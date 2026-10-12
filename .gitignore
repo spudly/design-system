@@ -1,0 +1,8 @@
+node_modules
+dist
+.turbo
+coverage
+.expo
+# Changesets: ignore generated version files, keep the README
+.changeset/*.md
+!.changeset/README.md
