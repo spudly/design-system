@@ -1,0 +1,68 @@
+{
+  "description": "Shared design system (tokens, themes, universal components) for Spudly apps: Eciperay and Memorize.",
+  "devDependencies": {
+    "@changesets/cli": "^2.29.4",
+    "@eslint/js": "^9.34.0",
+    "@types/react": "^19.1.0",
+    "eslint": "^9.34.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "jiti": "^2.7.0",
+    "lint-staged": "^16.1.6",
+    "prettier": "^3.6.2",
+    "react": "^19.1.0",
+    "react-native": "^0.81.0",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.41.0"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "exports": {
+    ".": {
+      "default": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "lint-staged": {
+    "*.{ts,tsx,js,cjs,mjs,json,md}": [
+      "prettier --write"
+    ],
+    "*.{ts,tsx}": [
+      "eslint --fix",
+      "bash -c 'npm run typecheck'"
+    ]
+  },
+  "main": "./dist/index.js",
+  "name": "@spudly/ui",
+  "packageManager": "npm@10.8.2",
+  "peerDependencies": {
+    "react": ">=18",
+    "react-native": ">=0.72"
+  },
+  "publishConfig": {
+    "access": "restricted",
+    "registry": "https://npm.pkg.github.com"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "changeset": "changeset",
+    "clean": "rm -rf dist",
+    "lint": "eslint src --max-warnings 0",
+    "lint:fix": "eslint src --fix",
+    "prepare": "husky",
+    "prepublishOnly": "npm run build",
+    "prettier": "prettier --write .",
+    "prettier:check": "prettier --check .",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "version": "0.1.0",
+  "dependencies": {
+    "tamagui": "^3.0.3"
+  }
+}
