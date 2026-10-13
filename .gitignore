@@ -4,6 +4,5 @@ storybook-static
 .turbo
 coverage
 .expo
-# Changesets: ignore generated version files, keep the README
-.changeset/*.md
-!.changeset/README.md
+# Changesets: changeset files are committed (they drive the release workflow)
+# Only the generated CHANGELOG artifacts are ignored, none currently apply
