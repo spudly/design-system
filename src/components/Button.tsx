@@ -6,7 +6,7 @@ const StyledButton = styled(TamaguiButton, {
   name: "SpudlyButton",
 
   // Base: token-driven styling only — no hardcoded colors, spacing, or radii.
-  backgroundColor: tokens.colors.primary.primary6,
+  backgroundColor: tokens.colors.primary.primary7,
   borderRadius: tokens.radii.md,
   borderWidth: 0,
   color: tokens.colors.gray.gray1,
@@ -18,7 +18,7 @@ const StyledButton = styled(TamaguiButton, {
   variants: {
     variant: {
       primary: {
-        backgroundColor: tokens.colors.primary.primary6,
+        backgroundColor: tokens.colors.primary.primary7,
         color: tokens.colors.gray.gray1,
       },
       secondary: {

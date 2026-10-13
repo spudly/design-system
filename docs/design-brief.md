@@ -1,6 +1,10 @@
 # Design Brief — @spudly/ui
 
-**Status:** Draft for review — nothing here is final until Stephen signs off.
+**Status:** ✅ Approved 2026-10-12 — E1 "Warm Harvest" for Eciperay, M1 "Quiet Dawn"
+for Memorize. Defaults adopted for the remaining questions: system font stacks
+for now (custom serif deferred), light theme first (dark follows),
+photography-forward for Eciperay. Visual directions in
+`docs/visual-directions/`; tokens finalized in `src/tokens/` + `src/themes/`.
 **Pipeline:** This brief → AI visual directions → finalized tokens → components → visual regression (Storybook is the source of truth; no Figma).
 
 ## 1. Purpose
