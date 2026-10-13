@@ -1,0 +1,68 @@
+import { Image as TamaguiImage, YStack, styled } from "tamagui";
+import type { GetProps } from "tamagui";
+import { tokens } from "../tokens/index.js";
+import { Text } from "./Text.js";
+
+const StyledImage = styled(TamaguiImage, {
+  name: "SpudlyAvatarImage",
+
+  borderRadius: tokens.radii.full,
+});
+
+const Fallback = styled(YStack, {
+  name: "SpudlyAvatarFallback",
+
+  backgroundColor: tokens.colors.primary.primary2,
+  borderRadius: tokens.radii.full,
+  alignItems: "center",
+  justifyContent: "center",
+});
+
+type StyledImageProps = GetProps<typeof StyledImage>;
+
+export interface AvatarProps extends Omit<StyledImageProps, "source"> {
+  src?: string;
+  /** Full name; used for the accessibility label and the initials fallback. */
+  name: string;
+  size?: number;
+}
+
+function initialsFor(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "";
+  if (words.length === 1) return words[0]!.slice(0, 2).toUpperCase();
+  return `${words[0]![0]}${words[words.length - 1]![0]}`.toUpperCase();
+}
+
+/**
+ * User avatar: image when `src` is provided, otherwise the person's initials
+ * (first letters of the first and last name words) on a primary-tinted
+ * circle. Exposed as an image with the name as its accessible label.
+ */
+export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
+  const dimensions = { width: size, height: size };
+  if (!src) {
+    return (
+      <Fallback style={dimensions} accessibilityRole="img" accessibilityLabel={name}>
+        <Text
+          style={{
+            color: tokens.colors.primary.primary8,
+            fontWeight: tokens.typography.fontWeight.semibold,
+            fontSize: Math.round(size * 0.4),
+          }}
+        >
+          {initialsFor(name)}
+        </Text>
+      </Fallback>
+    );
+  }
+  return (
+    <StyledImage
+      source={{ uri: src }}
+      style={dimensions}
+      accessibilityRole="img"
+      accessibilityLabel={name}
+      {...rest}
+    />
+  );
+}

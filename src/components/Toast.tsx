@@ -1,0 +1,94 @@
+import type { ReactNode } from "react";
+import { Toast as TamaguiToast, YStack, styled, toast } from "tamagui";
+import type { GetProps } from "tamagui";
+import { tokens } from "../tokens/index.js";
+import { Text } from "./Text.js";
+
+const ToastCard = styled(YStack, {
+  name: "SpudlyToast",
+
+  backgroundColor: tokens.colors.gray.gray10,
+  borderRadius: tokens.radii.md,
+  padding: tokens.spacing[3],
+  gap: tokens.spacing[1],
+  minWidth: 200,
+  maxWidth: 360,
+  shadowColor: tokens.shadows.md.shadowColor,
+  shadowOffset: tokens.shadows.md.shadowOffset,
+  shadowOpacity: tokens.shadows.md.shadowOpacity,
+  shadowRadius: tokens.shadows.md.shadowRadius,
+});
+
+type ToastCardProps = GetProps<typeof ToastCard>;
+
+export interface ToastProps extends ToastCardProps {
+  title?: string;
+  description?: ReactNode;
+}
+
+/**
+ * Toast notification card in design-system tokens. This same card is what
+ * `ToastProvider` renders for toasts fired via the `toast()` function
+ * (re-exported below from Tamagui). The card itself announces via
+ * `role="status"`.
+ */
+export function Toast({ title, description, ...rest }: ToastProps) {
+  return (
+    <ToastCard accessibilityRole="status" {...rest}>
+      {title ? (
+        <Text
+          style={{
+            color: tokens.colors.gray.gray1,
+            fontWeight: tokens.typography.fontWeight.semibold,
+          }}
+        >
+          {title}
+        </Text>
+      ) : null}
+      {description ? (
+        <Text
+          style={{
+            color: tokens.colors.gray.gray4,
+            fontSize: tokens.typography.fontSize.sm,
+          }}
+        >
+          {description}
+        </Text>
+      ) : null}
+    </ToastCard>
+  );
+}
+
+export interface ToastProviderProps {
+  children: ReactNode;
+}
+
+/**
+ * Sets up Tamagui's toast system: viewport plus the toast host, rendering
+ * each toast with the design-system `Toast` card (bottom position, 4s
+ * duration by default). Wrap the app root once, then fire toasts with the
+ * re-exported `toast()` function:
+ *
+ *   toast("Verse memorized!", { description: "Psalm 23:1" });
+ */
+export function ToastProvider({ children }: ToastProviderProps) {
+  return (
+    <>
+      {children}
+      <TamaguiToast.Viewport />
+      <TamaguiToast position="bottom-center" duration={4000}>
+        <TamaguiToast.List
+          renderItem={({ toast: t }) => (
+            <Toast
+              key={t.id}
+              {...(typeof t.title === "string" ? { title: t.title } : {})}
+              {...(typeof t.description === "string" ? { description: t.description } : {})}
+            />
+          )}
+        />
+      </TamaguiToast>
+    </>
+  );
+}
+
+export { toast };
