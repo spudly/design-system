@@ -1,6 +1,10 @@
 /**
- * Neutral starter color palette. PLACEHOLDER — the design direction
- * (design brief → AI visual directions) will replace these values.
+ * Color palette — finalized from the approved visual directions
+ * (E1 "Warm Harvest" for Eciperay, M1 "Quiet Dawn" for Memorize).
+ *
+ * Base ramps (gray, primary, success, warning, danger) are the neutral
+ * system set. `terracotta` and `teal` are brand hues for the Eciperay and
+ * Memorize themes respectively.
  *
  * Every value is a plain serializable string; no functions.
  */
@@ -75,4 +79,32 @@ export const danger = {
   danger10: "#7f1d1d",
 } as const;
 
-export const colors = { gray, primary, success, warning, danger } as const;
+/** 10-step terracotta ramp (light → dark). Eciperay brand hue. */
+export const terracotta = {
+  terracotta1: "#fff7ed",
+  terracotta2: "#ffedd5",
+  terracotta3: "#fed7aa",
+  terracotta4: "#fdba74",
+  terracotta5: "#fb923c",
+  terracotta6: "#ea580c",
+  terracotta7: "#c2410c",
+  terracotta8: "#9a3412",
+  terracotta9: "#7c2d12",
+  terracotta10: "#431407",
+} as const;
+
+/** 10-step deep teal ramp (light → dark). Memorize brand hue. */
+export const teal = {
+  teal1: "#f0fdfa",
+  teal2: "#ccfbf1",
+  teal3: "#99f6e4",
+  teal4: "#5eead4",
+  teal5: "#2dd4bf",
+  teal6: "#14b8a6",
+  teal7: "#0d9488",
+  teal8: "#0f766e",
+  teal9: "#115e59",
+  teal10: "#134e4a",
+} as const;
+
+export const colors = { gray, primary, success, warning, danger, terracotta, teal } as const;
