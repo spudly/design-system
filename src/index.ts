@@ -1,5 +1,5 @@
 export { tokens, type Tokens } from "./tokens/index.js";
 export { baseTheme, eciperayTheme, memorizeTheme } from "./themes/index.js";
 export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
-export { Button, type ButtonProps } from "./components/index.js";
+export * from "./components/index.js";
 export { tamaguiConfig, default as defaultTamaguiConfig } from "./tamagui.config.js";
