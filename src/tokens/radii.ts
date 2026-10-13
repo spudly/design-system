@@ -2,7 +2,7 @@
  * Border-radius scale in px. Every value is a plain serializable number.
  */
 export const radii = {
-  none: 0,
+  zero: 0,
   sm: 4,
   md: 8,
   lg: 12,
