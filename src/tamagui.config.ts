@@ -75,8 +75,21 @@ export const tamaguiConfig = createTamagui({
     },
     space: { ...tokens.spacing },
     size: { ...tokens.spacing },
-    radius: { ...tokens.radii },
-    zIndex: { base: 0, above: 10, modal: 100 },
+    // Tamagui requires radius/zIndex keys to be a subset of the size keys.
+    // Map our semantic radii onto the numeric size scale (0->0px, 1->4px,
+    // 2->8px, 3->12px, 4->16px, matching the 4px-base spacing scale).
+    radius: {
+      0: tokens.radii.zero,
+      1: tokens.radii.sm,
+      2: tokens.radii.md,
+      3: tokens.radii.lg,
+      4: tokens.radii.xl,
+    },
+    zIndex: {
+      0: 0, // base
+      1: 10, // above
+      2: 100, // modal
+    },
   },
   themes: {
     light: toTamaguiTheme(baseTheme.semantic, false),
