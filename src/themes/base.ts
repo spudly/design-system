@@ -30,4 +30,5 @@ export const baseTheme = {
 } as const;
 
 export type Theme = typeof baseTheme;
-export type SemanticColors = typeof semantic;
+/** Widened semantic color roles (no literal types) so themes can override values. */
+export type SemanticColors = { [K in keyof typeof semantic]: string };
