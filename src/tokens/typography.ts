@@ -1,12 +1,14 @@
 /**
- * Typography tokens. PLACEHOLDER values — the design direction will finalize
- * the type scale and font families.
+ * Typography tokens — finalized per the approved visual directions
+ * (serif display/verse type for Eciperay + Memorize, system sans for UI).
  *
  * Every value is a plain serializable string or number; no functions.
  */
 export const fontFamily = {
   /** Default UI font stack (system). */
   sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+  /** Serif stack for display titles and verse/reading text (system serif). */
+  serif: "Georgia, 'Times New Roman', serif",
   /** Monospace stack for code / tabular content. */
   mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 } as const;
