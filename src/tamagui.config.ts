@@ -1,7 +1,7 @@
 import { createAnimations } from "@tamagui/animations-css/extras";
 import { createTamagui } from "tamagui";
 import { tokens } from "./tokens/index.js";
-import { baseTheme, type SemanticColors } from "./themes/base.js";
+import { baseTheme, eciperayTheme, memorizeTheme, type SemanticColors } from "./themes/index.js";
 
 const animations = createAnimations({
   fast: {
@@ -58,22 +58,6 @@ function toTamaguiTheme(semantic: SemanticColors, dark: boolean) {
   };
 }
 
-const darkSemantic: SemanticColors = {
-  background: tokens.colors.gray.gray10,
-  surface: tokens.colors.gray.gray9,
-  text: tokens.colors.gray.gray1,
-  textMuted: tokens.colors.gray.gray5,
-  border: tokens.colors.gray.gray7,
-  primary: baseTheme.semantic.primary,
-  primaryHover: baseTheme.semantic.primaryHover,
-  primaryActive: baseTheme.semantic.primaryActive,
-  onPrimary: baseTheme.semantic.onPrimary,
-  accent: baseTheme.semantic.accent,
-  success: baseTheme.semantic.success,
-  warning: baseTheme.semantic.warning,
-  danger: baseTheme.semantic.danger,
-};
-
 /**
  * Tamagui configuration wiring the design-system tokens in.
  *
@@ -83,43 +67,72 @@ const darkSemantic: SemanticColors = {
  * while the config below additionally exposes `$token` shorthands for
  * app-level styling.
  *
+ * Use `createTamaguiConfig(theme)` to build a config for a specific app
+ * theme (e.g. eciperayTheme, memorizeTheme). The default `tamaguiConfig`
+ * uses the brand-neutral baseTheme.
+ *
  * NOTE: media breakpoints and font configs are intentionally minimal here;
- * they grow with the first real design direction. Theme values are
- * placeholders pending the design brief.
+ * they grow with the first real design direction.
  */
-export const tamaguiConfig = createTamagui({
-  animations,
-  tokens: {
-    color: {
-      ...tokens.colors.gray,
-      ...tokens.colors.primary,
-      ...tokens.colors.success,
-      ...tokens.colors.warning,
-      ...tokens.colors.danger,
+export function createTamaguiConfig(theme: { semantic: SemanticColors }) {
+  const darkSemantic: SemanticColors = {
+    background: tokens.colors.gray.gray10,
+    surface: tokens.colors.gray.gray9,
+    text: tokens.colors.gray.gray1,
+    textMuted: tokens.colors.gray.gray5,
+    border: tokens.colors.gray.gray7,
+    primary: theme.semantic.primary,
+    primaryHover: theme.semantic.primaryHover,
+    primaryActive: theme.semantic.primaryActive,
+    onPrimary: theme.semantic.onPrimary,
+    accent: theme.semantic.accent,
+    success: theme.semantic.success,
+    warning: theme.semantic.warning,
+    danger: theme.semantic.danger,
+  };
+
+  return createTamagui({
+    animations,
+    tokens: {
+      color: {
+        ...tokens.colors.gray,
+        ...tokens.colors.primary,
+        ...tokens.colors.success,
+        ...tokens.colors.warning,
+        ...tokens.colors.danger,
+      },
+      space: { ...tokens.spacing },
+      size: { ...tokens.spacing },
+      // Tamagui requires radius/zIndex keys to be a subset of the size keys.
+      // Map our semantic radii onto the numeric size scale (0->0px, 1->4px,
+      // 2->8px, 3->12px, 4->16px, matching the 4px-base spacing scale).
+      radius: {
+        0: tokens.radii.zero,
+        1: tokens.radii.sm,
+        2: tokens.radii.md,
+        3: tokens.radii.lg,
+        4: tokens.radii.xl,
+      },
+      zIndex: {
+        0: 0, // base
+        1: 10, // above
+        2: 100, // modal
+      },
     },
-    space: { ...tokens.spacing },
-    size: { ...tokens.spacing },
-    // Tamagui requires radius/zIndex keys to be a subset of the size keys.
-    // Map our semantic radii onto the numeric size scale (0->0px, 1->4px,
-    // 2->8px, 3->12px, 4->16px, matching the 4px-base spacing scale).
-    radius: {
-      0: tokens.radii.zero,
-      1: tokens.radii.sm,
-      2: tokens.radii.md,
-      3: tokens.radii.lg,
-      4: tokens.radii.xl,
+    themes: {
+      light: toTamaguiTheme(theme.semantic, false),
+      dark: toTamaguiTheme(darkSemantic, true),
     },
-    zIndex: {
-      0: 0, // base
-      1: 10, // above
-      2: 100, // modal
-    },
-  },
-  themes: {
-    light: toTamaguiTheme(baseTheme.semantic, false),
-    dark: toTamaguiTheme(darkSemantic, true),
-  },
-});
+  });
+}
+
+export const tamaguiConfig = createTamaguiConfig(baseTheme);
+
+/** Pre-built Tamagui config using the Eciperay "Warm Harvest" theme. */
+export const eciperayTamaguiConfig = createTamaguiConfig(eciperayTheme);
+
+/** Pre-built Tamagui config using the Memorize "Quiet Dawn" theme. */
+export const memorizeTamaguiConfig = createTamaguiConfig(memorizeTheme);
 
 export default tamaguiConfig;
 
