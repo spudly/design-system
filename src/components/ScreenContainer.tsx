@@ -35,7 +35,7 @@ export function ScreenContainer({ scrollable = true, children, ...rest }: Screen
       $platform-web={{
         display: "flex",
         flexDirection: "column",
-        minHeight: "100vh",
+        minHeight: "100%",
       }}
     >
       {content}
