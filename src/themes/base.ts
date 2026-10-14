@@ -15,6 +15,10 @@ const semantic = {
   primaryHover: tokens.colors.primary.primary8,
   primaryActive: tokens.colors.primary.primary9,
   onPrimary: "#ffffff",
+  /** Light tint of primary for subtle backgrounds (badges, alerts). */
+  primarySubtle: tokens.colors.primary.primary2,
+  /** Dark primary for text on light backgrounds. */
+  primaryEmphasis: tokens.colors.primary.primary8,
   /** Secondary brand accent (per-theme: sage for Eciperay, gold for Memorize). */
   accent: tokens.colors.primary.primary5,
   success: tokens.colors.success.success6,

@@ -5,11 +5,13 @@ import { tokens } from "../tokens/index.js";
 const StyledButton = styled(TamaguiButton, {
   name: "SpudlyButton",
 
-  // Base: token-driven styling only — no hardcoded colors, spacing, or radii.
-  backgroundColor: tokens.colors.primary.primary7,
+  // Base: theme-aware styling — uses $primary/$onPrimary from the active
+  // Tamagui theme (e.g. terracotta for Eciperay Warm Harvest), not the raw
+  // brand-neutral primary ramp.
+  backgroundColor: "$primary",
   borderRadius: tokens.radii.md,
   borderWidth: 0,
-  color: tokens.colors.gray.gray1,
+  color: "$onPrimary",
   fontSize: tokens.typography.fontSize.md,
   fontWeight: tokens.typography.fontWeight.semibold,
   paddingHorizontal: tokens.spacing[4],
@@ -18,8 +20,8 @@ const StyledButton = styled(TamaguiButton, {
   variants: {
     variant: {
       primary: {
-        backgroundColor: tokens.colors.primary.primary7,
-        color: tokens.colors.gray.gray1,
+        backgroundColor: "$primary",
+        color: "$onPrimary",
       },
       secondary: {
         backgroundColor: tokens.colors.gray.gray3,
@@ -27,7 +29,7 @@ const StyledButton = styled(TamaguiButton, {
       },
       ghost: {
         backgroundColor: "transparent",
-        color: tokens.colors.primary.primary7,
+        color: "$primary",
       },
     },
     size: {

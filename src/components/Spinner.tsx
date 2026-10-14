@@ -14,7 +14,7 @@ export interface SpinnerProps extends TamaguiSpinnerProps {
  */
 export function Spinner({
   label = "Loading",
-  color = tokens.colors.primary.primary7,
+  color = "$primary",
   ...rest
 }: SpinnerProps) {
   return <TamaguiSpinner color={color} aria-label={label} {...rest} />;
