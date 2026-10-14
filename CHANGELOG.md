@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 0.4.1
+
+### Patch Changes
+
+- ffbabe8: Fix components using hardcoded blue primary ramp instead of theme: Button, Badge, InlineAlert, Spinner, and ProgressBar now use $primary/$onPrimary/$primarySubtle/$primaryEmphasis theme values. Added primarySubtle and primaryEmphasis semantic roles to base and eciperay themes.
+
 ## 0.4.0
 
 ### Minor Changes
