@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 0.4.0
+
+### Minor Changes
+
+- 52b223a: Add theme-specific Tamagui configs: createTamaguiConfig(theme) factory plus pre-built eciperayTamaguiConfig (Warm Harvest) and memorizeTamaguiConfig (Quiet Dawn). The default tamaguiConfig still uses the brand-neutral baseTheme.
+
 ## 0.3.6
 
 ### Patch Changes
