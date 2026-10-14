@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 0.3.5
+
+### Patch Changes
+
+- c7146ca: Fix ScreenContainer on web: make ScrollView a flex column with minHeight 100vh so it fills the viewport even when the parent is not a flex container
+
 ## 0.3.4
 
 ### Patch Changes
