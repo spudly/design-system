@@ -6,6 +6,7 @@ const StyledContent = styled(YStack, {
   name: "SpudlyScreenContainer",
 
   flex: 1,
+  minHeight: "100%",
   paddingHorizontal: tokens.spacing[4],
   paddingVertical: tokens.spacing[4],
   gap: tokens.spacing[4],
@@ -28,5 +29,5 @@ export function ScreenContainer({ scrollable = true, children, ...rest }: Screen
   if (!scrollable) {
     return content;
   }
-  return <ScrollView>{content}</ScrollView>;
+  return <ScrollView flex={1}>{content}</ScrollView>;
 }
