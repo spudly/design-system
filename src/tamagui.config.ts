@@ -1,4 +1,4 @@
-import { createAnimations } from "@tamagui/animations-css";
+import { createAnimations } from "@tamagui/animations-css/extras";
 import { createTamagui } from "tamagui";
 import { tokens } from "./tokens/index.js";
 import { baseTheme, type SemanticColors } from "./themes/base.js";
