@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 0.3.1
+
+### Patch Changes
+
+- 76f933b: Add animations configuration to tamaguiConfig (required by Tamagui components that use animations, e.g. Sheet)
+
 ## 0.3.0
 
 ### Minor Changes
