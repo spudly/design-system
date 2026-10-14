@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 0.3.6
+
+### Patch Changes
+
+- 2c916c8: Fix ScreenContainer on web: use minHeight 100% (fills parent) instead of 100vh (viewport), so nested usage doesn't force viewport height
+
 ## 0.3.5
 
 ### Patch Changes

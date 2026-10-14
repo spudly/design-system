@@ -65,7 +65,7 @@
   },
   "type": "module",
   "types": "./dist/index.d.ts",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "dependencies": {
     "@tamagui/animations-css": "^3.0.3",
     "tamagui": "^3.0.3"
