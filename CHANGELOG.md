@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 0.3.4
+
+### Patch Changes
+
+- fd77175: Fix ScreenContainer collapsing on web: add minHeight 100% to content and flex:1 to ScrollView wrapper
+
 ## 0.3.3
 
 ### Patch Changes
