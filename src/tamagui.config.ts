@@ -1,6 +1,27 @@
+import { createAnimations } from "@tamagui/animations-react-native";
 import { createTamagui } from "tamagui";
 import { tokens } from "./tokens/index.js";
 import { baseTheme, type SemanticColors } from "./themes/base.js";
+
+const animations = createAnimations({
+  fast: {
+    type: "spring",
+    damping: 20,
+    mass: 1.2,
+    stiffness: 250,
+  },
+  medium: {
+    type: "spring",
+    damping: 10,
+    mass: 0.9,
+    stiffness: 100,
+  },
+  slow: {
+    type: "spring",
+    damping: 20,
+    stiffness: 60,
+  },
+});
 
 /**
  * Convert our semantic color roles into a Tamagui theme object.
@@ -67,6 +88,7 @@ const darkSemantic: SemanticColors = {
  * placeholders pending the design brief.
  */
 export const tamaguiConfig = createTamagui({
+  animations,
   tokens: {
     color: {
       ...tokens.colors.gray,
