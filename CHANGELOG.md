@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 0.3.3
+
+### Patch Changes
+
+- 3b1e9f8: Import createAnimations from @tamagui/animations-css/extras to include animated-number hooks
+
 ## 0.3.2
 
 ### Patch Changes
