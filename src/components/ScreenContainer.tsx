@@ -29,5 +29,16 @@ export function ScreenContainer({ scrollable = true, children, ...rest }: Screen
   if (!scrollable) {
     return content;
   }
-  return <ScrollView flex={1}>{content}</ScrollView>;
+  return (
+    <ScrollView
+      flex={1}
+      $platform-web={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+      }}
+    >
+      {content}
+    </ScrollView>
+  );
 }
