@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 0.3.2
+
+### Patch Changes
+
+- a2a20ea: Use @tamagui/animations-css instead of @tamagui/animations-react-native for cross-platform compatibility (the RN driver crashes on web)
+
 ## 0.3.1
 
 ### Patch Changes
