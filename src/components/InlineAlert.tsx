@@ -5,9 +5,9 @@ import { Text } from "./Text.js";
 
 const severityStyles = {
   info: {
-    background: tokens.colors.primary.primary1,
-    border: tokens.colors.primary.primary4,
-    text: tokens.colors.primary.primary8,
+    background: "$primarySubtle",
+    border: "$primary",
+    text: "$primaryEmphasis",
   },
   success: {
     background: tokens.colors.success.success1,

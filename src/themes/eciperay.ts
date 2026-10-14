@@ -20,6 +20,8 @@ export const eciperayTheme = {
     primaryHover: tokens.colors.terracotta.terracotta8,
     primaryActive: tokens.colors.terracotta.terracotta9,
     onPrimary: tokens.colors.terracotta.terracotta1,
+    primarySubtle: tokens.colors.terracotta.terracotta2,
+    primaryEmphasis: tokens.colors.terracotta.terracotta8,
     accent: "#5f6f52",
   },
   tokens: {

@@ -14,7 +14,7 @@ const StyledTrack = styled(TamaguiProgress, {
 const StyledIndicator = styled(TamaguiProgress.Indicator, {
   name: "SpudlyProgressBarIndicator",
 
-  backgroundColor: tokens.colors.primary.primary7,
+  backgroundColor: "$primary",
   height: "100%",
 });
 

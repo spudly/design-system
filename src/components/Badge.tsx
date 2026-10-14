@@ -9,8 +9,8 @@ const toneStyles = {
     text: tokens.colors.gray.gray8,
   },
   info: {
-    background: tokens.colors.primary.primary2,
-    text: tokens.colors.primary.primary8,
+    background: "$primarySubtle",
+    text: "$primaryEmphasis",
   },
   success: {
     background: tokens.colors.success.success2,
