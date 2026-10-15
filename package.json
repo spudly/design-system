@@ -14,7 +14,7 @@
     "react": "^19.1.0",
     "react-native": "^0.81.0",
     "storybook": "^10.6.2",
-    "typescript": "^5.9.2",
+    "typescript": "^7.0.2",
     "typescript-eslint": "^8.41.0"
   },
   "engines": {
