@@ -1,6 +1,5 @@
 import { Spinner as TamaguiSpinner } from "tamagui";
 import type { GetProps } from "tamagui";
-import { tokens } from "../tokens/index.js";
 
 type TamaguiSpinnerProps = GetProps<typeof TamaguiSpinner>;
 
