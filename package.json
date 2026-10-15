@@ -1,7 +1,7 @@
 {
   "description": "Shared design system (tokens, themes, universal components) for Spudly apps: Eciperay and Memorize.",
   "devDependencies": {
-    "@changesets/cli": "^2.29.4",
+    "@changesets/cli": "^3.0.3",
     "@eslint/js": "^9.34.0",
     "@storybook/react-vite": "^10.6.2",
     "@types/react": "^19.1.0",
