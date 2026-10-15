@@ -12,7 +12,7 @@
     "lint-staged": "^16.1.6",
     "prettier": "^3.6.2",
     "react": "^19.1.0",
-    "react-native": "^0.81.0",
+    "react-native": "^0.87.1",
     "storybook": "^10.6.2",
     "typescript": "^5.9.2",
     "typescript-eslint": "^8.41.0"
