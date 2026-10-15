@@ -1,21 +1,21 @@
 {
   "description": "Shared design system (tokens, themes, universal components) for Spudly apps: Eciperay and Memorize.",
   "devDependencies": {
-    "@changesets/cli": "^2.29.4",
-    "@eslint/js": "^9.34.0",
+    "@changesets/cli": "^3.0.3",
+    "@eslint/js": "^10.0.1",
     "@storybook/react-vite": "^10.6.2",
-    "@types/react": "^19.1.0",
-    "eslint": "^9.34.0",
+    "@types/react": "^19.3.0",
+    "eslint": "^10.12.0",
     "eslint-config-prettier": "^10.1.8",
     "husky": "^9.1.7",
     "jiti": "^2.7.0",
-    "lint-staged": "^16.1.6",
-    "prettier": "^3.6.2",
-    "react": "^19.1.0",
-    "react-native": "^0.81.0",
+    "lint-staged": "^17.6.0",
+    "prettier": "^3.9.10",
+    "react": "^19.3.1",
+    "react-native": "^0.88.0",
     "storybook": "^10.6.2",
     "typescript": "^5.9.2",
-    "typescript-eslint": "^8.41.0"
+    "typescript-eslint": "^8.71.2"
   },
   "engines": {
     "node": ">=22"
@@ -67,7 +67,7 @@
   "types": "./dist/index.d.ts",
   "version": "0.4.1",
   "dependencies": {
-    "@tamagui/animations-css": "^3.0.3",
-    "tamagui": "^3.0.3"
+    "@tamagui/animations-css": "^3.0.15",
+    "tamagui": "^3.0.15"
   }
 }
