@@ -19,11 +19,19 @@ const semantic = {
   primarySubtle: tokens.colors.primary.primary2,
   /** Dark primary for text on light backgrounds. */
   primaryEmphasis: tokens.colors.primary.primary8,
+  /** Link foreground on light backgrounds/surfaces (AA as text). */
+  link: tokens.colors.primary.primary8,
+  /** Link foreground in dark themes: a lightened step that keeps AA contrast on the dark background/surface. */
+  linkDark: tokens.colors.primary.primary5,
   /** Secondary brand accent (per-theme: sage for Eciperay, gold for Memorize). */
   accent: tokens.colors.primary.primary5,
   success: tokens.colors.success.success6,
   warning: tokens.colors.warning.warning6,
   danger: tokens.colors.danger.danger6,
+  /** Error/validation text foreground on light backgrounds (AA as text). */
+  errorText: tokens.colors.danger.danger7,
+  /** Error text in dark themes: a lightened danger step that keeps AA contrast on the dark background/surface. */
+  errorTextDark: tokens.colors.danger.danger5,
 } as const;
 
 /**

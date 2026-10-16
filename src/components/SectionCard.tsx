@@ -13,6 +13,8 @@ export interface SectionCardProps extends CardProps {
 /**
  * Titled card section: a Card with a subheading title row and spacing below
  * it. Pass `action` for a trailing header element such as an Edit button.
+ * Appearance comes from Card's `variant` prop ("default" | "bordered" |
+ * "muted" | "elevated"), passed through via {@link SectionCardProps}.
  */
 export function SectionCard({ title, action, children, ...rest }: SectionCardProps) {
   return (

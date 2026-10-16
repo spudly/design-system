@@ -6,9 +6,9 @@ import { Text } from "./Text.js";
 const SecretBox = styled(XStack, {
   name: "SpudlySecretBox",
 
-  backgroundColor: tokens.colors.gray.gray2,
+  backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: tokens.colors.gray.gray4,
+  borderColor: "$borderColor",
   borderRadius: tokens.radii.md,
   padding: tokens.spacing[3],
   alignItems: "center",

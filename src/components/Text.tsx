@@ -5,7 +5,7 @@ import { tokens } from "../tokens/index.js";
 const StyledText = styled(TamaguiText, {
   name: "SpudlyText",
 
-  color: tokens.colors.gray.gray10,
+  color: "$color",
   fontSize: tokens.typography.fontSize.md,
 
   variants: {
@@ -23,11 +23,11 @@ const StyledText = styled(TamaguiText, {
       },
       hint: {
         fontSize: tokens.typography.fontSize.sm,
-        color: tokens.colors.gray.gray6,
+        color: "$textMuted",
       },
       error: {
         fontSize: tokens.typography.fontSize.sm,
-        color: tokens.colors.danger.danger7,
+        color: "$errorText",
       },
       verse: {
         fontSize: tokens.typography.fontSize.lg,

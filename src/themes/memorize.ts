@@ -21,6 +21,8 @@ export const memorizeTheme = {
     primaryHover: tokens.colors.teal.teal9,
     primaryActive: tokens.colors.teal.teal10,
     onPrimary: tokens.colors.teal.teal1,
+    link: tokens.colors.teal.teal8,
+    linkDark: tokens.colors.teal.teal6,
     accent: "#b45309",
   },
   tokens: {
