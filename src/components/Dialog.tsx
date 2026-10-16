@@ -13,7 +13,7 @@ const StyledOverlay = styled(TamaguiDialog.Overlay, {
 const StyledContent = styled(TamaguiDialog.Content, {
   name: "SpudlyDialogContent",
 
-  backgroundColor: "#ffffff",
+  backgroundColor: "$surface",
   borderRadius: tokens.radii.lg,
   padding: tokens.spacing[5],
   width: "90%",
@@ -46,7 +46,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
             <TamaguiDialog.Title
               fontSize={tokens.typography.fontSize.xl}
               fontWeight={tokens.typography.fontWeight.semibold}
-              color={tokens.colors.gray.gray10}
+              color="$color"
             >
               {title}
             </TamaguiDialog.Title>

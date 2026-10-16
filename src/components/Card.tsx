@@ -58,13 +58,17 @@ export interface CardProps extends StyledCardProps {
  * from `variant` (see {@link CardProps}); the legacy `elevated` boolean maps
  * to `variant="elevated"` when no variant is given.
  */
-export function Card({ variant, elevated = false, ...rest }: CardProps) {
+export function Card({ variant, elevated = false, style, ...rest }: CardProps) {
   const resolvedVariant = variant ?? (elevated ? "elevated" : "default");
   // Android shadow for the elevated variant: `elevation` comes from the same
   // shadow token as the iOS shadow props above and is applied via `style`,
   // because Tamagui v3's styled() typing accepts it in neither the static
-  // config nor this component's props.
-  const style =
-    resolvedVariant === "elevated" ? { elevation: tokens.shadows.md.elevation } : undefined;
-  return <StyledCard variant={resolvedVariant} style={style} {...rest} />;
+  // config nor this component's props. It is merged under the caller's style
+  // so unrelated caller styles preserve the shadow and an explicit caller
+  // elevation wins.
+  const mergedStyle = Object.assign(
+    resolvedVariant === "elevated" ? { elevation: tokens.shadows.md.elevation } : {},
+    style,
+  );
+  return <StyledCard variant={resolvedVariant} style={mergedStyle} {...rest} />;
 }

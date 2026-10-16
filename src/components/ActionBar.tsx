@@ -55,16 +55,12 @@ export interface ActionBarProps extends StyledActionBarProps {
  * with consistent gaps — compose rows with XStack. All colors come from
  * semantic theme tokens; the border sits on the bar's inner edge.
  */
-export function ActionBar({ placement = "bottom", ...rest }: ActionBarProps) {
+export function ActionBar({ placement = "bottom", style, ...rest }: ActionBarProps) {
   // Android shadow: `elevation` comes from the same lg shadow token as the
   // iOS shadow props above and is applied via `style`, because Tamagui v3's
   // styled() typing accepts it in neither the static config nor this
-  // component's props.
-  return (
-    <StyledActionBar
-      placement={placement}
-      style={{ elevation: tokens.shadows.lg.elevation }}
-      {...rest}
-    />
-  );
+  // component's props. It is merged under the caller's style so unrelated
+  // caller styles preserve the shadow and an explicit caller elevation wins.
+  const mergedStyle = Object.assign({ elevation: tokens.shadows.lg.elevation }, style);
+  return <StyledActionBar placement={placement} style={mergedStyle} {...rest} />;
 }
