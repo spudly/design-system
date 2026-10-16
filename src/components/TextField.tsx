@@ -9,7 +9,12 @@ const StyledInput = styled(TamaguiInput, {
 
   backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: "$borderColor",
+  // Input boundaries are functional, not decorative: WCAG 1.4.11 asks
+  // ≥3:1 against adjacent colors. $borderColor falls to 1.2:1 in light
+  // mode and 1.9–2.3:1 in dark, so field borders use $textMuted, which
+  // holds ≥4.5:1 against both the page background and the $surface fill
+  // in every brand and mode.
+  borderColor: "$textMuted",
   borderRadius: tokens.radii.md,
   paddingHorizontal: tokens.spacing[3],
   minHeight: 44,

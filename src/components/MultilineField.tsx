@@ -9,7 +9,9 @@ const StyledTextArea = styled(TamaguiTextArea, {
 
   backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: "$borderColor",
+  // $textMuted, not $borderColor: input boundaries need ≥3:1 against
+  // adjacent colors (WCAG 1.4.11) in both modes — see TextField.
+  borderColor: "$textMuted",
   borderRadius: tokens.radii.md,
   paddingHorizontal: tokens.spacing[3],
   paddingVertical: tokens.spacing[3],

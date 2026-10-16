@@ -55,6 +55,10 @@ export function Tabs({ tabs, value, onValueChange }: TabsProps) {
       <StyledList>
         {tabs.map((tab) => (
           <StyledTab key={tab.value} value={tab.value} active={tab.value === value}>
+            {/* Selected label uses $link, not $primaryEmphasis:
+                $primaryEmphasis has no dark variant and drops to
+                ~2.3:1 on dark backgrounds, while the dark-aware $link
+                holds ≥5:1 in every brand and mode. */}
             <Text
               variant="body"
               style={{
@@ -62,7 +66,7 @@ export function Tabs({ tabs, value, onValueChange }: TabsProps) {
                   tab.value === value
                     ? tokens.typography.fontWeight.semibold
                     : tokens.typography.fontWeight.regular,
-                color: tab.value === value ? "$primaryEmphasis" : "$textMuted",
+                color: tab.value === value ? "$link" : "$textMuted",
               }}
             >
               {tab.label}

@@ -9,7 +9,9 @@ const StyledContainer = styled(XStack, {
 
   backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: "$borderColor",
+  // $textMuted, not $borderColor: input boundaries need ≥3:1 against
+  // adjacent colors (WCAG 1.4.11) in both modes — see TextField.
+  borderColor: "$textMuted",
   borderRadius: tokens.radii.md,
   paddingLeft: tokens.spacing[3],
   paddingRight: tokens.spacing[1],

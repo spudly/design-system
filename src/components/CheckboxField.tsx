@@ -77,8 +77,11 @@ export function CheckboxField({
           aria-describedby={error ? errorId : undefined}
           {...rest}
         >
+          {/* Unchecked border is $textMuted, not $borderColor: the box
+              boundary needs ≥3:1 against adjacent colors (WCAG 1.4.11)
+              in both modes — see TextField. Checked stays $primary. */}
           <StyledBox
-            borderColor={checked ? "$primary" : "$borderColor"}
+            borderColor={checked ? "$primary" : "$textMuted"}
             backgroundColor={checked ? "$primary" : "$surface"}
           >
             <TamaguiCheckbox.Indicator>

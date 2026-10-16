@@ -90,8 +90,10 @@ export function RadioOptionGroup({
                     // minimum in dark mode (border 2.85:1 against the base
                     // dark background), while $link holds ≥5:1 against both
                     // the circle's $surface and the page background in every
-                    // brand and mode.
-                    borderColor={selected ? "$link" : "$borderColor"}
+                    // brand and mode. The UNSELECTED border is $textMuted,
+                    // not $borderColor: as an input boundary it needs the
+                    // same ≥3:1 (WCAG 1.4.11) in both modes — see TextField.
+                    borderColor={selected ? "$link" : "$textMuted"}
                     backgroundColor="$surface"
                     alignItems="center"
                     justifyContent="center"

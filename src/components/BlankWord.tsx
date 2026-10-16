@@ -80,8 +80,13 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
         {/* The word itself, invisible: identical metrics to the revealed
             state is what guarantees zero layout shift. aria-hidden keeps
             the answer out of the accessibility tree (the button's label
-            carries the meaning), and userSelect keeps it un-copyable. */}
-        <Text variant="verse" aria-hidden opacity={0} userSelect="none">
+            carries the meaning), and userSelect keeps it un-copyable.
+            fontWeight pins the sizing text to the surrounding sentence's
+            weight: the revealed word inherits that weight, so the hidden
+            state must too — the Button's own semibold label styling must
+            never reach this text, or the wider semibold glyphs would size
+            the blank wider than the word that replaces it. */}
+        <Text variant="verse" aria-hidden opacity={0} userSelect="none" fontWeight="inherit">
           {word}
         </Text>
         {/* The blank line, overlaid across the word's width. */}
