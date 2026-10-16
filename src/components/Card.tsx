@@ -63,12 +63,13 @@ export function Card({ variant, elevated = false, style, ...rest }: CardProps) {
   // Android shadow for the elevated variant: `elevation` comes from the same
   // shadow token as the iOS shadow props above and is applied via `style`,
   // because Tamagui v3's styled() typing accepts it in neither the static
-  // config nor this component's props. It is merged under the caller's style
-  // so unrelated caller styles preserve the shadow and an explicit caller
-  // elevation wins.
-  const mergedStyle = Object.assign(
-    resolvedVariant === "elevated" ? { elevation: tokens.shadows.md.elevation } : {},
+  // config nor this component's props. It is composed as a style array under
+  // the caller's style (React Native flattens arrays left to right), so
+  // unrelated caller styles — including caller style arrays — preserve the
+  // shadow and an explicit caller elevation wins.
+  const composedStyle = [
+    resolvedVariant === "elevated" ? { elevation: tokens.shadows.md.elevation } : undefined,
     style,
-  );
-  return <StyledCard variant={resolvedVariant} style={mergedStyle} {...rest} />;
+  ];
+  return <StyledCard variant={resolvedVariant} style={composedStyle} {...rest} />;
 }

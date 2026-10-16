@@ -23,7 +23,7 @@ const StyledText = styled(TamaguiText, {
       },
       hint: {
         fontSize: tokens.typography.fontSize.sm,
-        color: tokens.colors.gray.gray6,
+        color: "$textMuted",
       },
       error: {
         fontSize: tokens.typography.fontSize.sm,
