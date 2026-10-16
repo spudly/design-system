@@ -31,10 +31,24 @@ export interface TextLinkProps extends Omit<StyledTextLinkProps, "onPress"> {
  * adjusted through the usual Tamagui text props.
  */
 export function TextLink({ onPress, children, ...rest }: TextLinkProps) {
+  // Web keyboard support: with no href, link semantics alone do not make
+  // the text keyboard-operable, so it is made focusable and Enter (the link
+  // activation key) invokes the same callback as a press. `tabIndex` and
+  // `onKeyDown` are web-only props in Tamagui and are ignored on native,
+  // where onPress is the activation path. A caller's own tabIndex/onKeyDown
+  // (via rest) overrides these defaults.
+  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      onPress();
+    }
+  };
   return (
     <StyledTextLink
       accessibilityRole="link"
       onPress={onPress}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
       $platform-web={{ cursor: "pointer" }}
       {...rest}
     >

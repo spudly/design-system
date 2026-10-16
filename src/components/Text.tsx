@@ -27,7 +27,7 @@ const StyledText = styled(TamaguiText, {
       },
       error: {
         fontSize: tokens.typography.fontSize.sm,
-        color: tokens.colors.danger.danger7,
+        color: "$errorText",
       },
       verse: {
         fontSize: tokens.typography.fontSize.lg,

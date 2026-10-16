@@ -28,6 +28,10 @@ const semantic = {
   success: tokens.colors.success.success6,
   warning: tokens.colors.warning.warning6,
   danger: tokens.colors.danger.danger6,
+  /** Error/validation text foreground on light backgrounds (AA as text). */
+  errorText: tokens.colors.danger.danger7,
+  /** Error text in dark themes: a lightened danger step that keeps AA contrast on the dark background/surface. */
+  errorTextDark: tokens.colors.danger.danger5,
 } as const;
 
 /**
