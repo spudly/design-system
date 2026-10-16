@@ -31,9 +31,12 @@ export interface StepDotsProps extends Omit<StyledDotProps, "active"> {
 }
 
 /**
- * Dot row showing position in a sequence — step progress, streaks, drill
- * rounds. Non-interactive: the container carries `progressbar` semantics with
- * the current step, and individual dots are hidden from assistive tech.
+ * Dot row showing progress through a sequence — step progress, streaks,
+ * drill rounds. Dots up to and including the current step are filled
+ * (completed steps plus the current one), so a streak or a half-finished
+ * flow reads as accumulated progress, not a single marker. Non-interactive:
+ * the container carries `progressbar` semantics with the current step, and
+ * individual dots are hidden from assistive tech.
  */
 export function StepDots({ count, activeIndex, label, ...rest }: StepDotsProps) {
   const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(count - 1, 0));
@@ -48,7 +51,7 @@ export function StepDots({ count, activeIndex, label, ...rest }: StepDotsProps) 
       {...rest}
     >
       {Array.from({ length: count }, (_, i) => (
-        <StyledDot key={i} active={i === safeIndex} aria-hidden />
+        <StyledDot key={i} active={i <= safeIndex} aria-hidden />
       ))}
     </XStack>
   );

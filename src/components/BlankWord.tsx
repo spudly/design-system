@@ -17,7 +17,9 @@ export interface BlankWordProps {
 /**
  * Fill-in-the-blank word for memorization drills. While hidden this is a
  * genuine keyboard-focusable button (not a div with onClick) labeled
- * "Reveal blank word N of M", with a visible focus ring. Once revealed it
+ * "Reveal blank word N of M"; focus is indicated by the blank line
+ * changing color (deliberately no focus ring — a ring flashes on pointer
+ * click in the instant before the word reveals). Once revealed it
  * becomes plain text labeled "Revealed: <word>" so the state change is
  * announced.
  *
@@ -88,13 +90,6 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
       // here), so it never reaches the frame — verified in SSR output.
       // The style prop lands on the frame element itself.
       style={inheritWeight ? { fontWeight: inheritWeight } : undefined}
-      outlineWidth={focused ? 2 : 0}
-      outlineStyle="solid"
-      // $link is the interactive-affordance role: same value as $primary
-      // in the light themes, a brighter step in dark (where $primary
-      // drops under 3:1 against the dark background).
-      outlineColor="$link"
-      outlineOffset={2}
       accessibilityLabel={`Reveal blank word ${index + 1} of ${total}`}
     >
       <View position="relative">
@@ -115,7 +110,10 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
         <Text variant="verse" aria-hidden opacity={0} userSelect="none" fontWeight={inheritWeight}>
           {word}
         </Text>
-        {/* The blank line, overlaid across the word's width. */}
+        {/* The blank line, overlaid across the word's width. It is also
+            the focus indicator: $link at rest, $color (the theme's main
+            text color — maximally visible against the background in both
+            modes) while the button is focused. */}
         <View
           aria-hidden
           position="absolute"
@@ -124,7 +122,7 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
           bottom={4}
           height={2}
           borderRadius={1}
-          backgroundColor="$link"
+          backgroundColor={focused ? "$color" : "$link"}
         />
       </View>
     </Button>

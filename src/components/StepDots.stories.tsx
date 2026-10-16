@@ -15,7 +15,7 @@ export default meta;
 type Story = StoryObj<typeof StepDots>;
 
 export const Middle: Story = {
-  args: { count: 5, activeIndex: 1 },
+  args: { count: 5, activeIndex: 2 },
 };
 
 export const First: Story = {

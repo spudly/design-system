@@ -36,6 +36,14 @@ const StyledThumb = styled(TamaguiSwitch.Thumb, {
   height: tokens.spacing[6],
   borderRadius: tokens.radii.full,
   backgroundColor: tokens.colors.gray.gray1,
+  // Vertical centering: Tamagui's frame carries 2px padding and stacks
+  // the thumb at the top of its inner wrapper, so the 24px thumb rides
+  // 2px high in the 32px track (its center lands at 14px, not 16px). A
+  // 2px top margin restores the ideal 4px offset, (32 − 24) / 2. The
+  // horizontal travel is a transform Tamagui computes from layout widths
+  // at runtime, which a top margin cannot disturb. (No 2px spacing token
+  // exists — the scale is 4px-based — so the literal is intentional.)
+  marginTop: 2,
 });
 
 export interface SwitchProps {

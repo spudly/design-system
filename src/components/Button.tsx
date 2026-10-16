@@ -28,14 +28,14 @@ const StyledButton = styled(TamaguiButton, {
         color: tokens.colors.gray.gray10,
       },
       ghost: {
-        // Visible affordance on any background: subtle primary fill plus a
-        // primary border (a transparent fill left the button invisible on
-        // white). The label color is set by the Button wrapper below — a
-        // variant-level `color` does not reach Tamagui Button's internal
-        // text element.
-        backgroundColor: "$primarySubtle",
-        borderWidth: 1,
-        borderColor: "$primary",
+        // Text-only by design: no fill and no border at rest. (An earlier
+        // revision added a subtle fill plus border for visibility, but
+        // ghost means chrome-less — the fill made it read as a secondary
+        // button.) Readability comes from the label color, which the
+        // Button wrapper below sets per variant — a variant-level `color`
+        // does not reach Tamagui Button's internal text element.
+        backgroundColor: "transparent",
+        borderWidth: 0,
       },
       danger: {
         // Danger ramp step 7 (not the $danger role at step 6) so white
@@ -92,7 +92,11 @@ export interface ButtonProps extends Omit<StyledButtonProps, "disabled"> {
 const variantLabelColors = {
   primary: "$onPrimary",
   secondary: tokens.colors.gray.gray10,
-  ghost: "$primaryEmphasis",
+  // $link is the dark-aware text role: a dark step on light surfaces and
+  // the lightened step in dark themes, so the text-only ghost label keeps
+  // AA contrast in both modes (the base $onPrimary white was invisible on
+  // light backgrounds — the original defect).
+  ghost: "$link",
   danger: "#ffffff",
 } as const;
 

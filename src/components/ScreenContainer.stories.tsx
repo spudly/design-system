@@ -18,28 +18,40 @@ const meta: Meta<typeof ScreenContainer> = {
 export default meta;
 type Story = StoryObj<typeof ScreenContainer>;
 
+const verses = [
+  "Psalm 23:1",
+  "Philippians 4:6–7",
+  "Isaiah 40:31",
+  "John 3:16",
+  "Proverbs 3:5",
+  "Psalm 46:1",
+  "Romans 8:28",
+  "Joshua 1:9",
+  "Psalm 121:1–2",
+  "Lamentations 3:22–23",
+  "2 Timothy 1:7",
+  "Psalm 19:14",
+  "Micah 6:8",
+  "Hebrews 11:1",
+];
+
 export const Scrollable: Story = {
   render: (args) => (
     // display:flex + column so the ScrollView's flex:1 can resolve against
     // the fixed height; in a plain block wrapper the scroll region
-    // collapses to content height.
+    // collapses to content height. The content must actually overflow the
+    // 400px frame for the story to demonstrate scrolling: 14 cards at
+    // ~58px each plus the heading and 16px gaps total ~1100px.
     <div
       style={{ height: 400, border: "1px dashed #ccc", display: "flex", flexDirection: "column" }}
     >
       <ScreenContainer {...args}>
         <Text variant="heading">My verses</Text>
-        <Card>
-          <Text variant="body">Psalm 23:1</Text>
-        </Card>
-        <Card>
-          <Text variant="body">Philippians 4:6–7</Text>
-        </Card>
-        <Card>
-          <Text variant="body">Isaiah 40:31</Text>
-        </Card>
-        <Card>
-          <Text variant="body">John 3:16</Text>
-        </Card>
+        {verses.map((verse) => (
+          <Card key={verse}>
+            <Text variant="body">{verse}</Text>
+          </Card>
+        ))}
       </ScreenContainer>
     </div>
   ),
