@@ -8,6 +8,10 @@ const meta: Meta<typeof ScreenContainer> = {
   component: ScreenContainer,
   argTypes: {
     scrollable: { control: "boolean" },
+    variant: {
+      control: "select",
+      options: ["default", "padded", "list", "auth"],
+    },
   },
 };
 
@@ -42,5 +46,43 @@ export const NotScrollable: Story = {
       <Text variant="heading">Sign in</Text>
       <Text variant="hint">Fixed-height content, no scroll view.</Text>
     </ScreenContainer>
+  ),
+};
+
+export const Padded: Story = {
+  render: (args) => (
+    <div style={{ height: 400, border: "1px dashed #ccc" }}>
+      <ScreenContainer {...args} variant="padded">
+        <Text variant="heading">Creamy Tuscan Garlic Chicken</Text>
+        <Text variant="hint">Wider horizontal padding and a larger top offset.</Text>
+      </ScreenContainer>
+    </div>
+  ),
+};
+
+export const List: Story = {
+  render: (args) => (
+    <div style={{ height: 400, border: "1px dashed #ccc" }}>
+      <ScreenContainer {...args} variant="list" scrollable={false}>
+        <Text variant="body">Flush shell — the list manages its own padding.</Text>
+        <Card>
+          <Text variant="body">Row one</Text>
+        </Card>
+        <Card>
+          <Text variant="body">Row two</Text>
+        </Card>
+      </ScreenContainer>
+    </div>
+  ),
+};
+
+export const Auth: Story = {
+  render: (args) => (
+    <div style={{ height: 400, border: "1px dashed #ccc" }}>
+      <ScreenContainer {...args} variant="auth" scrollable={false}>
+        <Text variant="heading">Welcome back</Text>
+        <Text variant="hint">Surface shell with the large auth top offset.</Text>
+      </ScreenContainer>
+    </div>
   ),
 };

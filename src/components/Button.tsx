@@ -31,6 +31,13 @@ const StyledButton = styled(TamaguiButton, {
         backgroundColor: "transparent",
         color: "$primary",
       },
+      danger: {
+        // Danger ramp step 7 (not the $danger role at step 6) so white
+        // label text keeps WCAG AA contrast on the filled background —
+        // same value the apps' destructive buttons already render.
+        backgroundColor: tokens.colors.danger.danger7,
+        color: "#ffffff",
+      },
     },
     size: {
       sm: {
@@ -71,8 +78,9 @@ export interface ButtonProps extends Omit<StyledButtonProps, "disabled"> {
 /**
  * Universal cross-platform button (web + React Native via Tamagui).
  *
- * Props: `variant` ("primary" | "secondary" | "ghost"), `size`
- * ("sm" | "md" | "lg"), `disabled`. All styling is token-driven.
+ * Props: `variant` ("primary" | "secondary" | "ghost" | "danger"), `size`
+ * ("sm" | "md" | "lg"), `disabled`. All styling is token-driven. Use
+ * `danger` for destructive actions (delete, revoke, remove).
  * Accessibility: exposes `accessibilityRole="button"` and mirrors `disabled`
  * into `accessibilityState` (mapped to `aria-disabled` on web).
  */

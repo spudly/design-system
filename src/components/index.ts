@@ -1,3 +1,4 @@
+export { ActionBar, type ActionBarProps } from "./ActionBar.js";
 export { Avatar, type AvatarProps } from "./Avatar.js";
 export { Badge, type BadgeProps } from "./Badge.js";
 export { BlankWord, type BlankWordProps } from "./BlankWord.js";
@@ -39,6 +40,7 @@ export { Switch, type SwitchProps } from "./Switch.js";
 export { Tabs, type TabItem, type TabsProps } from "./Tabs.js";
 export { Text, type TextProps } from "./Text.js";
 export { TextField, type TextFieldProps } from "./TextField.js";
+export { TextLink, type TextLinkProps } from "./TextLink.js";
 export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./Toast.js";
 export {
   ToggleChipGroup,
