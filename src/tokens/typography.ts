@@ -19,6 +19,18 @@ export const fontFamily = {
    * in `sansNativeFaces`).
    */
   sansNative: "sans-serif",
+  /**
+   * Single font name for React Native on Android for the `sans` role.
+   * Android's stock fonts are only the generics ("sans-serif", "serif",
+   * "monospace") — named families like Georgia or Avenir Next don't exist
+   * there, so registering one silently falls back to the default sans and
+   * a serif brand loses its serif typography entirely. The generic keeps
+   * the brand's serif/sans character, and Android resolves numeric
+   * fontWeight against it, so Android registrations carry NO named faces
+   * (see resolveFontFamily in tamagui.config). The base brand is
+   * platform-system sans on every platform, hence "sans-serif".
+   */
+  sansNativeAndroid: "sans-serif",
   /** Serif stack for display titles and verse/reading text (system serif). */
   serif: "Georgia, 'Times New Roman', serif",
   /** Monospace stack for code / tabular content. */

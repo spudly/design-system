@@ -1,5 +1,8 @@
 import { createAnimations } from "@tamagui/animations-css/extras";
-import { createFont, createTamagui, isWeb } from "tamagui";
+// Platform constants come from Tamagui's own constants package: the
+// `tamagui` entry re-exports `isWeb` but not `isAndroid`/`isIos`.
+import { isAndroid, isWeb } from "@tamagui/constants";
+import { createFont, createTamagui } from "tamagui";
 import { tokens } from "./tokens/index.js";
 import { baseTheme, eciperayTheme, memorizeTheme, type SemanticColors } from "./themes/index.js";
 
@@ -141,29 +144,61 @@ function buildTamaguiThemes(theme: { semantic: SemanticColors }) {
 interface BrandFontFamily {
   /** Web family: a full CSS fallback stack. */
   sans: string;
-  /** React Native family: a SINGLE font name (a CSS list is invalid there). */
+  /** iOS family: a SINGLE font name (a CSS list is invalid there). */
   sansNative?: string | undefined;
-  /** Native per-weight face names (weight → font name), for families whose weights are separate named fonts. */
+  /** iOS per-weight face names (weight → font name), for families whose weights are separate named fonts. */
   sansNativeFaces?: Record<string, string> | undefined;
+  /** Android family: a generic ("serif"/"sans-serif") — named brand families don't exist on Android. */
+  sansNativeAndroid?: string | undefined;
+}
+
+/** Platforms whose font resolution differs. */
+export type FontPlatform = "web" | "ios" | "android";
+
+/** The platform this build targets, for font resolution. Any native target other than Android takes the iOS (named-family) path, as all native did before the Android split. */
+const fontPlatform: FontPlatform = isWeb ? "web" : isAndroid ? "android" : "ios";
+
+/** A resolved font registration: the family plus optional per-weight faces. */
+export interface ResolvedFont {
+  family: string;
+  face?: Record<string, { normal: string }> | undefined;
 }
 
 /**
- * Resolve the family to register for one brand on one platform. Web takes
- * the brand's full CSS fallback stack. React Native's `fontFamily` accepts
- * a single font name only, so native takes the brand's declared native
- * name; a brand that declares none gets the generic "sans-serif" — the
- * native equivalent of the base stack's platform-system fonts (Android
- * resolves the generic to its system font; iOS falls back to the system
- * font for it). Pure and platform-parameterized so the choice is testable
- * without a native runtime.
+ * Resolve the registration for one brand on one platform. Web takes the
+ * brand's full CSS fallback stack and selects weights from the stack
+ * itself, so it registers no faces. iOS takes the brand's declared single
+ * native name; a named family's heavier weights are separate fonts there,
+ * so its declared per-weight faces register alongside. Android's stock
+ * fonts are only the generics — Georgia and Avenir Next don't exist there
+ * and a named registration silently falls back to the default sans — so
+ * Android takes the brand's declared generic (`serif` for serif brands)
+ * and resolves weights numerically: no named faces. A brand that declares
+ * no native names gets the generic "sans-serif" on either native
+ * platform — the native equivalent of the base stack's platform-system
+ * fonts (Android resolves the generic to its system font; iOS falls back
+ * to the system font for it). Pure and platform-parameterized so the
+ * choice is testable without a native runtime.
  */
 export function resolveFontFamily(
-  stack: string,
-  nativeFamily: string | undefined,
-  web: boolean,
-): string {
-  if (web) return stack;
-  return nativeFamily ?? "sans-serif";
+  fontFamily: BrandFontFamily,
+  platform: FontPlatform,
+): ResolvedFont {
+  if (platform === "web") {
+    return { family: fontFamily.sans };
+  }
+  if (platform === "android") {
+    return { family: fontFamily.sansNativeAndroid ?? "sans-serif" };
+  }
+  const face = fontFamily.sansNativeFaces
+    ? Object.fromEntries(
+        Object.entries(fontFamily.sansNativeFaces).map(([weight, name]) => [
+          weight,
+          { normal: name },
+        ]),
+      )
+    : undefined;
+  return { family: fontFamily.sansNative ?? "sans-serif", ...(face ? { face } : {}) };
 }
 
 /**
@@ -173,26 +208,15 @@ export function resolveFontFamily(
  * fall back to platform defaults — on web, form controls don't even inherit
  * the page font — while plain text inherits, so controls and body text
  * visibly diverged (Warm Harvest body text is the serif stack; buttons
- * rendered in a browser-default sans). The family is the brand theme's own
- * `sans` stack on web and its single `sansNative` name on React Native
- * (see resolveFontFamily); size/lineHeight mirror the DS type scale
- * (lineHeight = size × 1.5, the `normal` multiplier).
+ * rendered in a browser-default sans). The registration is resolved per
+ * platform (see resolveFontFamily): the brand theme's own `sans` stack on
+ * web, its single `sansNative` name plus named faces on iOS, and its
+ * generic `sansNativeAndroid` with numeric weights on Android;
+ * size/lineHeight mirror the DS type scale (lineHeight = size × 1.5, the
+ * `normal` multiplier).
  */
 function buildBrandFonts(fontFamily: BrandFontFamily) {
-  const family = resolveFontFamily(fontFamily.sans, fontFamily.sansNative, isWeb);
-  // Per-weight faces exist only on native: a named family's heavier
-  // weights are separate fonts there, while web selects weights from the
-  // stack itself. Keeping `face` out of the web registration leaves the
-  // web font object exactly as it was before native support.
-  const face =
-    !isWeb && fontFamily.sansNativeFaces
-      ? Object.fromEntries(
-          Object.entries(fontFamily.sansNativeFaces).map(([weight, name]) => [
-            weight,
-            { normal: name },
-          ]),
-        )
-      : undefined;
+  const { family, face } = resolveFontFamily(fontFamily, fontPlatform);
   const font = createFont({
     family,
     ...(face ? { face } : {}),
@@ -243,6 +267,7 @@ export function createTamaguiConfig(theme: {
         theme.tokens?.typography?.fontFamily?.sans ?? baseTheme.tokens.typography.fontFamily.sans,
       sansNative: theme.tokens?.typography?.fontFamily?.sansNative,
       sansNativeFaces: theme.tokens?.typography?.fontFamily?.sansNativeFaces,
+      sansNativeAndroid: theme.tokens?.typography?.fontFamily?.sansNativeAndroid,
     }),
     tokens: tamaguiTokens,
     themes: buildTamaguiThemes(theme),
