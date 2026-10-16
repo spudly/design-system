@@ -51,6 +51,7 @@ function toTamaguiTheme(semantic: SemanticColors, dark: boolean) {
     onPrimary: semantic.onPrimary,
     primarySubtle: semantic.primarySubtle,
     primaryEmphasis: semantic.primaryEmphasis,
+    link: semantic.link,
     accent: semantic.accent,
     surface: semantic.surface,
     textMuted: semantic.textMuted,
@@ -89,6 +90,10 @@ export function createTamaguiConfig(theme: { semantic: SemanticColors }) {
     onPrimary: theme.semantic.onPrimary,
     primarySubtle: theme.semantic.primarySubtle,
     primaryEmphasis: theme.semantic.primaryEmphasis,
+    // Links switch to the theme's lightened step in dark mode so they keep
+    // AA contrast on the dark background/surface.
+    link: theme.semantic.linkDark,
+    linkDark: theme.semantic.linkDark,
     accent: theme.semantic.accent,
     success: theme.semantic.success,
     warning: theme.semantic.warning,

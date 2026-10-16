@@ -6,7 +6,7 @@ import { tokens } from "../tokens/index.js";
 const StyledTextLink = styled(TamaguiText, {
   name: "SpudlyTextLink",
 
-  color: "$primary",
+  color: "$link",
   fontSize: tokens.typography.fontSize.md,
   fontWeight: tokens.typography.fontWeight.medium,
   // Underlined by default so the link is identifiable without hover —
@@ -23,7 +23,8 @@ export interface TextLinkProps extends Omit<StyledTextLinkProps, "onPress"> {
 }
 
 /**
- * Inline semantic link for use inside prose: primary-colored, medium-weight
+ * Inline semantic link for use inside prose: link-colored (the `$link`
+ * semantic token, which carries AA-contrast light/dark values), medium-weight
  * text with an underline affordance and `accessibilityRole="link"`. Use
  * this instead of a ghost Button when the action sits within a sentence
  * (legal links, "forgot password", inline references). Text styling can be
