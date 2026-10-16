@@ -1,5 +1,5 @@
 import { createAnimations } from "@tamagui/animations-css/extras";
-import { createFont, createTamagui } from "tamagui";
+import { createFont, createTamagui, isWeb } from "tamagui";
 import { tokens } from "./tokens/index.js";
 import { baseTheme, eciperayTheme, memorizeTheme, type SemanticColors } from "./themes/index.js";
 
@@ -137,6 +137,35 @@ function buildTamaguiThemes(theme: { semantic: SemanticColors }) {
   };
 }
 
+/** The font-family shape a brand theme contributes (all fields but `sans` optional). */
+interface BrandFontFamily {
+  /** Web family: a full CSS fallback stack. */
+  sans: string;
+  /** React Native family: a SINGLE font name (a CSS list is invalid there). */
+  sansNative?: string | undefined;
+  /** Native per-weight face names (weight → font name), for families whose weights are separate named fonts. */
+  sansNativeFaces?: Record<string, string> | undefined;
+}
+
+/**
+ * Resolve the family to register for one brand on one platform. Web takes
+ * the brand's full CSS fallback stack. React Native's `fontFamily` accepts
+ * a single font name only, so native takes the brand's declared native
+ * name; a brand that declares none gets the generic "sans-serif" — the
+ * native equivalent of the base stack's platform-system fonts (Android
+ * resolves the generic to its system font; iOS falls back to the system
+ * font for it). Pure and platform-parameterized so the choice is testable
+ * without a native runtime.
+ */
+export function resolveFontFamily(
+  stack: string,
+  nativeFamily: string | undefined,
+  web: boolean,
+): string {
+  if (web) return stack;
+  return nativeFamily ?? "sans-serif";
+}
+
 /**
  * Tamagui font registration for one brand. Registering the fonts is what
  * makes Tamagui's text-bearing primitives (Button, Input, Select, Label,
@@ -145,12 +174,28 @@ function buildTamaguiThemes(theme: { semantic: SemanticColors }) {
  * the page font — while plain text inherits, so controls and body text
  * visibly diverged (Warm Harvest body text is the serif stack; buttons
  * rendered in a browser-default sans). The family is the brand theme's own
- * `sans` stack; size/lineHeight mirror the DS type scale (lineHeight =
- * size × 1.5, the `normal` multiplier).
+ * `sans` stack on web and its single `sansNative` name on React Native
+ * (see resolveFontFamily); size/lineHeight mirror the DS type scale
+ * (lineHeight = size × 1.5, the `normal` multiplier).
  */
-function buildBrandFonts(family: string) {
+function buildBrandFonts(fontFamily: BrandFontFamily) {
+  const family = resolveFontFamily(fontFamily.sans, fontFamily.sansNative, isWeb);
+  // Per-weight faces exist only on native: a named family's heavier
+  // weights are separate fonts there, while web selects weights from the
+  // stack itself. Keeping `face` out of the web registration leaves the
+  // web font object exactly as it was before native support.
+  const face =
+    !isWeb && fontFamily.sansNativeFaces
+      ? Object.fromEntries(
+          Object.entries(fontFamily.sansNativeFaces).map(([weight, name]) => [
+            weight,
+            { normal: name },
+          ]),
+        )
+      : undefined;
   const font = createFont({
     family,
+    ...(face ? { face } : {}),
     size: {
       1: tokens.typography.fontSize.xs,
       2: tokens.typography.fontSize.sm,
@@ -185,16 +230,20 @@ function buildBrandFonts(family: string) {
 
 export function createTamaguiConfig(theme: {
   semantic: SemanticColors;
-  tokens?: { typography: { fontFamily: { sans: string } } };
+  tokens?: { typography: { fontFamily: BrandFontFamily } };
 }) {
   return createTamagui({
     animations,
     // The font override is optional: callers that pass a semantic-only
     // theme (the factory's original input shape) get the base font stack
-    // instead of a dereference error.
-    fonts: buildBrandFonts(
-      theme.tokens?.typography?.fontFamily?.sans ?? baseTheme.tokens.typography.fontFamily.sans,
-    ),
+    // instead of a dereference error. The native fields fall back the
+    // same way (resolveFontFamily's generic when a theme declares none).
+    fonts: buildBrandFonts({
+      sans:
+        theme.tokens?.typography?.fontFamily?.sans ?? baseTheme.tokens.typography.fontFamily.sans,
+      sansNative: theme.tokens?.typography?.fontFamily?.sansNative,
+      sansNativeFaces: theme.tokens?.typography?.fontFamily?.sansNativeFaces,
+    }),
     tokens: tamaguiTokens,
     themes: buildTamaguiThemes(theme),
   });
@@ -234,7 +283,9 @@ export const storybookTamaguiConfig = createTamagui({
   // config's `--f-family` var.) The per-brand configs used by the apps
   // register the literal stack (native has no CSS vars); the fallback here
   // is the base stack for renders outside the preview.
-  fonts: buildBrandFonts(`var(--dsFontStack, ${baseTheme.tokens.typography.fontFamily.sans})`),
+  fonts: buildBrandFonts({
+    sans: `var(--dsFontStack, ${baseTheme.tokens.typography.fontFamily.sans})`,
+  }),
   tokens: tamaguiTokens,
   themes: {
     ...baseThemes,

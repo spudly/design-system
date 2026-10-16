@@ -67,6 +67,16 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
       paddingHorizontal={0}
       paddingVertical={0}
       minHeight={0}
+      // Pin the frame's weight too: the Button's styled base is semibold,
+      // and the sizing text inside is pinned to `inherit` (below) — pinning
+      // the frame as well means the inherit chain runs sentence → frame →
+      // sizing text with no semibold step in between, on any platform.
+      // This must go through `style`: Tamagui routes a `fontWeight`
+      // instance prop to the Button's internal text element (and drops it
+      // entirely when the children are elements, as here), so it never
+      // reaches the frame — verified in SSR output. The style prop lands
+      // on the frame element itself.
+      style={{ fontWeight: "inherit" }}
       outlineWidth={focused ? 2 : 0}
       outlineStyle="solid"
       // $link is the interactive-affordance role: same value as $primary
@@ -85,7 +95,10 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
             weight: the revealed word inherits that weight, so the hidden
             state must too — the Button's own semibold label styling must
             never reach this text, or the wider semibold glyphs would size
-            the blank wider than the word that replaces it. */}
+            the blank wider than the word that replaces it. The button
+            frame carries the same `inherit` pin (above), so the weight
+            this text inherits is the sentence's, never the frame's
+            semibold base. */}
         <Text variant="verse" aria-hidden opacity={0} userSelect="none" fontWeight="inherit">
           {word}
         </Text>

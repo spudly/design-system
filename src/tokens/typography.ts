@@ -7,6 +7,18 @@
 export const fontFamily = {
   /** Default UI font stack (system). */
   sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+  /**
+   * Single font name for React Native for the `sans` role. Native
+   * `fontFamily` takes ONE font name — the CSS fallback list in `sans` is
+   * invalid there. The base stack is entirely platform system fonts, so
+   * the native equivalent is the generic "sans-serif": Android resolves it
+   * to its system font (Roboto), and iOS falls back to the system font
+   * for the generic name — the platform system font either way, which is
+   * exactly what the web stack targets. Brands whose stack names a real
+   * family override this with that family (and optional per-weight faces
+   * in `sansNativeFaces`).
+   */
+  sansNative: "sans-serif",
   /** Serif stack for display titles and verse/reading text (system serif). */
   serif: "Georgia, 'Times New Roman', serif",
   /** Monospace stack for code / tabular content. */

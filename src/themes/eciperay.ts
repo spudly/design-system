@@ -34,6 +34,15 @@ export const eciperayTheme = {
         ...baseTheme.tokens.typography.fontFamily,
         // System serif for display type (custom serif deferred — see design brief).
         sans: "Georgia, 'Times New Roman', serif",
+        // Native takes a single name (the stack's head). Georgia ships on
+        // both mobile platforms; its semibold/bold face is the separate
+        // named font Georgia-Bold, mapped per weight so native text at
+        // the DS semibold/bold weights renders in the real bold face.
+        sansNative: "Georgia",
+        sansNativeFaces: {
+          "600": "Georgia-Bold",
+          "700": "Georgia-Bold",
+        },
       },
     },
   },

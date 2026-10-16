@@ -38,6 +38,16 @@ export const memorizeTheme = {
       fontFamily: {
         ...baseTheme.tokens.typography.fontFamily,
         sans: "'Avenir Next', 'Segoe UI', sans-serif",
+        // Native takes a single name (the stack's head). Avenir Next is an
+        // iOS system family; its weights are separate named fonts, mapped
+        // per weight below. (Android has no Avenir Next and falls back to
+        // its system font, as it does for any missing family.)
+        sansNative: "Avenir Next",
+        sansNativeFaces: {
+          "500": "AvenirNext-Medium",
+          "600": "AvenirNext-DemiBold",
+          "700": "AvenirNext-Bold",
+        },
       },
     },
   },
