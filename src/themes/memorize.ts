@@ -21,6 +21,12 @@ export const memorizeTheme = {
     primaryHover: tokens.colors.teal.teal9,
     primaryActive: tokens.colors.teal.teal10,
     onPrimary: tokens.colors.teal.teal1,
+    // Without these two the ghost button, Badge/InlineAlert info tones and
+    // Avatar fallback silently fell back to the base (indigo) ramp under
+    // Quiet Dawn. Steps parallel the other themes: subtle = step 2 tint,
+    // emphasis = the primaryHover step (dark primary for text on light).
+    primarySubtle: tokens.colors.teal.teal2,
+    primaryEmphasis: tokens.colors.teal.teal9,
     link: tokens.colors.teal.teal8,
     linkDark: tokens.colors.teal.teal6,
     accent: "#b45309",
@@ -32,6 +38,19 @@ export const memorizeTheme = {
       fontFamily: {
         ...baseTheme.tokens.typography.fontFamily,
         sans: "'Avenir Next', 'Segoe UI', sans-serif",
+        // Native takes a single name (the stack's head). Avenir Next is an
+        // iOS system family; its weights are separate named fonts, mapped
+        // per weight below.
+        sansNative: "Avenir Next",
+        sansNativeFaces: {
+          "500": "AvenirNext-Medium",
+          "600": "AvenirNext-DemiBold",
+          "700": "AvenirNext-Bold",
+        },
+        // Android has no Avenir Next: the generic sans-serif (numeric
+        // weights, no named faces) is the deliberate Android resolution,
+        // not a missing-family fallback.
+        sansNativeAndroid: "sans-serif",
       },
     },
   },

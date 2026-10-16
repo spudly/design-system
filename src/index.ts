@@ -8,4 +8,6 @@ export {
   createTamaguiConfig,
   eciperayTamaguiConfig,
   memorizeTamaguiConfig,
+  storybookTamaguiConfig,
+  type StorybookThemeName,
 } from "./tamagui.config.js";

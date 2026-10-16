@@ -6,9 +6,11 @@ import { Text } from "./Text.js";
 const StyledTrigger = styled(TamaguiSelect.Trigger, {
   name: "SpudlySelectFieldTrigger",
 
-  backgroundColor: "#ffffff",
+  backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: tokens.colors.gray.gray4,
+  // Input boundary: $textMuted holds ≥3:1 against page and surface in every
+  // brand and mode; $borderColor fell to 1.94–2.29:1 in dark mode.
+  borderColor: "$textMuted",
   borderRadius: tokens.radii.md,
   paddingHorizontal: tokens.spacing[3],
   minHeight: 44,
@@ -17,7 +19,7 @@ const StyledTrigger = styled(TamaguiSelect.Trigger, {
   variants: {
     error: {
       true: {
-        borderColor: tokens.colors.danger.danger6,
+        borderColor: "$danger",
       },
     },
   } as const,
@@ -72,7 +74,7 @@ export function SelectField({
           aria-describedby={error ? errorId : undefined}
         >
           <TamaguiSelect.Value placeholder={placeholder} />
-          <Text style={{ color: tokens.colors.gray.gray6 }}>▾</Text>
+          <Text style={{ color: "$textMuted" }}>▾</Text>
         </StyledTrigger>
 
         <Adapt platform="touch">
@@ -90,7 +92,7 @@ export function SelectField({
               <TamaguiSelect.Item key={option.value} value={option.value}>
                 <TamaguiSelect.ItemText>{option.label}</TamaguiSelect.ItemText>
                 <TamaguiSelect.ItemIndicator marginLeft="auto">
-                  <Text style={{ color: tokens.colors.primary.primary7 }}>✓</Text>
+                  <Text style={{ color: "$primary" }}>✓</Text>
                 </TamaguiSelect.ItemIndicator>
               </TamaguiSelect.Item>
             ))}

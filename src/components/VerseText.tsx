@@ -5,7 +5,7 @@ import { tokens } from "../tokens/index.js";
 const StyledVerseText = styled(TamaguiText, {
   name: "SpudlyVerseText",
 
-  color: tokens.colors.gray.gray10,
+  color: "$color",
   fontSize: tokens.typography.fontSize.lg,
   fontFamily: tokens.typography.fontFamily.serif,
 });

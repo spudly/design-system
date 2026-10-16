@@ -9,8 +9,11 @@ const StyledCheckbox = styled(TamaguiCheckbox, {
   height: tokens.spacing[6],
   borderRadius: tokens.radii.sm,
   borderWidth: 2,
-  borderColor: tokens.colors.gray.gray4,
-  backgroundColor: "#ffffff",
+  // Unchecked border is $textMuted, not $borderColor: the box boundary
+  // needs ≥3:1 against adjacent colors (WCAG 1.4.11) in both modes —
+  // see TextField. The checked border below stays $primary.
+  borderColor: "$textMuted",
+  backgroundColor: "$surface",
   alignItems: "center",
   justifyContent: "center",
 });
@@ -42,11 +45,11 @@ export function ChecklistRow({ label, metadata, checked, onCheckedChange }: Chec
         checked={checked}
         onCheckedChange={onCheckedChange}
         accessibilityLabel={label}
-        backgroundColor={checked ? tokens.colors.primary.primary7 : "#ffffff"}
-        borderColor={checked ? tokens.colors.primary.primary7 : tokens.colors.gray.gray4}
+        backgroundColor={checked ? "$primary" : "$surface"}
+        borderColor={checked ? "$primary" : "$textMuted"}
       >
         <TamaguiCheckbox.Indicator>
-          <Text style={{ fontSize: tokens.typography.fontSize.sm, color: "#ffffff" }}>✓</Text>
+          <Text style={{ fontSize: tokens.typography.fontSize.sm, color: "$onPrimary" }}>✓</Text>
         </TamaguiCheckbox.Indicator>
       </StyledCheckbox>
       <YStack flex={1} onPress={toggle} cursor="pointer">
@@ -55,7 +58,7 @@ export function ChecklistRow({ label, metadata, checked, onCheckedChange }: Chec
             checked
               ? {
                   textDecorationLine: "line-through",
-                  color: tokens.colors.gray.gray6,
+                  color: "$textMuted",
                 }
               : undefined
           }

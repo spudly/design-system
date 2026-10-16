@@ -7,7 +7,7 @@ const StyledList = styled(TamaguiTabs.List, {
 
   gap: tokens.spacing[1],
   borderBottomWidth: 1,
-  borderBottomColor: tokens.colors.gray.gray3,
+  borderBottomColor: "$borderColor",
 });
 
 const StyledTab = styled(TamaguiTabs.Tab, {
@@ -23,7 +23,7 @@ const StyledTab = styled(TamaguiTabs.Tab, {
   variants: {
     active: {
       true: {
-        borderBottomColor: tokens.colors.primary.primary7,
+        borderBottomColor: "$primary",
       },
     },
   } as const,
@@ -55,6 +55,10 @@ export function Tabs({ tabs, value, onValueChange }: TabsProps) {
       <StyledList>
         {tabs.map((tab) => (
           <StyledTab key={tab.value} value={tab.value} active={tab.value === value}>
+            {/* Selected label uses $link, not $primaryEmphasis:
+                $primaryEmphasis has no dark variant and drops to
+                ~2.3:1 on dark backgrounds, while the dark-aware $link
+                holds ≥5:1 in every brand and mode. */}
             <Text
               variant="body"
               style={{
@@ -62,8 +66,7 @@ export function Tabs({ tabs, value, onValueChange }: TabsProps) {
                   tab.value === value
                     ? tokens.typography.fontWeight.semibold
                     : tokens.typography.fontWeight.regular,
-                color:
-                  tab.value === value ? tokens.colors.primary.primary8 : tokens.colors.gray.gray7,
+                color: tab.value === value ? "$link" : "$textMuted",
               }}
             >
               {tab.label}

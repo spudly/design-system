@@ -1,8 +1,19 @@
 import { useId } from "react";
-import { Checkbox as TamaguiCheckbox, Label, XStack, YStack, styled } from "tamagui";
+import { Checkbox as TamaguiCheckbox, Label, XStack, YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
+
+/**
+ * Line height for the ✓ glyph, matched to its 14px font size. A numeric
+ * lineHeight reaches web CSS unitless, where CSS reads it as a multiplier
+ * (line-height:14 at a 14px font is a 196px line box — the same leak that
+ * made SearchField grow past the viewport). Web needs the px string;
+ * React Native takes the plain number.
+ */
+const glyphLineHeight = isWeb
+  ? `${tokens.typography.fontSize.sm}px`
+  : tokens.typography.fontSize.sm;
 
 const StyledCheckbox = styled(TamaguiCheckbox, {
   name: "SpudlyCheckbox",
@@ -77,18 +88,21 @@ export function CheckboxField({
           aria-describedby={error ? errorId : undefined}
           {...rest}
         >
+          {/* Unchecked border is $textMuted, not $borderColor: the box
+              boundary needs ≥3:1 against adjacent colors (WCAG 1.4.11)
+              in both modes — see TextField. Checked stays $primary. */}
           <StyledBox
-            borderColor={checked ? tokens.colors.primary.primary7 : tokens.colors.gray.gray4}
-            backgroundColor={checked ? tokens.colors.primary.primary7 : "#ffffff"}
+            borderColor={checked ? "$primary" : "$textMuted"}
+            backgroundColor={checked ? "$primary" : "$surface"}
           >
             <TamaguiCheckbox.Indicator>
               <Text
                 aria-hidden
                 style={{
-                  color: "#ffffff",
+                  color: "$onPrimary",
                   fontSize: tokens.typography.fontSize.sm,
                   fontWeight: tokens.typography.fontWeight.bold,
-                  lineHeight: tokens.typography.fontSize.sm,
+                  lineHeight: glyphLineHeight,
                 }}
               >
                 ✓

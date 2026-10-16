@@ -13,7 +13,7 @@ const StyledDot = styled(XStack, {
   variants: {
     active: {
       true: {
-        backgroundColor: tokens.colors.primary.primary7,
+        backgroundColor: "$primary",
       },
     },
   } as const,
@@ -31,9 +31,10 @@ export interface StepDotsProps extends Omit<StyledDotProps, "active"> {
 }
 
 /**
- * Dot row showing position in a sequence — step progress, streaks, drill
- * rounds. Non-interactive: the container carries `progressbar` semantics with
- * the current step, and individual dots are hidden from assistive tech.
+ * Dot row showing progress through a sequence — step progress, drill
+ * rounds. Only the current step's dot is filled. Non-interactive:
+ * the container carries `progressbar` semantics with the current step, and
+ * individual dots are hidden from assistive tech.
  */
 export function StepDots({ count, activeIndex, label, ...rest }: StepDotsProps) {
   const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(count - 1, 0));

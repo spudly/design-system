@@ -12,7 +12,7 @@ const StyledImage = styled(TamaguiImage, {
 const Fallback = styled(YStack, {
   name: "SpudlyAvatarFallback",
 
-  backgroundColor: tokens.colors.primary.primary2,
+  backgroundColor: "$primarySubtle",
   borderRadius: tokens.radii.full,
   alignItems: "center",
   justifyContent: "center",
@@ -46,7 +46,7 @@ export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
       <Fallback style={dimensions} accessibilityRole="img" accessibilityLabel={name}>
         <Text
           style={{
-            color: tokens.colors.primary.primary8,
+            color: "$primaryEmphasis",
             fontWeight: tokens.typography.fontWeight.semibold,
             fontSize: Math.round(size * 0.4),
           }}
@@ -58,7 +58,11 @@ export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
   }
   return (
     <StyledImage
-      source={{ uri: src }}
+      // Tamagui's Image renders an <img> on web and maps `src` (not the
+      // React Native-style `source` object, which web ignores) to the
+      // image URL; on native it converts the string to `{ uri }`.
+      src={src}
+      objectFit="cover"
       style={dimensions}
       accessibilityRole="img"
       accessibilityLabel={name}

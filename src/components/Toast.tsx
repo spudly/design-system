@@ -7,7 +7,15 @@ import { Text } from "./Text.js";
 const ToastCard = styled(YStack, {
   name: "SpudlyToast",
 
-  backgroundColor: tokens.colors.gray.gray10,
+  // Theme-matched card (same treatment as Card): surface fill with a
+  // 1px border. The previous fixed near-black (gray10) fill clashed with
+  // both brand themes and, being the same color as the dark page
+  // background, made the card's edges vanish in dark mode; the border
+  // ($borderColor is #525252 in dark themes, ~2.3:1 against the #171717
+  // page) plus the shadow keeps the edge defined in both modes.
+  backgroundColor: "$surface",
+  borderWidth: 1,
+  borderColor: "$borderColor",
   borderRadius: tokens.radii.md,
   padding: tokens.spacing[3],
   gap: tokens.spacing[1],
@@ -38,7 +46,7 @@ export function Toast({ title, description, ...rest }: ToastProps) {
       {title ? (
         <Text
           style={{
-            color: tokens.colors.gray.gray1,
+            color: "$color",
             fontWeight: tokens.typography.fontWeight.semibold,
           }}
         >
@@ -48,7 +56,7 @@ export function Toast({ title, description, ...rest }: ToastProps) {
       {description ? (
         <Text
           style={{
-            color: tokens.colors.gray.gray4,
+            color: "$textMuted",
             fontSize: tokens.typography.fontSize.sm,
           }}
         >
@@ -75,17 +83,22 @@ export function ToastProvider({ children }: ToastProviderProps) {
   return (
     <>
       {children}
-      <TamaguiToast.Viewport />
+      {/* Viewport and List must live INSIDE the Toast root: both consume
+          the toast context and throw "`Toast.Viewport` must be used within
+          `Toast`" when rendered as siblings of the root (the List belongs
+          inside the Viewport). */}
       <TamaguiToast position="bottom-center" duration={4000}>
-        <TamaguiToast.List
-          renderItem={({ toast: t }) => (
-            <Toast
-              key={t.id}
-              {...(typeof t.title === "string" ? { title: t.title } : {})}
-              {...(typeof t.description === "string" ? { description: t.description } : {})}
-            />
-          )}
-        />
+        <TamaguiToast.Viewport>
+          <TamaguiToast.List
+            renderItem={({ toast: t }) => (
+              <Toast
+                key={t.id}
+                {...(typeof t.title === "string" ? { title: t.title } : {})}
+                {...(typeof t.description === "string" ? { description: t.description } : {})}
+              />
+            )}
+          />
+        </TamaguiToast.Viewport>
       </TamaguiToast>
     </>
   );

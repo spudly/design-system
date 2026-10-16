@@ -85,21 +85,31 @@ export function RadioOptionGroup({
                     height={24}
                     borderRadius={tokens.radii.full}
                     borderWidth={2}
-                    borderColor={
-                      selected ? tokens.colors.primary.primary7 : tokens.colors.gray.gray4
-                    }
-                    backgroundColor="#ffffff"
+                    // Selected chrome uses $link, the dark-aware interactive
+                    // role: $primary falls below the 3:1 state-indicator
+                    // minimum in dark mode (border 2.85:1 against the base
+                    // dark background), while $link holds ≥5:1 against both
+                    // the circle's $surface and the page background in every
+                    // brand and mode. The UNSELECTED border is $textMuted,
+                    // not $borderColor: as an input boundary it needs the
+                    // same ≥3:1 (WCAG 1.4.11) in both modes — see TextField.
+                    borderColor={selected ? "$link" : "$textMuted"}
+                    backgroundColor="$surface"
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <TamaguiRadioGroup.Indicator>
-                      <XStack
-                        width={12}
-                        height={12}
-                        borderRadius={tokens.radii.full}
-                        backgroundColor={tokens.colors.primary.primary7}
-                      />
-                    </TamaguiRadioGroup.Indicator>
+                    {/* The Indicator itself is the dot: Tamagui sizes the
+                        Indicator frame to 50% of the circle (10x10), so a
+                        fixed 12x12 child overflowed it from the top-left
+                        and rendered off-center. Its color is $link for the
+                        same reason as the border above: as $primary it sat
+                        at 2.41–2.92:1 against the dark $surface circle. */}
+                    <TamaguiRadioGroup.Indicator
+                      width={12}
+                      height={12}
+                      borderRadius={tokens.radii.full}
+                      backgroundColor="$link"
+                    />
                   </XStack>
                 </StyledItem>
                 <YStack flex={1} gap={tokens.spacing[1]}>

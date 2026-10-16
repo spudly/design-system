@@ -6,12 +6,21 @@ import { Text } from "./Text.js";
 const StyledSwitch = styled(TamaguiSwitch, {
   name: "SpudlySwitch",
 
+  // Explicit dimensions: Tamagui Switch sizes itself from the `$size`
+  // token scale (its dynamic size variant looks up a named size), but this
+  // design system's size tokens are the numeric spacing scale, so the
+  // lookup resolved to nothing and the switch rendered with no width or
+  // height at all. 48x32 track; the thumb travel distance is measured by
+  // Tamagui at runtime, so it stays correct with explicit sizes.
+  width: tokens.spacing[12],
+  height: tokens.spacing[8],
+  borderRadius: tokens.radii.full,
   borderWidth: 0,
 
   variants: {
     on: {
       true: {
-        backgroundColor: tokens.colors.primary.primary7,
+        backgroundColor: "$primary",
       },
       false: {
         backgroundColor: tokens.colors.gray.gray4,
@@ -23,7 +32,18 @@ const StyledSwitch = styled(TamaguiSwitch, {
 const StyledThumb = styled(TamaguiSwitch.Thumb, {
   name: "SpudlySwitchThumb",
 
+  width: tokens.spacing[6],
+  height: tokens.spacing[6],
+  borderRadius: tokens.radii.full,
   backgroundColor: tokens.colors.gray.gray1,
+  // Vertical centering: Tamagui's frame carries 2px padding and stacks
+  // the thumb at the top of its inner wrapper, so the 24px thumb rides
+  // 2px high in the 32px track (its center lands at 14px, not 16px). A
+  // 2px top margin restores the ideal 4px offset, (32 − 24) / 2. The
+  // horizontal travel is a transform Tamagui computes from layout widths
+  // at runtime, which a top margin cannot disturb. (No 2px spacing token
+  // exists — the scale is 4px-based — so the literal is intentional.)
+  marginTop: 2,
 });
 
 export interface SwitchProps {

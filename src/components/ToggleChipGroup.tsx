@@ -6,9 +6,11 @@ const StyledChip = styled(XStack, {
   name: "SpudlyToggleChip",
 
   borderWidth: 1,
-  borderColor: tokens.colors.gray.gray4,
+  // Unselected chip boundary: $textMuted holds ≥3:1 in every brand and mode;
+  // $borderColor fell to 1.94–2.29:1 in dark mode. Selected overrides below.
+  borderColor: "$textMuted",
   borderRadius: tokens.radii.full,
-  backgroundColor: "#ffffff",
+  backgroundColor: "$surface",
   paddingHorizontal: tokens.spacing[4],
   minHeight: 44,
   alignItems: "center",
@@ -17,8 +19,8 @@ const StyledChip = styled(XStack, {
   variants: {
     selected: {
       true: {
-        backgroundColor: tokens.colors.primary.primary7,
-        borderColor: tokens.colors.primary.primary7,
+        backgroundColor: "$primary",
+        borderColor: "$primary",
       },
     },
   } as const,
@@ -81,7 +83,7 @@ export function ToggleChipGroup({
             >
               <Text
                 style={{
-                  color: selected ? "#ffffff" : tokens.colors.gray.gray10,
+                  color: selected ? "$onPrimary" : "$color",
                   fontWeight: selected
                     ? tokens.typography.fontWeight.semibold
                     : tokens.typography.fontWeight.regular,

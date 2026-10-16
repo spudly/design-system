@@ -1,21 +1,42 @@
 import { useId } from "react";
-import { Input as TamaguiInput, Label, XStack, YStack, styled } from "tamagui";
+import { Input as TamaguiInput, Label, XStack, YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
+/**
+ * Line height for the ⌕ glyph, matched to its 36px font size. A numeric
+ * lineHeight reaches web CSS unitless (both via a raw `style` object and
+ * via Tamagui's own style engine), where CSS reads it as a multiplier:
+ * line-height:36 at a 36px font is a 1296px line box, which forced the
+ * 44px row — and the page — to grow past the viewport. Web therefore
+ * needs the px string; React Native takes the plain number.
+ */
+const glyphLineHeight = isWeb
+  ? `${tokens.typography.fontSize["4xl"]}px`
+  : tokens.typography.fontSize["4xl"];
+
 const StyledContainer = styled(XStack, {
   name: "SpudlySearchField",
 
-  backgroundColor: "#ffffff",
+  backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: tokens.colors.gray.gray4,
+  // $textMuted, not $borderColor: input boundaries need ≥3:1 against
+  // adjacent colors (WCAG 1.4.11) in both modes — see TextField.
+  borderColor: "$textMuted",
   borderRadius: tokens.radii.md,
   paddingLeft: tokens.spacing[3],
   paddingRight: tokens.spacing[1],
   minHeight: 44,
   alignItems: "center",
   gap: tokens.spacing[2],
+  // The focus ring belongs on the whole field, not the inner input (whose
+  // own outline is suppressed below): when anything inside is focused, the
+  // container shows the ring. Tamagui v3 condition clauses in the value.
+  outlineWidth: "0px focus-within:2px",
+  outlineStyle: "none focus-within:solid",
+  outlineColor: "$link",
+  outlineOffset: 2,
 });
 
 const StyledInput = styled(TamaguiInput, {
@@ -26,7 +47,10 @@ const StyledInput = styled(TamaguiInput, {
   backgroundColor: "transparent",
   paddingHorizontal: 0,
   fontSize: tokens.typography.fontSize.md,
-  color: tokens.colors.gray.gray10,
+  color: "$color",
+  // No ring on the input itself — the container carries it (focus-within).
+  outlineWidth: 0,
+  outlineStyle: "none",
 });
 
 type StyledInputProps = GetProps<typeof StyledInput>;
@@ -65,10 +89,12 @@ export function SearchField({
       <StyledContainer>
         <Text
           aria-hidden
-          style={{
-            fontSize: tokens.typography.fontSize.lg,
-            color: tokens.colors.gray.gray6,
-          }}
+          // ~2x the previous lg (18px) glyph so the search affordance
+          // reads at a glance; lineHeight keeps it inside the 44px row
+          // (see glyphLineHeight above for why it is platform-split).
+          fontSize={tokens.typography.fontSize["4xl"]}
+          lineHeight={glyphLineHeight}
+          color="$textMuted"
         >
           ⌕
         </Text>
@@ -93,7 +119,7 @@ export function SearchField({
               aria-hidden
               style={{
                 fontSize: tokens.typography.fontSize.lg,
-                color: tokens.colors.gray.gray6,
+                color: "$textMuted",
               }}
             >
               ×
