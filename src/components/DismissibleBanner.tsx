@@ -69,6 +69,14 @@ export function DismissibleBanner({
         <Button
           variant="ghost"
           size="sm"
+          // The banner background stays pale in dark mode ($primarySubtle /
+          // warning1 in both modes), so the ghost variant's default $link
+          // label — which lightens in dark themes for dark page backgrounds —
+          // drops to 1.98–2.42:1 (info) / 2.18–2.88:1 (warning) against it,
+          // below the 3:1 minimum for control icons. The banner's own text
+          // color is the contrasting foreground for this background in both
+          // modes: 6.38–6.73:1 (info, per brand) and 4.84:1 (warning).
+          color={styles.text}
           onPress={onDismiss}
           accessibilityLabel="Dismiss"
           minWidth={44}
