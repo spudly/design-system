@@ -6,7 +6,9 @@ const StyledChip = styled(XStack, {
   name: "SpudlyToggleChip",
 
   borderWidth: 1,
-  borderColor: "$borderColor",
+  // Unselected chip boundary: $textMuted holds ≥3:1 in every brand and mode;
+  // $borderColor fell to 1.94–2.29:1 in dark mode. Selected overrides below.
+  borderColor: "$textMuted",
   borderRadius: tokens.radii.full,
   backgroundColor: "$surface",
   paddingHorizontal: tokens.spacing[4],

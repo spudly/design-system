@@ -8,7 +8,9 @@ const StyledTrigger = styled(TamaguiSelect.Trigger, {
 
   backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: "$borderColor",
+  // Input boundary: $textMuted holds ≥3:1 against page and surface in every
+  // brand and mode; $borderColor fell to 1.94–2.29:1 in dark mode.
+  borderColor: "$textMuted",
   borderRadius: tokens.radii.md,
   paddingHorizontal: tokens.spacing[3],
   minHeight: 44,
