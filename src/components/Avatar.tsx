@@ -12,7 +12,7 @@ const StyledImage = styled(TamaguiImage, {
 const Fallback = styled(YStack, {
   name: "SpudlyAvatarFallback",
 
-  backgroundColor: tokens.colors.primary.primary2,
+  backgroundColor: "$primarySubtle",
   borderRadius: tokens.radii.full,
   alignItems: "center",
   justifyContent: "center",
@@ -46,7 +46,7 @@ export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
       <Fallback style={dimensions} accessibilityRole="img" accessibilityLabel={name}>
         <Text
           style={{
-            color: tokens.colors.primary.primary8,
+            color: "$primaryEmphasis",
             fontWeight: tokens.typography.fontWeight.semibold,
             fontSize: Math.round(size * 0.4),
           }}

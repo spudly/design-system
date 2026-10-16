@@ -7,7 +7,7 @@ const StyledList = styled(TamaguiTabs.List, {
 
   gap: tokens.spacing[1],
   borderBottomWidth: 1,
-  borderBottomColor: tokens.colors.gray.gray3,
+  borderBottomColor: "$borderColor",
 });
 
 const StyledTab = styled(TamaguiTabs.Tab, {
@@ -23,7 +23,7 @@ const StyledTab = styled(TamaguiTabs.Tab, {
   variants: {
     active: {
       true: {
-        borderBottomColor: tokens.colors.primary.primary7,
+        borderBottomColor: "$primary",
       },
     },
   } as const,
@@ -62,8 +62,7 @@ export function Tabs({ tabs, value, onValueChange }: TabsProps) {
                   tab.value === value
                     ? tokens.typography.fontWeight.semibold
                     : tokens.typography.fontWeight.regular,
-                color:
-                  tab.value === value ? tokens.colors.primary.primary8 : tokens.colors.gray.gray7,
+                color: tab.value === value ? "$primaryEmphasis" : "$textMuted",
               }}
             >
               {tab.label}

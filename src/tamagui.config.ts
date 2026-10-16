@@ -1,5 +1,5 @@
 import { createAnimations } from "@tamagui/animations-css/extras";
-import { createTamagui } from "tamagui";
+import { createFont, createTamagui } from "tamagui";
 import { tokens } from "./tokens/index.js";
 import { baseTheme, eciperayTheme, memorizeTheme, type SemanticColors } from "./themes/index.js";
 
@@ -137,9 +137,59 @@ function buildTamaguiThemes(theme: { semantic: SemanticColors }) {
   };
 }
 
-export function createTamaguiConfig(theme: { semantic: SemanticColors }) {
+/**
+ * Tamagui font registration for one brand. Registering the fonts is what
+ * makes Tamagui's text-bearing primitives (Button, Input, Select, Label,
+ * Text) render in the brand's stack at all: with no fonts configured they
+ * fall back to platform defaults — on web, form controls don't even inherit
+ * the page font — while plain text inherits, so controls and body text
+ * visibly diverged (Warm Harvest body text is the serif stack; buttons
+ * rendered in a browser-default sans). The family is the brand theme's own
+ * `sans` stack; size/lineHeight mirror the DS type scale (lineHeight =
+ * size × 1.5, the `normal` multiplier).
+ */
+function buildBrandFonts(family: string) {
+  const font = createFont({
+    family,
+    size: {
+      1: tokens.typography.fontSize.xs,
+      2: tokens.typography.fontSize.sm,
+      3: tokens.typography.fontSize.md,
+      4: tokens.typography.fontSize.lg,
+      5: tokens.typography.fontSize.xl,
+      6: tokens.typography.fontSize["2xl"],
+      7: tokens.typography.fontSize["3xl"],
+      8: tokens.typography.fontSize["4xl"],
+    },
+    lineHeight: {
+      1: 18,
+      2: 21,
+      3: 24,
+      4: 27,
+      5: 30,
+      6: 36,
+      7: 45,
+      8: 54,
+    },
+    weight: {
+      1: String(tokens.typography.fontWeight.regular),
+      2: String(tokens.typography.fontWeight.medium),
+      3: String(tokens.typography.fontWeight.semibold),
+      4: String(tokens.typography.fontWeight.bold),
+    },
+  });
+  // Headings use the same stack: hierarchy in this system is carried by
+  // size/weight (the DS Text heading variants set no family of their own).
+  return { body: font, heading: font };
+}
+
+export function createTamaguiConfig(theme: {
+  semantic: SemanticColors;
+  tokens: { typography: { fontFamily: { sans: string } } };
+}) {
   return createTamagui({
     animations,
+    fonts: buildBrandFonts(theme.tokens.typography.fontFamily.sans),
     tokens: tamaguiTokens,
     themes: buildTamaguiThemes(theme),
   });
@@ -168,6 +218,18 @@ const quietDawnThemes = buildTamaguiThemes(memorizeTheme);
 
 export const storybookTamaguiConfig = createTamagui({
   animations,
+  // One config serves every brand, and Tamagui font families are
+  // config-global, so the Storybook fonts point at the `--dsFontStack`
+  // CSS var: the Storybook preview sets it on the document root from the
+  // selected brand theme (see .storybook/preview.tsx) and the stack
+  // switches with the theme. (Carrying the stack as a Tamagui theme value
+  // instead collides with Tamagui's global variable registry: all four
+  // configs are created in one process, and a stack string already
+  // registered as another config's font family gets rewritten to that
+  // config's `--f-family` var.) The per-brand configs used by the apps
+  // register the literal stack (native has no CSS vars); the fallback here
+  // is the base stack for renders outside the preview.
+  fonts: buildBrandFonts(`var(--dsFontStack, ${baseTheme.tokens.typography.fontFamily.sans})`),
   tokens: tamaguiTokens,
   themes: {
     ...baseThemes,

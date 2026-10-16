@@ -85,10 +85,8 @@ export function RadioOptionGroup({
                     height={24}
                     borderRadius={tokens.radii.full}
                     borderWidth={2}
-                    borderColor={
-                      selected ? tokens.colors.primary.primary7 : tokens.colors.gray.gray4
-                    }
-                    backgroundColor="#ffffff"
+                    borderColor={selected ? "$primary" : "$borderColor"}
+                    backgroundColor="$surface"
                     alignItems="center"
                     justifyContent="center"
                   >
@@ -100,7 +98,7 @@ export function RadioOptionGroup({
                       width={12}
                       height={12}
                       borderRadius={tokens.radii.full}
-                      backgroundColor={tokens.colors.primary.primary7}
+                      backgroundColor="$primary"
                     />
                   </XStack>
                 </StyledItem>

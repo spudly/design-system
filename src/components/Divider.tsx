@@ -1,11 +1,10 @@
 import { Separator as TamaguiSeparator, styled } from "tamagui";
 import type { GetProps } from "tamagui";
-import { tokens } from "../tokens/index.js";
 
 const StyledSeparator = styled(TamaguiSeparator, {
   name: "SpudlyDivider",
 
-  borderColor: tokens.colors.gray.gray3,
+  borderColor: "$borderColor",
 });
 
 type StyledSeparatorProps = GetProps<typeof StyledSeparator>;

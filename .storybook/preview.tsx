@@ -1,6 +1,29 @@
+import { useEffect } from "react";
 import type { Preview } from "@storybook/react";
 import { TamaguiProvider, YStack } from "tamagui";
 import { storybookTamaguiConfig, type StorybookThemeName } from "../src/tamagui.config.js";
+import { baseTheme, eciperayTheme, memorizeTheme } from "../src/themes/index.js";
+
+/**
+ * The body/UI font stack for a Storybook theme, from the brand theme's
+ * own tokens. The combined Storybook Tamagui config points its font
+ * family at the `--dsFontStack` CSS var (Tamagui font definitions are
+ * config-global and cannot vary per sub-theme), so the preview sets the
+ * var on the document root for the selected brand — see
+ * storybookTamaguiConfig in src/tamagui.config.ts.
+ */
+function fontStackFor(theme: StorybookThemeName): string {
+  if (theme.includes("warmHarvest")) return eciperayTheme.tokens.typography.fontFamily.sans;
+  if (theme.includes("quietDawn")) return memorizeTheme.tokens.typography.fontFamily.sans;
+  return baseTheme.tokens.typography.fontFamily.sans;
+}
+
+function FontStackSync({ theme }: { theme: StorybookThemeName }) {
+  useEffect(() => {
+    document.documentElement.style.setProperty("--dsFontStack", fontStackFor(theme));
+  }, [theme]);
+  return null;
+}
 
 const themeNames: StorybookThemeName[] = [
   "light",
@@ -50,6 +73,7 @@ const preview: Preview = {
           config={storybookTamaguiConfig}
           defaultTheme={theme}
         >
+          <FontStackSync theme={theme} />
           <YStack backgroundColor="$background" padding={24} style={{ minHeight: "100vh" }}>
             <Story />
           </YStack>

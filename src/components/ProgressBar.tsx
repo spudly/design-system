@@ -7,7 +7,7 @@ const StyledTrack = styled(TamaguiProgress, {
 
   height: tokens.spacing[2],
   borderRadius: tokens.radii.full,
-  backgroundColor: tokens.colors.gray.gray3,
+  backgroundColor: "$borderColor",
   overflow: "hidden",
 });
 

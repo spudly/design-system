@@ -5,10 +5,12 @@ import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
 const toneStyles = {
+  // Info tone mirrors InlineAlert's semantic treatment exactly (the
+  // warning tone keeps the brand-neutral status ramp, as in InlineAlert).
   info: {
-    background: tokens.colors.primary.primary1,
-    border: tokens.colors.primary.primary4,
-    text: tokens.colors.primary.primary8,
+    background: "$primarySubtle",
+    border: "$primary",
+    text: "$primaryEmphasis",
   },
   warning: {
     background: tokens.colors.warning.warning1,

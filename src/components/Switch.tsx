@@ -20,7 +20,7 @@ const StyledSwitch = styled(TamaguiSwitch, {
   variants: {
     on: {
       true: {
-        backgroundColor: tokens.colors.primary.primary7,
+        backgroundColor: "$primary",
       },
       false: {
         backgroundColor: tokens.colors.gray.gray4,

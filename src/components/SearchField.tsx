@@ -7,9 +7,9 @@ import { Text } from "./Text.js";
 const StyledContainer = styled(XStack, {
   name: "SpudlySearchField",
 
-  backgroundColor: "#ffffff",
+  backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: tokens.colors.gray.gray4,
+  borderColor: "$borderColor",
   borderRadius: tokens.radii.md,
   paddingLeft: tokens.spacing[3],
   paddingRight: tokens.spacing[1],
@@ -26,7 +26,7 @@ const StyledInput = styled(TamaguiInput, {
   backgroundColor: "transparent",
   paddingHorizontal: 0,
   fontSize: tokens.typography.fontSize.md,
-  color: tokens.colors.gray.gray10,
+  color: "$color",
 });
 
 type StyledInputProps = GetProps<typeof StyledInput>;
@@ -70,7 +70,7 @@ export function SearchField({
             // reads at a glance; lineHeight keeps it inside the 44px row.
             fontSize: tokens.typography.fontSize["4xl"],
             lineHeight: tokens.typography.fontSize["4xl"],
-            color: tokens.colors.gray.gray6,
+            color: "$textMuted",
           }}
         >
           ⌕
@@ -96,7 +96,7 @@ export function SearchField({
               aria-hidden
               style={{
                 fontSize: tokens.typography.fontSize.lg,
-                color: tokens.colors.gray.gray6,
+                color: "$textMuted",
               }}
             >
               ×

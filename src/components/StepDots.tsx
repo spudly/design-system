@@ -13,7 +13,7 @@ const StyledDot = styled(XStack, {
   variants: {
     active: {
       true: {
-        backgroundColor: tokens.colors.primary.primary7,
+        backgroundColor: "$primary",
       },
     },
   } as const,

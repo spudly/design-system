@@ -78,14 +78,14 @@ export function CheckboxField({
           {...rest}
         >
           <StyledBox
-            borderColor={checked ? tokens.colors.primary.primary7 : tokens.colors.gray.gray4}
-            backgroundColor={checked ? tokens.colors.primary.primary7 : "#ffffff"}
+            borderColor={checked ? "$primary" : "$borderColor"}
+            backgroundColor={checked ? "$primary" : "$surface"}
           >
             <TamaguiCheckbox.Indicator>
               <Text
                 aria-hidden
                 style={{
-                  color: "#ffffff",
+                  color: "$onPrimary",
                   fontSize: tokens.typography.fontSize.sm,
                   fontWeight: tokens.typography.fontWeight.bold,
                   lineHeight: tokens.typography.fontSize.sm,

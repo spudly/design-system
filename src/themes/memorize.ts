@@ -21,6 +21,12 @@ export const memorizeTheme = {
     primaryHover: tokens.colors.teal.teal9,
     primaryActive: tokens.colors.teal.teal10,
     onPrimary: tokens.colors.teal.teal1,
+    // Without these two the ghost button, Badge/InlineAlert info tones and
+    // Avatar fallback silently fell back to the base (indigo) ramp under
+    // Quiet Dawn. Steps parallel the other themes: subtle = step 2 tint,
+    // emphasis = the primaryHover step (dark primary for text on light).
+    primarySubtle: tokens.colors.teal.teal2,
+    primaryEmphasis: tokens.colors.teal.teal9,
     link: tokens.colors.teal.teal8,
     linkDark: tokens.colors.teal.teal6,
     accent: "#b45309",
