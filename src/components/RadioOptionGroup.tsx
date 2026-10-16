@@ -92,14 +92,16 @@ export function RadioOptionGroup({
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <TamaguiRadioGroup.Indicator>
-                      <XStack
-                        width={12}
-                        height={12}
-                        borderRadius={tokens.radii.full}
-                        backgroundColor={tokens.colors.primary.primary7}
-                      />
-                    </TamaguiRadioGroup.Indicator>
+                    {/* The Indicator itself is the dot: Tamagui sizes the
+                        Indicator frame to 50% of the circle (10x10), so a
+                        fixed 12x12 child overflowed it from the top-left
+                        and rendered off-center. */}
+                    <TamaguiRadioGroup.Indicator
+                      width={12}
+                      height={12}
+                      borderRadius={tokens.radii.full}
+                      backgroundColor={tokens.colors.primary.primary7}
+                    />
                   </XStack>
                 </StyledItem>
                 <YStack flex={1} gap={tokens.spacing[1]}>

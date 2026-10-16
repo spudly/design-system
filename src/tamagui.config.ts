@@ -78,7 +78,35 @@ function toTamaguiTheme(semantic: SemanticColors, dark: boolean) {
  * NOTE: media breakpoints and font configs are intentionally minimal here;
  * they grow with the first real design direction.
  */
-export function createTamaguiConfig(theme: { semantic: SemanticColors }) {
+const tamaguiTokens = {
+  color: {
+    ...tokens.colors.gray,
+    ...tokens.colors.primary,
+    ...tokens.colors.success,
+    ...tokens.colors.warning,
+    ...tokens.colors.danger,
+  },
+  space: { ...tokens.spacing },
+  size: { ...tokens.spacing },
+  // Tamagui requires radius/zIndex keys to be a subset of the size keys.
+  // Map our semantic radii onto the numeric size scale (0->0px, 1->4px,
+  // 2->8px, 3->12px, 4->16px, matching the 4px-base spacing scale).
+  radius: {
+    0: tokens.radii.zero,
+    1: tokens.radii.sm,
+    2: tokens.radii.md,
+    3: tokens.radii.lg,
+    4: tokens.radii.xl,
+  },
+  zIndex: {
+    0: 0, // base
+    1: 10, // above
+    2: 100, // modal
+  },
+};
+
+/** Build the light/dark Tamagui theme pair for one brand theme. */
+function buildTamaguiThemes(theme: { semantic: SemanticColors }) {
   const darkSemantic: SemanticColors = {
     background: tokens.colors.gray.gray10,
     surface: tokens.colors.gray.gray9,
@@ -103,38 +131,17 @@ export function createTamaguiConfig(theme: { semantic: SemanticColors }) {
     danger: theme.semantic.danger,
   };
 
+  return {
+    light: toTamaguiTheme(theme.semantic, false),
+    dark: toTamaguiTheme(darkSemantic, true),
+  };
+}
+
+export function createTamaguiConfig(theme: { semantic: SemanticColors }) {
   return createTamagui({
     animations,
-    tokens: {
-      color: {
-        ...tokens.colors.gray,
-        ...tokens.colors.primary,
-        ...tokens.colors.success,
-        ...tokens.colors.warning,
-        ...tokens.colors.danger,
-      },
-      space: { ...tokens.spacing },
-      size: { ...tokens.spacing },
-      // Tamagui requires radius/zIndex keys to be a subset of the size keys.
-      // Map our semantic radii onto the numeric size scale (0->0px, 1->4px,
-      // 2->8px, 3->12px, 4->16px, matching the 4px-base spacing scale).
-      radius: {
-        0: tokens.radii.zero,
-        1: tokens.radii.sm,
-        2: tokens.radii.md,
-        3: tokens.radii.lg,
-        4: tokens.radii.xl,
-      },
-      zIndex: {
-        0: 0, // base
-        1: 10, // above
-        2: 100, // modal
-      },
-    },
-    themes: {
-      light: toTamaguiTheme(theme.semantic, false),
-      dark: toTamaguiTheme(darkSemantic, true),
-    },
+    tokens: tamaguiTokens,
+    themes: buildTamaguiThemes(theme),
   });
 }
 
@@ -145,6 +152,39 @@ export const eciperayTamaguiConfig = createTamaguiConfig(eciperayTheme);
 
 /** Pre-built Tamagui config using the Memorize "Quiet Dawn" theme. */
 export const memorizeTamaguiConfig = createTamaguiConfig(memorizeTheme);
+
+/**
+ * Combined config for Storybook: every brand lives in ONE config, with the
+ * brands registered as sub-themes (light_warmHarvest, dark_quietDawn, ...),
+ * so the toolbar can switch brand/mode by changing `defaultTheme` on a
+ * single provider. Swapping between the separate per-brand configs at
+ * runtime cannot work: each config generates the same `.t_light` / `.t_dark`
+ * theme class names, and the browser keeps the first-mounted config's
+ * stylesheet, so the provider swap is a no-op and styles never change.
+ */
+const baseThemes = buildTamaguiThemes(baseTheme);
+const warmHarvestThemes = buildTamaguiThemes(eciperayTheme);
+const quietDawnThemes = buildTamaguiThemes(memorizeTheme);
+
+export const storybookTamaguiConfig = createTamagui({
+  animations,
+  tokens: tamaguiTokens,
+  themes: {
+    ...baseThemes,
+    light_warmHarvest: warmHarvestThemes.light,
+    dark_warmHarvest: warmHarvestThemes.dark,
+    light_quietDawn: quietDawnThemes.light,
+    dark_quietDawn: quietDawnThemes.dark,
+  },
+});
+
+export type StorybookThemeName =
+  | "light"
+  | "dark"
+  | "light_warmHarvest"
+  | "dark_warmHarvest"
+  | "light_quietDawn"
+  | "dark_quietDawn";
 
 export default tamaguiConfig;
 

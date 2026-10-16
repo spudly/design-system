@@ -66,7 +66,10 @@ export function SearchField({
         <Text
           aria-hidden
           style={{
-            fontSize: tokens.typography.fontSize.lg,
+            // ~2x the previous lg (18px) glyph so the search affordance
+            // reads at a glance; lineHeight keeps it inside the 44px row.
+            fontSize: tokens.typography.fontSize["4xl"],
+            lineHeight: tokens.typography.fontSize["4xl"],
             color: tokens.colors.gray.gray6,
           }}
         >

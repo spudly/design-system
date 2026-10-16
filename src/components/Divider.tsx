@@ -19,5 +19,14 @@ export interface DividerProps extends StyledSeparatorProps {
  * Pass `vertical` for a vertical rule.
  */
 export function Divider({ vertical = false, ...rest }: DividerProps) {
-  return <StyledSeparator vertical={vertical} {...rest} />;
+  // Tamagui's vertical Separator sizes to its content height, which is 0 —
+  // in a flex row it only becomes visible if it stretches to the row's
+  // cross-axis height.
+  return (
+    <StyledSeparator
+      vertical={vertical}
+      {...(vertical ? { alignSelf: "stretch" as const } : {})}
+      {...rest}
+    />
+  );
 }

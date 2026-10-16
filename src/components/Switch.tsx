@@ -6,6 +6,15 @@ import { Text } from "./Text.js";
 const StyledSwitch = styled(TamaguiSwitch, {
   name: "SpudlySwitch",
 
+  // Explicit dimensions: Tamagui Switch sizes itself from the `$size`
+  // token scale (its dynamic size variant looks up a named size), but this
+  // design system's size tokens are the numeric spacing scale, so the
+  // lookup resolved to nothing and the switch rendered with no width or
+  // height at all. 48x32 track; the thumb travel distance is measured by
+  // Tamagui at runtime, so it stays correct with explicit sizes.
+  width: tokens.spacing[12],
+  height: tokens.spacing[8],
+  borderRadius: tokens.radii.full,
   borderWidth: 0,
 
   variants: {
@@ -23,6 +32,9 @@ const StyledSwitch = styled(TamaguiSwitch, {
 const StyledThumb = styled(TamaguiSwitch.Thumb, {
   name: "SpudlySwitchThumb",
 
+  width: tokens.spacing[6],
+  height: tokens.spacing[6],
+  borderRadius: tokens.radii.full,
   backgroundColor: tokens.colors.gray.gray1,
 });
 

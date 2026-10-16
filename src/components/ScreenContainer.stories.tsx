@@ -20,7 +20,12 @@ type Story = StoryObj<typeof ScreenContainer>;
 
 export const Scrollable: Story = {
   render: (args) => (
-    <div style={{ height: 400, border: "1px dashed #ccc" }}>
+    // display:flex + column so the ScrollView's flex:1 can resolve against
+    // the fixed height; in a plain block wrapper the scroll region
+    // collapses to content height.
+    <div
+      style={{ height: 400, border: "1px dashed #ccc", display: "flex", flexDirection: "column" }}
+    >
       <ScreenContainer {...args}>
         <Text variant="heading">My verses</Text>
         <Card>
@@ -51,7 +56,9 @@ export const NotScrollable: Story = {
 
 export const Padded: Story = {
   render: (args) => (
-    <div style={{ height: 400, border: "1px dashed #ccc" }}>
+    <div
+      style={{ height: 400, border: "1px dashed #ccc", display: "flex", flexDirection: "column" }}
+    >
       <ScreenContainer {...args} variant="padded">
         <Text variant="heading">Creamy Tuscan Garlic Chicken</Text>
         <Text variant="hint">Wider horizontal padding and a larger top offset.</Text>

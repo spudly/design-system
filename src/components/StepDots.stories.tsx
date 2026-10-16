@@ -19,13 +19,13 @@ export const Middle: Story = {
 };
 
 export const First: Story = {
-  args: { count: 4, activeIndex: 0, label: "Step 1 of 4" },
+  args: { count: 5, activeIndex: 0, label: "Step 1 of 5" },
 };
 
 export const Last: Story = {
-  args: { count: 3, activeIndex: 2 },
+  args: { count: 5, activeIndex: 4 },
 };
 
 export const Streak: Story = {
-  args: { count: 7, activeIndex: 2, label: "3-day study streak" },
+  args: { count: 5, activeIndex: 2, label: "3-day study streak" },
 };

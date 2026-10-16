@@ -36,6 +36,14 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
     <Button
       variant="secondary"
       size="sm"
+      // Flow inline within the surrounding sentence on web (Tamagui
+      // buttons are display:flex, which block-ifies in text flow), and
+      // hug the left edge like the revealed text instead of stretching
+      // full-width with centered content. The web-only display uses
+      // Tamagui v3's conditional-object syntax — the v2 `$platform-web`
+      // prop was removed in v3 and is silently dropped.
+      display={{ web: "inline-flex" }}
+      alignSelf="flex-start"
       onPress={onReveal}
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}

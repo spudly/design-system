@@ -58,7 +58,11 @@ export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
   }
   return (
     <StyledImage
-      source={{ uri: src }}
+      // Tamagui's Image renders an <img> on web and maps `src` (not the
+      // React Native-style `source` object, which web ignores) to the
+      // image URL; on native it converts the string to `{ uri }`.
+      src={src}
+      objectFit="cover"
       style={dimensions}
       accessibilityRole="img"
       accessibilityLabel={name}

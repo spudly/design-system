@@ -1,62 +1,54 @@
 import type { Preview } from "@storybook/react";
 import { TamaguiProvider, YStack } from "tamagui";
-import {
-  eciperayTamaguiConfig,
-  memorizeTamaguiConfig,
-  tamaguiConfig,
-} from "../src/tamagui.config.js";
+import { storybookTamaguiConfig, type StorybookThemeName } from "../src/tamagui.config.js";
 
-const brandConfigs = {
-  base: tamaguiConfig,
-  "warm-harvest": eciperayTamaguiConfig,
-  "quiet-dawn": memorizeTamaguiConfig,
-} as const;
+const themeNames: StorybookThemeName[] = [
+  "light",
+  "dark",
+  "light_warmHarvest",
+  "dark_warmHarvest",
+  "light_quietDawn",
+  "dark_quietDawn",
+];
 
-type Brand = keyof typeof brandConfigs;
+function isStorybookThemeName(value: string): value is StorybookThemeName {
+  return (themeNames as string[]).includes(value);
+}
 
 const preview: Preview = {
   globalTypes: {
-    brand: {
-      description: "Brand theme (Tamagui config)",
+    theme: {
+      description: "Theme (brand + light/dark mode)",
       toolbar: {
-        title: "Brand",
+        title: "Theme",
         icon: "paintbrush",
         items: [
-          { value: "base", title: "Base (neutral)" },
-          { value: "warm-harvest", title: "Warm Harvest · Eciperay" },
-          { value: "quiet-dawn", title: "Quiet Dawn · Memorize" },
-        ],
-        dynamicTitle: true,
-      },
-    },
-    mode: {
-      description: "Light or dark theme",
-      toolbar: {
-        title: "Mode",
-        icon: "contrast",
-        items: [
-          { value: "light", title: "Light", icon: "sun" },
-          { value: "dark", title: "Dark", icon: "moon" },
+          { value: "light", title: "Base · Light" },
+          { value: "dark", title: "Base · Dark" },
+          { value: "light_warmHarvest", title: "Warm Harvest · Light" },
+          { value: "dark_warmHarvest", title: "Warm Harvest · Dark" },
+          { value: "light_quietDawn", title: "Quiet Dawn · Light" },
+          { value: "dark_quietDawn", title: "Quiet Dawn · Dark" },
         ],
         dynamicTitle: true,
       },
     },
   },
   initialGlobals: {
-    brand: "base",
-    mode: "light",
+    theme: "light",
   },
   decorators: [
     (Story, context) => {
-      const brandValue = context.globals.brand as string;
-      const brand: Brand = brandValue in brandConfigs ? (brandValue as Brand) : "base";
-      const mode = context.globals.mode === "dark" ? "dark" : "light";
+      const themeValue = context.globals.theme as string;
+      const theme: StorybookThemeName = isStorybookThemeName(themeValue) ? themeValue : "light";
       return (
         <TamaguiProvider
-          // Remount on switch: Tamagui reads config/defaultTheme at mount.
-          key={`${brand}-${mode}`}
-          config={brandConfigs[brand]}
-          defaultTheme={mode}
+          // Remount on switch so Tamagui re-reads defaultTheme. All brands
+          // live in this one config as sub-themes — swapping configs at
+          // runtime does not restyle (see storybookTamaguiConfig).
+          key={theme}
+          config={storybookTamaguiConfig}
+          defaultTheme={theme}
         >
           <YStack backgroundColor="$background" padding={24} style={{ minHeight: "100vh" }}>
             <Story />

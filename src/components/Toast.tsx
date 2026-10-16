@@ -75,17 +75,22 @@ export function ToastProvider({ children }: ToastProviderProps) {
   return (
     <>
       {children}
-      <TamaguiToast.Viewport />
+      {/* Viewport and List must live INSIDE the Toast root: both consume
+          the toast context and throw "`Toast.Viewport` must be used within
+          `Toast`" when rendered as siblings of the root (the List belongs
+          inside the Viewport). */}
       <TamaguiToast position="bottom-center" duration={4000}>
-        <TamaguiToast.List
-          renderItem={({ toast: t }) => (
-            <Toast
-              key={t.id}
-              {...(typeof t.title === "string" ? { title: t.title } : {})}
-              {...(typeof t.description === "string" ? { description: t.description } : {})}
-            />
-          )}
-        />
+        <TamaguiToast.Viewport>
+          <TamaguiToast.List
+            renderItem={({ toast: t }) => (
+              <Toast
+                key={t.id}
+                {...(typeof t.title === "string" ? { title: t.title } : {})}
+                {...(typeof t.description === "string" ? { description: t.description } : {})}
+              />
+            )}
+          />
+        </TamaguiToast.Viewport>
       </TamaguiToast>
     </>
   );
