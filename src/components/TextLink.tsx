@@ -49,7 +49,7 @@ export function TextLink({ onPress, children, ...rest }: TextLinkProps) {
       onPress={onPress}
       tabIndex={0}
       onKeyDown={handleKeyDown}
-      $platform-web={{ cursor: "pointer" }}
+      cursor="web:pointer"
       {...rest}
     >
       {children}
