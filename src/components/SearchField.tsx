@@ -30,6 +30,13 @@ const StyledContainer = styled(XStack, {
   minHeight: 44,
   alignItems: "center",
   gap: tokens.spacing[2],
+  // The focus ring belongs on the whole field, not the inner input (whose
+  // own outline is suppressed below): when anything inside is focused, the
+  // container shows the ring. Tamagui v3 condition clauses in the value.
+  outlineWidth: "0px focus-within:2px",
+  outlineStyle: "none focus-within:solid",
+  outlineColor: "$link",
+  outlineOffset: 2,
 });
 
 const StyledInput = styled(TamaguiInput, {
@@ -41,6 +48,9 @@ const StyledInput = styled(TamaguiInput, {
   paddingHorizontal: 0,
   fontSize: tokens.typography.fontSize.md,
   color: "$color",
+  // No ring on the input itself — the container carries it (focus-within).
+  outlineWidth: 0,
+  outlineStyle: "none",
 });
 
 type StyledInputProps = GetProps<typeof StyledInput>;
