@@ -25,7 +25,3 @@ export const First: Story = {
 export const Last: Story = {
   args: { count: 5, activeIndex: 4 },
 };
-
-export const Streak: Story = {
-  args: { count: 5, activeIndex: 2, label: "3-day study streak" },
-};
