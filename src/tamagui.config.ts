@@ -185,11 +185,16 @@ function buildBrandFonts(family: string) {
 
 export function createTamaguiConfig(theme: {
   semantic: SemanticColors;
-  tokens: { typography: { fontFamily: { sans: string } } };
+  tokens?: { typography: { fontFamily: { sans: string } } };
 }) {
   return createTamagui({
     animations,
-    fonts: buildBrandFonts(theme.tokens.typography.fontFamily.sans),
+    // The font override is optional: callers that pass a semantic-only
+    // theme (the factory's original input shape) get the base font stack
+    // instead of a dereference error.
+    fonts: buildBrandFonts(
+      theme.tokens?.typography?.fontFamily?.sans ?? baseTheme.tokens.typography.fontFamily.sans,
+    ),
     tokens: tamaguiTokens,
     themes: buildTamaguiThemes(theme),
   });

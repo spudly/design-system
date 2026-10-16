@@ -61,8 +61,11 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
       backgroundColor="transparent"
       borderColor="transparent"
       borderWidth={0}
-      // The box is exactly the word's box — no padding, no min-height.
+      // The box is exactly the word's box — no padding in either axis
+      // (the `sm` variant otherwise adds 8px top and bottom, growing the
+      // hidden state 16px taller than the revealed text), no min-height.
       paddingHorizontal={0}
+      paddingVertical={0}
       minHeight={0}
       outlineWidth={focused ? 2 : 0}
       outlineStyle="solid"

@@ -85,7 +85,13 @@ export function RadioOptionGroup({
                     height={24}
                     borderRadius={tokens.radii.full}
                     borderWidth={2}
-                    borderColor={selected ? "$primary" : "$borderColor"}
+                    // Selected chrome uses $link, the dark-aware interactive
+                    // role: $primary falls below the 3:1 state-indicator
+                    // minimum in dark mode (border 2.85:1 against the base
+                    // dark background), while $link holds ≥5:1 against both
+                    // the circle's $surface and the page background in every
+                    // brand and mode.
+                    borderColor={selected ? "$link" : "$borderColor"}
                     backgroundColor="$surface"
                     alignItems="center"
                     justifyContent="center"
@@ -93,12 +99,14 @@ export function RadioOptionGroup({
                     {/* The Indicator itself is the dot: Tamagui sizes the
                         Indicator frame to 50% of the circle (10x10), so a
                         fixed 12x12 child overflowed it from the top-left
-                        and rendered off-center. */}
+                        and rendered off-center. Its color is $link for the
+                        same reason as the border above: as $primary it sat
+                        at 2.41–2.92:1 against the dark $surface circle. */}
                     <TamaguiRadioGroup.Indicator
                       width={12}
                       height={12}
                       borderRadius={tokens.radii.full}
-                      backgroundColor="$primary"
+                      backgroundColor="$link"
                     />
                   </XStack>
                 </StyledItem>
