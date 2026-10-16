@@ -5,7 +5,7 @@ import { tokens } from "../tokens/index.js";
 const StyledText = styled(TamaguiText, {
   name: "SpudlyText",
 
-  color: tokens.colors.gray.gray10,
+  color: "$color",
   fontSize: tokens.typography.fontSize.md,
 
   variants: {

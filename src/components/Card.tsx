@@ -7,7 +7,7 @@ const StyledCard = styled(YStack, {
 
   backgroundColor: "$surface",
   borderWidth: 1,
-  borderColor: "$border",
+  borderColor: "$borderColor",
   borderRadius: tokens.radii.lg,
   padding: tokens.spacing[4],
 
@@ -60,5 +60,11 @@ export interface CardProps extends StyledCardProps {
  */
 export function Card({ variant, elevated = false, ...rest }: CardProps) {
   const resolvedVariant = variant ?? (elevated ? "elevated" : "default");
-  return <StyledCard variant={resolvedVariant} {...rest} />;
+  // Android shadow for the elevated variant: `elevation` comes from the same
+  // shadow token as the iOS shadow props above and is applied via `style`,
+  // because Tamagui v3's styled() typing accepts it in neither the static
+  // config nor this component's props.
+  const style =
+    resolvedVariant === "elevated" ? { elevation: tokens.shadows.md.elevation } : undefined;
+  return <StyledCard variant={resolvedVariant} style={style} {...rest} />;
 }

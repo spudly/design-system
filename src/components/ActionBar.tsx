@@ -12,7 +12,7 @@ const StyledActionBar = styled(YStack, {
   right: 0,
   zIndex: 1,
   backgroundColor: "$surface",
-  borderColor: "$border",
+  borderColor: "$borderColor",
   borderWidth: 0,
   padding: tokens.spacing[4],
   gap: tokens.spacing[3],
@@ -56,5 +56,15 @@ export interface ActionBarProps extends StyledActionBarProps {
  * semantic theme tokens; the border sits on the bar's inner edge.
  */
 export function ActionBar({ placement = "bottom", ...rest }: ActionBarProps) {
-  return <StyledActionBar placement={placement} {...rest} />;
+  // Android shadow: `elevation` comes from the same lg shadow token as the
+  // iOS shadow props above and is applied via `style`, because Tamagui v3's
+  // styled() typing accepts it in neither the static config nor this
+  // component's props.
+  return (
+    <StyledActionBar
+      placement={placement}
+      style={{ elevation: tokens.shadows.lg.elevation }}
+      {...rest}
+    />
+  );
 }
