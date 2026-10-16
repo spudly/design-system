@@ -71,11 +71,11 @@ export function ScreenContainer({ scrollable = true, children, ...rest }: Screen
   return (
     <ScrollView
       flex={1}
-      $platform-web={{
-        display: "flex",
-        flexDirection: "column",
-        minHeight: "100%",
-      }}
+      // Tamagui v3 removed the $platform-web sub-object; web-only styles
+      // are now flat `web:` clauses on each property value.
+      display="web:flex"
+      flexDirection="web:column"
+      minHeight="web:100%"
     >
       {content}
     </ScrollView>
