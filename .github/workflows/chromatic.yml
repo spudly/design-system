@@ -1,0 +1,56 @@
+name: chromatic
+
+# Publishes every PR's Storybook to Chromatic: each run gets its own
+# browsable build URL for review, plus visual snapshot diffs against the
+# accepted main-branch baseline (the check reports changes until they are
+# accepted in Chromatic's UI — that is the review gate working).
+#
+# Setup (one-time, see README "Storybook previews (Chromatic)"): create a
+# Chromatic project linked to this repo and store its project token as the
+# CHROMATIC_PROJECT_TOKEN repository secret. Until then this workflow's
+# publish step fails (confined to its own check; CI is unaffected).
+
+on:
+  # Baselines: main-branch builds are the comparison target for PR diffs.
+  push:
+    branches: [main]
+  pull_request:
+
+# Match ci.yml: cancel superseded runs for the same PR/branch.
+concurrency:
+  group: chromatic-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Fork PRs never receive repository secrets, so the publish step could
+    # only fail there — skip them. (Dependabot PRs DO run, but need the
+    # token mirrored as a Dependabot secret; see README.)
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+        with:
+          # Chromatic needs full history to find baseline builds and to
+          # scope TurboSnap change detection.
+          fetch-depth: 0
+          # On PRs, check out the PR head itself — not GitHub's synthetic
+          # merge commit — so snapshots are built from (and attributed to)
+          # exactly the commit Chromatic records for the build.
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Publish to Chromatic
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
