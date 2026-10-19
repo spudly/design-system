@@ -66,7 +66,7 @@
   "version": "0.5.1",
   "dependencies": {
     "@tamagui/animations-css": "^3.0.15",
-    "@tamagui/constants": "3.0.15",
+    "@tamagui/constants": "3.0.18",
     "tamagui": "^3.0.15"
   }
 }
