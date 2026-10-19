@@ -91,6 +91,10 @@ One-time setup:
    `CHROMATIC_PROJECT_TOKEN` (Settings → Secrets and variables → Actions).
    Until the secret exists, the publish step fails — confined to the
    chromatic check; CI is unaffected.
+3. For Dependabot PRs, add the same value as a **Dependabot** secret with
+   the same name (Settings → Secrets and variables → Dependabot):
+   Dependabot-triggered runs cannot read Actions secrets. Fork PRs are
+   skipped entirely — they never receive secrets, by design.
 
 ## Next steps
 
