@@ -73,6 +73,25 @@ Releases are automated with [Changesets](https://github.com/changesets/changeset
 3. Consumers upgrade on their own schedule — Eciperay can stay on 1.4 while
    Memorize tries 2.0.
 
+## Storybook previews (Chromatic)
+
+Every pull request publishes its Storybook build to
+[Chromatic](https://www.chromatic.com/) via `.github/workflows/chromatic.yml`:
+each run gets a browsable build URL for review, and Chromatic diffs story
+snapshots against the accepted `main` baseline. Visual changes show up as a
+failing/check-pending Chromatic status until they are accepted in
+Chromatic's UI — that acceptance is the visual-regression gate. Pushes to
+`main` publish the new baseline.
+
+One-time setup:
+
+1. Create a Chromatic project linked to this GitHub repo (chromatic.com →
+   Add project). Chromatic's free tier covers this project's volume.
+2. Copy the project token into a repository secret named
+   `CHROMATIC_PROJECT_TOKEN` (Settings → Secrets and variables → Actions).
+   Until the secret exists, the publish step fails — confined to the
+   chromatic check; CI is unaffected.
+
 ## Next steps
 
 1. **Design brief** — one page: product personality, audience, adjectives,
