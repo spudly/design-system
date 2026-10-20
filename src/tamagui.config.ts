@@ -68,15 +68,13 @@ function toTamaguiTheme(semantic: SemanticColors, dark: boolean) {
 /**
  * Tamagui configuration wiring the design-system tokens in.
  *
- * Consumers wrap their app in `<TamaguiProvider config={tamaguiConfig}>`
- * (web) / the native equivalent. Components in this package reference the
- * raw `tokens` object directly so they stay usable even without the provider,
- * while the config below additionally exposes `$token` shorthands for
- * app-level styling.
- *
- * Use `createTamaguiConfig(theme)` to build a config for a specific app
- * theme (e.g. eciperayTheme, memorizeTheme). The default `tamaguiConfig`
- * uses the brand-neutral baseTheme.
+ * Consumers create their app config with `createTamaguiConfig(theme)`
+ * for their brand theme (eciperayTheme, memorizeTheme, or the
+ * brand-neutral baseTheme) and wrap the app in
+ * `<TamaguiProvider config={thatConfig}>`. Components in this package
+ * reference the raw `tokens` object directly so they stay usable even
+ * without the provider, while the config additionally exposes `$token`
+ * shorthands for app-level styling.
  *
  * NOTE: media breakpoints and font configs are intentionally minimal here;
  * they grow with the first real design direction.
@@ -274,52 +272,75 @@ export function createTamaguiConfig(theme: {
   });
 }
 
-export const tamaguiConfig = createTamaguiConfig(baseTheme);
-
-/** Pre-built Tamagui config using the Eciperay "Warm Harvest" theme. */
-export const eciperayTamaguiConfig = createTamaguiConfig(eciperayTheme);
-
-/** Pre-built Tamagui config using the Memorize "Quiet Dawn" theme. */
-export const memorizeTamaguiConfig = createTamaguiConfig(memorizeTheme);
+/**
+ * NO pre-built configs are exported anymore — deliberately.
+ *
+ * Tamagui v3 keeps exactly ONE global config: `createTamagui()` installs
+ * its result as the singleton every theme/token resolution reads, and
+ * `TamaguiProvider`'s `config` prop does not change that (it only seeds
+ * the default theme name and animation driver). This module used to
+ * create the base, Eciperay, Memorize, and Storybook configs at module
+ * scope, so merely importing the package left the LAST-created config
+ * in charge of every consumer's rendering — the Eciperay app shipped
+ * with Memorize teal buttons and background (spudly/eciperay#149).
+ *
+ * Each app must create its own config exactly once, in app-owned code
+ * that evaluates after this package, via the factories:
+ *
+ *   const config = createTamaguiConfig(eciperayTheme); // or memorizeTheme / baseTheme
+ *
+ * See the changeset / migration notes for the per-app replacements of
+ * the removed `tamaguiConfig`, `eciperayTamaguiConfig`, and
+ * `memorizeTamaguiConfig` exports.
+ */
 
 /**
- * Combined config for Storybook: every brand lives in ONE config, with the
- * brands registered as sub-themes (light_warmHarvest, dark_quietDawn, ...),
- * so the toolbar can switch brand/mode by changing `defaultTheme` on a
- * single provider. Swapping between the separate per-brand configs at
- * runtime cannot work: each config generates the same `.t_light` / `.t_dark`
- * theme class names, and the browser keeps the first-mounted config's
- * stylesheet, so the provider swap is a no-op and styles never change.
+ * Build the combined config for Storybook: every brand lives in ONE
+ * config, with the brands registered as sub-themes (light_warmHarvest,
+ * dark_quietDawn, ...), so the toolbar can switch brand/mode by
+ * changing `defaultTheme` on a single provider. Swapping between the
+ * separate per-brand configs at runtime cannot work: each config
+ * generates the same `.t_light` / `.t_dark` theme class names, and the
+ * browser keeps the first-mounted config's stylesheet, so the
+ * provider swap is a no-op and styles never change.
+ *
+ * A factory (not a pre-built export) for the same reason as the app
+ * configs above: creating it at module scope would install it as the
+ * global config for every consumer of this package. The Storybook
+ * preview calls this once, in Storybook-owned code.
  */
-const baseThemes = buildTamaguiThemes(baseTheme);
-const warmHarvestThemes = buildTamaguiThemes(eciperayTheme);
-const quietDawnThemes = buildTamaguiThemes(memorizeTheme);
+export function createStorybookTamaguiConfig() {
+  const baseThemes = buildTamaguiThemes(baseTheme);
+  const warmHarvestThemes = buildTamaguiThemes(eciperayTheme);
+  const quietDawnThemes = buildTamaguiThemes(memorizeTheme);
 
-export const storybookTamaguiConfig = createTamagui({
-  animations,
-  // One config serves every brand, and Tamagui font families are
-  // config-global, so the Storybook fonts point at the `--dsFontStack`
-  // CSS var: the Storybook preview sets it on the document root from the
-  // selected brand theme (see .storybook/preview.tsx) and the stack
-  // switches with the theme. (Carrying the stack as a Tamagui theme value
-  // instead collides with Tamagui's global variable registry: all four
-  // configs are created in one process, and a stack string already
-  // registered as another config's font family gets rewritten to that
-  // config's `--f-family` var.) The per-brand configs used by the apps
-  // register the literal stack (native has no CSS vars); the fallback here
-  // is the base stack for renders outside the preview.
-  fonts: buildBrandFonts({
-    sans: `var(--dsFontStack, ${baseTheme.tokens.typography.fontFamily.sans})`,
-  }),
-  tokens: tamaguiTokens,
-  themes: {
-    ...baseThemes,
-    light_warmHarvest: warmHarvestThemes.light,
-    dark_warmHarvest: warmHarvestThemes.dark,
-    light_quietDawn: quietDawnThemes.light,
-    dark_quietDawn: quietDawnThemes.dark,
-  },
-});
+  return createTamagui({
+    animations,
+    // One config serves every brand, and Tamagui font families are
+    // config-global, so the Storybook fonts point at the `--dsFontStack`
+    // CSS var: the Storybook preview sets it on the document root from
+    // the selected brand theme (see .storybook/preview.tsx) and the stack
+    // switches with the theme. (Carrying the stack as a Tamagui theme
+    // value instead collides with Tamagui's global variable registry
+    // when several configs are created in one process, and a stack
+    // string already registered as another config's font family gets
+    // rewritten to that config's `--f-family` var.) The per-brand
+    // configs used by the apps register the literal stack (native has
+    // no CSS vars); the fallback here is the base stack for renders
+    // outside the preview.
+    fonts: buildBrandFonts({
+      sans: `var(--dsFontStack, ${baseTheme.tokens.typography.fontFamily.sans})`,
+    }),
+    tokens: tamaguiTokens,
+    themes: {
+      ...baseThemes,
+      light_warmHarvest: warmHarvestThemes.light,
+      dark_warmHarvest: warmHarvestThemes.dark,
+      light_quietDawn: quietDawnThemes.light,
+      dark_quietDawn: quietDawnThemes.dark,
+    },
+  });
+}
 
 export type StorybookThemeName =
   | "light"
@@ -329,9 +350,7 @@ export type StorybookThemeName =
   | "light_quietDawn"
   | "dark_quietDawn";
 
-export default tamaguiConfig;
-
-type AppConfig = typeof tamaguiConfig;
+type AppConfig = ReturnType<typeof createTamaguiConfig>;
 
 declare module "tamagui" {
   interface TamaguiCustomConfig extends AppConfig {}
