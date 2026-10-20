@@ -44,6 +44,15 @@ const StyledInput = styled(TamaguiInput, {
 
   flex: 1,
   borderWidth: 0,
+  // The umbrella Input skin's default size variant sets borderRadius to
+  // the bare token name "md"; this package's radius scale is keyed by
+  // number, so the unresolved string is expanded into the native text
+  // input's four corner radii and Android throws ClassCastException
+  // (String -> Double) when the input mounts (spudly/eciperay#150). The
+  // input is borderless by design — the container owns the visible
+  // radius — so pin the numeric zero here rather than relying on every
+  // app wrapper to pin it (the eciperay wrappers do, as a stopgap).
+  borderRadius: tokens.radii.zero,
   backgroundColor: "transparent",
   paddingHorizontal: 0,
   fontSize: tokens.typography.fontSize.md,
