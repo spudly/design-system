@@ -1,7 +1,12 @@
 import { useEffect } from "react";
 import type { Preview } from "@storybook/react";
 import { TamaguiProvider, YStack } from "tamagui";
-import { storybookTamaguiConfig, type StorybookThemeName } from "../src/tamagui.config.js";
+import { createStorybookTamaguiConfig, type StorybookThemeName } from "../src/tamagui.config.js";
+
+// Created here, in Storybook-owned code: creating a config installs it
+// as Tamagui's global config, so the package must not create it at
+// module scope (see src/tamagui.config.ts).
+const storybookTamaguiConfig = createStorybookTamaguiConfig();
 import { baseTheme, eciperayTheme, memorizeTheme } from "../src/themes/index.js";
 
 /**
@@ -10,7 +15,7 @@ import { baseTheme, eciperayTheme, memorizeTheme } from "../src/themes/index.js"
  * family at the `--dsFontStack` CSS var (Tamagui font definitions are
  * config-global and cannot vary per sub-theme), so the preview sets the
  * var on the document root for the selected brand — see
- * storybookTamaguiConfig in src/tamagui.config.ts.
+ * createStorybookTamaguiConfig in src/tamagui.config.ts.
  */
 function fontStackFor(theme: StorybookThemeName): string {
   if (theme.includes("warmHarvest")) return eciperayTheme.tokens.typography.fontFamily.sans;

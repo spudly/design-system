@@ -59,7 +59,8 @@
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "storybook": "storybook dev -p 6006",
-    "typecheck": "tsc --noEmit -p tsconfig.json"
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "test": "npm run build && node --test test/tamagui-config.test.mjs"
   },
   "type": "module",
   "types": "./dist/index.d.ts",
