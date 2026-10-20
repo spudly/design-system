@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Toast as TamaguiToast, YStack, styled, toast } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { politeLiveRegionProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const ToastCard = styled(YStack, {
@@ -37,12 +38,14 @@ export interface ToastProps extends ToastCardProps {
 /**
  * Toast notification card in design-system tokens. This same card is what
  * `ToastProvider` renders for toasts fired via the `toast()` function
- * (re-exported below from Tamagui). The card itself announces via
- * `role="status"`.
+ * (re-exported below from Tamagui). The card itself announces politely —
+ * `role="status"` on web, `accessibilityLiveRegion="polite"` on native,
+ * via `politeLiveRegionProps` (`status` is not a valid React Native
+ * `accessibilityRole` and crashes Android — spudly/eciperay#156).
  */
 export function Toast({ title, description, ...rest }: ToastProps) {
   return (
-    <ToastCard accessibilityRole="status" {...rest}>
+    <ToastCard {...politeLiveRegionProps} {...rest}>
       {title ? (
         <Text
           style={{

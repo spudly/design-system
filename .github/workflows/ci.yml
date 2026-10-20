@@ -31,4 +31,4 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
-      - run: node --test test/tamagui-config.test.mjs
+      - run: node --test test/*.test.mjs

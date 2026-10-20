@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { groupRoleProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const Swatch = styled(YStack, {
@@ -39,6 +40,9 @@ export interface ColorPickerFieldProps {
  * ≥44px round button showing its color, with `aria-pressed` reflecting
  * selection and an accessible label like "Select color #c2410c". The
  * selected swatch gets a visible dark ring. Error wiring matches TextField.
+ * The swatch container's grouping role is web-only — `group` is not a
+ * valid React Native `accessibilityRole` (see `accessibility.ts`,
+ * spudly/eciperay#156); on native the accessible name carries the grouping.
  */
 export function ColorPickerField({
   label,
@@ -63,7 +67,7 @@ export function ColorPickerField({
       <XStack
         flexWrap="wrap"
         gap={tokens.spacing[2]}
-        accessibilityRole="group"
+        {...groupRoleProps}
         aria-labelledby={label ? labelId : undefined}
         aria-label={label ? undefined : "Choose a color"}
         aria-describedby={error ? errorId : undefined}

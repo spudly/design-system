@@ -38,12 +38,15 @@ function initialsFor(name: string): string {
  * User avatar: image when `src` is provided, otherwise the person's initials
  * (first letters of the first and last name words) on a primary-tinted
  * circle. Exposed as an image with the name as its accessible label.
+ * (`accessibilityRole="image"`, React Native's role name — the web ARIA
+ * spelling `img` is invalid there and crashes Android, spudly/eciperay#156;
+ * React Native Web maps `image` back to the `img` role.)
  */
 export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
   const dimensions = { width: size, height: size };
   if (!src) {
     return (
-      <Fallback style={dimensions} accessibilityRole="img" accessibilityLabel={name}>
+      <Fallback style={dimensions} accessibilityRole="image" accessibilityLabel={name}>
         <Text
           style={{
             color: "$primaryEmphasis",
@@ -64,7 +67,7 @@ export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
       src={src}
       objectFit="cover"
       style={dimensions}
-      accessibilityRole="img"
+      accessibilityRole="image"
       accessibilityLabel={name}
       {...rest}
     />

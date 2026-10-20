@@ -1,6 +1,7 @@
 import { XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { politeLiveRegionProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
@@ -46,8 +47,12 @@ export interface DismissibleBannerProps extends StyledBannerProps {
 
 /**
  * Banner with a message, optional action buttons, and a dismiss (×) button.
- * The container uses `role="status"`; the dismiss button is labeled
- * "Dismiss" and meets the 44px minimum touch target.
+ * The container announces politely — `role="status"` on web,
+ * `accessibilityLiveRegion="polite"` on native, via
+ * `politeLiveRegionProps` (`status` is not a valid React Native
+ * `accessibilityRole` and crashes Android — spudly/eciperay#156). The
+ * dismiss button is labeled "Dismiss" and meets the 44px minimum touch
+ * target.
  */
 export function DismissibleBanner({
   message,
@@ -61,7 +66,7 @@ export function DismissibleBanner({
     <StyledBanner
       backgroundColor={styles.background}
       borderColor={styles.border}
-      accessibilityRole="status"
+      {...politeLiveRegionProps}
       {...rest}
     >
       <XStack justifyContent="space-between" alignItems="flex-start" gap={tokens.spacing[2]}>
