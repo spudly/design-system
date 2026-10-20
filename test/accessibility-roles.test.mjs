@@ -85,24 +85,27 @@ function sourceFiles(dir) {
 }
 
 /**
- * Every string literal handed to `accessibilityRole` in one file, from
- * `accessibilityRole="x"`, `accessibilityRole={"x"}`,
+ * Every `accessibilityRole` occurrence in one file, with the string
+ * literals it hands over, from `accessibilityRole="x"`,
+ * `accessibilityRole={"x"}` / `accessibilityRole={'x'}`,
  * `accessibilityRole={cond ? "x" : "y"}`, and the object form
- * `accessibilityRole: "x"`. Also returns how many `accessibilityRole`
- * occurrences were seen, so callers can assert none went unextracted.
+ * `accessibilityRole: "x"`. An occurrence with NO extractable literals
+ * (e.g. `accessibilityRole={role}`, a computed variable — the original
+ * InlineAlert crash pattern) is returned with an empty literal list so
+ * the caller can reject it: silently skipping it would let exactly the
+ * regression this test guards against pass unnoticed. Also returns how
+ * many times `accessibilityRole` appears at all, so callers can assert
+ * no occurrence went unmatched.
  */
 function accessibilityRoleLiterals(source) {
-  const literals = [];
-  let occurrences = 0;
-  const pattern = /accessibilityRole\s*[=:]\s*(\{[^}]*\}|"[^"]*")/g;
+  const occurrences = [];
+  const pattern = /accessibilityRole\s*[=:]\s*(\{[^}]*\}|"[^"]*"|'[^']*')/g;
   for (const match of source.matchAll(pattern)) {
-    occurrences += 1;
-    for (const literal of match[1].matchAll(/"([^"]+)"/g)) {
-      literals.push(literal[1]);
-    }
+    const literals = [...match[1].matchAll(/["']([^"']+)["']/g)].map((literal) => literal[1]);
+    occurrences.push({ expression: match[0], literals });
   }
   const total = (source.match(/accessibilityRole/g) ?? []).length;
-  return { literals, occurrences, total };
+  return { occurrences, total };
 }
 
 test("no component passes an accessibilityRole outside React Native's supported set", () => {
@@ -112,18 +115,24 @@ test("no component passes an accessibilityRole outside React Native's supported 
   let checked = 0;
   for (const file of files) {
     const source = stripComments(readFileSync(file, "utf8"));
-    const { literals, occurrences, total } = accessibilityRoleLiterals(source);
+    const { occurrences, total } = accessibilityRoleLiterals(source);
     assert.equal(
-      occurrences,
+      occurrences.length,
       total,
-      `${file}: every accessibilityRole occurrence must be in a literal form this scan understands`,
+      `${file}: every accessibilityRole occurrence must be in a form this scan understands`,
     );
-    for (const value of literals) {
-      checked += 1;
+    for (const { expression, literals } of occurrences) {
       assert.ok(
-        REACT_NATIVE_ACCESSIBILITY_ROLES.has(value),
-        `${file}: accessibilityRole="${value}" is not a React Native role and will crash Android (spudly/eciperay#156); use the platform split in src/components/accessibility.ts for ARIA-only roles`,
+        literals.length > 0,
+        `${file}: ${expression} hands accessibilityRole a value this scan cannot read (computed variable or unsupported form); spell the role as a string literal so it can be pinned against React Native's supported set`,
       );
+      for (const value of literals) {
+        checked += 1;
+        assert.ok(
+          REACT_NATIVE_ACCESSIBILITY_ROLES.has(value),
+          `${file}: accessibilityRole="${value}" is not a React Native role and will crash Android (spudly/eciperay#156); use the platform split in src/components/accessibility.ts for ARIA-only roles`,
+        );
+      }
     }
   }
   assert.ok(checked > 0, "scan must find at least one accessibilityRole literal");
