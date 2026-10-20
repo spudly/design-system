@@ -1,6 +1,7 @@
 import { XStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { politeLiveRegionProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const severityStyles = {
@@ -46,17 +47,21 @@ export interface InlineAlertProps extends StyledAlertProps {
 
 /**
  * Inline message with severity styling. `error` and `warning` announce via
- * `role="alert"`; `info` and `success` use the quieter `role="status"`.
- * Message meaning is carried by text, never color alone.
+ * `accessibilityRole="alert"` (valid on web and native alike); `info` and
+ * `success` announce politely — `role="status"` on web,
+ * `accessibilityLiveRegion="polite"` on native, via `politeLiveRegionProps`
+ * (`status` is not a valid React Native `accessibilityRole` and crashes
+ * Android — spudly/eciperay#156). Message meaning is carried by text,
+ * never color alone.
  */
 export function InlineAlert({ severity = "info", children, ...rest }: InlineAlertProps) {
   const styles = severityStyles[severity];
-  const role = severity === "error" || severity === "warning" ? "alert" : "status";
+  const isAlert = severity === "error" || severity === "warning";
   return (
     <StyledAlert
       backgroundColor={styles.background}
       borderColor={styles.border}
-      accessibilityRole={role}
+      {...(isAlert ? ({ accessibilityRole: "alert" } as const) : politeLiveRegionProps)}
       {...rest}
     >
       <Text style={{ color: styles.text, flex: 1 }}>{children}</Text>

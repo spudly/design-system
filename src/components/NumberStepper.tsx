@@ -1,5 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { groupRoleProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
@@ -16,7 +17,9 @@ export interface NumberStepperProps {
  * Increment/decrement stepper: [−] value [+]. The value display announces
  * changes via `aria-live="polite"`. The −/+ buttons disable at the min/max
  * bounds and are always ≥44px targets. An optional `label` names the group
- * for assistive technology.
+ * for assistive technology (the grouping role itself is web-only —
+ * `group` is not a valid React Native `accessibilityRole`; see
+ * `accessibility.ts`, spudly/eciperay#156).
  */
 export function NumberStepper({ value, onChange, min, max, step = 1, label }: NumberStepperProps) {
   const canDecrement = min === undefined || value - step >= min;
@@ -28,7 +31,7 @@ export function NumberStepper({ value, onChange, min, max, step = 1, label }: Nu
       <XStack
         alignItems="center"
         gap={tokens.spacing[2]}
-        accessibilityRole={label ? "group" : undefined}
+        {...(label ? groupRoleProps : {})}
         accessibilityLabel={label}
       >
         <Button

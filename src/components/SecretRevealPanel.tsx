@@ -1,5 +1,6 @@
 import { XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { politeLiveRegionProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
@@ -27,8 +28,11 @@ export interface SecretRevealPanelProps {
 /**
  * Show-once secret display (API tokens, recovery codes, etc.). Renders the
  * secret in mono inside a bordered box with Copy and optional Dismiss
- * actions. The container uses `role="status"` so its appearance is
- * announced politely. The app wires `onCopy` to the real clipboard API.
+ * actions. The container announces politely so its appearance is
+ * announced — `role="status"` on web, `accessibilityLiveRegion="polite"`
+ * on native, via `politeLiveRegionProps` (`status` is not a valid React
+ * Native `accessibilityRole` and crashes Android — spudly/eciperay#156).
+ * The app wires `onCopy` to the real clipboard API.
  */
 export function SecretRevealPanel({
   secret,
@@ -38,7 +42,7 @@ export function SecretRevealPanel({
   onDismiss,
 }: SecretRevealPanelProps) {
   return (
-    <YStack gap={tokens.spacing[3]} accessibilityRole="status">
+    <YStack gap={tokens.spacing[3]} {...politeLiveRegionProps}>
       <Text variant="subheading">{title}</Text>
       <Text variant="hint">Copy it now — it won&apos;t be shown again.</Text>
       <SecretBox>
