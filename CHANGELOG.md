@@ -1,5 +1,22 @@
 # @spudly/ui
 
+## 1.0.0
+
+### Major Changes
+
+- 8bdde3d: Remove the pre-built Tamagui config exports (`tamaguiConfig`, `eciperayTamaguiConfig`, `memorizeTamaguiConfig`, `storybookTamaguiConfig`, and the default export). Tamagui v3 resolves all styling against the single global config installed by the most recent `createTamagui()` call — `TamaguiProvider`'s `config` prop does not install its config — so creating four configs at module scope meant merely importing the package left the last-created brand (Memorize) in charge of every app's rendering; the Eciperay app shipped with teal Memorize buttons and background (spudly/eciperay#149).
+
+  Migration: each app creates its own config exactly once, in app-owned code that evaluates after this package:
+
+  - `eciperayTamaguiConfig` → `createTamaguiConfig(eciperayTheme)`
+  - `memorizeTamaguiConfig` → `createTamaguiConfig(memorizeTheme)`
+  - `tamaguiConfig` → `createTamaguiConfig(baseTheme)`
+  - `storybookTamaguiConfig` → `createStorybookTamaguiConfig()` (new factory; the Storybook preview now calls it itself)
+
+### Patch Changes
+
+- 0ff9022: Fix two Android crashes from Tamagui v3 umbrella-component skins leaking bare token names into native props (spudly/eciperay#150). `SelectField` now pins a numeric `fontSize` on its styled select value and item-text frames: the umbrella Select skin's "md" size variant sets `fontSize: "sm"`, which never resolves against this package's number-keyed font size scale (1–8) and reached the native text view as a string, throwing ClassCastException (String -> Double) on mount. `SearchField`'s inner input likewise pins `borderRadius` to the numeric zero token instead of inheriting the umbrella Input skin's unresolved "md" radius string — the durable home for the stopgap pin the eciperay app/web wrappers added in spudly/eciperay#153.
+
 ## 0.5.1
 
 ### Patch Changes
