@@ -38,9 +38,14 @@ Local auth is a one-time `npm login --registry=https://npm.pkg.github.com`
 built-in `GITHUB_TOKEN` — see `.github/workflows/`.
 
 ```tsx
-import { Button, tokens, eciperayTheme } from "@spudly/ui";
+import { Button, createTamaguiConfig, eciperayTheme } from "@spudly/ui";
 import { TamaguiProvider } from "tamagui";
-import { tamaguiConfig } from "@spudly/ui";
+
+// Create the app's config exactly once, in app-owned code outside
+// rendering. Tamagui resolves all styling against the config from the
+// most recent createTamagui() call, so the package ships factories
+// only — never pre-built configs (see src/tamagui.config.ts).
+const tamaguiConfig = createTamaguiConfig(eciperayTheme);
 
 <TamaguiProvider config={tamaguiConfig}>
   <Button variant="primary" size="md" onPress={save}>
