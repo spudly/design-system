@@ -25,6 +25,26 @@ const StyledTrigger = styled(TamaguiSelect.Trigger, {
   } as const,
 });
 
+const StyledValue = styled(TamaguiSelect.Value, {
+  name: "SpudlySelectFieldValue",
+
+  // The umbrella Select skin sizes its text frames with bare token names
+  // (its "md" size variant sets fontSize: "sm"). This package's fonts key
+  // their size scale by number (1–8), so the name never resolves and
+  // reaches the native text view as a string; Android's view manager
+  // throws ClassCastException (String -> Double) for fontSize and the app
+  // crashes on mount (spudly/eciperay#150). Pin the numeric size the
+  // skin's "md" variant intends.
+  fontSize: tokens.typography.fontSize.sm,
+});
+
+const StyledItemText = styled(TamaguiSelect.ItemText, {
+  name: "SpudlySelectFieldItemText",
+
+  // Same bare-name fontSize leak as StyledValue — see the note there.
+  fontSize: tokens.typography.fontSize.sm,
+});
+
 export interface SelectOption {
   value: string;
   label: string;
@@ -73,7 +93,7 @@ export function SelectField({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
         >
-          <TamaguiSelect.Value placeholder={placeholder} />
+          <StyledValue placeholder={placeholder} />
           <Text style={{ color: "$textMuted" }}>▾</Text>
         </StyledTrigger>
 
@@ -90,7 +110,7 @@ export function SelectField({
           <TamaguiSelect.Viewport minWidth={200}>
             {options.map((option) => (
               <TamaguiSelect.Item key={option.value} value={option.value}>
-                <TamaguiSelect.ItemText>{option.label}</TamaguiSelect.ItemText>
+                <StyledItemText>{option.label}</StyledItemText>
                 <TamaguiSelect.ItemIndicator marginLeft="auto">
                   <Text style={{ color: "$primary" }}>✓</Text>
                 </TamaguiSelect.ItemIndicator>
