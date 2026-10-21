@@ -155,8 +155,27 @@ function balancedBlock(text, start) {
  * template literals are tracked so a multiline ternary or call does
  * not terminate the capture early (a first-newline cutoff would let a
  * multiline fontSize-derived expression slip past the scan).
+ *
+ * A value that STARTS with a quoted literal (the JSX attribute form,
+ * `lineHeight="$3"`) is just that literal unless an operator follows
+ * it (concatenation, ternary, member access): nothing else terminates
+ * a plain value inside a JSX tag, so walking on would consume the
+ * NEXT attribute and blame its fontSize on this lineHeight.
  */
 function valueExpression(text, start) {
+  const quote = text[start];
+  if (quote === '"' || quote === "'") {
+    let end = start + 1;
+    while (end < text.length && text[end] !== quote) {
+      if (text[end] === "\\") end += 1;
+      end += 1;
+    }
+    end += 1; // past the closing quote
+    let next = end;
+    while (next < text.length && /\s/.test(text[next])) next += 1;
+    if (!"+?:|&.".includes(text[next] ?? "")) return text.slice(start, end);
+    return text.slice(start, end) + valueExpression(text, next);
+  }
   let depth = 0;
   let i = start;
   while (i < text.length) {
@@ -249,6 +268,28 @@ test("lineHeight extractor flags the defect form and ignores scale definitions (
   );
   // A multiline plain value with no fontSize reference passes.
   assert.deepEqual(lineHeightViolations("const f = { lineHeight:\n  isWeb ? 36 : 36 };"), []);
+  // A QUOTED value is a complete value (the JSX attribute form): the
+  // walker must not run on into the following attribute and blame
+  // its fontSize on this lineHeight — same line or across lines.
+  assert.deepEqual(
+    lineHeightViolations(
+      'const h = <Text lineHeight="$3" fontSize={tokens.typography.fontSize.md} />;',
+    ),
+    [],
+  );
+  assert.deepEqual(
+    lineHeightViolations(
+      'const i = <Text lineHeight="$3"\n  fontSize={tokens.typography.fontSize.md} />;',
+    ),
+    [],
+  );
+  assert.deepEqual(lineHeightViolations("const j = <Text lineHeight={'$3'} fontSize={36} />;"), []);
+  // But a quoted literal CONCATENATED with a fontSize value is still
+  // a fontSize-derived lineHeight and must flag.
+  assert.equal(
+    lineHeightViolations('const k = { lineHeight: "$" + tokens.typography.fontSize.md };').length,
+    1,
+  );
 });
 
 test("no lineHeight value is derived from a font size", () => {
