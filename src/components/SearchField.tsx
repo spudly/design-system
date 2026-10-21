@@ -16,8 +16,11 @@ import { Text } from "./Text.js";
  * the recipe list missing from the layout — Tamagui's style engine
  * resolves the numeric lineHeight the same multiplying way on native.
  * With no lineHeight prop the glyph takes the font's line height
- * (size × 1.5), and StyledContainer's fixed height + overflow cap the
- * row regardless: a mis-measured child can never again grow the field.
+ * (size × 1.5), and it renders inside StyledGlyphBox — a fixed-height
+ * clipping box — so a mis-measured glyph can never again grow the
+ * field, while the row itself keeps a minHeight so a caller-sized
+ * input (SearchField forwards input props via ...rest) can still
+ * grow it.
  */
 
 const StyledContainer = styled(XStack, {
@@ -31,12 +34,12 @@ const StyledContainer = styled(XStack, {
   borderRadius: tokens.radii.md,
   paddingLeft: tokens.spacing[3],
   paddingRight: tokens.spacing[1],
-  // Fixed height, not minHeight, plus hidden overflow: the row is a
-  // 44px control by design, and a child whose measurement explodes
-  // (see the glyph note above) must clip inside it instead of
-  // stretching it — on Android this container reached 1826px.
-  height: 44,
-  overflow: "hidden",
+  // minHeight, deliberately not a fixed height: the row must stay
+  // able to grow for a caller-sized input (props forward via ...rest).
+  // What must never grow it is the glyph — that is capped separately
+  // by StyledGlyphBox below (on Android this container reached 1826px
+  // when the glyph's line box exploded; see the note at the top).
+  minHeight: 44,
   alignItems: "center",
   gap: tokens.spacing[2],
   // The focus ring belongs on the whole field, not the inner input (whose
@@ -46,6 +49,19 @@ const StyledContainer = styled(XStack, {
   outlineStyle: "none focus-within:solid",
   outlineColor: "$link",
   outlineOffset: 2,
+});
+
+const StyledGlyphBox = styled(XStack, {
+  name: "SpudlySearchFieldGlyphBox",
+
+  // Fixed height + hidden overflow: the glyph's own box. If the
+  // glyph's measurement ever explodes again, it clips inside this
+  // 44px box instead of stretching the row (eciperay#162).
+  height: 44,
+  alignItems: "center",
+  justifyContent: "center",
+  overflow: "hidden",
+  flexShrink: 0,
 });
 
 const StyledInput = styled(TamaguiInput, {
@@ -105,16 +121,18 @@ export function SearchField({
         </Label>
       ) : null}
       <StyledContainer>
-        <Text
-          aria-hidden
-          // ~2x the previous lg (18px) glyph so the search affordance
-          // reads at a glance. No lineHeight prop — see the note at the
-          // top of this file for the Android row explosion it caused.
-          fontSize={tokens.typography.fontSize["4xl"]}
-          color="$textMuted"
-        >
-          ⌕
-        </Text>
+        <StyledGlyphBox>
+          <Text
+            aria-hidden
+            // ~2x the previous lg (18px) glyph so the search affordance
+            // reads at a glance. No lineHeight prop — see the note at
+            // the top of this file for the Android row explosion.
+            fontSize={tokens.typography.fontSize["4xl"]}
+            color="$textMuted"
+          >
+            ⌕
+          </Text>
+        </StyledGlyphBox>
         <StyledInput
           id={id}
           value={value}

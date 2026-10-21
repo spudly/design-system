@@ -27,9 +27,12 @@
  *    cannot satisfy or trip the scan. The extractor is self-tested
  *    against fixtures below, so a broken scan fails loudly instead of
  *    passing on a vacuous match count.
- * 2. The SearchField row is hard-capped: its styled container declares
- *    a fixed `height: 44` and `overflow: "hidden"`, so a mis-measured
- *    child clips inside the row instead of stretching it.
+ * 2. The SearchField glyph renders inside its own fixed box
+ *    (`SpudlySearchFieldGlyphBox`: `height: 44`, `overflow: "hidden"`),
+ *    so a mis-measured glyph clips there instead of stretching the
+ *    row. The row container itself keeps `minHeight: 44` and no fixed
+ *    height: SearchField forwards input props via ...rest, so a
+ *    caller-sized input must still be able to grow the row.
  * 3. The CheckboxField box clips its glyph the same way
  *    (`overflow: "hidden"` on the fixed 24px box).
  *
@@ -57,6 +60,9 @@ function* sourceFiles(dir) {
 
 const sources = [...sourceFiles(srcDir)].map((path) => ({
   path,
+  // Suffix checks below compare against forward-slash paths; join()
+  // produces backslashes on Windows, so keep a normalized twin.
+  posixPath: path.split("\\").join("/"),
   text: readFileSync(path, "utf8"),
 }));
 
@@ -144,25 +150,65 @@ function balancedBlock(text, start) {
 }
 
 /**
+ * The value expression starting at `start`, walked across lines until
+ * a `,`, `;`, or closing bracket at nesting depth 0. Brackets and
+ * template literals are tracked so a multiline ternary or call does
+ * not terminate the capture early (a first-newline cutoff would let a
+ * multiline fontSize-derived expression slip past the scan).
+ */
+function valueExpression(text, start) {
+  let depth = 0;
+  let i = start;
+  while (i < text.length) {
+    const ch = text[i];
+    if (ch === "`") {
+      // Skip a template literal (its ${} braces are not nesting here).
+      i += 1;
+      while (i < text.length && text[i] !== "`") {
+        if (text[i] === "\\") i += 1;
+        i += 1;
+      }
+      i += 1;
+      continue;
+    }
+    if (ch === "{" || ch === "(" || ch === "[") depth += 1;
+    else if (ch === "}" || ch === ")" || ch === "]") {
+      if (depth === 0) break;
+      depth -= 1;
+    } else if ((ch === "," || ch === ";") && depth === 0) break;
+    i += 1;
+  }
+  return text.slice(start, i);
+}
+
+/**
  * Every fontSize-derived lineHeight in comment-stripped source, as
- * human-readable violation strings. A `lineHeight: { ... }` object is
- * a scale definition, not a value: it is never captured as a value,
- * but a `fontSize` reference inside its block is still a violation.
+ * human-readable violation strings. What follows the separator decides
+ * the form: a `{ ... }` after `:` is a scale definition (never a
+ * value — but a `fontSize` reference inside its block still counts);
+ * a `{ ... }` after `=` is a JSX expression container, whose whole
+ * block is the value; anything else is a plain value expression,
+ * captured across lines by valueExpression.
  */
 function lineHeightViolations(rawText) {
   const text = stripComments(rawText);
   const violations = [];
-  const pattern = /lineHeight\s*(?::|=)\s*/g;
+  const pattern = /lineHeight\s*(:|=)\s*/g;
   for (const match of text.matchAll(pattern)) {
+    const separator = match[1];
     const valueStart = match.index + match[0].length;
     if (text[valueStart] === "{") {
       const block = balancedBlock(text, valueStart);
       if (block.includes("fontSize")) {
-        violations.push(`lineHeight scale block references fontSize: ${block.slice(0, 80)}…`);
+        violations.push(
+          separator === ":"
+            ? `lineHeight scale block references fontSize: ${block.slice(0, 80)}…`
+            : `lineHeight expression references fontSize: ${block.slice(0, 80)}…`,
+        );
       }
       continue;
     }
-    const value = /[^,}\n]+/.exec(text.slice(valueStart))?.[0] ?? "";
+    const value = valueExpression(text, valueStart);
     if (value.includes("fontSize")) {
       violations.push(`lineHeight value "${value.trim()}" references fontSize`);
     }
@@ -193,6 +239,16 @@ test("lineHeight extractor flags the defect form and ignores scale definitions (
     lineHeightViolations("const d = { lineHeight: tokens.typography.lineHeight.normal };"),
     [],
   );
+  // A multiline JSX expression container: the capture must not stop
+  // at the first newline and miss the fontSize-derived branches.
+  assert.equal(
+    lineHeightViolations(
+      'const e = <Text lineHeight={\n  isWeb\n    ? `${tokens.typography.fontSize["4xl"]}px`\n    : tokens.typography.fontSize["4xl"]\n} />;',
+    ).length,
+    1,
+  );
+  // A multiline plain value with no fontSize reference passes.
+  assert.deepEqual(lineHeightViolations("const f = { lineHeight:\n  isWeb ? 36 : 36 };"), []);
 });
 
 test("no lineHeight value is derived from a font size", () => {
@@ -201,7 +257,7 @@ test("no lineHeight value is derived from a font size", () => {
   assert.ok(sources.length > 10, `scan visited only ${sources.length} source files`);
   for (const suffix of ["tamagui.config.ts", "tokens/typography.ts"]) {
     assert.ok(
-      sources.some(({ path }) => path.endsWith(suffix)),
+      sources.some(({ posixPath }) => posixPath.endsWith(suffix)),
       `scan did not visit ${suffix} — the walk is broken, not the tree clean`,
     );
   }
@@ -214,25 +270,30 @@ test("no lineHeight value is derived from a font size", () => {
   }
 });
 
-test("SearchField row is hard-capped at a fixed 44px height with hidden overflow", () => {
-  const file = sources.find(({ path }) => path.endsWith("components/SearchField.tsx"));
+test("SearchField glyph is capped in its own fixed box; the row keeps minHeight", () => {
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("components/SearchField.tsx"));
   assert.ok(file, "src/components/SearchField.tsx not found");
-  const block = styledBlock(file.text, "SpudlySearchField");
-  assert.ok(/height:\s*44/.test(block), "SpudlySearchField container must declare height: 44");
+  // Declarations are checked on comment-stripped text so prose in the
+  // block's comments can neither satisfy nor trip them.
+  const stripped = stripComments(file.text);
+  const glyphBox = styledBlock(stripped, "SpudlySearchFieldGlyphBox");
+  assert.ok(/height:\s*44/.test(glyphBox), "SpudlySearchFieldGlyphBox must declare height: 44");
   assert.ok(
-    !/minHeight\s*:/.test(block),
-    "SpudlySearchField container must not declare minHeight — a min-height row can still be stretched by a mis-measured child",
+    /overflow:\s*"hidden"/.test(glyphBox),
+    'SpudlySearchFieldGlyphBox must declare overflow: "hidden" so an exploding glyph clips inside its own box',
   );
+  const row = styledBlock(stripped, "SpudlySearchField");
+  assert.ok(/minHeight:\s*44/.test(row), "SpudlySearchField container must declare minHeight: 44");
   assert.ok(
-    /overflow:\s*"hidden"/.test(block),
-    'SpudlySearchField container must declare overflow: "hidden" so an exploding child clips inside the row',
+    !/^\s*height\s*:/m.test(row),
+    "SpudlySearchField container must not declare a fixed height — SearchField forwards input props via ...rest, and a caller-sized input must still be able to grow the row",
   );
 });
 
 test("CheckboxField box clips its glyph with hidden overflow", () => {
-  const file = sources.find(({ path }) => path.endsWith("components/CheckboxField.tsx"));
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("components/CheckboxField.tsx"));
   assert.ok(file, "src/components/CheckboxField.tsx not found");
-  const block = styledBlock(file.text, "SpudlyCheckboxBox");
+  const block = styledBlock(stripComments(file.text), "SpudlyCheckboxBox");
   assert.ok(
     /overflow:\s*"hidden"/.test(block),
     'SpudlyCheckboxBox must declare overflow: "hidden" so its glyph cannot paint or measure outside the 24px box',
