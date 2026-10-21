@@ -1,19 +1,18 @@
 import { useId } from "react";
-import { Checkbox as TamaguiCheckbox, Label, XStack, YStack, isWeb, styled } from "tamagui";
+import { Checkbox as TamaguiCheckbox, Label, XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 /**
- * Line height for the ✓ glyph, matched to its 14px font size. A numeric
- * lineHeight reaches web CSS unitless, where CSS reads it as a multiplier
- * (line-height:14 at a 14px font is a 196px line box — the same leak that
- * made SearchField grow past the viewport). Web needs the px string;
- * React Native takes the plain number.
+ * The ✓ glyph must NOT get an explicit lineHeight: it previously
+ * received one equal to its font size (14), which Tamagui's style
+ * engine resolves as a multiplier of the font size — the same defect
+ * that stretched SearchField's row to full screen height on Android
+ * (spudly/eciperay#162; see the note in SearchField.tsx). With no
+ * lineHeight prop the glyph takes the font's line height, and
+ * StyledBox's fixed size + hidden overflow keep it inside the box.
  */
-const glyphLineHeight = isWeb
-  ? `${tokens.typography.fontSize.sm}px`
-  : tokens.typography.fontSize.sm;
 
 const StyledCheckbox = styled(TamaguiCheckbox, {
   name: "SpudlyCheckbox",
@@ -32,6 +31,7 @@ const StyledBox = styled(XStack, {
 
   width: 24,
   height: 24,
+  overflow: "hidden",
   borderWidth: 2,
   borderRadius: tokens.radii.sm,
   alignItems: "center",
@@ -102,7 +102,6 @@ export function CheckboxField({
                   color: "$onPrimary",
                   fontSize: tokens.typography.fontSize.sm,
                   fontWeight: tokens.typography.fontWeight.bold,
-                  lineHeight: glyphLineHeight,
                 }}
               >
                 ✓
