@@ -1,20 +1,24 @@
 import { useId } from "react";
-import { Input as TamaguiInput, Label, XStack, YStack, isWeb, styled } from "tamagui";
+import { Input as TamaguiInput, Label, XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 /**
- * Line height for the ⌕ glyph, matched to its 36px font size. A numeric
- * lineHeight reaches web CSS unitless (both via a raw `style` object and
- * via Tamagui's own style engine), where CSS reads it as a multiplier:
- * line-height:36 at a 36px font is a 1296px line box, which forced the
- * 44px row — and the page — to grow past the viewport. Web therefore
- * needs the px string; React Native takes the plain number.
+ * The ⌕ glyph must NOT get an explicit lineHeight. It previously received
+ * one equal to its font size (36), on the theory that web needed a "36px"
+ * string (a unitless 36 is read by CSS as a multiplier — a 1296px line
+ * box) while React Native "takes the plain number". The native half of
+ * that theory was wrong: an on-device uiautomator dump for
+ * spudly/eciperay#162 (Pixel 8a, Android) shows the glyph's host view and
+ * this field's container stretched to the full content height (1826px,
+ * clipped at the region's bottom edge), with every sibling control and
+ * the recipe list missing from the layout — Tamagui's style engine
+ * resolves the numeric lineHeight the same multiplying way on native.
+ * With no lineHeight prop the glyph takes the font's line height
+ * (size × 1.5), and StyledContainer's fixed height + overflow cap the
+ * row regardless: a mis-measured child can never again grow the field.
  */
-const glyphLineHeight = isWeb
-  ? `${tokens.typography.fontSize["4xl"]}px`
-  : tokens.typography.fontSize["4xl"];
 
 const StyledContainer = styled(XStack, {
   name: "SpudlySearchField",
@@ -27,7 +31,12 @@ const StyledContainer = styled(XStack, {
   borderRadius: tokens.radii.md,
   paddingLeft: tokens.spacing[3],
   paddingRight: tokens.spacing[1],
-  minHeight: 44,
+  // Fixed height, not minHeight, plus hidden overflow: the row is a
+  // 44px control by design, and a child whose measurement explodes
+  // (see the glyph note above) must clip inside it instead of
+  // stretching it — on Android this container reached 1826px.
+  height: 44,
+  overflow: "hidden",
   alignItems: "center",
   gap: tokens.spacing[2],
   // The focus ring belongs on the whole field, not the inner input (whose
@@ -99,10 +108,9 @@ export function SearchField({
         <Text
           aria-hidden
           // ~2x the previous lg (18px) glyph so the search affordance
-          // reads at a glance; lineHeight keeps it inside the 44px row
-          // (see glyphLineHeight above for why it is platform-split).
+          // reads at a glance. No lineHeight prop — see the note at the
+          // top of this file for the Android row explosion it caused.
           fontSize={tokens.typography.fontSize["4xl"]}
-          lineHeight={glyphLineHeight}
           color="$textMuted"
         >
           ⌕
