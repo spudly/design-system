@@ -1,4 +1,3 @@
-import { TouchableOpacity } from "react-native";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
@@ -37,7 +36,12 @@ import { Text } from "../components/Text.js";
  * tab) exactly: a scrolling shell, the "New meal plan" action above
  * the list, one elevated card per plan (title + meta line, no
  * thumbnail — these rows never rendered one), and a per-row Delete
- * when the app provides the callback. Two deliberate differences
+ * when the app provides the callback. One treatment deliberately
+ * diverges from the app rows: the plan title takes Text's
+ * theme-aware foreground instead of the app's fixed gray10 — on a
+ * dark theme's card surface that fixed near-black is unreadable
+ * (~1.2:1), and page components must stay theme-correct even where
+ * the app screen they port is light-only today. Two deliberate differences
  * from RecipesPage, both dictated by the app screen being ported:
  * - No FlatList: the app fetches the whole plan list at once and
  *   renders it unpaginated in a scroll view, so there is no
@@ -67,10 +71,6 @@ import { Text } from "../components/Text.js";
  * `renderRecipeAccessory` precedent) rather than a callback that
  * pretends to render.
  */
-
-// Structural flex only: the card's text block expands and may shrink
-// within the row (mirrors the app's hub rows).
-const textBlockStyle = { flex: 1, minWidth: 0 } as const;
 
 /** One meal plan row's view-model. The app formats `subtitle` (its
  * meta line — entry count · date range · nutrition); the view only
@@ -107,11 +107,17 @@ function MealPlanRow({
 }) {
   return (
     <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3" marginBottom="$3">
-      <TouchableOpacity style={textBlockStyle} onPress={onPress}>
+      {/* The pressable text block is a Tamagui view, not a React
+          Native Pressable/TouchableOpacity: those map
+          accessibilityRole="button" to a native <button> element on
+          web, whose UA styles center the row's text. A Tamagui
+          pressable renders a div carrying the role (the OptionCard
+          pattern) and keeps the layout. flex/minWidth are structural
+          only: the block expands and may shrink within the row. */}
+      <YStack flex={1} minWidth={0} accessibilityRole="button" onPress={onPress}>
         <Text
           fontSize={tokens.typography.fontSize.md}
           fontWeight={tokens.typography.fontWeight.semibold}
-          color={tokens.colors.gray.gray10}
         >
           {item.title}
         </Text>
@@ -120,14 +126,14 @@ function MealPlanRow({
             {item.subtitle}
           </Text>
         ) : null}
-      </TouchableOpacity>
+      </YStack>
       {onDeletePress ? (
         <XStack marginInlineStart="$3" alignItems="center">
           <Button
             variant="secondary"
             size="sm"
             backgroundColor={tokens.colors.danger.danger1}
-            color={tokens.colors.danger.danger7}
+            color={tokens.colors.danger.danger8}
             onPress={onDeletePress}
           >
             Delete
