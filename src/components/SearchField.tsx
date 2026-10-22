@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { Input as TamaguiInput, Label, XStack, YStack, styled } from "tamagui";
+import { Input as TamaguiInput, Label, View, XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
@@ -25,11 +25,18 @@ import { Text } from "./Text.js";
  * The glyph's SIZE is also capped by that box (spudly/design-system#45):
  * at 36px its natural line box is ~54px — taller than the 44px glyph
  * box — so the box centered the oversized line box, not the glyph ink,
- * and on Android the ink rode visibly above center. At 24px the line
- * box is ~36px and fits inside the 44px box, so centering the line box
- * centers the ink and the field height is unchanged. Do not raise the
- * glyph size past the box again (24 × 1.5 = 36 ≤ 44), and do not "fix"
- * centering with an explicit lineHeight — that is the explosion above.
+ * and on Android the ink rode visibly above center. Shrinking the
+ * character to 24px (line box ~36px, fits the box) was tried next and
+ * was STILL off-center (Stephen, on-device check, 2026-10-22): the ⌕
+ * character's ink is not centered inside its own em box at any size,
+ * and Android's fallback font for the codepoint shifts it further —
+ * no font size centers asymmetric ink. The search icon is therefore
+ * no longer a text glyph at all: SearchGlyph below draws it from two
+ * fixed-dimension shapes (a bordered circle + a rotated bar) inside a
+ * 24px box, so the flex centering of StyledGlyphBox centers the icon
+ * by construction, identically on web and native. Do not reintroduce
+ * a text glyph for this icon, and do not "fix" centering with an
+ * explicit lineHeight — that is the explosion above.
  */
 
 const StyledContainer = styled(XStack, {
@@ -73,6 +80,42 @@ const StyledGlyphBox = styled(XStack, {
   flexShrink: 0,
 });
 
+/**
+ * The search icon, drawn from fixed-dimension shapes rather than the
+ * "⌕" text glyph — see the note at the top of this file (#45). The
+ * lens is a bordered circle; the handle is a rounded bar rotated 45°,
+ * overlapping the lens edge on its lower-right diagonal. Both are
+ * absolutely positioned inside a fixed 24px box, so the icon's own
+ * geometry — not a font's metrics — decides where the ink sits, and
+ * StyledGlyphBox's flex centering centers the icon itself.
+ */
+function SearchGlyph() {
+  return (
+    <View aria-hidden position="relative" width={24} height={24} flexShrink={0}>
+      <View
+        position="absolute"
+        left={3}
+        top={3}
+        width={13}
+        height={13}
+        borderRadius={7}
+        borderWidth={2}
+        borderColor="$textMuted"
+      />
+      <View
+        position="absolute"
+        left={13.5}
+        top={15.5}
+        width={7.5}
+        height={2.6}
+        borderRadius={1.3}
+        backgroundColor="$textMuted"
+        rotate="45deg"
+      />
+    </View>
+  );
+}
+
 const StyledInput = styled(TamaguiInput, {
   name: "SpudlySearchFieldInput",
 
@@ -106,7 +149,9 @@ export interface SearchFieldProps extends Omit<StyledInputProps, "value" | "onCh
 }
 
 /**
- * Search input with a leading "⌕" glyph and a clear (×) button that appears
+ * Search input with a leading search icon (drawn shapes, not a text
+ * glyph — see the note at the top of this file) and a clear (×) button
+ * that appears
  * when there is a value. The clear button is a real button with
  * `accessibilityLabel="Clear search"` and a 44px touch target. An optional
  * visible `label` is associated via `htmlFor`.
@@ -131,18 +176,7 @@ export function SearchField({
       ) : null}
       <StyledContainer>
         <StyledGlyphBox>
-          <Text
-            aria-hidden
-            // 24px: still 1.5x the input text so the search affordance
-            // reads at a glance, and its natural line box (~36px) fits
-            // the 44px glyph box so the ink centers vertically on
-            // Android (#45). No lineHeight prop — see the note at the
-            // top of this file for the Android row explosion.
-            fontSize={tokens.typography.fontSize["2xl"]}
-            color="$textMuted"
-          >
-            ⌕
-          </Text>
+          <SearchGlyph />
         </StyledGlyphBox>
         <StyledInput
           id={id}
