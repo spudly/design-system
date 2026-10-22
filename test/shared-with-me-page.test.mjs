@@ -154,6 +154,19 @@ test("rows are press-only: the press reports the id; no actions, no slot", () =>
   }
 });
 
+test("both row press targets are named buttons for screen readers", () => {
+  assert.equal(
+    code.split('accessibilityRole="button"').length - 1,
+    2,
+    "the thumbnail and text press targets must each declare the button role",
+  );
+  assert.equal(
+    code.split("accessibilityLabel={item.title}").length - 1,
+    2,
+    "each press target must take the recipe title as its accessible name (the thumbnail target wraps only an image)",
+  );
+});
+
 test("optional props omitted leave rendering unchanged", () => {
   assert.match(
     code,

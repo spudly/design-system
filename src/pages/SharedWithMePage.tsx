@@ -298,10 +298,24 @@ function Thumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
 function SharedRecipeRow({ item, onPress }: { item: SharedWithMePageItem; onPress: () => void }) {
   return (
     <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3" marginBottom="$3">
-      <TouchableOpacity onPress={onPress}>
+      {/* Both press targets carry the button role and the recipe
+          title as their accessible name: the thumbnail target
+          wraps only an image (or an empty placeholder), so without
+          the label a screen reader meets an unidentified action
+          for every recipe. */}
+      <TouchableOpacity
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={item.title}
+      >
         <Thumbnail imageUrl={item.imageUrl} />
       </TouchableOpacity>
-      <TouchableOpacity style={textBlockStyle} onPress={onPress}>
+      <TouchableOpacity
+        style={textBlockStyle}
+        onPress={onPress}
+        accessibilityRole="button"
+        accessibilityLabel={item.title}
+      >
         <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
         {item.subtitle ? (
           <Text variant="hint" marginTop="$1">
