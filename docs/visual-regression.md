@@ -65,6 +65,16 @@ Linux locally, use CI to regenerate: run the **visual** workflow
 manually (`workflow_dispatch`) with **update_baselines = true**, download
 the `visual-baselines` artifact, and commit its PNGs.
 
+One component is sensitive even between Linux installs: the SearchField
+placeholder renders in a platform serif fallback font (not a bundled
+webfont), so its tight-crop baselines differ by a few hundred
+anti-aliased pixels between font stacks. The five SearchField
+`-content` baselines are therefore the CI-generated ones (adopted from
+a `workflow_dispatch` regeneration on the PR branch); a local run on a
+different font stack can diff those five files while CI stays green.
+Everything else in the snapshot set is byte-identical between local and
+CI generation.
+
 ## Playwright vs Chromatic — verdict: this replaces Chromatic
 
 Chromatic (`.github/workflows/chromatic.yml`, now removed) snapshotted
