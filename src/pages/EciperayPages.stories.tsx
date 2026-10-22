@@ -24,10 +24,13 @@ import {
 /**
  * Full-page demo stories for Eciperay's core screens (#44), composed
  * from @spudly/ui components with the static fixtures in ./fixtures.ts.
- * These are the visual spec for whole pages — component stories alone
- * would not have caught spudly/eciperay#162, where the Recipes screen
- * composed into a giant empty box. Every story pins the Warm Harvest
- * theme, Eciperay's brand, via its Storybook global.
+ * These are the visual spec for whole pages on web: they guard how the
+ * pieces compose on a real screen, which component stories alone do
+ * not show. Native-only rendering defects — spudly/eciperay#162's root
+ * cause, a SearchField glyph that rendered correctly on web and only
+ * exploded under Android's text layout — are the on-device Storybook
+ * work in #43, not these web screenshots. Every story pins the Warm
+ * Harvest theme, Eciperay's brand, via its Storybook global.
  */
 const meta: Meta = {
   title: "Pages/Eciperay",
