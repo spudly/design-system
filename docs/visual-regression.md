@@ -12,9 +12,17 @@ Implemented for issue #42.
   list — so a new story gets coverage automatically, and each story is
   screenshotted once per theme via the Storybook `theme` global
   (`.storybook/preview.tsx`).
-- The screenshot target is the `#storybook-root` element, not the
-  viewport: a layout blow-up like the SearchField `lineHeight` bug
-  (eciperay#162) grows the root, and a viewport shot would crop it away.
+- Each story gets **two** screenshots per theme:
+  1. the `#storybook-root` element (not the viewport): a layout blow-up
+     like the SearchField `lineHeight` bug (eciperay#162) grows the
+     root, and a viewport shot would crop it away;
+  2. a tight crop of just the rendered content (the union of the
+     visible descendant boxes). The root shot's diff budget is relative
+     to a full-viewport image, so a complete colour change on a small
+     component (an Avatar is 40×40) could hide inside it; against the
+     tight crop the same change is a large fraction of the pixels and
+     fails. Stories whose content fills the root are already tight in
+     shot 1.
 - External images referenced by stories (Avatar's picsum.photos image)
   are stubbed with a deterministic PNG; animations are disabled and
   carets hidden so animated components (Spinner, Toast) screenshot a
