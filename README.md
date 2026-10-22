@@ -80,13 +80,30 @@ Releases are automated with [Changesets](https://github.com/changesets/changeset
 
 ## Storybook previews (Chromatic)
 
-Every pull request publishes its Storybook build to
+Every push to `main` publishes its Storybook build to
 [Chromatic](https://www.chromatic.com/) via `.github/workflows/chromatic.yml`:
 each run gets a browsable build URL for review, and Chromatic diffs story
 snapshots against the accepted `main` baseline. Visual changes show up as a
 failing/check-pending Chromatic status until they are accepted in
 Chromatic's UI — that acceptance is the visual-regression gate. Pushes to
 `main` publish the new baseline.
+
+Pull requests do **not** publish on every push: snapshots are metered
+(Chromatic's free tier allows 5,000/month, and a full build is ~284
+snapshots — 142 stories × 2 themes). To request a snapshot run on a PR —
+typically once it is merge-ready — add the **`visual-check`** label. The
+label is one-shot: the job removes it as soon as a run actually starts, so
+re-add it when you want another run. Two gates run first, and a gate skip
+keeps the label so the next push retries automatically:
+
+1. **Pixel gate** — the PR's diff must touch at least one file that can
+   change pixels. Markdown, `docs/`, `.github/`, changeset, LICENSE,
+   `.gitignore`, and package-manifest-only changes are skipped.
+2. **CI-green gate** — the `ci` check for the PR's exact head commit must
+   have concluded successfully.
+
+Each run also uses TurboSnap, so only the stories a change actually
+affects are snapshotted instead of the full suite.
 
 One-time setup:
 
@@ -98,8 +115,10 @@ One-time setup:
    chromatic check; CI is unaffected.
 3. For Dependabot PRs, add the same value as a **Dependabot** secret with
    the same name (Settings → Secrets and variables → Dependabot):
-   Dependabot-triggered runs cannot read Actions secrets. Fork PRs are
-   skipped entirely — they never receive secrets, by design.
+   Dependabot-triggered runs cannot read Actions secrets. (Manifest-only
+   Dependabot PRs are skipped by the pixel gate anyway; this matters only
+   if a Dependabot PR that changes visual files is labeled `visual-check`.)
+   Fork PRs are skipped entirely — they never receive secrets, by design.
 
 ### Full-page demo stories (Pages)
 
