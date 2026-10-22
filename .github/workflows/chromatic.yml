@@ -20,7 +20,8 @@ name: chromatic
 #   the label is consumed, and a gate skip KEEPS the label, so a later
 #   push (synchronize) retries automatically:
 #     1. CI-green gate: the `ci` check for the PR's exact head SHA
-#        must have concluded success. Pending/failed CI skips.
+#        must have concluded success. A pending check gets a bounded
+#        wait (~5 min) inside the gate; failed/still-pending skips.
 #     2. Pixel gate: PRs whose diff touches only files that cannot
 #        change pixels (markdown, docs/, .github/, changesets,
 #        LICENSE, .gitignore, package manifests) skip. If the diff
@@ -42,15 +43,22 @@ on:
     # an already-labeled PR retry the gates when new commits land.
     types: [opened, reopened, synchronize, labeled]
 
-# Match ci.yml: cancel superseded runs for the same PR/branch.
-concurrency:
-  group: chromatic-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+# NOTE: concurrency lives on the job (below), not here. Workflow-level
+# concurrency cancels an in-flight run for ANY new event in the group —
+# including events the job's own `if` would skip (an unrelated label, a
+# push after a run consumed the visual-check label) — which could kill
+# a deliberately requested snapshot build mid-flight and lose it.
 
 jobs:
   chromatic:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Job-level concurrency (see the note above): events rejected by
+    # the job's condition never queue, so they cannot cancel an
+    # accepted run; only a genuinely superseding accepted run can.
+    concurrency:
+      group: chromatic-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     # Least privilege for what this job does: check out code, read the
     # ci check-run for the gate, and remove the visual-check label.
     permissions:
@@ -109,11 +117,26 @@ jobs:
 
           # --- CI-green gate ---------------------------------------------
           # The latest `ci` check run for the exact head SHA must be a
-          # completed success. Pending, failed, or missing → skip and
-          # keep the label for the next push.
-          ci_state="$(gh api "repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs?per_page=100" \
-            --jq '[.check_runs[] | select(.name == "ci" and .app.slug == "github-actions")] | sort_by(.started_at) | last | if . == null then "missing" else "\(.status):\(.conclusion)" end' \
-            2>/dev/null || echo "unknown")"
+          # completed success. A still-pending run gets a bounded wait
+          # (~5 min: CI here finishes in well under that, and the
+          # 15-min job timeout still leaves room to publish). A failed
+          # run, or one still pending after the wait, skips and keeps
+          # the label for the next push.
+          ci_state="missing"
+          for attempt in $(seq 1 16); do
+            ci_state="$(gh api "repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs?per_page=100" \
+              --jq '[.check_runs[] | select(.name == "ci" and .app.slug == "github-actions")] | sort_by(.started_at) | last | if . == null then "missing" else "\(.status):\(.conclusion)" end' \
+              2>/dev/null || echo "unknown")"
+            case "$ci_state" in
+              completed:*) break ;;
+              *)
+                if [ "$attempt" -lt 16 ]; then
+                  echo "ci check for ${HEAD_SHA} is '${ci_state}'; waiting 20s for it to finish (attempt ${attempt}/16)..."
+                  sleep 20
+                fi
+                ;;
+            esac
+          done
           if [ "$ci_state" != "completed:success" ]; then
             echo "::notice::Skipping Chromatic for PR #${PR_NUMBER}: ci check for ${HEAD_SHA} is '${ci_state}', not completed:success. The visual-check label is kept; a later push re-checks the gates."
             echo "run=false" >> "$GITHUB_OUTPUT"

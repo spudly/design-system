@@ -100,7 +100,8 @@ keeps the label so the next push retries automatically:
    change pixels. Markdown, `docs/`, `.github/`, changeset, LICENSE,
    `.gitignore`, and package-manifest-only changes are skipped.
 2. **CI-green gate** — the `ci` check for the PR's exact head commit must
-   have concluded successfully.
+   have concluded successfully. If it is still running, the gate waits up
+   to ~5 minutes for it before giving up.
 
 Each run also uses TurboSnap, so only the stories a change actually
 affects are snapshotted instead of the full suite.
