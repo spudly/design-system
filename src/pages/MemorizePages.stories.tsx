@@ -109,8 +109,8 @@ function MemorizationSessionDemo() {
           onReveal={() => reveal(0)}
           index={0}
           total={words.length}
-        />{" "}
-        He makes me lie down in green{" "}
+        />
+        . He makes me lie down in green{" "}
         <BlankWord
           word={words[1]!}
           revealed={revealed[1]!}
