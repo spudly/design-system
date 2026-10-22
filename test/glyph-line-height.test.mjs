@@ -331,6 +331,42 @@ test("SearchField glyph is capped in its own fixed box; the row keeps minHeight"
   );
 });
 
+test("SearchField glyph's natural line box fits its glyph box, so the ink centers (#45)", () => {
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("components/SearchField.tsx"));
+  assert.ok(file, "src/components/SearchField.tsx not found");
+  const stripped = stripComments(file.text);
+  // The glyph is the only `fontSize={tokens…}` JSX prop in the file
+  // (the input and the clear × set fontSize via style objects). Its
+  // size must resolve through the typography scale — a raw number
+  // here would bypass the check below, so fail loudly on that form.
+  const glyph = stripped.match(/fontSize=\{tokens\.typography\.fontSize\["([^"]+)"\]\}/);
+  assert.ok(
+    glyph,
+    "SearchField glyph fontSize must be a tokens.typography.fontSize[...] reference (the #45 centering check needs to resolve it)",
+  );
+  const scaleFile = sources.find(({ posixPath }) => posixPath.endsWith("tokens/typography.ts"));
+  assert.ok(scaleFile, "src/tokens/typography.ts not found");
+  const scale = stripComments(scaleFile.text).match(/fontSize\s*=\s*\{([^}]*)\}/);
+  assert.ok(scale, "fontSize scale block not found in tokens/typography.ts");
+  const entries = new Map(
+    [...scale[1].matchAll(/(?:^|,)\s*(?:"([^"]+)"|(\w+))\s*:\s*(\d+)/g)].map((m) => [
+      m[1] ?? m[2],
+      Number(m[3]),
+    ]),
+  );
+  const size = entries.get(glyph[1]);
+  assert.ok(size, `fontSize token "${glyph[1]}" not found in the typography scale`);
+  // No explicit lineHeight (banned above), so the line box is the
+  // font's natural ~1.5x. If it exceeds the 44px glyph box, the box
+  // centers the line box instead of the ink and the glyph rides high
+  // on Android — the #45 defect. 24px × 1.5 = 36 ≤ 44 passes; the old
+  // 36px × 1.5 = 54 fails.
+  assert.ok(
+    size * 1.5 <= 44,
+    `SearchField glyph is ${size}px: its natural line box (~${size * 1.5}px) exceeds the 44px glyph box, so its ink cannot center vertically on Android (design-system#45)`,
+  );
+});
+
 test("CheckboxField box clips its glyph with hidden overflow", () => {
   const file = sources.find(({ posixPath }) => posixPath.endsWith("components/CheckboxField.tsx"));
   assert.ok(file, "src/components/CheckboxField.tsx not found");
