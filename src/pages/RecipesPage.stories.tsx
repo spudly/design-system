@@ -59,10 +59,12 @@ function RecipesPageDemo({
   initialSearch = "",
   recipes = recipeItems,
   isLoading = false,
+  expandedRecipeId,
 }: {
   initialSearch?: string;
   recipes?: RecipesPageItem[];
   isLoading?: boolean;
+  expandedRecipeId?: string;
 }) {
   const [search, setSearch] = useState(initialSearch);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -89,6 +91,28 @@ function RecipesPageDemo({
         onRecipePress={() => undefined}
         onLogCookPress={() => undefined}
         onRecipeDelete={() => undefined}
+        {...(expandedRecipeId
+          ? {
+              // Fixture stand-in for the app's inline cook-log form:
+              // a plain expanded panel, not a form — the form is
+              // business logic and stays app-side. Returning content
+              // for one row also hides that row's Log cook button.
+              renderRecipeAccessory: (recipeId: string) =>
+                recipeId === expandedRecipeId ? (
+                  <div
+                    style={{
+                      border: "1px dashed #b08968",
+                      borderRadius: 8,
+                      padding: "12px 16px",
+                      fontFamily: "sans-serif",
+                      fontSize: 14,
+                    }}
+                  >
+                    Cook log form renders here (app-side fixture stand-in)
+                  </div>
+                ) : null,
+            }
+          : {})}
         search={search}
         onSearchChange={setSearch}
         statusFilter={statusFilter}
@@ -126,4 +150,8 @@ export const Empty: Story = {
 
 export const Loading: Story = {
   render: () => <RecipesPageDemo isLoading recipes={[]} />,
+};
+
+export const ExpandedAccessory: Story = {
+  render: () => <RecipesPageDemo expandedRecipeId="arroz-con-pollo" />,
 };

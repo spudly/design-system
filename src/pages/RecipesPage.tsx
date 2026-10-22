@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { FlatList, TouchableOpacity } from "react-native";
 import { Image, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
@@ -40,6 +41,22 @@ import { TextField } from "../components/TextField.js";
  * - #162: search uses the DS SearchField as-is. No lineHeight is set
  *   on any glyph or text in this file — the SearchField's own glyph
  *   box is the containment for that failure (see SearchField.tsx).
+ *
+ * Per-row accessory slot (`renderRecipeAccessory`): the one place
+ * app-rendered content enters the list. The app's cook-log form
+ * expands inline under the tapped card (its state and mutation live
+ * in the app's RecipeListCard), so the stage-1 contract — a bare
+ * `onLogCookPress(id)` callback with rows rendered end to end here —
+ * left it nowhere to render. The slot keeps the boundary intact:
+ * the view calls the render prop once per row with the row's id and
+ * renders whatever comes back directly under that row's card;
+ * returning null/undefined renders nothing. When a row's accessory
+ * is non-null, that row's "Log cook" button is hidden — the app
+ * reproduces its card's button-hides-while-the-form-is-open
+ * behavior purely by what it returns (the form for the open row,
+ * null everywhere else). The form itself, its state, and its
+ * mutation stay in the app; other rows' buttons and the
+ * `onLogCookPress` firing semantics are unchanged.
  */
 
 // List content geometry on the DS spacing scale, mirroring the app
@@ -103,9 +120,19 @@ export interface RecipesPageProps {
   onRecipePress: (recipeId: string) => void;
   /** Optional row actions, mirroring the app card's buttons. "Log
    * cook" is a callback only — the cook-log form and its mutation
-   * stay in the app, which renders them; the view owns the button. */
+   * stay in the app, which renders them (see
+   * `renderRecipeAccessory`); the view owns the button. */
   onLogCookPress?: (recipeId: string) => void;
   onRecipeDelete?: (recipeId: string) => void;
+  /** Optional per-row accessory slot: called once per row with the
+   * row's id; the returned node renders directly under that row's
+   * card, inside the list item. Return null/undefined to render
+   * nothing. When a row's accessory renders non-null content, that
+   * row's "Log cook" button is hidden — the app returns its inline
+   * cook-log form for the row whose form is open and null elsewhere,
+   * which reproduces the app card's button-hides-while-open
+   * behavior. */
+  renderRecipeAccessory?: (recipeId: string) => ReactNode;
   /** Pagination hook, wired to the list's end-reached signal. */
   onLoadMore?: () => void;
 
@@ -332,6 +359,7 @@ export function RecipesPage(props: RecipesPageProps) {
     onLogCookPress,
     onRecipeDelete,
     onLoadMore,
+    renderRecipeAccessory,
   } = props;
 
   return (
@@ -358,28 +386,35 @@ export function RecipesPage(props: RecipesPageProps) {
             <RecipesFiltersBar {...props} />
           </YStack>
         }
-        renderItem={({ item }) => (
-          <RecipeRow
-            item={item}
-            onPress={() => {
-              onRecipePress(item.id);
-            }}
-            {...(onLogCookPress
-              ? {
-                  onLogCookPress: () => {
-                    onLogCookPress(item.id);
-                  },
-                }
-              : {})}
-            {...(onRecipeDelete
-              ? {
-                  onDeletePress: () => {
-                    onRecipeDelete(item.id);
-                  },
-                }
-              : {})}
-          />
-        )}
+        renderItem={({ item }) => {
+          const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
+          const hasAccessory = accessory !== null && accessory !== undefined;
+          return (
+            <>
+              <RecipeRow
+                item={item}
+                onPress={() => {
+                  onRecipePress(item.id);
+                }}
+                {...(onLogCookPress && !hasAccessory
+                  ? {
+                      onLogCookPress: () => {
+                        onLogCookPress(item.id);
+                      },
+                    }
+                  : {})}
+                {...(onRecipeDelete
+                  ? {
+                      onDeletePress: () => {
+                        onRecipeDelete(item.id);
+                      },
+                    }
+                  : {})}
+              />
+              {hasAccessory ? <YStack marginBlockEnd="$3">{accessory}</YStack> : null}
+            </>
+          );
+        }}
         onEndReached={onLoadMore}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
