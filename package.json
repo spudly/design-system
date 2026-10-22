@@ -13,6 +13,7 @@
     "prettier": "^3.9.10",
     "react": "^19.3.1",
     "react-native": "^0.88.0",
+    "react-native-web": "^0.21.4",
     "storybook": "^10.6.2",
     "typescript": "^7.0.2"
   },
@@ -23,6 +24,10 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
+    },
+    "./pages": {
+      "types": "./dist/pages/index.d.ts",
+      "default": "./dist/pages/index.js"
     }
   },
   "files": [

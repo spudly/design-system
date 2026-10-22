@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+Add RecipesPage (spudly/design-system#49, pilot): Eciperay's Browse/Recipes screen as a controlled full-page component, exported from the new `@spudly/ui/pages` subpath (page components import react-native's FlatList, so they stay off the package root, which must remain importable in plain Node). The app keeps all state and business logic and drives the page entirely through props — recipe view-models ({id, title, subtitle, imageUrl}), the full filter surface mirrored from the app's filter bar (search, status, ingredient, min/max calories and satiety, sort and order), and press/load-more callbacks out. The composition carries the app screen's layout rules with it: a non-scrolling `list` shell, a `flex: 1`-bounded FlatList (spudly/eciperay#188, guarded by a new source-scan test), the filter bar as the list header, and the DS SearchField reused as-is (no lineHeight changes — spudly/eciperay#162). Stories render the real component with fixture props in the Warm Harvest theme; the Storybook config aliases react-native to react-native-web (now a devDependency) so the FlatList renders on web.
