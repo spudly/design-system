@@ -2,10 +2,11 @@
  * Coverage test for the full-page demo stories (design-system#44).
  *
  * The eight page stories are the page-level visual spec: Chromatic
- * screenshots them on every PR, which is the only layer that can catch
- * a page-composition failure like spudly/eciperay#162 (the Recipes
- * screen rendering as one giant empty box — every individual component
- * was fine; the composition was not). If a page story is deleted or
+ * screenshots them on every PR, which is the layer that catches
+ * page-composition and web-rendering failures at whole-screen scale.
+ * (Not spudly/eciperay#162 itself: its root cause was a native-only
+ * SearchField glyph defect that rendered correctly on web — the
+ * on-device coverage in #43 is what guards that class.) If a page story is deleted or
  * renamed, that coverage silently disappears, so this test pins the
  * set: both story files, all eight exports, the per-app theme each
  * file pins, and the fixture rules (static data only — no network, no
@@ -81,7 +82,7 @@ test("the Recipes page story composes the filter bar above the list (#162 sanity
   const end = text.indexOf("export const RecipesBrowse", start);
   assert.notEqual(end, -1, "RecipesBrowse story export not found after the demo function");
   const demo = text.slice(start, end);
-  // The #162 failure mode lives in this composition: the real filter
+  // This is the composition of the screen #162 broke: the real filter
   // bar (SearchField + the status/sort SelectFields) rendered above
   // the recipe list. Each control must be present, and the list
   // render must come after the filter bar.

@@ -107,13 +107,17 @@ Alongside the component stories, `src/pages/` holds full-page demo
 stories for each app's core screens — Eciperay: Recipes browse, Recipe
 detail, Meal plans, Shared-with-me; Memorize: Home / verse search,
 Passage view, Memorization session, Progress. Component screenshots
-alone would not necessarily catch page-composition failures (the
-spudly/eciperay#162 giant-empty-box Recipes screen was a composition
-failure, not a single component looking off), so the pages are composed
-from the real `@spudly/ui` components, in the app's brand theme, inside
-a fixed phone-width frame, and Chromatic screenshots them on every PR
-alongside the component stories — a deliberate layout change to a demo
-page produces a reviewable Chromatic diff like any other story.
+alone do not show how the pieces compose on a real screen, so the
+pages are composed from the real `@spudly/ui` components, in the app's
+brand theme, inside a fixed phone-width frame, and Chromatic
+screenshots them on every PR alongside the component stories — a
+deliberate layout change to a demo page produces a reviewable
+Chromatic diff like any other story. Scope note: these are **web**
+screenshots — they guard page composition and web rendering. They
+would not have caught spudly/eciperay#162 itself: its root cause was a
+native-only SearchField glyph defect that rendered correctly on web
+and only exploded under Android's text layout. That native class is
+what the on-device Storybook work (issue #43) covers.
 
 Rules for keeping that coverage meaningful:
 
