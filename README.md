@@ -101,6 +101,31 @@ One-time setup:
    Dependabot-triggered runs cannot read Actions secrets. Fork PRs are
    skipped entirely — they never receive secrets, by design.
 
+### Full-page demo stories (Pages)
+
+Alongside the component stories, `src/pages/` holds full-page demo
+stories for each app's core screens — Eciperay: Recipes browse, Recipe
+detail, Meal plans, Shared-with-me; Memorize: Home / verse search,
+Passage view, Memorization session, Progress. Component screenshots
+alone would not necessarily catch page-composition failures (the
+spudly/eciperay#162 giant-empty-box Recipes screen was a composition
+failure, not a single component looking off), so the pages are composed
+from the real `@spudly/ui` components, in the app's brand theme, inside
+a fixed phone-width frame, and Chromatic screenshots them on every PR
+alongside the component stories — a deliberate layout change to a demo
+page produces a reviewable Chromatic diff like any other story.
+
+Rules for keeping that coverage meaningful:
+
+- Stories render only the static fixtures in `src/pages/fixtures.ts` —
+  no network, no real API/auth, no clocks or relative timestamps, no
+  external images — so diffs reflect layout, not data churn.
+- When a real app screen's layout changes deliberately, update its page
+  story in the same spirit: the page stories are the visual spec for
+  whole screens, kept here alongside the components they compose.
+- On-device (Android) coverage of these pages follows via the
+  on-device Storybook work (issue #43).
+
 ## Next steps
 
 1. **Design brief** — one page: product personality, audience, adjectives,
