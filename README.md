@@ -93,7 +93,10 @@ Pull requests do **not** publish on every push: snapshots are metered
 snapshots — 142 stories × 2 themes). To request a snapshot run on a PR —
 typically once it is merge-ready — add the **`visual-check`** label. The
 label is one-shot: the job removes it as soon as a run actually starts, so
-re-add it when you want another run. Two gates run first, and a gate skip
+re-add it when you want another run. One exception: a run triggered by
+Dependabot itself gets a read-only token and cannot remove the label — it
+publishes with a warning instead, and the label must be removed manually
+(or by a later human-triggered run). Two gates run first, and a gate skip
 keeps the label so the next push retries automatically:
 
 1. **Pixel gate** — the PR's diff must touch at least one file that can

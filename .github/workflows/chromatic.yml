@@ -26,6 +26,10 @@ name: chromatic
 #        change pixels (markdown, docs/, .github/, changesets,
 #        LICENSE, .gitignore, package manifests) skip. If the diff
 #        can't be determined, the run proceeds (conservative).
+#   Exception (#53): a run triggered by dependabot[bot] gets a
+#   read-only token, so it cannot consume the label; it publishes with
+#   a warning instead and the label must be removed manually (a later
+#   human-triggered event can also consume it).
 # - TurboSnap (onlyChanged) scopes each run's snapshots to the
 #   stories affected by the change instead of the full suite.
 #
@@ -145,8 +149,22 @@ jobs:
 
           echo "Gates passed: snapshotting PR #${PR_NUMBER} at ${HEAD_SHA}."
 
+      - name: Warn that a Dependabot-triggered run cannot consume the label
+        if: github.event_name == 'pull_request' && steps.pr-gate.outputs.run == 'true' && github.actor == 'dependabot[bot]'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          # Runs triggered by dependabot[bot] get a read-only GITHUB_TOKEN
+          # regardless of the permissions declared above, so the DELETE in
+          # the consume step would 403 and fail an otherwise eligible run
+          # (#53). Skip consumption for those runs instead: publication
+          # proceeds, the label survives (the one-shot guarantee weakens
+          # for this edge only), and a later human-triggered event can
+          # consume it.
+          echo "::warning::This run was triggered by dependabot[bot], whose token is read-only: the visual-check label on PR #${PR_NUMBER} cannot be removed by this run and must be removed manually. Publication proceeds."
+
       - name: Consume the visual-check label (one-shot)
-        if: github.event_name == 'pull_request' && steps.pr-gate.outputs.run == 'true'
+        if: github.event_name == 'pull_request' && steps.pr-gate.outputs.run == 'true' && github.actor != 'dependabot[bot]'
         env:
           GH_TOKEN: ${{ github.token }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
