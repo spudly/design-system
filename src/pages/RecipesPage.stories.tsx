@@ -153,5 +153,9 @@ export const Loading: Story = {
 };
 
 export const ExpandedAccessory: Story = {
-  render: () => <RecipesPageDemo expandedRecipeId="arroz-con-pollo" />,
+  // The first recipe: the filter header plus three cards would push
+  // a later row's accessory below the fixed viewport, and the list
+  // has no scroll step in the snapshot — the expanded row must be
+  // the one visible in the initial frame.
+  render: () => <RecipesPageDemo expandedRecipeId="tuscan-chicken" />,
 };
