@@ -21,6 +21,15 @@ import { Text } from "./Text.js";
  * field, while the row itself keeps a minHeight so a caller-sized
  * input (SearchField forwards input props via ...rest) can still
  * grow it.
+ *
+ * The glyph's SIZE is also capped by that box (spudly/design-system#45):
+ * at 36px its natural line box is ~54px — taller than the 44px glyph
+ * box — so the box centered the oversized line box, not the glyph ink,
+ * and on Android the ink rode visibly above center. At 24px the line
+ * box is ~36px and fits inside the 44px box, so centering the line box
+ * centers the ink and the field height is unchanged. Do not raise the
+ * glyph size past the box again (24 × 1.5 = 36 ≤ 44), and do not "fix"
+ * centering with an explicit lineHeight — that is the explosion above.
  */
 
 const StyledContainer = styled(XStack, {
@@ -124,10 +133,12 @@ export function SearchField({
         <StyledGlyphBox>
           <Text
             aria-hidden
-            // ~2x the previous lg (18px) glyph so the search affordance
-            // reads at a glance. No lineHeight prop — see the note at
-            // the top of this file for the Android row explosion.
-            fontSize={tokens.typography.fontSize["4xl"]}
+            // 24px: still 1.5x the input text so the search affordance
+            // reads at a glance, and its natural line box (~36px) fits
+            // the 44px glyph box so the ink centers vertically on
+            // Android (#45). No lineHeight prop — see the note at the
+            // top of this file for the Android row explosion.
+            fontSize={tokens.typography.fontSize["2xl"]}
             color="$textMuted"
           >
             ⌕
