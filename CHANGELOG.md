@@ -1,5 +1,16 @@
 # @spudly/ui
 
+## 1.1.0
+
+### Minor Changes
+
+- 8b10cf5: Add RecipesPage (spudly/design-system#49, pilot): Eciperay's Browse/Recipes screen as a controlled full-page component, exported from the new `@spudly/ui/pages` subpath (page components import react-native's FlatList, so they stay off the package root, which must remain importable in plain Node). The app keeps all state and business logic and drives the page entirely through props — recipe view-models ({id, title, subtitle, imageUrl}), the full filter surface mirrored from the app's filter bar (search, status, ingredient, min/max calories and satiety, sort and order), and press/load-more callbacks out. The composition carries the app screen's layout rules with it: a non-scrolling `list` shell, a `flex: 1`-bounded FlatList (spudly/eciperay#188, guarded by a new source-scan test), the filter bar as the list header, and the DS SearchField reused as-is (no lineHeight changes — spudly/eciperay#162). Stories render the real component with fixture props in the Warm Harvest theme; the Storybook config aliases react-native to react-native-web (now a devDependency) so the FlatList renders on web.
+
+### Patch Changes
+
+- 482df34: Add full-page demo stories (spudly/design-system#44): a Pages section in Storybook with eight whole-screen demos — Eciperay Recipes browse (the spudly/eciperay#162 screen), Recipe detail, Meal plans, and Shared-with-me in the Warm Harvest theme, plus Memorize Home / verse search, Passage view, Memorization session, and Progress in the Quiet Dawn theme — composed from @spudly/ui components with static fixture data, so Chromatic's per-PR screenshots cover whole pages, not just components.
+- b1bcca7: Fix SearchField's search icon riding above center on Android (spudly/design-system#45): the icon is no longer the "⌕" text glyph at any size — the character's ink is asymmetric inside its em box (36px rode high, and a 24px reduction still rode high on an on-device check), so the icon is now drawn from two fixed-dimension shapes (a bordered circle and a rotated bar) inside the existing 44px glyph box, and centers by construction on web and native. No explicit lineHeight is involved (that remains the banned spudly/eciperay#162 explosion mechanism). Field height is unchanged.
+
 ## 1.0.3
 
 ### Patch Changes
