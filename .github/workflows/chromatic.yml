@@ -1,9 +1,32 @@
 name: chromatic
 
-# Publishes every PR's Storybook to Chromatic: each run gets its own
-# browsable build URL for review, plus visual snapshot diffs against the
-# accepted main-branch baseline (the check reports changes until they are
-# accepted in Chromatic's UI — that is the review gate working).
+# Publishes Storybook builds to Chromatic for visual snapshot diffs
+# against the accepted main-branch baseline (the check reports changes
+# until they are accepted in Chromatic's UI — that is the review gate
+# working).
+#
+# Snapshot budget: Chromatic's free tier allows 5,000 snapshots/month,
+# and the old run-on-every-push model burned ~284 snapshots per build
+# (142 stories × 2 themes) — 45 runs in 2026-10-19..22 alone. The
+# trigger model is now:
+#
+# - Pushes to main: ALWAYS run. Main builds anchor the baselines that
+#   PR diffs compare against, and they are comparatively rare.
+# - Pull requests: run ONLY on request. Add the `visual-check` label
+#   to a PR to request one snapshot run (typically once the PR is
+#   merge-ready). The label is one-shot: the job removes it as soon as
+#   a run actually starts, so later pushes don't silently re-burn
+#   snapshots — re-add the label for another run. Two gates run before
+#   the label is consumed, and a gate skip KEEPS the label, so a later
+#   push (synchronize) retries automatically:
+#     1. CI-green gate: the `ci` check for the PR's exact head SHA
+#        must have concluded success. Pending/failed CI skips.
+#     2. Pixel gate: PRs whose diff touches only files that cannot
+#        change pixels (markdown, docs/, .github/, changesets,
+#        LICENSE, .gitignore, package manifests) skip. If the diff
+#        can't be determined, the run proceeds (conservative).
+# - TurboSnap (onlyChanged) scopes each run's snapshots to the
+#   stories affected by the change instead of the full suite.
 #
 # Setup (one-time, see README "Storybook previews (Chromatic)"): create a
 # Chromatic project linked to this repo and store its project token as the
@@ -15,6 +38,9 @@ on:
   push:
     branches: [main]
   pull_request:
+    # `labeled` makes the visual-check request work; the other types let
+    # an already-labeled PR retry the gates when new commits land.
+    types: [opened, reopened, synchronize, labeled]
 
 # Match ci.yml: cancel superseded runs for the same PR/branch.
 concurrency:
@@ -25,12 +51,89 @@ jobs:
   chromatic:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    # Least privilege for what this job does: check out code, read the
+    # ci check-run for the gate, and remove the visual-check label.
+    permissions:
+      contents: read
+      checks: read
+      issues: write
+      pull-requests: write
     # Fork PRs never receive repository secrets, so the publish step could
     # only fail there — skip them. (Dependabot PRs DO run, but need the
-    # token mirrored as a Dependabot secret; see README.)
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    # token mirrored as a Dependabot secret; see README.) PR runs
+    # additionally require the visual-check label (see header), and a
+    # `labeled` event for any other label must not start a run.
+    if: |
+      github.event_name == 'push' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       contains(github.event.pull_request.labels.*.name, 'visual-check') &&
+       (github.event.action != 'labeled' || github.event.label.name == 'visual-check'))
     steps:
+      - name: Gate PR snapshot runs (pixel diff + CI green)
+        id: pr-gate
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # Default when anything is undetermined: run (conservative).
+          echo "run=true" >> "$GITHUB_OUTPUT"
+
+          # --- Pixel gate ------------------------------------------------
+          # Skip when every changed file is one that cannot change
+          # pixels. An empty or failed diff lookup means "unknown" and
+          # falls through to run.
+          if files="$(gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" --name-only 2>/dev/null)" && [ -n "$files" ]; then
+            visual=0
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              base="$(basename "$file")"
+              case "$file" in
+                *.md | docs/* | .github/*) ;;
+                *)
+                  case "$base" in
+                    LICENSE* | .gitignore | package.json | package-lock.json) ;;
+                    *) visual=1 ;;
+                  esac
+                  ;;
+              esac
+            done <<< "$files"
+            if [ "$visual" -eq 0 ]; then
+              echo "::notice::Skipping Chromatic for PR #${PR_NUMBER}: no changed file can change pixels. The visual-check label is kept; a later push re-checks the gates."
+              echo "run=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          # --- CI-green gate ---------------------------------------------
+          # The latest `ci` check run for the exact head SHA must be a
+          # completed success. Pending, failed, or missing → skip and
+          # keep the label for the next push.
+          ci_state="$(gh api "repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs?per_page=100" \
+            --jq '[.check_runs[] | select(.name == "ci" and .app.slug == "github-actions")] | sort_by(.started_at) | last | if . == null then "missing" else "\(.status):\(.conclusion)" end' \
+            2>/dev/null || echo "unknown")"
+          if [ "$ci_state" != "completed:success" ]; then
+            echo "::notice::Skipping Chromatic for PR #${PR_NUMBER}: ci check for ${HEAD_SHA} is '${ci_state}', not completed:success. The visual-check label is kept; a later push re-checks the gates."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Gates passed: snapshotting PR #${PR_NUMBER} at ${HEAD_SHA}."
+
+      - name: Consume the visual-check label (one-shot)
+        if: github.event_name == 'pull_request' && steps.pr-gate.outputs.run == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          gh api --method DELETE "repos/${{ github.repository }}/issues/${PR_NUMBER}/labels/visual-check"
+          echo "Removed the visual-check label from PR #${PR_NUMBER}: the one-shot request is consumed."
+
       - name: Checkout
+        if: steps.pr-gate.outputs.run != 'false'
         uses: actions/checkout@v7
         with:
           # Chromatic needs full history to find baseline builds and to
@@ -42,15 +145,21 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - name: Setup Node
+        if: steps.pr-gate.outputs.run != 'false'
         uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: npm
 
       - name: Install dependencies
+        if: steps.pr-gate.outputs.run != 'false'
         run: npm ci
 
       - name: Publish to Chromatic
+        if: steps.pr-gate.outputs.run != 'false'
         uses: chromaui/action@v18
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          # TurboSnap: snapshot only the stories this change affects
+          # instead of the full suite (see the header budget note).
+          onlyChanged: true
