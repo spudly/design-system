@@ -99,7 +99,7 @@ jobs:
               [ -z "$file" ] && continue
               base="$(basename "$file")"
               case "$file" in
-                *.md | docs/* | .github/*) ;;
+                *.md | docs/* | .github/* | .changeset/*) ;;
                 *)
                   case "$base" in
                     LICENSE* | .gitignore | package.json | package-lock.json) ;;
