@@ -5,3 +5,8 @@
  * FlatList), and the root entry must stay importable in plain Node.
  */
 export { RecipesPage, type RecipesPageItem, type RecipesPageProps } from "./RecipesPage.js";
+export {
+  SharedWithMePage,
+  type SharedWithMePageItem,
+  type SharedWithMePageProps,
+} from "./SharedWithMePage.js";
