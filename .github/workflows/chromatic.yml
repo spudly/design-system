@@ -152,8 +152,20 @@ jobs:
           PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           set -euo pipefail
-          gh api --method DELETE "repos/${{ github.repository }}/issues/${PR_NUMBER}/labels/visual-check"
-          echo "Removed the visual-check label from PR #${PR_NUMBER}: the one-shot request is consumed."
+          # Idempotent for the already-absent case only: a concurrent
+          # run admitted on a stale event payload can reach this step
+          # after another run consumed the label, and its DELETE then
+          # 404s. That race must not abort publication — but
+          # authorization and other API failures still fail the step.
+          output="$(gh api --method DELETE "repos/${{ github.repository }}/issues/${PR_NUMBER}/labels/visual-check" 2>&1)" && delete_rc=0 || delete_rc=$?
+          if [ "$delete_rc" -eq 0 ]; then
+            echo "Removed the visual-check label from PR #${PR_NUMBER}: the one-shot request is consumed."
+          elif grep -Eq '"status": *"404"' <<< "$output"; then
+            echo "::notice::visual-check was already absent on PR #${PR_NUMBER} (consumed by a concurrent run); continuing to publish."
+          else
+            echo "$output" >&2
+            exit 1
+          fi
 
       - name: Checkout
         if: steps.pr-gate.outputs.run != 'false'
