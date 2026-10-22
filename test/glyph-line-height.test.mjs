@@ -331,39 +331,30 @@ test("SearchField glyph is capped in its own fixed box; the row keeps minHeight"
   );
 });
 
-test("SearchField glyph's natural line box fits its glyph box, so the ink centers (#45)", () => {
+test("SearchField search icon is drawn shapes, not a text glyph, so it centers by construction (#45)", () => {
   const file = sources.find(({ posixPath }) => posixPath.endsWith("components/SearchField.tsx"));
   assert.ok(file, "src/components/SearchField.tsx not found");
   const stripped = stripComments(file.text);
-  // The glyph is the only `fontSize={tokens…}` JSX prop in the file
-  // (the input and the clear × set fontSize via style objects). Its
-  // size must resolve through the typography scale — a raw number
-  // here would bypass the check below, so fail loudly on that form.
-  const glyph = stripped.match(/fontSize=\{tokens\.typography\.fontSize\["([^"]+)"\]\}/);
+  // The ⌕ character (U+2315) must not survive as rendered content:
+  // its ink is asymmetric inside its em box, so no font size centers
+  // it — 36px rode high (line box 54px > the 44px box) and 24px still
+  // rode high on Stephen's 2026-10-22 on-device check. (Prose mentions
+  // in comments are stripped before this scan.)
   assert.ok(
-    glyph,
-    "SearchField glyph fontSize must be a tokens.typography.fontSize[...] reference (the #45 centering check needs to resolve it)",
+    !stripped.includes("⌕"),
+    "SearchField still renders the ⌕ text glyph — its ink cannot center vertically on Android (design-system#45); draw the icon from fixed-dimension shapes instead",
   );
-  const scaleFile = sources.find(({ posixPath }) => posixPath.endsWith("tokens/typography.ts"));
-  assert.ok(scaleFile, "src/tokens/typography.ts not found");
-  const scale = stripComments(scaleFile.text).match(/fontSize\s*=\s*\{([^}]*)\}/);
-  assert.ok(scale, "fontSize scale block not found in tokens/typography.ts");
-  const entries = new Map(
-    [...scale[1].matchAll(/(?:^|,)\s*(?:"([^"]+)"|(\w+))\s*:\s*(\d+)/g)].map((m) => [
-      m[1] ?? m[2],
-      Number(m[3]),
-    ]),
-  );
-  const size = entries.get(glyph[1]);
-  assert.ok(size, `fontSize token "${glyph[1]}" not found in the typography scale`);
-  // No explicit lineHeight (banned above), so the line box is the
-  // font's natural ~1.5x. If it exceeds the 44px glyph box, the box
-  // centers the line box instead of the ink and the glyph rides high
-  // on Android — the #45 defect. 24px × 1.5 = 36 ≤ 44 passes; the old
-  // 36px × 1.5 = 54 fails.
+  // The replacement icon is fixed-geometry: a SearchGlyph component
+  // rendering a fixed 24px box. If someone swaps it back to a font
+  // glyph, this fails loudly rather than passing vacuously.
   assert.ok(
-    size * 1.5 <= 44,
-    `SearchField glyph is ${size}px: its natural line box (~${size * 1.5}px) exceeds the 44px glyph box, so its ink cannot center vertically on Android (design-system#45)`,
+    /function SearchGlyph\(\)/.test(stripped),
+    "SearchField must define the SearchGlyph drawn-icon component (design-system#45)",
+  );
+  const glyphFn = stripped.slice(stripped.indexOf("function SearchGlyph()"));
+  assert.ok(
+    /width=\{24\}/.test(glyphFn) && /height=\{24\}/.test(glyphFn),
+    "SearchGlyph's box must be fixed at 24x24 so StyledGlyphBox's flex centering centers the icon itself (design-system#45)",
   );
 });
 
