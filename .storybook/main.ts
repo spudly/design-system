@@ -57,6 +57,17 @@ const config: StorybookConfig = {
     ]);
     return {
       ...config,
+      resolve: {
+        ...config.resolve,
+        alias: [
+          // Page components (#49) render React Native's FlatList;
+          // the web Storybook resolves it to react-native-web, the
+          // same substitution the apps' web builds make. Exact-name
+          // alias only: subpath imports (react-native/...) are not
+          // used in src and must not be rewritten.
+          { find: /^react-native$/, replacement: "react-native-web" },
+        ],
+      },
       define: {
         ...config.define,
         ...tamaguiDefine,
