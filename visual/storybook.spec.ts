@@ -200,7 +200,23 @@ for (const theme of THEMES) {
             return Number.isFinite(x1) ? { x1, y1, x2, y2 } : null;
           };
           let acc = measure();
-          if (!acc) return null;
+          if (!acc) {
+            // Nothing measurable — the story renders nothing inline
+            // (or a component that should render has disappeared).
+            // Do NOT skip the content assertion: fall back to a fixed
+            // clip at the root's origin, so an empty render is still
+            // compared against the story's content baseline and a
+            // disappearing component fails instead of passing inside
+            // the root shot's diff budget. A story that is empty by
+            // design gets this fixed clip's image as its baseline.
+            const rootRect = el.getBoundingClientRect();
+            return {
+              x: Math.max(0, Math.floor(rootRect.left + window.scrollX)),
+              y: Math.max(0, Math.floor(rootRect.top + window.scrollY)),
+              width: 48,
+              height: 48,
+            };
+          }
           for (let i = 0; i < 12; i++) {
             await new Promise((resolve) => setTimeout(resolve, 50));
             const next = measure();
@@ -241,8 +257,9 @@ for (const theme of THEMES) {
         // against the tight crop the same change is a large fraction of
         // the pixels and fails. Stories whose content fills the root
         // (ScreenContainer-style layouts) have no smaller box — the root
-        // shot already is the tight shot for them — and stories that
-        // render nothing inline (Dialog) have no content box at all.
+        // shot already is the tight shot for them. Stories that render
+        // nothing inline get the fixed empty-state clip from the
+        // measurement above, so this assertion always runs.
         if (contentClip) {
           await expect(page).toHaveScreenshot(`${story.id}-${theme.slug}-content.png`, {
             clip: contentClip,
