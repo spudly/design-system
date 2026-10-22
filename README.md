@@ -78,28 +78,25 @@ Releases are automated with [Changesets](https://github.com/changesets/changeset
 3. Consumers upgrade on their own schedule — Eciperay can stay on 1.4 while
    Memorize tries 2.0.
 
-## Storybook previews (Chromatic)
+## Visual regression (Playwright)
 
-Every pull request publishes its Storybook build to
-[Chromatic](https://www.chromatic.com/) via `.github/workflows/chromatic.yml`:
-each run gets a browsable build URL for review, and Chromatic diffs story
-snapshots against the accepted `main` baseline. Visual changes show up as a
-failing/check-pending Chromatic status until they are accepted in
-Chromatic's UI — that acceptance is the visual-regression gate. Pushes to
-`main` publish the new baseline.
+Every pull request that touches components, tokens, themes, or stories
+runs Playwright screenshot tests over the built Storybook — every story,
+in both brand themes (Eciperay "Warm Harvest" and Memorize "Quiet Dawn") —
+via `.github/workflows/visual.yml`. Baselines are committed in-repo; a
+visual diff fails the PR, with diff images uploaded as CI artifacts.
 
-One-time setup:
+```sh
+npm run build-storybook   # the suite enumerates stories from the build
+npm run test:visual       # check against committed baselines
+npm run test:visual:update  # regenerate baselines after a deliberate change
+```
 
-1. Create a Chromatic project linked to this GitHub repo (chromatic.com →
-   Add project). Chromatic's free tier covers this project's volume.
-2. Copy the project token into a repository secret named
-   `CHROMATIC_PROJECT_TOKEN` (Settings → Secrets and variables → Actions).
-   Until the secret exists, the publish step fails — confined to the
-   chromatic check; CI is unaffected.
-3. For Dependabot PRs, add the same value as a **Dependabot** secret with
-   the same name (Settings → Secrets and variables → Dependabot):
-   Dependabot-triggered runs cannot read Actions secrets. Fork PRs are
-   skipped entirely — they never receive secrets, by design.
+See [docs/visual-regression.md](docs/visual-regression.md) for the full
+baseline-update workflow. This setup **replaces Chromatic** (removed in
+the same PR): it snapshots the same stories with no external service or
+secret, and baselines are reviewable as files in the PR — the doc above
+states the reasoning in full.
 
 ## Next steps
 

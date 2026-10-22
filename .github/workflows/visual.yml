@@ -1,0 +1,94 @@
+name: visual
+
+# Playwright visual-regression for the built Storybook (issue #42; see
+# docs/visual-regression.md). Runs only when a PR touches something that
+# can change rendering — components, tokens, themes, stories, the
+# Storybook config, or this suite itself. A visual diff fails the PR;
+# the diff images are uploaded as artifacts on failure.
+#
+# This replaces Chromatic as the visual-regression gate (the hosted
+# Chromatic workflow was removed in the same PR): the same stories are
+# snapshotted, but baselines live in-repo, the check needs no external
+# service or secret, and it runs the same locally and in CI.
+#
+# Baseline regeneration in CI: run this workflow manually
+# (workflow_dispatch) with update_baselines=true — it uploads the
+# regenerated baselines as an artifact instead of failing on diffs.
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - ".storybook/**"
+      - "visual/**"
+      - "playwright.config.ts"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/visual.yml"
+  workflow_dispatch:
+    inputs:
+      update_baselines:
+        description: "Regenerate baselines and upload them as an artifact"
+        type: boolean
+        default: false
+
+concurrency:
+  group: visual-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: "@spudly"
+
+      - name: Install dependencies
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build Storybook
+        run: npm run build-storybook
+
+      - name: Run visual tests
+        if: ${{ !inputs.update_baselines }}
+        run: npx playwright test
+
+      - name: Regenerate baselines
+        if: ${{ inputs.update_baselines }}
+        run: npx playwright test --update-snapshots
+
+      - name: Upload regenerated baselines
+        if: ${{ inputs.update_baselines }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-baselines
+          path: visual/storybook.spec.ts-snapshots/
+          retention-days: 14
+
+      - name: Upload diff images and report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-diffs
+          path: |
+            test-results/
+            playwright-report/
+          if-no-files-found: ignore
+          retention-days: 14
