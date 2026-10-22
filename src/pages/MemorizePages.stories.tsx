@@ -100,7 +100,7 @@ function MemorizationSessionDemo() {
         <Text variant="hint">Session progress</Text>
         <StepDots count={3} activeIndex={1} label="Round 2 of 3" />
       </XStack>
-      <ProgressBar value={40} />
+      <ProgressBar value={40} accessibilityLabel="Memorization session progress" />
       <Text variant="verse">
         The LORD is my shepherd; I shall not{" "}
         <BlankWord
@@ -160,7 +160,10 @@ export const Progress: Story = {
                 <Text variant="body">{passage.reference}</Text>
                 <Text variant="hint">{passage.percent}%</Text>
               </XStack>
-              <ProgressBar value={passage.percent} />
+              <ProgressBar
+                value={passage.percent}
+                accessibilityLabel={`${passage.reference} progress`}
+              />
             </YStack>
           ))}
         </YStack>

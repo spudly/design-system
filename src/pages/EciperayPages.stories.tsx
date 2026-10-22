@@ -8,9 +8,10 @@ import { Card } from "../components/Card.js";
 import { ChecklistRow } from "../components/ChecklistRow.js";
 import { SearchField } from "../components/SearchField.js";
 import { SectionCard } from "../components/SectionCard.js";
+import { SelectField } from "../components/SelectField.js";
 import { Text } from "../components/Text.js";
+import { TextField } from "../components/TextField.js";
 import { TextLink } from "../components/TextLink.js";
-import { ToggleChipGroup } from "../components/ToggleChipGroup.js";
 import { tokens } from "../tokens/index.js";
 import { PageFrame } from "./PageFrame.js";
 import {
@@ -55,34 +56,88 @@ function RecipeCard({ title, meta: metaLine, tags }: (typeof recipeFixtures)[num
 }
 
 /**
- * The #162 screen: heading, the SearchField filter bar, filter chips,
- * and the recipe list, composed exactly as the real screen composes
- * them — search field above the list, both inside the page container.
+ * The #162 screen, mirroring the real RecipesListView composition
+ * (spudly/eciperay packages/app): a `variant="list"` container, the
+ * filter bar in a padded header block, then the recipe list. The
+ * filter bar mirrors RecipeListFiltersBar control-for-control —
+ * SearchField, the status SelectField, the Ingredient field, the
+ * min/max calorie and satiety number fields, and the Sort by / Order
+ * SelectFields — because those controls' sizing interactions with the
+ * list are exactly what this page story exists to screenshot. The one
+ * deliberate difference: the list is a mapped stack of cards, not
+ * React Native's FlatList — this Storybook is web and composes only
+ * @spudly/ui components, so the virtualized list itself cannot render
+ * here (on-device coverage of the real list follows via #43).
  */
 function RecipesBrowseDemo() {
   const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<string | undefined>("all");
+  const [status, setStatus] = useState("all");
+  const [sort, setSort] = useState("newest");
+  const [sortDir, setSortDir] = useState("desc");
   return (
-    <PageFrame>
-      <Text variant="heading">Recipes</Text>
-      <SearchField
-        label="Search recipes"
-        placeholder="Search recipes…"
-        value={query}
-        onChangeText={setQuery}
-      />
-      <ToggleChipGroup
-        mode="single"
-        label="Filter"
-        options={[
-          { value: "all", label: "All" },
-          { value: "favorites", label: "Favorites" },
-          { value: "quick", label: "Quick" },
-        ]}
-        value={filter}
-        onChange={(value) => setFilter(value === filter ? undefined : value)}
-      />
-      <YStack gap={tokens.spacing[3]}>
+    <PageFrame variant="list">
+      <YStack
+        paddingHorizontal={tokens.spacing[4]}
+        paddingTop={tokens.spacing[4]}
+        paddingBottom={tokens.spacing[2]}
+        gap={tokens.spacing[3]}
+      >
+        <SearchField placeholder="Search recipes…" value={query} onChangeText={setQuery} />
+        <SelectField
+          label="Status"
+          value={status}
+          onValueChange={setStatus}
+          options={[
+            { value: "all", label: "All statuses" },
+            { value: "idea", label: "Idea" },
+            { value: "evolving", label: "Evolving" },
+            { value: "perfected", label: "Perfected" },
+            { value: "abandoned", label: "Abandoned" },
+          ]}
+        />
+        <TextField label="Ingredient" placeholder="e.g. chicken" />
+        <XStack gap={tokens.spacing[2]}>
+          <YStack flex={1}>
+            <TextField label="Min cal" keyboardType="numeric" />
+          </YStack>
+          <YStack flex={1}>
+            <TextField label="Max cal" keyboardType="numeric" />
+          </YStack>
+        </XStack>
+        <XStack gap={tokens.spacing[2]}>
+          <YStack flex={1}>
+            <TextField label="Min satiety" keyboardType="numeric" />
+          </YStack>
+          <YStack flex={1}>
+            <TextField label="Max satiety" keyboardType="numeric" />
+          </YStack>
+        </XStack>
+        <SelectField
+          label="Sort by"
+          value={sort}
+          onValueChange={setSort}
+          options={[
+            { value: "newest", label: "Newest" },
+            { value: "rating", label: "Rating" },
+            { value: "satiety", label: "Satiety" },
+            { value: "calories", label: "Calories" },
+          ]}
+        />
+        <SelectField
+          label="Order"
+          value={sortDir}
+          onValueChange={setSortDir}
+          options={[
+            { value: "desc", label: "High to low" },
+            { value: "asc", label: "Low to high" },
+          ]}
+        />
+      </YStack>
+      <YStack
+        paddingHorizontal={tokens.spacing[4]}
+        paddingBottom={tokens.spacing[8]}
+        gap={tokens.spacing[3]}
+      >
         {recipeFixtures.map((recipe) => (
           <RecipeCard key={recipe.title} {...recipe} />
         ))}

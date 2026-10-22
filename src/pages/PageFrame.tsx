@@ -10,10 +10,20 @@ import { ScreenContainer } from "../components/ScreenContainer.js";
  * `scrollable={false}`: the story canvas, not an inner scroll view,
  * owns the page height, so the screenshot captures the whole page.
  */
-export function PageFrame({ children }: { children: ReactNode }) {
+export function PageFrame({
+  children,
+  variant,
+}: {
+  children: ReactNode;
+  /** ScreenContainer shell mode — pass "list" for list screens whose
+   * content manages its own padding, like the real Recipes screen. */
+  variant?: "default" | "padded" | "list" | "auth";
+}) {
   return (
     <div style={{ width: 430, maxWidth: "100%" }}>
-      <ScreenContainer scrollable={false}>{children}</ScreenContainer>
+      <ScreenContainer scrollable={false} {...(variant ? { variant } : {})}>
+        {children}
+      </ScreenContainer>
     </div>
   );
 }

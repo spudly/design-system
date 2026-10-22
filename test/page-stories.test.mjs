@@ -68,19 +68,38 @@ test("all eight full-page demo stories exist, in the correct theme per app", () 
   }
 });
 
-test("the Recipes page story composes the SearchField filter bar above the list (#162 sanity)", () => {
+test("the Recipes page story composes the filter bar above the list (#162 sanity)", () => {
   const text = readPageFile("EciperayPages.stories.tsx");
   assert.ok(text, "src/pages/EciperayPages.stories.tsx not found");
-  // The #162 failure mode lives in this composition: if the page story
-  // stopped rendering the real SearchField, a glyph/layout explosion
-  // like #162 could pass the page screenshot again.
+  // Scope every check to the RecipesBrowseDemo function itself — a
+  // file-wide match could be satisfied by an import or a type in
+  // RecipeCard while the demo's own list JSX was deleted (Copilot
+  // finding on PR #48). The demo function runs from its declaration
+  // to the story export that follows it.
+  const start = text.indexOf("function RecipesBrowseDemo");
+  assert.notEqual(start, -1, "RecipesBrowseDemo function not found");
+  const end = text.indexOf("export const RecipesBrowse", start);
+  assert.notEqual(end, -1, "RecipesBrowse story export not found after the demo function");
+  const demo = text.slice(start, end);
+  // The #162 failure mode lives in this composition: the real filter
+  // bar (SearchField + the status/sort SelectFields) rendered above
+  // the recipe list. Each control must be present, and the list
+  // render must come after the filter bar.
+  const searchAt = demo.indexOf("<SearchField");
+  assert.notEqual(searchAt, -1, "RecipesBrowseDemo must render the real SearchField (#162)");
   assert.ok(
-    text.includes("<SearchField"),
-    "RecipesBrowse must render the real SearchField — the #162 regression surface",
+    demo.includes("<SelectField"),
+    "RecipesBrowseDemo must render the filter bar's SelectFields (status / sort), mirroring RecipeListFiltersBar",
+  );
+  const listAt = demo.indexOf("recipeFixtures.map");
+  assert.notEqual(
+    listAt,
+    -1,
+    "RecipesBrowseDemo must render the recipe list from recipeFixtures.map — the list JSX is the composition under test",
   );
   assert.ok(
-    text.includes("recipeFixtures"),
-    "RecipesBrowse must render the fixture recipe list below the filter bar",
+    searchAt < listAt,
+    "RecipesBrowseDemo must render the filter bar above the recipe list (the #162 composition)",
   );
 });
 
