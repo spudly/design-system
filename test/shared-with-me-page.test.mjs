@@ -189,7 +189,7 @@ test("stories render the real component in its four states", () => {
   }
   assert.match(
     stories,
-    /title: "Pages\/SharedWithMePage"/,
-    "the stories must declare the Pages/SharedWithMePage title",
+    /title: "Pages\/Eciperay\/SharedWithMePage"/,
+    "the stories must declare the Pages/Eciperay/SharedWithMePage title (#70)",
   );
 });

@@ -29,7 +29,7 @@ import {
  * component header.
  */
 const meta: Meta<typeof MealPlanDetailPage> = {
-  title: "Pages/MealPlanDetailPage",
+  title: "Pages/Eciperay/MealPlanDetailPage",
   component: MealPlanDetailPage,
   globals: { theme: "light_warmHarvest" },
 };

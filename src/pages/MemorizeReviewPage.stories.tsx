@@ -21,7 +21,7 @@ import { MemorizeReviewPage, type MemorizeReviewPageVerse } from "./MemorizeRevi
  * pinned to Quiet Dawn, Memorize's brand, like Pages/Memorize.
  */
 const meta: Meta<typeof MemorizeReviewPage> = {
-  title: "Pages/MemorizeReviewPage",
+  title: "Pages/Memorize/MemorizeReviewPage",
   component: MemorizeReviewPage,
   globals: { theme: "light_quietDawn" },
 };

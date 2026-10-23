@@ -22,7 +22,7 @@ import { tokens } from "../tokens/index.js";
  * Theme pinned to Warm Harvest, Eciperay's brand, like Pages/Eciperay.
  */
 const meta: Meta<typeof RecipesPage> = {
-  title: "Pages/RecipesPage",
+  title: "Pages/Eciperay/RecipesPage",
   component: RecipesPage,
   globals: { theme: "light_warmHarvest" },
 };

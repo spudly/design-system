@@ -20,7 +20,7 @@ import { SharedWithMePage, type SharedWithMePageItem } from "./SharedWithMePage.
  * like Pages/Eciperay.
  */
 const meta: Meta<typeof SharedWithMePage> = {
-  title: "Pages/SharedWithMePage",
+  title: "Pages/Eciperay/SharedWithMePage",
   component: SharedWithMePage,
   globals: { theme: "light_warmHarvest" },
 };

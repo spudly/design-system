@@ -187,8 +187,8 @@ test("stories render the real component in its two states, in Quiet Dawn", () =>
   }
   assert.match(
     stories,
-    /title: "Pages\/MyVersesPage"/,
-    "the stories must declare the Pages/MyVersesPage title",
+    /title: "Pages\/Memorize\/MyVersesPage"/,
+    "the stories must declare the Pages/Memorize/MyVersesPage title (#70)",
   );
   assert.match(
     stories,
