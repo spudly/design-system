@@ -6,7 +6,7 @@
 // (see apps/storybook/App.tsx): it writes its story index to its files
 // dir at boot, and a `spudlyds://capture/<storyId>?theme=<theme>`
 // deep link renders exactly one story (no Storybook chrome) and logs
-// `DSVR READY <nonce> <storyId>` via ReactNativeJS when it is on
+// `DSVR READY <nonce> <storyId>` via logcat when it is on
 // screen. This driver sends the links, waits for READY, captures with
 // `screencap`, and pixel-compares against committed baselines.
 //
@@ -84,8 +84,13 @@ async function adbBuffer(...adbArgs) {
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function logcatDump() {
+  // Unfiltered on purpose: which logcat tag JS console output lands
+  // on varies across React Native versions/architectures (classic
+  // bridge: ReactNativeJS; bridgeless builds differ). Filtering to
+  // one tag made a healthy app look silent (PR #87, third CI run:
+  // app alive, bundle served, zero lines under the expected tag).
   try {
-    return await adb("logcat", "-d", "-s", "ReactNativeJS:I", "*:S");
+    return await adb("logcat", "-d");
   } catch {
     return "";
   }
@@ -183,13 +188,20 @@ async function deviceMode() {
   if (!indexReady) {
     console.error("FAIL: app did not report its story index (DSVR INDEX_END) in time");
     // Leave evidence for the next diagnosis: is the app process even
-    // alive, and what did it log last?
+    // alive, what did it log last (any tag), and what is on screen?
     const pid = await adb("shell", "pidof", pkg).catch(() => "");
     console.error(`app process: ${pid.trim() ? `alive (pid ${pid.trim()})` : "NOT RUNNING"}`);
     const logs = await logcatDump();
-    console.error("last ReactNativeJS log lines:");
-    console.error(logs.trim().split("\n").slice(-30).join("\n"));
+    console.error("last logcat lines (all tags):");
+    console.error(logs.trim().split("\n").slice(-200).join("\n"));
     mkdirSync(CONFIG.outDir, { recursive: true });
+    try {
+      const shot = await adbBuffer("exec-out", "screencap", "-p");
+      writeFileSync(join(CONFIG.outDir, "failure-screen.png"), shot);
+      console.error("saved failure-screen.png to the output dir");
+    } catch {
+      console.error("could not capture a failure screenshot");
+    }
     writeFileSync(
       join(CONFIG.outDir, "summary.json"),
       JSON.stringify({ failed: ["story index timeout"] }, null, 2),

@@ -20,6 +20,9 @@ npx expo prebuild --platform android --no-install
 (cd android && ./gradlew assembleDebug --console=plain -q)
 adb install -r android/app/build/outputs/apk/debug/app-debug.apk
 
+# Generous logcat buffer: the driver reads the full log back.
+adb logcat -G 8M
+
 # Deterministic capture surface: fixed density + font scale.
 adb shell wm density 320
 adb shell settings put system font_scale 1.0

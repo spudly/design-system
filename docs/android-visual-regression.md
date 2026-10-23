@@ -71,7 +71,7 @@ For a native build instead of Expo Go-style loading:
 - **Capture mode**: open `spudlyds://capture/<storyId>?theme=<subTheme>&nonce=<n>`.
   The app renders ONLY that story (no Storybook chrome, LogBox
   suppressed), and once fonts are loaded and the story is mounted it
-  logs `DSVR READY <nonce> <storyId>` (ReactNativeJS tag). At boot it
+  logs `DSVR READY <nonce> <storyId>` (logcat). At boot it
   also logs its story index: `DSVR INDEX_BEGIN <count>`, one
   `DSVR INDEX_ITEM <storyId>` per story, `DSVR INDEX_END`.
 

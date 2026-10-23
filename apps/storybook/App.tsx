@@ -14,7 +14,7 @@ import StorybookUIRoot, { view } from "./Storybook";
 // - At boot the app logs its story index: a `DSVR INDEX_BEGIN <n>`
 //   line, one `DSVR INDEX_ITEM <storyId>` line per story, and
 //   `DSVR INDEX_END` (React Native logs land in logcat under the
-//   ReactNativeJS tag).
+//   logcat).
 // - Opening `spudlyds://capture/<storyId>?theme=<subTheme>&nonce=<n>`
 //   switches to capture mode: only that story renders (no Storybook
 //   chrome, LogBox suppressed). When the story has rendered, the app
