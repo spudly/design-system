@@ -7,7 +7,10 @@ const StyledVerseText = styled(TamaguiText, {
 
   color: "$color",
   fontSize: tokens.typography.fontSize.lg,
-  fontFamily: tokens.typography.fontFamily.serif,
+  // The registered `verse` font: the family follows the app's brand
+  // config — the base serif stack, or Alegreya under Quiet Dawn
+  // (Memorize, #66) — never a family named here.
+  fontFamily: "$verse",
 });
 
 type StyledVerseTextProps = GetProps<typeof StyledVerseText>;

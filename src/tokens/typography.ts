@@ -38,6 +38,19 @@ export const fontFamily = {
   sansNativeAndroid: "Raleway",
   /** Serif stack for display titles and verse/reading text (system serif). */
   serif: "Georgia, 'Times New Roman', serif",
+  /**
+   * Verse/reading-text stack: the family `VerseText` and the Text
+   * `verse` variant render in, resolved through the registered
+   * Tamagui `verse` font (see tamagui.config). The base role is the
+   * serif stack; a theme may override it in its own tokens — Quiet
+   * Dawn (Memorize) sets Alegreya (#66) — so apps mark verse text
+   * with the component/variant and never name a family themselves.
+   */
+  verse: "Georgia, 'Times New Roman', serif",
+  /** Single font name for React Native for the `verse` role. */
+  verseNative: "Georgia",
+  /** Single font name for React Native on Android for the `verse` role. */
+  verseNativeAndroid: "serif",
   /** Monospace stack for code / tabular content. */
   mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 } as const;

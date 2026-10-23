@@ -148,6 +148,12 @@ interface BrandFontFamily {
   sansNativeFaces?: Record<string, string> | undefined;
   /** Android family: a SINGLE font name — the family the app registers on Android (Raleway, #65), or a generic for a theme that declares none. */
   sansNativeAndroid?: string | undefined;
+  /** Verse/reading-text web family: a full CSS fallback stack (the base serif stack when a theme declares none; Alegreya under Quiet Dawn, #66). */
+  verse?: string | undefined;
+  /** Verse iOS family: a SINGLE font name. */
+  verseNative?: string | undefined;
+  /** Verse Android family: a SINGLE font name. */
+  verseNativeAndroid?: string | undefined;
 }
 
 /** Platforms whose font resolution differs. */
@@ -213,10 +219,10 @@ export function resolveFontFamily(
  * `normal` multiplier).
  */
 function buildBrandFonts(fontFamily: BrandFontFamily) {
-  const { family, face } = resolveFontFamily(fontFamily, fontPlatform);
-  const font = createFont({
-    family,
-    ...(face ? { face } : {}),
+  // One scale for every registered font: size/lineHeight/weight mirror
+  // the DS type scale (lineHeight = size × 1.5, the `normal`
+  // multiplier), whatever family the font carries.
+  const scale = {
     size: {
       1: tokens.typography.fontSize.xs,
       2: tokens.typography.fontSize.sm,
@@ -243,10 +249,34 @@ function buildBrandFonts(fontFamily: BrandFontFamily) {
       3: String(tokens.typography.fontWeight.semibold),
       4: String(tokens.typography.fontWeight.bold),
     },
+  } as const;
+  const { family, face } = resolveFontFamily(fontFamily, fontPlatform);
+  const font = createFont({
+    family,
+    ...(face ? { face } : {}),
+    ...scale,
+  });
+  // The verse font (#66): same registration mechanism, resolved from
+  // the theme's `verse` role — the base serif stack when a theme
+  // declares none, Alegreya under Quiet Dawn. VerseText and the Text
+  // `verse` variant reference it as `$verse`, so the family follows
+  // the app's brand config instead of a package-global literal.
+  const verseResolved = resolveFontFamily(
+    {
+      sans: fontFamily.verse ?? tokens.typography.fontFamily.verse,
+      sansNative: fontFamily.verseNative,
+      sansNativeAndroid: fontFamily.verseNativeAndroid,
+    },
+    fontPlatform,
+  );
+  const verse = createFont({
+    family: verseResolved.family,
+    ...(verseResolved.face ? { face: verseResolved.face } : {}),
+    ...scale,
   });
   // Headings use the same stack: hierarchy in this system is carried by
   // size/weight (the DS Text heading variants set no family of their own).
-  return { body: font, heading: font };
+  return { body: font, heading: font, verse };
 }
 
 export function createTamaguiConfig(theme: {
@@ -265,6 +295,9 @@ export function createTamaguiConfig(theme: {
       sansNative: theme.tokens?.typography?.fontFamily?.sansNative,
       sansNativeFaces: theme.tokens?.typography?.fontFamily?.sansNativeFaces,
       sansNativeAndroid: theme.tokens?.typography?.fontFamily?.sansNativeAndroid,
+      verse: theme.tokens?.typography?.fontFamily?.verse,
+      verseNative: theme.tokens?.typography?.fontFamily?.verseNative,
+      verseNativeAndroid: theme.tokens?.typography?.fontFamily?.verseNativeAndroid,
     }),
     tokens: tamaguiTokens,
     themes: buildTamaguiThemes(theme),
@@ -329,6 +362,10 @@ export function createStorybookTamaguiConfig() {
     // outside the preview.
     fonts: buildBrandFonts({
       sans: `var(--dsFontStack, ${baseTheme.tokens.typography.fontFamily.sans})`,
+      // Same CSS-var mechanism for the verse font (#66): the preview
+      // sets `--dsVerseFontStack` from the selected brand (Alegreya
+      // under Quiet Dawn, the base serif stack otherwise).
+      verse: `var(--dsVerseFontStack, ${baseTheme.tokens.typography.fontFamily.verse})`,
     }),
     tokens: tamaguiTokens,
     themes: {
