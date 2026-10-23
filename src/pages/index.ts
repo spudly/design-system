@@ -39,3 +39,8 @@ export {
   type MealPlanDetailPageNutritionGoals,
   type MealPlanDetailPageProps,
 } from "./MealPlanDetailPage.js";
+export {
+  MemorizeReviewPage,
+  type MemorizeReviewPageProps,
+  type MemorizeReviewPageVerse,
+} from "./MemorizeReviewPage.js";
