@@ -173,12 +173,10 @@ function GoalRow({ label, valueLabel }: MealPlanDetailPageGoalRow) {
       borderBottomColor={tokens.colors.gray.gray2}
       paddingVertical="$2"
     >
-      <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
+      <Text fontSize={tokens.typography.fontSize.sm} color="$textMuted">
         {label}
       </Text>
-      <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray10}>
-        {valueLabel}
-      </Text>
+      <Text fontSize={tokens.typography.fontSize.sm}>{valueLabel}</Text>
     </XStack>
   );
 }
@@ -293,11 +291,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
         </Text>
       ) : null}
       {nutritionLabel ? (
-        <Text
-          marginBlockEnd="$4"
-          fontSize={tokens.typography.fontSize.sm}
-          color={tokens.colors.gray.gray9}
-        >
+        <Text marginBlockEnd="$4" fontSize={tokens.typography.fontSize.sm} color="$textMuted">
           {nutritionLabel}
         </Text>
       ) : null}
