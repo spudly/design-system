@@ -39,3 +39,14 @@ export {
   type MealPlanDetailPageNutritionGoals,
   type MealPlanDetailPageProps,
 } from "./MealPlanDetailPage.js";
+export {
+  VerseSearchPage,
+  type VerseSearchPageItem,
+  type VerseSearchPageProps,
+} from "./VerseSearchPage.js";
+export {
+  MyVersesPage,
+  type MyVersesPageItem,
+  type MyVersesPageProps,
+  type MyVersesPageStatus,
+} from "./MyVersesPage.js";
