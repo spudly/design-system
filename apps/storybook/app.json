@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "android": { "package": "dev.spudly.designsystem.storybook" },
+    "name": "DS Storybook",
+    "orientation": "portrait",
+    "platforms": ["android"],
+    "scheme": "spudlyds",
+    "slug": "design-system-storybook",
+    "version": "0.0.0"
+  }
+}
