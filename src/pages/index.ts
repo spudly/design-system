@@ -32,3 +32,9 @@ export {
   type SharedWithMePageItem,
   type SharedWithMePageProps,
 } from "./SharedWithMePage.js";
+export {
+  MealPlanDetailPage,
+  type MealPlanDetailPageEntry,
+  type MealPlanDetailPageNutritionGoals,
+  type MealPlanDetailPageProps,
+} from "./MealPlanDetailPage.js";
