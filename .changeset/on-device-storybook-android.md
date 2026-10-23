@@ -1,5 +1,0 @@
----
-"@spudly/ui": minor
----
-
-On-device Storybook support for Android (#43). New export `createOnDeviceStorybookTamaguiConfig()`: the combined three-brand Storybook config (base, Warm Harvest, Quiet Dawn) with NATIVE font registrations — the web combined config registers CSS-variable font stacks that are invalid on native, so the on-device config derives its body font from the base family and its verse font from Memorize's. (One process-wide config either way — Tamagui cannot swap brand configs at runtime; on device, base/Warm Harvest verse-role text therefore renders in Alegreya instead of the generic serif, a stories-only deviation: no Warm Harvest surface ships verse text.) It powers the new Expo host app in `apps/storybook`, which mounts the repo's CSF stories on Android via @storybook/react-native for the screenshot visual regression in `tools/visual-regression`. Story wrappers were converted from web-only `<div>` elements to platform-neutral Tamagui views so the same stories render on device and web.

@@ -90,6 +90,33 @@ via story globals on web; in capture mode the driver's theme wins
 (page stories render the brand the driver asks for — that is the
 point of capturing them under their own brand).
 
+How the driver's theme actually wins: page stories pin
+`globals: { theme: "light_<brand>" }` in their CSF meta, and
+Storybook composes the globals a decorator receives as
+`{ ...userGlobals, ...storyGlobals }` — story globals spread last,
+so the driver's `UPDATE_GLOBALS` alone cannot switch a page story
+to dark (the first dark baselines were byte-identical light renders;
+found reviewing PR #91). Capture mode therefore also hands the
+deep link's theme to the preview decorator directly:
+`apps/storybook/captureTheme.ts` holds the override, `App.tsx` sets
+it from the capture link, and `.rnstorybook/preview.tsx` prefers it
+over the theme global whenever it is set. Browse mode never sets it.
+
+### Capture scope: pages only, own brand
+
+Stephen's decision, 2026-10-23: the committed baseline set is **page
+stories only, each under its own brand** — `pages-eciperay` under
+Warm Harvest (light + dark) and `pages-memorize` under Quiet Dawn
+(light + dark). With the current story set that is 30 x 2 + 18 x 2 =
+**96 baselines**. Curating hundreds of component screenshots was
+more review surface than the Android check needs; component stories
+stay covered by Chromatic on web, and wrong-brand page captures are
+excluded because pages pin their brand. The rule lives in the
+`CAPTURE_SCOPE` table in `tools/visual-regression/run.mjs` — the
+driver captures only in-scope (story, theme) pairs in both compare
+and update modes, so the baseline folder and the CI runs follow the
+table. Edit the table to change the scope.
+
 Comparison: a pixel differs when any channel delta exceeds
 `--threshold` (default 16/255); a screenshot fails when differing
 pixels exceed `--max-ratio` (default 0.1%). Diff visualizations
@@ -115,8 +142,9 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
 2. **Regenerate deliberately**: dispatch the workflow
    (Actions → "Android Storybook VR" → Run workflow) with
    mode = `update`, **from the PR branch**. It captures everything
-   and does not compare. The follow-on `commit-baselines` job then
-   syncs the fresh screenshots into
+   in the capture scope (page stories, own brand — see "Capture
+   scope" above) and does not compare. The follow-on
+   `commit-baselines` job then syncs the fresh screenshots into
    `tools/visual-regression/baselines/` and — only if something
    actually changed — commits them to the dispatched branch as
    github-actions[bot] ("chore(vr): update Android Storybook
