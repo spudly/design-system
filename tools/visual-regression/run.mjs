@@ -230,7 +230,28 @@ async function deviceMode() {
     for (const story of stories) {
       nonce++;
       const url = `${CONFIG.scheme}://capture/${story.id}?theme=${encodeURIComponent(theme)}&nonce=${nonce}`;
-      await adb("shell", "am", "start", "-a", "android.intent.action.VIEW", "-d", url, pkg);
+      try {
+        // The URL must be single-quoted: `adb shell` re-parses its
+        // arguments through the DEVICE shell, where the URL's `&`
+        // would otherwise split the command (PR #87, fifth CI run —
+        // the intent arrived truncated and the package name was
+        // executed as a command). Story ids/themes/nonces contain no
+        // single quotes, so the quoting is safe.
+        await adb(
+          "shell",
+          "am",
+          "start",
+          "-a",
+          "android.intent.action.VIEW",
+          "-d",
+          `'${url}'`,
+          pkg,
+        );
+      } catch (err) {
+        summary.failed.push(`${theme}/${story.id}: deep link failed: ${err.message}`);
+        console.error(`FAIL ${theme}/${story.id}: deep link failed: ${err.message}`);
+        continue;
+      }
       const ready = await waitForLog(`DSVR READY ${nonce} `, CONFIG.readyTimeoutMs);
       if (!ready) {
         summary.failed.push(`${theme}/${story.id}: READY timeout`);
@@ -238,7 +259,12 @@ async function deviceMode() {
         continue;
       }
       await sleep(CONFIG.settleMs);
-      const png = await adbBuffer("exec-out", "screencap", "-p");
+      const png = await adbBuffer("exec-out", "screencap", "-p").catch((err) => {
+        summary.failed.push(`${theme}/${story.id}: screencap failed: ${err.message}`);
+        console.error(`FAIL ${theme}/${story.id}: screencap failed: ${err.message}`);
+        return null;
+      });
+      if (!png) continue;
       const rel = join(theme, `${story.id}.png`);
       const actualPath = join(CONFIG.outDir, "actual", rel);
       mkdirSync(dirname(actualPath), { recursive: true });
