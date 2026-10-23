@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { Text } from "../components/Text.js";
+import { View } from "tamagui";
 import { RecipesPage, type RecipesPageItem } from "./RecipesPage.js";
 import { tokens } from "../tokens/index.js";
 
@@ -30,7 +32,9 @@ type Story = StoryObj<typeof RecipesPage>;
 
 function Viewport({ children }: { children: ReactNode }) {
   return (
-    <div style={{ width: 430, maxWidth: "100%", height: 844, display: "flex" }}>{children}</div>
+    <View width={430} maxWidth="100%" height={844}>
+      {children}
+    </View>
   );
 }
 
@@ -100,17 +104,18 @@ function RecipesPageDemo({
               // for one row also hides that row's Log cook button.
               renderRecipeAccessory: (recipeId: string) =>
                 recipeId === expandedRecipeId ? (
-                  <div
-                    style={{
-                      border: "1px dashed #b08968",
-                      borderRadius: 8,
-                      padding: "12px 16px",
-                      fontFamily: tokens.typography.fontFamily.sans,
-                      fontSize: 14,
-                    }}
+                  <View
+                    borderWidth={1}
+                    borderColor="#b08968"
+                    borderStyle="dashed"
+                    borderRadius={8}
+                    paddingVertical={12}
+                    paddingHorizontal={16}
                   >
-                    Cook log form renders here (app-side fixture stand-in)
-                  </div>
+                    <Text variant="body">
+                      Cook log form renders here (app-side fixture stand-in)
+                    </Text>
+                  </View>
                 ) : null,
             }
           : {})}

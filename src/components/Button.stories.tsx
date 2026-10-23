@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { XStack } from "tamagui";
 import { Button } from "./Button.js";
 
 const meta: Meta<typeof Button> = {
@@ -40,11 +41,11 @@ export const Danger: Story = {
 
 export const Sizes: Story = {
   render: () => (
-    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+    <XStack gap={12} alignItems="center">
       <Button size="sm">Small</Button>
       <Button size="md">Medium</Button>
       <Button size="lg">Large</Button>
-    </div>
+    </XStack>
   ),
 };
 
@@ -54,11 +55,11 @@ export const Disabled: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+    <XStack gap={12} alignItems="center">
       <Button variant="primary">Primary</Button>
       <Button variant="secondary">Secondary</Button>
       <Button variant="ghost">Ghost</Button>
       <Button variant="danger">Danger</Button>
-    </div>
+    </XStack>
   ),
 };

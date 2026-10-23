@@ -1,5 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { Text } from "../components/Text.js";
+import { View } from "tamagui";
 import {
   RecipeDetailPage,
   type RecipeDetailPageProps,
@@ -34,7 +36,9 @@ type Story = StoryObj<typeof RecipeDetailPage>;
 
 function Viewport({ children }: { children: ReactNode }) {
   return (
-    <div style={{ width: 430, maxWidth: "100%", height: 844, display: "flex" }}>{children}</div>
+    <View width={430} maxWidth="100%" height={844}>
+      {children}
+    </View>
   );
 }
 
@@ -44,17 +48,16 @@ function Viewport({ children }: { children: ReactNode }) {
  * precedent. */
 function SlotStandIn({ label }: { label: string }) {
   return (
-    <div
-      style={{
-        border: "1px dashed #b08968",
-        borderRadius: 8,
-        padding: "12px 16px",
-        fontFamily: tokens.typography.fontFamily.sans,
-        fontSize: 14,
-      }}
+    <View
+      borderWidth={1}
+      borderColor="#b08968"
+      borderStyle="dashed"
+      borderRadius={8}
+      paddingVertical={12}
+      paddingHorizontal={16}
     >
-      {label}
-    </div>
+      <Text variant="body">{label}</Text>
+    </View>
   );
 }
 

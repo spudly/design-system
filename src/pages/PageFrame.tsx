@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { View } from "tamagui";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 
 /**
@@ -20,10 +21,10 @@ export function PageFrame({
   variant?: "default" | "padded" | "list" | "auth";
 }) {
   return (
-    <div style={{ width: 430, maxWidth: "100%" }}>
+    <View width={430} maxWidth="100%">
       <ScreenContainer scrollable={false} {...(variant ? { variant } : {})}>
         {children}
       </ScreenContainer>
-    </div>
+    </View>
   );
 }

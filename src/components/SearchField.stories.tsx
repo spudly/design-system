@@ -1,5 +1,6 @@
 import { useState, type ComponentProps } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { SearchField } from "./SearchField.js";
 
 const meta: Meta<typeof SearchField> = {
@@ -17,9 +18,9 @@ type Story = StoryObj<typeof SearchField>;
 function SearchDemo(args: Partial<ComponentProps<typeof SearchField>>) {
   const [value, setValue] = useState("pasta");
   return (
-    <div style={{ maxWidth: 360 }}>
+    <YStack maxWidth={360}>
       <SearchField value={value} onChangeText={setValue} {...args} />
-    </div>
+    </YStack>
   );
 }
 
@@ -31,14 +32,14 @@ export const Empty: Story = {
   render: () => {
     const [value, setValue] = useState("");
     return (
-      <div style={{ maxWidth: 360 }}>
+      <YStack maxWidth={360}>
         <SearchField
           label="Search verses"
           placeholder="Search by reference or text…"
           value={value}
           onChangeText={setValue}
         />
-      </div>
+      </YStack>
     );
   },
 };
@@ -47,14 +48,14 @@ export const WithoutLabel: Story = {
   render: () => {
     const [value, setValue] = useState("");
     return (
-      <div style={{ maxWidth: 360 }}>
+      <YStack maxWidth={360}>
         <SearchField
           aria-label="Search recipes"
           placeholder="Search recipes…"
           value={value}
           onChangeText={setValue}
         />
-      </div>
+      </YStack>
     );
   },
 };

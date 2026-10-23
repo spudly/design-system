@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof Text> = {
@@ -47,13 +48,13 @@ export const Verse: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+    <YStack gap={8}>
       <Text variant="heading">Heading</Text>
       <Text variant="subheading">Subheading</Text>
       <Text variant="body">Body text</Text>
       <Text variant="hint">Hint text</Text>
       <Text variant="error">Error text</Text>
       <Text variant="verse">Verse text</Text>
-    </div>
+    </YStack>
   ),
 };

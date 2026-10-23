@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { XStack } from "tamagui";
 import { Badge } from "./Badge.js";
 
 const meta: Meta<typeof Badge> = {
@@ -37,12 +38,12 @@ export const Danger: Story = {
 
 export const AllTones: Story = {
   render: () => (
-    <div style={{ display: "flex", gap: 8 }}>
+    <XStack gap={8}>
       <Badge tone="neutral">Neutral</Badge>
       <Badge tone="info">Info</Badge>
       <Badge tone="success">Success</Badge>
       <Badge tone="warning">Warning</Badge>
       <Badge tone="danger">Danger</Badge>
-    </div>
+    </XStack>
   ),
 };

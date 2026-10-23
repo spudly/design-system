@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { OptionCard } from "./OptionCard.js";
 
 const meta: Meta<typeof OptionCard> = {
@@ -20,24 +21,24 @@ export const WithDescription: Story = {
     onPress: () => {},
   },
   render: (args) => (
-    <div style={{ maxWidth: 480 }}>
+    <YStack maxWidth={480}>
       <OptionCard {...args} />
-    </div>
+    </YStack>
   ),
 };
 
 export const TitleOnly: Story = {
   args: { title: "Import from URL", onPress: () => {} },
   render: (args) => (
-    <div style={{ maxWidth: 480 }}>
+    <YStack maxWidth={480}>
       <OptionCard {...args} />
-    </div>
+    </YStack>
   ),
 };
 
 export const Multiple: Story = {
   render: () => (
-    <div style={{ maxWidth: 480, display: "flex", flexDirection: "column", gap: 12 }}>
+    <YStack maxWidth={480} gap={12}>
       <OptionCard
         title="Manual entry"
         description="Type or paste a recipe by hand"
@@ -53,6 +54,6 @@ export const Multiple: Story = {
         description="Extract a recipe from a photo"
         onPress={() => {}}
       />
-    </div>
+    </YStack>
   ),
 };
