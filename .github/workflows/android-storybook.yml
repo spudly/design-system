@@ -108,9 +108,12 @@ jobs:
   # appear in the PR diff for review instead of living only in a
   # workflow artifact someone has to download and commit by hand
   # (Stephen's directive, 2026-10-23). This is the only job with
-  # write access; the capture jobs above stay read-only. The push
-  # re-triggers the PR's compare run, which then verifies the new
-  # baselines pass strict-compare.
+  # write access; the capture jobs above stay read-only. Note: the
+  # bot's push does not auto-run the PR's checks — GitHub parks
+  # workflow runs for GITHUB_TOKEN pushes as "action_required", so
+  # the follow-up compare run starts only after a maintainer
+  # approves it in the Actions UI or pushes to the branch
+  # (verified live on PR #97, 2026-10-23).
   commit-baselines:
     needs: visual-regression
     if: github.event_name == 'workflow_dispatch' && inputs.mode == 'update'

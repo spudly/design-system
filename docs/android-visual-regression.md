@@ -156,7 +156,10 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
 3. Dispatching mode = `update` from the default branch (`main`) is
    refused: the commit job fails with an error, because baselines
    must land via a PR branch so they are reviewed in a diff.
-4. The baseline commit's push re-triggers the PR's compare run,
+4. The baseline commit's push does not auto-run the PR's checks:
+   GitHub parks workflow runs for bot-token pushes as
+   "action_required", so a maintainer approves the follow-up run in
+   the Actions UI (or pushes to the branch) to get the compare run,
    which is then strict for every story that has a baseline — green
    means the committed baselines match fresh captures.
 5. An intentional visual change follows the same flow: the compare
