@@ -6,6 +6,28 @@
  */
 export { RecipesPage, type RecipesPageItem, type RecipesPageProps } from "./RecipesPage.js";
 export {
+  RecipeDetailPage,
+  type RecipeDetailPageProps,
+  type RecipeDetailPageReadyProps,
+  type RecipeDetailPageTab,
+  type RecipeDetailPageVersion,
+  type RecipeDetailPageTag,
+  type RecipeDetailPageLifecycle,
+  type RecipeDetailPageRatings,
+  type RecipeDetailPageCommunityRating,
+  type RecipeDetailPageViewerRating,
+  type RecipeDetailPageOverviewProps,
+  type RecipeDetailPageIngredientsProps,
+  type RecipeDetailPageIngredient,
+  type RecipeDetailPageSubstitution,
+  type RecipeDetailPageInstructionsProps,
+  type RecipeDetailPageInstruction,
+  type RecipeDetailPageHistoryProps,
+  type RecipeDetailPageCookLog,
+  type RecipeDetailPageNutritionProps,
+  type RecipeDetailPageNutritionRow,
+} from "./RecipeDetailPage.js";
+export {
   SharedWithMePage,
   type SharedWithMePageItem,
   type SharedWithMePageProps,
