@@ -1,5 +1,15 @@
 # @spudly/ui
 
+## 1.5.0
+
+### Minor Changes
+
+- cfe4943: Verse text in the Quiet Dawn (Memorize) theme now renders in Alegreya (#66). A new `verse` typography role (web stack + native/Android names) defaults to the existing Georgia serif stack; Quiet Dawn's tokens override only that role to Alegreya. `createTamaguiConfig` registers the role as a Tamagui `verse` font, and `VerseText` plus the `Text` `verse` variant now reference `$verse` — so the verse family follows the app's brand config, and apps keep marking verse text with the component/variant instead of naming a family. The Memorize app must register/load a font under the exact name "Alegreya" (Google Fonts on web) for native rendering, the same contract as Raleway.
+
+### Patch Changes
+
+- fea8fec: Quiet Dawn (Memorize) gets a distinct body background (#68): the two brand themes previously resolved to near-identical warm off-whites (#faf6f0 Warm Harvest vs #faf8f2 Quiet Dawn). Quiet Dawn's background is now a cool, faintly teal dawn tint (#e9f0ee) that fits its teal primary, and its border cools from Warm Harvest's shared warm sand (#e9e2d5) to #d3ded9. Warm Harvest is unchanged; Quiet Dawn ink and muted text keep AA+ contrast on the new background and the white surface stays clearly distinguishable.
+
 ## 1.4.0
 
 ### Minor Changes
