@@ -24,5 +24,17 @@ export type VerseTextProps = StyledVerseTextProps;
  * interactive children such as `BlankWord`.
  */
 export function VerseText({ children, ...rest }: VerseTextProps) {
-  return <StyledVerseText {...rest}>{children}</StyledVerseText>;
+  // Instance `fontFamily` prop carrying the BARE font name for the
+  // same reason as in Text (#69): Tamagui only emits the
+  // font-context class (`font_verse`) that defines `--f-family`
+  // when a text component receives a registered font name in that
+  // form; the styled() "$verse" declaration alone resolves to
+  // `var(--f-family)` with nothing defining it, so verse text fell
+  // back to the page's inherited family instead of the verse font.
+  // A caller-passed `fontFamily` in `rest` still wins.
+  return (
+    <StyledVerseText fontFamily="verse" {...rest}>
+      {children}
+    </StyledVerseText>
+  );
 }
