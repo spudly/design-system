@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { RecipesPage, type RecipesPageItem } from "./RecipesPage.js";
+import { tokens } from "../tokens/index.js";
 
 /**
  * Stories for the real RecipesPage component (#49 pilot) — not a
@@ -104,7 +105,7 @@ function RecipesPageDemo({
                       border: "1px dashed #b08968",
                       borderRadius: 8,
                       padding: "12px 16px",
-                      fontFamily: "sans-serif",
+                      fontFamily: tokens.typography.fontFamily.sans,
                       fontSize: 14,
                     }}
                   >
