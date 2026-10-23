@@ -6,6 +6,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SET_CURRENT_STORY, STORY_RENDERED, UPDATE_GLOBALS } from "storybook/internal/core-events";
 import StorybookUIRoot, { view } from "./Storybook";
+import { setCaptureThemeOverride } from "./captureTheme";
 
 // ---------------------------------------------------------------------------
 // Capture protocol (used by tools/visual-regression/run.mjs — see
@@ -18,7 +19,10 @@ import StorybookUIRoot, { view } from "./Storybook";
 // - Opening `spudlyds://capture/<storyId>?theme=<subTheme>&nonce=<n>`
 //   switches to capture mode: only that story renders (no Storybook
 //   chrome, LogBox suppressed). When the story has rendered, the app
-//   logs `DSVR READY <nonce> <storyId>`.
+//   logs `DSVR READY <nonce> <storyId>`. The requested theme reaches
+//   the preview decorator through captureTheme.ts, not only the
+//   globals channel — story-pinned globals outrank UPDATE_GLOBALS
+//   (see that module).
 // - `spudlyds://browse` (or a plain launcher start) shows the
 //   Storybook UI.
 // ---------------------------------------------------------------------------
@@ -83,6 +87,19 @@ function useStoryIndexLog() {
 }
 
 function CaptureRoot({ storyId, theme, nonce }: Required<CaptureTarget>) {
+  // Hand the requested theme to the preview decorator directly (see
+  // captureTheme.ts): page stories pin a light theme in their story
+  // globals, and story globals outrank the UPDATE_GLOBALS emitted
+  // below, so the channel alone cannot switch a page story to dark.
+  // Set during render — children render before this component's
+  // effects run, so an effect would be too late for the first frame
+  // the driver screenshots — and cleared on unmount so browse mode
+  // is unaffected. The value is idempotent per capture target.
+  setCaptureThemeOverride(theme || null);
+  useEffect(() => {
+    return () => setCaptureThemeOverride(null);
+  }, []);
+
   const Root = useMemo(
     () =>
       view.getStorybookUI({

@@ -90,6 +90,18 @@ via story globals on web; in capture mode the driver's theme wins
 (page stories render the brand the driver asks for — that is the
 point of capturing them under their own brand).
 
+How the driver's theme actually wins: page stories pin
+`globals: { theme: "light_<brand>" }` in their CSF meta, and
+Storybook composes the globals a decorator receives as
+`{ ...userGlobals, ...storyGlobals }` — story globals spread last,
+so the driver's `UPDATE_GLOBALS` alone cannot switch a page story
+to dark (the first dark baselines were byte-identical light renders;
+found reviewing PR #91). Capture mode therefore also hands the
+deep link's theme to the preview decorator directly:
+`apps/storybook/captureTheme.ts` holds the override, `App.tsx` sets
+it from the capture link, and `.rnstorybook/preview.tsx` prefers it
+over the theme global whenever it is set. Browse mode never sets it.
+
 ### Capture scope: pages only, own brand
 
 Stephen's decision, 2026-10-23: the committed baseline set is **page

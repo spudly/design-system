@@ -1,6 +1,7 @@
 import type { Preview } from "@storybook/react";
 import { TamaguiProvider, YStack } from "tamagui";
 import { createOnDeviceStorybookTamaguiConfig } from "../../../src/tamagui.config.js";
+import { getCaptureThemeOverride } from "../captureTheme";
 
 // On-device mirror of the web .storybook/preview.tsx: same decorator
 // shape and the same theme global, but the config comes from the
@@ -19,7 +20,13 @@ const preview: Preview = {
   },
   decorators: [
     (Story, context) => {
-      const themeName = (context.globals.theme as string) ?? "light";
+      // Capture mode (visual regression) overrides the theme global:
+      // page stories pin `light_<brand>` in their story globals, and
+      // Storybook spreads story globals over user globals, so the
+      // driver's UPDATE_GLOBALS cannot switch them to dark — the
+      // deep link's theme arrives via captureTheme.ts instead (see
+      // that module). Null outside capture mode.
+      const themeName = getCaptureThemeOverride() ?? (context.globals.theme as string) ?? "light";
       return (
         <TamaguiProvider key={themeName} config={config} defaultTheme={themeName}>
           <YStack flex={1} backgroundColor="$background" padding={24}>
