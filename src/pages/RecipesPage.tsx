@@ -350,7 +350,7 @@ function RecipeRow({
               variant="secondary"
               size="sm"
               backgroundColor={tokens.colors.danger.danger1}
-              color={tokens.colors.danger.danger7}
+              color={tokens.colors.danger.danger8}
               onPress={onDeletePress}
             >
               Delete
