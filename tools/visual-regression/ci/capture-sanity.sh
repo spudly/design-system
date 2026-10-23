@@ -37,6 +37,13 @@ if [ -z "$metro_up" ]; then
   exit 1
 fi
 
+# Pre-warm the bundle (see capture-compare.sh).
+curl -sf -o /dev/null "http://localhost:8081/index.bundle?platform=android&dev=true&hot=false" || {
+  echo "Metro bundle request failed; last log lines:" >&2
+  tail -30 /tmp/metro.log >&2
+  exit 1
+}
+
 DRIVER="node ../../tools/visual-regression/run.mjs"
 
 # Clean capture (SearchField stories, one theme is enough).

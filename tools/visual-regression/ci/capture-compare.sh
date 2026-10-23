@@ -41,6 +41,15 @@ if [ -z "$metro_up" ]; then
   exit 1
 fi
 
+# Pre-warm the bundle: the first request triggers the full module
+# graph build (minutes on a cold CI runner). It must not eat into the
+# driver's app-launch waits.
+curl -sf -o /dev/null "http://localhost:8081/index.bundle?platform=android&dev=true&hot=false" || {
+  echo "Metro bundle request failed; last log lines:" >&2
+  tail -30 /tmp/metro.log >&2
+  exit 1
+}
+
 if [ "$MODE" = "update" ]; then
   node ../../tools/visual-regression/run.mjs --update --out /tmp/dsvr-out
 else

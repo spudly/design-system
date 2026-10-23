@@ -61,6 +61,10 @@ const CONFIG = {
   threshold: Number(argValue("--threshold", "16")),
   maxRatio: Number(argValue("--max-ratio", "0.001")),
   readyTimeoutMs: Number(argValue("--ready-timeout", "30000")),
+  // The first wait is different in kind: app launch + first (cold)
+  // Metro bundle fetch + story-index preparation. Minutes, not the
+  // seconds a warm per-story render needs.
+  indexTimeoutMs: Number(argValue("--index-timeout", "240000")),
   settleMs: Number(argValue("--settle", "500")),
 };
 
@@ -175,9 +179,21 @@ async function deviceMode() {
     "-n",
     `${pkg}/.MainActivity`,
   );
-  const indexReady = await waitForLog("DSVR INDEX_END", CONFIG.readyTimeoutMs);
+  const indexReady = await waitForLog("DSVR INDEX_END", CONFIG.indexTimeoutMs);
   if (!indexReady) {
     console.error("FAIL: app did not report its story index (DSVR INDEX_END) in time");
+    // Leave evidence for the next diagnosis: is the app process even
+    // alive, and what did it log last?
+    const pid = await adb("shell", "pidof", pkg).catch(() => "");
+    console.error(`app process: ${pid.trim() ? `alive (pid ${pid.trim()})` : "NOT RUNNING"}`);
+    const logs = await logcatDump();
+    console.error("last ReactNativeJS log lines:");
+    console.error(logs.trim().split("\n").slice(-30).join("\n"));
+    mkdirSync(CONFIG.outDir, { recursive: true });
+    writeFileSync(
+      join(CONFIG.outDir, "summary.json"),
+      JSON.stringify({ failed: ["story index timeout"] }, null, 2),
+    );
     return 1;
   }
   const logs = await logcatDump();
