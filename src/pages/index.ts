@@ -50,3 +50,9 @@ export {
   type MyVersesPageProps,
   type MyVersesPageStatus,
 } from "./MyVersesPage.js";
+export {
+  MemorizationSessionPage,
+  type MemorizationSessionPageProps,
+  type MemorizationSessionPageReadyProps,
+  type MemorizationSessionPageWord,
+} from "./MemorizationSessionPage.js";
