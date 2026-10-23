@@ -105,6 +105,18 @@ function MealPlanRow({
   onPress: () => void;
   onDeletePress?: () => void;
 }) {
+  // Web keyboard support (the TextLink pattern): a div carrying the
+  // button role is not keyboard-operable on its own, so it is made
+  // focusable and the button activation keys — Enter and Space —
+  // invoke the same callback as a press. `tabIndex` and `onKeyDown`
+  // are web-only props in Tamagui and are ignored on native, where
+  // onPress is the activation path.
+  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onPress();
+    }
+  };
   return (
     <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3" marginBottom="$3">
       {/* The pressable text block is a Tamagui view, not a React
@@ -114,7 +126,15 @@ function MealPlanRow({
           pressable renders a div carrying the role (the OptionCard
           pattern) and keeps the layout. flex/minWidth are structural
           only: the block expands and may shrink within the row. */}
-      <YStack flex={1} minWidth={0} accessibilityRole="button" onPress={onPress}>
+      <YStack
+        flex={1}
+        minWidth={0}
+        accessibilityRole="button"
+        onPress={onPress}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        cursor="web:pointer"
+      >
         <Text
           fontSize={tokens.typography.fontSize.md}
           fontWeight={tokens.typography.fontWeight.semibold}
