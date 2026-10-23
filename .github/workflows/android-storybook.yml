@@ -72,6 +72,10 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # The runner executes each line of `script:` in a separate
+      # shell process, so the flow lives in a checked-in script file
+      # (a `cd` in the workflow block would not survive to the next
+      # line — learned on this PR's first run).
       - name: Capture and compare story screenshots
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -81,28 +85,11 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
-          script: |
-            set -e
-            cd apps/storybook
-            npx expo prebuild --platform android --no-install
-            (cd android && ./gradlew assembleDebug --console=plain -q)
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            # Deterministic capture surface: fixed density + font scale.
-            adb shell wm density 320
-            adb shell settings put system font_scale 1.0
-            adb reverse tcp:8081 tcp:8081
-            (npx expo start --localhost > /tmp/metro.log 2>&1 &)
-            for i in $(seq 1 60); do curl -sf http://localhost:8081/status >/dev/null && break || sleep 2; done
-            MODE="${{ inputs.mode }}"
-            if [ "$MODE" = "update" ]; then
-              node ../../tools/visual-regression/run.mjs --update --out /tmp/dsvr-out
-            else
-              node ../../tools/visual-regression/run.mjs --out /tmp/dsvr-out
-            fi
+          script: bash tools/visual-regression/ci/capture-compare.sh "${{ inputs.mode }}"
 
       - name: Upload screenshots and diffs
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: dsvr-output
           path: /tmp/dsvr-out
@@ -110,7 +97,7 @@ jobs:
 
       - name: Upload regenerated baselines (update mode)
         if: inputs.mode == 'update'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: dsvr-baselines
           path: tools/visual-regression/baselines
@@ -166,36 +153,11 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
-          script: |
-            set -e
-            cd apps/storybook
-            npx expo prebuild --platform android --no-install
-            (cd android && ./gradlew assembleDebug --console=plain -q)
-            adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-            adb shell wm density 320
-            adb shell settings put system font_scale 1.0
-            adb reverse tcp:8081 tcp:8081
-            (npx expo start --localhost > /tmp/metro.log 2>&1 &)
-            for i in $(seq 1 60); do curl -sf http://localhost:8081/status >/dev/null && break || sleep 2; done
-            DRIVER="node ../../tools/visual-regression/run.mjs"
-            # Clean capture (SearchField stories, one theme is enough).
-            $DRIVER --stories searchfield --themes light_warmHarvest --out /tmp/dsvr-clean
-            # Reintroduce the #162 bug and recapture. Only the JS
-            # bundle changes, so a force-stop + relaunch re-fetches
-            # it from Metro — no native rebuild.
-            (cd ../.. && git apply tools/visual-regression/sanity/searchfield-162.patch)
-            adb shell am force-stop dev.spudly.designsystem.storybook
-            $DRIVER --stories searchfield --themes light_warmHarvest --out /tmp/dsvr-mutated
-            # The job passes only if the comparison FAILS (exit 1).
-            if $DRIVER --from-dir /tmp/dsvr-mutated/actual --baselines /tmp/dsvr-clean/actual --out /tmp/dsvr-sanity-diff; then
-              echo "::error::Sanity check failed: the #162 mutation produced NO screenshot diff — the pipeline is not sensitive to the bug."
-              exit 1
-            fi
-            echo "Sanity check passed: the #162 mutation changed the SearchField screenshot on Android."
+          script: bash tools/visual-regression/ci/capture-sanity.sh
 
       - name: Upload sanity captures
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: dsvr-sanity-output
           path: |
