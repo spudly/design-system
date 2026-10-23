@@ -126,6 +126,30 @@ export const Loading: Story = {
   ),
 };
 
+export const NutritionUnavailable: Story = {
+  // The #78 case: the plan's nutrition data is present but
+  // unavailable, so the app passes no summary and no goals —
+  // the auto rule would render no goals section at all. The
+  // explicit visibility control forces the section so the
+  // set-goals hint card renders, as the old app view did.
+  render: () => (
+    <Viewport>
+      <MealPlanDetailPage
+        state="ready"
+        title="Harvest week"
+        dateRangeLabel="2026-10-19 – 2026-10-25"
+        goalsSectionVisibility="shown"
+        onSetGoalsPress={() => undefined}
+        onShoppingListPress={() => undefined}
+        onEditPress={() => undefined}
+        entries={detailEntries.slice(0, 1)}
+        onMealPress={() => undefined}
+        onRecipePress={() => undefined}
+      />
+    </Viewport>
+  ),
+};
+
 export const NoGoals: Story = {
   // Nutrition summary present but no goals set: the goals
   // section shows the plan total, its set-goals hint, and the

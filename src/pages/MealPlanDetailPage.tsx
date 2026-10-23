@@ -56,6 +56,16 @@ import { TextLink } from "../components/TextLink.js";
  * (raw ISO dates; the detail screen does not reformat them, and
  * neither does this view).
  *
+ * The goals section's visibility is explicitly controllable
+ * (#78): the original contract keyed the section on goal
+ * progress or a nutrition summary, but the old app view keyed
+ * it on the raw nutrition object, so a plan whose nutrition is
+ * present-but-unavailable (no summary from the formatter) with
+ * no goal progress rendered the set-goals hint card there and
+ * nothing here. `goalsSectionVisibility` ("auto" | "shown" |
+ * "hidden", default "auto") lets the app reproduce that case —
+ * and suppress the section — without a render-slot hack.
+ *
  * The nutrition-goals section is view-modeled, NOT slotted —
  * the cook-log audit, applied before the fact: the app's goal
  * progress view is a pure function of its data (per-field
@@ -147,6 +157,18 @@ export interface MealPlanDetailPageReadyProps {
    * or `nutritionLabel` is present, mirroring the app view,
    * which renders nothing when the plan has neither. */
   nutritionGoals?: MealPlanDetailPageNutritionGoals | null;
+  /** Explicit control over the goals section's visibility (#78).
+   * `"auto"` (the default) keeps the original rule: the section
+   * renders when the plan has goal progress or a nutrition
+   * summary. `"shown"` forces the section even with neither —
+   * the case the auto rule cannot express: the plan's nutrition
+   * data is present but `status: "unavailable"`, so the app's
+   * formatter returns no summary, and the plan has no goal
+   * progress; the old app view still rendered the section there
+   * (keyed on the raw nutrition object), showing the set-goals
+   * hint card. `"hidden"` suppresses the section even when the
+   * auto rule would render it. */
+  goalsSectionVisibility?: "auto" | "shown" | "hidden";
   /** Optional: the goals section's "Set nutrition goals" link
    * renders only when the callback is provided (in the app it
    * navigates to the profile's goals). */
@@ -258,6 +280,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     dateRangeLabel,
     nutritionLabel,
     nutritionGoals,
+    goalsSectionVisibility = "auto",
     onSetGoalsPress,
     onShoppingListPress,
     onEditPress,
@@ -267,8 +290,15 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   } = props;
 
   // The app's goals view renders nothing when the plan has
-  // neither goal progress nor a nutrition summary.
-  const showGoals = (nutritionGoals !== undefined && nutritionGoals !== null) || !!nutritionLabel;
+  // neither goal progress nor a nutrition summary — that is the
+  // "auto" rule. The explicit visibility control (#78) overrides
+  // it in both directions: "shown" covers the present-but-
+  // unavailable nutrition case the auto rule cannot express,
+  // "hidden" suppresses a section the data would have rendered.
+  const autoShowGoals =
+    (nutritionGoals !== undefined && nutritionGoals !== null) || !!nutritionLabel;
+  const showGoals =
+    goalsSectionVisibility === "shown" || (goalsSectionVisibility !== "hidden" && autoShowGoals);
 
   return (
     <ScreenContainer>

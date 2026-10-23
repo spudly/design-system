@@ -30,12 +30,17 @@
  *    summary, shows the set-goals hint when no goals are set,
  *    and its link renders only with onSetGoalsPress. The absence
  *    of any render slot is pinned (the header's audit: the app's
- *    goal view is pure presentation over data).
+ *    goal view is pure presentation over data). Since #78 the
+ *    section also carries an explicit visibility control
+ *    (`goalsSectionVisibility`, default "auto" = the rule above)
+ *    so the present-but-unavailable nutrition case can force
+ *    the hint-only section.
  * 6. An entry-less plan renders the bare "Entries" section —
  *    this screen has no empty message, unlike the list pages.
  * 7. The component is exported from the pages subpath index,
- *    and stories exercise the Default, Empty, Loading, and
- *    NoGoals states so Chromatic captures them.
+ *    and stories exercise the Default, Empty, Loading, NoGoals,
+ *    and NutritionUnavailable (#78) states so Chromatic
+ *    captures them.
  *
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
@@ -203,6 +208,39 @@ test("the component is exported from the pages subpath index", () => {
   assert.match(index, /MealPlanDetailPage/);
   assert.match(index, /type MealPlanDetailPageProps/);
   assert.match(index, /from "\.\/MealPlanDetailPage\.js"/);
+});
+
+test("the goals section has an explicit visibility control (#78)", () => {
+  assert.match(
+    code,
+    /goalsSectionVisibility\?: "auto" \| "shown" \| "hidden";/,
+    "the contract must carry the tri-state visibility control",
+  );
+  assert.match(
+    code,
+    /goalsSectionVisibility = "auto"/,
+    "auto must be the default so existing consumers keep the original rule",
+  );
+  assert.match(
+    code,
+    /goalsSectionVisibility === "shown"/,
+    '"shown" must force the section for the present-but-unavailable case',
+  );
+  assert.match(
+    code,
+    /goalsSectionVisibility !== "hidden"/,
+    '"hidden" must suppress the section even when the auto rule would render it',
+  );
+  assert.match(
+    stories,
+    /export const NutritionUnavailable/,
+    "a story must exercise the forced hint-only section",
+  );
+  assert.match(
+    stories,
+    /goalsSectionVisibility="shown"/,
+    "the NutritionUnavailable story must use the explicit control",
+  );
 });
 
 test("stories exercise the default, empty, loading, and no-goals states", () => {
