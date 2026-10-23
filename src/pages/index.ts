@@ -39,3 +39,9 @@ export {
   type MealPlanDetailPageNutritionGoals,
   type MealPlanDetailPageProps,
 } from "./MealPlanDetailPage.js";
+export {
+  MemorizationSessionPage,
+  type MemorizationSessionPageProps,
+  type MemorizationSessionPageReadyProps,
+  type MemorizationSessionPageWord,
+} from "./MemorizationSessionPage.js";
