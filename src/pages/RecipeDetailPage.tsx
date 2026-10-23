@@ -1,11 +1,12 @@
 import { useMemo, useState, type ReactNode } from "react";
-import { Modal, Pressable, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { Image, ScrollView, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { NumberStepper } from "../components/NumberStepper.js";
+import { SelectField } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { StarRatingInput } from "../components/StarRatingInput.js";
 import { StatCard } from "../components/StatCard.js";
@@ -24,9 +25,8 @@ import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChip
  *
  * Placement: page components live in src/pages behind the
  * `@spudly/ui/pages` subpath export, not the package root — this
- * component imports react-native (Modal, Pressable,
- * TouchableOpacity), and the root entry must stay importable in
- * plain Node.
+ * component imports react-native (TouchableOpacity), and the root
+ * entry must stay importable in plain Node.
  *
  * Composition mirrors the app's RecipeDetailScreen +
  * RecipeDetailChrome (spudly/eciperay packages/app): a pinned
@@ -71,11 +71,15 @@ import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChip
  * (value in, change out, pending disables it) with the mutation
  * behind the callback — the same shape as RecipesPage's filters.
  *
- * Two pieces of ephemeral state stay inside the view, mirroring
- * the app components they replace: the version picker's sheet
- * open/close (the app's VersionPicker holds it in useState) and
- * the instructions section's active step (the app's
- * InstructionsTab holds it in useState). Neither is business state.
+ * One piece of ephemeral state stays inside the view, mirroring
+ * the app component it replaces: the instructions section's
+ * active step (the app's InstructionsTab holds it in useState).
+ * It is not business state. The version picker is the standard
+ * SelectField (#72 — it replaced a custom bottom-sheet widget
+ * whose options appeared at the bottom of the screen, unlike
+ * every other select in the system); its open/close state is
+ * internal to that component, and the data contract is unchanged
+ * (version list in, selected id in, change callback out).
  *
  * Documented deviations from the app's current rendering, all
  * presentation-only:
@@ -345,32 +349,12 @@ function StatusBadge({ status }: { status: string }) {
   return <Badge tone={badge?.tone ?? "neutral"}>{badge?.label ?? "Idea"}</Badge>;
 }
 
-// The version picker's sheet geometry on the DS token scale (plain
-// objects, no StyleSheet). The scrim is the DS shadow color at 40%
-// alpha, composed with an alpha suffix the way the app composes it.
-// Sheet max height (320) is layout geometry with no spacing step.
-const pickerTriggerStyle = {
-  flexDirection: "row",
-  alignItems: "center",
-  gap: tokens.spacing[2],
-} as const;
-
-const pickerBackdropStyle = {
-  position: "absolute",
-  top: 0,
-  left: 0,
-  right: 0,
-  bottom: 0,
-  backgroundColor: `${tokens.shadows.md.shadowColor}66`,
-} as const;
-
-const pickerRowStyle = {
-  borderBottomWidth: 1,
-  borderColor: tokens.colors.gray.gray1,
-  paddingHorizontal: tokens.spacing[4],
-  paddingVertical: tokens.spacing[3],
-} as const;
-
+// The version picker is the standard SelectField (#72): the same
+// version list, current selection, and change callback the custom
+// bottom-sheet widget took, rendered by the control every other
+// select in the system uses. With at most one version there is
+// nothing to select, so the picker collapses to static text, as
+// before.
 function VersionPicker({
   versions,
   selectedVersionId,
@@ -380,7 +364,6 @@ function VersionPicker({
   selectedVersionId: string;
   onSelectVersion: (versionId: string) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const sorted = useMemo(
     () => [...versions].sort((a, b) => b.versionNumber - a.versionNumber),
     [versions],
@@ -396,90 +379,14 @@ function VersionPicker({
   }
 
   return (
-    <>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Select version"
-        style={pickerTriggerStyle}
-        onPress={() => {
-          setOpen(true);
-        }}
-      >
-        <Text variant="hint">Version</Text>
-        <View
-          borderRadius={tokens.radii.md}
-          borderWidth={1}
-          borderColor={tokens.colors.gray.gray3}
-          paddingHorizontal="$2"
-          paddingVertical="$1"
-        >
-          <Text fontSize={tokens.typography.fontSize.sm} numberOfLines={1} ellipsizeMode="tail">
-            {selected?.label}
-          </Text>
-        </View>
-      </Pressable>
-      <Modal
-        visible={open}
-        transparent
-        animationType="fade"
-        onRequestClose={() => {
-          setOpen(false);
-        }}
-      >
-        <View flex={1} justifyContent="flex-end">
-          <Pressable
-            testID="version-picker-backdrop"
-            style={pickerBackdropStyle}
-            onPress={() => {
-              setOpen(false);
-            }}
-          />
-          <YStack
-            borderTopLeftRadius={tokens.radii.xl}
-            borderTopRightRadius={tokens.radii.xl}
-            backgroundColor="$surface"
-            maxHeight={320}
-          >
-            <Text
-              fontSize={tokens.typography.fontSize.sm}
-              fontWeight={tokens.typography.fontWeight.medium}
-              paddingHorizontal="$4"
-              paddingVertical="$3"
-              borderBottomWidth={1}
-              borderColor={tokens.colors.gray.gray2}
-            >
-              Select version
-            </Text>
-            <ScrollView>
-              {sorted.map((version) => (
-                <Pressable
-                  key={version.id}
-                  style={pickerRowStyle}
-                  onPress={() => {
-                    onSelectVersion(version.id);
-                    setOpen(false);
-                  }}
-                >
-                  <Text
-                    fontSize={tokens.typography.fontSize.sm}
-                    fontWeight={
-                      version.id === selectedVersionId
-                        ? tokens.typography.fontWeight.medium
-                        : undefined
-                    }
-                    color={version.id === selectedVersionId ? "$primary" : tokens.colors.gray.gray9}
-                    numberOfLines={1}
-                    ellipsizeMode="tail"
-                  >
-                    {version.label}
-                  </Text>
-                </Pressable>
-              ))}
-            </ScrollView>
-          </YStack>
-        </View>
-      </Modal>
-    </>
+    <View flex={1} minWidth={200}>
+      <SelectField
+        label="Version"
+        value={selected?.id ?? ""}
+        options={sorted.map((version) => ({ value: version.id, label: version.label }))}
+        onValueChange={onSelectVersion}
+      />
+    </View>
   );
 }
 
