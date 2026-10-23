@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { View } from "tamagui";
 import { SharedWithMePage, type SharedWithMePageItem } from "./SharedWithMePage.js";
 
 /**
@@ -29,7 +30,9 @@ type Story = StoryObj<typeof SharedWithMePage>;
 
 function Viewport({ children }: { children: ReactNode }) {
   return (
-    <div style={{ width: 430, maxWidth: "100%", height: 844, display: "flex" }}>{children}</div>
+    <View width={430} maxWidth="100%" height={844}>
+      {children}
+    </View>
   );
 }
 

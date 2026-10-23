@@ -1,0 +1,167 @@
+# On-device Storybook visual regression for Android (issue #43).
+#
+# Separate from Chromatic (which gates the WEB Storybook): this job
+# renders the same CSF stories in the Expo host app
+# (apps/storybook) on an Android emulator and pixel-compares
+# screenshots against baselines committed under
+# tools/visual-regression/baselines/. See
+# docs/android-visual-regression.md for the full workflow, including
+# how baselines are generated and updated.
+#
+# Scoping: GitHub Actions minutes are on paid overage until
+# 2026-11-01, so the job is path-filtered to the surfaces that can
+# change a story screenshot (library source, the host app, the VR
+# tooling, this workflow) instead of running on every PR.
+name: Android Storybook VR
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "apps/storybook/**"
+      - "tools/visual-regression/**"
+      - ".github/workflows/android-storybook.yml"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "compare against baselines, update baselines, or run the #162 sanity check"
+        type: choice
+        options:
+          - compare
+          - update
+          - sanity
+        default: compare
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-storybook-vr-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual-regression:
+    if: github.event_name == 'pull_request' || inputs.mode != 'sanity'
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/storybook/package-lock.json
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install host app dependencies
+        working-directory: apps/storybook
+        run: npm ci
+
+      - name: Generate storybook.requires
+        working-directory: apps/storybook
+        run: npm run generate
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # The runner executes each line of `script:` in a separate
+      # shell process, so the flow lives in a checked-in script file
+      # (a `cd` in the workflow block would not survive to the next
+      # line — learned on this PR's first run).
+      - name: Capture and compare story screenshots
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
+          script: bash tools/visual-regression/ci/capture-compare.sh "${{ inputs.mode }}"
+
+      - name: Upload screenshots and diffs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dsvr-output
+          path: /tmp/dsvr-out
+          if-no-files-found: ignore
+
+      - name: Upload regenerated baselines (update mode)
+        if: inputs.mode == 'update'
+        uses: actions/upload-artifact@v7
+        with:
+          name: dsvr-baselines
+          path: tools/visual-regression/baselines
+          if-no-files-found: error
+
+  # The #162 sanity check (issue #43 acceptance): reintroduce the
+  # SearchField lineHeight bug via the patch in
+  # tools/visual-regression/sanity/ and prove the pipeline FAILS the
+  # SearchField screenshot on Android. The patch restores the pre-fix
+  # text glyph (numeric lineHeight = fontSize) and removes the
+  # clip-box hardening — on web the same change renders identically,
+  # which is the asymmetry that let #162 ship. Runs on demand: add
+  # the `android-sanity` label to a PR, or dispatch with mode=sanity.
+  # Succeeds only if the mutated capture differs from the clean one.
+  sanity:
+    if: (github.event_name == 'workflow_dispatch' && inputs.mode == 'sanity') || contains(github.event.pull_request.labels.*.name, 'android-sanity')
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/storybook/package-lock.json
+
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install host app dependencies
+        working-directory: apps/storybook
+        run: npm ci
+
+      - name: Generate storybook.requires
+        working-directory: apps/storybook
+        run: npm run generate
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Capture SearchField clean vs mutated
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
+          script: bash tools/visual-regression/ci/capture-sanity.sh
+
+      - name: Upload sanity captures
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: dsvr-sanity-output
+          path: |
+            /tmp/dsvr-clean
+            /tmp/dsvr-mutated
+            /tmp/dsvr-sanity-diff
+          if-no-files-found: ignore

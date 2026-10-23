@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { TextLink } from "./TextLink.js";
 import { Text } from "./Text.js";
 
@@ -22,26 +23,26 @@ export const Default: Story = {
 
 export const InProse: Story = {
   render: () => (
-    <div style={{ maxWidth: 420 }}>
+    <YStack maxWidth={420}>
       <Text variant="body">
         By continuing you agree to the{" "}
         <TextLink onPress={() => undefined}>Terms of Service</TextLink> and{" "}
         <TextLink onPress={() => undefined}>Privacy Policy</TextLink>. Questions?{" "}
         <TextLink onPress={() => undefined}>Contact support</TextLink>.
       </Text>
-    </div>
+    </YStack>
   ),
 };
 
 export const InHintText: Story = {
   render: () => (
-    <div style={{ maxWidth: 420 }}>
+    <YStack maxWidth={420}>
       <Text variant="hint">
         Tokens let scripts act on your behalf.{" "}
         <TextLink onPress={() => undefined} fontSize={14}>
           Learn how tokens work
         </TextLink>
       </Text>
-    </div>
+    </YStack>
   ),
 };

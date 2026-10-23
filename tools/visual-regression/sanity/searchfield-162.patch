@@ -1,0 +1,50 @@
+diff --git a/src/components/SearchField.tsx b/src/components/SearchField.tsx
+index 66e9268..4b36a14 100644
+--- a/src/components/SearchField.tsx
++++ b/src/components/SearchField.tsx
+@@ -70,13 +70,8 @@ const StyledContainer = styled(XStack, {
+ const StyledGlyphBox = styled(XStack, {
+   name: "SpudlySearchFieldGlyphBox",
+ 
+-  // Fixed height + hidden overflow: the glyph's own box. If the
+-  // glyph's measurement ever explodes again, it clips inside this
+-  // 44px box instead of stretching the row (eciperay#162).
+-  height: 44,
+   alignItems: "center",
+   justifyContent: "center",
+-  overflow: "hidden",
+   flexShrink: 0,
+ });
+ 
+@@ -91,28 +86,9 @@ const StyledGlyphBox = styled(XStack, {
+  */
+ function SearchGlyph() {
+   return (
+-    <View aria-hidden position="relative" width={24} height={24} flexShrink={0}>
+-      <View
+-        position="absolute"
+-        left={3}
+-        top={3}
+-        width={13}
+-        height={13}
+-        borderRadius={7}
+-        borderWidth={2}
+-        borderColor="$textMuted"
+-      />
+-      <View
+-        position="absolute"
+-        left={13.5}
+-        top={15.5}
+-        width={7.5}
+-        height={2.6}
+-        borderRadius={1.3}
+-        backgroundColor="$textMuted"
+-        rotate="45deg"
+-      />
+-    </View>
++    <Text aria-hidden fontSize={36} lineHeight={36} color="$textMuted">
++      ⌕
++    </Text>
+   );
+ }
+ 

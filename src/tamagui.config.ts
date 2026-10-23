@@ -378,6 +378,56 @@ export function createStorybookTamaguiConfig() {
   });
 }
 
+/**
+ * Build the combined config for the ON-DEVICE Storybook (#43): the same
+ * one-config / brands-as-sub-themes structure as
+ * createStorybookTamaguiConfig (runtime config swapping cannot restyle —
+ * see its note), but with fonts registered the native way instead of
+ * through the web preview's CSS vars, which do not exist on device.
+ *
+ * Body/heading: every brand's UI stack is Raleway on native (#65), and
+ * the host app registers a variable font under the exact name "Raleway",
+ * so the registration passes the base family's native names through
+ * resolveFontFamily — on Android that resolves to the registered
+ * "Raleway" family, exactly as the per-brand app configs resolve it.
+ *
+ * Verse: fonts are config-global, so the one registered verse family
+ * must serve every brand. Quiet Dawn's Alegreya is registered (the
+ * host app bundles it under the exact name "Alegreya"): Quiet Dawn is
+ * the brand whose surfaces actually ship verse text (Memorize), and its
+ * app config resolves verse to Alegreya the same way. The cost is a
+ * documented deviation — under Base / Warm Harvest, verse-role text in
+ * the on-device Storybook renders in Alegreya where the apps resolve
+ * the generic "serif" on Android. No Warm Harvest surface ships verse
+ * text today, and layout (the native-only defect class #43 exists to
+ * catch) is unaffected beyond the verse passages themselves.
+ */
+export function createOnDeviceStorybookTamaguiConfig() {
+  const baseThemes = buildTamaguiThemes(baseTheme);
+  const warmHarvestThemes = buildTamaguiThemes(eciperayTheme);
+  const quietDawnThemes = buildTamaguiThemes(memorizeTheme);
+
+  return createTamagui({
+    animations,
+    fonts: buildBrandFonts({
+      sans: baseTheme.tokens.typography.fontFamily.sans,
+      sansNative: baseTheme.tokens.typography.fontFamily.sansNative,
+      sansNativeAndroid: baseTheme.tokens.typography.fontFamily.sansNativeAndroid,
+      verse: memorizeTheme.tokens.typography.fontFamily.verse,
+      verseNative: memorizeTheme.tokens.typography.fontFamily.verseNative,
+      verseNativeAndroid: memorizeTheme.tokens.typography.fontFamily.verseNativeAndroid,
+    }),
+    tokens: tamaguiTokens,
+    themes: {
+      ...baseThemes,
+      light_warmHarvest: warmHarvestThemes.light,
+      dark_warmHarvest: warmHarvestThemes.dark,
+      light_quietDawn: quietDawnThemes.light,
+      dark_quietDawn: quietDawnThemes.dark,
+    },
+  });
+}
+
 export type StorybookThemeName =
   | "light"
   | "dark"

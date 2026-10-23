@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { Button } from "./Button.js";
 import { Dialog } from "./Dialog.js";
 import { Text } from "./Text.js";
@@ -20,7 +21,7 @@ type Story = StoryObj<typeof Dialog>;
 function DialogDemo() {
   const [open, setOpen] = useState(false);
   return (
-    <div>
+    <YStack>
       <Button onPress={() => setOpen(true)}>Delete recipe</Button>
       <Dialog
         open={open}
@@ -42,7 +43,7 @@ function DialogDemo() {
           “Creamy Tuscan Garlic Chicken” will be removed from your library.
         </Text>
       </Dialog>
-    </div>
+    </YStack>
   );
 }
 
@@ -54,12 +55,12 @@ export const WithoutActions: Story = {
   render: () => {
     const [open, setOpen] = useState(false);
     return (
-      <div>
+      <YStack>
         <Button onPress={() => setOpen(true)}>About</Button>
         <Dialog open={open} onOpenChange={setOpen} title="About this app">
           <Text variant="body">Version 1.0.0</Text>
         </Dialog>
-      </div>
+      </YStack>
     );
   },
 };

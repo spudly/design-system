@@ -124,6 +124,18 @@ One-time setup:
    if a Dependabot PR that changes visual files is labeled `visual-check`.)
    Fork PRs are skipped entirely — they never receive secrets, by design.
 
+## On-device previews (Android visual regression)
+
+The same stories also run on Android: the Expo host app in
+`apps/storybook` mounts them via @storybook/react-native, and the
+"Android Storybook VR" workflow screenshot-compares them on an
+emulator against baselines committed in
+`tools/visual-regression/baselines/` — the on-device counterpart to
+Chromatic, covering the native-only rendering bugs web snapshots
+cannot see (e.g. eciperay#162). Local runs, the baseline-update
+workflow, and the #162 sanity check are documented in
+[docs/android-visual-regression.md](docs/android-visual-regression.md).
+
 ### Full-page demo stories (Pages)
 
 Alongside the component stories, `src/pages/` holds full-page demo

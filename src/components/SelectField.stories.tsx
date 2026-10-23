@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { SelectField } from "./SelectField.js";
 
 const meta: Meta<typeof SelectField> = {
@@ -26,9 +27,9 @@ function SelectDemo(props: React.ComponentProps<typeof SelectField>) {
   void _ignored;
   const [value, setValue] = useState(initialValue ?? "");
   return (
-    <div style={{ maxWidth: 320 }}>
+    <YStack maxWidth={320}>
       <SelectField {...rest} options={options} value={value} onValueChange={setValue} />
-    </div>
+    </YStack>
   );
 }
 

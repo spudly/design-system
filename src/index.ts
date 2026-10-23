@@ -5,5 +5,6 @@ export * from "./components/index.js";
 export {
   createTamaguiConfig,
   createStorybookTamaguiConfig,
+  createOnDeviceStorybookTamaguiConfig,
   type StorybookThemeName,
 } from "./tamagui.config.js";

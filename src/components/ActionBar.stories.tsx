@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { XStack } from "tamagui";
+import { View, XStack } from "tamagui";
 import { ActionBar } from "./ActionBar.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
@@ -22,20 +22,20 @@ type Story = StoryObj<typeof ActionBar>;
 // relatively positioned frame standing in for a screen.
 function ScreenFrame({ children }: { children: React.ReactNode }) {
   return (
-    <div
-      style={{
-        position: "relative",
-        height: 360,
-        maxWidth: 480,
-        border: "1px dashed #ccc",
-        overflow: "hidden",
-      }}
+    <View
+      position="relative"
+      height={360}
+      maxWidth={480}
+      borderWidth={1}
+      borderColor="#ccc"
+      borderStyle="dashed"
+      overflow="hidden"
     >
-      <div style={{ padding: 16 }}>
+      <View padding={16}>
         <Text variant="body">Screen content scrolls beneath the pinned bar.</Text>
-      </div>
+      </View>
       {children}
-    </div>
+    </View>
   );
 }
 

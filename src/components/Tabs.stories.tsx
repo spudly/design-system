@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { Tabs } from "./Tabs.js";
 import { Text } from "./Text.js";
 
@@ -27,12 +28,12 @@ const studyTabs = [
 function TabsDemo({ tabs }: { tabs: { value: string; label: string }[] }) {
   const [value, setValue] = useState(tabs[0]?.value ?? "");
   return (
-    <div>
+    <YStack>
       <Tabs tabs={tabs} value={value} onValueChange={setValue} />
-      <div style={{ paddingTop: 16 }}>
+      <YStack paddingTop={16}>
         <Text variant="hint">Selected: {value}</Text>
-      </div>
-    </div>
+      </YStack>
+    </YStack>
   );
 }
 

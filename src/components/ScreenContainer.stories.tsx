@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { ScreenContainer } from "./ScreenContainer.js";
 import { Card } from "./Card.js";
 import { Text } from "./Text.js";
@@ -42,9 +43,7 @@ export const Scrollable: Story = {
     // collapses to content height. The content must actually overflow the
     // 400px frame for the story to demonstrate scrolling: 14 cards at
     // ~58px each plus the heading and 16px gaps total ~1100px.
-    <div
-      style={{ height: 400, border: "1px dashed #ccc", display: "flex", flexDirection: "column" }}
-    >
+    <YStack height={400} borderWidth={1} borderColor="#ccc" borderStyle="dashed">
       <ScreenContainer {...args}>
         <Text variant="heading">My verses</Text>
         {verses.map((verse) => (
@@ -53,7 +52,7 @@ export const Scrollable: Story = {
           </Card>
         ))}
       </ScreenContainer>
-    </div>
+    </YStack>
   ),
 };
 
@@ -68,20 +67,18 @@ export const NotScrollable: Story = {
 
 export const Padded: Story = {
   render: (args) => (
-    <div
-      style={{ height: 400, border: "1px dashed #ccc", display: "flex", flexDirection: "column" }}
-    >
+    <YStack height={400} borderWidth={1} borderColor="#ccc" borderStyle="dashed">
       <ScreenContainer {...args} variant="padded">
         <Text variant="heading">Creamy Tuscan Garlic Chicken</Text>
         <Text variant="hint">Wider horizontal padding and a larger top offset.</Text>
       </ScreenContainer>
-    </div>
+    </YStack>
   ),
 };
 
 export const List: Story = {
   render: (args) => (
-    <div style={{ height: 400, border: "1px dashed #ccc" }}>
+    <YStack height={400} borderWidth={1} borderColor="#ccc" borderStyle="dashed">
       <ScreenContainer {...args} variant="list" scrollable={false}>
         <Text variant="body">Flush shell — the list manages its own padding.</Text>
         <Card>
@@ -91,17 +88,17 @@ export const List: Story = {
           <Text variant="body">Row two</Text>
         </Card>
       </ScreenContainer>
-    </div>
+    </YStack>
   ),
 };
 
 export const Auth: Story = {
   render: (args) => (
-    <div style={{ height: 400, border: "1px dashed #ccc" }}>
+    <YStack height={400} borderWidth={1} borderColor="#ccc" borderStyle="dashed">
       <ScreenContainer {...args} variant="auth" scrollable={false}>
         <Text variant="heading">Welcome back</Text>
         <Text variant="hint">Surface shell with the large auth top offset.</Text>
       </ScreenContainer>
-    </div>
+    </YStack>
   ),
 };
