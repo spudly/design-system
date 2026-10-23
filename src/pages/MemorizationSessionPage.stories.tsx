@@ -29,7 +29,7 @@ import {
  * brand.
  */
 const meta: Meta<typeof MemorizationSessionPage> = {
-  title: "Pages/MemorizationSessionPage",
+  title: "Pages/Memorize/MemorizationSessionPage",
   component: MemorizationSessionPage,
   globals: { theme: "light_quietDawn" },
 };

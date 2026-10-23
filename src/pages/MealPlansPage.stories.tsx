@@ -18,7 +18,7 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * pinned to Warm Harvest, Eciperay's brand, like Pages/Eciperay.
  */
 const meta: Meta<typeof MealPlansPage> = {
-  title: "Pages/MealPlansPage",
+  title: "Pages/Eciperay/MealPlansPage",
   component: MealPlansPage,
   globals: { theme: "light_warmHarvest" },
 };

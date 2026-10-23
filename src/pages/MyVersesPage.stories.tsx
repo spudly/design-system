@@ -19,7 +19,7 @@ import { MyVersesPage, type MyVersesPageItem } from "./MyVersesPage.js";
  * pinned to Quiet Dawn, Memorize's brand, like Pages/Memorize.
  */
 const meta: Meta<typeof MyVersesPage> = {
-  title: "Pages/MyVersesPage",
+  title: "Pages/Memorize/MyVersesPage",
   component: MyVersesPage,
   globals: { theme: "light_quietDawn" },
 };
