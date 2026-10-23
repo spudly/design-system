@@ -146,7 +146,7 @@ interface BrandFontFamily {
   sansNative?: string | undefined;
   /** iOS per-weight face names (weight → font name), for families whose weights are separate named fonts. */
   sansNativeFaces?: Record<string, string> | undefined;
-  /** Android family: a generic ("serif"/"sans-serif") — named brand families don't exist on Android. */
+  /** Android family: a SINGLE font name — the family the app registers on Android (Raleway, #65), or a generic for a theme that declares none. */
   sansNativeAndroid?: string | undefined;
 }
 
@@ -167,16 +167,15 @@ export interface ResolvedFont {
  * brand's full CSS fallback stack and selects weights from the stack
  * itself, so it registers no faces. iOS takes the brand's declared single
  * native name; a named family's heavier weights are separate fonts there,
- * so its declared per-weight faces register alongside. Android's stock
- * fonts are only the generics — Georgia and Avenir Next don't exist there
- * and a named registration silently falls back to the default sans — so
- * Android takes the brand's declared generic (`serif` for serif brands)
- * and resolves weights numerically: no named faces. A brand that declares
- * no native names gets the generic "sans-serif" on either native
- * platform — the native equivalent of the base stack's platform-system
- * fonts (Android resolves the generic to its system font; iOS falls back
- * to the system font for it). Pure and platform-parameterized so the
- * choice is testable without a native runtime.
+ * so its declared per-weight faces register alongside. Android takes the
+ * brand's declared Android name and resolves weights numerically: no
+ * named faces. Since #65 every theme names Raleway on all three — a
+ * family the apps register deliberately (it is not a stock font; an
+ * unregistered name silently falls back to the platform default sans,
+ * which is the pre-registration state, not a different design). A brand
+ * that declares no native names gets the generic "sans-serif" on either
+ * native platform. Pure and platform-parameterized so the choice is
+ * testable without a native runtime.
  */
 export function resolveFontFamily(
   fontFamily: BrandFontFamily,
@@ -205,11 +204,11 @@ export function resolveFontFamily(
  * Text) render in the brand's stack at all: with no fonts configured they
  * fall back to platform defaults — on web, form controls don't even inherit
  * the page font — while plain text inherits, so controls and body text
- * visibly diverged (Warm Harvest body text is the serif stack; buttons
- * rendered in a browser-default sans). The registration is resolved per
+ * visibly diverged (body text in the theme stack; buttons rendered in a
+ * browser-default sans). The registration is resolved per
  * platform (see resolveFontFamily): the brand theme's own `sans` stack on
- * web, its single `sansNative` name plus named faces on iOS, and its
- * generic `sansNativeAndroid` with numeric weights on Android;
+ * web, its single `sansNative` name plus any named faces on iOS, and its
+ * `sansNativeAndroid` name with numeric weights on Android;
  * size/lineHeight mirror the DS type scale (lineHeight = size × 1.5, the
  * `normal` multiplier).
  */

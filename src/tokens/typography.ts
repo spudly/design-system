@@ -1,36 +1,41 @@
 /**
- * Typography tokens — finalized per the approved visual directions
- * (serif display/verse type for Eciperay + Memorize, system sans for UI).
+ * Typography tokens — finalized per the approved visual directions.
+ * UI type (headings and body) is Raleway in every theme (#65); the
+ * `serif` role remains for verse/reading text (the deliberate
+ * exception — Memorize verse text gets its own family in #66).
  *
  * Every value is a plain serializable string or number; no functions.
  */
 export const fontFamily = {
-  /** Default UI font stack (system). */
-  sans: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+  /**
+   * Default UI font stack: Raleway first, platform system fonts as
+   * fallbacks for surfaces that have not loaded/bundled Raleway yet.
+   * Raleway is not a stock font on any platform: web surfaces load it
+   * (Google Fonts — the Storybook preview-head does), and native apps
+   * must register a font under the exact name "Raleway" (a variable
+   * font, so numeric weights resolve against the one family). Until
+   * an app registers it, native falls back to its default sans and
+   * web falls along this stack — the token contract is the name.
+   */
+  sans: "Raleway, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
   /**
    * Single font name for React Native for the `sans` role. Native
-   * `fontFamily` takes ONE font name — the CSS fallback list in `sans` is
-   * invalid there. The base stack is entirely platform system fonts, so
-   * the native equivalent is the generic "sans-serif": Android resolves it
-   * to its system font (Roboto), and iOS falls back to the system font
-   * for the generic name — the platform system font either way, which is
-   * exactly what the web stack targets. Brands whose stack names a real
-   * family override this with that family (and optional per-weight faces
-   * in `sansNativeFaces`).
+   * `fontFamily` takes ONE font name — the CSS fallback list in `sans`
+   * is invalid there. No per-weight faces are declared: apps register
+   * Raleway as a variable font under the family name, so iOS/Android
+   * resolve the DS weights numerically against it (the same reason
+   * Android registrations carry no named faces — see
+   * resolveFontFamily in tamagui.config).
    */
-  sansNative: "sans-serif",
+  sansNative: "Raleway",
   /**
-   * Single font name for React Native on Android for the `sans` role.
-   * Android's stock fonts are only the generics ("sans-serif", "serif",
-   * "monospace") — named families like Georgia or Avenir Next don't exist
-   * there, so registering one silently falls back to the default sans and
-   * a serif brand loses its serif typography entirely. The generic keeps
-   * the brand's serif/sans character, and Android resolves numeric
-   * fontWeight against it, so Android registrations carry NO named faces
-   * (see resolveFontFamily in tamagui.config). The base brand is
-   * platform-system sans on every platform, hence "sans-serif".
+   * Single font name for React Native on Android for the `sans` role:
+   * the same registered "Raleway" family as iOS. (The previous
+   * per-brand generics existed because Georgia / Avenir Next could
+   * not be bundled by the apps; Raleway is a free Google font the
+   * apps bundle deliberately, so the Android role names it too.)
    */
-  sansNativeAndroid: "sans-serif",
+  sansNativeAndroid: "Raleway",
   /** Serif stack for display titles and verse/reading text (system serif). */
   serif: "Georgia, 'Times New Roman', serif",
   /** Monospace stack for code / tabular content. */

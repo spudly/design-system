@@ -31,29 +31,10 @@ export const memorizeTheme = {
     linkDark: tokens.colors.teal.teal6,
     accent: "#b45309",
   },
-  tokens: {
-    ...baseTheme.tokens,
-    typography: {
-      ...baseTheme.tokens.typography,
-      fontFamily: {
-        ...baseTheme.tokens.typography.fontFamily,
-        sans: "'Avenir Next', 'Segoe UI', sans-serif",
-        // Native takes a single name (the stack's head). Avenir Next is an
-        // iOS system family; its weights are separate named fonts, mapped
-        // per weight below.
-        sansNative: "Avenir Next",
-        sansNativeFaces: {
-          "500": "AvenirNext-Medium",
-          "600": "AvenirNext-DemiBold",
-          "700": "AvenirNext-Bold",
-        },
-        // Android has no Avenir Next: the generic sans-serif (numeric
-        // weights, no named faces) is the deliberate Android resolution,
-        // not a missing-family fallback.
-        sansNativeAndroid: "sans-serif",
-      },
-    },
-  },
+  // No token overrides: fonts come from the base tokens — Raleway
+  // for headings and body in every theme (#65), replacing this
+  // theme's former Avenir Next UI stack. Verse text is the one
+  // exception and is handled separately (#66).
 } as const;
 
 export type MemorizeTheme = typeof memorizeTheme;

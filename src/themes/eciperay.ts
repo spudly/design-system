@@ -26,30 +26,9 @@ export const eciperayTheme = {
     linkDark: tokens.colors.terracotta.terracotta5,
     accent: "#5f6f52",
   },
-  tokens: {
-    ...baseTheme.tokens,
-    typography: {
-      ...baseTheme.tokens.typography,
-      fontFamily: {
-        ...baseTheme.tokens.typography.fontFamily,
-        // System serif for display type (custom serif deferred — see design brief).
-        sans: "Georgia, 'Times New Roman', serif",
-        // Native takes a single name (the stack's head). On iOS that is
-        // Georgia; its semibold/bold face is the separate named font
-        // Georgia-Bold, mapped per weight so iOS text at the DS
-        // semibold/bold weights renders in the real bold face.
-        sansNative: "Georgia",
-        sansNativeFaces: {
-          "600": "Georgia-Bold",
-          "700": "Georgia-Bold",
-        },
-        // Android has neither Georgia nor Georgia-Bold: its generic
-        // serif (numeric weights, no named faces) keeps Warm Harvest's
-        // serif typography there instead of the default sans fallback.
-        sansNativeAndroid: "serif",
-      },
-    },
-  },
+  // No token overrides: fonts come from the base tokens — Raleway
+  // for headings and body in every theme (#65), replacing this
+  // theme's former Georgia serif UI stack.
 } as const;
 
 export type EciperayTheme = typeof eciperayTheme;

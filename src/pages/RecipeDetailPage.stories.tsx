@@ -6,6 +6,7 @@ import {
   type RecipeDetailPageTab,
 } from "./RecipeDetailPage.js";
 import { recipeDetailFixture } from "./fixtures.js";
+import { tokens } from "../tokens/index.js";
 
 /**
  * Stories for the real RecipeDetailPage component (#49) — not a
@@ -48,7 +49,7 @@ function SlotStandIn({ label }: { label: string }) {
         border: "1px dashed #b08968",
         borderRadius: 8,
         padding: "12px 16px",
-        fontFamily: "sans-serif",
+        fontFamily: tokens.typography.fontFamily.sans,
         fontSize: 14,
       }}
     >
