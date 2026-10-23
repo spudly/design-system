@@ -40,6 +40,11 @@ export {
   type MealPlanDetailPageProps,
 } from "./MealPlanDetailPage.js";
 export {
+  MemorizeReviewPage,
+  type MemorizeReviewPageProps,
+  type MemorizeReviewPageVerse,
+} from "./MemorizeReviewPage.js";
+export {
   VerseSearchPage,
   type VerseSearchPageItem,
   type VerseSearchPageProps,
