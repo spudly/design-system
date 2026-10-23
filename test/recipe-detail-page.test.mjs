@@ -93,7 +93,11 @@ test("the loading state renders only the spinner shell", () => {
 test("the chrome is pinned above a single scroll view", () => {
   const toolbarAt = code.indexOf("<VersionPicker");
   const tabsAt = code.indexOf("<Tabs");
-  const scrollAt = code.indexOf("<ScrollView flex={1}>");
+  const scrollAt = code.indexOf('<ScrollView flex={1} keyboardShouldPersistTaps="handled">');
+  assert.ok(
+    scrollAt >= 0,
+    "the panel ScrollView must persist handled taps (slotted forms keep their presses)",
+  );
   assert.ok(toolbarAt >= 0, "the toolbar must render the version picker");
   assert.ok(tabsAt > toolbarAt, "the tab bar renders below the toolbar");
   assert.ok(scrollAt > tabsAt, "the scroll view renders below the pinned chrome");
@@ -205,6 +209,11 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
     code,
     /lifecycle\.isEditable \|\| lifecycle\.candidates\.length > 0/,
     "the lifecycle section renders only when editable or candidates exist",
+  );
+  assert.match(
+    code,
+    /\{onActivateCandidatePress \? \(/,
+    "the Activate button renders only with its callback (candidate data alone exposes no dead action)",
   );
   assert.match(
     code,

@@ -642,17 +642,19 @@ function LifecycleSection({
               >
                 {version.label}
               </Text>
-              <Button
-                variant="primary"
-                size="sm"
-                alignSelf="flex-start"
-                disabled={lifecycle.isActivationPending ?? false}
-                onPress={() => {
-                  onActivateCandidatePress?.(version.id);
-                }}
-              >
-                Activate
-              </Button>
+              {onActivateCandidatePress ? (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  alignSelf="flex-start"
+                  disabled={lifecycle.isActivationPending ?? false}
+                  onPress={() => {
+                    onActivateCandidatePress(version.id);
+                  }}
+                >
+                  Activate
+                </Button>
+              ) : null}
             </YStack>
           ))}
         </YStack>
@@ -836,12 +838,24 @@ function OverviewPanel({
             Start Cooking
           </Button>
           {onPrintPress ? (
-            <Button {...neutralChipProps} width="$12" paddingHorizontal={0} onPress={onPrintPress}>
+            <Button
+              {...neutralChipProps}
+              width="$12"
+              paddingHorizontal={0}
+              onPress={onPrintPress}
+              accessibilityLabel="Print recipe"
+            >
               🖨
             </Button>
           ) : null}
           {onSharePress ? (
-            <Button {...neutralChipProps} width="$12" paddingHorizontal={0} onPress={onSharePress}>
+            <Button
+              {...neutralChipProps}
+              width="$12"
+              paddingHorizontal={0}
+              onPress={onSharePress}
+              accessibilityLabel="Share recipe"
+            >
               ↗
             </Button>
           ) : null}
@@ -1071,7 +1085,12 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
               >
                 Step {step.stepNumber}
               </Text>
-              <Text fontSize={tokens.typography.fontSize.md}>{step.body}</Text>
+              <Text
+                fontSize={tokens.typography.fontSize.md}
+                {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
+              >
+                {step.body}
+              </Text>
             </YStack>
           </TouchableOpacity>
         );
@@ -1133,7 +1152,10 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
                 {log.dateLabel}
               </Text>
               {log.starRating ? (
-                <Text accessibilityLabel={`${log.starRating} stars`}>
+                <Text
+                  accessibilityLabel={`${log.starRating} stars`}
+                  color={tokens.colors.gray.gray10}
+                >
                   {"★".repeat(log.starRating)}
                 </Text>
               ) : null}
@@ -1285,7 +1307,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
           onTabChange(value as RecipeDetailPageTab);
         }}
       />
-      <ScrollView flex={1}>
+      <ScrollView flex={1} keyboardShouldPersistTaps="handled">
         {activeTab === "overview" ? (
           <OverviewPanel status={status} overview={props.overview} />
         ) : null}
