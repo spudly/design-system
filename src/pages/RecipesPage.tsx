@@ -304,11 +304,14 @@ function RecipeRow({
 }) {
   return (
     <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3" marginBottom="$3">
-      {/* Both press targets carry the button role and the recipe
-          title as their accessible name: the thumbnail target
+      {/* Both press targets carry the button role and an accessible
+          name built from the recipe title: the thumbnail target
           wraps only an image (or an empty placeholder), so without
           the label a screen reader meets an unidentified action
-          for every recipe. */}
+          for every recipe. The text target's label also carries
+          the subtitle when present — a title-only label would
+          override the name React Native derives from its Text
+          children and drop the subtitle announcement. */}
       <TouchableOpacity
         onPress={onPress}
         accessibilityRole="button"
@@ -320,7 +323,7 @@ function RecipeRow({
         style={textBlockStyle}
         onPress={onPress}
         accessibilityRole="button"
-        accessibilityLabel={item.title}
+        accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
       >
         <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
         {item.subtitle ? (

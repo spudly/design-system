@@ -38,7 +38,13 @@ test("both RecipeRow press targets are named buttons for screen readers (#60)", 
   );
   assert.equal(
     code.split("accessibilityLabel={item.title}").length - 1,
-    2,
-    "each press target must take the recipe title as its accessible name (the thumbnail target wraps only an image)",
+    1,
+    "the thumbnail press target must take the recipe title as its accessible name (it wraps only an image)",
+  );
+  assert.ok(
+    code.includes(
+      "accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}",
+    ),
+    "the text press target's label must include the subtitle when present — a title-only label would override the name derived from its Text children and drop the subtitle announcement",
   );
 });
