@@ -13,12 +13,15 @@
  *    screen's gate replaces the whole screen, and it has no
  *    distinct not-found state to model.
  * 3. The chrome is pinned: status badge + version picker toolbar
- *    and the tab bar render above the single ScrollView, and only
- *    the active panel renders inside it (the app's composition —
- *    a panel that scrolled its own chrome away would break the
- *    version/tab context).
- * 4. The tab set and scale option set moved with the page as
- *    DS-owned constants with the app's keys and labels.
+ *    renders above the single ScrollView, and every section
+ *    renders inside it (#71 — a section that scrolled its own
+ *    chrome away would break the version context).
+ * 4. The sections render in the order the tabs had (overview,
+ *    ingredients, instructions, cook history, nutrition), each
+ *    section after the overview under its own heading with the
+ *    tab's label; the tab state is gone from the contract. The
+ *    scale option set moved with the page as a DS-owned constant
+ *    with the app's keys and labels.
  * 5. The three render slots sit at the positions the app panels
  *    occupy today: the cook-log form replaces the "Log a cook"
  *    button while it renders content; sharing renders after the
@@ -80,9 +83,9 @@ test("the loading state renders only the spinner shell", () => {
     "the props must be the loading | ready union",
   );
   const loadingAt = code.indexOf('props.state === "loading"');
-  const tabsAt = code.indexOf("<Tabs");
+  const chromeAt = code.indexOf("<VersionPicker");
   assert.ok(loadingAt >= 0, "the component must branch on the loading state");
-  assert.ok(loadingAt < tabsAt, "the loading branch must come before the chrome render");
+  assert.ok(loadingAt < chromeAt, "the loading branch must come before the chrome render");
   assert.match(
     code,
     /<Spinner label="Loading recipe" \/>/,
@@ -92,36 +95,53 @@ test("the loading state renders only the spinner shell", () => {
 
 test("the chrome is pinned above a single scroll view", () => {
   const toolbarAt = code.indexOf("<VersionPicker");
-  const tabsAt = code.indexOf("<Tabs");
   const scrollAt = code.indexOf('<ScrollView flex={1} keyboardShouldPersistTaps="handled">');
   assert.ok(
     scrollAt >= 0,
-    "the panel ScrollView must persist handled taps (slotted forms keep their presses)",
+    "the section ScrollView must persist handled taps (slotted forms keep their presses)",
   );
   assert.ok(toolbarAt >= 0, "the toolbar must render the version picker");
-  assert.ok(tabsAt > toolbarAt, "the tab bar renders below the toolbar");
-  assert.ok(scrollAt > tabsAt, "the scroll view renders below the pinned chrome");
+  assert.ok(scrollAt > toolbarAt, "the scroll view renders below the pinned chrome");
   assert.equal(
     code.split("<ScrollView").length - 1,
     2,
-    "exactly two ScrollViews: the panel scroll and the version picker's sheet list",
+    "exactly two ScrollViews: the section scroll and the version picker's sheet list",
   );
-  const panelAt = code.indexOf('activeTab === "overview"');
-  assert.ok(panelAt > scrollAt, "the active panel renders inside the scroll view");
+  const panelAt = code.indexOf("<OverviewPanel");
+  assert.ok(panelAt > scrollAt, "the sections render inside the scroll view");
 });
 
-test("the tab set moved with the page, with the app's keys and labels", () => {
-  for (const [value, label] of [
-    ["overview", "Overview"],
-    ["ingredients", "Ingredients"],
-    ["instructions", "Instructions"],
-    ["history", "Cook History"],
-    ["nutrition", "Nutrition"],
-  ]) {
+test("there are no tabs: every section renders in one scroll, in tab order, under its heading (#71)", () => {
+  assert.ok(!code.includes("<Tabs"), "the page must not render a tab bar");
+  assert.ok(!code.includes("activeTab"), "the tab state left the contract");
+  assert.ok(!code.includes("onTabChange"), "the tab-change callback left the contract");
+  assert.ok(
+    !code.includes("RecipeDetailPageTab"),
+    "the tab type left the contract (and the pages index must not export it)",
+  );
+  assert.ok(
+    !index.includes("RecipeDetailPageTab"),
+    "the pages index must not export the removed tab type",
+  );
+  const sequence = [
+    "<OverviewPanel",
+    "<SectionHeading>Ingredients</SectionHeading>",
+    "<IngredientsPanel",
+    "<SectionHeading>Instructions</SectionHeading>",
+    "<InstructionsPanel",
+    "<SectionHeading>Cook History</SectionHeading>",
+    "<HistoryPanel",
+    "<SectionHeading>Nutrition</SectionHeading>",
+    "<NutritionPanel",
+  ];
+  let lastAt = -1;
+  for (const marker of sequence) {
+    const at = code.indexOf(marker);
     assert.ok(
-      code.includes(`{ value: "${value}", label: "${label}" }`),
-      `DETAIL_TABS must include ${value} / ${label}`,
+      at > lastAt,
+      `sections must render in tab order: ${marker} after the previous section`,
     );
+    lastAt = at;
   }
 });
 
@@ -223,7 +243,7 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(code, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
 });
 
-test("the scale option set moved with the ingredients tab", () => {
+test("the scale option set moved with the ingredients section", () => {
   for (const [value, label] of [
     ["0.5", "½×"],
     ["1", "1×"],

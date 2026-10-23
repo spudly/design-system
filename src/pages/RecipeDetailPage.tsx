@@ -9,7 +9,6 @@ import { NumberStepper } from "../components/NumberStepper.js";
 import { Spinner } from "../components/Spinner.js";
 import { StarRatingInput } from "../components/StarRatingInput.js";
 import { StatCard } from "../components/StatCard.js";
-import { Tabs } from "../components/Tabs.js";
 import { Text } from "../components/Text.js";
 import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChipGroup.js";
 
@@ -19,9 +18,9 @@ import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChip
  * pilot. The app keeps all state and business logic — the recipe,
  * versions, and cook-log queries, every mutation (status, version
  * activation, sharing, ratings, comments), navigation, printing —
- * and drives this view entirely through props: a view-model per tab
- * in, intent callbacks out. Nothing here imports an app package or
- * fetches anything.
+ * and drives this view entirely through props: a view-model per
+ * section in, intent callbacks out. Nothing here imports an app
+ * package or fetches anything.
  *
  * Placement: page components live in src/pages behind the
  * `@spudly/ui/pages` subpath export, not the package root — this
@@ -31,10 +30,13 @@ import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChip
  *
  * Composition mirrors the app's RecipeDetailScreen +
  * RecipeDetailChrome (spudly/eciperay packages/app): a pinned
- * chrome — toolbar (status badge + version picker) over the tab
- * bar — above a single ScrollView holding the active tab's panel.
- * The five tabs and their labels moved with the page, as the filter
- * option sets moved with RecipesPage.
+ * chrome — toolbar (status badge + version picker) — above a
+ * single ScrollView holding every section in order (overview,
+ * ingredients, instructions, cook history, nutrition), each under
+ * its own heading. The page originally split the sections across
+ * a tab layout; #71 replaced the tabs with this single scrollable
+ * page, so the per-tab view-models became section view-models and
+ * the tab state (activeTab / onTabChange) left the contract.
  *
  * States: the app screen renders a full-screen loading gate while
  * the recipe loads, and — deliberately mirrored here — it has no
@@ -52,7 +54,7 @@ import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChip
  * into props, so each enters through a documented render slot and
  * the app renders its existing component at the same position it
  * occupies today:
- * - `renderCookLogForm` (history tab): the cook-log form. When it
+ * - `renderCookLogForm` (history section): the cook-log form. When it
  *   returns non-null content, the content replaces the view's
  *   "Log a cook" button — the same button-hides-while-open
  *   semantics as the accessory slot. The cook-log ENTRIES are
@@ -72,13 +74,13 @@ import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChip
  * Two pieces of ephemeral state stay inside the view, mirroring
  * the app components they replace: the version picker's sheet
  * open/close (the app's VersionPicker holds it in useState) and
- * the instructions tab's active step (the app's InstructionsTab
- * holds it in useState). Neither is business state.
+ * the instructions section's active step (the app's
+ * InstructionsTab holds it in useState). Neither is business state.
  *
  * Documented deviations from the app's current rendering, all
  * presentation-only:
- * - The instructions tab's active card wash: the app composes the
- *   semantic primary at 5% alpha over RN primitives (its tab
+ * - The instructions section's active card wash: the app composes
+ *   the semantic primary at 5% alpha over RN primitives (its tab
  *   renders without a Tamagui provider in tests); the view uses
  *   `$primarySubtle` — the same treatment the app itself uses for
  *   its other primary-tinted panels (activation candidates,
@@ -96,9 +98,6 @@ import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChip
 // View-model types (DS-owned; the app maps its domain types at the
 // boundary, as with RecipesPage's plain-string filter values).
 // ---------------------------------------------------------------------------
-
-export type RecipeDetailPageTab =
-  "overview" | "ingredients" | "instructions" | "history" | "nutrition";
 
 export interface RecipeDetailPageVersion {
   id: string;
@@ -212,7 +211,7 @@ export interface RecipeDetailPageIngredientsProps {
   servings: number;
   onServingsChange: (servings: number) => void;
   /** Selected scale multiplier as a plain string ("0.5" | "1" |
-   * "2" | "3"); the option set below moved with the tab. The app
+   * "2" | "3"); the option set below moved with the section. The app
    * maps the value back to servings — the servings computation
    * stays app-side. */
   scaleValue: string;
@@ -290,8 +289,6 @@ export interface RecipeDetailPageReadyProps {
   versions: RecipeDetailPageVersion[];
   selectedVersionId: string;
   onSelectVersion: (versionId: string) => void;
-  activeTab: RecipeDetailPageTab;
-  onTabChange: (tab: RecipeDetailPageTab) => void;
   overview: RecipeDetailPageOverviewProps;
   ingredients: RecipeDetailPageIngredientsProps;
   instructions: RecipeDetailPageInstructionsProps;
@@ -305,14 +302,6 @@ export type RecipeDetailPageProps = { state: "loading" } | RecipeDetailPageReady
 // Constants moved with the page (the pilot's rule for option sets
 // and section copy).
 // ---------------------------------------------------------------------------
-
-const DETAIL_TABS: { value: RecipeDetailPageTab; label: string }[] = [
-  { value: "overview", label: "Overview" },
-  { value: "ingredients", label: "Ingredients" },
-  { value: "instructions", label: "Instructions" },
-  { value: "history", label: "Cook History" },
-  { value: "nutrition", label: "Nutrition" },
-];
 
 // Status badge map: labels and tones for the app's four statuses
 // (idea → neutral gray, evolving → info blue, perfected → success
@@ -348,7 +337,7 @@ const MISSING_INGREDIENTS_HINT =
   "Tap an ingredient to mark it missing and see substitutions below.";
 
 // ---------------------------------------------------------------------------
-// Chrome: status badge + version picker (pinned above the tab bar).
+// Chrome: status badge + version picker (pinned above the scroll view).
 // ---------------------------------------------------------------------------
 
 function StatusBadge({ status }: { status: string }) {
@@ -549,7 +538,7 @@ function EyebrowLabel({ children }: { children: string }) {
 }
 
 // ---------------------------------------------------------------------------
-// Overview tab.
+// Overview section (the page header).
 // ---------------------------------------------------------------------------
 
 function LifecycleSection({
@@ -937,7 +926,7 @@ function OverviewPanel({
 }
 
 // ---------------------------------------------------------------------------
-// Ingredients tab.
+// Ingredients section.
 // ---------------------------------------------------------------------------
 
 // Pressable row geometry (plain objects, as in the app's
@@ -1047,8 +1036,8 @@ function IngredientsPanel({
 }
 
 // ---------------------------------------------------------------------------
-// Instructions tab. The active step is ephemeral view state, held
-// here exactly as the app's tab held it (useState, first step
+// Instructions section. The active step is ephemeral view state,
+// held here exactly as the app's tab held it (useState, first step
 // active by default).
 // ---------------------------------------------------------------------------
 
@@ -1100,7 +1089,7 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
 }
 
 // ---------------------------------------------------------------------------
-// History tab (cook logs + the form slot).
+// History section (cook logs + the form slot).
 // ---------------------------------------------------------------------------
 
 function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
@@ -1173,7 +1162,7 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
 }
 
 // ---------------------------------------------------------------------------
-// Nutrition tab.
+// Nutrition section.
 // ---------------------------------------------------------------------------
 
 function NutritionRow({ label, valueLabel }: RecipeDetailPageNutritionRow) {
@@ -1265,11 +1254,29 @@ function NutritionPanel({ nutrition }: { nutrition: RecipeDetailPageNutritionPro
 // The page.
 // ---------------------------------------------------------------------------
 
+/** A section's heading on the single scrollable page (#71): the
+ * sections after the overview header are found by scanning, so
+ * each carries its label — the labels the tab bar used to show. */
+function SectionHeading({ children }: { children: string }) {
+  return (
+    <Text
+      paddingHorizontal="$4"
+      marginBlockStart="$2"
+      fontSize={tokens.typography.fontSize.lg}
+      fontWeight={tokens.typography.fontWeight.semibold}
+      color={tokens.colors.gray.gray10}
+    >
+      {children}
+    </Text>
+  );
+}
+
 /**
  * Full-page recipe detail view: pinned chrome (status + version
- * toolbar, tab bar) over the active tab's panel in a single scroll
- * view. Controlled — see the file header for the contract, the
- * slot design, and the layout decisions.
+ * toolbar) over all five sections in a single scroll view (#71 —
+ * no tabs; the sections render in the order the tabs had).
+ * Controlled — see the file header for the contract, the slot
+ * design, and the layout decisions.
  */
 export function RecipeDetailPage(props: RecipeDetailPageProps) {
   if (props.state === "loading") {
@@ -1280,7 +1287,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
     );
   }
 
-  const { status, versions, selectedVersionId, onSelectVersion, activeTab, onTabChange } = props;
+  const { status, versions, selectedVersionId, onSelectVersion } = props;
 
   return (
     <YStack flex={1} backgroundColor="$surface">
@@ -1300,23 +1307,16 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
           onSelectVersion={onSelectVersion}
         />
       </XStack>
-      <Tabs
-        tabs={DETAIL_TABS}
-        value={activeTab}
-        onValueChange={(value) => {
-          onTabChange(value as RecipeDetailPageTab);
-        }}
-      />
       <ScrollView flex={1} keyboardShouldPersistTaps="handled">
-        {activeTab === "overview" ? (
-          <OverviewPanel status={status} overview={props.overview} />
-        ) : null}
-        {activeTab === "ingredients" ? <IngredientsPanel ingredients={props.ingredients} /> : null}
-        {activeTab === "instructions" ? (
-          <InstructionsPanel instructions={props.instructions.instructions} />
-        ) : null}
-        {activeTab === "history" ? <HistoryPanel history={props.history} /> : null}
-        {activeTab === "nutrition" ? <NutritionPanel nutrition={props.nutrition} /> : null}
+        <OverviewPanel status={status} overview={props.overview} />
+        <SectionHeading>Ingredients</SectionHeading>
+        <IngredientsPanel ingredients={props.ingredients} />
+        <SectionHeading>Instructions</SectionHeading>
+        <InstructionsPanel instructions={props.instructions.instructions} />
+        <SectionHeading>Cook History</SectionHeading>
+        <HistoryPanel history={props.history} />
+        <SectionHeading>Nutrition</SectionHeading>
+        <NutritionPanel nutrition={props.nutrition} />
       </ScrollView>
     </YStack>
   );
