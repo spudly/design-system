@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 /**
  * Memorize theme — "Quiet Dawn" visual direction (approved 2026-10-12).
  *
- * Warm paper background, deep teal primary, ink text. Gold accent is reserved
+ * Cool dawn-paper background, deep teal primary, ink text. Gold accent is reserved
  * for progress/mastery states and used sparingly. Primary steps are chosen
  * for WCAG AA contrast (white text on primary ≥ 4.5:1).
  */
@@ -12,11 +12,18 @@ export const memorizeTheme = {
   ...baseTheme,
   semantic: {
     ...baseTheme.semantic,
-    background: "#faf8f2",
+    // Distinct from Warm Harvest's warm cream (#faf6f0) — the two
+    // themes previously resolved to near-identical warm off-whites
+    // (#68). Quiet Dawn's background is a cool, faintly teal dawn
+    // tint that fits its teal primary; the border cools with it (the
+    // old #e9e2d5 was Warm Harvest's warm sand, shared verbatim).
+    // Ink text and muted text keep AA+ contrast on it, and the white
+    // surface stays clearly distinguishable from the background.
+    background: "#e9f0ee",
     surface: "#ffffff",
     text: "#2b2620",
     textMuted: "#57534e",
-    border: "#e9e2d5",
+    border: "#d3ded9",
     primary: tokens.colors.teal.teal8,
     primaryHover: tokens.colors.teal.teal9,
     primaryActive: tokens.colors.teal.teal10,
