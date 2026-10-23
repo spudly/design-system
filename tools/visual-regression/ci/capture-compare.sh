@@ -9,6 +9,15 @@
 # instead, where it is also reviewable and runnable by hand on any
 # machine with an emulator running.
 #
+# The app is built as a RELEASE APK with the JS bundle embedded.
+# Serving the bundle from Metro inside CI was tried first and failed
+# on the emulator with React Native's "Unable to load script" error
+# (the debug app could not reach the dev server through the adb
+# reverse tunnel / emulator host aliasing, so JS never executed) —
+# an embedded bundle removes the network from the capture entirely.
+# The generated template signs release builds with the debug
+# keystore, so the APK installs as-is.
+#
 # Usage: capture-compare.sh [compare|update]
 set -euo pipefail
 
@@ -17,41 +26,15 @@ REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$REPO_ROOT/apps/storybook"
 
 npx expo prebuild --platform android --no-install
-(cd android && ./gradlew assembleDebug --console=plain -q)
-adb install -r android/app/build/outputs/apk/debug/app-debug.apk
-
-# Generous logcat buffer: the driver reads the full log back.
-adb logcat -G 8M
+(cd android && ./gradlew assembleRelease --console=plain -q)
+adb install -r android/app/build/outputs/apk/release/app-release.apk
 
 # Deterministic capture surface: fixed density + font scale.
 adb shell wm density 320
 adb shell settings put system font_scale 1.0
 
-# Debug builds load their JS bundle from Metro.
-adb reverse tcp:8081 tcp:8081
-(npx expo start --localhost > /tmp/metro.log 2>&1 &)
-metro_up=""
-for _ in $(seq 1 60); do
-  if curl -sf http://localhost:8081/status > /dev/null; then
-    metro_up="yes"
-    break
-  fi
-  sleep 2
-done
-if [ -z "$metro_up" ]; then
-  echo "Metro did not come up; last log lines:" >&2
-  tail -20 /tmp/metro.log >&2
-  exit 1
-fi
-
-# Pre-warm the bundle: the first request triggers the full module
-# graph build (minutes on a cold CI runner). It must not eat into the
-# driver's app-launch waits.
-curl -sf -o /dev/null "http://localhost:8081/index.bundle?platform=android&dev=true&hot=false" || {
-  echo "Metro bundle request failed; last log lines:" >&2
-  tail -30 /tmp/metro.log >&2
-  exit 1
-}
+# Generous logcat buffer: the driver reads the full log back.
+adb logcat -G 8M
 
 if [ "$MODE" = "update" ]; then
   node ../../tools/visual-regression/run.mjs --update --out /tmp/dsvr-out

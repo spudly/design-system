@@ -61,9 +61,9 @@ const CONFIG = {
   threshold: Number(argValue("--threshold", "16")),
   maxRatio: Number(argValue("--max-ratio", "0.001")),
   readyTimeoutMs: Number(argValue("--ready-timeout", "30000")),
-  // The first wait is different in kind: app launch + first (cold)
-  // Metro bundle fetch + story-index preparation. Minutes, not the
-  // seconds a warm per-story render needs.
+  // The first wait is different in kind: cold app launch + story
+  // index preparation on a freshly booted emulator. Minutes, not
+  // the seconds a warm per-story render needs.
   indexTimeoutMs: Number(argValue("--index-timeout", "240000")),
   settleMs: Number(argValue("--settle", "500")),
 };

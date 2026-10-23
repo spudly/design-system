@@ -141,19 +141,25 @@ mis-measures and stretches the field — the asymmetry that shipped
 #162.
 
 The `sanity` CI job: captures the SearchField stories clean, applies
-the patch, recaptures (Metro rebundles — no native rebuild), and
-compares the two captures. **The job succeeds only if the comparison
-FAILS.** Run it by dispatching the workflow with mode = `sanity`, or
-by adding the `android-sanity` label to a PR. If SearchField changes
-so the patch no longer applies, the job fails at `git apply` —
-refresh the patch (edit the file the same way, `git diff` it into
-the patch file, revert) in the same PR.
+the patch, rebuilds and reinstalls, recaptures, and compares the two
+captures. **The job succeeds only if the comparison FAILS.** Run it
+by dispatching the workflow with mode = `sanity`, or by adding the
+`android-sanity` label to a PR. If SearchField changes so the patch
+no longer applies, the job fails at `git apply` — refresh the patch
+(edit the file the same way, `git diff` it into the patch file,
+revert) in the same PR.
 
 ## CI scoping
 
 The workflow is path-filtered to `src/**`, `apps/storybook/**`,
 `tools/visual-regression/**` and itself, because Actions minutes are
 on paid overage until 2026-11-01 and an emulator job is the most
-expensive kind. It builds a **debug** APK and serves the JS bundle
-from Metro inside the job, so the sanity job's mutation needs no
-native rebuild — a force-stop and relaunch re-fetches the bundle.
+expensive kind. It builds a **release** APK with the JS bundle
+embedded (the generated template signs it with the debug keystore,
+so it installs as-is). Serving the bundle from a Metro dev server
+inside the job was tried first and failed on the emulator with
+React Native's "Unable to load script" error — the debug app could
+not reach Metro through the adb reverse tunnel, so JS never
+executed; an embedded bundle removes the network from the capture
+entirely. (Local development still uses Metro via `expo start` —
+only the CI scripts build release.)
