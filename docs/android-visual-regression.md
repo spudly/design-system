@@ -18,7 +18,7 @@ the field to 1826px on a Pixel 8a) passed every web check.
 | VR driver        | `tools/visual-regression/run.mjs`                                  | Drives the app over ADB, captures screenshots, pixel-compares against baselines. Zero dependencies (own PNG codec in `png.mjs`, validated round-trip against PIL).                                                                                                              |
 | Baselines        | `tools/visual-regression/baselines/<theme>/<storyId>.png`          | Committed reference screenshots.                                                                                                                                                                                                                                                |
 | Sanity patch     | `tools/visual-regression/sanity/searchfield-162.patch`             | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                   |
-| CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job (below).                                                                                                                                                                                                                              |
+| CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job + an update-mode job that commits regenerated baselines to the dispatched branch (below).                                                                                                                                            |
 
 Fonts: the app loads the same faces the apps register — Raleway
 (variable TTF, all themes' body/heading) and Alegreya (variable TTF,
@@ -114,15 +114,31 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
    fails the job even before it has a baseline.
 2. **Regenerate deliberately**: dispatch the workflow
    (Actions → "Android Storybook VR" → Run workflow) with
-   mode = `update`. It captures everything, uploads the fresh
-   screenshots as the `dsvr-baselines` artifact, and does not compare.
-3. Download the artifact, replace `tools/visual-regression/baselines/`
-   with its contents, and commit on a PR like any other change. The
-   next compare run is strict for every story that has a baseline.
-4. An intentional visual change follows the same flow: the compare
+   mode = `update`, **from the PR branch**. It captures everything
+   and does not compare. The follow-on `commit-baselines` job then
+   syncs the fresh screenshots into
+   `tools/visual-regression/baselines/` and — only if something
+   actually changed — commits them to the dispatched branch as
+   github-actions[bot] ("chore(vr): update Android Storybook
+   baselines") and pushes. The regenerated baselines therefore show
+   up in the PR diff for review like any other change; nobody has
+   to download and commit them by hand. (The fresh screenshots are
+   still uploaded as the `dsvr-baselines` artifact, as a
+   fallback/debug copy.)
+3. Dispatching mode = `update` from the default branch (`main`) is
+   refused: the commit job fails with an error, because baselines
+   must land via a PR branch so they are reviewed in a diff.
+4. The baseline commit's push re-triggers the PR's compare run,
+   which is then strict for every story that has a baseline — green
+   means the committed baselines match fresh captures.
+5. An intentional visual change follows the same flow: the compare
    job fails with diff images in the `dsvr-output` artifact — inspect
-   them, and if the change is intended, run the update dispatch and
-   commit the new baselines in the same PR.
+   them, and if the change is intended, run the update dispatch from
+   the PR branch and review the auto-committed baselines in the same
+   PR. (Manual fallback, e.g. for a dispatch that could not commit:
+   download the `dsvr-baselines` artifact, replace
+   `tools/visual-regression/baselines/` with its contents, and
+   commit it yourself.)
 
 Locally (with an emulator): `node tools/visual-regression/run.mjs --update`.
 
