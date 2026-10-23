@@ -14,6 +14,9 @@
 // the same comparator — used for local harness validation and for
 // re-checking CI artifacts offline. No device needed.
 //
+// Capture scope: PAGE stories only, each under its own brand's
+// themes — see CAPTURE_SCOPE below.
+//
 // Exit code: 0 = all compared screenshots within tolerance (or update
 // mode completed), 1 = a diff exceeded tolerance / a capture failed /
 // compare mode found no baselines at all.
@@ -67,6 +70,35 @@ const CONFIG = {
   indexTimeoutMs: Number(argValue("--index-timeout", "240000")),
   settleMs: Number(argValue("--settle", "500")),
 };
+
+// Capture scope — Stephen's decision, 2026-10-23: the committed
+// baseline set is PAGE stories only, each captured under its own
+// brand's themes (light + dark). Curating hundreds of component
+// screenshots was more review surface than the Android check needs:
+// full pages are where native layout diverges from web in ways that
+// hurt users, and component stories stay covered by Chromatic on
+// web. Wrong-brand page captures (an Eciperay page under Quiet
+// Dawn, or vice versa) are excluded — pages pin their brand.
+//
+// To widen or narrow the Android VR set, edit this table; the
+// driver, the CI job, and the committed baselines all follow it.
+// Current yield: 30 pages-eciperay stories x 2 warmHarvest themes
+// + 18 pages-memorize stories x 2 quietDawn themes = 96 baselines.
+const CAPTURE_SCOPE = [
+  {
+    storyPrefix: "pages-eciperay",
+    themes: ["light_warmHarvest", "dark_warmHarvest"],
+  },
+  {
+    storyPrefix: "pages-memorize",
+    themes: ["light_quietDawn", "dark_quietDawn"],
+  },
+];
+function inCaptureScope(storyId, theme) {
+  return CAPTURE_SCOPE.some(
+    (rule) => storyId.startsWith(rule.storyPrefix) && rule.themes.includes(theme),
+  );
+}
 
 async function adb(...adbArgs) {
   const { stdout } = await run("adb", adbArgs, { maxBuffer: 64 * 1024 * 1024 });
@@ -219,8 +251,13 @@ async function deviceMode() {
   if (CONFIG.storyFilter) {
     stories = stories.filter((s) => s.id.includes(CONFIG.storyFilter));
   }
+  const inScopeCount = CONFIG.themes.reduce(
+    (n, theme) => n + stories.filter((s) => inCaptureScope(s.id, theme)).length,
+    0,
+  );
   console.log(
-    `capturing ${stories.length} stor${stories.length === 1 ? "y" : "ies"} x ${CONFIG.themes.length} theme(s)`,
+    `capturing ${inScopeCount} (story x theme) pairs in capture scope ` +
+      `(page stories only, own brand; index holds ${stories.length} stories x ${CONFIG.themes.length} themes)`,
   );
 
   const summary = { captured: 0, compared: 0, updated: 0, noBaseline: 0, failed: [] };
@@ -228,6 +265,7 @@ async function deviceMode() {
 
   for (const theme of CONFIG.themes) {
     for (const story of stories) {
+      if (!inCaptureScope(story.id, theme)) continue;
       nonce++;
       const url = `${CONFIG.scheme}://capture/${story.id}?theme=${encodeURIComponent(theme)}&nonce=${nonce}`;
       try {

@@ -90,6 +90,21 @@ via story globals on web; in capture mode the driver's theme wins
 (page stories render the brand the driver asks for — that is the
 point of capturing them under their own brand).
 
+### Capture scope: pages only, own brand
+
+Stephen's decision, 2026-10-23: the committed baseline set is **page
+stories only, each under its own brand** — `pages-eciperay` under
+Warm Harvest (light + dark) and `pages-memorize` under Quiet Dawn
+(light + dark). With the current story set that is 30 x 2 + 18 x 2 =
+**96 baselines**. Curating hundreds of component screenshots was
+more review surface than the Android check needs; component stories
+stay covered by Chromatic on web, and wrong-brand page captures are
+excluded because pages pin their brand. The rule lives in the
+`CAPTURE_SCOPE` table in `tools/visual-regression/run.mjs` — the
+driver captures only in-scope (story, theme) pairs in both compare
+and update modes, so the baseline folder and the CI runs follow the
+table. Edit the table to change the scope.
+
 Comparison: a pixel differs when any channel delta exceeds
 `--threshold` (default 16/255); a screenshot fails when differing
 pixels exceed `--max-ratio` (default 0.1%). Diff visualizations
@@ -114,8 +129,10 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
    fails the job even before it has a baseline.
 2. **Regenerate deliberately**: dispatch the workflow
    (Actions → "Android Storybook VR" → Run workflow) with
-   mode = `update`. It captures everything, uploads the fresh
-   screenshots as the `dsvr-baselines` artifact, and does not compare.
+   mode = `update`. It captures everything in the capture scope
+   (page stories, own brand — see "Capture scope" above), uploads
+   the fresh screenshots as the `dsvr-baselines` artifact, and does
+   not compare.
 3. Download the artifact, replace `tools/visual-regression/baselines/`
    with its contents, and commit on a PR like any other change. The
    next compare run is strict for every story that has a baseline.
