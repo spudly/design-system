@@ -1,5 +1,17 @@
 # @spudly/ui
 
+## 1.6.0
+
+### Minor Changes
+
+- e916091: On-device Storybook support for Android (#43). New export `createOnDeviceStorybookTamaguiConfig()`: the combined three-brand Storybook config (base, Warm Harvest, Quiet Dawn) with NATIVE font registrations — the web combined config registers CSS-variable font stacks that are invalid on native, so the on-device config derives its body font from the base family and its verse font from Memorize's. (One process-wide config either way — Tamagui cannot swap brand configs at runtime; on device, base/Warm Harvest verse-role text therefore renders in Alegreya instead of the generic serif, a stories-only deviation: no Warm Harvest surface ships verse text.) It powers the new Expo host app in `apps/storybook`, which mounts the repo's CSF stories on Android via @storybook/react-native for the screenshot visual regression in `tools/visual-regression`. Story wrappers were converted from web-only `<div>` elements to platform-neutral Tamagui views so the same stories render on device and web.
+- 93e3b5c: RecipeDetailPage: replace the tab layout with a single scrollable page (#71). All five sections (overview, ingredients, instructions, cook history, nutrition) now render in one ScrollView in the order the tabs had, each section after the overview under its own heading. Breaking contract change: `activeTab` / `onTabChange` are removed from `RecipeDetailPageReadyProps` and the `RecipeDetailPageTab` type is no longer exported — the per-tab view-models are now section view-models with the same field names and callbacks, so app hosts drop their tab state and keep the rest of their mapping. The Eciperay app rewire follows in the app repo once this version is published.
+
+### Patch Changes
+
+- b8bc4a2: Organize the Pages stories under two top-level categories (#70): the nine real page stories move from flat `Pages/<Page>` titles to `Pages/Eciperay/<Page>` (RecipesPage, SharedWithMePage, RecipeDetailPage, MealPlansPage, MealPlanDetailPage) and `Pages/Memorize/<Page>` (MyVersesPage, VerseSearchPage, MemorizationSessionPage, MemorizeReviewPage). The #44 demo collections keep their `Pages/Eciperay` / `Pages/Memorize` titles as the category collections. Story ids change accordingly, so Chromatic baselines for the moved stories are re-established on the next accepted run.
+- 73ac238: Fix inconsistent font-family on rendered pages (#69): Text, VerseText, Button, and SelectField's value/item text now pass their font family as an instance prop carrying the bare registered font name (`body` / `verse`), which is what makes Tamagui emit the font-context class on web. Previously the family existed only as a styled() value or in the `$body` / `$verse` form, which resolves to an undefined `var(--f-family)`, so body text, button labels, and select values silently inherited the surrounding page's default family while fonted primitives (Input, Label) rendered in the theme stack.
+
 ## 1.5.0
 
 ### Minor Changes
