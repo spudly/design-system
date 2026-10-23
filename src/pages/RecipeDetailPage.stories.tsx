@@ -2,11 +2,7 @@ import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../components/Text.js";
 import { View } from "tamagui";
-import {
-  RecipeDetailPage,
-  type RecipeDetailPageProps,
-  type RecipeDetailPageTab,
-} from "./RecipeDetailPage.js";
+import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
 import { recipeDetailFixture } from "./fixtures.js";
 import { tokens } from "../tokens/index.js";
 
@@ -121,13 +117,11 @@ const minimalIngredients: DemoIngredient[] = [
 
 function RecipeDetailPageDemo({
   variant = "full",
-  initialTab = "overview",
   initialMissing = [],
   cookLogFormOpen = false,
   showPanelSlots = false,
 }: {
   variant?: "full" | "minimal";
-  initialTab?: RecipeDetailPageTab;
   initialMissing?: string[];
   cookLogFormOpen?: boolean;
   showPanelSlots?: boolean;
@@ -136,7 +130,6 @@ function RecipeDetailPageDemo({
   const baseServings = isFull ? 4 : 2;
   const demoIngredients = isFull ? fullIngredients : minimalIngredients;
 
-  const [activeTab, setActiveTab] = useState<RecipeDetailPageTab>(initialTab);
   const [selectedVersionId, setSelectedVersionId] = useState(isFull ? "version-3" : "version-1");
   const [servings, setServings] = useState(baseServings);
   const [missing, setMissing] = useState<ReadonlySet<string>>(() => new Set(initialMissing));
@@ -167,8 +160,6 @@ function RecipeDetailPageDemo({
       : [{ id: "version-1", label: "v1 — Active", versionNumber: 1 }],
     selectedVersionId,
     onSelectVersion: setSelectedVersionId,
-    activeTab,
-    onTabChange: setActiveTab,
     overview: {
       title: isFull ? recipeDetailFixture.title : "Weeknight Tomato Pasta",
       ...(isFull
@@ -327,24 +318,29 @@ export const Loading: Story = {
   ),
 };
 
+// Section stories (#71): the page is a single scroll now, so there
+// is no tab to preselect — each story below renders the full page
+// with that section's state exercised (missing ingredient +
+// substitutions, cook logs, ready nutrition). The screenshots pin
+// the page as composed; the contract test pins the section order.
 export const Ingredients: Story = {
-  render: () => <RecipeDetailPageDemo initialTab="ingredients" initialMissing={["heavy-cream"]} />,
+  render: () => <RecipeDetailPageDemo initialMissing={["heavy-cream"]} />,
 };
 
 export const Instructions: Story = {
-  render: () => <RecipeDetailPageDemo initialTab="instructions" />,
+  render: () => <RecipeDetailPageDemo />,
 };
 
 export const CookHistory: Story = {
-  render: () => <RecipeDetailPageDemo initialTab="history" />,
+  render: () => <RecipeDetailPageDemo />,
 };
 
 export const CookLogFormOpen: Story = {
   // The form slot replaces the "Log a cook" button when it renders
   // content — the snapshot pins that swap.
-  render: () => <RecipeDetailPageDemo initialTab="history" cookLogFormOpen />,
+  render: () => <RecipeDetailPageDemo cookLogFormOpen />,
 };
 
 export const Nutrition: Story = {
-  render: () => <RecipeDetailPageDemo initialTab="nutrition" />,
+  render: () => <RecipeDetailPageDemo />,
 };

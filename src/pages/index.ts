@@ -10,7 +10,6 @@ export {
   RecipeDetailPage,
   type RecipeDetailPageProps,
   type RecipeDetailPageReadyProps,
-  type RecipeDetailPageTab,
   type RecipeDetailPageVersion,
   type RecipeDetailPageTag,
   type RecipeDetailPageLifecycle,
