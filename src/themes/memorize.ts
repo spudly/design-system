@@ -31,10 +31,25 @@ export const memorizeTheme = {
     linkDark: tokens.colors.teal.teal6,
     accent: "#b45309",
   },
-  // No token overrides: fonts come from the base tokens — Raleway
-  // for headings and body in every theme (#65), replacing this
-  // theme's former Avenir Next UI stack. Verse text is the one
-  // exception and is handled separately (#66).
+  // UI fonts come from the base tokens — Raleway for headings and
+  // body in every theme (#65), replacing this theme's former Avenir
+  // Next UI stack. Verse text is the one exception (#66): only the
+  // `verse` role is overridden, to Alegreya — a reading serif
+  // bundled by the Memorize app under that exact family name (web
+  // surfaces load it from Google Fonts; the Storybook preview-head
+  // does). Everything else in the typography tokens is inherited.
+  tokens: {
+    ...tokens,
+    typography: {
+      ...tokens.typography,
+      fontFamily: {
+        ...tokens.typography.fontFamily,
+        verse: "Alegreya, Georgia, 'Times New Roman', serif",
+        verseNative: "Alegreya",
+        verseNativeAndroid: "Alegreya",
+      },
+    },
+  },
 } as const;
 
 export type MemorizeTheme = typeof memorizeTheme;

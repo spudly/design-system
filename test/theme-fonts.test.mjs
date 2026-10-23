@@ -80,7 +80,11 @@ test("no component, page, or story hardcodes a UI font family", () => {
         // hardcode; token reads (`fontFamily: tokens...`,
         // `fontFamily.sans`) and the type-level BrandFontFamily
         // declarations carry no quoted family name on the value side.
+        // A `$`-prefixed value is a Tamagui font-token reference
+        // (`fontFamily: "$verse"`, #66), not a family literal — the
+        // family itself still comes from the theme's tokens.
         for (const match of text.matchAll(/fontFamily:\s*"([^"]+)"/g)) {
+          if (match[1].startsWith("$")) continue;
           offenders.push(`${path}: fontFamily: "${match[1]}"`);
         }
       }

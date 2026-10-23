@@ -31,7 +31,9 @@ const StyledText = styled(TamaguiText, {
       },
       verse: {
         fontSize: tokens.typography.fontSize.lg,
-        fontFamily: tokens.typography.fontFamily.serif,
+        // The registered `verse` font (base serif stack; Alegreya
+        // under Quiet Dawn, #66) — see VerseText.
+        fontFamily: "$verse",
       },
     },
   } as const,
