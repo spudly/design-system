@@ -33,16 +33,21 @@ const StyledValue = styled(TamaguiSelect.Value, {
   // their size scale by number (1–8), so the name never resolves and
   // reaches the native text view as a string; Android's view manager
   // throws ClassCastException (String -> Double) for fontSize and the app
-  // crashes on mount (spudly/eciperay#150). Pin the numeric size the
-  // skin's "md" variant intends.
-  fontSize: tokens.typography.fontSize.sm,
+  // crashes on mount (spudly/eciperay#150). Pin the numeric size — and pin
+  // the shared field-value size, tokens.typography.fontSize.md: every
+  // field component (TextField, SearchField, MultilineField, SelectField)
+  // renders its entered/selected text at md, so filter bars that mix them
+  // (RecipesPage, SharedWithMePage) cannot drift apart (design-system#67).
+  // The skin's sm is deliberately NOT used here. Labels stay sm.
+  fontSize: tokens.typography.fontSize.md,
 });
 
 const StyledItemText = styled(TamaguiSelect.ItemText, {
   name: "SpudlySelectFieldItemText",
 
-  // Same bare-name fontSize leak as StyledValue — see the note there.
-  fontSize: tokens.typography.fontSize.sm,
+  // Same bare-name fontSize leak and shared field-value size as
+  // StyledValue — see the note there.
+  fontSize: tokens.typography.fontSize.md,
 });
 
 export interface SelectOption {
