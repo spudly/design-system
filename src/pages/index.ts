@@ -27,3 +27,8 @@ export {
   type RecipeDetailPageNutritionProps,
   type RecipeDetailPageNutritionRow,
 } from "./RecipeDetailPage.js";
+export {
+  SharedWithMePage,
+  type SharedWithMePageItem,
+  type SharedWithMePageProps,
+} from "./SharedWithMePage.js";
