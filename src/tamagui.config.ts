@@ -53,6 +53,7 @@ function toTamaguiTheme(semantic: SemanticColors, dark: boolean) {
     primaryActive: semantic.primaryActive,
     onPrimary: semantic.onPrimary,
     primarySubtle: semantic.primarySubtle,
+    progressTrack: semantic.progressTrack,
     primaryEmphasis: semantic.primaryEmphasis,
     link: semantic.link,
     errorText: semantic.errorText,
@@ -119,6 +120,9 @@ function buildTamaguiThemes(theme: { semantic: SemanticColors }) {
     primaryActive: theme.semantic.primaryActive,
     onPrimary: theme.semantic.onPrimary,
     primarySubtle: theme.semantic.primarySubtle,
+    // Dark progress tracks keep the primarySubtle tint even when the
+    // light theme overrides progressTrack (#94 was a light-only call).
+    progressTrack: theme.semantic.primarySubtle,
     primaryEmphasis: theme.semantic.primaryEmphasis,
     // Links switch to the theme's lightened step in dark mode so they keep
     // AA contrast on the dark background/surface.
