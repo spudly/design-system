@@ -9,7 +9,7 @@ import StorybookUIRoot, { view } from "./Storybook";
 import { setCaptureThemeOverride } from "./captureTheme";
 
 // ---------------------------------------------------------------------------
-// Capture protocol (used by tools/visual-regression/run.mjs — see
+// Capture protocol (used by tools/visualRegression/run.mjs — see
 // docs/android-visual-regression.md):
 //
 // - At boot the app logs its story index: a `DSVR INDEX_BEGIN <n>`
