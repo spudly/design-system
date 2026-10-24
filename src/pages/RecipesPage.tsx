@@ -51,12 +51,25 @@ import { TextField } from "../components/TextField.js";
  * the view calls the render prop once per row with the row's id and
  * renders whatever comes back directly under that row's card;
  * returning null/undefined renders nothing. When a row's accessory
- * is non-null, that row's "Log cook" button is hidden — the app
- * reproduces its card's button-hides-while-the-form-is-open
+ * is non-null, that row's log-cook control is hidden — the app
+ * reproduces its card's control-hides-while-the-form-is-open
  * behavior purely by what it returns (the form for the open row,
  * null everywhere else). The form itself, its state, and its
- * mutation stay in the app; other rows' buttons and the
+ * mutation stay in the app; other rows' controls and the
  * `onLogCookPress` firing semantics are unchanged.
+ *
+ * Row actions: the row's only action is logging a cook, and the
+ * control is the recipe's rating. A rated recipe renders its stars
+ * (see `RecipesPageItem.rating`) and pressing them fires
+ * `onLogCookPress`; an unrated recipe renders a single icon-only
+ * button — one unfilled star, no text — firing the same callback.
+ * There is deliberately no Delete in the list: deleting a recipe
+ * lives on RecipeDetailPage (its `onDeletePress` chip). The two
+ * text buttons this replaces ("Log cook", "Delete") were also the
+ * row's inflexible width — at the largest display size they still
+ * crowded the text block in the narrow captures after the #205 wrap
+ * fix — while the star control is narrower than either button and
+ * wraps as a single unit with the row's flexWrap.
  *
  * Collapsed filters (#96): the filter bar used to render every
  * filter control at once, and the form filled most of the
@@ -93,12 +106,12 @@ const listStyle = { flex: 1 } as const;
 // flexBasis matters (eciperay #205): with a plain `flex: 1` the basis
 // is 0, so on narrow viewports (e.g. a phone at the largest display
 // size, ~314dp wide) the row's fixed children — the 64dp thumbnail
-// and the Log cook / Delete buttons — consume the entire row and the
+// and the trailing log-cook control — consume the entire row and the
 // text block collapses to ~0dp wide. Text measured at ~0 width paints
 // nothing yet measures extremely tall, which stretched the card past
-// the viewport with only the thumbnail and buttons visible. A 60dp
+// the viewport with only the thumbnail and control visible. A 60dp
 // basis gives the row a real line-breaking size: combined with the
-// row's flexWrap, the buttons wrap onto their own line instead of
+// row's flexWrap, the control wraps onto its own line instead of
 // squeezing the text out of existence, and the text block grows to
 // fill that line. At ordinary widths nothing changes — the basis is
 // below the width the block already gets, so it still just expands.
@@ -111,6 +124,14 @@ export interface RecipesPageItem {
   id: string;
   title: string;
   subtitle?: string;
+  /** Display rating, 0–5, or null/absent when the recipe is
+   * unrated. The app computes it by its display-rating rule (the
+   * owner's star rating, else the community average); the view
+   * renders it as the row's log-cook control — a rated recipe's
+   * stars are the control, an unrated recipe gets an icon-only
+   * button — and never formats it into the subtitle, so an app
+   * that passes `rating` keeps the rating text out of `subtitle`. */
+  rating?: number | null;
   imageUrl?: string | null;
 }
 
@@ -168,19 +189,21 @@ export interface RecipesPageProps {
   /** Next page in flight: a spinner renders as the list footer. */
   isFetchingNextPage?: boolean;
   onRecipePress: (recipeId: string) => void;
-  /** Optional row actions, mirroring the app card's buttons. "Log
-   * cook" is a callback only — the cook-log form and its mutation
-   * stay in the app, which renders them (see
-   * `renderRecipeAccessory`); the view owns the button. */
+  /** Optional row action, mirroring the app card's log-cook
+   * affordance. "Log cook" is a callback only — the cook-log form
+   * and its mutation stay in the app, which renders them (see
+   * `renderRecipeAccessory`); the view owns the control: the
+   * recipe's stars when it has a rating, a single icon-only button
+   * when it does not. There is no delete callback — deleting a
+   * recipe is a RecipeDetailPage action, not a list action. */
   onLogCookPress?: (recipeId: string) => void;
-  onRecipeDelete?: (recipeId: string) => void;
   /** Optional per-row accessory slot: called once per row with the
    * row's id; the returned node renders directly under that row's
    * card, inside the list item. Return null/undefined to render
    * nothing. When a row's accessory renders non-null content, that
-   * row's "Log cook" button is hidden — the app returns its inline
+   * row's log-cook control is hidden — the app returns its inline
    * cook-log form for the row whose form is open and null elsewhere,
-   * which reproduces the app card's button-hides-while-open
+   * which reproduces the app card's control-hides-while-open
    * behavior. */
   renderRecipeAccessory?: (recipeId: string) => ReactNode;
   /** Pagination hook, wired to the list's end-reached signal. */
@@ -500,16 +523,93 @@ function Thumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
   );
 }
 
+// Touch-target geometry for the row's log-cook control: a ≥44dp
+// target (the StarRatingInput precedent) centering its glyphs.
+// Plain object, no StyleSheet, like the row's other geometry.
+const logCookTargetStyle = {
+  minWidth: 44,
+  minHeight: 44,
+  alignItems: "center",
+  justifyContent: "center",
+} as const;
+
+const STAR_STEPS = [1, 2, 3, 4, 5] as const;
+
+/** The rated state of the row's log-cook control: the recipe's
+ * rating as five stars in the DS star language (StarRatingInput:
+ * ★ in warning amber when filled, gray when not). The rating is a
+ * display average as often as a personal star count, so the stars
+ * fill by rounding to the nearest whole star; the pressable's
+ * accessibility label carries the exact value. No lineHeight is
+ * set on the glyphs — see the #162 note in the file header. */
+function RatingStars({ rating }: { rating: number }) {
+  const filled = Math.min(5, Math.max(1, Math.round(rating)));
+  return (
+    <XStack gap={tokens.spacing[1]} alignItems="center">
+      {STAR_STEPS.map((star) => (
+        <Text
+          key={star}
+          style={{
+            fontSize: tokens.typography.fontSize.lg,
+            color: star <= filled ? tokens.colors.warning.warning6 : tokens.colors.gray.gray4,
+          }}
+        >
+          ★
+        </Text>
+      ))}
+    </XStack>
+  );
+}
+
+/** The row's only action: log a cook. A rated recipe's stars are
+ * the button; an unrated recipe gets a single icon-only button —
+ * one unfilled star in the same glyph and tone, no text. Both fire
+ * the row's `onLogCookPress`, and both carry an accessibility
+ * label that names the action and the recipe: the stars alone
+ * would announce as a rating, not as the log-cook action they
+ * perform here. */
+function LogCookControl({
+  item,
+  onLogCookPress,
+}: {
+  item: RecipesPageItem;
+  onLogCookPress: () => void;
+}) {
+  const rating = item.rating;
+  if (rating !== null && rating !== undefined && rating > 0) {
+    return (
+      <TouchableOpacity
+        style={logCookTargetStyle}
+        onPress={onLogCookPress}
+        accessibilityRole="button"
+        accessibilityLabel={`Log a cook of ${item.title}, rated ${rating} out of 5 stars`}
+      >
+        <RatingStars rating={rating} />
+      </TouchableOpacity>
+    );
+  }
+  return (
+    <TouchableOpacity
+      style={logCookTargetStyle}
+      onPress={onLogCookPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Log a cook of ${item.title}`}
+    >
+      <Text style={{ fontSize: tokens.typography.fontSize.lg, color: tokens.colors.gray.gray4 }}>
+        ★
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
 function RecipeRow({
   item,
   onPress,
   onLogCookPress,
-  onDeletePress,
 }: {
   item: RecipesPageItem;
   onPress: () => void;
   onLogCookPress?: () => void;
-  onDeletePress?: () => void;
 }) {
   return (
     <Card
@@ -520,14 +620,16 @@ function RecipeRow({
       gap="$3"
       marginBottom="$3"
     >
-      {/* Both press targets carry the button role and an accessible
-          name built from the recipe title: the thumbnail target
-          wraps only an image (or an empty placeholder), so without
-          the label a screen reader meets an unidentified action
-          for every recipe. The text target's label also carries
-          the subtitle when present — a title-only label would
-          override the name React Native derives from its Text
-          children and drop the subtitle announcement. */}
+      {/* Both navigation press targets carry the button role and an
+          accessible name built from the recipe title: the thumbnail
+          target wraps only an image (or an empty placeholder), so
+          without the label a screen reader meets an unidentified
+          action for every recipe. The text target's label also
+          carries the subtitle when present — a title-only label
+          would override the name React Native derives from its Text
+          children and drop the subtitle announcement. (The trailing
+          log-cook control is a third press target; its label names
+          the action instead — see LogCookControl.) */}
       <TouchableOpacity
         onPress={onPress}
         accessibilityRole="button"
@@ -548,30 +650,9 @@ function RecipeRow({
           </Text>
         ) : null}
       </TouchableOpacity>
-      {onLogCookPress || onDeletePress ? (
-        <XStack marginInlineStart="$3" alignItems="center" gap="$2">
-          {onLogCookPress ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              backgroundColor={tokens.colors.gray.gray2}
-              color={tokens.colors.gray.gray8}
-              onPress={onLogCookPress}
-            >
-              Log cook
-            </Button>
-          ) : null}
-          {onDeletePress ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              backgroundColor={tokens.colors.danger.danger1}
-              color={tokens.colors.danger.danger8}
-              onPress={onDeletePress}
-            >
-              Delete
-            </Button>
-          ) : null}
+      {onLogCookPress ? (
+        <XStack marginInlineStart="$3" alignItems="center">
+          <LogCookControl item={item} onLogCookPress={onLogCookPress} />
         </XStack>
       ) : null}
     </Card>
@@ -590,7 +671,6 @@ export function RecipesPage(props: RecipesPageProps) {
     isFetchingNextPage = false,
     onRecipePress,
     onLogCookPress,
-    onRecipeDelete,
     onLoadMore,
     renderRecipeAccessory,
   } = props;
@@ -633,13 +713,6 @@ export function RecipesPage(props: RecipesPageProps) {
                   ? {
                       onLogCookPress: () => {
                         onLogCookPress(item.id);
-                      },
-                    }
-                  : {})}
-                {...(onRecipeDelete
-                  ? {
-                      onDeletePress: () => {
-                        onRecipeDelete(item.id);
                       },
                     }
                   : {})}
