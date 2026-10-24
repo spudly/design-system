@@ -12,6 +12,17 @@
 # 2026-11-01, so the job is path-filtered to the surfaces that can
 # change a story screenshot (library source, the host app, the VR
 # tooling, this workflow) instead of running on every PR.
+#
+# PR runs auto-commit regenerated baselines (Stephen's directive,
+# 2026-10-23): when the compare finds screenshot diffs, the capture
+# script regenerates the baselines from the fresh captures, gates
+# them through the luminance guard (tools/visual-regression/
+# guard.mjs, issue #101), proves them with an in-job re-capture and
+# re-compare, and the commit-pr-baselines job below pushes them
+# onto the PR branch — no manual update dispatch. Pushes to main
+# and workflow_dispatch runs never take this path (update mode has
+# its own commit job, commit-baselines). See
+# docs/android-visual-regression.md.
 name: Android Storybook VR
 
 on:
@@ -38,12 +49,24 @@ permissions:
 concurrency:
   group: android-storybook-vr-${{ github.ref }}
   cancel-in-progress: true
+  # Concurrency acts on whole runs, never individual jobs, so a run
+  # cannot cancel its own commit job mid-push. The bot's baseline
+  # push starts a follow-up run that GitHub parks as
+  # "action_required" (see commit-pr-baselines), so it cannot
+  # cancel a successor either.
 
 jobs:
   visual-regression:
     if: github.event_name == 'pull_request' || inputs.mode != 'sanity'
+    # Set by the "Note PR auto-commit readiness" step when a PR
+    # compare run regenerated baselines and proved them green
+    # in-job; gates the commit-pr-baselines job.
+    outputs:
+      pr_autocommit_ready: ${{ steps.autocommit.outputs.ready }}
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    # 120, not 90: a PR run whose compare finds diffs captures the
+    # whole set twice (compare pass + in-job verification pass).
+    timeout-minutes: 120
     steps:
       - uses: actions/checkout@v7
 
@@ -85,7 +108,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
-          script: bash tools/visual-regression/ci/capture-compare.sh "${{ inputs.mode }}"
+          script: bash tools/visual-regression/ci/capture-compare.sh "${{ github.event_name == 'pull_request' && 'pr-autocommit' || inputs.mode }}"
 
       - name: Upload screenshots and diffs
         if: always()
@@ -94,6 +117,29 @@ jobs:
           name: dsvr-output
           path: /tmp/dsvr-out
           if-no-files-found: ignore
+
+      # PR auto-commit: capture-compare.sh (mode pr-autocommit)
+      # drops a marker file in /tmp when it regenerated baselines
+      # AND proved them green in-job (luminance guard + re-compare).
+      # Surface that as a job output for commit-pr-baselines.
+      - name: Note PR auto-commit readiness
+        id: autocommit
+        if: always() && github.event_name == 'pull_request'
+        run: |
+          if [ -f /tmp/dsvr-pr-autocommit-ready ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "This PR's compare run found screenshot diffs. CI regenerated the baselines from the fresh captures, passed them through the luminance guard (issue #101), and re-verified them in-job; the commit-pr-baselines job pushes them to this branch as github-actions[bot] for review in the PR diff." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Upload PR-regenerated baselines
+        if: steps.autocommit.outputs.ready == 'true'
+        uses: actions/upload-artifact@v7
+        with:
+          name: dsvr-pr-baselines
+          path: /tmp/dsvr-pr-baselines
+          if-no-files-found: error
 
       - name: Upload regenerated baselines (update mode)
         if: inputs.mode == 'update'
@@ -154,6 +200,69 @@ jobs:
           git add tools/visual-regression/baselines
           git commit -m "chore(vr): update Android Storybook baselines"
           git push origin "HEAD:${{ github.ref_name }}"
+
+  # PR runs only: push the baselines the visual-regression job
+  # regenerated and PROVED GREEN IN-JOB (luminance guard + a second
+  # capture pass compared against the regenerated set — see
+  # capture-compare.sh mode pr-autocommit) onto the PR's head
+  # branch, so an intentional visual change lands its new baselines
+  # in the same PR without a manual update dispatch (Stephen's
+  # directive, 2026-10-23). Mirrors commit-baselines above: job-level
+  # write permission, the capture job stays read-only, and the
+  # default branch is refused — baselines only ever land via a PR
+  # branch, never on main. Same-repo PRs only: a fork's head branch
+  # is not pushable from here.
+  #
+  # The bot's push parks the follow-up workflow run as
+  # "action_required" (the same GITHUB_TOKEN behavior verified on
+  # PR #97), so the follow-up compare starts only after a maintainer
+  # approves it. That is not a blocker: the in-job re-compare is the
+  # verification, and when the follow-up does run it compares
+  # against the just-committed baselines and passes with no diffs —
+  # so the bot never commits twice for the same change (no loop).
+  commit-pr-baselines:
+    needs: visual-regression
+    if: >-
+      github.event_name == 'pull_request' &&
+      needs.visual-regression.outputs.pr_autocommit_ready == 'true' &&
+      github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Defense in depth on top of the gating above: a head branch
+      # named like the default branch still gets refused here,
+      # exactly as the update-mode job refuses a main dispatch.
+      - name: Refuse the default branch
+        if: github.head_ref == github.event.repository.default_branch
+        run: |
+          echo "::error::Refusing to push regenerated baselines to the default branch (${{ github.head_ref }}). Baselines land via PR branches so they are reviewed in the PR diff."
+          exit 1
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Download PR-regenerated baselines
+        uses: actions/download-artifact@v7
+        with:
+          name: dsvr-pr-baselines
+          path: ${{ runner.temp }}/dsvr-pr-baselines
+
+      - name: Sync baselines into the tree
+        run: rsync -a --delete "${{ runner.temp }}/dsvr-pr-baselines/" tools/visual-regression/baselines/
+
+      - name: Commit and push regenerated baselines
+        run: |
+          if [ -z "$(git status --porcelain -- tools/visual-regression/baselines)" ]; then
+            echo "Baselines unchanged; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/visual-regression/baselines
+          git commit -m "chore(vr): update Android Storybook baselines"
+          git push origin "HEAD:${{ github.head_ref }}"
 
   # The #162 sanity check (issue #43 acceptance): reintroduce the
   # SearchField lineHeight bug via the patch in

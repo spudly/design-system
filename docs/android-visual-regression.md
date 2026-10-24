@@ -16,9 +16,10 @@ the field to 1826px on a Pixel 8a) passed every web check.
 | On-device config | `src/tamagui.config.ts` → `createOnDeviceStorybookTamaguiConfig()` | Combined three-brand config (base, Warm Harvest, Quiet Dawn) with native font registrations. The web combined config uses CSS-variable font stacks, invalid on native. One process-wide config either way — Tamagui cannot swap brand configs at runtime (spudly/eciperay#149). |
 | Preview          | `apps/storybook/.rnstorybook/preview.tsx`                          | Mirrors the web preview: a `theme` global (the six sub-theme names, e.g. `light_warmHarvest`, `dark_quietDawn`) drives `defaultTheme`, keyed remount per theme.                                                                                                                 |
 | VR driver        | `tools/visual-regression/run.mjs`                                  | Drives the app over ADB, captures screenshots, pixel-compares against baselines. Zero dependencies (own PNG codec in `png.mjs`, validated round-trip against PIL).                                                                                                              |
+| Luminance guard  | `tools/visual-regression/guard.mjs`                                | Pre-commit check on fresh captures: rejects a set that looks uniformly dimmed or scrimmed (issue #101) before CI may turn it into baselines (below).                                                                                                                             |
 | Baselines        | `tools/visual-regression/baselines/<theme>/<storyId>.png`          | Committed reference screenshots.                                                                                                                                                                                                                                                |
 | Sanity patch     | `tools/visual-regression/sanity/searchfield-162.patch`             | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                   |
-| CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job + an update-mode job that commits regenerated baselines to the dispatched branch (below).                                                                                                                                            |
+| CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job + jobs that commit regenerated baselines to a PR branch (PR auto-commit) or the dispatched branch (update mode) (below).                                                                                                              |
 
 Fonts: the app loads the same faces the apps register — Raleway
 (variable TTF, all themes' body/heading) and Alegreya (variable TTF,
@@ -137,13 +138,34 @@ device).
 
 ## Baselines: generating and updating
 
-Baselines are created by the CI job, never by hand-editing images:
+Baselines are created by the CI job, never by hand-editing images.
+On a pull request the whole cycle is automatic (Stephen's
+directive, 2026-10-23 — no manual dispatch):
 
-1. **First run / new stories**: the compare job passes with `WARN …
+1. **PRs: automatic.** The PR compare run (`capture-compare.sh`,
+   mode `pr-autocommit`) starts with the ordinary strict compare.
+   If every story matches, nothing else happens. If the compare
+   fails and **every failure is a pixel diff** (a capture failure —
+   deep link, READY timeout, screencap — means an incomplete set
+   and stops the flow), the job regenerates the baselines from the
+   fresh captures, runs them through the **luminance guard**
+   (below), and then **captures everything a second time and
+   compares against the regenerated set, in the same job**. Only a
+   set that passes that in-job re-compare is committed: the
+   `commit-pr-baselines` job syncs it into
+   `tools/visual-regression/baselines/` and pushes it to the PR's
+   head branch as github-actions[bot] ("chore(vr): update Android
+   Storybook baselines"). Review the baseline PNGs in the PR diff
+   like any other change — a green VR check on a PR whose head
+   carries such a bot commit means "the change is real and its
+   baselines were re-verified", not "nothing changed". The diff
+   images from the first compare pass are in the `dsvr-output`
+   artifact.
+2. **First run / new stories**: the compare job passes with `WARN …
 no baseline yet` lines and a BOOTSTRAP note while baselines are
    missing — capture still runs, so a story that crashes the app
    fails the job even before it has a baseline.
-2. **Regenerate deliberately**: dispatch the workflow
+3. **Regenerate deliberately**: dispatch the workflow
    (Actions → "Android Storybook VR" → Run workflow) with
    mode = `update`, **from the PR branch**. It captures everything
    in the capture scope (page stories, own brand — see "Capture
@@ -156,26 +178,55 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
    up in the PR diff for review like any other change; nobody has
    to download and commit them by hand. (The fresh screenshots are
    still uploaded as the `dsvr-baselines` artifact, as a
-   fallback/debug copy.)
-3. Dispatching mode = `update` from the default branch (`main`) is
+   fallback/debug copy.) This manual path remains for cases the PR
+   flow refuses (a guard trip, a capture failure) or when there is
+   no failing PR compare to trigger from; it does not run the
+   luminance guard, so review its baseline diff with the #101
+   dimming signature in mind.
+4. Dispatching mode = `update` from the default branch (`main`) is
    refused: the commit job fails with an error, because baselines
-   must land via a PR branch so they are reviewed in a diff.
-4. The baseline commit's push does not auto-run the PR's checks:
+   must land via a PR branch so they are reviewed in a diff. The PR
+   auto-commit jobs refuse the default branch the same way — main
+   pushes are always compare-only and never receive baseline
+   commits.
+5. A baseline commit's push does not auto-run the PR's checks:
    GitHub parks workflow runs for bot-token pushes as
    "action_required", so a maintainer approves the follow-up run in
-   the Actions UI (or pushes to the branch) to get the compare run,
-   which is then strict for every story that has a baseline — green
-   means the committed baselines match fresh captures.
-5. An intentional visual change follows the same flow: the compare
-   job fails with diff images in the `dsvr-output` artifact — inspect
-   them, and if the change is intended, run the update dispatch from
-   the PR branch and review the auto-committed baselines in the same
-   PR. (Manual fallback, e.g. for a dispatch that could not commit:
-   download the `dsvr-baselines` artifact, replace
-   `tools/visual-regression/baselines/` with its contents, and
-   commit it yourself.)
+   the Actions UI (or pushes to the branch) to get the compare run.
+   For the PR flow that parked run is not a blocker — the in-job
+   re-compare already verified the committed set — and when it does
+   run it compares against the just-committed baselines and passes
+   with no diffs, so the bot never commits twice for the same
+   change.
 
 Locally (with an emulator): `node tools/visual-regression/run.mjs --update`.
+
+### The luminance guard (issue #101 mitigation)
+
+Issue #101: the capture pipeline intermittently screenshots a
+dimmed emulator display (every story uniformly darkened to ~40%
+brightness) despite the display pin in the CI script. A compare run
+in that state only fails loudly, but the PR auto-commit path turns
+captures into baselines — a dimmed set committed as baselines would
+poison every future compare. `tools/visual-regression/guard.mjs`
+therefore gates the automatic path. Over the fresh captures it
+rejects the whole set when:
+
+- any capture's mean luminance is outside [0.60, 1.67] of its own
+  previous baseline's mean (dimming is multiplicative, ≈0.4x; a
+  legit page change moves a full-page mean by a few percent),
+- the session's median ratio is outside [0.80, 1.25] (the flake
+  dims everything at once), or
+- a capture is a near-uniform frame (blank surface or a system
+  scrim over the app — a real page screenshot always has variance).
+
+On any trip the job commits nothing and fails, naming the guard and
+issue #101. There is no absolute luminance floor: dark-theme pages
+are legitimately dark, so only the ratio against a story's own
+baseline is a safe signal. The guard is a mitigation, **not** a fix
+for #101 — the root cause of the dimming is still open there; the
+guard only guarantees a dimmed or scrimmed capture set can never
+become baselines via the automatic path.
 
 ## The #162 sanity check
 
