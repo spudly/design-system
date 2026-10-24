@@ -30,19 +30,64 @@
 # commit-pr-baselines job, which pushes it onto the PR branch.
 # Anything short of proven green (capture failures, a guard trip, a
 # failed re-compare) commits NOTHING and fails the job.
+#
+# Every mode runs TWO capture sets against the same install:
+#   1. the standard set (all in-scope page stories) at the pinned
+#      standard display (wm density 320, font_scale 1.0), and
+#   2. the narrow-viewport variant (run.mjs --variant narrow):
+#      ONLY the RecipesPage stories, with the display switched to
+#      wm size 1080x2400 + wm density 500 (345.6dp logical width)
+#      + font_scale 1.3 — the display-size override + font size on
+#      Stephen's Pixel 8a that shipped eciperay #205, whose fix
+#      (design-system PR #117) moved ZERO standard baselines
+#      because the standard surface is 540dp wide and the row
+#      never starves there. Variant baselines sit beside the
+#      standard ones with a "-narrow" filename suffix, so both
+#      sets flow through the same guard / regenerate / commit
+#      machinery; the standard display is restored after the
+#      variant pass no matter how it ends.
 set -euo pipefail
 
 MODE="${1:-compare}"
 REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
+VR_DIR="$REPO_ROOT/tools/visual-regression"
 cd "$REPO_ROOT/apps/storybook"
 
 npx expo prebuild --platform android --no-install
 (cd android && ./gradlew assembleRelease --console=plain -q)
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 
+# The two deterministic capture surfaces (see the header comment).
+# Standard: the pixel_6's 1080px width at density 320 is a 540dp
+# logical width — wide enough that fixed-width row children never
+# squeeze flexible text. Narrow: Stephen's phone exactly — 1080px
+# at density 500 is 345.6dp logical, and font_scale 1.3 grows the
+# row's buttons from the other side (eciperay #205).
+display_standard() {
+  adb shell wm size reset
+  adb shell wm density 320
+  adb shell settings put system font_scale 1.0
+}
+display_narrow() {
+  adb shell wm size 1080x2400
+  adb shell wm density 500
+  adb shell settings put system font_scale 1.3
+}
+
+# Run the driver for the narrow variant: switch the display, run,
+# and restore the standard display before returning, whatever the
+# run's outcome was (a later pass or the workflow's failure
+# artifacts must never inherit the narrow surface).
+run_narrow() {
+  local rc=0
+  display_narrow
+  node "$VR_DIR/run.mjs" --variant narrow "$@" || rc=$?
+  display_standard
+  return $rc
+}
+
 # Deterministic capture surface: fixed density + font scale.
-adb shell wm density 320
-adb shell settings put system font_scale 1.0
+display_standard
 
 # Pin the display fully awake and bright for the whole session.
 # The release build above can take long enough for the emulator's
@@ -61,15 +106,30 @@ adb shell input keyevent KEYCODE_WAKEUP
 adb logcat -G 8M
 
 # PR auto-commit flow. Runs entirely inside this job; the workflow's
-# commit-pr-baselines job only pushes what this flow stages.
+# commit-pr-baselines job only pushes what this flow stages. Both
+# capture sets (standard + narrow variant) go through the same
+# cycle: a set may only be regenerated when its failures are all
+# pixel diffs, both sets pass the luminance guard, and both pass an
+# in-job re-capture/re-compare against the regenerated baselines.
+# The staged tree is shared — variant baselines differ from standard
+# ones only by their "-narrow" filename suffix.
 pr_autocommit() {
-  local tool_dir="$REPO_ROOT/tools/visual-regression"
+  local tool_dir="$VR_DIR"
   local out=/tmp/dsvr-out
+  local out_narrow=/tmp/dsvr-out-narrow
   local staged=/tmp/dsvr-staged-baselines
 
-  # Pass 1: the ordinary strict compare against committed baselines.
-  echo "PR auto-commit: compare pass against committed baselines..."
-  if node "$tool_dir/run.mjs" --out "$out"; then
+  # Pass 1: the ordinary strict compare of BOTH sets against the
+  # committed baselines.
+  echo "PR auto-commit: compare pass against committed baselines (standard set, then narrow variant)..."
+  local std_failed=0 narrow_failed=0
+  if ! node "$tool_dir/run.mjs" --out "$out"; then
+    std_failed=1
+  fi
+  if ! run_narrow --out "$out_narrow"; then
+    narrow_failed=1
+  fi
+  if [ "$std_failed" = 0 ] && [ "$narrow_failed" = 0 ]; then
     echo "PR auto-commit: no diffs - baselines already match; nothing to commit."
     return 0
   fi
@@ -77,18 +137,23 @@ pr_autocommit() {
   # Only a run whose failures are ALL pixel diffs may regenerate.
   # A capture failure (deep link, READY timeout, screencap) means
   # the fresh set is incomplete, and an incomplete set must never
-  # become the baselines.
+  # become the baselines. Classification spans both sets' summary
+  # files: a set that passed contributes no failures; a set that
+  # failed without a readable summary stops the flow.
   local classify
   classify="$(node -e '
     const fs = require("node:fs");
-    let s;
-    try { s = JSON.parse(fs.readFileSync(process.argv[1], "utf8")); }
-    catch { console.log("unreadable"); process.exit(0); }
-    const failed = Array.isArray(s.failed) ? s.failed : [];
+    const failed = [];
+    for (const path of process.argv.slice(1)) {
+      let s;
+      try { s = JSON.parse(fs.readFileSync(path, "utf8")); }
+      catch { console.log("unreadable"); process.exit(0); }
+      if (Array.isArray(s.failed)) failed.push(...s.failed);
+    }
     if (failed.length === 0) { console.log("none"); process.exit(0); }
     const diff = /: \d+\.\d+% pixels differ/;
     console.log(failed.every((f) => diff.test(f)) ? "diffs-only" : "other");
-  ' "$out/summary.json")"
+  ' "$out/summary.json" "$out_narrow/summary.json")"
   if [ "$classify" != "diffs-only" ]; then
     echo "::error::PR auto-commit: compare failed with non-diff failures (classification: $classify); NOT regenerating baselines. See the compare output above."
     return 1
@@ -96,28 +161,41 @@ pr_autocommit() {
   echo "PR auto-commit: compare found only pixel diffs; regenerating baselines from the fresh captures."
 
   # The regenerated set: committed baselines overlaid with the fresh
-  # captures (exactly what update mode would write), staged in /tmp
-  # so the checkout tree stays untouched until the commit job runs.
+  # captures of both sets (exactly what update mode would write),
+  # staged in /tmp so the checkout tree stays untouched until the
+  # commit job runs.
   rm -rf "$staged"
   mkdir -p "$staged"
   cp -r "$tool_dir/baselines/." "$staged/"
-  cp -r "$out/actual/." "$staged/"
+  if [ -d "$out/actual" ]; then cp -r "$out/actual/." "$staged/"; fi
+  if [ -d "$out_narrow/actual" ]; then cp -r "$out_narrow/actual/." "$staged/"; fi
 
   # Luminance guard (issue #101): a dimmed or scrimmed capture set
   # must never be committed. The guard exits non-zero on any trip.
+  # It runs per set: it judges each capture against its OWN
+  # baseline, and the standard and narrow surfaces have different
+  # brightness profiles by construction.
   echo "PR auto-commit: running the luminance guard over the fresh captures (issue #101)..."
   if ! node "$tool_dir/guard.mjs" --captures "$out/actual" --baselines "$tool_dir/baselines"; then
-    echo "::error::PR auto-commit: luminance guard tripped - committing NOTHING. If the change is intentional and the captures are genuinely correct, investigate (issue #101) and regenerate via a manual mode=update dispatch from this branch."
+    echo "::error::PR auto-commit: luminance guard tripped on the standard set - committing NOTHING. If the change is intentional and the captures are genuinely correct, investigate (issue #101) and regenerate via a manual mode=update dispatch from this branch."
+    return 1
+  fi
+  if ! node "$tool_dir/guard.mjs" --captures "$out_narrow/actual" --baselines "$tool_dir/baselines"; then
+    echo "::error::PR auto-commit: luminance guard tripped on the narrow-variant set - committing NOTHING. If the change is intentional and the captures are genuinely correct, investigate (issue #101) and regenerate via a manual mode=update dispatch from this branch."
     return 1
   fi
 
-  # In-job verification: capture everything AGAIN and compare
-  # against the regenerated set. The commit is only as good as this
-  # proof - a set that cannot pass a fresh capture pass is not
-  # committed, and the job fails instead.
+  # In-job verification: capture everything AGAIN (both sets) and
+  # compare against the regenerated set. The commit is only as good
+  # as this proof - a set that cannot pass a fresh capture pass is
+  # not committed, and the job fails instead.
   echo "PR auto-commit: re-capturing and comparing against the regenerated baselines (in-job verification)..."
   if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify"; then
-    echo "::error::PR auto-commit: in-job re-compare against the regenerated baselines failed - committing NOTHING."
+    echo "::error::PR auto-commit: in-job re-compare of the standard set against the regenerated baselines failed - committing NOTHING."
+    return 1
+  fi
+  if ! run_narrow --baselines "$staged" --out "$out_narrow/verify"; then
+    echo "::error::PR auto-commit: in-job re-compare of the narrow-variant set against the regenerated baselines failed - committing NOTHING."
     return 1
   fi
 
@@ -131,9 +209,17 @@ pr_autocommit() {
 }
 
 if [ "$MODE" = "update" ]; then
-  node ../../tools/visual-regression/run.mjs --update --out /tmp/dsvr-out
+  node "$VR_DIR/run.mjs" --update --out /tmp/dsvr-out
+  run_narrow --update --out /tmp/dsvr-out-narrow
 elif [ "$MODE" = "pr-autocommit" ]; then
   pr_autocommit
 else
-  node ../../tools/visual-regression/run.mjs --out /tmp/dsvr-out
+  # Compare mode: both sets; the run fails if either set fails.
+  compare_rc=0
+  node "$VR_DIR/run.mjs" --out /tmp/dsvr-out || compare_rc=1
+  run_narrow --out /tmp/dsvr-out-narrow || compare_rc=1
+  if [ "$compare_rc" != 0 ]; then
+    echo "::error::Compare failed for at least one capture set (see the standard and narrow-variant output above)."
+    exit 1
+  fi
 fi
