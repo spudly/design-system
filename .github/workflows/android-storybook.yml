@@ -103,6 +103,58 @@ jobs:
           path: tools/visual-regression/baselines
           if-no-files-found: error
 
+  # Update mode only: commit the baselines the visual-regression
+  # job just regenerated back onto the dispatched branch, so they
+  # appear in the PR diff for review instead of living only in a
+  # workflow artifact someone has to download and commit by hand
+  # (Stephen's directive, 2026-10-23). This is the only job with
+  # write access; the capture jobs above stay read-only. Note: the
+  # bot's push does not auto-run the PR's checks — GitHub parks
+  # workflow runs for GITHUB_TOKEN pushes as "action_required", so
+  # the follow-up compare run starts only after a maintainer
+  # approves it in the Actions UI or pushes to the branch
+  # (verified live on PR #97, 2026-10-23).
+  commit-baselines:
+    needs: visual-regression
+    if: github.event_name == 'workflow_dispatch' && inputs.mode == 'update'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      # Baselines must land via PR branches so Stephen reviews them
+      # in a diff; committing them straight to the default branch
+      # would bypass that review.
+      - name: Refuse the default branch
+        if: github.ref_name == github.event.repository.default_branch
+        run: |
+          echo "::error::mode=update was dispatched from the default branch (${{ github.ref_name }}). Dispatch it from a PR branch instead, so the regenerated baselines are committed to that branch and reviewed in the PR diff."
+          exit 1
+
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.ref_name }}
+
+      - name: Download regenerated baselines
+        uses: actions/download-artifact@v7
+        with:
+          name: dsvr-baselines
+          path: ${{ runner.temp }}/dsvr-baselines
+
+      - name: Sync baselines into the tree
+        run: rsync -a --delete "${{ runner.temp }}/dsvr-baselines/" tools/visual-regression/baselines/
+
+      - name: Commit and push if baselines changed
+        run: |
+          if [ -z "$(git status --porcelain -- tools/visual-regression/baselines)" ]; then
+            echo "Baselines unchanged; nothing to commit."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add tools/visual-regression/baselines
+          git commit -m "chore(vr): update Android Storybook baselines"
+          git push origin "HEAD:${{ github.ref_name }}"
+
   # The #162 sanity check (issue #43 acceptance): reintroduce the
   # SearchField lineHeight bug via the patch in
   # tools/visual-regression/sanity/ and prove the pipeline FAILS the
