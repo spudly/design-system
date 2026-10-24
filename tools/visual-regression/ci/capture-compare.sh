@@ -18,7 +18,18 @@
 # The generated template signs release builds with the debug
 # keystore, so the APK installs as-is.
 #
-# Usage: capture-compare.sh [compare|update]
+# Usage: capture-compare.sh [compare|update|pr-autocommit]
+#
+# Modes compare/update are the workflow_dispatch modes. Mode
+# pr-autocommit is what pull_request runs use (Stephen's directive,
+# 2026-10-23): if the compare finds screenshot diffs, regenerate the
+# baselines from the fresh captures IN THIS JOB — gated by the
+# luminance guard (tools/visual-regression/guard.mjs, issue #101)
+# and an in-job re-capture/re-compare against the regenerated set —
+# and hand the proven-green set to the workflow's
+# commit-pr-baselines job, which pushes it onto the PR branch.
+# Anything short of proven green (capture failures, a guard trip, a
+# failed re-compare) commits NOTHING and fails the job.
 set -euo pipefail
 
 MODE="${1:-compare}"
@@ -49,8 +60,80 @@ adb shell input keyevent KEYCODE_WAKEUP
 # Generous logcat buffer: the driver reads the full log back.
 adb logcat -G 8M
 
+# PR auto-commit flow. Runs entirely inside this job; the workflow's
+# commit-pr-baselines job only pushes what this flow stages.
+pr_autocommit() {
+  local tool_dir="$REPO_ROOT/tools/visual-regression"
+  local out=/tmp/dsvr-out
+  local staged=/tmp/dsvr-staged-baselines
+
+  # Pass 1: the ordinary strict compare against committed baselines.
+  echo "PR auto-commit: compare pass against committed baselines..."
+  if node "$tool_dir/run.mjs" --out "$out"; then
+    echo "PR auto-commit: no diffs - baselines already match; nothing to commit."
+    return 0
+  fi
+
+  # Only a run whose failures are ALL pixel diffs may regenerate.
+  # A capture failure (deep link, READY timeout, screencap) means
+  # the fresh set is incomplete, and an incomplete set must never
+  # become the baselines.
+  local classify
+  classify="$(node -e '
+    const fs = require("node:fs");
+    let s;
+    try { s = JSON.parse(fs.readFileSync(process.argv[1], "utf8")); }
+    catch { console.log("unreadable"); process.exit(0); }
+    const failed = Array.isArray(s.failed) ? s.failed : [];
+    if (failed.length === 0) { console.log("none"); process.exit(0); }
+    const diff = /: \d+\.\d+% pixels differ/;
+    console.log(failed.every((f) => diff.test(f)) ? "diffs-only" : "other");
+  ' "$out/summary.json")"
+  if [ "$classify" != "diffs-only" ]; then
+    echo "::error::PR auto-commit: compare failed with non-diff failures (classification: $classify); NOT regenerating baselines. See the compare output above."
+    return 1
+  fi
+  echo "PR auto-commit: compare found only pixel diffs; regenerating baselines from the fresh captures."
+
+  # The regenerated set: committed baselines overlaid with the fresh
+  # captures (exactly what update mode would write), staged in /tmp
+  # so the checkout tree stays untouched until the commit job runs.
+  rm -rf "$staged"
+  mkdir -p "$staged"
+  cp -r "$tool_dir/baselines/." "$staged/"
+  cp -r "$out/actual/." "$staged/"
+
+  # Luminance guard (issue #101): a dimmed or scrimmed capture set
+  # must never be committed. The guard exits non-zero on any trip.
+  echo "PR auto-commit: running the luminance guard over the fresh captures (issue #101)..."
+  if ! node "$tool_dir/guard.mjs" --captures "$out/actual" --baselines "$tool_dir/baselines"; then
+    echo "::error::PR auto-commit: luminance guard tripped - committing NOTHING. If the change is intentional and the captures are genuinely correct, investigate (issue #101) and regenerate via a manual mode=update dispatch from this branch."
+    return 1
+  fi
+
+  # In-job verification: capture everything AGAIN and compare
+  # against the regenerated set. The commit is only as good as this
+  # proof - a set that cannot pass a fresh capture pass is not
+  # committed, and the job fails instead.
+  echo "PR auto-commit: re-capturing and comparing against the regenerated baselines (in-job verification)..."
+  if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify"; then
+    echo "::error::PR auto-commit: in-job re-compare against the regenerated baselines failed - committing NOTHING."
+    return 1
+  fi
+
+  # Proven green: hand the staged set and a readiness marker to the
+  # workflow (the marker step publishes the job output the
+  # commit-pr-baselines job gates on).
+  rm -rf /tmp/dsvr-pr-baselines
+  cp -r "$staged" /tmp/dsvr-pr-baselines
+  touch /tmp/dsvr-pr-autocommit-ready
+  echo "PR auto-commit: regenerated baselines verified in-job; the commit-pr-baselines job will push them to this PR branch."
+}
+
 if [ "$MODE" = "update" ]; then
   node ../../tools/visual-regression/run.mjs --update --out /tmp/dsvr-out
+elif [ "$MODE" = "pr-autocommit" ]; then
+  pr_autocommit
 else
   node ../../tools/visual-regression/run.mjs --out /tmp/dsvr-out
 fi
