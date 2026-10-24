@@ -31,19 +31,19 @@ import {
   readdirSync,
   statSync,
 } from "node:fs";
-import { dirname, join, relative } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { promisify } from "node:util";
+
 import { decodePng, diffImages } from "./png.mjs";
 
 const run = promisify(execFile);
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = join(TOOL_DIR, "..", "..");
 
 const args = process.argv.slice(2);
 function argValue(name, fallback) {
   const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : fallback;
+  return i === -1 ? fallback : args[i + 1];
 }
 function argFlag(name) {
   return args.includes(name);
@@ -108,11 +108,6 @@ const CAPTURE_SCOPE = [
     themes: ["light_quietDawn"],
   },
 ];
-function inCaptureScope(storyId, theme) {
-  return CAPTURE_SCOPE.some(
-    (rule) => storyId.startsWith(rule.storyPrefix) && rule.themes.includes(theme),
-  );
-}
 
 // Narrow-viewport variant scope (Stephen's directive, 2026-10-24):
 // ONLY the RecipesPage stories, re-captured with the emulator
@@ -166,7 +161,10 @@ async function adbBuffer(...adbArgs) {
   return stdout;
 }
 
-const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const sleep = (ms) =>
+  new Promise((r) => {
+    setTimeout(r, ms);
+  });
 
 async function logcatDump() {
   // Unfiltered on purpose: which logcat tag JS console output lands
@@ -217,7 +215,7 @@ function comparePair(baselinePath, actualPath, diffPath) {
   return { ok: true, ...result };
 }
 
-async function fromDirMode() {
+function fromDirMode() {
   const actualDir = CONFIG.fromDir;
   // Standard and narrow baselines share one tree (the "-narrow"
   // suffix tells them apart); an offline compare covers exactly
@@ -264,8 +262,12 @@ async function deviceMode() {
   const pkg = CONFIG.packageName;
 
   // Fresh app start; the app writes its story index at boot.
-  await adb("shell", "am", "force-stop", pkg).catch(() => {});
-  await adb("logcat", "-c").catch(() => {});
+  await adb("shell", "am", "force-stop", pkg).catch(() => {
+    // Best effort: the app may not be running yet.
+  });
+  await adb("logcat", "-c").catch(() => {
+    // Best effort: clearing the log must not abort the run.
+  });
   await adb(
     "shell",
     "am",
@@ -317,10 +319,11 @@ async function deviceMode() {
     0,
   );
   console.log(
-    `capturing ${inScopeCount} (story x theme) pairs in capture scope ` +
-      (CONFIG.variant === "narrow"
+    `capturing ${inScopeCount} (story x theme) pairs in capture scope ${
+      CONFIG.variant === "narrow"
         ? `(narrow-viewport variant: RecipesPage stories only, own brand; index holds ${stories.length} stories x ${CONFIG.themes.length} themes)`
-        : `(page stories only, own brand; index holds ${stories.length} stories x ${CONFIG.themes.length} themes)`),
+        : `(page stories only, own brand; index holds ${stories.length} stories x ${CONFIG.themes.length} themes)`
+    }`,
   );
 
   const summary = { captured: 0, compared: 0, updated: 0, noBaseline: 0, failed: [] };
@@ -348,9 +351,9 @@ async function deviceMode() {
           `'${url}'`,
           pkg,
         );
-      } catch (err) {
-        summary.failed.push(`${theme}/${story.id}: deep link failed: ${err.message}`);
-        console.error(`FAIL ${theme}/${story.id}: deep link failed: ${err.message}`);
+      } catch (error) {
+        summary.failed.push(`${theme}/${story.id}: deep link failed: ${error.message}`);
+        console.error(`FAIL ${theme}/${story.id}: deep link failed: ${error.message}`);
         continue;
       }
       const ready = await waitForLog(`DSVR READY ${nonce} `, CONFIG.readyTimeoutMs);
@@ -360,9 +363,9 @@ async function deviceMode() {
         continue;
       }
       await sleep(CONFIG.settleMs);
-      const png = await adbBuffer("exec-out", "screencap", "-p").catch((err) => {
-        summary.failed.push(`${theme}/${story.id}: screencap failed: ${err.message}`);
-        console.error(`FAIL ${theme}/${story.id}: screencap failed: ${err.message}`);
+      const png = await adbBuffer("exec-out", "screencap", "-p").catch((error) => {
+        summary.failed.push(`${theme}/${story.id}: screencap failed: ${error.message}`);
+        console.error(`FAIL ${theme}/${story.id}: screencap failed: ${error.message}`);
         return null;
       });
       if (!png) continue;

@@ -27,12 +27,11 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-const { baseTheme, eciperayTheme, memorizeTheme, createTamaguiConfig } = await import(
-  "../dist/index.js"
-);
+const { baseTheme, eciperayTheme, memorizeTheme, createTamaguiConfig } =
+  await import("../dist/index.js");
 
 function rgb(hex) {
-  return [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return [1, 3, 5].map((i) => Number.parseInt(hex.slice(i, i + 2), 16));
 }
 
 function luminance(hex) {

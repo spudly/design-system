@@ -12,16 +12,16 @@ const crcTable = (() => {
   const table = new Int32Array(256);
   for (let n = 0; n < 256; n++) {
     let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+    for (let k = 0; k < 8; k++) c = c & 1 ? 0xed_b8_83_20 ^ (c >>> 1) : c >>> 1;
     table[n] = c;
   }
   return table;
 })();
 
 function crc32(buf) {
-  let c = 0xffffffff;
+  let c = 0xff_ff_ff_ff;
   for (let i = 0; i < buf.length; i++) c = crcTable[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
-  return (c ^ 0xffffffff) >>> 0;
+  return (c ^ 0xff_ff_ff_ff) >>> 0;
 }
 
 function chunk(type, data) {
@@ -74,23 +74,32 @@ export function decodePng(buf) {
   let height = 0;
   let colorType = 0;
   const idat = [];
-  while (offset < buf.length) {
+  chunks: while (offset < buf.length) {
     const len = buf.readUInt32BE(offset);
     const type = buf.toString("ascii", offset + 4, offset + 8);
     const data = buf.subarray(offset + 8, offset + 8 + len);
-    if (type === "IHDR") {
-      width = data.readUInt32BE(0);
-      height = data.readUInt32BE(4);
-      if (data[8] !== 8) throw new Error(`decodePng: unsupported bit depth ${data[8]}`);
-      colorType = data[9];
-      if (colorType !== 2 && colorType !== 6) {
-        throw new Error(`decodePng: unsupported color type ${colorType}`);
+    switch (type) {
+      case "IHDR": {
+        width = data.readUInt32BE(0);
+        height = data.readUInt32BE(4);
+        if (data[8] !== 8) throw new Error(`decodePng: unsupported bit depth ${data[8]}`);
+        colorType = data[9];
+        if (colorType !== 2 && colorType !== 6) {
+          throw new Error(`decodePng: unsupported color type ${colorType}`);
+        }
+        if (data[12] !== 0) throw new Error("decodePng: interlaced PNGs unsupported");
+        break;
       }
-      if (data[12] !== 0) throw new Error("decodePng: interlaced PNGs unsupported");
-    } else if (type === "IDAT") {
-      idat.push(data);
-    } else if (type === "IEND") {
-      break;
+      case "IDAT": {
+        idat.push(data);
+        break;
+      }
+      case "IEND": {
+        break chunks;
+      }
+      default: {
+        break;
+      }
     }
     offset += 12 + len;
   }
@@ -108,11 +117,27 @@ export function decodePng(buf) {
       const left = x >= bpp ? row[x - bpp] : 0;
       const up = prevRow[x];
       const upLeft = x >= bpp ? prevRow[x - bpp] : 0;
-      if (filter === 1) row[x] = (row[x] + left) & 0xff;
-      else if (filter === 2) row[x] = (row[x] + up) & 0xff;
-      else if (filter === 3) row[x] = (row[x] + ((left + up) >> 1)) & 0xff;
-      else if (filter === 4) row[x] = (row[x] + paeth(left, up, upLeft)) & 0xff;
-      else if (filter !== 0) throw new Error(`decodePng: unknown filter ${filter}`);
+      switch (filter) {
+        case 1: {
+          row[x] = (row[x] + left) & 0xff;
+          break;
+        }
+        case 2: {
+          row[x] = (row[x] + up) & 0xff;
+          break;
+        }
+        case 3: {
+          row[x] = (row[x] + ((left + up) >> 1)) & 0xff;
+          break;
+        }
+        case 4: {
+          row[x] = (row[x] + paeth(left, up, upLeft)) & 0xff;
+          break;
+        }
+        default: {
+          if (filter !== 0) throw new Error(`decodePng: unknown filter ${filter}`);
+        }
+      }
     }
     for (let x = 0; x < width; x++) {
       const src = x * bpp;

@@ -73,7 +73,7 @@ const REACT_NATIVE_ACCESSIBILITY_ROLES = new Set([
  * the scan runs on code only.
  */
 function stripComments(source) {
-  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^[ \t]*\/\/.*$/gm, "");
+  return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/^[ \t]*\/\/.*$/gm, "");
 }
 
 function sourceFiles(dir) {

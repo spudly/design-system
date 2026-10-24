@@ -62,7 +62,7 @@ const sources = [...sourceFiles(srcDir)].map((path) => ({
   path,
   // Suffix checks below compare against forward-slash paths; join()
   // produces backslashes on Windows, so keep a normalized twin.
-  posixPath: path.split("\\").join("/"),
+  posixPath: path.replaceAll("\\", "/"),
   text: readFileSync(path, "utf8"),
 }));
 
@@ -96,40 +96,64 @@ function stripComments(text) {
   for (let i = 0; i < text.length; i += 1) {
     const ch = text[i];
     const next = text[i + 1] ?? "";
-    if (state === "code") {
-      if (ch === "/" && next === "/") state = "line";
-      else if (ch === "/" && next === "*") state = "block";
-      else if (ch === "'") state = "single";
-      else if (ch === '"') state = "double";
-      else if (ch === "`") state = "template";
-      out += state === "line" || state === "block" ? " " : ch;
-      if (state === "line" || state === "block") {
-        out += " ";
-        i += 1;
+    switch (state) {
+      case "code": {
+        if (ch === "/" && next === "/") state = "line";
+        else if (ch === "/" && next === "*") state = "block";
+        else {
+          switch (ch) {
+            case "'": {
+              state = "single";
+              break;
+            }
+            case '"': {
+              state = "double";
+              break;
+            }
+            case "`": {
+              state = "template";
+              break;
+            }
+            default: {
+              break;
+            }
+          }
+        }
+        out += state === "line" || state === "block" ? " " : ch;
+        if (state === "line" || state === "block") {
+          out += " ";
+          i += 1;
+        }
+        break;
       }
-    } else if (state === "line") {
-      if (ch === "\n") {
-        state = "code";
+      case "line": {
+        if (ch === "\n") {
+          state = "code";
+          out += ch;
+        } else out += " ";
+        break;
+      }
+      case "block": {
+        if (ch === "*" && next === "/") {
+          state = "code";
+          out += "  ";
+          i += 1;
+        } else out += ch === "\n" ? "\n" : " ";
+        break;
+      }
+      default: {
+        // Inside a string or template literal: copy verbatim.
         out += ch;
-      } else out += " ";
-    } else if (state === "block") {
-      if (ch === "*" && next === "/") {
-        state = "code";
-        out += "  ";
-        i += 1;
-      } else out += ch === "\n" ? "\n" : " ";
-    } else {
-      // Inside a string or template literal: copy verbatim.
-      out += ch;
-      if (ch === "\\") {
-        out += next;
-        i += 1;
-      } else if (
-        (state === "single" && ch === "'") ||
-        (state === "double" && ch === '"') ||
-        (state === "template" && ch === "`")
-      ) {
-        state = "code";
+        if (ch === "\\") {
+          out += next;
+          i += 1;
+        } else if (
+          (state === "single" && ch === "'") ||
+          (state === "double" && ch === '"') ||
+          (state === "template" && ch === "`")
+        ) {
+          state = "code";
+        }
       }
     }
   }
@@ -241,6 +265,7 @@ test("lineHeight extractor flags the defect form and ignores scale definitions (
     ['lineHeight value "tokens.typography.fontSize.md" references fontSize'],
   );
   assert.equal(
+    // eslint-disable-next-line no-template-curly-in-string -- fixture source text intentionally contains a template literal
     lineHeightViolations('const b = { lineHeight: `${tokens.typography.fontSize["4xl"]}px` };')
       .length,
     1,
@@ -262,6 +287,7 @@ test("lineHeight extractor flags the defect form and ignores scale definitions (
   // at the first newline and miss the fontSize-derived branches.
   assert.equal(
     lineHeightViolations(
+      // eslint-disable-next-line no-template-curly-in-string -- fixture source text intentionally contains a template literal
       'const e = <Text lineHeight={\n  isWeb\n    ? `${tokens.typography.fontSize["4xl"]}px`\n    : tokens.typography.fontSize["4xl"]\n} />;',
     ).length,
     1,

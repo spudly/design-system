@@ -51,7 +51,7 @@ const stories = readFileSync(join(pagesDir, "VerseSearchPage.stories.tsx"), "utf
 
 // Strip block and line comments so documented patterns in prose
 // (this file's subject is heavily commented) cannot pass the scan.
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("VerseSearchPage source is readable and non-trivial", () => {
   assert.ok(code.length > 1000, "expected the full VerseSearchPage source");
@@ -200,7 +200,7 @@ test("no render slot: no ReactNode prop, no accessory", () => {
 test("stories render the real component in its five states, in Quiet Dawn", () => {
   for (const story of ["Default", "DemoMode", "Searching", "Error", "NoResults"]) {
     assert.ok(
-      new RegExp(`export const ${story}\\b`).test(stories),
+      new RegExp(String.raw`export const ${story}\b`).test(stories),
       `VerseSearchPage.stories.tsx must export a ${story} story`,
     );
   }

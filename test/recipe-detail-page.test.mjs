@@ -58,8 +58,10 @@ const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
-const storiesCode = stories.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+const storiesCode = stories
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("RecipeDetailPage is exported from the pages subpath", () => {
   assert.match(index, /RecipeDetailPage,/, "index.ts must export RecipeDetailPage");
@@ -86,7 +88,7 @@ test("the loading state renders only the spinner shell", () => {
   );
   const loadingAt = code.indexOf('props.state === "loading"');
   const chromeAt = code.indexOf("<VersionPicker");
-  assert.ok(loadingAt >= 0, "the component must branch on the loading state");
+  assert.ok(loadingAt !== -1, "the component must branch on the loading state");
   assert.ok(loadingAt < chromeAt, "the loading branch must come before the chrome render");
   assert.match(
     code,
@@ -99,10 +101,10 @@ test("the chrome is pinned above a single scroll view", () => {
   const toolbarAt = code.indexOf("<VersionPicker");
   const scrollAt = code.indexOf('<ScrollView flex={1} keyboardShouldPersistTaps="handled">');
   assert.ok(
-    scrollAt >= 0,
+    scrollAt !== -1,
     "the section ScrollView must persist handled taps (slotted forms keep their presses)",
   );
-  assert.ok(toolbarAt >= 0, "the toolbar must render the version picker");
+  assert.ok(toolbarAt !== -1, "the toolbar must render the version picker");
   assert.ok(scrollAt > toolbarAt, "the scroll view renders below the pinned chrome");
   assert.equal(
     code.split("<ScrollView").length - 1,
@@ -224,7 +226,7 @@ test("the sharing slot renders after the lifecycle section and before the tags",
   const lifecycleAt = code.indexOf("<LifecycleSection");
   const sharingAt = code.indexOf("{sharingControls}");
   const tagsAt = code.indexOf("tags.map");
-  assert.ok(lifecycleAt >= 0, "the lifecycle section renders in the overview");
+  assert.ok(lifecycleAt !== -1, "the lifecycle section renders in the overview");
   assert.ok(sharingAt > lifecycleAt, "sharing renders after the lifecycle section");
   assert.ok(tagsAt > sharingAt, "the tags render after the sharing slot");
   assert.match(
@@ -237,7 +239,7 @@ test("the sharing slot renders after the lifecycle section and before the tags",
 test("the comments slot renders in the engagement stack after the ratings card", () => {
   const ratingsAt = code.indexOf("<RatingsCard");
   const commentsAt = code.indexOf("{comments}", ratingsAt);
-  assert.ok(ratingsAt >= 0, "the ratings card renders in the engagement stack");
+  assert.ok(ratingsAt !== -1, "the ratings card renders in the engagement stack");
   assert.ok(commentsAt > ratingsAt, "comments render after the ratings card");
 });
 

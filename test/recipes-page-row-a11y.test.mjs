@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "pages", "RecipesPage.tsx"), "utf8");
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("RecipesPage source is readable and non-trivial", () => {
   assert.ok(code.length > 1000, "expected the full RecipesPage source");
@@ -43,6 +43,7 @@ test("both RecipeRow press targets are named buttons for screen readers (#60)", 
   );
   assert.ok(
     code.includes(
+      // eslint-disable-next-line no-template-curly-in-string -- expected source text intentionally contains a template literal
       "accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}",
     ),
     "the text press target's label must include the subtitle when present — a title-only label would override the name derived from its Text children and drop the subtitle announcement",

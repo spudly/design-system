@@ -62,7 +62,7 @@ test("all eight full-page demo stories exist, in the correct theme per app", () 
     );
     for (const story of stories) {
       assert.ok(
-        new RegExp(`export const ${story}\\b`).test(text),
+        new RegExp(String.raw`export const ${story}\b`).test(text),
         `src/pages/${file} is missing the ${story} page story (#44 acceptance: eight screens)`,
       );
     }

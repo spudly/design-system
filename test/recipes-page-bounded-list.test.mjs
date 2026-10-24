@@ -41,7 +41,7 @@ const source = readFileSync(join(here, "..", "src", "pages", "RecipesPage.tsx"),
 
 // Strip block and line comments so documented patterns in prose
 // (this file's subject is heavily commented) cannot pass the scan.
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("RecipesPage source is readable and non-trivial", () => {
   assert.ok(code.length > 1000, "expected the full RecipesPage source");
@@ -72,7 +72,7 @@ test("the FlatList is height-bounded with flex: 1 (#188)", () => {
 test("the filter bar renders as the list header, not a pinned sibling (#188)", () => {
   const headerAt = code.indexOf("ListHeaderComponent");
   const barAt = code.indexOf("<RecipesFiltersBar");
-  assert.ok(headerAt >= 0, "the FlatList must receive a ListHeaderComponent");
+  assert.ok(headerAt !== -1, "the FlatList must receive a ListHeaderComponent");
   assert.ok(barAt > headerAt, "the filter bar must render inside the ListHeaderComponent");
   assert.equal(
     code.indexOf("<RecipesFiltersBar"),

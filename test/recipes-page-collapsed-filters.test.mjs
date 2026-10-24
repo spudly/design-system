@@ -39,7 +39,7 @@ const pagesDir = join(here, "..", "src", "pages");
 const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
 const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
 
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("the collapsed-filter contract props are declared", () => {
   assert.match(
@@ -58,14 +58,14 @@ test("search and the Filters button are the initial render", () => {
   assert.match(code, />\s*Filters\s*<\/Button>/, "the button label is Filters");
   const searchAt = code.indexOf("<SearchField");
   const buttonAt = code.indexOf('accessibilityLabel="Add a filter"');
-  assert.ok(searchAt >= 0 && buttonAt > searchAt, "search renders before the Filters button");
+  assert.ok(searchAt !== -1 && buttonAt > searchAt, "search renders before the Filters button");
 });
 
 test("each filter control renders only when its filter is added", () => {
   for (const id of ["status", "ingredient", "calories", "satiety", "sort"]) {
     assert.match(
       code,
-      new RegExp(`active\\.includes\\("${id}"\\)`),
+      new RegExp(String.raw`active\.includes\("${id}"\)`),
       `the ${id} control must be gated on active.includes("${id}")`,
     );
   }

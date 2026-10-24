@@ -46,7 +46,7 @@ const index = readFileSync(join(componentsDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("BackLink source is readable and non-trivial", () => {
   assert.ok(code.length > 500, "expected the full BackLink source");

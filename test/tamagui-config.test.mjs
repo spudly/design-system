@@ -22,11 +22,13 @@ import { getConfig } from "tamagui";
 
 /** The installed global config, or undefined when none is installed. */
 function getConfigMaybe() {
+  let config;
   try {
-    return getConfig();
+    config = getConfig();
   } catch {
-    return undefined;
+    // No config installed: getConfig() throws; absence is the signal.
   }
+  return config;
 }
 
 test("importing the package registers no global Tamagui config", async () => {

@@ -1,5 +1,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
+
 const { getDefaultConfig } = require("expo/metro-config");
 const { withStorybook } = require("@storybook/react-native/metro/withStorybook");
 

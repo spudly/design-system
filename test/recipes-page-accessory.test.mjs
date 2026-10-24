@@ -42,7 +42,7 @@ const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("the accessory slot prop is declared with the id-based signature", () => {
   assert.match(
@@ -86,7 +86,7 @@ test("a row with accessory content hides its Log cook button; other rows keep it
 test("the accessory renders under the row's card, inside the list item", () => {
   const rowAt = code.indexOf("<RecipeRow");
   const accessoryAt = code.indexOf("{accessory}");
-  assert.ok(rowAt >= 0, "renderItem must render the RecipeRow");
+  assert.ok(rowAt !== -1, "renderItem must render the RecipeRow");
   assert.ok(accessoryAt > rowAt, "the accessory must render after (under) the row's card");
   assert.match(
     code,

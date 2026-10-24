@@ -44,6 +44,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+
 import { decodePng } from "./png.mjs";
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
@@ -51,7 +52,7 @@ const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
 const args = process.argv.slice(2);
 function argValue(name, fallback) {
   const i = args.indexOf(name);
-  return i >= 0 ? args[i + 1] : fallback;
+  return i === -1 ? fallback : args[i + 1];
 }
 
 const CAPTURES_DIR = argValue("--captures", "");
@@ -65,7 +66,7 @@ const SINGLE_MIN_RATIO = 0.6;
 const SINGLE_MAX_RATIO = 1.67;
 const MEDIAN_MIN_RATIO = 0.8;
 const MEDIAN_MAX_RATIO = 1.25;
-const UNIFORM_STDDEV = 1.0; // on the 0..255 luminance scale
+const UNIFORM_STDDEV = 1; // on the 0..255 luminance scale
 
 function listPngs(dir) {
   const out = [];
@@ -135,7 +136,7 @@ function main() {
             trips.push(
               `${rel}: luminance ratio ${ratio.toFixed(3)} vs its previous baseline is ` +
                 `outside [${SINGLE_MIN_RATIO}, ${SINGLE_MAX_RATIO}] — the uniform-dimming ` +
-                  "signature of issue #101 (or a scrim brightening a dark page)",
+                "signature of issue #101 (or a scrim brightening a dark page)",
             );
           }
         }
@@ -154,16 +155,14 @@ function main() {
       trips.push(
         `session median luminance ratio ${median.toFixed(3)} is outside ` +
           `[${MEDIAN_MIN_RATIO}, ${MEDIAN_MAX_RATIO}] — the whole capture session looks ` +
-            "uniformly dimmed/brightened (issue #101)",
+          "uniformly dimmed/brightened (issue #101)",
       );
     }
   }
 
   if (trips.length > 0) {
     for (const t of trips) console.error(`LUMINANCE GUARD FAIL (issue #101): ${t}`);
-    console.error(
-      "LUMINANCE GUARD: refusing this capture set — nothing may be committed from it.",
-    );
+    console.error("LUMINANCE GUARD: refusing this capture set — nothing may be committed from it.");
     return 1;
   }
   console.log(`guard: PASS — ${captures.length} capture(s) show no dimming/scrim signature.`);

@@ -24,13 +24,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 function codeOf(rel) {
   const source = readFileSync(join(here, "..", rel), "utf8");
-  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+  return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
 /** Extract one styled(...) block starting at its const declaration. */
 function styledBlock(code, constName) {
   const start = code.indexOf(`const ${constName} = styled(`);
-  assert.ok(start >= 0, `${constName} styled definition not found`);
+  assert.ok(start !== -1, `${constName} styled definition not found`);
   const end = code.indexOf("});", start);
   assert.ok(end > start, `${constName} styled definition is not terminated`);
   return code.slice(start, end);

@@ -51,7 +51,7 @@ const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("MealPlansPage source is readable and non-trivial", () => {
   assert.ok(code.length > 1000, "expected the full MealPlansPage source");
@@ -115,7 +115,7 @@ test("loading swaps content before the empty and list branches", () => {
   const loadingAt = code.indexOf("{isLoading ? (");
   const emptyAt = code.indexOf("plans.length === 0");
   const listAt = code.indexOf("plans.map");
-  assert.ok(loadingAt >= 0, "the loading branch must key off isLoading");
+  assert.ok(loadingAt !== -1, "the loading branch must key off isLoading");
   assert.ok(emptyAt > loadingAt, "the empty branch must follow the loading branch");
   assert.ok(listAt > emptyAt, "the list branch must follow the empty branch");
   assert.match(code, /<Spinner label="Loading" \/>/, "loading must render the Spinner");
