@@ -857,27 +857,38 @@ function IngredientsPanel({
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
   return (
     <YStack padding="$4">
-      <NumberStepper
-        label="Servings"
-        value={view.servings}
-        min={1}
-        onChange={view.onServingsChange}
-      />
-      <XStack marginBlockEnd="$4" flexWrap="wrap" alignItems="center" gap="$2">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          fontWeight={tokens.typography.fontWeight.medium}
-          color={tokens.colors.gray.gray8}
-        >
-          Scale:
-        </Text>
-        <ToggleChipGroup
-          options={SCALE_OPTIONS}
-          mode="single"
-          value={view.scaleValue}
-          onChange={view.onScaleChange}
+      {/* Servings + scale controls (#73): one compact block, two fixed
+          rows. Servings is an inline stepper (label beside the stepper,
+          current value in a fixed-width box); Scale is a single
+          non-wrapping row of equal-width chips. Neither row can change
+          height or shift when values change, and every change is one
+          tap. Same props contract as before — the app wiring is
+          untouched. */}
+      <YStack gap="$3" marginBlockEnd="$4">
+        <NumberStepper
+          label="Servings"
+          layout="inline"
+          value={view.servings}
+          min={1}
+          onChange={view.onServingsChange}
         />
-      </XStack>
+        <XStack alignItems="center" gap="$3">
+          <Text
+            fontSize={tokens.typography.fontSize.sm}
+            fontWeight={tokens.typography.fontWeight.medium}
+            color={tokens.colors.gray.gray8}
+          >
+            Scale
+          </Text>
+          <ToggleChipGroup
+            options={SCALE_OPTIONS}
+            mode="single"
+            wrap={false}
+            value={view.scaleValue}
+            onChange={view.onScaleChange}
+          />
+        </XStack>
+      </YStack>
       {view.ingredients.map((ingredient) => (
         <TouchableOpacity
           key={ingredient.id}
