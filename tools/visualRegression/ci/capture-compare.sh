@@ -69,6 +69,15 @@ display_standard() {
   # screencap holds the whole page; unset = production behavior.
   if [ -n "${DSVR_SPIKE_SURFACE_H:-}" ]; then
     adb shell wm size "1080x${DSVR_SPIKE_SURFACE_H}"
+    # SPIKE (issue #137, runs A/A2): at a tall surface the Pixel
+    # Launcher — which renders its workspace at full display size
+    # under swiftshader — stalls past the ANR threshold, and its
+    # "isn't responding" dialog + frozen backdrop contaminate
+    # every capture (the known #112 dialog, made systematic).
+    # The capture flow never needs the launcher (explicit component
+    # launch + deep links), so disable the package for the session
+    # (CI emulators are throwaway; nothing to restore).
+    adb shell pm disable-user --user 0 com.google.android.apps.nexuslauncher || true
   else
     adb shell wm size reset
   fi
