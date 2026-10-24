@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { FlatList, TouchableOpacity } from "react-native";
 import { Image, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
@@ -57,6 +57,22 @@ import { TextField } from "../components/TextField.js";
  * null everywhere else). The form itself, its state, and its
  * mutation stay in the app; other rows' buttons and the
  * `onLogCookPress` firing semantics are unchanged.
+ *
+ * Collapsed filters (#96): the filter bar used to render every
+ * filter control at once, and the form filled most of the
+ * viewport. Now only the search field and a small "Filters"
+ * button render initially. The button opens an add-filter
+ * chooser; a filter's control renders only after it has been
+ * added, and each added filter carries a Remove control that
+ * clears its values (through the same change callbacks) and
+ * hides it again. Which filters are added — and whether the
+ * chooser is open — are controlled props (`activeFilters`,
+ * `filterChooserOpen`, with matching change callbacks) so the
+ * app can own the state per the #49 architecture; when the app
+ * does not provide them, the view keeps them internally,
+ * seeding the added set from any filter that already carries a
+ * non-default value so a pre-filtered screen never hides its
+ * own active filters.
  */
 
 // List content geometry on the DS spacing scale, mirroring the app
@@ -109,6 +125,28 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
   { value: "asc", label: "Low to high" },
 ];
 
+/** The addable filters of the collapsed filter bar (#96). The
+ * calorie and satiety ranges each count as one filter (their
+ * min/max fields add and remove together), as do the Sort by /
+ * Order selects. */
+export type RecipesPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
+
+const FILTER_LABELS: Record<RecipesPageFilterId, string> = {
+  status: "Status",
+  ingredient: "Ingredient",
+  calories: "Calories",
+  satiety: "Satiety",
+  sort: "Sort",
+};
+
+const ALL_FILTER_IDS: RecipesPageFilterId[] = [
+  "status",
+  "ingredient",
+  "calories",
+  "satiety",
+  "sort",
+];
+
 export interface RecipesPageProps {
   /** Recipes to render, already filtered/sorted by the app. */
   recipes: RecipesPageItem[];
@@ -158,6 +196,18 @@ export interface RecipesPageProps {
   onSortChange: (value: string) => void;
   sortDir: string;
   onSortDirChange: (value: string) => void;
+  /** Filters currently added to the bar (#96). Controlled: when
+   * provided, the view renders exactly these filters' controls;
+   * when omitted, the view tracks the added set internally,
+   * seeded from the filters carrying non-default values. */
+  activeFilters?: RecipesPageFilterId[];
+  /** Fires with the next added set whenever the user adds or
+   * removes a filter, in controlled and uncontrolled use alike. */
+  onActiveFiltersChange?: (filters: RecipesPageFilterId[]) => void;
+  /** Whether the add-filter chooser is open (#96). Controlled
+   * like `activeFilters`; uncontrolled when omitted. */
+  filterChooserOpen?: boolean;
+  onFilterChooserOpenChange?: (open: boolean) => void;
 }
 
 type FilterControlsProps = Pick<
@@ -181,6 +231,10 @@ type FilterControlsProps = Pick<
   | "onSortChange"
   | "sortDir"
   | "onSortDirChange"
+  | "activeFilters"
+  | "onActiveFiltersChange"
+  | "filterChooserOpen"
+  | "onFilterChooserOpenChange"
 >;
 
 function NumberFilter({
@@ -205,9 +259,42 @@ function NumberFilter({
   );
 }
 
-/** The filter bar, control-for-control the app's RecipeListFiltersBar:
- * search, the status select, ingredient, min/max calorie and satiety
- * number fields, and the Sort by / Order selects. */
+/** One added filter: its control(s) plus the Remove control that
+ * clears and hides it (#96). */
+function AddedFilter({
+  id,
+  onRemove,
+  children,
+}: {
+  id: RecipesPageFilterId;
+  onRemove: (id: RecipesPageFilterId) => void;
+  children: ReactNode;
+}) {
+  return (
+    <YStack gap={tokens.spacing[1]}>
+      <XStack justifyContent="flex-end">
+        <Button
+          variant="ghost"
+          size="sm"
+          accessibilityLabel={`Remove ${FILTER_LABELS[id]} filter`}
+          onPress={() => {
+            onRemove(id);
+          }}
+        >
+          Remove
+        </Button>
+      </XStack>
+      {children}
+    </YStack>
+  );
+}
+
+/** The collapsed filter bar (#96): search and a small Filters
+ * button initially; the button opens a chooser of the filters not
+ * yet added, and a filter's control — the same controls the bar
+ * always rendered: the status select, ingredient, min/max calorie
+ * and satiety number fields, and the Sort by / Order selects —
+ * renders only once that filter has been added. */
 function RecipesFiltersBar({
   search,
   onSearchChange,
@@ -228,45 +315,155 @@ function RecipesFiltersBar({
   sortDir,
   onSortDirChange,
   showStatusFilter = true,
+  activeFilters,
+  onActiveFiltersChange,
+  filterChooserOpen,
+  onFilterChooserOpenChange,
 }: FilterControlsProps) {
+  const statusAvailable =
+    showStatusFilter && statusFilter !== undefined && onStatusFilterChange !== undefined;
+  const available = ALL_FILTER_IDS.filter((id) => id !== "status" || statusAvailable);
+  // Uncontrolled seed: a filter that already carries a non-default
+  // value starts added, so existing callers that preset filter
+  // values keep seeing (and can clear) those filters.
+  const [internalActiveFilters, setInternalActiveFilters] = useState<RecipesPageFilterId[]>(() => {
+    const seeded: RecipesPageFilterId[] = [];
+    if (statusAvailable && statusFilter !== "all") seeded.push("status");
+    if (ingredient !== "") seeded.push("ingredient");
+    if (minCalories !== "" || maxCalories !== "") seeded.push("calories");
+    if (minSatiety !== "" || maxSatiety !== "") seeded.push("satiety");
+    if (sort !== "newest" || sortDir !== "desc") seeded.push("sort");
+    return seeded;
+  });
+  const [internalChooserOpen, setInternalChooserOpen] = useState(false);
+  const active = activeFilters ?? internalActiveFilters;
+  const chooserOpen = filterChooserOpen ?? internalChooserOpen;
+  const addable = available.filter((id) => !active.includes(id));
+
+  const setActive = (next: RecipesPageFilterId[]) => {
+    if (activeFilters === undefined) setInternalActiveFilters(next);
+    onActiveFiltersChange?.(next);
+  };
+  const setChooserOpen = (open: boolean) => {
+    if (filterChooserOpen === undefined) setInternalChooserOpen(open);
+    onFilterChooserOpenChange?.(open);
+  };
+  const addFilter = (id: RecipesPageFilterId) => {
+    setActive([...active, id]);
+    setChooserOpen(false);
+  };
+  const removeFilter = (id: RecipesPageFilterId) => {
+    // Removal clears the filter's values through the ordinary
+    // change callbacks, so a hidden filter never keeps filtering.
+    if (id === "status") onStatusFilterChange?.("all");
+    if (id === "ingredient") onIngredientChange("");
+    if (id === "calories") {
+      onMinCaloriesChange("");
+      onMaxCaloriesChange("");
+    }
+    if (id === "satiety") {
+      onMinSatietyChange("");
+      onMaxSatietyChange("");
+    }
+    if (id === "sort") {
+      onSortChange("newest");
+      onSortDirChange("desc");
+    }
+    setActive(active.filter((filterId) => filterId !== id));
+  };
+
   return (
     <YStack gap={tokens.spacing[3]}>
-      <SearchField value={search} onChangeText={onSearchChange} placeholder="Search recipes…" />
-      {showStatusFilter && statusFilter !== undefined && onStatusFilterChange ? (
-        <SelectField
-          label="Status"
-          value={statusFilter}
-          options={STATUS_OPTIONS}
-          onValueChange={onStatusFilterChange}
-        />
+      <XStack gap={tokens.spacing[2]} alignItems="flex-start">
+        <YStack flex={1}>
+          <SearchField value={search} onChangeText={onSearchChange} placeholder="Search recipes…" />
+        </YStack>
+        {addable.length > 0 ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            accessibilityLabel="Add a filter"
+            aria-expanded={chooserOpen}
+            onPress={() => {
+              setChooserOpen(!chooserOpen);
+            }}
+          >
+            Filters
+          </Button>
+        ) : null}
+      </XStack>
+      {chooserOpen && addable.length > 0 ? (
+        <XStack gap={tokens.spacing[2]} flexWrap="wrap">
+          {addable.map((id) => (
+            <Button
+              key={id}
+              variant="secondary"
+              size="sm"
+              accessibilityLabel={`Add ${FILTER_LABELS[id]} filter`}
+              onPress={() => {
+                addFilter(id);
+              }}
+            >
+              {FILTER_LABELS[id]}
+            </Button>
+          ))}
+        </XStack>
       ) : null}
-      <TextField
-        label="Ingredient"
-        accessibilityLabel="Ingredient"
-        value={ingredient}
-        onChangeText={onIngredientChange}
-        placeholder="e.g. chicken"
-      />
-      <XStack gap={tokens.spacing[2]}>
-        <NumberFilter label="Min cal" value={minCalories} onChange={onMinCaloriesChange} />
-        <NumberFilter label="Max cal" value={maxCalories} onChange={onMaxCaloriesChange} />
-      </XStack>
-      <XStack gap={tokens.spacing[2]}>
-        <NumberFilter label="Min satiety" value={minSatiety} onChange={onMinSatietyChange} />
-        <NumberFilter label="Max satiety" value={maxSatiety} onChange={onMaxSatietyChange} />
-      </XStack>
-      <SelectField
-        label="Sort by"
-        value={sort}
-        options={SORT_OPTIONS}
-        onValueChange={onSortChange}
-      />
-      <SelectField
-        label="Order"
-        value={sortDir}
-        options={SORT_DIR_OPTIONS}
-        onValueChange={onSortDirChange}
-      />
+      {active.includes("status") && statusAvailable ? (
+        <AddedFilter id="status" onRemove={removeFilter}>
+          <SelectField
+            label="Status"
+            value={statusFilter}
+            options={STATUS_OPTIONS}
+            onValueChange={onStatusFilterChange}
+          />
+        </AddedFilter>
+      ) : null}
+      {active.includes("ingredient") ? (
+        <AddedFilter id="ingredient" onRemove={removeFilter}>
+          <TextField
+            label="Ingredient"
+            accessibilityLabel="Ingredient"
+            value={ingredient}
+            onChangeText={onIngredientChange}
+            placeholder="e.g. chicken"
+          />
+        </AddedFilter>
+      ) : null}
+      {active.includes("calories") ? (
+        <AddedFilter id="calories" onRemove={removeFilter}>
+          <XStack gap={tokens.spacing[2]}>
+            <NumberFilter label="Min cal" value={minCalories} onChange={onMinCaloriesChange} />
+            <NumberFilter label="Max cal" value={maxCalories} onChange={onMaxCaloriesChange} />
+          </XStack>
+        </AddedFilter>
+      ) : null}
+      {active.includes("satiety") ? (
+        <AddedFilter id="satiety" onRemove={removeFilter}>
+          <XStack gap={tokens.spacing[2]}>
+            <NumberFilter label="Min satiety" value={minSatiety} onChange={onMinSatietyChange} />
+            <NumberFilter label="Max satiety" value={maxSatiety} onChange={onMaxSatietyChange} />
+          </XStack>
+        </AddedFilter>
+      ) : null}
+      {active.includes("sort") ? (
+        <AddedFilter id="sort" onRemove={removeFilter}>
+          <YStack gap={tokens.spacing[3]}>
+            <SelectField
+              label="Sort by"
+              value={sort}
+              options={SORT_OPTIONS}
+              onValueChange={onSortChange}
+            />
+            <SelectField
+              label="Order"
+              value={sortDir}
+              options={SORT_DIR_OPTIONS}
+              onValueChange={onSortDirChange}
+            />
+          </YStack>
+        </AddedFilter>
+      ) : null}
     </YStack>
   );
 }
