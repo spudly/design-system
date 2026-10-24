@@ -15,10 +15,10 @@ the field to 1826px on a Pixel 8a) passed every web check.
 | Host app         | `apps/storybook/`                                                  | Expo (SDK 58) app mounting @storybook/react-native v10 with the repo's stories. Also the capture target for the VR driver.                                                                                                                                                      |
 | On-device config | `src/tamagui.config.ts` → `createOnDeviceStorybookTamaguiConfig()` | Combined three-brand config (base, Warm Harvest, Quiet Dawn) with native font registrations. The web combined config uses CSS-variable font stacks, invalid on native. One process-wide config either way — Tamagui cannot swap brand configs at runtime (spudly/eciperay#149). |
 | Preview          | `apps/storybook/.rnstorybook/preview.tsx`                          | Mirrors the web preview: a `theme` global (the six sub-theme names, e.g. `light_warmHarvest`, `dark_quietDawn`) drives `defaultTheme`, keyed remount per theme.                                                                                                                 |
-| VR driver        | `tools/visual-regression/run.mjs`                                  | Drives the app over ADB, captures screenshots, pixel-compares against baselines. Zero dependencies (own PNG codec in `png.mjs`, validated round-trip against PIL).                                                                                                              |
-| Luminance guard  | `tools/visual-regression/guard.mjs`                                | Pre-commit check on fresh captures: rejects a set that looks uniformly dimmed or scrimmed (issue #101) before CI may turn it into baselines (below).                                                                                                                             |
-| Baselines        | `tools/visual-regression/baselines/<theme>/<storyId>.png`          | Committed reference screenshots.                                                                                                                                                                                                                                                |
-| Sanity patch     | `tools/visual-regression/sanity/searchfield-162.patch`             | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                   |
+| VR driver        | `tools/visualRegression/run.mjs`                                   | Drives the app over ADB, captures screenshots, pixel-compares against baselines. Zero dependencies (own PNG codec in `png.mjs`, validated round-trip against PIL).                                                                                                              |
+| Luminance guard  | `tools/visualRegression/guard.mjs`                                 | Pre-commit check on fresh captures: rejects a set that looks uniformly dimmed or scrimmed (issue #101) before CI may turn it into baselines (below).                                                                                                                            |
+| Baselines        | `tools/visualRegression/baselines/<theme>/<storyId>.png`           | Committed reference screenshots. The narrow-viewport variant's baselines sit in the same folders with a `-narrow` filename suffix.                                                                                                                                              |
+| Sanity patch     | `tools/visualRegression/sanity/searchfield-162.patch`              | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                   |
 | CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job + jobs that commit regenerated baselines to a PR branch (PR auto-commit) or the dispatched branch (update mode) (below).                                                                                                              |
 
 Fonts: the app loads the same faces the apps register — Raleway
@@ -83,8 +83,10 @@ waits for the READY line with the matching nonce, settles, and takes
 
 ### Capture matrix
 
-Default themes: `light_warmHarvest`, `dark_warmHarvest`,
-`light_quietDawn`, `dark_quietDawn` — each brand in both schemes. The
+Default themes: `light_warmHarvest`, `light_quietDawn` — each
+brand's LIGHT theme only (Stephen, 2026-10-24: dark captures
+doubled the snapshot count for a second render of the same layout,
+so dark was dropped from Android VR entirely). The
 plain base themes are the web default for component stories and can
 be added with `--themes light,dark,...`. Pages pin their brand theme
 via story globals on web; in capture mode the driver's theme wins
@@ -107,13 +109,16 @@ over the theme global whenever it is set. Browse mode never sets it.
 
 Stephen's decision, 2026-10-23: the committed baseline set is **page
 stories only, each under its own brand** — `pages-eciperay` under
-Warm Harvest (light + dark) and `pages-memorize` under Quiet Dawn
-(light + dark). With the current story set that is 30 x 2 + 18 x 2 =
-**96 baselines**. Curating hundreds of component screenshots was
+Warm Harvest and `pages-memorize` under Quiet Dawn. Since
+2026-10-24 the set is **light themes only**: dark captures doubled
+the snapshot count (and the job's emulator time) without catching
+layout regressions the light set misses, so the dark baselines were
+deleted outright. With the current story set that is 32 + 18 =
+**50 baselines**. Curating hundreds of component screenshots was
 more review surface than the Android check needs; component stories
 stay covered by Chromatic on web, and wrong-brand page captures are
 excluded because pages pin their brand. The rule lives in the
-`CAPTURE_SCOPE` table in `tools/visual-regression/run.mjs` — the
+`CAPTURE_SCOPE` table in `tools/visualRegression/run.mjs` — the
 driver captures only in-scope (story, theme) pairs in both compare
 and update modes, so the baseline folder and the CI runs follow the
 table. Edit the table to change the scope.
@@ -124,9 +129,66 @@ pixels exceed `--max-ratio` (default 0.1%). Diff visualizations
 (failed pixels in red over a dimmed baseline) are written to
 `<out>/diff/`.
 
+### Narrow-viewport variant: RecipesPage at phone display settings
+
+Stephen's directive, 2026-10-24. The standard set captures at
+`wm density 320` on the pixel_6's 1080px-wide screen — a **540dp
+logical width**, where a page row's fixed-width children never
+squeeze its flexible text. Eciperay #205 shipped exactly through
+that gap: on Stephen's Pixel 8a (display-size override
+`wm density 500` → **345.6dp logical width**, `font_scale 1.3`)
+the RecipesPage row's thumbnail + Log cook/Delete buttons claimed
+the whole row — the buttons grow with the font scale while the row
+shrinks with the density — the `flex:1` title/subtitle block
+starved to ~0dp, and each card stretched past the viewport with no
+text at all. The fix (PR #117: row `flexWrap` + an explicit 60dp
+`flexBasis` on the text block) passed this pipeline with **zero
+baseline movement**, because at 540dp/font 1.0 the pre-fix and
+post-fix renders are identical.
+
+The variant closes that hole. In every mode, after the standard
+pass, `ci/capture-compare.sh` switches the emulator display and
+re-captures **only the RecipesPage stories** (Warm Harvest light —
+the variant follows the light-only policy):
+
+| Setting                          | Value       | Why                                                                  |
+| -------------------------------- | ----------- | -------------------------------------------------------------------- |
+| `wm size`                        | `1080x2400` | Pins the surface so the logical width below is profile-proof.        |
+| `wm density`                     | `500`       | 1080px / (500/160) = **345.6dp logical width** — Stephen's override. |
+| `settings put system font_scale` | `1.3`       | Stephen's font size; this is what inflates the row's buttons.        |
+
+The standard display is restored after the pass, whatever its
+outcome. Scope lives in the `NARROW_SCOPE` table in
+`tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
+7 `pages-eciperay-recipespage` stories x light = **7
+baselines** (57 total). RecipesPage only, deliberately — a second
+full pass would roughly double the job's emulator time, and issue
+#114 is cutting VR time, not growing it.
+
+Baselines are named `<storyId>-narrow.png` in the same
+`baselines/<theme>/` folders, so the variant flows through the
+existing machinery unchanged: PR compare runs check both sets,
+the luminance guard runs per set (each capture is judged against
+its own baseline), the PR auto-commit flow regenerates and commits
+both sets together, and a mode = `update` dispatch regenerates the
+variant baselines in the same run as the standard ones — there is
+no separate regeneration flow to learn.
+
+Sensitivity proof (2026-10-24): with `RecipesPage` reverted to its
+pre-#117 form on a scratch branch, the standard set compared
+100/100 clean while the narrow set failed on 10 of 14 captures —
+including all five content-bearing light captures (default 5.63%,
+filtered 3.83%, filter-chooser-open 4.29%, with-filters-added
+3.16%, expanded-accessory 0.98% of pixels differing), proving the
+variant catches the #205 class in the light theme CI compares.
+Run: https://github.com/spudly/design-system/actions/runs/40108956001
+
 Determinism controls (CI script and recommended locally): fixed
 emulator profile (pixel_6, API 34, google_apis x86_64), `wm density
-320`, `font_scale 1.0`, display pinned awake at full brightness
+320`, `font_scale 1.0` for the standard set (the narrow variant
+pins its own surface — `wm size 1080x2400`, `wm density 500`,
+`font_scale 1.3` — and restores the standard one afterwards),
+display pinned awake at full brightness
 (`svc power stayon`, manual `screen_brightness 255`, 30-minute
 screen-off timeout — a doze-dimmed display otherwise leaks into
 screencap and, in update mode, into committed baselines),
@@ -143,8 +205,9 @@ On a pull request the whole cycle is automatic (Stephen's
 directive, 2026-10-23 — no manual dispatch):
 
 1. **PRs: automatic.** The PR compare run (`capture-compare.sh`,
-   mode `pr-autocommit`) starts with the ordinary strict compare.
-   If every story matches, nothing else happens. If the compare
+   mode `pr-autocommit`) starts with the ordinary strict compare
+   of both capture sets (standard + narrow variant). If every
+   story matches, nothing else happens. If the compare
    fails and **every failure is a pixel diff** (a capture failure —
    deep link, READY timeout, screencap — means an incomplete set
    and stops the flow), the job regenerates the baselines from the
@@ -153,7 +216,7 @@ directive, 2026-10-23 — no manual dispatch):
    compares against the regenerated set, in the same job**. Only a
    set that passes that in-job re-compare is committed: the
    `commit-pr-baselines` job syncs it into
-   `tools/visual-regression/baselines/` and pushes it to the PR's
+   `tools/visualRegression/baselines/` and pushes it to the PR's
    head branch as github-actions[bot] ("chore(vr): update Android
    Storybook baselines"). Review the baseline PNGs in the PR diff
    like any other change — a green VR check on a PR whose head
@@ -169,9 +232,10 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
    (Actions → "Android Storybook VR" → Run workflow) with
    mode = `update`, **from the PR branch**. It captures everything
    in the capture scope (page stories, own brand — see "Capture
-   scope" above) and does not compare. The follow-on
+   scope" above) plus the narrow-viewport variant set, and does
+   not compare. The follow-on
    `commit-baselines` job then syncs the fresh screenshots into
-   `tools/visual-regression/baselines/` and — only if something
+   `tools/visualRegression/baselines/` and — only if something
    actually changed — commits them to the dispatched branch as
    github-actions[bot] ("chore(vr): update Android Storybook
    baselines") and pushes. The regenerated baselines therefore show
@@ -192,14 +256,15 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
 5. A baseline commit's push does not auto-run the PR's checks:
    GitHub parks workflow runs for bot-token pushes as
    "action_required", so a maintainer approves the follow-up run in
-   the Actions UI (or pushes to the branch) to get the compare run.
-   For the PR flow that parked run is not a blocker — the in-job
-   re-compare already verified the committed set — and when it does
-   run it compares against the just-committed baselines and passes
-   with no diffs, so the bot never commits twice for the same
-   change.
+   the Actions UI (or pushes to the branch). For the PR flow that
+   parked run is not a blocker — the in-job re-compare already
+   verified the committed set — and when it does run, the job's
+   bot-head detection (head commit authored by github-actions[bot]
+   with the auto-commit message and baseline files only) passes it
+   immediately without re-capturing, so the bot never commits twice
+   for the same change.
 
-Locally (with an emulator): `node tools/visual-regression/run.mjs --update`.
+Locally (with an emulator): `node tools/visualRegression/run.mjs --update`.
 
 ### The luminance guard (issue #101 mitigation)
 
@@ -208,7 +273,7 @@ dimmed emulator display (every story uniformly darkened to ~40%
 brightness) despite the display pin in the CI script. A compare run
 in that state only fails loudly, but the PR auto-commit path turns
 captures into baselines — a dimmed set committed as baselines would
-poison every future compare. `tools/visual-regression/guard.mjs`
+poison every future compare. `tools/visualRegression/guard.mjs`
 therefore gates the automatic path. Over the fresh captures it
 rejects the whole set when:
 
@@ -231,11 +296,11 @@ become baselines via the automatic path.
 ## The #162 sanity check
 
 Acceptance requires proof the pipeline catches the bug class it
-exists for. `tools/visual-regression/sanity/searchfield-162.patch`
+exists for. `tools/visualRegression/sanity/searchfield-162.patch`
 reintroduces the bug into `src/components/SearchField.tsx`: the drawn
 shapes glyph becomes the pre-fix text glyph with a numeric
 `lineHeight` equal to its `fontSize` (the exact pattern
-`test/glyph-line-height.test.mjs` bans in committed source), and the
+`test/glyphLineHeight.test.mjs` bans in committed source), and the
 post-#162 clip-box hardening (`height: 44; overflow: hidden` on the
 glyph box) is removed. On web this renders identically (a web line
 box honors lineHeight exactly); on Android the text glyph's line box
@@ -254,7 +319,7 @@ revert) in the same PR.
 ## CI scoping
 
 The workflow is path-filtered to `src/**`, `apps/storybook/**`,
-`tools/visual-regression/**` and itself, because Actions minutes are
+`tools/visualRegression/**` and itself, because Actions minutes are
 on paid overage until 2026-11-01 and an emulator job is the most
 expensive kind. It builds a **release** APK with the JS bundle
 embedded (the generated template signs it with the debug keystore,

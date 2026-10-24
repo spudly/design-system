@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { FlatList, TouchableOpacity } from "react-native";
 import { Image, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
@@ -36,7 +36,7 @@ import { TextField } from "../components/TextField.js";
  *   list's header so it scrolls with the recipes instead of pinning
  *   above a sliver of list. The list — and therefore the focused
  *   filter input — stays mounted while loading; the spinner renders
- *   as the list's empty state. test/recipes-page-bounded-list.test.mjs
+ *   as the list's empty state. test/recipesPageBoundedList.test.mjs
  *   guards these patterns in source.
  * - #162: search uses the DS SearchField as-is. No lineHeight is set
  *   on any glyph or text in this file — the SearchField's own glyph
@@ -51,12 +51,49 @@ import { TextField } from "../components/TextField.js";
  * the view calls the render prop once per row with the row's id and
  * renders whatever comes back directly under that row's card;
  * returning null/undefined renders nothing. When a row's accessory
- * is non-null, that row's "Log cook" button is hidden — the app
- * reproduces its card's button-hides-while-the-form-is-open
+ * is non-null, that row's log-cook control is hidden — the app
+ * reproduces its card's control-hides-while-the-form-is-open
  * behavior purely by what it returns (the form for the open row,
  * null everywhere else). The form itself, its state, and its
- * mutation stay in the app; other rows' buttons and the
+ * mutation stay in the app; other rows' controls and the
  * `onLogCookPress` firing semantics are unchanged.
+ *
+ * Row actions: the row's only action is logging a cook, and the
+ * control is the recipe's rating. A rated recipe renders its stars
+ * (see `RecipesPageItem.rating`) and pressing them fires
+ * `onLogCookPress`; an unrated recipe renders a single icon-only
+ * button — one unfilled star, no text — firing the same callback.
+ * There is deliberately no Delete in the list: deleting a recipe
+ * lives on RecipeDetailPage (its `onDeletePress` chip).
+ *
+ * Placement is structural, not cosmetic (Stephen's direction,
+ * 2026-10-24, after inspecting PR #120's final narrow baseline):
+ * the control renders INLINE inside the text block — in the
+ * subtitle's wrapping flow, immediately after the subtitle text —
+ * and is never a flex item of the card row. As a trailing row item
+ * it still competed with the text block for the row's width and
+ * the narrow capture showed the same #205 failure (title wrapping
+ * a character at a time while the stars held their width at the
+ * row's right edge). Inside the text block the control can only
+ * wrap within the block's own full width, below the subtitle it
+ * follows; the row keeps exactly two flex children — thumbnail
+ * and text block.
+ *
+ * Collapsed filters (#96): the filter bar used to render every
+ * filter control at once, and the form filled most of the
+ * viewport. Now only the search field and a small "Filters"
+ * button render initially. The button opens an add-filter
+ * chooser; a filter's control renders only after it has been
+ * added, and each added filter carries a Remove control that
+ * clears its values (through the same change callbacks) and
+ * hides it again. Which filters are added — and whether the
+ * chooser is open — are controlled props (`activeFilters`,
+ * `filterChooserOpen`, with matching change callbacks) so the
+ * app can own the state per the #49 architecture; when the app
+ * does not provide them, the view keeps them internally,
+ * seeding the added set from any filter that already carries a
+ * non-default value so a pre-filtered screen never hides its
+ * own active filters.
  */
 
 // List content geometry on the DS spacing scale, mirroring the app
@@ -73,8 +110,20 @@ const listContentStyle = {
 const listStyle = { flex: 1 } as const;
 
 // Structural flex only: the card's text block expands and may shrink
-// within the row (mirrors the app's ThumbnailListCard).
-const textBlockStyle = { flex: 1, minWidth: 0 } as const;
+// within the row (mirrors the app's ThumbnailListCard). The explicit
+// flexBasis matters (eciperay #205): with a plain `flex: 1` the basis
+// is 0, so on narrow viewports (e.g. a phone at the largest display
+// size, ~314dp wide) the row's fixed child — the 64dp thumbnail —
+// and any trailing row item consume the entire row and the text
+// block collapses to ~0dp wide. Text measured at ~0 width paints
+// nothing yet measures extremely tall, which stretched the card past
+// the viewport with only the thumbnail visible. A 60dp basis gives
+// the row a real line-breaking size, and the text block grows to
+// fill its line. (The log-cook control is no longer a row item at
+// all — it renders inline inside this block; see the header's row
+// actions note.) At ordinary widths nothing changes — the basis is
+// below the width the block already gets, so it still just expands.
+const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
 
 /** One recipe row's view-model. The app formats `subtitle` (its list
  * meta line — servings · time · rating/satiety); the view only
@@ -83,6 +132,14 @@ export interface RecipesPageItem {
   id: string;
   title: string;
   subtitle?: string;
+  /** Display rating, 0–5, or null/absent when the recipe is
+   * unrated. The app computes it by its display-rating rule (the
+   * owner's star rating, else the community average); the view
+   * renders it as the row's log-cook control — a rated recipe's
+   * stars are the control, an unrated recipe gets an icon-only
+   * button — and never formats it into the subtitle, so an app
+   * that passes `rating` keeps the rating text out of `subtitle`. */
+  rating?: number | null;
   imageUrl?: string | null;
 }
 
@@ -109,6 +166,28 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
   { value: "asc", label: "Low to high" },
 ];
 
+/** The addable filters of the collapsed filter bar (#96). The
+ * calorie and satiety ranges each count as one filter (their
+ * min/max fields add and remove together), as do the Sort by /
+ * Order selects. */
+export type RecipesPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
+
+const FILTER_LABELS: Record<RecipesPageFilterId, string> = {
+  status: "Status",
+  ingredient: "Ingredient",
+  calories: "Calories",
+  satiety: "Satiety",
+  sort: "Sort",
+};
+
+const ALL_FILTER_IDS: RecipesPageFilterId[] = [
+  "status",
+  "ingredient",
+  "calories",
+  "satiety",
+  "sort",
+];
+
 export interface RecipesPageProps {
   /** Recipes to render, already filtered/sorted by the app. */
   recipes: RecipesPageItem[];
@@ -118,19 +197,21 @@ export interface RecipesPageProps {
   /** Next page in flight: a spinner renders as the list footer. */
   isFetchingNextPage?: boolean;
   onRecipePress: (recipeId: string) => void;
-  /** Optional row actions, mirroring the app card's buttons. "Log
-   * cook" is a callback only — the cook-log form and its mutation
-   * stay in the app, which renders them (see
-   * `renderRecipeAccessory`); the view owns the button. */
+  /** Optional row action, mirroring the app card's log-cook
+   * affordance. "Log cook" is a callback only — the cook-log form
+   * and its mutation stay in the app, which renders them (see
+   * `renderRecipeAccessory`); the view owns the control: the
+   * recipe's stars when it has a rating, a single icon-only button
+   * when it does not. There is no delete callback — deleting a
+   * recipe is a RecipeDetailPage action, not a list action. */
   onLogCookPress?: (recipeId: string) => void;
-  onRecipeDelete?: (recipeId: string) => void;
   /** Optional per-row accessory slot: called once per row with the
    * row's id; the returned node renders directly under that row's
    * card, inside the list item. Return null/undefined to render
    * nothing. When a row's accessory renders non-null content, that
-   * row's "Log cook" button is hidden — the app returns its inline
+   * row's log-cook control is hidden — the app returns its inline
    * cook-log form for the row whose form is open and null elsewhere,
-   * which reproduces the app card's button-hides-while-open
+   * which reproduces the app card's control-hides-while-open
    * behavior. */
   renderRecipeAccessory?: (recipeId: string) => ReactNode;
   /** Pagination hook, wired to the list's end-reached signal. */
@@ -158,6 +239,18 @@ export interface RecipesPageProps {
   onSortChange: (value: string) => void;
   sortDir: string;
   onSortDirChange: (value: string) => void;
+  /** Filters currently added to the bar (#96). Controlled: when
+   * provided, the view renders exactly these filters' controls;
+   * when omitted, the view tracks the added set internally,
+   * seeded from the filters carrying non-default values. */
+  activeFilters?: RecipesPageFilterId[];
+  /** Fires with the next added set whenever the user adds or
+   * removes a filter, in controlled and uncontrolled use alike. */
+  onActiveFiltersChange?: (filters: RecipesPageFilterId[]) => void;
+  /** Whether the add-filter chooser is open (#96). Controlled
+   * like `activeFilters`; uncontrolled when omitted. */
+  filterChooserOpen?: boolean;
+  onFilterChooserOpenChange?: (open: boolean) => void;
 }
 
 type FilterControlsProps = Pick<
@@ -181,6 +274,10 @@ type FilterControlsProps = Pick<
   | "onSortChange"
   | "sortDir"
   | "onSortDirChange"
+  | "activeFilters"
+  | "onActiveFiltersChange"
+  | "filterChooserOpen"
+  | "onFilterChooserOpenChange"
 >;
 
 function NumberFilter({
@@ -205,9 +302,42 @@ function NumberFilter({
   );
 }
 
-/** The filter bar, control-for-control the app's RecipeListFiltersBar:
- * search, the status select, ingredient, min/max calorie and satiety
- * number fields, and the Sort by / Order selects. */
+/** One added filter: its control(s) plus the Remove control that
+ * clears and hides it (#96). */
+function AddedFilter({
+  id,
+  onRemove,
+  children,
+}: {
+  id: RecipesPageFilterId;
+  onRemove: (id: RecipesPageFilterId) => void;
+  children: ReactNode;
+}) {
+  return (
+    <YStack gap={tokens.spacing[1]}>
+      <XStack justifyContent="flex-end">
+        <Button
+          variant="ghost"
+          size="sm"
+          accessibilityLabel={`Remove ${FILTER_LABELS[id]} filter`}
+          onPress={() => {
+            onRemove(id);
+          }}
+        >
+          Remove
+        </Button>
+      </XStack>
+      {children}
+    </YStack>
+  );
+}
+
+/** The collapsed filter bar (#96): search and a small Filters
+ * button initially; the button opens a chooser of the filters not
+ * yet added, and a filter's control — the same controls the bar
+ * always rendered: the status select, ingredient, min/max calorie
+ * and satiety number fields, and the Sort by / Order selects —
+ * renders only once that filter has been added. */
 function RecipesFiltersBar({
   search,
   onSearchChange,
@@ -228,45 +358,155 @@ function RecipesFiltersBar({
   sortDir,
   onSortDirChange,
   showStatusFilter = true,
+  activeFilters,
+  onActiveFiltersChange,
+  filterChooserOpen,
+  onFilterChooserOpenChange,
 }: FilterControlsProps) {
+  const statusAvailable =
+    showStatusFilter && statusFilter !== undefined && onStatusFilterChange !== undefined;
+  const available = ALL_FILTER_IDS.filter((id) => id !== "status" || statusAvailable);
+  // Uncontrolled seed: a filter that already carries a non-default
+  // value starts added, so existing callers that preset filter
+  // values keep seeing (and can clear) those filters.
+  const [internalActiveFilters, setInternalActiveFilters] = useState<RecipesPageFilterId[]>(() => {
+    const seeded: RecipesPageFilterId[] = [];
+    if (statusAvailable && statusFilter !== "all") seeded.push("status");
+    if (ingredient !== "") seeded.push("ingredient");
+    if (minCalories !== "" || maxCalories !== "") seeded.push("calories");
+    if (minSatiety !== "" || maxSatiety !== "") seeded.push("satiety");
+    if (sort !== "newest" || sortDir !== "desc") seeded.push("sort");
+    return seeded;
+  });
+  const [internalChooserOpen, setInternalChooserOpen] = useState(false);
+  const active = activeFilters ?? internalActiveFilters;
+  const chooserOpen = filterChooserOpen ?? internalChooserOpen;
+  const addable = available.filter((id) => !active.includes(id));
+
+  const setActive = (next: RecipesPageFilterId[]) => {
+    if (activeFilters === undefined) setInternalActiveFilters(next);
+    onActiveFiltersChange?.(next);
+  };
+  const setChooserOpen = (open: boolean) => {
+    if (filterChooserOpen === undefined) setInternalChooserOpen(open);
+    onFilterChooserOpenChange?.(open);
+  };
+  const addFilter = (id: RecipesPageFilterId) => {
+    setActive([...active, id]);
+    setChooserOpen(false);
+  };
+  const removeFilter = (id: RecipesPageFilterId) => {
+    // Removal clears the filter's values through the ordinary
+    // change callbacks, so a hidden filter never keeps filtering.
+    if (id === "status") onStatusFilterChange?.("all");
+    if (id === "ingredient") onIngredientChange("");
+    if (id === "calories") {
+      onMinCaloriesChange("");
+      onMaxCaloriesChange("");
+    }
+    if (id === "satiety") {
+      onMinSatietyChange("");
+      onMaxSatietyChange("");
+    }
+    if (id === "sort") {
+      onSortChange("newest");
+      onSortDirChange("desc");
+    }
+    setActive(active.filter((filterId) => filterId !== id));
+  };
+
   return (
     <YStack gap={tokens.spacing[3]}>
-      <SearchField value={search} onChangeText={onSearchChange} placeholder="Search recipes…" />
-      {showStatusFilter && statusFilter !== undefined && onStatusFilterChange ? (
-        <SelectField
-          label="Status"
-          value={statusFilter}
-          options={STATUS_OPTIONS}
-          onValueChange={onStatusFilterChange}
-        />
+      <XStack gap={tokens.spacing[2]} alignItems="flex-start">
+        <YStack flex={1}>
+          <SearchField value={search} onChangeText={onSearchChange} placeholder="Search recipes…" />
+        </YStack>
+        {addable.length > 0 ? (
+          <Button
+            variant="secondary"
+            size="sm"
+            accessibilityLabel="Add a filter"
+            aria-expanded={chooserOpen}
+            onPress={() => {
+              setChooserOpen(!chooserOpen);
+            }}
+          >
+            Filters
+          </Button>
+        ) : null}
+      </XStack>
+      {chooserOpen && addable.length > 0 ? (
+        <XStack gap={tokens.spacing[2]} flexWrap="wrap">
+          {addable.map((id) => (
+            <Button
+              key={id}
+              variant="secondary"
+              size="sm"
+              accessibilityLabel={`Add ${FILTER_LABELS[id]} filter`}
+              onPress={() => {
+                addFilter(id);
+              }}
+            >
+              {FILTER_LABELS[id]}
+            </Button>
+          ))}
+        </XStack>
       ) : null}
-      <TextField
-        label="Ingredient"
-        accessibilityLabel="Ingredient"
-        value={ingredient}
-        onChangeText={onIngredientChange}
-        placeholder="e.g. chicken"
-      />
-      <XStack gap={tokens.spacing[2]}>
-        <NumberFilter label="Min cal" value={minCalories} onChange={onMinCaloriesChange} />
-        <NumberFilter label="Max cal" value={maxCalories} onChange={onMaxCaloriesChange} />
-      </XStack>
-      <XStack gap={tokens.spacing[2]}>
-        <NumberFilter label="Min satiety" value={minSatiety} onChange={onMinSatietyChange} />
-        <NumberFilter label="Max satiety" value={maxSatiety} onChange={onMaxSatietyChange} />
-      </XStack>
-      <SelectField
-        label="Sort by"
-        value={sort}
-        options={SORT_OPTIONS}
-        onValueChange={onSortChange}
-      />
-      <SelectField
-        label="Order"
-        value={sortDir}
-        options={SORT_DIR_OPTIONS}
-        onValueChange={onSortDirChange}
-      />
+      {active.includes("status") && statusAvailable ? (
+        <AddedFilter id="status" onRemove={removeFilter}>
+          <SelectField
+            label="Status"
+            value={statusFilter}
+            options={STATUS_OPTIONS}
+            onValueChange={onStatusFilterChange}
+          />
+        </AddedFilter>
+      ) : null}
+      {active.includes("ingredient") ? (
+        <AddedFilter id="ingredient" onRemove={removeFilter}>
+          <TextField
+            label="Ingredient"
+            accessibilityLabel="Ingredient"
+            value={ingredient}
+            onChangeText={onIngredientChange}
+            placeholder="e.g. chicken"
+          />
+        </AddedFilter>
+      ) : null}
+      {active.includes("calories") ? (
+        <AddedFilter id="calories" onRemove={removeFilter}>
+          <XStack gap={tokens.spacing[2]}>
+            <NumberFilter label="Min cal" value={minCalories} onChange={onMinCaloriesChange} />
+            <NumberFilter label="Max cal" value={maxCalories} onChange={onMaxCaloriesChange} />
+          </XStack>
+        </AddedFilter>
+      ) : null}
+      {active.includes("satiety") ? (
+        <AddedFilter id="satiety" onRemove={removeFilter}>
+          <XStack gap={tokens.spacing[2]}>
+            <NumberFilter label="Min satiety" value={minSatiety} onChange={onMinSatietyChange} />
+            <NumberFilter label="Max satiety" value={maxSatiety} onChange={onMaxSatietyChange} />
+          </XStack>
+        </AddedFilter>
+      ) : null}
+      {active.includes("sort") ? (
+        <AddedFilter id="sort" onRemove={removeFilter}>
+          <YStack gap={tokens.spacing[3]}>
+            <SelectField
+              label="Sort by"
+              value={sort}
+              options={SORT_OPTIONS}
+              onValueChange={onSortChange}
+            />
+            <SelectField
+              label="Order"
+              value={sortDir}
+              options={SORT_DIR_OPTIONS}
+              onValueChange={onSortDirChange}
+            />
+          </YStack>
+        </AddedFilter>
+      ) : null}
     </YStack>
   );
 }
@@ -291,27 +531,117 @@ function Thumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
   );
 }
 
+// Touch-target geometry for the row's log-cook control: a ≥44dp
+// target (the StarRatingInput precedent) centering its glyphs.
+// Plain object, no StyleSheet, like the row's other geometry.
+const logCookTargetStyle = {
+  minWidth: 44,
+  minHeight: 44,
+  alignItems: "center",
+  justifyContent: "center",
+} as const;
+
+const STAR_STEPS = [1, 2, 3, 4, 5] as const;
+
+/** The rated state of the row's log-cook control: the recipe's
+ * rating as five stars in the DS star language (StarRatingInput:
+ * ★ in warning amber when filled, gray when not). The rating is a
+ * display average as often as a personal star count, so the stars
+ * fill by rounding to the nearest whole star; the pressable's
+ * accessibility label carries the exact value. No lineHeight is
+ * set on the glyphs — see the #162 note in the file header. */
+function RatingStars({ rating }: { rating: number }) {
+  const filled = Math.min(5, Math.max(1, Math.round(rating)));
+  return (
+    <XStack gap={tokens.spacing[1]} alignItems="center">
+      {STAR_STEPS.map((star) => (
+        <Text
+          key={star}
+          style={{
+            fontSize: tokens.typography.fontSize.lg,
+            color: star <= filled ? tokens.colors.warning.warning6 : tokens.colors.gray.gray4,
+          }}
+        >
+          ★
+        </Text>
+      ))}
+    </XStack>
+  );
+}
+
+/** The row's only action: log a cook. A rated recipe's stars are
+ * the button; an unrated recipe gets a single icon-only button —
+ * one unfilled star in the same glyph and tone, no text. Both fire
+ * the row's `onLogCookPress`, and both carry an accessibility
+ * label that names the action and the recipe: the stars alone
+ * would announce as a rating, not as the log-cook action they
+ * perform here. The control renders inside the text block's
+ * subtitle flow (see RecipeRow) — never as an item of the card
+ * row, where its width starved the text column (#205, and again
+ * in PR #120's narrow captures when it sat at the row's edge). */
+function LogCookControl({
+  item,
+  onLogCookPress,
+}: {
+  item: RecipesPageItem;
+  onLogCookPress: () => void;
+}) {
+  const rating = item.rating;
+  if (rating !== null && rating !== undefined && rating > 0) {
+    return (
+      <TouchableOpacity
+        style={logCookTargetStyle}
+        onPress={onLogCookPress}
+        accessibilityRole="button"
+        accessibilityLabel={`Log a cook of ${item.title}, rated ${rating} out of 5 stars`}
+      >
+        <RatingStars rating={rating} />
+      </TouchableOpacity>
+    );
+  }
+  return (
+    <TouchableOpacity
+      style={logCookTargetStyle}
+      onPress={onLogCookPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Log a cook of ${item.title}`}
+    >
+      <Text style={{ fontSize: tokens.typography.fontSize.lg, color: tokens.colors.gray.gray4 }}>
+        ★
+      </Text>
+    </TouchableOpacity>
+  );
+}
+
 function RecipeRow({
   item,
   onPress,
   onLogCookPress,
-  onDeletePress,
 }: {
   item: RecipesPageItem;
   onPress: () => void;
   onLogCookPress?: () => void;
-  onDeletePress?: () => void;
 }) {
   return (
-    <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3" marginBottom="$3">
-      {/* Both press targets carry the button role and an accessible
-          name built from the recipe title: the thumbnail target
-          wraps only an image (or an empty placeholder), so without
-          the label a screen reader meets an unidentified action
-          for every recipe. The text target's label also carries
-          the subtitle when present — a title-only label would
-          override the name React Native derives from its Text
-          children and drop the subtitle announcement. */}
+    <Card
+      variant="elevated"
+      flexDirection="row"
+      flexWrap="wrap"
+      alignItems="center"
+      gap="$3"
+      marginBottom="$3"
+    >
+      {/* Both navigation press targets carry the button role and an
+          accessible name built from the recipe title: the thumbnail
+          target wraps only an image (or an empty placeholder), so
+          without the label a screen reader meets an unidentified
+          action for every recipe. The text target's label also
+          carries the subtitle when present — a title-only label
+          would override the name React Native derives from its Text
+          children and drop the subtitle announcement. The log-cook
+          control is a third press target nested in the text block's
+          subtitle flow; its label names the action instead — see
+          LogCookControl. */}
       <TouchableOpacity
         onPress={onPress}
         accessibilityRole="button"
@@ -326,38 +656,22 @@ function RecipeRow({
         accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
       >
         <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
-        {item.subtitle ? (
-          <Text variant="hint" marginTop="$1">
-            {item.subtitle}
-          </Text>
+        {/* The subtitle line is a wrapping inline flow inside the
+            text block: the subtitle text first, the log-cook
+            control immediately after it (right after the
+            subtitle's final segment). The control flows with the
+            text — when the line is full it wraps onto the next
+            line of the block, at the block's full width — instead
+            of sitting in the card row as a third flex item whose
+            fixed width starved this block (the #205 failure, seen
+            again in PR #120's narrow captures). */}
+        {item.subtitle || onLogCookPress ? (
+          <XStack flexWrap="wrap" alignItems="center" gap="$1" marginTop="$1">
+            {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
+            {onLogCookPress ? <LogCookControl item={item} onLogCookPress={onLogCookPress} /> : null}
+          </XStack>
         ) : null}
       </TouchableOpacity>
-      {onLogCookPress || onDeletePress ? (
-        <XStack marginInlineStart="$3" alignItems="center" gap="$2">
-          {onLogCookPress ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              backgroundColor={tokens.colors.gray.gray2}
-              color={tokens.colors.gray.gray8}
-              onPress={onLogCookPress}
-            >
-              Log cook
-            </Button>
-          ) : null}
-          {onDeletePress ? (
-            <Button
-              variant="secondary"
-              size="sm"
-              backgroundColor={tokens.colors.danger.danger1}
-              color={tokens.colors.danger.danger8}
-              onPress={onDeletePress}
-            >
-              Delete
-            </Button>
-          ) : null}
-        </XStack>
-      ) : null}
     </Card>
   );
 }
@@ -374,7 +688,6 @@ export function RecipesPage(props: RecipesPageProps) {
     isFetchingNextPage = false,
     onRecipePress,
     onLogCookPress,
-    onRecipeDelete,
     onLoadMore,
     renderRecipeAccessory,
   } = props;
@@ -417,13 +730,6 @@ export function RecipesPage(props: RecipesPageProps) {
                   ? {
                       onLogCookPress: () => {
                         onLogCookPress(item.id);
-                      },
-                    }
-                  : {})}
-                {...(onRecipeDelete
-                  ? {
-                      onDeletePress: () => {
-                        onRecipeDelete(item.id);
                       },
                     }
                   : {})}

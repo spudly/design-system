@@ -1,5 +1,25 @@
 # @spudly/ui
 
+## 1.8.0
+
+### Minor Changes
+
+- 64747ca: RecipesPage: rework the row actions. **Breaking:** the `onRecipeDelete` prop is removed — a recipes list row no longer offers Delete at all; deleting a recipe lives on RecipeDetailPage (its `onDeletePress` chip), so consumers must stop passing the callback. The "Log cook" text button is also gone: `RecipesPageItem` gains an optional `rating` field (display rating 0–5, or null/absent when unrated), and the row's log-cook control is the rating itself — a rated recipe renders its five stars as the pressable that fires `onLogCookPress`, and an unrated recipe renders a single icon-only button (one unfilled star, no text) firing the same callback. Both states carry an accessibility label naming the log-cook action. The control renders inline inside the text block — in the subtitle's wrapping flow, immediately after the subtitle text — never as a flex item of the card row, so it cannot compete with the text column for the row's width (as a trailing row item it reproduced the #205 narrow-viewport failure: the title wrapping a character at a time while the control held its width at the row's edge).
+
+## 1.7.0
+
+### Minor Changes
+
+- fafc116: Add a shared `BackLink` component whose arrow is drawn from fixed-dimension shapes instead of the "←" text glyph, whose ink sat at the bottom of the line on Android (#95). The arrow and label are flex-centered in one pressable row, so the arrow is vertically centered by construction. MemorizationSessionPage now renders its back affordance through BackLink instead of an inline ghost Button.
+- 68f58ad: RecipesPage: collapse the filter bar behind a Filters button (#96). Initially only the search field and the button render; the button opens an add-filter chooser, and a filter's control renders only after it is added — each added filter carries a Remove control that clears its values and hides it again. New controlled props `activeFilters` / `onActiveFiltersChange` and `filterChooserOpen` / `onFilterChooserOpenChange` (plus the `RecipesPageFilterId` type) let the app own the state; when they are omitted the view tracks it internally, seeded from any filter carrying a non-default value.
+
+### Patch Changes
+
+- 1d78b15: fix(components): BlankWord's hidden-mode underline now sits at the bottom of the line on native — the anchor is platform-conditional (web 4, native -1) because Yoga's tighter glyph box left the line floating at mid x-height on Android (#93).
+- 0ac3c89: fix(components): Quiet Dawn light ProgressBar track is now a light gray instead of the light-blue teal tint, via a new scoped `progressTrack` semantic role — dark mode and the other themes keep their primarySubtle track, and Badge/Avatar/InlineAlert are unchanged (#94).
+- 432e720: RecipeDetailPage: replace the version selector with SelectField (#72). The custom bottom-sheet widget — whose options appeared at the bottom of the screen, unlike every other select in the system — is gone; the picker now renders the standard SelectField labeled "Version". No contract change: the same version list (newest first), the same selected-version fallback, and the same `onSelectVersion` callback, and the single-version case still collapses to static version text.
+- b85603b: fix(pages): RecipesPage rows no longer collapse on narrow viewports (eciperay #205). At the largest Android display size (~314dp wide) the row's fixed children — the 64dp thumbnail and the Log cook / Delete buttons — consumed the entire row, collapsing the title/subtitle block to ~0dp wide: the text painted nothing yet measured extremely tall, stretching each card past the viewport with only the thumbnail and buttons visible. The row now wraps (flexWrap) and the text block carries an explicit 60dp flexBasis, so when the row runs out of room the buttons wrap onto their own line and the text keeps a readable width. Layout at ordinary widths is unchanged.
+
 ## 1.6.0
 
 ### Minor Changes

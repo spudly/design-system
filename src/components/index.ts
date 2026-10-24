@@ -1,5 +1,6 @@
 export { ActionBar, type ActionBarProps } from "./ActionBar.js";
 export { Avatar, type AvatarProps } from "./Avatar.js";
+export { BackLink, type BackLinkProps } from "./BackLink.js";
 export { Badge, type BadgeProps } from "./Badge.js";
 export { BlankWord, type BlankWordProps } from "./BlankWord.js";
 export { Button, type ButtonProps } from "./Button.js";

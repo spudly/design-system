@@ -4,7 +4,7 @@
 # renders the same CSF stories in the Expo host app
 # (apps/storybook) on an Android emulator and pixel-compares
 # screenshots against baselines committed under
-# tools/visual-regression/baselines/. See
+# tools/visualRegression/baselines/. See
 # docs/android-visual-regression.md for the full workflow, including
 # how baselines are generated and updated.
 #
@@ -16,12 +16,30 @@
 # PR runs auto-commit regenerated baselines (Stephen's directive,
 # 2026-10-23): when the compare finds screenshot diffs, the capture
 # script regenerates the baselines from the fresh captures, gates
-# them through the luminance guard (tools/visual-regression/
+# them through the luminance guard (tools/visualRegression/
 # guard.mjs, issue #101), proves them with an in-job re-capture and
 # re-compare, and the commit-pr-baselines job below pushes them
 # onto the PR branch — no manual update dispatch. Pushes to main
 # and workflow_dispatch runs never take this path (update mode has
 # its own commit job, commit-baselines). See
+# docs/android-visual-regression.md.
+#
+# Bot-head pass-through (Stephen's directive, 2026-10-24): the
+# follow-up run a bot baseline push triggers used to re-capture the
+# whole set just to compare it against baselines the previous run
+# had already proved green in-job before committing. The
+# visual-regression job now detects that its head commit IS the VR
+# bot's own baseline commit (bot author + the auto-commit message +
+# baseline files only) and passes immediately instead.
+#
+# Narrow-viewport variant (Stephen's directive, 2026-10-24): every
+# capture mode also re-captures ONLY the RecipesPage stories with
+# the emulator display switched to a 345.6dp logical width +
+# font_scale 1.3 (the phone settings behind eciperay #205, whose
+# fix moved zero standard baselines — the standard surface is
+# 540dp wide and never starves the row). Variant baselines carry a
+# "-narrow" filename suffix and flow through the same compare /
+# guard / auto-commit path as the standard set. See
 # docs/android-visual-regression.md.
 name: Android Storybook VR
 
@@ -30,7 +48,7 @@ on:
     paths:
       - "src/**"
       - "apps/storybook/**"
-      - "tools/visual-regression/**"
+      - "tools/visualRegression/**"
       - ".github/workflows/android-storybook.yml"
   workflow_dispatch:
     inputs:
@@ -70,26 +88,63 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Bot-head pass-through (Stephen's directive, 2026-10-24):
+      # when the head commit is the VR bot's own baseline commit,
+      # the baselines it carries were already proved green in-job
+      # (luminance guard + re-compare) by the run that created the
+      # commit, so re-capturing everything is pure waste. All three
+      # conditions must hold: authored by github-actions[bot], the
+      # exact auto-commit subject, and every changed file under
+      # tools/visualRegression/baselines/. A maintainer merge or
+      # any later commit changes the head and the full run resumes.
+      # Update dispatches are excluded on purpose: an explicit
+      # regeneration request always runs in full.
+      - name: Detect VR bot baseline head
+        id: vrbot
+        if: github.event_name == 'pull_request' || inputs.mode == 'compare'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          skip=false
+          author="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.author.login // ""')"
+          subject="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.commit.message | split("\n")[0]')"
+          if [ "$author" = "github-actions[bot]" ] && [ "$subject" = "chore(vr): update Android Storybook baselines" ]; then
+            outside="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '[.files[].filename | select(startswith("tools/visualRegression/baselines/") | not)] | length')"
+            if [ "$outside" = "0" ]; then
+              skip=true
+            fi
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+          if [ "$skip" = "true" ]; then
+            echo "Head commit $HEAD_SHA is the VR bot's own baseline commit: the run that created it regenerated these baselines, passed them through the luminance guard, and re-verified them in-job before committing. Passing without re-capturing (Stephen's directive, 2026-10-24)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - uses: actions/setup-node@v7
+        if: steps.vrbot.outputs.skip != 'true'
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: apps/storybook/package-lock.json
 
       - uses: actions/setup-java@v5
+        if: steps.vrbot.outputs.skip != 'true'
         with:
           distribution: temurin
           java-version: 17
 
       - name: Install host app dependencies
+        if: steps.vrbot.outputs.skip != 'true'
         working-directory: apps/storybook
         run: npm ci
 
       - name: Generate storybook.requires
+        if: steps.vrbot.outputs.skip != 'true'
         working-directory: apps/storybook
         run: npm run generate
 
       - name: Enable KVM
+        if: steps.vrbot.outputs.skip != 'true'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
@@ -100,6 +155,7 @@ jobs:
       # (a `cd` in the workflow block would not survive to the next
       # line — learned on this PR's first run).
       - name: Capture and compare story screenshots
+        if: steps.vrbot.outputs.skip != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -108,14 +164,16 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
-          script: bash tools/visual-regression/ci/capture-compare.sh "${{ github.event_name == 'pull_request' && 'pr-autocommit' || inputs.mode }}"
+          script: bash tools/visualRegression/ci/capture-compare.sh "${{ github.event_name == 'pull_request' && 'pr-autocommit' || inputs.mode }}"
 
       - name: Upload screenshots and diffs
-        if: always()
+        if: always() && steps.vrbot.outputs.skip != 'true'
         uses: actions/upload-artifact@v7
         with:
           name: dsvr-output
-          path: /tmp/dsvr-out
+          path: |
+            /tmp/dsvr-out
+            /tmp/dsvr-out-narrow
           if-no-files-found: ignore
 
       # PR auto-commit: capture-compare.sh (mode pr-autocommit)
@@ -142,11 +200,11 @@ jobs:
           if-no-files-found: error
 
       - name: Upload regenerated baselines (update mode)
-        if: inputs.mode == 'update'
+        if: inputs.mode == 'update' && steps.vrbot.outputs.skip != 'true'
         uses: actions/upload-artifact@v7
         with:
           name: dsvr-baselines
-          path: tools/visual-regression/baselines
+          path: tools/visualRegression/baselines
           if-no-files-found: error
 
   # Update mode only: commit the baselines the visual-regression
@@ -187,17 +245,17 @@ jobs:
           path: ${{ runner.temp }}/dsvr-baselines
 
       - name: Sync baselines into the tree
-        run: rsync -a --delete "${{ runner.temp }}/dsvr-baselines/" tools/visual-regression/baselines/
+        run: rsync -a --delete "${{ runner.temp }}/dsvr-baselines/" tools/visualRegression/baselines/
 
       - name: Commit and push if baselines changed
         run: |
-          if [ -z "$(git status --porcelain -- tools/visual-regression/baselines)" ]; then
+          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines)" ]; then
             echo "Baselines unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tools/visual-regression/baselines
+          git add tools/visualRegression/baselines
           git commit -m "chore(vr): update Android Storybook baselines"
           git push origin "HEAD:${{ github.ref_name }}"
 
@@ -215,11 +273,11 @@ jobs:
   #
   # The bot's push parks the follow-up workflow run as
   # "action_required" (the same GITHUB_TOKEN behavior verified on
-  # PR #97), so the follow-up compare starts only after a maintainer
-  # approves it. That is not a blocker: the in-job re-compare is the
-  # verification, and when the follow-up does run it compares
-  # against the just-committed baselines and passes with no diffs —
-  # so the bot never commits twice for the same change (no loop).
+  # PR #97), so the follow-up run starts only after a maintainer
+  # approves it. When it does run, the visual-regression job's
+  # bot-head detection passes it immediately — the in-job
+  # re-compare is the verification — and the bot never commits
+  # twice for the same change (no loop).
   commit-pr-baselines:
     needs: visual-regression
     if: >-
@@ -250,23 +308,23 @@ jobs:
           path: ${{ runner.temp }}/dsvr-pr-baselines
 
       - name: Sync baselines into the tree
-        run: rsync -a --delete "${{ runner.temp }}/dsvr-pr-baselines/" tools/visual-regression/baselines/
+        run: rsync -a --delete "${{ runner.temp }}/dsvr-pr-baselines/" tools/visualRegression/baselines/
 
       - name: Commit and push regenerated baselines
         run: |
-          if [ -z "$(git status --porcelain -- tools/visual-regression/baselines)" ]; then
+          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines)" ]; then
             echo "Baselines unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tools/visual-regression/baselines
+          git add tools/visualRegression/baselines
           git commit -m "chore(vr): update Android Storybook baselines"
           git push origin "HEAD:${{ github.head_ref }}"
 
   # The #162 sanity check (issue #43 acceptance): reintroduce the
   # SearchField lineHeight bug via the patch in
-  # tools/visual-regression/sanity/ and prove the pipeline FAILS the
+  # tools/visualRegression/sanity/ and prove the pipeline FAILS the
   # SearchField screenshot on Android. The patch restores the pre-fix
   # text glyph (numeric lineHeight = fontSize) and removes the
   # clip-box hardening — on web the same change renders identically,
@@ -314,7 +372,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
-          script: bash tools/visual-regression/ci/capture-sanity.sh
+          script: bash tools/visualRegression/ci/capture-sanity.sh
 
       - name: Upload sanity captures
         if: always()

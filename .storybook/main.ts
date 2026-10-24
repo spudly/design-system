@@ -1,8 +1,9 @@
 import type { StorybookConfig } from "@storybook/react-vite";
 
 // Tamagui reads a number of process.env.* flags that don't exist in the
-// browser. esbuild only defines process.env.NODE_ENV, so without these the
-// pre-bundled tamagui.js throws "ReferenceError: process is not defined".
+// browser. Vite's dependency optimizer only defines process.env.NODE_ENV
+// for pre-bundled deps, so without these the pre-bundled tamagui.js throws
+// "ReferenceError: process is not defined".
 // All of Tamagui's uses are string comparisons or truthiness checks, so
 // empty string safely selects the default web behavior.
 const tamaguiEnvVars = [
@@ -75,11 +76,17 @@ const config: StorybookConfig = {
       optimizeDeps: {
         ...config.optimizeDeps,
         include: [...include],
-        esbuildOptions: {
-          ...config.optimizeDeps?.esbuildOptions,
-          define: {
-            ...config.optimizeDeps?.esbuildOptions?.define,
-            ...tamaguiDefine,
+        // Vite 8's dep optimizer runs on Rolldown: the deprecated
+        // esbuildOptions.define maps to rolldownOptions.transform.define
+        // (per the Vite 8 migration guide's automatic conversion table).
+        rolldownOptions: {
+          ...config.optimizeDeps?.rolldownOptions,
+          transform: {
+            ...config.optimizeDeps?.rolldownOptions?.transform,
+            define: {
+              ...config.optimizeDeps?.rolldownOptions?.transform?.define,
+              ...tamaguiDefine,
+            },
           },
         },
       },

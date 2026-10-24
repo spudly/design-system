@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../components/Text.js";
 import { View } from "tamagui";
-import { RecipesPage, type RecipesPageItem } from "./RecipesPage.js";
+import { RecipesPage, type RecipesPageFilterId, type RecipesPageItem } from "./RecipesPage.js";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -38,26 +38,44 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
+// Ratings ride the view model separately (`rating`), the way the
+// app passes its display rating; the subtitle stays rating-free.
+// The mix is deliberate: rated rows render their stars as the
+// log-cook control, unrated rows (Arroz con Pollo, Beef Chili)
+// render the icon-only button.
 const recipeItems: RecipesPageItem[] = [
   {
     id: "tuscan-chicken",
     title: "Creamy Tuscan Garlic Chicken",
     subtitle: "4 servings · 30 min · Satiety 60",
+    rating: 4.5,
   },
   {
     id: "stuffed-peppers",
     title: "Classic Stuffed Peppers",
     subtitle: "6 servings · 45 min · Satiety 72",
+    rating: 5,
   },
   { id: "arroz-con-pollo", title: "Arroz con Pollo", subtitle: "8 servings · 50 min · Satiety 68" },
-  { id: "fudgy-brownies", title: "Fudgy Brownies", subtitle: "12 servings · 35 min · Satiety 40" },
+  {
+    id: "fudgy-brownies",
+    title: "Fudgy Brownies",
+    subtitle: "12 servings · 35 min · Satiety 40",
+    rating: 3,
+  },
   {
     id: "chicken-tikka",
     title: "Chicken Tikka Masala",
     subtitle: "4 servings · 40 min · Satiety 64",
+    rating: 4,
   },
   { id: "beef-chili", title: "Beef Chili", subtitle: "6 servings · 60 min · Satiety 75" },
-  { id: "pollo-brasa", title: "Pollo a la Brasa", subtitle: "4 servings · 55 min · Satiety 70" },
+  {
+    id: "pollo-brasa",
+    title: "Pollo a la Brasa",
+    subtitle: "4 servings · 55 min · Satiety 70",
+    rating: 4,
+  },
 ];
 
 function RecipesPageDemo({
@@ -65,11 +83,15 @@ function RecipesPageDemo({
   recipes = recipeItems,
   isLoading = false,
   expandedRecipeId,
+  initialActiveFilters,
+  initialFilterChooserOpen = false,
 }: {
   initialSearch?: string;
   recipes?: RecipesPageItem[];
   isLoading?: boolean;
   expandedRecipeId?: string;
+  initialActiveFilters?: RecipesPageFilterId[];
+  initialFilterChooserOpen?: boolean;
 }) {
   const [search, setSearch] = useState(initialSearch);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -80,6 +102,11 @@ function RecipesPageDemo({
   const [maxSatiety, setMaxSatiety] = useState("");
   const [sort, setSort] = useState("newest");
   const [sortDir, setSortDir] = useState("desc");
+  // The #96 collapsed-filter state, held by the demo the way the
+  // app will hold it: which filters are added, and whether the
+  // add-filter chooser is open.
+  const [activeFilters, setActiveFilters] = useState(initialActiveFilters ?? []);
+  const [filterChooserOpen, setFilterChooserOpen] = useState(initialFilterChooserOpen);
 
   // The app filters server-side; the demo filters its fixtures by the
   // search text so the filtered state is honest about what the app
@@ -95,13 +122,12 @@ function RecipesPageDemo({
         isLoading={isLoading}
         onRecipePress={() => undefined}
         onLogCookPress={() => undefined}
-        onRecipeDelete={() => undefined}
         {...(expandedRecipeId
           ? {
               // Fixture stand-in for the app's inline cook-log form:
               // a plain expanded panel, not a form — the form is
               // business logic and stays app-side. Returning content
-              // for one row also hides that row's Log cook button.
+              // for one row also hides that row's log-cook control.
               renderRecipeAccessory: (recipeId: string) =>
                 recipeId === expandedRecipeId ? (
                   <View
@@ -137,6 +163,10 @@ function RecipesPageDemo({
         onSortChange={setSort}
         sortDir={sortDir}
         onSortDirChange={setSortDir}
+        activeFilters={activeFilters}
+        onActiveFiltersChange={setActiveFilters}
+        filterChooserOpen={filterChooserOpen}
+        onFilterChooserOpenChange={setFilterChooserOpen}
       />
     </Viewport>
   );
@@ -156,6 +186,19 @@ export const Empty: Story = {
 
 export const Loading: Story = {
   render: () => <RecipesPageDemo isLoading recipes={[]} />,
+};
+
+export const FilterChooserOpen: Story = {
+  // The #96 chooser state: search + Filters button, with the
+  // add-filter options (every filter not yet added) showing.
+  render: () => <RecipesPageDemo initialFilterChooserOpen />,
+};
+
+export const WithFiltersAdded: Story = {
+  // The #96 added state: only the added filters' controls render
+  // (here Status and Ingredient), each with its Remove control;
+  // the remaining filters stay collapsed behind the button.
+  render: () => <RecipesPageDemo initialActiveFilters={["status", "ingredient"]} />,
 };
 
 export const ExpandedAccessory: Story = {

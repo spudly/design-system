@@ -207,6 +207,8 @@ jobs:
       - name: Install dependencies
         if: steps.pr-gate.outputs.run != 'false'
         run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
 
       - name: Publish to Chromatic
         if: steps.pr-gate.outputs.run != 'false'
