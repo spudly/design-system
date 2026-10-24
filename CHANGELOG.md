@@ -1,5 +1,13 @@
 # @spudly/ui
 
+## 1.6.1
+
+### Patch Changes
+
+- 1d78b15: fix(components): BlankWord's hidden-mode underline now sits at the bottom of the line on native — the anchor is platform-conditional (web 4, native -1) because Yoga's tighter glyph box left the line floating at mid x-height on Android (#93).
+- 0ac3c89: fix(components): Quiet Dawn light ProgressBar track is now a light gray instead of the light-blue teal tint, via a new scoped `progressTrack` semantic role — dark mode and the other themes keep their primarySubtle track, and Badge/Avatar/InlineAlert are unchanged (#94).
+- 432e720: RecipeDetailPage: replace the version selector with SelectField (#72). The custom bottom-sheet widget — whose options appeared at the bottom of the screen, unlike every other select in the system — is gone; the picker now renders the standard SelectField labeled "Version". No contract change: the same version list (newest first), the same selected-version fallback, and the same `onSelectVersion` callback, and the single-version case still collapses to static version text.
+
 ## 1.6.0
 
 ### Minor Changes
