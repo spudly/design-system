@@ -83,8 +83,10 @@ waits for the READY line with the matching nonce, settles, and takes
 
 ### Capture matrix
 
-Default themes: `light_warmHarvest`, `dark_warmHarvest`,
-`light_quietDawn`, `dark_quietDawn` — each brand in both schemes. The
+Default themes: `light_warmHarvest`, `light_quietDawn` — each
+brand's LIGHT theme only (Stephen, 2026-10-24: dark captures
+doubled the snapshot count for a second render of the same layout,
+so dark was dropped from Android VR entirely). The
 plain base themes are the web default for component stories and can
 be added with `--themes light,dark,...`. Pages pin their brand theme
 via story globals on web; in capture mode the driver's theme wins
@@ -107,9 +109,12 @@ over the theme global whenever it is set. Browse mode never sets it.
 
 Stephen's decision, 2026-10-23: the committed baseline set is **page
 stories only, each under its own brand** — `pages-eciperay` under
-Warm Harvest (light + dark) and `pages-memorize` under Quiet Dawn
-(light + dark). With the current story set that is 30 x 2 + 18 x 2 =
-**96 baselines**. Curating hundreds of component screenshots was
+Warm Harvest and `pages-memorize` under Quiet Dawn. Since
+2026-10-24 the set is **light themes only**: dark captures doubled
+the snapshot count (and the job's emulator time) without catching
+layout regressions the light set misses, so the dark baselines were
+deleted outright. With the current story set that is 32 + 18 =
+**50 baselines**. Curating hundreds of component screenshots was
 more review surface than the Android check needs; component stories
 stay covered by Chromatic on web, and wrong-brand page captures are
 excluded because pages pin their brand. The rule lives in the
@@ -143,8 +148,8 @@ post-fix renders are identical.
 
 The variant closes that hole. In every mode, after the standard
 pass, `ci/capture-compare.sh` switches the emulator display and
-re-captures **only the RecipesPage stories** (Warm Harvest light +
-dark):
+re-captures **only the RecipesPage stories** (Warm Harvest light —
+the variant follows the light-only policy):
 
 | Setting                          | Value       | Why                                                                  |
 | -------------------------------- | ----------- | -------------------------------------------------------------------- |
@@ -155,8 +160,8 @@ dark):
 The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visual-regression/run.mjs` (driver flag `--variant narrow`):
-7 `pages-eciperay-recipespage` stories x 2 themes = **14
-baselines** (110 total). RecipesPage only, deliberately — a second
+7 `pages-eciperay-recipespage` stories x light = **7
+baselines** (57 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
@@ -168,6 +173,15 @@ its own baseline), the PR auto-commit flow regenerates and commits
 both sets together, and a mode = `update` dispatch regenerates the
 variant baselines in the same run as the standard ones — there is
 no separate regeneration flow to learn.
+
+Sensitivity proof (2026-10-24): with `RecipesPage` reverted to its
+pre-#117 form on a scratch branch, the standard set compared
+100/100 clean while the narrow set failed on 10 of 14 captures —
+including all five content-bearing light captures (default 5.63%,
+filtered 3.83%, filter-chooser-open 4.29%, with-filters-added
+3.16%, expanded-accessory 0.98% of pixels differing), proving the
+variant catches the #205 class in the light theme CI compares.
+Run: https://github.com/spudly/design-system/actions/runs/40108956001
 
 Determinism controls (CI script and recommended locally): fixed
 emulator profile (pixel_6, API 34, google_apis x86_64), `wm density

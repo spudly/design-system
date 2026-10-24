@@ -3,10 +3,13 @@
 Reference screenshots for the Android visual-regression driver, one
 per theme + story: `<theme>/<storyId>.png`.
 
-Scope (Stephen, 2026-10-23): page stories only, each in its own
-brand — `pages-eciperay` under the two warmHarvest themes,
-`pages-memorize` under the two quietDawn themes (96 baselines). The
-enforcing rule is the `CAPTURE_SCOPE` table in `../run.mjs`; see
+Scope (Stephen, 2026-10-23; light-only since 2026-10-24): page
+stories only, each in its own brand's LIGHT theme —
+`pages-eciperay` under light_warmHarvest, `pages-memorize` under
+light_quietDawn, plus the narrow-viewport RecipesPage variant
+(57 baselines total). Dark themes were dropped because they
+doubled the snapshot count. The enforcing rule is the
+`CAPTURE_SCOPE` / `NARROW_SCOPE` tables in `../run.mjs`; see
 `docs/android-visual-regression.md` ("Capture scope").
 
 This directory intentionally starts EMPTY (bootstrap state): with no
