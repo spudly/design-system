@@ -38,26 +38,44 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
+// Ratings ride the view model separately (`rating`), the way the
+// app passes its display rating; the subtitle stays rating-free.
+// The mix is deliberate: rated rows render their stars as the
+// log-cook control, unrated rows (Arroz con Pollo, Beef Chili)
+// render the icon-only button.
 const recipeItems: RecipesPageItem[] = [
   {
     id: "tuscan-chicken",
     title: "Creamy Tuscan Garlic Chicken",
     subtitle: "4 servings · 30 min · Satiety 60",
+    rating: 4.5,
   },
   {
     id: "stuffed-peppers",
     title: "Classic Stuffed Peppers",
     subtitle: "6 servings · 45 min · Satiety 72",
+    rating: 5,
   },
   { id: "arroz-con-pollo", title: "Arroz con Pollo", subtitle: "8 servings · 50 min · Satiety 68" },
-  { id: "fudgy-brownies", title: "Fudgy Brownies", subtitle: "12 servings · 35 min · Satiety 40" },
+  {
+    id: "fudgy-brownies",
+    title: "Fudgy Brownies",
+    subtitle: "12 servings · 35 min · Satiety 40",
+    rating: 3,
+  },
   {
     id: "chicken-tikka",
     title: "Chicken Tikka Masala",
     subtitle: "4 servings · 40 min · Satiety 64",
+    rating: 4,
   },
   { id: "beef-chili", title: "Beef Chili", subtitle: "6 servings · 60 min · Satiety 75" },
-  { id: "pollo-brasa", title: "Pollo a la Brasa", subtitle: "4 servings · 55 min · Satiety 70" },
+  {
+    id: "pollo-brasa",
+    title: "Pollo a la Brasa",
+    subtitle: "4 servings · 55 min · Satiety 70",
+    rating: 4,
+  },
 ];
 
 function RecipesPageDemo({
@@ -104,13 +122,12 @@ function RecipesPageDemo({
         isLoading={isLoading}
         onRecipePress={() => undefined}
         onLogCookPress={() => undefined}
-        onRecipeDelete={() => undefined}
         {...(expandedRecipeId
           ? {
               // Fixture stand-in for the app's inline cook-log form:
               // a plain expanded panel, not a form — the form is
               // business logic and stays app-side. Returning content
-              // for one row also hides that row's Log cook button.
+              // for one row also hides that row's log-cook control.
               renderRecipeAccessory: (recipeId: string) =>
                 recipeId === expandedRecipeId ? (
                   <View
