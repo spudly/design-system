@@ -399,7 +399,7 @@ export function RecipesPage(props: RecipesPageProps) {
         // mid-typing; the loading indicator renders as the list's
         // empty state instead.
         ListHeaderComponent={
-          <YStack paddingBlockStart="$4" paddingBlockEnd="$2">
+          <YStack paddingBlockStart="$12" paddingBlockEnd="$2">
             <RecipesFiltersBar {...props} />
           </YStack>
         }
