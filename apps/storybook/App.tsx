@@ -151,7 +151,9 @@ export default function App() {
   // exact names (see src/tokens/typography.ts — "Raleway" for body in
   // every theme, "Alegreya" for Quiet Dawn verse text).
   const [fontsLoaded, fontError] = useFonts({
-    Raleway: require("./assets/fonts/Raleway.ttf"),
+    // EXPERIMENT (eciperay #205): Raleway intentionally NOT loaded, to
+    // reproduce the Eciperay app's font state (it registers no Raleway)
+    // and see whether DS text/cards break on device without it.
     Alegreya: require("./assets/fonts/Alegreya.ttf"),
   });
   const capture = useCaptureTarget();
