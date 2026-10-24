@@ -11,6 +11,7 @@ import { Spinner } from "../components/Spinner.js";
 import { StarRatingInput } from "../components/StarRatingInput.js";
 import { StatCard } from "../components/StatCard.js";
 import { Text } from "../components/Text.js";
+import { TextField } from "../components/TextField.js";
 import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChipGroup.js";
 
 /**
@@ -214,10 +215,12 @@ export interface RecipeDetailPageSubstitution {
 export interface RecipeDetailPageIngredientsProps {
   servings: number;
   onServingsChange: (servings: number) => void;
-  /** Selected scale multiplier as a plain string ("0.5" | "1" |
-   * "2" | "3"); the option set below moved with the section. The app
-   * maps the value back to servings — the servings computation
-   * stays app-side. */
+  /** Selected scale multiplier as a plain string: one of the
+   * presets ("0.5" | "1" | "2" | "3") or any other positive number
+   * the user typed into the custom scale field ("4", "2.5"); the
+   * option set below moved with the section. The app maps the
+   * value back to servings — the servings computation stays
+   * app-side. */
   scaleValue: string;
   onScaleChange: (value: string) => void;
   ingredients: RecipeDetailPageIngredient[];
@@ -328,6 +331,20 @@ const SCALE_OPTIONS: ToggleChipOption[] = [
   { value: "2", label: "2×" },
   { value: "3", label: "3×" },
 ];
+
+// The custom scale chip's resting label (#73): beside the presets,
+// one more chip that turns into a number input when pressed, so any
+// scale beyond the presets (4× and up, or a fraction like 2.5×) is
+// directly enterable. Once a custom value applies, the chip shows
+// that value ("4×") selected instead of this label.
+const CUSTOM_SCALE_LABEL = "Custom";
+
+/** A scale value as the custom chip shows it: the number without
+ * trailing zeros ("2.50" → "2.5"); non-numeric values pass through. */
+function formatScaleValue(value: string): string {
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? String(parsed) : value;
+}
 
 // Stale-rating hint copy, verbatim from the app's client constants.
 const STALE_COMMUNITY_RATING_HINT =
@@ -855,14 +872,41 @@ function IngredientsPanel({
   ingredients: RecipeDetailPageIngredientsProps;
 }) {
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
+  // Custom scale editing is ephemeral view state, like the
+  // instructions section's active step: whether the custom chip is
+  // currently a number input, and the input's uncommitted text.
+  const [isCustomScaleEditing, setCustomScaleEditing] = useState(false);
+  const [customScaleDraft, setCustomScaleDraft] = useState("");
+  const isPresetScale = SCALE_OPTIONS.some((option) => option.value === view.scaleValue);
+  const isCustomScaleSelected = !isPresetScale && !isCustomScaleEditing;
+
+  const startCustomScaleEdit = () => {
+    setCustomScaleDraft(isPresetScale ? "" : formatScaleValue(view.scaleValue));
+    setCustomScaleEditing(true);
+  };
+
+  // Committing an entry applies it through the same onScaleChange
+  // the presets use; an empty, non-numeric, or non-positive entry
+  // commits nothing and the chip restores the current scale.
+  const commitCustomScale = () => {
+    const parsed = Number(customScaleDraft.trim());
+    setCustomScaleEditing(false);
+    if (Number.isFinite(parsed) && parsed > 0) {
+      view.onScaleChange(String(parsed));
+    }
+  };
+
   return (
     <YStack padding="$4">
       {/* Servings + scale controls (#73): one compact block, two fixed
-          rows. Servings is an inline stepper (label beside the stepper,
-          current value in a fixed-width box); Scale is a single
-          non-wrapping row of equal-width chips. Neither row can change
-          height or shift when values change, and every change is one
-          tap. Same props contract as before — the app wiring is
+          rows, and every value directly enterable — stepping is no
+          longer the only way to reach a large batch. Servings is an
+          inline editable stepper (label beside the stepper, the
+          value a number input in a fixed-width box); Scale is a
+          single non-wrapping row of equal-width preset chips plus a
+          Custom chip that turns into a number input when pressed
+          and afterwards shows the applied custom value selected.
+          Same props contract as before — the app wiring is
           untouched. */}
       <YStack gap="$3" marginBlockEnd="$4">
         <NumberStepper
@@ -871,9 +915,11 @@ function IngredientsPanel({
           value={view.servings}
           min={1}
           onChange={view.onServingsChange}
+          editable
         />
-        <XStack alignItems="center" gap="$3">
+        <XStack alignItems="center" gap="$2">
           <Text
+            marginInlineEnd="$1"
             fontSize={tokens.typography.fontSize.sm}
             fontWeight={tokens.typography.fontWeight.medium}
             color={tokens.colors.gray.gray8}
@@ -885,8 +931,53 @@ function IngredientsPanel({
             mode="single"
             wrap={false}
             value={view.scaleValue}
-            onChange={view.onScaleChange}
+            onChange={(value) => {
+              setCustomScaleEditing(false);
+              view.onScaleChange(value);
+            }}
           />
+          <View flex={0.25}>
+            {isCustomScaleEditing ? (
+              <TextField
+                accessibilityLabel="Custom scale"
+                keyboardType="decimal-pad"
+                inputMode="decimal"
+                type="number"
+                autoFocus
+                value={customScaleDraft}
+                onChangeText={setCustomScaleDraft}
+                onBlur={commitCustomScale}
+                onSubmitEditing={commitCustomScale}
+              />
+            ) : (
+              <XStack
+                minHeight={44}
+                alignItems="center"
+                justifyContent="center"
+                borderRadius={tokens.radii.full}
+                borderWidth={1}
+                borderColor={isCustomScaleSelected ? "$primary" : "$textMuted"}
+                backgroundColor={isCustomScaleSelected ? "$primary" : "$surface"}
+                onPress={startCustomScaleEdit}
+                accessibilityRole="button"
+                accessibilityLabel="Custom scale"
+                aria-pressed={isCustomScaleSelected}
+              >
+                <Text
+                  style={{
+                    color: isCustomScaleSelected ? "$onPrimary" : "$color",
+                    fontWeight: isCustomScaleSelected
+                      ? tokens.typography.fontWeight.semibold
+                      : tokens.typography.fontWeight.regular,
+                  }}
+                >
+                  {isCustomScaleSelected
+                    ? `${formatScaleValue(view.scaleValue)}×`
+                    : CUSTOM_SCALE_LABEL}
+                </Text>
+              </XStack>
+            )}
+          </View>
         </XStack>
       </YStack>
       {view.ingredients.map((ingredient) => (
