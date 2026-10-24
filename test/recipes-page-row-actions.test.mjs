@@ -21,6 +21,13 @@
  *    would announce as a rating.
  * 5. The stories exercise both states, so the Chromatic / Android
  *    VR captures show stars rows and icon-button rows.
+ * 6. Placement (Stephen's direction, 2026-10-24, after PR #120's
+ *    final narrow baseline still showed the #205 failure): the
+ *    control renders INLINE inside the text block — in the
+ *    subtitle's wrapping flow, immediately after the subtitle
+ *    text — and is never a flex item of the card row. As a
+ *    trailing row item its fixed width still starved the text
+ *    column at narrow widths.
  *
  * This is a source scan, not a render test, for the same reason as
  * the other RecipesPage tests: the repo has no JS renderer for
@@ -126,6 +133,58 @@ test("both control states fire the row's log-cook callback", () => {
     code,
     /<LogCookControl item=\{item\} onLogCookPress=\{onLogCookPress\} \/>/,
     "RecipeRow must render the control with the row's item and callback",
+  );
+});
+
+test("the control renders inline in the text block's subtitle flow, never as a row item", () => {
+  // The pre-fix structure: the control sat in a trailing XStack as
+  // the Card's third flex child, where its width starved the text
+  // column at narrow widths (the #205 failure in PR #120's narrow
+  // captures). That wrapper must not come back.
+  assert.ok(
+    !code.includes('marginInlineStart="$3"'),
+    "the trailing row-item wrapper for the log-cook control must be gone",
+  );
+  const rowAt = code.indexOf("function RecipeRow");
+  const pageAt = code.indexOf("export function RecipesPage");
+  assert.ok(rowAt >= 0 && pageAt > rowAt, "RecipeRow must be defined before RecipesPage");
+  const row = code.slice(rowAt, pageAt);
+  assert.equal(
+    row.split("<LogCookControl").length - 1,
+    1,
+    "RecipeRow must render the log-cook control exactly once",
+  );
+  // The control lives inside the text press target (the one carrying
+  // textBlockStyle): it opens before the control renders, and the
+  // control renders before that target closes.
+  const textTargetAt = row.indexOf("style={textBlockStyle}");
+  const controlAt = row.indexOf("<LogCookControl");
+  const textTargetCloseAt = row.indexOf("</TouchableOpacity>", controlAt);
+  assert.ok(
+    textTargetAt >= 0 && controlAt > textTargetAt,
+    "the control must render after the text press target opens",
+  );
+  assert.ok(
+    textTargetCloseAt > controlAt,
+    "the control must render before the text press target closes",
+  );
+  // Inside the target, the control sits in the subtitle's wrapping
+  // flow, after the subtitle text — so it flows with the text at the
+  // block's full width instead of holding width at the row's edge.
+  const flowAt = row.indexOf('flexWrap="wrap"', textTargetAt);
+  const subtitleAt = row.indexOf("{item.subtitle}", flowAt);
+  assert.ok(
+    flowAt > textTargetAt && flowAt < controlAt,
+    "a wrapping flow must open inside the text block before the control",
+  );
+  assert.ok(
+    subtitleAt > flowAt && subtitleAt < controlAt,
+    "the subtitle text must render in the flow before the control",
+  );
+  const flowCloseAt = row.indexOf("</XStack>", controlAt);
+  assert.ok(
+    flowCloseAt > controlAt && flowCloseAt < textTargetCloseAt,
+    "the flow must close after the control, inside the text target",
   );
 });
 

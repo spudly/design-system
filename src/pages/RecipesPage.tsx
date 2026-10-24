@@ -64,12 +64,20 @@ import { TextField } from "../components/TextField.js";
  * `onLogCookPress`; an unrated recipe renders a single icon-only
  * button — one unfilled star, no text — firing the same callback.
  * There is deliberately no Delete in the list: deleting a recipe
- * lives on RecipeDetailPage (its `onDeletePress` chip). The two
- * text buttons this replaces ("Log cook", "Delete") were also the
- * row's inflexible width — at the largest display size they still
- * crowded the text block in the narrow captures after the #205 wrap
- * fix — while the star control is narrower than either button and
- * wraps as a single unit with the row's flexWrap.
+ * lives on RecipeDetailPage (its `onDeletePress` chip).
+ *
+ * Placement is structural, not cosmetic (Stephen's direction,
+ * 2026-10-24, after inspecting PR #120's final narrow baseline):
+ * the control renders INLINE inside the text block — in the
+ * subtitle's wrapping flow, immediately after the subtitle text —
+ * and is never a flex item of the card row. As a trailing row item
+ * it still competed with the text block for the row's width and
+ * the narrow capture showed the same #205 failure (title wrapping
+ * a character at a time while the stars held their width at the
+ * row's right edge). Inside the text block the control can only
+ * wrap within the block's own full width, below the subtitle it
+ * follows; the row keeps exactly two flex children — thumbnail
+ * and text block.
  *
  * Collapsed filters (#96): the filter bar used to render every
  * filter control at once, and the form filled most of the
@@ -105,15 +113,15 @@ const listStyle = { flex: 1 } as const;
 // within the row (mirrors the app's ThumbnailListCard). The explicit
 // flexBasis matters (eciperay #205): with a plain `flex: 1` the basis
 // is 0, so on narrow viewports (e.g. a phone at the largest display
-// size, ~314dp wide) the row's fixed children — the 64dp thumbnail
-// and the trailing log-cook control — consume the entire row and the
-// text block collapses to ~0dp wide. Text measured at ~0 width paints
+// size, ~314dp wide) the row's fixed child — the 64dp thumbnail —
+// and any trailing row item consume the entire row and the text
+// block collapses to ~0dp wide. Text measured at ~0 width paints
 // nothing yet measures extremely tall, which stretched the card past
-// the viewport with only the thumbnail and control visible. A 60dp
-// basis gives the row a real line-breaking size: combined with the
-// row's flexWrap, the control wraps onto its own line instead of
-// squeezing the text out of existence, and the text block grows to
-// fill that line. At ordinary widths nothing changes — the basis is
+// the viewport with only the thumbnail visible. A 60dp basis gives
+// the row a real line-breaking size, and the text block grows to
+// fill its line. (The log-cook control is no longer a row item at
+// all — it renders inline inside this block; see the header's row
+// actions note.) At ordinary widths nothing changes — the basis is
 // below the width the block already gets, so it still just expands.
 const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
 
@@ -567,7 +575,10 @@ function RatingStars({ rating }: { rating: number }) {
  * the row's `onLogCookPress`, and both carry an accessibility
  * label that names the action and the recipe: the stars alone
  * would announce as a rating, not as the log-cook action they
- * perform here. */
+ * perform here. The control renders inside the text block's
+ * subtitle flow (see RecipeRow) — never as an item of the card
+ * row, where its width starved the text column (#205, and again
+ * in PR #120's narrow captures when it sat at the row's edge). */
 function LogCookControl({
   item,
   onLogCookPress,
@@ -627,9 +638,10 @@ function RecipeRow({
           action for every recipe. The text target's label also
           carries the subtitle when present — a title-only label
           would override the name React Native derives from its Text
-          children and drop the subtitle announcement. (The trailing
-          log-cook control is a third press target; its label names
-          the action instead — see LogCookControl.) */}
+          children and drop the subtitle announcement. The log-cook
+          control is a third press target nested in the text block's
+          subtitle flow; its label names the action instead — see
+          LogCookControl. */}
       <TouchableOpacity
         onPress={onPress}
         accessibilityRole="button"
@@ -644,17 +656,22 @@ function RecipeRow({
         accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
       >
         <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
-        {item.subtitle ? (
-          <Text variant="hint" marginTop="$1">
-            {item.subtitle}
-          </Text>
+        {/* The subtitle line is a wrapping inline flow inside the
+            text block: the subtitle text first, the log-cook
+            control immediately after it (right after the
+            subtitle's final segment). The control flows with the
+            text — when the line is full it wraps onto the next
+            line of the block, at the block's full width — instead
+            of sitting in the card row as a third flex item whose
+            fixed width starved this block (the #205 failure, seen
+            again in PR #120's narrow captures). */}
+        {item.subtitle || onLogCookPress ? (
+          <XStack flexWrap="wrap" alignItems="center" gap="$1" marginTop="$1">
+            {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
+            {onLogCookPress ? <LogCookControl item={item} onLogCookPress={onLogCookPress} /> : null}
+          </XStack>
         ) : null}
       </TouchableOpacity>
-      {onLogCookPress ? (
-        <XStack marginInlineStart="$3" alignItems="center">
-          <LogCookControl item={item} onLogCookPress={onLogCookPress} />
-        </XStack>
-      ) : null}
     </Card>
   );
 }
