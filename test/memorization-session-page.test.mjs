@@ -19,8 +19,11 @@
  *    selection, grading, peek counting, and persistence stay
  *    app-side in @memorize/core.
  * 3. The drill surface matches the real screen, not the #44
- *    demo: ghost Back, reference heading, the round hint
- *    above a StepDots indicator, the passage as VerseText in
+ *    demo: the shared BackLink (#95 — it replaced the inline
+ *    ghost "← Back" Button, whose arrow glyph sat at the
+ *    bottom of the line on Android), reference heading, the
+ *    round hint above a StepDots indicator, the passage as
+ *    VerseText in
  *    a Card with BlankWord blanks, the warning feedback
  *    alert, and the advance button. The demo's ProgressBar
  *    and "End session" button do not exist on the real
@@ -135,8 +138,12 @@ test("the view-model and callback contract matches the declared props", () => {
 });
 
 test("the drill chrome matches the app screen, in render order", () => {
-  assert.match(code, /<Button variant="ghost" onPress=\{onBack\}>/, "Back is the ghost button");
-  assert.match(code, /← Back/, "the ghost Back label must match the app's");
+  assert.match(code, /<BackLink onPress=\{onBack\} \/>/, "Back is the shared BackLink (#95)");
+  assert.doesNotMatch(
+    code,
+    /←/,
+    "the arrow is BackLink's drawn icon — the ← text glyph sat at the bottom of the line on Android (#95)",
+  );
   assert.match(
     code,
     /<Text variant="heading">\{reference\}<\/Text>/,
@@ -152,7 +159,7 @@ test("the drill chrome matches the app screen, in render order", () => {
     /<StepDots count=\{roundCount\} activeIndex=\{roundIndex\} \/>/,
     "the dots are the round indicator, driven by the same numbers",
   );
-  const backAt = code.indexOf('variant="ghost"');
+  const backAt = code.indexOf("<BackLink");
   const dotsAt = code.indexOf("<StepDots");
   const cardAt = code.indexOf("<Card>");
   assert.ok(backAt !== -1 && dotsAt !== -1 && cardAt !== -1, "chrome elements must be present");
