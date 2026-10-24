@@ -179,6 +179,24 @@ test("the passage renders as VerseText in a Card, blanks as BlankWord", () => {
   assert.match(code, /total=\{blankCount\}/, "BlankWord numbers blanks against the round's total");
 });
 
+test("blank ordinals are precomputed before the render map, never mutated during render (#135)", () => {
+  assert.match(
+    code,
+    /const blankOrdinals = words\.map\(/,
+    "ordinals come from a first pass over the words, before rendering",
+  );
+  assert.match(
+    code,
+    /const ordinal = blankOrdinals\[i\]/,
+    "each BlankWord reads its precomputed ordinal",
+  );
+  assert.doesNotMatch(
+    code,
+    /blankOrdinal \+=|blankOrdinal\+\+/,
+    "no counter may be mutated inside the render map (the immutability diagnostic's target pattern)",
+  );
+});
+
 test("the feedback alert and advance action match the app screen", () => {
   assert.match(
     code,
