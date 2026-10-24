@@ -1,5 +1,7 @@
 import { base, react, typescriptPendingIgnores } from "@spudly/eslint-config";
 
+import pageStyling from "./eslintRules/noPageStyling.mjs";
+
 // Shared config: @spudly/eslint-config (ported from Eciperay's
 // eslint.config.ts). This repo is a library, not an app, so it composes
 // only the subsets that match its code (see the package README's
@@ -56,6 +58,29 @@ export default [
     rules: {
       "max-lines": ["error", { max: 300, skipBlankLines: true, skipComments: true }],
     },
+  },
+  {
+    // #119: page components must not apply styling directly — no
+    // className, no inline style prop, no Tamagui styling props on any
+    // element (not even a DS component's designed style props), no
+    // layout primitives, no styling pass-through. Styling belongs in
+    // reusable components under src/components, driven by semantic
+    // props. DORMANT today: the typescriptPendingIgnores block above
+    // ignores every .ts/.tsx file (typescript-eslint has no TS7 parser
+    // yet), so this cannot fire until the TS lint restoration removes
+    // that block — at which point it activates with no further change.
+    // The pages are being fixed proactively from the audit on #119 so
+    // activation is a non-event. Rule: eslintRules/noPageStyling.mjs.
+    files: ["src/pages/**/*.tsx"],
+    plugins: { "design-system": pageStyling },
+    rules: { "design-system/no-page-styling": "error" },
+  },
+  {
+    // Stories are Storybook scaffolding, not shipped page components:
+    // they frame pages in demo viewports and spread fixture objects
+    // onto them, which the page rule forbids for pages themselves.
+    files: ["src/pages/**/*.stories.tsx"],
+    rules: { "design-system/no-page-styling": "off" },
   },
   {
     // The storybook host app's Babel/Metro configs are CommonJS in
