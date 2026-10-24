@@ -1,3 +1,4 @@
+import { BackLink } from "../components/BackLink.js";
 import { BlankWord } from "../components/BlankWord.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -22,8 +23,9 @@ import { VerseText } from "../components/VerseText.js";
  * out of the Node-importable root entry).
  *
  * The screen inventory this mirrors (DrillScreen in
- * spudly/memorize packages/app), in render order: a ghost
- * "← Back" button, the verse reference as the heading, the
+ * spudly/memorize packages/app), in render order: the shared
+ * BackLink ("Back", with its drawn arrow — #95), the verse
+ * reference as the heading, the
  * round hint ("Round N of M — tap a blank to peek at the
  * word."), a StepDots round indicator, the verse in a Card as
  * VerseText with each blanked word rendered by BlankWord, an
@@ -91,8 +93,9 @@ import { VerseText } from "../components/VerseText.js";
  * States: the props are a union of exactly the states the
  * app screen renders. `{ state: "not-found" }` is the
  * screen's missing-verse branch — a plain "Verse not found."
- * line and a primary Back button (not the ghost one; the app
- * renders them differently, and this view keeps that).
+ * line and a primary Back button (not the ready state's
+ * BackLink; the app renders them differently, and this view
+ * keeps that).
  * `{ state: "ready", ... }` is the drill. There is
  * deliberately no "loading" member: the app gates on its
  * store above this screen (the shell shows the spinner), so
@@ -159,7 +162,7 @@ export interface MemorizationSessionPageReadyProps {
    * advance button reads "Finish — mark memorized" instead
    * of "Next round". */
   isFinalRound: boolean;
-  /** Leave the session (the ghost Back button). */
+  /** Leave the session (the BackLink). */
   onBack: () => void;
   /** A hidden blank was pressed, with the word's index in
    * `words`. The app reveals it, counts the peek, and
@@ -212,9 +215,7 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
 
   return (
     <ScreenContainer>
-      <Button variant="ghost" onPress={onBack}>
-        ← Back
-      </Button>
+      <BackLink onPress={onBack} />
       <Text variant="heading">{reference}</Text>
       <Text variant="hint">
         Round {roundIndex + 1} of {roundCount} — tap a blank to peek at the word.
