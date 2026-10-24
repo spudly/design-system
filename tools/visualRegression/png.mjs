@@ -2,36 +2,13 @@
 // encode 8-bit RGB/RGBA PNGs (what `adb screencap` and this tool write)
 // using only Node built-ins (node:zlib), so the harness runs anywhere
 // Node does with zero install. Interlaced PNGs are rejected: neither
-// screencap nor this encoder produces them.
+// screencap nor this encoder produces them. The byte-level chunk
+// primitives live in pngChunks.mjs and the pixel comparator in
+// imageDiff.mjs (split out so each file stays under the length cap).
 
 import zlib from "node:zlib";
 
-const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-
-const crcTable = (() => {
-  const table = new Int32Array(256);
-  for (let n = 0; n < 256; n++) {
-    let c = n;
-    for (let k = 0; k < 8; k++) c = c & 1 ? 0xed_b8_83_20 ^ (c >>> 1) : c >>> 1;
-    table[n] = c;
-  }
-  return table;
-})();
-
-function crc32(buf) {
-  let c = 0xff_ff_ff_ff;
-  for (let i = 0; i < buf.length; i++) c = crcTable[(c ^ buf[i]) & 0xff] ^ (c >>> 8);
-  return (c ^ 0xff_ff_ff_ff) >>> 0;
-}
-
-function chunk(type, data) {
-  const len = Buffer.alloc(4);
-  len.writeUInt32BE(data.length, 0);
-  const body = Buffer.concat([Buffer.from(type, "ascii"), data]);
-  const crc = Buffer.alloc(4);
-  crc.writeUInt32BE(crc32(body), 0);
-  return Buffer.concat([len, body, crc]);
-}
+import { chunk, paeth, PNG_SIGNATURE } from "./pngChunks.mjs";
 
 /** Encode an RGBA buffer (width*height*4) as a PNG. */
 export function encodePng(width, height, rgba) {
@@ -54,16 +31,6 @@ export function encodePng(width, height, rgba) {
     chunk("IDAT", zlib.deflateSync(raw, { level: 6 })),
     chunk("IEND", Buffer.alloc(0)),
   ]);
-}
-
-function paeth(a, b, c) {
-  const p = a + b - c;
-  const pa = Math.abs(p - a);
-  const pb = Math.abs(p - b);
-  const pc = Math.abs(p - c);
-  if (pa <= pb && pa <= pc) return a;
-  if (pb <= pc) return b;
-  return c;
 }
 
 /** Decode a PNG to { width, height, rgba } (RGBA, 4 bytes/pixel). */
@@ -150,45 +117,4 @@ export function decodePng(buf) {
     prevRow = row;
   }
   return { width, height, rgba: out };
-}
-
-/**
- * Compare two decoded images. A pixel "differs" when any channel's
- * absolute delta exceeds `threshold` (0-255 scale). Returns the diff
- * count, the differing ratio, and a diff visualization (dimmed
- * baseline with differing pixels in red) as an encoded PNG buffer.
- */
-export function diffImages(a, b, threshold = 16) {
-  if (a.width !== b.width || a.height !== b.height) {
-    throw new Error(`diffImages: size mismatch ${a.width}x${a.height} vs ${b.width}x${b.height}`);
-  }
-  const total = a.width * a.height;
-  const vis = Buffer.alloc(total * 4);
-  let diffCount = 0;
-  for (let i = 0; i < total; i++) {
-    const o = i * 4;
-    const dr = Math.abs(a.rgba[o] - b.rgba[o]);
-    const dg = Math.abs(a.rgba[o + 1] - b.rgba[o + 1]);
-    const db = Math.abs(a.rgba[o + 2] - b.rgba[o + 2]);
-    const da = Math.abs(a.rgba[o + 3] - b.rgba[o + 3]);
-    if (Math.max(dr, dg, db, da) > threshold) {
-      diffCount++;
-      vis[o] = 0xff;
-      vis[o + 1] = 0x00;
-      vis[o + 2] = 0x00;
-      vis[o + 3] = 0xff;
-    } else {
-      const gray = Math.round((a.rgba[o] + a.rgba[o + 1] + a.rgba[o + 2]) / 3);
-      vis[o] = gray;
-      vis[o + 1] = gray;
-      vis[o + 2] = gray;
-      vis[o + 3] = 0xff;
-    }
-  }
-  return {
-    diffCount,
-    total,
-    ratio: diffCount / total,
-    diffPng: encodePng(a.width, a.height, vis),
-  };
 }

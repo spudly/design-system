@@ -45,6 +45,19 @@ export default [
     },
   },
   {
+    // Test files only (Stephen's decision, 2026-10-24): the file-length
+    // cap is raised to 300 for tests — fixture tables and scenario
+    // lists are naturally long, and splitting them purely to satisfy
+    // the cap hurts readability. The base rule's other options are
+    // preserved verbatim; only the max changes. src/ and tools/ keep
+    // the shared 150, and max-lines-per-function is NOT relaxed
+    // anywhere (the per-function findings stay warnings).
+    files: ["test/**"],
+    rules: {
+      "max-lines": ["error", { max: 300, skipBlankLines: true, skipComments: true }],
+    },
+  },
+  {
     // The storybook host app's Babel/Metro configs are CommonJS in
     // .js files. The shared base's CommonJS overrides only cover
     // *.cjs, so the same treatment is attached here for these files:
