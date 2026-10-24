@@ -33,6 +33,19 @@ adb install -r android/app/build/outputs/apk/release/app-release.apk
 adb shell wm density 320
 adb shell settings put system font_scale 1.0
 
+# Pin the display fully awake and bright for the whole session.
+# The release build above can take long enough for the emulator's
+# screen to time out and doze-dim, and screencap reads the dimmed
+# surface: an update dispatch on 2026-10-23 (PR #97) captured every
+# story uniformly dimmed to ~40% brightness and would have
+# committed those as baselines. Compare runs only fail loudly in
+# that state; update runs must never capture it at all.
+adb shell svc power stayon true
+adb shell settings put system screen_brightness_mode 0
+adb shell settings put system screen_brightness 255
+adb shell settings put system screen_off_timeout 1800000
+adb shell input keyevent KEYCODE_WAKEUP
+
 # Generous logcat buffer: the driver reads the full log back.
 adb logcat -G 8M
 
