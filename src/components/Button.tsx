@@ -120,16 +120,6 @@ export function Button({ disabled = false, variant = "primary", color, ...rest }
       disabled={disabled}
       variant={variant}
       color={labelColor}
-      // Same instance-prop rule as `color` above, for the family:
-      // Tamagui Button forwards an instance `fontFamily` to its
-      // internal text element, and the BARE font name ("body", no
-      // "$") is the form that makes Tamagui emit the font-context
-      // class defining `--f-family` (see Text, #69); a styled()-only
-      // or "$body" family left the label inheriting the page's
-      // default family while fonted primitives (Input, Label)
-      // rendered in the theme stack. A caller-passed `fontFamily`
-      // in `rest` still wins.
-      fontFamily="body"
       {...rest}
     />
   );

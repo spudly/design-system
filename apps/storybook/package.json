@@ -9,7 +9,7 @@
     "@storybook/addon-ondevice-controls": "10.6.2",
     "@storybook/addon-ondevice-notes": "10.6.2",
     "@storybook/react-native": "10.6.2",
-    "@tamagui/animations-css": "3.0.18",
+    "@tamagui/animations-css": "3.0.15",
     "@tamagui/constants": "3.0.18",
     "expo": "~58.0.14",
     "expo-constants": "~58.0.12",
@@ -23,7 +23,7 @@
     "react-native-safe-area-context": "~5.10.1",
     "react-native-svg": "^15.15.1",
     "react-native-worklets": "0.13.0",
-    "tamagui": "3.0.18"
+    "tamagui": "3.0.15"
   },
   "description": "On-device Storybook host app for @spudly/ui (design-system #43): mounts the repo's CSF stories on Android via @storybook/react-native and doubles as the screenshot-capture target for tools/visual-regression. Not published.",
   "devDependencies": {

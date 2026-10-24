@@ -98,12 +98,7 @@ export function SelectField({
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
         >
-          {/* Bare-name instance fontFamily, as in Text (#69): the
-              form that makes Tamagui emit the font-context class;
-              without it the selected value inherited the page's
-              default family while the field's label (a fonted
-              Label) rendered in the theme stack. */}
-          <StyledValue placeholder={placeholder} fontFamily="body" />
+          <StyledValue placeholder={placeholder} />
           <Text style={{ color: "$textMuted" }}>▾</Text>
         </StyledTrigger>
 
@@ -120,7 +115,7 @@ export function SelectField({
           <TamaguiSelect.Viewport minWidth={200}>
             {options.map((option) => (
               <TamaguiSelect.Item key={option.value} value={option.value}>
-                <StyledItemText fontFamily="body">{option.label}</StyledItemText>
+                <StyledItemText>{option.label}</StyledItemText>
                 <TamaguiSelect.ItemIndicator marginLeft="auto">
                   <Text style={{ color: "$primary" }}>✓</Text>
                 </TamaguiSelect.ItemIndicator>
