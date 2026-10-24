@@ -49,6 +49,9 @@ const CONFIG = {
   scheme: argValue("--scheme", "spudlyds"),
   themes: argValue("--themes", "light_warmHarvest,light_quietDawn").split(","),
   storyFilter: argValue("--stories", ""), // substring filter, empty = all
+  // SPIKE (issue #137): crop the blank tail off tall-surface
+  // captures in the driver. Off unless --crop-tall is passed.
+  cropTall: argFlag("--crop-tall"),
   // "" = the standard capture set; "narrow" = the narrow-viewport
   // variant (NARROW_SCOPE below, "-narrow" baseline filename suffix).
   variant: argValue("--variant", ""),

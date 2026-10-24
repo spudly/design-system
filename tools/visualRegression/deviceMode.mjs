@@ -9,6 +9,7 @@ import { copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { comparePair } from "./compare.mjs";
+import { cropBlankTailPng } from "./crop.mjs";
 import {
   adb,
   adbBuffer,
@@ -115,7 +116,36 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
       const rel = join(theme, baselineFileName(story.id));
       const actualPath = join(config.outDir, "actual", rel);
       mkdirSync(dirname(actualPath), { recursive: true });
-      writeFileSync(actualPath, png);
+      let outPng = png;
+      // SPIKE (issue #137): on a tall surface, crop the blank tail
+      // before the capture is compared/written as a baseline, and
+      // keep the raw frame alongside for offline analysis. The
+      // narrow variant never crops (it pins a real phone surface).
+      if (config.cropTall && config.variant !== "narrow") {
+        const rawPath = join(config.outDir, "raw", rel);
+        mkdirSync(dirname(rawPath), { recursive: true });
+        writeFileSync(rawPath, png);
+        const r = cropBlankTailPng(png);
+        outPng = r.png;
+        summary.crop = summary.crop || [];
+        summary.crop.push({
+          story: `${theme}/${story.id}`,
+          rawHeight: r.rawHeight,
+          croppedHeight: r.height,
+          removedRows: r.removedRows,
+          bottomRowUniform: r.bottomRowUniform,
+          truncationSuspect: r.truncationSuspect,
+        });
+        console.log(
+          `DSVR CROP ${theme}/${story.id}: raw=${r.rawWidth}x${r.rawHeight} cropped=${r.width}x${r.height} removed=${r.removedRows}`,
+        );
+        if (r.truncationSuspect) {
+          console.error(
+            `DSVR TRUNCATION WARNING ${theme}/${story.id}: zero rows cropped and the bottom row is not uniform background — content likely runs past the ${r.rawHeight}px surface (issue #137 guard signal)`,
+          );
+        }
+      }
+      writeFileSync(actualPath, outPng);
       summary.captured++;
 
       if (config.update) {

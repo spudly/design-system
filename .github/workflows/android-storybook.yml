@@ -60,6 +60,14 @@ on:
           - update
           - sanity
         default: compare
+      spike_surface_h:
+        description: "SPIKE (#137): tall standard surface height in px (e.g. 8000); empty = production 1080x2400"
+        type: string
+        default: ""
+      spike_stories:
+        description: "SPIKE (#137): story-id substring scope for the standard set (implies narrow variant is skipped); empty = full scope"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -156,6 +164,9 @@ jobs:
       # line — learned on this PR's first run).
       - name: Capture and compare story screenshots
         if: steps.vrbot.outputs.skip != 'true'
+        env:
+          DSVR_SPIKE_SURFACE_H: ${{ inputs.spike_surface_h }}
+          DSVR_SPIKE_STORIES: ${{ inputs.spike_stories }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
