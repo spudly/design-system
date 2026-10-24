@@ -34,7 +34,7 @@ test("both RecipeRow press targets are named buttons for screen readers (#60)", 
   assert.equal(
     code.split('accessibilityRole="button"').length - 1,
     4,
-    "four press targets declare the button role: the thumbnail and text targets pinned here, plus the log-cook control's two states (stars / icon button) pinned by test/recipes-page-row-actions.test.mjs",
+    "four press targets declare the button role: the thumbnail and text targets pinned here, plus the log-cook control's two states (stars / icon button) pinned by test/recipesPageRowActions.test.mjs",
   );
   assert.equal(
     code.split("accessibilityLabel={item.title}").length - 1,

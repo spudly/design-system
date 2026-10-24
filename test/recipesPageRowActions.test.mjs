@@ -49,7 +49,7 @@ const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
-const code = source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("no delete exists anywhere in the page contract", () => {
   assert.ok(
@@ -102,7 +102,10 @@ test("an unrated recipe gets a single icon-only button with no text", () => {
   assert.ok(!/>\s*Log cook\s*</.test(code), "the text Log cook button must be gone");
   const controlAt = code.indexOf("function LogCookControl");
   const rowAt = code.indexOf("function RecipeRow");
-  assert.ok(controlAt >= 0 && rowAt > controlAt, "LogCookControl must be defined before RecipeRow");
+  assert.ok(
+    controlAt !== -1 && rowAt > controlAt,
+    "LogCookControl must be defined before RecipeRow",
+  );
   const control = code.slice(controlAt, rowAt);
   assert.ok(
     !control.includes("<Button"),
@@ -147,7 +150,7 @@ test("the control renders inline in the text block's subtitle flow, never as a r
   );
   const rowAt = code.indexOf("function RecipeRow");
   const pageAt = code.indexOf("export function RecipesPage");
-  assert.ok(rowAt >= 0 && pageAt > rowAt, "RecipeRow must be defined before RecipesPage");
+  assert.ok(rowAt !== -1 && pageAt > rowAt, "RecipeRow must be defined before RecipesPage");
   const row = code.slice(rowAt, pageAt);
   assert.equal(
     row.split("<LogCookControl").length - 1,
@@ -161,7 +164,7 @@ test("the control renders inline in the text block's subtitle flow, never as a r
   const controlAt = row.indexOf("<LogCookControl");
   const textTargetCloseAt = row.indexOf("</TouchableOpacity>", controlAt);
   assert.ok(
-    textTargetAt >= 0 && controlAt > textTargetAt,
+    textTargetAt !== -1 && controlAt > textTargetAt,
     "the control must render after the text press target opens",
   );
   assert.ok(
