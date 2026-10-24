@@ -192,12 +192,13 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
 5. A baseline commit's push does not auto-run the PR's checks:
    GitHub parks workflow runs for bot-token pushes as
    "action_required", so a maintainer approves the follow-up run in
-   the Actions UI (or pushes to the branch) to get the compare run.
-   For the PR flow that parked run is not a blocker — the in-job
-   re-compare already verified the committed set — and when it does
-   run it compares against the just-committed baselines and passes
-   with no diffs, so the bot never commits twice for the same
-   change.
+   the Actions UI (or pushes to the branch). For the PR flow that
+   parked run is not a blocker — the in-job re-compare already
+   verified the committed set — and when it does run, the job's
+   bot-head detection (head commit authored by github-actions[bot]
+   with the auto-commit message and baseline files only) passes it
+   immediately without re-capturing, so the bot never commits twice
+   for the same change.
 
 Locally (with an emulator): `node tools/visual-regression/run.mjs --update`.
 

@@ -23,6 +23,14 @@
 # and workflow_dispatch runs never take this path (update mode has
 # its own commit job, commit-baselines). See
 # docs/android-visual-regression.md.
+#
+# Bot-head pass-through (Stephen's directive, 2026-10-24): the
+# follow-up run a bot baseline push triggers used to re-capture the
+# whole set just to compare it against baselines the previous run
+# had already proved green in-job before committing. The
+# visual-regression job now detects that its head commit IS the VR
+# bot's own baseline commit (bot author + the auto-commit message +
+# baseline files only) and passes immediately instead.
 name: Android Storybook VR
 
 on:
@@ -70,26 +78,63 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
+      # Bot-head pass-through (Stephen's directive, 2026-10-24):
+      # when the head commit is the VR bot's own baseline commit,
+      # the baselines it carries were already proved green in-job
+      # (luminance guard + re-compare) by the run that created the
+      # commit, so re-capturing everything is pure waste. All three
+      # conditions must hold: authored by github-actions[bot], the
+      # exact auto-commit subject, and every changed file under
+      # tools/visual-regression/baselines/. A maintainer merge or
+      # any later commit changes the head and the full run resumes.
+      # Update dispatches are excluded on purpose: an explicit
+      # regeneration request always runs in full.
+      - name: Detect VR bot baseline head
+        id: vrbot
+        if: github.event_name == 'pull_request' || inputs.mode == 'compare'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          skip=false
+          author="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.author.login // ""')"
+          subject="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.commit.message | split("\n")[0]')"
+          if [ "$author" = "github-actions[bot]" ] && [ "$subject" = "chore(vr): update Android Storybook baselines" ]; then
+            outside="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '[.files[].filename | select(startswith("tools/visual-regression/baselines/") | not)] | length')"
+            if [ "$outside" = "0" ]; then
+              skip=true
+            fi
+          fi
+          echo "skip=$skip" >> "$GITHUB_OUTPUT"
+          if [ "$skip" = "true" ]; then
+            echo "Head commit $HEAD_SHA is the VR bot's own baseline commit: the run that created it regenerated these baselines, passed them through the luminance guard, and re-verified them in-job before committing. Passing without re-capturing (Stephen's directive, 2026-10-24)." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
       - uses: actions/setup-node@v7
+        if: steps.vrbot.outputs.skip != 'true'
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: apps/storybook/package-lock.json
 
       - uses: actions/setup-java@v5
+        if: steps.vrbot.outputs.skip != 'true'
         with:
           distribution: temurin
           java-version: 17
 
       - name: Install host app dependencies
+        if: steps.vrbot.outputs.skip != 'true'
         working-directory: apps/storybook
         run: npm ci
 
       - name: Generate storybook.requires
+        if: steps.vrbot.outputs.skip != 'true'
         working-directory: apps/storybook
         run: npm run generate
 
       - name: Enable KVM
+        if: steps.vrbot.outputs.skip != 'true'
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
@@ -100,6 +145,7 @@ jobs:
       # (a `cd` in the workflow block would not survive to the next
       # line — learned on this PR's first run).
       - name: Capture and compare story screenshots
+        if: steps.vrbot.outputs.skip != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
@@ -111,7 +157,7 @@ jobs:
           script: bash tools/visual-regression/ci/capture-compare.sh "${{ github.event_name == 'pull_request' && 'pr-autocommit' || inputs.mode }}"
 
       - name: Upload screenshots and diffs
-        if: always()
+        if: always() && steps.vrbot.outputs.skip != 'true'
         uses: actions/upload-artifact@v7
         with:
           name: dsvr-output
@@ -142,7 +188,7 @@ jobs:
           if-no-files-found: error
 
       - name: Upload regenerated baselines (update mode)
-        if: inputs.mode == 'update'
+        if: inputs.mode == 'update' && steps.vrbot.outputs.skip != 'true'
         uses: actions/upload-artifact@v7
         with:
           name: dsvr-baselines
@@ -215,11 +261,11 @@ jobs:
   #
   # The bot's push parks the follow-up workflow run as
   # "action_required" (the same GITHUB_TOKEN behavior verified on
-  # PR #97), so the follow-up compare starts only after a maintainer
-  # approves it. That is not a blocker: the in-job re-compare is the
-  # verification, and when the follow-up does run it compares
-  # against the just-committed baselines and passes with no diffs —
-  # so the bot never commits twice for the same change (no loop).
+  # PR #97), so the follow-up run starts only after a maintainer
+  # approves it. When it does run, the visual-regression job's
+  # bot-head detection passes it immediately — the in-job
+  # re-compare is the verification — and the bot never commits
+  # twice for the same change (no loop).
   commit-pr-baselines:
     needs: visual-regression
     if: >-
