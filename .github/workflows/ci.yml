@@ -28,6 +28,8 @@ jobs:
           registry-url: https://npm.pkg.github.com
           scope: "@spudly"
       - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
