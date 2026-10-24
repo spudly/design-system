@@ -52,10 +52,7 @@ function argFlag(name) {
 const CONFIG = {
   packageName: argValue("--package", "dev.spudly.designsystem.storybook"),
   scheme: argValue("--scheme", "spudlyds"),
-  themes: argValue(
-    "--themes",
-    "light_warmHarvest,dark_warmHarvest,light_quietDawn,dark_quietDawn",
-  ).split(","),
+  themes: argValue("--themes", "light_warmHarvest,light_quietDawn").split(","),
   storyFilter: argValue("--stories", ""), // substring filter, empty = all
   // "" = the standard capture set; "narrow" = the narrow-viewport
   // variant (NARROW_SCOPE below, "-narrow" baseline filename suffix).
@@ -81,27 +78,34 @@ if (CONFIG.variant && CONFIG.variant !== "narrow") {
 
 // Capture scope — Stephen's decision, 2026-10-23: the committed
 // baseline set is PAGE stories only, each captured under its own
-// brand's themes (light + dark). Curating hundreds of component
+// brand's theme. Curating hundreds of component
 // screenshots was more review surface than the Android check needs:
 // full pages are where native layout diverges from web in ways that
 // hurt users, and component stories stay covered by Chromatic on
 // web. Wrong-brand page captures (an Eciperay page under Quiet
 // Dawn, or vice versa) are excluded — pages pin their brand.
 //
+// Light themes ONLY — Stephen's decision, 2026-10-24: dark-mode
+// captures doubled the snapshot count (and the VR job's emulator
+// time) for a second render of the same layout; layout regressions
+// are what this pipeline exists to catch, and they reproduce in
+// light. Dark baselines were deleted, not just de-scoped, so the
+// committed set stays exactly what CI compares.
+//
 // To widen or narrow the Android VR set, edit this table; the
 // driver, the CI job, and the committed baselines all follow it.
-// Current yield: 30 pages-eciperay stories x 2 warmHarvest themes
-// + 18 pages-memorize stories x 2 quietDawn themes = 96 baselines.
+// Current yield: 32 pages-eciperay stories + 18 pages-memorize
+// stories, light themes only = 50 baselines.
 // A second, display-variant set (RecipesPage stories at a narrow
 // logical width + large font) lives in NARROW_SCOPE below.
 const CAPTURE_SCOPE = [
   {
     storyPrefix: "pages-eciperay",
-    themes: ["light_warmHarvest", "dark_warmHarvest"],
+    themes: ["light_warmHarvest"],
   },
   {
     storyPrefix: "pages-memorize",
-    themes: ["light_quietDawn", "dark_quietDawn"],
+    themes: ["light_quietDawn"],
   },
 ];
 function inCaptureScope(storyId, theme) {
@@ -128,14 +132,15 @@ function inCaptureScope(storyId, theme) {
 // standard ones with a "-narrow" filename suffix
 // (baselines/<theme>/<storyId>-narrow.png), so the auto-commit /
 // guard / commit-job machinery treats them as ordinary baselines.
-// Current yield: 7 pages-eciperay-recipespage stories x 2
-// warmHarvest themes = 14 baselines (110 total with the standard
-// set). RecipesPage only on purpose: a second full pass would
-// double the job's emulator time (issue #114 is cutting it).
+// Current yield: 7 pages-eciperay-recipespage stories x light
+// warmHarvest = 7 baselines (57 total with the standard set). The
+// variant follows the light-only policy above (Stephen,
+// 2026-10-24). RecipesPage only on purpose: a second full pass
+// would double the job's emulator time (issue #114 is cutting it).
 const NARROW_SCOPE = [
   {
     storyPrefix: "pages-eciperay-recipespage",
-    themes: ["light_warmHarvest", "dark_warmHarvest"],
+    themes: ["light_warmHarvest"],
   },
 ];
 const ACTIVE_SCOPE = CONFIG.variant === "narrow" ? NARROW_SCOPE : CAPTURE_SCOPE;
