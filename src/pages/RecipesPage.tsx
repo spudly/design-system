@@ -73,8 +73,20 @@ const listContentStyle = {
 const listStyle = { flex: 1 } as const;
 
 // Structural flex only: the card's text block expands and may shrink
-// within the row (mirrors the app's ThumbnailListCard).
-const textBlockStyle = { flex: 1, minWidth: 0 } as const;
+// within the row (mirrors the app's ThumbnailListCard). The explicit
+// flexBasis matters (eciperay #205): with a plain `flex: 1` the basis
+// is 0, so on narrow viewports (e.g. a phone at the largest display
+// size, ~314dp wide) the row's fixed children — the 64dp thumbnail
+// and the Log cook / Delete buttons — consume the entire row and the
+// text block collapses to ~0dp wide. Text measured at ~0 width paints
+// nothing yet measures extremely tall, which stretched the card past
+// the viewport with only the thumbnail and buttons visible. A 60dp
+// basis gives the row a real line-breaking size: combined with the
+// row's flexWrap, the buttons wrap onto their own line instead of
+// squeezing the text out of existence, and the text block grows to
+// fill that line. At ordinary widths nothing changes — the basis is
+// below the width the block already gets, so it still just expands.
+const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
 
 /** One recipe row's view-model. The app formats `subtitle` (its list
  * meta line — servings · time · rating/satiety); the view only
@@ -303,7 +315,14 @@ function RecipeRow({
   onDeletePress?: () => void;
 }) {
   return (
-    <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3" marginBottom="$3">
+    <Card
+      variant="elevated"
+      flexDirection="row"
+      flexWrap="wrap"
+      alignItems="center"
+      gap="$3"
+      marginBottom="$3"
+    >
       {/* Both press targets carry the button role and an accessible
           name built from the recipe title: the thumbnail target
           wraps only an image (or an empty placeholder), so without
