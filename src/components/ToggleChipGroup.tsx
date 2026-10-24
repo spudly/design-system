@@ -47,6 +47,14 @@ export interface ToggleChipGroupProps {
    */
   onChange: (value: string) => void;
   label?: string;
+  /**
+   * Chips wrap onto extra rows when they run out of width (default).
+   * `wrap: false` keeps every chip on ONE row, each chip flexing to an
+   * equal share of the row width — for a small fixed option set (e.g.
+   * the recipe scale ½×/1×/2×/3×) where wrapping would change the
+   * control's height and push the content below it around (#73).
+   */
+  wrap?: boolean;
 }
 
 /**
@@ -62,20 +70,22 @@ export function ToggleChipGroup({
   values = [],
   onChange,
   label,
+  wrap = true,
 }: ToggleChipGroupProps) {
   const isSelected = (optionValue: string) =>
     mode === "single" ? optionValue === value : values.includes(optionValue);
 
   return (
-    <YStack gap={tokens.spacing[2]}>
+    <YStack gap={tokens.spacing[2]} {...(wrap ? {} : { flex: 1 })}>
       {label ? <Text variant="body">{label}</Text> : null}
-      <XStack flexWrap="wrap" gap={tokens.spacing[2]}>
+      <XStack flexWrap={wrap ? "wrap" : "nowrap"} gap={tokens.spacing[2]}>
         {options.map((opt) => {
           const selected = isSelected(opt.value);
           return (
             <StyledChip
               key={opt.value}
               selected={selected}
+              {...(wrap ? {} : { flex: 1 })}
               onPress={() => onChange(opt.value)}
               accessibilityRole="button"
               accessibilityLabel={opt.label}
