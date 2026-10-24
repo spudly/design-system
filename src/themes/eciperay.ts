@@ -21,6 +21,8 @@ export const eciperayTheme = {
     primaryActive: tokens.colors.terracotta.terracotta9,
     onPrimary: tokens.colors.terracotta.terracotta1,
     primarySubtle: tokens.colors.terracotta.terracotta2,
+    // ProgressBar track stays the primarySubtle tint in Warm Harvest (#94).
+    progressTrack: tokens.colors.terracotta.terracotta2,
     primaryEmphasis: tokens.colors.terracotta.terracotta8,
     link: tokens.colors.terracotta.terracotta8,
     linkDark: tokens.colors.terracotta.terracotta5,

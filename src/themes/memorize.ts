@@ -33,6 +33,16 @@ export const memorizeTheme = {
     // Quiet Dawn. Steps parallel the other themes: subtle = step 2 tint,
     // emphasis = the primaryHover step (dark primary for text on light).
     primarySubtle: tokens.colors.teal.teal2,
+    // ProgressBar track (#94, Stephen's call 2026-10-23): in Quiet
+    // Dawn LIGHT the bar's second color is a light gray, not the
+    // teal primarySubtle tint (#ccfbf1 reads light blue next to the
+    // teal fill). Scoped to the progressTrack role so Badge, Avatar,
+    // InlineAlert and the ghost button keep their teal tint. Fill
+    // (teal8) on gray3 keeps ≥3:1 WCAG non-text contrast (~4.8:1,
+    // same class as the old tint). Dark mode is unchanged: the dark
+    // semantic derives its track from primarySubtle, not this value
+    // (buildTamaguiThemes) — Stephen's request was light-only.
+    progressTrack: tokens.colors.gray.gray3,
     primaryEmphasis: tokens.colors.teal.teal9,
     link: tokens.colors.teal.teal8,
     linkDark: tokens.colors.teal.teal6,

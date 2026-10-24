@@ -17,6 +17,14 @@ const semantic = {
   onPrimary: "#ffffff",
   /** Light tint of primary for subtle backgrounds (badges, alerts). */
   primarySubtle: tokens.colors.primary.primary2,
+  /**
+   * ProgressBar track (the unfilled "second color"). Defaults to the
+   * primarySubtle tint; a theme may override it without touching the
+   * other primarySubtle consumers (badges, alerts, avatars) — Quiet
+   * Dawn light overrides it to a light gray (#94). Dark themes keep
+   * the primarySubtle tint (see buildTamaguiThemes).
+   */
+  progressTrack: tokens.colors.primary.primary2,
   /** Dark primary for text on light backgrounds. */
   primaryEmphasis: tokens.colors.primary.primary8,
   /** Link foreground on light backgrounds/surfaces (AA as text). */
