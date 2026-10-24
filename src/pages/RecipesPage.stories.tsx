@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../components/Text.js";
 import { View } from "tamagui";
-import { RecipesPage, type RecipesPageItem } from "./RecipesPage.js";
+import { RecipesPage, type RecipesPageFilterId, type RecipesPageItem } from "./RecipesPage.js";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -65,11 +65,15 @@ function RecipesPageDemo({
   recipes = recipeItems,
   isLoading = false,
   expandedRecipeId,
+  initialActiveFilters,
+  initialFilterChooserOpen = false,
 }: {
   initialSearch?: string;
   recipes?: RecipesPageItem[];
   isLoading?: boolean;
   expandedRecipeId?: string;
+  initialActiveFilters?: RecipesPageFilterId[];
+  initialFilterChooserOpen?: boolean;
 }) {
   const [search, setSearch] = useState(initialSearch);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -80,6 +84,11 @@ function RecipesPageDemo({
   const [maxSatiety, setMaxSatiety] = useState("");
   const [sort, setSort] = useState("newest");
   const [sortDir, setSortDir] = useState("desc");
+  // The #96 collapsed-filter state, held by the demo the way the
+  // app will hold it: which filters are added, and whether the
+  // add-filter chooser is open.
+  const [activeFilters, setActiveFilters] = useState(initialActiveFilters ?? []);
+  const [filterChooserOpen, setFilterChooserOpen] = useState(initialFilterChooserOpen);
 
   // The app filters server-side; the demo filters its fixtures by the
   // search text so the filtered state is honest about what the app
@@ -137,6 +146,10 @@ function RecipesPageDemo({
         onSortChange={setSort}
         sortDir={sortDir}
         onSortDirChange={setSortDir}
+        activeFilters={activeFilters}
+        onActiveFiltersChange={setActiveFilters}
+        filterChooserOpen={filterChooserOpen}
+        onFilterChooserOpenChange={setFilterChooserOpen}
       />
     </Viewport>
   );
@@ -156,6 +169,19 @@ export const Empty: Story = {
 
 export const Loading: Story = {
   render: () => <RecipesPageDemo isLoading recipes={[]} />,
+};
+
+export const FilterChooserOpen: Story = {
+  // The #96 chooser state: search + Filters button, with the
+  // add-filter options (every filter not yet added) showing.
+  render: () => <RecipesPageDemo initialFilterChooserOpen />,
+};
+
+export const WithFiltersAdded: Story = {
+  // The #96 added state: only the added filters' controls render
+  // (here Status and Ingredient), each with its Remove control;
+  // the remaining filters stay collapsed behind the button.
+  render: () => <RecipesPageDemo initialActiveFilters={["status", "ingredient"]} />,
 };
 
 export const ExpandedAccessory: Story = {
