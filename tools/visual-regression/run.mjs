@@ -57,6 +57,9 @@ const CONFIG = {
     "light_warmHarvest,dark_warmHarvest,light_quietDawn,dark_quietDawn",
   ).split(","),
   storyFilter: argValue("--stories", ""), // substring filter, empty = all
+  // "" = the standard capture set; "narrow" = the narrow-viewport
+  // variant (NARROW_SCOPE below, "-narrow" baseline filename suffix).
+  variant: argValue("--variant", ""),
   baselinesDir: argValue("--baselines", join(TOOL_DIR, "baselines")),
   outDir: argValue("--out", join(TOOL_DIR, "out")),
   update: argFlag("--update"),
@@ -71,6 +74,11 @@ const CONFIG = {
   settleMs: Number(argValue("--settle", "500")),
 };
 
+if (CONFIG.variant && CONFIG.variant !== "narrow") {
+  console.error(`FAIL: unknown --variant "${CONFIG.variant}" (only "narrow" is supported).`);
+  process.exit(1);
+}
+
 // Capture scope — Stephen's decision, 2026-10-23: the committed
 // baseline set is PAGE stories only, each captured under its own
 // brand's themes (light + dark). Curating hundreds of component
@@ -84,6 +92,8 @@ const CONFIG = {
 // driver, the CI job, and the committed baselines all follow it.
 // Current yield: 30 pages-eciperay stories x 2 warmHarvest themes
 // + 18 pages-memorize stories x 2 quietDawn themes = 96 baselines.
+// A second, display-variant set (RecipesPage stories at a narrow
+// logical width + large font) lives in NARROW_SCOPE below.
 const CAPTURE_SCOPE = [
   {
     storyPrefix: "pages-eciperay",
@@ -98,6 +108,44 @@ function inCaptureScope(storyId, theme) {
   return CAPTURE_SCOPE.some(
     (rule) => storyId.startsWith(rule.storyPrefix) && rule.themes.includes(theme),
   );
+}
+
+// Narrow-viewport variant scope (Stephen's directive, 2026-10-24):
+// ONLY the RecipesPage stories, re-captured with the emulator
+// display pinned to a phone running a large display-size override
+// + large font (ci/capture-compare.sh: wm size 1080x2400,
+// wm density 500 -> 345.6dp logical width, font_scale 1.3 — the
+// settings on Stephen's Pixel 8a that shipped eciperay #205). The
+// standard set never sees that class of bug: it captures at
+// density 320 / font 1.0, a 540dp-wide surface where the RecipesPage
+// row's fixed children (64dp thumbnail, Log cook / Delete buttons)
+// leave the flex:1 title/subtitle block ample room. At ~346dp with
+// font 1.3 the buttons grow while the row shrinks, the text block
+// starved to ~0dp, and PR #117 — the #205 fix (row flexWrap + a
+// 60dp flexBasis on the text block) — passed the standard set with
+// ZERO baseline movement. This variant exists so that regression
+// class produces a failing diff instead. Baselines live beside the
+// standard ones with a "-narrow" filename suffix
+// (baselines/<theme>/<storyId>-narrow.png), so the auto-commit /
+// guard / commit-job machinery treats them as ordinary baselines.
+// Current yield: 7 pages-eciperay-recipespage stories x 2
+// warmHarvest themes = 14 baselines (110 total with the standard
+// set). RecipesPage only on purpose: a second full pass would
+// double the job's emulator time (issue #114 is cutting it).
+const NARROW_SCOPE = [
+  {
+    storyPrefix: "pages-eciperay-recipespage",
+    themes: ["light_warmHarvest", "dark_warmHarvest"],
+  },
+];
+const ACTIVE_SCOPE = CONFIG.variant === "narrow" ? NARROW_SCOPE : CAPTURE_SCOPE;
+function inActiveScope(storyId, theme) {
+  return ACTIVE_SCOPE.some(
+    (rule) => storyId.startsWith(rule.storyPrefix) && rule.themes.includes(theme),
+  );
+}
+function baselineFileName(storyId) {
+  return CONFIG.variant === "narrow" ? `${storyId}-narrow.png` : `${storyId}.png`;
 }
 
 async function adb(...adbArgs) {
@@ -166,8 +214,16 @@ function comparePair(baselinePath, actualPath, diffPath) {
 
 async function fromDirMode() {
   const actualDir = CONFIG.fromDir;
-  const baselineFiles = listPngs(CONFIG.baselinesDir);
-  console.log(`compare-only: ${baselineFiles.length} baseline(s) vs ${actualDir}`);
+  // Standard and narrow baselines share one tree (the "-narrow"
+  // suffix tells them apart); an offline compare covers exactly
+  // one set — comparing a standard capture dir against the narrow
+  // baselines (or vice versa) would fail every pair on dimensions.
+  const baselineFiles = listPngs(CONFIG.baselinesDir).filter((rel) =>
+    CONFIG.variant === "narrow" ? rel.endsWith("-narrow.png") : !rel.endsWith("-narrow.png"),
+  );
+  console.log(
+    `compare-only: ${baselineFiles.length} ${CONFIG.variant || "standard"} baseline(s) vs ${actualDir}`,
+  );
   if (baselineFiles.length === 0) {
     console.error("FAIL: no baselines found — nothing to compare against.");
     return 1;
@@ -252,12 +308,14 @@ async function deviceMode() {
     stories = stories.filter((s) => s.id.includes(CONFIG.storyFilter));
   }
   const inScopeCount = CONFIG.themes.reduce(
-    (n, theme) => n + stories.filter((s) => inCaptureScope(s.id, theme)).length,
+    (n, theme) => n + stories.filter((s) => inActiveScope(s.id, theme)).length,
     0,
   );
   console.log(
     `capturing ${inScopeCount} (story x theme) pairs in capture scope ` +
-      `(page stories only, own brand; index holds ${stories.length} stories x ${CONFIG.themes.length} themes)`,
+      (CONFIG.variant === "narrow"
+        ? `(narrow-viewport variant: RecipesPage stories only, own brand; index holds ${stories.length} stories x ${CONFIG.themes.length} themes)`
+        : `(page stories only, own brand; index holds ${stories.length} stories x ${CONFIG.themes.length} themes)`),
   );
 
   const summary = { captured: 0, compared: 0, updated: 0, noBaseline: 0, failed: [] };
@@ -265,7 +323,7 @@ async function deviceMode() {
 
   for (const theme of CONFIG.themes) {
     for (const story of stories) {
-      if (!inCaptureScope(story.id, theme)) continue;
+      if (!inActiveScope(story.id, theme)) continue;
       nonce++;
       const url = `${CONFIG.scheme}://capture/${story.id}?theme=${encodeURIComponent(theme)}&nonce=${nonce}`;
       try {
@@ -303,7 +361,7 @@ async function deviceMode() {
         return null;
       });
       if (!png) continue;
-      const rel = join(theme, `${story.id}.png`);
+      const rel = join(theme, baselineFileName(story.id));
       const actualPath = join(CONFIG.outDir, "actual", rel);
       mkdirSync(dirname(actualPath), { recursive: true });
       writeFileSync(actualPath, png);
