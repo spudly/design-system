@@ -24,7 +24,7 @@
 # pr-autocommit is what pull_request runs use (Stephen's directive,
 # 2026-10-23): if the compare finds screenshot diffs, regenerate the
 # baselines from the fresh captures IN THIS JOB — gated by the
-# luminance guard (tools/visual-regression/guard.mjs, issue #101)
+# luminance guard (tools/visualRegression/guard.mjs, issue #101)
 # and an in-job re-capture/re-compare against the regenerated set —
 # and hand the proven-green set to the workflow's
 # commit-pr-baselines job, which pushes it onto the PR branch.
@@ -50,7 +50,7 @@ set -euo pipefail
 
 MODE="${1:-compare}"
 REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
-VR_DIR="$REPO_ROOT/tools/visual-regression"
+VR_DIR="$REPO_ROOT/tools/visualRegression"
 cd "$REPO_ROOT/apps/storybook"
 
 npx expo prebuild --platform android --no-install

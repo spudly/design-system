@@ -23,7 +23,7 @@
  *    captures the expanded layout.
  *
  * This is a source scan, not a render test, for the same reason as
- * test/recipes-page-bounded-list.test.mjs: the repo has no JS
+ * test/recipesPageBoundedList.test.mjs: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
  * and the invariant is a per-literal property of the source.
  * Comments are stripped before scanning so prose cannot satisfy

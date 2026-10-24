@@ -24,7 +24,7 @@
  *    override to work around the primitives — the fix lives in the
  *    primitives, so every story and app screen gets it.
  *
- * Source-scan test (like theme-fonts.test.mjs part 4): the
+ * Source-scan test (like themeFonts.test.mjs part 4): the
  * rendering proof lives in the PR description, this pins the
  * mechanism so it cannot silently regress to styled()-only.
  */

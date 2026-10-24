@@ -38,7 +38,7 @@
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in
  * CI), and the invariant is a per-literal property of the
- * source (same rationale as test/meal-plan-detail-page.test.mjs).
+ * source (same rationale as test/mealPlanDetailPage.test.mjs).
  * Comments are stripped before scanning so prose cannot
  * satisfy — or, for the pinned absences, accidentally trip —
  * the patterns.

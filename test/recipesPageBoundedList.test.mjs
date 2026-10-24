@@ -27,7 +27,7 @@
  * This is a source scan, not a render test: the failure happens in
  * Android's Yoga layout, which no JS renderer in this repo performs,
  * and the invariant is a per-literal property of the source (same
- * rationale as test/glyph-line-height.test.mjs). Comments are
+ * rationale as test/glyphLineHeight.test.mjs). Comments are
  * stripped before scanning so prose cannot satisfy the patterns.
  */
 import assert from "node:assert/strict";

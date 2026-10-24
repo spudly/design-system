@@ -4,7 +4,7 @@
 # why the app is built as a release APK with an embedded bundle).
 #
 # Captures the SearchField stories clean, applies
-# tools/visual-regression/sanity/searchfield-162.patch (pre-fix text
+# tools/visualRegression/sanity/searchfield-162.patch (pre-fix text
 # glyph with numeric lineHeight, clip-box hardening removed),
 # rebuilds and reinstalls, recaptures, and succeeds ONLY if the
 # comparison fails — i.e. the pipeline is sensitive to the bug on
@@ -22,13 +22,13 @@ adb shell wm density 320
 adb shell settings put system font_scale 1.0
 adb logcat -G 8M
 
-DRIVER="node ../../tools/visual-regression/run.mjs"
+DRIVER="node ../../tools/visualRegression/run.mjs"
 
 # Clean capture (SearchField stories, one theme is enough).
 $DRIVER --stories searchfield --themes light_warmHarvest --out /tmp/dsvr-clean
 
 # Reintroduce the #162 bug, rebuild with it embedded, and recapture.
-(cd "$REPO_ROOT" && git apply tools/visual-regression/sanity/searchfield-162.patch)
+(cd "$REPO_ROOT" && git apply tools/visualRegression/sanity/searchfield-162.patch)
 (cd android && ./gradlew assembleRelease --console=plain -q)
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 $DRIVER --stories searchfield --themes light_warmHarvest --out /tmp/dsvr-mutated

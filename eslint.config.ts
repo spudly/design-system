@@ -27,23 +27,6 @@ export default [
   ...base,
   ...react,
   {
-    // This repo names files in kebab-case alongside PascalCase
-    // (components) and camelCase. The shared config's filename-case
-    // only allows camel/Pascal, which fights the repo-wide convention,
-    // so kebab-case is allowed here too. The ignore list mirrors the
-    // shared config's own.
-    files: ["**/*.{ts,tsx,js,jsx,cjs,mjs}"],
-    rules: {
-      "unicorn/filename-case": [
-        "error",
-        {
-          cases: { camelCase: true, pascalCase: true, kebabCase: true },
-          ignore: [/^react-native\.config\.(?:js|cjs)$/u, /^(?:__tests__|__mocks__|mcp-server)$/u],
-        },
-      ],
-    },
-  },
-  {
     // Node tooling (the visual-regression runner and helpers): these
     // run under Node, not in the library runtime, so Node globals
     // apply and console is their interface — the shared base's

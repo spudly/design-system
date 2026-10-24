@@ -39,7 +39,7 @@
  * This is a source scan, not a render test: the failure happens in
  * Android's Yoga layout, which no JS renderer in this repo performs,
  * and the invariant is a per-literal property of the source (same
- * rationale as test/accessibility-roles.test.mjs). The scan fails
+ * rationale as test/accessibilityRoles.test.mjs). The scan fails
  * loudly on forms it cannot classify rather than passing vacuously.
  */
 import assert from "node:assert/strict";

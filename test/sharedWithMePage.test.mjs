@@ -4,7 +4,7 @@
  *
  * The app's SharedWithMeView shares Recipes' filter bar, filter
  * state, and fixed `list` shell, so this page carries the same
- * structural contract the recipes-page-bounded-list test pins for
+ * structural contract the recipesPageBoundedList test pins for
  * RecipesPage:
  * 1. The shell is the non-scrolling `list` ScreenContainer.
  * 2. The FlatList is height-bounded with `flex: 1` (#188).
@@ -29,7 +29,7 @@
  *    (Default, Filtered, Empty, Loading) for Chromatic.
  *
  * This is a source scan, not a render test, for the same reason
- * as test/recipes-page-bounded-list.test.mjs: the failures it
+ * as test/recipesPageBoundedList.test.mjs: the failures it
  * guards happen in native layout, which no JS renderer in this
  * repo performs, and the invariant is a per-literal property of
  * the source. Comments are stripped before scanning so prose

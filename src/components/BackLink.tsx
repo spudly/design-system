@@ -72,7 +72,7 @@ export interface BackLinkProps {
  *
  * Accessibility: exposes `accessibilityRole="link"` (a member of
  * React Native's supported role set — see
- * test/accessibility-roles.test.mjs) and a 44px minimum touch height.
+ * test/accessibilityRoles.test.mjs) and a 44px minimum touch height.
  * On web it is focusable and Enter activates it, like TextLink (with
  * no href, link semantics alone are not keyboard-operable).
  */

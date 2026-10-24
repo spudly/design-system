@@ -33,7 +33,7 @@
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
  * and the invariant is a per-literal property of the source (same
- * rationale as test/recipes-page-bounded-list.test.mjs). Comments
+ * rationale as test/recipesPageBoundedList.test.mjs). Comments
  * are stripped before scanning so prose cannot satisfy — or, for
  * the no-slot pin, accidentally trip — the patterns.
  */

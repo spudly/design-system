@@ -13,7 +13,7 @@
  * clocks — so screenshots stay deterministic).
  *
  * This is a source scan, not a render test, for the same reason as
- * test/glyph-line-height.test.mjs: the invariant is a per-file
+ * test/glyphLineHeight.test.mjs: the invariant is a per-file
  * property of the source, and no JS renderer in this repo performs
  * the screenshot comparison (Chromatic does, in CI).
  */

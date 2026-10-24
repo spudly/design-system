@@ -20,7 +20,7 @@
  * This is a source scan of the workflow YAML: the failure happens in
  * GitHub's token provisioning, which no local runner reproduces, and
  * the invariant is a per-literal property of the workflow source (same
- * rationale as test/glyph-line-height.test.mjs). The scan fails loudly
+ * rationale as test/glyphLineHeight.test.mjs). The scan fails loudly
  * if the steps it looks for cannot be found, rather than passing
  * vacuously.
  */

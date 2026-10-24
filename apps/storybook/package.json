@@ -25,7 +25,7 @@
     "react-native-worklets": "0.13.0",
     "tamagui": "3.0.18"
   },
-  "description": "On-device Storybook host app for @spudly/ui (design-system #43): mounts the repo's CSF stories on Android via @storybook/react-native and doubles as the screenshot-capture target for tools/visual-regression. Not published.",
+  "description": "On-device Storybook host app for @spudly/ui (design-system #43): mounts the repo's CSF stories on Android via @storybook/react-native and doubles as the screenshot-capture target for tools/visualRegression. Not published.",
   "devDependencies": {
     "@babel/core": "^7.28.0",
     "@types/react": "~19.3.0",

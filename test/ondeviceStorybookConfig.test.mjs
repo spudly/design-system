@@ -3,7 +3,7 @@
  *
  * The on-device Storybook (apps/storybook) renders every story under
  * every brand in ONE process, and Tamagui keeps exactly one global
- * config (see tamagui-config.test.mjs / eciperay#149), so it uses the
+ * config (see tamaguiConfig.test.mjs / eciperay#149), so it uses the
  * combined brands-as-sub-themes structure of the web Storybook config.
  * Unlike the web factory — whose fonts point at CSS vars the preview
  * sets per brand, which do not exist on device — the on-device factory
@@ -19,7 +19,7 @@
  * In Node the platform resolution takes the web path, so the families
  * assert as the brands' web stacks; the native names are pinned by
  * asserting the SAME resolution inputs through the per-brand factory
- * behavior covered in tamagui-config.test.mjs. What this test pins is
+ * behavior covered in tamaguiConfig.test.mjs. What this test pins is
  * the combined structure and which brand stacks feed it.
  *
  * Run against the built output: `npm run build` first (the `test`

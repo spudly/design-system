@@ -23,7 +23,7 @@
  *    filters added) so Chromatic and Android VR capture them.
  *
  * This is a source scan, not a render test, for the same reason
- * as test/recipes-page-accessory.test.mjs: the repo has no JS
+ * as test/recipesPageAccessory.test.mjs: the repo has no JS
  * renderer for these components, and the invariant is a
  * per-literal property of the source. Comments are stripped
  * before scanning so prose cannot satisfy the patterns.

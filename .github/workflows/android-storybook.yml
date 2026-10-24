@@ -4,7 +4,7 @@
 # renders the same CSF stories in the Expo host app
 # (apps/storybook) on an Android emulator and pixel-compares
 # screenshots against baselines committed under
-# tools/visual-regression/baselines/. See
+# tools/visualRegression/baselines/. See
 # docs/android-visual-regression.md for the full workflow, including
 # how baselines are generated and updated.
 #
@@ -16,7 +16,7 @@
 # PR runs auto-commit regenerated baselines (Stephen's directive,
 # 2026-10-23): when the compare finds screenshot diffs, the capture
 # script regenerates the baselines from the fresh captures, gates
-# them through the luminance guard (tools/visual-regression/
+# them through the luminance guard (tools/visualRegression/
 # guard.mjs, issue #101), proves them with an in-job re-capture and
 # re-compare, and the commit-pr-baselines job below pushes them
 # onto the PR branch — no manual update dispatch. Pushes to main
@@ -48,7 +48,7 @@ on:
     paths:
       - "src/**"
       - "apps/storybook/**"
-      - "tools/visual-regression/**"
+      - "tools/visualRegression/**"
       - ".github/workflows/android-storybook.yml"
   workflow_dispatch:
     inputs:
@@ -95,7 +95,7 @@ jobs:
       # commit, so re-capturing everything is pure waste. All three
       # conditions must hold: authored by github-actions[bot], the
       # exact auto-commit subject, and every changed file under
-      # tools/visual-regression/baselines/. A maintainer merge or
+      # tools/visualRegression/baselines/. A maintainer merge or
       # any later commit changes the head and the full run resumes.
       # Update dispatches are excluded on purpose: an explicit
       # regeneration request always runs in full.
@@ -110,7 +110,7 @@ jobs:
           author="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.author.login // ""')"
           subject="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.commit.message | split("\n")[0]')"
           if [ "$author" = "github-actions[bot]" ] && [ "$subject" = "chore(vr): update Android Storybook baselines" ]; then
-            outside="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '[.files[].filename | select(startswith("tools/visual-regression/baselines/") | not)] | length')"
+            outside="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '[.files[].filename | select(startswith("tools/visualRegression/baselines/") | not)] | length')"
             if [ "$outside" = "0" ]; then
               skip=true
             fi
@@ -164,7 +164,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
-          script: bash tools/visual-regression/ci/capture-compare.sh "${{ github.event_name == 'pull_request' && 'pr-autocommit' || inputs.mode }}"
+          script: bash tools/visualRegression/ci/capture-compare.sh "${{ github.event_name == 'pull_request' && 'pr-autocommit' || inputs.mode }}"
 
       - name: Upload screenshots and diffs
         if: always() && steps.vrbot.outputs.skip != 'true'
@@ -204,7 +204,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: dsvr-baselines
-          path: tools/visual-regression/baselines
+          path: tools/visualRegression/baselines
           if-no-files-found: error
 
   # Update mode only: commit the baselines the visual-regression
@@ -245,17 +245,17 @@ jobs:
           path: ${{ runner.temp }}/dsvr-baselines
 
       - name: Sync baselines into the tree
-        run: rsync -a --delete "${{ runner.temp }}/dsvr-baselines/" tools/visual-regression/baselines/
+        run: rsync -a --delete "${{ runner.temp }}/dsvr-baselines/" tools/visualRegression/baselines/
 
       - name: Commit and push if baselines changed
         run: |
-          if [ -z "$(git status --porcelain -- tools/visual-regression/baselines)" ]; then
+          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines)" ]; then
             echo "Baselines unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tools/visual-regression/baselines
+          git add tools/visualRegression/baselines
           git commit -m "chore(vr): update Android Storybook baselines"
           git push origin "HEAD:${{ github.ref_name }}"
 
@@ -308,23 +308,23 @@ jobs:
           path: ${{ runner.temp }}/dsvr-pr-baselines
 
       - name: Sync baselines into the tree
-        run: rsync -a --delete "${{ runner.temp }}/dsvr-pr-baselines/" tools/visual-regression/baselines/
+        run: rsync -a --delete "${{ runner.temp }}/dsvr-pr-baselines/" tools/visualRegression/baselines/
 
       - name: Commit and push regenerated baselines
         run: |
-          if [ -z "$(git status --porcelain -- tools/visual-regression/baselines)" ]; then
+          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines)" ]; then
             echo "Baselines unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tools/visual-regression/baselines
+          git add tools/visualRegression/baselines
           git commit -m "chore(vr): update Android Storybook baselines"
           git push origin "HEAD:${{ github.head_ref }}"
 
   # The #162 sanity check (issue #43 acceptance): reintroduce the
   # SearchField lineHeight bug via the patch in
-  # tools/visual-regression/sanity/ and prove the pipeline FAILS the
+  # tools/visualRegression/sanity/ and prove the pipeline FAILS the
   # SearchField screenshot on Android. The patch restores the pre-fix
   # text glyph (numeric lineHeight = fontSize) and removes the
   # clip-box hardening — on web the same change renders identically,
@@ -372,7 +372,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
-          script: bash tools/visual-regression/ci/capture-sanity.sh
+          script: bash tools/visualRegression/ci/capture-sanity.sh
 
       - name: Upload sanity captures
         if: always()

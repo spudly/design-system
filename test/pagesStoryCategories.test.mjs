@@ -12,7 +12,7 @@
  *    pre-#70 single mixed level must not come back.
  * 3. The two #44 demo collections keep their `Pages/Eciperay` /
  *    `Pages/Memorize` titles: they are the category collections,
- *    and page-stories.test.mjs pins their story sets separately.
+ *    and pageStories.test.mjs pins their story sets separately.
  *
  * Component (non-page) stories are out of scope — #70 is only
  * about the page stories' titles.

@@ -36,7 +36,7 @@ import { TextField } from "../components/TextField.js";
  *   list's header so it scrolls with the recipes instead of pinning
  *   above a sliver of list. The list — and therefore the focused
  *   filter input — stays mounted while loading; the spinner renders
- *   as the list's empty state. test/recipes-page-bounded-list.test.mjs
+ *   as the list's empty state. test/recipesPageBoundedList.test.mjs
  *   guards these patterns in source.
  * - #162: search uses the DS SearchField as-is. No lineHeight is set
  *   on any glyph or text in this file — the SearchField's own glyph
