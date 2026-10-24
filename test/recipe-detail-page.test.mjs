@@ -15,7 +15,9 @@
  * 3. The chrome is pinned: status badge + version picker toolbar
  *    renders above the single ScrollView, and every section
  *    renders inside it (#71 — a section that scrolled its own
- *    chrome away would break the version context).
+ *    chrome away would break the version context). The version
+ *    picker is the standard SelectField (#72) with the contract
+ *    the custom sheet widget had.
  * 4. The sections render in the order the tabs had (overview,
  *    ingredients, instructions, cook history, nutrition), each
  *    section after the overview under its own heading with the
@@ -104,8 +106,8 @@ test("the chrome is pinned above a single scroll view", () => {
   assert.ok(scrollAt > toolbarAt, "the scroll view renders below the pinned chrome");
   assert.equal(
     code.split("<ScrollView").length - 1,
-    2,
-    "exactly two ScrollViews: the section scroll and the version picker's sheet list",
+    1,
+    "exactly one ScrollView: the section scroll (the version picker is a SelectField since #72 — its sheet scroll lives in that component)",
   );
   const panelAt = code.indexOf("<OverviewPanel");
   assert.ok(panelAt > scrollAt, "the sections render inside the scroll view");
@@ -143,6 +145,39 @@ test("there are no tabs: every section renders in one scroll, in tab order, unde
     );
     lastAt = at;
   }
+});
+
+test("the version picker is the standard SelectField with the same data contract (#72)", () => {
+  assert.match(
+    code,
+    /<SelectField\s+label="Version"/,
+    "the version picker must render the DS SelectField, labeled Version",
+  );
+  assert.match(
+    code,
+    /options=\{sorted\.map\(\(version\) => \(\{ value: version\.id, label: version\.label \}\)\)\}/,
+    "the options are the versions in the picker's sorted order, id as value and app label as label",
+  );
+  assert.match(
+    code,
+    /value=\{selected\?\.id \?\? ""\}/,
+    "the field's value is the selected version (with the sorted-first fallback above it)",
+  );
+  assert.match(
+    code,
+    /onValueChange=\{onSelectVersion\}/,
+    "selection changes flow out through the unchanged onSelectVersion callback",
+  );
+  assert.ok(!code.includes("<Modal"), "the custom bottom-sheet widget is gone");
+  assert.ok(
+    !code.includes("version-picker-backdrop"),
+    "the custom sheet's backdrop testID is gone with it",
+  );
+  assert.match(
+    code,
+    /Version \{sorted\[0\]\?\.versionNumber \?\? 1\}/,
+    "the single-version case still collapses to static version text",
+  );
 });
 
 test("the status badge map covers the four statuses with a fallback", () => {

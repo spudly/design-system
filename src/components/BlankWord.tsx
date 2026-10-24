@@ -43,6 +43,21 @@ export interface BlankWordProps {
  */
 const inheritWeight = isWeb ? "inherit" : undefined;
 
+/**
+ * Where the blank line anchors inside the sizing word's box (#93).
+ * On web the box is the full line box (lineHeight = 1.5 × font size),
+ * so `bottom: 4` lands the line just below the baseline, like an
+ * underline. On native the box Yoga measures for the nested text is
+ * the tighter glyph box (no half-leading), so the same 4px offset
+ * leaves the line floating at mid x-height — Stephen's 2026-10-23
+ * Android-baseline review. Anchoring 1px BELOW the native box's
+ * bottom edge puts the line just under the baseline there (measured
+ * against the PR #91 mid-session baseline: the line sat ~5dp above
+ * the baseline; 4 → -1 moves it down exactly that 5dp). Web keeps 4:
+ * its line already sits at the bottom of the line.
+ */
+const blankLineBottom = isWeb ? 4 : -1;
+
 export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordProps) {
   const [focused, setFocused] = useState(false);
 
@@ -119,7 +134,7 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
           position="absolute"
           left={0}
           right={0}
-          bottom={4}
+          bottom={blankLineBottom}
           height={2}
           borderRadius={1}
           backgroundColor={focused ? "$color" : "$link"}
