@@ -31,6 +31,16 @@
 # visual-regression job now detects that its head commit IS the VR
 # bot's own baseline commit (bot author + the auto-commit message +
 # baseline files only) and passes immediately instead.
+#
+# Narrow-viewport variant (Stephen's directive, 2026-10-24): every
+# capture mode also re-captures ONLY the RecipesPage stories with
+# the emulator display switched to a 345.6dp logical width +
+# font_scale 1.3 (the phone settings behind eciperay #205, whose
+# fix moved zero standard baselines — the standard surface is
+# 540dp wide and never starves the row). Variant baselines carry a
+# "-narrow" filename suffix and flow through the same compare /
+# guard / auto-commit path as the standard set. See
+# docs/android-visual-regression.md.
 name: Android Storybook VR
 
 on:
@@ -161,7 +171,9 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: dsvr-output
-          path: /tmp/dsvr-out
+          path: |
+            /tmp/dsvr-out
+            /tmp/dsvr-out-narrow
           if-no-files-found: ignore
 
       # PR auto-commit: capture-compare.sh (mode pr-autocommit)
