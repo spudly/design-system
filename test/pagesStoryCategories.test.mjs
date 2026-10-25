@@ -6,7 +6,7 @@
  *
  * The contract:
  * 1. Each real page story (#49) declares its categorized title:
- *    `Pages/Eciperay/<Page>` for the five Eciperay pages,
+ *    `Pages/Eciperay/<Page>` for the Eciperay pages,
  *    `Pages/Memorize/<Page>` for the four Memorize pages.
  * 2. No page story file declares a flat `Pages/<Page>` title — the
  *    pre-#70 single mixed level must not come back.
@@ -35,6 +35,10 @@ const categorized = [
   ["RecipeDetailPage.stories.tsx", "Pages/Eciperay/RecipeDetailPage"],
   ["MealPlansPage.stories.tsx", "Pages/Eciperay/MealPlansPage"],
   ["MealPlanDetailPage.stories.tsx", "Pages/Eciperay/MealPlanDetailPage"],
+  ["RecipeFormPage.stories.tsx", "Pages/Eciperay/RecipeFormPage"],
+  ["EditRecipePage.stories.tsx", "Pages/Eciperay/EditRecipePage"],
+  ["EditVersionPage.stories.tsx", "Pages/Eciperay/EditVersionPage"],
+  ["ManualEntryPage.stories.tsx", "Pages/Eciperay/ManualEntryPage"],
   ["MyVersesPage.stories.tsx", "Pages/Memorize/MyVersesPage"],
   ["VerseSearchPage.stories.tsx", "Pages/Memorize/VerseSearchPage"],
   ["MemorizationSessionPage.stories.tsx", "Pages/Memorize/MemorizationSessionPage"],

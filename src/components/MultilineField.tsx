@@ -25,6 +25,15 @@ const StyledTextArea = styled(TamaguiTextArea, {
         borderColor: "$danger",
       },
     },
+    // The version-diff warning wash, same contract as TextField's
+    // `changed` variant: warning step 5 border / step 1 fill
+    // replacing the $surface fill outright.
+    changed: {
+      true: {
+        borderColor: tokens.colors.warning.warning5,
+        backgroundColor: tokens.colors.warning.warning1,
+      },
+    },
   } as const,
 });
 
