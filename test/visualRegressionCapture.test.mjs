@@ -67,6 +67,17 @@ test("crop flags a frame whose content runs to the last row", () => {
   assert.equal(r.truncationSuspect, true);
 });
 
+test("crop flags a frame with no content row at all", () => {
+  // Every row uniform: makeFrame with contentEnd 0 and no strip
+  // is a single flat background — the degenerate frame shape a
+  // clipped draw produces. Height 0 must be truncation-suspect,
+  // never a valid (empty) baseline.
+  const r = cropBlankTailPng(makeFrame(300, 0, false));
+  assert.equal(r.height, 0);
+  assert.equal(r.removedRows, 300);
+  assert.equal(r.truncationSuspect, true);
+});
+
 test("crop leaves a frame ending on a uniform row unsuspected", () => {
   const r = cropBlankTailPng(makeFrame(1200, 1199, false));
   assert.equal(r.removedRows, 1);

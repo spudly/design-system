@@ -177,23 +177,36 @@ class DsvrCaptureModule : Module() {
       throw Exception("root view has no size (${rootWidth}x${rootHeight})")
     }
     val delta = contentHeight - viewportHeight
-    val drawnHeight = rootHeight + delta
+    // Never draw shorter than the root's natural height. When the
+    // content overflows the viewport (delta > 0) the frame grows
+    // by the overflow; when the content FITS the viewport
+    // (delta <= 0) nothing is hidden below the fold and the full
+    // on-screen page is the complete frame — a bitmap shorter
+    // than the root would clip the root's lower rows, and with
+    // them whatever part of the page sits there (a short list's
+    // rows, a loading spinner), leaving a frame of pure
+    // background. First version of this module drew
+    // rootHeight + delta unconditionally and produced exactly
+    // that for short-content stories under the narrow geometry.
+    val drawnHeight = if (delta > 0) rootHeight + delta else rootHeight
     if (drawnHeight <= 0 || drawnHeight > 32768) {
       throw Exception("drawn height $drawnHeight out of range")
     }
 
-    // Record frames, then grow (scroll mode only): the ScrollView
-    // takes the content's full height; every ancestor grows by the
-    // same delta with its top anchored. In this hierarchy each
-    // growing child is the only or last child of its parent
-    // (decorator > viewport > page column of [header, ScrollView]),
-    // so no sibling is displaced.
+    // Record frames, then grow (scroll mode, positive delta only):
+    // the ScrollView takes the content's full height; every
+    // ancestor grows by the same delta with its top anchored. In
+    // this hierarchy each growing child is the only or last child
+    // of its parent (decorator > viewport > page column of
+    // [header, ScrollView]), so no sibling is displaced. A
+    // non-positive delta needs no re-layout at all: the hierarchy
+    // is drawn exactly as it sits on screen.
     val frames = ArrayList<IntArray>(chain.size)
     for (v in chain) frames.add(intArrayOf(v.left, v.top, v.right, v.bottom))
     val originalLayerType = root.layerType
     var bitmap: Bitmap? = null
     try {
-      if (scroll != null) {
+      if (scroll != null && delta > 0) {
         scroll.scrollTo(0, 0)
         scroll.layout(
           scroll.left,

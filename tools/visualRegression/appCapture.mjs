@@ -91,10 +91,14 @@ export async function pullAppCapture(config, summary, target) {
     chainDepth: Number(m[11]),
     appMs: Number(m[12]),
   };
-  // Truncation guard: the frame's content region (drawn height
-  // minus the on-screen chrome, root minus viewport) must equal
-  // the measured content height exactly — nothing clipped,
-  // nothing invented — or the frame is rejected.
+  // Truncation guard, two cases. Content TALLER than the
+  // viewport: the frame's content region (drawn height minus the
+  // on-screen chrome, root minus viewport) must equal the
+  // measured content height exactly — nothing clipped, nothing
+  // invented. Content that FITS the viewport (and root mode,
+  // where the two are equal by construction): the frame must be
+  // the root's full natural height — a shorter bitmap clips the
+  // root's lower rows and whatever page content sits in them.
   const contentRegion = metrics.height - (metrics.rootHeight - metrics.viewportHeight);
   metrics.contentRegion = contentRegion;
   metrics.totalMs = Date.now() - storyStartMs;
@@ -105,10 +109,17 @@ export async function pullAppCapture(config, summary, target) {
       `viewport=${metrics.viewportHeight} root=${metrics.rootHeight} mode=${metrics.mode} ` +
       `app=${metrics.appMs}ms total=${metrics.totalMs}ms`,
   );
-  if (contentRegion !== metrics.contentHeight) {
-    const why =
-      `APPCAP GUARD: drawn content region ${contentRegion}px != measured content ` +
-      `${metrics.contentHeight}px — frame rejected (issue #137 truncation guard)`;
+  const fitsViewport = metrics.contentHeight <= metrics.viewportHeight;
+  const guardOk = fitsViewport
+    ? metrics.height === metrics.rootHeight
+    : contentRegion === metrics.contentHeight;
+  if (!guardOk) {
+    const why = fitsViewport
+      ? `APPCAP GUARD: content fits the viewport (${metrics.contentHeight}px <= ` +
+        `${metrics.viewportHeight}px) but the frame is ${metrics.height}px tall, not the root's ` +
+        `${metrics.rootHeight}px — frame rejected (issue #137 truncation guard)`
+      : `APPCAP GUARD: drawn content region ${contentRegion}px != measured content ` +
+        `${metrics.contentHeight}px — frame rejected (issue #137 truncation guard)`;
     summary.failed.push(`${label}: ${why}`);
     console.error(`DSVR APPCAP GUARD FAIL ${label}: ${why}`);
     return { error: why };

@@ -86,12 +86,17 @@ function luminanceStats(rgba) {
   let sum = 0;
   let sumSq = 0;
   let n = 0;
+  // A zero-pixel frame has no luminance to average (the stats
+  // would be NaN and every comparison below false): report it as
+  // perfectly uniform so the near-uniform check trips on it — an
+  // empty frame is a broken capture, never a baseline.
   for (let o = 0; o + 3 < rgba.length; o += 4 * STRIDE) {
     const lum = 0.299 * rgba[o] + 0.587 * rgba[o + 1] + 0.114 * rgba[o + 2];
     sum += lum;
     sumSq += lum * lum;
     n++;
   }
+  if (n === 0) return { mean: 0, stddev: 0 };
   const mean = sum / n;
   const variance = Math.max(0, sumSq / n - mean * mean);
   return { mean, stddev: Math.sqrt(variance) };

@@ -13,13 +13,16 @@
 // system strip), and both must trim for the crop to reach the
 // content end.
 //
-// Truncation signal: a capture where NOTHING trimmed and the
+// Truncation signals: a capture where NOTHING trimmed and the
 // bottom row is not itself blank means content ran right up to
 // the frame's last row — for a scroll-mode app-drawn frame, whose
-// below-viewport tail should always trim, that is suspect, and
-// the driver fails the capture loudly (the drawn==measured guard
-// in appCapture.mjs is the primary completeness check; this is
-// the safety net behind it).
+// below-viewport tail should always trim, that is suspect. A
+// capture where EVERYTHING trimmed (height 0) is worse: the frame
+// held no content row at all, so the story's content never made
+// it into the bitmap. Both are truncation-suspect, and the driver
+// fails the capture loudly (the drawn==measured guard in
+// appCapture.mjs is the primary completeness check; this is the
+// safety net behind it).
 
 import { decodePng, encodePng } from "./png.mjs";
 
@@ -69,6 +72,6 @@ export function cropBlankTailPng(buf) {
     height,
     removedRows,
     bottomRowUniform,
-    truncationSuspect: removedRows === 0 && !bottomRowUniform,
+    truncationSuspect: height === 0 || (removedRows === 0 && !bottomRowUniform),
   };
 }

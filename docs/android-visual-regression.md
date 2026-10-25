@@ -107,9 +107,13 @@ the app itself:
   on-screen render (the spike verified alignment is exact).
 - **Truncation guard**: the module reports the measured content
   height alongside the drawn frame, and the driver rejects the
-  capture unless the frame's content region (drawn height minus
-  the on-screen chrome) equals the measured content height
-  exactly. A rejected capture fails the run and commits nothing.
+  capture unless the geometry checks out exactly — for content
+  taller than the viewport, the frame's content region (drawn
+  height minus the on-screen chrome) must equal the measured
+  content height; for content that fits the viewport, the frame
+  must be the root's full natural height (a shorter bitmap would
+  clip the root's lower rows and any content sitting in them).
+  A rejected capture fails the run and commits nothing.
 - **Blank-tail crop** (`tools/visualRegression/crop.mjs`): the
   drawn frame still carries the root's below-viewport region
   under the content; the driver trims trailing uniform rows so a
