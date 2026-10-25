@@ -22,7 +22,7 @@ export interface EditVersionPageProps {
   versionNumber: number;
   /** Host-composed summary of what the draft changes, rendered
    * under the heading when provided. */
-  changeSummary?: string;
+  changeSummary?: string | null;
   /** Renders the "based on imported vN" banner (the host decides —
    * it knows the creation path and has the parent loaded). */
   showImportBanner?: boolean;
