@@ -16,6 +16,7 @@ the field to 1826px on a Pixel 8a) passed every web check.
 | On-device config | `src/tamagui.config.ts` → `createOnDeviceStorybookTamaguiConfig()` | Combined three-brand config (base, Warm Harvest, Quiet Dawn) with native font registrations. The web combined config uses CSS-variable font stacks, invalid on native. One process-wide config either way — Tamagui cannot swap brand configs at runtime (spudly/eciperay#149). |
 | Preview          | `apps/storybook/.rnstorybook/preview.tsx`                          | Mirrors the web preview: a `theme` global (the six sub-theme names, e.g. `light_warmHarvest`, `dark_quietDawn`) drives `defaultTheme`, keyed remount per theme.                                                                                                                 |
 | VR driver        | `tools/visualRegression/run.mjs`                                   | Drives the app over ADB, captures screenshots, pixel-compares against baselines. Zero dependencies (own PNG codec in `png.mjs`, validated round-trip against PIL).                                                                                                              |
+| Capture module   | `apps/storybook/modules/dsvr-capture/`                             | Local Expo native module (issue #137): draws the story's full content — below the fold included — into a PNG on a software canvas, which the driver pulls over ADB instead of screenshotting the display surface (see "Full-page captures" below).                              |
 | Luminance guard  | `tools/visualRegression/guard.mjs`                                 | Pre-commit check on fresh captures: rejects a set that looks uniformly dimmed or scrimmed (issue #101) before CI may turn it into baselines (below).                                                                                                                            |
 | Baselines        | `tools/visualRegression/baselines/<theme>/<storyId>.png`           | Committed reference screenshots. The narrow-viewport variant's baselines sit in the same folders with a `-narrow` filename suffix.                                                                                                                                              |
 | Sanity patch     | `tools/visualRegression/sanity/searchfield-162.patch`              | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                   |
@@ -78,8 +79,75 @@ For a native build instead of Expo Go-style loading:
 
 The driver (`run.mjs`) force-stops and launches the app, reads the
 index, then for each theme × story: sends the capture deep link,
-waits for the READY line with the matching nonce, settles, and takes
-`adb exec-out screencap -p`.
+waits for the READY line with the matching nonce, settles, and
+captures the frame. By default the frame is **app-drawn**: the deep
+link carries `&appcapture=1`, the app draws the story's full
+content via the dsvr-capture module and logs a `DSVR APPCAP
+<nonce> <storyId> …` line, and the driver pulls that PNG over ADB
+(`tools/visualRegression/appCapture.mjs`). `--no-app-capture`
+restores the legacy path — one `adb exec-out screencap -p` of the
+display surface — for debugging only.
+
+### Full-page captures (issue #137)
+
+A screencap can only ever show the first viewport of a page: the
+display pipeline never renders taller than the physical surface
+(a spike that pinned `wm size 1080x8000` got the 2400px render
+tiled, never extended), so below-the-fold content — the servings
+stepper and scale chips on RecipeDetailPage, for instance — was
+never verified by this pipeline. Captures are therefore drawn by
+the app itself:
+
+- The native module finds the story's ScrollView, measures its
+  content child's true height (RecipeDetailPage's longest fixture
+  measures 5,525px — 2.3x the surface), temporarily re-lays out
+  the ancestor chain at that full height, and draws the hierarchy
+  into a bitmap-backed software canvas. Height is memory-bound,
+  not surface-bound; layout geometry is identical to the
+  on-screen render (the spike verified alignment is exact).
+- **Truncation guard**: the module reports the measured content
+  height alongside the drawn frame, and the driver rejects the
+  capture unless the geometry checks out exactly — for content
+  taller than the viewport, the frame's content region (drawn
+  height minus the on-screen chrome) must equal the measured
+  content height; for content that fits the viewport, the frame
+  must be the root's full natural height (a shorter bitmap would
+  clip the root's lower rows and any content sitting in them).
+  A rejected capture fails the run and commits nothing.
+- **Blank-tail crop** (`tools/visualRegression/crop.mjs`): the
+  drawn frame still carries the root's below-viewport region
+  under the content; the driver trims trailing uniform rows so a
+  baseline ends at the page's real last row. A scroll capture
+  that trims nothing while ending on a non-uniform row is
+  truncation-suspect and fails loudly — the safety net behind the
+  guard.
+- **No-ScrollView fallback**: a story with no ScrollView worth
+  unrolling (the RecipeDetailPage `loading` state is a centered
+  spinner behind an early return; an empty virtualized list —
+  VerseSearchPage with no results — measures zero content height
+  inside its fixed shell) is single-viewport by construction.
+  The module draws the root hierarchy at its natural height and
+  reports `mode=root`; the driver logs an explicit `DSVR APPCAP
+FALLBACK` line. There is no silent fallback to screencap for
+  scrollable stories — an app-capture failure fails the capture.
+- **Renderer change**: frames are rasterized by the software
+  canvas, not the display compositor. Shadow and anti-aliasing
+  rasterization differ slightly (the spike measured a 0.17–0.46%
+  first-viewport delta against the old screencap baselines, all
+  of it in hero-image/card-shadow rows — geometry identical).
+  Because comparisons are like-vs-like, this cost exactly one
+  full baseline regeneration when #137 landed; every baseline in
+  the tree is now an app-drawn frame.
+- **FlatList caveat**: pages rendered with a virtualized list
+  only mount the rows near the viewport (React Native's default
+  `initialNumToRender` is 10), and unrendered rows exist only as
+  height spacers — an app-drawn frame of a >10-row list fixture
+  would contain blank gaps where the unmounted rows belong. All
+  current fixtures are ≤7 items, so today's captures are
+  complete. **Before adding a list fixture with more than 10
+  rows**, the page needs a capture-facing full-render prop (e.g.
+  `fullRender` → `disableVirtualization`) threaded from the
+  story; do not just raise the fixture size and trust the frame.
 
 ### Capture matrix
 
@@ -174,6 +242,12 @@ both sets together, and a mode = `update` dispatch regenerates the
 variant baselines in the same run as the standard ones — there is
 no separate regeneration flow to learn.
 
+The variant uses the same app-drawn capture mechanism (#137): the
+narrow display settings change the layout the app measures and
+draws (345.6dp logical width, font_scale 1.3), not how the frame
+is produced. RecipesPage is a FlatList page; its fixture has 7
+rows, under the 10-row virtualization caveat above.
+
 Sensitivity proof (2026-10-24): with `RecipesPage` reverted to its
 pre-#117 form on a scratch branch, the standard set compared
 100/100 clean while the narrow set failed on 10 of 14 captures —
@@ -190,13 +264,14 @@ pins its own surface — `wm size 1080x2400`, `wm density 500`,
 `font_scale 1.3` — and restores the standard one afterwards),
 display pinned awake at full brightness
 (`svc power stayon`, manual `screen_brightness 255`, 30-minute
-screen-off timeout — a doze-dimmed display otherwise leaks into
-screencap and, in update mode, into committed baselines),
-animations disabled, SwiftShader GPU (same
-rasterizer locally and in CI only if your machine also uses software
-rendering — baselines are generated BY the CI job, so they are
+screen-off timeout — a doze-dimmed display leaks into the legacy
+screencap path and failure-evidence screenshots; app-drawn frames
+never touch the surface),
+animations disabled, SwiftShader GPU. App-drawn frames rasterize
+on Android's software canvas regardless of the GPU path, and
+baselines are generated BY the CI job, so they are
 self-consistent; do not commit baselines captured on a physical
-device).
+device.
 
 ## Baselines: generating and updating
 
@@ -209,7 +284,8 @@ directive, 2026-10-23 — no manual dispatch):
    of both capture sets (standard + narrow variant). If every
    story matches, nothing else happens. If the compare
    fails and **every failure is a pixel diff** (a capture failure —
-   deep link, READY timeout, screencap — means an incomplete set
+   deep link, READY timeout, app-capture error or guard rejection —
+   means an incomplete set
    and stops the flow), the job regenerates the baselines from the
    fresh captures, runs them through the **luminance guard**
    (below), and then **captures everything a second time and
@@ -292,6 +368,14 @@ baseline is a safe signal. The guard is a mitigation, **not** a fix
 for #101 — the root cause of the dimming is still open there; the
 guard only guarantees a dimmed or scrimmed capture set can never
 become baselines via the automatic path.
+
+Since #137, captures are app-drawn frames that never touch the
+display surface, so the #101 dimming path cannot contaminate them
+at all (the display pin stays for the legacy screencap path and
+failure-evidence screenshots). The guard still gates the automatic
+path unchanged: its near-uniform check is what catches a blank or
+broken draw, and its ratio checks keep policing any future
+capture-path change.
 
 ## The #162 sanity check
 

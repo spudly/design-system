@@ -1,13 +1,16 @@
 // Device mode for the visual-regression driver (run.mjs): boots the
 // Storybook host app on an emulator/device, walks the capture
-// scope, screenshots each in-scope story, and compares against
-// baselines (or writes them, in update mode). Split out of run.mjs
-// so the driver stays under the file-length cap; behavior
-// identical — the driver passes its CONFIG and scope helpers in.
+// scope, captures each in-scope story, and compares against
+// baselines (or writes them, in update mode). Captures are
+// app-drawn full-content frames (appCapture.mjs, issue #137)
+// unless --no-app-capture selects the legacy screencap path.
+// Split out of run.mjs so the driver stays under the file-length
+// cap — the driver passes its CONFIG and scope helpers in.
 
 import { copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
+import { pullAppCapture } from "./appCapture.mjs";
 import { comparePair } from "./compare.mjs";
 import {
   adb,
@@ -76,7 +79,9 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
     for (const story of stories) {
       if (!inActiveScope(story.id, theme)) continue;
       nonce++;
-      const url = `${config.scheme}://capture/${story.id}?theme=${encodeURIComponent(theme)}&nonce=${nonce}`;
+      const storyStartMs = Date.now();
+      const appParam = config.appCapture ? "&appcapture=1" : "";
+      const url = `${config.scheme}://capture/${story.id}?theme=${encodeURIComponent(theme)}&nonce=${nonce}${appParam}`;
       try {
         // The URL must be single-quoted: `adb shell` re-parses its
         // arguments through the DEVICE shell, where the URL's `&`
@@ -106,12 +111,24 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
         continue;
       }
       await sleep(config.settleMs);
-      const png = await adbBuffer("exec-out", "screencap", "-p").catch((error) => {
-        summary.failed.push(`${theme}/${story.id}: screencap failed: ${error.message}`);
-        console.error(`FAIL ${theme}/${story.id}: screencap failed: ${error.message}`);
-        return null;
-      });
-      if (!png) continue;
+      // The frame: app-drawn full content by default (issue #137 —
+      // the app draws the story's whole page, below the fold
+      // included, via the dsvr-capture native module; see
+      // appCapture.mjs). --no-app-capture keeps the legacy path:
+      // one screencap of the display surface, first viewport only.
+      let png = null;
+      if (config.appCapture) {
+        const pulled = await pullAppCapture(config, summary, { theme, story, nonce, storyStartMs });
+        if (pulled.error) continue;
+        png = pulled.png;
+      } else {
+        png = await adbBuffer("exec-out", "screencap", "-p").catch((error) => {
+          summary.failed.push(`${theme}/${story.id}: screencap failed: ${error.message}`);
+          console.error(`FAIL ${theme}/${story.id}: screencap failed: ${error.message}`);
+          return null;
+        });
+        if (!png) continue;
+      }
       const rel = join(theme, baselineFileName(story.id));
       const actualPath = join(config.outDir, "actual", rel);
       mkdirSync(dirname(actualPath), { recursive: true });
@@ -133,6 +150,11 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
       }
       summary.compared++;
       const r = comparePair(config, baselinePath, actualPath, join(config.outDir, "diff", rel));
+      if (r.sizeMismatch) {
+        console.error(
+          `SIZE ${rel}: baseline is ${r.baselineSize}, capture is ${r.actualSize} — counted as a full diff`,
+        );
+      }
       if (!r.ok) {
         summary.failed.push(
           `${rel}: ${(r.ratio * 100).toFixed(3)}% pixels differ (${r.diffCount}/${r.total})`,

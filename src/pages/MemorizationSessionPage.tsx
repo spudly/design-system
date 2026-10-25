@@ -211,7 +211,13 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
   // numbers each blank among the round's blanks ("Reveal
   // blank word N of M").
   const blankCount = words.reduce((count, word) => count + (word.blank ? 1 : 0), 0);
-  let blankOrdinal = -1;
+  // Precompute each blank's ordinal in a first pass so the render
+  // map below only reads values — no counter is mutated during
+  // render (the @eslint-react immutability diagnostic's target
+  // pattern; see #135). Non-blank words get -1 and are never read.
+  const blankOrdinals = words.map((word, index) =>
+    word.blank ? words.slice(0, index).filter((earlier) => earlier.blank).length : -1,
+  );
 
   return (
     <ScreenContainer>
@@ -225,8 +231,7 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
         <VerseText>
           {words.map((word, i) => {
             if (word.blank) {
-              blankOrdinal += 1;
-              const ordinal = blankOrdinal;
+              const ordinal = blankOrdinals[i] ?? 0;
               return (
                 <Text key={i} variant="verse">
                   <BlankWord

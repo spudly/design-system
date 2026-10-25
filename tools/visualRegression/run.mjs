@@ -7,8 +7,12 @@
 // dir at boot, and a `spudlyds://capture/<storyId>?theme=<theme>`
 // deep link renders exactly one story (no Storybook chrome) and logs
 // `DSVR READY <nonce> <storyId>` via logcat when it is on
-// screen. This driver sends the links, waits for READY, captures with
-// `screencap`, and pixel-compares against committed baselines.
+// screen. This driver sends the links, waits for READY, and captures
+// each story as an app-drawn FULL-CONTENT frame (issue #137: the app
+// draws the page — below the fold included — via the dsvr-capture
+// native module; see appCapture.mjs), then pixel-compares against
+// committed baselines. --no-app-capture falls back to one `screencap`
+// of the display surface (first viewport only) for debugging.
 //
 // Compare-only mode (--from-dir): compares two folders of PNGs with
 // the same comparator — used for local harness validation and for
@@ -23,9 +27,10 @@
 //
 // This file is the CLI surface — argument parsing, CONFIG, and the
 // capture-scope tables. The modes and helpers live in sibling
-// modules (device.mjs, deviceMode.mjs, compare.mjs; the PNG codec
-// in png.mjs/pngChunks.mjs, the comparator in imageDiff.mjs) so
-// each file stays under the file-length cap.
+// modules (device.mjs, deviceMode.mjs, appCapture.mjs, crop.mjs,
+// compare.mjs; the PNG codec in png.mjs/pngChunks.mjs, the
+// comparator in imageDiff.mjs) so each file stays under the
+// file-length cap.
 
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -49,6 +54,16 @@ const CONFIG = {
   scheme: argValue("--scheme", "spudlyds"),
   themes: argValue("--themes", "light_warmHarvest,light_quietDawn").split(","),
   storyFilter: argValue("--stories", ""), // substring filter, empty = all
+  // App-side full-content capture (issue #137): the host app draws
+  // the story's full content to a PNG itself (deep link gains
+  // &appcapture=1) and the driver pulls that file instead of
+  // screenshotting the display surface. On by default for every
+  // capture set (standard and narrow variant alike — the narrow
+  // display settings change the layout the app measures, not the
+  // capture mechanism); --no-app-capture restores the screencap
+  // path for debugging.
+  appCapture: !argFlag("--no-app-capture"),
+  appCaptureTimeoutMs: Number(argValue("--app-capture-timeout", "90000")),
   // "" = the standard capture set; "narrow" = the narrow-viewport
   // variant (NARROW_SCOPE below, "-narrow" baseline filename suffix).
   variant: argValue("--variant", ""),

@@ -31,6 +31,14 @@
 # Anything short of proven green (capture failures, a guard trip, a
 # failed re-compare) commits NOTHING and fails the job.
 #
+# Captures are app-drawn full-content frames (issue #137): the
+# host app draws each story's whole page — below the fold
+# included — via the dsvr-capture native module and the driver
+# pulls the PNG over adb; the display surface is never
+# screenshotted for a story frame. Both capture sets below use
+# that mechanism; the narrow variant's display settings change
+# the layout the app measures, not the capture path.
+#
 # Every mode runs TWO capture sets against the same install:
 #   1. the standard set (all in-scope page stories) at the pinned
 #      standard display (wm density 320, font_scale 1.0), and
