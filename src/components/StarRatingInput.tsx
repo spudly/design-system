@@ -1,5 +1,8 @@
 import { useId } from "react";
 import { XStack, YStack, styled } from "tamagui";
+
+// Throwaway one-component change used to measure the scoped VR
+// run of issue #114 (comment-only; renders identically).
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
