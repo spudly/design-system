@@ -317,7 +317,7 @@ export const accessTokensFixture = {
       revoked: true,
     },
   ],
-  createdSecret: "ecp_9f2ka7QmZx41TbdR8sWpN3eVcHs6Lj",
+  createdSecret: "ecp_35ac91f0b6d24e8a9c1f5b7d03e6a2",
 };
 
 /**
@@ -451,8 +451,7 @@ export const aiSessionPreviewFixture = {
     },
     {
       role: "assistant" as const,
-      content:
-        "Creamy mushroom stroganoff it is — here's the full recipe for your review.",
+      content: "Creamy mushroom stroganoff it is — here's the full recipe for your review.",
     },
   ],
   canRefine: false,
