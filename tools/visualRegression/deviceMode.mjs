@@ -63,10 +63,7 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
     // A scoped id missing from the app index means the mapping and
     // the app disagree — warn loudly rather than silently skip it.
     const missing = [...config.storyIds].filter((id) => !stories.some((s) => s.id === id));
-    if (missing.length > 0)
-      console.warn(
-        `WARN: ${missing.length} scoped story id(s) not in the app index: ${missing.join(", ")}`,
-      );
+    if (missing.length > 0) console.warn("WARN: scoped ids not in app index:", missing.join(", "));
     stories = stories.filter((s) => config.storyIds.has(s.id));
   }
   const inScopeCount = config.themes.reduce(
