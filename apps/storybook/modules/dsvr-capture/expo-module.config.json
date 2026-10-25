@@ -1,0 +1,4 @@
+{
+  "android": { "modules": ["dev.spudly.dsvr.capture.DsvrCaptureModule"] },
+  "platforms": ["android"]
+}

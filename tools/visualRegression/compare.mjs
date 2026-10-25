@@ -27,6 +27,25 @@ export function listPngs(dir) {
 export function comparePair(config, baselinePath, actualPath, diffPath) {
   const base = decodePng(readFileSync(baselinePath));
   const actual = decodePng(readFileSync(actualPath));
+  if (base.width !== actual.width || base.height !== actual.height) {
+    // A size change is a diff, not a crash: report it as a 100%
+    // mismatch in the usual failure format (the PR auto-commit
+    // classifier keys on that format) and let the caller log the
+    // dimensions. This is how a capture-geometry change — e.g.
+    // #137's move from 2400px screencaps to full-height app-drawn
+    // frames — flows into baseline regeneration instead of
+    // aborting the run inside diffImages.
+    return {
+      ok: false,
+      diffCount: actual.width * actual.height,
+      total: actual.width * actual.height,
+      ratio: 1,
+      diffPng: null,
+      sizeMismatch: true,
+      baselineSize: `${base.width}x${base.height}`,
+      actualSize: `${actual.width}x${actual.height}`,
+    };
+  }
   const result = diffImages(base, actual, config.threshold);
   if (result.ratio > config.maxRatio) {
     mkdirSync(dirname(diffPath), { recursive: true });
