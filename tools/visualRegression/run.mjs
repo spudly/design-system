@@ -32,6 +32,7 @@
 // comparator in imageDiff.mjs) so each file stays under the
 // file-length cap.
 
+import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -54,6 +55,13 @@ const CONFIG = {
   scheme: argValue("--scheme", "spudlyds"),
   themes: argValue("--themes", "light_warmHarvest,light_quietDawn").split(","),
   storyFilter: argValue("--stories", ""), // substring filter, empty = all
+  // Affected-stories scoping (issue #114): a scope decision JSON
+  // written by scope.mjs (--scope-file); a "scoped" decision
+  // restricts device mode to the listed story ids for the active
+  // variant, a "full" decision leaves the capture set untouched.
+  // Absent = unscoped (local runs, update mode).
+  scopeFile: argValue("--scope-file", ""),
+  storyIds: null,
   // App-side full-content capture (issue #137): the host app draws
   // the story's full content to a PNG itself (deep link gains
   // &appcapture=1) and the driver pulls that file instead of
@@ -84,6 +92,40 @@ const CONFIG = {
 if (CONFIG.variant && CONFIG.variant !== "narrow") {
   console.error(`FAIL: unknown --variant "${CONFIG.variant}" (only "narrow" is supported).`);
   process.exit(1);
+}
+
+if (CONFIG.scopeFile) {
+  let scope = null;
+  try {
+    scope = JSON.parse(readFileSync(CONFIG.scopeFile, "utf8"));
+  } catch (error) {
+    console.error(
+      `FAIL: --scope-file ${CONFIG.scopeFile} is not readable JSON (${error.message}). ` +
+        "Refusing to guess a capture set.",
+    );
+    process.exit(1);
+  }
+  if (scope.mode !== "full" && scope.mode !== "scoped") {
+    console.error(
+      `FAIL: scope file has unknown mode "${scope.mode}". Refusing to guess a capture set.`,
+    );
+    process.exit(1);
+  }
+  if (scope.mode === "scoped") {
+    const list = CONFIG.variant === "narrow" ? scope.narrow : scope.standard;
+    if (!Array.isArray(list)) {
+      console.error(
+        "FAIL: scoped decision is missing its story list. Refusing to guess a capture set.",
+      );
+      process.exit(1);
+    }
+    CONFIG.storyIds = new Set(list);
+  }
+  console.log(
+    `VR scope (#114): ${scope.mode}` +
+      `${CONFIG.storyIds ? ` — ${CONFIG.storyIds.size} stories for the ${CONFIG.variant === "narrow" ? "narrow" : "standard"} set` : " — full capture set"}. ` +
+      `${(scope.reasons ?? []).join("; ")}`,
+  );
 }
 
 // Capture scope — Stephen's decision, 2026-10-23: the committed

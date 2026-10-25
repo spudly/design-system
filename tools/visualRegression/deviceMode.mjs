@@ -57,8 +57,17 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
     console.error("FAIL: story index was empty");
     return 1;
   }
-  if (config.storyFilter) {
-    stories = stories.filter((s) => s.id.includes(config.storyFilter));
+  if (config.storyFilter) stories = stories.filter((s) => s.id.includes(config.storyFilter));
+  if (config.storyIds) {
+    // Scoped run (issue #114): capture only the affected stories.
+    // A scoped id missing from the app index means the mapping and
+    // the app disagree — warn loudly rather than silently skip it.
+    const missing = [...config.storyIds].filter((id) => !stories.some((s) => s.id === id));
+    if (missing.length > 0)
+      console.warn(
+        `WARN: ${missing.length} scoped story id(s) not in the app index: ${missing.join(", ")}`,
+      );
+    stories = stories.filter((s) => config.storyIds.has(s.id));
   }
   const inScopeCount = config.themes.reduce(
     (n, theme) => n + stories.filter((s) => inActiveScope(s.id, theme)).length,
