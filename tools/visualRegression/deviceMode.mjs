@@ -57,8 +57,14 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
     console.error("FAIL: story index was empty");
     return 1;
   }
-  if (config.storyFilter) {
-    stories = stories.filter((s) => s.id.includes(config.storyFilter));
+  if (config.storyFilter) stories = stories.filter((s) => s.id.includes(config.storyFilter));
+  if (config.storyIds) {
+    // Scoped run (issue #114): capture only the affected stories.
+    // A scoped id missing from the app index means the mapping and
+    // the app disagree — warn loudly rather than silently skip it.
+    const missing = [...config.storyIds].filter((id) => !stories.some((s) => s.id === id));
+    if (missing.length > 0) console.warn("WARN: scoped ids not in app index:", missing.join(", "));
+    stories = stories.filter((s) => config.storyIds.has(s.id));
   }
   const inScopeCount = config.themes.reduce(
     (n, theme) => n + stories.filter((s) => inActiveScope(s.id, theme)).length,
@@ -165,6 +171,10 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
   }
 
   console.log(JSON.stringify(summary, null, 2));
+  // A session with zero captures (a set scoped to no stories,
+  // issue #114) never creates outDir through the capture paths —
+  // ensure it exists before writing the summary into it.
+  mkdirSync(config.outDir, { recursive: true });
   writeFileSync(join(config.outDir, "summary.json"), JSON.stringify(summary, null, 2));
 
   if (summary.failed.length > 0) return 1;

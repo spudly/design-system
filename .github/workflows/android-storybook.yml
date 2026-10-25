@@ -10,10 +10,15 @@
 # docs/android-visual-regression.md for the full workflow, including
 # how baselines are generated and updated.
 #
-# Scoping: GitHub Actions minutes are on paid overage until
-# 2026-11-01, so the job is path-filtered to the surfaces that can
+# Scoping: the job is path-filtered to the surfaces that can
 # change a story screenshot (library source, the host app, the VR
-# tooling, this workflow) instead of running on every PR.
+# tooling, this workflow) instead of running on every PR. Within a
+# run, PR compare runs capture only the stories the PR's changes
+# can affect (issue #114: the "Compute VR capture scope" step and
+# tools/visualRegression/scope.mjs; anything shared or unmappable
+# falls back to the full set), and the emulator boots from a
+# cached AVD (issue #114) instead of paying AVD creation +
+# first-boot setup every run.
 #
 # PR runs auto-commit regenerated baselines (Stephen's directive,
 # 2026-10-23): when the compare finds screenshot diffs, the capture
@@ -62,6 +67,13 @@ on:
           - update
           - sanity
         default: compare
+      scope:
+        description: "compare runs only (issue #114): the full capture set, or only the stories affected by this branch's diff against the default branch"
+        type: choice
+        options:
+          - full
+          - auto
+        default: full
 
 permissions:
   contents: read
@@ -135,6 +147,51 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      # Affected-stories scoping (issue #114): decide the capture
+      # set BEFORE the emulator boots. PR runs map the PR's changed
+      # files through the component import graph
+      # (tools/visualRegression/scope.mjs); a dispatch with
+      # scope=auto diffs this branch against the default branch.
+      # Anything shared or unmappable, the vr-full-run PR label, or
+      # any failure here degrades to the FULL set — never a smaller
+      # one. capture-compare.sh reads the decision from
+      # /tmp/dsvr-scope.json; update mode ignores it.
+      - name: Compute VR capture scope
+        if: steps.vrbot.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DSVR_FORCE_FULL: ${{ github.event_name == 'pull_request' && contains(github.event.pull_request.labels.*.name, 'vr-full-run') }}
+          DSVR_SCOPE_INPUT: ${{ inputs.scope }}
+        run: |
+          scope_file=/tmp/dsvr-scope.json
+          changed_file=/tmp/dsvr-changed-files.txt
+          have_list=0
+          if [ "$DSVR_FORCE_FULL" = "true" ]; then
+            echo "The vr-full-run label is set: forcing the full capture set."
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            if gh api "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}/files" --paginate --jq '.[].filename' > "$changed_file" && [ -s "$changed_file" ]; then
+              have_list=1
+            else
+              echo "Could not list the PR's changed files; falling back to the full capture set."
+            fi
+          elif [ "$DSVR_SCOPE_INPUT" = "auto" ]; then
+            if gh api "repos/${{ github.repository }}/compare/${{ github.event.repository.default_branch }}...${{ github.sha }}" --jq '.files[].filename' > "$changed_file" && [ -s "$changed_file" ]; then
+              have_list=1
+            else
+              echo "Could not diff against the default branch; falling back to the full capture set."
+            fi
+          fi
+          if [ "$have_list" = "1" ]; then
+            node tools/visualRegression/scope.mjs --changed-files "$changed_file" --out "$scope_file" || rm -f "$scope_file"
+          else
+            node tools/visualRegression/scope.mjs --force-full --out "$scope_file" || rm -f "$scope_file"
+          fi
+          if [ ! -f "$scope_file" ]; then
+            echo "Scope computation failed; falling back to the full capture set."
+            printf '{"mode":"full","reasons":["scope computation failed in CI; full run"],"standard":[],"narrow":[]}' > "$scope_file"
+          fi
+          { echo "### VR capture scope (#114)"; echo '```json'; cat "$scope_file"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Install host app dependencies
         if: steps.vrbot.outputs.skip != 'true'
         working-directory: apps/storybook
@@ -152,6 +209,48 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # AVD caching (issue #114): boot from a cached,
+      # already-first-booted AVD instead of creating one and
+      # paying first-boot setup on every run. The key spells out
+      # the emulator config (API level, target, arch, profile) and
+      # hashes this workflow + the capture script (which pins the
+      # display setup), so any change to how the emulator is
+      # configured misses the cache and regenerates it. On a miss —
+      # or a restored cache whose AVD is absent/corrupt — the
+      # generation step below creates and first-boots the AVD and
+      # the cache saves it at job end; a bad cache therefore
+      # degrades to a cold boot, never a failed or wrong run. If a
+      # cached AVD ever misbehaves persistently, bump the key's
+      # avd- prefix version to invalidate every entry.
+      - name: Cache the emulator AVD
+        id: avd-cache
+        if: steps.vrbot.outputs.skip != 'true'
+        uses: actions/cache@v6
+        with:
+          path: ~/.android/avd
+          key: avd-34-google_apis-x86_64-pixel_6-${{ hashFiles('.github/workflows/android-storybook.yml', 'tools/visualRegression/ci/capture-compare.sh') }}
+
+      - name: Check the cached AVD
+        id: avd-check
+        if: steps.vrbot.outputs.skip != 'true'
+        run: |
+          if [ -d "$HOME/.android/avd/test.avd" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate AVD snapshot for caching
+        if: steps.vrbot.outputs.skip != 'true' && (steps.avd-cache.outputs.cache-hit != 'true' || steps.avd-check.outputs.present != 'true')
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
+          script: echo "Generated AVD snapshot for caching."
+
       # The runner executes each line of `script:` in a separate
       # shell process, so the flow lives in a checked-in script file
       # (a `cd` in the workflow block would not survive to the next
@@ -164,6 +263,7 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
+          force-avd-creation: false
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
           script: bash tools/visualRegression/ci/capture-compare.sh "${{ github.event_name == 'pull_request' && 'pr-autocommit' || inputs.mode }}"
@@ -365,6 +465,35 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
+      # AVD caching (issue #114) — same cache and key as the
+      # visual-regression job; see the comment there.
+      - name: Cache the emulator AVD
+        id: avd-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.android/avd
+          key: avd-34-google_apis-x86_64-pixel_6-${{ hashFiles('.github/workflows/android-storybook.yml', 'tools/visualRegression/ci/capture-compare.sh') }}
+
+      - name: Check the cached AVD
+        id: avd-check
+        run: |
+          if [ -d "$HOME/.android/avd/test.avd" ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Generate AVD snapshot for caching
+        if: steps.avd-cache.outputs.cache-hit != 'true' || steps.avd-check.outputs.present != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
+          script: echo "Generated AVD snapshot for caching."
+
       - name: Capture SearchField clean vs mutated
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -372,6 +501,7 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_6
+          force-avd-creation: false
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot-save
           script: bash tools/visualRegression/ci/capture-sanity.sh

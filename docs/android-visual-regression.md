@@ -405,14 +405,107 @@ revert) in the same PR.
 ## CI scoping
 
 The workflow is path-filtered to `src/**`, `apps/storybook/**`,
-`tools/visualRegression/**` and itself, because Actions minutes are
-on paid overage until 2026-11-01 and an emulator job is the most
-expensive kind. It builds a **release** APK with the JS bundle
-embedded (the generated template signs it with the debug keystore,
-so it installs as-is). Serving the bundle from a Metro dev server
+`tools/visualRegression/**` and itself, so the emulator job does
+not run on changes that cannot affect a story screenshot. It
+builds a **release** APK with the JS bundle embedded (the
+generated template signs it with the debug keystore, so it
+installs as-is). Serving the bundle from a Metro dev server
 inside the job was tried first and failed on the emulator with
-React Native's "Unable to load script" error — the debug app could
-not reach Metro through the adb reverse tunnel, so JS never
-executed; an embedded bundle removes the network from the capture
-entirely. (Local development still uses Metro via `expo start` —
-only the CI scripts build release.)
+React Native's "Unable to load script" error — the debug app
+could not reach Metro through the adb reverse tunnel, so JS
+never executed; an embedded bundle removes the network from the
+capture entirely. (Local development still uses Metro via
+`expo start` — only the CI scripts build release.)
+
+### Scoped PR runs: capture only the affected stories (issue #114)
+
+Even path-filtered, a full run captures all 57 baselines (50
+standard + 7 narrow) — a 20–30 minute emulator job gating every
+PR, including one-line component fixes. Since issue #114, a PR
+compare run first computes the stories the PR can actually
+affect and captures only those:
+
+- The workflow's **Compute VR capture scope** step lists the PR's
+  changed files and runs `tools/visualRegression/scope.mjs`,
+  which writes a decision JSON to `/tmp/dsvr-scope.json`.
+- `scope.mjs` derives every story id in `src/` from the CSF
+  files (Storybook's own title/export → id rules) and builds the
+  component import graph over `src/`. A changed file affects
+  every story whose transitive import closure contains it — page
+  stories and the widget stories alike; a changed story file
+  affects itself. All variants of an affected story are captured
+  (standard, plus narrow for RecipesPage).
+- `ci/capture-compare.sh` passes the decision to the driver
+  (`run.mjs --scope-file`), which restricts captures to the
+  listed ids. The drawn==measured and truncation guards behave
+  exactly as in a full run. In the PR auto-commit flow, a scoped
+  run regenerates, luminance-guards, and commits **only its
+  scoped set** — baselines outside the scope are never read for
+  writing and never committed (a set scoped to zero stories skips
+  its luminance guard, which has nothing to judge).
+- Sanity mode always runs its full flow. `workflow_dispatch`
+  compare/update runs default to the full set; a dispatch
+  compare can opt into scoping with the `scope: auto` input
+  (diffs the branch against the default branch). Update mode
+  always captures the full set — it exists to regenerate
+  baselines.
+
+**Full-run fallback — never silently reduce coverage.** The
+decision is the full 57 whenever any changed file is:
+
+- design tokens (`src/tokens/**`), themes (`src/themes/**`), or
+  the Tamagui config (`src/tamagui.config.ts`) — they feed every
+  render;
+- the capture/compare harness itself: `tools/visualRegression/**`,
+  `apps/storybook/**` (host app + the native capture module),
+  `.github/workflows/**`, `.storybook/**`;
+- package manifests/lockfiles (`package.json`,
+  `package-lock.json`) or build config (`tsconfig*.json`,
+  `babel.config.*`, `metro.config.*`, `vite.config.*`);
+- a `src/` file that no longer exists in the tree (deleted by
+  the PR — it cannot be mapped through the post-change graph);
+- or whenever the mapping cannot be computed confidently at all
+  (an unparseable story file, a failed changed-file listing, a
+  crashed scope step).
+
+**Forcing a full run on a PR:** add the **`vr-full-run`** label.
+The scope step reads it and forces the full set; the decision and
+its reasons are echoed into the job's step summary on every run,
+so what was captured (and why) is always auditable after the
+fact. The mapper itself is unit-tested in
+`test/visualRegressionScope.test.mjs`, including an invariant
+that pins the derived story inventory against the committed
+baselines.
+
+### Emulator AVD cache (issue #114)
+
+Every run used to create the AVD and pay Android first-boot
+setup before the first capture. Both emulator jobs now restore
+`~/.android/avd` from `actions/cache`:
+
+- **Key:**
+  `avd-34-google_apis-x86_64-pixel_6-<hash>` where the hash
+  covers `.github/workflows/android-storybook.yml` and
+  `tools/visualRegression/ci/capture-compare.sh`. The literal
+  prefix spells out the emulator configuration (API level,
+  system-image target, architecture, device profile); the hash
+  covers everything else the runs pin, including the display
+  setup in the capture script. Changing any of those misses the
+  cache and regenerates it — that is the invalidation story.
+- On a cache miss (or a restored cache whose `test.avd` is
+  absent), a **Generate AVD snapshot for caching** step creates
+  and first-boots the AVD and the cache saves it at job end; the
+  capture steps run with `force-avd-creation: false` so they
+  reuse it. A corrupt or stale entry therefore degrades to a
+  cold boot in the generation step, never to a failed or wrong
+  run. If a cached AVD ever misbehaves persistently, bump the
+  `avd-` key prefix to invalidate every entry at once.
+- **Cache scoping (actions/cache semantics):** an entry is
+  visible to runs on the ref that created it, to PRs whose base
+  is that ref, and to everything once a run on the default
+  branch has saved one. In practice: repeat pushes to the same
+  PR hit the entry its first run saved (~1.5 min of AVD
+  generation skipped), a `workflow_dispatch` run on the default
+  branch warms the cache for every later PR, and a brand-new
+  PR's first run may still generate — the cost is one generation
+  step, not a failure.

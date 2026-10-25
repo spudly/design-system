@@ -61,6 +61,18 @@ REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 VR_DIR="$REPO_ROOT/tools/visualRegression"
 cd "$REPO_ROOT/apps/storybook"
 
+# Affected-stories scoping (issue #114): the workflow's scope step
+# writes a decision JSON (tools/visualRegression/scope.mjs — the
+# PR's affected stories, or the full set when anything shared or
+# unmappable changed). Compare modes honor it via run.mjs
+# --scope-file; update mode always captures the full set (it exists
+# to regenerate baselines) and ignores it. No file = unscoped.
+SCOPE_FILE="${DSVR_SCOPE_FILE:-/tmp/dsvr-scope.json}"
+SCOPE_ARGS=()
+if [ "$MODE" != "update" ] && [ -f "$SCOPE_FILE" ]; then
+  SCOPE_ARGS=(--scope-file "$SCOPE_FILE")
+fi
+
 npx expo prebuild --platform android --no-install
 (cd android && ./gradlew assembleRelease --console=plain -q)
 adb install -r android/app/build/outputs/apk/release/app-release.apk
@@ -131,10 +143,10 @@ pr_autocommit() {
   # committed baselines.
   echo "PR auto-commit: compare pass against committed baselines (standard set, then narrow variant)..."
   local std_failed=0 narrow_failed=0
-  if ! node "$tool_dir/run.mjs" --out "$out"; then
+  if ! node "$tool_dir/run.mjs" --out "$out" "${SCOPE_ARGS[@]}"; then
     std_failed=1
   fi
-  if ! run_narrow --out "$out_narrow"; then
+  if ! run_narrow --out "$out_narrow" "${SCOPE_ARGS[@]}"; then
     narrow_failed=1
   fi
   if [ "$std_failed" = 0 ] && [ "$narrow_failed" = 0 ]; then
@@ -182,13 +194,23 @@ pr_autocommit() {
   # must never be committed. The guard exits non-zero on any trip.
   # It runs per set: it judges each capture against its OWN
   # baseline, and the standard and narrow surfaces have different
-  # brightness profiles by construction.
+  # brightness profiles by construction. A set scoped to zero
+  # stories (issue #114) produced no captures and has nothing to
+  # guard — the guard itself refuses an empty captures dir.
   echo "PR auto-commit: running the luminance guard over the fresh captures (issue #101)..."
-  if ! node "$tool_dir/guard.mjs" --captures "$out/actual" --baselines "$tool_dir/baselines"; then
+  guard_set() {
+    # $1 = captures dir, $2 = set label for messages
+    if ! find "$1" -name '*.png' -print -quit 2>/dev/null | grep -q .; then
+      echo "PR auto-commit: no fresh captures for the $2 set — skipping its luminance guard."
+      return 0
+    fi
+    node "$tool_dir/guard.mjs" --captures "$1" --baselines "$tool_dir/baselines"
+  }
+  if ! guard_set "$out/actual" "standard"; then
     echo "::error::PR auto-commit: luminance guard tripped on the standard set - committing NOTHING. If the change is intentional and the captures are genuinely correct, investigate (issue #101) and regenerate via a manual mode=update dispatch from this branch."
     return 1
   fi
-  if ! node "$tool_dir/guard.mjs" --captures "$out_narrow/actual" --baselines "$tool_dir/baselines"; then
+  if ! guard_set "$out_narrow/actual" "narrow-variant"; then
     echo "::error::PR auto-commit: luminance guard tripped on the narrow-variant set - committing NOTHING. If the change is intentional and the captures are genuinely correct, investigate (issue #101) and regenerate via a manual mode=update dispatch from this branch."
     return 1
   fi
@@ -198,11 +220,11 @@ pr_autocommit() {
   # as this proof - a set that cannot pass a fresh capture pass is
   # not committed, and the job fails instead.
   echo "PR auto-commit: re-capturing and comparing against the regenerated baselines (in-job verification)..."
-  if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify"; then
+  if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify" "${SCOPE_ARGS[@]}"; then
     echo "::error::PR auto-commit: in-job re-compare of the standard set against the regenerated baselines failed - committing NOTHING."
     return 1
   fi
-  if ! run_narrow --baselines "$staged" --out "$out_narrow/verify"; then
+  if ! run_narrow --baselines "$staged" --out "$out_narrow/verify" "${SCOPE_ARGS[@]}"; then
     echo "::error::PR auto-commit: in-job re-compare of the narrow-variant set against the regenerated baselines failed - committing NOTHING."
     return 1
   fi
@@ -224,8 +246,8 @@ elif [ "$MODE" = "pr-autocommit" ]; then
 else
   # Compare mode: both sets; the run fails if either set fails.
   compare_rc=0
-  node "$VR_DIR/run.mjs" --out /tmp/dsvr-out || compare_rc=1
-  run_narrow --out /tmp/dsvr-out-narrow || compare_rc=1
+  node "$VR_DIR/run.mjs" --out /tmp/dsvr-out "${SCOPE_ARGS[@]}" || compare_rc=1
+  run_narrow --out /tmp/dsvr-out-narrow "${SCOPE_ARGS[@]}" || compare_rc=1
   if [ "$compare_rc" != 0 ]; then
     echo "::error::Compare failed for at least one capture set (see the standard and narrow-variant output above)."
     exit 1
