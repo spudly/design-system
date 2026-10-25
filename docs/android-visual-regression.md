@@ -498,3 +498,12 @@ setup before the first capture. Both emulator jobs now restore
   cold boot in the generation step, never to a failed or wrong
   run. If a cached AVD ever misbehaves persistently, bump the
   `avd-` key prefix to invalidate every entry at once.
+- **Cache scoping (actions/cache semantics):** an entry is
+  visible to runs on the ref that created it, to PRs whose base
+  is that ref, and to everything once a run on the default
+  branch has saved one. In practice: repeat pushes to the same
+  PR hit the entry its first run saved (~1.5 min of AVD
+  generation skipped), a `workflow_dispatch` run on the default
+  branch warms the cache for every later PR, and a brand-new
+  PR's first run may still generate — the cost is one generation
+  step, not a failure.
