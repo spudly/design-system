@@ -1,5 +1,0 @@
----
-"@spudly/ui": minor
----
-
-B3b meals, meal-planning, and shopping pages (#125): the meals cluster's view layer moves into the design system as six pages from `@spudly/ui/pages` — `MealFormPage` and `MealPlanFormPage` (fully controlled forms: field values and change callbacks cross as props, the DS `CheckboxSelectList` renders the recipe/entry options from array selected-ids, per-selected quantity/servings steppers, submission as a bare callback — form state, queries, and validation stay in the app), `ShoppingListPage` (controlled per-line check-off with real checkbox semantics in place of the app's text glyphs, quantities pre-composed), `MealCookingModePage` (the dark cooking overlay with controlled step progression; bounds follow the DS `PrevNextNav` convention), `MealDetailPage` (meal view-model with pre-composed member subtitles and the unavailable-member treatment), and `MealsHubPage` (hub chrome and meals tab, composing `MealPlansPage` for the plans tab exactly as the app view does). Each page ships with stories in both storybooks and contract tests.
