@@ -288,3 +288,172 @@ export const mealsHubFixture = {
     { id: "week-of-oct-26", title: "Week of October 26", subtitle: "5 entries" },
   ],
 };
+
+/**
+ * Access tokens fixture (#126): rows are view-models — the host
+ * pre-formats each row's meta line ("Created … · Last used …"),
+ * as the app host does. Prefixes are the tokens' non-secret
+ * prefixes.
+ */
+export const accessTokensFixture = {
+  tokens: [
+    {
+      id: "token-1",
+      name: "Claude Desktop",
+      prefix: "ecp_9f2ka",
+      metaLabel: "Created Oct 2, 2026 · Last used Oct 24, 2026",
+    },
+    {
+      id: "token-2",
+      name: "Backup script",
+      prefix: "ecp_41mdx",
+      metaLabel: "Created Sep 14, 2026 · Never used",
+    },
+    {
+      id: "token-3",
+      name: "Old laptop",
+      prefix: "ecp_77qpa",
+      metaLabel: "Created Jun 30, 2026 · Last used Aug 11, 2026",
+      revoked: true,
+    },
+  ],
+  createdSecret: "ecp_example_000000000000000000000000",
+};
+
+/**
+ * Nutrition goals fixture (#126): the goals view-model —
+ * numbers or null, as the host's form state carries them.
+ */
+export const nutritionGoalsFixture = {
+  calories: 2100,
+  proteinG: 140,
+  carbsG: 220,
+  fatG: 70,
+  satietyScore: null,
+};
+
+/**
+ * Home fixture (#126): the page's copy crosses as props (the
+ * strings are the app's content constants), and rows are
+ * id-only view-models the host renders through its row slot.
+ */
+export const homeFixture = {
+  title: "Eciperay",
+  subtitle: "Your recipes, organized and ready to cook.",
+  browseLabel: "Browse recipes",
+  addLabel: "Add a recipe",
+  sharedWithMeLabel: "Shared with me",
+  recipesTitle: "Recently viewed",
+  emptyMessage: "No recipes yet. Add your first recipe to get started.",
+  recipes: [{ id: "tuscan-chicken" }, { id: "fudgy-brownies" }],
+};
+
+/**
+ * Tags fixture (#126): tag view-models plus the app adapter's
+ * default swatch palette, which crosses as a prop.
+ */
+export const tagsFixture = {
+  tags: [
+    { id: "tag-1", name: "Weeknight", color: "#22c55e" },
+    { id: "tag-2", name: "Comfort food", color: "#f97316" },
+    { id: "tag-3", name: "Freezer-friendly", color: "#3b82f6" },
+  ],
+  colorOptions: [
+    "#6366f1",
+    "#ef4444",
+    "#f97316",
+    "#f59e0b",
+    "#84cc16",
+    "#22c55e",
+    "#14b8a6",
+    "#06b6d4",
+    "#3b82f6",
+    "#a855f7",
+    "#ec4899",
+    "#6b7280",
+  ],
+};
+
+/**
+ * Add-recipe menu fixture (#126): the options are app data —
+ * labels, descriptions, and navigation targets.
+ */
+export const addRecipeMenuFixture = {
+  options: [
+    {
+      label: "Create manually",
+      description: "Type in a recipe from scratch.",
+      target: "manualEntry",
+    },
+    {
+      label: "Generate with AI",
+      description: "Describe what you want and let AI draft it.",
+      target: "generateAi",
+    },
+    {
+      label: "Import from text",
+      description: "Paste a recipe from anywhere.",
+      target: "importText",
+    },
+    {
+      label: "Import from URL",
+      description: "Pull a recipe from a web page.",
+      target: "importUrl",
+    },
+    {
+      label: "Import from image",
+      description: "Snap a photo of a recipe card or page.",
+      target: "importImage",
+    },
+  ],
+};
+
+/**
+ * AI session fixtures (#126): the two flows' config strings
+ * (app content) and a planning-stage session view-model — the
+ * host resolves the phase label and the stage booleans.
+ */
+export const aiSessionGenerateConfigFixture = {
+  title: "Generate with AI",
+  intro:
+    "Tell me what you'd like to cook. I'll sketch a plan first — you approve it before I write the full recipe.",
+  promptPlaceholder: "e.g. A cozy vegetarian dinner for four…",
+  startLabel: "Start planning",
+  startPendingLabel: "Starting…",
+  previewTitle: "Proposed recipe",
+  finalizeLabel: "Save recipe",
+  finalizePendingLabel: "Saving…",
+};
+
+export const aiSessionPlanningFixture = {
+  phaseLabel: "Planning",
+  messages: [
+    {
+      role: "user" as const,
+      content: "A cozy vegetarian dinner for four, something with mushrooms.",
+    },
+    {
+      role: "assistant" as const,
+      content:
+        "How about a creamy mushroom stroganoff over egg noodles? Serves four, about 35 minutes, with a simple green salad on the side.",
+    },
+  ],
+  canRefine: true,
+  canCancel: true,
+};
+
+export const aiSessionPreviewFixture = {
+  phaseLabel: "Preview ready",
+  messages: [
+    {
+      role: "user" as const,
+      content: "A cozy vegetarian dinner for four, something with mushrooms.",
+    },
+    {
+      role: "assistant" as const,
+      content: "Creamy mushroom stroganoff it is — here's the full recipe for your review.",
+    },
+  ],
+  canRefine: false,
+  canCancel: true,
+};
