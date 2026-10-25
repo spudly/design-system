@@ -171,6 +171,10 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
   }
 
   console.log(JSON.stringify(summary, null, 2));
+  // A session with zero captures (a set scoped to no stories,
+  // issue #114) never creates outDir through the capture paths —
+  // ensure it exists before writing the summary into it.
+  mkdirSync(config.outDir, { recursive: true });
   writeFileSync(join(config.outDir, "summary.json"), JSON.stringify(summary, null, 2));
 
   if (summary.failed.length > 0) return 1;
