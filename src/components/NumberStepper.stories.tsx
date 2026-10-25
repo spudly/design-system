@@ -42,3 +42,13 @@ export const CustomStep: Story = {
   args: { label: "Quantity (packs of 2)", value: 2, min: 0, step: 2 },
   render: (args) => <StepperDemo {...args} />,
 };
+
+export const Inline: Story = {
+  args: { label: "Servings", value: 4, min: 1, layout: "inline" },
+  render: (args) => <StepperDemo {...args} />,
+};
+
+export const Editable: Story = {
+  args: { label: "Servings", value: 4, min: 1, layout: "inline", editable: true },
+  render: (args) => <StepperDemo {...args} />,
+};

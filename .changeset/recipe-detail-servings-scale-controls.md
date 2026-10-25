@@ -1,0 +1,5 @@
+---
+"@spudly/ui": patch
+---
+
+RecipeDetailPage ingredients: servings/scale controls reworked for usability (#73). Servings is now an inline stepper (label beside the stepper, current value in a fixed-width box so digit changes never shift the buttons) via a new additive NumberStepper `layout="inline"` prop, and Scale is a single non-wrapping row of equal-width chips via a new additive ToggleChipGroup `wrap={false}` prop — neither control can change height or push the ingredient list around when values change, and every change is one tap. The servings value is also directly enterable (NumberStepper's new additive `editable` prop: an `input[type=number]` on web, the numeric keypad on native; entries commit on blur/submit, snapped to the step and clamped to min/max, with invalid entries ignored), and the scale row gains a Custom chip that turns into a number input when pressed so any scale — 4×, 2.5× — can be typed; a committed custom scale shows on the chip as its selected value. No contract change: the same servings/scale values and change handlers, so app wiring is untouched.

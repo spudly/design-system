@@ -64,7 +64,13 @@ function scaleValueFor(baseServings: number, servings: number): string {
     const scaled = Math.max(1, Math.round(baseServings * multiplier));
     return servings === scaled && (servings !== baseServings || multiplier === 1);
   });
-  return String(match ?? 1);
+  if (match !== undefined) {
+    return String(match);
+  }
+  // No preset matches (a directly entered servings count, or the
+  // custom scale field): the scale is the exact servings ratio, so
+  // the page's custom scale chip shows it selected ("4×", "2.5×").
+  return String(Math.round((servings / baseServings) * 100) / 100);
 }
 
 interface DemoIngredient {

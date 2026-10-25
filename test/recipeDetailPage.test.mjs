@@ -294,8 +294,8 @@ test("the scale option set moved with the ingredients section", () => {
   }
   assert.match(
     code,
-    /<NumberStepper\s+label="Servings"\s+value=\{view\.servings\}\s+min=\{1\}/,
-    "the servings stepper mirrors the app's (label Servings, floor of 1)",
+    /<NumberStepper\s+label="Servings"\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
+    "the servings stepper mirrors the app's (label Servings, floor of 1) in the inline #73 layout",
   );
 });
 
