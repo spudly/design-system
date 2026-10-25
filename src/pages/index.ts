@@ -60,6 +60,7 @@ export {
   type MemorizationSessionPageReadyProps,
   type MemorizationSessionPageWord,
 } from "./MemorizationSessionPage.js";
+export { MemorizeSettingsPage, type MemorizeSettingsPageProps } from "./MemorizeSettingsPage.js";
 export {
   RecipeFormPage,
   type RecipeFormPageProps,

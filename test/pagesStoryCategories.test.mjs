@@ -7,7 +7,7 @@
  * The contract:
  * 1. Each real page story (#49) declares its categorized title:
  *    `Pages/Eciperay/<Page>` for the Eciperay pages,
- *    `Pages/Memorize/<Page>` for the four Memorize pages.
+ *    `Pages/Memorize/<Page>` for the Memorize pages.
  * 2. No page story file declares a flat `Pages/<Page>` title — the
  *    pre-#70 single mixed level must not come back.
  * 3. The two #44 demo collections keep their `Pages/Eciperay` /
@@ -63,6 +63,7 @@ const categorized = [
   ["VerseSearchPage.stories.tsx", "Pages/Memorize/VerseSearchPage"],
   ["MemorizationSessionPage.stories.tsx", "Pages/Memorize/MemorizationSessionPage"],
   ["MemorizeReviewPage.stories.tsx", "Pages/Memorize/MemorizeReviewPage"],
+  ["MemorizeSettingsPage.stories.tsx", "Pages/Memorize/MemorizeSettingsPage"],
 ];
 
 const demoCollections = [
