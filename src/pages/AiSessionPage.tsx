@@ -4,7 +4,6 @@ import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { MultilineField } from "../components/MultilineField.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
 
 /**
@@ -112,55 +111,62 @@ export function AiSessionPage({
 }: AiSessionPageProps) {
   if (!session) {
     return (
-      <ScreenContainer scrollable={false}>
-        <YStack flex={1} paddingTop="$4">
-          <Text
-            variant="heading"
-            fontSize={tokens.typography.fontSize["2xl"]}
-            marginBottom="$6"
-          >
-            {config.title}
+      <YStack
+        flex={1}
+        backgroundColor={tokens.colors.gray.gray1}
+        paddingHorizontal="$4"
+        paddingTop="$4"
+      >
+        <Text
+          fontSize={tokens.typography.fontSize["2xl"]}
+          fontWeight={tokens.typography.fontWeight.bold}
+          color={tokens.colors.gray.gray10}
+          marginBottom="$2"
+        >
+          {config.title}
+        </Text>
+        <Text
+          color="$textMuted"
+          fontSize={tokens.typography.fontSize.sm}
+          marginBottom="$6"
+        >
+          {config.intro}
+        </Text>
+        <MultilineField
+          value={prompt}
+          onChangeText={onPromptChange}
+          placeholder={config.promptPlaceholder}
+          minHeight={192}
+          marginBottom="$4"
+          textAlignVertical="top"
+        />
+        {error ? (
+          <Text variant="error" marginBottom="$4">
+            {error}
           </Text>
-          <Text
-            color="$textMuted"
+        ) : null}
+        <XStack gap="$3">
+          <Button
+            variant="outlined"
+            onPress={onEmptyCancel}
             fontSize={tokens.typography.fontSize.sm}
-            marginBottom="$6"
+            fontWeight={tokens.typography.fontWeight.medium}
+            color={tokens.colors.gray.gray8}
           >
-            {config.intro}
-          </Text>
-          <MultilineField
-            value={prompt}
-            onChangeText={onPromptChange}
-            placeholder={config.promptPlaceholder}
-            minHeight={192}
-            marginBottom="$4"
-            textAlignVertical="top"
-          />
-          {error ? <Text variant="error">{error}</Text> : null}
-          <XStack gap="$3">
-            <Button
-              variant="outlined"
-              onPress={onEmptyCancel}
-              fontSize={tokens.typography.fontSize.sm}
-              fontWeight={tokens.typography.fontWeight.medium}
-              color="$textMuted"
-            >
-              Cancel
-            </Button>
-            <YStack flex={1}>
-              <Button
-                variant="primary"
-                disabled={busy || !prompt.trim()}
-                onPress={() => {
-                  onStart(prompt);
-                }}
-              >
-                {startPending ? config.startPendingLabel : config.startLabel}
-              </Button>
-            </YStack>
-          </XStack>
-        </YStack>
-      </ScreenContainer>
+            Cancel
+          </Button>
+          <Button
+            variant="primary"
+            flex={1}
+            disabled={busy || !prompt.trim()}
+            onPress={() => {
+              onStart(prompt);
+            }}
+          >
+            {startPending ? config.startPendingLabel : config.startLabel}
+          </Button>
+        </XStack>
+      </YStack>
     );
   }
 
@@ -173,9 +179,10 @@ export function AiSessionPage({
       }}
     >
       <Text
-        variant="heading"
         fontSize={tokens.typography.fontSize["2xl"]}
-        marginBottom="$6"
+        fontWeight={tokens.typography.fontWeight.bold}
+        color={tokens.colors.gray.gray10}
+        marginBottom="$2"
       >
         {config.title}
       </Text>
@@ -198,6 +205,7 @@ export function AiSessionPage({
               fontSize={tokens.typography.fontSize.xs}
               fontWeight={tokens.typography.fontWeight.semibold}
               color={tokens.colors.gray.gray6}
+              textTransform="uppercase"
               marginBottom="$1"
             >
               {message.role === "user" ? "You" : "Plan"}
@@ -212,17 +220,20 @@ export function AiSessionPage({
         ))}
       </YStack>
       {session.canRefine ? (
-        <YStack>
+        <YStack marginBottom="$4" gap="$3">
           <MultilineField
             value={followUp}
             onChangeText={onFollowUpChange}
             placeholder="Ask for changes to the plan…"
             minHeight={96}
-            marginBottom="$3"
           />
           <XStack flexWrap="wrap" gap="$2">
             <Button
+              variant="outlined"
               size="sm"
+              fontSize={tokens.typography.fontSize.sm}
+              fontWeight={tokens.typography.fontWeight.medium}
+              color={tokens.colors.gray.gray8}
               disabled={busy || !followUp.trim()}
               onPress={() => {
                 onSendMessage(followUp);
