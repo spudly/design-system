@@ -143,3 +143,148 @@ export const recipeFormFixture = {
   ],
   tagIds: ["dinner", "chicken", "one-pan"],
 };
+
+/**
+ * Meal / meal-plan form fixtures (#125): the option sets are app
+ * data in production (the recipe and meal queries are the app's);
+ * here they are written out literally in the pages' view-model
+ * shapes, mirroring the app forms' content.
+ */
+export const mealFormFixture = {
+  title: "Sunday Chicken Dinner",
+  notes: "The kids asked for the Tuscan chicken again.",
+  recipeOptions: [
+    { id: "tuscan-chicken", label: "Creamy Tuscan Garlic Chicken", servings: 4 },
+    { id: "stuffed-peppers", label: "Classic Stuffed Peppers", servings: 6 },
+    { id: "arroz-con-pollo", label: "Arroz con Pollo", servings: 8 },
+    { id: "fudgy-brownies", label: "Fudgy Brownies", servings: 12 },
+  ],
+  selectedRecipeIds: ["tuscan-chicken", "fudgy-brownies"],
+  servingsByRecipeId: { "tuscan-chicken": 6, "fudgy-brownies": 12 },
+};
+
+export const mealPlanFormFixture = {
+  title: "Week of October 19",
+  notes: "School nights need the fast recipes.",
+  startsOn: "2026-10-19",
+  endsOn: "2026-10-25",
+  entryOptions: [
+    { key: "meal:sunday-dinner", kind: "meal" as const, title: "Sunday Chicken Dinner" },
+    { key: "meal:taco-night", kind: "meal" as const, title: "Taco Night" },
+    {
+      key: "recipe:tuscan-chicken",
+      kind: "recipe" as const,
+      title: "Creamy Tuscan Garlic Chicken",
+      recipeId: "tuscan-chicken",
+      servings: 4,
+    },
+    {
+      key: "recipe:stuffed-peppers",
+      kind: "recipe" as const,
+      title: "Classic Stuffed Peppers",
+      recipeId: "stuffed-peppers",
+      servings: 6,
+    },
+  ],
+  selectedKeys: ["meal:sunday-dinner", "recipe:tuscan-chicken"],
+  quantityByKey: { "meal:sunday-dinner": 1, "recipe:tuscan-chicken": 2 },
+  servingsByRecipeId: { "tuscan-chicken": 6 },
+};
+
+/**
+ * Shopping list fixture (#125): line view-models in the page's
+ * shape — the quantity labels are pre-composed strings, as the
+ * app host composes them from its quantity/unit data.
+ */
+export const shoppingListFixture = {
+  lines: [
+    { key: "chicken-breast", name: "Chicken breast", quantityLabel: "2 lb", isChecked: true },
+    { key: "heavy-cream", name: "Heavy cream", quantityLabel: "1 pint", isChecked: false },
+    { key: "spinach", name: "Baby spinach", quantityLabel: "5 oz", isChecked: false },
+    {
+      key: "parmesan",
+      name: "Parmesan, grated",
+      quantityLabel: "1 cup",
+      isOptional: true,
+      isChecked: false,
+    },
+    { key: "brownies-mix", name: "Cocoa powder", quantityLabel: null, isChecked: false },
+  ],
+};
+
+/**
+ * Meal detail fixture (#125): member subtitles are pre-composed
+ * strings, as the app host composes them (servings line plus the
+ * nutrition summary).
+ */
+export const mealDetailFixture = {
+  title: "Sunday Chicken Dinner",
+  notes: "The kids asked for the Tuscan chicken again.",
+  nutritionLabel: "1,240 cal · 82g protein",
+  members: [
+    {
+      recipeId: "tuscan-chicken",
+      title: "Creamy Tuscan Garlic Chicken",
+      subtitle: "6 servings · 640 cal · 42g protein · satiety 74",
+    },
+    {
+      recipeId: "fudgy-brownies",
+      title: "Fudgy Brownies",
+      subtitle: "12 servings · 310 cal · 4g protein · satiety 38",
+    },
+    {
+      recipeId: "arroz-con-pollo",
+      title: "Arroz con Pollo",
+      subtitle: "8 servings",
+      isUnavailable: true,
+    },
+  ],
+};
+
+/** Cooking mode fixture (#125): the plan's steps as view-models. */
+export const mealCookingFixture = {
+  mealTitle: "Sunday Chicken Dinner",
+  steps: [
+    {
+      stepNumber: 1,
+      recipeTitle: "Creamy Tuscan Garlic Chicken",
+      body: "Season the chicken with salt, pepper, and Italian seasoning.",
+    },
+    {
+      stepNumber: 2,
+      recipeTitle: "Creamy Tuscan Garlic Chicken",
+      body: "Sear in a hot pan until golden, about 5 minutes per side. Set aside.",
+    },
+    {
+      stepNumber: 3,
+      recipeTitle: "Creamy Tuscan Garlic Chicken",
+      body: "Add garlic, sun-dried tomatoes, cream, and spinach. Simmer until the spinach wilts, then return the chicken to the pan.",
+    },
+    {
+      stepNumber: 1,
+      recipeTitle: "Fudgy Brownies",
+      body: "Whisk the cocoa, sugar, and melted butter until glossy.",
+    },
+  ],
+};
+
+/**
+ * Meals hub fixture (#125): meal rows carry pre-composed
+ * subtitles (member count plus nutrition summary), and the plans
+ * are MealPlansPage items, as the app host composes both.
+ */
+export const mealsHubFixture = {
+  meals: [
+    { id: "sunday-dinner", title: "Sunday Chicken Dinner", subtitle: "2 recipes · 1,240 cal" },
+    { id: "taco-night", title: "Taco Night", subtitle: "3 recipes · 980 cal" },
+    { id: "pizza-friday", title: "Pizza Friday", subtitle: "1 recipe" },
+  ],
+  plans: [
+    {
+      id: "week-of-oct-19",
+      title: "Week of October 19",
+      subtitle: "7 entries · 2026-10-19 – 2026-10-25",
+    },
+    { id: "week-of-oct-26", title: "Week of October 26", subtitle: "5 entries" },
+  ],
+};
