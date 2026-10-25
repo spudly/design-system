@@ -115,13 +115,14 @@ export async function pullAppCapture(config, summary, target) {
   }
   if (metrics.mode === "root") {
     // Explicit fallback, never silent: the story has no
-    // ScrollView (single-viewport by construction — a loading
-    // spinner, an error state), so the module drew the root
+    // ScrollView worth unrolling (single-viewport by construction
+    // — a loading spinner, an error state, an empty virtualized
+    // list in a fixed shell), so the module drew the root
     // hierarchy at its natural height instead of unrolling a
     // scroller. The frame is complete; it is also not cropped —
     // there is no below-viewport tail to trim.
     console.log(
-      `DSVR APPCAP FALLBACK ${label}: no ScrollView in this story — root-draw frame ` +
+      `DSVR APPCAP FALLBACK ${label}: no unrollable ScrollView in this story — root-draw frame ` +
         `(${metrics.width}x${metrics.height}); single-viewport story, frame is complete by construction`,
     );
   }

@@ -31,11 +31,13 @@ import java.util.concurrent.TimeUnit
  * and restores every frame it touched. The driver pulls the PNG
  * over adb instead of screenshotting.
  *
- * Stories with no ScrollView (a loading state that renders only a
- * centered spinner, say) are single-viewport by construction: the
- * module draws the root hierarchy at its natural height instead
- * and reports mode="root", so the driver can log the fallback
- * explicitly rather than failing or silently screenshotting.
+ * Stories with no ScrollView worth unrolling (a loading state
+ * that renders only a centered spinner, or an empty virtualized
+ * list whose content measures zero height inside a fixed shell)
+ * are single-viewport by construction: the module draws the root
+ * hierarchy at its natural height instead and reports
+ * mode="root", so the driver can log the fallback explicitly
+ * rather than failing or silently screenshotting.
  *
  * Returns the drawn geometry plus the measured content geometry
  * so the driver can enforce the truncation guard: the content
@@ -105,8 +107,13 @@ class DsvrCaptureModule : Module() {
     // ReactScrollView extends android.widget.ScrollView) and keep
     // the one whose content child is tallest — the story's page
     // scroller. Sheets/menus are closed during captures. A story
-    // may legitimately have none (single-viewport states); that
-    // is the root-draw fallback below, not an error.
+    // may legitimately have no scroller worth unrolling
+    // (single-viewport states); that is the root-draw fallback
+    // below, not an error. A content child measuring ZERO height
+    // does not count: an empty virtualized list in a fixed shell
+    // (VerseSearchPage with no results) has nothing below any
+    // fold — the shell bounds it to the viewport — so it takes
+    // the root-draw path like any other single-viewport story.
     val scrolls = ArrayList<ScrollView>()
     val stack = ArrayDeque<View>()
     stack.addLast(decor)
@@ -118,7 +125,7 @@ class DsvrCaptureModule : Module() {
       }
     }
     var scroll: ScrollView? = null
-    var bestContentHeight = -1
+    var bestContentHeight = 0
     for (candidate in scrolls) {
       if (candidate.childCount == 0) continue
       val h = candidate.getChildAt(0).height

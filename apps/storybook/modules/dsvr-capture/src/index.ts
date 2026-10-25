@@ -24,9 +24,11 @@ export interface FullPageCaptureResult {
   rootHeight: number;
   /** How the frame was produced: "scroll" = a ScrollView's full
    * content was unrolled and drawn; "root" = the story has no
-   * ScrollView (e.g. a loading spinner), so the root hierarchy was
-   * drawn at its natural single-viewport height. The driver logs
-   * "root" captures as an explicit fallback, never silently. */
+   * ScrollView worth unrolling (e.g. a loading spinner, or an
+   * empty virtualized list measuring zero height in a fixed
+   * shell), so the root hierarchy was drawn at its natural
+   * single-viewport height. The driver logs "root" captures as an
+   * explicit fallback, never silently. */
   mode: "scroll" | "root";
   scrollViews: number;
   chainDepth: number;

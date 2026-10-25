@@ -117,11 +117,13 @@ the app itself:
   that trims nothing while ending on a non-uniform row is
   truncation-suspect and fails loudly — the safety net behind the
   guard.
-- **No-ScrollView fallback**: a story with no ScrollView (the
-  RecipeDetailPage `loading` state is a centered spinner behind
-  an early return) is single-viewport by construction. The module
-  draws the root hierarchy at its natural height and reports
-  `mode=root`; the driver logs an explicit `DSVR APPCAP
+- **No-ScrollView fallback**: a story with no ScrollView worth
+  unrolling (the RecipeDetailPage `loading` state is a centered
+  spinner behind an early return; an empty virtualized list —
+  VerseSearchPage with no results — measures zero content height
+  inside its fixed shell) is single-viewport by construction.
+  The module draws the root hierarchy at its natural height and
+  reports `mode=root`; the driver logs an explicit `DSVR APPCAP
 FALLBACK` line. There is no silent fallback to screencap for
   scrollable stories — an app-capture failure fails the capture.
 - **Renderer change**: frames are rasterized by the software
