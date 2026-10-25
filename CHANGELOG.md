@@ -1,5 +1,12 @@
 # @spudly/ui
 
+## 1.9.0
+
+### Minor Changes
+
+- e9e678e: B2 component completion (#123): seven widgets audited out of eciperay's `packages/app/src/components` now live in the design system — `BulkSelectToolbar` (search + select-all/clear + selection count for bulk-selection lists), `CheckboxSelectList` (checkbox multi-select with loading and empty states), `CommentItem` (comment row with inline edit and moderation actions, all state via props), `FixedActionBanner` (pinned consent/action bar over ActionBar + InlineAlert, with a ReactNode message and optional dismiss — the shape DismissibleBanner's contract cannot express), `StatRow` (the recessed band that spreads StatCards across a section), `TagPill` (display pill tinted by a tag's data color), and `TokenRow` (personal-access-token row with pre-formatted meta label and revoke action). Each ships with stories in both storybooks and contract tests. The full audit of all 113 app component files — kinds, dispositions, and the DS gaps it exposed — lands in `docs/b2-component-audit.md` as the specification for B3 (pages/splits) and B6 (app-side cleanup). No existing component's contract changed.
+- 5946f63: B3a recipe-form pages (#124): the recipe form's view layer moves into the design system as `RecipeFormPage` (from `@spudly/ui/pages`) plus the three shell pages that compose it — `EditRecipePage`, `ManualEntryPage`, and `EditVersionPage` (draft heading, imported-draft banner, not-editable state). The form page is fully controlled: field values and change callbacks cross as props in the RecipesPage idiom, status and tag options are app-supplied view-models rendered through `ToggleChipGroup`, version-diff presentation (changed fields, revert hints, changed-list banners) crosses as pre-formatted props with revert intents out, and submission is a bare callback — form state, diffing, AI generation, image upload, and validation stay in the app. The image field and the sortable ingredient/instruction lists enter through render slots pending the contract decisions proposed on #124. `TextField` and `MultilineField` gain a semantic `changed` variant (warning step-5 border, step-1 fill) that carries the version-diff wash. Each page ships with stories in both storybooks and contract tests.
+
 ## 1.8.1
 
 ### Patch Changes
