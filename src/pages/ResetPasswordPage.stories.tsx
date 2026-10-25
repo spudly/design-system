@@ -12,6 +12,8 @@ const meta: Meta<typeof ResetPasswordPage> = {
 export default meta;
 type Story = StoryObj<typeof ResetPasswordPage>;
 
+const filledValue = "a brand new password";
+
 function Viewport({ children }: { children: ReactNode }) {
   return (
     <View width={430} maxWidth="100%" height={844}>
@@ -20,12 +22,11 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
-
 export const Filled: Story = {
   render: () => (
     <Viewport>
       <ResetPasswordPage
-        password="a brand new password"
+        password={filledValue}
         onPasswordChange={() => undefined}
         onSubmit={() => undefined}
       />

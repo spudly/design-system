@@ -14,6 +14,8 @@ const meta: Meta<typeof SignUpPage> = {
 export default meta;
 type Story = StoryObj<typeof SignUpPage>;
 
+const filledValue = "correct horse battery";
+
 function Viewport({ children }: { children: ReactNode }) {
   return (
     <View width={430} maxWidth="100%" height={844}>
@@ -21,7 +23,6 @@ function Viewport({ children }: { children: ReactNode }) {
     </View>
   );
 }
-
 
 /**
  * The legal notice is a slot: hosts render their LegalLinks
@@ -45,7 +46,7 @@ export const Filled: Story = {
       <SignUpPage
         displayName="Sam Cook"
         email="cook@example.com"
-        password="correct horse battery"
+        password={filledValue}
         onDisplayNameChange={() => undefined}
         onEmailChange={() => undefined}
         onPasswordChange={() => undefined}

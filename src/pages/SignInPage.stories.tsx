@@ -12,6 +12,8 @@ const meta: Meta<typeof SignInPage> = {
 export default meta;
 type Story = StoryObj<typeof SignInPage>;
 
+const filledValue = "correct horse battery";
+
 function Viewport({ children }: { children: ReactNode }) {
   return (
     <View width={430} maxWidth="100%" height={844}>
@@ -20,13 +22,12 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
-
 export const Filled: Story = {
   render: () => (
     <Viewport>
       <SignInPage
         email="cook@example.com"
-        password="correct horse battery"
+        password={filledValue}
         onEmailChange={() => undefined}
         onPasswordChange={() => undefined}
         onSubmit={() => undefined}
