@@ -1,0 +1,8 @@
+{
+  "description": "Native full-content capture for the Android VR host app (design-system #137): draws the story's view hierarchy into a full-height bitmap on a software canvas instead of screenshotting the display surface, so page captures include everything below the fold.",
+  "main": "src/index.ts",
+  "name": "dsvr-capture",
+  "private": true,
+  "types": "src/index.ts",
+  "version": "0.1.0"
+}
