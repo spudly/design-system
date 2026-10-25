@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { recipeFormFixture } from "./fixtures.js";
 import { EditVersionPage } from "./EditVersionPage.js";
-import type { RecipeFormPageProps } from "./RecipeFormPage.js";
+import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
 /**
  * Stories for the real EditVersionPage shell (#124): the
@@ -72,42 +72,14 @@ function Shell() {
   const formProps = useFormProps();
   return (
     <EditVersionPage
-      {...formProps}
       versionNumber={2}
       changeSummary="Reduced sugar and added citrus."
       showImportBanner
       parentVersionNumber={1}
-    />
+    >
+      <RecipeFormPage {...formProps} />
+    </EditVersionPage>
   );
-}
-
-/** Static form props for the not-editable story: that state never
- * renders the form, so the values are inert fixture data. */
-function staticFormProps(): RecipeFormPageProps {
-  const fixture = recipeFormFixture;
-  const noop = () => undefined;
-  return {
-    title: fixture.title,
-    onTitleChange: noop,
-    description: fixture.description,
-    onDescriptionChange: noop,
-    servings: fixture.servings,
-    onServingsChange: noop,
-    prepTimeMin: fixture.prepTimeMin,
-    onPrepTimeMinChange: noop,
-    cookTimeMin: fixture.cookTimeMin,
-    onCookTimeMinChange: noop,
-    sourceUrl: fixture.sourceUrl,
-    onSourceUrlChange: noop,
-    statusOptions: fixture.statusOptions,
-    status: fixture.status,
-    onStatusChange: noop,
-    tagOptions: fixture.tagOptions,
-    tagIds: fixture.tagIds,
-    onTagIdsChange: noop,
-    submitLabel: "Save Draft",
-    onSubmit: noop,
-  };
 }
 
 export const Default: Story = {
@@ -121,12 +93,7 @@ export const Default: Story = {
 export const NotEditable: Story = {
   render: () => (
     <Viewport>
-      <EditVersionPage
-        {...staticFormProps()}
-        versionNumber={1}
-        notEditable
-        onBack={() => undefined}
-      />
+      <EditVersionPage versionNumber={1} notEditable onBack={() => undefined} />
     </Viewport>
   ),
 };

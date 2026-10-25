@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { recipeFormFixture } from "./fixtures.js";
 import { EditRecipePage } from "./EditRecipePage.js";
-import type { RecipeFormPageProps } from "./RecipeFormPage.js";
+import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
 /**
  * Stories for the real EditRecipePage shell (#124): the "Edit
@@ -65,7 +65,11 @@ function useFormProps(): RecipeFormPageProps {
 
 function Shell() {
   const formProps = useFormProps();
-  return <EditRecipePage {...formProps} contentLocked />;
+  return (
+    <EditRecipePage>
+      <RecipeFormPage {...formProps} contentLocked />
+    </EditRecipePage>
+  );
 }
 
 export const Default: Story = {

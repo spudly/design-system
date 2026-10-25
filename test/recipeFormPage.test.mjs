@@ -144,14 +144,11 @@ test("status and tag options cross as view-models through ToggleChipGroup", () =
 test("the shells mirror the app views' chrome", () => {
   const edit = pageSource("EditRecipePage");
   assert.ok(edit.includes("Edit Recipe"), "EditRecipePage heading missing");
-  assert.ok(edit.includes("<RecipeFormPage {...props} />"), "EditRecipePage must render the form");
+  assert.ok(edit.includes("{children}"), "EditRecipePage must render its children (the form)");
 
   const manual = pageSource("ManualEntryPage");
   assert.ok(manual.includes("Manual Entry"), "ManualEntryPage heading missing");
-  assert.ok(
-    manual.includes("<RecipeFormPage {...props} />"),
-    "ManualEntryPage must render the form",
-  );
+  assert.ok(manual.includes("{children}"), "ManualEntryPage must render its children (the form)");
 
   const version = pageSource("EditVersionPage");
   // eslint-disable-next-line no-template-curly-in-string -- expected source text intentionally contains a template literal
@@ -177,10 +174,12 @@ test("stories cover the captured states", () => {
     storySource("EditVersionPage").includes("export const NotEditable"),
     "EditVersionPage NotEditable story missing",
   );
-  for (const shell of ["EditRecipePage", "ManualEntryPage"]) {
+  for (const shell of ["EditRecipePage", "ManualEntryPage", "EditVersionPage"]) {
+    const stories = storySource(shell);
+    assert.ok(stories.includes("export const Default"), `${shell} Default story missing`);
     assert.ok(
-      storySource(shell).includes("export const Default"),
-      `${shell} Default story missing`,
+      stories.includes("<RecipeFormPage"),
+      `${shell} stories must compose the real form inside the shell`,
     );
   }
 });

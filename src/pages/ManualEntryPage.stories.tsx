@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { recipeFormFixture } from "./fixtures.js";
 import { ManualEntryPage } from "./ManualEntryPage.js";
-import type { RecipeFormPageProps } from "./RecipeFormPage.js";
+import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
 /**
  * Stories for the real ManualEntryPage shell (#124): the
@@ -66,7 +66,11 @@ function useFormProps(): RecipeFormPageProps {
 
 function Shell() {
   const formProps = useFormProps();
-  return <ManualEntryPage {...formProps} />;
+  return (
+    <ManualEntryPage>
+      <RecipeFormPage {...formProps} />
+    </ManualEntryPage>
+  );
 }
 
 export const Default: Story = {
