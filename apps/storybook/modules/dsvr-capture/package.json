@@ -1,0 +1,1 @@
+{"description":"SPIKE (design-system #137, option 3): native full-content capture for the Android VR host app — draws the story's view hierarchy into a full-height bitmap on a software canvas instead of screenshotting the display surface.","main":"src/index.ts","name":"dsvr-capture","private":true,"types":"src/index.ts","version":"0.1.0"}

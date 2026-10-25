@@ -8,6 +8,20 @@ import { SET_CURRENT_STORY, STORY_RENDERED, UPDATE_GLOBALS } from "storybook/int
 import StorybookUIRoot, { view } from "./Storybook";
 import { setCaptureThemeOverride } from "./captureTheme";
 
+// SPIKE (design-system #137, option 3): the app-side full-content
+// capture module. Required defensively: if the native module is not
+// linked (e.g. a JS-only runtime), capture mode falls back to
+// signalling APPCAP_ERROR instead of crashing the host app.
+let captureFullPageNative:
+  | typeof import("./modules/dsvr-capture/src/index").captureFullPage
+  | null = null;
+try {
+  captureFullPageNative =
+    require("./modules/dsvr-capture/src/index").captureFullPage;
+} catch {
+  captureFullPageNative = null;
+}
+
 // ---------------------------------------------------------------------------
 // Capture protocol (used by tools/visualRegression/run.mjs — see
 // docs/android-visual-regression.md):
@@ -23,11 +37,18 @@ import { setCaptureThemeOverride } from "./captureTheme";
 //   the preview decorator through captureTheme.ts, not only the
 //   globals channel — story-pinned globals outrank UPDATE_GLOBALS
 //   (see that module).
+// - SPIKE (#137, option 3): with `&appcapture=1` on the capture URL,
+//   after READY the app additionally draws the story's full content
+//   (including everything below the fold) into a PNG via the
+//   dsvr-capture native module and logs
+//   `DSVR APPCAP <nonce> <storyId> path=... w=... h=... ...` (or
+//   `DSVR APPCAP_ERROR <nonce> <storyId> <message>`). The driver
+//   pulls that file instead of taking a screencap.
 // - `spudlyds://browse` (or a plain launcher start) shows the
 //   Storybook UI.
 // ---------------------------------------------------------------------------
 
-type CaptureTarget = { storyId: string; theme?: string; nonce?: string };
+type CaptureTarget = { storyId: string; theme?: string; nonce?: string; appCapture: boolean };
 
 function parseCapture(url: string): CaptureTarget | null | undefined {
   const parsed = Linking.parse(url);
@@ -40,6 +61,7 @@ function parseCapture(url: string): CaptureTarget | null | undefined {
       storyId,
       theme: typeof theme === "string" ? theme : undefined,
       nonce: typeof nonce === "string" ? nonce : undefined,
+      appCapture: parsed.queryParams?.appcapture === "1",
     };
   }
   if (parsed.hostname === "browse") return null;
@@ -86,7 +108,7 @@ function useStoryIndexLog() {
   }, []);
 }
 
-function CaptureRoot({ storyId, theme, nonce }: Required<CaptureTarget>) {
+function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarget>) {
   // Hand the requested theme to the preview decorator directly (see
   // captureTheme.ts): page stories pin a light theme in their story
   // globals, and story globals outrank the UPDATE_GLOBALS emitted
@@ -143,6 +165,50 @@ function CaptureRoot({ storyId, theme, nonce }: Required<CaptureTarget>) {
     };
   }, [storyId, nonce]);
 
+  // SPIKE (#137, option 3): app-side full-content capture. Runs
+  // once per capture target, shortly after the story has rendered
+  // (READY fires 250ms after the same event; this waits a beat
+  // longer so it draws the same painted, settled frame the
+  // screencap path would take — plus everything below the fold).
+  useEffect(() => {
+    if (!appCapture) return;
+    let cancelled = false;
+    let started = false;
+    const run = async () => {
+      if (started || cancelled) return;
+      started = true;
+      try {
+        if (!captureFullPageNative) {
+          throw new Error("dsvr-capture native module not linked");
+        }
+        const r = await captureFullPageNative(`dsvr-appcap-${nonce}.png`);
+        if (!cancelled) {
+          console.log(
+            `DSVR APPCAP ${nonce} ${storyId} path=${r.path} ipath=${r.internalPath} w=${r.width} h=${r.height} content=${r.contentHeight} viewport=${r.viewportHeight} root=${r.rootHeight} scrolls=${r.scrollViews} chain=${r.chainDepth} ms=${r.drawMs}`,
+          );
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.log(
+            `DSVR APPCAP_ERROR ${nonce} ${storyId} ${error instanceof Error ? error.message : String(error)}`,
+          );
+        }
+      }
+    };
+    const handler = (payload?: { storyId?: string }) => {
+      if (!payload || payload.storyId === undefined || payload.storyId === storyId) {
+        setTimeout(run, 650);
+      }
+    };
+    view._channel.on(STORY_RENDERED, handler);
+    const fallback = setTimeout(run, 6000);
+    return () => {
+      cancelled = true;
+      view._channel.off(STORY_RENDERED, handler);
+      clearTimeout(fallback);
+    };
+  }, [appCapture, storyId, nonce]);
+
   return <Root key={`${storyId}:${nonce}`} />;
 }
 
@@ -174,6 +240,7 @@ export default function App() {
             storyId={capture.storyId}
             theme={capture.theme ?? ""}
             nonce={capture.nonce ?? "0"}
+            appCapture={capture.appCapture}
           />
         ) : (
           <StorybookUIRoot />

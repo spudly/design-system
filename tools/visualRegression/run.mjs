@@ -49,6 +49,12 @@ const CONFIG = {
   scheme: argValue("--scheme", "spudlyds"),
   themes: argValue("--themes", "light_warmHarvest,light_quietDawn").split(","),
   storyFilter: argValue("--stories", ""), // substring filter, empty = all
+  // SPIKE (issue #137, option 3): app-side full-content capture —
+  // the host app draws the story's full content to a PNG itself
+  // (deep link gains &appcapture=1) and the driver pulls that file
+  // instead of taking a screencap. Off unless --app-capture.
+  appCapture: argFlag("--app-capture"),
+  appCaptureTimeoutMs: Number(argValue("--app-capture-timeout", "90000")),
   // "" = the standard capture set; "narrow" = the narrow-viewport
   // variant (NARROW_SCOPE below, "-narrow" baseline filename suffix).
   variant: argValue("--variant", ""),

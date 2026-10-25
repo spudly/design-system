@@ -86,6 +86,18 @@ run_narrow() {
   return $rc
 }
 
+# SPIKE (issue #137) driver args for the STANDARD set only: a
+# story-substring scope (DSVR_SPIKE_STORIES) and, for the option-3
+# spike, app-side full-content capture (DSVR_SPIKE_APP_CAPTURE=1).
+# Unset env = empty args = today's behavior exactly.
+SPIKE_ARGS=()
+if [ -n "${DSVR_SPIKE_STORIES:-}" ]; then
+  SPIKE_ARGS+=(--stories "$DSVR_SPIKE_STORIES")
+fi
+if [ -n "${DSVR_SPIKE_APP_CAPTURE:-}" ]; then
+  SPIKE_ARGS+=(--app-capture)
+fi
+
 # Deterministic capture surface: fixed density + font scale.
 display_standard
 
@@ -123,7 +135,7 @@ pr_autocommit() {
   # committed baselines.
   echo "PR auto-commit: compare pass against committed baselines (standard set, then narrow variant)..."
   local std_failed=0 narrow_failed=0
-  if ! node "$tool_dir/run.mjs" --out "$out"; then
+  if ! node "$tool_dir/run.mjs" --out "$out" "${SPIKE_ARGS[@]}"; then
     std_failed=1
   fi
   if ! run_narrow --out "$out_narrow"; then
@@ -190,7 +202,7 @@ pr_autocommit() {
   # as this proof - a set that cannot pass a fresh capture pass is
   # not committed, and the job fails instead.
   echo "PR auto-commit: re-capturing and comparing against the regenerated baselines (in-job verification)..."
-  if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify"; then
+  if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify" "${SPIKE_ARGS[@]}"; then
     echo "::error::PR auto-commit: in-job re-compare of the standard set against the regenerated baselines failed - committing NOTHING."
     return 1
   fi
@@ -209,15 +221,23 @@ pr_autocommit() {
 }
 
 if [ "$MODE" = "update" ]; then
-  node "$VR_DIR/run.mjs" --update --out /tmp/dsvr-out
-  run_narrow --update --out /tmp/dsvr-out-narrow
+  node "$VR_DIR/run.mjs" --update --out /tmp/dsvr-out "${SPIKE_ARGS[@]}"
+  if [ -n "${DSVR_SPIKE_STORIES:-}" ]; then
+    echo "SPIKE (issue #137): story scope set — skipping the narrow variant."
+  else
+    run_narrow --update --out /tmp/dsvr-out-narrow
+  fi
 elif [ "$MODE" = "pr-autocommit" ]; then
   pr_autocommit
 else
   # Compare mode: both sets; the run fails if either set fails.
   compare_rc=0
-  node "$VR_DIR/run.mjs" --out /tmp/dsvr-out || compare_rc=1
-  run_narrow --out /tmp/dsvr-out-narrow || compare_rc=1
+  node "$VR_DIR/run.mjs" --out /tmp/dsvr-out "${SPIKE_ARGS[@]}" || compare_rc=1
+  if [ -n "${DSVR_SPIKE_STORIES:-}" ]; then
+    echo "SPIKE (issue #137): story scope set — skipping the narrow variant."
+  else
+    run_narrow --out /tmp/dsvr-out-narrow || compare_rc=1
+  fi
   if [ "$compare_rc" != 0 ]; then
     echo "::error::Compare failed for at least one capture set (see the standard and narrow-variant output above)."
     exit 1

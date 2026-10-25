@@ -18,6 +18,89 @@ import {
   waitForLog,
 } from "./device.mjs";
 
+// SPIKE (issue #137, option 3): pull one app-drawn capture. The
+// app logs `DSVR APPCAP <nonce> <storyId> path=... ipath=... w=...
+// h=... content=... viewport=... root=... scrolls=... chain=...
+// ms=...` after writing the PNG. Returns { png, metrics } or
+// { error }. The truncation guard lives here: the frame's content
+// region (drawn height minus the on-screen chrome, root minus
+// viewport) must equal the measured content height exactly.
+async function pullAppCapture(config, summary, theme, story, nonce, storyStartMs) {
+  const label = `${theme}/${story.id}`;
+  const lineRe = new RegExp(
+    `DSVR APPCAP ${nonce} \\S+ path=(\\S*) ipath=(\\S+) w=(\\d+) h=(\\d+) content=(\\d+) viewport=(\\d+) root=(\\d+) scrolls=(\\d+) chain=(\\d+) ms=(\\d+)`,
+  );
+  const errorRe = new RegExp(`DSVR APPCAP_ERROR ${nonce} \\S+ (.*)`);
+  // Poll logcat for THIS nonce's line (an earlier story's APPCAP
+  // line must not satisfy the wait).
+  let m = null;
+  let errorMatch = null;
+  const deadline = Date.now() + config.appCaptureTimeoutMs;
+  while (Date.now() < deadline && !m && !errorMatch) {
+    const logs = await logcatDump();
+    m = logs.match(lineRe);
+    if (!m) errorMatch = logs.match(errorRe);
+    if (!m && !errorMatch) await sleep(700);
+  }
+  if (!m) {
+    const why = errorMatch
+      ? `app capture error: ${errorMatch[1].trim()}`
+      : "APPCAP timeout";
+    summary.failed.push(`${label}: ${why}`);
+    console.error(`FAIL ${label}: ${why}`);
+    return { error: why };
+  }
+  const metrics = {
+    path: m[1],
+    internalPath: m[2],
+    width: Number(m[3]),
+    height: Number(m[4]),
+    contentHeight: Number(m[5]),
+    viewportHeight: Number(m[6]),
+    rootHeight: Number(m[7]),
+    scrollViews: Number(m[8]),
+    chainDepth: Number(m[9]),
+    appMs: Number(m[10]),
+  };
+  const contentRegion = metrics.height - (metrics.rootHeight - metrics.viewportHeight);
+  metrics.contentRegion = contentRegion;
+  metrics.totalMs = Date.now() - storyStartMs;
+  summary.appCapture = summary.appCapture || [];
+  summary.appCapture.push({ story: label, ...metrics });
+  console.log(
+    `DSVR APPCAP ${label}: frame=${metrics.width}x${metrics.height} content=${metrics.contentHeight} ` +
+      `viewport=${metrics.viewportHeight} root=${metrics.rootHeight} app=${metrics.appMs}ms total=${metrics.totalMs}ms`,
+  );
+  if (contentRegion !== metrics.contentHeight) {
+    const why =
+      `APPCAP GUARD: drawn content region ${contentRegion}px != measured content ` +
+      `${metrics.contentHeight}px — frame rejected (issue #137 truncation guard)`;
+    summary.failed.push(`${label}: ${why}`);
+    console.error(`DSVR APPCAP GUARD FAIL ${label}: ${why}`);
+    return { error: why, metrics };
+  }
+  const isPng = (buf) =>
+    buf && buf.length > 8 && buf[0] === 0x89 && buf[1] === 0x50 && buf[2] === 0x4e && buf[3] === 0x47;
+  let png = metrics.path
+    ? await adbBuffer("exec-out", "cat", metrics.path).catch(() => null)
+    : null;
+  if (!isPng(png)) {
+    // The external path was unreadable (scoped-storage shells):
+    // root the emulator shell and read the internal copy instead.
+    console.warn(`WARN ${label}: external pull failed; retrying via adb root + internal path`);
+    await adb("root").catch(() => {});
+    await adb("wait-for-device").catch(() => {});
+    png = await adbBuffer("exec-out", "cat", metrics.internalPath).catch(() => null);
+  }
+  if (!isPng(png)) {
+    const why = "APPCAP pull failed: no readable PNG at the external or internal path";
+    summary.failed.push(`${label}: ${why}`);
+    console.error(`FAIL ${label}: ${why}`);
+    return { error: why, metrics };
+  }
+  return { png, metrics };
+}
+
 export async function deviceMode(config, inActiveScope, baselineFileName) {
   await adb("wait-for-device");
   const pkg = config.packageName;
@@ -76,7 +159,10 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
     for (const story of stories) {
       if (!inActiveScope(story.id, theme)) continue;
       nonce++;
-      const url = `${config.scheme}://capture/${story.id}?theme=${encodeURIComponent(theme)}&nonce=${nonce}`;
+      const storyStartMs = Date.now();
+      const url =
+        `${config.scheme}://capture/${story.id}?theme=${encodeURIComponent(theme)}&nonce=${nonce}` +
+        (config.appCapture ? "&appcapture=1" : "");
       try {
         // The URL must be single-quoted: `adb shell` re-parses its
         // arguments through the DEVICE shell, where the URL's `&`
@@ -106,12 +192,23 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
         continue;
       }
       await sleep(config.settleMs);
-      const png = await adbBuffer("exec-out", "screencap", "-p").catch((error) => {
-        summary.failed.push(`${theme}/${story.id}: screencap failed: ${error.message}`);
-        console.error(`FAIL ${theme}/${story.id}: screencap failed: ${error.message}`);
-        return null;
-      });
-      if (!png) continue;
+      // SPIKE (#137, option 3): with --app-capture the frame comes
+      // from the app itself (full content height, drawn natively);
+      // otherwise the production path — one screencap of the
+      // display surface.
+      let png = null;
+      if (config.appCapture) {
+        const pulled = await pullAppCapture(config, summary, theme, story, nonce, storyStartMs);
+        if (pulled.error) continue;
+        png = pulled.png;
+      } else {
+        png = await adbBuffer("exec-out", "screencap", "-p").catch((error) => {
+          summary.failed.push(`${theme}/${story.id}: screencap failed: ${error.message}`);
+          console.error(`FAIL ${theme}/${story.id}: screencap failed: ${error.message}`);
+          return null;
+        });
+        if (!png) continue;
+      }
       const rel = join(theme, baselineFileName(story.id));
       const actualPath = join(config.outDir, "actual", rel);
       mkdirSync(dirname(actualPath), { recursive: true });

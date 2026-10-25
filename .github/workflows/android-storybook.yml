@@ -60,6 +60,14 @@ on:
           - update
           - sanity
         default: compare
+      spike_stories:
+        description: "SPIKE (#137): story-id substring scope for the standard set (implies narrow variant is skipped); empty = full scope"
+        type: string
+        default: ""
+      spike_app_capture:
+        description: "SPIKE (#137, option 3): set to 1 for app-side full-content capture instead of screencap"
+        type: string
+        default: ""
 
 permissions:
   contents: read
@@ -156,6 +164,9 @@ jobs:
       # line — learned on this PR's first run).
       - name: Capture and compare story screenshots
         if: steps.vrbot.outputs.skip != 'true'
+        env:
+          DSVR_SPIKE_STORIES: ${{ inputs.spike_stories }}
+          DSVR_SPIKE_APP_CAPTURE: ${{ inputs.spike_app_capture }}
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 34
