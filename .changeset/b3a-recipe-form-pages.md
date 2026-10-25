@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+B3a recipe-form pages (#124): the recipe form's view layer moves into the design system as `RecipeFormPage` (from `@spudly/ui/pages`) plus the three shell pages that compose it — `EditRecipePage`, `ManualEntryPage`, and `EditVersionPage` (draft heading, imported-draft banner, not-editable state). The form page is fully controlled: field values and change callbacks cross as props in the RecipesPage idiom, status and tag options are app-supplied view-models rendered through `ToggleChipGroup`, version-diff presentation (changed fields, revert hints, changed-list banners) crosses as pre-formatted props with revert intents out, and submission is a bare callback — form state, diffing, AI generation, image upload, and validation stay in the app. The image field and the sortable ingredient/instruction lists enter through render slots pending the contract decisions proposed on #124. `TextField` and `MultilineField` gain a semantic `changed` variant (warning step-5 border, step-1 fill) that carries the version-diff wash. Each page ships with stories in both storybooks and contract tests.

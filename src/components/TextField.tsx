@@ -27,6 +27,18 @@ const StyledInput = styled(TamaguiInput, {
         borderColor: "$danger",
       },
     },
+    // A field whose value differs from the version it was derived
+    // from (the recipe form's parent-version diff): the warning wash
+    // REPLACES the $surface fill outright — warning step 5 border,
+    // step 1 fill — so the two fills never combine. Semantic prop, so
+    // pages pass `changed` instead of styling the field themselves
+    // (#119).
+    changed: {
+      true: {
+        borderColor: tokens.colors.warning.warning5,
+        backgroundColor: tokens.colors.warning.warning1,
+      },
+    },
   } as const,
 });
 
