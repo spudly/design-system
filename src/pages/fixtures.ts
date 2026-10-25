@@ -317,7 +317,7 @@ export const accessTokensFixture = {
       revoked: true,
     },
   ],
-  createdSecret: "ecp_35ac91f0b6d24e8a9c1f5b7d03e6a2",
+  createdSecret: "ecp_example_000000000000000000000000",
 };
 
 /**
