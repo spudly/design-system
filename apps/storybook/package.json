@@ -38,6 +38,7 @@
   "scripts": {
     "android": "expo run:android",
     "generate": "sb-rn-get-stories --config-path .rnstorybook",
+    "storybook:react-native": "npm run generate && expo start",
     "prestart": "npm run generate",
     "start": "expo start",
     "typecheck": "tsc --noEmit -p tsconfig.json"

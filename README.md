@@ -78,7 +78,12 @@ Releases are automated with [Changesets](https://github.com/changesets/changeset
 3. Consumers upgrade on their own schedule — Eciperay can stay on 1.4 while
    Memorize tries 2.0.
 
-## Storybook previews (Chromatic)
+## React storybook (web, Chromatic)
+
+The design system has two storybooks over one shared set of story
+files — this react (web) storybook and the react-native storybook
+below. The structure, commands, and the coverage-parity rule are
+documented in [docs/storybooks.md](docs/storybooks.md).
 
 Every push to `main` publishes its Storybook build to
 [Chromatic](https://www.chromatic.com/) via `.github/workflows/chromatic.yml`:
@@ -124,24 +129,28 @@ One-time setup:
    if a Dependabot PR that changes visual files is labeled `visual-check`.)
    Fork PRs are skipped entirely — they never receive secrets, by design.
 
-## On-device previews (Android visual regression)
+## React Native storybook (Android visual regression)
 
-The same stories also run on Android: the Expo host app in
-`apps/storybook` mounts them via @storybook/react-native, and the
-"Android Storybook VR" workflow screenshot-compares them on an
-emulator against baselines committed in
-`tools/visualRegression/baselines/` — the on-device counterpart to
-Chromatic, covering the native-only rendering bugs web snapshots
-cannot see (e.g. eciperay#162). Local runs, the baseline-update
-workflow, and the #162 sanity check are documented in
+The same stories also run on Android in the react-native storybook:
+the Expo host app in `apps/storybook` mounts them via
+@storybook/react-native, and the "React Native storybook VR"
+workflow screenshot-compares the page stories on an emulator
+against baselines committed in `tools/visualRegression/baselines/`
+— the on-device counterpart to Chromatic, covering the native-only
+rendering bugs web snapshots cannot see (e.g. eciperay#162). Local
+runs, the baseline-update workflow, and the #162 sanity check are
+documented in
 [docs/android-visual-regression.md](docs/android-visual-regression.md).
 
 ### Full-page demo stories (Pages)
 
-Alongside the component stories, `src/pages/` holds full-page demo
-stories for each app's core screens — Eciperay: Recipes browse, Recipe
-detail, Meal plans, Shared-with-me; Memorize: Home / verse search,
-Passage view, Memorization session, Progress. Component screenshots
+Alongside the component stories, `src/pages/` holds page stories
+organized by app: the composed overview collections for each app's
+core screens — Eciperay: Recipes browse, Recipe detail, Meal plans,
+Shared-with-me; Memorize: Home / verse search, Passage view,
+Memorization session, Progress — and, per page component, stories
+rendering the real page component with fixture props (#49).
+Component screenshots
 alone do not show how the pieces compose on a real screen, so the
 pages are composed from the real `@spudly/ui` components, in the app's
 brand theme, inside a fixed phone-width frame, and Chromatic

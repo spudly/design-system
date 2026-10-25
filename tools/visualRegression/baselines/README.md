@@ -15,7 +15,7 @@ doubled the snapshot count. The enforcing rule is the
 This directory intentionally starts EMPTY (bootstrap state): with no
 baselines present the driver captures everything, warns per story,
 and compares nothing. Generate the real baselines by dispatching the
-"Android Storybook VR" workflow with mode = `update`, downloading
+"React Native storybook VR" workflow with mode = `update`, downloading
 the `dsvr-baselines` artifact, and committing its contents here.
 See docs/android-visual-regression.md ("Baselines: generating and
 updating") — never hand-edit or hand-create images in this folder.
