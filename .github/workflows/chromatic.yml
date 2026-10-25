@@ -1,9 +1,11 @@
-name: chromatic
+name: React storybook (Chromatic)
 
-# Publishes Storybook builds to Chromatic for visual snapshot diffs
-# against the accepted main-branch baseline (the check reports changes
-# until they are accepted in Chromatic's UI — that is the review gate
-# working).
+# Publishes the react storybook (the web Storybook at the repo root —
+# one of the repo's two storybooks, #122; the react-native storybook
+# is covered by android-storybook.yml) to Chromatic for visual
+# snapshot diffs against the accepted main-branch baseline (the check
+# reports changes until they are accepted in Chromatic's UI — that is
+# the review gate working).
 #
 # Snapshot budget: Chromatic's free tier allows 5,000 snapshots/month,
 # and the old run-on-every-push model burned ~284 snapshots per build
@@ -33,7 +35,7 @@ name: chromatic
 # - TurboSnap (onlyChanged) scopes each run's snapshots to the
 #   stories affected by the change instead of the full suite.
 #
-# Setup (one-time, see README "Storybook previews (Chromatic)"): create a
+# Setup (one-time, see README "React storybook (web, Chromatic)"): create a
 # Chromatic project linked to this repo and store its project token as the
 # CHROMATIC_PROJECT_TOKEN repository secret. Until then this workflow's
 # publish step fails (confined to its own check; CI is unaffected).

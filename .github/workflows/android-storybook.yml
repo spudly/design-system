@@ -1,7 +1,9 @@
-# On-device Storybook visual regression for Android (issue #43).
+# Visual regression for the react-native storybook on Android
+# (issue #43). The react-native storybook is one of the repo's two
+# storybooks (#122); this workflow is its CI.
 #
-# Separate from Chromatic (which gates the WEB Storybook): this job
-# renders the same CSF stories in the Expo host app
+# Separate from Chromatic (which gates the react/web Storybook): this
+# job renders the same CSF stories in the Expo host app
 # (apps/storybook) on an Android emulator and pixel-compares
 # screenshots against baselines committed under
 # tools/visualRegression/baselines/. See
@@ -41,7 +43,7 @@
 # "-narrow" filename suffix and flow through the same compare /
 # guard / auto-commit path as the standard set. See
 # docs/android-visual-regression.md.
-name: Android Storybook VR
+name: React Native storybook VR
 
 on:
   pull_request:

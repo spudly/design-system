@@ -1,8 +1,10 @@
-# Android on-device Storybook + visual regression
+# Android visual regression (React Native storybook)
 
-Issue #43. The web Storybook is gated by Chromatic; this system is its
-on-device counterpart: the **same CSF stories** rendered in a real
-Android app and screenshot-compared in CI. It exists because the
+Issue #43. The react (web) Storybook is gated by Chromatic; this
+system is the react-native storybook's counterpart: the **same CSF
+stories** rendered in a real Android app and screenshot-compared in
+CI. (The two-storybook structure is described in
+[storybooks.md](storybooks.md).) It exists because the
 class of bug it catches — React Native measuring/rendering text
 differently than the web — is invisible to web screenshots:
 spudly/eciperay#162 (the SearchField glyph whose line box stretched
@@ -37,7 +39,7 @@ text. Web keeps the per-brand stacks.
 
 ## Stories on device
 
-Stories are shared verbatim with web: `apps/storybook/.rnstorybook/main.ts`
+Stories are shared verbatim with the react storybook: `apps/storybook/.rnstorybook/main.ts`
 globs `../../src/**/*.stories.@(ts|tsx)`. They must stay
 platform-neutral:
 
@@ -305,7 +307,7 @@ no baseline yet` lines and a BOOTSTRAP note while baselines are
    missing — capture still runs, so a story that crashes the app
    fails the job even before it has a baseline.
 3. **Regenerate deliberately**: dispatch the workflow
-   (Actions → "Android Storybook VR" → Run workflow) with
+   (Actions → "React Native storybook VR" → Run workflow) with
    mode = `update`, **from the PR branch**. It captures everything
    in the capture scope (page stories, own brand — see "Capture
    scope" above) plus the narrow-viewport variant set, and does

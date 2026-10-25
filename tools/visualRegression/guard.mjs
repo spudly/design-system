@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Luminance guard for Android Storybook VR captures (issue #101).
+// Luminance guard for React Native storybook VR captures (issue #101).
 //
 // Issue #101: the CI capture pipeline intermittently screenshots a
 // DIMMED emulator display — every story uniformly darkened to ~40%
