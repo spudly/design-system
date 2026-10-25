@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+B2 component completion (#123): seven widgets audited out of eciperay's `packages/app/src/components` now live in the design system — `BulkSelectToolbar` (search + select-all/clear + selection count for bulk-selection lists), `CheckboxSelectList` (checkbox multi-select with loading and empty states), `CommentItem` (comment row with inline edit and moderation actions, all state via props), `FixedActionBanner` (pinned consent/action bar over ActionBar + InlineAlert, with a ReactNode message and optional dismiss — the shape DismissibleBanner's contract cannot express), `StatRow` (the recessed band that spreads StatCards across a section), `TagPill` (display pill tinted by a tag's data color), and `TokenRow` (personal-access-token row with pre-formatted meta label and revoke action). Each ships with stories in both storybooks and contract tests. The full audit of all 113 app component files — kinds, dispositions, and the DS gaps it exposed — lands in `docs/b2-component-audit.md` as the specification for B3 (pages/splits) and B6 (app-side cleanup). No existing component's contract changed.
