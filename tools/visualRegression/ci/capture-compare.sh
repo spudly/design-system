@@ -22,7 +22,10 @@
 #
 # Modes compare/update are the workflow_dispatch modes. Mode
 # pr-autocommit is what pull_request runs use (Stephen's directive,
-# 2026-10-23): if the compare finds screenshot diffs, regenerate the
+# 2026-10-23): if the compare finds screenshot diffs — or stories
+# with no baseline yet (bootstrap; a missing baseline never fails a
+# compare, so without this trigger new stories could never acquire
+# baselines through the PR flow — issue #128) — regenerate the
 # baselines from the fresh captures IN THIS JOB — gated by the
 # luminance guard (tools/visualRegression/guard.mjs, issue #101)
 # and an in-job re-capture/re-compare against the regenerated set —
@@ -129,7 +132,8 @@ adb logcat -G 8M
 # commit-pr-baselines job only pushes what this flow stages. Both
 # capture sets (standard + narrow variant) go through the same
 # cycle: a set may only be regenerated when its failures are all
-# pixel diffs, both sets pass the luminance guard, and both pass an
+# pixel diffs (baseline-less stories count as a regeneration
+# trigger, not a failure — see below), both sets pass the luminance guard, and both pass an
 # in-job re-capture/re-compare against the regenerated baselines.
 # The staged tree is shared — variant baselines differ from standard
 # ones only by their "-narrow" filename suffix.
@@ -149,36 +153,47 @@ pr_autocommit() {
   if ! run_narrow --out "$out_narrow" "${SCOPE_ARGS[@]}"; then
     narrow_failed=1
   fi
-  if [ "$std_failed" = 0 ] && [ "$narrow_failed" = 0 ]; then
-    echo "PR auto-commit: no diffs - baselines already match; nothing to commit."
-    return 0
-  fi
-
-  # Only a run whose failures are ALL pixel diffs may regenerate.
-  # A capture failure (deep link, READY timeout, screencap) means
-  # the fresh set is incomplete, and an incomplete set must never
-  # become the baselines. Classification spans both sets' summary
-  # files: a set that passed contributes no failures; a set that
-  # failed without a readable summary stops the flow.
+  # Classification spans both sets' summary files: a set that
+  # passed contributes no failures; a set that failed without a
+  # readable summary stops the flow. Regeneration is allowed when
+  # every failure is a pixel diff, and also when the run merely
+  # found stories with no baseline yet (bootstrap): a missing
+  # baseline never fails the compare (deviceMode.mjs warns and
+  # skips the story), so without this trigger a new story could
+  # never acquire a baseline through the PR flow at all (issue
+  # #128). The verdict line is verdict:missingBaselines:failures.
   local classify
   classify="$(node -e '
     const fs = require("node:fs");
     const failed = [];
+    let missing = 0;
     for (const path of process.argv.slice(1)) {
       let s;
       try { s = JSON.parse(fs.readFileSync(path, "utf8")); }
-      catch { console.log("unreadable"); process.exit(0); }
+      catch { console.log("unreadable:0:0"); process.exit(0); }
       if (Array.isArray(s.failed)) failed.push(...s.failed);
+      if (Number.isInteger(s.noBaseline)) missing += s.noBaseline;
     }
-    if (failed.length === 0) { console.log("none"); process.exit(0); }
     const diff = /: \d+\.\d+% pixels differ/;
-    console.log(failed.every((f) => diff.test(f)) ? "diffs-only" : "other");
+    if (!failed.every((f) => diff.test(f))) { console.log(`other:${missing}:${failed.length}`); process.exit(0); }
+    if (failed.length === 0 && missing === 0) { console.log("clean:0:0"); process.exit(0); }
+    console.log(`regen:${missing}:${failed.length}`);
   ' "$out/summary.json" "$out_narrow/summary.json")"
-  if [ "$classify" != "diffs-only" ]; then
+  local verdict="${classify%%:*}" counts="${classify#*:}"
+  local missing_count="${counts%%:*}" diff_count="${counts##*:}"
+  if [ "$verdict" = "clean" ]; then
+    if [ "$std_failed" = 0 ] && [ "$narrow_failed" = 0 ]; then
+      echo "PR auto-commit: no diffs and no missing baselines - baselines already match; nothing to commit."
+      return 0
+    fi
+    echo "::error::PR auto-commit: a compare failed but its summary shows no failures and no missing baselines (classification: $classify); NOT regenerating baselines. See the compare output above."
+    return 1
+  fi
+  if [ "$verdict" != "regen" ]; then
     echo "::error::PR auto-commit: compare failed with non-diff failures (classification: $classify); NOT regenerating baselines. See the compare output above."
     return 1
   fi
-  echo "PR auto-commit: compare found only pixel diffs; regenerating baselines from the fresh captures."
+  echo "PR auto-commit: regenerating baselines from the fresh captures ($diff_count pixel-diff failures, $missing_count stories with no baseline yet)."
 
   # The regenerated set: committed baselines overlaid with the fresh
   # captures of both sets (exactly what update mode would write),
