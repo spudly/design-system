@@ -7,7 +7,15 @@
 // away from what the pipeline actually captures.
 
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, mkdtempSync, readdirSync, statSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readFileSync,
+  readdirSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -170,9 +178,12 @@ test("isFallbackPath classifies the guardrail list", () => {
 });
 
 test("real repo: derived capture set matches the committed baselines", () => {
-  // The mapper's story inventory must reproduce exactly the ids
-  // the pipeline has baselines for — every baseline derivable, and
-  // the standard/narrow sets at their known sizes (100 + 7 = 107;
+  // Completeness gate (issue #128): the mapper's story inventory
+  // and the committed baselines must agree in BOTH directions —
+  // every baseline derivable, and every derivable in-scope story
+  // HAS a committed baseline — and the coverage listing in
+  // docs/android-visual-regression.md must match both. The
+  // standard/narrow sets are at their known sizes (100 + 7 = 107;
   // the standard set grew by the eight B3a recipe-form stories,
   // #124, the sixteen B3b meals/shopping stories, #125, the
   // twenty-three B3c account/auth stories, #126, and the three
@@ -184,11 +195,16 @@ test("real repo: derived capture set matches the committed baselines", () => {
   const standard = new Set(scope.standard);
   const narrow = new Set(scope.narrow);
   const baselineRoot = join(repoRoot, "tools/visualRegression/baselines");
+  const themeOf = (id) =>
+    id.startsWith("pages-memorize") ? "light_quietDawn" : "light_warmHarvest";
+  const baselineFiles = new Map();
   for (const theme of readdirSync(baselineRoot)) {
     const dir = join(baselineRoot, theme);
     if (!statSync(dir).isDirectory()) continue;
-    for (const file of readdirSync(dir)) {
-      if (!file.endsWith(".png")) continue;
+    baselineFiles.set(theme, new Set(readdirSync(dir).filter((f) => f.endsWith(".png"))));
+  }
+  for (const [theme, files] of baselineFiles) {
+    for (const file of files) {
       if (file.endsWith("-narrow.png")) {
         assert.ok(narrow.has(file.slice(0, -"-narrow.png".length)), `narrow baseline ${file}`);
       } else {
@@ -196,5 +212,85 @@ test("real repo: derived capture set matches the committed baselines", () => {
       }
     }
   }
+  // The other direction: no in-scope story may lack a baseline.
+  for (const id of scope.standard) {
+    assert.ok(
+      baselineFiles.get(themeOf(id)).has(`${id}.png`),
+      `missing committed baseline for ${id} (${themeOf(id)})`,
+    );
+  }
+  for (const id of scope.narrow) {
+    assert.ok(
+      baselineFiles.get("light_warmHarvest").has(`${id}-narrow.png`),
+      `missing committed narrow baseline for ${id}`,
+    );
+  }
   assert.ok(existsSync(baselineRoot));
+
+  // The docs coverage listing must match the derived set and the
+  // files on disk, group by group.
+  const docs = readFileSync(join(repoRoot, "docs/android-visual-regression.md"), "utf8");
+  const begin = docs.indexOf("<!-- VR-COVERAGE-BEGIN -->");
+  const end = docs.indexOf("<!-- VR-COVERAGE-END -->");
+  assert.ok(begin !== -1 && end > begin, "docs coverage listing markers present");
+  const rows = new Map();
+  let totalStories = 0;
+  let totalBaselines = 0;
+  for (const line of docs.slice(begin, end).split("\n")) {
+    const raw = line.split("|").map((c) => c.replaceAll("**", "").trim());
+    const cells = raw.slice(1, raw.at(-1) === "" ? -1 : undefined);
+    if (cells.length !== 4) continue;
+    const [group, theme, stories, baselines] = cells;
+    if (group === "Total") {
+      totalStories = Number(stories);
+      totalBaselines = Number(baselines);
+      continue;
+    }
+    if (!group.startsWith("pages-")) continue;
+    rows.set(group, { theme, stories: Number(stories), baselines: Number(baselines) });
+  }
+  const groupOf = (id) => id.split("--")[0];
+  const derivedGroups = new Map();
+  for (const id of scope.standard) {
+    const key = groupOf(id);
+    if (!derivedGroups.has(key))
+      derivedGroups.set(key, { theme: themeOf(id), standard: [], narrow: [] });
+    derivedGroups.get(key).standard.push(id);
+  }
+  for (const id of scope.narrow) derivedGroups.get(groupOf(id)).narrow.push(id);
+  let countedStories = 0;
+  let countedBaselines = 0;
+  for (const [key, group] of derivedGroups) {
+    const row = rows.get(key);
+    assert.ok(row, `docs coverage listing has a row for ${key}`);
+    assert.equal(row.theme, group.theme, `docs theme for ${key}`);
+    assert.equal(row.stories, group.standard.length, `docs story count for ${key}`);
+    assert.equal(
+      row.baselines,
+      group.standard.filter((id) => baselineFiles.get(group.theme).has(`${id}.png`)).length,
+      `docs baseline count for ${key}`,
+    );
+    countedStories += row.stories;
+    countedBaselines += row.baselines;
+    if (group.narrow.length > 0) {
+      const narrowRow = rows.get(`${key} — narrow variant`);
+      assert.ok(narrowRow, `docs coverage listing has the narrow-variant row for ${key}`);
+      assert.equal(narrowRow.stories, group.narrow.length, `docs narrow story count for ${key}`);
+      assert.equal(
+        narrowRow.baselines,
+        group.narrow.filter((id) => baselineFiles.get("light_warmHarvest").has(`${id}-narrow.png`))
+          .length,
+        `docs narrow baseline count for ${key}`,
+      );
+      countedStories += narrowRow.stories;
+      countedBaselines += narrowRow.baselines;
+    }
+  }
+  assert.equal(
+    rows.size,
+    derivedGroups.size + 1,
+    "docs listing has no rows beyond the derived groups (+ narrow)",
+  );
+  assert.equal(totalStories, countedStories, "docs listing total stories");
+  assert.equal(totalBaselines, countedBaselines, "docs listing total baselines");
 });
