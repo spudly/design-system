@@ -15,7 +15,10 @@ before this PR is merged.
 - [ ] Review feedback addressed (Copilot and/or human)
 - [ ] No new console or CI warnings introduced — or a GitHub issue filed
       for each new one
-- [ ] Changeset added, or not required (docs/CI/test-only)
+- [ ] Changeset added, or not required (docs/CI/test-only) — and for
+      user-visible changes, the changeset description describes the
+      feature change in testable, user-visible terms (consuming apps
+      test from these descriptions)
 - [ ] Stories updated for component/page changes, or not applicable
 - [ ] `visual-check` label added for this PR's one Chromatic snapshot
       run before merge-ready, or no visual changes
