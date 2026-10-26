@@ -183,8 +183,8 @@ Warm Harvest and `pages-memorize` under Quiet Dawn. Since
 2026-10-24 the set is **light themes only**: dark captures doubled
 the snapshot count (and the job's emulator time) without catching
 layout regressions the light set misses, so the dark baselines were
-deleted outright. With the current story set that is 32 + 18 =
-**50 baselines**. Curating hundreds of component screenshots was
+deleted outright. With the current story set that is 79 + 21 =
+**100 baselines**. Curating hundreds of component screenshots was
 more review surface than the Android check needs; component stories
 stay covered by Chromatic on web, and wrong-brand page captures are
 excluded because pages pin their brand. The rule lives in the
@@ -192,6 +192,64 @@ excluded because pages pin their brand. The rule lives in the
 driver captures only in-scope (story, theme) pairs in both compare
 and update modes, so the baseline folder and the CI runs follow the
 table. Edit the table to change the scope.
+
+### Coverage listing (issue #128)
+
+Every page in @spudly/ui, accounted for against the committed
+baselines. One row per story group (a page's stories, or an
+aggregate story file); `PageFrame` is the internal page shell —
+it has no stories of its own and renders inside every page
+capture below. The narrow-variant row is the RecipesPage
+exception set (see the next section). This table is pinned by
+`test/visualRegressionScope.test.mjs` against the derived
+capture set and the baseline files on disk: a page story without
+a committed baseline — or a row that drifts from the files —
+fails the test suite.
+
+<!-- VR-COVERAGE-BEGIN -->
+
+| Story group                                 | Theme             | Stories | Baselines |
+| ------------------------------------------- | ----------------- | ------: | --------: |
+| pages-eciperay                              | light_warmHarvest |       4 |         4 |
+| pages-eciperay-addrecipemenupage            | light_warmHarvest |       1 |         1 |
+| pages-eciperay-aisessionpage                | light_warmHarvest |       3 |         3 |
+| pages-eciperay-editrecipepage               | light_warmHarvest |       1 |         1 |
+| pages-eciperay-editversionpage              | light_warmHarvest |       2 |         2 |
+| pages-eciperay-feedbackpage                 | light_warmHarvest |       2 |         2 |
+| pages-eciperay-forgotpasswordpage           | light_warmHarvest |       1 |         1 |
+| pages-eciperay-homepage                     | light_warmHarvest |       3 |         3 |
+| pages-eciperay-importimagepage              | light_warmHarvest |       1 |         1 |
+| pages-eciperay-importreviewpage             | light_warmHarvest |       1 |         1 |
+| pages-eciperay-importtextpage               | light_warmHarvest |       2 |         2 |
+| pages-eciperay-importurlpage                | light_warmHarvest |       1 |         1 |
+| pages-eciperay-manualentrypage              | light_warmHarvest |       1 |         1 |
+| pages-eciperay-mealcookingmodepage          | light_warmHarvest |       3 |         3 |
+| pages-eciperay-mealdetailpage               | light_warmHarvest |       2 |         2 |
+| pages-eciperay-mealformpage                 | light_warmHarvest |       3 |         3 |
+| pages-eciperay-mealplandetailpage           | light_warmHarvest |       5 |         5 |
+| pages-eciperay-mealplanformpage             | light_warmHarvest |       2 |         2 |
+| pages-eciperay-mealplanspage                | light_warmHarvest |       4 |         4 |
+| pages-eciperay-mealshubpage                 | light_warmHarvest |       3 |         3 |
+| pages-eciperay-profilepage                  | light_warmHarvest |       1 |         1 |
+| pages-eciperay-recipedetailpage             | light_warmHarvest |       8 |         8 |
+| pages-eciperay-recipeformpage               | light_warmHarvest |       4 |         4 |
+| pages-eciperay-recipespage                  | light_warmHarvest |       7 |         7 |
+| pages-eciperay-recipespage — narrow variant | light_warmHarvest |       7 |         7 |
+| pages-eciperay-resetpasswordpage            | light_warmHarvest |       1 |         1 |
+| pages-eciperay-sharedwithmepage             | light_warmHarvest |       4 |         4 |
+| pages-eciperay-shoppinglistpage             | light_warmHarvest |       3 |         3 |
+| pages-eciperay-signinpage                   | light_warmHarvest |       2 |         2 |
+| pages-eciperay-signuppage                   | light_warmHarvest |       2 |         2 |
+| pages-eciperay-tagspage                     | light_warmHarvest |       2 |         2 |
+| pages-memorize                              | light_quietDawn   |       4 |         4 |
+| pages-memorize-memorizationsessionpage      | light_quietDawn   |       5 |         5 |
+| pages-memorize-memorizereviewpage           | light_quietDawn   |       2 |         2 |
+| pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
+| pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
+| pages-memorize-versesearchpage              | light_quietDawn   |       5 |         5 |
+| **Total**                                   |                   | **107** |   **107** |
+
+<!-- VR-COVERAGE-END -->
 
 Comparison: a pixel differs when any channel delta exceeds
 `--threshold` (default 16/255); a screenshot fails when differing
@@ -231,7 +289,7 @@ The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
 7 `pages-eciperay-recipespage` stories x light = **7
-baselines** (57 total). RecipesPage only, deliberately — a second
+baselines** (107 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
@@ -284,11 +342,13 @@ directive, 2026-10-23 — no manual dispatch):
 1. **PRs: automatic.** The PR compare run (`capture-compare.sh`,
    mode `pr-autocommit`) starts with the ordinary strict compare
    of both capture sets (standard + narrow variant). If every
-   story matches, nothing else happens. If the compare
+   story matches and every story has a baseline, nothing else
+   happens. If the compare
    fails and **every failure is a pixel diff** (a capture failure —
    deep link, READY timeout, app-capture error or guard rejection —
    means an incomplete set
-   and stops the flow), the job regenerates the baselines from the
+   and stops the flow) — or if any captured story has **no
+   baseline yet** (point 2) — the job regenerates the baselines from the
    fresh captures, runs them through the **luminance guard**
    (below), and then **captures everything a second time and
    compares against the regenerated set, in the same job**. Only a
@@ -302,10 +362,18 @@ directive, 2026-10-23 — no manual dispatch):
    baselines were re-verified", not "nothing changed". The diff
    images from the first compare pass are in the `dsvr-output`
    artifact.
-2. **First run / new stories**: the compare job passes with `WARN …
-no baseline yet` lines and a BOOTSTRAP note while baselines are
-   missing — capture still runs, so a story that crashes the app
-   fails the job even before it has a baseline.
+2. **First run / new stories**: a missing baseline never fails a
+   compare — the driver captures the story, warns `WARN … no
+baseline yet` and skips it (a BOOTSTRAP note when nothing at all
+   was compared), so a story that crashes the app still fails the
+   job before it has a baseline. On a PR that bootstrap state is
+   not terminal: it triggers the same guarded regeneration as a
+   pixel diff (point 1), so the new story's baseline is committed
+   to the PR branch by the auto-commit flow. (Before issue #128
+   it did not — regeneration was entered only on a failed compare,
+   so the B3a–B4 page stories bootstrap-passed with no baselines
+   ever landing. Compare-only runs — main pushes, dispatched
+   compares — still just warn.)
 3. **Regenerate deliberately**: dispatch the workflow
    (Actions → "React Native storybook VR" → Run workflow) with
    mode = `update`, **from the PR branch**. It captures everything
@@ -419,7 +487,7 @@ capture entirely. (Local development still uses Metro via
 
 ### Scoped PR runs: capture only the affected stories (issue #114)
 
-Even path-filtered, a full run captures all 57 baselines (50
+Even path-filtered, a full run captures all 107 baselines (100
 standard + 7 narrow) — a 20–30 minute emulator job gating every
 PR, including one-line component fixes. Since issue #114, a PR
 compare run first computes the stories the PR can actually
@@ -451,7 +519,7 @@ affect and captures only those:
   baselines.
 
 **Full-run fallback — never silently reduce coverage.** The
-decision is the full 57 whenever any changed file is:
+decision is the full 107 whenever any changed file is:
 
 - design tokens (`src/tokens/**`), themes (`src/themes/**`), or
   the Tamagui config (`src/tamagui.config.ts`) — they feed every

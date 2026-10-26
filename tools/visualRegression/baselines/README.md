@@ -7,7 +7,7 @@ Scope (Stephen, 2026-10-23; light-only since 2026-10-24): page
 stories only, each in its own brand's LIGHT theme —
 `pages-eciperay` under light_warmHarvest, `pages-memorize` under
 light_quietDawn, plus the narrow-viewport RecipesPage variant
-(57 baselines total). Dark themes were dropped because they
+(107 baselines total). Dark themes were dropped because they
 doubled the snapshot count. The enforcing rule is the
 `CAPTURE_SCOPE` / `NARROW_SCOPE` tables in `../run.mjs`; see
 `docs/android-visual-regression.md` ("Capture scope").
