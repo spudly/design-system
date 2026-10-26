@@ -16,6 +16,47 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  changeset-check:
+    # PRs that change src/** must include a changeset: the consuming apps
+    # scope their testing for a version bump from the changelog that
+    # changesets generates, so a src change without one can be missed
+    # downstream. See "Writing changesets" in README.md.
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          # Full history so the PR diff against its base can be computed.
+          fetch-depth: 0
+      - name: Require a changeset for src changes
+        env:
+          HEAD_REF: ${{ github.head_ref }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # Exempt: the changesets/action "Version Packages" PR (it consumes
+          # changesets rather than adding one) and Dependabot PRs.
+          if [ "$HEAD_REF" = "changeset-release/main" ] || [ "$PR_TITLE" = "Version Packages" ] || [ "$PR_AUTHOR" = "dependabot[bot]" ]; then
+            echo "Exempt PR (head branch '$HEAD_REF', author '$PR_AUTHOR') - skipping changeset check."
+            exit 0
+          fi
+          changed=$(git diff --name-only "$BASE_SHA...$HEAD_SHA")
+          echo "Changed files:"
+          echo "$changed"
+          if ! grep -q '^src/' <<< "$changed"; then
+            echo "No src/** changes in this PR - no changeset required."
+            exit 0
+          fi
+          if grep -E '^\.changeset/[^/]+\.md$' <<< "$changed" | grep -qv '^\.changeset/README\.md$'; then
+            echo "src/** changed and a changeset is included."
+            exit 0
+          fi
+          echo "::error::This PR changes src/** but includes no changeset - add one with \`npm run changeset\`, describing user-visible feature changes in testable terms."
+          exit 1
+
   ci:
     runs-on: ubuntu-latest
     timeout-minutes: 15
