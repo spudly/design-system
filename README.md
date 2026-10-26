@@ -78,6 +78,22 @@ Releases are automated with [Changesets](https://github.com/changesets/changeset
 3. Consumers upgrade on their own schedule — Eciperay can stay on 1.4 while
    Memorize tries 2.0.
 
+### Writing changesets
+
+Every PR that changes `src/**` must include a changeset — a CI check fails
+the PR if `src/**` changed but no `.changeset/*.md` file was added or
+modified. (The "Version Packages" PR and Dependabot PRs are exempt, as are
+PRs that don't touch `src/**`, such as docs- or CI-only changes.)
+
+For user-visible changes, write the changeset description in testable,
+user-visible terms: say what changed for a user of the consuming apps, and
+name the pages or components affected. Changesets generates the changelog
+for each release from these descriptions, and the consuming apps
+(Eciperay, Memorize) build the manual test scope for a version bump from
+that changelog — a vague description means the change can be missed when
+an app pulls in the new version. If a change is an internal refactor with
+no user-visible effect, say so plainly in the description.
+
 ## React storybook (web, Chromatic)
 
 The design system has two storybooks over one shared set of story
