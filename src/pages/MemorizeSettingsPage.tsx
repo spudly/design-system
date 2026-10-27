@@ -170,7 +170,7 @@ export function MemorizeSettingsPage({
           secureTextEntry
           autoCapitalize="none"
         />
-        <XStack gap="$2">
+        <XStack gap="$2" marginTop="$3">
           <Button size="sm" onPress={onSaveApiKeyPress} disabled={!apiKeyValue.trim()}>
             Save key
           </Button>
@@ -188,11 +188,15 @@ export function MemorizeSettingsPage({
           ” Drive folder.
         </Text>
         {driveConnected ? (
-          <Button onPress={onSyncDrivePress} disabled={isSyncing}>
+          <Button marginTop="$3" onPress={onSyncDrivePress} disabled={isSyncing}>
             Sync with Drive
           </Button>
         ) : (
-          <Button onPress={onConnectDrivePress} disabled={!driveConnectReady || isSyncing}>
+          <Button
+            marginTop="$3"
+            onPress={onConnectDrivePress}
+            disabled={!driveConnectReady || isSyncing}
+          >
             Connect Google Drive
           </Button>
         )}
@@ -201,7 +205,7 @@ export function MemorizeSettingsPage({
           <InlineAlert severity={syncConflict ? "warning" : "info"}>{syncMessage}</InlineAlert>
         ) : null}
         {syncConflict ? (
-          <XStack gap="$2">
+          <XStack gap="$2" marginTop="$3">
             <Button size="sm" onPress={onKeepDevicePress} disabled={isSyncing}>
               Keep this device
             </Button>
