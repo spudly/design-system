@@ -42,7 +42,7 @@ test("Badge's color form keeps TagPill's tint and type contract", () => {
     "Badge must resolve tag colors through the shared token resolver",
   );
   assert.ok(
-    source.includes("`${resolvedColor}22`"),
+    source.includes("{resolvedColor}22`"),
     "surface must be the resolved color at 22 hex alpha",
   );
   assert.ok(
