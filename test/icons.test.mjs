@@ -54,7 +54,7 @@ const ICONS = [
   ["AddIcon", null],
   ["FeedbackIcon", "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7"],
   ["HomeIcon", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"],
-  ["MealsIcon", "M6.22 13.6 A6 6 0 0 0 17.78 13.6 Z"],
+  ["MealsIcon", "M2.62 13.5 A9.5 9.5 0 0 0 21.38 13.5 Z"],
   ["PrintIcon", "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"],
   ["ProfileIcon", "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"],
   ["RecipesIcon", "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"],
@@ -105,16 +105,17 @@ test("no icon module carries another icon's glyph (#246)", () => {
 
 test("MealsIcon is the custom divided plate, not Feather's coffee glyph", () => {
   const meals = codeByIcon.get("MealsIcon");
-  // The rim: a circle centered on the grid.
-  assert.match(meals, /kind: "circle", cx: "12", cy: "12", r: "9"/);
+  // No rim: the plate is its three portions alone, enlarged to
+  // fill the frame, so there is no circle element at all.
+  assert.ok(!meals.includes('kind: "circle"'), "MealsIcon still carries the plate rim");
   // Two quarter portions across the top, their arcs concentric
-  // with the rim (radius 6 about the same 12,12 center).
+  // about the grid center (radius 9.5 about 12,12).
   assert.ok(
-    meals.includes("M6.17 10.6 L10.6 10.6 L10.6 6.17 A6 6 0 0 0 6.17 10.6 Z"),
+    meals.includes("M2.62 10.5 L10.5 10.5 L10.5 2.62 A9.5 9.5 0 0 0 2.62 10.5 Z"),
     "MealsIcon is missing its top-left quarter portion",
   );
   assert.ok(
-    meals.includes("M17.83 10.6 L13.4 10.6 L13.4 6.17 A6 6 0 0 1 17.83 10.6 Z"),
+    meals.includes("M21.38 10.5 L13.5 10.5 L13.5 2.62 A9.5 9.5 0 0 1 21.38 10.5 Z"),
     "MealsIcon is missing its top-right quarter portion",
   );
   // The half portion along the bottom is pinned via the ICONS literal.
