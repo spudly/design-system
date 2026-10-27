@@ -2,7 +2,7 @@ import { useState } from "react";
 import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
-import { MultilineField } from "../components/MultilineField.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
 import { tokens } from "../tokens/index.js";
 
@@ -39,7 +39,7 @@ export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextP
         Import from text
       </Text>
       <Text variant="hint">Paste a recipe from Word, a web page, or any rich text source.</Text>
-      <MultilineField value={text} onChangeText={setText} placeholder="Paste your recipe here…" />
+      <TextAreaField value={text} onChangeText={setText} placeholder="Paste your recipe here…" />
       {error ? (
         <YStack marginBottom="$4">
           <Text variant="error">{error}</Text>

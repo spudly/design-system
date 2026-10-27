@@ -19,7 +19,7 @@
  *    lock notice does.
  * 4. The version-diff wash is the DS fields' semantic `changed`
  *    variant (warning step 5 border / step 1 fill on TextField and
- *    MultilineField), never page-level color props on the fields.
+ *    TextAreaField), never page-level color props on the fields.
  * 5. Option data crosses as view-models: status and tag options
  *    are props, rendered through the DS ToggleChipGroup in single
  *    and multiple mode.
@@ -118,7 +118,7 @@ test("the diff wash is the fields' semantic `changed` variant, defined in the co
     form.includes('changed={isChanged("description")}'),
     "description field must pass `changed`",
   );
-  for (const component of ["TextField", "MultilineField"]) {
+  for (const component of ["TextField", "TextAreaField"]) {
     const src = source("components", component);
     assert.ok(src.includes("changed: {"), `${component} must define the changed variant`);
     assert.ok(

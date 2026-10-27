@@ -3,7 +3,7 @@ import { ScrollView, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { InlineAlert } from "../components/InlineAlert.js";
-import { MultilineField } from "../components/MultilineField.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
@@ -57,7 +57,7 @@ import { ToggleChipGroup } from "../components/ToggleChipGroup.js";
  *   background overrides on those buttons do not cross.
  * - The app form's label rows were bespoke text; here every label
  *   row is the same composition, and the scalar fields render
- *   through the DS TextField / MultilineField chrome (with the
+ *   through the DS TextField / TextAreaField chrome (with the
  *   `changed` variant carrying the diff wash — see TextField).
  */
 
@@ -353,7 +353,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               ) : null}
             </XStack>
           </XStack>
-          <MultilineField
+          <TextAreaField
             accessibilityLabel="Description"
             changed={isChanged("description")}
             numberOfLines={3}
