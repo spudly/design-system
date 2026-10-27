@@ -2,7 +2,9 @@
  * Contract test for the icons module (spudly/eciperay#246).
  *
  * The module is the design system's one icon set: official Feather
- * SVG element data rendered with react-native-svg. Its shape is a
+ * SVG element data rendered with react-native-svg (the sole
+ * exception is MealsIcon's custom divided plate — Feather has no
+ * plate glyph — pinned below). Its shape is a
  * base `Icon` renderer plus one module per icon, each embedding only
  * its own glyph's data and exporting one component under a semantic
  * usage name (PrintIcon, not "printer") — so unused icons
@@ -37,14 +39,22 @@ function codeOf(rel) {
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-/** Semantic export name -> module file + a distinctive literal from its glyph's official data. */
+/**
+ * Semantic export name -> module file + a distinctive literal from
+ * its glyph's data. Every glyph's data is the official Feather data
+ * except MealsIcon's: Feather has no plate icon, so MealsIcon
+ * carries an original divided-plate design drawn to Feather's
+ * construction specifications; its literal below is the plate's
+ * bottom half portion, and its full structure is pinned by a
+ * dedicated test below.
+ */
 const ICONS = [
   // AddIcon (two bare lines) and ShareIcon (circles and lines) have
   // no path literal; their data is pinned by dedicated tests below.
   ["AddIcon", null],
   ["FeedbackIcon", "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7"],
   ["HomeIcon", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"],
-  ["MealsIcon", "M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"],
+  ["MealsIcon", "M6.22 13.6 A6 6 0 0 0 17.78 13.6 Z"],
   ["PrintIcon", "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"],
   ["ProfileIcon", "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"],
   ["RecipesIcon", "M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"],
@@ -69,7 +79,7 @@ test("each icon module exports its semantic component through the base Icon (#24
   }
 });
 
-test("each icon module carries its glyph's official Feather data (#246)", () => {
+test("each icon module carries its glyph's data (official Feather, except the custom Meals plate) (#246)", () => {
   for (const [name, literal] of ICONS) {
     if (!literal) continue;
     assert.ok(
@@ -91,6 +101,26 @@ test("no icon module carries another icon's glyph (#246)", () => {
       assert.ok(!code.includes(literal), `${owner} also carries ${name}'s glyph data`);
     }
   }
+});
+
+test("MealsIcon is the custom divided plate, not Feather's coffee glyph", () => {
+  const meals = codeByIcon.get("MealsIcon");
+  // The rim: a circle centered on the grid.
+  assert.match(meals, /kind: "circle", cx: "12", cy: "12", r: "9"/);
+  // Two quarter portions across the top, their arcs concentric
+  // with the rim (radius 6 about the same 12,12 center).
+  assert.ok(
+    meals.includes("M6.17 10.6 L10.6 10.6 L10.6 6.17 A6 6 0 0 0 6.17 10.6 Z"),
+    "MealsIcon is missing its top-left quarter portion",
+  );
+  assert.ok(
+    meals.includes("M17.83 10.6 L13.4 10.6 L13.4 6.17 A6 6 0 0 1 17.83 10.6 Z"),
+    "MealsIcon is missing its top-right quarter portion",
+  );
+  // The half portion along the bottom is pinned via the ICONS literal.
+  // The Feather coffee data it replaced is gone.
+  assert.ok(!meals.includes("M2 8h16v9"), "MealsIcon still carries the coffee body");
+  assert.ok(!meals.includes("M18 8h1a4"), "MealsIcon still carries the coffee handle");
 });
 
 test("printer and share-2 use the official Feather element data (#187)", () => {
