@@ -32,6 +32,11 @@ import { TextField } from "../components/TextField.js";
  * share the row below. All three previously shared one row,
  * where the swatch row overlapped the name input and the
  * input collapsed to a sliver behind the first swatch.
+ *
+ * That second row wraps (#219): at narrow widths the
+ * ColorPickerField shrinks (its swatches wrap internally)
+ * and, if the row still cannot fit, the Add button wraps
+ * below the swatches instead of overflowing off-screen.
  */
 
 export interface TagsPageTag {
@@ -78,7 +83,7 @@ export function TagsPage({
       </Text>
       <YStack marginBottom="$6" gap="$3">
         <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
-        <XStack gap="$2" alignItems="center" justifyContent="space-between">
+        <XStack flexWrap="wrap" gap="$2" alignItems="center" justifyContent="space-between">
           <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
           <Button
             variant="primary"

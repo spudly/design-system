@@ -58,7 +58,7 @@ export function ColorPickerField({
   const errorId = `${id}-error`;
 
   return (
-    <YStack gap={tokens.spacing[2]}>
+    <YStack gap={tokens.spacing[2]} flexShrink={1} flexGrow={1} minWidth={0}>
       {label ? (
         <Text id={labelId} style={{ fontSize: tokens.typography.fontSize.sm }}>
           {label}
