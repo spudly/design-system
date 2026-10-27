@@ -13,6 +13,8 @@ import { StatCard } from "../components/StatCard.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChipGroup.js";
+import { PrintIcon } from "../icons/PrintIcon.js";
+import { ShareIcon } from "../icons/ShareIcon.js";
 
 /**
  * RecipeDetailPage (#49): Eciperay's recipe detail screen as a
@@ -420,117 +422,16 @@ const neutralChipProps = {
 } as const;
 
 /**
- * The print and share chips' icons, drawn from fixed-dimension
- * shapes (#187) in the SearchField (#45) / BackLink (#95)
- * pattern — not the "🖨" emoji and "↗" text glyph they replace:
- * emoji render in full color at font-dependent sizes, clashing
- * with the neutral chips and drifting between platforms, while
- * drawn shapes render in the chip's own ink color (gray8, the
- * neutral chips' label color) at a fixed 24px geometry on web
- * and native alike. Do not reintroduce text glyphs for these.
+ * The print and share chips render the icons module's PrintIcon /
+ * ShareIcon (#187, reworked after #217): the official Feather
+ * printer / share-2 glyphs in the chip's own ink color (gray8, the
+ * neutral chips' label color) at Feather's fixed 24px geometry —
+ * not the "🖨" emoji and "↗" text glyph the page originally
+ * used, which render in full color at font-dependent sizes,
+ * clashing with the neutral chips and drifting between platforms.
+ * Do not reintroduce text glyphs or hand-drawn icons for these:
+ * icons come from src/icons (see that module's header).
  */
-function PrinterGlyph() {
-  const ink = tokens.colors.gray.gray8;
-  return (
-    <View aria-hidden position="relative" width={24} height={24} flexShrink={0}>
-      {/* The sheet loaded in the top of the printer. */}
-      <View
-        position="absolute"
-        left={7}
-        top={1.5}
-        width={10}
-        height={6}
-        borderWidth={2}
-        borderColor={ink}
-        backgroundColor="$surface"
-        borderRadius={1}
-      />
-      {/* The printer body. */}
-      <View
-        position="absolute"
-        left={2.5}
-        top={8}
-        width={19}
-        height={8}
-        borderRadius={2}
-        backgroundColor={ink}
-      />
-      {/* The printed sheet emerging from the front, with a text line. */}
-      <View
-        position="absolute"
-        left={7}
-        top={13}
-        width={10}
-        height={7.5}
-        borderWidth={2}
-        borderColor={ink}
-        backgroundColor="$surface"
-        borderRadius={1}
-      />
-      <View
-        position="absolute"
-        left={9.5}
-        top={16}
-        width={5}
-        height={1.8}
-        borderRadius={0.9}
-        backgroundColor={ink}
-      />
-    </View>
-  );
-}
-
-function ShareGlyph() {
-  const ink = tokens.colors.gray.gray8;
-  return (
-    <View aria-hidden position="relative" width={24} height={24} flexShrink={0}>
-      {/* Arrow shaft: a vertical bar rising out of the tray. */}
-      <View
-        position="absolute"
-        left={10.75}
-        top={5}
-        width={2.5}
-        height={10.5}
-        borderRadius={1.25}
-        backgroundColor={ink}
-      />
-      {/* Arrowhead: two bars rotated ±45°, meeting at the shaft's top. */}
-      <View
-        position="absolute"
-        left={5.2}
-        top={5.1}
-        width={8}
-        height={2.5}
-        borderRadius={1.25}
-        backgroundColor={ink}
-        rotate="-45deg"
-      />
-      <View
-        position="absolute"
-        left={10.8}
-        top={5.1}
-        width={8}
-        height={2.5}
-        borderRadius={1.25}
-        backgroundColor={ink}
-        rotate="45deg"
-      />
-      {/* The tray: an open-top box the arrow rises from. */}
-      <View
-        position="absolute"
-        left={4}
-        top={13.5}
-        width={16}
-        height={7}
-        borderWidth={2}
-        borderTopWidth={0}
-        borderColor={ink}
-        borderBottomLeftRadius={2}
-        borderBottomRightRadius={2}
-      />
-    </View>
-  );
-}
 
 /** The lifecycle/sharing outline action look: transparent fill,
  * hairline border, gray label (the app's OutlineActionButton). */
@@ -871,7 +772,7 @@ function OverviewPanel({
               onPress={onPrintPress}
               accessibilityLabel="Print recipe"
             >
-              <PrinterGlyph />
+              <PrintIcon color={tokens.colors.gray.gray8} />
             </Button>
           ) : null}
           {onSharePress ? (
@@ -882,7 +783,7 @@ function OverviewPanel({
               onPress={onSharePress}
               accessibilityLabel="Share recipe"
             >
-              <ShareGlyph />
+              <ShareIcon color={tokens.colors.gray.gray8} />
             </Button>
           ) : null}
           {onEditPress ? (
