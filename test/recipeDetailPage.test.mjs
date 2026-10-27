@@ -290,7 +290,7 @@ test("tags render through Badge's color form, not an inline pill (#211)", () => 
     "each tag must render as a Badge in its data color",
   );
   assert.ok(
-    !code.includes("$" + "{tag.color}22"),
+    !code.includes("{tag.color}22"),
     "the page must not re-implement the tag tint inline (Badge owns it)",
   );
 });
