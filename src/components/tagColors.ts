@@ -18,7 +18,7 @@ import {
  * themes/tagColors.ts. The resolver accepts names only — the strict
  * `TagColorName` typing is what keeps raw hexes out of the component
  * tree (stored data converts through `tagColorNameForHex` at the data
- * boundary). TagPill, ColorPickerField, TagsPage, and RecipeDetailPage
+ * boundary). Badge, ColorPickerField, TagsPage, and RecipeDetailPage
  * all go through this hook.
  */
 export function useTagColorResolver(): (name: TagColorName) => string {

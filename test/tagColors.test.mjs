@@ -11,14 +11,14 @@
  *    unknown stored hex falls back to `defaultTagColorName` —
  *    unknown values never pass through as raw hex.
  * 3. `resolveTagColorValue` resolves NAMES ONLY through the given
- *    theme's values; the tag-color props across TagPill,
+ *    theme's values; the tag-color props across Badge,
  *    ColorPickerField, TagsPage, and RecipeDetailPage are typed
  *    `TagColorName`, so a raw hex is a compile error (the `npm run
  *    build` typecheck in the test script is the enforcement).
  * 4. Both brand themes carry a complete, distinct value set, and
  *    the registered Tamagui themes expose the active brand's hex
  *    under the tag<Name> keys the component resolver reads.
- * 5. Source scan: TagPill, ColorPickerField, TagsPage, and
+ * 5. Source scan: Badge, ColorPickerField, TagsPage, and
  *    RecipeDetailPage all resolve through the one shared resolver
  *    (src/components/tagColors.ts) instead of consuming raw hex.
  *
@@ -137,10 +137,10 @@ test("components resolve tag colors through the one shared resolver", () => {
   assert.match(hook, /export function useTagColorResolver/);
   assert.match(hook, /resolveTagColorValue\(name, themeColors\)/);
 
-  const tagPill = read("src/components/TagPill.tsx");
-  assert.match(tagPill, /useTagColorResolver\(\)/);
-  assert.match(tagPill, /resolveTagColor\(color\)/);
-  assert.doesNotMatch(tagPill, /backgroundColor=\{`\$\{color\}22`\}/);
+  const badge = read("src/components/Badge.tsx");
+  assert.match(badge, /useTagColorResolver\(\)/);
+  assert.match(badge, /resolveTagColor\(color\)/);
+  assert.doesNotMatch(badge, /backgroundColor=\{`\$\{color\}22`\}/);
 
   const picker = read("src/components/ColorPickerField.tsx");
   assert.match(picker, /colors: TagColorName\[\]/);
@@ -164,8 +164,8 @@ test("the tag color API is strictly typed: names only, no hex pass-through", () 
   const hook = read("src/components/tagColors.ts");
   assert.match(hook, /useTagColorResolver\(\): \(name: TagColorName\) => string/);
 
-  const tagPill = read("src/components/TagPill.tsx");
-  assert.match(tagPill, /color: TagColorName;/);
+  const badge = read("src/components/Badge.tsx");
+  assert.match(badge, /color\?: TagColorName;/);
 
   const picker = read("src/components/ColorPickerField.tsx");
   assert.match(picker, /value\?: TagColorName;/);

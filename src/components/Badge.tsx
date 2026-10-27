@@ -1,7 +1,9 @@
 import { XStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import type { TagColorName } from "../themes/tagColors.js";
 import { Text } from "./Text.js";
+import { useTagColorResolver } from "./tagColors.js";
 
 const toneStyles = {
   neutral: {
@@ -41,15 +43,48 @@ const StyledBadge = styled(XStack, {
 
 type StyledBadgeProps = GetProps<typeof StyledBadge>;
 
-export interface BadgeProps extends StyledBadgeProps {
+export type BadgeProps = StyledBadgeProps & {
   tone?: Tone;
-}
+  /**
+   * A tag color: a design-system tag color token name (e.g. "blue"),
+   * resolved through the active theme at render. When set, the badge
+   * renders as a colored tag instead of a status pill: the surface is
+   * the resolved color at low alpha (`22` hex, 12.5% opacity), and the
+   * border and label are the resolved color itself. The two forms
+   * share the same label typography and padding — only the colors
+   * differ. This is the rendering TagPill had before it was merged
+   * into Badge (#183); `tone` is ignored while `color` is set. The
+   * type is the strict `TagColorName` union (#207) — a raw hex is a
+   * compile error; stored tag data converts to a name through
+   * `tagColorNameForHex` before it reaches this prop.
+   */
+  color?: TagColorName;
+};
 
 /**
  * Small status pill. Status is always conveyed with text, never color alone.
  * Tones: `neutral` (default), `info`, `success`, `warning`, `danger`.
+ * With a `color` prop (a tag color token name) it renders as a colored
+ * tag (the former TagPill).
  */
-export function Badge({ tone = "neutral", children, ...rest }: BadgeProps) {
+export function Badge({ tone = "neutral", color, children, ...rest }: BadgeProps) {
+  const resolveTagColor = useTagColorResolver();
+  if (color) {
+    const resolvedColor = resolveTagColor(color);
+    return (
+      <StyledBadge backgroundColor={`${resolvedColor}22`} borderColor={resolvedColor} {...rest}>
+        <Text
+          style={{
+            fontSize: tokens.typography.fontSize.xs,
+            fontWeight: tokens.typography.fontWeight.semibold,
+            color: resolvedColor,
+          }}
+        >
+          {children}
+        </Text>
+      </StyledBadge>
+    );
+  }
   const styles = toneStyles[tone];
   return (
     <StyledBadge backgroundColor={styles.background} borderColor={styles.text} {...rest}>

@@ -3,13 +3,16 @@
  * seven components audited out of eciperay's
  * `packages/app/src/components` into @spudly/ui — BulkSelectToolbar,
  * CheckboxSelectList, CommentItem, FixedActionBanner, StatRow, TagPill,
- * TokenRow (see docs/b2-component-audit.md).
+ * TokenRow (see docs/b2-component-audit.md). TagPill was later merged
+ * into Badge (#183): it is no longer exported, and Badge's `color`
+ * form carries its tint contract.
  *
  * The contracts pinned here:
- * 1. All seven are exported from the package root (dist), next to the
- *    widgets they compose.
- * 2. TagPill tints from the data color: surface = color + "22" alpha,
- *    label = the color itself, full radius.
+ * 1. The six remaining widgets are exported from the package root
+ *    (dist), next to the widgets they compose.
+ * 2. Badge's colored-tag form (the former TagPill) tints from the data
+ *    color: surface = color + "22" alpha, label = the color itself,
+ *    full radius.
  * 3. CheckboxSelectList has the three branches (loading Spinner, empty
  *    EmptyState, CheckboxField rows) and reports toggles by id.
  * 4. BulkSelectToolbar disables its selection buttons at
@@ -49,30 +52,30 @@ const MOVED = [
   "CommentItem",
   "FixedActionBanner",
   "StatRow",
-  "TagPill",
   "TokenRow",
 ];
 
-test("all seven B2 widgets are exported from the package root", () => {
+test("the six remaining B2 widgets are exported from the package root", () => {
   for (const name of MOVED) {
     assert.equal(typeof dist[name], "function", `${name} must be exported from dist/index.js`);
   }
+  assert.equal(dist.TagPill, undefined, "TagPill was merged into Badge (#183)");
 });
 
-test("TagPill tints its surface and label from the resolved data color", () => {
-  const tagPill = source("TagPill");
-  // #207: the data color (a tag color token name, strictly typed)
-  // resolves through the shared tag-color resolver first; the tint
-  // and label use the resolved hex.
+test("Badge's colored-tag form tints its surface and label from the resolved token color", () => {
+  const badge = source("Badge");
+  // #207: the tag color (a token name, strictly typed) resolves
+  // through the shared tag-color resolver first; the tint and label
+  // use the resolved hex.
   assert.ok(
-    tagPill.includes("{resolvedColor}22`"),
+    badge.includes("{resolvedColor}22`"),
     "surface must be the resolved color at 22 hex alpha",
   );
   assert.ok(
-    tagPill.includes("color={resolvedColor}"),
+    badge.includes("color: resolvedColor"),
     "label must render in the resolved color itself",
   );
-  assert.ok(tagPill.includes("radii.full"), "pill must use the full radius token");
+  assert.ok(badge.includes("radii.full"), "pill must use the full radius token");
 });
 
 test("CheckboxSelectList branches loading / empty / rows and toggles by id", () => {

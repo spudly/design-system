@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack } from "tamagui";
+import { tagColorNames } from "../themes/tagColors.js";
 import { Badge } from "./Badge.js";
 
 const meta: Meta<typeof Badge> = {
@@ -10,6 +11,7 @@ const meta: Meta<typeof Badge> = {
       control: "select",
       options: ["neutral", "info", "success", "warning", "danger"],
     },
+    color: { control: "select", options: [...tagColorNames] },
   },
 };
 
@@ -34,6 +36,19 @@ export const Warning: Story = {
 
 export const Danger: Story = {
   args: { tone: "danger", children: "Overdue" },
+};
+
+export const ColoredTag: Story = {
+  args: { color: "indigo", children: "Weeknight" },
+};
+
+export const ColoredTags: Story = {
+  render: () => (
+    <XStack gap={8}>
+      <Badge color="indigo">Weeknight</Badge>
+      <Badge color="amber">Comfort food</Badge>
+    </XStack>
+  ),
 };
 
 export const AllTones: Story = {
