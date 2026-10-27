@@ -48,10 +48,10 @@ const EXPECTED_NAMES = [
 
 test("featherIconNames carries the eciperay mapping plus printer/share-2 (#246, #187)", () => {
   for (const name of EXPECTED_NAMES) {
-    assert.match(code, new RegExp(`"${name.replace("-", "\\-")}"`), `missing icon name ${name}`);
+    assert.match(code, new RegExp(`"${name}"`), `missing icon name ${name}`);
     assert.match(
       code,
-      new RegExp(`(^|\\n)  "?${name.replace("-", "\\-")}"?: \\[`),
+      new RegExp(String.raw`(^|\n)  "?${name}"?: \[`),
       `missing element data for ${name}`,
     );
   }
