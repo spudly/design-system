@@ -59,7 +59,11 @@ const codeByIcon = new Map(ICONS.map(([name]) => [name, codeOf(`src/icons/${name
 test("each icon module exports its semantic component through the base Icon (#246)", () => {
   for (const [name] of ICONS) {
     const code = codeByIcon.get(name);
-    assert.match(code, new RegExp(`export function ${name}\\(`), `${name} is not exported`);
+    assert.match(
+      code,
+      new RegExp(String.raw`export function ${name}\(`),
+      `${name} is not exported`,
+    );
     assert.match(code, /from "\.\/Icon\.js"/, `${name} does not render through Icon`);
     assert.match(code, /<Icon elements=\{/, `${name} does not pass its glyph data to Icon`);
   }
@@ -146,6 +150,10 @@ test("the package exposes the module behind the ./icons subpath (#246)", () => {
   const index = codeOf("src/icons/index.ts");
   assert.match(index, /Icon/);
   for (const [name] of ICONS) {
-    assert.match(index, new RegExp(`export \\{ ${name} \\}`), `index.ts does not export ${name}`);
+    assert.match(
+      index,
+      new RegExp(String.raw`export \{ ${name} \}`),
+      `index.ts does not export ${name}`,
+    );
   }
 });
