@@ -417,7 +417,12 @@ function RecipesFiltersBar({
 
   return (
     <YStack gap={tokens.spacing[3]}>
-      <XStack gap={tokens.spacing[2]} alignItems="flex-start">
+      {/* The row stretches its children (#188): the small Filters
+          button's natural height is shorter than the SearchField,
+          so the button stretches to the search field's height and
+          the two line up. Do not switch this back to flex-start —
+          that is what made the button shorter than the field. */}
+      <XStack gap={tokens.spacing[2]} alignItems="stretch">
         <YStack flex={1}>
           <SearchField value={search} onChangeText={onSearchChange} placeholder="Search recipes…" />
         </YStack>
