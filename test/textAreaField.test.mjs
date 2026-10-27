@@ -43,8 +43,8 @@ test("no source file still references MultilineField (#180)", () => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) walk(path);
-      else if (/\.(ts|tsx)$/.test(entry.name)) {
-        if (readFileSync(path, "utf8").includes("MultilineField")) offenders.push(path);
+      else if (/\.(ts|tsx)$/.test(entry.name) && readFileSync(path, "utf8").includes("MultilineField")) {
+        offenders.push(path);
       }
     }
   };
