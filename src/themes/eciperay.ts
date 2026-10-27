@@ -1,5 +1,6 @@
 import { baseTheme } from "./base.js";
 import { tokens } from "../tokens/index.js";
+import { warmHarvestTagColors } from "./tagColors.js";
 
 /**
  * Eciperay theme — "Warm Harvest" visual direction (approved 2026-10-12).
@@ -9,6 +10,11 @@ import { tokens } from "../tokens/index.js";
  */
 export const eciperayTheme = {
   ...baseTheme,
+  // Warm Harvest tag colors (#207) are the legacy app palette verbatim,
+  // so existing tags render exactly as before — stated explicitly
+  // (rather than inherited silently) because that identity is the
+  // stored-data contract.
+  tagColors: warmHarvestTagColors,
   semantic: {
     ...baseTheme.semantic,
     background: "#faf6f0",

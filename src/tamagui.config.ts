@@ -5,6 +5,7 @@ import { isAndroid, isWeb } from "@tamagui/constants";
 import { createFont, createTamagui } from "tamagui";
 import { tokens } from "./tokens/index.js";
 import { baseTheme, eciperayTheme, memorizeTheme, type SemanticColors } from "./themes/index.js";
+import { warmHarvestTagColors, type TagColorValues } from "./themes/tagColors.js";
 
 const animations = createAnimations({
   fast: {
@@ -31,7 +32,7 @@ const animations = createAnimations({
  * Tamagui components resolve `background`, `color`, `borderColor` (+ state
  * variants); the semantic aliases let app code reference brand roles.
  */
-function toTamaguiTheme(semantic: SemanticColors, dark: boolean) {
+function toTamaguiTheme(semantic: SemanticColors, dark: boolean, tagColors: TagColorValues) {
   return {
     background: semantic.background,
     backgroundHover: semantic.surface,
@@ -63,6 +64,22 @@ function toTamaguiTheme(semantic: SemanticColors, dark: boolean) {
     success: semantic.success,
     warning: semantic.warning,
     danger: semantic.danger,
+    // Named tag colors (#207), registered under tagColorThemeKey(name)
+    // so components resolve the active theme's shade for a tag color
+    // name. The same values serve light and dark: tag colors were
+    // mode-independent hexes before they were tokens.
+    tagIndigo: tagColors.indigo,
+    tagRed: tagColors.red,
+    tagOrange: tagColors.orange,
+    tagAmber: tagColors.amber,
+    tagLime: tagColors.lime,
+    tagGreen: tagColors.green,
+    tagTeal: tagColors.teal,
+    tagCyan: tagColors.cyan,
+    tagBlue: tagColors.blue,
+    tagPurple: tagColors.purple,
+    tagPink: tagColors.pink,
+    tagGray: tagColors.gray,
   };
 }
 
@@ -108,7 +125,10 @@ const tamaguiTokens = {
 };
 
 /** Build the light/dark Tamagui theme pair for one brand theme. */
-function buildTamaguiThemes(theme: { semantic: SemanticColors }) {
+function buildTamaguiThemes(theme: { semantic: SemanticColors; tagColors?: TagColorValues }) {
+  // A semantic-only caller (the factory's original input shape) gets
+  // the canonical palette — the Warm Harvest tag values.
+  const tagColors = theme.tagColors ?? warmHarvestTagColors;
   const darkSemantic: SemanticColors = {
     background: tokens.colors.gray.gray10,
     surface: tokens.colors.gray.gray9,
@@ -137,8 +157,8 @@ function buildTamaguiThemes(theme: { semantic: SemanticColors }) {
   };
 
   return {
-    light: toTamaguiTheme(theme.semantic, false),
-    dark: toTamaguiTheme(darkSemantic, true),
+    light: toTamaguiTheme(theme.semantic, false, tagColors),
+    dark: toTamaguiTheme(darkSemantic, true, tagColors),
   };
 }
 
@@ -285,6 +305,7 @@ function buildBrandFonts(fontFamily: BrandFontFamily) {
 
 export function createTamaguiConfig(theme: {
   semantic: SemanticColors;
+  tagColors?: TagColorValues;
   tokens?: { typography: { fontFamily: BrandFontFamily } };
 }) {
   return createTamagui({

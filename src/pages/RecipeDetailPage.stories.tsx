@@ -197,7 +197,7 @@ function RecipeDetailPageDemo({
       tags: isFull
         ? [
             { id: "dinner", name: "Dinner", color: "#b3543f" },
-            { id: "chicken", name: "Chicken", color: "#6366f1" },
+            { id: "chicken", name: "Chicken", color: "indigo" },
             { id: "one-pan", name: "One pan", color: "#2f7d4f" },
           ]
         : [],

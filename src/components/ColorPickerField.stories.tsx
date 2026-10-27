@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import type { TagColorName } from "../themes/tagColors.js";
 import { ColorPickerField } from "./ColorPickerField.js";
 
 const meta: Meta<typeof ColorPickerField> = {
@@ -14,7 +15,7 @@ const meta: Meta<typeof ColorPickerField> = {
 export default meta;
 type Story = StoryObj<typeof ColorPickerField>;
 
-const tagColors = ["#c2410c", "#15803d", "#4f46e5", "#b45309", "#be123c", "#0f766e"];
+const tagColors: TagColorName[] = ["orange", "green", "indigo", "amber", "pink", "teal"];
 
 function ColorDemo(props: React.ComponentProps<typeof ColorPickerField>) {
   const { value: initialValue, onChange: _ignored, ...rest } = props;
@@ -24,7 +25,7 @@ function ColorDemo(props: React.ComponentProps<typeof ColorPickerField>) {
 }
 
 export const Default: Story = {
-  args: { label: "Tag color", colors: tagColors, value: "#c2410c" },
+  args: { label: "Tag color", colors: tagColors, value: "orange" },
   render: (args) => <ColorDemo {...args} />,
 };
 
@@ -32,7 +33,7 @@ export const WithError: Story = {
   args: {
     label: "Tag color",
     colors: tagColors,
-    value: "#c2410c",
+    value: "orange",
     error: "Pick a color for this tag.",
   },
   render: (args) => <ColorDemo {...args} />,

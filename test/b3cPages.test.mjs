@@ -163,7 +163,8 @@ test("HomePage renders rows through the host slot and copy through props", () =>
 
 test("TagsPage takes its palette as a prop and renders DS TagPills", () => {
   const source = page("TagsPage");
-  assert.match(source, /colorOptions: string\[\]/);
+  // #207: the palette crosses as tag color token names, not raw hexes.
+  assert.match(source, /colorOptions: TagColorName\[\]/);
   assert.match(source, /TagPill/);
   assert.match(source, /ColorPickerField/);
 });

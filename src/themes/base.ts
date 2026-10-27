@@ -1,4 +1,5 @@
 import { tokens, type Tokens } from "../tokens/index.js";
+import { warmHarvestTagColors } from "./tagColors.js";
 
 /**
  * Semantic color roles derived from the raw token ramps. Components should
@@ -49,6 +50,10 @@ const semantic = {
 export const baseTheme = {
   tokens: tokens satisfies Tokens,
   semantic,
+  // Named tag colors (#207): the brand-neutral default is the legacy
+  // palette itself (the Warm Harvest values); brand themes override
+  // with their own shades of the same names.
+  tagColors: warmHarvestTagColors,
 } as const;
 
 export type Theme = typeof baseTheme;

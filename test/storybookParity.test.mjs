@@ -34,6 +34,8 @@
  *
  * Documented exceptions (not components/pages, so no stories):
  * - src/components/accessibility.ts — ARIA helper utilities.
+ * - src/components/tagColors.ts — the shared tag-color resolver hook
+ *   (#207); exercised through the TagPill/ColorPickerField stories.
  * - src/pages/PageFrame.tsx — internal page scaffolding shared by the
  *   page components; NOT exported from src/pages/index.ts, so it is
  *   not part of the @spudly/ui/pages surface. It is exercised through
@@ -93,7 +95,7 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches })
 test("every widget component has a story file titled Components/<Name>", () => {
   const dir = join(root, "src", "components");
   const index = read("src/components/index.ts");
-  const exceptions = new Set(["accessibility.ts", "index.ts"]);
+  const exceptions = new Set(["accessibility.ts", "index.ts", "tagColors.ts"]);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),
