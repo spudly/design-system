@@ -5,7 +5,7 @@ import { StarRatingInput } from "./StarRatingInput.js";
 import { Text } from "./Text.js";
 
 const NotesArea = styled(TamaguiTextArea, {
-  name: "SpudlyCookLogNotesArea",
+  name: "SpudlyRatingFormNotesArea",
 
   borderRadius: tokens.radii.xl,
   paddingHorizontal: tokens.spacing[4],
@@ -13,48 +13,48 @@ const NotesArea = styled(TamaguiTextArea, {
   fontSize: tokens.typography.fontSize.md,
 });
 
-export interface CookLogFormValues {
-  authorStarRating: 1 | 2 | 3 | 4 | 5 | null;
+export interface RatingFormValues {
+  rating: 1 | 2 | 3 | 4 | 5 | null;
   notes: string | null;
 }
 
-export interface CookLogFormProps {
-  onSubmit: (values: CookLogFormValues) => void;
+export interface RatingFormProps {
+  onSubmit: (values: RatingFormValues) => void;
   onSkip: () => void;
   isPending: boolean;
   variant?: "dark" | "light";
   secondaryLabel?: string;
+  title?: string;
+  notesPlaceholder?: string;
 }
 
 /**
- * CookLogForm (#126, B3c contract proposals, option A — the
- * standalone component Stephen approved 2026-10-26): the
- * "How did it go?" form shown after a cook — a star rating
- * plus free-text notes — as one DS component, replacing the
- * copies the app hosts and page slots carried (RecipeDetailPage's
- * `renderCookLogForm` slot, RecipeListCard's inline form, the
- * cooking overlay).
+ * RatingForm (#176 — generalized from the cook-log form that
+ * shipped as CookLogForm under #126, B3c contract proposals,
+ * option A): a generic star-rating plus free-text notes form.
+ * Nothing about it is specific to any one app or domain: the
+ * heading and the notes placeholder are props (with neutral
+ * defaults), and the submit view-model carries a plain
+ * `rating`, so any "rate this and leave a note" surface can
+ * use it — a cook log, a session review, a purchase rating.
  *
  * The rating and notes are internal view state (uncontrolled):
  * only the submit view-model crosses the boundary —
- * `onSubmit({ authorStarRating, notes })` with the notes
- * trimmed and empty notes crossing as null, exactly as the
- * app form behaved. The rating is optional: submitting with
- * no stars sends `authorStarRating: null`. Pressing the
- * current star clears the rating (the toggle-off the app
- * adapter synthesized around the DS StarRatingInput, done
- * here in the form that owns the state). `isPending` disables
- * Save (at half opacity); the secondary action stays live.
- * No StarRatingInput contract change: the app adapter never
- * forwarded `tone`, so both variants render the DS stars in
- * their default colors, as production does today.
+ * `onSubmit({ rating, notes })` with the notes trimmed and
+ * empty notes crossing as null. The rating is optional:
+ * submitting with no stars sends `rating: null`. Pressing
+ * the current star clears the rating (toggle-off, owned by
+ * the form that holds the state). `isPending` disables Save
+ * (at half opacity); the secondary action stays live. The
+ * stars render through the DS StarRatingInput as-is, in its
+ * default colors.
  *
  * Variants: `light` (default chrome on light surfaces — the
  * gray ramp positionally: gray-50 -> step 1 card fill,
  * gray-200 -> step 3 borders, gray-300 -> step 4 field border,
  * gray-700 -> step 8 secondary label, gray-900 -> step 10
  * text; the notes field fills with the theme's surface) and
- * `dark`, which sits on the G9 cooking-mode overlay: its
+ * `dark`, which sits on a dark overlay surface: its
  * fills are the theme's $surface at 10% composed as layered
  * opacity (the MealCookingModePage precedent) instead of one
  * app theme's hex-alpha suffixes, so the form stays
@@ -66,13 +66,15 @@ export interface CookLogFormProps {
  * the save half is the semantic primary with its onPrimary
  * label.
  */
-export function CookLogForm({
+export function RatingForm({
   onSubmit,
   onSkip,
   isPending,
   variant = "dark",
   secondaryLabel = "Skip",
-}: CookLogFormProps) {
+  title = "How did it go?",
+  notesPlaceholder = "Notes (optional)",
+}: RatingFormProps) {
   const [rating, setRating] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
   const [notes, setNotes] = useState("");
   const isLight = variant === "light";
@@ -82,7 +84,7 @@ export function CookLogForm({
   };
 
   const handleSubmit = () => {
-    onSubmit({ authorStarRating: rating, notes: notes.trim() || null });
+    onSubmit({ rating, notes: notes.trim() || null });
   };
 
   return (
@@ -112,7 +114,7 @@ export function CookLogForm({
           fontWeight={tokens.typography.fontWeight.semibold}
           color={isLight ? tokens.colors.gray.gray10 : "$surface"}
         >
-          How did it go?
+          {title}
         </Text>
         <YStack marginBlockEnd="$4" alignItems="center">
           <StarRatingInput value={rating ?? 0} onChange={handleRatingChange} />
@@ -134,7 +136,7 @@ export function CookLogForm({
             multiline
             value={notes}
             onChangeText={setNotes}
-            placeholder="Notes from this cook (optional)"
+            placeholder={notesPlaceholder}
             placeholderTextColor={tokens.colors.gray.gray5}
             backgroundColor={isLight ? "$surface" : "transparent"}
             borderWidth={isLight ? 1 : 0}

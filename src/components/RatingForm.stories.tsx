@@ -2,16 +2,16 @@ import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { CookLogForm } from "./CookLogForm.js";
+import { RatingForm } from "./RatingForm.js";
 
-const meta: Meta<typeof CookLogForm> = {
-  title: "Components/CookLogForm",
-  component: CookLogForm,
+const meta: Meta<typeof RatingForm> = {
+  title: "Components/RatingForm",
+  component: RatingForm,
   globals: { theme: "light_warmHarvest" },
 };
 
 export default meta;
-type Story = StoryObj<typeof CookLogForm>;
+type Story = StoryObj<typeof RatingForm>;
 
 function Viewport({ children, onOverlay = false }: { children: ReactNode; onOverlay?: boolean }) {
   return (
@@ -29,7 +29,7 @@ function Viewport({ children, onOverlay = false }: { children: ReactNode; onOver
 export const Dark: Story = {
   render: () => (
     <Viewport onOverlay>
-      <CookLogForm onSubmit={() => undefined} onSkip={() => undefined} isPending={false} />
+      <RatingForm onSubmit={() => undefined} onSkip={() => undefined} isPending={false} />
     </Viewport>
   ),
 };
@@ -37,7 +37,7 @@ export const Dark: Story = {
 export const Light: Story = {
   render: () => (
     <Viewport>
-      <CookLogForm
+      <RatingForm
         variant="light"
         onSubmit={() => undefined}
         onSkip={() => undefined}
@@ -50,16 +50,18 @@ export const Light: Story = {
 export const Pending: Story = {
   render: () => (
     <Viewport>
-      <CookLogForm variant="light" onSubmit={() => undefined} onSkip={() => undefined} isPending />
+      <RatingForm variant="light" onSubmit={() => undefined} onSkip={() => undefined} isPending />
     </Viewport>
   ),
 };
 
-export const CustomSecondaryLabel: Story = {
+export const CustomLabels: Story = {
   render: () => (
     <Viewport>
-      <CookLogForm
+      <RatingForm
         variant="light"
+        title="Rate this recipe"
+        notesPlaceholder="Notes from this cook (optional)"
         secondaryLabel="Cancel"
         onSubmit={() => undefined}
         onSkip={() => undefined}
