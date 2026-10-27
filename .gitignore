@@ -6,3 +6,4 @@ coverage
 .expo
 # Changesets: changeset files are committed (they drive the release workflow)
 # Only the generated CHANGELOG artifacts are ignored, none currently apply
+.npmrc
