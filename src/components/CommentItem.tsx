@@ -1,6 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { MultilineField } from "./MultilineField.js";
+import { TextAreaField } from "./TextAreaField.js";
 import { Text } from "./Text.js";
 
 export interface CommentItemProps {
@@ -28,7 +28,7 @@ export interface CommentItemProps {
 /**
  * One comment in a thread: author line (with a stale marker when the
  * comment predates the current version), the body — or an inline
- * MultilineField editor while editing — and a row of small text actions.
+ * TextAreaField editor while editing — and a row of small text actions.
  * All state is the caller's: the item renders the edit draft and pending
  * flags it is given and reports presses through the callbacks. Save
  * disables while an update is pending or the draft is blank. The stale
@@ -81,7 +81,7 @@ export function CommentItem({
         ) : null}
       </XStack>
       {isEditing ? (
-        <MultilineField
+        <TextAreaField
           marginBlockEnd="$2"
           value={editDraft}
           onChangeText={(value) => {

@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, XStack, YStack } from "tamagui";
-import { MultilineField } from "../components/MultilineField.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { tokens } from "../tokens/index.js";
@@ -126,7 +126,7 @@ function InstructionsSectionStandIn() {
         Instructions
       </Text>
       {rows.map((row, index) => (
-        <MultilineField
+        <TextAreaField
           key={index}
           accessibilityLabel={`Step ${index + 1}`}
           numberOfLines={2}

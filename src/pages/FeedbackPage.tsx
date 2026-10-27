@@ -2,7 +2,7 @@ import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { CheckboxField } from "../components/CheckboxField.js";
-import { MultilineField } from "../components/MultilineField.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
@@ -83,7 +83,7 @@ export function FeedbackPage({
             >
               What&apos;s on your mind?
             </Text>
-            <MultilineField
+            <TextAreaField
               value={message}
               onChangeText={onMessageChange}
               placeholder="Tell us what happened or what you'd like to see improved."

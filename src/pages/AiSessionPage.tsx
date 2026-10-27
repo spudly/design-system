@@ -3,7 +3,7 @@ import { ScrollView } from "react-native";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
-import { MultilineField } from "../components/MultilineField.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
 
 /**
@@ -128,7 +128,7 @@ export function AiSessionPage({
         <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm} marginBottom="$6">
           {config.intro}
         </Text>
-        <MultilineField
+        <TextAreaField
           value={prompt}
           onChangeText={onPromptChange}
           placeholder={config.promptPlaceholder}
@@ -212,7 +212,7 @@ export function AiSessionPage({
       </YStack>
       {session.canRefine ? (
         <YStack marginBottom="$4" gap="$3">
-          <MultilineField
+          <TextAreaField
             value={followUp}
             onChangeText={onFollowUpChange}
             placeholder="Ask for changes to the plan…"

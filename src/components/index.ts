@@ -31,7 +31,7 @@ export {
 } from "./FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
 export { InlineAlert, type InlineAlertProps } from "./InlineAlert.js";
-export { MultilineField, type MultilineFieldProps } from "./MultilineField.js";
+export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
 export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";

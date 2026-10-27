@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { MultilineField } from "./MultilineField.js";
+import { TextAreaField } from "./TextAreaField.js";
 
-const meta: Meta<typeof MultilineField> = {
-  title: "Components/MultilineField",
-  component: MultilineField,
+const meta: Meta<typeof TextAreaField> = {
+  title: "Components/TextAreaField",
+  component: TextAreaField,
   argTypes: {
     label: { control: "text" },
     error: { control: "text" },
@@ -14,7 +14,7 @@ const meta: Meta<typeof MultilineField> = {
 };
 
 export default meta;
-type Story = StoryObj<typeof MultilineField>;
+type Story = StoryObj<typeof TextAreaField>;
 
 export const Default: Story = {
   args: {
