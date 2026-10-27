@@ -54,6 +54,15 @@ test("Badge's color form keeps TagPill's tint and type contract", () => {
     source.includes("fontWeight: tokens.typography.fontWeight.semibold"),
     "tag label must use the semibold weight, same as the status form",
   );
+  assert.ok(source.includes("borderWidth: 1"), "Badge must carry the 1px border (#174)");
+  assert.ok(
+    source.includes("borderColor={resolvedColor}"),
+    "the color form's border must be the resolved tag color itself (#211)",
+  );
+  assert.ok(
+    source.includes("borderColor={styles.text}"),
+    "the tone form's border must match its text color (#174)",
+  );
 });
 
 test("no source file still imports TagPill (#183)", () => {

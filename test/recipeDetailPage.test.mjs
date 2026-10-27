@@ -283,6 +283,18 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(code, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
 });
 
+test("tags render through Badge's color form, not an inline pill (#211)", () => {
+  assert.match(
+    code,
+    /<Badge key=\{tag\.id\} color=\{tag\.color\}>/,
+    "each tag must render as a Badge in its data color",
+  );
+  assert.ok(
+    !code.includes("${tag.color}22"),
+    "the page must not re-implement the tag tint inline (Badge owns it)",
+  );
+});
+
 test("the scale option set moved with the ingredients section", () => {
   for (const [value, label] of [
     ["0.5", "½×"],
