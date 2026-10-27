@@ -22,8 +22,10 @@
  *    non-wrapping equal-width chip row beside its label, in one
  *    controls block above the ingredient rows.
  * 5. NumberStepper gains an additive `editable` prop (default
- *    false): the value renders as a number input — `type="number"`
- *    for web, `keyboardType`/`inputMode` numeric for native — whose
+ *    false): the value renders as an editable numeric field —
+ *    `keyboardType`/`inputMode` numeric (a text input on web, NOT
+ *    `type="number"`: browsers add native spin buttons to number
+ *    inputs, duplicating the stepper's own −/+ buttons, #181) — whose
  *    entry commits on blur/submit, snapped to the step and clamped
  *    to min/max; an empty or non-numeric entry commits nothing.
  *    The panel passes `editable`, so servings takes any typed
@@ -95,10 +97,15 @@ test("the ingredients panel uses the inline stepper and the nowrap scale row", (
   assert.match(page, /view\.onScaleChange\(value\)/, "preset scale handler unchanged");
 });
 
-test("NumberStepper editable is additive, off by default, and renders a number input", () => {
+test("NumberStepper editable is additive, off by default, and renders a numeric text input", () => {
   assert.match(stepper, /editable\?: boolean;/, "editable prop is declared");
   assert.match(stepper, /editable = false/, "direct entry is off by default");
-  assert.match(stepper, /type="number"/, "web renders an input[type=number]");
+  // #181: NOT type="number" — browsers render native spin buttons inside
+  // a number input, duplicating the stepper's own −/+ buttons. A text
+  // input with a numeric inputMode keeps direct entry without them; the
+  // commit path parses/snaps/clamps the typed text itself.
+  assert.doesNotMatch(stepper, /type="number"/, "web must not render an input[type=number]");
+  assert.match(stepper, /type="text"/, "web renders an input[type=text]");
   assert.match(
     stepper,
     /keyboardType="numeric"/,
@@ -116,8 +123,13 @@ test("the stepper commits typed entries snapped and clamped, and ignores invalid
   assert.match(stepper, /const parsed = Number\(draft\.trim\(\)\);/, "the entry is parsed");
   assert.match(
     stepper,
+    /if \(draft\.trim\(\) === ""\) \{\s+setDraft\(null\);\s+return;/,
+    "an empty entry commits nothing (Number(\"\") is 0, so it needs its own guard)",
+  );
+  assert.match(
+    stepper,
     /if \(!Number\.isFinite\(parsed\)\) \{\s+return;/,
-    "empty or non-numeric entries commit nothing",
+    "non-numeric entries commit nothing",
   );
   assert.match(
     stepper,

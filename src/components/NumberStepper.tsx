@@ -38,10 +38,15 @@ export interface NumberStepperProps {
   /**
    * The value display becomes a directly editable numeric field
    * (default false: the value is read-only text, stepped only via
-   * the −/+ buttons). Editable renders a number input —
-   * `type="number"` on web, the numeric keypad (`keyboardType` /
-   * `inputMode`) on native — so a user can type an arbitrary value
-   * instead of stepping to it one tap at a time (#73). Typing does
+   * the −/+ buttons). Editable renders a text input with the
+   * numeric keypad (`keyboardType` / `inputMode`) so a user can
+   * type an arbitrary value instead of stepping to it one tap at
+   * a time (#73). It deliberately does NOT use a number-type
+   * input on web: browsers render their own native spin buttons
+   * inside one, duplicating this stepper's own −/+ buttons
+   * (#181) — and the commit path below already parses, snaps, and
+   * clamps the typed text, so the native number semantics are not
+   * load-bearing. Typing does
    * not commit per keystroke: the entry commits on blur or submit,
    * snapped to the nearest `step` and clamped to `min`/`max`; an
    * empty or non-numeric entry commits nothing and the field
@@ -82,6 +87,13 @@ export function NumberStepper({
 
   const commitDraft = () => {
     if (draft === null) {
+      return;
+    }
+    // Number("") is 0, not NaN: without this guard a cleared field
+    // would commit 0 (snapped/clamped) instead of committing
+    // nothing, as documented on the `editable` prop.
+    if (draft.trim() === "") {
+      setDraft(null);
       return;
     }
     const parsed = Number(draft.trim());
@@ -125,7 +137,7 @@ export function NumberStepper({
       </Button>
       {editable ? (
         <StyledValueInput
-          type="number"
+          type="text"
           keyboardType="numeric"
           inputMode="numeric"
           aria-live="polite"
