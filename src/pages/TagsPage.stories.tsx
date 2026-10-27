@@ -1,8 +1,9 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+import type { TagColorName } from "../themes/tagColors.js";
 import { tagsFixture } from "./fixtures.js";
-import { TagsPage } from "./TagsPage.js";
+import { TagsPage, type TagsPageTag } from "./TagsPage.js";
 
 const meta: Meta<typeof TagsPage> = {
   title: "Pages/Eciperay/TagsPage",
@@ -36,6 +37,53 @@ export const WithTags: Story = {
       />
     </Viewport>
   ),
+};
+
+/**
+ * Inline rename (eciperay#254): each row offers Edit; starting an
+ * edit swaps the row for the name + color form with Save/Cancel.
+ * The story holds the draft the way a host screen would.
+ */
+export const Editing: Story = {
+  render: () => {
+    const [editingTagId, setEditingTagId] = useState<string | null>(
+      tagsFixture.tags[0]?.id ?? null,
+    );
+    const [editName, setEditName] = useState(tagsFixture.tags[0]?.name ?? "");
+    const [editColor, setEditColor] = useState<TagColorName>(
+      tagsFixture.tags[0]?.color ?? "indigo",
+    );
+    return (
+      <Viewport>
+        <TagsPage
+          tags={tagsFixture.tags}
+          name=""
+          color={tagsFixture.colorOptions[0] ?? "indigo"}
+          colorOptions={tagsFixture.colorOptions}
+          onNameChange={() => undefined}
+          onColorChange={() => undefined}
+          onCreate={() => undefined}
+          onDelete={() => undefined}
+          editingTagId={editingTagId}
+          editName={editName}
+          editColor={editColor}
+          onStartEdit={(tag: TagsPageTag) => {
+            setEditingTagId(tag.id);
+            setEditName(tag.name);
+            setEditColor(tag.color);
+          }}
+          onEditNameChange={setEditName}
+          onEditColorChange={setEditColor}
+          onSaveEdit={() => {
+            setEditingTagId(null);
+          }}
+          onCancelEdit={() => {
+            setEditingTagId(null);
+          }}
+        />
+      </Viewport>
+    );
+  },
 };
 
 export const Loading: Story = {
