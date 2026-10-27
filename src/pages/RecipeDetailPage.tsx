@@ -15,6 +15,8 @@ import { useTagColorResolver } from "../components/tagColors.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChipGroup.js";
+import { PrintIcon } from "../icons/PrintIcon.js";
+import { ShareIcon } from "../icons/ShareIcon.js";
 
 /**
  * RecipeDetailPage (#49): Eciperay's recipe detail screen as a
@@ -426,6 +428,18 @@ const neutralChipProps = {
   color: tokens.colors.gray.gray8,
 } as const;
 
+/**
+ * The print and share chips render the icons module's PrintIcon /
+ * ShareIcon (#187, reworked after #217): the official Feather
+ * printer / share-2 glyphs in the chip's own ink color (gray8, the
+ * neutral chips' label color) at Feather's fixed 24px geometry —
+ * not the "🖨" emoji and "↗" text glyph the page originally
+ * used, which render in full color at font-dependent sizes,
+ * clashing with the neutral chips and drifting between platforms.
+ * Do not reintroduce text glyphs or hand-drawn icons for these:
+ * icons come from src/icons (see that module's header).
+ */
+
 /** The lifecycle/sharing outline action look: transparent fill,
  * hairline border, gray label (the app's OutlineActionButton). */
 function OutlineActionButton({
@@ -766,7 +780,7 @@ function OverviewPanel({
               onPress={onPrintPress}
               accessibilityLabel="Print recipe"
             >
-              🖨
+              <PrintIcon color={tokens.colors.gray.gray8} />
             </Button>
           ) : null}
           {onSharePress ? (
@@ -777,7 +791,7 @@ function OverviewPanel({
               onPress={onSharePress}
               accessibilityLabel="Share recipe"
             >
-              ↗
+              <ShareIcon color={tokens.colors.gray.gray8} />
             </Button>
           ) : null}
           {onEditPress ? (

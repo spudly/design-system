@@ -36,6 +36,9 @@
  * 7. No explicit lineHeight anywhere (the #162 rule).
  * 8. Stories exercise the states and the cook-log form slot, so
  *    Chromatic captures them.
+ * 9. The print/share chips render the icons module's PrintIcon /
+ *    ShareIcon (#187) — no emoji or text glyphs, no hand-drawn
+ *    glyph components.
  *
  * This is a source scan, not a render test, for the same reason as
  * test/recipesPageAccessory.test.mjs: the repo has no JS
@@ -345,4 +348,13 @@ test("stories exercise the states and the cook-log form slot", () => {
     /<RecipeDetailPage state="loading" \/>/,
     "the Loading story must render the loading props member",
   );
+});
+
+test("print/share render the icons module's Feather icons, not text glyphs (#187)", () => {
+  for (const name of ["PrintIcon", "ShareIcon"]) {
+    assert.match(code, new RegExp(String.raw`import \{ ${name} \} from "\.\./icons/${name}\.js";`));
+    assert.match(code, new RegExp(String.raw`<${name} color=\{tokens\.colors\.gray\.gray8\} />`));
+  }
+  assert.ok(!code.includes("🖨") && !code.includes("↗"), "no emoji/text glyph button labels");
+  assert.ok(!code.includes("PrinterGlyph") && !code.includes("ShareGlyph"), "no hand-drawn glyphs");
 });
