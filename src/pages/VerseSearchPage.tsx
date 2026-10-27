@@ -2,7 +2,7 @@ import { FlatList } from "react-native";
 import { XStack, YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
-import { InlineAlert } from "../components/InlineAlert.js";
+import { Alert } from "../components/Alert.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SearchField } from "../components/SearchField.js";
 import { Spinner } from "../components/Spinner.js";
@@ -171,10 +171,10 @@ export function VerseSearchPage({
     <ScreenContainer scrollable={false}>
       <Text variant="heading">Search verses</Text>
       {usingDemo ? (
-        <InlineAlert severity="info">
+        <Alert severity="info">
           Searching the built-in demo set. Add a gospel-engine API key in Settings for full-library
           search.
-        </InlineAlert>
+        </Alert>
       ) : null}
       <XStack gap="$2" alignItems="center">
         <YStack flex={1}>
@@ -189,7 +189,7 @@ export function VerseSearchPage({
           Search
         </Button>
       </XStack>
-      {errorMessage ? <InlineAlert severity="error">{errorMessage}</InlineAlert> : null}
+      {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
       {isSearching ? <Spinner label="Loading" /> : null}
       <FlatList
         style={listStyle}

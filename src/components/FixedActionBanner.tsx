@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
 import { ActionBar } from "./ActionBar.js";
 import { Button } from "./Button.js";
-import { InlineAlert } from "./InlineAlert.js";
+import { Alert } from "./Alert.js";
 
 export interface FixedActionBannerAction {
   label: string;
@@ -23,15 +23,15 @@ export interface FixedActionBannerProps {
 
 /**
  * Pinned action banner (consent bars, install prompts): the DS ActionBar
- * pinned to a screen edge, holding an info InlineAlert above a wrapping
+ * pinned to a screen edge, holding an info Alert above a wrapping
  * row of actions — secondary first, then primary, then an optional ghost
  * dismiss button labeled "Dismiss". Content sits in a centered column
  * capped at 1024px so the bar reads the same on wide screens.
  *
- * This exists alongside DismissibleBanner because that component's
- * contract cannot express this shape: its `message` is a plain string,
- * `onDismiss` is required, and every action renders as a secondary
- * button (design-system #123, gap 1).
+ * This exists alongside Alert because that component's contract cannot
+ * express this shape: it is not pinned to a screen edge, and every one
+ * of its actions renders as a secondary button (design-system #123,
+ * gap 1).
  */
 export function FixedActionBanner({
   message,
@@ -44,7 +44,7 @@ export function FixedActionBanner({
   return (
     <ActionBar placement={position}>
       <YStack width="100%" maxWidth={1024} alignSelf="center" gap="$3">
-        <InlineAlert severity="info">{message}</InlineAlert>
+        <Alert severity="info">{message}</Alert>
         <XStack flexWrap="wrap" alignItems="center" gap="$2">
           {secondaryAction ? (
             <Button variant="secondary" onPress={secondaryAction.onPress}>

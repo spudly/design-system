@@ -6,7 +6,7 @@
  * The contract:
  * 1. The track color is its own semantic role (`progressTrack`), so
  *    the change cannot leak into the other primarySubtle consumers
- *    (Badge, Avatar, InlineAlert, ghost button) — Quiet Dawn's
+ *    (Badge, Avatar, Alert, ghost button) — Quiet Dawn's
  *    primarySubtle itself stays teal2.
  * 2. Quiet Dawn light's progressTrack is a genuine light gray:
  *    neutral (equal RGB channels) and light.
@@ -55,7 +55,7 @@ test("Quiet Dawn light progressTrack is a light gray, and primarySubtle stays te
   assert.equal(
     memorizeTheme.semantic.primarySubtle,
     "#ccfbf1",
-    "primarySubtle must stay teal2 — Badge/Avatar/InlineAlert were not part of the #94 call",
+    "primarySubtle must stay teal2 — Badge/Avatar/Alert were not part of the #94 call",
   );
 });
 

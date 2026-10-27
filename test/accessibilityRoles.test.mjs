@@ -7,8 +7,8 @@
  * `status` is a web ARIA live-region role. React Native's
  * `accessibilityRole` accepts only its own role set, and Android's view
  * manager throws when any other value reaches a native view. Four
- * components passed ARIA roles as `accessibilityRole` (InlineAlert,
- * Toast, DismissibleBanner, SecretRevealPanel — all `"status"`), and the
+ * components passed ARIA roles as `accessibilityRole` (Alert,
+ * Toast, SecretRevealPanel — all `"status"`), and the
  * same defect class existed in Avatar (`"img"`) and in NumberStepper /
  * ColorPickerField (`"group"`).
  *
@@ -91,7 +91,7 @@ function sourceFiles(dir) {
  * `accessibilityRole={cond ? "x" : "y"}`, and the object form
  * `accessibilityRole: "x"`. An occurrence with NO extractable literals
  * (e.g. `accessibilityRole={role}`, a computed variable — the original
- * InlineAlert crash pattern) is returned with an empty literal list so
+ * Alert crash pattern) is returned with an empty literal list so
  * the caller can reject it: silently skipping it would let exactly the
  * regression this test guards against pass unnoticed. Also returns how
  * many times `accessibilityRole` appears at all, so callers can assert

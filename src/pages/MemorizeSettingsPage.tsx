@@ -1,6 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { Button } from "../components/Button.js";
-import { InlineAlert } from "../components/InlineAlert.js";
+import { Alert } from "../components/Alert.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
 import { Text } from "../components/Text.js";
@@ -199,9 +199,9 @@ export function MemorizeSettingsPage({
               Connect Google Drive
             </Button>
           )}
-          {driveError ? <InlineAlert severity="error">{driveError}</InlineAlert> : null}
+          {driveError ? <Alert severity="error">{driveError}</Alert> : null}
           {syncMessage ? (
-            <InlineAlert severity={syncConflict ? "warning" : "info"}>{syncMessage}</InlineAlert>
+            <Alert severity={syncConflict ? "warning" : "info"}>{syncMessage}</Alert>
           ) : null}
           {syncConflict ? (
             <XStack gap="$2">

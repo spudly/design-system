@@ -28,7 +28,7 @@ export const memorizeTheme = {
     primaryHover: tokens.colors.teal.teal9,
     primaryActive: tokens.colors.teal.teal10,
     onPrimary: tokens.colors.teal.teal1,
-    // Without these two the ghost button, Badge/InlineAlert info tones and
+    // Without these two the ghost button, Badge/Alert info tones and
     // Avatar fallback silently fell back to the base (indigo) ramp under
     // Quiet Dawn. Steps parallel the other themes: subtle = step 2 tint,
     // emphasis = the primaryHover step (dark primary for text on light).
@@ -37,7 +37,7 @@ export const memorizeTheme = {
     // Dawn LIGHT the bar's second color is a light gray, not the
     // teal primarySubtle tint (#ccfbf1 reads light blue next to the
     // teal fill). Scoped to the progressTrack role so Badge, Avatar,
-    // InlineAlert and the ghost button keep their teal tint. Fill
+    // Alert and the ghost button keep their teal tint. Fill
     // (teal8) on gray3 keeps ≥3:1 WCAG non-text contrast (~4.8:1,
     // same class as the old tint). Dark mode is unchanged: the dark
     // semantic derives its track from primarySubtle, not this value

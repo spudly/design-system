@@ -2,7 +2,7 @@ import { BackLink } from "../components/BackLink.js";
 import { BlankWord } from "../components/BlankWord.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
-import { InlineAlert } from "../components/InlineAlert.js";
+import { Alert } from "../components/Alert.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { StepDots } from "../components/StepDots.js";
 import { Text } from "../components/Text.js";
@@ -29,7 +29,7 @@ import { VerseText } from "../components/VerseText.js";
  * round hint ("Round N of M — tap a blank to peek at the
  * word."), a StepDots round indicator, the verse in a Card as
  * VerseText with each blanked word rendered by BlankWord, an
- * optional warning InlineAlert carrying the round's retry
+ * optional warning Alert carrying the round's retry
  * feedback, and the advance button ("Next round", or "Finish
  * — mark memorized" on the final round). The drill's chrome
  * around it — the app shell's "Memorize" heading and tab bar —
@@ -252,7 +252,7 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
           })}
         </VerseText>
       </Card>
-      {feedback ? <InlineAlert severity="warning">{feedback}</InlineAlert> : null}
+      {feedback ? <Alert severity="warning">{feedback}</Alert> : null}
       <Button onPress={onAdvance}>{isFinalRound ? "Finish — mark memorized" : "Next round"}</Button>
     </ScreenContainer>
   );
