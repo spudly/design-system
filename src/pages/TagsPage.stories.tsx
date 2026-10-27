@@ -46,6 +46,7 @@ export const WithTags: Story = {
  */
 export const Editing: Story = {
   render: () => {
+    const [tags, setTags] = useState<TagsPageTag[]>(tagsFixture.tags);
     const [editingTagId, setEditingTagId] = useState<string | null>(
       tagsFixture.tags[0]?.id ?? null,
     );
@@ -56,7 +57,7 @@ export const Editing: Story = {
     return (
       <Viewport>
         <TagsPage
-          tags={tagsFixture.tags}
+          tags={tags}
           name=""
           color={tagsFixture.colorOptions[0] ?? "indigo"}
           colorOptions={tagsFixture.colorOptions}
@@ -75,6 +76,11 @@ export const Editing: Story = {
           onEditNameChange={setEditName}
           onEditColorChange={setEditColor}
           onSaveEdit={() => {
+            setTags((current) =>
+              current.map((tag) =>
+                tag.id === editingTagId ? { ...tag, name: editName, color: editColor } : tag,
+              ),
+            );
             setEditingTagId(null);
           }}
           onCancelEdit={() => {
