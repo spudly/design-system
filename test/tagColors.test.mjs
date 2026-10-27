@@ -150,8 +150,8 @@ test("components resolve tag colors through the one shared resolver", () => {
   assert.match(tagsPage, /colorOptions: TagColorName\[\]/);
 
   const recipeDetail = read("src/pages/RecipeDetailPage.tsx");
-  assert.match(recipeDetail, /useTagColorResolver\(\)/);
-  assert.match(recipeDetail, /resolveTagColor\(tag\.color\)/);
+  assert.match(recipeDetail, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/);
+  assert.doesNotMatch(recipeDetail, /useTagColorResolver\(\)/);
 });
 
 test("the tag color API is strictly typed: names only, no hex pass-through", () => {

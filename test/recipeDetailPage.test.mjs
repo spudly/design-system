@@ -284,15 +284,8 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
 });
 
 test("tags render through Badge's color form, not an inline pill (#211)", () => {
-  assert.match(
-    code,
-    /<Badge key=\{tag\.id\} color=\{tag\.color\}>/,
-    "each tag must render as a Badge in its data color",
-  );
-  assert.ok(
-    !code.includes("{tag.color}22"),
-    "the page must not re-implement the tag tint inline (Badge owns it)",
-  );
+  assert.match(code, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/, "tags render as Badge");
+  assert.ok(!code.includes("{tag.color}22"), "the page must not re-implement the tag tint inline");
 });
 
 test("the scale option set moved with the ingredients section", () => {
