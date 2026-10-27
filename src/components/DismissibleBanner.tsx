@@ -52,7 +52,9 @@ export interface DismissibleBannerProps extends StyledBannerProps {
  * `politeLiveRegionProps` (`status` is not a valid React Native
  * `accessibilityRole` and crashes Android — spudly/eciperay#156). The
  * dismiss button is labeled "Dismiss" and meets the 44px minimum touch
- * target.
+ * target. Its × glyph renders at the 2xl font size, not a button label
+ * size: at the small button size the glyph was 14px and read as a speck
+ * next to the message text (#179).
  */
 export function DismissibleBanner({
   message,
@@ -73,7 +75,19 @@ export function DismissibleBanner({
         <Text style={{ color: styles.text, flex: 1 }}>{message}</Text>
         <Button
           variant="ghost"
-          size="sm"
+          // Shift the 44px target into the corner with relative
+          // positioning: the banner's own padding (spacing[3]) plus
+          // the glyph centering inside the target otherwise leaves
+          // the × floating ~34px from the top-right corner. The
+          // offsets are spacing tokens, not raw pixels: up by
+          // spacing[6] and right by spacing[5] puts the glyph
+          // center ~10px from the corner. Offsets, not margins —
+          // spacing belongs to the parent layout; the layout box
+          // and the target size are unchanged.
+          position="relative"
+          top={-tokens.spacing[6]}
+          right={-tokens.spacing[5]}
+          fontSize={tokens.typography.fontSize["2xl"]}
           // The banner background stays pale in dark mode ($primarySubtle /
           // warning1 in both modes), so the ghost variant's default $link
           // label — which lightens in dark themes for dark page backgrounds —

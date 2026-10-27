@@ -91,6 +91,18 @@ test("BulkSelectToolbar disables selection at zero filtered and counts only when
   );
 });
 
+test("DismissibleBanner renders its dismiss glyph at 2xl, not a button label size", () => {
+  const banner = source("DismissibleBanner");
+  assert.ok(
+    banner.includes('fontSize={tokens.typography.fontSize["2xl"]}'),
+    "the dismiss × must render at the 2xl font size (#179)",
+  );
+  assert.ok(
+    !banner.includes('size="sm"'),
+    "the dismiss button must not use the sm size, whose 14px label made the × a speck (#179)",
+  );
+});
+
 test("FixedActionBanner keeps dismiss optional and the message a ReactNode", () => {
   const banner = source("FixedActionBanner");
   assert.ok(banner.includes("onDismiss?: () => void"), "onDismiss must be optional");
