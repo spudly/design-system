@@ -61,9 +61,8 @@ test("no source file still imports TagPill (#183)", () => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) walk(path);
-      else if (/\.(ts|tsx)$/.test(entry.name)) {
-        if (readFileSync(path, "utf8").includes("TagPill.js")) offenders.push(path);
-      }
+      else if (/\.(ts|tsx)$/.test(entry.name) && readFileSync(path, "utf8").includes("TagPill.js"))
+        offenders.push(path);
     }
   };
   walk(join(root, "src"));
