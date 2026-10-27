@@ -8,6 +8,31 @@ import type { StorybookConfig } from "@storybook/react-vite";
 const svgSoundModuleStub = join(process.cwd(), ".storybook", "svgSoundModuleStub.ts");
 const assetsRegistryStub = join(process.cwd(), ".storybook", "assetsRegistryStub.ts");
 
+// react-native-svg's three PEG.js parsers are CommonJS-only files
+// (a single `module.exports = { parse, SyntaxError }`) inside its ESM
+// module tree. The production bundler's CJS interop handles them, but
+// Vite dev serves the package's files raw (it is excluded from
+// pre-bundling — see optimizeDeps below), so the browser hits
+// "does not provide an export named 'parse'". This serve-only plugin
+// wraps those exact files with a local CommonJS shim and re-exports
+// the parser as ESM. The build is untouched (apply: "serve").
+const rnsvgPegParserPattern =
+  /react-native-svg\/lib\/module\/(?:lib\/extract\/(?:transform|transformToRn)|filter-image\/extract\/extractFiltersString)\.js(?:\?.*)?$/;
+const rnsvgPegCjsPlugin = {
+  name: "rnsvg-peg-cjs-exports",
+  apply: "serve" as const,
+  transform(code: string, id: string) {
+    if (!rnsvgPegParserPattern.test(id)) return null;
+    return [
+      "const module = { exports: {} };",
+      code.replace('"use strict";', ""),
+      "export const parse = module.exports.parse;",
+      "export const SyntaxError = module.exports.SyntaxError;",
+      "export default module.exports;",
+    ].join("\n");
+  },
+};
+
 // Tamagui reads a number of process.env.* flags that don't exist in the
 // browser. Vite's dependency optimizer only defines process.env.NODE_ENV
 // for pre-bundled deps, so without these the pre-bundled tamagui.js throws
@@ -66,6 +91,7 @@ const config: StorybookConfig = {
     ]);
     return {
       ...config,
+      plugins: [...(config.plugins ?? []), rnsvgPegCjsPlugin],
       resolve: {
         ...config.resolve,
         // Platform extensions, web first: react-native-svg (the icons
