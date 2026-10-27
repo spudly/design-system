@@ -123,8 +123,13 @@ test("the stepper commits typed entries snapped and clamped, and ignores invalid
   assert.match(stepper, /const parsed = Number\(draft\.trim\(\)\);/, "the entry is parsed");
   assert.match(
     stepper,
+    /if \(draft\.trim\(\) === ""\) \{\s+setDraft\(null\);\s+return;/,
+    "an empty entry commits nothing (Number(\"\") is 0, so it needs its own guard)",
+  );
+  assert.match(
+    stepper,
     /if \(!Number\.isFinite\(parsed\)\) \{\s+return;/,
-    "empty or non-numeric entries commit nothing",
+    "non-numeric entries commit nothing",
   );
   assert.match(
     stepper,

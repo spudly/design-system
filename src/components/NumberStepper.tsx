@@ -89,6 +89,13 @@ export function NumberStepper({
     if (draft === null) {
       return;
     }
+    // Number("") is 0, not NaN: without this guard a cleared field
+    // would commit 0 (snapped/clamped) instead of committing
+    // nothing, as documented on the `editable` prop.
+    if (draft.trim() === "") {
+      setDraft(null);
+      return;
+    }
     const parsed = Number(draft.trim());
     setDraft(null);
     if (!Number.isFinite(parsed)) {
