@@ -18,22 +18,16 @@ type Story = StoryObj<typeof Switch>;
 function SwitchDemo(props: Partial<SwitchProps>) {
   const [checked, setChecked] = useState(props.checked ?? false);
   return (
-    <Switch
-      label="Email notifications"
-      description="Get a reminder when verses are due."
-      checked={checked}
-      onCheckedChange={setChecked}
-      {...props}
-    />
+    <Switch label="Email notifications" checked={checked} onCheckedChange={setChecked} {...props} />
   );
 }
 
 export const Off: Story = {
-  render: () => <SwitchDemo checked={false} />,
+  render: () => <SwitchDemo checked={false} description="Get a reminder when verses are due." />,
 };
 
 export const On: Story = {
-  render: () => <SwitchDemo checked={true} />,
+  render: () => <SwitchDemo checked={true} description="Get a reminder when verses are due." />,
 };
 
 export const WithoutDescription: Story = {
