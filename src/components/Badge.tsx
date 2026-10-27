@@ -33,6 +33,7 @@ const StyledBadge = styled(XStack, {
 
   alignItems: "center",
   alignSelf: "flex-start",
+  borderWidth: 1,
   borderRadius: tokens.radii.full,
   paddingHorizontal: tokens.spacing[2],
   paddingVertical: tokens.spacing[1],
@@ -51,7 +52,7 @@ export interface BadgeProps extends StyledBadgeProps {
 export function Badge({ tone = "neutral", children, ...rest }: BadgeProps) {
   const styles = toneStyles[tone];
   return (
-    <StyledBadge backgroundColor={styles.background} {...rest}>
+    <StyledBadge backgroundColor={styles.background} borderColor={styles.text} {...rest}>
       <Text
         style={{
           fontSize: tokens.typography.fontSize.xs,
