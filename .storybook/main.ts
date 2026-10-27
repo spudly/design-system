@@ -113,6 +113,15 @@ const config: StorybookConfig = {
       optimizeDeps: {
         ...config.optimizeDeps,
         include: [...include],
+        // react-native-svg must NOT be pre-bundled by the dev
+        // optimizer: pre-bundling resolves its native entry, whose
+        // fabric components import codegenNativeComponent from
+        // "react-native" — which the react-native-web alias cannot
+        // provide, and Storybook dev fails with MISSING_EXPORT
+        // errors. Excluded, Vite serves it through the normal
+        // pipeline, where the web-first extensions and aliases above
+        // (the ones the production build uses) apply.
+        exclude: [...(config.optimizeDeps?.exclude ?? []), "react-native-svg"],
         // Vite 8's dep optimizer runs on Rolldown: the deprecated
         // esbuildOptions.define maps to rolldownOptions.transform.define
         // (per the Vite 8 migration guide's automatic conversion table).
