@@ -1,5 +1,6 @@
 import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import type { TagColorName } from "../themes/tagColors.js";
 import { Text } from "./Text.js";
 import { useTagColorResolver } from "./tagColors.js";
 
@@ -8,12 +9,12 @@ export type TagPillProps = {
   name: string;
   /**
    * The tag's color: a design-system tag color token name (e.g.
-   * "blue"), resolved through the active theme at render. Legacy
-   * stored hex values are also accepted — a known palette hex renders
-   * as the active theme's shade of its token name, and any other hex
-   * passes through unchanged (see themes/tagColors.ts, #207).
+   * "blue"), resolved through the active theme at render. The type
+   * is the strict `TagColorName` union — a raw hex is a compile
+   * error. Stored tag data converts to a name through
+   * `tagColorNameForHex` before it reaches this prop (#207).
    */
-  color: string;
+  color: TagColorName;
 };
 
 /**

@@ -6,12 +6,15 @@
  * 1. The twelve token names cover exactly the legacy app palette:
  *    the Warm Harvest values ARE the legacy hexes, verbatim, so
  *    stored tags map 1:1 by value.
- * 2. `tagColorNameForHex` maps every legacy palette hex (any case)
- *    to its name, and nothing else.
- * 3. `resolveTagColorValue` resolves a name through the given
- *    theme's values; a known legacy hex resolves through its name
- *    (so a stored tag takes the active theme's shade); an unknown
- *    value passes through unchanged.
+ * 2. `tagColorNameForHex` is the single stored-data boundary: it
+ *    maps every legacy palette hex (any case) to its name, and an
+ *    unknown stored hex falls back to `defaultTagColorName` —
+ *    unknown values never pass through as raw hex.
+ * 3. `resolveTagColorValue` resolves NAMES ONLY through the given
+ *    theme's values; the tag-color props across TagPill,
+ *    ColorPickerField, TagsPage, and RecipeDetailPage are typed
+ *    `TagColorName`, so a raw hex is a compile error (the `npm run
+ *    build` typecheck in the test script is the enforcement).
  * 4. Both brand themes carry a complete, distinct value set, and
  *    the registered Tamagui themes expose the active brand's hex
  *    under the tag<Name> keys the component resolver reads.
@@ -30,6 +33,7 @@ import { fileURLToPath } from "node:url";
 
 const {
   tagColorNames,
+  defaultTagColorName,
   warmHarvestTagColors,
   quietDawnTagColors,
   baseTheme,
@@ -75,8 +79,13 @@ test("tagColorNameForHex maps every legacy hex to its name, case-insensitively",
     assert.equal(tagColorNameForHex(hex), tagColorNames[index], hex);
     assert.equal(tagColorNameForHex(hex.toUpperCase()), tagColorNames[index], hex);
   }
-  assert.equal(tagColorNameForHex("#123456"), undefined);
-  assert.equal(tagColorNameForHex("blue"), undefined);
+});
+
+test("tagColorNameForHex falls back to the default name for unknown stored values", () => {
+  assert.equal(defaultTagColorName, "gray");
+  assert.equal(tagColorNameForHex("#123456"), defaultTagColorName);
+  assert.equal(tagColorNameForHex("#b3543f"), defaultTagColorName, "non-palette hex");
+  assert.equal(tagColorNameForHex("not-a-color"), defaultTagColorName);
 });
 
 test("resolveTagColorValue resolves names through the given theme's values", () => {
@@ -85,15 +94,17 @@ test("resolveTagColorValue resolves names through the given theme's values", () 
   assert.equal(resolveTagColorValue("pink", {}), "#ec4899", "missing theme value falls back");
 });
 
-test("resolveTagColorValue maps a stored legacy hex through its name", () => {
-  assert.equal(resolveTagColorValue("#3b82f6"), "#3b82f6", "identity under the default values");
+test("stored hexes resolve only through the tagColorNameForHex boundary", () => {
   assert.equal(
-    resolveTagColorValue("#3b82f6", quietDawnTagColors),
+    resolveTagColorValue(tagColorNameForHex("#3b82f6"), quietDawnTagColors),
     quietDawnTagColors.blue,
-    "a stored hex takes the active theme's shade of its color",
+    "a stored palette hex takes the active theme's shade of its color",
   );
-  assert.equal(resolveTagColorValue("#b3543f", quietDawnTagColors), "#b3543f");
-  assert.equal(resolveTagColorValue("not-a-color"), "not-a-color");
+  assert.equal(
+    resolveTagColorValue(tagColorNameForHex("#b3543f")),
+    warmHarvestTagColors[defaultTagColorName],
+    "an unknown stored hex renders as the default color, never as itself",
+  );
 });
 
 test("both brand themes carry complete, distinct tag color values", () => {
@@ -124,7 +135,7 @@ test("registered Tamagui themes expose the active brand's tag hexes", () => {
 test("components resolve tag colors through the one shared resolver", () => {
   const hook = read("src/components/tagColors.ts");
   assert.match(hook, /export function useTagColorResolver/);
-  assert.match(hook, /resolveTagColorValue\(value, themeColors\)/);
+  assert.match(hook, /resolveTagColorValue\(name, themeColors\)/);
 
   const tagPill = read("src/components/TagPill.tsx");
   assert.match(tagPill, /useTagColorResolver\(\)/);
@@ -141,4 +152,27 @@ test("components resolve tag colors through the one shared resolver", () => {
   const recipeDetail = read("src/pages/RecipeDetailPage.tsx");
   assert.match(recipeDetail, /useTagColorResolver\(\)/);
   assert.match(recipeDetail, /resolveTagColor\(tag\.color\)/);
+});
+
+test("the tag color API is strictly typed: names only, no hex pass-through", () => {
+  const themeModule = read("src/themes/tagColors.ts");
+  assert.match(themeModule, /export const defaultTagColorName: TagColorName = "gray"/);
+  assert.match(themeModule, /export function tagColorNameForHex\(hex: string\): TagColorName/);
+  assert.match(themeModule, /export function resolveTagColorValue\(\s*name: TagColorName,/);
+  assert.doesNotMatch(themeModule, /passes through unchanged/);
+
+  const hook = read("src/components/tagColors.ts");
+  assert.match(hook, /useTagColorResolver\(\): \(name: TagColorName\) => string/);
+
+  const tagPill = read("src/components/TagPill.tsx");
+  assert.match(tagPill, /color: TagColorName;/);
+
+  const picker = read("src/components/ColorPickerField.tsx");
+  assert.match(picker, /value\?: TagColorName;/);
+
+  const tagsPage = read("src/pages/TagsPage.tsx");
+  assert.match(tagsPage, /color: TagColorName;/);
+
+  const recipeDetail = read("src/pages/RecipeDetailPage.tsx");
+  assert.match(recipeDetail, /color: TagColorName;/);
 });

@@ -1,4 +1,5 @@
-import { tagColorNames } from "../themes/tagColors.js";
+import { tagColorNames, type TagColorName } from "../themes/tagColors.js";
+import type { TagsPageTag } from "./TagsPage.js";
 
 /**
  * Static fixture data for the full-page demo stories (design-system#44).
@@ -355,7 +356,7 @@ export const homeFixture = {
  * palette, which crosses as a prop in token names (#207 — the
  * canonical `tagColorNames` list).
  */
-export const tagsFixture = {
+export const tagsFixture: { tags: TagsPageTag[]; colorOptions: TagColorName[] } = {
   tags: [
     { id: "tag-1", name: "Weeknight", color: "green" },
     { id: "tag-2", name: "Comfort food", color: "orange" },

@@ -45,18 +45,19 @@ export interface TagsPageTag {
   id: string;
   name: string;
   /**
-   * The tag's color: a DS tag color token name, or a legacy stored
-   * hex (resolved at render — see TagPill).
+   * The tag's color: a DS tag color token name, strictly typed (a
+   * raw hex is a compile error). The host converts stored tag data
+   * to a name through `tagColorNameForHex` before passing tags in.
    */
-  color: string;
+  color: TagColorName;
 }
 
 export interface TagsPageProps {
   tags: TagsPageTag[];
   isLoading?: boolean;
   name: string;
-  /** The form's color value: a token name, or a legacy stored hex. */
-  color: string;
+  /** The form's color value: a tag color token name. */
+  color: TagColorName;
   /** The selectable swatches, as tag color token names — host-supplied. */
   colorOptions: TagColorName[];
   onNameChange: (value: string) => void;

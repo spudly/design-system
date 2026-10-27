@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { tagColorNames } from "../themes/tagColors.js";
+import { tagColorNameForHex, tagColorNames } from "../themes/tagColors.js";
 import { TagPill } from "./TagPill.js";
 
 const meta: Meta<typeof TagPill> = {
@@ -22,7 +22,11 @@ export const Warm: Story = {
   args: { name: "Comfort food", color: "amber" },
 };
 
-/** A legacy stored hex still renders: it resolves through its token name's mapping. */
+/**
+ * A legacy stored hex reaches the pill only as a name: the stored
+ * value converts at the data boundary through `tagColorNameForHex`
+ * (the typed `color` prop rejects a raw hex at compile time).
+ */
 export const LegacyHex: Story = {
-  args: { name: "Freezer-friendly", color: "#3b82f6" },
+  args: { name: "Freezer-friendly", color: tagColorNameForHex("#3b82f6") },
 };

@@ -3,23 +3,25 @@ import {
   resolveTagColorValue,
   tagColorNames,
   tagColorThemeKey,
+  type TagColorName,
   type TagColorValues,
 } from "../themes/tagColors.js";
 
 /**
  * The one shared tag-color resolution for components (#207): returns a
- * resolver that maps a tag color value — a token name ("blue") or a
- * stored legacy hex — to the active theme's concrete hex.
+ * resolver that maps a tag color NAME to the active theme's concrete
+ * hex.
  *
  * The active theme's values are read from the Tamagui theme, where the
  * config registers each name under `tagColorThemeKey(name)`; the pure
- * mapping rules (name lookup, legacy hex → name, unknown passthrough)
- * live in `resolveTagColorValue` in themes/tagColors.ts. Components
- * never resolve names or hexes on their own — TagPill,
- * ColorPickerField, TagsPage, and RecipeDetailPage all go through
- * this hook.
+ * name → hex mapping lives in `resolveTagColorValue` in
+ * themes/tagColors.ts. The resolver accepts names only — the strict
+ * `TagColorName` typing is what keeps raw hexes out of the component
+ * tree (stored data converts through `tagColorNameForHex` at the data
+ * boundary). TagPill, ColorPickerField, TagsPage, and RecipeDetailPage
+ * all go through this hook.
  */
-export function useTagColorResolver(): (value: string) => string {
+export function useTagColorResolver(): (name: TagColorName) => string {
   const theme = useTheme();
   const themeColors: Partial<TagColorValues> = {};
   for (const name of tagColorNames) {
@@ -28,5 +30,5 @@ export function useTagColorResolver(): (value: string) => string {
       themeColors[name] = variable.val;
     }
   }
-  return (value: string) => resolveTagColorValue(value, themeColors);
+  return (name: TagColorName) => resolveTagColorValue(name, themeColors);
 }

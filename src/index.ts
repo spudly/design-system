@@ -3,6 +3,7 @@ export { baseTheme, eciperayTheme, memorizeTheme } from "./themes/index.js";
 export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
 export {
   tagColorNames,
+  defaultTagColorName,
   warmHarvestTagColors,
   quietDawnTagColors,
   isTagColorName,

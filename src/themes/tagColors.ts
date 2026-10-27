@@ -13,15 +13,22 @@
  * role like tone's error/warning/success — so all twelve names are
  * hues.
  *
+ * The set is STRICT and enforced by TypeScript (Stephen, #207
+ * follow-up): every prop that carries a tag color is typed
+ * `TagColorName`, so a raw hex in TSX is a compile error, and
+ * resolution (`resolveTagColorValue`) accepts names only — there is
+ * no pass-through of unknown values, so a future rebrand only
+ * touches the token tables below.
+ *
  * Stored-data mapping: tags created before this change hold raw hex
  * values. The Warm Harvest values below ARE the legacy app palette,
- * verbatim, so every stored hex maps 1:1 to a name by value
- * (`tagColorNameForHex`). Resolution (`resolveTagColorValue`) accepts
- * a name or a stored hex: a known hex resolves through its name to
- * the ACTIVE theme's shade, and an unknown value passes through
- * unchanged, so a stored hex always renders. The mapping lives here,
- * in the design system, rather than in an app-side migration, because
- * the palette it maps from is a design-system palette.
+ * verbatim, so every stored hex maps 1:1 to a name by value.
+ * `tagColorNameForHex` is the single conversion boundary for stored
+ * data: a known palette hex converts to its name, and an unknown
+ * stored hex falls back to the default name (`defaultTagColorName`)
+ * rather than rendering as itself. The mapping lives here, in the
+ * design system, rather than in an app-side migration, because the
+ * palette it maps from is a design-system palette.
  */
 
 /** The twelve tag color names, in the legacy palette's display order. */
@@ -41,6 +48,13 @@ export const tagColorNames = [
 ] as const;
 
 export type TagColorName = (typeof tagColorNames)[number];
+
+/**
+ * The fallback tag color: a stored value that is not one of the
+ * twelve palette hexes converts to this name at the
+ * `tagColorNameForHex` boundary instead of passing through.
+ */
+export const defaultTagColorName: TagColorName = "gray";
 
 /** One theme's concrete hex for every tag color name. */
 export type TagColorValues = Record<TagColorName, string>;
@@ -92,31 +106,31 @@ export function isTagColorName(value: string): value is TagColorName {
 }
 
 /**
- * The token name for a stored legacy palette hex, or undefined when
- * the hex is not one of the twelve palette values. Matching is
- * case-insensitive; the palette hexes are the Warm Harvest values.
+ * The token name for a stored legacy palette hex — the single
+ * conversion boundary between stored tag data and the typed
+ * `TagColorName` API. Matching is case-insensitive; the palette
+ * hexes are the Warm Harvest values. A hex that is not one of the
+ * twelve palette values returns `defaultTagColorName`: unknown
+ * stored colors never pass through as raw hex.
  */
-export function tagColorNameForHex(hex: string): TagColorName | undefined {
+export function tagColorNameForHex(hex: string): TagColorName {
   const normalized = hex.trim().toLowerCase();
-  return tagColorNames.find((name) => warmHarvestTagColors[name] === normalized);
+  return (
+    tagColorNames.find((name) => warmHarvestTagColors[name] === normalized) ?? defaultTagColorName
+  );
 }
 
 /**
- * Resolve a tag color value — a token name or a stored hex — to the
- * concrete hex to render.
- *
- * - A token name resolves through `themeColors` (the active theme's
- *   values), falling back to the Warm Harvest value when the theme
- *   assigns none.
- * - A known legacy palette hex maps to its token name first, then
- *   resolves the same way, so stored tags take the active theme's
- *   shade of their color.
- * - Any other value passes through unchanged, so an unrecognized
- *   stored hex still renders as itself.
+ * Resolve a tag color NAME to the concrete hex to render, through
+ * `themeColors` (the active theme's values), falling back to the
+ * Warm Harvest value when the theme assigns none. Names only: raw
+ * hexes are a compile error here — stored data converts through
+ * `tagColorNameForHex` first.
  */
-export function resolveTagColorValue(value: string, themeColors?: Partial<TagColorValues>): string {
-  const name = isTagColorName(value) ? value : tagColorNameForHex(value);
-  if (!name) return value;
+export function resolveTagColorValue(
+  name: TagColorName,
+  themeColors?: Partial<TagColorValues>,
+): string {
   return themeColors?.[name] ?? warmHarvestTagColors[name];
 }
 

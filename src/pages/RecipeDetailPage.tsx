@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { TouchableOpacity } from "react-native";
 import { Image, ScrollView, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import type { TagColorName } from "../themes/tagColors.js";
 import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -116,11 +117,12 @@ export interface RecipeDetailPageTag {
   id: string;
   name: string;
   /**
-   * The tag's color: a DS tag color token name, or a legacy stored
-   * hex — resolved through the active theme for the pill tint and
-   * label (#207).
+   * The tag's color: a DS tag color token name, strictly typed (a
+   * raw hex is a compile error) — resolved through the active theme
+   * for the pill tint and label (#207). The host converts stored
+   * tag data to a name through `tagColorNameForHex` first.
    */
-  color: string;
+  color: TagColorName;
 }
 
 export interface RecipeDetailPageLifecycle {

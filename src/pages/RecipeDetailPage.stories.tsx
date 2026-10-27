@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../components/Text.js";
 import { View } from "tamagui";
 import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
+import { tagColorNameForHex } from "../themes/tagColors.js";
 import { recipeDetailFixture } from "./fixtures.js";
 import { tokens } from "../tokens/index.js";
 
@@ -194,11 +195,15 @@ function RecipeDetailPageDemo({
       onMarkPerfectedPress: () => undefined,
       onAbandonPress: () => undefined,
       onActivateCandidatePress: () => undefined,
+      // Tag colors are names at the prop boundary (#207): stored
+      // hexes convert through `tagColorNameForHex`, as the host's
+      // data layer does — the two hex stand-ins below are legacy
+      // palette values mapping to orange and teal.
       tags: isFull
         ? [
-            { id: "dinner", name: "Dinner", color: "#b3543f" },
+            { id: "dinner", name: "Dinner", color: tagColorNameForHex("#f97316") },
             { id: "chicken", name: "Chicken", color: "indigo" },
-            { id: "one-pan", name: "One pan", color: "#2f7d4f" },
+            { id: "one-pan", name: "One pan", color: tagColorNameForHex("#14b8a6") },
           ]
         : [],
       ratings: {

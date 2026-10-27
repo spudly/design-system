@@ -35,11 +35,11 @@ export type ColorPickerFieldProps = {
    */
   colors: TagColorName[];
   /**
-   * The selected value: a token name, or a legacy stored hex (it is
-   * resolved before comparison, so a stored palette hex selects its
-   * token name's swatch).
+   * The selected value: a tag color token name (strictly typed — a
+   * raw hex is a compile error; stored data converts through
+   * `tagColorNameForHex` first).
    */
-  value?: string;
+  value?: TagColorName;
   onChange?: (color: TagColorName) => void;
   error?: string;
   id?: string;

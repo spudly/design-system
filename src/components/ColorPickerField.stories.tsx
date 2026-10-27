@@ -20,8 +20,10 @@ const tagColors: TagColorName[] = ["orange", "green", "indigo", "amber", "pink",
 function ColorDemo(props: React.ComponentProps<typeof ColorPickerField>) {
   const { value: initialValue, onChange: _ignored, ...rest } = props;
   void _ignored;
-  const [value, setValue] = useState(initialValue ?? "");
-  return <ColorPickerField {...rest} value={value} onChange={setValue} />;
+  const [value, setValue] = useState<TagColorName | undefined>(initialValue);
+  return (
+    <ColorPickerField {...rest} {...(value !== undefined ? { value } : {})} onChange={setValue} />
+  );
 }
 
 export const Default: Story = {
@@ -40,6 +42,6 @@ export const WithError: Story = {
 };
 
 export const WithoutLabel: Story = {
-  args: { colors: tagColors, value: "" },
+  args: { colors: tagColors },
   render: (args) => <ColorDemo {...args} />,
 };

@@ -61,9 +61,9 @@ test("all seven B2 widgets are exported from the package root", () => {
 
 test("TagPill tints its surface and label from the resolved data color", () => {
   const tagPill = source("TagPill");
-  // #207: the data color (a token name or a legacy hex) resolves
-  // through the shared tag-color resolver first; the tint and label
-  // use the resolved hex.
+  // #207: the data color (a tag color token name, strictly typed)
+  // resolves through the shared tag-color resolver first; the tint
+  // and label use the resolved hex.
   assert.ok(
     tagPill.includes("{resolvedColor}22`"),
     "surface must be the resolved color at 22 hex alpha",
