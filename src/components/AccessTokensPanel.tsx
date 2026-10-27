@@ -1,7 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
-import { InlineAlert } from "./InlineAlert.js";
+import { Alert } from "./Alert.js";
 import { SectionCard } from "./SectionCard.js";
 import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
@@ -78,10 +78,10 @@ export function AccessTokensPanel({
 }: AccessTokensPanelProps) {
   return (
     <SectionCard title="API access tokens">
-      <InlineAlert severity="info">
+      <Alert severity="info">
         Personal access tokens let apps and scripts use the Eciperay API — including the MCP server
         — without signing in each time. Treat them like passwords.
-      </InlineAlert>
+      </Alert>
       {createdSecret ? (
         <YStack
           marginTop="$4"
@@ -132,7 +132,7 @@ export function AccessTokensPanel({
         </YStack>
       ) : null}
       {planNotice ? (
-        <InlineAlert severity="info">{planNotice}</InlineAlert>
+        <Alert severity="info">{planNotice}</Alert>
       ) : (
         <YStack marginBottom="$4">
           <TextField

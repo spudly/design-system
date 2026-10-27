@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { ScrollView, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
-import { InlineAlert } from "../components/InlineAlert.js";
+import { Alert } from "../components/Alert.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
@@ -432,10 +432,10 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
         </YStack>
 
         {contentLocked ? (
-          <InlineAlert severity="warning">
+          <Alert severity="warning">
             Ingredients and instructions are locked on the active version. Create a draft to change
             them.
-          </InlineAlert>
+          </Alert>
         ) : null}
 
         {ingredientsChangedLabel && !contentLocked ? (

@@ -7,7 +7,7 @@ import { isWeb } from "tamagui";
  * Native's `accessibilityRole` set, and passing them as `accessibilityRole`
  * makes Android's view manager throw on mount:
  * `JSApplicationIllegalArgumentException: Invalid accessibility role value:
- * "status"` (spudly/eciperay#156 — InlineAlert, Toast, DismissibleBanner,
+ * "status"` (spudly/eciperay#156 — Alert, Toast,
  * and SecretRevealPanel all crashed this way; Avatar's `img` and the
  * `group` roles in NumberStepper/ColorPickerField were the same defect).
  *
