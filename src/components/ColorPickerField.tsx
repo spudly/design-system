@@ -1,7 +1,9 @@
 import { useId } from "react";
 import { XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import type { TagColorName } from "../themes/tagColors.js";
 import { groupRoleProps } from "./accessibility.js";
+import { useTagColorResolver } from "./tagColors.js";
 import { Text } from "./Text.js";
 
 const Swatch = styled(YStack, {
@@ -25,24 +27,34 @@ const Swatch = styled(YStack, {
   } as const,
 });
 
-export interface ColorPickerFieldProps {
+export type ColorPickerFieldProps = {
   label?: string;
-  /** Hex color values to choose from. */
-  colors: string[];
-  value?: string;
-  onChange?: (color: string) => void;
+  /**
+   * Tag color token names to choose from (e.g. "blue", "pink"). Each
+   * swatch renders the active theme's hex for its name (#207).
+   */
+  colors: TagColorName[];
+  /**
+   * The selected value: a tag color token name (strictly typed — a
+   * raw hex is a compile error; stored data converts through
+   * `tagColorNameForHex` first).
+   */
+  value?: TagColorName;
+  onChange?: (color: TagColorName) => void;
   error?: string;
   id?: string;
-}
+};
 
 /**
- * Labeled color swatch selector (e.g. for tag colors). Each swatch is a
- * ≥44px round button showing its color, with `aria-pressed` reflecting
- * selection and an accessible label like "Select color #c2410c". The
- * selected swatch gets a visible dark ring. Error wiring matches TextField.
- * The swatch container's grouping role is web-only — `group` is not a
- * valid React Native `accessibilityRole` (see `accessibility.ts`,
- * spudly/eciperay#156); on native the accessible name carries the grouping.
+ * Labeled tag-color selector. Each swatch is a ≥44px round button
+ * showing the active theme's hex for its token name, with
+ * `aria-pressed` reflecting selection and an accessible label like
+ * "Select color blue". The selected swatch gets a visible dark ring.
+ * Error wiring matches TextField. The swatch container's grouping
+ * role is web-only — `group` is not a valid React Native
+ * `accessibilityRole` (see `accessibility.ts`,
+ * spudly/eciperay#156); on native the accessible name carries the
+ * grouping.
  */
 export function ColorPickerField({
   label,
@@ -56,6 +68,8 @@ export function ColorPickerField({
   const id = idProp ?? autoId;
   const labelId = `${id}-label`;
   const errorId = `${id}-error`;
+  const resolveTagColor = useTagColorResolver();
+  const resolvedValue = value ? resolveTagColor(value) : undefined;
 
   return (
     <YStack gap={tokens.spacing[2]} flexShrink={1} flexGrow={1} minWidth={0}>
@@ -73,12 +87,13 @@ export function ColorPickerField({
         aria-describedby={error ? errorId : undefined}
       >
         {colors.map((color) => {
-          const selected = color.toLowerCase() === value?.toLowerCase();
+          const resolvedColor = resolveTagColor(color);
+          const selected = resolvedColor === resolvedValue;
           return (
             <Swatch
               key={color}
               selected={selected}
-              backgroundColor={color}
+              backgroundColor={resolvedColor}
               accessibilityRole="button"
               aria-pressed={selected}
               accessibilityLabel={`Select color ${color}`}

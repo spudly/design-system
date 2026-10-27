@@ -48,6 +48,7 @@ export { StatRow, type StatRowProps } from "./StatRow.js";
 export { StepDots, type StepDotsProps } from "./StepDots.js";
 export { Switch, type SwitchProps } from "./Switch.js";
 export { Tabs, type TabItem, type TabsProps } from "./Tabs.js";
+export { useTagColorResolver } from "./tagColors.js";
 export { TagPill, type TagPillProps } from "./TagPill.js";
 export { Text, type TextProps } from "./Text.js";
 export { TextField, type TextFieldProps } from "./TextField.js";

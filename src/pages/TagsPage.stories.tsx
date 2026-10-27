@@ -27,7 +27,7 @@ export const WithTags: Story = {
       <TagsPage
         tags={tagsFixture.tags}
         name="Baking"
-        color="#a855f7"
+        color="purple"
         colorOptions={tagsFixture.colorOptions}
         onNameChange={() => undefined}
         onColorChange={() => undefined}
@@ -45,7 +45,7 @@ export const Loading: Story = {
         tags={[]}
         isLoading
         name=""
-        color={tagsFixture.colorOptions[0] ?? "#6366f1"}
+        color={tagsFixture.colorOptions[0] ?? "indigo"}
         colorOptions={tagsFixture.colorOptions}
         onNameChange={() => undefined}
         onColorChange={() => undefined}

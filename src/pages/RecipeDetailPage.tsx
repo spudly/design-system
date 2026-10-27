@@ -2,6 +2,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { TouchableOpacity } from "react-native";
 import { Image, ScrollView, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import type { TagColorName } from "../themes/tagColors.js";
 import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -10,6 +11,7 @@ import { SelectField } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { StarRatingInput } from "../components/StarRatingInput.js";
 import { StatCard } from "../components/StatCard.js";
+import { useTagColorResolver } from "../components/tagColors.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChipGroup.js";
@@ -114,8 +116,13 @@ export interface RecipeDetailPageVersion {
 export interface RecipeDetailPageTag {
   id: string;
   name: string;
-  /** Data color (hex), used for the pill tint and label, as in the app. */
-  color: string;
+  /**
+   * The tag's color: a DS tag color token name, strictly typed (a
+   * raw hex is a compile error) — resolved through the active theme
+   * for the pill tint and label (#207). The host converts stored
+   * tag data to a name through `tagColorNameForHex` first.
+   */
+  color: TagColorName;
 }
 
 export interface RecipeDetailPageLifecycle {
@@ -696,6 +703,7 @@ function OverviewPanel({
     renderSharingControls,
     renderComments,
   } = overview;
+  const resolveTagColor = useTagColorResolver();
 
   const showLifecycle =
     lifecycle !== undefined &&
@@ -817,23 +825,26 @@ function OverviewPanel({
         {sharingControls}
         {tags.length > 0 ? (
           <XStack flexWrap="wrap" gap="$2">
-            {tags.map((tag) => (
-              <XStack
-                key={tag.id}
-                borderRadius={tokens.radii.full}
-                paddingHorizontal="$3"
-                paddingVertical="$1"
-                backgroundColor={`${tag.color}22`}
-              >
-                <Text
-                  fontSize={tokens.typography.fontSize.sm}
-                  fontWeight={tokens.typography.fontWeight.medium}
-                  color={tag.color}
+            {tags.map((tag) => {
+              const resolvedTagColor = resolveTagColor(tag.color);
+              return (
+                <XStack
+                  key={tag.id}
+                  borderRadius={tokens.radii.full}
+                  paddingHorizontal="$3"
+                  paddingVertical="$1"
+                  backgroundColor={`${resolvedTagColor}22`}
                 >
-                  {tag.name}
-                </Text>
-              </XStack>
-            ))}
+                  <Text
+                    fontSize={tokens.typography.fontSize.sm}
+                    fontWeight={tokens.typography.fontWeight.medium}
+                    color={resolvedTagColor}
+                  >
+                    {tag.name}
+                  </Text>
+                </XStack>
+              );
+            })}
           </XStack>
         ) : null}
       </YStack>

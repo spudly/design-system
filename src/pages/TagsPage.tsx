@@ -1,5 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../components/Button.js";
 import { ColorPickerField } from "../components/ColorPickerField.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
@@ -16,10 +17,11 @@ import { TextField } from "../components/TextField.js";
  * form and the list, and reports intents.
  *
  * The form is controlled (name + color values with change
- * callbacks), the form idiom. The color palette crosses as a
- * prop: the swatches are app data (the app adapter supplies
- * the default palette today), so the host passes its palette
- * and the DS renders the DS ColorPickerField with it.
+ * callbacks), the form idiom. The selectable colors cross as a
+ * prop in token names (#207): the host passes which of the DS
+ * tag color names it offers (the canonical list is
+ * `tagColorNames`), and the DS renders the DS ColorPickerField
+ * with them, resolving each name through the active theme.
  *
  * Rows render the DS TagPill (moved in B2) with a delete
  * action; the row card treatment is the app view's, on DS
@@ -42,18 +44,24 @@ import { TextField } from "../components/TextField.js";
 export interface TagsPageTag {
   id: string;
   name: string;
-  color: string;
+  /**
+   * The tag's color: a DS tag color token name, strictly typed (a
+   * raw hex is a compile error). The host converts stored tag data
+   * to a name through `tagColorNameForHex` before passing tags in.
+   */
+  color: TagColorName;
 }
 
 export interface TagsPageProps {
   tags: TagsPageTag[];
   isLoading?: boolean;
   name: string;
-  color: string;
-  /** The selectable swatch palette — app data, host-supplied. */
-  colorOptions: string[];
+  /** The form's color value: a tag color token name. */
+  color: TagColorName;
+  /** The selectable swatches, as tag color token names — host-supplied. */
+  colorOptions: TagColorName[];
   onNameChange: (value: string) => void;
-  onColorChange: (value: string) => void;
+  onColorChange: (value: TagColorName) => void;
   onCreate: () => void;
   onDelete: (id: string) => void;
   isCreating?: boolean;

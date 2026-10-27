@@ -1,3 +1,6 @@
+import { tagColorNames, type TagColorName } from "../themes/tagColors.js";
+import type { TagsPageTag } from "./TagsPage.js";
+
 /**
  * Static fixture data for the full-page demo stories (design-system#44).
  *
@@ -349,29 +352,17 @@ export const homeFixture = {
 };
 
 /**
- * Tags fixture (#126): tag view-models plus the app adapter's
- * default swatch palette, which crosses as a prop.
+ * Tags fixture (#126): tag view-models plus the selectable swatch
+ * palette, which crosses as a prop in token names (#207 — the
+ * canonical `tagColorNames` list).
  */
-export const tagsFixture = {
+export const tagsFixture: { tags: TagsPageTag[]; colorOptions: TagColorName[] } = {
   tags: [
-    { id: "tag-1", name: "Weeknight", color: "#22c55e" },
-    { id: "tag-2", name: "Comfort food", color: "#f97316" },
-    { id: "tag-3", name: "Freezer-friendly", color: "#3b82f6" },
+    { id: "tag-1", name: "Weeknight", color: "green" },
+    { id: "tag-2", name: "Comfort food", color: "orange" },
+    { id: "tag-3", name: "Freezer-friendly", color: "blue" },
   ],
-  colorOptions: [
-    "#6366f1",
-    "#ef4444",
-    "#f97316",
-    "#f59e0b",
-    "#84cc16",
-    "#22c55e",
-    "#14b8a6",
-    "#06b6d4",
-    "#3b82f6",
-    "#a855f7",
-    "#ec4899",
-    "#6b7280",
-  ],
+  colorOptions: [...tagColorNames],
 };
 
 /**
