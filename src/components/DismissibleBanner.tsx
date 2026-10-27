@@ -75,16 +75,18 @@ export function DismissibleBanner({
         <Text style={{ color: styles.text, flex: 1 }}>{message}</Text>
         <Button
           variant="ghost"
-          // Shift the 44px target toward the corner with relative
+          // Shift the 44px target into the corner with relative
           // positioning: the banner's own padding (spacing[3]) plus
           // the glyph centering inside the target otherwise leaves
-          // the × floating ~34px from the top-right corner. Offsets
-          // (not margins — spacing belongs to the parent layout)
-          // recover most of the padding inset visually; the layout
-          // box and the target size are unchanged.
+          // the × floating ~34px from the top-right corner. The
+          // offsets are spacing tokens, not raw pixels: up by
+          // spacing[6] and right by spacing[5] puts the glyph
+          // center ~10px from the corner. Offsets, not margins —
+          // spacing belongs to the parent layout; the layout box
+          // and the target size are unchanged.
           position="relative"
-          top={-tokens.spacing[2]}
-          right={-tokens.spacing[2]}
+          top={-tokens.spacing[6]}
+          right={-tokens.spacing[5]}
           fontSize={tokens.typography.fontSize["2xl"]}
           // The banner background stays pale in dark mode ($primarySubtle /
           // warning1 in both modes), so the ghost variant's default $link
