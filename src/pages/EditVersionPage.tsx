@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { InlineAlert } from "../components/InlineAlert.js";
+import { Alert } from "../components/Alert.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
 import { TextLink } from "../components/TextLink.js";
@@ -60,9 +60,9 @@ export function EditVersionPage(props: EditVersionPageProps) {
     <ScreenContainer scrollable={false}>
       <Text variant="heading">{`Edit Draft (v${versionNumber})`}</Text>
       {showImportBanner && parentVersionNumber !== undefined ? (
-        <InlineAlert severity="info">
+        <Alert severity="info">
           {`Editing draft (v${versionNumber}) based on imported v${parentVersionNumber}.`}
-        </InlineAlert>
+        </Alert>
       ) : null}
       {changeSummary ? <Text variant="hint">{changeSummary}</Text> : null}
       {children}

@@ -1,4 +1,37 @@
+import { join } from "node:path";
 import type { StorybookConfig } from "@storybook/react-vite";
+
+// Absolute path (Storybook runs from the repo root): the alias below
+// replaces the whole import specifier, so a relative replacement
+// would be resolved against the importing file inside
+// react-native-svg and miss.
+const svgSoundModuleStub = join(process.cwd(), ".storybook", "svgSoundModuleStub.ts");
+const assetsRegistryStub = join(process.cwd(), ".storybook", "assetsRegistryStub.ts");
+
+// react-native-svg's three PEG.js parsers are CommonJS-only files
+// (a single `module.exports = { parse, SyntaxError }`) inside its ESM
+// module tree. The production bundler's CJS interop handles them, but
+// Vite dev serves the package's files raw (it is excluded from
+// pre-bundling — see optimizeDeps below), so the browser hits
+// "does not provide an export named 'parse'". This serve-only plugin
+// wraps those exact files with a local CommonJS shim and re-exports
+// the parser as ESM. The build is untouched (apply: "serve").
+const rnsvgPegParserPattern =
+  /react-native-svg\/lib\/module\/(?:lib\/extract\/(?:transform|transformToRn)|filter-image\/extract\/extractFiltersString)\.js(?:\?.*)?$/;
+const rnsvgPegCjsPlugin = {
+  name: "rnsvg-peg-cjs-exports",
+  apply: "serve" as const,
+  transform(code: string, id: string) {
+    if (!rnsvgPegParserPattern.test(id)) return null;
+    return [
+      "const module = { exports: {} };",
+      code.replace('"use strict";', ""),
+      "export const parse = module.exports.parse;",
+      "export const SyntaxError = module.exports.SyntaxError;",
+      "export default module.exports;",
+    ].join("\n");
+  },
+};
 
 // Tamagui reads a number of process.env.* flags that don't exist in the
 // browser. Vite's dependency optimizer only defines process.env.NODE_ENV
@@ -58,9 +91,39 @@ const config: StorybookConfig = {
     ]);
     return {
       ...config,
+      plugins: [...(config.plugins ?? []), rnsvgPegCjsPlugin],
       resolve: {
         ...config.resolve,
+        // Platform extensions, web first: react-native-svg (the icons
+        // module, @spudly/ui/icons) ships parallel .web.js builds of
+        // its entry and element files; without this, Vite resolves the
+        // native entry, whose fabric components import
+        // codegenNativeComponent from "react-native" — which the
+        // react-native-web alias below cannot provide, and the
+        // Storybook build fails with MISSING_EXPORT errors.
+        extensions: [
+          ".web.tsx",
+          ".web.ts",
+          ".web.jsx",
+          ".web.js",
+          ".mjs",
+          ".mts",
+          ".tsx",
+          ".ts",
+          ".jsx",
+          ".js",
+          ".json",
+        ],
         alias: [
+          // react-native-svg's sound module is native-only and breaks
+          // the web build (TurboModuleRegistry is not exported by
+          // react-native-web) — see svgSoundModuleStub.ts. This entry
+          // must precede the react-native alias below.
+          { find: /^.*NativeSvgSoundModule(\.js)?$/, replacement: svgSoundModuleStub },
+          // react-native-svg's web build imports
+          // @react-native/assets-registry/registry, which is not in
+          // this repo's dependency tree — see assetsRegistryStub.ts.
+          { find: /^@react-native\/assets-registry\/registry$/, replacement: assetsRegistryStub },
           // Page components (#49) render React Native's FlatList;
           // the web Storybook resolves it to react-native-web, the
           // same substitution the apps' web builds make. Exact-name
@@ -76,6 +139,15 @@ const config: StorybookConfig = {
       optimizeDeps: {
         ...config.optimizeDeps,
         include: [...include],
+        // react-native-svg must NOT be pre-bundled by the dev
+        // optimizer: pre-bundling resolves its native entry, whose
+        // fabric components import codegenNativeComponent from
+        // "react-native" — which the react-native-web alias cannot
+        // provide, and Storybook dev fails with MISSING_EXPORT
+        // errors. Excluded, Vite serves it through the normal
+        // pipeline, where the web-first extensions and aliases above
+        // (the ones the production build uses) apply.
+        exclude: [...(config.optimizeDeps?.exclude ?? []), "react-native-svg"],
         // Vite 8's dep optimizer runs on Rolldown: the deprecated
         // esbuildOptions.define maps to rolldownOptions.transform.define
         // (per the Vite 8 migration guide's automatic conversion table).

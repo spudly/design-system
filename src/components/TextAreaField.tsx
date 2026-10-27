@@ -5,7 +5,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {
-  name: "SpudlyMultilineField",
+  name: "SpudlyTextAreaField",
 
   backgroundColor: "$surface",
   borderWidth: 1,
@@ -39,7 +39,7 @@ const StyledTextArea = styled(TamaguiTextArea, {
 
 type StyledTextAreaProps = GetProps<typeof StyledTextArea>;
 
-export interface MultilineFieldProps extends StyledTextAreaProps {
+export interface TextAreaFieldProps extends StyledTextAreaProps {
   label?: string;
   error?: string;
   id?: string;
@@ -52,13 +52,13 @@ export interface MultilineFieldProps extends StyledTextAreaProps {
  * `htmlFor`, error text is wired through `aria-describedby`/`aria-invalid`.
  * `numberOfLines` defaults to 4.
  */
-export function MultilineField({
+export function TextAreaField({
   label,
   error,
   id: idProp,
   numberOfLines = 4,
   ...rest
-}: MultilineFieldProps) {
+}: TextAreaFieldProps) {
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;

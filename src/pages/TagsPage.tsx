@@ -26,6 +26,17 @@ import { TextField } from "../components/TextField.js";
  * tokens. While `isLoading`, a spinner replaces the list (the
  * DS Spinner stands in for the app's branded loader — the
  * RecipeFormPage precedent).
+ *
+ * The create form is stacked (#189): the name field takes its
+ * own full-width row, and the color swatches and Add button
+ * share the row below. All three previously shared one row,
+ * where the swatch row overlapped the name input and the
+ * input collapsed to a sliver behind the first swatch.
+ *
+ * That second row wraps (#219): at narrow widths the
+ * ColorPickerField shrinks (its swatches wrap internally)
+ * and, if the row still cannot fit, the Add button wraps
+ * below the swatches instead of overflowing off-screen.
  */
 
 export interface TagsPageTag {
@@ -70,20 +81,20 @@ export function TagsPage({
       >
         Tags
       </Text>
-      <XStack marginBottom="$6" gap="$2">
-        <YStack flex={1}>
-          <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
-        </YStack>
-        <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
-        <Button
-          variant="primary"
-          disabled={!name.trim() || isCreating}
-          onPress={onCreate}
-          accessibilityLabel="Add"
-        >
-          Add
-        </Button>
-      </XStack>
+      <YStack marginBottom="$6" gap="$3">
+        <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
+        <XStack flexWrap="wrap" gap="$2" alignItems="center" justifyContent="space-between">
+          <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
+          <Button
+            variant="primary"
+            disabled={!name.trim() || isCreating}
+            onPress={onCreate}
+            accessibilityLabel="Add"
+          >
+            Add
+          </Button>
+        </XStack>
+      </YStack>
       {isLoading ? (
         <Spinner label="Loading tags" />
       ) : (

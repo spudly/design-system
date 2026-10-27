@@ -1,6 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { CheckboxField } from "./CheckboxField.js";
+import { Text } from "./Text.js";
+import { TextLink } from "./TextLink.js";
 
 const meta: Meta<typeof CheckboxField> = {
   title: "Components/CheckboxField",
@@ -43,6 +45,43 @@ export const Checked: Story = {
     const [checked, setChecked] = useState(true);
     return (
       <CheckboxField label="2 tbsp olive oil" checked={checked} onCheckedChange={setChecked} />
+    );
+  },
+};
+
+export const WithRichDescription: Story = {
+  render: () => {
+    const [checked, setChecked] = useState(false);
+    return (
+      <CheckboxField
+        label="Publishing consent"
+        description={
+          <>
+            I understand this recipe may be viewed without signing in and I agree to the{" "}
+            <TextLink onPress={() => {}}>Privacy Policy</TextLink>.
+          </>
+        }
+        checked={checked}
+        onCheckedChange={setChecked}
+      />
+    );
+  },
+};
+
+export const WithChildren: Story = {
+  render: () => {
+    const [checked, setChecked] = useState(false);
+    return (
+      <CheckboxField
+        label="Show feedback shortcut"
+        description="Adds a Feedback tab so you can send product feedback."
+        checked={checked}
+        onCheckedChange={setChecked}
+      >
+        <Text variant="hint">
+          Feedback is unavailable because analytics is not configured in this environment.
+        </Text>
+      </CheckboxField>
     );
   },
 };

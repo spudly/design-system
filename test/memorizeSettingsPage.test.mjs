@@ -160,7 +160,7 @@ test("the sync button follows connection state, with the app's disabled rules", 
 test("feedback renders as the app renders it", () => {
   assert.match(
     code,
-    /driveError \? <InlineAlert severity="error">\{driveError\}<\/InlineAlert> : null/,
+    /driveError \? <Alert severity="error">\{driveError\}<\/Alert> : null/,
     "the auth error must render as an error alert",
   );
   assert.match(

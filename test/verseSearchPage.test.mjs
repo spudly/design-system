@@ -129,7 +129,7 @@ test("the search row wires the field and the button to the one search callback",
 test("the error alert carries the app-composed message", () => {
   assert.match(
     code,
-    /\{errorMessage \? <InlineAlert severity="error">\{errorMessage\}<\/InlineAlert> : null\}/,
+    /\{errorMessage \? <Alert severity="error">\{errorMessage\}<\/Alert> : null\}/,
     "a non-null errorMessage must render as the error alert, verbatim",
   );
 });

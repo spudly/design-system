@@ -200,7 +200,7 @@ test("blank ordinals are precomputed before the render map, never mutated during
 test("the feedback alert and advance action match the app screen", () => {
   assert.match(
     code,
-    /\{feedback \? <InlineAlert severity="warning">\{feedback\}<\/InlineAlert> : null\}/,
+    /\{feedback \? <Alert severity="warning">\{feedback\}<\/Alert> : null\}/,
     "feedback renders as the warning alert, only when present",
   );
   assert.match(

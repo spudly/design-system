@@ -1,0 +1,279 @@
+# Manual Test Plan — Storybook QA
+
+Manual tests are the tests that are **not run via Jest or Playwright**
+(Stephen's definition). For the design system, that surface is visual:
+how components and pages render, lay out, and respond in their story
+states. This document is the maintained record of those checks, seeded
+from the components with the most review churn first (design-system
+#212); it grows section by section as PRs touch new components.
+
+## How runs work
+
+- **Scope — changed components only.** A design-system PR (including a
+  Version Packages PR) gets a manual QA pass over ONLY its changed
+  components/pages. Each section below ends with a **Run when:** line
+  naming the source paths / component names that select it. For a
+  Version Packages PR, the trigger match runs against the components
+  named across all changesets in the release.
+- **Environment.** The Storybook deployment Chromatic publishes for
+  the PR's build (the react Storybook). Use the build for the PR's
+  head SHA; if no Chromatic build exists for the head yet, the pass
+  is pending that build and still gates merge-ready.
+- **Cases.** The checks a human would do that Jest/Playwright do not
+  cover: open the named stories, verify the rendered states (variants,
+  tones, empty/loading/error states the stories expose), and exercise
+  the interactions the stories expose (controls/args, toggles, dismiss,
+  stepping). The PR's changeset description — written in testable,
+  user-visible terms — is the expected-behavior source for what the
+  change should look like.
+- **Recording.** One comment on the PR per head SHA: components
+  tested, stories opened, pass/fail per component, and observed vs
+  expected for any failure.
+- **Failures.** A failure in behavior the PR changes is a loop failure
+  (fix and re-run the affected stories). A pre-existing failure is
+  filed as a `bug` + `qa` issue, linked on the PR, and does not block
+  merge-ready.
+- **Exemptions.** Diffs touching no component/page/story have nothing
+  to test — the PR comment says so and the gate is satisfied.
+
+## Maintaining this document
+
+- **Every PR that adds or changes a component/page's visible behavior
+  updates this document in the same PR** — add a section for a new
+  component, adjust cases for changed behavior, delete cases for
+  removed behavior.
+- Keep cases concrete: real story names, real controls, and the
+  expected rendered result — not general intentions.
+- When a case becomes automated (Jest contract test or Playwright),
+  remove it here and say so in the PR description.
+
+---
+
+## Badge
+
+Open in `Components/Badge`: Neutral, Info, Success, Warning, Danger,
+AllTones.
+
+1. Every tone renders as a pill with a **visible 1px border in the
+   same color as its label text** — no tone is borderless or uses a
+   mismatched border color.
+2. In AllTones, the five pills align on one baseline with even
+   spacing; no pill is taller or wider than its label needs.
+3. Long labels (type one in via Controls) wrap or truncate without
+   breaking the pill shape or overlapping neighbors.
+
+**Run when:** `src/components/Badge.tsx`, `src/components/Badge.stories.tsx`,
+or a changeset naming Badge (including TagPill-into-Badge changes).
+
+---
+
+## BulkSelectToolbar
+
+Open in `Components/BulkSelectToolbar`: Default, NothingFiltered.
+
+1. The selection count sits **on the same visual center line as the
+   action buttons** beside it — not raised, dropped, or offset.
+2. NothingFiltered renders the toolbar in its nothing-filtered state
+   with no stray count or disabled-looking actions.
+3. Buttons remain legible and tappable-looking at the story's default
+   size; nothing overlaps the count text.
+
+**Run when:** `src/components/BulkSelectToolbar.tsx`, its stories, or
+a changeset naming BulkSelectToolbar.
+
+---
+
+## DismissibleBanner & InlineAlert
+
+Open in `Components/DismissibleBanner`: Info, Warning, WithActions —
+and `Components/InlineAlert`: Info, Success, Warning, Error.
+
+1. The dismiss (×) glyph renders **large and clearly visible** (2xl
+   class), centered in its 44px touch target — not a tiny × in the
+   corner.
+2. Clicking dismiss in the story removes the banner (actions addon /
+   story state) without leaving an empty gap band behind.
+3. WithActions: the action buttons sit clear of the dismiss target
+   and the message text; nothing overlaps at the story width.
+4. InlineAlert severity colors: each severity's icon/text treatment
+   is distinguishable and the message is readable against its
+   background in all four stories.
+
+**Run when:** `src/components/DismissibleBanner.tsx`,
+`src/components/InlineAlert.tsx`, their stories, or a changeset
+naming DismissibleBanner, InlineAlert, or Alert.
+
+---
+
+## NumberStepper
+
+Open in `Components/NumberStepper`: Default, AtMinBound, AtMaxBound,
+CustomStep, Inline, Editable.
+
+1. Exactly **one pair** of step buttons renders — the browser's native
+   spin buttons never appear alongside them in the Editable story.
+2. AtMinBound: the decrement button reads as disabled and clicking it
+   does not move the value below the minimum. AtMaxBound: same for
+   increment at the maximum.
+3. Stepping in Default/CustomStep moves by 1 / the custom step, and
+   the displayed value updates immediately.
+4. Clearing the Editable field and blurring commits nothing (the
+   value returns to / stays at the last committed value) — an empty
+   entry never commits 0 or NaN.
+
+**Run when:** `src/components/NumberStepper.tsx`, its stories, or a
+changeset naming NumberStepper.
+
+---
+
+## CheckboxField
+
+Open in `Components/CheckboxField`: Default, WithDescription, Checked,
+WithRichDescription, WithChildren, WithError.
+
+1. WithRichDescription: rich (multi-element) description content
+   renders under the label with normal text spacing — not clipped,
+   not squeezed against the checkbox.
+2. WithChildren: child content renders inside the field's frame,
+   aligned with the label column.
+3. WithError: the error message is visible, in the danger treatment,
+   and the checkbox remains toggleable in the story.
+4. Toggling in Default/Checked flips the check with no layout shift.
+
+**Run when:** `src/components/CheckboxField.tsx`, its stories, or a
+changeset naming CheckboxField.
+
+---
+
+## StarRatingInput
+
+Open in `Components/StarRatingInput`: Default, Unrated, WithoutLabel,
+DarkTone, AllowClear, ReadOnly, Disabled.
+
+1. Tapping the currently-selected star in AllowClear clears the
+   rating back to unrated; in Default (no allow-clear) it does not.
+2. DarkTone: stars render in the gold/dark tone treatment and remain
+   clearly visible against the story background.
+3. ReadOnly shows the value with no interactive affordance;
+   Disabled reads as disabled (dimmed) and does not respond.
+4. Unrated renders five empty stars with no partial fill.
+
+**Run when:** `src/components/StarRatingInput.tsx`, its stories, or
+a changeset naming StarRatingInput.
+
+---
+
+## PrevNextNav
+
+Open in `Components/PrevNextNav`: Both, CustomLabels, NextOnly,
+NextDisabled, BackDisabled.
+
+1. BackDisabled: the Back button is hidden or visibly disabled (per
+   the story) while Next stays active and right-aligned as in
+   NextOnly.
+2. NextDisabled: Next reads as disabled; Back remains usable.
+3. CustomLabels render verbatim with no truncation at story width.
+
+**Run when:** `src/components/PrevNextNav.tsx`, its stories, or a
+changeset naming PrevNextNav.
+
+---
+
+## AccessTokensPanel
+
+Open in `Components/AccessTokensPanel`: WithTokens,
+SecretJustCreated, PlanNotice.
+
+1. SecretJustCreated: there is a **visible gap** between the info
+   alert at the top and the amber new-token panel below it — the two
+   panels never touch.
+2. The new-token secret text is fully visible (no clipping) and its
+   warning copy sits clear of the panel edges.
+3. PlanNotice renders its notice without pushing the token list into
+   overlap or horizontal scroll.
+
+**Run when:** `src/components/AccessTokensPanel.tsx`, its stories, or
+a changeset naming AccessTokensPanel.
+
+---
+
+## AiSessionPage
+
+Open in `Pages/Eciperay/AiSessionPage`: Start, Planning, PreviewReady.
+
+1. Start: the Cancel button is a **ghost (text-only) button with a
+   readable label** — never a filled button whose label clashes with
+   the fill. The Refine plan button in Planning follows the same
+   treatment.
+2. PreviewReady renders the plan preview with all sections visible
+   and no clipped footer actions.
+
+**Run when:** `src/pages/AiSessionPage.tsx`, its stories, or a
+changeset naming AiSessionPage.
+
+---
+
+## MemorizeSettingsPage
+
+Open in `Pages/Memorize/MemorizeSettingsPage`: Default, NoApiKeyDriveDisconnected,
+SyncConflict.
+
+1. There is **visible spacing above the action buttons** in each
+   card — buttons never sit flush against the field or text above
+   them (spacing comes from the parent stack's gap).
+2. SyncConflict renders the conflict notice and both resolution
+   actions legibly, with nothing overlapping the notice.
+
+**Run when:** `src/pages/MemorizeSettingsPage.tsx`, its stories, or a
+changeset naming MemorizeSettingsPage.
+
+---
+
+## RecipesPage
+
+Open in `Pages/Eciperay/RecipesPage`: Default, Filtered, Empty,
+Loading, FilterChooserOpen, WithFiltersAdded, ExpandedAccessory.
+
+1. The **Filters button is exactly as tall as the search field**
+   beside it — top and bottom edges align.
+2. FilterChooserOpen shows only the collapsed filter affordance by
+   default (no full filter panel duplicating RecipesBrowse behavior)
+   until filters are added in WithFiltersAdded.
+3. Empty and Loading render their states centered in the page frame
+   with no leftover list chrome.
+
+**Run when:** `src/pages/RecipesPage.tsx`, its stories, or a
+changeset naming RecipesPage.
+
+---
+
+## RecipeDetailPage
+
+Open in `Pages/Eciperay/RecipeDetailPage`: Default, Minimal, Loading,
+Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition.
+
+1. The overview action row: Print and Share render as **real icons**
+   (printer / share-2 from `@spudly/ui/icons`) in the same neutral
+   chip treatment as Edit/Delete — no emoji or text glyphs, no
+   color-rendered printer.
+2. Tags render as bordered Badge pills whose border matches the tag
+   label color.
+3. CookLogFormOpen: the inline form fits the section width; its
+   rating stars and fields do not overflow the card.
+
+**Run when:** `src/pages/RecipeDetailPage.tsx`, its stories, or a
+changeset naming RecipeDetailPage.
+
+---
+
+## TagsPage
+
+Open in `Pages/Eciperay/TagsPage`: WithTags, Loading.
+
+1. In the create form, the **name input and the color swatches never
+   overlap** at the story width — the form stacks cleanly.
+2. Existing tags render their color swatch and name on one line with
+   even row spacing.
+
+**Run when:** `src/pages/TagsPage.tsx`, its stories, or a changeset
+naming TagsPage.

@@ -3,7 +3,7 @@ import { ScrollView } from "react-native";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
-import { MultilineField } from "../components/MultilineField.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
 
 /**
@@ -38,6 +38,14 @@ import { Text } from "../components/Text.js";
  * controlled (the host reads them at submit); the transcript
  * and stage rendering mirrors the app view, including the
  * planning stage's refine row and the preview stage's card.
+ *
+ * The secondary actions (the start view's Cancel, the planning
+ * stage's Refine plan) are ghost buttons (#184): Button has no
+ * "outlined" variant, so the old `variant="outlined"` fell back
+ * to the primary fill and the gray label clashed with it —
+ * dark text on the terracotta fill was hard to read next to
+ * the real primary button. Ghost's label color is Button's
+ * dark-aware $link role, readable on the page background.
  */
 
 export interface AiSessionPageConfig {
@@ -128,7 +136,7 @@ export function AiSessionPage({
         <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm} marginBottom="$6">
           {config.intro}
         </Text>
-        <MultilineField
+        <TextAreaField
           value={prompt}
           onChangeText={onPromptChange}
           placeholder={config.promptPlaceholder}
@@ -142,13 +150,7 @@ export function AiSessionPage({
           </Text>
         ) : null}
         <XStack gap="$3">
-          <Button
-            variant="outlined"
-            onPress={onEmptyCancel}
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.medium}
-            color={tokens.colors.gray.gray8}
-          >
+          <Button variant="ghost" onPress={onEmptyCancel}>
             Cancel
           </Button>
           <Button
@@ -212,7 +214,7 @@ export function AiSessionPage({
       </YStack>
       {session.canRefine ? (
         <YStack marginBottom="$4" gap="$3">
-          <MultilineField
+          <TextAreaField
             value={followUp}
             onChangeText={onFollowUpChange}
             placeholder="Ask for changes to the plan…"
@@ -220,11 +222,8 @@ export function AiSessionPage({
           />
           <XStack flexWrap="wrap" gap="$2">
             <Button
-              variant="outlined"
+              variant="ghost"
               size="sm"
-              fontSize={tokens.typography.fontSize.sm}
-              fontWeight={tokens.typography.fontWeight.medium}
-              color={tokens.colors.gray.gray8}
               disabled={busy || !followUp.trim()}
               onPress={() => {
                 onSendMessage(followUp);

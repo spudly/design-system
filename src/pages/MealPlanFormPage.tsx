@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
-import { MultilineField } from "../components/MultilineField.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { NumberStepper } from "../components/NumberStepper.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
@@ -114,7 +114,7 @@ export function MealPlanFormPage({
         onChangeText={onTitleChange}
         placeholder="Plan title"
       />
-      <MultilineField
+      <TextAreaField
         value={notes}
         onChangeText={onNotesChange}
         placeholder="Notes (optional)"

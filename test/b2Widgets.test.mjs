@@ -17,7 +17,9 @@
  *    selectedCount > 0.
  * 5. FixedActionBanner's dismiss is optional (rendered only with
  *    onDismiss) and its message is a ReactNode — the two gaps in
- *    DismissibleBanner's contract that made the component necessary.
+ *    the pre-consolidation DismissibleBanner contract that made the
+ *    component necessary (its message was a plain string and its
+ *    dismiss was required; both gaps are closed in Alert, #208).
  * 6. CommentItem gates Save on a non-blank draft and carries the stale
  *    marker's meaning in `staleHintLabel`.
  * 7. TokenRow renders no action for a revoked token and switches the
@@ -85,6 +87,24 @@ test("BulkSelectToolbar disables selection at zero filtered and counts only when
     "the selected count must render only when something is selected",
   );
   assert.ok(toolbar.includes("disabled || busy"), "busy must disable the controls like disabled");
+  assert.ok(
+    toolbar.includes('alignItems="center"'),
+    "the actions row must center its children so the selected count aligns with the buttons (#175)",
+  );
+});
+
+test("Alert renders its dismiss glyph at 2xl, not a button label size", () => {
+  // The #179 treatment lived on DismissibleBanner until #208 consolidated
+  // it into Alert; the contract follows the component that owns the ×.
+  const banner = source("Alert");
+  assert.ok(
+    banner.includes('fontSize={tokens.typography.fontSize["2xl"]}'),
+    "the dismiss × must render at the 2xl font size (#179)",
+  );
+  assert.ok(
+    !banner.includes('size="sm"'),
+    "the dismiss button must not use the sm size, whose 14px label made the × a speck (#179)",
+  );
 });
 
 test("FixedActionBanner keeps dismiss optional and the message a ReactNode", () => {
@@ -92,7 +112,7 @@ test("FixedActionBanner keeps dismiss optional and the message a ReactNode", () 
   assert.ok(banner.includes("onDismiss?: () => void"), "onDismiss must be optional");
   assert.ok(banner.includes("message: ReactNode"), "message must accept a ReactNode");
   assert.ok(banner.includes("<ActionBar"), "the bar must be the DS ActionBar");
-  assert.ok(banner.includes("<InlineAlert"), "the message must render as a DS InlineAlert");
+  assert.ok(banner.includes("<Alert"), "the message must render as a DS Alert");
 });
 
 test("CommentItem gates Save on a non-blank draft and labels the stale marker", () => {
