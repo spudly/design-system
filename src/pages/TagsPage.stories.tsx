@@ -22,21 +22,55 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
+/**
+ * The page's primary story wires the full inline-edit contract
+ * (eciperay#254) the way a host screen would: rows offer Edit, and
+ * the story holds the controlled draft, starting with no editor open.
+ */
 export const WithTags: Story = {
-  render: () => (
-    <Viewport>
-      <TagsPage
-        tags={tagsFixture.tags}
-        name="Baking"
-        color="purple"
-        colorOptions={tagsFixture.colorOptions}
-        onNameChange={() => undefined}
-        onColorChange={() => undefined}
-        onCreate={() => undefined}
-        onDelete={() => undefined}
-      />
-    </Viewport>
-  ),
+  render: () => {
+    const [tags, setTags] = useState<TagsPageTag[]>(tagsFixture.tags);
+    const [editingTagId, setEditingTagId] = useState<string | null>(null);
+    const [editName, setEditName] = useState(tagsFixture.tags[0]?.name ?? "");
+    const [editColor, setEditColor] = useState<TagColorName>(
+      tagsFixture.tags[0]?.color ?? "indigo",
+    );
+    return (
+      <Viewport>
+        <TagsPage
+          tags={tags}
+          name="Baking"
+          color="purple"
+          colorOptions={tagsFixture.colorOptions}
+          onNameChange={() => undefined}
+          onColorChange={() => undefined}
+          onCreate={() => undefined}
+          onDelete={() => undefined}
+          editingTagId={editingTagId}
+          editName={editName}
+          editColor={editColor}
+          onStartEdit={(tag: TagsPageTag) => {
+            setEditingTagId(tag.id);
+            setEditName(tag.name);
+            setEditColor(tag.color);
+          }}
+          onEditNameChange={setEditName}
+          onEditColorChange={setEditColor}
+          onSaveEdit={() => {
+            setTags((current) =>
+              current.map((tag) =>
+                tag.id === editingTagId ? { ...tag, name: editName, color: editColor } : tag,
+              ),
+            );
+            setEditingTagId(null);
+          }}
+          onCancelEdit={() => {
+            setEditingTagId(null);
+          }}
+        />
+      </Viewport>
+    );
+  },
 };
 
 /**
