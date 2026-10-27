@@ -23,7 +23,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 function codeOf(rel) {
   const source = readFileSync(join(here, "..", rel), "utf8");
-  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/(^|[^:])\/\/.*$/gm, "$1");
+  return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
 const code = codeOf("src/components/PrevNextNav.tsx");
