@@ -11,7 +11,6 @@ import { SelectField } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { StarRatingInput } from "../components/StarRatingInput.js";
 import { StatCard } from "../components/StatCard.js";
-import { useTagColorResolver } from "../components/tagColors.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChipGroup.js";
@@ -717,7 +716,6 @@ function OverviewPanel({
     renderSharingControls,
     renderComments,
   } = overview;
-  const resolveTagColor = useTagColorResolver();
 
   const showLifecycle =
     lifecycle !== undefined &&
@@ -839,26 +837,11 @@ function OverviewPanel({
         {sharingControls}
         {tags.length > 0 ? (
           <XStack flexWrap="wrap" gap="$2">
-            {tags.map((tag) => {
-              const resolvedTagColor = resolveTagColor(tag.color);
-              return (
-                <XStack
-                  key={tag.id}
-                  borderRadius={tokens.radii.full}
-                  paddingHorizontal="$3"
-                  paddingVertical="$1"
-                  backgroundColor={`${resolvedTagColor}22`}
-                >
-                  <Text
-                    fontSize={tokens.typography.fontSize.sm}
-                    fontWeight={tokens.typography.fontWeight.medium}
-                    color={resolvedTagColor}
-                  >
-                    {tag.name}
-                  </Text>
-                </XStack>
-              );
-            })}
+            {tags.map((tag) => (
+              <Badge key={tag.id} color={tag.color}>
+                {tag.name}
+              </Badge>
+            ))}
           </XStack>
         ) : null}
       </YStack>
