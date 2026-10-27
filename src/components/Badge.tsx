@@ -49,10 +49,10 @@ export type BadgeProps = StyledBadgeProps & {
    * A tag color: a design-system tag color token name (e.g. "blue"),
    * resolved through the active theme at render. When set, the badge
    * renders as a colored tag instead of a status pill: the surface is
-   * the resolved color at low alpha (`22` hex, 12.5% opacity), the
-   * border and label are the resolved color itself, and the label
-   * steps up to the small/medium type step with wider horizontal
-   * padding. This is the rendering TagPill had before it was merged
+   * the resolved color at low alpha (`22` hex, 12.5% opacity), and the
+   * border and label are the resolved color itself. The two forms
+   * share the same label typography and padding — only the colors
+   * differ. This is the rendering TagPill had before it was merged
    * into Badge (#183); `tone` is ignored while `color` is set. The
    * type is the strict `TagColorName` union (#207) — a raw hex is a
    * compile error; stored tag data converts to a name through
@@ -72,16 +72,11 @@ export function Badge({ tone = "neutral", color, children, ...rest }: BadgeProps
   if (color) {
     const resolvedColor = resolveTagColor(color);
     return (
-      <StyledBadge
-        backgroundColor={`${resolvedColor}22`}
-        borderColor={resolvedColor}
-        paddingHorizontal={tokens.spacing[3]}
-        {...rest}
-      >
+      <StyledBadge backgroundColor={`${resolvedColor}22`} borderColor={resolvedColor} {...rest}>
         <Text
           style={{
-            fontSize: tokens.typography.fontSize.sm,
-            fontWeight: tokens.typography.fontWeight.medium,
+            fontSize: tokens.typography.fontSize.xs,
+            fontWeight: tokens.typography.fontWeight.semibold,
             color: resolvedColor,
           }}
         >

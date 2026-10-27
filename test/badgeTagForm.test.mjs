@@ -7,8 +7,9 @@
  *    longer exported under its own name.
  * 2. Badge's `color` form carries TagPill's rendering contract: the
  *    surface is the resolved token color at `22` hex alpha, the label
- *    renders in the resolved color itself at the small/medium type
- *    step, and `tone` is ignored while `color` is set. The `color`
+ *    renders in the resolved color itself at the same xs/semibold
+ *    type step as the status form, and `tone` is ignored while
+ *    `color` is set. The `color`
  *    prop is the strict `TagColorName` token union (#207) — never a
  *    raw string — and resolution goes through the shared
  *    `useTagColorResolver` hook, exactly as TagPill did.
@@ -46,12 +47,12 @@ test("Badge's color form keeps TagPill's tint and type contract", () => {
     "surface must be the resolved color at 22 hex alpha",
   );
   assert.ok(
-    source.includes("fontSize: tokens.typography.fontSize.sm"),
-    "tag label must use the small type step",
+    source.includes("fontSize: tokens.typography.fontSize.xs"),
+    "tag label must use the extra-small type step, same as the status form",
   );
   assert.ok(
-    source.includes("fontWeight: tokens.typography.fontWeight.medium"),
-    "tag label must use the medium weight",
+    source.includes("fontWeight: tokens.typography.fontWeight.semibold"),
+    "tag label must use the semibold weight, same as the status form",
   );
 });
 
