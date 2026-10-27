@@ -84,6 +84,7 @@ export function AccessTokensPanel({
       </InlineAlert>
       {createdSecret ? (
         <YStack
+          marginTop="$4"
           marginBottom="$4"
           borderRadius={tokens.radii.md}
           borderWidth={1}
