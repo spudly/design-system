@@ -85,6 +85,10 @@ test("BulkSelectToolbar disables selection at zero filtered and counts only when
     "the selected count must render only when something is selected",
   );
   assert.ok(toolbar.includes("disabled || busy"), "busy must disable the controls like disabled");
+  assert.ok(
+    toolbar.includes('alignItems="center"'),
+    "the actions row must center its children so the selected count aligns with the buttons (#175)",
+  );
 });
 
 test("FixedActionBanner keeps dismiss optional and the message a ReactNode", () => {

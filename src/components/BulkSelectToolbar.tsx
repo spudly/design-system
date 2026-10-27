@@ -22,7 +22,10 @@ export interface BulkSelectToolbarProps {
 /**
  * Toolbar for bulk-selection lists: a search field over a wrapping row of
  * ghost select-all / clear-selection buttons and a hint-styled
- * "N selected" count (rendered only when something is selected). The
+ * "N selected" count (rendered only when something is selected). The row
+ * centers its children vertically, so the count — a bare text element
+ * without the buttons' vertical padding — sits on the buttons' midline
+ * instead of hugging the top of the row (#175). The
  * selection buttons disable when the controls are disabled or busy, or
  * when the filter shows nothing. Selection state is the caller's — the
  * toolbar only reports presses and renders the counts it is given.
@@ -45,7 +48,7 @@ export function BulkSelectToolbar({
   return (
     <YStack>
       <SearchField value={search} onChangeText={onSearchChange} placeholder={searchPlaceholder} />
-      <XStack flexWrap="wrap" gap="$3" marginBlockEnd="$3">
+      <XStack flexWrap="wrap" alignItems="center" gap="$3" marginBlockEnd="$3">
         <Button
           variant="ghost"
           size="sm"
