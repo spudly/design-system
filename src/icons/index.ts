@@ -1,0 +1,12 @@
+export { Icon, type IconComponentProps, type IconElement, type IconProps } from "./Icon.js";
+export { AddIcon } from "./AddIcon.js";
+export { FeedbackIcon } from "./FeedbackIcon.js";
+export { HomeIcon } from "./HomeIcon.js";
+export { MealsIcon } from "./MealsIcon.js";
+export { PrintIcon } from "./PrintIcon.js";
+export { ProfileIcon } from "./ProfileIcon.js";
+export { RecipesIcon } from "./RecipesIcon.js";
+export { ShareIcon } from "./ShareIcon.js";
+export { SharedIcon } from "./SharedIcon.js";
+export { TagsIcon } from "./TagsIcon.js";
+export { WarningIcon } from "./WarningIcon.js";
