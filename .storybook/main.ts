@@ -1,4 +1,12 @@
+import { join } from "node:path";
 import type { StorybookConfig } from "@storybook/react-vite";
+
+// Absolute path (Storybook runs from the repo root): the alias below
+// replaces the whole import specifier, so a relative replacement
+// would be resolved against the importing file inside
+// react-native-svg and miss.
+const svgSoundModuleStub = join(process.cwd(), ".storybook", "svgSoundModuleStub.ts");
+const assetsRegistryStub = join(process.cwd(), ".storybook", "assetsRegistryStub.ts");
 
 // Tamagui reads a number of process.env.* flags that don't exist in the
 // browser. Vite's dependency optimizer only defines process.env.NODE_ENV
@@ -60,7 +68,36 @@ const config: StorybookConfig = {
       ...config,
       resolve: {
         ...config.resolve,
+        // Platform extensions, web first: react-native-svg (the icons
+        // module, @spudly/ui/icons) ships parallel .web.js builds of
+        // its entry and element files; without this, Vite resolves the
+        // native entry, whose fabric components import
+        // codegenNativeComponent from "react-native" — which the
+        // react-native-web alias below cannot provide, and the
+        // Storybook build fails with MISSING_EXPORT errors.
+        extensions: [
+          ".web.tsx",
+          ".web.ts",
+          ".web.jsx",
+          ".web.js",
+          ".mjs",
+          ".mts",
+          ".tsx",
+          ".ts",
+          ".jsx",
+          ".js",
+          ".json",
+        ],
         alias: [
+          // react-native-svg's sound module is native-only and breaks
+          // the web build (TurboModuleRegistry is not exported by
+          // react-native-web) — see svgSoundModuleStub.ts. This entry
+          // must precede the react-native alias below.
+          { find: /^.*NativeSvgSoundModule(\.js)?$/, replacement: svgSoundModuleStub },
+          // react-native-svg's web build imports
+          // @react-native/assets-registry/registry, which is not in
+          // this repo's dependency tree — see assetsRegistryStub.ts.
+          { find: /^@react-native\/assets-registry\/registry$/, replacement: assetsRegistryStub },
           // Page components (#49) render React Native's FlatList;
           // the web Storybook resolves it to react-native-web, the
           // same substitution the apps' web builds make. Exact-name
