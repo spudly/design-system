@@ -35,7 +35,7 @@
  * Documented exceptions (not components/pages, so no stories):
  * - src/components/accessibility.ts — ARIA helper utilities.
  * - src/components/tagColors.ts — the shared tag-color resolver hook
- *   (#207); exercised through the TagPill/ColorPickerField stories.
+ *   (#207); exercised through the Badge/ColorPickerField stories.
  * - src/pages/PageFrame.tsx — internal page scaffolding shared by the
  *   page components; NOT exported from src/pages/index.ts, so it is
  *   not part of the @spudly/ui/pages surface. It is exercised through

@@ -5,7 +5,7 @@ import { Button } from "../components/Button.js";
 import { ColorPickerField } from "../components/ColorPickerField.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
-import { TagPill } from "../components/TagPill.js";
+import { Badge } from "../components/Badge.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 
@@ -23,7 +23,8 @@ import { TextField } from "../components/TextField.js";
  * `tagColorNames`), and the DS renders the DS ColorPickerField
  * with them, resolving each name through the active theme.
  *
- * Rows render the DS TagPill (moved in B2) with a delete
+ * Rows render the DS Badge in its colored-tag form (the
+ * former TagPill, merged into Badge in #183) with a delete
  * action; the row card treatment is the app view's, on DS
  * tokens. While `isLoading`, a spinner replaces the list (the
  * DS Spinner stands in for the app's branded loader — the
@@ -120,7 +121,7 @@ export function TagsPage({
             shadowOpacity={tokens.shadows.sm.shadowOpacity}
             shadowRadius={tokens.shadows.sm.shadowRadius}
           >
-            <TagPill name={tag.name} color={tag.color} />
+            <Badge color={tag.color}>{tag.name}</Badge>
             <XStack
               accessibilityRole="button"
               accessibilityLabel={`Delete tag ${tag.name}`}

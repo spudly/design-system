@@ -161,11 +161,11 @@ test("HomePage renders rows through the host slot and copy through props", () =>
   assert.doesNotMatch(source, /RecipeListCard\.js|CookLogForm\.js/);
 });
 
-test("TagsPage takes its palette as a prop and renders DS TagPills", () => {
+test("TagsPage takes its palette as a prop and renders DS Badges as colored tags", () => {
   const source = page("TagsPage");
   // #207: the palette crosses as tag color token names, not raw hexes.
   assert.match(source, /colorOptions: TagColorName\[\]/);
-  assert.match(source, /TagPill/);
+  assert.match(source, /<Badge color=\{tag\.color\}>\{tag\.name\}<\/Badge>/);
   assert.match(source, /ColorPickerField/);
 });
 
