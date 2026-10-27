@@ -1,4 +1,5 @@
 import { useId } from "react";
+import type { ReactNode } from "react";
 import { Checkbox as TamaguiCheckbox, Label, XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
@@ -45,11 +46,25 @@ export interface CheckboxFieldProps extends Omit<
   "checked" | "onCheckedChange"
 > {
   label: string;
-  description?: string;
+  /**
+   * Supporting text under the label. A plain string renders in the hint
+   * style; richer text content (a fragment mixing strings with DS `Text`
+   * / `TextLink` elements — e.g. a consent line with an inline Privacy
+   * Policy link) renders in the same hint style wrapped around the
+   * nodes, so inline links stay pressable. Block-level content does not
+   * belong here — use `children` for that.
+   */
+  description?: ReactNode;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
   error?: string;
   id?: string;
+  /**
+   * Extra content slotted below the field, inside its layout stack —
+   * e.g. an environment warning shown under the description. Rendered
+   * as-is; the caller styles it (typically with DS `Text`).
+   */
+  children?: ReactNode;
 }
 
 /**
@@ -68,6 +83,7 @@ export function CheckboxField({
   onCheckedChange,
   error,
   id: idProp,
+  children,
   ...rest
 }: CheckboxFieldProps) {
   const autoId = useId();
@@ -116,6 +132,7 @@ export function CheckboxField({
           {description ? <Text variant="hint">{description}</Text> : null}
         </YStack>
       </XStack>
+      {children}
       {error ? (
         <Text variant="error" id={errorId}>
           {error}
