@@ -7,6 +7,7 @@ const meta: Meta<typeof PrevNextNav> = {
   argTypes: {
     backLabel: { control: "text" },
     nextLabel: { control: "text" },
+    backDisabled: { control: "boolean" },
     nextDisabled: { control: "boolean" },
   },
 };
@@ -33,4 +34,8 @@ export const NextOnly: Story = {
 
 export const NextDisabled: Story = {
   args: { onBack: () => {}, onNext: () => {}, nextDisabled: true },
+};
+
+export const BackDisabled: Story = {
+  args: { onBack: () => {}, onNext: () => {}, backDisabled: true },
 };
