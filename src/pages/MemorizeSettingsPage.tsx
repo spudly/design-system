@@ -1,4 +1,4 @@
-import { XStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { InlineAlert } from "../components/InlineAlert.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
@@ -158,58 +158,62 @@ export function MemorizeSettingsPage({
       <Text variant="heading">Settings</Text>
 
       <SectionCard title="Scripture source">
-        <Text variant="hint">
-          A gospel-engine API key unlocks full-library search. The key stays on this device and is
-          never synced.
-        </Text>
-        <TextField
-          label="API key"
-          value={apiKeyValue}
-          onChangeText={onApiKeyValueChange}
-          placeholder="gospel-engine API key"
-          secureTextEntry
-          autoCapitalize="none"
-        />
-        <XStack gap="$2">
-          <Button size="sm" onPress={onSaveApiKeyPress} disabled={!apiKeyValue.trim()}>
-            Save key
-          </Button>
-          {hasSavedApiKey ? (
-            <Button size="sm" variant="secondary" onPress={onClearApiKeyPress}>
-              Clear key
+        <YStack gap="$3">
+          <Text variant="hint">
+            A gospel-engine API key unlocks full-library search. The key stays on this device and
+            is never synced.
+          </Text>
+          <TextField
+            label="API key"
+            value={apiKeyValue}
+            onChangeText={onApiKeyValueChange}
+            placeholder="gospel-engine API key"
+            secureTextEntry
+            autoCapitalize="none"
+          />
+          <XStack gap="$2">
+            <Button size="sm" onPress={onSaveApiKeyPress} disabled={!apiKeyValue.trim()}>
+              Save key
             </Button>
-          ) : null}
-        </XStack>
+            {hasSavedApiKey ? (
+              <Button size="sm" variant="secondary" onPress={onClearApiKeyPress}>
+                Clear key
+              </Button>
+            ) : null}
+          </XStack>
+        </YStack>
       </SectionCard>
 
       <SectionCard title="Google Drive sync">
-        <Text variant="hint">
-          Syncs your verse list (never your API key) to memorize-data.json in the “{driveFolderName}
-          ” Drive folder.
-        </Text>
-        {driveConnected ? (
-          <Button onPress={onSyncDrivePress} disabled={isSyncing}>
-            Sync with Drive
-          </Button>
-        ) : (
-          <Button onPress={onConnectDrivePress} disabled={!driveConnectReady || isSyncing}>
-            Connect Google Drive
-          </Button>
-        )}
-        {driveError ? <InlineAlert severity="error">{driveError}</InlineAlert> : null}
-        {syncMessage ? (
-          <InlineAlert severity={syncConflict ? "warning" : "info"}>{syncMessage}</InlineAlert>
-        ) : null}
-        {syncConflict ? (
-          <XStack gap="$2">
-            <Button size="sm" onPress={onKeepDevicePress} disabled={isSyncing}>
-              Keep this device
+        <YStack gap="$3">
+          <Text variant="hint">
+            Syncs your verse list (never your API key) to memorize-data.json in the “{driveFolderName}
+            ” Drive folder.
+          </Text>
+          {driveConnected ? (
+            <Button onPress={onSyncDrivePress} disabled={isSyncing}>
+              Sync with Drive
             </Button>
-            <Button size="sm" variant="secondary" onPress={onKeepDrivePress} disabled={isSyncing}>
-              Keep Drive
+          ) : (
+            <Button onPress={onConnectDrivePress} disabled={!driveConnectReady || isSyncing}>
+              Connect Google Drive
             </Button>
-          </XStack>
-        ) : null}
+          )}
+          {driveError ? <InlineAlert severity="error">{driveError}</InlineAlert> : null}
+          {syncMessage ? (
+            <InlineAlert severity={syncConflict ? "warning" : "info"}>{syncMessage}</InlineAlert>
+          ) : null}
+          {syncConflict ? (
+            <XStack gap="$2">
+              <Button size="sm" onPress={onKeepDevicePress} disabled={isSyncing}>
+                Keep this device
+              </Button>
+              <Button size="sm" variant="secondary" onPress={onKeepDrivePress} disabled={isSyncing}>
+                Keep Drive
+              </Button>
+            </XStack>
+          ) : null}
+        </YStack>
       </SectionCard>
     </ScreenContainer>
   );
