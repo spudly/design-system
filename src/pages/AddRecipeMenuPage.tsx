@@ -28,7 +28,7 @@ export function AddRecipeMenuPage({ options, onSelect }: AddRecipeMenuPageProps)
   return (
     <ScreenContainer variant="padded">
       <Text
-        variant="subheading"
+        variant="heading"
         fontSize={tokens.typography.fontSize.xl}
         fontWeight={tokens.typography.fontWeight.bold}
         marginBottom="$4"
