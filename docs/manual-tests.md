@@ -445,22 +445,25 @@ the stories are interactive: fields can be typed in, and a
 submit switches the page to its loading state).
 
 1. In every field of each page's Filled story, pressing Enter
-   (web) or the return key (native) submits the page — visible
-   as the page switching to its loading state (the submit
-   button's label changes to its loading label, e.g. "Signing
-   in…", and the button disables), the same result as pressing
-   the submit button. This holds for the first field as well
-   as the last; the last field's return key is labeled "go" on
-   native.
+   submits the page — visible as the page switching to its
+   loading state (the submit button's label changes to its
+   loading label, e.g. "Signing in…", and the button disables),
+   the same result as pressing the submit button. This holds
+   for the first field as well as the last.
 2. In each page's Loading story (and in a Filled story after
    step 1 has put it in the loading state), pressing Enter in
    a field does not submit again — the page stays in the
    loading state with no further change.
 3. Pressing the submit button itself in a Filled story still
    submits (same loading-state switch), and the "Create an
-   account" / "Forgot password?" / "Back to sign in" links do
-   not submit — clicking one does not switch the page to its
-   loading state.
+   account" / "Forgot password?" / "Back to sign in" /
+   "Already have an account? Sign in" links do not submit —
+   clicking one does not switch the page to its loading state.
+4. Native (separate QA step — not covered by the deployed web
+   Storybook above): in the on-device Storybook
+   (`npm run storybook:react-native`), the return key submits
+   from every field of each page, and the last field's return
+   key is labeled "go".
 
 **Run when:** `src/pages/SignInPage.tsx`,
 `src/pages/SignUpPage.tsx`, `src/pages/ForgotPasswordPage.tsx`,
