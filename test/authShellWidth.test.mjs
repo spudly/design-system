@@ -63,8 +63,8 @@ test("the auth content column is capped at 480px and rendered only for the auth 
   assert.match(innerBlock, /maxWidth: 480/);
   assert.match(
     screenContainer,
-    /rest\.variant === "auth" \? <StyledAuthContent>\{children\}<\/StyledAuthContent> : children/,
-    "children must be wrapped in the capped column only for the auth variant",
+    /rest\.variant === "auth" \? \(\s*<StyledAuthContent gap=\{gap \?\? tokens\.spacing\[4\]\}>\{children\}<\/StyledAuthContent>/,
+    "children must be wrapped in the capped column only for the auth variant, with the caller's gap preserved (spacing[4] default)",
   );
   assert.equal(
     [...screenContainer.matchAll(/maxWidth/g)].length,

@@ -86,10 +86,19 @@ export type ScreenContainerProps = StyledContentProps & {
  * pass `scrollable={false}` for fixed-height screens. Use `variant` for
  * the padded, list, and auth shell modes.
  */
-export function ScreenContainer({ scrollable = true, children, ...rest }: ScreenContainerProps) {
+export function ScreenContainer({
+  scrollable = true,
+  children,
+  gap,
+  ...rest
+}: ScreenContainerProps) {
   const content = (
-    <StyledContent {...rest}>
-      {rest.variant === "auth" ? <StyledAuthContent>{children}</StyledAuthContent> : children}
+    <StyledContent gap={gap} {...rest}>
+      {rest.variant === "auth" ? (
+        <StyledAuthContent gap={gap ?? tokens.spacing[4]}>{children}</StyledAuthContent>
+      ) : (
+        children
+      )}
     </StyledContent>
   );
   if (!scrollable) {
