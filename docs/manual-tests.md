@@ -251,8 +251,11 @@ SharedFiltered, SharedEmpty, SharedLoading.
    "Recipes others share with you will appear here." with its
    second sentence — **not** "No recipes found."; the Recipes
    configuration's Empty still shows "No recipes found."
-6. SharedFiltered and SharedLoading render their states centered
-   with no leftover list chrome, like the Recipes configuration's.
+6. SharedFiltered lists the two matching rows, Creamy Tuscan
+   Garlic Chicken and Chicken Tikka Masala, below the collapsed
+   filter bar. SharedLoading shows the spinner centered below the
+   filter bar with no recipe rows, like the Recipes configuration's
+   Loading state.
 
 **Run when:** `src/pages/RecipesPage.tsx`, its stories, or a
 changeset naming RecipesPage or the Shared-with-me screen.
