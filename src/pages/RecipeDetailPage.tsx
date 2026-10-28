@@ -1146,7 +1146,7 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
       {history.cookLogs.length === 0 ? (
         <Text variant="hint">{COOK_LOG_EMPTY_MESSAGE}</Text>
       ) : (
-        history.cookLogs.map((log) => (
+        history.cookLogs.map((log, index) => (
           <YStack
             key={log.id}
             marginBlockEnd="$4"
@@ -1185,6 +1185,7 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
                   size="sm"
                   backgroundColor={tokens.colors.danger.danger1}
                   color={tokens.colors.danger.danger8}
+                  accessibilityLabel={`Delete cook log ${index + 1} from ${log.dateLabel}`}
                   onPress={() => {
                     history.onDeleteCookLogPress?.(log.id);
                   }}

@@ -230,6 +230,14 @@ test("the cook-log form slot replaces the Log a cook button while it renders con
   assert.match(code, /history\.onDeleteCookLogPress \?/);
   assert.match(code, /history\.onDeleteCookLogPress\?\.\(log\.id\)/);
   assert.match(storiesCode, /onDeleteCookLogPress: \(\) => undefined/);
+  // Each entry's Delete button needs an entry-specific accessible name
+  // (position + date) — otherwise screen-reader button lists show
+  // several identical "Delete" entries.
+  assert.match(code, /history\.cookLogs\.map\(\(log, index\) =>/);
+  assert.match(
+    code,
+    /accessibilityLabel=\{`Delete cook log \$\{index \+ 1\} from \$\{log\.dateLabel\}`\}/,
+  );
 });
 
 test("the sharing slot renders after the lifecycle section and before the tags", () => {
