@@ -47,10 +47,14 @@ export function TextAction({ onPress, disabled = false, children, ...rest }: Tex
       onPress();
     }
   };
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+  const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
     if (!disabled && (event.key === "Enter" || event.key === " ")) {
       event.preventDefault();
-      onPress();
+      // A held key repeats keydown events; a native button does not
+      // re-activate on repeats, so only the first event presses.
+      if (!event.repeat) {
+        onPress();
+      }
     }
   };
   return (

@@ -73,6 +73,11 @@ test("TextAction suppresses activation while disabled", () => {
     /if \(!disabled && \(event\.key === "Enter"/,
     "the key handler must guard on disabled",
   );
+  assert.match(
+    textAction,
+    /if \(!event\.repeat\)/,
+    "held-key keydown repeats must not re-activate the action",
+  );
 });
 
 test("TextAction uses a type alias for its props, not an interface (Stephen's style rule)", () => {
