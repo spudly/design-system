@@ -30,10 +30,19 @@ const StyledContent = styled(YStack, {
       // Auth shell: surface background, wide horizontal padding, and a
       // large top offset for sign-in flows (the old ui-screen-shell-auth).
       // 80px is the shell's fixed top offset; it is not on the spacing scale.
+      // The content column is capped and centered at the FormScreenLayout
+      // geometry (480px of content): without the cap the auth pages
+      // stretched edge-to-edge on desktop web (#265). maxWidth is the
+      // border box, so it is the 480px content width plus this variant's
+      // horizontal padding on both sides (2 × spacing[6] = 48px). On
+      // phone-width viewports the cap does not bind and nothing changes.
       auth: {
         backgroundColor: "$surface",
         paddingHorizontal: tokens.spacing[6],
         paddingTop: 80,
+        width: "100%",
+        maxWidth: 480 + 2 * tokens.spacing[6],
+        alignSelf: "center",
       },
     },
   } as const,
