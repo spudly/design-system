@@ -1,7 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { Card } from "./Card.js";
-import { MasonryGrid } from "./MasonryGrid.js";
+import {
+  MasonryGrid,
+  type MasonryColumnCountOptions,
+  type MasonryGridProps,
+} from "./MasonryGrid.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof MasonryGrid> = {
@@ -47,43 +51,79 @@ function renderDemoItem(item: DemoItem) {
   );
 }
 
+/**
+ * The layout props a story's controls drive. Each story spreads
+ * these onto the grid so the minColumnWidth / minColumns /
+ * maxColumns / gap controls actually re-flow it; story-specific
+ * props set after the spread (items, a column cap) always win.
+ */
+function layoutArgs(args: MasonryColumnCountOptions): Partial<MasonryGridProps<DemoItem>> {
+  return {
+    minColumnWidth: args.minColumnWidth,
+    minColumns: args.minColumns,
+    maxColumns: args.maxColumns,
+    gap: args.gap,
+  };
+}
+
 export const VariableHeights: Story = {
-  render: () => (
-    <MasonryGrid items={VARIED} renderItem={renderDemoItem} keyExtractor={(item) => item.id} />
+  render: (args) => (
+    <MasonryGrid
+      {...layoutArgs(args)}
+      items={VARIED}
+      renderItem={renderDemoItem}
+      keyExtractor={(item: DemoItem) => item.id}
+    />
   ),
 };
 
 export const Narrow: Story = {
-  render: () => (
+  render: (args) => (
     <View width={300}>
-      <MasonryGrid items={VARIED} renderItem={renderDemoItem} keyExtractor={(item) => item.id} />
+      <MasonryGrid
+        {...layoutArgs(args)}
+        items={VARIED}
+        renderItem={renderDemoItem}
+        keyExtractor={(item: DemoItem) => item.id}
+      />
     </View>
   ),
 };
 
 export const TwoColumns: Story = {
-  render: () => (
+  render: (args) => (
     <View width={360}>
-      <MasonryGrid items={VARIED} renderItem={renderDemoItem} keyExtractor={(item) => item.id} />
+      <MasonryGrid
+        {...layoutArgs(args)}
+        items={VARIED}
+        renderItem={renderDemoItem}
+        keyExtractor={(item: DemoItem) => item.id}
+      />
     </View>
   ),
 };
 
 export const Wide: Story = {
-  render: () => (
+  render: (args) => (
     <View width={760}>
-      <MasonryGrid items={VARIED} renderItem={renderDemoItem} keyExtractor={(item) => item.id} />
+      <MasonryGrid
+        {...layoutArgs(args)}
+        items={VARIED}
+        renderItem={renderDemoItem}
+        keyExtractor={(item: DemoItem) => item.id}
+      />
     </View>
   ),
 };
 
 export const CappedColumns: Story = {
-  render: () => (
+  render: (args) => (
     <View width={760}>
       <MasonryGrid
+        {...layoutArgs(args)}
         items={VARIED}
         renderItem={renderDemoItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: DemoItem) => item.id}
         maxColumns={2}
       />
     </View>
@@ -91,21 +131,23 @@ export const CappedColumns: Story = {
 };
 
 export const FewItems: Story = {
-  render: () => (
+  render: (args) => (
     <View width={760}>
       <MasonryGrid
+        {...layoutArgs(args)}
         items={makeItems([2, 4, 1])}
         renderItem={renderDemoItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item: DemoItem) => item.id}
       />
     </View>
   ),
 };
 
 export const Empty: Story = {
-  render: () => (
+  render: (args) => (
     <View width={760}>
       <MasonryGrid
+        {...layoutArgs(args)}
         items={[]}
         renderItem={renderDemoItem}
         keyExtractor={(item: DemoItem) => item.id}

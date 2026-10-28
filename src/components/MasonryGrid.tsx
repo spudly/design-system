@@ -113,8 +113,18 @@ export type MasonryGridProps<Item> = {
  *
  * The first render, before the first layout pass reports a width,
  * uses `minColumns`; the grid re-flows as soon as the width lands
- * and again whenever the container resizes. Items keep their
- * identity across re-flows through `keyExtractor` (or their index).
+ * and again whenever the container resizes. Within one column count,
+ * items keep their identity through `keyExtractor` (or their
+ * index). When the column COUNT changes, items redistribute across
+ * the column stacks and React remounts the moved subtrees — the
+ * deliberate trade of the column-stack layout: rendering stays a
+ * single deterministic pass (stable story snapshots, no measuring
+ * phase), at the cost of item-local state surviving a resize that
+ * crosses a column breakpoint. Items are expected to be
+ * presentational (cards); hosts keep any state that must survive a
+ * re-flow outside the rendered item. A measured, absolutely
+ * positioned layout could preserve identity across breakpoints if a
+ * stateful-item consumer ever appears.
  *
  * Layout only — no data, fetching, or press handling lives here.
  * Item content arrives through `renderItem`; if an item navigates,
