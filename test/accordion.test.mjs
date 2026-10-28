@@ -22,15 +22,20 @@
  *    clips overflow, and aria-hides closed content.
  * 6. DS hard rules across the family: type aliases only (no
  *    `interface`), no margins for spacing (#209 — gap/padding only),
- *    no text-glyph chevron (the indicator is drawn shapes, #95), and
- *    no import of the icons module or react-native from the root
- *    entry's components (the root stays importable in plain Node).
+ *    and no direct import of react-native / react-native-svg. The
+ *    section's chevron is the icons module's CollapsibleIcon
+ *    (Stephen's #250 split into CollapsedIcon / ExpandedIcon /
+ *    CollapsibleIcon) — the one sanctioned icons import from a root
+ *    component, which is why this file registers the test harness's
+ *    react-native-svg stub before importing dist (see
+ *    registerSvgStub.mjs).
  *
  * Source scan for the per-literal invariants (like this repo's other
  * component contract tests; comments are stripped first so prose
  * cannot satisfy the patterns), plus a dist import for the export
  * contract — `npm test` builds before running.
  */
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -92,8 +97,11 @@ test("the section header is keyboard-operable on web and at least 44px tall", ()
   assert.match(section, /minHeight=\{44\}/);
 });
 
-test("the chevron rotates 180 degrees when the section opens", () => {
-  assert.match(section, /rotate=\{isOpen \? "180deg" : "0deg"\}/);
+test("the section's indicator is the icons module's CollapsibleIcon (#250)", () => {
+  assert.match(section, /import \{ CollapsibleIcon \} from "\.\.\/icons\/CollapsibleIcon\.js"/);
+  assert.match(section, /<CollapsibleIcon isOpen=\{open\} size=\{20\}/);
+  // The drawn-bars chevron it replaced is gone.
+  assert.doesNotMatch(section, /SectionChevron/);
 });
 
 test("Collapsible animates height between 0 and the measured content height", () => {
@@ -106,7 +114,7 @@ test("Collapsible animates height between 0 and the measured content height", ()
   assert.match(collapsible, /\{\.\.\.inertPropsWhenClosed\(isOpen\)\}/);
 });
 
-test("the family follows the DS hard rules: aliases only, no margins, no glyph icons, no native imports", () => {
+test("the family follows the DS hard rules: aliases only, no margins, no direct native imports", () => {
   for (const [name, code] of Object.entries(family)) {
     assert.doesNotMatch(code, /\binterface\s/, `${name} must use type aliases, not interfaces`);
     assert.doesNotMatch(
@@ -116,10 +124,18 @@ test("the family follows the DS hard rules: aliases only, no margins, no glyph i
     );
     assert.doesNotMatch(
       code,
-      /from "(\.\.\/icons|react-native|react-native-svg)/,
-      `${name} sits in the Node-importable root entry and must not import icons/react-native`,
+      /from "(react-native|react-native-svg)/,
+      `${name} must not import react-native/react-native-svg directly (icons go through the icons module)`,
     );
   }
+  // Accordion and Collapsible need no icons at all; AccordionSection's
+  // single icons import is pinned by the CollapsibleIcon test above.
+  assert.doesNotMatch(accordion, /from "\.\.\/icons/, "Accordion must not import the icons module");
+  assert.doesNotMatch(
+    collapsible,
+    /from "\.\.\/icons/,
+    "Collapsible must not import the icons module",
+  );
   assert.match(section, /export type AccordionSectionProps = \{/);
   assert.match(accordion, /export type AccordionItem = \{/);
   assert.match(collapsible, /export type CollapsibleProps = \{/);

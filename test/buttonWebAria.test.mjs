@@ -49,6 +49,7 @@
  * The source scan strips comments first, like the other contract
  * tests here, so prose cannot satisfy or trip the patterns.
  */
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";

@@ -1,59 +1,10 @@
 import { useState, type ReactNode } from "react";
-import { View, XStack, YStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
+import { CollapsibleIcon } from "../icons/CollapsibleIcon.js";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Collapsible } from "./Collapsible.js";
 import { Text } from "./Text.js";
-
-/**
- * The expand/collapse chevron, drawn from two bars in a fixed 20px
- * box (the BackLink/SearchField drawn-shape technique): a text glyph
- * here would ride off-center in its line box on Android (#95), and
- * the icons module lives behind the `@spudly/ui/icons` subpath, which
- * root-entry components must not import (the root entry stays
- * importable in plain Node). The wrapper rotates 180° when the
- * section opens, so the chevron points up over open content, exactly
- * the shuoink/ui CollapsibleIcon behavior. The Feather equivalents
- * for surfaces that live behind the subpath — CollapsedIcon,
- * ExpandedIcon, and the CollapsibleIcon switcher — live in the
- * icons module (#250).
- */
-function SectionChevron({ isOpen }: { isOpen: boolean }) {
-  return (
-    <View
-      aria-hidden
-      animation="fast"
-      rotate={isOpen ? "180deg" : "0deg"}
-      position="relative"
-      width={20}
-      height={20}
-      flexShrink={0}
-    >
-      {/* Left arm: from the box's upper left down to the center point. */}
-      <View
-        position="absolute"
-        left={2.15}
-        top={8.5}
-        width={9.2}
-        height={2.5}
-        borderRadius={1.25}
-        backgroundColor="$textMuted"
-        rotate="45deg"
-      />
-      {/* Right arm: from the center point up to the box's upper right. */}
-      <View
-        position="absolute"
-        left={8.65}
-        top={8.5}
-        width={9.2}
-        height={2.5}
-        borderRadius={1.25}
-        backgroundColor="$textMuted"
-        rotate="-45deg"
-      />
-    </View>
-  );
-}
 
 export type AccordionSectionProps = {
   /** Section header label; also the header button's accessible name. */
@@ -75,7 +26,9 @@ export type AccordionSectionProps = {
  * One expandable section (spudly/design-system#178, adopting the
  * shuoink/ui AccordionSection as spec): a bordered frame whose header
  * row is a real button (title + chevron) and whose body expands and
- * collapses with the Collapsible height animation.
+ * collapses with the Collapsible height animation. The chevron is
+ * the icons module's CollapsibleIcon — ExpandedIcon while open,
+ * CollapsedIcon while closed (Stephen's split, #250).
  *
  * State follows the DS controlled/uncontrolled pair: pass `isOpen`
  * to control it (with `onOpenChange` reporting presses), or omit it
@@ -145,7 +98,7 @@ export function AccordionSection({
         <Text variant="subheading" flex={1}>
           {title}
         </Text>
-        <SectionChevron isOpen={open} />
+        <CollapsibleIcon isOpen={open} size={20} color={tokens.colors.gray.gray7} />
       </XStack>
       <Collapsible isOpen={open}>
         <YStack borderTopWidth={1} borderColor="$borderColor" padding={tokens.spacing[4]}>

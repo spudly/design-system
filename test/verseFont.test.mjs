@@ -23,6 +23,7 @@
  * Run against the built output: `npm run build` first (the `test`
  * script does both). The source scan reads source.
  */
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
