@@ -14,8 +14,8 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/../../.." && pwd)"
 cd "$REPO_ROOT/apps/storybook"
 
-npx expo prebuild --platform android --no-install
-(cd android && ./gradlew assembleRelease --console=plain -q)
+# Built by the workflow's background "Start APK build" step.
+bash "$REPO_ROOT/tools/visualRegression/ci/wait-for-build.sh"
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 
 adb shell wm density 320
@@ -29,7 +29,7 @@ $DRIVER --stories searchfield --themes light_warmHarvest --out /tmp/dsvr-clean
 
 # Reintroduce the #162 bug, rebuild with it embedded, and recapture.
 (cd "$REPO_ROOT" && git apply tools/visualRegression/sanity/searchfield-162.patch)
-(cd android && ./gradlew assembleRelease --console=plain -q)
+bash "$REPO_ROOT/tools/visualRegression/ci/build-apk.sh" --gradle-only
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 $DRIVER --stories searchfield --themes light_warmHarvest --out /tmp/dsvr-mutated
 

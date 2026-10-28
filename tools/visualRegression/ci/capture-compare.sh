@@ -76,8 +76,10 @@ if [ "$MODE" != "update" ] && [ -f "$SCOPE_FILE" ]; then
   SCOPE_ARGS=(--scope-file "$SCOPE_FILE")
 fi
 
-npx expo prebuild --platform android --no-install
-(cd android && ./gradlew assembleRelease --console=plain -q)
+# The APK is built by the workflow's background "Start APK build"
+# step (build-apk.sh) so it overlaps the emulator boot; this waits
+# for it (or builds in the foreground when run by hand).
+bash "$VR_DIR/ci/wait-for-build.sh"
 adb install -r android/app/build/outputs/apk/release/app-release.apk
 
 # The two deterministic capture surfaces (see the header comment).
