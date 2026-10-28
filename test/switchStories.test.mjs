@@ -38,7 +38,7 @@ test("SwitchDemo stateful props win over the props spread (#231)", () => {
     stories.indexOf("export const Off"),
   );
   const spread = demo.indexOf("{...props}");
-  assert.ok(spread >= 0, "SwitchDemo must spread the story props into Switch");
+  assert.notEqual(spread, -1, "SwitchDemo must spread the story props into Switch");
   assert.ok(
     demo.indexOf("checked={checked}", spread) > spread,
     "checked={checked} must come after {...props} so the story's static checked prop cannot pin the rendered state (#231)",
