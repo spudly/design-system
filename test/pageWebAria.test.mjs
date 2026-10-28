@@ -140,6 +140,10 @@ test("page-level stack pressables route through the translator, never raw RN JSX
       `${rel} must route its stack accessibility props through platformAccessibilityProps`,
     );
     assert.ok(
+      code.includes("...platformAccessibilityProps("),
+      `${rel} must spread the translator's result onto the pressable — calling the helper without spreading it changes nothing`,
+    );
+    assert.ok(
       !/accessibility(Label|State|Role|Value)=/.test(
         code.replaceAll(
           /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity)\b[^>]*>/g,
@@ -153,7 +157,11 @@ test("page-level stack pressables route through the translator, never raw RN JSX
 
 test("ShoppingListPage's checkbox row translates role, checked state, and label together (#237)", () => {
   const code = readCode("src/pages/ShoppingListPage.tsx");
-  assert.match(code, /accessibilityRole: "checkbox"/);
+  assert.match(
+    code,
+    /\{\.\.\.platformAccessibilityProps\(\{\s+accessibilityRole: "checkbox"/,
+    "the translated props must be spread onto the row's XStack pressable",
+  );
   assert.match(code, /accessibilityState: \{ checked \}/);
   assert.match(code, /accessibilityLabel: line\.name/);
 });
