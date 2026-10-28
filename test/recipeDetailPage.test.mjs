@@ -205,21 +205,13 @@ test("the status badge map covers the four statuses with a fallback", () => {
 });
 
 test("the cook-log form slot replaces the Log a cook button while it renders content", () => {
-  assert.match(
-    code,
-    /renderCookLogForm\?: \(\) => ReactNode;/,
-    "the history props must declare the renderCookLogForm slot",
-  );
+  assert.match(code, /renderCookLogForm\?: \(\) => ReactNode;/);
   assert.match(
     code,
     /const form = history\.renderCookLogForm \? history\.renderCookLogForm\(\) : null;/,
     "the slot is called once per render and its result decides the button swap",
   );
-  assert.match(
-    code,
-    /form !== null && form !== undefined \?/,
-    "non-null form content takes the form branch",
-  );
+  assert.match(code, /form !== null && form !== undefined \?/);
   const formBranchAt = code.indexOf("form !== null && form !== undefined");
   const buttonAt = code.indexOf("Log a cook", formBranchAt);
   assert.ok(buttonAt > formBranchAt, "the Log a cook button is the else-branch of the form slot");
