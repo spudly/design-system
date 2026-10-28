@@ -37,7 +37,7 @@ const StyledValue = styled(TamaguiSelect.Value, {
   // the shared field-value size, tokens.typography.fontSize.md: every
   // field component (TextField, SearchField, TextAreaField, SelectField)
   // renders its entered/selected text at md, so filter bars that mix them
-  // (RecipesPage, SharedWithMePage) cannot drift apart (design-system#67).
+  // (RecipesPage) cannot drift apart (design-system#67).
   // The skin's sm is deliberately NOT used here. Labels stay sm.
   fontSize: tokens.typography.fontSize.md,
 });

@@ -94,6 +94,23 @@ import { TextField } from "../components/TextField.js";
  * seeding the added set from any filter that already carries a
  * non-default value so a pre-filtered screen never hides its
  * own active filters.
+ *
+ * One list page, two screens (#185): this component is also
+ * Eciperay's Shared-with-me screen — SharedWithMePage, the #49
+ * sibling port, is consolidated into this page. The shared
+ * configuration is a strict subset of this contract: the host
+ * passes neither `onLogCookPress` nor `renderRecipeAccessory`,
+ * so shared rows stay press-only (the #49 contract — in the app
+ * the press opens the recipe's permalink externally), and it
+ * passes its own empty-state copy through `emptyTitle` /
+ * `emptyBody`, so neither screen's empty message changes. The
+ * collapsed filter bar serves both screens; its uncontrolled
+ * mode seeds the added set from non-default values, so the
+ * shared host adopts it with no new state. Two deliberate
+ * unifications ride along (accepted in the #185 decisions):
+ * shared rows gain this page's "title, subtitle" accessible
+ * label and the `flexBasis: 60` narrow-width row geometry
+ * (#205) the shared page's rows lacked.
  */
 
 // List content geometry on the DS spacing scale, mirroring the app
@@ -216,6 +233,15 @@ export type RecipesPageProps = {
   renderRecipeAccessory?: (recipeId: string) => ReactNode;
   /** Pagination hook, wired to the list's end-reached signal. */
   onLoadMore?: () => void;
+  /** Empty-state copy, per screen (#185): the title shown when
+   * the list is empty and not loading. Defaults to the Recipes
+   * screen's "No recipes found."; the Shared-with-me host passes
+   * its own message so consolidation changes no visible copy. */
+  emptyTitle?: string;
+  /** Empty-state body shown under `emptyTitle`. The Recipes
+   * screen has none; the Shared-with-me host passes its second
+   * sentence here. */
+  emptyBody?: string;
 
   search: string;
   onSearchChange: (value: string) => void;
@@ -682,9 +708,11 @@ function RecipeRow({
 }
 
 /**
- * Full-page Browse/Recipes view: the filter bar and recipe list in
- * the fixed `list` shell. Controlled — see the file header for the
- * contract and the layout regressions its structure guards.
+ * Full-page recipes-list view — the Recipes/Browse screen and,
+ * since #185, the Shared-with-me screen: the filter bar and
+ * recipe list in the fixed `list` shell. Controlled — see the
+ * file header for the contract and the layout regressions its
+ * structure guards.
  */
 export function RecipesPage(props: RecipesPageProps) {
   const {
@@ -695,6 +723,8 @@ export function RecipesPage(props: RecipesPageProps) {
     onLogCookPress,
     onLoadMore,
     renderRecipeAccessory,
+    emptyTitle = "No recipes found.",
+    emptyBody,
   } = props;
 
   return (
@@ -751,7 +781,7 @@ export function RecipesPage(props: RecipesPageProps) {
               <Spinner label="Loading" />
             </YStack>
           ) : (
-            <EmptyState title="No recipes found." />
+            <EmptyState title={emptyTitle} {...(emptyBody ? { body: emptyBody } : {})} />
           )
         }
         ListFooterComponent={
