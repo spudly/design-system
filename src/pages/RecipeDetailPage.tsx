@@ -990,7 +990,12 @@ function IngredientsPanel({
                 onPress={startCustomScaleEdit}
                 {...platformAccessibilityProps({
                   accessibilityRole: "button",
-                  accessibilityLabel: "Custom scale",
+                  // When a custom scale is selected the chip's visible
+                  // text is the multiplier itself; the accessible name
+                  // must carry it too, not just "Custom scale".
+                  accessibilityLabel: isCustomScaleSelected
+                    ? `Custom scale ${formatScaleValue(view.scaleValue)}×`
+                    : "Custom scale",
                 })}
                 tabIndex={0}
                 onKeyDown={handleCustomScaleKeyDown}

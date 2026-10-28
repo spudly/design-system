@@ -341,6 +341,19 @@ test("SSR: TextLink, BackLink, OptionCard, and Alert render their roles (#237)",
   assert.ok(labelledAlert.includes('aria-label="Failure notice"'));
   assert.ok(labelledAlert.includes('role="alert"'));
   assertNoLeak(labelledAlert);
+  // A caller role override on a polite (non-alert) severity must not
+  // drop the live region: role="status" carries it implicitly, so an
+  // override gets an explicit aria-live="polite" instead.
+  const headingAlert = await renderToHtml(
+    React.createElement(Alert, {
+      severity: "success",
+      message: "Saved",
+      accessibilityRole: "header",
+    }),
+  );
+  assert.ok(headingAlert.includes('role="heading"'));
+  assert.ok(headingAlert.includes('aria-live="polite"'));
+  assertNoLeak(headingAlert);
 });
 
 test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbit PR #243)", () => {
@@ -355,4 +368,17 @@ test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbi
   const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
   assert.match(recipeDetail, /onKeyDown=\{handleCustomScaleKeyDown\}/);
   assert.match(recipeDetail, /tabIndex=\{0\}/);
+});
+
+test("busy Cancel is keyboard-guarded and the Custom scale name carries the multiplier (#237)", () => {
+  // pointerEvents="none" does not stop key events on a focused
+  // control, so the Cancel handler must refuse activation while busy
+  // and the control must expose its disabled state.
+  const aiSession = readCode("src/pages/AiSessionPage.tsx");
+  assert.match(aiSession, /if \(busy\) return;/);
+  assert.match(aiSession, /accessibilityState: \{ disabled: busy \}/);
+  // The selected custom-scale chip shows the multiplier as its visible
+  // text; the accessible name must include it.
+  const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
+  assert.match(recipeDetail, /`Custom scale \$\{formatScaleValue\(view\.scaleValue\)\}×`/);
 });

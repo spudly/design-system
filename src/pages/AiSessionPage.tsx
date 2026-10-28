@@ -125,6 +125,9 @@ export function AiSessionPage({
   // `onKeyDown` are web-only props in Tamagui and are ignored on
   // native, where onPress is the activation path.
   const handleCancelKeyDown = (event: { key: string; preventDefault: () => void }) => {
+    // pointerEvents="none" blocks pointer activation while busy, but a
+    // focused control can still receive key events — guard explicitly.
+    if (busy) return;
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       onCancel();
@@ -289,6 +292,7 @@ export function AiSessionPage({
           {...platformAccessibilityProps({
             accessibilityRole: "button",
             accessibilityLabel: "Cancel session",
+            accessibilityState: { disabled: busy },
           })}
           tabIndex={0}
           onKeyDown={handleCancelKeyDown}
