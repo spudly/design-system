@@ -223,6 +223,13 @@ test("the cook-log form slot replaces the Log a cook button while it renders con
   const formBranchAt = code.indexOf("form !== null && form !== undefined");
   const buttonAt = code.indexOf("Log a cook", formBranchAt);
   assert.ok(buttonAt > formBranchAt, "the Log a cook button is the else-branch of the form slot");
+  // #266: entries also carry an optional Delete action — the history
+  // props declare the callback, the button renders only with it,
+  // pressing reports the entry id, and a story passes it.
+  assert.match(code, /onDeleteCookLogPress\?: \(cookLogId: string\) => void;/);
+  assert.match(code, /history\.onDeleteCookLogPress \?/);
+  assert.match(code, /history\.onDeleteCookLogPress\?\.\(log\.id\)/);
+  assert.match(storiesCode, /onDeleteCookLogPress: \(\) => undefined/);
 });
 
 test("the sharing slot renders after the lifecycle section and before the tags", () => {

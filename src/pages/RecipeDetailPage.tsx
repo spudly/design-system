@@ -265,6 +265,13 @@ export interface RecipeDetailPageHistoryProps {
   /** Renders the "Log a cook" button; hidden while the form slot
    * renders content. */
   onLogCookPress?: () => void;
+  /** Optional per-entry Delete action (eciperay#266): each cook-log
+   * entry renders a Delete button only when this callback is
+   * provided, reporting the entry's id. Confirmation, the delete
+   * mutation, and error surfacing stay app-side, as with
+   * MealPlansPage's `onPlanDelete` — the view only reports the
+   * intent. Omit it for a read-only history. */
+  onDeleteCookLogPress?: (cookLogId: string) => void;
   /** Slot: the app's cook-log form. Called once per render; when
    * it returns non-null, the form replaces the "Log a cook"
    * button. Form, state, and mutation stay app-side. */
@@ -1170,6 +1177,21 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
               <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
                 {log.notes}
               </Text>
+            ) : null}
+            {history.onDeleteCookLogPress ? (
+              <XStack marginBlockStart="$2">
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  backgroundColor={tokens.colors.danger.danger1}
+                  color={tokens.colors.danger.danger8}
+                  onPress={() => {
+                    history.onDeleteCookLogPress?.(log.id);
+                  }}
+                >
+                  Delete
+                </Button>
+              </XStack>
             ) : null}
           </YStack>
         ))
