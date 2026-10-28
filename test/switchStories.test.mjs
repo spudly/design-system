@@ -32,6 +32,33 @@ test("Off and On stories pass their description explicitly (#220)", () => {
   assert.match(stories, /checked=\{true\} description="Get a reminder when verses are due\."/);
 });
 
+test("SwitchDemo stateful props win over the props spread (#231)", () => {
+  const demo = stories.slice(
+    stories.indexOf("function SwitchDemo"),
+    stories.indexOf("export const Off"),
+  );
+  const spread = demo.indexOf("{...props}");
+  assert.notEqual(spread, -1, "SwitchDemo must spread the story props into Switch");
+  assert.ok(
+    demo.indexOf("checked={checked}", spread) > spread,
+    "checked={checked} must come after {...props} so the story's static checked prop cannot pin the rendered state (#231)",
+  );
+  assert.ok(
+    demo.indexOf("onCheckedChange={setChecked}", spread) > spread,
+    "onCheckedChange={setChecked} must come after {...props} so clicks update the rendered state (#231)",
+  );
+  assert.match(
+    demo,
+    /useState\(props\.checked \?\? false\)/,
+    "SwitchDemo must seed its state from the story's checked prop (#231)",
+  );
+  assert.match(
+    demo,
+    /label=\{props\.label \?\? "Email notifications"\}/,
+    "SwitchDemo must default the label while letting a story's label win (#231)",
+  );
+});
+
 test("WithoutDescription story passes no description (#220)", () => {
   const story = stories.slice(stories.indexOf("export const WithoutDescription"));
   assert.match(story, /label="Dark mode"/);
