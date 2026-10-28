@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
 const StyledText = styled(TamaguiText, {
-  name: "SpudlyText",
+  name: "Text",
 
   color: "$color",
   fontSize: tokens.typography.fontSize.md,

@@ -7,7 +7,7 @@ import { useTagColorResolver } from "./tagColors.js";
 import { Text } from "./Text.js";
 
 const Swatch = styled(YStack, {
-  name: "SpudlyColorSwatch",
+  name: "ColorSwatch",
 
   width: 44,
   height: 44,

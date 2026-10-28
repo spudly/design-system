@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledVerseText = styled(TamaguiText, {
-  name: "SpudlyVerseText",
+  name: "VerseText",
 
   color: "$color",
   fontSize: tokens.typography.fontSize.lg,

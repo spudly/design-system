@@ -5,13 +5,13 @@ import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const StyledImage = styled(TamaguiImage, {
-  name: "SpudlyAvatarImage",
+  name: "AvatarImage",
 
   borderRadius: tokens.radii.full,
 });
 
 const Fallback = styled(YStack, {
-  name: "SpudlyAvatarFallback",
+  name: "AvatarFallback",
 
   backgroundColor: "$primarySubtle",
   borderRadius: tokens.radii.full,

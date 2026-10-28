@@ -4,14 +4,14 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledOverlay = styled(TamaguiDialog.Overlay, {
-  name: "SpudlyDialogOverlay",
+  name: "DialogOverlay",
 
   backgroundColor: tokens.colors.gray.gray10,
   opacity: 0.5,
 });
 
 const StyledContent = styled(TamaguiDialog.Content, {
-  name: "SpudlyDialogContent",
+  name: "DialogContent",
 
   backgroundColor: "$surface",
   borderRadius: tokens.radii.lg,

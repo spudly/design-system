@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
 const StyledDot = styled(XStack, {
-  name: "SpudlyStepDot",
+  name: "StepDot",
 
   width: tokens.spacing[2],
   height: tokens.spacing[2],

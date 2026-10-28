@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledActionBar = styled(YStack, {
-  name: "SpudlyActionBar",
+  name: "ActionBar",
 
   // Pinned to the screen edge by default; override `position` (and the
   // anchored edge) through stack props when the bar should sit in flow.

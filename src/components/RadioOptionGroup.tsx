@@ -5,7 +5,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledItem = styled(TamaguiRadioGroup.Item, {
-  name: "SpudlyRadioItem",
+  name: "RadioItem",
 
   // 44px touch target; the 24px visual circle is centered inside.
   width: 44,

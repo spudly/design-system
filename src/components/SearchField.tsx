@@ -41,7 +41,7 @@ import { Text } from "./Text.js";
  */
 
 const StyledContainer = styled(XStack, {
-  name: "SpudlySearchField",
+  name: "SearchField",
 
   backgroundColor: "$surface",
   borderWidth: 1,
@@ -69,7 +69,7 @@ const StyledContainer = styled(XStack, {
 });
 
 const StyledGlyphBox = styled(XStack, {
-  name: "SpudlySearchFieldGlyphBox",
+  name: "SearchFieldGlyphBox",
 
   // Fixed height + hidden overflow: the glyph's own box. If the
   // glyph's measurement ever explodes again, it clips inside this
@@ -118,7 +118,7 @@ function SearchGlyph() {
 }
 
 const StyledInput = styled(TamaguiInput, {
-  name: "SpudlySearchFieldInput",
+  name: "SearchFieldInput",
 
   flex: 1,
   borderWidth: 0,

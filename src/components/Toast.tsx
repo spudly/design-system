@@ -6,7 +6,7 @@ import { politeLiveRegionProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const ToastCard = styled(YStack, {
-  name: "SpudlyToast",
+  name: "Toast",
 
   // Theme-matched card (same treatment as Card): surface fill with a
   // 1px border. The previous fixed near-black (gray10) fill clashed with

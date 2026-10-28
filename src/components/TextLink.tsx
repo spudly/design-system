@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 import { tokens } from "../tokens/index.js";
 
 const StyledTextLink = styled(TamaguiText, {
-  name: "SpudlyTextLink",
+  name: "TextLink",
 
   color: "$link",
   fontSize: tokens.typography.fontSize.md,

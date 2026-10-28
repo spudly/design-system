@@ -5,7 +5,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {
-  name: "SpudlyTextAreaField",
+  name: "TextAreaField",
 
   backgroundColor: "$surface",
   borderWidth: 1,

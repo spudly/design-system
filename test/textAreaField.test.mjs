@@ -6,7 +6,7 @@
  * 1. TextAreaField is exported from the package root (dist) and
  *    MultilineField is no longer exported under its old name.
  * 2. The component source keeps the field contract MultilineField had:
- *    a styled Tamagui TextArea named SpudlyTextAreaField, a label wired
+ *    a styled Tamagui TextArea named TextAreaField, a label wired
  *    via htmlFor, and error text wired through aria-describedby /
  *    aria-invalid, with numberOfLines defaulting to 4.
  * 3. No source file in src/ still references the old name.
@@ -30,7 +30,7 @@ test("TextAreaField is exported and MultilineField is gone (#180)", () => {
 
 test("TextAreaField keeps the labeled, error-aware field contract", () => {
   const source = readFileSync(join(root, "src", "components", "TextAreaField.tsx"), "utf8");
-  assert.ok(source.includes("SpudlyTextAreaField"), "styled name must be SpudlyTextAreaField");
+  assert.ok(source.includes('name: "TextAreaField"'), "styled name must be TextAreaField");
   assert.ok(source.includes("htmlFor={id}"), "label must be associated via htmlFor");
   assert.ok(source.includes("aria-describedby"), "error must be wired via aria-describedby");
   assert.ok(source.includes("aria-invalid"), "error must set aria-invalid");
@@ -43,7 +43,10 @@ test("no source file still references MultilineField (#180)", () => {
     for (const entry of readdirSync(dir, { withFileTypes: true })) {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) walk(path);
-      else if (/\.(ts|tsx)$/.test(entry.name) && readFileSync(path, "utf8").includes("MultilineField")) {
+      else if (
+        /\.(ts|tsx)$/.test(entry.name) &&
+        readFileSync(path, "utf8").includes("MultilineField")
+      ) {
         offenders.push(path);
       }
     }
