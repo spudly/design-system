@@ -8,14 +8,17 @@
  * rendered FormScreenLayout, which caps content at 480px and
  * centers it.
  *
- * The contract now: the `auth` variant caps its border box at the
- * FormScreenLayout geometry (480px of content + the variant's own
- * horizontal padding on both sides) and centers itself; the other
- * variants stay uncapped. Only the four auth pages (SignInPage,
- * SignUpPage, ForgotPasswordPage, ResetPasswordPage) use
- * `variant="auth"`, and on phone-width viewports the cap does not
- * bind, so phone rendering (and the Android VR baselines) are
- * unchanged.
+ * The contract now mirrors FormScreenLayout's two-layer shape:
+ * 1. The `auth` variant's outer layer stays full-width — it keeps
+ *    painting `$surface` across the whole screen — and centers its
+ *    child via `alignItems` (not `alignSelf` on the column, which a
+ *    block parent on web would ignore).
+ * 2. The page content renders inside `StyledAuthContent`, a column
+ *    capped at 480px, when and only when the variant is `auth`.
+ * Only the four auth pages (SignInPage, SignUpPage,
+ * ForgotPasswordPage, ResetPasswordPage) use `variant="auth"`, and
+ * on phone-width viewports the cap does not bind, so phone
+ * rendering (and the Android VR baselines) are unchanged.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -34,26 +37,39 @@ function readCode(rel) {
 const screenContainer = readCode("src/components/ScreenContainer.tsx");
 const formScreenLayout = readCode("src/components/FormScreenLayout.tsx");
 
-test("FormScreenLayout's cap is the geometry the auth variant mirrors (#265)", () => {
+test("FormScreenLayout's cap is the geometry the auth shell mirrors (#265)", () => {
   assert.match(formScreenLayout, /maxWidth: 480/);
   assert.match(formScreenLayout, /alignItems: "center"/);
 });
 
-test("ScreenContainer auth variant is capped at 480px of content and centered (#265)", () => {
+test("the auth outer layer stays full-width, paints the surface, and centers its child (#265)", () => {
   const authBlock = screenContainer.slice(
     screenContainer.indexOf("auth: {"),
     screenContainer.indexOf("},", screenContainer.indexOf("auth: {")),
   );
-  assert.match(authBlock, /maxWidth: 480 \+ 2 \* tokens\.spacing\[6\]/);
-  assert.match(authBlock, /alignSelf: "center"/);
-  assert.match(authBlock, /width: "100%"/);
+  assert.match(authBlock, /backgroundColor: "\$surface"/);
+  assert.match(authBlock, /alignItems: "center"/);
+  assert.ok(!/maxWidth/.test(authBlock), "the surface-painting outer layer must not be capped");
+  assert.ok(!/alignSelf/.test(authBlock), "centering must not rely on alignSelf");
 });
 
-test("only the auth variant is capped (#265)", () => {
+test("the auth content column is capped at 480px and rendered only for the auth variant (#265)", () => {
+  assert.match(screenContainer, /const StyledAuthContent = styled\(YStack/);
+  const innerBlock = screenContainer.slice(
+    screenContainer.indexOf("const StyledAuthContent"),
+    screenContainer.indexOf("});", screenContainer.indexOf("const StyledAuthContent")),
+  );
+  assert.match(innerBlock, /width: "100%"/);
+  assert.match(innerBlock, /maxWidth: 480/);
+  assert.match(
+    screenContainer,
+    /rest\.variant === "auth" \? <StyledAuthContent>\{children\}<\/StyledAuthContent> : children/,
+    "children must be wrapped in the capped column only for the auth variant",
+  );
   assert.equal(
     [...screenContainer.matchAll(/maxWidth/g)].length,
     1,
-    "maxWidth must appear exactly once in ScreenContainer (the auth variant)",
+    "maxWidth must appear exactly once in ScreenContainer (the auth content column)",
   );
 });
 
