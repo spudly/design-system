@@ -88,6 +88,8 @@ export function Alert({
   accessibilityRole,
   accessibilityState,
   accessibilityValue,
+  role,
+  "aria-live": ariaLive,
   ...rest
 }: AlertProps) {
   const styles = severityStyles[severity];
@@ -98,7 +100,12 @@ export function Alert({
   // `rest` and translated like every other wrapper (#237): left in
   // `rest` they would reach the Tamagui element untranslated and leak
   // as raw HTML attributes on web. The severity default is applied
-  // first, so a caller's own role/live-region wins where given.
+  // first, so a caller's own role/live-region wins where given. A
+  // direct web `role`/`aria-live` is destructured and translated too:
+  // left in `rest` it would override the translated role after the
+  // polite fallback below was computed from that role, so a direct
+  // role="alert" could inherit an explicit aria-live="polite" and
+  // lose its assertive announcement.
   const callerA11yProps = platformAccessibilityProps({
     accessible,
     accessibilityElementsHidden,
@@ -109,6 +116,8 @@ export function Alert({
     accessibilityRole,
     accessibilityState,
     accessibilityValue,
+    role,
+    "aria-live": ariaLive,
   });
   const a11yProps = {
     ...(isAlert

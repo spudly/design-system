@@ -367,6 +367,21 @@ test("SSR: TextLink, BackLink, OptionCard, and Alert render their roles (#237)",
   assert.ok(callerAlertRole.includes('role="alert"'));
   assert.ok(!callerAlertRole.includes('aria-live="polite"'));
   assertNoLeak(callerAlertRole);
+  // Same protection for a direct web role="alert" combined with a
+  // translated accessibilityRole: the direct role goes through the
+  // translator (and wins), so the polite fallback must not fire
+  // (CodeRabbit finding on PR #241, head 6f0bbd1).
+  const directAlertRole = await renderToHtml(
+    React.createElement(Alert, {
+      severity: "success",
+      message: "Saved",
+      accessibilityRole: "header",
+      role: "alert",
+    }),
+  );
+  assert.ok(directAlertRole.includes('role="alert"'));
+  assert.ok(!directAlertRole.includes('aria-live="polite"'));
+  assertNoLeak(directAlertRole);
 });
 
 test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbit PR #243)", () => {
