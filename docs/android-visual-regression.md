@@ -216,7 +216,7 @@ fails the test suite.
 | pages-eciperay-editrecipepage               | light_warmHarvest |       1 |         1 |
 | pages-eciperay-editversionpage              | light_warmHarvest |       2 |         2 |
 | pages-eciperay-feedbackpage                 | light_warmHarvest |       2 |         2 |
-| pages-eciperay-forgotpasswordpage           | light_warmHarvest |       1 |         1 |
+| pages-eciperay-forgotpasswordpage           | light_warmHarvest |       2 |         2 |
 | pages-eciperay-homepage                     | light_warmHarvest |       3 |         3 |
 | pages-eciperay-importimagepage              | light_warmHarvest |       1 |         1 |
 | pages-eciperay-importreviewpage             | light_warmHarvest |       1 |         1 |
@@ -235,10 +235,10 @@ fails the test suite.
 | pages-eciperay-recipeformpage               | light_warmHarvest |       4 |         4 |
 | pages-eciperay-recipespage                  | light_warmHarvest |      11 |        11 |
 | pages-eciperay-recipespage — narrow variant | light_warmHarvest |      11 |        11 |
-| pages-eciperay-resetpasswordpage            | light_warmHarvest |       1 |         1 |
+| pages-eciperay-resetpasswordpage            | light_warmHarvest |       2 |         2 |
 | pages-eciperay-shoppinglistpage             | light_warmHarvest |       3 |         3 |
-| pages-eciperay-signinpage                   | light_warmHarvest |       2 |         2 |
-| pages-eciperay-signuppage                   | light_warmHarvest |       2 |         2 |
+| pages-eciperay-signinpage                   | light_warmHarvest |       3 |         3 |
+| pages-eciperay-signuppage                   | light_warmHarvest |       3 |         3 |
 | pages-eciperay-tagspage                     | light_warmHarvest |       3 |         3 |
 | pages-memorize                              | light_quietDawn   |       4 |         4 |
 | pages-memorize-memorizationsessionpage      | light_quietDawn   |       5 |         5 |
@@ -246,7 +246,7 @@ fails the test suite.
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **111** |   **111** |
+| **Total**                                   |                   | **115** |   **115** |
 
 <!-- VR-COVERAGE-END -->
 
@@ -486,7 +486,7 @@ capture entirely. (Local development still uses Metro via
 
 ### Scoped PR runs: capture only the affected stories (issue #114)
 
-Even path-filtered, a full run captures all 111 baselines (100
+Even path-filtered, a full run captures all 115 baselines (104
 standard + 11 narrow) — a 20–30 minute emulator job gating every
 PR, including one-line component fixes. Since issue #114, a PR
 compare run first computes the stories the PR can actually
