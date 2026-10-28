@@ -113,18 +113,23 @@ export type MasonryGridProps<Item> = {
  *
  * The first render, before the first layout pass reports a width,
  * uses `minColumns`; the grid re-flows as soon as the width lands
- * and again whenever the container resizes. Within one column count,
- * items keep their identity through `keyExtractor` (or their
- * index). When the column COUNT changes, items redistribute across
- * the column stacks and React remounts the moved subtrees — the
- * deliberate trade of the column-stack layout: rendering stays a
- * single deterministic pass (stable story snapshots, no measuring
- * phase), at the cost of item-local state surviving a resize that
- * crosses a column breakpoint. Items are expected to be
+ * and again whenever the container resizes. Item identity is
+ * narrower than the props might suggest: an item's subtree survives
+ * a re-render only while its column assignment and key both stay
+ * put — true for a pure re-render and for appending items at the
+ * end, but inserting, deleting, or reordering items shifts the
+ * round-robin assignments, and a changed column count redistributes
+ * everything; moved items remount. Without `keyExtractor`, index
+ * keys can additionally hand one item's local state to a different
+ * item after a reorder, so hosts with mutable lists should pass
+ * one. This is the deliberate trade of the column-stack layout:
+ * rendering stays a single deterministic pass (stable story
+ * snapshots, no measuring phase), at the cost of item-local state
+ * surviving a redistribution. Items are expected to be
  * presentational (cards); hosts keep any state that must survive a
  * re-flow outside the rendered item. A measured, absolutely
- * positioned layout could preserve identity across breakpoints if a
- * stateful-item consumer ever appears.
+ * positioned layout could preserve identity across redistributions
+ * if a stateful-item consumer ever appears.
  *
  * Layout only — no data, fetching, or press handling lives here.
  * Item content arrives through `renderItem`; if an item navigates,
