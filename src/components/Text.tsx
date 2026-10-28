@@ -76,6 +76,18 @@ export function Text({
   accessibilityValue,
   ...rest
 }: TextProps) {
+  // Heading semantics (#256): the `heading` and `subheading`
+  // variants are page/section titles, so they carry the RN `header`
+  // role by default — on web the translator renders it as
+  // `role="heading"` with `aria-level` 1 (heading) / 2 (subheading),
+  // and on native the `header` role alone gives VoiceOver/TalkBack
+  // heading navigation, with visuals unchanged. A caller-supplied
+  // role (RN `accessibilityRole` or web `role` in rest) always wins;
+  // the level is only attached when the effective role is a heading.
+  const headingLevel = variant === "heading" ? 1 : variant === "subheading" ? 2 : undefined;
+  const callerRole = accessibilityRole ?? (rest as { role?: string }).role;
+  const roleIsHeading =
+    callerRole === undefined || callerRole === "header" || callerRole === "heading";
   const a11yProps = platformAccessibilityProps({
     accessible,
     accessibilityElementsHidden,
@@ -83,9 +95,10 @@ export function Text({
     accessibilityLabel,
     accessibilityLabelledBy,
     accessibilityLiveRegion,
-    accessibilityRole,
+    accessibilityRole: accessibilityRole ?? (headingLevel !== undefined ? "header" : undefined),
     accessibilityState,
     accessibilityValue,
+    "aria-level": headingLevel !== undefined && roleIsHeading ? headingLevel : undefined,
   });
   // The font family must cross as an instance prop carrying the
   // BARE font name ("body" / "verse", no "$"): on web, Tamagui only
