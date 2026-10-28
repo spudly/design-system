@@ -61,6 +61,8 @@ export function TextField({
   label,
   error,
   id: idProp,
+  secureTextEntry,
+  type,
   onSubmitEditing,
   onCompositionStart,
   onCompositionEnd,
@@ -89,6 +91,25 @@ export function TextField({
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
+  // `secureTextEntry` is a React Native prop; Tamagui's web Input
+  // destructures it out and discards it, so a password field rendered
+  // as a plain text input and showed the password as typed (#262,
+  // found on Eciperay web as spudly/eciperay#292). Translate it per
+  // platform, the same way the accessibility props above are
+  // translated: on web it becomes `type="password"` (a caller-supplied
+  // `type` wins) and the RN prop is not forwarded; on native
+  // `secureTextEntry` passes through unchanged and a caller-supplied
+  // `type` is forwarded alongside it — Tamagui's native Input
+  // translates `type="password"` to `secureTextEntry` when the RN
+  // prop itself is unset, so dropping `type` there would silently
+  // unmask a field the caller marked as a password field.
+  const secureProps = Object.fromEntries(
+    Object.entries(
+      isWeb
+        ? { type: type ?? (secureTextEntry ? "password" : undefined) }
+        : { secureTextEntry, type },
+    ).filter(([, value]) => value !== undefined),
+  ) as Pick<StyledInputProps, "type" | "secureTextEntry">;
 
   // IME composition guard (web): Tamagui's Input fires
   // `onSubmitEditing` from its Enter keydown handler without
@@ -148,6 +169,7 @@ export function TextField({
         aria-describedby={error ? errorId : undefined}
         {...a11yProps}
         {...rest}
+        {...secureProps}
         {...(onSubmitEditing ? { onSubmitEditing: handleSubmitEditing } : {})}
         {...(isWeb
           ? {
