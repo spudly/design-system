@@ -491,6 +491,29 @@ a changeset naming DropdownButton.
 
 ---
 
+## Text
+
+Open in `Components/Text`: AllVariants (or any page story, e.g.
+`Pages/Eciperay/SignInPage`).
+
+1. The `heading` variant ("Heading" in AllVariants; the page title
+   on a page story) is exposed as a heading at level 1: in the
+   rendered DOM / Storybook accessibility panel it carries
+   `role="heading"` and `aria-level="1"`, and there is no
+   `accessibilityrole` attribute.
+2. The `subheading` variant carries `role="heading"` with
+   `aria-level="2"`.
+3. The `body`, `hint`, `error`, and `verse` variants carry no
+   heading role and no `aria-level`.
+4. Visually nothing changes: heading/subheading keep their sizes
+   and weights, and all variants keep their theme fonts.
+
+**Run when:** `src/components/Text.tsx`, its stories, the
+accessibility translator (`src/components/accessibility.ts`), or a
+changeset naming Text or heading semantics.
+
+---
+
 ## Import pages (ImportTextPage, ImportUrlPage, ImportReviewPage)
 
 Open in `Pages/Eciperay/ImportTextPage`: Empty, WithError.
