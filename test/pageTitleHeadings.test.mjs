@@ -1,0 +1,228 @@
+/**
+ * Contract test for spudly/design-system#263: eight DS pages rendered
+ * their standalone page title with the `subheading` Text variant, so
+ * after #261 gave heading variants real web heading semantics their
+ * titles were exposed as level-2 headings and the pages had no
+ * level-1 heading at all — screen-reader users could not navigate to
+ * the page title as the page's top heading.
+ *
+ * The contract now:
+ * 1. Each of the eight pages (AddRecipeMenuPage, FeedbackPage,
+ *    MealDetailPage, MealPlanDetailPage, MealsHubPage, ProfilePage,
+ *    ShoppingListPage, TagsPage) renders its title with
+ *    `variant="heading"` (level 1 on web) — exactly once, so no page
+ *    gains a second level-1 heading — and no `subheading` usage
+ *    remains in those files (their only subheading was the title).
+ * 2. The title keeps its explicit `fontSize` xl / `fontWeight` bold
+ *    overrides, so the visual rendering is unchanged (the `heading`
+ *    variant's own defaults are 3xl/bold; the overrides pin xl/bold).
+ * 3. HomePage is the pinned exception that proves the sweep is
+ *    title-only: its page title was already `heading`, and its
+ *    section title correctly stays `subheading` (level 2).
+ * 4. Composition: MealsHubPage renders MealPlansPage inside its
+ *    plans tab, under the hub's own title — the one page-in-page
+ *    composition in the DS. MealPlansPage therefore takes a
+ *    `titleLevel` prop: standalone it defaults to level 1, and
+ *    MealsHubPage passes 2 for the nested render, so each hub tab
+ *    still exposes exactly one level-1 heading. The SSR tests below
+ *    count rendered headings per tab (a source-level count cannot
+ *    see the nested heading).
+ */
+import "./registerSvgStub.mjs";
+import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+function readCode(rel) {
+  return readFileSync(join(root, rel), "utf8")
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+}
+
+const TITLE_PAGES = [
+  "AddRecipeMenuPage",
+  "FeedbackPage",
+  "MealDetailPage",
+  "MealPlanDetailPage",
+  "MealsHubPage",
+  "ProfilePage",
+  "ShoppingListPage",
+  "TagsPage",
+];
+
+function countOccurrences(code, needle) {
+  return code.split(needle).length - 1;
+}
+
+test("page titles use the heading variant exactly once, with no subheading left (#263)", () => {
+  for (const page of TITLE_PAGES) {
+    const code = readCode(`src/pages/${page}.tsx`);
+    assert.equal(
+      countOccurrences(code, 'variant="heading"'),
+      1,
+      `${page} must render exactly one heading-variant Text (its title)`,
+    );
+    assert.equal(
+      countOccurrences(code, 'variant="subheading"'),
+      0,
+      `${page} must not keep a subheading usage — its only one was the page title`,
+    );
+  }
+});
+
+test("page titles keep their xl/bold overrides so rendering is unchanged (#263)", () => {
+  for (const page of TITLE_PAGES) {
+    const code = readCode(`src/pages/${page}.tsx`);
+    const variantAt = code.indexOf('variant="heading"');
+    const openAt = code.lastIndexOf("<Text", variantAt);
+    const closeAt = code.indexOf(">", variantAt);
+    const attrs = code.slice(openAt, closeAt);
+    assert.match(
+      attrs,
+      /fontSize=\{tokens\.typography\.fontSize\.xl\}/,
+      `${page} title must keep its fontSize xl override`,
+    );
+    assert.match(
+      attrs,
+      /fontWeight=\{tokens\.typography\.fontWeight\.bold\}/,
+      `${page} title must keep its fontWeight bold override`,
+    );
+  }
+});
+
+test("HomePage stays the exception: heading title, subheading section title (#263)", () => {
+  const code = readCode("src/pages/HomePage.tsx");
+  assert.equal(
+    countOccurrences(code, 'variant="heading"'),
+    1,
+    "HomePage must keep exactly one heading-variant Text (its page title)",
+  );
+  assert.ok(
+    countOccurrences(code, 'variant="subheading"') >= 1,
+    "HomePage's section title must stay subheading (a genuine level-2 usage)",
+  );
+});
+
+test("the MealsHub composition demotes the nested MealPlansPage title (#263)", () => {
+  const plansCode = readCode("src/pages/MealPlansPage.tsx");
+  assert.match(
+    plansCode,
+    /titleLevel\?:\s*1 \| 2/,
+    "MealPlansPage must accept an optional titleLevel prop",
+  );
+  assert.match(
+    plansCode,
+    /<Text variant="heading" aria-level=\{titleLevel\}>/,
+    "MealPlansPage's title must forward titleLevel as the heading level",
+  );
+  const hubCode = readCode("src/pages/MealsHubPage.tsx");
+  assert.match(
+    hubCode,
+    /<MealPlansPage[\s\S]*?titleLevel=\{2\}/,
+    "MealsHubPage must render its nested MealPlansPage with titleLevel 2",
+  );
+});
+
+// Runtime imports are lazy (inside the SSR tests) so the source-scan
+// tests above still run and report when the build output is missing
+// or broken, instead of the whole file failing at import time.
+let runtimePromise;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const reactModule = await import("react");
+    const React = reactModule.default;
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider } = await import("tamagui");
+    const dist = await import("../dist/index.js");
+    // The pages barrel is not Node-importable (some pages import
+    // react-native), so the two pages under test are loaded from
+    // their own modules — both are plain component compositions.
+    const { MealPlansPage } = await import("../dist/pages/MealPlansPage.js");
+    const { MealsHubPage } = await import("../dist/pages/MealsHubPage.js");
+    return { React, renderToString, TamaguiProvider, ...dist, MealPlansPage, MealsHubPage };
+  })();
+  return runtimePromise;
+}
+
+async function renderToHtml(element) {
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+    await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const html = renderToString(
+    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+  );
+  const styleEnd = html.lastIndexOf("</style>");
+  return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
+}
+
+// [{ level, text }] for every rendered heading, in document order.
+function renderedHeadings(html) {
+  const headings = [];
+  const pattern = /<[a-zA-Z][^>]*role="heading"[^>]*>([^<]*)/g;
+  let match;
+  while ((match = pattern.exec(html)) !== null) {
+    const tag = match[0].slice(0, match[0].indexOf(">") + 1);
+    const level = /aria-level="(\d)"/.exec(tag);
+    headings.push({ level: level ? Number(level[1]) : null, text: match[1].trim() });
+  }
+  return headings;
+}
+
+const noop = () => null;
+const hubPlan = { id: "plan-1", title: "Weeknight plan" };
+
+function hubProps(React, MealsHubPage, activeTab) {
+  return React.createElement(MealsHubPage, {
+    activeTab,
+    onSelectTab: noop,
+    meals: [],
+    plans: [hubPlan],
+    isLoading: false,
+    onCreateMeal: noop,
+    onCreatePlan: noop,
+    onMealPress: noop,
+    onPlanPress: noop,
+    onDeleteMeal: noop,
+    onDeletePlan: noop,
+  });
+}
+
+test("SSR: each MealsHubPage tab renders exactly one level-1 heading (#263)", async () => {
+  const { React, MealsHubPage } = await loadRuntime();
+  for (const tab of ["meals", "plans"]) {
+    const html = await renderToHtml(hubProps(React, MealsHubPage, tab));
+    const headings = renderedHeadings(html);
+    assert.deepEqual(
+      headings.filter((h) => h.level === 1).map((h) => h.text),
+      ["Meals"],
+      `${tab} tab must expose only the hub title as a level-1 heading`,
+    );
+  }
+  const plansHtml = await renderToHtml(hubProps(React, MealsHubPage, "plans"));
+  assert.deepEqual(
+    renderedHeadings(plansHtml).find((h) => h.text === "Meal plans"),
+    { level: 2, text: "Meal plans" },
+    "the nested MealPlansPage title must render at level 2 in the plans tab",
+  );
+});
+
+test("SSR: standalone MealPlansPage keeps its title at level 1 (#263)", async () => {
+  const { React, MealPlansPage } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(MealPlansPage, {
+      plans: [hubPlan],
+      isLoading: false,
+      onPlanPress: noop,
+      onCreatePlan: noop,
+    }),
+  );
+  assert.deepEqual(
+    renderedHeadings(html).find((h) => h.text === "Meal plans"),
+    { level: 1, text: "Meal plans" },
+    "the standalone MealPlansPage title must render at level 1",
+  );
+});
