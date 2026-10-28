@@ -354,6 +354,19 @@ test("SSR: TextLink, BackLink, OptionCard, and Alert render their roles (#237)",
   assert.ok(headingAlert.includes('role="heading"'));
   assert.ok(headingAlert.includes('aria-live="polite"'));
   assertNoLeak(headingAlert);
+  // A caller-supplied "alert" role must keep its implicit assertive
+  // announcement: the polite fallback must not downgrade it with an
+  // explicit aria-live="polite" (CodeRabbit finding on PR #241).
+  const callerAlertRole = await renderToHtml(
+    React.createElement(Alert, {
+      severity: "success",
+      message: "Saved",
+      accessibilityRole: "alert",
+    }),
+  );
+  assert.ok(callerAlertRole.includes('role="alert"'));
+  assert.ok(!callerAlertRole.includes('aria-live="polite"'));
+  assertNoLeak(callerAlertRole);
 });
 
 test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbit PR #243)", () => {
@@ -377,6 +390,11 @@ test("busy Cancel is keyboard-guarded and the Custom scale name carries the mult
   const aiSession = readCode("src/pages/AiSessionPage.tsx");
   assert.match(aiSession, /if \(busy\) return;/);
   assert.match(aiSession, /accessibilityState: \{ disabled: busy \}/);
+  // The press path shares the busy guard: an assistive-technology
+  // virtual click can reach onPress despite pointerEvents="none"
+  // (CodeRabbit finding on PR #241).
+  assert.match(aiSession, /onPress=\{handleCancel\}/);
+  assert.match(aiSession, /const handleCancel = \(\) => \{\s+if \(busy\) return;/);
   // The selected custom-scale chip shows the multiplier as its visible
   // text; the accessible name must include it.
   const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");

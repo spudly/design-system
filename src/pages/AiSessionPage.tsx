@@ -124,13 +124,18 @@ export function AiSessionPage({
   // Space invoke the same callback as a press. `tabIndex` and
   // `onKeyDown` are web-only props in Tamagui and are ignored on
   // native, where onPress is the activation path.
-  const handleCancelKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    // pointerEvents="none" blocks pointer activation while busy, but a
-    // focused control can still receive key events — guard explicitly.
+  // Both activation paths route through one busy-guarded callback:
+  // pointerEvents="none" blocks pointer input while busy, but a
+  // focused control can still receive key events and an assistive-
+  // technology virtual click can still reach onPress.
+  const handleCancel = () => {
     if (busy) return;
+    onCancel();
+  };
+  const handleCancelKeyDown = (event: { key: string; preventDefault: () => void }) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      onCancel();
+      handleCancel();
     }
   };
   if (!session) {
@@ -288,7 +293,7 @@ export function AiSessionPage({
           marginBottom={tokens.spacing[8]}
           opacity={busy ? 0.5 : 1}
           pointerEvents={busy ? "none" : "auto"}
-          onPress={onCancel}
+          onPress={handleCancel}
           {...platformAccessibilityProps({
             accessibilityRole: "button",
             accessibilityLabel: "Cancel session",

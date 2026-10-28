@@ -120,10 +120,14 @@ export function Alert({
     // would silently drop the live region native keeps via
     // accessibilityLiveRegion="polite". Restore it as an explicit
     // aria-live unless the caller supplied their own live value.
+    // Roles "status" and "alert" are excluded: they carry their own
+    // live semantics (polite / assertive), and an explicit polite
+    // value would downgrade an "alert" announcement.
     ...(isWeb &&
     !isAlert &&
     callerA11yProps.role !== undefined &&
     callerA11yProps.role !== "status" &&
+    callerA11yProps.role !== "alert" &&
     callerA11yProps["aria-live"] === undefined
       ? { "aria-live": "polite" as const }
       : {}),
