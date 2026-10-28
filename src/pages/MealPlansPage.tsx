@@ -1,5 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
@@ -129,7 +130,7 @@ function MealPlanRow({
       <YStack
         flex={1}
         minWidth={0}
-        accessibilityRole="button"
+        {...platformAccessibilityProps({ accessibilityRole: "button" })}
         onPress={onPress}
         tabIndex={0}
         onKeyDown={handleKeyDown}

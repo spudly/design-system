@@ -3,6 +3,7 @@ import { TouchableOpacity } from "react-native";
 import { Image, ScrollView, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -621,7 +622,7 @@ function ViewerRatingInput({
     <View
       pointerEvents={interactive ? "auto" : "none"}
       opacity={isPending ? 0.5 : undefined}
-      accessibilityState={{ disabled: isPending }}
+      {...platformAccessibilityProps({ accessibilityState: { disabled: isPending } })}
     >
       <StarRatingInput
         value={value ?? 0}
@@ -974,8 +975,10 @@ function IngredientsPanel({
                 borderColor={isCustomScaleSelected ? "$primary" : "$textMuted"}
                 backgroundColor={isCustomScaleSelected ? "$primary" : "$surface"}
                 onPress={startCustomScaleEdit}
-                accessibilityRole="button"
-                accessibilityLabel="Custom scale"
+                {...platformAccessibilityProps({
+                  accessibilityRole: "button",
+                  accessibilityLabel: "Custom scale",
+                })}
                 aria-pressed={isCustomScaleSelected}
               >
                 <Text

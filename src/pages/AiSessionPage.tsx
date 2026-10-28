@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { ScrollView } from "react-native";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
@@ -273,8 +274,10 @@ export function AiSessionPage({
           opacity={busy ? 0.5 : 1}
           pointerEvents={busy ? "none" : "auto"}
           onPress={onCancel}
-          accessibilityRole="button"
-          accessibilityLabel="Cancel session"
+          {...platformAccessibilityProps({
+            accessibilityRole: "button",
+            accessibilityLabel: "Cancel session",
+          })}
           cursor="web:pointer"
         >
           <Text

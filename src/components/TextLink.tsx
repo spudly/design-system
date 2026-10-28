@@ -2,6 +2,7 @@ import { Text as TamaguiText, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import type { ReactNode } from "react";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 
 const StyledTextLink = styled(TamaguiText, {
   name: "TextLink",
@@ -30,7 +31,31 @@ export type TextLinkProps = Omit<StyledTextLinkProps, "onPress"> & {
  * (legal links, "forgot password", inline references). Text styling can be
  * adjusted through the usual Tamagui text props.
  */
-export function TextLink({ onPress, children, ...rest }: TextLinkProps) {
+export function TextLink({
+  onPress,
+  children,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
+  ...rest
+}: TextLinkProps) {
+  const a11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole: accessibilityRole ?? "link",
+    accessibilityState,
+    accessibilityValue,
+  });
   // Web keyboard support: with no href, link semantics alone do not make
   // the text keyboard-operable, so it is made focusable and Enter (the link
   // activation key) invokes the same callback as a press. `tabIndex` and
@@ -45,7 +70,7 @@ export function TextLink({ onPress, children, ...rest }: TextLinkProps) {
   };
   return (
     <StyledTextLink
-      accessibilityRole="link"
+      {...a11yProps}
       onPress={onPress}
       tabIndex={0}
       onKeyDown={handleKeyDown}

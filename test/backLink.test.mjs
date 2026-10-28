@@ -84,8 +84,8 @@ test("the row centers the arrow against the label by construction", () => {
   assert.match(code, /minHeight=\{44\}/, "the press target keeps a 44px minimum height");
   assert.match(
     code,
-    /accessibilityRole="link"/,
-    "the back link exposes link semantics (an RN-supported role)",
+    /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/,
+    'the back link exposes link semantics (an RN-supported role), routed through the platform translator so web renders role="link" instead of a raw accessibilityrole attribute (#237)',
   );
 });
 

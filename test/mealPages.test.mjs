@@ -137,8 +137,8 @@ test("ShoppingListPage check-off is controlled per line with real checkbox seman
   assert.ok(page.includes("isChecked"), "each line carries its checked state in");
   assert.ok(page.includes("onToggleLine"), "toggles report out through onToggleLine");
   assert.ok(
-    page.includes('accessibilityRole="checkbox"'),
-    "rows carry checkbox semantics, not a text glyph",
+    page.includes('accessibilityRole: "checkbox"') && page.includes("platformAccessibilityProps"),
+    "rows carry checkbox semantics, not a text glyph — routed through the platform translator so web renders role/aria-checked/aria-label instead of raw RN attributes (#237)",
   );
   assert.ok(!page.includes("☑") && !page.includes("☐"), "the app's text glyphs must not cross");
   assert.ok(page.includes("quantityLabel"), "quantities cross pre-composed");

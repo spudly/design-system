@@ -1,5 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
@@ -237,9 +238,9 @@ function EntryRow({
       <YStack
         paddingVertical="$3"
         {...(isUnavailable
-          ? { accessibilityState: { disabled: true } }
+          ? platformAccessibilityProps({ accessibilityState: { disabled: true } })
           : {
-              accessibilityRole: "button",
+              ...platformAccessibilityProps({ accessibilityRole: "button" }),
               onPress: handlePress,
               tabIndex: 0,
               onKeyDown: handleKeyDown,

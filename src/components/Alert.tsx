@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { politeLiveRegionProps } from "./accessibility.js";
+import { platformAccessibilityProps, politeLiveRegionProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
@@ -89,7 +89,9 @@ export function Alert({
     <StyledAlert
       backgroundColor={styles.background}
       borderColor={styles.border}
-      {...(isAlert ? ({ accessibilityRole: "alert" } as const) : politeLiveRegionProps)}
+      {...(isAlert
+        ? platformAccessibilityProps({ accessibilityRole: "alert" })
+        : politeLiveRegionProps)}
       {...rest}
     >
       <XStack justifyContent="space-between" alignItems="flex-start" gap={tokens.spacing[2]}>
