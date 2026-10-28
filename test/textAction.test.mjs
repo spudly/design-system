@@ -102,16 +102,22 @@ test("CommentItem's four text actions render through TextAction", () => {
   assert.match(commentItem, /disabled=\{isDeletePending\}/, "Delete keeps its disabled state");
 });
 
-test("TagsPage's Delete row action renders through TextAction", () => {
+test("TagsPage's Edit and Delete row actions render through TextAction", () => {
   assert.match(tagsPage, /<TextAction/);
   assert.ok(
     tagsPage.includes("accessibilityLabel={`Delete tag") && tagsPage.includes("{tag.name}`}"),
     "the Delete row action must be a TextAction keeping its accessible label",
   );
   assert.ok(
-    tagsPage.includes(">\n              Delete\n            </TextAction>"),
-    "the TextAction's label is Delete",
+    tagsPage.includes("accessibilityLabel={`Edit tag"),
+    "the Edit row action (added by #228, merged before this fix landed) must be a TextAction keeping its accessible label",
   );
+  for (const label of ["Edit", "Delete"]) {
+    assert.ok(
+      new RegExp(String.raw`<TextAction[\s\S]*?>\s*${label}\s*</TextAction>`).test(tagsPage),
+      `TagsPage's ${label} action must render through TextAction`,
+    );
+  }
   assert.ok(
     !tagsPage.includes('accessibilityRole="button"'),
     "TagsPage must not keep a bare button-role text action (#229)",

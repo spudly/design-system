@@ -169,6 +169,22 @@ test("TagsPage takes its palette as a prop and renders DS Badges as colored tags
   assert.match(source, /ColorPickerField/);
 });
 
+test("TagsPage supports inline rename through a controlled edit draft (eciperay#254)", () => {
+  const source = page("TagsPage");
+  // The edit draft is controlled like the create form, in token names.
+  assert.match(source, /editingTagId\?: string \| null/);
+  assert.match(source, /editName\?: string/);
+  assert.match(source, /editColor\?: TagColorName/);
+  assert.match(source, /onStartEdit\?: \(tag: TagsPageTag\) => void/);
+  assert.match(source, /onEditNameChange\?: \(value: string\) => void/);
+  assert.match(source, /onEditColorChange\?: \(value: TagColorName\) => void/);
+  assert.match(source, /onSaveEdit\?: \(\) => void/);
+  assert.match(source, /onCancelEdit\?: \(\) => void/);
+  // The row offers an accessible Edit action and the editor a Save action.
+  assert.match(source, /accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/);
+  assert.match(source, /accessibilityLabel="Save"/);
+});
+
 test("FeedbackPage is fully controlled; validation crosses as a boolean", () => {
   const source = page("FeedbackPage");
   assert.match(source, /submitDisabled\?: boolean/);
