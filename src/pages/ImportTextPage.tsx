@@ -39,7 +39,12 @@ export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextP
         Import from text
       </Text>
       <Text variant="hint">Paste a recipe from Word, a web page, or any rich text source.</Text>
-      <TextAreaField value={text} onChangeText={setText} placeholder="Paste your recipe here…" />
+      <TextAreaField
+        value={text}
+        onChangeText={setText}
+        placeholder="Paste your recipe here…"
+        accessibilityLabel="Recipe text"
+      />
       {error ? (
         <YStack marginBottom="$4">
           <Text variant="error">{error}</Text>
