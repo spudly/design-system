@@ -183,8 +183,8 @@ Warm Harvest and `pages-memorize` under Quiet Dawn. Since
 2026-10-24 the set is **light themes only**: dark captures doubled
 the snapshot count (and the job's emulator time) without catching
 layout regressions the light set misses, so the dark baselines were
-deleted outright. With the current story set that is 79 + 21 =
-**100 baselines**. Curating hundreds of component screenshots was
+deleted outright. With the current story set that is 79 + 22 =
+**101 baselines**. Curating hundreds of component screenshots was
 more review surface than the Android check needs; component stories
 stay covered by Chromatic on web, and wrong-brand page captures are
 excluded because pages pin their brand. The rule lives in the
@@ -240,14 +240,14 @@ fails the test suite.
 | pages-eciperay-shoppinglistpage             | light_warmHarvest |       3 |         3 |
 | pages-eciperay-signinpage                   | light_warmHarvest |       2 |         2 |
 | pages-eciperay-signuppage                   | light_warmHarvest |       2 |         2 |
-| pages-eciperay-tagspage                     | light_warmHarvest |       2 |         2 |
+| pages-eciperay-tagspage                     | light_warmHarvest |       3 |         3 |
 | pages-memorize                              | light_quietDawn   |       4 |         4 |
 | pages-memorize-memorizationsessionpage      | light_quietDawn   |       5 |         5 |
 | pages-memorize-memorizereviewpage           | light_quietDawn   |       2 |         2 |
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       5 |         5 |
-| **Total**                                   |                   | **107** |   **107** |
+| **Total**                                   |                   | **108** |   **108** |
 
 <!-- VR-COVERAGE-END -->
 
@@ -289,7 +289,7 @@ The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
 7 `pages-eciperay-recipespage` stories x light = **7
-baselines** (107 total). RecipesPage only, deliberately — a second
+baselines** (108 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
@@ -487,7 +487,7 @@ capture entirely. (Local development still uses Metro via
 
 ### Scoped PR runs: capture only the affected stories (issue #114)
 
-Even path-filtered, a full run captures all 107 baselines (100
+Even path-filtered, a full run captures all 108 baselines (101
 standard + 7 narrow) — a 20–30 minute emulator job gating every
 PR, including one-line component fixes. Since issue #114, a PR
 compare run first computes the stories the PR can actually
@@ -519,7 +519,7 @@ affect and captures only those:
   baselines.
 
 **Full-run fallback — never silently reduce coverage.** The
-decision is the full 107 whenever any changed file is:
+decision is the full 108 whenever any changed file is:
 
 - design tokens (`src/tokens/**`), themes (`src/themes/**`), or
   the Tamagui config (`src/tamagui.config.ts`) — they feed every
