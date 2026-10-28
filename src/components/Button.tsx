@@ -1,7 +1,7 @@
-import { Children } from "react";
+import { Children, forwardRef } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Button as TamaguiButton, styled, useTheme } from "tamagui";
-import type { GetProps } from "tamagui";
+import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { IconComponentProps } from "../icons/Icon.js";
 import { platformAccessibilityProps } from "./accessibility.js";
@@ -229,24 +229,27 @@ function useGlyphInk(variant: string | undefined): string {
  * they pass through unchanged. A caller-passed ARIA prop in `rest`
  * still wins over the translated one.
  */
-export function Button({
-  disabled = false,
-  variant = "primary",
-  size = "md",
-  icon: IconGlyph,
-  children,
-  color,
-  accessible,
-  accessibilityElementsHidden,
-  accessibilityHint,
-  accessibilityLabel,
-  accessibilityLabelledBy,
-  accessibilityLiveRegion,
-  accessibilityRole,
-  accessibilityState,
-  accessibilityValue,
-  ...rest
-}: ButtonProps) {
+export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
+  {
+    disabled = false,
+    variant = "primary",
+    size = "md",
+    icon: IconGlyph,
+    children,
+    color,
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole,
+    accessibilityState,
+    accessibilityValue,
+    ...rest
+  }: ButtonProps,
+  ref,
+) {
   // `variant`'s prop type also admits Tamagui Button's built-in variant
   // names; only the four design-system variants have a mapped label color.
   const labelColor = color ?? variantLabelColors[variant as keyof typeof variantLabelColors];
@@ -273,6 +276,7 @@ export function Button({
   const iconOnlyBox = iconOnlyBoxes[size as keyof typeof iconOnlyBoxes] ?? iconOnlyBoxes.md;
   return (
     <StyledButton
+      ref={ref}
       {...a11yProps}
       disabled={disabled}
       variant={variant}
@@ -312,4 +316,4 @@ export function Button({
       {children}
     </StyledButton>
   );
-}
+});

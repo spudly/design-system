@@ -83,9 +83,16 @@ function sourceFiles(dir) {
 /** DS primitives that translate caller RN props themselves (#235/#237),
  * plus RN elements react-native-web translates on web. */
 // Compact split form: this file sits at the test max-lines cap
-// (300), so the tag list cannot grow one-per-line.
+// (300), so the tag list cannot grow one-per-line. Dropdown and
+// DropdownButton (#178) are sanctioned on the same ground as the
+// primitives: Dropdown routes its panel label through
+// platformAccessibilityProps onto the Popover content, and
+// DropdownButton forwards its label to the DS Button — both
+// translate caller RN props themselves.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image".split(","),
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton".split(
+    ",",
+  ),
 );
 
 test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in src/ (#237)", () => {
@@ -384,16 +391,19 @@ test("SSR: TextLink, BackLink, OptionCard, and Alert render their roles (#237)",
   assertNoLeak(directAlertRole);
 });
 
+// Shared by the two #237 page-pattern tests below (hoisted so each
+// page source is read once).
+const aiSession = readCode("src/pages/AiSessionPage.tsx");
+const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
+
 test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbit PR #243)", () => {
   // A Tamagui stack carrying role="button" is a div: without
   // tabIndex + an Enter/Space handler it announces as a button that
   // the keyboard cannot reach. The MealPlansPage rows set the
   // pattern; the AiSessionPage Cancel control and the
   // RecipeDetailPage Custom scale chip must follow it.
-  const aiSession = readCode("src/pages/AiSessionPage.tsx");
   assert.match(aiSession, /onKeyDown=\{handleCancelKeyDown\}/);
   assert.match(aiSession, /tabIndex=\{0\}/);
-  const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
   assert.match(recipeDetail, /onKeyDown=\{handleCustomScaleKeyDown\}/);
   assert.match(recipeDetail, /tabIndex=\{0\}/);
 });
@@ -402,7 +412,6 @@ test("busy Cancel is keyboard-guarded and the Custom scale name carries the mult
   // pointerEvents="none" does not stop key events on a focused
   // control, so the Cancel handler must refuse activation while busy
   // and the control must expose its disabled state.
-  const aiSession = readCode("src/pages/AiSessionPage.tsx");
   assert.match(aiSession, /if \(busy\) return;/);
   assert.match(aiSession, /accessibilityState: \{ disabled: busy \}/);
   // The press path shares the busy guard: an assistive-technology
@@ -412,6 +421,5 @@ test("busy Cancel is keyboard-guarded and the Custom scale name carries the mult
   assert.match(aiSession, /const handleCancel = \(\) => \{\s+if \(busy\) return;/);
   // The selected custom-scale chip shows the multiplier as its visible
   // text; the accessible name must include it.
-  const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
   assert.match(recipeDetail, /`Custom scale \$\{formatScaleValue\(view\.scaleValue\)\}×`/);
 });

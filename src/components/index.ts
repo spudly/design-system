@@ -22,6 +22,14 @@ export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { RatingForm, type RatingFormProps, type RatingFormValues } from "./RatingForm.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
 export { Divider, type DividerProps } from "./Divider.js";
+export {
+  Dropdown,
+  useDropdownClose,
+  type DropdownAlign,
+  type DropdownProps,
+  type DropdownSide,
+} from "./Dropdown.js";
+export { DropdownButton, type DropdownButtonProps } from "./DropdownButton.js";
 export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export {
   FixedActionBanner,
