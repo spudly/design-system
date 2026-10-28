@@ -433,3 +433,28 @@ button. The icon-slot stories:
 
 **Run when:** `src/components/Button.tsx`, its stories, or a
 changeset naming Button or the Button icon slot.
+
+---
+
+## Import pages (ImportTextPage, ImportUrlPage, ImportReviewPage)
+
+Open in `Pages/Eciperay/ImportTextPage`: Empty, WithError.
+Open in `Pages/Eciperay/ImportUrlPage`: Filled.
+ImportReviewPage has no image story — its image case is verified
+from the changeset/PR description against a host render.
+
+1. ImportTextPage: the paste field is findable by the accessible
+   name "Recipe text" (Storybook accessibility panel or DOM
+   `aria-label`), not only by its "Paste your recipe here…"
+   placeholder. The Import button stays disabled on blank text.
+2. ImportUrlPage (Filled): pressing Enter in the URL field
+   submits the import, exactly like pressing the Import button;
+   with a blank URL or while loading, Enter does nothing.
+3. ImportReviewPage: a render that passes `imageAlt` (hosts pass
+   the recipe title) exposes that text as the hero image's
+   accessible name — `alt` on web, accessibility label on
+   native; a render without an image shows no image at all.
+
+**Run when:** `src/pages/ImportTextPage.tsx`,
+`src/pages/ImportUrlPage.tsx`, `src/pages/ImportReviewPage.tsx`,
+their stories, or a changeset naming the import pages.

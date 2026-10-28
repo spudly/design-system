@@ -26,6 +26,14 @@ import { Text } from "../components/Text.js";
 export type ImportReviewPageProps = {
   versionLabel: string;
   imageUrl?: string | null;
+  /**
+   * Accessible name for the hero image (hosts pass the recipe
+   * title, as the retired web view's alt text did). Applied as
+   * the image's `accessibilityLabel` — react-native-web renders
+   * it as the image's `alt` text on web; omit it only for a
+   * purely decorative image.
+   */
+  imageAlt?: string;
   /** The host-rendered recipe preview (app RecipeInputPreview). */
   preview: ReactNode;
   error?: string | null;
@@ -39,6 +47,7 @@ export type ImportReviewPageProps = {
 export function ImportReviewPage({
   versionLabel,
   imageUrl,
+  imageAlt,
   preview,
   error,
   busy,
@@ -59,6 +68,7 @@ export function ImportReviewPage({
       {imageUrl ? (
         <Image
           source={{ uri: imageUrl }}
+          accessibilityLabel={imageAlt}
           style={{
             marginBottom: tokens.spacing[4],
             borderRadius: tokens.radii.lg,
