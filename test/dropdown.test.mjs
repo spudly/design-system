@@ -102,12 +102,28 @@ test("anchoring is the semantic side/align subset composed into the Popover plac
   assert.match(dropdown, /export type DropdownAlign = "start" \| "end"/);
   assert.match(dropdown, /placement=\{`\$\{side\}-\$\{align\}`\}/);
   assert.match(dropdown, /allowFlip/);
-  assert.match(dropdown, /<Popover\.Anchor>\{trigger\}<\/Popover\.Anchor>/);
   assert.doesNotMatch(
     dropdown,
     /bottom-start|top-end/,
     "raw Popper placement strings must not leak",
   );
+});
+
+test("the trigger is composed through Popover.Trigger so the primitive registers it (focus return), with its own press toggle disabled", () => {
+  // An Anchor-only shell never registers a trigger with the Popover,
+  // so the primitive's close-focus-restoration has no element to
+  // return focus to. The Trigger composition registers it; the
+  // primitive's press toggle is disabled because toggling belongs to
+  // the trigger itself (DropdownButton, through the Dropdown
+  // context) — both firing would double-toggle.
+  assert.match(dropdown, /<Popover\.Trigger asChild disablePressTrigger>/);
+  assert.doesNotMatch(dropdown, /<Popover\.Anchor>/);
+  // DropdownButton forwards the injected activation props + ref to
+  // the Button it renders, so registration reaches the real button.
+  assert.match(dropdownButton, /type DropdownButtonTriggerProps = \{/);
+  assert.match(dropdownButton, /ref=\{ref\}/);
+  assert.match(dropdownButton, /onPressIn=\{onPressIn\}/);
+  assert.match(dropdownButton, /onFocus=\{onFocus\}/);
 });
 
 test("close-on-select is the context affordance (the spec's ExitContext descendant)", () => {
@@ -146,7 +162,10 @@ test("DropdownButton wires haspopup + expanded state and toggles through the Dro
   assert.match(dropdownButton, /useDropdownContext\(\)/);
   assert.match(dropdownButton, /const open = context\?\.open \?\? false/);
   assert.match(dropdownButton, /accessibilityState=\{\{ expanded: open \}\}/);
-  assert.match(dropdownButton, /aria-haspopup="true"/);
+  // "dialog", not "true" (which ARIA reads as "menu"): the value
+  // names the popup's role, and the Popover panel's role is dialog —
+  // the same value Tamagui's floating layer computes for a trigger.
+  assert.match(dropdownButton, /aria-haspopup="dialog"/);
   assert.match(dropdownButton, /context\?\.toggle\(\)/);
   // The raw accessibility props above land ONLY on the DS Button —
   // the sanctioned caller API, since Button translates them (#235).
@@ -214,7 +233,7 @@ test("SSR: a closed dropdown renders its trigger collapsed and no panel content"
     ),
   );
   assert.ok(html.includes("Recipe actions"), "the trigger label must render");
-  assert.ok(html.includes('aria-haspopup="true"'), "the trigger must carry aria-haspopup");
+  assert.ok(html.includes('aria-haspopup="dialog"'), "the trigger must carry aria-haspopup");
   assert.ok(html.includes('aria-expanded="false"'), "the trigger must report its collapsed state");
   assert.ok(!html.includes("PANEL CONTENT"), "a closed dropdown must not render its panel content");
   assert.ok(!html.includes("accessibilitylabel"), "no raw RN accessibility attributes may leak");

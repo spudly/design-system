@@ -1,7 +1,7 @@
 import { Children } from "react";
-import type { ComponentType, ReactNode } from "react";
+import type { ComponentType, ReactNode, Ref } from "react";
 import { Button as TamaguiButton, styled, useTheme } from "tamagui";
-import type { GetProps } from "tamagui";
+import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { IconComponentProps } from "../icons/Icon.js";
 import { platformAccessibilityProps } from "./accessibility.js";
@@ -90,6 +90,13 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
  * icon slot takes an icon COMPONENT instead, declared here).
  */
 type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon"> & {
+  /**
+   * The rendered button element's ref, forwarded to the styled
+   * Tamagui Button. Composed primitives that must know the button's
+   * element (a Popover-family shell returning focus to its trigger,
+   * via DropdownButton) inject it; callers may also pass their own.
+   */
+  ref?: Ref<TamaguiElement> | undefined;
   disabled?: boolean;
   /**
    * The icon slot: one of the design system's semantic icon
@@ -230,6 +237,7 @@ function useGlyphInk(variant: string | undefined): string {
  * still wins over the translated one.
  */
 export function Button({
+  ref,
   disabled = false,
   variant = "primary",
   size = "md",
@@ -273,6 +281,7 @@ export function Button({
   const iconOnlyBox = iconOnlyBoxes[size as keyof typeof iconOnlyBoxes] ?? iconOnlyBoxes.md;
   return (
     <StyledButton
+      {...(ref ? { ref } : null)}
       {...a11yProps}
       disabled={disabled}
       variant={variant}

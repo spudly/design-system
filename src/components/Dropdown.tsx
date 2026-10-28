@@ -60,7 +60,13 @@ export type DropdownProps = {
    * props-described and DS-rendered (design-system#178, decisions 1–2)
    * and wires itself to this shell through context: it reads the open
    * state for its chevron and expanded state, and its press toggles
-   * the menu. The shell anchors the panel to whatever renders here.
+   * the menu. The shell composes the trigger through the Popover's
+   * own Trigger (asChild, the primitive's press toggle disabled —
+   * toggling stays with the trigger itself) so the primitive
+   * registers the element: when the panel closes, focus returns to
+   * it. The trigger must be a single element that forwards the
+   * injected activation props to its focusable element, the way
+   * `DropdownButton` does.
    */
   trigger: ReactNode;
   /**
@@ -98,8 +104,8 @@ export type DropdownProps = {
  * shuoink/ui Dropdown as spec, redirected by Stephen to a shell with
  * a single children slot — no items view-model): the shell owns
  * anchoring/positioning, open/close state, outside-press and Escape
- * dismissal, and the close affordance its content rows use to close
- * on activation. What goes inside the panel is entirely the caller's
+ * dismissal, focus return to the trigger on close, and the close
+ * affordance its content rows use to close on activation. What goes inside the panel is entirely the caller's
  * composition — most often a DS page component composing DS rows.
  *
  * Built on Tamagui's Popover primitive (the floating layer
@@ -150,7 +156,9 @@ export function Dropdown({
         allowFlip
         stayInFrame={{ padding: tokens.spacing[2] }}
       >
-        <Popover.Anchor>{trigger}</Popover.Anchor>
+        <Popover.Trigger asChild disablePressTrigger>
+          {trigger}
+        </Popover.Trigger>
         <StyledContent {...platformAccessibilityProps({ accessibilityLabel })}>
           {children}
         </StyledContent>

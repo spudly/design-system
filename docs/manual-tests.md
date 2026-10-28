@@ -445,7 +445,9 @@ AlignEnd, SideTop, InitiallyOpen, Controlled.
    under the button (surface fill, bordered, shadowed), the
    trigger's chevron flips up while open, and pressing the trigger
    again closes it. Pressing outside the panel, or pressing Escape
-   on web, also closes it.
+   on web, also closes it — and on web, closing with Escape returns
+   focus to the trigger button (keep tabbing from where the menu
+   was opened, not from the top of the page).
 2. ActionMenu rows: choosing "Print recipe" closes the menu and the
    line under it reads "Last action: Print recipe" (close-on-select);
    "Delete recipe" renders in the danger color. Rows are at least
