@@ -52,6 +52,15 @@ export function SignUpPage({
   onSignInPress,
   legalNotice,
 }: SignUpPageProps) {
+  // Enter/return in a field submits (#255), mirroring the
+  // native-form behavior the retired web views had; while
+  // loading the submit button is disabled, so field
+  // submission is held the same way.
+  const submitFromField = () => {
+    if (!loading) {
+      onSubmit();
+    }
+  };
   return (
     <ScreenContainer scrollable={false} variant="auth">
       <Text variant="heading" marginBottom="$8">
@@ -62,6 +71,7 @@ export function SignUpPage({
         value={displayName}
         onChangeText={onDisplayNameChange}
         accessibilityLabel="Your name"
+        onSubmitEditing={submitFromField}
       />
       <TextField
         label="Email"
@@ -71,6 +81,7 @@ export function SignUpPage({
         autoCapitalize="none"
         keyboardType="email-address"
         accessibilityLabel="Email"
+        onSubmitEditing={submitFromField}
       />
       <TextField
         label="Password"
@@ -79,6 +90,8 @@ export function SignUpPage({
         autoComplete="password-new"
         secureTextEntry
         accessibilityLabel="Password"
+        onSubmitEditing={submitFromField}
+        returnKeyType="go"
       />
       {error ? <Text variant="error">{error}</Text> : null}
       <Button
