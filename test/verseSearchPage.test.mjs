@@ -188,6 +188,19 @@ test("result rows mirror the app card and the add action reports the verse id", 
   );
 });
 
+test("an added result renders the disabled Added confirmation, not the Add button (#242)", () => {
+  assert.match(
+    code,
+    /added\?: boolean;/,
+    "VerseSearchPageItem must carry the optional added flag (#242)",
+  );
+  assert.match(
+    code,
+    /\{item\.added \? \(\s*<Button size="sm" variant="secondary" disabled>\s*Added\s*<\/Button>/,
+    'an added result must render the disabled secondary "Added" button (mirroring the memorize web fix)',
+  );
+});
+
 test("no render slot: no ReactNode prop, no accessory", () => {
   for (const banned of ["ReactNode", "Accessory", "slot"]) {
     assert.ok(
@@ -197,8 +210,15 @@ test("no render slot: no ReactNode prop, no accessory", () => {
   }
 });
 
-test("stories render the real component in its five states, in Quiet Dawn", () => {
-  for (const story of ["Default", "DemoMode", "Searching", "Error", "NoResults"]) {
+test("stories render the real component in its six states, in Quiet Dawn", () => {
+  for (const story of [
+    "Default",
+    "DemoMode",
+    "Searching",
+    "Error",
+    "NoResults",
+    "WithAddedResult",
+  ]) {
     assert.ok(
       new RegExp(String.raw`export const ${story}\b`).test(stories),
       `VerseSearchPage.stories.tsx must export a ${story} story`,

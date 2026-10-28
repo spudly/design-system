@@ -183,8 +183,8 @@ Warm Harvest and `pages-memorize` under Quiet Dawn. Since
 2026-10-24 the set is **light themes only**: dark captures doubled
 the snapshot count (and the job's emulator time) without catching
 layout regressions the light set misses, so the dark baselines were
-deleted outright. With the current story set that is 79 + 22 =
-**101 baselines**. Curating hundreds of component screenshots was
+deleted outright. With the current story set that is 79 + 23 =
+**102 baselines**. Curating hundreds of component screenshots was
 more review surface than the Android check needs; component stories
 stay covered by Chromatic on web, and wrong-brand page captures are
 excluded because pages pin their brand. The rule lives in the
@@ -245,8 +245,8 @@ fails the test suite.
 | pages-memorize-memorizereviewpage           | light_quietDawn   |       2 |         2 |
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
-| pages-memorize-versesearchpage              | light_quietDawn   |       5 |         5 |
-| **Total**                                   |                   | **110** |   **110** |
+| pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
+| **Total**                                   |                   | **111** |   **111** |
 
 <!-- VR-COVERAGE-END -->
 
@@ -486,7 +486,7 @@ capture entirely. (Local development still uses Metro via
 
 ### Scoped PR runs: capture only the affected stories (issue #114)
 
-Even path-filtered, a full run captures all 110 baselines (99
+Even path-filtered, a full run captures all 111 baselines (100
 standard + 11 narrow) — a 20–30 minute emulator job gating every
 PR, including one-line component fixes. Since issue #114, a PR
 compare run first computes the stories the PR can actually

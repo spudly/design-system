@@ -82,6 +82,28 @@ export const Default: Story = {
   ),
 };
 
+export const WithAddedResult: Story = {
+  // #242: a result already in the memorize list renders the
+  // disabled "Added" confirmation instead of the Add button;
+  // the other results keep the active button.
+  render: () => (
+    <Viewport>
+      <VerseSearchPage
+        query="charity"
+        onQueryChange={() => undefined}
+        onSearch={() => undefined}
+        isSearching={false}
+        usingDemo={false}
+        errorMessage={null}
+        results={charityResults.map((verse, index) =>
+          index === 0 ? { ...verse, added: true } : verse,
+        )}
+        onAddVerse={() => undefined}
+      />
+    </Viewport>
+  ),
+};
+
 export const DemoMode: Story = {
   // No API key in the app: the demo-set notice renders above the
   // search row, and the screen waits for a first search.
