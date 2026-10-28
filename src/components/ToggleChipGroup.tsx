@@ -26,12 +26,12 @@ const StyledChip = styled(XStack, {
   } as const,
 });
 
-export interface ToggleChipOption {
+export type ToggleChipOption = {
   value: string;
   label: string;
-}
+};
 
-export interface ToggleChipGroupProps {
+export type ToggleChipGroupProps = {
   options: ToggleChipOption[];
   mode: "single" | "multiple";
   /** Selected value in `single` mode. */
@@ -55,7 +55,7 @@ export interface ToggleChipGroupProps {
    * control's height and push the content below it around (#73).
    */
   wrap?: boolean;
-}
+};
 
 /**
  * Pill-button chips for single- or multi-select (e.g. recipe tag pickers).

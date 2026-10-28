@@ -103,13 +103,13 @@ const listStyle = { flex: 1 } as const;
 
 /** One search result's view-model: the verse's id, its reference
  * line, and its full text, as the app's data source returns them. */
-export interface VerseSearchPageItem {
+export type VerseSearchPageItem = {
   id: string;
   reference: string;
   text: string;
-}
+};
 
-export interface VerseSearchPageProps {
+export type VerseSearchPageProps = {
   /** The query text, held by the app (it runs the search). */
   query: string;
   onQueryChange: (value: string) => void;
@@ -131,7 +131,7 @@ export interface VerseSearchPageProps {
   results: VerseSearchPageItem[];
   /** Row action: add this verse to the app's memorize list. */
   onAddVerse: (verseId: string) => void;
-}
+};
 
 function VerseResultRow({
   item,

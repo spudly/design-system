@@ -3,7 +3,7 @@ import { Button } from "./Button.js";
 import { SearchField } from "./SearchField.js";
 import { Text } from "./Text.js";
 
-export interface BulkSelectToolbarProps {
+export type BulkSelectToolbarProps = {
   search: string;
   onSearchChange: (text: string) => void;
   searchPlaceholder?: string;
@@ -17,7 +17,7 @@ export interface BulkSelectToolbarProps {
   onClearSelection: () => void;
   selectAllLabel?: string;
   clearSelectionLabel?: string;
-}
+};
 
 /**
  * Toolbar for bulk-selection lists: a search field over a wrapping row of

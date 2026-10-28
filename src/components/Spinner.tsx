@@ -3,9 +3,9 @@ import type { GetProps } from "tamagui";
 
 type TamaguiSpinnerProps = GetProps<typeof TamaguiSpinner>;
 
-export interface SpinnerProps extends TamaguiSpinnerProps {
+export type SpinnerProps = TamaguiSpinnerProps & {
   label?: string;
-}
+};
 
 /**
  * Loading indicator in the brand primary color. Provide `label` (e.g.

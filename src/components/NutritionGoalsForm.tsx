@@ -20,21 +20,21 @@ import { TextField } from "./TextField.js";
  * validates nothing — the host owns the save.
  */
 
-export interface NutritionGoalsValues {
+export type NutritionGoalsValues = {
   calories: number | null;
   proteinG: number | null;
   carbsG: number | null;
   fatG: number | null;
   satietyScore: number | null;
-}
+};
 
-export interface NutritionGoalsFormProps {
+export type NutritionGoalsFormProps = {
   goals: NutritionGoalsValues;
   onChange: (goals: NutritionGoalsValues) => void;
   saving?: boolean;
   error?: string | null;
   onSave: () => void;
-}
+};
 
 function parseOptionalNumber(value: string): number | null {
   const trimmed = value.trim();

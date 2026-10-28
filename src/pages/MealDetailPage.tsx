@@ -35,7 +35,7 @@ import { Text } from "../components/Text.js";
  * unreadable on a dark theme's card surface.
  */
 
-export interface MealDetailPageMember {
+export type MealDetailPageMember = {
   recipeId: string;
   title: string;
   /** Pre-composed meta line ("6 servings · 640 cal · 42g
@@ -45,9 +45,9 @@ export interface MealDetailPageMember {
   /** Access to this recipe was lost: the title gains its
    * "(unavailable)" suffix and the row does not press. */
   isUnavailable?: boolean;
-}
+};
 
-export interface MealDetailPageProps {
+export type MealDetailPageProps = {
   title: string;
   /** The meal's notes; omit or pass null to hide the line. */
   notes?: string | null;
@@ -58,7 +58,7 @@ export interface MealDetailPageProps {
   onCook: () => void;
   onEdit: () => void;
   onRecipePress: (recipeId: string) => void;
-}
+};
 
 function MemberRow({
   member,

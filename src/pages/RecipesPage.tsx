@@ -128,7 +128,7 @@ const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 
 /** One recipe row's view-model. The app formats `subtitle` (its list
  * meta line — servings · time · rating/satiety); the view only
  * renders it. */
-export interface RecipesPageItem {
+export type RecipesPageItem = {
   id: string;
   title: string;
   subtitle?: string;
@@ -141,7 +141,7 @@ export interface RecipesPageItem {
    * that passes `rating` keeps the rating text out of `subtitle`. */
   rating?: number | null;
   imageUrl?: string | null;
-}
+};
 
 // The filter option sets the app's filter bar hardcodes, moved with
 // the bar. Values stay plain strings so no app type leaks into the
@@ -188,7 +188,7 @@ const ALL_FILTER_IDS: RecipesPageFilterId[] = [
   "sort",
 ];
 
-export interface RecipesPageProps {
+export type RecipesPageProps = {
   /** Recipes to render, already filtered/sorted by the app. */
   recipes: RecipesPageItem[];
   /** First-load in flight: the list renders empty with a spinner as
@@ -251,7 +251,7 @@ export interface RecipesPageProps {
    * like `activeFilters`; uncontrolled when omitted. */
   filterChooserOpen?: boolean;
   onFilterChooserOpenChange?: (open: boolean) => void;
-}
+};
 
 type FilterControlsProps = Pick<
   RecipesPageProps,

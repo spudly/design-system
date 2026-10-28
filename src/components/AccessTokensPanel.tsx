@@ -32,7 +32,7 @@ import { TokenRow } from "./TokenRow.js";
  * made here.
  */
 
-export interface AccessTokensPanelToken {
+export type AccessTokensPanelToken = {
   id: string;
   name: string;
   /** The token's non-secret prefix (rendered mono, with an ellipsis). */
@@ -40,9 +40,9 @@ export interface AccessTokensPanelToken {
   /** Pre-formatted meta line ("Created Jan 2, 2026 · Last used …"). */
   metaLabel: string;
   revoked?: boolean;
-}
+};
 
-export interface AccessTokensPanelProps {
+export type AccessTokensPanelProps = {
   tokens: AccessTokensPanelToken[];
   isLoading?: boolean;
   tokenName: string;
@@ -60,7 +60,7 @@ export interface AccessTokensPanelProps {
    * actions stay available. Null/absent shows the form.
    */
   planNotice?: string | null;
-}
+};
 
 export function AccessTokensPanel({
   tokens: accessTokens,

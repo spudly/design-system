@@ -163,7 +163,7 @@ function buildTamaguiThemes(theme: { semantic: SemanticColors; tagColors?: TagCo
 }
 
 /** The font-family shape a brand theme contributes (all fields but `sans` optional). */
-interface BrandFontFamily {
+type BrandFontFamily = {
   /** Web family: a full CSS fallback stack. */
   sans: string;
   /** iOS family: a SINGLE font name (a CSS list is invalid there). */
@@ -178,7 +178,7 @@ interface BrandFontFamily {
   verseNative?: string | undefined;
   /** Verse Android family: a SINGLE font name. */
   verseNativeAndroid?: string | undefined;
-}
+};
 
 /** Platforms whose font resolution differs. */
 export type FontPlatform = "web" | "ios" | "android";
@@ -187,10 +187,10 @@ export type FontPlatform = "web" | "ios" | "android";
 const fontPlatform: FontPlatform = isWeb ? "web" : isAndroid ? "android" : "ios";
 
 /** A resolved font registration: the family plus optional per-weight faces. */
-export interface ResolvedFont {
+export type ResolvedFont = {
   family: string;
   face?: Record<string, { normal: string }> | undefined;
-}
+};
 
 /**
  * Resolve the registration for one brand on one platform. Web takes the

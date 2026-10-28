@@ -20,12 +20,12 @@ const Fallback = styled(YStack, {
 
 type StyledImageProps = GetProps<typeof StyledImage>;
 
-export interface AvatarProps extends Omit<StyledImageProps, "source"> {
+export type AvatarProps = Omit<StyledImageProps, "source"> & {
   src?: string;
   /** Full name; used for the accessibility label and the initials fallback. */
   name: string;
   size?: number;
-}
+};
 
 function initialsFor(name: string): string {
   const words = name.trim().split(/\s+/).filter(Boolean);

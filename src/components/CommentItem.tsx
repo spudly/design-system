@@ -4,7 +4,7 @@ import { TextAreaField } from "./TextAreaField.js";
 import { Text } from "./Text.js";
 import { TextAction } from "./TextAction.js";
 
-export interface CommentItemProps {
+export type CommentItemProps = {
   authorName: string;
   body: string;
   /** The comment was written against an older version of the content. */
@@ -24,7 +24,7 @@ export interface CommentItemProps {
   onCancelEdit?: () => void;
   onSaveEdit?: () => void;
   onDelete?: () => void;
-}
+};
 
 /**
  * One comment in a thread: author line (with a stale marker when the

@@ -2,14 +2,14 @@ import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 
-export interface PrevNextNavProps {
+export type PrevNextNavProps = {
   onBack?: () => void;
   onNext?: () => void;
   backLabel?: string;
   nextLabel?: string;
   backDisabled?: boolean;
   nextDisabled?: boolean;
-}
+};
 
 /**
  * Back/next step navigation row for wizards, cooking mode, and multi-step

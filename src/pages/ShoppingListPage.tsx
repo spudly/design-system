@@ -41,7 +41,7 @@ import { Text } from "../components/Text.js";
  * app's message.
  */
 
-export interface ShoppingListPageLine {
+export type ShoppingListPageLine = {
   key: string;
   name: string;
   /** Pre-composed quantity ("2 lb"); omit or pass null when
@@ -49,13 +49,13 @@ export interface ShoppingListPageLine {
   quantityLabel?: string | null;
   isOptional?: boolean;
   isChecked: boolean;
-}
+};
 
-export interface ShoppingListPageProps {
+export type ShoppingListPageProps = {
   lines: ShoppingListPageLine[];
   isLoading?: boolean;
   onToggleLine: (key: string) => void;
-}
+};
 
 function ShoppingListRow({ line, onToggle }: { line: ShoppingListPageLine; onToggle: () => void }) {
   // Web keyboard support (the MealPlansPage row pattern): a

@@ -24,7 +24,7 @@ import { TextLink } from "../components/TextLink.js";
  * position the app view renders it.
  */
 
-export interface SignUpPageProps {
+export type SignUpPageProps = {
   displayName: string;
   email: string;
   password: string;
@@ -37,7 +37,7 @@ export interface SignUpPageProps {
   onSignInPress?: () => void;
   /** The app's inline legal notice (app LegalLinks). */
   legalNotice?: ReactNode;
-}
+};
 
 export function SignUpPage({
   displayName,

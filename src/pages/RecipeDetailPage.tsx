@@ -107,14 +107,14 @@ import { ShareIcon } from "../icons/ShareIcon.js";
 // boundary, as with RecipesPage's plain-string filter values).
 // ---------------------------------------------------------------------------
 
-export interface RecipeDetailPageVersion {
+export type RecipeDetailPageVersion = {
   id: string;
   /** Full picker label, app-formatted ("v3 — Active: summary"). */
   label: string;
   versionNumber: number;
-}
+};
 
-export interface RecipeDetailPageTag {
+export type RecipeDetailPageTag = {
   id: string;
   name: string;
   /**
@@ -124,9 +124,9 @@ export interface RecipeDetailPageTag {
    * tag data to a name through `tagColorNameForHex` first.
    */
   color: TagColorName;
-}
+};
 
-export interface RecipeDetailPageLifecycle {
+export type RecipeDetailPageLifecycle = {
   /** The displayed version's status allows tweaking/perfecting/abandoning. */
   isEditable: boolean;
   /** Tweak-manually mutation in flight: its button disables. */
@@ -137,32 +137,32 @@ export interface RecipeDetailPageLifecycle {
   isActivationPending?: boolean;
   /** Candidate versions awaiting activation, app-formatted labels. */
   candidates: { id: string; label: string }[];
-}
+};
 
-export interface RecipeDetailPageCommunityRating {
+export type RecipeDetailPageCommunityRating = {
   /** Pre-rendered star string ("★★★★★"), app-formatted from the average. */
   stars: string;
   /** App-formatted label ("4.6 (9)"). */
   label: string;
   hasStaleRatings?: boolean;
-}
+};
 
-export interface RecipeDetailPageViewerRating {
+export type RecipeDetailPageViewerRating = {
   /** The viewer's stars, or null when they have not rated. */
   value: number | null;
   isStale?: boolean;
   /** Rating mutation in flight: the input disables. */
   isPending?: boolean;
-}
+};
 
-export interface RecipeDetailPageRatings {
+export type RecipeDetailPageRatings = {
   /** Null renders the "No community ratings yet" line. */
   community: RecipeDetailPageCommunityRating | null;
   /** Null (signed out) hides the "Your rating" input entirely. */
   viewer: RecipeDetailPageViewerRating | null;
-}
+};
 
-export interface RecipeDetailPageOverviewProps {
+export type RecipeDetailPageOverviewProps = {
   imageUrl?: string | null;
   title: string;
   description?: string | null;
@@ -201,9 +201,9 @@ export interface RecipeDetailPageOverviewProps {
   /** Slot: the app's comments section, rendered in the engagement
    * stack under the ratings card. */
   renderComments?: () => ReactNode;
-}
+};
 
-export interface RecipeDetailPageIngredient {
+export type RecipeDetailPageIngredient = {
   id: string;
   /** The full scaled line, app-formatted ("1 1/2 lb chicken"). */
   label: string;
@@ -211,16 +211,16 @@ export interface RecipeDetailPageIngredient {
   /** Marked missing by the viewer: the row dims and the
    * substitutions flow keys off it. */
   isMissing?: boolean;
-}
+};
 
-export interface RecipeDetailPageSubstitution {
+export type RecipeDetailPageSubstitution = {
   /** The missing ingredient's name. */
   ingredient: string;
   /** App-formatted suggestions line (joined). */
   suggestions: string;
-}
+};
 
-export interface RecipeDetailPageIngredientsProps {
+export type RecipeDetailPageIngredientsProps = {
   servings: number;
   onServingsChange: (servings: number) => void;
   /** Selected scale multiplier as a plain string: one of the
@@ -236,28 +236,28 @@ export interface RecipeDetailPageIngredientsProps {
   /** Substitutions lookup in flight ("Finding substitutions…"). */
   isLoadingSubstitutions?: boolean;
   substitutions?: RecipeDetailPageSubstitution[];
-}
+};
 
-export interface RecipeDetailPageInstruction {
+export type RecipeDetailPageInstruction = {
   id: string;
   stepNumber: number;
   body: string;
-}
+};
 
-export interface RecipeDetailPageInstructionsProps {
+export type RecipeDetailPageInstructionsProps = {
   /** Rendered sorted by stepNumber, as the app's tab sorts them. */
   instructions: RecipeDetailPageInstruction[];
-}
+};
 
-export interface RecipeDetailPageCookLog {
+export type RecipeDetailPageCookLog = {
   id: string;
   /** App-formatted date label ("Oct 12, 2026"). */
   dateLabel: string;
   starRating?: number | null;
   notes?: string | null;
-}
+};
 
-export interface RecipeDetailPageHistoryProps {
+export type RecipeDetailPageHistoryProps = {
   /** Cook-log query in flight: the panel renders only a spinner,
    * as the app's tab returns early on loading. */
   isLoading?: boolean;
@@ -269,13 +269,13 @@ export interface RecipeDetailPageHistoryProps {
    * it returns non-null, the form replaces the "Log a cook"
    * button. Form, state, and mutation stay app-side. */
   renderCookLogForm?: () => ReactNode;
-}
+};
 
-export interface RecipeDetailPageNutritionRow {
+export type RecipeDetailPageNutritionRow = {
   label: string;
   /** App-formatted value with unit ("520 kcal"). */
   valueLabel: string;
-}
+};
 
 export type RecipeDetailPageNutritionProps =
   | { state: "loading" }
@@ -295,7 +295,7 @@ export type RecipeDetailPageNutritionProps =
       onRefreshPress?: () => void;
     };
 
-export interface RecipeDetailPageReadyProps {
+export type RecipeDetailPageReadyProps = {
   state: "ready";
   /** Recipe status as a plain string; the badge label/tone map
    * below is DS-owned. Unknown values fall back to "idea", as the
@@ -309,7 +309,7 @@ export interface RecipeDetailPageReadyProps {
   instructions: RecipeDetailPageInstructionsProps;
   history: RecipeDetailPageHistoryProps;
   nutrition: RecipeDetailPageNutritionProps;
-}
+};
 
 export type RecipeDetailPageProps = { state: "loading" } | RecipeDetailPageReadyProps;
 

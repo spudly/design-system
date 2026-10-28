@@ -32,7 +32,7 @@ import { Text } from "../components/Text.js";
  * business logic and never enters the DS.
  */
 
-export interface ProfilePageProps {
+export type ProfilePageProps = {
   email?: string | null;
   onSignOut: () => void;
   onManageTagsPress?: () => void;
@@ -42,7 +42,7 @@ export interface ProfilePageProps {
   sectionsAfterFeedback?: ReactNode;
   /** The app's LegalLinks, rendered inside the Legal section. */
   legalLinks?: ReactNode;
-}
+};
 
 export function ProfilePage({
   email,

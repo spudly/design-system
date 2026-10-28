@@ -30,10 +30,10 @@ const ToastCard = styled(YStack, {
 
 type ToastCardProps = GetProps<typeof ToastCard>;
 
-export interface ToastProps extends ToastCardProps {
+export type ToastProps = ToastCardProps & {
   title?: string;
   description?: ReactNode;
-}
+};
 
 /**
  * Toast notification card in design-system tokens. This same card is what
@@ -70,9 +70,9 @@ export function Toast({ title, description, ...rest }: ToastProps) {
   );
 }
 
-export interface ToastProviderProps {
+export type ToastProviderProps = {
   children: ReactNode;
-}
+};
 
 /**
  * Sets up Tamagui's toast system: viewport plus the toast host, rendering

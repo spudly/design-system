@@ -13,12 +13,12 @@ const NotesArea = styled(TamaguiTextArea, {
   fontSize: tokens.typography.fontSize.md,
 });
 
-export interface RatingFormValues {
+export type RatingFormValues = {
   rating: 1 | 2 | 3 | 4 | 5 | null;
   notes: string | null;
-}
+};
 
-export interface RatingFormProps {
+export type RatingFormProps = {
   onSubmit: (values: RatingFormValues) => void;
   onSkip: () => void;
   isPending: boolean;
@@ -26,7 +26,7 @@ export interface RatingFormProps {
   secondaryLabel?: string;
   title?: string;
   notesPlaceholder?: string;
-}
+};
 
 /**
  * RatingForm (#176 — generalized from the cook-log form that

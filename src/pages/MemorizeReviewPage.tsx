@@ -84,13 +84,13 @@ const listStyle = { flex: 1 } as const;
 
 /** One due verse row's view-model: the verse only — due rows
  * carry no status badge or schedule detail in the app. */
-export interface MemorizeReviewPageVerse {
+export type MemorizeReviewPageVerse = {
   id: string;
   reference: string;
   text: string;
-}
+};
 
-export interface MemorizeReviewPageProps {
+export type MemorizeReviewPageProps = {
   /** Verses due for review, in the app's order (oldest due
    * first). The app computes dueness from its
    * spaced-repetition schedule; the view only renders. */
@@ -101,7 +101,7 @@ export interface MemorizeReviewPageProps {
   /** "I forgot it" action: in the app this records a forgot
    * review, resetting the verse's schedule. */
   onForgotPress: (verseId: string) => void;
-}
+};
 
 function ReviewVerseRow({
   verse,

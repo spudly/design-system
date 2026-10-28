@@ -15,12 +15,12 @@ import { Text } from "../components/Text.js";
  * pickers, the import mutation, and navigation.
  */
 
-export interface ImportImagePageProps {
+export type ImportImagePageProps = {
   loading?: boolean;
   error?: string | null;
   onPickCamera?: () => void;
   onPickLibrary?: () => void;
-}
+};
 
 export function ImportImagePage({
   loading = false,

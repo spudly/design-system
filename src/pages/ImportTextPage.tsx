@@ -24,11 +24,11 @@ import { tokens } from "../tokens/index.js";
  * on blank text, as in the app view.
  */
 
-export interface ImportTextPageProps {
+export type ImportTextPageProps = {
   loading?: boolean;
   error?: string | null;
   onSubmit: (text: string) => void;
-}
+};
 
 export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextPageProps) {
   const [text, setText] = useState("");

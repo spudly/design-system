@@ -15,7 +15,7 @@ const SecretBox = styled(XStack, {
   alignItems: "center",
 });
 
-export interface SecretRevealPanelProps {
+export type SecretRevealPanelProps = {
   /** The secret value to display (shown once). */
   secret: string;
   title?: string;
@@ -23,7 +23,7 @@ export interface SecretRevealPanelProps {
   /** Called with the secret when Copy is pressed; the app wires the real clipboard. */
   onCopy: (secret: string) => void;
   onDismiss?: () => void;
-}
+};
 
 /**
  * Show-once secret display (API tokens, recovery codes, etc.). Renders the

@@ -17,13 +17,13 @@ import { TextField } from "../components/TextField.js";
  * callback, with submission a bare intent.
  */
 
-export interface ResetPasswordPageProps {
+export type ResetPasswordPageProps = {
   password: string;
   onPasswordChange: (value: string) => void;
   loading?: boolean;
   error?: string | null;
   onSubmit: () => void;
-}
+};
 
 export function ResetPasswordPage({
   password,

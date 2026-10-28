@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
-export interface TokenRowProps {
+export type TokenRowProps = {
   /** The token's display name. */
   name: string;
   /** The token's non-secret prefix, rendered in mono with a trailing ellipsis. */
@@ -16,7 +16,7 @@ export interface TokenRowProps {
   revoking?: boolean;
   /** Without it (or when revoked) the row renders no action. */
   onRevoke?: () => void;
-}
+};
 
 /**
  * One personal-access-token row in an account's token list: the name (with

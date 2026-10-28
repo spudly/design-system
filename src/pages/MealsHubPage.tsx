@@ -49,14 +49,14 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
 
 export type MealsHubPageTab = "meals" | "plans";
 
-export interface MealsHubPageMeal {
+export type MealsHubPageMeal = {
   id: string;
   title: string;
   /** Pre-composed meta line ("2 recipes · 1,240 cal"). */
   subtitle: string;
-}
+};
 
-export interface MealsHubPageProps {
+export type MealsHubPageProps = {
   activeTab: MealsHubPageTab;
   onSelectTab: (tab: MealsHubPageTab) => void;
   meals: MealsHubPageMeal[];
@@ -68,7 +68,7 @@ export interface MealsHubPageProps {
   onPlanPress: (planId: string) => void;
   onDeleteMeal: (mealId: string) => void;
   onDeletePlan: (planId: string) => void;
-}
+};
 
 function MealRow({
   meal,

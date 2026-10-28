@@ -3,11 +3,11 @@ import { tokens } from "../tokens/index.js";
 import { Card, type CardProps } from "./Card.js";
 import { Text } from "./Text.js";
 
-export interface OptionCardProps extends Omit<CardProps, "onPress"> {
+export type OptionCardProps = Omit<CardProps, "onPress"> & {
   title: string;
   description?: string;
   onPress: () => void;
-}
+};
 
 /**
  * Tappable card that navigates somewhere (e.g. "Manual entry", "Import from

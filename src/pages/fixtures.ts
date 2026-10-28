@@ -19,11 +19,11 @@ import type { TagsPageTag } from "./TagsPage.js";
  *   deliberately, update its page story in the same spirit.
  */
 
-export interface RecipeFixture {
+export type RecipeFixture = {
   title: string;
   meta: string;
   tags: string[];
-}
+};
 
 export const recipeFixtures: RecipeFixture[] = [
   {
@@ -56,12 +56,12 @@ export const recipeDetailFixture = {
   ],
 };
 
-export interface MealPlanDayFixture {
+export type MealPlanDayFixture = {
   day: string;
   dateLabel: string;
   dish: string;
   meta: string;
-}
+};
 
 /** Fixed week — the date labels are literals on purpose (see header). */
 export const mealPlanFixture: { weekLabel: string; days: MealPlanDayFixture[] } = {
@@ -77,11 +77,11 @@ export const mealPlanFixture: { weekLabel: string; days: MealPlanDayFixture[] } 
   ],
 };
 
-export interface SharedRecipeFixture {
+export type SharedRecipeFixture = {
   title: string;
   meta: string;
   sharedBy: string;
-}
+};
 
 export const sharedRecipeFixtures: SharedRecipeFixture[] = [
   { title: "Arroz con Pollo", meta: "50 min · 8 servings", sharedBy: "Katie Sorensen" },

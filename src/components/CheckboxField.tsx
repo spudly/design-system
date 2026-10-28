@@ -41,10 +41,10 @@ const StyledBox = styled(XStack, {
 
 type StyledCheckboxProps = GetProps<typeof StyledCheckbox>;
 
-export interface CheckboxFieldProps extends Omit<
+export type CheckboxFieldProps = Omit<
   StyledCheckboxProps,
   "checked" | "onCheckedChange"
-> {
+> & {
   label: string;
   /**
    * Supporting text under the label. A plain string renders in the hint
@@ -65,7 +65,7 @@ export interface CheckboxFieldProps extends Omit<
    * as-is; the caller styles it (typically with DS `Text`).
    */
   children?: ReactNode;
-}
+};
 
 /**
  * Labeled checkbox with optional description and error text.

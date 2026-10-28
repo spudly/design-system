@@ -77,9 +77,9 @@ const StyledButton = styled(TamaguiButton, {
 
 type StyledButtonProps = GetProps<typeof StyledButton>;
 
-export interface ButtonProps extends Omit<StyledButtonProps, "disabled"> {
+export type ButtonProps = Omit<StyledButtonProps, "disabled"> & {
   disabled?: boolean;
-}
+};
 
 /**
  * Label colors per variant. These must be passed as an instance `color`

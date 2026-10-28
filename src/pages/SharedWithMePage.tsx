@@ -91,12 +91,12 @@ const textBlockStyle = { flex: 1, minWidth: 0 } as const;
 /** One shared recipe row's view-model. The app formats `subtitle`
  * (its list meta line — servings · time · rating/satiety); the
  * view only renders it. */
-export interface SharedWithMePageItem {
+export type SharedWithMePageItem = {
   id: string;
   title: string;
   subtitle?: string;
   imageUrl?: string | null;
-}
+};
 
 // The filter option sets the app's filter bar hardcodes, moved
 // with the bar (identical to RecipesPage's — the app shares one
@@ -123,7 +123,7 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
   { value: "asc", label: "Low to high" },
 ];
 
-export interface SharedWithMePageProps {
+export type SharedWithMePageProps = {
   /** Shared recipes to render, already filtered/sorted by the app. */
   recipes: SharedWithMePageItem[];
   /** First-load in flight: the list renders empty with a spinner
@@ -159,7 +159,7 @@ export interface SharedWithMePageProps {
   onSortChange: (value: string) => void;
   sortDir: string;
   onSortDirChange: (value: string) => void;
-}
+};
 
 type FilterControlsProps = Pick<
   SharedWithMePageProps,

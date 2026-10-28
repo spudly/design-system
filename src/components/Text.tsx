@@ -45,9 +45,9 @@ const StyledText = styled(TamaguiText, {
 
 type StyledTextProps = GetProps<typeof StyledText>;
 
-export interface TextProps extends StyledTextProps {
+export type TextProps = StyledTextProps & {
   variant?: "heading" | "subheading" | "body" | "hint" | "error" | "verse";
-}
+};
 
 /**
  * Token-driven text primitive. Variants: `heading`, `subheading`, `body`

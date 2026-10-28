@@ -106,7 +106,7 @@ import { TextLink } from "../components/TextLink.js";
 /** One entry row's view-model. The app formats `subtitle` (its
  * meta line — quantity · member count or servings · nutrition);
  * the view only renders it. */
-export interface MealPlanDetailPageEntry {
+export type MealPlanDetailPageEntry = {
   /** The entry's own id (the row key). */
   id: string;
   kind: "meal" | "recipe";
@@ -120,23 +120,23 @@ export interface MealPlanDetailPageEntry {
    * "(unavailable)" suffix and the row does not press. Meal
    * entries are never unavailable. */
   isUnavailable?: boolean;
-}
+};
 
 /** One nutrition-goal progress row. The app composes
  * `valueLabel` from the field's numbers and band ("850 / 2,000 ·
  * On track") — the rounding and band wording stay app-side. */
-export interface MealPlanDetailPageGoalRow {
+export type MealPlanDetailPageGoalRow = {
   label: string;
   valueLabel: string;
-}
+};
 
 /** The "Nutrition goals" section's view-model: the per-field
  * progress rows for the goals the user has set. */
-export interface MealPlanDetailPageNutritionGoals {
+export type MealPlanDetailPageNutritionGoals = {
   rows: MealPlanDetailPageGoalRow[];
-}
+};
 
-export interface MealPlanDetailPageReadyProps {
+export type MealPlanDetailPageReadyProps = {
   state: "ready";
   /** The plan's title. */
   title: string;
@@ -183,7 +183,7 @@ export interface MealPlanDetailPageReadyProps {
   onMealPress: (mealId: string) => void;
   /** A recipe entry was pressed, with its recipe id. */
   onRecipePress: (recipeId: string) => void;
-}
+};
 
 export type MealPlanDetailPageProps = { state: "loading" } | MealPlanDetailPageReadyProps;
 

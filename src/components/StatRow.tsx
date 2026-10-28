@@ -13,7 +13,7 @@ const StyledStatRow = styled(XStack, {
 
 type StyledStatRowProps = GetProps<typeof StyledStatRow>;
 
-export interface StatRowProps extends StyledStatRowProps {}
+export type StatRowProps = StyledStatRowProps & {};
 
 /**
  * Recessed band that spreads a row of StatCards across the width of a

@@ -48,7 +48,7 @@ import { Text } from "../components/Text.js";
  * dark-aware $link role, readable on the page background.
  */
 
-export interface AiSessionPageConfig {
+export type AiSessionPageConfig = {
   title: string;
   intro: string;
   promptPlaceholder: string;
@@ -57,14 +57,14 @@ export interface AiSessionPageConfig {
   previewTitle: string;
   finalizeLabel: string;
   finalizePendingLabel: string;
-}
+};
 
-export interface AiSessionPageMessage {
+export type AiSessionPageMessage = {
   role: "user" | "assistant";
   content: string;
-}
+};
 
-export interface AiSessionPageSession {
+export type AiSessionPageSession = {
   /** The host-resolved phase label ("Planning", "Preview ready", …). */
   phaseLabel: string;
   messages: AiSessionPageMessage[];
@@ -72,9 +72,9 @@ export interface AiSessionPageSession {
   canRefine: boolean;
   /** The cancel row shows unless the session is finished. */
   canCancel: boolean;
-}
+};
 
-export interface AiSessionPageProps {
+export type AiSessionPageProps = {
   config: AiSessionPageConfig;
   session: AiSessionPageSession | null;
   /** The host-rendered recipe preview for the preview stage. */
@@ -95,7 +95,7 @@ export interface AiSessionPageProps {
   onFinalize: () => void;
   onCancel: () => void;
   onEmptyCancel: () => void;
-}
+};
 
 export function AiSessionPage({
   config,

@@ -74,14 +74,14 @@ function scaleValueFor(baseServings: number, servings: number): string {
   return String(Math.round((servings / baseServings) * 100) / 100);
 }
 
-interface DemoIngredient {
+type DemoIngredient = {
   id: string;
   name: string;
   /** Quantity prefix per reachable servings count; the demo
    * recomputes the formatted line the way the app would. */
   quantityByServings?: Record<number, string>;
   isOptional?: boolean;
-}
+};
 
 const fullIngredients: DemoIngredient[] = [
   {

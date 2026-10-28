@@ -44,11 +44,11 @@ const StyledInput = styled(TamaguiInput, {
 
 type StyledInputProps = GetProps<typeof StyledInput>;
 
-export interface TextFieldProps extends StyledInputProps {
+export type TextFieldProps = StyledInputProps & {
   label?: string;
   error?: string;
   id?: string;
-}
+};
 
 /**
  * Labeled text input with error-state support. Associates the label via

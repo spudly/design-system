@@ -16,11 +16,11 @@ const StyledTextLink = styled(TamaguiText, {
 
 type StyledTextLinkProps = GetProps<typeof StyledTextLink>;
 
-export interface TextLinkProps extends Omit<StyledTextLinkProps, "onPress"> {
+export type TextLinkProps = Omit<StyledTextLinkProps, "onPress"> & {
   /** Press handler — a link always navigates or triggers an action. */
   onPress: () => void;
   children: ReactNode;
-}
+};
 
 /**
  * Inline semantic link for use inside prose: link-colored (the `$link`

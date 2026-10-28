@@ -30,11 +30,11 @@ import { Text } from "../components/Text.js";
  * list renders the host's empty message.
  */
 
-export interface HomePageRecipe {
+export type HomePageRecipe = {
   id: string;
-}
+};
 
-export interface HomePageProps {
+export type HomePageProps = {
   title: string;
   subtitle: string;
   browseLabel: string;
@@ -48,7 +48,7 @@ export interface HomePageProps {
   onBrowsePress: () => void;
   onAddPress: () => void;
   onSharedWithMePress: () => void;
-}
+};
 
 export function HomePage({
   title,

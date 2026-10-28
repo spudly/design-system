@@ -21,7 +21,7 @@ const StyledValueInput = styled(TamaguiInput, {
   textAlign: "center",
 });
 
-export interface NumberStepperProps {
+export type NumberStepperProps = {
   value: number;
   onChange: (value: number) => void;
   min?: number;
@@ -53,7 +53,7 @@ export interface NumberStepperProps {
    * restores the current value.
    */
   editable?: boolean;
-}
+};
 
 /**
  * Increment/decrement stepper: [−] value [+]. The value display announces
