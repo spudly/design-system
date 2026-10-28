@@ -292,3 +292,32 @@ Open in `Pages/Eciperay/TagsPage`: WithTags, Loading.
 
 **Run when:** `src/pages/TagsPage.tsx`, its stories, or a changeset
 naming TagsPage.
+
+---
+
+## IconButton
+
+Open in `Components/IconButton`: Print, Primary, Ghost, Danger,
+Sizes, Disabled, AllVariants, PressCounter.
+
+1. AllVariants: the glyph is clearly visible against every variant
+   fill — light glyph on the primary fill, dark glyph on the
+   secondary gray chip, link-colored glyph with no fill on ghost,
+   white glyph on the danger fill.
+2. Sizes: three squares grow left to right (sm, md, lg) with the
+   printer glyph centered in each; the smallest is still a full
+   44px touch target (compare its height with a `Components/Button`
+   small button's row — it is visibly no shorter than the 44px
+   SearchField clear target in `Components/SearchField`).
+3. PressCounter: pressing the button increments the "Pressed N
+   times" count; on web, tabbing to the button and pressing Enter
+   or Space increments it too.
+4. Disabled: the button renders dimmed and pressing it does
+   nothing.
+5. The button's accessible name is its label: in the rendered DOM
+   (or the Storybook accessibility panel) the Print story's button
+   carries `aria-label="Print recipe"` and there is no
+   `accessibilitylabel` attribute.
+
+**Run when:** `src/components/IconButton.tsx`, its stories, or a
+changeset naming IconButton.

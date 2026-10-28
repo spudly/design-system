@@ -26,6 +26,12 @@ export {
   type FixedActionBannerProps,
 } from "./FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
+export {
+  IconButton,
+  type IconButtonProps,
+  type IconButtonSize,
+  type IconButtonVariant,
+} from "./IconButton.js";
 export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
 export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
