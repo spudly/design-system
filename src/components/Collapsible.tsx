@@ -1,5 +1,14 @@
 import { useState, type ReactNode } from "react";
-import { View, YStack } from "tamagui";
+import { View, YStack, isWeb } from "tamagui";
+
+// `inert` reaches the DOM through Tamagui's web renderer (which
+// forwards props it does not map — see accessibility.ts), but
+// Tamagui's View prop types do not declare it yet, so it travels as
+// a pre-built spread object, the platform-split pattern
+// accessibility.ts uses for `groupRoleProps`. Native has no Tab
+// sequence for closed content to leave, so it gets an empty spread.
+const inertPropsWhenClosed = (isOpen: boolean) =>
+  isWeb && !isOpen ? ({ inert: true } as const) : ({} as const);
 
 export type CollapsibleProps = {
   /**
@@ -26,8 +35,12 @@ export type CollapsibleProps = {
  * animation is the shared "fast" spring from the Tamagui config —
  * the same driver every DS config installs.
  *
- * Accessibility: closed content is aria-hidden — a collapsed region
- * must leave the accessibility tree along with the visual one.
+ * Accessibility: closed content is aria-hidden AND inert — a
+ * collapsed region must leave the accessibility tree along with the
+ * visual one, and aria-hidden alone does not remove focusable
+ * descendants (a button or link in the content) from the web Tab
+ * sequence; inert does, including while the collapse animation runs.
+ * Inert is web-only by construction (see inertPropsWhenClosed).
  */
 export function Collapsible({ isOpen = false, children }: CollapsibleProps) {
   const [contentHeight, setContentHeight] = useState<number | null>(null);
@@ -35,6 +48,7 @@ export function Collapsible({ isOpen = false, children }: CollapsibleProps) {
     <YStack overflow="hidden" animation="fast" height={isOpen ? (contentHeight ?? undefined) : 0}>
       <View
         aria-hidden={!isOpen}
+        {...inertPropsWhenClosed(isOpen)}
         onLayout={(event) => {
           setContentHeight(event.nativeEvent.layout.height);
         }}

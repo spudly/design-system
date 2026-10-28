@@ -61,7 +61,10 @@ test("Accordion tracks the open section by value with the controlled/uncontrolle
   assert.match(accordion, /openValue\?: string \| null/);
   assert.match(accordion, /defaultOpenValue\?: string \| null/);
   assert.match(accordion, /onOpenValueChange\?: \(value: string \| null\) => void/);
-  assert.match(accordion, /const resolvedOpenValue = openValue \?\? internalOpenValue/);
+  assert.match(
+    accordion,
+    /const resolvedOpenValue = openValue === undefined \? internalOpenValue : openValue/,
+  );
 });
 
 test("Accordion is single-open: each section's isOpen is openValue === its value", () => {
@@ -99,6 +102,8 @@ test("Collapsible animates height between 0 and the measured content height", ()
   assert.match(collapsible, /height=\{isOpen \? \(contentHeight \?\? undefined\) : 0\}/);
   assert.match(collapsible, /onLayout=/);
   assert.match(collapsible, /aria-hidden=\{!isOpen\}/);
+  assert.match(collapsible, /\(\{ inert: true \} as const\)/);
+  assert.match(collapsible, /\{\.\.\.inertPropsWhenClosed\(isOpen\)\}/);
 });
 
 test("the family follows the DS hard rules: aliases only, no margins, no glyph icons, no native imports", () => {

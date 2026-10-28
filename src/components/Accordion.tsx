@@ -58,7 +58,7 @@ export function Accordion({
   onOpenValueChange,
 }: AccordionProps) {
   const [internalOpenValue, setInternalOpenValue] = useState<string | null>(defaultOpenValue);
-  const resolvedOpenValue = openValue ?? internalOpenValue;
+  const resolvedOpenValue = openValue === undefined ? internalOpenValue : openValue;
 
   const handleSectionChange = (value: string, isOpen: boolean) => {
     const next = isOpen ? value : null;
