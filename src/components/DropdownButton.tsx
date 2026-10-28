@@ -133,18 +133,22 @@ export const DropdownButton = forwardRef<
   const chevronInk = useChevronInk(variant);
   const glyphSize = glyphSizes[size];
 
-  // Focus the trigger on press-in before forwarding the shell's
-  // injected handler: Safari never focuses a button on click, and
-  // the panel's close-focus restoration returns focus to the element
-  // focused before it opened — without this, a Safari trigger-open
-  // would hand focus back to the page body on close instead of the
+  // Focus the trigger as part of activation (onPress, immediately
+  // before the toggle) — NOT on press-in: press-in also fires for
+  // touch-start / mouse-down, so focusing there would blur the
+  // user's active input when they merely start a scroll over the
+  // trigger and the menu never opens. The focus exists because
+  // Safari never focuses a button on click, and the panel's
+  // close-focus restoration returns focus to the element focused
+  // before it opened — without this, a Safari trigger-open would
+  // hand focus back to the page body on close instead of the
   // trigger. (Chrome/Firefox focus the button on press natively;
   // this just makes every browser behave that way.) On native the
   // press target has no focus() and this is a no-op.
-  const handlePressIn: NonNullable<DropdownButtonTriggerProps["onPressIn"]> = (event) => {
+  const handlePress: NonNullable<ComponentProps<typeof Button>["onPress"]> = (event) => {
     const target = (event as { currentTarget?: { focus?: () => void } | null }).currentTarget;
     target?.focus?.();
-    onPressIn?.(event);
+    context?.toggle();
   };
 
   // The label (when there is one) plus the disclosure chevron, as a
@@ -163,7 +167,7 @@ export const DropdownButton = forwardRef<
       ref={ref}
       onFocus={onFocus}
       onBlur={onBlur}
-      onPressIn={handlePressIn}
+      onPressIn={onPressIn}
       onMouseEnter={onMouseEnter}
       variant={variant}
       size={size}
@@ -173,9 +177,7 @@ export const DropdownButton = forwardRef<
       accessibilityState={{ expanded: open }}
       aria-haspopup="dialog"
       gap={tokens.spacing[2]}
-      onPress={() => {
-        context?.toggle();
-      }}
+      onPress={handlePress}
     >
       {content}
     </Button>

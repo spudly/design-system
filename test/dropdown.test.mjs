@@ -132,7 +132,7 @@ test("the trigger is composed through Popover.Trigger so the primitive registers
   // the Button it renders, so registration reaches the real button.
   assert.match(dropdownButton, /type DropdownButtonTriggerProps = \{/);
   assert.match(dropdownButton, /ref=\{ref\}/);
-  assert.match(dropdownButton, /onPressIn=\{handlePressIn\}/);
+  assert.match(dropdownButton, /onPressIn=\{onPressIn\}/);
   assert.match(dropdownButton, /onFocus=\{onFocus\}/);
 });
 
@@ -153,11 +153,13 @@ test("refs reach the rendered button on the React 18 peer (forwardRef, not ref-a
   // The fallback restores whatever was focused before opening, so a
   // trigger-activated open only returns focus to the trigger if the
   // trigger actually held focus — Safari never focuses a button on
-  // click. DropdownButton therefore focuses its press target on
-  // press-in, normalizing every browser to the Chrome/Firefox
-  // behavior before the shell's injected press-in handler runs.
-  assert.match(dropdownButton, /target\?\.focus\?\.\(\)/);
-  assert.match(dropdownButton, /onPressIn\?\.\(event\)/);
+  // click. DropdownButton therefore focuses its press target as
+  // part of activation (onPress, immediately before the toggle) —
+  // not on press-in, which also fires for touch-start/mouse-down
+  // and would blur the user's active input on a scroll that never
+  // opens the menu.
+  assert.match(dropdownButton, /onPress=\{handlePress\}/);
+  assert.match(dropdownButton, /target\?\.focus\?\.\(\);\s*context\?\.toggle\(\)/);
 });
 
 test("close-on-select is the context affordance (the spec's ExitContext descendant)", () => {
