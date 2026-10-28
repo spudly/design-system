@@ -1,5 +1,6 @@
 import { XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const StyledChip = styled(XStack, {
@@ -87,8 +88,10 @@ export function ToggleChipGroup({
               selected={selected}
               {...(wrap ? {} : { flex: 1 })}
               onPress={() => onChange(opt.value)}
-              accessibilityRole="button"
-              accessibilityLabel={opt.label}
+              {...platformAccessibilityProps({
+                accessibilityRole: "button",
+                accessibilityLabel: opt.label,
+              })}
               aria-pressed={selected}
             >
               <Text

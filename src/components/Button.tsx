@@ -1,6 +1,7 @@
 import { Button as TamaguiButton, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 
 const StyledButton = styled(TamaguiButton, {
   name: "Button",
@@ -107,16 +108,48 @@ const variantLabelColors = {
  * ("sm" | "md" | "lg"), `disabled`. All styling is token-driven. Use
  * `danger` for destructive actions (delete, revoke, remove).
  * Accessibility: exposes `accessibilityRole="button"` and mirrors `disabled`
- * into `accessibilityState` (mapped to `aria-disabled` on web).
+ * into `accessibilityState`. Caller accessibility props
+ * (`accessibilityLabel`, `accessibilityState`, …) go through
+ * `platformAccessibilityProps` (#235): Tamagui's web renderer forwards
+ * them to the DOM verbatim (`accessibilitylabel="…"`,
+ * `accessibilitystate="[object Object]"`, no accessible name), so on
+ * web they are translated to their ARIA equivalents (`aria-label`,
+ * `aria-disabled`, …) and the RN-only props are dropped; on native
+ * they pass through unchanged. A caller-passed ARIA prop in `rest`
+ * still wins over the translated one.
  */
-export function Button({ disabled = false, variant = "primary", color, ...rest }: ButtonProps) {
+export function Button({
+  disabled = false,
+  variant = "primary",
+  color,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
+  ...rest
+}: ButtonProps) {
   // `variant`'s prop type also admits Tamagui Button's built-in variant
   // names; only the four design-system variants have a mapped label color.
   const labelColor = color ?? variantLabelColors[variant as keyof typeof variantLabelColors];
+  const a11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole: accessibilityRole ?? "button",
+    accessibilityState: { disabled, ...accessibilityState },
+    accessibilityValue,
+  });
   return (
     <StyledButton
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
+      {...a11yProps}
       disabled={disabled}
       variant={variant}
       color={labelColor}

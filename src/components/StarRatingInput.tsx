@@ -1,6 +1,7 @@
 import { useId } from "react";
 import { XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const StarButton = styled(YStack, {
@@ -88,8 +89,10 @@ export function StarRatingInput({
       {label ? <Text id={labelId}>{label}</Text> : null}
       {readOnly ? (
         <XStack
-          accessibilityRole="image"
-          accessibilityLabel={`Rated ${value} out of 5 stars`}
+          {...platformAccessibilityProps({
+            accessibilityRole: "image",
+            accessibilityLabel: `Rated ${value} out of 5 stars`,
+          })}
           aria-label={`Rated ${value} out of 5 stars`}
         >
           {stars.map((star) => {
@@ -111,7 +114,7 @@ export function StarRatingInput({
         </XStack>
       ) : (
         <XStack
-          accessibilityRole="radiogroup"
+          {...platformAccessibilityProps({ accessibilityRole: "radiogroup" })}
           aria-labelledby={label ? labelId : undefined}
           aria-label={label ? undefined : "Star rating"}
           opacity={disabled ? 0.5 : 1}
@@ -122,11 +125,13 @@ export function StarRatingInput({
             return (
               <StarButton
                 key={star}
-                accessibilityRole="radio"
+                {...platformAccessibilityProps({
+                  accessibilityRole: "radio",
+                  accessibilityState: { disabled },
+                  accessibilityLabel: `Rate ${star} out of 5 stars`,
+                })}
                 aria-checked={selected}
-                accessibilityState={{ disabled }}
                 disabled={disabled}
-                accessibilityLabel={`Rate ${star} out of 5 stars`}
                 onPress={() => {
                   if (disabled) {
                     return;

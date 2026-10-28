@@ -1,6 +1,7 @@
 import { Image as TamaguiImage, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const StyledImage = styled(TamaguiImage, {
@@ -40,13 +41,20 @@ function initialsFor(name: string): string {
  * circle. Exposed as an image with the name as its accessible label.
  * (`accessibilityRole="image"`, React Native's role name — the web ARIA
  * spelling `img` is invalid there and crashes Android, spudly/eciperay#156;
- * React Native Web maps `image` back to the `img` role.)
+ * `platformAccessibilityProps` maps `image` back to the `img` role and
+ * the label to `aria-label` on web, #235.)
  */
 export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
   const dimensions = { width: size, height: size };
   if (!src) {
     return (
-      <Fallback style={dimensions} accessibilityRole="image" accessibilityLabel={name}>
+      <Fallback
+        style={dimensions}
+        {...platformAccessibilityProps({
+          accessibilityRole: "image",
+          accessibilityLabel: name,
+        })}
+      >
         <Text
           style={{
             color: "$primaryEmphasis",
@@ -67,8 +75,10 @@ export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
       src={src}
       objectFit="cover"
       style={dimensions}
-      accessibilityRole="image"
-      accessibilityLabel={name}
+      {...platformAccessibilityProps({
+        accessibilityRole: "image",
+        accessibilityLabel: name,
+      })}
       {...rest}
     />
   );

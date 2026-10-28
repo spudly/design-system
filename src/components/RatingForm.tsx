@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { TextArea as TamaguiTextArea, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { StarRatingInput } from "./StarRatingInput.js";
 import { Text } from "./Text.js";
 
@@ -153,8 +154,10 @@ export function RatingForm({
             backgroundColor={isLight ? "$surface" : undefined}
             borderWidth={isLight ? 1 : undefined}
             borderColor={isLight ? tokens.colors.gray.gray3 : undefined}
-            accessibilityRole="button"
-            accessibilityLabel={secondaryLabel}
+            {...platformAccessibilityProps({
+              accessibilityRole: "button",
+              accessibilityLabel: secondaryLabel,
+            })}
             onPress={onSkip}
             cursor="pointer"
           >
@@ -184,9 +187,11 @@ export function RatingForm({
             paddingVertical={tokens.spacing[3]}
             backgroundColor="$primary"
             opacity={isPending ? 0.5 : 1}
-            accessibilityRole="button"
-            accessibilityLabel="Save"
-            accessibilityState={{ disabled: isPending }}
+            {...platformAccessibilityProps({
+              accessibilityRole: "button",
+              accessibilityLabel: "Save",
+              accessibilityState: { disabled: isPending },
+            })}
             onPress={isPending ? undefined : handleSubmit}
             cursor="pointer"
           >

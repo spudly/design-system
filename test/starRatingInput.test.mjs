@@ -50,12 +50,15 @@ test("allowClear clears through onChange(0) only when enabled (#159)", () => {
 
 test("readOnly renders a static image-role display, not radio buttons (#159)", () => {
   assert.match(code, /readOnly \? \(/);
-  assert.match(code, /accessibilityRole="image"/);
+  // #235: the role crosses through platformAccessibilityProps (the
+  // helper-call object form), which maps image -> img + aria-label
+  // on web instead of leaking the RN props as raw HTML attributes.
+  assert.match(code, /accessibilityRole: "image"/);
   assert.match(code, /Rated \$\{value\} out of 5 stars/);
 });
 
 test("disabled blocks presses and dims the radiogroup (#159)", () => {
   assert.match(code, /if \(disabled\) \{\s*return;/);
   assert.match(code, /opacity=\{disabled \? 0\.5 : 1\}/);
-  assert.match(code, /accessibilityState=\{\{ disabled \}\}/);
+  assert.match(code, /accessibilityState: \{ disabled \}/);
 });

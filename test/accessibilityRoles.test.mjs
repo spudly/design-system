@@ -23,6 +23,16 @@
  * the invariant is a per-literal property of the source. The scan fails
  * loudly (rather than passing vacuously) if an `accessibilityRole` ever
  * appears in a form it cannot extract literals from.
+ *
+ * Three files are excluded from the literal scan, by design (#235):
+ * `src/components/accessibility.ts` implements
+ * `platformAccessibilityProps`, the generic RN->ARIA translator whose
+ * whole job is handling this prop non-literally, and
+ * `src/components/Button.tsx` / `src/components/Text.tsx` are the two
+ * DS primitives that destructure a caller's role and forward it
+ * through that translator. A dedicated test below pins that all three
+ * route through the translator, so the exclusion cannot become a
+ * hole a bare computed role could slip through.
  */
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
@@ -108,8 +118,15 @@ function accessibilityRoleLiterals(source) {
   return { occurrences, total };
 }
 
+/** Files that handle `accessibilityRole` generically (#235) — see header. */
+const TRANSLATOR_FILES = new Set([
+  join(srcDir, "components", "accessibility.ts"),
+  join(srcDir, "components", "Button.tsx"),
+  join(srcDir, "components", "Text.tsx"),
+]);
+
 test("no component passes an accessibilityRole outside React Native's supported set", () => {
-  const files = sourceFiles(srcDir);
+  const files = sourceFiles(srcDir).filter((file) => !TRANSLATOR_FILES.has(file));
   assert.ok(files.length > 0, "scan must find source files");
 
   let checked = 0;
@@ -136,4 +153,22 @@ test("no component passes an accessibilityRole outside React Native's supported 
     }
   }
   assert.ok(checked > 0, "scan must find at least one accessibilityRole literal");
+});
+
+test("the excluded translator/forwarder files route through platformAccessibilityProps (#235)", () => {
+  for (const file of TRANSLATOR_FILES) {
+    const source = stripComments(readFileSync(file, "utf8"));
+    assert.ok(
+      source.includes("platformAccessibilityProps"),
+      `${file}: excluded from the literal scan only because it routes accessibility props through platformAccessibilityProps`,
+    );
+  }
+  const translator = stripComments(
+    readFileSync(join(srcDir, "components", "accessibility.ts"), "utf8"),
+  );
+  assert.match(
+    translator,
+    /export function platformAccessibilityProps/,
+    "accessibility.ts must define the shared translator the forwarders use",
+  );
 });

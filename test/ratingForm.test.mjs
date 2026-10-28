@@ -75,7 +75,11 @@ test("defaults: dark variant, Skip secondary label", () => {
 });
 
 test("isPending disables Save (half opacity); the secondary action stays live", () => {
-  assert.match(source, /accessibilityState=\{\{ disabled: isPending \}\}/);
+  // #235: the Save action's state crosses through
+  // platformAccessibilityProps (the helper-call object form), which
+  // maps it to aria-disabled on web instead of leaking it as a raw
+  // accessibilitystate="[object Object]" attribute.
+  assert.match(source, /accessibilityState: \{ disabled: isPending \}/);
   assert.match(source, /opacity=\{isPending \? 0\.5 : 1\}/);
   assert.match(source, /onPress=\{isPending \? undefined : handleSubmit\}/);
   assert.match(source, /onPress=\{onSkip\}/);

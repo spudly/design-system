@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Input as TamaguiInput, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { groupRoleProps } from "./accessibility.js";
+import { groupRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
@@ -121,7 +121,7 @@ export function NumberStepper({
       alignItems="center"
       gap={tokens.spacing[2]}
       {...(label ? groupRoleProps : {})}
-      accessibilityLabel={label}
+      {...platformAccessibilityProps({ accessibilityLabel: label })}
     >
       <Button
         variant="secondary"
@@ -141,7 +141,9 @@ export function NumberStepper({
           keyboardType="numeric"
           inputMode="numeric"
           aria-live="polite"
-          accessibilityLabel={label ? `${label} value` : "Value"}
+          {...platformAccessibilityProps({
+            accessibilityLabel: label ? `${label} value` : "Value",
+          })}
           minWidth={tokens.spacing[10]}
           width={tokens.spacing[16]}
           value={draft ?? String(value)}

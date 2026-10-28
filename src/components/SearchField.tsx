@@ -2,6 +2,7 @@ import { useId } from "react";
 import { Input as TamaguiInput, Label, View, XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 /**
@@ -188,8 +189,10 @@ export function SearchField({
         {value ? (
           <XStack
             onPress={() => onChangeText("")}
-            accessibilityRole="button"
-            accessibilityLabel="Clear search"
+            {...platformAccessibilityProps({
+              accessibilityRole: "button",
+              accessibilityLabel: "Clear search",
+            })}
             alignItems="center"
             justifyContent="center"
             minWidth={44}
