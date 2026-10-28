@@ -2,7 +2,7 @@ import { Icon, type IconComponentProps, type IconElement } from "./Icon.js";
 
 /**
  * The official Feather users element data (feathericons/feather,
- * ISC licensed) — copied from the Feather SVG source, not redrawn.
+ * MIT licensed) — copied from the Feather SVG source, not redrawn.
  */
 const usersElements: IconElement[] = [
   { kind: "path", d: "M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" },

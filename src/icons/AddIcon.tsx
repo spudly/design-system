@@ -2,7 +2,7 @@ import { Icon, type IconComponentProps, type IconElement } from "./Icon.js";
 
 /**
  * The official Feather plus element data (feathericons/feather,
- * ISC licensed) — copied from the Feather SVG source, not redrawn.
+ * MIT licensed) — copied from the Feather SVG source, not redrawn.
  */
 const addElements: IconElement[] = [
   { kind: "line", x1: "12", y1: "5", x2: "12", y2: "19" },
