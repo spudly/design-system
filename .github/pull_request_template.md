@@ -13,6 +13,9 @@ before this PR is merged.
 
 - [ ] CI is green for the exact head commit
 - [ ] Review feedback addressed (Copilot and/or human)
+- [ ] Manual Storybook QA pass posted for this head SHA (changed
+      components/pages/stories only), or exempt (no component/page/story
+      changes)
 - [ ] No new console or CI warnings introduced — or a GitHub issue filed
       for each new one
 - [ ] Changeset added, or not required (docs/CI/test-only) — and for

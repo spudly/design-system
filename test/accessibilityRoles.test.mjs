@@ -141,6 +141,10 @@ const TRANSLATOR_FILES = new Set([
   join(srcDir, "components", "TextAreaField.tsx"),
   join(srcDir, "components", "CheckboxField.tsx"),
   join(srcDir, "components", "Alert.tsx"),
+  // Spinner joined with its determinate ring (#178): the ring
+  // destructures a caller's role and forwards it through the same
+  // translator, defaulting to "progressbar".
+  join(srcDir, "components", "Spinner.tsx"),
 ]);
 
 test("no component passes an accessibilityRole outside React Native's supported set", () => {

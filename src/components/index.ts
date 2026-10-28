@@ -29,6 +29,13 @@ export {
   type FixedActionBannerProps,
 } from "./FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
+export {
+  MasonryGrid,
+  distributeMasonryItems,
+  masonryColumnCount,
+  type MasonryColumnCountOptions,
+  type MasonryGridProps,
+} from "./MasonryGrid.js";
 export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
 export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";

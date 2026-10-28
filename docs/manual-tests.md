@@ -218,6 +218,30 @@ a changeset naming StarRatingInput.
 
 ---
 
+## MasonryGrid
+
+Open in `Components/MasonryGrid`: VariableHeights, Narrow, TwoColumns,
+Wide, CappedColumns, FewItems, Empty.
+
+1. VariableHeights: the twelve cards form staggered columns — cards
+   stack inside each column with even gaps and no overlap or clipping,
+   and the columns end at visibly unequal heights.
+2. Narrow (300px container): a single column. TwoColumns (360px):
+   exactly two columns. Wide (760px): exactly four columns.
+3. CappedColumns: despite the 760px container, exactly two columns
+   render (the `maxColumns` cap).
+4. FewItems (760px, three cards): three columns with one card each —
+   no empty fourth column or stray gap.
+5. Empty: nothing renders and nothing errors.
+6. Web Storybook only: with VariableHeights open, slowly resize the
+   browser window — the column count steps down/up as the width
+   crosses the breakpoints and the cards re-flow without overlap.
+
+**Run when:** `src/components/MasonryGrid.tsx`, its stories, or a
+changeset naming MasonryGrid.
+
+---
+
 ## PrevNextNav
 
 Open in `Components/PrevNextNav`: Both, CustomLabels, NextOnly,
@@ -231,6 +255,32 @@ NextDisabled, BackDisabled.
 
 **Run when:** `src/components/PrevNextNav.tsx`, its stories, or a
 changeset naming PrevNextNav.
+
+---
+
+## Spinner
+
+Open in `Components/Spinner`: Default, Large, Determinate,
+DeterminateComplete, DeterminateLarge, DeterminateStates.
+
+1. Default and Large still spin continuously (indeterminate); Large
+   is visibly bigger than Default.
+2. Determinate (value 65) does NOT spin: it shows a static ring
+   filled about two-thirds, the arc starting at the top and running
+   clockwise, in the brand primary over the lighter progress-track
+   ring.
+3. DeterminateStates: the five rings fill 0 / 25 / 50 / 75 / 100 —
+   0 is the empty track only, 50 fills exactly the right half, 100
+   is a complete ring with no gap.
+4. DeterminateComplete (100) matches the full ring in
+   DeterminateStates; DeterminateLarge (30) shows the same ring at
+   the large size.
+5. Dragging the `value` control in Determinate moves the arc
+   smoothly between the states above; setting `size` to large grows
+   the ring without changing its proportions.
+
+**Run when:** `src/components/Spinner.tsx`, its stories, or a
+changeset naming Spinner.
 
 ---
 
