@@ -80,7 +80,6 @@ function sourceFiles(dir) {
  * plus RN elements react-native-web translates on web. */
 const SANCTIONED_TAGS = new Set([
   "Button",
-  "IconButton",
   "Text",
   "TextField",
   "TextAreaField",

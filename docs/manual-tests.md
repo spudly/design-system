@@ -295,29 +295,36 @@ naming TagsPage.
 
 ---
 
-## IconButton
+## Button
 
-Open in `Components/IconButton`: Print, Primary, Ghost, Danger,
-Sizes, Disabled, AllVariants, PressCounter.
+Open in `Components/Button`: Primary, Secondary, Ghost, Danger,
+Sizes, Disabled, AllVariants, WithIcon, WithIconVariants, IconOnly,
+IconOnlyVariants, IconSizes, IconDisabled, IconPressCounter.
 
-1. AllVariants: the glyph is clearly visible against every variant
-   fill — light glyph on the primary fill, dark glyph on the
-   secondary gray chip, link-colored glyph with no fill on ghost,
-   white glyph on the danger fill.
-2. Sizes: three squares grow left to right (sm, md, lg) with the
-   printer glyph centered in each; the smallest is still a full
-   44px touch target (compare its height with a `Components/Button`
-   small button's row — it is visibly no shorter than the 44px
-   SearchField clear target in `Components/SearchField`).
-3. PressCounter: pressing the button increments the "Pressed N
-   times" count; on web, tabbing to the button and pressing Enter
-   or Space increments it too.
-4. Disabled: the button renders dimmed and pressing it does
-   nothing.
-5. The button's accessible name is its label: in the rendered DOM
-   (or the Storybook accessibility panel) the Print story's button
-   carries `aria-label="Print recipe"` and there is no
-   `accessibilitylabel` attribute.
+The plain stories (Primary → AllVariants) are the unchanged labeled
+button. The icon-slot stories:
 
-**Run when:** `src/components/IconButton.tsx`, its stories, or a
-changeset naming IconButton.
+1. WithIcon / WithIconVariants: the glyph sits to the **left** of
+   the label with an even gap, vertically centered on the label's
+   line, inked in the variant's label color — light glyph on the
+   primary fill, dark glyph on the secondary gray, link-colored
+   glyph with no fill on ghost, white glyph on the danger fill.
+2. IconOnly / IconOnlyVariants: only the glyph renders — no text —
+   centered in a square target, in every variant.
+3. IconSizes: the labeled row's glyph grows with the button size
+   (sm → lg); the icon-only row's squares grow sm → lg with the
+   glyph centered in each, and the smallest is still a full 44px
+   touch target (compare it with the 44px SearchField clear target
+   in `Components/SearchField` — it is no smaller).
+4. IconDisabled: both the labeled and the icon-only button render
+   dimmed and pressing them does nothing.
+5. IconPressCounter: pressing the icon-only button increments the
+   "Pressed N times" count; on web, tabbing to the button and
+   pressing Enter or Space increments it too.
+6. The icon-only button's accessible name is its label: in the
+   rendered DOM (or the Storybook accessibility panel) the IconOnly
+   story's button carries `aria-label="Print recipe"` and there is
+   no `accessibilitylabel` attribute.
+
+**Run when:** `src/components/Button.tsx`, its stories, or a
+changeset naming Button or the Button icon slot.
