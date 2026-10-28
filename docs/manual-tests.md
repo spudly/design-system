@@ -433,3 +433,56 @@ button. The icon-slot stories:
 
 **Run when:** `src/components/Button.tsx`, its stories, or a
 changeset naming Button or the Button icon slot.
+
+---
+
+## Dropdown
+
+Open in `Components/Dropdown`: ActionMenu, IconOnlyTrigger,
+AlignEnd, SideTop, InitiallyOpen, Controlled.
+
+1. ActionMenu: pressing "Recipe actions" opens the panel anchored
+   under the button (surface fill, bordered, shadowed), the
+   trigger's chevron flips up while open, and pressing the trigger
+   again closes it. Pressing outside the panel, or pressing Escape
+   on web, also closes it.
+2. ActionMenu rows: choosing "Print recipe" closes the menu and the
+   line under it reads "Last action: Print recipe" (close-on-select);
+   "Delete recipe" renders in the danger color. Rows are at least
+   44px tall; on web, Tab reaches a row and Enter/Space activates it.
+3. IconOnlyTrigger: the trigger is the profile glyph plus chevron
+   with no text, and its accessible name is "Account menu".
+4. AlignEnd: the panel's trailing edge lines up with the trigger's
+   trailing edge (the panel extends left from the button).
+5. SideTop: the panel opens above its trigger instead of below.
+6. InitiallyOpen: the panel renders open on load, rows visible
+   without any press.
+7. Controlled: the "Menu is open/closed" line tracks the menu as it
+   is toggled, and "Open from outside" opens it — the host owns the
+   state.
+
+**Run when:** `src/components/Dropdown.tsx`, its stories, or a
+changeset naming Dropdown.
+
+---
+
+## DropdownButton
+
+Open in `Components/DropdownButton`: Labeled, WithIcon, IconOnly,
+Variants, Disabled. Each story's button is the trigger of a small
+dropdown whose panel reads "Menu content".
+
+1. Labeled: the label sits left of a chevron pointing down; opening
+   the menu flips the chevron up.
+2. WithIcon: the share glyph renders left of the label, the chevron
+   after it, all in the secondary variant's ink.
+3. IconOnly: no label text — profile glyph plus chevron — and the
+   button's accessible name is "Account menu".
+4. Variants: Primary, Secondary, and Ghost triggers each open their
+   menu; the chevron takes the variant's label color (light on the
+   primary fill, dark on the secondary gray, link-colored on ghost).
+5. Disabled: the trigger renders dimmed and pressing it does not
+   open the menu.
+
+**Run when:** `src/components/DropdownButton.tsx`, its stories, or
+a changeset naming DropdownButton.
