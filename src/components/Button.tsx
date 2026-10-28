@@ -1,3 +1,4 @@
+import { Children } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Button as TamaguiButton, styled, useTheme } from "tamagui";
 import type { GetProps } from "tamagui";
@@ -116,19 +117,26 @@ export type ButtonProps = ButtonOwnProps &
         accessibilityLabel?: string;
       }
     | {
-        /** Icon + label: the glyph renders left of the label text. */
+        /**
+         * Icon + label: the glyph renders left of the label text.
+         * Boolean children are excluded — `false` renders no label,
+         * so it belongs to the icon-only shape below, where the
+         * label requirement lives.
+         */
         icon: ComponentType<IconComponentProps>;
-        children: NonNullable<ReactNode>;
+        children: Exclude<NonNullable<ReactNode>, boolean>;
         accessibilityLabel?: string;
       }
     | {
         /**
-         * Icon-only: no label text, so `accessibilityLabel` is
-         * REQUIRED — it is the only name assistive tech (and tests
-         * querying by role + name) can find the button by.
+         * Icon-only: no label text (no children, or only
+         * boolean/null children, which render nothing), so
+         * `accessibilityLabel` is REQUIRED — it is the only name
+         * assistive tech (and tests querying by role + name) can
+         * find the button by.
          */
         icon: ComponentType<IconComponentProps>;
-        children?: null | undefined;
+        children?: boolean | null;
         accessibilityLabel: string;
       }
   );
@@ -254,7 +262,13 @@ export function Button({
     accessibilityState: { disabled, ...accessibilityState },
     accessibilityValue,
   });
-  const iconOnly = IconGlyph != null && (children == null || children === "");
+  // Renderable-label detection: Children.toArray drops the child
+  // forms that render nothing (null, undefined, booleans); an empty
+  // string is dropped by the some() check. Anything left — text, a
+  // number, an element — is a real label. With an icon and no
+  // renderable label, the button is icon-only.
+  const hasLabel = Children.toArray(children).some((child) => child !== "");
+  const iconOnly = IconGlyph != null && !hasLabel;
   const glyphSize = glyphSizes[size as keyof typeof glyphSizes] ?? glyphSizes.md;
   const iconOnlyBox = iconOnlyBoxes[size as keyof typeof iconOnlyBoxes] ?? iconOnlyBoxes.md;
   return (

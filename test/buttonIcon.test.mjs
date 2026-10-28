@@ -82,15 +82,16 @@ test("icon-only requires accessibilityLabel at the type level; the labeled shape
     button,
     /icon\?: undefined;\s*children\?: ReactNode;\s*accessibilityLabel\?: string;/,
   );
-  // Icon + label branch.
+  // Icon + label branch. Boolean children are excluded: `false`
+  // renders no label, so it must fall into the icon-only branch.
   assert.match(
     button,
-    /icon: ComponentType<IconComponentProps>;\s*children: NonNullable<ReactNode>;\s*accessibilityLabel\?: string;/,
+    /icon: ComponentType<IconComponentProps>;\s*children: Exclude<NonNullable<ReactNode>, boolean>;\s*accessibilityLabel\?: string;/,
   );
   // Icon-only branch: label is a required string, never optional.
   assert.match(
     button,
-    /icon: ComponentType<IconComponentProps>;\s*children\?: null \| undefined;\s*accessibilityLabel: string;/,
+    /icon: ComponentType<IconComponentProps>;\s*children\?: boolean \| null;\s*accessibilityLabel: string;/,
   );
 });
 
@@ -124,7 +125,12 @@ test("glyph ink mirrors Button's variant label colors (#178)", () => {
 
 test("icon-only pins the square standard box (44/48/56) with text padding zeroed (#178)", () => {
   assert.match(button, /sm: 44,\s*md: 48,\s*lg: 56/);
-  assert.match(button, /const iconOnly = IconGlyph != null/);
+  // Icon-only detection is render-based: Children.toArray drops
+  // the child forms that render nothing (null, undefined,
+  // booleans) and the some() check drops the empty string, so a
+  // `false` or "" child cannot leave an unnamed, un-pinned button.
+  assert.match(button, /Children\.toArray\(children\)\.some\(\(child\) => child !== ""\)/);
+  assert.match(button, /const iconOnly = IconGlyph != null && !hasLabel;/);
   assert.match(button, /width: iconOnlyBox/);
   assert.match(button, /height: iconOnlyBox/);
   assert.match(button, /flexShrink: 0/);
@@ -247,6 +253,25 @@ test("SSR: icon-only renders no text, carries the required label as its name, an
   );
   assert.ok(sm.includes('data-glyph-size="18"'), "sm glyph size is 18");
   assert.ok(sm.includes('aria-label="Print recipe"'));
+});
+
+test('SSR: children that render nothing (false, "") are treated as icon-only, never left unnamed (#178)', async () => {
+  const { React, Button } = await loadRuntime();
+  for (const emptyChild of [false, ""]) {
+    const html = await renderToHtml(
+      React.createElement(
+        Button,
+        { icon: stubGlyph, accessibilityLabel: "Print recipe", onPress: noop },
+        emptyChild,
+      ),
+    );
+    assert.ok(
+      html.includes('aria-label="Print recipe"'),
+      `child ${JSON.stringify(emptyChild)}: the required label names the button`,
+    );
+    assert.ok(html.includes('data-glyph-size="20"'), "the glyph still renders at md size");
+    assert.ok(!html.includes(">Print recipe<"), "no visible label text is rendered");
+  }
 });
 
 test("SSR: a disabled icon-only Button reports aria-disabled; a plain Button renders no glyph (#178)", async () => {
