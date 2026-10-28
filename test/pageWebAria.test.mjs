@@ -82,16 +82,11 @@ function sourceFiles(dir) {
 
 /** DS primitives that translate caller RN props themselves (#235/#237),
  * plus RN elements react-native-web translates on web. */
-const SANCTIONED_TAGS = new Set([
-  "Button",
-  "Text",
-  "TextField",
-  "TextAreaField",
-  "TextAction",
-  "ProgressBar",
-  "TouchableOpacity",
-  "Image",
-]);
+// Compact split form: this file sits at the test max-lines cap
+// (300), so the tag list cannot grow one-per-line.
+const SANCTIONED_TAGS = new Set(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image".split(","),
+);
 
 test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in src/ (#237)", () => {
   const files = sourceFiles(join(root, "src"));
