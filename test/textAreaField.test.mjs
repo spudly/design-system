@@ -30,7 +30,7 @@ test("TextAreaField is exported and MultilineField is gone (#180)", () => {
 
 test("TextAreaField keeps the labeled, error-aware field contract", () => {
   const source = readFileSync(join(root, "src", "components", "TextAreaField.tsx"), "utf8");
-  assert.ok(source.includes("TextAreaField"), "styled name must be TextAreaField");
+  assert.ok(source.includes('name: "TextAreaField"'), "styled name must be TextAreaField");
   assert.ok(source.includes("htmlFor={id}"), "label must be associated via htmlFor");
   assert.ok(source.includes("aria-describedby"), "error must be wired via aria-describedby");
   assert.ok(source.includes("aria-invalid"), "error must set aria-invalid");
