@@ -71,7 +71,12 @@ import { Text } from "../components/Text.js";
  * - Result rows are plain cards: reference (subheading), verse
  *   text (verse variant), and a small "Add to memorize list"
  *   button whose press is `onAddVerse(id)` — the store mutation
- *   stays app-side.
+ *   stays app-side. A result the app marks `added` (#242) renders
+ *   a disabled secondary "Added" button instead, mirroring the
+ *   memorize web fix (memorize #56/PR #57): the confirmation is
+ *   derived from app state, so it is correct on first render for
+ *   verses already in the library and flips in place after a tap
+ *   once the app re-renders with the flag set.
  *
  * Two layout notes:
  * - #188: the FlatList is bounded to the fixed shell with
@@ -107,6 +112,10 @@ export type VerseSearchPageItem = {
   id: string;
   reference: string;
   text: string;
+  /** The verse is already in the app's memorize list (#242):
+   * the row renders the disabled "Added" confirmation instead of
+   * the active Add button. Optional — omitted means not added. */
+  added?: boolean;
 };
 
 export type VerseSearchPageProps = {
@@ -144,9 +153,15 @@ function VerseResultRow({
     <Card marginBottom="$2">
       <Text variant="subheading">{item.reference}</Text>
       <Text variant="verse">{item.text}</Text>
-      <Button size="sm" onPress={onAddPress}>
-        Add to memorize list
-      </Button>
+      {item.added ? (
+        <Button size="sm" variant="secondary" disabled>
+          Added
+        </Button>
+      ) : (
+        <Button size="sm" onPress={onAddPress}>
+          Add to memorize list
+        </Button>
+      )}
     </Card>
   );
 }
