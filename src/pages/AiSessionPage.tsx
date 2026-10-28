@@ -118,6 +118,18 @@ export function AiSessionPage({
   onCancel,
   onEmptyCancel,
 }: AiSessionPageProps) {
+  // Web keyboard support (the TextLink/MealPlansPage pattern): the
+  // Cancel control below carries the button role on web, and a div
+  // with a role is not keyboard-operable on its own, so Enter and
+  // Space invoke the same callback as a press. `tabIndex` and
+  // `onKeyDown` are web-only props in Tamagui and are ignored on
+  // native, where onPress is the activation path.
+  const handleCancelKeyDown = (event: { key: string; preventDefault: () => void }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onCancel();
+    }
+  };
   if (!session) {
     return (
       <YStack
@@ -278,6 +290,8 @@ export function AiSessionPage({
             accessibilityRole: "button",
             accessibilityLabel: "Cancel session",
           })}
+          tabIndex={0}
+          onKeyDown={handleCancelKeyDown}
           cursor="web:pointer"
         >
           <Text

@@ -79,19 +79,47 @@ export function Alert({
   dismissible = false,
   onDismiss,
   children,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
   ...rest
 }: AlertProps) {
   const styles = severityStyles[severity];
   const isAlert = severity === "error" || severity === "warning";
   const showDismiss = dismissible && onDismiss !== undefined;
   const content = children ?? message;
+  // Caller-supplied RN accessibility props are destructured out of
+  // `rest` and translated like every other wrapper (#237): left in
+  // `rest` they would reach the Tamagui element untranslated and leak
+  // as raw HTML attributes on web. The severity default is applied
+  // first, so a caller's own role/live-region wins where given.
+  const a11yProps = {
+    ...(isAlert
+      ? platformAccessibilityProps({ accessibilityRole: "alert" })
+      : politeLiveRegionProps),
+    ...platformAccessibilityProps({
+      accessible,
+      accessibilityElementsHidden,
+      accessibilityHint,
+      accessibilityLabel,
+      accessibilityLabelledBy,
+      accessibilityLiveRegion,
+      accessibilityRole,
+      accessibilityState,
+      accessibilityValue,
+    }),
+  };
   return (
     <StyledAlert
       backgroundColor={styles.background}
       borderColor={styles.border}
-      {...(isAlert
-        ? platformAccessibilityProps({ accessibilityRole: "alert" })
-        : politeLiveRegionProps)}
+      {...a11yProps}
       {...rest}
     >
       <XStack justifyContent="space-between" alignItems="flex-start" gap={tokens.spacing[2]}>

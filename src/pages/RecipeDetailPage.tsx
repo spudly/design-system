@@ -901,6 +901,19 @@ function IngredientsPanel({
     setCustomScaleEditing(true);
   };
 
+  // Web keyboard support (the TextLink/MealPlansPage pattern): the
+  // Custom scale chip carries the button role on web, and a div with
+  // a role is not keyboard-operable on its own, so Enter and Space
+  // start the edit exactly like a press. `tabIndex` and `onKeyDown`
+  // are web-only props in Tamagui and are ignored on native, where
+  // onPress is the activation path.
+  const handleCustomScaleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      startCustomScaleEdit();
+    }
+  };
+
   // Committing an entry applies it through the same onScaleChange
   // the presets use; an empty, non-numeric, or non-positive entry
   // commits nothing and the chip restores the current scale.
@@ -979,6 +992,8 @@ function IngredientsPanel({
                   accessibilityRole: "button",
                   accessibilityLabel: "Custom scale",
                 })}
+                tabIndex={0}
+                onKeyDown={handleCustomScaleKeyDown}
                 aria-pressed={isCustomScaleSelected}
               >
                 <Text

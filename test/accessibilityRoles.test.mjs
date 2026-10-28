@@ -31,7 +31,8 @@
  * and the DS primitives/wrappers that destructure a caller's role
  * and forward it through that translator (Button and Text from
  * #235; ProgressBar, TextLink, OptionCard, TextField, TextAreaField,
- * and CheckboxField from #237 — see TRANSLATOR_FILES below). A
+ * and CheckboxField from #237, and Alert once it began destructuring
+ * caller props the same way — see TRANSLATOR_FILES below). A
  * dedicated test below pins that every excluded file routes through
  * the translator, so the exclusion cannot become a hole a bare
  * computed role could slip through.
@@ -139,6 +140,7 @@ const TRANSLATOR_FILES = new Set([
   join(srcDir, "components", "TextField.tsx"),
   join(srcDir, "components", "TextAreaField.tsx"),
   join(srcDir, "components", "CheckboxField.tsx"),
+  join(srcDir, "components", "Alert.tsx"),
 ]);
 
 test("no component passes an accessibilityRole outside React Native's supported set", () => {

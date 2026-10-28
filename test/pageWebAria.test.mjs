@@ -206,6 +206,7 @@ test("field/primitive wrappers destructure caller RN props out of rest and trans
     "src/components/CheckboxField.tsx",
     "src/components/TextLink.tsx",
     "src/components/OptionCard.tsx",
+    "src/components/Alert.tsx",
   ]) {
     const code = readCode(rel);
     assert.ok(
@@ -328,4 +329,30 @@ test("SSR: TextLink, BackLink, OptionCard, and Alert render their roles (#237)",
   );
   assert.ok(alertHtml.includes('role="alert"'));
   assertNoLeak(alertHtml);
+  // Caller-supplied RN props on Alert are translated too, not leaked
+  // raw through `...rest` (CodeRabbit finding on PR #243).
+  const labelledAlert = await renderToHtml(
+    React.createElement(Alert, {
+      severity: "error",
+      message: "Boom",
+      accessibilityLabel: "Failure notice",
+    }),
+  );
+  assert.ok(labelledAlert.includes('aria-label="Failure notice"'));
+  assert.ok(labelledAlert.includes('role="alert"'));
+  assertNoLeak(labelledAlert);
+});
+
+test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbit PR #243)", () => {
+  // A Tamagui stack carrying role="button" is a div: without
+  // tabIndex + an Enter/Space handler it announces as a button that
+  // the keyboard cannot reach. The MealPlansPage rows set the
+  // pattern; the AiSessionPage Cancel control and the
+  // RecipeDetailPage Custom scale chip must follow it.
+  const aiSession = readCode("src/pages/AiSessionPage.tsx");
+  assert.match(aiSession, /onKeyDown=\{handleCancelKeyDown\}/);
+  assert.match(aiSession, /tabIndex=\{0\}/);
+  const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
+  assert.match(recipeDetail, /onKeyDown=\{handleCustomScaleKeyDown\}/);
+  assert.match(recipeDetail, /tabIndex=\{0\}/);
 });
