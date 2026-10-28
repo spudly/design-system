@@ -2,6 +2,9 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
 import { Text } from "../components/Text.js";
 import { AddIcon } from "./AddIcon.js";
+import { CollapsedIcon } from "./CollapsedIcon.js";
+import { CollapsibleIcon } from "./CollapsibleIcon.js";
+import { ExpandedIcon } from "./ExpandedIcon.js";
 import { FeedbackIcon } from "./FeedbackIcon.js";
 import { HomeIcon } from "./HomeIcon.js";
 import { Icon, type IconElement } from "./Icon.js";
@@ -45,6 +48,8 @@ export const Large: Story = {
 
 const galleryIcons = [
   { name: "AddIcon", Icon: AddIcon },
+  { name: "CollapsedIcon", Icon: CollapsedIcon },
+  { name: "ExpandedIcon", Icon: ExpandedIcon },
   { name: "FeedbackIcon", Icon: FeedbackIcon },
   { name: "HomeIcon", Icon: HomeIcon },
   { name: "MealsIcon", Icon: MealsIcon },
@@ -67,6 +72,22 @@ export const AllIcons: Story = {
           <Text variant="hint">{name}</Text>
         </YStack>
       ))}
+    </XStack>
+  ),
+};
+
+/** CollapsibleIcon in both states: collapsed (chevron-down) and expanded (chevron-up). */
+export const Collapsible: Story = {
+  render: () => (
+    <XStack gap={16}>
+      <YStack alignItems="center" gap={4} width={110}>
+        <CollapsibleIcon isOpen={false} size={24} color="#333333" />
+        <Text variant="hint">Collapsed</Text>
+      </YStack>
+      <YStack alignItems="center" gap={4} width={110}>
+        <CollapsibleIcon isOpen={true} size={24} color="#333333" />
+        <Text variant="hint">Expanded</Text>
+      </YStack>
     </XStack>
   ),
 };

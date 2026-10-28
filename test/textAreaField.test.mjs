@@ -14,6 +14,7 @@
  * Run against the built output: `npm run build` first (the `test`
  * script does both).
  */
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";

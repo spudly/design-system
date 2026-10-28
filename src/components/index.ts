@@ -1,3 +1,5 @@
+export { Accordion, type AccordionItem, type AccordionProps } from "./Accordion.js";
+export { AccordionSection, type AccordionSectionProps } from "./AccordionSection.js";
 export { Alert, type AlertAction, type AlertProps, type AlertSeverity } from "./Alert.js";
 export { ActionBar, type ActionBarProps } from "./ActionBar.js";
 export { Avatar, type AvatarProps } from "./Avatar.js";
@@ -14,6 +16,7 @@ export {
   type CheckboxSelectListProps,
 } from "./CheckboxSelectList.js";
 export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
+export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField.js";
 export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { RatingForm, type RatingFormProps, type RatingFormValues } from "./RatingForm.js";

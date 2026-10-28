@@ -15,6 +15,7 @@
  * Run against the built output: `npm run build` first (the `test`
  * script does both).
  */
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
