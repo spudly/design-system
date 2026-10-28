@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+New Accordion widgets (adopted from shuoink/ui, design-system #178): `Accordion` renders a group of titled sections where only one section is open at a time — tapping a section header expands it with an animated height and closes the previously open one, and tapping the open header closes it. `AccordionSection` is the standalone building block for a single expandable section (its own bordered frame, header button with a chevron that flips when open, controlled or self-managed open state), and `Collapsible` is the animated expand/collapse container underneath both. On a @spudly/ui bump, re-check in Storybook: Components/Accordion's Default story opens and closes sections one at a time, Components/AccordionSection's Open story renders its body expanded, and Components/Collapsible's Interactive story animates open and closed from its Toggle button.

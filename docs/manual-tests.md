@@ -49,6 +49,61 @@ from the components with the most review churn first (design-system
 
 ---
 
+## Accordion
+
+Open in `Components/Accordion`: Default, FirstOpen, Controlled,
+SingleSection.
+
+1. Default: all sections start closed. Opening one section expands
+   it with an animated height and closes whichever section was open
+   — only one section is ever open at a time. Pressing the open
+   section's header closes it, leaving all sections closed.
+2. FirstOpen: the first section renders expanded on load, the rest
+   closed.
+3. Controlled: the "Open section:" line under the accordion tracks
+   the open section's name as headers are pressed, and reads "none"
+   when all sections are closed.
+4. Section headers read as buttons: the chevron points down over a
+   closed section and flips up over the open one; on web, Tab reaches
+   a header and Enter/Space toggles it.
+
+**Run when:** `src/components/Accordion.tsx`, its stories, or a
+changeset naming Accordion.
+
+---
+
+## AccordionSection
+
+Open in `Components/AccordionSection`: Closed, Open, LongTitle.
+
+1. Closed: only the header row renders (title + chevron pointing
+   down) inside the bordered frame; no body text is visible.
+2. Open: the body renders expanded under a divider line, chevron
+   flipped up. Pressing the header collapses it with an animated
+   height; pressing again re-expands it.
+3. LongTitle: the title wraps to two lines beside the chevron
+   without truncating or pushing the chevron out of the frame.
+
+**Run when:** `src/components/AccordionSection.tsx`, its stories, or
+a changeset naming AccordionSection.
+
+---
+
+## Collapsible
+
+Open in `Components/Collapsible`: Closed, Open, Interactive.
+
+1. Closed renders nothing visible; Open renders the full content
+   block.
+2. Interactive: the Toggle button animates the region open and
+   closed — height grows/shrinks smoothly rather than snapping, and
+   no content spills outside the frame mid-animation.
+
+**Run when:** `src/components/Collapsible.tsx`, its stories, or a
+changeset naming Collapsible.
+
+---
+
 ## Badge
 
 Open in `Components/Badge`: Neutral, Info, Success, Warning, Danger,
