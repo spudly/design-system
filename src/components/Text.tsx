@@ -48,6 +48,10 @@ type StyledTextProps = GetProps<typeof StyledText>;
 
 export type TextProps = StyledTextProps & {
   variant?: "heading" | "subheading" | "body" | "hint" | "error" | "verse";
+  // A caller-supplied heading level for the web target (routed
+  // through platformAccessibilityProps and dropped on native, where
+  // RN has no heading-level prop).
+  "aria-level"?: number | undefined;
 };
 
 /**
@@ -74,8 +78,31 @@ export function Text({
   accessibilityRole,
   accessibilityState,
   accessibilityValue,
+  "aria-level": callerAriaLevel,
   ...rest
 }: TextProps) {
+  // Heading semantics (#256): the `heading` and `subheading`
+  // variants are page/section titles, so they carry the RN `header`
+  // role by default — on web the translator renders it as
+  // `role="heading"` with `aria-level` 1 (heading) / 2 (subheading),
+  // and on native the `header` role alone gives VoiceOver/TalkBack
+  // heading navigation, with visuals unchanged. A caller-supplied
+  // role (RN `accessibilityRole` or web `role` in rest) always wins;
+  // the level is only attached when the effective role is a heading.
+  // A caller-supplied `aria-level` is destructured out of rest and
+  // routed through the translator like the generated level: left in
+  // rest it would spread after a11yProps at render, so an explicit
+  // `aria-level={undefined}` would clobber the generated level on
+  // web and a defined level would bypass the translator's native
+  // filter (RN has no heading-level prop; it is dropped there).
+  const headingLevel = variant === "heading" ? 1 : variant === "subheading" ? 2 : undefined;
+  // The web `role` in rest spreads last at render (below), so when
+  // both role props are supplied it is the role that actually
+  // renders — check it first, or a rendered button would keep a
+  // heading's aria-level (and a rendered heading would lose its).
+  const callerRole = (rest as { role?: string }).role ?? accessibilityRole;
+  const roleIsHeading =
+    callerRole === undefined || callerRole === "header" || callerRole === "heading";
   const a11yProps = platformAccessibilityProps({
     accessible,
     accessibilityElementsHidden,
@@ -83,9 +110,11 @@ export function Text({
     accessibilityLabel,
     accessibilityLabelledBy,
     accessibilityLiveRegion,
-    accessibilityRole,
+    accessibilityRole: accessibilityRole ?? (headingLevel !== undefined ? "header" : undefined),
     accessibilityState,
     accessibilityValue,
+    "aria-level":
+      callerAriaLevel ?? (headingLevel !== undefined && roleIsHeading ? headingLevel : undefined),
   });
   // The font family must cross as an instance prop carrying the
   // BARE font name ("body" / "verse", no "$"): on web, Tamagui only

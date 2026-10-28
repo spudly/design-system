@@ -52,6 +52,7 @@ export type TranslatableAccessibilityProps = {
   "aria-hidden"?: boolean | undefined;
   "aria-label"?: string | undefined;
   "aria-labelledby"?: string | undefined;
+  "aria-level"?: number | undefined;
   "aria-live"?: "off" | "polite" | "assertive" | undefined;
   "aria-selected"?: boolean | undefined;
   "aria-valuemax"?: number | undefined;
@@ -127,9 +128,12 @@ export function platformAccessibilityProps(
   if (!isWeb) {
     // Pass the defined props through untouched (filtering undefined
     // values only so the result satisfies the tighter `role` typing
-    // above under exactOptionalPropertyTypes).
+    // above under exactOptionalPropertyTypes). `aria-level` is the
+    // one exception: it is ARIA-only (React Native has no heading
+    // level prop — the `header` role alone carries heading semantics
+    // there), so it is dropped rather than forwarded to a native view.
     return Object.fromEntries(
-      Object.entries(input).filter(([, value]) => value !== undefined),
+      Object.entries(input).filter(([key, value]) => value !== undefined && key !== "aria-level"),
     ) as PlatformAccessibilityProps;
   }
 
@@ -151,6 +155,7 @@ export function platformAccessibilityProps(
     "aria-hidden": ariaHidden,
     "aria-label": ariaLabel,
     "aria-labelledby": ariaLabelledBy,
+    "aria-level": ariaLevel,
     "aria-live": ariaLive,
     "aria-selected": ariaSelected,
     "aria-valuemax": ariaValueMax,
@@ -203,6 +208,9 @@ export function platformAccessibilityProps(
   const expanded = ariaExpanded ?? accessibilityState?.expanded;
   if (expanded !== undefined) {
     translated["aria-expanded"] = expanded;
+  }
+  if (ariaLevel !== undefined) {
+    translated["aria-level"] = ariaLevel;
   }
   const live = ariaLive ?? (accessibilityLiveRegion === "none" ? "off" : accessibilityLiveRegion);
   if (live !== undefined) {
