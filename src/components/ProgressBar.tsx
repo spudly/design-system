@@ -1,6 +1,7 @@
 import { Progress as TamaguiProgress, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 
 const StyledTrack = styled(TamaguiProgress, {
   name: "ProgressBar",
@@ -37,16 +38,40 @@ export type ProgressBarProps = StyledTrackProps & {
  * Linear progress meter. Exposes `progressbar` semantics with the current
  * value so screen readers announce progress.
  */
-export function ProgressBar({ value, ...rest }: ProgressBarProps) {
+export function ProgressBar({
+  value,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
+  ...rest
+}: ProgressBarProps) {
   const clamped = Math.min(100, Math.max(0, value));
+  // The track's own progressbar semantics and any caller accessibility
+  // props (stories/pages pass `accessibilityLabel`) go through the
+  // shared translator (#237): Tamagui Progress already renders
+  // role="progressbar" and aria-value* from value/max, but the raw RN
+  // props leaked to the DOM verbatim — `accessibilityvalue=
+  // "[object Object]"`, no aria-label. On native the RN props pass
+  // through unchanged.
+  const a11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole: accessibilityRole ?? "progressbar",
+    accessibilityState,
+    accessibilityValue: accessibilityValue ?? { min: 0, max: 100, now: Math.round(clamped) },
+  });
   return (
-    <StyledTrack
-      value={clamped}
-      max={100}
-      accessibilityRole="progressbar"
-      accessibilityValue={{ min: 0, max: 100, now: Math.round(clamped) }}
-      {...rest}
-    >
+    <StyledTrack value={clamped} max={100} {...a11yProps} {...rest}>
       <StyledIndicator />
     </StyledTrack>
   );

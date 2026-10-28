@@ -24,15 +24,18 @@
  * loudly (rather than passing vacuously) if an `accessibilityRole` ever
  * appears in a form it cannot extract literals from.
  *
- * Three files are excluded from the literal scan, by design (#235):
- * `src/components/accessibility.ts` implements
- * `platformAccessibilityProps`, the generic RN->ARIA translator whose
- * whole job is handling this prop non-literally, and
- * `src/components/Button.tsx` / `src/components/Text.tsx` are the two
- * DS primitives that destructure a caller's role and forward it
- * through that translator. A dedicated test below pins that all three
- * route through the translator, so the exclusion cannot become a
- * hole a bare computed role could slip through.
+ * A small set of files is excluded from the literal scan, by design
+ * (#235, extended in #237): `src/components/accessibility.ts`
+ * implements `platformAccessibilityProps`, the generic RN->ARIA
+ * translator whose whole job is handling this prop non-literally,
+ * and the DS primitives/wrappers that destructure a caller's role
+ * and forward it through that translator (Button and Text from
+ * #235; ProgressBar, TextLink, OptionCard, TextField, TextAreaField,
+ * and CheckboxField from #237, and Alert once it began destructuring
+ * caller props the same way — see TRANSLATOR_FILES below). A
+ * dedicated test below pins that every excluded file routes through
+ * the translator, so the exclusion cannot become a hole a bare
+ * computed role could slip through.
  */
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
@@ -118,11 +121,26 @@ function accessibilityRoleLiterals(source) {
   return { occurrences, total };
 }
 
-/** Files that handle `accessibilityRole` generically (#235) — see header. */
+/**
+ * Files that handle `accessibilityRole` generically — see header.
+ * Button/Text joined in #235; the #237 wrappers (ProgressBar,
+ * TextLink, OptionCard, TextField, TextAreaField, CheckboxField)
+ * destructure a caller's role and forward it through the same
+ * translator, so they are excluded on the same terms, and the
+ * dedicated test below pins that every excluded file routes through
+ * `platformAccessibilityProps`.
+ */
 const TRANSLATOR_FILES = new Set([
   join(srcDir, "components", "accessibility.ts"),
   join(srcDir, "components", "Button.tsx"),
   join(srcDir, "components", "Text.tsx"),
+  join(srcDir, "components", "ProgressBar.tsx"),
+  join(srcDir, "components", "TextLink.tsx"),
+  join(srcDir, "components", "OptionCard.tsx"),
+  join(srcDir, "components", "TextField.tsx"),
+  join(srcDir, "components", "TextAreaField.tsx"),
+  join(srcDir, "components", "CheckboxField.tsx"),
+  join(srcDir, "components", "Alert.tsx"),
 ]);
 
 test("no component passes an accessibilityRole outside React Native's supported set", () => {

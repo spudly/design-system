@@ -152,8 +152,8 @@ test("an unavailable recipe entry shows its suffix and does not press", () => {
   );
   assert.match(
     code,
-    /isUnavailable\s*\?\s*\{\s*accessibilityState/,
-    "the unavailable branch must carry no press wiring — the press props live in the other branch",
+    /isUnavailable\s*\?\s*platformAccessibilityProps\(\{\s*accessibilityState/,
+    "the unavailable branch must carry no press wiring — the press props live in the other branch (and its disabled state goes through the platform translator, #237)",
   );
 });
 

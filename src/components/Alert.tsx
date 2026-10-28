@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { XStack, YStack, styled } from "tamagui";
+import { XStack, YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { politeLiveRegionProps } from "./accessibility.js";
+import { platformAccessibilityProps, politeLiveRegionProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
@@ -79,17 +79,73 @@ export function Alert({
   dismissible = false,
   onDismiss,
   children,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
+  role,
+  "aria-live": ariaLive,
   ...rest
 }: AlertProps) {
   const styles = severityStyles[severity];
   const isAlert = severity === "error" || severity === "warning";
   const showDismiss = dismissible && onDismiss !== undefined;
   const content = children ?? message;
+  // Caller-supplied RN accessibility props are destructured out of
+  // `rest` and translated like every other wrapper (#237): left in
+  // `rest` they would reach the Tamagui element untranslated and leak
+  // as raw HTML attributes on web. The severity default is applied
+  // first, so a caller's own role/live-region wins where given. A
+  // direct web `role`/`aria-live` is destructured and translated too:
+  // left in `rest` it would override the translated role after the
+  // polite fallback below was computed from that role, so a direct
+  // role="alert" could inherit an explicit aria-live="polite" and
+  // lose its assertive announcement.
+  const callerA11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole,
+    accessibilityState,
+    accessibilityValue,
+    role,
+    "aria-live": ariaLive,
+  });
+  const a11yProps = {
+    ...(isAlert
+      ? platformAccessibilityProps({ accessibilityRole: "alert" })
+      : politeLiveRegionProps),
+    ...callerA11yProps,
+    // On web the polite default above is carried by role="status"
+    // itself, so a caller role override (e.g. "header" -> "heading")
+    // would silently drop the live region native keeps via
+    // accessibilityLiveRegion="polite". Restore it as an explicit
+    // aria-live unless the caller supplied their own live value.
+    // Roles "status" and "alert" are excluded: they carry their own
+    // live semantics (polite / assertive), and an explicit polite
+    // value would downgrade an "alert" announcement.
+    ...(isWeb &&
+    !isAlert &&
+    callerA11yProps.role !== undefined &&
+    callerA11yProps.role !== "status" &&
+    callerA11yProps.role !== "alert" &&
+    callerA11yProps["aria-live"] === undefined
+      ? { "aria-live": "polite" as const }
+      : {}),
+  };
   return (
     <StyledAlert
       backgroundColor={styles.background}
       borderColor={styles.border}
-      {...(isAlert ? ({ accessibilityRole: "alert" } as const) : politeLiveRegionProps)}
+      {...a11yProps}
       {...rest}
     >
       <XStack justifyContent="space-between" alignItems="flex-start" gap={tokens.spacing[2]}>

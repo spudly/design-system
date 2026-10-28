@@ -1,5 +1,6 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { PrevNextNav } from "../components/PrevNextNav.js";
 import { StepDots } from "../components/StepDots.js";
 import { Text } from "../components/Text.js";
@@ -106,8 +107,10 @@ export function MealCookingModePage({
         top={tokens.spacing[12]}
         borderRadius={tokens.radii.full}
         overflow="hidden"
-        accessibilityRole="button"
-        accessibilityLabel="Done"
+        {...platformAccessibilityProps({
+          accessibilityRole: "button",
+          accessibilityLabel: "Done",
+        })}
         onPress={onDone}
         tabIndex={0}
         onKeyDown={handleDoneKeyDown}

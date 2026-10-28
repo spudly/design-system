@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Checkbox as TamaguiCheckbox, Label, XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 /**
@@ -41,10 +42,7 @@ const StyledBox = styled(XStack, {
 
 type StyledCheckboxProps = GetProps<typeof StyledCheckbox>;
 
-export type CheckboxFieldProps = Omit<
-  StyledCheckboxProps,
-  "checked" | "onCheckedChange"
-> & {
+export type CheckboxFieldProps = Omit<StyledCheckboxProps, "checked" | "onCheckedChange"> & {
   label: string;
   /**
    * Supporting text under the label. A plain string renders in the hint
@@ -84,8 +82,28 @@ export function CheckboxField({
   error,
   id: idProp,
   children,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
   ...rest
 }: CheckboxFieldProps) {
+  const a11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole,
+    accessibilityState,
+    accessibilityValue,
+  });
   const autoId = useId();
   const id = idProp ?? autoId;
   const labelId = `${id}-label`;
@@ -102,6 +120,7 @@ export function CheckboxField({
           aria-labelledby={labelId}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}
+          {...a11yProps}
           {...rest}
         >
           {/* Unchecked border is $textMuted, not $borderColor: the box

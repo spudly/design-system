@@ -1,5 +1,6 @@
 import { View, XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 /**
@@ -85,7 +86,7 @@ export function BackLink({ onPress, label = "Back" }: BackLinkProps) {
   };
   return (
     <XStack
-      accessibilityRole="link"
+      {...platformAccessibilityProps({ accessibilityRole: "link" })}
       onPress={onPress}
       tabIndex={0}
       onKeyDown={handleKeyDown}

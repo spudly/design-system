@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { ScrollView, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { Alert } from "../components/Alert.js";
 import { TextAreaField } from "../components/TextAreaField.js";
@@ -179,7 +180,7 @@ function RevertAction({ label, onPress }: { label: string; onPress: () => void }
   };
   return (
     <YStack
-      accessibilityRole="button"
+      {...platformAccessibilityProps({ accessibilityRole: "button" })}
       onPress={onPress}
       tabIndex={0}
       onKeyDown={handleKeyDown}
@@ -226,7 +227,7 @@ function ChangedListBanner({ label, onRevert }: { label: string; onRevert?: () =
       </Text>
       {onRevert ? (
         <YStack
-          accessibilityRole="button"
+          {...platformAccessibilityProps({ accessibilityRole: "button" })}
           onPress={onRevert}
           tabIndex={0}
           onKeyDown={handleKeyDown}

@@ -3,6 +3,7 @@ import { TouchableOpacity } from "react-native";
 import { Image, ScrollView, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -621,7 +622,7 @@ function ViewerRatingInput({
     <View
       pointerEvents={interactive ? "auto" : "none"}
       opacity={isPending ? 0.5 : undefined}
-      accessibilityState={{ disabled: isPending }}
+      {...platformAccessibilityProps({ accessibilityState: { disabled: isPending } })}
     >
       <StarRatingInput
         value={value ?? 0}
@@ -900,6 +901,19 @@ function IngredientsPanel({
     setCustomScaleEditing(true);
   };
 
+  // Web keyboard support (the TextLink/MealPlansPage pattern): the
+  // Custom scale chip carries the button role on web, and a div with
+  // a role is not keyboard-operable on its own, so Enter and Space
+  // start the edit exactly like a press. `tabIndex` and `onKeyDown`
+  // are web-only props in Tamagui and are ignored on native, where
+  // onPress is the activation path.
+  const handleCustomScaleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      startCustomScaleEdit();
+    }
+  };
+
   // Committing an entry applies it through the same onScaleChange
   // the presets use; an empty, non-numeric, or non-positive entry
   // commits nothing and the chip restores the current scale.
@@ -974,8 +988,17 @@ function IngredientsPanel({
                 borderColor={isCustomScaleSelected ? "$primary" : "$textMuted"}
                 backgroundColor={isCustomScaleSelected ? "$primary" : "$surface"}
                 onPress={startCustomScaleEdit}
-                accessibilityRole="button"
-                accessibilityLabel="Custom scale"
+                {...platformAccessibilityProps({
+                  accessibilityRole: "button",
+                  // When a custom scale is selected the chip's visible
+                  // text is the multiplier itself; the accessible name
+                  // must carry it too, not just "Custom scale".
+                  accessibilityLabel: isCustomScaleSelected
+                    ? `Custom scale ${formatScaleValue(view.scaleValue)}×`
+                    : "Custom scale",
+                })}
+                tabIndex={0}
+                onKeyDown={handleCustomScaleKeyDown}
                 aria-pressed={isCustomScaleSelected}
               >
                 <Text

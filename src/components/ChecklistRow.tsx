@@ -1,5 +1,6 @@
 import { Checkbox as TamaguiCheckbox, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const StyledCheckbox = styled(TamaguiCheckbox, {
@@ -44,7 +45,7 @@ export function ChecklistRow({ label, metadata, checked, onCheckedChange }: Chec
       <StyledCheckbox
         checked={checked}
         onCheckedChange={onCheckedChange}
-        accessibilityLabel={label}
+        {...platformAccessibilityProps({ accessibilityLabel: label })}
         backgroundColor={checked ? "$primary" : "$surface"}
         borderColor={checked ? "$primary" : "$textMuted"}
       >

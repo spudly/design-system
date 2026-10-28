@@ -1,5 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
@@ -76,9 +77,11 @@ function ShoppingListRow({ line, onToggle }: { line: ShoppingListPageLine; onTog
       borderBottomWidth={1}
       borderBottomColor={tokens.colors.gray.gray2}
       paddingVertical="$3"
-      accessibilityRole="checkbox"
-      accessibilityState={{ checked }}
-      accessibilityLabel={line.name}
+      {...platformAccessibilityProps({
+        accessibilityRole: "checkbox",
+        accessibilityState: { checked },
+        accessibilityLabel: line.name,
+      })}
       onPress={onToggle}
       tabIndex={0}
       onKeyDown={handleKeyDown}

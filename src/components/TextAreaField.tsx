@@ -2,6 +2,7 @@ import { useId } from "react";
 import { TextArea as TamaguiTextArea, Label, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {
@@ -57,8 +58,28 @@ export function TextAreaField({
   error,
   id: idProp,
   numberOfLines = 4,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
   ...rest
 }: TextAreaFieldProps) {
+  const a11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole,
+    accessibilityState,
+    accessibilityValue,
+  });
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
@@ -76,6 +97,7 @@ export function TextAreaField({
         error={!!error}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
+        {...a11yProps}
         {...rest}
       />
       {error ? (

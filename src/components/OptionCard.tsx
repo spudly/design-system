@@ -1,6 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Card, type CardProps } from "./Card.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 export type OptionCardProps = Omit<CardProps, "onPress"> & {
@@ -14,9 +15,34 @@ export type OptionCardProps = Omit<CardProps, "onPress"> & {
  * URL"). The whole card is a real pressable with `accessibilityRole="button"`
  * and a minimum 44px height; a trailing chevron signals navigation.
  */
-export function OptionCard({ title, description, onPress, ...rest }: OptionCardProps) {
+export function OptionCard({
+  title,
+  description,
+  onPress,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
+  ...rest
+}: OptionCardProps) {
+  const a11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole: accessibilityRole ?? "button",
+    accessibilityState,
+    accessibilityValue,
+  });
   return (
-    <Card onPress={onPress} accessibilityRole="button" minHeight={44} {...rest}>
+    <Card onPress={onPress} {...a11yProps} minHeight={44} {...rest}>
       <XStack alignItems="center" justifyContent="space-between" gap={tokens.spacing[3]}>
         <YStack flex={1} gap={tokens.spacing[1]}>
           <Text variant="subheading">{title}</Text>

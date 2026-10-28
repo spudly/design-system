@@ -2,6 +2,7 @@ import { useId } from "react";
 import { Input as TamaguiInput, Label, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const StyledInput = styled(TamaguiInput, {
@@ -56,7 +57,32 @@ export type TextFieldProps = StyledInputProps & {
  * and enforces a 44px minimum touch target. Pass `secureTextEntry` for
  * password fields.
  */
-export function TextField({ label, error, id: idProp, ...rest }: TextFieldProps) {
+export function TextField({
+  label,
+  error,
+  id: idProp,
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
+  ...rest
+}: TextFieldProps) {
+  const a11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole,
+    accessibilityState,
+    accessibilityValue,
+  });
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
@@ -73,6 +99,7 @@ export function TextField({ label, error, id: idProp, ...rest }: TextFieldProps)
         error={!!error}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
+        {...a11yProps}
         {...rest}
       />
       {error ? (
