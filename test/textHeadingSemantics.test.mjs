@@ -46,8 +46,13 @@ test("Text defaults heading variants to the header role with a level (#256)", ()
   );
   assert.match(
     source,
-    /"aria-level": headingLevel !== undefined && roleIsHeading \? headingLevel : undefined/,
-    "Text must attach aria-level 1/2 only when the effective role is a heading",
+    /"aria-level":\s+callerAriaLevel \?\?\s+\(headingLevel !== undefined && roleIsHeading \? headingLevel : undefined\)/,
+    "Text must prefer a caller-supplied aria-level, else attach the variant's level only when the effective role is a heading",
+  );
+  assert.match(
+    source,
+    /"aria-level": callerAriaLevel,/,
+    "a caller-supplied aria-level must be destructured out of rest so it routes through the translator instead of spreading after a11yProps",
   );
   assert.match(
     source,
@@ -148,6 +153,29 @@ test("SSR: both role props — a rendered heading keeps its level (#256)", async
   assert.ok(html.includes('role="heading"'), `web role must win: ${html.slice(0, 400)}`);
   assert.ok(html.includes('aria-level="1"'), "a rendered heading keeps the variant's level");
   assertNoLeak(html);
+});
+
+test("SSR: a caller-supplied aria-level wins; an explicit undefined keeps the generated level (#256)", async () => {
+  const { React, Text } = await loadRuntime();
+  const explicit = await renderToHtml(
+    React.createElement(Text, { variant: "heading", "aria-level": 3 }, "Deep title"),
+  );
+  assert.ok(
+    explicit.includes('aria-level="3"'),
+    `caller aria-level must win: ${explicit.slice(0, 400)}`,
+  );
+  assertNoLeak(explicit);
+  // An explicit undefined must not clobber the generated level via
+  // rest spreading after a11yProps — the prop is destructured out of
+  // rest and routed through the translator instead.
+  const undef = await renderToHtml(
+    React.createElement(Text, { variant: "heading", "aria-level": undefined }, "Welcome back"),
+  );
+  assert.ok(
+    undef.includes('aria-level="1"'),
+    `generated level must survive an explicit undefined: ${undef.slice(0, 400)}`,
+  );
+  assertNoLeak(undef);
 });
 
 test("SSR: body Text has no heading role; a caller role wins (#256)", async () => {
