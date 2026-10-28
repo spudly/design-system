@@ -51,6 +51,11 @@ test("ImportReviewPage applies imageAlt as the hero image's accessible name", ()
     /accessibilityLabel=\{imageAlt\}/,
     "the Image must receive accessibilityLabel={imageAlt} (rendered as alt text on web)",
   );
+  assert.match(
+    code,
+    /accessible=\{imageAlt \? true : undefined\}/,
+    "the Image must be an accessibility element only when imageAlt is supplied (RN does not auto-mark a labeled Image accessible; a decorative image stays out of the tree)",
+  );
 });
 
 test("ImportTextPage names its paste field 'Recipe text'", () => {

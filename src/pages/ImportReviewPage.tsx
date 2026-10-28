@@ -68,6 +68,7 @@ export function ImportReviewPage({
       {imageUrl ? (
         <Image
           source={{ uri: imageUrl }}
+          accessible={imageAlt ? true : undefined}
           accessibilityLabel={imageAlt}
           style={{
             marginBottom: tokens.spacing[4],

@@ -439,7 +439,7 @@ changeset naming Button or the Button icon slot.
 ## Import pages (ImportTextPage, ImportUrlPage, ImportReviewPage)
 
 Open in `Pages/Eciperay/ImportTextPage`: Empty, WithError.
-Open in `Pages/Eciperay/ImportUrlPage`: Filled.
+Open in `Pages/Eciperay/ImportUrlPage`: Filled, Interactive.
 ImportReviewPage has no image story — its image case is verified
 from the changeset/PR description against a host render.
 
@@ -447,9 +447,10 @@ from the changeset/PR description against a host render.
    name "Recipe text" (Storybook accessibility panel or DOM
    `aria-label`), not only by its "Paste your recipe here…"
    placeholder. The Import button stays disabled on blank text.
-2. ImportUrlPage (Filled): pressing Enter in the URL field
-   submits the import, exactly like pressing the Import button;
-   with a blank URL or while loading, Enter does nothing.
+2. ImportUrlPage (Interactive): pressing Enter in the URL field
+   increments the "Submitted N times" counter, exactly like
+   pressing the Import button; clear the field first and Enter
+   does nothing (the counter does not move).
 3. ImportReviewPage: a render that passes `imageAlt` (hosts pass
    the recipe title) exposes that text as the hero image's
    accessible name — `alt` on web, accessibility label on
