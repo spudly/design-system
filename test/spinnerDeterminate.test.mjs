@@ -36,6 +36,7 @@
  * translated props spread, so the rendered ARIA output is asserted
  * too, the same way pageWebAria.test.mjs pins ProgressBar's.
  */
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
