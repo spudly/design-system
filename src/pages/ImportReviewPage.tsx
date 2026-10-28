@@ -23,7 +23,7 @@ import { Text } from "../components/Text.js";
  * of the host's mutation states, mirrored from the app view.
  */
 
-export interface ImportReviewPageProps {
+export type ImportReviewPageProps = {
   versionLabel: string;
   imageUrl?: string | null;
   /** The host-rendered recipe preview (app RecipeInputPreview). */
@@ -34,7 +34,7 @@ export interface ImportReviewPageProps {
   editsPending: boolean;
   onAccept: () => void;
   onStartEdits: () => void;
-}
+};
 
 export function ImportReviewPage({
   versionLabel,

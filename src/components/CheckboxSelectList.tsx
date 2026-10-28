@@ -4,12 +4,12 @@ import { CheckboxField } from "./CheckboxField.js";
 import { EmptyState } from "./EmptyState.js";
 import { Spinner } from "./Spinner.js";
 
-export interface CheckboxSelectItem {
+export type CheckboxSelectItem = {
   id: string;
   label: string;
-}
+};
 
-export interface CheckboxSelectListProps {
+export type CheckboxSelectListProps = {
   items: CheckboxSelectItem[];
   /** Ids of the selected items (the ToggleChipGroup multi-select convention: a plain array). */
   selectedIds: string[];
@@ -19,7 +19,7 @@ export interface CheckboxSelectListProps {
   isLoading?: boolean;
   /** Shown through EmptyState when there are no items. */
   emptyMessage?: string;
-}
+};
 
 /**
  * Multi-select list of labeled checkboxes with loading and empty states:

@@ -45,7 +45,7 @@ const StyledContent = styled(YStack, {
 
 type StyledContentProps = GetProps<typeof StyledContent>;
 
-export interface ScreenContainerProps extends StyledContentProps {
+export type ScreenContainerProps = StyledContentProps & {
   /** Wrap content in a scroll view. Defaults to true. */
   scrollable?: boolean;
   /**
@@ -55,7 +55,7 @@ export interface ScreenContainerProps extends StyledContentProps {
    * before; only `auth` bakes in its surface background.
    */
   variant?: "default" | "padded" | "list" | "auth";
-}
+};
 
 /**
  * Page scaffold: full-height container with horizontal page padding and

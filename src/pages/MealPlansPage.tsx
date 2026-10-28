@@ -75,13 +75,13 @@ import { Text } from "../components/Text.js";
 /** One meal plan row's view-model. The app formats `subtitle` (its
  * meta line — entry count · date range · nutrition); the view only
  * renders it. */
-export interface MealPlansPageItem {
+export type MealPlansPageItem = {
   id: string;
   title: string;
   subtitle?: string;
-}
+};
 
-export interface MealPlansPageProps {
+export type MealPlansPageProps = {
   /** Meal plans to render, in the app's order. */
   plans: MealPlansPageItem[];
   /** Load in flight: the spinner renders in place of the list,
@@ -94,7 +94,7 @@ export interface MealPlansPageProps {
   /** Optional row action, mirroring the app row's Delete. The
    * button renders only when the callback is provided. */
   onPlanDelete?: (planId: string) => void;
-}
+};
 
 function MealPlanRow({
   item,

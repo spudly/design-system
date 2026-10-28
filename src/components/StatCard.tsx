@@ -2,13 +2,13 @@ import { tokens } from "../tokens/index.js";
 import { Card } from "./Card.js";
 import { Text } from "./Text.js";
 
-export interface StatCardProps {
+export type StatCardProps = {
   /** The headline number, e.g. "12". Rendered large and semibold. */
   value: string;
   /** What the number measures, e.g. "verses mastered". */
   label: string;
   sublabel?: string;
-}
+};
 
 /**
  * Big-number stat tile built on Card: a large semibold value, a label, and

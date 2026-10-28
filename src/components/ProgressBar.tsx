@@ -28,10 +28,10 @@ const StyledIndicator = styled(TamaguiProgress.Indicator, {
 
 type StyledTrackProps = GetProps<typeof StyledTrack>;
 
-export interface ProgressBarProps extends StyledTrackProps {
+export type ProgressBarProps = StyledTrackProps & {
   /** Completion percentage, 0–100. */
   value: number;
-}
+};
 
 /**
  * Linear progress meter. Exposes `progressbar` semantics with the current

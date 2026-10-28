@@ -83,22 +83,22 @@ export type MyVersesPageStatus = "learning" | "memorized";
 /** One row's view-model: the verse on the app's memorize list,
  * with its status and, when a review is scheduled, the app's
  * pre-composed next-review line. */
-export interface MyVersesPageItem {
+export type MyVersesPageItem = {
   id: string;
   reference: string;
   text: string;
   status: MyVersesPageStatus;
   nextReviewLabel?: string;
-}
+};
 
-export interface MyVersesPageProps {
+export type MyVersesPageProps = {
   /** The app's memorize list, in the app's order. */
   verses: MyVersesPageItem[];
   /** Row action: start drilling this verse. */
   onDrillVerse: (verseId: string) => void;
   /** Row action: remove this verse from the app's list. */
   onRemoveVerse: (verseId: string) => void;
-}
+};
 
 function MyVerseRow({
   item,

@@ -77,7 +77,7 @@ import { TextField } from "../components/TextField.js";
  * key" link is web-only surface; it is not in this screen
  * and does not enter the contract.)
  */
-export interface MemorizeSettingsPageProps {
+export type MemorizeSettingsPageProps = {
   /** The API-key field's current text. The host holds this
    * state; its Save handler reads it. */
   apiKeyValue: string;
@@ -126,7 +126,7 @@ export interface MemorizeSettingsPageProps {
   /** "Keep Drive" action: the host resolves the conflict
    * in Drive's favor (its pull). */
   onKeepDrivePress: () => void;
-}
+};
 
 /**
  * Full-page Memorize settings view: the heading and the

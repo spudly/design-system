@@ -33,7 +33,7 @@ test("RatingForm is exported from the components barrel; CookLogForm is gone", (
 test("the submit view-model is generic: rating, not a domain field name", () => {
   assert.match(
     source,
-    /export interface RatingFormValues \{\n {2}rating: 1 \| 2 \| 3 \| 4 \| 5 \| null;/,
+    /export type RatingFormValues = \{\n {2}rating: 1 \| 2 \| 3 \| 4 \| 5 \| null;/,
   );
   assert.match(source, /onSubmit: \(values: RatingFormValues\) => void/);
   assert.match(source, /onSubmit\(\{ rating, notes: notes\.trim\(\) \|\| null \}\)/);
@@ -56,8 +56,8 @@ test("rating and notes are uncontrolled internal state", () => {
   assert.match(source, /useState<1 \| 2 \| 3 \| 4 \| 5 \| null>\(null\)/);
   assert.match(source, /useState\(""\)/);
   const propsBlock = source.slice(
-    source.indexOf("export interface RatingFormProps"),
-    source.indexOf("}", source.indexOf("export interface RatingFormProps")),
+    source.indexOf("export type RatingFormProps"),
+    source.indexOf("}", source.indexOf("export type RatingFormProps")),
   );
   assert.doesNotMatch(propsBlock, /(rating|notes)\??:/, "no field values cross as props");
 });

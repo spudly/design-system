@@ -54,12 +54,12 @@ function BackArrow() {
   );
 }
 
-export interface BackLinkProps {
+export type BackLinkProps = {
   /** Navigate back — a link always navigates. */
   onPress: () => void;
   /** Link label. Defaults to "Back", the apps' back-link copy. */
   label?: string;
-}
+};
 
 /**
  * The shared back link for page tops: a drawn left arrow plus a label,

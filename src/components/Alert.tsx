@@ -42,12 +42,12 @@ const StyledAlert = styled(YStack, {
 
 type StyledAlertProps = GetProps<typeof StyledAlert>;
 
-export interface AlertAction {
+export type AlertAction = {
   label: string;
   onPress: () => void;
-}
+};
 
-export interface AlertProps extends StyledAlertProps {
+export type AlertProps = StyledAlertProps & {
   severity?: AlertSeverity;
   /** Plain-text message. Use `children` instead for rich content; children win when both are given. */
   message?: string;
@@ -56,7 +56,7 @@ export interface AlertProps extends StyledAlertProps {
   dismissible?: boolean;
   onDismiss?: () => void;
   children?: ReactNode;
-}
+};
 
 /**
  * The single inline message component (consolidates the former InlineAlert

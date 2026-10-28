@@ -22,14 +22,14 @@ const StyledDot = styled(XStack, {
 
 type StyledDotProps = GetProps<typeof StyledDot>;
 
-export interface StepDotsProps extends Omit<StyledDotProps, "active"> {
+export type StepDotsProps = Omit<StyledDotProps, "active"> & {
   /** Total number of dots. */
   count: number;
   /** Zero-based index of the current step. */
   activeIndex: number;
   /** Accessible label, e.g. "Step 2 of 5". Defaults to "Step N of M". */
   label?: string;
-}
+};
 
 /**
  * Dot row showing progress through a sequence — step progress, drill

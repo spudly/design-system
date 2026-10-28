@@ -18,12 +18,12 @@ const StyledCheckbox = styled(TamaguiCheckbox, {
   justifyContent: "center",
 });
 
-export interface ChecklistRowProps {
+export type ChecklistRowProps = {
   label: string;
   metadata?: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
-}
+};
 
 /**
  * Checkbox row: a real Tamagui Checkbox (focusable, with `role="checkbox"`

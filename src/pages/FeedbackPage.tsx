@@ -27,7 +27,7 @@ import { TextField } from "../components/TextField.js";
  * the app form.
  */
 
-export interface FeedbackPageProps {
+export type FeedbackPageProps = {
   message: string;
   onMessageChange: (value: string) => void;
   replyEmail: string;
@@ -40,7 +40,7 @@ export interface FeedbackPageProps {
   /** The host's validation result: submit is disabled while true. */
   submitDisabled?: boolean;
   onSubmit: () => void;
-}
+};
 
 export function FeedbackPage({
   message,

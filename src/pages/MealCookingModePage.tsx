@@ -50,20 +50,20 @@ import { Text } from "../components/Text.js";
  *   defaults are unadorned.
  */
 
-export interface MealCookingModePageStep {
+export type MealCookingModePageStep = {
   stepNumber: number;
   recipeTitle: string;
   body: string;
-}
+};
 
-export interface MealCookingModePageProps {
+export type MealCookingModePageProps = {
   mealTitle: string;
   steps: MealCookingModePageStep[];
   stepIndex: number;
   onPrev: () => void;
   onNext: () => void;
   onDone: () => void;
-}
+};
 
 export function MealCookingModePage({
   mealTitle,

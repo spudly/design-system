@@ -13,16 +13,16 @@ import { Text } from "../components/Text.js";
  * stays app-side.
  */
 
-export interface AddRecipeMenuPageOption {
+export type AddRecipeMenuPageOption = {
   label: string;
   description: string;
   target: string;
-}
+};
 
-export interface AddRecipeMenuPageProps {
+export type AddRecipeMenuPageProps = {
   options: AddRecipeMenuPageOption[];
   onSelect?: (target: string) => void;
-}
+};
 
 export function AddRecipeMenuPage({ options, onSelect }: AddRecipeMenuPageProps) {
   return (

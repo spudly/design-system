@@ -44,15 +44,15 @@ import { TextField } from "../components/TextField.js";
  * its adapters.
  */
 
-export interface MealFormPageRecipeOption {
+export type MealFormPageRecipeOption = {
   id: string;
   label: string;
   /** The recipe's own servings — the stepper's value when the
    * host has no override in `servingsByRecipeId`. */
   servings: number;
-}
+};
 
-export interface MealFormPageProps {
+export type MealFormPageProps = {
   title: string;
   onTitleChange: (value: string) => void;
   notes: string;
@@ -71,7 +71,7 @@ export interface MealFormPageProps {
   /** Host-reported save failure, rendered above the submit row. */
   error?: string | null;
   onSubmit: () => void;
-}
+};
 
 export function MealFormPage({
   title,

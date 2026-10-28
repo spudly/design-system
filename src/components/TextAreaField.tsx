@@ -39,12 +39,12 @@ const StyledTextArea = styled(TamaguiTextArea, {
 
 type StyledTextAreaProps = GetProps<typeof StyledTextArea>;
 
-export interface TextAreaFieldProps extends StyledTextAreaProps {
+export type TextAreaFieldProps = StyledTextAreaProps & {
   label?: string;
   error?: string;
   id?: string;
   numberOfLines?: number;
-}
+};
 
 /**
  * Labeled multi-line text input (Tamagui TextArea) with error-state support.

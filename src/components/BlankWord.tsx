@@ -3,7 +3,7 @@ import { isWeb, View } from "tamagui";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
-export interface BlankWordProps {
+export type BlankWordProps = {
   /** The word shown once revealed. */
   word: string;
   revealed: boolean;
@@ -12,7 +12,7 @@ export interface BlankWordProps {
   index: number;
   /** Total number of blanks in the drill. */
   total: number;
-}
+};
 
 /**
  * Fill-in-the-blank word for memorization drills. While hidden this is a

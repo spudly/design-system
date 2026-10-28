@@ -55,7 +55,7 @@ import { TextField } from "../components/TextField.js";
  * apart from Delete, as before.
  */
 
-export interface TagsPageTag {
+export type TagsPageTag = {
   id: string;
   name: string;
   /**
@@ -64,9 +64,9 @@ export interface TagsPageTag {
    * to a name through `tagColorNameForHex` before passing tags in.
    */
   color: TagColorName;
-}
+};
 
-export interface TagsPageProps {
+export type TagsPageProps = {
   tags: TagsPageTag[];
   isLoading?: boolean;
   name: string;
@@ -96,7 +96,7 @@ export interface TagsPageProps {
   onSaveEdit?: () => void;
   onCancelEdit?: () => void;
   isUpdating?: boolean;
-}
+};
 
 export function TagsPage({
   tags,

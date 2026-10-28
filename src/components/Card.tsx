@@ -42,7 +42,7 @@ const StyledCard = styled(YStack, {
 
 type StyledCardProps = GetProps<typeof StyledCard>;
 
-export interface CardProps extends StyledCardProps {
+export type CardProps = StyledCardProps & {
   /**
    * Appearance: `default` (filled, bordered), `bordered` (outline only),
    * `muted` (page-background fill, no border), `elevated` (filled, soft
@@ -51,7 +51,7 @@ export interface CardProps extends StyledCardProps {
   variant?: "default" | "bordered" | "muted" | "elevated";
   /** @deprecated Use `variant="elevated"` instead. Kept for existing consumers. */
   elevated?: boolean;
-}
+};
 
 /**
  * Surface container with token-driven padding and radius. Appearance comes

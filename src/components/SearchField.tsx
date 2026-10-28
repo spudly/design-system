@@ -142,12 +142,12 @@ const StyledInput = styled(TamaguiInput, {
 
 type StyledInputProps = GetProps<typeof StyledInput>;
 
-export interface SearchFieldProps extends Omit<StyledInputProps, "value" | "onChangeText"> {
+export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> & {
   value: string;
   onChangeText: (text: string) => void;
   label?: string;
   id?: string;
-}
+};
 
 /**
  * Search input with a leading search icon (drawn shapes, not a text

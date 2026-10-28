@@ -19,13 +19,13 @@ import { TextField } from "../components/TextField.js";
  * submit's disabled state.
  */
 
-export interface ImportUrlPageProps {
+export type ImportUrlPageProps = {
   url: string;
   onUrlChange: (value: string) => void;
   loading?: boolean;
   error?: string | null;
   onSubmit: () => void;
-}
+};
 
 export function ImportUrlPage({
   url,

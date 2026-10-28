@@ -4,12 +4,12 @@ import { ActionBar } from "./ActionBar.js";
 import { Button } from "./Button.js";
 import { Alert } from "./Alert.js";
 
-export interface FixedActionBannerAction {
+export type FixedActionBannerAction = {
   label: string;
   onPress: () => void;
-}
+};
 
-export interface FixedActionBannerProps {
+export type FixedActionBannerProps = {
   /** Banner content; a ReactNode so callers can compose text and links. */
   message: ReactNode;
   primaryAction?: FixedActionBannerAction;
@@ -19,7 +19,7 @@ export interface FixedActionBannerProps {
   dismissAriaLabel?: string;
   /** Which screen edge the bar pins to (the ActionBar placement). */
   position?: "top" | "bottom";
-}
+};
 
 /**
  * Pinned action banner (consent bars, install prompts): the DS ActionBar

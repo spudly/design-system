@@ -4,11 +4,11 @@ import { tokens } from "../tokens/index.js";
 import { Card, type CardProps } from "./Card.js";
 import { Text } from "./Text.js";
 
-export interface SectionCardProps extends CardProps {
+export type SectionCardProps = CardProps & {
   title: string;
   /** Optional trailing element in the header row, e.g. an "Edit" button. */
   action?: ReactNode;
-}
+};
 
 /**
  * Titled card section: a Card with a subheading title row and spacing below

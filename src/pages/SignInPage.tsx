@@ -26,7 +26,7 @@ import { TextLink } from "../components/TextLink.js";
  * button disables and reads its pending label.
  */
 
-export interface SignInPageProps {
+export type SignInPageProps = {
   email: string;
   password: string;
   onEmailChange: (value: string) => void;
@@ -36,7 +36,7 @@ export interface SignInPageProps {
   onSubmit: () => void;
   onSignUpPress?: () => void;
   onForgotPasswordPress?: () => void;
-}
+};
 
 export function SignInPage({
   email,

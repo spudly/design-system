@@ -17,7 +17,7 @@ import { TextLink } from "../components/TextLink.js";
  * link render instead of the children (the locked version's form
  * never mounts).
  */
-export interface EditVersionPageProps {
+export type EditVersionPageProps = {
   /** Draft version number, rendered in the heading. */
   versionNumber: number;
   /** Host-composed summary of what the draft changes, rendered
@@ -34,7 +34,7 @@ export interface EditVersionPageProps {
    * when the callback is provided. */
   onBack?: () => void;
   children?: ReactNode;
-}
+};
 
 export function EditVersionPage(props: EditVersionPageProps) {
   const {

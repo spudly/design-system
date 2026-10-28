@@ -3,12 +3,12 @@ import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
-export interface EmptyStateProps {
+export type EmptyStateProps = {
   title: string;
   body?: string;
   actionLabel?: string;
   onAction?: () => void;
-}
+};
 
 /**
  * Empty-state composition: title, optional body, optional action.

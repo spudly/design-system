@@ -46,12 +46,12 @@ const StyledThumb = styled(TamaguiSwitch.Thumb, {
   marginTop: 2,
 });
 
-export interface SwitchProps {
+export type SwitchProps = {
   label: string;
   description?: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
-}
+};
 
 /**
  * Labeled switch row. The label is associated via `htmlFor` so it toggles

@@ -43,10 +43,10 @@ const StyledActionBar = styled(YStack, {
 
 type StyledActionBarProps = GetProps<typeof StyledActionBar>;
 
-export interface ActionBarProps extends StyledActionBarProps {
+export type ActionBarProps = StyledActionBarProps & {
   /** Which screen edge the bar pins to. Defaults to "bottom". */
   placement?: "top" | "bottom";
-}
+};
 
 /**
  * Sticky action bar: a bordered, shadowed surface pinned to the top or

@@ -25,7 +25,7 @@ const StarCell = styled(YStack, {
 
 export type StarRatingTone = "default" | "dark";
 
-export interface StarRatingInputProps {
+export type StarRatingInputProps = {
   /** Current rating, 0–5. */
   value: number;
   onChange: (value: number) => void;
@@ -51,7 +51,7 @@ export interface StarRatingInputProps {
   readOnly?: boolean;
   /** When true, the input is inert and dimmed; presses do nothing. */
   disabled?: boolean;
-}
+};
 
 /**
  * Interactive 5-star rating using ★ glyphs. Uses radiogroup semantics: the

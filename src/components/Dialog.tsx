@@ -20,7 +20,7 @@ const StyledContent = styled(TamaguiDialog.Content, {
   maxWidth: 400,
 });
 
-export interface DialogProps {
+export type DialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   title: string;
@@ -28,7 +28,7 @@ export interface DialogProps {
   children: ReactNode;
   /** Optional footer row of buttons (the app composes these). */
   actions?: ReactNode;
-}
+};
 
 /**
  * Modal dialog wrapping Tamagui's Dialog (focus trap, Escape-to-close, and

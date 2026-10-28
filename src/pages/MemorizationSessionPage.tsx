@@ -126,7 +126,7 @@ import { VerseText } from "../components/VerseText.js";
 /** One word of the passage, as rendered. A plain word crosses
  * as just its text; a word blanked this round also carries
  * its `blank` state. */
-export interface MemorizationSessionPageWord {
+export type MemorizationSessionPageWord = {
   /** The word's text (punctuation stays attached, as the app
    * tokenizes). Rendered as-is for a plain word; for a blank
    * it is the word the blank reveals — BlankWord sizes the
@@ -140,9 +140,9 @@ export interface MemorizationSessionPageWord {
      * the tappable blank. */
     revealed: boolean;
   };
-}
+};
 
-export interface MemorizationSessionPageReadyProps {
+export type MemorizationSessionPageReadyProps = {
   state: "ready";
   /** The verse's reference, rendered as the heading. */
   reference: string;
@@ -172,7 +172,7 @@ export interface MemorizationSessionPageReadyProps {
    * round: retry feedback, the next round, or — on the final
    * round — completion and navigation away. */
   onAdvance: () => void;
-}
+};
 
 export type MemorizationSessionPageProps =
   { state: "not-found"; onBack: () => void } | MemorizationSessionPageReadyProps;

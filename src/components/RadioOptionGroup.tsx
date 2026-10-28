@@ -16,25 +16,25 @@ const StyledItem = styled(TamaguiRadioGroup.Item, {
   borderWidth: 0,
 });
 
-export interface RadioOption {
+export type RadioOption = {
   value: string;
   label: string;
   description?: string;
-}
+};
 
 type RadioGroupProps = GetProps<typeof TamaguiRadioGroup>;
 
-export interface RadioOptionGroupProps extends Omit<
+export type RadioOptionGroupProps = Omit<
   RadioGroupProps,
   "value" | "onValueChange" | "children"
-> {
+> & {
   label?: string;
   options: RadioOption[];
   value: string;
   onValueChange: (value: string) => void;
   error?: string;
   id?: string;
-}
+};
 
 /**
  * Labeled radio group (Tamagui RadioGroup). Radiogroup semantics, arrow-key

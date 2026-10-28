@@ -29,16 +29,16 @@ const StyledTab = styled(TamaguiTabs.Tab, {
   } as const,
 });
 
-export interface TabItem {
+export type TabItem = {
   value: string;
   label: string;
-}
+};
 
-export interface TabsProps {
+export type TabsProps = {
   tabs: TabItem[];
   value: string;
   onValueChange: (value: string) => void;
-}
+};
 
 /**
  * Accessible tab navigation built on Tamagui Tabs (tablist semantics,

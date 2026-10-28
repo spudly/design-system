@@ -40,7 +40,7 @@ import { TextField } from "../components/TextField.js";
  * least one selected entry).
  */
 
-export interface MealPlanFormPageEntryOption {
+export type MealPlanFormPageEntryOption = {
   /** The host-composed selection key (`meal:<id>` /
    * `recipe:<id>` in the app's form state). */
   key: string;
@@ -51,9 +51,9 @@ export interface MealPlanFormPageEntryOption {
   /** Recipes only: the recipe's own servings — the stepper's
    * value when the host has no override. */
   servings?: number;
-}
+};
 
-export interface MealPlanFormPageProps {
+export type MealPlanFormPageProps = {
   title: string;
   onTitleChange: (value: string) => void;
   notes: string;
@@ -79,7 +79,7 @@ export interface MealPlanFormPageProps {
   /** Host-reported save failure, rendered above the submit row. */
   error?: string | null;
   onSubmit: () => void;
-}
+};
 
 export function MealPlanFormPage({
   title,

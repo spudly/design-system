@@ -50,12 +50,12 @@ const StyledItemText = styled(TamaguiSelect.ItemText, {
   fontSize: tokens.typography.fontSize.md,
 });
 
-export interface SelectOption {
+export type SelectOption = {
   value: string;
   label: string;
-}
+};
 
-export interface SelectFieldProps {
+export type SelectFieldProps = {
   label?: string;
   options: SelectOption[];
   value?: string;
@@ -63,7 +63,7 @@ export interface SelectFieldProps {
   placeholder?: string;
   error?: string;
   id?: string;
-}
+};
 
 /**
  * Labeled select. On touch devices the options open in a bottom sheet (via

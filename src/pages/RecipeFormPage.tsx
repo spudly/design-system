@@ -64,12 +64,12 @@ import { ToggleChipGroup } from "../components/ToggleChipGroup.js";
 export type RecipeFormPageField =
   "title" | "description" | "servings" | "prepTimeMin" | "cookTimeMin" | "sourceUrl" | "image";
 
-export interface RecipeFormPageOption {
+export type RecipeFormPageOption = {
   value: string;
   label: string;
-}
+};
 
-export interface RecipeFormPageProps {
+export type RecipeFormPageProps = {
   /** Controlled field values (text — the host parses numerics). */
   title: string;
   onTitleChange: (value: string) => void;
@@ -143,7 +143,7 @@ export interface RecipeFormPageProps {
   /** Host-reported save failure, rendered above the submit row. */
   submitError?: string | null;
   onSubmit: () => void;
-}
+};
 
 function FieldLabel({ children }: { children: string }) {
   return (

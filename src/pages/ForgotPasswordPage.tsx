@@ -19,14 +19,14 @@ import { TextLink } from "../components/TextLink.js";
  * it, as in the app view.
  */
 
-export interface ForgotPasswordPageProps {
+export type ForgotPasswordPageProps = {
   email: string;
   onEmailChange: (value: string) => void;
   loading?: boolean;
   error?: string | null;
   onSubmit: () => void;
   onBackPress?: () => void;
-}
+};
 
 export function ForgotPasswordPage({
   email,

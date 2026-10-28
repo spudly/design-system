@@ -9,9 +9,9 @@ const StyledSeparator = styled(TamaguiSeparator, {
 
 type StyledSeparatorProps = GetProps<typeof StyledSeparator>;
 
-export interface DividerProps extends StyledSeparatorProps {
+export type DividerProps = StyledSeparatorProps & {
   vertical?: boolean;
-}
+};
 
 /**
  * Hairline divider for separating list rows and content sections.
