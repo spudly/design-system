@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledChip = styled(XStack, {
-  name: "SpudlyToggleChip",
+  name: "ToggleChip",
 
   borderWidth: 1,
   // Unselected chip boundary: $textMuted holds ≥3:1 in every brand and mode;

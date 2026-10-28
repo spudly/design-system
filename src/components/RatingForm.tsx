@@ -5,7 +5,7 @@ import { StarRatingInput } from "./StarRatingInput.js";
 import { Text } from "./Text.js";
 
 const NotesArea = styled(TamaguiTextArea, {
-  name: "SpudlyRatingFormNotesArea",
+  name: "RatingFormNotesArea",
 
   borderRadius: tokens.radii.xl,
   paddingHorizontal: tokens.spacing[4],

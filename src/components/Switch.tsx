@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledSwitch = styled(TamaguiSwitch, {
-  name: "SpudlySwitch",
+  name: "Switch",
 
   // Explicit dimensions: Tamagui Switch sizes itself from the `$size`
   // token scale (its dynamic size variant looks up a named size), but this
@@ -30,7 +30,7 @@ const StyledSwitch = styled(TamaguiSwitch, {
 });
 
 const StyledThumb = styled(TamaguiSwitch.Thumb, {
-  name: "SpudlySwitchThumb",
+  name: "SwitchThumb",
 
   width: tokens.spacing[6],
   height: tokens.spacing[6],

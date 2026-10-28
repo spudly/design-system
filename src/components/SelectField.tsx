@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledTrigger = styled(TamaguiSelect.Trigger, {
-  name: "SpudlySelectFieldTrigger",
+  name: "SelectFieldTrigger",
 
   backgroundColor: "$surface",
   borderWidth: 1,
@@ -26,7 +26,7 @@ const StyledTrigger = styled(TamaguiSelect.Trigger, {
 });
 
 const StyledValue = styled(TamaguiSelect.Value, {
-  name: "SpudlySelectFieldValue",
+  name: "SelectFieldValue",
 
   // The umbrella Select skin sizes its text frames with bare token names
   // (its "md" size variant sets fontSize: "sm"). This package's fonts key
@@ -43,7 +43,7 @@ const StyledValue = styled(TamaguiSelect.Value, {
 });
 
 const StyledItemText = styled(TamaguiSelect.ItemText, {
-  name: "SpudlySelectFieldItemText",
+  name: "SelectFieldItemText",
 
   // Same bare-name fontSize leak and shared field-value size as
   // StyledValue — see the note there.

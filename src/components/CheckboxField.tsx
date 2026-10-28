@@ -16,7 +16,7 @@ import { Text } from "./Text.js";
  */
 
 const StyledCheckbox = styled(TamaguiCheckbox, {
-  name: "SpudlyCheckbox",
+  name: "Checkbox",
 
   // 44px touch target; the 24px visual box is centered inside.
   width: 44,
@@ -28,7 +28,7 @@ const StyledCheckbox = styled(TamaguiCheckbox, {
 });
 
 const StyledBox = styled(XStack, {
-  name: "SpudlyCheckboxBox",
+  name: "CheckboxBox",
 
   width: 24,
   height: 24,

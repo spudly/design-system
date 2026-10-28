@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledContent = styled(YStack, {
-  name: "SpudlyScreenContainer",
+  name: "ScreenContainer",
 
   flex: 1,
   minHeight: "100%",

@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledOuter = styled(YStack, {
-  name: "SpudlyFormScreenLayout",
+  name: "FormScreenLayout",
 
   width: "100%",
   alignItems: "center",
@@ -12,7 +12,7 @@ const StyledOuter = styled(YStack, {
 });
 
 const StyledInner = styled(YStack, {
-  name: "SpudlyFormScreenLayoutInner",
+  name: "FormScreenLayoutInner",
 
   width: "100%",
   maxWidth: 480,

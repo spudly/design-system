@@ -31,7 +31,7 @@ const toneStyles = {
 type Tone = keyof typeof toneStyles;
 
 const StyledBadge = styled(XStack, {
-  name: "SpudlyBadge",
+  name: "Badge",
 
   alignItems: "center",
   alignSelf: "flex-start",

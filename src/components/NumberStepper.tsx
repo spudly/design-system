@@ -6,7 +6,7 @@ import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
 const StyledValueInput = styled(TamaguiInput, {
-  name: "SpudlyNumberStepperValue",
+  name: "NumberStepperValue",
 
   backgroundColor: "$surface",
   borderWidth: 1,

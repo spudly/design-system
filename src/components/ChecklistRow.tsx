@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledCheckbox = styled(TamaguiCheckbox, {
-  name: "SpudlyChecklistCheckbox",
+  name: "ChecklistCheckbox",
 
   width: tokens.spacing[6],
   height: tokens.spacing[6],

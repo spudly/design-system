@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledDot = styled(XStack, {
-  name: "SpudlyStepDot",
+  name: "StepDot",
 
   width: tokens.spacing[2],
   height: tokens.spacing[2],

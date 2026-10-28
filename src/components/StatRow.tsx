@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledStatRow = styled(XStack, {
-  name: "SpudlyStatRow",
+  name: "StatRow",
 
   justifyContent: "space-around",
   backgroundColor: tokens.colors.gray.gray1,

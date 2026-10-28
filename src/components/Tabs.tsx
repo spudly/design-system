@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StyledList = styled(TamaguiTabs.List, {
-  name: "SpudlyTabsList",
+  name: "TabsList",
 
   gap: tokens.spacing[1],
   borderBottomWidth: 1,
@@ -11,7 +11,7 @@ const StyledList = styled(TamaguiTabs.List, {
 });
 
 const StyledTab = styled(TamaguiTabs.Tab, {
-  name: "SpudlyTabsTab",
+  name: "TabsTab",
 
   paddingHorizontal: tokens.spacing[3],
   paddingVertical: tokens.spacing[2],

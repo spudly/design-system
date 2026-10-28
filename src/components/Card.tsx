@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledCard = styled(YStack, {
-  name: "SpudlyCard",
+  name: "Card",
 
   backgroundColor: "$surface",
   borderWidth: 1,
