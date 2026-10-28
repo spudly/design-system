@@ -32,6 +32,7 @@
  * passes the glyph (size + color, no label), and a source scan pins
  * that the stories use the real DS icons.
  */
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
