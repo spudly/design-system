@@ -210,7 +210,7 @@ fails the test suite.
 
 | Story group                                 | Theme             | Stories | Baselines |
 | ------------------------------------------- | ----------------- | ------: | --------: |
-| pages-eciperay                              | light_warmHarvest |       4 |         4 |
+| pages-eciperay                              | light_warmHarvest |       2 |         2 |
 | pages-eciperay-addrecipemenupage            | light_warmHarvest |       1 |         1 |
 | pages-eciperay-aisessionpage                | light_warmHarvest |       3 |         3 |
 | pages-eciperay-editrecipepage               | light_warmHarvest |       1 |         1 |
@@ -233,10 +233,9 @@ fails the test suite.
 | pages-eciperay-profilepage                  | light_warmHarvest |       1 |         1 |
 | pages-eciperay-recipedetailpage             | light_warmHarvest |       8 |         8 |
 | pages-eciperay-recipeformpage               | light_warmHarvest |       4 |         4 |
-| pages-eciperay-recipespage                  | light_warmHarvest |       7 |         7 |
-| pages-eciperay-recipespage — narrow variant | light_warmHarvest |       7 |         7 |
+| pages-eciperay-recipespage                  | light_warmHarvest |      11 |        11 |
+| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      11 |        11 |
 | pages-eciperay-resetpasswordpage            | light_warmHarvest |       1 |         1 |
-| pages-eciperay-sharedwithmepage             | light_warmHarvest |       4 |         4 |
 | pages-eciperay-shoppinglistpage             | light_warmHarvest |       3 |         3 |
 | pages-eciperay-signinpage                   | light_warmHarvest |       2 |         2 |
 | pages-eciperay-signuppage                   | light_warmHarvest |       2 |         2 |
@@ -247,7 +246,7 @@ fails the test suite.
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       5 |         5 |
-| **Total**                                   |                   | **108** |   **108** |
+| **Total**                                   |                   | **110** |   **110** |
 
 <!-- VR-COVERAGE-END -->
 
@@ -288,8 +287,8 @@ the variant follows the light-only policy):
 The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
-7 `pages-eciperay-recipespage` stories x light = **7
-baselines** (108 total). RecipesPage only, deliberately — a second
+11 `pages-eciperay-recipespage` stories x light = **11
+baselines** (110 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
@@ -487,8 +486,8 @@ capture entirely. (Local development still uses Metro via
 
 ### Scoped PR runs: capture only the affected stories (issue #114)
 
-Even path-filtered, a full run captures all 108 baselines (101
-standard + 7 narrow) — a 20–30 minute emulator job gating every
+Even path-filtered, a full run captures all 110 baselines (99
+standard + 11 narrow) — a 20–30 minute emulator job gating every
 PR, including one-line component fixes. Since issue #114, a PR
 compare run first computes the stories the PR can actually
 affect and captures only those:
@@ -519,7 +518,7 @@ affect and captures only those:
   baselines.
 
 **Full-run fallback — never silently reduce coverage.** The
-decision is the full 108 whenever any changed file is:
+decision is the full 110 whenever any changed file is:
 
 - design tokens (`src/tokens/**`), themes (`src/themes/**`), or
   the Tamagui config (`src/tamagui.config.ts`) — they feed every

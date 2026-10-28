@@ -27,7 +27,7 @@
  *    (Default, Empty) in the Quiet Dawn theme.
  *
  * This is a source scan, not a render test, for the same reason
- * as test/sharedWithMePage.test.mjs: the failures it guards
+ * as test/recipesPageSharedConfig.test.mjs: the failures it guards
  * happen in native layout, which no JS renderer in this repo
  * performs, and the invariant is a per-literal property of the
  * source. Comments are stripped before scanning so prose cannot

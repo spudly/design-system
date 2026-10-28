@@ -10,8 +10,14 @@ import { tokens } from "../tokens/index.js";
  * made-up page composition: this renders the same component the
  * Eciperay app will consume, driven by fixture props. It succeeds
  * the Recipes browse demo in Pages/Eciperay (#44), whose fixtures
- * below mirror that demo's data; the demo stays as the spec until
- * the app rewires onto this component.
+ * below mirror that demo's data; the #44 demos are retired
+ * (#185) and these stories are the spec.
+ *
+ * The Shared* stories carry the Shared-with-me configuration of
+ * the same component (#185 — SharedWithMePage is consolidated
+ * into RecipesPage): press-only rows (no log-cook control, no
+ * accessory slot) and the shared screen's own empty-state copy,
+ * succeeding SharedWithMePage.stories.tsx and its four states.
  *
  * The frame differs from the Pages PageFrame on purpose: PageFrame
  * leaves height unbounded so the story canvas owns it, but a real
@@ -207,4 +213,110 @@ export const ExpandedAccessory: Story = {
   // has no scroll step in the snapshot — the expanded row must be
   // the one visible in the initial frame.
   render: () => <RecipesPageDemo expandedRecipeId="tuscan-chicken" />,
+};
+
+// The Shared-with-me configuration's fixtures: the old
+// SharedWithMePage stories' items, unchanged. No ratings — the
+// shared screen's rows are press-only, so no rating ever renders.
+const sharedItems: RecipesPageItem[] = [
+  { id: "arroz-con-pollo", title: "Arroz con Pollo", subtitle: "8 servings · 50 min · Satiety 68" },
+  { id: "fudgy-brownies", title: "Fudgy Brownies", subtitle: "12 servings · 35 min · Satiety 40" },
+  { id: "banana-bread", title: "Banana Bread", subtitle: "10 servings · 60 min · Satiety 55" },
+  {
+    id: "tuscan-chicken",
+    title: "Creamy Tuscan Garlic Chicken",
+    subtitle: "4 servings · 30 min · Satiety 60",
+  },
+  { id: "beef-chili", title: "Beef Chili", subtitle: "6 servings · 60 min · Satiety 75" },
+  {
+    id: "stuffed-peppers",
+    title: "Classic Stuffed Peppers",
+    subtitle: "6 servings · 45 min · Satiety 72",
+  },
+  {
+    id: "chicken-tikka",
+    title: "Chicken Tikka Masala",
+    subtitle: "4 servings · 40 min · Satiety 64",
+  },
+];
+
+/**
+ * The Shared-with-me configuration (#185): the same component with
+ * the shared host's contract — no `onLogCookPress` and no
+ * `renderRecipeAccessory` (press-only rows), the shared screen's
+ * empty-state copy, and the collapsed filter bar left uncontrolled
+ * (no `activeFilters` / `filterChooserOpen` props), the way the
+ * SharedWithMe host adopts it with no new state.
+ */
+function SharedRecipesPageDemo({
+  initialSearch = "",
+  recipes = sharedItems,
+  isLoading = false,
+}: {
+  initialSearch?: string;
+  recipes?: RecipesPageItem[];
+  isLoading?: boolean;
+}) {
+  const [search, setSearch] = useState(initialSearch);
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [ingredient, setIngredient] = useState("");
+  const [minCalories, setMinCalories] = useState("");
+  const [maxCalories, setMaxCalories] = useState("");
+  const [minSatiety, setMinSatiety] = useState("");
+  const [maxSatiety, setMaxSatiety] = useState("");
+  const [sort, setSort] = useState("newest");
+  const [sortDir, setSortDir] = useState("desc");
+
+  // The app filters server-side; the demo filters its fixtures by
+  // the search text so the filtered state is honest about what the
+  // app would pass back.
+  const visible = recipes.filter((recipe) =>
+    recipe.title.toLowerCase().includes(search.toLowerCase()),
+  );
+
+  return (
+    <Viewport>
+      <RecipesPage
+        recipes={visible}
+        isLoading={isLoading}
+        onRecipePress={() => undefined}
+        emptyTitle="Recipes others share with you will appear here."
+        emptyBody="Open a share link while signed in to save recipes to this list."
+        search={search}
+        onSearchChange={setSearch}
+        statusFilter={statusFilter}
+        onStatusFilterChange={setStatusFilter}
+        ingredient={ingredient}
+        onIngredientChange={setIngredient}
+        minCalories={minCalories}
+        onMinCaloriesChange={setMinCalories}
+        maxCalories={maxCalories}
+        onMaxCaloriesChange={setMaxCalories}
+        minSatiety={minSatiety}
+        onMinSatietyChange={setMinSatiety}
+        maxSatiety={maxSatiety}
+        onMaxSatietyChange={setMaxSatiety}
+        sort={sort}
+        onSortChange={setSort}
+        sortDir={sortDir}
+        onSortDirChange={setSortDir}
+      />
+    </Viewport>
+  );
+}
+
+export const SharedDefault: Story = {
+  render: () => <SharedRecipesPageDemo />,
+};
+
+export const SharedFiltered: Story = {
+  render: () => <SharedRecipesPageDemo initialSearch="chicken" />,
+};
+
+export const SharedEmpty: Story = {
+  render: () => <SharedRecipesPageDemo initialSearch="quiche" />,
+};
+
+export const SharedLoading: Story = {
+  render: () => <SharedRecipesPageDemo isLoading recipes={[]} />,
 };

@@ -28,11 +28,6 @@ export {
   type RecipeDetailPageNutritionRow,
 } from "./RecipeDetailPage.js";
 export {
-  SharedWithMePage,
-  type SharedWithMePageItem,
-  type SharedWithMePageProps,
-} from "./SharedWithMePage.js";
-export {
   MealPlanDetailPage,
   type MealPlanDetailPageEntry,
   type MealPlanDetailPageNutritionGoals,

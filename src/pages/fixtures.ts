@@ -19,23 +19,6 @@ import type { TagsPageTag } from "./TagsPage.js";
  *   deliberately, update its page story in the same spirit.
  */
 
-export type RecipeFixture = {
-  title: string;
-  meta: string;
-  tags: string[];
-};
-
-export const recipeFixtures: RecipeFixture[] = [
-  {
-    title: "Creamy Tuscan Garlic Chicken",
-    meta: "30 min · 4 servings",
-    tags: ["Dinner", "Chicken"],
-  },
-  { title: "Classic Stuffed Peppers", meta: "45 min · 6 servings", tags: ["Dinner", "Beef"] },
-  { title: "Arroz con Pollo", meta: "50 min · 8 servings", tags: ["Dinner", "Rice"] },
-  { title: "Fudgy Brownies", meta: "35 min · 12 servings", tags: ["Dessert", "Baking"] },
-];
-
 export const recipeDetailFixture = {
   title: "Creamy Tuscan Garlic Chicken",
   meta: "30 min · 4 servings · Dinner",
@@ -76,18 +59,6 @@ export const mealPlanFixture: { weekLabel: string; days: MealPlanDayFixture[] } 
     { day: "Sunday", dateLabel: "Oct 25", dish: "Leftovers", meta: "No cooking" },
   ],
 };
-
-export type SharedRecipeFixture = {
-  title: string;
-  meta: string;
-  sharedBy: string;
-};
-
-export const sharedRecipeFixtures: SharedRecipeFixture[] = [
-  { title: "Arroz con Pollo", meta: "50 min · 8 servings", sharedBy: "Katie Sorensen" },
-  { title: "Fudgy Brownies", meta: "35 min · 12 servings", sharedBy: "Melody Sorensen" },
-  { title: "Banana Bread", meta: "60 min · 10 servings", sharedBy: "Raleigh Sorensen" },
-];
 
 export const passageFixture = {
   reference: "Psalm 23:1-3",

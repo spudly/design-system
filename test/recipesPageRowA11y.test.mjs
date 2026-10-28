@@ -4,8 +4,9 @@
  * Found during the PR #58 review: Copilot flagged that SharedWithMePage's
  * row thumbnail TouchableOpacity had no accessibility label/role, and the
  * same gap shipped in RecipesPage's RecipeRow. #58 named the
- * SharedRecipeRow press targets (test/sharedWithMePage.test.mjs pins
- * that contract); this file pins the identical contract for RecipeRow:
+ * SharedRecipeRow press targets (its contract test was folded into
+ * test/recipesPageSharedConfig.test.mjs when #185 consolidated the
+ * pages); this file pins the identical contract for RecipeRow:
  * both press targets (thumbnail and text block) must declare the button
  * role and take the recipe title as their accessible name.
  *

@@ -1,7 +1,8 @@
 /**
  * Contract test for the filter-bar font-size fix (spudly/design-system#67).
  *
- * On the recipe browse screens (RecipesPage, SharedWithMePage) the filter
+ * On the recipe browse screens (RecipesPage — since #185 the single
+ * recipes-list page, serving Shared-with-me too) the filter
  * bar mixes SearchField, TextField (incl. the page NumberFilters) and
  * SelectField — and SelectField rendered its value/item text at
  * fontSize.sm (14) while every text input rendered at fontSize.md (16),
@@ -58,11 +59,12 @@ for (const [rel, constName] of FIELD_VALUE_BLOCKS) {
   });
 }
 
-test("both browse pages build their filter bars from the shared field components (#67)", () => {
-  for (const page of ["src/pages/RecipesPage.tsx", "src/pages/SharedWithMePage.tsx"]) {
-    const code = codeOf(page);
-    for (const comp of ["SearchField", "SelectField", "TextField"]) {
-      assert.ok(code.includes(comp), `${page} filter bar should use the shared ${comp}`);
-    }
+test("the recipes page builds its filter bar from the shared field components (#67)", () => {
+  // Since #185 RecipesPage is the single recipes-list page (it also
+  // serves Shared-with-me); before that, SharedWithMePage carried an
+  // identical copy of this bar and was scanned alongside.
+  const code = codeOf("src/pages/RecipesPage.tsx");
+  for (const comp of ["SearchField", "SelectField", "TextField"]) {
+    assert.ok(code.includes(comp), `RecipesPage filter bar should use the shared ${comp}`);
   }
 });
