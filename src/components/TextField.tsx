@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { Input as TamaguiInput, Label, YStack, styled } from "tamagui";
+import { Input as TamaguiInput, Label, YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
@@ -61,6 +61,8 @@ export function TextField({
   label,
   error,
   id: idProp,
+  secureTextEntry,
+  type,
   accessible,
   accessibilityElementsHidden,
   accessibilityHint,
@@ -86,6 +88,20 @@ export function TextField({
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
+  // `secureTextEntry` is a React Native prop; Tamagui's web Input
+  // destructures it out and discards it, so a password field rendered
+  // as a plain text input and showed the password as typed (#262,
+  // found on Eciperay web as spudly/eciperay#292). Translate it per
+  // platform, the same way the accessibility props above are
+  // translated: on web it becomes `type="password"` (a caller-supplied
+  // `type` wins) and the RN prop is not forwarded; on native
+  // `secureTextEntry` passes through unchanged and the web-only
+  // `type` is dropped.
+  const secureProps = Object.fromEntries(
+    Object.entries(
+      isWeb ? { type: type ?? (secureTextEntry ? "password" : undefined) } : { secureTextEntry },
+    ).filter(([, value]) => value !== undefined),
+  ) as Pick<StyledInputProps, "type" | "secureTextEntry">;
 
   return (
     <YStack gap={tokens.spacing[1]}>
@@ -101,6 +117,7 @@ export function TextField({
         aria-describedby={error ? errorId : undefined}
         {...a11yProps}
         {...rest}
+        {...secureProps}
       />
       {error ? (
         <Text variant="error" id={errorId}>
