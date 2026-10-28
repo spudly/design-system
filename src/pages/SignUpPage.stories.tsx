@@ -50,13 +50,15 @@ function LegalNotice() {
 function Interactive({
   error,
   initialLoading = false,
+  initialPassword = filledValue,
 }: {
   error?: string;
   initialLoading?: boolean;
+  initialPassword?: string;
 }) {
   const [displayName, setDisplayName] = useState("Sam Cook");
   const [email, setEmail] = useState("cook@example.com");
-  const [password, setPassword] = useState(filledValue);
+  const [password, setPassword] = useState(initialPassword);
   const [loading, setLoading] = useState(initialLoading);
   return (
     <Viewport>
@@ -82,7 +84,11 @@ export const Filled: Story = {
 };
 
 export const WithError: Story = {
-  render: () => <Interactive error="Password must be at least 8 characters." />,
+  // The error is a password-length error, so the story's
+  // initial password is genuinely too short.
+  render: () => (
+    <Interactive error="Password must be at least 8 characters." initialPassword="short" />
+  ),
 };
 
 export const Loading: Story = {

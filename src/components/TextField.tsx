@@ -97,17 +97,30 @@ export function TextField({
   // the field itself and hold submit-editing while it is
   // active; composition events do not exist on native, where
   // the return key never fires during composition.
+  //
+  // The flag alone is not enough: Safari fires
+  // `compositionend` BEFORE the confirming Enter keydown, so
+  // the flag is already cleared when Tamagui's handler runs —
+  // and the event Tamagui passes to `onSubmitEditing` carries
+  // only the field text (no isComposing/keyCode to check
+  // here). The guard therefore also holds submit-editing for
+  // a short grace window after composition ends: the
+  // confirming keydown follows `compositionend` within the
+  // same task sequence, while a deliberate Enter press lands
+  // well after the window.
   const composingRef = useRef(false);
+  const compositionEndedAtRef = useRef(0);
   const handleCompositionStart: typeof onCompositionStart = (event) => {
     composingRef.current = true;
     onCompositionStart?.(event);
   };
   const handleCompositionEnd: typeof onCompositionEnd = (event) => {
     composingRef.current = false;
+    compositionEndedAtRef.current = Date.now();
     onCompositionEnd?.(event);
   };
   const handleSubmitEditing: typeof onSubmitEditing = (event) => {
-    if (isWeb && composingRef.current) {
+    if (isWeb && (composingRef.current || Date.now() - compositionEndedAtRef.current < 100)) {
       return;
     }
     onSubmitEditing?.(event);

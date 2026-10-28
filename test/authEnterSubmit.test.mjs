@@ -82,13 +82,13 @@ test("TextField: submit-editing is held while an IME composition is active (web)
   );
   assert.match(
     source,
-    /composingRef\.current = false;[\s\S]*?onCompositionEnd\?\.\(event\);/,
-    "composition end clears the flag and chains the caller's handler",
+    /composingRef\.current = false;\s*compositionEndedAtRef\.current = Date\.now\(\);[\s\S]*?onCompositionEnd\?\.\(event\);/,
+    "composition end clears the flag, stamps the end time, and chains the caller's handler",
   );
   assert.match(
     source,
-    /if \(isWeb && composingRef\.current\) \{\s*return;\s*\}\s*onSubmitEditing\?\.\(event\);/,
-    "submit-editing is held while composing on web and otherwise fires",
+    /if \(\s*isWeb &&\s*\(composingRef\.current \|\|\s*Date\.now\(\) - compositionEndedAtRef\.current < 100\)\s*\) \{\s*return;\s*\}\s*onSubmitEditing\?\.\(event\);/,
+    "submit-editing is held while composing on web — and for the grace window after composition ends (Safari fires compositionend before the confirming Enter keydown) — and otherwise fires",
   );
   assert.match(
     source,
