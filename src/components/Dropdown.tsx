@@ -63,10 +63,12 @@ export type DropdownProps = {
    * the menu. The shell composes the trigger through the Popover's
    * own Trigger (asChild, the primitive's press toggle disabled —
    * toggling stays with the trigger itself) so the primitive
-   * registers the element: when the panel closes, focus returns to
-   * it. The trigger must be a single element that forwards the
-   * injected activation props to its focusable element, the way
-   * `DropdownButton` does.
+   * registers the element as the panel's anchor. When the panel
+   * closes, focus returns to the element focused before it opened —
+   * the trigger in trigger-activated flows (see the content's
+   * `onCloseAutoFocus` note in the render below). The trigger must
+   * be a single element that forwards the injected activation props
+   * to its focusable element, the way `DropdownButton` does.
    */
   trigger: ReactNode;
   /**
@@ -104,7 +106,9 @@ export type DropdownProps = {
  * shuoink/ui Dropdown as spec, redirected by Stephen to a shell with
  * a single children slot — no items view-model): the shell owns
  * anchoring/positioning, open/close state, outside-press and Escape
- * dismissal, focus return to the trigger on close, and the close
+ * dismissal, focus return on close (to the trigger for
+ * trigger-activated opens; to the previously focused element for
+ * programmatic opens), and the close
  * affordance its content rows use to close on activation. What goes inside the panel is entirely the caller's
  * composition — most often a DS page component composing DS rows.
  *
@@ -159,7 +163,23 @@ export function Dropdown({
         <Popover.Trigger asChild disablePressTrigger>
           {trigger}
         </Popover.Trigger>
-        <StyledContent {...platformAccessibilityProps({ accessibilityLabel })}>
+        {/*
+          onCloseAutoFocus={false}: the Popover's own close-focus
+          composition cancels FocusScope's previous-focus restoration
+          and focuses only the trigger target the primitive registered
+          on trigger activation (hover/press-in/focus). A panel opened
+          programmatically — `defaultOpen`, or a controlled `open`
+          flipped by an outside control — has no registered target, so
+          that composition strands focus on the unmounting panel.
+          Opting out leaves FocusScope's default in place: focus
+          returns to the element focused before the panel opened —
+          the trigger in trigger-activated flows (it holds focus
+          there), and the invoking control for programmatic opens.
+        */}
+        <StyledContent
+          onCloseAutoFocus={false}
+          {...platformAccessibilityProps({ accessibilityLabel })}
+        >
           {children}
         </StyledContent>
       </Popover>

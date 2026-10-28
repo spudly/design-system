@@ -65,12 +65,22 @@ function codeOf(rel) {
 
 const dropdown = codeOf("src/components/Dropdown.tsx");
 const dropdownButton = codeOf("src/components/DropdownButton.tsx");
+const button = codeOf("src/components/Button.tsx");
 const family = { Dropdown: dropdown, DropdownButton: dropdownButton };
 
 test("Dropdown, DropdownButton, and useDropdownClose are exported from the package root", () => {
-  for (const name of ["Dropdown", "DropdownButton", "useDropdownClose"]) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from dist/index.js`);
-  }
+  assert.equal(typeof dist.Dropdown, "function", "Dropdown must be exported from dist/index.js");
+  assert.equal(
+    typeof dist.useDropdownClose,
+    "function",
+    "useDropdownClose must be exported from dist/index.js",
+  );
+  // DropdownButton is a forwardRef component: an exotic component
+  // object, not a plain function.
+  assert.ok(
+    ["function", "object"].includes(typeof dist.DropdownButton) && dist.DropdownButton !== null,
+    "DropdownButton must be exported from dist/index.js",
+  );
 });
 
 test("Dropdown is a shell with one children slot and no items view-model", () => {
@@ -124,6 +134,22 @@ test("the trigger is composed through Popover.Trigger so the primitive registers
   assert.match(dropdownButton, /ref=\{ref\}/);
   assert.match(dropdownButton, /onPressIn=\{onPressIn\}/);
   assert.match(dropdownButton, /onFocus=\{onFocus\}/);
+});
+
+test("refs reach the rendered button on the React 18 peer (forwardRef, not ref-as-prop), and close-focus keeps the previous-focus fallback for programmatic opens", () => {
+  // The peer range starts at React 18, where a plain function
+  // component never receives `ref` through its props — a
+  // props-carried ref is dropped silently, and with it the
+  // Popover's trigger registration. Both components in the chain
+  // must be forwardRef components.
+  assert.match(button, /export const Button = forwardRef<TamaguiElement, ButtonProps>/);
+  assert.match(dropdownButton, /export const DropdownButton = forwardRef</);
+  // The Popover's close-focus composition cancels FocusScope's
+  // previous-focus restoration and focuses only the target
+  // registered on trigger activation; a programmatically opened
+  // panel (defaultOpen, controlled open) has none and would strand
+  // focus. The content opts out so the fallback survives.
+  assert.match(dropdown, /onCloseAutoFocus=\{false\}/);
 });
 
 test("close-on-select is the context affordance (the spec's ExitContext descendant)", () => {

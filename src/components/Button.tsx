@@ -1,5 +1,5 @@
-import { Children } from "react";
-import type { ComponentType, ReactNode, Ref } from "react";
+import { Children, forwardRef } from "react";
+import type { ComponentType, ReactNode } from "react";
 import { Button as TamaguiButton, styled, useTheme } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
@@ -90,13 +90,6 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
  * icon slot takes an icon COMPONENT instead, declared here).
  */
 type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon"> & {
-  /**
-   * The rendered button element's ref, forwarded to the styled
-   * Tamagui Button. Composed primitives that must know the button's
-   * element (a Popover-family shell returning focus to its trigger,
-   * via DropdownButton) inject it; callers may also pass their own.
-   */
-  ref?: Ref<TamaguiElement> | undefined;
   disabled?: boolean;
   /**
    * The icon slot: one of the design system's semantic icon
@@ -236,25 +229,27 @@ function useGlyphInk(variant: string | undefined): string {
  * they pass through unchanged. A caller-passed ARIA prop in `rest`
  * still wins over the translated one.
  */
-export function Button({
+export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
+  {
+    disabled = false,
+    variant = "primary",
+    size = "md",
+    icon: IconGlyph,
+    children,
+    color,
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole,
+    accessibilityState,
+    accessibilityValue,
+    ...rest
+  }: ButtonProps,
   ref,
-  disabled = false,
-  variant = "primary",
-  size = "md",
-  icon: IconGlyph,
-  children,
-  color,
-  accessible,
-  accessibilityElementsHidden,
-  accessibilityHint,
-  accessibilityLabel,
-  accessibilityLabelledBy,
-  accessibilityLiveRegion,
-  accessibilityRole,
-  accessibilityState,
-  accessibilityValue,
-  ...rest
-}: ButtonProps) {
+) {
   // `variant`'s prop type also admits Tamagui Button's built-in variant
   // names; only the four design-system variants have a mapped label color.
   const labelColor = color ?? variantLabelColors[variant as keyof typeof variantLabelColors];
@@ -281,7 +276,7 @@ export function Button({
   const iconOnlyBox = iconOnlyBoxes[size as keyof typeof iconOnlyBoxes] ?? iconOnlyBoxes.md;
   return (
     <StyledButton
-      {...(ref ? { ref } : null)}
+      ref={ref}
       {...a11yProps}
       disabled={disabled}
       variant={variant}
@@ -321,4 +316,4 @@ export function Button({
       {children}
     </StyledButton>
   );
-}
+});

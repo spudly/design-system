@@ -1,4 +1,5 @@
-import type { ComponentProps, ComponentType, ReactElement, Ref } from "react";
+import { forwardRef } from "react";
+import type { ComponentProps, ComponentType, ReactElement } from "react";
 import { useTheme, type TamaguiElement } from "tamagui";
 import { CollapsibleIcon } from "../icons/CollapsibleIcon.js";
 import type { IconComponentProps } from "../icons/Icon.js";
@@ -41,16 +42,18 @@ export type DropdownButtonProps = DropdownButtonCommonProps &
  * What the Dropdown shell's Popover.Trigger composition injects
  * into its child (asChild): the activation handlers that register
  * the trigger with the floating layer — so the primitive knows the
- * element and returns focus to it when the panel closes — and the
- * composed ref. NOT caller API: `DropdownButton` accepts these only
- * to forward them to the Button it renders. The expanded state is
- * deliberately not among them (it is DropdownButton's own, driven
- * by the Dropdown context), and neither is the press (the toggle is
- * DropdownButton's own; the shell disables the primitive's press
- * toggle so the two never double-toggle).
+ * element and returns focus to it when the panel closes. The
+ * composed ref arrives the same way, but through `forwardRef` (a
+ * props-carried ref never reaches a function component on the
+ * supported React 18 peer). NOT caller API: `DropdownButton`
+ * accepts these only to forward them to the Button it renders. The
+ * expanded state is deliberately not among them (it is
+ * DropdownButton's own, driven by the Dropdown context), and
+ * neither is the press (the toggle is DropdownButton's own; the
+ * shell disables the primitive's press toggle so the two never
+ * double-toggle).
  */
 type DropdownButtonTriggerProps = {
-  ref?: Ref<TamaguiElement> | undefined;
   onFocus?: ComponentProps<typeof Button>["onFocus"];
   onBlur?: ComponentProps<typeof Button>["onBlur"];
   onPressIn?: ComponentProps<typeof Button>["onPressIn"];
@@ -107,19 +110,24 @@ function useChevronInk(variant: string): string {
  * button. Rendered outside one it stays a plain closed button whose
  * press does nothing.
  */
-export function DropdownButton({
-  label,
-  icon,
-  accessibilityLabel,
-  variant = "secondary",
-  size = "md",
-  disabled = false,
+export const DropdownButton = forwardRef<
+  TamaguiElement,
+  DropdownButtonProps & DropdownButtonTriggerProps
+>(function DropdownButton(
+  {
+    label,
+    icon,
+    accessibilityLabel,
+    variant = "secondary",
+    size = "md",
+    disabled = false,
+    onFocus,
+    onBlur,
+    onPressIn,
+    onMouseEnter,
+  }: DropdownButtonProps & DropdownButtonTriggerProps,
   ref,
-  onFocus,
-  onBlur,
-  onPressIn,
-  onMouseEnter,
-}: DropdownButtonProps & DropdownButtonTriggerProps) {
+) {
   const context = useDropdownContext();
   const open = context?.open ?? false;
   const chevronInk = useChevronInk(variant);
@@ -158,4 +166,4 @@ export function DropdownButton({
       {content}
     </Button>
   );
-}
+});
