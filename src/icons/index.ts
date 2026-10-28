@@ -1,5 +1,8 @@
 export { Icon, type IconComponentProps, type IconElement, type IconProps } from "./Icon.js";
 export { AddIcon } from "./AddIcon.js";
+export { CollapsedIcon } from "./CollapsedIcon.js";
+export { CollapsibleIcon, type CollapsibleIconProps } from "./CollapsibleIcon.js";
+export { ExpandedIcon } from "./ExpandedIcon.js";
 export { FeedbackIcon } from "./FeedbackIcon.js";
 export { HomeIcon } from "./HomeIcon.js";
 export { MealsIcon } from "./MealsIcon.js";

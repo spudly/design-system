@@ -13,7 +13,10 @@ import { Text } from "./Text.js";
  * root-entry components must not import (the root entry stays
  * importable in plain Node). The wrapper rotates 180° when the
  * section opens, so the chevron points up over open content, exactly
- * the shuoink/ui CollapsibleIcon behavior.
+ * the shuoink/ui CollapsibleIcon behavior. The Feather equivalents
+ * for surfaces that live behind the subpath — CollapsedIcon,
+ * ExpandedIcon, and the CollapsibleIcon switcher — live in the
+ * icons module (#250).
  */
 function SectionChevron({ isOpen }: { isOpen: boolean }) {
   return (

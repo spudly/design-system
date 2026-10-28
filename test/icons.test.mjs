@@ -52,6 +52,8 @@ const ICONS = [
   // AddIcon (two bare lines) and ShareIcon (circles and lines) have
   // no path literal; their data is pinned by dedicated tests below.
   ["AddIcon", null],
+  ["CollapsedIcon", "6 9 12 15 18 9"],
+  ["ExpandedIcon", "18 15 12 9 6 15"],
   ["FeedbackIcon", "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7"],
   ["HomeIcon", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"],
   ["MealsIcon", "M2.62 13.5 A9.5 9.5 0 0 0 21.38 13.5 Z"],
@@ -187,4 +189,24 @@ test("the package exposes the module behind the ./icons subpath (#246)", () => {
       `index.ts does not export ${name}`,
     );
   }
+});
+
+test("CollapsibleIcon composes CollapsedIcon/ExpandedIcon by isOpen and carries no glyph data (#250)", () => {
+  const code = codeOf("src/icons/CollapsibleIcon.tsx");
+  assert.match(code, /export function CollapsibleIcon\(/);
+  assert.match(code, /from "\.\/CollapsedIcon\.js"/);
+  assert.match(code, /from "\.\/ExpandedIcon\.js"/);
+  assert.match(
+    code,
+    /isOpen \? <ExpandedIcon \{\.\.\.props\} \/> : <CollapsedIcon \{\.\.\.props\} \/>/,
+  );
+  // The switcher embeds no glyph data of its own: the chevron
+  // polylines live only in the two state icons it composes.
+  assert.ok(!code.includes("6 9 12 15 18 9"), "CollapsibleIcon embeds the chevron-down data");
+  assert.ok(!code.includes("18 15 12 9 6 15"), "CollapsibleIcon embeds the chevron-up data");
+  for (const banned of ["FeatherIcon", "featherIconNames", "featherIconElements", "tabIcons"]) {
+    assert.ok(!code.includes(banned), `CollapsibleIcon still references ${banned}`);
+  }
+  const index = codeOf("src/icons/index.ts");
+  assert.match(index, /export \{ CollapsibleIcon, type CollapsibleIconProps \}/);
 });
