@@ -2,7 +2,7 @@ import { Icon, type IconComponentProps, type IconElement } from "./Icon.js";
 
 /**
  * The official Feather chevron-up element data (feathericons/feather,
- * ISC licensed) — copied from the Feather SVG source, not redrawn.
+ * MIT licensed) — copied from the Feather SVG source, not redrawn.
  */
 const chevronUpElements: IconElement[] = [{ kind: "polyline", points: "18 15 12 9 6 15" }];
 

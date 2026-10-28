@@ -3,7 +3,7 @@ import { Circle, Line, Path, Polyline, Rect, Svg } from "react-native-svg";
 /**
  * The design system's icons module (spudly/eciperay#246): the Feather
  * icon set, shipped as the official Feather SVG element data (from
- * feathericons/feather, ISC licensed) rendered with react-native-svg.
+ * feathericons/feather, MIT licensed) rendered with react-native-svg.
  *
  * Why this exists: eciperay's packages/icons package owned the icon
  * mapping while the apps rendered the glyphs through two different
