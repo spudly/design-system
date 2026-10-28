@@ -1,5 +1,5 @@
-import { useId } from "react";
-import { Input as TamaguiInput, Label, YStack, styled } from "tamagui";
+import { useId, useRef } from "react";
+import { Input as TamaguiInput, Label, YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
@@ -61,6 +61,9 @@ export function TextField({
   label,
   error,
   id: idProp,
+  onSubmitEditing,
+  onCompositionStart,
+  onCompositionEnd,
   accessible,
   accessibilityElementsHidden,
   accessibilityHint,
@@ -87,6 +90,29 @@ export function TextField({
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
 
+  // IME composition guard (web): Tamagui's Input fires
+  // `onSubmitEditing` from its Enter keydown handler without
+  // checking composition, so a CJK user confirming a candidate
+  // with Enter would submit mid-typing. Track composition on
+  // the field itself and hold submit-editing while it is
+  // active; composition events do not exist on native, where
+  // the return key never fires during composition.
+  const composingRef = useRef(false);
+  const handleCompositionStart: typeof onCompositionStart = (event) => {
+    composingRef.current = true;
+    onCompositionStart?.(event);
+  };
+  const handleCompositionEnd: typeof onCompositionEnd = (event) => {
+    composingRef.current = false;
+    onCompositionEnd?.(event);
+  };
+  const handleSubmitEditing: typeof onSubmitEditing = (event) => {
+    if (isWeb && composingRef.current) {
+      return;
+    }
+    onSubmitEditing?.(event);
+  };
+
   return (
     <YStack gap={tokens.spacing[1]}>
       {label ? (
@@ -101,6 +127,16 @@ export function TextField({
         aria-describedby={error ? errorId : undefined}
         {...a11yProps}
         {...rest}
+        {...(onSubmitEditing ? { onSubmitEditing: handleSubmitEditing } : {})}
+        {...(isWeb
+          ? {
+              onCompositionStart: handleCompositionStart,
+              onCompositionEnd: handleCompositionEnd,
+            }
+          : {
+              ...(onCompositionStart ? { onCompositionStart } : {}),
+              ...(onCompositionEnd ? { onCompositionEnd } : {}),
+            })}
       />
       {error ? (
         <Text variant="error" id={errorId}>

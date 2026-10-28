@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { Text } from "../components/Text.js";
@@ -40,39 +40,51 @@ function LegalNotice() {
   );
 }
 
-export const Filled: Story = {
-  render: () => (
+/**
+ * Interactive wrapper: the fields are stateful so the story
+ * can be typed in, and submit switches the page to its
+ * loading state — so Enter-to-submit (#255) and the
+ * held-while-loading guard are observable in Storybook
+ * (submit shows "Creating account…" and disables the button).
+ */
+function Interactive({
+  error,
+  initialLoading = false,
+}: {
+  error?: string;
+  initialLoading?: boolean;
+}) {
+  const [displayName, setDisplayName] = useState("Sam Cook");
+  const [email, setEmail] = useState("cook@example.com");
+  const [password, setPassword] = useState(filledValue);
+  const [loading, setLoading] = useState(initialLoading);
+  return (
     <Viewport>
       <SignUpPage
-        displayName="Sam Cook"
-        email="cook@example.com"
-        password={filledValue}
-        onDisplayNameChange={() => undefined}
-        onEmailChange={() => undefined}
-        onPasswordChange={() => undefined}
-        onSubmit={() => undefined}
+        displayName={displayName}
+        email={email}
+        password={password}
+        onDisplayNameChange={setDisplayName}
+        onEmailChange={setEmail}
+        onPasswordChange={setPassword}
+        loading={loading}
+        error={error ?? null}
+        onSubmit={() => setLoading(true)}
         onSignInPress={() => undefined}
         legalNotice={<LegalNotice />}
       />
     </Viewport>
-  ),
+  );
+}
+
+export const Filled: Story = {
+  render: () => <Interactive />,
 };
 
 export const WithError: Story = {
-  render: () => (
-    <Viewport>
-      <SignUpPage
-        displayName="Sam Cook"
-        email="cook@example.com"
-        password="short"
-        onDisplayNameChange={() => undefined}
-        onEmailChange={() => undefined}
-        onPasswordChange={() => undefined}
-        error="Password must be at least 8 characters."
-        onSubmit={() => undefined}
-        onSignInPress={() => undefined}
-        legalNotice={<LegalNotice />}
-      />
-    </Viewport>
-  ),
+  render: () => <Interactive error="Password must be at least 8 characters." />,
+};
+
+export const Loading: Story = {
+  render: () => <Interactive initialLoading />,
 };

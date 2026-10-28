@@ -63,3 +63,36 @@ for (const { name, fields } of AUTH_PAGES) {
     assert.match(source, /onPress=\{onSubmit\}/, `${name} button onPress is the submit intent`);
   });
 }
+
+test("TextField: submit-editing is held while an IME composition is active (web)", () => {
+  const source = readFileSync("src/components/TextField.tsx", "utf8");
+  // Composition is tracked on the field itself (web only —
+  // Tamagui's Enter handler fires onSubmitEditing without a
+  // composition check, so the guard must live in the shared
+  // field every auth page renders).
+  assert.match(
+    source,
+    /const composingRef = useRef\(false\);/,
+    "TextField tracks composition state",
+  );
+  assert.match(
+    source,
+    /composingRef\.current = true;[\s\S]*?onCompositionStart\?\.\(event\);/,
+    "composition start sets the flag and chains the caller's handler",
+  );
+  assert.match(
+    source,
+    /composingRef\.current = false;[\s\S]*?onCompositionEnd\?\.\(event\);/,
+    "composition end clears the flag and chains the caller's handler",
+  );
+  assert.match(
+    source,
+    /if \(isWeb && composingRef\.current\) \{\s*return;\s*\}\s*onSubmitEditing\?\.\(event\);/,
+    "submit-editing is held while composing on web and otherwise fires",
+  );
+  assert.match(
+    source,
+    /onCompositionStart: handleCompositionStart,[\s\S]*?onCompositionEnd: handleCompositionEnd,/,
+    "the composition handlers are wired on the web target",
+  );
+});
