@@ -49,6 +49,11 @@ test("Text defaults heading variants to the header role with a level (#256)", ()
     /"aria-level": headingLevel !== undefined && roleIsHeading \? headingLevel : undefined/,
     "Text must attach aria-level 1/2 only when the effective role is a heading",
   );
+  assert.match(
+    source,
+    /const callerRole = \(rest as \{ role\?: string \}\)\.role \?\? accessibilityRole;/,
+    "the effective role must be the rendered one: rest's web role spreads last, so it is checked before accessibilityRole",
+  );
 });
 
 test("the translator passes aria-level on web and drops it on native (#256)", () => {
@@ -112,6 +117,37 @@ test("SSR: heading and subheading Text render heading semantics (#256)", async (
   assert.ok(subheading.includes('role="heading"'));
   assert.ok(subheading.includes('aria-level="2"'));
   assertNoLeak(subheading);
+});
+
+test("SSR: both role props — a rendered button keeps no aria-level (#256)", async () => {
+  const { React, Text } = await loadRuntime();
+  // rest's role spreads last at render, so this renders a button —
+  // it must not keep the heading variant's aria-level.
+  const html = await renderToHtml(
+    React.createElement(
+      Text,
+      { variant: "heading", accessibilityRole: "header", role: "button", onPress: () => null },
+      "Act",
+    ),
+  );
+  assert.ok(html.includes('role="button"'), `web role must win: ${html.slice(0, 400)}`);
+  assert.ok(!html.includes("aria-level"), "a rendered button must not carry aria-level");
+  assertNoLeak(html);
+});
+
+test("SSR: both role props — a rendered heading keeps its level (#256)", async () => {
+  const { React, Text } = await loadRuntime();
+  // Reverse the roles: this renders a heading, so it keeps level 1.
+  const html = await renderToHtml(
+    React.createElement(
+      Text,
+      { variant: "heading", accessibilityRole: "button", role: "heading" },
+      "Title",
+    ),
+  );
+  assert.ok(html.includes('role="heading"'), `web role must win: ${html.slice(0, 400)}`);
+  assert.ok(html.includes('aria-level="1"'), "a rendered heading keeps the variant's level");
+  assertNoLeak(html);
 });
 
 test("SSR: body Text has no heading role; a caller role wins (#256)", async () => {

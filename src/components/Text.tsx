@@ -85,7 +85,11 @@ export function Text({
   // role (RN `accessibilityRole` or web `role` in rest) always wins;
   // the level is only attached when the effective role is a heading.
   const headingLevel = variant === "heading" ? 1 : variant === "subheading" ? 2 : undefined;
-  const callerRole = accessibilityRole ?? (rest as { role?: string }).role;
+  // The web `role` in rest spreads last at render (below), so when
+  // both role props are supplied it is the role that actually
+  // renders — check it first, or a rendered button would keep a
+  // heading's aria-level (and a rendered heading would lose its).
+  const callerRole = (rest as { role?: string }).role ?? accessibilityRole;
   const roleIsHeading =
     callerRole === undefined || callerRole === "header" || callerRole === "heading";
   const a11yProps = platformAccessibilityProps({
