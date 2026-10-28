@@ -11,7 +11,7 @@ export type SpinnerProps = TamaguiSpinnerProps & {
    * progress ring showing that percentage instead of spinning — for
    * waits whose progress is known (uploads, AI generation). Omit it
    * for an open-ended wait. Out-of-range values are clamped, as on
-   * ProgressBar.
+   * ProgressBar; non-finite values (NaN, Infinity) count as 0.
    *
    * This is the shuoink/ui ProgressSpinner folded into Spinner
    * (design-system #178): Stephen's call was one loading-indicator
@@ -84,7 +84,10 @@ function ProgressRing({
   accessibilityValue,
   ...rest
 }: SpinnerProps & { value: number }) {
-  const clamped = Math.min(100, Math.max(0, value));
+  // Non-finite input (a NaN from a 0/0 progress ratio, an Infinity)
+  // maps to 0: Math.min/Math.max propagate NaN, which would otherwise
+  // reach the arc rotations and the announced value.
+  const clamped = Number.isFinite(value) ? Math.min(100, Math.max(0, value)) : 0;
   const px = ringSizePx(size);
   // The shuoink stroke ratio: a tenth of the diameter.
   const strokeWidth = px / 10;

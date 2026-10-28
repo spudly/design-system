@@ -31,7 +31,10 @@
  *
  * Source scan like this repo's other contract tests (comments are
  * stripped so explanatory comments cannot satisfy the patterns),
- * plus a dist import smoke test for (4).
+ * plus a dist import smoke test for (4) and an SSR render check for
+ * (3): the source scan alone cannot catch the ring's View losing its
+ * translated props spread, so the rendered ARIA output is asserted
+ * too, the same way pageWebAria.test.mjs pins ProgressBar's.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -96,6 +99,59 @@ test("Spinner stays free of react-native-svg and react-native imports (#178)", (
 test("the dist root still loads in plain Node with the ring in its graph (#178)", async () => {
   const mod = await import("../dist/index.js");
   assert.equal(typeof mod.Spinner, "function");
+});
+
+// Runtime imports are lazy (inside the SSR test) so the source-scan
+// tests above still run and report when the build output is missing
+// or broken, instead of the whole file failing at import time —
+// pageWebAria.test.mjs's pattern.
+let runtimePromise;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const reactModule = await import("react");
+    const React = reactModule.default;
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider } = await import("tamagui");
+    const dist = await import("../dist/index.js");
+    return { React, renderToString, TamaguiProvider, ...dist };
+  })();
+  return runtimePromise;
+}
+
+async function renderToHtml(element) {
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+    await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const html = renderToString(
+    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+  );
+  // Strip the Tamagui CSS block: the assertions are about the rendered
+  // elements' attributes, not stylesheet text.
+  const styleEnd = html.lastIndexOf("</style>");
+  return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
+}
+
+test("SSR: the determinate ring renders its progressbar semantics (#178)", async () => {
+  const { React, Spinner } = await loadRuntime();
+  const html = await renderToHtml(React.createElement(Spinner, { value: 25 }));
+  assert.ok(
+    html.includes('role="progressbar"'),
+    `expected progressbar role in: ${html.slice(0, 600)}`,
+  );
+  assert.ok(html.includes('aria-valuenow="25"'));
+  assert.ok(html.includes('aria-valuemin="0"'));
+  assert.ok(html.includes('aria-valuemax="100"'));
+  // The default `label` is the accessible name.
+  assert.ok(html.includes('aria-label="Loading"'));
+  // No leaked RN attributes, no stringified value object.
+  assert.ok(!/accessibilityvalue/i.test(html), "accessibilityvalue must not leak to the DOM");
+  assert.ok(!html.includes("[object Object]"), "no stringified value object in the DOM");
+  // A non-finite value (a 0/0 progress ratio) announces as 0, not NaN.
+  const nan = await renderToHtml(React.createElement(Spinner, { value: Number.NaN }));
+  assert.ok(
+    nan.includes('aria-valuenow="0"'),
+    `expected NaN to announce as 0 in: ${nan.slice(0, 600)}`,
+  );
 });
 
 test("stories cover the determinate mode (#178)", () => {
