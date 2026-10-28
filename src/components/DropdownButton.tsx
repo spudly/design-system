@@ -133,6 +133,20 @@ export const DropdownButton = forwardRef<
   const chevronInk = useChevronInk(variant);
   const glyphSize = glyphSizes[size];
 
+  // Focus the trigger on press-in before forwarding the shell's
+  // injected handler: Safari never focuses a button on click, and
+  // the panel's close-focus restoration returns focus to the element
+  // focused before it opened — without this, a Safari trigger-open
+  // would hand focus back to the page body on close instead of the
+  // trigger. (Chrome/Firefox focus the button on press natively;
+  // this just makes every browser behave that way.) On native the
+  // press target has no focus() and this is a no-op.
+  const handlePressIn: NonNullable<DropdownButtonTriggerProps["onPressIn"]> = (event) => {
+    const target = (event as { currentTarget?: { focus?: () => void } | null }).currentTarget;
+    target?.focus?.();
+    onPressIn?.(event);
+  };
+
   // The label (when there is one) plus the disclosure chevron, as a
   // flat child list with no undefined entries — Button's props are a
   // discriminated union over its icon/label shapes and compile under
@@ -149,7 +163,7 @@ export const DropdownButton = forwardRef<
       ref={ref}
       onFocus={onFocus}
       onBlur={onBlur}
-      onPressIn={onPressIn}
+      onPressIn={handlePressIn}
       onMouseEnter={onMouseEnter}
       variant={variant}
       size={size}
