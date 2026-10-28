@@ -281,6 +281,7 @@ function RecipeDetailPageDemo({
       onLogCookPress: () => {
         setFormOpen(true);
       },
+      onDeleteCookLogPress: () => undefined,
       ...(formOpen
         ? {
             renderCookLogForm: () => (

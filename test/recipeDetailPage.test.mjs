@@ -205,24 +205,31 @@ test("the status badge map covers the four statuses with a fallback", () => {
 });
 
 test("the cook-log form slot replaces the Log a cook button while it renders content", () => {
-  assert.match(
-    code,
-    /renderCookLogForm\?: \(\) => ReactNode;/,
-    "the history props must declare the renderCookLogForm slot",
-  );
+  assert.match(code, /renderCookLogForm\?: \(\) => ReactNode;/);
   assert.match(
     code,
     /const form = history\.renderCookLogForm \? history\.renderCookLogForm\(\) : null;/,
     "the slot is called once per render and its result decides the button swap",
   );
-  assert.match(
-    code,
-    /form !== null && form !== undefined \?/,
-    "non-null form content takes the form branch",
-  );
+  assert.match(code, /form !== null && form !== undefined \?/);
   const formBranchAt = code.indexOf("form !== null && form !== undefined");
   const buttonAt = code.indexOf("Log a cook", formBranchAt);
   assert.ok(buttonAt > formBranchAt, "the Log a cook button is the else-branch of the form slot");
+  // #266: entries also carry an optional Delete action — the history
+  // props declare the callback, the button renders only with it,
+  // pressing reports the entry id, and a story passes it.
+  assert.match(code, /onDeleteCookLogPress\?: \(cookLogId: string\) => void;/);
+  assert.match(code, /history\.onDeleteCookLogPress \?/);
+  assert.match(code, /history\.onDeleteCookLogPress\?\.\(log\.id\)/);
+  assert.match(storiesCode, /onDeleteCookLogPress: \(\) => undefined/);
+  // Each entry's Delete button needs an entry-specific accessible name
+  // (position + date) — otherwise screen-reader button lists show
+  // several identical "Delete" entries.
+  assert.match(code, /history\.cookLogs\.map\(\(log, index\) =>/);
+  assert.match(
+    code,
+    /accessibilityLabel=\{`Delete cook log \$\{index \+ 1\} from \$\{log\.dateLabel\}`\}/,
+  );
 });
 
 test("the sharing slot renders after the lifecycle section and before the tags", () => {
