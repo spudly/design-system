@@ -7,6 +7,7 @@ import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
 import { Badge } from "../components/Badge.js";
 import { Text } from "../components/Text.js";
+import { TextAction } from "../components/TextAction.js";
 import { TextField } from "../components/TextField.js";
 
 /**
@@ -25,7 +26,9 @@ import { TextField } from "../components/TextField.js";
  *
  * Rows render the DS Badge in its colored-tag form (the
  * former TagPill, merged into Badge in #183) with a delete
- * action; the row card treatment is the app view's, on DS
+ * action rendered through the shared TextAction (#229), so it
+ * is keyboard-focusable and Enter/Space-operable on web; the
+ * row card treatment is the app view's, on DS
  * tokens. While `isLoading`, a spinner replaces the list (the
  * DS Spinner stands in for the app's branded loader — the
  * RecipeFormPage precedent).
@@ -214,27 +217,24 @@ export function TagsPage({
               <Badge color={tag.color}>{tag.name}</Badge>
               <XStack gap="$3" alignItems="center">
                 {onStartEdit ? (
-                  <XStack
-                    accessibilityRole="button"
+                  <TextAction
                     accessibilityLabel={`Edit tag ${tag.name}`}
                     onPress={() => {
                       onStartEdit(tag);
                     }}
-                    cursor="web:pointer"
                   >
-                    <Text>Edit</Text>
-                  </XStack>
+                    Edit
+                  </TextAction>
                 ) : null}
-                <XStack
-                  accessibilityRole="button"
+                <TextAction
+                  variant="error"
                   accessibilityLabel={`Delete tag ${tag.name}`}
                   onPress={() => {
                     onDelete(tag.id);
                   }}
-                  cursor="web:pointer"
                 >
-                  <Text variant="error">Delete</Text>
-                </XStack>
+                  Delete
+                </TextAction>
               </XStack>
             </XStack>
           ),

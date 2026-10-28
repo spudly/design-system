@@ -51,6 +51,7 @@ export { Tabs, type TabItem, type TabsProps } from "./Tabs.js";
 export { useTagColorResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./Text.js";
 export { TextField, type TextFieldProps } from "./TextField.js";
+export { TextAction, type TextActionProps } from "./TextAction.js";
 export { TextLink, type TextLinkProps } from "./TextLink.js";
 export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./Toast.js";
 export {
