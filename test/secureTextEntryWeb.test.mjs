@@ -13,8 +13,10 @@
  *    untranslated.
  * 2. On web, `secureTextEntry` becomes `type="password"`; a
  *    caller-supplied `type` wins over the translation. On native,
- *    `secureTextEntry` passes through unchanged and the web-only
- *    `type` is dropped.
+ *    `secureTextEntry` passes through unchanged and a
+ *    caller-supplied `type` is forwarded alongside it — Tamagui's
+ *    native Input translates `type="password"` to `secureTextEntry`
+ *    when the RN prop itself is unset.
  * 3. Runtime (SSR, against the built output): a secure TextField
  *    renders `<input type="password">` with no `securetextentry`
  *    attribute in the DOM; a plain TextField does not render
@@ -47,8 +49,8 @@ test("TextField destructures secureTextEntry and type out of rest (#262)", () =>
 test("TextField translates secureTextEntry to type=password on web only (#262)", () => {
   assert.match(
     textField,
-    /isWeb \? \{ type: type \?\? \(secureTextEntry \? "password" : undefined\) \} : \{ secureTextEntry \}/,
-    "web must map secureTextEntry to type=password (caller type wins); native must pass secureTextEntry through",
+    /isWeb\s*\?\s*\{ type: type \?\? \(secureTextEntry \? "password" : undefined\) \}\s*:\s*\{ secureTextEntry, type \}/,
+    "web must map secureTextEntry to type=password (caller type wins); native must pass secureTextEntry through and forward a caller-supplied type",
   );
   assert.match(textField, /\{\.\.\.secureProps\}/, "the translated props must reach the input");
 });

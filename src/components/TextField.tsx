@@ -98,11 +98,16 @@ export function TextField({
   // platform, the same way the accessibility props above are
   // translated: on web it becomes `type="password"` (a caller-supplied
   // `type` wins) and the RN prop is not forwarded; on native
-  // `secureTextEntry` passes through unchanged and the web-only
-  // `type` is dropped.
+  // `secureTextEntry` passes through unchanged and a caller-supplied
+  // `type` is forwarded alongside it — Tamagui's native Input
+  // translates `type="password"` to `secureTextEntry` when the RN
+  // prop itself is unset, so dropping `type` there would silently
+  // unmask a field the caller marked as a password field.
   const secureProps = Object.fromEntries(
     Object.entries(
-      isWeb ? { type: type ?? (secureTextEntry ? "password" : undefined) } : { secureTextEntry },
+      isWeb
+        ? { type: type ?? (secureTextEntry ? "password" : undefined) }
+        : { secureTextEntry, type },
     ).filter(([, value]) => value !== undefined),
   ) as Pick<StyledInputProps, "type" | "secureTextEntry">;
 
