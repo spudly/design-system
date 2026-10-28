@@ -1,6 +1,7 @@
 import { XStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 
 const StyledDot = styled(XStack, {
   name: "SpudlyStepDot",
@@ -43,9 +44,11 @@ export function StepDots({ count, activeIndex, label, ...rest }: StepDotsProps) 
     <XStack
       gap={tokens.spacing[2]}
       alignItems="center"
-      accessibilityRole="progressbar"
-      accessibilityLabel={accessibleLabel}
-      accessibilityValue={{ min: 1, max: count, now: safeIndex + 1 }}
+      {...platformAccessibilityProps({
+        accessibilityRole: "progressbar",
+        accessibilityLabel: accessibleLabel,
+        accessibilityValue: { min: 1, max: count, now: safeIndex + 1 },
+      })}
       {...rest}
     >
       {Array.from({ length: count }, (_, i) => (

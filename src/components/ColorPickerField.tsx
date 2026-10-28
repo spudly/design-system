@@ -2,7 +2,7 @@ import { useId } from "react";
 import { XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
-import { groupRoleProps } from "./accessibility.js";
+import { groupRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { useTagColorResolver } from "./tagColors.js";
 import { Text } from "./Text.js";
 
@@ -94,9 +94,11 @@ export function ColorPickerField({
               key={color}
               selected={selected}
               backgroundColor={resolvedColor}
-              accessibilityRole="button"
+              {...platformAccessibilityProps({
+                accessibilityRole: "button",
+                accessibilityLabel: `Select color ${color}`,
+              })}
               aria-pressed={selected}
-              accessibilityLabel={`Select color ${color}`}
               onPress={() => onChange?.(color)}
             />
           );

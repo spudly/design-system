@@ -1,6 +1,7 @@
 import { Text as TamaguiText, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 
 const StyledText = styled(TamaguiText, {
   name: "SpudlyText",
@@ -53,8 +54,39 @@ export interface TextProps extends StyledTextProps {
  * Token-driven text primitive. Variants: `heading`, `subheading`, `body`
  * (default), `hint` (muted caption), `error`, and `verse` (serif reading
  * text for scripture/long-form content).
+ *
+ * Accessibility props go through `platformAccessibilityProps` (#235),
+ * the same translation as Button: text is a pressable path too
+ * (TextAction, TextLink, BackLink carry `accessibilityRole="button"`
+ * and callers' `accessibilityLabel`s), and Tamagui's web renderer
+ * would otherwise leak the RN props to the DOM as raw attributes with
+ * no accessible name. On native they pass through unchanged; a
+ * caller-passed ARIA prop in `rest` still wins on web.
  */
-export function Text({ variant = "body", ...rest }: TextProps) {
+export function Text({
+  variant = "body",
+  accessible,
+  accessibilityElementsHidden,
+  accessibilityHint,
+  accessibilityLabel,
+  accessibilityLabelledBy,
+  accessibilityLiveRegion,
+  accessibilityRole,
+  accessibilityState,
+  accessibilityValue,
+  ...rest
+}: TextProps) {
+  const a11yProps = platformAccessibilityProps({
+    accessible,
+    accessibilityElementsHidden,
+    accessibilityHint,
+    accessibilityLabel,
+    accessibilityLabelledBy,
+    accessibilityLiveRegion,
+    accessibilityRole,
+    accessibilityState,
+    accessibilityValue,
+  });
   // The font family must cross as an instance prop carrying the
   // BARE font name ("body" / "verse", no "$"): on web, Tamagui only
   // records the font — and so only emits the font-context class
@@ -73,6 +105,11 @@ export function Text({ variant = "body", ...rest }: TextProps) {
   // in the registered verse font, the way the apps' screens render.
   // A caller-passed `fontFamily` in `rest` still wins.
   return (
-    <StyledText variant={variant} fontFamily={variant === "verse" ? "verse" : "body"} {...rest} />
+    <StyledText
+      variant={variant}
+      fontFamily={variant === "verse" ? "verse" : "body"}
+      {...a11yProps}
+      {...rest}
+    />
   );
 }
