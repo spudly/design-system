@@ -41,8 +41,11 @@
  *    primitive that itself translates (Button, Text, TextField,
  *    TextAreaField, TextAction — via Text — and ProgressBar), or a
  *    React Native element (TouchableOpacity in RecipesPage /
- *    SharedWithMePage / RecipeDetailPage), which react-native-web
- *    translates to ARIA itself on web. Raw Tamagui stacks (XStack,
+ *    SharedWithMePage / RecipeDetailPage; Image in
+ *    ImportReviewPage, whose `accessibilityLabel`
+ *    react-native-web renders as the image's `alt` text), which
+ *    react-native-web translates to ARIA itself on web. Raw
+ *    Tamagui stacks (XStack,
  *    YStack, View), styled Tamagui primitives (StyledCheckbox,
  *    StyledTrack, StyledTextLink, Card, …), and Progress/Checkbox
  *    primitives are NOT sanctioned targets.
@@ -79,15 +82,11 @@ function sourceFiles(dir) {
 
 /** DS primitives that translate caller RN props themselves (#235/#237),
  * plus RN elements react-native-web translates on web. */
-const SANCTIONED_TAGS = new Set([
-  "Button",
-  "Text",
-  "TextField",
-  "TextAreaField",
-  "TextAction",
-  "ProgressBar",
-  "TouchableOpacity",
-]);
+// Compact split form: this file sits at the test max-lines cap
+// (300), so the tag list cannot grow one-per-line.
+const SANCTIONED_TAGS = new Set(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image".split(","),
+);
 
 test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in src/ (#237)", () => {
   const files = sourceFiles(join(root, "src"));

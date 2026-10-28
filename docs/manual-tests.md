@@ -433,3 +433,63 @@ button. The icon-slot stories:
 
 **Run when:** `src/components/Button.tsx`, its stories, or a
 changeset naming Button or the Button icon slot.
+
+---
+
+## Import pages (ImportTextPage, ImportUrlPage, ImportReviewPage)
+
+Open in `Pages/Eciperay/ImportTextPage`: Empty, WithError.
+Open in `Pages/Eciperay/ImportUrlPage`: Filled, Interactive.
+ImportReviewPage has no image story — its image case is verified
+from the changeset/PR description against a host render.
+
+1. ImportTextPage: the paste field is findable by the accessible
+   name "Recipe text" (Storybook accessibility panel or DOM
+   `aria-label`), not only by its "Paste your recipe here…"
+   placeholder. The Import button stays disabled on blank text.
+2. ImportUrlPage (Interactive): pressing Enter in the URL field
+   increments the "Submitted N times" counter, exactly like
+   pressing the Import button; clear the field first and Enter
+   does nothing (the counter does not move).
+3. ImportReviewPage: a render that passes `imageAlt` (hosts pass
+   the recipe title) exposes that text as the hero image's
+   accessible name — `alt` on web, accessibility label on
+   native; a render without an image shows no image at all.
+
+**Run when:** `src/pages/ImportTextPage.tsx`,
+`src/pages/ImportUrlPage.tsx`, `src/pages/ImportReviewPage.tsx`,
+their stories, or a changeset naming the import pages.
+
+## Auth pages (SignInPage, SignUpPage, ForgotPasswordPage, ResetPasswordPage)
+
+Open in `Pages/Eciperay/SignInPage`, `Pages/Eciperay/SignUpPage`,
+`Pages/Eciperay/ForgotPasswordPage`,
+`Pages/Eciperay/ResetPasswordPage` (the Filled story of each —
+the stories are interactive: fields can be typed in, and a
+submit switches the page to its loading state).
+
+1. In every field of each page's Filled story, pressing Enter
+   submits the page — visible as the page switching to its
+   loading state (the submit button's label changes to its
+   loading label, e.g. "Signing in…", and the button disables),
+   the same result as pressing the submit button. This holds
+   for the first field as well as the last.
+2. In each page's Loading story (and in a Filled story after
+   step 1 has put it in the loading state), pressing Enter in
+   a field does not submit again — the page stays in the
+   loading state with no further change.
+3. Pressing the submit button itself in a Filled story still
+   submits (same loading-state switch), and the "Create an
+   account" / "Forgot password?" / "Back to sign in" /
+   "Already have an account? Sign in" links do not submit —
+   clicking one does not switch the page to its loading state.
+4. Native (separate QA step — not covered by the deployed web
+   Storybook above): in the on-device Storybook
+   (`npm run storybook:react-native`), the return key submits
+   from every field of each page, and the last field's return
+   key is labeled "go".
+
+**Run when:** `src/pages/SignInPage.tsx`,
+`src/pages/SignUpPage.tsx`, `src/pages/ForgotPasswordPage.tsx`,
+`src/pages/ResetPasswordPage.tsx`, their stories, or a changeset
+naming the auth pages or Enter-to-submit.

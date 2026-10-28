@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { ResetPasswordPage } from "./ResetPasswordPage.js";
@@ -22,14 +22,32 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
-export const Filled: Story = {
-  render: () => (
+/**
+ * Interactive wrapper: the field is stateful so the story
+ * can be typed in, and submit switches the page to its
+ * loading state — so Enter-to-submit (#255) and the
+ * held-while-loading guard are observable in Storybook
+ * (submit shows "Updating…" and disables the button).
+ */
+function Interactive({ initialLoading = false }: { initialLoading?: boolean }) {
+  const [password, setPassword] = useState(filledValue);
+  const [loading, setLoading] = useState(initialLoading);
+  return (
     <Viewport>
       <ResetPasswordPage
-        password={filledValue}
-        onPasswordChange={() => undefined}
-        onSubmit={() => undefined}
+        password={password}
+        onPasswordChange={setPassword}
+        loading={loading}
+        onSubmit={() => setLoading(true)}
       />
     </Viewport>
-  ),
+  );
+}
+
+export const Filled: Story = {
+  render: () => <Interactive />,
+};
+
+export const Loading: Story = {
+  render: () => <Interactive initialLoading />,
 };

@@ -34,12 +34,27 @@ export function ImportUrlPage({
   error,
   onSubmit,
 }: ImportUrlPageProps) {
+  // Enter in the URL field submits, as the retired web form did —
+  // guarded exactly like the Import button (non-blank URL, not
+  // already loading), so the two submit paths can never diverge.
+  const submitFromField = () => {
+    if (url.trim() && !loading) {
+      onSubmit();
+    }
+  };
+
   return (
     <FormScreenLayout>
       <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]} marginBottom="$6">
         Import from URL
       </Text>
-      <TextField value={url} onChangeText={onUrlChange} placeholder="https://example.com/recipe" />
+      <TextField
+        value={url}
+        onChangeText={onUrlChange}
+        placeholder="https://example.com/recipe"
+        onSubmitEditing={submitFromField}
+        returnKeyType="go"
+      />
       {error ? (
         <YStack marginBottom="$4">
           <Text variant="error">{error}</Text>
