@@ -95,6 +95,12 @@ export type MealPlansPageProps = {
   /** Optional row action, mirroring the app row's Delete. The
    * button renders only when the callback is provided. */
   onPlanDelete?: (planId: string) => void;
+  /** Heading level for the "Meal plans" title on web (1 by default,
+   * the standalone page title). Hosts that render this page under
+   * their own page title — MealsHubPage's plans tab — pass 2 so the
+   * composed screen keeps exactly one level-1 heading (#263). The
+   * title's styling is unchanged; native ignores the level. */
+  titleLevel?: 1 | 2;
 };
 
 function MealPlanRow({
@@ -176,10 +182,13 @@ export function MealPlansPage({
   onPlanPress,
   onCreatePlan,
   onPlanDelete,
+  titleLevel,
 }: MealPlansPageProps) {
   return (
     <ScreenContainer>
-      <Text variant="heading">Meal plans</Text>
+      <Text variant="heading" aria-level={titleLevel}>
+        Meal plans
+      </Text>
       {onCreatePlan ? (
         <Button alignSelf="stretch" onPress={onCreatePlan}>
           New meal plan

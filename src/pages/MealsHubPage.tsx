@@ -167,6 +167,7 @@ export function MealsHubPage({
           onPlanPress={onPlanPress}
           onCreatePlan={onCreatePlan}
           onPlanDelete={onDeletePlan}
+          titleLevel={2}
         />
       </YStack>
     );
