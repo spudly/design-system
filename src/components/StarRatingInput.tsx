@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 const StarButton = styled(YStack, {
-  name: "SpudlyStarButton",
+  name: "StarButton",
 
   minWidth: 44,
   minHeight: 44,
@@ -14,7 +14,7 @@ const StarButton = styled(YStack, {
 });
 
 const StarCell = styled(YStack, {
-  name: "SpudlyStarCell",
+  name: "StarCell",
 
   minWidth: 44,
   minHeight: 44,

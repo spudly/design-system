@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledTrack = styled(TamaguiProgress, {
-  name: "SpudlyProgressBar",
+  name: "ProgressBar",
 
   height: tokens.spacing[2],
   borderRadius: tokens.radii.full,
@@ -20,7 +20,7 @@ const StyledTrack = styled(TamaguiProgress, {
 });
 
 const StyledIndicator = styled(TamaguiProgress.Indicator, {
-  name: "SpudlyProgressBarIndicator",
+  name: "ProgressBarIndicator",
 
   backgroundColor: "$primary",
   height: "100%",

@@ -2,7 +2,7 @@ import { Separator as TamaguiSeparator, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 
 const StyledSeparator = styled(TamaguiSeparator, {
-  name: "SpudlyDivider",
+  name: "Divider",
 
   borderColor: "$borderColor",
 });

@@ -28,7 +28,7 @@
  *    against fixtures below, so a broken scan fails loudly instead of
  *    passing on a vacuous match count.
  * 2. The SearchField glyph renders inside its own fixed box
- *    (`SpudlySearchFieldGlyphBox`: `height: 44`, `overflow: "hidden"`),
+ *    (`SearchFieldGlyphBox`: `height: 44`, `overflow: "hidden"`),
  *    so a mis-measured glyph clips there instead of stretching the
  *    row. The row container itself keeps `minHeight: 44` and no fixed
  *    height: SearchField forwards input props via ...rest, so a
@@ -343,17 +343,17 @@ test("SearchField glyph is capped in its own fixed box; the row keeps minHeight"
   // Declarations are checked on comment-stripped text so prose in the
   // block's comments can neither satisfy nor trip them.
   const stripped = stripComments(file.text);
-  const glyphBox = styledBlock(stripped, "SpudlySearchFieldGlyphBox");
-  assert.ok(/height:\s*44/.test(glyphBox), "SpudlySearchFieldGlyphBox must declare height: 44");
+  const glyphBox = styledBlock(stripped, "SearchFieldGlyphBox");
+  assert.ok(/height:\s*44/.test(glyphBox), "SearchFieldGlyphBox must declare height: 44");
   assert.ok(
     /overflow:\s*"hidden"/.test(glyphBox),
-    'SpudlySearchFieldGlyphBox must declare overflow: "hidden" so an exploding glyph clips inside its own box',
+    'SearchFieldGlyphBox must declare overflow: "hidden" so an exploding glyph clips inside its own box',
   );
-  const row = styledBlock(stripped, "SpudlySearchField");
-  assert.ok(/minHeight:\s*44/.test(row), "SpudlySearchField container must declare minHeight: 44");
+  const row = styledBlock(stripped, "SearchField");
+  assert.ok(/minHeight:\s*44/.test(row), "SearchField container must declare minHeight: 44");
   assert.ok(
     !/^\s*height\s*:/m.test(row),
-    "SpudlySearchField container must not declare a fixed height — SearchField forwards input props via ...rest, and a caller-sized input must still be able to grow the row",
+    "SearchField container must not declare a fixed height — SearchField forwards input props via ...rest, and a caller-sized input must still be able to grow the row",
   );
 });
 
@@ -387,9 +387,9 @@ test("SearchField search icon is drawn shapes, not a text glyph, so it centers b
 test("CheckboxField box clips its glyph with hidden overflow", () => {
   const file = sources.find(({ posixPath }) => posixPath.endsWith("components/CheckboxField.tsx"));
   assert.ok(file, "src/components/CheckboxField.tsx not found");
-  const block = styledBlock(stripComments(file.text), "SpudlyCheckboxBox");
+  const block = styledBlock(stripComments(file.text), "CheckboxBox");
   assert.ok(
     /overflow:\s*"hidden"/.test(block),
-    'SpudlyCheckboxBox must declare overflow: "hidden" so its glyph cannot paint or measure outside the 24px box',
+    'CheckboxBox must declare overflow: "hidden" so its glyph cannot paint or measure outside the 24px box',
   );
 });

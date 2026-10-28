@@ -32,7 +32,7 @@ const severityStyles = {
 export type AlertSeverity = keyof typeof severityStyles;
 
 const StyledAlert = styled(YStack, {
-  name: "SpudlyAlert",
+  name: "Alert",
 
   borderWidth: 1,
   borderRadius: tokens.radii.md,

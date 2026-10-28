@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledButton = styled(TamaguiButton, {
-  name: "SpudlyButton",
+  name: "Button",
 
   // Base: theme-aware styling — uses $primary/$onPrimary from the active
   // Tamagui theme (e.g. terracotta for Eciperay Warm Harvest), not the raw

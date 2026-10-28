@@ -5,7 +5,7 @@ import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
 const SecretBox = styled(XStack, {
-  name: "SpudlySecretBox",
+  name: "SecretBox",
 
   backgroundColor: "$surface",
   borderWidth: 1,
