@@ -109,18 +109,26 @@ export function TextField({
   // same task sequence, while a deliberate Enter press lands
   // well after the window.
   const composingRef = useRef(false);
-  const compositionEndedAtRef = useRef(0);
+  // Monotonic clock (performance.now): a wall-clock step must
+  // not stretch or shrink the grace window. -Infinity means
+  // "no composition has ended yet" (performance.now() starts
+  // near 0, so 0 would falsely hold submits in the first
+  // 100 ms after mount).
+  const compositionEndedAtRef = useRef(Number.NEGATIVE_INFINITY);
   const handleCompositionStart: typeof onCompositionStart = (event) => {
     composingRef.current = true;
     onCompositionStart?.(event);
   };
   const handleCompositionEnd: typeof onCompositionEnd = (event) => {
     composingRef.current = false;
-    compositionEndedAtRef.current = Date.now();
+    compositionEndedAtRef.current = performance.now();
     onCompositionEnd?.(event);
   };
   const handleSubmitEditing: typeof onSubmitEditing = (event) => {
-    if (isWeb && (composingRef.current || Date.now() - compositionEndedAtRef.current < 100)) {
+    if (
+      isWeb &&
+      (composingRef.current || performance.now() - compositionEndedAtRef.current < 100)
+    ) {
       return;
     }
     onSubmitEditing?.(event);
