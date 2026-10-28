@@ -32,6 +32,15 @@ export function ResetPasswordPage({
   error,
   onSubmit,
 }: ResetPasswordPageProps) {
+  // Enter/return in the field submits (#255), mirroring the
+  // native-form behavior the retired web view had; while
+  // loading the submit button is disabled, so field
+  // submission is held the same way.
+  const submitFromField = () => {
+    if (!loading) {
+      onSubmit();
+    }
+  };
   return (
     <ScreenContainer scrollable={false} variant="auth">
       <Text variant="heading" marginBottom="$4">
@@ -47,6 +56,8 @@ export function ResetPasswordPage({
         autoComplete="password-new"
         secureTextEntry
         accessibilityLabel="New password"
+        onSubmitEditing={submitFromField}
+        returnKeyType="go"
       />
       {error ? <Text variant="error">{error}</Text> : null}
       <Button

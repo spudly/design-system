@@ -378,3 +378,27 @@ button. The icon-slot stories:
 
 **Run when:** `src/components/Button.tsx`, its stories, or a
 changeset naming Button or the Button icon slot.
+
+---
+
+## Auth pages (SignInPage, SignUpPage, ForgotPasswordPage, ResetPasswordPage)
+
+Open in `Pages/SignInPage`, `Pages/SignUpPage`,
+`Pages/ForgotPasswordPage`, `Pages/ResetPasswordPage` (the Default
+story of each).
+
+1. In every field of each page, pressing Enter (web) or the return
+   key (native) submits the page — the same result as pressing the
+   submit button (in Storybook, the submit action fires in the
+   Actions panel). This holds for the first field as well as the
+   last; the last field's return key is labeled "go" on native.
+2. While a page shows its loading label (the Loading story where
+   present), pressing Enter in a field does not submit again.
+3. Pressing the submit button itself still submits, and the
+   "Create an account" / "Forgot password?" / "Back to sign in"
+   links still fire their own actions, not the submit.
+
+**Run when:** `src/pages/SignInPage.tsx`,
+`src/pages/SignUpPage.tsx`, `src/pages/ForgotPasswordPage.tsx`,
+`src/pages/ResetPasswordPage.tsx`, their stories, or a changeset
+naming the auth pages or Enter-to-submit.
