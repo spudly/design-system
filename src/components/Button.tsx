@@ -135,12 +135,12 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
 type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" | "href"> & {
   disabled?: boolean;
   /**
-   * Grow to fill the row's remaining width (flex: 1): the
-   * primary action in an action row claims the space the row's
-   * other actions leave — the way SearchField's `grow` lets a
-   * field take its row's remaining width. A layout semantic,
-   * not a style value: the row still owns the button's size
-   * and separation.
+   * Grow to fill the row's remaining width (flexGrow with a
+   * content-sized basis): the primary action in an action row
+   * claims the space the row's other actions leave — the way
+   * SearchField's `grow` lets a field take its row's remaining
+   * width. A layout semantic, not a style value: the row still
+   * owns the button's size and separation.
    */
   grow?: boolean;
   /**
@@ -453,8 +453,16 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         // still wins.
         fontFamily="body"
         // `grow` claims the row's remaining width; a caller-passed
-        // flex in `rest` still wins over it.
-        {...(grow ? { flex: 1 } : null)}
+        // flex in `rest` still wins over it. The basis stays
+        // content-sized ("auto"), never `flex: 1`'s zero basis: in a
+        // wrapping row (ButtonRow), line-breaking measures a
+        // zero-basis button at ~0 and on native its grown width can
+        // collapse below the label's content width — the label then
+        // wraps a character at a time (seen in RecipeDetailPage's
+        // Start Cooking link, PR #314's VR baselines). A
+        // content-sized basis makes line-breaking account for the
+        // label; grow then claims the line's remaining width.
+        {...(grow ? { flexGrow: 1, flexShrink: 1, flexBasis: "auto" } : null)}
         // `rest` is read through the widened render shape (its
         // fields are the button frame's); call sites are typed by
         // ButtonLinkProps, so what actually arrives is the link
@@ -526,8 +534,11 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
           }
         : null)}
       // `grow` claims the row's remaining width; a caller-passed
-      // flex in `rest` still wins over it.
-      {...(grow ? { flex: 1 } : null)}
+      // flex in `rest` still wins over it. The basis stays
+      // content-sized ("auto") for the reason recorded at the link
+      // form's spread: a zero basis collapses the button in a
+      // wrapping row on native.
+      {...(grow ? { flexGrow: 1, flexShrink: 1, flexBasis: "auto" } : null)}
       {...rest}
     >
       {IconGlyph ? <IconGlyph size={glyphSize} color={glyphInk} /> : null}

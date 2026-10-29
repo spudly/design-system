@@ -27,9 +27,11 @@
  * - Center: centers a single child — boolean `horizontal` /
  *   `vertical`, both defaulting to true.
  * The pins hold each component's treatment, its Omit of the
- * style keys it owns, and SearchField's `grow` (the other half
+ * style keys it owns, SearchField's `grow` (the other half
  * of the FieldRow pattern: the field takes the row's
- * remaining width).
+ * remaining width), and Button's `grow` basis (the ButtonRow
+ * pattern's other half: a growing button in a wrapping row
+ * must keep a content-sized basis or it collapses on native).
  *
  * Source scan plus dist export checks, like the other component
  * contract tests. The dist import needs the harness's
@@ -61,6 +63,7 @@ const panelStackCode = code("PanelStack.tsx");
 const chipRowCode = code("ChipRow.tsx");
 const centerCode = code("Center.tsx");
 const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
+const buttonCode = code("Button.tsx");
 
 test("the layout components are exported from the built package root", async () => {
   const dist = await import("../dist/index.js");
@@ -166,6 +169,21 @@ test("no layout component offers step, role, or margin props", () => {
       );
     }
   }
+});
+
+test("Button's grow keeps a content-sized basis in both forms (no wrapping-row collapse)", () => {
+  const spreads = buttonCode.match(
+    /\{\.\.\.\(grow \? \{ flexGrow: 1, flexShrink: 1, flexBasis: "auto" \} : null\)\}/g,
+  );
+  assert.equal(
+    spreads?.length,
+    2,
+    "both Button forms must spread the content-basis grow shape — a zero basis (flex: 1) collapses a growing button in a wrapping row on native (PR #314's Start Cooking)",
+  );
+  assert.ok(
+    !/\{\.\.\.\(grow \? \{ flex: 1 \}/.test(buttonCode),
+    "Button's grow must never spread flex: 1 (zero basis — the wrapping-row collapse)",
+  );
 });
 
 test("SearchField's grow prop flexes the field's root, and only when set", () => {
