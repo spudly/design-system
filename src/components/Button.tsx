@@ -135,6 +135,15 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
 type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" | "href"> & {
   disabled?: boolean;
   /**
+   * Grow to fill the row's remaining width (flex: 1): the
+   * primary action in an action row claims the space the row's
+   * other actions leave — the way SearchField's `grow` lets a
+   * field take its row's remaining width. A layout semantic,
+   * not a style value: the row still owns the button's size
+   * and separation.
+   */
+  grow?: boolean;
+  /**
    * The icon slot: one of the design system's semantic icon
    * components from `@spudly/ui/icons` (PrintIcon, ShareIcon, …).
    * This is CONTENT, not styling — Button renders the glyph itself,
@@ -212,6 +221,8 @@ type ButtonLinkProps = Omit<StyledLinkButtonProps, "disabled" | "children" | "ic
    * (the host composes hrefs from its routes, #248).
    */
   href: string;
+  /** Grow to fill the row's remaining width (see ButtonOwnProps). */
+  grow?: boolean;
   /** A link navigates — press callbacks belong to the button form. */
   onPress?: never;
   /**
@@ -311,7 +322,8 @@ function useGlyphInk(variant: string | undefined): string {
  * Universal cross-platform button (web + React Native via Tamagui).
  *
  * Props: `variant` ("primary" | "secondary" | "ghost" | "danger"), `size`
- * ("sm" | "md" | "lg"), `disabled`. All styling is token-driven. Use
+ * ("sm" | "md" | "lg"), `disabled`, `grow` (claim the row's remaining
+ * width). All styling is token-driven. Use
  * `danger` for destructive actions (delete, revoke, remove).
  *
  * Two activation forms (#248's navigation rule — a control that
@@ -351,6 +363,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     disabled = false,
     variant = "primary",
     size = "md",
+    grow = false,
     icon: IconGlyph,
     children,
     color,
@@ -439,6 +452,9 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         // (see Text, #69). A caller-passed `fontFamily` in `rest`
         // still wins.
         fontFamily="body"
+        // `grow` claims the row's remaining width; a caller-passed
+        // flex in `rest` still wins over it.
+        {...(grow ? { flex: 1 } : null)}
         // `rest` is read through the widened render shape (its
         // fields are the button frame's); call sites are typed by
         // ButtonLinkProps, so what actually arrives is the link
@@ -509,6 +525,9 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
             justifyContent: "center",
           }
         : null)}
+      // `grow` claims the row's remaining width; a caller-passed
+      // flex in `rest` still wins over it.
+      {...(grow ? { flex: 1 } : null)}
       {...rest}
     >
       {IconGlyph ? <IconGlyph size={glyphSize} color={glyphInk} /> : null}

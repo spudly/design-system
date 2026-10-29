@@ -20,6 +20,10 @@
  *   spacing[2] (8px), centered.
  * - ListStack: hairline rows as one list — no gap of its own;
  *   the rows own their separation.
+ * - PanelStack: a section panel's blocks — padding and gap both
+ *   spacing[4] (16px), stretch.
+ * - ChipRow: a wrapping row of chips/badges — gap spacing[2]
+ *   (8px) and wrap, items at natural size.
  * - Center: centers a single child — boolean `horizontal` /
  *   `vertical`, both defaulting to true.
  * The pins hold each component's treatment, its Omit of the
@@ -53,6 +57,8 @@ const cardStackCode = code("CardStack.tsx");
 const sectionStackCode = code("SectionStack.tsx");
 const fieldRowCode = code("FieldRow.tsx");
 const listStackCode = code("ListStack.tsx");
+const panelStackCode = code("PanelStack.tsx");
+const chipRowCode = code("ChipRow.tsx");
 const centerCode = code("Center.tsx");
 const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
 
@@ -64,6 +70,8 @@ test("the layout components are exported from the built package root", async () 
     "SectionStack",
     "FieldRow",
     "ListStack",
+    "PanelStack",
+    "ChipRow",
     "Center",
   ]) {
     assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
@@ -110,6 +118,20 @@ test("FieldRow owns the search row's gap and centering", () => {
   assert.match(fieldRowCode, /styled\(XStack, \{\s+name: "FieldRow",/);
   assert.match(fieldRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "center",/);
   assert.match(fieldRowCode, /Omit<StyledFieldRowProps, "gap" \| "alignItems">/);
+});
+
+test("PanelStack owns the section panel's inset and block rhythm", () => {
+  assert.match(panelStackCode, /styled\(YStack, \{\s+name: "PanelStack",/);
+  assert.match(panelStackCode, /padding: tokens\.spacing\[4\],\s+gap: tokens\.spacing\[4\],/);
+  assert.match(panelStackCode, /alignItems: "stretch",/);
+  assert.match(panelStackCode, /Omit<StyledPanelStackProps, "padding" \| "gap" \| "alignItems">/);
+});
+
+test("ChipRow owns the chip flow's gap and wrap", () => {
+  assert.match(chipRowCode, /styled\(XStack, \{\s+name: "ChipRow",/);
+  assert.match(chipRowCode, /flexWrap: "wrap",\s+gap: tokens\.spacing\[2\],/);
+  assert.match(chipRowCode, /alignItems: "flex-start",/);
+  assert.match(chipRowCode, /Omit<StyledChipRowProps, "flexWrap" \| "gap" \| "alignItems">/);
 });
 
 test("ListStack adds no gap of its own — the rows own their separation", () => {

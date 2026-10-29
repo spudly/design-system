@@ -19,8 +19,9 @@
  *    `wrap: false` renders ONE non-wrapping row whose chips flex to
  *    equal shares of the row width.
  * 4. The ingredients panel uses both: servings inline, scale as a
- *    non-wrapping equal-width chip row beside its label, in one
- *    controls block above the ingredient rows.
+ *    non-wrapping equal-width chip row beside its label (the
+ *    EditableChipGroup the #119 pass extracted from this row), in
+ *    one controls block above the ingredient rows.
  * 5. NumberStepper gains an additive `editable` prop (default
  *    false): the value renders as an editable numeric field —
  *    `keyboardType`/`inputMode` numeric (a text input on web, NOT
@@ -35,7 +36,11 @@
  *    entry applies it through the same onScaleChange (arbitrary
  *    scales like "4" or "2.5"), an invalid entry commits nothing,
  *    and a non-preset scaleValue renders the chip selected showing
- *    that value. Pressing a preset leaves custom editing.
+ *    that value. Pressing a preset leaves custom editing. (The
+ *    chip lives in EditableChipGroup since the #119 extraction;
+ *    its pins below read that component's source, and the page's
+ *    pins hold the wiring: options in, the same onScaleChange
+ *    out, the value format with its × suffix.)
  *
  * Source-pinning test in the style of recipeDetailPage.test.mjs;
  * run via `npm test` (which builds first).
@@ -49,6 +54,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const stepper = readFileSync(join(root, "src/components/NumberStepper.tsx"), "utf8");
 const chips = readFileSync(join(root, "src/components/ToggleChipGroup.tsx"), "utf8");
+const chipGroup = readFileSync(join(root, "src/components/EditableChipGroup.tsx"), "utf8");
 const page = readFileSync(join(root, "src/pages/RecipeDetailPage.tsx"), "utf8");
 
 test("NumberStepper layout is additive with stacked as the default", () => {
@@ -89,12 +95,17 @@ test("the ingredients panel uses the inline stepper and the nowrap scale row", (
   );
   assert.match(
     page,
-    /<ToggleChipGroup\s+options=\{SCALE_OPTIONS\}\s+mode="single"\s+wrap=\{false\}/,
+    /<EditableChipGroup\s+label="Scale"\s+options=\{SCALE_OPTIONS\}/,
+    "the panel composes the scale row as an EditableChipGroup over the same options",
+  );
+  assert.match(
+    chipGroup,
+    /<ToggleChipGroup\s+options=\{options\}\s+mode="single"\s+wrap=\{false\}/,
     "scale renders as one non-wrapping chip row",
   );
   // The contract is unchanged: the same handlers feed both controls.
   assert.match(page, /onChange=\{view\.onServingsChange\}/, "servings handler unchanged");
-  assert.match(page, /view\.onScaleChange\(value\)/, "preset scale handler unchanged");
+  assert.match(page, /onChange=\{view\.onScaleChange\}/, "scale handler unchanged");
 });
 
 test("NumberStepper editable is additive, off by default, and renders a numeric text input", () => {
@@ -124,7 +135,7 @@ test("the stepper commits typed entries snapped and clamped, and ignores invalid
   assert.match(
     stepper,
     /if \(draft\.trim\(\) === ""\) \{\s+setDraft\(null\);\s+return;/,
-    "an empty entry commits nothing (Number(\"\") is 0, so it needs its own guard)",
+    'an empty entry commits nothing (Number("") is 0, so it needs its own guard)',
   );
   assert.match(
     stepper,
@@ -157,52 +168,70 @@ test("the ingredients panel makes servings directly editable", () => {
 
 test("the scale row has a Custom chip that turns into a number input in place", () => {
   assert.match(page, /const CUSTOM_SCALE_LABEL = "Custom";/, "the custom chip label is Custom");
-  assert.match(page, /accessibilityLabel="Custom scale"/, "the custom control is labelled");
-  assert.match(page, /onPress=\{startCustomScaleEdit\}/, "pressing the chip starts editing");
   assert.match(
     page,
+    /customAccessibilityLabel="Custom scale"/,
+    "the page names the custom control for assistive tech",
+  );
+  assert.match(
+    chipGroup,
+    /accessibilityLabel=\{customAccessibilityLabel\}/,
+    "the custom editor carries that label",
+  );
+  assert.match(chipGroup, /onPress=\{startCustomEdit\}/, "pressing the chip starts editing");
+  assert.match(
+    chipGroup,
     /keyboardType="decimal-pad"/,
     "the custom scale input uses the decimal keypad (fractions allowed)",
   );
-  assert.match(page, /type="number"/, "web renders an input[type=number] for the custom scale");
-  assert.match(page, /isCustomScaleEditing \? \(/, "the input replaces the chip while editing");
+  assert.match(
+    chipGroup,
+    /type="number"/,
+    "web renders an input[type=number] for the custom scale",
+  );
+  assert.match(chipGroup, /isCustomEditing \? \(/, "the input replaces the chip while editing");
 });
 
 test("committing a custom scale applies any positive multiplier and ignores invalid entries", () => {
-  assert.match(page, /const parsed = Number\(customScaleDraft\.trim\(\)\);/, "the entry is parsed");
+  assert.match(chipGroup, /const parsed = Number\(customDraft\.trim\(\)\);/, "the entry is parsed");
   assert.match(
-    page,
-    /if \(Number\.isFinite\(parsed\) && parsed > 0\) \{\s+view\.onScaleChange\(String\(parsed\)\);/,
-    "a positive entry (e.g. 4 or 2.5) applies through onScaleChange; else nothing commits",
+    chipGroup,
+    /if \(Number\.isFinite\(parsed\) && parsed > 0\) \{\s+onChange\(String\(parsed\)\);/,
+    "a positive entry (e.g. 4 or 2.5) applies through onChange; else nothing commits",
   );
-  assert.match(page, /onBlur=\{commitCustomScale\}/, "the custom entry commits on blur");
-  assert.match(page, /onSubmitEditing=\{commitCustomScale\}/, "the custom entry commits on submit");
+  assert.match(chipGroup, /onBlur=\{commitCustom\}/, "the custom entry commits on blur");
+  assert.match(chipGroup, /onSubmitEditing=\{commitCustom\}/, "the custom entry commits on submit");
 });
 
 test("a non-preset scale renders the custom chip selected with its value; presets leave editing", () => {
   assert.match(
-    page,
-    /const isPresetScale = SCALE_OPTIONS\.some\(\(option\) => option\.value === view\.scaleValue\);/,
+    chipGroup,
+    /const isPreset = options\.some\(\(option\) => option\.value === value\);/,
     "preset membership is derived from the option set",
   );
   assert.match(
-    page,
-    /const isCustomScaleSelected = !isPresetScale && !isCustomScaleEditing;/,
-    "a non-preset scaleValue selects the custom chip",
+    chipGroup,
+    /const isCustomSelected = !isPreset && !isCustomEditing;/,
+    "a non-preset value selects the custom chip",
   );
   assert.match(
     page,
-    /`\$\{formatScaleValue\(view\.scaleValue\)\}×`/,
-    "the selected custom chip shows the applied value (e.g. 4×)",
+    /formatCustomValue=\{\(value\) => `\$\{formatScaleValue\(value\)\}×`\}/,
+    "the page formats the selected custom value with its × suffix (e.g. 4×)",
   );
   assert.match(
-    page,
-    /aria-pressed=\{isCustomScaleSelected\}/,
+    chipGroup,
+    /isCustomSelected \? formattedCustom : customLabel/,
+    "the selected custom chip shows the formatted applied value",
+  );
+  assert.match(
+    chipGroup,
+    /aria-pressed=\{isCustomSelected\}/,
     "the custom chip exposes its selected state",
   );
   assert.match(
-    page,
-    /setCustomScaleEditing\(false\);\s+view\.onScaleChange\(value\);/,
+    chipGroup,
+    /setCustomEditing\(false\);\s+onChange\(next\);/,
     "choosing a preset leaves custom editing and applies the preset",
   );
 });

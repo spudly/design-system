@@ -1,21 +1,22 @@
 import type { ComponentType } from "react";
-import { Button as TamaguiButton, styled, useTheme } from "tamagui";
-import type { GetProps } from "tamagui";
+import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { IconComponentProps } from "../icons/Icon.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
 /**
  * The chip frame: Button's geometry at the small end of its scale,
- * with the fill/border owned by the `tone` variant. The label ink is
- * NOT set here — a styled() variant's `color` styles only the frame,
- * not Tamagui Button's internal text element (the lesson Button's
- * variantLabelColors records), so the wrapper passes the tone's ink
- * as an instance `color` prop at render.
+ * with the fill/border owned by the `tone` variant. ONE config
+ * shared by the two frames the chip renders (the press form's
+ * Tamagui Button and the href form's Anchor — Button's
+ * buttonFrameConfig pattern), so the forms are pixel-identical
+ * and cannot drift. The label ink is NOT set here — a styled()
+ * variant's `color` styles only the frame, not Tamagui Button's
+ * internal text element (the lesson Button's variantLabelColors
+ * records), so the wrapper passes the tone's ink as an instance
+ * `color` prop at render.
  */
-const StyledChip = styled(TamaguiButton, {
-  name: "ActionChip",
-
+const chipFrameConfig = {
   borderRadius: tokens.radii.md,
   borderWidth: 0,
   fontWeight: tokens.typography.fontWeight.semibold,
@@ -64,10 +65,31 @@ const StyledChip = styled(TamaguiButton, {
   defaultVariants: {
     tone: "neutral",
     size: "sm",
-  },
+  } as const,
+};
+
+const StyledChip = styled(TamaguiButton, {
+  name: "ActionChip",
+  ...chipFrameConfig,
 });
 
-type StyledChipProps = GetProps<typeof StyledChip>;
+const StyledLinkChip = styled(Anchor, {
+  name: "ActionChipLink",
+  ...chipFrameConfig,
+
+  // An anchor is a text element, not a flex frame: on web it is
+  // `display: inline` by default, which would collapse the chip's
+  // frame — so web gets a real flex frame, centering the label
+  // the way the press form centers its content (Button's
+  // StyledLinkButton lesson). A web anchor also carries the UA
+  // link underline; the press form has none, and the two forms
+  // are contracted to look identical.
+  display: "web:flex",
+  alignItems: "web:center",
+  justifyContent: "web:center",
+  textAlign: "center",
+  textDecorationLine: "none",
+});
 
 export type ActionChipTone = "neutral" | "danger" | "success" | "primary" | "outline";
 
@@ -132,7 +154,15 @@ const iconOnlyBoxes = {
   md: 48,
 } as const;
 
-type ActionChipBaseProps = {
+/** Label font size per chip size, for the href form's label text
+ * (Button's labelFontSizes pattern: the anchor's label renders in
+ * one nested text element carrying its own typography). */
+const labelFontSizes = {
+  sm: tokens.typography.fontSize.sm,
+  md: tokens.typography.fontSize.md,
+} as const;
+
+type ActionChipOwnProps = {
   /**
    * The chip's treatment: `neutral` (default — gray fill, the
    * overview action chips), `danger` (soft danger fill for
@@ -144,34 +174,65 @@ type ActionChipBaseProps = {
   /** `sm` (default) is the in-content chip; `md` matches the
    * standard button's geometry for action rows. */
   size?: "sm" | "md";
-  onPress: () => void;
   disabled?: boolean;
 };
 
-export type ActionChipProps = ActionChipBaseProps &
+/** The press form's label/icon shapes (activation by callback). */
+type ActionChipPressShapes =
+  | {
+      /** The chip's label. */
+      children: string;
+      /** Optional leading icon (a DS icon component). */
+      icon?: ComponentType<IconComponentProps>;
+      accessibilityLabel?: string;
+    }
+  | {
+      children?: undefined;
+      /** The chip's only content — an icon component. */
+      icon: ComponentType<IconComponentProps>;
+      /** Required when icon-only: the chip's accessible name. */
+      accessibilityLabel: string;
+    };
+
+export type ActionChipProps = ActionChipOwnProps &
   (
+    | (ActionChipPressShapes & {
+        onPress: () => void;
+        href?: undefined;
+      })
     | {
-        /** The chip's label. */
+        /**
+         * The link's destination. Giving the chip an `href` makes
+         * it a LINK (#248's navigation rule, Button's two-form
+         * contract): on web it renders a real anchor carrying the
+         * href, and on native a press opens the href through the
+         * platform link path — so on native the host passes an
+         * absolute URL, as with every DS href form. The frame,
+         * tones, and sizes are the press form's own — only the
+         * element and the activation differ.
+         */
+        href: string;
+        /** A link navigates — press callbacks belong to the press form. */
+        onPress?: never;
+        /**
+         * The icon slot belongs to the press form: an anchor's
+         * content is its label text (a navigating control that
+         * needs richer content is a card/row link, not a chip).
+         */
+        icon?: never;
+        /** The chip's label. A labeled link is named by its text. */
         children: string;
-        /** Optional leading icon (a DS icon component). */
-        icon?: ComponentType<IconComponentProps>;
         accessibilityLabel?: string;
-      }
-    | {
-        children?: undefined;
-        /** The chip's only content — an icon component. */
-        icon: ComponentType<IconComponentProps>;
-        /** Required when icon-only: the chip's accessible name. */
-        accessibilityLabel: string;
       }
   );
 
-type ActionChipRenderProps = Omit<StyledChipProps, "tone" | "size" | "children"> &
-  ActionChipBaseProps & {
-    children?: string;
-    icon?: ComponentType<IconComponentProps>;
-    accessibilityLabel?: string;
-  };
+type ActionChipRenderProps = ActionChipOwnProps & {
+  onPress?: () => void;
+  href?: string;
+  children?: string;
+  icon?: ComponentType<IconComponentProps>;
+  accessibilityLabel?: string;
+};
 
 /**
  * A small tonal action chip: the compact action control pages used
@@ -187,21 +248,63 @@ type ActionChipRenderProps = Omit<StyledChipProps, "tone" | "size" | "children">
  *
  * The icon slot mirrors Button's: an icon component renders left of
  * the label in the tone's ink; with no label the chip is icon-only —
- * a square target that requires `accessibilityLabel`. Activation is
- * always a callback (`onPress`): a control that navigates is a link,
- * never a chip (#248's navigation rule).
+ * a square target that requires `accessibilityLabel`.
+ *
+ * One component, two forms (#248's navigation rule, Button's
+ * contract): pass `onPress` and the chip is a button element with a
+ * callback; pass `href` and the chip is a link — a real anchor on
+ * web, the platform link path on native — with the identical frame.
+ * The href form is label-only, like Button's: the overview's Edit
+ * chips and the lifecycle's Tweak-with-AI chip navigate, and they
+ * render through it.
  */
 export function ActionChip(props: ActionChipProps) {
   const {
     tone = "neutral",
     size = "sm",
     onPress,
+    href,
     disabled = false,
     icon: IconGlyph,
     children,
     accessibilityLabel,
   } = props as ActionChipRenderProps;
   const glyphInk = useGlyphInk(tone);
+  if (href !== undefined) {
+    const linkA11yProps = platformAccessibilityProps({
+      accessibilityRole: "link",
+      accessibilityLabel,
+      accessibilityState: { disabled },
+    });
+    return (
+      <StyledLinkChip
+        {...linkA11yProps}
+        // A disabled link is not followable: the href is withheld
+        // entirely (ARIA's disabled-link pattern — the attribute
+        // is absent, not empty) while the disabled state above
+        // still announces it. On native the Anchor opens the href
+        // only when one is present, so the press is inert too.
+        {...(disabled ? {} : { href })}
+        disabled={disabled}
+        tone={tone}
+        size={size}
+        color={toneLabelColors[tone]}
+        // The bare font name ("body") is the form that makes
+        // Tamagui emit the font-context class defining
+        // `--f-family` for the label text (see Text, #69).
+        fontFamily="body"
+      >
+        <TamaguiText
+          color={toneLabelColors[tone]}
+          fontFamily="$body"
+          fontSize={labelFontSizes[size as keyof typeof labelFontSizes] ?? labelFontSizes.sm}
+          fontWeight={tokens.typography.fontWeight.semibold}
+        >
+          {children}
+        </TamaguiText>
+      </StyledLinkChip>
+    );
+  }
   const iconOnly = IconGlyph != null && !children;
   const glyphSize = glyphSizes[size as keyof typeof glyphSizes] ?? glyphSizes.sm;
   const iconOnlyBox = iconOnlyBoxes[size as keyof typeof iconOnlyBoxes] ?? iconOnlyBoxes.sm;

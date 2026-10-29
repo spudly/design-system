@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+RecipeDetailPage is rebuilt from shared components (#119, recipes-detail tranche): the page now composes a ScreenShell + Toolbar chrome over a ScrollRegion with PanelStack section panels, and its clusters ship as reusable components — RatingsCard, NutritionPanel, CandidateList, LogEntryCard, StepList, MarkableRow, EditableChipGroup, SuggestionPanel, TagList, SectionHeading, StatusMessage, plus the PanelStack / ChipRow layout stacks. ActionChip gains an href (link) form with the identical frame for chips that navigate (Edit, Tweak with AI), Button and SelectField gain a `grow` prop for action rows and toolbars, and the version picker grows through SelectField instead of a layout wrapper. Rendering is unchanged apart from the canonical treatments the components own: overview Delete and lifecycle Abandon take ActionChip's danger pair, print/share take the chip's square 48px target, the recipe description takes the body text treatment, and panel separations follow PanelStack's 16px rhythm. New Storybook stories cover every new component and ActionChip's link form.

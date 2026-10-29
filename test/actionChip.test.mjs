@@ -90,3 +90,34 @@ test("the chip exposes the button role with its disabled state", () => {
     /accessibilityRole: "button",\s+accessibilityLabel,\s+accessibilityState: \{ disabled \},/,
   );
 });
+
+test("the href form is a link with the identical frame (Button's two-form contract)", () => {
+  // The link form exists because overview/lifecycle chips navigate
+  // (RecipeDetailPage's Edit chips, Tweak with AI): #248's rule
+  // makes them links, and the chip's frame must not change for it.
+  assert.match(code, /href: string;/, "the link form is discriminated by href");
+  assert.match(code, /onPress\?: never;/, "a link takes no press callback");
+  assert.match(code, /icon\?: never;/, "the link form is label-only, like Button's");
+  assert.match(
+    code,
+    /const StyledLinkChip = styled\(Anchor, \{\s+name: "ActionChipLink",\s+\.\.\.chipFrameConfig,/,
+    "the anchor frame spreads the one shared chip frame config",
+  );
+  assert.match(
+    code,
+    /const StyledChip = styled\(TamaguiButton, \{\s+name: "ActionChip",\s+\.\.\.chipFrameConfig,/,
+    "the press frame spreads the same config — the forms cannot drift",
+  );
+  assert.match(code, /display: "web:flex",/, "the web anchor is a real flex frame");
+  assert.match(code, /textDecorationLine: "none",/, "the link form drops the UA underline");
+  assert.match(
+    code,
+    /accessibilityRole: "link",\s+accessibilityLabel,\s+accessibilityState: \{ disabled \},/,
+    "the link form exposes the link role with its disabled state",
+  );
+  assert.match(
+    code,
+    /\{\.\.\.\(disabled \? \{\} : \{ href \}\)\}/,
+    "a disabled link withholds its href (the ARIA disabled-link pattern)",
+  );
+});

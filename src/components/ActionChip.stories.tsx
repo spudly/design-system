@@ -95,6 +95,22 @@ export const Sizes: Story = {
   ),
 };
 
+export const LinkForm: Story = {
+  render: () => (
+    <XStack flexWrap="wrap" gap={8} maxWidth={430}>
+      <ActionChip tone="neutral" href="https://example.com/edit">
+        Edit
+      </ActionChip>
+      <ActionChip tone="primary" href="https://example.com/tweak">
+        Tweak with AI
+      </ActionChip>
+      <ActionChip tone="neutral" href="https://example.com/edit" disabled>
+        Edit (disabled)
+      </ActionChip>
+    </XStack>
+  ),
+};
+
 function DisabledPressCounterDemo() {
   const [count, setCount] = useState(0);
   const onPress = () => {

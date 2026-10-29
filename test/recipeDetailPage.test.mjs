@@ -9,11 +9,11 @@
  *    the view imports nothing from an app package and runs no
  *    queries or mutations — business logic stays app-side.
  * 2. The loading member of the props union renders only the
- *    spinner shell, before (and instead of) the chrome — the app
+ *    LoadingGate, before (and instead of) the chrome — the app
  *    screen's gate replaces the whole screen, and it has no
  *    distinct not-found state to model.
  * 3. The chrome is pinned: status badge + version picker toolbar
- *    renders above the single ScrollView, and every section
+ *    renders above the single ScrollRegion, and every section
  *    renders inside it (#71 — a section that scrolled its own
  *    chrome away would break the version context). The version
  *    picker is the standard SelectField (#72) with the contract
@@ -28,7 +28,7 @@
  *    occupy today: the cook-log form replaces the "Log a cook"
  *    button while it renders content; sharing renders after the
  *    lifecycle section and before the tags; comments render in
- *    the engagement stack after the ratings card.
+ *    the overview panel after the ratings card.
  * 6. Optional content is omitted cleanly: no image, description,
  *    prep/cook stats, edit chips, lifecycle section, substitutions
  *    panel, or ratings card appears unless its data/callback is
@@ -37,8 +37,17 @@
  * 8. Stories exercise the states and the cook-log form slot, so
  *    Chromatic captures them.
  * 9. The print/share chips render the icons module's PrintIcon /
- *    ShareIcon (#187) — no emoji or text glyphs, no hand-drawn
- *    glyph components.
+ *    ShareIcon (#187) through ActionChip's icon slot — no emoji
+ *    or text glyphs, no hand-drawn glyph components.
+ *
+ * The #119 de-styling pass (recipes-detail tranche) rebuilt the
+ * page as a composition of design-system components; invariants
+ * about a widget's internals moved with the widget into its own
+ * contract test (the Activate conditional to candidateList, the
+ * nutrition union to nutritionPanel, the tag Badge form to
+ * tagList, the custom-scale chip to pageWebAria's
+ * EditableChipGroup pins). The pins below hold the page-level
+ * contract: composition, ordering, slots, and pass-throughs.
  *
  * This is a source scan, not a render test, for the same reason as
  * test/recipesPageAccessory.test.mjs: the repo has no JS
@@ -95,27 +104,27 @@ test("the loading state renders only the spinner shell", () => {
   assert.ok(loadingAt < chromeAt, "the loading branch must come before the chrome render");
   assert.match(
     code,
-    /<Spinner label="Loading recipe" \/>/,
-    "the loading shell renders the DS Spinner",
+    /<LoadingGate label="Loading recipe" \/>/,
+    "the loading shell renders the DS LoadingGate (whose spinner carries the label)",
   );
 });
 
-test("the chrome is pinned above a single scroll view", () => {
+test("the chrome is pinned above a single scroll region", () => {
   const toolbarAt = code.indexOf("<VersionPicker");
-  const scrollAt = code.indexOf('<ScrollView flex={1} keyboardShouldPersistTaps="handled">');
+  const scrollAt = code.indexOf("<ScrollRegion>");
   assert.ok(
     scrollAt !== -1,
-    "the section ScrollView must persist handled taps (slotted forms keep their presses)",
+    "the sections render in the ScrollRegion (its contract persists handled taps — slotted forms keep their presses)",
   );
   assert.ok(toolbarAt !== -1, "the toolbar must render the version picker");
-  assert.ok(scrollAt > toolbarAt, "the scroll view renders below the pinned chrome");
+  assert.ok(scrollAt > toolbarAt, "the scroll region renders below the pinned chrome");
   assert.equal(
-    code.split("<ScrollView").length - 1,
+    code.split("<ScrollRegion").length - 1,
     1,
-    "exactly one ScrollView: the section scroll (the version picker is a SelectField since #72 — its sheet scroll lives in that component)",
+    "exactly one ScrollRegion: the section scroll (the version picker is a SelectField since #72 — its sheet scroll lives in that component)",
   );
   const panelAt = code.indexOf("<OverviewPanel");
-  assert.ok(panelAt > scrollAt, "the sections render inside the scroll view");
+  assert.ok(panelAt > scrollAt, "the sections render inside the scroll region");
 });
 
 test("there are no tabs: every section renders in one scroll, in tab order, under its heading (#71)", () => {
@@ -219,23 +228,24 @@ test("the cook-log form slot replaces the Log a cook button while it renders con
   // props declare the callback, the button renders only with it,
   // pressing reports the entry id, and a story passes it.
   assert.match(code, /onDeleteCookLogPress\?: \(cookLogId: string\) => void;/);
-  assert.match(code, /history\.onDeleteCookLogPress \?/);
+  assert.match(code, /history\.onDeleteCookLogPress\s*\?/);
   assert.match(code, /history\.onDeleteCookLogPress\?\.\(log\.id\)/);
   assert.match(storiesCode, /onDeleteCookLogPress: \(\) => undefined/);
   // Each entry's Delete button needs an entry-specific accessible name
   // (position + date) — otherwise screen-reader button lists show
-  // several identical "Delete" entries.
+  // several identical "Delete" entries. The name is composed here
+  // and crosses into LogEntryCard as its deleteAccessibilityLabel.
   assert.match(code, /history\.cookLogs\.map\(\(log, index\) =>/);
   assert.match(
     code,
-    /accessibilityLabel=\{`Delete cook log \$\{index \+ 1\} from \$\{log\.dateLabel\}`\}/,
+    /deleteAccessibilityLabel: `Delete cook log \$\{index \+ 1\} from \$\{log\.dateLabel\}`/,
   );
 });
 
 test("the sharing slot renders after the lifecycle section and before the tags", () => {
   const lifecycleAt = code.indexOf("<LifecycleSection");
   const sharingAt = code.indexOf("{sharingControls}");
-  const tagsAt = code.indexOf("tags.map");
+  const tagsAt = code.indexOf("<TagList");
   assert.ok(lifecycleAt !== -1, "the lifecycle section renders in the overview");
   assert.ok(sharingAt > lifecycleAt, "sharing renders after the lifecycle section");
   assert.ok(tagsAt > sharingAt, "the tags render after the sharing slot");
@@ -246,16 +256,16 @@ test("the sharing slot renders after the lifecycle section and before the tags",
   );
 });
 
-test("the comments slot renders in the engagement stack after the ratings card", () => {
+test("the comments slot renders in the overview panel after the ratings card", () => {
   const ratingsAt = code.indexOf("<RatingsCard");
   const commentsAt = code.indexOf("{comments}", ratingsAt);
-  assert.ok(ratingsAt !== -1, "the ratings card renders in the engagement stack");
+  assert.ok(ratingsAt !== -1, "the ratings card renders in the overview panel");
   assert.ok(commentsAt > ratingsAt, "comments render after the ratings card");
 });
 
 test("optional content is omitted cleanly, never rendered as a shell", () => {
-  assert.match(code, /\{imageUrl \? \(/, "the hero image renders only with an imageUrl");
-  assert.match(code, /\{description \? \(/, "the description renders only when present");
+  assert.match(code, /\{imageUrl \? <Thumbnail/, "the hero image renders only with an imageUrl");
+  assert.match(code, /\{description \? <Text variant="body">/, "description renders when present");
   assert.match(
     code,
     /\{prepTimeLabel \? <StatCard label="Prep"/,
@@ -266,8 +276,8 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
     /\{cookTimeLabel \? <StatCard label="Cook"/,
     "the Cook stat renders only with a cook time",
   );
-  assert.match(code, /\{editHref \? \(/, "the Edit chip renders only with its href");
-  assert.match(code, /\{editDraftHref \? \(/, "the Edit draft chip renders only with its href");
+  assert.match(code, /\{editHref \? <ActionChip href=\{editHref\}>Edit<\/ActionChip>/);
+  assert.match(code, /\{editDraftHref \? <ActionChip href/, "Edit draft needs its href");
   assert.match(
     code,
     /lifecycle\.isEditable \|\| lifecycle\.candidates\.length > 0/,
@@ -275,15 +285,15 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
   );
   assert.match(
     code,
-    /\{onActivateCandidatePress \? \(/,
-    "the Activate button renders only with its callback (candidate data alone exposes no dead action)",
+    /onActivateCandidatePress\s*\?\s*\{ onActivatePress: onActivateCandidatePress \}/,
+    "the page passes the activation callback into CandidateList only when provided (the Activate conditional itself is pinned in candidateList.test.mjs)",
   );
   assert.match(
     code,
     /view\.substitutions && view\.substitutions\.length > 0/,
     "the substitutions panel renders only with substitutions",
   );
-  assert.match(code, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
+  assert.match(code, /\{tags\.length > 0 \? <TagList/, "the tag row renders only with tags");
 });
 
 test("the tweak controls split on the #248 ruling: AI is a link, manual is an exempt callback", () => {
@@ -299,8 +309,8 @@ test("the tweak controls split on the #248 ruling: AI is a link, manual is an ex
   assert.doesNotMatch(code, /tweakManuallyHref/);
 });
 
-test("tags render through Badge's color form, not an inline pill (#211)", () => {
-  assert.match(code, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/, "tags render as Badge");
+test("tags render through TagList (Badge's color form lives inside it, #211)", () => {
+  assert.match(code, /<TagList tags=\{tags\} \/>/, "tags render as a TagList of the page's tags");
   assert.ok(!code.includes("{tag.color}22"), "the page must not re-implement the tag tint inline");
 });
 
@@ -324,13 +334,16 @@ test("the scale option set moved with the ingredients section", () => {
 });
 
 test("nutrition models its three states as a union", () => {
-  assert.match(code, /state: "unavailable";/, "unavailable is a union member");
-  assert.match(code, /state: "ready";/, "ready is a union member");
-  assert.match(
-    code,
-    /nutrition\.state === "unavailable"/,
-    "the panel branches on the nutrition state",
-  );
+  // The union lives with NutritionPanel (the extracted widget);
+  // the page's contract name aliases it, so the app's contract
+  // is unchanged. The union's members and the state branch are
+  // pinned here against the component's source.
+  const panelFile = join(here, "..", "src", "components", "NutritionPanel.tsx");
+  const nutritionPanel = readFileSync(panelFile, "utf8");
+  assert.match(code, /RecipeDetailPageNutritionProps = NutritionPanelData;/);
+  assert.match(nutritionPanel, /state: "unavailable";/, "unavailable is a union member");
+  assert.match(nutritionPanel, /state: "ready";/, "ready is a union member");
+  assert.match(nutritionPanel, /nutrition\.state === "unavailable"/, "branches on state");
 });
 
 test("no explicit lineHeight anywhere in the file (#162)", () => {
@@ -374,7 +387,7 @@ test("stories exercise the states and the cook-log form slot", () => {
 test("print/share render the icons module's Feather icons, not text glyphs (#187)", () => {
   for (const name of ["PrintIcon", "ShareIcon"]) {
     assert.match(code, new RegExp(String.raw`import \{ ${name} \} from "\.\./icons/${name}\.js";`));
-    assert.match(code, new RegExp(String.raw`<${name} color=\{tokens\.colors\.gray\.gray8\} />`));
+    assert.match(code, new RegExp(String.raw`icon=\{${name}\}`), "the chip's icon slot");
   }
   assert.ok(!code.includes("🖨") && !code.includes("↗"), "no emoji/text glyph button labels");
   assert.ok(!code.includes("PrinterGlyph") && !code.includes("ShareGlyph"), "no hand-drawn glyphs");

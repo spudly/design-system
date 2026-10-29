@@ -137,14 +137,15 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 });
 
 // Compact split form (the SANCTIONED_TAGS pattern above): this
-// file sits at the max-lines cap. MealPlansPage and
-// MealPlanDetailPage are deliberately absent: their rows render
-// through the generic CardRow / ListRow components in those
-// rows' link forms (#248, after the #119 tranche-2 extraction),
-// so neither page has a stack pressable left to translate —
-// pinned by the dedicated test below.
+// file sits at the max-lines cap. MealPlansPage,
+// MealPlanDetailPage, and RecipeDetailPage are deliberately
+// absent: their rows render through the generic row components
+// in those rows' link forms (#248, after the #119 tranche-2
+// extraction; RecipeDetailPage's rows/steps through MarkableRow
+// / StepList after the recipes-detail tranche), so none of them
+// has a stack pressable left to translate — pinned below.
 const PAGE_STACKS =
-  "src/pages/ShoppingListPage.tsx,src/pages/MealDetailPage.tsx,src/pages/MealsHubPage.tsx,src/pages/AiSessionPage.tsx,src/pages/MealCookingModePage.tsx,src/pages/RecipeDetailPage.tsx,src/pages/RecipeFormPage.tsx".split(
+  "src/pages/ShoppingListPage.tsx,src/pages/MealDetailPage.tsx,src/pages/MealsHubPage.tsx,src/pages/AiSessionPage.tsx,src/pages/MealCookingModePage.tsx,src/pages/RecipeFormPage.tsx".split(
     ",",
   );
 
@@ -154,7 +155,7 @@ const PAGE_STACKS =
 // TouchableOpacity / LinkOverlay) before RAW is applied.
 const RAW = /accessibility(Label|State|Role|Value)=/;
 const TAGS =
-  /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g;
+  /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity|LinkOverlay|ActionChip)\b[^>]*>/g;
 
 test("page-level stack pressables route through the translator, never raw RN JSX props (#237)", () => {
   for (const rel of PAGE_STACKS) {
@@ -185,14 +186,16 @@ test("ShoppingListPage's checkbox row translates role, checked state, and label 
   assert.match(code, /accessibilityLabel: line\.name/);
 });
 
-test("MealPlansPage and MealPlanDetailPage have no stack pressable left to translate (#237, #248)", () => {
-  // Both pages' rows render through the generic row components in
-  // their link forms — no stack pressable remains in either page,
-  // so the translator must not be imported or used, and no raw RN
+test("MealPlansPage, MealPlanDetailPage, and RecipeDetailPage have no stack pressable left (#237, #248)", () => {
+  // The pages' rows render through the generic row components in
+  // their link forms (RecipeDetailPage's through MarkableRow /
+  // StepList) — no stack pressable remains in any of them, so
+  // the translator must not be imported or used, and no raw RN
   // accessibility JSX props may appear either (props on DS
   // primitives / LinkOverlay are the sanctioned exceptions,
   // stripped via the shared TAGS before RAW is applied).
-  for (const rel of ["src/pages/MealPlansPage.tsx", "src/pages/MealPlanDetailPage.tsx"]) {
+  for (const page of ["MealPlansPage", "MealPlanDetailPage", "RecipeDetailPage"]) {
+    const rel = `src/pages/${page}.tsx`;
     const code = readCode(rel);
     assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
     assert.ok(
@@ -434,17 +437,19 @@ test("SSR: TextLink, BackLink, OptionCard, and Alert render their roles (#237)",
 // page source is read once).
 const aiSession = readCode("src/pages/AiSessionPage.tsx");
 const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
+const editableChipGroup = readCode("src/components/EditableChipGroup.tsx");
 
 test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbit PR #243)", () => {
   // A Tamagui stack carrying role="button" is a div: without
   // tabIndex + an Enter/Space handler it announces as a button that
   // the keyboard cannot reach. The MealPlansPage rows set the
-  // pattern; the AiSessionPage Cancel control and the
-  // RecipeDetailPage Custom scale chip must follow it.
+  // pattern; the AiSessionPage Cancel control and the Custom scale
+  // chip (RecipeDetailPage's scale row, in EditableChipGroup since
+  // the #119 extraction) must follow it.
   assert.match(aiSession, /onKeyDown=\{handleCancelKeyDown\}/);
   assert.match(aiSession, /tabIndex=\{0\}/);
-  assert.match(recipeDetail, /onKeyDown=\{handleCustomScaleKeyDown\}/);
-  assert.match(recipeDetail, /tabIndex=\{0\}/);
+  assert.match(editableChipGroup, /onKeyDown=\{handleCustomKeyDown\}/);
+  assert.match(editableChipGroup, /tabIndex=\{0\}/);
 });
 
 test("busy Cancel is keyboard-guarded and the Custom scale name carries the multiplier (#237)", () => {
@@ -459,6 +464,12 @@ test("busy Cancel is keyboard-guarded and the Custom scale name carries the mult
   assert.match(aiSession, /onPress=\{handleCancel\}/);
   assert.match(aiSession, /const handleCancel = \(\) => \{\s+if \(busy\) return;/);
   // The selected custom-scale chip shows the multiplier as its visible
-  // text; the accessible name must include it.
-  assert.match(recipeDetail, /`Custom scale \$\{formatScaleValue\(view\.scaleValue\)\}×`/);
+  // text; the accessible name must include it. The name is composed in
+  // EditableChipGroup from the control's label + the formatted value,
+  // and the page's formatter supplies the value with its × suffix.
+  assert.match(editableChipGroup, /`\$\{customAccessibilityLabel\} \$\{formattedCustom\}`/);
+  assert.match(
+    recipeDetail,
+    /formatCustomValue=\{\(value\) => `\$\{formatScaleValue\(value\)\}×`\}/,
+  );
 });
