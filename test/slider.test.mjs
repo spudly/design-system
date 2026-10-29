@@ -23,7 +23,9 @@
  *    name from the explicit `accessibilityLabel` prop instead
  *    (which wins when both are set). `error` renders as the error
  *    Text variant with a generated id, wired to the thumb via
- *    aria-describedby / aria-invalid.
+ *    aria-describedby / aria-invalid on web; on native, which has
+ *    no described-by relationship, the error text is included in
+ *    the thumb's accessible name instead.
  * 5. Ticks are data, not children: `ticks?: SliderTick[]`
  *    ({ value, label }), each label positioned under its value's
  *    clamped percentage along the track, centered except the first
@@ -49,6 +51,10 @@
  *    keys, and RN props would leak to the DOM there), each moving
  *    the controlled value by one step, clamped to the range, inert
  *    while disabled.
+ * 10. The stories demo keeps its local value in sync with the
+ *    Storybook `value` arg after mount (an effect keyed on the
+ *    arg), so the controls panel drives the rendered slider;
+ *    dragging updates only the local state and never fights it.
  *
  * Source scan for the per-literal invariants (like this repo's other
  * component contract tests; comments are stripped first so prose
@@ -75,6 +81,7 @@ function codeOf(rel) {
 }
 
 const slider = codeOf("src/components/Slider.tsx");
+const stories = codeOf("src/components/Slider.stories.tsx");
 
 test("Slider is exported from the package root", () => {
   assert.equal(typeof dist.Slider, "function", "Slider must be exported from dist/index.js");
@@ -126,7 +133,7 @@ test("the thumb carries the label as its accessible name and the error wiring", 
   // accessibilityLabel prop, which wins when both are set.
   assert.match(slider, /accessibilityLabel\?: string/);
   assert.match(slider, /const accessibleName = accessibilityLabel \?\? label/);
-  assert.match(slider, /platformAccessibilityProps\(\{ accessibilityLabel: accessibleName \}\)/);
+  assert.match(slider, /accessibilityLabel: isWeb \? accessibleName : nativeAccessibleName/);
   assert.match(slider, /aria-invalid=\{error \? true : undefined\}/);
   assert.match(slider, /aria-describedby=\{error \? errorId : undefined\}/);
   assert.match(slider, /index=\{0\}/);
@@ -254,6 +261,34 @@ test("SSR: the thumb renders slider semantics with the label as its name", async
     !html.includes("accessibilityactions"),
     "the native adjust actions must not leak to the DOM on web",
   );
+});
+
+test("on native the error text rides in the accessible name", () => {
+  // The composition lives in the component source (SSR renders the web
+  // platform only): "<name>: <error>" when both exist, the error alone
+  // when the slider is unnamed.
+  assert.match(slider, /const nativeAccessibleName = error/);
+  assert.match(slider, /`\$\{accessibleName\}: \$\{error\}`/);
+});
+
+test("the stories demo syncs with the value arg after mount", () => {
+  assert.match(stories, /useEffect\(\(\) => \{/);
+  assert.match(stories, /if \(props\.value !== undefined\)/);
+});
+
+test("SSR: the web name stays the plain label when an error is set", async () => {
+  const { React, Slider } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(Slider, {
+      label: "Volume",
+      error: "Too loud.",
+      value: 40,
+      onValueChange: () => null,
+    }),
+  );
+  // Web keeps the name clean; the error is reached via aria-describedby.
+  assert.ok(html.includes('aria-label="Volume"'), html);
+  assert.ok(!html.includes("Volume: Too loud."), html);
 });
 
 test("SSR: a bare slider takes its accessible name from accessibilityLabel", async () => {

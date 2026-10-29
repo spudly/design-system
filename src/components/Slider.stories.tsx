@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Slider, type SliderProps } from "./Slider.js";
 
@@ -20,6 +20,14 @@ type Story = StoryObj<typeof Slider>;
 
 function SliderDemo(props: Partial<SliderProps>) {
   const [value, setValue] = useState(props.value ?? 50);
+  // Keep the demo in sync when the Storybook controls change the value arg
+  // after mount; dragging only updates the local state, so it never fights
+  // this effect (the arg itself does not change while dragging).
+  useEffect(() => {
+    if (props.value !== undefined) {
+      setValue(props.value);
+    }
+  }, [props.value]);
   return <Slider {...props} value={value} onValueChange={setValue} />;
 }
 

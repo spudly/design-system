@@ -142,6 +142,14 @@ export function Slider({
   const step = Number.isFinite(stepProp) && stepProp > 0 ? stepProp : 1;
   const range = max - min;
   const accessibleName = accessibilityLabel ?? label;
+  // Native has no described-by relationship: aria-describedby stays web-only,
+  // so the error text rides in the native accessible name instead — a native
+  // screen reader focusing the thumb hears the error with the field's name.
+  const nativeAccessibleName = error
+    ? accessibleName
+      ? `${accessibleName}: ${error}`
+      : error
+    : accessibleName;
   // Native adjust actions: the primitive renders the thumb with
   // slider semantics but declares no accessibilityActions, so
   // VoiceOver / TalkBack adjust gestures have nothing to invoke.
@@ -199,7 +207,9 @@ export function Slider({
           <StyledThumb
             index={0}
             id={id}
-            {...platformAccessibilityProps({ accessibilityLabel: accessibleName })}
+            {...platformAccessibilityProps({
+              accessibilityLabel: isWeb ? accessibleName : nativeAccessibleName,
+            })}
             {...nativeAdjustProps}
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? errorId : undefined}
