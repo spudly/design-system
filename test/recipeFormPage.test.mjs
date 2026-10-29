@@ -21,8 +21,8 @@
  *    variant (warning step 5 border / step 1 fill on TextField and
  *    TextAreaField), never page-level color props on the fields.
  * 5. Option data crosses as view-models: status and tag options
- *    are props, rendered through the DS ToggleChipGroup in single
- *    and multiple mode.
+ *    are props, rendered as rows of DS toggle Buttons (Button's
+ *    `selected` form — the chip groups are retired).
  * 6. The shells mirror the app views: EditRecipePage /
  *    ManualEntryPage render their headings around the form;
  *    EditVersionPage renders the draft heading, the import banner,
@@ -132,13 +132,23 @@ test("the diff wash is the fields' semantic `changed` variant, defined in the co
   }
 });
 
-test("status and tag options cross as view-models through ToggleChipGroup", () => {
+test("status and tag options cross as view-models through toggle Buttons", () => {
   const form = pageSource("RecipeFormPage");
-  assert.ok(form.includes('mode="single"'), "status picker must be a single-mode chip group");
-  assert.ok(form.includes('mode="multiple"'), "tag picker must be a multiple-mode chip group");
+  // The chip retirement: both pickers are ButtonRow compositions
+  // of Button's toggle form; the selection state derives from the
+  // same view-model props as before.
   assert.ok(form.includes("statusOptions"), "status options must cross as props");
   assert.ok(form.includes("tagOptions"), "tag options must cross as props");
   assert.ok(form.includes("isLoadingTags"), "tag loading must cross as a prop");
+  assert.ok(
+    form.includes("selected={status === option.value}"),
+    "the status picker marks the current status selected",
+  );
+  assert.ok(
+    form.includes("selected={tagIds.includes(option.value)}"),
+    "the tag picker marks each chosen tag selected",
+  );
+  assert.ok(!form.includes("ToggleChipGroup"), "the retired chip group must not come back");
 });
 
 test("the shells mirror the app views' chrome", () => {

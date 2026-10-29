@@ -241,3 +241,50 @@ export const LinkDisabled: Story = {
     children: "Browse recipes",
   },
 };
+
+function ToggleDemo() {
+  const [picked, setPicked] = useState("1");
+  return (
+    <YStack gap={12}>
+      <XStack gap={8} alignItems="center">
+        {["½×", "1×", "2×", "3×"].map((label, index) => {
+          const value = String(index + 1);
+          return (
+            <Button
+              key={value}
+              variant="secondary"
+              size="sm"
+              selected={picked === value}
+              onPress={() => {
+                setPicked(value);
+              }}
+            >
+              {label}
+            </Button>
+          );
+        })}
+      </XStack>
+      <Text>Selected: {picked}×</Text>
+    </YStack>
+  );
+}
+
+export const Toggle: Story = {
+  render: () => <ToggleDemo />,
+};
+
+export const ToggleStates: Story = {
+  render: () => (
+    <XStack gap={8} alignItems="center">
+      <Button variant="secondary" size="sm" selected={false} onPress={noop}>
+        Unselected
+      </Button>
+      <Button variant="secondary" size="sm" selected onPress={noop}>
+        Selected
+      </Button>
+      <Button variant="secondary" size="sm" selected disabled onPress={noop}>
+        Selected disabled
+      </Button>
+    </XStack>
+  ),
+};
