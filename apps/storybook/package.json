@@ -35,7 +35,7 @@
   "main": "index.ts",
   "name": "@spudly/design-system-storybook",
   "private": true,
-  "packageManager": "npm@10.8.2",
+  "packageManager": "npm@10.9.4",
   "scripts": {
     "android": "expo run:android",
     "generate": "sb-rn-get-stories --config-path .rnstorybook",
