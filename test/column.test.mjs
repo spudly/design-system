@@ -65,6 +65,11 @@ test("Column's styled base is a YStack named Column, with the role variants pinn
 test("Column's public API is the required role prop, and no step or margin props exist", () => {
   assert.match(columnCode, /variant: "sections" \| "group" \| "list" \| "state";/);
   assert.match(columnCode, /export function Column\(\{ variant, \.\.\.rest \}: ColumnProps\)/);
+  assert.match(
+    columnCode,
+    /Omit<StyledColumnProps, "gap" \| "alignItems">/,
+    "the role-owned style keys must be omitted from ColumnProps so call sites cannot override the role",
+  );
   for (const banned of ["spacing", "spaceBefore", "spaceAfter", "align"]) {
     assert.ok(
       !new RegExp(String.raw`${banned}\?:`).test(columnCode),

@@ -33,12 +33,14 @@ const StyledRow = styled(XStack, {
 
 type StyledRowProps = GetProps<typeof StyledRow>;
 
-export type RowProps = StyledRowProps & {
+export type RowProps = Omit<StyledRowProps, "gap" | "alignItems" | "flexWrap" | "marginTop"> & {
   /** What the row IS — the role pins the row's gap, alignment,
    * and wrapping inside the component, so every action bar and
    * every inline group in the system is spaced identically:
    * `actions` (a button row following content) or `inline`
-   * (controls composed on one line within content). */
+   * (controls composed on one line within content). The
+   * role-owned style keys are omitted from the public type:
+   * they cannot be passed at a call site. */
   variant: "actions" | "inline";
 };
 

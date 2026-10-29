@@ -58,6 +58,11 @@ test("Row's styled base is an XStack named Row, with the role variants pinning t
 test("Row's public API is the required role prop, and no step props exist", () => {
   assert.match(rowCode, /variant: "actions" \| "inline";/);
   assert.match(rowCode, /export function Row\(\{ variant, \.\.\.rest \}: RowProps\)/);
+  assert.match(
+    rowCode,
+    /Omit<StyledRowProps, "gap" \| "alignItems" \| "flexWrap" \| "marginTop">/,
+    "the role-owned style keys must be omitted from RowProps so call sites cannot override the role",
+  );
   for (const banned of ["spacing", "spaceBefore", "spaceAfter", "align", "wrap"]) {
     assert.ok(
       !new RegExp(String.raw`${banned}\?:`).test(rowCode),

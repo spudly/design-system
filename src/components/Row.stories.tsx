@@ -18,7 +18,7 @@ type Story = StoryObj<typeof Row>;
 
 export const Actions: Story = {
   render: (args) => (
-    <YStack maxWidth={360} gap={16}>
+    <YStack maxWidth={360}>
       <Text>
         Tender chicken, garlic cream sauce with spinach and sun-dried tomatoes — the action bar
         below follows the content at the role's standard separation.

@@ -40,13 +40,15 @@ const StyledColumn = styled(YStack, {
 
 type StyledColumnProps = GetProps<typeof StyledColumn>;
 
-export type ColumnProps = StyledColumnProps & {
+export type ColumnProps = Omit<StyledColumnProps, "gap" | "alignItems"> & {
   /** What the column IS — the role pins the column's gap and
    * alignment inside the component, so every section stack,
    * content group, list, and state block in the system is spaced
    * identically: `sections` (a page's major blocks), `group`
    * (related content inside a card), `list` (rows of one list),
-   * or `state` (a centered page-state block). */
+   * or `state` (a centered page-state block). The role-owned
+   * style keys are omitted from the public type: they cannot be
+   * passed at a call site. */
   variant: "sections" | "group" | "list" | "state";
 };
 
