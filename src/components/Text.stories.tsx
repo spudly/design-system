@@ -8,7 +8,17 @@ const meta: Meta<typeof Text> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["heading", "title", "subheading", "body", "hint", "error", "verse"],
+      options: [
+        "heading",
+        "title",
+        "formTitle",
+        "subheading",
+        "body",
+        "hint",
+        "error",
+        "label",
+        "verse",
+      ],
     },
   },
 };
@@ -24,6 +34,10 @@ export const Title: Story = {
   args: { variant: "title", children: "Weeknight favorites" },
 };
 
+export const FormTitle: Story = {
+  args: { variant: "formTitle", children: "Import from text" },
+};
+
 export const Subheading: Story = {
   args: { variant: "subheading", children: "Verses in progress" },
 };
@@ -33,6 +47,10 @@ export const Body: Story = {
     variant: "body",
     children: "Tender chicken, garlic cream sauce with spinach & sun-dried tomatoes.",
   },
+};
+
+export const Label: Story = {
+  args: { variant: "label", children: "Per serving" },
 };
 
 export const Hint: Story = {
@@ -55,8 +73,10 @@ export const AllVariants: Story = {
     <YStack gap={8}>
       <Text variant="heading">Heading</Text>
       <Text variant="title">Title</Text>
+      <Text variant="formTitle">Form title</Text>
       <Text variant="subheading">Subheading</Text>
       <Text variant="body">Body text</Text>
+      <Text variant="label">Section label</Text>
       <Text variant="hint">Hint text</Text>
       <Text variant="error">Error text</Text>
       <Text variant="verse">Verse text</Text>

@@ -95,9 +95,11 @@ function sourceFiles(dir) {
 // translate caller RN props themselves. LinkOverlay is sanctioned
 // on the same ground again: it is the native link layer for
 // view-level link surfaces and spreads platformAccessibilityProps
-// onto its Anchor.
+// onto its Anchor. ActionChip and Thumbnail are sanctioned on
+// the same ground: each routes its `accessibilityLabel` through
+// platformAccessibilityProps internally.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,ActionChip,Thumbnail".split(
     ",",
   ),
 );

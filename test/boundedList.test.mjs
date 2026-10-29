@@ -68,9 +68,48 @@ test("row separation is the spacing scale's step 2, rendered by the list itself"
   );
   assert.match(
     code,
-    /ItemSeparatorComponent=\{BoundedListSeparator\}/,
+    /ItemSeparatorComponent=\{separator === "none" \? undefined : separators\[separator\]\}/,
     "the list must render the separator itself, so rows carry no spacing props",
   );
+  assert.match(
+    code,
+    /const separators = \{ sm: BoundedListSeparator, md: BoundedListSeparatorMd \} as const;/,
+    "the default separator stays BoundedListSeparator; md is the only other rhythm",
+  );
+  assert.match(
+    code,
+    /separator = "sm"/,
+    "the separator defaults to sm, so existing consumers render unchanged",
+  );
+});
+
+test("the catalog slots and handlers are optional and passed through only when given", () => {
+  for (const prop of [
+    "ListHeaderComponent",
+    "ListEmptyComponent",
+    "ListFooterComponent",
+    "onEndReached",
+    "onEndReachedThreshold",
+    "onScroll",
+    "keyboardShouldPersistTaps",
+  ]) {
+    assert.match(
+      code,
+      new RegExp(String.raw`\.\.\.\(${prop} !== undefined \? \{ ${prop} \} : null\)`),
+      `${prop} must reach the FlatList only when the caller provides it`,
+    );
+  }
+  assert.match(
+    code,
+    /const pageContentStyle = \{\s+paddingHorizontal: tokens\.spacing\[4\],\s+paddingBottom: tokens\.spacing\[8\],\s+\} as const;/,
+    "the page content inset is the standard page geometry both catalog lists used",
+  );
+  assert.match(
+    code,
+    /\.\.\.\(contentInset === "page" \? \{ contentContainerStyle: pageContentStyle \} : null\)/,
+    "the content inset applies only when the caller asks for the page geometry",
+  );
+  assert.match(code, /contentInset = "none"/, "the content inset defaults to none");
 });
 
 test("the API mirrors the FlatList props the pages use — data, keyExtractor, renderItem", () => {

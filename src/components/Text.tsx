@@ -19,6 +19,17 @@ const StyledText = styled(TamaguiText, {
         fontSize: tokens.typography.fontSize.xl,
         fontWeight: tokens.typography.fontWeight.bold,
       },
+      formTitle: {
+        fontSize: tokens.typography.fontSize["2xl"],
+        fontWeight: tokens.typography.fontWeight.bold,
+      },
+      label: {
+        fontSize: tokens.typography.fontSize.xs,
+        fontWeight: tokens.typography.fontWeight.semibold,
+        letterSpacing: 0.3,
+        textTransform: "uppercase",
+        color: "$textMuted",
+      },
       subheading: {
         fontSize: tokens.typography.fontSize.xl,
         fontWeight: tokens.typography.fontWeight.semibold,
@@ -51,7 +62,16 @@ const StyledText = styled(TamaguiText, {
 type StyledTextProps = GetProps<typeof StyledText>;
 
 export type TextProps = StyledTextProps & {
-  variant?: "heading" | "title" | "subheading" | "body" | "hint" | "error" | "verse";
+  variant?:
+    | "heading"
+    | "title"
+    | "formTitle"
+    | "subheading"
+    | "body"
+    | "hint"
+    | "error"
+    | "label"
+    | "verse";
   // A caller-supplied heading level for the web target (routed
   // through platformAccessibilityProps and dropped on native, where
   // RN has no heading-level prop).
@@ -61,9 +81,12 @@ export type TextProps = StyledTextProps & {
 /**
  * Token-driven text primitive. Variants: `heading`, `title` (a compact
  * page title — xl bold, for detail screens whose title sits above a
- * meta block rather than opening a list), `subheading`, `body`
- * (default), `hint` (muted caption), `error`, and `verse` (serif reading
- * text for scripture/long-form content).
+ * meta block rather than opening a list), `formTitle` (the form-flow
+ * page title — 2xl bold, for the import/form screens whose titles sit
+ * inside the form layout rather than opening a page), `subheading`,
+ * `body` (default), `hint` (muted caption), `error`, `label` (the
+ * section eyebrow — xs semibold, uppercase, letter-spaced, muted gray),
+ * and `verse` (serif reading text for scripture/long-form content).
  *
  * Accessibility props go through `platformAccessibilityProps` (#235),
  * the same translation as Button: text is a pressable path too
@@ -87,11 +110,11 @@ export function Text({
   "aria-level": callerAriaLevel,
   ...rest
 }: TextProps) {
-  // Heading semantics (#256): the `heading`, `title`, and `subheading`
-  // variants are page/section titles, so they carry the RN `header`
-  // role by default — on web the translator renders it as
-  // `role="heading"` with `aria-level` 1 (heading/title) / 2
-  // (subheading),
+  // Heading semantics (#256): the `heading`, `title`, `formTitle`,
+  // and `subheading` variants are page/section titles, so they carry
+  // the RN `header` role by default — on web the translator renders
+  // it as `role="heading"` with `aria-level` 1
+  // (heading/title/formTitle) / 2 (subheading),
   // and on native the `header` role alone gives VoiceOver/TalkBack
   // heading navigation, with visuals unchanged. A caller-supplied
   // role (RN `accessibilityRole` or web `role` in rest) always wins;
@@ -103,7 +126,11 @@ export function Text({
   // web and a defined level would bypass the translator's native
   // filter (RN has no heading-level prop; it is dropped there).
   const headingLevel =
-    variant === "heading" || variant === "title" ? 1 : variant === "subheading" ? 2 : undefined;
+    variant === "heading" || variant === "title" || variant === "formTitle"
+      ? 1
+      : variant === "subheading"
+        ? 2
+        : undefined;
   // The web `role` in rest spreads last at render (below), so when
   // both role props are supplied it is the role that actually
   // renders — check it first, or a rendered button would keep a
