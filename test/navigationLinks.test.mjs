@@ -187,7 +187,7 @@ function anchorDecoration(html) {
   const tag = html.match(/<a[^>]*class="([^"]*)"/);
   assert.ok(tag, `expected an anchor with classes in: ${html.slice(-400)}`);
   for (const cls of tag[1].split(/\s+/)) {
-    const rule = html.match(new RegExp(`\\.${cls}\\{[^}]*text-decoration-line:([a-z]+)`));
+    const rule = html.match(new RegExp(String.raw`\.${cls}\{[^}]*text-decoration-line:([a-z]+)`));
     if (rule) return rule[1];
   }
   return null;
