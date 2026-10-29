@@ -66,7 +66,7 @@ test("the bar takes its filters as caller-supplied definitions, never hardcoded 
   for (const kind of ["select", "text", "range", "sort"]) {
     assert.match(
       bar,
-      new RegExp(String.raw`kind: "${kind}";`),
+      new RegExp(`kind: "${kind}";`),
       `the bar's control shapes include the ${kind} definition`,
     );
   }
