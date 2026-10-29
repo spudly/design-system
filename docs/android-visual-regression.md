@@ -411,7 +411,9 @@ baseline yet` and skips it (a BOOTSTRAP note when nothing at all
    rewrites noise-only files either. To force a sub-gate change
    into the baselines deliberately, lower the gate for the run
    (`--commit-max-ratio` on `run.mjs`, or the
-   `DSVR_COMMIT_MAX_RATIO` env var). The follow-on
+   `DSVR_COMMIT_MAX_RATIO` env var) — local runs only: the
+   Actions dispatch accepts no gate override, so dispatched
+   updates always use the default gate. The follow-on
    `commit-baselines` job then syncs the fresh screenshots into
    `tools/visualRegression/baselines/` and — only if something
    actually changed — commits them to the dispatched branch as

@@ -283,7 +283,7 @@ pr_autocommit() {
   local skipped_strict_count
   skipped_strict_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).skippedStrict)')"
   if [ "$skipped_strict_count" != "0" ]; then
-    echo "::warning::PR auto-commit: $skipped_strict_count capture(s) FAIL the strict compare but were at or under the commit gate, so they were NOT committed (see the commit-gate SKIP lines above). If any is a genuine change, re-run update mode with a lowered gate (--commit-max-ratio / DSVR_COMMIT_MAX_RATIO) to commit it deliberately."
+    echo "::warning::PR auto-commit: $skipped_strict_count capture(s) FAIL the strict compare but were at or under the commit gate, so they were NOT committed (see the commit-gate SKIP lines above). If any is a genuine change, commit it deliberately by running update mode LOCALLY with a lowered gate (the Actions update dispatch accepts no gate override), e.g. DSVR_COMMIT_MAX_RATIO=0 node tools/visualRegression/run.mjs --update."
   fi
   if [ "$staged_count" = "0" ]; then
     echo "PR auto-commit: commit gate staged 0 files — every capture was at or under the gate (noise) or matched its baseline. Baselines unchanged; nothing to commit."
