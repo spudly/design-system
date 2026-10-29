@@ -88,6 +88,7 @@ function RecipesPageDemo({
   initialSearch = "",
   recipes = recipeItems,
   isLoading = false,
+  isFetchingNextPage = false,
   expandedRecipeId,
   initialActiveFilters,
   initialFilterChooserOpen = false,
@@ -95,6 +96,7 @@ function RecipesPageDemo({
   initialSearch?: string;
   recipes?: RecipesPageItem[];
   isLoading?: boolean;
+  isFetchingNextPage?: boolean;
   expandedRecipeId?: string;
   initialActiveFilters?: RecipesPageFilterId[];
   initialFilterChooserOpen?: boolean;
@@ -126,6 +128,7 @@ function RecipesPageDemo({
       <RecipesPage
         recipes={visible}
         isLoading={isLoading}
+        isFetchingNextPage={isFetchingNextPage}
         onRecipePress={() => undefined}
         onLogCookPress={() => undefined}
         {...(expandedRecipeId
@@ -192,6 +195,13 @@ export const Empty: Story = {
 
 export const Loading: Story = {
   render: () => <RecipesPageDemo isLoading recipes={[]} />,
+};
+
+export const LoadingMore: Story = {
+  // The pagination-in-flight state (#292): rows stay rendered and
+  // the footer spinner shows below them while the next page loads —
+  // the DiscoverPage LoadingMore story's counterpart.
+  render: () => <RecipesPageDemo isFetchingNextPage />,
 };
 
 export const FilterChooserOpen: Story = {

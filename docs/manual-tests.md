@@ -385,9 +385,9 @@ changeset naming MemorizeSettingsPage.
 ## RecipesPage
 
 Open in `Pages/Eciperay/RecipesPage`: Default, Filtered, Empty,
-Loading, FilterChooserOpen, WithFiltersAdded, ExpandedAccessory —
-and the Shared-with-me configuration (#185): SharedDefault,
-SharedFiltered, SharedEmpty, SharedLoading.
+Loading, LoadingMore, FilterChooserOpen, WithFiltersAdded,
+ExpandedAccessory — and the Shared-with-me configuration (#185):
+SharedDefault, SharedFiltered, SharedEmpty, SharedLoading.
 
 1. The **Filters button is exactly as tall as the search field**
    beside it — top and bottom edges align.
@@ -409,6 +409,9 @@ SharedFiltered, SharedEmpty, SharedLoading.
    filter bar. SharedLoading shows the spinner centered below the
    filter bar with no recipe rows, like the Recipes configuration's
    Loading state.
+7. LoadingMore keeps the recipe rows rendered with the footer
+   spinner below them (the next-page-in-flight state,
+   `isFetchingNextPage`), like DiscoverPage's LoadingMore story.
 
 **Run when:** `src/pages/RecipesPage.tsx`, its stories, or a
 changeset naming RecipesPage or the Shared-with-me screen.
