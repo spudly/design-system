@@ -85,12 +85,17 @@ function MealRow({ meal, onDelete }: { meal: MealsHubPageMeal; onDelete: () => v
     <>
       <Text
         accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
         fontSize={tokens.typography.fontSize.md}
         fontWeight={tokens.typography.fontWeight.semibold}
       >
         {meal.title}
       </Text>
-      <Text variant="hint" accessible={decorative ? false : undefined}>
+      <Text
+        variant="hint"
+        accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+      >
         {meal.subtitle}
       </Text>
     </>
@@ -133,7 +138,7 @@ function MealRow({ meal, onDelete }: { meal: MealsHubPageMeal; onDelete: () => v
             <LinkOverlay
               href={meal.href}
               accessibilityRole="link"
-              accessibilityLabel={meal.title}
+              accessibilityLabel={meal.subtitle ? `${meal.title}, ${meal.subtitle}` : meal.title}
             />
           </YStack>
         )}

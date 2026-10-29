@@ -705,6 +705,7 @@ function RecipeRow({
       <Text
         fontWeight={tokens.typography.fontWeight.semibold}
         accessible={native ? false : undefined}
+        importantForAccessibility={native ? "no-hide-descendants" : undefined}
         pointerEvents={native ? "none" : undefined}
       >
         {item.title}
@@ -730,6 +731,7 @@ function RecipeRow({
             <Text
               variant="hint"
               accessible={native ? false : undefined}
+              importantForAccessibility={native ? "no-hide-descendants" : undefined}
               pointerEvents={native ? "none" : undefined}
             >
               {item.subtitle}

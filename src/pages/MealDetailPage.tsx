@@ -78,13 +78,18 @@ function MemberRow({ member }: { member: MealDetailPageMember }) {
     <>
       <Text
         accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
         fontSize={tokens.typography.fontSize.md}
         fontWeight={tokens.typography.fontWeight.medium}
       >
         {member.title}
         {isUnavailable ? " (unavailable)" : ""}
       </Text>
-      <Text variant="hint" accessible={decorative ? false : undefined}>
+      <Text
+        variant="hint"
+        accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+      >
         {member.subtitle}
       </Text>
     </>

@@ -59,14 +59,28 @@ export function OptionCard({
   // native href form's LinkOverlay carries the card's composed
   // label as the one accessibility stop, so the texts it names
   // must not also surface as separate stops (see LinkOverlay).
+  // Two props do that work on native: `accessible={false}` alone
+  // does not hide a Text on Android — React Native's Text view
+  // managers implement the `accessible` setter as `isFocusable`
+  // only, leaving `importantForAccessibility` at AUTO, so the
+  // text still enters the accessibility tree; the Android
+  // descendant-hiding value is what actually removes it.
   const renderContent = (decorative: boolean) => (
     <XStack alignItems="center" justifyContent="space-between" gap={tokens.spacing[3]}>
       <YStack flex={1} gap={tokens.spacing[1]}>
-        <Text variant="subheading" accessible={decorative ? false : undefined}>
+        <Text
+          variant="subheading"
+          accessible={decorative ? false : undefined}
+          importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+        >
           {title}
         </Text>
         {description ? (
-          <Text variant="hint" accessible={decorative ? false : undefined}>
+          <Text
+            variant="hint"
+            accessible={decorative ? false : undefined}
+            importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+          >
             {description}
           </Text>
         ) : null}
@@ -74,6 +88,7 @@ export function OptionCard({
       <Text
         aria-hidden
         accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
         style={{
           fontSize: tokens.typography.fontSize.xl,
           color: tokens.colors.gray.gray5,

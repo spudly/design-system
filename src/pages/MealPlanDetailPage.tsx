@@ -216,6 +216,7 @@ function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
     <>
       <Text
         accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
         fontSize={tokens.typography.fontSize.md}
         fontWeight={tokens.typography.fontWeight.medium}
       >
@@ -223,7 +224,11 @@ function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
         {isUnavailable ? " (unavailable)" : ""}
       </Text>
       {entry.subtitle ? (
-        <Text variant="hint" accessible={decorative ? false : undefined}>
+        <Text
+          variant="hint"
+          accessible={decorative ? false : undefined}
+          importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+        >
           {entry.subtitle}
         </Text>
       ) : null}

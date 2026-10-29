@@ -37,9 +37,10 @@ export type LinkOverlayProps = TranslatableAccessibilityProps & {
  * through the platform link path (the Anchor's own `Linking`
  * handling), preserving the href forms' native contract; rendering
  * no text, the overlay paints nothing. The frame's visible texts
- * are marked `accessible={false}` in the native rendering — the
- * overlay's composed label is the row's one accessibility stop,
- * the native counterpart of the web anchor wrapping its texts.
+ * are marked decorative in the native rendering (the hiding
+ * contract below) — the overlay's composed label is the row's one
+ * accessibility stop, the native counterpart of the web anchor
+ * wrapping its texts.
  *
  * Layering contract: render the overlay as the frame's LAST child
  * (the topmost layer). Native hit testing targets the topmost view
@@ -55,6 +56,17 @@ export type LinkOverlayProps = TranslatableAccessibilityProps & {
  * flow wrapper), so hit testing falls through the content to the
  * overlay while the nested pressable — which keeps the default
  * pointer events — still takes its own presses.
+ *
+ * Hiding contract: the frame's visible texts are marked decorative
+ * with BOTH `accessible={false}` and
+ * `importantForAccessibility="no-hide-descendants"`. The second
+ * prop is load-bearing on Android: React Native's Text view
+ * managers implement the `accessible` setter as `isFocusable`
+ * only, leaving `importantForAccessibility` at AUTO, so an
+ * `accessible={false}` text still enters the accessibility tree
+ * and TalkBack reaches it as its own stop; the descendant-hiding
+ * value is what removes it. (On iOS the prop is ignored and
+ * `accessible={false}` suffices.)
  */
 export function LinkOverlay({ href, ...a11yProps }: LinkOverlayProps) {
   return (

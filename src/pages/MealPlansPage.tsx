@@ -121,13 +121,18 @@ function MealPlanRow({
     <>
       <Text
         accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
         fontSize={tokens.typography.fontSize.md}
         fontWeight={tokens.typography.fontWeight.semibold}
       >
         {item.title}
       </Text>
       {item.subtitle ? (
-        <Text variant="hint" accessible={decorative ? false : undefined}>
+        <Text
+          variant="hint"
+          accessible={decorative ? false : undefined}
+          importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+        >
           {item.subtitle}
         </Text>
       ) : null}
