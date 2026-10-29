@@ -60,8 +60,12 @@ test("the shared hook declares the catalog pagination contract", () => {
   assert.match(hook, /isFetchingNextPage\?: boolean;/);
   assert.match(hook, /itemCount: number;/);
   assert.match(hook, /canPaginate\?: boolean;/);
+  assert.match(hook, /canPaginate\?: boolean;/);
+  assert.match(hook, /endReachedThreshold\?: number;/);
   assert.match(hook, /export type CatalogPagination = \{/);
   assert.match(hook, /onEndReached: \(\(\) => void\) \| undefined;/);
+  assert.match(hook, /onScroll: \(event: NativeSyntheticEvent<NativeScrollEvent>\) => void;/);
+  assert.match(hook, /onEndReachedThreshold: number;/);
   assert.match(hook, /export function useCatalogPagination\(/);
   // Type aliases only (Stephen's code style, #214) — no interfaces.
   assert.ok(!/\binterface\b/.test(hook), "the hook must use type aliases, not interfaces");
@@ -110,11 +114,34 @@ test("the re-arm: a no-new-rows fetch completion at the end re-fires onLoadMore"
   assert.match(hook, /wasFetchingRef\.current = isFetchingNextPage;/);
 });
 
-test("both catalog pages wire the shared hook with the same shape", () => {
-  for (const [name, page] of [
-    ["RecipesPage", recipesPage],
-    ["DiscoverPage", discoverPage],
-  ]) {
+test("the end latch is live: scroll metrics set and clear it with the shared threshold", () => {
+  // The scroll handler recomputes the latch from the native
+  // scroll metrics: distance from the end within the threshold
+  // fraction of the visible length — the list's own test. A
+  // scroll away during a fetch therefore clears the latch and
+  // the completion does not chain in the background.
+  assert.match(
+    hook,
+    /const handleScroll = \(event: NativeSyntheticEvent<NativeScrollEvent>\) => \{\s*const \{ contentOffset, contentSize, layoutMeasurement \} = event\.nativeEvent;\s*const distanceFromEnd = contentSize\.height - contentOffset\.y - layoutMeasurement\.height;\s*endReachedRef\.current = distanceFromEnd <= endReachedThreshold \* layoutMeasurement\.height;\s*\};/,
+    "the scroll handler must recompute the end latch from the scroll metrics",
+  );
+  // The callback ref is written inside the effect, never during
+  // render, so a discarded render cannot leak its callback.
+  assert.match(hook, /useEffect\(\(\) => \{\s*onLoadMoreRef\.current = onLoadMore;/);
+  assert.equal(
+    hook.match(/onLoadMoreRef\.current = onLoadMore;/g)?.length,
+    1,
+    "the callback ref must be assigned exactly once — inside the effect, never during render",
+  );
+});
+
+const catalogPages = [
+  ["RecipesPage", recipesPage],
+  ["DiscoverPage", discoverPage],
+];
+
+test("both catalog pages call the shared hook with the same shape", () => {
+  for (const [name, page] of catalogPages) {
     assert.match(
       page,
       /import \{ useCatalogPagination \} from "\.\/useCatalogPagination\.js";/,
@@ -127,12 +154,32 @@ test("both catalog pages wire the shared hook with the same shape", () => {
     );
     assert.match(
       page,
-      /onEndReached=\{onEndReached\}/,
-      `${name} must wire the hook's handler to its list`,
+      /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{/,
+      `${name} must take the hook's handlers and threshold`,
     );
     assert.ok(
       !page.includes("handleEndReached"),
       `${name} must not define a local end-reached handler — the pattern is shared`,
+    );
+  }
+});
+
+test("both catalog pages wire the hook's handlers and threshold to their lists", () => {
+  for (const [name, page] of catalogPages) {
+    assert.match(
+      page,
+      /onEndReached=\{onEndReached\}/,
+      `${name} must wire the hook's handler to its list`,
+    );
+    assert.match(
+      page,
+      /onScroll=\{onScroll\}/,
+      `${name} must wire the hook's scroll handler so the end latch stays live`,
+    );
+    assert.match(
+      page,
+      /onEndReachedThreshold=\{onEndReachedThreshold\}/,
+      `${name} must use the hook's threshold for the list's own signal`,
     );
   }
 });

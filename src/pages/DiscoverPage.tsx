@@ -529,7 +529,7 @@ export function DiscoverPage(props: DiscoverPageProps) {
   // added no new visible rows, so consecutive no-new-rows
   // pages paginate through without a scroll-away. See
   // useCatalogPagination for the full pattern.
-  const { onEndReached } = useCatalogPagination({
+  const { onEndReached, onScroll, onEndReachedThreshold } = useCatalogPagination({
     onLoadMore,
     isFetchingNextPage,
     itemCount: recipes.length,
@@ -581,7 +581,8 @@ export function DiscoverPage(props: DiscoverPageProps) {
         // only for the first load, the error state, or a host
         // with no continuation.
         onEndReached={onEndReached}
-        onEndReachedThreshold={0.4}
+        onScroll={onScroll}
+        onEndReachedThreshold={onEndReachedThreshold}
         ListEmptyComponent={
           isLoading ? (
             <YStack marginBlockStart="$8" alignItems="center">

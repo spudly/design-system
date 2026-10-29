@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
 /**
  * useCatalogPagination (#285): the shared pagination pattern for
@@ -46,6 +47,17 @@ import { useEffect, useRef } from "react";
  *    content-length change re-arms its signal, and it re-fires
  *    (re-latching here) if the viewport is still at the end.
  *
+ * The end latch is a live at-end state, not a one-shot flag:
+ * the returned `onScroll` handler recomputes it from the
+ * list's scroll metrics on every scroll event (within the
+ * end threshold, using the same threshold the list's own
+ * end-reached signal uses — the hook owns that value and
+ * returns it for the list's `onEndReachedThreshold`). A user
+ * who scrolls away from the end while a fetch is in flight
+ * clears the latch, so a no-new-rows completion then does NOT
+ * chain: lazy loading resumes only when the user returns to
+ * the end and the list's own signal fires again.
+ *
  * The contract's one fetch signal is `isFetchingNextPage`. A
  * host that omits it gets plain guarded end-reached semantics:
  * no duplicates while a fetch it does report is in flight, but
@@ -65,12 +77,24 @@ export type CatalogPaginationOptions = {
    * the first load and (on DiscoverPage) while the error state
    * shows. Defaults to true. */
   canPaginate?: boolean;
+  /** The list's end-reached threshold (a fraction of the
+   * visible length), shared by the list's own signal and the
+   * hook's scroll-metrics latch so the two can never disagree.
+   * Defaults to 0.4, the value both catalogs have always used. */
+  endReachedThreshold?: number;
 };
 
 export type CatalogPagination = {
   /** Wire to the list's `onEndReached`. Undefined while the
    * mount gate is closed. */
   onEndReached: (() => void) | undefined;
+  /** Wire to the list's `onScroll`: keeps the hook's at-end
+   * latch current as the user scrolls. */
+  onScroll: (event: NativeSyntheticEvent<NativeScrollEvent>) => void;
+  /** Wire to the list's `onEndReachedThreshold`: the threshold
+   * the hook was configured with, so the list's signal and the
+   * hook's latch share one value. */
+  onEndReachedThreshold: number;
 };
 
 export function useCatalogPagination({
@@ -78,10 +102,12 @@ export function useCatalogPagination({
   isFetchingNextPage = false,
   itemCount,
   canPaginate = true,
+  endReachedThreshold = 0.4,
 }: CatalogPaginationOptions): CatalogPagination {
-  // Whether the list's end was reached for the current content:
-  // latched by the end-reached handler, cleared when a fetch
-  // completes having added rows (the list re-arms itself then).
+  // Whether the viewport is currently at the list's end:
+  // latched by the end-reached handler, kept current by the
+  // scroll handler, cleared when a fetch completes having
+  // added rows (the list re-arms itself then).
   const endReachedRef = useRef(false);
   const wasFetchingRef = useRef(false);
   // Item count captured when the in-flight fetch began; null
@@ -89,13 +115,15 @@ export function useCatalogPagination({
   const countAtFetchStartRef = useRef<number | null>(null);
   // The latest host callback, read by the re-arm effect so the
   // effect itself never has to subscribe to callback identity.
+  // Written inside the effect, never during render: a discarded
+  // render must not leak its callback into a committed effect.
   const onLoadMoreRef = useRef(onLoadMore);
-  onLoadMoreRef.current = onLoadMore;
 
   // Fetch-completion re-arm (pattern part 3). Runs after every
   // render; the refs make it act only on the true-to-false edge
   // of isFetchingNextPage, exactly once per completed fetch.
   useEffect(() => {
+    onLoadMoreRef.current = onLoadMore;
     if (isFetchingNextPage) {
       if (!wasFetchingRef.current) {
         countAtFetchStartRef.current = itemCount;
@@ -126,7 +154,20 @@ export function useCatalogPagination({
     }
   };
 
+  // The live at-end latch: recomputed from the scroll metrics
+  // on every scroll event, with the same distance test the
+  // list's own end-reached signal applies (distance from the
+  // end within the threshold fraction of the visible length).
+  // A ref write only — scrolling never re-renders the page.
+  const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    const distanceFromEnd = contentSize.height - contentOffset.y - layoutMeasurement.height;
+    endReachedRef.current = distanceFromEnd <= endReachedThreshold * layoutMeasurement.height;
+  };
+
   return {
     onEndReached: canPaginate && onLoadMore ? handleEndReached : undefined,
+    onScroll: handleScroll,
+    onEndReachedThreshold: endReachedThreshold,
   };
 }

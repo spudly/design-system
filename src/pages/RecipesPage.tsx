@@ -745,7 +745,7 @@ export function RecipesPage(props: RecipesPageProps) {
   // a fetch completes having added no new visible rows, so
   // consecutive no-new-rows pages paginate through without a
   // scroll-away. See useCatalogPagination for the full pattern.
-  const { onEndReached } = useCatalogPagination({
+  const { onEndReached, onScroll, onEndReachedThreshold } = useCatalogPagination({
     onLoadMore,
     isFetchingNextPage,
     itemCount: recipes.length,
@@ -799,7 +799,8 @@ export function RecipesPage(props: RecipesPageProps) {
           );
         }}
         onEndReached={onEndReached}
-        onEndReachedThreshold={0.4}
+        onScroll={onScroll}
+        onEndReachedThreshold={onEndReachedThreshold}
         ListEmptyComponent={
           isLoading ? (
             <YStack paddingBlockStart="$8" alignItems="center">

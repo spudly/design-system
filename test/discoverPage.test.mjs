@@ -155,9 +155,11 @@ test("the title renders as the page heading and pagination rides the shared cata
   // page with a live continuation still paginates.
   assert.match(
     page,
-    /const \{ onEndReached \} = useCatalogPagination\(\{\s*onLoadMore,\s*isFetchingNextPage,\s*itemCount: recipes\.length,\s*canPaginate: !isLoading && !errorMessage,\s*\}\);/,
+    /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{\s*onLoadMore,\s*isFetchingNextPage,\s*itemCount: recipes\.length,\s*canPaginate: !isLoading && !errorMessage,\s*\}\);/,
   );
   assert.match(page, /onEndReached=\{onEndReached\}/);
+  assert.match(page, /onScroll=\{onScroll\}/);
+  assert.match(page, /onEndReachedThreshold=\{onEndReachedThreshold\}/);
   assert.ok(
     !page.includes("handleEndReached"),
     "the page must not keep a local end-reached handler — the pattern is shared (#285)",
