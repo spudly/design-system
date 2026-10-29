@@ -24,6 +24,11 @@
  *    frame building block the host composes around this view,
  *    per the ownership model confirmed on #171; it is not part
  *    of this page's contract.)
+ * 5. CTA layout: stacked narrow / row on wide (the contract's
+ *    layout line). The DS config defines no width breakpoints —
+ *    narrow is the native rendering (RN storybook / Android VR)
+ *    and wide is web — so the row is a flat `web:` clause on a
+ *    column stack, never a wrapping row.
  *
  * Source scans strip comments first, like the other contract
  * tests here, so prose cannot satisfy or trip the patterns. The
@@ -118,6 +123,19 @@ test("the CTAs render through an anchor fed by the CTA's href", () => {
   assert.match(page, /cta=\{discoverCta\} variant="primary"/);
   assert.match(page, /cta=\{signUpCta\} variant="secondary"/);
   assert.match(page, /cta=\{getAppCta\} variant="secondary"/);
+});
+
+test("the CTA container stacks narrow and rows on web — no wrapping CTA row", () => {
+  assert.match(
+    page,
+    /flexDirection="web:row"/,
+    "the CTA container must become a row only on web — the #171 contract is stacked narrow / row on wide, and its narrow rendering is the native one while wide is web (the DS config defines no width breakpoints)",
+  );
+  assert.equal(
+    page.split("flexWrap").length - 1,
+    1,
+    "only the feature grid may flexWrap — a wrapping CTA row could seat two CTAs side by side at the 430px story viewport instead of the contracted stack",
+  );
 });
 
 test("frame structure: ScreenContainer shell, sections in hero → CTAs → features order", () => {

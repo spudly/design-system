@@ -109,11 +109,20 @@ export function LandingPage({
           {heroSubtitle}
         </Text>
       </YStack>
-      <XStack flexWrap="wrap" gap="$3" justifyContent="center">
+      {/* CTA layout (#171 contract): stacked narrow, a row on
+          wide. The DS Tamagui config defines no width
+          breakpoints — the contract's narrow rendering is the
+          native one (the RN storybook / Android VR capture) and
+          its wide rendering is web — so the row is a flat `web:`
+          clause on a column stack, the ScreenContainer idiom. A
+          wrapping row could seat two CTAs side by side at the
+          430px story viewport, which is not the contracted
+          stack. */}
+      <YStack flexDirection="web:row" gap="$3" alignItems="center" justifyContent="center">
         <LandingCta cta={discoverCta} variant="primary" />
         <LandingCta cta={signUpCta} variant="secondary" />
         <LandingCta cta={getAppCta} variant="secondary" />
-      </XStack>
+      </YStack>
       <XStack flexWrap="wrap" gap="$3">
         <LandingFeatureCard feature={featureOne} />
         <LandingFeatureCard feature={featureTwo} />
