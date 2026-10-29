@@ -507,6 +507,33 @@ export function DiscoverPage(props: DiscoverPageProps) {
     onLoadMore,
   } = props;
 
+  // End-reached handling, in two halves. The mount gate: while
+  // the first load is in flight or the error state is showing,
+  // the list's data range is empty and no page request may
+  // start, so the callback is not mounted at all (a host that
+  // passes no onLoadMore never paginates either). The fetch
+  // guard: during a next-page fetch the callback STAYS mounted
+  // and the handler swallows the request instead of unmounting.
+  // Unmounting would break VirtualizedList's end-reached
+  // bookkeeping — it fires once per content length (its
+  // _sentEndForContentLength sentinel): the footer spinner's
+  // mount grows the content length, and a mounted callback gets
+  // that inflated length recorded even when the request is
+  // swallowed, so when the fetch completes and the footer
+  // unmounts, the restored length differs from the sentinel and
+  // the next page is requested. Unmounted during the fetch, the
+  // sentinel keeps the pre-footer length; an empty page (every
+  // item filtered out client-side) restores exactly that
+  // length, the fire is suppressed, and pagination stalls until
+  // the user scrolls away and back. Neither half tests
+  // recipes.length: an empty page with a live continuation
+  // still paginates.
+  const handleEndReached = () => {
+    if (!isFetchingNextPage) {
+      onLoadMore?.();
+    }
+  };
+
   return (
     <ScreenContainer variant="list" scrollable={false}>
       <FlatList
@@ -546,16 +573,11 @@ export function DiscoverPage(props: DiscoverPageProps) {
         // own (the direction of #209 — gap/separation over margins
         // for inter-item spacing).
         ItemSeparatorComponent={() => <View height={tokens.spacing[3]} />}
-        // Pagination fires only from a settled list. While the
-        // first load or a next page is in flight — or the error
-        // state is showing — the list's data range is empty or
-        // shifting under the footer, and the end-reached signal
-        // can fire spuriously, re-requesting a page the host has
-        // not answered yet. The host still ends pagination itself
-        // by omitting onLoadMore; an empty page with a live
-        // continuation (client-side filtering) keeps paginating,
-        // so the gate deliberately does not test recipes.length.
-        onEndReached={!isLoading && !isFetchingNextPage && !errorMessage ? onLoadMore : undefined}
+        // Pagination: see handleEndReached above for why the
+        // callback stays mounted (but guarded) during a next-page
+        // fetch and is unmounted only for the first load, the
+        // error state, or a host with no continuation.
+        onEndReached={!isLoading && !errorMessage && onLoadMore ? handleEndReached : undefined}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           isLoading ? (

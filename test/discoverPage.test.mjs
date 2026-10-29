@@ -142,16 +142,25 @@ test("removing a filter clears its values through the change callbacks", () => {
   assert.match(page, /accessibilityLabel=\{`Remove \$\{FILTER_LABELS\[id\]\} filter`\}/);
 });
 
-test("the title renders as the page heading and pagination rides end-reached from a settled list", () => {
+test("the title renders as the page heading and pagination rides a guarded end-reached handler", () => {
   assert.match(page, /<Text variant="heading">\{title\}<\/Text>/);
-  // Pagination is gated off while the first load or a next page
-  // is in flight or the error state is showing — in those states
-  // the data range is empty or shifting and end-reached can fire
-  // spuriously. It is NOT gated on recipes.length: an empty page
-  // with a live continuation still paginates.
+  // The callback is unmounted only for the first load, the
+  // error state, or a host with no continuation. During a
+  // next-page fetch it stays MOUNTED and the handler swallows
+  // the request: unmounting it would leave VirtualizedList's
+  // per-content-length end-reached sentinel holding the
+  // pre-footer length, and an empty page completing would
+  // restore exactly that length and suppress the next fire —
+  // consecutive empty pages would stall pagination. The two
+  // exact-match pins below also exclude any recipes.length
+  // gate: an empty page with a live continuation paginates.
   assert.match(
     page,
-    /onEndReached=\{\s*!isLoading && !isFetchingNextPage && !errorMessage \? onLoadMore : undefined\s*\}/,
+    /onEndReached=\{!isLoading && !errorMessage && onLoadMore \? handleEndReached : undefined\}/,
+  );
+  assert.match(
+    page,
+    /const handleEndReached = \(\) => \{\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
   );
   assert.match(
     page,
