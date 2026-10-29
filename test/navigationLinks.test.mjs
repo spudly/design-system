@@ -179,6 +179,45 @@ async function renderToHtml(element) {
 
 const noop = () => null;
 
+// The generated text-decoration-line rule carried by an SSR
+// anchor's classes — the rendered-output counterpart of the
+// source pins (CodeRabbit finding on PR #283: source text alone
+// does not prove the post-fix rendered decoration).
+function anchorDecoration(html) {
+  const tag = html.match(/<a[^>]*class="([^"]*)"/);
+  assert.ok(tag, `expected an anchor with classes in: ${html.slice(-400)}`);
+  for (const cls of tag[1].split(/\s+/)) {
+    const rule = html.match(new RegExp(`\\.${cls}\\{[^}]*text-decoration-line:([a-z]+)`));
+    if (rule) return rule[1];
+  }
+  return null;
+}
+
+test("SSR: href anchors render text-decoration-line:none; TextLink keeps its underline (#248)", async () => {
+  const { React, Button, BackLink, Tabs, TextLink } = await loadRuntime();
+  const buttonHtml = await renderToHtml(
+    React.createElement(Button, { href: "/recipes" }, "Browse recipes"),
+  );
+  assert.equal(anchorDecoration(buttonHtml), "none", "Button link anchor");
+  const backHtml = await renderToHtml(React.createElement(BackLink, { href: "/recipes" }));
+  assert.equal(anchorDecoration(backHtml), "none", "BackLink anchor");
+  const tabsHtml = await renderToHtml(
+    React.createElement(Tabs, {
+      variant: "link",
+      value: "search",
+      tabs: [
+        { value: "verses", label: "My verses", href: "/verses" },
+        { value: "search", label: "Search", href: "/search" },
+      ],
+    }),
+  );
+  assert.equal(anchorDecoration(tabsHtml), "none", "Tabs link anchor");
+  const textLinkHtml = await renderToHtml(
+    React.createElement(TextLink, { href: "/terms" }, "Terms of Service"),
+  );
+  assert.equal(anchorDecoration(textLinkHtml), "underline", "TextLink anchor (by design)");
+});
+
 test("SSR: a Button with href renders a real anchor, not a button (#248)", async () => {
   const { React, Button } = await loadRuntime();
   const html = await renderToHtml(
