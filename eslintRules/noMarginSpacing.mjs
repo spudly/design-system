@@ -66,7 +66,13 @@
  */
 import { styleProps } from "./styleProps.mjs";
 
-export const marginProps = new Set([...styleProps].filter((name) => name.startsWith("margin")));
+export const marginProps = new Set(
+  // marginTrim is excluded deliberately: it adds no margin to the
+  // element — it controls how a container trims its CHILDREN's
+  // margins, which is parent-owned spacing behavior, not a
+  // margin of the element's own.
+  [...styleProps].filter((name) => name.startsWith("margin") && name !== "marginTrim"),
+);
 
 function isMarginKey(key) {
   return typeof key === "string" && marginProps.has(key);
@@ -116,6 +122,15 @@ function checkObjectKeys(context, node) {
   }
 }
 
+function checkStyleArray(context, node) {
+  // Style arrays (`style={[base, { marginTop: 8 }]}`) are a
+  // supported React Native form — inspect each visible element
+  // the same way as a standalone style object.
+  for (const element of node.elements) {
+    if (element) checkStyleObject(context, element);
+  }
+}
+
 function checkStyleObject(context, node) {
   switch (node.type) {
     case "ObjectExpression": {
@@ -145,12 +160,7 @@ function checkStyleObject(context, node) {
       break;
     }
     case "ArrayExpression": {
-      // Style arrays (`style={[base, { marginTop: 8 }]}`) are a
-      // supported React Native form — inspect each visible
-      // element the same way as a standalone style object.
-      for (const element of node.elements) {
-        if (element) checkStyleObject(context, element);
-      }
+      checkStyleArray(context, node);
       break;
     }
     default: {

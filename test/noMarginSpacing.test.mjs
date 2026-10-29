@@ -171,6 +171,11 @@ test("margin keys inside arrays spread into style arrays are banned", () => {
   assert.deepEqual(messageIds(`<View style={[...[{ marginTop: 8 }]]} />`), ["marginKey"]);
 });
 
+test("marginTrim is not a margin: it trims children's margins, it adds none", () => {
+  assert.deepEqual(messageIds(`<View marginTrim="block" />`), []);
+  assert.deepEqual(messageIds(`<View style={{ marginTrim: "block" }} />`), []);
+});
+
 test("gap, padding and positioning offsets are untouched", () => {
   assert.deepEqual(messageIds(`<YStack gap="$3" padding="$4" />`), []);
   assert.deepEqual(messageIds(`<YStack paddingBlockEnd="$3" />`), []);
