@@ -63,6 +63,11 @@ test("steps sort by number and the active step is internal state", () => {
     /accessibilityRole: "button"/,
     "cards carry the button role (the ListRow pressable pattern, no react-native import)",
   );
+  assert.match(
+    panelCode,
+    /aria-pressed=\{isActive\}/,
+    "the active card exposes its selected state to assistive technology",
+  );
   assert.ok(
     !panelCode.includes("react-native"),
     "a root-graph component must not import react-native",

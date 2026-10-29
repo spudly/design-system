@@ -71,6 +71,7 @@ export function RecipeInstructionsPanel({ instructions }: RecipeInstructionsPane
             tabIndex={0}
             onKeyDown={handleCardKeyDown(i)}
             cursor="web:pointer"
+            aria-pressed={isActive}
           >
             <Text
               marginBlockEnd="$1"

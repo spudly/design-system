@@ -26,9 +26,10 @@ export type EqualButtonRowProps = {
 /**
  * A row of action buttons that share the row's width equally
  * (#119): the row sizes each button itself — flex 1 with a 40%
- * minimum width — so two buttons split a row and share its
- * height, and further buttons wrap onto the next line at the
- * same width instead of overflowing or hugging their labels:
+ * minimum width — so buttons sharing a line split its width
+ * equally and share its height, a button alone on a wrapped
+ * line fills that line, and no button shrinks below the 40%
+ * minimum instead of wrapping:
  * the call-to-action bar treatment PublicRecipePage's CTA card
  * hand-styled onto its Buttons before this component.
  * ButtonRow is the natural-width sibling: it owns the same 12px

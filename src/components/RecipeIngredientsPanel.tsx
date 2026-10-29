@@ -247,6 +247,7 @@ export function RecipeIngredientsPanel({ ingredients: view }: RecipeIngredientsP
           tabIndex={0}
           onKeyDown={handleRowKeyDown(ingredient.id)}
           cursor="web:pointer"
+          aria-pressed={ingredient.isMissing ?? false}
         >
           <Text flex={1}>{ingredient.label}</Text>
           {ingredient.isOptional ? (

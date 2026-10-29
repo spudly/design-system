@@ -105,6 +105,11 @@ test("rows and substitutions keep their conditional rendering", () => {
     /accessibilityRole: "button"/,
     "rows carry the button role (the ListRow pressable pattern, no react-native import)",
   );
+  assert.match(
+    panelCode,
+    /aria-pressed=\{ingredient\.isMissing \?\? false\}/,
+    "a row exposes its missing (toggled) state to assistive technology",
+  );
   assert.ok(
     !panelCode.includes("react-native"),
     "a root-graph component must not import react-native",
