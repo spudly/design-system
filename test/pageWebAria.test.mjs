@@ -97,9 +97,11 @@ function sourceFiles(dir) {
 // view-level link surfaces and spreads platformAccessibilityProps
 // onto its Anchor. ActionChip and Thumbnail are sanctioned on
 // the same ground: each routes its `accessibilityLabel` through
-// platformAccessibilityProps internally.
+// platformAccessibilityProps internally. RatingStars (#119) is
+// sanctioned on the same ground: its pressable form routes the
+// label through platformAccessibilityProps onto its target.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,ActionChip,Thumbnail".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,ActionChip,Thumbnail,RatingStars".split(
     ",",
   ),
 );
