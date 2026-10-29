@@ -167,12 +167,12 @@ function stageOneCapture(opts) {
 // `log` and counted in the returned summary; `staged` counts the
 // files whose bytes will differ from the committed baselines.
 export function stageGatedBaselines(opts) {
-  const { baselinesDir, capturesDirs, outDir, log } = opts;
-  mkdirSync(outDir, { recursive: true });
-  copyTree(baselinesDir, outDir);
+  const { log } = opts;
+  mkdirSync(opts.outDir, { recursive: true });
+  copyTree(opts.baselinesDir, opts.outDir);
   const summary = { captured: 0, staged: 0, new: 0, changed: 0, skipped: 0 };
   const seen = new Map();
-  for (const capturesDir of capturesDirs) {
+  for (const capturesDir of opts.capturesDirs) {
     if (!existsSync(capturesDir)) continue;
     for (const rel of listPngs(capturesDir)) seen.set(rel, join(capturesDir, rel));
   }
@@ -185,27 +185,26 @@ export function stageGatedBaselines(opts) {
   return summary;
 }
 
+function argValue(args, name, fallback) {
+  const i = args.indexOf(name);
+  return i === -1 ? fallback : args[i + 1];
+}
+
 function effectiveGate(args) {
-  const i = args.indexOf("--max-ratio");
-  if (i !== -1) return Number(args[i + 1]);
-  if (process.env.DSVR_COMMIT_MAX_RATIO) return Number(process.env.DSVR_COMMIT_MAX_RATIO);
-  return COMMIT_GATE_MAX_RATIO;
+  const raw = argValue(args, "--max-ratio", "") || process.env.DSVR_COMMIT_MAX_RATIO;
+  return raw ? Number(raw) : COMMIT_GATE_MAX_RATIO;
 }
 
 function parseStageArgs(args) {
-  const argValue = (name, fallback) => {
-    const i = args.indexOf(name);
-    return i === -1 ? fallback : args[i + 1];
-  };
   const parsed = {
-    baselinesDir: argValue("--baselines", ""),
-    outDir: argValue("--out", ""),
-    capturesDirs: argValue("--captures", "")
+    baselinesDir: argValue(args, "--baselines", ""),
+    outDir: argValue(args, "--out", ""),
+    capturesDirs: argValue(args, "--captures", "")
       .split(",")
       .map((s) => s.trim())
       .filter(Boolean),
-    colorThreshold: Number(argValue("--threshold", "16")),
-    summaryPath: argValue("--summary", ""),
+    colorThreshold: Number(argValue(args, "--threshold", "16")),
+    summaryPath: argValue(args, "--summary", ""),
   };
   return parsed.baselinesDir && parsed.outDir && parsed.capturesDirs.length > 0 ? parsed : null;
 }
