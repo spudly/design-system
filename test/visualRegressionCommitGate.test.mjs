@@ -25,6 +25,7 @@ const {
   COMMIT_GATE_MAX_RATIO,
   commitGateRatio,
   commitGateVerdict,
+  gateRatioFromArgs,
   parseCommitGateRatio,
   stageGatedBaselines,
   updateBaselineThroughGate,
@@ -139,6 +140,20 @@ test("commitGateRatio precedence: CLI value beats env beats the named default", 
     assert.equal(commitGateRatio("0.02"), 0.02);
     process.env.DSVR_COMMIT_MAX_RATIO = "banana";
     assert.throws(() => commitGateRatio(""), /invalid commit-gate ratio/);
+  } finally {
+    if (saved === undefined) delete process.env.DSVR_COMMIT_MAX_RATIO;
+    else process.env.DSVR_COMMIT_MAX_RATIO = saved;
+  }
+});
+
+test("gateRatioFromArgs: absent flag falls through, missing operand throws", () => {
+  const saved = process.env.DSVR_COMMIT_MAX_RATIO;
+  try {
+    delete process.env.DSVR_COMMIT_MAX_RATIO;
+    assert.equal(gateRatioFromArgs([], "--max-ratio"), COMMIT_GATE_MAX_RATIO);
+    assert.equal(gateRatioFromArgs(["--max-ratio", "0.02"], "--max-ratio"), 0.02);
+    assert.throws(() => gateRatioFromArgs(["--max-ratio"], "--max-ratio"), /missing operand/);
+    assert.throws(() => gateRatioFromArgs(["--max-ratio", ""], "--max-ratio"), /missing operand/);
   } finally {
     if (saved === undefined) delete process.env.DSVR_COMMIT_MAX_RATIO;
     else process.env.DSVR_COMMIT_MAX_RATIO = saved;

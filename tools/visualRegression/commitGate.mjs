@@ -199,3 +199,20 @@ export function commitGateRatio(rawCli, source = "--commit-max-ratio") {
   const env = process.env.DSVR_COMMIT_MAX_RATIO;
   return env ? parseCommitGateRatio(env, "DSVR_COMMIT_MAX_RATIO") : COMMIT_GATE_MAX_RATIO;
 }
+
+// Resolve the gate from an argv-style list for a flag that takes
+// the ratio as its operand (--max-ratio on the CLI,
+// --commit-max-ratio on run.mjs). An ABSENT flag falls through to
+// the env/default resolution; a flag present WITHOUT an operand
+// is a malformed command and throws — silently falling back would
+// let a typo'd invocation skip changes it meant to stage.
+export function gateRatioFromArgs(args, flag) {
+  const i = args.indexOf(flag);
+  if (i === -1) return commitGateRatio("");
+  const raw = args[i + 1];
+  if (!raw)
+    throw new Error(
+      `invalid commit-gate ratio from ${flag}: missing operand (expected a finite number in [0, 1])`,
+    );
+  return parseCommitGateRatio(raw, flag);
+}

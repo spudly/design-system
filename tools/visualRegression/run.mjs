@@ -36,7 +36,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { commitGateRatio } from "./commitGate.mjs";
+import { gateRatioFromArgs } from "./commitGate.mjs";
 import { fromDirMode } from "./compare.mjs";
 import { deviceMode } from "./deviceMode.mjs";
 
@@ -86,8 +86,9 @@ const CONFIG = {
   // replaces its baseline only when its differing-pixel ratio
   // exceeds this. Resolution (commitGate.mjs): the explicit flag
   // wins, then DSVR_COMMIT_MAX_RATIO, then the named default; a
-  // set-but-invalid value throws instead of silently defaulting.
-  commitMaxRatio: commitGateRatio(argValue("--commit-max-ratio", "")),
+  // set-but-invalid value — or the flag without an operand —
+  // throws instead of silently defaulting.
+  commitMaxRatio: gateRatioFromArgs(args, "--commit-max-ratio"),
   readyTimeoutMs: Number(argValue("--ready-timeout", "30000")),
   // The first wait is different in kind: cold app launch + story
   // index preparation on a freshly booted emulator. Minutes, not

@@ -280,6 +280,11 @@ pr_autocommit() {
   # git-status guard is a second safety net, never the mechanism.
   local staged_count
   staged_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).staged)')"
+  local skipped_count
+  skipped_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).skipped)')"
+  if [ "$skipped_count" != "0" ]; then
+    echo "::warning::PR auto-commit: $skipped_count capture(s) differ from their committed baselines but were at or under the commit gate, so they were NOT committed (see the commit-gate SKIP lines above). They still differ under the strict compare; if any is a genuine change, re-run update mode with a lowered gate (--commit-max-ratio / DSVR_COMMIT_MAX_RATIO) to commit it deliberately."
+  fi
   if [ "$staged_count" = "0" ]; then
     echo "PR auto-commit: commit gate staged 0 files — every capture was at or under the gate (noise) or matched its baseline. Baselines unchanged; nothing to commit."
     return 0
