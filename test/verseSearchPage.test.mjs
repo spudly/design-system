@@ -9,9 +9,11 @@
  * 1. The shell is the non-scrolling ScreenContainer (the app
  *    renders every tab inside <ScreenContainer scrollable=
  *    {false}>; its "Memorize" title and tab bar stay app-side).
- * 2. The FlatList is height-bounded with `flex: 1` (#188) and
- *    stays mounted across searches — a re-search never blanks
- *    the previous results; the busy spinner renders above it.
+ * 2. The results list is the shared BoundedList, height-bounded
+ *    with `flex: 1` (#188 — the bounding is BoundedList's own
+ *    since the #119 fix) and stays mounted across searches — a
+ *    re-search never blanks the previous results; the busy
+ *    spinner renders above it.
  * 3. The demo-mode notice carries the app's text verbatim and
  *    renders above the search row; the error alert carries the
  *    app-composed message.
@@ -58,14 +60,18 @@ test("VerseSearchPage source is readable and non-trivial", () => {
   assert.match(code, /export function VerseSearchPage/);
 });
 
-test("no app imports: every import is react-native, tamagui, or a DS component", () => {
+test("no app imports: every import is react-native, tamagui, a DS component, or the internal BoundedList", () => {
   const specifiers = [...code.matchAll(/from\s+"([^"]+)"/g)].map((m) => m[1]);
   assert.ok(specifiers.length > 0, "expected import specifiers to scan");
   for (const specifier of specifiers) {
     assert.ok(
       specifier === "react-native" ||
         specifier === "tamagui" ||
-        specifier.startsWith("../components/"),
+        specifier.startsWith("../components/") ||
+        // Internal page scaffolding (the PageFrame pattern): the
+        // shared bounded list lives with the pages because it
+        // imports react-native (#119).
+        specifier === "./BoundedList.js",
       `VerseSearchPage must not import "${specifier}" — app logic stays app-side`,
     );
   }
@@ -146,22 +152,23 @@ test("the busy spinner renders above a results list that stays mounted", () => {
     "the list data must be the results as-is — no swap or blanking while searching",
   );
   assert.ok(
-    code.indexOf("<Spinner") < code.indexOf("<FlatList"),
+    code.indexOf("<Spinner") < code.indexOf("<BoundedList"),
     "the spinner must render above the list, as in the app",
   );
 });
 
-test("the FlatList is height-bounded with flex: 1 (#188)", () => {
+test("the list is the shared BoundedList; the page carries no styling of its own (#119)", () => {
   assert.match(
     code,
-    /const listStyle = \{ flex: 1 \} as const;/,
-    "the listStyle constant must be exactly { flex: 1 }",
+    /<BoundedList\s+data=\{results\}/,
+    "the results must render through BoundedList, which owns the #188 flex: 1 bounding and row separation",
   );
-  assert.match(
-    code,
-    /<FlatList\s+style=\{listStyle\}/,
-    "the FlatList must take style={listStyle} so the shell bounds its height",
-  );
+  for (const banned of ["FlatList", "listStyle", "XStack", "YStack", "marginBottom", "style={"]) {
+    assert.ok(
+      !code.includes(banned),
+      `VerseSearchPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / Row / SearchField since the #119 fix`,
+    );
+  }
 });
 
 test("there is deliberately no empty state on this screen", () => {

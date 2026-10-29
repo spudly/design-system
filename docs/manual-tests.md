@@ -258,6 +258,25 @@ changeset naming PrevNextNav.
 
 ---
 
+## Row
+
+Open in `Components/Row`: Actions, Centered, SpaceBefore.
+
+1. Actions: the two small buttons sit side by side with an even 8px
+   gap and no space above the row.
+2. Centered: the search field fills the row's remaining width, the
+   Search button keeps its natural width, and field and button are
+   vertically centered on each other.
+3. SpaceBefore: the action row renders 8px below the verse text,
+   with the same 8px gap between its buttons.
+
+**Run when:** `src/components/Row.tsx`, its stories,
+`src/components/SearchField.tsx` (the `grow` prop), the pages that
+compose Row (VerseSearchPage, MemorizeReviewPage, MyVersesPage),
+or a changeset naming Row.
+
+---
+
 ## Spinner
 
 Open in `Components/Spinner`: Default, Large, Determinate,
