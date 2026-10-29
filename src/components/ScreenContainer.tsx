@@ -30,10 +30,19 @@ const StyledContent = styled(YStack, {
       // Auth shell: surface background, wide horizontal padding, and a
       // large top offset for sign-in flows (the old ui-screen-shell-auth).
       // 80px is the shell's fixed top offset; it is not on the spacing scale.
+      // This outer layer stays full-width so the $surface paint covers
+      // the whole screen; the content column inside it is capped and
+      // centered by StyledAuthContent at the FormScreenLayout geometry
+      // (480px) — without the cap the auth pages stretched edge-to-edge
+      // on desktop web (#265). Centering comes from this layer's
+      // alignItems, not alignSelf on the column, so it holds under any
+      // parent, flex or block. On phone-width viewports the cap does
+      // not bind and nothing changes.
       auth: {
         backgroundColor: "$surface",
         paddingHorizontal: tokens.spacing[6],
         paddingTop: 80,
+        alignItems: "center",
       },
     },
   } as const,
@@ -43,6 +52,19 @@ const StyledContent = styled(YStack, {
   },
 });
 
+/**
+ * The capped, centered content column rendered inside the `auth`
+ * shell (see the auth variant above): 480px wide at most, with the
+ * shell's section gap between the page's children.
+ */
+const StyledAuthContent = styled(YStack, {
+  name: "ScreenContainerAuthContent",
+
+  width: "100%",
+  maxWidth: 480,
+  gap: tokens.spacing[4],
+});
+
 type StyledContentProps = GetProps<typeof StyledContent>;
 
 export type ScreenContainerProps = StyledContentProps & {
@@ -50,7 +72,8 @@ export type ScreenContainerProps = StyledContentProps & {
   scrollable?: boolean;
   /**
    * Shell mode: `default` page padding, `padded` (wider), `list` (flush —
-   * caller manages padding), `auth` (surface background, large top offset).
+   * caller manages padding), `auth` (surface background, large top offset,
+   * content in a centered column capped at 480px).
    * Page background for the other modes stays a caller/stack prop, as
    * before; only `auth` bakes in its surface background.
    */
@@ -63,8 +86,21 @@ export type ScreenContainerProps = StyledContentProps & {
  * pass `scrollable={false}` for fixed-height screens. Use `variant` for
  * the padded, list, and auth shell modes.
  */
-export function ScreenContainer({ scrollable = true, children, ...rest }: ScreenContainerProps) {
-  const content = <StyledContent {...rest}>{children}</StyledContent>;
+export function ScreenContainer({
+  scrollable = true,
+  children,
+  gap,
+  ...rest
+}: ScreenContainerProps) {
+  const content = (
+    <StyledContent gap={gap} {...rest}>
+      {rest.variant === "auth" ? (
+        <StyledAuthContent gap={gap ?? tokens.spacing[4]}>{children}</StyledAuthContent>
+      ) : (
+        children
+      )}
+    </StyledContent>
+  );
   if (!scrollable) {
     return content;
   }
