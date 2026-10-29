@@ -28,10 +28,10 @@ export const Default: Story = {
         footer={
           <PublicFrameFooter
             note="Recipes shared on Eciperay may be viewed without an account."
-            privacyLabel="Privacy Policy"
-            privacyHref="/privacy"
-            termsLabel="Terms of Service"
-            termsHref="/terms"
+            links={[
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Terms of Service", href: "/terms" },
+            ]}
           />
         }
       >

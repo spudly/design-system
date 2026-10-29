@@ -38,6 +38,11 @@ test("PresetValueSelector is exported from the built package root", async () => 
 });
 
 test("the selector is a labeled preset row of toggle buttons plus the editable custom slot", () => {
+  // The row is programmatically named by its label (the
+  // NumberStepper group pattern), so the toggles announce what
+  // they set.
+  assert.match(code, /\{\.\.\.groupRoleProps\}/);
+  assert.match(code, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
   assert.match(code, /selected=\{value === option\.value\}/, "presets are toggle buttons");
   assert.match(
     code,

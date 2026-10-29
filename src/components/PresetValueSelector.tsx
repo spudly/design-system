@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { groupRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
@@ -99,7 +100,12 @@ export function PresetValueSelector({
   };
 
   return (
-    <XStack alignItems="center" gap="$2">
+    <XStack
+      alignItems="center"
+      gap="$2"
+      {...groupRoleProps}
+      {...platformAccessibilityProps({ accessibilityLabel: label })}
+    >
       <XStack paddingInlineEnd="$1">
         <Text
           fontSize={tokens.typography.fontSize.sm}

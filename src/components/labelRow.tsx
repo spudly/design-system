@@ -16,11 +16,15 @@ export function LabelRow({
   label,
   action,
   separation,
+  htmlFor,
 }: {
   label: string;
   action?: ReactNode;
   /** The space below the row, as a spacing-scale step. */
   separation: 1 | 2;
+  /** The field control's id, forwarded to the label so the web
+   * label element's `for` names that control. */
+  htmlFor?: string | undefined;
 }) {
   return (
     <XStack
@@ -29,7 +33,7 @@ export function LabelRow({
       justifyContent="space-between"
       gap={tokens.spacing[3]}
     >
-      <FieldLabel>{label}</FieldLabel>
+      <FieldLabel htmlFor={htmlFor}>{label}</FieldLabel>
       {action ? (
         <XStack alignItems="center" gap={tokens.spacing[2]}>
           {action}

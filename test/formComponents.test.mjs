@@ -56,24 +56,49 @@ for (const name of COMPONENTS) {
 test("the label row is one shared implementation behind both labeled wrappers", () => {
   const row = readRepoFile("src/components/labelRow.tsx");
   assert.match(row, /paddingBlockEnd=\{tokens\.spacing\[separation\]\}/);
-  assert.match(row, /<FieldLabel>\{label\}<\/FieldLabel>/);
+  assert.match(row, /<FieldLabel htmlFor=\{htmlFor\}>\{label\}<\/FieldLabel>/);
   const field = readRepoFile("src/components/LabeledField.tsx");
-  assert.match(field, /<LabelRow label=\{label\} action=\{action\} separation=\{1\} \/>/);
+  assert.match(
+    field,
+    /<LabelRow label=\{label\} action=\{action\} separation=\{1\} htmlFor=\{fieldId\} \/>/,
+  );
   const group = readRepoFile("src/components/LabeledGroup.tsx");
-  assert.match(group, /<LabelRow label=\{label\} action=\{action\} separation=\{2\} \/>/);
+  assert.match(
+    group,
+    /<LabelRow label=\{label\} action=\{action\} separation=\{2\} htmlFor=\{fieldId\} \/>/,
+  );
+});
+
+test("FieldLabel renders a real label element on web and keeps the text treatment on native", () => {
+  const source = readRepoFile("src/components/FieldLabel.tsx");
+  // Stephen's ruling on PR #320: web uses an HTML label element
+  // with a proper `for`; native keeps the plain Text treatment.
+  assert.match(source, /if \(isWeb\) \{/);
+  assert.match(source, /<Label\s+\{\.\.\.\(htmlFor \? \{ htmlFor \} : \{\}\)\}/);
+  assert.match(source, /htmlFor\?: string \| undefined;/);
+  assert.match(source, /<Text\s+fontSize=\{tokens\.typography\.fontSize\.sm\}/);
 });
 
 test("LabeledField owns the 4px label separation and renders the error below the field", () => {
   const source = readRepoFile("src/components/LabeledField.tsx");
   assert.match(source, /label: string;/);
+  assert.match(source, /fieldId\?: string | undefined;/);
   assert.match(source, /error\?: string \| null \| undefined;/);
   assert.match(source, /paddingBlockStart=\{tokens\.spacing\[2\]\}/);
   assert.match(source, /variant="error"/);
+  // The host-placed error carries the field's deterministic
+  // error id (the field components' own `${id}-error` shape).
+  assert.match(source, /\{\.\.\.\(fieldId \? \{ id: `\$\{fieldId\}-error` \} : \{\}\)\}/);
 });
 
 test("LabeledGroup owns the wider 8px label separation for non-field controls", () => {
   const source = readRepoFile("src/components/LabeledGroup.tsx");
   assert.match(source, /separation=\{2\}/);
+  assert.match(source, /fieldId\?: string | undefined;/);
+  // The group is programmatically named by its label (the
+  // NumberStepper pattern): group role + accessible name.
+  assert.match(source, /\{\.\.\.groupRoleProps\}/);
+  assert.match(source, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
 });
 
 test("FormStack owns the form rhythm: 16px section gaps, stretched children, 32px tail", () => {
@@ -108,4 +133,72 @@ test("ChangedListBanner keeps the warning wash and offers its revert only when g
   assert.match(source, /backgroundColor=\{tokens\.colors\.warning\.warning1\}/);
   assert.match(source, /\{onRevert \? \(/);
   assert.match(source, /<TextAction/, "the revert renders through TextAction (cluster C3)");
+});
+
+// Runtime imports are lazy (inside the SSR tests) so the
+// source-scan tests above still run and report when the build
+// output is missing or broken, instead of the whole file
+// failing at import time.
+let runtimePromise;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const reactModule = await import("react");
+    const React = reactModule.default;
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider } = await import("tamagui");
+    const distRuntime = await import(join(here, "..", "dist", "index.js"));
+    return { React, renderToString, TamaguiProvider, ...distRuntime };
+  })();
+  return runtimePromise;
+}
+
+async function renderToHtml(element) {
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+    await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const html = renderToString(
+    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+  );
+  const styleEnd = html.lastIndexOf("</style>");
+  return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
+}
+
+test("SSR: a LabeledField's label is a real label element whose `for` matches the field's id", async () => {
+  const { React, LabeledField, TextField } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(
+      LabeledField,
+      { label: "Title", fieldId: "recipe-title" },
+      React.createElement(TextField, {
+        id: "recipe-title",
+        accessibilityLabel: "Title",
+        value: "Tuscan chicken",
+        onChangeText: () => {},
+      }),
+    ),
+  );
+  assert.match(
+    html,
+    /<label[^>]*for="recipe-title"[^>]*>(?:<[^>]+>)?Title/,
+    "the visible label renders as a <label> element naming the field by id (PR #320)",
+  );
+  assert.match(html, /<input[^>]*id="recipe-title"/, "the field control carries the same id");
+});
+
+test("SSR: FieldLabel with htmlFor renders a label element; a LabeledGroup is a named group", async () => {
+  const { React, FieldLabel, LabeledGroup, Text } = await loadRuntime();
+  const labelHtml = await renderToHtml(
+    React.createElement(FieldLabel, { htmlFor: "some-field" }, "Title"),
+  );
+  assert.match(labelHtml, /<label[^>]*for="some-field"[^>]*>(?:<[^>]+>)?Title/);
+
+  const groupHtml = await renderToHtml(
+    React.createElement(
+      LabeledGroup,
+      { label: "Tags" },
+      React.createElement(Text, null, "Weeknight"),
+    ),
+  );
+  assert.match(groupHtml, /role="group"/, "the group carries the group role on web");
+  assert.match(groupHtml, /aria-label="Tags"/, "the group is named by its label");
 });

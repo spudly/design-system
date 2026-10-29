@@ -582,8 +582,10 @@ Open in `Components/PublicFrameLayout`: Default;
    real links (the DOM nodes are anchors carrying their
    hrefs; right-click offers "Open in new tab"). The wordmark
    is the semibold primary wordmark with no underline.
-2. The footer band: the note in muted ink and the Privacy /
-   Terms links, wrapping without overlap on narrow widths.
+2. The footer band: the note in muted ink and the links the
+   caller passed in (the story passes Privacy / Terms),
+   rendered in the caller's order as real links and wrapping
+   without overlap on narrow widths.
 3. The layout centers its content column at 768px on wide
    viewports and fills narrow ones; header and footer bands
    span the full width.
@@ -598,24 +600,21 @@ their stories, or a changeset naming any of them.
 
 ---
 
-## List states (ListErrorState, ListLoadingState, ListLoadingFooter)
+## List states (ListLoadingState)
 
-Open in `Components/ListLoadingState`: Default;
-`Components/ListErrorState`: Default;
-`Components/ListLoadingFooter`: Default.
+Open in `Components/ListLoadingState`: Default.
 
 1. ListLoadingState: the spinner renders centered in its
    parent with its label; the state carries no padding or
    margin of its own — spacing around it is the parent's.
-2. ListErrorState: the error message renders as the error
-   Alert, flush to the parent's inset.
-3. ListLoadingFooter: identical rendering to ListLoadingState
-   at the foot of a list.
+   The same component renders directly at the foot of a list
+   for the loading-more slot.
+2. A list's error state has no wrapper component: the page
+   renders the Alert component directly, flush to the parent's
+   inset.
 
-**Run when:** `src/components/ListErrorState.tsx`,
-`src/components/ListLoadingState.tsx`,
-`src/components/ListLoadingFooter.tsx`, their stories, or a
-changeset naming any of them.
+**Run when:** `src/components/ListLoadingState.tsx`, its
+stories, or a changeset naming it.
 
 ---
 
@@ -654,6 +653,7 @@ Open in `Components/FormStack`: Default;
 `Components/FormHeading`: Default, WithSubtitle;
 `Components/LabeledField`: Default, WithAction, WithError;
 `Components/LabeledGroup`: Default, WithAction;
+`Components/FieldLabel`: Default, Associated;
 `Components/RevertAction` and `Components/ChangedListBanner`
 (their stories).
 
@@ -662,11 +662,14 @@ Open in `Components/FormStack`: Default;
    field.
 2. FormHeading: the title renders in the form-title treatment;
    WithSubtitle shows the hint line under the title.
-3. LabeledField: the label sits 4px over the field; WithError
-   shows the error line below the field in the error treatment;
-   WithAction shows the action at the label row's end.
+3. LabeledField: the label sits 4px over the field; on web the
+   label is a real label element — clicking it focuses the
+   field. WithError shows the error line below the field in
+   the error treatment; WithAction shows the action at the
+   label row's end.
 4. LabeledGroup: the label sits 8px over the grouped control —
-   the wider separation than a field's.
+   the wider separation than a field's; the group announces
+   itself by the label's name.
 5. RevertAction: the "Revert to: <label>" text action renders
    in the warning ink and presses like a button.
 6. ChangedListBanner: the changed-lines list renders on the

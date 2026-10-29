@@ -37,10 +37,15 @@ export type MarkableRowProps = {
  * (Enter and Space) invoke the same callback as a press.
  */
 export function MarkableRow({ label, trailingNote, isMarked = false, onPress }: MarkableRowProps) {
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+  const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      onPress?.();
+      // A held key repeats keydown events; a native button does
+      // not re-activate on repeats (TextAction's guard), and a
+      // repeat here would flip the mark back and forth.
+      if (!event.repeat) {
+        onPress?.();
+      }
     }
   };
   return (

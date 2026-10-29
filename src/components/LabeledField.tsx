@@ -7,6 +7,15 @@ import { Text } from "./Text.js";
 export type LabeledFieldProps = {
   /** The field's label, rendered in the FieldLabel treatment. */
   label: string;
+  /** The field control's id. Pass the same id to the control
+   * itself (the field components take an `id` prop): on web the
+   * label then renders as a real label element whose `for`
+   * names the control, and the error below the field carries
+   * the deterministic id `${fieldId}-error` — the same error-id
+   * shape the field components use for their own `error` prop —
+   * so a host wiring a raw control can point its
+   * `aria-describedby` at it. */
+  fieldId?: string | undefined;
   /** Optional trailing action for the label row (a revert
    * affordance, a generate button, or several composed in a
    * fragment): the row right-aligns it beside the label, with
@@ -30,14 +39,16 @@ export type LabeledFieldProps = {
  * label sits 8px above the group instead. The label row itself
  * is the one implementation both wrappers share (labelRow).
  */
-export function LabeledField({ label, action, error, children }: LabeledFieldProps) {
+export function LabeledField({ label, fieldId, action, error, children }: LabeledFieldProps) {
   return (
     <YStack>
-      <LabelRow label={label} action={action} separation={1} />
+      <LabelRow label={label} action={action} separation={1} htmlFor={fieldId} />
       {children}
       {error ? (
         <YStack paddingBlockStart={tokens.spacing[2]}>
-          <Text variant="error">{error}</Text>
+          <Text variant="error" {...(fieldId ? { id: `${fieldId}-error` } : {})}>
+            {error}
+          </Text>
         </YStack>
       ) : null}
     </YStack>

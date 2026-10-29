@@ -1,9 +1,8 @@
-import { View, XStack, YStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Card } from "./Card.js";
 import { StarRatingInput } from "./StarRatingInput.js";
 import { Text } from "./Text.js";
-import { platformAccessibilityProps } from "./accessibility.js";
 
 export type RatingsCardCommunityRating = {
   /** Pre-rendered star string ("★★★★★"), app-formatted from the average. */
@@ -56,8 +55,12 @@ function EyebrowLabel({ children }: { children: string }) {
 
 /** The viewer's star input with the app adapter's semantics
  * preserved: pressing the current star clears the rating (null),
- * and a pending rating disables the input behind a
- * non-interactive wrapper. */
+ * and a pending rating disables the input. The non-interactive
+ * states are the input's own (`readOnly` when the card has no
+ * change handler, `disabled` while a rating is pending), so the
+ * semantics reach the star controls themselves — a pointerEvents
+ * wrapper would leave the stars focusable and announced as
+ * enabled on web while silently dropping their presses. */
 function ViewerRatingInput({
   value,
   isPending = false,
@@ -67,22 +70,17 @@ function ViewerRatingInput({
   isPending?: boolean;
   onChange: ((stars: number | null) => void) | undefined;
 }) {
-  const interactive = !isPending && onChange !== undefined;
   return (
-    <View
-      pointerEvents={interactive ? "auto" : "none"}
-      opacity={isPending ? 0.5 : undefined}
-      {...platformAccessibilityProps({ accessibilityState: { disabled: isPending } })}
-    >
-      <StarRatingInput
-        value={value ?? 0}
-        onChange={(star) => {
-          if (!isPending && onChange) {
-            onChange(value === star ? null : star);
-          }
-        }}
-      />
-    </View>
+    <StarRatingInput
+      value={value ?? 0}
+      readOnly={onChange === undefined}
+      disabled={isPending}
+      onChange={(star) => {
+        if (!isPending && onChange) {
+          onChange(value === star ? null : star);
+        }
+      }}
+    />
   );
 }
 

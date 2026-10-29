@@ -128,8 +128,6 @@ export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
 export { FormStack, type FormStackProps } from "./FormStack.js";
 export { LabeledField, type LabeledFieldProps } from "./LabeledField.js";
 export { LabeledGroup, type LabeledGroupProps } from "./LabeledGroup.js";
-export { ListErrorState, type ListErrorStateProps } from "./ListErrorState.js";
-export { ListLoadingFooter, type ListLoadingFooterProps } from "./ListLoadingFooter.js";
 export { ListLoadingState, type ListLoadingStateProps } from "./ListLoadingState.js";
 export { MarkableRow, type MarkableRowProps } from "./MarkableRow.js";
 export { PinnedHeaderShell, type PinnedHeaderShellProps } from "./PinnedHeaderShell.js";
@@ -138,7 +136,11 @@ export {
   type PresetValueOption,
   type PresetValueSelectorProps,
 } from "./PresetValueSelector.js";
-export { PublicFrameFooter, type PublicFrameFooterProps } from "./PublicFrameFooter.js";
+export {
+  PublicFrameFooter,
+  type PublicFrameFooterLink,
+  type PublicFrameFooterProps,
+} from "./PublicFrameFooter.js";
 export { PublicFrameHeader, type PublicFrameHeaderProps } from "./PublicFrameHeader.js";
 export {
   COLUMN_MAX_WIDTH,

@@ -87,14 +87,29 @@ test("PublicFrameHeader is the surface band with wordmark and sign-in link", () 
   );
 });
 
-test("PublicFrameFooter is the surface band with the note and legal links", () => {
+test("PublicFrameFooter is the surface band with the note and the caller's links", () => {
   assert.match(footer, /backgroundColor="\$surface"/);
   assert.match(footer, /borderTopWidth=\{1\}/);
   assert.match(footer, /maxWidth=\{COLUMN_MAX_WIDTH\}/, "the band's row shares the column");
   assert.match(footer, /flexWrap="wrap"/, "the footer row wraps on narrow widths");
   assert.match(footer, /color=\{tokens\.colors\.gray\.gray6\}/, "the note is muted ink");
-  assert.match(footer, /<TextLink[^>]*href=\{privacyHref\}/, "Privacy is a real link with an href");
-  assert.match(footer, /<TextLink[^>]*href=\{termsHref\}/, "Terms is a real link with an href");
+  // The links are caller-supplied data (Stephen's ruling on
+  // PR #320): an array of {label, href} rendered in order — the
+  // component names no route itself.
+  assert.match(footer, /export type PublicFrameFooterLink = \{\s*label: string;/);
+  assert.match(footer, /links: PublicFrameFooterLink\[\];/);
+  assert.match(footer, /links\.map\(\(link\) =>/);
+  assert.match(
+    footer,
+    /<TextLink key=\{link\.href\} fontSize=\{tokens\.typography\.fontSize\.sm\} href=\{link\.href\}>/,
+  );
+  assert.match(footer, /\{link\.label\}/);
+  for (const baked of ["privacy", "Privacy", "terms", "Terms", "/privacy", "/terms"]) {
+    assert.ok(
+      !footer.includes(baked),
+      `the footer must not hardcode ${baked} — footer links are passed in as data`,
+    );
+  }
   assert.ok(
     !footer.includes("onPrivacyPress"),
     "no press callbacks survive on links (Stephen's ruling)",
@@ -131,4 +146,31 @@ test("SSR: BrandLink renders as a real anchor carrying the given href", async ()
   assert.ok(/<a [^>]*href="\//.test(html), "the wordmark is an anchor carrying the href");
   assert.ok(html.includes("Eciperay"), "the wordmark label renders");
   assert.ok(!/<button/.test(html), "the wordmark must not render as a button");
+});
+
+test("SSR: PublicFrameFooter renders exactly the caller's links, in order", async () => {
+  const { React, PublicFrameFooter } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(PublicFrameFooter, {
+      note: "A note.",
+      links: [
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+        { label: "Cookies", href: "/cookies" },
+      ],
+    }),
+  );
+  for (const [label, href] of [
+    ["Privacy Policy", "/privacy"],
+    ["Terms of Service", "/terms"],
+    ["Cookies", "/cookies"],
+  ]) {
+    assert.ok(html.includes(label), `the caller's ${label} link renders`);
+    assert.ok(new RegExp(`<a [^>]*href="${href}"`).test(html), `${label} is an anchor to ${href}`);
+  }
+  assert.ok(
+    html.indexOf("Privacy Policy") < html.indexOf("Terms of Service") &&
+      html.indexOf("Terms of Service") < html.indexOf("Cookies"),
+    "the links render in the caller's order",
+  );
 });

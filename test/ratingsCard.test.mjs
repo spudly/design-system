@@ -5,9 +5,10 @@
  *
  * The pins hold the app adapter's semantics the page carried:
  * pressing the viewer's current star clears the rating (null),
- * a pending rating disables the input behind a non-interactive
- * wrapper, stale ratings show their hints, and a null community
- * rating renders the "No community ratings yet" line.
+ * a pending rating disables the input itself (and a handler-less
+ * card renders it read-only), stale ratings show their hints,
+ * and a null community rating renders the "No community
+ * ratings yet" line.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -31,16 +32,16 @@ test("the viewer's star input keeps the adapter's clear-on-repress and pending s
     /onChange\(value === star \? null : star\)/,
     "pressing the current star clears the rating",
   );
+  // The non-interactive states are the input's own props, so
+  // the semantics reach the star controls (a pointerEvents
+  // wrapper would leave them focusable and announced enabled).
   assert.match(
     code,
-    /pointerEvents=\{interactive \? "auto" : "none"\}/,
-    "a pending (or read-only) input is non-interactive",
+    /readOnly=\{onChange === undefined\}/,
+    "a card without a change handler renders the input read-only",
   );
-  assert.match(
-    code,
-    /accessibilityState: \{ disabled: isPending \}/,
-    "the pending state is announced as disabled",
-  );
+  assert.match(code, /disabled=\{isPending\}/, "a pending rating disables the input itself");
+  assert.ok(!code.includes("pointerEvents"), "no pointerEvents wrapper around the input");
 });
 
 test("stale ratings and the empty community state render their copy", () => {

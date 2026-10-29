@@ -1,15 +1,15 @@
 /**
  * Contract test for the catalog components
  * (spudly/design-system#168/#119): CatalogFiltersBar,
- * CatalogHeader, and the shared list states (ListLoadingState,
- * ListErrorState, ListLoadingFooter) — extracted from
- * DiscoverPage in the public-pages de-styling tranche so the
- * catalog pages compose them and pass data and callbacks only.
- * (The bar's behavior contract — the #96 chooser, the clearing
- * semantics — is pinned by test/discoverPage.test.mjs, which
- * scans this component's source; this file pins the extraction
- * shape: exports, the header geometry, and the list states'
- * treatments.)
+ * CatalogHeader, and the shared list loading state
+ * (ListLoadingState) — extracted from DiscoverPage in the
+ * public-pages de-styling tranche so the catalog pages compose
+ * them and pass data and callbacks only. (The bar's behavior
+ * contract — the #96 chooser, the clearing semantics — is
+ * pinned by test/discoverPage.test.mjs, which scans this
+ * component's source; this file pins the extraction shape:
+ * exports, the header geometry, and the loading state's
+ * treatment.)
  *
  * The bar is definition-driven (Stephen's ruling on PR #311):
  * which filters exist, their labels, option sets, and defaults
@@ -17,15 +17,21 @@
  * bar owns the control shapes only and hardcodes no app filter
  * or sorter list.
  *
- * The list states carry no offset of their own (Stephen's
+ * The loading state carries no offset of its own (Stephen's
  * ruling on PR #311): an internal top padding is the margin
  * loophole in another form — parents own the spacing between
- * their children — so the loading states center their spinner
- * with <Center> and the error state is the bare alert.
+ * their children — so the state centers its spinner with
+ * <Center>.
+ *
+ * There is deliberately no ListErrorState and no
+ * ListLoadingFooter (Stephen's ruling on PR #320: no middleman
+ * components): a list's error renders the Alert component
+ * directly where it occurs, and a list's loading-more slot
+ * renders ListLoadingState directly.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -42,19 +48,26 @@ function readCode(name) {
 const bar = readCode("CatalogFiltersBar.tsx");
 const header = readCode("CatalogHeader.tsx");
 const loadingState = readCode("ListLoadingState.tsx");
-const errorState = readCode("ListErrorState.tsx");
-const loadingFooter = readCode("ListLoadingFooter.tsx");
 
 test("the catalog components are exported from the built package root", async () => {
   const dist = await import("../dist/index.js");
-  for (const name of [
-    "CatalogFiltersBar",
-    "CatalogHeader",
-    "ListLoadingState",
-    "ListErrorState",
-    "ListLoadingFooter",
-  ]) {
+  for (const name of ["CatalogFiltersBar", "CatalogHeader", "ListLoadingState"]) {
     assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+  }
+});
+
+test("the middleman list states are not shipped (PR #320)", async () => {
+  const dist = await import("../dist/index.js");
+  for (const name of ["ListErrorState", "ListLoadingFooter"]) {
+    assert.equal(dist[name], undefined, `${name} must not be exported from @spudly/ui`);
+    assert.ok(
+      !existsSync(join(componentsDir, `${name}.tsx`)),
+      `${name}.tsx must not exist — render Alert / ListLoadingState directly`,
+    );
+    assert.ok(
+      !existsSync(join(componentsDir, `${name}.stories.tsx`)),
+      `${name}.stories.tsx must not exist`,
+    );
   }
 });
 
@@ -96,21 +109,14 @@ test("CatalogHeader renders the title as the heading over its controls", () => {
   assert.match(header, /children: ReactNode;/, "the bar composes in as the child");
 });
 
-test("the list states center with <Center> and carry no offset of their own", () => {
+test("the loading state centers with <Center> and carries no offset of its own", () => {
   assert.match(loadingState, /<Center>\s*<Spinner label=\{label\} \/>\s*<\/Center>/);
-  assert.match(errorState, /<Alert severity="error">\{message\}<\/Alert>/);
-  // One implementation, two names (dedupe cluster B11): the
-  // footer delegates to the state rather than re-implementing it.
-  assert.match(loadingFooter, /<ListLoadingState label=\{label\} \/>/);
-  for (const [name, source] of [
-    ["ListLoadingState", loadingState],
-    ["ListErrorState", errorState],
-    ["ListLoadingFooter", loadingFooter],
-  ]) {
-    assert.ok(!/margin/.test(source), `${name} must not space itself with margins (#209)`);
-    assert.ok(
-      !/padding/.test(source),
-      `${name} must not carry a padding offset — parents own spacing between children (PR #311)`,
-    );
-  }
+  assert.ok(
+    !/margin/.test(loadingState),
+    "ListLoadingState must not space itself with margins (#209)",
+  );
+  assert.ok(
+    !/padding/.test(loadingState),
+    "ListLoadingState must not carry a padding offset — parents own spacing between children (PR #311)",
+  );
 });
