@@ -1,11 +1,12 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
+import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
-import { TextAreaField } from "../components/TextAreaField.js";
+import { FormSubmit } from "../components/FormSubmit.js";
+import { LabeledGroup } from "../components/LabeledGroup.js";
 import { NumberStepper } from "../components/NumberStepper.js";
 import { Text } from "../components/Text.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { TextField } from "../components/TextField.js";
 
 /**
@@ -40,8 +41,11 @@ import { TextField } from "../components/TextField.js";
  *
  * The shell is the DS FormScreenLayout (the centered form
  * column the app screens render today), with the heading
- * composed from Text — the app composes the same two through
- * its adapters.
+ * composed through FormHeading — the app composes the same
+ * two through its adapters. The page applies no styling
+ * itself (#119): the recipe list's label is a LabeledGroup
+ * and the submit row is a FormSubmit; the page composes DS
+ * components and passes data and callbacks only.
  */
 
 export type MealFormPageRecipeOption = {
@@ -91,11 +95,7 @@ export function MealFormPage({
 
   return (
     <FormScreenLayout>
-      <YStack paddingBottom="$6">
-        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
-          {title.trim() ? title : "Meal"}
-        </Text>
-      </YStack>
+      <FormHeading>{title.trim() ? title : "Meal"}</FormHeading>
       <TextField
         label="Title"
         value={title}
@@ -108,20 +108,13 @@ export function MealFormPage({
         placeholder="Notes (optional)"
         numberOfLines={4}
       />
-      <YStack paddingBlockEnd="$2">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          fontWeight={tokens.typography.fontWeight.medium}
-          color={tokens.colors.gray.gray8}
-        >
-          Recipes
-        </Text>
-      </YStack>
-      <CheckboxSelectList
-        items={recipeOptions.map((recipe) => ({ id: recipe.id, label: recipe.label }))}
-        selectedIds={selectedRecipeIds}
-        onToggle={onToggleRecipe}
-      />
+      <LabeledGroup label="Recipes">
+        <CheckboxSelectList
+          items={recipeOptions.map((recipe) => ({ id: recipe.id, label: recipe.label }))}
+          selectedIds={selectedRecipeIds}
+          onToggle={onToggleRecipe}
+        />
+      </LabeledGroup>
       {selectedRecipeIds.map((recipeId) => {
         const recipe = optionById.get(recipeId);
         if (!recipe) {
@@ -139,7 +132,7 @@ export function MealFormPage({
         );
       })}
       {error ? <Text variant="error">{error}</Text> : null}
-      <YStack paddingBlockStart="$4">
+      <FormSubmit>
         <Button
           variant="primary"
           accessibilityLabel="Save meal"
@@ -148,7 +141,7 @@ export function MealFormPage({
         >
           Save meal
         </Button>
-      </YStack>
+      </FormSubmit>
     </FormScreenLayout>
   );
 }

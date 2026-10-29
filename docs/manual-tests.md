@@ -582,6 +582,130 @@ naming either page.
 
 ---
 
+## FieldLabel, LabeledField & LabeledGroup
+
+Open in `Components/FieldLabel`: Default. Open in
+`Components/LabeledField`: Default, WithAction, WithError. Open
+in `Components/LabeledGroup`: Default, WithAction.
+
+1. FieldLabel Default: the "Title" label in the small medium
+   label treatment sits directly over its field.
+2. LabeledField Default: the label sits 4px over the field;
+   WithAction adds the revert action at the label row's right
+   edge, vertically centered with the label; WithError renders
+   the error text below the field in the error treatment.
+3. LabeledGroup: the label sits 8px over the chip group (visibly
+   wider separation than LabeledField's); WithAction shows the
+   revert action at the row's right edge; chips toggle on press.
+
+**Run when:** `src/components/FieldLabel.tsx`,
+`src/components/LabeledField.tsx`, `src/components/LabeledGroup.tsx`,
+their stories, a form page composing them, or a changeset naming
+any of them.
+
+---
+
+## RevertAction & ChangedListBanner
+
+Open in `Components/RevertAction`: Default. Open in
+`Components/ChangedListBanner`: Default, WithoutRevert.
+
+1. RevertAction Default: the warning-colored "Revert to:
+   Chicken, plain" text; pressing it (or Enter/Space on web)
+   increments the counter below.
+2. ChangedListBanner Default: the banner on its pale warning
+   wash with the difference text and an underlined Revert action
+   at its right edge; pressing Revert increments the counter.
+3. WithoutRevert: the banner shows only the difference text —
+   no Revert action.
+
+**Run when:** `src/components/RevertAction.tsx`,
+`src/components/ChangedListBanner.tsx`, their stories,
+RecipeFormPage, or a changeset naming either component.
+
+---
+
+## FieldColumns
+
+Open in `Components/FieldColumns`: Default.
+
+1. Servings, Prep (min), and Cook (min) fields sit in three
+   equal-width columns with an even gutter between them; each
+   label sits over its own field.
+
+**Run when:** `src/components/FieldColumns.tsx`, its stories,
+RecipeFormPage, or a changeset naming FieldColumns.
+
+---
+
+## FormStack, FormHeading & FormSubmit
+
+Open in `Components/FormStack`: Default. Open in
+`Components/FormHeading`: Default. Open in
+`Components/FormSubmit`: Default.
+
+1. FormStack Default: the fields stack at an even 16px rhythm,
+   stretched to the column width (the Save Changes button
+   included), with clear space below the last element.
+2. FormHeading Default: the "Meal plan" title in the form-title
+   treatment (2xl bold, heading level 1) sits 24px above the
+   first field.
+3. FormSubmit Default: the Save meal button sits 16px below the
+   field above it, full width.
+
+**Run when:** `src/components/FormStack.tsx`,
+`src/components/FormHeading.tsx`, `src/components/FormSubmit.tsx`,
+their stories, a form page composing them, or a changeset naming
+any of them.
+
+---
+
+## StepperGroup
+
+Open in `Components/StepperGroup`: Default.
+
+1. The Quantity and Servings steppers for the entry sit flush
+   together (no gap between the two rows); both steppers
+   increment and decrement.
+
+**Run when:** `src/components/StepperGroup.tsx`, its stories,
+MealPlanFormPage, or a changeset naming StepperGroup.
+
+---
+
+## RecipeFormPage, MealFormPage & MealPlanFormPage
+
+Open in `Pages/Eciperay/RecipeFormPage`: Default, Empty,
+ContentLocked, VersionDiff. Open in `Pages/Eciperay/MealFormPage`:
+Default, NoSelection, SaveError. Open in
+`Pages/Eciperay/MealPlanFormPage`: Default, NoSelection.
+
+1. RecipeFormPage Default: Title, Status chips, Description with
+   its "Describe with AI" action, the Servings / Prep / Cook
+   columns, image, Ingredients and Instructions slots, Tags
+   chips, Source URL, and the full-width Save Changes button,
+   evenly spaced in one scrolling form.
+2. ContentLocked: the lock notice renders above the slots with
+   the notice's link, and the fields are disabled.
+3. VersionDiff: the ingredients and instructions changed-list
+   banners render above their slots with Revert actions, and
+   changed fields carry their revert actions beside the labels.
+4. MealFormPage Default: the meal-title heading, fields, recipe
+   checkbox list, and a servings stepper per selected recipe;
+   NoSelection disables Save meal; SaveError shows the error
+   line above the submit row.
+5. MealPlanFormPage Default: the plan-title heading, the Starts
+   on / Ends on fields, the entry checkbox list with kind
+   prefixes, and quantity (plus servings for recipes) steppers
+   grouped flush per selected entry; NoSelection disables Save
+   plan.
+
+**Run when:** `src/pages/RecipeFormPage.tsx`,
+`src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
+their stories, or a changeset naming any of the three pages.
+
+---
+
 ## Spinner
 
 Open in `Components/Spinner`: Default, Large, Determinate,

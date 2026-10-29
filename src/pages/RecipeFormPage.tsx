@@ -1,12 +1,16 @@
 import type { ReactNode } from "react";
-import { ScrollView, XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
-import { Button } from "../components/Button.js";
 import { Alert } from "../components/Alert.js";
-import { TextAreaField } from "../components/TextAreaField.js";
+import { Button } from "../components/Button.js";
+import { ChangedListBanner } from "../components/ChangedListBanner.js";
+import { FieldColumns } from "../components/FieldColumns.js";
+import { FormStack } from "../components/FormStack.js";
+import { LabeledField } from "../components/LabeledField.js";
+import { LabeledGroup } from "../components/LabeledGroup.js";
+import { RevertAction } from "../components/RevertAction.js";
+import { ScrollRegion } from "../components/ScrollRegion.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { TextField } from "../components/TextField.js";
 import { ToggleChipGroup } from "../components/ToggleChipGroup.js";
 
@@ -60,6 +64,13 @@ import { ToggleChipGroup } from "../components/ToggleChipGroup.js";
  *   row is the same composition, and the scalar fields render
  *   through the DS TextField / TextAreaField chrome (with the
  *   `changed` variant carrying the diff wash — see TextField).
+ * - The page applies no styling itself (#119): the scroll region
+ *   is ScrollRegion, the body stack is FormStack, each field
+ *   section is a LabeledField (the tags a LabeledGroup), the
+ *   short-field row is FieldColumns, and the revert affordances
+ *   and changed-list banners are the RevertAction and
+ *   ChangedListBanner components — the page composes them and
+ *   passes data and callbacks only.
  */
 
 export type RecipeFormPageField =
@@ -146,107 +157,6 @@ export type RecipeFormPageProps = {
   onSubmit: () => void;
 };
 
-function FieldLabel({ children }: { children: string }) {
-  return (
-    <Text
-      fontSize={tokens.typography.fontSize.sm}
-      fontWeight={tokens.typography.fontWeight.medium}
-      color={tokens.colors.gray.gray8}
-    >
-      {children}
-    </Text>
-  );
-}
-
-function LabelRow({ label, action }: { label: string; action?: ReactNode }) {
-  return (
-    <XStack paddingBlockEnd="$1" alignItems="center" justifyContent="space-between" gap="$3">
-      <FieldLabel>{label}</FieldLabel>
-      {action ?? null}
-    </XStack>
-  );
-}
-
-/** The version-diff revert affordance: small warning-tone text,
- * pressable (the app's RevertButton treatment). Web keyboard support
- * follows the MealPlansPage row pattern — Enter and Space invoke
- * the same callback as a press. */
-function RevertAction({ label, onPress }: { label: string; onPress: () => void }) {
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onPress();
-    }
-  };
-  return (
-    <YStack
-      {...platformAccessibilityProps({ accessibilityRole: "button" })}
-      onPress={onPress}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-      cursor="web:pointer"
-    >
-      <Text
-        fontSize={tokens.typography.fontSize.xs}
-        fontWeight={tokens.typography.fontWeight.medium}
-        color={tokens.colors.warning.warning9}
-        opacity={0.8}
-      >
-        {`Revert to: ${label}`}
-      </Text>
-    </YStack>
-  );
-}
-
-/** The changed-list banner: warning wash row with the host's
- * summary line and an underlined Revert action (the app form's
- * treatment for a list that differs from the parent version). */
-function ChangedListBanner({ label, onRevert }: { label: string; onRevert?: () => void }) {
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if ((event.key === "Enter" || event.key === " ") && onRevert) {
-      event.preventDefault();
-      onRevert();
-    }
-  };
-  return (
-    <XStack
-      alignItems="center"
-      justifyContent="space-between"
-      gap="$2"
-      borderRadius={tokens.radii.md}
-      backgroundColor={tokens.colors.warning.warning1}
-      paddingHorizontal="$3"
-      paddingVertical="$2"
-    >
-      <Text
-        flex={1}
-        fontSize={tokens.typography.fontSize.sm}
-        color={tokens.colors.warning.warning10}
-      >
-        {label}
-      </Text>
-      {onRevert ? (
-        <YStack
-          {...platformAccessibilityProps({ accessibilityRole: "button" })}
-          onPress={onRevert}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          cursor="web:pointer"
-        >
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.medium}
-            color={tokens.colors.warning.warning10}
-            textDecorationLine="underline"
-          >
-            Revert
-          </Text>
-        </YStack>
-      ) : null}
-    </XStack>
-  );
-}
-
 export function RecipeFormPage(props: RecipeFormPageProps) {
   const {
     title,
@@ -314,32 +224,30 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
   };
 
   return (
-    <ScrollView flex={1} keyboardShouldPersistTaps="handled">
-      <YStack gap="$4" paddingBlockEnd="$8">
-        <YStack>
-          <LabelRow label="Title" action={revertAction("title")} />
+    <ScrollRegion>
+      <FormStack>
+        <LabeledField label="Title" action={revertAction("title")}>
           <TextField
             accessibilityLabel="Title"
             changed={isChanged("title")}
             value={title}
             onChangeText={onTitleChange}
           />
-        </YStack>
+        </LabeledField>
 
-        <YStack>
-          <LabelRow label="Status" />
+        <LabeledField label="Status">
           <ToggleChipGroup
             mode="single"
             options={statusOptions}
             value={status}
             onChange={onStatusChange}
           />
-        </YStack>
+        </LabeledField>
 
-        <YStack>
-          <XStack paddingBlockEnd="$1" alignItems="center" justifyContent="space-between" gap="$3">
-            <FieldLabel>Description</FieldLabel>
-            <XStack alignItems="center" gap="$2">
+        <LabeledField
+          label="Description"
+          action={
+            <>
               {revertAction("description")}
               {onGenerateDescription ? (
                 <Button
@@ -352,8 +260,10 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
                   {isGeneratingDescription ? "Generating…" : "Generate with AI"}
                 </Button>
               ) : null}
-            </XStack>
-          </XStack>
+            </>
+          }
+          error={descriptionError}
+        >
           <TextAreaField
             accessibilityLabel="Description"
             changed={isChanged("description")}
@@ -361,16 +271,10 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
             value={description}
             onChangeText={onDescriptionChange}
           />
-          {descriptionError ? (
-            <YStack paddingBlockStart="$2">
-              <Text variant="error">{descriptionError}</Text>
-            </YStack>
-          ) : null}
-        </YStack>
+        </LabeledField>
 
-        <XStack gap="$3">
-          <YStack flex={1}>
-            <LabelRow label="Servings" action={revertAction("servings")} />
+        <FieldColumns>
+          <LabeledField label="Servings" action={revertAction("servings")}>
             <TextField
               accessibilityLabel="Servings"
               changed={isChanged("servings")}
@@ -378,9 +282,8 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               value={servings}
               onChangeText={onServingsChange}
             />
-          </YStack>
-          <YStack flex={1}>
-            <LabelRow label="Prep (min)" action={revertAction("prepTimeMin")} />
+          </LabeledField>
+          <LabeledField label="Prep (min)" action={revertAction("prepTimeMin")}>
             <TextField
               accessibilityLabel="Prep (min)"
               changed={isChanged("prepTimeMin")}
@@ -388,9 +291,8 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               value={prepTimeMin}
               onChangeText={onPrepTimeMinChange}
             />
-          </YStack>
-          <YStack flex={1}>
-            <LabelRow label="Cook (min)" action={revertAction("cookTimeMin")} />
+          </LabeledField>
+          <LabeledField label="Cook (min)" action={revertAction("cookTimeMin")}>
             <TextField
               accessibilityLabel="Cook (min)"
               changed={isChanged("cookTimeMin")}
@@ -398,28 +300,28 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               value={cookTimeMin}
               onChangeText={onCookTimeMinChange}
             />
-          </YStack>
-        </XStack>
+          </LabeledField>
+        </FieldColumns>
 
         {renderImageSection ? renderImageSection(revertAction("image")) : null}
 
-        <YStack>
-          <LabelRow label="Source URL" action={revertAction("sourceUrl")} />
+        <LabeledField label="Source URL" action={revertAction("sourceUrl")}>
           <TextField
             accessibilityLabel="Source URL"
             changed={isChanged("sourceUrl")}
             value={sourceUrl}
             onChangeText={onSourceUrlChange}
           />
-        </YStack>
+        </LabeledField>
 
-        <YStack>
-          <XStack paddingBlockEnd="$2" alignItems="center" justifyContent="space-between" gap="$2">
-            <FieldLabel>Tags</FieldLabel>
-            {tagsRevertLabel && onRevertTags ? (
+        <LabeledGroup
+          label="Tags"
+          action={
+            tagsRevertLabel && onRevertTags ? (
               <RevertAction label={tagsRevertLabel} onPress={onRevertTags} />
-            ) : null}
-          </XStack>
+            ) : null
+          }
+        >
           {isLoadingTags ? (
             <Spinner label="Loading tags" />
           ) : (
@@ -430,7 +332,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               onChange={toggleTag}
             />
           )}
-        </YStack>
+        </LabeledGroup>
 
         {contentLocked ? (
           <Alert severity="warning">
@@ -456,10 +358,10 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
         {contentLocked ? null : renderInstructionsSection ? renderInstructionsSection() : null}
 
         {submitError ? <Text variant="error">{submitError}</Text> : null}
-        <Button alignSelf="stretch" disabled={isSubmitting} onPress={onSubmit}>
+        <Button disabled={isSubmitting} onPress={onSubmit}>
           {isSubmitting ? submittingLabel : submitLabel}
         </Button>
-      </YStack>
-    </ScrollView>
+      </FormStack>
+    </ScrollRegion>
   );
 }

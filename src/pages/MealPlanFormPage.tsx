@@ -1,11 +1,13 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
+import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
-import { TextAreaField } from "../components/TextAreaField.js";
+import { FormSubmit } from "../components/FormSubmit.js";
+import { LabeledGroup } from "../components/LabeledGroup.js";
 import { NumberStepper } from "../components/NumberStepper.js";
+import { StepperGroup } from "../components/StepperGroup.js";
 import { Text } from "../components/Text.js";
+import { TextAreaField } from "../components/TextAreaField.js";
 import { TextField } from "../components/TextField.js";
 
 /**
@@ -37,7 +39,12 @@ import { TextField } from "../components/TextField.js";
  *
  * Submission is a bare intent (`onSubmit`); the disabled rule
  * is the app view's one presentation rule (a title and at
- * least one selected entry).
+ * least one selected entry). The page applies no styling
+ * itself (#119): the heading is a FormHeading, the entry
+ * list's label is a LabeledGroup, each selected entry's
+ * steppers are a StepperGroup, and the submit row is a
+ * FormSubmit; the page composes DS components and passes
+ * data and callbacks only.
  */
 
 export type MealPlanFormPageEntryOption = {
@@ -105,11 +112,7 @@ export function MealPlanFormPage({
 
   return (
     <FormScreenLayout>
-      <YStack paddingBottom="$6">
-        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
-          {title.trim() ? title : "Meal plan"}
-        </Text>
-      </YStack>
+      <FormHeading>{title.trim() ? title : "Meal plan"}</FormHeading>
       <TextField
         label="Title"
         value={title}
@@ -134,23 +137,16 @@ export function MealPlanFormPage({
         onChangeText={onEndsOnChange}
         placeholder="YYYY-MM-DD"
       />
-      <YStack paddingBlockEnd="$2">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          fontWeight={tokens.typography.fontWeight.medium}
-          color={tokens.colors.gray.gray8}
-        >
-          Meals & recipes
-        </Text>
-      </YStack>
-      <CheckboxSelectList
-        items={entryOptions.map((entry) => ({
-          id: entry.key,
-          label: `${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}`,
-        }))}
-        selectedIds={selectedKeys}
-        onToggle={onToggleEntry}
-      />
+      <LabeledGroup label="Meals & recipes">
+        <CheckboxSelectList
+          items={entryOptions.map((entry) => ({
+            id: entry.key,
+            label: `${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}`,
+          }))}
+          selectedIds={selectedKeys}
+          onToggle={onToggleEntry}
+        />
+      </LabeledGroup>
       {selectedKeys.map((key) => {
         const option = optionByKey.get(key);
         if (!option) {
@@ -166,11 +162,11 @@ export function MealPlanFormPage({
           />
         );
         if (option.kind === "meal" || !option.recipeId) {
-          return <YStack key={key}>{quantityStepper}</YStack>;
+          return <StepperGroup key={key}>{quantityStepper}</StepperGroup>;
         }
         const recipeId = option.recipeId;
         return (
-          <YStack key={key}>
+          <StepperGroup key={key}>
             {quantityStepper}
             <NumberStepper
               label={`Servings · ${option.title}`}
@@ -179,11 +175,11 @@ export function MealPlanFormPage({
                 onRecipeServingsChange(recipeId, value);
               }}
             />
-          </YStack>
+          </StepperGroup>
         );
       })}
       {error ? <Text variant="error">{error}</Text> : null}
-      <YStack paddingBlockStart="$4">
+      <FormSubmit>
         <Button
           variant="primary"
           accessibilityLabel="Save plan"
@@ -192,7 +188,7 @@ export function MealPlanFormPage({
         >
           Save plan
         </Button>
-      </YStack>
+      </FormSubmit>
     </FormScreenLayout>
   );
 }
