@@ -143,3 +143,11 @@ export {
   type MealsHubPageMeal,
   type MealsHubPageTab,
 } from "./MealsHubPage.js";
+export {
+  LegalDocumentPage,
+  type LegalDocumentPageProps,
+  type LegalDocumentSection,
+  type LegalDocumentBlock,
+  type LegalDocumentSpan,
+  type LegalDocumentLink,
+} from "./LegalDocumentPage.js";

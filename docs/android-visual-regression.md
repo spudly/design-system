@@ -223,6 +223,7 @@ fails the test suite.
 | pages-eciperay-importreviewpage             | light_warmHarvest |       1 |         1 |
 | pages-eciperay-importtextpage               | light_warmHarvest |       2 |         2 |
 | pages-eciperay-importurlpage                | light_warmHarvest |       2 |         2 |
+| pages-eciperay-legaldocumentpage            | light_warmHarvest |       2 |         2 |
 | pages-eciperay-manualentrypage              | light_warmHarvest |       1 |         1 |
 | pages-eciperay-mealcookingmodepage          | light_warmHarvest |       3 |         3 |
 | pages-eciperay-mealdetailpage               | light_warmHarvest |       2 |         2 |
@@ -249,7 +250,7 @@ fails the test suite.
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **135** |   **135** |
+| **Total**                                   |                   | **137** |   **137** |
 
 <!-- VR-COVERAGE-END -->
 

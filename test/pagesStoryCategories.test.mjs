@@ -60,6 +60,7 @@ const categorized = [
   ["FeedbackPage.stories.tsx", "Pages/Eciperay/FeedbackPage"],
   ["AddRecipeMenuPage.stories.tsx", "Pages/Eciperay/AddRecipeMenuPage"],
   ["AiSessionPage.stories.tsx", "Pages/Eciperay/AiSessionPage"],
+  ["LegalDocumentPage.stories.tsx", "Pages/Eciperay/LegalDocumentPage"],
   ["MyVersesPage.stories.tsx", "Pages/Memorize/MyVersesPage"],
   ["VerseSearchPage.stories.tsx", "Pages/Memorize/VerseSearchPage"],
   ["MemorizationSessionPage.stories.tsx", "Pages/Memorize/MemorizationSessionPage"],

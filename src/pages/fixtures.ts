@@ -1,4 +1,5 @@
 import { tagColorNames, type TagColorName } from "../themes/tagColors.js";
+import type { LegalDocumentPageProps } from "./LegalDocumentPage.js";
 import type { TagsPageTag } from "./TagsPage.js";
 
 /**
@@ -418,4 +419,141 @@ export const aiSessionPreviewFixture = {
   ],
   canRefine: false,
   canCancel: true,
+};
+
+/**
+ * Legal document fixtures for LegalDocumentPage (#170): two short
+ * documents in the real pages' shape — the privacy policy and the
+ * terms are the same page driven by different content props. The
+ * copy is fixture prose written for the stories (the real legal
+ * text is app content and stays app-side); the structure mirrors
+ * the real documents: paragraphs mixing plain, strong, and code
+ * spans, bullet lists whose items lead with a strong phrase, and a
+ * mailto link span mid-sentence in the contact section. Dates are
+ * fixed literals per the fixture rules above.
+ */
+export const legalPrivacyFixture: LegalDocumentPageProps = {
+  title: "Privacy Policy",
+  lastUpdated: "July 22, 2026",
+  brandLabel: "Eciperay",
+  brandHref: "/",
+  signInLabel: "Sign in",
+  signInHref: "/login",
+  footerLinks: [
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+  ],
+  sections: [
+    {
+      title: "Information we collect",
+      blocks: [
+        {
+          type: "paragraph",
+          spans: [
+            { type: "text", text: "Eciperay collects the information you give us when you " },
+            { type: "strong", text: "create an account" },
+            { type: "text", text: " and save recipes, including:" },
+          ],
+        },
+        {
+          type: "list",
+          items: [
+            [
+              { type: "strong", text: "Account details." },
+              { type: "text", text: " Your name and email address." },
+            ],
+            [
+              { type: "strong", text: "Your content." },
+              { type: "text", text: " Recipes, meal plans, and notes you save." },
+            ],
+            [
+              { type: "strong", text: "Usage data." },
+              { type: "text", text: " Which features you use, so we can improve them." },
+            ],
+          ],
+        },
+      ],
+    },
+    {
+      title: "Search engines",
+      blocks: [
+        {
+          type: "paragraph",
+          spans: [
+            { type: "text", text: "Private pages carry a " },
+            { type: "code", text: "noindex" },
+            { type: "text", text: " directive so search engines do not list them." },
+          ],
+        },
+      ],
+    },
+    {
+      title: "Contact us",
+      blocks: [
+        {
+          type: "paragraph",
+          spans: [
+            { type: "text", text: "Questions about this policy? Email us at " },
+            { type: "link", label: "legal@example.com", href: "mailto:legal@example.com" },
+            { type: "text", text: " and we will reply within a few days." },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
+export const legalTermsFixture: LegalDocumentPageProps = {
+  title: "Terms of Service",
+  lastUpdated: "June 18, 2026",
+  brandLabel: "Eciperay",
+  brandHref: "/",
+  signInLabel: "Sign in",
+  signInHref: "/login",
+  footerLinks: [
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+  ],
+  sections: [
+    {
+      title: "Using Eciperay",
+      blocks: [
+        {
+          type: "paragraph",
+          spans: [
+            {
+              type: "text",
+              text: "By using Eciperay you agree to these terms. You may use the service to store and share your own recipes, and you are responsible for your account activity.",
+            },
+          ],
+        },
+        {
+          type: "list",
+          items: [
+            [
+              { type: "strong", text: "Your recipes stay yours." },
+              { type: "text", text: " You keep ownership of the content you save." },
+            ],
+            [
+              { type: "strong", text: "Be considerate." },
+              { type: "text", text: " Do not upload content that infringes others' rights." },
+            ],
+          ],
+        },
+      ],
+    },
+    {
+      title: "Contact us",
+      blocks: [
+        {
+          type: "paragraph",
+          spans: [
+            { type: "text", text: "Questions about these terms? Email us at " },
+            { type: "link", label: "legal@example.com", href: "mailto:legal@example.com" },
+            { type: "text", text: "." },
+          ],
+        },
+      ],
+    },
+  ],
 };
