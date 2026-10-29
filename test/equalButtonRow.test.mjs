@@ -38,16 +38,18 @@ test("EqualButtonRowProps is a type-only export from the built components barrel
   assert.match(types, /EqualButtonRowProps/);
 });
 
-test("the row owns the equal-share sizing: growing frames at a 40% minimum in a wrapping row", () => {
+test("the row owns the equal-share sizing: flexed buttons at a 40% minimum in a wrapping row", () => {
   assert.match(rowCode, /name: "EqualButtonRow"/);
   assert.match(rowCode, /flexWrap: "wrap"/);
-  assert.match(rowCode, /name: "EqualButtonRowFrame"/);
-  assert.match(rowCode, /flex: 1,/);
-  assert.match(rowCode, /minWidth: "40%"/);
   assert.match(
     rowCode,
     /child\.type === Fragment/,
     "a fragment child flattens into the row, so a variant's button set passes as one fragment",
+  );
+  assert.match(
+    rowCode,
+    /cloneElement\(item as ReactElement<\{ flex\?: number; minWidth\?: string \}>, \{\s+flex: 1,\s+minWidth: "40%",/,
+    "the row sizes each button itself (flex 1, 40% minimum), as the CTA card hand-styled them",
   );
   assert.ok(!rowCode.includes("lineHeight"), "the row must not set lineHeight");
 });

@@ -571,7 +571,9 @@ Open in `Components/EqualButtonRow`: Default, Wrapping.
    none hugs its label — with a 12px gap between them.
 2. Wrapping: at the narrow width the third button wraps onto a
    second line at the same width as the two above it, instead of
-   shrinking below readable width.
+   shrinking below readable width; the two buttons on the first
+   line share its height even though one label wraps to two
+   lines.
 
 **Run when:** `src/components/EqualButtonRow.tsx`, its stories,
 PublicRecipePage's CTA bar, or a changeset naming EqualButtonRow.
