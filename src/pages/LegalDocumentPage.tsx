@@ -1,10 +1,12 @@
-import type { ReactNode } from "react";
-import { Anchor, XStack, YStack } from "tamagui";
-import { listItemRoleProps, listRoleProps } from "../components/accessibility.js";
-import { Divider } from "../components/Divider.js";
+import { DocumentFooter } from "../components/DocumentFooter.js";
+import { DocumentHeader } from "../components/DocumentHeader.js";
+import {
+  ProseDocument,
+  type ProseBlock,
+  type ProseSection,
+  type ProseSpan,
+} from "../components/ProseDocument.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Text } from "../components/Text.js";
-import { tokens } from "../tokens/index.js";
 
 /**
  * LegalDocumentPage (spudly/design-system#170, B7 public surfaces):
@@ -39,24 +41,27 @@ import { tokens } from "../tokens/index.js";
  * copy and the destinations, the DS owns the frame's design, and
  * the same frame shape serves the other public surfaces.
  *
+ * The page composes components and passes data only (#119): the
+ * frame's header and footer are DocumentHeader / DocumentFooter
+ * and the document itself renders through ProseDocument — the
+ * shared prose renderer whose content model the page's public
+ * types alias, so the contract below is unchanged.
+ *
  * Stays app-side: the legal text itself, routing, document
  * head/SEO, and the analytics consent banner.
  */
 
-export type LegalDocumentSpan =
-  | { type: "text"; text: string }
-  | { type: "strong"; text: string }
-  | { type: "code"; text: string }
-  | { type: "link"; label: string; href: string };
+/** The document's span model — ProseDocument's, under the page's
+ * public names (the #170 contract). */
+export type LegalDocumentSpan = ProseSpan;
 
-export type LegalDocumentBlock =
-  | { type: "paragraph"; spans: LegalDocumentSpan[] }
-  | { type: "list"; items: LegalDocumentSpan[][] };
+/** The document's block model — ProseDocument's, under the page's
+ * public names (the #170 contract). */
+export type LegalDocumentBlock = ProseBlock;
 
-export type LegalDocumentSection = {
-  title: string;
-  blocks: LegalDocumentBlock[];
-};
+/** The document's section model — ProseDocument's, under the
+ * page's public names (the #170 contract). */
+export type LegalDocumentSection = ProseSection;
 
 /** A frame link: the label renders, the href is where it goes. */
 export type LegalDocumentLink = {
@@ -83,67 +88,6 @@ export type LegalDocumentPageProps = {
   footerLinks: LegalDocumentLink[];
 };
 
-function renderSpan(span: LegalDocumentSpan, key: number): ReactNode {
-  switch (span.type) {
-    case "text":
-      return span.text;
-    case "strong":
-      return (
-        <Text key={key} fontWeight={tokens.typography.fontWeight.bold}>
-          {span.text}
-        </Text>
-      );
-    case "code":
-      return (
-        <Text key={key} fontFamily={tokens.typography.fontFamily.mono}>
-          {span.text}
-        </Text>
-      );
-    case "link":
-      return (
-        <Anchor
-          key={key}
-          href={span.href}
-          color="$link"
-          fontWeight={tokens.typography.fontWeight.medium}
-          textDecorationLine="underline"
-        >
-          {span.label}
-        </Anchor>
-      );
-  }
-}
-
-function renderSpans(spans: LegalDocumentSpan[]): ReactNode {
-  return spans.map((span, index) => renderSpan(span, index));
-}
-
-function LegalDocumentBlockView({ block }: { block: LegalDocumentBlock }) {
-  if (block.type === "paragraph") {
-    return <Text>{renderSpans(block.spans)}</Text>;
-  }
-  return (
-    <YStack gap="$2" {...listRoleProps}>
-      {block.items.map((item, index) => (
-        <XStack key={index} gap="$2" {...listItemRoleProps}>
-          <Text>{"•"}</Text>
-          <Text flex={1}>{renderSpans(item)}</Text>
-        </XStack>
-      ))}
-    </YStack>
-  );
-}
-
-/**
- * The document's prose column width: the same 768px (the web
- * layout's max-w-3xl) centered column the other public surfaces
- * render into (PublicPageFrame's column), so the legal text stays
- * readable on wide viewports. The frame header and footer stay
- * outside the column, spanning the container as before; on
- * phone-width viewports the cap does not bind.
- */
-const PROSE_MAX_WIDTH = 768;
-
 export function LegalDocumentPage({
   title,
   lastUpdated,
@@ -156,48 +100,14 @@ export function LegalDocumentPage({
 }: LegalDocumentPageProps) {
   return (
     <ScreenContainer>
-      <XStack alignItems="center" justifyContent="space-between" gap="$4">
-        <Anchor
-          href={brandHref}
-          fontSize={tokens.typography.fontSize.lg}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          {brandLabel}
-        </Anchor>
-        <Anchor href={signInHref} color="$link" fontWeight={tokens.typography.fontWeight.medium}>
-          {signInLabel}
-        </Anchor>
-      </XStack>
-      <YStack width="100%" maxWidth={PROSE_MAX_WIDTH} alignSelf="center" gap="$4">
-        <YStack gap="$3">
-          <Text variant="heading">{title}</Text>
-          <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>
-        </YStack>
-        {sections.map((section) => (
-          <YStack key={section.title} gap="$3">
-            <Text variant="subheading">{section.title}</Text>
-            {section.blocks.map((block, index) => (
-              <LegalDocumentBlockView key={index} block={block} />
-            ))}
-          </YStack>
-        ))}
-      </YStack>
-      <YStack gap="$4">
-        <Divider />
-        <XStack gap="$4" flexWrap="wrap">
-          {footerLinks.map((link) => (
-            <Anchor
-              key={link.href}
-              href={link.href}
-              color="$link"
-              fontSize={tokens.typography.fontSize.sm}
-              fontWeight={tokens.typography.fontWeight.medium}
-            >
-              {link.label}
-            </Anchor>
-          ))}
-        </XStack>
-      </YStack>
+      <DocumentHeader
+        brandLabel={brandLabel}
+        brandHref={brandHref}
+        signInLabel={signInLabel}
+        signInHref={signInHref}
+      />
+      <ProseDocument title={title} lastUpdated={lastUpdated} sections={sections} />
+      <DocumentFooter links={footerLinks} />
     </ScreenContainer>
   );
 }

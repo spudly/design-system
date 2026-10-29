@@ -550,6 +550,180 @@ recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
+## BrandLink
+
+Open in `Components/BrandLink`: Default.
+
+1. The wordmark "Eciperay" renders in the primary ink, semibold,
+   at the large size, with no underline.
+2. Keyboard only: Tab reaches the wordmark and Enter activates
+   it (its accessible name is "Eciperay", role link).
+
+**Run when:** `src/components/BrandLink.tsx`, its stories, the
+public frame's header, or a changeset naming BrandLink.
+
+---
+
+## Public frame components (PublicFrameLayout, PublicFrameHeader, PublicFrameFooter)
+
+Open in `Components/PublicFrameLayout`: Default. Open in
+`Components/PublicFrameHeader`: Default. Open in
+`Components/PublicFrameFooter`: Default.
+
+1. Layout Default: the header band sits above and the footer
+   band below the content column; on a wide viewport the column
+   caps at 768px and centers, and both bands' inner rows align
+   to the same column edges as the content.
+2. Header Default: a surface band with a hairline bottom
+   border — the brand wordmark left, the "Sign in" link right.
+3. Footer Default: a surface band with a hairline top border —
+   the muted note left, the Privacy Policy / Terms of Service
+   links right; at a narrow width the row wraps instead of
+   overflowing.
+
+**Run when:** `src/components/PublicFrameLayout.tsx`,
+`PublicFrameHeader.tsx`, `PublicFrameFooter.tsx`, their
+stories, PublicPageFrame, or a changeset naming any of them.
+
+---
+
+## Document frame components (DocumentHeader, DocumentFooter)
+
+Open in `Components/DocumentHeader`: Default. Open in
+`Components/DocumentFooter`: Default.
+
+1. Header Default: the bold "Eciperay" wordmark left and the
+   "Sign in" link in link ink right; both are real links (the
+   wordmark points to /, Sign in to /login).
+2. Footer Default: a divider above the Privacy Policy and Terms
+   of Service links in link ink; the row wraps at narrow widths.
+
+**Run when:** `src/components/DocumentHeader.tsx`,
+`DocumentFooter.tsx`, their stories, LegalDocumentPage, or a
+changeset naming either.
+
+---
+
+## ProseDocument
+
+Open in `Components/ProseDocument`: Default.
+
+1. The "Privacy Policy" title is the level-1 heading, with the
+   muted "Last updated: July 22, 2026" line under it; each
+   section title is a level-2 heading.
+2. The paragraph renders its strong span bold and its mailto
+   link underlined in link ink; the list renders bulleted rows
+   with bold lead-ins and a monospace code span.
+3. On a wide viewport the prose column caps at 768px and
+   centers.
+
+**Run when:** `src/components/ProseDocument.tsx`, its stories,
+LegalDocumentPage, or a changeset naming ProseDocument.
+
+---
+
+## Hero
+
+Open in `Components/Hero`: Default.
+
+1. The headline renders centered as the level-1 heading, with
+   the muted subtitle centered under it and breathing room
+   above the headline.
+
+**Run when:** `src/components/Hero.tsx`, its stories,
+LandingPage, or a changeset naming Hero.
+
+---
+
+## CtaLink & CtaRow
+
+Open in `Components/CtaLink`: Variants. Open in
+`Components/CtaRow`: Default.
+
+1. Variants: the primary CTA is a filled brand pill with white
+   semibold text; the secondary is a light-gray pill with dark
+   semibold text. Both are real links (role link, their hrefs),
+   never buttons.
+2. CtaRow Default: on web the three CTAs sit in one centered
+   row; on native (the RN storybook) they stack vertically —
+   the row never wraps two CTAs side by side at phone width.
+
+**Run when:** `src/components/CtaLink.tsx`, `CtaRow.tsx`,
+their stories, LandingPage, or a changeset naming either.
+
+---
+
+## FeatureCard & CardGrid
+
+Open in `Components/FeatureCard`: Default. Open in
+`Components/CardGrid`: Default.
+
+1. FeatureCard Default: a card with the feature title as a
+   level-2 heading and the muted description under it.
+2. CardGrid Default: the three feature cards share one row at
+   story width; narrowing the viewport wraps them onto further
+   rows at their 260px basis instead of squeezing them.
+
+**Run when:** `src/components/FeatureCard.tsx`, `CardGrid.tsx`,
+their stories, LandingPage, or a changeset naming either.
+
+---
+
+## CatalogFiltersBar
+
+Open in `Components/CatalogFiltersBar`: Collapsed, ChooserOpen,
+WithFiltersAdded.
+
+1. Collapsed: the search field and the small "Filters" button
+   at the same height; no filter controls are shown.
+2. ChooserOpen: the chooser offers one add button per filter
+   not yet added (Ingredient, Calories, Satiety, Sort — and
+   Status only when a status filter is supplied); adding one
+   closes the chooser and renders that filter's control.
+3. WithFiltersAdded: the Ingredient field, the Min/Max cal
+   fields, and the Sort by / Order selects render, each with a
+   "Remove" control whose accessible name is "Remove {filter}
+   filter"; removing a filter clears its values.
+
+**Run when:** `src/components/CatalogFiltersBar.tsx`, its
+stories, a catalog page's filter bar, or a changeset naming
+CatalogFiltersBar.
+
+---
+
+## CatalogHeader
+
+Open in `Components/CatalogHeader`: Default.
+
+1. The catalog title renders as the page heading above the
+   filter bar, with the header's top padding and the gap
+   between title and bar.
+
+**Run when:** `src/components/CatalogHeader.tsx`, its stories,
+a catalog page's list header, or a changeset naming
+CatalogHeader.
+
+---
+
+## List states (ListLoadingState, ListErrorState, ListLoadingFooter)
+
+Open in `Components/ListLoadingState`: Default. Open in
+`Components/ListErrorState`: Default. Open in
+`Components/ListLoadingFooter`: Default.
+
+1. ListLoadingState: a centered spinner (accessible label
+   "Loading") dropped below where the list header would sit.
+2. ListErrorState: the error message in an error alert at the
+   same offset.
+3. ListLoadingFooter: a centered spinner in a padded band, as
+   the list's loading-more footer renders it.
+
+**Run when:** `src/components/ListLoadingState.tsx`,
+`ListErrorState.tsx`, `ListLoadingFooter.tsx`, their stories, a
+catalog page's list states, or a changeset naming any of them.
+
+---
+
 ## MealPlansPage & MealPlanDetailPage
 
 Open in `Pages/Eciperay/MealPlansPage`: Default, Empty, Loading,

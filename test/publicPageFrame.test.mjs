@@ -36,6 +36,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "..", "src", "pages");
+const componentsDir = join(here, "..", "src", "components");
 const frameSource = readFileSync(join(pagesDir, "PublicPageFrame.tsx"), "utf8");
 const frameStories = readFileSync(join(pagesDir, "PublicPageFrame.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
@@ -44,7 +45,23 @@ const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 // cannot pass the scan.
 const strip = (text) =>
   text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const frameCode = strip(frameSource);
+// The frame's internals moved into shared components in the #119
+// de-styling tranche — PublicFrameLayout owns the shell and the
+// column, PublicFrameHeader / PublicFrameFooter own the bands,
+// BrandLink owns the wordmark — so the frame's source for these
+// scans is the page plus the components it composes. The page
+// itself keeps the contract: the intent callbacks and the
+// DS-owned copy constants.
+const frameCode = strip(
+  [
+    frameSource,
+    readFileSync(join(componentsDir, "PublicFrameLayout.tsx"), "utf8"),
+    readFileSync(join(componentsDir, "PublicFrameHeader.tsx"), "utf8"),
+    readFileSync(join(componentsDir, "PublicFrameFooter.tsx"), "utf8"),
+    readFileSync(join(componentsDir, "BrandLink.tsx"), "utf8"),
+  ].join("\n"),
+);
+const pageCode = strip(frameSource);
 const frameStoriesCode = strip(frameStories);
 
 test("PublicPageFrame is exported from the pages subpath", () => {
@@ -54,7 +71,7 @@ test("PublicPageFrame is exported from the pages subpath", () => {
     /from "\.\/PublicPageFrame\.js"/,
     "the frame export must come from ./PublicPageFrame.js",
   );
-  assert.match(frameCode, /export function PublicPageFrame/);
+  assert.match(pageCode, /export function PublicPageFrame/);
 });
 
 test("the frame imports no app package and runs no data hooks", () => {
@@ -70,7 +87,7 @@ test("the frame imports no app package and runs no data hooks", () => {
 test("the frame owns the public chrome with intent callbacks and no scroll of its own", () => {
   for (const intent of ["onBrandPress", "onSignInPress", "onPrivacyPress", "onTermsPress"]) {
     assert.match(
-      frameCode,
+      pageCode,
       new RegExp(String.raw`${intent}: \(\) => void;`),
       `the frame's ${intent} intent is a plain callback out`,
     );
@@ -81,10 +98,13 @@ test("the frame owns the public chrome with intent callbacks and no scroll of it
     'FOOTER_NOTE = "Recipes shared on Eciperay may be viewed without an account."',
     'PRIVACY_LABEL = "Privacy Policy"',
     'TERMS_LABEL = "Terms of Service"',
-    "COLUMN_MAX_WIDTH = 768",
   ]) {
-    assert.ok(frameCode.includes(copy), `the frame must carry ${copy}`);
+    assert.ok(pageCode.includes(copy), `the frame must carry ${copy}`);
   }
+  assert.ok(
+    frameCode.includes("COLUMN_MAX_WIDTH = 768"),
+    "the frame must carry COLUMN_MAX_WIDTH = 768 (PublicFrameLayout owns the column)",
+  );
   assert.match(
     frameCode,
     /maxWidth=\{COLUMN_MAX_WIDTH\}/,

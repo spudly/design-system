@@ -1,8 +1,9 @@
-import { Anchor, XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { Card } from "../components/Card.js";
+import { CardGrid } from "../components/CardGrid.js";
+import { CtaLink } from "../components/CtaLink.js";
+import { CtaRow } from "../components/CtaRow.js";
+import { FeatureCard } from "../components/FeatureCard.js";
+import { Hero } from "../components/Hero.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Text } from "../components/Text.js";
 
 /**
  * LandingPage (#171, B7/C11): the signed-out marketing landing —
@@ -29,6 +30,12 @@ import { Text } from "../components/Text.js";
  * #171, against the array lean): the page's structure is fixed,
  * and adding a fourth feature later is a deliberate contract
  * change, not a longer array from the host.
+ *
+ * The page composes components and passes data only (#119): the
+ * hero is Hero, the CTAs are CtaLinks in a CtaRow, and the
+ * feature slots are FeatureCards in a CardGrid — each component
+ * owns its treatment; the page keeps the structure and the
+ * content contract.
  */
 
 export type LandingPageCta = {
@@ -52,43 +59,6 @@ export type LandingPageProps = {
   featureThree: LandingPageFeature;
 };
 
-/**
- * One hero CTA: a real anchor wearing the Button variants'
- * styling (primary = filled brand, secondary = muted fill), so
- * the landing's links read as the same calls to action the
- * app's buttons do while keeping native link semantics — an
- * `href` and the link role on web (crawlable, open-in-new-tab);
- * on native the anchor opens the URL.
- */
-function LandingCta({ cta, variant }: { cta: LandingPageCta; variant: "primary" | "secondary" }) {
-  return (
-    <Anchor
-      href={cta.href}
-      backgroundColor={variant === "primary" ? "$primary" : tokens.colors.gray.gray3}
-      color={variant === "primary" ? "$onPrimary" : tokens.colors.gray.gray10}
-      fontSize={tokens.typography.fontSize.md}
-      fontWeight={tokens.typography.fontWeight.semibold}
-      paddingHorizontal={tokens.spacing[4]}
-      paddingVertical={tokens.spacing[3]}
-      borderRadius={tokens.radii.md}
-      textAlign="center"
-      textDecorationLine="none"
-    >
-      {cta.label}
-    </Anchor>
-  );
-}
-
-/** One fixed feature slot: a uniform card — title + one line. */
-function LandingFeatureCard({ feature }: { feature: LandingPageFeature }) {
-  return (
-    <Card flex={1} flexBasis={260} gap="$2">
-      <Text variant="subheading">{feature.title}</Text>
-      <Text color="$textMuted">{feature.description}</Text>
-    </Card>
-  );
-}
-
 export function LandingPage({
   heroTitle,
   heroSubtitle,
@@ -101,33 +71,17 @@ export function LandingPage({
 }: LandingPageProps) {
   return (
     <ScreenContainer>
-      <YStack alignItems="center" gap="$3" paddingTop="$6">
-        <Text variant="heading" textAlign="center">
-          {heroTitle}
-        </Text>
-        <Text color="$textMuted" textAlign="center">
-          {heroSubtitle}
-        </Text>
-      </YStack>
-      {/* CTA layout (#171 contract): stacked narrow, a row on
-          wide. The DS Tamagui config defines no width
-          breakpoints — the contract's narrow rendering is the
-          native one (the RN storybook / Android VR capture) and
-          its wide rendering is web — so the row is a flat `web:`
-          clause on a column stack, the ScreenContainer idiom. A
-          wrapping row could seat two CTAs side by side at the
-          430px story viewport, which is not the contracted
-          stack. */}
-      <YStack flexDirection="web:row" gap="$3" alignItems="center" justifyContent="center">
-        <LandingCta cta={discoverCta} variant="primary" />
-        <LandingCta cta={signUpCta} variant="secondary" />
-        <LandingCta cta={getAppCta} variant="secondary" />
-      </YStack>
-      <XStack flexWrap="wrap" gap="$3">
-        <LandingFeatureCard feature={featureOne} />
-        <LandingFeatureCard feature={featureTwo} />
-        <LandingFeatureCard feature={featureThree} />
-      </XStack>
+      <Hero title={heroTitle} subtitle={heroSubtitle} />
+      <CtaRow>
+        <CtaLink cta={discoverCta} variant="primary" />
+        <CtaLink cta={signUpCta} variant="secondary" />
+        <CtaLink cta={getAppCta} variant="secondary" />
+      </CtaRow>
+      <CardGrid>
+        <FeatureCard feature={featureOne} />
+        <FeatureCard feature={featureTwo} />
+        <FeatureCard feature={featureThree} />
+      </CardGrid>
     </ScreenContainer>
   );
 }

@@ -55,6 +55,18 @@ function readCode(path) {
 
 const page = readCode(join(pagesDir, "DiscoverPage.tsx"));
 const pageStories = readCode(join(pagesDir, "DiscoverPage.stories.tsx"));
+// The page's internals moved into shared components in the #119
+// de-styling tranche: the filter bar is CatalogFiltersBar, the
+// list header is CatalogHeader, and the list's loading/error
+// states are ListLoadingState / ListErrorState. The scans below
+// follow the code — the bar's decisions pin against the bar, the
+// heading against the header, the states against the state
+// components — while the page-level pins (contract, pagination
+// wiring, composition) stay on the page.
+const bar = readCode(join(componentsDir, "CatalogFiltersBar.tsx"));
+const catalogHeader = readCode(join(componentsDir, "CatalogHeader.tsx"));
+const loadingState = readCode(join(componentsDir, "ListLoadingState.tsx"));
+const errorState = readCode(join(componentsDir, "ListErrorState.tsx"));
 const card = readCode(join(componentsDir, "DiscoveryCard.tsx"));
 const cardStories = readCode(join(componentsDir, "DiscoveryCard.stories.tsx"));
 const pagesBarrel = readCode(join(pagesDir, "index.ts"));
@@ -67,15 +79,29 @@ test("the page contract carries copy in and the error state (decision 3)", () =>
   assert.match(page, /errorMessage: string \| null;/);
   assert.match(
     page,
-    /<Alert severity="error">\{errorMessage\}<\/Alert>/,
-    "errorMessage must render as an error alert",
+    /<ListErrorState message=\{errorMessage\} \/>/,
+    "the error state must carry errorMessage",
+  );
+  assert.match(
+    errorState,
+    /<Alert severity="error">\{message\}<\/Alert>/,
+    "the error state renders the message as an error alert",
   );
   assert.match(
     page,
     /<EmptyState title=\{emptyMessage\} \/>/,
     "the empty state must carry emptyMessage",
   );
-  assert.match(page, /<Spinner label="Loading" \/>/, "loading renders the spinner empty state");
+  assert.match(
+    page,
+    /<ListLoadingState label="Loading" \/>/,
+    "loading renders the spinner empty state",
+  );
+  assert.match(
+    loadingState,
+    /<Spinner label=\{label\} \/>/,
+    "the loading state renders the spinner",
+  );
 });
 
 test("card navigation is an href, never a press callback (decision 1)", () => {
@@ -106,21 +132,21 @@ test("the collapsed-filter contract props are declared (decision 2)", () => {
 
 test("search (with the page's own placeholder) and the Filters button are the initial render", () => {
   assert.match(
-    page,
+    bar,
     /placeholder=\{searchPlaceholder\}/,
     "the search field takes the placeholder prop",
   );
-  assert.match(page, /accessibilityLabel="Add a filter"/, "the Filters button must be named");
-  assert.match(page, />\s*Filters\s*<\/Button>/, "the button label is Filters");
-  const searchAt = page.indexOf("<SearchField");
-  const buttonAt = page.indexOf('accessibilityLabel="Add a filter"');
+  assert.match(bar, /accessibilityLabel="Add a filter"/, "the Filters button must be named");
+  assert.match(bar, />\s*Filters\s*<\/Button>/, "the button label is Filters");
+  const searchAt = bar.indexOf("<SearchField");
+  const buttonAt = bar.indexOf('accessibilityLabel="Add a filter"');
   assert.ok(searchAt !== -1 && buttonAt > searchAt, "search renders before the Filters button");
 });
 
 test("each filter control renders only when its filter is added", () => {
   for (const id of ["status", "ingredient", "calories", "satiety", "sort"]) {
     assert.match(
-      page,
+      bar,
       new RegExp(String.raw`active\.includes\("${id}"\)`),
       `the ${id} control must be gated on active.includes("${id}")`,
     );
@@ -128,22 +154,31 @@ test("each filter control renders only when its filter is added", () => {
 });
 
 test("the chooser offers exactly the filters not yet added, and adding closes it", () => {
-  assert.match(page, /const addable = available\.filter\(\(id\) => !active\.includes\(id\)\);/);
-  assert.match(page, /accessibilityLabel=\{`Add \$\{FILTER_LABELS\[id\]\} filter`\}/);
-  assert.match(page, /setActive\(\[\.\.\.active, id\]\);\s*setChooserOpen\(false\);/);
+  assert.match(bar, /const addable = available\.filter\(\(id\) => !active\.includes\(id\)\);/);
+  assert.match(bar, /accessibilityLabel=\{`Add \$\{FILTER_LABELS\[id\]\} filter`\}/);
+  assert.match(bar, /setActive\(\[\.\.\.active, id\]\);\s*setChooserOpen\(false\);/);
 });
 
 test("removing a filter clears its values through the change callbacks", () => {
-  assert.match(page, /if \(id === "status"\) onStatusFilterChange\?\.\("all"\);/);
-  assert.match(page, /if \(id === "ingredient"\) onIngredientChange\(""\);/);
-  assert.match(page, /onMinCaloriesChange\(""\);\s*onMaxCaloriesChange\(""\);/);
-  assert.match(page, /onMinSatietyChange\(""\);\s*onMaxSatietyChange\(""\);/);
-  assert.match(page, /onSortChange\("newest"\);\s*onSortDirChange\("desc"\);/);
-  assert.match(page, /accessibilityLabel=\{`Remove \$\{FILTER_LABELS\[id\]\} filter`\}/);
+  assert.match(bar, /if \(id === "status"\) onStatusFilterChange\?\.\("all"\);/);
+  assert.match(bar, /if \(id === "ingredient"\) onIngredientChange\(""\);/);
+  assert.match(bar, /onMinCaloriesChange\(""\);\s*onMaxCaloriesChange\(""\);/);
+  assert.match(bar, /onMinSatietyChange\(""\);\s*onMaxSatietyChange\(""\);/);
+  assert.match(bar, /onSortChange\("newest"\);\s*onSortDirChange\("desc"\);/);
+  assert.match(bar, /accessibilityLabel=\{`Remove \$\{FILTER_LABELS\[id\]\} filter`\}/);
 });
 
 test("the title renders as the page heading and pagination rides the shared catalog pattern", () => {
-  assert.match(page, /<Text variant="heading">\{title\}<\/Text>/);
+  assert.match(
+    catalogHeader,
+    /<Text variant="heading">\{title\}<\/Text>/,
+    "the list header renders the title as the heading",
+  );
+  assert.match(
+    page,
+    /<CatalogHeader title=\{title\}>/,
+    "the page renders its title through the list header",
+  );
   // Pagination is the shared catalog pattern (#285): the page
   // wires useCatalogPagination — the same hook RecipesPage
   // uses — with this page's mount gate (first load + error
@@ -166,7 +201,7 @@ test("the title renders as the page heading and pagination rides the shared cata
   );
   assert.match(
     page,
-    /isFetchingNextPage \? \(/,
+    /isFetchingNextPage \? <ListLoadingFooter label="Loading" \/>/,
     "the loading-more footer keys off isFetchingNextPage",
   );
 });

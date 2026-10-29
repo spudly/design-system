@@ -55,6 +55,19 @@ const page = readCode("src/pages/LandingPage.tsx");
 const stories = readCode("src/pages/LandingPage.stories.tsx");
 const pagesIndex = readCode("src/pages/index.ts");
 const fixtures = readCode("src/pages/fixtures.ts");
+// The page's sections moved into shared components in the #119
+// de-styling tranche: the hero is Hero, the CTAs are CtaLinks in
+// a CtaRow, and the feature slots are FeatureCards in a CardGrid.
+// The scans below follow the code — the anchor, the web: row, the
+// heading variants pin against the components that render them —
+// while the contract pins (types, slots, section order, exports)
+// stay on the page.
+const hero = readCode("src/components/Hero.tsx");
+const ctaLink = readCode("src/components/CtaLink.tsx");
+const ctaRow = readCode("src/components/CtaRow.tsx");
+const featureCard = readCode("src/components/FeatureCard.tsx");
+const cardGrid = readCode("src/components/CardGrid.tsx");
+const landingUnit = [page, hero, ctaLink, ctaRow, featureCard, cardGrid].join("\n");
 
 test("LandingPage source is readable and exports the page and its view-model types", () => {
   assert.ok(page.length > 1000, "expected the full LandingPage source");
@@ -103,9 +116,9 @@ test("the CTAs cross as {label, href} data — no CTA press callbacks", () => {
 
 test("the CTAs render through an anchor fed by the CTA's href", () => {
   assert.match(
-    page,
+    ctaLink,
     /<Anchor\s+href=\{cta\.href\}/,
-    "the CTA helper must render an Anchor with href={cta.href}",
+    "the CTA link must render an Anchor with href={cta.href}",
   );
   // The three CTAs render in contract order: Discover (primary),
   // Sign up (secondary), Get the app (secondary).
@@ -127,15 +140,17 @@ test("the CTAs render through an anchor fed by the CTA's href", () => {
 
 test("the CTA container stacks narrow and rows on web — no wrapping CTA row", () => {
   assert.match(
-    page,
+    ctaRow,
     /flexDirection="web:row"/,
-    "the CTA container must become a row only on web — the #171 contract is stacked narrow / row on wide, and its narrow rendering is the native one while wide is web (the DS config defines no width breakpoints)",
+    "the CTA row must become a row only on web — the #171 contract is stacked narrow / row on wide, and its narrow rendering is the native one while wide is web (the DS config defines no width breakpoints)",
   );
+  assert.ok(!ctaRow.includes("flexWrap"), "the CTA row must not wrap");
   assert.equal(
-    page.split("flexWrap").length - 1,
+    landingUnit.split("flexWrap").length - 1,
     1,
     "only the feature grid may flexWrap — a wrapping CTA row could seat two CTAs side by side at the 430px story viewport instead of the contracted stack",
   );
+  assert.match(cardGrid, /flexWrap="wrap"/, "the one flexWrap is the feature grid's");
 });
 
 test("frame structure: ScreenContainer shell, sections in hero → CTAs → features order", () => {
@@ -153,12 +168,17 @@ test("frame structure: ScreenContainer shell, sections in hero → CTAs → feat
     "sections must render hero, then CTAs, then features",
   );
   assert.equal(
-    page.split('variant="heading"').length - 1,
+    landingUnit.split('variant="heading"').length - 1,
     1,
     "the hero title must be the page's only heading-variant (level-1) Text",
   );
   assert.match(
-    page,
+    hero,
+    /<Text variant="heading" textAlign="center">/,
+    "the hero renders the heading-variant (level-1) title",
+  );
+  assert.match(
+    featureCard,
     /<Text variant="subheading">\{feature\.title\}<\/Text>/,
     "feature titles render with the subheading (level-2) variant",
   );
