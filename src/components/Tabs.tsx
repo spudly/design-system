@@ -62,6 +62,11 @@ const StyledLinkTab = styled(Anchor, {
   // body's size, with the active state carrying the same $link +
   // semibold treatment the button variant's selected label uses.
   fontSize: tokens.typography.fontSize.md,
+  // A web anchor carries the UA link underline; the button
+  // variant's tab labels have none, and the variants are
+  // contracted to look identical (manual Storybook QA finding on
+  // PR #283).
+  textDecorationLine: "none",
 
   variants: {
     active: {

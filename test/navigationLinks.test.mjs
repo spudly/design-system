@@ -92,6 +92,20 @@ test("Button: the link frame is a web flex frame, like BackLink's (#248)", () =>
   assert.match(button, /justifyContent: "web:center",/);
 });
 
+test("href anchors suppress the UA link underline the button forms never had (#248)", () => {
+  // A web <a> is underlined by the UA stylesheet unless the styled
+  // anchor resets it; the button/tab/back callback forms render
+  // non-anchor elements and carry no underline, and the forms are
+  // contracted to look identical — the manual Storybook QA pass on
+  // PR #283 caught every href form's label underlined. TextLink is
+  // deliberately NOT in this set: its underline is its design (a
+  // prose link, pinned in its shared frame config).
+  assert.match(button, /textDecorationLine: "none",/);
+  assert.match(backLink, /textDecorationLine: "none",/);
+  assert.match(tabs, /textDecorationLine: "none",/);
+  assert.match(textLink, /textDecorationLine: "underline",/);
+});
+
 test("Button: href is destructured by the wrapper and withheld while disabled (#248)", () => {
   assert.match(button, /const isLink = href !== undefined;/);
   assert.match(button, /accessibilityRole: accessibilityRole \?\? \(isLink \? "link" : "button"\)/);

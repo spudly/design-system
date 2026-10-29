@@ -78,6 +78,10 @@ function BackArrow() {
 const StyledBackAnchor = styled(Anchor, {
   name: "BackLinkAnchor",
 
+  // A web anchor carries the UA link underline; the callback
+  // form's row has none, and the two forms are contracted to look
+  // identical (manual Storybook QA finding on PR #283).
+  textDecorationLine: "none",
   display: "web:flex",
   alignItems: "center",
   alignSelf: "flex-start",

@@ -112,6 +112,11 @@ const StyledLinkButton = styled(Anchor, {
   alignItems: "web:center",
   justifyContent: "web:center",
   textAlign: "center",
+  // A web anchor carries the UA link underline; the button form
+  // has none, and the two forms are contracted to look identical
+  // (manual Storybook QA finding on PR #283 — every href form's
+  // label rendered underlined, no button counterpart was).
+  textDecorationLine: "none",
 });
 
 type StyledButtonProps = GetProps<typeof StyledButton>;
