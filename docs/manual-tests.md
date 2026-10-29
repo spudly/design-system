@@ -403,14 +403,17 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
 3. NotFound shows the card "Recipe not found" / "This recipe may
    be private or no longer available."; Unavailable shows "Recipe
    unavailable" / "This recipe link is invalid or has expired."
-4. Ingredients: tapping the "Heavy cream" row in the Ingredients
-   story dims it and shows the substitutions panel below the
-   list; the servings stepper and scale chips fit the story
-   width without wrapping the Scale row.
+4. Ingredients: the Ingredients story opens with the "Heavy
+   cream" row already marked missing — the row is dimmed and the
+   substitutions panel shows below the list. Tapping the row
+   clears the missing mark (the dim and the panel disappear);
+   tapping it again restores them. The servings stepper and
+   scale chips fit the story width without wrapping the Scale
+   row.
 5. Open in `Pages/Eciperay/PublicPageFrame`: Default, Content,
-   Narrow. The header (Eciperay brand, Sign in) and footer (the
+   NarrowViewport. The header (Eciperay brand, Sign in) and footer (the
    without-an-account note, Privacy Policy, Terms of Service)
-   frame the centered wide column; in Narrow the column fills the
+   frame the centered wide column; in NarrowViewport the column fills the
    phone width and the footer wraps without overlap.
 
 **Run when:** `src/pages/PublicRecipePage.tsx`,

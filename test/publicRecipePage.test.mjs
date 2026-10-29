@@ -35,7 +35,8 @@
  *    the wide (max-w-3xl) centered column, the footer note and
  *    legal links — with navigation leaving through intent
  *    callbacks only, and no scroll view of its own (the page
- *    inside owns the scroll).
+ *    inside owns the scroll). (Pinned in
+ *    test/publicPageFrame.test.mjs.)
  * 8. Optional content is omitted cleanly: no image, description,
  *    prep/cook stats, tags row, ratings card, or comments appear
  *    unless their data/callback is provided.
@@ -61,7 +62,6 @@ const pagesDir = join(here, "..", "src", "pages");
 const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
 const frameSource = readFileSync(join(pagesDir, "PublicPageFrame.tsx"), "utf8");
 const stories = readFileSync(join(pagesDir, "PublicRecipePage.stories.tsx"), "utf8");
-const frameStories = readFileSync(join(pagesDir, "PublicPageFrame.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -71,7 +71,6 @@ const strip = (text) =>
 const code = strip(source);
 const frameCode = strip(frameSource);
 const storiesCode = strip(stories);
-const frameStoriesCode = strip(frameStories);
 
 test("PublicRecipePage and PublicPageFrame are exported from the pages subpath", () => {
   assert.match(index, /PublicRecipePage,/, "index.ts must export PublicRecipePage");
@@ -197,7 +196,7 @@ test("the CTA bar switches on the auth-state variant with verbatim labels", () =
   for (const intent of ["onSignUpPress", "onClonePress", "onGetAppPress"]) {
     assert.match(
       code,
-      new RegExp(`${intent}: \\(\\) => void;`),
+      new RegExp(String.raw`${intent}: \(\) => void;`),
       `the ${intent} intent is a plain callback out`,
     );
   }
@@ -291,38 +290,6 @@ test("tags render through Badge's color form, not an inline pill (#211)", () => 
   assert.ok(!code.includes("{tag.color}22"), "the page must not re-implement the tag tint inline");
 });
 
-test("the frame owns the public chrome with intent callbacks and no scroll of its own", () => {
-  for (const intent of ["onBrandPress", "onSignInPress", "onPrivacyPress", "onTermsPress"]) {
-    assert.match(
-      frameCode,
-      new RegExp(`${intent}: \\(\\) => void;`),
-      `the frame's ${intent} intent is a plain callback out`,
-    );
-  }
-  for (const copy of [
-    'BRAND_LABEL = "Eciperay"',
-    'SIGN_IN_LABEL = "Sign in"',
-    'FOOTER_NOTE = "Recipes shared on Eciperay may be viewed without an account."',
-    'PRIVACY_LABEL = "Privacy Policy"',
-    'TERMS_LABEL = "Terms of Service"',
-    "COLUMN_MAX_WIDTH = 768",
-  ]) {
-    assert.ok(frameCode.includes(copy), `the frame must carry ${copy}`);
-  }
-  assert.match(
-    frameCode,
-    /maxWidth=\{COLUMN_MAX_WIDTH\}/,
-    "the header, column, and footer share the wide public column",
-  );
-  assert.ok(
-    !frameCode.includes("<ScrollView"),
-    "the frame must not scroll — the page inside owns its scroll",
-  );
-  assert.match(frameCode, /<TextLink[^>]*onPress=\{onSignInPress\}/, "Sign in is a link intent");
-  assert.match(frameCode, /<TextLink[^>]*onPress=\{onPrivacyPress\}/, "Privacy is a link intent");
-  assert.match(frameCode, /<TextLink[^>]*onPress=\{onTermsPress\}/, "Terms is a link intent");
-});
-
 test("no explicit lineHeight anywhere in the new files (#162)", () => {
   assert.ok(!code.includes("lineHeight"), "the page must not set lineHeight");
   assert.ok(!frameCode.includes("lineHeight"), "the frame must not set lineHeight");
@@ -362,17 +329,5 @@ test("stories exercise every union state and both CTA variants", () => {
     storiesCode,
     /renderComments: \(\) =>/,
     "a story must pass the comments slot with stand-in content",
-  );
-  for (const name of ["Default", "Content", "Narrow"]) {
-    assert.match(
-      frameStoriesCode,
-      new RegExp(`export const ${name}: Story`),
-      `PublicPageFrame.stories.tsx must export a ${name} story`,
-    );
-  }
-  assert.match(
-    frameStoriesCode,
-    /<PublicPageFrame \{\.\.\.frameProps\}>/,
-    "the frame stories render the real frame",
   );
 });

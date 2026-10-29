@@ -11,9 +11,12 @@ import { recipeDetailFixture } from "./fixtures.js";
  * public chrome (header, wide column, footer) the host wraps
  * around every public page state. The Default story composes the
  * frame around the real PublicRecipePage in its not-found state,
- * the composition the web host renders; Narrow pins the same
- * chrome at phone width, where the wide column simply fills the
- * viewport. Theme pinned to Warm Harvest, Eciperay's brand.
+ * the composition the web host renders; NarrowViewport pins the
+ * same chrome at phone width, where the wide column simply fills
+ * the viewport. Theme pinned to Warm Harvest, Eciperay's brand.
+ * (The story is not named "Narrow": its baseline file would end
+ * in "-narrow.png", the suffix the VR pipeline reserves for the
+ * narrow-viewport variant captures.)
  */
 const meta: Meta<typeof PublicPageFrame> = {
   title: "Pages/Eciperay/PublicPageFrame",
@@ -73,7 +76,7 @@ export const Content: Story = {
   ),
 };
 
-export const Narrow: Story = {
+export const NarrowViewport: Story = {
   render: () => (
     <Viewport width={430}>
       <PublicPageFrame {...frameProps}>
