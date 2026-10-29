@@ -1,52 +1,67 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { Button } from "./Button.js";
+import { CardRow } from "./CardRow.js";
 import { Column } from "./Column.js";
+import { DetailRow } from "./DetailRow.js";
+import { Spinner } from "./Spinner.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof Column> = {
   title: "Components/Column",
   component: Column,
   argTypes: {
-    spacing: { control: "select", options: ["none", "sm", "md", "lg", "xl", "2xl"] },
-    align: { control: "select", options: ["start", "center", "end", "stretch"] },
-    spaceBefore: { control: "select", options: ["none", "sm", "md", "lg", "xl", "2xl"] },
-    spaceAfter: { control: "select", options: ["none", "sm", "md", "lg", "xl", "2xl"] },
+    variant: { control: "select", options: ["sections", "group", "list", "state"] },
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof Column>;
 
-export const Stacked: Story = {
+export const Sections: Story = {
   render: (args) => (
-    <YStack maxWidth={360}>
-      <Column {...args} align="start">
-        <Button>Shopping list</Button>
-        <Button variant="secondary">Edit</Button>
-      </Column>
-    </YStack>
-  ),
-};
-
-export const Centered: Story = {
-  render: (args) => (
-    <YStack maxWidth={360}>
-      <Column {...args} align="center">
-        <Text variant="hint">Nothing here yet.</Text>
-        <Button size="sm">Add the first one</Button>
-      </Column>
-    </YStack>
-  ),
-};
-
-export const SpaceAfter: Story = {
-  render: (args) => (
-    <YStack maxWidth={360}>
-      <Column {...args} spaceAfter="lg">
+    <YStack maxWidth={430}>
+      <Column {...args} variant="sections">
         <Text variant="title">Weeknight favorites</Text>
+        <Text variant="hint">Oct 19 – Oct 25</Text>
+        <Text>
+          Every block in the stack is separated by the one sections gap — the page rhythm is
+          identical between blocks by construction.
+        </Text>
       </Column>
-      <Text>The next block sits one lg step (16px) below the title block.</Text>
+    </YStack>
+  ),
+};
+
+export const Group: Story = {
+  render: (args) => (
+    <YStack maxWidth={430}>
+      <Column {...args} variant="group">
+        <DetailRow label="Calories" value="850 / 2,000 · On track" />
+        <DetailRow label="Protein" value="62 / 120 g · Behind" />
+        <DetailRow label="Fiber" value="18 / 30 g · On track" />
+      </Column>
+    </YStack>
+  ),
+};
+
+export const List: Story = {
+  render: (args) => (
+    <YStack maxWidth={430}>
+      <Column {...args} variant="list">
+        <CardRow title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
+        <CardRow title="Sunday prep" subtitle="2 entries" onPress={() => {}} />
+      </Column>
+    </YStack>
+  ),
+};
+
+export const State: Story = {
+  render: (args) => (
+    <YStack maxWidth={430}>
+      <Column {...args} variant="state">
+        <Spinner label="Loading" />
+      </Column>
     </YStack>
   ),
 };

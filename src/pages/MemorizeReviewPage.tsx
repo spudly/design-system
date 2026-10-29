@@ -109,7 +109,7 @@ function ReviewVerseRow({
     <Card>
       <Text variant="subheading">{verse.reference}</Text>
       <Text variant="verse">{verse.text}</Text>
-      <Row spaceBefore="sm">
+      <Row variant="actions">
         <Button size="sm" onPress={onRememberedPress}>
           I remembered it
         </Button>

@@ -206,7 +206,7 @@ export function VerseSearchPage({
           search.
         </Alert>
       ) : null}
-      <Row align="center">
+      <Row variant="inline">
         <SearchField
           value={query}
           onChangeText={onQueryChange}

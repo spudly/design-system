@@ -2,109 +2,65 @@ import { YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
-/**
- * The layout scale steps Column shares with Row (#119): named
- * steps on the spacing scale — pages name a step, never a value.
- * The steps run none/sm/md/lg/xl/2xl = 0/8/12/16/24/32px (spacing
- * tokens 0/2/3/4/6/8). The tables are duplicated from Row's rather
- * than imported: each layout block stays self-contained, and the
- * two components' contract tests pin both to the same scale.
- */
-const spacingSteps = {
-  none: { gap: 0 },
-  sm: { gap: tokens.spacing[2] },
-  md: { gap: tokens.spacing[3] },
-  lg: { gap: tokens.spacing[4] },
-  xl: { gap: tokens.spacing[6] },
-  "2xl": { gap: tokens.spacing[8] },
-} as const;
-
-const spaceBeforeSteps = {
-  none: { marginTop: 0 },
-  sm: { marginTop: tokens.spacing[2] },
-  md: { marginTop: tokens.spacing[3] },
-  lg: { marginTop: tokens.spacing[4] },
-  xl: { marginTop: tokens.spacing[6] },
-  "2xl": { marginTop: tokens.spacing[8] },
-} as const;
-
-const spaceAfterSteps = {
-  none: { marginBottom: 0 },
-  sm: { marginBottom: tokens.spacing[2] },
-  md: { marginBottom: tokens.spacing[3] },
-  lg: { marginBottom: tokens.spacing[4] },
-  xl: { marginBottom: tokens.spacing[6] },
-  "2xl": { marginBottom: tokens.spacing[8] },
-} as const;
-
 const StyledColumn = styled(YStack, {
   name: "Column",
 
   variants: {
-    spacing: spacingSteps,
-    align: {
-      start: { alignItems: "flex-start" },
-      center: { alignItems: "center" },
-      end: { alignItems: "flex-end" },
-      stretch: { alignItems: "stretch" },
+    variant: {
+      // A page's section stack: the major blocks of a page in
+      // order (title, meta, sections, actions). The role's gap is
+      // the page rhythm — every section separation on the page is
+      // this one value, identical by construction.
+      sections: {
+        gap: tokens.spacing[8],
+        alignItems: "stretch",
+      },
+      // A content group inside a card: closely related rows and
+      // blocks (a card's label/value rows with their lead and
+      // follow-up lines) at the card-content rhythm.
+      group: {
+        gap: tokens.spacing[3],
+        alignItems: "stretch",
+      },
+      // A list stack: rows of one list, each row carrying its own
+      // internal padding, separated by the list rhythm.
+      list: {
+        gap: tokens.spacing[2],
+        alignItems: "stretch",
+      },
+      // A state block: a page state shown in place of content (a
+      // loading spinner, an empty notice), centered.
+      state: {
+        gap: tokens.spacing[2],
+        alignItems: "center",
+      },
     },
-    spaceBefore: spaceBeforeSteps,
-    spaceAfter: spaceAfterSteps,
   } as const,
-
-  defaultVariants: {
-    spacing: "sm",
-    align: "stretch",
-    spaceBefore: "none",
-    spaceAfter: "none",
-  },
 });
 
 type StyledColumnProps = GetProps<typeof StyledColumn>;
 
 export type ColumnProps = StyledColumnProps & {
-  /** Gap between the column's children, a step on the layout scale:
-   * `sm` (8px, the default), `md` (12px), `lg` (16px), `xl` (24px),
-   * `2xl` (32px), or `none`. */
-  spacing?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
-  /** Horizontal alignment of the column's children. Defaults to
-   * `stretch` — the bare stack's behavior, so composed blocks fill
-   * the column's width unless a page asks otherwise. */
-  align?: "start" | "center" | "end" | "stretch";
-  /** Space above the column, separating it from the content before
-   * it, on the layout scale. Defaults to `none`. */
-  spaceBefore?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
-  /** Space below the column, separating it from the content after
-   * it, on the layout scale. Defaults to `none`. */
-  spaceAfter?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
+  /** What the column IS — the role pins the column's gap and
+   * alignment inside the component, so every section stack,
+   * content group, list, and state block in the system is spaced
+   * identically: `sections` (a page's major blocks), `group`
+   * (related content inside a card), `list` (rows of one list),
+   * or `state` (a centered page-state block). */
+  variant: "sections" | "group" | "list" | "state";
 };
 
 /**
- * Vertical layout column with token-driven gaps (#119): the
- * vertical counterpart to Row — the layout wrapper pages compose
- * instead of rendering a Tamagui stack with styling props of their
- * own. All spacing is chosen through the semantic scale steps
- * (`spacing` / `spaceBefore` / `spaceAfter`, shared with Row) and
- * cross-axis alignment through `align` — pages name the intent,
- * this component owns the style values. The default alignment is
- * `stretch`, the bare stack's own behavior, so a block composed
- * in a Column fills its width exactly as it did in the stack the
- * Column replaces.
+ * Vertical layout column (#119): Row's vertical counterpart —
+ * the layout wrapper pages compose instead of rendering a
+ * Tamagui stack with styling props of their own. A Column takes
+ * ONE semantic prop — its `variant`, the role the column plays —
+ * and the role owns every style value (gap and alignment).
+ * Call sites never pass spacing, and there are no per-block
+ * margin props: separation between blocks is the parent stack's
+ * role gap, so blocks wrapped in margin columns are not a shape
+ * this API offers.
  */
-export function Column({
-  spacing = "sm",
-  align = "stretch",
-  spaceBefore = "none",
-  spaceAfter = "none",
-  ...rest
-}: ColumnProps) {
-  return (
-    <StyledColumn
-      spacing={spacing}
-      align={align}
-      spaceBefore={spaceBefore}
-      spaceAfter={spaceAfter}
-      {...rest}
-    />
-  );
+export function Column({ variant, ...rest }: ColumnProps) {
+  return <StyledColumn variant={variant} {...rest} />;
 }

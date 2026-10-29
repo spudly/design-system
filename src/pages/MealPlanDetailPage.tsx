@@ -111,7 +111,10 @@ import { TextLink } from "../components/TextLink.js";
  * disabled flag as content), the goal rows are DetailRow widgets,
  * the plan title takes Text's
  * `title` variant, the meta lines take its `hint` variant, and
- * the section spacing rides Column/Row scale steps.
+ * the page's blocks are children of one `sections` Column whose
+ * role gap owns every section separation (the goals card's
+ * content groups in a `group` Column; the action bar is an
+ * `actions` Row).
  */
 
 /** One entry row's view-model. The app formats `subtitle` (its
@@ -237,73 +240,55 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
 
   return (
     <ScreenContainer>
-      <Column spaceAfter="lg">
+      <Column variant="sections">
         <Text variant="title">{title}</Text>
-      </Column>
-      {notes ? (
-        <Column spaceAfter="lg">
-          <Text variant="hint">{notes}</Text>
-        </Column>
-      ) : null}
-      {dateRangeLabel ? (
-        <Column spaceAfter="lg">
-          <Text variant="hint">{dateRangeLabel}</Text>
-        </Column>
-      ) : null}
-      {nutritionLabel ? (
-        <Column spaceAfter="lg">
-          <Text variant="hint">{nutritionLabel}</Text>
-        </Column>
-      ) : null}
-      {showGoals ? (
-        <Column spaceAfter="2xl">
+        {notes ? <Text variant="hint">{notes}</Text> : null}
+        {dateRangeLabel ? <Text variant="hint">{dateRangeLabel}</Text> : null}
+        {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
+        {showGoals ? (
           <SectionCard title="Nutrition goals">
-            {nutritionLabel ? (
-              <Column spaceAfter="md">
-                <Text variant="hint">Plan total: {nutritionLabel}</Text>
-              </Column>
-            ) : null}
-            {nutritionGoals ? (
-              nutritionGoals.rows.map((row) => (
-                <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
-              ))
-            ) : (
-              <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
-            )}
-            {onSetGoalsPress ? (
-              <Column spaceBefore="md">
+            <Column variant="group">
+              {nutritionLabel ? <Text variant="hint">Plan total: {nutritionLabel}</Text> : null}
+              {nutritionGoals ? (
+                nutritionGoals.rows.map((row) => (
+                  <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
+                ))
+              ) : (
+                <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
+              )}
+              {onSetGoalsPress ? (
                 <TextLink onPress={onSetGoalsPress}>Set nutrition goals</TextLink>
-              </Column>
-            ) : null}
+              ) : null}
+            </Column>
           </SectionCard>
-        </Column>
-      ) : null}
-      <Row spacing="md" spaceAfter="xl" wrap>
-        <Button onPress={onShoppingListPress}>Shopping list</Button>
-        <Button variant="secondary" onPress={onEditPress}>
-          Edit
-        </Button>
-      </Row>
-      <SectionCard title="Entries">
-        {entries.map((entry) => (
-          <ListRow
-            key={entry.id}
-            prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
-            title={entry.title}
-            {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
-            {...(entry.kind === "recipe" && entry.isUnavailable
-              ? { isDisabled: true, titleSuffix: " (unavailable)" }
-              : {})}
-            onPress={() => {
-              if (entry.kind === "meal") {
-                onMealPress(entry.targetId);
-              } else {
-                onRecipePress(entry.targetId);
-              }
-            }}
-          />
-        ))}
-      </SectionCard>
+        ) : null}
+        <Row variant="actions">
+          <Button onPress={onShoppingListPress}>Shopping list</Button>
+          <Button variant="secondary" onPress={onEditPress}>
+            Edit
+          </Button>
+        </Row>
+        <SectionCard title="Entries">
+          {entries.map((entry) => (
+            <ListRow
+              key={entry.id}
+              prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
+              title={entry.title}
+              {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
+              {...(entry.kind === "recipe" && entry.isUnavailable
+                ? { isDisabled: true, titleSuffix: " (unavailable)" }
+                : {})}
+              onPress={() => {
+                if (entry.kind === "meal") {
+                  onMealPress(entry.targetId);
+                } else {
+                  onRecipePress(entry.targetId);
+                }
+              }}
+            />
+          ))}
+        </SectionCard>
+      </Column>
     </ScreenContainer>
   );
 }

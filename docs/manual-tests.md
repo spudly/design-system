@@ -289,22 +289,22 @@ changeset naming PrevNextNav.
 
 ## Row
 
-Open in `Components/Row`: Actions, Centered, SpaceBefore.
+Open in `Components/Row`: Actions, Inline.
 
-1. Actions: the two small buttons sit side by side with an even 8px
-   gap and no space above the row.
-2. Centered: the search field fills the row's remaining width, the
-   Search button keeps its natural width, and field and button are
-   vertically centered on each other.
-3. SpaceBefore: the action row renders 8px below the verse text,
-   with the same 8px gap between its buttons.
-4. The spacing steps are the layout scale shared with Column:
-   `spacing` / `spaceBefore` / `spaceAfter` accept
-   none/sm/md/lg/xl/2xl = 0/8/12/16/24/32px — set the controls in
-   turn and confirm each step widens/narrows the gap or the space
-   around the row by the matching amount, and that `wrap` lets the
-   buttons flow onto a second line at a narrow width instead of
-   overflowing (MealPlanDetailPage's action row is the live case).
+A Row takes one semantic prop — its `variant`, the role it
+plays — and the role pins the gap, alignment, and wrapping; there
+are no spacing props to pass.
+
+1. Actions (the `actions` role): the button row follows the text
+   at the role's standard 8px separation, the two buttons sit
+   12px apart, and at a narrow width the second button wraps onto
+   the next line instead of overflowing (MealPlanDetailPage's
+   Shopping list / Edit row and the Memorize card footers are the
+   live cases).
+2. Inline (the `inline` role): the search field fills the row's
+   remaining width, the Search button keeps its natural width,
+   and field and button are vertically centered on each other
+   (VerseSearchPage's search row is the live case).
 
 **Run when:** `src/components/Row.tsx`, its stories,
 `src/components/SearchField.tsx` (the `grow` prop), the pages that
@@ -315,21 +315,26 @@ MealPlanDetailPage), or a changeset naming Row.
 
 ## Column
 
-Open in `Components/Column`: Stacked, Centered, SpaceAfter.
+Open in `Components/Column`: Sections, Group, List, State.
 
-1. Stacked (align="start"): the two buttons stack vertically with
-   an even 8px gap, left-aligned at their natural widths. With no
-   `align` passed the default is `stretch` — children fill the
-   column's width, the bare stack's behavior.
-2. Centered: the hint text and the small button are horizontally
-   centered in the column.
-3. SpaceAfter: the title block sits one lg step (16px) above the
-   following paragraph.
-4. The spacing steps are the layout scale shared with Row:
-   `spacing` / `spaceBefore` / `spaceAfter` accept
-   none/sm/md/lg/xl/2xl = 0/8/12/16/24/32px — set the controls in
-   turn and confirm each step changes the gap or the space around
-   the column by the matching amount.
+A Column takes one semantic prop — its `variant`, the role it
+plays — and the role pins the gap and alignment; there are no
+spacing or margin props to pass, and separation between blocks
+is the parent stack's role gap.
+
+1. Sections (the `sections` role): every block in the stack —
+   title, meta line, paragraph — is separated by the same 32px
+   gap, and children fill the column's width (MealPlanDetailPage's
+   page stack is the live case).
+2. Group (the `group` role): the three detail rows stack at the
+   12px card-content rhythm (MealPlanDetailPage's Nutrition goals
+   content is the live case).
+3. List (the `list` role): the two card rows stack with an 8px
+   gap between them, each keeping its own 12px bottom padding
+   (MealPlansPage's plan list is the live case).
+4. State (the `state` role): the spinner sits centered
+   horizontally in the column (MealPlansPage's loading block is
+   the live case).
 
 **Run when:** `src/components/Column.tsx`, its stories, the pages
 that compose Column (MealPlansPage, MealPlanDetailPage), or a

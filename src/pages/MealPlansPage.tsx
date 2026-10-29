@@ -128,13 +128,13 @@ export function MealPlansPage({
       </Text>
       {onCreatePlan ? <Button onPress={onCreatePlan}>New meal plan</Button> : null}
       {isLoading ? (
-        <Column spaceBefore="2xl" align="center">
+        <Column variant="state">
           <Spinner label="Loading" />
         </Column>
       ) : plans.length === 0 ? (
         <EmptyState title="No meal plans yet." />
       ) : (
-        <Column spacing="sm">
+        <Column variant="list">
           {plans.map((plan) => (
             <CardRow
               key={plan.id}

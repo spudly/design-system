@@ -110,7 +110,7 @@ function MyVerseRow({
       <Badge tone={item.status === "memorized" ? "success" : "info"}>{item.status}</Badge>
       <Text variant="verse">{item.text}</Text>
       {item.nextReviewLabel ? <Text variant="hint">{item.nextReviewLabel}</Text> : null}
-      <Row spaceBefore="sm">
+      <Row variant="actions">
         <Button size="sm" onPress={onDrillPress}>
           Drill
         </Button>

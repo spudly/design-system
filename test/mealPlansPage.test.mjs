@@ -177,16 +177,18 @@ test("the page carries no styling of its own (#119)", () => {
     "paddingBlockEnd",
     "alignSelf",
     "cursor=",
+    "spacing=",
+    "spaceBefore",
   ]) {
     assert.ok(
       !code.includes(banned),
       `MealPlansPage must not contain "${banned}" — layout and text treatments live in CardRow / Column / Text since the #119 tranche-2 fix`,
     );
   }
-  assert.match(code, /<Column spacing="sm">/, "the plan list must stack in a Column");
+  assert.match(code, /<Column variant="list">/, "the plan list must stack in a list Column");
   assert.match(
     code,
-    /<Column spaceBefore="2xl" align="center">/,
-    "the loading block must center its spinner in a Column",
+    /<Column variant="state">/,
+    "the loading block must render in a state Column (the role centers it)",
   );
 });

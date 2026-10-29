@@ -287,9 +287,22 @@ test("the page carries no styling of its own (#119)", () => {
     /<Text variant="title">\{title\}<\/Text>/,
     "the plan title must take the title variant",
   );
+});
+
+test("the page composes through the layout roles (#119)", () => {
   assert.match(
     code,
-    /<Row spacing="md" spaceAfter="xl" wrap>/,
-    "the action row must compose through Row with its wrap and spacing steps",
+    /<Column variant="sections">/,
+    "the page's blocks must be children of one sections Column, whose role gap owns every section separation",
+  );
+  assert.match(
+    code,
+    /<Column variant="group">/,
+    "the goals card's content must group in a group Column",
+  );
+  assert.match(
+    code,
+    /<Row variant="actions">/,
+    "the action bar must compose through the actions Row role",
   );
 });
