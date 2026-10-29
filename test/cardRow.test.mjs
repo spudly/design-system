@@ -79,6 +79,22 @@ test("CardRow keeps the elevated card and the div-button pressable pattern", () 
   assert.doesNotMatch(cardRowCode, /paddingBlockEnd/);
 });
 
+test("CardRow's keyboard activation ignores held-key repeats (#313)", () => {
+  assert.match(cardRowCode, /repeat\?: boolean/, "the key handler types the repeat flag");
+  assert.match(
+    cardRowCode,
+    /if \(!event\.repeat\) \{\s+onPress\?\.\(\);\s+\}/,
+    "only the first keydown of a held key presses",
+  );
+  // preventDefault still runs for repeat events, before the guard,
+  // so a held Space key does not scroll the page.
+  const handler = cardRowCode.slice(cardRowCode.indexOf("handleKeyDown"));
+  assert.ok(
+    handler.indexOf("event.preventDefault()") < handler.indexOf("!event.repeat"),
+    "preventDefault runs before the repeat guard",
+  );
+});
+
 test("CardRow's title takes the md semibold treatment and the subtitle the hint variant", () => {
   assert.match(
     cardRowCode,
