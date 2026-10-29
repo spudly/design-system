@@ -45,7 +45,7 @@ function messageIds(code, filename = "src/components/Example.tsx") {
   return linter.verify(code, spacingConfig, { filename }).map((message) => message.messageId);
 }
 
-test("the margin-prop set covers the full margin family but not padding/gap/offsets", () => {
+test("the margin-prop set covers the full margin family", () => {
   const marginNames = [
     "margin",
     "marginTop",
@@ -66,6 +66,9 @@ test("the margin-prop set covers the full margin family but not padding/gap/offs
   for (const name of marginNames) {
     assert.ok(marginProps.has(name), `${name} must count as a margin prop`);
   }
+});
+
+test("the margin-prop set excludes padding, gap, offsets and scroll margins", () => {
   const otherNames = [
     "padding",
     "paddingTop",
