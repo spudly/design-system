@@ -1,10 +1,8 @@
 import { useState } from "react";
-import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
-import { tokens } from "../tokens/index.js";
 
 /**
  * ImportTextPage (#126, B3c): the import-from-text step — the
@@ -22,6 +20,11 @@ import { tokens } from "../tokens/index.js";
  * `onSubmit(text)` the app view has today. The text crosses
  * only at submit, trimmed-check included: the button disables
  * on blank text, as in the app view.
+ *
+ * De-styled for #119: the page renders no layout primitives
+ * and sets no styling props. The title is Text's `formTitle`
+ * variant (the form-flow title treatment), and the section
+ * rhythm is FormScreenLayout's own.
  */
 
 export type ImportTextPageProps = {
@@ -35,11 +38,7 @@ export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextP
 
   return (
     <FormScreenLayout>
-      <YStack paddingBottom="$6">
-        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
-          Import from text
-        </Text>
-      </YStack>
+      <Text variant="formTitle">Import from text</Text>
       <Text variant="hint">Paste a recipe from Word, a web page, or any rich text source.</Text>
       <TextAreaField
         value={text}
@@ -47,11 +46,7 @@ export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextP
         placeholder="Paste your recipe here…"
         accessibilityLabel="Recipe text"
       />
-      {error ? (
-        <YStack paddingBottom="$4">
-          <Text variant="error">{error}</Text>
-        </YStack>
-      ) : null}
+      {error ? <Text variant="error">{error}</Text> : null}
       <Button
         variant="primary"
         disabled={!text.trim() || loading}

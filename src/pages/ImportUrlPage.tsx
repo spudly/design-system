@@ -1,5 +1,3 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { Text } from "../components/Text.js";
@@ -17,6 +15,11 @@ import { TextField } from "../components/TextField.js";
  * stays app-side, and the one presentation rule the app view
  * encodes — no import on a blank URL — is mirrored in the
  * submit's disabled state.
+ *
+ * De-styled for #119: the page renders no layout primitives
+ * and sets no styling props. The title is Text's `formTitle`
+ * variant (the form-flow title treatment), and the section
+ * rhythm is FormScreenLayout's own.
  */
 
 export type ImportUrlPageProps = {
@@ -45,11 +48,7 @@ export function ImportUrlPage({
 
   return (
     <FormScreenLayout>
-      <YStack paddingBottom="$6">
-        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
-          Import from URL
-        </Text>
-      </YStack>
+      <Text variant="formTitle">Import from URL</Text>
       <TextField
         value={url}
         onChangeText={onUrlChange}
@@ -57,11 +56,7 @@ export function ImportUrlPage({
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
-      {error ? (
-        <YStack paddingBottom="$4">
-          <Text variant="error">{error}</Text>
-        </YStack>
-      ) : null}
+      {error ? <Text variant="error">{error}</Text> : null}
       <Button
         variant="primary"
         disabled={!url.trim() || loading}

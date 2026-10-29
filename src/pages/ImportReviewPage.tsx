@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { Image } from "react-native";
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
+import { ButtonRow } from "../components/ButtonRow.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
+import { PreviewCard } from "../components/PreviewCard.js";
 import { Text } from "../components/Text.js";
+import { Thumbnail } from "../components/Thumbnail.js";
 
 /**
  * ImportReviewPage (#126, B3c): the import review step — the
@@ -21,6 +21,14 @@ import { Text } from "../components/Text.js";
  * The description's version label is host data and crosses as
  * a string; the accept/edit pending labels are presentation
  * of the host's mutation states, mirrored from the app view.
+ *
+ * De-styled for #119: the page renders no layout primitives
+ * and sets no styling props. The hero image is Thumbnail's
+ * `banner` presentation (the full-width 192px cover shape it
+ * was extracted from), the preview slot is framed by
+ * PreviewCard, the title is Text's `formTitle` variant, the
+ * actions sit in a ButtonRow, and the section rhythm is
+ * FormScreenLayout's own.
  */
 
 export type ImportReviewPageProps = {
@@ -58,54 +66,28 @@ export function ImportReviewPage({
 }: ImportReviewPageProps) {
   return (
     <FormScreenLayout>
-      <YStack paddingBottom="$6">
-        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
-          Review Import
-        </Text>
-      </YStack>
+      <Text variant="formTitle">Review Import</Text>
       <Text variant="hint">
         This is your imported recipe ({versionLabel}). Looks good, or make edits to create a draft
         version.
       </Text>
       {imageUrl ? (
-        <YStack paddingBottom={tokens.spacing[4]}>
-          <Image
-            source={{ uri: imageUrl }}
-            accessible={imageAlt ? true : undefined}
-            accessibilityLabel={imageAlt}
-            style={{
-              borderRadius: tokens.radii.lg,
-              height: 192,
-              width: "100%",
-            }}
-            resizeMode="cover"
-          />
-        </YStack>
+        <Thumbnail
+          variant="banner"
+          src={imageUrl}
+          {...(imageAlt ? { accessibilityLabel: imageAlt } : {})}
+        />
       ) : null}
-      <YStack paddingBottom="$6">
-        <YStack
-          borderRadius={tokens.radii.lg}
-          borderWidth={1}
-          borderColor={tokens.colors.gray.gray3}
-          backgroundColor="$surface"
-          padding="$4"
-        >
-          {preview}
-        </YStack>
-      </YStack>
-      {error ? (
-        <YStack paddingBottom="$4">
-          <Text variant="error">{error}</Text>
-        </YStack>
-      ) : null}
-      <XStack flexWrap="wrap" gap="$3">
+      <PreviewCard>{preview}</PreviewCard>
+      {error ? <Text variant="error">{error}</Text> : null}
+      <ButtonRow>
         <Button variant="primary" disabled={busy} onPress={onAccept}>
           {acceptPending ? "Saving…" : "Looks good"}
         </Button>
         <Button variant="secondary" disabled={busy} onPress={onStartEdits}>
           {editsPending ? "Creating draft…" : "Make edits"}
         </Button>
-      </XStack>
+      </ButtonRow>
     </FormScreenLayout>
   );
 }

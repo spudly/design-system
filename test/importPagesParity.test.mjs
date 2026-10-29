@@ -4,10 +4,13 @@
  *
  * 1. ImportReviewPage's hero image carries an accessible name:
  *    the optional `imageAlt` prop (hosts pass the recipe title)
- *    is applied as the RN Image's `accessibilityLabel` —
- *    react-native-web renders it as the image's `alt` text, and
- *    `Image` is a sanctioned translating target in the #237
- *    web-ARIA scan for exactly that reason.
+ *    is passed as Thumbnail's `accessibilityLabel` in its
+ *    `banner` presentation — Thumbnail routes a supplied name
+ *    through the accessibility translator (an accessibility
+ *    element named on both platforms) and renders an unnamed
+ *    image decorative; that mechanism is pinned in
+ *    thumbnail.test.mjs. (Before the #119 ai-import tranche
+ *    the page applied the name to a raw RN Image itself.)
  * 2. ImportTextPage's paste field carries the accessible name
  *    "Recipe text" (the retired web editor's name), not just a
  *    placeholder.
@@ -66,15 +69,26 @@ test("ImportReviewPage declares an optional imageAlt prop", () => {
 
 test("ImportReviewPage applies imageAlt as the hero image's accessible name", () => {
   const code = pageCode("ImportReviewPage");
+  // The hero renders through Thumbnail's banner presentation
+  // (the full-width 192px cover shape Thumbnail was extracted
+  // from this page's hand-styled Image), and the accessible
+  // name crosses only when the host supplied one — the
+  // conditional-spread idiom, since `imageAlt` is optional and
+  // the repo type-checks with exactOptionalPropertyTypes.
   assert.match(
     code,
-    /accessibilityLabel=\{imageAlt\}/,
-    "the Image must receive accessibilityLabel={imageAlt} (rendered as alt text on web)",
+    /<Thumbnail\s+variant="banner"\s+src=\{imageUrl\}/,
+    "the hero image must render through Thumbnail's banner presentation",
   );
   assert.match(
     code,
-    /accessible=\{imageAlt \? true : undefined\}/,
-    "the Image must be an accessibility element only when imageAlt is supplied (RN does not auto-mark a labeled Image accessible; a decorative image stays out of the tree)",
+    /\{\.\.\.\(imageAlt \? \{ accessibilityLabel: imageAlt \} : \{\}\)\}/,
+    "imageAlt must cross as Thumbnail's accessibilityLabel when supplied (Thumbnail makes a named image an accessibility element and keeps an unnamed one decorative — pinned in thumbnail.test.mjs)",
+  );
+  assert.doesNotMatch(
+    code,
+    /from "react-native"|<Image/,
+    "the page must not render a raw Image — the presentation lives in Thumbnail",
   );
 });
 

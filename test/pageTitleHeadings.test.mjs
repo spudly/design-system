@@ -9,10 +9,13 @@
  * The contract now:
  * 1. Each of the eight pages (AddRecipeMenuPage, FeedbackPage,
  *    MealDetailPage, MealPlanDetailPage, MealsHubPage, ProfilePage,
- *    ShoppingListPage, TagsPage) renders its title with
- *    `variant="heading"` (level 1 on web) — exactly once, so no page
- *    gains a second level-1 heading — and no `subheading` usage
- *    remains in those files (their only subheading was the title).
+ *    ShoppingListPage, TagsPage) renders its title as the page's
+ *    one level-1 heading — no page gains a second level-1
+ *    heading — and no `subheading` usage remains in those files
+ *    (their only subheading was the title). Six render it with
+ *    `variant="heading"`; MealPlanDetailPage and
+ *    AddRecipeMenuPage render it with `variant="title"` instead
+ *    (item 5).
  * 2. The title keeps its explicit `fontSize` xl / `fontWeight` bold
  *    overrides, so the visual rendering is unchanged (the `heading`
  *    variant's own defaults are 3xl/bold; the overrides pin xl/bold).
@@ -34,6 +37,8 @@
  *    which IS xl bold at heading level 1. Rendering and heading
  *    semantics are unchanged; the size/weight are owned by the
  *    variant (pinned against Text.tsx below) instead of the page.
+ *    AddRecipeMenuPage joined it in the #119 ai-import tranche,
+ *    on the same terms (its dedicated test below).
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -51,7 +56,6 @@ function readCode(rel) {
 }
 
 const TITLE_PAGES = [
-  "AddRecipeMenuPage",
   "FeedbackPage",
   "MealDetailPage",
   "MealsHubPage",
@@ -122,6 +126,25 @@ test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 
     text,
     /title: \{\s+fontSize: tokens\.typography\.fontSize\.xl,\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+\}/,
     "Text's title variant must carry the xl/bold treatment the page title rendered with",
+  );
+});
+
+test("AddRecipeMenuPage's title takes the title variant — xl bold at level 1 (#263, #119)", () => {
+  const code = readCode("src/pages/AddRecipeMenuPage.tsx");
+  assert.equal(
+    countOccurrences(code, 'variant="title"'),
+    1,
+    "AddRecipeMenuPage must render exactly one title-variant Text (its title)",
+  );
+  assert.equal(
+    countOccurrences(code, 'variant="heading"'),
+    0,
+    "AddRecipeMenuPage's title must not use the heading variant (its 3xl default is not the app's title size)",
+  );
+  assert.equal(
+    countOccurrences(code, 'variant="subheading"'),
+    0,
+    "AddRecipeMenuPage must not keep a subheading usage",
   );
 });
 

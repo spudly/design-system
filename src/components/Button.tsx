@@ -135,6 +135,15 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
 type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" | "href"> & {
   disabled?: boolean;
   /**
+   * Grow to fill the row's remaining space (the button form's
+   * share of a button row: a primary action beside a natural-width
+   * secondary, the form-submit pattern). A semantic layout-
+   * participation prop, not a styling prop: the page says the
+   * button grows, Button owns the `flex: 1` that does it (#119 —
+   * pages must not set `flex` themselves).
+   */
+  grow?: boolean;
+  /**
    * The icon slot: one of the design system's semantic icon
    * components from `@spudly/ui/icons` (PrintIcon, ShareIcon, …).
    * This is CONTENT, not styling — Button renders the glyph itself,
@@ -351,6 +360,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     disabled = false,
     variant = "primary",
     size = "md",
+    grow = false,
     icon: IconGlyph,
     children,
     color,
@@ -498,6 +508,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
       // Instance props on Button's own styled frame, not caller
       // styling; a caller-passed value in `rest` still wins.
       {...(IconGlyph ? { gap: tokens.spacing[2] } : null)}
+      {...(grow ? { flex: 1 } : null)}
       {...(iconOnly
         ? {
             width: iconOnlyBox,
