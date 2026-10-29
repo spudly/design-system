@@ -10,7 +10,7 @@ import { LegalDocumentPage } from "./LegalDocumentPage.js";
  * by fixture props. The two stories are the point of the page's
  * contract: the privacy policy and the terms of service are one
  * page parameterized by its content props, so each story passes a
- * different document (title, last-updated line, markdown) into the
+ * different document (title, last-updated line, sections) into the
  * same frame. The fixture copy is story prose in the real
  * documents' shape — the real legal text is app content.
  *

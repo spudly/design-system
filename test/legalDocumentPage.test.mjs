@@ -3,34 +3,29 @@
  *
  * LegalDocumentPage is the design-system legal document view: one
  * parameterized page serves both the privacy policy and the terms
- * of service. The contract Stephen resolved on the issue
- * (2026-10-28):
- * 1. Content model: the document crosses as ONE markdown string —
- *    Stephen superseded the structured section/block/span tree
- *    this page first shipped with the same day ("accept markdown
- *    instead of a complex json contract"). The supported subset is
- *    what the real documents use: `##` headings opening sections,
- *    blank-line-separated paragraphs, `-` bullet lists, and
- *    `**strong**` / `` `code` `` / `[label](href)` inline spans.
- *    The block/span view-model types are gone from the public API.
- * 2. Inline links: a markdown link renders as a real link (a web
- *    anchor with the href from the markdown, `mailto:` included),
- *    per the navigation rule. There is no press callback and no
- *    link-id indirection — the href in the markdown is where the
- *    link goes.
+ * of service, driven by structured content props. The contract
+ * Stephen resolved on the issue (2026-10-28):
+ * 1. Content model: structured blocks, not markdown or JSX — the
+ *    document crosses as section/block/span type aliases: sections
+ *    with titles, paragraph and bullet-list blocks, and text /
+ *    strong / code / link spans.
+ * 2. Inline links: a link span carries its href in the data and
+ *    renders as a real link (a web anchor with that href), per the
+ *    navigation rule. There is no press callback and no link-id
+ *    indirection — the href in the data is where the link goes.
  * 3. Frame: the page renders the full DS public frame, unified
  *    across the public surfaces — a header with the brand wordmark
  *    and a sign-in link, the document, and a footer carrying the
  *    host's legal links. The frame's links navigate, so they cross
  *    as hrefs with their labels, like the content links.
  * 4. The page title is the level-1 heading (#261/#263 semantics)
- *    and section headings are level 2; the last-updated line
- *    renders the host's pre-formatted date as "Last updated: …".
+ *    and section titles are level 2; the last-updated line renders
+ *    the host's pre-formatted date as "Last updated: …".
  *
  * Source scans pin the contract's shape; the SSR tests render the
- * built page from markdown and pin what a reader (and a screen
- * reader) actually gets: every markdown construct rendered, link
- * spans as anchors with their hrefs, and the footer present.
+ * built page and pin what a reader (and a screen reader) actually
+ * gets: every block type rendered, link spans as anchors with
+ * their hrefs, and the footer present.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -49,24 +44,28 @@ function readCode(rel) {
 
 const code = readCode("src/pages/LegalDocumentPage.tsx");
 
-test("content crosses as one markdown string — the structured tree is gone (#170)", () => {
+test("content crosses as structured section/block/span data (#170)", () => {
+  for (const spanType of ['"text"', '"strong"', '"code"', '"link"']) {
+    assert.ok(
+      code.includes(`type: ${spanType}`),
+      `LegalDocumentSpan must include the ${spanType} span`,
+    );
+  }
+  assert.match(code, /type: "link"; label: string; href: string/, "link spans carry label + href");
+  assert.match(code, /type: "paragraph"; spans: LegalDocumentSpan\[\]/, "paragraph block shape");
+  assert.match(code, /type: "list"; items: LegalDocumentSpan\[\]\[\]/, "list block shape");
+  assert.match(
+    code,
+    /LegalDocumentSection = \{\s*title: string;\s*blocks: LegalDocumentBlock\[\];/,
+    "section shape",
+  );
+  // No app JSX crosses the boundary: the props carry no ReactNode.
   const propsAt = code.indexOf("LegalDocumentPageProps = {");
   const propsBlock = code.slice(propsAt, code.indexOf("};", propsAt));
-  assert.match(propsBlock, /markdown: string/, "the document crosses as a markdown string");
-  assert.ok(!propsBlock.includes("sections"), "no sections prop — the markdown carries them");
-  // No app JSX crosses the boundary: the props carry no ReactNode.
   assert.ok(!propsBlock.includes("ReactNode"), "page props must not carry ReactNode");
-  // The block/span view-model types are no longer part of the page.
-  for (const removed of ["LegalDocumentSection", "LegalDocumentBlock", "LegalDocumentSpan"]) {
-    assert.ok(!code.includes(removed), `${removed} must be removed from the page module`);
-  }
-  // The page parses the markdown itself, with the subset's patterns.
-  assert.ok(code.includes("parseMarkdown"), "the page parses its markdown prop");
-  assert.ok(code.includes("parseInline"), "inline markdown spans are parsed");
-  assert.match(code, /#\{1,2\}/, "heading pattern covers the `#`/`##` section headings");
 });
 
-test("markdown links render as real anchors with the markdown's href — no press callback (#170)", () => {
+test("link spans render as real anchors with the data's href — no press callback (#170)", () => {
   assert.ok(!code.includes("onLinkPress"), "content links must not report through a callback");
   assert.ok(!code.includes("onPress"), "the page has no press intents at all — links carry hrefs");
   assert.match(code, /<Anchor\s+key=\{key\}\s+href=\{span\.href\}/, "link span renders an Anchor");
@@ -80,14 +79,17 @@ test("the full public frame renders: brand, sign-in, and footer links as hrefs (
   assert.match(code, /<Divider \/>/, "the footer is set off by the frame divider");
 });
 
-test("LegalDocumentPage is exported from the pages subpath without the removed types (#170)", () => {
+test("LegalDocumentPage is exported from the pages subpath with its view-model types (#170)", () => {
   const index = readCode("src/pages/index.ts");
   assert.match(index, /LegalDocumentPage,/, "page exported");
-  for (const typeName of ["LegalDocumentPageProps", "LegalDocumentLink"]) {
+  for (const typeName of [
+    "LegalDocumentPageProps",
+    "LegalDocumentSection",
+    "LegalDocumentBlock",
+    "LegalDocumentSpan",
+    "LegalDocumentLink",
+  ]) {
     assert.ok(index.includes(`type ${typeName}`), `${typeName} must be exported`);
-  }
-  for (const removed of ["LegalDocumentSection", "LegalDocumentBlock", "LegalDocumentSpan"]) {
-    assert.ok(!index.includes(removed), `${removed} must no longer be exported`);
   }
 });
 
@@ -145,20 +147,6 @@ function anchorHrefs(html) {
   return [...html.matchAll(/<a[^>]*href="([^"]+)"/g)].map((match) => match[1]);
 }
 
-const fixtureMarkdown = `This page explains what Eciperay collects and why.
-
-## Information we collect
-
-Eciperay collects the information you give us when you **create an account** and save recipes, including:
-
-- **Account details.** Your name and email address.
-- **Your content.** Recipes, meal plans, and notes you save.
-
-Private pages carry a \`noindex\` directive so search engines do not list them.
-
-Questions? Email us at [legal@example.com](mailto:legal@example.com) and we will reply.
-`;
-
 const fixtureProps = {
   title: "Privacy Policy",
   lastUpdated: "July 22, 2026",
@@ -170,10 +158,53 @@ const fixtureProps = {
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
   ],
-  markdown: fixtureMarkdown,
+  sections: [
+    {
+      title: "Information we collect",
+      blocks: [
+        {
+          type: "paragraph",
+          spans: [
+            { type: "text", text: "Eciperay collects the information you give us when you " },
+            { type: "strong", text: "create an account" },
+            { type: "text", text: " and save recipes, including:" },
+          ],
+        },
+        {
+          type: "list",
+          items: [
+            [
+              { type: "strong", text: "Account details." },
+              { type: "text", text: " Your name and email address." },
+            ],
+            [
+              { type: "strong", text: "Your content." },
+              { type: "text", text: " Recipes, meal plans, and notes you save." },
+            ],
+          ],
+        },
+        {
+          type: "paragraph",
+          spans: [
+            { type: "text", text: "Private pages carry a " },
+            { type: "code", text: "noindex" },
+            { type: "text", text: " directive so search engines do not list them." },
+          ],
+        },
+        {
+          type: "paragraph",
+          spans: [
+            { type: "text", text: "Questions? Email us at " },
+            { type: "link", label: "legal@example.com", href: "mailto:legal@example.com" },
+            { type: "text", text: " and we will reply." },
+          ],
+        },
+      ],
+    },
+  ],
 };
 
-test("SSR: the markdown renders every construct under a single level-1 title (#170)", async () => {
+test("SSR: the document renders every block type under a single level-1 title (#170)", async () => {
   const { React, LegalDocumentPage } = await loadRuntime();
   const html = await renderToHtml(React.createElement(LegalDocumentPage, fixtureProps));
 
@@ -186,21 +217,19 @@ test("SSR: the markdown renders every construct under a single level-1 title (#1
   assert.deepEqual(
     headings.filter((h) => h.level === 2).map((h) => h.text),
     ["Information we collect"],
-    "`##` headings render as level-2 section headings",
+    "section titles render as level-2 headings",
   );
 
   assert.ok(html.includes("Last updated: July 22, 2026"), "last-updated line renders");
-  // Lead content before the first heading renders as a paragraph.
-  assert.ok(html.includes("This page explains what Eciperay collects and why."), "lead paragraph");
-  // Paragraph: plain + strong spans in one flow.
+  // Paragraph block: plain + strong spans in one flow.
   assert.ok(
     html.includes("Eciperay collects the information you give us when you"),
     "paragraph text",
   );
-  assert.ok(html.includes("create an account"), "**strong** renders");
+  assert.ok(html.includes("create an account"), "strong span renders");
   // Code span.
-  assert.ok(html.includes("noindex"), "`code` renders");
-  // List: every item renders, bulleted.
+  assert.ok(html.includes("noindex"), "code span renders");
+  // List block: every item renders, bulleted.
   assert.ok(html.includes("Account details."), "list item strong lead-in renders");
   assert.ok(html.includes("Recipes, meal plans, and notes you save."), "list item text renders");
   assert.ok((html.match(/•/g) ?? []).length >= 2, "list items render with bullet markers");

@@ -11,29 +11,23 @@ import { tokens } from "../tokens/index.js";
  * privacy policy and the terms of service, driven entirely by its
  * content props.
  *
- * Content model (Stephen's decision, 2026-10-28, superseding the
- * structured section/block/span contract this page first shipped
- * with the same day): the document crosses as ONE markdown string.
- * No view-model tree and no app JSX crosses the boundary: the app
- * owns the words, the DS owns how markdown renders. The supported
- * subset is exactly what the two real documents use:
+ * Content model (Stephen's decision, 2026-10-28): the document
+ * crosses as structured view-model data — sections of paragraph and
+ * bullet-list blocks, each built from text / strong / code / link
+ * spans. No markdown string and no app JSX crosses the boundary:
+ * the DS owns how every block renders, the app owns the words. The
+ * span inventory covers everything the two real documents use today
+ * (paragraphs, bullet lists with strong lead-ins, one code span, and
+ * mailto links interpolated mid-sentence); the operator name and
+ * contact address are interpolated app-side while building the
+ * data, so no app constant enters the DS.
  *
- *   - `## ` (or `# `) at line start opens a section; its text is
- *     the section heading, rendered at heading level 2 — the page
- *     title stays the document's only level-1 heading. Content
- *     before the first heading renders without one.
- *   - Blank lines separate blocks; consecutive plain lines join
- *     into one paragraph.
- *   - Lines starting with `- ` (or `* `) form a bullet list.
- *   - Inline: `**strong**`, `` `code` ``, and `[label](href)`.
- *
- * Inline links (Stephen's decision, 2026-10-28): a markdown link
- * renders as a real link (a web anchor with the href from the
- * markdown, `mailto:` included) — the navigation rule applied to
- * prose. There is deliberately no press callback for content
- * links: the page never routes, opens mail clients, or maps link
- * ids; the href says where the link goes and the platform follows
- * it.
+ * Inline links (Stephen's decision, 2026-10-28): a link span
+ * carries its `href` in the data and renders as a real link (a web
+ * anchor with that href) — the navigation rule applied to prose.
+ * There is deliberately no press callback for content links: the
+ * page never routes, opens mail clients, or maps link ids; the
+ * href says where the link goes and the platform follows it.
  *
  * Frame (Stephen's decision, 2026-10-28 — unify now): the page
  * renders the full DS public frame, not a header-only variant: a
@@ -48,23 +42,19 @@ import { tokens } from "../tokens/index.js";
  * head/SEO, and the analytics consent banner.
  */
 
-/**
- * The parse tree for the supported markdown subset — internal to
- * this module. The markdown string is the contract; these shapes
- * never cross the page boundary.
- */
-type MarkdownSpan =
+export type LegalDocumentSpan =
   | { type: "text"; text: string }
   | { type: "strong"; text: string }
   | { type: "code"; text: string }
   | { type: "link"; label: string; href: string };
 
-type MarkdownBlock =
-  { type: "paragraph"; spans: MarkdownSpan[] } | { type: "list"; items: MarkdownSpan[][] };
+export type LegalDocumentBlock =
+  | { type: "paragraph"; spans: LegalDocumentSpan[] }
+  | { type: "list"; items: LegalDocumentSpan[][] };
 
-type MarkdownSection = {
-  title: string | null;
-  blocks: MarkdownBlock[];
+export type LegalDocumentSection = {
+  title: string;
+  blocks: LegalDocumentBlock[];
 };
 
 /** A frame link: the label renders, the href is where it goes. */
@@ -81,8 +71,7 @@ export type LegalDocumentPageProps = {
    * renders it as "Last updated: …".
    */
   lastUpdated: string;
-  /** The document body as one markdown string (subset above). */
-  markdown: string;
+  sections: LegalDocumentSection[];
   /** Brand wordmark in the frame header, linking to the host's home. */
   brandLabel: string;
   brandHref: string;
@@ -93,87 +82,7 @@ export type LegalDocumentPageProps = {
   footerLinks: LegalDocumentLink[];
 };
 
-const INLINE_PATTERN = /\*\*([^*]+)\*\*|`([^`]+)`|\[([^\]]+)\]\(([^)\s]+)\)/g;
-const HEADING_PATTERN = /^#{1,2}\s+(.*)$/;
-const LIST_ITEM_PATTERN = /^[-*]\s+(.*)$/;
-
-function parseInline(text: string): MarkdownSpan[] {
-  const spans: MarkdownSpan[] = [];
-  INLINE_PATTERN.lastIndex = 0;
-  let lastIndex = 0;
-  let match: RegExpExecArray | null;
-  while ((match = INLINE_PATTERN.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      spans.push({ type: "text", text: text.slice(lastIndex, match.index) });
-    }
-    if (match[1] !== undefined) {
-      spans.push({ type: "strong", text: match[1] });
-    } else if (match[2] !== undefined) {
-      spans.push({ type: "code", text: match[2] });
-    } else {
-      spans.push({ type: "link", label: match[3] ?? "", href: match[4] ?? "" });
-    }
-    lastIndex = match.index + match[0].length;
-  }
-  if (lastIndex < text.length) {
-    spans.push({ type: "text", text: text.slice(lastIndex) });
-  }
-  return spans;
-}
-
-function parseMarkdown(markdown: string): MarkdownSection[] {
-  const sections: MarkdownSection[] = [];
-  let section: MarkdownSection = { title: null, blocks: [] };
-  let paragraphLines: string[] = [];
-  let listItems: MarkdownSpan[][] | null = null;
-
-  const flushParagraph = () => {
-    if (paragraphLines.length > 0) {
-      section.blocks.push({ type: "paragraph", spans: parseInline(paragraphLines.join(" ")) });
-      paragraphLines = [];
-    }
-  };
-  const flushList = () => {
-    if (listItems !== null) {
-      section.blocks.push({ type: "list", items: listItems });
-      listItems = null;
-    }
-  };
-  const flushSection = () => {
-    flushParagraph();
-    flushList();
-    if (section.title !== null || section.blocks.length > 0) {
-      sections.push(section);
-    }
-  };
-
-  for (const rawLine of markdown.split("\n")) {
-    const line = rawLine.trim();
-    const heading = HEADING_PATTERN.exec(line);
-    if (heading) {
-      flushSection();
-      section = { title: (heading[1] ?? "").trim(), blocks: [] };
-      continue;
-    }
-    if (line === "") {
-      flushParagraph();
-      flushList();
-      continue;
-    }
-    const item = LIST_ITEM_PATTERN.exec(line);
-    if (item) {
-      flushParagraph();
-      (listItems ??= []).push(parseInline(item[1] ?? ""));
-      continue;
-    }
-    flushList();
-    paragraphLines.push(line);
-  }
-  flushSection();
-  return sections;
-}
-
-function renderSpan(span: MarkdownSpan, key: number): ReactNode {
+function renderSpan(span: LegalDocumentSpan, key: number): ReactNode {
   switch (span.type) {
     case "text":
       return span.text;
@@ -204,11 +113,11 @@ function renderSpan(span: MarkdownSpan, key: number): ReactNode {
   }
 }
 
-function renderSpans(spans: MarkdownSpan[]): ReactNode {
+function renderSpans(spans: LegalDocumentSpan[]): ReactNode {
   return spans.map((span, index) => renderSpan(span, index));
 }
 
-function MarkdownBlockView({ block }: { block: MarkdownBlock }) {
+function LegalDocumentBlockView({ block }: { block: LegalDocumentBlock }) {
   if (block.type === "paragraph") {
     return <Text>{renderSpans(block.spans)}</Text>;
   }
@@ -227,14 +136,13 @@ function MarkdownBlockView({ block }: { block: MarkdownBlock }) {
 export function LegalDocumentPage({
   title,
   lastUpdated,
-  markdown,
+  sections,
   brandLabel,
   brandHref,
   signInLabel,
   signInHref,
   footerLinks,
 }: LegalDocumentPageProps) {
-  const sections = parseMarkdown(markdown);
   return (
     <ScreenContainer>
       <XStack alignItems="center" justifyContent="space-between" gap="$4">
@@ -253,11 +161,11 @@ export function LegalDocumentPage({
         <Text variant="heading">{title}</Text>
         <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>
       </YStack>
-      {sections.map((section, sectionIndex) => (
-        <YStack key={section.title ?? sectionIndex} gap="$3">
-          {section.title ? <Text variant="subheading">{section.title}</Text> : null}
+      {sections.map((section) => (
+        <YStack key={section.title} gap="$3">
+          <Text variant="subheading">{section.title}</Text>
           {section.blocks.map((block, index) => (
-            <MarkdownBlockView key={index} block={block} />
+            <LegalDocumentBlockView key={index} block={block} />
           ))}
         </YStack>
       ))}
