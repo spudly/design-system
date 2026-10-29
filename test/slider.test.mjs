@@ -270,6 +270,25 @@ test("the thumb is marked accessible so iOS exposes it to VoiceOver", () => {
   assert.match(slider, /accessible: true/);
 });
 
+test("the thumb itself reports the disabled state", () => {
+  assert.match(slider, /accessibilityState: \{ disabled \}/);
+});
+
+test("SSR: a disabled slider's thumb carries aria-disabled", async () => {
+  const { React, Slider } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(Slider, {
+      label: "Volume",
+      disabled: true,
+      value: 40,
+      onValueChange: () => null,
+    }),
+  );
+  const thumb = html.match(/<[^>]*role="slider"[^>]*>/);
+  assert.ok(thumb, html);
+  assert.ok(thumb[0].includes('aria-disabled="true"'), thumb[0]);
+});
+
 test("on native the error text rides in the accessible name", () => {
   // The composition lives in the component source (SSR renders the web
   // platform only): "<name>: <error>" when both exist, the error alone

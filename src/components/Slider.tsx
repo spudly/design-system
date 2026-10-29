@@ -214,6 +214,10 @@ export function Slider({
               // strips the flag on web.
               accessible: true,
               accessibilityLabel: isWeb ? accessibleName : nativeAccessibleName,
+              // The primitive marks the root disabled, not the thumb — the
+              // state rides the helper so the focusable element itself
+              // reports it (aria-disabled on web, accessibilityState native).
+              accessibilityState: { disabled },
             })}
             {...nativeAdjustProps}
             aria-invalid={error ? true : undefined}
