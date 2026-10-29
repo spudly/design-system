@@ -71,18 +71,25 @@ export type MealDetailPageProps = {
 
 function MemberRow({ member }: { member: MealDetailPageMember }) {
   const isUnavailable = member.isUnavailable ?? false;
-  const rowContent = (
+  // `decorative` marks the visible texts non-accessible for the
+  // native link rendering, whose LinkOverlay carries the composed
+  // label as the row's one accessibility stop (see LinkOverlay).
+  const renderRowContent = (decorative: boolean) => (
     <>
       <Text
+        accessible={decorative ? false : undefined}
         fontSize={tokens.typography.fontSize.md}
         fontWeight={tokens.typography.fontWeight.medium}
       >
         {member.title}
         {isUnavailable ? " (unavailable)" : ""}
       </Text>
-      <Text variant="hint">{member.subtitle}</Text>
+      <Text variant="hint" accessible={decorative ? false : undefined}>
+        {member.subtitle}
+      </Text>
     </>
   );
+  const rowContent = renderRowContent(false);
   return (
     <YStack borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2}>
       {isUnavailable ? (
@@ -117,12 +124,12 @@ function MemberRow({ member }: { member: MealDetailPageMember }) {
         // carrying the href; the overlay's label composes the
         // title and subtitle the way RecipesPage's row labels do.
         <YStack paddingVertical="$3" position="relative">
+          {renderRowContent(true)}
           <LinkOverlay
             href={member.href}
             accessibilityRole="link"
             accessibilityLabel={`${member.title}, ${member.subtitle}`}
           />
-          {rowContent}
         </YStack>
       )}
     </YStack>

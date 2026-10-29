@@ -114,17 +114,26 @@ function MealPlanRow({
   item: MealPlansPageItem;
   onDeletePress?: () => void;
 }) {
-  const textContent = (
+  // `decorative` marks the visible texts non-accessible for the
+  // native link rendering, whose LinkOverlay carries the composed
+  // label as the row's one accessibility stop (see LinkOverlay).
+  const renderTextContent = (decorative: boolean) => (
     <>
       <Text
+        accessible={decorative ? false : undefined}
         fontSize={tokens.typography.fontSize.md}
         fontWeight={tokens.typography.fontWeight.semibold}
       >
         {item.title}
       </Text>
-      {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
+      {item.subtitle ? (
+        <Text variant="hint" accessible={decorative ? false : undefined}>
+          {item.subtitle}
+        </Text>
+      ) : null}
     </>
   );
+  const textContent = renderTextContent(false);
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
@@ -157,12 +166,12 @@ function MealPlanRow({
           </Anchor>
         ) : (
           <YStack flex={1} minWidth={0} gap="$1" position="relative">
+            {renderTextContent(true)}
             <LinkOverlay
               href={item.href}
               accessibilityRole="link"
               accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
             />
-            {textContent}
           </YStack>
         )}
         {onDeletePress ? (

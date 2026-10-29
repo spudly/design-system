@@ -36,14 +36,25 @@ export type LinkOverlayProps = TranslatableAccessibilityProps & {
  * press on the surface reaches the overlay and opens the href
  * through the platform link path (the Anchor's own `Linking`
  * handling), preserving the href forms' native contract; rendering
- * no text, the overlay paints nothing.
+ * no text, the overlay paints nothing. The frame's visible texts
+ * are marked `accessible={false}` in the native rendering — the
+ * overlay's composed label is the row's one accessibility stop,
+ * the native counterpart of the web anchor wrapping its texts.
  *
- * Layering contract: render the overlay as the frame's FIRST child
- * (the bottom layer). Content above it that is not itself pressable
- * — plain texts and views — does not consume touches, so presses
- * fall through to the overlay, while a pressable nested inside the
- * content (RecipesPage's log-cook control) sits above the overlay
- * and keeps its own presses.
+ * Layering contract: render the overlay as the frame's LAST child
+ * (the topmost layer). Native hit testing targets the topmost view
+ * under the touch and bubbles through its ancestors only — a
+ * sibling overlay UNDER the content would never see presses that
+ * land on the content's plain views, so the overlay sits on top
+ * and takes the surface's presses directly. The one exception is
+ * a frame whose content nests a pressable of its own (RecipesPage's
+ * text block, with the log-cook control in its subtitle flow):
+ * there the overlay renders FIRST (bottom layer) and the frame's
+ * non-interactive content is made pointer-transparent
+ * (`pointerEvents="none"` on the plain texts, `"box-none"` on the
+ * flow wrapper), so hit testing falls through the content to the
+ * overlay while the nested pressable — which keeps the default
+ * pointer events — still takes its own presses.
  */
 export function LinkOverlay({ href, ...a11yProps }: LinkOverlayProps) {
   return (

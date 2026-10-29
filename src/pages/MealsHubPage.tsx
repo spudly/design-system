@@ -78,17 +78,24 @@ export type MealsHubPageProps = {
 };
 
 function MealRow({ meal, onDelete }: { meal: MealsHubPageMeal; onDelete: () => void }) {
-  const textContent = (
+  // `decorative` marks the visible texts non-accessible for the
+  // native link rendering, whose LinkOverlay carries the label as
+  // the row's one accessibility stop (see LinkOverlay).
+  const renderTextContent = (decorative: boolean) => (
     <>
       <Text
+        accessible={decorative ? false : undefined}
         fontSize={tokens.typography.fontSize.md}
         fontWeight={tokens.typography.fontWeight.semibold}
       >
         {meal.title}
       </Text>
-      <Text variant="hint">{meal.subtitle}</Text>
+      <Text variant="hint" accessible={decorative ? false : undefined}>
+        {meal.subtitle}
+      </Text>
     </>
   );
+  const textContent = renderTextContent(false);
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
@@ -122,12 +129,12 @@ function MealRow({ meal, onDelete }: { meal: MealsHubPageMeal; onDelete: () => v
           </Anchor>
         ) : (
           <YStack flex={1} minWidth={0} gap="$1" position="relative">
+            {renderTextContent(true)}
             <LinkOverlay
               href={meal.href}
               accessibilityRole="link"
               accessibilityLabel={meal.title}
             />
-            {textContent}
           </YStack>
         )}
         {/* Delete is an action, not navigation (#248 ruling):

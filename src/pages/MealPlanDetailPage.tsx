@@ -209,18 +209,27 @@ function GoalRow({ label, valueLabel }: MealPlanDetailPageGoalRow) {
 
 function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
   const isUnavailable = entry.isUnavailable ?? false;
-  const rowContent = (
+  // `decorative` marks the visible texts non-accessible for the
+  // native link rendering, whose LinkOverlay carries the composed
+  // label as the row's one accessibility stop (see LinkOverlay).
+  const renderRowContent = (decorative: boolean) => (
     <>
       <Text
+        accessible={decorative ? false : undefined}
         fontSize={tokens.typography.fontSize.md}
         fontWeight={tokens.typography.fontWeight.medium}
       >
         {entry.kind === "meal" ? "Meal" : "Recipe"} · {entry.title}
         {isUnavailable ? " (unavailable)" : ""}
       </Text>
-      {entry.subtitle ? <Text variant="hint">{entry.subtitle}</Text> : null}
+      {entry.subtitle ? (
+        <Text variant="hint" accessible={decorative ? false : undefined}>
+          {entry.subtitle}
+        </Text>
+      ) : null}
     </>
   );
+  const rowContent = renderRowContent(false);
   return (
     <YStack borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2}>
       {isUnavailable ? (
@@ -255,6 +264,7 @@ function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
         // carrying the href; the overlay's label composes the
         // kind-prefixed title and the subtitle when present.
         <YStack paddingVertical="$3" position="relative">
+          {renderRowContent(true)}
           <LinkOverlay
             href={entry.href}
             accessibilityRole="link"
@@ -262,7 +272,6 @@ function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
               entry.subtitle ? `, ${entry.subtitle}` : ""
             }`}
           />
-          {rowContent}
         </YStack>
       )}
     </YStack>

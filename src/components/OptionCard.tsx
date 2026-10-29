@@ -55,14 +55,25 @@ export function OptionCard({
   accessibilityValue,
   ...rest
 }: OptionCardProps) {
-  const content = (
+  // `decorative` marks the visible texts non-accessible: the
+  // native href form's LinkOverlay carries the card's composed
+  // label as the one accessibility stop, so the texts it names
+  // must not also surface as separate stops (see LinkOverlay).
+  const renderContent = (decorative: boolean) => (
     <XStack alignItems="center" justifyContent="space-between" gap={tokens.spacing[3]}>
       <YStack flex={1} gap={tokens.spacing[1]}>
-        <Text variant="subheading">{title}</Text>
-        {description ? <Text variant="hint">{description}</Text> : null}
+        <Text variant="subheading" accessible={decorative ? false : undefined}>
+          {title}
+        </Text>
+        {description ? (
+          <Text variant="hint" accessible={decorative ? false : undefined}>
+            {description}
+          </Text>
+        ) : null}
       </YStack>
       <Text
         aria-hidden
+        accessible={decorative ? false : undefined}
         style={{
           fontSize: tokens.typography.fontSize.xl,
           color: tokens.colors.gray.gray5,
@@ -72,6 +83,7 @@ export function OptionCard({
       </Text>
     </XStack>
   );
+  const content = renderContent(false);
   if (href !== undefined) {
     // The anchor is the card's link: no underline (this is a card,
     // not prose) and no color of its own — the card's texts carry
@@ -111,22 +123,27 @@ export function OptionCard({
     }
     // Native: the anchor is a Text and cannot hold the card's view
     // subtree (see LinkOverlay) — the card itself is the frame and
-    // a childless anchor stretched over it carries the href.
+    // a childless anchor stretched over it carries the href. The
+    // overlay's label defaults to the card's title and description
+    // (the name the web anchor derives from its content) when the
+    // caller supplied none.
     return (
       <Card minHeight={44} {...rest} position="relative">
+        {renderContent(true)}
         <LinkOverlay
           href={href}
           accessible={accessible}
           accessibilityElementsHidden={accessibilityElementsHidden}
           accessibilityHint={accessibilityHint}
-          accessibilityLabel={accessibilityLabel}
+          accessibilityLabel={
+            accessibilityLabel ?? (description ? `${title}, ${description}` : title)
+          }
           accessibilityLabelledBy={accessibilityLabelledBy}
           accessibilityLiveRegion={accessibilityLiveRegion}
           accessibilityRole={accessibilityRole ?? "link"}
           accessibilityState={accessibilityState}
           accessibilityValue={accessibilityValue}
         />
-        {content}
       </Card>
     );
   }

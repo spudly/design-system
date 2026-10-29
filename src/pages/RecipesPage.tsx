@@ -692,9 +692,23 @@ function RecipeRow({
   item: RecipesPageItem;
   onLogCookPress?: () => void;
 }) {
-  const textContent = (
+  // The native rendering (`native` true) makes two adjustments
+  // for the text frame's LinkOverlay (see the row comment below):
+  // the visible texts are decorative for accessibility (the
+  // overlay's composed label is the row's one stop) and
+  // pointer-transparent, so native hit testing falls through them
+  // to the overlay beneath, while the log-cook control — which
+  // keeps the default pointer events inside the box-none flow —
+  // still takes its own presses.
+  const renderTextContent = (native: boolean) => (
     <>
-      <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
+      <Text
+        fontWeight={tokens.typography.fontWeight.semibold}
+        accessible={native ? false : undefined}
+        pointerEvents={native ? "none" : undefined}
+      >
+        {item.title}
+      </Text>
       {/* The subtitle line is a wrapping inline flow inside the
         text block: the subtitle text first, the log-cook
         control immediately after it (right after the
@@ -705,13 +719,28 @@ function RecipeRow({
         fixed width starved this block (the #205 failure, seen
         again in PR #120's narrow captures). */}
       {item.subtitle || onLogCookPress ? (
-        <XStack flexWrap="wrap" alignItems="center" gap="$1" paddingTop="$1">
-          {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
+        <XStack
+          flexWrap="wrap"
+          alignItems="center"
+          gap="$1"
+          paddingTop="$1"
+          pointerEvents={native ? "box-none" : undefined}
+        >
+          {item.subtitle ? (
+            <Text
+              variant="hint"
+              accessible={native ? false : undefined}
+              pointerEvents={native ? "none" : undefined}
+            >
+              {item.subtitle}
+            </Text>
+          ) : null}
           {onLogCookPress ? <LogCookControl item={item} onLogCookPress={onLogCookPress} /> : null}
         </XStack>
       ) : null}
     </>
   );
+  const textContent = renderTextContent(false);
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
@@ -731,9 +760,13 @@ function RecipeRow({
           and the thumbnail would be measured as text), so both
           targets platform-split (see LinkOverlay): view-level
           frames carry the content, and childless anchors
-          stretched over the frames carry the hrefs. The log-cook
-          control stays nested in the text frame's subtitle flow,
-          above the frame's overlay, and keeps its own presses. */}
+          stretched over the frames carry the hrefs. The thumbnail
+          frame's overlay renders last (topmost, the standard
+          layering); the text frame nests the log-cook control,
+          so its overlay renders underneath and the frame's
+          non-interactive content is pointer-transparent — the
+          control stays nested in the subtitle flow and keeps
+          its own presses (see renderTextContent). */}
         {isWeb ? (
           <Anchor
             href={item.href}
@@ -748,12 +781,12 @@ function RecipeRow({
           </Anchor>
         ) : (
           <View position="relative">
+            <Thumbnail imageUrl={item.imageUrl} />
             <LinkOverlay
               href={item.href}
               accessibilityRole="link"
               accessibilityLabel={item.title}
             />
-            <Thumbnail imageUrl={item.imageUrl} />
           </View>
         )}
         {isWeb ? (
@@ -777,7 +810,7 @@ function RecipeRow({
               accessibilityRole="link"
               accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
             />
-            {textContent}
+            {renderTextContent(true)}
           </YStack>
         )}
       </Card>

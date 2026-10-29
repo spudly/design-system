@@ -167,9 +167,10 @@ test("the control renders inline in the text block's subtitle flow, never as a r
   // both platform text targets render. The text target is a real
   // Anchor on web; on native the anchor is a Text and cannot carry
   // the block, so a YStack frame carrying textBlockStyle renders
-  // the same content with a LinkOverlay anchor stretched over it
-  // (the control sits above the overlay and keeps its presses).
-  const contentAt = row.indexOf("const textContent");
+  // the same content with a LinkOverlay anchor stretched under it
+  // (the frame's layering exception: the content is
+  // pointer-transparent, the control keeps its own presses).
+  const contentAt = row.indexOf("const renderTextContent");
   const controlAt = row.indexOf("<LogCookControl");
   const contentEndAt = row.indexOf("return (", contentAt);
   assert.ok(
@@ -177,16 +178,54 @@ test("the control renders inline in the text block's subtitle flow, never as a r
     "the control must render inside the shared text content both targets render",
   );
   // Both platform targets carry the text block style and render
-  // the shared content; the web target is the Anchor, the native
-  // target's href rides on its LinkOverlay.
+  // the shared content; the web target is the Anchor rendering the
+  // plain content, the native target renders the native variant
+  // over its LinkOverlay.
   assert.equal(
     row.split("style={textBlockStyle}").length - 1,
     2,
     "the web Anchor and the native frame must both carry textBlockStyle",
   );
   assert.ok(
-    row.includes("<LinkOverlay") && row.slice(contentEndAt).includes("{textContent}"),
-    "the native text target must render the shared content over a LinkOverlay",
+    row.slice(contentEndAt).includes("{textContent}") &&
+      row.slice(contentEndAt).includes("{renderTextContent(true)}"),
+    "the web target must render the plain content and the native target the native variant",
+  );
+  // The native layering contract (LinkOverlay): the text frame's
+  // overlay renders BEFORE the native content (bottom layer), its
+  // plain texts are pointer-transparent ("none") and the subtitle
+  // flow is "box-none", so hit testing falls through to the
+  // overlay while the control — default pointer events — keeps
+  // its presses. The thumbnail frame's overlay renders AFTER the
+  // thumbnail (topmost layer; nothing in that frame is
+  // interactive). These pins are the static coverage for the
+  // layering; tap behavior itself follows React Native's hitTest
+  // semantics and is not executable in this Node suite.
+  const nativeTextFrameAt = row.indexOf('<YStack style={textBlockStyle} position="relative">');
+  const textOverlayAt = row.indexOf("<LinkOverlay", nativeTextFrameAt);
+  const nativeContentAt = row.indexOf("{renderTextContent(true)}", nativeTextFrameAt);
+  assert.ok(
+    nativeTextFrameAt !== -1 &&
+      textOverlayAt > nativeTextFrameAt &&
+      nativeContentAt > textOverlayAt,
+    "the text frame's overlay must render before the native content (bottom layer)",
+  );
+  assert.equal(
+    row.split('pointerEvents={native ? "none" : undefined}').length - 1,
+    2,
+    "the native title and subtitle texts must be pointer-transparent",
+  );
+  assert.equal(
+    row.split('pointerEvents={native ? "box-none" : undefined}').length - 1,
+    1,
+    "the native subtitle flow must be box-none so the control inside it stays pressable",
+  );
+  const thumbFrameAt = row.indexOf('<View position="relative">');
+  const thumbAt = row.indexOf("<Thumbnail", thumbFrameAt);
+  const thumbOverlayAt = row.indexOf("<LinkOverlay", thumbFrameAt);
+  assert.ok(
+    thumbFrameAt !== -1 && thumbAt > thumbFrameAt && thumbOverlayAt > thumbAt,
+    "the thumbnail frame's overlay must render after the thumbnail (topmost layer)",
   );
   // Inside the content, the control sits in the subtitle's wrapping
   // flow, after the subtitle text — so it flows with the text at the
