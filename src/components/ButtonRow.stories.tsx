@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 import { ButtonRow } from "./ButtonRow.js";
 import { Text } from "./Text.js";
@@ -14,10 +15,11 @@ type Story = StoryObj<typeof ButtonRow>;
 
 export const Default: Story = {
   render: () => (
-    <YStack maxWidth={360}>
+    <YStack maxWidth={360} gap={tokens.spacing[2]}>
       <Text>
         Tender chicken, garlic cream sauce with spinach and sun-dried tomatoes — the button row
-        below follows the content at the bar's standard separation.
+        below follows the content at the separation this parent stack's gap supplies; the bar
+        carries no margin of its own.
       </Text>
       <ButtonRow>
         <Button>Shopping list</Button>

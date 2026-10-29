@@ -295,11 +295,13 @@ A ButtonRow is a row of action buttons that follows content.
 It owns the bar's whole treatment — there are no spacing props
 to pass.
 
-1. The button row follows the text at the bar's standard 8px
-   separation, the two buttons sit 12px apart, and at a narrow
-   width the second button wraps onto the next line instead of
-   overflowing (MealPlanDetailPage's Shopping list / Edit bar
-   and the Memorize card footers are the live cases).
+1. The button row follows the text at the separation its parent
+   supplies (in the story, the wrapping stack's gap — the bar
+   itself carries no margin), the two buttons sit 12px apart,
+   and at a narrow width the second button wraps onto the next
+   line instead of overflowing (MealPlanDetailPage's Shopping
+   list / Edit bar and the Memorize card footers are the live
+   cases).
 
 **Run when:** `src/components/ButtonRow.tsx`, its stories, the
 pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
