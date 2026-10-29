@@ -94,7 +94,7 @@ function sourceFiles(dir) {
 // DropdownButton forwards its label to the DS Button — both
 // translate caller RN props themselves.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,ActionChip,Thumbnail".split(
     ",",
   ),
 );
