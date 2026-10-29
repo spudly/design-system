@@ -12,12 +12,16 @@
  * or semantics on web:
  *
  * - Page-level raw-stack pressables in src/pages/**: ShoppingListPage's
- *   checkbox row (XStack), MealDetailPage / MealPlanDetailPage member
- *   rows (YStack, including the disabled-state spread for unavailable
- *   rows), MealPlansPage and MealsHubPage rows (YStack), AiSessionPage's
+ *   checkbox row (XStack), MealDetailPage member rows (YStack,
+ *   including the disabled-state spread for unavailable rows),
+ *   MealsHubPage rows (YStack), AiSessionPage's
  *   Cancel action (YStack), MealCookingModePage's Done action (YStack),
  *   RecipeFormPage's revert actions (YStack), and RecipeDetailPage's
  *   viewer-rating wrapper (View) and Custom scale chip (XStack).
+ *   (MealPlansPage's and MealPlanDetailPage's rows were in this
+ *   list until the #119 tranche-2 de-styling moved them into the
+ *   generic CardRow / ListRow components; the routing moved with
+ *   them and the rows test below pins it there.)
  * - Tamagui semantic primitives used directly: Checkbox in
  *   ChecklistRow (its `accessibilityLabel` leaked; Tamagui supplies
  *   role/aria-checked itself) and Progress in ProgressBar (role,
@@ -130,8 +134,6 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 const PAGE_STACKS = [
   "src/pages/ShoppingListPage.tsx",
   "src/pages/MealDetailPage.tsx",
-  "src/pages/MealPlanDetailPage.tsx",
-  "src/pages/MealPlansPage.tsx",
   "src/pages/MealsHubPage.tsx",
   "src/pages/AiSessionPage.tsx",
   "src/pages/MealCookingModePage.tsx",
@@ -173,19 +175,29 @@ test("ShoppingListPage's checkbox row translates role, checked state, and label 
   assert.match(code, /accessibilityLabel: line\.name/);
 });
 
-test("MealDetail / MealPlanDetail rows translate the disabled state and the button role (#237)", () => {
-  for (const rel of ["src/pages/MealDetailPage.tsx", "src/pages/MealPlanDetailPage.tsx"]) {
+test("MealDetail rows and the generic row components translate the disabled state and the button role (#237)", () => {
+  // MealPlanDetailPage's and MealPlansPage's rows moved into the
+  // generic ListRow / CardRow components in the #119 tranche-2
+  // de-styling; the translator routing moved with them.
+  const files = [
+    "src/pages/MealDetailPage.tsx",
+    "src/components/ListRow.tsx",
+    "src/components/CardRow.tsx",
+  ];
+  for (const rel of files) {
     const code = readCode(rel);
-    assert.match(
-      code,
-      /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/,
-      `${rel}: the unavailable row's disabled state must go through the translator`,
-    );
     assert.match(
       code,
       /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/,
       `${rel}: the pressable row's button role must go through the translator`,
     );
+    if (rel !== "src/components/CardRow.tsx") {
+      assert.match(
+        code,
+        /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/,
+        `${rel}: the unavailable row's disabled state must go through the translator`,
+      );
+    }
   }
 });
 

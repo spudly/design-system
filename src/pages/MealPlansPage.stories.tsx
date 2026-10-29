@@ -85,7 +85,12 @@ export const Empty: Story = {
 export const Loading: Story = {
   render: () => (
     <Viewport>
-      <MealPlansPage plans={[]} isLoading onPlanPress={() => undefined} />
+      <MealPlansPage
+        plans={[]}
+        isLoading
+        onPlanPress={() => undefined}
+        onCreatePlan={() => undefined}
+      />
     </Viewport>
   ),
 };

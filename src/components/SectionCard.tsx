@@ -25,7 +25,7 @@ export function SectionCard({ title, action, children, ...rest }: SectionCardPro
           {action}
         </XStack>
       </YStack>
-      {children}
+      <YStack gap={tokens.spacing[3]}>{children}</YStack>
     </Card>
   );
 }

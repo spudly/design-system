@@ -118,7 +118,7 @@ test("the shell is the fixed ScreenContainer; the list is the shared BoundedList
   ]) {
     assert.ok(
       !code.includes(banned),
-      `MemorizeReviewPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / Row since the #119 fix`,
+      `MemorizeReviewPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / ButtonRow since the #119 fix`,
     );
   }
 });

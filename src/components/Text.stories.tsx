@@ -8,7 +8,7 @@ const meta: Meta<typeof Text> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["heading", "subheading", "body", "hint", "error", "verse"],
+      options: ["heading", "title", "subheading", "body", "hint", "error", "verse"],
     },
   },
 };
@@ -18,6 +18,10 @@ type Story = StoryObj<typeof Text>;
 
 export const Heading: Story = {
   args: { variant: "heading", children: "Discover Recipes" },
+};
+
+export const Title: Story = {
+  args: { variant: "title", children: "Weeknight favorites" },
 };
 
 export const Subheading: Story = {
@@ -50,6 +54,7 @@ export const AllVariants: Story = {
   render: () => (
     <YStack gap={8}>
       <Text variant="heading">Heading</Text>
+      <Text variant="title">Title</Text>
       <Text variant="subheading">Subheading</Text>
       <Text variant="body">Body text</Text>
       <Text variant="hint">Hint text</Text>
