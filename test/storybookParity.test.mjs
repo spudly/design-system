@@ -49,6 +49,13 @@
  *   MyVersesPage). Same rule as PageFrame: export means a story
  *   decision is required.
  * - src/pages/fixtures.ts — static story fixtures, not a component.
+ * - src/pages/usePaginationRearm.ts — internal page scaffolding
+ *   (#285): the shared pagination re-arm hook the catalog pages
+ *   (RecipesPage, DiscoverPage) consume. Not a component; NOT
+ *   exported from src/pages/index.ts, exercised through the
+ *   catalog pages and pinned directly by
+ *   test/paginationRearm.test.mjs. Same rule as PageFrame: export
+ *   means a story decision is required.
  *
  * Source scan, like the other story contract tests
  * (pagesStoryCategories.test.mjs, pageStories.test.mjs): the
@@ -130,15 +137,19 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
   // Internal files with no story of their own (see header): PageFrame
   // and BoundedList are scaffolding exercised through the page stories;
   // fixtures.ts is data. None is exported from src/pages/index.ts.
-  const exceptions = new Set(["PageFrame.tsx", "BoundedList.tsx", "fixtures.ts", "index.ts"]);
-  assert.ok(
-    !index.includes('from "./PageFrame.js"'),
-    "PageFrame is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
-  );
-  assert.ok(
-    !index.includes('from "./BoundedList.js"'),
-    "BoundedList is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
-  );
+  const exceptions = new Set([
+    "PageFrame.tsx",
+    "BoundedList.tsx",
+    "fixtures.ts",
+    "index.ts",
+    "usePaginationRearm.ts",
+  ]);
+  for (const internal of ["PageFrame", "BoundedList", "usePaginationRearm"]) {
+    assert.ok(
+      !index.includes(`from "./${internal}.js"`),
+      `${internal} is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)`,
+    );
+  }
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),

@@ -11,6 +11,7 @@ import { SelectField, type SelectOption } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
+import { usePaginationRearm } from "./usePaginationRearm.js";
 
 /**
  * RecipesPage (#49, pilot): Eciperay's Browse/Recipes screen as a
@@ -724,6 +725,19 @@ export function RecipesPage(props: RecipesPageProps) {
     emptyBody,
   } = props;
 
+  // Pagination rides the shared catalog re-arm (#285,
+  // usePaginationRearm) — the same pattern as DiscoverPage: the
+  // guarded end-reached handler plus a fetch-completion chain,
+  // so consecutive pages that add no new rows still paginate
+  // without a scroll-away and no page request is ever duplicated
+  // in flight.
+  const { handleEndReached } = usePaginationRearm({
+    itemCount: recipes.length,
+    isFetchingNextPage,
+    onLoadMore,
+    enabled: !isLoading,
+  });
+
   return (
     <ScreenContainer variant="list" scrollable={false}>
       <FlatList
@@ -770,7 +784,7 @@ export function RecipesPage(props: RecipesPageProps) {
             </>
           );
         }}
-        onEndReached={onLoadMore}
+        onEndReached={onLoadMore ? handleEndReached : undefined}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           isLoading ? (

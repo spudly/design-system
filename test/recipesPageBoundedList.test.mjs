@@ -93,3 +93,25 @@ test("the list stays mounted while loading (#188 focus contract)", () => {
     "the loading spinner must render as the list's empty state",
   );
 });
+
+test("pagination rides the shared catalog re-arm, not a raw callback (#285)", () => {
+  // The same usePaginationRearm shape as DiscoverPage — one
+  // pagination contract for both catalogs. The chain behavior
+  // is pinned by test/paginationRearm.test.mjs against the
+  // shared state machine.
+  assert.match(
+    code,
+    /const \{ handleEndReached \} = usePaginationRearm\(\{\s*itemCount: recipes\.length,\s*isFetchingNextPage,\s*onLoadMore,\s*enabled: !isLoading,\s*\}\);/,
+    "RecipesPage must take its end-reached handler from usePaginationRearm with the shared inputs",
+  );
+  assert.match(
+    code,
+    /onEndReached=\{onLoadMore \? handleEndReached : undefined\}/,
+    "the list's onEndReached must be the re-arm handler, mounted only when the host paginates",
+  );
+  assert.doesNotMatch(
+    code,
+    /onEndReached=\{onLoadMore\}/,
+    "the raw host callback must not wire straight to onEndReached — it bypasses the fetch guard and the re-arm",
+  );
+});

@@ -12,6 +12,7 @@ import { SelectField, type SelectOption } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
+import { usePaginationRearm } from "./usePaginationRearm.js";
 
 /**
  * DiscoverPage (#168): Eciperay's public recipe catalog (the web
@@ -514,32 +515,21 @@ export function DiscoverPage(props: DiscoverPageProps) {
     onLoadMore,
   } = props;
 
-  // End-reached handling, in two halves. The mount gate: while
-  // the first load is in flight or the error state is showing,
-  // the list's data range is empty and no page request may
-  // start, so the callback is not mounted at all (a host that
-  // passes no onLoadMore never paginates either). The fetch
-  // guard: during a next-page fetch the callback STAYS mounted
-  // and the handler swallows the request instead of unmounting.
-  // Unmounting would break VirtualizedList's end-reached
-  // bookkeeping — it fires once per content length (its
-  // _sentEndForContentLength sentinel): the footer spinner's
-  // mount grows the content length, and a mounted callback gets
-  // that inflated length recorded even when the request is
-  // swallowed, so when the fetch completes and the footer
-  // unmounts, the restored length differs from the sentinel and
-  // the next page is requested. Unmounted during the fetch, the
-  // sentinel keeps the pre-footer length; an empty page (every
-  // item filtered out client-side) restores exactly that
-  // length, the fire is suppressed, and pagination stalls until
-  // the user scrolls away and back. Neither half tests
-  // recipes.length: an empty page with a live continuation
-  // still paginates.
-  const handleEndReached = () => {
-    if (!isFetchingNextPage) {
-      onLoadMore?.();
-    }
-  };
+  // Pagination rides the shared catalog re-arm (#285,
+  // usePaginationRearm): the guarded end-reached handler plus a
+  // fetch-completion chain, so consecutive pages that add no new
+  // rows still paginate without a scroll-away and no page request
+  // is ever duplicated in flight. The mount gate below is the
+  // pattern's first half: while the first load is in flight or
+  // the error state is showing, the callback is not mounted at
+  // all (a host that passes no onLoadMore never paginates
+  // either).
+  const { handleEndReached } = usePaginationRearm({
+    itemCount: recipes.length,
+    isFetchingNextPage,
+    onLoadMore,
+    enabled: !isLoading && !errorMessage,
+  });
 
   return (
     <ScreenContainer variant="list" scrollable={false}>

@@ -145,22 +145,21 @@ test("removing a filter clears its values through the change callbacks", () => {
 test("the title renders as the page heading and pagination rides a guarded end-reached handler", () => {
   assert.match(page, /<Text variant="heading">\{title\}<\/Text>/);
   // The callback is unmounted only for the first load, the
-  // error state, or a host with no continuation. During a
-  // next-page fetch it stays MOUNTED and the handler swallows
-  // the request: unmounting it would leave VirtualizedList's
-  // per-content-length end-reached sentinel holding the
-  // pre-footer length, and an empty page completing would
-  // restore exactly that length and suppress the next fire —
-  // consecutive empty pages would stall pagination. The two
-  // exact-match pins below also exclude any recipes.length
-  // gate: an empty page with a live continuation paginates.
+  // error state, or a host with no continuation. Pagination
+  // itself rides the shared catalog re-arm (#285): the guarded
+  // handler and the fetch-completion chain live in
+  // usePaginationRearm, shared with RecipesPage so the two
+  // catalogs keep one pagination contract. The pins below hold
+  // this page to the shared shape — including the exact enabled
+  // expression — and the chain behavior is pinned by
+  // test/paginationRearm.test.mjs against the state machine.
   assert.match(
     page,
     /onEndReached=\{!isLoading && !errorMessage && onLoadMore \? handleEndReached : undefined\}/,
   );
   assert.match(
     page,
-    /const handleEndReached = \(\) => \{\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
+    /const \{ handleEndReached \} = usePaginationRearm\(\{\s*itemCount: recipes\.length,\s*isFetchingNextPage,\s*onLoadMore,\s*enabled: !isLoading && !errorMessage,\s*\}\);/,
   );
   assert.match(
     page,
