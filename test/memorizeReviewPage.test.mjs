@@ -18,8 +18,9 @@
  *    "Review" heading over the app's nothing-due empty state,
  *    copy verbatim.
  * 3. The shell is the fixed ScreenContainer (the app's tab
- *    screens share App's non-scrolling shell) with the
- *    FlatList bounded by `flex: 1` — the #188 geometry.
+ *    screens share App's non-scrolling shell) with the list
+ *    bounded by `flex: 1` — the #188 geometry, owned by the
+ *    shared BoundedList since the #119 fix.
  * 4. The actions are exactly the app screen's two review
  *    outcomes, as two named callbacks reporting the verse id.
  *    There is deliberately no Drill or Remove callback —
@@ -96,19 +97,30 @@ test("the heading carries the due count; the empty state matches the app verbati
   );
 });
 
-test("the shell is the fixed ScreenContainer with the FlatList bounded by flex: 1", () => {
+test("the shell is the fixed ScreenContainer; the list is the shared BoundedList (#119)", () => {
   assert.match(
     code,
     /<ScreenContainer scrollable=\{false\}>/,
     "the tab screens share the app's non-scrolling shell",
   );
-  assert.match(code, /<FlatList/, "the due list must be the app's FlatList");
   assert.match(
     code,
-    /const listStyle = \{ flex: 1 \} as const;/,
-    "the list must be bounded to the shell (#188)",
+    /<BoundedList\s+data=\{verses\}/,
+    "the due list must render through BoundedList, which owns the #188 flex: 1 bounding and row separation",
   );
-  assert.match(code, /style=\{listStyle\}/, "the FlatList must carry the bounding style");
+  for (const banned of [
+    "FlatList",
+    "listStyle",
+    "XStack",
+    "marginBottom",
+    "marginTop",
+    "style={",
+  ]) {
+    assert.ok(
+      !code.includes(banned),
+      `MemorizeReviewPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / Row since the #119 fix`,
+    );
+  }
 });
 
 test("the view-model and callback contract matches the declared props", () => {

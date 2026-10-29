@@ -9,8 +9,10 @@
  * 1. The shell is the non-scrolling ScreenContainer (the app
  *    renders every tab inside <ScreenContainer scrollable=
  *    {false}>; its "Memorize" title and tab bar stay app-side).
- * 2. The FlatList is height-bounded with `flex: 1` (#188), the
- *    geometry the app's list uses in the same shell.
+ * 2. The list is the shared BoundedList, height-bounded with
+ *    `flex: 1` (#188 — the bounding is BoundedList's own since
+ *    the #119 fix), the geometry the app's list uses in the
+ *    same shell.
  * 3. The empty branch keys off the list being empty and carries
  *    the app's empty state verbatim; there is no loading state
  *    (the app gates on store readiness before any tab renders).
@@ -53,14 +55,18 @@ test("MyVersesPage source is readable and non-trivial", () => {
   assert.match(code, /export function MyVersesPage/);
 });
 
-test("no app imports: every import is react-native, tamagui, or a DS component", () => {
+test("no app imports: every import is react-native, tamagui, a DS component, or the internal BoundedList", () => {
   const specifiers = [...code.matchAll(/from\s+"([^"]+)"/g)].map((m) => m[1]);
   assert.ok(specifiers.length > 0, "expected import specifiers to scan");
   for (const specifier of specifiers) {
     assert.ok(
       specifier === "react-native" ||
         specifier === "tamagui" ||
-        specifier.startsWith("../components/"),
+        specifier.startsWith("../components/") ||
+        // Internal page scaffolding (the PageFrame pattern): the
+        // shared bounded list lives with the pages because it
+        // imports react-native (#119).
+        specifier === "./BoundedList.js",
       `MyVersesPage must not import "${specifier}" — app logic stays app-side`,
     );
   }
@@ -82,17 +88,25 @@ test("the heading is the app screen's own heading", () => {
   );
 });
 
-test("the FlatList is height-bounded with flex: 1 (#188)", () => {
+test("the list is the shared BoundedList; the page carries no styling of its own (#119)", () => {
   assert.match(
     code,
-    /const listStyle = \{ flex: 1 \} as const;/,
-    "the listStyle constant must be exactly { flex: 1 }",
+    /<BoundedList\s+data=\{verses\}/,
+    "the list must render through BoundedList, which owns the #188 flex: 1 bounding and row separation",
   );
-  assert.match(
-    code,
-    /<FlatList\s+style=\{listStyle\}/,
-    "the FlatList must take style={listStyle} so the shell bounds its height",
-  );
+  for (const banned of [
+    "FlatList",
+    "listStyle",
+    "XStack",
+    "marginBottom",
+    "marginTop",
+    "style={",
+  ]) {
+    assert.ok(
+      !code.includes(banned),
+      `MyVersesPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / Row since the #119 fix`,
+    );
+  }
 });
 
 test("the empty branch keys off the empty list and carries the app's empty state verbatim", () => {

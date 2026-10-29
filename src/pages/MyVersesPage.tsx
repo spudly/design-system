@@ -1,11 +1,11 @@
-import { FlatList } from "react-native";
-import { XStack } from "tamagui";
 import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { Row } from "../components/Row.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
+import { BoundedList } from "./BoundedList.js";
 
 /**
  * MyVersesPage (#49): Memorize's "My verses" screen as a
@@ -57,9 +57,10 @@ import { Text } from "../components/Text.js";
  *   app's store mutation). Navigation and mutation stay
  *   app-side.
  *
- * #188: the FlatList is bounded to the fixed shell with
- * `flex: 1` (see listStyle), the same geometry the app's list
- * uses inside the non-scrolling container.
+ * #188: the list is the shared BoundedList, bounded to the
+ * fixed shell with `flex: 1` (owned by BoundedList, #119), the
+ * same geometry the app's list uses inside the non-scrolling
+ * container.
  *
  * No render slot, by audit (the cook-log lesson, applied before
  * the fact): the app screen renders no app-owned content inside
@@ -68,12 +69,6 @@ import { Text } from "../components/Text.js";
  * is therefore a pure callback, which is the honest contract for
  * this view.
  */
-
-// The FlatList must be bounded to the space the fixed shell
-// leaves it (#188): without flex: 1 it sizes to its full content
-// height inside the non-scrolling shell, overflows the viewport,
-// and never gets a scrollable viewport of its own.
-const listStyle = { flex: 1 } as const;
 
 /** A verse's memorization status, mirroring the app's status
  * values — the view renders it as the badge text and derives the
@@ -110,19 +105,19 @@ function MyVerseRow({
   onRemovePress: () => void;
 }) {
   return (
-    <Card marginBottom="$2">
+    <Card>
       <Text variant="subheading">{item.reference}</Text>
       <Badge tone={item.status === "memorized" ? "success" : "info"}>{item.status}</Badge>
       <Text variant="verse">{item.text}</Text>
       {item.nextReviewLabel ? <Text variant="hint">{item.nextReviewLabel}</Text> : null}
-      <XStack gap="$2" marginTop="$2">
+      <Row spaceBefore="sm">
         <Button size="sm" onPress={onDrillPress}>
           Drill
         </Button>
         <Button size="sm" variant="secondary" onPress={onRemovePress}>
           Remove
         </Button>
-      </XStack>
+      </Row>
     </Card>
   );
 }
@@ -140,8 +135,7 @@ export function MyVersesPage({ verses, onDrillVerse, onRemoveVerse }: MyVersesPa
       {verses.length === 0 ? (
         <EmptyState title="No verses yet" body="Find one in the Search tab to get started." />
       ) : (
-        <FlatList
-          style={listStyle}
+        <BoundedList
           data={verses}
           keyExtractor={(verse) => verse.id}
           renderItem={({ item }) => (
