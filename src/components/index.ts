@@ -71,6 +71,7 @@ export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";
 export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
 export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";
 export { FieldLabel, type FieldLabelProps } from "./FieldLabel.js";
+export { FieldLabelBlock, type FieldLabelBlockProps } from "./FieldLabelBlock.js";
 export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
 export { FormStack, type FormStackProps } from "./FormStack.js";
 export { FormSubmit, type FormSubmitProps } from "./FormSubmit.js";

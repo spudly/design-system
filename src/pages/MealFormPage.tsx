@@ -2,8 +2,8 @@ import { Button } from "../components/Button.js";
 import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
 import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
+import { FieldLabelBlock } from "../components/FieldLabelBlock.js";
 import { FormSubmit } from "../components/FormSubmit.js";
-import { LabeledGroup } from "../components/LabeledGroup.js";
 import { NumberStepper } from "../components/NumberStepper.js";
 import { Text } from "../components/Text.js";
 import { TextAreaField } from "../components/TextAreaField.js";
@@ -43,9 +43,10 @@ import { TextField } from "../components/TextField.js";
  * column the app screens render today), with the heading
  * composed through FormHeading — the app composes the same
  * two through its adapters. The page applies no styling
- * itself (#119): the recipe list's label is a LabeledGroup
- * and the submit row is a FormSubmit; the page composes DS
- * components and passes data and callbacks only.
+ * itself (#119): the recipe list's label is a FieldLabelBlock
+ * (its own form block, as in the app view) and the submit row
+ * is a FormSubmit; the page composes DS components and passes
+ * data and callbacks only.
  */
 
 export type MealFormPageRecipeOption = {
@@ -108,13 +109,12 @@ export function MealFormPage({
         placeholder="Notes (optional)"
         numberOfLines={4}
       />
-      <LabeledGroup label="Recipes">
-        <CheckboxSelectList
-          items={recipeOptions.map((recipe) => ({ id: recipe.id, label: recipe.label }))}
-          selectedIds={selectedRecipeIds}
-          onToggle={onToggleRecipe}
-        />
-      </LabeledGroup>
+      <FieldLabelBlock label="Recipes" />
+      <CheckboxSelectList
+        items={recipeOptions.map((recipe) => ({ id: recipe.id, label: recipe.label }))}
+        selectedIds={selectedRecipeIds}
+        onToggle={onToggleRecipe}
+      />
       {selectedRecipeIds.map((recipeId) => {
         const recipe = optionById.get(recipeId);
         if (!recipe) {

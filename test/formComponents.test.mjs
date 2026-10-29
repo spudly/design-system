@@ -2,9 +2,9 @@
  * Form-component contracts for the #119 forms tranche: the
  * components the RecipeFormPage / MealFormPage /
  * MealPlanFormPage de-styling extracted (LabeledField,
- * LabeledGroup, FieldLabel, RevertAction, ChangedListBanner,
- * FieldColumns, FormStack, FormHeading, FormSubmit,
- * StepperGroup). Like the layout-components contracts, these
+ * LabeledGroup, FieldLabel, FieldLabelBlock, RevertAction,
+ * ChangedListBanner, FieldColumns, FormStack, FormHeading,
+ * FormSubmit, StepperGroup). Like the layout-components contracts, these
  * pin the public shape (props and owned geometry) so a later
  * edit cannot silently reintroduce styling pass-throughs or
  * move the owned spacing, and pin the three pages themselves
@@ -30,6 +30,7 @@ const readRepoFile = (rel) =>
 
 const COMPONENTS = [
   "FieldLabel",
+  "FieldLabelBlock",
   "LabeledField",
   "LabeledGroup",
   "RevertAction",
@@ -63,6 +64,12 @@ test("LabeledField owns the 4px label separation and renders the error below the
   assert.match(source, /error\?: string \| null \| undefined;/);
   assert.match(source, /paddingBlockStart=\{tokens\.spacing\[2\]\}/);
   assert.match(source, /variant="error"/);
+});
+
+test("FieldLabelBlock is the standalone label block with its 8px bottom padding", () => {
+  const source = readRepoFile("src/components/FieldLabelBlock.tsx");
+  assert.match(source, /paddingBlockEnd=\{tokens\.spacing\[2\]\}/);
+  assert.match(source, /label: string;/);
 });
 
 test("LabeledGroup owns the wider 8px label separation for non-field controls", () => {

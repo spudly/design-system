@@ -2,8 +2,8 @@ import { Button } from "../components/Button.js";
 import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
 import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
+import { FieldLabelBlock } from "../components/FieldLabelBlock.js";
 import { FormSubmit } from "../components/FormSubmit.js";
-import { LabeledGroup } from "../components/LabeledGroup.js";
 import { NumberStepper } from "../components/NumberStepper.js";
 import { StepperGroup } from "../components/StepperGroup.js";
 import { Text } from "../components/Text.js";
@@ -41,10 +41,10 @@ import { TextField } from "../components/TextField.js";
  * is the app view's one presentation rule (a title and at
  * least one selected entry). The page applies no styling
  * itself (#119): the heading is a FormHeading, the entry
- * list's label is a LabeledGroup, each selected entry's
- * steppers are a StepperGroup, and the submit row is a
- * FormSubmit; the page composes DS components and passes
- * data and callbacks only.
+ * list's label is a FieldLabelBlock (its own form block, as
+ * in the app view), each selected entry's steppers are a
+ * StepperGroup, and the submit row is a FormSubmit; the page
+ * composes DS components and passes data and callbacks only.
  */
 
 export type MealPlanFormPageEntryOption = {
@@ -137,16 +137,15 @@ export function MealPlanFormPage({
         onChangeText={onEndsOnChange}
         placeholder="YYYY-MM-DD"
       />
-      <LabeledGroup label="Meals & recipes">
-        <CheckboxSelectList
-          items={entryOptions.map((entry) => ({
-            id: entry.key,
-            label: `${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}`,
-          }))}
-          selectedIds={selectedKeys}
-          onToggle={onToggleEntry}
-        />
-      </LabeledGroup>
+      <FieldLabelBlock label="Meals & recipes" />
+      <CheckboxSelectList
+        items={entryOptions.map((entry) => ({
+          id: entry.key,
+          label: `${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}`,
+        }))}
+        selectedIds={selectedKeys}
+        onToggle={onToggleEntry}
+      />
       {selectedKeys.map((key) => {
         const option = optionByKey.get(key);
         if (!option) {

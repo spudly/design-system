@@ -582,11 +582,12 @@ naming either page.
 
 ---
 
-## FieldLabel, LabeledField & LabeledGroup
+## FieldLabel, LabeledField, LabeledGroup & FieldLabelBlock
 
 Open in `Components/FieldLabel`: Default. Open in
 `Components/LabeledField`: Default, WithAction, WithError. Open
-in `Components/LabeledGroup`: Default, WithAction.
+in `Components/LabeledGroup`: Default, WithAction. Open in
+`Components/FieldLabelBlock`: Default.
 
 1. FieldLabel Default: the "Title" label in the small medium
    label treatment sits directly over its field.
@@ -597,11 +598,15 @@ in `Components/LabeledGroup`: Default, WithAction.
 3. LabeledGroup: the label sits 8px over the chip group (visibly
    wider separation than LabeledField's); WithAction shows the
    revert action at the row's right edge; chips toggle on press.
+4. FieldLabelBlock Default: the "Recipes" label stands as its
+   own block over the checkbox list — 8px of padding under the
+   label plus the stack's 16px gap before the first row (the
+   meal forms' list-label rhythm); rows toggle on press.
 
 **Run when:** `src/components/FieldLabel.tsx`,
 `src/components/LabeledField.tsx`, `src/components/LabeledGroup.tsx`,
-their stories, a form page composing them, or a changeset naming
-any of them.
+`src/components/FieldLabelBlock.tsx`, their stories, a form page
+composing them, or a changeset naming any of them.
 
 ---
 
