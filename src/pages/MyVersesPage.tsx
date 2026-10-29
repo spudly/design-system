@@ -52,10 +52,12 @@ import { BoundedList } from "./BoundedList.js";
  *   app's business, exactly as a meal plan's meta line crosses
  *   pre-composed in MealPlansPage. Absent means the verse has no
  *   review scheduled and no line renders.
- * - Actions are bare intents by id: `onDrillVerse(id)` (the app
- *   swaps in its drill screen) and `onRemoveVerse(id)` (the
- *   app's store mutation). Navigation and mutation stay
- *   app-side.
+ * - The row's two controls split on #248's navigation rule:
+ *   Drill navigates (the app swaps in its drill screen), so it
+ *   is a link — each item carries its pre-composed `drillHref`
+ *   and the Drill control renders in Button's href form.
+ *   Remove is a bare intent by id, `onRemoveVerse(id)` (the
+ *   app's store mutation stays app-side).
  *
  * #188: the list is the shared BoundedList, bounded to the
  * fixed shell with `flex: 1` (owned by BoundedList, #119), the
@@ -65,9 +67,8 @@ import { BoundedList } from "./BoundedList.js";
  * No render slot, by audit (the cook-log lesson, applied before
  * the fact): the app screen renders no app-owned content inside
  * itself — a row is verse data plus a status and a pre-composed
- * date line, and both row actions are bare intents. Every action
- * is therefore a pure callback, which is the honest contract for
- * this view.
+ * date line. The row's controls are a link and a callback per
+ * #248's rule, which is the honest contract for this view.
  */
 
 /** A verse's memorization status, mirroring the app's status
@@ -80,6 +81,11 @@ export type MyVersesPageStatus = "learning" | "memorized";
  * pre-composed next-review line. */
 export type MyVersesPageItem = {
   id: string;
+  /** The drill destination for this verse (#248's navigation
+   * rule: starting the drill navigates, so it is a link): the
+   * host composes it from the verse id. The row's Drill control
+   * renders as a link carrying this href. */
+  drillHref: string;
   reference: string;
   text: string;
   status: MyVersesPageStatus;
@@ -89,19 +95,15 @@ export type MyVersesPageItem = {
 export type MyVersesPageProps = {
   /** The app's memorize list, in the app's order. */
   verses: MyVersesPageItem[];
-  /** Row action: start drilling this verse. */
-  onDrillVerse: (verseId: string) => void;
   /** Row action: remove this verse from the app's list. */
   onRemoveVerse: (verseId: string) => void;
 };
 
 function MyVerseRow({
   item,
-  onDrillPress,
   onRemovePress,
 }: {
   item: MyVersesPageItem;
-  onDrillPress: () => void;
   onRemovePress: () => void;
 }) {
   return (
@@ -111,7 +113,7 @@ function MyVerseRow({
       <Text variant="verse">{item.text}</Text>
       {item.nextReviewLabel ? <Text variant="hint">{item.nextReviewLabel}</Text> : null}
       <Row spaceBefore="sm">
-        <Button size="sm" onPress={onDrillPress}>
+        <Button size="sm" href={item.drillHref}>
           Drill
         </Button>
         <Button size="sm" variant="secondary" onPress={onRemovePress}>
@@ -128,7 +130,7 @@ function MyVerseRow({
  * Controlled — see the file header for the contract and the
  * screen inventory it mirrors.
  */
-export function MyVersesPage({ verses, onDrillVerse, onRemoveVerse }: MyVersesPageProps) {
+export function MyVersesPage({ verses, onRemoveVerse }: MyVersesPageProps) {
   return (
     <ScreenContainer scrollable={false}>
       <Text variant="heading">My verses</Text>
@@ -141,9 +143,6 @@ export function MyVersesPage({ verses, onDrillVerse, onRemoveVerse }: MyVersesPa
           renderItem={({ item }) => (
             <MyVerseRow
               item={item}
-              onDrillPress={() => {
-                onDrillVerse(item.id);
-              }}
               onRemovePress={() => {
                 onRemoveVerse(item.id);
               }}

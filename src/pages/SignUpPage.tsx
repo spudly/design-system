@@ -35,7 +35,10 @@ export type SignUpPageProps = {
   loading?: boolean;
   error?: string | null;
   onSubmit: () => void;
-  onSignInPress?: () => void;
+  /** The sign-in destination (#248: navigation crosses as an
+   * href, not a press callback); the link renders only when the
+   * href is provided. */
+  signInHref?: string;
   /** The app's inline legal notice (app LegalLinks). */
   legalNotice?: ReactNode;
 };
@@ -50,7 +53,7 @@ export function SignUpPage({
   loading = false,
   error,
   onSubmit,
-  onSignInPress,
+  signInHref,
   legalNotice,
 }: SignUpPageProps) {
   // Enter/return in a field submits (#255), mirroring the
@@ -104,9 +107,9 @@ export function SignUpPage({
         {loading ? "Creating account…" : "Create Account"}
       </Button>
       {legalNotice}
-      {onSignInPress ? (
+      {signInHref ? (
         <YStack paddingTop="$4">
-          <TextLink textAlign="center" onPress={onSignInPress}>
+          <TextLink textAlign="center" href={signInHref}>
             Already have an account? Sign in
           </TextLink>
         </YStack>

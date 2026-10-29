@@ -199,16 +199,19 @@ export const mealDetailFixture = {
   members: [
     {
       recipeId: "tuscan-chicken",
+      href: "/recipes/tuscan-chicken",
       title: "Creamy Tuscan Garlic Chicken",
       subtitle: "6 servings · 640 cal · 42g protein · satiety 74",
     },
     {
       recipeId: "fudgy-brownies",
+      href: "/recipes/fudgy-brownies",
       title: "Fudgy Brownies",
       subtitle: "12 servings · 310 cal · 4g protein · satiety 38",
     },
     {
       recipeId: "arroz-con-pollo",
+      href: "/recipes/arroz-con-pollo",
       title: "Arroz con Pollo",
       subtitle: "8 servings",
       isUnavailable: true,
@@ -250,17 +253,38 @@ export const mealCookingFixture = {
  */
 export const mealsHubFixture = {
   meals: [
-    { id: "sunday-dinner", title: "Sunday Chicken Dinner", subtitle: "2 recipes · 1,240 cal" },
-    { id: "taco-night", title: "Taco Night", subtitle: "3 recipes · 980 cal" },
-    { id: "pizza-friday", title: "Pizza Friday", subtitle: "1 recipe" },
+    {
+      id: "sunday-dinner",
+      href: "/meals/sunday-dinner",
+      title: "Sunday Chicken Dinner",
+      subtitle: "2 recipes · 1,240 cal",
+    },
+    {
+      id: "taco-night",
+      href: "/meals/taco-night",
+      title: "Taco Night",
+      subtitle: "3 recipes · 980 cal",
+    },
+    {
+      id: "pizza-friday",
+      href: "/meals/pizza-friday",
+      title: "Pizza Friday",
+      subtitle: "1 recipe",
+    },
   ],
   plans: [
     {
       id: "week-of-oct-19",
+      href: "/meal-plans/week-of-oct-19",
       title: "Week of October 19",
       subtitle: "7 entries · 2026-10-19 – 2026-10-25",
     },
-    { id: "week-of-oct-26", title: "Week of October 26", subtitle: "5 entries" },
+    {
+      id: "week-of-oct-26",
+      href: "/meal-plans/week-of-oct-26",
+      title: "Week of October 26",
+      subtitle: "5 entries",
+    },
   ],
 };
 
@@ -375,27 +399,27 @@ export const addRecipeMenuFixture = {
     {
       label: "Create manually",
       description: "Type in a recipe from scratch.",
-      target: "manualEntry",
+      href: "/recipes/new/manual",
     },
     {
       label: "Generate with AI",
       description: "Describe what you want and let AI draft it.",
-      target: "generateAi",
+      href: "/recipes/new/ai",
     },
     {
       label: "Import from text",
       description: "Paste a recipe from anywhere.",
-      target: "importText",
+      href: "/recipes/new/import-text",
     },
     {
       label: "Import from URL",
       description: "Pull a recipe from a web page.",
-      target: "importUrl",
+      href: "/recipes/new/import-url",
     },
     {
       label: "Import from image",
       description: "Snap a photo of a recipe card or page.",
-      target: "importImage",
+      href: "/recipes/new/import-image",
     },
   ],
 };

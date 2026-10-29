@@ -37,9 +37,9 @@ export const WithRecipes: Story = {
             <Text>{recipe.id === "tuscan-chicken" ? "Tuscan Chicken" : "Fudgy Brownies"}</Text>
           </YStack>
         )}
-        onBrowsePress={() => undefined}
-        onAddPress={() => undefined}
-        onSharedWithMePress={() => undefined}
+        browseHref="/recipes"
+        addHref="/recipes/new"
+        sharedWithMeHref="/shared-with-me"
       />
     </Viewport>
   ),
@@ -52,9 +52,9 @@ export const Empty: Story = {
         {...homeFixture}
         recipes={[]}
         renderRecipeRow={() => null}
-        onBrowsePress={() => undefined}
-        onAddPress={() => undefined}
-        onSharedWithMePress={() => undefined}
+        browseHref="/recipes"
+        addHref="/recipes/new"
+        sharedWithMeHref="/shared-with-me"
       />
     </Viewport>
   ),
@@ -68,9 +68,9 @@ export const Loading: Story = {
         recipes={[]}
         isLoading
         renderRecipeRow={() => null}
-        onBrowsePress={() => undefined}
-        onAddPress={() => undefined}
-        onSharedWithMePress={() => undefined}
+        browseHref="/recipes"
+        addHref="/recipes/new"
+        sharedWithMeHref="/shared-with-me"
       />
     </Viewport>
   ),

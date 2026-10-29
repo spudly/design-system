@@ -1,4 +1,4 @@
-import { XStack, YStack } from "tamagui";
+import { Anchor, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
@@ -72,26 +72,24 @@ import { TextLink } from "../components/TextLink.js";
  * progress view is a pure function of its data (per-field
  * actual/goal/band progress, the plan total, a set-goals link).
  * It holds no state, runs no query or mutation, and its one
- * interaction is a navigation intent, so it crosses the boundary
- * as data plus a callback (`nutritionGoals` +
- * `onSetGoalsPress`). A render slot exists for content that
+ * interaction is a navigation, so it crosses the boundary
+ * as data plus an href (`nutritionGoals` + `goalsHref`, #248). A render slot exists for content that
  * cannot be view-modeled without leaking business logic into
  * props (RecipesPage's cook-log form); nothing on this screen
  * qualifies, so — as in MealPlansPage — the contract pins the
  * absence of a slot, and a future app change that puts
  * app-rendered content inside this view adds one consciously.
  *
- * Entries come in two kinds with two different destinations, so
- * the contract carries two press callbacks where RecipesPage
- * carries one: a meal row opens the meal detail
- * (`onMealPress(mealId)`), a recipe row opens the recipe detail
- * (`onRecipePress(recipeId)`). Each entry therefore carries its
- * own `id` (the row key) plus the `targetId` its press reports —
- * a plan may contain the same recipe twice, so the target cannot
- * double as the key. A recipe entry whose access was lost
- * renders its "(unavailable)" suffix and does not press,
- * mirroring the app's disabled row; meal entries are never
- * unavailable. An entry-less plan renders the bare "Entries"
+ * Entries come in two kinds with two different destinations: a
+ * meal row opens the meal detail, a recipe row opens the recipe
+ * detail. Each entry therefore carries its own `id` (the row
+ * key) plus the `targetId` the host routes on — a plan may
+ * contain the same recipe twice, so the target cannot double as
+ * the key — and the `href` the host composes from that target
+ * (#248: the rows navigate, so they render as links). A recipe
+ * entry whose access was lost renders its "(unavailable)"
+ * suffix and does not render as a link, mirroring the app's
+ * disabled row; meal entries are never unavailable. An entry-less plan renders the bare "Entries"
  * section, as the app does — there is no empty message on this
  * screen, unlike the list pages' empty states.
  *
@@ -111,10 +109,16 @@ export type MealPlanDetailPageEntry = {
   /** The entry's own id (the row key). */
   id: string;
   kind: "meal" | "recipe";
-  /** The meal or recipe the row opens, by kind — reported to
-   * `onMealPress` / `onRecipePress`. Distinct from `id`: a plan
-   * can hold the same recipe in two entries. */
+  /** The meal or recipe the row opens, by kind — the host
+   * composes the entry's `href` from it. Distinct from `id`: a
+   * plan can hold the same recipe in two entries. */
   targetId: string;
+  /** The entry's destination (#248's navigation rule: the row
+   * navigates, so it is a link): the host composes it from
+   * `targetId`, routed by `kind`. The row renders as a link
+   * carrying this href; an unavailable entry's row does not
+   * render as a link. */
+  href: string;
   title: string;
   subtitle?: string;
   /** Recipe entries whose access was lost: the title gains its
@@ -171,19 +175,17 @@ export type MealPlanDetailPageReadyProps = {
    * auto rule would render it. */
   goalsSectionVisibility?: "auto" | "shown" | "hidden";
   /** Optional: the goals section's "Set nutrition goals" link
-   * renders only when the callback is provided (in the app it
+   * renders only when the href is provided (in the app it
    * navigates to the profile's goals). */
-  onSetGoalsPress?: () => void;
-  /** The primary action: the plan's shopping list. */
-  onShoppingListPress: () => void;
-  /** The secondary action: edit the plan (the form screen). */
-  onEditPress: () => void;
+  goalsHref?: string;
+  /** The primary action's destination: the plan's shopping
+   * list (#248: navigation crosses as an href). */
+  shoppingListHref: string;
+  /** The secondary action's destination: edit the plan (the
+   * form screen) (#248). */
+  editHref: string;
   /** The plan's entries, in the app's order. */
   entries: MealPlanDetailPageEntry[];
-  /** A meal entry was pressed, with its meal id. */
-  onMealPress: (mealId: string) => void;
-  /** A recipe entry was pressed, with its recipe id. */
-  onRecipePress: (recipeId: string) => void;
 };
 
 export type MealPlanDetailPageProps = { state: "loading" } | MealPlanDetailPageReadyProps;
@@ -204,58 +206,47 @@ function GoalRow({ label, valueLabel }: MealPlanDetailPageGoalRow) {
   );
 }
 
-function EntryRow({
-  entry,
-  onMealPress,
-  onRecipePress,
-}: {
-  entry: MealPlanDetailPageEntry;
-  onMealPress: (mealId: string) => void;
-  onRecipePress: (recipeId: string) => void;
-}) {
+function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
   const isUnavailable = entry.isUnavailable ?? false;
-  const handlePress = () => {
-    if (entry.kind === "meal") {
-      onMealPress(entry.targetId);
-    } else {
-      onRecipePress(entry.targetId);
-    }
-  };
-  // Web keyboard support (the MealPlansPage row pattern): a view
-  // carrying the button role is made focusable and the button
-  // activation keys — Enter and Space — invoke the same callback
-  // as a press. Web-only props, ignored on native. An unavailable
-  // row is not a button at all: no press, no focus, marked
-  // disabled — the app's disabled Pressable.
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      handlePress();
-    }
-  };
+  const rowContent = (
+    <>
+      <Text
+        fontSize={tokens.typography.fontSize.md}
+        fontWeight={tokens.typography.fontWeight.medium}
+      >
+        {entry.kind === "meal" ? "Meal" : "Recipe"} · {entry.title}
+        {isUnavailable ? " (unavailable)" : ""}
+      </Text>
+      {entry.subtitle ? <Text variant="hint">{entry.subtitle}</Text> : null}
+    </>
+  );
   return (
     <YStack borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2}>
-      <YStack
-        paddingVertical="$3"
-        {...(isUnavailable
-          ? platformAccessibilityProps({ accessibilityState: { disabled: true } })
-          : {
-              ...platformAccessibilityProps({ accessibilityRole: "button" }),
-              onPress: handlePress,
-              tabIndex: 0,
-              onKeyDown: handleKeyDown,
-              cursor: "web:pointer",
-            })}
-      >
-        <Text
-          fontSize={tokens.typography.fontSize.md}
-          fontWeight={tokens.typography.fontWeight.medium}
+      {isUnavailable ? (
+        <YStack
+          paddingVertical="$3"
+          {...platformAccessibilityProps({ accessibilityState: { disabled: true } })}
         >
-          {entry.kind === "meal" ? "Meal" : "Recipe"} · {entry.title}
-          {isUnavailable ? " (unavailable)" : ""}
-        </Text>
-        {entry.subtitle ? <Text variant="hint">{entry.subtitle}</Text> : null}
-      </YStack>
+          {rowContent}
+        </YStack>
+      ) : (
+        // The row navigates, so it renders as a real anchor
+        // carrying the entry's href (#248) — keyboard-operable
+        // on web by default, which retires the hand-rolled
+        // focus/keydown press pattern this row used as a button.
+        // The anchor is pinned to a web flex column (the BackLink
+        // lesson: a text-based anchor is inline on web and would
+        // not hold the row's stacked layout).
+        <Anchor
+          href={entry.href}
+          textDecorationLine="none"
+          display="web:flex"
+          flexDirection="column"
+          paddingVertical="$3"
+        >
+          {rowContent}
+        </Anchor>
+      )}
     </YStack>
   );
 }
@@ -282,12 +273,10 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     nutritionLabel,
     nutritionGoals,
     goalsSectionVisibility = "auto",
-    onSetGoalsPress,
-    onShoppingListPress,
-    onEditPress,
+    goalsHref,
+    shoppingListHref,
+    editHref,
     entries,
-    onMealPress,
-    onRecipePress,
   } = props;
 
   // The app's goals view renders nothing when the plan has
@@ -352,28 +341,23 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                 Set daily nutrition goals to compare this plan.
               </Text>
             )}
-            {onSetGoalsPress ? (
+            {goalsHref ? (
               <YStack paddingBlockStart="$3">
-                <TextLink onPress={onSetGoalsPress}>Set nutrition goals</TextLink>
+                <TextLink href={goalsHref}>Set nutrition goals</TextLink>
               </YStack>
             ) : null}
           </SectionCard>
         </YStack>
       ) : null}
       <XStack paddingBlockEnd="$6" flexWrap="wrap" gap="$3">
-        <Button onPress={onShoppingListPress}>Shopping list</Button>
-        <Button variant="secondary" onPress={onEditPress}>
+        <Button href={shoppingListHref}>Shopping list</Button>
+        <Button variant="secondary" href={editHref}>
           Edit
         </Button>
       </XStack>
       <SectionCard title="Entries">
         {entries.map((entry) => (
-          <EntryRow
-            key={entry.id}
-            entry={entry}
-            onMealPress={onMealPress}
-            onRecipePress={onRecipePress}
-          />
+          <EntryRow key={entry.id} entry={entry} />
         ))}
       </SectionCard>
     </ScreenContainer>

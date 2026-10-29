@@ -45,9 +45,11 @@ export type HomePageProps = {
   recipes: HomePageRecipe[];
   renderRecipeRow: (recipe: HomePageRecipe) => ReactNode;
   isLoading?: boolean;
-  onBrowsePress: () => void;
-  onAddPress: () => void;
-  onSharedWithMePress: () => void;
+  /** Navigation destinations (#248: navigation crosses as hrefs,
+   * not press callbacks); the host composes them from its routes. */
+  browseHref: string;
+  addHref: string;
+  sharedWithMeHref: string;
 };
 
 export function HomePage({
@@ -61,9 +63,9 @@ export function HomePage({
   recipes,
   renderRecipeRow,
   isLoading = false,
-  onBrowsePress,
-  onAddPress,
-  onSharedWithMePress,
+  browseHref,
+  addHref,
+  sharedWithMeHref,
 }: HomePageProps) {
   return (
     <ScreenContainer>
@@ -77,13 +79,13 @@ export function HomePage({
           </Text>
         </YStack>
         <YStack paddingBottom="$8" gap="$3">
-          <Button variant="primary" onPress={onBrowsePress}>
+          <Button variant="primary" href={browseHref}>
             {browseLabel}
           </Button>
-          <Button variant="secondary" onPress={onAddPress}>
+          <Button variant="secondary" href={addHref}>
             {addLabel}
           </Button>
-          <Button variant="secondary" onPress={onSharedWithMePress}>
+          <Button variant="secondary" href={sharedWithMeHref}>
             {sharedWithMeLabel}
           </Button>
         </YStack>

@@ -24,7 +24,7 @@ function Viewport({ children }: { children: ReactNode }) {
 export const Menu: Story = {
   render: () => (
     <Viewport>
-      <AddRecipeMenuPage options={addRecipeMenuFixture.options} onSelect={() => undefined} />
+      <AddRecipeMenuPage options={addRecipeMenuFixture.options} />
     </Viewport>
   ),
 };

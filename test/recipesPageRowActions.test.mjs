@@ -157,19 +157,19 @@ test("the control renders inline in the text block's subtitle flow, never as a r
     1,
     "RecipeRow must render the log-cook control exactly once",
   );
-  // The control lives inside the text press target (the one carrying
+  // The control lives inside the text link target (the one carrying
   // textBlockStyle): it opens before the control renders, and the
   // control renders before that target closes.
   const textTargetAt = row.indexOf("style={textBlockStyle}");
   const controlAt = row.indexOf("<LogCookControl");
-  const textTargetCloseAt = row.indexOf("</TouchableOpacity>", controlAt);
+  const textTargetCloseAt = row.indexOf("</Anchor>", controlAt);
   assert.ok(
     textTargetAt !== -1 && controlAt > textTargetAt,
-    "the control must render after the text press target opens",
+    "the control must render after the text link target opens",
   );
   assert.ok(
     textTargetCloseAt > controlAt,
-    "the control must render before the text press target closes",
+    "the control must render before the text link target closes",
   );
   // Inside the target, the control sits in the subtitle's wrapping
   // flow, after the subtitle text — so it flows with the text at the
@@ -198,7 +198,7 @@ test("the stories exercise rated and unrated rows", () => {
   );
   assert.match(
     stories,
-    /id: "arroz-con-pollo", title: "Arroz con Pollo", subtitle: "[^"]*" \}/,
+    /id: "arroz-con-pollo", href: "\/recipes\/arroz-con-pollo", title: "Arroz con Pollo", subtitle: "[^"]*" \}/,
     "at least one fixture recipe (Arroz con Pollo) must stay unrated so the icon-only button renders in captures",
   );
 });

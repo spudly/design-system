@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from "react";
 import { FlatList, TouchableOpacity } from "react-native";
-import { Image, View, XStack, YStack } from "tamagui";
+import { Anchor, Image, View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
@@ -148,6 +149,12 @@ const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 
  * renders it. */
 export type RecipesPageItem = {
   id: string;
+  /** The recipe's destination (#248's navigation rule: the row
+   * navigates, so it is a link): the host composes it from the
+   * recipe id — in the shared-with-me configuration, the recipe's
+   * permalink. Both of the row's targets (thumbnail and text
+   * block) render as links carrying this href. */
+  href: string;
   title: string;
   subtitle?: string;
   /** Display rating, 0–5, or null/absent when the recipe is
@@ -224,7 +231,6 @@ export type RecipesPageProps = {
    * fire-once-per-content-length end-reached semantics and an
    * empty page cannot re-arm the signal on its own. */
   isFetchingNextPage?: boolean;
-  onRecipePress: (recipeId: string) => void;
   /** Optional row action, mirroring the app card's log-cook
    * affordance. "Log cook" is a callback only — the cook-log form
    * and its mutation stay in the app, which renders them (see
@@ -660,39 +666,46 @@ function LogCookControl({
 
 function RecipeRow({
   item,
-  onPress,
   onLogCookPress,
 }: {
   item: RecipesPageItem;
-  onPress: () => void;
   onLogCookPress?: () => void;
 }) {
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
-        {/* Both navigation press targets carry the button role and an
-          accessible name built from the recipe title: the thumbnail
-          target wraps only an image (or an empty placeholder), so
-          without the label a screen reader meets an unidentified
-          action for every recipe. The text target's label also
-          carries the subtitle when present — a title-only label
-          would override the name React Native derives from its Text
-          children and drop the subtitle announcement. The log-cook
-          control is a third press target nested in the text block's
-          subtitle flow; its label names the action instead — see
-          LogCookControl. */}
-        <TouchableOpacity
-          onPress={onPress}
-          accessibilityRole="button"
-          accessibilityLabel={item.title}
+        {/* Both navigation targets are links carrying the recipe's
+          href (#248) and an accessible name built from the recipe
+          title: the thumbnail target wraps only an image (or an
+          empty placeholder), so without the label a screen reader
+          meets an unidentified link for every recipe. The text
+          target's label also carries the subtitle when present — a
+          title-only label would override the name React Native
+          derives from its Text children and drop the subtitle
+          announcement. The log-cook control is a third press
+          target nested in the text block's subtitle flow; its
+          label names the action instead — see LogCookControl. */}
+        <Anchor
+          href={item.href}
+          textDecorationLine="none"
+          display="web:flex"
+          {...platformAccessibilityProps({
+            accessibilityRole: "link",
+            accessibilityLabel: item.title,
+          })}
         >
           <Thumbnail imageUrl={item.imageUrl} />
-        </TouchableOpacity>
-        <TouchableOpacity
+        </Anchor>
+        <Anchor
+          href={item.href}
+          textDecorationLine="none"
+          display="web:flex"
+          flexDirection="column"
           style={textBlockStyle}
-          onPress={onPress}
-          accessibilityRole="button"
-          accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
+          {...platformAccessibilityProps({
+            accessibilityRole: "link",
+            accessibilityLabel: item.subtitle ? `${item.title}, ${item.subtitle}` : item.title,
+          })}
         >
           <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
           {/* The subtitle line is a wrapping inline flow inside the
@@ -712,7 +725,7 @@ function RecipeRow({
               ) : null}
             </XStack>
           ) : null}
-        </TouchableOpacity>
+        </Anchor>
       </Card>
     </YStack>
   );
@@ -730,7 +743,6 @@ export function RecipesPage(props: RecipesPageProps) {
     recipes,
     isLoading,
     isFetchingNextPage = false,
-    onRecipePress,
     onLogCookPress,
     onLoadMore,
     renderRecipeAccessory,
@@ -783,9 +795,6 @@ export function RecipesPage(props: RecipesPageProps) {
             <>
               <RecipeRow
                 item={item}
-                onPress={() => {
-                  onRecipePress(item.id);
-                }}
                 {...(onLogCookPress && !hasAccessory
                   ? {
                       onLogCookPress: () => {

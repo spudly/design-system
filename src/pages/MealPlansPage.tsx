@@ -1,6 +1,5 @@
-import { XStack, YStack } from "tamagui";
+import { Anchor, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
@@ -78,6 +77,11 @@ import { Text } from "../components/Text.js";
  * renders it. */
 export type MealPlansPageItem = {
   id: string;
+  /** The plan's destination (#248's navigation rule: the row
+   * navigates, so it is a link): the host composes it from the
+   * plan id. The row's text block renders as a link carrying
+   * this href. */
+  href: string;
   title: string;
   subtitle?: string;
 };
@@ -88,10 +92,9 @@ export type MealPlansPageProps = {
   /** Load in flight: the spinner renders in place of the list,
    * mirroring the app's content swap (see the header). */
   isLoading: boolean;
-  onPlanPress: (planId: string) => void;
   /** Optional: the "New meal plan" action renders only when the
-   * callback is provided. */
-  onCreatePlan?: () => void;
+   * href is provided (#248: it navigates, so it is a link). */
+  createHref?: string;
   /** Optional row action, mirroring the app row's Delete. The
    * button renders only when the callback is provided. */
   onPlanDelete?: (planId: string) => void;
@@ -105,44 +108,32 @@ export type MealPlansPageProps = {
 
 function MealPlanRow({
   item,
-  onPress,
   onDeletePress,
 }: {
   item: MealPlansPageItem;
-  onPress: () => void;
   onDeletePress?: () => void;
 }) {
-  // Web keyboard support (the TextLink pattern): a div carrying the
-  // button role is not keyboard-operable on its own, so it is made
-  // focusable and the button activation keys — Enter and Space —
-  // invoke the same callback as a press. `tabIndex` and `onKeyDown`
-  // are web-only props in Tamagui and are ignored on native, where
-  // onPress is the activation path.
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onPress();
-    }
-  };
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
-        {/* The pressable text block is a Tamagui view, not a React
-          Native Pressable/TouchableOpacity: those map
-          accessibilityRole="button" to a native <button> element on
-          web, whose UA styles center the row's text. A Tamagui
-          pressable renders a div carrying the role (the OptionCard
-          pattern) and keeps the layout. flex/minWidth are structural
-          only: the block expands and may shrink within the row. */}
-        <YStack
+        {/* The text block is a Tamagui Anchor carrying the plan's
+          href, not a React Native Pressable/TouchableOpacity:
+          those map accessibilityRole="button" to a native
+          <button> element on web, whose UA styles center the
+          row's text. The anchor renders a real link (the row
+          navigates, #248) and keeps the layout. flex/minWidth are
+          structural only: the block expands and may shrink within
+          the row. As a real anchor it is keyboard-operable on web
+          by default, which retires the hand-rolled focus/keydown
+          press pattern this row used as a button. */}
+        <Anchor
           flex={1}
           minWidth={0}
           gap="$1"
-          {...platformAccessibilityProps({ accessibilityRole: "button" })}
-          onPress={onPress}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          cursor="web:pointer"
+          href={item.href}
+          textDecorationLine="none"
+          display="web:flex"
+          flexDirection="column"
         >
           <Text
             fontSize={tokens.typography.fontSize.md}
@@ -151,7 +142,7 @@ function MealPlanRow({
             {item.title}
           </Text>
           {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
-        </YStack>
+        </Anchor>
         {onDeletePress ? (
           <XStack paddingInlineStart="$3" alignItems="center">
             <Button
@@ -178,8 +169,7 @@ function MealPlanRow({
 export function MealPlansPage({
   plans,
   isLoading,
-  onPlanPress,
-  onCreatePlan,
+  createHref,
   onPlanDelete,
   titleLevel,
 }: MealPlansPageProps) {
@@ -188,8 +178,8 @@ export function MealPlansPage({
       <Text variant="heading" aria-level={titleLevel}>
         Meal plans
       </Text>
-      {onCreatePlan ? (
-        <Button alignSelf="stretch" onPress={onCreatePlan}>
+      {createHref ? (
+        <Button alignSelf="stretch" href={createHref}>
           New meal plan
         </Button>
       ) : null}
@@ -205,9 +195,6 @@ export function MealPlansPage({
             <MealPlanRow
               key={plan.id}
               item={plan}
-              onPress={() => {
-                onPlanPress(plan.id);
-              }}
               {...(onPlanDelete
                 ? {
                     onDeletePress: () => {

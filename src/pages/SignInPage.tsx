@@ -35,8 +35,13 @@ export type SignInPageProps = {
   loading?: boolean;
   error?: string | null;
   onSubmit: () => void;
-  onSignUpPress?: () => void;
-  onForgotPasswordPress?: () => void;
+  /** The create-account destination (#248: navigation crosses as
+   * an href, not a press callback); the link renders only when
+   * the href is provided. */
+  signUpHref?: string;
+  /** The forgot-password destination (#248); the link renders
+   * only when the href is provided. */
+  forgotPasswordHref?: string;
 };
 
 export function SignInPage({
@@ -47,8 +52,8 @@ export function SignInPage({
   loading = false,
   error,
   onSubmit,
-  onSignUpPress,
-  onForgotPasswordPress,
+  signUpHref,
+  forgotPasswordHref,
 }: SignInPageProps) {
   // Enter/return in a field submits (#255), mirroring the
   // native-form behavior the retired web views had; while
@@ -88,14 +93,14 @@ export function SignInPage({
       <Button variant="primary" disabled={loading} onPress={onSubmit} accessibilityLabel="Sign In">
         {loading ? "Signing in…" : "Sign In"}
       </Button>
-      {onSignUpPress ? (
+      {signUpHref ? (
         <YStack paddingTop="$4">
-          <TextLink onPress={onSignUpPress}>Create an account</TextLink>
+          <TextLink href={signUpHref}>Create an account</TextLink>
         </YStack>
       ) : null}
-      {onForgotPasswordPress ? (
+      {forgotPasswordHref ? (
         <YStack paddingTop="$2">
-          <TextLink color={tokens.colors.gray.gray6} onPress={onForgotPasswordPress}>
+          <TextLink color={tokens.colors.gray.gray6} href={forgotPasswordHref}>
             Forgot password?
           </TextLink>
         </YStack>

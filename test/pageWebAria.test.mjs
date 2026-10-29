@@ -131,7 +131,10 @@ const PAGE_STACKS = [
   "src/pages/ShoppingListPage.tsx",
   "src/pages/MealDetailPage.tsx",
   "src/pages/MealPlanDetailPage.tsx",
-  "src/pages/MealPlansPage.tsx",
+  // MealPlansPage is deliberately absent: #248 remodeled its row
+  // from a stack pressable to a real Anchor (the row navigates),
+  // so it has no stack pressable left to translate — pinned by
+  // the dedicated test below.
   "src/pages/MealsHubPage.tsx",
   "src/pages/AiSessionPage.tsx",
   "src/pages/MealCookingModePage.tsx",
@@ -173,19 +176,30 @@ test("ShoppingListPage's checkbox row translates role, checked state, and label 
   assert.match(code, /accessibilityLabel: line\.name/);
 });
 
-test("MealDetail / MealPlanDetail rows translate the disabled state and the button role (#237)", () => {
+test("MealPlansPage has no stack pressable left to translate (#237, #248)", () => {
+  // The plan row is a real Anchor since #248 — no stack pressable
+  // remains, so the translator must not be imported or used, and
+  // no raw RN accessibility JSX props may appear either.
+  const code = readCode("src/pages/MealPlansPage.tsx");
+  assert.ok(!code.includes("platformAccessibilityProps"));
+  assert.ok(
+    !/accessibility(Label|State|Role|Value)=/.test(
+      code.replaceAll(
+        /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity)\b[^>]*>/g,
+        "",
+      ),
+    ),
+  );
+});
+
+test("MealDetail / MealPlanDetail rows translate the disabled state; the rows are links now (#237, #248)", () => {
   for (const rel of ["src/pages/MealDetailPage.tsx", "src/pages/MealPlanDetailPage.tsx"]) {
     const code = readCode(rel);
     assert.match(
       code,
       /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/,
-      `${rel}: the unavailable row's disabled state must go through the translator`,
     );
-    assert.match(
-      code,
-      /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/,
-      `${rel}: the pressable row's button role must go through the translator`,
-    );
+    assert.doesNotMatch(code, /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/);
   }
 });
 

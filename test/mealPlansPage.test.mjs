@@ -10,13 +10,16 @@
  *    unpaginated in a scroll view, so RecipesPage's bounded-list
  *    structure (#188) does not apply — a FlatList here would be a
  *    structure the app screen never had.
- * 2. The view-model and callbacks match the component's contract:
- *    plan items in ({id, title, subtitle}), press intents out by
- *    id, with onCreatePlan / onPlanDelete optional.
- * 3. Optional actions omit cleanly: the create button and the
- *    per-row Delete render only when their callbacks are provided
- *    (the RecipesPage optional-callback idiom), so a read-only
- *    consumer gets a clean list.
+ * 2. The view-model and navigation contract matches the
+ *    component's contract: plan items in ({id, href, title,
+ *    subtitle}) — the row navigates, so it is a link (#248) —
+ *    with the create destination (createHref) and the row
+ *    delete callback (onPlanDelete) optional.
+ * 3. Optional actions omit cleanly: the create button renders
+ *    only when its href is provided and the per-row Delete only
+ *    when its callback is provided (the RecipesPage
+ *    optional-prop idiom), so a read-only consumer gets a clean
+ *    list.
  * 4. The states follow the app: loading swaps the content for the
  *    spinner (checked before the empty/list branches — the app
  *    replaces its content while loading), and the empty state is
@@ -76,28 +79,32 @@ test("the shell is the scrolling ScreenContainer, with no FlatList", () => {
   );
 });
 
-test("the view-model and callback contract matches the declared props", () => {
+test("the view-model and navigation contract matches the declared props", () => {
   assert.match(code, /plans: MealPlansPageItem\[\];/);
-  assert.match(code, /onPlanPress: \(planId: string\) => void;/);
-  assert.match(code, /onCreatePlan\?: \(\) => void;/);
+  assert.match(code, /createHref\?: string;/);
   assert.match(code, /onPlanDelete\?: \(planId: string\) => void;/);
   assert.match(
     code,
-    /onPlanPress\(plan\.id\)/,
-    "row presses must fire onPlanPress with the row's plan id",
+    /<Anchor\s+flex=\{1\}\s+minWidth=\{0\}\s+gap="\$1"\s+href=\{item\.href\}/,
+    "rows must render as anchors carrying the plan's href (#248)",
   );
   assert.match(
     code,
     /onPlanDelete\(plan\.id\)/,
     "row deletes must fire onPlanDelete with the row's plan id",
   );
+  assert.doesNotMatch(
+    code,
+    /onPlanPress|onCreatePlan/,
+    "rows and the create action navigate — #248 leaves no press callbacks behind",
+  );
 });
 
-test("optional actions render only when their callbacks are provided", () => {
+test("optional actions render only when their props are provided", () => {
   assert.match(
     code,
-    /\{onCreatePlan \? \(/,
-    "the create button must be guarded by the onCreatePlan prop",
+    /\{createHref \? \(/,
+    "the create button must be guarded by the createHref prop",
   );
   assert.match(
     code,
