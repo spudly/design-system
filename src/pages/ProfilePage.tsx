@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
+import { LegalSection } from "../components/LegalSection.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
 
@@ -26,10 +25,18 @@ import { Text } from "../components/Text.js";
  * - `legalLinks` — the Legal section's links are app content
  *   (the URLs are app constants; the B2 audit keeps
  *   `LegalLinks` app-side), so the host renders its LegalLinks
- *   into the section this page frames.
+ *   into the section this page frames (LegalSection, #119).
  *
  * Sign out is a bare intent: the session teardown is app-side
  * business logic and never enters the DS.
+ *
+ * De-styled for #119: the page renders no layout primitives
+ * and sets no styling props. The shell's own section rhythm
+ * separates the blocks (the app view's title, email, and
+ * button separations), the title takes Text's `title` variant
+ * (the xl bold treatment it rendered with, owned by the
+ * variant), the email takes the `muted` variant, and the
+ * Legal block is the LegalSection component.
  */
 
 export type ProfilePageProps = {
@@ -61,49 +68,22 @@ export function ProfilePage({
 }: ProfilePageProps) {
   return (
     <ScreenContainer variant="padded">
-      <YStack paddingBottom="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          Profile
-        </Text>
-      </YStack>
-      {email ? (
-        <YStack paddingBottom="$6">
-          <Text color={tokens.colors.gray.gray8}>{email}</Text>
-        </YStack>
-      ) : null}
+      <Text variant="title">Profile</Text>
+      {email ? <Text variant="muted">{email}</Text> : null}
       {showcaseHref ? (
-        <YStack paddingBottom="$4">
-          <Button variant="secondary" href={showcaseHref}>
-            Component Showcase
-          </Button>
-        </YStack>
+        <Button variant="secondary" href={showcaseHref}>
+          Component Showcase
+        </Button>
       ) : null}
       {sectionsBeforeFeedback}
       {tagsHref ? (
-        <YStack paddingBottom="$4">
-          <Button variant="secondary" href={tagsHref}>
-            Manage Tags
-          </Button>
-        </YStack>
+        <Button variant="secondary" href={tagsHref}>
+          Manage Tags
+        </Button>
       ) : null}
       {feedbackPreference}
       {sectionsAfterFeedback}
-      <YStack paddingBottom="$8">
-        <YStack paddingBottom="$3">
-          <Text
-            fontSize={tokens.typography.fontSize.lg}
-            fontWeight={tokens.typography.fontWeight.semibold}
-            color={tokens.colors.gray.gray10}
-          >
-            Legal
-          </Text>
-        </YStack>
-        {legalLinks}
-      </YStack>
+      <LegalSection title="Legal">{legalLinks}</LegalSection>
       <Button variant="danger" onPress={onSignOut}>
         Sign Out
       </Button>

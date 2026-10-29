@@ -1,5 +1,3 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { CheckboxField } from "../components/CheckboxField.js";
 import { TextAreaField } from "../components/TextAreaField.js";
@@ -25,6 +23,17 @@ import { TextField } from "../components/TextField.js";
  * boolean (`submitDisabled`). The submitted state crosses as
  * a boolean and swaps the form for the thanks message, as in
  * the app form.
+ *
+ * De-styled for #119: the page renders no layout primitives
+ * and sets no styling props. The shell's own section rhythm
+ * separates the blocks at the form's field rhythm; the title
+ * takes Text's `title` variant (the xl bold treatment it
+ * rendered with, owned by the variant), the subtitle the
+ * `hint` variant, and the message field takes TextAreaField's
+ * own label — the same label treatment the email field's
+ * TextField renders, where the page previously hand-rolled a
+ * label beside the textarea. The submitted thanks takes the
+ * `success` variant (the app form's bare success line).
  */
 
 export type FeedbackPageProps = {
@@ -57,41 +66,21 @@ export function FeedbackPage({
 }: FeedbackPageProps) {
   return (
     <ScreenContainer variant="padded">
-      <YStack paddingBottom="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          Feedback
-        </Text>
-      </YStack>
-      <YStack paddingBottom="$6">
-        <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-          Share ideas, confusion, or problems. We&apos;ll include session context to help us
-          investigate.
-        </Text>
-      </YStack>
+      <Text variant="title">Feedback</Text>
+      <Text variant="hint">
+        Share ideas, confusion, or problems. We&apos;ll include session context to help us
+        investigate.
+      </Text>
       {submitted ? (
-        <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.success.success8}>
-          Thanks — we got your feedback.
-        </Text>
+        <Text variant="success">Thanks — we got your feedback.</Text>
       ) : (
-        <YStack gap="$4">
-          <YStack gap="$2">
-            <Text
-              fontSize={tokens.typography.fontSize.sm}
-              fontWeight={tokens.typography.fontWeight.medium}
-              color={tokens.colors.gray.gray10}
-            >
-              What&apos;s on your mind?
-            </Text>
-            <TextAreaField
-              value={message}
-              onChangeText={onMessageChange}
-              placeholder="Tell us what happened or what you'd like to see improved."
-            />
-          </YStack>
+        <>
+          <TextAreaField
+            label="What's on your mind?"
+            value={message}
+            onChangeText={onMessageChange}
+            placeholder="Tell us what happened or what you'd like to see improved."
+          />
           <TextField
             label="Email me back (optional)"
             value={replyEmail}
@@ -111,7 +100,7 @@ export function FeedbackPage({
           >
             {submitting ? "Submitting…" : "Submit feedback"}
           </Button>
-        </YStack>
+        </>
       )}
     </ScreenContainer>
   );

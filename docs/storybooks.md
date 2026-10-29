@@ -72,8 +72,8 @@ Exceptions — files that are not components/pages and carry no
 stories, by design:
 
 - `src/components/accessibility.ts` — ARIA helper utilities.
-- `src/pages/PageFrame.tsx` — internal page scaffolding shared by
-  the page components; not exported from `@spudly/ui/pages`, and
+- `src/components/PageFrame.tsx` — internal page-story scaffolding
+  shared by the page stories; not exported from `@spudly/ui`, and
   exercised through every page story.
 - `src/pages/fixtures.ts` — the static fixtures the page stories
   render.

@@ -13,7 +13,7 @@ import { StepDots } from "../components/StepDots.js";
 import { Text } from "../components/Text.js";
 import { VerseText } from "../components/VerseText.js";
 import { tokens } from "../tokens/index.js";
-import { PageFrame } from "./PageFrame.js";
+import { PageFrame } from "../components/PageFrame.js";
 import { passageFixture, progressFixtures, verseListFixtures } from "./fixtures.js";
 
 /**
