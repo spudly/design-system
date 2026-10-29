@@ -30,7 +30,10 @@
  *   are not inspected — the same sight limit the no-page-styling
  *   rule documents. An inline object on a NON-style attribute
  *   (e.g. `options={{ ... }}`) is data, not styling, and is
- *   likewise not inspected.
+ *   likewise not inspected. Style arrays (`style={[...]}`) and
+ *   style-bearing properties nested inside a spread object
+ *   (`{...{ style: { ... } }}`) ARE inspected: their visible
+ *   objects are style objects in every sense that matters here.
  *
  * Deliberately NOT reported:
  *
@@ -83,6 +86,11 @@ function checkObjectKeys(context, node) {
     const key = property.key.name ?? property.key.value;
     if (isMarginKey(key)) {
       context.report({ node: property, messageId: "marginKey", data: { name: key } });
+    } else if (isStyleBearingAttribute(key)) {
+      // A style-bearing property nested in the object (e.g. the
+      // `style` key of a JSX spread's props object) carries a
+      // style object of its own — inspect its visible keys.
+      checkStyleObject(context, property.value);
     }
   }
 }
@@ -100,6 +108,15 @@ function checkStyleObject(context, node) {
     }
     case "LogicalExpression": {
       checkStyleObject(context, node.right);
+      break;
+    }
+    case "ArrayExpression": {
+      // Style arrays (`style={[base, { marginTop: 8 }]}`) are a
+      // supported React Native form — inspect each visible
+      // element the same way as a standalone style object.
+      for (const element of node.elements) {
+        if (element) checkStyleObject(context, element);
+      }
       break;
     }
     default: {
@@ -126,6 +143,14 @@ function checkAttribute(context, attribute) {
     return;
   }
   const { name } = attribute.name;
+  if (typeof name !== "string") {
+    // Namespaced attribute names (JSXNamespacedName, e.g.
+    // `xlink:href`) destructure to a node, not a string — they
+    // are never margin props or style-bearing attributes, so
+    // there is nothing to check (and the string checks below
+    // must not run on them).
+    return;
+  }
   if (marginProps.has(name)) {
     context.report({ node: attribute, messageId: "marginProp", data: { name } });
     return;

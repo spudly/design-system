@@ -132,6 +132,23 @@ test("inline objects on non-style attributes are data, not styling", () => {
   assert.deepEqual(messageIds(`<View contentContainerStyle={{ marginTop: 8 }} />`), ["marginKey"]);
 });
 
+test("margin keys inside style arrays are banned", () => {
+  assert.deepEqual(messageIds(`<View style={[{ marginTop: 8 }]} />`), ["marginKey"]);
+  assert.deepEqual(messageIds(`<View style={[baseStyle, { marginTop: 8 }]} />`), ["marginKey"]);
+  assert.deepEqual(messageIds(`<View style={[baseStyle]} />`), []);
+});
+
+test("style-bearing properties nested in spread objects are inspected; data properties are not", () => {
+  assert.deepEqual(messageIds(`<View {...{ style: { marginTop: 8 } }} />`), ["marginKey"]);
+  assert.deepEqual(messageIds(`<View {...{ hoverStyle: { margin: 4 } }} />`), ["marginKey"]);
+  assert.deepEqual(messageIds(`<View {...{ options: { marginTop: 8 } }} />`), []);
+});
+
+test("namespaced attribute names are skipped, not crashed on", () => {
+  assert.deepEqual(messageIds(`<svg xlink:href="#icon" />`), []);
+  assert.deepEqual(messageIds(`<svg xlink:href="#icon" marginTop={8} />`), ["marginProp"]);
+});
+
 test("gap, padding and positioning offsets are untouched", () => {
   assert.deepEqual(messageIds(`<YStack gap="$3" padding="$4" />`), []);
   assert.deepEqual(messageIds(`<YStack paddingBlockEnd="$3" />`), []);
