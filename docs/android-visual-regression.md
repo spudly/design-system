@@ -232,6 +232,8 @@ fails the test suite.
 | pages-eciperay-mealplanspage                | light_warmHarvest |       4 |         4 |
 | pages-eciperay-mealshubpage                 | light_warmHarvest |       3 |         3 |
 | pages-eciperay-profilepage                  | light_warmHarvest |       1 |         1 |
+| pages-eciperay-publicpageframe              | light_warmHarvest |       3 |         3 |
+| pages-eciperay-publicrecipepage             | light_warmHarvest |       8 |         8 |
 | pages-eciperay-recipedetailpage             | light_warmHarvest |       8 |         8 |
 | pages-eciperay-recipeformpage               | light_warmHarvest |       4 |         4 |
 | pages-eciperay-recipespage                  | light_warmHarvest |      11 |        11 |
@@ -247,7 +249,7 @@ fails the test suite.
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **117** |   **117** |
+| **Total**                                   |                   | **128** |   **128** |
 
 <!-- VR-COVERAGE-END -->
 
