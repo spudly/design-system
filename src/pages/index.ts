@@ -75,6 +75,12 @@ export { ImportUrlPage, type ImportUrlPageProps } from "./ImportUrlPage.js";
 export { ImportImagePage, type ImportImagePageProps } from "./ImportImagePage.js";
 export { ImportReviewPage, type ImportReviewPageProps } from "./ImportReviewPage.js";
 export { HomePage, type HomePageProps, type HomePageRecipe } from "./HomePage.js";
+export {
+  LandingPage,
+  type LandingPageProps,
+  type LandingPageCta,
+  type LandingPageFeature,
+} from "./LandingPage.js";
 export { TagsPage, type TagsPageProps, type TagsPageTag } from "./TagsPage.js";
 export { FeedbackPage, type FeedbackPageProps } from "./FeedbackPage.js";
 export {
