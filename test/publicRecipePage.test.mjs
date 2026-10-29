@@ -15,10 +15,12 @@
  *    and unavailable are union members alongside ready, each
  *    non-ready state branches before the ready render, and the
  *    error copy is the web surface's verbatim copy.
- * 3. Single scroll, no tabs: exactly one ScrollView in the page,
- *    no tab state in the contract, and the sections render in tab
- *    order (CTA bar, overview, ingredients, instructions,
- *    engagement) so every section stays in the document.
+ * 3. Single scroll, no tabs: exactly one scroll region in the
+ *    page — owned by ScrollShell since the #119 de-styling moved
+ *    the page's hand-rolled ScrollView into it — no tab state in
+ *    the contract, and the sections render in tab order (CTA bar,
+ *    overview, ingredients, instructions, engagement) so every
+ *    section stays in the document.
  * 4. The CTA bar's variant is chosen by the host's auth state:
  *    signed-out shows the three navigation intents with their
  *    verbatim labels; signed-in shows the clone button (with its
@@ -50,6 +52,14 @@
  * these components (Chromatic screenshots in CI), and the
  * invariant is a per-literal property of the source. Comments are
  * stripped before scanning so prose cannot satisfy the patterns.
+ *
+ * The #119 de-styling extracted the page's four sections into
+ * shared components (RecipeOverviewPanel, RecipeIngredientsPanel,
+ * RecipeInstructionsPanel, RatingsCard) and its shells into
+ * ScrollShell / LoadingGate / MessageCard; pins for invariants
+ * that live inside a section now scan that component's source,
+ * while the page-level pins (union, CTA contract, section order,
+ * slot) scan the page.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -59,10 +69,15 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "..", "src", "pages");
+const componentsDir = join(here, "..", "src", "components");
 const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
 const frameSource = readFileSync(join(pagesDir, "PublicPageFrame.tsx"), "utf8");
 const stories = readFileSync(join(pagesDir, "PublicRecipePage.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
+const overviewSource = readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8");
+const ingredientsSource = readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8");
+const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
+const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
@@ -71,6 +86,10 @@ const strip = (text) =>
 const code = strip(source);
 const frameCode = strip(frameSource);
 const storiesCode = strip(stories);
+const overviewCode = strip(overviewSource);
+const ingredientsCode = strip(ingredientsSource);
+const ratingsCode = strip(ratingsSource);
+const scrollShellCode = strip(scrollShellSource);
 
 test("PublicRecipePage and PublicPageFrame are exported from the pages subpath", () => {
   assert.match(index, /PublicRecipePage,/, "index.ts must export PublicRecipePage");
@@ -115,11 +134,14 @@ test("error states live inside the props union, branched before the ready render
   }
   assert.match(
     code,
-    /<Spinner label="Loading recipe" \/>/,
-    "the loading state renders the DS Spinner shell",
+    /<LoadingGate label="Loading recipe" \/>/,
+    "the loading state renders the DS LoadingGate",
   );
-  assert.match(code, /<ErrorState title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
-  assert.match(code, /<ErrorState title=\{UNAVAILABLE_TITLE\} message=\{UNAVAILABLE_MESSAGE\} \/>/);
+  assert.match(code, /<MessageCard title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
+  assert.match(
+    code,
+    /<MessageCard title=\{UNAVAILABLE_TITLE\} message=\{UNAVAILABLE_MESSAGE\} \/>/,
+  );
 });
 
 test("the error copy is the web surface's verbatim copy", () => {
@@ -133,27 +155,32 @@ test("the error copy is the web surface's verbatim copy", () => {
   }
 });
 
-test("single scroll, no tabs: the sections render in tab order inside one ScrollView", () => {
+test("single scroll, no tabs: the sections render in tab order inside one ScrollShell", () => {
   assert.equal(
     code.split("<ScrollView").length - 1,
+    0,
+    "the page renders no ScrollView of its own: ScrollShell owns the page's single scroll",
+  );
+  assert.equal(
+    code.split("<ScrollShell").length - 1,
     1,
-    "exactly one ScrollView: the page's single section scroll",
+    "exactly one ScrollShell: the page's single section scroll",
   );
   assert.match(
-    code,
-    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">/,
-    "the scroll view must persist handled taps (slotted comments keep their presses)",
+    scrollShellCode,
+    /<ScrollRegion>/,
+    "the shell's scroll is ScrollRegion (which persists handled taps, so slotted comments keep their presses)",
   );
   assert.ok(!code.includes("<Tabs"), "the page must not render a tab bar");
   assert.ok(!code.includes("activeTab"), "the tab state left the contract");
   assert.ok(!code.includes("onTabChange"), "the tab-change callback left the contract");
   const sequence = [
     "<CtaBar",
-    "<OverviewPanel",
+    "<RecipeOverviewPanel",
     "<SectionHeading>Ingredients</SectionHeading>",
-    "<IngredientsPanel",
+    "<RecipeIngredientsPanel",
     "<SectionHeading>Instructions</SectionHeading>",
-    "<InstructionsPanel",
+    "<RecipeInstructionsPanel",
     "<RatingsCard",
     "{comments}",
   ];
@@ -163,8 +190,8 @@ test("single scroll, no tabs: the sections render in tab order inside one Scroll
     assert.ok(at > lastAt, `sections must render in tab order: ${marker} after the previous one`);
     lastAt = at;
   }
-  const scrollAt = code.indexOf("<ScrollView");
-  assert.ok(code.indexOf("<CtaBar") > scrollAt, "the sections render inside the scroll view");
+  const scrollAt = code.indexOf("<ScrollShell");
+  assert.ok(code.indexOf("<CtaBar") > scrollAt, "the sections render inside the scroll shell");
 });
 
 test("the CTA bar switches on the auth-state variant with verbatim labels", () => {
@@ -224,7 +251,7 @@ test("engagement is in v1: ratings reuse the detail page's view-model, comments 
     "the slot is called once per render, only when provided",
   );
   assert.match(
-    code,
+    ratingsCode,
     /\{ratings\.viewer \? \(/,
     "the viewer star input renders only with a viewer (signed out hides it)",
   );
@@ -248,51 +275,68 @@ test("the shared section shapes are reused from RecipeDetailPage by alias", () =
     ["3", "3×"],
   ]) {
     assert.ok(
-      code.includes(`{ value: "${value}", label: "${label}" }`),
+      ingredientsCode.includes(`{ value: "${value}", label: "${label}" }`),
       `SCALE_OPTIONS must include ${value} / ${label}, as on the detail page`,
     );
   }
   assert.match(
-    code,
+    ingredientsCode,
     /<NumberStepper\s+label="Servings"\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
     "the servings stepper mirrors the detail page's (label Servings, floor of 1, inline layout)",
   );
 });
 
 test("optional content is omitted cleanly, never rendered as a shell", () => {
-  assert.match(code, /\{imageUrl \? \(/, "the hero image renders only with an imageUrl");
-  assert.match(code, /\{description \? \(/, "the description renders only when present");
+  assert.match(overviewCode, /\{imageUrl \? \(/, "the hero image renders only with an imageUrl");
+  assert.match(overviewCode, /\{description \? \(/, "the description renders only when present");
   assert.match(
-    code,
+    overviewCode,
     /\{prepTimeLabel \? <StatCard label="Prep"/,
     "the Prep stat needs a prep time",
   );
   assert.match(
-    code,
+    overviewCode,
     /\{cookTimeLabel \? <StatCard label="Cook"/,
     "the Cook stat needs a cook time",
   );
-  assert.match(code, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
+  assert.match(overviewCode, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
+  assert.match(code, /\{ratings \? \(/, "the ratings card renders only with ratings");
   assert.match(
     code,
-    /\{ratings \|\| comments \? \(/,
-    "the engagement stack renders only with ratings or comments",
+    /\{comments\}/,
+    "the comments slot renders its content directly (no shell when the slot is empty)",
   );
   assert.match(
-    code,
+    ingredientsCode,
     /view\.substitutions && view\.substitutions\.length > 0/,
     "the substitutions panel renders only with substitutions",
   );
 });
 
 test("tags render through Badge's color form, not an inline pill (#211)", () => {
-  assert.match(code, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/, "tags render as Badge");
+  assert.match(
+    overviewCode,
+    /<Badge key=\{tag\.id\} color=\{tag\.color\}>/,
+    "tags render as Badge",
+  );
   assert.ok(!code.includes("{tag.color}22"), "the page must not re-implement the tag tint inline");
+  assert.ok(
+    !overviewCode.includes("{tag.color}22"),
+    "the overview panel must not re-implement the tag tint inline",
+  );
 });
 
 test("no explicit lineHeight anywhere in the new files (#162)", () => {
   assert.ok(!code.includes("lineHeight"), "the page must not set lineHeight");
   assert.ok(!frameCode.includes("lineHeight"), "the frame must not set lineHeight");
+  for (const [name, text] of [
+    ["RecipeOverviewPanel", overviewCode],
+    ["RecipeIngredientsPanel", ingredientsCode],
+    ["RatingsCard", ratingsCode],
+    ["ScrollShell", scrollShellCode],
+  ]) {
+    assert.ok(!text.includes("lineHeight"), `${name} must not set lineHeight`);
+  }
 });
 
 test("stories exercise every union state and both CTA variants", () => {

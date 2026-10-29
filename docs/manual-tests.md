@@ -550,6 +550,114 @@ recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
+## ScrollShell
+
+Open in `Components/ScrollShell`: Default.
+
+1. The shell's blocks sit 16px from the canvas edges and from
+   each other, on a surface background that fills the frame; the
+   content scrolls as one region when it overflows.
+
+**Run when:** `src/components/ScrollShell.tsx`, its stories,
+PublicRecipePage, or a changeset naming ScrollShell.
+
+---
+
+## EqualButtonRow
+
+Open in `Components/EqualButtonRow`: Default, Wrapping.
+
+1. Default: the three buttons share the row's width equally —
+   none hugs its label — with a 12px gap between them.
+2. Wrapping: at the narrow width the third button wraps onto a
+   second line at the same width as the two above it, instead of
+   shrinking below readable width.
+
+**Run when:** `src/components/EqualButtonRow.tsx`, its stories,
+PublicRecipePage's CTA bar, or a changeset naming EqualButtonRow.
+
+---
+
+## MessageCard
+
+Open in `Components/MessageCard`: Default.
+
+1. The card sits centered — horizontally and vertically — on a
+   surface background that fills the frame, with the heading
+   above the explanatory line, both centered.
+
+**Run when:** `src/components/MessageCard.tsx`, its stories,
+PublicRecipePage's error states, or a changeset naming
+MessageCard.
+
+---
+
+## RecipeOverviewPanel
+
+Open in `Components/RecipeOverviewPanel`: Default, Minimal.
+
+1. Default: the title, status pill, description, stat band, and
+   tag pills stack with even 16px separation; the tag pills carry
+   their named colors. Minimal shows the title, the "Idea" pill,
+   and the Servings stat only — no description, Prep/Cook stats,
+   or tag row.
+
+**Run when:** `src/components/RecipeOverviewPanel.tsx`, its
+stories, PublicRecipePage, or a changeset naming
+RecipeOverviewPanel.
+
+---
+
+## RecipeIngredientsPanel
+
+Open in `Components/RecipeIngredientsPanel`: Default, Plain.
+
+1. Default: the servings stepper and the Scale chip row fit the
+   width without the Scale row wrapping; the Custom chip turns
+   into a number input when pressed and, once a value is
+   entered, shows it selected (e.g. "4×"). The dimmed "heavy
+   cream" row is marked missing and the Substitutions panel
+   shows below the list; pressing the row clears the dim.
+2. Plain: two unadorned rows with hairline separators and no
+   substitutions panel.
+
+**Run when:** `src/components/RecipeIngredientsPanel.tsx`, its
+stories, PublicRecipePage, or a changeset naming
+RecipeIngredientsPanel.
+
+---
+
+## RecipeInstructionsPanel
+
+Open in `Components/RecipeInstructionsPanel`: Default.
+
+1. The first step card is highlighted (primary border and tint)
+   on open; pressing another card moves the highlight to it.
+   Steps render in step-number order.
+
+**Run when:** `src/components/RecipeInstructionsPanel.tsx`, its
+stories, PublicRecipePage, or a changeset naming
+RecipeInstructionsPanel.
+
+---
+
+## RatingsCard
+
+Open in `Components/RatingsCard`: Default, SignedOut, NoRatings.
+
+1. Default: the community average shows with the stale-ratings
+   hint under it; "Your rating" shows the viewer's stars with
+   the stale hint below — pressing the currently selected star
+   clears the rating, and pressing another star changes it.
+2. SignedOut: no "Your rating" block renders. NoRatings shows
+   "No community ratings yet" with an empty star input.
+
+**Run when:** `src/components/RatingsCard.tsx`, its stories,
+PublicRecipePage's engagement block, or a changeset naming
+RatingsCard.
+
+---
+
 ## MealPlansPage & MealPlanDetailPage
 
 Open in `Pages/Eciperay/MealPlansPage`: Default, Empty, Loading,
