@@ -46,7 +46,7 @@
   },
   "main": "./dist/index.js",
   "name": "@spudly/ui",
-  "packageManager": "npm@10.8.2",
+  "packageManager": "npm@10.9.4",
   "peerDependencies": {
     "react": ">=18",
     "react-native": ">=0.72"

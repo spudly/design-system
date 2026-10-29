@@ -155,6 +155,10 @@ jobs:
           cache: npm
           cache-dependency-path: apps/storybook/package-lock.json
 
+      - name: Enable Corepack (pinned npm)
+        if: steps.vrbot.outputs.skip != 'true'
+        run: corepack enable npm
+
       - uses: actions/setup-java@v6
         if: steps.vrbot.outputs.skip != 'true'
         with:
@@ -488,6 +492,9 @@ jobs:
           node-version: 22
           cache: npm
           cache-dependency-path: apps/storybook/package-lock.json
+
+      - name: Enable Corepack (pinned npm)
+        run: corepack enable npm
 
       - uses: actions/setup-java@v6
         with:
