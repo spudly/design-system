@@ -277,7 +277,7 @@ function renderedAnchors(html) {
   const pattern = /<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
   let match;
   while ((match = pattern.exec(html)) !== null) {
-    anchors.push({ href: match[1], label: match[2].replace(/<[^>]*>/g, "").trim(), tag: match[0] });
+    anchors.push({ href: match[1], label: match[2].replaceAll(/<[^>]*>/g, "").trim(), tag: match[0] });
   }
   return anchors;
 }
