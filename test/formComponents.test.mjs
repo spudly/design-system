@@ -173,7 +173,7 @@ test("SSR: a LabeledField's label is a real label element whose `for` matches th
         id: "recipe-title",
         accessibilityLabel: "Title",
         value: "Tuscan chicken",
-        onChangeText: () => {},
+        onChangeText: () => null,
       }),
     ),
   );
