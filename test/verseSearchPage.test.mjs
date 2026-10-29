@@ -188,8 +188,8 @@ test("a completed search with no results renders the empty state; the pre-search
   );
   assert.match(
     code,
-    /\{hasSearched && !isSearching && !errorMessage && results\.length === 0 \? \(\s*<EmptyState title="No results" body="Try a different word or reference\." \/>\s*\) : \(\s*<BoundedList/,
-    "a fruitless completed search (hasSearched, not searching, no error, zero results) must render the no-results EmptyState in place of the empty list; every other state renders the list",
+    /\{hasSearched && !isSearching && !errorMessage && results\.length === 0 \? \(\s*<EmptyState title="No results" body="Try a different word or reference\." announce \/>\s*\) : \(\s*<BoundedList/,
+    "a fruitless completed search (hasSearched, not searching, no error, zero results) must render the no-results EmptyState (announced as a polite status, since it is the result of an action) in place of the empty list; every other state renders the list",
   );
 });
 

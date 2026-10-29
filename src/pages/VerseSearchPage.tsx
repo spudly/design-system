@@ -74,7 +74,9 @@ import { BoundedList } from "./BoundedList.js";
  *   state, and none is invented here. But once the app reports
  *   a completed search (`hasSearched`) that returned zero
  *   results, the page renders the DS EmptyState ("No results" /
- *   "Try a different word or reference."), consistent with the
+ *   "Try a different word or reference.", with `announce` so the
+ *   result of the search action is announced as a polite status),
+ *   consistent with the
  *   sibling Memorize pages (MyVersesPage's "No verses yet",
  *   MemorizeReviewPage's "Nothing due"): a fruitless search
  *   must give the user feedback, which the app's blank list
@@ -221,7 +223,7 @@ export function VerseSearchPage({
       {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
       {isSearching ? <Spinner label="Loading" /> : null}
       {hasSearched && !isSearching && !errorMessage && results.length === 0 ? (
-        <EmptyState title="No results" body="Try a different word or reference." />
+        <EmptyState title="No results" body="Try a different word or reference." announce />
       ) : (
         <BoundedList
           data={results}
