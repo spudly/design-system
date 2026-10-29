@@ -41,7 +41,7 @@ test("there is no delete affordance on the list", () => {
 });
 
 test("rows place the RatingStars control in the subtitle flow, rated names carrying the rating", () => {
-  const dollar = "\\$";
+  const dollar = String.raw`\$`;
   assert.match(code, /<RatingStars/);
   assert.match(
     code,
