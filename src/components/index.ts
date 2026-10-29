@@ -21,6 +21,7 @@ export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField
 export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { RatingForm, type RatingFormProps, type RatingFormValues } from "./RatingForm.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
+export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
 export { Divider, type DividerProps } from "./Divider.js";
 export {
   Dropdown,
