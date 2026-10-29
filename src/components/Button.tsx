@@ -461,8 +461,11 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         // wraps a character at a time (seen in RecipeDetailPage's
         // Start Cooking link, PR #314's VR baselines). A
         // content-sized basis makes line-breaking account for the
-        // label; grow then claims the line's remaining width.
-        {...(grow ? { flexGrow: 1, flexShrink: 1, flexBasis: "auto" } : null)}
+        // label, flexGrow claims the line's remaining width, and
+        // flexShrink 0 stops the wrap/shrink pass from compressing
+        // the button below its content (the strip above is what
+        // shrink 1 produced even with the basis fixed).
+        {...(grow ? { flexGrow: 1, flexShrink: 0, flexBasis: "auto" } : null)}
         // `rest` is read through the widened render shape (its
         // fields are the button frame's); call sites are typed by
         // ButtonLinkProps, so what actually arrives is the link
@@ -538,7 +541,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
       // content-sized ("auto") for the reason recorded at the link
       // form's spread: a zero basis collapses the button in a
       // wrapping row on native.
-      {...(grow ? { flexGrow: 1, flexShrink: 1, flexBasis: "auto" } : null)}
+      {...(grow ? { flexGrow: 1, flexShrink: 0, flexBasis: "auto" } : null)}
       {...rest}
     >
       {IconGlyph ? <IconGlyph size={glyphSize} color={glyphInk} /> : null}
