@@ -342,22 +342,22 @@ changeset naming SectionStack.
 
 ---
 
-## SearchControls
+## FieldRow
 
-Open in `Components/SearchControls`: Default.
+Open in `Components/FieldRow`: Default.
 
-SearchControls compose a search field with its submit button
-on one line.
+A FieldRow composes form fields and their action on one line —
+here a search field with its submit button.
 
 1. The search field fills the row's remaining width, the Search
    button keeps its natural width, and field and button are
    vertically centered on each other (VerseSearchPage's search
    row is the live case).
 
-**Run when:** `src/components/SearchControls.tsx`, its stories,
+**Run when:** `src/components/FieldRow.tsx`, its stories,
 `src/components/SearchField.tsx` (the `grow` prop), the pages
-that compose SearchControls (VerseSearchPage), or a changeset
-naming SearchControls.
+that compose FieldRow (VerseSearchPage), or a changeset
+naming FieldRow.
 
 ---
 

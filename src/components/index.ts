@@ -63,7 +63,7 @@ export {
 export { ButtonRow, type ButtonRowProps } from "./ButtonRow.js";
 export { CardStack, type CardStackProps } from "./CardStack.js";
 export { ListStack, type ListStackProps } from "./ListStack.js";
-export { SearchControls, type SearchControlsProps } from "./SearchControls.js";
+export { FieldRow, type FieldRowProps } from "./FieldRow.js";
 export { SectionStack, type SectionStackProps } from "./SectionStack.js";
 export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
 export { SearchField, type SearchFieldProps } from "./SearchField.js";

@@ -15,7 +15,7 @@
  * - CardStack: a stack of cards — gap spacing[2] (8px), stretch.
  * - SectionStack: a page's sections — gap spacing[8] (32px),
  *   stretch.
- * - SearchControls: a search field with its button — gap
+ * - FieldRow: a search field with its button — gap
  *   spacing[2] (8px), centered.
  * - ListStack: hairline rows as one list — no gap of its own;
  *   the rows own their separation.
@@ -23,7 +23,7 @@
  *   `vertical`, both defaulting to true.
  * The pins hold each component's treatment, its Omit of the
  * style keys it owns, and SearchField's `grow` (the other half
- * of the SearchControls pattern: the field takes the row's
+ * of the FieldRow pattern: the field takes the row's
  * remaining width).
  *
  * Source scan plus dist export checks, like the other component
@@ -50,7 +50,7 @@ function code(file) {
 const buttonRowCode = code("ButtonRow.tsx");
 const cardStackCode = code("CardStack.tsx");
 const sectionStackCode = code("SectionStack.tsx");
-const searchControlsCode = code("SearchControls.tsx");
+const fieldRowCode = code("FieldRow.tsx");
 const listStackCode = code("ListStack.tsx");
 const centerCode = code("Center.tsx");
 const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
@@ -61,7 +61,7 @@ test("the layout components are exported from the built package root", async () 
     "ButtonRow",
     "CardStack",
     "SectionStack",
-    "SearchControls",
+    "FieldRow",
     "ListStack",
     "Center",
   ]) {
@@ -101,10 +101,10 @@ test("SectionStack owns the page-section rhythm", () => {
   assert.match(sectionStackCode, /Omit<StyledSectionStackProps, "gap" \| "alignItems">/);
 });
 
-test("SearchControls owns the search row's gap and centering", () => {
-  assert.match(searchControlsCode, /styled\(XStack, \{\s+name: "SearchControls",/);
-  assert.match(searchControlsCode, /gap: tokens\.spacing\[2\],\s+alignItems: "center",/);
-  assert.match(searchControlsCode, /Omit<StyledSearchControlsProps, "gap" \| "alignItems">/);
+test("FieldRow owns the search row's gap and centering", () => {
+  assert.match(fieldRowCode, /styled\(XStack, \{\s+name: "FieldRow",/);
+  assert.match(fieldRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "center",/);
+  assert.match(fieldRowCode, /Omit<StyledFieldRowProps, "gap" \| "alignItems">/);
 });
 
 test("ListStack adds no gap of its own — the rows own their separation", () => {
@@ -129,7 +129,7 @@ test("no layout component offers step, role, or margin props", () => {
     ["ButtonRow", buttonRowCode],
     ["CardStack", cardStackCode],
     ["SectionStack", sectionStackCode],
-    ["SearchControls", searchControlsCode],
+    ["FieldRow", fieldRowCode],
     ["ListStack", listStackCode],
   ]) {
     for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {
