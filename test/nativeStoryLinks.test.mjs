@@ -112,6 +112,10 @@ test("App.tsx wraps react-native's Linking.openURL at module scope (#300)", () =
 
 test("App.tsx logs a routed story press as DS LINK <path> (#300)", () => {
   assert.match(app, /function logStoryLink\(url: string\)/);
+  // The logged value is the routed path parameter — not
+  // parsed.path, which IS "browse" in the Expo Go shape and
+  // would log "DS LINK browse" (CodeRabbit round 2 on PR #303).
+  assert.match(app, /const path = parsed\.queryParams\?\.\path;/);
   assert.match(
     app,
     /const isBrowse = parsed\.hostname === "browse" \|\| parsed\.path === "browse";/,
