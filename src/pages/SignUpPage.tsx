@@ -104,7 +104,7 @@ export function SignUpPage({
       </Button>
       {legalNotice}
       {onSignInPress ? (
-        <TextLink marginTop="$4" onPress={onSignInPress}>
+        <TextLink marginTop="$4" textAlign="center" onPress={onSignInPress}>
           Already have an account? Sign in
         </TextLink>
       ) : null}

@@ -21,6 +21,8 @@ jobs:
           cache: npm
           registry-url: https://npm.pkg.github.com
           scope: "@spudly"
+      - name: Enable Corepack (pinned npm)
+        run: corepack enable npm
       - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
