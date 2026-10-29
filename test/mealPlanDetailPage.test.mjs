@@ -21,8 +21,8 @@
  *    removing entries happens on the plan form screen. Since
  *    #248's navigation rule, every one of those controls
  *    navigates, so they cross as hrefs (the buttons' href
- *    forms, the rows as anchors, the set-goals TextLink's href
- *    form), not press callbacks.
+ *    forms, the rows through ListRow's link form, the set-goals
+ *    TextLink's href form), not press callbacks.
  * 4. Entries carry two id spaces: the entry's own `id` (the row
  *    key) and the `targetId` the host composes the entry's
  *    `href` from, because a plan can hold the same recipe twice
@@ -45,6 +45,17 @@
  *    and stories exercise the Default, Empty, Loading, NoGoals,
  *    and NutritionUnavailable (#78) states so Chromatic
  *    captures them.
+ * 8. The page carries no styling of its own (#119, tranche 2):
+ *    the loading state is the LoadingGate component, the entry
+ *    rows are the generic ListRow widget (its pressable area,
+ *    hairline, and disabled treatment live there — pinned in
+ *    test/listRow.test.mjs; the page supplies the kind prefix,
+ *    the unavailable suffix, and the disabled flag as content),
+ *    the goal rows are DetailRow
+ *    widgets, the plan title takes Text's `title` variant, the
+ *    meta lines take its `hint` variant, and the section spacing
+ *    rides the SectionStack. The page's only entry logic is the
+ *    kind prefix it composes and the href it passes through.
  *
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
@@ -83,8 +94,8 @@ test("the props are a loading | ready union, with no not-found member", () => {
   );
   assert.match(
     code,
-    /<Spinner label="Loading meal plan" \/>/,
-    "the loading state must render only the spinner shell",
+    /<LoadingGate label="Loading meal plan" \/>/,
+    "the loading state must render only the LoadingGate shell (the gate's spinner is pinned in test/loadingGate.test.mjs)",
   );
   assert.doesNotMatch(
     code,
@@ -134,8 +145,8 @@ test("the actions are exactly the app screen's — no delete, no entry editing",
 test("entry rows are links carrying the entry href, by kind", () => {
   assert.match(
     code,
-    /<Anchor\s+href=\{entry\.href\}/,
-    "entry rows must render as anchors carrying the entry's href",
+    /<ListRow[\s\S]*?href=\{entry\.href\}/,
+    "entry rows must render through ListRow in its link form, carrying the entry's href (the link rendering itself is pinned in test/listRow.test.mjs)",
   );
   assert.match(code, /kind: "meal" \| "recipe";/, "entries must carry their kind");
   assert.match(
@@ -146,18 +157,24 @@ test("entry rows are links carrying the entry href, by kind", () => {
   assert.match(code, /href: string;/, "entries must carry their pre-composed href");
 });
 
-test("an unavailable recipe entry shows its suffix and is not a link", () => {
+test("entries render through ListRow, with the kind prefix and availability as content", () => {
+  assert.match(
+    code,
+    /<ListRow/,
+    "entry rows must render through the ListRow widget — its disabled state and link wiring are pinned in test/listRow.test.mjs",
+  );
+  assert.match(
+    code,
+    /prefix=\{entry\.kind === "meal" \? "Meal · " : "Recipe · "\}/,
+    "the kind lead-in must cross as the row's caller-supplied prefix",
+  );
   assert.match(code, /" \(unavailable\)"/, "the access-lost suffix must render on the title line");
   assert.match(
     code,
-    /accessibilityState: \{ disabled: true \}/,
-    "the unavailable row must be marked disabled",
+    /entry\.kind === "recipe" && entry\.isUnavailable\s+\? \{ isDisabled: true, titleSuffix: " \(unavailable\)" \}/,
+    "only a recipe entry can be unavailable — it passes the generic disabled flag and the suffix as content (a disabled ListRow renders no link, so the unavailable row is not a link)",
   );
-  assert.match(
-    code,
-    /isUnavailable \? \(\s*<YStack\s+paddingVertical="\$3"\s+\{\.\.\.platformAccessibilityProps\(\{\s*accessibilityState/,
-    "the unavailable branch must render plain content with no link wiring — the anchor lives in the other branch (and its disabled state goes through the platform translator, #237)",
-  );
+  assert.match(code, /title=\{entry\.title\}/, "the row must receive the entry's title");
 });
 
 test("the goals section follows the app's visibility and hint rules", () => {
@@ -179,7 +196,7 @@ test("the goals section follows the app's visibility and hint rules", () => {
   );
   assert.match(
     code,
-    /\{goalsHref \? \(/,
+    /\{goalsHref \? <TextLink/,
     "the set-goals link must render only when its href is provided",
   );
   assert.match(
@@ -258,4 +275,38 @@ test("stories exercise the default, empty, loading, and no-goals states", () => 
       `MealPlanDetailPage.stories.tsx must export a ${name} story`,
     );
   }
+});
+
+test("the page carries no styling of its own (#119)", () => {
+  // Compact split form (the pageWebAria pattern): the banned list
+  // cannot grow one-per-line without tripping the line caps.
+  const banned =
+    "XStack,YStack,style={,className,fontSize=,fontWeight=,color=,backgroundColor=,marginBottom,paddingBottom,paddingBlockEnd,paddingBlockStart,paddingVertical,borderBottom,flexWrap,cursor=,function GoalRow,<GoalRow".split(
+      ",",
+    );
+  for (const item of banned) {
+    assert.ok(
+      !code.includes(item),
+      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in SectionStack / ButtonRow / LoadingGate / ListRow / ListStack / DetailRow since the #119 tranche-2 fix`,
+    );
+  }
+  assert.match(
+    code,
+    /<Text variant="title">\{title\}<\/Text>/,
+    "the plan title must take the title variant",
+  );
+});
+
+test("the page composes through the purpose-named layout components (#119)", () => {
+  assert.match(
+    code,
+    /<SectionStack>/,
+    "the page's blocks must be children of one SectionStack, whose gap owns every section separation",
+  );
+  assert.match(code, /<ButtonRow>/, "the action bar must compose through ButtonRow");
+  assert.match(
+    code,
+    /<ListStack>/,
+    "the entry rows must compose as one ListStack inside the Entries card (SectionCard spaces its own children; the rows own theirs)",
+  );
 });

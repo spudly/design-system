@@ -104,7 +104,7 @@ test("the list is the shared BoundedList; the page carries no styling of its own
   ]) {
     assert.ok(
       !code.includes(banned),
-      `MyVersesPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / Row since the #119 fix`,
+      `MyVersesPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / ButtonRow since the #119 fix`,
     );
   }
 });

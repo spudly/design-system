@@ -45,12 +45,15 @@ function count(code, literal) {
 }
 
 // The family's render-content functions flag their decorative
-// variant `decorative` (RecipesPage's is named `native`).
+// variant `decorative` (RecipesPage's is named `native`). Two of
+// the surfaces live in the generic row components since the #119
+// tranche-2 extraction merged with the stage-2 remodel: the plan
+// rows in CardRow, the entry rows in ListRow.
 const FAMILY = [
   ["src/components/OptionCard.tsx", "decorative"],
+  ["src/components/CardRow.tsx", "decorative"],
+  ["src/components/ListRow.tsx", "decorative"],
   ["src/pages/MealDetailPage.tsx", "decorative"],
-  ["src/pages/MealPlanDetailPage.tsx", "decorative"],
-  ["src/pages/MealPlansPage.tsx", "decorative"],
   ["src/pages/MealsHubPage.tsx", "decorative"],
   ["src/pages/RecipesPage.tsx", "native"],
 ];

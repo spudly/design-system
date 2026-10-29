@@ -287,22 +287,221 @@ changeset naming PrevNextNav.
 
 ---
 
-## Row
+## ButtonRow
 
-Open in `Components/Row`: Actions, Centered, SpaceBefore.
+Open in `Components/ButtonRow`: Default.
 
-1. Actions: the two small buttons sit side by side with an even 8px
-   gap and no space above the row.
-2. Centered: the search field fills the row's remaining width, the
-   Search button keeps its natural width, and field and button are
-   vertically centered on each other.
-3. SpaceBefore: the action row renders 8px below the verse text,
-   with the same 8px gap between its buttons.
+A ButtonRow is a row of action buttons that follows content.
+It owns the bar's whole treatment — there are no spacing props
+to pass.
 
-**Run when:** `src/components/Row.tsx`, its stories,
-`src/components/SearchField.tsx` (the `grow` prop), the pages that
-compose Row (VerseSearchPage, MemorizeReviewPage, MyVersesPage),
-or a changeset naming Row.
+1. The button row follows the text at the separation its parent
+   supplies (in the story, the wrapping stack's gap — the bar
+   itself carries no margin), the two buttons sit 12px apart,
+   and at a narrow width the second button wraps onto the next
+   line instead of overflowing (MealPlanDetailPage's Shopping
+   list / Edit bar and the Memorize card footers are the live
+   cases).
+
+**Run when:** `src/components/ButtonRow.tsx`, its stories, the
+pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
+MealPlanDetailPage), or a changeset naming ButtonRow.
+
+---
+
+## CardStack
+
+Open in `Components/CardStack`: Default.
+
+A CardStack is a stack of cards — a list whose rows are cards.
+
+1. The three cards stack with an even 8px gap between them,
+   each keeping its own internal padding and full width
+   (MealPlansPage's plan list is the live case, including the
+   first card's danger Delete action).
+
+**Run when:** `src/components/CardStack.tsx`, its stories, the
+pages that compose CardStack (MealPlansPage), or a changeset
+naming CardStack.
+
+---
+
+## SectionStack
+
+Open in `Components/SectionStack`: Default.
+
+A SectionStack is a stack of a page's sections — its major
+blocks in order.
+
+1. Every block in the stack — title, meta line, paragraph — is
+   separated by the same 32px gap, and children fill the
+   stack's width (MealPlanDetailPage's page stack is the live
+   case: every section separation on the page is that one gap).
+
+**Run when:** `src/components/SectionStack.tsx`, its stories,
+the pages that compose SectionStack (MealPlanDetailPage), or a
+changeset naming SectionStack.
+
+---
+
+## FieldRow
+
+Open in `Components/FieldRow`: Default.
+
+A FieldRow composes form fields and their action on one line —
+here a search field with its submit button.
+
+1. The search field fills the row's remaining width, the Search
+   button keeps its natural width, and field and button are
+   vertically centered on each other (VerseSearchPage's search
+   row is the live case).
+
+**Run when:** `src/components/FieldRow.tsx`, its stories,
+`src/components/SearchField.tsx` (the `grow` prop), the pages
+that compose FieldRow (VerseSearchPage), or a changeset
+naming FieldRow.
+
+---
+
+## ListStack
+
+Open in `Components/ListStack`: Default.
+
+A ListStack composes hairline rows as one continuous list; the
+stack adds no gap of its own — the rows own their separation.
+
+1. The three rows read as one ruled surface: hairlines run
+   continuously from row to row with no gaps of card background
+   between them, and the third row shows the disabled treatment
+   (MealPlanDetailPage's Entries card and MealDetailPage's
+   Recipes card are the live cases).
+
+**Run when:** `src/components/ListStack.tsx`, its stories, the
+pages that compose ListStack (MealPlanDetailPage,
+MealDetailPage), or a changeset naming ListStack.
+
+---
+
+## Center
+
+Open in `Components/Center`: Centered, HorizontalOnly.
+
+Center centers a single child; `horizontal` and `vertical` are
+booleans, both defaulting to true.
+
+1. Centered: the spinner sits at the center of the framed
+   block, both dimensions on. Toggle `vertical` off in the
+   controls: the spinner moves to the top, still centered
+   horizontally; toggle `horizontal` off instead: it moves to
+   the left edge, still centered vertically.
+2. HorizontalOnly: the notice sits at the top of its block,
+   centered horizontally (MealPlansPage's loading block is the
+   live page case — the spinner centered under the heading and
+   create button).
+
+**Run when:** `src/components/Center.tsx`, its stories, the
+pages that compose Center (MealPlansPage), or a changeset
+naming Center.
+
+---
+
+## DetailRow
+
+Open in `Components/DetailRow`: Default, Stacked.
+
+1. Default: the muted label sits on the left edge and the value on
+   the right edge of the same line, over a light hairline.
+2. Stacked: three rows share the same hairline rhythm — labels
+   aligned left, values aligned right, even vertical padding on
+   every row.
+
+**Run when:** `src/components/DetailRow.tsx`, its stories,
+MealPlanDetailPage (the nutrition-goal rows), or a changeset
+naming DetailRow.
+
+---
+
+## LoadingGate
+
+Open in `Components/LoadingGate`: Default.
+
+1. The spinner sits centered — horizontally and vertically — on a
+   plain surface background that fills the story canvas, with its
+   accessible label naming what is loading ("Loading meal plan").
+2. MealPlanDetailPage's Loading story shows the identical gate.
+
+**Run when:** `src/components/LoadingGate.tsx`, its stories,
+MealPlanDetailPage's loading state, or a changeset naming
+LoadingGate.
+
+---
+
+## ListRow
+
+Open in `Components/ListRow`: Prefixed, Plain, Disabled.
+
+1. Prefixed: the title line reads "Meal · Taco Tuesday" (the
+   prefix is caller-supplied content) in medium weight over the
+   muted meta line, with a hairline under the row; the row presses
+   (pointer cursor on web, Enter/Space activate).
+2. Plain: the title line reads "Garlic cream chicken" with no
+   prefix and no meta line.
+3. Disabled: the title gains its caller-supplied " (unavailable)"
+   suffix; the row does not press, is not focusable, and is
+   exposed as disabled.
+
+**Run when:** `src/components/ListRow.tsx`, its stories,
+MealPlanDetailPage's entries, or a changeset naming ListRow.
+
+---
+
+## CardRow
+
+Open in `Components/CardRow`: Default, WithAction, TitleOnly.
+
+1. Default: an elevated card with the title in semibold over its
+   muted meta line; the text block presses (pointer cursor on
+   web, Enter/Space activate) and no action button shows.
+2. WithAction: a small soft-red action button ("Delete",
+   danger tone) sits at the card's right edge, vertically
+   centered, and pressing it does not trigger the row's press.
+3. TitleOnly: the card shows the title alone, no meta line and no
+   empty gap where it would sit.
+
+**Run when:** `src/components/CardRow.tsx`, its stories,
+MealPlansPage's list, or a changeset naming CardRow.
+
+---
+
+## MealPlansPage & MealPlanDetailPage
+
+Open in `Pages/Eciperay/MealPlansPage`: Default, Empty, Loading,
+NoActions. Open in `Pages/Eciperay/MealPlanDetailPage`: Default,
+Empty, Loading, NoGoals, NutritionUnavailable.
+
+1. MealPlansPage Default: the "Meal plans" heading, the full-width
+   "New meal plan" button under it, then the plan cards stacked
+   at an even rhythm — each title over its meta line; NoActions
+   drops the create button and the row Delete buttons.
+2. MealPlansPage Loading: the spinner sits centered horizontally,
+   16px below the create button; Empty shows "No meal plans yet."
+3. MealPlanDetailPage Default: the plan title (xl bold, heading
+   level 1) and its muted meta lines separated by the page's
+   uniform 32px section gap, the Nutrition goals card (plan
+   total, then label/value rows over hairlines at the card's
+   even content rhythm), the Shopping list / Edit buttons side
+   by side with a 12px gap, then the Entries card with
+   kind-prefixed entry rows as one continuous ruled list.
+4. MealPlanDetailPage Loading shows only the centered loading
+   gate; NoGoals (a nutrition summary is present but no goals
+   are set) shows the goals card with the plan total, the
+   set-goals hint, and the "Set nutrition goals" link;
+   NutritionUnavailable forces the same card via the visibility
+   control when no summary exists.
+
+**Run when:** `src/pages/MealPlansPage.tsx`,
+`src/pages/MealPlanDetailPage.tsx`, their stories, or a changeset
+naming either page.
 
 ---
 
@@ -620,11 +819,14 @@ Open in `Components/Text`: AllVariants (or any page story, e.g.
    rendered DOM / Storybook accessibility panel it carries
    `role="heading"` and `aria-level="1"`, and there is no
    `accessibilityrole` attribute.
-2. The `subheading` variant carries `role="heading"` with
+2. The `title` variant ("Title" in AllVariants) is the compact
+   page title — xl bold — and is also exposed as a heading at
+   level 1 (MealPlanDetailPage's plan title renders through it).
+3. The `subheading` variant carries `role="heading"` with
    `aria-level="2"`.
-3. The `body`, `hint`, `error`, and `verse` variants carry no
+4. The `body`, `hint`, `error`, and `verse` variants carry no
    heading role and no `aria-level`.
-4. Visually nothing changes: heading/subheading keep their sizes
+5. Visually nothing changes: heading/subheading keep their sizes
    and weights, and all variants keep their theme fonts.
 
 **Run when:** `src/components/Text.tsx`, its stories, the

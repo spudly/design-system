@@ -12,12 +12,16 @@
  * or semantics on web:
  *
  * - Page-level raw-stack pressables in src/pages/**: ShoppingListPage's
- *   checkbox row (XStack), MealDetailPage / MealPlanDetailPage member
- *   rows (YStack, including the disabled-state spread for unavailable
- *   rows), MealPlansPage and MealsHubPage rows (YStack), AiSessionPage's
+ *   checkbox row (XStack), MealDetailPage member rows (YStack,
+ *   including the disabled-state spread for unavailable rows),
+ *   MealsHubPage rows (YStack), AiSessionPage's
  *   Cancel action (YStack), MealCookingModePage's Done action (YStack),
  *   RecipeFormPage's revert actions (YStack), and RecipeDetailPage's
  *   viewer-rating wrapper (View) and Custom scale chip (XStack).
+ *   (MealPlansPage's and MealPlanDetailPage's rows were in this
+ *   list until the #119 tranche-2 de-styling moved them into the
+ *   generic CardRow / ListRow components; the routing moved with
+ *   them and the rows test below pins it there.)
  * - Tamagui semantic primitives used directly: Checkbox in
  *   ChecklistRow (its `accessibilityLabel` leaked; Tamagui supplies
  *   role/aria-checked itself) and Progress in ProgressBar (role,
@@ -133,11 +137,11 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 const PAGE_STACKS = [
   "src/pages/ShoppingListPage.tsx",
   "src/pages/MealDetailPage.tsx",
-  "src/pages/MealPlanDetailPage.tsx",
-  // MealPlansPage is deliberately absent: #248 remodeled its row
-  // from a stack pressable to a real Anchor (the row navigates),
-  // so it has no stack pressable left to translate — pinned by
-  // the dedicated test below.
+  // MealPlansPage and MealPlanDetailPage are deliberately absent:
+  // their rows render through the generic CardRow / ListRow
+  // components (the #119 tranche-2 extraction) in those rows'
+  // link forms (#248), so neither page has a stack pressable left
+  // to translate — pinned by the dedicated test below.
   "src/pages/MealsHubPage.tsx",
   "src/pages/AiSessionPage.tsx",
   "src/pages/MealCookingModePage.tsx",
@@ -179,33 +183,59 @@ test("ShoppingListPage's checkbox row translates role, checked state, and label 
   assert.match(code, /accessibilityLabel: line\.name/);
 });
 
-test("MealPlansPage has no stack pressable left to translate (#237, #248)", () => {
-  // The plan row is a real Anchor since #248 — no stack pressable
-  // remains, so the translator must not be imported or used, and
-  // no raw RN accessibility JSX props may appear either (the
-  // row's native LinkOverlay is a sanctioned translator-forwarder,
-  // stripped like the DS primitives below).
-  const code = readCode("src/pages/MealPlansPage.tsx");
-  assert.ok(!code.includes("platformAccessibilityProps"));
-  assert.ok(
-    !/accessibility(Label|State|Role|Value)=/.test(
-      code.replaceAll(
-        /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g,
-        "",
+test("MealPlansPage and MealPlanDetailPage have no stack pressable left to translate (#237, #248)", () => {
+  // Both pages' rows render through the generic row components in
+  // their link forms — no stack pressable remains in either page,
+  // so the translator must not be imported or used, and no raw RN
+  // accessibility JSX props may appear either (props on DS
+  // primitives / LinkOverlay are the sanctioned exceptions,
+  // stripped like the stack scan above).
+  for (const rel of ["src/pages/MealPlansPage.tsx", "src/pages/MealPlanDetailPage.tsx"]) {
+    const code = readCode(rel);
+    assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
+    assert.ok(
+      !/accessibility(Label|State|Role|Value)=/.test(
+        code.replaceAll(
+          /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g,
+          "",
+        ),
       ),
-    ),
-  );
+      `${rel} must not carry raw RN accessibility JSX props`,
+    );
+  }
 });
 
-test("MealDetail / MealPlanDetail rows translate the disabled state; the rows are links now (#237, #248)", () => {
-  for (const rel of ["src/pages/MealDetailPage.tsx", "src/pages/MealPlanDetailPage.tsx"]) {
+test("rows translate the disabled state; the generic rows keep the button role in their press form (#237, #248)", () => {
+  // MealDetailPage's member rows are links since #248: the page
+  // itself routes only the unavailable row's disabled state
+  // through the translator, never a button role. MealPlanDetail's
+  // and MealPlans' rows moved into the generic ListRow / CardRow
+  // components in the #119 tranche-2 de-styling, and the
+  // translator routing moved with them: their press forms carry
+  // the button role, and ListRow (like MealDetailPage) also
+  // translates its disabled state. CardRow has no disabled state.
+  for (const rel of ["src/components/ListRow.tsx", "src/components/CardRow.tsx"]) {
+    const code = readCode(rel);
+    assert.match(
+      code,
+      /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/,
+      `${rel}: the press form's button role must go through the translator`,
+    );
+  }
+  for (const rel of ["src/pages/MealDetailPage.tsx", "src/components/ListRow.tsx"]) {
     const code = readCode(rel);
     assert.match(
       code,
       /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/,
+      `${rel}: the unavailable row's disabled state must go through the translator`,
     );
-    assert.doesNotMatch(code, /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/);
   }
+  const mealDetail = readCode("src/pages/MealDetailPage.tsx");
+  assert.doesNotMatch(
+    mealDetail,
+    /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/,
+    "MealDetailPage's rows are links (#248) — no button role may come back through the translator",
+  );
 });
 
 test("ChecklistRow's Checkbox and ProgressBar's Progress route through the translator (#237)", () => {

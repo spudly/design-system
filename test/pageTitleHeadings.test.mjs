@@ -27,6 +27,13 @@
  *    still exposes exactly one level-1 heading. The SSR tests below
  *    count rendered headings per tab (a source-level count cannot
  *    see the nested heading).
+ * 5. MealPlanDetailPage is the pinned exception since #119
+ *    tranche 2: its title was the `heading` variant plus xl/bold
+ *    styling overrides — the overrides are exactly what #119 bans
+ *    in pages — so the title now takes Text's `title` variant,
+ *    which IS xl bold at heading level 1. Rendering and heading
+ *    semantics are unchanged; the size/weight are owned by the
+ *    variant (pinned against Text.tsx below) instead of the page.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -47,7 +54,6 @@ const TITLE_PAGES = [
   "AddRecipeMenuPage",
   "FeedbackPage",
   "MealDetailPage",
-  "MealPlanDetailPage",
   "MealsHubPage",
   "ProfilePage",
   "ShoppingListPage",
@@ -92,6 +98,31 @@ test("page titles keep their xl/bold overrides so rendering is unchanged (#263)"
       `${page} title must keep its fontWeight bold override`,
     );
   }
+});
+
+test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 (#263, #119)", () => {
+  const code = readCode("src/pages/MealPlanDetailPage.tsx");
+  assert.equal(
+    countOccurrences(code, 'variant="title"'),
+    1,
+    "MealPlanDetailPage must render exactly one title-variant Text (its title)",
+  );
+  assert.equal(
+    countOccurrences(code, 'variant="heading"'),
+    0,
+    "MealPlanDetailPage's title must not use the heading variant (its 3xl default is not the app's title size)",
+  );
+  assert.equal(
+    countOccurrences(code, 'variant="subheading"'),
+    0,
+    "MealPlanDetailPage must not keep a subheading usage",
+  );
+  const text = readCode("src/components/Text.tsx");
+  assert.match(
+    text,
+    /title: \{\s+fontSize: tokens\.typography\.fontSize\.xl,\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+\}/,
+    "Text's title variant must carry the xl/bold treatment the page title rendered with",
+  );
 });
 
 test("HomePage stays the exception: heading title, subheading section title (#263)", () => {

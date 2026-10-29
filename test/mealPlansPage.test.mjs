@@ -32,6 +32,14 @@
  * 6. The component is exported from the pages subpath index, and
  *    stories exercise the Default, Empty, Loading, and
  *    no-actions states so Chromatic captures them.
+ * 7. The page carries no styling of its own (#119, tranche 2):
+ *    the plan row is the generic CardRow widget in its link form
+ *    (its card layout, link area, and action treatment live
+ *    there — pinned in test/cardRow.test.mjs; the page supplies
+ *    the plan's href, the Delete label, and the danger tone as
+ *    content), the list stacks in a CardStack,
+ *    the loading block centers its spinner in a Center, and the
+ *    page renders no layout primitives and sets no styling props.
  *
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
@@ -85,8 +93,8 @@ test("the view-model and navigation contract matches the declared props", () => 
   assert.match(code, /onPlanDelete\?: \(planId: string\) => void;/);
   assert.match(
     code,
-    /<Anchor\s+flex=\{1\}\s+minWidth=\{0\}\s+gap="\$1"\s+href=\{item\.href\}/,
-    "rows must render as anchors carrying the plan's href (#248)",
+    /<CardRow[\s\S]*?href=\{plan\.href\}/,
+    "rows must render through CardRow in its link form, carrying the plan's href (#248; the link rendering itself is pinned in test/cardRow.test.mjs)",
   );
   assert.match(
     code,
@@ -103,18 +111,18 @@ test("the view-model and navigation contract matches the declared props", () => 
 test("optional actions render only when their props are provided", () => {
   assert.match(
     code,
-    /\{createHref \? \(/,
-    "the create button must be guarded by the createHref prop",
+    /\{createHref \? <Button href=\{createHref\}>/,
+    "the create button must be guarded by the createHref prop, in Button's href form (#248)",
   );
   assert.match(
     code,
-    /\{onDeletePress \? \(/,
-    "the row Delete button must be guarded by the row's delete wiring",
+    /<CardRow/,
+    "rows must render through the CardRow widget, whose action renders only when its label and callback are wired (pinned in test/cardRow.test.mjs)",
   );
   assert.match(
     code,
-    /onPlanDelete\s*\?\s*\{\s*onDeletePress/,
-    "the row's delete wiring must exist only when onPlanDelete is provided",
+    /onPlanDelete\s*\?\s*\{\s*onActionPress/,
+    "the row's action wiring must exist only when onPlanDelete is provided",
   );
 });
 
@@ -160,4 +168,35 @@ test("stories exercise the default, empty, loading, and no-actions states", () =
       `MealPlansPage.stories.tsx must export a ${name} story`,
     );
   }
+});
+
+test("the page carries no styling of its own (#119)", () => {
+  for (const banned of [
+    "XStack",
+    "YStack",
+    "style={",
+    "className",
+    "fontSize=",
+    "fontWeight=",
+    "color=",
+    "backgroundColor=",
+    "marginBottom",
+    "paddingBottom",
+    "paddingBlockEnd",
+    "alignSelf",
+    "cursor=",
+    "spacing=",
+    "spaceBefore",
+  ]) {
+    assert.ok(
+      !code.includes(banned),
+      `MealPlansPage must not contain "${banned}" — layout and text treatments live in CardRow / CardStack / Center / Text since the #119 tranche-2 fix`,
+    );
+  }
+  assert.match(code, /<CardStack>/, "the plan list must stack in a CardStack");
+  assert.match(
+    code,
+    /<Center>/,
+    "the loading block must render in a Center (the dedicated centering component)",
+  );
 });

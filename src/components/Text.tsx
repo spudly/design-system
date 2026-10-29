@@ -15,6 +15,10 @@ const StyledText = styled(TamaguiText, {
         fontSize: tokens.typography.fontSize["3xl"],
         fontWeight: tokens.typography.fontWeight.bold,
       },
+      title: {
+        fontSize: tokens.typography.fontSize.xl,
+        fontWeight: tokens.typography.fontWeight.bold,
+      },
       subheading: {
         fontSize: tokens.typography.fontSize.xl,
         fontWeight: tokens.typography.fontWeight.semibold,
@@ -47,7 +51,7 @@ const StyledText = styled(TamaguiText, {
 type StyledTextProps = GetProps<typeof StyledText>;
 
 export type TextProps = StyledTextProps & {
-  variant?: "heading" | "subheading" | "body" | "hint" | "error" | "verse";
+  variant?: "heading" | "title" | "subheading" | "body" | "hint" | "error" | "verse";
   // A caller-supplied heading level for the web target (routed
   // through platformAccessibilityProps and dropped on native, where
   // RN has no heading-level prop).
@@ -55,7 +59,9 @@ export type TextProps = StyledTextProps & {
 };
 
 /**
- * Token-driven text primitive. Variants: `heading`, `subheading`, `body`
+ * Token-driven text primitive. Variants: `heading`, `title` (a compact
+ * page title — xl bold, for detail screens whose title sits above a
+ * meta block rather than opening a list), `subheading`, `body`
  * (default), `hint` (muted caption), `error`, and `verse` (serif reading
  * text for scripture/long-form content).
  *
@@ -81,10 +87,11 @@ export function Text({
   "aria-level": callerAriaLevel,
   ...rest
 }: TextProps) {
-  // Heading semantics (#256): the `heading` and `subheading`
+  // Heading semantics (#256): the `heading`, `title`, and `subheading`
   // variants are page/section titles, so they carry the RN `header`
   // role by default — on web the translator renders it as
-  // `role="heading"` with `aria-level` 1 (heading) / 2 (subheading),
+  // `role="heading"` with `aria-level` 1 (heading/title) / 2
+  // (subheading),
   // and on native the `header` role alone gives VoiceOver/TalkBack
   // heading navigation, with visuals unchanged. A caller-supplied
   // role (RN `accessibilityRole` or web `role` in rest) always wins;
@@ -95,7 +102,8 @@ export function Text({
   // `aria-level={undefined}` would clobber the generated level on
   // web and a defined level would bypass the translator's native
   // filter (RN has no heading-level prop; it is dropped there).
-  const headingLevel = variant === "heading" ? 1 : variant === "subheading" ? 2 : undefined;
+  const headingLevel =
+    variant === "heading" || variant === "title" ? 1 : variant === "subheading" ? 2 : undefined;
   // The web `role` in rest spreads last at render (below), so when
   // both role props are supplied it is the role that actually
   // renders — check it first, or a rendered button would keep a

@@ -1,11 +1,12 @@
-import { Anchor, XStack, YStack, isWeb } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
-import { LinkOverlay } from "../components/linkOverlay.js";
+import { ButtonRow } from "../components/ButtonRow.js";
+import { DetailRow } from "../components/DetailRow.js";
+import { LoadingGate } from "../components/LoadingGate.js";
+import { ListRow } from "../components/ListRow.js";
+import { ListStack } from "../components/ListStack.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
-import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextLink } from "../components/TextLink.js";
 
@@ -15,8 +16,8 @@ import { TextLink } from "../components/TextLink.js";
  * RecipesPage pilot and MealPlansPage. The app keeps all state
  * and business logic — the plan query, mutations, navigation —
  * and drives this view entirely through props: a plan view-model
- * in, press callbacks out. Nothing here imports an app package or
- * fetches anything.
+ * in, destinations and callbacks out. Nothing here imports an app
+ * package or fetches anything.
  *
  * Placement: page components live in src/pages behind the
  * `@spudly/ui/pages` subpath export, not the package root — see
@@ -37,7 +38,9 @@ import { TextLink } from "../components/TextLink.js";
  * screen's. The form screen (MealPlanForm) is a form, not a page
  * view, and stays app-side — out of #49's scope. The actions
  * this screen actually has are the two buttons and the entry
- * presses, plus the goals section's set-goals link.
+ * rows, plus the goals section's set-goals link — and every one
+ * of them navigates, so under #248's navigation rule every one
+ * crosses as an href (see the entry contract below).
  *
  * States: the app screen renders a full-screen loading gate
  * while the plan loads, and — deliberately mirrored here, as in
@@ -73,24 +76,27 @@ import { TextLink } from "../components/TextLink.js";
  * progress view is a pure function of its data (per-field
  * actual/goal/band progress, the plan total, a set-goals link).
  * It holds no state, runs no query or mutation, and its one
- * interaction is a navigation, so it crosses the boundary
- * as data plus an href (`nutritionGoals` + `goalsHref`, #248). A render slot exists for content that
- * cannot be view-modeled without leaking business logic into
- * props (RecipesPage's cook-log form); nothing on this screen
- * qualifies, so — as in MealPlansPage — the contract pins the
- * absence of a slot, and a future app change that puts
- * app-rendered content inside this view adds one consciously.
+ * interaction is a navigation, so it crosses the boundary as
+ * data plus a destination (`nutritionGoals` + `goalsHref`). A
+ * render slot exists for content that cannot be view-modeled
+ * without leaking business logic into props (RecipesPage's
+ * cook-log form); nothing on this screen qualifies, so — as in
+ * MealPlansPage — the contract pins the absence of a slot, and a
+ * future app change that puts app-rendered content inside this
+ * view adds one consciously.
  *
  * Entries come in two kinds with two different destinations: a
- * meal row opens the meal detail, a recipe row opens the recipe
- * detail. Each entry therefore carries its own `id` (the row
- * key) plus the `targetId` the host routes on — a plan may
+ * meal entry opens the meal detail, a recipe entry opens the
+ * recipe detail. Each entry therefore carries its own `id` (the
+ * row key), the `targetId` its destination was composed from,
+ * and the `href` itself — the host routes by `kind` when
+ * composing it, so the view needs no per-kind press callbacks
+ * (#248: the rows navigate, so they are links). A plan may
  * contain the same recipe twice, so the target cannot double as
- * the key — and the `href` the host composes from that target
- * (#248: the rows navigate, so they render as links). A recipe
- * entry whose access was lost renders its "(unavailable)"
- * suffix and does not render as a link, mirroring the app's
- * disabled row; meal entries are never unavailable. An entry-less plan renders the bare "Entries"
+ * the key. A recipe entry whose access was lost renders its
+ * "(unavailable)" suffix and does not render as a link,
+ * mirroring the app's disabled row; meal entries are never
+ * unavailable. An entry-less plan renders the bare "Entries"
  * section, as the app does — there is no empty message on this
  * screen, unlike the list pages' empty states.
  *
@@ -101,6 +107,16 @@ import { TextLink } from "../components/TextLink.js";
  * even where the app screen they port is light-only today.
  *
  * No lineHeight is set anywhere in this file (the #162 rule).
+ *
+ * De-styled for #119: the page renders no layout primitives and
+ * sets no styling props. The loading state is the LoadingGate
+ * component, the entry rows are the generic ListRow widget in
+ * its link form (the page supplies the kind prefix, the entry's
+ * href, the unavailable suffix, and the disabled flag as
+ * content), the goal rows are DetailRow widgets, the plan title
+ * takes Text's `title` variant, the meta lines take its `hint`
+ * variant, and the page's blocks stack in a SectionStack, which
+ * owns every section separation.
  */
 
 /** One entry row's view-model. The app formats `subtitle` (its
@@ -191,98 +207,6 @@ export type MealPlanDetailPageReadyProps = {
 
 export type MealPlanDetailPageProps = { state: "loading" } | MealPlanDetailPageReadyProps;
 
-function GoalRow({ label, valueLabel }: MealPlanDetailPageGoalRow) {
-  return (
-    <XStack
-      justifyContent="space-between"
-      borderBottomWidth={1}
-      borderBottomColor={tokens.colors.gray.gray2}
-      paddingVertical="$2"
-    >
-      <Text fontSize={tokens.typography.fontSize.sm} color="$textMuted">
-        {label}
-      </Text>
-      <Text fontSize={tokens.typography.fontSize.sm}>{valueLabel}</Text>
-    </XStack>
-  );
-}
-
-function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
-  const isUnavailable = entry.isUnavailable ?? false;
-  // `decorative` marks the visible texts non-accessible for the
-  // native link rendering, whose LinkOverlay carries the composed
-  // label as the row's one accessibility stop (see LinkOverlay).
-  const renderRowContent = (decorative: boolean) => (
-    <>
-      <Text
-        accessible={decorative ? false : undefined}
-        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        fontSize={tokens.typography.fontSize.md}
-        fontWeight={tokens.typography.fontWeight.medium}
-      >
-        {entry.kind === "meal" ? "Meal" : "Recipe"} · {entry.title}
-        {isUnavailable ? " (unavailable)" : ""}
-      </Text>
-      {entry.subtitle ? (
-        <Text
-          variant="hint"
-          accessible={decorative ? false : undefined}
-          importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        >
-          {entry.subtitle}
-        </Text>
-      ) : null}
-    </>
-  );
-  const rowContent = renderRowContent(false);
-  return (
-    <YStack borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2}>
-      {isUnavailable ? (
-        <YStack
-          paddingVertical="$3"
-          {...platformAccessibilityProps({ accessibilityState: { disabled: true } })}
-        >
-          {rowContent}
-        </YStack>
-      ) : isWeb ? (
-        // The row navigates, so it renders as a real anchor
-        // carrying the entry's href (#248) — keyboard-operable
-        // on web by default, which retires the hand-rolled
-        // focus/keydown press pattern this row used as a button.
-        // The anchor is pinned to a web flex column (the BackLink
-        // lesson: a text-based anchor is inline on web and would
-        // not hold the row's stacked layout).
-        <Anchor
-          href={entry.href}
-          textDecorationLine="none"
-          display="web:flex"
-          flexDirection="column"
-          paddingVertical="$3"
-        >
-          {rowContent}
-        </Anchor>
-      ) : (
-        // Native: the anchor is a Text, so the stacked row content
-        // would flow inline inside it (see LinkOverlay). The row
-        // renders in the same YStack frame as the unavailable
-        // branch, with a childless anchor stretched over it
-        // carrying the href; the overlay's label composes the
-        // kind-prefixed title and the subtitle when present.
-        <YStack paddingVertical="$3" position="relative">
-          {renderRowContent(true)}
-          <LinkOverlay
-            href={entry.href}
-            accessibilityRole="link"
-            accessibilityLabel={`${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}${
-              entry.subtitle ? `, ${entry.subtitle}` : ""
-            }`}
-          />
-        </YStack>
-      )}
-    </YStack>
-  );
-}
-
 /**
  * Full-page meal plan detail view: plan meta, the nutrition
  * goals section, the shopping-list/edit actions, and the flat
@@ -291,11 +215,7 @@ function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
  */
 export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   if (props.state === "loading") {
-    return (
-      <YStack flex={1} backgroundColor="$surface" alignItems="center" justifyContent="center">
-        <Spinner label="Loading meal plan" />
-      </YStack>
-    );
+    return <LoadingGate label="Loading meal plan" />;
   }
 
   const {
@@ -324,74 +244,47 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
 
   return (
     <ScreenContainer>
-      <YStack paddingBlockEnd="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          {title}
-        </Text>
-      </YStack>
-      {notes ? (
-        <YStack paddingBlockEnd="$4">
-          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-            {notes}
-          </Text>
-        </YStack>
-      ) : null}
-      {dateRangeLabel ? (
-        <YStack paddingBlockEnd="$4">
-          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-            {dateRangeLabel}
-          </Text>
-        </YStack>
-      ) : null}
-      {nutritionLabel ? (
-        <YStack paddingBlockEnd="$4">
-          <Text fontSize={tokens.typography.fontSize.sm} color="$textMuted">
-            {nutritionLabel}
-          </Text>
-        </YStack>
-      ) : null}
-      {showGoals ? (
-        <YStack paddingBottom="$8">
+      <SectionStack>
+        <Text variant="title">{title}</Text>
+        {notes ? <Text variant="hint">{notes}</Text> : null}
+        {dateRangeLabel ? <Text variant="hint">{dateRangeLabel}</Text> : null}
+        {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
+        {showGoals ? (
           <SectionCard title="Nutrition goals">
-            {nutritionLabel ? (
-              <YStack paddingBlockEnd="$3">
-                <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-                  Plan total: {nutritionLabel}
-                </Text>
-              </YStack>
-            ) : null}
+            {nutritionLabel ? <Text variant="hint">Plan total: {nutritionLabel}</Text> : null}
             {nutritionGoals ? (
               nutritionGoals.rows.map((row) => (
-                <GoalRow key={row.label} label={row.label} valueLabel={row.valueLabel} />
+                <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
               ))
             ) : (
-              <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-                Set daily nutrition goals to compare this plan.
-              </Text>
+              <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
             )}
-            {goalsHref ? (
-              <YStack paddingBlockStart="$3">
-                <TextLink href={goalsHref}>Set nutrition goals</TextLink>
-              </YStack>
-            ) : null}
+            {goalsHref ? <TextLink href={goalsHref}>Set nutrition goals</TextLink> : null}
           </SectionCard>
-        </YStack>
-      ) : null}
-      <XStack paddingBlockEnd="$6" flexWrap="wrap" gap="$3">
-        <Button href={shoppingListHref}>Shopping list</Button>
-        <Button variant="secondary" href={editHref}>
-          Edit
-        </Button>
-      </XStack>
-      <SectionCard title="Entries">
-        {entries.map((entry) => (
-          <EntryRow key={entry.id} entry={entry} />
-        ))}
-      </SectionCard>
+        ) : null}
+        <ButtonRow>
+          <Button href={shoppingListHref}>Shopping list</Button>
+          <Button variant="secondary" href={editHref}>
+            Edit
+          </Button>
+        </ButtonRow>
+        <SectionCard title="Entries">
+          <ListStack>
+            {entries.map((entry) => (
+              <ListRow
+                key={entry.id}
+                prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
+                title={entry.title}
+                {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
+                {...(entry.kind === "recipe" && entry.isUnavailable
+                  ? { isDisabled: true, titleSuffix: " (unavailable)" }
+                  : {})}
+                href={entry.href}
+              />
+            ))}
+          </ListStack>
+        </SectionCard>
+      </SectionStack>
     </ScreenContainer>
   );
 }

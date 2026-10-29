@@ -1,9 +1,8 @@
-import { Anchor, XStack, YStack, isWeb } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { LinkOverlay } from "../components/linkOverlay.js";
+import { CardStack } from "../components/CardStack.js";
+import { Center } from "../components/Center.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { CardRow } from "../components/CardRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
@@ -12,8 +11,9 @@ import { Text } from "../components/Text.js";
  * MealPlansPage (#49): Eciperay's meal plan list as a controlled
  * @spudly/ui page component. The app keeps all state and business
  * logic — queries, mutations, navigation — and drives this view
- * entirely through props: plan view-models in, press callbacks out.
- * Nothing here imports an app package or fetches anything.
+ * entirely through props: plan view-models in, destinations and
+ * callbacks out. Nothing here imports an app package or fetches
+ * anything.
  *
  * Which screen this is: the app's meal-planning surfaces are the
  * Meals hub (a tabbed screen: "Meals" | "Meal plans"), a single
@@ -65,12 +65,23 @@ import { Text } from "../components/Text.js";
  * inside itself — no forms, pickers, or inline editors live in
  * these rows; creating goes to the plan form screen, deleting is
  * a bare mutation intent, and entry editing happens on the form
- * screen too. Every action here is therefore a pure intent
- * callback, which is the honest contract for this view. If a
- * future app change puts app-rendered content inside a plan row,
- * that change adds a slot to this contract (the
- * `renderRecipeAccessory` precedent) rather than a callback that
- * pretends to render.
+ * screen too. The controls split on #248's navigation rule: the
+ * plan rows and the create action navigate, so they cross as
+ * hrefs (each plan carries its own; the create action takes
+ * `createHref`), and Delete — a mutation, not a navigation —
+ * stays a bare intent callback, which is the honest contract for
+ * this view. If a future app change puts app-rendered content
+ * inside a plan row, that change adds a slot to this contract
+ * (the `renderRecipeAccessory` precedent) rather than a callback
+ * that pretends to render.
+ *
+ * De-styled for #119: the page renders no layout primitives and
+ * sets no styling props. The plan row is the generic CardRow
+ * widget in its link form (its card layout, link area, and action
+ * treatment live there; the page supplies the plan content, the
+ * plan's href, and the Delete action), the list stacks in a
+ * CardStack, and the loading block centers its spinner in a
+ * Center.
  */
 
 /** One meal plan row's view-model. The app formats `subtitle` (its
@@ -80,8 +91,7 @@ export type MealPlansPageItem = {
   id: string;
   /** The plan's destination (#248's navigation rule: the row
    * navigates, so it is a link): the host composes it from the
-   * plan id. The row's text block renders as a link carrying
-   * this href. */
+   * plan id. The row renders as a link carrying this href. */
   href: string;
   title: string;
   subtitle?: string;
@@ -107,96 +117,6 @@ export type MealPlansPageProps = {
   titleLevel?: 1 | 2;
 };
 
-function MealPlanRow({
-  item,
-  onDeletePress,
-}: {
-  item: MealPlansPageItem;
-  onDeletePress?: () => void;
-}) {
-  // `decorative` marks the visible texts non-accessible for the
-  // native link rendering, whose LinkOverlay carries the composed
-  // label as the row's one accessibility stop (see LinkOverlay).
-  const renderTextContent = (decorative: boolean) => (
-    <>
-      <Text
-        accessible={decorative ? false : undefined}
-        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        fontSize={tokens.typography.fontSize.md}
-        fontWeight={tokens.typography.fontWeight.semibold}
-      >
-        {item.title}
-      </Text>
-      {item.subtitle ? (
-        <Text
-          variant="hint"
-          accessible={decorative ? false : undefined}
-          importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        >
-          {item.subtitle}
-        </Text>
-      ) : null}
-    </>
-  );
-  const textContent = renderTextContent(false);
-  return (
-    <YStack paddingBlockEnd="$3">
-      <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
-        {/* The text block is a Tamagui Anchor carrying the plan's
-          href, not a React Native Pressable/TouchableOpacity:
-          those map accessibilityRole="button" to a native
-          <button> element on web, whose UA styles center the
-          row's text. The anchor renders a real link (the row
-          navigates, #248) and keeps the layout. flex/minWidth are
-          structural only: the block expands and may shrink within
-          the row. As a real anchor it is keyboard-operable on web
-          by default, which retires the hand-rolled focus/keydown
-          press pattern this row used as a button. On native the
-          anchor is a Text and the stacked texts would flow inline
-          inside it, so the block platform-splits (see
-          LinkOverlay): a YStack frame with the same structural
-          flex carries the texts, and a childless anchor stretched
-          over it carries the href. */}
-        {isWeb ? (
-          <Anchor
-            flex={1}
-            minWidth={0}
-            gap="$1"
-            href={item.href}
-            textDecorationLine="none"
-            display="web:flex"
-            flexDirection="column"
-          >
-            {textContent}
-          </Anchor>
-        ) : (
-          <YStack flex={1} minWidth={0} gap="$1" position="relative">
-            {renderTextContent(true)}
-            <LinkOverlay
-              href={item.href}
-              accessibilityRole="link"
-              accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
-            />
-          </YStack>
-        )}
-        {onDeletePress ? (
-          <XStack paddingInlineStart="$3" alignItems="center">
-            <Button
-              variant="secondary"
-              size="sm"
-              backgroundColor={tokens.colors.danger.danger1}
-              color={tokens.colors.danger.danger8}
-              onPress={onDeletePress}
-            >
-              Delete
-            </Button>
-          </XStack>
-        ) : null}
-      </Card>
-    </YStack>
-  );
-}
-
 /**
  * Full-page Meal plans view: the heading, the create action, and
  * the plan list in a scrolling shell. Controlled — see the file
@@ -214,33 +134,33 @@ export function MealPlansPage({
       <Text variant="heading" aria-level={titleLevel}>
         Meal plans
       </Text>
-      {createHref ? (
-        <Button alignSelf="stretch" href={createHref}>
-          New meal plan
-        </Button>
-      ) : null}
+      {createHref ? <Button href={createHref}>New meal plan</Button> : null}
       {isLoading ? (
-        <YStack paddingBlockStart="$8" alignItems="center">
+        <Center>
           <Spinner label="Loading" />
-        </YStack>
+        </Center>
       ) : plans.length === 0 ? (
         <EmptyState title="No meal plans yet." />
       ) : (
-        <YStack gap="$2">
+        <CardStack>
           {plans.map((plan) => (
-            <MealPlanRow
+            <CardRow
               key={plan.id}
-              item={plan}
+              title={plan.title}
+              {...(plan.subtitle ? { subtitle: plan.subtitle } : {})}
+              href={plan.href}
+              actionLabel="Delete"
+              actionTone="danger"
               {...(onPlanDelete
                 ? {
-                    onDeletePress: () => {
+                    onActionPress: () => {
                       onPlanDelete(plan.id);
                     },
                   }
                 : {})}
             />
           ))}
-        </YStack>
+        </CardStack>
       )}
     </ScreenContainer>
   );

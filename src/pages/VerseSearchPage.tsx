@@ -2,7 +2,7 @@ import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { Alert } from "../components/Alert.js";
 import { EmptyState } from "../components/EmptyState.js";
-import { Row } from "../components/Row.js";
+import { FieldRow } from "../components/FieldRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SearchField } from "../components/SearchField.js";
 import { Spinner } from "../components/Spinner.js";
@@ -98,7 +98,7 @@ import { BoundedList } from "./BoundedList.js";
  *   the `flex: 1` bounding to the fixed shell, the same geometry
  *   the app's list uses inside the non-scrolling container.
  * - The app passes `style={{ flex: 1 }}` to the field itself; here
- *   the search row is the DS Row and the field takes the row's
+ *   the search row is a FieldRow and the field takes the row's
  *   remaining width through SearchField's `grow` prop — the
  *   layout is the app's (the field takes the remaining width, the
  *   button its natural width). No lineHeight is set on any glyph
@@ -206,7 +206,7 @@ export function VerseSearchPage({
           search.
         </Alert>
       ) : null}
-      <Row align="center">
+      <FieldRow>
         <SearchField
           value={query}
           onChangeText={onQueryChange}
@@ -219,7 +219,7 @@ export function VerseSearchPage({
         <Button onPress={onSearch} disabled={isSearching || query.trim() === ""}>
           Search
         </Button>
-      </Row>
+      </FieldRow>
       {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
       {isSearching ? <Spinner label="Loading" /> : null}
       {hasSearched && !isSearching && !errorMessage && results.length === 0 ? (
