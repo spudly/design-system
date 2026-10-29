@@ -66,6 +66,11 @@ test("the auth content column is capped at 480px and rendered only for the auth 
     /rest\.variant === "auth" \? \(\s*<StyledAuthContent gap=\{gap \?\? tokens\.spacing\[4\]\}>\{children\}<\/StyledAuthContent>/,
     "children must be wrapped in the capped column only for the auth variant, with the caller's gap preserved (spacing[4] default)",
   );
+  assert.match(
+    screenContainer,
+    /<\/StyledAuthContent>\s*\)\s*:\s*\(\s*children\s*\)/,
+    "non-auth variants must render children directly, without the capped column",
+  );
   assert.equal(
     [...screenContainer.matchAll(/maxWidth/g)].length,
     1,
