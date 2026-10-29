@@ -206,6 +206,10 @@ jobs:
           node-version: 22
           cache: npm
 
+      - name: Enable Corepack (pinned npm)
+        if: steps.pr-gate.outputs.run != 'false'
+        run: corepack enable npm
+
       - name: Install dependencies
         if: steps.pr-gate.outputs.run != 'false'
         run: npm ci
