@@ -78,7 +78,11 @@ test("loading keeps the list mounted and shows the spinner as its empty state", 
     /data=\{isLoading \? \[\] : recipes\}/,
     "loading empties the DATA, never the list — swapping the tree would unmount the focused filter input mid-typing",
   );
-  assert.match(code, /<BoundedListLoading \/>/);
+  assert.match(
+    code,
+    /ListEmptyComponent=\{\s*isLoading \? \(\s*<BoundedListLoading \/>/,
+    "the loading spinner renders as the list's EMPTY state, not in any other slot",
+  );
   assert.match(
     code,
     /ListHeaderComponent=\{\s*<RecipesFiltersBar/,

@@ -17,21 +17,16 @@ const StyledRatingTarget = styled(YStack, {
   cursor: "pointer",
 });
 
-export type RatingStarsProps = {
+type RatingStarsBase = {
   /** Display rating, 0–5, or null/absent when unrated. The app
    * computes it by its display-rating rule; the component
    * renders it and never formats it into text. */
   rating?: number | null | undefined;
-  /** When provided, the stars are a button and pressing them
-   * fires this callback. Without it the stars are a static
-   * display. */
-  onPress?: () => void;
-  /** The button form's accessible name — it must name the
-   * action the press performs (the stars alone would announce
-   * as a rating, not as the action they trigger). Required in
-   * effect when `onPress` is given. */
-  accessibilityLabel?: string;
 };
+
+export type RatingStarsProps =
+  | (RatingStarsBase & { onPress?: undefined; accessibilityLabel?: string | undefined })
+  | (RatingStarsBase & { onPress: () => void; accessibilityLabel: string });
 
 /**
  * A five-star display rating in the DS star language (the
@@ -52,19 +47,33 @@ export type RatingStarsProps = {
  * click's propagation but does not cancel its default, so
  * without the cancellation the wrapping anchor would also
  * navigate. On native the call is inert — the innermost press
- * target wins the responder.
+ * target wins the responder. The button form requires its
+ * accessible name in the type (the stars alone would announce
+ * as a rating, not as the action they trigger), and it is
+ * keyboard-operable on web: a focus stop with Enter/Space
+ * activation (the CardRow pattern — a plain stack with onPress
+ * is not a tab stop).
  */
-export function RatingStars({ rating, onPress, accessibilityLabel }: RatingStarsProps) {
-  if (!onPress) {
-    return <RatingStarRow rating={rating} />;
+export function RatingStars(props: RatingStarsProps) {
+  if (!props.onPress) {
+    return <RatingStarRow rating={props.rating} />;
   }
+  const { rating, onPress, accessibilityLabel } = props;
   const handlePress = (event: { preventDefault: () => void }) => {
     event.preventDefault();
     onPress();
   };
+  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onPress();
+    }
+  };
   return (
     <StyledRatingTarget
       onPress={handlePress}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
       {...platformAccessibilityProps({
         accessibilityRole: "button",
         accessibilityLabel,

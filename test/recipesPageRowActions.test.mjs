@@ -88,7 +88,7 @@ test("the pressable form cancels the click default before firing (the row's link
   assert.match(ratingStars, /accessibilityRole: "button"/);
   assert.match(
     ratingStars,
-    /if \(!onPress\) \{\s*return <RatingStarRow rating=\{rating\} \/>;/,
+    /if \(!props\.onPress\) \{\s*return <RatingStarRow rating=\{props\.rating\} \/>;/,
     "without onPress the stars are a static display, never a button",
   );
 });

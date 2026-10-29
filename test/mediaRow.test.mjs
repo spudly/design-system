@@ -89,6 +89,21 @@ test("RatingStars' pressable target is ≥44dp and carries the button role", () 
   );
 });
 
+test("RatingStars' button form requires its accessible name in the type", () => {
+  assert.match(
+    ratingStars,
+    /\(RatingStarsBase & \{ onPress: \(\) => void; accessibilityLabel: string \}\)/,
+    "with onPress the label is required — the stars alone would announce as a rating",
+  );
+  assert.match(ratingStars, /if \(!props\.onPress\)/);
+});
+
+test("RatingStars' button is keyboard-operable on web (the CardRow pattern)", () => {
+  assert.match(ratingStars, /tabIndex=\{0\}/);
+  assert.match(ratingStars, /onKeyDown=\{handleKeyDown\}/);
+  assert.match(ratingStars, /event\.key === "Enter" \|\| event\.key === " "/);
+});
+
 test("RemovableField pairs the field with its end-aligned ghost Remove button at a 4px gap", () => {
   assert.match(removableField, /<YStack gap=\{tokens\.spacing\[1\]\}>/);
   assert.match(removableField, /<XStack justifyContent="flex-end">/);
