@@ -89,6 +89,7 @@ test("CardRow's keyboard activation ignores held-key repeats (#313)", () => {
   // preventDefault still runs for repeat events, before the guard,
   // so a held Space key does not scroll the page.
   const handler = cardRowCode.slice(cardRowCode.indexOf("handleKeyDown"));
+  assert.ok(handler.indexOf("event.preventDefault()") > -1, "the key handler calls preventDefault");
   assert.ok(
     handler.indexOf("event.preventDefault()") < handler.indexOf("!event.repeat"),
     "preventDefault runs before the repeat guard",
