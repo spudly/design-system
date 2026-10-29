@@ -65,6 +65,16 @@ export type TextLinkProps =
        * platform link path. This is the navigation form — a control
        * that navigates to another page is a link with an href
        * (#248); in-page actions are buttons (see TextAction).
+       * Native contract (shared by every DS href form): the href
+       * is forwarded verbatim to `Linking.openURL`, which requires
+       * a scheme-bearing URL an installed app can open — so on
+       * native the host passes an absolute URL (the app's
+       * deep-link scheme or an https URL); root-relative paths
+       * such as "/forgot-password" are web-form destinations. The
+       * design system has no base URL or router to resolve a
+       * relative path against, so composing the per-platform
+       * destination is the host's part of the contract (the host
+       * composes hrefs from its routes, #248).
        */
       href: string;
       onPress?: never;

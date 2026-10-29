@@ -103,6 +103,11 @@ test("TextLink: href form renders a styled Anchor over the shared frame; the for
 
 test("BackLink: href is optional and renders the row inside a styled Anchor (#248)", () => {
   assert.match(backLink, /styled\(Anchor, \{\s*name: "BackLinkAnchor",/);
+  // The Anchor is text-based (display: inline on web by default),
+  // so the styled frame must pin a web flex display or the row's
+  // flexDirection/gap/min-height never take effect (CodeRabbit
+  // finding on PR #283, verified in the SSR-generated CSS).
+  assert.match(backLink, /display: "web:flex",/);
   assert.match(backLink, /href: string;/);
   assert.match(backLink, /onPress\?: never;/);
   assert.match(backLink, /if \(props\.href !== undefined\) \{/);

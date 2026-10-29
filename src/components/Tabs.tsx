@@ -86,7 +86,17 @@ export type TabItem = {
 export type LinkTabItem = {
   value: string;
   label: string;
-  /** The tab's destination — a link tab navigates (#248). */
+  /**
+   * The tab's destination — a link tab navigates (#248). Native
+   * contract (shared by every DS href form): the href is forwarded
+   * verbatim to the platform link path (`Linking.openURL`), which
+   * requires a scheme-bearing URL an installed app can open — so
+   * on native the host passes absolute URLs (the app's deep-link
+   * scheme or https URLs); root-relative paths are web-form
+   * destinations. The design system has no base URL or router to
+   * resolve a relative path against, so composing the
+   * per-platform destinations is the host's part of the contract.
+   */
   href: string;
 };
 

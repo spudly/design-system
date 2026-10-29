@@ -64,10 +64,21 @@ function BackArrow() {
  * no DS component imports react-native). The drawn arrow and the
  * label render inside it unchanged, so both forms are one control
  * with one layout.
+ *
+ * The web display is pinned to flex explicitly: Anchor is a
+ * text-based component (Tamagui's Anchor frame is a styled
+ * SizableText rendering an `<a>`), and Tamagui's text base style is
+ * `display: inline` on web — an inline anchor silently ignores the
+ * row's flexDirection/gap/alignItems and does not reliably hold
+ * the 44px minimum height (verified in the SSR-generated CSS for
+ * this component: the flex classes were emitted with no display
+ * class at all). The v3 flat `web:` clause (the ScreenContainer
+ * pattern) scopes the flex display to web; native is unchanged.
  */
 const StyledBackAnchor = styled(Anchor, {
   name: "BackLinkAnchor",
 
+  display: "web:flex",
   alignItems: "center",
   alignSelf: "flex-start",
   flexDirection: "row",
@@ -89,6 +100,16 @@ export type BackLinkProps =
        * The back destination as an href — the link form, for hosts
        * with a canonical back destination (sign-in, the recipe
        * page): renders a real anchor carrying the href on web.
+       * Native contract (shared by every DS href form): the href
+       * is forwarded verbatim to the platform link path
+       * (`Linking.openURL`), which requires a scheme-bearing URL
+       * an installed app can open — so on native the host passes
+       * an absolute URL (the app's deep-link scheme or an https
+       * URL); root-relative paths such as "/recipes" are
+       * web-form destinations. The design system has no base URL
+       * or router to resolve a relative path against, so composing
+       * the per-platform destination is the host's part of the
+       * contract (the host composes hrefs from its routes, #248).
        */
       href: string;
       onPress?: never;

@@ -188,6 +188,15 @@ type ButtonLinkProps = Omit<StyledLinkButtonProps, "disabled" | "children" | "ic
    * carrying the href, and on native a press opens the href through
    * the platform link path. The frame, variants, and sizes are the
    * button form's own — only the element and the activation differ.
+   * Native contract (shared by every DS href form): the href is
+   * forwarded verbatim to `Linking.openURL`, which requires a
+   * scheme-bearing URL an installed app can open — so on native
+   * the host passes an absolute URL (the app's deep-link scheme
+   * or an https URL); root-relative paths such as "/recipes" are
+   * web-form destinations. The design system has no base URL or
+   * router to resolve a relative path against, so composing the
+   * per-platform destination is the host's part of the contract
+   * (the host composes hrefs from its routes, #248).
    */
   href: string;
   /** A link navigates — press callbacks belong to the button form. */
