@@ -146,8 +146,8 @@ if (CONFIG.scopeFile) {
 //
 // To widen or narrow the Android VR set, edit this table; the
 // driver, the CI job, and the committed baselines all follow it.
-// Current yield: 32 pages-eciperay stories + 18 pages-memorize
-// stories, light themes only = 50 baselines.
+// Current yield: 106 pages-eciperay stories + 22 pages-memorize
+// stories, light themes only = 128 baselines.
 // A second, display-variant set (RecipesPage stories at a narrow
 // logical width + large font) lives in NARROW_SCOPE below.
 const CAPTURE_SCOPE = [
@@ -179,8 +179,8 @@ const CAPTURE_SCOPE = [
 // standard ones with a "-narrow" filename suffix
 // (baselines/<theme>/<storyId>-narrow.png), so the auto-commit /
 // guard / commit-job machinery treats them as ordinary baselines.
-// Current yield: 7 pages-eciperay-recipespage stories x light
-// warmHarvest = 7 baselines (57 total with the standard set). The
+// Current yield: 12 pages-eciperay-recipespage stories x light
+// warmHarvest = 12 baselines (140 total with the standard set). The
 // variant follows the light-only policy above (Stephen,
 // 2026-10-24). RecipesPage only on purpose: a second full pass
 // would double the job's emulator time (issue #114 is cutting it).
