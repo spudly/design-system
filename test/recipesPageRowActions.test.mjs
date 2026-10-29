@@ -198,7 +198,7 @@ test("the stories exercise rated and unrated rows", () => {
   );
   assert.match(
     stories,
-    /id: "arroz-con-pollo", href: "\/recipes\/arroz-con-pollo", title: "Arroz con Pollo", subtitle: "[^"]*" \}/,
+    /id: "arroz-con-pollo",\s+href: "\/recipes\/arroz-con-pollo",\s+title: "Arroz con Pollo",\s+subtitle: "[^"]*",\s+\}/,
     "at least one fixture recipe (Arroz con Pollo) must stay unrated so the icon-only button renders in captures",
   );
 });
