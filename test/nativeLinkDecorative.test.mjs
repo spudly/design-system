@@ -45,20 +45,21 @@ function count(code, literal) {
 }
 
 // The family's render-content functions flag their decorative
-// variant `decorative` (RecipesPage's is named `native`). Two of
+// variant `decorative` (RecipesPage's is named `native`), and
+// the third element is the file's decorative-text count. Two of
 // the surfaces live in the generic row components since the #119
 // tranche-2 extraction merged with the stage-2 remodel: the plan
 // rows in CardRow, the entry rows in ListRow.
 const FAMILY = [
-  ["src/components/OptionCard.tsx", "decorative"],
-  ["src/components/CardRow.tsx", "decorative"],
-  ["src/components/ListRow.tsx", "decorative"],
-  ["src/pages/MealDetailPage.tsx", "decorative"],
-  ["src/pages/MealsHubPage.tsx", "decorative"],
-  ["src/pages/RecipesPage.tsx", "native"],
+  ["src/components/OptionCard.tsx", "decorative", 3],
+  ["src/components/CardRow.tsx", "decorative", 2],
+  ["src/components/ListRow.tsx", "decorative", 2],
+  ["src/pages/MealDetailPage.tsx", "decorative", 2],
+  ["src/pages/MealsHubPage.tsx", "decorative", 2],
+  ["src/pages/RecipesPage.tsx", "native", 2],
 ];
 
-for (const [rel, flag] of FAMILY) {
+for (const [rel, flag, expectedCount] of FAMILY) {
   test(`${rel}: every decorative text is hidden from Android accessibility too`, () => {
     const code = codeOf(rel);
     const accessibleCount = count(code, `accessible={${flag} ? false : undefined}`);
@@ -66,9 +67,15 @@ for (const [rel, flag] of FAMILY) {
       code,
       `importantForAccessibility={${flag} ? "no-hide-descendants" : undefined}`,
     );
-    assert.ok(
-      accessibleCount >= 2,
-      `${rel} must mark at least its title and subtitle texts decorative in the native rendering`,
+    // The exact count is pinned, not just the pairing: a text
+    // that lost BOTH props would leave the pairing counts equal
+    // (CodeRabbit round on 0dcf5b1), so the family's size is part
+    // of the contract — a new decorative text updates it
+    // consciously.
+    assert.equal(
+      accessibleCount,
+      expectedCount,
+      `${rel} must mark exactly its ${expectedCount} native-rendering texts decorative`,
     );
     assert.equal(
       hiddenCount,
