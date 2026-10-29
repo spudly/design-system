@@ -202,7 +202,16 @@ test("staging keeps baseline bytes for noise, capture bytes for real changes", (
     log: (line) => logs.push(line),
   });
 
-  assert.deepEqual(summary, { captured: 3, staged: 2, new: 1, changed: 1, skipped: 1 });
+  // skippedStrict: the noise pair (0.2%) is over the strict
+  // tolerance (0.1%), so the gate absorbed one strict failure.
+  assert.deepEqual(summary, {
+    captured: 3,
+    staged: 2,
+    new: 1,
+    changed: 1,
+    skipped: 1,
+    skippedStrict: 1,
+  });
   assert.match(logs.at(-1), /3 capture\(s\) gated: 2 staged/, "per-run summary line is logged");
   const stagedBytes = [
     ["t/noise.png", fx.base], // noise keeps baseline bytes

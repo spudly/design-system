@@ -12,7 +12,7 @@
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-import { gateRatioFromArgs, stageGatedBaselines } from "./commitGate.mjs";
+import { gateRatioFromArgs, parseCommitGateRatio, stageGatedBaselines } from "./commitGate.mjs";
 
 function argValue(args, name, fallback) {
   const i = args.indexOf(name);
@@ -28,6 +28,7 @@ function parseStageArgs(args) {
       .map((s) => s.trim())
       .filter(Boolean),
     colorThreshold: Number(argValue(args, "--threshold", "16")),
+    strictMaxRatioRaw: argValue(args, "--strict-max-ratio", "0.001"),
     summaryPath: argValue(args, "--summary", ""),
   };
   return parsed.baselinesDir && parsed.outDir && parsed.capturesDirs.length > 0 ? parsed : null;
@@ -47,7 +48,13 @@ function runCli() {
     return 1;
   }
   const gateRatio = gateRatioFromArgs(args, "--max-ratio");
-  const summary = stageGatedBaselines({ ...parsed, gateRatio, log: (line) => console.log(line) });
+  const strictMaxRatio = parseCommitGateRatio(parsed.strictMaxRatioRaw, "--strict-max-ratio");
+  const summary = stageGatedBaselines({
+    ...parsed,
+    gateRatio,
+    strictMaxRatio,
+    log: (line) => console.log(line),
+  });
   if (parsed.summaryPath) writeFileSync(parsed.summaryPath, JSON.stringify(summary, null, 2));
   return 0;
 }

@@ -132,6 +132,11 @@ function stageOneCapture(opts) {
   );
   if (verdict.action === "skipped") {
     summary.skipped++;
+    // A skipped capture whose ratio is over the strict compare's
+    // tolerance is a strict failure the gate absorbed; the shell
+    // warns on exactly those (identical/within-tolerance skips are
+    // unremarkable).
+    if (verdict.ratio > (opts.strictMaxRatio ?? 0.001)) summary.skippedStrict++;
     log(
       `commit-gate: SKIP ${rel} — ${(verdict.ratio * 100).toFixed(3)}% pixels differ (<= ${(gateRatio * 100).toFixed(2)}% gate); baseline kept`,
     );
@@ -159,7 +164,7 @@ export function stageGatedBaselines(opts) {
   const { log } = opts;
   mkdirSync(opts.outDir, { recursive: true });
   copyTree(opts.baselinesDir, opts.outDir);
-  const summary = { captured: 0, staged: 0, new: 0, changed: 0, skipped: 0 };
+  const summary = { captured: 0, staged: 0, new: 0, changed: 0, skipped: 0, skippedStrict: 0 };
   const seen = new Map();
   for (const capturesDir of opts.capturesDirs) {
     if (!existsSync(capturesDir)) continue;
