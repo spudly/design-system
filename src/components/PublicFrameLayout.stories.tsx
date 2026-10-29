@@ -20,7 +20,7 @@ export const Default: Story = {
         header={
           <PublicFrameHeader
             brandLabel="Eciperay"
-            onBrandPress={() => {}}
+            brandHref="/"
             signInLabel="Sign in"
             onSignInPress={() => {}}
           />

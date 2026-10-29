@@ -36,7 +36,7 @@ function Viewport({ width, children }: { width: number; children: ReactNode }) {
 }
 
 const frameProps = {
-  onBrandPress: () => undefined,
+  brandHref: "/",
   onSignInPress: () => undefined,
   onPrivacyPress: () => undefined,
   onTermsPress: () => undefined,

@@ -7,11 +7,12 @@
  * callbacks only.
  *
  * The pins hold the frame's design where it now lives: the
- * wordmark's brand treatment and keyboard activation, the wide
- * column (768px) shared by the layout and both bands, the
- * bands' surface fills and hairline borders, and the footer's
- * note + legal-link treatments — the exact treatments the frame
- * rendered before the extraction.
+ * wordmark's brand treatment on a real anchor (BrandLink takes
+ * an href, never a press callback — Stephen's ruling on PR
+ * #311), the wide column (768px) shared by the layout and both
+ * bands, the bands' surface fills and hairline borders, and the
+ * footer's note + legal-link treatments — the exact treatments
+ * the frame rendered before the extraction.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -42,16 +43,21 @@ test("the frame components are exported from the built package root", async () =
   assert.equal(dist.COLUMN_MAX_WIDTH, 768, "the shared column constant is exported");
 });
 
-test("BrandLink carries the wordmark treatment and Enter activation", () => {
-  assert.match(brandLink, /fontSize=\{tokens\.typography\.fontSize\.lg\}/);
-  assert.match(brandLink, /fontWeight=\{tokens\.typography\.fontWeight\.semibold\}/);
-  assert.match(brandLink, /color="\$primary"/);
-  assert.match(brandLink, /accessibilityRole="link"/);
-  assert.match(brandLink, /accessibilityLabel=\{label\}/);
-  assert.match(brandLink, /tabIndex=\{0\}/);
-  assert.match(brandLink, /event\.key === "Enter"/, "Enter activates the wordmark");
+test("BrandLink is a real anchor carrying the href, in the wordmark treatment", () => {
+  assert.match(brandLink, /fontSize: tokens\.typography\.fontSize\.lg/);
+  assert.match(brandLink, /fontWeight: tokens\.typography\.fontWeight\.semibold/);
+  assert.match(brandLink, /color: "\$primary"/);
+  assert.match(brandLink, /textDecorationLine: "none"/, "the wordmark carries no underline");
+  assert.match(brandLink, /styled\(Anchor/, "the wordmark renders through an Anchor frame");
+  assert.match(brandLink, /href=\{href\}/, "the anchor carries the given href");
+  assert.match(brandLink, /accessibilityRole: "link"/);
+  assert.match(brandLink, /accessibilityLabel: label/);
   assert.match(brandLink, /label: string;/, "the wordmark text is caller content");
-  assert.match(brandLink, /onPress: \(\) => void;/, "the brand intent is a callback");
+  assert.match(brandLink, /href: string;/, "the brand destination crosses as an href");
+  assert.ok(
+    !brandLink.includes("onPress"),
+    "a component named *Link carrying the link role is a real link — no press callback (Stephen's ruling, PR #311)",
+  );
 });
 
 test("PublicFrameLayout owns the shell and the wide centered column", () => {
@@ -72,7 +78,7 @@ test("PublicFrameHeader is the surface band with wordmark and sign-in link", () 
   assert.match(header, /borderBottomWidth=\{1\}/);
   assert.match(header, /borderColor=\{tokens\.colors\.gray\.gray2\}/);
   assert.match(header, /maxWidth=\{COLUMN_MAX_WIDTH\}/, "the band's row shares the column");
-  assert.match(header, /<BrandLink label=\{brandLabel\} onPress=\{onBrandPress\} \/>/);
+  assert.match(header, /<BrandLink label=\{brandLabel\} href=\{brandHref\} \/>/);
   assert.match(header, /<TextLink[^>]*onPress=\{onSignInPress\}/, "Sign in is a link intent");
 });
 
@@ -84,4 +90,36 @@ test("PublicFrameFooter is the surface band with the note and legal links", () =
   assert.match(footer, /color=\{tokens\.colors\.gray\.gray6\}/, "the note is muted ink");
   assert.match(footer, /<TextLink[^>]*onPress=\{onPrivacyPress\}/, "Privacy is a link intent");
   assert.match(footer, /<TextLink[^>]*onPress=\{onTermsPress\}/, "Terms is a link intent");
+});
+
+let runtimePromise;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const reactModule = await import("react");
+    const React = reactModule.default;
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider } = await import("tamagui");
+    const dist = await import("../dist/index.js");
+    return { React, renderToString, TamaguiProvider, ...dist };
+  })();
+  return runtimePromise;
+}
+
+async function renderToHtml(element) {
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+    await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const html = renderToString(
+    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+  );
+  const styleEnd = html.lastIndexOf("</style>");
+  return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
+}
+
+test("SSR: BrandLink renders as a real anchor carrying the given href", async () => {
+  const { React, BrandLink } = await loadRuntime();
+  const html = await renderToHtml(React.createElement(BrandLink, { label: "Eciperay", href: "/" }));
+  assert.ok(/<a [^>]*href="\//.test(html), "the wordmark is an anchor carrying the href");
+  assert.ok(html.includes("Eciperay"), "the wordmark label renders");
+  assert.ok(!/<button/.test(html), "the wordmark must not render as a button");
 });

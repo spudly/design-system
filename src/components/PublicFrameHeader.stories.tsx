@@ -12,7 +12,7 @@ type Story = StoryObj<typeof PublicFrameHeader>;
 export const Default: Story = {
   args: {
     brandLabel: "Eciperay",
-    onBrandPress: () => {},
+    brandHref: "/",
     signInLabel: "Sign in",
     onSignInPress: () => {},
   },

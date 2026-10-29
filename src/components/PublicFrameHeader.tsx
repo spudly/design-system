@@ -7,8 +7,8 @@ import { TextLink } from "./TextLink.js";
 export type PublicFrameHeaderProps = {
   /** Brand wordmark text (the frame's DS-owned copy, passed in). */
   brandLabel: string;
-  /** Brand intent: the host navigates to the public home. */
-  onBrandPress: () => void;
+  /** The brand's href — the wordmark navigates home, so it is a link. */
+  brandHref: string;
   /** Sign-in link label (the frame's DS-owned copy, passed in). */
   signInLabel: string;
   /** Sign-in intent: the host navigates to the login route. */
@@ -22,11 +22,13 @@ export type PublicFrameHeaderProps = {
  * (COLUMN_MAX_WIDTH). Extracted from PublicPageFrame for the
  * #119 page de-styling program — the band's fill, border, column
  * geometry, and link treatments are the frame's design, owned
- * here; the copy and the navigation intents cross as props.
+ * here; the copy crosses as props, the wordmark's home href
+ * crosses as an href (it navigates — #248), and the sign-in
+ * navigation crosses as an intent callback.
  */
 export function PublicFrameHeader({
   brandLabel,
-  onBrandPress,
+  brandHref,
   signInLabel,
   onSignInPress,
 }: PublicFrameHeaderProps) {
@@ -41,7 +43,7 @@ export function PublicFrameHeader({
         paddingHorizontal="$6"
         paddingVertical="$4"
       >
-        <BrandLink label={brandLabel} onPress={onBrandPress} />
+        <BrandLink label={brandLabel} href={brandHref} />
         <TextLink fontSize={tokens.typography.fontSize.sm} onPress={onSignInPress}>
           {signInLabel}
         </TextLink>

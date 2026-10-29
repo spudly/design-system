@@ -15,10 +15,14 @@ import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
  * alike): the DS owns the design — this frame included — and the
  * app owns the content. The frame's copy is therefore DS-owned
  * constants that move with the frame (the copy precedent from
- * RecipeDetailPage), and every navigation leaves through an intent
- * callback: the host routes (brand → home, Sign in → the login
- * route, Privacy/Terms → the legal routes). Nothing here imports
- * an app package or fetches anything.
+ * RecipeDetailPage). Navigation leaves two ways, per #248's
+ * rule: the brand wordmark navigates home — a canonical
+ * destination — so its href crosses as an href (BrandLink is a
+ * real link; Stephen's ruling on PR #311), while the remaining
+ * navigation leaves through intent callbacks: the host routes
+ * (Sign in → the login route, Privacy/Terms → the legal
+ * routes). Nothing here imports an app package or fetches
+ * anything.
  *
  * This is the wide public counterpart to PageFrame (the 430px
  * phone frame the app-page stories render in): the content column
@@ -31,17 +35,17 @@ import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
  * frame components — PublicFrameLayout owns the shell and the
  * column, PublicFrameHeader / PublicFrameFooter own the bands and
  * their link treatments, BrandLink owns the wordmark — and this
- * file keeps what is the frame's own: the intent-callback
- * contract and the DS-owned copy constants, passed into the bands
- * as data.
+ * file keeps what is the frame's own: the navigation contract
+ * (the brand href and the intent callbacks) and the DS-owned
+ * copy constants, passed into the bands as data.
  *
  * Placement: page components live in src/pages behind the
  * `@spudly/ui/pages` subpath export, not the package root.
  */
 
 export type PublicPageFrameProps = {
-  /** Brand intent: the host navigates to the public home. */
-  onBrandPress: () => void;
+  /** The brand wordmark's href — the host's home route (the wordmark navigates, so it is a link). */
+  brandHref: string;
   /** Sign-in intent: the host navigates to the login route. */
   onSignInPress: () => void;
   /** Privacy intent: the host navigates to the privacy policy. */
@@ -66,7 +70,7 @@ const TERMS_LABEL = "Terms of Service";
  * file header for the contract and the ownership split.
  */
 export function PublicPageFrame({
-  onBrandPress,
+  brandHref,
   onSignInPress,
   onPrivacyPress,
   onTermsPress,
@@ -77,7 +81,7 @@ export function PublicPageFrame({
       header={
         <PublicFrameHeader
           brandLabel={BRAND_LABEL}
-          onBrandPress={onBrandPress}
+          brandHref={brandHref}
           signInLabel={SIGN_IN_LABEL}
           onSignInPress={onSignInPress}
         />

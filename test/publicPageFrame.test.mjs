@@ -12,7 +12,10 @@
  * 2. The frame owns the public chrome: brand + Sign in header,
  *    the wide (max-w-3xl) centered column, the footer note and
  *    legal links — with navigation leaving through intent
- *    callbacks only, and no scroll view of its own (the page
+ *    callbacks, except the brand wordmark: it navigates home, a
+ *    canonical destination, so it crosses as an href and renders
+ *    as a real link (Stephen's ruling on PR #311, applying
+ *    #248). The frame has no scroll view of its own (the page
  *    inside owns the scroll).
  * 3. No explicit lineHeight (the #162 rule).
  * 4. Stories exercise the frame around real page content and a
@@ -50,8 +53,9 @@ const strip = (text) =>
 // column, PublicFrameHeader / PublicFrameFooter own the bands,
 // BrandLink owns the wordmark — so the frame's source for these
 // scans is the page plus the components it composes. The page
-// itself keeps the contract: the intent callbacks and the
-// DS-owned copy constants.
+// itself keeps the contract: the navigation crossings (the brand
+// href and the intent callbacks) and the DS-owned copy
+// constants.
 const frameCode = strip(
   [
     frameSource,
@@ -84,8 +88,17 @@ test("the frame imports no app package and runs no data hooks", () => {
   assert.ok(!frameCode.includes("@tanstack"), "no react-query in the frame");
 });
 
-test("the frame owns the public chrome with intent callbacks and no scroll of its own", () => {
-  for (const intent of ["onBrandPress", "onSignInPress", "onPrivacyPress", "onTermsPress"]) {
+test("the frame owns the public chrome: brand href, intent callbacks, no scroll of its own", () => {
+  assert.match(
+    pageCode,
+    /brandHref: string;/,
+    "the brand wordmark navigates home — its destination crosses as an href, not a callback",
+  );
+  assert.ok(
+    !pageCode.includes("onBrandPress"),
+    "the frame has no brand press callback — BrandLink is a real link (PR #311)",
+  );
+  for (const intent of ["onSignInPress", "onPrivacyPress", "onTermsPress"]) {
     assert.match(
       pageCode,
       new RegExp(String.raw`${intent}: \(\) => void;`),

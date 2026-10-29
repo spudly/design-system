@@ -1,8 +1,5 @@
-import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { YStack } from "tamagui";
 import { BrandLink } from "./BrandLink.js";
-import { Text } from "./Text.js";
 
 const meta: Meta<typeof BrandLink> = {
   title: "Components/BrandLink",
@@ -12,24 +9,12 @@ const meta: Meta<typeof BrandLink> = {
 export default meta;
 type Story = StoryObj<typeof BrandLink>;
 
-/** The press counter makes activation observable: clicking the
- * wordmark — or focusing it and pressing Enter — increments it,
- * which is what the manual check verifies. */
-function PressCounterDemo() {
-  const [count, setCount] = useState(0);
-  return (
-    <YStack gap="$2">
-      <BrandLink
-        label="Eciperay"
-        onPress={() => {
-          setCount((current) => current + 1);
-        }}
-      />
-      <Text>Pressed {count} times</Text>
-    </YStack>
-  );
-}
-
+/** The wordmark is a real link: it renders as an anchor carrying
+ * the home href — "/" here, the stand-in for the host's home
+ * route — which is what the manual check verifies in the DOM. */
 export const Default: Story = {
-  render: () => <PressCounterDemo />,
+  args: {
+    label: "Eciperay",
+    href: "/",
+  },
 };
