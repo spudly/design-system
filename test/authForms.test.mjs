@@ -22,6 +22,7 @@
  * - TextLink's muted tone is the theme's muted role on both
  *   link frames, and an explicit color still wins over it.
  */
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";

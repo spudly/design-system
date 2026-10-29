@@ -100,23 +100,25 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches })
   assert.ok(storyExportCount(story) >= 1, `${base}.stories.tsx exports no stories`);
 }
 
+// Internal helpers, not widgets: accessibility.ts / tagColors.ts
+// are prop/style translators, linkOverlay.tsx is the native-only
+// link layer other components compose, and PageFrame.tsx is
+// page-story scaffolding (the demo stories' phone-width frame,
+// relocated out of src/pages for #119) — none is a standalone
+// component with a story of its own, and none is exported from
+// the components barrel.
+const COMPONENT_STORY_EXCEPTIONS = new Set([
+  "accessibility.ts",
+  "index.ts",
+  "tagColors.ts",
+  "linkOverlay.tsx",
+  "PageFrame.tsx",
+]);
+
 test("every widget component has a story file titled Components/<Name>", () => {
   const dir = join(root, "src", "components");
   const index = read("src/components/index.ts");
-  // Internal helpers, not widgets: accessibility.ts / tagColors.ts
-  // are prop/style translators, linkOverlay.tsx is the
-  // native-only link layer other components compose, and
-  // PageFrame.tsx is page-story scaffolding (the demo stories'
-  // phone-width frame, relocated out of src/pages for #119) —
-  // none is a standalone component with a story of its own, and
-  // none is exported from the components barrel.
-  const exceptions = new Set([
-    "accessibility.ts",
-    "index.ts",
-    "tagColors.ts",
-    "linkOverlay.tsx",
-    "PageFrame.tsx",
-  ]);
+  const exceptions = COMPONENT_STORY_EXCEPTIONS;
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),
