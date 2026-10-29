@@ -22,12 +22,21 @@ import { isWeb } from "tamagui";
  * - A grouping container is `role="group"` on web; native has no group
  *   role, so the container's accessible name (accessibilityLabel /
  *   aria-labelledby) carries the grouping on its own there.
+ * - A prose bullet list is `role="list"` / `role="listitem"` on web;
+ *   `listitem` is not a member of RN's `accessibilityRole` set, so
+ *   both go through the web `role` prop like `group`. On native the
+ *   bullet glyph and the surrounding section heading carry the
+ *   list's structure.
  */
 export const politeLiveRegionProps = isWeb
   ? ({ role: "status" } as const)
   : ({ accessibilityLiveRegion: "polite" } as const);
 
 export const groupRoleProps = isWeb ? ({ role: "group" } as const) : ({} as const);
+
+export const listRoleProps = isWeb ? ({ role: "list" } as const) : ({} as const);
+
+export const listItemRoleProps = isWeb ? ({ role: "listitem" } as const) : ({} as const);
 
 /**
  * React Native accessibility props a DS component accepts, plus the

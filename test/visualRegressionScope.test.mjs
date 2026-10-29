@@ -7,15 +7,7 @@
 // away from what the pipeline actually captures.
 
 import assert from "node:assert/strict";
-import {
-  existsSync,
-  mkdirSync,
-  mkdtempSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import test from "node:test";
@@ -29,6 +21,13 @@ const { sanitizeStoryPart, storyId, storyNameFromExport, parseStoryFile } = awai
 const { computeScope, isFallbackPath } = await import(
   join(repoRoot, "tools/visualRegression/scope.mjs")
 );
+const {
+  buildCoverageRows,
+  generateCoverageDocs,
+  readBaselineFiles,
+  renderCoverageTable,
+  themeOfStory,
+} = await import(join(repoRoot, "tools/visualRegression/coverageListing.mjs"));
 
 test("story id derivation mirrors Storybook's sanitize + startCase", () => {
   assert.equal(sanitizeStoryPart("Pages/Eciperay/RecipesPage"), "pages-eciperay-recipespage");
@@ -170,6 +169,40 @@ test("fallback: deleted src files, unparseable stories, explicit override", () =
   assert.match(broken.reasons[0], /Broken\.stories\.tsx/);
 });
 
+test("coverage listing: rows derive from the scope and the files on disk (#284)", () => {
+  const scope = {
+    standard: [
+      "pages-eciperay-recipespage--default",
+      "pages-eciperay-recipespage--empty",
+      "pages-memorize-myversespage--default",
+    ],
+    narrow: ["pages-eciperay-recipespage--default"],
+  };
+  const baselineFiles = new Map([
+    [
+      "light_warmHarvest",
+      new Set([
+        "pages-eciperay-recipespage--default.png",
+        "pages-eciperay-recipespage--default-narrow.png",
+      ]),
+    ],
+    ["light_quietDawn", new Set(["pages-memorize-myversespage--default.png"])],
+  ]);
+  const rows = buildCoverageRows(scope, baselineFiles);
+  assert.deepEqual(rows, [
+    { group: "pages-eciperay-recipespage", theme: "light_warmHarvest", stories: 2, baselines: 1 },
+    {
+      group: "pages-eciperay-recipespage — narrow variant",
+      theme: "light_warmHarvest",
+      stories: 1,
+      baselines: 1,
+    },
+    { group: "pages-memorize-myversespage", theme: "light_quietDawn", stories: 1, baselines: 1 },
+  ]);
+  const table = renderCoverageTable(rows);
+  assert.match(table, /\| \*\*Total\*\*.*\| +\*\*4\*\* \| +\*\*3\*\* \|/);
+});
+
 test("isFallbackPath classifies the guardrail list", () => {
   assert.equal(isFallbackPath("tools/visualRegression/scope.mjs"), true);
   assert.equal(isFallbackPath("src/components/Button.tsx"), false);
@@ -178,54 +211,11 @@ test("isFallbackPath classifies the guardrail list", () => {
 });
 
 // Helpers for the real-repo completeness gate below (issue #128),
-// at module scope per the repo lint rules.
-const themeOfStory = (id) =>
-  id.startsWith("pages-memorize") ? "light_quietDawn" : "light_warmHarvest";
-const groupOfStory = (id) => id.split("--")[0];
-
-function readBaselineFiles(baselineRoot) {
-  const files = new Map();
-  for (const theme of readdirSync(baselineRoot)) {
-    const dir = join(baselineRoot, theme);
-    if (!statSync(dir).isDirectory()) continue;
-    files.set(theme, new Set(readdirSync(dir).filter((f) => f.endsWith(".png"))));
-  }
-  return files;
-}
-
-function parseCoverageListing(docs) {
-  const begin = docs.indexOf("<!-- VR-COVERAGE-BEGIN -->");
-  const end = docs.indexOf("<!-- VR-COVERAGE-END -->");
-  assert.ok(begin !== -1 && end > begin, "docs coverage listing markers present");
-  const rows = new Map();
-  let totalStories = 0;
-  let totalBaselines = 0;
-  for (const line of docs.slice(begin, end).split("\n")) {
-    const raw = line.split("|").map((c) => c.replaceAll("**", "").trim());
-    const cells = raw.slice(1, raw.at(-1) === "" ? -1 : undefined);
-    if (cells.length !== 4) continue;
-    const [group, theme, stories, baselines] = cells;
-    if (group === "Total") {
-      totalStories = Number(stories);
-      totalBaselines = Number(baselines);
-      continue;
-    }
-    if (!group.startsWith("pages-")) continue;
-    rows.set(group, { theme, stories: Number(stories), baselines: Number(baselines) });
-  }
-  return { rows, totalStories, totalBaselines };
-}
-
-function derivedGroupsOf(scope) {
-  const groups = new Map();
-  for (const id of scope.standard) {
-    const key = groupOfStory(id);
-    if (!groups.has(key)) groups.set(key, { theme: themeOfStory(id), standard: [], narrow: [] });
-    groups.get(key).standard.push(id);
-  }
-  for (const id of scope.narrow) groups.get(groupOfStory(id)).narrow.push(id);
-  return groups;
-}
+// at module scope per the repo lint rules. The coverage-listing
+// derivation itself lives in tools/visualRegression/coverageListing.mjs
+// (issue #284) — the listing assertion below is a pure verification
+// that the committed table matches what the generator derives from
+// the capture set and the baseline files on disk.
 
 // Both directions of the completeness gate: every committed
 // baseline must be derivable, and every derivable in-scope story
@@ -256,66 +246,19 @@ function assertBaselinesMatchScope(scope, baselineFiles) {
   }
 }
 
-// One standard row (+ its narrow-variant row when the group has
-// narrow stories) against the derived group and the files on
-// disk. Returns [stories, baselines] counted for the row.
-function assertListingRow(key, group, rows, baselineFiles) {
-  const row = rows.get(key);
-  assert.ok(row, `docs coverage listing has a row for ${key}`);
-  assert.equal(row.theme, group.theme, `docs theme for ${key}`);
-  assert.equal(row.stories, group.standard.length, `docs story count for ${key}`);
-  assert.equal(
-    row.baselines,
-    group.standard.filter((id) => baselineFiles.get(group.theme).has(`${id}.png`)).length,
-    `docs baseline count for ${key}`,
-  );
-  let stories = row.stories;
-  let baselines = row.baselines;
-  if (group.narrow.length > 0) {
-    const narrowRow = rows.get(`${key} — narrow variant`);
-    assert.ok(narrowRow, `docs coverage listing has the narrow-variant row for ${key}`);
-    assert.equal(narrowRow.stories, group.narrow.length, `docs narrow story count for ${key}`);
-    assert.equal(
-      narrowRow.baselines,
-      group.narrow.filter((id) => baselineFiles.get("light_warmHarvest").has(`${id}-narrow.png`))
-        .length,
-      `docs narrow baseline count for ${key}`,
-    );
-    stories += narrowRow.stories;
-    baselines += narrowRow.baselines;
-  }
-  return [stories, baselines];
-}
-
-// The docs coverage listing must match the derived set and the
-// files on disk, group by group, totals included.
-function assertCoverageListing(scope, baselineFiles) {
-  const docs = readFileSync(join(repoRoot, "docs/android-visual-regression.md"), "utf8");
-  const { rows, totalStories, totalBaselines } = parseCoverageListing(docs);
-  const derivedGroups = derivedGroupsOf(scope);
-  let countedStories = 0;
-  let countedBaselines = 0;
-  for (const [key, group] of derivedGroups) {
-    const [stories, baselines] = assertListingRow(key, group, rows, baselineFiles);
-    countedStories += stories;
-    countedBaselines += baselines;
-  }
-  assert.equal(
-    rows.size,
-    derivedGroups.size + 1,
-    "docs listing has no rows beyond the derived groups (+ narrow)",
-  );
-  assert.equal(totalStories, countedStories, "docs listing total stories");
-  assert.equal(totalBaselines, countedBaselines, "docs listing total baselines");
-}
-
 test("real repo: derived capture set matches the committed baselines", () => {
   // Completeness gate (issue #128): the mapper's story inventory
   // and the committed baselines must agree in BOTH directions —
   // every baseline derivable, and every derivable in-scope story
   // HAS a committed baseline — and the coverage listing in
   // docs/android-visual-regression.md must match both. The
-  // standard/narrow sets are at their known sizes (125 + 11 = 136;
+  // Current light set: 127 standard-width stories (107 light_warmHarvest + 22
+  // light_quietDawn on disk minus the 3 Reading-screen stories the capture app
+  // excludes, ReadingView replicating Memorize's reading screen and landing in
+  // B4; the #168 DiscoverPage/DiscoveryCard baselines joined through merges
+  // after the #169 +11 / #170 +2 page growth, and #171 added the
+  // LandingPage story (+1 standard)).
+  const EXPECTED_LIGHT_STORY_COUNT = 127;
   // the standard set grew by the eight B3a recipe-form stories,
   // #124, the sixteen B3b meals/shopping stories, #125, the
   // twenty-three B3c account/auth stories, #126, the three
@@ -330,16 +273,21 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // (+4 standard) and #254 added the ImportUrlPage
   // Interactive story (+1 standard), #169 added the eight
   // PublicRecipePage stories and three PublicPageFrame stories
-  // (+11 standard), #168 added the eight DiscoverPage
-  // stories (+8 standard), and #171 added the LandingPage story
-  // (+1 standard) — their baselines are
+  // (+11 standard), #170 added the two LegalDocumentPage
+  // stories (+2 standard), and #168 added the eight
+  // DiscoverPage stories (+8 standard) — their baselines are
   // generated by the pipeline's auto-commit flow).
   const scope = computeScope({ repoRoot, changedFiles: [], forceFull: true });
-  assert.equal(scope.standard.length, 125);
+  assert.equal(scope.standard.length, EXPECTED_LIGHT_STORY_COUNT);
   assert.equal(scope.narrow.length, 11);
   const baselineRoot = join(repoRoot, "tools/visualRegression/baselines");
   const baselineFiles = readBaselineFiles(baselineRoot);
   assertBaselinesMatchScope(scope, baselineFiles);
   assert.ok(existsSync(baselineRoot));
-  assertCoverageListing(scope, baselineFiles);
+  const docs = readFileSync(join(repoRoot, "docs/android-visual-regression.md"), "utf8");
+  assert.equal(
+    docs,
+    generateCoverageDocs(repoRoot, docs),
+    "docs coverage listing matches the generated table (run tools/visualRegression/coverageListing.mjs)",
+  );
 });
