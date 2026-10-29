@@ -473,6 +473,79 @@ MealPlansPage's list, or a changeset naming CardRow.
 
 ---
 
+## ActionChip
+
+Open in `Components/ActionChip`: Tones, WithIcon, IconOnly,
+Sizes, Disabled.
+
+1. Tones: five small labeled chips — Edit on a gray fill,
+   Delete on a soft red fill, Mark perfected on a soft green
+   fill, Tweak with AI with a primary-tinted fill and primary
+   outline, Add to plan transparent with a hairline border; each
+   label in its tone's darker ink, semibold.
+2. WithIcon: the Print and Share chips show their glyph left of
+   the label in the same gray ink as the label.
+3. IconOnly: two square 48px gray targets with the printer /
+   share glyph centered; their accessible names are "Print
+   recipe" and "Share recipe".
+4. Sizes: the sm row's chips are compact; the md row matches
+   the standard button's height and label size.
+5. Disabled: both chips are dimmed and do not press.
+
+**Run when:** `src/components/ActionChip.tsx`, its stories,
+the recipe pages' action rows, or a changeset naming ActionChip.
+
+---
+
+## Thumbnail
+
+Open in `Components/Thumbnail`: Hero, Banner, Row.
+
+1. Hero: the image sits contained (whole image visible) inside
+   a recessed light-gray frame 256px tall with large rounded
+   corners, at full story width.
+2. Banner: the image fills the full width at 192px tall,
+   cover-cropped, with large rounded corners and no frame.
+3. Row: a 64px square image, cover-cropped, medium rounded
+   corners, over the hint line.
+
+**Run when:** `src/components/Thumbnail.tsx`, its stories, the
+recipe pages' imagery or the import review's preview, or a
+changeset naming Thumbnail.
+
+---
+
+## ScrollRegion
+
+Open in `Components/ScrollRegion`: Default.
+
+1. The "Pinned header" block stays at the top and the "Pinned
+   footer" block at the bottom of the 480px frame while the
+   twelve section paragraphs between them scroll.
+2. The scrolling region fills exactly the space between the
+   header and footer — no gap, no overlap.
+
+**Run when:** `src/components/ScrollRegion.tsx`, its stories,
+a fixed-shell page's scroll region, or a changeset naming
+ScrollRegion.
+
+---
+
+## StatBand
+
+Open in `Components/StatBand`: Default, TwoStats.
+
+1. Default: Servings, Prep, and Cook stat cards spread evenly
+   across a recessed light-gray band with large rounded corners
+   and vertical padding; the band itself has no margin.
+2. TwoStats: the two cards spread to the band's ends with the
+   same fill and padding.
+
+**Run when:** `src/components/StatBand.tsx`, its stories, the
+recipe detail pages' stat band, or a changeset naming StatBand.
+
+---
+
 ## MealPlansPage & MealPlanDetailPage
 
 Open in `Pages/Eciperay/MealPlansPage`: Default, Empty, Loading,
@@ -826,7 +899,14 @@ Open in `Components/Text`: AllVariants (or any page story, e.g.
    `aria-level="2"`.
 4. The `body`, `hint`, `error`, and `verse` variants carry no
    heading role and no `aria-level`.
-5. Visually nothing changes: heading/subheading keep their sizes
+5. The `formTitle` variant ("FormTitle" in the Text stories)
+   is the form-flow page title — 2xl bold — and is exposed as a
+   heading at level 1 (the Import pages' titles render through
+   it once their tranches land).
+6. The `label` variant ("Label" in the Text stories) is the
+   section eyebrow — xs semibold, uppercase, letter-spaced,
+   muted gray — and carries no heading role and no `aria-level`.
+7. Visually nothing changes: heading/subheading keep their sizes
    and weights, and all variants keep their theme fonts.
 
 **Run when:** `src/components/Text.tsx`, its stories, the

@@ -130,6 +130,29 @@ test("SSR: heading and subheading Text render heading semantics (#256)", async (
   assert.ok(title.includes('role="heading"'), `expected role=heading in: ${title.slice(0, 400)}`);
   assert.ok(title.includes('aria-level="1"'), `expected aria-level=1 in: ${title.slice(0, 400)}`);
   assertNoLeak(title);
+  // The formTitle variant (#119 foundation) is the form-flow pages'
+  // title — also a level-1 heading.
+  const formTitle = await renderToHtml(
+    React.createElement(Text, { variant: "formTitle" }, "Import from text"),
+  );
+  assert.ok(
+    formTitle.includes('role="heading"'),
+    `expected role=heading in: ${formTitle.slice(0, 400)}`,
+  );
+  assert.ok(
+    formTitle.includes('aria-level="1"'),
+    `expected aria-level=1 in: ${formTitle.slice(0, 400)}`,
+  );
+  assertNoLeak(formTitle);
+  // The label variant (#119 foundation) is a section eyebrow, not a
+  // heading: no role, no level.
+  const label = await renderToHtml(React.createElement(Text, { variant: "label" }, "Per serving"));
+  assert.ok(
+    !label.includes('role="heading"'),
+    `label must not be a heading: ${label.slice(0, 400)}`,
+  );
+  assert.ok(!label.includes("aria-level"), "label must not carry aria-level");
+  assertNoLeak(label);
 });
 
 test("SSR: both role props — a rendered button keeps no aria-level (#256)", async () => {
