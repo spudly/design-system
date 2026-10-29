@@ -102,6 +102,11 @@ test("RatingStars' button is keyboard-operable on web (the CardRow pattern)", ()
   assert.match(ratingStars, /tabIndex=\{0\}/);
   assert.match(ratingStars, /onKeyDown=\{handleKeyDown\}/);
   assert.match(ratingStars, /event\.key === "Enter" \|\| event\.key === " "/);
+  assert.match(
+    ratingStars,
+    /if \(!event\.repeat\) onPress\(\);/,
+    "a held key must not re-fire the press on keydown repeats",
+  );
 });
 
 test("RemovableField pairs the field with its end-aligned ghost Remove button at a 4px gap", () => {

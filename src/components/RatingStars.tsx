@@ -63,10 +63,11 @@ export function RatingStars(props: RatingStarsProps) {
     event.preventDefault();
     onPress();
   };
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+  const handleKeyDown = (event: { key: string; preventDefault: () => void; repeat?: boolean }) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      onPress();
+      // A held key repeats keydown — activate once, not per repeat.
+      if (!event.repeat) onPress();
     }
   };
   return (
