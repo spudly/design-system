@@ -124,7 +124,7 @@ export function renderCoverageTable(rows) {
   const row = (r) =>
     `| ${r.group.padEnd(widths.group)} | ${r.theme.padEnd(widths.theme)} | ${r.stories.padStart(widths.stories)} | ${r.baselines.padStart(widths.baselines)} |`;
   const separator = `| ${"-".repeat(widths.group)} | ${"-".repeat(widths.theme)} | ${"-".repeat(widths.stories - 1)}: | ${"-".repeat(widths.baselines - 1)}: |`;
-  return [row(all[0]), separator, ...body.map(row), row(total)].join("\n") + "\n";
+  return `${[row(all[0]), separator, ...body.map(row), row(total)].join("\n")}\n`;
 }
 
 export function coverageTableForRepo(repoRoot) {
