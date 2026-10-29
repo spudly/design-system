@@ -116,13 +116,10 @@ test("the search row wires the field and the button to the one search callback",
     /placeholder=\{\s*usingDemo \?/,
     "the placeholder's keyword example must be selected by usingDemo (#276)",
   );
-  assert.ok(
-    code.includes('"e.g. Ether 12:27 or “weakness”"'),
-    'in demo mode the placeholder must suggest "weakness" — the demo set answers it with Ether 12:27, while it contains no "charity" verse (#276)',
-  );
-  assert.ok(
-    code.includes('"e.g. Ether 12:27 or “charity”"'),
-    'in full-library mode the placeholder must keep the app\'s "charity" example, verbatim',
+  assert.match(
+    code,
+    /usingDemo \? "e\.g\. Ether 12:27 or “weakness”" : "e\.g\. Ether 12:27 or “charity”"/,
+    'the ternary must map demo mode to the "weakness" placeholder (the demo set answers it with Ether 12:27 and contains no "charity" verse) and full-library mode to the "charity" placeholder, verbatim (#276)',
   );
   assert.match(
     code,
