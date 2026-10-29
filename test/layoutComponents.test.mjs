@@ -90,7 +90,7 @@ test("ButtonRow owns the action bar's gap and wrap; separation from preceding co
   );
   assert.match(
     buttonRowCode,
-    /Omit<\s+StyledButtonRowProps,\s+"gap" \| "alignItems" \| "flexWrap"\s+>/,
+    /Omit<\s*StyledButtonRowProps,\s*"gap" \| "alignItems" \| "flexWrap"\s*>/,
   );
 });
 
