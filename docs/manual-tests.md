@@ -386,6 +386,39 @@ changeset naming RecipeDetailPage.
 
 ---
 
+## PublicRecipePage
+
+Open in `Pages/Eciperay/PublicRecipePage`: Default, SignedIn,
+ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
+
+1. One scroll, no tab bar: overview, Ingredients, Instructions,
+   and the engagement block (ratings card above the comments
+   stand-in) are all reachable by scrolling the Default story —
+   nothing is hidden behind a tab.
+2. Default (signed out): the CTA bar shows "Sign up free",
+   "Clone this recipe", and "Get the mobile app"; the ratings
+   card shows the community rating only — no "Your rating" star
+   input. SignedIn shows the star input; ClonePending's primary
+   button reads "Saving…" and is disabled.
+3. NotFound shows the card "Recipe not found" / "This recipe may
+   be private or no longer available."; Unavailable shows "Recipe
+   unavailable" / "This recipe link is invalid or has expired."
+4. Ingredients: tapping the "Heavy cream" row in the Ingredients
+   story dims it and shows the substitutions panel below the
+   list; the servings stepper and scale chips fit the story
+   width without wrapping the Scale row.
+5. Open in `Pages/Eciperay/PublicPageFrame`: Default, Content,
+   Narrow. The header (Eciperay brand, Sign in) and footer (the
+   without-an-account note, Privacy Policy, Terms of Service)
+   frame the centered wide column; in Narrow the column fills the
+   phone width and the footer wraps without overlap.
+
+**Run when:** `src/pages/PublicRecipePage.tsx`,
+`src/pages/PublicPageFrame.tsx`, their stories, or a changeset
+naming PublicRecipePage or PublicPageFrame.
+
+---
+
 ## TagsPage
 
 Open in `Pages/Eciperay/TagsPage`: WithTags, Loading.
