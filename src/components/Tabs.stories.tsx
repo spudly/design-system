@@ -44,3 +44,21 @@ export const RecipeDetail: Story = {
 export const AppNavigation: Story = {
   render: () => <TabsDemo tabs={studyTabs} />,
 };
+
+const studyLinkTabs = [
+  { value: "verses", label: "My verses", href: "/verses" },
+  { value: "search", label: "Search", href: "/search" },
+  { value: "review", label: "Review", href: "/review" },
+  { value: "settings", label: "Settings", href: "/settings" },
+];
+
+export const LinkNavigation: Story = {
+  render: () => (
+    <YStack>
+      <Tabs variant="link" tabs={studyLinkTabs} value="search" />
+      <YStack paddingTop={16}>
+        <Text variant="hint">Current page: Search</Text>
+      </YStack>
+    </YStack>
+  ),
+};

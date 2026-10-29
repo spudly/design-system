@@ -1,4 +1,4 @@
-import { View, XStack } from "tamagui";
+import { Anchor, View, XStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
@@ -55,12 +55,46 @@ function BackArrow() {
   );
 }
 
-export type BackLinkProps = {
-  /** Navigate back — a link always navigates. */
-  onPress: () => void;
-  /** Link label. Defaults to "Back", the apps' back-link copy. */
-  label?: string;
-};
+/**
+ * The href form's frame (#248): the same row geometry as the
+ * callback form's XStack (centered row, 44px minimum height, same
+ * padding and gap), carried by a Tamagui Anchor — a real `<a href>`
+ * on web; on native a press opens the href through the platform
+ * link path (Tamagui's Anchor calls Linking.openURL internally, so
+ * no DS component imports react-native). The drawn arrow and the
+ * label render inside it unchanged, so both forms are one control
+ * with one layout.
+ */
+const StyledBackAnchor = styled(Anchor, {
+  name: "BackLinkAnchor",
+
+  alignItems: "center",
+  alignSelf: "flex-start",
+  flexDirection: "row",
+  gap: tokens.spacing[2],
+  minHeight: 44,
+  paddingHorizontal: tokens.spacing[2],
+});
+
+export type BackLinkProps =
+  | {
+      /** Navigate back — the callback form, for hosts whose back navigation is callback-driven (e.g. "wherever the user came from"). */
+      onPress: () => void;
+      href?: never;
+      /** Link label. Defaults to "Back", the apps' back-link copy. */
+      label?: string;
+    }
+  | {
+      /**
+       * The back destination as an href — the link form, for hosts
+       * with a canonical back destination (sign-in, the recipe
+       * page): renders a real anchor carrying the href on web.
+       */
+      href: string;
+      onPress?: never;
+      /** Link label. Defaults to "Back", the apps' back-link copy. */
+      label?: string;
+    };
 
 /**
  * The shared back link for page tops: a drawn left arrow plus a label,
@@ -71,13 +105,32 @@ export type BackLinkProps = {
  * bottom of the line on Android. Pages use this component so every
  * back link inherits the correction.
  *
+ * Two forms (#248's navigation rule): pass `href` when the back
+ * destination is a canonical page (the link form — a real anchor on
+ * web), or `onPress` when the host's back navigation is
+ * callback-driven.
+ *
  * Accessibility: exposes `accessibilityRole="link"` (a member of
  * React Native's supported role set — see
  * test/accessibilityRoles.test.mjs) and a 44px minimum touch height.
- * On web it is focusable and Enter activates it, like TextLink (with
- * no href, link semantics alone are not keyboard-operable).
+ * The href form's anchor is keyboard-operable by default on web;
+ * the callback form is focusable and Enter activates it, like
+ * TextLink (with no href, link semantics alone are not
+ * keyboard-operable).
  */
-export function BackLink({ onPress, label = "Back" }: BackLinkProps) {
+export function BackLink(props: BackLinkProps) {
+  const { label = "Back" } = props;
+  if (props.href !== undefined) {
+    return (
+      <StyledBackAnchor href={props.href} cursor="web:pointer">
+        <BackArrow />
+        <Text color="$link" fontWeight={tokens.typography.fontWeight.semibold}>
+          {label}
+        </Text>
+      </StyledBackAnchor>
+    );
+  }
+  const { onPress } = props;
   const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
     if (event.key === "Enter") {
       event.preventDefault();

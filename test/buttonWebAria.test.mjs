@@ -31,7 +31,8 @@
  *    RN accessibility props OUT of their rest props and route them
  *    through the translator, so the RN forms can never reach a
  *    Tamagui element through them. Button keeps its defaults through
- *    the same path (role "button", disabled mirrored into state).
+ *    the same path (role "button" — "link" in the #248 href form —
+ *    disabled mirrored into state).
  * 3. The component-internal pressables/containers that set the RN
  *    props on raw Tamagui stacks — ToggleChipGroup chips,
  *    RatingForm's two actions, ColorPickerField swatches,
@@ -110,8 +111,8 @@ test("Button destructures the RN accessibility props out of rest and routes them
   }
   assert.match(
     button,
-    /accessibilityRole: accessibilityRole \?\? "button"/,
-    "the default button role must survive the translation",
+    /accessibilityRole: accessibilityRole \?\? \(isLink \? "link" : "button"\)/,
+    "the default role (button, or link in the #248 href form) must survive the translation",
   );
   assert.match(
     button,

@@ -46,3 +46,22 @@ export const InHintText: Story = {
     </YStack>
   ),
 };
+
+export const Href: Story = {
+  args: {
+    children: "Forgot your password?",
+    href: "/forgot-password",
+  },
+};
+
+export const HrefInProse: Story = {
+  render: () => (
+    <YStack maxWidth={420}>
+      <Text variant="body">
+        By continuing you agree to the <TextLink href="/terms">Terms of Service</TextLink> and{" "}
+        <TextLink href="/privacy">Privacy Policy</TextLink>. Questions?{" "}
+        <TextLink href="/support">Contact support</TextLink>.
+      </Text>
+    </YStack>
+  ),
+};
