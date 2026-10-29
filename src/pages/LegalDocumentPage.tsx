@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Anchor, XStack, YStack } from "tamagui";
+import { listItemRoleProps, listRoleProps } from "../components/accessibility.js";
 import { Divider } from "../components/Divider.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
@@ -122,9 +123,9 @@ function LegalDocumentBlockView({ block }: { block: LegalDocumentBlock }) {
     return <Text>{renderSpans(block.spans)}</Text>;
   }
   return (
-    <YStack gap="$2">
+    <YStack gap="$2" {...listRoleProps}>
       {block.items.map((item, index) => (
-        <XStack key={index} gap="$2">
+        <XStack key={index} gap="$2" {...listItemRoleProps}>
           <Text>{"•"}</Text>
           <Text flex={1}>{renderSpans(item)}</Text>
         </XStack>
@@ -132,6 +133,16 @@ function LegalDocumentBlockView({ block }: { block: LegalDocumentBlock }) {
     </YStack>
   );
 }
+
+/**
+ * The document's prose column width: the same 768px (the web
+ * layout's max-w-3xl) centered column the other public surfaces
+ * render into (PublicPageFrame's column), so the legal text stays
+ * readable on wide viewports. The frame header and footer stay
+ * outside the column, spanning the container as before; on
+ * phone-width viewports the cap does not bind.
+ */
+const PROSE_MAX_WIDTH = 768;
 
 export function LegalDocumentPage({
   title,
@@ -157,18 +168,20 @@ export function LegalDocumentPage({
           {signInLabel}
         </Anchor>
       </XStack>
-      <YStack gap="$3">
-        <Text variant="heading">{title}</Text>
-        <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>
-      </YStack>
-      {sections.map((section) => (
-        <YStack key={section.title} gap="$3">
-          <Text variant="subheading">{section.title}</Text>
-          {section.blocks.map((block, index) => (
-            <LegalDocumentBlockView key={index} block={block} />
-          ))}
+      <YStack width="100%" maxWidth={PROSE_MAX_WIDTH} alignSelf="center" gap="$4">
+        <YStack gap="$3">
+          <Text variant="heading">{title}</Text>
+          <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>
         </YStack>
-      ))}
+        {sections.map((section) => (
+          <YStack key={section.title} gap="$3">
+            <Text variant="subheading">{section.title}</Text>
+            {section.blocks.map((block, index) => (
+              <LegalDocumentBlockView key={index} block={block} />
+            ))}
+          </YStack>
+        ))}
+      </YStack>
       <YStack gap="$4">
         <Divider />
         <XStack gap="$4" flexWrap="wrap">

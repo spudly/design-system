@@ -79,6 +79,31 @@ test("the full public frame renders: brand, sign-in, and footer links as hrefs (
   assert.match(code, /<Divider \/>/, "the footer is set off by the frame divider");
 });
 
+test("the document renders in a prose column; list blocks carry list semantics (#170)", () => {
+  // Prose column: title + sections sit in the centered 768px
+  // column (the public surfaces' max-w-3xl), not stretched across
+  // a wide viewport; ScreenContainer itself has no cap.
+  assert.match(code, /const PROSE_MAX_WIDTH = 768;/, "prose column width is the public 768px");
+  assert.match(
+    code,
+    /<YStack width="100%" maxWidth=\{PROSE_MAX_WIDTH\} alignSelf="center" gap="\$4">/,
+    "title and sections render inside the centered prose column",
+  );
+  // List semantics: the block's stack carries the web list role and
+  // each item row the listitem role (platform-split props from
+  // components/accessibility — native has no listitem role).
+  assert.match(
+    code,
+    /<YStack gap="\$2" \{\.\.\.listRoleProps\}>/,
+    "list block carries the list role",
+  );
+  assert.match(
+    code,
+    /<XStack key=\{index\} gap="\$2" \{\.\.\.listItemRoleProps\}>/,
+    "list items carry the listitem role",
+  );
+});
+
 test("LegalDocumentPage is exported from the pages subpath with its view-model types (#170)", () => {
   const index = readCode("src/pages/index.ts");
   assert.match(index, /LegalDocumentPage,/, "page exported");
@@ -233,6 +258,13 @@ test("SSR: the document renders every block type under a single level-1 title (#
   assert.ok(html.includes("Account details."), "list item strong lead-in renders");
   assert.ok(html.includes("Recipes, meal plans, and notes you save."), "list item text renders");
   assert.ok((html.match(/•/g) ?? []).length >= 2, "list items render with bullet markers");
+  // List semantics reach the rendered web tree: the block is a
+  // list and each bulleted row a list item.
+  assert.ok(html.includes('role="list"'), "list block renders with the list role");
+  assert.ok(
+    (html.match(/role="listitem"/g) ?? []).length >= 2,
+    "list items render with the listitem role",
+  );
 });
 
 test("SSR: content and frame links render as anchors with their hrefs (#170)", async () => {
