@@ -557,7 +557,9 @@ Open in `Components/BrandLink`: Default.
 1. The wordmark "Eciperay" renders in the primary ink, semibold,
    at the large size, with no underline.
 2. Keyboard only: Tab reaches the wordmark and Enter activates
-   it (its accessible name is "Eciperay", role link).
+   it — the "Pressed N times" counter under it increments (its
+   accessible name is "Eciperay", role link). Clicking it
+   increments the counter too.
 
 **Run when:** `src/components/BrandLink.tsx`, its stories, the
 public frame's header, or a changeset naming BrandLink.
