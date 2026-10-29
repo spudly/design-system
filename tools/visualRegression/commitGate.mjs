@@ -180,6 +180,13 @@ export function stageGatedBaselines(opts) {
 // make the gate skip every change, and a ratio over 1 is
 // meaningless for a differing-pixel fraction.
 export function parseCommitGateRatio(raw, source) {
+  // Number(" ") is 0, so a whitespace-only value would silently
+  // zero the gate; reject empty-after-trim strings up front.
+  if (typeof raw === "string" && raw.trim() === "") {
+    throw new Error(
+      `invalid commit-gate ratio from ${source}: ${JSON.stringify(raw)} (expected a finite number in [0, 1])`,
+    );
+  }
   const n = Number(raw);
   if (!Number.isFinite(n) || n < 0 || n > 1) {
     throw new Error(

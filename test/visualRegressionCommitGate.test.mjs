@@ -123,6 +123,7 @@ test("over-gate change is staged (20% of pixels)", () => {
 
 test("ratio overrides are validated: non-finite or out-of-range values throw", () => {
   assert.throws(() => parseCommitGateRatio("banana", "test"), /invalid commit-gate ratio/);
+  assert.throws(() => parseCommitGateRatio("   ", "test"), /invalid commit-gate ratio/);
   assert.throws(() => parseCommitGateRatio("1.5", "test"), /invalid commit-gate ratio/);
   assert.throws(() => parseCommitGateRatio("-0.1", "test"), /invalid commit-gate ratio/);
   assert.equal(parseCommitGateRatio("0.02", "test"), 0.02);
