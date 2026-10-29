@@ -11,6 +11,7 @@ import { SelectField, type SelectOption } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
+import { useCatalogPagination } from "./useCatalogPagination.js";
 
 /**
  * RecipesPage (#49, pilot): Eciperay's Browse/Recipes screen as a
@@ -211,7 +212,17 @@ export type RecipesPageProps = {
   /** First-load in flight: the list renders empty with a spinner as
    * its empty state, and the filter bar stays mounted. */
   isLoading: boolean;
-  /** Next page in flight: a spinner renders as the list footer. */
+  /** Next page in flight: a spinner renders as the list footer,
+   * and it is the shared pagination pattern's only fetch signal
+   * (see useCatalogPagination, #285): while it is set the
+   * end-reached handler swallows duplicate requests, and when a
+   * fetch completes having added no new visible rows the
+   * pattern re-fires `onLoadMore` so consecutive no-new-rows
+   * pages cannot stall pagination. A host whose pages can
+   * return no new visible rows (e.g. after client-side
+   * filtering) should pass it — without it the list keeps plain
+   * fire-once-per-content-length end-reached semantics and an
+   * empty page cannot re-arm the signal on its own. */
   isFetchingNextPage?: boolean;
   onRecipePress: (recipeId: string) => void;
   /** Optional row action, mirroring the app card's log-cook
@@ -231,7 +242,10 @@ export type RecipesPageProps = {
    * which reproduces the app card's control-hides-while-open
    * behavior. */
   renderRecipeAccessory?: (recipeId: string) => ReactNode;
-  /** Pagination hook, wired to the list's end-reached signal. */
+  /** Pagination hook, wired to the list's end-reached signal
+   * through the shared catalog pagination pattern
+   * (useCatalogPagination, #285 — the same pattern DiscoverPage
+   * uses, so the two catalogs share one pagination contract). */
   onLoadMore?: () => void;
   /** Empty-state copy, per screen (#185): the title shown when
    * the list is empty and not loading. Defaults to the Recipes
@@ -724,6 +738,20 @@ export function RecipesPage(props: RecipesPageProps) {
     emptyBody,
   } = props;
 
+  // Pagination: the shared catalog pattern (#285) — the same
+  // hook DiscoverPage uses. It gates the end-reached handler
+  // during the first load, swallows duplicate requests while a
+  // next-page fetch is in flight, and re-fires onLoadMore when
+  // a fetch completes having added no new visible rows, so
+  // consecutive no-new-rows pages paginate through without a
+  // scroll-away. See useCatalogPagination for the full pattern.
+  const { onEndReached, onScroll, onEndReachedThreshold } = useCatalogPagination({
+    onLoadMore,
+    isFetchingNextPage,
+    itemCount: recipes.length,
+    canPaginate: !isLoading,
+  });
+
   return (
     <ScreenContainer variant="list" scrollable={false}>
       <FlatList
@@ -770,8 +798,9 @@ export function RecipesPage(props: RecipesPageProps) {
             </>
           );
         }}
-        onEndReached={onLoadMore}
-        onEndReachedThreshold={0.4}
+        onEndReached={onEndReached}
+        onScroll={onScroll}
+        onEndReachedThreshold={onEndReachedThreshold}
         ListEmptyComponent={
           isLoading ? (
             <YStack paddingBlockStart="$8" alignItems="center">

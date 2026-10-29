@@ -12,6 +12,7 @@ import { SelectField, type SelectOption } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
+import { useCatalogPagination } from "./useCatalogPagination.js";
 
 /**
  * DiscoverPage (#168): Eciperay's public recipe catalog (the web
@@ -178,15 +179,21 @@ export type DiscoverPageProps = {
    * as its empty state, and the filter bar stays mounted. */
   isLoading: boolean;
   /** Next page in flight: a spinner renders as the list footer,
-   * and the end-reached handler swallows duplicate requests
-   * while it is set. It is the pagination guard's only fetch
-   * signal: a host whose pages can return no new visible rows
-   * (e.g. after client-side filtering) should pass it — without
-   * it the list keeps plain fire-once-per-content-length
-   * end-reached semantics and an empty page cannot re-arm the
-   * signal on its own. */
+   * and it is the shared pagination pattern's only fetch signal
+   * (see useCatalogPagination, #285): while it is set the
+   * end-reached handler swallows duplicate requests, and when a
+   * fetch completes having added no new visible rows the
+   * pattern re-fires `onLoadMore` so consecutive no-new-rows
+   * pages cannot stall pagination. A host whose pages can
+   * return no new visible rows (e.g. after client-side
+   * filtering) should pass it — without it the list keeps plain
+   * fire-once-per-content-length end-reached semantics and an
+   * empty page cannot re-arm the signal on its own. */
   isFetchingNextPage?: boolean;
-  /** Pagination hook, wired to the list's end-reached signal. */
+  /** Pagination hook, wired to the list's end-reached signal
+   * through the shared catalog pagination pattern
+   * (useCatalogPagination, #285 — the same pattern RecipesPage
+   * uses, so the two catalogs share one pagination contract). */
   onLoadMore?: () => void;
 
   search: string;
@@ -514,32 +521,20 @@ export function DiscoverPage(props: DiscoverPageProps) {
     onLoadMore,
   } = props;
 
-  // End-reached handling, in two halves. The mount gate: while
-  // the first load is in flight or the error state is showing,
-  // the list's data range is empty and no page request may
-  // start, so the callback is not mounted at all (a host that
-  // passes no onLoadMore never paginates either). The fetch
-  // guard: during a next-page fetch the callback STAYS mounted
-  // and the handler swallows the request instead of unmounting.
-  // Unmounting would break VirtualizedList's end-reached
-  // bookkeeping — it fires once per content length (its
-  // _sentEndForContentLength sentinel): the footer spinner's
-  // mount grows the content length, and a mounted callback gets
-  // that inflated length recorded even when the request is
-  // swallowed, so when the fetch completes and the footer
-  // unmounts, the restored length differs from the sentinel and
-  // the next page is requested. Unmounted during the fetch, the
-  // sentinel keeps the pre-footer length; an empty page (every
-  // item filtered out client-side) restores exactly that
-  // length, the fire is suppressed, and pagination stalls until
-  // the user scrolls away and back. Neither half tests
-  // recipes.length: an empty page with a live continuation
-  // still paginates.
-  const handleEndReached = () => {
-    if (!isFetchingNextPage) {
-      onLoadMore?.();
-    }
-  };
+  // Pagination: the shared catalog pattern (#285) — the same
+  // hook RecipesPage uses. It gates the end-reached handler
+  // during the first load and the error state, swallows
+  // duplicate requests while a next-page fetch is in flight,
+  // and re-fires onLoadMore when a fetch completes having
+  // added no new visible rows, so consecutive no-new-rows
+  // pages paginate through without a scroll-away. See
+  // useCatalogPagination for the full pattern.
+  const { onEndReached, onScroll, onEndReachedThreshold } = useCatalogPagination({
+    onLoadMore,
+    isFetchingNextPage,
+    itemCount: recipes.length,
+    canPaginate: !isLoading && !errorMessage,
+  });
 
   return (
     <ScreenContainer variant="list" scrollable={false}>
@@ -580,12 +575,14 @@ export function DiscoverPage(props: DiscoverPageProps) {
         // own (the direction of #209 — gap/separation over margins
         // for inter-item spacing).
         ItemSeparatorComponent={() => <View height={tokens.spacing[3]} />}
-        // Pagination: see handleEndReached above for why the
-        // callback stays mounted (but guarded) during a next-page
-        // fetch and is unmounted only for the first load, the
-        // error state, or a host with no continuation.
-        onEndReached={!isLoading && !errorMessage && onLoadMore ? handleEndReached : undefined}
-        onEndReachedThreshold={0.4}
+        // Pagination: the shared catalog pattern's handler —
+        // see useCatalogPagination above. It stays mounted (but
+        // guarded) during a next-page fetch and is unmounted
+        // only for the first load, the error state, or a host
+        // with no continuation.
+        onEndReached={onEndReached}
+        onScroll={onScroll}
+        onEndReachedThreshold={onEndReachedThreshold}
         ListEmptyComponent={
           isLoading ? (
             <YStack marginBlockStart="$8" alignItems="center">

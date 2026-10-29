@@ -142,25 +142,27 @@ test("removing a filter clears its values through the change callbacks", () => {
   assert.match(page, /accessibilityLabel=\{`Remove \$\{FILTER_LABELS\[id\]\} filter`\}/);
 });
 
-test("the title renders as the page heading and pagination rides a guarded end-reached handler", () => {
+test("the title renders as the page heading and pagination rides the shared catalog pattern", () => {
   assert.match(page, /<Text variant="heading">\{title\}<\/Text>/);
-  // The callback is unmounted only for the first load, the
-  // error state, or a host with no continuation. During a
-  // next-page fetch it stays MOUNTED and the handler swallows
-  // the request: unmounting it would leave VirtualizedList's
-  // per-content-length end-reached sentinel holding the
-  // pre-footer length, and an empty page completing would
-  // restore exactly that length and suppress the next fire —
-  // consecutive empty pages would stall pagination. The two
-  // exact-match pins below also exclude any recipes.length
-  // gate: an empty page with a live continuation paginates.
+  // Pagination is the shared catalog pattern (#285): the page
+  // wires useCatalogPagination — the same hook RecipesPage
+  // uses — with this page's mount gate (first load + error
+  // state) as canPaginate, and the list takes the hook's
+  // handler verbatim. The hook's contract suite
+  // (test/catalogPagination.test.mjs) pins the guard, the
+  // mount gate, and the fetch-completion re-arm itself. No
+  // recipes.length gate may appear in the wiring: an empty
+  // page with a live continuation still paginates.
   assert.match(
     page,
-    /onEndReached=\{!isLoading && !errorMessage && onLoadMore \? handleEndReached : undefined\}/,
+    /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{\s*onLoadMore,\s*isFetchingNextPage,\s*itemCount: recipes\.length,\s*canPaginate: !isLoading && !errorMessage,\s*\}\);/,
   );
-  assert.match(
-    page,
-    /const handleEndReached = \(\) => \{\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
+  assert.match(page, /onEndReached=\{onEndReached\}/);
+  assert.match(page, /onScroll=\{onScroll\}/);
+  assert.match(page, /onEndReachedThreshold=\{onEndReachedThreshold\}/);
+  assert.ok(
+    !page.includes("handleEndReached"),
+    "the page must not keep a local end-reached handler — the pattern is shared (#285)",
   );
   assert.match(
     page,

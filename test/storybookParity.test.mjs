@@ -129,8 +129,16 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
   const index = read("src/pages/index.ts");
   // Internal files with no story of their own (see header): PageFrame
   // and BoundedList are scaffolding exercised through the page stories;
-  // fixtures.ts is data. None is exported from src/pages/index.ts.
-  const exceptions = new Set(["PageFrame.tsx", "BoundedList.tsx", "fixtures.ts", "index.ts"]);
+  // fixtures.ts is data; useCatalogPagination.ts is the shared hook
+  // (#285) exercised through the RecipesPage/DiscoverPage stories.
+  // None is exported from src/pages/index.ts.
+  const exceptions = new Set([
+    "PageFrame.tsx",
+    "BoundedList.tsx",
+    "fixtures.ts",
+    "useCatalogPagination.ts",
+    "index.ts",
+  ]);
   assert.ok(
     !index.includes('from "./PageFrame.js"'),
     "PageFrame is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
