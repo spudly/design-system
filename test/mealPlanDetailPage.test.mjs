@@ -264,7 +264,7 @@ test("stories exercise the default, empty, loading, and no-goals states", () => 
 });
 
 test("the page carries no styling of its own (#119)", () => {
-  for (const banned of [
+  const banned = [
     "XStack",
     "YStack",
     "style={",
@@ -283,10 +283,11 @@ test("the page carries no styling of its own (#119)", () => {
     "cursor=",
     "function GoalRow",
     "<GoalRow",
-  ]) {
+  ];
+  for (const item of banned) {
     assert.ok(
-      !code.includes(banned),
-      `MealPlanDetailPage must not contain "${banned}" — layout and row treatments live in Column / Row / LoadingGate / MealPlanEntryRow / DetailRow since the #119 tranche-2 fix`,
+      !code.includes(item),
+      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in Column / Row / LoadingGate / MealPlanEntryRow / DetailRow since the #119 tranche-2 fix`,
     );
   }
   assert.match(

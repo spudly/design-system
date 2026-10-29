@@ -41,7 +41,7 @@ test("MealPlanEntryRow is exported from the built package root", async () => {
   );
 });
 
-test("MealPlanEntryRowProps is a type-only export from the built components barrel", async () => {
+test("MealPlanEntryRowProps is a type-only export from the built components barrel", () => {
   const types = readFileSync(join(here, "..", "dist", "components", "index.d.ts"), "utf8");
   assert.match(types, /MealPlanEntryRowProps/);
 });

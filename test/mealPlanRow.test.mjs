@@ -39,7 +39,7 @@ test("MealPlanRow is exported from the built package root", async () => {
   assert.equal(typeof dist.MealPlanRow, "function", "MealPlanRow must be exported from @spudly/ui");
 });
 
-test("MealPlanRowProps is a type-only export from the built components barrel", async () => {
+test("MealPlanRowProps is a type-only export from the built components barrel", () => {
   const types = readFileSync(join(here, "..", "dist", "components", "index.d.ts"), "utf8");
   assert.match(types, /MealPlanRowProps/);
 });
