@@ -691,9 +691,9 @@ Default, NoSelection, SaveError. Open in
    columns, image, Ingredients and Instructions slots, Tags
    chips, Source URL, and the full-width Save Changes button,
    evenly spaced in one scrolling form.
-2. ContentLocked: the lock notice (with its link) renders in
-   place of the Ingredients and Instructions slots — the slots
-   disappear — while the scalar fields and tags remain editable.
+2. ContentLocked: the lock notice renders in place of the
+   Ingredients and Instructions slots — the slots disappear —
+   while the scalar fields and tags remain editable.
 3. VersionDiff: the ingredients and instructions changed-list
    banners render above their slots with Revert actions, and
    changed fields carry their revert actions beside the labels.
