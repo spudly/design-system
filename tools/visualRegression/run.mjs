@@ -36,7 +36,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { COMMIT_GATE_MAX_RATIO } from "./commitGate.mjs";
+import { commitGateRatio } from "./commitGate.mjs";
 import { fromDirMode } from "./compare.mjs";
 import { deviceMode } from "./deviceMode.mjs";
 
@@ -84,8 +84,10 @@ const CONFIG = {
   maxRatio: Number(argValue("--max-ratio", "0.001")),
   // Pixel-diff commit gate (issue #296): in update mode a capture
   // replaces its baseline only when its differing-pixel ratio
-  // exceeds this. The named default lives in commitGate.mjs.
-  commitMaxRatio: Number(argValue("--commit-max-ratio", String(COMMIT_GATE_MAX_RATIO))),
+  // exceeds this. Resolution (commitGate.mjs): the explicit flag
+  // wins, then DSVR_COMMIT_MAX_RATIO, then the named default; a
+  // set-but-invalid value throws instead of silently defaulting.
+  commitMaxRatio: commitGateRatio(argValue("--commit-max-ratio", "")),
   readyTimeoutMs: Number(argValue("--ready-timeout", "30000")),
   // The first wait is different in kind: cold app launch + story
   // index preparation on a freshly booted emulator. Minutes, not

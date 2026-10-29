@@ -46,24 +46,13 @@
 // with a lower gate (--commit-max-ratio on run.mjs,
 // --max-ratio here, or the DSVR_COMMIT_MAX_RATIO env var).
 //
-// CLI (used by ci/capture-compare.sh to build the staged set):
-//   node commitGate.mjs --baselines <dir> --captures <dir>[,<dir>...]
-//                       --out <stagedDir> [--summary <jsonPath>]
-//                       [--threshold 16] [--max-ratio <ratio>]
-//   node commitGate.mjs --print-gate   (prints the effective ratio)
-// Exit code: 0 = staged set built, 1 = bad input / undecodable PNG.
+// The CLI surface used by ci/capture-compare.sh (staging +
+// --print-gate) lives in commitGateCli.mjs; this module is the
+// library: the named setting, the ratio resolution/validation,
+// the per-pair verdict, and the two gated write paths.
 
-import {
-  copyFileSync,
-  existsSync,
-  mkdirSync,
-  readFileSync,
-  readdirSync,
-  statSync,
-  writeFileSync,
-} from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join, relative } from "node:path";
-import { fileURLToPath } from "node:url";
 
 import { listPngs } from "./compare.mjs";
 import { diffImages } from "./imageDiff.mjs";
@@ -185,53 +174,28 @@ export function stageGatedBaselines(opts) {
   return summary;
 }
 
-function argValue(args, name, fallback) {
-  const i = args.indexOf(name);
-  return i === -1 ? fallback : args[i + 1];
-}
-
-function effectiveGate(args) {
-  const raw = argValue(args, "--max-ratio", "") || process.env.DSVR_COMMIT_MAX_RATIO;
-  return raw ? Number(raw) : COMMIT_GATE_MAX_RATIO;
-}
-
-function parseStageArgs(args) {
-  const parsed = {
-    baselinesDir: argValue(args, "--baselines", ""),
-    outDir: argValue(args, "--out", ""),
-    capturesDirs: argValue(args, "--captures", "")
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean),
-    colorThreshold: Number(argValue(args, "--threshold", "16")),
-    summaryPath: argValue(args, "--summary", ""),
-  };
-  return parsed.baselinesDir && parsed.outDir && parsed.capturesDirs.length > 0 ? parsed : null;
-}
-
-function main() {
-  const args = process.argv.slice(2);
-  if (args.includes("--print-gate")) {
-    console.log(String(effectiveGate(args)));
-    return 0;
-  }
-  const parsed = parseStageArgs(args);
-  if (!parsed) {
-    console.error(
-      "commit-gate FAIL (issue #296): --baselines <dir>, --captures <dir>[,<dir>...] and --out <dir> are required.",
+// Parse + validate a gate-ratio override. Anything that is not a
+// finite number in [0, 1] is a configuration error and throws:
+// silently coercing it (NaN comparisons are always false) would
+// make the gate skip every change, and a ratio over 1 is
+// meaningless for a differing-pixel fraction.
+export function parseCommitGateRatio(raw, source) {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || n < 0 || n > 1) {
+    throw new Error(
+      `invalid commit-gate ratio from ${source}: ${JSON.stringify(raw)} (expected a finite number in [0, 1])`,
     );
-    return 1;
   }
-  const gateRatio = effectiveGate(args);
-  let summary;
-  try {
-    summary = stageGatedBaselines({ ...parsed, gateRatio, log: (line) => console.log(line) });
-  } catch (error) {
-    console.error(`commit-gate FAIL (issue #296): ${error.message}`);
-    return 1;
-  }
-  if (parsed.summaryPath) writeFileSync(parsed.summaryPath, JSON.stringify(summary, null, 2));
-  return 0;
+  return n;
 }
 
-if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) process.exit(main());
+// Resolve the effective gate when the caller has an optional CLI
+// value: the explicit value wins, then the DSVR_COMMIT_MAX_RATIO
+// env override, then the named default. Set-but-invalid values
+// throw (see parseCommitGateRatio) rather than silently falling
+// back — a typo'd override must never change behavior unnoticed.
+export function commitGateRatio(rawCli, source = "--commit-max-ratio") {
+  if (rawCli) return parseCommitGateRatio(rawCli, source);
+  const env = process.env.DSVR_COMMIT_MAX_RATIO;
+  return env ? parseCommitGateRatio(env, "DSVR_COMMIT_MAX_RATIO") : COMMIT_GATE_MAX_RATIO;
+}

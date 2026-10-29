@@ -203,15 +203,16 @@ pr_autocommit() {
   echo "PR auto-commit: regenerating baselines from the fresh captures ($diff_count pixel-diff failures, $missing_count stories with no baseline yet)."
 
   # The pixel-diff commit gate (issue #296): the effective gate
-  # ratio comes from the tooling's named setting (commitGate.mjs —
+  # ratio comes from the tooling's named setting (commitGate.mjs, via
+  # the commitGateCli.mjs CLI —
   # --print-gate respects the DSVR_COMMIT_MAX_RATIO override). The
   # in-job verification below compares with this same ratio: the
   # staged set is proven when a fresh capture pass agrees with it
   # to within the gate.
   local gate_ratio
-  gate_ratio="$(node "$tool_dir/commitGate.mjs" --print-gate)"
+  gate_ratio="$(node "$tool_dir/commitGateCli.mjs" --print-gate)"
   if [ -z "$gate_ratio" ]; then
-    echo "::error::PR auto-commit: could not read the commit-gate ratio from commitGate.mjs - committing NOTHING."
+    echo "::error::PR auto-commit: could not read the commit-gate ratio via commitGateCli.mjs --print-gate - committing NOTHING."
     return 1
   fi
 
@@ -224,7 +225,7 @@ pr_autocommit() {
   # SKIP/STAGE decision plus a summary, and writes the counts to
   # /tmp/dsvr-commit-gate-summary.json for the publish step below.
   rm -rf "$staged"
-  if ! node "$tool_dir/commitGate.mjs" \
+  if ! node "$tool_dir/commitGateCli.mjs" \
     --baselines "$tool_dir/baselines" \
     --captures "$out/actual,$out_narrow/actual" \
     --out "$staged" \

@@ -15,13 +15,20 @@ import { Buffer } from "node:buffer";
 import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import process from "node:process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-const { COMMIT_GATE_MAX_RATIO, commitGateVerdict, stageGatedBaselines, updateBaselineThroughGate } =
-  await import(join(repoRoot, "tools/visualRegression/commitGate.mjs"));
+const {
+  COMMIT_GATE_MAX_RATIO,
+  commitGateRatio,
+  commitGateVerdict,
+  parseCommitGateRatio,
+  stageGatedBaselines,
+  updateBaselineThroughGate,
+} = await import(join(repoRoot, "tools/visualRegression/commitGate.mjs"));
 const { encodePng } = await import(join(repoRoot, "tools/visualRegression/png.mjs"));
 
 const W = 100;
@@ -111,6 +118,31 @@ test("over-gate change is staged (20% of pixels)", () => {
   const v = commitGateVerdict(baselinePath, capturePath, 16, COMMIT_GATE_MAX_RATIO);
   assert.equal(v.action, "changed");
   assert.ok(Math.abs(v.ratio - 0.2) < 1e-9);
+});
+
+test("ratio overrides are validated: non-finite or out-of-range values throw", () => {
+  assert.throws(() => parseCommitGateRatio("banana", "test"), /invalid commit-gate ratio/);
+  assert.throws(() => parseCommitGateRatio("1.5", "test"), /invalid commit-gate ratio/);
+  assert.throws(() => parseCommitGateRatio("-0.1", "test"), /invalid commit-gate ratio/);
+  assert.equal(parseCommitGateRatio("0.02", "test"), 0.02);
+  assert.equal(parseCommitGateRatio("0", "test"), 0);
+  assert.equal(parseCommitGateRatio("1", "test"), 1);
+});
+
+test("commitGateRatio precedence: CLI value beats env beats the named default", () => {
+  const saved = process.env.DSVR_COMMIT_MAX_RATIO;
+  try {
+    delete process.env.DSVR_COMMIT_MAX_RATIO;
+    assert.equal(commitGateRatio(""), COMMIT_GATE_MAX_RATIO);
+    process.env.DSVR_COMMIT_MAX_RATIO = "0.03";
+    assert.equal(commitGateRatio(""), 0.03);
+    assert.equal(commitGateRatio("0.02"), 0.02);
+    process.env.DSVR_COMMIT_MAX_RATIO = "banana";
+    assert.throws(() => commitGateRatio(""), /invalid commit-gate ratio/);
+  } finally {
+    if (saved === undefined) delete process.env.DSVR_COMMIT_MAX_RATIO;
+    else process.env.DSVR_COMMIT_MAX_RATIO = saved;
+  }
 });
 
 test("missing baseline is staged as new", () => {
