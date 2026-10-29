@@ -1,53 +1,53 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { MealPlanEntryRow } from "./MealPlanEntryRow.js";
+import { ListRow } from "./ListRow.js";
 
-const meta: Meta<typeof MealPlanEntryRow> = {
-  title: "Components/MealPlanEntryRow",
-  component: MealPlanEntryRow,
+const meta: Meta<typeof ListRow> = {
+  title: "Components/ListRow",
+  component: ListRow,
 };
 
 export default meta;
-type Story = StoryObj<typeof MealPlanEntryRow>;
+type Story = StoryObj<typeof ListRow>;
 
-export const Meal: Story = {
+export const Prefixed: Story = {
   render: (args) => (
     <YStack maxWidth={430}>
-      <MealPlanEntryRow {...args} />
+      <ListRow {...args} />
     </YStack>
   ),
   args: {
-    kind: "meal",
+    prefix: "Meal · ",
     title: "Taco Tuesday",
     subtitle: "Serves 4 · 2,150 cal",
     onPress: () => {},
   },
 };
 
-export const Recipe: Story = {
+export const Plain: Story = {
   render: (args) => (
     <YStack maxWidth={430}>
-      <MealPlanEntryRow {...args} />
+      <ListRow {...args} />
     </YStack>
   ),
   args: {
-    kind: "recipe",
     title: "Garlic cream chicken",
     onPress: () => {},
   },
 };
 
-export const Unavailable: Story = {
+export const Disabled: Story = {
   render: (args) => (
     <YStack maxWidth={430}>
-      <MealPlanEntryRow {...args} />
+      <ListRow {...args} />
     </YStack>
   ),
   args: {
-    kind: "recipe",
+    prefix: "Recipe · ",
     title: "Shared stew",
+    titleSuffix: " (unavailable)",
     subtitle: "Serves 6",
-    isUnavailable: true,
+    isDisabled: true,
     onPress: () => {},
   },
 };

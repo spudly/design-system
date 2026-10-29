@@ -20,8 +20,8 @@
  *   viewer-rating wrapper (View) and Custom scale chip (XStack).
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
- *   MealPlanRow / MealPlanEntryRow components; the routing moved
- *   with them and the rows test below pins it there.)
+ *   generic CardRow / ListRow components; the routing moved with
+ *   them and the rows test below pins it there.)
  * - Tamagui semantic primitives used directly: Checkbox in
  *   ChecklistRow (its `accessibilityLabel` leaked; Tamagui supplies
  *   role/aria-checked itself) and Progress in ProgressBar (role,
@@ -175,14 +175,14 @@ test("ShoppingListPage's checkbox row translates role, checked state, and label 
   assert.match(code, /accessibilityLabel: line\.name/);
 });
 
-test("MealDetail rows and the meal-plan row components translate the disabled state and the button role (#237)", () => {
+test("MealDetail rows and the generic row components translate the disabled state and the button role (#237)", () => {
   // MealPlanDetailPage's and MealPlansPage's rows moved into the
-  // MealPlanEntryRow / MealPlanRow components in the #119
-  // tranche-2 de-styling; the translator routing moved with them.
+  // generic ListRow / CardRow components in the #119 tranche-2
+  // de-styling; the translator routing moved with them.
   const files = [
     "src/pages/MealDetailPage.tsx",
-    "src/components/MealPlanEntryRow.tsx",
-    "src/components/MealPlanRow.tsx",
+    "src/components/ListRow.tsx",
+    "src/components/CardRow.tsx",
   ];
   for (const rel of files) {
     const code = readCode(rel);
@@ -191,7 +191,7 @@ test("MealDetail rows and the meal-plan row components translate the disabled st
       /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/,
       `${rel}: the pressable row's button role must go through the translator`,
     );
-    if (rel !== "src/components/MealPlanRow.tsx") {
+    if (rel !== "src/components/CardRow.tsx") {
       assert.match(
         code,
         /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/,

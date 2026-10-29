@@ -48,9 +48,9 @@ export {
   type MasonryGridProps,
 } from "./MasonryGrid.js";
 export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
+export { CardRow, type CardRowProps } from "./CardRow.js";
+export { ListRow, type ListRowProps } from "./ListRow.js";
 export { LoadingGate, type LoadingGateProps } from "./LoadingGate.js";
-export { MealPlanEntryRow, type MealPlanEntryRowProps } from "./MealPlanEntryRow.js";
-export { MealPlanRow, type MealPlanRowProps } from "./MealPlanRow.js";
 export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";

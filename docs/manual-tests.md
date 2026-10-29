@@ -368,39 +368,40 @@ LoadingGate.
 
 ---
 
-## MealPlanEntryRow
+## ListRow
 
-Open in `Components/MealPlanEntryRow`: Meal, Recipe, Unavailable.
+Open in `Components/ListRow`: Prefixed, Plain, Disabled.
 
-1. Meal: the title line reads "Meal · Taco Tuesday" in medium
-   weight over the muted meta line, with a hairline under the row;
-   the row presses (pointer cursor on web, Enter/Space activate).
-2. Recipe: the title line reads "Recipe · Garlic cream chicken"
-   with no meta line.
-3. Unavailable: the title gains " (unavailable)"; the row does not
-   press, is not focusable, and is exposed as disabled.
+1. Prefixed: the title line reads "Meal · Taco Tuesday" (the
+   prefix is caller-supplied content) in medium weight over the
+   muted meta line, with a hairline under the row; the row presses
+   (pointer cursor on web, Enter/Space activate).
+2. Plain: the title line reads "Garlic cream chicken" with no
+   prefix and no meta line.
+3. Disabled: the title gains its caller-supplied " (unavailable)"
+   suffix; the row does not press, is not focusable, and is
+   exposed as disabled.
 
-**Run when:** `src/components/MealPlanEntryRow.tsx`, its stories,
-MealPlanDetailPage's entries, or a changeset naming
-MealPlanEntryRow.
+**Run when:** `src/components/ListRow.tsx`, its stories,
+MealPlanDetailPage's entries, or a changeset naming ListRow.
 
 ---
 
-## MealPlanRow
+## CardRow
 
-Open in `Components/MealPlanRow`: Default, WithDelete, TitleOnly.
+Open in `Components/CardRow`: Default, WithAction, TitleOnly.
 
-1. Default: an elevated card with the plan title in semibold over
-   its muted meta line; the text block presses (pointer cursor on
-   web, Enter/Space activate) and no Delete button shows.
-2. WithDelete: a small soft-red Delete button sits at the card's
-   right edge, vertically centered, and pressing it does not
-   trigger the row's press.
+1. Default: an elevated card with the title in semibold over its
+   muted meta line; the text block presses (pointer cursor on
+   web, Enter/Space activate) and no action button shows.
+2. WithAction: a small soft-red action button ("Delete",
+   danger tone) sits at the card's right edge, vertically
+   centered, and pressing it does not trigger the row's press.
 3. TitleOnly: the card shows the title alone, no meta line and no
    empty gap where it would sit.
 
-**Run when:** `src/components/MealPlanRow.tsx`, its stories,
-MealPlansPage's list, or a changeset naming MealPlanRow.
+**Run when:** `src/components/CardRow.tsx`, its stories,
+MealPlansPage's list, or a changeset naming CardRow.
 
 ---
 

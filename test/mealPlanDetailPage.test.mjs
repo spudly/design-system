@@ -43,9 +43,11 @@
  *    captures them.
  * 8. The page carries no styling of its own (#119, tranche 2):
  *    the loading state is the LoadingGate component, the entry
- *    rows are MealPlanEntryRow widgets (their pressable area,
+ *    rows are the generic ListRow widget (its pressable area,
  *    hairline, and disabled treatment live there — pinned in
- *    test/mealPlanEntryRow.test.mjs), the goal rows are DetailRow
+ *    test/listRow.test.mjs; the page supplies the kind prefix,
+ *    the unavailable suffix, and the disabled flag as content),
+ *    the goal rows are DetailRow
  *    widgets, the plan title takes Text's `title` variant, the
  *    meta lines take its `hint` variant, and the section spacing
  *    rides Column/Row scale steps. The page keeps only the kind
@@ -152,18 +154,22 @@ test("entry presses report the target id, by kind", () => {
   );
 });
 
-test("entries render through MealPlanEntryRow, with availability passed only for recipes", () => {
+test("entries render through ListRow, with the kind prefix and availability as content", () => {
   assert.match(
     code,
-    /<MealPlanEntryRow/,
-    "entry rows must render through the MealPlanEntryRow widget — its suffix, disabled state, and press wiring are pinned in test/mealPlanEntryRow.test.mjs",
+    /<ListRow/,
+    "entry rows must render through the ListRow widget — its disabled state and press wiring are pinned in test/listRow.test.mjs",
   );
   assert.match(
     code,
-    /entry\.kind === "recipe" && entry\.isUnavailable \? \{ isUnavailable: true \} : \{\}/,
-    "only a recipe entry can be unavailable — meal entries never carry the flag",
+    /prefix=\{entry\.kind === "meal" \? "Meal · " : "Recipe · "\}/,
+    "the kind lead-in must cross as the row's caller-supplied prefix",
   );
-  assert.match(code, /kind=\{entry\.kind\}/, "the row must receive the entry's kind");
+  assert.match(
+    code,
+    /entry\.kind === "recipe" && entry\.isUnavailable\s+\? \{ isDisabled: true, titleSuffix: " \(unavailable\)" \}/,
+    "only a recipe entry can be unavailable — it passes the generic disabled flag and the suffix as content",
+  );
   assert.match(code, /title=\{entry\.title\}/, "the row must receive the entry's title");
 });
 
@@ -264,30 +270,16 @@ test("stories exercise the default, empty, loading, and no-goals states", () => 
 });
 
 test("the page carries no styling of its own (#119)", () => {
-  const banned = [
-    "XStack",
-    "YStack",
-    "style={",
-    "className",
-    "fontSize=",
-    "fontWeight=",
-    "color=",
-    "backgroundColor=",
-    "marginBottom",
-    "paddingBottom",
-    "paddingBlockEnd",
-    "paddingBlockStart",
-    "paddingVertical",
-    "borderBottom",
-    "flexWrap",
-    "cursor=",
-    "function GoalRow",
-    "<GoalRow",
-  ];
+  // Compact split form (the pageWebAria pattern): the banned list
+  // cannot grow one-per-line without tripping the line caps.
+  const banned =
+    "XStack,YStack,style={,className,fontSize=,fontWeight=,color=,backgroundColor=,marginBottom,paddingBottom,paddingBlockEnd,paddingBlockStart,paddingVertical,borderBottom,flexWrap,cursor=,function GoalRow,<GoalRow".split(
+      ",",
+    );
   for (const item of banned) {
     assert.ok(
       !code.includes(item),
-      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in Column / Row / LoadingGate / MealPlanEntryRow / DetailRow since the #119 tranche-2 fix`,
+      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in Column / Row / LoadingGate / ListRow / DetailRow since the #119 tranche-2 fix`,
     );
   }
   assert.match(

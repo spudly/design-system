@@ -2,7 +2,7 @@ import { Button } from "../components/Button.js";
 import { Column } from "../components/Column.js";
 import { DetailRow } from "../components/DetailRow.js";
 import { LoadingGate } from "../components/LoadingGate.js";
-import { MealPlanEntryRow } from "../components/MealPlanEntryRow.js";
+import { ListRow } from "../components/ListRow.js";
 import { Row } from "../components/Row.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
@@ -106,8 +106,10 @@ import { TextLink } from "../components/TextLink.js";
  *
  * De-styled for #119: the page renders no layout primitives and
  * sets no styling props. The loading state is the LoadingGate
- * component, the entry rows are MealPlanEntryRow widgets, the
- * goal rows are DetailRow widgets, the plan title takes Text's
+ * component, the entry rows are the generic ListRow widget (the
+ * page supplies the kind prefix, the unavailable suffix, and the
+ * disabled flag as content), the goal rows are DetailRow widgets,
+ * the plan title takes Text's
  * `title` variant, the meta lines take its `hint` variant, and
  * the section spacing rides Column/Row scale steps.
  */
@@ -284,12 +286,14 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
       </Row>
       <SectionCard title="Entries">
         {entries.map((entry) => (
-          <MealPlanEntryRow
+          <ListRow
             key={entry.id}
-            kind={entry.kind}
+            prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
             title={entry.title}
             {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
-            {...(entry.kind === "recipe" && entry.isUnavailable ? { isUnavailable: true } : {})}
+            {...(entry.kind === "recipe" && entry.isUnavailable
+              ? { isDisabled: true, titleSuffix: " (unavailable)" }
+              : {})}
             onPress={() => {
               if (entry.kind === "meal") {
                 onMealPress(entry.targetId);

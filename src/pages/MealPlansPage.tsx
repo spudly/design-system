@@ -1,7 +1,7 @@
 import { Button } from "../components/Button.js";
 import { Column } from "../components/Column.js";
 import { EmptyState } from "../components/EmptyState.js";
-import { MealPlanRow } from "../components/MealPlanRow.js";
+import { CardRow } from "../components/CardRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
@@ -71,9 +71,10 @@ import { Text } from "../components/Text.js";
  * pretends to render.
  *
  * De-styled for #119: the page renders no layout primitives and
- * sets no styling props. The plan row is the MealPlanRow widget
- * (its card layout, pressable area, and Delete treatment live
- * there), the list stacks in a Column, and the loading block
+ * sets no styling props. The plan row is the generic CardRow
+ * widget (its card layout, pressable area, and action treatment
+ * live there; the page supplies the plan content and the Delete
+ * action), the list stacks in a Column, and the loading block
  * centers its spinner in a Column.
  */
 
@@ -135,16 +136,18 @@ export function MealPlansPage({
       ) : (
         <Column spacing="sm">
           {plans.map((plan) => (
-            <MealPlanRow
+            <CardRow
               key={plan.id}
               title={plan.title}
               {...(plan.subtitle ? { subtitle: plan.subtitle } : {})}
               onPress={() => {
                 onPlanPress(plan.id);
               }}
+              actionLabel="Delete"
+              actionTone="danger"
               {...(onPlanDelete
                 ? {
-                    onDeletePress: () => {
+                    onActionPress: () => {
                       onPlanDelete(plan.id);
                     },
                   }
