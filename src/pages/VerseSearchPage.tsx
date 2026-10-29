@@ -1,12 +1,12 @@
-import { FlatList } from "react-native";
-import { XStack, YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { Alert } from "../components/Alert.js";
+import { Row } from "../components/Row.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SearchField } from "../components/SearchField.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
+import { BoundedList } from "./BoundedList.js";
 
 /**
  * VerseSearchPage (#49): Memorize's verse search screen as a
@@ -85,16 +85,15 @@ import { Text } from "../components/Text.js";
  *   once the app re-renders with the flag set.
  *
  * Two layout notes:
- * - #188: the FlatList is bounded to the fixed shell with
- *   `flex: 1` (see listStyle), the same geometry the app's list
- *   uses inside the non-scrolling container.
- * - The app passes `style={{ flex: 1 }}` to the field itself; the
- *   DS SearchField's root is a stack and a style prop forwards to
- *   its inner input, so the flex sits on a wrapper stack here —
- *   the layout is the app's (the field takes the row's remaining
- *   width, the button its natural width). The field is used
- *   as-is: no lineHeight is set on any glyph or text in this
- *   file (#162).
+ * - #188: the results list is the shared BoundedList, which owns
+ *   the `flex: 1` bounding to the fixed shell, the same geometry
+ *   the app's list uses inside the non-scrolling container.
+ * - The app passes `style={{ flex: 1 }}` to the field itself; here
+ *   the search row is the DS Row and the field takes the row's
+ *   remaining width through SearchField's `grow` prop — the
+ *   layout is the app's (the field takes the remaining width, the
+ *   button its natural width). No lineHeight is set on any glyph
+ *   or text in this file (#162).
  *
  * No render slot, by audit (the cook-log lesson, applied before
  * the fact): the app screen renders no app-owned content inside
@@ -105,12 +104,6 @@ import { Text } from "../components/Text.js";
  * action is a bare mutation intent. Every action is therefore a
  * pure callback, which is the honest contract for this view.
  */
-
-// The FlatList must be bounded to the space the fixed shell
-// leaves it (#188): without flex: 1 it sizes to its full content
-// height inside the non-scrolling shell, overflows the viewport,
-// and never gets a scrollable viewport of its own.
-const listStyle = { flex: 1 } as const;
 
 /** One search result's view-model: the verse's id, its reference
  * line, and its full text, as the app's data source returns them. */
@@ -156,21 +149,19 @@ function VerseResultRow({
   onAddPress: () => void;
 }) {
   return (
-    <YStack paddingBottom="$2">
-      <Card>
-        <Text variant="subheading">{item.reference}</Text>
-        <Text variant="verse">{item.text}</Text>
-        {item.added ? (
-          <Button size="sm" variant="secondary" disabled>
-            Added
-          </Button>
-        ) : (
-          <Button size="sm" onPress={onAddPress}>
-            Add to memorize list
-          </Button>
-        )}
-      </Card>
-    </YStack>
+    <Card>
+      <Text variant="subheading">{item.reference}</Text>
+      <Text variant="verse">{item.text}</Text>
+      {item.added ? (
+        <Button size="sm" variant="secondary" disabled>
+          Added
+        </Button>
+      ) : (
+        <Button size="sm" onPress={onAddPress}>
+          Add to memorize list
+        </Button>
+      )}
+    </Card>
   );
 }
 
@@ -199,25 +190,23 @@ export function VerseSearchPage({
           search.
         </Alert>
       ) : null}
-      <XStack gap="$2" alignItems="center">
-        <YStack flex={1}>
-          <SearchField
-            value={query}
-            onChangeText={onQueryChange}
-            placeholder={
-              usingDemo ? "e.g. Ether 12:27 or “weakness”" : "e.g. Ether 12:27 or “charity”"
-            }
-            onSubmitEditing={onSearch}
-          />
-        </YStack>
+      <Row align="center">
+        <SearchField
+          value={query}
+          onChangeText={onQueryChange}
+          placeholder={
+            usingDemo ? "e.g. Ether 12:27 or “weakness”" : "e.g. Ether 12:27 or “charity”"
+          }
+          onSubmitEditing={onSearch}
+          grow
+        />
         <Button onPress={onSearch} disabled={isSearching || query.trim() === ""}>
           Search
         </Button>
-      </XStack>
+      </Row>
       {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
       {isSearching ? <Spinner label="Loading" /> : null}
-      <FlatList
-        style={listStyle}
+      <BoundedList
         data={results}
         keyExtractor={(verse) => verse.id}
         renderItem={({ item }) => (
