@@ -142,9 +142,17 @@ test("removing a filter clears its values through the change callbacks", () => {
   assert.match(page, /accessibilityLabel=\{`Remove \$\{FILTER_LABELS\[id\]\} filter`\}/);
 });
 
-test("the title renders as the page heading and pagination rides end-reached", () => {
+test("the title renders as the page heading and pagination rides end-reached from a settled list", () => {
   assert.match(page, /<Text variant="heading">\{title\}<\/Text>/);
-  assert.match(page, /onEndReached=\{onLoadMore\}/);
+  // Pagination is gated off while the first load or a next page
+  // is in flight or the error state is showing — in those states
+  // the data range is empty or shifting and end-reached can fire
+  // spuriously. It is NOT gated on recipes.length: an empty page
+  // with a live continuation still paginates.
+  assert.match(
+    page,
+    /onEndReached=\{\s*!isLoading && !isFetchingNextPage && !errorMessage \? onLoadMore : undefined\s*\}/,
+  );
   assert.match(
     page,
     /isFetchingNextPage \? \(/,

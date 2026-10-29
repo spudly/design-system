@@ -546,7 +546,16 @@ export function DiscoverPage(props: DiscoverPageProps) {
         // own (the direction of #209 — gap/separation over margins
         // for inter-item spacing).
         ItemSeparatorComponent={() => <View height={tokens.spacing[3]} />}
-        onEndReached={onLoadMore}
+        // Pagination fires only from a settled list. While the
+        // first load or a next page is in flight — or the error
+        // state is showing — the list's data range is empty or
+        // shifting under the footer, and the end-reached signal
+        // can fire spuriously, re-requesting a page the host has
+        // not answered yet. The host still ends pagination itself
+        // by omitting onLoadMore; an empty page with a live
+        // continuation (client-side filtering) keeps paginating,
+        // so the gate deliberately does not test recipes.length.
+        onEndReached={!isLoading && !isFetchingNextPage && !errorMessage ? onLoadMore : undefined}
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           isLoading ? (

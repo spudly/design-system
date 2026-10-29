@@ -71,6 +71,7 @@ function Thumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
   return imageUrl ? (
     <Image
       src={imageUrl}
+      alt=""
       width="$16"
       height="$16"
       borderRadius={tokens.radii.md}
