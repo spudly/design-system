@@ -159,7 +159,7 @@ test("frame structure: ScreenContainer shell, sections in hero → CTAs → feat
     "the view must render inside the ScreenContainer page shell",
   );
   const heroAt = page.indexOf("{heroTitle}");
-  const ctasAt = page.indexOf("cta={discoverCta}");
+  const ctasAt = page.indexOf("href={discoverCta.href}");
   const featuresAt = page.indexOf("feature={featureOne}");
   assert.ok(heroAt !== -1 && ctasAt !== -1 && featuresAt !== -1, "all three sections must render");
   assert.ok(
@@ -271,10 +271,13 @@ async function renderLanding() {
 
 function renderedAnchors(html) {
   const anchors = [];
-  const pattern = /<a [^>]*href="([^"]+)"[^>]*>([^<]*)<\/a>/g;
+  // The label may be nested (Button's href form wraps it in a
+  // Text, which renders a <span> on web): read the anchor's text
+  // content, not just direct text children.
+  const pattern = /<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
   let match;
   while ((match = pattern.exec(html)) !== null) {
-    anchors.push({ href: match[1], label: match[2].trim(), tag: match[0] });
+    anchors.push({ href: match[1], label: match[2].replace(/<[^>]*>/g, "").trim(), tag: match[0] });
   }
   return anchors;
 }
