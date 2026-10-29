@@ -41,22 +41,18 @@ test("there is no delete affordance on the list", () => {
 });
 
 test("rows place the RatingStars control in the subtitle flow, rated names carrying the rating", () => {
-  const dollar = "$";
+  const dollar = "\\$";
   assert.match(code, /<RatingStars/);
   assert.match(
     code,
     new RegExp(
-      "`Log a cook of \\" +
-        dollar +
-        "{item\\.title}, rated \\" +
-        dollar +
-        "{item\\.rating} out of 5 stars`",
+      `\`Log a cook of ${dollar}{item\\.title}, rated ${dollar}{item\\.rating} out of 5 stars\``,
     ),
     "the rated control's name must carry the rating — the stars alone would mislead a screen reader",
   );
   assert.match(
     code,
-    new RegExp("`Log a cook of \\" + dollar + "{item\\.title}`"),
+    new RegExp(`\`Log a cook of ${dollar}{item\\.title}\``),
     "the unrated control's name is just the action and the title",
   );
   assert.match(

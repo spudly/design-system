@@ -95,11 +95,7 @@ test("each added filter renders in a RemovableField named for that filter (#119)
   for (const id of ["status", "ingredient", "calories", "satiety", "sort"]) {
     assert.match(
       code,
-      new RegExp(
-        String.raw`removeAccessibilityLabel=\{\`Remove \$\{FILTER_LABELS\.` +
-          id +
-          String.raw`\} filter\`\}`,
-      ),
+      new RegExp(`removeAccessibilityLabel=\\{\`Remove \\$\\{FILTER_LABELS\\.${id}\\} filter\`\\}`),
       `the ${id} filter's remove control must be named for the ${id} filter`,
     );
   }
