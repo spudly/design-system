@@ -24,58 +24,57 @@ function SliderDemo(props: Partial<SliderProps>) {
 }
 
 export const Default: Story = {
-  render: () => <SliderDemo label="Volume" value={40} />,
+  args: { label: "Volume", value: 40 },
+  render: (args) => <SliderDemo {...args} />,
 };
 
 /** The shuoink/ui spec's story, in DS form: a 1–10 range whose tick
  * labels spell out every step under the track. */
 export const Ticks: Story = {
-  render: () => (
-    <SliderDemo
-      label="Rating"
-      min={1}
-      max={10}
-      value={5}
-      ticks={[
-        { value: 1, label: "One" },
-        { value: 2, label: "Two" },
-        { value: 3, label: "Three" },
-        { value: 4, label: "Four" },
-        { value: 5, label: "Five" },
-        { value: 6, label: "Six" },
-        { value: 7, label: "Seven" },
-        { value: 8, label: "Eight" },
-        { value: 9, label: "Nine" },
-        { value: 10, label: "Ten" },
-      ]}
-    />
-  ),
+  args: {
+    label: "Rating",
+    min: 1,
+    max: 10,
+    value: 5,
+    ticks: [
+      { value: 1, label: "One" },
+      { value: 2, label: "Two" },
+      { value: 3, label: "Three" },
+      { value: 4, label: "Four" },
+      { value: 5, label: "Five" },
+      { value: 6, label: "Six" },
+      { value: 7, label: "Seven" },
+      { value: 8, label: "Eight" },
+      { value: 9, label: "Nine" },
+      { value: 10, label: "Ten" },
+    ],
+  },
+  render: (args) => <SliderDemo {...args} />,
 };
 
 /** A fractional step over a short range, with sparse tick labels. */
 export const CustomRange: Story = {
-  render: () => (
-    <SliderDemo
-      label="Portion size"
-      min={0}
-      max={5}
-      step={0.5}
-      value={2.5}
-      ticks={[
-        { value: 0, label: "0" },
-        { value: 2.5, label: "2.5" },
-        { value: 5, label: "5" },
-      ]}
-    />
-  ),
+  args: {
+    label: "Portion size",
+    min: 0,
+    max: 5,
+    step: 0.5,
+    value: 2.5,
+    ticks: [
+      { value: 0, label: "0" },
+      { value: 2.5, label: "2.5" },
+      { value: 5, label: "5" },
+    ],
+  },
+  render: (args) => <SliderDemo {...args} />,
 };
 
 export const WithError: Story = {
-  render: () => (
-    <SliderDemo label="Spice level" value={0} error="Choose a level before continuing." />
-  ),
+  args: { label: "Spice level", value: 0, error: "Choose a level before continuing." },
+  render: (args) => <SliderDemo {...args} />,
 };
 
 export const Disabled: Story = {
-  render: () => <SliderDemo label="Volume" value={60} disabled />,
+  args: { label: "Volume", value: 60, disabled: true },
+  render: (args) => <SliderDemo {...args} />,
 };

@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { Label, Slider as TamaguiSlider, View, YStack, styled } from "tamagui";
+import { Label, Slider as TamaguiSlider, View, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
@@ -60,7 +60,13 @@ export type SliderProps = {
   /** Current value. Controlled — the host owns it, as on every DS field. */
   value: number;
   onValueChange: (value: number) => void;
-  /** Range bounds and step granularity; the Tamagui defaults. */
+  /**
+   * Range bounds and step granularity; the Tamagui defaults.
+   * Invalid values (non-finite bounds, `max <= min`, a non-positive
+   * or non-finite `step`) are normalized inside the component and
+   * never forwarded — the primitive divides by both the range and
+   * the step when positioning and adjusting the thumb.
+   */
   min?: number;
   max?: number;
   step?: number;
@@ -69,6 +75,13 @@ export type SliderProps = {
    * accessible name (routed to the thumb, the focusable element).
    */
   label?: string;
+  /**
+   * The thumb's accessible name when there is no visible `label`:
+   * a bare slider still needs a name, and the primitive gives the
+   * thumb no fallback. When both are set, this explicit name wins
+   * over `label` (the Button convention for supplied names).
+   */
+  accessibilityLabel?: string;
   /** Error text under the slider, wired to the thumb as its description. */
   error?: string;
   /** When true, the slider is inert and dimmed; the value cannot change. */
@@ -86,8 +99,10 @@ export type SliderProps = {
 /**
  * Single-value slider field: a labeled, controlled range input built
  * on the Tamagui Slider primitive (drag, keyboard arrows/Home/End,
- * and slider semantics come from the primitive; the DS owns the
- * track/thumb styling and the field chrome).
+ * and slider semantics come from the primitive; the native
+ * VoiceOver/TalkBack adjust actions are added here because the
+ * primitive declares none; the DS owns the track/thumb styling and
+ * the field chrome).
  *
  * This is the shuoink/ui Slider re-implemented in DS conventions
  * (design-system #178): the spec's range props (min / max / step /
@@ -103,10 +118,11 @@ export type SliderProps = {
 export function Slider({
   value,
   onValueChange,
-  min = 0,
-  max = 100,
-  step = 1,
+  min: minProp = 0,
+  max: maxProp = 100,
+  step: stepProp = 1,
   label,
+  accessibilityLabel,
   error,
   disabled = false,
   ticks,
@@ -115,7 +131,45 @@ export function Slider({
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
+  // Normalize the range before anything reaches the primitive: it
+  // divides by (max - min) to position the thumb and by step to
+  // adjust it, so a degenerate range or step is NaN geometry, not
+  // an error the host can see. As elsewhere in the DS (Spinner,
+  // NumberStepper), out-of-contract numbers are sanitized here
+  // rather than forwarded or thrown.
+  const min = Number.isFinite(minProp) ? minProp : 0;
+  const max = Number.isFinite(maxProp) && maxProp > min ? maxProp : min + 1;
+  const step = Number.isFinite(stepProp) && stepProp > 0 ? stepProp : 1;
   const range = max - min;
+  const accessibleName = accessibilityLabel ?? label;
+  // Native adjust actions: the primitive renders the thumb with
+  // slider semantics but declares no accessibilityActions, so
+  // VoiceOver / TalkBack adjust gestures have nothing to invoke.
+  // Native only — on web the primitive already handles the arrow
+  // keys, and raw RN accessibility props leak to the DOM as
+  // meaningless attributes (#235).
+  const nativeAdjustProps: {
+    accessibilityActions?: { name: string }[];
+    onAccessibilityAction?: (event: { nativeEvent: { actionName: string } }) => void;
+  } = isWeb
+    ? {}
+    : {
+        accessibilityActions: [{ name: "increment" }, { name: "decrement" }],
+        onAccessibilityAction: (event) => {
+          if (disabled) {
+            return;
+          }
+          const delta =
+            event.nativeEvent.actionName === "increment"
+              ? step
+              : event.nativeEvent.actionName === "decrement"
+                ? -step
+                : 0;
+          if (delta !== 0) {
+            onValueChange(Math.min(max, Math.max(min, value + delta)));
+          }
+        },
+      };
 
   return (
     <YStack gap={tokens.spacing[1]}>
@@ -145,7 +199,8 @@ export function Slider({
           <StyledThumb
             index={0}
             id={id}
-            {...platformAccessibilityProps({ accessibilityLabel: label })}
+            {...platformAccessibilityProps({ accessibilityLabel: accessibleName })}
+            {...nativeAdjustProps}
             aria-invalid={error ? true : undefined}
             aria-describedby={error ? errorId : undefined}
           >

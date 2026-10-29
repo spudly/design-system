@@ -11,14 +11,19 @@
  *    adapted inside the component — `value={[value]}` in, the first
  *    element out — and never leaks into the props.
  * 3. The spec's range props carry over with the Tamagui defaults:
- *    min 0, max 100, step 1.
+ *    min 0, max 100, step 1 — and out-of-contract values (non-finite
+ *    bounds, max <= min, non-positive or non-finite step) are
+ *    normalized inside the component, never forwarded: the
+ *    primitive divides by both the range and the step.
  * 4. Field chrome follows the DS field pattern (SelectField /
  *    CheckboxField): `label` renders through a Label associated by
  *    id and is also the thumb's accessible name (routed through
  *    platformAccessibilityProps — the thumb is the focusable,
- *    slider-role element); `error` renders as the error Text variant
- *    with a generated id, wired to the thumb via aria-describedby /
- *    aria-invalid.
+ *    slider-role element); a bare slider with no `label` takes its
+ *    name from the explicit `accessibilityLabel` prop instead
+ *    (which wins when both are set). `error` renders as the error
+ *    Text variant with a generated id, wired to the thumb via
+ *    aria-describedby / aria-invalid.
  * 5. Ticks are data, not children: `ticks?: SliderTick[]`
  *    ({ value, label }), each label positioned under its value's
  *    clamped percentage along the track, centered except the first
@@ -38,6 +43,12 @@
  *    the label as its accessible name, the tick labels and error
  *    text in the markup, the error wired via aria-describedby, and
  *    no raw React Native accessibility attributes leaking to the DOM.
+ * 9. Native adjust actions: the primitive declares no
+ *    accessibilityActions, so the thumb carries increment /
+ *    decrement actions on native only (web already has the arrow
+ *    keys, and RN props would leak to the DOM there), each moving
+ *    the controlled value by one step, clamped to the range, inert
+ *    while disabled.
  *
  * Source scan for the per-literal invariants (like this repo's other
  * component contract tests; comments are stripped first so prose
@@ -83,12 +94,20 @@ test("range props carry the spec's shape with the Tamagui defaults", () => {
   assert.match(slider, /min\?: number/);
   assert.match(slider, /max\?: number/);
   assert.match(slider, /step\?: number/);
-  assert.match(slider, /min = 0/);
-  assert.match(slider, /max = 100/);
-  assert.match(slider, /step = 1/);
+  assert.match(slider, /minProp = 0/);
+  assert.match(slider, /maxProp = 100/);
+  assert.match(slider, /stepProp = 1/);
   assert.match(slider, /min=\{min\}/);
   assert.match(slider, /max=\{max\}/);
   assert.match(slider, /step=\{step\}/);
+});
+
+test("out-of-contract range values are normalized, never forwarded", () => {
+  // The primitive divides by (max - min) and by step, so the raw
+  // props must not reach it: finite bounds, max > min, positive step.
+  assert.match(slider, /const min = Number\.isFinite\(minProp\) \? minProp : 0/);
+  assert.match(slider, /Number\.isFinite\(maxProp\) && maxProp > min \? maxProp : min \+ 1/);
+  assert.match(slider, /Number\.isFinite\(stepProp\) && stepProp > 0 \? stepProp : 1/);
 });
 
 test("field chrome: label by id, error text with its generated id", () => {
@@ -103,10 +122,32 @@ test("the thumb carries the label as its accessible name and the error wiring", 
   // The thumb is the focusable slider-role element, so the field's
   // accessible name and error description land on it — the name
   // through the shared translator (#235), never as raw RN props.
-  assert.match(slider, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
+  // A bare slider (no visible label) is named by the explicit
+  // accessibilityLabel prop, which wins when both are set.
+  assert.match(slider, /accessibilityLabel\?: string/);
+  assert.match(slider, /const accessibleName = accessibilityLabel \?\? label/);
+  assert.match(slider, /platformAccessibilityProps\(\{ accessibilityLabel: accessibleName \}\)/);
   assert.match(slider, /aria-invalid=\{error \? true : undefined\}/);
   assert.match(slider, /aria-describedby=\{error \? errorId : undefined\}/);
   assert.match(slider, /index=\{0\}/);
+});
+
+test("the thumb carries native increment/decrement adjust actions, native only", () => {
+  // The primitive declares no accessibilityActions, so VoiceOver /
+  // TalkBack adjust gestures need these on the thumb. Web is
+  // excluded (the empty branch): the primitive handles the arrow
+  // keys there, and raw RN props leak to the DOM (#235).
+  assert.match(slider, /const nativeAdjustProps/);
+  assert.match(slider, /isWeb\s+\?\s+\{\}/);
+  assert.match(
+    slider,
+    /accessibilityActions: \[\{ name: "increment" \}, \{ name: "decrement" \}\]/,
+  );
+  assert.match(slider, /onAccessibilityAction: \(event\) =>/);
+  assert.match(slider, /nativeEvent\.actionName === "increment"/);
+  assert.match(slider, /nativeEvent\.actionName === "decrement"/);
+  assert.match(slider, /onValueChange\(Math\.min\(max, Math\.max\(min, value \+ delta\)\)\)/);
+  assert.match(slider, /\{\.\.\.nativeAdjustProps\}/);
 });
 
 test("disabled passes through to the primitive and dims the control", () => {
@@ -209,6 +250,26 @@ test("SSR: the thumb renders slider semantics with the label as its name", async
   assert.ok(html.includes('aria-valuenow="5"'), "the thumb must report the current value");
   assert.ok(html.includes('aria-label="Rating"'), "the label must be the slider's accessible name");
   assert.ok(!html.includes("accessibilitylabel"), "no raw RN accessibility attributes may leak");
+  assert.ok(
+    !html.includes("accessibilityactions"),
+    "the native adjust actions must not leak to the DOM on web",
+  );
+});
+
+test("SSR: a bare slider takes its accessible name from accessibilityLabel", async () => {
+  const { React, Slider } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(Slider, {
+      accessibilityLabel: "Portion size",
+      value: 3,
+      onValueChange: () => null,
+    }),
+  );
+  assert.ok(html.includes('role="slider"'), "the thumb must carry the slider role");
+  assert.ok(
+    html.includes('aria-label="Portion size"'),
+    "accessibilityLabel must name a slider that has no visible label",
+  );
 });
 
 test("SSR: tick labels and the error render, the error wired to the thumb", async () => {
