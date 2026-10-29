@@ -27,12 +27,17 @@
 # compare, so without this trigger new stories could never acquire
 # baselines through the PR flow — issue #128) — regenerate the
 # baselines from the fresh captures IN THIS JOB — gated by the
-# luminance guard (tools/visualRegression/guard.mjs, issue #101)
-# and an in-job re-capture/re-compare against the regenerated set —
-# and hand the proven-green set to the workflow's
-# commit-pr-baselines job, which pushes it onto the PR branch.
-# Anything short of proven green (capture failures, a guard trip, a
-# failed re-compare) commits NOTHING and fails the job.
+# luminance guard (tools/visualRegression/guard.mjs, issue #101),
+# the pixel-diff commit gate (tools/visualRegression/commitGate.mjs,
+# issue #296: a capture replaces its baseline in the staged set
+# only when its differing-pixel ratio exceeds the gate, so noise
+# never lands as baseline churn), and an in-job re-capture/re-compare
+# against the regenerated set — and hand the proven-green set to the
+# workflow's commit-pr-baselines job, which pushes it onto the PR
+# branch. Anything short of proven green (capture failures, a guard
+# trip, a failed re-compare) commits NOTHING and fails the job. A
+# run whose captures are all at or under the gate stages zero
+# changed files and publishes nothing at all (issue #296).
 #
 # Captures are app-drawn full-content frames (issue #137): the
 # host app draws each story's whole page — below the fold
@@ -197,15 +202,36 @@ pr_autocommit() {
   fi
   echo "PR auto-commit: regenerating baselines from the fresh captures ($diff_count pixel-diff failures, $missing_count stories with no baseline yet)."
 
+  # The pixel-diff commit gate (issue #296): the effective gate
+  # ratio comes from the tooling's named setting (commitGate.mjs —
+  # --print-gate respects the DSVR_COMMIT_MAX_RATIO override). The
+  # in-job verification below compares with this same ratio: the
+  # staged set is proven when a fresh capture pass agrees with it
+  # to within the gate.
+  local gate_ratio
+  gate_ratio="$(node "$tool_dir/commitGate.mjs" --print-gate)"
+  if [ -z "$gate_ratio" ]; then
+    echo "::error::PR auto-commit: could not read the commit-gate ratio from commitGate.mjs - committing NOTHING."
+    return 1
+  fi
+
   # The regenerated set: committed baselines overlaid with the fresh
-  # captures of both sets (exactly what update mode would write),
-  # staged in /tmp so the checkout tree stays untouched until the
-  # commit job runs.
+  # captures of both sets — but ONLY where the commit gate stages a
+  # capture (issue #296): a capture at or under the gate keeps its
+  # committed baseline bytes, so render/re-encode noise never lands
+  # in the bot commit. Staged in /tmp so the checkout tree stays
+  # untouched until the commit job runs. The gate logs every
+  # SKIP/STAGE decision plus a summary, and writes the counts to
+  # /tmp/dsvr-commit-gate-summary.json for the publish step below.
   rm -rf "$staged"
-  mkdir -p "$staged"
-  cp -r "$tool_dir/baselines/." "$staged/"
-  if [ -d "$out/actual" ]; then cp -r "$out/actual/." "$staged/"; fi
-  if [ -d "$out_narrow/actual" ]; then cp -r "$out_narrow/actual/." "$staged/"; fi
+  if ! node "$tool_dir/commitGate.mjs" \
+    --baselines "$tool_dir/baselines" \
+    --captures "$out/actual,$out_narrow/actual" \
+    --out "$staged" \
+    --summary /tmp/dsvr-commit-gate-summary.json; then
+    echo "::error::PR auto-commit: commit-gate staging failed - committing NOTHING."
+    return 1
+  fi
 
   # Luminance guard (issue #101): a dimmed or scrimmed capture set
   # must never be committed. The guard exits non-zero on any trip.
@@ -236,23 +262,35 @@ pr_autocommit() {
   # compare against the regenerated set. The commit is only as good
   # as this proof - a set that cannot pass a fresh capture pass is
   # not committed, and the job fails instead.
-  echo "PR auto-commit: re-capturing and comparing against the regenerated baselines (in-job verification)..."
-  if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify" "${SCOPE_ARGS[@]}"; then
+  echo "PR auto-commit: re-capturing and comparing against the regenerated baselines (in-job verification, tolerance = commit gate ${gate_ratio})..."
+  if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify" --max-ratio "$gate_ratio" "${SCOPE_ARGS[@]}"; then
     echo "::error::PR auto-commit: in-job re-compare of the standard set against the regenerated baselines failed - committing NOTHING."
     return 1
   fi
-  if ! run_narrow --baselines "$staged" --out "$out_narrow/verify" "${SCOPE_ARGS[@]}"; then
+  if ! run_narrow --baselines "$staged" --out "$out_narrow/verify" --max-ratio "$gate_ratio" "${SCOPE_ARGS[@]}"; then
     echo "::error::PR auto-commit: in-job re-compare of the narrow-variant set against the regenerated baselines failed - committing NOTHING."
     return 1
   fi
 
-  # Proven green: hand the staged set and a readiness marker to the
-  # workflow (the marker step publishes the job output the
-  # commit-pr-baselines job gates on).
+  # Proven green — but if the commit gate staged zero changed
+  # files, the "regenerated" set is byte-identical to the committed
+  # baselines: publish nothing, so the run produces NO baseline
+  # commit (issue #296's acceptance). The commit job's own
+  # git-status guard is a second safety net, never the mechanism.
+  local staged_count
+  staged_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).staged)')"
+  if [ "$staged_count" = "0" ]; then
+    echo "PR auto-commit: commit gate staged 0 files — every capture was at or under the gate (noise) or matched its baseline. Baselines unchanged; nothing to commit."
+    return 0
+  fi
+
+  # Hand the staged set and a readiness marker to the workflow (the
+  # marker step publishes the job output the commit-pr-baselines
+  # job gates on).
   rm -rf /tmp/dsvr-pr-baselines
   cp -r "$staged" /tmp/dsvr-pr-baselines
   touch /tmp/dsvr-pr-autocommit-ready
-  echo "PR auto-commit: regenerated baselines verified in-job; the commit-pr-baselines job will push them to this PR branch."
+  echo "PR auto-commit: regenerated baselines verified in-job ($staged_count file(s) staged by the commit gate); the commit-pr-baselines job will push them to this PR branch."
 }
 
 if [ "$MODE" = "update" ]; then

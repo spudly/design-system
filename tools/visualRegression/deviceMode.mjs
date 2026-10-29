@@ -7,10 +7,11 @@
 // Split out of run.mjs so the driver stays under the file-length
 // cap — the driver passes its CONFIG and scope helpers in.
 
-import { copyFileSync, existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { pullAppCapture } from "./appCapture.mjs";
+import { updateBaselineThroughGate } from "./commitGate.mjs";
 import { comparePair } from "./compare.mjs";
 import {
   adb,
@@ -78,7 +79,7 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
     }`,
   );
 
-  const summary = { captured: 0, compared: 0, updated: 0, noBaseline: 0, failed: [] };
+  const summary = { captured: 0, compared: 0, updated: 0, skipped: 0, noBaseline: 0, failed: [] };
   let nonce = 0;
 
   for (const theme of config.themes) {
@@ -141,14 +142,13 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
       writeFileSync(actualPath, png);
       summary.captured++;
 
+      const baselinePath = join(config.baselinesDir, rel);
       if (config.update) {
-        const baselinePath = join(config.baselinesDir, rel);
-        mkdirSync(dirname(baselinePath), { recursive: true });
-        copyFileSync(actualPath, baselinePath);
-        summary.updated++;
+        // Pixel-diff commit gate (issue #296) — see commitGate.mjs:
+        // sub-gate captures keep their baseline; new ones write.
+        updateBaselineThroughGate(baselinePath, actualPath, config, summary);
         continue;
       }
-      const baselinePath = join(config.baselinesDir, rel);
       if (!existsSync(baselinePath)) {
         summary.noBaseline++;
         console.warn(`WARN ${rel}: no baseline yet (bootstrap)`);
