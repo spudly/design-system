@@ -95,7 +95,7 @@ test("the catalog slots and handlers are optional and passed through only when g
   ]) {
     assert.match(
       code,
-      new RegExp(`\\.\\.\\.\\(${prop} !== undefined \\? \\{ ${prop} \\} : null\\)`),
+      new RegExp(String.raw`\.\.\.\(${prop} !== undefined \? \{ ${prop} \} : null\)`),
       `${prop} must reach the FlatList only when the caller provides it`,
     );
   }
