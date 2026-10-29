@@ -22,10 +22,12 @@
  *    submit-editing and the Search button
  *    firing the same callback, and the button's disabled rule
  *    (searching, or a blank query).
- * 5. There is deliberately NO empty state: the app renders an
- *    empty list before the first search and after a fruitless
- *    one. The absence is pinned — inventing one would repeat
- *    the #44 demo failure mode.
+ * 5. The empty state is scoped to a fruitless search (#287):
+ *    before the first search there is deliberately NO message
+ *    (the pre-search blank is pinned), but once the app reports
+ *    a completed search via `hasSearched` and the results are
+ *    empty — not searching, no error — the page renders the DS
+ *    EmptyState, consistent with the sibling Memorize pages.
  * 6. Result rows mirror the app card and the add action reports
  *    the verse id. No render slot: no ReactNode prop, no
  *    accessory — the app screen renders no app-owned content
@@ -178,14 +180,16 @@ test("the list is the shared BoundedList; the page carries no styling of its own
   }
 });
 
-test("there is deliberately no empty state on this screen", () => {
-  assert.ok(
-    !code.includes("EmptyState"),
-    "VerseSearchPage must not render an EmptyState — the app renders an empty list before the first search and after a fruitless one",
+test("a completed search with no results renders the empty state; the pre-search state does not (#287)", () => {
+  assert.match(
+    code,
+    /hasSearched\?: boolean;/,
+    "VerseSearchPageProps must carry the optional hasSearched flag (#287)",
   );
-  assert.ok(
-    !code.includes("No results"),
-    "VerseSearchPage must not invent a no-results message — the app has none on this screen",
+  assert.match(
+    code,
+    /\{hasSearched && !isSearching && !errorMessage && results\.length === 0 \? \(\s*<EmptyState title="No results" body="Try a different word or reference\." announce \/>\s*\) : \(\s*<BoundedList/,
+    "a fruitless completed search (hasSearched, not searching, no error, zero results) must render the no-results EmptyState (announced as a polite status, since it is the result of an action) in place of the empty list; every other state renders the list",
   );
 });
 

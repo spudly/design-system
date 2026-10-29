@@ -1,6 +1,7 @@
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { Alert } from "../components/Alert.js";
+import { EmptyState } from "../components/EmptyState.js";
 import { Row } from "../components/Row.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SearchField } from "../components/SearchField.js";
@@ -68,12 +69,20 @@ import { BoundedList } from "./BoundedList.js";
  *   still in it: the app keeps its results state across a search,
  *   so a re-search never blanks the list. There is deliberately
  *   no loading state union and no content swap.
- * - Empty results render an empty list — the app has NO empty
- *   state on this screen (unlike its Verses and Review tabs,
- *   which do use an empty-state component). Before the first
- *   search and after a fruitless one, the screen is the form and
- *   blank space. Inventing an empty message here would be the
- *   #44 failure mode, so the contract test pins its absence.
+ * - Empty results (#287): before the first search the screen
+ *   is the form and blank space — the app has no pre-search
+ *   state, and none is invented here. But once the app reports
+ *   a completed search (`hasSearched`) that returned zero
+ *   results, the page renders the DS EmptyState ("No results" /
+ *   "Try a different word or reference.", with `announce` so the
+ *   result of the search action is announced as a polite status),
+ *   consistent with the
+ *   sibling Memorize pages (MyVersesPage's "No verses yet",
+ *   MemorizeReviewPage's "Nothing due"): a fruitless search
+ *   must give the user feedback, which the app's blank list
+ *   did not. The empty state replaces the (empty) list only in
+ *   that case — while a search is in flight the spinner is the
+ *   feedback, and when the search failed the error alert is.
  * - Result rows are plain cards: reference (subheading), verse
  *   text (verse variant), and a small "Add to memorize list"
  *   button whose press is `onAddVerse(id)` — the store mutation
@@ -137,6 +146,12 @@ export type VerseSearchPageProps = {
   errorMessage: string | null;
   /** Results of the last completed search, in the app's order. */
   results: VerseSearchPageItem[];
+  /** A search has been run at least once (#287): when true, an
+   * empty, non-searching, error-free result set renders the
+   * no-results empty state instead of blank space. Optional —
+   * omitted means no search has run yet (the pre-search state),
+   * which renders no empty state. */
+  hasSearched?: boolean;
   /** Row action: add this verse to the app's memorize list. */
   onAddVerse: (verseId: string) => void;
 };
@@ -179,6 +194,7 @@ export function VerseSearchPage({
   usingDemo,
   errorMessage,
   results,
+  hasSearched,
   onAddVerse,
 }: VerseSearchPageProps) {
   return (
@@ -206,18 +222,22 @@ export function VerseSearchPage({
       </Row>
       {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
       {isSearching ? <Spinner label="Loading" /> : null}
-      <BoundedList
-        data={results}
-        keyExtractor={(verse) => verse.id}
-        renderItem={({ item }) => (
-          <VerseResultRow
-            item={item}
-            onAddPress={() => {
-              onAddVerse(item.id);
-            }}
-          />
-        )}
-      />
+      {hasSearched && !isSearching && !errorMessage && results.length === 0 ? (
+        <EmptyState title="No results" body="Try a different word or reference." announce />
+      ) : (
+        <BoundedList
+          data={results}
+          keyExtractor={(verse) => verse.id}
+          renderItem={({ item }) => (
+            <VerseResultRow
+              item={item}
+              onAddPress={() => {
+                onAddVerse(item.id);
+              }}
+            />
+          )}
+        />
+      )}
     </ScreenContainer>
   );
 }
