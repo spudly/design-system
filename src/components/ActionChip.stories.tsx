@@ -1,8 +1,10 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
 import { PrintIcon } from "../icons/PrintIcon.js";
 import { ShareIcon } from "../icons/ShareIcon.js";
 import { ActionChip } from "./ActionChip.js";
+import { Text } from "./Text.js";
 
 const meta: Meta<typeof ActionChip> = {
   title: "Components/ActionChip",
@@ -93,15 +95,26 @@ export const Sizes: Story = {
   ),
 };
 
+function DisabledPressCounterDemo() {
+  const [count, setCount] = useState(0);
+  const onPress = () => {
+    setCount((current) => current + 1);
+  };
+  return (
+    <YStack gap={8}>
+      <XStack gap={8} maxWidth={430}>
+        <ActionChip tone="success" disabled onPress={onPress}>
+          Mark perfected
+        </ActionChip>
+        <ActionChip tone="danger" disabled onPress={onPress}>
+          Abandon
+        </ActionChip>
+      </XStack>
+      <Text>Pressed {count} times</Text>
+    </YStack>
+  );
+}
+
 export const Disabled: Story = {
-  render: () => (
-    <XStack gap={8} maxWidth={430}>
-      <ActionChip tone="success" disabled onPress={noop}>
-        Mark perfected
-      </ActionChip>
-      <ActionChip tone="danger" disabled onPress={noop}>
-        Abandon
-      </ActionChip>
-    </XStack>
-  ),
+  render: () => <DisabledPressCounterDemo />,
 };

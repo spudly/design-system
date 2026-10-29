@@ -73,12 +73,20 @@ export function Thumbnail({ src, variant = "hero", accessibilityLabel }: Thumbna
   // A named image is exposed as an image with that name, routed
   // through the accessibility translator (Avatar's pattern, #235):
   // the RN `image` role and label become `role="img"` and
-  // `aria-label` on web instead of leaking as raw attributes. An
-  // unnamed image is decorative: `alt=""` (DiscoveryCard's
-  // treatment) keeps web screen readers from announcing it by
-  // filename; the prop is ignored on native.
+  // `aria-label` on web instead of leaking as raw attributes. The
+  // `accessible: true` flag rides along for native, where an
+  // image is not an accessibility element by default — without
+  // it the label would never be announced (the translator drops
+  // the flag on web, which needs no equivalent). An unnamed
+  // image is decorative: `alt=""` (DiscoveryCard's treatment)
+  // keeps web screen readers from announcing it by filename; the
+  // prop is ignored on native.
   const a11yProps = accessibilityLabel
-    ? platformAccessibilityProps({ accessibilityRole: "image", accessibilityLabel })
+    ? platformAccessibilityProps({
+        accessible: true,
+        accessibilityRole: "image",
+        accessibilityLabel,
+      })
     : { alt: "" };
   if (variant === "banner") {
     return <StyledBannerImage src={src} {...a11yProps} />;

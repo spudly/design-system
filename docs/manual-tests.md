@@ -490,7 +490,8 @@ Sizes, Disabled.
    recipe" and "Share recipe".
 4. Sizes: the sm row's chips are compact; the md row matches
    the standard button's height and label size.
-5. Disabled: both chips are dimmed and do not press.
+5. Disabled: both chips are dimmed and do not press — the
+   "Pressed N times" counter under them stays at 0.
 
 **Run when:** `src/components/ActionChip.tsx`, its stories,
 the recipe pages' action rows, or a changeset naming ActionChip.
