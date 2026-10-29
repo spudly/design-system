@@ -263,6 +263,13 @@ test("SSR: the thumb renders slider semantics with the label as its name", async
   );
 });
 
+test("the thumb is marked accessible so iOS exposes it to VoiceOver", () => {
+  // Without accessible=true the native thumb is not an accessibility
+  // element on iOS and VoiceOver can skip it — and its adjust actions.
+  // The translator forwards the flag on native and strips it on web.
+  assert.match(slider, /accessible: true/);
+});
+
 test("on native the error text rides in the accessible name", () => {
   // The composition lives in the component source (SSR renders the web
   // platform only): "<name>: <error>" when both exist, the error alone

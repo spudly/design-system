@@ -208,6 +208,11 @@ export function Slider({
             index={0}
             id={id}
             {...platformAccessibilityProps({
+              // iOS only treats the thumb as an accessibility element when
+              // it is marked accessible — without this VoiceOver can skip
+              // the thumb and its adjust actions entirely. The translator
+              // strips the flag on web.
+              accessible: true,
               accessibilityLabel: isWeb ? accessibleName : nativeAccessibleName,
             })}
             {...nativeAdjustProps}
