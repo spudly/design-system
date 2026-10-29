@@ -68,7 +68,10 @@ test("CardRow keeps the elevated card and the div-button pressable pattern", () 
   assert.match(cardRowCode, /tabIndex=\{0\}/);
   assert.match(cardRowCode, /cursor="web:pointer"/);
   assert.match(cardRowCode, /event\.key === "Enter" \|\| event\.key === " "/);
-  assert.match(cardRowCode, /<YStack paddingBlockEnd="\$3">/);
+  // The row carries no spacing outside its card: separation between
+  // rows is the composing stack's gap (CardStack's 8px rhythm),
+  // never the row's own padding.
+  assert.doesNotMatch(cardRowCode, /paddingBlockEnd/);
 });
 
 test("CardRow's title takes the md semibold treatment and the subtitle the hint variant", () => {

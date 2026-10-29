@@ -32,7 +32,9 @@ export type CardRowProps = {
  * pressable area, and the action's treatment so pages compose
  * rows without styling them (#119); all content — title, meta
  * line, action label — is caller-supplied, so the row serves any
- * app's lists.
+ * app's lists. The row carries no spacing outside its card:
+ * separation between rows is the composing stack's (CardStack's
+ * gap), never the row's own padding.
  *
  * The pressable text block is a Tamagui view, not a React Native
  * Pressable/TouchableOpacity: those map accessibilityRole="button"
@@ -62,44 +64,42 @@ export function CardRow({
     }
   };
   return (
-    <YStack paddingBlockEnd="$3">
-      <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
-        <YStack
-          flex={1}
-          minWidth={0}
-          gap="$1"
-          {...platformAccessibilityProps({ accessibilityRole: "button" })}
-          onPress={onPress}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          cursor="web:pointer"
+    <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
+      <YStack
+        flex={1}
+        minWidth={0}
+        gap="$1"
+        {...platformAccessibilityProps({ accessibilityRole: "button" })}
+        onPress={onPress}
+        tabIndex={0}
+        onKeyDown={handleKeyDown}
+        cursor="web:pointer"
+      >
+        <Text
+          fontSize={tokens.typography.fontSize.md}
+          fontWeight={tokens.typography.fontWeight.semibold}
         >
-          <Text
-            fontSize={tokens.typography.fontSize.md}
-            fontWeight={tokens.typography.fontWeight.semibold}
+          {title}
+        </Text>
+        {subtitle ? <Text variant="hint">{subtitle}</Text> : null}
+      </YStack>
+      {onActionPress && actionLabel ? (
+        <XStack paddingInlineStart="$3" alignItems="center">
+          <Button
+            variant="secondary"
+            size="sm"
+            {...(actionTone === "danger"
+              ? {
+                  backgroundColor: tokens.colors.danger.danger1,
+                  color: tokens.colors.danger.danger8,
+                }
+              : {})}
+            onPress={onActionPress}
           >
-            {title}
-          </Text>
-          {subtitle ? <Text variant="hint">{subtitle}</Text> : null}
-        </YStack>
-        {onActionPress && actionLabel ? (
-          <XStack paddingInlineStart="$3" alignItems="center">
-            <Button
-              variant="secondary"
-              size="sm"
-              {...(actionTone === "danger"
-                ? {
-                    backgroundColor: tokens.colors.danger.danger1,
-                    color: tokens.colors.danger.danger8,
-                  }
-                : {})}
-              onPress={onActionPress}
-            >
-              {actionLabel}
-            </Button>
-          </XStack>
-        ) : null}
-      </Card>
-    </YStack>
+            {actionLabel}
+          </Button>
+        </XStack>
+      ) : null}
+    </Card>
   );
 }
