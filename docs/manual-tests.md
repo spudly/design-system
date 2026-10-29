@@ -493,8 +493,11 @@ Empty, Loading, NoGoals, NutritionUnavailable.
    by side with a 12px gap, then the Entries card with
    kind-prefixed entry rows as one continuous ruled list.
 4. MealPlanDetailPage Loading shows only the centered loading
-   gate; NoGoals hides the goals card entirely; NutritionUnavailable
-   shows the goals card with the set-goals hint and link.
+   gate; NoGoals (a nutrition summary is present but no goals
+   are set) shows the goals card with the plan total, the
+   set-goals hint, and the "Set nutrition goals" link;
+   NutritionUnavailable forces the same card via the visibility
+   control when no summary exists.
 
 **Run when:** `src/pages/MealPlansPage.tsx`,
 `src/pages/MealPlanDetailPage.tsx`, their stories, or a changeset
