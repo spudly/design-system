@@ -17,11 +17,13 @@ export {
 } from "./CheckboxSelectList.js";
 export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
+export { Column, type ColumnProps } from "./Column.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField.js";
 export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { RatingForm, type RatingFormProps, type RatingFormValues } from "./RatingForm.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
+export { DetailRow, type DetailRowProps } from "./DetailRow.js";
 export { Divider, type DividerProps } from "./Divider.js";
 export {
   Dropdown,
@@ -46,6 +48,9 @@ export {
   type MasonryGridProps,
 } from "./MasonryGrid.js";
 export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
+export { LoadingGate, type LoadingGateProps } from "./LoadingGate.js";
+export { MealPlanEntryRow, type MealPlanEntryRowProps } from "./MealPlanEntryRow.js";
+export { MealPlanRow, type MealPlanRowProps } from "./MealPlanRow.js";
 export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";

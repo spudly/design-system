@@ -298,11 +298,135 @@ Open in `Components/Row`: Actions, Centered, SpaceBefore.
    vertically centered on each other.
 3. SpaceBefore: the action row renders 8px below the verse text,
    with the same 8px gap between its buttons.
+4. The spacing steps are the layout scale shared with Column:
+   `spacing` / `spaceBefore` / `spaceAfter` accept
+   none/sm/md/lg/xl/2xl = 0/8/12/16/24/32px — set the controls in
+   turn and confirm each step widens/narrows the gap or the space
+   around the row by the matching amount, and that `wrap` lets the
+   buttons flow onto a second line at a narrow width instead of
+   overflowing (MealPlanDetailPage's action row is the live case).
 
 **Run when:** `src/components/Row.tsx`, its stories,
 `src/components/SearchField.tsx` (the `grow` prop), the pages that
-compose Row (VerseSearchPage, MemorizeReviewPage, MyVersesPage),
-or a changeset naming Row.
+compose Row (VerseSearchPage, MemorizeReviewPage, MyVersesPage,
+MealPlanDetailPage), or a changeset naming Row.
+
+---
+
+## Column
+
+Open in `Components/Column`: Stacked, Centered, SpaceAfter.
+
+1. Stacked: the two buttons stack vertically with an even 8px gap,
+   left-aligned at their natural widths.
+2. Centered: the hint text and the small button are horizontally
+   centered in the column.
+3. SpaceAfter: the title block sits one lg step (16px) above the
+   following paragraph.
+4. The spacing steps are the layout scale shared with Row:
+   `spacing` / `spaceBefore` / `spaceAfter` accept
+   none/sm/md/lg/xl/2xl = 0/8/12/16/24/32px — set the controls in
+   turn and confirm each step changes the gap or the space around
+   the column by the matching amount.
+
+**Run when:** `src/components/Column.tsx`, its stories, the pages
+that compose Column (MealPlansPage, MealPlanDetailPage), or a
+changeset naming Column.
+
+---
+
+## DetailRow
+
+Open in `Components/DetailRow`: Default, Stacked.
+
+1. Default: the muted label sits on the left edge and the value on
+   the right edge of the same line, over a light hairline.
+2. Stacked: three rows share the same hairline rhythm — labels
+   aligned left, values aligned right, even vertical padding on
+   every row.
+
+**Run when:** `src/components/DetailRow.tsx`, its stories,
+MealPlanDetailPage (the nutrition-goal rows), or a changeset
+naming DetailRow.
+
+---
+
+## LoadingGate
+
+Open in `Components/LoadingGate`: Default.
+
+1. The spinner sits centered — horizontally and vertically — on a
+   plain surface background that fills the story canvas, with its
+   accessible label naming what is loading ("Loading meal plan").
+2. MealPlanDetailPage's Loading story shows the identical gate.
+
+**Run when:** `src/components/LoadingGate.tsx`, its stories,
+MealPlanDetailPage's loading state, or a changeset naming
+LoadingGate.
+
+---
+
+## MealPlanEntryRow
+
+Open in `Components/MealPlanEntryRow`: Meal, Recipe, Unavailable.
+
+1. Meal: the title line reads "Meal · Taco Tuesday" in medium
+   weight over the muted meta line, with a hairline under the row;
+   the row presses (pointer cursor on web, Enter/Space activate).
+2. Recipe: the title line reads "Recipe · Garlic cream chicken"
+   with no meta line.
+3. Unavailable: the title gains " (unavailable)"; the row does not
+   press, is not focusable, and is exposed as disabled.
+
+**Run when:** `src/components/MealPlanEntryRow.tsx`, its stories,
+MealPlanDetailPage's entries, or a changeset naming
+MealPlanEntryRow.
+
+---
+
+## MealPlanRow
+
+Open in `Components/MealPlanRow`: Default, WithDelete, TitleOnly.
+
+1. Default: an elevated card with the plan title in semibold over
+   its muted meta line; the text block presses (pointer cursor on
+   web, Enter/Space activate) and no Delete button shows.
+2. WithDelete: a small soft-red Delete button sits at the card's
+   right edge, vertically centered, and pressing it does not
+   trigger the row's press.
+3. TitleOnly: the card shows the title alone, no meta line and no
+   empty gap where it would sit.
+
+**Run when:** `src/components/MealPlanRow.tsx`, its stories,
+MealPlansPage's list, or a changeset naming MealPlanRow.
+
+---
+
+## MealPlansPage & MealPlanDetailPage
+
+Open in `Pages/Eciperay/MealPlansPage`: Default, Empty, Loading,
+NoActions. Open in `Pages/Eciperay/MealPlanDetailPage`: Default,
+Empty, Loading, NoGoals, NutritionUnavailable.
+
+1. MealPlansPage Default: the "Meal plans" heading, the full-width
+   "New meal plan" button under it, then the plan cards — each
+   title over its meta line with 12px of space under each card;
+   NoActions drops the create button and the row Delete buttons.
+2. MealPlansPage Loading: the spinner sits centered horizontally,
+   32px below the create button; Empty shows "No meal plans yet."
+3. MealPlanDetailPage Default: the plan title (xl bold, heading
+   level 1) with its muted meta lines 16px apart, the Nutrition
+   goals card (plan total, then label/value rows over hairlines),
+   the Shopping list / Edit buttons side by side with a 12px gap
+   and 24px of space under the row, then the Entries card with
+   kind-prefixed entry rows.
+4. MealPlanDetailPage Loading shows only the centered loading
+   gate; NoGoals hides the goals card entirely; NutritionUnavailable
+   shows the goals card with the set-goals hint and link.
+
+**Run when:** `src/pages/MealPlansPage.tsx`,
+`src/pages/MealPlanDetailPage.tsx`, their stories, or a changeset
+naming either page.
 
 ---
 
@@ -620,11 +744,14 @@ Open in `Components/Text`: AllVariants (or any page story, e.g.
    rendered DOM / Storybook accessibility panel it carries
    `role="heading"` and `aria-level="1"`, and there is no
    `accessibilityrole` attribute.
-2. The `subheading` variant carries `role="heading"` with
+2. The `title` variant ("Title" in AllVariants) is the compact
+   page title — xl bold — and is also exposed as a heading at
+   level 1 (MealPlanDetailPage's plan title renders through it).
+3. The `subheading` variant carries `role="heading"` with
    `aria-level="2"`.
-3. The `body`, `hint`, `error`, and `verse` variants carry no
+4. The `body`, `hint`, `error`, and `verse` variants carry no
    heading role and no `aria-level`.
-4. Visually nothing changes: heading/subheading keep their sizes
+5. Visually nothing changes: heading/subheading keep their sizes
    and weights, and all variants keep their theme fonts.
 
 **Run when:** `src/components/Text.tsx`, its stories, the

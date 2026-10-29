@@ -29,6 +29,12 @@
  * 6. The component is exported from the pages subpath index, and
  *    stories exercise the Default, Empty, Loading, and
  *    no-actions states so Chromatic captures them.
+ * 7. The page carries no styling of its own (#119, tranche 2):
+ *    the plan row is the MealPlanRow widget (its card layout,
+ *    pressable area, and Delete treatment live there — pinned in
+ *    test/mealPlanRow.test.mjs), the list stacks in a Column, the
+ *    loading block centers its spinner in a Column, and the page
+ *    renders no layout primitives and sets no styling props.
  *
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
@@ -96,13 +102,13 @@ test("the view-model and callback contract matches the declared props", () => {
 test("optional actions render only when their callbacks are provided", () => {
   assert.match(
     code,
-    /\{onCreatePlan \? \(/,
+    /\{onCreatePlan \? <Button onPress=\{onCreatePlan\}>/,
     "the create button must be guarded by the onCreatePlan prop",
   );
   assert.match(
     code,
-    /\{onDeletePress \? \(/,
-    "the row Delete button must be guarded by the row's delete wiring",
+    /<MealPlanRow/,
+    "rows must render through the MealPlanRow widget, whose Delete renders only when its delete callback is wired (pinned in test/mealPlanRow.test.mjs)",
   );
   assert.match(
     code,
@@ -153,4 +159,33 @@ test("stories exercise the default, empty, loading, and no-actions states", () =
       `MealPlansPage.stories.tsx must export a ${name} story`,
     );
   }
+});
+
+test("the page carries no styling of its own (#119)", () => {
+  for (const banned of [
+    "XStack",
+    "YStack",
+    "style={",
+    "className",
+    "fontSize=",
+    "fontWeight=",
+    "color=",
+    "backgroundColor=",
+    "marginBottom",
+    "paddingBottom",
+    "paddingBlockEnd",
+    "alignSelf",
+    "cursor=",
+  ]) {
+    assert.ok(
+      !code.includes(banned),
+      `MealPlansPage must not contain "${banned}" — layout and text treatments live in MealPlanRow / Column / Text since the #119 tranche-2 fix`,
+    );
+  }
+  assert.match(code, /<Column spacing="sm">/, "the plan list must stack in a Column");
+  assert.match(
+    code,
+    /<Column spaceBefore="2xl" align="center">/,
+    "the loading block must center its spinner in a Column",
+  );
 });

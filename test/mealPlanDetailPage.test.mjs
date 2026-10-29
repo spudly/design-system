@@ -41,6 +41,15 @@
  *    and stories exercise the Default, Empty, Loading, NoGoals,
  *    and NutritionUnavailable (#78) states so Chromatic
  *    captures them.
+ * 8. The page carries no styling of its own (#119, tranche 2):
+ *    the loading state is the LoadingGate component, the entry
+ *    rows are MealPlanEntryRow widgets (their pressable area,
+ *    hairline, and disabled treatment live there — pinned in
+ *    test/mealPlanEntryRow.test.mjs), the goal rows are DetailRow
+ *    widgets, the plan title takes Text's `title` variant, the
+ *    meta lines take its `hint` variant, and the section spacing
+ *    rides Column/Row scale steps. The page keeps only the kind
+ *    dispatch in its entry onPress closure.
  *
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
@@ -79,8 +88,8 @@ test("the props are a loading | ready union, with no not-found member", () => {
   );
   assert.match(
     code,
-    /<Spinner label="Loading meal plan" \/>/,
-    "the loading state must render only the spinner shell",
+    /<LoadingGate label="Loading meal plan" \/>/,
+    "the loading state must render only the LoadingGate shell (the gate's spinner is pinned in test/loadingGate.test.mjs)",
   );
   assert.doesNotMatch(
     code,
@@ -143,18 +152,19 @@ test("entry presses report the target id, by kind", () => {
   );
 });
 
-test("an unavailable recipe entry shows its suffix and does not press", () => {
-  assert.match(code, /" \(unavailable\)"/, "the access-lost suffix must render on the title line");
+test("entries render through MealPlanEntryRow, with availability passed only for recipes", () => {
   assert.match(
     code,
-    /accessibilityState: \{ disabled: true \}/,
-    "the unavailable row must be marked disabled",
+    /<MealPlanEntryRow/,
+    "entry rows must render through the MealPlanEntryRow widget — its suffix, disabled state, and press wiring are pinned in test/mealPlanEntryRow.test.mjs",
   );
   assert.match(
     code,
-    /isUnavailable\s*\?\s*platformAccessibilityProps\(\{\s*accessibilityState/,
-    "the unavailable branch must carry no press wiring — the press props live in the other branch (and its disabled state goes through the platform translator, #237)",
+    /entry\.kind === "recipe" && entry\.isUnavailable \? \{ isUnavailable: true \} : \{\}/,
+    "only a recipe entry can be unavailable — meal entries never carry the flag",
   );
+  assert.match(code, /kind=\{entry\.kind\}/, "the row must receive the entry's kind");
+  assert.match(code, /title=\{entry\.title\}/, "the row must receive the entry's title");
 });
 
 test("the goals section follows the app's visibility and hint rules", () => {
@@ -251,4 +261,42 @@ test("stories exercise the default, empty, loading, and no-goals states", () => 
       `MealPlanDetailPage.stories.tsx must export a ${name} story`,
     );
   }
+});
+
+test("the page carries no styling of its own (#119)", () => {
+  for (const banned of [
+    "XStack",
+    "YStack",
+    "style={",
+    "className",
+    "fontSize=",
+    "fontWeight=",
+    "color=",
+    "backgroundColor=",
+    "marginBottom",
+    "paddingBottom",
+    "paddingBlockEnd",
+    "paddingBlockStart",
+    "paddingVertical",
+    "borderBottom",
+    "flexWrap",
+    "cursor=",
+    "function GoalRow",
+    "<GoalRow",
+  ]) {
+    assert.ok(
+      !code.includes(banned),
+      `MealPlanDetailPage must not contain "${banned}" — layout and row treatments live in Column / Row / LoadingGate / MealPlanEntryRow / DetailRow since the #119 tranche-2 fix`,
+    );
+  }
+  assert.match(
+    code,
+    /<Text variant="title">\{title\}<\/Text>/,
+    "the plan title must take the title variant",
+  );
+  assert.match(
+    code,
+    /<Row spacing="md" spaceAfter="xl" wrap>/,
+    "the action row must compose through Row with its wrap and spacing steps",
+  );
 });

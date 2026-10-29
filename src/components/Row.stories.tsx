@@ -9,9 +9,10 @@ const meta: Meta<typeof Row> = {
   title: "Components/Row",
   component: Row,
   argTypes: {
-    spacing: { control: "select", options: ["none", "sm", "md"] },
+    spacing: { control: "select", options: ["none", "sm", "md", "lg", "xl", "2xl"] },
     align: { control: "select", options: ["start", "center", "end", "stretch"] },
-    spaceBefore: { control: "select", options: ["none", "sm", "md"] },
+    spaceBefore: { control: "select", options: ["none", "sm", "md", "lg", "xl", "2xl"] },
+    spaceAfter: { control: "select", options: ["none", "sm", "md", "lg", "xl", "2xl"] },
   },
 };
 

@@ -122,6 +122,14 @@ test("SSR: heading and subheading Text render heading semantics (#256)", async (
   assert.ok(subheading.includes('role="heading"'));
   assert.ok(subheading.includes('aria-level="2"'));
   assertNoLeak(subheading);
+  // The title variant (#119 tranche 2) is a level-1 heading too:
+  // MealPlanDetailPage's plan title renders through it.
+  const title = await renderToHtml(
+    React.createElement(Text, { variant: "title" }, "Weeknight favorites"),
+  );
+  assert.ok(title.includes('role="heading"'), `expected role=heading in: ${title.slice(0, 400)}`);
+  assert.ok(title.includes('aria-level="1"'), `expected aria-level=1 in: ${title.slice(0, 400)}`);
+  assertNoLeak(title);
 });
 
 test("SSR: both role props — a rendered button keeps no aria-level (#256)", async () => {

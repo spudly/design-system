@@ -1,10 +1,11 @@
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
+import { Column } from "../components/Column.js";
+import { DetailRow } from "../components/DetailRow.js";
+import { LoadingGate } from "../components/LoadingGate.js";
+import { MealPlanEntryRow } from "../components/MealPlanEntryRow.js";
+import { Row } from "../components/Row.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
-import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextLink } from "../components/TextLink.js";
 
@@ -102,6 +103,13 @@ import { TextLink } from "../components/TextLink.js";
  * even where the app screen they port is light-only today.
  *
  * No lineHeight is set anywhere in this file (the #162 rule).
+ *
+ * De-styled for #119: the page renders no layout primitives and
+ * sets no styling props. The loading state is the LoadingGate
+ * component, the entry rows are MealPlanEntryRow widgets, the
+ * goal rows are DetailRow widgets, the plan title takes Text's
+ * `title` variant, the meta lines take its `hint` variant, and
+ * the section spacing rides Column/Row scale steps.
  */
 
 /** One entry row's view-model. The app formats `subtitle` (its
@@ -188,78 +196,6 @@ export type MealPlanDetailPageReadyProps = {
 
 export type MealPlanDetailPageProps = { state: "loading" } | MealPlanDetailPageReadyProps;
 
-function GoalRow({ label, valueLabel }: MealPlanDetailPageGoalRow) {
-  return (
-    <XStack
-      justifyContent="space-between"
-      borderBottomWidth={1}
-      borderBottomColor={tokens.colors.gray.gray2}
-      paddingVertical="$2"
-    >
-      <Text fontSize={tokens.typography.fontSize.sm} color="$textMuted">
-        {label}
-      </Text>
-      <Text fontSize={tokens.typography.fontSize.sm}>{valueLabel}</Text>
-    </XStack>
-  );
-}
-
-function EntryRow({
-  entry,
-  onMealPress,
-  onRecipePress,
-}: {
-  entry: MealPlanDetailPageEntry;
-  onMealPress: (mealId: string) => void;
-  onRecipePress: (recipeId: string) => void;
-}) {
-  const isUnavailable = entry.isUnavailable ?? false;
-  const handlePress = () => {
-    if (entry.kind === "meal") {
-      onMealPress(entry.targetId);
-    } else {
-      onRecipePress(entry.targetId);
-    }
-  };
-  // Web keyboard support (the MealPlansPage row pattern): a view
-  // carrying the button role is made focusable and the button
-  // activation keys — Enter and Space — invoke the same callback
-  // as a press. Web-only props, ignored on native. An unavailable
-  // row is not a button at all: no press, no focus, marked
-  // disabled — the app's disabled Pressable.
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      handlePress();
-    }
-  };
-  return (
-    <YStack borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2}>
-      <YStack
-        paddingVertical="$3"
-        {...(isUnavailable
-          ? platformAccessibilityProps({ accessibilityState: { disabled: true } })
-          : {
-              ...platformAccessibilityProps({ accessibilityRole: "button" }),
-              onPress: handlePress,
-              tabIndex: 0,
-              onKeyDown: handleKeyDown,
-              cursor: "web:pointer",
-            })}
-      >
-        <Text
-          fontSize={tokens.typography.fontSize.md}
-          fontWeight={tokens.typography.fontWeight.medium}
-        >
-          {entry.kind === "meal" ? "Meal" : "Recipe"} · {entry.title}
-          {isUnavailable ? " (unavailable)" : ""}
-        </Text>
-        {entry.subtitle ? <Text variant="hint">{entry.subtitle}</Text> : null}
-      </YStack>
-    </YStack>
-  );
-}
-
 /**
  * Full-page meal plan detail view: plan meta, the nutrition
  * goals section, the shopping-list/edit actions, and the flat
@@ -268,11 +204,7 @@ function EntryRow({
  */
 export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   if (props.state === "loading") {
-    return (
-      <YStack flex={1} backgroundColor="$surface" alignItems="center" justifyContent="center">
-        <Spinner label="Loading meal plan" />
-      </YStack>
-    );
+    return <LoadingGate label="Loading meal plan" />;
   }
 
   const {
@@ -303,76 +235,68 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
 
   return (
     <ScreenContainer>
-      <YStack paddingBlockEnd="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          {title}
-        </Text>
-      </YStack>
+      <Column spaceAfter="lg">
+        <Text variant="title">{title}</Text>
+      </Column>
       {notes ? (
-        <YStack paddingBlockEnd="$4">
-          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-            {notes}
-          </Text>
-        </YStack>
+        <Column spaceAfter="lg">
+          <Text variant="hint">{notes}</Text>
+        </Column>
       ) : null}
       {dateRangeLabel ? (
-        <YStack paddingBlockEnd="$4">
-          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-            {dateRangeLabel}
-          </Text>
-        </YStack>
+        <Column spaceAfter="lg">
+          <Text variant="hint">{dateRangeLabel}</Text>
+        </Column>
       ) : null}
       {nutritionLabel ? (
-        <YStack paddingBlockEnd="$4">
-          <Text fontSize={tokens.typography.fontSize.sm} color="$textMuted">
-            {nutritionLabel}
-          </Text>
-        </YStack>
+        <Column spaceAfter="lg">
+          <Text variant="hint">{nutritionLabel}</Text>
+        </Column>
       ) : null}
       {showGoals ? (
-        <YStack paddingBottom="$8">
+        <Column spaceAfter="2xl">
           <SectionCard title="Nutrition goals">
             {nutritionLabel ? (
-              <YStack paddingBlockEnd="$3">
-                <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-                  Plan total: {nutritionLabel}
-                </Text>
-              </YStack>
+              <Column spaceAfter="md">
+                <Text variant="hint">Plan total: {nutritionLabel}</Text>
+              </Column>
             ) : null}
             {nutritionGoals ? (
               nutritionGoals.rows.map((row) => (
-                <GoalRow key={row.label} label={row.label} valueLabel={row.valueLabel} />
+                <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
               ))
             ) : (
-              <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-                Set daily nutrition goals to compare this plan.
-              </Text>
+              <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
             )}
             {onSetGoalsPress ? (
-              <YStack paddingBlockStart="$3">
+              <Column spaceBefore="md">
                 <TextLink onPress={onSetGoalsPress}>Set nutrition goals</TextLink>
-              </YStack>
+              </Column>
             ) : null}
           </SectionCard>
-        </YStack>
+        </Column>
       ) : null}
-      <XStack paddingBlockEnd="$6" flexWrap="wrap" gap="$3">
+      <Row spacing="md" spaceAfter="xl" wrap>
         <Button onPress={onShoppingListPress}>Shopping list</Button>
         <Button variant="secondary" onPress={onEditPress}>
           Edit
         </Button>
-      </XStack>
+      </Row>
       <SectionCard title="Entries">
         {entries.map((entry) => (
-          <EntryRow
+          <MealPlanEntryRow
             key={entry.id}
-            entry={entry}
-            onMealPress={onMealPress}
-            onRecipePress={onRecipePress}
+            kind={entry.kind}
+            title={entry.title}
+            {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
+            {...(entry.kind === "recipe" && entry.isUnavailable ? { isUnavailable: true } : {})}
+            onPress={() => {
+              if (entry.kind === "meal") {
+                onMealPress(entry.targetId);
+              } else {
+                onRecipePress(entry.targetId);
+              }
+            }}
           />
         ))}
       </SectionCard>

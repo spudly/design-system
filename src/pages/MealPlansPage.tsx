@@ -1,9 +1,7 @@
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
+import { Column } from "../components/Column.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { MealPlanRow } from "../components/MealPlanRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
@@ -71,6 +69,12 @@ import { Text } from "../components/Text.js";
  * that change adds a slot to this contract (the
  * `renderRecipeAccessory` precedent) rather than a callback that
  * pretends to render.
+ *
+ * De-styled for #119: the page renders no layout primitives and
+ * sets no styling props. The plan row is the MealPlanRow widget
+ * (its card layout, pressable area, and Delete treatment live
+ * there), the list stacks in a Column, and the loading block
+ * centers its spinner in a Column.
  */
 
 /** One meal plan row's view-model. The app formats `subtitle` (its
@@ -103,73 +107,6 @@ export type MealPlansPageProps = {
   titleLevel?: 1 | 2;
 };
 
-function MealPlanRow({
-  item,
-  onPress,
-  onDeletePress,
-}: {
-  item: MealPlansPageItem;
-  onPress: () => void;
-  onDeletePress?: () => void;
-}) {
-  // Web keyboard support (the TextLink pattern): a div carrying the
-  // button role is not keyboard-operable on its own, so it is made
-  // focusable and the button activation keys — Enter and Space —
-  // invoke the same callback as a press. `tabIndex` and `onKeyDown`
-  // are web-only props in Tamagui and are ignored on native, where
-  // onPress is the activation path.
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onPress();
-    }
-  };
-  return (
-    <YStack paddingBlockEnd="$3">
-      <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
-        {/* The pressable text block is a Tamagui view, not a React
-          Native Pressable/TouchableOpacity: those map
-          accessibilityRole="button" to a native <button> element on
-          web, whose UA styles center the row's text. A Tamagui
-          pressable renders a div carrying the role (the OptionCard
-          pattern) and keeps the layout. flex/minWidth are structural
-          only: the block expands and may shrink within the row. */}
-        <YStack
-          flex={1}
-          minWidth={0}
-          gap="$1"
-          {...platformAccessibilityProps({ accessibilityRole: "button" })}
-          onPress={onPress}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          cursor="web:pointer"
-        >
-          <Text
-            fontSize={tokens.typography.fontSize.md}
-            fontWeight={tokens.typography.fontWeight.semibold}
-          >
-            {item.title}
-          </Text>
-          {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
-        </YStack>
-        {onDeletePress ? (
-          <XStack paddingInlineStart="$3" alignItems="center">
-            <Button
-              variant="secondary"
-              size="sm"
-              backgroundColor={tokens.colors.danger.danger1}
-              color={tokens.colors.danger.danger8}
-              onPress={onDeletePress}
-            >
-              Delete
-            </Button>
-          </XStack>
-        ) : null}
-      </Card>
-    </YStack>
-  );
-}
-
 /**
  * Full-page Meal plans view: the heading, the create action, and
  * the plan list in a scrolling shell. Controlled — see the file
@@ -188,23 +125,20 @@ export function MealPlansPage({
       <Text variant="heading" aria-level={titleLevel}>
         Meal plans
       </Text>
-      {onCreatePlan ? (
-        <Button alignSelf="stretch" onPress={onCreatePlan}>
-          New meal plan
-        </Button>
-      ) : null}
+      {onCreatePlan ? <Button onPress={onCreatePlan}>New meal plan</Button> : null}
       {isLoading ? (
-        <YStack paddingBlockStart="$8" alignItems="center">
+        <Column spaceBefore="2xl" align="center">
           <Spinner label="Loading" />
-        </YStack>
+        </Column>
       ) : plans.length === 0 ? (
         <EmptyState title="No meal plans yet." />
       ) : (
-        <YStack gap="$2">
+        <Column spacing="sm">
           {plans.map((plan) => (
             <MealPlanRow
               key={plan.id}
-              item={plan}
+              title={plan.title}
+              {...(plan.subtitle ? { subtitle: plan.subtitle } : {})}
               onPress={() => {
                 onPlanPress(plan.id);
               }}
@@ -217,7 +151,7 @@ export function MealPlansPage({
                 : {})}
             />
           ))}
-        </YStack>
+        </Column>
       )}
     </ScreenContainer>
   );
