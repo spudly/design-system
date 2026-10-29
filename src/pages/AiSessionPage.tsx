@@ -304,27 +304,28 @@ export function AiSessionPage({
         </YStack>
       ) : null}
       {session.canCancel ? (
-        <YStack
-          paddingBottom={tokens.spacing[8]}
-          opacity={busy ? 0.5 : 1}
-          pointerEvents={busy ? "none" : "auto"}
-          onPress={handleCancel}
-          {...platformAccessibilityProps({
-            accessibilityRole: "button",
-            accessibilityLabel: "Cancel session",
-            accessibilityState: { disabled: busy },
-          })}
-          tabIndex={0}
-          onKeyDown={handleCancelKeyDown}
-          cursor="web:pointer"
-        >
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            color={tokens.colors.gray.gray6}
-            textDecorationLine="underline"
+        <YStack paddingBottom={tokens.spacing[8]}>
+          <YStack
+            opacity={busy ? 0.5 : 1}
+            pointerEvents={busy ? "none" : "auto"}
+            onPress={handleCancel}
+            {...platformAccessibilityProps({
+              accessibilityRole: "button",
+              accessibilityLabel: "Cancel session",
+              accessibilityState: { disabled: busy },
+            })}
+            tabIndex={0}
+            onKeyDown={handleCancelKeyDown}
+            cursor="web:pointer"
           >
-            Cancel session
-          </Text>
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              color={tokens.colors.gray.gray6}
+              textDecorationLine="underline"
+            >
+              Cancel session
+            </Text>
+          </YStack>
         </YStack>
       ) : null}
     </ScrollView>

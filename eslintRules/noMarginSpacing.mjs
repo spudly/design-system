@@ -19,13 +19,18 @@
  *   styleProps.mjs), so it tracks Tamagui rather than being
  *   hand-curated. A `$`-token value (`marginTop="$4"`) is the same
  *   prop and is reported the same way.
- * - Any margin key inside a style object carried by an attribute:
- *   the `style` prop's object, a media/variant object
- *   (`$gtSm={{ ... }}`), a pseudo-style object (`hoverStyle`,
- *   `pressStyle`, ...), or a spread whose visible keys include one
- *   (`{...(cond ? { marginTop: ... } : {})}`). Objects the rule
- *   cannot see into (opaque spreads, variables) are not inspected —
- *   the same sight limit the no-page-styling rule documents.
+ * - Any margin key inside a style object carried by a
+ *   style-bearing attribute: the `style` prop's object, a
+ *   media/variant object (`$gtSm={{ ... }}`), a pseudo-style
+ *   object (`hoverStyle`, `pressStyle`, ...), or a spread whose
+ *   visible keys include one — whether the spread is the
+ *   attribute itself (`{...(cond ? { marginTop: ... } : {})}`)
+ *   or nested inside the object (`style={{ ...{ marginTop: 8 } }}`).
+ *   Objects the rule cannot see into (opaque spreads, variables)
+ *   are not inspected — the same sight limit the no-page-styling
+ *   rule documents. An inline object on a NON-style attribute
+ *   (e.g. `options={{ ... }}`) is data, not styling, and is
+ *   likewise not inspected.
  *
  * Deliberately NOT reported:
  *
@@ -66,6 +71,14 @@ function isMarginKey(key) {
 
 function checkObjectKeys(context, node) {
   for (const property of node.properties) {
+    if (property.type === "SpreadElement") {
+      // A spread inside the object whose argument is visibly an
+      // object (or a conditional/logical over objects) carries
+      // keys the same way the object's own keys do — look inside
+      // it. Opaque spreads (identifiers, calls) stay out of sight.
+      checkStyleObject(context, property.argument);
+      continue;
+    }
     if (property.type !== "Property") continue;
     const key = property.key.name ?? property.key.value;
     if (isMarginKey(key)) {
@@ -98,6 +111,15 @@ function checkStyleObject(context, node) {
   }
 }
 
+function isStyleBearingAttribute(name) {
+  // Only style-bearing attributes can style the element: the
+  // `style` prop, a `$`-prefixed media/variant object, or the
+  // `*Style` family (hoverStyle, pressStyle, contentContainerStyle,
+  // ...). An inline object on any other attribute is data, not
+  // styling, so its keys are not the rule's business.
+  return name === "style" || name.startsWith("$") || name.endsWith("Style");
+}
+
 function checkAttribute(context, attribute) {
   if (attribute.type === "JSXSpreadAttribute") {
     checkStyleObject(context, attribute.argument);
@@ -108,11 +130,11 @@ function checkAttribute(context, attribute) {
     context.report({ node: attribute, messageId: "marginProp", data: { name } });
     return;
   }
-  // Any attribute whose value is an inline object — the `style`
-  // prop, a `$`-media/variant object, a pseudo-style object —
-  // can carry margin keys; check the keys it visibly holds.
+  // A style-bearing attribute whose value is an inline object —
+  // the `style` prop, a `$`-media/variant object, a pseudo-style
+  // object — can carry margin keys; check the keys it visibly holds.
   const value = attribute.value;
-  if (value?.type === "JSXExpressionContainer") {
+  if (isStyleBearingAttribute(name) && value?.type === "JSXExpressionContainer") {
     checkStyleObject(context, value.expression);
   }
 }

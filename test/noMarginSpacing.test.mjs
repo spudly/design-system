@@ -117,6 +117,21 @@ test("margin keys in spread objects are banned; unseen objects are out of sight"
   assert.deepEqual(messageIds(`<View style={sharedStyle} />`), []);
 });
 
+test("margin keys inside objects spread into a style object are banned", () => {
+  assert.deepEqual(messageIds(`<View style={{ ...{ marginTop: 8 } }} />`), ["marginKey"]);
+  assert.deepEqual(messageIds(`<View style={{ ...(cond ? { marginTop: 8 } : {}) }} />`), [
+    "marginKey",
+  ]);
+  assert.deepEqual(messageIds(`<View $gtSm={{ ...{ marginBlockEnd: 4 } }} />`), ["marginKey"]);
+  assert.deepEqual(messageIds(`<View style={{ ...sharedStyle }} />`), []);
+});
+
+test("inline objects on non-style attributes are data, not styling", () => {
+  assert.deepEqual(messageIds(`<Widget options={{ marginTop: 8 }} />`), []);
+  assert.deepEqual(messageIds(`<Widget data={{ margin: 4 }} />`), []);
+  assert.deepEqual(messageIds(`<View contentContainerStyle={{ marginTop: 8 }} />`), ["marginKey"]);
+});
+
 test("gap, padding and positioning offsets are untouched", () => {
   assert.deepEqual(messageIds(`<YStack gap="$3" padding="$4" />`), []);
   assert.deepEqual(messageIds(`<YStack paddingBlockEnd="$3" />`), []);
