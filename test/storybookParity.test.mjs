@@ -41,6 +41,13 @@
  *   not part of the @spudly/ui/pages surface. It is exercised through
  *   every page story. If it is ever exported, this test fails and a
  *   story decision is required.
+ * - src/pages/BoundedList.tsx — internal page scaffolding (#119): the
+ *   shared bounded FlatList the fixed-shell list pages render. It
+ *   imports react-native, so it cannot be a root-exported component;
+ *   NOT exported from src/pages/index.ts, exercised through the
+ *   pages that use it (VerseSearchPage, MemorizeReviewPage,
+ *   MyVersesPage). Same rule as PageFrame: export means a story
+ *   decision is required.
  * - src/pages/fixtures.ts — static story fixtures, not a component.
  *
  * Source scan, like the other story contract tests
@@ -121,12 +128,16 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
   const dir = join(root, "src", "pages");
   const index = read("src/pages/index.ts");
   // Internal files with no story of their own (see header): PageFrame
-  // is scaffolding exercised through the page stories; fixtures.ts is
-  // data. Neither is exported from src/pages/index.ts.
-  const exceptions = new Set(["PageFrame.tsx", "fixtures.ts", "index.ts"]);
+  // and BoundedList are scaffolding exercised through the page stories;
+  // fixtures.ts is data. None is exported from src/pages/index.ts.
+  const exceptions = new Set(["PageFrame.tsx", "BoundedList.tsx", "fixtures.ts", "index.ts"]);
   assert.ok(
     !index.includes('from "./PageFrame.js"'),
     "PageFrame is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
+  );
+  assert.ok(
+    !index.includes('from "./BoundedList.js"'),
+    "BoundedList is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
   );
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(

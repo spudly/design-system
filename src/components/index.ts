@@ -21,6 +21,7 @@ export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField
 export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { RatingForm, type RatingFormProps, type RatingFormValues } from "./RatingForm.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
+export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
 export { Divider, type DividerProps } from "./Divider.js";
 export {
   Dropdown,
@@ -54,6 +55,7 @@ export {
   type RadioOption,
   type RadioOptionGroupProps,
 } from "./RadioOptionGroup.js";
+export { Row, type RowProps } from "./Row.js";
 export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
 export { SearchField, type SearchFieldProps } from "./SearchField.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./SecretRevealPanel.js";

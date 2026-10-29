@@ -147,6 +147,11 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
   onChangeText: (text: string) => void;
   label?: string;
   id?: string;
+  /** Grow to fill the remaining width of a row the field sits in
+   * (an inline search row beside a button — #119): the field's root
+   * takes flex: 1 so the row's other children keep their natural
+   * width. Off by default; a standalone field sizes as before. */
+  grow?: boolean;
 };
 
 /**
@@ -163,13 +168,14 @@ export function SearchField({
   label,
   id: idProp,
   placeholder,
+  grow = false,
   ...rest
 }: SearchFieldProps) {
   const autoId = useId();
   const id = idProp ?? autoId;
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1 } : {})}>
       {label ? (
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
           {label}

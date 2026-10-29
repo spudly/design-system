@@ -1,10 +1,10 @@
-import { FlatList } from "react-native";
-import { XStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { Row } from "../components/Row.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
+import { BoundedList } from "./BoundedList.js";
 
 /**
  * MemorizeReviewPage (#49): Memorize's Review screen as a
@@ -57,13 +57,13 @@ import { Text } from "../components/Text.js";
  *   never renders a loading state of its own; an empty due
  *   list is the screen's real empty state, not a placeholder
  *   for one.
- * - The list is React Native's FlatList bounded with
- *   `flex: 1` inside the fixed shell — the app's own
- *   structure (its App renders a non-scrolling
- *   ScreenContainer; the screen's list is `flex: 1` inside
- *   it), which is the #188 geometry: a list that sizes to
- *   its content inside a non-scrolling shell overflows and
- *   never scrolls.
+ * - The list is the shared BoundedList bounded with `flex: 1`
+ *   inside the fixed shell — the app's own structure (its App
+ *   renders a non-scrolling ScreenContainer; the screen's list
+ *   is `flex: 1` inside it), which is the #188 geometry: a list
+ *   that sizes to its content inside a non-scrolling shell
+ *   overflows and never scrolls. BoundedList owns that bounding
+ *   (#119); this page renders no list styling of its own.
  *
  * No render slot, by audit: the app's rows render only DS
  * primitives (text, two buttons) over per-verse data — no
@@ -74,13 +74,6 @@ import { Text } from "../components/Text.js";
  * that change adds a slot then (the `renderRecipeAccessory`
  * precedent) rather than the slot existing speculatively now.
  */
-
-// The FlatList must be bounded to the space the fixed shell
-// leaves it (#188): the app screen's list carries `flex: 1`
-// inside App's non-scrolling ScreenContainer; without it the
-// list sizes to its full content height, overflows the shell,
-// and never gets a scrollable viewport of its own.
-const listStyle = { flex: 1 } as const;
 
 /** One due verse row's view-model: the verse only — due rows
  * carry no status badge or schedule detail in the app. */
@@ -113,17 +106,17 @@ function ReviewVerseRow({
   onForgotPress: () => void;
 }) {
   return (
-    <Card marginBottom="$2">
+    <Card>
       <Text variant="subheading">{verse.reference}</Text>
       <Text variant="verse">{verse.text}</Text>
-      <XStack gap="$2" marginTop="$2">
+      <Row spaceBefore="sm">
         <Button size="sm" onPress={onRememberedPress}>
           I remembered it
         </Button>
         <Button size="sm" variant="secondary" onPress={onForgotPress}>
           I forgot it
         </Button>
-      </XStack>
+      </Row>
     </Card>
   );
 }
@@ -148,8 +141,7 @@ export function MemorizeReviewPage({
       {verses.length === 0 ? (
         <EmptyState title="Nothing due" body="Nice work." />
       ) : (
-        <FlatList
-          style={listStyle}
+        <BoundedList
           data={verses}
           keyExtractor={(verse) => verse.id}
           renderItem={({ item }) => (
