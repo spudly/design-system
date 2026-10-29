@@ -56,18 +56,17 @@ const stories = readCode("src/pages/LandingPage.stories.tsx");
 const pagesIndex = readCode("src/pages/index.ts");
 const fixtures = readCode("src/pages/fixtures.ts");
 // The page's sections moved into shared components in the #119
-// de-styling tranche: the hero is Hero, the CTAs are CtaLinks in
-// a CtaRow, and the feature slots are FeatureCards in a CardGrid.
-// The scans below follow the code — the anchor, the web: row, the
-// heading variants pin against the components that render them —
-// while the contract pins (types, slots, section order, exports)
-// stay on the page.
+// de-styling tranche: the hero is Hero, the CTAs are Button href
+// links in a CtaRow, and the feature slots are FeatureCards in a
+// CardGrid. The scans below follow the code — the anchor, the
+// web: row, the heading variants pin against the components that
+// render them — while the contract pins (types, slots, section
+// order, exports) stay on the page.
 const hero = readCode("src/components/Hero.tsx");
-const ctaLink = readCode("src/components/CtaLink.tsx");
 const ctaRow = readCode("src/components/CtaRow.tsx");
 const featureCard = readCode("src/components/FeatureCard.tsx");
 const cardGrid = readCode("src/components/CardGrid.tsx");
-const landingUnit = [page, hero, ctaLink, ctaRow, featureCard, cardGrid].join("\n");
+const landingUnit = [page, hero, ctaRow, featureCard, cardGrid].join("\n");
 
 test("LandingPage source is readable and exports the page and its view-model types", () => {
   assert.ok(page.length > 1000, "expected the full LandingPage source");
@@ -114,28 +113,28 @@ test("the CTAs cross as {label, href} data — no CTA press callbacks", () => {
   }
 });
 
-test("the CTAs render through an anchor fed by the CTA's href", () => {
-  assert.match(
-    ctaLink,
-    /<Anchor\s+href=\{cta\.href\}/,
-    "the CTA link must render an Anchor with href={cta.href}",
-  );
-  // The three CTAs render in contract order: Discover (primary),
-  // Sign up (secondary), Get the app (secondary).
+test("the CTAs render through Button's href form fed by the CTA data", () => {
+  // Button's href form (ButtonLink) renders the real anchor —
+  // its anchor rendering is pinned by
+  // test/navigationLinks.test.mjs; here the page's wiring pins:
+  // each CTA crosses into a <Button href> with its emphasis.
+  // (A dedicated CtaLink duplicated this form and was deleted —
+  // Stephen's ruling on PR #311.)
   const order = ["discoverCta", "signUpCta", "getAppCta"].map((prop) =>
-    page.indexOf(`cta={${prop}}`),
+    page.indexOf(`${prop}.href`),
   );
   assert.ok(
     order.every((index) => index !== -1),
-    "all three CTAs must render through the helper",
+    "all three CTAs must render through Button's href form",
   );
   assert.ok(
     order[0] < order[1] && order[1] < order[2],
     "the CTAs must render in Discover / Sign up / Get-the-app order",
   );
-  assert.match(page, /cta=\{discoverCta\} variant="primary"/);
-  assert.match(page, /cta=\{signUpCta\} variant="secondary"/);
-  assert.match(page, /cta=\{getAppCta\} variant="secondary"/);
+  assert.match(page, /<Button href=\{discoverCta\.href\} variant="primary">/);
+  assert.match(page, /<Button href=\{signUpCta\.href\} variant="secondary">/);
+  assert.match(page, /<Button href=\{getAppCta\.href\} variant="secondary">/);
+  assert.ok(!page.includes("CtaLink"), "the page must not render the deleted CtaLink");
 });
 
 test("the CTA container stacks narrow and rows on web — no wrapping CTA row", () => {

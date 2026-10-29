@@ -1,4 +1,4 @@
-import { YStack } from "tamagui";
+import { Center } from "./Center.js";
 import { Spinner } from "./Spinner.js";
 
 export type ListLoadingStateProps = {
@@ -7,17 +7,18 @@ export type ListLoadingStateProps = {
 };
 
 /**
- * A list's loading state (#119): a centered spinner dropped below
- * the list's header by the state's own top padding — the offset
- * RecipesPage's catalog established for this slot, carried as
- * padding (the parent-side mechanism) rather than a margin.
- * Extracted from the catalog pages for the #119 page de-styling
- * program, so every catalog renders its first-load the same way.
+ * A list's loading state (#119): the spinner, centered by
+ * <Center> — the dedicated centering component — with no offset
+ * of its own (Stephen's ruling on PR #311: a top padding inside
+ * the leaf is a top-margin in disguise; parents own the spacing
+ * between their children). Extracted from the catalog pages for
+ * the #119 page de-styling program, so every catalog renders its
+ * first-load the same way.
  */
 export function ListLoadingState({ label }: ListLoadingStateProps) {
   return (
-    <YStack paddingBlockStart="$8" alignItems="center">
+    <Center>
       <Spinner label={label} />
-    </YStack>
+    </Center>
   );
 }

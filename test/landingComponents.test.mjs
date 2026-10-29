@@ -1,15 +1,16 @@
 /**
  * Contract test for the landing components
- * (spudly/design-system#171, extracted for #119): Hero, CtaLink,
- * CtaRow, FeatureCard, and CardGrid — the sections LandingPage
- * composes, extracted in the public-pages de-styling tranche so
- * the page passes content only.
+ * (spudly/design-system#171, extracted for #119): Hero, CtaRow,
+ * FeatureCard, and CardGrid — the sections LandingPage composes,
+ * extracted in the public-pages de-styling tranche so the page
+ * passes content only. (There is no CtaLink component: it
+ * duplicated Button's href form and was deleted on Stephen's
+ * ruling on PR #311 — the landing's CTAs are <Button href>.)
  *
  * The pins hold the #171 treatments where they now live: the
- * CTA anchor's two emphases, the row's stacked-narrow / row-on-
- * web geometry (never wrapping), the feature card's flex and
- * 260px wrap basis, the grid's wrap, and the hero's centered
- * heading + muted subtitle.
+ * row's stacked-narrow / row-on-web geometry (never wrapping),
+ * the feature card's flex and 260px wrap basis, the grid's
+ * wrap, and the hero's centered heading + muted subtitle.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -28,16 +29,20 @@ function readCode(name) {
 }
 
 const hero = readCode("Hero.tsx");
-const ctaLink = readCode("CtaLink.tsx");
 const ctaRow = readCode("CtaRow.tsx");
 const featureCard = readCode("FeatureCard.tsx");
 const cardGrid = readCode("CardGrid.tsx");
+const componentsBarrel = readCode("index.ts");
 
 test("the landing components are exported from the built package root", async () => {
   const dist = await import("../dist/index.js");
-  for (const name of ["Hero", "CtaLink", "CtaRow", "FeatureCard", "CardGrid"]) {
+  for (const name of ["Hero", "CtaRow", "FeatureCard", "CardGrid"]) {
     assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
   }
+  // CtaLink duplicated Button's href form and was deleted
+  // (Stephen's ruling, PR #311): it must not come back.
+  assert.equal(dist.CtaLink, undefined, "CtaLink must not be exported — use Button's href form");
+  assert.ok(!componentsBarrel.includes("CtaLink"), "the barrel must not export CtaLink");
 });
 
 test("Hero centers the heading and the muted subtitle", () => {
@@ -46,17 +51,6 @@ test("Hero centers the heading and the muted subtitle", () => {
   assert.match(hero, /paddingTop="\$6"/, "the hero owns its top breathing room");
   assert.match(hero, /title: string;/);
   assert.match(hero, /subtitle: string;/);
-});
-
-test("CtaLink is an anchor wearing the primary/secondary treatments", () => {
-  assert.match(ctaLink, /<Anchor\s+href=\{cta\.href\}/, "the CTA renders an Anchor with its href");
-  assert.match(ctaLink, /variant === "primary" \? "\$primary" : tokens\.colors\.gray\.gray3/);
-  assert.match(ctaLink, /variant === "primary" \? "\$onPrimary" : tokens\.colors\.gray\.gray10/);
-  assert.match(ctaLink, /fontWeight=\{tokens\.typography\.fontWeight\.semibold\}/);
-  assert.match(ctaLink, /textDecorationLine="none"/);
-  assert.match(ctaLink, /label: string;/, "the CTA crosses as data");
-  assert.match(ctaLink, /href: string;/, "the CTA crosses as data");
-  assert.ok(!ctaLink.includes("onPress"), "a CTA navigates — no press callback");
 });
 
 test("CtaRow stacks narrow and rows on web, never wrapping", () => {
@@ -96,18 +90,19 @@ async function renderToHtml(element) {
   return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
 }
 
-test("SSR: both CTA emphases render as real anchors with the link role", async () => {
-  const { React, CtaLink } = await loadRuntime();
-  for (const variant of ["primary", "secondary"]) {
-    const html = await renderToHtml(
-      React.createElement(CtaLink, {
-        cta: { label: "Get started", href: "/signup" },
-        variant,
-      }),
-    );
-    assert.ok(/<a [^>]*href="\/signup"/.test(html), `${variant} CTA is an anchor`);
-    assert.ok(html.includes('role="link"'), `${variant} CTA carries the link role`);
-    assert.ok(html.includes("Get started"), `${variant} CTA label renders`);
-    assert.ok(!/<button/.test(html), `${variant} CTA must not render as a button`);
-  }
+test("SSR: the CTA row renders its Button href forms as real anchors", async () => {
+  const { React, Button, CtaRow } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(
+      CtaRow,
+      null,
+      React.createElement(Button, { href: "/discover", variant: "primary" }, "Browse public recipes"),
+      React.createElement(Button, { href: "/signup", variant: "secondary" }, "Create account"),
+    ),
+  );
+  assert.ok(/<a [^>]*href="\/discover"/.test(html), "the primary CTA is an anchor");
+  assert.ok(/<a [^>]*href="\/signup"/.test(html), "the secondary CTA is an anchor");
+  assert.ok(html.includes("Browse public recipes"), "the primary CTA label renders");
+  assert.ok(html.includes("Create account"), "the secondary CTA label renders");
+  assert.ok(!/<button/.test(html), "href CTAs must not render as buttons");
 });

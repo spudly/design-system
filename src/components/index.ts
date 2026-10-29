@@ -108,12 +108,15 @@ export { VerseText, type VerseTextProps } from "./VerseText.js";
 export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
 export {
   CatalogFiltersBar,
-  type CatalogFilterId,
+  type CatalogFilterDefinition,
   type CatalogFiltersBarProps,
+  type CatalogRangeFilter,
+  type CatalogSelectFilter,
+  type CatalogSortFilter,
+  type CatalogTextFilter,
 } from "./CatalogFiltersBar.js";
 export { CatalogHeader, type CatalogHeaderProps } from "./CatalogHeader.js";
 export { CardGrid, type CardGridProps } from "./CardGrid.js";
-export { CtaLink, type CtaLinkProps, type CtaLinkTarget } from "./CtaLink.js";
 export { CtaRow, type CtaRowProps } from "./CtaRow.js";
 export {
   DocumentFooter,

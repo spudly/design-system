@@ -11,10 +11,17 @@
  * shape: exports, the header geometry, and the list states'
  * treatments.)
  *
- * The list states carry their header offset as padding, never a
- * margin: inter-item spacing belongs to the parent (the
- * no-margin-spacing direction, #209), and RecipesPage's catalog
- * established the padding form for this exact slot.
+ * The bar is definition-driven (Stephen's ruling on PR #311):
+ * which filters exist, their labels, option sets, and defaults
+ * are the caller's data passed in as filter definitions — the
+ * bar owns the control shapes only and hardcodes no app filter
+ * or sorter list.
+ *
+ * The list states carry no offset of their own (Stephen's
+ * ruling on PR #311): an internal top padding is the margin
+ * loophole in another form — parents own the spacing between
+ * their children — so the loading states center their spinner
+ * with <Center> and the error state is the bare alert.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -51,14 +58,31 @@ test("the catalog components are exported from the built package root", async ()
   }
 });
 
-test("the bar carries the five addable filters as its own vocabulary", () => {
-  assert.match(
-    bar,
-    /export type CatalogFilterId = "status" \| "ingredient" \| "calories" \| "satiety" \| "sort";/,
-  );
-  assert.match(bar, /FILTER_LABELS: Record<CatalogFilterId, string>/);
-  assert.match(bar, /activeFilters\?: CatalogFilterId\[\];/);
-  assert.match(bar, /onActiveFiltersChange\?: \(filters: CatalogFilterId\[\]\) => void;/);
+test("the bar takes its filters as caller-supplied definitions, never hardcoded lists", () => {
+  assert.match(bar, /export type CatalogFilterDefinition<FilterId extends string = string> =/);
+  assert.match(bar, /filters: CatalogFilterDefinition<FilterId>\[\];/);
+  assert.match(bar, /activeFilters\?: FilterId\[\];/);
+  assert.match(bar, /onActiveFiltersChange\?: \(filters: FilterId\[\]\) => void;/);
+  for (const kind of ["select", "text", "range", "sort"]) {
+    assert.match(
+      bar,
+      new RegExp(String.raw`kind: "${kind}";`),
+      `the bar's control shapes include the ${kind} definition`,
+    );
+  }
+  // No single app's catalog data may live in the bar (PR #311):
+  // the recipe option sets and filter labels are the caller's.
+  for (const baked of [
+    "STATUS_OPTIONS",
+    "SORT_OPTIONS",
+    "SORT_DIR_OPTIONS",
+    "FILTER_LABELS",
+    "ALL_FILTER_IDS",
+    "Perfected",
+    "All statuses",
+  ]) {
+    assert.ok(!bar.includes(baked), `the bar must not hardcode ${baked} — filter data is passed in`);
+  }
   assert.ok(!/\binterface\b/.test(bar), "props are type aliases, never interfaces");
 });
 
@@ -69,21 +93,19 @@ test("CatalogHeader renders the title as the heading over its controls", () => {
   assert.match(header, /children: ReactNode;/, "the bar composes in as the child");
 });
 
-test("the list states own their treatments — padding offsets, never margins", () => {
-  assert.match(loadingState, /<YStack paddingBlockStart="\$8" alignItems="center">/);
-  assert.match(loadingState, /<Spinner label=\{label\} \/>/);
-  assert.match(errorState, /<YStack paddingBlockStart="\$8">/);
+test("the list states center with <Center> and carry no offset of their own", () => {
+  assert.match(loadingState, /<Center>\s*<Spinner label=\{label\} \/>\s*<\/Center>/);
   assert.match(errorState, /<Alert severity="error">\{message\}<\/Alert>/);
-  assert.match(
-    loadingFooter,
-    /<YStack alignItems="center" justifyContent="center" paddingVertical="\$4">/,
-  );
-  assert.match(loadingFooter, /<Spinner label=\{label\} \/>/);
+  assert.match(loadingFooter, /<Center>\s*<Spinner label=\{label\} \/>\s*<\/Center>/);
   for (const [name, source] of [
     ["ListLoadingState", loadingState],
     ["ListErrorState", errorState],
     ["ListLoadingFooter", loadingFooter],
   ]) {
     assert.ok(!/margin/.test(source), `${name} must not space itself with margins (#209)`);
+    assert.ok(
+      !/padding/.test(source),
+      `${name} must not carry a padding offset — parents own spacing between children (PR #311)`,
+    );
   }
 });

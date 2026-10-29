@@ -556,10 +556,9 @@ Open in `Components/BrandLink`: Default.
 
 1. The wordmark "Eciperay" renders in the primary ink, semibold,
    at the large size, with no underline.
-2. Keyboard only: Tab reaches the wordmark and Enter activates
-   it — the "Pressed N times" counter under it increments (its
-   accessible name is "Eciperay", role link). Clicking it
-   increments the counter too.
+2. It is a real link: role link, accessible name "Eciperay",
+   carrying the story's href ("/"); Tab reaches it and Enter
+   follows it like any anchor.
 
 **Run when:** `src/components/BrandLink.tsx`, its stories, the
 public frame's header, or a changeset naming BrandLink.
@@ -637,21 +636,23 @@ LandingPage, or a changeset naming Hero.
 
 ---
 
-## CtaLink & CtaRow
+## CtaRow (landing CTAs are Button href links)
 
-Open in `Components/CtaLink`: Variants. Open in
-`Components/CtaRow`: Default.
+Open in `Components/CtaRow`: Default. The landing's CTAs are
+Button's href form (`<Button href>` — the ButtonLink form);
+there is no CtaLink component (deleted on Stephen's PR #311
+ruling — it duplicated ButtonLink).
 
-1. Variants: the primary CTA is a filled brand pill with white
-   semibold text; the secondary is a light-gray pill with dark
-   semibold text. Both are real links (role link, their hrefs),
-   never buttons.
-2. CtaRow Default: on web the three CTAs sit in one centered
-   row; on native (the RN storybook) they stack vertically —
-   the row never wraps two CTAs side by side at phone width.
+1. Default: the primary CTA is the filled brand button link;
+   the two secondary CTAs are the neutral button links. All
+   three are real links (role link, their hrefs), never buttons.
+2. On web the three CTAs sit in one centered row; on native
+   (the RN storybook) they stack vertically — the row never
+   wraps two CTAs side by side at phone width.
 
-**Run when:** `src/components/CtaLink.tsx`, `CtaRow.tsx`,
-their stories, LandingPage, or a changeset naming either.
+**Run when:** `src/components/CtaRow.tsx`, its stories,
+LandingPage, Button's href form, or a changeset naming any of
+them.
 
 ---
 
@@ -674,14 +675,18 @@ their stories, LandingPage, or a changeset naming either.
 ## CatalogFiltersBar
 
 Open in `Components/CatalogFiltersBar`: Collapsed, ChooserOpen,
-WithFiltersAdded.
+WithFiltersAdded. The bar is definition-driven: the story (like
+a catalog page) supplies the filter definitions — which filters
+exist, their labels, option sets, and defaults; the bar owns
+the control shapes only.
 
 1. Collapsed: the search field and the small "Filters" button
    at the same height; no filter controls are shown.
 2. ChooserOpen: the chooser offers one add button per filter
-   not yet added (Ingredient, Calories, Satiety, Sort — and
-   Status only when a status filter is supplied); adding one
-   closes the chooser and renders that filter's control.
+   not yet added (the story supplies Ingredient, Calories,
+   Satiety, Sort — a catalog that supplies a status definition
+   offers Status too); adding one closes the chooser and
+   renders that filter's control.
 3. WithFiltersAdded: the Ingredient field, the Min/Max cal
    fields, and the Sort by / Order selects render, each with a
    "Remove" control whose accessible name is "Remove {filter}
@@ -714,11 +719,12 @@ Open in `Components/ListLoadingState`: Default. Open in
 `Components/ListLoadingFooter`: Default.
 
 1. ListLoadingState: a centered spinner (accessible label
-   "Loading") dropped below where the list header would sit.
-2. ListErrorState: the error message in an error alert at the
-   same offset.
-3. ListLoadingFooter: a centered spinner in a padded band, as
-   the list's loading-more footer renders it.
+   "Loading") — the state carries no offset of its own; the
+   parent composition places it.
+2. ListErrorState: the error message in an error alert, at the
+   parent composition's spacing.
+3. ListLoadingFooter: a centered spinner with no padding band,
+   as the list's loading-more footer renders it.
 
 **Run when:** `src/components/ListLoadingState.tsx`,
 `ListErrorState.tsx`, `ListLoadingFooter.tsx`, their stories, a

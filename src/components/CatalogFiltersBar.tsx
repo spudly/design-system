@@ -18,86 +18,108 @@ import { TextField } from "./TextField.js";
  * internally tracked (seeded from non-default values), exactly
  * the contract RecipesPage's bar carries.
  *
+ * The bar owns the filter CONTROL DESIGN — the four control
+ * shapes (select, text, number range, sort pair), the chooser,
+ * the add/remove rhythm — and nothing else: which filters
+ * exist, their labels, their option sets, and their defaults
+ * are the caller's DATA, passed in as filter definitions
+ * (Stephen's ruling on PR #311: the bar must not hardcode one
+ * app's filter/sorter lists; the DS extraction reusability rule
+ * — no single app's domain data baked into a shared component).
  * Extracted from DiscoverPage for the #119 page de-styling
- * program, unchanged in behavior: the catalog pages compose this
- * bar into their list headers, and the bar owns the filter
- * option sets and labels because they are the bar's vocabulary,
- * not any one page's.
+ * program, unchanged in behavior: the catalog pages compose
+ * this bar into their list headers and pass their catalog's
+ * definitions in.
  */
 
-// The filter option sets the app's filter bar hardcodes, moved
-// with the bar (the same sets RecipesPage carries). Values stay
-// plain strings so no app type leaks into the DS: the app maps
-// its own status/sort unions at the boundary.
-const STATUS_OPTIONS: SelectOption[] = [
-  { value: "all", label: "All statuses" },
-  { value: "idea", label: "Idea" },
-  { value: "evolving", label: "Evolving" },
-  { value: "perfected", label: "Perfected" },
-  { value: "abandoned", label: "Abandoned" },
-];
-
-const SORT_OPTIONS: SelectOption[] = [
-  { value: "newest", label: "Newest" },
-  { value: "rating", label: "Rating" },
-  { value: "satiety", label: "Satiety" },
-  { value: "calories", label: "Calories" },
-];
-
-const SORT_DIR_OPTIONS: SelectOption[] = [
-  { value: "desc", label: "High to low" },
-  { value: "asc", label: "Low to high" },
-];
-
-/** The addable filters of the collapsed filter bar (#96). The
- * calorie and satiety ranges each count as one filter (their
- * min/max fields add and remove together), as do the Sort by /
- * Order selects. */
-export type CatalogFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
-
-const FILTER_LABELS: Record<CatalogFilterId, string> = {
-  status: "Status",
-  ingredient: "Ingredient",
-  calories: "Calories",
-  satiety: "Satiety",
-  sort: "Sort",
+/** A single-select filter: a SelectField over caller-supplied
+ * options. Removal (and the uncontrolled seed) keys off
+ * `defaultValue`: the filter starts added iff its value differs
+ * from the default, and removal resets it to the default. */
+export type CatalogSelectFilter<FilterId extends string = string> = {
+  kind: "select";
+  id: FilterId;
+  label: string;
+  options: SelectOption[];
+  value: string;
+  onChange: (value: string) => void;
+  defaultValue: string;
 };
 
-const ALL_FILTER_IDS: CatalogFilterId[] = ["status", "ingredient", "calories", "satiety", "sort"];
+/** A free-text filter: a TextField. Defaults work like the
+ * select's. */
+export type CatalogTextFilter<FilterId extends string = string> = {
+  kind: "text";
+  id: FilterId;
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+  defaultValue: string;
+};
 
-export type CatalogFiltersBarProps = {
+/** A numeric range filter: the min/max TextFields add and
+ * remove together (one filter, #96). The range's default is
+ * empty on both ends: it starts added iff either end is set,
+ * and removal clears both. */
+export type CatalogRangeFilter<FilterId extends string = string> = {
+  kind: "range";
+  id: FilterId;
+  label: string;
+  minLabel: string;
+  maxLabel: string;
+  minValue: string;
+  maxValue: string;
+  onMinChange: (value: string) => void;
+  onMaxChange: (value: string) => void;
+};
+
+/** The sort filter: the Sort-by and Order SelectFields as one
+ * filter (#96). Starts added iff either value differs from its
+ * default; removal resets both. */
+export type CatalogSortFilter<FilterId extends string = string> = {
+  kind: "sort";
+  id: FilterId;
+  label: string;
+  sortLabel: string;
+  sortOptions: SelectOption[];
+  sortValue: string;
+  onSortChange: (value: string) => void;
+  defaultSortValue: string;
+  dirLabel: string;
+  dirOptions: SelectOption[];
+  dirValue: string;
+  onDirChange: (value: string) => void;
+  defaultDirValue: string;
+};
+
+/** One addable filter of the collapsed filter bar (#96), as
+ * caller-supplied data: its id, its label, and the control
+ * shape (by `kind`) with the values and callbacks the control
+ * binds to. */
+export type CatalogFilterDefinition<FilterId extends string = string> =
+  | CatalogSelectFilter<FilterId>
+  | CatalogTextFilter<FilterId>
+  | CatalogRangeFilter<FilterId>
+  | CatalogSortFilter<FilterId>;
+
+export type CatalogFiltersBarProps<FilterId extends string = string> = {
   /** Search field placeholder copy, passed through to the search field. */
   searchPlaceholder: string;
   search: string;
   onSearchChange: (value: string) => void;
-  /** Status filter. The control renders only when both the value
-   * and its callback are provided and `showStatusFilter` is not
-   * false — the same condition as RecipesPage's bar. */
-  statusFilter?: string;
-  onStatusFilterChange?: (value: string) => void;
-  showStatusFilter?: boolean;
-  ingredient: string;
-  onIngredientChange: (value: string) => void;
-  minCalories: string;
-  onMinCaloriesChange: (value: string) => void;
-  maxCalories: string;
-  onMaxCaloriesChange: (value: string) => void;
-  minSatiety: string;
-  onMinSatietyChange: (value: string) => void;
-  maxSatiety: string;
-  onMaxSatietyChange: (value: string) => void;
-  sort: string;
-  onSortChange: (value: string) => void;
-  sortDir: string;
-  onSortDirChange: (value: string) => void;
+  /** The addable filters, in chooser order — the caller's data
+   * (see the file header): the bar renders a control for a
+   * definition only once its filter has been added. */
+  filters: CatalogFilterDefinition<FilterId>[];
   /** Filters currently added to the bar (#96). Controlled: when
    * provided, the bar renders exactly these filters' controls;
    * when omitted, the bar tracks the added set internally, seeded
    * from the filters carrying non-default values. */
-  activeFilters?: CatalogFilterId[];
+  activeFilters?: FilterId[];
   /** Fires with the next added set whenever the user adds or
    * removes a filter, in controlled and uncontrolled use alike. */
-  onActiveFiltersChange?: (filters: CatalogFilterId[]) => void;
+  onActiveFiltersChange?: (filters: FilterId[]) => void;
   /** Whether the add-filter chooser is open (#96). Controlled
    * like `activeFilters`; uncontrolled when omitted. */
   filterChooserOpen?: boolean;
@@ -126,15 +148,113 @@ function NumberFilter({
   );
 }
 
+/** Whether a filter carries a non-default value — the
+ * uncontrolled seed condition (a preset filter starts added so
+ * existing callers keep seeing, and can clear, it). */
+function isNonDefault<FilterId extends string>(definition: CatalogFilterDefinition<FilterId>) {
+  switch (definition.kind) {
+    case "select":
+    case "text":
+      return definition.value !== definition.defaultValue;
+    case "range":
+      return definition.minValue !== "" || definition.maxValue !== "";
+    case "sort":
+      return (
+        definition.sortValue !== definition.defaultSortValue ||
+        definition.dirValue !== definition.defaultDirValue
+      );
+  }
+}
+
+/** Removal clears the filter's values through its ordinary
+ * change callbacks, so a hidden filter never keeps filtering. */
+function clearFilter<FilterId extends string>(definition: CatalogFilterDefinition<FilterId>) {
+  switch (definition.kind) {
+    case "select":
+    case "text":
+      definition.onChange(definition.defaultValue);
+      break;
+    case "range":
+      definition.onMinChange("");
+      definition.onMaxChange("");
+      break;
+    case "sort":
+      definition.onSortChange(definition.defaultSortValue);
+      definition.onDirChange(definition.defaultDirValue);
+      break;
+  }
+}
+
+/** One filter definition's control(s), by shape. */
+function FilterControl<FilterId extends string>({
+  definition,
+}: {
+  definition: CatalogFilterDefinition<FilterId>;
+}) {
+  switch (definition.kind) {
+    case "select":
+      return (
+        <SelectField
+          label={definition.label}
+          value={definition.value}
+          options={definition.options}
+          onValueChange={definition.onChange}
+        />
+      );
+    case "text":
+      return (
+        <TextField
+          label={definition.label}
+          accessibilityLabel={definition.label}
+          value={definition.value}
+          onChangeText={definition.onChange}
+          {...(definition.placeholder !== undefined ? { placeholder: definition.placeholder } : {})}
+        />
+      );
+    case "range":
+      return (
+        <XStack gap={tokens.spacing[2]}>
+          <NumberFilter
+            label={definition.minLabel}
+            value={definition.minValue}
+            onChange={definition.onMinChange}
+          />
+          <NumberFilter
+            label={definition.maxLabel}
+            value={definition.maxValue}
+            onChange={definition.onMaxChange}
+          />
+        </XStack>
+      );
+    case "sort":
+      return (
+        <YStack gap={tokens.spacing[3]}>
+          <SelectField
+            label={definition.sortLabel}
+            value={definition.sortValue}
+            options={definition.sortOptions}
+            onValueChange={definition.onSortChange}
+          />
+          <SelectField
+            label={definition.dirLabel}
+            value={definition.dirValue}
+            options={definition.dirOptions}
+            onValueChange={definition.onDirChange}
+          />
+        </YStack>
+      );
+  }
+}
+
 /** One added filter: its control(s) plus the Remove control that
  * clears and hides it (#96). */
 function AddedFilter({
-  id,
+  label,
   onRemove,
   children,
 }: {
-  id: CatalogFilterId;
-  onRemove: (id: CatalogFilterId) => void;
+  label: string;
+  onRemove: () => void;
   children: ReactNode;
 }) {
   return (
@@ -143,10 +263,8 @@ function AddedFilter({
         <Button
           variant="ghost"
           size="sm"
-          accessibilityLabel={`Remove ${FILTER_LABELS[id]} filter`}
-          onPress={() => {
-            onRemove(id);
-          }}
+          accessibilityLabel={`Remove ${label} filter`}
+          onPress={onRemove}
         >
           Remove
         </Button>
@@ -160,56 +278,31 @@ function AddedFilter({
  * renders: search and a small Filters button initially; the
  * button opens a chooser of the filters not yet added, and a
  * filter's control renders only once that filter has been
- * added. The only difference from RecipesPage's bar is the
- * search placeholder, which is a prop here because the two
- * catalogs' copy differs. */
-export function CatalogFiltersBar({
+ * added. The search placeholder and the filter definitions are
+ * props because the catalogs' copy and data differ. */
+export function CatalogFiltersBar<FilterId extends string = string>({
   searchPlaceholder,
   search,
   onSearchChange,
-  statusFilter,
-  onStatusFilterChange,
-  ingredient,
-  onIngredientChange,
-  minCalories,
-  onMinCaloriesChange,
-  maxCalories,
-  onMaxCaloriesChange,
-  minSatiety,
-  onMinSatietyChange,
-  maxSatiety,
-  onMaxSatietyChange,
-  sort,
-  onSortChange,
-  sortDir,
-  onSortDirChange,
-  showStatusFilter = true,
+  filters,
   activeFilters,
   onActiveFiltersChange,
   filterChooserOpen,
   onFilterChooserOpenChange,
-}: CatalogFiltersBarProps) {
-  const statusAvailable =
-    showStatusFilter && statusFilter !== undefined && onStatusFilterChange !== undefined;
-  const available = ALL_FILTER_IDS.filter((id) => id !== "status" || statusAvailable);
+}: CatalogFiltersBarProps<FilterId>) {
   // Uncontrolled seed: a filter that already carries a non-default
   // value starts added, so existing callers that preset filter
   // values keep seeing (and can clear) those filters.
-  const [internalActiveFilters, setInternalActiveFilters] = useState<CatalogFilterId[]>(() => {
-    const seeded: CatalogFilterId[] = [];
-    if (statusAvailable && statusFilter !== "all") seeded.push("status");
-    if (ingredient !== "") seeded.push("ingredient");
-    if (minCalories !== "" || maxCalories !== "") seeded.push("calories");
-    if (minSatiety !== "" || maxSatiety !== "") seeded.push("satiety");
-    if (sort !== "newest" || sortDir !== "desc") seeded.push("sort");
-    return seeded;
-  });
+  const [internalActiveFilters, setInternalActiveFilters] = useState<FilterId[]>(() =>
+    filters.filter(isNonDefault).map((definition) => definition.id),
+  );
   const [internalChooserOpen, setInternalChooserOpen] = useState(false);
   const active = activeFilters ?? internalActiveFilters;
   const chooserOpen = filterChooserOpen ?? internalChooserOpen;
-  const addable = available.filter((id) => !active.includes(id));
+  const addable = filters.filter((definition) => !active.includes(definition.id));
+  const added = filters.filter((definition) => active.includes(definition.id));
 
-  const setActive = (next: CatalogFilterId[]) => {
+  const setActive = (next: FilterId[]) => {
     if (activeFilters === undefined) setInternalActiveFilters(next);
     onActiveFiltersChange?.(next);
   };
@@ -217,28 +310,13 @@ export function CatalogFiltersBar({
     if (filterChooserOpen === undefined) setInternalChooserOpen(open);
     onFilterChooserOpenChange?.(open);
   };
-  const addFilter = (id: CatalogFilterId) => {
+  const addFilter = (id: FilterId) => {
     setActive([...active, id]);
     setChooserOpen(false);
   };
-  const removeFilter = (id: CatalogFilterId) => {
-    // Removal clears the filter's values through the ordinary
-    // change callbacks, so a hidden filter never keeps filtering.
-    if (id === "status") onStatusFilterChange?.("all");
-    if (id === "ingredient") onIngredientChange("");
-    if (id === "calories") {
-      onMinCaloriesChange("");
-      onMaxCaloriesChange("");
-    }
-    if (id === "satiety") {
-      onMinSatietyChange("");
-      onMaxSatietyChange("");
-    }
-    if (id === "sort") {
-      onSortChange("newest");
-      onSortDirChange("desc");
-    }
-    setActive(active.filter((filterId) => filterId !== id));
+  const removeFilter = (definition: CatalogFilterDefinition<FilterId>) => {
+    clearFilter(definition);
+    setActive(active.filter((filterId) => filterId !== definition.id));
   };
 
   return (
@@ -272,76 +350,32 @@ export function CatalogFiltersBar({
       </XStack>
       {chooserOpen && addable.length > 0 ? (
         <XStack gap={tokens.spacing[2]} flexWrap="wrap">
-          {addable.map((id) => (
+          {addable.map((definition) => (
             <Button
-              key={id}
+              key={definition.id}
               variant="secondary"
               size="sm"
-              accessibilityLabel={`Add ${FILTER_LABELS[id]} filter`}
+              accessibilityLabel={`Add ${definition.label} filter`}
               onPress={() => {
-                addFilter(id);
+                addFilter(definition.id);
               }}
             >
-              {FILTER_LABELS[id]}
+              {definition.label}
             </Button>
           ))}
         </XStack>
       ) : null}
-      {active.includes("status") && statusAvailable ? (
-        <AddedFilter id="status" onRemove={removeFilter}>
-          <SelectField
-            label="Status"
-            value={statusFilter}
-            options={STATUS_OPTIONS}
-            onValueChange={onStatusFilterChange}
-          />
+      {added.map((definition) => (
+        <AddedFilter
+          key={definition.id}
+          label={definition.label}
+          onRemove={() => {
+            removeFilter(definition);
+          }}
+        >
+          <FilterControl definition={definition} />
         </AddedFilter>
-      ) : null}
-      {active.includes("ingredient") ? (
-        <AddedFilter id="ingredient" onRemove={removeFilter}>
-          <TextField
-            label="Ingredient"
-            accessibilityLabel="Ingredient"
-            value={ingredient}
-            onChangeText={onIngredientChange}
-            placeholder="e.g. chicken"
-          />
-        </AddedFilter>
-      ) : null}
-      {active.includes("calories") ? (
-        <AddedFilter id="calories" onRemove={removeFilter}>
-          <XStack gap={tokens.spacing[2]}>
-            <NumberFilter label="Min cal" value={minCalories} onChange={onMinCaloriesChange} />
-            <NumberFilter label="Max cal" value={maxCalories} onChange={onMaxCaloriesChange} />
-          </XStack>
-        </AddedFilter>
-      ) : null}
-      {active.includes("satiety") ? (
-        <AddedFilter id="satiety" onRemove={removeFilter}>
-          <XStack gap={tokens.spacing[2]}>
-            <NumberFilter label="Min satiety" value={minSatiety} onChange={onMinSatietyChange} />
-            <NumberFilter label="Max satiety" value={maxSatiety} onChange={onMaxSatietyChange} />
-          </XStack>
-        </AddedFilter>
-      ) : null}
-      {active.includes("sort") ? (
-        <AddedFilter id="sort" onRemove={removeFilter}>
-          <YStack gap={tokens.spacing[3]}>
-            <SelectField
-              label="Sort by"
-              value={sort}
-              options={SORT_OPTIONS}
-              onValueChange={onSortChange}
-            />
-            <SelectField
-              label="Order"
-              value={sortDir}
-              options={SORT_DIR_OPTIONS}
-              onValueChange={onSortDirChange}
-            />
-          </YStack>
-        </AddedFilter>
-      ) : null}
+      ))}
     </YStack>
   );
 }

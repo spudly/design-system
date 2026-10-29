@@ -1,4 +1,3 @@
-import { YStack } from "tamagui";
 import { Alert } from "./Alert.js";
 
 export type ListErrorStateProps = {
@@ -7,17 +6,15 @@ export type ListErrorStateProps = {
 };
 
 /**
- * A list's error state (#119): the error alert dropped below the
- * list's header by the state's own top padding — the offset
- * RecipesPage's catalog established for this slot, carried as
- * padding (the parent-side mechanism) rather than a margin.
- * Extracted from the catalog pages for the #119 page de-styling
- * program, so every catalog renders its load failure the same way.
+ * A list's error state (#119): the error alert, nothing more.
+ * The state carries no offset of its own (Stephen's ruling on
+ * PR #311: an internal top padding used as an offset is the
+ * margin loophole in another form — separation between a list's
+ * elements belongs to the parent composition, the list and its
+ * header, never to the leaf). Extracted from the catalog pages
+ * for the #119 page de-styling program, so every catalog renders
+ * its load failure the same way.
  */
 export function ListErrorState({ message }: ListErrorStateProps) {
-  return (
-    <YStack paddingBlockStart="$8">
-      <Alert severity="error">{message}</Alert>
-    </YStack>
-  );
+  return <Alert severity="error">{message}</Alert>;
 }

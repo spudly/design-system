@@ -1,5 +1,5 @@
+import { Button } from "../components/Button.js";
 import { CardGrid } from "../components/CardGrid.js";
-import { CtaLink } from "../components/CtaLink.js";
 import { CtaRow } from "../components/CtaRow.js";
 import { FeatureCard } from "../components/FeatureCard.js";
 import { Hero } from "../components/Hero.js";
@@ -24,7 +24,11 @@ import { ScreenContainer } from "../components/ScreenContainer.js";
  * props rendered as anchors — not press callbacks. That is the
  * navigation rule (a control that navigates is a link with an
  * href) and the deliberate exception for public web surfaces;
- * signed-in app pages keep the callbacks-out pattern.
+ * signed-in app pages keep the callbacks-out pattern. The
+ * anchors are Button's href form (Stephen's ruling on PR #311):
+ * an earlier dedicated CtaLink component duplicated that form
+ * and was deleted — the CTAs render through <Button href>
+ * (ButtonLink) with the primary/secondary variants.
  *
  * The features are three FIXED slots (Stephen's decision on
  * #171, against the array lean): the page's structure is fixed,
@@ -32,10 +36,10 @@ import { ScreenContainer } from "../components/ScreenContainer.js";
  * change, not a longer array from the host.
  *
  * The page composes components and passes data only (#119): the
- * hero is Hero, the CTAs are CtaLinks in a CtaRow, and the
- * feature slots are FeatureCards in a CardGrid — each component
- * owns its treatment; the page keeps the structure and the
- * content contract.
+ * hero is Hero, the CTAs are Button href links in a CtaRow, and
+ * the feature slots are FeatureCards in a CardGrid — each
+ * component owns its treatment; the page keeps the structure
+ * and the content contract.
  */
 
 export type LandingPageCta = {
@@ -73,9 +77,15 @@ export function LandingPage({
     <ScreenContainer>
       <Hero title={heroTitle} subtitle={heroSubtitle} />
       <CtaRow>
-        <CtaLink cta={discoverCta} variant="primary" />
-        <CtaLink cta={signUpCta} variant="secondary" />
-        <CtaLink cta={getAppCta} variant="secondary" />
+        <Button href={discoverCta.href} variant="primary">
+          {discoverCta.label}
+        </Button>
+        <Button href={signUpCta.href} variant="secondary">
+          {signUpCta.label}
+        </Button>
+        <Button href={getAppCta.href} variant="secondary">
+          {getAppCta.label}
+        </Button>
       </CtaRow>
       <CardGrid>
         <FeatureCard feature={featureOne} />

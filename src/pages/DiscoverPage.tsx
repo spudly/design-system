@@ -1,4 +1,4 @@
-import { CatalogFiltersBar } from "../components/CatalogFiltersBar.js";
+import { CatalogFiltersBar, type CatalogFilterDefinition } from "../components/CatalogFiltersBar.js";
 import { CatalogHeader } from "../components/CatalogHeader.js";
 import { DiscoveryCard } from "../components/DiscoveryCard.js";
 import { EmptyState } from "../components/EmptyState.js";
@@ -6,6 +6,7 @@ import { ListErrorState } from "../components/ListErrorState.js";
 import { ListLoadingFooter } from "../components/ListLoadingFooter.js";
 import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import type { SelectOption } from "../components/SelectField.js";
 import { BoundedList } from "./BoundedList.js";
 import { useCatalogPagination } from "./useCatalogPagination.js";
 
@@ -47,7 +48,11 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  *   the two catalogs behave the same. The bar is the shared
  *   CatalogFiltersBar component; the filter prop contract is
  *   RecipesPage's, mirrored 1:1 — plain strings at the boundary,
- *   the app maps its own unions.
+ *   the app maps its own unions. The bar is definition-driven
+ *   (Stephen's ruling on PR #311): which filters exist, their
+ *   labels, option sets, and defaults are THIS page's data,
+ *   passed in as filter definitions — the bar owns only the
+ *   control design.
  * - #162: search uses the DS SearchField as-is; no lineHeight is
  *   set on any glyph or text in this file.
  *
@@ -108,6 +113,32 @@ export type DiscoverPageItem = {
  * min/max fields add and remove together), as do the Sort by /
  * Order selects. */
 export type DiscoverPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
+
+// The catalog's filter option sets — this page's DATA, passed
+// into CatalogFiltersBar as filter definitions (the bar owns
+// the control design, not the data — Stephen's ruling on PR
+// #311). Values stay plain strings so no app type leaks into
+// the DS: the app maps its own status/sort unions at the
+// boundary.
+const STATUS_OPTIONS: SelectOption[] = [
+  { value: "all", label: "All statuses" },
+  { value: "idea", label: "Idea" },
+  { value: "evolving", label: "Evolving" },
+  { value: "perfected", label: "Perfected" },
+  { value: "abandoned", label: "Abandoned" },
+];
+
+const SORT_OPTIONS: SelectOption[] = [
+  { value: "newest", label: "Newest" },
+  { value: "rating", label: "Rating" },
+  { value: "satiety", label: "Satiety" },
+  { value: "calories", label: "Calories" },
+];
+
+const SORT_DIR_OPTIONS: SelectOption[] = [
+  { value: "desc", label: "High to low" },
+  { value: "asc", label: "Low to high" },
+];
 
 export type DiscoverPageProps = {
   /** Page title copy — app-owned, like all copy on this page. */
@@ -239,6 +270,72 @@ export function DiscoverPage(props: DiscoverPageProps) {
     canPaginate: !isLoading && !errorMessage,
   });
 
+  // The catalog's filter definitions — the page's data in the
+  // bar's control shapes (see the option sets above). The status
+  // filter joins only when the host wires it (value + callback
+  // provided, not hidden), the same condition RecipesPage's bar
+  // carries; the public host passes no status filter today.
+  const catalogFilters: CatalogFilterDefinition<DiscoverPageFilterId>[] = [];
+  if (showStatusFilter !== false && statusFilter !== undefined && onStatusFilterChange !== undefined) {
+    catalogFilters.push({
+      kind: "select",
+      id: "status",
+      label: "Status",
+      options: STATUS_OPTIONS,
+      value: statusFilter,
+      onChange: onStatusFilterChange,
+      defaultValue: "all",
+    });
+  }
+  catalogFilters.push(
+    {
+      kind: "text",
+      id: "ingredient",
+      label: "Ingredient",
+      value: ingredient,
+      onChange: onIngredientChange,
+      placeholder: "e.g. chicken",
+      defaultValue: "",
+    },
+    {
+      kind: "range",
+      id: "calories",
+      label: "Calories",
+      minLabel: "Min cal",
+      maxLabel: "Max cal",
+      minValue: minCalories,
+      maxValue: maxCalories,
+      onMinChange: onMinCaloriesChange,
+      onMaxChange: onMaxCaloriesChange,
+    },
+    {
+      kind: "range",
+      id: "satiety",
+      label: "Satiety",
+      minLabel: "Min satiety",
+      maxLabel: "Max satiety",
+      minValue: minSatiety,
+      maxValue: maxSatiety,
+      onMinChange: onMinSatietyChange,
+      onMaxChange: onMaxSatietyChange,
+    },
+    {
+      kind: "sort",
+      id: "sort",
+      label: "Sort",
+      sortLabel: "Sort by",
+      sortOptions: SORT_OPTIONS,
+      sortValue: sort,
+      onSortChange,
+      defaultSortValue: "newest",
+      dirLabel: "Order",
+      dirOptions: SORT_DIR_OPTIONS,
+      dirValue: sortDir,
+      onDirChange: onSortDirChange,
+      defaultDirValue: "desc",
+    },
+  );
+
   return (
     <ScreenContainer variant="list" scrollable={false}>
       <BoundedList
@@ -268,23 +365,7 @@ export function DiscoverPage(props: DiscoverPageProps) {
               searchPlaceholder={searchPlaceholder}
               search={search}
               onSearchChange={onSearchChange}
-              {...(statusFilter !== undefined ? { statusFilter } : {})}
-              {...(onStatusFilterChange ? { onStatusFilterChange } : {})}
-              {...(showStatusFilter !== undefined ? { showStatusFilter } : {})}
-              ingredient={ingredient}
-              onIngredientChange={onIngredientChange}
-              minCalories={minCalories}
-              onMinCaloriesChange={onMinCaloriesChange}
-              maxCalories={maxCalories}
-              onMaxCaloriesChange={onMaxCaloriesChange}
-              minSatiety={minSatiety}
-              onMinSatietyChange={onMinSatietyChange}
-              maxSatiety={maxSatiety}
-              onMaxSatietyChange={onMaxSatietyChange}
-              sort={sort}
-              onSortChange={onSortChange}
-              sortDir={sortDir}
-              onSortDirChange={onSortDirChange}
+              filters={catalogFilters}
               {...(activeFilters ? { activeFilters } : {})}
               {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
               {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}

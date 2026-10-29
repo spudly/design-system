@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 
 export type CtaRowProps = {
-  /** The row's calls to action (CtaLinks), in display order. */
+  /** The row's calls to action (Button href links), in display order. */
   children: ReactNode;
 };
 

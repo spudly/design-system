@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { CtaLink } from "./CtaLink.js";
+import { Button } from "./Button.js";
 import { CtaRow } from "./CtaRow.js";
 
 const meta: Meta<typeof CtaRow> = {
@@ -13,9 +13,15 @@ type Story = StoryObj<typeof CtaRow>;
 export const Default: Story = {
   render: () => (
     <CtaRow>
-      <CtaLink cta={{ label: "Browse public recipes", href: "/discover" }} variant="primary" />
-      <CtaLink cta={{ label: "Create account", href: "/signup" }} variant="secondary" />
-      <CtaLink cta={{ label: "Get the app", href: "/get-app" }} variant="secondary" />
+      <Button href="/discover" variant="primary">
+        Browse public recipes
+      </Button>
+      <Button href="/signup" variant="secondary">
+        Create account
+      </Button>
+      <Button href="/get-app" variant="secondary">
+        Get the app
+      </Button>
     </CtaRow>
   ),
 };

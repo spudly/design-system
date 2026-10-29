@@ -14,7 +14,10 @@
  *    initially, a filter's control only once added, removal
  *    clearing values through the change callbacks. The public
  *    catalog's search placeholder is a prop (its copy differs
- *    from RecipesPage's).
+ *    from RecipesPage's). The bar is definition-driven
+ *    (Stephen's ruling on PR #311): the filter/filter-sorter
+ *    lists are the page's data, passed in as definitions — the
+ *    bar owns the control shapes only.
  * 3. The error state exists: `errorMessage: string | null`
  *    renders an error alert as the list's empty state — the
  *    retired web view never read the query error and spun
@@ -144,28 +147,40 @@ test("search (with the page's own placeholder) and the Filters button are the in
 });
 
 test("each filter control renders only when its filter is added", () => {
-  for (const id of ["status", "ingredient", "calories", "satiety", "sort"]) {
-    assert.match(
-      bar,
-      new RegExp(String.raw`active\.includes\("${id}"\)`),
-      `the ${id} control must be gated on active.includes("${id}")`,
-    );
-  }
+  assert.match(
+    bar,
+    /const added = filters\.filter\(\(definition\) => active\.includes\(definition\.id\)\);/,
+    "controls render from the added definitions only",
+  );
+  assert.match(bar, /\{added\.map\(\(definition\) => \(/);
+  assert.match(bar, /<FilterControl definition=\{definition\} \/>/);
+  assert.match(
+    page,
+    /filters=\{catalogFilters\}/,
+    "the page passes its filter definitions into the bar",
+  );
+  // The option sets are the page's data (PR #311): they live in
+  // the page and reach the bar inside the definitions.
+  assert.match(page, /const STATUS_OPTIONS: SelectOption\[\] = \[/);
+  assert.match(page, /options: STATUS_OPTIONS,/);
+  assert.match(page, /sortOptions: SORT_OPTIONS,/);
+  assert.match(page, /dirOptions: SORT_DIR_OPTIONS,/);
 });
 
 test("the chooser offers exactly the filters not yet added, and adding closes it", () => {
-  assert.match(bar, /const addable = available\.filter\(\(id\) => !active\.includes\(id\)\);/);
-  assert.match(bar, /accessibilityLabel=\{`Add \$\{FILTER_LABELS\[id\]\} filter`\}/);
+  assert.match(bar, /const addable = filters\.filter\(\(definition\) => !active\.includes\(definition\.id\)\);/);
+  assert.match(bar, /accessibilityLabel=\{`Add \$\{definition\.label\} filter`\}/);
   assert.match(bar, /setActive\(\[\.\.\.active, id\]\);\s*setChooserOpen\(false\);/);
 });
 
 test("removing a filter clears its values through the change callbacks", () => {
-  assert.match(bar, /if \(id === "status"\) onStatusFilterChange\?\.\("all"\);/);
-  assert.match(bar, /if \(id === "ingredient"\) onIngredientChange\(""\);/);
-  assert.match(bar, /onMinCaloriesChange\(""\);\s*onMaxCaloriesChange\(""\);/);
-  assert.match(bar, /onMinSatietyChange\(""\);\s*onMaxSatietyChange\(""\);/);
-  assert.match(bar, /onSortChange\("newest"\);\s*onSortDirChange\("desc"\);/);
-  assert.match(bar, /accessibilityLabel=\{`Remove \$\{FILTER_LABELS\[id\]\} filter`\}/);
+  assert.match(bar, /definition\.onChange\(definition\.defaultValue\);/);
+  assert.match(bar, /definition\.onMinChange\(""\);\s*definition\.onMaxChange\(""\);/);
+  assert.match(
+    bar,
+    /definition\.onSortChange\(definition\.defaultSortValue\);\s*definition\.onDirChange\(definition\.defaultDirValue\);/,
+  );
+  assert.match(bar, /accessibilityLabel=\{`Remove \$\{label\} filter`\}/);
 });
 
 test("the title renders as the page heading and pagination rides the shared catalog pattern", () => {
