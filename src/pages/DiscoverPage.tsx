@@ -177,7 +177,14 @@ export type DiscoverPageProps = {
   /** First-load in flight: the list renders empty with a spinner
    * as its empty state, and the filter bar stays mounted. */
   isLoading: boolean;
-  /** Next page in flight: a spinner renders as the list footer. */
+  /** Next page in flight: a spinner renders as the list footer,
+   * and the end-reached handler swallows duplicate requests
+   * while it is set. It is the pagination guard's only fetch
+   * signal: a host whose pages can return no new visible rows
+   * (e.g. after client-side filtering) should pass it — without
+   * it the list keeps plain fire-once-per-content-length
+   * end-reached semantics and an empty page cannot re-arm the
+   * signal on its own. */
   isFetchingNextPage?: boolean;
   /** Pagination hook, wired to the list's end-reached signal. */
   onLoadMore?: () => void;
