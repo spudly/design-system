@@ -123,7 +123,9 @@ jobs:
       # commit, so re-capturing everything is pure waste. All three
       # conditions must hold: authored by github-actions[bot], the
       # exact auto-commit subject, and every changed file under
-      # tools/visualRegression/baselines/. A maintainer merge or
+      # tools/visualRegression/baselines/ or the VR coverage listing
+      # the commit jobs refresh alongside them (issue #284:
+      # docs/android-visual-regression.md). A maintainer merge or
       # any later commit changes the head and the full run resumes.
       # Update dispatches are excluded on purpose: an explicit
       # regeneration request always runs in full.
@@ -138,7 +140,7 @@ jobs:
           author="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.author.login // ""')"
           subject="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.commit.message | split("\n")[0]')"
           if [ "$author" = "github-actions[bot]" ] && [ "$subject" = "chore(vr): update Android Storybook baselines" ]; then
-            outside="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '[.files[].filename | select(startswith("tools/visualRegression/baselines/") | not)] | length')"
+            outside="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '[.files[].filename | select((startswith("tools/visualRegression/baselines/") or . == "docs/android-visual-regression.md") | not)] | length')"
             if [ "$outside" = "0" ]; then
               skip=true
             fi
@@ -393,15 +395,26 @@ jobs:
       - name: Sync baselines into the tree
         run: rsync -a --delete "${{ runner.temp }}/dsvr-baselines/" tools/visualRegression/baselines/
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Issue #284: refresh the docs coverage listing from the
+      # synced baselines so it lands in the same bot commit —
+      # otherwise the scope test goes red on the follow-up run
+      # until a human refreshes the table by hand.
+      - name: Refresh the VR coverage listing
+        run: node tools/visualRegression/coverageListing.mjs
+
       - name: Commit and push if baselines changed
         run: |
-          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines)" ]; then
+          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines docs/android-visual-regression.md)" ]; then
             echo "Baselines unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tools/visualRegression/baselines
+          git add tools/visualRegression/baselines docs/android-visual-regression.md
           git commit -m "chore(vr): update Android Storybook baselines"
           git push origin "HEAD:${{ github.ref_name }}"
 
@@ -456,15 +469,25 @@ jobs:
       - name: Sync baselines into the tree
         run: rsync -a --delete "${{ runner.temp }}/dsvr-pr-baselines/" tools/visualRegression/baselines/
 
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+
+      # Issue #284: same listing refresh as the update-mode job —
+      # the refreshed table lands in this bot commit, so the
+      # follow-up run's scope test passes with no manual doc edit.
+      - name: Refresh the VR coverage listing
+        run: node tools/visualRegression/coverageListing.mjs
+
       - name: Commit and push regenerated baselines
         run: |
-          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines)" ]; then
+          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines docs/android-visual-regression.md)" ]; then
             echo "Baselines unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tools/visualRegression/baselines
+          git add tools/visualRegression/baselines docs/android-visual-regression.md
           git commit -m "chore(vr): update Android Storybook baselines"
           git push origin "HEAD:${{ github.head_ref }}"
 
