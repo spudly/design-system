@@ -324,6 +324,35 @@ export const homeFixture = {
 };
 
 /**
+ * Landing fixture (#171): mirrors @eciperay/client's landingCopy
+ * constants (the host's copy source of truth) and the CTA shape
+ * the web host passes — Discover and Sign up routes plus the
+ * mobile-app install link. The install href is a same-shaped
+ * stand-in: fixtures.ts bans URL literals so screenshots stay
+ * deterministic (#44); the host passes the real install URL.
+ */
+export const landingFixture = {
+  heroTitle: "Your recipes, organized and ready to cook",
+  heroSubtitle:
+    "Save recipes from anywhere, tweak them with AI, and share what you love with friends or the community.",
+  discoverCta: { label: "Discover public recipes", href: "/discover" },
+  signUpCta: { label: "Sign up free", href: "/signup" },
+  getAppCta: { label: "Get the mobile app", href: "/get-the-app" },
+  featureOne: {
+    title: "Import from anywhere",
+    description: "Paste a URL, photo, or notes and let AI turn it into a structured recipe.",
+  },
+  featureTwo: {
+    title: "Cook with confidence",
+    description: "Scale servings, track versions, and follow step-by-step cooking mode.",
+  },
+  featureThree: {
+    title: "Share on your terms",
+    description: "Keep recipes private, share unlisted links, or publish to the community.",
+  },
+};
+
+/**
  * Tags fixture (#126): tag view-models plus the selectable swatch
  * palette, which crosses as a prop in token names (#207 — the
  * canonical `tagColorNames` list).

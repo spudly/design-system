@@ -252,12 +252,13 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // every baseline derivable, and every derivable in-scope story
   // HAS a committed baseline — and the coverage listing in
   // docs/android-visual-regression.md must match both. The
-  // Current light set: 126 standard-width stories (107 light_warmHarvest + 22
+  // Current light set: 127 standard-width stories (107 light_warmHarvest + 22
   // light_quietDawn on disk minus the 3 Reading-screen stories the capture app
   // excludes, ReadingView replicating Memorize's reading screen and landing in
   // B4; the #168 DiscoverPage/DiscoveryCard baselines joined through merges
-  // after the #169 +11 / #170 +2 page growth).
-  const EXPECTED_LIGHT_STORY_COUNT = 126;
+  // after the #169 +11 / #170 +2 page growth, and #171 added the
+  // LandingPage story (+1 standard)).
+  const EXPECTED_LIGHT_STORY_COUNT = 127;
   // the standard set grew by the eight B3a recipe-form stories,
   // #124, the sixteen B3b meals/shopping stories, #125, the
   // twenty-three B3c account/auth stories, #126, the three
