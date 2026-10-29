@@ -105,7 +105,7 @@ test("auth pages report bare intents; no credentials logic in the DS", () => {
     assert.doesNotMatch(
       source,
       /\b(?:signIn|signUp|resetPassword)\s*\(|requestPasswordReset/,
-      `${name} must not call credentials logic — submits are bare intents and cross-page links are hrefs (#248)`,
+      name,
     );
   }
   // #248: the auth pages' cross-links navigate, so they cross as
@@ -115,9 +115,13 @@ test("auth pages report bare intents; no credentials logic in the DS", () => {
   assert.match(page("SignInPage"), /forgotPasswordHref\?: string;/);
   assert.match(page("SignUpPage"), /signInHref\?: string;/);
   assert.match(page("ForgotPasswordPage"), /signInHref\?: string;/);
-  // The declarations alone don't prove the destinations reach the
-  // rendered links — pin the rendered forms too (SignUpPage's is
-  // pinned by the footer test above).
+});
+
+test("auth cross-links render their href destinations (#248)", () => {
+  // The declarations alone don't prove the destinations reach
+  // the rendered links — pin the rendered forms too (SignUpPage's
+  // is pinned by the footer test above), and pin that no
+  // navigation press callback survives on these pages.
   assert.match(page("SignInPage"), /<TextLink href=\{signUpHref\}>Create an account<\/TextLink>/);
   assert.match(
     page("SignInPage"),
