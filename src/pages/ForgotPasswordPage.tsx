@@ -26,7 +26,10 @@ export type ForgotPasswordPageProps = {
   loading?: boolean;
   error?: string | null;
   onSubmit: () => void;
-  onBackPress?: () => void;
+  /** The sign-in destination (#248: navigation crosses as an
+   * href, not a press callback); the "Back to sign in" link
+   * renders only when the href is provided. */
+  signInHref?: string;
 };
 
 export function ForgotPasswordPage({
@@ -35,7 +38,7 @@ export function ForgotPasswordPage({
   loading = false,
   error,
   onSubmit,
-  onBackPress,
+  signInHref,
 }: ForgotPasswordPageProps) {
   // Enter/return in the field submits (#255), mirroring the
   // native-form behavior the retired web view had; while
@@ -74,9 +77,9 @@ export function ForgotPasswordPage({
       >
         {loading ? "Sending…" : "Send Reset Link"}
       </Button>
-      {onBackPress ? (
+      {signInHref ? (
         <YStack paddingTop="$2">
-          <TextLink color={tokens.colors.gray.gray6} onPress={onBackPress}>
+          <TextLink color={tokens.colors.gray.gray6} href={signInHref}>
             Back to sign in
           </TextLink>
         </YStack>

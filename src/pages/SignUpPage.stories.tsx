@@ -72,7 +72,7 @@ function Interactive({
         loading={loading}
         error={error ?? null}
         onSubmit={() => setLoading(true)}
-        onSignInPress={() => undefined}
+        signInHref="/signin"
         legalNotice={<LegalNotice />}
       />
     </Viewport>

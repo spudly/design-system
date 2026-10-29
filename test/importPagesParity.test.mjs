@@ -34,6 +34,26 @@ function pageCode(name) {
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
+test("ImportReviewPage's Make edits stays a callback — the #248 mutation exemption", () => {
+  const code = pageCode("ImportReviewPage");
+  // Stephen's #248 ruling (2026-10-29): "Make edits" creates a
+  // draft and then opens the editor — a mutation whose primary
+  // job is the creation, so it is EXEMPT from the href rule and
+  // stays a press callback (with its "Creating draft…" pending
+  // state); the host does not pre-create drafts.
+  assert.match(code, /onStartEdits: \(\) => void;/, "Make edits must stay a callback prop");
+  assert.match(
+    code,
+    /<Button variant="secondary" disabled=\{busy\} onPress=\{onStartEdits\}>/,
+    "Make edits must render as a press button, not a link",
+  );
+  assert.doesNotMatch(
+    code,
+    /startEditsHref|makeEditsHref|editsHref/,
+    "no edits href may exist — the exemption is by design, not an omission",
+  );
+});
+
 test("ImportReviewPage declares an optional imageAlt prop", () => {
   const code = pageCode("ImportReviewPage");
   assert.match(code, /imageAlt\?: string;/, "the props type must carry optional imageAlt");

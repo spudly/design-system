@@ -1,14 +1,15 @@
-import { YStack } from "tamagui";
+import { Anchor, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
+import { LinkOverlay } from "../components/linkOverlay.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
 import { Tabs } from "../components/Tabs.js";
 import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { TextAction } from "../components/TextAction.js";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
 
 /**
@@ -52,6 +53,11 @@ export type MealsHubPageTab = "meals" | "plans";
 
 export type MealsHubPageMeal = {
   id: string;
+  /** The meal's destination (#248's navigation rule: the row
+   * navigates, so it is a link): the host composes it from the
+   * meal id. The row's text block renders as a link carrying
+   * this href. */
+  href: string;
   title: string;
   /** Pre-composed meta line ("2 recipes · 1,240 cal"). */
   subtitle: string;
@@ -63,58 +69,83 @@ export type MealsHubPageProps = {
   meals: MealsHubPageMeal[];
   plans: MealPlansPageItem[];
   isLoading: boolean;
-  onCreateMeal: () => void;
-  onCreatePlan: () => void;
-  onMealPress: (mealId: string) => void;
-  onPlanPress: (planId: string) => void;
+  /** The create destinations (#248: both create actions
+   * navigate, so they cross as hrefs, not press callbacks). */
+  createMealHref: string;
+  createPlanHref: string;
   onDeleteMeal: (mealId: string) => void;
   onDeletePlan: (planId: string) => void;
 };
 
-function MealRow({
-  meal,
-  onPress,
-  onDelete,
-}: {
-  meal: MealsHubPageMeal;
-  onPress: () => void;
-  onDelete: () => void;
-}) {
-  // Web keyboard support (the MealPlansPage row pattern):
-  // Enter and Space on the focused text block invoke the
-  // same callback as a press. Web-only props, ignored on
-  // native.
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onPress();
-    }
-  };
+function MealRow({ meal, onDelete }: { meal: MealsHubPageMeal; onDelete: () => void }) {
+  // `decorative` marks the visible texts non-accessible for the
+  // native link rendering, whose LinkOverlay carries the label as
+  // the row's one accessibility stop (see LinkOverlay).
+  const renderTextContent = (decorative: boolean) => (
+    <>
+      <Text
+        accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+        fontSize={tokens.typography.fontSize.md}
+        fontWeight={tokens.typography.fontWeight.semibold}
+      >
+        {meal.title}
+      </Text>
+      <Text
+        variant="hint"
+        accessible={decorative ? false : undefined}
+        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+      >
+        {meal.subtitle}
+      </Text>
+    </>
+  );
+  const textContent = renderTextContent(false);
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
-        <YStack
-          flex={1}
-          minWidth={0}
-          gap="$1"
-          {...platformAccessibilityProps({
-            accessibilityRole: "button",
-            accessibilityLabel: meal.title,
-          })}
-          onPress={onPress}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          cursor="web:pointer"
-        >
-          <Text
-            fontSize={tokens.typography.fontSize.md}
-            fontWeight={tokens.typography.fontWeight.semibold}
+        {/* The text block is a real anchor carrying the meal's
+          href (the row navigates, #248) — keyboard-operable on
+          web by default, which retires the hand-rolled
+          focus/keydown press pattern this row used as a button.
+          It is pinned to a web flex column (the BackLink lesson:
+          a text-based anchor is inline on web and would not hold
+          the block's stacked layout). On native the anchor is a
+          Text and the stacked texts would flow inline inside it,
+          so the block platform-splits (see LinkOverlay): a YStack
+          frame with the same structural flex carries the texts,
+          and a childless anchor stretched over it carries the
+          href. */}
+        {isWeb ? (
+          <Anchor
+            flex={1}
+            minWidth={0}
+            gap="$1"
+            href={meal.href}
+            textDecorationLine="none"
+            display="web:flex"
+            flexDirection="column"
+            {...platformAccessibilityProps({
+              accessibilityRole: "link",
+              accessibilityLabel: meal.title,
+            })}
           >
-            {meal.title}
-          </Text>
-          <Text variant="hint">{meal.subtitle}</Text>
-        </YStack>
-        <TextLink onPress={onDelete}>Delete</TextLink>
+            {textContent}
+          </Anchor>
+        ) : (
+          <YStack flex={1} minWidth={0} gap="$1" position="relative">
+            {renderTextContent(true)}
+            <LinkOverlay
+              href={meal.href}
+              accessibilityRole="link"
+              accessibilityLabel={meal.subtitle ? `${meal.title}, ${meal.subtitle}` : meal.title}
+            />
+          </YStack>
+        )}
+        {/* Delete is an action, not navigation (#248 ruling):
+          it renders through TextAction's button role and stays a
+          callback. */}
+        <TextAction onPress={onDelete}>Delete</TextAction>
       </Card>
     </YStack>
   );
@@ -126,10 +157,8 @@ export function MealsHubPage({
   meals,
   plans,
   isLoading,
-  onCreateMeal,
-  onCreatePlan,
-  onMealPress,
-  onPlanPress,
+  createMealHref,
+  createPlanHref,
   onDeleteMeal,
   onDeletePlan,
 }: MealsHubPageProps) {
@@ -166,8 +195,7 @@ export function MealsHubPage({
         <MealPlansPage
           plans={plans}
           isLoading={isLoading}
-          onPlanPress={onPlanPress}
-          onCreatePlan={onCreatePlan}
+          createHref={createPlanHref}
           onPlanDelete={onDeletePlan}
           titleLevel={2}
         />
@@ -179,7 +207,7 @@ export function MealsHubPage({
     <ScreenContainer>
       {hubChrome}
       <YStack paddingVertical="$4">
-        <Button variant="primary" accessibilityLabel="New meal" onPress={onCreateMeal}>
+        <Button variant="primary" accessibilityLabel="New meal" href={createMealHref}>
           New meal
         </Button>
       </YStack>
@@ -193,9 +221,6 @@ export function MealsHubPage({
             <MealRow
               key={meal.id}
               meal={meal}
-              onPress={() => {
-                onMealPress(meal.id);
-              }}
               onDelete={() => {
                 onDeleteMeal(meal.id);
               }}

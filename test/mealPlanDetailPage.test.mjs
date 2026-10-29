@@ -15,20 +15,24 @@
  *    inside a section card (no week grid, no virtualization —
  *    #188's bounded-list structure does not apply).
  * 3. The actions are exactly the app screen's: Shopping list
- *    and Edit buttons, entry presses, and the goals section's
+ *    and Edit buttons, entry rows, and the goals section's
  *    set-goals link. There is deliberately no delete callback —
  *    deleting a plan is the list row's action, and adding or
- *    removing entries happens on the plan form screen.
+ *    removing entries happens on the plan form screen. Since
+ *    #248's navigation rule, every one of those controls
+ *    navigates, so they cross as hrefs (the buttons' href
+ *    forms, the rows through ListRow's link form, the set-goals
+ *    TextLink's href form), not press callbacks.
  * 4. Entries carry two id spaces: the entry's own `id` (the row
- *    key) and the `targetId` its press reports, because a plan
- *    can hold the same recipe twice and meal/recipe rows
- *    navigate to different screens (onMealPress / onRecipePress).
- *    A recipe entry with lost access renders its "(unavailable)"
- *    suffix and carries no press wiring.
+ *    key) and the `targetId` the host composes the entry's
+ *    `href` from, because a plan can hold the same recipe twice
+ *    and meal/recipe rows navigate to different screens. A
+ *    recipe entry with lost access renders its "(unavailable)"
+ *    suffix and renders as plain content, not a link.
  * 5. The nutrition-goals section is view-modeled, not slotted:
  *    it renders when the plan has goal progress or a nutrition
  *    summary, shows the set-goals hint when no goals are set,
- *    and its link renders only with onSetGoalsPress. The absence
+ *    and its link renders only with goalsHref. The absence
  *    of any render slot is pinned (the header's audit: the app's
  *    goal view is pure presentation over data). Since #78 the
  *    section also carries an explicit visibility control
@@ -50,8 +54,8 @@
  *    the goal rows are DetailRow
  *    widgets, the plan title takes Text's `title` variant, the
  *    meta lines take its `hint` variant, and the section spacing
- *    rides the SectionStack. The page keeps only the kind
- *    dispatch in its entry onPress closure.
+ *    rides the SectionStack. The page's only entry logic is the
+ *    kind prefix it composes and the href it passes through.
  *
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
@@ -114,15 +118,18 @@ test("the shell is the scrolling ScreenContainer, with no FlatList", () => {
   );
 });
 
-test("the view-model and callback contract matches the declared props", () => {
+test("the view-model and href contract matches the declared props", () => {
   assert.match(code, /title: string;/);
   assert.match(code, /entries: MealPlanDetailPageEntry\[\];/);
-  assert.match(code, /onMealPress: \(mealId: string\) => void;/);
-  assert.match(code, /onRecipePress: \(recipeId: string\) => void;/);
-  assert.match(code, /onShoppingListPress: \(\) => void;/);
-  assert.match(code, /onEditPress: \(\) => void;/);
-  assert.match(code, /onSetGoalsPress\?: \(\) => void;/);
+  assert.match(code, /shoppingListHref: string;/);
+  assert.match(code, /editHref: string;/);
+  assert.match(code, /goalsHref\?: string;/);
   assert.match(code, /nutritionGoals\?: MealPlanDetailPageNutritionGoals \| null;/);
+  assert.doesNotMatch(
+    code,
+    /onMealPress|onRecipePress|onShoppingListPress|onEditPress|onSetGoalsPress/,
+    "every control on this page navigates — #248 leaves no press callbacks behind",
+  );
 });
 
 test("the actions are exactly the app screen's — no delete, no entry editing", () => {
@@ -135,40 +142,37 @@ test("the actions are exactly the app screen's — no delete, no entry editing",
   );
 });
 
-test("entry presses report the target id, by kind", () => {
+test("entry rows are links carrying the entry href, by kind", () => {
   assert.match(
     code,
-    /onMealPress\(entry\.targetId\)/,
-    "meal rows must fire onMealPress with the entry's target id",
-  );
-  assert.match(
-    code,
-    /onRecipePress\(entry\.targetId\)/,
-    "recipe rows must fire onRecipePress with the entry's target id",
+    /<ListRow[\s\S]*?href=\{entry\.href\}/,
+    "entry rows must render through ListRow in its link form, carrying the entry's href (the link rendering itself is pinned in test/listRow.test.mjs)",
   );
   assert.match(code, /kind: "meal" \| "recipe";/, "entries must carry their kind");
   assert.match(
     code,
     /targetId: string;/,
-    "entries must carry the press target separately from the row key",
+    "entries must carry the host's href source separately from the row key",
   );
+  assert.match(code, /href: string;/, "entries must carry their pre-composed href");
 });
 
 test("entries render through ListRow, with the kind prefix and availability as content", () => {
   assert.match(
     code,
     /<ListRow/,
-    "entry rows must render through the ListRow widget — its disabled state and press wiring are pinned in test/listRow.test.mjs",
+    "entry rows must render through the ListRow widget — its disabled state and link wiring are pinned in test/listRow.test.mjs",
   );
   assert.match(
     code,
     /prefix=\{entry\.kind === "meal" \? "Meal · " : "Recipe · "\}/,
     "the kind lead-in must cross as the row's caller-supplied prefix",
   );
+  assert.match(code, /" \(unavailable\)"/, "the access-lost suffix must render on the title line");
   assert.match(
     code,
     /entry\.kind === "recipe" && entry\.isUnavailable\s+\? \{ isDisabled: true, titleSuffix: " \(unavailable\)" \}/,
-    "only a recipe entry can be unavailable — it passes the generic disabled flag and the suffix as content",
+    "only a recipe entry can be unavailable — it passes the generic disabled flag and the suffix as content (a disabled ListRow renders no link, so the unavailable row is not a link)",
   );
   assert.match(code, /title=\{entry\.title\}/, "the row must receive the entry's title");
 });
@@ -192,10 +196,14 @@ test("the goals section follows the app's visibility and hint rules", () => {
   );
   assert.match(
     code,
-    /\{onSetGoalsPress \? \(/,
-    "the set-goals link must render only when its callback is provided",
+    /\{goalsHref \? <TextLink/,
+    "the set-goals link must render only when its href is provided",
   );
-  assert.match(code, />Set nutrition goals<\/TextLink>/, "the link label must match the app's");
+  assert.match(
+    code,
+    /<TextLink href=\{goalsHref\}>Set nutrition goals<\/TextLink>/,
+    "the link label must match the app's, in TextLink's href form (#248)",
+  );
 });
 
 test("an entry-less plan renders the bare Entries section, with no empty message", () => {

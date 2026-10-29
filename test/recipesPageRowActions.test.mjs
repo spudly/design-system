@@ -123,10 +123,16 @@ test("both control states fire the row's log-cook callback", () => {
   const rowAt = code.indexOf("function RecipeRow");
   const control = code.slice(controlAt, rowAt);
   assert.equal(
-    control.split("onPress={onLogCookPress}").length - 1,
+    control.split("onPress={handlePress}").length - 1,
     2,
-    "the stars pressable and the icon button must each wire onPress to onLogCookPress",
+    "the stars pressable and the icon button must each wire onPress to the control's press handler",
   );
+  // The handler fires the row's callback — and first cancels the
+  // click's default action, because the control renders inside
+  // the row's text link (#248): on web, react-native-web stops
+  // the click's propagation but not its default, so without the
+  // cancellation the wrapping anchor would also navigate.
+  assert.match(control, /event\.preventDefault\(\);\s+onLogCookPress\(\);/);
   assert.equal(
     control.split('accessibilityRole="button"').length - 1,
     2,
@@ -157,27 +163,77 @@ test("the control renders inline in the text block's subtitle flow, never as a r
     1,
     "RecipeRow must render the log-cook control exactly once",
   );
-  // The control lives inside the text press target (the one carrying
-  // textBlockStyle): it opens before the control renders, and the
-  // control renders before that target closes.
-  const textTargetAt = row.indexOf("style={textBlockStyle}");
+  // The control lives inside the row's text content — the block
+  // both platform text targets render. The text target is a real
+  // Anchor on web; on native the anchor is a Text and cannot carry
+  // the block, so a YStack frame carrying textBlockStyle renders
+  // the same content with a LinkOverlay anchor stretched under it
+  // (the frame's layering exception: the content is
+  // pointer-transparent, the control keeps its own presses).
+  const contentAt = row.indexOf("const renderTextContent");
   const controlAt = row.indexOf("<LogCookControl");
-  const textTargetCloseAt = row.indexOf("</TouchableOpacity>", controlAt);
+  const contentEndAt = row.indexOf("return (", contentAt);
   assert.ok(
-    textTargetAt !== -1 && controlAt > textTargetAt,
-    "the control must render after the text press target opens",
+    contentAt !== -1 && controlAt > contentAt && controlAt < contentEndAt,
+    "the control must render inside the shared text content both targets render",
+  );
+  // Both platform targets carry the text block style and render
+  // the shared content; the web target is the Anchor rendering the
+  // plain content, the native target renders the native variant
+  // over its LinkOverlay.
+  assert.equal(
+    row.split("style={textBlockStyle}").length - 1,
+    2,
+    "the web Anchor and the native frame must both carry textBlockStyle",
   );
   assert.ok(
-    textTargetCloseAt > controlAt,
-    "the control must render before the text press target closes",
+    row.slice(contentEndAt).includes("{textContent}") &&
+      row.slice(contentEndAt).includes("{renderTextContent(true)}"),
+    "the web target must render the plain content and the native target the native variant",
   );
-  // Inside the target, the control sits in the subtitle's wrapping
+  // The native layering contract (LinkOverlay): the text frame's
+  // overlay renders BEFORE the native content (bottom layer), its
+  // plain texts are pointer-transparent ("none") and the subtitle
+  // flow is "box-none", so hit testing falls through to the
+  // overlay while the control — default pointer events — keeps
+  // its presses. The thumbnail frame's overlay renders AFTER the
+  // thumbnail (topmost layer; nothing in that frame is
+  // interactive). These pins are the static coverage for the
+  // layering; tap behavior itself follows React Native's hitTest
+  // semantics and is not executable in this Node suite.
+  const nativeTextFrameAt = row.indexOf('<YStack style={textBlockStyle} position="relative">');
+  const textOverlayAt = row.indexOf("<LinkOverlay", nativeTextFrameAt);
+  const nativeContentAt = row.indexOf("{renderTextContent(true)}", nativeTextFrameAt);
+  assert.ok(
+    nativeTextFrameAt !== -1 &&
+      textOverlayAt > nativeTextFrameAt &&
+      nativeContentAt > textOverlayAt,
+    "the text frame's overlay must render before the native content (bottom layer)",
+  );
+  assert.equal(
+    row.split('pointerEvents={native ? "none" : undefined}').length - 1,
+    2,
+    "the native title and subtitle texts must be pointer-transparent",
+  );
+  assert.equal(
+    row.split('pointerEvents={native ? "box-none" : undefined}').length - 1,
+    1,
+    "the native subtitle flow must be box-none so the control inside it stays pressable",
+  );
+  const thumbFrameAt = row.indexOf('<View position="relative">');
+  const thumbAt = row.indexOf("<Thumbnail", thumbFrameAt);
+  const thumbOverlayAt = row.indexOf("<LinkOverlay", thumbFrameAt);
+  assert.ok(
+    thumbFrameAt !== -1 && thumbAt > thumbFrameAt && thumbOverlayAt > thumbAt,
+    "the thumbnail frame's overlay must render after the thumbnail (topmost layer)",
+  );
+  // Inside the content, the control sits in the subtitle's wrapping
   // flow, after the subtitle text — so it flows with the text at the
   // block's full width instead of holding width at the row's edge.
-  const flowAt = row.indexOf('flexWrap="wrap"', textTargetAt);
+  const flowAt = row.indexOf('flexWrap="wrap"', contentAt);
   const subtitleAt = row.indexOf("{item.subtitle}", flowAt);
   assert.ok(
-    flowAt > textTargetAt && flowAt < controlAt,
+    flowAt > contentAt && flowAt < controlAt,
     "a wrapping flow must open inside the text block before the control",
   );
   assert.ok(
@@ -186,8 +242,8 @@ test("the control renders inline in the text block's subtitle flow, never as a r
   );
   const flowCloseAt = row.indexOf("</XStack>", controlAt);
   assert.ok(
-    flowCloseAt > controlAt && flowCloseAt < textTargetCloseAt,
-    "the flow must close after the control, inside the text target",
+    flowCloseAt > controlAt && flowCloseAt < contentEndAt,
+    "the flow must close after the control, inside the text content",
   );
 });
 
@@ -198,7 +254,7 @@ test("the stories exercise rated and unrated rows", () => {
   );
   assert.match(
     stories,
-    /id: "arroz-con-pollo", title: "Arroz con Pollo", subtitle: "[^"]*" \}/,
+    /id: "arroz-con-pollo",\s+href: "\/recipes\/arroz-con-pollo",\s+title: "Arroz con Pollo",\s+subtitle: "[^"]*",\s+\}/,
     "at least one fixture recipe (Arroz con Pollo) must stay unrated so the icon-only button renders in captures",
   );
 });

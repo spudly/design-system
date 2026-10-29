@@ -39,7 +39,7 @@ export const WithSections: Story = {
       <ProfilePage
         email="cook@example.com"
         onSignOut={() => undefined}
-        onManageTagsPress={() => undefined}
+        tagsHref="/profile/tags"
         sectionsBeforeFeedback={
           <YStack gap="$4">
             <NutritionGoalsForm

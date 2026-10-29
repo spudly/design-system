@@ -11,8 +11,9 @@ import { Text } from "../components/Text.js";
  * MealPlansPage (#49): Eciperay's meal plan list as a controlled
  * @spudly/ui page component. The app keeps all state and business
  * logic — queries, mutations, navigation — and drives this view
- * entirely through props: plan view-models in, press callbacks out.
- * Nothing here imports an app package or fetches anything.
+ * entirely through props: plan view-models in, destinations and
+ * callbacks out. Nothing here imports an app package or fetches
+ * anything.
  *
  * Which screen this is: the app's meal-planning surfaces are the
  * Meals hub (a tabbed screen: "Meals" | "Meal plans"), a single
@@ -64,19 +65,23 @@ import { Text } from "../components/Text.js";
  * inside itself — no forms, pickers, or inline editors live in
  * these rows; creating goes to the plan form screen, deleting is
  * a bare mutation intent, and entry editing happens on the form
- * screen too. Every action here is therefore a pure intent
- * callback, which is the honest contract for this view. If a
- * future app change puts app-rendered content inside a plan row,
- * that change adds a slot to this contract (the
- * `renderRecipeAccessory` precedent) rather than a callback that
- * pretends to render.
+ * screen too. The controls split on #248's navigation rule: the
+ * plan rows and the create action navigate, so they cross as
+ * hrefs (each plan carries its own; the create action takes
+ * `createHref`), and Delete — a mutation, not a navigation —
+ * stays a bare intent callback, which is the honest contract for
+ * this view. If a future app change puts app-rendered content
+ * inside a plan row, that change adds a slot to this contract
+ * (the `renderRecipeAccessory` precedent) rather than a callback
+ * that pretends to render.
  *
  * De-styled for #119: the page renders no layout primitives and
  * sets no styling props. The plan row is the generic CardRow
- * widget (its card layout, pressable area, and action treatment
- * live there; the page supplies the plan content and the Delete
- * action), the list stacks in a CardStack, and the loading block
- * centers its spinner in a Center.
+ * widget in its link form (its card layout, link area, and action
+ * treatment live there; the page supplies the plan content, the
+ * plan's href, and the Delete action), the list stacks in a
+ * CardStack, and the loading block centers its spinner in a
+ * Center.
  */
 
 /** One meal plan row's view-model. The app formats `subtitle` (its
@@ -84,6 +89,10 @@ import { Text } from "../components/Text.js";
  * renders it. */
 export type MealPlansPageItem = {
   id: string;
+  /** The plan's destination (#248's navigation rule: the row
+   * navigates, so it is a link): the host composes it from the
+   * plan id. The row renders as a link carrying this href. */
+  href: string;
   title: string;
   subtitle?: string;
 };
@@ -94,10 +103,9 @@ export type MealPlansPageProps = {
   /** Load in flight: the spinner renders in place of the list,
    * mirroring the app's content swap (see the header). */
   isLoading: boolean;
-  onPlanPress: (planId: string) => void;
   /** Optional: the "New meal plan" action renders only when the
-   * callback is provided. */
-  onCreatePlan?: () => void;
+   * href is provided (#248: it navigates, so it is a link). */
+  createHref?: string;
   /** Optional row action, mirroring the app row's Delete. The
    * button renders only when the callback is provided. */
   onPlanDelete?: (planId: string) => void;
@@ -117,8 +125,7 @@ export type MealPlansPageProps = {
 export function MealPlansPage({
   plans,
   isLoading,
-  onPlanPress,
-  onCreatePlan,
+  createHref,
   onPlanDelete,
   titleLevel,
 }: MealPlansPageProps) {
@@ -127,7 +134,7 @@ export function MealPlansPage({
       <Text variant="heading" aria-level={titleLevel}>
         Meal plans
       </Text>
-      {onCreatePlan ? <Button onPress={onCreatePlan}>New meal plan</Button> : null}
+      {createHref ? <Button href={createHref}>New meal plan</Button> : null}
       {isLoading ? (
         <Center>
           <Spinner label="Loading" />
@@ -141,9 +148,7 @@ export function MealPlansPage({
               key={plan.id}
               title={plan.title}
               {...(plan.subtitle ? { subtitle: plan.subtitle } : {})}
-              onPress={() => {
-                onPlanPress(plan.id);
-              }}
+              href={plan.href}
               actionLabel="Delete"
               actionTone="danger"
               {...(onPlanDelete

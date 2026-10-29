@@ -36,6 +36,19 @@ export const TitleOnly: Story = {
   ),
 };
 
+export const Href: Story = {
+  args: {
+    title: "Manual entry",
+    description: "Type or paste a recipe by hand",
+    href: "/recipes/new/manual",
+  },
+  render: (args) => (
+    <YStack maxWidth={480}>
+      <OptionCard {...args} />
+    </YStack>
+  ),
+};
+
 export const Multiple: Story = {
   render: () => (
     <YStack maxWidth={480} gap={12}>

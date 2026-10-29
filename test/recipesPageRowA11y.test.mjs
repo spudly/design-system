@@ -7,8 +7,11 @@
  * SharedRecipeRow press targets (its contract test was folded into
  * test/recipesPageSharedConfig.test.mjs when #185 consolidated the
  * pages); this file pins the identical contract for RecipeRow:
- * both press targets (thumbnail and text block) must declare the button
- * role and take the recipe title as their accessible name.
+ * both row targets (thumbnail and text block) must declare a role
+ * and take the recipe title as their accessible name. Since #248's
+ * navigation rule the rows navigate, so the targets are anchors
+ * declaring the LINK role (routed through the platform translator,
+ * #237) — the naming contract is unchanged.
  *
  * Source scan, not a render test: the failures it guards happen on native
  * screen readers, which no JS renderer in this repo exercises, and the
@@ -31,22 +34,27 @@ test("RecipesPage source is readable and non-trivial", () => {
   assert.match(code, /function RecipeRow/);
 });
 
-test("both RecipeRow press targets are named buttons for screen readers (#60)", () => {
+test("both RecipeRow link targets are named links for screen readers (#60, #248)", () => {
   assert.equal(
-    code.split('accessibilityRole="button"').length - 1,
-    4,
-    "four press targets declare the button role: the thumbnail and text targets pinned here, plus the log-cook control's two states (stars / icon button) pinned by test/recipesPageRowActions.test.mjs",
+    code.split('accessibilityRole: "link"').length - 1,
+    2,
+    "the thumbnail and text targets declare the link role (they navigate, #248), routed through the platform translator",
   );
   assert.equal(
-    code.split("accessibilityLabel={item.title}").length - 1,
+    code.split('accessibilityRole="button"').length - 1,
+    2,
+    "the button role remains only on the log-cook control's two states (stars / icon button), pinned by test/recipesPageRowActions.test.mjs — the row targets are links now",
+  );
+  assert.equal(
+    code.split("accessibilityLabel: item.title").length - 1,
     1,
-    "the thumbnail press target must take the recipe title as its accessible name (it wraps only an image)",
+    "the thumbnail link target must take the recipe title as its accessible name (it wraps only an image)",
   );
   assert.ok(
     code.includes(
       // eslint-disable-next-line no-template-curly-in-string -- expected source text intentionally contains a template literal
-      "accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}",
+      "accessibilityLabel: item.subtitle ? `${item.title}, ${item.subtitle}` : item.title",
     ),
-    "the text press target's label must include the subtitle when present — a title-only label would override the name derived from its Text children and drop the subtitle announcement",
+    "the text link target's label must include the subtitle when present — a title-only label would override the name derived from its Text children and drop the subtitle announcement",
   );
 });

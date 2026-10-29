@@ -266,12 +266,8 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
     /\{cookTimeLabel \? <StatCard label="Cook"/,
     "the Cook stat renders only with a cook time",
   );
-  assert.match(code, /\{onEditPress \? \(/, "the Edit chip renders only with its callback");
-  assert.match(
-    code,
-    /\{onEditDraftPress \? \(/,
-    "the Edit draft chip renders only with its callback",
-  );
+  assert.match(code, /\{editHref \? \(/, "the Edit chip renders only with its href");
+  assert.match(code, /\{editDraftHref \? \(/, "the Edit draft chip renders only with its href");
   assert.match(
     code,
     /lifecycle\.isEditable \|\| lifecycle\.candidates\.length > 0/,
@@ -288,6 +284,19 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
     "the substitutions panel renders only with substitutions",
   );
   assert.match(code, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
+});
+
+test("the tweak controls split on the #248 ruling: AI is a link, manual is an exempt callback", () => {
+  // Pure navigation remodels to the href form ("Tweak with AI");
+  // Stephen's #248 ruling (2026-10-29) EXEMPTS "Tweak manually":
+  // its primary job is the mutation (create the draft, then open
+  // the editor), so it stays a callback and the host does not
+  // pre-create drafts.
+  assert.match(code, /tweakAiHref\?: string;/);
+  assert.match(code, /href=\{tweakAiHref\}/);
+  assert.match(code, /onTweakManuallyPress\?: \(\) => void;/);
+  assert.match(code, /onPress=\{onTweakManuallyPress\}/);
+  assert.doesNotMatch(code, /tweakManuallyHref/);
 });
 
 test("tags render through Badge's color form, not an inline pill (#211)", () => {

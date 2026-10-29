@@ -37,7 +37,7 @@ function Interactive({ initialLoading = false }: { initialLoading?: boolean }) {
         onEmailChange={setEmail}
         loading={loading}
         onSubmit={() => setLoading(true)}
-        onBackPress={() => undefined}
+        signInHref="/signin"
       />
     </Viewport>
   );

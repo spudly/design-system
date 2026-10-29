@@ -12,9 +12,10 @@
  * as a caller-supplied `prefix`, the "(unavailable)" text as a
  * caller-supplied `titleSuffix`, and the recipe-access state as
  * a generic `isDisabled` treatment (no press, no focus, marked
- * disabled). The page keeps only its kind dispatch in its own
- * onPress closure. The pins hold the shape, including the
- * disabled treatment.
+ * disabled). The page composes only its kind prefix and passes
+ * each entry's href through to the row's link form. The pins
+ * hold the shape, including the disabled treatment and the
+ * link form.
  *
  * Source scan plus a dist export check, like the other component
  * contract tests. The dist import needs the harness's
@@ -66,7 +67,37 @@ test("ListRow keeps the hairline row and composes the title line from its parts"
     /fontSize=\{tokens\.typography\.fontSize\.md\}\s+fontWeight=\{tokens\.typography\.fontWeight\.medium\}/,
   );
   assert.match(listRowCode, /\{prefix\}\s+\{title\}\s+\{titleSuffix\}/);
-  assert.match(listRowCode, /\{subtitle \? <Text variant="hint">\{subtitle\}<\/Text> : null\}/);
+  assert.match(listRowCode, /\{subtitle \? \(/, "the subtitle renders only when provided");
+  assert.match(
+    listRowCode,
+    /<Text\s+variant="hint"\s+accessible=\{decorative \? false : undefined\}/,
+    "the subtitle takes the hint variant and the decorative flag (the native link form hides it behind the overlay's composed label)",
+  );
+});
+
+test("ListRow's link form renders an anchor on web and a LinkOverlay on native; a disabled row renders no link (#248)", () => {
+  assert.match(listRowCode, /href: string;/, "the link form's discriminant is the href");
+  assert.match(listRowCode, /onPress\?: never/, "the two forms are mutually exclusive");
+  assert.match(
+    listRowCode,
+    /href !== undefined && !isDisabled/,
+    "the link rendering is gated on the href form and the row being enabled — a disabled row falls through to the plain disabled rendering",
+  );
+  assert.match(
+    listRowCode,
+    /<Anchor\s+href=\{href\}/,
+    "the web link form is an anchor carrying the href",
+  );
+  assert.match(
+    listRowCode,
+    /<LinkOverlay\s+href=\{href\}/,
+    "the native link form's overlay carries the href",
+  );
+  assert.match(
+    listRowCode,
+    /subtitle \? `, \$\{subtitle\}` : ""/,
+    "the overlay's label composes the title line and the subtitle when present — the visible texts are decorative in this form",
+  );
 });
 
 test("ListRow's enabled row is a keyboard-operable button; the disabled row is marked disabled", () => {

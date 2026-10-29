@@ -170,8 +170,13 @@ test("MealDetailPage members are view-models with pre-composed subtitles", () =>
   assert.ok(page.includes("subtitle"), "member subtitles cross pre-composed");
   assert.ok(page.includes("isUnavailable"), "unavailable members render their suffix from a flag");
   assert.ok(page.includes("(unavailable)"), "the unavailable suffix renders in the page");
-  for (const prop of ["onCook", "onEdit", "onRecipePress"]) {
+  // #248: Cook and Edit navigate, and each member row is a link —
+  // they cross as hrefs, not press callbacks.
+  for (const prop of ["cookHref", "editHref", "href: string"]) {
     assert.ok(page.includes(prop), `MealDetailPage must take ${prop}`);
+  }
+  for (const prop of ["onCook", "onEdit", "onRecipePress"]) {
+    assert.ok(!page.includes(prop), `MealDetailPage must not take ${prop} (#248)`);
   }
 });
 
@@ -181,16 +186,21 @@ test("MealsHubPage composes MealPlansPage for the plans tab and reports the tab 
   assert.ok(page.includes("onSelectTab"), "the tab switch reports out as an intent");
   assert.ok(page.includes("activeTab"), "the active tab crosses as a prop");
   assert.ok(page.includes("subtitle"), "meal subtitles cross pre-composed");
-  for (const prop of [
-    "onCreateMeal",
-    "onCreatePlan",
-    "onMealPress",
-    "onPlanPress",
-    "onDeleteMeal",
-    "onDeletePlan",
-  ]) {
+  // #248: both create actions navigate and each meal row is a
+  // link, so they cross as hrefs; the deletes stay callbacks.
+  for (const prop of ["createMealHref", "createPlanHref", "onDeleteMeal", "onDeletePlan"]) {
     assert.ok(page.includes(prop), `MealsHubPage must take ${prop}`);
   }
+  for (const prop of ["onCreateMeal", "onCreatePlan", "onMealPress", "onPlanPress"]) {
+    assert.ok(!page.includes(prop), `MealsHubPage must not take ${prop} (#248)`);
+  }
+  // Stephen's #248 ruling: an action never renders in link form —
+  // the row Delete is the button-role TextAction, never a TextLink.
+  assert.ok(
+    page.includes("<TextAction onPress={onDelete}>Delete</TextAction>"),
+    "the meal row Delete must render through TextAction (#248 ruling)",
+  );
+  assert.ok(!page.includes("TextLink"), "MealsHubPage must not render a TextLink");
 });
 
 test("stories cover the captured states for each B3b page", () => {

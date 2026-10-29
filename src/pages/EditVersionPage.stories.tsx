@@ -93,7 +93,7 @@ export const Default: Story = {
 export const NotEditable: Story = {
   render: () => (
     <Viewport>
-      <EditVersionPage versionNumber={1} notEditable onBack={() => undefined} />
+      <EditVersionPage versionNumber={1} notEditable backHref="/recipes/1" />
     </Viewport>
   ),
 };

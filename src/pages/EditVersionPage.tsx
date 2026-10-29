@@ -30,9 +30,10 @@ export type EditVersionPageProps = {
   parentVersionNumber?: number;
   /** Locked version: renders the not-editable state, no form. */
   notEditable?: boolean;
-  /** Back intent for the not-editable state; the link renders only
-   * when the callback is provided. */
-  onBack?: () => void;
+  /** Back link for the not-editable state (#248: the host
+   * composes the recipe URL as an href); the link renders only
+   * when the href is provided. */
+  backHref?: string;
   children?: ReactNode;
 };
 
@@ -43,7 +44,7 @@ export function EditVersionPage(props: EditVersionPageProps) {
     showImportBanner = false,
     parentVersionNumber,
     notEditable = false,
-    onBack,
+    backHref,
     children,
   } = props;
 
@@ -51,7 +52,7 @@ export function EditVersionPage(props: EditVersionPageProps) {
     return (
       <ScreenContainer scrollable={false}>
         <Text variant="error">This version can no longer be edited.</Text>
-        {onBack ? <TextLink onPress={onBack}>Back to recipe</TextLink> : null}
+        {backHref ? <TextLink href={backHref}>Back to recipe</TextLink> : null}
       </ScreenContainer>
     );
   }

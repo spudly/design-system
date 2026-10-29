@@ -88,8 +88,8 @@ test("SignUpPage footer block is consistently centered (eciperay#294)", () => {
   const source = page("SignUpPage");
   assert.match(
     source,
-    /<YStack paddingTop="\$4">\s*<TextLink textAlign="center" onPress={onSignInPress}>\s*Already have an account\? Sign in/,
-    "the sign-in footer link is center-aligned like the legal notice above it",
+    /<YStack paddingTop="\$4">\s*<TextLink textAlign="center" href={signInHref}>\s*Already have an account\? Sign in/,
+    "the sign-in footer link is center-aligned like the legal notice above it (and a link since #248)",
   );
   assert.doesNotMatch(
     source,
@@ -102,7 +102,41 @@ test("auth pages report bare intents; no credentials logic in the DS", () => {
   for (const name of ["SignInPage", "SignUpPage", "ForgotPasswordPage", "ResetPasswordPage"]) {
     const source = page(name);
     assert.match(source, /onSubmit: \(\) => void/, `${name} submits a bare intent`);
-    assert.doesNotMatch(source, /signIn|signUp|requestPasswordReset|resetPassword\(/, name);
+    assert.doesNotMatch(
+      source,
+      /\b(?:signIn|signUp|resetPassword)\s*\(|requestPasswordReset/,
+      name,
+    );
+  }
+  // #248: the auth pages' cross-links navigate, so they cross as
+  // href props and render in TextLink's href form — no press
+  // callbacks for navigation remain on these pages.
+  assert.match(page("SignInPage"), /signUpHref\?: string;/);
+  assert.match(page("SignInPage"), /forgotPasswordHref\?: string;/);
+  assert.match(page("SignUpPage"), /signInHref\?: string;/);
+  assert.match(page("ForgotPasswordPage"), /signInHref\?: string;/);
+});
+
+test("auth cross-links render their href destinations (#248)", () => {
+  // The declarations alone don't prove the destinations reach
+  // the rendered links — pin the rendered forms too (SignUpPage's
+  // is pinned by the footer test above), and pin that no
+  // navigation press callback survives on these pages.
+  assert.match(page("SignInPage"), /<TextLink href=\{signUpHref\}>Create an account<\/TextLink>/);
+  assert.match(
+    page("SignInPage"),
+    /<TextLink color=\{tokens\.colors\.gray\.gray6\} href=\{forgotPasswordHref\}>/,
+  );
+  assert.match(
+    page("ForgotPasswordPage"),
+    /<TextLink color=\{tokens\.colors\.gray\.gray6\} href=\{signInHref\}>/,
+  );
+  for (const name of ["SignInPage", "SignUpPage", "ForgotPasswordPage"]) {
+    assert.doesNotMatch(
+      page(name),
+      /onSignUpPress|onForgotPasswordPress|onSignInPress|onBackPress/,
+      `${name} must not keep a navigation press callback (#248)`,
+    );
   }
 });
 

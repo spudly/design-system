@@ -45,6 +45,7 @@ function Viewport({ children }: { children: ReactNode }) {
 const verseItems: MyVersesPageItem[] = [
   {
     id: "ether-12-27",
+    drillHref: "/drill/ether-12-27",
     reference: "Ether 12:27",
     text: "And if men come unto me I will show unto them their weakness. I give unto men weakness that they may be humble; and my grace is sufficient for all men that humble themselves before me.",
     status: "memorized",
@@ -52,6 +53,7 @@ const verseItems: MyVersesPageItem[] = [
   },
   {
     id: "alma-32-21",
+    drillHref: "/drill/alma-32-21",
     reference: "Alma 32:21",
     text: "And now as I said concerning faith—faith is not to have a perfect knowledge of things; therefore if ye have faith ye hope for things which are not seen, which are true.",
     status: "learning",
@@ -59,6 +61,7 @@ const verseItems: MyVersesPageItem[] = [
   },
   {
     id: "moroni-7-47",
+    drillHref: "/drill/moroni-7-47",
     reference: "Moroni 7:47",
     text: "But charity is the pure love of Christ, and it endureth forever; and whoso is found possessed of it at the last day, it shall be well with him.",
     status: "learning",
@@ -68,11 +71,7 @@ const verseItems: MyVersesPageItem[] = [
 export const Default: Story = {
   render: () => (
     <Viewport>
-      <MyVersesPage
-        verses={verseItems}
-        onDrillVerse={() => undefined}
-        onRemoveVerse={() => undefined}
-      />
+      <MyVersesPage verses={verseItems} onRemoveVerse={() => undefined} />
     </Viewport>
   ),
 };
@@ -80,7 +79,7 @@ export const Default: Story = {
 export const Empty: Story = {
   render: () => (
     <Viewport>
-      <MyVersesPage verses={[]} onDrillVerse={() => undefined} onRemoveVerse={() => undefined} />
+      <MyVersesPage verses={[]} onRemoveVerse={() => undefined} />
     </Viewport>
   ),
 };
