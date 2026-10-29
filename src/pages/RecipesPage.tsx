@@ -629,7 +629,11 @@ function RatingStars({ rating }: { rating: number }) {
  * perform here. The control renders inside the text block's
  * subtitle flow (see RecipeRow) — never as an item of the card
  * row, where its width starved the text column (#205, and again
- * in PR #120's narrow captures when it sat at the row's edge). */
+ * in PR #120's narrow captures when it sat at the row's edge).
+ * Since #248 the text block is a link, so the control's press
+ * handler also cancels the click's default action on web —
+ * otherwise the wrapping anchor would navigate as well as log
+ * (see handlePress below). */
 function LogCookControl({
   item,
   onLogCookPress,
@@ -638,11 +642,27 @@ function LogCookControl({
   onLogCookPress: () => void;
 }) {
   const rating = item.rating;
+  // The control renders inside the row's text link (#248), and
+  // on web the wrapping anchor would ALSO follow its href when
+  // the control is clicked: react-native-web's press handling
+  // stops the click's propagation but does not cancel its
+  // default action (verified in its PressResponder source — the
+  // conditional preventDefault covers only long-press and
+  // selection-terminated presses). Cancelling the default in
+  // the control's own press handler — the one handler certain
+  // to run for its clicks — keeps a log-cook press from also
+  // navigating. On native the call is inert: the innermost
+  // press target wins the responder, as it did when the row's
+  // outer target was a pressable too.
+  const handlePress = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    onLogCookPress();
+  };
   if (rating !== null && rating !== undefined && rating > 0) {
     return (
       <TouchableOpacity
         style={logCookTargetStyle}
-        onPress={onLogCookPress}
+        onPress={handlePress}
         accessibilityRole="button"
         accessibilityLabel={`Log a cook of ${item.title}, rated ${rating} out of 5 stars`}
       >
@@ -653,7 +673,7 @@ function LogCookControl({
   return (
     <TouchableOpacity
       style={logCookTargetStyle}
-      onPress={onLogCookPress}
+      onPress={handlePress}
       accessibilityRole="button"
       accessibilityLabel={`Log a cook of ${item.title}`}
     >

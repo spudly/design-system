@@ -123,10 +123,16 @@ test("both control states fire the row's log-cook callback", () => {
   const rowAt = code.indexOf("function RecipeRow");
   const control = code.slice(controlAt, rowAt);
   assert.equal(
-    control.split("onPress={onLogCookPress}").length - 1,
+    control.split("onPress={handlePress}").length - 1,
     2,
-    "the stars pressable and the icon button must each wire onPress to onLogCookPress",
+    "the stars pressable and the icon button must each wire onPress to the control's press handler",
   );
+  // The handler fires the row's callback — and first cancels the
+  // click's default action, because the control renders inside
+  // the row's text link (#248): on web, react-native-web stops
+  // the click's propagation but not its default, so without the
+  // cancellation the wrapping anchor would also navigate.
+  assert.match(control, /event\.preventDefault\(\);\s+onLogCookPress\(\);/);
   assert.equal(
     control.split('accessibilityRole="button"').length - 1,
     2,

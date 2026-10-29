@@ -115,6 +115,18 @@ test("auth pages report bare intents; no credentials logic in the DS", () => {
   assert.match(page("SignInPage"), /forgotPasswordHref\?: string;/);
   assert.match(page("SignUpPage"), /signInHref\?: string;/);
   assert.match(page("ForgotPasswordPage"), /signInHref\?: string;/);
+  // The declarations alone don't prove the destinations reach the
+  // rendered links — pin the rendered forms too (SignUpPage's is
+  // pinned by the footer test above).
+  assert.match(page("SignInPage"), /<TextLink href=\{signUpHref\}>Create an account<\/TextLink>/);
+  assert.match(
+    page("SignInPage"),
+    /<TextLink color=\{tokens\.colors\.gray\.gray6\} href=\{forgotPasswordHref\}>/,
+  );
+  assert.match(
+    page("ForgotPasswordPage"),
+    /<TextLink color=\{tokens\.colors\.gray\.gray6\} href=\{signInHref\}>/,
+  );
   for (const name of ["SignInPage", "SignUpPage", "ForgotPasswordPage"]) {
     assert.doesNotMatch(
       page(name),
