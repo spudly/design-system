@@ -137,12 +137,11 @@ test("ShoppingListPage check-off is controlled per line with real checkbox seman
   assert.ok(page.includes("isChecked"), "each line carries its checked state in");
   assert.ok(page.includes("onToggleLine"), "toggles report out through onToggleLine");
   assert.ok(
-    page.includes('accessibilityRole: "checkbox"') && page.includes("platformAccessibilityProps"),
-    "rows carry checkbox semantics, not a text glyph — routed through the platform translator so web renders role/aria-checked/aria-label instead of raw RN attributes (#237)",
+    page.includes("CheckRow"),
+    "rows render through the generic CheckRow since the #119 de-styling — the checkbox semantics (routed through the platform translator, #237) and the checked strike-through are pinned in test/checkRow.test.mjs",
   );
   assert.ok(!page.includes("☑") && !page.includes("☐"), "the app's text glyphs must not cross");
   assert.ok(page.includes("quantityLabel"), "quantities cross pre-composed");
-  assert.ok(page.includes("line-through"), "checked lines render struck through");
 });
 
 test("MealCookingModePage progression is controlled and bounded by the PrevNextNav convention", () => {
@@ -196,9 +195,12 @@ test("MealsHubPage composes MealPlansPage for the plans tab and reports the tab 
   }
   // Stephen's #248 ruling: an action never renders in link form —
   // the row Delete is the button-role TextAction, never a TextLink.
+  // Since the #119 de-styling the row renders through the generic
+  // TextActionCardRow; the TextAction rendering itself is pinned
+  // in test/textActionCardRow.test.mjs.
   assert.ok(
-    page.includes("<TextAction onPress={onDelete}>Delete</TextAction>"),
-    "the meal row Delete must render through TextAction (#248 ruling)",
+    page.includes("TextActionCardRow"),
+    "meal rows render through the generic TextActionCardRow (#119)",
   );
   assert.ok(!page.includes("TextLink"), "MealsHubPage must not render a TextLink");
 });

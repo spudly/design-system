@@ -10,6 +10,8 @@ export { BlankWord, type BlankWordProps } from "./BlankWord.js";
 export { BulkSelectToolbar, type BulkSelectToolbarProps } from "./BulkSelectToolbar.js";
 export { Button, type ButtonProps } from "./Button.js";
 export { Card, type CardProps } from "./Card.js";
+export { CompactCard, type CompactCardProps } from "./CompactCard.js";
+export { BadgeCardRow, type BadgeCardRowAction, type BadgeCardRowProps } from "./BadgeCardRow.js";
 export { CheckboxField, type CheckboxFieldProps } from "./CheckboxField.js";
 export {
   CheckboxSelectList,
@@ -19,6 +21,8 @@ export {
 export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
+export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
+export { CheckRow, type CheckRowProps } from "./CheckRow.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField.js";
 export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { RatingForm, type RatingFormProps, type RatingFormValues } from "./RatingForm.js";
@@ -62,11 +66,14 @@ export {
   type RadioOptionGroupProps,
 } from "./RadioOptionGroup.js";
 export { ButtonRow, type ButtonRowProps } from "./ButtonRow.js";
+export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
 export { CardStack, type CardStackProps } from "./CardStack.js";
 export { ListStack, type ListStackProps } from "./ListStack.js";
 export { FieldRow, type FieldRowProps } from "./FieldRow.js";
+export { FieldStack, type FieldStackProps } from "./FieldStack.js";
 export { SectionStack, type SectionStackProps } from "./SectionStack.js";
 export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
+export { PinnedHeaderShell, type PinnedHeaderShellProps } from "./PinnedHeaderShell.js";
 export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";
 export { SearchField, type SearchFieldProps } from "./SearchField.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./SecretRevealPanel.js";
@@ -79,13 +86,16 @@ export { StatBand, type StatBandProps } from "./StatBand.js";
 export { StatCard, type StatCardProps } from "./StatCard.js";
 export { StatRow, type StatRowProps } from "./StatRow.js";
 export { StepDots, type StepDotsProps } from "./StepDots.js";
+export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Switch, type SwitchProps } from "./Switch.js";
 export { Tabs, type LinkTabItem, type TabItem, type TabsProps } from "./Tabs.js";
 export { useTagColorResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./Text.js";
 export { Thumbnail, type ThumbnailProps } from "./Thumbnail.js";
+export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";
 export { TextField, type TextFieldProps } from "./TextField.js";
 export { TextAction, type TextActionProps } from "./TextAction.js";
+export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCardRow.js";
 export { TextLink, type TextLinkProps } from "./TextLink.js";
 export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./Toast.js";
 export {

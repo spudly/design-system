@@ -1,8 +1,11 @@
 import { Fragment, type ReactNode } from "react";
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
+import { ButtonStack } from "../components/ButtonStack.js";
+import { Center } from "../components/Center.js";
+import { CenteredText } from "../components/CenteredText.js";
+import { ListStack } from "../components/ListStack.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 
@@ -28,6 +31,20 @@ import { Text } from "../components/Text.js";
  * branded loader — the RecipeFormPage precedent; the branded
  * loader stays app-side by recorded decision), and an empty
  * list renders the host's empty message.
+ *
+ * De-styled for #119: the page composes DS components only —
+ * the whole screen stacks in SectionStack at its uniform
+ * rhythm (the bespoke per-block separations the wrappers
+ * carried are gone; the loading and empty states no longer
+ * add their own extra top offset either), the title keeps
+ * its pinned `heading` treatment (the pageTitleHeadings
+ * exception) and the section title its `subheading` variant,
+ * the subtitle and empty message render through CenteredText,
+ * the three actions stack in ButtonStack, and the host's
+ * rows stack in ListStack, which imposes no gap of its own —
+ * each row keeps the rhythm it renders with. This page is
+ * the pinned exception to the `title` variant (its title is
+ * a hero heading, not a screen title).
  */
 
 export type HomePageRecipe = {
@@ -69,16 +86,10 @@ export function HomePage({
 }: HomePageProps) {
   return (
     <ScreenContainer>
-      <YStack paddingTop="$2">
-        <YStack paddingBottom="$8">
-          <Text variant="heading">{title}</Text>
-        </YStack>
-        <YStack paddingBottom="$6">
-          <Text color="$textMuted" textAlign="center">
-            {subtitle}
-          </Text>
-        </YStack>
-        <YStack paddingBottom="$8" gap="$3">
+      <SectionStack>
+        <Text variant="heading">{title}</Text>
+        <CenteredText muted>{subtitle}</CenteredText>
+        <ButtonStack>
           <Button variant="primary" href={browseHref}>
             {browseLabel}
           </Button>
@@ -88,30 +99,22 @@ export function HomePage({
           <Button variant="secondary" href={sharedWithMeHref}>
             {sharedWithMeLabel}
           </Button>
-        </YStack>
-        <YStack paddingBottom="$4">
-          <Text
-            variant="subheading"
-            fontSize={tokens.typography.fontSize.xl}
-            fontWeight={tokens.typography.fontWeight.bold}
-          >
-            {recipesTitle}
-          </Text>
-        </YStack>
-      </YStack>
-      <YStack paddingBottom="$8">
+        </ButtonStack>
+        <Text variant="subheading">{recipesTitle}</Text>
         {isLoading ? (
-          <YStack paddingTop="$8" alignItems="center">
+          <Center horizontal vertical={false}>
             <Spinner label="Loading recipes" />
-          </YStack>
+          </Center>
         ) : recipes.length === 0 ? (
-          <YStack paddingTop="$8">
-            <Text textAlign="center">{emptyMessage}</Text>
-          </YStack>
+          <CenteredText>{emptyMessage}</CenteredText>
         ) : (
-          recipes.map((recipe) => <Fragment key={recipe.id}>{renderRecipeRow(recipe)}</Fragment>)
+          <ListStack>
+            {recipes.map((recipe) => (
+              <Fragment key={recipe.id}>{renderRecipeRow(recipe)}</Fragment>
+            ))}
+          </ListStack>
         )}
-      </YStack>
+      </SectionStack>
     </ScreenContainer>
   );
 }

@@ -1,8 +1,8 @@
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
+import { CheckRow } from "../components/CheckRow.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { ListStack } from "../components/ListStack.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 
@@ -40,6 +40,15 @@ import { Text } from "../components/Text.js";
  * precedent — the branded loader stays app-side by recorded
  * decision); an empty list renders the DS EmptyState with the
  * app's message.
+ *
+ * De-styled for #119: the page composes DS components only —
+ * the title is Text's `title` variant, the sections stack in
+ * SectionStack, the lines stack in ListStack, and each line
+ * renders through the generic CheckRow, its `detail` composed
+ * here from the line's quantity and optional flag (the row
+ * joins it to the name with the middle-dot separator, so the
+ * rendered line is unchanged). The page sets no styling props
+ * and renders no layout primitives.
  */
 
 export type ShoppingListPageLine = {
@@ -58,76 +67,6 @@ export type ShoppingListPageProps = {
   onToggleLine: (key: string) => void;
 };
 
-function ShoppingListRow({ line, onToggle }: { line: ShoppingListPageLine; onToggle: () => void }) {
-  // Web keyboard support (the MealPlansPage row pattern): a
-  // view carrying a role is made focusable and the activation
-  // keys — Enter and Space — invoke the same callback as a
-  // press. Web-only props, ignored on native.
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onToggle();
-    }
-  };
-  const checked = line.isChecked;
-  return (
-    <XStack
-      alignItems="flex-start"
-      gap="$3"
-      borderBottomWidth={1}
-      borderBottomColor={tokens.colors.gray.gray2}
-      paddingVertical="$3"
-      {...platformAccessibilityProps({
-        accessibilityRole: "checkbox",
-        accessibilityState: { checked },
-        accessibilityLabel: line.name,
-      })}
-      onPress={onToggle}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-      cursor="web:pointer"
-    >
-      <YStack paddingTop={2}>
-        <YStack
-          width={tokens.spacing[6]}
-          height={tokens.spacing[6]}
-          borderRadius={tokens.radii.sm}
-          borderWidth={2}
-          borderColor={checked ? "$primary" : "$textMuted"}
-          backgroundColor={checked ? "$primary" : "$surface"}
-          alignItems="center"
-          justifyContent="center"
-        >
-          {checked ? (
-            <Text fontSize={tokens.typography.fontSize.sm} color="$onPrimary">
-              ✓
-            </Text>
-          ) : null}
-        </YStack>
-      </YStack>
-      <Text
-        flex={1}
-        {...(checked ? { color: "$textMuted" } : {})}
-        textDecorationLine={checked ? "line-through" : "none"}
-      >
-        <Text fontWeight={tokens.typography.fontWeight.medium}>{line.name}</Text>
-        {line.quantityLabel ? (
-          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-            {" "}
-            · {line.quantityLabel}
-          </Text>
-        ) : null}
-        {line.isOptional ? (
-          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-            {" "}
-            · optional
-          </Text>
-        ) : null}
-      </Text>
-    </XStack>
-  );
-}
-
 export function ShoppingListPage({
   lines,
   isLoading = false,
@@ -135,32 +74,32 @@ export function ShoppingListPage({
 }: ShoppingListPageProps) {
   return (
     <ScreenContainer>
-      <YStack paddingBottom="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          Shopping list
-        </Text>
-      </YStack>
-      {isLoading ? (
-        <Spinner label="Loading shopping list" />
-      ) : lines.length === 0 ? (
-        <EmptyState title="No items on this list." />
-      ) : (
-        <YStack>
-          {lines.map((line) => (
-            <ShoppingListRow
-              key={line.key}
-              line={line}
-              onToggle={() => {
-                onToggleLine(line.key);
-              }}
-            />
-          ))}
-        </YStack>
-      )}
+      <SectionStack>
+        <Text variant="title">Shopping list</Text>
+        {isLoading ? (
+          <Spinner label="Loading shopping list" />
+        ) : lines.length === 0 ? (
+          <EmptyState title="No items on this list." />
+        ) : (
+          <ListStack>
+            {lines.map((line) => (
+              <CheckRow
+                key={line.key}
+                label={line.name}
+                detail={
+                  [line.quantityLabel, line.isOptional ? "optional" : null]
+                    .filter(Boolean)
+                    .join(" · ") || null
+                }
+                checked={line.isChecked}
+                onToggle={() => {
+                  onToggleLine(line.key);
+                }}
+              />
+            ))}
+          </ListStack>
+        )}
+      </SectionStack>
     </ScreenContainer>
   );
 }

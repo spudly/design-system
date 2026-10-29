@@ -1,15 +1,13 @@
-import { Anchor, YStack, isWeb } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { LinkOverlay } from "../components/linkOverlay.js";
+import { CardStack } from "../components/CardStack.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { PinnedHeaderShell } from "../components/PinnedHeaderShell.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { Spinner } from "../components/Spinner.js";
 import { Tabs } from "../components/Tabs.js";
 import { Text } from "../components/Text.js";
-import { TextAction } from "../components/TextAction.js";
+import { TextActionCardRow } from "../components/TextActionCardRow.js";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
 
 /**
@@ -47,6 +45,20 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * branded loader stays app-side by recorded decision); an
  * empty meals list renders the DS EmptyState with the app's
  * message. The plans tab's states are MealPlansPage's own.
+ *
+ * De-styled for #119: the page composes DS components only.
+ * The chrome is a SectionStack (the "Meals" title in Text's
+ * `title` variant over the tab bar); on the meals tab the
+ * whole screen stacks in SectionStack inside the
+ * ScreenContainer, and each meal renders through the generic
+ * TextActionCardRow — its text block the meal's link, its
+ * trailing Delete the #248 text action — stacked in
+ * CardStack, so row separation is the stack's 8px card rhythm
+ * (the plans tab's own rhythm) instead of a per-row bottom
+ * padding. On the plans tab the pinned chrome and the
+ * self-scrolling MealPlansPage compose through
+ * PinnedHeaderShell, which owns the shell's background and
+ * header inset.
  */
 
 export type MealsHubPageTab = "meals" | "plans";
@@ -77,80 +89,6 @@ export type MealsHubPageProps = {
   onDeletePlan: (planId: string) => void;
 };
 
-function MealRow({ meal, onDelete }: { meal: MealsHubPageMeal; onDelete: () => void }) {
-  // `decorative` marks the visible texts non-accessible for the
-  // native link rendering, whose LinkOverlay carries the label as
-  // the row's one accessibility stop (see LinkOverlay).
-  const renderTextContent = (decorative: boolean) => (
-    <>
-      <Text
-        accessible={decorative ? false : undefined}
-        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        fontSize={tokens.typography.fontSize.md}
-        fontWeight={tokens.typography.fontWeight.semibold}
-      >
-        {meal.title}
-      </Text>
-      <Text
-        variant="hint"
-        accessible={decorative ? false : undefined}
-        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-      >
-        {meal.subtitle}
-      </Text>
-    </>
-  );
-  const textContent = renderTextContent(false);
-  return (
-    <YStack paddingBlockEnd="$3">
-      <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
-        {/* The text block is a real anchor carrying the meal's
-          href (the row navigates, #248) — keyboard-operable on
-          web by default, which retires the hand-rolled
-          focus/keydown press pattern this row used as a button.
-          It is pinned to a web flex column (the BackLink lesson:
-          a text-based anchor is inline on web and would not hold
-          the block's stacked layout). On native the anchor is a
-          Text and the stacked texts would flow inline inside it,
-          so the block platform-splits (see LinkOverlay): a YStack
-          frame with the same structural flex carries the texts,
-          and a childless anchor stretched over it carries the
-          href. */}
-        {isWeb ? (
-          <Anchor
-            flex={1}
-            minWidth={0}
-            gap="$1"
-            href={meal.href}
-            textDecorationLine="none"
-            display="web:flex"
-            flexDirection="column"
-            {...platformAccessibilityProps({
-              accessibilityRole: "link",
-              accessibilityLabel: meal.title,
-            })}
-          >
-            {textContent}
-          </Anchor>
-        ) : (
-          <YStack flex={1} minWidth={0} gap="$1" position="relative">
-            {renderTextContent(true)}
-            <LinkOverlay
-              href={meal.href}
-              accessibilityRole="link"
-              accessibilityLabel={meal.subtitle ? `${meal.title}, ${meal.subtitle}` : meal.title}
-            />
-          </YStack>
-        )}
-        {/* Delete is an action, not navigation (#248 ruling):
-          it renders through TextAction's button role and stays a
-          callback. */}
-        <TextAction onPress={onDelete}>Delete</TextAction>
-      </Card>
-    </YStack>
-  );
-}
-
 export function MealsHubPage({
   activeTab,
   onSelectTab,
@@ -164,15 +102,7 @@ export function MealsHubPage({
 }: MealsHubPageProps) {
   const hubChrome = (
     <>
-      <YStack paddingBottom="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          Meals
-        </Text>
-      </YStack>
+      <Text variant="title">Meals</Text>
       <Tabs
         tabs={[
           { value: "meals", label: "Meals" },
@@ -188,10 +118,7 @@ export function MealsHubPage({
 
   if (activeTab === "plans") {
     return (
-      <YStack flex={1} backgroundColor={tokens.colors.gray.gray1}>
-        <YStack paddingHorizontal="$4" paddingTop="$4" gap="$4">
-          {hubChrome}
-        </YStack>
+      <PinnedHeaderShell header={<SectionStack>{hubChrome}</SectionStack>}>
         <MealPlansPage
           plans={plans}
           isLoading={isLoading}
@@ -199,35 +126,38 @@ export function MealsHubPage({
           onPlanDelete={onDeletePlan}
           titleLevel={2}
         />
-      </YStack>
+      </PinnedHeaderShell>
     );
   }
 
   return (
     <ScreenContainer>
-      {hubChrome}
-      <YStack paddingVertical="$4">
+      <SectionStack>
+        {hubChrome}
         <Button variant="primary" accessibilityLabel="New meal" href={createMealHref}>
           New meal
         </Button>
-      </YStack>
-      {isLoading ? (
-        <Spinner label="Loading meals" />
-      ) : meals.length === 0 ? (
-        <EmptyState title="No meals yet." />
-      ) : (
-        <YStack gap="$2">
-          {meals.map((meal) => (
-            <MealRow
-              key={meal.id}
-              meal={meal}
-              onDelete={() => {
-                onDeleteMeal(meal.id);
-              }}
-            />
-          ))}
-        </YStack>
-      )}
+        {isLoading ? (
+          <Spinner label="Loading meals" />
+        ) : meals.length === 0 ? (
+          <EmptyState title="No meals yet." />
+        ) : (
+          <CardStack>
+            {meals.map((meal) => (
+              <TextActionCardRow
+                key={meal.id}
+                title={meal.title}
+                subtitle={meal.subtitle}
+                href={meal.href}
+                actionLabel="Delete"
+                onActionPress={() => {
+                  onDeleteMeal(meal.id);
+                }}
+              />
+            ))}
+          </CardStack>
+        )}
+      </SectionStack>
     </ScreenContainer>
   );
 }

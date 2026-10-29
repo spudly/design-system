@@ -22,6 +22,10 @@
  *   the rows own their separation.
  * - Center: centers a single child — boolean `horizontal` /
  *   `vertical`, both defaulting to true.
+ * - FieldStack: one form's fields — gap spacing[3] (12px),
+ *   stretch (the meals & planning tranche of #119).
+ * - ButtonStack: a stack of full-width buttons — gap
+ *   spacing[3] (12px), stretch (ButtonRow's vertical form).
  * The pins hold each component's treatment, its Omit of the
  * style keys it owns, and SearchField's `grow` (the other half
  * of the FieldRow pattern: the field takes the row's
@@ -54,6 +58,8 @@ const sectionStackCode = code("SectionStack.tsx");
 const fieldRowCode = code("FieldRow.tsx");
 const listStackCode = code("ListStack.tsx");
 const centerCode = code("Center.tsx");
+const fieldStackCode = code("FieldStack.tsx");
+const buttonStackCode = code("ButtonStack.tsx");
 const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
 
 test("the layout components are exported from the built package root", async () => {
@@ -65,6 +71,8 @@ test("the layout components are exported from the built package root", async () 
     "FieldRow",
     "ListStack",
     "Center",
+    "FieldStack",
+    "ButtonStack",
   ]) {
     assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
   }
@@ -129,6 +137,18 @@ test("Center centers a single child on boolean dimensions defaulting to true", (
   assert.match(centerCode, /Omit<StyledCenterProps, "alignItems" \| "justifyContent">/);
 });
 
+test("FieldStack owns the form-field rhythm", () => {
+  assert.match(fieldStackCode, /styled\(YStack, \{\s+name: "FieldStack",/);
+  assert.match(fieldStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
+  assert.match(fieldStackCode, /Omit<StyledFieldStackProps, "gap" \| "alignItems">/);
+});
+
+test("ButtonStack owns the full-width button stack's rhythm", () => {
+  assert.match(buttonStackCode, /styled\(YStack, \{\s+name: "ButtonStack",/);
+  assert.match(buttonStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
+  assert.match(buttonStackCode, /Omit<StyledButtonStackProps, "gap" \| "alignItems">/);
+});
+
 test("no layout component offers step, role, or margin props", () => {
   for (const [name, src] of [
     ["ButtonRow", buttonRowCode],
@@ -136,6 +156,8 @@ test("no layout component offers step, role, or margin props", () => {
     ["SectionStack", sectionStackCode],
     ["FieldRow", fieldRowCode],
     ["ListStack", listStackCode],
+    ["FieldStack", fieldStackCode],
+    ["ButtonStack", buttonStackCode],
   ]) {
     for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {
       assert.ok(

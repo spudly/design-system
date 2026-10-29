@@ -142,9 +142,13 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 // through the generic CardRow / ListRow components in those
 // rows' link forms (#248, after the #119 tranche-2 extraction),
 // so neither page has a stack pressable left to translate —
-// pinned by the dedicated test below.
+// pinned by the dedicated test below. The #119 meals & planning
+// tranche moved four more pages off the list the same way:
+// ShoppingListPage (its row is CheckRow), MealDetailPage (its
+// rows are ListRow), MealsHubPage (TextActionCardRow), and
+// MealCookingModePage (its Done pill is StepOverlay's).
 const PAGE_STACKS =
-  "src/pages/ShoppingListPage.tsx,src/pages/MealDetailPage.tsx,src/pages/MealsHubPage.tsx,src/pages/AiSessionPage.tsx,src/pages/MealCookingModePage.tsx,src/pages/RecipeDetailPage.tsx,src/pages/RecipeFormPage.tsx".split(
+  "src/pages/AiSessionPage.tsx,src/pages/RecipeDetailPage.tsx,src/pages/RecipeFormPage.tsx".split(
     ",",
   );
 
@@ -174,25 +178,33 @@ test("page-level stack pressables route through the translator, never raw RN JSX
   }
 });
 
-test("ShoppingListPage's checkbox row translates role, checked state, and label together (#237)", () => {
-  const code = readCode("src/pages/ShoppingListPage.tsx");
+test("CheckRow (ShoppingListPage's row) translates role, checked state, and label together (#237)", () => {
+  const code = readCode("src/components/CheckRow.tsx");
   assert.match(
     code,
     /\{\.\.\.platformAccessibilityProps\(\{\s+accessibilityRole: "checkbox"/,
     "the translated props must be spread onto the row's XStack pressable",
   );
   assert.match(code, /accessibilityState: \{ checked \}/);
-  assert.match(code, /accessibilityLabel: line\.name/);
+  assert.match(code, /accessibilityLabel: label/);
 });
 
-test("MealPlansPage and MealPlanDetailPage have no stack pressable left to translate (#237, #248)", () => {
-  // Both pages' rows render through the generic row components in
-  // their link forms — no stack pressable remains in either page,
-  // so the translator must not be imported or used, and no raw RN
-  // accessibility JSX props may appear either (props on DS
-  // primitives / LinkOverlay are the sanctioned exceptions,
+test("the de-styled pages have no stack pressable left to translate (#237, #248, #119)", () => {
+  // These pages' rows render through the generic row components
+  // in their link forms (and MealCookingModePage's pressable is
+  // StepOverlay's pill) — no stack pressable remains in any of
+  // them, so the translator must not be imported or used, and no
+  // raw RN accessibility JSX props may appear either (props on
+  // DS primitives / LinkOverlay are the sanctioned exceptions,
   // stripped via the shared TAGS before RAW is applied).
-  for (const rel of ["src/pages/MealPlansPage.tsx", "src/pages/MealPlanDetailPage.tsx"]) {
+  for (const rel of [
+    "src/pages/MealPlansPage.tsx",
+    "src/pages/MealPlanDetailPage.tsx",
+    "src/pages/ShoppingListPage.tsx",
+    "src/pages/MealDetailPage.tsx",
+    "src/pages/MealsHubPage.tsx",
+    "src/pages/MealCookingModePage.tsx",
+  ]) {
     const code = readCode(rel);
     assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
     assert.ok(
@@ -203,18 +215,17 @@ test("MealPlansPage and MealPlanDetailPage have no stack pressable left to trans
 });
 
 test("rows translate the disabled state; the generic rows keep the button role in their press form (#237, #248)", () => {
-  // MealDetailPage's member rows are links since #248: the page
-  // routes only the unavailable row's disabled state through the
-  // translator, never a button role. The plan pages' rows moved
-  // into the generic ListRow / CardRow components (#119 tranche
-  // 2) and the routing moved with them: their press forms carry
-  // the button role, ListRow also translates its disabled state,
-  // and CardRow has no disabled state. Compact table form: this
-  // file is at its line cap.
+  // MealDetailPage's member rows are links since #248 and render
+  // through ListRow since the #119 meals tranche: the disabled
+  // routing lives in the row, not the page. The plan pages' rows
+  // moved into the generic ListRow / CardRow components (#119
+  // tranche 2) and the routing moved with them: their press
+  // forms carry the button role, ListRow also translates its
+  // disabled state, and CardRow has no disabled state. Compact
+  // table form: this file is at its line cap.
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases = [
-    ["src/pages/MealDetailPage.tsx", null, DISABLED],
     ["src/components/ListRow.tsx", ROLE, DISABLED],
     ["src/components/CardRow.tsx", ROLE, null],
   ];
