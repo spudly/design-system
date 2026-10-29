@@ -1,8 +1,9 @@
-import { Anchor, YStack } from "tamagui";
+import { Anchor, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
+import { LinkOverlay } from "../components/linkOverlay.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
@@ -77,6 +78,17 @@ export type MealsHubPageProps = {
 };
 
 function MealRow({ meal, onDelete }: { meal: MealsHubPageMeal; onDelete: () => void }) {
+  const textContent = (
+    <>
+      <Text
+        fontSize={tokens.typography.fontSize.md}
+        fontWeight={tokens.typography.fontWeight.semibold}
+      >
+        {meal.title}
+      </Text>
+      <Text variant="hint">{meal.subtitle}</Text>
+    </>
+  );
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
@@ -86,28 +98,38 @@ function MealRow({ meal, onDelete }: { meal: MealsHubPageMeal; onDelete: () => v
           focus/keydown press pattern this row used as a button.
           It is pinned to a web flex column (the BackLink lesson:
           a text-based anchor is inline on web and would not hold
-          the block's stacked layout). */}
-        <Anchor
-          flex={1}
-          minWidth={0}
-          gap="$1"
-          href={meal.href}
-          textDecorationLine="none"
-          display="web:flex"
-          flexDirection="column"
-          {...platformAccessibilityProps({
-            accessibilityRole: "link",
-            accessibilityLabel: meal.title,
-          })}
-        >
-          <Text
-            fontSize={tokens.typography.fontSize.md}
-            fontWeight={tokens.typography.fontWeight.semibold}
+          the block's stacked layout). On native the anchor is a
+          Text and the stacked texts would flow inline inside it,
+          so the block platform-splits (see LinkOverlay): a YStack
+          frame with the same structural flex carries the texts,
+          and a childless anchor stretched over it carries the
+          href. */}
+        {isWeb ? (
+          <Anchor
+            flex={1}
+            minWidth={0}
+            gap="$1"
+            href={meal.href}
+            textDecorationLine="none"
+            display="web:flex"
+            flexDirection="column"
+            {...platformAccessibilityProps({
+              accessibilityRole: "link",
+              accessibilityLabel: meal.title,
+            })}
           >
-            {meal.title}
-          </Text>
-          <Text variant="hint">{meal.subtitle}</Text>
-        </Anchor>
+            {textContent}
+          </Anchor>
+        ) : (
+          <YStack flex={1} minWidth={0} gap="$1" position="relative">
+            <LinkOverlay
+              href={meal.href}
+              accessibilityRole="link"
+              accessibilityLabel={meal.title}
+            />
+            {textContent}
+          </YStack>
+        )}
         {/* Delete is an action, not navigation (#248 ruling):
           it renders through TextAction's button role and stays a
           callback. */}

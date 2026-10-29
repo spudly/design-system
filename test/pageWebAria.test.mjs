@@ -88,9 +88,12 @@ function sourceFiles(dir) {
 // primitives: Dropdown routes its panel label through
 // platformAccessibilityProps onto the Popover content, and
 // DropdownButton forwards its label to the DS Button — both
-// translate caller RN props themselves.
+// translate caller RN props themselves. LinkOverlay is sanctioned
+// on the same ground again: it is the native link layer for
+// view-level link surfaces and spreads platformAccessibilityProps
+// onto its Anchor.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay".split(
     ",",
   ),
 );
@@ -156,11 +159,11 @@ test("page-level stack pressables route through the translator, never raw RN JSX
     assert.ok(
       !/accessibility(Label|State|Role|Value)=/.test(
         code.replaceAll(
-          /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity)\b[^>]*>/g,
+          /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g,
           "",
         ),
       ),
-      `${rel} must not pass raw RN accessibility JSX props to a Tamagui stack (props on DS primitives / TouchableOpacity are the sanctioned exceptions)`,
+      `${rel} must not pass raw RN accessibility JSX props to a Tamagui stack (props on DS primitives / TouchableOpacity / LinkOverlay are the sanctioned exceptions)`,
     );
   }
 });
@@ -179,13 +182,15 @@ test("ShoppingListPage's checkbox row translates role, checked state, and label 
 test("MealPlansPage has no stack pressable left to translate (#237, #248)", () => {
   // The plan row is a real Anchor since #248 — no stack pressable
   // remains, so the translator must not be imported or used, and
-  // no raw RN accessibility JSX props may appear either.
+  // no raw RN accessibility JSX props may appear either (the
+  // row's native LinkOverlay is a sanctioned translator-forwarder,
+  // stripped like the DS primitives below).
   const code = readCode("src/pages/MealPlansPage.tsx");
   assert.ok(!code.includes("platformAccessibilityProps"));
   assert.ok(
     !/accessibility(Label|State|Role|Value)=/.test(
       code.replaceAll(
-        /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity)\b[^>]*>/g,
+        /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g,
         "",
       ),
     ),

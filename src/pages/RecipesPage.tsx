@@ -1,11 +1,12 @@
 import { useState, type ReactNode } from "react";
 import { FlatList, TouchableOpacity } from "react-native";
-import { Anchor, Image, View, XStack, YStack } from "tamagui";
+import { Anchor, Image, View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { LinkOverlay } from "../components/linkOverlay.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SearchField } from "../components/SearchField.js";
 import { SelectField, type SelectOption } from "../components/SelectField.js";
@@ -691,6 +692,26 @@ function RecipeRow({
   item: RecipesPageItem;
   onLogCookPress?: () => void;
 }) {
+  const textContent = (
+    <>
+      <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
+      {/* The subtitle line is a wrapping inline flow inside the
+        text block: the subtitle text first, the log-cook
+        control immediately after it (right after the
+        subtitle's final segment). The control flows with the
+        text — when the line is full it wraps onto the next
+        line of the block, at the block's full width — instead
+        of sitting in the card row as a third flex item whose
+        fixed width starved this block (the #205 failure, seen
+        again in PR #120's narrow captures). */}
+      {item.subtitle || onLogCookPress ? (
+        <XStack flexWrap="wrap" alignItems="center" gap="$1" paddingTop="$1">
+          {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
+          {onLogCookPress ? <LogCookControl item={item} onLogCookPress={onLogCookPress} /> : null}
+        </XStack>
+      ) : null}
+    </>
+  );
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
@@ -704,48 +725,61 @@ function RecipeRow({
           derives from its Text children and drop the subtitle
           announcement. The log-cook control is a third press
           target nested in the text block's subtitle flow; its
-          label names the action instead — see LogCookControl. */}
-        <Anchor
-          href={item.href}
-          textDecorationLine="none"
-          display="web:flex"
-          {...platformAccessibilityProps({
-            accessibilityRole: "link",
-            accessibilityLabel: item.title,
-          })}
-        >
-          <Thumbnail imageUrl={item.imageUrl} />
-        </Anchor>
-        <Anchor
-          href={item.href}
-          textDecorationLine="none"
-          display="web:flex"
-          flexDirection="column"
-          style={textBlockStyle}
-          {...platformAccessibilityProps({
-            accessibilityRole: "link",
-            accessibilityLabel: item.subtitle ? `${item.title}, ${item.subtitle}` : item.title,
-          })}
-        >
-          <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
-          {/* The subtitle line is a wrapping inline flow inside the
-            text block: the subtitle text first, the log-cook
-            control immediately after it (right after the
-            subtitle's final segment). The control flows with the
-            text — when the line is full it wraps onto the next
-            line of the block, at the block's full width — instead
-            of sitting in the card row as a third flex item whose
-            fixed width starved this block (the #205 failure, seen
-            again in PR #120's narrow captures). */}
-          {item.subtitle || onLogCookPress ? (
-            <XStack flexWrap="wrap" alignItems="center" gap="$1" paddingTop="$1">
-              {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
-              {onLogCookPress ? (
-                <LogCookControl item={item} onLogCookPress={onLogCookPress} />
-              ) : null}
-            </XStack>
-          ) : null}
-        </Anchor>
+          label names the action instead — see LogCookControl.
+          On native the anchors are Texts and cannot carry these
+          view subtrees (the text block's texts would flow inline
+          and the thumbnail would be measured as text), so both
+          targets platform-split (see LinkOverlay): view-level
+          frames carry the content, and childless anchors
+          stretched over the frames carry the hrefs. The log-cook
+          control stays nested in the text frame's subtitle flow,
+          above the frame's overlay, and keeps its own presses. */}
+        {isWeb ? (
+          <Anchor
+            href={item.href}
+            textDecorationLine="none"
+            display="web:flex"
+            {...platformAccessibilityProps({
+              accessibilityRole: "link",
+              accessibilityLabel: item.title,
+            })}
+          >
+            <Thumbnail imageUrl={item.imageUrl} />
+          </Anchor>
+        ) : (
+          <View position="relative">
+            <LinkOverlay
+              href={item.href}
+              accessibilityRole="link"
+              accessibilityLabel={item.title}
+            />
+            <Thumbnail imageUrl={item.imageUrl} />
+          </View>
+        )}
+        {isWeb ? (
+          <Anchor
+            href={item.href}
+            textDecorationLine="none"
+            display="web:flex"
+            flexDirection="column"
+            style={textBlockStyle}
+            {...platformAccessibilityProps({
+              accessibilityRole: "link",
+              accessibilityLabel: item.subtitle ? `${item.title}, ${item.subtitle}` : item.title,
+            })}
+          >
+            {textContent}
+          </Anchor>
+        ) : (
+          <YStack style={textBlockStyle} position="relative">
+            <LinkOverlay
+              href={item.href}
+              accessibilityRole="link"
+              accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
+            />
+            {textContent}
+          </YStack>
+        )}
       </Card>
     </YStack>
   );

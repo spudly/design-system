@@ -1,7 +1,8 @@
-import { Anchor, XStack, YStack } from "tamagui";
+import { Anchor, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
+import { LinkOverlay } from "../components/linkOverlay.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
 import { Spinner } from "../components/Spinner.js";
@@ -229,7 +230,7 @@ function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
         >
           {rowContent}
         </YStack>
-      ) : (
+      ) : isWeb ? (
         // The row navigates, so it renders as a real anchor
         // carrying the entry's href (#248) — keyboard-operable
         // on web by default, which retires the hand-rolled
@@ -246,6 +247,23 @@ function EntryRow({ entry }: { entry: MealPlanDetailPageEntry }) {
         >
           {rowContent}
         </Anchor>
+      ) : (
+        // Native: the anchor is a Text, so the stacked row content
+        // would flow inline inside it (see LinkOverlay). The row
+        // renders in the same YStack frame as the unavailable
+        // branch, with a childless anchor stretched over it
+        // carrying the href; the overlay's label composes the
+        // kind-prefixed title and the subtitle when present.
+        <YStack paddingVertical="$3" position="relative">
+          <LinkOverlay
+            href={entry.href}
+            accessibilityRole="link"
+            accessibilityLabel={`${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}${
+              entry.subtitle ? `, ${entry.subtitle}` : ""
+            }`}
+          />
+          {rowContent}
+        </YStack>
       )}
     </YStack>
   );

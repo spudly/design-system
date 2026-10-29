@@ -163,27 +163,38 @@ test("the control renders inline in the text block's subtitle flow, never as a r
     1,
     "RecipeRow must render the log-cook control exactly once",
   );
-  // The control lives inside the text link target (the one carrying
-  // textBlockStyle): it opens before the control renders, and the
-  // control renders before that target closes.
-  const textTargetAt = row.indexOf("style={textBlockStyle}");
+  // The control lives inside the row's text content — the block
+  // both platform text targets render. The text target is a real
+  // Anchor on web; on native the anchor is a Text and cannot carry
+  // the block, so a YStack frame carrying textBlockStyle renders
+  // the same content with a LinkOverlay anchor stretched over it
+  // (the control sits above the overlay and keeps its presses).
+  const contentAt = row.indexOf("const textContent");
   const controlAt = row.indexOf("<LogCookControl");
-  const textTargetCloseAt = row.indexOf("</Anchor>", controlAt);
+  const contentEndAt = row.indexOf("return (", contentAt);
   assert.ok(
-    textTargetAt !== -1 && controlAt > textTargetAt,
-    "the control must render after the text link target opens",
+    contentAt !== -1 && controlAt > contentAt && controlAt < contentEndAt,
+    "the control must render inside the shared text content both targets render",
+  );
+  // Both platform targets carry the text block style and render
+  // the shared content; the web target is the Anchor, the native
+  // target's href rides on its LinkOverlay.
+  assert.equal(
+    row.split("style={textBlockStyle}").length - 1,
+    2,
+    "the web Anchor and the native frame must both carry textBlockStyle",
   );
   assert.ok(
-    textTargetCloseAt > controlAt,
-    "the control must render before the text link target closes",
+    row.includes("<LinkOverlay") && row.slice(contentEndAt).includes("{textContent}"),
+    "the native text target must render the shared content over a LinkOverlay",
   );
-  // Inside the target, the control sits in the subtitle's wrapping
+  // Inside the content, the control sits in the subtitle's wrapping
   // flow, after the subtitle text — so it flows with the text at the
   // block's full width instead of holding width at the row's edge.
-  const flowAt = row.indexOf('flexWrap="wrap"', textTargetAt);
+  const flowAt = row.indexOf('flexWrap="wrap"', contentAt);
   const subtitleAt = row.indexOf("{item.subtitle}", flowAt);
   assert.ok(
-    flowAt > textTargetAt && flowAt < controlAt,
+    flowAt > contentAt && flowAt < controlAt,
     "a wrapping flow must open inside the text block before the control",
   );
   assert.ok(
@@ -192,8 +203,8 @@ test("the control renders inline in the text block's subtitle flow, never as a r
   );
   const flowCloseAt = row.indexOf("</XStack>", controlAt);
   assert.ok(
-    flowCloseAt > controlAt && flowCloseAt < textTargetCloseAt,
-    "the flow must close after the control, inside the text target",
+    flowCloseAt > controlAt && flowCloseAt < contentEndAt,
+    "the flow must close after the control, inside the text content",
   );
 });
 

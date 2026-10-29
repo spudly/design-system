@@ -1,7 +1,8 @@
-import { Anchor, XStack, YStack } from "tamagui";
+import { Anchor, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
+import { LinkOverlay } from "../components/linkOverlay.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Spinner } from "../components/Spinner.js";
@@ -113,6 +114,17 @@ function MealPlanRow({
   item: MealPlansPageItem;
   onDeletePress?: () => void;
 }) {
+  const textContent = (
+    <>
+      <Text
+        fontSize={tokens.typography.fontSize.md}
+        fontWeight={tokens.typography.fontWeight.semibold}
+      >
+        {item.title}
+      </Text>
+      {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
+    </>
+  );
   return (
     <YStack paddingBlockEnd="$3">
       <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
@@ -125,24 +137,34 @@ function MealPlanRow({
           structural only: the block expands and may shrink within
           the row. As a real anchor it is keyboard-operable on web
           by default, which retires the hand-rolled focus/keydown
-          press pattern this row used as a button. */}
-        <Anchor
-          flex={1}
-          minWidth={0}
-          gap="$1"
-          href={item.href}
-          textDecorationLine="none"
-          display="web:flex"
-          flexDirection="column"
-        >
-          <Text
-            fontSize={tokens.typography.fontSize.md}
-            fontWeight={tokens.typography.fontWeight.semibold}
+          press pattern this row used as a button. On native the
+          anchor is a Text and the stacked texts would flow inline
+          inside it, so the block platform-splits (see
+          LinkOverlay): a YStack frame with the same structural
+          flex carries the texts, and a childless anchor stretched
+          over it carries the href. */}
+        {isWeb ? (
+          <Anchor
+            flex={1}
+            minWidth={0}
+            gap="$1"
+            href={item.href}
+            textDecorationLine="none"
+            display="web:flex"
+            flexDirection="column"
           >
-            {item.title}
-          </Text>
-          {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
-        </Anchor>
+            {textContent}
+          </Anchor>
+        ) : (
+          <YStack flex={1} minWidth={0} gap="$1" position="relative">
+            <LinkOverlay
+              href={item.href}
+              accessibilityRole="link"
+              accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
+            />
+            {textContent}
+          </YStack>
+        )}
         {onDeletePress ? (
           <XStack paddingInlineStart="$3" alignItems="center">
             <Button

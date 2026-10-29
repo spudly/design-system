@@ -1,7 +1,8 @@
-import { Anchor, XStack, YStack } from "tamagui";
+import { Anchor, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Button } from "../components/Button.js";
+import { LinkOverlay } from "../components/linkOverlay.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
 import { Text } from "../components/Text.js";
@@ -91,7 +92,7 @@ function MemberRow({ member }: { member: MealDetailPageMember }) {
         >
           {rowContent}
         </YStack>
-      ) : (
+      ) : isWeb ? (
         // The row navigates, so it renders as a real anchor
         // carrying the member's href (#248) — keyboard-operable
         // on web by default, which retires the hand-rolled
@@ -108,6 +109,21 @@ function MemberRow({ member }: { member: MealDetailPageMember }) {
         >
           {rowContent}
         </Anchor>
+      ) : (
+        // Native: the anchor is a Text, so the stacked row content
+        // would flow inline inside it (see LinkOverlay). The row
+        // renders in the same YStack frame as the unavailable
+        // branch, with a childless anchor stretched over it
+        // carrying the href; the overlay's label composes the
+        // title and subtitle the way RecipesPage's row labels do.
+        <YStack paddingVertical="$3" position="relative">
+          <LinkOverlay
+            href={member.href}
+            accessibilityRole="link"
+            accessibilityLabel={`${member.title}, ${member.subtitle}`}
+          />
+          {rowContent}
+        </YStack>
       )}
     </YStack>
   );

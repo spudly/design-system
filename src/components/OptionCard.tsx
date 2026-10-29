@@ -1,7 +1,8 @@
-import { Anchor, XStack, YStack } from "tamagui";
+import { Anchor, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Card, type CardProps } from "./Card.js";
 import { platformAccessibilityProps } from "./accessibility.js";
+import { LinkOverlay } from "./linkOverlay.js";
 import { Text } from "./Text.js";
 
 export type OptionCardProps = Omit<CardProps, "onPress"> & {
@@ -88,23 +89,45 @@ export function OptionCard({
       accessibilityState,
       accessibilityValue,
     });
+    if (isWeb) {
+      return (
+        // The anchor must be a block-level flex box on web (the
+        // BackLink lesson): Anchor is text-based with `display:
+        // inline` there, which would shrink the card to its content
+        // instead of the press form's full-width row. As a column
+        // flex container it stretches the card across, unchanged.
+        <Anchor
+          href={href}
+          textDecorationLine="none"
+          display="web:flex"
+          flexDirection="column"
+          {...linkA11yProps}
+        >
+          <Card minHeight={44} {...rest}>
+            {content}
+          </Card>
+        </Anchor>
+      );
+    }
+    // Native: the anchor is a Text and cannot hold the card's view
+    // subtree (see LinkOverlay) — the card itself is the frame and
+    // a childless anchor stretched over it carries the href.
     return (
-      // The anchor must be a block-level flex box on web (the
-      // BackLink lesson): Anchor is text-based with `display:
-      // inline` there, which would shrink the card to its content
-      // instead of the press form's full-width row. As a column
-      // flex container it stretches the card across, unchanged.
-      <Anchor
-        href={href}
-        textDecorationLine="none"
-        display="web:flex"
-        flexDirection="column"
-        {...linkA11yProps}
-      >
-        <Card minHeight={44} {...rest}>
-          {content}
-        </Card>
-      </Anchor>
+      <Card minHeight={44} {...rest} position="relative">
+        <LinkOverlay
+          href={href}
+          accessible={accessible}
+          accessibilityElementsHidden={accessibilityElementsHidden}
+          accessibilityHint={accessibilityHint}
+          accessibilityLabel={accessibilityLabel}
+          accessibilityLabelledBy={accessibilityLabelledBy}
+          accessibilityLiveRegion={accessibilityLiveRegion}
+          accessibilityRole={accessibilityRole ?? "link"}
+          accessibilityState={accessibilityState}
+          accessibilityValue={accessibilityValue}
+        />
+        {content}
+      </Card>
     );
   }
   const a11yProps = platformAccessibilityProps({

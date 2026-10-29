@@ -102,7 +102,11 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches })
 test("every widget component has a story file titled Components/<Name>", () => {
   const dir = join(root, "src", "components");
   const index = read("src/components/index.ts");
-  const exceptions = new Set(["accessibility.ts", "index.ts", "tagColors.ts"]);
+  // Internal helpers, not widgets: accessibility.ts / tagColors.ts
+  // are prop/style translators, and linkOverlay.tsx is the
+  // native-only link layer other components compose — none is a
+  // standalone component with a story of its own.
+  const exceptions = new Set(["accessibility.ts", "index.ts", "tagColors.ts", "linkOverlay.tsx"]);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),
