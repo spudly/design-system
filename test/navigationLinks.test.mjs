@@ -200,6 +200,27 @@ test("SSR: a formatted href label keeps its whitespace inside one text container
   assert.match(html, /<a[^>]*><span[^>]*><span>Save<\/span> <span>recipe<\/span><\/span><\/a>/);
 });
 
+test("SSR: a caller fontSize override reaches the link label text (#248)", async () => {
+  const { React, Button } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(Button, { href: "/recipes", fontSize: 20 }, "Browse recipes"),
+  );
+  // The label lives in the nested Text container (see the
+  // formatted-label test); a caller-passed fontSize bound for the
+  // frame must resolve onto that Text too, or the explicit label
+  // props would silently override it (CodeRabbit finding on
+  // PR #283). Find the nested span's font-size class and check
+  // its generated rule is the caller's 20px, not the md default.
+  const nested = html.match(
+    /<a[^>]*><span class="[^"]*?(_fs-\d+)[^"]*">Browse recipes<\/span><\/a>/,
+  );
+  assert.ok(nested, `expected the label inside one nested text element in: ${html.slice(-600)}`);
+  assert.ok(
+    html.includes(`.${nested[1]}{font-size:20px}`),
+    `expected the label's font-size class to resolve to 20px in: ${html.slice(0, 400)}`,
+  );
+});
+
 test("SSR: a Button with onPress renders a button and no stray href (#248)", async () => {
   const { React, Button } = await loadRuntime();
   const html = await renderToHtml(React.createElement(Button, { onPress: noop }, "Save recipe"));

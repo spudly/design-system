@@ -391,12 +391,29 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     // the frame's variants and the wrapper's instance props give
     // the button form's internal text): the variant label color,
     // the size's font size, the semibold weight, the body family.
+    // Caller typography props win over those defaults, exactly as
+    // they did when the label was the anchor's own text (and as
+    // they do in the button form, where Tamagui forwards instance
+    // typography to its internal text): a caller-passed fontSize /
+    // fontWeight / fontFamily arrives in `rest` bound for the
+    // frame, and the label must resolve from the same values or
+    // the explicit Text props would silently override them
+    // (CodeRabbit finding on PR #283).
     const labelFontSizes = {
       sm: tokens.typography.fontSize.sm,
       md: tokens.typography.fontSize.md,
       lg: tokens.typography.fontSize.lg,
     } as const;
-    const labelFontSize = labelFontSizes[size as keyof typeof labelFontSizes] ?? labelFontSizes.md;
+    const callerType = rest as Pick<
+      StyledLinkButtonProps,
+      "fontSize" | "fontWeight" | "fontFamily"
+    >;
+    const labelFontSize =
+      callerType.fontSize ??
+      labelFontSizes[size as keyof typeof labelFontSizes] ??
+      labelFontSizes.md;
+    const labelFontWeight = callerType.fontWeight ?? tokens.typography.fontWeight.semibold;
+    const labelFontFamily = callerType.fontFamily ?? "$body";
     return (
       <StyledLinkButton
         ref={ref}
@@ -429,9 +446,9 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         {Children.count(children) > 0 ? (
           <TamaguiText
             color={labelColor}
-            fontFamily="$body"
+            fontFamily={labelFontFamily}
             fontSize={labelFontSize}
-            fontWeight={tokens.typography.fontWeight.semibold}
+            fontWeight={labelFontWeight}
           >
             {children}
           </TamaguiText>
