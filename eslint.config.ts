@@ -1,6 +1,15 @@
 import { base, react, typescriptPendingIgnores } from "@spudly/eslint-config";
 
 import pageStyling from "./eslintRules/noPageStyling.mjs";
+import marginSpacing from "./eslintRules/noMarginSpacing.mjs";
+
+// The repo-local design-system plugin: the #119 page-styling rule
+// and the #209 margin-spacing rule, registered under one namespace
+// (flat config cannot register the same namespace twice for one
+// file with different plugin objects).
+const designSystem = {
+  rules: { ...pageStyling.rules, ...marginSpacing.rules },
+};
 
 // Shared config: @spudly/eslint-config (ported from Eciperay's
 // eslint.config.ts). This repo is a library, not an app, so it composes
@@ -72,15 +81,42 @@ export default [
     // The pages are being fixed proactively from the audit on #119 so
     // activation is a non-event. Rule: eslintRules/noPageStyling.mjs.
     files: ["src/pages/**/*.tsx"],
-    plugins: { "design-system": pageStyling },
-    rules: { "design-system/no-page-styling": "error" },
+    plugins: { "design-system": designSystem },
+    rules: {
+      "design-system/no-page-styling": "error",
+      "design-system/no-margin-spacing": "error",
+    },
+  },
+  {
+    // #209: inter-item spacing is a parent-layout concern — parents
+    // express it with gap (stacks) and padding (containers), so no
+    // element in a component or a page carries a margin prop (or a
+    // margin key in a style object) to create space between
+    // siblings. DORMANT today, beside the #119 rule: the
+    // typescriptPendingIgnores block above ignores every .ts/.tsx
+    // file, so this cannot fire until the TS lint restoration —
+    // at which point it activates with no further change. The
+    // codebase was swept proactively on #209 so activation is a
+    // non-event. Rule: eslintRules/noMarginSpacing.mjs.
+    files: ["src/components/**/*.tsx"],
+    plugins: { "design-system": designSystem },
+    rules: { "design-system/no-margin-spacing": "error" },
   },
   {
     // Stories are Storybook scaffolding, not shipped page components:
     // they frame pages in demo viewports and spread fixture objects
     // onto them, which the page rule forbids for pages themselves.
+    // The margin rule is off for the same reason: stories lay out
+    // demo content, they are not shipped components or pages.
     files: ["src/pages/**/*.stories.tsx"],
-    rules: { "design-system/no-page-styling": "off" },
+    rules: {
+      "design-system/no-page-styling": "off",
+      "design-system/no-margin-spacing": "off",
+    },
+  },
+  {
+    files: ["src/components/**/*.stories.tsx"],
+    rules: { "design-system/no-margin-spacing": "off" },
   },
   {
     // The storybook host app's Babel/Metro configs are CommonJS in
