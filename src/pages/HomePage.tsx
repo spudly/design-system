@@ -68,13 +68,15 @@ export function HomePage({
   return (
     <ScreenContainer>
       <YStack paddingTop="$2">
-        <Text variant="heading" marginBottom="$8">
-          {title}
-        </Text>
-        <Text color="$textMuted" marginBottom="$6" textAlign="center">
-          {subtitle}
-        </Text>
-        <YStack marginBottom="$8" gap="$3">
+        <YStack paddingBottom="$8">
+          <Text variant="heading">{title}</Text>
+        </YStack>
+        <YStack paddingBottom="$6">
+          <Text color="$textMuted" textAlign="center">
+            {subtitle}
+          </Text>
+        </YStack>
+        <YStack paddingBottom="$8" gap="$3">
           <Button variant="primary" onPress={onBrowsePress}>
             {browseLabel}
           </Button>
@@ -85,24 +87,25 @@ export function HomePage({
             {sharedWithMeLabel}
           </Button>
         </YStack>
-        <Text
-          variant="subheading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-          marginBottom="$4"
-        >
-          {recipesTitle}
-        </Text>
+        <YStack paddingBottom="$4">
+          <Text
+            variant="subheading"
+            fontSize={tokens.typography.fontSize.xl}
+            fontWeight={tokens.typography.fontWeight.bold}
+          >
+            {recipesTitle}
+          </Text>
+        </YStack>
       </YStack>
       <YStack paddingBottom="$8">
         {isLoading ? (
-          <YStack marginTop="$8" alignItems="center">
+          <YStack paddingTop="$8" alignItems="center">
             <Spinner label="Loading recipes" />
           </YStack>
         ) : recipes.length === 0 ? (
-          <Text textAlign="center" marginTop="$8">
-            {emptyMessage}
-          </Text>
+          <YStack paddingTop="$8">
+            <Text textAlign="center">{emptyMessage}</Text>
+          </YStack>
         ) : (
           recipes.map((recipe) => <Fragment key={recipe.id}>{renderRecipeRow(recipe)}</Fragment>)
         )}

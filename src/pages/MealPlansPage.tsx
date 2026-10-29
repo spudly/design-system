@@ -125,49 +125,48 @@ function MealPlanRow({
     }
   };
   return (
-    <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3" marginBottom="$3">
-      {/* The pressable text block is a Tamagui view, not a React
+    <YStack paddingBlockEnd="$3">
+      <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
+        {/* The pressable text block is a Tamagui view, not a React
           Native Pressable/TouchableOpacity: those map
           accessibilityRole="button" to a native <button> element on
           web, whose UA styles center the row's text. A Tamagui
           pressable renders a div carrying the role (the OptionCard
           pattern) and keeps the layout. flex/minWidth are structural
           only: the block expands and may shrink within the row. */}
-      <YStack
-        flex={1}
-        minWidth={0}
-        {...platformAccessibilityProps({ accessibilityRole: "button" })}
-        onPress={onPress}
-        tabIndex={0}
-        onKeyDown={handleKeyDown}
-        cursor="web:pointer"
-      >
-        <Text
-          fontSize={tokens.typography.fontSize.md}
-          fontWeight={tokens.typography.fontWeight.semibold}
+        <YStack
+          flex={1}
+          minWidth={0}
+          gap="$1"
+          {...platformAccessibilityProps({ accessibilityRole: "button" })}
+          onPress={onPress}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          cursor="web:pointer"
         >
-          {item.title}
-        </Text>
-        {item.subtitle ? (
-          <Text variant="hint" marginTop="$1">
-            {item.subtitle}
-          </Text>
-        ) : null}
-      </YStack>
-      {onDeletePress ? (
-        <XStack marginInlineStart="$3" alignItems="center">
-          <Button
-            variant="secondary"
-            size="sm"
-            backgroundColor={tokens.colors.danger.danger1}
-            color={tokens.colors.danger.danger8}
-            onPress={onDeletePress}
+          <Text
+            fontSize={tokens.typography.fontSize.md}
+            fontWeight={tokens.typography.fontWeight.semibold}
           >
-            Delete
-          </Button>
-        </XStack>
-      ) : null}
-    </Card>
+            {item.title}
+          </Text>
+          {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
+        </YStack>
+        {onDeletePress ? (
+          <XStack paddingInlineStart="$3" alignItems="center">
+            <Button
+              variant="secondary"
+              size="sm"
+              backgroundColor={tokens.colors.danger.danger1}
+              color={tokens.colors.danger.danger8}
+              onPress={onDeletePress}
+            >
+              Delete
+            </Button>
+          </XStack>
+        ) : null}
+      </Card>
+    </YStack>
   );
 }
 
@@ -195,7 +194,7 @@ export function MealPlansPage({
         </Button>
       ) : null}
       {isLoading ? (
-        <YStack marginBlockStart="$8" alignItems="center">
+        <YStack paddingBlockStart="$8" alignItems="center">
           <Spinner label="Loading" />
         </YStack>
       ) : plans.length === 0 ? (

@@ -91,9 +91,11 @@ export function MealFormPage({
 
   return (
     <FormScreenLayout>
-      <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]} marginBottom="$6">
-        {title.trim() ? title : "Meal"}
-      </Text>
+      <YStack paddingBottom="$6">
+        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
+          {title.trim() ? title : "Meal"}
+        </Text>
+      </YStack>
       <TextField
         label="Title"
         value={title}
@@ -106,14 +108,15 @@ export function MealFormPage({
         placeholder="Notes (optional)"
         numberOfLines={4}
       />
-      <Text
-        marginBlockEnd="$2"
-        fontSize={tokens.typography.fontSize.sm}
-        fontWeight={tokens.typography.fontWeight.medium}
-        color={tokens.colors.gray.gray8}
-      >
-        Recipes
-      </Text>
+      <YStack paddingBlockEnd="$2">
+        <Text
+          fontSize={tokens.typography.fontSize.sm}
+          fontWeight={tokens.typography.fontWeight.medium}
+          color={tokens.colors.gray.gray8}
+        >
+          Recipes
+        </Text>
+      </YStack>
       <CheckboxSelectList
         items={recipeOptions.map((recipe) => ({ id: recipe.id, label: recipe.label }))}
         selectedIds={selectedRecipeIds}
@@ -136,7 +139,7 @@ export function MealFormPage({
         );
       })}
       {error ? <Text variant="error">{error}</Text> : null}
-      <YStack marginBlockStart="$4">
+      <YStack paddingBlockStart="$4">
         <Button
           variant="primary"
           accessibilityLabel="Save meal"

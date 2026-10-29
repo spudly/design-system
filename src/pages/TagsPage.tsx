@@ -121,15 +121,16 @@ export function TagsPage({
 }: TagsPageProps) {
   return (
     <ScreenContainer>
-      <Text
-        variant="heading"
-        fontSize={tokens.typography.fontSize.xl}
-        fontWeight={tokens.typography.fontWeight.bold}
-        marginBottom="$4"
-      >
-        Tags
-      </Text>
-      <YStack marginBottom="$6" gap="$3">
+      <YStack paddingBottom="$4">
+        <Text
+          variant="heading"
+          fontSize={tokens.typography.fontSize.xl}
+          fontWeight={tokens.typography.fontWeight.bold}
+        >
+          Tags
+        </Text>
+      </YStack>
+      <YStack paddingBottom="$6" gap="$3">
         <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
         <XStack flexWrap="wrap" gap="$2" alignItems="center" justifyContent="space-between">
           <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
@@ -148,95 +149,95 @@ export function TagsPage({
       ) : (
         tags.map((tag) =>
           editingTagId === tag.id ? (
-            <YStack
-              key={tag.id}
-              marginBottom="$2"
-              gap="$3"
-              borderRadius={tokens.radii.md}
-              backgroundColor="$surface"
-              padding="$3"
-              shadowColor={tokens.shadows.sm.shadowColor}
-              shadowOffset={tokens.shadows.sm.shadowOffset}
-              shadowOpacity={tokens.shadows.sm.shadowOpacity}
-              shadowRadius={tokens.shadows.sm.shadowRadius}
-            >
-              <TextField
-                placeholder="Tag name"
-                value={editName}
-                onChangeText={(value) => {
-                  onEditNameChange?.(value);
-                }}
-                accessibilityLabel={`Rename tag ${tag.name}`}
-              />
-              <XStack flexWrap="wrap" gap="$2" alignItems="center" justifyContent="space-between">
-                <ColorPickerField
-                  colors={colorOptions}
-                  value={editColor ?? tag.color}
-                  onChange={(value) => {
-                    onEditColorChange?.(value);
+            <YStack key={tag.id} paddingBottom="$2">
+              <YStack
+                gap="$3"
+                borderRadius={tokens.radii.md}
+                backgroundColor="$surface"
+                padding="$3"
+                shadowColor={tokens.shadows.sm.shadowColor}
+                shadowOffset={tokens.shadows.sm.shadowOffset}
+                shadowOpacity={tokens.shadows.sm.shadowOpacity}
+                shadowRadius={tokens.shadows.sm.shadowRadius}
+              >
+                <TextField
+                  placeholder="Tag name"
+                  value={editName}
+                  onChangeText={(value) => {
+                    onEditNameChange?.(value);
                   }}
+                  accessibilityLabel={`Rename tag ${tag.name}`}
                 />
-                <XStack gap="$2">
-                  <Button
-                    variant="secondary"
-                    disabled={isUpdating}
-                    onPress={() => {
-                      onCancelEdit?.();
+                <XStack flexWrap="wrap" gap="$2" alignItems="center" justifyContent="space-between">
+                  <ColorPickerField
+                    colors={colorOptions}
+                    value={editColor ?? tag.color}
+                    onChange={(value) => {
+                      onEditColorChange?.(value);
                     }}
-                    accessibilityLabel="Cancel"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    variant="primary"
-                    disabled={!editName.trim() || isUpdating}
+                  />
+                  <XStack gap="$2">
+                    <Button
+                      variant="secondary"
+                      disabled={isUpdating}
+                      onPress={() => {
+                        onCancelEdit?.();
+                      }}
+                      accessibilityLabel="Cancel"
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      variant="primary"
+                      disabled={!editName.trim() || isUpdating}
+                      onPress={() => {
+                        onSaveEdit?.();
+                      }}
+                      accessibilityLabel="Save"
+                    >
+                      Save
+                    </Button>
+                  </XStack>
+                </XStack>
+              </YStack>
+            </YStack>
+          ) : (
+            <YStack key={tag.id} paddingBottom="$2">
+              <XStack
+                alignItems="center"
+                justifyContent="space-between"
+                borderRadius={tokens.radii.md}
+                backgroundColor="$surface"
+                padding="$3"
+                shadowColor={tokens.shadows.sm.shadowColor}
+                shadowOffset={tokens.shadows.sm.shadowOffset}
+                shadowOpacity={tokens.shadows.sm.shadowOpacity}
+                shadowRadius={tokens.shadows.sm.shadowRadius}
+              >
+                <Badge color={tag.color}>{tag.name}</Badge>
+                <XStack gap="$3" alignItems="center">
+                  {onStartEdit ? (
+                    <TextAction
+                      accessibilityLabel={`Edit tag ${tag.name}`}
+                      onPress={() => {
+                        onStartEdit(tag);
+                      }}
+                    >
+                      Edit
+                    </TextAction>
+                  ) : null}
+                  <TextAction
+                    variant="error"
+                    accessibilityLabel={`Delete tag ${tag.name}`}
                     onPress={() => {
-                      onSaveEdit?.();
+                      onDelete(tag.id);
                     }}
-                    accessibilityLabel="Save"
                   >
-                    Save
-                  </Button>
+                    Delete
+                  </TextAction>
                 </XStack>
               </XStack>
             </YStack>
-          ) : (
-            <XStack
-              key={tag.id}
-              marginBottom="$2"
-              alignItems="center"
-              justifyContent="space-between"
-              borderRadius={tokens.radii.md}
-              backgroundColor="$surface"
-              padding="$3"
-              shadowColor={tokens.shadows.sm.shadowColor}
-              shadowOffset={tokens.shadows.sm.shadowOffset}
-              shadowOpacity={tokens.shadows.sm.shadowOpacity}
-              shadowRadius={tokens.shadows.sm.shadowRadius}
-            >
-              <Badge color={tag.color}>{tag.name}</Badge>
-              <XStack gap="$3" alignItems="center">
-                {onStartEdit ? (
-                  <TextAction
-                    accessibilityLabel={`Edit tag ${tag.name}`}
-                    onPress={() => {
-                      onStartEdit(tag);
-                    }}
-                  >
-                    Edit
-                  </TextAction>
-                ) : null}
-                <TextAction
-                  variant="error"
-                  accessibilityLabel={`Delete tag ${tag.name}`}
-                  onPress={() => {
-                    onDelete(tag.id);
-                  }}
-                >
-                  Delete
-                </TextAction>
-              </XStack>
-            </XStack>
           ),
         )
       )}

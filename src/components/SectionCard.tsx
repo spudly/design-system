@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { XStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Card, type CardProps } from "./Card.js";
 import { Text } from "./Text.js";
@@ -19,15 +19,12 @@ export type SectionCardProps = CardProps & {
 export function SectionCard({ title, action, children, ...rest }: SectionCardProps) {
   return (
     <Card {...rest}>
-      <XStack
-        justifyContent="space-between"
-        alignItems="center"
-        gap={tokens.spacing[2]}
-        marginBottom={tokens.spacing[3]}
-      >
-        <Text variant="subheading">{title}</Text>
-        {action}
-      </XStack>
+      <YStack paddingBottom={tokens.spacing[3]}>
+        <XStack justifyContent="space-between" alignItems="center" gap={tokens.spacing[2]}>
+          <Text variant="subheading">{title}</Text>
+          {action}
+        </XStack>
+      </YStack>
       {children}
     </Card>
   );

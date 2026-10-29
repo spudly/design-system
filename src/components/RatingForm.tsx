@@ -108,19 +108,18 @@ export function RatingForm({
           opacity={0.1}
         />
       )}
-      <YStack padding="$6">
+      <YStack padding="$6" gap="$4">
         <Text
-          marginBlockEnd="$4"
           fontSize={tokens.typography.fontSize.xl}
           fontWeight={tokens.typography.fontWeight.semibold}
           color={isLight ? tokens.colors.gray.gray10 : "$surface"}
         >
           {title}
         </Text>
-        <YStack marginBlockEnd="$4" alignItems="center">
+        <YStack alignItems="center">
           <StarRatingInput value={rating ?? 0} onChange={handleRatingChange} />
         </YStack>
-        <YStack marginBlockEnd="$4">
+        <YStack>
           {isLight ? null : (
             <YStack
               position="absolute"

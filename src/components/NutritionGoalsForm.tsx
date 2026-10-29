@@ -122,7 +122,7 @@ export function NutritionGoalsForm({
         }}
       />
       {error ? <Text variant="error">{error}</Text> : null}
-      <YStack marginTop="$3">
+      <YStack paddingTop="$3">
         <Button variant="primary" disabled={saving} onPress={onSave}>
           Save goals
         </Button>

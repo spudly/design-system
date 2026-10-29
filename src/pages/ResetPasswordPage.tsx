@@ -1,3 +1,4 @@
+import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
@@ -43,12 +44,12 @@ export function ResetPasswordPage({
   };
   return (
     <ScreenContainer scrollable={false} variant="auth">
-      <Text variant="heading" marginBottom="$4">
-        New password
-      </Text>
-      <Text color="$textMuted" marginBottom="$8">
-        Choose a new password for your account.
-      </Text>
+      <YStack paddingBottom="$4">
+        <Text variant="heading">New password</Text>
+      </YStack>
+      <YStack paddingBottom="$8">
+        <Text color="$textMuted">Choose a new password for your account.</Text>
+      </YStack>
       <TextField
         label="New password"
         value={password}

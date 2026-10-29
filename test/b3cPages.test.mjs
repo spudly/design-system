@@ -81,12 +81,20 @@ test("SignUpPage footer block is consistently centered (eciperay#294)", () => {
   // The host renders its legal notice centered in the legalNotice
   // slot; the sign-in link that follows it in the same footer
   // block must carry the same alignment or the block reads as
-  // two mismatched columns.
+  // two mismatched columns. Since #209 the $4 space above the
+  // link is the parent stack's padding, not a margin on the
+  // link itself — the pin follows the shape that carries both
+  // properties today.
   const source = page("SignUpPage");
   assert.match(
     source,
-    /<TextLink marginTop="\$4" textAlign="center" onPress={onSignInPress}>\s*Already have an account\? Sign in/,
+    /<YStack paddingTop="\$4">\s*<TextLink textAlign="center" onPress={onSignInPress}>\s*Already have an account\? Sign in/,
     "the sign-in footer link is center-aligned like the legal notice above it",
+  );
+  assert.doesNotMatch(
+    source,
+    /<TextLink[^>]*\bmargin/,
+    "the sign-in footer link carries no margin prop (#209)",
   );
 });
 

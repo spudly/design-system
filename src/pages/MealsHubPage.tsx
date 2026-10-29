@@ -91,31 +91,32 @@ function MealRow({
     }
   };
   return (
-    <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3" marginBottom="$3">
-      <YStack
-        flex={1}
-        minWidth={0}
-        {...platformAccessibilityProps({
-          accessibilityRole: "button",
-          accessibilityLabel: meal.title,
-        })}
-        onPress={onPress}
-        tabIndex={0}
-        onKeyDown={handleKeyDown}
-        cursor="web:pointer"
-      >
-        <Text
-          fontSize={tokens.typography.fontSize.md}
-          fontWeight={tokens.typography.fontWeight.semibold}
+    <YStack paddingBlockEnd="$3">
+      <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
+        <YStack
+          flex={1}
+          minWidth={0}
+          gap="$1"
+          {...platformAccessibilityProps({
+            accessibilityRole: "button",
+            accessibilityLabel: meal.title,
+          })}
+          onPress={onPress}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          cursor="web:pointer"
         >
-          {meal.title}
-        </Text>
-        <Text variant="hint" marginTop="$1">
-          {meal.subtitle}
-        </Text>
-      </YStack>
-      <TextLink onPress={onDelete}>Delete</TextLink>
-    </Card>
+          <Text
+            fontSize={tokens.typography.fontSize.md}
+            fontWeight={tokens.typography.fontWeight.semibold}
+          >
+            {meal.title}
+          </Text>
+          <Text variant="hint">{meal.subtitle}</Text>
+        </YStack>
+        <TextLink onPress={onDelete}>Delete</TextLink>
+      </Card>
+    </YStack>
   );
 }
 
@@ -134,14 +135,15 @@ export function MealsHubPage({
 }: MealsHubPageProps) {
   const hubChrome = (
     <>
-      <Text
-        variant="heading"
-        fontSize={tokens.typography.fontSize.xl}
-        fontWeight={tokens.typography.fontWeight.bold}
-        marginBottom="$4"
-      >
-        Meals
-      </Text>
+      <YStack paddingBottom="$4">
+        <Text
+          variant="heading"
+          fontSize={tokens.typography.fontSize.xl}
+          fontWeight={tokens.typography.fontWeight.bold}
+        >
+          Meals
+        </Text>
+      </YStack>
       <Tabs
         tabs={[
           { value: "meals", label: "Meals" },
@@ -176,7 +178,7 @@ export function MealsHubPage({
   return (
     <ScreenContainer>
       {hubChrome}
-      <YStack marginVertical="$4">
+      <YStack paddingVertical="$4">
         <Button variant="primary" accessibilityLabel="New meal" onPress={onCreateMeal}>
           New meal
         </Button>

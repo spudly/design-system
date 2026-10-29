@@ -1,0 +1,5 @@
+---
+"@spudly/ui": patch
+---
+
+Internal spacing refactor (#209): across all components and pages, space between items is now carried by the parent (stack `gap` and container `padding`) instead of `margin` props on individual elements. Every conversion preserves the previous spacing value, so no layout should move: headings, cards, rows, and sections keep exactly the gaps they had. On a @spudly/ui bump, spot-check in Storybook that spacing is unchanged on the densest surfaces: Pages/Eciperay/RecipeDetailPage (overview header, ingredients scale row, instruction step cards, cook-log cards), Pages/Eciperay/RecipesPage and MealPlansPage rows (12px below each card inside the lists' 8px gap), Components/AccessTokensPanel (the amber created-token panel sits 16px from the sections around it), and Pages/Eciperay/AiSessionPage (chat bubbles keep their 32px inset on the sender's side). A new design-system ESLint rule (`no-margin-spacing`) also lands in the repo, dormant beside the #119 page-styling rule until the TypeScript lint restoration activates both.

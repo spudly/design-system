@@ -45,9 +45,11 @@ export function ImportUrlPage({
 
   return (
     <FormScreenLayout>
-      <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]} marginBottom="$6">
-        Import from URL
-      </Text>
+      <YStack paddingBottom="$6">
+        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
+          Import from URL
+        </Text>
+      </YStack>
       <TextField
         value={url}
         onChangeText={onUrlChange}
@@ -56,7 +58,7 @@ export function ImportUrlPage({
         returnKeyType="go"
       />
       {error ? (
-        <YStack marginBottom="$4">
+        <YStack paddingBottom="$4">
           <Text variant="error">{error}</Text>
         </YStack>
       ) : null}

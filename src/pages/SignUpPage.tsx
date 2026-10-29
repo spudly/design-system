@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
@@ -63,9 +64,9 @@ export function SignUpPage({
   };
   return (
     <ScreenContainer scrollable={false} variant="auth">
-      <Text variant="heading" marginBottom="$8">
-        Create account
-      </Text>
+      <YStack paddingBottom="$8">
+        <Text variant="heading">Create account</Text>
+      </YStack>
       <TextField
         label="Your name"
         value={displayName}
@@ -104,9 +105,11 @@ export function SignUpPage({
       </Button>
       {legalNotice}
       {onSignInPress ? (
-        <TextLink marginTop="$4" textAlign="center" onPress={onSignInPress}>
-          Already have an account? Sign in
-        </TextLink>
+        <YStack paddingTop="$4">
+          <TextLink textAlign="center" onPress={onSignInPress}>
+            Already have an account? Sign in
+          </TextLink>
+        </YStack>
       ) : null}
     </ScreenContainer>
   );

@@ -1,3 +1,4 @@
+import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
@@ -60,9 +61,9 @@ export function SignInPage({
   };
   return (
     <ScreenContainer scrollable={false} variant="auth">
-      <Text variant="heading" marginBottom="$8">
-        Welcome back
-      </Text>
+      <YStack paddingBottom="$8">
+        <Text variant="heading">Welcome back</Text>
+      </YStack>
       <TextField
         label="Email"
         value={email}
@@ -88,14 +89,16 @@ export function SignInPage({
         {loading ? "Signing in…" : "Sign In"}
       </Button>
       {onSignUpPress ? (
-        <TextLink marginTop="$4" onPress={onSignUpPress}>
-          Create an account
-        </TextLink>
+        <YStack paddingTop="$4">
+          <TextLink onPress={onSignUpPress}>Create an account</TextLink>
+        </YStack>
       ) : null}
       {onForgotPasswordPress ? (
-        <TextLink color={tokens.colors.gray.gray6} marginTop="$2" onPress={onForgotPasswordPress}>
-          Forgot password?
-        </TextLink>
+        <YStack paddingTop="$2">
+          <TextLink color={tokens.colors.gray.gray6} onPress={onForgotPasswordPress}>
+            Forgot password?
+          </TextLink>
+        </YStack>
       ) : null}
     </ScreenContainer>
   );

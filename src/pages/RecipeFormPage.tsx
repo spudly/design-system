@@ -160,7 +160,7 @@ function FieldLabel({ children }: { children: string }) {
 
 function LabelRow({ label, action }: { label: string; action?: ReactNode }) {
   return (
-    <XStack marginBlockEnd="$1" alignItems="center" justifyContent="space-between" gap="$3">
+    <XStack paddingBlockEnd="$1" alignItems="center" justifyContent="space-between" gap="$3">
       <FieldLabel>{label}</FieldLabel>
       {action ?? null}
     </XStack>
@@ -337,7 +337,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
         </YStack>
 
         <YStack>
-          <XStack marginBlockEnd="$1" alignItems="center" justifyContent="space-between" gap="$3">
+          <XStack paddingBlockEnd="$1" alignItems="center" justifyContent="space-between" gap="$3">
             <FieldLabel>Description</FieldLabel>
             <XStack alignItems="center" gap="$2">
               {revertAction("description")}
@@ -362,9 +362,9 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
             onChangeText={onDescriptionChange}
           />
           {descriptionError ? (
-            <Text variant="error" marginBlockStart="$2">
-              {descriptionError}
-            </Text>
+            <YStack paddingBlockStart="$2">
+              <Text variant="error">{descriptionError}</Text>
+            </YStack>
           ) : null}
         </YStack>
 
@@ -414,7 +414,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
         </YStack>
 
         <YStack>
-          <XStack marginBlockEnd="$2" alignItems="center" justifyContent="space-between" gap="$2">
+          <XStack paddingBlockEnd="$2" alignItems="center" justifyContent="space-between" gap="$2">
             <FieldLabel>Tags</FieldLabel>
             {tagsRevertLabel && onRevertTags ? (
               <RevertAction label={tagsRevertLabel} onPress={onRevertTags} />
