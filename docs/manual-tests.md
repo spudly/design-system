@@ -648,8 +648,9 @@ Open in `Components/FormStack`: Default. Open in
    stretched to the column width (the Save Changes button
    included), with clear space below the last element.
 2. FormHeading Default: the "Meal plan" title in the form-title
-   treatment (2xl bold, heading level 1) sits 24px above the
-   first field.
+   treatment (2xl bold, heading level 1) sits above the first
+   field with 40px of total separation — the heading's own 24px
+   padding plus the form layout's 16px gap.
 3. FormSubmit Default: the Save meal button sits 16px below the
    field above it, full width.
 
@@ -685,8 +686,9 @@ Default, NoSelection, SaveError. Open in
    columns, image, Ingredients and Instructions slots, Tags
    chips, Source URL, and the full-width Save Changes button,
    evenly spaced in one scrolling form.
-2. ContentLocked: the lock notice renders above the slots with
-   the notice's link, and the fields are disabled.
+2. ContentLocked: the lock notice (with its link) renders in
+   place of the Ingredients and Instructions slots — the slots
+   disappear — while the scalar fields and tags remain editable.
 3. VersionDiff: the ingredients and instructions changed-list
    banners render above their slots with Revert actions, and
    changed fields carry their revert actions beside the labels.

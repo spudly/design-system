@@ -74,6 +74,7 @@ test("FieldColumns gives every child an equal flex column with an owned 12px gut
   const source = readRepoFile("src/components/FieldColumns.tsx");
   assert.match(source, /gap=\{tokens\.spacing\[3\]\}/);
   assert.match(source, /<YStack flex=\{1\}>/);
+  assert.match(source, /typeof child === "boolean"/);
 });
 
 test("FormStack owns the form rhythm: 16px section gaps, stretched children, 32px tail", () => {

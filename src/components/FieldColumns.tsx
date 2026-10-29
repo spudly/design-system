@@ -14,14 +14,16 @@ export type FieldColumnsProps = {
  * gutter between columns — the shape of a form's short-field
  * row (servings / prep / cook on the recipe form). The columns
  * are the component's own: call sites pass only the fields,
- * and no column widths or gaps cross as props.
+ * and no column widths or gaps cross as props. Empty children
+ * (a conditional field that rendered nothing) get no column —
+ * the remaining fields share the full row.
  */
 export function FieldColumns({ children }: FieldColumnsProps) {
   return (
     <XStack gap={tokens.spacing[3]}>
-      {Children.map(children, (child) => (
-        <YStack flex={1}>{child}</YStack>
-      ))}
+      {Children.map(children, (child) =>
+        child == null || typeof child === "boolean" ? null : <YStack flex={1}>{child}</YStack>,
+      )}
     </XStack>
   );
 }
