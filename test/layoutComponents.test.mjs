@@ -9,9 +9,10 @@
  * spaceBefore/spaceAfter are abolished in all cases, and
  * separation between blocks is the parent stack's gap).
  *
- * - ButtonRow: a row of action buttons — gap spacing[3] (12px),
- *   wrap, and the standard spacing[2] (8px) separation from the
- *   content it follows, owned by the bar.
+ * - ButtonRow: a row of action buttons — gap spacing[3] (12px)
+ *   and wrap. Separation from the content it follows is the
+ *   parent's (a stack's gap, a card's internal gap), never the
+ *   bar's own margin.
  * - CardStack: a stack of cards — gap spacing[2] (8px), stretch.
  * - SectionStack: a page's sections — gap spacing[8] (32px),
  *   stretch.
@@ -79,13 +80,17 @@ test("the layout components are exported from the built package root", async () 
   );
 });
 
-test("ButtonRow owns the action bar's gap, wrap, and follow separation", () => {
+test("ButtonRow owns the action bar's gap and wrap; separation from preceding content is the parent's", () => {
   assert.match(buttonRowCode, /styled\(XStack, \{\s+name: "ButtonRow",/);
   assert.match(buttonRowCode, /gap: tokens\.spacing\[3\],\s+flexWrap: "wrap",/);
-  assert.match(buttonRowCode, /alignItems: "flex-start",\s+marginTop: tokens\.spacing\[2\],/);
+  assert.match(buttonRowCode, /alignItems: "flex-start",/);
+  assert.ok(
+    !buttonRowCode.includes("marginTop"),
+    "ButtonRow must not carry a margin — separation from the content it follows belongs to the parent (#119)",
+  );
   assert.match(
     buttonRowCode,
-    /Omit<\s+StyledButtonRowProps,\s+"gap" \| "alignItems" \| "flexWrap" \| "marginTop"\s+>/,
+    /Omit<\s+StyledButtonRowProps,\s+"gap" \| "alignItems" \| "flexWrap"\s+>/,
   );
 });
 
