@@ -61,6 +61,7 @@ export { SearchField, type SearchFieldProps } from "./SearchField.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./SecretRevealPanel.js";
 export { SectionCard, type SectionCardProps } from "./SectionCard.js";
 export { SelectField, type SelectFieldProps, type SelectOption } from "./SelectField.js";
+export { Slider, type SliderProps, type SliderTick } from "./Slider.js";
 export { Spinner, type SpinnerProps } from "./Spinner.js";
 export { StarRatingInput, type StarRatingInputProps } from "./StarRatingInput.js";
 export { StatCard, type StatCardProps } from "./StatCard.js";
