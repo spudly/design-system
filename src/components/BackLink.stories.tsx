@@ -25,3 +25,10 @@ export const CustomLabel: Story = {
     onPress: () => undefined,
   },
 };
+
+export const Href: Story = {
+  args: {
+    label: "Back to recipes",
+    href: "/recipes",
+  },
+};

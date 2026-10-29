@@ -1,14 +1,26 @@
 import { Children, forwardRef } from "react";
 import type { ComponentType, ReactNode } from "react";
-import { Button as TamaguiButton, styled, useTheme } from "tamagui";
+import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { IconComponentProps } from "../icons/Icon.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
-const StyledButton = styled(TamaguiButton, {
-  name: "Button",
-
+/**
+ * The button frame's styling: ONE config shared by the two frames
+ * Button renders, so the forms are pixel-identical and cannot drift:
+ *
+ * - `StyledButton` (the button form): a Tamagui Button — renders a
+ *   `<button>` element on web and a pressable on native; activation
+ *   is the caller's `onPress` callback.
+ * - `StyledLinkButton` (the href form, #248): a Tamagui Anchor with
+ *   the same frame — renders a real `<a href>` on web; on native a
+ *   press opens the href through the platform link path (Tamagui's
+ *   Anchor calls Linking.openURL internally, so no DS component
+ *   imports react-native — the root module graph must stay loadable
+ *   in plain Node).
+ */
+const buttonFrameConfig = {
   // Base: theme-aware styling — uses $primary/$onPrimary from the active
   // Tamagui theme (e.g. terracotta for Eciperay Warm Harvest), not the raw
   // brand-neutral primary ramp.
@@ -76,7 +88,35 @@ const StyledButton = styled(TamaguiButton, {
   defaultVariants: {
     variant: "primary",
     size: "md",
-  },
+  } as const,
+};
+
+const StyledButton = styled(TamaguiButton, {
+  name: "Button",
+  ...buttonFrameConfig,
+});
+
+const StyledLinkButton = styled(Anchor, {
+  name: "ButtonLink",
+  ...buttonFrameConfig,
+
+  // An anchor is a text element, not a flex frame: on web it is
+  // `display: inline` by default, which ignores the frame's width
+  // in normal flow (a width="100%" CTA link would shrink to its
+  // label) — so web gets a real flex frame, centering the label
+  // the way the button form centers its content (CodeRabbit
+  // finding on PR #283; the same defect class as BackLink's href
+  // anchor, verified the same way in the SSR-generated CSS). The
+  // v3 flat `web:` clauses scope this to web; native is unchanged.
+  display: "web:flex",
+  alignItems: "web:center",
+  justifyContent: "web:center",
+  textAlign: "center",
+  // A web anchor carries the UA link underline; the button form
+  // has none, and the two forms are contracted to look identical
+  // (manual Storybook QA finding on PR #283 — every href form's
+  // label rendered underlined, no button counterpart was).
+  textDecorationLine: "none",
 });
 
 type StyledButtonProps = GetProps<typeof StyledButton>;
@@ -85,11 +125,14 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
  * Button's own props, minus the entries the wrapper manages or gives
  * a design-system meaning: `disabled` (mirrored into the
  * accessibility state), `children` (the label — declared per
- * ButtonProps shape below), and Tamagui Button's own `icon` prop
+ * ButtonProps shape below), Tamagui Button's own `icon` prop
  * (a rendered node/callback in Tamagui's API; the design system's
- * icon slot takes an icon COMPONENT instead, declared here).
+ * icon slot takes an icon COMPONENT instead, declared here), and
+ * `href` (the activation discriminant — declared per ButtonProps
+ * shape below, and destructured by the wrapper so it can never leak
+ * onto the rendered button element as a stray attribute).
  */
-type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon"> & {
+type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" | "href"> & {
   disabled?: boolean;
   /**
    * The icon slot: one of the design system's semantic icon
@@ -107,39 +150,96 @@ type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon"> 
   icon?: ComponentType<IconComponentProps>;
 };
 
-export type ButtonProps = ButtonOwnProps &
-  (
-    | {
-        /** No icon: the plain labeled button, unchanged. */
-        icon?: undefined;
-        /** The label text. A labeled button is named by its text. */
-        children?: ReactNode;
-        accessibilityLabel?: string;
-      }
-    | {
-        /**
-         * Icon + label: the glyph renders left of the label text.
-         * Boolean children are excluded — `false` renders no label,
-         * so it belongs to the icon-only shape below, where the
-         * label requirement lives.
-         */
-        icon: ComponentType<IconComponentProps>;
-        children: Exclude<NonNullable<ReactNode>, boolean>;
-        accessibilityLabel?: string;
-      }
-    | {
-        /**
-         * Icon-only: no label text (no children, or only
-         * boolean/null children, which render nothing), so
-         * `accessibilityLabel` is REQUIRED — it is the only name
-         * assistive tech (and tests querying by role + name) can
-         * find the button by.
-         */
-        icon: ComponentType<IconComponentProps>;
-        children?: boolean | null;
-        accessibilityLabel: string;
-      }
-  );
+/** The button form's label/icon shapes (activation by callback). */
+type ButtonIconShapes =
+  | {
+      /** No icon: the plain labeled button, unchanged. */
+      icon?: undefined;
+      /** The label text. A labeled button is named by its text. */
+      children?: ReactNode;
+      accessibilityLabel?: string;
+    }
+  | {
+      /**
+       * Icon + label: the glyph renders left of the label text.
+       * Boolean children are excluded — `false` renders no label,
+       * so it belongs to the icon-only shape below, where the
+       * label requirement lives.
+       */
+      icon: ComponentType<IconComponentProps>;
+      children: Exclude<NonNullable<ReactNode>, boolean>;
+      accessibilityLabel?: string;
+    }
+  | {
+      /**
+       * Icon-only: no label text (no children, or only
+       * boolean/null children, which render nothing), so
+       * `accessibilityLabel` is REQUIRED — it is the only name
+       * assistive tech (and tests querying by role + name) can
+       * find the button by.
+       */
+      icon: ComponentType<IconComponentProps>;
+      children?: boolean | null;
+      accessibilityLabel: string;
+    };
+
+type StyledLinkButtonProps = GetProps<typeof StyledLinkButton>;
+
+/**
+ * The href (link) form's props: the Anchor frame's props, minus the
+ * entries the wrapper manages (`disabled`, `children`) and the
+ * button-form-only entries (`icon`, `onPress` — a link navigates;
+ * it does not take a press callback).
+ */
+type ButtonLinkProps = Omit<StyledLinkButtonProps, "disabled" | "children" | "icon" | "onPress"> & {
+  disabled?: boolean;
+  /**
+   * The link's destination. Giving Button an `href` makes it a
+   * LINK (#248's navigation rule: a control that navigates to
+   * another page is a link with an href; anything else is a button
+   * element with a callback): on web it renders a real anchor
+   * carrying the href, and on native a press opens the href through
+   * the platform link path. The frame, variants, and sizes are the
+   * button form's own — only the element and the activation differ.
+   * Native contract (shared by every DS href form): the href is
+   * forwarded verbatim to `Linking.openURL`, which requires a
+   * scheme-bearing URL an installed app can open — so on native
+   * the host passes an absolute URL (the app's deep-link scheme
+   * or an https URL); root-relative paths such as "/recipes" are
+   * web-form destinations. The design system has no base URL or
+   * router to resolve a relative path against, so composing the
+   * per-platform destination is the host's part of the contract
+   * (the host composes hrefs from its routes, #248).
+   */
+  href: string;
+  /** A link navigates — press callbacks belong to the button form. */
+  onPress?: never;
+  /**
+   * The icon slot belongs to the button form: an anchor's content
+   * is its label text (a navigating control that needs richer
+   * content is a card/row link, not a Button).
+   */
+  icon?: never;
+  /** The label text. A labeled link is named by its text. */
+  children?: ReactNode;
+  accessibilityLabel?: string;
+};
+
+export type ButtonProps =
+  (ButtonOwnProps & { href?: undefined } & ButtonIconShapes) | ButtonLinkProps;
+
+/**
+ * The widened field set the wrapper renders from. The public
+ * `ButtonProps` union keeps the two activation forms mutually
+ * exclusive at call sites; the members agree on every shared
+ * field's type, so rendering reads them through this one shape.
+ */
+type ButtonRenderProps = ButtonOwnProps & {
+  href?: string;
+  icon?: ComponentType<IconComponentProps>;
+  children?: ReactNode;
+  accessibilityLabel?: string;
+};
 
 /**
  * Label colors per variant. These must be passed as an instance `color`
@@ -213,13 +313,27 @@ function useGlyphInk(variant: string | undefined): string {
  * Props: `variant` ("primary" | "secondary" | "ghost" | "danger"), `size`
  * ("sm" | "md" | "lg"), `disabled`. All styling is token-driven. Use
  * `danger` for destructive actions (delete, revoke, remove).
+ *
+ * Two activation forms (#248's navigation rule — a control that
+ * navigates to another page is a link with an href; anything else is
+ * a button element with a callback):
+ *
+ * - Button form (default): pass `onPress`; renders a `<button>`
+ *   element on web, a pressable on native.
+ * - Link form: pass `href` (and no `onPress`, no `icon`); renders a
+ *   real `<a href>` on web with the identical frame, variants, and
+ *   sizes, and on native a press opens the href through the platform
+ *   link path. While `disabled`, the link renders WITHOUT its href
+ *   (the ARIA disabled-link pattern): it stays visible and announced
+ *   as disabled but cannot be followed on either platform.
+ *
  * Icon slot: pass a DS icon component as `icon` and it renders to
  * the left of the label, in the variant's label color; pass no label
  * and the button is icon-only — a square target (44/48/56px) that
  * then requires `accessibilityLabel` (see ButtonProps). Button owns
  * all of the slot's styling; there are no icon styling props.
- * Accessibility: exposes `accessibilityRole="button"` and mirrors `disabled`
- * into `accessibilityState`. Caller accessibility props
+ * Accessibility: exposes `accessibilityRole="button"` ("link" in the
+ * href form) and mirrors `disabled` into `accessibilityState`. Caller accessibility props
  * (`accessibilityLabel`, `accessibilityState`, …) go through
  * `platformAccessibilityProps` (#235): Tamagui's web renderer forwards
  * them to the DOM verbatim (`accessibilitylabel="…"`,
@@ -230,13 +344,18 @@ function useGlyphInk(variant: string | undefined): string {
  * still wins over the translated one.
  */
 export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
-  {
+  props: ButtonProps,
+  ref,
+) {
+  const {
     disabled = false,
     variant = "primary",
     size = "md",
     icon: IconGlyph,
     children,
     color,
+    href,
+    onPress,
     accessible,
     accessibilityElementsHidden,
     accessibilityHint,
@@ -247,13 +366,12 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     accessibilityState,
     accessibilityValue,
     ...rest
-  }: ButtonProps,
-  ref,
-) {
+  } = props as ButtonRenderProps;
   // `variant`'s prop type also admits Tamagui Button's built-in variant
   // names; only the four design-system variants have a mapped label color.
   const labelColor = color ?? variantLabelColors[variant as keyof typeof variantLabelColors];
   const glyphInk = useGlyphInk(typeof variant === "string" ? variant : undefined);
+  const isLink = href !== undefined;
   const a11yProps = platformAccessibilityProps({
     accessible,
     accessibilityElementsHidden,
@@ -261,10 +379,90 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     accessibilityLabel,
     accessibilityLabelledBy,
     accessibilityLiveRegion,
-    accessibilityRole: accessibilityRole ?? "button",
+    accessibilityRole: accessibilityRole ?? (isLink ? "link" : "button"),
     accessibilityState: { disabled, ...accessibilityState },
     accessibilityValue,
   });
+  if (isLink) {
+    // The label renders inside ONE text container, not as direct
+    // children of the flex anchor: flex layout drops whitespace-only
+    // text nodes between flex items, so a formatted label such as
+    // <span>Save</span>{" "}<span>recipe</span> would render as
+    // "Saverecipe" (CodeRabbit finding on PR #283). The button form
+    // keeps that space because Tamagui Button wraps text children
+    // in its own text elements; the single nested Text is the link
+    // form's equivalent — its content flows inline again. The Text
+    // carries the label's own styling explicitly (the same values
+    // the frame's variants and the wrapper's instance props give
+    // the button form's internal text): the variant label color,
+    // the size's font size, the semibold weight, the body family.
+    // Caller typography props win over those defaults, exactly as
+    // they did when the label was the anchor's own text (and as
+    // they do in the button form, where Tamagui forwards instance
+    // typography to its internal text): a caller-passed fontSize /
+    // fontWeight / fontFamily arrives in `rest` bound for the
+    // frame, and the label must resolve from the same values or
+    // the explicit Text props would silently override them
+    // (CodeRabbit finding on PR #283).
+    const labelFontSizes = {
+      sm: tokens.typography.fontSize.sm,
+      md: tokens.typography.fontSize.md,
+      lg: tokens.typography.fontSize.lg,
+    } as const;
+    const callerType = rest as Pick<
+      StyledLinkButtonProps,
+      "fontSize" | "fontWeight" | "fontFamily"
+    >;
+    const labelFontSize =
+      callerType.fontSize ??
+      labelFontSizes[size as keyof typeof labelFontSizes] ??
+      labelFontSizes.md;
+    const labelFontWeight = callerType.fontWeight ?? tokens.typography.fontWeight.semibold;
+    const labelFontFamily = callerType.fontFamily ?? "$body";
+    return (
+      <StyledLinkButton
+        ref={ref}
+        {...a11yProps}
+        // A disabled link is not followable: the href is withheld
+        // entirely (ARIA's disabled-link pattern — the attribute is
+        // absent, not empty) while the disabled state above still
+        // announces it. On native the Anchor opens the href only
+        // when one is present, so the press is inert too.
+        {...(disabled ? {} : { href })}
+        disabled={disabled}
+        variant={variant}
+        size={size}
+        color={labelColor}
+        // Same instance-prop rule as the button form's `color`: the
+        // BARE font name ("body", no "$") is the form that makes
+        // Tamagui emit the font-context class defining `--f-family`
+        // (see Text, #69). A caller-passed `fontFamily` in `rest`
+        // still wins.
+        fontFamily="body"
+        // `rest` is read through the widened render shape (its
+        // fields are the button frame's); call sites are typed by
+        // ButtonLinkProps, so what actually arrives is the link
+        // frame's own props — the cast states that for the spread.
+        {...(rest as Omit<
+          StyledLinkButtonProps,
+          "href" | "disabled" | "children" | "variant" | "size" | "color" | "fontFamily"
+        >)}
+      >
+        {Children.count(children) > 0 ? (
+          <TamaguiText
+            color={labelColor}
+            fontFamily={labelFontFamily}
+            fontSize={labelFontSize}
+            fontWeight={labelFontWeight}
+          >
+            {children}
+          </TamaguiText>
+        ) : (
+          children
+        )}
+      </StyledLinkButton>
+    );
+  }
   // Renderable-label detection: Children.toArray drops the child
   // forms that render nothing (null, undefined, booleans); an empty
   // string is dropped by the some() check. Anything left — text, a
@@ -278,6 +476,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     <StyledButton
       ref={ref}
       {...a11yProps}
+      onPress={onPress}
       disabled={disabled}
       variant={variant}
       size={size}

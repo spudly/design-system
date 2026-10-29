@@ -23,6 +23,9 @@ const meta: Meta<typeof Button> = {
     disabled: {
       control: "boolean",
     },
+    href: {
+      control: "text",
+    },
     accessibilityLabel: {
       control: "text",
     },
@@ -188,4 +191,53 @@ function IconPressCounterDemo() {
 
 export const IconPressCounter: Story = {
   render: () => <IconPressCounterDemo />,
+};
+
+export const Link: Story = {
+  args: { variant: "primary", size: "md", href: "/recipes", children: "Browse recipes" },
+};
+
+export const LinkVariants: Story = {
+  render: () => (
+    <XStack gap={12} alignItems="center">
+      <Button variant="primary" href="/recipes">
+        Browse recipes
+      </Button>
+      <Button variant="secondary" href="/sign-in">
+        Sign in
+      </Button>
+      <Button variant="ghost" href="/about">
+        Learn more
+      </Button>
+      <Button variant="danger" href="/account/delete">
+        Delete account
+      </Button>
+    </XStack>
+  ),
+};
+
+export const LinkSizes: Story = {
+  render: () => (
+    <XStack gap={12} alignItems="center">
+      <Button size="sm" href="/recipes">
+        Small
+      </Button>
+      <Button size="md" href="/recipes">
+        Medium
+      </Button>
+      <Button size="lg" href="/recipes">
+        Large
+      </Button>
+    </XStack>
+  ),
+};
+
+export const LinkDisabled: Story = {
+  args: {
+    variant: "primary",
+    size: "md",
+    href: "/recipes",
+    disabled: true,
+    children: "Browse recipes",
+  },
 };
