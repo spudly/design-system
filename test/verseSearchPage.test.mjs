@@ -16,7 +16,8 @@
  *    renders above the search row; the error alert carries the
  *    app-composed message.
  * 4. The search row mirrors the app: the DS SearchField with the
- *    app's placeholder, submit-editing and the Search button
+ *    app's placeholder (its keyword example mode-aware, #276),
+ *    submit-editing and the Search button
  *    firing the same callback, and the button's disabled rule
  *    (searching, or a blank query).
  * 5. There is deliberately NO empty state: the app renders an
@@ -110,9 +111,18 @@ test("the search row wires the field and the button to the one search callback",
     /<SearchField\s+value=\{query\}\s+onChangeText=\{onQueryChange\}/,
     "the SearchField must be controlled by the query props",
   );
+  assert.match(
+    code,
+    /placeholder=\{\s*usingDemo \?/,
+    "the placeholder's keyword example must be selected by usingDemo (#276)",
+  );
   assert.ok(
-    code.includes('placeholder="e.g. Ether 12:27 or “charity”"'),
-    "the placeholder must be the app's, verbatim",
+    code.includes('"e.g. Ether 12:27 or “weakness”"'),
+    'in demo mode the placeholder must suggest "weakness" — the demo set answers it with Ether 12:27, while it contains no "charity" verse (#276)',
+  );
+  assert.ok(
+    code.includes('"e.g. Ether 12:27 or “charity”"'),
+    'in full-library mode the placeholder must keep the app\'s "charity" example, verbatim',
   );
   assert.match(
     code,
