@@ -24,11 +24,17 @@ try {
 // Story link routing (#300 — see storyLinks.ts): wrap the
 // platform Linking.openURL, the call Tamagui's Anchor makes for
 // every href press, so scheme-less app paths from stories route
-// to this host's browse scheme instead of rejecting. Installed
-// at module scope so it is in place before any story renders, in
-// browse and capture mode alike (capture never presses links;
-// the wrap is inert there).
-RNLinking.openURL = createStoryLinkOpenURL(RNLinking.openURL.bind(RNLinking));
+// to this host's browse URL instead of rejecting. The browse URL
+// comes from expo-linking's createURL so it matches how the host
+// was started: spudlyds://browse in a native build, the
+// exp://…/--/browse form in Expo Go (which registers no custom
+// scheme). Installed at module scope so it is in place before
+// any story renders, in browse and capture mode alike (capture
+// never presses links; the wrap is inert there).
+RNLinking.openURL = createStoryLinkOpenURL(
+  RNLinking.openURL.bind(RNLinking),
+  Linking.createURL("browse"),
+);
 
 // ---------------------------------------------------------------------------
 // Capture protocol (used by tools/visualRegression/run.mjs — see
@@ -60,8 +66,10 @@ RNLinking.openURL = createStoryLinkOpenURL(RNLinking.openURL.bind(RNLinking));
 // - Story link presses: stories carry web-style app hrefs
 //   ("/recipes/..."), which scheme-less would reject in
 //   Linking.openURL. The wrap installed above (storyLinks.ts,
-//   #300) routes them to `spudlyds://browse?path=<original>`
-//   instead; the host logs the pressed path as a `DS LINK
+//   #300) routes them to the host's browse URL with the
+//   original path attached (`…/browse?path=<original>` — the
+//   spudlyds: form in a native build, the exp://…/--/ form in
+//   Expo Go); the host logs the pressed path as a `DS LINK
 //   <path>` line and stays in browse mode.
 // ---------------------------------------------------------------------------
 
@@ -81,7 +89,11 @@ function parseCapture(url: string): CaptureTarget | null | undefined {
       appCapture: parsed.queryParams?.appcapture === "1",
     };
   }
-  if (parsed.hostname === "browse") return null;
+  // Browse arrives as hostname "browse" from a native build
+  // (spudlyds://browse) and as path "browse" from Expo Go
+  // (exp://<host>/--/browse — expo-linking's parse strips the
+  // prefix and nulls the hostname there).
+  if (parsed.hostname === "browse" || parsed.path === "browse") return null;
   return undefined;
 }
 
@@ -93,7 +105,8 @@ function parseCapture(url: string): CaptureTarget | null | undefined {
 function logStoryLink(url: string) {
   const parsed = Linking.parse(url);
   const path = parsed.queryParams?.path;
-  if (parsed.hostname === "browse" && typeof path === "string") {
+  const isBrowse = parsed.hostname === "browse" || parsed.path === "browse";
+  if (isBrowse && typeof path === "string") {
     console.log(`DS LINK ${path}`);
   }
 }

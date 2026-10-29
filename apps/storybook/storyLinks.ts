@@ -27,15 +27,23 @@
 // - Scheme-bearing URLs (https:, mailto:, tel:, and this host's
 //   own spudlyds: capture/browse links) pass through untouched,
 //   with their original promise semantics.
-// - Scheme-less app paths are rewritten to the host's browse
-//   scheme with the original path attached
-//   (spudlyds://browse?path=<original>). Opening the app's own
-//   registered scheme delivers the URL back to the host's link
+// - Scheme-less app paths are rewritten to the host's browse URL
+//   with the original path attached (<browse>?path=<original>).
+//   Opening that URL delivers it back to the host's link
 //   listener, which stays in browse mode and logs the pressed
 //   path (see App.tsx) — the press lands somewhere sane instead
 //   of rejecting, and the path is visible in the device log.
-
-const BROWSE_URL = "spudlyds://browse";
+//
+// The browse URL is supplied by the host (App.tsx) rather than
+// hardcoded here, because the reachable form depends on how the
+// host was started: expo-linking's createURL("browse") yields
+// `spudlyds://browse` in a native build (the scheme app.json
+// registers), but `exp://<metro-host>/--/browse` under
+// `expo start` in Expo Go, which registers no custom scheme — a
+// spudlyds: URL there has no handler and would reject like the
+// original href did. This module stays import-free so the
+// routing logic is directly unit-testable; the host passes its
+// environment-aware browse URL in.
 
 // An RFC 3986 scheme — ALPHA *( ALPHA / DIGIT / "+" / "-" / "." )
 // followed by ":". Anything without one is an app-style path.
@@ -44,12 +52,13 @@ const SCHEME_PATTERN = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
 /**
  * Resolve an href pressed inside a story to the URL the platform
  * should actually open: scheme-bearing URLs unchanged, app-style
- * paths routed to this host's browse scheme with the original
- * path preserved as a query parameter.
+ * paths routed to the host's browse URL with the original path
+ * preserved as a query parameter.
  */
-export function resolveStoryLink(url: string): string {
+export function resolveStoryLink(url: string, browseUrl: string): string {
   if (SCHEME_PATTERN.test(url)) return url;
-  return `${BROWSE_URL}?path=${encodeURIComponent(url)}`;
+  const separator = browseUrl.includes("?") ? "&" : "?";
+  return `${browseUrl}${separator}path=${encodeURIComponent(url)}`;
 }
 
 export type OpenURL = (url: string) => Promise<void>;
@@ -58,15 +67,15 @@ export type OpenURL = (url: string) => Promise<void>;
  * Wrap a Linking.openURL implementation with resolveStoryLink.
  * Pass-through URLs keep the original function's exact behavior
  * (including rejections — e.g. a mailto: with no mail app fails
- * the same way it does in a real app). A rewritten URL is this
- * host's own registered scheme and so cannot be unopenable in
- * principle; a rejection is absorbed anyway, because a story link
- * press must never surface as an unhandled promise rejection in
- * the host.
+ * the same way it does in a real app). A rewritten URL is the
+ * host's own browse URL and so cannot be unopenable in
+ * principle; a rejection is absorbed anyway, because a story
+ * link press must never surface as an unhandled promise
+ * rejection in the host.
  */
-export function createStoryLinkOpenURL(openURL: OpenURL): OpenURL {
+export function createStoryLinkOpenURL(openURL: OpenURL, browseUrl: string): OpenURL {
   return (url: string) => {
-    const resolved = resolveStoryLink(url);
+    const resolved = resolveStoryLink(url, browseUrl);
     if (resolved === url) return openURL(url);
     return openURL(resolved).catch(() => {
       console.log(`DS LINK unresolved ${url}`);
