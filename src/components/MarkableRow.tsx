@@ -53,6 +53,7 @@ export function MarkableRow({ label, trailingNote, isMarked = false, onPress }: 
       {...(onPress
         ? {
             ...platformAccessibilityProps({ accessibilityRole: "button" }),
+            "aria-pressed": isMarked,
             onPress,
             tabIndex: 0,
             onKeyDown: handleKeyDown,

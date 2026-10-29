@@ -51,8 +51,8 @@ export function StepList({ steps }: StepListProps) {
             key={step.id}
             {...platformAccessibilityProps({
               accessibilityRole: "button",
-              accessibilityState: { selected: isActive },
             })}
+            aria-pressed={isActive}
             onPress={() => {
               setActiveIndex(i);
             }}

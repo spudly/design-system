@@ -228,7 +228,7 @@ test("the cook-log form slot replaces the Log a cook button while it renders con
   // props declare the callback, the button renders only with it,
   // pressing reports the entry id, and a story passes it.
   assert.match(code, /onDeleteCookLogPress\?: \(cookLogId: string\) => void;/);
-  assert.match(code, /history\.onDeleteCookLogPress\s*\?/);
+  assert.match(code, /history\.onDeleteCookLogPress\s*\?\s*\{\s*onDeletePress:/);
   assert.match(code, /history\.onDeleteCookLogPress\?\.\(log\.id\)/);
   assert.match(storiesCode, /onDeleteCookLogPress: \(\) => undefined/);
   // Each entry's Delete button needs an entry-specific accessible name

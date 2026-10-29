@@ -33,6 +33,11 @@ test("a marked row dims but keeps its press — the mark is a toggle, not a disa
     /accessibilityRole: "button"/,
     "the press form carries the button role regardless of the mark",
   );
+  assert.match(
+    code,
+    /"aria-pressed": isMarked/,
+    "the mark is exposed as a pressed toggle (the ToggleChipGroup pattern)",
+  );
   assert.ok(!code.includes("accessibilityState"), "a marked row is never announced disabled");
 });
 

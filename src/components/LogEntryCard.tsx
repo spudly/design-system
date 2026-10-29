@@ -10,19 +10,25 @@ export type LogEntryCardProps = {
   starRating?: number;
   /** Optional notes body. */
   notes?: string;
-  /**
-   * Delete callback. Omit it and the card renders no delete
-   * action — entry data alone exposes no dead button.
-   */
-  onDeletePress?: () => void;
-  /**
-   * The delete action's accessible name — entry-specific
-   * (position + date), so screen-reader button lists do not
-   * show several identical "Delete" entries. Required in
-   * practice whenever `onDeletePress` is given.
-   */
-  deleteAccessibilityLabel?: string;
-};
+} & (
+  | {
+      /**
+       * Delete callback, with its accessible name — entry-specific
+       * (position + date), so screen-reader button lists do not
+       * show several identical "Delete" entries. The label is
+       * required with the callback: a delete action without an
+       * entry-specific name is indistinguishable from its siblings.
+       */
+      onDeletePress: () => void;
+      deleteAccessibilityLabel: string;
+    }
+  | {
+      /** No delete callback: the card renders no delete action —
+       * entry data alone exposes no dead button. */
+      onDeletePress?: undefined;
+      deleteAccessibilityLabel?: undefined;
+    }
+);
 
 /**
  * A log entry card (#119): a dated header with an optional star
@@ -75,9 +81,7 @@ export function LogEntryCard({
             size="sm"
             backgroundColor={tokens.colors.danger.danger1}
             color={tokens.colors.danger.danger8}
-            {...(deleteAccessibilityLabel
-              ? { accessibilityLabel: deleteAccessibilityLabel }
-              : null)}
+            {...(deleteAccessibilityLabel ? { accessibilityLabel: deleteAccessibilityLabel } : {})}
             onPress={onDeletePress}
           >
             Delete

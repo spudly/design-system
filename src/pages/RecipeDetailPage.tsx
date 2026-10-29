@@ -680,9 +680,13 @@ function IngredientsPanel({
             label={ingredient.label}
             isMarked={ingredient.isMissing ?? false}
             {...(ingredient.isOptional ? { trailingNote: "optional" } : {})}
-            onPress={() => {
-              view.onIngredientPress?.(ingredient.id);
-            }}
+            {...(view.onIngredientPress
+              ? {
+                  onPress: () => {
+                    view.onIngredientPress?.(ingredient.id);
+                  },
+                }
+              : {})}
           />
         ))}
       </ListStack>
