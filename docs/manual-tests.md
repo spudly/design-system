@@ -817,6 +817,10 @@ renders as a real anchor carrying its href:
    not followable (no href in the DOM).
 2. TextLink Href / HrefInProse: the links carry their hrefs and
    keep the link color and underline, inline in the prose.
+   TextLink Muted: the same link in the muted treatment (the
+   theme's muted ink, still underlined) — the de-emphasized
+   destination form the auth forms' "Forgot password?" and
+   "Back to sign in" links render in.
 3. BackLink Href: the drawn arrow and label render inside one
    anchor with the href; the arrow stays centered on the label's
    line, as in the Default story.
