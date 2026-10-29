@@ -162,9 +162,9 @@ export const Error: Story = {
 };
 
 export const NoResults: Story = {
-  // A completed search with no matches: the app renders an empty
-  // list — there is deliberately no empty-state message on this
-  // screen (see the component header).
+  // A completed search with no matches (#287): the page renders
+  // the no-results empty state so the user gets feedback; the
+  // pre-search state (DemoMode) still renders no message.
   render: () => (
     <Viewport>
       <VerseSearchPage
@@ -175,6 +175,7 @@ export const NoResults: Story = {
         usingDemo={false}
         errorMessage={null}
         results={[]}
+        hasSearched
         onAddVerse={() => undefined}
       />
     </Viewport>
