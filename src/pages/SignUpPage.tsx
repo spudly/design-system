@@ -106,7 +106,9 @@ export function SignUpPage({
       {legalNotice}
       {onSignInPress ? (
         <YStack paddingTop="$4">
-          <TextLink onPress={onSignInPress}>Already have an account? Sign in</TextLink>
+          <TextLink textAlign="center" onPress={onSignInPress}>
+            Already have an account? Sign in
+          </TextLink>
         </YStack>
       ) : null}
     </ScreenContainer>

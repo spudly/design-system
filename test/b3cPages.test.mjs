@@ -77,6 +77,19 @@ test("auth pages use the DS auth shell and secure password entry", () => {
   assert.doesNotMatch(page("ResetPasswordPage"), /\btoken\??:/);
 });
 
+test("SignUpPage footer block is consistently centered (eciperay#294)", () => {
+  // The host renders its legal notice centered in the legalNotice
+  // slot; the sign-in link that follows it in the same footer
+  // block must carry the same alignment or the block reads as
+  // two mismatched columns.
+  const source = page("SignUpPage");
+  assert.match(
+    source,
+    /<TextLink marginTop="\$4" textAlign="center" onPress={onSignInPress}>\s*Already have an account\? Sign in/,
+    "the sign-in footer link is center-aligned like the legal notice above it",
+  );
+});
+
 test("auth pages report bare intents; no credentials logic in the DS", () => {
   for (const name of ["SignInPage", "SignUpPage", "ForgotPasswordPage", "ResetPasswordPage"]) {
     const source = page(name);

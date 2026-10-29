@@ -46,6 +46,12 @@ import { Text } from "../components/Text.js";
  *   a built-in demo set and says so in an info alert above the
  *   search row. The text is the app's, verbatim; `usingDemo`
  *   carries the one fact the view needs.
+ * - The placeholder's keyword example is mode-aware (#276):
+ *   the demo set contains no "charity" verse, so suggesting it
+ *   in demo mode sent the user's first search to an empty list.
+ *   In demo mode the example is "weakness" — the demo set
+ *   answers it with Ether 12:27, the reference example both
+ *   modes share; the full library keeps "charity".
  * - The search row: the DS SearchField and a Search button. Both
  *   submitting the field (its submit-editing signal) and pressing
  *   the button fire the same `onSearch` — in the app both invoke
@@ -198,7 +204,9 @@ export function VerseSearchPage({
           <SearchField
             value={query}
             onChangeText={onQueryChange}
-            placeholder="e.g. Ether 12:27 or “charity”"
+            placeholder={
+              usingDemo ? "e.g. Ether 12:27 or “weakness”" : "e.g. Ether 12:27 or “charity”"
+            }
             onSubmitEditing={onSearch}
           />
         </YStack>
