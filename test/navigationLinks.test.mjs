@@ -82,6 +82,16 @@ test("Button: the href form is a distinct props shape — href required, onPress
   );
 });
 
+test("Button: the link frame is a web flex frame, like BackLink's (#248)", () => {
+  // The Anchor is text-based (display: inline on web by default),
+  // which ignores the frame's width in normal flow; both href
+  // anchors pin a web flex display (CodeRabbit findings on
+  // PR #283, verified in the SSR-generated CSS).
+  assert.match(button, /display: "web:flex",/);
+  assert.match(button, /alignItems: "web:center",/);
+  assert.match(button, /justifyContent: "web:center",/);
+});
+
 test("Button: href is destructured by the wrapper and withheld while disabled (#248)", () => {
   assert.match(button, /const isLink = href !== undefined;/);
   assert.match(button, /accessibilityRole: accessibilityRole \?\? \(isLink \? "link" : "button"\)/);

@@ -100,9 +100,17 @@ const StyledLinkButton = styled(Anchor, {
   name: "ButtonLink",
   ...buttonFrameConfig,
 
-  // An anchor is a text element, not a flex frame: center the label
-  // so a stretched link (a full-width CTA row) centers its label the
-  // way the button form centers its content.
+  // An anchor is a text element, not a flex frame: on web it is
+  // `display: inline` by default, which ignores the frame's width
+  // in normal flow (a width="100%" CTA link would shrink to its
+  // label) — so web gets a real flex frame, centering the label
+  // the way the button form centers its content (CodeRabbit
+  // finding on PR #283; the same defect class as BackLink's href
+  // anchor, verified the same way in the SSR-generated CSS). The
+  // v3 flat `web:` clauses scope this to web; native is unchanged.
+  display: "web:flex",
+  alignItems: "web:center",
+  justifyContent: "web:center",
   textAlign: "center",
 });
 
