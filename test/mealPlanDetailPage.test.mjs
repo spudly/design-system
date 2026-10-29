@@ -50,7 +50,7 @@
  *    the goal rows are DetailRow
  *    widgets, the plan title takes Text's `title` variant, the
  *    meta lines take its `hint` variant, and the section spacing
- *    rides Column/Row scale steps. The page keeps only the kind
+ *    rides the SectionStack. The page keeps only the kind
  *    dispatch in its entry onPress closure.
  *
  * This is a source scan, not a render test: the repo has no JS
@@ -279,7 +279,7 @@ test("the page carries no styling of its own (#119)", () => {
   for (const item of banned) {
     assert.ok(
       !code.includes(item),
-      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in Column / Row / LoadingGate / ListRow / DetailRow since the #119 tranche-2 fix`,
+      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in SectionStack / ButtonRow / LoadingGate / ListRow / ListStack / DetailRow since the #119 tranche-2 fix`,
     );
   }
   assert.match(
@@ -289,20 +289,16 @@ test("the page carries no styling of its own (#119)", () => {
   );
 });
 
-test("the page composes through the layout roles (#119)", () => {
+test("the page composes through the purpose-named layout components (#119)", () => {
   assert.match(
     code,
-    /<Column variant="sections">/,
-    "the page's blocks must be children of one sections Column, whose role gap owns every section separation",
+    /<SectionStack>/,
+    "the page's blocks must be children of one SectionStack, whose gap owns every section separation",
   );
+  assert.match(code, /<ButtonRow>/, "the action bar must compose through ButtonRow");
   assert.match(
     code,
-    /<Column variant="group">/,
-    "the goals card's content must group in a group Column",
-  );
-  assert.match(
-    code,
-    /<Row variant="actions">/,
-    "the action bar must compose through the actions Row role",
+    /<ListStack>/,
+    "the entry rows must compose as one ListStack inside the Entries card (SectionCard spaces its own children; the rows own theirs)",
   );
 });

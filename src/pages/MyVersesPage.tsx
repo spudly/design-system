@@ -2,7 +2,7 @@ import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
-import { Row } from "../components/Row.js";
+import { ButtonRow } from "../components/ButtonRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
 import { BoundedList } from "./BoundedList.js";
@@ -110,14 +110,14 @@ function MyVerseRow({
       <Badge tone={item.status === "memorized" ? "success" : "info"}>{item.status}</Badge>
       <Text variant="verse">{item.text}</Text>
       {item.nextReviewLabel ? <Text variant="hint">{item.nextReviewLabel}</Text> : null}
-      <Row variant="actions">
+      <ButtonRow>
         <Button size="sm" onPress={onDrillPress}>
           Drill
         </Button>
         <Button size="sm" variant="secondary" onPress={onRemovePress}>
           Remove
         </Button>
-      </Row>
+      </ButtonRow>
     </Card>
   );
 }

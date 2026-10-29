@@ -175,7 +175,7 @@ test("the list is the shared BoundedList; the page carries no styling of its own
   for (const banned of ["FlatList", "listStyle", "XStack", "YStack", "marginBottom", "style={"]) {
     assert.ok(
       !code.includes(banned),
-      `VerseSearchPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / Row / SearchField since the #119 fix`,
+      `VerseSearchPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / SearchControls / SearchField since the #119 fix`,
     );
   }
 });

@@ -1,7 +1,7 @@
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
-import { Row } from "../components/Row.js";
+import { ButtonRow } from "../components/ButtonRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
 import { BoundedList } from "./BoundedList.js";
@@ -109,14 +109,14 @@ function ReviewVerseRow({
     <Card>
       <Text variant="subheading">{verse.reference}</Text>
       <Text variant="verse">{verse.text}</Text>
-      <Row variant="actions">
+      <ButtonRow>
         <Button size="sm" onPress={onRememberedPress}>
           I remembered it
         </Button>
         <Button size="sm" variant="secondary" onPress={onForgotPress}>
           I forgot it
         </Button>
-      </Row>
+      </ButtonRow>
     </Card>
   );
 }

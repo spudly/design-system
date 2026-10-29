@@ -33,8 +33,8 @@
  *    the plan row is the generic CardRow widget (its card layout,
  *    pressable area, and action treatment live there — pinned in
  *    test/cardRow.test.mjs; the page supplies the Delete label
- *    and danger tone as content), the list stacks in a Column,
- *    the loading block centers its spinner in a Column, and the
+ *    and danger tone as content), the list stacks in a CardStack,
+ *    the loading block centers its spinner in a Center, and the
  *    page renders no layout primitives and sets no styling props.
  *
  * This is a source scan, not a render test: the repo has no JS
@@ -182,13 +182,13 @@ test("the page carries no styling of its own (#119)", () => {
   ]) {
     assert.ok(
       !code.includes(banned),
-      `MealPlansPage must not contain "${banned}" — layout and text treatments live in CardRow / Column / Text since the #119 tranche-2 fix`,
+      `MealPlansPage must not contain "${banned}" — layout and text treatments live in CardRow / CardStack / Center / Text since the #119 tranche-2 fix`,
     );
   }
-  assert.match(code, /<Column variant="list">/, "the plan list must stack in a list Column");
+  assert.match(code, /<CardStack>/, "the plan list must stack in a CardStack");
   assert.match(
     code,
-    /<Column variant="state">/,
-    "the loading block must render in a state Column (the role centers it)",
+    /<Center>/,
+    "the loading block must render in a Center (the dedicated centering component)",
   );
 });

@@ -287,58 +287,119 @@ changeset naming PrevNextNav.
 
 ---
 
-## Row
+## ButtonRow
 
-Open in `Components/Row`: Actions, Inline.
+Open in `Components/ButtonRow`: Default.
 
-A Row takes one semantic prop — its `variant`, the role it
-plays — and the role pins the gap, alignment, and wrapping; there
-are no spacing props to pass.
+A ButtonRow is a row of action buttons that follows content.
+It owns the bar's whole treatment — there are no spacing props
+to pass.
 
-1. Actions (the `actions` role): the button row follows the text
-   at the role's standard 8px separation, the two buttons sit
-   12px apart, and at a narrow width the second button wraps onto
-   the next line instead of overflowing (MealPlanDetailPage's
-   Shopping list / Edit row and the Memorize card footers are the
-   live cases).
-2. Inline (the `inline` role): the search field fills the row's
-   remaining width, the Search button keeps its natural width,
-   and field and button are vertically centered on each other
-   (VerseSearchPage's search row is the live case).
+1. The button row follows the text at the bar's standard 8px
+   separation, the two buttons sit 12px apart, and at a narrow
+   width the second button wraps onto the next line instead of
+   overflowing (MealPlanDetailPage's Shopping list / Edit bar
+   and the Memorize card footers are the live cases).
 
-**Run when:** `src/components/Row.tsx`, its stories,
-`src/components/SearchField.tsx` (the `grow` prop), the pages that
-compose Row (VerseSearchPage, MemorizeReviewPage, MyVersesPage,
-MealPlanDetailPage), or a changeset naming Row.
+**Run when:** `src/components/ButtonRow.tsx`, its stories, the
+pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
+MealPlanDetailPage), or a changeset naming ButtonRow.
 
 ---
 
-## Column
+## CardStack
 
-Open in `Components/Column`: Sections, Group, List, State.
+Open in `Components/CardStack`: Default.
 
-A Column takes one semantic prop — its `variant`, the role it
-plays — and the role pins the gap and alignment; there are no
-spacing or margin props to pass, and separation between blocks
-is the parent stack's role gap.
+A CardStack is a stack of cards — a list whose rows are cards.
 
-1. Sections (the `sections` role): every block in the stack —
-   title, meta line, paragraph — is separated by the same 32px
-   gap, and children fill the column's width (MealPlanDetailPage's
-   page stack is the live case).
-2. Group (the `group` role): the three detail rows stack at the
-   12px card-content rhythm (MealPlanDetailPage's Nutrition goals
-   content is the live case).
-3. List (the `list` role): the two card rows stack with an 8px
-   gap between them, each keeping its own 12px bottom padding
-   (MealPlansPage's plan list is the live case).
-4. State (the `state` role): the spinner sits centered
-   horizontally in the column (MealPlansPage's loading block is
-   the live case).
+1. The three cards stack with an even 8px gap between them,
+   each keeping its own internal padding and full width
+   (MealPlansPage's plan list is the live case, including the
+   first card's danger Delete action).
 
-**Run when:** `src/components/Column.tsx`, its stories, the pages
-that compose Column (MealPlansPage, MealPlanDetailPage), or a
-changeset naming Column.
+**Run when:** `src/components/CardStack.tsx`, its stories, the
+pages that compose CardStack (MealPlansPage), or a changeset
+naming CardStack.
+
+---
+
+## SectionStack
+
+Open in `Components/SectionStack`: Default.
+
+A SectionStack is a stack of a page's sections — its major
+blocks in order.
+
+1. Every block in the stack — title, meta line, paragraph — is
+   separated by the same 32px gap, and children fill the
+   stack's width (MealPlanDetailPage's page stack is the live
+   case: every section separation on the page is that one gap).
+
+**Run when:** `src/components/SectionStack.tsx`, its stories,
+the pages that compose SectionStack (MealPlanDetailPage), or a
+changeset naming SectionStack.
+
+---
+
+## SearchControls
+
+Open in `Components/SearchControls`: Default.
+
+SearchControls compose a search field with its submit button
+on one line.
+
+1. The search field fills the row's remaining width, the Search
+   button keeps its natural width, and field and button are
+   vertically centered on each other (VerseSearchPage's search
+   row is the live case).
+
+**Run when:** `src/components/SearchControls.tsx`, its stories,
+`src/components/SearchField.tsx` (the `grow` prop), the pages
+that compose SearchControls (VerseSearchPage), or a changeset
+naming SearchControls.
+
+---
+
+## ListStack
+
+Open in `Components/ListStack`: Default.
+
+A ListStack composes hairline rows as one continuous list; the
+stack adds no gap of its own — the rows own their separation.
+
+1. The three rows read as one ruled surface: hairlines run
+   continuously from row to row with no gaps of card background
+   between them, and the third row shows the disabled treatment
+   (MealPlanDetailPage's Entries card and MealDetailPage's
+   Recipes card are the live cases).
+
+**Run when:** `src/components/ListStack.tsx`, its stories, the
+pages that compose ListStack (MealPlanDetailPage,
+MealDetailPage), or a changeset naming ListStack.
+
+---
+
+## Center
+
+Open in `Components/Center`: Centered, HorizontalOnly.
+
+Center centers a single child; `horizontal` and `vertical` are
+booleans, both defaulting to true.
+
+1. Centered: the spinner sits at the center of the framed
+   block, both dimensions on. Toggle `vertical` off in the
+   controls: the spinner moves to the top, still centered
+   horizontally; toggle `horizontal` off instead: it moves to
+   the left edge, still centered vertically.
+2. HorizontalOnly: the notice sits at the top of its block,
+   centered horizontally (MealPlansPage's loading block is the
+   live page case — the spinner centered under the heading and
+   create button).
+
+**Run when:** `src/components/Center.tsx`, its stories, the
+pages that compose Center (MealPlansPage), or a changeset
+naming Center.
 
 ---
 
@@ -417,17 +478,18 @@ NoActions. Open in `Pages/Eciperay/MealPlanDetailPage`: Default,
 Empty, Loading, NoGoals, NutritionUnavailable.
 
 1. MealPlansPage Default: the "Meal plans" heading, the full-width
-   "New meal plan" button under it, then the plan cards — each
-   title over its meta line with 12px of space under each card;
-   NoActions drops the create button and the row Delete buttons.
+   "New meal plan" button under it, then the plan cards stacked
+   at an even rhythm — each title over its meta line; NoActions
+   drops the create button and the row Delete buttons.
 2. MealPlansPage Loading: the spinner sits centered horizontally,
    16px below the create button; Empty shows "No meal plans yet."
 3. MealPlanDetailPage Default: the plan title (xl bold, heading
-   level 1) with its muted meta lines 16px apart, the Nutrition
-   goals card (plan total, then label/value rows over hairlines),
-   the Shopping list / Edit buttons side by side with a 12px gap
-   and 24px of space under the row, then the Entries card with
-   kind-prefixed entry rows.
+   level 1) and its muted meta lines separated by the page's
+   uniform 32px section gap, the Nutrition goals card (plan
+   total, then label/value rows over hairlines at the card's
+   even content rhythm), the Shopping list / Edit buttons side
+   by side with a 12px gap, then the Entries card with
+   kind-prefixed entry rows as one continuous ruled list.
 4. MealPlanDetailPage Loading shows only the centered loading
    gate; NoGoals hides the goals card entirely; NutritionUnavailable
    shows the goals card with the set-goals hint and link.

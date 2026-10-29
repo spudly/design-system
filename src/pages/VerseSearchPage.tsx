@@ -2,7 +2,7 @@ import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { Alert } from "../components/Alert.js";
 import { EmptyState } from "../components/EmptyState.js";
-import { Row } from "../components/Row.js";
+import { SearchControls } from "../components/SearchControls.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SearchField } from "../components/SearchField.js";
 import { Spinner } from "../components/Spinner.js";
@@ -206,7 +206,7 @@ export function VerseSearchPage({
           search.
         </Alert>
       ) : null}
-      <Row variant="inline">
+      <SearchControls>
         <SearchField
           value={query}
           onChangeText={onQueryChange}
@@ -219,7 +219,7 @@ export function VerseSearchPage({
         <Button onPress={onSearch} disabled={isSearching || query.trim() === ""}>
           Search
         </Button>
-      </Row>
+      </SearchControls>
       {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
       {isSearching ? <Spinner label="Loading" /> : null}
       {hasSearched && !isSearching && !errorMessage && results.length === 0 ? (

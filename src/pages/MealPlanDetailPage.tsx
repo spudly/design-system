@@ -1,9 +1,10 @@
 import { Button } from "../components/Button.js";
-import { Column } from "../components/Column.js";
+import { ButtonRow } from "../components/ButtonRow.js";
 import { DetailRow } from "../components/DetailRow.js";
 import { LoadingGate } from "../components/LoadingGate.js";
 import { ListRow } from "../components/ListRow.js";
-import { Row } from "../components/Row.js";
+import { ListStack } from "../components/ListStack.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
 import { Text } from "../components/Text.js";
@@ -240,55 +241,55 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
 
   return (
     <ScreenContainer>
-      <Column variant="sections">
+      <SectionStack>
         <Text variant="title">{title}</Text>
         {notes ? <Text variant="hint">{notes}</Text> : null}
         {dateRangeLabel ? <Text variant="hint">{dateRangeLabel}</Text> : null}
         {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
         {showGoals ? (
           <SectionCard title="Nutrition goals">
-            <Column variant="group">
-              {nutritionLabel ? <Text variant="hint">Plan total: {nutritionLabel}</Text> : null}
-              {nutritionGoals ? (
-                nutritionGoals.rows.map((row) => (
-                  <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
-                ))
-              ) : (
-                <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
-              )}
-              {onSetGoalsPress ? (
-                <TextLink onPress={onSetGoalsPress}>Set nutrition goals</TextLink>
-              ) : null}
-            </Column>
+            {nutritionLabel ? <Text variant="hint">Plan total: {nutritionLabel}</Text> : null}
+            {nutritionGoals ? (
+              nutritionGoals.rows.map((row) => (
+                <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
+              ))
+            ) : (
+              <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
+            )}
+            {onSetGoalsPress ? (
+              <TextLink onPress={onSetGoalsPress}>Set nutrition goals</TextLink>
+            ) : null}
           </SectionCard>
         ) : null}
-        <Row variant="actions">
+        <ButtonRow>
           <Button onPress={onShoppingListPress}>Shopping list</Button>
           <Button variant="secondary" onPress={onEditPress}>
             Edit
           </Button>
-        </Row>
+        </ButtonRow>
         <SectionCard title="Entries">
-          {entries.map((entry) => (
-            <ListRow
-              key={entry.id}
-              prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
-              title={entry.title}
-              {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
-              {...(entry.kind === "recipe" && entry.isUnavailable
-                ? { isDisabled: true, titleSuffix: " (unavailable)" }
-                : {})}
-              onPress={() => {
-                if (entry.kind === "meal") {
-                  onMealPress(entry.targetId);
-                } else {
-                  onRecipePress(entry.targetId);
-                }
-              }}
-            />
-          ))}
+          <ListStack>
+            {entries.map((entry) => (
+              <ListRow
+                key={entry.id}
+                prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
+                title={entry.title}
+                {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
+                {...(entry.kind === "recipe" && entry.isUnavailable
+                  ? { isDisabled: true, titleSuffix: " (unavailable)" }
+                  : {})}
+                onPress={() => {
+                  if (entry.kind === "meal") {
+                    onMealPress(entry.targetId);
+                  } else {
+                    onRecipePress(entry.targetId);
+                  }
+                }}
+              />
+            ))}
+          </ListStack>
         </SectionCard>
-      </Column>
+      </SectionStack>
     </ScreenContainer>
   );
 }

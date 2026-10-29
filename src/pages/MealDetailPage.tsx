@@ -1,6 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
+import { ListStack } from "../components/ListStack.js";
 import { Button } from "../components/Button.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
@@ -149,9 +150,11 @@ export function MealDetailPage({
         </Button>
       </XStack>
       <SectionCard title="Recipes">
-        {members.map((member) => (
-          <MemberRow key={member.recipeId} member={member} onRecipePress={onRecipePress} />
-        ))}
+        <ListStack>
+          {members.map((member) => (
+            <MemberRow key={member.recipeId} member={member} onRecipePress={onRecipePress} />
+          ))}
+        </ListStack>
       </SectionCard>
     </ScreenContainer>
   );

@@ -1,5 +1,6 @@
 import { Button } from "../components/Button.js";
-import { Column } from "../components/Column.js";
+import { CardStack } from "../components/CardStack.js";
+import { Center } from "../components/Center.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { CardRow } from "../components/CardRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
@@ -74,8 +75,8 @@ import { Text } from "../components/Text.js";
  * sets no styling props. The plan row is the generic CardRow
  * widget (its card layout, pressable area, and action treatment
  * live there; the page supplies the plan content and the Delete
- * action), the list stacks in a Column, and the loading block
- * centers its spinner in a Column.
+ * action), the list stacks in a CardStack, and the loading block
+ * centers its spinner in a Center.
  */
 
 /** One meal plan row's view-model. The app formats `subtitle` (its
@@ -128,13 +129,13 @@ export function MealPlansPage({
       </Text>
       {onCreatePlan ? <Button onPress={onCreatePlan}>New meal plan</Button> : null}
       {isLoading ? (
-        <Column variant="state">
+        <Center>
           <Spinner label="Loading" />
-        </Column>
+        </Center>
       ) : plans.length === 0 ? (
         <EmptyState title="No meal plans yet." />
       ) : (
-        <Column variant="list">
+        <CardStack>
           {plans.map((plan) => (
             <CardRow
               key={plan.id}
@@ -154,7 +155,7 @@ export function MealPlansPage({
                 : {})}
             />
           ))}
-        </Column>
+        </CardStack>
       )}
     </ScreenContainer>
   );

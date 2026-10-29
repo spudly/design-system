@@ -17,7 +17,7 @@ export {
 } from "./CheckboxSelectList.js";
 export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
-export { Column, type ColumnProps } from "./Column.js";
+export { Center, type CenterProps } from "./Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField.js";
 export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { RatingForm, type RatingFormProps, type RatingFormValues } from "./RatingForm.js";
@@ -60,7 +60,11 @@ export {
   type RadioOption,
   type RadioOptionGroupProps,
 } from "./RadioOptionGroup.js";
-export { Row, type RowProps } from "./Row.js";
+export { ButtonRow, type ButtonRowProps } from "./ButtonRow.js";
+export { CardStack, type CardStackProps } from "./CardStack.js";
+export { ListStack, type ListStackProps } from "./ListStack.js";
+export { SearchControls, type SearchControlsProps } from "./SearchControls.js";
+export { SectionStack, type SectionStackProps } from "./SectionStack.js";
 export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
 export { SearchField, type SearchFieldProps } from "./SearchField.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./SecretRevealPanel.js";
