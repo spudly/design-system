@@ -49,7 +49,7 @@ test("checked rows render struck through and muted; the box fills with the check
 test("the detail renders as one muted segment after the middle-dot separator", () => {
   assert.match(code, /\{detail \? \(/);
   assert.match(code, /· \{detail\}/);
-  assert.match(code, /fontWeight=\{tokens\.typography\.fontWeight\.medium\}\>\{label\}/);
+  assert.match(code, /fontWeight=\{tokens\.typography\.fontWeight\.medium\}>\{label\}/);
 });
 
 test("the row is the press target with web keyboard activation", () => {

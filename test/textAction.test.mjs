@@ -113,12 +113,16 @@ test("TagsPage's Edit and Delete row actions render through TextAction", () => {
   // action through TextAction (pinned in full in
   // test/badgeCardRow.test.mjs).
   assert.match(tagsPage, /<BadgeCardRow/);
+  // The matched literals contain template placeholders; interpolate
+  // the "$" so this file's lint (no template-curly in plain
+  // strings) stays quiet — the nativeLinkDecorative pattern.
+  const dollar = "$";
   assert.ok(
-    tagsPage.includes("accessibilityLabel: `Delete tag ${tag.name}`"),
+    tagsPage.includes(`accessibilityLabel: \`Delete tag ${dollar}{tag.name}\``),
     "the Delete row action must keep its accessible label",
   );
   assert.ok(
-    tagsPage.includes("accessibilityLabel: `Edit tag ${tag.name}`"),
+    tagsPage.includes(`accessibilityLabel: \`Edit tag ${dollar}{tag.name}\``),
     "the Edit row action (added by #228, merged before this fix landed) must keep its accessible label",
   );
   for (const label of ["Edit", "Delete"]) {
