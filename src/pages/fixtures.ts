@@ -424,13 +424,14 @@ export const aiSessionPreviewFixture = {
 /**
  * Legal document fixtures for LegalDocumentPage (#170): two short
  * documents in the real pages' shape — the privacy policy and the
- * terms are the same page driven by different content props. The
+ * terms are the same page driven by different markdown strings. The
  * copy is fixture prose written for the stories (the real legal
- * text is app content and stays app-side); the structure mirrors
- * the real documents: paragraphs mixing plain, strong, and code
- * spans, bullet lists whose items lead with a strong phrase, and a
- * mailto link span mid-sentence in the contact section. Dates are
- * fixed literals per the fixture rules above.
+ * text is app content and stays app-side); the markdown mirrors
+ * the real documents: section headings, paragraphs mixing plain
+ * and strong text with a code span, bullet lists whose items lead
+ * with a strong phrase, and a mailto link mid-sentence in the
+ * contact section. Dates are fixed literals per the fixture rules
+ * above.
  */
 export const legalPrivacyFixture: LegalDocumentPageProps = {
   title: "Privacy Policy",
@@ -443,64 +444,22 @@ export const legalPrivacyFixture: LegalDocumentPageProps = {
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
   ],
-  sections: [
-    {
-      title: "Information we collect",
-      blocks: [
-        {
-          type: "paragraph",
-          spans: [
-            { type: "text", text: "Eciperay collects the information you give us when you " },
-            { type: "strong", text: "create an account" },
-            { type: "text", text: " and save recipes, including:" },
-          ],
-        },
-        {
-          type: "list",
-          items: [
-            [
-              { type: "strong", text: "Account details." },
-              { type: "text", text: " Your name and email address." },
-            ],
-            [
-              { type: "strong", text: "Your content." },
-              { type: "text", text: " Recipes, meal plans, and notes you save." },
-            ],
-            [
-              { type: "strong", text: "Usage data." },
-              { type: "text", text: " Which features you use, so we can improve them." },
-            ],
-          ],
-        },
-      ],
-    },
-    {
-      title: "Search engines",
-      blocks: [
-        {
-          type: "paragraph",
-          spans: [
-            { type: "text", text: "Private pages carry a " },
-            { type: "code", text: "noindex" },
-            { type: "text", text: " directive so search engines do not list them." },
-          ],
-        },
-      ],
-    },
-    {
-      title: "Contact us",
-      blocks: [
-        {
-          type: "paragraph",
-          spans: [
-            { type: "text", text: "Questions about this policy? Email us at " },
-            { type: "link", label: "legal@example.com", href: "mailto:legal@example.com" },
-            { type: "text", text: " and we will reply within a few days." },
-          ],
-        },
-      ],
-    },
-  ],
+  markdown: `## Information we collect
+
+Eciperay collects the information you give us when you **create an account** and save recipes, including:
+
+- **Account details.** Your name and email address.
+- **Your content.** Recipes, meal plans, and notes you save.
+- **Usage data.** Which features you use, so we can improve them.
+
+## Search engines
+
+Private pages carry a \`noindex\` directive so search engines do not list them.
+
+## Contact us
+
+Questions about this policy? Email us at [legal@example.com](mailto:legal@example.com) and we will reply within a few days.
+`,
 };
 
 export const legalTermsFixture: LegalDocumentPageProps = {
@@ -514,46 +473,15 @@ export const legalTermsFixture: LegalDocumentPageProps = {
     { label: "Privacy Policy", href: "/privacy" },
     { label: "Terms of Service", href: "/terms" },
   ],
-  sections: [
-    {
-      title: "Using Eciperay",
-      blocks: [
-        {
-          type: "paragraph",
-          spans: [
-            {
-              type: "text",
-              text: "By using Eciperay you agree to these terms. You may use the service to store and share your own recipes, and you are responsible for your account activity.",
-            },
-          ],
-        },
-        {
-          type: "list",
-          items: [
-            [
-              { type: "strong", text: "Your recipes stay yours." },
-              { type: "text", text: " You keep ownership of the content you save." },
-            ],
-            [
-              { type: "strong", text: "Be considerate." },
-              { type: "text", text: " Do not upload content that infringes others' rights." },
-            ],
-          ],
-        },
-      ],
-    },
-    {
-      title: "Contact us",
-      blocks: [
-        {
-          type: "paragraph",
-          spans: [
-            { type: "text", text: "Questions about these terms? Email us at " },
-            { type: "link", label: "legal@example.com", href: "mailto:legal@example.com" },
-            { type: "text", text: "." },
-          ],
-        },
-      ],
-    },
-  ],
+  markdown: `## Using Eciperay
+
+By using Eciperay you agree to these terms. You may use the service to store and share your own recipes, and you are responsible for your account activity.
+
+- **Your recipes stay yours.** You keep ownership of the content you save.
+- **Be considerate.** Do not upload content that infringes others' rights.
+
+## Contact us
+
+Questions about these terms? Email us at [legal@example.com](mailto:legal@example.com).
+`,
 };
