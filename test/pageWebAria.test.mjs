@@ -186,7 +186,7 @@ test("CheckRow (ShoppingListPage's row) translates role, checked state, and labe
     "the translated props must be spread onto the row's XStack pressable",
   );
   assert.match(code, /accessibilityState: \{ checked \}/);
-  assert.match(code, /accessibilityLabel: label/);
+  assert.match(code, /accessibilityLabel: accessibleName/);
 });
 
 test("the de-styled pages have no stack pressable left to translate (#237, #248, #119)", () => {

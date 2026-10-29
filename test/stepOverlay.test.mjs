@@ -45,6 +45,7 @@ test("the Done pill routes its button semantics through the translator (#237)", 
   assert.match(code, /onPress=\{onDone\}/);
   assert.match(code, /tabIndex=\{0\}/);
   assert.match(code, /opacity=\{0\.1\}/);
+  assert.match(code, /if \(!event\.repeat\) \{\s+onDone\(\);\s+\}/);
 });
 
 test("the header treatment: uppercased eyebrows at 60% over the body at reading size", () => {

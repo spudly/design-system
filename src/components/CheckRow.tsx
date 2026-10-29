@@ -5,12 +5,13 @@ import { Text } from "./Text.js";
 
 export type CheckRowProps = {
   /** The row's label: the bold lead of its text line, and the
-   * row's accessible name. */
+   * base of the row's accessible name. */
   label: string;
   /** Optional detail rendered after the label on the same line
    * as a muted segment ("2 lb · optional" — the caller composes
    * the segments; the row joins them to the label with the
-   * middle-dot separator). Omit when the label stands alone. */
+   * middle-dot separator) and composed into the accessible
+   * name after the label. Omit when the label stands alone. */
   detail?: string | null;
   /** The row's checked state, controlled by the caller. */
   checked: boolean;
@@ -42,13 +43,23 @@ export function CheckRow({ label, detail, checked, onToggle }: CheckRowProps) {
   // Web keyboard support (the MealPlansPage row pattern): a
   // view carrying a role is made focusable and the activation
   // keys — Enter and Space — invoke the same callback as a
-  // press. Web-only props, ignored on native.
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+  // press. A held key's repeats still prevent the default (a
+  // held Space must not scroll) but do not re-toggle: one press
+  // is one toggle. Web-only props, ignored on native.
+  const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      onToggle();
+      if (!event.repeat) {
+        onToggle();
+      }
     }
   };
+  // The row's accessible name composes the detail after the
+  // label (the row family's standing rule — ListRow's composed
+  // label): with the row as the one accessibility stop, a
+  // name-only label would drop the quantity from the
+  // announcement.
+  const accessibleName = detail ? `${label}, ${detail}` : label;
   return (
     <XStack
       alignItems="flex-start"
@@ -59,7 +70,7 @@ export function CheckRow({ label, detail, checked, onToggle }: CheckRowProps) {
       {...platformAccessibilityProps({
         accessibilityRole: "checkbox",
         accessibilityState: { checked },
-        accessibilityLabel: label,
+        accessibilityLabel: accessibleName,
       })}
       onPress={onToggle}
       tabIndex={0}
@@ -89,7 +100,12 @@ export function CheckRow({ label, detail, checked, onToggle }: CheckRowProps) {
         {...(checked ? { color: "$textMuted" } : {})}
         textDecorationLine={checked ? "line-through" : "none"}
       >
-        <Text fontWeight={tokens.typography.fontWeight.medium}>{label}</Text>
+        <Text
+          fontWeight={tokens.typography.fontWeight.medium}
+          {...(checked ? { color: "$textMuted" } : {})}
+        >
+          {label}
+        </Text>
         {detail ? (
           <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
             {" "}

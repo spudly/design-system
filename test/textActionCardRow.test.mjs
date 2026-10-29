@@ -34,7 +34,14 @@ test("TextActionCardRow is exported from the built package root", async () => {
 });
 
 test("the trailing action renders through TextAction, never a link (#248 ruling)", () => {
-  assert.match(code, /<TextAction onPress=\{onActionPress\}>\{actionLabel\}<\/TextAction>/);
+  // The action's accessible name composes the row's title (the
+  // TagsPage convention — "Delete tag X"): in a list of rows,
+  // a bare "Delete" does not say which row it acts on. The
+  // visible text stays the bare action label.
+  assert.match(
+    code,
+    /<TextAction accessibilityLabel=\{`\$\{actionLabel\} \$\{title\}`\} onPress=\{onActionPress\}>/,
+  );
   assert.ok(!code.includes("TextLink"), "the row must not render a TextLink");
 });
 

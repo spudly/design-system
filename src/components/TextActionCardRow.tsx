@@ -111,7 +111,9 @@ export function TextActionCardRow({
           />
         </YStack>
       )}
-      <TextAction onPress={onActionPress}>{actionLabel}</TextAction>
+      <TextAction accessibilityLabel={`${actionLabel} ${title}`} onPress={onActionPress}>
+        {actionLabel}
+      </TextAction>
     </Card>
   );
 }

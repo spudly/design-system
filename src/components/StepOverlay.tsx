@@ -54,11 +54,18 @@ export function StepOverlay({
   // Web keyboard support (the MealPlansPage row pattern): a
   // view carrying a role is made focusable and the activation
   // keys — Enter and Space — invoke the same callback as a
-  // press. Web-only props, ignored on native.
-  const handleDoneKeyDown = (event: { key: string; preventDefault: () => void }) => {
+  // press. A held key's repeats still prevent the default but
+  // do not re-fire Done. Web-only props, ignored on native.
+  const handleDoneKeyDown = (event: {
+    key: string;
+    repeat?: boolean;
+    preventDefault: () => void;
+  }) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
-      onDone();
+      if (!event.repeat) {
+        onDone();
+      }
     }
   };
   return (
