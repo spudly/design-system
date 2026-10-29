@@ -37,10 +37,8 @@ function Hub({ initialTab }: { initialTab: MealsHubPageTab }) {
       meals={mealsHubFixture.meals}
       plans={mealsHubFixture.plans}
       isLoading={false}
-      onCreateMeal={() => undefined}
-      onCreatePlan={() => undefined}
-      onMealPress={() => undefined}
-      onPlanPress={() => undefined}
+      createMealHref="/meals/new"
+      createPlanHref="/meal-plans/new"
       onDeleteMeal={() => undefined}
       onDeletePlan={() => undefined}
     />
@@ -72,10 +70,8 @@ export const Empty: Story = {
         meals={[]}
         plans={[]}
         isLoading={false}
-        onCreateMeal={() => undefined}
-        onCreatePlan={() => undefined}
-        onMealPress={() => undefined}
-        onPlanPress={() => undefined}
+        createMealHref="/meals/new"
+        createPlanHref="/meal-plans/new"
         onDeleteMeal={() => undefined}
         onDeletePlan={() => undefined}
       />

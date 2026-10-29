@@ -38,9 +38,8 @@ export const Default: Story = {
         notes={fixture.notes}
         nutritionLabel={fixture.nutritionLabel}
         members={fixture.members}
-        onCook={() => undefined}
-        onEdit={() => undefined}
-        onRecipePress={() => undefined}
+        cookHref="/meals/sunday-chicken-dinner/cook"
+        editHref="/meals/sunday-chicken-dinner/edit"
       />
     </Viewport>
   ),
@@ -52,9 +51,8 @@ export const NoNotesOrNutrition: Story = {
       <MealDetailPage
         title={fixture.title}
         members={fixture.members.slice(0, 1)}
-        onCook={() => undefined}
-        onEdit={() => undefined}
-        onRecipePress={() => undefined}
+        cookHref="/meals/sunday-chicken-dinner/cook"
+        editHref="/meals/sunday-chicken-dinner/edit"
       />
     </Viewport>
   ),

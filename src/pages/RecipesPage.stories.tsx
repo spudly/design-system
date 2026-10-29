@@ -52,32 +52,47 @@ function Viewport({ children }: { children: ReactNode }) {
 const recipeItems: RecipesPageItem[] = [
   {
     id: "tuscan-chicken",
+    href: "/recipes/tuscan-chicken",
     title: "Creamy Tuscan Garlic Chicken",
     subtitle: "4 servings · 30 min · Satiety 60",
     rating: 4.5,
   },
   {
     id: "stuffed-peppers",
+    href: "/recipes/stuffed-peppers",
     title: "Classic Stuffed Peppers",
     subtitle: "6 servings · 45 min · Satiety 72",
     rating: 5,
   },
-  { id: "arroz-con-pollo", title: "Arroz con Pollo", subtitle: "8 servings · 50 min · Satiety 68" },
+  {
+    id: "arroz-con-pollo",
+    href: "/recipes/arroz-con-pollo",
+    title: "Arroz con Pollo",
+    subtitle: "8 servings · 50 min · Satiety 68",
+  },
   {
     id: "fudgy-brownies",
+    href: "/recipes/fudgy-brownies",
     title: "Fudgy Brownies",
     subtitle: "12 servings · 35 min · Satiety 40",
     rating: 3,
   },
   {
     id: "chicken-tikka",
+    href: "/recipes/chicken-tikka",
     title: "Chicken Tikka Masala",
     subtitle: "4 servings · 40 min · Satiety 64",
     rating: 4,
   },
-  { id: "beef-chili", title: "Beef Chili", subtitle: "6 servings · 60 min · Satiety 75" },
+  {
+    id: "beef-chili",
+    href: "/recipes/beef-chili",
+    title: "Beef Chili",
+    subtitle: "6 servings · 60 min · Satiety 75",
+  },
   {
     id: "pollo-brasa",
+    href: "/recipes/pollo-brasa",
     title: "Pollo a la Brasa",
     subtitle: "4 servings · 55 min · Satiety 70",
     rating: 4,
@@ -129,7 +144,6 @@ function RecipesPageDemo({
         recipes={visible}
         isLoading={isLoading}
         isFetchingNextPage={isFetchingNextPage}
-        onRecipePress={() => undefined}
         onLogCookPress={() => undefined}
         {...(expandedRecipeId
           ? {
@@ -227,24 +241,47 @@ export const ExpandedAccessory: Story = {
 
 // The Shared-with-me configuration's fixtures: the old
 // SharedWithMePage stories' items, unchanged. No ratings — the
-// shared screen's rows are press-only, so no rating ever renders.
+// shared screen's rows are links, so no rating ever renders.
 const sharedItems: RecipesPageItem[] = [
-  { id: "arroz-con-pollo", title: "Arroz con Pollo", subtitle: "8 servings · 50 min · Satiety 68" },
-  { id: "fudgy-brownies", title: "Fudgy Brownies", subtitle: "12 servings · 35 min · Satiety 40" },
-  { id: "banana-bread", title: "Banana Bread", subtitle: "10 servings · 60 min · Satiety 55" },
+  {
+    id: "arroz-con-pollo",
+    href: "/recipes/arroz-con-pollo",
+    title: "Arroz con Pollo",
+    subtitle: "8 servings · 50 min · Satiety 68",
+  },
+  {
+    id: "fudgy-brownies",
+    href: "/recipes/fudgy-brownies",
+    title: "Fudgy Brownies",
+    subtitle: "12 servings · 35 min · Satiety 40",
+  },
+  {
+    id: "banana-bread",
+    href: "/recipes/banana-bread",
+    title: "Banana Bread",
+    subtitle: "10 servings · 60 min · Satiety 55",
+  },
   {
     id: "tuscan-chicken",
+    href: "/recipes/tuscan-chicken",
     title: "Creamy Tuscan Garlic Chicken",
     subtitle: "4 servings · 30 min · Satiety 60",
   },
-  { id: "beef-chili", title: "Beef Chili", subtitle: "6 servings · 60 min · Satiety 75" },
+  {
+    id: "beef-chili",
+    href: "/recipes/beef-chili",
+    title: "Beef Chili",
+    subtitle: "6 servings · 60 min · Satiety 75",
+  },
   {
     id: "stuffed-peppers",
+    href: "/recipes/stuffed-peppers",
     title: "Classic Stuffed Peppers",
     subtitle: "6 servings · 45 min · Satiety 72",
   },
   {
     id: "chicken-tikka",
+    href: "/recipes/chicken-tikka",
     title: "Chicken Tikka Masala",
     subtitle: "4 servings · 40 min · Satiety 64",
   },
@@ -253,7 +290,7 @@ const sharedItems: RecipesPageItem[] = [
 /**
  * The Shared-with-me configuration (#185): the same component with
  * the shared host's contract — no `onLogCookPress` and no
- * `renderRecipeAccessory` (press-only rows), the shared screen's
+ * `renderRecipeAccessory` (link rows), the shared screen's
  * empty-state copy, and the collapsed filter bar left uncontrolled
  * (no `activeFilters` / `filterChooserOpen` props), the way the
  * SharedWithMe host adopts it with no new state.
@@ -289,7 +326,6 @@ function SharedRecipesPageDemo({
       <RecipesPage
         recipes={visible}
         isLoading={isLoading}
-        onRecipePress={() => undefined}
         emptyTitle="Recipes others share with you will appear here."
         emptyBody="Open a share link while signed in to save recipes to this list."
         search={search}

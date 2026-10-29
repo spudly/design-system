@@ -173,22 +173,32 @@ export type RecipeDetailPageOverviewProps = {
   cookTimeLabel?: string;
   /** Transient feedback line ("Version activated"), app-held. */
   actionMessage?: string | null;
-  onStartCooking: () => void;
+  /** The cooking-mode destination (#248: navigation crosses as
+   * an href, not a press callback); the host composes it from
+   * the recipe's route. */
+  cookingHref: string;
   /** Row action chips; each renders only when its callback is
    * provided (the pilot's rule — the app computes the
    * can-edit/can-edit-draft conditions and passes the callback
    * only when the action applies). */
   onPrintPress?: () => void;
   onSharePress?: () => void;
-  onEditPress?: () => void;
-  onEditDraftPress?: () => void;
+  /** The edit destinations (#248): each chip renders only when
+   * its href is provided (the app computes the
+   * can-edit/can-edit-draft conditions and passes the href only
+   * when the action applies). */
+  editHref?: string;
+  editDraftHref?: string;
   onDeletePress?: () => void;
   /** Lifecycle section; renders only when editable or candidates
    * exist, exactly as the app's OverviewActions returns null
    * otherwise. Omit (or pass null) to hide the section. */
   lifecycle?: RecipeDetailPageLifecycle | null;
   onTweakManuallyPress?: () => void;
-  onTweakAiPress?: () => void;
+  /** The tweak-with-AI destination (#248: navigation crosses as
+   * an href); the control renders only when the href is
+   * provided. */
+  tweakAiHref?: string;
   onMarkPerfectedPress?: () => void;
   onAbandonPress?: () => void;
   onActivateCandidatePress?: (versionId: string) => void;
@@ -497,14 +507,14 @@ function EyebrowLabel({ children }: { children: string }) {
 function LifecycleSection({
   lifecycle,
   onTweakManuallyPress,
-  onTweakAiPress,
+  tweakAiHref,
   onMarkPerfectedPress,
   onAbandonPress,
   onActivateCandidatePress,
 }: {
   lifecycle: RecipeDetailPageLifecycle;
   onTweakManuallyPress: (() => void) | undefined;
-  onTweakAiPress: (() => void) | undefined;
+  tweakAiHref: string | undefined;
   onMarkPerfectedPress: (() => void) | undefined;
   onAbandonPress: (() => void) | undefined;
   onActivateCandidatePress: ((versionId: string) => void) | undefined;
@@ -520,7 +530,7 @@ function LifecycleSection({
               onPress={onTweakManuallyPress}
             />
           ) : null}
-          {onTweakAiPress ? (
+          {tweakAiHref ? (
             <Button
               variant="ghost"
               size="sm"
@@ -528,7 +538,7 @@ function LifecycleSection({
               borderColor="$primary"
               backgroundColor="$primarySubtle"
               color="$primaryEmphasis"
-              onPress={onTweakAiPress}
+              href={tweakAiHref}
             >
               Tweak with AI
             </Button>
@@ -712,11 +722,11 @@ function OverviewPanel({
     prepTimeLabel,
     cookTimeLabel,
     actionMessage,
-    onStartCooking,
+    cookingHref,
     onPrintPress,
     onSharePress,
-    onEditPress,
-    onEditDraftPress,
+    editHref,
+    editDraftHref,
     onDeletePress,
     lifecycle,
     tags,
@@ -779,7 +789,7 @@ function OverviewPanel({
           </XStack>
         </YStack>
         <XStack paddingBlockEnd="$4" flexWrap="wrap" gap="$3">
-          <Button variant="primary" flex={1} minWidth="40%" onPress={onStartCooking}>
+          <Button variant="primary" flex={1} minWidth="40%" href={cookingHref}>
             Start Cooking
           </Button>
           {onPrintPress ? (
@@ -804,13 +814,13 @@ function OverviewPanel({
               <ShareIcon color={tokens.colors.gray.gray8} />
             </Button>
           ) : null}
-          {onEditPress ? (
-            <Button {...neutralChipProps} onPress={onEditPress}>
+          {editHref ? (
+            <Button {...neutralChipProps} href={editHref}>
               Edit
             </Button>
           ) : null}
-          {onEditDraftPress ? (
-            <Button {...neutralChipProps} onPress={onEditDraftPress}>
+          {editDraftHref ? (
+            <Button {...neutralChipProps} href={editDraftHref}>
               Edit draft
             </Button>
           ) : null}
@@ -841,7 +851,7 @@ function OverviewPanel({
           <LifecycleSection
             lifecycle={lifecycle}
             onTweakManuallyPress={overview.onTweakManuallyPress}
-            onTweakAiPress={overview.onTweakAiPress}
+            tweakAiHref={overview.tweakAiHref}
             onMarkPerfectedPress={overview.onMarkPerfectedPress}
             onAbandonPress={overview.onAbandonPress}
             onActivateCandidatePress={overview.onActivateCandidatePress}

@@ -16,8 +16,8 @@ import { TextLink } from "../components/TextLink.js";
  * RecipesPage pilot and MealPlansPage. The app keeps all state
  * and business logic — the plan query, mutations, navigation —
  * and drives this view entirely through props: a plan view-model
- * in, press callbacks out. Nothing here imports an app package or
- * fetches anything.
+ * in, destinations and callbacks out. Nothing here imports an app
+ * package or fetches anything.
  *
  * Placement: page components live in src/pages behind the
  * `@spudly/ui/pages` subpath export, not the package root — see
@@ -38,7 +38,9 @@ import { TextLink } from "../components/TextLink.js";
  * screen's. The form screen (MealPlanForm) is a form, not a page
  * view, and stays app-side — out of #49's scope. The actions
  * this screen actually has are the two buttons and the entry
- * presses, plus the goals section's set-goals link.
+ * rows, plus the goals section's set-goals link — and every one
+ * of them navigates, so under #248's navigation rule every one
+ * crosses as an href (see the entry contract below).
  *
  * States: the app screen renders a full-screen loading gate
  * while the plan loads, and — deliberately mirrored here, as in
@@ -74,24 +76,25 @@ import { TextLink } from "../components/TextLink.js";
  * progress view is a pure function of its data (per-field
  * actual/goal/band progress, the plan total, a set-goals link).
  * It holds no state, runs no query or mutation, and its one
- * interaction is a navigation intent, so it crosses the boundary
- * as data plus a callback (`nutritionGoals` +
- * `onSetGoalsPress`). A render slot exists for content that
- * cannot be view-modeled without leaking business logic into
- * props (RecipesPage's cook-log form); nothing on this screen
- * qualifies, so — as in MealPlansPage — the contract pins the
- * absence of a slot, and a future app change that puts
- * app-rendered content inside this view adds one consciously.
+ * interaction is a navigation, so it crosses the boundary as
+ * data plus a destination (`nutritionGoals` + `goalsHref`). A
+ * render slot exists for content that cannot be view-modeled
+ * without leaking business logic into props (RecipesPage's
+ * cook-log form); nothing on this screen qualifies, so — as in
+ * MealPlansPage — the contract pins the absence of a slot, and a
+ * future app change that puts app-rendered content inside this
+ * view adds one consciously.
  *
- * Entries come in two kinds with two different destinations, so
- * the contract carries two press callbacks where RecipesPage
- * carries one: a meal row opens the meal detail
- * (`onMealPress(mealId)`), a recipe row opens the recipe detail
- * (`onRecipePress(recipeId)`). Each entry therefore carries its
- * own `id` (the row key) plus the `targetId` its press reports —
- * a plan may contain the same recipe twice, so the target cannot
- * double as the key. A recipe entry whose access was lost
- * renders its "(unavailable)" suffix and does not press,
+ * Entries come in two kinds with two different destinations: a
+ * meal entry opens the meal detail, a recipe entry opens the
+ * recipe detail. Each entry therefore carries its own `id` (the
+ * row key), the `targetId` its destination was composed from,
+ * and the `href` itself — the host routes by `kind` when
+ * composing it, so the view needs no per-kind press callbacks
+ * (#248: the rows navigate, so they are links). A plan may
+ * contain the same recipe twice, so the target cannot double as
+ * the key. A recipe entry whose access was lost renders its
+ * "(unavailable)" suffix and does not render as a link,
  * mirroring the app's disabled row; meal entries are never
  * unavailable. An entry-less plan renders the bare "Entries"
  * section, as the app does — there is no empty message on this
@@ -107,15 +110,13 @@ import { TextLink } from "../components/TextLink.js";
  *
  * De-styled for #119: the page renders no layout primitives and
  * sets no styling props. The loading state is the LoadingGate
- * component, the entry rows are the generic ListRow widget (the
- * page supplies the kind prefix, the unavailable suffix, and the
- * disabled flag as content), the goal rows are DetailRow widgets,
- * the plan title takes Text's
- * `title` variant, the meta lines take its `hint` variant, and
- * the page's blocks are children of one `sections` Column whose
- * role gap owns every section separation (the goals card's
- * content groups in a `group` Column; the action bar is an
- * `actions` Row).
+ * component, the entry rows are the generic ListRow widget in
+ * its link form (the page supplies the kind prefix, the entry's
+ * href, the unavailable suffix, and the disabled flag as
+ * content), the goal rows are DetailRow widgets, the plan title
+ * takes Text's `title` variant, the meta lines take its `hint`
+ * variant, and the page's blocks stack in a SectionStack, which
+ * owns every section separation.
  */
 
 /** One entry row's view-model. The app formats `subtitle` (its
@@ -125,10 +126,16 @@ export type MealPlanDetailPageEntry = {
   /** The entry's own id (the row key). */
   id: string;
   kind: "meal" | "recipe";
-  /** The meal or recipe the row opens, by kind — reported to
-   * `onMealPress` / `onRecipePress`. Distinct from `id`: a plan
-   * can hold the same recipe in two entries. */
+  /** The meal or recipe the row opens, by kind — the host
+   * composes the entry's `href` from it. Distinct from `id`: a
+   * plan can hold the same recipe in two entries. */
   targetId: string;
+  /** The entry's destination (#248's navigation rule: the row
+   * navigates, so it is a link): the host composes it from
+   * `targetId`, routed by `kind`. The row renders as a link
+   * carrying this href; an unavailable entry's row does not
+   * render as a link. */
+  href: string;
   title: string;
   subtitle?: string;
   /** Recipe entries whose access was lost: the title gains its
@@ -185,19 +192,17 @@ export type MealPlanDetailPageReadyProps = {
    * auto rule would render it. */
   goalsSectionVisibility?: "auto" | "shown" | "hidden";
   /** Optional: the goals section's "Set nutrition goals" link
-   * renders only when the callback is provided (in the app it
+   * renders only when the href is provided (in the app it
    * navigates to the profile's goals). */
-  onSetGoalsPress?: () => void;
-  /** The primary action: the plan's shopping list. */
-  onShoppingListPress: () => void;
-  /** The secondary action: edit the plan (the form screen). */
-  onEditPress: () => void;
+  goalsHref?: string;
+  /** The primary action's destination: the plan's shopping
+   * list (#248: navigation crosses as an href). */
+  shoppingListHref: string;
+  /** The secondary action's destination: edit the plan (the
+   * form screen) (#248). */
+  editHref: string;
   /** The plan's entries, in the app's order. */
   entries: MealPlanDetailPageEntry[];
-  /** A meal entry was pressed, with its meal id. */
-  onMealPress: (mealId: string) => void;
-  /** A recipe entry was pressed, with its recipe id. */
-  onRecipePress: (recipeId: string) => void;
 };
 
 export type MealPlanDetailPageProps = { state: "loading" } | MealPlanDetailPageReadyProps;
@@ -220,12 +225,10 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     nutritionLabel,
     nutritionGoals,
     goalsSectionVisibility = "auto",
-    onSetGoalsPress,
-    onShoppingListPress,
-    onEditPress,
+    goalsHref,
+    shoppingListHref,
+    editHref,
     entries,
-    onMealPress,
-    onRecipePress,
   } = props;
 
   // The app's goals view renders nothing when the plan has
@@ -256,14 +259,12 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
             ) : (
               <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
             )}
-            {onSetGoalsPress ? (
-              <TextLink onPress={onSetGoalsPress}>Set nutrition goals</TextLink>
-            ) : null}
+            {goalsHref ? <TextLink href={goalsHref}>Set nutrition goals</TextLink> : null}
           </SectionCard>
         ) : null}
         <ButtonRow>
-          <Button onPress={onShoppingListPress}>Shopping list</Button>
-          <Button variant="secondary" onPress={onEditPress}>
+          <Button href={shoppingListHref}>Shopping list</Button>
+          <Button variant="secondary" href={editHref}>
             Edit
           </Button>
         </ButtonRow>
@@ -278,13 +279,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                 {...(entry.kind === "recipe" && entry.isUnavailable
                   ? { isDisabled: true, titleSuffix: " (unavailable)" }
                   : {})}
-                onPress={() => {
-                  if (entry.kind === "meal") {
-                    onMealPress(entry.targetId);
-                  } else {
-                    onRecipePress(entry.targetId);
-                  }
-                }}
+                href={entry.href}
               />
             ))}
           </ListStack>

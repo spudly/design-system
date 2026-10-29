@@ -42,16 +42,28 @@ function Viewport({ children }: { children: ReactNode }) {
 const planItems: MealPlansPageItem[] = [
   {
     id: "weeknight-dinners",
+    href: "/meal-plans/weeknight-dinners",
     title: "Weeknight dinners",
     subtitle: "5 entries · Oct 19 – Oct 25 · 2,140 cal · Protein 118 g",
   },
   {
     id: "meal-prep-sunday",
+    href: "/meal-plans/meal-prep-sunday",
     title: "Meal prep Sunday",
     subtitle: "3 entries · Oct 26 – Oct 28",
   },
-  { id: "holiday-baking", title: "Holiday baking", subtitle: "1 entry" },
-  { id: "new-plan-draft", title: "New plan draft", subtitle: "0 entries" },
+  {
+    id: "holiday-baking",
+    href: "/meal-plans/holiday-baking",
+    title: "Holiday baking",
+    subtitle: "1 entry",
+  },
+  {
+    id: "new-plan-draft",
+    href: "/meal-plans/new-plan-draft",
+    title: "New plan draft",
+    subtitle: "0 entries",
+  },
 ];
 
 export const Default: Story = {
@@ -60,8 +72,7 @@ export const Default: Story = {
       <MealPlansPage
         plans={planItems}
         isLoading={false}
-        onPlanPress={() => undefined}
-        onCreatePlan={() => undefined}
+        createHref="/meal-plans/new"
         onPlanDelete={() => undefined}
       />
     </Viewport>
@@ -74,8 +85,7 @@ export const Empty: Story = {
       <MealPlansPage
         plans={[]}
         isLoading={false}
-        onPlanPress={() => undefined}
-        onCreatePlan={() => undefined}
+        createHref="/meal-plans/new"
         onPlanDelete={() => undefined}
       />
     </Viewport>
@@ -85,22 +95,17 @@ export const Empty: Story = {
 export const Loading: Story = {
   render: () => (
     <Viewport>
-      <MealPlansPage
-        plans={[]}
-        isLoading
-        onPlanPress={() => undefined}
-        onCreatePlan={() => undefined}
-      />
+      <MealPlansPage plans={[]} isLoading />
     </Viewport>
   ),
 };
 
 export const NoActions: Story = {
-  // No onCreatePlan / onPlanDelete: the create button and the
+  // No createHref / onPlanDelete: the create button and the
   // per-row Delete buttons omit cleanly, leaving a read-only list.
   render: () => (
     <Viewport>
-      <MealPlansPage plans={planItems} isLoading={false} onPlanPress={() => undefined} />
+      <MealPlansPage plans={planItems} isLoading={false} />
     </Viewport>
   ),
 };

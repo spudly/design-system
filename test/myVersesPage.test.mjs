@@ -164,17 +164,22 @@ test("the next-review line renders only when the app composed one", () => {
   );
 });
 
-test("row actions are bare intents reporting the verse id", () => {
-  assert.match(code, /onDrillVerse\(item\.id\)/, "Drill must fire onDrillVerse with the verse id");
+test("row controls split on the navigation rule: Drill is a link, Remove an intent", () => {
+  assert.match(
+    code,
+    /drillHref: string;/,
+    "each verse item must carry its pre-composed drill href (#248)",
+  );
+  assert.match(
+    code,
+    /<Button size="sm" href=\{item\.drillHref\}>\s*Drill\s*<\/Button>/,
+    "the Drill control must be Button's href form carrying the item's drill href",
+  );
+  assert.ok(!code.includes("onDrillVerse"), "Drill navigates — no drill press callback remains");
   assert.match(
     code,
     /onRemoveVerse\(item\.id\)/,
     "Remove must fire onRemoveVerse with the verse id",
-  );
-  assert.match(
-    code,
-    /<Button size="sm" onPress=\{onDrillPress\}>\s*Drill\s*<\/Button>/,
-    "the Drill button must mirror the app's (small, primary)",
   );
   assert.match(
     code,

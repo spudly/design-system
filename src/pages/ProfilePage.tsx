@@ -35,8 +35,13 @@ import { Text } from "../components/Text.js";
 export type ProfilePageProps = {
   email?: string | null;
   onSignOut: () => void;
-  onManageTagsPress?: () => void;
-  onComponentShowcasePress?: () => void;
+  /** The tags destination (#248: navigation crosses as an href,
+   * not a press callback); the button renders only when the href
+   * is provided. */
+  tagsHref?: string;
+  /** The component-showcase destination (#248); the button
+   * renders only when the href is provided. */
+  showcaseHref?: string;
   sectionsBeforeFeedback?: ReactNode;
   feedbackPreference?: ReactNode;
   sectionsAfterFeedback?: ReactNode;
@@ -47,8 +52,8 @@ export type ProfilePageProps = {
 export function ProfilePage({
   email,
   onSignOut,
-  onManageTagsPress,
-  onComponentShowcasePress,
+  tagsHref,
+  showcaseHref,
   sectionsBeforeFeedback,
   feedbackPreference,
   sectionsAfterFeedback,
@@ -70,17 +75,17 @@ export function ProfilePage({
           <Text color={tokens.colors.gray.gray8}>{email}</Text>
         </YStack>
       ) : null}
-      {onComponentShowcasePress ? (
+      {showcaseHref ? (
         <YStack paddingBottom="$4">
-          <Button variant="secondary" onPress={onComponentShowcasePress}>
+          <Button variant="secondary" href={showcaseHref}>
             Component Showcase
           </Button>
         </YStack>
       ) : null}
       {sectionsBeforeFeedback}
-      {onManageTagsPress ? (
+      {tagsHref ? (
         <YStack paddingBottom="$4">
-          <Button variant="secondary" onPress={onManageTagsPress}>
+          <Button variant="secondary" href={tagsHref}>
             Manage Tags
           </Button>
         </YStack>

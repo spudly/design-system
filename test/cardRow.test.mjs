@@ -1,9 +1,9 @@
 /**
  * Contract test for CardRow (spudly/design-system#119), the
  * generic titled card row for lists: an elevated card whose text
- * block — title over an optional meta line — is the press target,
- * with an optional trailing action button when the action's label
- * and callback are wired.
+ * block — title over an optional meta line — is the activation
+ * target, with an optional trailing action button when the
+ * action's label and callback are wired.
  *
  * Extracted from MealPlansPage in tranche 2 and generalized the
  * same day at Stephen's direction: components extracted under
@@ -14,7 +14,12 @@
  * pins hold the shape: the card treatment, the div-button
  * pressable pattern (the OptionCard pattern: a Tamagui view, not
  * a Pressable, so web keeps the layout), the keyboard activation,
- * and the action guard.
+ * and the action guard. Since #248's navigation rule the row
+ * also ships a link form (the Button pattern: `href`
+ * discriminates it from `onPress`) — a real anchor on web, a
+ * frame + LinkOverlay on native, with the texts marked decorative
+ * and the composed title-and-subtitle label as the row's one
+ * accessibility stop — so a navigating list row stays a link.
  *
  * Source scan plus a dist export check, like the other component
  * contract tests. The dist import needs the harness's
@@ -79,7 +84,37 @@ test("CardRow's title takes the md semibold treatment and the subtitle the hint 
     cardRowCode,
     /fontSize=\{tokens\.typography\.fontSize\.md\}\s+fontWeight=\{tokens\.typography\.fontWeight\.semibold\}/,
   );
-  assert.match(cardRowCode, /\{subtitle \? <Text variant="hint">\{subtitle\}<\/Text> : null\}/);
+  assert.match(cardRowCode, /\{subtitle \? \(/, "the subtitle renders only when provided");
+  assert.match(
+    cardRowCode,
+    /<Text\s+variant="hint"\s+accessible=\{decorative \? false : undefined\}/,
+    "the subtitle takes the hint variant and the decorative flag (the native link form hides it behind the overlay's composed label)",
+  );
+});
+
+test("CardRow's link form renders an anchor on web and a LinkOverlay on native (#248)", () => {
+  assert.match(cardRowCode, /href: string;/, "the link form's discriminant is the href");
+  assert.match(cardRowCode, /onPress\?: never/, "the two forms are mutually exclusive");
+  assert.match(
+    cardRowCode,
+    /<Anchor\s+flex=\{1\}\s+minWidth=\{0\}\s+gap="\$1"\s+href=\{href\}/,
+    "the web link form is an anchor carrying the href, in the press block's structural frame",
+  );
+  assert.match(
+    cardRowCode,
+    /<LinkOverlay\s+href=\{href\}/,
+    "the native link form's overlay carries the href",
+  );
+  assert.match(
+    cardRowCode,
+    /accessibilityLabel=\{subtitle \? `\$\{title\}, \$\{subtitle\}` : title\}/,
+    "the overlay's label composes the title and the subtitle — the visible texts are decorative in this form",
+  );
+  assert.match(
+    cardRowCode,
+    /accessible=\{decorative \? false : undefined\}/,
+    "the native link form marks its visible texts decorative",
+  );
 });
 
 test("CardRow's action renders only when its label and callback are both wired", () => {

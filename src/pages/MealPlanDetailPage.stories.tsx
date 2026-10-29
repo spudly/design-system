@@ -53,6 +53,7 @@ const detailEntries: MealPlanDetailPageEntry[] = [
     id: "entry-sunday-dinner",
     kind: "meal",
     targetId: "meal-sunday-dinner",
+    href: "/meals/meal-sunday-dinner",
     title: "Sunday Dinner",
     subtitle: "Qty 1 · 3 recipes",
   },
@@ -60,6 +61,7 @@ const detailEntries: MealPlanDetailPageEntry[] = [
     id: "entry-test-recipe",
     kind: "recipe",
     targetId: "recipe-test",
+    href: "/recipes/recipe-test",
     title: "Test Recipe",
     subtitle: "Qty 1 · 4 servings · 520 cal · Protein 32 g",
   },
@@ -67,6 +69,7 @@ const detailEntries: MealPlanDetailPageEntry[] = [
     id: "entry-shared-pasta",
     kind: "recipe",
     targetId: "recipe-pasta",
+    href: "/recipes/recipe-pasta",
     title: "Shared Pasta Bake",
     subtitle: "Qty 2 · 6 servings",
     isUnavailable: true,
@@ -91,12 +94,10 @@ export const Default: Story = {
         dateRangeLabel="2026-10-19 – 2026-10-25"
         nutritionLabel="2,140 cal · Protein 118 g"
         nutritionGoals={detailGoals}
-        onSetGoalsPress={() => undefined}
-        onShoppingListPress={() => undefined}
-        onEditPress={() => undefined}
+        goalsHref="/meal-plans/this-week/goals"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
         entries={detailEntries}
-        onMealPress={() => undefined}
-        onRecipePress={() => undefined}
       />
     </Viewport>
   ),
@@ -111,11 +112,9 @@ export const Empty: Story = {
       <MealPlanDetailPage
         state="ready"
         title="New plan draft"
-        onShoppingListPress={() => undefined}
-        onEditPress={() => undefined}
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
         entries={[]}
-        onMealPress={() => undefined}
-        onRecipePress={() => undefined}
       />
     </Viewport>
   ),
@@ -142,12 +141,10 @@ export const NutritionUnavailable: Story = {
         title="Harvest week"
         dateRangeLabel="2026-10-19 – 2026-10-25"
         goalsSectionVisibility="shown"
-        onSetGoalsPress={() => undefined}
-        onShoppingListPress={() => undefined}
-        onEditPress={() => undefined}
+        goalsHref="/meal-plans/this-week/goals"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
         entries={detailEntries.slice(0, 1)}
-        onMealPress={() => undefined}
-        onRecipePress={() => undefined}
       />
     </Viewport>
   ),
@@ -164,12 +161,10 @@ export const NoGoals: Story = {
         title="Meal prep Sunday"
         dateRangeLabel="2026-10-26 – 2026-10-28"
         nutritionLabel="1,480 cal · Protein 96 g"
-        onSetGoalsPress={() => undefined}
-        onShoppingListPress={() => undefined}
-        onEditPress={() => undefined}
+        goalsHref="/meal-plans/this-week/goals"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
         entries={detailEntries.slice(0, 1)}
-        onMealPress={() => undefined}
-        onRecipePress={() => undefined}
       />
     </Viewport>
   ),

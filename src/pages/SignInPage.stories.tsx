@@ -49,8 +49,8 @@ function Interactive({
         loading={loading}
         error={error ?? null}
         onSubmit={() => setLoading(true)}
-        onSignUpPress={() => undefined}
-        onForgotPasswordPress={() => undefined}
+        signUpHref="/signup"
+        forgotPasswordHref="/forgot-password"
       />
     </Viewport>
   );

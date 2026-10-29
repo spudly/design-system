@@ -139,6 +139,9 @@ test("the view-model and callback contract matches the declared props", () => {
 
 test("the drill chrome matches the app screen, in render order", () => {
   assert.match(code, /<BackLink onPress=\{onBack\} \/>/, "Back is the shared BackLink (#95)");
+  // Stephen's #248 ruling (2026-10-29): a genuinely dynamic back
+  // destination is EXEMPT from the href rule — it keeps its callback.
+  assert.doesNotMatch(code, /backHref|href=\{onBack\}/, "the session back must not take an href");
   assert.doesNotMatch(
     code,
     /←/,

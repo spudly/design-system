@@ -15,11 +15,12 @@
  *    ("No recipes found.", no body), and the shared
  *    configuration's stories pass the app's shared-with-me
  *    message verbatim, both sentences.
- * 3. The shared configuration is press-only: its stories pass
+ * 3. The shared configuration is link-only: its stories pass
  *    neither `onLogCookPress` nor `renderRecipeAccessory`, so
  *    shared rows render no log-cook control and no accessory —
- *    the #49 contract (in the app the press opens the recipe's
- *    permalink externally).
+ *    the #49 contract. Since #248 the rows navigate, so each
+ *    item carries its `href` and there is no row press wiring
+ *    at all.
  * 4. The shared configuration leaves the collapsed filter bar
  *    uncontrolled (no `activeFilters` / `filterChooserOpen`
  *    props): the shared host adopts the bar with no new state,
@@ -102,17 +103,25 @@ test("the shared configuration passes the app's shared-with-me empty message ver
   );
 });
 
-test("the shared configuration is press-only: no row actions, no accessory slot", () => {
+test("the shared configuration is link-only: no row actions, no accessory slot", () => {
   for (const banned of ["onLogCookPress", "renderRecipeAccessory"]) {
     assert.ok(
       !sharedDemo.includes(banned),
-      `the shared demo must not pass ${banned} — shared rows are press-only (#49 contract)`,
+      `the shared demo must not pass ${banned} — shared rows carry no row actions (#49 contract)`,
     );
   }
-  assert.match(
-    sharedDemo,
-    /onRecipePress=\{\(\) => undefined\}/,
-    "the shared demo must still wire the row press",
+  assert.ok(
+    !sharedDemo.includes("onRecipePress"),
+    "the shared demo must not wire a row press — rows navigate by item href (#248)",
+  );
+  assert.ok(
+    !code.includes("onRecipePress"),
+    "RecipesPage must not declare a row press callback at all (#248)",
+  );
+  const hrefCount = (stories.match(/href: "\/recipes\//g) ?? []).length;
+  assert.ok(
+    hrefCount >= 14,
+    `every story item (both configurations) must carry its href — found ${hrefCount}`,
   );
 });
 

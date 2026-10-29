@@ -178,11 +178,11 @@ function RecipeDetailPageDemo({
           }
         : {}),
       servingsLabel: String(servings),
-      onStartCooking: () => undefined,
+      cookingHref: "/recipes/1/cook",
       onPrintPress: () => undefined,
       onSharePress: () => undefined,
-      onEditPress: () => undefined,
-      ...(isFull ? { onEditDraftPress: () => undefined } : {}),
+      editHref: "/recipes/1/edit",
+      ...(isFull ? { editDraftHref: "/recipes/1/edit-draft" } : {}),
       onDeletePress: () => undefined,
       lifecycle: isFull
         ? {
@@ -191,7 +191,7 @@ function RecipeDetailPageDemo({
           }
         : null,
       onTweakManuallyPress: () => undefined,
-      onTweakAiPress: () => undefined,
+      tweakAiHref: "/recipes/1/tweak-ai",
       onMarkPerfectedPress: () => undefined,
       onAbandonPress: () => undefined,
       onActivateCandidatePress: () => undefined,
