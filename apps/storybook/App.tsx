@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { LogBox, View } from "react-native";
+import { Linking as RNLinking, LogBox, View } from "react-native";
 import { useFonts } from "expo-font";
 import * as Linking from "expo-linking";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -7,6 +7,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SET_CURRENT_STORY, STORY_RENDERED, UPDATE_GLOBALS } from "storybook/internal/core-events";
 import StorybookUIRoot, { view } from "./Storybook";
 import { setCaptureThemeOverride } from "./captureTheme";
+import { createStoryLinkOpenURL } from "./storyLinks";
 
 // App-side full-content capture module (design-system #137).
 // Required defensively: if the native module is not linked (e.g. a
@@ -19,6 +20,15 @@ try {
 } catch {
   captureFullPageNative = null;
 }
+
+// Story link routing (#300 — see storyLinks.ts): wrap the
+// platform Linking.openURL, the call Tamagui's Anchor makes for
+// every href press, so scheme-less app paths from stories route
+// to this host's browse scheme instead of rejecting. Installed
+// at module scope so it is in place before any story renders, in
+// browse and capture mode alike (capture never presses links;
+// the wrap is inert there).
+RNLinking.openURL = createStoryLinkOpenURL(RNLinking.openURL.bind(RNLinking));
 
 // ---------------------------------------------------------------------------
 // Capture protocol (used by tools/visualRegression/run.mjs — see
@@ -47,6 +57,12 @@ try {
 //   the single-viewport fallback, logged explicitly by the driver).
 // - `spudlyds://browse` (or a plain launcher start) shows the
 //   Storybook UI.
+// - Story link presses: stories carry web-style app hrefs
+//   ("/recipes/..."), which scheme-less would reject in
+//   Linking.openURL. The wrap installed above (storyLinks.ts,
+//   #300) routes them to `spudlyds://browse?path=<original>`
+//   instead; the host logs the pressed path as a `DS LINK
+//   <path>` line and stays in browse mode.
 // ---------------------------------------------------------------------------
 
 type CaptureTarget = { storyId: string; theme?: string; nonce?: string; appCapture: boolean };
@@ -69,17 +85,32 @@ function parseCapture(url: string): CaptureTarget | null | undefined {
   return undefined;
 }
 
+// A browse URL carrying a `path` is a story link press that the
+// storyLinks.ts wrap routed back to this host (#300): log the
+// path the story originally carried, so a press while browsing
+// on-device leaves a visible trace instead of a rejected
+// openURL promise.
+function logStoryLink(url: string) {
+  const parsed = Linking.parse(url);
+  const path = parsed.queryParams?.path;
+  if (parsed.hostname === "browse" && typeof path === "string") {
+    console.log(`DS LINK ${path}`);
+  }
+}
+
 function useCaptureTarget(): CaptureTarget | null {
   const [capture, setCapture] = useState<CaptureTarget | null>(null);
   useEffect(() => {
     let cancelled = false;
     Linking.getInitialURL().then((url) => {
       if (!cancelled && url) {
+        logStoryLink(url);
         const target = parseCapture(url);
         if (target !== undefined) setCapture(target);
       }
     });
     const sub = Linking.addEventListener("url", ({ url }) => {
+      logStoryLink(url);
       const target = parseCapture(url);
       if (target !== undefined) setCapture(target);
     });
