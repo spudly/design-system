@@ -67,7 +67,7 @@ test("the row thumbnail is the 64px cover square on its gray well", () => {
 test("a named image is exposed through the accessibility translator (Avatar's pattern)", () => {
   assert.match(
     code,
-    /const a11yProps = accessibilityLabel\s+\? platformAccessibilityProps\(\{ accessibilityRole: "image", accessibilityLabel \}\)\s+: \{\};/,
-    "the label must route through platformAccessibilityProps so web gets role=img + aria-label, not a leaked accessibilityLabel attribute",
+    /const a11yProps = accessibilityLabel\s+\? platformAccessibilityProps\(\{ accessibilityRole: "image", accessibilityLabel \}\)\s+: \{ alt: "" \};/,
+    'the label must route through platformAccessibilityProps so web gets role=img + aria-label, not a leaked accessibilityLabel attribute; an unnamed image is decorative (alt="") so web screen readers never announce it by filename',
   );
 });

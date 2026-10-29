@@ -9,8 +9,10 @@
  * pages outright).
  *
  * The pins hold the shape: exported from the package root, the
- * contract is children only, and the ScrollView carries exactly
- * the two treatments the three pages render today.
+ * contract is children only, and the ScrollView carries the
+ * treatments the three pages render today plus web keyboard
+ * focus (`tabIndex={0}`), so a region whose content has no
+ * focusable element stays scrollable from the keyboard.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -41,6 +43,6 @@ test("the contract is children only — no styling surface", () => {
   assert.match(code, /export type ScrollRegionProps = \{\s+children: ReactNode;\s+\};/);
 });
 
-test("the region fills its shell and keeps taps landing with the keyboard open", () => {
-  assert.match(code, /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">/);
+test("the region fills its shell, keeps taps landing with the keyboard open, and is keyboard-focusable on web", () => {
+  assert.match(code, /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled" tabIndex=\{0\}>/);
 });

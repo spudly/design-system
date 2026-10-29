@@ -50,9 +50,10 @@ export type ThumbnailProps = {
   /**
    * Accessible name for the image. When given, the image is exposed
    * as an image with this name (the import review names its preview
-   * this way); without it no accessibility props are set and the
-   * image renders as the raw element does (list rows name their
-   * press target from the row's title instead).
+   * this way); without it the image is decorative — `alt=""` on web
+   * so no screen reader announces it by filename (list rows name
+   * their press target from the row's title instead), and on native
+   * an unlabeled image is not exposed as its own element.
    */
   accessibilityLabel?: string;
 };
@@ -72,10 +73,13 @@ export function Thumbnail({ src, variant = "hero", accessibilityLabel }: Thumbna
   // A named image is exposed as an image with that name, routed
   // through the accessibility translator (Avatar's pattern, #235):
   // the RN `image` role and label become `role="img"` and
-  // `aria-label` on web instead of leaking as raw attributes.
+  // `aria-label` on web instead of leaking as raw attributes. An
+  // unnamed image is decorative: `alt=""` (DiscoveryCard's
+  // treatment) keeps web screen readers from announcing it by
+  // filename; the prop is ignored on native.
   const a11yProps = accessibilityLabel
     ? platformAccessibilityProps({ accessibilityRole: "image", accessibilityLabel })
-    : {};
+    : { alt: "" };
   if (variant === "banner") {
     return <StyledBannerImage src={src} {...a11yProps} />;
   }

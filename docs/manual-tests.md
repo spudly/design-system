@@ -524,6 +524,9 @@ Open in `Components/ScrollRegion`: Default.
    twelve section paragraphs between them scroll.
 2. The scrolling region fills exactly the space between the
    header and footer — no gap, no overlap.
+3. Keyboard only: Tab reaches the scrolling region itself (its
+   paragraphs contain no focusable elements) and the arrow /
+   Page Down keys scroll it.
 
 **Run when:** `src/components/ScrollRegion.tsx`, its stories,
 a fixed-shell page's scroll region, or a changeset naming

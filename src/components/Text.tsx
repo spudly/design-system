@@ -28,7 +28,7 @@ const StyledText = styled(TamaguiText, {
         fontWeight: tokens.typography.fontWeight.semibold,
         letterSpacing: 0.3,
         textTransform: "uppercase",
-        color: tokens.colors.gray.gray6,
+        color: "$textMuted",
       },
       subheading: {
         fontSize: tokens.typography.fontSize.xl,

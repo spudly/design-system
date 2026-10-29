@@ -20,10 +20,16 @@ export type ScrollRegionProps = {
  * (it wraps a page's content in its own ScrollView). ScrollRegion
  * is for the inner region of a shell ScreenContainer does not
  * scroll (`scrollable={false}` or a page-owned fixed layout).
+ *
+ * The region is keyboard-focusable on web (`tabIndex={0}` — a
+ * web-only Tamagui prop, ignored on native, the CardRow pattern):
+ * a scrollable region whose content has no focusable element of
+ * its own must still be reachable and scrollable from the
+ * keyboard (Safari does not scroll an unfocused overflow region).
  */
 export function ScrollRegion({ children }: ScrollRegionProps) {
   return (
-    <ScrollView flex={1} keyboardShouldPersistTaps="handled">
+    <ScrollView flex={1} keyboardShouldPersistTaps="handled" tabIndex={0}>
       {children}
     </ScrollView>
   );

@@ -4,9 +4,13 @@
  * hand-applied text treatments that recur identically —
  *
  * - `label`, the section eyebrow (xs semibold, uppercase,
- *   letter-spaced, muted gray): RecipeDetailPage (twice, plus its
+ *   letter-spaced, muted ink): RecipeDetailPage (twice, plus its
  *   "Per Serving" heading), PublicRecipePage, and AiSessionPage
- *   each hand-style it from the same values.
+ *   each hand-style it from the same values. The ink is the
+ *   theme's `$textMuted` role (the `hint` variant's treatment):
+ *   the pages' raw gray6 equals it in light themes, but only the
+ *   role follows the dark theme's lightened muted step, so the
+ *   eyebrow keeps AA contrast on dark backgrounds.
  * - `formTitle`, the form-flow page title (2xl bold): the six
  *   FormScreenLayout pages (ImportTextPage, ImportUrlPage,
  *   ImportReviewPage, ImportImagePage, MealFormPage,
@@ -33,7 +37,7 @@ const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/
 test("the label variant is the section eyebrow treatment", () => {
   assert.match(
     code,
-    /label: \{\s+fontSize: tokens\.typography\.fontSize\.xs,\s+fontWeight: tokens\.typography\.fontWeight\.semibold,\s+letterSpacing: 0\.3,\s+textTransform: "uppercase",\s+color: tokens\.colors\.gray\.gray6,\s+\},/,
+    /label: \{\s+fontSize: tokens\.typography\.fontSize\.xs,\s+fontWeight: tokens\.typography\.fontWeight\.semibold,\s+letterSpacing: 0\.3,\s+textTransform: "uppercase",\s+color: "\$textMuted",\s+\},/,
   );
 });
 
