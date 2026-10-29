@@ -149,6 +149,28 @@ test("namespaced attribute names are skipped, not crashed on", () => {
   assert.deepEqual(messageIds(`<svg xlink:href="#icon" marginTop={8} />`), ["marginProp"]);
 });
 
+test("computed property keys are classified only when statically known", () => {
+  // A member-expression key has no static name — no crash, no report.
+  assert.deepEqual(messageIds(`<View style={{ [styles.key]: 8 }} />`), []);
+  // A computed identifier is a variable name, not the key itself:
+  // the object it labels may be a data prop, so it stays unchecked.
+  assert.deepEqual(messageIds(`<View {...{ [style]: { marginTop: 8 } }} />`), []);
+  // A computed string Literal IS the key, statically known.
+  assert.deepEqual(messageIds(`<View style={{ ["marginTop"]: 8 }} />`), ["marginKey"]);
+});
+
+test("visible objects on either side of a logical style expression are inspected", () => {
+  assert.deepEqual(messageIds(`<View style={fallback || { marginTop: 8 }} />`), ["marginKey"]);
+  assert.deepEqual(messageIds(`<View style={{ marginTop: 8 } || fallback} />`), ["marginKey"]);
+  assert.deepEqual(messageIds(`<View style={maybe ?? { marginTop: 8 }} />`), ["marginKey"]);
+  // `a && b` never applies a left-hand object (objects are truthy).
+  assert.deepEqual(messageIds(`<View style={{ marginTop: 8 } && fallback} />`), []);
+});
+
+test("margin keys inside arrays spread into style arrays are banned", () => {
+  assert.deepEqual(messageIds(`<View style={[...[{ marginTop: 8 }]]} />`), ["marginKey"]);
+});
+
 test("gap, padding and positioning offsets are untouched", () => {
   assert.deepEqual(messageIds(`<YStack gap="$3" padding="$4" />`), []);
   assert.deepEqual(messageIds(`<YStack paddingBlockEnd="$3" />`), []);

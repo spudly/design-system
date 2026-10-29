@@ -72,6 +72,20 @@ function isMarginKey(key) {
   return typeof key === "string" && marginProps.has(key);
 }
 
+/**
+ * The statically known name of an object property, or undefined
+ * when the name is computed from a runtime value. A computed
+ * Literal (`["marginTop"]`) is known; a computed identifier or
+ * member expression (`[style]`, `[styles.key]`) is not — the
+ * identifier's spelling is a variable name, not the key.
+ */
+function staticPropertyKey(property) {
+  if (property.computed) {
+    return property.key.type === "Literal" ? property.key.value : undefined;
+  }
+  return property.key.name ?? property.key.value;
+}
+
 function checkObjectKeys(context, node) {
   for (const property of node.properties) {
     if (property.type === "SpreadElement") {
@@ -83,7 +97,14 @@ function checkObjectKeys(context, node) {
       continue;
     }
     if (property.type !== "Property") continue;
-    const key = property.key.name ?? property.key.value;
+    const key = staticPropertyKey(property);
+    if (typeof key !== "string") {
+      // Computed keys (`[styles.key]`, `[someVar]`) have no
+      // statically known name: the property cannot be classified
+      // as a margin key or a style-bearing property, and string
+      // checks must not run on a non-string.
+      continue;
+    }
     if (isMarginKey(key)) {
       context.report({ node: property, messageId: "marginKey", data: { name: key } });
     } else if (isStyleBearingAttribute(key)) {
@@ -107,7 +128,20 @@ function checkStyleObject(context, node) {
       break;
     }
     case "LogicalExpression": {
+      // `a || b` and `a ?? b` return `a` when it is truthy or
+      // non-nullish, so a visible object on the left can be the
+      // applied style — inspect it too. `a && b` returns `a`
+      // only when falsy, and an object literal never is, so a
+      // left-hand object is never applied there.
+      if (node.operator !== "&&") checkStyleObject(context, node.left);
       checkStyleObject(context, node.right);
+      break;
+    }
+    case "SpreadElement": {
+      // A spread whose argument is visibly an object (e.g.
+      // inside a style array) carries keys the same way the
+      // enclosing value does.
+      checkStyleObject(context, node.argument);
       break;
     }
     case "ArrayExpression": {
