@@ -1,6 +1,6 @@
 import { Children, forwardRef } from "react";
 import type { ComponentType, ReactNode } from "react";
-import { Anchor, Button as TamaguiButton, styled, useTheme } from "tamagui";
+import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { IconComponentProps } from "../icons/Icon.js";
@@ -379,6 +379,24 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     accessibilityValue,
   });
   if (isLink) {
+    // The label renders inside ONE text container, not as direct
+    // children of the flex anchor: flex layout drops whitespace-only
+    // text nodes between flex items, so a formatted label such as
+    // <span>Save</span>{" "}<span>recipe</span> would render as
+    // "Saverecipe" (CodeRabbit finding on PR #283). The button form
+    // keeps that space because Tamagui Button wraps text children
+    // in its own text elements; the single nested Text is the link
+    // form's equivalent — its content flows inline again. The Text
+    // carries the label's own styling explicitly (the same values
+    // the frame's variants and the wrapper's instance props give
+    // the button form's internal text): the variant label color,
+    // the size's font size, the semibold weight, the body family.
+    const labelFontSizes = {
+      sm: tokens.typography.fontSize.sm,
+      md: tokens.typography.fontSize.md,
+      lg: tokens.typography.fontSize.lg,
+    } as const;
+    const labelFontSize = labelFontSizes[size as keyof typeof labelFontSizes] ?? labelFontSizes.md;
     return (
       <StyledLinkButton
         ref={ref}
@@ -408,7 +426,18 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
           "href" | "disabled" | "children" | "variant" | "size" | "color" | "fontFamily"
         >)}
       >
-        {children}
+        {Children.count(children) > 0 ? (
+          <TamaguiText
+            color={labelColor}
+            fontFamily="$body"
+            fontSize={labelFontSize}
+            fontWeight={tokens.typography.fontWeight.semibold}
+          >
+            {children}
+          </TamaguiText>
+        ) : (
+          children
+        )}
       </StyledLinkButton>
     );
   }

@@ -67,7 +67,7 @@ test("Button: one shared frame config feeds the button and anchor frames (#248)"
   assert.match(button, /styled\(Anchor, \{\s*name: "ButtonLink",\s*\.\.\.buttonFrameConfig,/);
   assert.match(
     button,
-    /import \{ Anchor, Button as TamaguiButton, styled, useTheme \} from "tamagui";/,
+    /import \{ Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme \} from "tamagui";/,
   );
 });
 
@@ -177,6 +177,27 @@ test("SSR: a Button with href renders a real anchor, not a button (#248)", async
   );
   assert.ok(!html.includes("<button"), "the href form must not render a <button>");
   assert.ok(html.includes('role="link"'), "the href form carries link semantics");
+});
+
+test("SSR: a formatted href label keeps its whitespace inside one text container (#248)", async () => {
+  const { React, Button } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(
+      Button,
+      { href: "/recipes" },
+      React.createElement("span", { key: "a" }, "Save"),
+      " ",
+      React.createElement("span", { key: "b" }, "recipe"),
+    ),
+  );
+  // The link anchor is a flex frame, and flex layout drops
+  // whitespace-only text nodes between flex items — so the label
+  // must sit inside ONE nested text element, where the space
+  // between the formatted spans is inline content, not a flex
+  // item boundary (CodeRabbit finding on PR #283; the button form
+  // keeps the space the same way, via Tamagui Button's own text
+  // wrapping).
+  assert.match(html, /<a[^>]*><span[^>]*><span>Save<\/span> <span>recipe<\/span><\/span><\/a>/);
 });
 
 test("SSR: a Button with onPress renders a button and no stray href (#248)", async () => {
