@@ -21,7 +21,7 @@ type Story = StoryObj<typeof Column>;
 export const Stacked: Story = {
   render: (args) => (
     <YStack maxWidth={360}>
-      <Column {...args}>
+      <Column {...args} align="start">
         <Button>Shopping list</Button>
         <Button variant="secondary">Edit</Button>
       </Column>

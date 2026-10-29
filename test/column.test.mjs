@@ -64,13 +64,18 @@ test("Column's styled base is a YStack named Column, with token-driven variants"
   assert.match(columnCode, /center: \{ alignItems: "center" \}/);
 });
 
-test("Column's public API is the semantic props, with Row's defaults", () => {
+test("Column's public API is the semantic props, with the bare-stack defaults", () => {
   assert.match(columnCode, /spacing\?: "none" \| "sm" \| "md" \| "lg" \| "xl" \| "2xl";/);
   assert.match(columnCode, /align\?: "start" \| "center" \| "end" \| "stretch";/);
   assert.match(columnCode, /spaceBefore\?: "none" \| "sm" \| "md" \| "lg" \| "xl" \| "2xl";/);
   assert.match(columnCode, /spaceAfter\?: "none" \| "sm" \| "md" \| "lg" \| "xl" \| "2xl";/);
   assert.match(
     columnCode,
-    /spacing = "sm",\s+align = "start",\s+spaceBefore = "none",\s+spaceAfter = "none",/,
+    /spacing = "sm",\s+align = "stretch",\s+spaceBefore = "none",\s+spaceAfter = "none",/,
+  );
+  assert.match(
+    columnCode,
+    /defaultVariants: \{\s+spacing: "sm",\s+align: "stretch",/,
+    "the styled default must also be stretch, so the variant table and the wrapper agree",
   );
 });

@@ -317,8 +317,10 @@ MealPlanDetailPage), or a changeset naming Row.
 
 Open in `Components/Column`: Stacked, Centered, SpaceAfter.
 
-1. Stacked: the two buttons stack vertically with an even 8px gap,
-   left-aligned at their natural widths.
+1. Stacked (align="start"): the two buttons stack vertically with
+   an even 8px gap, left-aligned at their natural widths. With no
+   `align` passed the default is `stretch` — children fill the
+   column's width, the bare stack's behavior.
 2. Centered: the hint text and the small button are horizontally
    centered in the column.
 3. SpaceAfter: the title block sits one lg step (16px) above the

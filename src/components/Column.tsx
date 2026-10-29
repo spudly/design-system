@@ -54,7 +54,7 @@ const StyledColumn = styled(YStack, {
 
   defaultVariants: {
     spacing: "sm",
-    align: "start",
+    align: "stretch",
     spaceBefore: "none",
     spaceAfter: "none",
   },
@@ -68,7 +68,8 @@ export type ColumnProps = StyledColumnProps & {
    * `2xl` (32px), or `none`. */
   spacing?: "none" | "sm" | "md" | "lg" | "xl" | "2xl";
   /** Horizontal alignment of the column's children. Defaults to
-   * `start`. */
+   * `stretch` — the bare stack's behavior, so composed blocks fill
+   * the column's width unless a page asks otherwise. */
   align?: "start" | "center" | "end" | "stretch";
   /** Space above the column, separating it from the content before
    * it, on the layout scale. Defaults to `none`. */
@@ -85,11 +86,14 @@ export type ColumnProps = StyledColumnProps & {
  * own. All spacing is chosen through the semantic scale steps
  * (`spacing` / `spaceBefore` / `spaceAfter`, shared with Row) and
  * cross-axis alignment through `align` — pages name the intent,
- * this component owns the style values.
+ * this component owns the style values. The default alignment is
+ * `stretch`, the bare stack's own behavior, so a block composed
+ * in a Column fills its width exactly as it did in the stack the
+ * Column replaces.
  */
 export function Column({
   spacing = "sm",
-  align = "start",
+  align = "stretch",
   spaceBefore = "none",
   spaceAfter = "none",
   ...rest
