@@ -119,25 +119,30 @@ export function MealDetailPage({
 }: MealDetailPageProps) {
   return (
     <ScreenContainer>
-      <Text
-        variant="heading"
-        fontSize={tokens.typography.fontSize.xl}
-        fontWeight={tokens.typography.fontWeight.bold}
-        marginBlockEnd="$4"
-      >
-        {title}
-      </Text>
-      {notes ? (
-        <Text color="$textMuted" marginBlockEnd="$4" fontSize={tokens.typography.fontSize.sm}>
-          {notes}
+      <YStack paddingBlockEnd="$4">
+        <Text
+          variant="heading"
+          fontSize={tokens.typography.fontSize.xl}
+          fontWeight={tokens.typography.fontWeight.bold}
+        >
+          {title}
         </Text>
+      </YStack>
+      {notes ? (
+        <YStack paddingBlockEnd="$4">
+          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
+            {notes}
+          </Text>
+        </YStack>
       ) : null}
       {nutritionLabel ? (
-        <Text marginBlockEnd="$4" fontSize={tokens.typography.fontSize.sm} color="$textMuted">
-          {nutritionLabel}
-        </Text>
+        <YStack paddingBlockEnd="$4">
+          <Text fontSize={tokens.typography.fontSize.sm} color="$textMuted">
+            {nutritionLabel}
+          </Text>
+        </YStack>
       ) : null}
-      <XStack marginBlockEnd="$6" flexWrap="wrap" gap="$3">
+      <XStack paddingBlockEnd="$6" flexWrap="wrap" gap="$3">
         <Button onPress={onCook}>Cook meal</Button>
         <Button variant="secondary" onPress={onEdit}>
           Edit

@@ -87,22 +87,23 @@ function ShoppingListRow({ line, onToggle }: { line: ShoppingListPageLine; onTog
       onKeyDown={handleKeyDown}
       cursor="web:pointer"
     >
-      <YStack
-        marginTop={2}
-        width={tokens.spacing[6]}
-        height={tokens.spacing[6]}
-        borderRadius={tokens.radii.sm}
-        borderWidth={2}
-        borderColor={checked ? "$primary" : "$textMuted"}
-        backgroundColor={checked ? "$primary" : "$surface"}
-        alignItems="center"
-        justifyContent="center"
-      >
-        {checked ? (
-          <Text fontSize={tokens.typography.fontSize.sm} color="$onPrimary">
-            ✓
-          </Text>
-        ) : null}
+      <YStack paddingTop={2}>
+        <YStack
+          width={tokens.spacing[6]}
+          height={tokens.spacing[6]}
+          borderRadius={tokens.radii.sm}
+          borderWidth={2}
+          borderColor={checked ? "$primary" : "$textMuted"}
+          backgroundColor={checked ? "$primary" : "$surface"}
+          alignItems="center"
+          justifyContent="center"
+        >
+          {checked ? (
+            <Text fontSize={tokens.typography.fontSize.sm} color="$onPrimary">
+              ✓
+            </Text>
+          ) : null}
+        </YStack>
       </YStack>
       <Text
         flex={1}
@@ -134,14 +135,15 @@ export function ShoppingListPage({
 }: ShoppingListPageProps) {
   return (
     <ScreenContainer>
-      <Text
-        variant="heading"
-        fontSize={tokens.typography.fontSize.xl}
-        fontWeight={tokens.typography.fontWeight.bold}
-        marginBottom="$4"
-      >
-        Shopping list
-      </Text>
+      <YStack paddingBottom="$4">
+        <Text
+          variant="heading"
+          fontSize={tokens.typography.fontSize.xl}
+          fontWeight={tokens.typography.fontWeight.bold}
+        >
+          Shopping list
+        </Text>
+      </YStack>
       {isLoading ? (
         <Spinner label="Loading shopping list" />
       ) : lines.length === 0 ? (

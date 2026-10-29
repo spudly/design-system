@@ -35,9 +35,11 @@ export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextP
 
   return (
     <FormScreenLayout>
-      <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]} marginBottom="$6">
-        Import from text
-      </Text>
+      <YStack paddingBottom="$6">
+        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
+          Import from text
+        </Text>
+      </YStack>
       <Text variant="hint">Paste a recipe from Word, a web page, or any rich text source.</Text>
       <TextAreaField
         value={text}
@@ -46,7 +48,7 @@ export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextP
         accessibilityLabel="Recipe text"
       />
       {error ? (
-        <YStack marginBottom="$4">
+        <YStack paddingBottom="$4">
           <Text variant="error">{error}</Text>
         </YStack>
       ) : null}

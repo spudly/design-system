@@ -56,21 +56,22 @@ export function ProfilePage({
 }: ProfilePageProps) {
   return (
     <ScreenContainer variant="padded">
-      <Text
-        variant="heading"
-        fontSize={tokens.typography.fontSize.xl}
-        fontWeight={tokens.typography.fontWeight.bold}
-        marginBottom="$4"
-      >
-        Profile
-      </Text>
-      {email ? (
-        <Text marginBottom="$6" color={tokens.colors.gray.gray8}>
-          {email}
+      <YStack paddingBottom="$4">
+        <Text
+          variant="heading"
+          fontSize={tokens.typography.fontSize.xl}
+          fontWeight={tokens.typography.fontWeight.bold}
+        >
+          Profile
         </Text>
+      </YStack>
+      {email ? (
+        <YStack paddingBottom="$6">
+          <Text color={tokens.colors.gray.gray8}>{email}</Text>
+        </YStack>
       ) : null}
       {onComponentShowcasePress ? (
-        <YStack marginBottom="$4">
+        <YStack paddingBottom="$4">
           <Button variant="secondary" onPress={onComponentShowcasePress}>
             Component Showcase
           </Button>
@@ -78,7 +79,7 @@ export function ProfilePage({
       ) : null}
       {sectionsBeforeFeedback}
       {onManageTagsPress ? (
-        <YStack marginBottom="$4">
+        <YStack paddingBottom="$4">
           <Button variant="secondary" onPress={onManageTagsPress}>
             Manage Tags
           </Button>
@@ -86,15 +87,16 @@ export function ProfilePage({
       ) : null}
       {feedbackPreference}
       {sectionsAfterFeedback}
-      <YStack marginBottom="$8">
-        <Text
-          marginBottom="$3"
-          fontSize={tokens.typography.fontSize.lg}
-          fontWeight={tokens.typography.fontWeight.semibold}
-          color={tokens.colors.gray.gray10}
-        >
-          Legal
-        </Text>
+      <YStack paddingBottom="$8">
+        <YStack paddingBottom="$3">
+          <Text
+            fontSize={tokens.typography.fontSize.lg}
+            fontWeight={tokens.typography.fontWeight.semibold}
+            color={tokens.colors.gray.gray10}
+          >
+            Legal
+          </Text>
+        </YStack>
         {legalLinks}
       </YStack>
       <Button variant="danger" onPress={onSignOut}>

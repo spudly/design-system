@@ -58,39 +58,43 @@ export function ImportReviewPage({
 }: ImportReviewPageProps) {
   return (
     <FormScreenLayout>
-      <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]} marginBottom="$6">
-        Review Import
-      </Text>
+      <YStack paddingBottom="$6">
+        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
+          Review Import
+        </Text>
+      </YStack>
       <Text variant="hint">
         This is your imported recipe ({versionLabel}). Looks good, or make edits to create a draft
         version.
       </Text>
       {imageUrl ? (
-        <Image
-          source={{ uri: imageUrl }}
-          accessible={imageAlt ? true : undefined}
-          accessibilityLabel={imageAlt}
-          style={{
-            marginBottom: tokens.spacing[4],
-            borderRadius: tokens.radii.lg,
-            height: 192,
-            width: "100%",
-          }}
-          resizeMode="cover"
-        />
+        <YStack paddingBottom={tokens.spacing[4]}>
+          <Image
+            source={{ uri: imageUrl }}
+            accessible={imageAlt ? true : undefined}
+            accessibilityLabel={imageAlt}
+            style={{
+              borderRadius: tokens.radii.lg,
+              height: 192,
+              width: "100%",
+            }}
+            resizeMode="cover"
+          />
+        </YStack>
       ) : null}
-      <YStack
-        marginBottom="$6"
-        borderRadius={tokens.radii.lg}
-        borderWidth={1}
-        borderColor={tokens.colors.gray.gray3}
-        backgroundColor="$surface"
-        padding="$4"
-      >
-        {preview}
+      <YStack paddingBottom="$6">
+        <YStack
+          borderRadius={tokens.radii.lg}
+          borderWidth={1}
+          borderColor={tokens.colors.gray.gray3}
+          backgroundColor="$surface"
+          padding="$4"
+        >
+          {preview}
+        </YStack>
       </YStack>
       {error ? (
-        <YStack marginBottom="$4">
+        <YStack paddingBottom="$4">
           <Text variant="error">{error}</Text>
         </YStack>
       ) : null}

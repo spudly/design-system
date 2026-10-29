@@ -46,7 +46,7 @@ function messageIds(code, filename = "src/components/Example.tsx") {
 }
 
 test("the margin-prop set covers the full margin family but not padding/gap/offsets", () => {
-  for (const name of [
+  const marginNames = [
     "margin",
     "marginTop",
     "marginBottom",
@@ -62,10 +62,11 @@ test("the margin-prop set covers the full margin family but not padding/gap/offs
     "marginBlock",
     "marginBlockStart",
     "marginBlockEnd",
-  ]) {
+  ];
+  for (const name of marginNames) {
     assert.ok(marginProps.has(name), `${name} must count as a margin prop`);
   }
-  for (const name of [
+  const otherNames = [
     "padding",
     "paddingTop",
     "paddingBlockEnd",
@@ -74,7 +75,8 @@ test("the margin-prop set covers the full margin family but not padding/gap/offs
     "right",
     "scrollMargin",
     "scrollMarginTop",
-  ]) {
+  ];
+  for (const name of otherNames) {
     assert.ok(!marginProps.has(name), `${name} must NOT count as a margin prop`);
   }
 });

@@ -150,19 +150,21 @@ function VerseResultRow({
   onAddPress: () => void;
 }) {
   return (
-    <Card marginBottom="$2">
-      <Text variant="subheading">{item.reference}</Text>
-      <Text variant="verse">{item.text}</Text>
-      {item.added ? (
-        <Button size="sm" variant="secondary" disabled>
-          Added
-        </Button>
-      ) : (
-        <Button size="sm" onPress={onAddPress}>
-          Add to memorize list
-        </Button>
-      )}
-    </Card>
+    <YStack paddingBottom="$2">
+      <Card>
+        <Text variant="subheading">{item.reference}</Text>
+        <Text variant="verse">{item.text}</Text>
+        {item.added ? (
+          <Button size="sm" variant="secondary" disabled>
+            Added
+          </Button>
+        ) : (
+          <Button size="sm" onPress={onAddPress}>
+            Add to memorize list
+          </Button>
+        )}
+      </Card>
+    </YStack>
   );
 }
 

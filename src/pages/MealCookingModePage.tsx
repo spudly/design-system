@@ -134,29 +134,33 @@ export function MealCookingModePage({
           Done
         </Text>
       </YStack>
-      <Text
-        marginBlockEnd="$2"
-        fontSize={tokens.typography.fontSize.sm}
-        letterSpacing={1.4}
-        color="$surface"
-        opacity={0.6}
-        textTransform="uppercase"
-      >
-        {mealTitle}
-      </Text>
-      <Text
-        marginBlockEnd="$4"
-        fontSize={tokens.typography.fontSize.sm}
-        letterSpacing={1.4}
-        color="$surface"
-        opacity={0.6}
-        textTransform="uppercase"
-      >
-        Step {current.stepNumber} of {steps.length} · {current.recipeTitle}
-      </Text>
-      <Text marginBlockEnd="$8" fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
-        {current.body}
-      </Text>
+      <YStack paddingBlockEnd="$2">
+        <Text
+          fontSize={tokens.typography.fontSize.sm}
+          letterSpacing={1.4}
+          color="$surface"
+          opacity={0.6}
+          textTransform="uppercase"
+        >
+          {mealTitle}
+        </Text>
+      </YStack>
+      <YStack paddingBlockEnd="$4">
+        <Text
+          fontSize={tokens.typography.fontSize.sm}
+          letterSpacing={1.4}
+          color="$surface"
+          opacity={0.6}
+          textTransform="uppercase"
+        >
+          Step {current.stepNumber} of {steps.length} · {current.recipeTitle}
+        </Text>
+      </YStack>
+      <YStack paddingBlockEnd="$8">
+        <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
+          {current.body}
+        </Text>
+      </YStack>
       <StepDots count={steps.length} activeIndex={stepIndex} />
       <PrevNextNav
         {...(stepIndex === 0 ? {} : { onBack: onPrev })}

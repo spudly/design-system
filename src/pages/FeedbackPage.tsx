@@ -57,18 +57,21 @@ export function FeedbackPage({
 }: FeedbackPageProps) {
   return (
     <ScreenContainer variant="padded">
-      <Text
-        variant="heading"
-        fontSize={tokens.typography.fontSize.xl}
-        fontWeight={tokens.typography.fontWeight.bold}
-        marginBottom="$4"
-      >
-        Feedback
-      </Text>
-      <Text color="$textMuted" marginBottom="$6" fontSize={tokens.typography.fontSize.sm}>
-        Share ideas, confusion, or problems. We&apos;ll include session context to help us
-        investigate.
-      </Text>
+      <YStack paddingBottom="$4">
+        <Text
+          variant="heading"
+          fontSize={tokens.typography.fontSize.xl}
+          fontWeight={tokens.typography.fontWeight.bold}
+        >
+          Feedback
+        </Text>
+      </YStack>
+      <YStack paddingBottom="$6">
+        <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
+          Share ideas, confusion, or problems. We&apos;ll include session context to help us
+          investigate.
+        </Text>
+      </YStack>
       {submitted ? (
         <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.success.success8}>
           Thanks — we got your feedback.

@@ -1,3 +1,4 @@
+import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { OptionCard } from "../components/OptionCard.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
@@ -27,14 +28,15 @@ export type AddRecipeMenuPageProps = {
 export function AddRecipeMenuPage({ options, onSelect }: AddRecipeMenuPageProps) {
   return (
     <ScreenContainer variant="padded">
-      <Text
-        variant="heading"
-        fontSize={tokens.typography.fontSize.xl}
-        fontWeight={tokens.typography.fontWeight.bold}
-        marginBottom="$4"
-      >
-        Add Recipe
-      </Text>
+      <YStack paddingBottom="$4">
+        <Text
+          variant="heading"
+          fontSize={tokens.typography.fontSize.xl}
+          fontWeight={tokens.typography.fontWeight.bold}
+        >
+          Add Recipe
+        </Text>
+      </YStack>
       {options.map((option) => (
         <OptionCard
           key={option.target}

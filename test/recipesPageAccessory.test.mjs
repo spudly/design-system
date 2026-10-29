@@ -90,7 +90,7 @@ test("the accessory renders under the row's card, inside the list item", () => {
   assert.ok(accessoryAt > rowAt, "the accessory must render after (under) the row's card");
   assert.match(
     code,
-    /\{hasAccessory \? <YStack marginBlockEnd="\$3">\{accessory\}<\/YStack> : null\}/,
+    /\{hasAccessory \? <YStack paddingBlockEnd="\$3">\{accessory\}<\/YStack> : null\}/,
     "the accessory must render in the under-card YStack only when it has content",
   );
 });

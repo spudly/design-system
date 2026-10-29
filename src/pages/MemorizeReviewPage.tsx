@@ -1,5 +1,5 @@
 import { FlatList } from "react-native";
-import { XStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
@@ -113,18 +113,20 @@ function ReviewVerseRow({
   onForgotPress: () => void;
 }) {
   return (
-    <Card marginBottom="$2">
-      <Text variant="subheading">{verse.reference}</Text>
-      <Text variant="verse">{verse.text}</Text>
-      <XStack gap="$2" marginTop="$2">
-        <Button size="sm" onPress={onRememberedPress}>
-          I remembered it
-        </Button>
-        <Button size="sm" variant="secondary" onPress={onForgotPress}>
-          I forgot it
-        </Button>
-      </XStack>
-    </Card>
+    <YStack paddingBottom="$2">
+      <Card>
+        <Text variant="subheading">{verse.reference}</Text>
+        <Text variant="verse">{verse.text}</Text>
+        <XStack gap="$2" paddingTop="$2">
+          <Button size="sm" onPress={onRememberedPress}>
+            I remembered it
+          </Button>
+          <Button size="sm" variant="secondary" onPress={onForgotPress}>
+            I forgot it
+          </Button>
+        </XStack>
+      </Card>
+    </YStack>
   );
 }
 

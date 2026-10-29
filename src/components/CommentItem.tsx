@@ -59,98 +59,100 @@ export function CommentItem({
   const saveDisabled = isUpdatePending || !editDraft.trim();
 
   return (
-    <YStack
-      marginBlockEnd="$3"
-      borderRadius={tokens.radii.md}
-      backgroundColor={tokens.colors.gray.gray1}
-      padding="$3"
-    >
-      <XStack marginBlockEnd="$1" alignItems="center" gap="$2">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          fontWeight={tokens.typography.fontWeight.medium}
-          color={tokens.colors.gray.gray10}
-        >
-          {authorName}
-        </Text>
-        {isStale ? (
+    <YStack paddingBlockEnd="$3">
+      <YStack
+        borderRadius={tokens.radii.md}
+        backgroundColor={tokens.colors.gray.gray1}
+        padding="$3"
+      >
+        <XStack paddingBlockEnd="$1" alignItems="center" gap="$2">
           <Text
-            accessibilityLabel={staleHintLabel}
             fontSize={tokens.typography.fontSize.sm}
-            color={tokens.colors.warning.warning7}
+            fontWeight={tokens.typography.fontWeight.medium}
+            color={tokens.colors.gray.gray10}
           >
-            ⚠
+            {authorName}
           </Text>
-        ) : null}
-      </XStack>
-      {isEditing ? (
-        <TextAreaField
-          marginBlockEnd="$2"
-          value={editDraft}
-          onChangeText={(value) => {
-            onEditDraftChange?.(value);
-          }}
-        />
-      ) : (
-        <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
-          {body}
-        </Text>
-      )}
-      {canEdit || canDelete ? (
-        <XStack marginBlockStart="$2" gap="$3">
-          {canEdit ? (
-            isEditing ? (
-              <>
+          {isStale ? (
+            <Text
+              accessibilityLabel={staleHintLabel}
+              fontSize={tokens.typography.fontSize.sm}
+              color={tokens.colors.warning.warning7}
+            >
+              ⚠
+            </Text>
+          ) : null}
+        </XStack>
+        {isEditing ? (
+          <YStack paddingBlockEnd="$2">
+            <TextAreaField
+              value={editDraft}
+              onChangeText={(value) => {
+                onEditDraftChange?.(value);
+              }}
+            />
+          </YStack>
+        ) : (
+          <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
+            {body}
+          </Text>
+        )}
+        {canEdit || canDelete ? (
+          <XStack paddingBlockStart="$2" gap="$3">
+            {canEdit ? (
+              isEditing ? (
+                <>
+                  <TextAction
+                    disabled={saveDisabled}
+                    color="$primary"
+                    fontSize={tokens.typography.fontSize.xs}
+                    fontWeight={tokens.typography.fontWeight.medium}
+                    opacity={saveDisabled ? 0.5 : 1}
+                    onPress={() => {
+                      onSaveEdit?.();
+                    }}
+                  >
+                    Save
+                  </TextAction>
+                  <TextAction
+                    fontSize={tokens.typography.fontSize.xs}
+                    color={tokens.colors.gray.gray7}
+                    onPress={() => {
+                      onCancelEdit?.();
+                    }}
+                  >
+                    Cancel
+                  </TextAction>
+                </>
+              ) : (
                 <TextAction
-                  disabled={saveDisabled}
                   color="$primary"
                   fontSize={tokens.typography.fontSize.xs}
                   fontWeight={tokens.typography.fontWeight.medium}
-                  opacity={saveDisabled ? 0.5 : 1}
                   onPress={() => {
-                    onSaveEdit?.();
+                    onStartEdit?.();
                   }}
                 >
-                  Save
+                  Edit
                 </TextAction>
-                <TextAction
-                  fontSize={tokens.typography.fontSize.xs}
-                  color={tokens.colors.gray.gray7}
-                  onPress={() => {
-                    onCancelEdit?.();
-                  }}
-                >
-                  Cancel
-                </TextAction>
-              </>
-            ) : (
+              )
+            ) : null}
+            {canDelete ? (
               <TextAction
-                color="$primary"
+                disabled={isDeletePending}
                 fontSize={tokens.typography.fontSize.xs}
-                fontWeight={tokens.typography.fontWeight.medium}
+                color={tokens.colors.danger.danger7}
+                opacity={isDeletePending ? 0.5 : 1}
                 onPress={() => {
-                  onStartEdit?.();
+                  onDelete?.();
                 }}
               >
-                Edit
+                Delete
               </TextAction>
-            )
-          ) : null}
-          {canDelete ? (
-            <TextAction
-              disabled={isDeletePending}
-              fontSize={tokens.typography.fontSize.xs}
-              color={tokens.colors.danger.danger7}
-              opacity={isDeletePending ? 0.5 : 1}
-              onPress={() => {
-                onDelete?.();
-              }}
-            >
-              Delete
-            </TextAction>
-          ) : null}
-        </XStack>
-      ) : null}
+            ) : null}
+          </XStack>
+        ) : null}
+      </YStack>
     </YStack>
   );
 }

@@ -1,3 +1,4 @@
+import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
@@ -47,12 +48,12 @@ export function ForgotPasswordPage({
   };
   return (
     <ScreenContainer scrollable={false} variant="auth">
-      <Text variant="heading" marginBottom="$4">
-        Reset password
-      </Text>
-      <Text color="$textMuted" marginBottom="$8">
-        We&apos;ll send a reset link to your email.
-      </Text>
+      <YStack paddingBottom="$4">
+        <Text variant="heading">Reset password</Text>
+      </YStack>
+      <YStack paddingBottom="$8">
+        <Text color="$textMuted">We&apos;ll send a reset link to your email.</Text>
+      </YStack>
       <TextField
         label="Email"
         value={email}
@@ -74,9 +75,11 @@ export function ForgotPasswordPage({
         {loading ? "Sending…" : "Send Reset Link"}
       </Button>
       {onBackPress ? (
-        <TextLink color={tokens.colors.gray.gray6} marginTop="$2" onPress={onBackPress}>
-          Back to sign in
-        </TextLink>
+        <YStack paddingTop="$2">
+          <TextLink color={tokens.colors.gray.gray6} onPress={onBackPress}>
+            Back to sign in
+          </TextLink>
+        </YStack>
       ) : null}
     </ScreenContainer>
   );

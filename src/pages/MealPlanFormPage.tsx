@@ -105,9 +105,11 @@ export function MealPlanFormPage({
 
   return (
     <FormScreenLayout>
-      <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]} marginBottom="$6">
-        {title.trim() ? title : "Meal plan"}
-      </Text>
+      <YStack paddingBottom="$6">
+        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
+          {title.trim() ? title : "Meal plan"}
+        </Text>
+      </YStack>
       <TextField
         label="Title"
         value={title}
@@ -132,14 +134,15 @@ export function MealPlanFormPage({
         onChangeText={onEndsOnChange}
         placeholder="YYYY-MM-DD"
       />
-      <Text
-        marginBlockEnd="$2"
-        fontSize={tokens.typography.fontSize.sm}
-        fontWeight={tokens.typography.fontWeight.medium}
-        color={tokens.colors.gray.gray8}
-      >
-        Meals & recipes
-      </Text>
+      <YStack paddingBlockEnd="$2">
+        <Text
+          fontSize={tokens.typography.fontSize.sm}
+          fontWeight={tokens.typography.fontWeight.medium}
+          color={tokens.colors.gray.gray8}
+        >
+          Meals & recipes
+        </Text>
+      </YStack>
       <CheckboxSelectList
         items={entryOptions.map((entry) => ({
           id: entry.key,
@@ -180,7 +183,7 @@ export function MealPlanFormPage({
         );
       })}
       {error ? <Text variant="error">{error}</Text> : null}
-      <YStack marginBlockStart="$4">
+      <YStack paddingBlockStart="$4">
         <Button
           variant="primary"
           accessibilityLabel="Save plan"

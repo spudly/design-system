@@ -146,29 +146,33 @@ export function AiSessionPage({
         paddingHorizontal="$4"
         paddingTop="$4"
       >
-        <Text
-          fontSize={tokens.typography.fontSize["2xl"]}
-          fontWeight={tokens.typography.fontWeight.bold}
-          color={tokens.colors.gray.gray10}
-          marginBottom="$2"
-        >
-          {config.title}
-        </Text>
-        <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm} marginBottom="$6">
-          {config.intro}
-        </Text>
-        <TextAreaField
-          value={prompt}
-          onChangeText={onPromptChange}
-          placeholder={config.promptPlaceholder}
-          minHeight={192}
-          marginBottom="$4"
-          textAlignVertical="top"
-        />
-        {error ? (
-          <Text variant="error" marginBottom="$4">
-            {error}
+        <YStack paddingBottom="$2">
+          <Text
+            fontSize={tokens.typography.fontSize["2xl"]}
+            fontWeight={tokens.typography.fontWeight.bold}
+            color={tokens.colors.gray.gray10}
+          >
+            {config.title}
           </Text>
+        </YStack>
+        <YStack paddingBottom="$6">
+          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
+            {config.intro}
+          </Text>
+        </YStack>
+        <YStack paddingBottom="$4">
+          <TextAreaField
+            value={prompt}
+            onChangeText={onPromptChange}
+            placeholder={config.promptPlaceholder}
+            minHeight={192}
+            textAlignVertical="top"
+          />
+        </YStack>
+        {error ? (
+          <YStack paddingBottom="$4">
+            <Text variant="error">{error}</Text>
+          </YStack>
         ) : null}
         <XStack gap="$3">
           <Button variant="ghost" onPress={onEmptyCancel}>
@@ -197,44 +201,53 @@ export function AiSessionPage({
         paddingTop: tokens.spacing[4],
       }}
     >
-      <Text
-        fontSize={tokens.typography.fontSize["2xl"]}
-        fontWeight={tokens.typography.fontWeight.bold}
-        color={tokens.colors.gray.gray10}
-        marginBottom="$2"
-      >
-        {config.title}
-      </Text>
-      <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm} marginBottom="$4">
-        {session.phaseLabel}
-      </Text>
-      <YStack gap="$3" marginBottom="$4">
+      <YStack paddingBottom="$2">
+        <Text
+          fontSize={tokens.typography.fontSize["2xl"]}
+          fontWeight={tokens.typography.fontWeight.bold}
+          color={tokens.colors.gray.gray10}
+        >
+          {config.title}
+        </Text>
+      </YStack>
+      <YStack paddingBottom="$4">
+        <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
+          {session.phaseLabel}
+        </Text>
+      </YStack>
+      <YStack gap="$3" paddingBottom="$4">
         {session.messages.map((message, index) => (
           <YStack
             key={index}
-            marginStart={message.role === "user" ? "$8" : undefined}
-            marginEnd={message.role === "assistant" ? "$8" : undefined}
-            borderRadius={tokens.radii.md}
-            backgroundColor={message.role === "user" ? tokens.colors.gray.gray2 : "$primarySubtle"}
-            padding="$3"
+            paddingStart={message.role === "user" ? "$8" : undefined}
+            paddingEnd={message.role === "assistant" ? "$8" : undefined}
           >
-            <Text
-              fontSize={tokens.typography.fontSize.xs}
-              fontWeight={tokens.typography.fontWeight.semibold}
-              color={tokens.colors.gray.gray6}
-              textTransform="uppercase"
-              marginBottom="$1"
+            <YStack
+              borderRadius={tokens.radii.md}
+              backgroundColor={
+                message.role === "user" ? tokens.colors.gray.gray2 : "$primarySubtle"
+              }
+              padding="$3"
             >
-              {message.role === "user" ? "You" : "Plan"}
-            </Text>
-            <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
-              {message.content}
-            </Text>
+              <YStack paddingBottom="$1">
+                <Text
+                  fontSize={tokens.typography.fontSize.xs}
+                  fontWeight={tokens.typography.fontWeight.semibold}
+                  color={tokens.colors.gray.gray6}
+                  textTransform="uppercase"
+                >
+                  {message.role === "user" ? "You" : "Plan"}
+                </Text>
+              </YStack>
+              <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
+                {message.content}
+              </Text>
+            </YStack>
           </YStack>
         ))}
       </YStack>
       {session.canRefine ? (
-        <YStack marginBottom="$4" gap="$3">
+        <YStack paddingBottom="$4" gap="$3">
           <TextAreaField
             value={followUp}
             onChangeText={onFollowUpChange}
@@ -259,38 +272,40 @@ export function AiSessionPage({
         </YStack>
       ) : null}
       {preview ? (
-        <YStack
-          borderRadius={tokens.radii.lg}
-          borderWidth={1}
-          borderColor={tokens.colors.gray.gray3}
-          backgroundColor="$surface"
-          padding="$4"
-          marginBottom="$4"
-        >
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.semibold}
-            color={tokens.colors.gray.gray10}
-            marginBottom="$3"
+        <YStack paddingBottom="$4">
+          <YStack
+            borderRadius={tokens.radii.lg}
+            borderWidth={1}
+            borderColor={tokens.colors.gray.gray3}
+            backgroundColor="$surface"
+            padding="$4"
           >
-            {config.previewTitle}
-          </Text>
-          {preview}
-          <YStack marginTop="$4">
-            <Button variant="primary" disabled={busy} onPress={onFinalize}>
-              {finalizePending ? config.finalizePendingLabel : config.finalizeLabel}
-            </Button>
+            <YStack paddingBottom="$3">
+              <Text
+                fontSize={tokens.typography.fontSize.sm}
+                fontWeight={tokens.typography.fontWeight.semibold}
+                color={tokens.colors.gray.gray10}
+              >
+                {config.previewTitle}
+              </Text>
+            </YStack>
+            {preview}
+            <YStack paddingTop="$4">
+              <Button variant="primary" disabled={busy} onPress={onFinalize}>
+                {finalizePending ? config.finalizePendingLabel : config.finalizeLabel}
+              </Button>
+            </YStack>
           </YStack>
         </YStack>
       ) : null}
       {error ? (
-        <Text variant="error" marginBottom="$4">
-          {error}
-        </Text>
+        <YStack paddingBottom="$4">
+          <Text variant="error">{error}</Text>
+        </YStack>
       ) : null}
       {session.canCancel ? (
         <YStack
-          marginBottom={tokens.spacing[8]}
+          paddingBottom={tokens.spacing[8]}
           opacity={busy ? 0.5 : 1}
           pointerEvents={busy ? "none" : "auto"}
           onPress={handleCancel}

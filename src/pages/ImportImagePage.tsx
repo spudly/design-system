@@ -30,9 +30,11 @@ export function ImportImagePage({
 }: ImportImagePageProps) {
   return (
     <FormScreenLayout>
-      <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]} marginBottom="$6">
-        Import from Image
-      </Text>
+      <YStack paddingBottom="$6">
+        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
+          Import from Image
+        </Text>
+      </YStack>
       <Button
         variant="primary"
         disabled={loading}
@@ -43,7 +45,7 @@ export function ImportImagePage({
       >
         Take Photo
       </Button>
-      <YStack marginTop="$3">
+      <YStack paddingTop="$3">
         <Button
           variant="secondary"
           disabled={loading}
@@ -55,12 +57,12 @@ export function ImportImagePage({
         </Button>
       </YStack>
       {loading ? (
-        <Text color="$textMuted" marginTop="$4">
-          Importing…
-        </Text>
+        <YStack paddingTop="$4">
+          <Text color="$textMuted">Importing…</Text>
+        </YStack>
       ) : null}
       {error ? (
-        <YStack marginTop="$4">
+        <YStack paddingTop="$4">
           <Text variant="error">{error}</Text>
         </YStack>
       ) : null}

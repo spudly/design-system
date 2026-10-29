@@ -48,7 +48,7 @@ export function BulkSelectToolbar({
   return (
     <YStack>
       <SearchField value={search} onChangeText={onSearchChange} placeholder={searchPlaceholder} />
-      <XStack flexWrap="wrap" alignItems="center" gap="$3" marginBlockEnd="$3">
+      <XStack flexWrap="wrap" alignItems="center" gap="$3" paddingBlockEnd="$3">
         <Button
           variant="ghost"
           size="sm"

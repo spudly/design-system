@@ -476,16 +476,17 @@ function OutlineActionButton({
 
 function EyebrowLabel({ children }: { children: string }) {
   return (
-    <Text
-      marginBlockEnd="$1"
-      fontSize={tokens.typography.fontSize.xs}
-      fontWeight={tokens.typography.fontWeight.medium}
-      letterSpacing={0.3}
-      color={tokens.colors.gray.gray6}
-      textTransform="uppercase"
-    >
-      {children}
-    </Text>
+    <YStack paddingBlockEnd="$1">
+      <Text
+        fontSize={tokens.typography.fontSize.xs}
+        fontWeight={tokens.typography.fontWeight.medium}
+        letterSpacing={0.3}
+        color={tokens.colors.gray.gray6}
+        textTransform="uppercase"
+      >
+        {children}
+      </Text>
+    </YStack>
   );
 }
 
@@ -511,7 +512,7 @@ function LifecycleSection({
   return (
     <>
       {lifecycle.isEditable ? (
-        <XStack marginBlockEnd="$4" flexWrap="wrap" gap="$2">
+        <XStack paddingBlockEnd="$4" flexWrap="wrap" gap="$2">
           {onTweakManuallyPress ? (
             <OutlineActionButton
               label="Tweak manually"
@@ -559,7 +560,7 @@ function LifecycleSection({
         </XStack>
       ) : null}
       {lifecycle.candidates.length > 0 ? (
-        <YStack marginBlockEnd="$4" gap="$2">
+        <YStack paddingBlockEnd="$4" gap="$2">
           <Text
             fontSize={tokens.typography.fontSize.sm}
             fontWeight={tokens.typography.fontWeight.medium}
@@ -576,13 +577,11 @@ function LifecycleSection({
               backgroundColor="$primarySubtle"
               padding="$3"
             >
-              <Text
-                marginBlockEnd="$2"
-                fontSize={tokens.typography.fontSize.sm}
-                color={tokens.colors.gray.gray9}
-              >
-                {version.label}
-              </Text>
+              <YStack paddingBlockEnd="$2">
+                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
+                  {version.label}
+                </Text>
+              </YStack>
               {onActivateCandidatePress ? (
                 <Button
                   variant="primary"
@@ -644,55 +643,57 @@ function RatingsCard({
   onViewerRatingChange: ((stars: number | null) => void) | undefined;
 }) {
   return (
-    <Card variant="muted" marginBlockEnd="$4">
-      <EyebrowLabel>Community rating</EyebrowLabel>
-      {ratings.community ? (
-        <>
-          <XStack marginBlockEnd="$3" alignItems="center" gap="$2">
-            <Text color={tokens.colors.warning.warning5}>{ratings.community.stars}</Text>
-            <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
-              {ratings.community.label}
+    <YStack paddingBlockEnd="$4">
+      <Card variant="muted">
+        <EyebrowLabel>Community rating</EyebrowLabel>
+        {ratings.community ? (
+          <>
+            <XStack paddingBlockEnd="$3" alignItems="center" gap="$2">
+              <Text color={tokens.colors.warning.warning5}>{ratings.community.stars}</Text>
+              <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
+                {ratings.community.label}
+              </Text>
+            </XStack>
+            {ratings.community.hasStaleRatings ? (
+              <YStack paddingBlockEnd="$3">
+                <Text
+                  fontSize={tokens.typography.fontSize.xs}
+                  color={tokens.colors.warning.warning9}
+                >
+                  {STALE_COMMUNITY_RATING_HINT}
+                </Text>
+              </YStack>
+            ) : null}
+          </>
+        ) : (
+          <YStack paddingBlockEnd="$3">
+            <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
+              No community ratings yet
             </Text>
-          </XStack>
-          {ratings.community.hasStaleRatings ? (
-            <Text
-              marginBlockEnd="$3"
-              fontSize={tokens.typography.fontSize.xs}
-              color={tokens.colors.warning.warning9}
-            >
-              {STALE_COMMUNITY_RATING_HINT}
-            </Text>
-          ) : null}
-        </>
-      ) : (
-        <Text
-          marginBlockEnd="$3"
-          fontSize={tokens.typography.fontSize.sm}
-          color={tokens.colors.gray.gray7}
-        >
-          No community ratings yet
-        </Text>
-      )}
-      {ratings.viewer ? (
-        <>
-          <EyebrowLabel>Your rating</EyebrowLabel>
-          <ViewerRatingInput
-            value={ratings.viewer.value}
-            isPending={ratings.viewer.isPending ?? false}
-            onChange={onViewerRatingChange}
-          />
-          {ratings.viewer.isStale ? (
-            <Text
-              marginBlockStart="$2"
-              fontSize={tokens.typography.fontSize.xs}
-              color={tokens.colors.warning.warning9}
-            >
-              {STALE_VIEWER_RATING_HINT}
-            </Text>
-          ) : null}
-        </>
-      ) : null}
-    </Card>
+          </YStack>
+        )}
+        {ratings.viewer ? (
+          <>
+            <EyebrowLabel>Your rating</EyebrowLabel>
+            <ViewerRatingInput
+              value={ratings.viewer.value}
+              isPending={ratings.viewer.isPending ?? false}
+              onChange={onViewerRatingChange}
+            />
+            {ratings.viewer.isStale ? (
+              <YStack paddingBlockStart="$2">
+                <Text
+                  fontSize={tokens.typography.fontSize.xs}
+                  color={tokens.colors.warning.warning9}
+                >
+                  {STALE_VIEWER_RATING_HINT}
+                </Text>
+              </YStack>
+            ) : null}
+          </>
+        ) : null}
+      </Card>
+    </YStack>
   );
 }
 
@@ -736,45 +737,48 @@ function OverviewPanel({
     <>
       <YStack padding="$4">
         {imageUrl ? (
-          <YStack
-            marginBlockEnd="$4"
-            overflow="hidden"
-            borderRadius={tokens.radii.lg}
-            backgroundColor={tokens.colors.gray.gray1}
-            height={256}
-            width="100%"
-          >
-            <Image src={imageUrl} width="100%" height="100%" objectFit="contain" />
+          <YStack paddingBlockEnd="$4">
+            <YStack
+              overflow="hidden"
+              borderRadius={tokens.radii.lg}
+              backgroundColor={tokens.colors.gray.gray1}
+              height={256}
+              width="100%"
+            >
+              <Image src={imageUrl} width="100%" height="100%" objectFit="contain" />
+            </YStack>
           </YStack>
         ) : null}
-        <Text
-          fontSize={tokens.typography.fontSize["2xl"]}
-          fontWeight={tokens.typography.fontWeight.bold}
-          color={tokens.colors.gray.gray10}
-          marginBlockEnd="$2"
-        >
-          {title}
-        </Text>
-        <YStack marginBlockEnd="$4" alignSelf="flex-start">
+        <YStack paddingBlockEnd="$2">
+          <Text
+            fontSize={tokens.typography.fontSize["2xl"]}
+            fontWeight={tokens.typography.fontWeight.bold}
+            color={tokens.colors.gray.gray10}
+          >
+            {title}
+          </Text>
+        </YStack>
+        <YStack paddingBlockEnd="$4" alignSelf="flex-start">
           <StatusBadge status={status} />
         </YStack>
         {description ? (
-          <Text color={tokens.colors.gray.gray7} marginBlockEnd="$4">
-            {description}
-          </Text>
+          <YStack paddingBlockEnd="$4">
+            <Text color={tokens.colors.gray.gray7}>{description}</Text>
+          </YStack>
         ) : null}
-        <XStack
-          justifyContent="space-around"
-          backgroundColor={tokens.colors.gray.gray1}
-          borderRadius={tokens.radii.lg}
-          paddingVertical="$4"
-          marginBlockEnd="$4"
-        >
-          <StatCard label="Servings" value={servingsLabel} />
-          {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
-          {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
-        </XStack>
-        <XStack marginBlockEnd="$4" flexWrap="wrap" gap="$3">
+        <YStack paddingBlockEnd="$4">
+          <XStack
+            justifyContent="space-around"
+            backgroundColor={tokens.colors.gray.gray1}
+            borderRadius={tokens.radii.lg}
+            paddingVertical="$4"
+          >
+            <StatCard label="Servings" value={servingsLabel} />
+            {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
+            {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
+          </XStack>
+        </YStack>
+        <XStack paddingBlockEnd="$4" flexWrap="wrap" gap="$3">
           <Button variant="primary" flex={1} minWidth="40%" onPress={onStartCooking}>
             Start Cooking
           </Button>
@@ -822,15 +826,16 @@ function OverviewPanel({
           ) : null}
         </XStack>
         {actionMessage ? (
-          <Text
-            accessibilityRole="text"
-            marginBlockEnd="$4"
-            textAlign="center"
-            fontSize={tokens.typography.fontSize.sm}
-            color={tokens.colors.gray.gray7}
-          >
-            {actionMessage}
-          </Text>
+          <YStack paddingBlockEnd="$4">
+            <Text
+              accessibilityRole="text"
+              textAlign="center"
+              fontSize={tokens.typography.fontSize.sm}
+              color={tokens.colors.gray.gray7}
+            >
+              {actionMessage}
+            </Text>
+          </YStack>
         ) : null}
         {showLifecycle && lifecycle ? (
           <LifecycleSection
@@ -937,7 +942,7 @@ function IngredientsPanel({
           and afterwards shows the applied custom value selected.
           Same props contract as before — the app wiring is
           untouched. */}
-      <YStack gap="$3" marginBlockEnd="$4">
+      <YStack gap="$3" paddingBlockEnd="$4">
         <NumberStepper
           label="Servings"
           layout="inline"
@@ -947,14 +952,15 @@ function IngredientsPanel({
           editable
         />
         <XStack alignItems="center" gap="$2">
-          <Text
-            marginInlineEnd="$1"
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.medium}
-            color={tokens.colors.gray.gray8}
-          >
-            Scale
-          </Text>
+          <XStack paddingInlineEnd="$1">
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              fontWeight={tokens.typography.fontWeight.medium}
+              color={tokens.colors.gray.gray8}
+            >
+              Scale
+            </Text>
+          </XStack>
           <ToggleChipGroup
             options={SCALE_OPTIONS}
             mode="single"
@@ -1028,54 +1034,50 @@ function IngredientsPanel({
         >
           <Text flex={1}>{ingredient.label}</Text>
           {ingredient.isOptional ? (
-            <Text
-              fontSize={tokens.typography.fontSize.xs}
-              color="$textMuted"
-              marginInlineStart="$2"
-            >
-              optional
-            </Text>
+            <YStack paddingInlineStart="$2">
+              <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted">
+                optional
+              </Text>
+            </YStack>
           ) : null}
         </TouchableOpacity>
       ))}
       {hasMissing ? (
-        <Text variant="hint" marginBlockStart="$3">
-          {MISSING_INGREDIENTS_HINT}
-        </Text>
+        <YStack paddingBlockStart="$3">
+          <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text>
+        </YStack>
       ) : null}
       {view.isLoadingSubstitutions ? (
-        <Text variant="hint" marginBlockStart="$4">
-          Finding substitutions…
-        </Text>
+        <YStack paddingBlockStart="$4">
+          <Text variant="hint">Finding substitutions…</Text>
+        </YStack>
       ) : null}
       {view.substitutions && view.substitutions.length > 0 ? (
-        <YStack
-          marginBlockStart="$4"
-          borderRadius={tokens.radii.lg}
-          backgroundColor="$primarySubtle"
-          padding="$4"
-        >
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.semibold}
-            color="$primaryEmphasis"
-            marginBlockEnd="$2"
-          >
-            Substitutions
-          </Text>
-          {view.substitutions.map((sub) => (
-            <YStack key={sub.ingredient} marginBlockEnd="$2">
+        <YStack paddingBlockStart="$4">
+          <YStack borderRadius={tokens.radii.lg} backgroundColor="$primarySubtle" padding="$4">
+            <YStack paddingBlockEnd="$2">
               <Text
                 fontSize={tokens.typography.fontSize.sm}
-                fontWeight={tokens.typography.fontWeight.medium}
+                fontWeight={tokens.typography.fontWeight.semibold}
+                color="$primaryEmphasis"
               >
-                {sub.ingredient}
-              </Text>
-              <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
-                {sub.suggestions}
+                Substitutions
               </Text>
             </YStack>
-          ))}
+            {view.substitutions.map((sub) => (
+              <YStack key={sub.ingredient} paddingBlockEnd="$2">
+                <Text
+                  fontSize={tokens.typography.fontSize.sm}
+                  fontWeight={tokens.typography.fontWeight.medium}
+                >
+                  {sub.ingredient}
+                </Text>
+                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
+                  {sub.suggestions}
+                </Text>
+              </YStack>
+            ))}
+          </YStack>
         </YStack>
       ) : null}
     </YStack>
@@ -1105,28 +1107,30 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
               setActiveIndex(i);
             }}
           >
-            <YStack
-              marginBlockEnd="$3"
-              borderRadius={tokens.radii.lg}
-              borderWidth={1}
-              padding="$4"
-              borderColor={isActive ? "$primary" : tokens.colors.gray.gray2}
-              backgroundColor={isActive ? "$primarySubtle" : "$surface"}
-            >
-              <Text
-                marginBlockEnd="$1"
-                fontSize={tokens.typography.fontSize.xs}
-                fontWeight={tokens.typography.fontWeight.semibold}
-                color={isActive ? "$primary" : "$textMuted"}
+            <YStack paddingBlockEnd="$3">
+              <YStack
+                borderRadius={tokens.radii.lg}
+                borderWidth={1}
+                padding="$4"
+                borderColor={isActive ? "$primary" : tokens.colors.gray.gray2}
+                backgroundColor={isActive ? "$primarySubtle" : "$surface"}
               >
-                Step {step.stepNumber}
-              </Text>
-              <Text
-                fontSize={tokens.typography.fontSize.md}
-                {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
-              >
-                {step.body}
-              </Text>
+                <YStack paddingBlockEnd="$1">
+                  <Text
+                    fontSize={tokens.typography.fontSize.xs}
+                    fontWeight={tokens.typography.fontWeight.semibold}
+                    color={isActive ? "$primary" : "$textMuted"}
+                  >
+                    Step {step.stepNumber}
+                  </Text>
+                </YStack>
+                <Text
+                  fontSize={tokens.typography.fontSize.md}
+                  {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
+                >
+                  {step.body}
+                </Text>
+              </YStack>
             </YStack>
           </TouchableOpacity>
         );
@@ -1154,69 +1158,70 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
   return (
     <YStack padding="$4">
       {form !== null && form !== undefined ? (
-        <YStack marginBlockEnd="$4">{form}</YStack>
+        <YStack paddingBlockEnd="$4">{form}</YStack>
       ) : history.onLogCookPress ? (
-        <Button
-          variant="primary"
-          size="sm"
-          alignSelf="flex-start"
-          marginBlockEnd="$4"
-          onPress={history.onLogCookPress}
-        >
-          Log a cook
-        </Button>
+        <YStack paddingBlockEnd="$4" alignSelf="flex-start">
+          <Button variant="primary" size="sm" onPress={history.onLogCookPress}>
+            Log a cook
+          </Button>
+        </YStack>
       ) : null}
       {history.cookLogs.length === 0 ? (
         <Text variant="hint">{COOK_LOG_EMPTY_MESSAGE}</Text>
       ) : (
         history.cookLogs.map((log, index) => (
-          <YStack
-            key={log.id}
-            marginBlockEnd="$4"
-            borderRadius={tokens.radii.md}
-            borderWidth={1}
-            borderColor={tokens.colors.gray.gray2}
-            backgroundColor={tokens.colors.gray.gray1}
-            padding="$4"
-          >
-            <XStack marginBlockEnd="$1" alignItems="center" justifyContent="space-between" gap="$2">
-              <Text
-                fontSize={tokens.typography.fontSize.sm}
-                fontWeight={tokens.typography.fontWeight.medium}
-                color={tokens.colors.gray.gray10}
+          <YStack key={log.id} paddingBlockEnd="$4">
+            <YStack
+              borderRadius={tokens.radii.md}
+              borderWidth={1}
+              borderColor={tokens.colors.gray.gray2}
+              backgroundColor={tokens.colors.gray.gray1}
+              padding="$4"
+            >
+              <XStack
+                paddingBlockEnd="$1"
+                alignItems="center"
+                justifyContent="space-between"
+                gap="$2"
               >
-                {log.dateLabel}
-              </Text>
-              {log.starRating ? (
                 <Text
-                  accessibilityLabel={`${log.starRating} stars`}
+                  fontSize={tokens.typography.fontSize.sm}
+                  fontWeight={tokens.typography.fontWeight.medium}
                   color={tokens.colors.gray.gray10}
                 >
-                  {"★".repeat(log.starRating)}
+                  {log.dateLabel}
+                </Text>
+                {log.starRating ? (
+                  <Text
+                    accessibilityLabel={`${log.starRating} stars`}
+                    color={tokens.colors.gray.gray10}
+                  >
+                    {"★".repeat(log.starRating)}
+                  </Text>
+                ) : null}
+              </XStack>
+              {log.notes ? (
+                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
+                  {log.notes}
                 </Text>
               ) : null}
-            </XStack>
-            {log.notes ? (
-              <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
-                {log.notes}
-              </Text>
-            ) : null}
-            {history.onDeleteCookLogPress ? (
-              <XStack marginBlockStart="$2">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  backgroundColor={tokens.colors.danger.danger1}
-                  color={tokens.colors.danger.danger8}
-                  accessibilityLabel={`Delete cook log ${index + 1} from ${log.dateLabel}`}
-                  onPress={() => {
-                    history.onDeleteCookLogPress?.(log.id);
-                  }}
-                >
-                  Delete
-                </Button>
-              </XStack>
-            ) : null}
+              {history.onDeleteCookLogPress ? (
+                <XStack paddingBlockStart="$2">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    backgroundColor={tokens.colors.danger.danger1}
+                    color={tokens.colors.danger.danger8}
+                    accessibilityLabel={`Delete cook log ${index + 1} from ${log.dateLabel}`}
+                    onPress={() => {
+                      history.onDeleteCookLogPress?.(log.id);
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </XStack>
+              ) : null}
+            </YStack>
           </YStack>
         ))
       )}
@@ -1261,9 +1266,9 @@ function NutritionPanel({ nutrition }: { nutrition: RecipeDetailPageNutritionPro
   if (nutrition.state === "unavailable") {
     return (
       <YStack padding="$4">
-        <Text color="$textMuted" marginBlockEnd="$3">
-          Nutrition is not available yet.
-        </Text>
+        <YStack paddingBlockEnd="$3">
+          <Text color="$textMuted">Nutrition is not available yet.</Text>
+        </YStack>
         {nutrition.onEstimatePress ? (
           <Button
             variant="secondary"
@@ -1280,7 +1285,7 @@ function NutritionPanel({ nutrition }: { nutrition: RecipeDetailPageNutritionPro
   }
   return (
     <YStack padding="$4">
-      <XStack marginBlockEnd="$3" alignItems="center" justifyContent="space-between" gap="$3">
+      <XStack paddingBlockEnd="$3" alignItems="center" justifyContent="space-between" gap="$3">
         <Text
           fontSize={tokens.typography.fontSize.sm}
           fontWeight={tokens.typography.fontWeight.semibold}
@@ -1306,9 +1311,11 @@ function NutritionPanel({ nutrition }: { nutrition: RecipeDetailPageNutritionPro
       {nutrition.rows.map((row) => (
         <NutritionRow key={row.label} label={row.label} valueLabel={row.valueLabel} />
       ))}
-      <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted" marginBlockStart="$4">
-        {nutrition.disclaimer}
-      </Text>
+      <YStack paddingBlockStart="$4">
+        <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted">
+          {nutrition.disclaimer}
+        </Text>
+      </YStack>
     </YStack>
   );
 }
@@ -1322,15 +1329,16 @@ function NutritionPanel({ nutrition }: { nutrition: RecipeDetailPageNutritionPro
  * each carries its label — the labels the tab bar used to show. */
 function SectionHeading({ children }: { children: string }) {
   return (
-    <Text
-      paddingHorizontal="$4"
-      marginBlockStart="$2"
-      fontSize={tokens.typography.fontSize.lg}
-      fontWeight={tokens.typography.fontWeight.semibold}
-      color={tokens.colors.gray.gray10}
-    >
-      {children}
-    </Text>
+    <YStack paddingBlockStart="$2">
+      <Text
+        paddingHorizontal="$4"
+        fontSize={tokens.typography.fontSize.lg}
+        fontWeight={tokens.typography.fontWeight.semibold}
+        color={tokens.colors.gray.gray10}
+      >
+        {children}
+      </Text>
+    </YStack>
   );
 }
 

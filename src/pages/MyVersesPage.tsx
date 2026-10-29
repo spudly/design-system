@@ -1,5 +1,5 @@
 import { FlatList } from "react-native";
-import { XStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -110,20 +110,22 @@ function MyVerseRow({
   onRemovePress: () => void;
 }) {
   return (
-    <Card marginBottom="$2">
-      <Text variant="subheading">{item.reference}</Text>
-      <Badge tone={item.status === "memorized" ? "success" : "info"}>{item.status}</Badge>
-      <Text variant="verse">{item.text}</Text>
-      {item.nextReviewLabel ? <Text variant="hint">{item.nextReviewLabel}</Text> : null}
-      <XStack gap="$2" marginTop="$2">
-        <Button size="sm" onPress={onDrillPress}>
-          Drill
-        </Button>
-        <Button size="sm" variant="secondary" onPress={onRemovePress}>
-          Remove
-        </Button>
-      </XStack>
-    </Card>
+    <YStack paddingBottom="$2">
+      <Card>
+        <Text variant="subheading">{item.reference}</Text>
+        <Badge tone={item.status === "memorized" ? "success" : "info"}>{item.status}</Badge>
+        <Text variant="verse">{item.text}</Text>
+        {item.nextReviewLabel ? <Text variant="hint">{item.nextReviewLabel}</Text> : null}
+        <XStack gap="$2" paddingTop="$2">
+          <Button size="sm" onPress={onDrillPress}>
+            Drill
+          </Button>
+          <Button size="sm" variant="secondary" onPress={onRemovePress}>
+            Remove
+          </Button>
+        </XStack>
+      </Card>
+    </YStack>
   );
 }
 

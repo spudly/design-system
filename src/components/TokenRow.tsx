@@ -60,21 +60,20 @@ export function TokenRow({
             </Text>
           ) : null}
         </Text>
-        <Text
-          marginBlockStart={2}
-          fontFamily={tokens.typography.fontFamily.mono}
-          fontSize={tokens.typography.fontSize.xs}
-          color={tokens.colors.gray.gray6}
-        >
-          {prefix}…
-        </Text>
-        <Text
-          marginBlockStart={2}
-          fontSize={tokens.typography.fontSize.xs}
-          color={tokens.colors.gray.gray6}
-        >
-          {metaLabel}
-        </Text>
+        <YStack paddingBlockStart={2}>
+          <Text
+            fontFamily={tokens.typography.fontFamily.mono}
+            fontSize={tokens.typography.fontSize.xs}
+            color={tokens.colors.gray.gray6}
+          >
+            {prefix}…
+          </Text>
+        </YStack>
+        <YStack paddingBlockStart={2}>
+          <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.gray.gray6}>
+            {metaLabel}
+          </Text>
+        </YStack>
       </YStack>
       {revoked || !onRevoke ? null : (
         <Button

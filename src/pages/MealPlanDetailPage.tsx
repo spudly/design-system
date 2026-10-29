@@ -303,53 +303,64 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
 
   return (
     <ScreenContainer>
-      <Text
-        variant="heading"
-        fontSize={tokens.typography.fontSize.xl}
-        fontWeight={tokens.typography.fontWeight.bold}
-        marginBlockEnd="$4"
-      >
-        {title}
-      </Text>
-      {notes ? (
-        <Text color="$textMuted" marginBlockEnd="$4" fontSize={tokens.typography.fontSize.sm}>
-          {notes}
+      <YStack paddingBlockEnd="$4">
+        <Text
+          variant="heading"
+          fontSize={tokens.typography.fontSize.xl}
+          fontWeight={tokens.typography.fontWeight.bold}
+        >
+          {title}
         </Text>
+      </YStack>
+      {notes ? (
+        <YStack paddingBlockEnd="$4">
+          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
+            {notes}
+          </Text>
+        </YStack>
       ) : null}
       {dateRangeLabel ? (
-        <Text color="$textMuted" marginBlockEnd="$4" fontSize={tokens.typography.fontSize.sm}>
-          {dateRangeLabel}
-        </Text>
+        <YStack paddingBlockEnd="$4">
+          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
+            {dateRangeLabel}
+          </Text>
+        </YStack>
       ) : null}
       {nutritionLabel ? (
-        <Text marginBlockEnd="$4" fontSize={tokens.typography.fontSize.sm} color="$textMuted">
-          {nutritionLabel}
-        </Text>
+        <YStack paddingBlockEnd="$4">
+          <Text fontSize={tokens.typography.fontSize.sm} color="$textMuted">
+            {nutritionLabel}
+          </Text>
+        </YStack>
       ) : null}
       {showGoals ? (
-        <SectionCard title="Nutrition goals" marginBottom="$8">
-          {nutritionLabel ? (
-            <Text color="$textMuted" marginBlockEnd="$3" fontSize={tokens.typography.fontSize.sm}>
-              Plan total: {nutritionLabel}
-            </Text>
-          ) : null}
-          {nutritionGoals ? (
-            nutritionGoals.rows.map((row) => (
-              <GoalRow key={row.label} label={row.label} valueLabel={row.valueLabel} />
-            ))
-          ) : (
-            <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-              Set daily nutrition goals to compare this plan.
-            </Text>
-          )}
-          {onSetGoalsPress ? (
-            <YStack marginBlockStart="$3">
-              <TextLink onPress={onSetGoalsPress}>Set nutrition goals</TextLink>
-            </YStack>
-          ) : null}
-        </SectionCard>
+        <YStack paddingBottom="$8">
+          <SectionCard title="Nutrition goals">
+            {nutritionLabel ? (
+              <YStack paddingBlockEnd="$3">
+                <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
+                  Plan total: {nutritionLabel}
+                </Text>
+              </YStack>
+            ) : null}
+            {nutritionGoals ? (
+              nutritionGoals.rows.map((row) => (
+                <GoalRow key={row.label} label={row.label} valueLabel={row.valueLabel} />
+              ))
+            ) : (
+              <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
+                Set daily nutrition goals to compare this plan.
+              </Text>
+            )}
+            {onSetGoalsPress ? (
+              <YStack paddingBlockStart="$3">
+                <TextLink onPress={onSetGoalsPress}>Set nutrition goals</TextLink>
+              </YStack>
+            ) : null}
+          </SectionCard>
+        </YStack>
       ) : null}
-      <XStack marginBlockEnd="$6" flexWrap="wrap" gap="$3">
+      <XStack paddingBlockEnd="$6" flexWrap="wrap" gap="$3">
         <Button onPress={onShoppingListPress}>Shopping list</Button>
         <Button variant="secondary" onPress={onEditPress}>
           Edit

@@ -83,65 +83,61 @@ export function AccessTokensPanel({
         — without signing in each time. Treat them like passwords.
       </Alert>
       {createdSecret ? (
-        <YStack
-          marginTop="$4"
-          marginBottom="$4"
-          borderRadius={tokens.radii.md}
-          borderWidth={1}
-          borderColor={tokens.colors.warning.warning4}
-          backgroundColor={tokens.colors.warning.warning1}
-          padding="$4"
-        >
-          <Text
-            marginBottom="$2"
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.semibold}
-            color={tokens.colors.warning.warning10}
-          >
-            Copy your new token now — you won&apos;t see it again.
-          </Text>
+        <YStack paddingTop="$4" paddingBottom="$4">
           <YStack
-            marginBottom="$1"
-            borderRadius={tokens.radii.sm}
-            backgroundColor="$surface"
-            padding="$3"
+            borderRadius={tokens.radii.md}
+            borderWidth={1}
+            borderColor={tokens.colors.warning.warning4}
+            backgroundColor={tokens.colors.warning.warning1}
+            padding="$4"
           >
-            <Text
-              userSelect="text"
-              color={tokens.colors.gray.gray10}
-              style={{
-                fontFamily: tokens.typography.fontFamily.mono,
-                fontSize: tokens.typography.fontSize.sm,
-              }}
-            >
-              {createdSecret}
-            </Text>
+            <YStack paddingBottom="$2">
+              <Text
+                fontSize={tokens.typography.fontSize.sm}
+                fontWeight={tokens.typography.fontWeight.semibold}
+                color={tokens.colors.warning.warning10}
+              >
+                Copy your new token now — you won&apos;t see it again.
+              </Text>
+            </YStack>
+            <YStack paddingBottom="$1">
+              <YStack borderRadius={tokens.radii.sm} backgroundColor="$surface" padding="$3">
+                <Text
+                  userSelect="text"
+                  color={tokens.colors.gray.gray10}
+                  style={{
+                    fontFamily: tokens.typography.fontFamily.mono,
+                    fontSize: tokens.typography.fontSize.sm,
+                  }}
+                >
+                  {createdSecret}
+                </Text>
+              </YStack>
+            </YStack>
+            <YStack paddingBottom="$3">
+              <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
+                Long-press the token to copy it.
+              </Text>
+            </YStack>
+            <XStack gap="$2">
+              <Button variant="secondary" onPress={onDismissSecret}>
+                Done
+              </Button>
+            </XStack>
           </YStack>
-          <Text
-            marginBottom="$3"
-            fontSize={tokens.typography.fontSize.xs}
-            color={tokens.colors.warning.warning9}
-          >
-            Long-press the token to copy it.
-          </Text>
-          <XStack gap="$2">
-            <Button variant="secondary" onPress={onDismissSecret}>
-              Done
-            </Button>
-          </XStack>
         </YStack>
       ) : null}
       {planNotice ? (
         <Alert severity="info">{planNotice}</Alert>
       ) : (
-        <YStack marginBottom="$4">
+        <YStack paddingBottom="$4">
           <TextField
             label="Token name"
             value={tokenName}
             onChangeText={onTokenNameChange}
             placeholder="e.g. Claude Desktop"
           />
-          <YStack marginTop="$3">
+          <YStack paddingTop="$3">
             <Button
               variant="primary"
               disabled={!tokenName.trim() || createdSecret !== null || isCreating}

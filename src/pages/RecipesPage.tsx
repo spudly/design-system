@@ -654,15 +654,9 @@ function RecipeRow({
   onLogCookPress?: () => void;
 }) {
   return (
-    <Card
-      variant="elevated"
-      flexDirection="row"
-      flexWrap="wrap"
-      alignItems="center"
-      gap="$3"
-      marginBottom="$3"
-    >
-      {/* Both navigation press targets carry the button role and an
+    <YStack paddingBlockEnd="$3">
+      <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
+        {/* Both navigation press targets carry the button role and an
           accessible name built from the recipe title: the thumbnail
           target wraps only an image (or an empty placeholder), so
           without the label a screen reader meets an unidentified
@@ -673,21 +667,21 @@ function RecipeRow({
           control is a third press target nested in the text block's
           subtitle flow; its label names the action instead — see
           LogCookControl. */}
-      <TouchableOpacity
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={item.title}
-      >
-        <Thumbnail imageUrl={item.imageUrl} />
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={textBlockStyle}
-        onPress={onPress}
-        accessibilityRole="button"
-        accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
-      >
-        <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
-        {/* The subtitle line is a wrapping inline flow inside the
+        <TouchableOpacity
+          onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel={item.title}
+        >
+          <Thumbnail imageUrl={item.imageUrl} />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={textBlockStyle}
+          onPress={onPress}
+          accessibilityRole="button"
+          accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
+        >
+          <Text fontWeight={tokens.typography.fontWeight.semibold}>{item.title}</Text>
+          {/* The subtitle line is a wrapping inline flow inside the
             text block: the subtitle text first, the log-cook
             control immediately after it (right after the
             subtitle's final segment). The control flows with the
@@ -696,14 +690,17 @@ function RecipeRow({
             of sitting in the card row as a third flex item whose
             fixed width starved this block (the #205 failure, seen
             again in PR #120's narrow captures). */}
-        {item.subtitle || onLogCookPress ? (
-          <XStack flexWrap="wrap" alignItems="center" gap="$1" marginTop="$1">
-            {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
-            {onLogCookPress ? <LogCookControl item={item} onLogCookPress={onLogCookPress} /> : null}
-          </XStack>
-        ) : null}
-      </TouchableOpacity>
-    </Card>
+          {item.subtitle || onLogCookPress ? (
+            <XStack flexWrap="wrap" alignItems="center" gap="$1" paddingTop="$1">
+              {item.subtitle ? <Text variant="hint">{item.subtitle}</Text> : null}
+              {onLogCookPress ? (
+                <LogCookControl item={item} onLogCookPress={onLogCookPress} />
+              ) : null}
+            </XStack>
+          ) : null}
+        </TouchableOpacity>
+      </Card>
+    </YStack>
   );
 }
 
@@ -769,7 +766,7 @@ export function RecipesPage(props: RecipesPageProps) {
                     }
                   : {})}
               />
-              {hasAccessory ? <YStack marginBlockEnd="$3">{accessory}</YStack> : null}
+              {hasAccessory ? <YStack paddingBlockEnd="$3">{accessory}</YStack> : null}
             </>
           );
         }}
@@ -777,7 +774,7 @@ export function RecipesPage(props: RecipesPageProps) {
         onEndReachedThreshold={0.4}
         ListEmptyComponent={
           isLoading ? (
-            <YStack marginBlockStart="$8" alignItems="center">
+            <YStack paddingBlockStart="$8" alignItems="center">
               <Spinner label="Loading" />
             </YStack>
           ) : (
