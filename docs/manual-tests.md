@@ -550,6 +550,83 @@ recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
+## MediaRow
+
+Open in `Components/MediaRow`: Default, WithAccessory.
+
+1. Default: an elevated card with a 64px cover-cropped
+   thumbnail, a semibold title, and a hint subtitle with the
+   star control flowing after it. Both the thumbnail and the
+   text are links to the row's href — the card itself is not
+   pressable.
+2. WithAccessory: the row shows the gray placeholder well
+   instead of an image, and the accessory content renders under
+   the card inside the same list item, 12px below it.
+3. At a narrow width the text block wraps under the thumbnail
+   rather than collapsing beside it (the 60dp basis).
+
+**Run when:** `src/components/MediaRow.tsx`, its stories,
+RecipesPage's rows, or a changeset naming MediaRow.
+
+---
+
+## RatingStars
+
+Open in `Components/RatingStars`: Display, Pressable,
+UnratedPressable.
+
+1. Display: a rating of 4 renders four amber stars and one gray
+   star (fill rounds to the nearest whole star); the stars are
+   not a button.
+2. Pressable: the five stars are one button with a 44dp target
+   and the story's action label as its accessible name ("Log a
+   cook of Tuscan Chicken, rated 4 out of 5 stars").
+3. UnratedPressable: a single gray star as the button, same
+   target size, named "Log a cook of Arroz con Pollo".
+
+**Run when:** `src/components/RatingStars.tsx`, its stories,
+RecipesPage's log-cook control, or a changeset naming
+RatingStars.
+
+---
+
+## RemovableField
+
+Open in `Components/RemovableField`: Default.
+
+1. A small ghost "Remove" button sits right-aligned above the
+   Ingredient field at a 4px gap; its accessible name names the
+   field ("Remove Ingredient filter").
+2. The field under it renders at full width, unchanged.
+
+**Run when:** `src/components/RemovableField.tsx`, its
+stories, the catalog pages' filter bars, or a changeset naming
+RemovableField.
+
+---
+
+## FilterBar, SearchRow, ChoiceRow, FieldStack
+
+Open in `Components/FilterBar`, `Components/SearchRow`,
+`Components/ChoiceRow`, `Components/FieldStack`: Default (each).
+
+1. FilterBar: the search row and the added filter stack at a
+   12px rhythm with 16px above the first and 8px below the
+   last.
+2. SearchRow: the Filters button is exactly as tall as the
+   search field beside it — top and bottom edges align.
+3. ChoiceRow: the five filter-choice buttons wrap onto a
+   second line when the row runs out of width.
+4. FieldStack: the Min cal / Max cal fields stack at a 12px
+   rhythm, each full width.
+
+**Run when:** `src/components/FilterBar.tsx`,
+`src/components/SearchRow.tsx`, `src/components/ChoiceRow.tsx`,
+`src/components/FieldStack.tsx`, their stories, the catalog
+pages' filter bars, or a changeset naming any of them.
+
+---
+
 ## MealPlansPage & MealPlanDetailPage
 
 Open in `Pages/Eciperay/MealPlansPage`: Default, Empty, Loading,

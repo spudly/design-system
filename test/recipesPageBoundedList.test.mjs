@@ -1,34 +1,24 @@
 /**
- * Regression test for spudly/eciperay#188 (Android: the Recipes
- * screen is not scrollable — the filter form fills the viewport and
- * the recipe list below it is unreachable).
+ * RecipesPage list geometry (#188): the page's recipe list must
+ * fill the viewport height below the fixed shell's header area.
+ * The regression shipped because ScreenContainer's content box
+ * could not establish a definite cross-size: Tamagui's YStack
+ * defaults to alignItems "stretch", so a FlatList child rendered
+ * at its content height and every list after the first screenful
+ * was unreachable — no error, just silent truncation. The `list`
+ * ScreenContainer variant and the shared BoundedList pattern pin
+ * the fix.
  *
- * The app's diagnosis, verified against its layout: the screen is a
- * fixed `list` shell (by design it does not scroll), and the
- * FlatList inside it carried no height bound, so it sized to its
- * full content height, overflowed the viewport, and never received
- * a scrollable viewport of its own. Pinning the filters above the
- * bounded list was not a fix either: the filter form is nearly a
- * viewport tall on its own, so the list got only a sliver.
- *
- * RecipesPage (#49) is the design-system port of that screen, and
- * its structure is the contract this test guards in source:
- * 1. The shell is the non-scrolling `list` ScreenContainer
- *    (`variant="list"`, `scrollable={false}`).
- * 2. The FlatList is height-bounded with `flex: 1` (the listStyle
- *    constant) so the shell hands it exactly the leftover viewport.
- * 3. The filter bar renders as the list's ListHeaderComponent, so
- *    filters and recipes scroll together.
- * 4. While loading, the list stays mounted with empty data
- *    (`data={isLoading ? [] : recipes}`) — unmounting it would drop
- *    the focused filter input mid-typing; the spinner is the list's
- *    empty state instead.
- *
- * This is a source scan, not a render test: the failure happens in
- * Android's Yoga layout, which no JS renderer in this repo performs,
- * and the invariant is a per-literal property of the source (same
- * rationale as test/glyphLineHeight.test.mjs). Comments are
- * stripped before scanning so prose cannot satisfy the patterns.
+ * Since the #119 recipes-list tranche the page adopts BoundedList
+ * itself (separator="none" — the rows space themselves, exactly
+ * the pre-adoption structure; contentInset="page" — its 16px
+ * sides / 32px bottom inset, identical to the pre-adoption
+ * listContentStyle), so these pins run against the adoption and
+ * the shared component. The other fixed-header pages (Discover,
+ * MealtimeQueue) keep their own FlatList + listStyle composition;
+ * their separator/inset pins live in discoverPage.test.mjs and
+ * mealtimeQueuePage.test.mjs. Comments are stripped before
+ * scanning so prose cannot satisfy the patterns.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -37,59 +27,81 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "..", "src", "pages", "RecipesPage.tsx"), "utf8");
+const pagesDir = join(here, "..", "src", "pages");
+const code = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8")
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
 
-// Strip block and line comments so documented patterns in prose
-// (this file's subject is heavily commented) cannot pass the scan.
-const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-
-test("RecipesPage source is readable and non-trivial", () => {
-  assert.ok(code.length > 1000, "expected the full RecipesPage source");
-  assert.match(code, /export function RecipesPage/);
-});
-
-test("the shell is the non-scrolling list ScreenContainer", () => {
+test("RecipesPage renders the fixed list shell, non-scrolling", () => {
   assert.match(
     code,
-    /<ScreenContainer\s+variant="list"\s+scrollable=\{false\}>/,
-    'RecipesPage must render <ScreenContainer variant="list" scrollable={false}>',
+    /<ScreenContainer variant="list" scrollable=\{false\}>/,
+    "RecipesPage must render ScreenContainer's list variant so the shell owns the fill",
   );
 });
 
-test("the FlatList is height-bounded with flex: 1 (#188)", () => {
+test("RecipesPage adopts BoundedList with its separator and inset (#119)", () => {
+  assert.match(code, /import \{[\s\S]*?BoundedList[\s\S]*?\} from "\.\/BoundedList\.js";/);
+  assert.match(code, /<BoundedList/);
   assert.match(
     code,
-    /const listStyle = \{ flex: 1 \} as const;/,
-    "the listStyle constant must be exactly { flex: 1 }",
+    /separator="none"/,
+    "the rows space themselves (MediaRow's own padded wrapper) — no list separator, exactly the pre-adoption structure",
   );
   assert.match(
     code,
-    /<FlatList\s+style=\{listStyle\}/,
-    "the FlatList must take style={listStyle} so the shell bounds its height",
+    /contentInset="page"/,
+    "the page's 16px sides / 32px bottom inset is BoundedList's page inset",
+  );
+  assert.ok(
+    !code.includes("FlatList"),
+    "the page must not render its own list element — BoundedList owns it",
+  );
+  assert.ok(
+    !code.includes("listStyle"),
+    "the page must not carry the old listStyle constant — BoundedList owns the geometry",
   );
 });
 
-test("the filter bar renders as the list header, not a pinned sibling (#188)", () => {
-  const headerAt = code.indexOf("ListHeaderComponent");
-  const barAt = code.indexOf("<RecipesFiltersBar");
-  assert.ok(headerAt !== -1, "the FlatList must receive a ListHeaderComponent");
-  assert.ok(barAt > headerAt, "the filter bar must render inside the ListHeaderComponent");
-  assert.equal(
-    code.indexOf("<RecipesFiltersBar"),
-    code.lastIndexOf("<RecipesFiltersBar"),
-    "the filter bar must render exactly once (a second copy could pin above the list)",
+test("the list takes separating taps while the keyboard is open", () => {
+  assert.match(
+    code,
+    /keyboardShouldPersistTaps="handled"/,
+    "filter controls live in the list header — taps must land with the keyboard open",
   );
 });
 
-test("the list stays mounted while loading (#188 focus contract)", () => {
+test("loading keeps the list mounted and shows the spinner as its empty state", () => {
   assert.match(
     code,
     /data=\{isLoading \? \[\] : recipes\}/,
-    "loading must empty the data, not swap the tree, so the filter input keeps focus",
+    "loading empties the DATA, never the list — swapping the tree would unmount the focused filter input mid-typing",
   );
+  assert.match(code, /<BoundedListLoading \/>/);
   assert.match(
     code,
-    /ListEmptyComponent=\{\s*isLoading \?/,
-    "the loading spinner must render as the list's empty state",
+    /ListHeaderComponent=\{\s*<RecipesFiltersBar/,
+    "the filter bar renders once as the list header, so it scrolls with the recipes",
   );
+});
+
+test("rows render through MediaRow, standalone (no list-item wrapper)", () => {
+  assert.match(code, /renderItem=\{\(\{ item \}\) => \{/);
+  assert.match(code, /<MediaRow/);
+  assert.ok(
+    !code.includes('role="listitem"'),
+    "rows must not be wrapped in a listitem element — each row is a standalone article",
+  );
+});
+
+test("the list stories pin the bounded geometry (#188)", () => {
+  assert.match(
+    stories,
+    /<View width=\{430\} maxWidth="100%" height=\{844\}>/,
+    "the stories' Viewport bounds the list to a phone-height frame",
+  );
+  assert.match(stories, /export const Default/);
+  assert.match(stories, /export const Empty/);
+  assert.match(stories, /export const Loading/);
 });

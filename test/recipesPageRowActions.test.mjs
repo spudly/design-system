@@ -1,40 +1,18 @@
 /**
- * Contract test for the RecipesPage row actions rework (Stephen's
- * direction, 2026-10-24, after the narrow-viewport captures of
- * eciperay #205 still showed the expanded row crowding).
+ * RecipesPage row action contract: the rows carry a log-cook
+ * control mirroring the app card's affordance — the recipe's
+ * stars when it has a rating, a single unfilled star when it
+ * does not — and no other row action. "Log cook" is a callback
+ * only: the cook-log form and its mutation stay in the app (the
+ * inline form arrives through the accessory slot; see
+ * recipesPageAccessory.test.mjs). Deleting a recipe is a
+ * RecipeDetailPage action, not a list action, so the list
+ * exposes no delete callback at all.
  *
- * The row used to carry two text buttons, "Log cook" and "Delete".
- * They were the row's inflexible width, and Delete duplicated an
- * action that belongs on the details page. The rework:
- * 1. Delete is gone from the page entirely — no `onRecipeDelete`
- *    prop, no row delete control. (RecipeDetailPage keeps its own
- *    `onDeletePress` chip; that contract is untouched.)
- * 2. The recipe's rating is the log-cook control: the view model
- *    carries `rating`, a rated recipe renders five stars and
- *    pressing them fires the row's `onLogCookPress` — the same
- *    callback, with the same accessory-hides-the-control semantics
- *    (pinned by test/recipes-page-accessory.test.mjs).
- * 3. An unrated recipe renders a single icon-only button — one
- *    unfilled star, no text — firing the same callback.
- * 4. Both states are real buttons with an accessible name that
- *    says the action ("Log a cook of …"), because the stars alone
- *    would announce as a rating.
- * 5. The stories exercise both states, so the Chromatic / Android
- *    VR captures show stars rows and icon-button rows.
- * 6. Placement (Stephen's direction, 2026-10-24, after PR #120's
- *    final narrow baseline still showed the #205 failure): the
- *    control renders INLINE inside the text block — in the
- *    subtitle's wrapping flow, immediately after the subtitle
- *    text — and is never a flex item of the card row. As a
- *    trailing row item its fixed width still starved the text
- *    column at narrow widths.
- *
- * This is a source scan, not a render test, for the same reason as
- * the other RecipesPage tests: the repo has no JS renderer for
- * these components (CI screenshots are the render check), and the
- * invariants are per-literal properties of the source. Comments
- * are stripped before scanning so prose cannot satisfy the
- * patterns.
+ * Since the #119 recipes-list tranche the control is the
+ * RatingStars component and the row is MediaRow; the page
+ * composes the accessible names and places the control in the
+ * row's subtitle flow via MediaRow's subtitleAction slot.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -43,218 +21,89 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pagesDir = join(here, "..", "src", "pages");
-const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
+const code = readFileSync(join(here, "..", "src", "pages", "RecipesPage.tsx"), "utf8")
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+const ratingStars = readFileSync(join(here, "..", "src", "components", "RatingStars.tsx"), "utf8")
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+const mediaRow = readFileSync(join(here, "..", "src", "components", "MediaRow.tsx"), "utf8");
+const stories = readFileSync(join(here, "..", "src", "pages", "RecipesPage.stories.tsx"), "utf8");
 
-// Strip block and line comments so documented patterns in prose
-// cannot pass the scan.
-const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-
-test("no delete exists anywhere in the page contract", () => {
-  assert.ok(
-    !code.includes("onRecipeDelete"),
-    "RecipesPageProps must not declare an onRecipeDelete callback",
-  );
-  assert.ok(!code.includes("onDeletePress"), "RecipeRow must not take a delete press handler");
-  assert.ok(!code.includes("Delete"), "no Delete control or label may remain in RecipesPage");
-  assert.ok(
-    !stories.includes("onRecipeDelete"),
-    "the stories must not pass a delete callback that no longer exists",
-  );
+test("the log-cook callback is optional and keyed by recipe id", () => {
+  assert.match(code, /onLogCookPress\?: \(recipeId: string\) => void;/);
+  assert.match(code, /onLogCookPress\(item\.id\)/);
 });
 
-test("the view model carries the display rating separately from the subtitle", () => {
-  assert.match(
-    code,
-    /rating\?: number \| null;/,
-    "RecipesPageItem must declare rating?: number | null",
-  );
+test("there is no delete affordance on the list", () => {
+  assert.ok(!code.includes("onDelete"), "RecipesPage must not expose a delete callback");
+  assert.ok(!code.includes("Delete"), "RecipesPage rows render no delete control");
 });
 
-test("a rated recipe's stars are the log-cook button", () => {
+test("rows place the RatingStars control in the subtitle flow, rated names carrying the rating", () => {
+  const dollar = "$";
+  assert.match(code, /<RatingStars/);
   assert.match(
     code,
-    /rating !== null && rating !== undefined && rating > 0/,
-    "the rated branch must key on a present, positive rating",
-  );
-  assert.match(
-    code,
-    /accessibilityLabel=\{`Log a cook of \$\{item\.title\}, rated \$\{rating\} out of 5 stars`\}/,
-    "the stars pressable's label must name the log-cook action, the recipe, and the exact rating",
-  );
-  // Filled stars follow the DS star language: warning amber when
-  // filled, gray when not, filled count rounding the display
-  // rating to the nearest whole star.
-  assert.match(code, /Math\.min\(5, Math\.max\(1, Math\.round\(rating\)\)\)/);
-  assert.match(code, /tokens\.colors\.warning\.warning6/);
-  assert.match(code, /tokens\.colors\.gray\.gray4/);
-});
-
-test("an unrated recipe gets a single icon-only button with no text", () => {
-  assert.match(
-    code,
-    /accessibilityLabel=\{`Log a cook of \$\{item\.title\}`\}/,
-    "the icon button's label must name the log-cook action and the recipe",
-  );
-  // No text button survives: neither the old "Log cook" button nor
-  // any Button element in the row's trailing control.
-  assert.ok(!/>\s*Log cook\s*</.test(code), "the text Log cook button must be gone");
-  const controlAt = code.indexOf("function LogCookControl");
-  const rowAt = code.indexOf("function RecipeRow");
-  assert.ok(
-    controlAt !== -1 && rowAt > controlAt,
-    "LogCookControl must be defined before RecipeRow",
-  );
-  const control = code.slice(controlAt, rowAt);
-  assert.ok(
-    !control.includes("<Button"),
-    "the log-cook control must be pressable star/icon content, not a text Button",
-  );
-  assert.equal(
-    code.split("★").length - 1,
-    2,
-    "exactly two star glyph templates exist in the page: the rating row's glyph (mapped over five steps) and the unrated button's single star",
-  );
-});
-
-test("both control states fire the row's log-cook callback", () => {
-  const controlAt = code.indexOf("function LogCookControl");
-  const rowAt = code.indexOf("function RecipeRow");
-  const control = code.slice(controlAt, rowAt);
-  assert.equal(
-    control.split("onPress={handlePress}").length - 1,
-    2,
-    "the stars pressable and the icon button must each wire onPress to the control's press handler",
-  );
-  // The handler fires the row's callback — and first cancels the
-  // click's default action, because the control renders inside
-  // the row's text link (#248): on web, react-native-web stops
-  // the click's propagation but not its default, so without the
-  // cancellation the wrapping anchor would also navigate.
-  assert.match(control, /event\.preventDefault\(\);\s+onLogCookPress\(\);/);
-  assert.equal(
-    control.split('accessibilityRole="button"').length - 1,
-    2,
-    "both control states must declare the button role",
+    new RegExp(
+      "`Log a cook of \\" +
+        dollar +
+        "{item\\.title}, rated \\" +
+        dollar +
+        "{item\\.rating} out of 5 stars`",
+    ),
+    "the rated control's name must carry the rating — the stars alone would mislead a screen reader",
   );
   assert.match(
     code,
-    /<LogCookControl item=\{item\} onLogCookPress=\{onLogCookPress\} \/>/,
-    "RecipeRow must render the control with the row's item and callback",
+    new RegExp("`Log a cook of \\" + dollar + "{item\\.title}`"),
+    "the unrated control's name is just the action and the title",
+  );
+  assert.match(
+    code,
+    /subtitleAction=\{/,
+    "the control renders through MediaRow's subtitleAction slot",
+  );
+  assert.match(
+    mediaRow,
+    /flexWrap="wrap"\s+alignItems="center"\s+gap="\$1"\s+paddingTop="\$1"/,
+    "MediaRow's subtitle flow is a wrapping inline row — the action sits in the subtitle's flow",
+  );
+  assert.match(mediaRow, /\{subtitleAction\}/);
+});
+
+test("RatingStars fills by rounding, in the DS star colors", () => {
+  assert.match(
+    ratingStars,
+    /Math\.min\(5, Math\.max\(1, Math\.round\(rating\)\)\)/,
+    "display averages fill by rounding to whole stars, clamped to 1–5",
+  );
+  assert.match(ratingStars, /tokens\.colors\.warning\.warning6/);
+  assert.match(ratingStars, /tokens\.colors\.gray\.gray4/);
+  assert.equal(
+    ratingStars.split("★").length - 1,
+    2,
+    "two glyph literals: the star row's and the unrated button's single star",
   );
 });
 
-test("the control renders inline in the text block's subtitle flow, never as a row item", () => {
-  // The pre-fix structure: the control sat in a trailing XStack as
-  // the Card's third flex child, where its width starved the text
-  // column at narrow widths (the #205 failure in PR #120's narrow
-  // captures). That wrapper must not come back.
-  assert.ok(
-    !code.includes('marginInlineStart="$3"'),
-    "the trailing row-item wrapper for the log-cook control must be gone",
-  );
-  const rowAt = code.indexOf("function RecipeRow");
-  const pageAt = code.indexOf("export function RecipesPage");
-  assert.ok(rowAt !== -1 && pageAt > rowAt, "RecipeRow must be defined before RecipesPage");
-  const row = code.slice(rowAt, pageAt);
-  assert.equal(
-    row.split("<LogCookControl").length - 1,
-    1,
-    "RecipeRow must render the log-cook control exactly once",
-  );
-  // The control lives inside the row's text content — the block
-  // both platform text targets render. The text target is a real
-  // Anchor on web; on native the anchor is a Text and cannot carry
-  // the block, so a YStack frame carrying textBlockStyle renders
-  // the same content with a LinkOverlay anchor stretched under it
-  // (the frame's layering exception: the content is
-  // pointer-transparent, the control keeps its own presses).
-  const contentAt = row.indexOf("const renderTextContent");
-  const controlAt = row.indexOf("<LogCookControl");
-  const contentEndAt = row.indexOf("return (", contentAt);
-  assert.ok(
-    contentAt !== -1 && controlAt > contentAt && controlAt < contentEndAt,
-    "the control must render inside the shared text content both targets render",
-  );
-  // Both platform targets carry the text block style and render
-  // the shared content; the web target is the Anchor rendering the
-  // plain content, the native target renders the native variant
-  // over its LinkOverlay.
-  assert.equal(
-    row.split("style={textBlockStyle}").length - 1,
-    2,
-    "the web Anchor and the native frame must both carry textBlockStyle",
-  );
-  assert.ok(
-    row.slice(contentEndAt).includes("{textContent}") &&
-      row.slice(contentEndAt).includes("{renderTextContent(true)}"),
-    "the web target must render the plain content and the native target the native variant",
-  );
-  // The native layering contract (LinkOverlay): the text frame's
-  // overlay renders BEFORE the native content (bottom layer), its
-  // plain texts are pointer-transparent ("none") and the subtitle
-  // flow is "box-none", so hit testing falls through to the
-  // overlay while the control — default pointer events — keeps
-  // its presses. The thumbnail frame's overlay renders AFTER the
-  // thumbnail (topmost layer; nothing in that frame is
-  // interactive). These pins are the static coverage for the
-  // layering; tap behavior itself follows React Native's hitTest
-  // semantics and is not executable in this Node suite.
-  const nativeTextFrameAt = row.indexOf('<YStack style={textBlockStyle} position="relative">');
-  const textOverlayAt = row.indexOf("<LinkOverlay", nativeTextFrameAt);
-  const nativeContentAt = row.indexOf("{renderTextContent(true)}", nativeTextFrameAt);
-  assert.ok(
-    nativeTextFrameAt !== -1 &&
-      textOverlayAt > nativeTextFrameAt &&
-      nativeContentAt > textOverlayAt,
-    "the text frame's overlay must render before the native content (bottom layer)",
-  );
-  assert.equal(
-    row.split('pointerEvents={native ? "none" : undefined}').length - 1,
-    2,
-    "the native title and subtitle texts must be pointer-transparent",
-  );
-  assert.equal(
-    row.split('pointerEvents={native ? "box-none" : undefined}').length - 1,
-    1,
-    "the native subtitle flow must be box-none so the control inside it stays pressable",
-  );
-  const thumbFrameAt = row.indexOf('<View position="relative">');
-  const thumbAt = row.indexOf("<Thumbnail", thumbFrameAt);
-  const thumbOverlayAt = row.indexOf("<LinkOverlay", thumbFrameAt);
-  assert.ok(
-    thumbFrameAt !== -1 && thumbAt > thumbFrameAt && thumbOverlayAt > thumbAt,
-    "the thumbnail frame's overlay must render after the thumbnail (topmost layer)",
-  );
-  // Inside the content, the control sits in the subtitle's wrapping
-  // flow, after the subtitle text — so it flows with the text at the
-  // block's full width instead of holding width at the row's edge.
-  const flowAt = row.indexOf('flexWrap="wrap"', contentAt);
-  const subtitleAt = row.indexOf("{item.subtitle}", flowAt);
-  assert.ok(
-    flowAt > contentAt && flowAt < controlAt,
-    "a wrapping flow must open inside the text block before the control",
-  );
-  assert.ok(
-    subtitleAt > flowAt && subtitleAt < controlAt,
-    "the subtitle text must render in the flow before the control",
-  );
-  const flowCloseAt = row.indexOf("</XStack>", controlAt);
-  assert.ok(
-    flowCloseAt > controlAt && flowCloseAt < contentEndAt,
-    "the flow must close after the control, inside the text content",
+test("the pressable form cancels the click default before firing (the row's links must not also navigate)", () => {
+  assert.match(ratingStars, /event\.preventDefault\(\);\s*onPress\(\);/);
+  assert.match(ratingStars, /accessibilityRole: "button"/);
+  assert.match(
+    ratingStars,
+    /if \(!onPress\) \{\s*return <RatingStarRow rating=\{rating\} \/>;/,
+    "without onPress the stars are a static display, never a button",
   );
 });
 
-test("the stories exercise rated and unrated rows", () => {
-  assert.ok(
-    (stories.match(/rating: \d/g) ?? []).length >= 3,
-    "several fixture recipes must carry a rating so star rows render in captures",
-  );
+test("the stories exercise the control across rated and unrated rows", () => {
+  assert.match(stories, /onLogCookPress/);
+  assert.match(stories, /rating: 5/);
+  assert.match(stories, /rating: 4\.5/);
   assert.match(
     stories,
-    /id: "arroz-con-pollo",\s+href: "\/recipes\/arroz-con-pollo",\s+title: "Arroz con Pollo",\s+subtitle: "[^"]*",\s+\}/,
-    "at least one fixture recipe (Arroz con Pollo) must stay unrated so the icon-only button renders in captures",
+    /unrated rows \(Arroz con Pollo, Beef Chili\)/,
+    "the fixture's unrated rows (rating omitted) render the icon-only button",
   );
 });

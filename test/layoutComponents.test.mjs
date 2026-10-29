@@ -54,6 +54,11 @@ const sectionStackCode = code("SectionStack.tsx");
 const fieldRowCode = code("FieldRow.tsx");
 const listStackCode = code("ListStack.tsx");
 const centerCode = code("Center.tsx");
+const fieldStackCode = code("FieldStack.tsx");
+const filterBarCode = code("FilterBar.tsx");
+const searchRowCode = code("SearchRow.tsx");
+const choiceRowCode = code("ChoiceRow.tsx");
+const textFieldSource = readFileSync(join(componentsDir, "TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
 
 test("the layout components are exported from the built package root", async () => {
@@ -144,6 +149,72 @@ test("no layout component offers step, role, or margin props", () => {
       );
     }
   }
+});
+
+test("the filter-bar shells are exported from the built package root", async () => {
+  const dist = await import("../dist/index.js");
+  for (const name of ["FieldStack", "FilterBar", "SearchRow", "ChoiceRow"]) {
+    assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+  }
+});
+
+test("FieldStack owns the stacked-fields rhythm (#119)", () => {
+  assert.match(fieldStackCode, /styled\(YStack, \{\s+name: "FieldStack",/);
+  assert.match(fieldStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
+  assert.match(fieldStackCode, /Omit<StyledFieldStackProps, "gap" \| "alignItems">/);
+});
+
+test("FilterBar owns the filter bar's rhythm and its top/bottom inset (#119)", () => {
+  assert.match(filterBarCode, /styled\(YStack, \{\s+name: "FilterBar",/);
+  assert.match(filterBarCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
+  assert.match(filterBarCode, /paddingBlockStart: tokens\.spacing\[4\],/);
+  assert.match(filterBarCode, /paddingBlockEnd: tokens\.spacing\[2\],/);
+  assert.match(
+    filterBarCode,
+    /Omit<\s*StyledFilterBarProps,\s*"gap" \| "alignItems" \| "paddingBlockStart" \| "paddingBlockEnd"\s*>/,
+  );
+});
+
+test("SearchRow stretches its children — the Filters button matches the search field's height (#119)", () => {
+  assert.match(searchRowCode, /styled\(XStack, \{\s+name: "SearchRow",/);
+  assert.match(searchRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "stretch",/);
+  assert.match(searchRowCode, /Omit<StyledSearchRowProps, "gap" \| "alignItems">/);
+});
+
+test("ChoiceRow wraps its choice buttons (#119)", () => {
+  assert.match(choiceRowCode, /styled\(XStack, \{\s+name: "ChoiceRow",/);
+  assert.match(choiceRowCode, /gap: tokens\.spacing\[2\],\s+flexWrap: "wrap",/);
+  assert.match(choiceRowCode, /alignItems: "flex-start",/);
+  assert.match(choiceRowCode, /Omit<StyledChoiceRowProps, "gap" \| "flexWrap" \| "alignItems">/);
+});
+
+test("no filter-bar shell offers spacing or margin props", () => {
+  for (const [name, src] of [
+    ["FieldStack", fieldStackCode],
+    ["FilterBar", filterBarCode],
+    ["SearchRow", searchRowCode],
+    ["ChoiceRow", choiceRowCode],
+  ]) {
+    for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {
+      assert.ok(
+        !new RegExp(String.raw`${banned}\?:`).test(src),
+        `${name} must not carry a ${banned} prop (#119)`,
+      );
+    }
+  }
+});
+
+test("TextField's grow prop flexes the field's root, and only when set (#119)", () => {
+  assert.match(
+    textFieldSource,
+    /grow\?: boolean;/,
+    "TextFieldProps must carry the optional grow flag (the SearchField precedent)",
+  );
+  assert.match(
+    textFieldSource,
+    /\{\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)\}/,
+    "the field's root must take flex: 1 only when grow is set, so standalone fields are unchanged",
+  );
 });
 
 test("SearchField's grow prop flexes the field's root, and only when set", () => {

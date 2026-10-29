@@ -37,6 +37,10 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "..", "src", "pages");
 const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
+const removableField = readFileSync(
+  join(here, "..", "src", "components", "RemovableField.tsx"),
+  "utf8",
+);
 const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
 
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -83,7 +87,25 @@ test("removing a filter clears its values through the change callbacks", () => {
   assert.match(code, /onMinCaloriesChange\(""\);\s*onMaxCaloriesChange\(""\);/);
   assert.match(code, /onMinSatietyChange\(""\);\s*onMaxSatietyChange\(""\);/);
   assert.match(code, /onSortChange\("newest"\);\s*onSortDirChange\("desc"\);/);
-  assert.match(code, /accessibilityLabel=\{`Remove \$\{FILTER_LABELS\[id\]\} filter`\}/);
+});
+
+test("each added filter renders in a RemovableField named for that filter (#119)", () => {
+  // The remove affordance is the RemovableField component since
+  // the #119 recipes-list tranche; each usage names its filter.
+  for (const id of ["status", "ingredient", "calories", "satiety", "sort"]) {
+    assert.match(
+      code,
+      new RegExp(
+        String.raw`removeAccessibilityLabel=\{\`Remove \$\{FILTER_LABELS\.` +
+          id +
+          String.raw`\} filter\`\}`,
+      ),
+      `the ${id} filter's remove control must be named for the ${id} filter`,
+    );
+  }
+  assert.match(removableField, /export function RemovableField/);
+  assert.match(removableField, /accessibilityLabel=\{removeAccessibilityLabel\}/);
+  assert.match(removableField, />\s*Remove\s*<\/Button>/);
 });
 
 test("stories cover the initial, chooser-open and filters-added states", () => {

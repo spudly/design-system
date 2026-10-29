@@ -45,18 +45,20 @@ function count(code, literal) {
 }
 
 // The family's render-content functions flag their decorative
-// variant `decorative` (RecipesPage's is named `native`), and
-// the third element is the file's decorative-text count. Two of
-// the surfaces live in the generic row components since the #119
-// tranche-2 extraction merged with the stage-2 remodel: the plan
-// rows in CardRow, the entry rows in ListRow.
+// variant `decorative` (MediaRow's is named `native`, inherited
+// from RecipesPage), and the third element is the file's
+// decorative-text count. Three of the surfaces live in the
+// generic row components since the #119 extractions: the plan
+// rows in CardRow, the entry rows in ListRow, and the media
+// rows in MediaRow (the recipe list's rows, extracted in the
+// #119 recipes-list tranche).
 const FAMILY = [
   ["src/components/OptionCard.tsx", "decorative", 3],
   ["src/components/CardRow.tsx", "decorative", 2],
   ["src/components/ListRow.tsx", "decorative", 2],
+  ["src/components/MediaRow.tsx", "native", 2],
   ["src/pages/MealDetailPage.tsx", "decorative", 2],
   ["src/pages/MealsHubPage.tsx", "decorative", 2],
-  ["src/pages/RecipesPage.tsx", "native", 2],
 ];
 
 for (const [rel, flag, expectedCount] of FAMILY) {

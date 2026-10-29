@@ -199,10 +199,16 @@ test("RecipesPage no longer wires the plain stalling handler", () => {
 });
 
 test("both pages keep the loading-more footer on isFetchingNextPage", () => {
-  for (const [name, page] of [
-    ["RecipesPage", recipesPage],
-    ["DiscoverPage", discoverPage],
-  ]) {
-    assert.match(page, /isFetchingNextPage \? \(/, `${name}'s footer keys off isFetchingNextPage`);
-  }
+  assert.match(
+    discoverPage,
+    /isFetchingNextPage \? \(/,
+    "DiscoverPage's footer keys off isFetchingNextPage",
+  );
+  // RecipesPage renders the shared BoundedList loading-more
+  // helper as its footer since the #119 recipes-list tranche.
+  assert.match(
+    recipesPage,
+    /ListFooterComponent=\{isFetchingNextPage \? <BoundedListLoadingMore \/> : undefined\}/,
+    "RecipesPage's footer is the BoundedList loading-more helper, keyed off isFetchingNextPage",
+  );
 });

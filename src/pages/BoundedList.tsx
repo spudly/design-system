@@ -1,6 +1,8 @@
 import type { ComponentType, ReactElement } from "react";
 import { FlatList, View } from "react-native";
 import type { ListRenderItem, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import { YStack } from "tamagui";
+import { Spinner } from "../components/Spinner.js";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -75,6 +77,35 @@ const pageContentStyle = {
   paddingHorizontal: tokens.spacing[4],
   paddingBottom: tokens.spacing[8],
 } as const;
+
+/**
+ * The catalog lists' first-load state: the spinner that renders
+ * as the list's empty component while the first page loads —
+ * centered in the empty area, offset from the list's top by
+ * the page rhythm (32px). The list (and its header) stays
+ * mounted behind it; see BoundedList's header note.
+ */
+export function BoundedListLoading() {
+  return (
+    <YStack paddingBlockStart="$8" alignItems="center">
+      <Spinner label="Loading" />
+    </YStack>
+  );
+}
+
+/**
+ * The catalog lists' next-page state: the spinner that renders
+ * as the list's footer while a next page is in flight —
+ * centered, with the field rhythm (16px) of air above and
+ * below it.
+ */
+export function BoundedListLoadingMore() {
+  return (
+    <YStack alignItems="center" justifyContent="center" paddingVertical="$4">
+      <Spinner label="Loading" />
+    </YStack>
+  );
+}
 
 export type BoundedListProps<Item> = {
   /** The rows to render, in order. */
