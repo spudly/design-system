@@ -104,6 +104,16 @@ test("LegalSection frames the host's links under its title in the app treatment"
     "the title keeps the app section title's weight",
   );
   assert.match(source, /gap: tokens\.spacing\[3\]/, "the block carries its 12px rhythm");
+  assert.match(
+    source,
+    /color: "\$color"/,
+    "the title inks with the theme's text color, not a fixed gray step (legible on dark themes)",
+  );
+  assert.match(
+    source,
+    /accessibilityRole: "header", "aria-level": 2/,
+    "the title carries level-2 heading semantics, like the DS's other section titles",
+  );
 });
 
 test("TextLink's muted tone is the muted role on both frames, under an explicit color", () => {

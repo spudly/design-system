@@ -32,8 +32,9 @@ import { TextField } from "../components/TextField.js";
  * `hint` variant, and the message field takes TextAreaField's
  * own label — the same label treatment the email field's
  * TextField renders, where the page previously hand-rolled a
- * label beside the textarea. The submitted thanks takes the
- * `success` variant (the app form's bare success line).
+ * label beside the textarea — with the explicit accessible
+ * name the email field carries. The submitted thanks takes
+ * the `success` variant (the app form's bare success line).
  */
 
 export type FeedbackPageProps = {
@@ -77,6 +78,7 @@ export function FeedbackPage({
         <>
           <TextAreaField
             label="What's on your mind?"
+            accessibilityLabel="What's on your mind?"
             value={message}
             onChangeText={onMessageChange}
             placeholder="Tell us what happened or what you'd like to see improved."

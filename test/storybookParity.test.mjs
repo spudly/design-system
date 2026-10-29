@@ -119,6 +119,13 @@ test("every widget component has a story file titled Components/<Name>", () => {
   const dir = join(root, "src", "components");
   const index = read("src/components/index.ts");
   const exceptions = COMPONENT_STORY_EXCEPTIONS;
+  // The exception files stay unexported (see header): if one is
+  // ever exported from the barrel, it becomes public surface and
+  // owes a story decision.
+  assert.ok(
+    !index.includes('from "./PageFrame.js"'),
+    "PageFrame must stay unexported from src/components/index.ts (internal scaffolding)",
+  );
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),

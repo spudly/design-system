@@ -251,3 +251,12 @@ test("FeedbackPage is fully controlled; validation crosses as a boolean", () => 
   assert.match(source, /submitDisabled\?: boolean/);
   assert.doesNotMatch(source, /useAnalytics|useAuth|validateUserFeedback|APP_VERSION/);
 });
+
+test("FeedbackPage fields carry explicit accessible names", () => {
+  // The fields' visible labels associate on web through their
+  // Label elements; the native accessible names cross explicitly,
+  // as the email field's always has.
+  const source = page("FeedbackPage");
+  assert.match(source, /accessibilityLabel="What's on your mind\?"/);
+  assert.match(source, /accessibilityLabel="Email me back \(optional\)"/);
+});
