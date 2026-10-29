@@ -5,11 +5,12 @@
  * (ListLoadingState) — extracted from DiscoverPage in the
  * public-pages de-styling tranche so the catalog pages compose
  * them and pass data and callbacks only. (The bar's behavior
- * contract — the #96 chooser, the clearing semantics — is
- * pinned by test/discoverPage.test.mjs, which scans this
- * component's source; this file pins the extraction shape:
- * exports, the header geometry, and the loading state's
- * treatment.)
+ * contract — the #96 chooser, the removal/clearing semantics —
+ * is pinned here against the bar's own source;
+ * test/discoverPage.test.mjs pins the page's composition, not
+ * the bar. This file pins the extraction shape — exports, the
+ * header geometry, and the loading state's treatment — plus
+ * that behavior.)
  *
  * The bar is definition-driven (Stephen's ruling on PR #311):
  * which filters exist, their labels, option sets, and defaults
@@ -100,6 +101,34 @@ test("the bar takes its filters as caller-supplied definitions, never hardcoded 
     );
   }
   assert.ok(!/\binterface\b/.test(bar), "props are type aliases, never interfaces");
+});
+
+test("the bar's chooser adds filters and each added filter removes through RemovableField", () => {
+  // The chooser offers only the filters not yet added (#96),
+  // and choosing one appends it and closes the chooser.
+  assert.match(
+    bar,
+    /const addable = filters\.filter\(\(definition\) => !active\.includes\(definition\.id\)\);/,
+  );
+  assert.match(bar, /accessibilityLabel=\{`Add \$\{definition\.label\} filter`\}/);
+  assert.match(
+    bar,
+    /const addFilter = \(id: FilterId\) => \{\s*setActive\(\[\.\.\.active, id\]\);\s*setChooserOpen\(false\);/,
+  );
+  // Added filters render as RemovableFields; removing one
+  // clears its value back to its default and drops it from
+  // the active set.
+  assert.match(bar, /<RemovableField/);
+  assert.match(bar, /removeAccessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/);
+  assert.match(
+    bar,
+    /const removeFilter = \(definition: CatalogFilterDefinition<FilterId>\) => \{\s*clearFilter\(definition\);\s*setActive\(active\.filter\(\(filterId\) => filterId !== definition\.id\)\);/,
+  );
+  // One setter serves the controlled and uncontrolled forms:
+  // internal state moves only when uncontrolled, and the
+  // change callback always fires.
+  assert.match(bar, /if \(activeFilters === undefined\) setInternalActiveFilters\(next\);/);
+  assert.match(bar, /onActiveFiltersChange\?\.\(next\);/);
 });
 
 test("CatalogHeader renders the title as the heading over its controls", () => {

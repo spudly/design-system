@@ -608,10 +608,13 @@ Open in `Components/ListLoadingState`: Default.
    parent with its label; the state carries no padding or
    margin of its own — spacing around it is the parent's.
    The same component renders directly at the foot of a list
-   for the loading-more slot.
+   for the loading-more slot — check that rendering in
+   `Pages/Eciperay/DiscoverPage`: LoadingMore, where the
+   spinner follows the last card with the list's own gap.
 2. A list's error state has no wrapper component: the page
-   renders the Alert component directly, flush to the parent's
-   inset.
+   renders the Alert component directly — check in
+   `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
+   sits under the filter bar, flush to the parent's inset.
 
 **Run when:** `src/components/ListLoadingState.tsx`, its
 stories, or a changeset naming it.
