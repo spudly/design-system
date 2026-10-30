@@ -1,4 +1,4 @@
-import { Image, YStack, styled } from "tamagui";
+import { Image, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
@@ -52,8 +52,11 @@ export type ThumbnailProps = {
    * as an image with this name (the import review names its preview
    * this way); without it the image is decorative — `alt=""` on web
    * so no screen reader announces it by filename (list rows name
-   * their press target from the row's title instead), and on native
-   * an unlabeled image is not exposed as its own element.
+   * their press target from the row's title instead). On native a
+   * decorative image carries no `alt` at all: React Native's Image
+   * turns any non-null `alt` into `accessible: true` with that
+   * (empty) label, which would expose the image as an unlabeled
+   * accessibility element (#339).
    */
   accessibilityLabel?: string;
 };
@@ -69,6 +72,17 @@ export type ThumbnailProps = {
  * the image carries meaning), so the component serves any app's
  * imagery.
  */
+/**
+ * Props for a decorative (unnamed) image. On web, `alt=""` keeps
+ * screen readers from announcing the image by filename. On native
+ * the prop set is empty: React Native's Image maps any non-null
+ * `alt` to `accessible: true` plus an accessibilityLabel of that
+ * value, so an empty `alt` would expose the image as an unlabeled
+ * accessibility element instead of leaving it decorative —
+ * verified against the Android accessibility tree in #339.
+ */
+const decorativeImageProps = isWeb ? ({ alt: "" } as const) : ({} as const);
+
 export function Thumbnail({ src, variant = "hero", accessibilityLabel }: ThumbnailProps) {
   // A named image is exposed as an image with that name, routed
   // through the accessibility translator (Avatar's pattern, #235):
@@ -78,16 +92,16 @@ export function Thumbnail({ src, variant = "hero", accessibilityLabel }: Thumbna
   // image is not an accessibility element by default — without
   // it the label would never be announced (the translator drops
   // the flag on web, which needs no equivalent). An unnamed
-  // image is decorative: `alt=""` (DiscoveryCard's treatment)
-  // keeps web screen readers from announcing it by filename; the
-  // prop is ignored on native.
+  // image is decorative and takes decorativeImageProps instead:
+  // `alt=""` on web (DiscoveryCard's treatment), nothing on
+  // native, where an empty alt is NOT ignored (see the const).
   const a11yProps = accessibilityLabel
     ? platformAccessibilityProps({
         accessible: true,
         accessibilityRole: "image",
         accessibilityLabel,
       })
-    : { alt: "" };
+    : decorativeImageProps;
   if (variant === "banner") {
     return <StyledBannerImage src={src} {...a11yProps} />;
   }
