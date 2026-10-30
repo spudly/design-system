@@ -87,6 +87,20 @@ test("SSR: a pending card's stars are unfocusable and announced disabled (#316)"
     assert.ok(!tag.includes('aria-disabled="false"'), `no contradictory announcement: ${tag}`);
     assert.ok(tag.includes('tabindex="-1"'), `out of the tab order: ${tag}`);
   }
+  // The pending dim is exactly ONE 0.5, carried by the rating
+  // group itself. Derive the group's opacity utility class from
+  // its own tag (the class name differs between render setups),
+  // then count the elements carrying that exact class: a second
+  // dimmed element (a wrapper around the group, or the stars
+  // themselves) would compound the rendered opacity to 0.25
+  // while sharing the same single CSS rule, so the rule count
+  // alone cannot pin this — the element count does.
+  const groupTag = (html.match(/<[a-z]+[^>]*role="radiogroup"[^>]*>/) ?? [])[0] ?? "";
+  const opacityClass = (groupTag.match(/_o-[a-z0-9]+/) ?? [])[0];
+  assert.ok(opacityClass, "the pending rating group carries an opacity utility class");
+  const dimmedTags =
+    html.match(new RegExp(`<[a-z]+[^>]*class="[^"]*${opacityClass}[^"]*"[^>]*>`, "g")) ?? [];
+  assert.equal(dimmedTags.length, 1, "pending dims exactly one element (no stacked 0.5s)");
 });
 
 test("SSR: a read-only card renders no focusable star controls (#316)", async () => {
