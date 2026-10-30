@@ -67,7 +67,62 @@ test("the row thumbnail is the 64px cover square on its gray well", () => {
 test("a named image is exposed through the accessibility translator (Avatar's pattern)", () => {
   assert.match(
     code,
-    /const a11yProps = accessibilityLabel\s+\? platformAccessibilityProps\(\{\s+accessible: true,\s+accessibilityRole: "image",\s+accessibilityLabel,\s+\}\)\s+: \{ alt: "" \};/,
-    'the label must route through platformAccessibilityProps so web gets role=img + aria-label, not a leaked accessibilityLabel attribute; an unnamed image is decorative (alt="") so web screen readers never announce it by filename',
+    /const a11yProps = accessibilityLabel\s+\? platformAccessibilityProps\(\{\s+accessible: true,\s+accessibilityRole: "image",\s+accessibilityLabel,\s+\}\)\s+: decorativeImageProps;/,
+    "the label must route through platformAccessibilityProps so web gets role=img + aria-label, not a leaked accessibilityLabel attribute; an unnamed image takes the decorative props instead",
+  );
+});
+
+test("a decorative image's alt is web-only (native exposure, #339)", () => {
+  assert.match(
+    code,
+    /const decorativeImageProps = isWeb \? \(\{ alt: "" \} as const\) : \(\{\} as const\);/,
+    'React Native Image maps any non-null alt to accessible:true plus that label, so alt="" on native exposes an unnamed image as an unlabeled accessibility element (#339, verified against the Android accessibility tree); the decorative props must be alt="" on web and empty on native',
+  );
+});
+
+// Runtime imports are lazy (inside the SSR test) so the
+// source-scan tests above still run and report when the build
+// output is missing or broken.
+let runtimePromise;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const reactModule = await import("react");
+    const React = reactModule.default;
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider } = await import("tamagui");
+    const distRuntime = await import(join(here, "..", "dist", "index.js"));
+    return { React, renderToString, TamaguiProvider, ...distRuntime };
+  })();
+  return runtimePromise;
+}
+
+async function renderToHtml(element) {
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+    await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const html = renderToString(
+    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+  );
+  const styleEnd = html.lastIndexOf("</style>");
+  return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
+}
+
+test('SSR: an unnamed Thumbnail renders decorative on web — alt="" and no accessible name', async () => {
+  const { React, Thumbnail } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(Thumbnail, { src: "https://example.com/row.png", variant: "row" }),
+  );
+  assert.match(
+    html,
+    /<img[^>]*alt=""/,
+    'an unnamed image must render alt="" on web so screen readers never announce it by filename',
+  );
+  assert.ok(
+    !html.includes("aria-label"),
+    "a decorative image must not gain an accessible name on web",
+  );
+  assert.ok(
+    !html.includes("accessibilitylabel"),
+    "no raw RN accessibility prop may leak into the web render",
   );
 });
