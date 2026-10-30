@@ -1,8 +1,9 @@
-import { Anchor, Image, View, YStack, isWeb } from "tamagui";
+import { Anchor, View, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Card } from "./Card.js";
 import { Text } from "./Text.js";
+import { Thumbnail } from "./Thumbnail.js";
 
 /**
  * DiscoveryCard (#168): one public-catalog recipe as a standalone
@@ -67,17 +68,23 @@ export type DiscoveryCardProps = {
 // changes.
 const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
 
-function Thumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
+// The card's thumbnail slot: the shared Thumbnail's row variant
+// when the recipe has an image, the same-size placeholder block
+// when it does not. The image is decorative — the card's
+// accessible name is its title and subtitle — and it renders
+// through the shared component rather than a local Image so it
+// carries that component's platform-split decorative treatment:
+// `alt=""` on web, no `alt` on native, where React Native's Image
+// turns any non-null alt into an accessible element carrying
+// that (empty) label. A local `alt=""` Image was verified against
+// the Android accessibility tree in #349 to surface as its own
+// focusable, unnamed element inside the card — the card's native
+// link grouping does not mask it. The row variant's geometry is
+// the helper's own (64dp square, cover crop, medium radius, gray
+// well), so the render is unchanged.
+function CardThumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
   return imageUrl ? (
-    <Image
-      src={imageUrl}
-      alt=""
-      width="$16"
-      height="$16"
-      borderRadius={tokens.radii.md}
-      backgroundColor={tokens.colors.gray.gray1}
-      objectFit="cover"
-    />
+    <Thumbnail src={imageUrl} variant="row" />
   ) : (
     <View
       width="$16"
@@ -91,7 +98,7 @@ function Thumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
 export function DiscoveryCard({ title, subtitle, imageUrl, href }: DiscoveryCardProps) {
   const card = (
     <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
-      <Thumbnail imageUrl={imageUrl} />
+      <CardThumbnail imageUrl={imageUrl} />
       <YStack style={textBlockStyle} gap="$1">
         <Text fontWeight={tokens.typography.fontWeight.semibold}>{title}</Text>
         {subtitle ? <Text variant="hint">{subtitle}</Text> : null}
