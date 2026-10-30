@@ -27,7 +27,10 @@ const EQUAL_BUTTON_MIN_WIDTH = "40%";
  * Flatten the row's children into its items: a variant fragment a
  * caller wraps its buttons in contributes its own children, and
  * the child forms that render nothing (null, undefined, booleans)
- * drop out.
+ * drop out. An element lifted out of a fragment is re-keyed with
+ * the fragment's own key (or position) as a scope prefix: two
+ * fragments may each hold a child keyed the same, and the
+ * flattened list must not carry duplicate keys.
  */
 function flattenRowChildren(children: ReactNode): ReactNode[] {
   const items: ReactNode[] = [];
@@ -35,9 +38,24 @@ function flattenRowChildren(children: ReactNode): ReactNode[] {
     if (node === null || node === undefined || typeof node === "boolean") return;
     items.push(node);
   };
-  Children.forEach(children, (child) => {
+  Children.forEach(children, (child, childIndex) => {
     if (isValidElement(child) && child.type === Fragment) {
-      Children.forEach((child as ReactElement<{ children?: ReactNode }>).props.children, push);
+      const scope = (child as ReactElement).key ?? `fragment-${childIndex}`;
+      Children.forEach(
+        (child as ReactElement<{ children?: ReactNode }>).props.children,
+        (inner, innerIndex) => {
+          if (inner === null || inner === undefined || typeof inner === "boolean") return;
+          if (isValidElement(inner)) {
+            items.push(
+              cloneElement(inner as ReactElement, {
+                key: `${scope}:${(inner as ReactElement).key ?? innerIndex}`,
+              }),
+            );
+          } else {
+            items.push(inner);
+          }
+        },
+      );
     } else {
       push(child);
     }
@@ -70,8 +88,11 @@ function flattenRowChildren(children: ReactNode): ReactNode[] {
  * Extracted from PublicRecipePage's CTA bar, which hand-rolled
  * this sizing in the page (a raw stack plus per-button
  * cloneElement sizing) — styling a page may not apply itself
- * under #119. RecipeDetailPage's cooking-action bar hand-rolls
- * the same treatment and is the second consumer.
+ * under #119. The row's scope is bars whose buttons are all
+ * peers: a bar that mixes in fixed-width actions (an icon-only
+ * print or share button, say) is a different, mixed-width
+ * treatment and keeps its own layout — it is not a consumer of
+ * this row.
  */
 export function EqualButtonRow({ children, ...rest }: EqualButtonRowProps) {
   const items = flattenRowChildren(children);

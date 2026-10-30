@@ -60,3 +60,9 @@ test("the row sizes its buttons itself: flex 1 with the 40% floor", () => {
   assert.match(code, /cloneElement\(/);
   assert.match(code, /flex: 1,\s+minWidth: EQUAL_BUTTON_MIN_WIDTH/);
 });
+
+test("elements lifted out of a fragment are re-keyed under the fragment's scope", () => {
+  // Two fragments may each hold a child keyed the same; the
+  // flattened list must not carry duplicate keys.
+  assert.match(code, /cloneElement\(inner as ReactElement, \{\s+key: `\$\{scope\}:/);
+});

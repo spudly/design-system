@@ -344,8 +344,7 @@ props to pass.
    PublicRecipePage adopts).
 
 **Run when:** `src/components/EqualButtonRow.tsx`, its stories,
-PublicRecipePage's CTA bar, RecipeDetailPage's cooking-action
-bar, or a changeset naming EqualButtonRow.
+PublicRecipePage's CTA bar, or a changeset naming EqualButtonRow.
 
 ---
 
