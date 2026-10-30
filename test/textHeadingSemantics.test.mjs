@@ -21,6 +21,12 @@
  *    `aria-level="2"`, body Text renders no heading role, a caller
  *    role override renders that role with no aria-level, and no RN
  *    accessibility prop leaks to the DOM.
+ * 4. SectionHeading (#317): the shared section heading states the
+ *    same semantics explicitly — `accessibilityRole="header"` plus
+ *    `aria-level={2}` on its subheading Text — so a detail page's
+ *    sections (Ingredients / Instructions / …) render as level-2
+ *    headings under the page title's level 1, instead of relying
+ *    on the variant default alone.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -153,6 +159,32 @@ test("SSR: heading and subheading Text render heading semantics (#256)", async (
   );
   assert.ok(!label.includes("aria-level"), "label must not carry aria-level");
   assertNoLeak(label);
+});
+
+test("SectionHeading states header role and level 2 explicitly (#317)", () => {
+  const source = readCode("src/components/SectionHeading.tsx");
+  assert.match(
+    source,
+    /<Text\s+variant="subheading"\s+accessibilityRole="header"\s+aria-level=\{2\}\s*>/,
+    "SectionHeading must render its subheading Text with accessibilityRole header and aria-level 2",
+  );
+});
+
+test("SSR: SectionHeading renders as a level-2 heading (#317)", async () => {
+  const { React, SectionHeading } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(SectionHeading, null, "Ingredients"),
+  );
+  assert.ok(
+    html.includes('role="heading"'),
+    `expected role=heading in: ${html.slice(0, 400)}`,
+  );
+  assert.ok(
+    html.includes('aria-level="2"'),
+    `expected aria-level=2 in: ${html.slice(0, 400)}`,
+  );
+  assert.ok(html.includes("Ingredients"), "the section label must render");
+  assertNoLeak(html);
 });
 
 test("SSR: both role props — a rendered button keeps no aria-level (#256)", async () => {

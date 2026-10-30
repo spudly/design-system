@@ -22,7 +22,24 @@ export type SectionHeadingProps = {
  * rule that removed the padded offsets from the list states —
  * a heading that carries its own offset is a margin by another
  * name.
+ *
+ * Heading semantics (#317): a section heading is a heading,
+ * not plain text — screen-reader heading navigation must be
+ * able to jump between a detail page's sections. Following
+ * the #263 heading regime (page titles at level 1), the label
+ * carries the heading role at level 2, stated explicitly here
+ * rather than left to the `subheading` variant's default in
+ * Text: `accessibilityRole="header"` plus `aria-level={2}`.
+ * On web, Text's platform translator renders that as
+ * `role="heading"` with `aria-level="2"`; on native the
+ * `header` role alone carries heading navigation (React
+ * Native has no heading-level prop, so the translator drops
+ * `aria-level` there).
  */
 export function SectionHeading({ children }: SectionHeadingProps) {
-  return <Text variant="subheading">{children}</Text>;
+  return (
+    <Text variant="subheading" accessibilityRole="header" aria-level={2}>
+      {children}
+    </Text>
+  );
 }
