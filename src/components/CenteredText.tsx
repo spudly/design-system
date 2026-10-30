@@ -18,12 +18,13 @@ export type CenteredTextProps = TextProps & {
  * line itself (each wrapped line centers, which a centered
  * flex item would not do).
  *
- * This is also the canonical home of the recipedetail
- * tranche's StatusMessage (#119 dedupe, cluster B8): a lone
- * centered status line is this component at the small size
- * with `muted` — the two tranches' centered-line components
- * were the same job at near-identical treatments, so one
- * ships.
+ * The recipedetail tranche's StatusMessage was folded in here
+ * by the #119 dedupe (cluster B8) as a static centered line, and
+ * ships separately again since #318: a transient action
+ * confirmation needs an always-mounted polite live region,
+ * which a static centered line must not carry (every subtitle
+ * would become a live region). StatusMessage owns that
+ * announcer contract; this component stays the static line.
  */
 export function CenteredText({ muted = false, ...rest }: CenteredTextProps) {
   return <Text textAlign="center" {...(muted ? { color: "$textMuted" } : {})} {...rest} />;

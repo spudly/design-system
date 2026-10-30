@@ -635,7 +635,7 @@ stories, or a changeset naming it.
 
 ---
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, SearchRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, StatusMessage, SearchRow, RemovableField)
 
 Open in `Components/StepList`: Default;
 `Components/MarkableRow`: Default;
@@ -643,6 +643,7 @@ Open in `Components/StepList`: Default;
 `Components/TagList`: Default; `Components/FieldStack`: (its
 stories); `Components/TextActionCardRow`: (its stories);
 `Components/CenteredText`: (its stories);
+`Components/StatusMessage`: Default, Empty, Transient;
 `Components/SearchRow`: (its stories);
 `Components/RemovableField`: (its stories).
 
@@ -658,6 +659,11 @@ stories); `Components/TextActionCardRow`: (its stories);
 5. SearchRow: the search field claims the row's width and its
    trailing action sits at the end; RemovableField's remove
    button names the value it removes.
+6. StatusMessage: the message line is centered, small, and in
+   muted ink that stays readable in the dark theme; Empty shows
+   nothing (the live region is mounted but empty); Transient's
+   toggle makes the confirmation appear and disappear under the
+   button row without shifting focus.
 
 **Run when:** any of these components, their stories, or a
 changeset naming them.
