@@ -140,6 +140,15 @@ test("ShoppingListPage check-off is controlled per line with real checkbox seman
     page.includes("CheckRow"),
     "rows render through the generic CheckRow since the #119 de-styling — the checkbox semantics (routed through the platform translator, #237) and the checked strike-through are pinned in test/checkRow.test.mjs",
   );
+  assert.ok(page.includes("label={line.name}"), "row labels use each line's name");
+  assert.ok(
+    page.includes("checked={line.isChecked}"),
+    "row checked state uses each line's isChecked",
+  );
+  assert.ok(
+    page.includes("onToggleLine(line.key)"),
+    "toggles report the line's key through onToggleLine",
+  );
   assert.ok(!page.includes("☑") && !page.includes("☐"), "the app's text glyphs must not cross");
   assert.ok(page.includes("quantityLabel"), "quantities cross pre-composed");
 });

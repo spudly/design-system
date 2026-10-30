@@ -568,8 +568,9 @@ Open in `Components/StepOverlay`: Default.
    light text, and the translucent Done pill sits at the top
    right (focusable on web; Enter/Space activate it).
 2. The story's dots and Back / Next row render below the body,
-   composed by the caller — the shell adds no spacing or
-   controls of its own there.
+   composed by the caller — the controls are the caller's; the
+   shell owns only the gap above them (its 32px body bottom
+   padding).
 
 **Run when:** `src/components/StepOverlay.tsx`, its stories,
 MealCookingModePage, or a changeset naming StepOverlay.
