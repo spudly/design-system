@@ -62,8 +62,26 @@ export type TextFieldProps = StyledInputProps & {
  * Labeled text input with error-state support. Associates the label via
  * `htmlFor`, wires error text through `aria-describedby`/`aria-invalid`,
  * and enforces a 44px minimum touch target. Pass `secureTextEntry` for
- * password fields.
+ * password fields. `autoComplete` accepts React Native's values; the
+ * password tokens are translated to the HTML tokens on web (#321).
  */
+/**
+ * The auth forms pass React Native's Android-vocabulary autocomplete
+ * hints (`password`, `password-new`), which the HTML `autocomplete`
+ * attribute does not define — web password managers ignore them.
+ * The valid web tokens are `current-password` / `new-password`
+ * (#321). Native needs no translation: React Native 0.88's TextInput
+ * accepts the native values as-is (and itself maps `new-password`
+ * to `password-new` for Android internally), so only the two
+ * password tokens are rewritten, and only on web; every other
+ * value (`email`, `username`, `off`, …) passes through unchanged
+ * on both platforms.
+ */
+const webAutoCompleteByNativeAutoComplete: Record<string, string> = {
+  password: "current-password",
+  "password-new": "new-password",
+};
+
 export function TextField({
   label,
   error,
@@ -71,6 +89,7 @@ export function TextField({
   id: idProp,
   secureTextEntry,
   type,
+  autoComplete,
   onSubmitEditing,
   onCompositionStart,
   onCompositionEnd,
@@ -118,6 +137,18 @@ export function TextField({
         : { secureTextEntry, type },
     ).filter(([, value]) => value !== undefined),
   ) as Pick<StyledInputProps, "type" | "secureTextEntry">;
+
+  // `autoComplete` is destructured out of the rest props and
+  // re-emitted per platform (#321, see the map above): on web the
+  // two RN password tokens become the HTML tokens; on native the
+  // caller's value passes through unchanged.
+  const autoCompleteProps = Object.fromEntries(
+    Object.entries({
+      autoComplete: isWeb
+        ? (webAutoCompleteByNativeAutoComplete[autoComplete ?? ""] ?? autoComplete)
+        : autoComplete,
+    }).filter(([, value]) => value !== undefined),
+  ) as Pick<StyledInputProps, "autoComplete">;
 
   // IME composition guard (web): Tamagui's Input fires
   // `onSubmitEditing` from its Enter keydown handler without
@@ -178,6 +209,7 @@ export function TextField({
         {...a11yProps}
         {...rest}
         {...secureProps}
+        {...autoCompleteProps}
         {...(onSubmitEditing ? { onSubmitEditing: handleSubmitEditing } : {})}
         {...(isWeb
           ? {

@@ -32,6 +32,21 @@ const StyledCard = styled(YStack, {
         shadowOpacity: tokens.shadows.md.shadowOpacity,
         shadowRadius: tokens.shadows.md.shadowRadius,
       },
+      // Compact surface: filled, no border — 12px padding, the
+      // medium radius, the small shadow. The dense-row treatment
+      // (tag rows, inline editors), folded in from the former
+      // CompactCard under Stephen's 2026-10-29 ruling: a surface
+      // treatment difference is a variant of Card, not a
+      // separate component.
+      compact: {
+        borderWidth: 0,
+        borderRadius: tokens.radii.md,
+        padding: tokens.spacing[3],
+        shadowColor: tokens.shadows.sm.shadowColor,
+        shadowOffset: tokens.shadows.sm.shadowOffset,
+        shadowOpacity: tokens.shadows.sm.shadowOpacity,
+        shadowRadius: tokens.shadows.sm.shadowRadius,
+      },
     },
   } as const,
 
@@ -46,9 +61,10 @@ export type CardProps = StyledCardProps & {
   /**
    * Appearance: `default` (filled, bordered), `bordered` (outline only),
    * `muted` (page-background fill, no border), `elevated` (filled, soft
-   * shadow, no border).
+   * shadow, no border), `compact` (filled, no border — 12px padding,
+   * medium radius, small shadow; dense rows and inline editors).
    */
-  variant?: "default" | "bordered" | "muted" | "elevated";
+  variant?: "default" | "bordered" | "muted" | "elevated" | "compact";
   /** @deprecated Use `variant="elevated"` instead. Kept for existing consumers. */
   elevated?: boolean;
 };
@@ -60,16 +76,19 @@ export type CardProps = StyledCardProps & {
  */
 export function Card({ variant, elevated = false, style, ...rest }: CardProps) {
   const resolvedVariant = variant ?? (elevated ? "elevated" : "default");
-  // Android shadow for the elevated variant: `elevation` comes from the same
+  // Android shadow for the shadowed variants: `elevation` comes from the same
   // shadow token as the iOS shadow props above and is applied via `style`,
   // because Tamagui v3's styled() typing accepts it in neither the static
   // config nor this component's props. It is composed as a style array under
   // the caller's style (React Native flattens arrays left to right), so
   // unrelated caller styles — including caller style arrays — preserve the
   // shadow and an explicit caller elevation wins.
-  const composedStyle = [
-    resolvedVariant === "elevated" ? { elevation: tokens.shadows.md.elevation } : undefined,
-    style,
-  ];
+  const elevation =
+    resolvedVariant === "elevated"
+      ? tokens.shadows.md.elevation
+      : resolvedVariant === "compact"
+        ? tokens.shadows.sm.elevation
+        : undefined;
+  const composedStyle = [elevation !== undefined ? { elevation } : undefined, style];
   return <StyledCard variant={resolvedVariant} style={composedStyle} {...rest} />;
 }

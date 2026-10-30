@@ -1,0 +1,5 @@
+---
+"@spudly/ui": patch
+---
+
+RatingsCard / StarRatingInput: a non-interactive viewer rating no longer leaves its stars in the keyboard focus order. While a rating is pending, StarRatingInput's disabled stars are removed from focus on both platforms — `tabIndex={-1}` on web and non-focusable on native — and announce themselves consistently as disabled (`aria-disabled="true"` on web, with no contradictory enabled announcement), while presses and keyboard activation stay inert and the input keeps its single 0.5 dim. Enabled stars are now properly keyboard-operable on web (focusable, with Enter and Space rating the star, matching the other DS pressables), and a read-only rating (a RatingsCard with no change handler) still renders as a static full-brightness display with no star controls. On a @spudly/ui bump, re-check in Storybook: Components/RatingsCard and Components/StarRatingInput — with a rating pending, Tab skips the viewer's stars entirely and a screen reader announces them as disabled; when interactive, Tab reaches the stars and Enter/Space sets the rating; the read-only card's stars cannot be focused at all.
