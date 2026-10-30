@@ -56,14 +56,16 @@
  * The #119 de-styling composes the page's sections from shared
  * components: RatingsCard carries the engagement section,
  * ScrollShell / LoadingGate the shells, and the three recipe
- * sections are composed in the page file itself from the shared
- * primitives (Thumbnail/StatusBadge/StatBand/TagList,
- * NumberStepper/PresetValueSelector/MarkableRow/SuggestionPanel,
- * StepList) — under the #119 program rule (2026-10-29) a tranche
- * page adds no library components, so the section compositions
- * live in the page until a separate component-only change
- * extracts them. All pins scan the page (the section scans use
- * the page source under the section names).
+ * sections are the shared library panels (RecipeOverviewPanel,
+ * RecipeIngredientsPanel, RecipeInstructionsPanel) — first
+ * composed in the page file itself from the shared primitives
+ * under the #119 program rule (2026-10-29) that a tranche page
+ * adds no library components, then extracted in the
+ * component-only change (#331) and adopted back here. The
+ * wiring pins scan the page (render order, the status map);
+ * the section-internal pins scan the panel sources, and the
+ * panels carry their own contract tests
+ * (test/recipeOverviewPanel.test.mjs and siblings).
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -81,6 +83,7 @@ const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
 const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
 
+
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
 const strip = (text) =>
@@ -88,10 +91,11 @@ const strip = (text) =>
 const code = strip(source);
 const frameCode = strip(frameSource);
 const storiesCode = strip(stories);
-// The recipe sections are composed in the page file (see the
-// header), so the section scans read the page source.
-const overviewCode = code;
-const ingredientsCode = code;
+// The recipe sections are the shared library panels (see the
+// header), so the section scans read the panel sources; the
+// page source hosts the wiring pins (render order, status map).
+const overviewCode = strip(readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8"));
+const ingredientsCode = strip(readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8"));
 const ratingsCode = strip(ratingsSource);
 const scrollShellCode = strip(scrollShellSource);
 
@@ -323,8 +327,17 @@ test("the status badge map is page-owned with the idea fallback", () => {
     assert.ok(code.includes(`${status}: { label: "${label}"`), `STATUS_BADGES must map ${status} to ${label}`);
   }
   assert.match(code, /STATUS_BADGES\[overview\.status\] \?\? STATUS_BADGES\.idea/);
-  assert.match(code, /tone=\{statusBadge\?\.tone \?\? "neutral"\}/);
-  assert.match(code, /label=\{statusBadge\?\.label \?\? "Idea"\}/);
+  assert.match(code, /statusTone=\{statusBadge\?\.tone \?\? "neutral"\}/);
+  assert.match(code, /statusLabel=\{statusBadge\?\.label \?\? "Idea"\}/);
+});
+
+test("the sections render through the shared library panels (#331)", () => {
+  for (const panel of ["RecipeOverviewPanel", "RecipeIngredientsPanel", "RecipeInstructionsPanel"]) {
+    assert.ok(code.includes(`import { ${panel} } from "../components/${panel}.js";`), `the page imports the library ${panel}`);
+  }
+  // The view-models pass into the panels unchanged (the shared shapes).
+  assert.match(code, /<RecipeIngredientsPanel ingredients=\{ingredients\} \/>/);
+  assert.match(code, /<RecipeInstructionsPanel instructions=\{instructions\} \/>/);
 });
 
 test("no explicit lineHeight anywhere in the new files (#162)", () => {

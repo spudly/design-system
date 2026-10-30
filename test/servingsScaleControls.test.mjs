@@ -61,7 +61,14 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const stepper = readFileSync(join(root, "src/components/NumberStepper.tsx"), "utf8");
 const selector = readFileSync(join(root, "src/components/PresetValueSelector.tsx"), "utf8");
 const page = readFileSync(join(root, "src/pages/RecipeDetailPage.tsx"), "utf8");
-const publicPage = readFileSync(join(root, "src/pages/PublicRecipePage.tsx"), "utf8");
+// PublicRecipePage's ingredients section is the shared library
+// panel since the #331 extraction, so its control pins scan the
+// panel source (the page wires its view-model into the panel;
+// test/publicRecipePage.test.mjs pins that wiring).
+const ingredientsPanel = readFileSync(
+  join(root, "src/components/RecipeIngredientsPanel.tsx"),
+  "utf8",
+);
 
 test("NumberStepper layout is additive with stacked as the default", () => {
   assert.match(stepper, /layout\?: "stacked" \| "inline";/, "layout prop is declared");
@@ -92,7 +99,7 @@ test("PresetValueSelector renders one non-wrapping row of equal-width toggle but
 test("the ingredients panels use the inline stepper and the PresetValueSelector", () => {
   for (const [name, source] of [
     ["RecipeDetailPage", page],
-    ["PublicRecipePage", publicPage],
+    ["PublicRecipePage (via RecipeIngredientsPanel)", ingredientsPanel],
   ]) {
     assert.match(
       source,

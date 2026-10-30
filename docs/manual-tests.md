@@ -1050,8 +1050,10 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
    phone width and the footer wraps without overlap.
 
 **Run when:** `src/pages/PublicRecipePage.tsx`,
-`src/pages/PublicPageFrame.tsx`, their stories, or a changeset
-naming PublicRecipePage or PublicPageFrame.
+`src/pages/PublicPageFrame.tsx`, their stories, the recipe
+panels the page composes (RecipeOverviewPanel,
+RecipeIngredientsPanel, RecipeInstructionsPanel), or a
+changeset naming PublicRecipePage or PublicPageFrame.
 
 ---
 

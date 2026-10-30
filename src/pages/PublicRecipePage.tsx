@@ -3,7 +3,6 @@ import {
   Fragment,
   cloneElement,
   isValidElement,
-  useMemo,
   type ReactElement,
   type ReactNode,
 } from "react";
@@ -12,20 +11,13 @@ import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { LoadingGate } from "../components/LoadingGate.js";
-import { MarkableRow } from "../components/MarkableRow.js";
-import { NumberStepper } from "../components/NumberStepper.js";
-import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
 import { RatingsCard } from "../components/RatingsCard.js";
+import { RecipeIngredientsPanel } from "../components/RecipeIngredientsPanel.js";
+import { RecipeInstructionsPanel } from "../components/RecipeInstructionsPanel.js";
+import { RecipeOverviewPanel } from "../components/RecipeOverviewPanel.js";
 import { ScrollShell } from "../components/ScrollShell.js";
 import { SectionHeading } from "../components/SectionHeading.js";
-import { StatBand } from "../components/StatBand.js";
-import { StatCard } from "../components/StatCard.js";
-import { StatusBadge } from "../components/StatusBadge.js";
-import { StepList } from "../components/StepList.js";
-import { SuggestionPanel } from "../components/SuggestionPanel.js";
-import { TagList } from "../components/TagList.js";
 import { Text } from "../components/Text.js";
-import { Thumbnail } from "../components/Thumbnail.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,
@@ -95,28 +87,28 @@ import type {
  * surface paint, the single scroll region, and the content
  * column's inset and separation rhythm; RatingsCard carries the
  * engagement section and LoadingGate the loading state. The
- * three recipe sections are composed in this file from the
- * shared primitives — the overview from Thumbnail, StatusBadge,
- * StatBand/StatCard and TagList; the ingredients from
- * NumberStepper, PresetValueSelector, MarkableRow and
- * SuggestionPanel; the instructions from StepList — the same
- * pieces RecipeDetailPage's in-file sections compose, so the two
- * surfaces render one interaction model. Under the #119 program
- * rule (2026-10-29) a tranche page adds no library components:
- * the sections live here as page-local compositions, and their
- * extraction into shared components shared with RecipeDetailPage
- * belongs to a separate component-only change. Section
- * separation is the shell column's 16px gap throughout, where
- * the hand-styled page mixed 16px section padding with 8px
- * heading margins — the headings now sit 16px from the sections
- * on both sides — and the section headings are the shared
- * SectionHeading (Text's subheading variant, xl semibold ink)
- * in place of the hand-styled lg treatment.
+ * three recipe sections are the shared library panels —
+ * RecipeOverviewPanel, RecipeIngredientsPanel and
+ * RecipeInstructionsPanel — extracted in the component-only
+ * change (#331) after this tranche first composed them in-file
+ * under the #119 program rule (2026-10-29) that a tranche page
+ * adds no library components; the same panels serve
+ * RecipeDetailPage's sections, so the two surfaces render one
+ * interaction model. What stays page-side is only the wiring:
+ * the status badge's tone/label pair resolved from the page's
+ * own STATUS_BADGES map, and the section view-models passed
+ * through. Section separation is the shell column's 16px gap
+ * throughout, where the hand-styled page mixed 16px section
+ * padding with 8px heading margins — the headings now sit 16px
+ * from the sections on both sides — and the section headings
+ * are the shared SectionHeading (Text's subheading variant,
+ * xl semibold ink) in place of the hand-styled lg treatment.
  *
  * The sections' ephemeral state stays inside the shared pieces
- * that own it, mirroring RecipeDetailPage: StepList holds the
- * active step, PresetValueSelector the custom-scale editing.
- * None of it is business state.
+ * that own it, mirroring RecipeDetailPage: the instructions
+ * panel's StepList holds the active step, the ingredients
+ * panel's PresetValueSelector the custom-scale editing. None
+ * of it is business state.
  *
  * No lineHeight is set anywhere in this file (the #162 rule).
  */
@@ -146,13 +138,13 @@ export type PublicRecipePageOverviewProps = {
   imageUrl?: string | null;
   title: string;
   description?: string | null;
-  /** Recipe status as a plain string; the overview section
-   * resolves it to the badge's tone and label through the
-   * page's STATUS_BADGES map (the same map RecipeDetailPage
-   * carries) and renders the shared StatusBadge from the pair —
-   * status words are the surface's data, not a design-system
-   * vocabulary (#119 dedupe). Unknown values fall back to
-   * "idea", as the app's status normalizer does. */
+  /** Recipe status as a plain string; the page resolves it to
+   * the badge's tone and label through its STATUS_BADGES map
+   * (the same map RecipeDetailPage carries) and passes the pair
+   * into RecipeOverviewPanel — status words are the surface's
+   * data, not a design-system vocabulary (#119 dedupe). Unknown
+   * values fall back to "idea", as the app's status normalizer
+   * does. */
   status: string;
   /** Overview stat band values, app-formatted ("4", "15m", "30m"). */
   servingsLabel: string;
@@ -232,31 +224,9 @@ const STATUS_BADGES: Record<
   abandoned: { label: "Abandoned", tone: "danger" },
 };
 
-// Scale multipliers from the app's scaling constants (shared with
-// RecipeDetailPage's ingredients section); labels are
-// presentation, the servings math stays app-side.
-const SCALE_OPTIONS: PresetValueOption[] = [
-  { value: "0.5", label: "½×" },
-  { value: "1", label: "1×" },
-  { value: "2", label: "2×" },
-  { value: "3", label: "3×" },
-];
-
-// The custom scale slot's resting label: beside the presets, one
-// more slot that turns into a number input when pressed, as on
-// RecipeDetailPage (#73). Once a custom value applies, the slot
-// shows that value ("4×") selected instead of this label.
-const CUSTOM_SCALE_LABEL = "Custom";
-
-/** A scale value as the custom slot shows it: the number without
- * trailing zeros ("2.50" → "2.5"); non-numeric values pass through. */
-function formatScaleValue(value: string): string {
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? String(parsed) : value;
-}
-
-const MISSING_INGREDIENTS_HINT =
-  "Tap an ingredient to mark it missing and see substitutions below.";
+// The scale option set, the custom-scale label and the missing-
+// ingredients hint moved with the ingredients section into
+// RecipeIngredientsPanel (#331); the servings math stays app-side.
 
 // ---------------------------------------------------------------------------
 // CTA bar (above the sections; variant chosen by auth state). The
@@ -332,9 +302,7 @@ function CtaBar({
               flex: 1,
               minWidth: "40%",
               key:
-                (item as ReactElement).key != null
-                  ? (item as ReactElement).key
-                  : `button-${index}`,
+                (item as ReactElement).key != null ? (item as ReactElement).key : `button-${index}`,
             })
           ) : (
             <Fragment key={`button-${index}`}>{item}</Fragment>
@@ -346,170 +314,52 @@ function CtaBar({
 }
 
 // ---------------------------------------------------------------------------
-// The three recipe sections, composed in-file from the shared
-// primitives (see the header's composition note). Each carries
-// no outer padding or spacing — the shell column insets it and
-// owns separation from its neighbours; a section's own blocks
-// separate with padding wrappers, the recipe pages' settled form.
+// The three recipe sections are the shared library panels (see
+// the header's composition note): RecipeOverviewPanel,
+// RecipeIngredientsPanel and RecipeInstructionsPanel carry the
+// sections' rendering; this file only wires the page's
+// view-models into them. The overview's one piece of page-side
+// wiring is the status resolution below — the panel takes the
+// badge's tone/label pair, and the map that produces it is the
+// page's own.
 // ---------------------------------------------------------------------------
 
-/** The overview header block: hero image, title, status badge,
- * description, the servings/prep/cook stat band, and the tag
- * row. */
+/** The overview header block: the shared RecipeOverviewPanel,
+ * fed the page's overview view-model with its status resolved
+ * to the badge's tone/label pair through STATUS_BADGES. */
 function OverviewSection({ overview }: { overview: PublicRecipePageOverviewProps }) {
-  const {
-    imageUrl,
-    title,
-    description,
-    servingsLabel,
-    prepTimeLabel,
-    cookTimeLabel,
-    tags,
-  } = overview;
   const statusBadge = STATUS_BADGES[overview.status] ?? STATUS_BADGES.idea;
 
   return (
-    <YStack>
-      {imageUrl ? (
-        <YStack paddingBlockEnd="$4">
-          <Thumbnail src={imageUrl} />
-        </YStack>
-      ) : null}
-      <YStack paddingBlockEnd="$2">
-        <Text
-          fontSize={tokens.typography.fontSize["2xl"]}
-          fontWeight={tokens.typography.fontWeight.bold}
-          color={tokens.colors.gray.gray10}
-        >
-          {title}
-        </Text>
-      </YStack>
-      <YStack paddingBlockEnd="$4" alignSelf="flex-start">
-        <StatusBadge
-          tone={statusBadge?.tone ?? "neutral"}
-          label={statusBadge?.label ?? "Idea"}
-        />
-      </YStack>
-      {description ? (
-        <YStack paddingBlockEnd="$4">
-          <Text color={tokens.colors.gray.gray7}>{description}</Text>
-        </YStack>
-      ) : null}
-      <YStack paddingBlockEnd="$4">
-        <StatBand>
-          <StatCard label="Servings" value={servingsLabel} />
-          {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
-          {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
-        </StatBand>
-      </YStack>
-      {tags.length > 0 ? <TagList tags={tags} /> : null}
-    </YStack>
-  );
-}
-
-/** The ingredients section: the servings stepper and scale
- * selector (#73, as on RecipeDetailPage), the pressable
- * ingredient rows (missing ones dimmed by MarkableRow, optional
- * ones noted), and the substitutions block. */
-function IngredientsSection({
-  ingredients: view,
-}: {
-  ingredients: PublicRecipePageIngredientsProps;
-}) {
-  const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
-
-  return (
-    <YStack>
-      {/* Servings + scale controls: one compact block, two fixed
-          rows, and every value directly enterable. Servings is an
-          inline editable stepper; Scale is the
-          PresetValueSelector — a single non-wrapping row of
-          equal-width preset buttons plus a Custom button that
-          turns into a number input when pressed and afterwards
-          shows the applied custom value selected. */}
-      <YStack gap="$3" paddingBlockEnd="$4">
-        <NumberStepper
-          label="Servings"
-          layout="inline"
-          value={view.servings}
-          min={1}
-          onChange={view.onServingsChange}
-          editable
-        />
-        <PresetValueSelector
-          label="Scale"
-          options={SCALE_OPTIONS}
-          value={view.scaleValue}
-          onChange={view.onScaleChange}
-          customLabel={CUSTOM_SCALE_LABEL}
-          customAccessibilityLabel="Custom scale"
-          formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
-        />
-      </YStack>
-      {view.ingredients.map((ingredient) => (
-        <MarkableRow
-          key={ingredient.id}
-          label={ingredient.label}
-          {...(ingredient.isOptional ? { trailingNote: "optional" } : {})}
-          isMarked={ingredient.isMissing ?? false}
-          {...(view.onIngredientPress
-            ? {
-                onPress: () => {
-                  view.onIngredientPress?.(ingredient.id);
-                },
-              }
-            : {})}
-        />
-      ))}
-      {hasMissing ? (
-        <YStack paddingBlockStart="$3">
-          <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text>
-        </YStack>
-      ) : null}
-      {view.isLoadingSubstitutions ? (
-        <YStack paddingBlockStart="$4">
-          <Text variant="hint">Finding substitutions…</Text>
-        </YStack>
-      ) : null}
-      {view.substitutions && view.substitutions.length > 0 ? (
-        <YStack paddingBlockStart="$4">
-          <SuggestionPanel
-            title="Substitutions"
-            entries={view.substitutions.map((sub) => ({
-              id: sub.ingredient,
-              label: sub.ingredient,
-              detail: sub.suggestions,
-            }))}
-          />
-        </YStack>
-      ) : null}
-    </YStack>
-  );
-}
-
-/** The instructions section: the step cards in step-number order
- * through the shared StepList (it owns the card treatment and
- * the active-step state); each step's "Step N" eyebrow label is
- * composed here — StepList takes pre-composed labels because
- * labels are caller content. */
-function InstructionsSection({
-  instructions,
-}: {
-  instructions: PublicRecipePageInstruction[];
-}) {
-  const sorted = useMemo(
-    () => [...instructions].sort((a, b) => a.stepNumber - b.stepNumber),
-    [instructions],
-  );
-  return (
-    <StepList
-      steps={sorted.map((step) => ({
-        id: step.id,
-        label: `Step ${step.stepNumber}`,
-        body: step.body,
-      }))}
+    <RecipeOverviewPanel
+      {...(overview.imageUrl !== undefined ? { imageUrl: overview.imageUrl } : {})}
+      title={overview.title}
+      {...(overview.description !== undefined ? { description: overview.description } : {})}
+      statusTone={statusBadge?.tone ?? "neutral"}
+      statusLabel={statusBadge?.label ?? "Idea"}
+      servingsLabel={overview.servingsLabel}
+      {...(overview.prepTimeLabel !== undefined ? { prepTimeLabel: overview.prepTimeLabel } : {})}
+      {...(overview.cookTimeLabel !== undefined ? { cookTimeLabel: overview.cookTimeLabel } : {})}
+      tags={overview.tags}
     />
   );
+}
+
+/** The ingredients section: the shared RecipeIngredientsPanel
+ * (the servings stepper and scale selector, the pressable
+ * ingredient rows, and the substitutions block), fed the page's
+ * ingredients view-model — the shape is RecipeDetailPage's,
+ * reused by alias, and the panel's view is the same shape. */
+function IngredientsSection({ ingredients }: { ingredients: PublicRecipePageIngredientsProps }) {
+  return <RecipeIngredientsPanel ingredients={ingredients} />;
+}
+
+/** The instructions section: the shared
+ * RecipeInstructionsPanel (the step cards in step-number order,
+ * the tapped card highlighted as the active step), fed the
+ * page's instruction list. */
+function InstructionsSection({ instructions }: { instructions: PublicRecipePageInstruction[] }) {
+  return <RecipeInstructionsPanel instructions={instructions} />;
 }
 
 // ---------------------------------------------------------------------------
