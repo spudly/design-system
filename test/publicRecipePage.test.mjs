@@ -227,6 +227,13 @@ test("the CTA bar switches on the auth-state variant with verbatim labels", () =
       `the ${intent} intent is a plain callback out`,
     );
   }
+  for (const key of ['key="sign-up"', 'key="clone"', 'key="get-app"']) {
+    assert.match(
+      code,
+      new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+      `the CTA buttons carry stable per-action keys (${key}), so a variant switch never reuses one action's button for another`,
+    );
+  }
 });
 
 test("engagement is in v1: ratings reuse the detail page's view-model, comments take the slot", () => {

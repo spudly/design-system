@@ -228,26 +228,27 @@ function CtaBar({
       <EqualButtonRow>
         {ctas.variant === "signedOut" ? (
           <>
-            <Button variant="primary" onPress={onSignUpPress}>
+            <Button key="sign-up" variant="primary" onPress={onSignUpPress}>
               {SIGN_UP_LABEL}
             </Button>
-            <Button variant="secondary" onPress={onClonePress}>
+            <Button key="clone" variant="secondary" onPress={onClonePress}>
               {CLONE_LABEL}
             </Button>
-            <Button variant="secondary" onPress={onGetAppPress}>
+            <Button key="get-app" variant="secondary" onPress={onGetAppPress}>
               {GET_APP_LABEL}
             </Button>
           </>
         ) : (
           <>
             <Button
+              key="clone"
               variant="primary"
               disabled={ctas.isClonePending ?? false}
               onPress={onClonePress}
             >
               {ctas.isClonePending ? SAVE_COPY_PENDING_LABEL : SAVE_COPY_LABEL}
             </Button>
-            <Button variant="secondary" onPress={onGetAppPress}>
+            <Button key="get-app" variant="secondary" onPress={onGetAppPress}>
               {GET_APP_LABEL}
             </Button>
           </>
