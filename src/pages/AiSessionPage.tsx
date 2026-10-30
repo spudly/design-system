@@ -1,13 +1,13 @@
 import type { ReactNode } from "react";
+import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
-import { CancelSessionAction } from "../components/CancelSessionAction.js";
 import { FormHeading } from "../components/FormHeading.js";
-import { MessageList } from "../components/MessageList.js";
-import { PreviewCard } from "../components/PreviewCard.js";
 import { SessionShell } from "../components/SessionShell.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
+import { TextAction } from "../components/TextAction.js";
+import { tokens } from "../tokens/index.js";
 
 /**
  * AiSessionPage (#126, B3c): the AI session view — the split
@@ -50,20 +50,25 @@ import { Text } from "../components/Text.js";
  * the real primary button. Ghost's label color is Button's
  * dark-aware $link role, readable on the page background.
  *
- * De-styled for #119: the page renders no layout primitives
- * and sets no styling props. SessionShell owns the two states'
- * frames (the recessed background, content padding, and the
- * section rhythm) and the running state's scrolling;
- * FormHeading owns the title block; MessageList owns the
- * transcript bubbles; PreviewCard frames the preview stage;
+ * De-styled for #119: the shared pieces are the library's —
+ * SessionShell owns the two states' frames (the recessed
+ * background, content padding, and the section rhythm) and the
+ * running state's scrolling; FormHeading owns the title block;
  * the prompt and follow-up fields take TextAreaField's `xl` /
  * `lg` height steps instead of a raw minHeight; the start
- * action grows through Button's `grow` prop; and the cancel
- * control is CancelSessionAction (TextAction's keyboard and
- * disabled semantics under the muted underlined treatment),
+ * action grows through Button's `grow` prop. The pieces only
+ * this page needs — the transcript bubbles, the preview
+ * stage's bordered frame, and the cancel control — are
+ * composed inline below from library primitives rather than
+ * added as new library components: the bubbles are Text in
+ * token-inked stacks, the frame is a bordered surface stack
+ * (ImportReviewPage composes the same frame around its
+ * preview), and the cancel control is TextAction (its keyboard
+ * and disabled semantics, which also refuse held-key repeats)
+ * under the muted underlined treatment in a stack that dims
+ * and blocks the pointer while a request is in flight —
  * replacing the hand-built pressable stack this page used to
- * carry — including its keyboard handler, which now also
- * refuses held-key repeats, as TextAction does.
+ * carry, including its own keyboard handler.
  */
 
 export type AiSessionPageConfig = {
@@ -169,7 +174,31 @@ export function AiSessionPage({
   return (
     <SessionShell scrollable>
       <FormHeading subtitle={session.phaseLabel}>{config.title}</FormHeading>
-      <MessageList messages={session.messages} userLabel="You" assistantLabel="Plan" />
+      <YStack gap="$3">
+        {session.messages.map((message, index) => {
+          const own = message.role === "user";
+          return (
+            <YStack
+              key={index}
+              paddingStart={own ? "$8" : undefined}
+              paddingEnd={own ? undefined : "$8"}
+            >
+              <YStack
+                borderRadius={tokens.radii.md}
+                backgroundColor={own ? tokens.colors.gray.gray2 : "$primarySubtle"}
+                padding="$3"
+              >
+                <YStack paddingBottom="$1">
+                  <Text variant="label">{own ? "You" : "Plan"}</Text>
+                </YStack>
+                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
+                  {message.content}
+                </Text>
+              </YStack>
+            </YStack>
+          );
+        })}
+      </YStack>
       {session.canRefine ? (
         <>
           <TextAreaField
@@ -196,19 +225,45 @@ export function AiSessionPage({
         </>
       ) : null}
       {preview ? (
-        <PreviewCard
-          title={config.previewTitle}
-          actions={
+        <YStack
+          borderRadius={tokens.radii.lg}
+          borderWidth={1}
+          borderColor={tokens.colors.gray.gray3}
+          backgroundColor="$surface"
+          padding="$4"
+        >
+          <YStack paddingBottom="$3">
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              fontWeight={tokens.typography.fontWeight.semibold}
+              color={tokens.colors.gray.gray10}
+            >
+              {config.previewTitle}
+            </Text>
+          </YStack>
+          {preview}
+          <YStack paddingTop="$4">
             <Button variant="primary" disabled={busy} onPress={onFinalize}>
               {finalizePending ? config.finalizePendingLabel : config.finalizeLabel}
             </Button>
-          }
-        >
-          {preview}
-        </PreviewCard>
+          </YStack>
+        </YStack>
       ) : null}
       {error ? <Text variant="error">{error}</Text> : null}
-      {session.canCancel ? <CancelSessionAction disabled={busy} onPress={onCancel} /> : null}
+      {session.canCancel ? (
+        <YStack opacity={busy ? 0.5 : 1} pointerEvents={busy ? "none" : "auto"}>
+          <TextAction
+            onPress={onCancel}
+            disabled={busy}
+            accessibilityLabel="Cancel session"
+            fontSize={tokens.typography.fontSize.sm}
+            color={tokens.colors.gray.gray6}
+            textDecorationLine="underline"
+          >
+            Cancel session
+          </TextAction>
+        </YStack>
+      ) : null}
     </SessionShell>
   );
 }
