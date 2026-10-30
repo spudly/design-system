@@ -77,6 +77,11 @@ test("PresetValueSelector renders one non-wrapping row of equal-width toggle but
     "each preset is a toggle button carrying its selected state",
   );
   assert.match(selector, /grow/, "the buttons flex to equal shares of the row");
+  assert.match(
+    selector,
+    /flexBasis=\{0\}/,
+    "equal shares need the zero basis (Button's grow default is content-sized for wrapping rows)",
+  );
   assert.match(selector, /flex=\{0\.25\}/, "the custom slot keeps its quarter share");
 });
 
