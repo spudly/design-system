@@ -70,7 +70,23 @@ export const Selected: Story = {
 };
 
 export const SelectableDisabled: Story = {
-  args: { selected: true, disabled: true, onPress: () => undefined, children: "Weeknight" },
+  render: function SelectableDisabledStory() {
+    const [selected, setSelected] = useState(true);
+    // The handler is live on purpose: if a disabled badge ever
+    // activated, the selection would visibly flip — inertness is
+    // demonstrated, not just asserted.
+    return (
+      <Badge
+        selected={selected}
+        disabled
+        onPress={() => {
+          setSelected((current) => !current);
+        }}
+      >
+        Weeknight
+      </Badge>
+    );
+  },
 };
 
 export const Selectable: Story = {
