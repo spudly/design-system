@@ -242,7 +242,15 @@ export function PresetValueSelector({
           </Button>
         ))}
       </XStack>
-      <XStack flex={0.25}>
+      {/* #327: the custom slot's share must leave the small
+          Button's label room to sit on one line at the Android
+          VR capture width (~430px). At flex 0.25 the slot was
+          ~68px and "Custom" wrapped mid-word ("Custo/m"),
+          making the button taller than the preset row; the
+          presets' labels are short (½×, 1×, …), so the custom
+          slot takes the larger share while the presets stay
+          equal-width. */}
+      <XStack flex={0.35}>
         {isCustomEditing ? (
           <TextField
             accessibilityLabel={customAccessibilityLabel}

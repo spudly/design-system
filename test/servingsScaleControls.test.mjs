@@ -78,7 +78,7 @@ test("the stepper value box is fixed-width so digit changes cannot shift the but
   assert.ok(!stepper.includes("spacing[8]"), "the old narrower value box is gone");
 });
 
-test("PresetValueSelector renders one non-wrapping row of equal-width toggle buttons", () => {
+test("PresetValueSelector renders one non-wrapping row of toggle buttons, presets at equal width", () => {
   assert.ok(!selector.includes('flexWrap="wrap"'), "the row never wraps");
   assert.match(
     selector,
@@ -91,7 +91,11 @@ test("PresetValueSelector renders one non-wrapping row of equal-width toggle but
     2,
     "equal shares need the zero basis on both grow buttons (presets and Custom — Button's grow default is content-sized for wrapping rows)",
   );
-  assert.match(selector, /flex=\{0\.25\}/, "the custom slot keeps its quarter share");
+  // #327: the custom slot's share is deliberately wider than a
+  // preset's — at the old quarter share (flex 0.25 of the row,
+  // level with one preset) the slot was ~68px at the ~430px VR
+  // capture width and the "Custom" label wrapped mid-word.
+  assert.match(selector, /flex=\{0\.35\}/, "the custom slot keeps its widened share (#327)");
 });
 
 test("the ingredients panels use the inline stepper and the PresetValueSelector", () => {
