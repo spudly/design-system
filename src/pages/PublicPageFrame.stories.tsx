@@ -36,10 +36,10 @@ function Viewport({ width, children }: { width: number; children: ReactNode }) {
 }
 
 const frameProps = {
-  onBrandPress: () => undefined,
-  onSignInPress: () => undefined,
-  onPrivacyPress: () => undefined,
-  onTermsPress: () => undefined,
+  brandHref: "/",
+  signInHref: "/sign-in",
+  privacyHref: "/privacy",
+  termsHref: "/terms",
 };
 
 /** A plain stand-in for page content: the frame's contract is the

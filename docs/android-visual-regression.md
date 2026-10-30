@@ -228,8 +228,8 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-importreviewpage             | light_warmHarvest |       1 |         1 |
 | pages-eciperay-importtextpage               | light_warmHarvest |       2 |         2 |
 | pages-eciperay-importurlpage                | light_warmHarvest |       2 |         2 |
-| pages-eciperay-landingpage                  | light_warmHarvest |       1 |         1 |
-| pages-eciperay-legaldocumentpage            | light_warmHarvest |       2 |         2 |
+| pages-eciperay-landingpage                  | light_warmHarvest |       2 |         2 |
+| pages-eciperay-legaldocumentpage            | light_warmHarvest |       3 |         3 |
 | pages-eciperay-manualentrypage              | light_warmHarvest |       1 |         1 |
 | pages-eciperay-mealcookingmodepage          | light_warmHarvest |       3 |         3 |
 | pages-eciperay-mealdetailpage               | light_warmHarvest |       2 |         2 |
@@ -256,7 +256,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **140** |   **140** |
+| **Total**                                   |                   | **142** |   **142** |
 
 <!-- VR-COVERAGE-END -->
 
@@ -298,7 +298,7 @@ The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
 12 `pages-eciperay-recipespage` stories x light = **12
-baselines** (140 total). RecipesPage only, deliberately — a second
+baselines** (142 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
