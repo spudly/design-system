@@ -86,13 +86,12 @@ test("each form's submit button is named for the label it renders, in both state
     );
     // The rendered label itself must be the same ternary, so a
     // change to either visible label is caught here too (the
-    // name and the text cannot drift apart).
-    assert.match(
-      source,
-      new RegExp(
-        `^\\s*\\{loading \\? "${busy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}" : "${idle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\}$`,
-        "m",
-      ),
+    // name and the text cannot drift apart). The accessible-name
+    // line cannot false-positive this: trimmed, it starts with
+    // "accessibilityLabel=".
+    const rendered = `{loading ? "${busy}" : "${idle}"}`;
+    assert.ok(
+      source.split("\n").some((line) => line.trim() === rendered),
       `${form} renders the same loading ternary it is named by`,
     );
   }
