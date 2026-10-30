@@ -55,12 +55,19 @@ test("the base sans stack leads with Raleway on every platform", () => {
   assert.equal(fontFamily.sansNativeAndroid, "UiSans");
 });
 
-/** The static per-weight faces every native registration declares (#326). */
+/**
+ * The static per-weight faces every native registration declares
+ * (#326): the four numeric weights plus the React Native fontWeight
+ * keyword aliases (`normal`/`bold`), which Tamagui's native face
+ * lookup can key on unnormalized.
+ */
 const EXPECTED_FACES = {
   "400": "UiSans",
   "500": "UiSans-Medium",
   "600": "UiSans-SemiBold",
   "700": "UiSans-Bold",
+  normal: "UiSans",
+  bold: "UiSans-Bold",
 };
 
 test("all themes resolve the sans role to the base Raleway values", () => {

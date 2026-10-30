@@ -48,12 +48,22 @@ export const fontFamily = {
    * apps/storybook/assets/fonts/OFL-Raleway.txt). The instances
    * are therefore renamed UiSans with their glyphs unchanged; web
    * keeps loading the unmodified Raleway under its own name.
+   *
+   * The `normal`/`bold` entries cover React Native's fontWeight
+   * keywords: Tamagui's native face lookup keys on the style's
+   * fontWeight value, and a keyword can reach it unnormalized
+   * (the DS's own stories pass fontWeight="bold"), where a miss
+   * would leave the platform to resolve the keyword against the
+   * regular face — the numeric-resolution failure this
+   * registration exists to remove.
    */
   sansNativeFaces: {
     "400": "UiSans",
     "500": "UiSans-Medium",
     "600": "UiSans-SemiBold",
     "700": "UiSans-Bold",
+    normal: "UiSans",
+    bold: "UiSans-Bold",
   },
   /**
    * Single font name for React Native on Android for the `sans` role:
@@ -75,6 +85,8 @@ export const fontFamily = {
     "500": "UiSans-Medium",
     "600": "UiSans-SemiBold",
     "700": "UiSans-Bold",
+    normal: "UiSans",
+    bold: "UiSans-Bold",
   },
   /** Serif stack for display titles and verse/reading text (system serif). */
   serif: "Georgia, 'Times New Roman', serif",
