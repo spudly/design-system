@@ -478,10 +478,7 @@ test("busy Cancel is activation-guarded and the Custom scale name carries the mu
   // The selected custom-scale button shows the multiplier as its visible
   // text; the accessible name must include it (composed in the selector).
   assert.match(recipeDetail, /customAccessibilityLabel="Custom scale"/);
-  assert.match(
-    recipeDetail,
-    /formatCustomValue=\{\(custom\) => `\$\{formatScaleValue\(custom\)\}×`\}/,
-  );
+  assert.match(recipeDetail, /formatCustomValue=\{\(custom\) => `\$\{formatScaleValue\(custom\)\}×`\}/);
   const selector = readCode("src/components/PresetValueSelector.tsx");
   assert.match(selector, /`\$\{customAccessibilityLabel\} \$\{formattedCustom\}`/);
 });
