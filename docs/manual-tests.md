@@ -1082,6 +1082,10 @@ renders as a real anchor carrying its href:
    not followable (no href in the DOM).
 2. TextLink Href / HrefInProse: the links carry their hrefs and
    keep the link color and underline, inline in the prose.
+   TextLink Muted: the same link in the muted treatment (the
+   theme's muted ink, still underlined) — the de-emphasized
+   treatment the auth forms' "Forgot password?" and "Back to
+   sign in" links render in.
 3. BackLink Href: the drawn arrow and label render inside one
    anchor with the href; the arrow stays centered on the label's
    line, as in the Default story.
@@ -1175,7 +1179,14 @@ Open in `Components/Text`: AllVariants (or any page story, e.g.
 6. The `label` variant ("Label" in the Text stories) is the
    section eyebrow — xs semibold, uppercase, letter-spaced,
    muted gray — and carries no heading role and no `aria-level`.
-7. Visually nothing changes: heading/subheading keep their sizes
+7. The `muted` variant ("Muted" in the Text stories) is
+   body-size text in the muted treatment — the intro line under
+   the auth pages' titles and the Profile page's email line
+   render through it — and the `success` variant ("Success")
+   is small text in the success treatment — the Feedback page's
+   submitted thanks renders through it. Neither carries a
+   heading role.
+8. Visually nothing changes: heading/subheading keep their sizes
    and weights, and all variants keep their theme fonts.
 
 **Run when:** `src/components/Text.tsx`, its stories, the
@@ -1241,8 +1252,51 @@ submit switches the page to its loading state).
 
 **Run when:** `src/pages/SignInPage.tsx`,
 `src/pages/SignUpPage.tsx`, `src/pages/ForgotPasswordPage.tsx`,
-`src/pages/ResetPasswordPage.tsx`, their stories, or a changeset
-naming the auth pages or Enter-to-submit.
+`src/pages/ResetPasswordPage.tsx`, the form components they
+compose (`src/components/SignInForm.tsx`,
+`src/components/SignUpForm.tsx`,
+`src/components/ForgotPasswordForm.tsx`,
+`src/components/ResetPasswordForm.tsx`), their stories, or a
+changeset naming the auth pages or Enter-to-submit.
+
+---
+
+## Auth forms (SignInForm, SignUpForm, ForgotPasswordForm, ResetPasswordForm) & LegalSection
+
+Open in `Components/SignInForm`, `Components/SignUpForm`,
+`Components/ForgotPasswordForm`, `Components/ResetPasswordForm`,
+`Components/LegalSection` (each form's Default story — the
+stories are interactive: fields can be typed in).
+
+The auth pages' forms as standalone components: each form
+composes the shared FormStack (which owns the 16px field
+rhythm) and its own footer layout, and the pages compose the
+forms.
+
+1. Each form's fields stack at a 16px rhythm, and an error (the
+   WithError story) renders directly above the submit button in
+   the error treatment.
+2. In SignInForm's Default story, both footer links render
+   under the submit button at a tighter 8px separation:
+   "Create an account" in the link color and "Forgot password?"
+   in the muted treatment. In the WithoutLinks story neither
+   link renders and the form ends at the submit button.
+3. In SignUpForm's Default story, the legal notice under the
+   submit button and the centered "Already have an account?
+   Sign in" link below it read as one centered footer block.
+4. In ForgotPasswordForm's Default story, the muted "Back to
+   sign in" link renders under the submit button.
+5. In LegalSection's Default story, the "Legal" title (large,
+   semibold) sits 12px above the two links, which stack 12px
+   apart — the Profile page's legal block.
+
+**Run when:** `src/components/SignInForm.tsx`,
+`src/components/SignUpForm.tsx`,
+`src/components/ForgotPasswordForm.tsx`,
+`src/components/ResetPasswordForm.tsx`,
+`src/components/LegalSection.tsx`, their stories, the auth or
+Profile pages that compose them, or a changeset naming the
+auth forms or LegalSection.
 
 ---
 

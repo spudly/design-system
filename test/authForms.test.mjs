@@ -1,18 +1,23 @@
 /**
- * Contract tests for the #119 auth form components, shipped
- * standalone ahead of the pages that will compose them
+ * Contract tests for the #119 auth tranche: the auth pages'
+ * embedded forms are extracted into form components
  * (SignInForm, SignUpForm, ForgotPasswordForm,
  * ResetPasswordForm — a form is a group of fields AND a way to
- * handle them, per Stephen's definition for #182), plus
- * LegalSection, the profile page's legal block as a component,
- * and the de-emphasized auth links' TextLink `muted` tone.
+ * handle them, per Stephen's definition for #182), the profile
+ * page's legal block is the LegalSection component, and the
+ * de-emphasized auth links take TextLink's `muted` tone.
  *
  * The pins:
  * - each form is exported from the components barrel and from
- *   the built dist;
+ *   the built dist, and each auth page composes its form unit
+ *   (the page keeps its prop surface — the b3cPages pins hold
+ *   the declarations);
  * - the forms compose the shared FormStack (the #119 dedupe
  *   canonical form stack), which owns the 16px field rhythm —
- *   no form defines a local form stack;
+ *   no form defines a local form stack — and the pages render
+ *   no fields directly;
+ * - each form's submit button is named for the label it
+ *   renders in both its idle and loading states;
  * - SignUpForm keeps the legalNotice slot between the submit
  *   button and the sign-in link (the app view's order);
  * - LegalSection renders its title in the app profile screen's
@@ -20,10 +25,6 @@
  *   children;
  * - TextLink's muted tone is the theme's muted role on both
  *   link frames, and an explicit color still wins over it.
- *
- * The page-side pins (each auth page composing its form unit
- * and forwarding its props) are not here: they land with the
- * pages' adoption of these components.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -36,11 +37,30 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const read = (rel) => readFileSync(join(root, rel), "utf8");
 
 const FORMS = ["SignInForm", "SignUpForm", "ForgotPasswordForm", "ResetPasswordForm"];
+const FORM_PAGES = {
+  SignInForm: "SignInPage",
+  SignUpForm: "SignUpPage",
+  ForgotPasswordForm: "ForgotPasswordPage",
+  ResetPasswordForm: "ResetPasswordPage",
+};
 
 test("the auth forms and LegalSection are exported from the components barrel", () => {
   const barrel = read("src/components/index.ts");
   for (const name of [...FORMS, "LegalSection"]) {
     assert.match(barrel, new RegExp(String.raw`export \{ ${name},`), name);
+  }
+});
+
+test("the auth pages compose their form units and render no fields directly", () => {
+  for (const [form, page] of Object.entries(FORM_PAGES)) {
+    const pageSource = read(`src/pages/${page}.tsx`);
+    assert.match(pageSource, new RegExp(String.raw`<${form}\b`), `${page} composes ${form}`);
+    assert.doesNotMatch(pageSource, /<TextField/, `${page} renders no field directly`);
+    assert.doesNotMatch(
+      pageSource,
+      /from "tamagui"|from '@tamagui/,
+      `${page} imports no layout primitives`,
+    );
   }
 });
 
@@ -64,6 +84,59 @@ test("each form composes the shared FormStack and owns its submit handling", () 
       /useMutation|useQuery|fetch\(|AsyncStorage/,
       `${form} reaches for no data layer`,
     );
+  }
+});
+
+const PAGE_FORM_PROPS = {
+  SignInPage: [
+    "email={email}",
+    "password={password}",
+    "onEmailChange={onEmailChange}",
+    "onPasswordChange={onPasswordChange}",
+    "loading={loading}",
+    "error={error}",
+    "onSubmit={onSubmit}",
+    "signUpHref={signUpHref}",
+    "forgotPasswordHref={forgotPasswordHref}",
+  ],
+  SignUpPage: [
+    "displayName={displayName}",
+    "email={email}",
+    "password={password}",
+    "onDisplayNameChange={onDisplayNameChange}",
+    "onEmailChange={onEmailChange}",
+    "onPasswordChange={onPasswordChange}",
+    "loading={loading}",
+    "error={error}",
+    "onSubmit={onSubmit}",
+    "signInHref={signInHref}",
+    "legalNotice={legalNotice}",
+  ],
+  ForgotPasswordPage: [
+    "email={email}",
+    "onEmailChange={onEmailChange}",
+    "loading={loading}",
+    "error={error}",
+    "onSubmit={onSubmit}",
+    "signInHref={signInHref}",
+  ],
+  ResetPasswordPage: [
+    "password={password}",
+    "onPasswordChange={onPasswordChange}",
+    "loading={loading}",
+    "error={error}",
+    "onSubmit={onSubmit}",
+  ],
+};
+
+test("auth pages forward their props to their forms", () => {
+  for (const [form, page] of Object.entries(FORM_PAGES)) {
+    const pageSource = read(`src/pages/${page}.tsx`);
+    const invocation = pageSource.match(new RegExp(String.raw`<${form}\b[\s\S]*?/>`));
+    assert.ok(invocation, `${page} invokes ${form}`);
+    for (const prop of PAGE_FORM_PROPS[page]) {
+      assert.ok(invocation[0].includes(prop), `${page} forwards ${prop}`);
+    }
   }
 });
 

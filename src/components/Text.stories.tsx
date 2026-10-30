@@ -61,6 +61,14 @@ export const Error: Story = {
   args: { variant: "error", children: "Something went wrong. Try again." },
 };
 
+export const Muted: Story = {
+  args: { variant: "muted", children: "We'll send a reset link to your email." },
+};
+
+export const Success: Story = {
+  args: { variant: "success", children: "Thanks — we got your feedback." },
+};
+
 export const Verse: Story = {
   args: {
     variant: "verse",
@@ -78,7 +86,9 @@ export const AllVariants: Story = {
       <Text variant="body">Body text</Text>
       <Text variant="label">Section label</Text>
       <Text variant="hint">Hint text</Text>
+      <Text variant="muted">Muted text</Text>
       <Text variant="error">Error text</Text>
+      <Text variant="success">Success text</Text>
       <Text variant="verse">Verse text</Text>
     </YStack>
   ),

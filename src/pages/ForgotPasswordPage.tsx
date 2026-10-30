@@ -1,10 +1,7 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { Button } from "../components/Button.js";
+import { ForgotPasswordForm } from "../components/ForgotPasswordForm.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
-import { TextLink } from "../components/TextLink.js";
 
 /**
  * ForgotPasswordPage (#126, B3c): the reset-request view —
@@ -18,6 +15,13 @@ import { TextLink } from "../components/TextLink.js";
  * submission is a bare intent, and no credentials logic lives
  * in the DS. The back link renders only when the host wires
  * it, as in the app view.
+ *
+ * The form itself is ForgotPasswordForm (#119): the page
+ * composes the heading, the intro line, and the form as the
+ * screen's sections (SectionStack's rhythm carries the
+ * separations the app view's title and intro spacing render),
+ * and the form owns the field, the submit handling, and the
+ * back link.
  */
 
 export type ForgotPasswordPageProps = {
@@ -40,50 +44,20 @@ export function ForgotPasswordPage({
   onSubmit,
   signInHref,
 }: ForgotPasswordPageProps) {
-  // Enter/return in the field submits (#255), mirroring the
-  // native-form behavior the retired web view had; while
-  // loading the submit button is disabled, so field
-  // submission is held the same way.
-  const submitFromField = () => {
-    if (!loading) {
-      onSubmit();
-    }
-  };
   return (
     <ScreenContainer scrollable={false} variant="auth">
-      <YStack paddingBottom="$4">
+      <SectionStack>
         <Text variant="heading">Reset password</Text>
-      </YStack>
-      <YStack paddingBottom="$8">
-        <Text color="$textMuted">We&apos;ll send a reset link to your email.</Text>
-      </YStack>
-      <TextField
-        label="Email"
-        value={email}
-        onChangeText={onEmailChange}
-        autoComplete="email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        accessibilityLabel="Email"
-        onSubmitEditing={submitFromField}
-        returnKeyType="go"
-      />
-      {error ? <Text variant="error">{error}</Text> : null}
-      <Button
-        variant="primary"
-        disabled={loading}
-        onPress={onSubmit}
-        accessibilityLabel="Send Reset Link"
-      >
-        {loading ? "Sending…" : "Send Reset Link"}
-      </Button>
-      {signInHref ? (
-        <YStack paddingTop="$2">
-          <TextLink color={tokens.colors.gray.gray6} href={signInHref}>
-            Back to sign in
-          </TextLink>
-        </YStack>
-      ) : null}
+        <Text variant="muted">We&apos;ll send a reset link to your email.</Text>
+        <ForgotPasswordForm
+          email={email}
+          onEmailChange={onEmailChange}
+          loading={loading}
+          error={error}
+          onSubmit={onSubmit}
+          signInHref={signInHref}
+        />
+      </SectionStack>
     </ScreenContainer>
   );
 }
