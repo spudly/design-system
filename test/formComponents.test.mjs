@@ -7,10 +7,12 @@
  * (props and owned geometry) so a later edit cannot silently
  * reintroduce styling pass-throughs or move the owned spacing.
  *
- * The forms tranche's wider set (FieldLabelBlock, FieldColumns,
- * FormSubmit, StepperGroup) and its page-composition pins stay
- * with that tranche — they are single-family components and
- * this PR ships no page rewrite.
+ * The forms tranche's wider set was split by disposition in the
+ * adoption rounds: FieldLabelBlock and StepperGroup composed
+ * away into LabeledGroup and FieldStack, while FieldColumns
+ * and FormSubmit are genuine library components — they ship in
+ * the #119 extraction set and are pinned here alongside the
+ * dedupe set.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -34,8 +36,10 @@ const COMPONENTS = [
   "LabeledGroup",
   "RevertAction",
   "ChangedListBanner",
+  "FieldColumns",
   "FormStack",
   "FormHeading",
+  "FormSubmit",
 ];
 
 for (const name of COMPONENTS) {
@@ -106,6 +110,18 @@ test("FormStack owns the form rhythm: 16px section gaps, stretched children, 32p
   assert.match(source, /gap: tokens\.spacing\[4\]/);
   assert.match(source, /alignItems: "stretch"/);
   assert.match(source, /paddingBlockEnd: tokens\.spacing\[8\]/);
+});
+
+test("FieldColumns gives every child an equal flex column with an owned 12px gutter", () => {
+  const source = readRepoFile("src/components/FieldColumns.tsx");
+  assert.match(source, /gap=\{tokens\.spacing\[3\]\}/);
+  assert.match(source, /<YStack flex=\{1\}>/);
+  assert.match(source, /typeof child === "boolean"/);
+});
+
+test("FormSubmit owns the 16px separation above the submit row", () => {
+  const source = readRepoFile("src/components/FormSubmit.tsx");
+  assert.match(source, /paddingBlockStart=\{tokens\.spacing\[4\]\}/);
 });
 
 test("FormHeading owns the title treatment, its 24px separation, and the optional subtitle", () => {

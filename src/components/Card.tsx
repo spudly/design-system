@@ -32,6 +32,21 @@ const StyledCard = styled(YStack, {
         shadowOpacity: tokens.shadows.md.shadowOpacity,
         shadowRadius: tokens.shadows.md.shadowRadius,
       },
+      // Compact surface: filled, no border — 12px padding, the
+      // medium radius, the small shadow. The dense-row treatment
+      // (tag rows, inline editors), folded in from the former
+      // CompactCard under Stephen's 2026-10-29 ruling: a surface
+      // treatment difference is a variant of Card, not a
+      // separate component.
+      compact: {
+        borderWidth: 0,
+        borderRadius: tokens.radii.md,
+        padding: tokens.spacing[3],
+        shadowColor: tokens.shadows.sm.shadowColor,
+        shadowOffset: tokens.shadows.sm.shadowOffset,
+        shadowOpacity: tokens.shadows.sm.shadowOpacity,
+        shadowRadius: tokens.shadows.sm.shadowRadius,
+      },
     },
   } as const,
 
@@ -46,9 +61,10 @@ export type CardProps = StyledCardProps & {
   /**
    * Appearance: `default` (filled, bordered), `bordered` (outline only),
    * `muted` (page-background fill, no border), `elevated` (filled, soft
-   * shadow, no border).
+   * shadow, no border), `compact` (filled, no border — 12px padding,
+   * medium radius, small shadow; dense rows and inline editors).
    */
-  variant?: "default" | "bordered" | "muted" | "elevated";
+  variant?: "default" | "bordered" | "muted" | "elevated" | "compact";
   /** @deprecated Use `variant="elevated"` instead. Kept for existing consumers. */
   elevated?: boolean;
 };

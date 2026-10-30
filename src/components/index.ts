@@ -175,3 +175,43 @@ export {
 } from "./SuggestionPanel.js";
 export { TagList, type TagListProps, type TagListTag } from "./TagList.js";
 export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCardRow.js";
+
+// The #119 extraction set: the components the tranche PRs
+// inventoried as extraction-required during their adoption
+// rounds, shipped once here (the tranche PRs adopt these in
+// their post-extraction rounds).
+export { BadgeCardRow, type BadgeCardRowAction, type BadgeCardRowProps } from "./BadgeCardRow.js";
+export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
+export { CandidateList, type CandidateListItem, type CandidateListProps } from "./CandidateList.js";
+export { CheckRow, type CheckRowProps } from "./CheckRow.js";
+export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";
+export { FormSubmit, type FormSubmitProps } from "./FormSubmit.js";
+export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
+export {
+  NutritionPanel,
+  type NutritionPanelData,
+  type NutritionPanelProps,
+  type NutritionPanelRow,
+} from "./NutritionPanel.js";
+export { PanelStack, type PanelStackProps } from "./PanelStack.js";
+export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
+export {
+  RecipeIngredientsPanel,
+  type RecipeIngredientsPanelIngredient,
+  type RecipeIngredientsPanelProps,
+  type RecipeIngredientsPanelSubstitution,
+  type RecipeIngredientsPanelView,
+} from "./RecipeIngredientsPanel.js";
+export {
+  RecipeInstructionsPanel,
+  type RecipeInstructionsPanelProps,
+  type RecipeInstructionsPanelStep,
+} from "./RecipeInstructionsPanel.js";
+export {
+  RecipeOverviewPanel,
+  type RecipeOverviewPanelProps,
+  type RecipeOverviewPanelTag,
+} from "./RecipeOverviewPanel.js";
+export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
+export { Toolbar, type ToolbarProps } from "./Toolbar.js";
+export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";

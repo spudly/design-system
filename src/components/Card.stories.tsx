@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { Badge } from "./Badge.js";
 import { Card } from "./Card.js";
 import { Text } from "./Text.js";
 
@@ -8,7 +9,7 @@ const meta: Meta<typeof Card> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["default", "bordered", "muted", "elevated"],
+      options: ["default", "bordered", "muted", "elevated", "compact"],
     },
     elevated: { control: "boolean" },
   },
@@ -58,6 +59,15 @@ export const ElevatedVariant: Story = {
     <Card {...args} variant="elevated" style={{ maxWidth: 360 }}>
       <Text variant="subheading">Raised section</Text>
       <Text variant="hint">Same look as the legacy `elevated` boolean.</Text>
+    </Card>
+  ),
+};
+
+export const Compact: Story = {
+  render: (args) => (
+    <Card {...args} variant="compact" style={{ maxWidth: 430 }}>
+      <Badge color="green">Weeknight</Badge>
+      <Text variant="hint">A dense row's worth of content on the compact surface.</Text>
     </Card>
   ),
 };
