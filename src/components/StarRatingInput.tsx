@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { XStack, YStack, styled } from "tamagui";
+import { XStack, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
@@ -61,7 +61,14 @@ export type StarRatingInputProps = {
  * `role="radio"` and `aria-checked`. Selected stars render in an amber
  * tone, unselected in gray (or near-white at reduced opacity with
  * `tone="dark"`); every star is a ≥44px touch target. With `readOnly`,
- * the same stars render as a static, non-interactive display.
+ * the same stars render as a static, non-interactive display. With
+ * `disabled`, the stars leave the focus order on both platforms —
+ * `focusable={false}` on native, `tabIndex={-1}` on web (the Badge /
+ * TextAction disabled treatment) — and the disabled state is
+ * announced consistently: the translator's `aria-disabled` is
+ * restated explicitly on web after the Tamagui `disabled` prop, so
+ * a disabled star can never render with a contradictory
+ * `aria-disabled="false"` (#316).
  */
 export function StarRatingInput({
   value,
@@ -131,6 +138,24 @@ export function StarRatingInput({
           {stars.map((star) => {
             const selected = star <= value;
             const style = starStyle(star);
+            // Web keyboard activation for an enabled star (the
+            // CardRow pattern): a view carrying a role is made
+            // focusable by its tabIndex, and the button keys —
+            // Enter and Space — invoke the same change as a press.
+            // A held key's repeats are ignored, matching a native
+            // button. Disabled stars never activate.
+            const handleKeyDown = (event: {
+              key: string;
+              repeat?: boolean;
+              preventDefault: () => void;
+            }) => {
+              if (!disabled && (event.key === "Enter" || event.key === " ")) {
+                event.preventDefault();
+                if (!event.repeat) {
+                  onChange(allowClear && star === value ? 0 : star);
+                }
+              }
+            };
             return (
               <StarButton
                 key={star}
@@ -141,12 +166,26 @@ export function StarRatingInput({
                 })}
                 aria-checked={selected}
                 disabled={disabled}
+                {...(disabled && !isWeb
+                  ? // Native focus removal (#316): React Native's
+                    // `focusable={false}` takes a disabled star out of
+                    // the keyboard / switch-access focus order. The
+                    // prop is an RN View prop Tamagui's stack types do
+                    // not declare, so it rides a native-only spread
+                    // (the Slider nativeAdjustProps pattern); Tamagui
+                    // forwards it to the RN View at runtime. Web gets
+                    // `tabIndex={-1}` below instead.
+                    ({ focusable: false } as Record<string, unknown>)
+                  : null)}
+                tabIndex={disabled ? -1 : 0}
+                {...(isWeb ? { "aria-disabled": disabled } : null)}
                 onPress={() => {
                   if (disabled) {
                     return;
                   }
                   onChange(allowClear && star === value ? 0 : star);
                 }}
+                onKeyDown={handleKeyDown}
               >
                 <Text
                   style={{
