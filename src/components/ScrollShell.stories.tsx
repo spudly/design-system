@@ -33,9 +33,9 @@ export const Default: Story = {
         </Text>
         <Text variant="subheading">Third block</Text>
         <Text>
-          With four blocks the content is taller than the frame, so this block starts below the
-          fold: reaching it means scrolling the whole column inside the surface frame, which is the
-          shell's one job. Nothing outside the frame moves while it scrolls — the surface stays
+          With four blocks the content is taller than the frame, so the fourth block starts below
+          the fold: reaching it means scrolling the whole column inside the surface frame, which is
+          the shell's one job. Nothing outside the frame moves while it scrolls — the surface stays
           painted around the moving column, and the frame itself keeps its size.
         </Text>
         <Text variant="subheading">Fourth block</Text>
