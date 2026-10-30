@@ -18,5 +18,7 @@ export {
   createTamaguiConfig,
   createStorybookTamaguiConfig,
   createOnDeviceStorybookTamaguiConfig,
+  resolveFontFamily,
+  type FontPlatform,
   type StorybookThemeName,
 } from "./tamagui.config.js";

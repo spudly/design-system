@@ -52,9 +52,10 @@ test("Quiet Dawn overrides the verse role to Alegreya and nothing else", () => {
   );
   assert.equal(family.verseNative, "Alegreya");
   assert.equal(family.verseNativeAndroid, "Alegreya");
-  // The UI roles are untouched: Raleway still governs headings/body.
+  // The UI roles are untouched: the UiSans family (Raleway instances)
+  // still governs headings/body.
   assert.equal(family.sans, tokens.typography.fontFamily.sans);
-  assert.equal(family.sansNative, "Raleway");
+  assert.equal(family.sansNative, "UiSans");
 });
 
 test("Warm Harvest keeps the base verse stack", () => {
