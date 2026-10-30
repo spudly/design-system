@@ -298,7 +298,7 @@ The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
 12 `pages-eciperay-recipespage` stories x light = **12
-baselines** (140 total). RecipesPage only, deliberately — a second
+baselines** (142 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
