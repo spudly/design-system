@@ -34,8 +34,10 @@ export type StarRatingInputProps = {
    * Color treatment for the stars. `default` renders unselected stars in
    * gray, for light surfaces. `dark` is for dark surfaces (e.g. the
    * cooking-mode overlay): unselected stars render near-white at reduced
-   * opacity so they stay visible without competing with selected stars.
-   * Selected stars render in the amber tone either way.
+   * opacity so they stay visible without competing with selected stars,
+   * and the label renders in the same near-white ink at full opacity so
+   * it stays legible against the dark surface (#334). Selected stars
+   * render in the amber tone either way.
    */
   tone?: StarRatingTone;
   /**
@@ -86,7 +88,14 @@ export function StarRatingInput({
 
   return (
     <YStack gap={tokens.spacing[1]}>
-      {label ? <Text id={labelId}>{label}</Text> : null}
+      {label ? (
+        <Text
+          id={labelId}
+          style={tone === "dark" ? { color: tokens.colors.gray.gray1 } : undefined}
+        >
+          {label}
+        </Text>
+      ) : null}
       {readOnly ? (
         <XStack
           {...platformAccessibilityProps({
