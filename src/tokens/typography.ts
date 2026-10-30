@@ -12,22 +12,41 @@ export const fontFamily = {
    * fallbacks for surfaces that have not loaded/bundled Raleway yet.
    * Raleway is not a stock font on any platform: web surfaces load it
    * (Google Fonts — the Storybook preview-head does), and native apps
-   * must register a font under the exact name "Raleway" (a variable
-   * font, so numeric weights resolve against the one family). Until
-   * an app registers it, native falls back to its default sans and
-   * web falls along this stack — the token contract is the name.
+   * register the static per-weight faces named in `sansNativeFaces` /
+   * `sansNativeAndroidFaces` below. Until an app registers them,
+   * native falls back to its default sans and web falls along this
+   * stack — the token contract is the names.
    */
   sans: "Raleway, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
   /**
    * Single font name for React Native for the `sans` role. Native
    * `fontFamily` takes ONE font name — the CSS fallback list in `sans`
-   * is invalid there. No per-weight faces are declared: apps register
-   * Raleway as a variable font under the family name, so iOS/Android
-   * resolve the DS weights numerically against it (the same reason
-   * Android registrations carry no named faces — see
-   * resolveFontFamily in tamagui.config).
+   * is invalid there.
    */
   sansNative: "Raleway",
+  /**
+   * iOS per-weight face names (weight → font name) for the `sans`
+   * role: native apps register one STATIC font per DS weight under
+   * these exact names, and Tamagui selects the face for a text's
+   * weight instead of asking the platform to resolve the weight
+   * numerically (see resolveFontFamily in tamagui.config).
+   *
+   * Why static faces, not one variable font: the bundled Raleway
+   * variable font's own default instance is its Thin (100) weight,
+   * so every DS weight asked the platform to instantiate the
+   * variable font at a non-default weight — and Android's numeric
+   * resolution of the medium (500) weight proved nondeterministic
+   * across app launches, rendering the same medium text (the public
+   * frame's sign-in and footer links) in two different weights from
+   * launch to launch (#326). A static face can only render its own
+   * weight, so face selection is deterministic by construction.
+   */
+  sansNativeFaces: {
+    "400": "Raleway",
+    "500": "Raleway-Medium",
+    "600": "Raleway-SemiBold",
+    "700": "Raleway-Bold",
+  },
   /**
    * Single font name for React Native on Android for the `sans` role:
    * the same registered "Raleway" family as iOS. (The previous
@@ -36,6 +55,18 @@ export const fontFamily = {
    * apps bundle deliberately, so the Android role names it too.)
    */
   sansNativeAndroid: "Raleway",
+  /**
+   * Android per-weight face names for the `sans` role: the same
+   * static faces as iOS (see `sansNativeFaces` for why). Android
+   * registrations carried no named faces until #326 — numeric weight
+   * resolution against the variable font is exactly what flipped.
+   */
+  sansNativeAndroidFaces: {
+    "400": "Raleway",
+    "500": "Raleway-Medium",
+    "600": "Raleway-SemiBold",
+    "700": "Raleway-Bold",
+  },
   /** Serif stack for display titles and verse/reading text (system serif). */
   serif: "Georgia, 'Times New Roman', serif",
   /**

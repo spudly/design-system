@@ -10,7 +10,8 @@
  * registers native font families:
  *
  * - body/heading resolve to the family every brand registers on native:
- *   "Raleway" (a variable font the host app bundles under that name).
+ *   "Raleway" (the host app bundles its static per-weight faces under
+ *   the declared names, #326).
  * - verse resolves to Quiet Dawn's "Alegreya" (also bundled): fonts are
  *   config-global, Quiet Dawn is the brand that ships verse text, and
  *   Base / Warm Harvest verse-role text deviating to Alegreya on

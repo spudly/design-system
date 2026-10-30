@@ -21,6 +21,12 @@
  *    a UI font family — components and stories read the token.
  *    (The mono role in SecretRevealPanel and the serif verse
  *    role in Text/VerseText are token reads, not literals.)
+ * 5. Both native platforms declare the static per-weight faces
+ *    (#326): apps register one static font per DS weight under
+ *    the declared names, so no platform resolves a weight
+ *    numerically against the variable font — Android's numeric
+ *    resolution of the medium weight rendered nondeterministically
+ *    across app launches.
  *
  * Run against the built output: `npm run build` first (the `test`
  * script does both). The hardcoded-family scan reads source.
@@ -47,8 +53,22 @@ test("the base sans stack leads with Raleway on every platform", () => {
   assert.equal(fontFamily.sansNativeAndroid, "Raleway");
 });
 
+/** The static per-weight faces every native registration declares (#326). */
+const EXPECTED_FACES = {
+  "400": "Raleway",
+  "500": "Raleway-Medium",
+  "600": "Raleway-SemiBold",
+  "700": "Raleway-Bold",
+};
+
 test("all themes resolve the sans role to the base Raleway values", () => {
   const base = baseTheme.tokens.typography.fontFamily;
+  assert.deepEqual(base.sansNativeFaces, EXPECTED_FACES, "base iOS faces must be the static faces");
+  assert.deepEqual(
+    base.sansNativeAndroidFaces,
+    EXPECTED_FACES,
+    "base Android faces must be the static faces",
+  );
   for (const [name, theme] of [
     ["eciperayTheme", eciperayTheme],
     ["memorizeTheme", memorizeTheme],
@@ -57,10 +77,15 @@ test("all themes resolve the sans role to the base Raleway values", () => {
     assert.equal(family.sans, base.sans, `${name} web stack must be the base Raleway stack`);
     assert.equal(family.sansNative, "Raleway", `${name} native name must be Raleway`);
     assert.equal(family.sansNativeAndroid, "Raleway", `${name} Android name must be Raleway`);
-    assert.equal(
+    assert.deepEqual(
       family.sansNativeFaces,
-      undefined,
-      `${name} must not declare per-weight faces — Raleway registers as one variable family`,
+      EXPECTED_FACES,
+      `${name} must declare the static per-weight faces for iOS (#326)`,
+    );
+    assert.deepEqual(
+      family.sansNativeAndroidFaces,
+      EXPECTED_FACES,
+      `${name} must declare the static per-weight faces for Android (#326)`,
     );
   }
 });
