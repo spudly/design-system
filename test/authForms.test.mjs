@@ -84,6 +84,17 @@ test("each form's submit button is named for the label it renders, in both state
       source.includes(`accessibilityLabel={loading ? "${busy}" : "${idle}"}`),
       `${form} names its submit button for the state it renders`,
     );
+    // The rendered label itself must be the same ternary, so a
+    // change to either visible label is caught here too (the
+    // name and the text cannot drift apart).
+    assert.match(
+      source,
+      new RegExp(
+        `^\\s*\\{loading \\? "${busy.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}" : "${idle.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}"\\}$`,
+        "m",
+      ),
+      `${form} renders the same loading ternary it is named by`,
+    );
   }
 });
 
