@@ -245,6 +245,11 @@ test("on native, a preset press in flight suppresses the blur commit (#315)", ()
   );
   assert.match(
     selector,
+    /onPressOut=\{\(\) => \{\s+\/\/ #315 cancel path:[\s\S]*?queueMicrotask\(\(\) => \{\s+presetPressPendingRef\.current = false;/,
+    "a canceled preset press (press-out with no onPress) clears the pending flag in a microtask, so a later genuine blur still commits",
+  );
+  assert.match(
+    selector,
     /const handleCustomBlur =[\s\S]*?commitCustom\(\);\s+\};/,
     "a blur leaving the group falls through to commitCustom",
   );

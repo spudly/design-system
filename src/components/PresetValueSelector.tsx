@@ -186,6 +186,25 @@ export function PresetValueSelector({
                 presetPressPendingRef.current = true;
               }
             }}
+            onPressOut={() => {
+              // #315 cancel path: a press that ends WITHOUT
+              // onPress (canceled by a scroll stealing the
+              // responder, or by releasing off the button) must
+              // not leave the pending flag set — a later genuine
+              // blur would read it and wrongly discard the draft
+              // instead of committing. The clear is deferred to
+              // a microtask: the blur a completed press causes
+              // fires during press-in (before press-out), and a
+              // completed press's onPress runs synchronously
+              // right after press-out and clears the flag itself,
+              // so this deferred clear only ever takes effect
+              // for a canceled press.
+              if (presetPressPendingRef.current) {
+                queueMicrotask(() => {
+                  presetPressPendingRef.current = false;
+                });
+              }
+            }}
             onPress={() => {
               presetPressPendingRef.current = false;
               setCustomEditing(false);
