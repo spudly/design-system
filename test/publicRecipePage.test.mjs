@@ -228,11 +228,7 @@ test("the CTA bar switches on the auth-state variant with verbatim labels", () =
     );
   }
   for (const key of ['key="sign-up"', 'key="clone"', 'key="get-app"']) {
-    assert.match(
-      code,
-      new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
-      `the CTA buttons carry stable per-action keys (${key}), so a variant switch never reuses one action's button for another`,
-    );
+    assert.match(code, new RegExp(key.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)), `the CTA buttons carry stable per-action keys (${key})`);
   }
 });
 
@@ -296,16 +292,8 @@ test("the shared section shapes are reused from RecipeDetailPage by alias", () =
 test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(overviewCode, /\{imageUrl \? \(/, "the hero image renders only with an imageUrl");
   assert.match(overviewCode, /\{description \? \(/, "the description renders only when present");
-  assert.match(
-    overviewCode,
-    /\{prepTimeLabel \? <StatCard label="Prep"/,
-    "the Prep stat needs a prep time",
-  );
-  assert.match(
-    overviewCode,
-    /\{cookTimeLabel \? <StatCard label="Cook"/,
-    "the Cook stat needs a cook time",
-  );
+  assert.match(overviewCode, /\{prepTimeLabel \? <StatCard label="Prep"/, "the Prep stat needs a prep time");
+  assert.match(overviewCode, /\{cookTimeLabel \? <StatCard label="Cook"/, "the Cook stat needs a cook time");
   assert.match(overviewCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
   assert.match(code, /\{ratings \? \(/, "the ratings card renders only with ratings");
   assert.match(
@@ -313,11 +301,7 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
     /\{comments\}/,
     "the comments slot renders its content directly (no shell when the slot is empty)",
   );
-  assert.match(
-    ingredientsCode,
-    /view\.substitutions && view\.substitutions\.length > 0/,
-    "the substitutions panel renders only with substitutions",
-  );
+  assert.match(ingredientsCode, /view\.substitutions && view\.substitutions\.length > 0/, "the substitutions panel renders only with substitutions");
 });
 
 test("tags render through Badge's color form, not an inline pill (#211)", () => {
@@ -327,23 +311,12 @@ test("tags render through Badge's color form, not an inline pill (#211)", () => 
     "tags render through TagList (Badge's color form)",
   );
   assert.ok(!code.includes("{tag.color}22"), "the page must not re-implement the tag tint inline");
-  assert.ok(
-    !overviewCode.includes("{tag.color}22"),
-    "the overview panel must not re-implement the tag tint inline",
-  );
+  assert.ok(!overviewCode.includes("{tag.color}22"), "the overview panel must not re-implement the tag tint inline");
 });
 
 test("the status badge map is page-owned with the idea fallback", () => {
-  for (const [status, label] of [
-    ["idea", "Idea"],
-    ["evolving", "Evolving"],
-    ["perfected", "Perfected"],
-    ["abandoned", "Abandoned"],
-  ]) {
-    assert.ok(
-      code.includes(`${status}: { label: "${label}"`),
-      `STATUS_BADGES must map ${status} to ${label}`,
-    );
+  for (const [status, label] of [["idea", "Idea"], ["evolving", "Evolving"], ["perfected", "Perfected"], ["abandoned", "Abandoned"]]) {
+    assert.ok(code.includes(`${status}: { label: "${label}"`), `STATUS_BADGES must map ${status} to ${label}`);
   }
   assert.match(code, /STATUS_BADGES\[overview\.status\] \?\? STATUS_BADGES\.idea/);
   assert.match(code, /statusTone=\{statusBadge\?\.tone \?\? "neutral"\}/);
