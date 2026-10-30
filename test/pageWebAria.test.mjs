@@ -153,17 +153,18 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 // Compact split form (the SANCTIONED_TAGS pattern above): this
 // file sits at the max-lines cap. MealPlansPage,
 // MealPlanDetailPage, AiSessionPage, and RecipeFormPage are
-// deliberately absent: their pressables render through generic
-// components (the rows' CardRow / ListRow link forms, #248 after
-// the #119 tranche-2 extraction; AiSessionPage's Cancel control
-// is an inline TextAction, #119 ai-import tranche; RecipeFormPage's
-// revert pressables moved into RevertAction / ChangedListBanner,
-// #119 forms tranche), so none has a stack pressable left to
-// translate — pinned by the dedicated test below.
-const PAGE_STACKS =
-  "src/pages/ShoppingListPage.tsx,src/pages/MealDetailPage.tsx,src/pages/MealsHubPage.tsx,src/pages/MealCookingModePage.tsx,src/pages/RecipeDetailPage.tsx".split(
-    ",",
-  );
+// deliberately absent: their rows and revert pressables render
+// through the generic components the #119 extractions moved
+// them into (CardRow / ListRow; RevertAction /
+// ChangedListBanner), and AiSessionPage's Cancel control is an
+// inline TextAction (#119 ai-import tranche), so none of the
+// four pages has a stack pressable left to translate — pinned
+// by the dedicated test below. The #119 meals & planning
+// tranche moved four more pages off the list the same way:
+// ShoppingListPage (its row is CheckRow), MealDetailPage (its
+// rows are ListRow), MealsHubPage (TextActionCardRow), and
+// MealCookingModePage (its Done pill is StepOverlay's).
+const PAGE_STACKS = "src/pages/RecipeDetailPage.tsx".split(",");
 
 // Shared by the stack scans below (compact form: this file sits
 // at the max-lines cap). RAW matches a raw RN accessibility JSX
@@ -191,29 +192,36 @@ test("page-level stack pressables route through the translator, never raw RN JSX
   }
 });
 
-test("ShoppingListPage's checkbox row translates role, checked state, and label together (#237)", () => {
-  const code = readCode("src/pages/ShoppingListPage.tsx");
+test("CheckRow (ShoppingListPage's row) translates role, checked state, and label together (#237)", () => {
+  const code = readCode("src/components/CheckRow.tsx");
   assert.match(
     code,
     /\{\.\.\.platformAccessibilityProps\(\{\s+accessibilityRole: "checkbox"/,
     "the translated props must be spread onto the row's XStack pressable",
   );
   assert.match(code, /accessibilityState: \{ checked \}/);
-  assert.match(code, /accessibilityLabel: line\.name/);
+  assert.match(code, /accessibilityLabel: accessibleName/);
 });
 
-test("de-styled pages have no stack pressable left to translate (#237, #248, #119)", () => {
-  // The plan pages' rows render through the generic row components
-  // in their link forms, AiSessionPage's Cancel action is an inline
-  // TextAction composition, and RecipeFormPage's rows and revert
-  // pressables render through the generic components the #119
-  // extractions moved them into — no stack pressable remains in
-  // any of the four pages, so the translator must not be imported
-  // or used, and no raw RN accessibility JSX props may appear
-  // either (props on DS primitives / LinkOverlay are the sanctioned
-  // exceptions, stripped via the shared TAGS before RAW is applied).
-  const PAGES = "MealPlansPage,MealPlanDetailPage,AiSessionPage,RecipeFormPage".split(",");
-  for (const rel of PAGES.map((page) => `src/pages/${page}.tsx`)) {
+test("the de-styled pages have no stack pressable left to translate (#237, #248, #119)", () => {
+  // These pages' rows and revert pressables render through the
+  // generic components the #119 extractions moved them into
+  // (and MealCookingModePage's pressable is StepOverlay's pill)
+  // — no stack pressable remains in any of them, so the
+  // translator must not be imported or used, and no raw RN
+  // accessibility JSX props may appear either (props on DS
+  // primitives / LinkOverlay are the sanctioned exceptions,
+  // stripped via the shared TAGS before RAW is applied).
+  for (const rel of [
+    "src/pages/MealPlansPage.tsx",
+    "src/pages/MealPlanDetailPage.tsx",
+    "src/pages/AiSessionPage.tsx",
+    "src/pages/RecipeFormPage.tsx",
+    "src/pages/ShoppingListPage.tsx",
+    "src/pages/MealDetailPage.tsx",
+    "src/pages/MealsHubPage.tsx",
+    "src/pages/MealCookingModePage.tsx",
+  ]) {
     const code = readCode(rel);
     assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
     assert.ok(
@@ -224,21 +232,21 @@ test("de-styled pages have no stack pressable left to translate (#237, #248, #11
 });
 
 test("rows translate the disabled state; the generic rows keep the button role in their press form (#237, #248)", () => {
-  // MealDetailPage's member rows are links since #248: the page
-  // routes only the unavailable row's disabled state through the
-  // translator, never a button role. The plan pages' rows moved
-  // into the generic ListRow / CardRow components (#119 tranche
-  // 2) and the routing moved with them: their press forms carry
-  // the button role, ListRow also translates its disabled state,
-  // and CardRow has no disabled state. RecipeFormPage's revert
-  // pressables (RevertAction / ChangedListBanner, #119 forms
-  // tranche) carry no row here: since the #119 dedupe both
-  // compose TextAction, whose own routing carries their role.
-  // Compact table form: this file is at its line cap.
+  // MealDetailPage's member rows are links since #248 and render
+  // through ListRow since the #119 meals tranche: the disabled
+  // routing lives in the row, not the page. The plan pages' rows
+  // moved into the generic ListRow / CardRow components (#119
+  // tranche 2) and the routing moved with them: their press
+  // forms carry the button role, ListRow also translates its
+  // disabled state, and CardRow has no disabled state.
+  // RecipeFormPage's revert pressables (RevertAction /
+  // ChangedListBanner, #119 forms tranche) carry no row here:
+  // since the #119 dedupe both compose TextAction, whose own
+  // routing carries their role. Compact table form: this file
+  // is at its line cap.
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases = [
-    ["src/pages/MealDetailPage.tsx", null, DISABLED],
     ["src/components/ListRow.tsx", ROLE, DISABLED],
     ["src/components/CardRow.tsx", ROLE, null],
   ];
@@ -452,46 +460,4 @@ test("SSR: TextLink, BackLink, OptionCard, and Alert render their roles (#237)",
   assert.ok(directAlertRole.includes('role="alert"'));
   assert.ok(!directAlertRole.includes('aria-live="polite"'));
   assertNoLeak(directAlertRole);
-});
-
-// Shared by the two #237 page-pattern tests below (hoisted so each
-// source is read once). AiSessionPage's Cancel control is composed
-// inline in the #119 ai-import tranche; the pins that guarded its
-// hand-built stack pressable now guard the inline composition.
-const aiSession = readCode("src/pages/AiSessionPage.tsx");
-const recipeDetail = readCode("src/pages/RecipeDetailPage.tsx");
-
-test("button-role pressables are keyboard-operable on web (#237, CodeRabbit PR #243)", () => {
-  // A Tamagui stack carrying role="button" is a div: without
-  // tabIndex + an Enter/Space handler it announces as a button that
-  // the keyboard cannot reach. The MealPlansPage rows set the
-  // pattern; AiSessionPage's Cancel control reaches the same
-  // semantics by composing TextAction inline (whose tabIndex +
-  // Enter/Space handler textAction.test.mjs pins).
-  assert.match(aiSession, /<TextAction\s+onPress=\{onCancel\}\s+disabled=\{busy\}/);
-  assert.match(aiSession, /accessibilityLabel="Cancel session"/);
-  // The scale control is no longer a page-level stack pressable:
-  // PresetValueSelector's Custom slot is a DS Button.
-  assert.ok(!recipeDetail.includes("handleCustomScaleKeyDown"), "the scale pressable retired");
-  assert.match(recipeDetail, /<PresetValueSelector/);
-});
-
-test("busy Cancel is activation-guarded and the Custom scale name carries the multiplier (#237)", () => {
-  // pointerEvents="none" does not stop key events on a focused
-  // control, so the Cancel control must refuse activation while
-  // busy and expose its disabled state: the page's busy flag
-  // drives the wrapper stack, which dims and blocks the pointer,
-  // and the TextAction's `disabled`, whose press/key handlers
-  // refuse activation while disabled (pinned in
-  // textAction.test.mjs) — covering the assistive-technology
-  // virtual click that can reach onPress despite
-  // pointerEvents="none" (CodeRabbit finding on PR #241).
-  assert.match(aiSession, /opacity=\{busy \? 0\.5 : 1\} pointerEvents=\{busy \? "none" : "auto"\}/);
-  assert.match(aiSession, /disabled=\{busy\}/);
-  // The selected custom-scale button shows the multiplier as its visible
-  // text; the accessible name must include it (composed in the selector).
-  assert.match(recipeDetail, /customAccessibilityLabel="Custom scale"/);
-  assert.match(recipeDetail, /formatCustomValue=\{\(custom\) => `\$\{formatScaleValue\(custom\)\}×`\}/);
-  const selector = readCode("src/components/PresetValueSelector.tsx");
-  assert.match(selector, /`\$\{customAccessibilityLabel\} \$\{formattedCustom\}`/);
 });

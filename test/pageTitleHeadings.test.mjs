@@ -7,23 +7,21 @@
  * the page title as the page's top heading.
  *
  * The contract now:
- * 1. Each of the eight pages (AddRecipeMenuPage, FeedbackPage,
+ * 1. All eight pages (AddRecipeMenuPage, FeedbackPage,
  *    MealDetailPage, MealPlanDetailPage, MealsHubPage, ProfilePage,
- *    ShoppingListPage, TagsPage) renders its title as the page's
- *    one level-1 heading — no page gains a second level-1
- *    heading — and no `subheading` usage remains in those files
- *    (their only subheading was the title). Four render it with
- *    `variant="heading"` (MealDetailPage, MealsHubPage,
- *    ShoppingListPage, TagsPage — the TITLE_PAGES list below);
- *    four render it with `variant="title"` instead
- *    (MealPlanDetailPage, item 6; AddRecipeMenuPage, FeedbackPage,
- *    and ProfilePage, items 2 and 6).
- * 2. The title keeps its explicit `fontSize` xl / `fontWeight` bold
- *    overrides, so the visual rendering is unchanged (the `heading`
- *    variant's own defaults are 3xl/bold; the overrides pin xl/bold).
- *    (FeedbackPage and ProfilePage rendered with exactly those
- *    overrides too, until the #119 auth tranche moved them to the
- *    `title` variant — point 5.)
+ *    ShoppingListPage, TagsPage) render their title with the
+ *    `title` variant — exactly once, so no page gains a second
+ *    level-1 heading — and no `subheading` usage remains in those
+ *    files (their only subheading was the title). AddRecipeMenuPage
+ *    was the last `heading` holdout; the #119 ai-import tranche
+ *    moved it (items 6 and 7 give the move's history per page).
+ * 2. While a page kept the heading form, its title kept its
+ *    explicit `fontSize` xl / `fontWeight` bold overrides, so the
+ *    visual rendering was unchanged (the `heading` variant's own
+ *    defaults are 3xl/bold; the overrides pinned xl/bold). The
+ *    `title` variant owns that xl/bold treatment (pinned against
+ *    Text.tsx in the MealPlanDetailPage test below), which is
+ *    what made each move rendering-neutral.
  * 3. HomePage is the pinned exception that proves the sweep is
  *    title-only: its page title was already `heading`, and its
  *    section title correctly stays `subheading` (level 2).
@@ -48,11 +46,17 @@
  *    which IS xl bold at heading level 1. Rendering and heading
  *    semantics are unchanged; the size/weight are owned by the
  *    variant (pinned against Text.tsx below) instead of the page.
+ * 7. The #119 meals & planning tranche applies the same move to
+ *    MealDetailPage, MealsHubPage, ShoppingListPage, and
+ *    TagsPage: their titles take the `title` variant (exactly
+ *    once; no `heading` or `subheading` usage remains), so the
+ *    SSR composition contract under 4 is unchanged — each hub
+ *    tab still exposes exactly one level-1 heading.
+ *    FeedbackPage and ProfilePage joined it in the #119 auth
+ *    tranche: same shape (heading + xl/bold overrides), same move
+ *    to the `title` variant, pinned by their own test below.
  *    AddRecipeMenuPage joined it in the #119 ai-import tranche,
- *    on the same terms (its dedicated test below). FeedbackPage
- *    and ProfilePage joined it in the #119 auth tranche: same
- *    shape (heading + xl/bold overrides), same move to the
- *    `title` variant, pinned by the same test below.
+ *    on the same terms (its dedicated test below).
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -69,49 +73,50 @@ function readCode(rel) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const TITLE_PAGES = [
-  "MealDetailPage",
-  "MealsHubPage",
-  "ShoppingListPage",
-  "TagsPage",
-];
+// The #119 meals & planning tranche's pages: their titles moved
+// to the `title` variant (the MealPlanDetailPage pattern, item 6).
+const TITLE_VARIANT_PAGES = ["MealDetailPage", "MealsHubPage", "ShoppingListPage", "TagsPage"];
 
 function countOccurrences(code, needle) {
   return code.split(needle).length - 1;
 }
 
-test("page titles use the heading variant exactly once, with no subheading left (#263)", () => {
-  for (const page of TITLE_PAGES) {
+test("AddRecipeMenuPage's title takes the title variant — xl bold at level 1 (#263, #119)", () => {
+  const code = readCode("src/pages/AddRecipeMenuPage.tsx");
+  assert.equal(
+    countOccurrences(code, 'variant="title"'),
+    1,
+    "AddRecipeMenuPage must render exactly one title-variant Text (its title)",
+  );
+  assert.equal(
+    countOccurrences(code, 'variant="heading"'),
+    0,
+    "AddRecipeMenuPage's title must not use the heading variant (its 3xl default is not the app's title size)",
+  );
+  assert.equal(
+    countOccurrences(code, 'variant="subheading"'),
+    0,
+    "AddRecipeMenuPage must not keep a subheading usage",
+  );
+});
+
+test("the #119 meals tranche's page titles take the title variant — xl bold at level 1 (#263, #119)", () => {
+  for (const page of TITLE_VARIANT_PAGES) {
     const code = readCode(`src/pages/${page}.tsx`);
     assert.equal(
-      countOccurrences(code, 'variant="heading"'),
+      countOccurrences(code, 'variant="title"'),
       1,
-      `${page} must render exactly one heading-variant Text (its title)`,
+      `${page} must render exactly one title-variant Text (its title)`,
+    );
+    assert.equal(
+      countOccurrences(code, 'variant="heading"'),
+      0,
+      `${page}'s title must not use the heading variant (its 3xl default is not the app's title size)`,
     );
     assert.equal(
       countOccurrences(code, 'variant="subheading"'),
       0,
-      `${page} must not keep a subheading usage — its only one was the page title`,
-    );
-  }
-});
-
-test("page titles keep their xl/bold overrides so rendering is unchanged (#263)", () => {
-  for (const page of TITLE_PAGES) {
-    const code = readCode(`src/pages/${page}.tsx`);
-    const variantAt = code.indexOf('variant="heading"');
-    const openAt = code.lastIndexOf("<Text", variantAt);
-    const closeAt = code.indexOf(">", variantAt);
-    const attrs = code.slice(openAt, closeAt);
-    assert.match(
-      attrs,
-      /fontSize=\{tokens\.typography\.fontSize\.xl\}/,
-      `${page} title must keep its fontSize xl override`,
-    );
-    assert.match(
-      attrs,
-      /fontWeight=\{tokens\.typography\.fontWeight\.bold\}/,
-      `${page} title must keep its fontWeight bold override`,
+      `${page} must not keep a subheading usage`,
     );
   }
 });
@@ -138,25 +143,6 @@ test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 
     text,
     /title: \{\s+fontSize: tokens\.typography\.fontSize\.xl,\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+\}/,
     "Text's title variant must carry the xl/bold treatment the page title rendered with",
-  );
-});
-
-test("AddRecipeMenuPage's title takes the title variant — xl bold at level 1 (#263, #119)", () => {
-  const code = readCode("src/pages/AddRecipeMenuPage.tsx");
-  assert.equal(
-    countOccurrences(code, 'variant="title"'),
-    1,
-    "AddRecipeMenuPage must render exactly one title-variant Text (its title)",
-  );
-  assert.equal(
-    countOccurrences(code, 'variant="heading"'),
-    0,
-    "AddRecipeMenuPage's title must not use the heading variant (its 3xl default is not the app's title size)",
-  );
-  assert.equal(
-    countOccurrences(code, 'variant="subheading"'),
-    0,
-    "AddRecipeMenuPage must not keep a subheading usage",
   );
 });
 

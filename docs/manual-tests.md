@@ -323,6 +323,31 @@ MealPlanDetailPage), or a changeset naming ButtonRow.
 
 ---
 
+## EqualButtonRow
+
+Open in `Components/EqualButtonRow`: Default, ThreeButtons,
+InCard.
+
+An EqualButtonRow is a row of action buttons that share the
+row's width equally. It owns the bar's whole treatment — the
+12px gap, the wrap, and the sizing of every button (flex 1
+with a 40% minimum width) — so there are no sizing or spacing
+props to pass.
+
+1. Default: the two buttons split the row as equal halves at
+   the same height, 12px apart, their labels on one line each.
+2. ThreeButtons: the first two buttons share line 1 as equal
+   halves and the third wraps to line 2 at the full row width —
+   no line of three thirds, and no label wraps inside a button.
+3. InCard: the same two-over-one treatment inside the card,
+   inset by the card's own padding (the CTA-bar composition
+   PublicRecipePage adopts).
+
+**Run when:** `src/components/EqualButtonRow.tsx`, its stories,
+PublicRecipePage's CTA bar, or a changeset naming EqualButtonRow.
+
+---
+
 ## CardStack
 
 Open in `Components/CardStack`: Default.
@@ -450,6 +475,32 @@ LoadingGate.
 
 ---
 
+## MessageCard
+
+Open in `Components/MessageCard`: Default, LongMessage.
+
+A MessageCard is a whole-screen message state: a card carrying
+a heading and one explanatory line, centered — horizontally
+and vertically — on a surface-filled shell that fills the
+story frame's height, inset 16px from the frame's edges. It
+owns the whole treatment; the caller supplies only the two
+strings.
+
+1. Default: the card sits at the vertical center of the frame
+   (not the top), the heading reads centered over the muted
+   message line, also centered.
+2. LongMessage: the message wraps inside the card and every
+   wrapped line stays centered; the card grows taller and
+   remains vertically centered.
+3. PublicRecipePage's NotFound and Unavailable stories show
+   the identical state once the page adopts the component.
+
+**Run when:** `src/components/MessageCard.tsx`, its stories,
+PublicRecipePage's notFound and unavailable states, or a
+changeset naming MessageCard.
+
+---
+
 ## ListRow
 
 Open in `Components/ListRow`: Prefixed, Plain, Disabled.
@@ -492,8 +543,9 @@ CustomSelected.
 
 1. Default: the Scale row shows ½× / 1× / 2× / 3× preset buttons
    at equal width in one non-wrapping row, 1× selected
-   (primary-filled, light label), plus the narrower Custom
-   button unselected.
+   (primary-filled, light label), plus the Custom button
+   unselected. The Custom label sits on one line (never wrapped
+   mid-word) and all five buttons are the same height.
 2. CustomSelected: the Custom button shows "2.5×" and is
    selected (primary-filled); no preset is selected.
 3. Pressing Custom swaps it in place for a decimal number
@@ -505,6 +557,133 @@ CustomSelected.
 **Run when:** `src/components/PresetValueSelector.tsx`, its
 stories, the recipe pages' scale rows, or a changeset naming
 PresetValueSelector.
+
+---
+
+## CheckRow
+
+Open in `Components/CheckRow`: Default, Checked, LabelOnly.
+
+1. Default: an outlined box sits left of a bold label with its
+   muted detail ("2 tbsp · optional") on the same line, over a
+   hairline; the whole row is the press target (pointer cursor
+   on web, Enter/Space toggle it, the story's row checks and
+   unchecks).
+2. Checked: the box fills with the primary color and a check
+   glyph, and the label renders muted and struck through.
+3. LabelOnly: no detail segment renders — the label stands
+   alone with no trailing separator.
+
+**Run when:** `src/components/CheckRow.tsx`, its stories,
+ShoppingListPage's list, or a changeset naming CheckRow.
+
+---
+
+## TextActionCardRow
+
+Open in `Components/TextActionCardRow`: Default, TitleOnly.
+
+1. Default: an elevated card with the title in semibold over
+   its muted subtitle; the text block is a link (anchor on
+   web) and "Delete" sits at the right edge as bare text —
+   pressing Delete does not navigate.
+2. TitleOnly: the card shows the title alone, no subtitle line
+   and no empty gap where it would sit.
+
+**Run when:** `src/components/TextActionCardRow.tsx`, its
+stories, MealsHubPage's meal list, or a changeset naming
+TextActionCardRow.
+
+---
+
+## BadgeCardRow
+
+Open in `Components/BadgeCardRow`: Default, DeleteOnly.
+
+1. Default: a compact card (small padding and shadow) with the
+   colored badge at the left and Edit / Delete as bare text
+   actions at the right, Delete in the error treatment.
+2. DeleteOnly: only the Delete action shows; the badge keeps
+   its color and the row height is unchanged.
+
+**Run when:** `src/components/BadgeCardRow.tsx`, its stories,
+TagsPage's rows, or a changeset naming BadgeCardRow.
+
+---
+
+## StepOverlay
+
+Open in `Components/StepOverlay`: Default.
+
+1. The dark overlay fills its frame: title and step eyebrows
+   render uppercase and dimmed over the step body in large
+   light text, and the translucent Done pill sits at the top
+   right (focusable on web; Enter/Space activate it).
+2. The story's dots and Back / Next row render below the body,
+   composed by the caller — the controls are the caller's; the
+   shell owns only the gap above them (its 32px body bottom
+   padding).
+
+**Run when:** `src/components/StepOverlay.tsx`, its stories,
+MealCookingModePage, or a changeset naming StepOverlay.
+
+---
+
+## PinnedHeaderShell
+
+Open in `Components/PinnedHeaderShell`: Default.
+
+1. The header block (title over the tab bar) stays pinned at
+   the top on the light page background while the content
+   region below it scrolls; the header's inset matches the
+   page inset (16px sides and top).
+
+**Run when:** `src/components/PinnedHeaderShell.tsx`, its
+stories, MealsHubPage's plans tab, or a changeset naming
+PinnedHeaderShell.
+
+---
+
+## FieldStack & TrailingActionsRow; Card's compact variant
+
+Open in `Components/FieldStack`: Default;
+`Components/TrailingActionsRow`: FieldAndAction,
+ContentAndTextActions, Narrow; `Components/Card`: Compact.
+
+1. FieldStack: the form's fields stack at an even 12px rhythm
+   with the button row last.
+2. TrailingActionsRow FieldAndAction: the leading group sits
+   at the left and the action at the right on one line.
+   ContentAndTextActions: the badge sits left, Edit / Delete
+   right, at a 12px gap between the actions. Narrow: when the
+   groups cannot fit, the action wraps below the leading group
+   instead of overflowing.
+3. Card Compact: the surface is the small card treatment —
+   12px padding, medium corners, small shadow, no border (the
+   former CompactCard, folded into Card as `variant="compact"`
+   under Stephen's 2026-10-29 ruling).
+
+**Run when:** `src/components/FieldStack.tsx`,
+`src/components/TrailingActionsRow.tsx`,
+`src/components/Card.tsx`, their stories, TagsPage's
+forms or rows, or a changeset naming any of them.
+
+---
+
+## ButtonStack & CenteredText
+
+Open in `Components/ButtonStack`: Default;
+`Components/CenteredText`: Default.
+
+1. ButtonStack: the three buttons stretch full width at an
+   even 12px rhythm.
+2. CenteredText: the subtitle line centers (each wrapped line
+   centered) in the muted ink; the plain line centers in the
+   default ink.
+
+**Run when:** `src/components/ButtonStack.tsx`,
+`src/components/CenteredText.tsx`, their stories, HomePage's
+header, or a changeset naming either.
 
 ---
 
@@ -851,6 +1030,48 @@ Empty, Loading, NoGoals, NutritionUnavailable.
 **Run when:** `src/pages/MealPlansPage.tsx`,
 `src/pages/MealPlanDetailPage.tsx`, their stories, or a changeset
 naming either page.
+
+---
+
+## Meals & planning pages (MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)
+
+Open in `Pages/Eciperay/MealDetailPage`: Default,
+NoNotesOrNutrition; `Pages/Eciperay/MealsHubPage`: Default,
+PlansTab, Empty; `Pages/Eciperay/ShoppingListPage`: Default,
+Loading, Empty; `Pages/Eciperay/HomePage`: WithRecipes, Empty,
+Loading; `Pages/Eciperay/MealCookingModePage`: Default,
+FirstStep, LastStep.
+
+1. MealDetailPage Default: xl bold title, muted notes and
+   nutrition lines, Cook meal / Edit side by side, then the
+   Recipes card whose member rows link (title over its meta
+   line); an unavailable member would show its
+   " (unavailable)" suffix and not link. NoNotesOrNutrition
+   drops the two muted lines with no leftover gaps.
+2. MealsHubPage Default: Meals title over the tab bar, the
+   full-width New meal button, then meal cards at an even 8px
+   rhythm, each card's Delete a bare text action at its right
+   edge. PlansTab: the same chrome stays pinned above the
+   plans list. Empty: the empty state replaces the list.
+3. ShoppingListPage Default: each line's box, bold name, and
+   muted quantity / "optional" segments render on one line;
+   checking a line fills its box and strikes the line through.
+   Loading shows the spinner under the title; Empty shows the
+   empty state.
+4. HomePage WithRecipes: hero title, centered muted subtitle,
+   three full-width buttons, then the section title over the
+   host-rendered rows at the rows' own rhythm. Loading centers
+   the spinner under the section title; Empty centers the
+   empty message there.
+5. MealCookingModePage: the dark overlay covers the frame —
+   uppercase meal title and "Step N of M · recipe" eyebrows
+   over the step body, Done pill at the top right, dots and
+   Back / Next below. FirstStep has no Back; LastStep disables
+   Next.
+
+**Run when:** any of the five pages' sources or stories, or a
+changeset naming any of them. Run only the numbered cases for
+the page(s) that changed.
 
 ---
 
