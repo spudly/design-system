@@ -225,7 +225,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-forgotpasswordpage           | light_warmHarvest |       2 |         2 |
 | pages-eciperay-homepage                     | light_warmHarvest |       3 |         3 |
 | pages-eciperay-importimagepage              | light_warmHarvest |       1 |         1 |
-| pages-eciperay-importreviewpage             | light_warmHarvest |       2 |         1 |
+| pages-eciperay-importreviewpage             | light_warmHarvest |       2 |         2 |
 | pages-eciperay-importtextpage               | light_warmHarvest |       2 |         2 |
 | pages-eciperay-importurlpage                | light_warmHarvest |       2 |         2 |
 | pages-eciperay-landingpage                  | light_warmHarvest |       2 |         2 |
@@ -256,7 +256,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **143** |   **142** |
+| **Total**                                   |                   | **143** |   **143** |
 
 <!-- VR-COVERAGE-END -->
 
