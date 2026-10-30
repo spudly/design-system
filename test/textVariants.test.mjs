@@ -17,6 +17,15 @@
  *   MealPlanFormPage) each override `heading` down to exactly
  *   this, because their titles sit inside the form layout rather
  *   than opening a page.
+ * - `muted` and `success` (the #119 auth tranche): the auth
+ *   pages' intro lines and ProfilePage's account line hand-set
+ *   the muted role at body size on the default variant
+ *   (ForgotPasswordPage, ResetPasswordPage, ProfilePage), and
+ *   FeedbackPage's submitted message hand-set the success color
+ *   at small size. The variants own those treatments: `muted`
+ *   is the theme's `$textMuted` role at the default body size;
+ *   `success` is the success ramp's text step (success8) at
+ *   small size — the app form's bare success line.
  *
  * The pins hold the variant definitions to the exact values the
  * pages render today and keep `formTitle` in the level-1 heading
@@ -59,4 +68,20 @@ test("formTitle is a level-1 heading; label carries no heading level", () => {
     /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle"/,
     "formTitle must sit in the level-1 heading group",
   );
+});
+
+test("the muted variant is the muted role at body size", () => {
+  assert.match(code, /muted: \{\s+color: "\$textMuted",\s+\},/);
+});
+
+test("the success variant is small text in the success treatment", () => {
+  assert.match(
+    code,
+    /success: \{\s+fontSize: tokens\.typography\.fontSize\.sm,\s+color: tokens\.colors\.success\.success8,\s+\},/,
+  );
+});
+
+test("muted and success are in the public TextProps union and carry no heading level", () => {
+  assert.match(code, /"muted"/);
+  assert.match(code, /"success"/);
 });

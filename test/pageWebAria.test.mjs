@@ -25,7 +25,13 @@
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
  *   generic CardRow / ListRow components; the routing moved with
- *   them and the rows test below pins it there.)
+ *   them and the rows test below pins it there. RecipeFormPage's
+ *   revert actions and changed-list banner joined them in the
+ *   #119 forms tranche as the RevertAction / ChangedListBanner
+ *   components; since the #119 dedupe both compose TextAction,
+ *   so their press role is TextAction's routing, pinned with
+ *   TextAction — the de-styled-pages test below pins that no
+ *   stack pressable remains in RecipeFormPage itself.)
  * - Tamagui semantic primitives used directly: Checkbox in
  *   ChecklistRow (its `accessibilityLabel` leaked; Tamagui supplies
  *   role/aria-checked itself) and Progress in ProgressBar (role,
@@ -103,8 +109,11 @@ function sourceFiles(dir) {
 // it routes its `accessibilityLabel` through
 // platformAccessibilityProps internally. (ActionChip was too,
 // until the #119 dedupe retired it; its consumers are Buttons.)
+// RatingStars (RecipesPage's page-local log-cook control) is
+// sanctioned on the same ground: its pressable form routes
+// the label through platformAccessibilityProps onto its target.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars".split(
     ",",
   ),
 );
@@ -217,8 +226,11 @@ test("rows translate the disabled state; the generic rows keep the button role i
   // into the generic ListRow / CardRow components (#119 tranche
   // 2) and the routing moved with them: their press forms carry
   // the button role, ListRow also translates its disabled state,
-  // and CardRow has no disabled state. Compact table form: this
-  // file is at its line cap.
+  // and CardRow has no disabled state. RecipeFormPage's revert
+  // pressables (RevertAction / ChangedListBanner, #119 forms
+  // tranche) carry no row here: since the #119 dedupe both
+  // compose TextAction, whose own routing carries their role.
+  // Compact table form: this file is at its line cap.
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases = [

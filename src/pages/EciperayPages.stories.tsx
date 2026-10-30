@@ -9,7 +9,7 @@ import { SectionCard } from "../components/SectionCard.js";
 import { Text } from "../components/Text.js";
 import { TextLink } from "../components/TextLink.js";
 import { tokens } from "../tokens/index.js";
-import { PageFrame } from "./PageFrame.js";
+import { PageFrame } from "../components/PageFrame.js";
 import { mealPlanFixture, recipeDetailFixture } from "./fixtures.js";
 
 /**

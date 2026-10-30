@@ -201,15 +201,15 @@ test("RecipesPage no longer wires the plain stalling handler", () => {
 test("both pages keep the loading-more footer on isFetchingNextPage", () => {
   assert.match(
     recipesPage,
-    /isFetchingNextPage \? \(/,
-    "RecipesPage's footer keys off isFetchingNextPage",
+    /ListFooterComponent=\{isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined\}/,
+    "RecipesPage's footer is the shared ListLoadingState, keyed off isFetchingNextPage",
   );
-  // DiscoverPage's footer renders the shared ListLoadingState
-  // directly (#320 removed the ListLoadingFooter middleman),
-  // whose one-line form prettier keeps unparenthesized.
+  // DiscoverPage renders the shared ListLoadingState directly
+  // in the same form (#320 removed the ListLoadingFooter
+  // middleman).
   assert.match(
     discoverPage,
-    /isFetchingNextPage \? <ListLoadingState label="Loading" \/>/,
-    "DiscoverPage's footer keys off isFetchingNextPage",
+    /ListFooterComponent=\{isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined\}/,
+    "DiscoverPage's footer is the shared ListLoadingState, keyed off isFetchingNextPage",
   );
 });

@@ -38,6 +38,12 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "..", "src", "pages");
 const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
+// The MediaRow composition is page-local (bottom of the page
+// file); slice it out so the placement pins run against it.
+const mediaRow = source.slice(
+  source.indexOf("const textBlockStyle"),
+  source.indexOf("const STAR_STEPS"),
+);
 const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -84,13 +90,22 @@ test("a row with accessory content hides its Log cook button; other rows keep it
 });
 
 test("the accessory renders under the row's card, inside the list item", () => {
-  const rowAt = code.indexOf("<RecipeRow");
-  const accessoryAt = code.indexOf("{accessory}");
-  assert.ok(rowAt !== -1, "renderItem must render the RecipeRow");
-  assert.ok(accessoryAt > rowAt, "the accessory must render after (under) the row's card");
+  // Since the #119 recipes-list tranche the row is the page's
+  // page-local MediaRow composition: the page hands the
+  // accessory over only when it has content, and the under-card
+  // placement is the composition's own.
   assert.match(
     code,
-    /\{hasAccessory \? <YStack paddingBlockEnd="\$3">\{accessory\}<\/YStack> : null\}/,
+    /accessory=\{hasAccessory \? accessory : undefined\}/,
+    "the page must pass the accessory to MediaRow only when it renders content",
+  );
+  const cardAt = mediaRow.indexOf("<Card variant=");
+  const accessoryAt = mediaRow.indexOf("{accessory}");
+  assert.ok(cardAt !== -1, "MediaRow must render its row card");
+  assert.ok(accessoryAt > cardAt, "the accessory must render after (under) the row's card");
+  assert.match(
+    mediaRow,
+    /\{accessory \? <YStack paddingBlockEnd="\$3">\{accessory\}<\/YStack> : null\}/,
     "the accessory must render in the under-card YStack only when it has content",
   );
 });

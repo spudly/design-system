@@ -62,6 +62,9 @@ const listStackCode = code("ListStack.tsx");
 const panelStackCode = code("PanelStack.tsx");
 const buttonStackCode = code("ButtonStack.tsx");
 const centerCode = code("Center.tsx");
+const fieldStackCode = code("FieldStack.tsx");
+const searchRowCode = code("SearchRow.tsx");
+const textFieldSource = readFileSync(join(componentsDir, "TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
 const buttonCode = code("Button.tsx");
 
@@ -184,6 +187,62 @@ test("Button's grow keeps a content-sized basis in both forms (no wrapping-row c
   assert.ok(
     !/\{\.\.\.\(grow \? \{ flex: 1 \}/.test(buttonCode),
     "Button's grow must never spread flex: 1 (zero basis — the wrapping-row collapse)",
+  );
+});
+
+test("the filter-bar shells are exported from the built package root", async () => {
+  const dist = await import("../dist/index.js");
+  for (const name of ["FieldStack", "SearchRow"]) {
+    assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+  }
+  assert.equal(
+    dist.FilterBar,
+    undefined,
+    "FilterBar was this tranche's local shell — the #119 dedupe subsumed it into CatalogFiltersBar and it must not survive as package API",
+  );
+  assert.equal(
+    dist.ChoiceRow,
+    undefined,
+    "ChoiceRow was this tranche's local chooser row — the #119 dedupe retired it with the chips and it must not survive as package API",
+  );
+});
+
+test("FieldStack owns the stacked-fields rhythm (#119)", () => {
+  assert.match(fieldStackCode, /styled\(YStack, \{\s+name: "FieldStack",/);
+  assert.match(fieldStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
+  assert.match(fieldStackCode, /Omit<StyledFieldStackProps, "gap" \| "alignItems">/);
+});
+
+test("SearchRow stretches its children — the Filters button matches the search field's height (#119)", () => {
+  assert.match(searchRowCode, /styled\(XStack, \{\s+name: "SearchRow",/);
+  assert.match(searchRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "stretch",/);
+  assert.match(searchRowCode, /Omit<StyledSearchRowProps, "gap" \| "alignItems">/);
+});
+
+test("no filter-bar shell offers spacing or margin props", () => {
+  for (const [name, src] of [
+    ["FieldStack", fieldStackCode],
+    ["SearchRow", searchRowCode],
+  ]) {
+    for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {
+      assert.ok(
+        !new RegExp(String.raw`${banned}\?:`).test(src),
+        `${name} must not carry a ${banned} prop (#119)`,
+      );
+    }
+  }
+});
+
+test("TextField's grow prop flexes the field's root, and only when set (#119)", () => {
+  assert.match(
+    textFieldSource,
+    /grow\?: boolean;/,
+    "TextFieldProps must carry the optional grow flag (the SearchField precedent)",
+  );
+  assert.match(
+    textFieldSource,
+    /\{\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)\}/,
+    "the field's root must take flex: 1 only when grow is set, so standalone fields are unchanged",
   );
 });
 

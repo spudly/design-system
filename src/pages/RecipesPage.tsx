@@ -1,18 +1,20 @@
-import { useState, type ReactNode } from "react";
-import { FlatList, TouchableOpacity } from "react-native";
-import { Anchor, Image, View, XStack, YStack, isWeb } from "tamagui";
+import type { ReactNode } from "react";
+import { Anchor, View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
-import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
+import {
+  CatalogFiltersBar,
+  type CatalogFilterDefinition,
+} from "../components/CatalogFiltersBar.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { LinkOverlay } from "../components/linkOverlay.js";
+import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SearchField } from "../components/SearchField.js";
-import { SelectField, type SelectOption } from "../components/SelectField.js";
-import { Spinner } from "../components/Spinner.js";
+import type { SelectOption } from "../components/SelectField.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
+import { Thumbnail } from "../components/Thumbnail.js";
+import { BoundedList } from "./BoundedList.js";
 import { useCatalogPagination } from "./useCatalogPagination.js";
 
 /**
@@ -25,21 +27,22 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  *
  * Placement: page components live in src/pages behind the
  * `@spudly/ui/pages` subpath export, not the package root. This
- * component imports react-native's FlatList; the root entry must
- * stay importable in plain Node (SSR, tooling, this repo's own
- * config tests), where react-native's Flow-typed source cannot
- * load. Apps opt into the subpath explicitly when they rewire a
- * screen onto a page component.
+ * component imports react-native's FlatList (through BoundedList);
+ * the root entry must stay importable in plain Node (SSR, tooling,
+ * this repo's own config tests), where react-native's Flow-typed
+ * source cannot load. Apps opt into the subpath explicitly when they
+ * rewire a screen onto a page component.
  *
  * The composition mirrors the app's RecipesListView (spudly/eciperay
  * packages/app) exactly, including its two layout regressions kept as
  * structural rules:
- * - #188: the FlatList is bounded to the fixed `list` shell with
- *   `flex: 1` (see listStyle), and the filter bar renders as the
- *   list's header so it scrolls with the recipes instead of pinning
- *   above a sliver of list. The list — and therefore the focused
- *   filter input — stays mounted while loading; the spinner renders
- *   as the list's empty state. test/recipesPageBoundedList.test.mjs
+ * - #188: the list is the shared BoundedList (#119), bounded to the
+ *   fixed `list` shell with `flex: 1` — its own styling, owned by
+ *   BoundedList — and the filter bar renders as the list's header so
+ *   it scrolls with the recipes instead of pinning above a sliver of
+ *   list. The list — and therefore the focused filter input — stays
+ *   mounted while loading; the spinner renders as the list's empty
+ *   state (ListLoadingState). test/recipesPageBoundedList.test.mjs
  *   guards these patterns in source.
  * - #162: search uses the DS SearchField as-is. No lineHeight is set
  *   on any glyph or text in this file — the SearchField's own glyph
@@ -52,9 +55,10 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * `onLogCookPress(id)` callback with rows rendered end to end here —
  * left it nowhere to render. The slot keeps the boundary intact:
  * the view calls the render prop once per row with the row's id and
- * renders whatever comes back directly under that row's card;
- * returning null/undefined renders nothing. When a row's accessory
- * is non-null, that row's log-cook control is hidden — the app
+ * hands the result to the row (MediaRow's `accessory`), which
+ * renders it directly under that row's card; returning
+ * null/undefined renders nothing. When a row's accessory is
+ * non-null, that row's log-cook control is hidden — the app
  * reproduces its card's control-hides-while-the-form-is-open
  * behavior purely by what it returns (the form for the open row,
  * null everywhere else). The form itself, its state, and its
@@ -66,8 +70,10 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * (see `RecipesPageItem.rating`) and pressing them fires
  * `onLogCookPress`; an unrated recipe renders a single icon-only
  * button — one unfilled star, no text — firing the same callback.
- * There is deliberately no Delete in the list: deleting a recipe
- * lives on RecipeDetailPage (its `onDeletePress` chip).
+ * Both states are the page-local RatingStars composition's
+ * pressable form (bottom of this file). There is deliberately no
+ * Delete in the list: deleting a recipe lives on RecipeDetailPage
+ * (its `onDeletePress` chip).
  *
  * Placement is structural, not cosmetic (Stephen's direction,
  * 2026-10-24, after inspecting PR #120's final narrow baseline):
@@ -80,7 +86,8 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * row's right edge). Inside the text block the control can only
  * wrap within the block's own full width, below the subtitle it
  * follows; the row keeps exactly two flex children — thumbnail
- * and text block.
+ * and text block. The page-local MediaRow composition owns
+ * that geometry (see its `subtitleAction` slot).
  *
  * Collapsed filters (#96): the filter bar used to render every
  * filter control at once, and the form filled most of the
@@ -114,36 +121,22 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * shared rows gain this page's "title, subtitle" accessible
  * label and the `flexBasis: 60` narrow-width row geometry
  * (#205) the shared page's rows lacked.
+ *
+ * #119: the page composes design-system components and passes
+ * data and callbacks only. The layout it used to hand-style
+ * lives in the components it renders: BoundedList (the bounded
+ * list, its content inset, the 12px row separation),
+ * ListLoadingState (the loading states), CatalogFiltersBar
+ * (the shared catalog filter bar — the page supplies its filter
+ * definitions as data; the bar owns the control design). The
+ * row and its rating control are the page-local MediaRow /
+ * RatingStars compositions at the bottom of this file, built
+ * from the shared Card / Thumbnail / Text / LinkOverlay
+ * components: a tranche page adds no library components
+ * (Stephen's rule, 2026-10-29), so single-page compositions
+ * live in the page. DiscoverPage renders the same
+ * CatalogFiltersBar with its own definitions.
  */
-
-// List content geometry on the DS spacing scale, mirroring the app
-// screen (plain object, no StyleSheet).
-const listContentStyle = {
-  paddingHorizontal: tokens.spacing[4],
-  paddingBottom: tokens.spacing[8],
-} as const;
-
-// The FlatList must be bounded to the space the fixed `list` shell
-// leaves it (#188): without flex: 1 it sizes to its full content
-// height inside the non-scrolling shell, overflows the viewport, and
-// never gets a scrollable viewport of its own.
-const listStyle = { flex: 1 } as const;
-
-// Structural flex only: the card's text block expands and may shrink
-// within the row (mirrors the app's ThumbnailListCard). The explicit
-// flexBasis matters (eciperay #205): with a plain `flex: 1` the basis
-// is 0, so on narrow viewports (e.g. a phone at the largest display
-// size, ~314dp wide) the row's fixed child — the 64dp thumbnail —
-// and any trailing row item consume the entire row and the text
-// block collapses to ~0dp wide. Text measured at ~0 width paints
-// nothing yet measures extremely tall, which stretched the card past
-// the viewport with only the thumbnail visible. A 60dp basis gives
-// the row a real line-breaking size, and the text block grows to
-// fill its line. (The log-cook control is no longer a row item at
-// all — it renders inline inside this block; see the header's row
-// actions note.) At ordinary widths nothing changes — the basis is
-// below the width the block already gets, so it still just expands.
-const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
 
 /** One recipe row's view-model. The app formats `subtitle` (its list
  * meta line — servings · time · rating/satiety); the view only
@@ -169,9 +162,12 @@ export type RecipesPageItem = {
   imageUrl?: string | null;
 };
 
-// The filter option sets the app's filter bar hardcodes, moved with
-// the bar. Values stay plain strings so no app type leaks into the
-// DS: the app maps its own status/sort unions at the boundary.
+// The filter option sets are this catalog's data, passed to the
+// shared CatalogFiltersBar as filter definitions (the bar owns
+// the control design; option sets and labels are the caller's
+// data — the #311 ruling). Values stay plain strings so no app
+// type leaks into the DS: the app maps its own status/sort
+// unions at the boundary.
 const STATUS_OPTIONS: SelectOption[] = [
   { value: "all", label: "All statuses" },
   { value: "idea", label: "Idea" },
@@ -197,22 +193,6 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
  * min/max fields add and remove together), as do the Sort by /
  * Order selects. */
 export type RecipesPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
-
-const FILTER_LABELS: Record<RecipesPageFilterId, string> = {
-  status: "Status",
-  ingredient: "Ingredient",
-  calories: "Calories",
-  satiety: "Satiety",
-  sort: "Sort",
-};
-
-const ALL_FILTER_IDS: RecipesPageFilterId[] = [
-  "status",
-  "ingredient",
-  "calories",
-  "satiety",
-  "sort",
-];
 
 export type RecipesPageProps = {
   /** Recipes to render, already filtered/sorted by the app. */
@@ -300,526 +280,6 @@ export type RecipesPageProps = {
   onFilterChooserOpenChange?: (open: boolean) => void;
 };
 
-type FilterControlsProps = Pick<
-  RecipesPageProps,
-  | "search"
-  | "onSearchChange"
-  | "statusFilter"
-  | "onStatusFilterChange"
-  | "showStatusFilter"
-  | "ingredient"
-  | "onIngredientChange"
-  | "minCalories"
-  | "onMinCaloriesChange"
-  | "maxCalories"
-  | "onMaxCaloriesChange"
-  | "minSatiety"
-  | "onMinSatietyChange"
-  | "maxSatiety"
-  | "onMaxSatietyChange"
-  | "sort"
-  | "onSortChange"
-  | "sortDir"
-  | "onSortDirChange"
-  | "activeFilters"
-  | "onActiveFiltersChange"
-  | "filterChooserOpen"
-  | "onFilterChooserOpenChange"
->;
-
-function NumberFilter({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <YStack flex={1}>
-      <TextField
-        label={label}
-        accessibilityLabel={label}
-        keyboardType="numeric"
-        value={value}
-        onChangeText={onChange}
-      />
-    </YStack>
-  );
-}
-
-/** One added filter: its control(s) plus the Remove control that
- * clears and hides it (#96). */
-function AddedFilter({
-  id,
-  onRemove,
-  children,
-}: {
-  id: RecipesPageFilterId;
-  onRemove: (id: RecipesPageFilterId) => void;
-  children: ReactNode;
-}) {
-  return (
-    <YStack gap={tokens.spacing[1]}>
-      <XStack justifyContent="flex-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          accessibilityLabel={`Remove ${FILTER_LABELS[id]} filter`}
-          onPress={() => {
-            onRemove(id);
-          }}
-        >
-          Remove
-        </Button>
-      </XStack>
-      {children}
-    </YStack>
-  );
-}
-
-/** The collapsed filter bar (#96): search and a small Filters
- * button initially; the button opens a chooser of the filters not
- * yet added, and a filter's control — the same controls the bar
- * always rendered: the status select, ingredient, min/max calorie
- * and satiety number fields, and the Sort by / Order selects —
- * renders only once that filter has been added. */
-function RecipesFiltersBar({
-  search,
-  onSearchChange,
-  statusFilter,
-  onStatusFilterChange,
-  ingredient,
-  onIngredientChange,
-  minCalories,
-  onMinCaloriesChange,
-  maxCalories,
-  onMaxCaloriesChange,
-  minSatiety,
-  onMinSatietyChange,
-  maxSatiety,
-  onMaxSatietyChange,
-  sort,
-  onSortChange,
-  sortDir,
-  onSortDirChange,
-  showStatusFilter = true,
-  activeFilters,
-  onActiveFiltersChange,
-  filterChooserOpen,
-  onFilterChooserOpenChange,
-}: FilterControlsProps) {
-  const statusAvailable =
-    showStatusFilter && statusFilter !== undefined && onStatusFilterChange !== undefined;
-  const available = ALL_FILTER_IDS.filter((id) => id !== "status" || statusAvailable);
-  // Uncontrolled seed: a filter that already carries a non-default
-  // value starts added, so existing callers that preset filter
-  // values keep seeing (and can clear) those filters.
-  const [internalActiveFilters, setInternalActiveFilters] = useState<RecipesPageFilterId[]>(() => {
-    const seeded: RecipesPageFilterId[] = [];
-    if (statusAvailable && statusFilter !== "all") seeded.push("status");
-    if (ingredient !== "") seeded.push("ingredient");
-    if (minCalories !== "" || maxCalories !== "") seeded.push("calories");
-    if (minSatiety !== "" || maxSatiety !== "") seeded.push("satiety");
-    if (sort !== "newest" || sortDir !== "desc") seeded.push("sort");
-    return seeded;
-  });
-  const [internalChooserOpen, setInternalChooserOpen] = useState(false);
-  const active = activeFilters ?? internalActiveFilters;
-  const chooserOpen = filterChooserOpen ?? internalChooserOpen;
-  const addable = available.filter((id) => !active.includes(id));
-
-  const setActive = (next: RecipesPageFilterId[]) => {
-    if (activeFilters === undefined) setInternalActiveFilters(next);
-    onActiveFiltersChange?.(next);
-  };
-  const setChooserOpen = (open: boolean) => {
-    if (filterChooserOpen === undefined) setInternalChooserOpen(open);
-    onFilterChooserOpenChange?.(open);
-  };
-  const addFilter = (id: RecipesPageFilterId) => {
-    setActive([...active, id]);
-    setChooserOpen(false);
-  };
-  const removeFilter = (id: RecipesPageFilterId) => {
-    // Removal clears the filter's values through the ordinary
-    // change callbacks, so a hidden filter never keeps filtering.
-    if (id === "status") onStatusFilterChange?.("all");
-    if (id === "ingredient") onIngredientChange("");
-    if (id === "calories") {
-      onMinCaloriesChange("");
-      onMaxCaloriesChange("");
-    }
-    if (id === "satiety") {
-      onMinSatietyChange("");
-      onMaxSatietyChange("");
-    }
-    if (id === "sort") {
-      onSortChange("newest");
-      onSortDirChange("desc");
-    }
-    setActive(active.filter((filterId) => filterId !== id));
-  };
-
-  return (
-    <YStack gap={tokens.spacing[3]}>
-      {/* The row stretches its children (#188): the small Filters
-          button's natural height is shorter than the SearchField,
-          so the button stretches to the search field's height and
-          the two line up. Do not switch this back to flex-start —
-          that is what made the button shorter than the field. */}
-      <XStack gap={tokens.spacing[2]} alignItems="stretch">
-        <YStack flex={1}>
-          <SearchField value={search} onChangeText={onSearchChange} placeholder="Search recipes…" />
-        </YStack>
-        {addable.length > 0 ? (
-          <Button
-            variant="secondary"
-            size="sm"
-            accessibilityLabel="Add a filter"
-            aria-expanded={chooserOpen}
-            onPress={() => {
-              setChooserOpen(!chooserOpen);
-            }}
-          >
-            Filters
-          </Button>
-        ) : null}
-      </XStack>
-      {chooserOpen && addable.length > 0 ? (
-        <XStack gap={tokens.spacing[2]} flexWrap="wrap">
-          {addable.map((id) => (
-            <Button
-              key={id}
-              variant="secondary"
-              size="sm"
-              accessibilityLabel={`Add ${FILTER_LABELS[id]} filter`}
-              onPress={() => {
-                addFilter(id);
-              }}
-            >
-              {FILTER_LABELS[id]}
-            </Button>
-          ))}
-        </XStack>
-      ) : null}
-      {active.includes("status") && statusAvailable ? (
-        <AddedFilter id="status" onRemove={removeFilter}>
-          <SelectField
-            label="Status"
-            value={statusFilter}
-            options={STATUS_OPTIONS}
-            onValueChange={onStatusFilterChange}
-          />
-        </AddedFilter>
-      ) : null}
-      {active.includes("ingredient") ? (
-        <AddedFilter id="ingredient" onRemove={removeFilter}>
-          <TextField
-            label="Ingredient"
-            accessibilityLabel="Ingredient"
-            value={ingredient}
-            onChangeText={onIngredientChange}
-            placeholder="e.g. chicken"
-          />
-        </AddedFilter>
-      ) : null}
-      {active.includes("calories") ? (
-        <AddedFilter id="calories" onRemove={removeFilter}>
-          <XStack gap={tokens.spacing[2]}>
-            <NumberFilter label="Min cal" value={minCalories} onChange={onMinCaloriesChange} />
-            <NumberFilter label="Max cal" value={maxCalories} onChange={onMaxCaloriesChange} />
-          </XStack>
-        </AddedFilter>
-      ) : null}
-      {active.includes("satiety") ? (
-        <AddedFilter id="satiety" onRemove={removeFilter}>
-          <XStack gap={tokens.spacing[2]}>
-            <NumberFilter label="Min satiety" value={minSatiety} onChange={onMinSatietyChange} />
-            <NumberFilter label="Max satiety" value={maxSatiety} onChange={onMaxSatietyChange} />
-          </XStack>
-        </AddedFilter>
-      ) : null}
-      {active.includes("sort") ? (
-        <AddedFilter id="sort" onRemove={removeFilter}>
-          <YStack gap={tokens.spacing[3]}>
-            <SelectField
-              label="Sort by"
-              value={sort}
-              options={SORT_OPTIONS}
-              onValueChange={onSortChange}
-            />
-            <SelectField
-              label="Order"
-              value={sortDir}
-              options={SORT_DIR_OPTIONS}
-              onValueChange={onSortDirChange}
-            />
-          </YStack>
-        </AddedFilter>
-      ) : null}
-    </YStack>
-  );
-}
-
-function Thumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
-  return imageUrl ? (
-    <Image
-      src={imageUrl}
-      width="$16"
-      height="$16"
-      borderRadius={tokens.radii.md}
-      backgroundColor={tokens.colors.gray.gray1}
-      objectFit="cover"
-    />
-  ) : (
-    <View
-      width="$16"
-      height="$16"
-      borderRadius={tokens.radii.md}
-      backgroundColor={tokens.colors.gray.gray2}
-    />
-  );
-}
-
-// Touch-target geometry for the row's log-cook control: a ≥44dp
-// target (the StarRatingInput precedent) centering its glyphs.
-// Plain object, no StyleSheet, like the row's other geometry.
-const logCookTargetStyle = {
-  minWidth: 44,
-  minHeight: 44,
-  alignItems: "center",
-  justifyContent: "center",
-} as const;
-
-const STAR_STEPS = [1, 2, 3, 4, 5] as const;
-
-/** The rated state of the row's log-cook control: the recipe's
- * rating as five stars in the DS star language (StarRatingInput:
- * ★ in warning amber when filled, gray when not). The rating is a
- * display average as often as a personal star count, so the stars
- * fill by rounding to the nearest whole star; the pressable's
- * accessibility label carries the exact value. No lineHeight is
- * set on the glyphs — see the #162 note in the file header. */
-function RatingStars({ rating }: { rating: number }) {
-  const filled = Math.min(5, Math.max(1, Math.round(rating)));
-  return (
-    <XStack gap={tokens.spacing[1]} alignItems="center">
-      {STAR_STEPS.map((star) => (
-        <Text
-          key={star}
-          style={{
-            fontSize: tokens.typography.fontSize.lg,
-            color: star <= filled ? tokens.colors.warning.warning6 : tokens.colors.gray.gray4,
-          }}
-        >
-          ★
-        </Text>
-      ))}
-    </XStack>
-  );
-}
-
-/** The row's only action: log a cook. A rated recipe's stars are
- * the button; an unrated recipe gets a single icon-only button —
- * one unfilled star in the same glyph and tone, no text. Both fire
- * the row's `onLogCookPress`, and both carry an accessibility
- * label that names the action and the recipe: the stars alone
- * would announce as a rating, not as the log-cook action they
- * perform here. The control renders inside the text block's
- * subtitle flow (see RecipeRow) — never as an item of the card
- * row, where its width starved the text column (#205, and again
- * in PR #120's narrow captures when it sat at the row's edge).
- * Since #248 the text block is a link, so the control's press
- * handler also cancels the click's default action on web —
- * otherwise the wrapping anchor would navigate as well as log
- * (see handlePress below). */
-function LogCookControl({
-  item,
-  onLogCookPress,
-}: {
-  item: RecipesPageItem;
-  onLogCookPress: () => void;
-}) {
-  const rating = item.rating;
-  // The control renders inside the row's text link (#248), and
-  // on web the wrapping anchor would ALSO follow its href when
-  // the control is clicked: react-native-web's press handling
-  // stops the click's propagation but does not cancel its
-  // default action (verified in its PressResponder source — the
-  // conditional preventDefault covers only long-press and
-  // selection-terminated presses). Cancelling the default in
-  // the control's own press handler — the one handler certain
-  // to run for its clicks — keeps a log-cook press from also
-  // navigating. On native the call is inert: the innermost
-  // press target wins the responder, as it did when the row's
-  // outer target was a pressable too.
-  const handlePress = (event: { preventDefault: () => void }) => {
-    event.preventDefault();
-    onLogCookPress();
-  };
-  if (rating !== null && rating !== undefined && rating > 0) {
-    return (
-      <TouchableOpacity
-        style={logCookTargetStyle}
-        onPress={handlePress}
-        accessibilityRole="button"
-        accessibilityLabel={`Log a cook of ${item.title}, rated ${rating} out of 5 stars`}
-      >
-        <RatingStars rating={rating} />
-      </TouchableOpacity>
-    );
-  }
-  return (
-    <TouchableOpacity
-      style={logCookTargetStyle}
-      onPress={handlePress}
-      accessibilityRole="button"
-      accessibilityLabel={`Log a cook of ${item.title}`}
-    >
-      <Text style={{ fontSize: tokens.typography.fontSize.lg, color: tokens.colors.gray.gray4 }}>
-        ★
-      </Text>
-    </TouchableOpacity>
-  );
-}
-
-function RecipeRow({
-  item,
-  onLogCookPress,
-}: {
-  item: RecipesPageItem;
-  onLogCookPress?: () => void;
-}) {
-  // The native rendering (`native` true) makes two adjustments
-  // for the text frame's LinkOverlay (see the row comment below):
-  // the visible texts are decorative for accessibility (the
-  // overlay's composed label is the row's one stop) and
-  // pointer-transparent, so native hit testing falls through them
-  // to the overlay beneath, while the log-cook control — which
-  // keeps the default pointer events inside the box-none flow —
-  // still takes its own presses.
-  const renderTextContent = (native: boolean) => (
-    <>
-      <Text
-        fontWeight={tokens.typography.fontWeight.semibold}
-        accessible={native ? false : undefined}
-        importantForAccessibility={native ? "no-hide-descendants" : undefined}
-        pointerEvents={native ? "none" : undefined}
-      >
-        {item.title}
-      </Text>
-      {/* The subtitle line is a wrapping inline flow inside the
-        text block: the subtitle text first, the log-cook
-        control immediately after it (right after the
-        subtitle's final segment). The control flows with the
-        text — when the line is full it wraps onto the next
-        line of the block, at the block's full width — instead
-        of sitting in the card row as a third flex item whose
-        fixed width starved this block (the #205 failure, seen
-        again in PR #120's narrow captures). */}
-      {item.subtitle || onLogCookPress ? (
-        <XStack
-          flexWrap="wrap"
-          alignItems="center"
-          gap="$1"
-          paddingTop="$1"
-          pointerEvents={native ? "box-none" : undefined}
-        >
-          {item.subtitle ? (
-            <Text
-              variant="hint"
-              accessible={native ? false : undefined}
-              importantForAccessibility={native ? "no-hide-descendants" : undefined}
-              pointerEvents={native ? "none" : undefined}
-            >
-              {item.subtitle}
-            </Text>
-          ) : null}
-          {onLogCookPress ? <LogCookControl item={item} onLogCookPress={onLogCookPress} /> : null}
-        </XStack>
-      ) : null}
-    </>
-  );
-  const textContent = renderTextContent(false);
-  return (
-    <YStack paddingBlockEnd="$3">
-      <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
-        {/* Both navigation targets are links carrying the recipe's
-          href (#248) and an accessible name built from the recipe
-          title: the thumbnail target wraps only an image (or an
-          empty placeholder), so without the label a screen reader
-          meets an unidentified link for every recipe. The text
-          target's label also carries the subtitle when present — a
-          title-only label would override the name React Native
-          derives from its Text children and drop the subtitle
-          announcement. The log-cook control is a third press
-          target nested in the text block's subtitle flow; its
-          label names the action instead — see LogCookControl.
-          On native the anchors are Texts and cannot carry these
-          view subtrees (the text block's texts would flow inline
-          and the thumbnail would be measured as text), so both
-          targets platform-split (see LinkOverlay): view-level
-          frames carry the content, and childless anchors
-          stretched over the frames carry the hrefs. The thumbnail
-          frame's overlay renders last (topmost, the standard
-          layering); the text frame nests the log-cook control,
-          so its overlay renders underneath and the frame's
-          non-interactive content is pointer-transparent — the
-          control stays nested in the subtitle flow and keeps
-          its own presses (see renderTextContent). */}
-        {isWeb ? (
-          <Anchor
-            href={item.href}
-            textDecorationLine="none"
-            display="web:flex"
-            {...platformAccessibilityProps({
-              accessibilityRole: "link",
-              accessibilityLabel: item.title,
-            })}
-          >
-            <Thumbnail imageUrl={item.imageUrl} />
-          </Anchor>
-        ) : (
-          <View position="relative">
-            <Thumbnail imageUrl={item.imageUrl} />
-            <LinkOverlay
-              href={item.href}
-              accessibilityRole="link"
-              accessibilityLabel={item.title}
-            />
-          </View>
-        )}
-        {isWeb ? (
-          <Anchor
-            href={item.href}
-            textDecorationLine="none"
-            display="web:flex"
-            flexDirection="column"
-            style={textBlockStyle}
-            {...platformAccessibilityProps({
-              accessibilityRole: "link",
-              accessibilityLabel: item.subtitle ? `${item.title}, ${item.subtitle}` : item.title,
-            })}
-          >
-            {textContent}
-          </Anchor>
-        ) : (
-          <YStack style={textBlockStyle} position="relative">
-            <LinkOverlay
-              href={item.href}
-              accessibilityRole="link"
-              accessibilityLabel={item.subtitle ? `${item.title}, ${item.subtitle}` : item.title}
-            />
-            {renderTextContent(true)}
-          </YStack>
-        )}
-      </Card>
-    </YStack>
-  );
-}
-
 /**
  * Full-page recipes-list view — the Recipes/Browse screen and,
  * since #185, the Shared-with-me screen: the filter bar and
@@ -837,6 +297,29 @@ export function RecipesPage(props: RecipesPageProps) {
     renderRecipeAccessory,
     emptyTitle = "No recipes found.",
     emptyBody,
+    search,
+    onSearchChange,
+    statusFilter,
+    onStatusFilterChange,
+    showStatusFilter,
+    ingredient,
+    onIngredientChange,
+    minCalories,
+    onMinCaloriesChange,
+    maxCalories,
+    onMaxCaloriesChange,
+    minSatiety,
+    onMinSatietyChange,
+    maxSatiety,
+    onMaxSatietyChange,
+    sort,
+    onSortChange,
+    sortDir,
+    onSortDirChange,
+    activeFilters,
+    onActiveFiltersChange,
+    filterChooserOpen,
+    onFilterChooserOpenChange,
   } = props;
 
   // Pagination: the shared catalog pattern (#285) — the same
@@ -853,17 +336,88 @@ export function RecipesPage(props: RecipesPageProps) {
     canPaginate: !isLoading,
   });
 
+  // The catalog's filter definitions — this page's data in the
+  // shared bar's control shapes (see the option sets above).
+  // The status filter joins only when the host wires it (value
+  // + callback provided, not hidden) — the same condition the
+  // page's own bar carried before the #119 dedupe unified the
+  // two catalogs' bars into CatalogFiltersBar.
+  const catalogFilters: CatalogFilterDefinition<RecipesPageFilterId>[] = [];
+  if (
+    showStatusFilter !== false &&
+    statusFilter !== undefined &&
+    onStatusFilterChange !== undefined
+  ) {
+    catalogFilters.push({
+      kind: "select",
+      id: "status",
+      label: "Status",
+      options: STATUS_OPTIONS,
+      value: statusFilter,
+      onChange: onStatusFilterChange,
+      defaultValue: "all",
+    });
+  }
+  catalogFilters.push(
+    {
+      kind: "text",
+      id: "ingredient",
+      label: "Ingredient",
+      value: ingredient,
+      onChange: onIngredientChange,
+      placeholder: "e.g. chicken",
+      defaultValue: "",
+    },
+    {
+      kind: "range",
+      id: "calories",
+      label: "Calories",
+      minLabel: "Min cal",
+      maxLabel: "Max cal",
+      minValue: minCalories,
+      maxValue: maxCalories,
+      onMinChange: onMinCaloriesChange,
+      onMaxChange: onMaxCaloriesChange,
+    },
+    {
+      kind: "range",
+      id: "satiety",
+      label: "Satiety",
+      minLabel: "Min satiety",
+      maxLabel: "Max satiety",
+      minValue: minSatiety,
+      maxValue: maxSatiety,
+      onMinChange: onMinSatietyChange,
+      onMaxChange: onMaxSatietyChange,
+    },
+    {
+      kind: "sort",
+      id: "sort",
+      label: "Sort",
+      sortLabel: "Sort by",
+      sortOptions: SORT_OPTIONS,
+      sortValue: sort,
+      onSortChange,
+      defaultSortValue: "newest",
+      dirLabel: "Order",
+      dirOptions: SORT_DIR_OPTIONS,
+      dirValue: sortDir,
+      onDirChange: onSortDirChange,
+      defaultDirValue: "desc",
+    },
+  );
+
   return (
     <ScreenContainer variant="list" scrollable={false}>
-      <FlatList
-        style={listStyle}
+      <BoundedList
+        separator="none"
+        contentInset="page"
         // The filter controls live inside this scroll view, so taps on
         // them must land while the keyboard is open instead of being
         // consumed to dismiss it.
         keyboardShouldPersistTaps="handled"
         data={isLoading ? [] : recipes}
         keyExtractor={(recipe) => recipe.id}
-        contentContainerStyle={listContentStyle}
         // The filters render as the list's header so they scroll
         // together with the recipes (#188). The header sits inside
         // the list's content container, which already supplies the
@@ -873,27 +427,43 @@ export function RecipesPage(props: RecipesPageProps) {
         // mid-typing; the loading indicator renders as the list's
         // empty state instead.
         ListHeaderComponent={
-          <YStack paddingBlockStart="$4" paddingBlockEnd="$2">
-            <RecipesFiltersBar {...props} />
-          </YStack>
+          <CatalogFiltersBar
+            searchPlaceholder="Search recipes…"
+            search={search}
+            onSearchChange={onSearchChange}
+            filters={catalogFilters}
+            {...(activeFilters ? { activeFilters } : {})}
+            {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
+            {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
+            {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
+          />
         }
         renderItem={({ item }) => {
           const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
           const hasAccessory = accessory !== null && accessory !== undefined;
           return (
-            <>
-              <RecipeRow
-                item={item}
-                {...(onLogCookPress && !hasAccessory
-                  ? {
-                      onLogCookPress: () => {
-                        onLogCookPress(item.id);
-                      },
+            <MediaRow
+              href={item.href}
+              title={item.title}
+              subtitle={item.subtitle}
+              imageUrl={item.imageUrl}
+              subtitleAction={
+                onLogCookPress && !hasAccessory ? (
+                  <RatingStars
+                    rating={item.rating}
+                    accessibilityLabel={
+                      item.rating !== null && item.rating !== undefined && item.rating > 0
+                        ? `Log a cook of ${item.title}, rated ${item.rating} out of 5 stars`
+                        : `Log a cook of ${item.title}`
                     }
-                  : {})}
-              />
-              {hasAccessory ? <YStack paddingBlockEnd="$3">{accessory}</YStack> : null}
-            </>
+                    onPress={() => {
+                      onLogCookPress(item.id);
+                    }}
+                  />
+                ) : undefined
+              }
+              accessory={hasAccessory ? accessory : undefined}
+            />
           );
         }}
         onEndReached={onEndReached}
@@ -901,21 +471,319 @@ export function RecipesPage(props: RecipesPageProps) {
         onEndReachedThreshold={onEndReachedThreshold}
         ListEmptyComponent={
           isLoading ? (
-            <YStack paddingBlockStart="$8" alignItems="center">
-              <Spinner label="Loading" />
-            </YStack>
+            <ListLoadingState label="Loading" />
           ) : (
             <EmptyState title={emptyTitle} {...(emptyBody ? { body: emptyBody } : {})} />
           )
         }
-        ListFooterComponent={
-          isFetchingNextPage ? (
-            <YStack alignItems="center" justifyContent="center" paddingVertical="$4">
-              <Spinner label="Loading" />
-            </YStack>
-          ) : undefined
-        }
+        ListFooterComponent={isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined}
       />
     </ScreenContainer>
+  );
+}
+
+/**
+ * Page-local compositions (Stephen's tranche rule, 2026-10-29):
+ * a tranche page adds no library components, so the compositions
+ * only this page uses live here, built from the shared
+ * components — MediaRow (the list row) and RatingStars (its
+ * log-cook control). If another page ever needs either, it
+ * graduates to the library through a component-only PR; it is
+ * never exported from this file.
+ */
+
+// Structural flex only: the card's text block expands and may shrink
+// within the row (mirrors the app's ThumbnailListCard). The explicit
+// flexBasis matters (eciperay #205): with a plain `flex: 1` the basis
+// is 0, so on narrow viewports (e.g. a phone at the largest display
+// size, ~314dp wide) the row's fixed child — the 64dp thumbnail —
+// and any trailing row item consume the entire row and the text
+// block collapses to ~0dp wide. Text measured at ~0 width paints
+// nothing yet measures extremely tall, which stretched the card past
+// the viewport with only the thumbnail visible. A 60dp basis gives
+// the row a real line-breaking size, and the text block grows to
+// fill its line. (A row action is not a row item at all — it renders
+// inline inside this block; see subtitleAction.) At ordinary widths
+// nothing changes — the basis is below the width the block already
+// gets, so it still just expands.
+const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
+
+type MediaRowProps = {
+  /** Row detail href. Both the media and the title/subtitle
+   * text are links to it (two independent targets, per the
+   * design system's link rules — cards are never pressable). */
+  href: string;
+  /** The row's title — the accessible name of the media link,
+   * and the lead of the text link's composed name. */
+  title: string;
+  /** Optional secondary line under the title (counts, times,
+   * attribution — the caller composes the string). It joins
+   * the text link's accessible name ("Title, Subtitle"): a
+   * title-only label would override the name React Native
+   * derives from its Text children and drop the subtitle
+   * announcement. */
+  subtitle?: string | undefined;
+  /** Optional image URL; absent renders the placeholder well. */
+  imageUrl?: string | null | undefined;
+  /** Optional control rendered inline in the subtitle flow
+   * (after the subtitle text, wrapping with it) — a row action
+   * that reads as part of the subtitle line, e.g. a RatingStars
+   * log-cook control. It renders inside the text link, so it
+   * must cancel its press's default action (the RatingStars
+   * contract) to keep the press from also navigating. */
+  subtitleAction?: ReactNode;
+  /** Optional accessory rendered after the row, inside the list
+   * item — an expanded inline form belongs to the row it
+   * belongs to. It renders in the same under-row padded wrapper
+   * shape the card itself sits in. */
+  accessory?: ReactNode;
+};
+
+/**
+ * The recipe list's media row: an elevated card holding a 64px
+ * thumbnail (or the placeholder well), the title and optional
+ * subtitle, and an optional accessory after the row. Composed
+ * here in the page from the shared Card, Thumbnail, Text, and
+ * LinkOverlay components (Stephen's tranche rule, 2026-10-29:
+ * single-page compositions live in the page, not the library);
+ * the row renderer supplies only domain content (href, title,
+ * subtitle, image) and slots (subtitleAction, accessory).
+ *
+ * Both navigation targets are links carrying the row's href
+ * (#248) and an accessible name built from the title: the media
+ * target wraps only an image (or an empty placeholder), so
+ * without the label a screen reader meets an unidentified link
+ * for every row; the text target's label also carries the
+ * subtitle when present. A subtitleAction is a third press
+ * target nested in the text block's subtitle flow.
+ *
+ * On native the anchors are Texts and cannot carry these view
+ * subtrees (the text block's texts would flow inline and the
+ * thumbnail would be measured as text), so both targets
+ * platform-split (see LinkOverlay): view-level frames carry the
+ * content, and childless anchors stretched over the frames
+ * carry the hrefs. The media frame's overlay renders last
+ * (topmost, the standard layering); the text frame nests the
+ * subtitle action, so its overlay renders underneath and the
+ * frame's non-interactive content is pointer-transparent — the
+ * action stays nested in the subtitle flow and keeps its own
+ * presses.
+ */
+function MediaRow({ href, title, subtitle, imageUrl, subtitleAction, accessory }: MediaRowProps) {
+  // The native rendering (`native` true) makes two adjustments
+  // for the text frame's LinkOverlay: the visible texts are
+  // decorative for accessibility (the overlay's composed label
+  // is the row's one stop) and pointer-transparent, so native
+  // hit testing falls through them to the overlay beneath,
+  // while the subtitle action — which keeps the default pointer
+  // events inside the box-none flow — still takes its own
+  // presses.
+  const renderTextContent = (native: boolean) => (
+    <>
+      <Text
+        fontWeight={tokens.typography.fontWeight.semibold}
+        accessible={native ? false : undefined}
+        importantForAccessibility={native ? "no-hide-descendants" : undefined}
+        pointerEvents={native ? "none" : undefined}
+      >
+        {title}
+      </Text>
+      {/* The subtitle line is a wrapping inline flow inside the
+        text block: the subtitle text first, the subtitle action
+        immediately after it (right after the subtitle's final
+        segment). The action flows with the text — when the line
+        is full it wraps onto the next line of the block, at the
+        block's full width — instead of sitting in the card row
+        as a third flex item whose fixed width starved this
+        block (the #205 failure, seen again in PR #120's narrow
+        captures). */}
+      {subtitle || subtitleAction ? (
+        <XStack
+          flexWrap="wrap"
+          alignItems="center"
+          gap="$1"
+          paddingTop="$1"
+          pointerEvents={native ? "box-none" : undefined}
+        >
+          {subtitle ? (
+            <Text
+              variant="hint"
+              accessible={native ? false : undefined}
+              importantForAccessibility={native ? "no-hide-descendants" : undefined}
+              pointerEvents={native ? "none" : undefined}
+            >
+              {subtitle}
+            </Text>
+          ) : null}
+          {subtitleAction}
+        </XStack>
+      ) : null}
+    </>
+  );
+  const textContent = renderTextContent(false);
+  const media = imageUrl ? (
+    <Thumbnail src={imageUrl} variant="row" />
+  ) : (
+    <View
+      width="$16"
+      height="$16"
+      borderRadius={tokens.radii.md}
+      backgroundColor={tokens.colors.gray.gray2}
+    />
+  );
+  const textLabel = subtitle ? `${title}, ${subtitle}` : title;
+  return (
+    <>
+      <YStack paddingBlockEnd="$3">
+        <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
+          {isWeb ? (
+            <Anchor
+              href={href}
+              textDecorationLine="none"
+              display="web:flex"
+              {...platformAccessibilityProps({
+                accessibilityRole: "link",
+                accessibilityLabel: title,
+              })}
+            >
+              {media}
+            </Anchor>
+          ) : (
+            <View position="relative">
+              {media}
+              <LinkOverlay href={href} accessibilityRole="link" accessibilityLabel={title} />
+            </View>
+          )}
+          {isWeb ? (
+            <Anchor
+              href={href}
+              textDecorationLine="none"
+              display="web:flex"
+              flexDirection="column"
+              style={textBlockStyle}
+              {...platformAccessibilityProps({
+                accessibilityRole: "link",
+                accessibilityLabel: textLabel,
+              })}
+            >
+              {textContent}
+            </Anchor>
+          ) : (
+            <YStack style={textBlockStyle} position="relative">
+              <LinkOverlay href={href} accessibilityRole="link" accessibilityLabel={textLabel} />
+              {renderTextContent(true)}
+            </YStack>
+          )}
+        </Card>
+      </YStack>
+      {accessory ? <YStack paddingBlockEnd="$3">{accessory}</YStack> : null}
+    </>
+  );
+}
+
+const STAR_STEPS = [1, 2, 3, 4, 5] as const;
+
+type RatingStarsBase = {
+  /** Display rating, 0–5, or null/absent when unrated. The app
+   * computes it by its display-rating rule; the composition
+   * renders it and never formats it into text. */
+  rating?: number | null | undefined;
+};
+
+type RatingStarsProps =
+  | (RatingStarsBase & { onPress?: undefined; accessibilityLabel?: string | undefined })
+  | (RatingStarsBase & { onPress: () => void; accessibilityLabel: string });
+
+/**
+ * A five-star display rating in the DS star language (the
+ * StarRatingInput glyph treatment at reading size): ★ in
+ * warning amber when filled, gray when not. The rating is a
+ * display average as often as a personal star count, so the
+ * stars fill by rounding to the nearest whole star. No
+ * lineHeight is set on the glyphs (the #162 containment rule).
+ *
+ * With `onPress` the stars become the button for an action on
+ * the rated item — a list row whose rating is its log-cook
+ * control is the shape this serves. A rated item renders its
+ * five stars as the button; an unrated item renders a single
+ * unfilled star, no text — one glyph, same tone. The press
+ * handler cancels the click's default action before firing:
+ * the control typically renders inside a link (a row's text
+ * target), and on web the platform press handling stops the
+ * click's propagation but does not cancel its default, so
+ * without the cancellation the wrapping anchor would also
+ * navigate. On native the call is inert — the innermost press
+ * target wins the responder. The button form requires its
+ * accessible name in the type (the stars alone would announce
+ * as a rating, not as the action they trigger), and it is
+ * keyboard-operable on web: a focus stop with Enter/Space
+ * activation (the CardRow pattern — a plain stack with onPress
+ * is not a tab stop).
+ */
+function RatingStars(props: RatingStarsProps) {
+  if (!props.onPress) {
+    return <RatingStarRow rating={props.rating} />;
+  }
+  const { rating, onPress, accessibilityLabel } = props;
+  const handlePress = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    onPress();
+  };
+  const handleKeyDown = (event: { key: string; preventDefault: () => void; repeat?: boolean }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      // A held key repeats keydown — activate once, not per repeat.
+      if (!event.repeat) onPress();
+    }
+  };
+  return (
+    // Touch-target geometry for the pressable form: a ≥44dp
+    // target centering its glyphs (the StarRatingInput
+    // precedent).
+    <YStack
+      minWidth={44}
+      minHeight={44}
+      alignItems="center"
+      justifyContent="center"
+      cursor="pointer"
+      onPress={handlePress}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      {...platformAccessibilityProps({
+        accessibilityRole: "button",
+        accessibilityLabel,
+      })}
+    >
+      {rating !== null && rating !== undefined && rating > 0 ? (
+        <RatingStarRow rating={rating} />
+      ) : (
+        <Text style={{ fontSize: tokens.typography.fontSize.lg, color: tokens.colors.gray.gray4 }}>
+          ★
+        </Text>
+      )}
+    </YStack>
+  );
+}
+
+/** The five glyphs themselves, filled by the rounded rating. */
+function RatingStarRow({ rating }: { rating?: number | null | undefined }) {
+  const filled =
+    rating !== null && rating !== undefined && rating > 0
+      ? Math.min(5, Math.max(1, Math.round(rating)))
+      : 0;
+  return (
+    <XStack gap={tokens.spacing[1]} alignItems="center">
+      {STAR_STEPS.map((star) => (
+        <Text
+          key={star}
+          style={{
+            fontSize: tokens.typography.fontSize.lg,
+            color: star <= filled ? tokens.colors.warning.warning6 : tokens.colors.gray.gray4,
+          }}
+        >
+          ★
+        </Text>
+      ))}
+    </XStack>
   );
 }
