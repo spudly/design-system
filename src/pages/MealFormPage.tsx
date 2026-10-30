@@ -2,6 +2,7 @@ import { Button } from "../components/Button.js";
 import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
 import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
+import { FormSubmit } from "../components/FormSubmit.js";
 import { LabeledGroup } from "../components/LabeledGroup.js";
 import { NumberStepper } from "../components/NumberStepper.js";
 import { Text } from "../components/Text.js";
@@ -44,8 +45,9 @@ import { TextField } from "../components/TextField.js";
  * two through its adapters. The page applies no styling
  * itself (#119): the recipe list is a LabeledGroup (the label
  * over the select list, the group carrying the label as its
- * name) and the submit button is a direct child of the layout;
- * the page composes DS components and passes data and
+ * name) and the submit button sits in a FormSubmit (the
+ * submit row's separation from the last field is the row's
+ * own); the page composes DS components and passes data and
  * callbacks only.
  */
 
@@ -133,14 +135,16 @@ export function MealFormPage({
         );
       })}
       {error ? <Text variant="error">{error}</Text> : null}
-      <Button
-        variant="primary"
-        accessibilityLabel="Save meal"
-        disabled={!title.trim() || selectedRecipeIds.length === 0 || isSaving}
-        onPress={onSubmit}
-      >
-        Save meal
-      </Button>
+      <FormSubmit>
+        <Button
+          variant="primary"
+          accessibilityLabel="Save meal"
+          disabled={!title.trim() || selectedRecipeIds.length === 0 || isSaving}
+          onPress={onSubmit}
+        >
+          Save meal
+        </Button>
+      </FormSubmit>
     </FormScreenLayout>
   );
 }

@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { ChangedListBanner } from "../components/ChangedListBanner.js";
+import { FieldColumns } from "../components/FieldColumns.js";
 import { FormStack } from "../components/FormStack.js";
 import { LabeledField } from "../components/LabeledField.js";
 import { LabeledGroup } from "../components/LabeledGroup.js";
@@ -70,7 +71,9 @@ import { Badge } from "../components/Badge.js";
  *   `changed` variant carrying the diff wash — see TextField).
  * - The page applies no styling itself (#119): the scroll region
  *   is ScrollRegion, the body stack is FormStack, each field
- *   section is a LabeledField (the tags a LabeledGroup), and the
+ *   section is a LabeledField (the tags a LabeledGroup, the
+ *   servings / prep / cook fields a FieldColumns row of
+ *   LabeledFields), and the
  *   revert affordances and changed-list banners are the
  *   RevertAction and ChangedListBanner components — the page
  *   composes them and passes data and callbacks only.
@@ -288,44 +291,50 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
           />
         </LabeledField>
 
-        <LabeledField label="Servings" fieldId="recipe-servings" action={revertAction("servings")}>
-          <TextField
-            id="recipe-servings"
-            accessibilityLabel="Servings"
-            changed={isChanged("servings")}
-            keyboardType="number-pad"
-            value={servings}
-            onChangeText={onServingsChange}
-          />
-        </LabeledField>
-        <LabeledField
-          label="Prep (min)"
-          fieldId="recipe-prep-time"
-          action={revertAction("prepTimeMin")}
-        >
-          <TextField
-            id="recipe-prep-time"
-            accessibilityLabel="Prep (min)"
-            changed={isChanged("prepTimeMin")}
-            keyboardType="number-pad"
-            value={prepTimeMin}
-            onChangeText={onPrepTimeMinChange}
-          />
-        </LabeledField>
-        <LabeledField
-          label="Cook (min)"
-          fieldId="recipe-cook-time"
-          action={revertAction("cookTimeMin")}
-        >
-          <TextField
-            id="recipe-cook-time"
-            accessibilityLabel="Cook (min)"
-            changed={isChanged("cookTimeMin")}
-            keyboardType="number-pad"
-            value={cookTimeMin}
-            onChangeText={onCookTimeMinChange}
-          />
-        </LabeledField>
+        <FieldColumns>
+          <LabeledField
+            label="Servings"
+            fieldId="recipe-servings"
+            action={revertAction("servings")}
+          >
+            <TextField
+              id="recipe-servings"
+              accessibilityLabel="Servings"
+              changed={isChanged("servings")}
+              keyboardType="number-pad"
+              value={servings}
+              onChangeText={onServingsChange}
+            />
+          </LabeledField>
+          <LabeledField
+            label="Prep (min)"
+            fieldId="recipe-prep-time"
+            action={revertAction("prepTimeMin")}
+          >
+            <TextField
+              id="recipe-prep-time"
+              accessibilityLabel="Prep (min)"
+              changed={isChanged("prepTimeMin")}
+              keyboardType="number-pad"
+              value={prepTimeMin}
+              onChangeText={onPrepTimeMinChange}
+            />
+          </LabeledField>
+          <LabeledField
+            label="Cook (min)"
+            fieldId="recipe-cook-time"
+            action={revertAction("cookTimeMin")}
+          >
+            <TextField
+              id="recipe-cook-time"
+              accessibilityLabel="Cook (min)"
+              changed={isChanged("cookTimeMin")}
+              keyboardType="number-pad"
+              value={cookTimeMin}
+              onChangeText={onCookTimeMinChange}
+            />
+          </LabeledField>
+        </FieldColumns>
 
         {renderImageSection ? renderImageSection(revertAction("image")) : null}
 
