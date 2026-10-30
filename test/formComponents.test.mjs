@@ -1,11 +1,15 @@
 /**
- * Form-component contracts for the #119 dedupe set: the form
- * components both form tranches coined (LabeledField,
+ * Form-component contracts for the #119 form set the three
+ * form pages compose: the dedupe set (LabeledField,
  * LabeledGroup, FieldLabel, RevertAction, ChangedListBanner,
- * FormStack, FormHeading), shipped once here. Like the
- * layout-components contracts, these pin the public shape
- * (props and owned geometry) so a later edit cannot silently
- * reintroduce styling pass-throughs or move the owned spacing.
+ * FormStack, FormHeading), shipped once on main. Like the
+ * layout-components contracts, these pin the public
+ * shape (props and owned geometry) so a later edit cannot
+ * silently reintroduce styling pass-throughs or move the owned
+ * spacing, and pin the three form pages themselves to
+ * composing DS components only — the no-page-styling rule is
+ * dormant in the ESLint config (no TS7 parser), so this test
+ * is the pages' enforcement until the rule revives.
  *
  * The forms tranche's wider set was split by disposition in the
  * adoption rounds: FieldLabelBlock and StepperGroup composed
@@ -217,4 +221,14 @@ test("SSR: FieldLabel with htmlFor renders a label element; a LabeledGroup is a 
   );
   assert.match(groupHtml, /role="group"/, "the group carries the group role on web");
   assert.match(groupHtml, /aria-label="Tags"/, "the group is named by its label");
+});
+
+test("the three form pages compose DS components only — no tamagui, no tokens, no styled (#119)", () => {
+  for (const page of ["RecipeFormPage", "MealFormPage", "MealPlanFormPage"]) {
+    const source = readRepoFile(`src/pages/${page}.tsx`);
+    assert.doesNotMatch(source, /from "tamagui"/, `${page} must not import layout primitives`);
+    assert.doesNotMatch(source, /tokens/, `${page} must not reach for design tokens`);
+    assert.doesNotMatch(source, /styled\(/, `${page} must not define styled components`);
+    assert.doesNotMatch(source, /<(XStack|YStack|ZStack|Stack|View|ScrollView)\b/);
+  }
 });

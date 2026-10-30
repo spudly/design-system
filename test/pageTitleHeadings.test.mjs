@@ -12,13 +12,18 @@
  *    ShoppingListPage, TagsPage) renders its title as the page's
  *    one level-1 heading — no page gains a second level-1
  *    heading — and no `subheading` usage remains in those files
- *    (their only subheading was the title). Six render it with
- *    `variant="heading"`; MealPlanDetailPage and
- *    AddRecipeMenuPage render it with `variant="title"` instead
- *    (item 5).
+ *    (their only subheading was the title). Four render it with
+ *    `variant="heading"` (MealDetailPage, MealsHubPage,
+ *    ShoppingListPage, TagsPage — the TITLE_PAGES list below);
+ *    four render it with `variant="title"` instead
+ *    (MealPlanDetailPage, item 6; AddRecipeMenuPage, FeedbackPage,
+ *    and ProfilePage, items 2 and 6).
  * 2. The title keeps its explicit `fontSize` xl / `fontWeight` bold
  *    overrides, so the visual rendering is unchanged (the `heading`
  *    variant's own defaults are 3xl/bold; the overrides pin xl/bold).
+ *    (FeedbackPage and ProfilePage rendered with exactly those
+ *    overrides too, until the #119 auth tranche moved them to the
+ *    `title` variant — point 5.)
  * 3. HomePage is the pinned exception that proves the sweep is
  *    title-only: its page title was already `heading`, and its
  *    section title correctly stays `subheading` (level 2).
@@ -44,7 +49,10 @@
  *    semantics are unchanged; the size/weight are owned by the
  *    variant (pinned against Text.tsx below) instead of the page.
  *    AddRecipeMenuPage joined it in the #119 ai-import tranche,
- *    on the same terms (its dedicated test below).
+ *    on the same terms (its dedicated test below). FeedbackPage
+ *    and ProfilePage joined it in the #119 auth tranche: same
+ *    shape (heading + xl/bold overrides), same move to the
+ *    `title` variant, pinned by the same test below.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -62,10 +70,8 @@ function readCode(rel) {
 }
 
 const TITLE_PAGES = [
-  "FeedbackPage",
   "MealDetailPage",
   "MealsHubPage",
-  "ProfilePage",
   "ShoppingListPage",
   "TagsPage",
 ];
@@ -152,6 +158,27 @@ test("AddRecipeMenuPage's title takes the title variant — xl bold at level 1 (
     0,
     "AddRecipeMenuPage must not keep a subheading usage",
   );
+});
+
+test("FeedbackPage and ProfilePage titles take the title variant — xl bold at level 1 (#263, #119)", () => {
+  for (const page of ["FeedbackPage", "ProfilePage"]) {
+    const code = readCode(`src/pages/${page}.tsx`);
+    assert.equal(
+      countOccurrences(code, 'variant="title"'),
+      1,
+      `${page} must render exactly one title-variant Text (its title)`,
+    );
+    assert.equal(
+      countOccurrences(code, 'variant="heading"'),
+      0,
+      `${page}'s title must not use the heading variant (its 3xl default is not the app's title size)`,
+    );
+    assert.equal(
+      countOccurrences(code, 'variant="subheading"'),
+      0,
+      `${page} must not keep a subheading usage`,
+    );
+  }
 });
 
 test("SectionHeading is a level-2 heading under the page title (#317)", () => {

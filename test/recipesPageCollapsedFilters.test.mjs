@@ -6,19 +6,25 @@
  * the filter row took up too much room, so initially only the
  * search field and a small filter button render; clicking the
  * button gives the option to add additional filters, and a
- * filter renders only after it has been added. This test pins
- * that behavior in source:
+ * filter renders only after it has been added.
+ *
+ * Since the #119 dedupe, the bar itself is the shared
+ * CatalogFiltersBar: its behavior (chooser, add/remove,
+ * removal clearing values through the change callbacks so a
+ * hidden filter can never keep filtering invisibly) is pinned
+ * in test/catalogComponents.test.mjs. This test pins the PAGE
+ * side of the contract:
  * 1. The controlled contract props exist (`activeFilters`,
  *    `onActiveFiltersChange`, `filterChooserOpen`,
  *    `onFilterChooserOpenChange`) plus the filter-id type.
- * 2. Search and the Filters button render unconditionally (the
- *    button only while a filter remains addable); every filter
- *    control renders only when its id is in the added set.
- * 3. The chooser renders one add control per not-yet-added
- *    filter, and adding closes the chooser.
- * 4. Removal clears the filter's values through its ordinary
- *    change callbacks before hiding it, so a hidden filter can
- *    never keep filtering invisibly.
+ * 2. The page renders CatalogFiltersBar as its list header and
+ *    passes the controlled props through.
+ * 3. The page supplies its filters as definitions — the five
+ *    filters with their kinds, labels, option sets, and
+ *    defaults as this catalog's data; the status filter joins
+ *    only when the host wires it.
+ * 4. The page carries no bar implementation of its own anymore
+ *    (the in-page RecipesFiltersBar/NumberFilter stay retired).
  * 5. Stories cover the three states (initial, chooser open,
  *    filters added) so Chromatic and Android VR capture them.
  *
@@ -53,37 +59,59 @@ test("the collapsed-filter contract props are declared", () => {
   assert.match(code, /onFilterChooserOpenChange\?: \(open: boolean\) => void;/);
 });
 
-test("search and the Filters button are the initial render", () => {
-  assert.match(code, /accessibilityLabel="Add a filter"/, "the Filters button must be named");
-  assert.match(code, />\s*Filters\s*<\/Button>/, "the button label is Filters");
-  const searchAt = code.indexOf("<SearchField");
-  const buttonAt = code.indexOf('accessibilityLabel="Add a filter"');
-  assert.ok(searchAt !== -1 && buttonAt > searchAt, "search renders before the Filters button");
+test("the page renders the shared CatalogFiltersBar with its search copy", () => {
+  assert.match(code, /<CatalogFiltersBar/);
+  assert.match(code, /searchPlaceholder="Search recipes…"/);
+  assert.match(code, /filters=\{catalogFilters\}/);
+  assert.match(code, /\{\.\.\.\(activeFilters \? \{ activeFilters \} : \{\}\)\}/);
+  assert.match(code, /\{\.\.\.\(onActiveFiltersChange \? \{ onActiveFiltersChange \} : \{\}\)\}/);
+  assert.match(
+    code,
+    /\{\.\.\.\(filterChooserOpen !== undefined \? \{ filterChooserOpen \} : \{\}\)\}/,
+  );
+  assert.match(
+    code,
+    /\{\.\.\.\(onFilterChooserOpenChange \? \{ onFilterChooserOpenChange \} : \{\}\)\}/,
+  );
 });
 
-test("each filter control renders only when its filter is added", () => {
-  for (const id of ["status", "ingredient", "calories", "satiety", "sort"]) {
-    assert.match(
-      code,
-      new RegExp(String.raw`active\.includes\("${id}"\)`),
-      `the ${id} control must be gated on active.includes("${id}")`,
+test("the page supplies its five filters as definitions, in chooser order", () => {
+  // Status: a select over the page's option set, defaulting to
+  // "all", joining only when the host wires it.
+  assert.match(
+    code,
+    /showStatusFilter !== false &&\s*statusFilter !== undefined &&\s*onStatusFilterChange !== undefined/,
+    "the status filter joins only when the host wires it (value + callback, not hidden)",
+  );
+  assert.match(code, /kind: "select",\s*id: "status",\s*label: "Status",/);
+  assert.match(code, /options: STATUS_OPTIONS,/);
+  assert.match(code, /defaultValue: "all",/);
+  // Ingredient: free text with the page's placeholder.
+  assert.match(code, /kind: "text",\s*id: "ingredient",\s*label: "Ingredient",/);
+  assert.match(code, /placeholder: "e\.g\. chicken",/);
+  assert.match(code, /defaultValue: "",/);
+  // Calories and satiety: one range filter each, min/max labels.
+  assert.match(code, /kind: "range",\s*id: "calories",\s*label: "Calories",/);
+  assert.match(code, /minLabel: "Min cal",\s*maxLabel: "Max cal",/);
+  assert.match(code, /kind: "range",\s*id: "satiety",\s*label: "Satiety",/);
+  assert.match(code, /minLabel: "Min satiety",\s*maxLabel: "Max satiety",/);
+  // Sort: the Sort by / Order pair with the page's defaults.
+  assert.match(code, /kind: "sort",\s*id: "sort",\s*label: "Sort",/);
+  assert.match(code, /sortLabel: "Sort by",/);
+  assert.match(code, /sortOptions: SORT_OPTIONS,/);
+  assert.match(code, /defaultSortValue: "newest",/);
+  assert.match(code, /dirLabel: "Order",/);
+  assert.match(code, /dirOptions: SORT_DIR_OPTIONS,/);
+  assert.match(code, /defaultDirValue: "desc",/);
+});
+
+test("the page carries no filter-bar implementation of its own (#119 dedupe)", () => {
+  for (const retired of ["RecipesFiltersBar", "NumberFilter", "FILTER_LABELS", "ALL_FILTER_IDS"]) {
+    assert.ok(
+      !code.includes(retired),
+      `${retired} was the in-page bar's machinery — the shared CatalogFiltersBar owns it now and it must not come back`,
     );
   }
-});
-
-test("the chooser offers exactly the filters not yet added, and adding closes it", () => {
-  assert.match(code, /const addable = available\.filter\(\(id\) => !active\.includes\(id\)\);/);
-  assert.match(code, /accessibilityLabel=\{`Add \$\{FILTER_LABELS\[id\]\} filter`\}/);
-  assert.match(code, /setActive\(\[\.\.\.active, id\]\);\s*setChooserOpen\(false\);/);
-});
-
-test("removing a filter clears its values through the change callbacks", () => {
-  assert.match(code, /if \(id === "status"\) onStatusFilterChange\?\.\("all"\);/);
-  assert.match(code, /if \(id === "ingredient"\) onIngredientChange\(""\);/);
-  assert.match(code, /onMinCaloriesChange\(""\);\s*onMaxCaloriesChange\(""\);/);
-  assert.match(code, /onMinSatietyChange\(""\);\s*onMaxSatietyChange\(""\);/);
-  assert.match(code, /onSortChange\("newest"\);\s*onSortDirChange\("desc"\);/);
-  assert.match(code, /accessibilityLabel=\{`Remove \$\{FILTER_LABELS\[id\]\} filter`\}/);
 });
 
 test("stories cover the initial, chooser-open and filters-added states", () => {

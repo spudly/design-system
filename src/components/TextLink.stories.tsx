@@ -54,6 +54,14 @@ export const Href: Story = {
   },
 };
 
+export const Muted: Story = {
+  args: {
+    children: "Forgot password?",
+    href: "/forgot-password",
+    tone: "muted",
+  },
+};
+
 export const HrefInProse: Story = {
   render: () => (
     <YStack maxWidth={420}>

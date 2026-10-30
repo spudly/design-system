@@ -1,10 +1,7 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { Button } from "../components/Button.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import { SectionStack } from "../components/SectionStack.js";
+import { SignInForm } from "../components/SignInForm.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
-import { TextLink } from "../components/TextLink.js";
 
 /**
  * SignInPage (#126, B3c): the sign-in view — the split view half
@@ -21,10 +18,13 @@ import { TextLink } from "../components/TextLink.js";
  * renders above the submit button, as in the app view.
  *
  * The shell is the DS ScreenContainer `auth` variant (the app
- * view's AuthScreenLayout adapter renders exactly it), the
- * heading is the app view's title, and the loading label swap
- * mirrors the app PrimaryButton adapter: while `loading`, the
- * button disables and reads its pending label.
+ * view's AuthScreenLayout adapter renders exactly it) and the
+ * heading is the app view's title. The form itself is
+ * SignInForm (#119): the page composes the heading and the
+ * form as the screen's two sections (SectionStack's rhythm is
+ * the separation the app view's title spacing renders), and
+ * the form owns the fields, the submit handling, and the
+ * footer links.
  */
 
 export type SignInPageProps = {
@@ -55,56 +55,22 @@ export function SignInPage({
   signUpHref,
   forgotPasswordHref,
 }: SignInPageProps) {
-  // Enter/return in a field submits (#255), mirroring the
-  // native-form behavior the retired web views had; while
-  // loading the submit button is disabled, so field
-  // submission is held the same way.
-  const submitFromField = () => {
-    if (!loading) {
-      onSubmit();
-    }
-  };
   return (
     <ScreenContainer scrollable={false} variant="auth">
-      <YStack paddingBottom="$8">
+      <SectionStack>
         <Text variant="heading">Welcome back</Text>
-      </YStack>
-      <TextField
-        label="Email"
-        value={email}
-        onChangeText={onEmailChange}
-        autoComplete="email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        accessibilityLabel="Email"
-        onSubmitEditing={submitFromField}
-      />
-      <TextField
-        label="Password"
-        value={password}
-        onChangeText={onPasswordChange}
-        autoComplete="password"
-        secureTextEntry
-        accessibilityLabel="Password"
-        onSubmitEditing={submitFromField}
-        returnKeyType="go"
-      />
-      {error ? <Text variant="error">{error}</Text> : null}
-      <Button variant="primary" disabled={loading} onPress={onSubmit} accessibilityLabel="Sign In">
-        {loading ? "Signing in…" : "Sign In"}
-      </Button>
-      {signUpHref ? (
-        <YStack paddingTop="$4">
-          <TextLink href={signUpHref}>Create an account</TextLink>
-        </YStack>
-      ) : null}
-      {forgotPasswordHref ? (
-        <YStack paddingTop="$2">
-          <TextLink color={tokens.colors.gray.gray6} href={forgotPasswordHref}>
-            Forgot password?
-          </TextLink>
-        </YStack>
-      ) : null}
+        <SignInForm
+          email={email}
+          password={password}
+          onEmailChange={onEmailChange}
+          onPasswordChange={onPasswordChange}
+          loading={loading}
+          error={error}
+          onSubmit={onSubmit}
+          signUpHref={signUpHref}
+          forgotPasswordHref={forgotPasswordHref}
+        />
+      </SectionStack>
     </ScreenContainer>
   );
 }
