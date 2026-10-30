@@ -19,9 +19,12 @@
  *    Button-based successor to the retired chip group): ONE
  *    non-wrapping row of equal-width toggle Buttons (Button's
  *    `selected` form), presets plus a Custom slot.
- * 4. Both recipe panels use both controls: servings inline, scale
- *    as the PresetValueSelector beside its label, in one controls
- *    block above the ingredient rows.
+ * 4. Both recipe surfaces use both controls: servings inline,
+ *    scale as the PresetValueSelector beside its label, in one
+ *    controls block above the ingredient rows — RecipeDetailPage
+ *    inline, PublicRecipePage through the shared
+ *    RecipeIngredientsPanel it composes (#119), which this test
+ *    scans in the page's place.
  * 5. NumberStepper gains an additive `editable` prop (default
  *    false): the value renders as an editable numeric field —
  *    `keyboardType`/`inputMode` numeric (a text input on web, NOT
@@ -52,7 +55,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const stepper = readFileSync(join(root, "src/components/NumberStepper.tsx"), "utf8");
 const selector = readFileSync(join(root, "src/components/PresetValueSelector.tsx"), "utf8");
 const page = readFileSync(join(root, "src/pages/RecipeDetailPage.tsx"), "utf8");
-const publicPage = readFileSync(join(root, "src/pages/PublicRecipePage.tsx"), "utf8");
+const publicPanel = readFileSync(join(root, "src/components/RecipeIngredientsPanel.tsx"), "utf8");
 
 test("NumberStepper layout is additive with stacked as the default", () => {
   assert.match(stepper, /layout\?: "stacked" \| "inline";/, "layout prop is declared");
@@ -83,7 +86,7 @@ test("PresetValueSelector renders one non-wrapping row of equal-width toggle but
 test("the ingredients panels use the inline stepper and the PresetValueSelector", () => {
   for (const [name, source] of [
     ["RecipeDetailPage", page],
-    ["PublicRecipePage", publicPage],
+    ["RecipeIngredientsPanel (PublicRecipePage's shared panel)", publicPanel],
   ]) {
     assert.match(
       source,
