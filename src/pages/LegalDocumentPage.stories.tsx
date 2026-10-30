@@ -16,8 +16,12 @@ import { LegalDocumentPage } from "./LegalDocumentPage.js";
  *
  * Like the other page stories, the frame pins a phone viewport
  * (430×844) so Chromatic screenshots stay deterministic; the
- * document scrolls inside it. Theme pinned to Warm Harvest,
- * Eciperay's brand.
+ * document scrolls inside it. The Wide story is the exception:
+ * it renders the privacy document unconstrained so the prose
+ * column's 768px cap and centering can be checked on a wide
+ * viewport (the manual-tests LegalDocumentPage section names
+ * it for that check). Theme pinned to Warm Harvest, Eciperay's
+ * brand.
  */
 const meta: Meta<typeof LegalDocumentPage> = {
   title: "Pages/Eciperay/LegalDocumentPage",
@@ -50,4 +54,8 @@ export const TermsOfService: Story = {
       <LegalDocumentPage {...legalTermsFixture} />
     </Viewport>
   ),
+};
+
+export const Wide: Story = {
+  render: () => <LegalDocumentPage {...legalPrivacyFixture} />,
 };

@@ -1,9 +1,10 @@
 import type { ReactNode } from "react";
 import { Anchor, XStack, YStack } from "tamagui";
-import { listItemRoleProps, listRoleProps } from "../components/accessibility.js";
-import { Divider } from "../components/Divider.js";
+import { DocumentFooter } from "../components/DocumentFooter.js";
+import { DocumentHeader } from "../components/DocumentHeader.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
+import { listItemRoleProps, listRoleProps } from "../components/accessibility.js";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -39,20 +40,36 @@ import { tokens } from "../tokens/index.js";
  * copy and the destinations, the DS owns the frame's design, and
  * the same frame shape serves the other public surfaces.
  *
+ * The page composes components and passes data only (#119): the
+ * frame's header and footer are the shared DocumentHeader /
+ * DocumentFooter, and the document itself renders through the
+ * page-local prose renderer below (Stephen's no-new-components
+ * rule for tranche PRs, 2026-10-29). An earlier tranche cut
+ * extracted the renderer as a ProseDocument library component;
+ * it had no second consumer, so it was folded back into the
+ * page — the model types live here under the page's public
+ * names, so the contract below is unchanged.
+ *
  * Stays app-side: the legal text itself, routing, document
  * head/SEO, and the analytics consent banner.
  */
 
+/** A prose span: the document's inline semantics — plain text,
+ * strong emphasis, code, and links (a link span's href navigates,
+ * so it renders as a real anchor). */
 export type LegalDocumentSpan =
   | { type: "text"; text: string }
   | { type: "strong"; text: string }
   | { type: "code"; text: string }
   | { type: "link"; label: string; href: string };
 
+/** A prose block: a paragraph of spans, or a bulleted list whose
+ * items are span runs. */
 export type LegalDocumentBlock =
   | { type: "paragraph"; spans: LegalDocumentSpan[] }
   | { type: "list"; items: LegalDocumentSpan[][] };
 
+/** A document section: a titled run of blocks. */
 export type LegalDocumentSection = {
   title: string;
   blocks: LegalDocumentBlock[];
@@ -64,24 +81,15 @@ export type LegalDocumentLink = {
   href: string;
 };
 
-export type LegalDocumentPageProps = {
-  /** Document title, rendered as the page's level-1 heading. */
-  title: string;
-  /**
-   * Pre-formatted by the host, e.g. "July 22, 2026" — the page
-   * renders it as "Last updated: …".
-   */
-  lastUpdated: string;
-  sections: LegalDocumentSection[];
-  /** Brand wordmark in the frame header, linking to the host's home. */
-  brandLabel: string;
-  brandHref: string;
-  /** Sign-in link in the frame header. */
-  signInLabel: string;
-  signInHref: string;
-  /** The frame footer's links (the privacy/terms links today). */
-  footerLinks: LegalDocumentLink[];
-};
+/**
+ * The document's prose column width: the same 768px (the web
+ * layout's max-w-3xl) centered column the other public surfaces
+ * render into (PublicFrameLayout's COLUMN_MAX_WIDTH), so the
+ * prose stays readable on wide viewports. The frame header and
+ * footer stay outside the column, spanning the container as
+ * before; on phone-width viewports the cap does not bind.
+ */
+const PROSE_MAX_WIDTH = 768;
 
 function renderSpan(span: LegalDocumentSpan, key: number): ReactNode {
   switch (span.type) {
@@ -118,12 +126,12 @@ function renderSpans(spans: LegalDocumentSpan[]): ReactNode {
   return spans.map((span, index) => renderSpan(span, index));
 }
 
-function LegalDocumentBlockView({ block }: { block: LegalDocumentBlock }) {
+function renderBlock(block: LegalDocumentBlock, key: number): ReactNode {
   if (block.type === "paragraph") {
-    return <Text>{renderSpans(block.spans)}</Text>;
+    return <Text key={key}>{renderSpans(block.spans)}</Text>;
   }
   return (
-    <YStack gap="$2" {...listRoleProps}>
+    <YStack key={key} gap="$2" {...listRoleProps}>
       {block.items.map((item, index) => (
         <XStack key={index} gap="$2" {...listItemRoleProps}>
           <Text>{"•"}</Text>
@@ -134,15 +142,24 @@ function LegalDocumentBlockView({ block }: { block: LegalDocumentBlock }) {
   );
 }
 
-/**
- * The document's prose column width: the same 768px (the web
- * layout's max-w-3xl) centered column the other public surfaces
- * render into (PublicPageFrame's column), so the legal text stays
- * readable on wide viewports. The frame header and footer stay
- * outside the column, spanning the container as before; on
- * phone-width viewports the cap does not bind.
- */
-const PROSE_MAX_WIDTH = 768;
+export type LegalDocumentPageProps = {
+  /** Document title, rendered as the page's level-1 heading. */
+  title: string;
+  /**
+   * Pre-formatted by the host, e.g. "July 22, 2026" — the page
+   * renders it as "Last updated: …".
+   */
+  lastUpdated: string;
+  sections: LegalDocumentSection[];
+  /** Brand wordmark in the frame header, linking to the host's home. */
+  brandLabel: string;
+  brandHref: string;
+  /** Sign-in link in the frame header. */
+  signInLabel: string;
+  signInHref: string;
+  /** The frame footer's links (the privacy/terms links today). */
+  footerLinks: LegalDocumentLink[];
+};
 
 export function LegalDocumentPage({
   title,
@@ -156,18 +173,12 @@ export function LegalDocumentPage({
 }: LegalDocumentPageProps) {
   return (
     <ScreenContainer>
-      <XStack alignItems="center" justifyContent="space-between" gap="$4">
-        <Anchor
-          href={brandHref}
-          fontSize={tokens.typography.fontSize.lg}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          {brandLabel}
-        </Anchor>
-        <Anchor href={signInHref} color="$link" fontWeight={tokens.typography.fontWeight.medium}>
-          {signInLabel}
-        </Anchor>
-      </XStack>
+      <DocumentHeader
+        brandLabel={brandLabel}
+        brandHref={brandHref}
+        signInLabel={signInLabel}
+        signInHref={signInHref}
+      />
       <YStack width="100%" maxWidth={PROSE_MAX_WIDTH} alignSelf="center" gap="$4">
         <YStack gap="$3">
           <Text variant="heading">{title}</Text>
@@ -176,28 +187,11 @@ export function LegalDocumentPage({
         {sections.map((section) => (
           <YStack key={section.title} gap="$3">
             <Text variant="subheading">{section.title}</Text>
-            {section.blocks.map((block, index) => (
-              <LegalDocumentBlockView key={index} block={block} />
-            ))}
+            {section.blocks.map((block, index) => renderBlock(block, index))}
           </YStack>
         ))}
       </YStack>
-      <YStack gap="$4">
-        <Divider />
-        <XStack gap="$4" flexWrap="wrap">
-          {footerLinks.map((link) => (
-            <Anchor
-              key={link.href}
-              href={link.href}
-              color="$link"
-              fontSize={tokens.typography.fontSize.sm}
-              fontWeight={tokens.typography.fontWeight.medium}
-            >
-              {link.label}
-            </Anchor>
-          ))}
-        </XStack>
-      </YStack>
+      <DocumentFooter links={footerLinks} />
     </ScreenContainer>
   );
 }

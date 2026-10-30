@@ -635,7 +635,7 @@ stories, or a changeset naming it.
 
 ---
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, SearchRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, StatusMessage, SearchRow, RemovableField)
 
 Open in `Components/StepList`: Default;
 `Components/MarkableRow`: Default;
@@ -643,6 +643,7 @@ Open in `Components/StepList`: Default;
 `Components/TagList`: Default; `Components/FieldStack`: (its
 stories); `Components/TextActionCardRow`: (its stories);
 `Components/CenteredText`: (its stories);
+`Components/StatusMessage`: Default, Empty, Transient;
 `Components/SearchRow`: (its stories);
 `Components/RemovableField`: (its stories).
 
@@ -658,6 +659,11 @@ stories); `Components/TextActionCardRow`: (its stories);
 5. SearchRow: the search field claims the row's width and its
    trailing action sits at the end; RemovableField's remove
    button names the value it removes.
+6. StatusMessage: the message line is centered, small, and in
+   muted ink that stays readable in the dark theme; Empty shows
+   nothing (the live region is mounted but empty); Transient's
+   toggle makes the confirmation appear and disappear under the
+   button row without shifting focus.
 
 **Run when:** any of these components, their stories, or a
 changeset naming them.
@@ -747,6 +753,57 @@ Open in `Components/StatBand`: Default, TwoStats.
 
 **Run when:** `src/components/StatBand.tsx`, its stories, the
 recipe detail pages' stat band, or a changeset naming StatBand.
+
+---
+
+## LegalDocumentPage
+
+Open in `Pages/Eciperay/LegalDocumentPage`: PrivacyPolicy,
+TermsOfService, Wide.
+
+1. The document title is the level-1 heading, with the muted
+   last-updated line under it — "Last updated: July 22, 2026"
+   in PrivacyPolicy, "Last updated: June 18, 2026" in
+   TermsOfService (each story's fixture date); each section
+   title is a level-2 heading.
+2. The paragraph renders its strong span bold and its mailto
+   link underlined in link ink; the list renders bulleted rows
+   with bold lead-ins and a monospace code span.
+3. In Wide (the unconstrained story — the other two pin a
+   430px viewport, where the cap cannot bind): on a wide
+   viewport the prose column caps at 768px and centers; the
+   frame header (wordmark + sign-in links) and footer (the
+   host's legal links) render as real links.
+
+**Run when:** `src/pages/LegalDocumentPage.tsx`, its stories,
+DocumentHeader / DocumentFooter, or a changeset naming
+LegalDocumentPage.
+
+---
+
+## LandingPage
+
+Open in `Pages/Eciperay/LandingPage`: Default, Wide.
+
+1. The headline renders centered as the level-1 heading, with
+   the muted subtitle centered under it and breathing room
+   above the headline.
+2. The three CTAs are Button's href form (`<Button href>` —
+   the ButtonLink form; there is no CtaLink): the primary CTA
+   is the filled brand button link, the two secondaries are
+   neutral button links, all real links (role link, their
+   hrefs), never buttons. On web they sit in one centered row
+   (check in Wide); on native (the RN storybook) they stack
+   vertically — the row never wraps two CTAs side by side at
+   phone width.
+3. Feature cards: in Wide the three cards share one row, each
+   with its title as a level-2 heading and the muted
+   description under it; in Default (the 430px phone viewport)
+   they wrap onto further rows at their 260px basis instead
+   of squeezing — three-across cannot fit there.
+
+**Run when:** `src/pages/LandingPage.tsx`, its stories,
+Button's href form, or a changeset naming LandingPage.
 
 ---
 
@@ -1186,3 +1243,276 @@ submit switches the page to its loading state).
 `src/pages/SignUpPage.tsx`, `src/pages/ForgotPasswordPage.tsx`,
 `src/pages/ResetPasswordPage.tsx`, their stories, or a changeset
 naming the auth pages or Enter-to-submit.
+
+---
+
+## PanelStack
+
+Open in `Components/PanelStack`: Default.
+
+1. The panel's blocks (the title, the body text, the stat
+   band) sit inside an even 16px inset with 16px between
+   blocks, and the panel stretches to its column's width —
+   the blocks are listed, never spaced by hand.
+
+**Run when:** `src/components/PanelStack.tsx`, its stories, a
+detail page composing it, or a changeset naming PanelStack.
+
+---
+
+## Toolbar
+
+Open in `Components/Toolbar`: Default.
+
+1. The status badge and the Version select share one line
+   over a hairline divider, the select growing to take the
+   bar's remaining width; the bar's inset is 16px at the
+   sides and 12px vertically. Narrow the story's frame: the
+   select wraps onto a second line instead of overflowing
+   the bar.
+
+**Run when:** `src/components/Toolbar.tsx`, its stories, a
+fixed-shell page composing it, or a changeset naming Toolbar.
+
+---
+
+## CandidateList
+
+Open in `Components/CandidateList`: Default, Pending,
+ReadOnly.
+
+1. Default: the heading sits over one tinted card per
+   candidate, each card carrying the candidate's label and
+   its Activate button; each button's accessible name
+   includes its candidate ("Activate Pea soup").
+2. Pending: the Activate button renders disabled while the
+   activation is in flight.
+3. ReadOnly: the cards render their labels with no Activate
+   button — candidate data alone exposes no dead action.
+
+**Run when:** `src/components/CandidateList.tsx`, its
+stories, or a changeset naming CandidateList.
+
+---
+
+## LogEntryCard
+
+Open in `Components/LogEntryCard`: Default, WithoutAction.
+
+1. Default: the date and the star rating head the card, the
+   notes body follows, and the Delete action sits below,
+   carrying its entry-specific accessible name (position +
+   date, composed by the caller).
+2. WithoutAction: the card renders its date and rating with
+   no Delete action.
+
+**Run when:** `src/components/LogEntryCard.tsx`, its
+stories, or a changeset naming LogEntryCard.
+
+---
+
+## NutritionPanel
+
+Open in `Components/NutritionPanel`: Ready, Loading,
+Unavailable, UnavailableRefreshing.
+
+1. Ready: the "Per Serving" header with its Refresh action,
+   one hairline label/value row per nutrient, and the
+   disclaimer in small muted text below.
+2. Loading: a single "Estimating nutrition…" line.
+3. Unavailable: the not-available line with the Estimate
+   nutrition action below it. UnavailableRefreshing: the
+   action reads "Refreshing…" and renders disabled while
+   the refresh is in flight.
+
+**Run when:** `src/components/NutritionPanel.tsx`, its
+stories, or a changeset naming NutritionPanel.
+
+---
+
+## RecipeOverviewPanel
+
+Open in `Components/RecipeOverviewPanel`: Default, Minimal.
+
+1. Default: the title, status pill, description, stat band,
+   and tag pills stack with even 16px separation; the tag
+   pills carry their named colors. Minimal shows the title,
+   the "Idea" pill, and the Servings stat only — no
+   description, Prep/Cook stats, or tag row.
+
+**Run when:** `src/components/RecipeOverviewPanel.tsx`, its
+stories, PublicRecipePage, RecipeDetailPage, or a changeset
+naming RecipeOverviewPanel.
+
+---
+
+## RecipeIngredientsPanel
+
+Open in `Components/RecipeIngredientsPanel`: Default, Plain.
+
+1. Default: the servings stepper and the Scale preset row
+   fit the width without the Scale row wrapping; the Custom
+   button turns into a number input when pressed and, once a
+   value is entered, shows it selected (e.g. "4×"). The
+   dimmed "heavy cream" row is marked missing and the
+   Substitutions panel shows below the list; pressing the
+   row clears the dim.
+2. Plain: two unadorned rows with hairline separators and no
+   substitutions panel.
+
+**Run when:** `src/components/RecipeIngredientsPanel.tsx`,
+its stories, PublicRecipePage, RecipeDetailPage, or a
+changeset naming RecipeIngredientsPanel.
+
+---
+
+## RecipeInstructionsPanel
+
+Open in `Components/RecipeInstructionsPanel`: Default.
+
+1. The first step card is highlighted (primary border and
+   tint) on open; pressing another card moves the highlight
+   to it. Steps render in step-number order.
+
+**Run when:** `src/components/RecipeInstructionsPanel.tsx`,
+its stories, PublicRecipePage, RecipeDetailPage, or a
+changeset naming RecipeInstructionsPanel.
+
+---
+
+## PreviewCard
+
+Open in `Components/PreviewCard`: Default, NoTitle,
+NoActions.
+
+1. Default: the title heads the framed preview in its own
+   treatment, the preview content follows, and the actions
+   sit below the content inside the card — the frame is the
+   fixed gray3 hairline on the surface fill.
+2. NoTitle: no title block renders; the content starts at
+   the card's inset.
+3. NoActions: no actions row renders below the content.
+
+**Run when:** `src/components/PreviewCard.tsx`, its stories,
+AiSessionPage, ImportReviewPage, or a changeset naming
+PreviewCard.
+
+---
+
+## BadgeCardRow
+
+Open in `Components/BadgeCardRow`: Default, DeleteOnly.
+
+1. Default: a compact card (small padding and shadow) with
+   the colored badge at the left and Edit / Delete as bare
+   text actions at the right, Delete in the error treatment.
+2. DeleteOnly: only the Delete action shows; the badge
+   keeps its color and the row height is unchanged.
+
+**Run when:** `src/components/BadgeCardRow.tsx`, its
+stories, TagsPage's rows, or a changeset naming
+BadgeCardRow.
+
+---
+
+## TrailingActionsRow; Card's compact variant
+
+Open in `Components/TrailingActionsRow`: FieldAndAction,
+ContentAndTextActions, Narrow; `Components/Card`: Compact.
+
+1. FieldAndAction: the leading group sits at the left and
+   the action at the right on one line.
+   ContentAndTextActions: the badge sits left, Edit / Delete
+   right, at a 12px gap between the actions. Narrow: when
+   the groups cannot fit, the action wraps below the leading
+   group instead of overflowing.
+2. Card Compact: the surface is the small card treatment —
+   12px padding, medium corners, small shadow, no border
+   (the former CompactCard, folded into Card as
+   `variant="compact"` under Stephen's 2026-10-29 ruling).
+
+**Run when:** `src/components/TrailingActionsRow.tsx`,
+`src/components/Card.tsx`, their stories, TagsPage's forms
+or rows, or a changeset naming any of them.
+
+---
+
+## ButtonStack
+
+Open in `Components/ButtonStack`: Default.
+
+1. The three buttons stretch full width at an even 12px
+   rhythm.
+
+**Run when:** `src/components/ButtonStack.tsx`, its
+stories, HomePage's actions, or a changeset naming
+ButtonStack.
+
+---
+
+## CheckRow
+
+Open in `Components/CheckRow`: Default, Checked, LabelOnly.
+
+1. Default: an outlined box sits left of a bold label with
+   its muted detail ("2 tbsp · optional") on the same line,
+   over a hairline; the whole row is the press target
+   (pointer cursor on web, Enter/Space toggle it, the
+   story's row checks and unchecks).
+2. Checked: the box fills with the primary color and a check
+   glyph, and the label renders muted and struck through.
+3. LabelOnly: no detail segment renders — the label stands
+   alone with no trailing separator.
+
+**Run when:** `src/components/CheckRow.tsx`, its stories,
+ShoppingListPage's list, or a changeset naming CheckRow.
+
+---
+
+## StepOverlay
+
+Open in `Components/StepOverlay`: Default.
+
+1. The dark overlay fills its frame: title and step eyebrows
+   render uppercase and dimmed over the step body in large
+   light text, and the translucent Done pill sits at the
+   top right (focusable on web; Enter/Space activate it —
+   each activation adds to the "Done activated" line under
+   the frame).
+2. The story's dots and Back / Next row render below the
+   body, composed by the caller, and walk the demo's three
+   steps (Back disables on the first step, Next on the
+   last) — the controls are the caller's; the shell owns
+   only the gap above them (its 32px body bottom padding).
+
+**Run when:** `src/components/StepOverlay.tsx`, its
+stories, MealCookingModePage, or a changeset naming
+StepOverlay.
+
+---
+
+## FieldColumns
+
+Open in `Components/FieldColumns`: Default.
+
+1. Servings, Prep (min), and Cook (min) fields sit in three
+   equal-width columns with an even gutter between them;
+   each label sits over its own field.
+
+**Run when:** `src/components/FieldColumns.tsx`, its
+stories, RecipeFormPage, or a changeset naming FieldColumns.
+
+---
+
+## FormSubmit
+
+Open in `Components/FormSubmit`: Default.
+
+1. FormSubmit Default: the Save meal button sits 32px below
+   the field above it — FormSubmit's own 16px of top padding
+   on top of the layout's 16px gap — full width.
+
+**Run when:** `src/components/FormSubmit.tsx`, its stories,
+a form page composing it, or a changeset naming it.
+(FormStack and FormHeading are covered by the Form set
+section above.)
