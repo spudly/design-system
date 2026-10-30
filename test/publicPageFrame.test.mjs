@@ -94,7 +94,7 @@ test("the frame owns the public chrome: href navigation throughout, no scroll of
   for (const hrefProp of ["brandHref", "signInHref", "privacyHref", "termsHref"]) {
     assert.match(
       pageCode,
-      new RegExp(String.raw`${hrefProp}: string;`),
+      new RegExp(`${hrefProp}: string;`),
       `the frame's ${hrefProp} destination crosses as an href, not a callback`,
     );
   }

@@ -164,7 +164,10 @@ test("each filter control renders only when its filter is added", () => {
 });
 
 test("the chooser offers exactly the filters not yet added, and adding closes it", () => {
-  assert.match(bar, /const addable = filters\.filter\(\(definition\) => !active\.includes\(definition\.id\)\);/);
+  assert.match(
+    bar,
+    /const addable = filters\.filter\(\(definition\) => !active\.includes\(definition\.id\)\);/,
+  );
   assert.match(bar, /accessibilityLabel=\{`Add \$\{definition\.label\} filter`\}/);
   assert.match(bar, /setActive\(\[\.\.\.active, id\]\);\s*setChooserOpen\(false\);/);
 });
@@ -176,7 +179,11 @@ test("removing a filter clears its values through the change callbacks", () => {
     bar,
     /definition\.onSortChange\(definition\.defaultSortValue\);\s*definition\.onDirChange\(definition\.defaultDirValue\);/,
   );
-  assert.match(bar, /accessibilityLabel=\{`Remove \$\{label\} filter`\}/);
+  assert.match(
+    bar,
+    /removeAccessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/,
+    "the added filter's remove control is a RemovableField naming the filter",
+  );
 });
 
 test("the title renders as the page heading and pagination rides the shared catalog pattern", () => {

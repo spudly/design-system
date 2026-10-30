@@ -1,5 +1,8 @@
 import { Alert } from "../components/Alert.js";
-import { CatalogFiltersBar, type CatalogFilterDefinition } from "../components/CatalogFiltersBar.js";
+import {
+  CatalogFiltersBar,
+  type CatalogFilterDefinition,
+} from "../components/CatalogFiltersBar.js";
 import { CatalogHeader } from "../components/CatalogHeader.js";
 import { DiscoveryCard } from "../components/DiscoveryCard.js";
 import { EmptyState } from "../components/EmptyState.js";
@@ -275,7 +278,11 @@ export function DiscoverPage(props: DiscoverPageProps) {
   // provided, not hidden), the same condition RecipesPage's bar
   // carries; the public host passes no status filter today.
   const catalogFilters: CatalogFilterDefinition<DiscoverPageFilterId>[] = [];
-  if (showStatusFilter !== false && statusFilter !== undefined && onStatusFilterChange !== undefined) {
+  if (
+    showStatusFilter !== false &&
+    statusFilter !== undefined &&
+    onStatusFilterChange !== undefined
+  ) {
     catalogFilters.push({
       kind: "select",
       id: "status",
