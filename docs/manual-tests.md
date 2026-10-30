@@ -1002,7 +1002,8 @@ FirstStep, LastStep.
    Next.
 
 **Run when:** any of the five pages' sources or stories, or a
-changeset naming any of them.
+changeset naming any of them. Run only the numbered cases for
+the page(s) that changed.
 
 ---
 

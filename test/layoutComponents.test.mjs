@@ -28,8 +28,6 @@
  *   `vertical`, both defaulting to true.
  * - FieldStack: one form's fields — gap spacing[3] (12px),
  *   stretch (the meals & planning tranche of #119).
- * - ButtonStack: a stack of full-width buttons — gap
- *   spacing[3] (12px), stretch (ButtonRow's vertical form).
  * The pins hold each component's treatment, its Omit of the
  * style keys it owns, and SearchField's `grow` (the other half
  * of the FieldRow pattern: the field takes the row's
@@ -79,7 +77,6 @@ test("the layout components are exported from the built package root", async () 
     "ButtonStack",
     "Center",
     "FieldStack",
-    "ButtonStack",
   ]) {
     assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
   }
