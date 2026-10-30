@@ -1199,10 +1199,10 @@ Open in `Pages/Eciperay/ImportReviewPage`: Ready, WithImage.
    pressing the Import button; clear the field first and Enter
    does nothing (the counter does not move).
 3. ImportReviewPage (WithImage): the render passes `imageAlt`
-   (hosts pass the recipe title), which is exposed as the hero
-   image's accessible name — `alt` on web, accessibility label
-   on native; the Ready render, which passes no image, shows no
-   image at all.
+   (hosts pass the recipe title), which Thumbnail exposes as
+   the hero image's accessible name — `role="img"` with an
+   `aria-label` on web, the accessibility label on native; the
+   Ready render, which passes no image, shows no image at all.
 
 **Run when:** `src/pages/ImportTextPage.tsx`,
 `src/pages/ImportUrlPage.tsx`, `src/pages/ImportReviewPage.tsx`,
