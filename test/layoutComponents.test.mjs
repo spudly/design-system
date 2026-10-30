@@ -65,7 +65,6 @@ const panelStackCode = code("PanelStack.tsx");
 const buttonStackCode = code("ButtonStack.tsx");
 const centerCode = code("Center.tsx");
 const fieldStackCode = code("FieldStack.tsx");
-const buttonStackCode = code("ButtonStack.tsx");
 const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
 
 test("the layout components are exported from the built package root", async () => {
@@ -162,12 +161,6 @@ test("FieldStack owns the form-field rhythm", () => {
   assert.match(fieldStackCode, /styled\(YStack, \{\s+name: "FieldStack",/);
   assert.match(fieldStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
   assert.match(fieldStackCode, /Omit<StyledFieldStackProps, "gap" \| "alignItems">/);
-});
-
-test("ButtonStack owns the full-width button stack's rhythm", () => {
-  assert.match(buttonStackCode, /styled\(YStack, \{\s+name: "ButtonStack",/);
-  assert.match(buttonStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
-  assert.match(buttonStackCode, /Omit<StyledButtonStackProps, "gap" \| "alignItems">/);
 });
 
 test("no layout component offers step, role, or margin props", () => {
