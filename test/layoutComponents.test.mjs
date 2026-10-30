@@ -174,12 +174,12 @@ test("no layout component offers step, role, or margin props", () => {
 
 test("Button's grow keeps a content-sized basis in both forms (no wrapping-row collapse)", () => {
   const spreads = buttonCode.match(
-    /\{\.\.\.\(grow \? \{ flexGrow: 1, flexShrink: 0, flexBasis: "auto" \} : null\)\}/g,
+    /\{\.\.\.\(grow && rest\.flex === undefined\s+\? \{ flexGrow: 1, flexShrink: 0, flexBasis: "auto", maxWidth: "100%" \}\s+: null\)\}/g,
   );
   assert.equal(
     spreads?.length,
     2,
-    "both Button forms must spread the content-basis grow shape — a zero basis (flex: 1) collapses a growing button in a wrapping row on native (PR #314's Start Cooking)",
+    "both Button forms must spread the content-basis grow shape, displaced by a caller-passed flex and capped at the row's width — a zero basis (flex: 1) collapses a growing button in a wrapping row on native (PR #314's Start Cooking)",
   );
   assert.ok(
     !/\{\.\.\.\(grow \? \{ flex: 1 \}/.test(buttonCode),
