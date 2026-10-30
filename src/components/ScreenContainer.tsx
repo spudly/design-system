@@ -93,7 +93,15 @@ export function ScreenContainer({
   ...rest
 }: ScreenContainerProps) {
   const content = (
-    <StyledContent gap={gap} {...rest}>
+    // The gap override is spread only when the caller actually passed
+    // one: an explicit `gap={undefined}` overrides StyledContent's
+    // static 16px gap in Tamagui's web style merge (the styled rule is
+    // generated but the class is never applied), so every shell whose
+    // caller passed no gap rendered its children flush on web (#299).
+    // Native ignored the undefined and kept the static gap, which is
+    // why only web lost the shell's section separation. The
+    // conditional spread is the PageFrame idiom for the same hazard.
+    <StyledContent {...(gap !== undefined ? { gap } : null)} {...rest}>
       {rest.variant === "auth" ? (
         <StyledAuthContent gap={gap ?? tokens.spacing[4]}>{children}</StyledAuthContent>
       ) : (
