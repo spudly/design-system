@@ -560,6 +560,133 @@ PresetValueSelector.
 
 ---
 
+## CheckRow
+
+Open in `Components/CheckRow`: Default, Checked, LabelOnly.
+
+1. Default: an outlined box sits left of a bold label with its
+   muted detail ("2 tbsp · optional") on the same line, over a
+   hairline; the whole row is the press target (pointer cursor
+   on web, Enter/Space toggle it, the story's row checks and
+   unchecks).
+2. Checked: the box fills with the primary color and a check
+   glyph, and the label renders muted and struck through.
+3. LabelOnly: no detail segment renders — the label stands
+   alone with no trailing separator.
+
+**Run when:** `src/components/CheckRow.tsx`, its stories,
+ShoppingListPage's list, or a changeset naming CheckRow.
+
+---
+
+## TextActionCardRow
+
+Open in `Components/TextActionCardRow`: Default, TitleOnly.
+
+1. Default: an elevated card with the title in semibold over
+   its muted subtitle; the text block is a link (anchor on
+   web) and "Delete" sits at the right edge as bare text —
+   pressing Delete does not navigate.
+2. TitleOnly: the card shows the title alone, no subtitle line
+   and no empty gap where it would sit.
+
+**Run when:** `src/components/TextActionCardRow.tsx`, its
+stories, MealsHubPage's meal list, or a changeset naming
+TextActionCardRow.
+
+---
+
+## BadgeCardRow
+
+Open in `Components/BadgeCardRow`: Default, DeleteOnly.
+
+1. Default: a compact card (small padding and shadow) with the
+   colored badge at the left and Edit / Delete as bare text
+   actions at the right, Delete in the error treatment.
+2. DeleteOnly: only the Delete action shows; the badge keeps
+   its color and the row height is unchanged.
+
+**Run when:** `src/components/BadgeCardRow.tsx`, its stories,
+TagsPage's rows, or a changeset naming BadgeCardRow.
+
+---
+
+## StepOverlay
+
+Open in `Components/StepOverlay`: Default.
+
+1. The dark overlay fills its frame: title and step eyebrows
+   render uppercase and dimmed over the step body in large
+   light text, and the translucent Done pill sits at the top
+   right (focusable on web; Enter/Space activate it).
+2. The story's dots and Back / Next row render below the body,
+   composed by the caller — the controls are the caller's; the
+   shell owns only the gap above them (its 32px body bottom
+   padding).
+
+**Run when:** `src/components/StepOverlay.tsx`, its stories,
+MealCookingModePage, or a changeset naming StepOverlay.
+
+---
+
+## PinnedHeaderShell
+
+Open in `Components/PinnedHeaderShell`: Default.
+
+1. The header block (title over the tab bar) stays pinned at
+   the top on the light page background while the content
+   region below it scrolls; the header's inset matches the
+   page inset (16px sides and top).
+
+**Run when:** `src/components/PinnedHeaderShell.tsx`, its
+stories, MealsHubPage's plans tab, or a changeset naming
+PinnedHeaderShell.
+
+---
+
+## FieldStack & TrailingActionsRow; Card's compact variant
+
+Open in `Components/FieldStack`: Default;
+`Components/TrailingActionsRow`: FieldAndAction,
+ContentAndTextActions, Narrow; `Components/Card`: Compact.
+
+1. FieldStack: the form's fields stack at an even 12px rhythm
+   with the button row last.
+2. TrailingActionsRow FieldAndAction: the leading group sits
+   at the left and the action at the right on one line.
+   ContentAndTextActions: the badge sits left, Edit / Delete
+   right, at a 12px gap between the actions. Narrow: when the
+   groups cannot fit, the action wraps below the leading group
+   instead of overflowing.
+3. Card Compact: the surface is the small card treatment —
+   12px padding, medium corners, small shadow, no border (the
+   former CompactCard, folded into Card as `variant="compact"`
+   under Stephen's 2026-10-29 ruling).
+
+**Run when:** `src/components/FieldStack.tsx`,
+`src/components/TrailingActionsRow.tsx`,
+`src/components/Card.tsx`, their stories, TagsPage's
+forms or rows, or a changeset naming any of them.
+
+---
+
+## ButtonStack & CenteredText
+
+Open in `Components/ButtonStack`: Default;
+`Components/CenteredText`: Default.
+
+1. ButtonStack: the three buttons stretch full width at an
+   even 12px rhythm.
+2. CenteredText: the subtitle line centers (each wrapped line
+   centered) in the muted ink; the plain line centers in the
+   default ink.
+
+**Run when:** `src/components/ButtonStack.tsx`,
+`src/components/CenteredText.tsx`, their stories, HomePage's
+header, or a changeset naming either.
+
+---
+
 ## CatalogFiltersBar & CatalogHeader
 
 Open in `Components/CatalogFiltersBar`: Collapsed, ChooserOpen,
@@ -903,6 +1030,48 @@ Empty, Loading, NoGoals, NutritionUnavailable.
 **Run when:** `src/pages/MealPlansPage.tsx`,
 `src/pages/MealPlanDetailPage.tsx`, their stories, or a changeset
 naming either page.
+
+---
+
+## Meals & planning pages (MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)
+
+Open in `Pages/Eciperay/MealDetailPage`: Default,
+NoNotesOrNutrition; `Pages/Eciperay/MealsHubPage`: Default,
+PlansTab, Empty; `Pages/Eciperay/ShoppingListPage`: Default,
+Loading, Empty; `Pages/Eciperay/HomePage`: WithRecipes, Empty,
+Loading; `Pages/Eciperay/MealCookingModePage`: Default,
+FirstStep, LastStep.
+
+1. MealDetailPage Default: xl bold title, muted notes and
+   nutrition lines, Cook meal / Edit side by side, then the
+   Recipes card whose member rows link (title over its meta
+   line); an unavailable member would show its
+   " (unavailable)" suffix and not link. NoNotesOrNutrition
+   drops the two muted lines with no leftover gaps.
+2. MealsHubPage Default: Meals title over the tab bar, the
+   full-width New meal button, then meal cards at an even 8px
+   rhythm, each card's Delete a bare text action at its right
+   edge. PlansTab: the same chrome stays pinned above the
+   plans list. Empty: the empty state replaces the list.
+3. ShoppingListPage Default: each line's box, bold name, and
+   muted quantity / "optional" segments render on one line;
+   checking a line fills its box and strikes the line through.
+   Loading shows the spinner under the title; Empty shows the
+   empty state.
+4. HomePage WithRecipes: hero title, centered muted subtitle,
+   three full-width buttons, then the section title over the
+   host-rendered rows at the rows' own rhythm. Loading centers
+   the spinner under the section title; Empty centers the
+   empty message there.
+5. MealCookingModePage: the dark overlay covers the frame —
+   uppercase meal title and "Step N of M · recipe" eyebrows
+   over the step body, Done pill at the top right, dots and
+   Back / Next below. FirstStep has no Back; LastStep disables
+   Next.
+
+**Run when:** any of the five pages' sources or stories, or a
+changeset naming any of them. Run only the numbered cases for
+the page(s) that changed.
 
 ---
 
@@ -1322,8 +1491,7 @@ changeset naming Text or heading semantics.
 
 Open in `Pages/Eciperay/ImportTextPage`: Empty, WithError.
 Open in `Pages/Eciperay/ImportUrlPage`: Filled, Interactive.
-ImportReviewPage has no image story — its image case is verified
-from the changeset/PR description against a host render.
+Open in `Pages/Eciperay/ImportReviewPage`: Ready, WithImage.
 
 1. ImportTextPage: the paste field is findable by the accessible
    name "Recipe text" (Storybook accessibility panel or DOM
@@ -1333,10 +1501,11 @@ from the changeset/PR description against a host render.
    increments the "Submitted N times" counter, exactly like
    pressing the Import button; clear the field first and Enter
    does nothing (the counter does not move).
-3. ImportReviewPage: a render that passes `imageAlt` (hosts pass
-   the recipe title) exposes that text as the hero image's
-   accessible name — `alt` on web, accessibility label on
-   native; a render without an image shows no image at all.
+3. ImportReviewPage (WithImage): the render passes `imageAlt`
+   (hosts pass the recipe title), which Thumbnail exposes as
+   the hero image's accessible name — `role="img"` with an
+   `aria-label` on web, the accessibility label on native; the
+   Ready render, which passes no image, shows no image at all.
 
 **Run when:** `src/pages/ImportTextPage.tsx`,
 `src/pages/ImportUrlPage.tsx`, `src/pages/ImportReviewPage.tsx`,

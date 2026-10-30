@@ -1,5 +1,3 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { Text } from "../components/Text.js";
@@ -13,6 +11,12 @@ import { Text } from "../components/Text.js";
  * decision applied to import — the DS receives no picker
  * library and no picked file). The step's screen keeps the
  * pickers, the import mutation, and navigation.
+ *
+ * De-styled for #119: the page renders no layout primitives
+ * and sets no styling props. The title is Text's `formTitle`
+ * variant, the importing status is the muted `hint`
+ * treatment, and the section rhythm is FormScreenLayout's
+ * own.
  */
 
 export type ImportImagePageProps = {
@@ -30,11 +34,7 @@ export function ImportImagePage({
 }: ImportImagePageProps) {
   return (
     <FormScreenLayout>
-      <YStack paddingBottom="$6">
-        <Text variant="heading" fontSize={tokens.typography.fontSize["2xl"]}>
-          Import from Image
-        </Text>
-      </YStack>
+      <Text variant="formTitle">Import from Image</Text>
       <Button
         variant="primary"
         disabled={loading}
@@ -45,27 +45,17 @@ export function ImportImagePage({
       >
         Take Photo
       </Button>
-      <YStack paddingTop="$3">
-        <Button
-          variant="secondary"
-          disabled={loading}
-          onPress={() => {
-            onPickLibrary?.();
-          }}
-        >
-          Choose from Library
-        </Button>
-      </YStack>
-      {loading ? (
-        <YStack paddingTop="$4">
-          <Text color="$textMuted">Importing…</Text>
-        </YStack>
-      ) : null}
-      {error ? (
-        <YStack paddingTop="$4">
-          <Text variant="error">{error}</Text>
-        </YStack>
-      ) : null}
+      <Button
+        variant="secondary"
+        disabled={loading}
+        onPress={() => {
+          onPickLibrary?.();
+        }}
+      >
+        Choose from Library
+      </Button>
+      {loading ? <Text variant="hint">Importing…</Text> : null}
+      {error ? <Text variant="error">{error}</Text> : null}
     </FormScreenLayout>
   );
 }

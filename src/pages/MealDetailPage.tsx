@@ -1,11 +1,10 @@
-import { Anchor, XStack, YStack, isWeb } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
-import { ListStack } from "../components/ListStack.js";
 import { Button } from "../components/Button.js";
-import { LinkOverlay } from "../components/linkOverlay.js";
+import { ButtonRow } from "../components/ButtonRow.js";
+import { ListRow } from "../components/ListRow.js";
+import { ListStack } from "../components/ListStack.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { Text } from "../components/Text.js";
 
 /**
@@ -36,6 +35,20 @@ import { Text } from "../components/Text.js";
  * MealPlanDetailPage: member titles take the theme-aware
  * foreground instead of the app's fixed gray10, which is
  * unreadable on a dark theme's card surface.
+ *
+ * De-styled for #119: the page composes DS components only —
+ * the sections stack in SectionStack (wrappers that existed
+ * only to space content are gone; separation is the stack's,
+ * at its uniform rhythm), the title is Text's `title`
+ * variant, the notes and nutrition lines are `hint` text,
+ * the actions sit in ButtonRow, and each member renders
+ * through ListRow's link form: the row passes its href
+ * always and adds ListRow's disabled state plus the
+ * "(unavailable)" title suffix only for a member whose
+ * access was lost (the MealPlanDetailPage pattern), so the
+ * row's link semantics — a real anchor on web, a LinkOverlay
+ * carrying the composed label on native — are the generic
+ * row's, not the page's.
  */
 
 export type MealDetailPageMember = {
@@ -70,78 +83,6 @@ export type MealDetailPageProps = {
   editHref: string;
 };
 
-function MemberRow({ member }: { member: MealDetailPageMember }) {
-  const isUnavailable = member.isUnavailable ?? false;
-  // `decorative` marks the visible texts non-accessible for the
-  // native link rendering, whose LinkOverlay carries the composed
-  // label as the row's one accessibility stop (see LinkOverlay).
-  const renderRowContent = (decorative: boolean) => (
-    <>
-      <Text
-        accessible={decorative ? false : undefined}
-        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        fontSize={tokens.typography.fontSize.md}
-        fontWeight={tokens.typography.fontWeight.medium}
-      >
-        {member.title}
-        {isUnavailable ? " (unavailable)" : ""}
-      </Text>
-      <Text
-        variant="hint"
-        accessible={decorative ? false : undefined}
-        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-      >
-        {member.subtitle}
-      </Text>
-    </>
-  );
-  const rowContent = renderRowContent(false);
-  return (
-    <YStack borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2}>
-      {isUnavailable ? (
-        <YStack
-          paddingVertical="$3"
-          {...platformAccessibilityProps({ accessibilityState: { disabled: true } })}
-        >
-          {rowContent}
-        </YStack>
-      ) : isWeb ? (
-        // The row navigates, so it renders as a real anchor
-        // carrying the member's href (#248) — keyboard-operable
-        // on web by default, which retires the hand-rolled
-        // focus/keydown press pattern this row used as a button.
-        // The anchor is pinned to a web flex column (the BackLink
-        // lesson: a text-based anchor is inline on web and would
-        // not hold the row's stacked layout).
-        <Anchor
-          href={member.href}
-          textDecorationLine="none"
-          display="web:flex"
-          flexDirection="column"
-          paddingVertical="$3"
-        >
-          {rowContent}
-        </Anchor>
-      ) : (
-        // Native: the anchor is a Text, so the stacked row content
-        // would flow inline inside it (see LinkOverlay). The row
-        // renders in the same YStack frame as the unavailable
-        // branch, with a childless anchor stretched over it
-        // carrying the href; the overlay's label composes the
-        // title and subtitle the way RecipesPage's row labels do.
-        <YStack paddingVertical="$3" position="relative">
-          {renderRowContent(true)}
-          <LinkOverlay
-            href={member.href}
-            accessibilityRole="link"
-            accessibilityLabel={`${member.title}, ${member.subtitle}`}
-          />
-        </YStack>
-      )}
-    </YStack>
-  );
-}
-
 export function MealDetailPage({
   title,
   notes,
@@ -152,42 +93,32 @@ export function MealDetailPage({
 }: MealDetailPageProps) {
   return (
     <ScreenContainer>
-      <YStack paddingBlockEnd="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          {title}
-        </Text>
-      </YStack>
-      {notes ? (
-        <YStack paddingBlockEnd="$4">
-          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-            {notes}
-          </Text>
-        </YStack>
-      ) : null}
-      {nutritionLabel ? (
-        <YStack paddingBlockEnd="$4">
-          <Text fontSize={tokens.typography.fontSize.sm} color="$textMuted">
-            {nutritionLabel}
-          </Text>
-        </YStack>
-      ) : null}
-      <XStack paddingBlockEnd="$6" flexWrap="wrap" gap="$3">
-        <Button href={cookHref}>Cook meal</Button>
-        <Button variant="secondary" href={editHref}>
-          Edit
-        </Button>
-      </XStack>
-      <SectionCard title="Recipes">
-        <ListStack>
-          {members.map((member) => (
-            <MemberRow key={member.recipeId} member={member} />
-          ))}
-        </ListStack>
-      </SectionCard>
+      <SectionStack>
+        <Text variant="title">{title}</Text>
+        {notes ? <Text variant="hint">{notes}</Text> : null}
+        {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
+        <ButtonRow>
+          <Button href={cookHref}>Cook meal</Button>
+          <Button variant="secondary" href={editHref}>
+            Edit
+          </Button>
+        </ButtonRow>
+        <SectionCard title="Recipes">
+          <ListStack>
+            {members.map((member) => (
+              <ListRow
+                key={member.recipeId}
+                title={member.title}
+                subtitle={member.subtitle}
+                href={member.href}
+                {...(member.isUnavailable
+                  ? { isDisabled: true, titleSuffix: " (unavailable)" }
+                  : {})}
+              />
+            ))}
+          </ListStack>
+        </SectionCard>
+      </SectionStack>
     </ScreenContainer>
   );
 }

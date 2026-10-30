@@ -51,3 +51,28 @@ export const Ready: Story = {
     </Viewport>
   ),
 };
+
+/**
+ * The image-bearing render: hosts that parsed a photo of the dish
+ * pass its URL (and the recipe title as the image's accessible
+ * name), and the banner renders above the preview frame. This
+ * story exists so the hero-banner re-check in the changeset and
+ * docs/manual-tests.md is performable — Ready passes no image.
+ */
+export const WithImage: Story = {
+  render: () => (
+    <Viewport>
+      <ImportReviewPage
+        versionLabel="v1"
+        imageUrl="https://picsum.photos/seed/import-review/800/400"
+        imageAlt="Creamy Mushroom Stroganoff"
+        preview={<PreviewStandIn />}
+        busy={false}
+        acceptPending={false}
+        editsPending={false}
+        onAccept={() => undefined}
+        onStartEdits={() => undefined}
+      />
+    </Viewport>
+  ),
+};
