@@ -205,6 +205,25 @@ export function PresetValueSelector({
                 });
               }
             }}
+            onPointerCancel={() => {
+              // #315 web touch-cancel path: Tamagui's web event
+              // mapping (getWebEvents) wires onPressOut only to
+              // onMouseUp/onTouchEnd — a touch CANCELED by the
+              // browser (scroll gesture, gesture takeover) fires
+              // neither, so onPressOut never runs and the pending
+              // flag would stay set; a later genuine blur outside
+              // the group would then discard the draft instead of
+              // committing it. The pointer-cancel event is the
+              // web-supported cancellation signal: clear the flag
+              // here too, with the same deferred microtask (a
+              // canceled press produces no onPress, so the defer
+              // can only ever take effect for a canceled press).
+              if (presetPressPendingRef.current) {
+                queueMicrotask(() => {
+                  presetPressPendingRef.current = false;
+                });
+              }
+            }}
             onPress={() => {
               presetPressPendingRef.current = false;
               setCustomEditing(false);

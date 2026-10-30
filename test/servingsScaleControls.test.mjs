@@ -250,6 +250,11 @@ test("on native, a preset press in flight suppresses the blur commit (#315)", ()
   );
   assert.match(
     selector,
+    /onPointerCancel=\{\(\) => \{\s+\/\/ #315 web touch-cancel path:[\s\S]*?queueMicrotask\(\(\) => \{\s+presetPressPendingRef\.current = false;/,
+    "a web touch-canceled preset press (pointer-cancel, which Tamagui does not map to press-out) clears the pending flag in a microtask, so a canceled touch followed by an outside blur still commits the draft",
+  );
+  assert.match(
+    selector,
     /const handleCustomBlur =[\s\S]*?commitCustom\(\);\s+\};/,
     "a blur leaving the group falls through to commitCustom",
   );
