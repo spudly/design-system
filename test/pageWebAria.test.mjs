@@ -152,14 +152,14 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 
 // Compact split form (the SANCTIONED_TAGS pattern above): this
 // file sits at the max-lines cap. MealPlansPage,
-// MealPlanDetailPage, and RecipeDetailPage are deliberately
-// absent: their rows render through the generic row components
-// in those rows' link forms (#248, after the #119 tranche-2
-// extraction; RecipeDetailPage's rows/steps through MarkableRow
-// / StepList after the recipes-detail tranche), so none of them
-// has a stack pressable left to translate — pinned below.
+// MealPlanDetailPage, RecipeDetailPage, and RecipeFormPage are
+// deliberately absent: their rows and revert pressables render
+// through the generic components the #119 extractions moved
+// them into (RecipeDetailPage's rows/steps through MarkableRow
+// / StepList after the recipes-detail tranche), so none of
+// them has a stack pressable left to translate — pinned below.
 const PAGE_STACKS =
-  "src/pages/ShoppingListPage.tsx,src/pages/MealDetailPage.tsx,src/pages/MealsHubPage.tsx,src/pages/AiSessionPage.tsx,src/pages/MealCookingModePage.tsx,src/pages/RecipeFormPage.tsx".split(
+  "src/pages/ShoppingListPage.tsx,src/pages/MealDetailPage.tsx,src/pages/MealsHubPage.tsx,src/pages/AiSessionPage.tsx,src/pages/MealCookingModePage.tsx".split(
     ",",
   );
 
@@ -200,7 +200,7 @@ test("ShoppingListPage's checkbox row translates role, checked state, and label 
   assert.match(code, /accessibilityLabel: line\.name/);
 });
 
-test("MealPlansPage, MealPlanDetailPage, and RecipeDetailPage have no stack pressable left (#237, #248)", () => {
+test("MealPlansPage, MealPlanDetailPage, RecipeDetailPage, and RecipeFormPage have no stack pressable left (#237, #248, #119)", () => {
   // The pages' rows render through the generic row components in
   // their link forms (RecipeDetailPage's through MarkableRow /
   // StepList) — no stack pressable remains in any of them, so
@@ -208,7 +208,12 @@ test("MealPlansPage, MealPlanDetailPage, and RecipeDetailPage have no stack pres
   // accessibility JSX props may appear either (props on DS
   // primitives / LinkOverlay are the sanctioned exceptions,
   // stripped via the shared TAGS before RAW is applied).
-  for (const page of ["MealPlansPage", "MealPlanDetailPage", "RecipeDetailPage"]) {
+  for (const page of [
+    "MealPlansPage",
+    "MealPlanDetailPage",
+    "RecipeDetailPage",
+    "RecipeFormPage",
+  ]) {
     const rel = `src/pages/${page}.tsx`;
     const code = readCode(rel);
     assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
