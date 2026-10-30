@@ -2,9 +2,9 @@ import type { ReactNode } from "react";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
 import { CancelSessionAction } from "../components/CancelSessionAction.js";
+import { FormHeading } from "../components/FormHeading.js";
 import { MessageList } from "../components/MessageList.js";
 import { PreviewCard } from "../components/PreviewCard.js";
-import { SessionHeader } from "../components/SessionHeader.js";
 import { SessionShell } from "../components/SessionShell.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
@@ -54,7 +54,7 @@ import { Text } from "../components/Text.js";
  * and sets no styling props. SessionShell owns the two states'
  * frames (the recessed background, content padding, and the
  * section rhythm) and the running state's scrolling;
- * SessionHeader owns the title block; MessageList owns the
+ * FormHeading owns the title block; MessageList owns the
  * transcript bubbles; PreviewCard frames the preview stage;
  * the prompt and follow-up fields take TextAreaField's `xl` /
  * `lg` height steps instead of a raw minHeight; the start
@@ -138,7 +138,7 @@ export function AiSessionPage({
   if (!session) {
     return (
       <SessionShell>
-        <SessionHeader title={config.title} subtitle={config.intro} />
+        <FormHeading subtitle={config.intro}>{config.title}</FormHeading>
         <TextAreaField
           value={prompt}
           onChangeText={onPromptChange}
@@ -168,7 +168,7 @@ export function AiSessionPage({
 
   return (
     <SessionShell scrollable>
-      <SessionHeader title={config.title} subtitle={session.phaseLabel} />
+      <FormHeading subtitle={session.phaseLabel}>{config.title}</FormHeading>
       <MessageList messages={session.messages} userLabel="You" assistantLabel="Plan" />
       {session.canRefine ? (
         <>

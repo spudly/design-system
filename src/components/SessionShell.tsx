@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { ScrollView, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { ScrollRegion } from "./ScrollRegion.js";
 
 export type SessionShellProps = {
   /**
@@ -23,22 +24,24 @@ export type SessionShellProps = {
  * the last block. Extracted for the #119 page de-styling
  * program from the AI session page, whose two states framed
  * themselves with hand-styled shells.
+ *
+ * The scrollable form composes ScrollRegion for the scroll
+ * itself (#119 dedupe): the shell owns the recessed frame and
+ * the padded column, the region owns scrolling — the tranche's
+ * first cut hand-rolled a raw ScrollView with the padding on
+ * its content container, which bypassed the shell-gap contract
+ * the shared region carries.
  */
 export function SessionShell({ scrollable = false, children }: SessionShellProps) {
   if (scrollable) {
     return (
-      <ScrollView
-        flex={1}
-        backgroundColor={tokens.colors.gray.gray1}
-        contentContainerStyle={{
-          paddingHorizontal: tokens.spacing[4],
-          paddingTop: tokens.spacing[4],
-        }}
-      >
-        <YStack gap="$4" paddingBottom={tokens.spacing[8]}>
-          {children}
-        </YStack>
-      </ScrollView>
+      <YStack flex={1} backgroundColor={tokens.colors.gray.gray1}>
+        <ScrollRegion>
+          <YStack paddingHorizontal="$4" paddingTop="$4" gap="$4" paddingBottom={tokens.spacing[8]}>
+            {children}
+          </YStack>
+        </ScrollRegion>
+      </YStack>
     );
   }
   return (

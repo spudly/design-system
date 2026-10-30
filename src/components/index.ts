@@ -2,7 +2,6 @@ export { Accordion, type AccordionItem, type AccordionProps } from "./Accordion.
 export { AccordionSection, type AccordionSectionProps } from "./AccordionSection.js";
 export { Alert, type AlertAction, type AlertProps, type AlertSeverity } from "./Alert.js";
 export { ActionBar, type ActionBarProps } from "./ActionBar.js";
-export { ActionChip, type ActionChipProps, type ActionChipTone } from "./ActionChip.js";
 export { Avatar, type AvatarProps } from "./Avatar.js";
 export { BackLink, type BackLinkProps } from "./BackLink.js";
 export { Badge, type BadgeProps } from "./Badge.js";
@@ -54,8 +53,6 @@ export { ListRow, type ListRowProps } from "./ListRow.js";
 export { LoadingGate, type LoadingGateProps } from "./LoadingGate.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
 export { MessageList, type MessageListMessage, type MessageListProps } from "./MessageList.js";
-export { SessionShell, type SessionShellProps } from "./SessionShell.js";
-export { SessionHeader, type SessionHeaderProps } from "./SessionHeader.js";
 export {
   CancelSessionAction,
   type CancelSessionActionProps,
@@ -96,11 +93,6 @@ export { TextField, type TextFieldProps } from "./TextField.js";
 export { TextAction, type TextActionProps } from "./TextAction.js";
 export { TextLink, type TextLinkProps } from "./TextLink.js";
 export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./Toast.js";
-export {
-  ToggleChipGroup,
-  type ToggleChipGroupProps,
-  type ToggleChipOption,
-} from "./ToggleChipGroup.js";
 export { TokenRow, type TokenRowProps } from "./TokenRow.js";
 export {
   AccessTokensPanel,
@@ -113,3 +105,74 @@ export {
   type NutritionGoalsValues,
 } from "./NutritionGoalsForm.js";
 export { VerseText, type VerseTextProps } from "./VerseText.js";
+
+// The #119 dedupe set: the canonical components the tranche
+// branches coined independently, shipped once here (the
+// tranche PRs adopt these in their update rounds).
+export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
+export {
+  CatalogFiltersBar,
+  type CatalogFilterDefinition,
+  type CatalogFiltersBarProps,
+  type CatalogRangeFilter,
+  type CatalogSelectFilter,
+  type CatalogSortFilter,
+  type CatalogTextFilter,
+} from "./CatalogFiltersBar.js";
+export { CatalogHeader, type CatalogHeaderProps } from "./CatalogHeader.js";
+export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
+export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
+export {
+  DocumentFooter,
+  type DocumentFooterLink,
+  type DocumentFooterProps,
+} from "./DocumentFooter.js";
+export { DocumentHeader, type DocumentHeaderProps } from "./DocumentHeader.js";
+export { FieldLabel, type FieldLabelProps } from "./FieldLabel.js";
+export { FieldStack, type FieldStackProps } from "./FieldStack.js";
+export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
+export { FormStack, type FormStackProps } from "./FormStack.js";
+export { LabeledField, type LabeledFieldProps } from "./LabeledField.js";
+export { LabeledGroup, type LabeledGroupProps } from "./LabeledGroup.js";
+export { ListLoadingState, type ListLoadingStateProps } from "./ListLoadingState.js";
+export { MarkableRow, type MarkableRowProps } from "./MarkableRow.js";
+export { PinnedHeaderShell, type PinnedHeaderShellProps } from "./PinnedHeaderShell.js";
+export {
+  PresetValueSelector,
+  type PresetValueOption,
+  type PresetValueSelectorProps,
+} from "./PresetValueSelector.js";
+export {
+  PublicFrameFooter,
+  type PublicFrameFooterLink,
+  type PublicFrameFooterProps,
+} from "./PublicFrameFooter.js";
+export { PublicFrameHeader, type PublicFrameHeaderProps } from "./PublicFrameHeader.js";
+export {
+  COLUMN_MAX_WIDTH,
+  PublicFrameLayout,
+  type PublicFrameLayoutProps,
+} from "./PublicFrameLayout.js";
+export {
+  RatingsCard,
+  type RatingsCardCommunityRating,
+  type RatingsCardProps,
+  type RatingsCardRatings,
+  type RatingsCardViewerRating,
+} from "./RatingsCard.js";
+export { RemovableField, type RemovableFieldProps } from "./RemovableField.js";
+export { RevertAction, type RevertActionProps } from "./RevertAction.js";
+export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
+export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
+export { SearchRow, type SearchRowProps } from "./SearchRow.js";
+export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
+export { SessionShell, type SessionShellProps } from "./SessionShell.js";
+export { StatusBadge, type StatusBadgeProps, type StatusBadgeTone } from "./StatusBadge.js";
+export { StepList, type StepListProps, type StepListStep } from "./StepList.js";
+export {
+  SuggestionPanel,
+  type SuggestionPanelEntry,
+  type SuggestionPanelProps,
+} from "./SuggestionPanel.js";
+export { TagList, type TagListProps, type TagListTag } from "./TagList.js";
+export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCardRow.js";

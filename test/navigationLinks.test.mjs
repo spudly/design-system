@@ -92,6 +92,33 @@ test("Button: the link frame is a web flex frame, like BackLink's (#248)", () =>
   assert.match(button, /justifyContent: "web:center",/);
 });
 
+test("Button: the toggle form carries `selected` to the frame and the platform pressed state (#119 dedupe)", () => {
+  // The chip retirement: Button's press form gains the semantic
+  // selected state the retired ToggleChipGroup carried.
+  assert.match(button, /selected: \{\s+true: \{/);
+  assert.match(button, /selected\?: boolean;/);
+  assert.match(button, /selected\?: never;/, "the href form takes no selected state");
+  assert.match(
+    button,
+    /\{\.\.\.\(selected !== undefined\s+\? isWeb\s+\? \{ "aria-pressed": selected \}/,
+    "web exposes the pressed state when the caller uses the toggle form",
+  );
+  assert.match(
+    button,
+    /accessibilityState: \{ disabled, selected, \.\.\.accessibilityState \}/,
+    "native mirrors the selected state",
+  );
+});
+
+test("Button: both forms accept the semantic `grow` layout flag (#119 dedupe)", () => {
+  assert.match(button, /grow\?: boolean;/);
+  assert.equal(
+    button.split("{...(grow ? { flex: 1 } : null)}").length - 1,
+    2,
+    "grow applies on both the press form and the href form",
+  );
+});
+
 test("href anchors suppress the UA link underline the button forms never had (#248)", () => {
   // A web <a> is underlined by the UA stylesheet unless the styled
   // anchor resets it; the button/tab/back callback forms render

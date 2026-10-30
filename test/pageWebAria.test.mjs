@@ -16,7 +16,8 @@
  *   including the disabled-state spread for unavailable rows),
  *   MealsHubPage rows (YStack), MealCookingModePage's Done action (YStack),
  *   RecipeFormPage's revert actions (YStack), and RecipeDetailPage's
- *   viewer-rating wrapper (View) and Custom scale chip (XStack).
+ *   viewer-rating wrapper (View). (The Custom scale chip left this
+ *   list in the #119 dedupe: it is a PresetValueSelector Button now.)
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
  *   generic CardRow / ListRow components; the routing moved with
@@ -97,11 +98,12 @@ function sourceFiles(dir) {
 // translate caller RN props themselves. LinkOverlay is sanctioned
 // on the same ground again: it is the native link layer for
 // view-level link surfaces and spreads platformAccessibilityProps
-// onto its Anchor. ActionChip and Thumbnail are sanctioned on
-// the same ground: each routes its `accessibilityLabel` through
-// platformAccessibilityProps internally.
+// onto its Anchor. Thumbnail is sanctioned on the same ground:
+// it routes its `accessibilityLabel` through
+// platformAccessibilityProps internally. (ActionChip was too,
+// until the #119 dedupe retired it; its consumers are Buttons.)
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,ActionChip,Thumbnail".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail".split(
     ",",
   ),
 );
@@ -450,14 +452,15 @@ test("button-role pressables are keyboard-operable on web (#237, CodeRabbit PR #
   // A Tamagui stack carrying role="button" is a div: without
   // tabIndex + an Enter/Space handler it announces as a button that
   // the keyboard cannot reach. The MealPlansPage rows set the
-  // pattern; the RecipeDetailPage Custom scale chip must follow
-  // it, and AiSessionPage's Cancel control reaches the same
+  // pattern; AiSessionPage's Cancel control reaches the same
   // semantics by delegating to TextAction (whose tabIndex +
   // Enter/Space handler textAction.test.mjs pins).
   assert.match(aiSession, /<CancelSessionAction disabled=\{busy\} onPress=\{onCancel\} \/>/);
   assert.match(cancelAction, /<TextAction/);
-  assert.match(recipeDetail, /onKeyDown=\{handleCustomScaleKeyDown\}/);
-  assert.match(recipeDetail, /tabIndex=\{0\}/);
+  // The scale control is no longer a page-level stack pressable:
+  // PresetValueSelector's Custom slot is a DS Button.
+  assert.ok(!recipeDetail.includes("handleCustomScaleKeyDown"), "the scale pressable retired");
+  assert.match(recipeDetail, /<PresetValueSelector/);
 });
 
 test("busy Cancel is activation-guarded and the Custom scale name carries the multiplier (#237)", () => {
@@ -472,7 +475,13 @@ test("busy Cancel is activation-guarded and the Custom scale name carries the mu
   // despite pointerEvents="none" (CodeRabbit finding on PR #241).
   assert.match(cancelAction, /opacity=\{disabled \? 0\.5 : 1\} pointerEvents=\{disabled \? "none" : "auto"\}/);
   assert.match(cancelAction, /disabled=\{disabled\}/);
-  // The selected custom-scale chip shows the multiplier as its visible
-  // text; the accessible name must include it.
-  assert.match(recipeDetail, /`Custom scale \$\{formatScaleValue\(view\.scaleValue\)\}×`/);
+  // The selected custom-scale button shows the multiplier as its visible
+  // text; the accessible name must include it (composed in the selector).
+  assert.match(recipeDetail, /customAccessibilityLabel="Custom scale"/);
+  assert.match(
+    recipeDetail,
+    /formatCustomValue=\{\(custom\) => `\$\{formatScaleValue\(custom\)\}×`\}/,
+  );
+  const selector = readCode("src/components/PresetValueSelector.tsx");
+  assert.match(selector, /`\$\{customAccessibilityLabel\} \$\{formattedCustom\}`/);
 });

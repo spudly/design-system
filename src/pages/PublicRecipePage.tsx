@@ -12,7 +12,7 @@ import { StarRatingInput } from "../components/StarRatingInput.js";
 import { StatCard } from "../components/StatCard.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
-import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChipGroup.js";
+import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,
@@ -176,7 +176,7 @@ const STATUS_BADGES: Record<
 // Scale multipliers from the app's scaling constants (shared with
 // RecipeDetailPage's ingredients section); labels are
 // presentation, the servings math stays app-side.
-const SCALE_OPTIONS: ToggleChipOption[] = [
+const SCALE_OPTIONS: PresetValueOption[] = [
   { value: "0.5", label: "½×" },
   { value: "1", label: "1×" },
   { value: "2", label: "2×" },
@@ -507,52 +507,16 @@ function IngredientsPanel({
   ingredients: PublicRecipePageIngredientsProps;
 }) {
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
-  // Custom scale editing is ephemeral view state, like the
-  // instructions section's active step: whether the custom chip is
-  // currently a number input, and the input's uncommitted text.
-  const [isCustomScaleEditing, setCustomScaleEditing] = useState(false);
-  const [customScaleDraft, setCustomScaleDraft] = useState("");
-  const isPresetScale = SCALE_OPTIONS.some((option) => option.value === view.scaleValue);
-  const isCustomScaleSelected = !isPresetScale && !isCustomScaleEditing;
-
-  const startCustomScaleEdit = () => {
-    setCustomScaleDraft(isPresetScale ? "" : formatScaleValue(view.scaleValue));
-    setCustomScaleEditing(true);
-  };
-
-  // Web keyboard support (the TextLink/MealPlansPage pattern): the
-  // Custom scale chip carries the button role on web, and a div with
-  // a role is not keyboard-operable on its own, so Enter and Space
-  // start the edit exactly like a press. `tabIndex` and `onKeyDown`
-  // are web-only props in Tamagui and are ignored on native, where
-  // onPress is the activation path.
-  const handleCustomScaleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      startCustomScaleEdit();
-    }
-  };
-
-  // Committing an entry applies it through the same onScaleChange
-  // the presets use; an empty, non-numeric, or non-positive entry
-  // commits nothing and the chip restores the current scale.
-  const commitCustomScale = () => {
-    const parsed = Number(customScaleDraft.trim());
-    setCustomScaleEditing(false);
-    if (Number.isFinite(parsed) && parsed > 0) {
-      view.onScaleChange(String(parsed));
-    }
-  };
-
   return (
     <YStack padding="$4">
       {/* Servings + scale controls (#73, as on RecipeDetailPage):
           one compact block, two fixed rows, and every value
           directly enterable. Servings is an inline editable
-          stepper; Scale is a single non-wrapping row of
-          equal-width preset chips plus a Custom chip that turns
-          into a number input when pressed and afterwards shows
-          the applied custom value selected. */}
+          stepper; Scale is the PresetValueSelector — a single
+          non-wrapping row of equal-width preset buttons plus a
+          Custom button that turns into a number input when
+          pressed and afterwards shows the applied custom value
+          selected. */}
       <YStack gap="$3" marginBlockEnd="$4">
         <NumberStepper
           label="Servings"
@@ -562,77 +526,15 @@ function IngredientsPanel({
           onChange={view.onServingsChange}
           editable
         />
-        <XStack alignItems="center" gap="$2">
-          <Text
-            marginInlineEnd="$1"
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.medium}
-            color={tokens.colors.gray.gray8}
-          >
-            Scale
-          </Text>
-          <ToggleChipGroup
-            options={SCALE_OPTIONS}
-            mode="single"
-            wrap={false}
-            value={view.scaleValue}
-            onChange={(value) => {
-              setCustomScaleEditing(false);
-              view.onScaleChange(value);
-            }}
-          />
-          <View flex={0.25}>
-            {isCustomScaleEditing ? (
-              <TextField
-                accessibilityLabel="Custom scale"
-                keyboardType="decimal-pad"
-                inputMode="decimal"
-                type="number"
-                autoFocus
-                value={customScaleDraft}
-                onChangeText={setCustomScaleDraft}
-                onBlur={commitCustomScale}
-                onSubmitEditing={commitCustomScale}
-              />
-            ) : (
-              <XStack
-                minHeight={44}
-                alignItems="center"
-                justifyContent="center"
-                borderRadius={tokens.radii.full}
-                borderWidth={1}
-                borderColor={isCustomScaleSelected ? "$primary" : "$textMuted"}
-                backgroundColor={isCustomScaleSelected ? "$primary" : "$surface"}
-                onPress={startCustomScaleEdit}
-                {...platformAccessibilityProps({
-                  accessibilityRole: "button",
-                  // When a custom scale is selected the chip's visible
-                  // text is the multiplier itself; the accessible name
-                  // must carry it too, not just "Custom scale".
-                  accessibilityLabel: isCustomScaleSelected
-                    ? `Custom scale ${formatScaleValue(view.scaleValue)}×`
-                    : "Custom scale",
-                })}
-                tabIndex={0}
-                onKeyDown={handleCustomScaleKeyDown}
-                aria-pressed={isCustomScaleSelected}
-              >
-                <Text
-                  style={{
-                    color: isCustomScaleSelected ? "$onPrimary" : "$color",
-                    fontWeight: isCustomScaleSelected
-                      ? tokens.typography.fontWeight.semibold
-                      : tokens.typography.fontWeight.regular,
-                  }}
-                >
-                  {isCustomScaleSelected
-                    ? `${formatScaleValue(view.scaleValue)}×`
-                    : CUSTOM_SCALE_LABEL}
-                </Text>
-              </XStack>
-            )}
-          </View>
-        </XStack>
+        <PresetValueSelector
+          label="Scale"
+          options={SCALE_OPTIONS}
+          value={view.scaleValue}
+          onChange={view.onScaleChange}
+          customLabel={CUSTOM_SCALE_LABEL}
+          customAccessibilityLabel="Custom scale"
+          formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
+        />
       </YStack>
       {view.ingredients.map((ingredient) => (
         <TouchableOpacity
