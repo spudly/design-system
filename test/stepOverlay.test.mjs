@@ -64,6 +64,12 @@ test("the body and navigation scroll in a bounded region; short bodies stay cent
     regionEnd !== -1 && pill > regionEnd,
     "the Done pill renders outside the scroll region",
   );
+  // The pill's fill is opaque to content scrolling beneath it:
+  // the pill paints the shell's own color as the base under
+  // its layered 10% surface, so the composite over the shell
+  // is unchanged but scrolled text cannot show through (#332)
+  // — the gray-10 paint appears twice, shell and pill.
+  assert.equal((code.match(/backgroundColor=\{tokens\.colors\.gray\.gray10\}/g) ?? []).length, 2);
 });
 
 test("the shell manages focus: dialog semantics and a web mount focus move (#332)", () => {
@@ -81,6 +87,19 @@ test("the shell manages focus: dialog semantics and a web mount focus move (#332
   assert.match(code, /useEffect\(\(\) => \{\s+if \(!isWeb\) \{\s+return;\s+\}/);
   assert.match(code, /node\?\.focus\?\.\(\)/);
   assert.match(code, /\}, \[\]\);/);
+  // On unmount, focus returns to the element that held it
+  // before the overlay opened, when it is still in the tree.
+  assert.match(code, /const previouslyFocused = document\.activeElement as HTMLElement \| null;/);
+  assert.match(code, /document\.contains\(previouslyFocused\)/);
+  assert.match(code, /previouslyFocused\.focus\(\)/);
+  // Focus containment: the shell's keydown handler wraps Tab
+  // and Shift+Tab at the overlay's first and last focusable
+  // controls, so keyboard focus cannot escape into the
+  // covered content behind the overlay.
+  assert.match(code, /onKeyDown=\{handleShellKeyDown\}/);
+  assert.match(code, /event\.key !== "Tab"/);
+  assert.match(code, /last\.focus\(\)/);
+  assert.match(code, /first\.focus\(\)/);
 });
 
 test("the Done pill routes its button semantics through the translator (#237)", () => {

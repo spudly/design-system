@@ -50,7 +50,10 @@ const scrollContentContainerStyle = { flexGrow: 1 } as const;
  * column with the navigation pushed off-screen. Short bodies
  * keep the vertically centered treatment, and the Done pill is
  * a sibling of the region, not part of it, so it stays fixed
- * and reachable at any scroll position.
+ * and reachable at any scroll position. The pill paints the
+ * shell's own color as the base under its layered fill, so
+ * the composite over the shell is unchanged but scrolled text
+ * passing beneath the pill no longer shows through it.
  *
  * The shell manages focus (#332): it carries dialog semantics
  * (dialogRoleProps — a modal dialog named for its title on
@@ -61,6 +64,10 @@ const scrollContentContainerStyle = { flexGrow: 1 } as const;
  * shell. The host does not need to unmount or inert the
  * covered content. The move happens once per mount, never per
  * step change, so stepping keeps focus where the user put it.
+ * Tab and Shift+Tab wrap at the overlay's edges, so keyboard
+ * focus cannot escape into the covered content, and when the
+ * overlay unmounts focus returns to the element that held it
+ * before the overlay opened.
  *
  * The pill is a pressable view with the button semantics
  * routed through the platform translator (#237), and web
@@ -91,9 +98,56 @@ export function StepOverlay({
     if (!isWeb) {
       return;
     }
+    const previouslyFocused = document.activeElement as HTMLElement | null;
     const node = shellRef.current as unknown as { focus?: () => void } | null;
     node?.focus?.();
+    return () => {
+      if (previouslyFocused && document.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+      }
+    };
   }, []);
+
+  // Focus containment (web): the modal semantics say the
+  // covered content is inert, but browsers do not enforce
+  // that for the Tab key — without containment, Tab walks
+  // out of the overlay into whatever the host left mounted
+  // behind it. Tab / Shift+Tab wrap at the overlay's first
+  // and last focusable controls instead, so containment does
+  // not depend on the host inerting the covered content.
+  const handleShellKeyDown = (event: {
+    key: string;
+    shiftKey: boolean;
+    preventDefault: () => void;
+  }) => {
+    if (!isWeb || event.key !== "Tab") {
+      return;
+    }
+    const node = shellRef.current as unknown as HTMLElement | null;
+    if (!node || typeof node.querySelectorAll !== "function") {
+      return;
+    }
+    const focusables = Array.from(
+      node.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
+      ),
+    ).filter((element) => element.offsetParent !== null || element === document.activeElement);
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (!first || !last) {
+      event.preventDefault();
+      node.focus();
+      return;
+    }
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || active === node)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
 
   // Web keyboard support (the MealPlansPage row pattern): a
   // view carrying a role is made focusable and the activation
@@ -122,6 +176,7 @@ export function StepOverlay({
       bottom={0}
       backgroundColor={tokens.colors.gray.gray10}
       tabIndex={-1}
+      onKeyDown={handleShellKeyDown}
       {...dialogRoleProps}
       {...platformAccessibilityProps({ accessibilityLabel: title })}
     >
@@ -167,6 +222,7 @@ export function StepOverlay({
         top={tokens.spacing[12]}
         borderRadius={tokens.radii.full}
         overflow="hidden"
+        backgroundColor={tokens.colors.gray.gray10}
         {...platformAccessibilityProps({
           accessibilityRole: "button",
           accessibilityLabel: doneLabel,

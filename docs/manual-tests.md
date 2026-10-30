@@ -625,8 +625,9 @@ Open in `Components/StepOverlay`: Default, LongBody.
    padding).
 3. On open (web), keyboard focus lands on the overlay itself:
    it announces as a modal dialog named for its title, and
-   Tab moves through the controls inside it — never to
-   content behind it.
+   Tab moves through the controls inside it — Tab wraps from
+   the last control back to the first and Shift+Tab wraps
+   the other way, so focus never reaches content behind it.
 4. LongBody: the long step body fills the short frame and the
    region scrolls — scroll to the bottom to reach the dots
    and the Back / Next row; the Done pill stays pinned at the
@@ -1893,7 +1894,9 @@ Open in `Components/StepOverlay`: Default, LongBody.
 3. On open (web), keyboard focus lands on the overlay
    itself: it announces as a modal dialog named for its
    title, and Tab moves through the controls inside it —
-   never to content behind it.
+   Tab wraps from the last control back to the first and
+   Shift+Tab wraps the other way, so focus never reaches
+   content behind it.
 4. LongBody: the long step body fills the short frame and
    the region scrolls — scroll to the bottom to reach the
    dots and the Back / Next row; the Done pill stays
