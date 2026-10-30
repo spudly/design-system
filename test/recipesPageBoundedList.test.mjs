@@ -80,12 +80,12 @@ test("loading keeps the list mounted and shows the spinner as its empty state", 
   );
   assert.match(
     code,
-    /ListEmptyComponent=\{\s*isLoading \? \(\s*<BoundedListLoading \/>/,
+    /ListEmptyComponent=\{\s*isLoading \? \(\s*<ListLoadingState label="Loading" \/>/,
     "the loading spinner renders as the list's EMPTY state, not in any other slot",
   );
   assert.match(
     code,
-    /ListHeaderComponent=\{\s*<RecipesFiltersBar/,
+    /ListHeaderComponent=\{\s*<CatalogFiltersBar/,
     "the filter bar renders once as the list header, so it scrolls with the recipes",
   );
 });

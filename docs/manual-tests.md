@@ -805,28 +805,6 @@ RemovableField.
 
 ---
 
-## FilterBar, SearchRow, ChoiceRow, FieldStack
-
-Open in `Components/FilterBar`, `Components/SearchRow`,
-`Components/ChoiceRow`, `Components/FieldStack`: Default (each).
-
-1. FilterBar: the search row and the added filter stack at a
-   12px rhythm with 16px above the first and 8px below the
-   last.
-2. SearchRow: the Filters button is exactly as tall as the
-   search field beside it — top and bottom edges align.
-3. ChoiceRow: the five filter-choice buttons wrap onto a
-   second line when the row runs out of width.
-4. FieldStack: the Min cal / Max cal fields stack at a 12px
-   rhythm, each full width.
-
-**Run when:** `src/components/FilterBar.tsx`,
-`src/components/SearchRow.tsx`, `src/components/ChoiceRow.tsx`,
-`src/components/FieldStack.tsx`, their stories, the catalog
-pages' filter bars, or a changeset naming any of them.
-
----
-
 ## MealPlansPage & MealPlanDetailPage
 
 Open in `Pages/Eciperay/MealPlansPage`: Default, Empty, Loading,

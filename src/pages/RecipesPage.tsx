@@ -1,19 +1,15 @@
-import { useState, type ReactNode } from "react";
-import { Button } from "../components/Button.js";
-import { ChoiceRow } from "../components/ChoiceRow.js";
+import type { ReactNode } from "react";
+import {
+  CatalogFiltersBar,
+  type CatalogFilterDefinition,
+} from "../components/CatalogFiltersBar.js";
 import { EmptyState } from "../components/EmptyState.js";
-import { FieldRow } from "../components/FieldRow.js";
-import { FieldStack } from "../components/FieldStack.js";
-import { FilterBar } from "../components/FilterBar.js";
+import { ListLoadingState } from "../components/ListLoadingState.js";
 import { MediaRow } from "../components/MediaRow.js";
 import { RatingStars } from "../components/RatingStars.js";
-import { RemovableField } from "../components/RemovableField.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SearchField } from "../components/SearchField.js";
-import { SearchRow } from "../components/SearchRow.js";
-import { SelectField, type SelectOption } from "../components/SelectField.js";
-import { TextField } from "../components/TextField.js";
-import { BoundedList, BoundedListLoading, BoundedListLoadingMore } from "./BoundedList.js";
+import type { SelectOption } from "../components/SelectField.js";
+import { BoundedList } from "./BoundedList.js";
 import { useCatalogPagination } from "./useCatalogPagination.js";
 
 /**
@@ -41,7 +37,7 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  *   it scrolls with the recipes instead of pinning above a sliver of
  *   list. The list — and therefore the focused filter input — stays
  *   mounted while loading; the spinner renders as the list's empty
- *   state (BoundedListLoading). test/recipesPageBoundedList.test.mjs
+ *   state (ListLoadingState). test/recipesPageBoundedList.test.mjs
  *   guards these patterns in source.
  * - #162: search uses the DS SearchField as-is. No lineHeight is set
  *   on any glyph or text in this file — the SearchField's own glyph
@@ -124,11 +120,12 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * design-system components and passes data and callbacks only.
  * The layout it used to hand-style lives in the components it
  * renders: BoundedList (the bounded list, its content inset,
- * the 12px row separation, the loading states), FilterBar /
- * SearchRow / ChoiceRow / FieldStack / RemovableField (the
- * filter bar's shells), and MediaRow / RatingStars (the row and
- * its rating control). The same shells serve DiscoverPage's
- * identical filter bar in its own #119 tranche.
+ * the 12px row separation), ListLoadingState (the loading
+ * states), CatalogFiltersBar (the shared catalog filter bar —
+ * the page supplies its filter definitions as data; the bar
+ * owns the control design), and MediaRow / RatingStars (the
+ * row and its rating control). DiscoverPage renders the same
+ * CatalogFiltersBar with its own definitions.
  */
 
 /** One recipe row's view-model. The app formats `subtitle` (its list
@@ -155,9 +152,12 @@ export type RecipesPageItem = {
   imageUrl?: string | null;
 };
 
-// The filter option sets the app's filter bar hardcodes, moved with
-// the bar. Values stay plain strings so no app type leaks into the
-// DS: the app maps its own status/sort unions at the boundary.
+// The filter option sets are this catalog's data, passed to the
+// shared CatalogFiltersBar as filter definitions (the bar owns
+// the control design; option sets and labels are the caller's
+// data — the #311 ruling). Values stay plain strings so no app
+// type leaks into the DS: the app maps its own status/sort
+// unions at the boundary.
 const STATUS_OPTIONS: SelectOption[] = [
   { value: "all", label: "All statuses" },
   { value: "idea", label: "Idea" },
@@ -183,22 +183,6 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
  * min/max fields add and remove together), as do the Sort by /
  * Order selects. */
 export type RecipesPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
-
-const FILTER_LABELS: Record<RecipesPageFilterId, string> = {
-  status: "Status",
-  ingredient: "Ingredient",
-  calories: "Calories",
-  satiety: "Satiety",
-  sort: "Sort",
-};
-
-const ALL_FILTER_IDS: RecipesPageFilterId[] = [
-  "status",
-  "ingredient",
-  "calories",
-  "satiety",
-  "sort",
-];
 
 export type RecipesPageProps = {
   /** Recipes to render, already filtered/sorted by the app. */
@@ -286,268 +270,6 @@ export type RecipesPageProps = {
   onFilterChooserOpenChange?: (open: boolean) => void;
 };
 
-// The filter bar's slice of the page contract (the same fields
-// as the matching RecipesPageProps members). Written out rather
-// than Pick<>ed so the optional members carry `| undefined`:
-// the page passes each field explicitly (#119 — no opaque
-// spread), and exactOptionalPropertyTypes requires the target
-// type to admit the undefined the page's optional props hold.
-type FilterControlsProps = {
-  search: string;
-  onSearchChange: (value: string) => void;
-  statusFilter?: string | undefined;
-  onStatusFilterChange?: ((value: string) => void) | undefined;
-  showStatusFilter?: boolean | undefined;
-  ingredient: string;
-  onIngredientChange: (value: string) => void;
-  minCalories: string;
-  onMinCaloriesChange: (value: string) => void;
-  maxCalories: string;
-  onMaxCaloriesChange: (value: string) => void;
-  minSatiety: string;
-  onMinSatietyChange: (value: string) => void;
-  maxSatiety: string;
-  onMaxSatietyChange: (value: string) => void;
-  sort: string;
-  onSortChange: (value: string) => void;
-  sortDir: string;
-  onSortDirChange: (value: string) => void;
-  activeFilters?: RecipesPageFilterId[] | undefined;
-  onActiveFiltersChange?: ((filters: RecipesPageFilterId[]) => void) | undefined;
-  filterChooserOpen?: boolean | undefined;
-  onFilterChooserOpenChange?: ((open: boolean) => void) | undefined;
-};
-
-function NumberFilter({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <TextField
-      grow
-      label={label}
-      accessibilityLabel={label}
-      keyboardType="numeric"
-      value={value}
-      onChangeText={onChange}
-    />
-  );
-}
-
-/** The collapsed filter bar (#96): search and a small Filters
- * button initially; the button opens a chooser of the filters not
- * yet added, and a filter's control — the same controls the bar
- * always rendered: the status select, ingredient, min/max calorie
- * and satiety number fields, and the Sort by / Order selects —
- * renders only once that filter has been added. The bar's layout
- * lives in the shells it composes (FilterBar, SearchRow,
- * ChoiceRow, RemovableField, FieldRow, FieldStack — #119). */
-function RecipesFiltersBar({
-  search,
-  onSearchChange,
-  statusFilter,
-  onStatusFilterChange,
-  ingredient,
-  onIngredientChange,
-  minCalories,
-  onMinCaloriesChange,
-  maxCalories,
-  onMaxCaloriesChange,
-  minSatiety,
-  onMinSatietyChange,
-  maxSatiety,
-  onMaxSatietyChange,
-  sort,
-  onSortChange,
-  sortDir,
-  onSortDirChange,
-  showStatusFilter = true,
-  activeFilters,
-  onActiveFiltersChange,
-  filterChooserOpen,
-  onFilterChooserOpenChange,
-}: FilterControlsProps) {
-  const statusAvailable =
-    showStatusFilter && statusFilter !== undefined && onStatusFilterChange !== undefined;
-  const available = ALL_FILTER_IDS.filter((id) => id !== "status" || statusAvailable);
-  // Uncontrolled seed: a filter that already carries a non-default
-  // value starts added, so existing callers that preset filter
-  // values keep seeing (and can clear) those filters.
-  const [internalActiveFilters, setInternalActiveFilters] = useState<RecipesPageFilterId[]>(() => {
-    const seeded: RecipesPageFilterId[] = [];
-    if (statusAvailable && statusFilter !== "all") seeded.push("status");
-    if (ingredient !== "") seeded.push("ingredient");
-    if (minCalories !== "" || maxCalories !== "") seeded.push("calories");
-    if (minSatiety !== "" || maxSatiety !== "") seeded.push("satiety");
-    if (sort !== "newest" || sortDir !== "desc") seeded.push("sort");
-    return seeded;
-  });
-  const [internalChooserOpen, setInternalChooserOpen] = useState(false);
-  const active = activeFilters ?? internalActiveFilters;
-  const chooserOpen = filterChooserOpen ?? internalChooserOpen;
-  const addable = available.filter((id) => !active.includes(id));
-
-  const setActive = (next: RecipesPageFilterId[]) => {
-    if (activeFilters === undefined) setInternalActiveFilters(next);
-    onActiveFiltersChange?.(next);
-  };
-  const setChooserOpen = (open: boolean) => {
-    if (filterChooserOpen === undefined) setInternalChooserOpen(open);
-    onFilterChooserOpenChange?.(open);
-  };
-  const addFilter = (id: RecipesPageFilterId) => {
-    setActive([...active, id]);
-    setChooserOpen(false);
-  };
-  const removeFilter = (id: RecipesPageFilterId) => {
-    // Removal clears the filter's values through the ordinary
-    // change callbacks, so a hidden filter never keeps filtering.
-    if (id === "status") onStatusFilterChange?.("all");
-    if (id === "ingredient") onIngredientChange("");
-    if (id === "calories") {
-      onMinCaloriesChange("");
-      onMaxCaloriesChange("");
-    }
-    if (id === "satiety") {
-      onMinSatietyChange("");
-      onMaxSatietyChange("");
-    }
-    if (id === "sort") {
-      onSortChange("newest");
-      onSortDirChange("desc");
-    }
-    setActive(active.filter((filterId) => filterId !== id));
-  };
-
-  return (
-    <FilterBar>
-      <SearchRow>
-        <SearchField
-          grow
-          value={search}
-          onChangeText={onSearchChange}
-          placeholder="Search recipes…"
-        />
-        {addable.length > 0 ? (
-          <Button
-            variant="secondary"
-            size="sm"
-            accessibilityLabel="Add a filter"
-            aria-expanded={chooserOpen}
-            onPress={() => {
-              setChooserOpen(!chooserOpen);
-            }}
-          >
-            Filters
-          </Button>
-        ) : null}
-      </SearchRow>
-      {chooserOpen && addable.length > 0 ? (
-        <ChoiceRow>
-          {addable.map((id) => (
-            <Button
-              key={id}
-              variant="secondary"
-              size="sm"
-              accessibilityLabel={`Add ${FILTER_LABELS[id]} filter`}
-              onPress={() => {
-                addFilter(id);
-              }}
-            >
-              {FILTER_LABELS[id]}
-            </Button>
-          ))}
-        </ChoiceRow>
-      ) : null}
-      {active.includes("status") && statusAvailable ? (
-        <RemovableField
-          removeAccessibilityLabel={`Remove ${FILTER_LABELS.status} filter`}
-          onRemove={() => {
-            removeFilter("status");
-          }}
-        >
-          <SelectField
-            label="Status"
-            value={statusFilter}
-            options={STATUS_OPTIONS}
-            onValueChange={onStatusFilterChange}
-          />
-        </RemovableField>
-      ) : null}
-      {active.includes("ingredient") ? (
-        <RemovableField
-          removeAccessibilityLabel={`Remove ${FILTER_LABELS.ingredient} filter`}
-          onRemove={() => {
-            removeFilter("ingredient");
-          }}
-        >
-          <TextField
-            label="Ingredient"
-            accessibilityLabel="Ingredient"
-            value={ingredient}
-            onChangeText={onIngredientChange}
-            placeholder="e.g. chicken"
-          />
-        </RemovableField>
-      ) : null}
-      {active.includes("calories") ? (
-        <RemovableField
-          removeAccessibilityLabel={`Remove ${FILTER_LABELS.calories} filter`}
-          onRemove={() => {
-            removeFilter("calories");
-          }}
-        >
-          <FieldRow>
-            <NumberFilter label="Min cal" value={minCalories} onChange={onMinCaloriesChange} />
-            <NumberFilter label="Max cal" value={maxCalories} onChange={onMaxCaloriesChange} />
-          </FieldRow>
-        </RemovableField>
-      ) : null}
-      {active.includes("satiety") ? (
-        <RemovableField
-          removeAccessibilityLabel={`Remove ${FILTER_LABELS.satiety} filter`}
-          onRemove={() => {
-            removeFilter("satiety");
-          }}
-        >
-          <FieldRow>
-            <NumberFilter label="Min satiety" value={minSatiety} onChange={onMinSatietyChange} />
-            <NumberFilter label="Max satiety" value={maxSatiety} onChange={onMaxSatietyChange} />
-          </FieldRow>
-        </RemovableField>
-      ) : null}
-      {active.includes("sort") ? (
-        <RemovableField
-          removeAccessibilityLabel={`Remove ${FILTER_LABELS.sort} filter`}
-          onRemove={() => {
-            removeFilter("sort");
-          }}
-        >
-          <FieldStack>
-            <SelectField
-              label="Sort by"
-              value={sort}
-              options={SORT_OPTIONS}
-              onValueChange={onSortChange}
-            />
-            <SelectField
-              label="Order"
-              value={sortDir}
-              options={SORT_DIR_OPTIONS}
-              onValueChange={onSortDirChange}
-            />
-          </FieldStack>
-        </RemovableField>
-      ) : null}
-    </FilterBar>
-  );
-}
-
 /**
  * Full-page recipes-list view — the Recipes/Browse screen and,
  * since #185, the Shared-with-me screen: the filter bar and
@@ -565,6 +287,29 @@ export function RecipesPage(props: RecipesPageProps) {
     renderRecipeAccessory,
     emptyTitle = "No recipes found.",
     emptyBody,
+    search,
+    onSearchChange,
+    statusFilter,
+    onStatusFilterChange,
+    showStatusFilter,
+    ingredient,
+    onIngredientChange,
+    minCalories,
+    onMinCaloriesChange,
+    maxCalories,
+    onMaxCaloriesChange,
+    minSatiety,
+    onMinSatietyChange,
+    maxSatiety,
+    onMaxSatietyChange,
+    sort,
+    onSortChange,
+    sortDir,
+    onSortDirChange,
+    activeFilters,
+    onActiveFiltersChange,
+    filterChooserOpen,
+    onFilterChooserOpenChange,
   } = props;
 
   // Pagination: the shared catalog pattern (#285) — the same
@@ -580,6 +325,77 @@ export function RecipesPage(props: RecipesPageProps) {
     itemCount: recipes.length,
     canPaginate: !isLoading,
   });
+
+  // The catalog's filter definitions — this page's data in the
+  // shared bar's control shapes (see the option sets above).
+  // The status filter joins only when the host wires it (value
+  // + callback provided, not hidden) — the same condition the
+  // page's own bar carried before the #119 dedupe unified the
+  // two catalogs' bars into CatalogFiltersBar.
+  const catalogFilters: CatalogFilterDefinition<RecipesPageFilterId>[] = [];
+  if (
+    showStatusFilter !== false &&
+    statusFilter !== undefined &&
+    onStatusFilterChange !== undefined
+  ) {
+    catalogFilters.push({
+      kind: "select",
+      id: "status",
+      label: "Status",
+      options: STATUS_OPTIONS,
+      value: statusFilter,
+      onChange: onStatusFilterChange,
+      defaultValue: "all",
+    });
+  }
+  catalogFilters.push(
+    {
+      kind: "text",
+      id: "ingredient",
+      label: "Ingredient",
+      value: ingredient,
+      onChange: onIngredientChange,
+      placeholder: "e.g. chicken",
+      defaultValue: "",
+    },
+    {
+      kind: "range",
+      id: "calories",
+      label: "Calories",
+      minLabel: "Min cal",
+      maxLabel: "Max cal",
+      minValue: minCalories,
+      maxValue: maxCalories,
+      onMinChange: onMinCaloriesChange,
+      onMaxChange: onMaxCaloriesChange,
+    },
+    {
+      kind: "range",
+      id: "satiety",
+      label: "Satiety",
+      minLabel: "Min satiety",
+      maxLabel: "Max satiety",
+      minValue: minSatiety,
+      maxValue: maxSatiety,
+      onMinChange: onMinSatietyChange,
+      onMaxChange: onMaxSatietyChange,
+    },
+    {
+      kind: "sort",
+      id: "sort",
+      label: "Sort",
+      sortLabel: "Sort by",
+      sortOptions: SORT_OPTIONS,
+      sortValue: sort,
+      onSortChange,
+      defaultSortValue: "newest",
+      dirLabel: "Order",
+      dirOptions: SORT_DIR_OPTIONS,
+      dirValue: sortDir,
+      onDirChange: onSortDirChange,
+      defaultDirValue: "desc",
+    },
+  );
 
   return (
     <ScreenContainer variant="list" scrollable={false}>
@@ -601,30 +417,15 @@ export function RecipesPage(props: RecipesPageProps) {
         // mid-typing; the loading indicator renders as the list's
         // empty state instead.
         ListHeaderComponent={
-          <RecipesFiltersBar
-            search={props.search}
-            onSearchChange={props.onSearchChange}
-            statusFilter={props.statusFilter}
-            onStatusFilterChange={props.onStatusFilterChange}
-            showStatusFilter={props.showStatusFilter}
-            ingredient={props.ingredient}
-            onIngredientChange={props.onIngredientChange}
-            minCalories={props.minCalories}
-            onMinCaloriesChange={props.onMinCaloriesChange}
-            maxCalories={props.maxCalories}
-            onMaxCaloriesChange={props.onMaxCaloriesChange}
-            minSatiety={props.minSatiety}
-            onMinSatietyChange={props.onMinSatietyChange}
-            maxSatiety={props.maxSatiety}
-            onMaxSatietyChange={props.onMaxSatietyChange}
-            sort={props.sort}
-            onSortChange={props.onSortChange}
-            sortDir={props.sortDir}
-            onSortDirChange={props.onSortDirChange}
-            activeFilters={props.activeFilters}
-            onActiveFiltersChange={props.onActiveFiltersChange}
-            filterChooserOpen={props.filterChooserOpen}
-            onFilterChooserOpenChange={props.onFilterChooserOpenChange}
+          <CatalogFiltersBar
+            searchPlaceholder="Search recipes…"
+            search={search}
+            onSearchChange={onSearchChange}
+            filters={catalogFilters}
+            {...(activeFilters ? { activeFilters } : {})}
+            {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
+            {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
+            {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
           />
         }
         renderItem={({ item }) => {
@@ -660,12 +461,12 @@ export function RecipesPage(props: RecipesPageProps) {
         onEndReachedThreshold={onEndReachedThreshold}
         ListEmptyComponent={
           isLoading ? (
-            <BoundedListLoading />
+            <ListLoadingState label="Loading" />
           ) : (
             <EmptyState title={emptyTitle} {...(emptyBody ? { body: emptyBody } : {})} />
           )
         }
-        ListFooterComponent={isFetchingNextPage ? <BoundedListLoadingMore /> : undefined}
+        ListFooterComponent={isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined}
       />
     </ScreenContainer>
   );

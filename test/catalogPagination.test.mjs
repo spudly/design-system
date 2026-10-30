@@ -204,11 +204,11 @@ test("both pages keep the loading-more footer on isFetchingNextPage", () => {
     /isFetchingNextPage \? \(/,
     "DiscoverPage's footer keys off isFetchingNextPage",
   );
-  // RecipesPage renders the shared BoundedList loading-more
-  // helper as its footer since the #119 recipes-list tranche.
+  // RecipesPage renders the shared ListLoadingState as its
+  // footer since the #119 dedupe retired its local helpers.
   assert.match(
     recipesPage,
-    /ListFooterComponent=\{isFetchingNextPage \? <BoundedListLoadingMore \/> : undefined\}/,
-    "RecipesPage's footer is the BoundedList loading-more helper, keyed off isFetchingNextPage",
+    /ListFooterComponent=\{isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined\}/,
+    "RecipesPage's footer is the shared ListLoadingState, keyed off isFetchingNextPage",
   );
 });

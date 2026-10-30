@@ -140,19 +140,15 @@ test("the three fixed-shell list pages render BoundedList", () => {
   }
 });
 
-test("the loading slot helpers render the catalog spinner compositions (#119)", () => {
-  assert.match(code, /export function BoundedListLoading\(\)/);
-  assert.match(code, /export function BoundedListLoadingMore\(\)/);
-  assert.match(code, /<Spinner label="Loading" \/>/);
-  assert.match(
-    code,
-    /paddingBlockStart="\$8"/,
-    "the empty-state spinner sits below the header's height, as the catalog pages composed it",
+test("the retired loading slot helpers stay retired (#119 dedupe)", () => {
+  assert.ok(
+    !code.includes("BoundedListLoading"),
+    "BoundedListLoading/BoundedListLoadingMore were this tranche's local helpers — the dedupe retired them for the shared ListLoadingState and they must not come back",
   );
 });
 
-test("RecipesPage renders its loading slots through the helpers (#119)", () => {
+test("RecipesPage renders its loading slots through ListLoadingState directly (#119)", () => {
   const page = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  assert.match(page, /isLoading \? \(\s*<BoundedListLoading \/>/);
-  assert.match(page, /isFetchingNextPage \? <BoundedListLoadingMore \/> : undefined/);
+  assert.match(page, /isLoading \? \(\s*<ListLoadingState label="Loading" \/>/);
+  assert.match(page, /isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined/);
 });
