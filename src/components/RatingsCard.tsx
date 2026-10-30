@@ -1,23 +1,8 @@
-import { View, XStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
 import { Card } from "./Card.js";
 import { StarRatingInput } from "./StarRatingInput.js";
 import { Text } from "./Text.js";
-
-/**
- * The community + viewer ratings card: the engagement block the
- * two recipe surfaces (RecipeDetailPage and PublicRecipePage)
- * render identically from the same ratings view-model — a
- * community average with its star string, an optional stale-rating
- * hint (ratings left on earlier versions count at half weight),
- * and the viewer's own star input with the same stale treatment.
- * Both pages carried this card inline before it moved here
- * (#119); the view-model shape is declared here structurally so
- * either page's ratings object composes it without a second
- * shape to drift. The card carries no outer spacing — separation
- * from the sections around it is the parent stack's.
- */
 
 export type RatingsCardCommunityRating = {
   /** Pre-rendered star string ("★★★★★"), app-formatted from the average. */
@@ -43,12 +28,18 @@ export type RatingsCardRatings = {
 };
 
 export type RatingsCardProps = {
+  /** The community + viewer rating view-model. */
   ratings: RatingsCardRatings;
+  /**
+   * The viewer's rating change, with the star pressed — or null
+   * when the viewer pressed their current star again (clearing
+   * the rating). Pass undefined for a read-only card: the input
+   * renders non-interactive.
+   */
   onViewerRatingChange?: ((stars: number | null) => void) | undefined;
 };
 
-// Stale-rating hint copy, verbatim from the app's client
-// constants (carried by both recipe surfaces).
+// Stale-rating hint copy, verbatim from the app's client constants.
 const STALE_COMMUNITY_RATING_HINT =
   "Some community ratings were left on earlier recipe versions and count at half weight in the average.";
 const STALE_VIEWER_RATING_HINT =
@@ -56,23 +47,20 @@ const STALE_VIEWER_RATING_HINT =
 
 function EyebrowLabel({ children }: { children: string }) {
   return (
-    <Text
-      marginBlockEnd="$1"
-      fontSize={tokens.typography.fontSize.xs}
-      fontWeight={tokens.typography.fontWeight.medium}
-      letterSpacing={0.3}
-      color={tokens.colors.gray.gray6}
-      textTransform="uppercase"
-    >
-      {children}
-    </Text>
+    <YStack paddingBlockEnd="$1">
+      <Text variant="label">{children}</Text>
+    </YStack>
   );
 }
 
 /** The viewer's star input with the app adapter's semantics
  * preserved: pressing the current star clears the rating (null),
- * and a pending rating disables the input behind a
- * non-interactive wrapper. */
+ * and a pending rating disables the input. The non-interactive
+ * states are the input's own (`readOnly` when the card has no
+ * change handler, `disabled` while a rating is pending), so the
+ * semantics reach the star controls themselves — a pointerEvents
+ * wrapper would leave the stars focusable and announced as
+ * enabled on web while silently dropping their presses. */
 function ViewerRatingInput({
   value,
   isPending = false,
@@ -82,55 +70,57 @@ function ViewerRatingInput({
   isPending?: boolean;
   onChange: ((stars: number | null) => void) | undefined;
 }) {
-  const interactive = !isPending && onChange !== undefined;
   return (
-    <View
-      pointerEvents={interactive ? "auto" : "none"}
-      opacity={isPending ? 0.5 : undefined}
-      {...platformAccessibilityProps({ accessibilityState: { disabled: isPending } })}
-    >
-      <StarRatingInput
-        value={value ?? 0}
-        onChange={(star) => {
-          if (!isPending && onChange) {
-            onChange(value === star ? null : star);
-          }
-        }}
-      />
-    </View>
+    <StarRatingInput
+      value={value ?? 0}
+      readOnly={onChange === undefined}
+      disabled={isPending}
+      onChange={(star) => {
+        if (!isPending && onChange) {
+          onChange(value === star ? null : star);
+        }
+      }}
+    />
   );
 }
 
+/**
+ * The ratings card (#119): a muted card pairing the community
+ * rating (stars + label, with the stale-ratings notice when
+ * some ratings predate the current version) with the viewer's
+ * own star input (with its own stale notice). Extracted from
+ * RecipeDetailPage's engagement stack; the card owns its frame
+ * and internal rhythm, and its separation from surrounding
+ * content is the parent stack's. The rating strings are
+ * caller-supplied pre-composed values, so the card serves any
+ * app's rated content.
+ */
 export function RatingsCard({ ratings, onViewerRatingChange }: RatingsCardProps) {
   return (
     <Card variant="muted">
       <EyebrowLabel>Community rating</EyebrowLabel>
       {ratings.community ? (
         <>
-          <XStack marginBlockEnd="$3" alignItems="center" gap="$2">
+          <XStack paddingBlockEnd="$3" alignItems="center" gap="$2">
             <Text color={tokens.colors.warning.warning5}>{ratings.community.stars}</Text>
             <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
               {ratings.community.label}
             </Text>
           </XStack>
           {ratings.community.hasStaleRatings ? (
-            <Text
-              marginBlockEnd="$3"
-              fontSize={tokens.typography.fontSize.xs}
-              color={tokens.colors.warning.warning9}
-            >
-              {STALE_COMMUNITY_RATING_HINT}
-            </Text>
+            <YStack paddingBlockEnd="$3">
+              <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
+                {STALE_COMMUNITY_RATING_HINT}
+              </Text>
+            </YStack>
           ) : null}
         </>
       ) : (
-        <Text
-          marginBlockEnd="$3"
-          fontSize={tokens.typography.fontSize.sm}
-          color={tokens.colors.gray.gray7}
-        >
-          No community ratings yet
-        </Text>
+        <YStack paddingBlockEnd="$3">
+          <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
+            No community ratings yet
+          </Text>
+        </YStack>
       )}
       {ratings.viewer ? (
         <>
@@ -141,13 +131,11 @@ export function RatingsCard({ ratings, onViewerRatingChange }: RatingsCardProps)
             onChange={onViewerRatingChange}
           />
           {ratings.viewer.isStale ? (
-            <Text
-              marginBlockStart="$2"
-              fontSize={tokens.typography.fontSize.xs}
-              color={tokens.colors.warning.warning9}
-            >
-              {STALE_VIEWER_RATING_HINT}
-            </Text>
+            <YStack paddingBlockStart="$2">
+              <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
+                {STALE_VIEWER_RATING_HINT}
+              </Text>
+            </YStack>
           ) : null}
         </>
       ) : null}

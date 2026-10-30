@@ -42,7 +42,10 @@ test("ScrollShellProps is a type-only export from the built components barrel", 
 
 test("ScrollShell paints the surface and scrolls its inset column through ScrollRegion", () => {
   assert.match(scrollShellCode, /export type ScrollShellProps = \{\s+children: ReactNode;\s+\};/);
-  assert.match(scrollShellCode, /<YStack flex=\{1\} backgroundColor="\$surface">/);
+  // The dedupe rebuild composes ScreenShell — the shell that owns
+  // the flex + surface paint — instead of re-painting its own
+  // frame (cluster B9: one shell implementation).
+  assert.match(scrollShellCode, /<ScreenShell>/);
   assert.equal(
     scrollShellCode.split("<ScrollRegion>").length - 1,
     1,

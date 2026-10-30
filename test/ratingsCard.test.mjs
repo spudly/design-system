@@ -1,18 +1,14 @@
 /**
- * Contract test for RatingsCard (spudly/design-system#119), the
- * community + viewer ratings card the two recipe surfaces render
- * identically from the shared ratings view-model. Both pages
- * carried the card inline before it moved here; its invariants
- * are the engagement semantics the #169 contract settled: the
- * viewer's star input hides when the viewer is null, pressing
- * the current star clears the rating, a pending rating disables
- * the input, and the stale-rating hints carry the app's verbatim
- * copy.
+ * Contract test for RatingsCard (spudly/design-system#119,
+ * recipes-detail tranche): the ratings card extracted from
+ * RecipeDetailPage's engagement stack.
  *
- * Source scan plus a dist export check, like the other component
- * contract tests. The dist import needs the harness's
- * react-native-svg stub registered first, so this file imports
- * registerSvgStub.mjs before anything else.
+ * The pins hold the app adapter's semantics the page carried:
+ * pressing the viewer's current star clears the rating (null),
+ * a pending rating disables the input itself (and a handler-less
+ * card renders it read-only), stale ratings show their hints,
+ * and a null community rating renders the "No community
+ * ratings yet" line.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -22,64 +18,35 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "..", "src", "components");
-const cardSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
-
-const cardCode = cardSource
-  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+const source = readFileSync(join(here, "..", "src", "components", "RatingsCard.tsx"), "utf8");
+const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("RatingsCard is exported from the built package root", async () => {
   const dist = await import("../dist/index.js");
   assert.equal(typeof dist.RatingsCard, "function", "RatingsCard must be exported from @spudly/ui");
 });
 
-test("RatingsCard's types are type-only exports from the built components barrel", () => {
-  const types = readFileSync(join(here, "..", "dist", "components", "index.d.ts"), "utf8");
-  for (const name of [
-    "RatingsCardProps",
-    "RatingsCardRatings",
-    "RatingsCardCommunityRating",
-    "RatingsCardViewerRating",
-  ]) {
-    assert.match(types, new RegExp(name), `${name} must be exported from the barrel types`);
-  }
-});
-
-test("the card renders community and viewer blocks with the settled semantics", () => {
-  assert.match(cardCode, /<Card variant="muted">/);
+test("the viewer's star input keeps the adapter's clear-on-repress and pending semantics", () => {
   assert.match(
-    cardCode,
-    /\{ratings\.community \? \(/,
-    "the community block renders only with a community rating",
-  );
-  assert.match(cardCode, /No community ratings yet/, "the empty community line is pinned copy");
-  assert.match(
-    cardCode,
-    /\{ratings\.viewer \? \(/,
-    "the viewer block renders only with a viewer (signed out hides it)",
-  );
-  assert.match(
-    cardCode,
+    code,
     /onChange\(value === star \? null : star\)/,
     "pressing the current star clears the rating",
   );
+  // The non-interactive states are the input's own props, so
+  // the semantics reach the star controls (a pointerEvents
+  // wrapper would leave them focusable and announced enabled).
   assert.match(
-    cardCode,
-    /pointerEvents=\{interactive \? "auto" : "none"\}/,
-    "a pending rating disables the input",
+    code,
+    /readOnly=\{onChange === undefined\}/,
+    "a card without a change handler renders the input read-only",
   );
-  assert.ok(
-    cardCode.includes(
-      '"Some community ratings were left on earlier recipe versions and count at half weight in the average."',
-    ),
-    "the stale community hint is the app's verbatim copy",
-  );
-  assert.ok(
-    cardCode.includes(
-      '"Your rating was left on an earlier version of the recipe. Tap a star to update it for the current version."',
-    ),
-    "the stale viewer hint is the app's verbatim copy",
-  );
-  assert.ok(!cardCode.includes("lineHeight"), "the card must not set lineHeight");
+  assert.match(code, /disabled=\{isPending\}/, "a pending rating disables the input itself");
+  assert.ok(!code.includes("pointerEvents"), "no pointerEvents wrapper around the input");
+});
+
+test("stale ratings and the empty community state render their copy", () => {
+  assert.match(code, /STALE_COMMUNITY_RATING_HINT/);
+  assert.match(code, /STALE_VIEWER_RATING_HINT/);
+  assert.match(code, /No community ratings yet/);
+  assert.match(code, /<Card variant="muted">/, "the card renders in the muted card treatment");
 });

@@ -11,44 +11,40 @@ const meta: Meta<typeof RatingsCard> = {
 export default meta;
 type Story = StoryObj<typeof RatingsCard>;
 
-function RatingsCardDemo() {
-  const [viewerRating, setViewerRating] = useState<number | null>(4);
-  return (
-    <YStack width={430} maxWidth="100%">
-      <RatingsCard
-        ratings={{
-          community: { stars: "★★★★★", label: "4.6 (9)", hasStaleRatings: true },
-          viewer: { value: viewerRating, isStale: true },
-        }}
-        onViewerRatingChange={setViewerRating}
-      />
-    </YStack>
-  );
-}
-
 export const Default: Story = {
-  render: () => <RatingsCardDemo />,
+  render: () => {
+    const [viewer, setViewer] = useState<number | null>(4);
+    return (
+      <YStack maxWidth={430} padding="$4">
+        <RatingsCard
+          ratings={{
+            community: { stars: "★★★★☆", label: "4.6 (9)" },
+            viewer: { value: viewer },
+          }}
+          onViewerRatingChange={setViewer}
+        />
+      </YStack>
+    );
+  },
 };
 
-export const SignedOut: Story = {
+export const NoRatingsYet: Story = {
   render: () => (
-    <YStack width={430} maxWidth="100%">
-      <RatingsCard
-        ratings={{
-          community: { stars: "★★★★☆", label: "4.2 (5)" },
-          viewer: null,
-        }}
-      />
+    <YStack maxWidth={430} padding="$4">
+      <RatingsCard ratings={{ community: null, viewer: null }} onViewerRatingChange={undefined} />
     </YStack>
   ),
 };
 
-export const NoRatings: Story = {
+export const Stale: Story = {
   render: () => (
-    <YStack width={430} maxWidth="100%">
+    <YStack maxWidth={430} padding="$4">
       <RatingsCard
-        ratings={{ community: null, viewer: { value: null } }}
-        onViewerRatingChange={() => undefined}
+        ratings={{
+          community: { stars: "★★★★☆", label: "4.6 (9)", hasStaleRatings: true },
+          viewer: { value: 3, isStale: true },
+        }}
+        onViewerRatingChange={() => {}}
       />
     </YStack>
   ),

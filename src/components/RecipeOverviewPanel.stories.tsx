@@ -16,7 +16,8 @@ export const Default: Story = {
       <RecipeOverviewPanel
         title="Tuscan Garlic Chicken"
         description="A one-pan weeknight chicken in a garlicky cream sauce with sun-dried tomatoes and spinach."
-        status="perfected"
+        statusTone="success"
+        statusLabel="Perfected"
         servingsLabel="4"
         prepTimeLabel="15m"
         cookTimeLabel="30m"
@@ -35,7 +36,8 @@ export const Minimal: Story = {
     <YStack width={640} maxWidth="100%">
       <RecipeOverviewPanel
         title="Weeknight Tomato Pasta"
-        status="idea"
+        statusTone="neutral"
+        statusLabel="Idea"
         servingsLabel="2"
         tags={[]}
       />

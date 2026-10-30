@@ -14,7 +14,7 @@ import { StarRatingInput } from "../components/StarRatingInput.js";
 import { StatCard } from "../components/StatCard.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
-import { ToggleChipGroup, type ToggleChipOption } from "../components/ToggleChipGroup.js";
+import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
 import { PrintIcon } from "../icons/PrintIcon.js";
 import { ShareIcon } from "../icons/ShareIcon.js";
 
@@ -177,7 +177,7 @@ export type RecipeDetailPageOverviewProps = {
    * an href, not a press callback); the host composes it from
    * the recipe's route. */
   cookingHref: string;
-  /** Row action chips; each renders only when its callback is
+  /** Row action buttons; each renders only when its callback is
    * provided (the pilot's rule — the app computes the
    * can-edit/can-edit-draft conditions and passes the callback
    * only when the action applies). */
@@ -351,7 +351,7 @@ const STATUS_BADGES: Record<
 
 // Scale multipliers from the app's scaling constants; labels are
 // presentation, the servings math stays app-side.
-const SCALE_OPTIONS: ToggleChipOption[] = [
+const SCALE_OPTIONS: PresetValueOption[] = [
   { value: "0.5", label: "½×" },
   { value: "1", label: "1×" },
   { value: "2", label: "2×" },
@@ -437,22 +437,23 @@ function VersionPicker({
 // Shared panel pieces.
 // ---------------------------------------------------------------------------
 
-/** The overview's neutral action chips (print/share/edit): a
+/** The overview's neutral action buttons (print/share/edit): a
  * gray-100 fill with a gray-700 label, as in the app. */
-const neutralChipProps = {
+const neutralActionProps = {
   variant: "secondary",
   backgroundColor: tokens.colors.gray.gray2,
   color: tokens.colors.gray.gray8,
 } as const;
 
 /**
- * The print and share chips render the icons module's PrintIcon /
+ * The print and share buttons render the icons module's PrintIcon /
  * ShareIcon (#187, reworked after #217): the official Feather
- * printer / share-2 glyphs in the chip's own ink color (gray8, the
- * neutral chips' label color) at Feather's fixed 24px geometry —
- * not the "🖨" emoji and "↗" text glyph the page originally
- * used, which render in full color at font-dependent sizes,
- * clashing with the neutral chips and drifting between platforms.
+ * printer / share-2 glyphs in the button's own ink color (gray8,
+ * the neutral buttons' label color) at Feather's fixed 24px
+ * geometry — not the "🖨" emoji and "↗" text glyph the page
+ * originally used, which render in full color at font-dependent
+ * sizes, clashing with the neutral buttons and drifting between
+ * platforms.
  * Do not reintroduce text glyphs or hand-drawn icons for these:
  * icons come from src/icons (see that module's header).
  */
@@ -794,7 +795,7 @@ function OverviewPanel({
           </Button>
           {onPrintPress ? (
             <Button
-              {...neutralChipProps}
+              {...neutralActionProps}
               width="$12"
               paddingHorizontal={0}
               onPress={onPrintPress}
@@ -805,7 +806,7 @@ function OverviewPanel({
           ) : null}
           {onSharePress ? (
             <Button
-              {...neutralChipProps}
+              {...neutralActionProps}
               width="$12"
               paddingHorizontal={0}
               onPress={onSharePress}
@@ -815,12 +816,12 @@ function OverviewPanel({
             </Button>
           ) : null}
           {editHref ? (
-            <Button {...neutralChipProps} href={editHref}>
+            <Button {...neutralActionProps} href={editHref}>
               Edit
             </Button>
           ) : null}
           {editDraftHref ? (
-            <Button {...neutralChipProps} href={editDraftHref}>
+            <Button {...neutralActionProps} href={editDraftHref}>
               Edit draft
             </Button>
           ) : null}
@@ -903,53 +904,17 @@ function IngredientsPanel({
   ingredients: RecipeDetailPageIngredientsProps;
 }) {
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
-  // Custom scale editing is ephemeral view state, like the
-  // instructions section's active step: whether the custom chip is
-  // currently a number input, and the input's uncommitted text.
-  const [isCustomScaleEditing, setCustomScaleEditing] = useState(false);
-  const [customScaleDraft, setCustomScaleDraft] = useState("");
-  const isPresetScale = SCALE_OPTIONS.some((option) => option.value === view.scaleValue);
-  const isCustomScaleSelected = !isPresetScale && !isCustomScaleEditing;
-
-  const startCustomScaleEdit = () => {
-    setCustomScaleDraft(isPresetScale ? "" : formatScaleValue(view.scaleValue));
-    setCustomScaleEditing(true);
-  };
-
-  // Web keyboard support (the TextLink/MealPlansPage pattern): the
-  // Custom scale chip carries the button role on web, and a div with
-  // a role is not keyboard-operable on its own, so Enter and Space
-  // start the edit exactly like a press. `tabIndex` and `onKeyDown`
-  // are web-only props in Tamagui and are ignored on native, where
-  // onPress is the activation path.
-  const handleCustomScaleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      startCustomScaleEdit();
-    }
-  };
-
-  // Committing an entry applies it through the same onScaleChange
-  // the presets use; an empty, non-numeric, or non-positive entry
-  // commits nothing and the chip restores the current scale.
-  const commitCustomScale = () => {
-    const parsed = Number(customScaleDraft.trim());
-    setCustomScaleEditing(false);
-    if (Number.isFinite(parsed) && parsed > 0) {
-      view.onScaleChange(String(parsed));
-    }
-  };
-
   return (
     <YStack padding="$4">
       {/* Servings + scale controls (#73): one compact block, two fixed
           rows, and every value directly enterable — stepping is no
           longer the only way to reach a large batch. Servings is an
           inline editable stepper (label beside the stepper, the
-          value a number input in a fixed-width box); Scale is a
-          single non-wrapping row of equal-width preset chips plus a
-          Custom chip that turns into a number input when pressed
-          and afterwards shows the applied custom value selected.
+          value a number input in a fixed-width box); Scale is
+          the PresetValueSelector — a single non-wrapping row of
+          equal-width preset buttons plus a Custom button that
+          turns into a number input when pressed and afterwards
+          shows the applied custom value selected.
           Same props contract as before — the app wiring is
           untouched. */}
       <YStack gap="$3" paddingBlockEnd="$4">
@@ -961,78 +926,15 @@ function IngredientsPanel({
           onChange={view.onServingsChange}
           editable
         />
-        <XStack alignItems="center" gap="$2">
-          <XStack paddingInlineEnd="$1">
-            <Text
-              fontSize={tokens.typography.fontSize.sm}
-              fontWeight={tokens.typography.fontWeight.medium}
-              color={tokens.colors.gray.gray8}
-            >
-              Scale
-            </Text>
-          </XStack>
-          <ToggleChipGroup
-            options={SCALE_OPTIONS}
-            mode="single"
-            wrap={false}
-            value={view.scaleValue}
-            onChange={(value) => {
-              setCustomScaleEditing(false);
-              view.onScaleChange(value);
-            }}
-          />
-          <View flex={0.25}>
-            {isCustomScaleEditing ? (
-              <TextField
-                accessibilityLabel="Custom scale"
-                keyboardType="decimal-pad"
-                inputMode="decimal"
-                type="number"
-                autoFocus
-                value={customScaleDraft}
-                onChangeText={setCustomScaleDraft}
-                onBlur={commitCustomScale}
-                onSubmitEditing={commitCustomScale}
-              />
-            ) : (
-              <XStack
-                minHeight={44}
-                alignItems="center"
-                justifyContent="center"
-                borderRadius={tokens.radii.full}
-                borderWidth={1}
-                borderColor={isCustomScaleSelected ? "$primary" : "$textMuted"}
-                backgroundColor={isCustomScaleSelected ? "$primary" : "$surface"}
-                onPress={startCustomScaleEdit}
-                {...platformAccessibilityProps({
-                  accessibilityRole: "button",
-                  // When a custom scale is selected the chip's visible
-                  // text is the multiplier itself; the accessible name
-                  // must carry it too, not just "Custom scale".
-                  accessibilityLabel: isCustomScaleSelected
-                    ? `Custom scale ${formatScaleValue(view.scaleValue)}×`
-                    : "Custom scale",
-                })}
-                tabIndex={0}
-                onKeyDown={handleCustomScaleKeyDown}
-                aria-pressed={isCustomScaleSelected}
-              >
-                <Text
-                  style={{
-                    color: isCustomScaleSelected ? "$onPrimary" : "$color",
-                    fontWeight: isCustomScaleSelected
-                      ? tokens.typography.fontWeight.semibold
-                      : tokens.typography.fontWeight.regular,
-                  }}
-                >
-                  {isCustomScaleSelected
-                    ? `${formatScaleValue(view.scaleValue)}×`
-                    : CUSTOM_SCALE_LABEL}
-                </Text>
-              </XStack>
-            )}
-          </View>
-        </XStack>
+        <PresetValueSelector
+          label="Scale"
+          options={SCALE_OPTIONS}
+          value={view.scaleValue}
+          onChange={view.onScaleChange}
+          customLabel={CUSTOM_SCALE_LABEL}
+          customAccessibilityLabel="Custom scale"
+          formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
+        />
       </YStack>
       {view.ingredients.map((ingredient) => (
         <TouchableOpacity

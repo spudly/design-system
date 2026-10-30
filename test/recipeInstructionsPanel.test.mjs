@@ -5,9 +5,11 @@
  * highlighted as the active step — shared by the two recipe
  * surfaces, which each carried it inline before it moved here.
  * Its invariants: steps render sorted by stepNumber regardless
- * of input order, the active step is ephemeral state inside the
- * panel (first step active by default), and the active card
- * takes the primary treatment.
+ * of input order, each step's eyebrow label is composed here as
+ * "Step N" (StepList takes pre-composed labels — labels are
+ * caller content), and the cards themselves are the shared
+ * StepList, which owns the card treatment, the pressable
+ * pattern, and the ephemeral active-step state (#119 dedupe).
  *
  * Source scan plus a dist export check, like the other component
  * contract tests. The dist import needs the harness's
@@ -44,29 +46,18 @@ test("RecipeInstructionsPanel's types are type-only exports from the built compo
   assert.match(types, /RecipeInstructionsPanelStep/);
 });
 
-test("steps sort by number and the active step is internal state", () => {
+test("steps sort by number and render through StepList with composed labels", () => {
   assert.match(panelCode, /\.sort\(\(a, b\) => a\.stepNumber - b\.stepNumber\)/);
-  assert.match(panelCode, /useState\(0\)/, "the first step is active by default");
-  assert.match(panelCode, /setActiveIndex\(i\)/, "tapping a card activates it");
+  assert.match(panelCode, /<StepList/, "the cards are the shared StepList");
   assert.match(
     panelCode,
-    /borderColor=\{isActive \? "\$primary" : tokens\.colors\.gray\.gray2\}/,
-    "the active card takes the primary border",
+    /label: `Step \$\{step\.stepNumber\}`/,
+    "each step's eyebrow label is composed here as Step N",
   );
-  assert.match(
-    panelCode,
-    /Step \{step\.stepNumber\}/,
-    "each card is eyebrowed with its step number",
-  );
-  assert.match(
-    panelCode,
-    /accessibilityRole: "button"/,
-    "cards carry the button role (the ListRow pressable pattern, no react-native import)",
-  );
-  assert.match(
-    panelCode,
-    /aria-pressed=\{isActive\}/,
-    "the active card exposes its selected state to assistive technology",
+  assert.match(panelCode, /body: step\.body/, "step bodies pass through verbatim");
+  assert.ok(
+    !panelCode.includes("useState"),
+    "the panel holds no active-step state — StepList owns it",
   );
   assert.ok(
     !panelCode.includes("react-native"),

@@ -5,9 +5,12 @@
  * row — shared by the two recipe surfaces, which each carried it
  * inline before it moved here. Its invariants: the hero renders
  * only with an image (through Thumbnail's hero frame), the
- * status badge map is DS-owned with the "idea" fallback, the
- * stat band composes StatBand/StatCard with conditional Prep and
- * Cook stats, and tags render through Badge's color form (#207).
+ * status badge is the shared StatusBadge fed a tone and label
+ * the caller resolved from its own status vocabulary (the panel
+ * owns no status map — status words are caller data, #119
+ * dedupe), the stat band composes StatBand/StatCard with
+ * conditional Prep and Cook stats, and tags render through
+ * TagList (Badge's color form, #207).
  *
  * Source scan plus a dist export check, like the other component
  * contract tests. The dist import needs the harness's
@@ -52,23 +55,24 @@ test("the panel composes the shared building blocks with its conditional content
   assert.match(panelCode, /<StatCard label="Servings" value=\{servingsLabel\} \/>/);
   assert.match(panelCode, /\{prepTimeLabel \? <StatCard label="Prep"/);
   assert.match(panelCode, /\{cookTimeLabel \? <StatCard label="Cook"/);
-  assert.match(panelCode, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
-  assert.match(panelCode, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/, "tags render as Badge");
+  assert.match(panelCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
+  assert.match(
+    panelCode,
+    /<TagList tags=\{tags\} \/>/,
+    "tags render through TagList (Badge's color form)",
+  );
   assert.ok(!panelCode.includes("{tag.color}22"), "no inline tag tint");
 });
 
-test("the status badge map is DS-owned with the idea fallback", () => {
-  for (const [status, label] of [
-    ["idea", "Idea"],
-    ["evolving", "Evolving"],
-    ["perfected", "Perfected"],
-    ["abandoned", "Abandoned"],
-  ]) {
-    assert.ok(
-      panelCode.includes(`${status}: { label: "${label}"`),
-      `STATUS_BADGES must map ${status} to ${label}`,
-    );
-  }
-  assert.match(panelCode, /STATUS_BADGES\[status\] \?\? STATUS_BADGES\.idea/);
+test("the status badge is the shared StatusBadge fed caller-resolved tone and label", () => {
+  assert.match(
+    panelCode,
+    /<StatusBadge tone=\{statusTone\} label=\{statusLabel\} \/>/,
+    "the badge is the shared StatusBadge with the caller's tone and label",
+  );
+  assert.ok(
+    !panelCode.includes("STATUS_BADGES"),
+    "the panel owns no status vocabulary — the caller resolves its statuses to tone/label",
+  );
   assert.ok(!panelCode.includes("lineHeight"), "the panel must not set lineHeight");
 });

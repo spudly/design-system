@@ -9,7 +9,7 @@ import { RecipeIngredientsPanel } from "../components/RecipeIngredientsPanel.js"
 import { RecipeInstructionsPanel } from "../components/RecipeInstructionsPanel.js";
 import { RecipeOverviewPanel } from "../components/RecipeOverviewPanel.js";
 import { ScrollShell } from "../components/ScrollShell.js";
-import { Text } from "../components/Text.js";
+import { SectionHeading } from "../components/SectionHeading.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,
@@ -86,9 +86,9 @@ import type {
  * error states. Section separation is the shell column's 16px
  * gap throughout, where the hand-styled page mixed 16px section
  * padding with 8px heading margins — the headings now sit 16px
- * from the sections on both sides — and the headings take Text's
- * subheading variant (xl semibold ink) in place of the
- * hand-styled lg treatment.
+ * from the sections on both sides — and the section headings are
+ * the shared SectionHeading (Text's subheading variant, xl
+ * semibold ink) in place of the hand-styled lg treatment.
  *
  * The sections' ephemeral state stays inside the section
  * components, mirroring RecipeDetailPage: the instructions
@@ -123,9 +123,12 @@ export type PublicRecipePageOverviewProps = {
   imageUrl?: string | null;
   title: string;
   description?: string | null;
-  /** Recipe status as a plain string; the badge label/tone map
-   * is DS-owned in RecipeOverviewPanel (the same map
-   * RecipeDetailPage carries). Unknown values fall back to
+  /** Recipe status as a plain string; the page resolves it to
+   * the badge's tone and label through its STATUS_BADGES map
+   * (the same map RecipeDetailPage carries) and passes the pair
+   * to RecipeOverviewPanel — the panel takes the resolved pair
+   * because status words are caller data, not a design-system
+   * vocabulary (#119 dedupe). Unknown values fall back to
    * "idea", as the app's status normalizer does. */
   status: string;
   /** Overview stat band values, app-formatted ("4", "15m", "30m"). */
@@ -191,18 +194,22 @@ const NOT_FOUND_MESSAGE = "This recipe may be private or no longer available.";
 const UNAVAILABLE_TITLE = "Recipe unavailable";
 const UNAVAILABLE_MESSAGE = "This recipe link is invalid or has expired.";
 
-// ---------------------------------------------------------------------------
-// Shared panel pieces.
-// ---------------------------------------------------------------------------
-
-/** A section's heading on the single scrollable page: the
- * sections after the overview header are found by scanning, so
- * each carries its label — the labels the tab bar used to show.
- * The subheading variant (xl semibold) carries the treatment
- * (#119). */
-function SectionHeading({ children }: { children: string }) {
-  return <Text variant="subheading">{children}</Text>;
-}
+// Status badge map: labels and tones for the app's four statuses
+// (idea → neutral gray, evolving → info blue, perfected → success
+// green, abandoned → danger red, matching the app's badge tints) —
+// the same map RecipeDetailPage carries. The page owns the map
+// and passes the resolved tone/label pair to the overview panel:
+// status words are the surface's data, not a vocabulary the
+// shared components own (#119 dedupe).
+const STATUS_BADGES: Record<
+  string,
+  { label: string; tone: "neutral" | "info" | "success" | "danger" }
+> = {
+  idea: { label: "Idea", tone: "neutral" },
+  evolving: { label: "Evolving", tone: "info" },
+  perfected: { label: "Perfected", tone: "success" },
+  abandoned: { label: "Abandoned", tone: "danger" },
+};
 
 // ---------------------------------------------------------------------------
 // CTA bar (above the sections; variant chosen by auth state). The
@@ -289,6 +296,7 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   // engagement stack under the ratings card.
   const comments = renderComments ? renderComments() : null;
   const { overview } = props;
+  const statusBadge = STATUS_BADGES[overview.status] ?? STATUS_BADGES.idea;
 
   return (
     <ScrollShell>
@@ -300,7 +308,8 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
       />
       <RecipeOverviewPanel
         title={overview.title}
-        status={overview.status}
+        statusTone={statusBadge?.tone ?? "neutral"}
+        statusLabel={statusBadge?.label ?? "Idea"}
         servingsLabel={overview.servingsLabel}
         tags={overview.tags}
         {...(overview.imageUrl !== undefined ? { imageUrl: overview.imageUrl } : {})}

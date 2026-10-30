@@ -1,9 +1,10 @@
-import { XStack, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
-import { Badge } from "./Badge.js";
 import { StatBand } from "./StatBand.js";
 import { StatCard } from "./StatCard.js";
+import { StatusBadge, type StatusBadgeTone } from "./StatusBadge.js";
+import { TagList } from "./TagList.js";
 import { Text } from "./Text.js";
 import { Thumbnail } from "./Thumbnail.js";
 
@@ -13,10 +14,23 @@ import { Thumbnail } from "./Thumbnail.js";
  * title, status badge, description, the servings/prep/cook stat
  * band, and the tag row. Both pages carried this panel inline
  * before it moved here (#119); the view-model shape is declared
- * here structurally so either page's overview object composes it
- * without a second shape to drift. The panel carries no outer
- * padding or spacing — the page shell's column insets it, and
- * separation from the sections around it is the parent stack's.
+ * here structurally so either page's overview object composes
+ * it without a second shape to drift. The panel carries no
+ * outer padding or spacing — the page shell's column insets it,
+ * and separation from the sections around it is the parent
+ * stack's; the panel's own blocks separate with padding
+ * wrappers, the recipe pages' settled form.
+ *
+ * The pieces are the shared ones (#119 dedupe): the status
+ * badge is the StatusBadge component, the tag row is the
+ * TagList, the stats compose StatBand/StatCard, and the hero is
+ * Thumbnail's frame. The status itself arrives as a tone and a
+ * label the caller resolved from its own status vocabulary —
+ * the design system owns no status map (Stephen's ruling on
+ * the #119 dedupe: status words are the app's data, the same
+ * principle that keeps filter option sets out of
+ * CatalogFiltersBar); PublicRecipePage carries the map and
+ * passes the pair in.
  */
 
 export type RecipeOverviewPanelTag = {
@@ -32,10 +46,11 @@ export type RecipeOverviewPanelProps = {
   imageUrl?: string | null;
   title: string;
   description?: string | null;
-  /** Recipe status as a plain string; the badge label/tone map
-   * below is DS-owned. Unknown values fall back to "idea", as
-   * the app's status normalizer does. */
-  status: string;
+  /** The status badge's tone, resolved by the caller from its
+   * status vocabulary. */
+  statusTone: StatusBadgeTone;
+  /** The status badge's label, resolved by the caller. */
+  statusLabel: string;
   /** Stat band values, app-formatted ("4", "15m", "30m"). */
   servingsLabel: string;
   prepTimeLabel?: string;
@@ -43,30 +58,13 @@ export type RecipeOverviewPanelProps = {
   tags: RecipeOverviewPanelTag[];
 };
 
-// Status badge map: DS-owned labels and tones (idea → neutral
-// gray, evolving → info blue, perfected → success green,
-// abandoned → danger red, matching the app's badge tints).
-const STATUS_BADGES: Record<
-  string,
-  { label: string; tone: "neutral" | "info" | "success" | "danger" }
-> = {
-  idea: { label: "Idea", tone: "neutral" },
-  evolving: { label: "Evolving", tone: "info" },
-  perfected: { label: "Perfected", tone: "success" },
-  abandoned: { label: "Abandoned", tone: "danger" },
-};
-
-function StatusBadge({ status }: { status: string }) {
-  const badge = STATUS_BADGES[status] ?? STATUS_BADGES.idea;
-  return <Badge tone={badge?.tone ?? "neutral"}>{badge?.label ?? "Idea"}</Badge>;
-}
-
 export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
   const {
     imageUrl,
     title,
     description,
-    status,
+    statusTone,
+    statusLabel,
     servingsLabel,
     prepTimeLabel,
     cookTimeLabel,
@@ -76,42 +74,35 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
   return (
     <YStack>
       {imageUrl ? (
-        <YStack marginBlockEnd="$4">
+        <YStack paddingBlockEnd="$4">
           <Thumbnail src={imageUrl} />
         </YStack>
       ) : null}
-      <Text
-        fontSize={tokens.typography.fontSize["2xl"]}
-        fontWeight={tokens.typography.fontWeight.bold}
-        color={tokens.colors.gray.gray10}
-        marginBlockEnd="$2"
-      >
-        {title}
-      </Text>
-      <YStack marginBlockEnd="$4" alignSelf="flex-start">
-        <StatusBadge status={status} />
+      <YStack paddingBlockEnd="$2">
+        <Text
+          fontSize={tokens.typography.fontSize["2xl"]}
+          fontWeight={tokens.typography.fontWeight.bold}
+          color={tokens.colors.gray.gray10}
+        >
+          {title}
+        </Text>
+      </YStack>
+      <YStack paddingBlockEnd="$4" alignSelf="flex-start">
+        <StatusBadge tone={statusTone} label={statusLabel} />
       </YStack>
       {description ? (
-        <Text color={tokens.colors.gray.gray7} marginBlockEnd="$4">
-          {description}
-        </Text>
+        <YStack paddingBlockEnd="$4">
+          <Text color={tokens.colors.gray.gray7}>{description}</Text>
+        </YStack>
       ) : null}
-      <YStack marginBlockEnd="$4">
+      <YStack paddingBlockEnd="$4">
         <StatBand>
           <StatCard label="Servings" value={servingsLabel} />
           {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
           {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
         </StatBand>
       </YStack>
-      {tags.length > 0 ? (
-        <XStack flexWrap="wrap" gap="$2">
-          {tags.map((tag) => (
-            <Badge key={tag.id} color={tag.color}>
-              {tag.name}
-            </Badge>
-          ))}
-        </XStack>
-      ) : null}
+      {tags.length > 0 ? <TagList tags={tags} /> : null}
     </YStack>
   );
 }

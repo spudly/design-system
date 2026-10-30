@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
+import { ScreenShell } from "./ScreenShell.js";
 import { ScrollRegion } from "./ScrollRegion.js";
 
 export type ScrollShellProps = {
@@ -24,15 +25,20 @@ export type ScrollShellProps = {
  * pages that own their paint and their scroll, the shape
  * PublicRecipePage hand-rolled as a styled YStack around its
  * ScrollView before adopting ScrollRegion for the scroll itself.
+ *
+ * The shell is a composition, not a re-declared frame (#119
+ * dedupe): ScreenShell supplies the surface frame and
+ * ScrollRegion the scroll, and this shell adds only the inset
+ * column the blocks stack in.
  */
 export function ScrollShell({ children }: ScrollShellProps) {
   return (
-    <YStack flex={1} backgroundColor="$surface">
+    <ScreenShell>
       <ScrollRegion>
         <YStack padding="$4" gap="$4">
           {children}
         </YStack>
       </ScrollRegion>
-    </YStack>
+    </ScreenShell>
   );
 }

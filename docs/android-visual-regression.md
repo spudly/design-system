@@ -12,17 +12,18 @@ the field to 1826px on a Pixel 8a) passed every web check.
 
 ## Pieces
 
-| Piece            | Where                                                              | What it does                                                                                                                                                                                                                                                                    |
-| ---------------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Host app         | `apps/storybook/`                                                  | Expo (SDK 58) app mounting @storybook/react-native v10 with the repo's stories. Also the capture target for the VR driver.                                                                                                                                                      |
-| On-device config | `src/tamagui.config.ts` → `createOnDeviceStorybookTamaguiConfig()` | Combined three-brand config (base, Warm Harvest, Quiet Dawn) with native font registrations. The web combined config uses CSS-variable font stacks, invalid on native. One process-wide config either way — Tamagui cannot swap brand configs at runtime (spudly/eciperay#149). |
-| Preview          | `apps/storybook/.rnstorybook/preview.tsx`                          | Mirrors the web preview: a `theme` global (the six sub-theme names, e.g. `light_warmHarvest`, `dark_quietDawn`) drives `defaultTheme`, keyed remount per theme.                                                                                                                 |
-| VR driver        | `tools/visualRegression/run.mjs`                                   | Drives the app over ADB, captures screenshots, pixel-compares against baselines. Zero dependencies (own PNG codec in `png.mjs`, validated round-trip against PIL).                                                                                                              |
-| Capture module   | `apps/storybook/modules/dsvr-capture/`                             | Local Expo native module (issue #137): draws the story's full content — below the fold included — into a PNG on a software canvas, which the driver pulls over ADB instead of screenshotting the display surface (see "Full-page captures" below).                              |
-| Luminance guard  | `tools/visualRegression/guard.mjs`                                 | Pre-commit check on fresh captures: rejects a set that looks uniformly dimmed or scrimmed (issue #101) before CI may turn it into baselines (below).                                                                                                                            |
-| Baselines        | `tools/visualRegression/baselines/<theme>/<storyId>.png`           | Committed reference screenshots. The narrow-viewport variant's baselines sit in the same folders with a `-narrow` filename suffix.                                                                                                                                              |
-| Sanity patch     | `tools/visualRegression/sanity/searchfield-162.patch`              | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                   |
-| CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job + jobs that commit regenerated baselines to a PR branch (PR auto-commit) or the dispatched branch (update mode) (below).                                                                                                              |
+| Piece            | Where                                                              | What it does                                                                                                                                                                                                                                                                     |
+| ---------------- | ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Host app         | `apps/storybook/`                                                  | Expo (SDK 58) app mounting @storybook/react-native v10 with the repo's stories. Also the capture target for the VR driver.                                                                                                                                                       |
+| On-device config | `src/tamagui.config.ts` → `createOnDeviceStorybookTamaguiConfig()` | Combined three-brand config (base, Warm Harvest, Quiet Dawn) with native font registrations. The web combined config uses CSS-variable font stacks, invalid on native. One process-wide config either way — Tamagui cannot swap brand configs at runtime (spudly/eciperay#149).  |
+| Preview          | `apps/storybook/.rnstorybook/preview.tsx`                          | Mirrors the web preview: a `theme` global (the six sub-theme names, e.g. `light_warmHarvest`, `dark_quietDawn`) drives `defaultTheme`, keyed remount per theme.                                                                                                                  |
+| VR driver        | `tools/visualRegression/run.mjs`                                   | Drives the app over ADB, captures screenshots, pixel-compares against baselines. Zero dependencies (own PNG codec in `png.mjs`, validated round-trip against PIL).                                                                                                               |
+| Capture module   | `apps/storybook/modules/dsvr-capture/`                             | Local Expo native module (issue #137): draws the story's full content — below the fold included — into a PNG on a software canvas, which the driver pulls over ADB instead of screenshotting the display surface (see "Full-page captures" below).                               |
+| Luminance guard  | `tools/visualRegression/guard.mjs`                                 | Pre-commit check on fresh captures: rejects a set that looks uniformly dimmed or scrimmed (issue #101) before CI may turn it into baselines (below).                                                                                                                             |
+| Commit gate      | `tools/visualRegression/commitGate.mjs`                            | Pixel-diff gate on the commit step (issue #296): a fresh capture replaces its baseline only when its differing-pixel ratio exceeds `COMMIT_GATE_MAX_RATIO` (1%), so render/re-encode noise never lands as baseline churn. Used by the PR auto-commit staging and by update mode. |
+| Baselines        | `tools/visualRegression/baselines/<theme>/<storyId>.png`           | Committed reference screenshots. The narrow-viewport variant's baselines sit in the same folders with a `-narrow` filename suffix.                                                                                                                                               |
+| Sanity patch     | `tools/visualRegression/sanity/searchfield-162.patch`              | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                    |
+| CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job + jobs that commit regenerated baselines to a PR branch (PR auto-commit) or the dispatched branch (update mode) (below).                                                                                                               |
 
 Fonts: the app loads the same faces the apps register — Raleway
 (variable TTF, all themes' body/heading) and Alegreya (variable TTF,
@@ -359,7 +360,23 @@ directive, 2026-10-23 — no manual dispatch):
    baseline yet** (point 2) — the job regenerates the baselines from the
    fresh captures, runs them through the **luminance guard**
    (below), and then **captures everything a second time and
-   compares against the regenerated set, in the same job**. Only a
+   compares against the regenerated set, in the same job**. The
+   regenerated set is built by the **pixel-diff commit gate**
+   (issue #296, `commitGate.mjs`): each fresh capture is
+   pixel-diffed against its committed baseline and staged only
+   when more than `COMMIT_GATE_MAX_RATIO` (1%) of its pixels
+   differ — captures at or under the gate keep their baseline
+   bytes, so render/re-encode noise never lands in the bot
+   commit. (Replaying the PR #295 bot commit that motivated the
+   gate through it: 24 of its 50 rewritten files are skipped as
+   noise — a systematic band at ≤0.47% plus one page the change
+   did not touch at 0.747% — and the 26 staged are 25 page-height
+   changes plus one genuine change at 1.025%; a capture whose
+   dimensions changed always stages.) The in-job re-compare
+   proves the staged set at the same gate tolerance, the gate
+   logs every SKIP/STAGE decision and a per-run summary in the
+   job log, and when the gate stages **zero** files the run
+   publishes nothing — no baseline commit at all. Only a
    set that passes that in-job re-compare is committed: the
    `commit-pr-baselines` job syncs it into
    `tools/visualRegression/baselines/` and pushes it to the PR's
@@ -387,7 +404,16 @@ baseline yet` and skips it (a BOOTSTRAP note when nothing at all
    mode = `update`, **from the PR branch**. It captures everything
    in the capture scope (page stories, own brand — see "Capture
    scope" above) plus the narrow-viewport variant set, and does
-   not compare. The follow-on
+   not compare. Writes go through the same commit gate as the PR
+   flow (issue #296): a capture at or under the gate keeps its
+   existing baseline (the driver logs `SKIP …` lines and counts
+   them in its summary), so a dispatched update no longer
+   rewrites noise-only files either. To force a sub-gate change
+   into the baselines deliberately, lower the gate for the run
+   (`--commit-max-ratio` on `run.mjs`, or the
+   `DSVR_COMMIT_MAX_RATIO` env var) — local runs only: the
+   Actions dispatch accepts no gate override, so dispatched
+   updates always use the default gate. The follow-on
    `commit-baselines` job then syncs the fresh screenshots into
    `tools/visualRegression/baselines/` and — only if something
    actually changed — commits them to the dispatched branch as

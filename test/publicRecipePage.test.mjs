@@ -306,7 +306,7 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
     /\{cookTimeLabel \? <StatCard label="Cook"/,
     "the Cook stat needs a cook time",
   );
-  assert.match(overviewCode, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
+  assert.match(overviewCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
   assert.match(code, /\{ratings \? \(/, "the ratings card renders only with ratings");
   assert.match(
     code,
@@ -323,14 +323,31 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
 test("tags render through Badge's color form, not an inline pill (#211)", () => {
   assert.match(
     overviewCode,
-    /<Badge key=\{tag\.id\} color=\{tag\.color\}>/,
-    "tags render as Badge",
+    /<TagList tags=\{tags\} \/>/,
+    "tags render through TagList (Badge's color form)",
   );
   assert.ok(!code.includes("{tag.color}22"), "the page must not re-implement the tag tint inline");
   assert.ok(
     !overviewCode.includes("{tag.color}22"),
     "the overview panel must not re-implement the tag tint inline",
   );
+});
+
+test("the status badge map is page-owned with the idea fallback", () => {
+  for (const [status, label] of [
+    ["idea", "Idea"],
+    ["evolving", "Evolving"],
+    ["perfected", "Perfected"],
+    ["abandoned", "Abandoned"],
+  ]) {
+    assert.ok(
+      code.includes(`${status}: { label: "${label}"`),
+      `STATUS_BADGES must map ${status} to ${label}`,
+    );
+  }
+  assert.match(code, /STATUS_BADGES\[overview\.status\] \?\? STATUS_BADGES\.idea/);
+  assert.match(code, /statusTone=\{statusBadge\?\.tone \?\? "neutral"\}/);
+  assert.match(code, /statusLabel=\{statusBadge\?\.label \?\? "Idea"\}/);
 });
 
 test("no explicit lineHeight anywhere in the new files (#162)", () => {

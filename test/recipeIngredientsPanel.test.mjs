@@ -1,16 +1,19 @@
 /**
  * Contract test for RecipeIngredientsPanel
  * (spudly/design-system#119), a recipe's ingredients section —
- * servings stepper, scale presets plus the custom-scale chip,
- * pressable ingredient rows, substitutions — shared by the two
- * recipe surfaces, which each carried it inline before it moved
- * here. Its invariants are the #73 interaction model both
- * surfaces share: the servings stepper mirrors the detail
- * page's, the scale option set is the presets 0.5–3, the chip
- * group never wraps, the custom chip exposes its pressed state
- * and carries the applied value in its accessible name, missing
- * rows dim, and the substitutions panel renders only with
- * substitutions.
+ * servings stepper, scale selector, pressable ingredient rows,
+ * substitutions — shared by the two recipe surfaces, which each
+ * carried it inline before it moved here. Its invariants are
+ * the #73 interaction model both surfaces share: the servings
+ * stepper mirrors the detail page's, the scale option set is
+ * the presets 0.5–3, the scale control is the shared
+ * PresetValueSelector (the Button-based selector that replaced
+ * the retired chip group; it owns the non-wrapping row, the
+ * custom-value editing state, and the custom slot's pressed
+ * state and value-carrying accessible name), ingredient rows
+ * are the shared MarkableRow (it owns the pressable pattern
+ * and the marked dimming), and the substitutions block is the
+ * shared SuggestionPanel, rendering only with substitutions.
  *
  * Source scan plus a dist export check, like the other component
  * contract tests. The dist import needs the harness's
@@ -70,51 +73,40 @@ test("the servings stepper and scale presets mirror the settled model", () => {
       `SCALE_OPTIONS must include ${value} / ${label}`,
     );
   }
-  assert.match(panelCode, /wrap=\{false\}/, "the scale chip row never wraps");
-});
-
-test("the custom scale chip keeps its button semantics and commit rules", () => {
-  assert.match(panelCode, /aria-pressed=\{isCustomScaleSelected\}/);
   assert.match(
     panelCode,
-    /`Custom scale \$\{formatScaleValue\(view\.scaleValue\)\}×`/,
-    "the selected chip's accessible name carries the applied multiplier",
+    /<PresetValueSelector/,
+    "the scale control is the shared PresetValueSelector",
+  );
+  assert.match(panelCode, /label="Scale"/);
+  assert.match(panelCode, /onChange=\{view\.onScaleChange\}/);
+  assert.match(
+    panelCode,
+    /customAccessibilityLabel="Custom scale"/,
+    "the custom slot's accessible name is 'Custom scale'",
   );
   assert.match(
     panelCode,
-    /: "Custom scale",/,
-    "the unselected chip's accessible name is the resting label",
+    /\$\{formatScaleValue\(custom\)\}×/,
+    "the custom slot shows the applied multiplier once a custom value applies",
   );
-  assert.match(
-    panelCode,
-    /Number\.isFinite\(parsed\) && parsed > 0/,
-    "only a finite positive entry commits",
-  );
-  assert.match(panelCode, /onBlur=\{commitCustomScale\}/);
-  assert.match(panelCode, /onSubmitEditing=\{commitCustomScale\}/);
+  assert.ok(!panelCode.includes("ToggleChipGroup"), "the retired chip group must not come back");
 });
 
 test("rows and substitutions keep their conditional rendering", () => {
+  assert.match(panelCode, /<MarkableRow/, "ingredient rows are the shared MarkableRow");
   assert.match(
     panelCode,
-    /opacity=\{ingredient\.isMissing \? 0\.4 : undefined\}/,
-    "missing rows dim",
+    /isMarked=\{ingredient\.isMissing \?\? false\}/,
+    "a row's marked state is the ingredient's missing flag (MarkableRow dims marked rows)",
   );
+  assert.ok(panelCode.includes('trailingNote: "optional"'), "optional rows carry the note");
   assert.match(
     panelCode,
-    /accessibilityRole: "button"/,
-    "rows carry the button role (the ListRow pressable pattern, no react-native import)",
+    /<SuggestionPanel/,
+    "the substitutions block is the shared SuggestionPanel",
   );
-  assert.match(
-    panelCode,
-    /aria-pressed=\{ingredient\.isMissing \?\? false\}/,
-    "a row exposes its missing (toggled) state to assistive technology",
-  );
-  assert.ok(
-    !panelCode.includes("react-native"),
-    "a root-graph component must not import react-native",
-  );
-  assert.match(panelCode, /\{ingredient\.isOptional \? \(/, "optional rows carry the note");
+  assert.match(panelCode, /title="Substitutions"/);
   assert.match(
     panelCode,
     /view\.substitutions && view\.substitutions\.length > 0/,
@@ -124,6 +116,10 @@ test("rows and substitutions keep their conditional rendering", () => {
     panelCode,
     /\{view\.isLoadingSubstitutions \? \(/,
     "the loading line is conditional",
+  );
+  assert.ok(
+    !panelCode.includes("react-native"),
+    "a root-graph component must not import react-native",
   );
   assert.ok(!panelCode.includes("lineHeight"), "the panel must not set lineHeight");
 });
