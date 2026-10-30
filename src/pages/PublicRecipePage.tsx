@@ -1,23 +1,15 @@
-import {
-  Children,
-  Fragment,
-  cloneElement,
-  isValidElement,
-  type ReactElement,
-  type ReactNode,
-} from "react";
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
+import type { ReactNode } from "react";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
+import { EqualButtonRow } from "../components/EqualButtonRow.js";
 import { LoadingGate } from "../components/LoadingGate.js";
+import { MessageCard } from "../components/MessageCard.js";
 import { RatingsCard } from "../components/RatingsCard.js";
 import { RecipeIngredientsPanel } from "../components/RecipeIngredientsPanel.js";
 import { RecipeInstructionsPanel } from "../components/RecipeInstructionsPanel.js";
 import { RecipeOverviewPanel } from "../components/RecipeOverviewPanel.js";
 import { ScrollShell } from "../components/ScrollShell.js";
 import { SectionHeading } from "../components/SectionHeading.js";
-import { Text } from "../components/Text.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,
@@ -86,7 +78,13 @@ import type {
  * and passes data and callbacks only. ScrollShell owns the
  * surface paint, the single scroll region, and the content
  * column's inset and separation rhythm; RatingsCard carries the
- * engagement section and LoadingGate the loading state. The
+ * engagement section and LoadingGate the loading state. The CTA
+ * bar's equal-width button treatment is EqualButtonRow's and
+ * the two message states are MessageCard — both extracted from
+ * this page's hand-rolled stacks in the component-only change
+ * (#341) after the #119 review found the page sizing its own
+ * buttons and styling its own message shell; the page now
+ * passes the row its buttons and the card its two strings. The
  * three recipe sections are the shared library panels —
  * RecipeOverviewPanel, RecipeIngredientsPanel and
  * RecipeInstructionsPanel — extracted in the component-only
@@ -232,10 +230,12 @@ const STATUS_BADGES: Record<
 // CTA bar (above the sections; variant chosen by auth state). The
 // bar's card has no outer spacing of its own: the shell column
 // insets it and owns its separation from the overview below
-// (#119). Its buttons share the card's width equally — flex 1
-// with a 40% minimum, wrapping instead of shrinking — sized here
-// in the bar, so no caller sizes a button itself (the treatment
-// ButtonRow's natural-width row is the sibling of).
+// (#119). Inside the card, EqualButtonRow owns the buttons'
+// treatment: they share the card's width equally — flex 1 with
+// a 40% minimum, wrapping instead of shrinking — so no caller
+// sizes a button itself (the treatment ButtonRow's natural-width
+// row is the sibling of). The bar passes the row the variant's
+// buttons as one fragment; the row flattens and sizes them.
 // ---------------------------------------------------------------------------
 
 function CtaBar({
@@ -277,38 +277,9 @@ function CtaBar({
         </Button>
       </>
     );
-  // Flatten the variant's fragment into the row's items, then
-  // size each button: flex 1 with a 40% minimum width, so
-  // buttons sharing a line split its width equally and share its
-  // height, and a button alone on a wrapped line fills that line.
-  const items: ReactNode[] = [];
-  Children.forEach(buttons, (child) => {
-    if (isValidElement(child) && child.type === Fragment) {
-      Children.forEach(
-        (child as ReactElement<{ children?: ReactNode }>).props.children,
-        (inner) => {
-          if (inner === null || inner === undefined || typeof inner === "boolean") return;
-          items.push(inner);
-        },
-      );
-    }
-  });
   return (
     <Card>
-      <XStack gap={tokens.spacing[3]} flexWrap="wrap">
-        {items.map((item, index) =>
-          isValidElement(item) ? (
-            cloneElement(item as ReactElement<{ flex?: number; minWidth?: string }>, {
-              flex: 1,
-              minWidth: "40%",
-              key:
-                (item as ReactElement).key != null ? (item as ReactElement).key : `button-${index}`,
-            })
-          ) : (
-            <Fragment key={`button-${index}`}>{item}</Fragment>
-          ),
-        )}
-      </XStack>
+      <EqualButtonRow>{buttons}</EqualButtonRow>
     </Card>
   );
 }
@@ -363,35 +334,12 @@ function InstructionsSection({ instructions }: { instructions: PublicRecipePageI
 }
 
 // ---------------------------------------------------------------------------
-// The whole-screen message state (notFound / unavailable): a
-// centered card carrying a heading and one explanatory line on
-// the surface-filled shell — the state the page shows when there
-// is no content to render. Composed in-file from the shell stack,
-// Card and Text; the copy is the state's own constants above.
+// The whole-screen message states (notFound / unavailable)
+// render the shared MessageCard directly: the surface-filled
+// shell, the centered card, and its heading/message treatments
+// are the card's own — the page supplies only the state's two
+// copy constants above.
 // ---------------------------------------------------------------------------
-
-function MessageState({ title, message }: { title: string; message: string }) {
-  return (
-    <YStack
-      flex={1}
-      backgroundColor="$surface"
-      alignItems="center"
-      justifyContent="center"
-      padding="$4"
-    >
-      <Card>
-        <YStack alignItems="center" gap="$2">
-          <Text variant="heading" textAlign="center">
-            {title}
-          </Text>
-          <Text color={tokens.colors.gray.gray6} textAlign="center">
-            {message}
-          </Text>
-        </YStack>
-      </Card>
-    </YStack>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // The page.
@@ -412,11 +360,11 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   }
 
   if (props.state === "notFound") {
-    return <MessageState title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />;
+    return <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />;
   }
 
   if (props.state === "unavailable") {
-    return <MessageState title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />;
+    return <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />;
   }
 
   const { ratings, onViewerRatingChange, renderComments } = props;
