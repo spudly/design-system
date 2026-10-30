@@ -168,9 +168,13 @@ test("the scalar fields' labels are wired to their inputs (web label focus)", ()
   // Stephen's #320 ruling: a field's web label is a real <label>
   // whose htmlFor names the field's id, so clicking the label
   // focuses the input. LabeledField takes the id as `fieldId`;
-  // the field itself carries the matching `id`. The Status and
-  // Tags labels head groups (ButtonRow / Badge row), not inputs,
-  // so they stay unwired.
+  // the field itself carries the matching `id`. Each check is
+  // scoped to its own field's block (the source from one
+  // <LabeledField up to the next), so swapping two fields' ids
+  // fails the swapped pair. The Status and Tags labels head
+  // groups (ButtonRow / Badge row), not inputs, so they stay
+  // unwired.
+  const blocks = form.split("<LabeledField").slice(1);
   const wired = [
     ["Title", "recipe-title"],
     ["Description", "recipe-description"],
@@ -180,11 +184,13 @@ test("the scalar fields' labels are wired to their inputs (web label focus)", ()
     ["Source URL", "recipe-source-url"],
   ];
   for (const [label, id] of wired) {
+    const block = blocks.find((b) => b.includes(`label="${label}"`));
+    assert.ok(block, `${label}'s LabeledField must exist`);
     assert.ok(
-      form.includes(`fieldId="${id}"`),
+      block.includes(`fieldId="${id}"`),
       `${label}'s LabeledField must pass fieldId="${id}"`,
     );
-    assert.ok(form.includes(`id="${id}"`), `${label}'s field must carry id="${id}"`);
+    assert.ok(block.includes(`id="${id}"`), `${label}'s field must carry id="${id}"`);
   }
 });
 
