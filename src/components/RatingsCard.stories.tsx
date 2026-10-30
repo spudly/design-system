@@ -37,15 +37,22 @@ export const NoRatingsYet: Story = {
 };
 
 export const Stale: Story = {
-  render: () => (
-    <YStack maxWidth={430} padding="$4">
-      <RatingsCard
-        ratings={{
-          community: { stars: "★★★★☆", label: "4.6 (9)", hasStaleRatings: true },
-          viewer: { value: 3, isStale: true },
-        }}
-        onViewerRatingChange={() => {}}
-      />
-    </YStack>
-  ),
+  render: () => {
+    const [viewer, setViewer] = useState<number | null>(3);
+    const [viewerIsStale, setViewerIsStale] = useState(true);
+    return (
+      <YStack maxWidth={430} padding="$4">
+        <RatingsCard
+          ratings={{
+            community: { stars: "★★★★☆", label: "4.6 (9)", hasStaleRatings: true },
+            viewer: { value: viewer, isStale: viewerIsStale },
+          }}
+          onViewerRatingChange={(stars) => {
+            setViewer(stars);
+            setViewerIsStale(false);
+          }}
+        />
+      </YStack>
+    );
+  },
 };
