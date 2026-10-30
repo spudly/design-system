@@ -1,7 +1,9 @@
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { ScrollView, YStack, isWeb } from "tamagui";
+import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
+import { dialogRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 export type StepOverlayProps = {
@@ -23,6 +25,15 @@ export type StepOverlayProps = {
   children?: ReactNode;
 };
 
+// The scroll region's content grows to at least the region's
+// own height (#332): the column inside can then keep the
+// vertically centered treatment for short bodies, while a
+// taller column overflows the grown container and scrolls.
+// (The shared ScrollRegion cannot be used here — it exposes
+// no way to grow its content container, and the centered
+// treatment depends on it.)
+const scrollContentContainerStyle = { flexGrow: 1 } as const;
+
 /**
  * A full-screen step-reader overlay (#119): a dark, opaque
  * shell that fills its nearest positioned ancestor (so the
@@ -32,6 +43,24 @@ export type StepOverlayProps = {
  * the body at reading size. The caller's step navigation
  * (progress dots, prev/next) composes below the body as
  * children.
+ *
+ * The column sits in a bounded scroll region (#332): a long
+ * step body on a short viewport scrolls — body and navigation
+ * together — instead of clipping at both ends of a centered
+ * column with the navigation pushed off-screen. Short bodies
+ * keep the vertically centered treatment, and the Done pill is
+ * a sibling of the region, not part of it, so it stays fixed
+ * and reachable at any scroll position.
+ *
+ * The shell manages focus (#332): it carries dialog semantics
+ * (dialogRoleProps — a modal dialog named for its title on
+ * web, view-modal on native) and, on web, moves focus into
+ * itself on mount, so a host that mounts it over still-mounted
+ * interactive content does not leave that content as the
+ * keyboard or screen-reader starting point behind the opaque
+ * shell. The host does not need to unmount or inert the
+ * covered content. The move happens once per mount, never per
+ * step change, so stepping keeps focus where the user put it.
  *
  * The pill is a pressable view with the button semantics
  * routed through the platform translator (#237), and web
@@ -51,6 +80,21 @@ export function StepOverlay({
   onDone,
   children,
 }: StepOverlayProps) {
+  const shellRef = useRef<TamaguiElement>(null);
+
+  // The mount focus move (web): the shell is focusable without
+  // being a tab stop (tabIndex={-1} below), and focus lands on
+  // it once when the overlay mounts. On native there is no DOM
+  // focus to move; dialogRoleProps' view-modal containment is
+  // the native half of the contract.
+  useEffect(() => {
+    if (!isWeb) {
+      return;
+    }
+    const node = shellRef.current as unknown as { focus?: () => void } | null;
+    node?.focus?.();
+  }, []);
+
   // Web keyboard support (the MealPlansPage row pattern): a
   // view carrying a role is made focusable and the activation
   // keys — Enter and Space — invoke the same callback as a
@@ -70,15 +114,53 @@ export function StepOverlay({
   };
   return (
     <YStack
+      ref={shellRef}
       position="absolute"
       top={0}
       left={0}
       right={0}
       bottom={0}
-      justifyContent="center"
       backgroundColor={tokens.colors.gray.gray10}
-      paddingHorizontal="$6"
+      tabIndex={-1}
+      {...dialogRoleProps}
+      {...platformAccessibilityProps({ accessibilityLabel: title })}
     >
+      <ScrollView
+        flex={1}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={scrollContentContainerStyle}
+      >
+        <YStack flex={1} justifyContent="center" paddingHorizontal="$6" paddingVertical="$12">
+          <YStack paddingBlockEnd="$2">
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              letterSpacing={1.4}
+              color="$surface"
+              opacity={0.6}
+              textTransform="uppercase"
+            >
+              {title}
+            </Text>
+          </YStack>
+          <YStack paddingBlockEnd="$4">
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              letterSpacing={1.4}
+              color="$surface"
+              opacity={0.6}
+              textTransform="uppercase"
+            >
+              {stepLabel}
+            </Text>
+          </YStack>
+          <YStack paddingBlockEnd="$8">
+            <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
+              {body}
+            </Text>
+          </YStack>
+          {children}
+        </YStack>
+      </ScrollView>
       <YStack
         position="absolute"
         right={tokens.spacing[6]}
@@ -112,34 +194,6 @@ export function StepOverlay({
           {doneLabel}
         </Text>
       </YStack>
-      <YStack paddingBlockEnd="$2">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          letterSpacing={1.4}
-          color="$surface"
-          opacity={0.6}
-          textTransform="uppercase"
-        >
-          {title}
-        </Text>
-      </YStack>
-      <YStack paddingBlockEnd="$4">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          letterSpacing={1.4}
-          color="$surface"
-          opacity={0.6}
-          textTransform="uppercase"
-        >
-          {stepLabel}
-        </Text>
-      </YStack>
-      <YStack paddingBlockEnd="$8">
-        <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
-          {body}
-        </Text>
-      </YStack>
-      {children}
     </YStack>
   );
 }

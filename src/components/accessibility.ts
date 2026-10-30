@@ -39,6 +39,26 @@ export const listRoleProps = isWeb ? ({ role: "list" } as const) : ({} as const)
 export const listItemRoleProps = isWeb ? ({ role: "listitem" } as const) : ({} as const);
 
 /**
+ * Dialog semantics for a hand-rolled modal shell — a component
+ * that covers its frame and takes interaction over without
+ * Tamagui's Dialog primitive. `dialog` is an ARIA role with no
+ * member in React Native's `accessibilityRole` set, so it goes
+ * through the web `role` prop like the roles above (passing it as
+ * `accessibilityRole` would hit the same Android view-manager
+ * throw). Web gets the ARIA pair — `role="dialog"` with
+ * `aria-modal`, so assistive technology treats the covered
+ * content as inert while the shell is mounted. Native gets
+ * `accessibilityViewIsModal`, the platform's own modal
+ * containment: VoiceOver stays inside the shell while it is
+ * mounted (Android has no equivalent prop; a full-screen shell
+ * there is the only mounted interactive surface in its host's
+ * flow).
+ */
+export const dialogRoleProps = isWeb
+  ? ({ role: "dialog", "aria-modal": true } as const)
+  : ({ accessibilityViewIsModal: true } as const);
+
+/**
  * React Native accessibility props a DS component accepts, plus the
  * ARIA props a caller may already have supplied for the same
  * semantics (the ARIA form wins on web).
