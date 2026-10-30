@@ -113,9 +113,11 @@ test("Button: the toggle form carries `selected` to the frame and the platform p
 test("Button: both forms accept the semantic `grow` layout flag (#119 dedupe)", () => {
   assert.match(button, /grow\?: boolean;/);
   assert.equal(
-    button.split("{...(grow ? { flex: 1 } : null)}").length - 1,
+    button.match(
+      /\{\.\.\.\(grow && rest\.flex === undefined\s+\? \{ flexGrow: 1, flexShrink: 0, flexBasis: "auto", maxWidth: "100%" \}\s+: null\)\}/g,
+    )?.length ?? 0,
     2,
-    "grow applies on both the press form and the href form",
+    "grow applies on both the press form and the href form, with a content-sized basis (flex: 1's zero basis collapses a growing button in a wrapping row on native — PR #314's Start Cooking)",
   );
 });
 

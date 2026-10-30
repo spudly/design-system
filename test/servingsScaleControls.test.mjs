@@ -92,7 +92,12 @@ test("PresetValueSelector renders one non-wrapping row of toggle buttons, preset
     /selected=\{value === option\.value\}/,
     "each preset is a toggle button carrying its selected state",
   );
-  assert.match(selector, /grow/, "the preset buttons flex to equal shares of their row");
+  assert.match(selector, /grow/, "the buttons flex to equal shares of the row");
+  assert.equal(
+    selector.split("flexBasis={0}").length - 1,
+    2,
+    "equal shares need the zero basis on both grow buttons (presets and Custom — Button's grow default is content-sized for wrapping rows)",
+  );
   // #327: the custom slot's share is deliberately wider than a
   // preset's — at the old quarter share (flex 0.25 of the row,
   // level with one preset) the slot was ~68px at the ~430px VR

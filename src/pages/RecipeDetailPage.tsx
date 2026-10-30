@@ -1,21 +1,43 @@
-import { useMemo, useState, type ReactNode } from "react";
-import { TouchableOpacity } from "react-native";
-import { Image, ScrollView, View, XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
+import { useMemo, type ReactNode } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
-import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
+import { ButtonRow } from "../components/ButtonRow.js";
+import { CandidateList } from "../components/CandidateList.js";
+import { CardStack } from "../components/CardStack.js";
+import { Center } from "../components/Center.js";
+import { ListStack } from "../components/ListStack.js";
+import { LoadingGate } from "../components/LoadingGate.js";
+import { LogEntryCard } from "../components/LogEntryCard.js";
+import { MarkableRow } from "../components/MarkableRow.js";
+import {
+  NutritionPanel,
+  type NutritionPanelData,
+  type NutritionPanelRow,
+} from "../components/NutritionPanel.js";
 import { NumberStepper } from "../components/NumberStepper.js";
+import { PanelStack } from "../components/PanelStack.js";
+import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
+import {
+  RatingsCard,
+  type RatingsCardCommunityRating,
+  type RatingsCardRatings,
+  type RatingsCardViewerRating,
+} from "../components/RatingsCard.js";
+import { ScreenShell } from "../components/ScreenShell.js";
+import { ScrollRegion } from "../components/ScrollRegion.js";
+import { SectionHeading } from "../components/SectionHeading.js";
 import { SelectField } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
-import { StarRatingInput } from "../components/StarRatingInput.js";
+import { StatBand } from "../components/StatBand.js";
 import { StatCard } from "../components/StatCard.js";
+import { StatusBadge, type StatusBadgeTone } from "../components/StatusBadge.js";
 import { StatusMessage } from "../components/StatusMessage.js";
+import { StepList } from "../components/StepList.js";
+import { SuggestionPanel } from "../components/SuggestionPanel.js";
+import { TagList } from "../components/TagList.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
-import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
+import { Thumbnail } from "../components/Thumbnail.js";
+import { Toolbar } from "../components/Toolbar.js";
 import { PrintIcon } from "../icons/PrintIcon.js";
 import { ShareIcon } from "../icons/ShareIcon.js";
 
@@ -30,14 +52,12 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  * package or fetches anything.
  *
  * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root — this
- * component imports react-native (TouchableOpacity), and the root
- * entry must stay importable in plain Node.
+ * `@spudly/ui/pages` subpath export, not the package root.
  *
  * Composition mirrors the app's RecipeDetailScreen +
  * RecipeDetailChrome (spudly/eciperay packages/app): a pinned
  * chrome — toolbar (status badge + version picker) — above a
- * single ScrollView holding every section in order (overview,
+ * single ScrollRegion holding every section in order (overview,
  * ingredients, instructions, cook history, nutrition), each under
  * its own heading. The page originally split the sections across
  * a tab layout; #71 replaced the tabs with this single scrollable
@@ -77,15 +97,55 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  * (value in, change out, pending disables it) with the mutation
  * behind the callback — the same shape as RecipesPage's filters.
  *
- * One piece of ephemeral state stays inside the view, mirroring
- * the app component it replaces: the instructions section's
- * active step (the app's InstructionsTab holds it in useState).
- * It is not business state. The version picker is the standard
- * SelectField (#72 — it replaced a custom bottom-sheet widget
- * whose options appeared at the bottom of the screen, unlike
- * every other select in the system); its open/close state is
- * internal to that component, and the data contract is unchanged
- * (version list in, selected id in, change callback out).
+ * Ephemeral state stays inside the view's components, mirroring
+ * the app components they replace: the instructions section's
+ * active step lives in StepList (the app's InstructionsTab holds
+ * it in useState), and the scale row's custom-value editing lives
+ * in PresetValueSelector. Neither is business state. The version
+ * picker is the standard SelectField (#72 — it replaced a custom
+ * bottom-sheet widget whose options appeared at the bottom of the
+ * screen, unlike every other select in the system); its open/close
+ * state is internal to that component, and the data contract is
+ * unchanged (version list in, selected id in, change callback out).
+ *
+ * The #119 de-styling pass (this tranche) rebuilt the page as a
+ * composition of design-system components — ScreenShell + Toolbar
+ * chrome over a ScrollRegion, PanelStack panels, and the widgets
+ * extracted from this page's clusters (RatingsCard, NutritionPanel,
+ * CandidateList, LogEntryCard, StepList, MarkableRow,
+ * PresetValueSelector, SuggestionPanel, SectionHeading, StatusMessage)
+ * — passing data and callbacks only. The widgets the pass first
+ * extracted as this page's local copies shipped as shared
+ * components — the deduped set in the #119 dedupe (#320), the
+ * five this page's clusters still owned (PanelStack, Toolbar,
+ * CandidateList, LogEntryCard, NutritionPanel) in the #119
+ * extraction set (#331) — and the page now composes those; the
+ * chip components the first extraction leaned on were retired
+ * in the dedupe, so the page's chip-shaped actions render as
+ * Buttons. The pass is a refactor, not a redesign; the treatment
+ * normalizations it makes are the design system's canonical ones,
+ * each small and deliberate:
+ * - The description renders through Text's body variant (theme
+ *   foreground ink; it was a fixed gray step).
+ * - The overview Delete and the lifecycle Abandon actions render
+ *   as danger-variant Buttons (they rendered danger7 ink and a
+ *   danger2/danger9 pair).
+ * - The print/share actions take Button's square icon-only md
+ *   target (48px; they were a 48×40 Button with the glyph as a
+ *   child — the glyph now crosses as the button's icon slot, in
+ *   the button's own label ink at its standard glyph size).
+ * - The single-version picker's static text takes the hint
+ *   treatment (it was xs muted text).
+ * - The transient action message renders through StatusMessage,
+ *   mounted unconditionally so its polite live region announces
+ *   the change (#318); the pass first rendered it as a
+ *   conditional static centered line, which never announced.
+ * - Panel block separations are PanelStack's 16px rhythm: the
+ *   servings → scale separation (12px) and the missing-ingredients
+ *   hint's offset (12px) normalize to it, as does the last
+ *   cook-log entry's trailing separation (a per-entry bottom
+ *   padding on top of the panel's own — the panel's padding now
+ *   provides it, as parents own separation in this system).
  *
  * Documented deviations from the app's current rendering, all
  * presentation-only:
@@ -98,9 +158,10 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  * - Stale-rating hints: the app renders an alert icon whose
  *   accessibility label is the hint; the view renders the hint as
  *   visible hint text. The copy moved verbatim from the app's
- *   client constants (STALE_*_RATING_HINT).
+ *   client constants (STALE_*_RATING_HINT, now in RatingsCard).
  * - The hero image frame height (256) is layout geometry with no
- *   step on the DS spacing scale, as in the app.
+ *   step on the DS spacing scale, as in the app — it lives in
+ *   Thumbnail's hero variant.
  * No lineHeight is set anywhere in this file (the #162 rule).
  */
 
@@ -141,28 +202,13 @@ export type RecipeDetailPageLifecycle = {
   candidates: { id: string; label: string }[];
 };
 
-export type RecipeDetailPageCommunityRating = {
-  /** Pre-rendered star string ("★★★★★"), app-formatted from the average. */
-  stars: string;
-  /** App-formatted label ("4.6 (9)"). */
-  label: string;
-  hasStaleRatings?: boolean;
-};
-
-export type RecipeDetailPageViewerRating = {
-  /** The viewer's stars, or null when they have not rated. */
-  value: number | null;
-  isStale?: boolean;
-  /** Rating mutation in flight: the input disables. */
-  isPending?: boolean;
-};
-
-export type RecipeDetailPageRatings = {
-  /** Null renders the "No community ratings yet" line. */
-  community: RecipeDetailPageCommunityRating | null;
-  /** Null (signed out) hides the "Your rating" input entirely. */
-  viewer: RecipeDetailPageViewerRating | null;
-};
+// The ratings view-model lives with RatingsCard (the widget the
+// #119 pass extracted from this page's engagement stack); the
+// page's contract names are aliases, so existing consumers of
+// the page's types are untouched.
+export type RecipeDetailPageCommunityRating = RatingsCardCommunityRating;
+export type RecipeDetailPageViewerRating = RatingsCardViewerRating;
+export type RecipeDetailPageRatings = RatingsCardRatings;
 
 export type RecipeDetailPageOverviewProps = {
   imageUrl?: string | null;
@@ -178,7 +224,7 @@ export type RecipeDetailPageOverviewProps = {
    * an href, not a press callback); the host composes it from
    * the recipe's route. */
   cookingHref: string;
-  /** Row action buttons; each renders only when its callback is
+  /** Row action chips; each renders only when its callback is
    * provided (the pilot's rule — the app computes the
    * can-edit/can-edit-draft conditions and passes the callback
    * only when the action applies). */
@@ -290,35 +336,19 @@ export type RecipeDetailPageHistoryProps = {
   renderCookLogForm?: () => ReactNode;
 };
 
-export type RecipeDetailPageNutritionRow = {
-  label: string;
-  /** App-formatted value with unit ("520 kcal"). */
-  valueLabel: string;
-};
-
-export type RecipeDetailPageNutritionProps =
-  | { state: "loading" }
-  | {
-      state: "unavailable";
-      isRefreshing?: boolean;
-      onEstimatePress?: () => void;
-    }
-  | {
-      state: "ready";
-      rows: RecipeDetailPageNutritionRow[];
-      disclaimer: string;
-      isRefreshing?: boolean;
-      /** Background refetch in flight: Refresh disables alongside
-       * an explicit refresh, as in the app. */
-      isFetching?: boolean;
-      onRefreshPress?: () => void;
-    };
+// The nutrition view-model lives with NutritionPanel (the widget
+// the #119 pass extracted from this page's nutrition section);
+// the page's contract names are aliases, as with the ratings
+// types above.
+export type RecipeDetailPageNutritionRow = NutritionPanelRow;
+export type RecipeDetailPageNutritionProps = NutritionPanelData;
 
 export type RecipeDetailPageReadyProps = {
   state: "ready";
-  /** Recipe status as a plain string; the badge label/tone map
-   * below is DS-owned. Unknown values fall back to "idea", as the
-   * app's status normalizer does. */
+  /** Recipe status as a plain string; the page maps it to the
+   * shared StatusBadge's tone/label below as caller data (the
+   * design system owns no status vocabulary). Unknown values
+   * fall back to "idea", as the app's status normalizer does. */
   status: string;
   versions: RecipeDetailPageVersion[];
   selectedVersionId: string;
@@ -340,10 +370,10 @@ export type RecipeDetailPageProps = { state: "loading" } | RecipeDetailPageReady
 // Status badge map: labels and tones for the app's four statuses
 // (idea → neutral gray, evolving → info blue, perfected → success
 // green, abandoned → danger red, matching the app's badge tints).
-const STATUS_BADGES: Record<
-  string,
-  { label: string; tone: "neutral" | "info" | "success" | "danger" }
-> = {
+// The vocabulary is this page's caller data — the shared
+// StatusBadge takes tone + label and owns only the rendering
+// (Stephen's #119 dedupe ruling: no DS-owned status vocabulary).
+const STATUS_BADGES: Record<string, { label: string; tone: StatusBadgeTone }> = {
   idea: { label: "Idea", tone: "neutral" },
   evolving: { label: "Evolving", tone: "info" },
   perfected: { label: "Perfected", tone: "success" },
@@ -359,25 +389,20 @@ const SCALE_OPTIONS: PresetValueOption[] = [
   { value: "3", label: "3×" },
 ];
 
-// The custom scale chip's resting label (#73): beside the presets,
-// one more chip that turns into a number input when pressed, so any
-// scale beyond the presets (4× and up, or a fraction like 2.5×) is
-// directly enterable. Once a custom value applies, the chip shows
-// that value ("4×") selected instead of this label.
+// The scale selector's custom resting label (#73): beside the
+// presets, one more option that turns into a number input when
+// pressed, so any scale beyond the presets (4× and up, or a
+// fraction like 2.5×) is directly enterable. Once a custom value
+// applies, the option shows that value ("4×") selected instead of
+// this label.
 const CUSTOM_SCALE_LABEL = "Custom";
 
-/** A scale value as the custom chip shows it: the number without
+/** A scale value as the custom option shows it: the number without
  * trailing zeros ("2.50" → "2.5"); non-numeric values pass through. */
 function formatScaleValue(value: string): string {
   const parsed = Number(value);
   return Number.isFinite(parsed) ? String(parsed) : value;
 }
-
-// Stale-rating hint copy, verbatim from the app's client constants.
-const STALE_COMMUNITY_RATING_HINT =
-  "Some community ratings were left on earlier recipe versions and count at half weight in the average.";
-const STALE_VIEWER_RATING_HINT =
-  "Your rating was left on an earlier version of the recipe. Tap a star to update it for the current version.";
 
 const COOK_LOG_EMPTY_MESSAGE =
   "No cooks logged yet. Log a cook here or finish a cooking session to record feedback for this version.";
@@ -385,12 +410,13 @@ const MISSING_INGREDIENTS_HINT =
   "Tap an ingredient to mark it missing and see substitutions below.";
 
 // ---------------------------------------------------------------------------
-// Chrome: status badge + version picker (pinned above the scroll view).
+// Chrome: status badge + version picker (pinned above the scroll
+// region).
 // ---------------------------------------------------------------------------
 
-function StatusBadge({ status }: { status: string }) {
+function RecipeStatusBadge({ status }: { status: string }) {
   const badge = STATUS_BADGES[status] ?? STATUS_BADGES.idea;
-  return <Badge tone={badge?.tone ?? "neutral"}>{badge?.label ?? "Idea"}</Badge>;
+  return <StatusBadge tone={badge?.tone ?? "neutral"} label={badge?.label ?? "Idea"} />;
 }
 
 // The version picker is the standard SelectField (#72): the same
@@ -398,7 +424,8 @@ function StatusBadge({ status }: { status: string }) {
 // bottom-sheet widget took, rendered by the control every other
 // select in the system uses. With at most one version there is
 // nothing to select, so the picker collapses to static text, as
-// before.
+// before. In the toolbar the field grows to fill the bar (its
+// `grow` pattern), so no layout wrapper remains here.
 function VersionPicker({
   versions,
   selectedVersionId,
@@ -415,90 +442,17 @@ function VersionPicker({
   const selected = sorted.find((v) => v.id === selectedVersionId) ?? sorted[0];
 
   if (sorted.length <= 1) {
-    return (
-      <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted">
-        Version {sorted[0]?.versionNumber ?? 1}
-      </Text>
-    );
+    return <Text variant="hint">Version {sorted[0]?.versionNumber ?? 1}</Text>;
   }
 
   return (
-    <View flex={1} minWidth={200}>
-      <SelectField
-        label="Version"
-        value={selected?.id ?? ""}
-        options={sorted.map((version) => ({ value: version.id, label: version.label }))}
-        onValueChange={onSelectVersion}
-      />
-    </View>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Shared panel pieces.
-// ---------------------------------------------------------------------------
-
-/** The overview's neutral action buttons (print/share/edit): a
- * gray-100 fill with a gray-700 label, as in the app. */
-const neutralActionProps = {
-  variant: "secondary",
-  backgroundColor: tokens.colors.gray.gray2,
-  color: tokens.colors.gray.gray8,
-} as const;
-
-/**
- * The print and share buttons render the icons module's PrintIcon /
- * ShareIcon (#187, reworked after #217): the official Feather
- * printer / share-2 glyphs in the button's own ink color (gray8,
- * the neutral buttons' label color) at Feather's fixed 24px
- * geometry — not the "🖨" emoji and "↗" text glyph the page
- * originally used, which render in full color at font-dependent
- * sizes, clashing with the neutral buttons and drifting between
- * platforms.
- * Do not reintroduce text glyphs or hand-drawn icons for these:
- * icons come from src/icons (see that module's header).
- */
-
-/** The lifecycle/sharing outline action look: transparent fill,
- * hairline border, gray label (the app's OutlineActionButton). */
-function OutlineActionButton({
-  label,
-  disabled = false,
-  onPress,
-}: {
-  label: string;
-  disabled?: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Button
-      variant="secondary"
-      size="sm"
-      backgroundColor="transparent"
-      borderWidth={1}
-      borderColor="$borderColor"
-      color={tokens.colors.gray.gray7}
-      disabled={disabled}
-      onPress={onPress}
-    >
-      {label}
-    </Button>
-  );
-}
-
-function EyebrowLabel({ children }: { children: string }) {
-  return (
-    <YStack paddingBlockEnd="$1">
-      <Text
-        fontSize={tokens.typography.fontSize.xs}
-        fontWeight={tokens.typography.fontWeight.medium}
-        letterSpacing={0.3}
-        color={tokens.colors.gray.gray6}
-        textTransform="uppercase"
-      >
-        {children}
-      </Text>
-    </YStack>
+    <SelectField
+      label="Version"
+      value={selected?.id ?? ""}
+      options={sorted.map((version) => ({ value: version.id, label: version.label }))}
+      onValueChange={onSelectVersion}
+      grow
+    />
   );
 }
 
@@ -506,6 +460,23 @@ function EyebrowLabel({ children }: { children: string }) {
 // Overview section (the page header).
 // ---------------------------------------------------------------------------
 
+/**
+ * The lifecycle block of the overview: the tweak / status actions
+ * of an editable version, over the activation candidates. Both
+ * blocks are design-system compositions (a ButtonRow of Buttons,
+ * a CandidateList); their separation — and theirs from the blocks
+ * around them — is the overview PanelStack's gap. The actions
+ * were chips in the page's first extraction; the #119 dedupe
+ * retired the chip components (buttons everywhere), so they
+ * render as small Buttons — "Mark perfected" in the neutral
+ * secondary form, as Button carries no success variant.
+ *
+ * The tweak controls split on the #248 ruling: "Tweak with AI"
+ * navigates, so it is the primary button's href form; "Tweak
+ * manually" is exempt — its primary job is the mutation (create
+ * the draft, then open the editor), so it stays a callback and
+ * the host does not pre-create drafts.
+ */
 function LifecycleSection({
   lifecycle,
   onTweakManuallyPress,
@@ -524,24 +495,19 @@ function LifecycleSection({
   return (
     <>
       {lifecycle.isEditable ? (
-        <XStack paddingBlockEnd="$4" flexWrap="wrap" gap="$2">
+        <ButtonRow>
           {onTweakManuallyPress ? (
-            <OutlineActionButton
-              label="Tweak manually"
+            <Button
+              variant="secondary"
+              size="sm"
               disabled={lifecycle.isTweakPending ?? false}
               onPress={onTweakManuallyPress}
-            />
+            >
+              Tweak manually
+            </Button>
           ) : null}
           {tweakAiHref ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              borderWidth={1}
-              borderColor="$primary"
-              backgroundColor="$primarySubtle"
-              color="$primaryEmphasis"
-              href={tweakAiHref}
-            >
+            <Button variant="primary" size="sm" href={tweakAiHref}>
               Tweak with AI
             </Button>
           ) : null}
@@ -549,8 +515,6 @@ function LifecycleSection({
             <Button
               variant="secondary"
               size="sm"
-              backgroundColor={tokens.colors.success.success2}
-              color={tokens.colors.success.success9}
               disabled={lifecycle.isStatusChangePending ?? false}
               onPress={onMarkPerfectedPress}
             >
@@ -559,153 +523,25 @@ function LifecycleSection({
           ) : null}
           {onAbandonPress ? (
             <Button
-              variant="secondary"
+              variant="danger"
               size="sm"
-              backgroundColor={tokens.colors.danger.danger2}
-              color={tokens.colors.danger.danger9}
               disabled={lifecycle.isStatusChangePending ?? false}
               onPress={onAbandonPress}
             >
               Abandon
             </Button>
           ) : null}
-        </XStack>
+        </ButtonRow>
       ) : null}
       {lifecycle.candidates.length > 0 ? (
-        <YStack paddingBlockEnd="$4" gap="$2">
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.medium}
-            color={tokens.colors.gray.gray10}
-          >
-            Ready to activate
-          </Text>
-          {lifecycle.candidates.map((version) => (
-            <YStack
-              key={version.id}
-              borderRadius={tokens.radii.md}
-              borderWidth={1}
-              borderColor={tokens.colors.terracotta.terracotta3}
-              backgroundColor="$primarySubtle"
-              padding="$3"
-            >
-              <YStack paddingBlockEnd="$2">
-                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
-                  {version.label}
-                </Text>
-              </YStack>
-              {onActivateCandidatePress ? (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  alignSelf="flex-start"
-                  disabled={lifecycle.isActivationPending ?? false}
-                  onPress={() => {
-                    onActivateCandidatePress(version.id);
-                  }}
-                >
-                  Activate
-                </Button>
-              ) : null}
-            </YStack>
-          ))}
-        </YStack>
+        <CandidateList
+          title="Ready to activate"
+          candidates={lifecycle.candidates}
+          isActivationPending={lifecycle.isActivationPending ?? false}
+          {...(onActivateCandidatePress ? { onActivatePress: onActivateCandidatePress } : {})}
+        />
       ) : null}
     </>
-  );
-}
-
-/** The viewer's star input with the app adapter's semantics
- * preserved: pressing the current star clears the rating (null),
- * and a pending rating disables the input behind a
- * non-interactive wrapper. */
-function ViewerRatingInput({
-  value,
-  isPending = false,
-  onChange,
-}: {
-  value: number | null;
-  isPending?: boolean;
-  onChange: ((stars: number | null) => void) | undefined;
-}) {
-  const interactive = !isPending && onChange !== undefined;
-  return (
-    <View
-      pointerEvents={interactive ? "auto" : "none"}
-      opacity={isPending ? 0.5 : undefined}
-      {...platformAccessibilityProps({ accessibilityState: { disabled: isPending } })}
-    >
-      <StarRatingInput
-        value={value ?? 0}
-        onChange={(star) => {
-          if (!isPending && onChange) {
-            onChange(value === star ? null : star);
-          }
-        }}
-      />
-    </View>
-  );
-}
-
-function RatingsCard({
-  ratings,
-  onViewerRatingChange,
-}: {
-  ratings: RecipeDetailPageRatings;
-  onViewerRatingChange: ((stars: number | null) => void) | undefined;
-}) {
-  return (
-    <YStack paddingBlockEnd="$4">
-      <Card variant="muted">
-        <EyebrowLabel>Community rating</EyebrowLabel>
-        {ratings.community ? (
-          <>
-            <XStack paddingBlockEnd="$3" alignItems="center" gap="$2">
-              <Text color={tokens.colors.warning.warning5}>{ratings.community.stars}</Text>
-              <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
-                {ratings.community.label}
-              </Text>
-            </XStack>
-            {ratings.community.hasStaleRatings ? (
-              <YStack paddingBlockEnd="$3">
-                <Text
-                  fontSize={tokens.typography.fontSize.xs}
-                  color={tokens.colors.warning.warning9}
-                >
-                  {STALE_COMMUNITY_RATING_HINT}
-                </Text>
-              </YStack>
-            ) : null}
-          </>
-        ) : (
-          <YStack paddingBlockEnd="$3">
-            <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
-              No community ratings yet
-            </Text>
-          </YStack>
-        )}
-        {ratings.viewer ? (
-          <>
-            <EyebrowLabel>Your rating</EyebrowLabel>
-            <ViewerRatingInput
-              value={ratings.viewer.value}
-              isPending={ratings.viewer.isPending ?? false}
-              onChange={onViewerRatingChange}
-            />
-            {ratings.viewer.isStale ? (
-              <YStack paddingBlockStart="$2">
-                <Text
-                  fontSize={tokens.typography.fontSize.xs}
-                  color={tokens.colors.warning.warning9}
-                >
-                  {STALE_VIEWER_RATING_HINT}
-                </Text>
-              </YStack>
-            ) : null}
-          </>
-        ) : null}
-      </Card>
-    </YStack>
   );
 }
 
@@ -738,6 +574,14 @@ function OverviewPanel({
     renderComments,
   } = overview;
 
+  // The print and share buttons carry the icons module's PrintIcon /
+  // ShareIcon (#187, reworked after #217) through Button's icon
+  // slot: the official Feather printer / share-2 glyphs, inked in
+  // the button's label color at its standard glyph size — not the
+  // "🖨" emoji and "↗" text glyph the page originally used, which
+  // render in full color at font-dependent sizes. Do not
+  // reintroduce text glyphs or hand-drawn icons for these: icons
+  // come from src/icons (see that module's header).
   const showLifecycle =
     lifecycle !== undefined &&
     lifecycle !== null &&
@@ -746,153 +590,85 @@ function OverviewPanel({
   const comments = renderComments ? renderComments() : null;
 
   return (
-    <>
-      <YStack padding="$4">
-        {imageUrl ? (
-          <YStack paddingBlockEnd="$4">
-            <YStack
-              overflow="hidden"
-              borderRadius={tokens.radii.lg}
-              backgroundColor={tokens.colors.gray.gray1}
-              height={256}
-              width="100%"
-            >
-              <Image src={imageUrl} width="100%" height="100%" objectFit="contain" />
-            </YStack>
-          </YStack>
-        ) : null}
-        <YStack paddingBlockEnd="$2">
-          <Text
-            fontSize={tokens.typography.fontSize["2xl"]}
-            fontWeight={tokens.typography.fontWeight.bold}
-            color={tokens.colors.gray.gray10}
-          >
-            {title}
-          </Text>
-        </YStack>
-        <YStack paddingBlockEnd="$4" alignSelf="flex-start">
-          <StatusBadge status={status} />
-        </YStack>
-        {description ? (
-          <YStack paddingBlockEnd="$4">
-            <Text color={tokens.colors.gray.gray7}>{description}</Text>
-          </YStack>
-        ) : null}
-        <YStack paddingBlockEnd="$4">
-          <XStack
-            justifyContent="space-around"
-            backgroundColor={tokens.colors.gray.gray1}
-            borderRadius={tokens.radii.lg}
-            paddingVertical="$4"
-          >
-            <StatCard label="Servings" value={servingsLabel} />
-            {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
-            {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
-          </XStack>
-        </YStack>
-        <XStack paddingBlockEnd="$4" flexWrap="wrap" gap="$3">
-          <Button variant="primary" flex={1} minWidth="40%" href={cookingHref}>
-            Start Cooking
-          </Button>
-          {onPrintPress ? (
-            <Button
-              {...neutralActionProps}
-              width="$12"
-              paddingHorizontal={0}
-              onPress={onPrintPress}
-              accessibilityLabel="Print recipe"
-            >
-              <PrintIcon color={tokens.colors.gray.gray8} />
-            </Button>
-          ) : null}
-          {onSharePress ? (
-            <Button
-              {...neutralActionProps}
-              width="$12"
-              paddingHorizontal={0}
-              onPress={onSharePress}
-              accessibilityLabel="Share recipe"
-            >
-              <ShareIcon color={tokens.colors.gray.gray8} />
-            </Button>
-          ) : null}
-          {editHref ? (
-            <Button {...neutralActionProps} href={editHref}>
-              Edit
-            </Button>
-          ) : null}
-          {editDraftHref ? (
-            <Button {...neutralActionProps} href={editDraftHref}>
-              Edit draft
-            </Button>
-          ) : null}
-          {onDeletePress ? (
-            <Button
-              variant="secondary"
-              backgroundColor={tokens.colors.danger.danger1}
-              color={tokens.colors.danger.danger7}
-              onPress={onDeletePress}
-            >
-              Delete
-            </Button>
-          ) : null}
-        </XStack>
-        {/* StatusMessage renders unconditionally (#318): its polite
-            live region must be mounted before the message changes
-            for the change to announce, so the old conditional block
-            (accessibilityRole="text", gray7 ink) is gone — the
-            component renders its empty region when there is no
-            message. */}
-        <StatusMessage message={actionMessage} />
-        {showLifecycle && lifecycle ? (
-          <LifecycleSection
-            lifecycle={lifecycle}
-            onTweakManuallyPress={overview.onTweakManuallyPress}
-            tweakAiHref={overview.tweakAiHref}
-            onMarkPerfectedPress={overview.onMarkPerfectedPress}
-            onAbandonPress={overview.onAbandonPress}
-            onActivateCandidatePress={overview.onActivateCandidatePress}
+    <PanelStack>
+      {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
+      <CardStack>
+        <Text variant="formTitle">{title}</Text>
+        <RecipeStatusBadge status={status} />
+      </CardStack>
+      {description ? <Text variant="body">{description}</Text> : null}
+      <StatBand>
+        <StatCard label="Servings" value={servingsLabel} />
+        {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
+        {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
+      </StatBand>
+      <ButtonRow>
+        <Button variant="primary" grow href={cookingHref}>
+          Start Cooking
+        </Button>
+        {onPrintPress ? (
+          <Button
+            variant="secondary"
+            size="md"
+            icon={PrintIcon}
+            accessibilityLabel="Print recipe"
+            onPress={onPrintPress}
           />
         ) : null}
-        {sharingControls}
-        {tags.length > 0 ? (
-          <XStack flexWrap="wrap" gap="$2">
-            {tags.map((tag) => (
-              <Badge key={tag.id} color={tag.color}>
-                {tag.name}
-              </Badge>
-            ))}
-          </XStack>
+        {onSharePress ? (
+          <Button
+            variant="secondary"
+            size="md"
+            icon={ShareIcon}
+            accessibilityLabel="Share recipe"
+            onPress={onSharePress}
+          />
         ) : null}
-      </YStack>
-      {ratings || comments ? (
-        <YStack paddingHorizontal="$4" paddingBlockEnd="$4">
-          {ratings ? (
-            <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
-          ) : null}
-          {comments}
-        </YStack>
+        {editHref ? (
+          <Button variant="secondary" size="sm" href={editHref}>
+            Edit
+          </Button>
+        ) : null}
+        {editDraftHref ? (
+          <Button variant="secondary" size="sm" href={editDraftHref}>
+            Edit draft
+          </Button>
+        ) : null}
+        {onDeletePress ? (
+          <Button variant="danger" size="sm" onPress={onDeletePress}>
+            Delete
+          </Button>
+        ) : null}
+      </ButtonRow>
+      {/* StatusMessage renders unconditionally (#318): its polite
+          live region must be mounted before the message changes
+          for the change to announce, so there is no conditional
+          block here — the component renders its empty region when
+          there is no message. */}
+      <StatusMessage message={actionMessage} />
+      {showLifecycle && lifecycle ? (
+        <LifecycleSection
+          lifecycle={lifecycle}
+          onTweakManuallyPress={overview.onTweakManuallyPress}
+          tweakAiHref={overview.tweakAiHref}
+          onMarkPerfectedPress={overview.onMarkPerfectedPress}
+          onAbandonPress={overview.onAbandonPress}
+          onActivateCandidatePress={overview.onActivateCandidatePress}
+        />
       ) : null}
-    </>
+      {sharingControls}
+      {tags.length > 0 ? <TagList tags={tags} /> : null}
+      {ratings ? (
+        <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
+      ) : null}
+      {comments}
+    </PanelStack>
   );
 }
 
 // ---------------------------------------------------------------------------
 // Ingredients section.
 // ---------------------------------------------------------------------------
-
-// Pressable row geometry (plain objects, as in the app's
-// IngredientsTab): rows are RN TouchableOpacity so taps register
-// without a form control; visual values come from DS tokens.
-const ingredientRowStyle = {
-  flexDirection: "row",
-  alignItems: "center",
-  borderBottomWidth: 1,
-  borderColor: tokens.colors.gray.gray2,
-  paddingVertical: tokens.spacing[3],
-} as const;
-
-const ingredientRowMissingStyle = { opacity: 0.4 } as const;
 
 function IngredientsPanel({
   ingredients: view,
@@ -901,149 +677,91 @@ function IngredientsPanel({
 }) {
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
   return (
-    <YStack padding="$4">
-      {/* Servings + scale controls (#73): one compact block, two fixed
-          rows, and every value directly enterable — stepping is no
-          longer the only way to reach a large batch. Servings is an
-          inline editable stepper (label beside the stepper, the
-          value a number input in a fixed-width box); Scale is
+    <PanelStack>
+      <SectionHeading>Ingredients</SectionHeading>
+      {/* Servings + scale controls (#73): one compact block, two
+          fixed rows, and every value directly enterable — stepping
+          is no longer the only way to reach a large batch. Servings
+          is an inline editable stepper (label beside the stepper,
+          the value a number input in a fixed-width box); Scale is
           the PresetValueSelector — a single non-wrapping row of
-          equal-width preset buttons plus a Custom button that
+          equal-width preset buttons plus a Custom option that
           turns into a number input when pressed and afterwards
-          shows the applied custom value selected.
-          Same props contract as before — the app wiring is
-          untouched. */}
-      <YStack gap="$3" paddingBlockEnd="$4">
-        <NumberStepper
-          label="Servings"
-          layout="inline"
-          value={view.servings}
-          min={1}
-          onChange={view.onServingsChange}
-          editable
-        />
-        <PresetValueSelector
-          label="Scale"
-          options={SCALE_OPTIONS}
-          value={view.scaleValue}
-          onChange={view.onScaleChange}
-          customLabel={CUSTOM_SCALE_LABEL}
-          customAccessibilityLabel="Custom scale"
-          formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
-        />
-      </YStack>
-      {view.ingredients.map((ingredient) => (
-        <TouchableOpacity
-          key={ingredient.id}
-          style={[ingredientRowStyle, ingredient.isMissing ? ingredientRowMissingStyle : undefined]}
-          onPress={() => {
-            view.onIngredientPress?.(ingredient.id);
-          }}
-        >
-          <Text flex={1}>{ingredient.label}</Text>
-          {ingredient.isOptional ? (
-            <YStack paddingInlineStart="$2">
-              <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted">
-                optional
-              </Text>
-            </YStack>
-          ) : null}
-        </TouchableOpacity>
-      ))}
-      {hasMissing ? (
-        <YStack paddingBlockStart="$3">
-          <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text>
-        </YStack>
-      ) : null}
-      {view.isLoadingSubstitutions ? (
-        <YStack paddingBlockStart="$4">
-          <Text variant="hint">Finding substitutions…</Text>
-        </YStack>
-      ) : null}
+          shows the applied custom value selected (the selector
+          owns that editing state). Same props contract as before —
+          the app wiring is untouched. */}
+      <NumberStepper
+        label="Servings"
+        layout="inline"
+        value={view.servings}
+        min={1}
+        onChange={view.onServingsChange}
+        editable
+      />
+      <PresetValueSelector
+        label="Scale"
+        options={SCALE_OPTIONS}
+        value={view.scaleValue}
+        onChange={view.onScaleChange}
+        customLabel={CUSTOM_SCALE_LABEL}
+        customAccessibilityLabel="Custom scale"
+        formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
+      />
+      <ListStack>
+        {view.ingredients.map((ingredient) => (
+          <MarkableRow
+            key={ingredient.id}
+            label={ingredient.label}
+            isMarked={ingredient.isMissing ?? false}
+            {...(ingredient.isOptional ? { trailingNote: "optional" } : {})}
+            {...(view.onIngredientPress
+              ? {
+                  onPress: () => {
+                    view.onIngredientPress?.(ingredient.id);
+                  },
+                }
+              : {})}
+          />
+        ))}
+      </ListStack>
+      {hasMissing ? <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text> : null}
+      {view.isLoadingSubstitutions ? <Text variant="hint">Finding substitutions…</Text> : null}
       {view.substitutions && view.substitutions.length > 0 ? (
-        <YStack paddingBlockStart="$4">
-          <YStack borderRadius={tokens.radii.lg} backgroundColor="$primarySubtle" padding="$4">
-            <YStack paddingBlockEnd="$2">
-              <Text
-                fontSize={tokens.typography.fontSize.sm}
-                fontWeight={tokens.typography.fontWeight.semibold}
-                color="$primaryEmphasis"
-              >
-                Substitutions
-              </Text>
-            </YStack>
-            {view.substitutions.map((sub) => (
-              <YStack key={sub.ingredient} paddingBlockEnd="$2">
-                <Text
-                  fontSize={tokens.typography.fontSize.sm}
-                  fontWeight={tokens.typography.fontWeight.medium}
-                >
-                  {sub.ingredient}
-                </Text>
-                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
-                  {sub.suggestions}
-                </Text>
-              </YStack>
-            ))}
-          </YStack>
-        </YStack>
+        <SuggestionPanel
+          title="Substitutions"
+          entries={view.substitutions.map((sub) => ({
+            id: sub.ingredient,
+            label: sub.ingredient,
+            detail: sub.suggestions,
+          }))}
+        />
       ) : null}
-    </YStack>
+    </PanelStack>
   );
 }
 
 // ---------------------------------------------------------------------------
 // Instructions section. The active step is ephemeral view state,
-// held here exactly as the app's tab held it (useState, first step
-// active by default).
+// held by StepList exactly as the app's tab held it (useState,
+// first step active by default).
 // ---------------------------------------------------------------------------
 
 function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageInstruction[] }) {
-  const [activeIndex, setActiveIndex] = useState(0);
   const sorted = useMemo(
     () => [...instructions].sort((a, b) => a.stepNumber - b.stepNumber),
     [instructions],
   );
   return (
-    <YStack padding="$4">
-      {sorted.map((step, i) => {
-        const isActive = i === activeIndex;
-        return (
-          <TouchableOpacity
-            key={step.id}
-            onPress={() => {
-              setActiveIndex(i);
-            }}
-          >
-            <YStack paddingBlockEnd="$3">
-              <YStack
-                borderRadius={tokens.radii.lg}
-                borderWidth={1}
-                padding="$4"
-                borderColor={isActive ? "$primary" : tokens.colors.gray.gray2}
-                backgroundColor={isActive ? "$primarySubtle" : "$surface"}
-              >
-                <YStack paddingBlockEnd="$1">
-                  <Text
-                    fontSize={tokens.typography.fontSize.xs}
-                    fontWeight={tokens.typography.fontWeight.semibold}
-                    color={isActive ? "$primary" : "$textMuted"}
-                  >
-                    Step {step.stepNumber}
-                  </Text>
-                </YStack>
-                <Text
-                  fontSize={tokens.typography.fontSize.md}
-                  {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
-                >
-                  {step.body}
-                </Text>
-              </YStack>
-            </YStack>
-          </TouchableOpacity>
-        );
-      })}
-    </YStack>
+    <PanelStack>
+      <SectionHeading>Instructions</SectionHeading>
+      <StepList
+        steps={sorted.map((step) => ({
+          id: step.id,
+          label: `Step ${step.stepNumber}`,
+          body: step.body,
+        }))}
+      />
+    </PanelStack>
   );
 }
 
@@ -1054,9 +772,12 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
 function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
   if (history.isLoading) {
     return (
-      <YStack alignItems="center" justifyContent="center" padding="$4">
-        <Spinner label="Loading cook history" />
-      </YStack>
+      <PanelStack>
+        <SectionHeading>Cook History</SectionHeading>
+        <Center vertical={false}>
+          <Spinner label="Loading cook history" />
+        </Center>
+      </PanelStack>
     );
   }
 
@@ -1064,167 +785,38 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
   const form = history.renderCookLogForm ? history.renderCookLogForm() : null;
 
   return (
-    <YStack padding="$4">
+    <PanelStack>
+      <SectionHeading>Cook History</SectionHeading>
       {form !== null && form !== undefined ? (
-        <YStack paddingBlockEnd="$4">{form}</YStack>
+        form
       ) : history.onLogCookPress ? (
-        <YStack paddingBlockEnd="$4" alignSelf="flex-start">
+        <ButtonRow>
           <Button variant="primary" size="sm" onPress={history.onLogCookPress}>
             Log a cook
           </Button>
-        </YStack>
+        </ButtonRow>
       ) : null}
       {history.cookLogs.length === 0 ? (
         <Text variant="hint">{COOK_LOG_EMPTY_MESSAGE}</Text>
       ) : (
         history.cookLogs.map((log, index) => (
-          <YStack key={log.id} paddingBlockEnd="$4">
-            <YStack
-              borderRadius={tokens.radii.md}
-              borderWidth={1}
-              borderColor={tokens.colors.gray.gray2}
-              backgroundColor={tokens.colors.gray.gray1}
-              padding="$4"
-            >
-              <XStack
-                paddingBlockEnd="$1"
-                alignItems="center"
-                justifyContent="space-between"
-                gap="$2"
-              >
-                <Text
-                  fontSize={tokens.typography.fontSize.sm}
-                  fontWeight={tokens.typography.fontWeight.medium}
-                  color={tokens.colors.gray.gray10}
-                >
-                  {log.dateLabel}
-                </Text>
-                {log.starRating ? (
-                  <Text
-                    accessibilityLabel={`${log.starRating} stars`}
-                    color={tokens.colors.gray.gray10}
-                  >
-                    {"★".repeat(log.starRating)}
-                  </Text>
-                ) : null}
-              </XStack>
-              {log.notes ? (
-                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
-                  {log.notes}
-                </Text>
-              ) : null}
-              {history.onDeleteCookLogPress ? (
-                <XStack paddingBlockStart="$2">
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    backgroundColor={tokens.colors.danger.danger1}
-                    color={tokens.colors.danger.danger8}
-                    accessibilityLabel={`Delete cook log ${index + 1} from ${log.dateLabel}`}
-                    onPress={() => {
-                      history.onDeleteCookLogPress?.(log.id);
-                    }}
-                  >
-                    Delete
-                  </Button>
-                </XStack>
-              ) : null}
-            </YStack>
-          </YStack>
+          <LogEntryCard
+            key={log.id}
+            dateLabel={log.dateLabel}
+            {...(log.starRating ? { starRating: log.starRating } : {})}
+            {...(log.notes ? { notes: log.notes } : {})}
+            {...(history.onDeleteCookLogPress
+              ? {
+                  onDeletePress: () => {
+                    history.onDeleteCookLogPress?.(log.id);
+                  },
+                  deleteAccessibilityLabel: `Delete cook log ${index + 1} from ${log.dateLabel}`,
+                }
+              : {})}
+          />
         ))
       )}
-    </YStack>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Nutrition section.
-// ---------------------------------------------------------------------------
-
-function NutritionRow({ label, valueLabel }: RecipeDetailPageNutritionRow) {
-  return (
-    <XStack
-      justifyContent="space-between"
-      borderBottomWidth={1}
-      borderBottomColor={tokens.colors.gray.gray2}
-      paddingVertical="$3"
-    >
-      <Text fontSize={tokens.typography.fontSize.md} color={tokens.colors.gray.gray8}>
-        {label}
-      </Text>
-      <Text
-        fontSize={tokens.typography.fontSize.md}
-        fontWeight={tokens.typography.fontWeight.semibold}
-        color={tokens.colors.gray.gray10}
-      >
-        {valueLabel}
-      </Text>
-    </XStack>
-  );
-}
-
-function NutritionPanel({ nutrition }: { nutrition: RecipeDetailPageNutritionProps }) {
-  if (nutrition.state === "loading") {
-    return (
-      <Text color="$textMuted" padding="$4">
-        Estimating nutrition…
-      </Text>
-    );
-  }
-  if (nutrition.state === "unavailable") {
-    return (
-      <YStack padding="$4">
-        <YStack paddingBlockEnd="$3">
-          <Text color="$textMuted">Nutrition is not available yet.</Text>
-        </YStack>
-        {nutrition.onEstimatePress ? (
-          <Button
-            variant="secondary"
-            backgroundColor={tokens.colors.gray.gray10}
-            color={tokens.colors.gray.gray1}
-            disabled={nutrition.isRefreshing ?? false}
-            onPress={nutrition.onEstimatePress}
-          >
-            {nutrition.isRefreshing ? "Refreshing…" : "Estimate nutrition"}
-          </Button>
-        ) : null}
-      </YStack>
-    );
-  }
-  return (
-    <YStack padding="$4">
-      <XStack paddingBlockEnd="$3" alignItems="center" justifyContent="space-between" gap="$3">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          fontWeight={tokens.typography.fontWeight.semibold}
-          letterSpacing={0.35}
-          color={tokens.colors.gray.gray6}
-          textTransform="uppercase"
-        >
-          Per Serving
-        </Text>
-        {nutrition.onRefreshPress ? (
-          <Button
-            variant="secondary"
-            size="sm"
-            backgroundColor={tokens.colors.gray.gray2}
-            color={tokens.colors.gray.gray9}
-            disabled={(nutrition.isRefreshing ?? false) || (nutrition.isFetching ?? false)}
-            onPress={nutrition.onRefreshPress}
-          >
-            {nutrition.isRefreshing ? "Refreshing…" : "Refresh"}
-          </Button>
-        ) : null}
-      </XStack>
-      {nutrition.rows.map((row) => (
-        <NutritionRow key={row.label} label={row.label} valueLabel={row.valueLabel} />
-      ))}
-      <YStack paddingBlockStart="$4">
-        <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted">
-          {nutrition.disclaimer}
-        </Text>
-      </YStack>
-    </YStack>
+    </PanelStack>
   );
 }
 
@@ -1232,71 +824,45 @@ function NutritionPanel({ nutrition }: { nutrition: RecipeDetailPageNutritionPro
 // The page.
 // ---------------------------------------------------------------------------
 
-/** A section's heading on the single scrollable page (#71): the
- * sections after the overview header are found by scanning, so
- * each carries its label — the labels the tab bar used to show. */
-function SectionHeading({ children }: { children: string }) {
-  return (
-    <YStack paddingBlockStart="$2">
-      <Text
-        paddingHorizontal="$4"
-        fontSize={tokens.typography.fontSize.lg}
-        fontWeight={tokens.typography.fontWeight.semibold}
-        color={tokens.colors.gray.gray10}
-      >
-        {children}
-      </Text>
-    </YStack>
-  );
-}
-
 /**
  * Full-page recipe detail view: pinned chrome (status + version
- * toolbar) over all five sections in a single scroll view (#71 —
+ * toolbar) over all five sections in a single scroll region (#71 —
  * no tabs; the sections render in the order the tabs had).
  * Controlled — see the file header for the contract, the slot
  * design, and the layout decisions.
  */
 export function RecipeDetailPage(props: RecipeDetailPageProps) {
   if (props.state === "loading") {
-    return (
-      <YStack flex={1} backgroundColor="$surface" alignItems="center" justifyContent="center">
-        <Spinner label="Loading recipe" />
-      </YStack>
-    );
+    return <LoadingGate label="Loading recipe" />;
   }
 
   const { status, versions, selectedVersionId, onSelectVersion } = props;
 
   return (
-    <YStack flex={1} backgroundColor="$surface">
-      <XStack
-        flexWrap="wrap"
-        alignItems="center"
-        gap="$2"
-        borderBottomWidth={1}
-        borderColor={tokens.colors.gray.gray2}
-        paddingHorizontal="$4"
-        paddingVertical="$3"
-      >
-        <StatusBadge status={status} />
+    <ScreenShell>
+      <Toolbar>
+        <RecipeStatusBadge status={status} />
         <VersionPicker
           versions={versions}
           selectedVersionId={selectedVersionId}
           onSelectVersion={onSelectVersion}
         />
-      </XStack>
-      <ScrollView flex={1} keyboardShouldPersistTaps="handled">
+      </Toolbar>
+      <ScrollRegion>
         <OverviewPanel status={status} overview={props.overview} />
-        <SectionHeading>Ingredients</SectionHeading>
         <IngredientsPanel ingredients={props.ingredients} />
-        <SectionHeading>Instructions</SectionHeading>
         <InstructionsPanel instructions={props.instructions.instructions} />
-        <SectionHeading>Cook History</SectionHeading>
         <HistoryPanel history={props.history} />
-        <SectionHeading>Nutrition</SectionHeading>
-        <NutritionPanel nutrition={props.nutrition} />
-      </ScrollView>
-    </YStack>
+        {/* The section headings render inside their panels as the
+            PanelStack's first block (the canonical SectionHeading
+            carries no padding of its own — the panel's inset is
+            the heading's). NutritionPanel is a bare widget, so its
+            section stack is composed here. */}
+        <PanelStack>
+          <SectionHeading>Nutrition</SectionHeading>
+          <NutritionPanel nutrition={props.nutrition} />
+        </PanelStack>
+      </ScrollRegion>
+    </ScreenShell>
   );
 }

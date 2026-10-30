@@ -160,12 +160,12 @@ type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" |
    */
   selected?: boolean;
   /**
-   * Grow to fill the row's remaining width (flex: 1): the
-   * primary action in an action row claims the space the row's
-   * other actions leave — the way SearchField's `grow` lets a
-   * field take its row's remaining width. A layout semantic,
-   * not a style value: the row still owns the button's size
-   * and separation.
+   * Grow to fill the row's remaining width (flexGrow with a
+   * content-sized basis): the primary action in an action row
+   * claims the space the row's other actions leave — the way
+   * SearchField's `grow` lets a field take its row's remaining
+   * width. A layout semantic, not a style value: the row still
+   * owns the button's size and separation.
    */
   grow?: boolean;
   /**
@@ -495,9 +495,30 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         // (see Text, #69). A caller-passed `fontFamily` in `rest`
         // still wins.
         fontFamily="body"
-        // `grow` claims the row's remaining width; a caller-passed
-        // flex in `rest` still wins over it.
-        {...(grow ? { flex: 1 } : null)}
+        // `grow` claims the row's remaining width — but only when
+        // the caller has not set `flex` themselves: an explicit
+        // `flex` shorthand and these longhands can coexist on the
+        // frame, and spread order alone does not settle which one
+        // native layout honors, so a caller-passed flex displaces
+        // grow entirely (CodeRabbit finding on PR #314). The basis
+        // stays content-sized ("auto"), never `flex: 1`'s zero
+        // basis: in a wrapping row (ButtonRow), line-breaking
+        // measures a zero-basis button at ~0 and on native its
+        // grown width can collapse below the label's content width
+        // — the label then wraps a character at a time (seen in
+        // RecipeDetailPage's Start Cooking link, PR #314's VR
+        // baselines). A content-sized basis makes line-breaking
+        // account for the label, flexGrow claims the line's
+        // remaining width, and flexShrink 0 stops the wrap/shrink
+        // pass from compressing the button below its content (the
+        // strip above is what shrink 1 produced even with the
+        // basis fixed). maxWidth caps the grown frame at the row's
+        // width, so with shrink off an over-wide label wraps inside
+        // the frame instead of overflowing the row (CodeRabbit
+        // finding on PR #314).
+        {...(grow && rest.flex === undefined
+          ? { flexGrow: 1, flexShrink: 0, flexBasis: "auto", maxWidth: "100%" }
+          : null)}
         // `rest` is read through the widened render shape (its
         // fields are the button frame's); call sites are typed by
         // ButtonLinkProps, so what actually arrives is the link
@@ -579,9 +600,16 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
             justifyContent: "center",
           }
         : null)}
-      // `grow` claims the row's remaining width; a caller-passed
-      // flex in `rest` still wins over it.
-      {...(grow ? { flex: 1 } : null)}
+      // `grow` claims the row's remaining width, under the same
+      // two rules recorded at the link form's spread: a
+      // caller-passed `flex` displaces grow entirely, and the
+      // grown frame is capped at the row's width. The basis stays
+      // content-sized ("auto") for the reason recorded there: a
+      // zero basis collapses the button in a wrapping row on
+      // native.
+      {...(grow && rest.flex === undefined
+        ? { flexGrow: 1, flexShrink: 0, flexBasis: "auto", maxWidth: "100%" }
+        : null)}
       {...rest}
     >
       {IconGlyph ? <IconGlyph size={glyphSize} color={glyphInk} /> : null}

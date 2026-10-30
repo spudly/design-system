@@ -180,6 +180,14 @@ export function PresetValueSelector({
             variant="secondary"
             size="sm"
             grow
+            // Equal shares of a non-wrapping row need a zero
+            // basis: Button's `grow` default is a content-sized
+            // basis (the wrapping-row treatment), so this caller
+            // passes the zero basis and shrink back — a
+            // caller-passed flex wins over `grow` by Button's
+            // contract.
+            flexBasis={0}
+            flexShrink={1}
             selected={value === option.value}
             onPressIn={() => {
               if (isCustomEditing) {
@@ -260,6 +268,8 @@ export function PresetValueSelector({
             variant="secondary"
             size="sm"
             grow
+            flexBasis={0}
+            flexShrink={1}
             selected={isCustomSelected}
             accessibilityLabel={
               isCustomSelected
