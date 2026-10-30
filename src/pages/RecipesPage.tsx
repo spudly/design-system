@@ -1,14 +1,19 @@
 import type { ReactNode } from "react";
+import { Anchor, View, XStack, YStack, isWeb } from "tamagui";
+import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
+import { Card } from "../components/Card.js";
 import {
   CatalogFiltersBar,
   type CatalogFilterDefinition,
 } from "../components/CatalogFiltersBar.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { LinkOverlay } from "../components/linkOverlay.js";
 import { ListLoadingState } from "../components/ListLoadingState.js";
-import { MediaRow } from "../components/MediaRow.js";
-import { RatingStars } from "../components/RatingStars.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import type { SelectOption } from "../components/SelectField.js";
+import { Text } from "../components/Text.js";
+import { Thumbnail } from "../components/Thumbnail.js";
 import { BoundedList } from "./BoundedList.js";
 import { useCatalogPagination } from "./useCatalogPagination.js";
 
@@ -65,9 +70,10 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * (see `RecipesPageItem.rating`) and pressing them fires
  * `onLogCookPress`; an unrated recipe renders a single icon-only
  * button — one unfilled star, no text — firing the same callback.
- * Both states are the RatingStars component's pressable form. There
- * is deliberately no Delete in the list: deleting a recipe lives on
- * RecipeDetailPage (its `onDeletePress` chip).
+ * Both states are the page-local RatingStars composition's
+ * pressable form (bottom of this file). There is deliberately no
+ * Delete in the list: deleting a recipe lives on RecipeDetailPage
+ * (its `onDeletePress` chip).
  *
  * Placement is structural, not cosmetic (Stephen's direction,
  * 2026-10-24, after inspecting PR #120's final narrow baseline):
@@ -80,8 +86,8 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * row's right edge). Inside the text block the control can only
  * wrap within the block's own full width, below the subtitle it
  * follows; the row keeps exactly two flex children — thumbnail
- * and text block. MediaRow owns that geometry now (see its
- * `subtitleAction` slot).
+ * and text block. The page-local MediaRow composition owns
+ * that geometry (see its `subtitleAction` slot).
  *
  * Collapsed filters (#96): the filter bar used to render every
  * filter control at once, and the form filled most of the
@@ -116,15 +122,19 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * label and the `flexBasis: 60` narrow-width row geometry
  * (#205) the shared page's rows lacked.
  *
- * #119: the page applies no styling of its own — it composes
- * design-system components and passes data and callbacks only.
- * The layout it used to hand-style lives in the components it
- * renders: BoundedList (the bounded list, its content inset,
- * the 12px row separation), ListLoadingState (the loading
- * states), CatalogFiltersBar (the shared catalog filter bar —
- * the page supplies its filter definitions as data; the bar
- * owns the control design), and MediaRow / RatingStars (the
- * row and its rating control). DiscoverPage renders the same
+ * #119: the page composes design-system components and passes
+ * data and callbacks only. The layout it used to hand-style
+ * lives in the components it renders: BoundedList (the bounded
+ * list, its content inset, the 12px row separation),
+ * ListLoadingState (the loading states), CatalogFiltersBar
+ * (the shared catalog filter bar — the page supplies its filter
+ * definitions as data; the bar owns the control design). The
+ * row and its rating control are the page-local MediaRow /
+ * RatingStars compositions at the bottom of this file, built
+ * from the shared Card / Thumbnail / Text / LinkOverlay
+ * components: a tranche page adds no library components
+ * (Stephen's rule, 2026-10-29), so single-page compositions
+ * live in the page. DiscoverPage renders the same
  * CatalogFiltersBar with its own definitions.
  */
 
@@ -469,5 +479,311 @@ export function RecipesPage(props: RecipesPageProps) {
         ListFooterComponent={isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined}
       />
     </ScreenContainer>
+  );
+}
+
+/**
+ * Page-local compositions (Stephen's tranche rule, 2026-10-29):
+ * a tranche page adds no library components, so the compositions
+ * only this page uses live here, built from the shared
+ * components — MediaRow (the list row) and RatingStars (its
+ * log-cook control). If another page ever needs either, it
+ * graduates to the library through a component-only PR; it is
+ * never exported from this file.
+ */
+
+// Structural flex only: the card's text block expands and may shrink
+// within the row (mirrors the app's ThumbnailListCard). The explicit
+// flexBasis matters (eciperay #205): with a plain `flex: 1` the basis
+// is 0, so on narrow viewports (e.g. a phone at the largest display
+// size, ~314dp wide) the row's fixed child — the 64dp thumbnail —
+// and any trailing row item consume the entire row and the text
+// block collapses to ~0dp wide. Text measured at ~0 width paints
+// nothing yet measures extremely tall, which stretched the card past
+// the viewport with only the thumbnail visible. A 60dp basis gives
+// the row a real line-breaking size, and the text block grows to
+// fill its line. (A row action is not a row item at all — it renders
+// inline inside this block; see subtitleAction.) At ordinary widths
+// nothing changes — the basis is below the width the block already
+// gets, so it still just expands.
+const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
+
+type MediaRowProps = {
+  /** Row detail href. Both the media and the title/subtitle
+   * text are links to it (two independent targets, per the
+   * design system's link rules — cards are never pressable). */
+  href: string;
+  /** The row's title — the accessible name of the media link,
+   * and the lead of the text link's composed name. */
+  title: string;
+  /** Optional secondary line under the title (counts, times,
+   * attribution — the caller composes the string). It joins
+   * the text link's accessible name ("Title, Subtitle"): a
+   * title-only label would override the name React Native
+   * derives from its Text children and drop the subtitle
+   * announcement. */
+  subtitle?: string | undefined;
+  /** Optional image URL; absent renders the placeholder well. */
+  imageUrl?: string | null | undefined;
+  /** Optional control rendered inline in the subtitle flow
+   * (after the subtitle text, wrapping with it) — a row action
+   * that reads as part of the subtitle line, e.g. a RatingStars
+   * log-cook control. It renders inside the text link, so it
+   * must cancel its press's default action (the RatingStars
+   * contract) to keep the press from also navigating. */
+  subtitleAction?: ReactNode;
+  /** Optional accessory rendered after the row, inside the list
+   * item — an expanded inline form belongs to the row it
+   * belongs to. It renders in the same under-row padded wrapper
+   * shape the card itself sits in. */
+  accessory?: ReactNode;
+};
+
+/**
+ * The recipe list's media row: an elevated card holding a 64px
+ * thumbnail (or the placeholder well), the title and optional
+ * subtitle, and an optional accessory after the row. Composed
+ * here in the page from the shared Card, Thumbnail, Text, and
+ * LinkOverlay components (Stephen's tranche rule, 2026-10-29:
+ * single-page compositions live in the page, not the library);
+ * the row renderer supplies only domain content (href, title,
+ * subtitle, image) and slots (subtitleAction, accessory).
+ *
+ * Both navigation targets are links carrying the row's href
+ * (#248) and an accessible name built from the title: the media
+ * target wraps only an image (or an empty placeholder), so
+ * without the label a screen reader meets an unidentified link
+ * for every row; the text target's label also carries the
+ * subtitle when present. A subtitleAction is a third press
+ * target nested in the text block's subtitle flow.
+ *
+ * On native the anchors are Texts and cannot carry these view
+ * subtrees (the text block's texts would flow inline and the
+ * thumbnail would be measured as text), so both targets
+ * platform-split (see LinkOverlay): view-level frames carry the
+ * content, and childless anchors stretched over the frames
+ * carry the hrefs. The media frame's overlay renders last
+ * (topmost, the standard layering); the text frame nests the
+ * subtitle action, so its overlay renders underneath and the
+ * frame's non-interactive content is pointer-transparent — the
+ * action stays nested in the subtitle flow and keeps its own
+ * presses.
+ */
+function MediaRow({ href, title, subtitle, imageUrl, subtitleAction, accessory }: MediaRowProps) {
+  // The native rendering (`native` true) makes two adjustments
+  // for the text frame's LinkOverlay: the visible texts are
+  // decorative for accessibility (the overlay's composed label
+  // is the row's one stop) and pointer-transparent, so native
+  // hit testing falls through them to the overlay beneath,
+  // while the subtitle action — which keeps the default pointer
+  // events inside the box-none flow — still takes its own
+  // presses.
+  const renderTextContent = (native: boolean) => (
+    <>
+      <Text
+        fontWeight={tokens.typography.fontWeight.semibold}
+        accessible={native ? false : undefined}
+        importantForAccessibility={native ? "no-hide-descendants" : undefined}
+        pointerEvents={native ? "none" : undefined}
+      >
+        {title}
+      </Text>
+      {/* The subtitle line is a wrapping inline flow inside the
+        text block: the subtitle text first, the subtitle action
+        immediately after it (right after the subtitle's final
+        segment). The action flows with the text — when the line
+        is full it wraps onto the next line of the block, at the
+        block's full width — instead of sitting in the card row
+        as a third flex item whose fixed width starved this
+        block (the #205 failure, seen again in PR #120's narrow
+        captures). */}
+      {subtitle || subtitleAction ? (
+        <XStack
+          flexWrap="wrap"
+          alignItems="center"
+          gap="$1"
+          paddingTop="$1"
+          pointerEvents={native ? "box-none" : undefined}
+        >
+          {subtitle ? (
+            <Text
+              variant="hint"
+              accessible={native ? false : undefined}
+              importantForAccessibility={native ? "no-hide-descendants" : undefined}
+              pointerEvents={native ? "none" : undefined}
+            >
+              {subtitle}
+            </Text>
+          ) : null}
+          {subtitleAction}
+        </XStack>
+      ) : null}
+    </>
+  );
+  const textContent = renderTextContent(false);
+  const media = imageUrl ? (
+    <Thumbnail src={imageUrl} variant="row" />
+  ) : (
+    <View
+      width="$16"
+      height="$16"
+      borderRadius={tokens.radii.md}
+      backgroundColor={tokens.colors.gray.gray2}
+    />
+  );
+  const textLabel = subtitle ? `${title}, ${subtitle}` : title;
+  return (
+    <>
+      <YStack paddingBlockEnd="$3">
+        <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
+          {isWeb ? (
+            <Anchor
+              href={href}
+              textDecorationLine="none"
+              display="web:flex"
+              {...platformAccessibilityProps({
+                accessibilityRole: "link",
+                accessibilityLabel: title,
+              })}
+            >
+              {media}
+            </Anchor>
+          ) : (
+            <View position="relative">
+              {media}
+              <LinkOverlay href={href} accessibilityRole="link" accessibilityLabel={title} />
+            </View>
+          )}
+          {isWeb ? (
+            <Anchor
+              href={href}
+              textDecorationLine="none"
+              display="web:flex"
+              flexDirection="column"
+              style={textBlockStyle}
+              {...platformAccessibilityProps({
+                accessibilityRole: "link",
+                accessibilityLabel: textLabel,
+              })}
+            >
+              {textContent}
+            </Anchor>
+          ) : (
+            <YStack style={textBlockStyle} position="relative">
+              <LinkOverlay href={href} accessibilityRole="link" accessibilityLabel={textLabel} />
+              {renderTextContent(true)}
+            </YStack>
+          )}
+        </Card>
+      </YStack>
+      {accessory ? <YStack paddingBlockEnd="$3">{accessory}</YStack> : null}
+    </>
+  );
+}
+
+const STAR_STEPS = [1, 2, 3, 4, 5] as const;
+
+type RatingStarsBase = {
+  /** Display rating, 0–5, or null/absent when unrated. The app
+   * computes it by its display-rating rule; the composition
+   * renders it and never formats it into text. */
+  rating?: number | null | undefined;
+};
+
+type RatingStarsProps =
+  | (RatingStarsBase & { onPress?: undefined; accessibilityLabel?: string | undefined })
+  | (RatingStarsBase & { onPress: () => void; accessibilityLabel: string });
+
+/**
+ * A five-star display rating in the DS star language (the
+ * StarRatingInput glyph treatment at reading size): ★ in
+ * warning amber when filled, gray when not. The rating is a
+ * display average as often as a personal star count, so the
+ * stars fill by rounding to the nearest whole star. No
+ * lineHeight is set on the glyphs (the #162 containment rule).
+ *
+ * With `onPress` the stars become the button for an action on
+ * the rated item — a list row whose rating is its log-cook
+ * control is the shape this serves. A rated item renders its
+ * five stars as the button; an unrated item renders a single
+ * unfilled star, no text — one glyph, same tone. The press
+ * handler cancels the click's default action before firing:
+ * the control typically renders inside a link (a row's text
+ * target), and on web the platform press handling stops the
+ * click's propagation but does not cancel its default, so
+ * without the cancellation the wrapping anchor would also
+ * navigate. On native the call is inert — the innermost press
+ * target wins the responder. The button form requires its
+ * accessible name in the type (the stars alone would announce
+ * as a rating, not as the action they trigger), and it is
+ * keyboard-operable on web: a focus stop with Enter/Space
+ * activation (the CardRow pattern — a plain stack with onPress
+ * is not a tab stop).
+ */
+function RatingStars(props: RatingStarsProps) {
+  if (!props.onPress) {
+    return <RatingStarRow rating={props.rating} />;
+  }
+  const { rating, onPress, accessibilityLabel } = props;
+  const handlePress = (event: { preventDefault: () => void }) => {
+    event.preventDefault();
+    onPress();
+  };
+  const handleKeyDown = (event: { key: string; preventDefault: () => void; repeat?: boolean }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      // A held key repeats keydown — activate once, not per repeat.
+      if (!event.repeat) onPress();
+    }
+  };
+  return (
+    // Touch-target geometry for the pressable form: a ≥44dp
+    // target centering its glyphs (the StarRatingInput
+    // precedent).
+    <YStack
+      minWidth={44}
+      minHeight={44}
+      alignItems="center"
+      justifyContent="center"
+      cursor="pointer"
+      onPress={handlePress}
+      tabIndex={0}
+      onKeyDown={handleKeyDown}
+      {...platformAccessibilityProps({
+        accessibilityRole: "button",
+        accessibilityLabel,
+      })}
+    >
+      {rating !== null && rating !== undefined && rating > 0 ? (
+        <RatingStarRow rating={rating} />
+      ) : (
+        <Text style={{ fontSize: tokens.typography.fontSize.lg, color: tokens.colors.gray.gray4 }}>
+          ★
+        </Text>
+      )}
+    </YStack>
+  );
+}
+
+/** The five glyphs themselves, filled by the rounded rating. */
+function RatingStarRow({ rating }: { rating?: number | null | undefined }) {
+  const filled =
+    rating !== null && rating !== undefined && rating > 0
+      ? Math.min(5, Math.max(1, Math.round(rating)))
+      : 0;
+  return (
+    <XStack gap={tokens.spacing[1]} alignItems="center">
+      {STAR_STEPS.map((star) => (
+        <Text
+          key={star}
+          style={{
+            fontSize: tokens.typography.fontSize.lg,
+            color: star <= filled ? tokens.colors.warning.warning6 : tokens.colors.gray.gray4,
+          }}
+        >
+          ★
+        </Text>
+      ))}
+    </XStack>
   );
 }

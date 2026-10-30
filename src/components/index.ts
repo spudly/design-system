@@ -64,8 +64,6 @@ export { ButtonRow, type ButtonRowProps } from "./ButtonRow.js";
 export { CardStack, type CardStackProps } from "./CardStack.js";
 export { ListStack, type ListStackProps } from "./ListStack.js";
 export { FieldRow, type FieldRowProps } from "./FieldRow.js";
-export { MediaRow, type MediaRowProps } from "./MediaRow.js";
-export { RatingStars, type RatingStarsProps } from "./RatingStars.js";
 export { SectionStack, type SectionStackProps } from "./SectionStack.js";
 export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
 export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";

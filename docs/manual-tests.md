@@ -750,46 +750,6 @@ recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
-## MediaRow
-
-Open in `Components/MediaRow`: Default, WithAccessory.
-
-1. Default: an elevated card with a 64px cover-cropped
-   thumbnail, a semibold title, and a hint subtitle with the
-   star control flowing after it. Both the thumbnail and the
-   text are links to the row's href — the card itself is not
-   pressable.
-2. WithAccessory: the row shows the gray placeholder well
-   instead of an image, and the accessory content renders under
-   the card inside the same list item, 12px below it.
-3. At a narrow width the text block wraps under the thumbnail
-   rather than collapsing beside it (the 60dp basis).
-
-**Run when:** `src/components/MediaRow.tsx`, its stories,
-RecipesPage's rows, or a changeset naming MediaRow.
-
----
-
-## RatingStars
-
-Open in `Components/RatingStars`: Display, Pressable,
-UnratedPressable.
-
-1. Display: a rating of 4 renders four amber stars and one gray
-   star (fill rounds to the nearest whole star); the stars are
-   not a button.
-2. Pressable: the five stars are one button with a 44dp target
-   and the story's action label as its accessible name ("Log a
-   cook of Tuscan Chicken, rated 4 out of 5 stars").
-3. UnratedPressable: a single gray star as the button, same
-   target size, named "Log a cook of Arroz con Pollo".
-
-**Run when:** `src/components/RatingStars.tsx`, its stories,
-RecipesPage's log-cook control, or a changeset naming
-RatingStars.
-
----
-
 ## RemovableField
 
 Open in `Components/RemovableField`: Default.
@@ -943,9 +903,27 @@ SharedDefault, SharedFiltered, SharedEmpty, SharedLoading.
 7. LoadingMore keeps the recipe rows rendered with the footer
    spinner below them (the next-page-in-flight state,
    `isFetchingNextPage`), like DiscoverPage's LoadingMore story.
+8. Rows: each row is an elevated card with a 64px cover-cropped
+   thumbnail (or the gray placeholder well when the recipe has
+   no image), a semibold title, and a hint subtitle. Both the
+   thumbnail and the text are links to the recipe — the card
+   itself is not pressable. At a narrow width the text block
+   wraps under the thumbnail rather than collapsing beside it
+   (the 60dp basis). ExpandedAccessory shows the accessory
+   content under the card inside the same list item, 12px
+   below it.
+9. Log-cook control: a rated row's stars are one button with a
+   44dp target, filled by rounding (a 4.5 rating shows five
+   amber stars), named "Log a cook of <title>, rated <N> out
+   of 5 stars"; an unrated row shows a single gray star as the
+   button, named "Log a cook of <title>". The control flows
+   inline after the subtitle text, never as a trailing row
+   item, and it hides on the row whose accessory is open.
 
-**Run when:** `src/pages/RecipesPage.tsx`, its stories, or a
-changeset naming RecipesPage or the Shared-with-me screen.
+**Run when:** `src/pages/RecipesPage.tsx` (including its
+page-local row and log-cook control compositions), its
+stories, or a changeset naming RecipesPage or the
+Shared-with-me screen.
 
 ---
 

@@ -1,15 +1,22 @@
 /**
- * Contract test for MediaRow and RatingStars (spudly/design-system
- * #119, recipes-list tranche): the media list row and the star
- * control extracted from RecipesPage so the page composes
- * components instead of carrying row/link/star styling itself.
+ * Contract test for RecipesPage's page-local MediaRow and
+ * RatingStars compositions (spudly/design-system #119,
+ * recipes-list tranche): the media list row and the star
+ * control the recipes list renders. They were briefly library
+ * components in this tranche; Stephen's tranche rule
+ * (2026-10-29) — a tranche PR adds no library components —
+ * moved them into the page, where they are composed from the
+ * shared Card, Thumbnail, Text, and LinkOverlay components and
+ * exported from nowhere. This test pins both halves of that:
+ * the compositions' contracts below, and their absence from
+ * the built package root.
  *
  * MediaRow owns the row's card geometry (elevated card, row/wrap/
  * center, 12px rhythm), its 64px media well (the shared row
  * Thumbnail or the placeholder), the text column's 60dp wrap
  * basis, and the stage-2 (#248) two-link choreography — web
  * anchors wrapping content, the native view frame plus childless
- * LinkOverlay — while the caller supplies only domain content
+ * LinkOverlay — while the page supplies only domain content
  * (href, title, subtitle, image) and slots (subtitleAction,
  * accessory). It is never pressable and renders no button: the
  * row's action, when one exists, is the caller's subtitleAction.
@@ -22,8 +29,10 @@
  * contract depth lives here and in
  * test/recipesPageRowActions.test.mjs.
  *
- * Source scan plus dist export checks, like the other component
- * contract tests. Comments are stripped before scanning.
+ * Source scan plus dist export checks, like the other contract
+ * tests. The scans slice RecipesPage.tsx at the compositions'
+ * markers so page-level code cannot satisfy them. Comments are
+ * stripped before scanning.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -35,20 +44,32 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const componentsDir = join(here, "..", "src", "components");
 
-function code(file) {
-  return readFileSync(join(componentsDir, file), "utf8")
-    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+function strip(source) {
+  return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const mediaRow = code("MediaRow.tsx");
-const ratingStars = code("RatingStars.tsx");
+function code(file) {
+  return strip(readFileSync(join(componentsDir, file), "utf8"));
+}
+
+const page = strip(readFileSync(join(here, "..", "src", "pages", "RecipesPage.tsx"), "utf8"));
+const mediaRow = page.slice(page.indexOf("const textBlockStyle"), page.indexOf("const STAR_STEPS"));
+const ratingStars = page.slice(page.indexOf("const STAR_STEPS"));
 const removableField = code("RemovableField.tsx");
 
-test("MediaRow, RatingStars and RemovableField are exported from the built package root", async () => {
+test("RemovableField is exported from the built package root; the page-local row and star control are not", async () => {
   const dist = await import("../dist/index.js");
-  for (const name of ["MediaRow", "RatingStars", "RemovableField"]) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+  assert.equal(
+    typeof dist.RemovableField,
+    "function",
+    "RemovableField must be exported from @spudly/ui",
+  );
+  for (const name of ["MediaRow", "RatingStars"]) {
+    assert.equal(
+      dist[name],
+      undefined,
+      `${name} is a RecipesPage-local composition — it must not be exported from @spudly/ui`,
+    );
   }
 });
 
@@ -80,12 +101,11 @@ test("the card and the accessory each sit in the under-row padded wrapper (the r
 });
 
 test("RatingStars' pressable target is ≥44dp and carries the button role", () => {
-  assert.match(ratingStars, /styled\(YStack, \{\s+name: "RatingStarTarget",/);
-  assert.match(ratingStars, /minWidth: 44,\s+minHeight: 44,/);
+  assert.match(ratingStars, /minWidth=\{44\}\s+minHeight=\{44\}/);
   assert.match(ratingStars, /accessibilityRole: "button"/);
   assert.ok(
     !ratingStars.includes("react-native"),
-    "RatingStars is root-exported — it must not import react-native (the package root loads in plain Node)",
+    "the page-local star control renders through Tamagui only — it must not import react-native",
   );
 });
 

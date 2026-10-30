@@ -37,9 +37,13 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "..", "src", "pages");
-const componentsDir = join(here, "..", "src", "components");
 const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-const mediaRow = readFileSync(join(componentsDir, "MediaRow.tsx"), "utf8");
+// The MediaRow composition is page-local (bottom of the page
+// file); slice it out so the placement pins run against it.
+const mediaRow = source.slice(
+  source.indexOf("const textBlockStyle"),
+  source.indexOf("const STAR_STEPS"),
+);
 const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -86,9 +90,10 @@ test("a row with accessory content hides its Log cook button; other rows keep it
 });
 
 test("the accessory renders under the row's card, inside the list item", () => {
-  // Since the #119 recipes-list tranche the row is MediaRow: the
-  // page hands the accessory over only when it has content, and
-  // the under-card placement is the row component's own.
+  // Since the #119 recipes-list tranche the row is the page's
+  // page-local MediaRow composition: the page hands the
+  // accessory over only when it has content, and the under-card
+  // placement is the composition's own.
   assert.match(
     code,
     /accessory=\{hasAccessory \? accessory : undefined\}/,

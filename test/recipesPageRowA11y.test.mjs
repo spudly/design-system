@@ -16,9 +16,10 @@
  * — while the subtitle action keeps its own presses inside the
  * box-none flow.
  *
- * Since the #119 recipes-list tranche the row is the MediaRow
- * component; the pins run against it. Comments are stripped
- * before scanning so prose cannot satisfy the patterns.
+ * Since the #119 recipes-list tranche the row is RecipesPage's
+ * page-local MediaRow composition; the pins run against its
+ * section of the page file. Comments are stripped before
+ * scanning so prose cannot satisfy the patterns.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -27,12 +28,12 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const mediaRow = readFileSync(join(here, "..", "src", "components", "MediaRow.tsx"), "utf8")
-  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const page = readFileSync(join(here, "..", "src", "pages", "RecipesPage.tsx"), "utf8")
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+// The MediaRow composition is page-local (bottom of the page
+// file); slice it out so the row pins run against it alone.
+const mediaRow = page.slice(page.indexOf("const textBlockStyle"), page.indexOf("const STAR_STEPS"));
 
 function count(code, literal) {
   return code.split(literal).length - 1;

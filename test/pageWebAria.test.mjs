@@ -100,9 +100,9 @@ function sourceFiles(dir) {
 // it routes its `accessibilityLabel` through
 // platformAccessibilityProps internally. (ActionChip was too,
 // until the #119 dedupe retired it; its consumers are Buttons.)
-// RatingStars (#119) is sanctioned on the same ground: its
-// pressable form routes the label through
-// platformAccessibilityProps onto its target.
+// RatingStars (RecipesPage's page-local log-cook control) is
+// sanctioned on the same ground: its pressable form routes
+// the label through platformAccessibilityProps onto its target.
 const SANCTIONED_TAGS = new Set(
   "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars".split(
     ",",

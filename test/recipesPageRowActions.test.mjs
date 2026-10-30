@@ -9,10 +9,12 @@
  * RecipeDetailPage action, not a list action, so the list
  * exposes no delete callback at all.
  *
- * Since the #119 recipes-list tranche the control is the
- * RatingStars component and the row is MediaRow; the page
- * composes the accessible names and places the control in the
- * row's subtitle flow via MediaRow's subtitleAction slot.
+ * Since the #119 recipes-list tranche the control and the row
+ * are RecipesPage's page-local RatingStars / MediaRow
+ * compositions (bottom of the page file — Stephen's tranche
+ * rule, 2026-10-29); the page composes the accessible names
+ * and places the control in the row's subtitle flow via
+ * MediaRow's subtitleAction slot.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -24,10 +26,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 const code = readFileSync(join(here, "..", "src", "pages", "RecipesPage.tsx"), "utf8")
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const ratingStars = readFileSync(join(here, "..", "src", "components", "RatingStars.tsx"), "utf8")
-  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const mediaRow = readFileSync(join(here, "..", "src", "components", "MediaRow.tsx"), "utf8");
+// The page-local compositions live at the bottom of the page
+// file; slice them out so page-level code cannot satisfy the
+// composition pins.
+const mediaRow = code.slice(code.indexOf("const textBlockStyle"), code.indexOf("const STAR_STEPS"));
+const ratingStars = code.slice(code.indexOf("const STAR_STEPS"));
 const stories = readFileSync(join(here, "..", "src", "pages", "RecipesPage.stories.tsx"), "utf8");
 
 test("the log-cook callback is optional and keyed by recipe id", () => {
