@@ -1,10 +1,9 @@
 /**
- * Form-component contracts for the #119 form set: the dedupe
- * set (LabeledField, LabeledGroup, FieldLabel, RevertAction,
- * ChangedListBanner, FormStack, FormHeading), shipped once on
- * main, plus the forms tranche's wider single-family set
- * (FieldLabelBlock, FieldColumns, FormSubmit, StepperGroup).
- * Like the layout-components contracts, these pin the public
+ * Form-component contracts for the #119 form set the three
+ * form pages compose: the dedupe set (LabeledField,
+ * LabeledGroup, FieldLabel, RevertAction, ChangedListBanner,
+ * FormStack, FormHeading), shipped once on main. Like the
+ * layout-components contracts, these pin the public
  * shape (props and owned geometry) so a later edit cannot
  * silently reintroduce styling pass-throughs or move the owned
  * spacing, and pin the three form pages themselves to
@@ -30,16 +29,12 @@ const readRepoFile = (rel) =>
 
 const COMPONENTS = [
   "FieldLabel",
-  "FieldLabelBlock",
   "LabeledField",
   "LabeledGroup",
   "RevertAction",
   "ChangedListBanner",
-  "FieldColumns",
   "FormStack",
   "FormHeading",
-  "FormSubmit",
-  "StepperGroup",
 ];
 
 for (const name of COMPONENTS) {
@@ -105,19 +100,6 @@ test("LabeledGroup owns the wider 8px label separation for non-field controls", 
   assert.match(source, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
 });
 
-test("FieldLabelBlock is the standalone label block with its 8px bottom padding", () => {
-  const source = readRepoFile("src/components/FieldLabelBlock.tsx");
-  assert.match(source, /paddingBlockEnd=\{tokens\.spacing\[2\]\}/);
-  assert.match(source, /label: string;/);
-});
-
-test("FieldColumns gives every child an equal flex column with an owned 12px gutter", () => {
-  const source = readRepoFile("src/components/FieldColumns.tsx");
-  assert.match(source, /gap=\{tokens\.spacing\[3\]\}/);
-  assert.match(source, /<YStack flex=\{1\}>/);
-  assert.match(source, /typeof child === "boolean"/);
-});
-
 test("FormStack owns the form rhythm: 16px section gaps, stretched children, 32px tail", () => {
   const source = readRepoFile("src/components/FormStack.tsx");
   assert.match(source, /gap: tokens\.spacing\[4\]/);
@@ -133,16 +115,6 @@ test("FormHeading owns the title treatment, its 24px separation, and the optiona
   // optional subtitle (dedupe cluster B5).
   assert.match(source, /subtitle\?: string;/);
   assert.match(source, /variant="hint"/);
-});
-
-test("FormSubmit owns the 16px separation above the submit row", () => {
-  const source = readRepoFile("src/components/FormSubmit.tsx");
-  assert.match(source, /paddingBlockStart=\{tokens\.spacing\[4\]\}/);
-});
-
-test("StepperGroup is flush: it sets no gap, so one entry's steppers stay glued", () => {
-  const source = readRepoFile("src/components/StepperGroup.tsx");
-  assert.doesNotMatch(source, /gap/);
 });
 
 test("RevertAction is the warning text action composed on TextAction", () => {

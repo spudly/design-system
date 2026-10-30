@@ -2,10 +2,9 @@ import { Button } from "../components/Button.js";
 import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
 import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
-import { FieldLabelBlock } from "../components/FieldLabelBlock.js";
-import { FormSubmit } from "../components/FormSubmit.js";
+import { FieldStack } from "../components/FieldStack.js";
+import { LabeledGroup } from "../components/LabeledGroup.js";
 import { NumberStepper } from "../components/NumberStepper.js";
-import { StepperGroup } from "../components/StepperGroup.js";
 import { Text } from "../components/Text.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { TextField } from "../components/TextField.js";
@@ -40,11 +39,12 @@ import { TextField } from "../components/TextField.js";
  * Submission is a bare intent (`onSubmit`); the disabled rule
  * is the app view's one presentation rule (a title and at
  * least one selected entry). The page applies no styling
- * itself (#119): the heading is a FormHeading, the entry
- * list's label is a FieldLabelBlock (its own form block, as
- * in the app view), each selected entry's steppers are a
- * StepperGroup, and the submit row is a FormSubmit; the page
- * composes DS components and passes data and callbacks only.
+ * itself (#119): the heading is a FormHeading, the entry list
+ * is a LabeledGroup (the label over the select list, the
+ * group carrying the label as its name), each selected
+ * entry's steppers are a FieldStack, and the submit button
+ * is a direct child of the layout; the page composes DS
+ * components and passes data and callbacks only.
  */
 
 export type MealPlanFormPageEntryOption = {
@@ -137,15 +137,16 @@ export function MealPlanFormPage({
         onChangeText={onEndsOnChange}
         placeholder="YYYY-MM-DD"
       />
-      <FieldLabelBlock label="Meals & recipes" />
-      <CheckboxSelectList
-        items={entryOptions.map((entry) => ({
-          id: entry.key,
-          label: `${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}`,
-        }))}
-        selectedIds={selectedKeys}
-        onToggle={onToggleEntry}
-      />
+      <LabeledGroup label="Meals & recipes">
+        <CheckboxSelectList
+          items={entryOptions.map((entry) => ({
+            id: entry.key,
+            label: `${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}`,
+          }))}
+          selectedIds={selectedKeys}
+          onToggle={onToggleEntry}
+        />
+      </LabeledGroup>
       {selectedKeys.map((key) => {
         const option = optionByKey.get(key);
         if (!option) {
@@ -161,11 +162,11 @@ export function MealPlanFormPage({
           />
         );
         if (option.kind === "meal" || !option.recipeId) {
-          return <StepperGroup key={key}>{quantityStepper}</StepperGroup>;
+          return <FieldStack key={key}>{quantityStepper}</FieldStack>;
         }
         const recipeId = option.recipeId;
         return (
-          <StepperGroup key={key}>
+          <FieldStack key={key}>
             {quantityStepper}
             <NumberStepper
               label={`Servings · ${option.title}`}
@@ -174,20 +175,18 @@ export function MealPlanFormPage({
                 onRecipeServingsChange(recipeId, value);
               }}
             />
-          </StepperGroup>
+          </FieldStack>
         );
       })}
       {error ? <Text variant="error">{error}</Text> : null}
-      <FormSubmit>
-        <Button
-          variant="primary"
-          accessibilityLabel="Save plan"
-          disabled={!title.trim() || selectedKeys.length === 0 || isSaving}
-          onPress={onSubmit}
-        >
-          Save plan
-        </Button>
-      </FormSubmit>
+      <Button
+        variant="primary"
+        accessibilityLabel="Save plan"
+        disabled={!title.trim() || selectedKeys.length === 0 || isSaving}
+        onPress={onSubmit}
+      >
+        Save plan
+      </Button>
     </FormScreenLayout>
   );
 }

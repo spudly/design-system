@@ -782,62 +782,6 @@ naming either page.
 
 ---
 
-## FieldLabelBlock
-
-Open in `Components/FieldLabelBlock`: Default.
-
-1. FieldLabelBlock Default: the "Recipes" label stands as its
-   own block over the checkbox list — 8px of padding under the
-   label plus the stack's 16px gap before the first row (the
-   meal forms' list-label rhythm); rows toggle on press.
-
-**Run when:** `src/components/FieldLabelBlock.tsx`, its
-stories, a form page composing it, or a changeset naming it.
-(The shared label components it composes are covered by the
-Form set section above.)
-
----
-
-## FieldColumns
-
-Open in `Components/FieldColumns`: Default.
-
-1. Servings, Prep (min), and Cook (min) fields sit in three
-   equal-width columns with an even gutter between them; each
-   label sits over its own field.
-
-**Run when:** `src/components/FieldColumns.tsx`, its stories,
-RecipeFormPage, or a changeset naming FieldColumns.
-
----
-
-## FormSubmit
-
-Open in `Components/FormSubmit`: Default.
-
-1. FormSubmit Default: the Save meal button sits 32px below the
-   field above it — FormSubmit's own 16px of top padding on top
-   of the layout's 16px gap — full width.
-
-**Run when:** `src/components/FormSubmit.tsx`, its stories, a
-form page composing it, or a changeset naming it. (FormStack
-and FormHeading are covered by the Form set section above.)
-
----
-
-## StepperGroup
-
-Open in `Components/StepperGroup`: Default.
-
-1. The Quantity and Servings steppers for the entry sit flush
-   together (no gap between the two rows); both steppers
-   increment and decrement.
-
-**Run when:** `src/components/StepperGroup.tsx`, its stories,
-MealPlanFormPage, or a changeset naming StepperGroup.
-
----
-
 ## RecipeFormPage, MealFormPage & MealPlanFormPage
 
 Open in `Pages/Eciperay/RecipeFormPage`: Default, Empty,
@@ -847,7 +791,7 @@ Default, NoSelection, SaveError. Open in
 
 1. RecipeFormPage Default: Title, the Status toggle buttons,
    Description with its "Generate with AI" action, the Servings
-   / Prep / Cook columns, image, Ingredients and Instructions
+   / Prep / Cook fields, image, Ingredients and Instructions
    slots, the selectable Tag badges, Source URL, and the
    full-width Create Recipe button, evenly spaced in one
    scrolling form. On web, clicking a field label (Title,
@@ -866,8 +810,8 @@ Default, NoSelection, SaveError. Open in
 5. MealPlanFormPage Default: the plan-title heading, the Starts
    on / Ends on fields, the entry checkbox list with kind
    prefixes, and quantity (plus servings for recipes) steppers
-   grouped flush per selected entry; NoSelection disables Save
-   plan.
+   grouped per selected entry in their own field stacks;
+   NoSelection disables Save plan.
 
 **Run when:** `src/pages/RecipeFormPage.tsx`,
 `src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
