@@ -31,7 +31,7 @@ function Controlled({ loading = false, error }: { loading?: boolean; error?: str
         onSubmit={() => undefined}
         signInHref="#/sign-in"
         legalNotice={
-          <Text variant="hint">
+          <Text textAlign="center" variant="hint">
             By continuing you accept the <TextLink href="#/terms">Terms</TextLink> and{" "}
             <TextLink href="#/privacy">Privacy Policy</TextLink>.
           </Text>

@@ -85,6 +85,59 @@ test("each form composes the shared FormStack and owns its submit handling", () 
   }
 });
 
+const PAGE_FORM_PROPS = {
+  SignInPage: [
+    "email={email}",
+    "password={password}",
+    "onEmailChange={onEmailChange}",
+    "onPasswordChange={onPasswordChange}",
+    "loading={loading}",
+    "error={error}",
+    "onSubmit={onSubmit}",
+    "signUpHref={signUpHref}",
+    "forgotPasswordHref={forgotPasswordHref}",
+  ],
+  SignUpPage: [
+    "displayName={displayName}",
+    "email={email}",
+    "password={password}",
+    "onDisplayNameChange={onDisplayNameChange}",
+    "onEmailChange={onEmailChange}",
+    "onPasswordChange={onPasswordChange}",
+    "loading={loading}",
+    "error={error}",
+    "onSubmit={onSubmit}",
+    "signInHref={signInHref}",
+    "legalNotice={legalNotice}",
+  ],
+  ForgotPasswordPage: [
+    "email={email}",
+    "onEmailChange={onEmailChange}",
+    "loading={loading}",
+    "error={error}",
+    "onSubmit={onSubmit}",
+    "signInHref={signInHref}",
+  ],
+  ResetPasswordPage: [
+    "password={password}",
+    "onPasswordChange={onPasswordChange}",
+    "loading={loading}",
+    "error={error}",
+    "onSubmit={onSubmit}",
+  ],
+};
+
+test("auth pages forward their props to their forms", () => {
+  for (const [form, page] of Object.entries(FORM_PAGES)) {
+    const pageSource = read(`src/pages/${page}.tsx`);
+    const invocation = pageSource.match(new RegExp(String.raw`<${form}\b[\s\S]*?/>`));
+    assert.ok(invocation, `${page} invokes ${form}`);
+    for (const prop of PAGE_FORM_PROPS[page]) {
+      assert.ok(invocation[0].includes(prop), `${page} forwards ${prop}`);
+    }
+  }
+});
+
 test("SignUpForm keeps the legal notice between submit and the sign-in link", () => {
   const source = read("src/components/SignUpForm.tsx");
   const submitAt = source.indexOf("Create Account");
