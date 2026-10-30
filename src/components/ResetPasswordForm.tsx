@@ -60,7 +60,7 @@ export function ResetPasswordForm({
         variant="primary"
         disabled={loading}
         onPress={onSubmit}
-        accessibilityLabel="Update password"
+        accessibilityLabel={loading ? "Updating…" : "Update password"}
       >
         {loading ? "Updating…" : "Update password"}
       </Button>

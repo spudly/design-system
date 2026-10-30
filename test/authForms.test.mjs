@@ -16,6 +16,8 @@
  *   canonical form stack), which owns the 16px field rhythm —
  *   no form defines a local form stack — and the pages render
  *   no fields directly;
+ * - each form's submit button is named for the label it
+ *   renders in both its idle and loading states;
  * - SignUpForm keeps the legalNotice slot between the submit
  *   button and the sign-in link (the app view's order);
  * - LegalSection renders its title in the app profile screen's
@@ -135,6 +137,36 @@ test("auth pages forward their props to their forms", () => {
     for (const prop of PAGE_FORM_PROPS[page]) {
       assert.ok(invocation[0].includes(prop), `${page} forwards ${prop}`);
     }
+  }
+});
+
+test("each form's submit button is named for the label it renders, in both states", () => {
+  // The visible label swaps while loading; the accessible name
+  // follows it (a static name would contradict the rendered
+  // label on web, where the button's label forwards as its
+  // aria-label).
+  const BUTTON_LABELS = {
+    SignInForm: ["Signing in…", "Sign In"],
+    SignUpForm: ["Creating account…", "Create Account"],
+    ForgotPasswordForm: ["Sending…", "Send Reset Link"],
+    ResetPasswordForm: ["Updating…", "Update password"],
+  };
+  for (const [form, [busy, idle]] of Object.entries(BUTTON_LABELS)) {
+    const source = read(`src/components/${form}.tsx`);
+    assert.ok(
+      source.includes(`accessibilityLabel={loading ? "${busy}" : "${idle}"}`),
+      `${form} names its submit button for the state it renders`,
+    );
+    // The rendered label itself must be the same ternary, so a
+    // change to either visible label is caught here too (the
+    // name and the text cannot drift apart). The accessible-name
+    // line cannot false-positive this: trimmed, it starts with
+    // "accessibilityLabel=".
+    const rendered = `{loading ? "${busy}" : "${idle}"}`;
+    assert.ok(
+      source.split("\n").some((line) => line.trim() === rendered),
+      `${form} renders the same loading ternary it is named by`,
+    );
   }
 });
 

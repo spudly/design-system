@@ -93,7 +93,12 @@ export function SignInForm({
         returnKeyType="go"
       />
       {error ? <Text variant="error">{error}</Text> : null}
-      <Button variant="primary" disabled={loading} onPress={onSubmit} accessibilityLabel="Sign In">
+      <Button
+        variant="primary"
+        disabled={loading}
+        onPress={onSubmit}
+        accessibilityLabel={loading ? "Signing in…" : "Sign In"}
+      >
         {loading ? "Signing in…" : "Sign In"}
       </Button>
       {signUpHref || forgotPasswordHref ? (
