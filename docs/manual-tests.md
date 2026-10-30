@@ -119,7 +119,8 @@ AllTones, Selectable, Selected.
 4. Selectable: pressing a pill toggles it — the pressed pill takes
    the **primary fill with the on-primary label**, the others keep
    the resting tint; pressing it again returns it to the tint.
-   Only the pressed pill changes.
+   Only the pressed pill changes. The pills are keyboard-operable:
+   Tab reaches them and Enter/Space toggles the focused pill.
 5. Selected: the pill renders in the selected treatment and is a
    toggle button (aria-pressed true); in Selectable, unpressed
    pills announce aria-pressed false.

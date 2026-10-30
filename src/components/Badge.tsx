@@ -44,8 +44,16 @@ const StyledBadge = styled(XStack, {
 
 type StyledBadgeProps = GetProps<typeof StyledBadge>;
 
-export type BadgeProps = StyledBadgeProps & {
+export type BadgeProps = Omit<StyledBadgeProps, "onPress"> & {
   tone?: Tone;
+  /**
+   * The selectable form's press handler: a bare intent with no
+   * event argument (the keyboard handler invokes the same
+   * callback). Passing it makes the badge a toggle (see
+   * `selected`); leaving it unpassed keeps the badge
+   * display-only.
+   */
+  onPress?: () => void;
   /**
    * A tag color: a design-system tag color token name (e.g. "blue"),
    * resolved through the active theme at render. When set, the badge
@@ -82,8 +90,10 @@ export type BadgeProps = StyledBadgeProps & {
  * role and announces its state — `aria-pressed` on web, the
  * selected accessibility state on native — and while selected it
  * renders the primary fill with the on-primary label ink, the
- * treatment a selected toggle Button takes. With no press handler
- * the badge is display-only.
+ * treatment a selected toggle Button takes. On web it is
+ * keyboard-operable like the DS's other pressable blocks:
+ * focusable, with Enter and Space invoking the press callback.
+ * With no press handler the badge is display-only.
  */
 export function Badge({
   tone = "neutral",
@@ -100,6 +110,36 @@ export function Badge({
     fontSize: tokens.typography.fontSize.xs,
     fontWeight: tokens.typography.fontWeight.semibold,
   } as const;
+  // Web keyboard support for the selectable form (the pressable
+  // rows' pattern): an element carrying the button role is not
+  // keyboard-operable on its own, so it is made focusable and the
+  // button activation keys — Enter and Space — invoke the same
+  // callback as a press. `tabIndex` and `onKeyDown` are web-only
+  // props in Tamagui and are ignored on native, where onPress is
+  // the activation path.
+  const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      // A held key repeats keydown events; a native button does
+      // not re-activate on repeats, and a repeat here would flip
+      // the selection back and forth.
+      if (!event.repeat) {
+        onPress?.();
+      }
+    }
+  };
+  const selectableProps = selectable
+    ? {
+        ...platformAccessibilityProps({ accessibilityRole: "button" }),
+        onPress,
+        tabIndex: 0,
+        onKeyDown: handleKeyDown,
+        cursor: "web:pointer" as const,
+        ...(isWeb
+          ? { "aria-pressed": selected ?? false }
+          : { accessibilityState: { selected: selected ?? false } }),
+      }
+    : null;
   if (color) {
     const resolvedColor = resolveTagColor(color);
     return (
@@ -107,13 +147,7 @@ export function Badge({
         backgroundColor={isSelected ? "$primary" : `${resolvedColor}22`}
         borderColor={isSelected ? "$primary" : resolvedColor}
         {...rest}
-        {...(selectable ? { onPress, cursor: "pointer" } : null)}
-        {...(selectable ? platformAccessibilityProps({ accessibilityRole: "button" }) : null)}
-        {...(selectable
-          ? isWeb
-            ? { "aria-pressed": selected ?? false }
-            : { accessibilityState: { selected: selected ?? false } }
-          : null)}
+        {...selectableProps}
       >
         <Text style={{ ...labelType, color: isSelected ? "$onPrimary" : resolvedColor }}>
           {children}
@@ -127,13 +161,7 @@ export function Badge({
       backgroundColor={isSelected ? "$primary" : styles.background}
       borderColor={isSelected ? "$primary" : styles.text}
       {...rest}
-      {...(selectable ? { onPress, cursor: "pointer" } : null)}
-      {...(selectable ? platformAccessibilityProps({ accessibilityRole: "button" }) : null)}
-      {...(selectable
-        ? isWeb
-          ? { "aria-pressed": selected ?? false }
-          : { accessibilityState: { selected: selected ?? false } }
-        : null)}
+      {...selectableProps}
     >
       <Text style={{ ...labelType, color: isSelected ? "$onPrimary" : styles.text }}>
         {children}

@@ -10,7 +10,10 @@
  * 2. A selectable Badge announces itself as a toggle the way a
  *    toggle Button does — `aria-pressed` on web (SSR-pinned
  *    below), the selected accessibility state on native
- *    (source-pinned), under the button role.
+ *    (source-pinned), under the button role — and on web it is
+ *    keyboard-operable like the DS's other pressable blocks:
+ *    focusable, Enter/Space activating the press callback, a
+ *    held key never re-activating.
  * 3. The selected treatment is the primary fill with the
  *    on-primary label ink — the treatment a selected toggle
  *    Button takes (source-pinned).
@@ -52,6 +55,22 @@ test("a selectable Badge announces a toggle: aria-pressed on web, selected state
   assert.ok(
     badgeSource.includes('platformAccessibilityProps({ accessibilityRole: "button" })'),
     "the selectable form must take the button role through the platform helper",
+  );
+});
+
+test("a selectable Badge is keyboard-operable on web: focusable, Enter/Space, no held-key repeats", () => {
+  assert.ok(badgeSource.includes("tabIndex: 0"), "a selectable badge must be focusable on web");
+  assert.ok(
+    badgeSource.includes("onKeyDown: handleKeyDown"),
+    "a selectable badge must wire the activation-keys handler",
+  );
+  assert.ok(
+    badgeSource.includes('event.key === "Enter" || event.key === " "'),
+    "Enter and Space must invoke the press callback",
+  );
+  assert.ok(
+    badgeSource.includes("if (!event.repeat)"),
+    "a held key must not re-activate (it would flip the selection back and forth)",
   );
 });
 
@@ -100,6 +119,7 @@ test("SSR: a selectable Badge renders the button role with aria-pressed tracking
   );
   assert.match(selectedHtml, /role="button"/, "a selectable badge takes the button role");
   assert.match(selectedHtml, /aria-pressed="true"/, "a selected badge announces pressed");
+  assert.match(selectedHtml, /tabindex="0"/, "a selectable badge is keyboard-focusable");
   const unselectedHtml = await renderToHtml(
     React.createElement(Badge, { selected: false, onPress: () => null }, "Weeknight"),
   );
