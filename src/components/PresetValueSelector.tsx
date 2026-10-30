@@ -1,5 +1,7 @@
-import { useState } from "react";
-import { XStack } from "tamagui";
+import { useRef, useState } from "react";
+import type { ComponentProps } from "react";
+import { XStack, isWeb } from "tamagui";
+import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
@@ -70,6 +72,21 @@ export type PresetValueSelectorProps = {
  * applies it through the same `onChange` the presets use; an
  * empty, non-numeric, or non-positive entry commits nothing
  * and the slot restores the current value.
+ *
+ * Commit timing (#315): the entry commits on submit, and on
+ * blur ONLY when focus leaves the selector entirely. A blur
+ * whose focus lands inside the group — on a preset button,
+ * above all — must not commit: the blur fires before the
+ * preset's press, so committing there would apply the draft
+ * through `onChange` ahead of (and potentially instead of)
+ * the preset the user actually chose. That blur instead ends
+ * the edit WITHOUT committing (the slot restores the current
+ * value), and the preset's own press then applies the preset.
+ * On web the destination is the blur event's `relatedTarget`,
+ * tested against the group element; native blur events carry
+ * no `relatedTarget` (buttons there take no focus), so the
+ * presets' `onPressIn` — which fires ahead of the input's
+ * blur for a touch — stands in for it.
  */
 export function PresetValueSelector({
   label,
@@ -82,11 +99,19 @@ export function PresetValueSelector({
 }: PresetValueSelectorProps) {
   const [isCustomEditing, setCustomEditing] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
+  const groupRef = useRef<TamaguiElement>(null);
+  // Set by a preset's onPressIn while the custom editor is open
+  // (native's stand-in for the web relatedTarget check — see the
+  // commit-timing note above); consumed by the blur handler and
+  // cleared by the press itself, so it can never suppress a
+  // later, unrelated blur.
+  const presetPressPendingRef = useRef(false);
   const isPreset = options.some((option) => option.value === value);
   const isCustomSelected = !isPreset && !isCustomEditing;
   const formattedCustom = formatCustomValue ? formatCustomValue(value) : value;
 
   const startCustomEdit = () => {
+    presetPressPendingRef.current = false;
     setCustomDraft(isPreset ? "" : value);
     setCustomEditing(true);
   };
@@ -99,8 +124,41 @@ export function PresetValueSelector({
     }
   };
 
+  const handleCustomBlur = (
+    event: Parameters<NonNullable<ComponentProps<typeof TextField>["onBlur"]>>[0],
+  ) => {
+    // #315: focus moving within the group (or a preset press
+    // already in flight on native) ends the edit WITHOUT
+    // committing the draft — the preset's press applies its
+    // own value next. Focus leaving the group entirely falls
+    // through to the commit.
+    if (presetPressPendingRef.current) {
+      presetPressPendingRef.current = false;
+      setCustomEditing(false);
+      return;
+    }
+    if (isWeb) {
+      // The blur event reaches the field in either of two
+      // shapes (the DropdownButton event-cast pattern): the
+      // DOM FocusEvent's `relatedTarget` directly, or under
+      // `nativeEvent` when the event arrives wrapped.
+      const blurEvent = event as {
+        relatedTarget?: unknown;
+        nativeEvent?: { relatedTarget?: unknown };
+      };
+      const relatedTarget = blurEvent.relatedTarget ?? blurEvent.nativeEvent?.relatedTarget;
+      const groupElement = groupRef.current as unknown as HTMLElement | null;
+      if (relatedTarget != null && groupElement?.contains(relatedTarget as Node)) {
+        setCustomEditing(false);
+        return;
+      }
+    }
+    commitCustom();
+  };
+
   return (
     <XStack
+      ref={groupRef}
       alignItems="center"
       gap="$2"
       {...groupRoleProps}
@@ -123,7 +181,13 @@ export function PresetValueSelector({
             size="sm"
             grow
             selected={value === option.value}
+            onPressIn={() => {
+              if (isCustomEditing) {
+                presetPressPendingRef.current = true;
+              }
+            }}
             onPress={() => {
+              presetPressPendingRef.current = false;
               setCustomEditing(false);
               onChange(option.value);
             }}
@@ -142,7 +206,7 @@ export function PresetValueSelector({
             autoFocus
             value={customDraft}
             onChangeText={setCustomDraft}
-            onBlur={commitCustom}
+            onBlur={handleCustomBlur}
             onSubmitEditing={commitCustom}
           />
         ) : (
