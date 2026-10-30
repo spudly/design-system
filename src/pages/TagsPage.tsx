@@ -1,14 +1,16 @@
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
+import { BadgeCardRow } from "../components/BadgeCardRow.js";
 import { Button } from "../components/Button.js";
+import { Card } from "../components/Card.js";
+import { CardStack } from "../components/CardStack.js";
 import { ColorPickerField } from "../components/ColorPickerField.js";
+import { FieldStack } from "../components/FieldStack.js";
+import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Spinner } from "../components/Spinner.js";
-import { Badge } from "../components/Badge.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { Text } from "../components/Text.js";
-import { TextAction } from "../components/TextAction.js";
 import { TextField } from "../components/TextField.js";
+import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
 
 /**
  * TagsPage (#126, B3c): the tag management view — the split
@@ -29,9 +31,9 @@ import { TextField } from "../components/TextField.js";
  * action rendered through the shared TextAction (#229), so it
  * is keyboard-focusable and Enter/Space-operable on web; the
  * row card treatment is the app view's, on DS
- * tokens. While `isLoading`, a spinner replaces the list (the
- * DS Spinner stands in for the app's branded loader — the
- * RecipeFormPage precedent).
+ * tokens. While `isLoading`, the shared ListLoadingState
+ * replaces the list (it stands in for the app's branded
+ * loader — the RecipeFormPage precedent).
  *
  * The create form is stacked (#189): the name field takes its
  * own full-width row, and the color swatches and Add button
@@ -53,6 +55,19 @@ import { TextField } from "../components/TextField.js";
  * holds it while the user types, and applies it on
  * `onSaveEdit`. Without `onStartEdit` the rows stay read-only
  * apart from Delete, as before.
+ *
+ * De-styled for #119: the page composes DS components only —
+ * the sections stack in SectionStack, the title is Text's
+ * `title` variant, each form's fields stack in FieldStack,
+ * the picker-and-actions rows are TrailingActionsRow (which
+ * carries the #219 wrap), the editor card is Card's `compact`
+ * variant, each display row renders through BadgeCardRow (the badge
+ * and its actions cross as data — the badge's color among
+ * them), and the rows stack in CardStack at its 8px rhythm
+ * (the per-row bottom padding they carried before). The
+ * display row composes through the same TrailingActionsRow
+ * as the form rows, so it gains the same wrap at narrow
+ * widths instead of squeezing.
  */
 
 export type TagsPageTag = {
@@ -121,126 +136,107 @@ export function TagsPage({
 }: TagsPageProps) {
   return (
     <ScreenContainer>
-      <YStack paddingBottom="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          Tags
-        </Text>
-      </YStack>
-      <YStack paddingBottom="$6" gap="$3">
-        <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
-        <XStack flexWrap="wrap" gap="$2" alignItems="center" justifyContent="space-between">
-          <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
-          <Button
-            variant="primary"
-            disabled={!name.trim() || isCreating}
-            onPress={onCreate}
-            accessibilityLabel="Add"
+      <SectionStack>
+        <Text variant="title">Tags</Text>
+        <FieldStack>
+          <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
+          <TrailingActionsRow
+            leading={
+              <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
+            }
           >
-            Add
-          </Button>
-        </XStack>
-      </YStack>
-      {isLoading ? (
-        <Spinner label="Loading tags" />
-      ) : (
-        tags.map((tag) =>
-          editingTagId === tag.id ? (
-            <YStack key={tag.id} paddingBottom="$2">
-              <YStack
-                gap="$3"
-                borderRadius={tokens.radii.md}
-                backgroundColor="$surface"
-                padding="$3"
-                shadowColor={tokens.shadows.sm.shadowColor}
-                shadowOffset={tokens.shadows.sm.shadowOffset}
-                shadowOpacity={tokens.shadows.sm.shadowOpacity}
-                shadowRadius={tokens.shadows.sm.shadowRadius}
-              >
-                <TextField
-                  placeholder="Tag name"
-                  value={editName}
-                  onChangeText={(value) => {
-                    onEditNameChange?.(value);
-                  }}
-                  accessibilityLabel={`Rename tag ${tag.name}`}
+            <Button
+              variant="primary"
+              disabled={!name.trim() || isCreating}
+              onPress={onCreate}
+              accessibilityLabel="Add"
+            >
+              Add
+            </Button>
+          </TrailingActionsRow>
+        </FieldStack>
+        {isLoading ? (
+          <ListLoadingState label="Loading tags" />
+        ) : (
+          <CardStack>
+            {tags.map((tag) =>
+              editingTagId === tag.id ? (
+                <Card key={tag.id} variant="compact">
+                  <FieldStack>
+                    <TextField
+                      placeholder="Tag name"
+                      value={editName}
+                      onChangeText={(value) => {
+                        onEditNameChange?.(value);
+                      }}
+                      accessibilityLabel={`Rename tag ${tag.name}`}
+                    />
+                    <TrailingActionsRow
+                      leading={
+                        <ColorPickerField
+                          colors={colorOptions}
+                          value={editColor ?? tag.color}
+                          onChange={(value) => {
+                            onEditColorChange?.(value);
+                          }}
+                        />
+                      }
+                    >
+                      <Button
+                        variant="secondary"
+                        disabled={isUpdating}
+                        onPress={() => {
+                          onCancelEdit?.();
+                        }}
+                        accessibilityLabel="Cancel"
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        variant="primary"
+                        disabled={!editName.trim() || isUpdating}
+                        onPress={() => {
+                          onSaveEdit?.();
+                        }}
+                        accessibilityLabel="Save"
+                      >
+                        Save
+                      </Button>
+                    </TrailingActionsRow>
+                  </FieldStack>
+                </Card>
+              ) : (
+                <BadgeCardRow
+                  key={tag.id}
+                  badgeLabel={tag.name}
+                  badgeColor={tag.color}
+                  actions={[
+                    ...(onStartEdit
+                      ? [
+                          {
+                            label: "Edit",
+                            accessibilityLabel: `Edit tag ${tag.name}`,
+                            onPress: () => {
+                              onStartEdit(tag);
+                            },
+                          },
+                        ]
+                      : []),
+                    {
+                      label: "Delete",
+                      accessibilityLabel: `Delete tag ${tag.name}`,
+                      variant: "error" as const,
+                      onPress: () => {
+                        onDelete(tag.id);
+                      },
+                    },
+                  ]}
                 />
-                <XStack flexWrap="wrap" gap="$2" alignItems="center" justifyContent="space-between">
-                  <ColorPickerField
-                    colors={colorOptions}
-                    value={editColor ?? tag.color}
-                    onChange={(value) => {
-                      onEditColorChange?.(value);
-                    }}
-                  />
-                  <XStack gap="$2">
-                    <Button
-                      variant="secondary"
-                      disabled={isUpdating}
-                      onPress={() => {
-                        onCancelEdit?.();
-                      }}
-                      accessibilityLabel="Cancel"
-                    >
-                      Cancel
-                    </Button>
-                    <Button
-                      variant="primary"
-                      disabled={!editName.trim() || isUpdating}
-                      onPress={() => {
-                        onSaveEdit?.();
-                      }}
-                      accessibilityLabel="Save"
-                    >
-                      Save
-                    </Button>
-                  </XStack>
-                </XStack>
-              </YStack>
-            </YStack>
-          ) : (
-            <YStack key={tag.id} paddingBottom="$2">
-              <XStack
-                alignItems="center"
-                justifyContent="space-between"
-                borderRadius={tokens.radii.md}
-                backgroundColor="$surface"
-                padding="$3"
-                shadowColor={tokens.shadows.sm.shadowColor}
-                shadowOffset={tokens.shadows.sm.shadowOffset}
-                shadowOpacity={tokens.shadows.sm.shadowOpacity}
-                shadowRadius={tokens.shadows.sm.shadowRadius}
-              >
-                <Badge color={tag.color}>{tag.name}</Badge>
-                <XStack gap="$3" alignItems="center">
-                  {onStartEdit ? (
-                    <TextAction
-                      accessibilityLabel={`Edit tag ${tag.name}`}
-                      onPress={() => {
-                        onStartEdit(tag);
-                      }}
-                    >
-                      Edit
-                    </TextAction>
-                  ) : null}
-                  <TextAction
-                    variant="error"
-                    accessibilityLabel={`Delete tag ${tag.name}`}
-                    onPress={() => {
-                      onDelete(tag.id);
-                    }}
-                  >
-                    Delete
-                  </TextAction>
-                </XStack>
-              </XStack>
-            </YStack>
-          ),
-        )
-      )}
+              ),
+            )}
+          </CardStack>
+        )}
+      </SectionStack>
     </ScreenContainer>
   );
 }

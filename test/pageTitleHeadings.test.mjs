@@ -7,19 +7,16 @@
  * the page title as the page's top heading.
  *
  * The contract now:
- * 1. Each of the six pages that keep the heading form
- *    (AddRecipeMenuPage, MealDetailPage, MealPlanDetailPage,
- *    MealsHubPage, ShoppingListPage, TagsPage) renders its title
- *    with `variant="heading"` (level 1 on web) — exactly once, so
- *    no page gains a second level-1 heading — and no `subheading`
- *    usage remains in those files (their only subheading was the
- *    title).
- * 2. The title keeps its explicit `fontSize` xl / `fontWeight` bold
- *    overrides, so the visual rendering is unchanged (the `heading`
- *    variant's own defaults are 3xl/bold; the overrides pin xl/bold).
- *    (FeedbackPage and ProfilePage rendered with exactly those
- *    overrides too, until the #119 auth tranche moved them to the
- *    `title` variant — point 5.)
+ * 1. One of the eight pages (AddRecipeMenuPage) still renders
+ *    its title with `variant="heading"` (level 1 on web) — exactly
+ *    once, so the page gains no second level-1 heading — and no
+ *    `subheading` usage remains in that file (its only subheading
+ *    was the title). Every other page's title has moved to the
+ *    `title` variant (items 6 and 7).
+ * 2. Its title keeps its explicit `fontSize` xl / `fontWeight`
+ *    bold overrides, so the visual rendering is unchanged (the
+ *    `heading` variant's own defaults are 3xl/bold; the overrides
+ *    pin xl/bold).
  * 3. HomePage is the pinned exception that proves the sweep is
  *    title-only: its page title was already `heading`, and its
  *    section title correctly stays `subheading` (level 2).
@@ -44,9 +41,15 @@
  *    which IS xl bold at heading level 1. Rendering and heading
  *    semantics are unchanged; the size/weight are owned by the
  *    variant (pinned against Text.tsx below) instead of the page.
+ * 7. The #119 meals & planning tranche applies the same move to
+ *    MealDetailPage, MealsHubPage, ShoppingListPage, and
+ *    TagsPage: their titles take the `title` variant (exactly
+ *    once; no `heading` or `subheading` usage remains), so the
+ *    SSR composition contract under 4 is unchanged — each hub
+ *    tab still exposes exactly one level-1 heading.
  *    FeedbackPage and ProfilePage joined it in the #119 auth
  *    tranche: same shape (heading + xl/bold overrides), same move
- *    to the `title` variant, pinned by the same test below.
+ *    to the `title` variant, pinned by their own test below.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -63,13 +66,11 @@ function readCode(rel) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const TITLE_PAGES = [
-  "AddRecipeMenuPage",
-  "MealDetailPage",
-  "MealsHubPage",
-  "ShoppingListPage",
-  "TagsPage",
-];
+const TITLE_PAGES = ["AddRecipeMenuPage"];
+
+// The #119 meals & planning tranche's pages: their titles moved
+// to the `title` variant (the MealPlanDetailPage pattern, item 6).
+const TITLE_VARIANT_PAGES = ["MealDetailPage", "MealsHubPage", "ShoppingListPage", "TagsPage"];
 
 function countOccurrences(code, needle) {
   return code.split(needle).length - 1;
@@ -107,6 +108,27 @@ test("page titles keep their xl/bold overrides so rendering is unchanged (#263)"
       attrs,
       /fontWeight=\{tokens\.typography\.fontWeight\.bold\}/,
       `${page} title must keep its fontWeight bold override`,
+    );
+  }
+});
+
+test("the #119 meals tranche's page titles take the title variant — xl bold at level 1 (#263, #119)", () => {
+  for (const page of TITLE_VARIANT_PAGES) {
+    const code = readCode(`src/pages/${page}.tsx`);
+    assert.equal(
+      countOccurrences(code, 'variant="title"'),
+      1,
+      `${page} must render exactly one title-variant Text (its title)`,
+    );
+    assert.equal(
+      countOccurrences(code, 'variant="heading"'),
+      0,
+      `${page}'s title must not use the heading variant (its 3xl default is not the app's title size)`,
+    );
+    assert.equal(
+      countOccurrences(code, 'variant="subheading"'),
+      0,
+      `${page} must not keep a subheading usage`,
     );
   }
 });

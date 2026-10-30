@@ -14,12 +14,16 @@
  * the family's render-content functions is accompanied by the
  * matching `importantForAccessibility` conditional.
  *
- * It also pins MealsHubPage's native overlay label composing the
- * row's subtitle (the family's standing rule — RecipesPage and
- * MealDetailPage already composed title + subtitle): with the
- * visible texts hidden, a title-only label would drop the recipe
- * count and nutrition summary from the announcement. The web
- * anchor keeps its title-only label (pre-existing behavior).
+ * It also pins the native overlay label of MealsHubPage's meal
+ * rows composing the row's subtitle (the family's standing rule
+ * — RecipesPage and MealDetailPage already composed title +
+ * subtitle): with the visible texts hidden, a title-only label
+ * would drop the recipe count and nutrition summary from the
+ * announcement. The web anchor keeps its title-only label
+ * (pre-existing behavior). Since the #119 meals & planning
+ * tranche the meal rows render through the generic
+ * TextActionCardRow, and MealDetailPage's member rows through
+ * ListRow, so both pins now live on the components.
  *
  * Source scan, not a render test: the failures it guards happen
  * on Android accessibility services, which no JS renderer in this
@@ -49,7 +53,10 @@ function count(code, literal) {
 // from RecipesPage), and the third element is the file's
 // decorative-text count. Two of the surfaces live in the
 // generic row components since the #119 extractions: the plan
-// rows in CardRow and the entry rows in ListRow. The recipe
+// rows in CardRow and the entry rows in ListRow. The meals &
+// planning tranche added a third generic surface: MealsHubPage's
+// meal rows in TextActionCardRow (MealDetailPage's member rows
+// are ListRow's surface, already counted above). The recipe
 // list's rows are RecipesPage's page-local MediaRow
 // composition (Stephen's tranche rule, 2026-10-29), so its
 // surface is the page file itself.
@@ -57,9 +64,8 @@ const FAMILY = [
   ["src/components/OptionCard.tsx", "decorative", 3],
   ["src/components/CardRow.tsx", "decorative", 2],
   ["src/components/ListRow.tsx", "decorative", 2],
+  ["src/components/TextActionCardRow.tsx", "decorative", 2],
   ["src/pages/RecipesPage.tsx", "native", 2],
-  ["src/pages/MealDetailPage.tsx", "decorative", 2],
-  ["src/pages/MealsHubPage.tsx", "decorative", 2],
 ];
 
 for (const [rel, flag, expectedCount] of FAMILY) {
@@ -88,8 +94,8 @@ for (const [rel, flag, expectedCount] of FAMILY) {
   });
 }
 
-test("MealsHubPage's native overlay label composes the subtitle; the web anchor keeps its title-only label", () => {
-  const code = codeOf("src/pages/MealsHubPage.tsx");
+test("TextActionCardRow's native overlay label composes the subtitle; the web anchor keeps its title-only label", () => {
+  const code = codeOf("src/components/TextActionCardRow.tsx");
   // The matched source literal itself contains template
   // placeholders; interpolate the "$" signs so this file's lint
   // (no placeholder-looking text in plain strings) stays quiet.
@@ -97,13 +103,13 @@ test("MealsHubPage's native overlay label composes the subtitle; the web anchor 
   assert.equal(
     count(
       code,
-      `accessibilityLabel={meal.subtitle ? \`${dollar}{meal.title}, ${dollar}{meal.subtitle}\` : meal.title}`,
+      `accessibilityLabel={subtitle ? \`${dollar}{title}, ${dollar}{subtitle}\` : title}`,
     ),
     1,
     "the native LinkOverlay's label must carry the subtitle — the visible texts are hidden, so a title-only label drops the recipe count and nutrition summary",
   );
   assert.equal(
-    count(code, "accessibilityLabel: meal.title"),
+    count(code, "accessibilityLabel: title"),
     1,
     "the web anchor's title-only label is pre-existing behavior and stays unchanged",
   );
