@@ -69,26 +69,31 @@ test("auth pages use the DS auth shell and secure password entry", () => {
     const source = page(name);
     assert.match(source, /variant="auth"/, `${name} renders the auth shell`);
   }
-  for (const name of ["SignInPage", "SignUpPage", "ResetPasswordPage"]) {
-    assert.match(page(name), /secureTextEntry/, `${name} masks the password`);
+  // Since #119 the password fields live in the pages' form units
+  // (the extracted form components) — the masking pin follows
+  // the fields there.
+  for (const name of ["SignInForm", "SignUpForm", "ResetPasswordForm"]) {
+    assert.match(component(name), /secureTextEntry/, `${name} masks the password`);
   }
   // The reset token is app-side business logic: it never
-  // crosses the DS boundary, not even as a prop.
+  // crosses the DS boundary, not even as a prop — neither on
+  // the page nor on its form unit.
   assert.doesNotMatch(page("ResetPasswordPage"), /\btoken\??:/);
+  assert.doesNotMatch(component("ResetPasswordForm"), /\btoken\??:/);
 });
 
-test("SignUpPage footer block is consistently centered (eciperay#294)", () => {
+test("SignUpForm footer block is consistently centered (eciperay#294)", () => {
   // The host renders its legal notice centered in the legalNotice
   // slot; the sign-in link that follows it in the same footer
   // block must carry the same alignment or the block reads as
-  // two mismatched columns. Since #209 the $4 space above the
-  // link is the parent stack's padding, not a margin on the
-  // link itself — the pin follows the shape that carries both
-  // properties today.
-  const source = page("SignUpPage");
+  // two mismatched columns. Since #119 the block lives in the
+  // SignUpForm unit the page composes, and the separation is
+  // the form's own field rhythm — the pin follows the rendered
+  // shape that carries the centering today.
+  const source = component("SignUpForm");
   assert.match(
     source,
-    /<YStack paddingTop="\$4">\s*<TextLink textAlign="center" href={signInHref}>\s*Already have an account\? Sign in/,
+    /<TextLink textAlign="center" href={signInHref}>\s*Already have an account\? Sign in/,
     "the sign-in footer link is center-aligned like the legal notice above it (and a link since #248)",
   );
   assert.doesNotMatch(
@@ -119,18 +124,19 @@ test("auth pages report bare intents; no credentials logic in the DS", () => {
 
 test("auth cross-links render their href destinations (#248)", () => {
   // The declarations alone don't prove the destinations reach
-  // the rendered links — pin the rendered forms too (SignUpPage's
+  // the rendered links — pin the rendered forms too (SignUpForm's
   // is pinned by the footer test above), and pin that no
-  // navigation press callback survives on these pages.
-  assert.match(page("SignInPage"), /<TextLink href=\{signUpHref\}>Create an account<\/TextLink>/);
+  // navigation press callback survives on these pages. Since
+  // #119 the links render in the pages' form units, and the
+  // de-emphasized destinations take TextLink's muted tone (the
+  // app link button's muted variant) instead of a hard-coded
+  // gray — the pins follow the links into the forms.
   assert.match(
-    page("SignInPage"),
-    /<TextLink color=\{tokens\.colors\.gray\.gray6\} href=\{forgotPasswordHref\}>/,
+    component("SignInForm"),
+    /<TextLink href=\{signUpHref\}>Create an account<\/TextLink>/,
   );
-  assert.match(
-    page("ForgotPasswordPage"),
-    /<TextLink color=\{tokens\.colors\.gray\.gray6\} href=\{signInHref\}>/,
-  );
+  assert.match(component("SignInForm"), /<TextLink tone="muted" href=\{forgotPasswordHref\}>/);
+  assert.match(component("ForgotPasswordForm"), /<TextLink tone="muted" href=\{signInHref\}>/);
   for (const name of ["SignInPage", "SignUpPage", "ForgotPasswordPage"]) {
     assert.doesNotMatch(
       page(name),
@@ -220,7 +226,13 @@ test("TagsPage takes its palette as a prop and renders DS Badges as colored tags
   const source = page("TagsPage");
   // #207: the palette crosses as tag color token names, not raw hexes.
   assert.match(source, /colorOptions: TagColorName\[\]/);
-  assert.match(source, /<Badge color=\{tag\.color\}>\{tag\.name\}<\/Badge>/);
+  // Since the #119 de-styling the rows render through
+  // BadgeCardRow: the page passes the tag's name and color name
+  // as the badge's data (Badge's `color` is a style-named prop,
+  // which pages may not set), and the row renders the Badge.
+  assert.match(source, /badgeLabel=\{tag\.name\}/);
+  assert.match(source, /badgeColor=\{tag\.color\}/);
+  assert.match(component("BadgeCardRow"), /<Badge color=\{badgeColor\}>\{badgeLabel\}<\/Badge>/);
   assert.match(source, /ColorPickerField/);
 });
 
@@ -236,7 +248,9 @@ test("TagsPage supports inline rename through a controlled edit draft (eciperay#
   assert.match(source, /onSaveEdit\?: \(\) => void/);
   assert.match(source, /onCancelEdit\?: \(\) => void/);
   // The row offers an accessible Edit action and the editor a Save action.
-  assert.match(source, /accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/);
+  // Since #119 the Edit action crosses as BadgeCardRow action
+  // data, so its label is composed in an object property.
+  assert.match(source, /accessibilityLabel: `Edit tag \$\{tag\.name\}`/);
   assert.match(source, /accessibilityLabel="Save"/);
 });
 
@@ -244,4 +258,13 @@ test("FeedbackPage is fully controlled; validation crosses as a boolean", () => 
   const source = page("FeedbackPage");
   assert.match(source, /submitDisabled\?: boolean/);
   assert.doesNotMatch(source, /useAnalytics|useAuth|validateUserFeedback|APP_VERSION/);
+});
+
+test("FeedbackPage fields carry explicit accessible names", () => {
+  // The fields' visible labels associate on web through their
+  // Label elements; the native accessible names cross explicitly,
+  // as the email field's always has.
+  const source = page("FeedbackPage");
+  assert.match(source, /accessibilityLabel="What's on your mind\?"/);
+  assert.match(source, /accessibilityLabel="Email me back \(optional\)"/);
 });

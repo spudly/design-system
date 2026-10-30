@@ -1,9 +1,6 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
 import { PrevNextNav } from "../components/PrevNextNav.js";
 import { StepDots } from "../components/StepDots.js";
-import { Text } from "../components/Text.js";
+import { StepOverlay } from "../components/StepOverlay.js";
 
 /**
  * MealCookingModePage (#125, B3b): the meal cooking mode's
@@ -21,12 +18,12 @@ import { Text } from "../components/Text.js";
  *   prop, and prev / next / done are bare callbacks. The
  *   screen keeps the index (and its clamping); nothing here
  *   owns navigation state.
- * - The overlay chrome is page chrome, baked in (the
- *   MealPlanDetailPage no-slot precedent): the dark full-
- *   screen shell, the absolute Done button, the uppercase
- *   step headers. No shared DS overlay shell is extracted in
- *   this batch; the recipe cooking view's parts family stays
- *   app-side (G9).
+ * - The overlay chrome is the generic StepOverlay shell
+ *   (#119): the dark full-screen shell, the absolute Done
+ *   button, the uppercase step headers. The page composes
+ *   the step line and passes its navigation (StepDots,
+ *   PrevNextNav) as the shell's children; the recipe cooking
+ *   view's parts family stays app-side (G9).
  * - Bounds are the page's presentation of its props: on the
  *   first step the back button is omitted (the DS
  *   PrevNextNav convention the app adapter encodes — the DS
@@ -49,6 +46,12 @@ import { Text } from "../components/Text.js";
  * - The nav labels keep the app's arrow forms ("← Back" /
  *   "Next →"), passed explicitly — the DS PrevNextNav
  *   defaults are unadorned.
+ *
+ * De-styled for #119: the page renders no layout primitives
+ * and sets no styling props — the overlay shell (formerly
+ * this page's own chrome) is the StepOverlay component, and
+ * the page contributes only the bounds logic, the composed
+ * step line, and its navigation controls.
  */
 
 export type MealCookingModePageStep = {
@@ -79,88 +82,13 @@ export function MealCookingModePage({
     return null;
   }
 
-  // Web keyboard support for the Done affordance (the
-  // MealPlansPage row pattern): Enter and Space invoke the
-  // same callback as a press. Web-only props, ignored on
-  // native.
-  const handleDoneKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onDone();
-    }
-  };
-
   return (
-    <YStack
-      position="absolute"
-      top={0}
-      left={0}
-      right={0}
-      bottom={0}
-      justifyContent="center"
-      backgroundColor={tokens.colors.gray.gray10}
-      paddingHorizontal="$6"
+    <StepOverlay
+      title={mealTitle}
+      stepLabel={`Step ${current.stepNumber} of ${steps.length} · ${current.recipeTitle}`}
+      body={current.body}
+      onDone={onDone}
     >
-      <YStack
-        position="absolute"
-        right={tokens.spacing[6]}
-        top={tokens.spacing[12]}
-        borderRadius={tokens.radii.full}
-        overflow="hidden"
-        {...platformAccessibilityProps({
-          accessibilityRole: "button",
-          accessibilityLabel: "Done",
-        })}
-        onPress={onDone}
-        tabIndex={0}
-        onKeyDown={handleDoneKeyDown}
-        cursor="web:pointer"
-      >
-        <YStack
-          position="absolute"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          backgroundColor="$surface"
-          opacity={0.1}
-        />
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          color="$surface"
-          paddingHorizontal="$4"
-          paddingVertical="$2"
-        >
-          Done
-        </Text>
-      </YStack>
-      <YStack paddingBlockEnd="$2">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          letterSpacing={1.4}
-          color="$surface"
-          opacity={0.6}
-          textTransform="uppercase"
-        >
-          {mealTitle}
-        </Text>
-      </YStack>
-      <YStack paddingBlockEnd="$4">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          letterSpacing={1.4}
-          color="$surface"
-          opacity={0.6}
-          textTransform="uppercase"
-        >
-          Step {current.stepNumber} of {steps.length} · {current.recipeTitle}
-        </Text>
-      </YStack>
-      <YStack paddingBlockEnd="$8">
-        <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
-          {current.body}
-        </Text>
-      </YStack>
       <StepDots count={steps.length} activeIndex={stepIndex} />
       <PrevNextNav
         {...(stepIndex === 0 ? {} : { onBack: onPrev })}
@@ -169,6 +97,6 @@ export function MealCookingModePage({
         nextLabel="Next →"
         nextDisabled={stepIndex >= steps.length - 1}
       />
-    </YStack>
+    </StepOverlay>
   );
 }

@@ -12,9 +12,13 @@
  *    and suppresses activation — and leaves the tab order — while
  *    disabled.
  * 2. CommentItem's Edit / Save / Cancel / Delete actions and
- *    TagsPage's Delete row action render through TextAction; no
+ *    TagsPage's row actions render through TextAction; no
  *    bare accessibilityRole="button" text action remains in
- *    either file.
+ *    either file. Since the #119 meals & planning tranche,
+ *    TagsPage's rows render through BadgeCardRow: the page
+ *    composes the Edit / Delete actions (with their accessible
+ *    labels) as data, and the row renders them through
+ *    TextAction.
  * 3. TextAction is exported from the components index and has
  *    stories, so Chromatic and the Android VR capture it.
  *
@@ -41,6 +45,7 @@ function readCode(rel) {
 const textAction = readCode("src/components/TextAction.tsx");
 const commentItem = readCode("src/components/CommentItem.tsx");
 const tagsPage = readCode("src/pages/TagsPage.tsx");
+const badgeCardRow = readCode("src/components/BadgeCardRow.tsx");
 const index = readFileSync(join(root, "src", "components", "index.ts"), "utf8");
 const stories = readFileSync(join(root, "src", "components", "TextAction.stories.tsx"), "utf8");
 
@@ -103,21 +108,30 @@ test("CommentItem's four text actions render through TextAction", () => {
 });
 
 test("TagsPage's Edit and Delete row actions render through TextAction", () => {
-  assert.match(tagsPage, /<TextAction/);
+  // The page composes the row's actions as data for BadgeCardRow,
+  // keeping their accessible labels (#119); the row renders each
+  // action through TextAction (pinned in full in
+  // test/badgeCardRow.test.mjs).
+  assert.match(tagsPage, /<BadgeCardRow/);
+  // The matched literals contain template placeholders; interpolate
+  // the "$" so this file's lint (no template-curly in plain
+  // strings) stays quiet — the nativeLinkDecorative pattern.
+  const dollar = "$";
   assert.ok(
-    tagsPage.includes("accessibilityLabel={`Delete tag") && tagsPage.includes("{tag.name}`}"),
-    "the Delete row action must be a TextAction keeping its accessible label",
+    tagsPage.includes(`accessibilityLabel: \`Delete tag ${dollar}{tag.name}\``),
+    "the Delete row action must keep its accessible label",
   );
   assert.ok(
-    tagsPage.includes("accessibilityLabel={`Edit tag"),
-    "the Edit row action (added by #228, merged before this fix landed) must be a TextAction keeping its accessible label",
+    tagsPage.includes(`accessibilityLabel: \`Edit tag ${dollar}{tag.name}\``),
+    "the Edit row action (added by #228, merged before this fix landed) must keep its accessible label",
   );
   for (const label of ["Edit", "Delete"]) {
     assert.ok(
-      new RegExp(String.raw`<TextAction[\s\S]*?>\s*${label}\s*</TextAction>`).test(tagsPage),
-      `TagsPage's ${label} action must render through TextAction`,
+      tagsPage.includes(`label: "${label}"`),
+      `TagsPage must compose its ${label} row action for BadgeCardRow`,
     );
   }
+  assert.match(badgeCardRow, /<TextAction/);
   assert.ok(
     !tagsPage.includes('accessibilityRole="button"'),
     "TagsPage must not keep a bare button-role text action (#229)",
