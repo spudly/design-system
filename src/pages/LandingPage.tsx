@@ -1,5 +1,5 @@
-import { Anchor, XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
+import { XStack, YStack } from "tamagui";
+import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
@@ -23,12 +23,43 @@ import { Text } from "../components/Text.js";
  * props rendered as anchors — not press callbacks. That is the
  * navigation rule (a control that navigates is a link with an
  * href) and the deliberate exception for public web surfaces;
- * signed-in app pages keep the callbacks-out pattern.
+ * signed-in app pages keep the callbacks-out pattern. The
+ * anchors are Button's href form (Stephen's ruling on PR #311):
+ * an earlier dedicated CtaLink component duplicated that form
+ * and was deleted — the CTAs render through <Button href>
+ * (ButtonLink) with the primary/secondary variants.
  *
  * The features are three FIXED slots (Stephen's decision on
  * #171, against the array lean): the page's structure is fixed,
  * and adding a fourth feature later is a deliberate contract
  * change, not a longer array from the host.
+ *
+ * The page composes its sections directly (#119; Stephen's
+ * no-new-components rule for tranche PRs, 2026-10-29): the hero,
+ * the CTA row, and the feature grid are page-local composition,
+ * not library components — the hero's centering and top
+ * breathing room, the CTA row's geometry, the cards' flex and
+ * 260px wrap basis, and the grid's wrap are this page's design,
+ * rendered here from the shared primitives (Text, Button, Card,
+ * and the Tamagui stacks). An earlier tranche cut extracted
+ * them as Hero / CtaRow / FeatureCard / CardGrid library
+ * components; they had no second consumer, so they were folded
+ * back into the page.
+ *
+ * CTA row geometry (#171): the CTAs under the hero stack
+ * narrow and row on wide. The DS Tamagui config defines no
+ * width breakpoints — the contract's narrow rendering is the
+ * native one (the RN storybook / Android VR capture) and its
+ * wide rendering is web — so the row is a flat `web:` clause on
+ * a column stack, the ScreenContainer idiom. A wrapping row
+ * could seat two CTAs side by side at the 430px story viewport,
+ * which is not the contracted stack, so the row deliberately
+ * does not wrap. Tamagui applies the clause when IT compiles
+ * the style; ui's web build is Vite, which does not run the
+ * compiler, so the clause only takes effect behind a consumer
+ * that compiles (Tamagui's Vite plugin / Metro) — the contract
+ * records the intended responsive geometry whatever the
+ * consumer.
  */
 
 export type LandingPageCta = {
@@ -52,43 +83,6 @@ export type LandingPageProps = {
   featureThree: LandingPageFeature;
 };
 
-/**
- * One hero CTA: a real anchor wearing the Button variants'
- * styling (primary = filled brand, secondary = muted fill), so
- * the landing's links read as the same calls to action the
- * app's buttons do while keeping native link semantics — an
- * `href` and the link role on web (crawlable, open-in-new-tab);
- * on native the anchor opens the URL.
- */
-function LandingCta({ cta, variant }: { cta: LandingPageCta; variant: "primary" | "secondary" }) {
-  return (
-    <Anchor
-      href={cta.href}
-      backgroundColor={variant === "primary" ? "$primary" : tokens.colors.gray.gray3}
-      color={variant === "primary" ? "$onPrimary" : tokens.colors.gray.gray10}
-      fontSize={tokens.typography.fontSize.md}
-      fontWeight={tokens.typography.fontWeight.semibold}
-      paddingHorizontal={tokens.spacing[4]}
-      paddingVertical={tokens.spacing[3]}
-      borderRadius={tokens.radii.md}
-      textAlign="center"
-      textDecorationLine="none"
-    >
-      {cta.label}
-    </Anchor>
-  );
-}
-
-/** One fixed feature slot: a uniform card — title + one line. */
-function LandingFeatureCard({ feature }: { feature: LandingPageFeature }) {
-  return (
-    <Card flex={1} flexBasis={260} gap="$2">
-      <Text variant="subheading">{feature.title}</Text>
-      <Text color="$textMuted">{feature.description}</Text>
-    </Card>
-  );
-}
-
 export function LandingPage({
   heroTitle,
   heroSubtitle,
@@ -109,24 +103,24 @@ export function LandingPage({
           {heroSubtitle}
         </Text>
       </YStack>
-      {/* CTA layout (#171 contract): stacked narrow, a row on
-          wide. The DS Tamagui config defines no width
-          breakpoints — the contract's narrow rendering is the
-          native one (the RN storybook / Android VR capture) and
-          its wide rendering is web — so the row is a flat `web:`
-          clause on a column stack, the ScreenContainer idiom. A
-          wrapping row could seat two CTAs side by side at the
-          430px story viewport, which is not the contracted
-          stack. */}
       <YStack flexDirection="web:row" gap="$3" alignItems="center" justifyContent="center">
-        <LandingCta cta={discoverCta} variant="primary" />
-        <LandingCta cta={signUpCta} variant="secondary" />
-        <LandingCta cta={getAppCta} variant="secondary" />
+        <Button href={discoverCta.href} variant="primary">
+          {discoverCta.label}
+        </Button>
+        <Button href={signUpCta.href} variant="secondary">
+          {signUpCta.label}
+        </Button>
+        <Button href={getAppCta.href} variant="secondary">
+          {getAppCta.label}
+        </Button>
       </YStack>
       <XStack flexWrap="wrap" gap="$3">
-        <LandingFeatureCard feature={featureOne} />
-        <LandingFeatureCard feature={featureTwo} />
-        <LandingFeatureCard feature={featureThree} />
+        {[featureOne, featureTwo, featureThree].map((feature) => (
+          <Card key={feature.title} flex={1} flexBasis={260} gap="$2">
+            <Text variant="subheading">{feature.title}</Text>
+            <Text color="$textMuted">{feature.description}</Text>
+          </Card>
+        ))}
       </XStack>
     </ScreenContainer>
   );

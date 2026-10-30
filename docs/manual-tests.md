@@ -750,6 +750,57 @@ recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
+## LegalDocumentPage
+
+Open in `Pages/Eciperay/LegalDocumentPage`: PrivacyPolicy,
+TermsOfService, Wide.
+
+1. The document title is the level-1 heading, with the muted
+   last-updated line under it — "Last updated: July 22, 2026"
+   in PrivacyPolicy, "Last updated: June 18, 2026" in
+   TermsOfService (each story's fixture date); each section
+   title is a level-2 heading.
+2. The paragraph renders its strong span bold and its mailto
+   link underlined in link ink; the list renders bulleted rows
+   with bold lead-ins and a monospace code span.
+3. In Wide (the unconstrained story — the other two pin a
+   430px viewport, where the cap cannot bind): on a wide
+   viewport the prose column caps at 768px and centers; the
+   frame header (wordmark + sign-in links) and footer (the
+   host's legal links) render as real links.
+
+**Run when:** `src/pages/LegalDocumentPage.tsx`, its stories,
+DocumentHeader / DocumentFooter, or a changeset naming
+LegalDocumentPage.
+
+---
+
+## LandingPage
+
+Open in `Pages/Eciperay/LandingPage`: Default, Wide.
+
+1. The headline renders centered as the level-1 heading, with
+   the muted subtitle centered under it and breathing room
+   above the headline.
+2. The three CTAs are Button's href form (`<Button href>` —
+   the ButtonLink form; there is no CtaLink): the primary CTA
+   is the filled brand button link, the two secondaries are
+   neutral button links, all real links (role link, their
+   hrefs), never buttons. On web they sit in one centered row
+   (check in Wide); on native (the RN storybook) they stack
+   vertically — the row never wraps two CTAs side by side at
+   phone width.
+3. Feature cards: in Wide the three cards share one row, each
+   with its title as a level-2 heading and the muted
+   description under it; in Default (the 430px phone viewport)
+   they wrap onto further rows at their 260px basis instead
+   of squeezing — three-across cannot fit there.
+
+**Run when:** `src/pages/LandingPage.tsx`, its stories,
+Button's href form, or a changeset naming LandingPage.
+
+---
+
 ## MealPlansPage & MealPlanDetailPage
 
 Open in `Pages/Eciperay/MealPlansPage`: Default, Empty, Loading,
