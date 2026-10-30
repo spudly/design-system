@@ -117,6 +117,27 @@ test("card navigation is an href, never a press callback (decision 1)", () => {
   assert.match(card, /if \(isWeb\)/, "the anchor render is the web branch of the platform split");
 });
 
+test("the card's thumbnail is decorative through the shared Thumbnail (#349)", () => {
+  assert.match(
+    card,
+    /import \{ Thumbnail \} from "\.\/Thumbnail\.js";/,
+    "the card must import the shared Thumbnail component",
+  );
+  assert.match(
+    card,
+    /<Thumbnail src=\{imageUrl\} variant="row" \/>/,
+    "the card's image must render through the shared Thumbnail's row variant (identical 64dp geometry), unnamed so it stays decorative",
+  );
+  assert.ok(
+    !card.includes("alt="),
+    'the card must not pass an alt itself: React Native Image maps any non-null alt to accessible:true plus that label, so a local alt="" exposed the image as an unlabeled accessibility element on native (#349, verified against the Android accessibility tree); the shared Thumbnail owns the platform split — alt="" on web, no alt on native (#339)',
+  );
+  assert.ok(
+    !/<Image[\s>]/.test(card),
+    "the card must not render a raw Tamagui Image — the shared Thumbnail is the image element",
+  );
+});
+
 test("the collapsed-filter contract props are declared (decision 2)", () => {
   assert.match(
     page,
@@ -320,6 +341,27 @@ test("SSR: DiscoveryCard renders a real anchor carrying the permalink", async ()
   assert.ok(html.includes("By Sam · ★ 4 · Satiety 75"), "the subtitle renders inside the anchor");
   assert.ok(!/accessibilityrole/i.test(html), "accessibilityrole must not leak to the DOM");
   assert.ok(!html.includes("[object Object]"), "no stringified object in the DOM");
+});
+
+test('SSR: DiscoveryCard with an image renders it decorative on web — alt="" and no accessible name (#349)', async () => {
+  const { React, DiscoveryCard } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(DiscoveryCard, {
+      title: "Creamy Tuscan Garlic Chicken",
+      subtitle: "By Maria · ★ 4.5 · Satiety 60",
+      imageUrl: "https://example.com/tuscan-chicken.jpg",
+      href: "/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken",
+    }),
+  );
+  assert.match(
+    html,
+    /<img[^>]*alt=""/,
+    'the card image must render alt="" on web so screen readers never announce it by filename (the card is named by its title and subtitle)',
+  );
+  assert.ok(
+    !/<img[^>]*aria-label/.test(html),
+    "the decorative card image must not gain an accessible name on web",
+  );
 });
 
 test("SSR: DiscoveryCard without a subtitle renders the title alone", async () => {
