@@ -750,70 +750,49 @@ recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
-## ProseDocument
+## LegalDocumentPage
 
-Open in `Components/ProseDocument`: Default.
+Open in `Pages/Eciperay/LegalDocumentPage`: PrivacyPolicy,
+TermsOfService.
 
-1. The "Privacy Policy" title is the level-1 heading, with the
-   muted "Last updated: July 22, 2026" line under it; each
-   section title is a level-2 heading.
+1. The document title is the level-1 heading, with the muted
+   "Last updated: July 22, 2026" line under it; each section
+   title is a level-2 heading.
 2. The paragraph renders its strong span bold and its mailto
    link underlined in link ink; the list renders bulleted rows
    with bold lead-ins and a monospace code span.
 3. On a wide viewport the prose column caps at 768px and
-   centers.
+   centers; the frame header (wordmark + sign-in links) and
+   footer (the host's legal links) render as real links.
 
-**Run when:** `src/components/ProseDocument.tsx`, its stories,
-LegalDocumentPage, or a changeset naming ProseDocument.
+**Run when:** `src/pages/LegalDocumentPage.tsx`, its stories,
+DocumentHeader / DocumentFooter, or a changeset naming
+LegalDocumentPage.
 
 ---
 
-## Hero
+## LandingPage
 
-Open in `Components/Hero`: Default.
+Open in `Pages/Eciperay/LandingPage`: Default.
 
 1. The headline renders centered as the level-1 heading, with
    the muted subtitle centered under it and breathing room
    above the headline.
+2. The three CTAs are Button's href form (`<Button href>` —
+   the ButtonLink form; there is no CtaLink): the primary CTA
+   is the filled brand button link, the two secondaries are
+   neutral button links, all real links (role link, their
+   hrefs), never buttons. On web they sit in one centered row;
+   on native (the RN storybook) they stack vertically — the
+   row never wraps two CTAs side by side at phone width.
+3. The three feature cards share one row at story width, each
+   with its title as a level-2 heading and the muted
+   description under it; narrowing the viewport wraps them
+   onto further rows at their 260px basis instead of
+   squeezing them.
 
-**Run when:** `src/components/Hero.tsx`, its stories,
-LandingPage, or a changeset naming Hero.
-
----
-
-## CtaRow (landing CTAs are Button href links)
-
-Open in `Components/CtaRow`: Default. The landing's CTAs are
-Button's href form (`<Button href>` — the ButtonLink form);
-there is no CtaLink component (deleted on Stephen's PR #311
-ruling — it duplicated ButtonLink).
-
-1. Default: the primary CTA is the filled brand button link;
-   the two secondary CTAs are the neutral button links. All
-   three are real links (role link, their hrefs), never buttons.
-2. On web the three CTAs sit in one centered row; on native
-   (the RN storybook) they stack vertically — the row never
-   wraps two CTAs side by side at phone width.
-
-**Run when:** `src/components/CtaRow.tsx`, its stories,
-LandingPage, Button's href form, or a changeset naming any of
-them.
-
----
-
-## FeatureCard & CardGrid
-
-Open in `Components/FeatureCard`: Default. Open in
-`Components/CardGrid`: Default.
-
-1. FeatureCard Default: a card with the feature title as a
-   level-2 heading and the muted description under it.
-2. CardGrid Default: the three feature cards share one row at
-   story width; narrowing the viewport wraps them onto further
-   rows at their 260px basis instead of squeezing them.
-
-**Run when:** `src/components/FeatureCard.tsx`, `CardGrid.tsx`,
-their stories, LandingPage, or a changeset naming either.
+**Run when:** `src/pages/LandingPage.tsx`, its stories,
+Button's href form, or a changeset naming LandingPage.
 
 ---
 

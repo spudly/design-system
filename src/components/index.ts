@@ -114,8 +114,6 @@ export {
   type CatalogTextFilter,
 } from "./CatalogFiltersBar.js";
 export { CatalogHeader, type CatalogHeaderProps } from "./CatalogHeader.js";
-export { CardGrid, type CardGridProps } from "./CardGrid.js";
-export { CtaRow, type CtaRowProps } from "./CtaRow.js";
 export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
 export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
 export {
@@ -124,12 +122,10 @@ export {
   type DocumentFooterProps,
 } from "./DocumentFooter.js";
 export { DocumentHeader, type DocumentHeaderProps } from "./DocumentHeader.js";
-export { FeatureCard, type FeatureCardContent, type FeatureCardProps } from "./FeatureCard.js";
 export { FieldLabel, type FieldLabelProps } from "./FieldLabel.js";
 export { FieldStack, type FieldStackProps } from "./FieldStack.js";
 export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
 export { FormStack, type FormStackProps } from "./FormStack.js";
-export { Hero, type HeroProps } from "./Hero.js";
 export { LabeledField, type LabeledFieldProps } from "./LabeledField.js";
 export { LabeledGroup, type LabeledGroupProps } from "./LabeledGroup.js";
 export { ListLoadingState, type ListLoadingStateProps } from "./ListLoadingState.js";
@@ -140,13 +136,6 @@ export {
   type PresetValueOption,
   type PresetValueSelectorProps,
 } from "./PresetValueSelector.js";
-export {
-  ProseDocument,
-  type ProseBlock,
-  type ProseDocumentProps,
-  type ProseSection,
-  type ProseSpan,
-} from "./ProseDocument.js";
 export {
   PublicFrameFooter,
   type PublicFrameFooterLink,

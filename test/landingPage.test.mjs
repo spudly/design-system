@@ -55,18 +55,14 @@ const page = readCode("src/pages/LandingPage.tsx");
 const stories = readCode("src/pages/LandingPage.stories.tsx");
 const pagesIndex = readCode("src/pages/index.ts");
 const fixtures = readCode("src/pages/fixtures.ts");
-// The page's sections moved into shared components in the #119
-// de-styling tranche: the hero is Hero, the CTAs are Button href
-// links in a CtaRow, and the feature slots are FeatureCards in a
-// CardGrid. The scans below follow the code — the anchor, the
-// web: row, the heading variants pin against the components that
-// render them — while the contract pins (types, slots, section
-// order, exports) stay on the page.
-const hero = readCode("src/components/Hero.tsx");
-const ctaRow = readCode("src/components/CtaRow.tsx");
-const featureCard = readCode("src/components/FeatureCard.tsx");
-const cardGrid = readCode("src/components/CardGrid.tsx");
-const landingUnit = [page, hero, ctaRow, featureCard, cardGrid].join("\n");
+// The page's sections are composed inline in the page itself:
+// an earlier #119 tranche cut extracted them as Hero / CtaRow /
+// FeatureCard / CardGrid library components, but Stephen's
+// no-new-components rule for tranche PRs (2026-10-29) folded
+// them back — they had no second consumer. Every scan below
+// pins against the page source, which is where the treatments
+// now live.
+const landingUnit = page;
 
 test("LandingPage source is readable and exports the page and its view-model types", () => {
   assert.ok(page.length > 1000, "expected the full LandingPage source");
@@ -139,17 +135,16 @@ test("the CTAs render through Button's href form fed by the CTA data", () => {
 
 test("the CTA container stacks narrow and rows on web — no wrapping CTA row", () => {
   assert.match(
-    ctaRow,
-    /flexDirection="web:row"/,
+    page,
+    /<YStack flexDirection="web:row" gap="\$3" alignItems="center" justifyContent="center">/,
     "the CTA row must become a row only on web — the #171 contract is stacked narrow / row on wide, and its narrow rendering is the native one while wide is web (the DS config defines no width breakpoints)",
   );
-  assert.ok(!ctaRow.includes("flexWrap"), "the CTA row must not wrap");
   assert.equal(
     landingUnit.split("flexWrap").length - 1,
     1,
     "only the feature grid may flexWrap — a wrapping CTA row could seat two CTAs side by side at the 430px story viewport instead of the contracted stack",
   );
-  assert.match(cardGrid, /flexWrap="wrap"/, "the one flexWrap is the feature grid's");
+  assert.match(page, /flexWrap="wrap"/, "the one flexWrap is the feature grid's");
 });
 
 test("frame structure: ScreenContainer shell, sections in hero → CTAs → features order", () => {
@@ -160,7 +155,7 @@ test("frame structure: ScreenContainer shell, sections in hero → CTAs → feat
   );
   const heroAt = page.indexOf("{heroTitle}");
   const ctasAt = page.indexOf("href={discoverCta.href}");
-  const featuresAt = page.indexOf("feature={featureOne}");
+  const featuresAt = page.indexOf("[featureOne, featureTwo, featureThree]");
   assert.ok(heroAt !== -1 && ctasAt !== -1 && featuresAt !== -1, "all three sections must render");
   assert.ok(
     heroAt < ctasAt && ctasAt < featuresAt,
@@ -172,12 +167,12 @@ test("frame structure: ScreenContainer shell, sections in hero → CTAs → feat
     "the hero title must be the page's only heading-variant (level-1) Text",
   );
   assert.match(
-    hero,
+    page,
     /<Text variant="heading" textAlign="center">/,
     "the hero renders the heading-variant (level-1) title",
   );
   assert.match(
-    featureCard,
+    page,
     /<Text variant="subheading">\{feature\.title\}<\/Text>/,
     "feature titles render with the subheading (level-2) variant",
   );
@@ -277,7 +272,11 @@ function renderedAnchors(html) {
   const pattern = /<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
   let match;
   while ((match = pattern.exec(html)) !== null) {
-    anchors.push({ href: match[1], label: match[2].replaceAll(/<[^>]*>/g, "").trim(), tag: match[0] });
+    anchors.push({
+      href: match[1],
+      label: match[2].replaceAll(/<[^>]*>/g, "").trim(),
+      tag: match[0],
+    });
   }
   return anchors;
 }

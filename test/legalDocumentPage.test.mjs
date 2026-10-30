@@ -43,15 +43,16 @@ function readCode(rel) {
 }
 
 const code = readCode("src/pages/LegalDocumentPage.tsx");
-// The document's renderer and frame moved into shared components
-// in the #119 de-styling tranche: the content model and rendering
-// live in ProseDocument, the frame in DocumentHeader /
-// DocumentFooter. The scans below follow the code — the model and
-// rendering pins scan ProseDocument, the frame pins scan the
-// frame components — while the page keeps the public contract:
-// its Legal* type names alias the renderer's model, and its
-// props carry the frame's data.
-const prose = readCode("src/components/ProseDocument.tsx");
+// The document's prose model and renderer live in the page
+// itself: an earlier #119 tranche cut extracted them as a
+// ProseDocument library component, but Stephen's
+// no-new-components rule for tranche PRs (2026-10-29) folded
+// them back — the page was the only consumer, and its public
+// Legal* type names now define the model directly. The frame
+// stays in the shared DocumentHeader / DocumentFooter. The
+// model and rendering pins below scan the page (`prose` is the
+// page source), the frame pins scan the frame components.
+const prose = code;
 const docHeader = readCode("src/components/DocumentHeader.tsx");
 const docFooter = readCode("src/components/DocumentFooter.tsx");
 
@@ -63,22 +64,19 @@ test("content crosses as structured section/block/span data (#170)", () => {
     );
   }
   assert.match(prose, /type: "link"; label: string; href: string/, "link spans carry label + href");
-  assert.match(prose, /type: "paragraph"; spans: ProseSpan\[\]/, "paragraph block shape");
-  assert.match(prose, /type: "list"; items: ProseSpan\[\]\[\]/, "list block shape");
+  assert.match(prose, /type: "paragraph"; spans: LegalDocumentSpan\[\]/, "paragraph block shape");
+  assert.match(prose, /type: "list"; items: LegalDocumentSpan\[\]\[\]/, "list block shape");
   assert.match(
     prose,
-    /ProseSection = \{\s*title: string;\s*blocks: ProseBlock\[\];/,
+    /LegalDocumentSection = \{\s*title: string;\s*blocks: LegalDocumentBlock\[\];/,
     "section shape",
   );
-  // The page's public names are the #170 contract: they alias the
-  // renderer's model, so the shapes above ARE the page's shapes.
-  assert.match(code, /LegalDocumentSpan = ProseSpan/, "the page's span type is the renderer's");
-  assert.match(code, /LegalDocumentBlock = ProseBlock/, "the page's block type is the renderer's");
-  assert.match(
-    code,
-    /LegalDocumentSection = ProseSection/,
-    "the page's section type is the renderer's",
-  );
+  // The page's public names are the #170 contract: the page
+  // defines the model under them directly (no separate renderer
+  // component exists to alias).
+  assert.match(code, /export type LegalDocumentSpan =/, "the page defines the span model");
+  assert.match(code, /export type LegalDocumentBlock =/, "the page defines the block model");
+  assert.match(code, /export type LegalDocumentSection =/, "the page defines the section model");
   // No app JSX crosses the boundary: the props carry no ReactNode.
   const propsAt = code.indexOf("LegalDocumentPageProps = {");
   const propsBlock = code.slice(propsAt, code.indexOf("};", propsAt));
@@ -125,7 +123,7 @@ test("the document renders in a prose column; list blocks carry list semantics (
   // components/accessibility — native has no listitem role).
   assert.match(
     prose,
-    /<YStack gap="\$2" \{\.\.\.listRoleProps\}>/,
+    /<YStack key=\{key\} gap="\$2" \{\.\.\.listRoleProps\}>/,
     "list block carries the list role",
   );
   assert.match(

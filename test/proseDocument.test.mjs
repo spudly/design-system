@@ -1,41 +1,64 @@
 /**
- * Contract test for ProseDocument (spudly/design-system#170,
- * extracted for #119): the structured prose renderer
- * LegalDocumentPage composes — the content model (sections of
- * paragraph/list blocks of text/strong/code/link spans), the
- * prose column, and the list semantics, rendered and pinned at
- * runtime like the page-level SSR tests pin them through the
- * page.
+ * Contract test for the prose document renderer
+ * (spudly/design-system#170, extracted for #119, folded back
+ * 2026-10-29): the structured prose renderer was extracted
+ * from LegalDocumentPage as a ProseDocument library component
+ * in the public-pages tranche, but Stephen's
+ * no-new-components rule for tranche PRs (2026-10-29) requires
+ * a tranche PR to add nothing under src/components/ — the
+ * page was the only consumer, so the renderer and its content
+ * model (sections of paragraph/list blocks of
+ * text/strong/code/link spans) were folded back into
+ * LegalDocumentPage, under the page's public Legal* type
+ * names. This test guards the end state (no ProseDocument
+ * component exists or is exported) and pins the model and the
+ * rendering where they now live: the page source, and the
+ * built page rendered at runtime.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "..", "src", "components", "ProseDocument.tsx"), "utf8");
+const root = join(here, "..");
+const source = readFileSync(join(root, "src", "pages", "LegalDocumentPage.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+const componentsBarrel = readFileSync(join(root, "src", "components", "index.ts"), "utf8");
 
-test("ProseDocument is exported from the built package root with its model types", async () => {
+test("ProseDocument is not a library component — the page carries the model types", async () => {
   const dist = await import("../dist/index.js");
-  assert.equal(typeof dist.ProseDocument, "function", "ProseDocument must be exported");
-  const types = readFileSync(join(here, "..", "dist", "components", "index.d.ts"), "utf8");
-  for (const name of ["ProseDocumentProps", "ProseSection", "ProseBlock", "ProseSpan"]) {
-    assert.match(types, new RegExp(name), `${name} must be a type export`);
+  assert.equal(
+    dist.ProseDocument,
+    undefined,
+    "ProseDocument must not be exported — it is composed inside LegalDocumentPage",
+  );
+  assert.ok(
+    !existsSync(join(root, "src", "components", "ProseDocument.tsx")),
+    "src/components/ProseDocument.tsx must not exist",
+  );
+  assert.ok(
+    !existsSync(join(root, "src", "components", "ProseDocument.stories.tsx")),
+    "src/components/ProseDocument.stories.tsx must not exist",
+  );
+  assert.ok(!componentsBarrel.includes("ProseDocument"), "the barrel must not export it");
+  const types = readFileSync(join(root, "dist", "pages", "LegalDocumentPage.d.ts"), "utf8");
+  for (const name of ["LegalDocumentSection", "LegalDocumentBlock", "LegalDocumentSpan"]) {
+    assert.match(types, new RegExp(name), `${name} must be a type export of the page`);
   }
 });
 
 test("the content model is structured data — spans, blocks, sections", () => {
-  assert.match(code, /type ProseSpan =/);
+  assert.match(code, /type LegalDocumentSpan =/);
   assert.match(code, /\{ type: "text"; text: string \}/);
   assert.match(code, /\{ type: "strong"; text: string \}/);
   assert.match(code, /\{ type: "code"; text: string \}/);
   assert.match(code, /\{ type: "link"; label: string; href: string \}/);
-  assert.match(code, /\{ type: "paragraph"; spans: ProseSpan\[\] \}/);
-  assert.match(code, /\{ type: "list"; items: ProseSpan\[\]\[\] \}/);
-  assert.match(code, /title: string;\s+blocks: ProseBlock\[\];/);
+  assert.match(code, /\{ type: "paragraph"; spans: LegalDocumentSpan\[\] \}/);
+  assert.match(code, /\{ type: "list"; items: LegalDocumentSpan\[\]\[\] \}/);
+  assert.match(code, /title: string;\s+blocks: LegalDocumentBlock\[\];/);
   assert.ok(!/\binterface\b/.test(code), "the model types are aliases, never interfaces");
   assert.ok(!code.includes("onPress"), "the renderer has no press callbacks — links carry hrefs");
 });
@@ -48,7 +71,8 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider } = await import("tamagui");
     const dist = await import("../dist/index.js");
-    return { React, renderToString, TamaguiProvider, ...dist };
+    const { LegalDocumentPage } = await import("../dist/pages/LegalDocumentPage.js");
+    return { React, renderToString, TamaguiProvider, ...dist, LegalDocumentPage };
   })();
   return runtimePromise;
 }
@@ -67,6 +91,14 @@ async function renderToHtml(element) {
 const fixture = {
   title: "Terms of Service",
   lastUpdated: "July 22, 2026",
+  brandLabel: "Eciperay",
+  brandHref: "/",
+  signInLabel: "Sign in",
+  signInHref: "/sign-in",
+  footerLinks: [
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+  ],
   sections: [
     {
       title: "Using the service",
@@ -100,9 +132,9 @@ const fixture = {
   ],
 };
 
-test("SSR: the document renders its title, sections, spans, and list semantics", async () => {
-  const { React, ProseDocument } = await loadRuntime();
-  const html = await renderToHtml(React.createElement(ProseDocument, fixture));
+test("SSR: the page renders the document's title, sections, spans, and list semantics", async () => {
+  const { React, LegalDocumentPage } = await loadRuntime();
+  const html = await renderToHtml(React.createElement(LegalDocumentPage, fixture));
   assert.ok(html.includes("Terms of Service"), "title renders");
   assert.ok(html.includes("Last updated: July 22, 2026"), "last-updated line renders");
   assert.ok(html.includes("Using the service"), "section title renders");

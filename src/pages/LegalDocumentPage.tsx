@@ -1,12 +1,11 @@
+import type { ReactNode } from "react";
+import { Anchor, XStack, YStack } from "tamagui";
 import { DocumentFooter } from "../components/DocumentFooter.js";
 import { DocumentHeader } from "../components/DocumentHeader.js";
-import {
-  ProseDocument,
-  type ProseBlock,
-  type ProseSection,
-  type ProseSpan,
-} from "../components/ProseDocument.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import { Text } from "../components/Text.js";
+import { listItemRoleProps, listRoleProps } from "../components/accessibility.js";
+import { tokens } from "../tokens/index.js";
 
 /**
  * LegalDocumentPage (spudly/design-system#170, B7 public surfaces):
@@ -42,32 +41,106 @@ import { ScreenContainer } from "../components/ScreenContainer.js";
  * the same frame shape serves the other public surfaces.
  *
  * The page composes components and passes data only (#119): the
- * frame's header and footer are DocumentHeader / DocumentFooter
- * and the document itself renders through ProseDocument — the
- * shared prose renderer whose content model the page's public
- * types alias, so the contract below is unchanged.
+ * frame's header and footer are the shared DocumentHeader /
+ * DocumentFooter, and the document itself renders through the
+ * page-local prose renderer below (Stephen's no-new-components
+ * rule for tranche PRs, 2026-10-29). An earlier tranche cut
+ * extracted the renderer as a ProseDocument library component;
+ * it had no second consumer, so it was folded back into the
+ * page — the model types live here under the page's public
+ * names, so the contract below is unchanged.
  *
  * Stays app-side: the legal text itself, routing, document
  * head/SEO, and the analytics consent banner.
  */
 
-/** The document's span model — ProseDocument's, under the page's
- * public names (the #170 contract). */
-export type LegalDocumentSpan = ProseSpan;
+/** A prose span: the document's inline semantics — plain text,
+ * strong emphasis, code, and links (a link span's href navigates,
+ * so it renders as a real anchor). */
+export type LegalDocumentSpan =
+  | { type: "text"; text: string }
+  | { type: "strong"; text: string }
+  | { type: "code"; text: string }
+  | { type: "link"; label: string; href: string };
 
-/** The document's block model — ProseDocument's, under the page's
- * public names (the #170 contract). */
-export type LegalDocumentBlock = ProseBlock;
+/** A prose block: a paragraph of spans, or a bulleted list whose
+ * items are span runs. */
+export type LegalDocumentBlock =
+  | { type: "paragraph"; spans: LegalDocumentSpan[] }
+  | { type: "list"; items: LegalDocumentSpan[][] };
 
-/** The document's section model — ProseDocument's, under the
- * page's public names (the #170 contract). */
-export type LegalDocumentSection = ProseSection;
+/** A document section: a titled run of blocks. */
+export type LegalDocumentSection = {
+  title: string;
+  blocks: LegalDocumentBlock[];
+};
 
 /** A frame link: the label renders, the href is where it goes. */
 export type LegalDocumentLink = {
   label: string;
   href: string;
 };
+
+/**
+ * The document's prose column width: the same 768px (the web
+ * layout's max-w-3xl) centered column the other public surfaces
+ * render into (PublicFrameLayout's COLUMN_MAX_WIDTH), so the
+ * prose stays readable on wide viewports. The frame header and
+ * footer stay outside the column, spanning the container as
+ * before; on phone-width viewports the cap does not bind.
+ */
+const PROSE_MAX_WIDTH = 768;
+
+function renderSpan(span: LegalDocumentSpan, key: number): ReactNode {
+  switch (span.type) {
+    case "text":
+      return span.text;
+    case "strong":
+      return (
+        <Text key={key} fontWeight={tokens.typography.fontWeight.bold}>
+          {span.text}
+        </Text>
+      );
+    case "code":
+      return (
+        <Text key={key} fontFamily={tokens.typography.fontFamily.mono}>
+          {span.text}
+        </Text>
+      );
+    case "link":
+      return (
+        <Anchor
+          key={key}
+          href={span.href}
+          color="$link"
+          fontWeight={tokens.typography.fontWeight.medium}
+          textDecorationLine="underline"
+        >
+          {span.label}
+        </Anchor>
+      );
+  }
+}
+
+function renderSpans(spans: LegalDocumentSpan[]): ReactNode {
+  return spans.map((span, index) => renderSpan(span, index));
+}
+
+function renderBlock(block: LegalDocumentBlock, key: number): ReactNode {
+  if (block.type === "paragraph") {
+    return <Text key={key}>{renderSpans(block.spans)}</Text>;
+  }
+  return (
+    <YStack key={key} gap="$2" {...listRoleProps}>
+      {block.items.map((item, index) => (
+        <XStack key={index} gap="$2" {...listItemRoleProps}>
+          <Text>{"•"}</Text>
+          <Text flex={1}>{renderSpans(item)}</Text>
+        </XStack>
+      ))}
+    </YStack>
+  );
+}
 
 export type LegalDocumentPageProps = {
   /** Document title, rendered as the page's level-1 heading. */
@@ -106,7 +179,18 @@ export function LegalDocumentPage({
         signInLabel={signInLabel}
         signInHref={signInHref}
       />
-      <ProseDocument title={title} lastUpdated={lastUpdated} sections={sections} />
+      <YStack width="100%" maxWidth={PROSE_MAX_WIDTH} alignSelf="center" gap="$4">
+        <YStack gap="$3">
+          <Text variant="heading">{title}</Text>
+          <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>
+        </YStack>
+        {sections.map((section) => (
+          <YStack key={section.title} gap="$3">
+            <Text variant="subheading">{section.title}</Text>
+            {section.blocks.map((block, index) => renderBlock(block, index))}
+          </YStack>
+        ))}
+      </YStack>
       <DocumentFooter links={footerLinks} />
     </ScreenContainer>
   );
