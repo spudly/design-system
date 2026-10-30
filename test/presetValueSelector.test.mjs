@@ -62,3 +62,14 @@ test("the selector is a labeled preset row of toggle buttons plus the editable c
   );
   assert.ok(!code.includes("Chip"), "no chip component survives in the selector");
 });
+
+test("the custom slot keeps the widened share that keeps its label on one line (#327)", () => {
+  // At the old flex 0.25 share the custom slot was ~68px wide at
+  // the ~430px Android VR capture width — too narrow for the
+  // small Button's horizontal padding plus the "Custom" label,
+  // which wrapped mid-word and made the button taller than the
+  // preset row. The widened share is the fix; shrinking it back
+  // reintroduces the wrap.
+  assert.match(code, /<XStack flex=\{0\.35\}>/);
+  assert.match(code, /<XStack flex=\{1\} gap=/, "the preset row keeps the remaining share");
+});

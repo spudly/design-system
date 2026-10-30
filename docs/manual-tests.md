@@ -492,8 +492,9 @@ CustomSelected.
 
 1. Default: the Scale row shows ½× / 1× / 2× / 3× preset buttons
    at equal width in one non-wrapping row, 1× selected
-   (primary-filled, light label), plus the narrower Custom
-   button unselected.
+   (primary-filled, light label), plus the Custom button
+   unselected. The Custom label sits on one line (never wrapped
+   mid-word) and all five buttons are the same height.
 2. CustomSelected: the Custom button shows "2.5×" and is
    selected (primary-filled); no preset is selected.
 3. Pressing Custom swaps it in place for a decimal number
