@@ -613,7 +613,7 @@ TagsPage's rows, or a changeset naming BadgeCardRow.
 
 ## StepOverlay
 
-Open in `Components/StepOverlay`: Default.
+Open in `Components/StepOverlay`: Default, LongBody.
 
 1. The dark overlay fills its frame: title and step eyebrows
    render uppercase and dimmed over the step body in large
@@ -623,6 +623,21 @@ Open in `Components/StepOverlay`: Default.
    composed by the caller — the controls are the caller's; the
    shell owns only the gap above them (its 32px body bottom
    padding).
+3. On open (web), keyboard focus lands on the overlay itself:
+   it announces as a modal dialog named for its title, and
+   Tab moves through the controls inside it — Tab wraps from
+   the last control back to the first and Shift+Tab wraps
+   the other way, so focus never reaches content behind it.
+4. LongBody: the long step body fills the short frame and the
+   region scrolls — scroll to the bottom to reach the dots
+   and the Back / Next row; the Done pill stays pinned at the
+   top right at every scroll position, and the short Default
+   body stays vertically centered.
+5. Close and reopen (web): press Done — the overlay closes.
+   Focus the "Reopen the overlay" button under the frame and
+   activate it: the overlay reopens with focus inside it.
+   Press Done again: the overlay closes and keyboard focus
+   returns to the "Reopen the overlay" button.
 
 **Run when:** `src/components/StepOverlay.tsx`, its stories,
 MealCookingModePage, or a changeset naming StepOverlay.
@@ -1868,7 +1883,7 @@ ShoppingListPage's list, or a changeset naming CheckRow.
 
 ## StepOverlay
 
-Open in `Components/StepOverlay`: Default.
+Open in `Components/StepOverlay`: Default, LongBody.
 
 1. The dark overlay fills its frame: title and step eyebrows
    render uppercase and dimmed over the step body in large
@@ -1881,6 +1896,22 @@ Open in `Components/StepOverlay`: Default.
    steps (Back disables on the first step, Next on the
    last) — the controls are the caller's; the shell owns
    only the gap above them (its 32px body bottom padding).
+3. On open (web), keyboard focus lands on the overlay
+   itself: it announces as a modal dialog named for its
+   title, and Tab moves through the controls inside it —
+   Tab wraps from the last control back to the first and
+   Shift+Tab wraps the other way, so focus never reaches
+   content behind it.
+4. LongBody: the long step body fills the short frame and
+   the region scrolls — scroll to the bottom to reach the
+   dots and the Back / Next row; the Done pill stays
+   pinned at the top right at every scroll position.
+5. Close and reopen (web): press Done — the overlay
+   closes. Focus the "Reopen the overlay" button under
+   the frame and activate it: the overlay reopens with
+   focus inside it. Press Done again: the overlay closes
+   and keyboard focus returns to the "Reopen the overlay"
+   button.
 
 **Run when:** `src/components/StepOverlay.tsx`, its
 stories, MealCookingModePage, or a changeset naming

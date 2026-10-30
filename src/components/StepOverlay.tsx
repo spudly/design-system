@@ -1,7 +1,9 @@
+import { useEffect, useRef } from "react";
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { ScrollView, YStack, isWeb } from "tamagui";
+import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
+import { dialogRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 export type StepOverlayProps = {
@@ -23,6 +25,20 @@ export type StepOverlayProps = {
   children?: ReactNode;
 };
 
+// The scroll region's content container grows to at least
+// the region's own height and centers its column (#332):
+// short bodies keep the vertically centered treatment, while
+// a taller column overflows the grown container and scrolls.
+// The centering lives on the container, not on a flexed
+// child — the ScrollRegion pattern; a flex={1} child makes
+// the native ScrollView size its content to the child's full
+// height and paint it past the region's bounds (the Android
+// VR LongBody capture on the first #332 head showed exactly
+// that). (The shared ScrollRegion cannot be used here — it
+// exposes no way to grow its content container, and the
+// centered treatment depends on it.)
+const scrollContentContainerStyle = { flexGrow: 1, justifyContent: "center" } as const;
+
 /**
  * A full-screen step-reader overlay (#119): a dark, opaque
  * shell that fills its nearest positioned ancestor (so the
@@ -32,6 +48,34 @@ export type StepOverlayProps = {
  * the body at reading size. The caller's step navigation
  * (progress dots, prev/next) composes below the body as
  * children.
+ *
+ * The column sits in a bounded scroll region (#332): a long
+ * step body on a short viewport scrolls — body and navigation
+ * together — instead of clipping at both ends of a centered
+ * column with the navigation pushed off-screen. Short bodies
+ * keep the vertically centered treatment, and the Done pill is
+ * a sibling of the region, not part of it, so it stays fixed
+ * and reachable at any scroll position. The pill paints the
+ * shell's own color as the base under its layered fill, so
+ * the composite over the shell is unchanged but scrolled text
+ * passing beneath the pill no longer shows through it.
+ *
+ * The shell manages focus (#332): it carries dialog semantics
+ * (dialogRoleProps — a modal dialog named for its title on
+ * web, view-modal on iOS) and, on web, moves focus into
+ * itself on mount, so a host that mounts it over still-mounted
+ * interactive content does not leave that content as the
+ * keyboard or screen-reader starting point behind the opaque
+ * shell. On web and iOS the host does not need to unmount or
+ * inert the covered content; on Android there is no view-modal
+ * equivalent, so an Android host must hide covered content
+ * from accessibility services or unmount it (see
+ * dialogRoleProps). The move happens once per mount, never per
+ * step change, so stepping keeps focus where the user put it.
+ * Tab and Shift+Tab wrap at the overlay's edges, so keyboard
+ * focus cannot escape into the covered content, and when the
+ * overlay unmounts focus returns to the element that held it
+ * before the overlay opened.
  *
  * The pill is a pressable view with the button semantics
  * routed through the platform translator (#237), and web
@@ -51,6 +95,77 @@ export function StepOverlay({
   onDone,
   children,
 }: StepOverlayProps) {
+  const shellRef = useRef<TamaguiElement>(null);
+
+  // The mount focus move (web): the shell is focusable without
+  // being a tab stop (tabIndex={-1} below), and focus lands on
+  // it once when the overlay mounts. On native there is no DOM
+  // focus to move; dialogRoleProps' view-modal is the iOS half
+  // of the containment contract (Android hosts carry it — see
+  // dialogRoleProps).
+  useEffect(() => {
+    if (!isWeb) {
+      return;
+    }
+    const previouslyFocused = document.activeElement as HTMLElement | null;
+    const node = shellRef.current as unknown as { focus?: () => void } | null;
+    node?.focus?.();
+    return () => {
+      if (previouslyFocused && document.contains(previouslyFocused)) {
+        previouslyFocused.focus();
+      }
+    };
+  }, []);
+
+  // Focus containment (web): the modal semantics say the
+  // covered content is inert, but browsers do not enforce
+  // that for the Tab key — without containment, Tab walks
+  // out of the overlay into whatever the host left mounted
+  // behind it. Tab / Shift+Tab wrap at the overlay's first
+  // and last focusable controls instead, so containment does
+  // not depend on the host inerting the covered content.
+  const handleShellKeyDown = (event: {
+    key: string;
+    shiftKey: boolean;
+    preventDefault: () => void;
+  }) => {
+    if (!isWeb || event.key !== "Tab") {
+      return;
+    }
+    const node = shellRef.current as unknown as HTMLElement | null;
+    if (!node || typeof node.querySelectorAll !== "function") {
+      return;
+    }
+    const focusables = Array.from(
+      node.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
+      ),
+    ).filter(
+      (element) =>
+        // Effective tab stops only: the selector also matches
+        // elements that carry a negative tabIndex (a link with
+        // tabIndex={-1}), which Tab always skips — counting one
+        // as the first or last stop would break the wrap.
+        element.tabIndex >= 0 &&
+        (element.offsetParent !== null || element === document.activeElement),
+    );
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (!first || !last) {
+      event.preventDefault();
+      node.focus();
+      return;
+    }
+    const active = document.activeElement;
+    if (event.shiftKey && (active === first || active === node)) {
+      event.preventDefault();
+      last.focus();
+    } else if (!event.shiftKey && active === last) {
+      event.preventDefault();
+      first.focus();
+    }
+  };
+
   // Web keyboard support (the MealPlansPage row pattern): a
   // view carrying a role is made focusable and the activation
   // keys — Enter and Space — invoke the same callback as a
@@ -70,21 +185,61 @@ export function StepOverlay({
   };
   return (
     <YStack
+      ref={shellRef}
       position="absolute"
       top={0}
       left={0}
       right={0}
       bottom={0}
-      justifyContent="center"
       backgroundColor={tokens.colors.gray.gray10}
-      paddingHorizontal="$6"
+      tabIndex={-1}
+      onKeyDown={handleShellKeyDown}
+      {...dialogRoleProps}
+      {...platformAccessibilityProps({ accessibilityLabel: title })}
     >
+      <ScrollView
+        flex={1}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={scrollContentContainerStyle}
+      >
+        <YStack paddingHorizontal="$6" paddingVertical="$12">
+          <YStack paddingBlockEnd="$2">
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              letterSpacing={1.4}
+              color="$surface"
+              opacity={0.6}
+              textTransform="uppercase"
+            >
+              {title}
+            </Text>
+          </YStack>
+          <YStack paddingBlockEnd="$4">
+            <Text
+              fontSize={tokens.typography.fontSize.sm}
+              letterSpacing={1.4}
+              color="$surface"
+              opacity={0.6}
+              textTransform="uppercase"
+            >
+              {stepLabel}
+            </Text>
+          </YStack>
+          <YStack paddingBlockEnd="$8">
+            <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
+              {body}
+            </Text>
+          </YStack>
+          {children}
+        </YStack>
+      </ScrollView>
       <YStack
         position="absolute"
         right={tokens.spacing[6]}
         top={tokens.spacing[12]}
         borderRadius={tokens.radii.full}
         overflow="hidden"
+        backgroundColor={tokens.colors.gray.gray10}
         {...platformAccessibilityProps({
           accessibilityRole: "button",
           accessibilityLabel: doneLabel,
@@ -112,34 +267,6 @@ export function StepOverlay({
           {doneLabel}
         </Text>
       </YStack>
-      <YStack paddingBlockEnd="$2">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          letterSpacing={1.4}
-          color="$surface"
-          opacity={0.6}
-          textTransform="uppercase"
-        >
-          {title}
-        </Text>
-      </YStack>
-      <YStack paddingBlockEnd="$4">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          letterSpacing={1.4}
-          color="$surface"
-          opacity={0.6}
-          textTransform="uppercase"
-        >
-          {stepLabel}
-        </Text>
-      </YStack>
-      <YStack paddingBlockEnd="$8">
-        <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
-          {body}
-        </Text>
-      </YStack>
-      {children}
     </YStack>
   );
 }
