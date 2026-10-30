@@ -41,9 +41,16 @@ const StyledText = styled(TamaguiText, {
         fontSize: tokens.typography.fontSize.sm,
         color: "$textMuted",
       },
+      muted: {
+        color: "$textMuted",
+      },
       error: {
         fontSize: tokens.typography.fontSize.sm,
         color: "$errorText",
+      },
+      success: {
+        fontSize: tokens.typography.fontSize.sm,
+        color: tokens.colors.success.success8,
       },
       verse: {
         fontSize: tokens.typography.fontSize.lg,
@@ -69,7 +76,9 @@ export type TextProps = StyledTextProps & {
     | "subheading"
     | "body"
     | "hint"
+    | "muted"
     | "error"
+    | "success"
     | "label"
     | "verse";
   // A caller-supplied heading level for the web target (routed
@@ -84,9 +93,13 @@ export type TextProps = StyledTextProps & {
  * meta block rather than opening a list), `formTitle` (the form-flow
  * page title — 2xl bold, for the import/form screens whose titles sit
  * inside the form layout rather than opening a page), `subheading`,
- * `body` (default), `hint` (muted caption), `error`, `label` (the
- * section eyebrow — xs semibold, uppercase, letter-spaced, muted gray),
- * and `verse` (serif reading text for scripture/long-form content).
+ * `body` (default), `hint` (muted caption), `muted` (body-size text in
+ * the muted treatment — the intro line under a page title, a
+ * de-emphasized account line), `error`, `success` (small confirmation
+ * text in the success treatment — a form's submitted message), `label`
+ * (the section eyebrow — xs semibold, uppercase, letter-spaced, muted
+ * gray), and `verse` (serif reading text for scripture/long-form
+ * content).
  *
  * Accessibility props go through `platformAccessibilityProps` (#235),
  * the same translation as Button: text is a pressable path too

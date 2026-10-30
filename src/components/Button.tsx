@@ -1,6 +1,7 @@
 import { Children, forwardRef } from "react";
 import type { ComponentType, ReactNode } from "react";
 import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme } from "tamagui";
+import { isWeb } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { IconComponentProps } from "../icons/Icon.js";
@@ -78,6 +79,18 @@ const buttonFrameConfig = {
         paddingVertical: tokens.spacing[4],
       },
     },
+    // The toggle treatment: a selected toggle button takes the
+    // primary fill and on-primary ink whatever its resting variant,
+    // so a row of toggle buttons reads as one control whose pressed
+    // member is filled (the treatment the retired ToggleChipGroup's
+    // chips rendered). Pair it with a resting variant that differs
+    // (e.g. `secondary`) so the selected member stands apart.
+    selected: {
+      true: {
+        backgroundColor: "$primary",
+        color: "$onPrimary",
+      },
+    },
     disabled: {
       true: {
         opacity: 0.5,
@@ -134,6 +147,27 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
  */
 type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" | "href"> & {
   disabled?: boolean;
+  /**
+   * Toggle-button state: when the caller passes `selected` (true
+   * or false), the button is a TOGGLE — it renders the selected
+   * treatment while true (primary fill, on-primary ink, whatever
+   * the resting `variant`) and announces itself as a toggle:
+   * `aria-pressed` on web, `accessibilityState.selected` on
+   * native. This is the semantic replacement for the retired chip
+   * components' selectable pills (#119 dedupe): a selectable
+   * option is a toggle button, composed in a ButtonRow. Leave
+   * `selected` unpassed for an ordinary action button.
+   */
+  selected?: boolean;
+  /**
+   * Grow to fill the row's remaining width (flex: 1): the
+   * primary action in an action row claims the space the row's
+   * other actions leave — the way SearchField's `grow` lets a
+   * field take its row's remaining width. A layout semantic,
+   * not a style value: the row still owns the button's size
+   * and separation.
+   */
+  grow?: boolean;
   /**
    * The icon slot: one of the design system's semantic icon
    * components from `@spudly/ui/icons` (PrintIcon, ShareIcon, …).
@@ -212,6 +246,11 @@ type ButtonLinkProps = Omit<StyledLinkButtonProps, "disabled" | "children" | "ic
    * (the host composes hrefs from its routes, #248).
    */
   href: string;
+  /** Grow to fill the row's remaining width (see ButtonOwnProps). */
+  grow?: boolean;
+  /** A link navigates — it is never a toggle; `selected` belongs
+   * to the button form. */
+  selected?: never;
   /** A link navigates — press callbacks belong to the button form. */
   onPress?: never;
   /**
@@ -239,6 +278,7 @@ type ButtonRenderProps = ButtonOwnProps & {
   icon?: ComponentType<IconComponentProps>;
   children?: ReactNode;
   accessibilityLabel?: string;
+  selected?: boolean;
 };
 
 /**
@@ -311,7 +351,8 @@ function useGlyphInk(variant: string | undefined): string {
  * Universal cross-platform button (web + React Native via Tamagui).
  *
  * Props: `variant` ("primary" | "secondary" | "ghost" | "danger"), `size`
- * ("sm" | "md" | "lg"), `disabled`. All styling is token-driven. Use
+ * ("sm" | "md" | "lg"), `disabled`, `grow` (claim the row's remaining
+ * width). All styling is token-driven. Use
  * `danger` for destructive actions (delete, revoke, remove).
  *
  * Two activation forms (#248's navigation rule — a control that
@@ -326,6 +367,14 @@ function useGlyphInk(variant: string | undefined): string {
  *   link path. While `disabled`, the link renders WITHOUT its href
  *   (the ARIA disabled-link pattern): it stays visible and announced
  *   as disabled but cannot be followed on either platform.
+ *
+ * Toggle form: pass `selected` (true/false) and the button is a
+ * toggle — the selected member renders the primary treatment and
+ * is announced as pressed (`aria-pressed` on web,
+ * `accessibilityState.selected` on native). Selectable option
+ * sets compose toggle buttons in a ButtonRow; this replaces the
+ * retired chip components (#119 dedupe — chips are removed from
+ * the design system entirely; a selectable pill is a button).
  *
  * Icon slot: pass a DS icon component as `icon` and it renders to
  * the left of the label, in the variant's label color; pass no label
@@ -351,6 +400,8 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     disabled = false,
     variant = "primary",
     size = "md",
+    grow = false,
+    selected,
     icon: IconGlyph,
     children,
     color,
@@ -369,8 +420,13 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
   } = props as ButtonRenderProps;
   // `variant`'s prop type also admits Tamagui Button's built-in variant
   // names; only the four design-system variants have a mapped label color.
-  const labelColor = color ?? variantLabelColors[variant as keyof typeof variantLabelColors];
-  const glyphInk = useGlyphInk(typeof variant === "string" ? variant : undefined);
+  // A selected toggle takes the primary ink, matching its fill.
+  const labelColor =
+    color ??
+    (selected ? "$onPrimary" : variantLabelColors[variant as keyof typeof variantLabelColors]);
+  const glyphInk = useGlyphInk(
+    selected ? "primary" : typeof variant === "string" ? variant : undefined,
+  );
   const isLink = href !== undefined;
   const a11yProps = platformAccessibilityProps({
     accessible,
@@ -439,6 +495,9 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         // (see Text, #69). A caller-passed `fontFamily` in `rest`
         // still wins.
         fontFamily="body"
+        // `grow` claims the row's remaining width; a caller-passed
+        // flex in `rest` still wins over it.
+        {...(grow ? { flex: 1 } : null)}
         // `rest` is read through the widened render shape (its
         // fields are the button frame's); call sites are typed by
         // ButtonLinkProps, so what actually arrives is the link
@@ -476,10 +535,21 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     <StyledButton
       ref={ref}
       {...a11yProps}
+      // The toggle announcement, one mechanism per platform (the
+      // retired ToggleChipGroup's contract): web gets the explicit
+      // `aria-pressed` a toggle button is announced by; native gets
+      // `accessibilityState.selected` merged over the state the
+      // helper spread above already carries.
+      {...(selected !== undefined
+        ? isWeb
+          ? { "aria-pressed": selected }
+          : { accessibilityState: { disabled, selected, ...accessibilityState } }
+        : null)}
       onPress={onPress}
       disabled={disabled}
       variant={variant}
       size={size}
+      {...(selected !== undefined ? { selected } : null)}
       color={labelColor}
       // Same instance-prop rule as `color` above, for the family:
       // Tamagui Button forwards an instance `fontFamily` to its
@@ -509,6 +579,9 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
             justifyContent: "center",
           }
         : null)}
+      // `grow` claims the row's remaining width; a caller-passed
+      // flex in `rest` still wins over it.
+      {...(grow ? { flex: 1 } : null)}
       {...rest}
     >
       {IconGlyph ? <IconGlyph size={glyphSize} color={glyphInk} /> : null}
