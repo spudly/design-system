@@ -17,7 +17,8 @@
  *   MealsHubPage rows (YStack), AiSessionPage's
  *   Cancel action (YStack), MealCookingModePage's Done action (YStack),
  *   RecipeFormPage's revert actions (YStack), and RecipeDetailPage's
- *   viewer-rating wrapper (View) and Custom scale chip (XStack).
+ *   viewer-rating wrapper (View). (The Custom scale chip left this
+ *   list in the #119 dedupe: it is a PresetValueSelector Button now.)
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
  *   generic CardRow / ListRow components; the routing moved with
@@ -95,11 +96,12 @@ function sourceFiles(dir) {
 // translate caller RN props themselves. LinkOverlay is sanctioned
 // on the same ground again: it is the native link layer for
 // view-level link surfaces and spreads platformAccessibilityProps
-// onto its Anchor. ActionChip and Thumbnail are sanctioned on
-// the same ground: each routes its `accessibilityLabel` through
-// platformAccessibilityProps internally.
+// onto its Anchor. Thumbnail is sanctioned on the same ground:
+// it routes its `accessibilityLabel` through
+// platformAccessibilityProps internally. (ActionChip was too,
+// until the #119 dedupe retired it; its consumers are Buttons.)
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,ActionChip,Thumbnail".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail".split(
     ",",
   ),
 );
@@ -454,8 +456,10 @@ test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbi
   // RecipeDetailPage Custom scale chip must follow it.
   assert.match(aiSession, /onKeyDown=\{handleCancelKeyDown\}/);
   assert.match(aiSession, /tabIndex=\{0\}/);
-  assert.match(recipeDetail, /onKeyDown=\{handleCustomScaleKeyDown\}/);
-  assert.match(recipeDetail, /tabIndex=\{0\}/);
+  // The scale control is no longer a page-level stack pressable:
+  // PresetValueSelector's Custom slot is a DS Button.
+  assert.ok(!recipeDetail.includes("handleCustomScaleKeyDown"), "the scale pressable retired");
+  assert.match(recipeDetail, /<PresetValueSelector/);
 });
 
 test("busy Cancel is keyboard-guarded and the Custom scale name carries the multiplier (#237)", () => {
@@ -469,7 +473,13 @@ test("busy Cancel is keyboard-guarded and the Custom scale name carries the mult
   // (CodeRabbit finding on PR #241).
   assert.match(aiSession, /onPress=\{handleCancel\}/);
   assert.match(aiSession, /const handleCancel = \(\) => \{\s+if \(busy\) return;/);
-  // The selected custom-scale chip shows the multiplier as its visible
-  // text; the accessible name must include it.
-  assert.match(recipeDetail, /`Custom scale \$\{formatScaleValue\(view\.scaleValue\)\}×`/);
+  // The selected custom-scale button shows the multiplier as its visible
+  // text; the accessible name must include it (composed in the selector).
+  assert.match(recipeDetail, /customAccessibilityLabel="Custom scale"/);
+  assert.match(
+    recipeDetail,
+    /formatCustomValue=\{\(custom\) => `\$\{formatScaleValue\(custom\)\}×`\}/,
+  );
+  const selector = readCode("src/components/PresetValueSelector.tsx");
+  assert.match(selector, /`\$\{customAccessibilityLabel\} \$\{formattedCustom\}`/);
 });

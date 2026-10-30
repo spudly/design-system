@@ -63,6 +63,16 @@ export type SelectFieldProps = {
   placeholder?: string;
   error?: string;
   id?: string;
+  /**
+   * Grow to fill the row's remaining width (SearchField's `grow`
+   * pattern): the field flexes within its row — a toolbar's
+   * version picker beside a status badge, a field beside its
+   * button in a FieldRow. A growing select never renders
+   * narrower than its own menu (the 200px the options viewport
+   * enforces), so in a wrapping row it drops to its own line
+   * instead of crushing.
+   */
+  grow?: boolean;
 };
 
 /**
@@ -79,13 +89,14 @@ export function SelectField({
   placeholder = "Select…",
   error,
   id: idProp,
+  grow = false,
 }: SelectFieldProps) {
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1, minWidth: 200 } : {})}>
       {label ? (
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
           {label}

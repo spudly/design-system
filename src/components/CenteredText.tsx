@@ -17,6 +17,13 @@ export type CenteredTextProps = TextProps & {
  * mixed content, compose Center instead; this is for the text
  * line itself (each wrapped line centers, which a centered
  * flex item would not do).
+ *
+ * This is also the canonical home of the recipedetail
+ * tranche's StatusMessage (#119 dedupe, cluster B8): a lone
+ * centered status line is this component at the small size
+ * with `muted` — the two tranches' centered-line components
+ * were the same job at near-identical treatments, so one
+ * ships.
  */
 export function CenteredText({ muted = false, ...rest }: CenteredTextProps) {
   return <Text textAlign="center" {...(muted ? { color: "$textMuted" } : {})} {...rest} />;
