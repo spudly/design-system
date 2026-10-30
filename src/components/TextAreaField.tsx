@@ -26,6 +26,17 @@ const StyledTextArea = styled(TamaguiTextArea, {
         borderColor: "$danger",
       },
     },
+    // The field's height step, a semantic size rather than a raw
+    // minHeight: `md` is the standard field (the base minHeight),
+    // `lg` a short multi-paragraph entry (a follow-up message, a
+    // comment), and `xl` a long-form composer (a prompt, pasted
+    // source text). Pages pick the step; the heights live here
+    // (#119 — pages must not set minHeight themselves).
+    size: {
+      md: {},
+      lg: { minHeight: 96 },
+      xl: { minHeight: 192 },
+    },
     // The version-diff warning wash, same contract as TextField's
     // `changed` variant: warning step 5 border / step 1 fill
     // replacing the $surface fill outright.
@@ -45,13 +56,17 @@ export type TextAreaFieldProps = StyledTextAreaProps & {
   error?: string;
   id?: string;
   numberOfLines?: number;
+  /** Height step: `md` (default), `lg`, or `xl` — see the styled
+   * variant. A semantic size, never a raw height. */
+  size?: "md" | "lg" | "xl";
 };
 
 /**
  * Labeled multi-line text input (Tamagui TextArea) with error-state support.
  * Same label/error/a11y wiring as TextField: the label is associated via
  * `htmlFor`, error text is wired through `aria-describedby`/`aria-invalid`.
- * `numberOfLines` defaults to 4.
+ * `numberOfLines` defaults to 4. The `size` prop picks the height step
+ * (`md` standard, `lg` short multi-paragraph, `xl` long-form composer).
  */
 export function TextAreaField({
   label,

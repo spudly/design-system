@@ -49,6 +49,13 @@ export type TextFieldProps = StyledInputProps & {
   label?: string;
   error?: string;
   id?: string;
+  /**
+   * When true, the field takes the flex row's remaining width
+   * (its root carries flex: 1) — the FieldRow pattern, mirroring
+   * SearchField's `grow`: a field in a row of fields grows,
+   * so the row's other children keep their natural widths.
+   */
+  grow?: boolean;
 };
 
 /**
@@ -60,6 +67,7 @@ export type TextFieldProps = StyledInputProps & {
 export function TextField({
   label,
   error,
+  grow = false,
   id: idProp,
   secureTextEntry,
   type,
@@ -156,7 +164,7 @@ export function TextField({
   };
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1 } : {})}>
       {label ? (
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
           {label}

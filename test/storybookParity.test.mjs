@@ -102,16 +102,18 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches })
 
 // Internal helpers, not widgets: accessibility.ts / tagColors.ts
 // are prop/style translators, linkOverlay.tsx is the native-only
-// link layer other components compose, and PageFrame.tsx is
-// page-story scaffolding (the demo stories' phone-width frame,
-// relocated out of src/pages for #119) — none is a standalone
-// component with a story of its own, and none is exported from
-// the components barrel.
+// link layer other components compose, labelRow.tsx is the
+// shared label-row implementation LabeledField / LabeledGroup
+// compose, and PageFrame.tsx is page-story scaffolding (the
+// demo stories' phone-width frame, relocated out of src/pages
+// for #119) — none is a standalone component with a story of
+// its own, and none is exported from the components barrel.
 const COMPONENT_STORY_EXCEPTIONS = new Set([
   "accessibility.ts",
   "index.ts",
   "tagColors.ts",
   "linkOverlay.tsx",
+  "labelRow.tsx",
   "PageFrame.tsx",
 ]);
 

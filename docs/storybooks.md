@@ -52,6 +52,23 @@ Because both storybooks load the identical files, a story added for
 one side exists on the other — what differs is only whether it
 renders correctly there, which is what the two CI systems check.
 
+One deliberate behavioral difference: link presses. Stories carry
+web-style app hrefs (`/recipes/...`) because the story set is
+shared, but on native a scheme-less href has no handler —
+`Linking.openURL` rejects and the press would do nothing. The
+native host app absorbs this at its platform boundary
+(`apps/storybook/storyLinks.ts`, #300): it wraps `Linking.openURL`
+so app-style paths route to the host's browse URL with the
+original path attached (logged as `DS LINK <path>`), while
+scheme-bearing URLs (https:, mailto:, the capture links) pass
+through untouched. The browse URL is built with expo-linking's
+`createURL`, so it matches how the host was started —
+`spudlyds://browse` in a native build, the `exp://…/--/browse`
+form under `expo start` in Expo Go, which registers no custom
+scheme. The components' contract is unchanged — hrefs are still
+forwarded verbatim; real native apps pass scheme-bearing URLs of
+their own.
+
 ## Coverage parity
 
 Every widget component exported from `src/components/index.ts` and
