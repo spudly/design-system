@@ -163,6 +163,37 @@ test("status and tag options cross as view-models; status picks by Button, tags 
   assert.ok(!form.includes("ToggleChipGroup"), "the retired chip group must not come back");
 });
 
+test("the scalar fields' labels are wired to their inputs (web label focus)", () => {
+  const form = pageSource("RecipeFormPage");
+  // Stephen's #320 ruling: a field's web label is a real <label>
+  // whose htmlFor names the field's id, so clicking the label
+  // focuses the input. LabeledField takes the id as `fieldId`;
+  // the field itself carries the matching `id`. Each check is
+  // scoped to its own field's block (the source from one
+  // <LabeledField up to the next), so swapping two fields' ids
+  // fails the swapped pair. The Status and Tags labels head
+  // groups (ButtonRow / Badge row), not inputs, so they stay
+  // unwired.
+  const blocks = form.split("<LabeledField").slice(1);
+  const wired = [
+    ["Title", "recipe-title"],
+    ["Description", "recipe-description"],
+    ["Servings", "recipe-servings"],
+    ["Prep (min)", "recipe-prep-time"],
+    ["Cook (min)", "recipe-cook-time"],
+    ["Source URL", "recipe-source-url"],
+  ];
+  for (const [label, id] of wired) {
+    const block = blocks.find((b) => b.includes(`label="${label}"`));
+    assert.ok(block, `${label}'s LabeledField must exist`);
+    assert.ok(
+      block.includes(`fieldId="${id}"`),
+      `${label}'s LabeledField must pass fieldId="${id}"`,
+    );
+    assert.ok(block.includes(`id="${id}"`), `${label}'s field must carry id="${id}"`);
+  }
+});
+
 test("the shells mirror the app views' chrome", () => {
   const edit = pageSource("EditRecipePage");
   assert.ok(edit.includes("Edit Recipe"), "EditRecipePage heading missing");
