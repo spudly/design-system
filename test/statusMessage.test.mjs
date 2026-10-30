@@ -65,7 +65,7 @@ test("StatusMessage is exported from the built package root", async () => {
 
 test("the root is a polite live region via the codebase's translator props", () => {
   assert.match(code, /politeLiveRegionProps/);
-  assert.match(code, /<YStack \{\.\.\.politeLiveRegionProps\}/);
+  assert.match(code, /<YStack\s+collapsable=\{false\}\s+\{\.\.\.politeLiveRegionProps\}/);
   assert.doesNotMatch(code, /accessibilityRole="text"/);
   assert.doesNotMatch(code, /accessibilityRole="status"/);
 });
@@ -73,7 +73,10 @@ test("the root is a polite live region via the codebase's translator props", () 
 test("the root renders unconditionally; only the message line is conditional", () => {
   assert.doesNotMatch(code, /if \(!message\)/);
   assert.doesNotMatch(code, /message \? \(\s*<YStack/);
-  assert.match(code, /return \(\s*<YStack \{\.\.\.politeLiveRegionProps\}/);
+  assert.match(
+    code,
+    /return \(\s*<YStack\s+collapsable=\{false\}\s+\{\.\.\.politeLiveRegionProps\}/,
+  );
   assert.match(code, /\{message \? \(/);
 });
 

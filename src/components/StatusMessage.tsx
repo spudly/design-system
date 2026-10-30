@@ -32,6 +32,14 @@ export type StatusMessageProps = {
  * in place of its old conditional block, so the mount requirement
  * holds by construction).
  *
+ * The root carries `collapsable={false}`: it has no drawing or
+ * layout styles of its own (only the live-region props and, when
+ * a message shows, bottom padding), so React Native's view
+ * flattening could remove it from the native hierarchy —
+ * empty, it could vanish entirely — and the live region would
+ * not exist for TalkBack to announce through. The prop keeps
+ * the node in the tree on native and is a no-op on web.
+ *
  * Ink (#318, gap 2): `$textMuted`, the theme-aware muted token —
  * never a raw ramp step. The old treatment's fixed gray7 (#525252)
  * measures 1.94:1 against the dark shell surface (gray9). Verified
@@ -54,7 +62,11 @@ export type StatusMessageProps = {
  */
 export function StatusMessage({ message }: StatusMessageProps) {
   return (
-    <YStack {...politeLiveRegionProps} {...(message ? { paddingBlockEnd: "$4" } : {})}>
+    <YStack
+      collapsable={false}
+      {...politeLiveRegionProps}
+      {...(message ? { paddingBlockEnd: "$4" } : {})}
+    >
       {message ? (
         <Text textAlign="center" fontSize={tokens.typography.fontSize.sm} color="$textMuted">
           {message}
