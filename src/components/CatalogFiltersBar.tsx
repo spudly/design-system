@@ -1,8 +1,10 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
+import { RemovableField } from "./RemovableField.js";
 import { SearchField } from "./SearchField.js";
+import { SearchRow } from "./SearchRow.js";
 import { SelectField, type SelectOption } from "./SelectField.js";
 import { TextField } from "./TextField.js";
 
@@ -136,15 +138,14 @@ function NumberFilter({
   onChange: (value: string) => void;
 }) {
   return (
-    <YStack flex={1}>
-      <TextField
-        label={label}
-        accessibilityLabel={label}
-        keyboardType="numeric"
-        value={value}
-        onChangeText={onChange}
-      />
-    </YStack>
+    <TextField
+      grow
+      label={label}
+      accessibilityLabel={label}
+      keyboardType="numeric"
+      value={value}
+      onChangeText={onChange}
+    />
   );
 }
 
@@ -246,40 +247,17 @@ function FilterControl<FilterId extends string>({
   }
 }
 
-/** One added filter: its control(s) plus the Remove control that
- * clears and hides it (#96). */
-function AddedFilter({
-  label,
-  onRemove,
-  children,
-}: {
-  label: string;
-  onRemove: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <YStack gap={tokens.spacing[1]}>
-      <XStack justifyContent="flex-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          accessibilityLabel={`Remove ${label} filter`}
-          onPress={onRemove}
-        >
-          Remove
-        </Button>
-      </XStack>
-      {children}
-    </YStack>
-  );
-}
-
 /** The collapsed filter bar (#96), the same bar RecipesPage
  * renders: search and a small Filters button initially; the
  * button opens a chooser of the filters not yet added, and a
  * filter's control renders only once that filter has been
  * added. The search placeholder and the filter definitions are
- * props because the catalogs' copy and data differ. */
+ * props because the catalogs' copy and data differ. The bar
+ * composes the shared primitives for its rows: SearchRow for
+ * the search row and RemovableField for each added filter —
+ * the two catalogs' bars had converged on those exact shapes
+ * independently before this component unified them (#119
+ * dedupe). */
 export function CatalogFiltersBar<FilterId extends string = string>({
   searchPlaceholder,
   search,
@@ -321,19 +299,19 @@ export function CatalogFiltersBar<FilterId extends string = string>({
 
   return (
     <YStack gap={tokens.spacing[3]}>
-      {/* The row stretches its children (#188): the small Filters
-          button's natural height is shorter than the SearchField,
-          so the button stretches to the search field's height and
-          the two line up. Do not switch this back to flex-start —
-          that is what made the button shorter than the field. */}
-      <XStack gap={tokens.spacing[2]} alignItems="stretch">
-        <YStack flex={1}>
-          <SearchField
-            value={search}
-            onChangeText={onSearchChange}
-            placeholder={searchPlaceholder}
-          />
-        </YStack>
+      {/* SearchRow stretches its children (#188): the small
+          Filters button's natural height is shorter than the
+          SearchField, so the button stretches to the search
+          field's height and the two line up. Do not switch this
+          back to flex-start — that is what made the button
+          shorter than the field. */}
+      <SearchRow>
+        <SearchField
+          grow
+          value={search}
+          onChangeText={onSearchChange}
+          placeholder={searchPlaceholder}
+        />
         {addable.length > 0 ? (
           <Button
             variant="secondary"
@@ -347,7 +325,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
             Filters
           </Button>
         ) : null}
-      </XStack>
+      </SearchRow>
       {chooserOpen && addable.length > 0 ? (
         <XStack gap={tokens.spacing[2]} flexWrap="wrap">
           {addable.map((definition) => (
@@ -366,15 +344,15 @@ export function CatalogFiltersBar<FilterId extends string = string>({
         </XStack>
       ) : null}
       {added.map((definition) => (
-        <AddedFilter
+        <RemovableField
           key={definition.id}
-          label={definition.label}
+          removeAccessibilityLabel={`Remove ${definition.label} filter`}
           onRemove={() => {
             removeFilter(definition);
           }}
         >
           <FilterControl definition={definition} />
-        </AddedFilter>
+        </RemovableField>
       ))}
     </YStack>
   );

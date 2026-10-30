@@ -11,8 +11,8 @@ export type PublicFrameHeaderProps = {
   brandHref: string;
   /** Sign-in link label (the frame's DS-owned copy, passed in). */
   signInLabel: string;
-  /** Sign-in intent: the host navigates to the login route. */
-  onSignInPress: () => void;
+  /** The sign-in route's href — sign-in navigates, so it is a link. */
+  signInHref: string;
 };
 
 /**
@@ -22,15 +22,23 @@ export type PublicFrameHeaderProps = {
  * (COLUMN_MAX_WIDTH). Extracted from PublicPageFrame for the
  * #119 page de-styling program — the band's fill, border, column
  * geometry, and link treatments are the frame's design, owned
- * here; the copy crosses as props, the wordmark's home href
- * crosses as an href (it navigates — #248), and the sign-in
- * navigation crosses as an intent callback.
+ * here; the copy crosses as props.
+ *
+ * Both controls are links with hrefs (#119 dedupe, cluster
+ * B7): the wordmark composes BrandLink and sign-in is a
+ * TextLink href form. The tranche's first cut crossed sign-in
+ * as an intent callback (the #169 frame contract) while the
+ * document surface's header (DocumentHeader) crossed the same
+ * control as an href — two contracts for one job. #248's
+ * navigation rule settles it: a control that navigates to
+ * another page is a link with an href, so the canonical
+ * contract is hrefs in, on both surfaces.
  */
 export function PublicFrameHeader({
   brandLabel,
   brandHref,
   signInLabel,
-  onSignInPress,
+  signInHref,
 }: PublicFrameHeaderProps) {
   return (
     <YStack backgroundColor="$surface" borderBottomWidth={1} borderColor={tokens.colors.gray.gray2}>
@@ -44,7 +52,7 @@ export function PublicFrameHeader({
         paddingVertical="$4"
       >
         <BrandLink label={brandLabel} href={brandHref} />
-        <TextLink fontSize={tokens.typography.fontSize.sm} onPress={onSignInPress}>
+        <TextLink fontSize={tokens.typography.fontSize.sm} href={signInHref}>
           {signInLabel}
         </TextLink>
       </XStack>

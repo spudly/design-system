@@ -59,17 +59,18 @@ function readCode(path) {
 const page = readCode(join(pagesDir, "DiscoverPage.tsx"));
 const pageStories = readCode(join(pagesDir, "DiscoverPage.stories.tsx"));
 // The page's internals moved into shared components in the #119
-// de-styling tranche: the filter bar is CatalogFiltersBar, the
-// list header is CatalogHeader, and the list's loading/error
-// states are ListLoadingState / ListErrorState. The scans below
-// follow the code — the bar's decisions pin against the bar, the
-// heading against the header, the states against the state
-// components — while the page-level pins (contract, pagination
-// wiring, composition) stay on the page.
+// de-styling tranche, canonized in the #320 dedupe: the filter
+// bar is CatalogFiltersBar, the list header is CatalogHeader,
+// and the list's loading state is ListLoadingState; the error
+// state renders Alert directly (the ListErrorState middleman was
+// removed in #320 — Stephen's no-middleman ruling). The scans
+// below follow the code — the bar's decisions pin against the
+// bar, the heading against the header, the states against the
+// page's own composition — while the page-level pins (contract,
+// pagination wiring, composition) stay on the page.
 const bar = readCode(join(componentsDir, "CatalogFiltersBar.tsx"));
 const catalogHeader = readCode(join(componentsDir, "CatalogHeader.tsx"));
 const loadingState = readCode(join(componentsDir, "ListLoadingState.tsx"));
-const errorState = readCode(join(componentsDir, "ListErrorState.tsx"));
 const card = readCode(join(componentsDir, "DiscoveryCard.tsx"));
 const cardStories = readCode(join(componentsDir, "DiscoveryCard.stories.tsx"));
 const pagesBarrel = readCode(join(pagesDir, "index.ts"));
@@ -82,13 +83,8 @@ test("the page contract carries copy in and the error state (decision 3)", () =>
   assert.match(page, /errorMessage: string \| null;/);
   assert.match(
     page,
-    /<ListErrorState message=\{errorMessage\} \/>/,
-    "the error state must carry errorMessage",
-  );
-  assert.match(
-    errorState,
-    /<Alert severity="error">\{message\}<\/Alert>/,
-    "the error state renders the message as an error alert",
+    /<Alert severity="error">\{errorMessage\}<\/Alert>/,
+    "the error state renders errorMessage as an error alert, directly (no middleman state component)",
   );
   assert.match(
     page,
@@ -216,7 +212,7 @@ test("the title renders as the page heading and pagination rides the shared cata
   );
   assert.match(
     page,
-    /isFetchingNextPage \? <ListLoadingFooter label="Loading" \/>/,
+    /isFetchingNextPage \? <ListLoadingState label="Loading" \/>/,
     "the loading-more footer keys off isFetchingNextPage",
   );
 });

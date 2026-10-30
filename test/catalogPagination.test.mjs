@@ -204,12 +204,12 @@ test("both pages keep the loading-more footer on isFetchingNextPage", () => {
     /isFetchingNextPage \? \(/,
     "RecipesPage's footer keys off isFetchingNextPage",
   );
-  // DiscoverPage's footer is the shared ListLoadingFooter
-  // component (#119), whose one-line form prettier keeps
-  // unparenthesized.
+  // DiscoverPage's footer renders the shared ListLoadingState
+  // directly (#320 removed the ListLoadingFooter middleman),
+  // whose one-line form prettier keeps unparenthesized.
   assert.match(
     discoverPage,
-    /isFetchingNextPage \? <ListLoadingFooter label="Loading" \/>/,
+    /isFetchingNextPage \? <ListLoadingState label="Loading" \/>/,
     "DiscoverPage's footer keys off isFetchingNextPage",
   );
 });

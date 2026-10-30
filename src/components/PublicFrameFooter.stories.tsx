@@ -12,9 +12,9 @@ type Story = StoryObj<typeof PublicFrameFooter>;
 export const Default: Story = {
   args: {
     note: "Recipes shared on Eciperay may be viewed without an account.",
-    privacyLabel: "Privacy Policy",
-    onPrivacyPress: () => {},
-    termsLabel: "Terms of Service",
-    onTermsPress: () => {},
+    links: [
+      { label: "Privacy Policy", href: "/privacy" },
+      { label: "Terms of Service", href: "/terms" },
+    ],
   },
 };

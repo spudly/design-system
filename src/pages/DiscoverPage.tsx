@@ -1,9 +1,8 @@
+import { Alert } from "../components/Alert.js";
 import { CatalogFiltersBar, type CatalogFilterDefinition } from "../components/CatalogFiltersBar.js";
 import { CatalogHeader } from "../components/CatalogHeader.js";
 import { DiscoveryCard } from "../components/DiscoveryCard.js";
 import { EmptyState } from "../components/EmptyState.js";
-import { ListErrorState } from "../components/ListErrorState.js";
-import { ListLoadingFooter } from "../components/ListLoadingFooter.js";
 import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import type { SelectOption } from "../components/SelectField.js";
@@ -385,12 +384,12 @@ export function DiscoverPage(props: DiscoverPageProps) {
           isLoading ? (
             <ListLoadingState label="Loading" />
           ) : errorMessage ? (
-            <ListErrorState message={errorMessage} />
+            <Alert severity="error">{errorMessage}</Alert>
           ) : (
             <EmptyState title={emptyMessage} />
           )
         }
-        ListFooterComponent={isFetchingNextPage ? <ListLoadingFooter label="Loading" /> : undefined}
+        ListFooterComponent={isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined}
         // Pagination: the shared catalog pattern's handler —
         // see useCatalogPagination above. It stays mounted (but
         // guarded) during a next-page fetch and is unmounted

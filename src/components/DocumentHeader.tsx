@@ -1,5 +1,7 @@
-import { Anchor, XStack } from "tamagui";
+import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { BrandLink } from "./BrandLink.js";
+import { TextLink } from "./TextLink.js";
 
 export type DocumentHeaderProps = {
   /** Brand wordmark text (the document surface's own label). */
@@ -15,12 +17,17 @@ export type DocumentHeaderProps = {
 /**
  * The document frame's header row (#170, extracted for #119): the
  * brand wordmark and the sign-in link at the ends of the row, both
- * real anchors — this frame's chrome navigates by href (the
- * structured-document surface owns its routes), unlike the public
- * frame's intent-callback chrome (PublicFrameHeader, #169). The
- * treatments (the wordmark's size and weight, the sign-in link's
- * link ink) are the frame's design, owned here; the labels and
- * hrefs are the host's content, passed in.
+ * real links — this frame's chrome navigates by href (the
+ * structured-document surface owns its routes). The row is the
+ * document surface's lighter chrome: no band, no wide column —
+ * it sits inside the document's own column, where
+ * PublicFrameHeader's full-width band would double-frame the
+ * page. That weight difference is why both headers ship; what
+ * the #119 dedupe unified is the contract and the pieces: the
+ * wordmark composes BrandLink (the tranche's first cut
+ * hand-rolled a second wordmark as a raw Anchor, in a different
+ * treatment) and sign-in is a TextLink href form, exactly the
+ * public frame header's shapes.
  */
 export function DocumentHeader({
   brandHref,
@@ -30,16 +37,10 @@ export function DocumentHeader({
 }: DocumentHeaderProps) {
   return (
     <XStack alignItems="center" justifyContent="space-between" gap="$4">
-      <Anchor
-        href={brandHref}
-        fontSize={tokens.typography.fontSize.lg}
-        fontWeight={tokens.typography.fontWeight.bold}
-      >
-        {brandLabel}
-      </Anchor>
-      <Anchor href={signInHref} color="$link" fontWeight={tokens.typography.fontWeight.medium}>
+      <BrandLink label={brandLabel} href={brandHref} />
+      <TextLink href={signInHref} fontWeight={tokens.typography.fontWeight.medium}>
         {signInLabel}
-      </Anchor>
+      </TextLink>
     </XStack>
   );
 }

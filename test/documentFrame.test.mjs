@@ -35,10 +35,16 @@ test("the document frame components are exported from the built package root", a
 });
 
 test("DocumentHeader renders brand and sign-in as anchors with hrefs", () => {
-  assert.match(header, /<Anchor\s+href=\{brandHref\}/, "the wordmark is an anchor");
-  assert.match(header, /fontWeight=\{tokens\.typography\.fontWeight\.bold\}/, "wordmark weight");
-  assert.match(header, /<Anchor\s+href=\{signInHref\}/, "sign-in is an anchor");
-  assert.match(header, /color="\$link"/, "sign-in carries the link ink");
+  // The dedupe unified the document chrome on the frame's link
+  // contract: the wordmark composes BrandLink and sign-in is a
+  // TextLink href form — real anchors, no press intents.
+  assert.match(
+    header,
+    /<BrandLink label=\{brandLabel\} href=\{brandHref\} \/>/,
+    "the wordmark is BrandLink",
+  );
+  assert.match(header, /<TextLink[^>]*href=\{signInHref\}/, "sign-in is a link with an href");
+  assert.match(header, /fontWeight=\{tokens\.typography\.fontWeight\.medium\}/, "sign-in weight");
   assert.ok(!header.includes("onPress"), "the document frame has no press intents — hrefs only");
   assert.match(header, /brandHref: string;/);
   assert.match(header, /signInHref: string;/);
@@ -47,7 +53,11 @@ test("DocumentHeader renders brand and sign-in as anchors with hrefs", () => {
 test("DocumentFooter renders the host's links under a divider", () => {
   assert.match(footer, /<Divider \/>/, "the footer is set off by the divider");
   assert.match(footer, /links\.map/, "the footer renders the links it is given");
-  assert.match(footer, /href=\{link\.href\}/, "each link renders as an anchor with its href");
+  assert.match(
+    footer,
+    /href=\{link\.href\}/,
+    "each link renders through a link form with its href",
+  );
   assert.match(footer, /flexWrap="wrap"/, "the link row wraps on narrow widths");
   assert.ok(!footer.includes("onPress"), "the document frame has no press intents — hrefs only");
 });

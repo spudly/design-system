@@ -14,6 +14,6 @@ export const Default: Story = {
     brandLabel: "Eciperay",
     brandHref: "/",
     signInLabel: "Sign in",
-    onSignInPress: () => {},
+    signInHref: "/sign-in",
   },
 };

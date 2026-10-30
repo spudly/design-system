@@ -15,14 +15,15 @@ import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
  * alike): the DS owns the design — this frame included — and the
  * app owns the content. The frame's copy is therefore DS-owned
  * constants that move with the frame (the copy precedent from
- * RecipeDetailPage). Navigation leaves two ways, per #248's
- * rule: the brand wordmark navigates home — a canonical
- * destination — so its href crosses as an href (BrandLink is a
- * real link; Stephen's ruling on PR #311), while the remaining
- * navigation leaves through intent callbacks: the host routes
- * (Sign in → the login route, Privacy/Terms → the legal
- * routes). Nothing here imports an app package or fetches
- * anything.
+ * RecipeDetailPage), while the destinations are the host's.
+ * Navigation leaves as hrefs throughout, per #248's rule: every
+ * control here navigates to another page — the brand wordmark
+ * home, Sign in to the login route, Privacy/Terms to the legal
+ * routes — so each crosses as a real link's href, never as an
+ * intent callback (Stephen's rulings on PR #311 and the #320
+ * dedupe: a control that navigates is a link with an href, and
+ * the footer's legal links are caller-supplied {label, href}
+ * data). Nothing here imports an app package or fetches anything.
  *
  * This is the wide public counterpart to PageFrame (the 430px
  * phone frame the app-page stories render in): the content column
@@ -31,13 +32,15 @@ import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
  * same split as the web PublicPageLayout it replaces, whose header
  * and footer sit outside the scrolling document flow.
  *
- * The composition (#119): the frame is assembled from the shared
- * frame components — PublicFrameLayout owns the shell and the
- * column, PublicFrameHeader / PublicFrameFooter own the bands and
- * their link treatments, BrandLink owns the wordmark — and this
- * file keeps what is the frame's own: the navigation contract
- * (the brand href and the intent callbacks) and the DS-owned
- * copy constants, passed into the bands as data.
+ * The composition (#119, deduped in #320): the frame is assembled
+ * from the shared frame components — PublicFrameLayout owns the
+ * shell and the column, PublicFrameHeader / PublicFrameFooter own
+ * the bands and their link treatments, BrandLink owns the
+ * wordmark — and this file keeps what is the frame's own: the
+ * navigation contract (the hrefs) and the DS-owned copy
+ * constants, passed into the bands as data (the footer receives
+ * its legal links as the {label, href} array its contract takes,
+ * built here from the frame's labels and the host's hrefs).
  *
  * Placement: page components live in src/pages behind the
  * `@spudly/ui/pages` subpath export, not the package root.
@@ -46,12 +49,12 @@ import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
 export type PublicPageFrameProps = {
   /** The brand wordmark's href — the host's home route (the wordmark navigates, so it is a link). */
   brandHref: string;
-  /** Sign-in intent: the host navigates to the login route. */
-  onSignInPress: () => void;
-  /** Privacy intent: the host navigates to the privacy policy. */
-  onPrivacyPress: () => void;
-  /** Terms intent: the host navigates to the terms of service. */
-  onTermsPress: () => void;
+  /** The Sign in link's href — the host's login route. */
+  signInHref: string;
+  /** The Privacy Policy link's href — the host's privacy route. */
+  privacyHref: string;
+  /** The Terms of Service link's href — the host's terms route. */
+  termsHref: string;
   children: ReactNode;
 };
 
@@ -71,9 +74,9 @@ const TERMS_LABEL = "Terms of Service";
  */
 export function PublicPageFrame({
   brandHref,
-  onSignInPress,
-  onPrivacyPress,
-  onTermsPress,
+  signInHref,
+  privacyHref,
+  termsHref,
   children,
 }: PublicPageFrameProps) {
   return (
@@ -83,16 +86,16 @@ export function PublicPageFrame({
           brandLabel={BRAND_LABEL}
           brandHref={brandHref}
           signInLabel={SIGN_IN_LABEL}
-          onSignInPress={onSignInPress}
+          signInHref={signInHref}
         />
       }
       footer={
         <PublicFrameFooter
           note={FOOTER_NOTE}
-          privacyLabel={PRIVACY_LABEL}
-          onPrivacyPress={onPrivacyPress}
-          termsLabel={TERMS_LABEL}
-          onTermsPress={onTermsPress}
+          links={[
+            { label: PRIVACY_LABEL, href: privacyHref },
+            { label: TERMS_LABEL, href: termsHref },
+          ]}
         />
       }
     >

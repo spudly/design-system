@@ -22,16 +22,16 @@ export const Default: Story = {
             brandLabel="Eciperay"
             brandHref="/"
             signInLabel="Sign in"
-            onSignInPress={() => {}}
+            signInHref="/sign-in"
           />
         }
         footer={
           <PublicFrameFooter
             note="Recipes shared on Eciperay may be viewed without an account."
-            privacyLabel="Privacy Policy"
-            onPrivacyPress={() => {}}
-            termsLabel="Terms of Service"
-            onTermsPress={() => {}}
+            links={[
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Terms of Service", href: "/terms" },
+            ]}
           />
         }
       >
