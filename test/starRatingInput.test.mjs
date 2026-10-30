@@ -44,6 +44,13 @@ test("dark tone renders unselected stars near-white at reduced opacity (#159)", 
   assert.match(code, /tokens\.colors\.gray\.gray1/);
 });
 
+test("dark tone renders the label in near-white ink so it stays legible on dark surfaces (#334)", () => {
+  assert.match(
+    code,
+    /style=\{tone === "dark" \? \{ color: tokens\.colors\.gray\.gray1 \} : undefined\}/,
+  );
+});
+
 test("allowClear clears through onChange(0) only when enabled (#159)", () => {
   assert.match(code, /onChange\(allowClear && star === value \? 0 : star\)/);
 });
