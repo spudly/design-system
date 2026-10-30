@@ -208,13 +208,8 @@ test("MealPlansPage, MealPlanDetailPage, RecipeDetailPage, and RecipeFormPage ha
   // accessibility JSX props may appear either (props on DS
   // primitives / LinkOverlay are the sanctioned exceptions,
   // stripped via the shared TAGS before RAW is applied).
-  for (const page of [
-    "MealPlansPage",
-    "MealPlanDetailPage",
-    "RecipeDetailPage",
-    "RecipeFormPage",
-  ]) {
-    const rel = `src/pages/${page}.tsx`;
+  const PAGES = "MealPlansPage,MealPlanDetailPage,RecipeDetailPage,RecipeFormPage".split(",");
+  for (const rel of PAGES.map((page) => `src/pages/${page}.tsx`)) {
     const code = readCode(rel);
     assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
     assert.ok(
