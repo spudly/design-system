@@ -5,9 +5,9 @@
  * treatment outright — the pins hold the treatments and the
  * package-root exports.
  *
- * The recipedetail tranche's version of this file also pinned
- * Toolbar and StatusMessage; neither ships here — Toolbar stays
- * with its tranche, and StatusMessage retired into CenteredText
+ * Toolbar — the recipedetail tranche's pinned bar — joins the
+ * set in the #119 extraction round and is pinned here;
+ * StatusMessage retired into CenteredText
  * (test/centeredText.test.mjs) in the dedupe.
  */
 import "./registerSvgStub.mjs";
@@ -27,7 +27,7 @@ function code(file) {
 
 test("the shell components are exported from the built package root", async () => {
   const dist = await import("../dist/index.js");
-  for (const name of ["ScreenShell", "SectionHeading"]) {
+  for (const name of ["ScreenShell", "SectionHeading", "Toolbar"]) {
     assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
   }
 });
@@ -37,6 +37,34 @@ test("ScreenShell owns the fixed-shell frame", () => {
   assert.match(shell, /styled\(YStack, \{\s+name: "ScreenShell",/);
   assert.match(shell, /flex: 1,\s+backgroundColor: "\$surface",/);
   assert.match(shell, /Omit<StyledScreenShellProps, "flex" \| "backgroundColor">/);
+});
+
+test("Toolbar owns the pinned bar's inset, gap, wrap, and hairline divider", () => {
+  const toolbar = code("Toolbar.tsx");
+  assert.match(toolbar, /styled\(XStack, \{\s+name: "Toolbar",/);
+  assert.match(toolbar, /flexWrap: "wrap",\s+alignItems: "center",/);
+  assert.match(toolbar, /gap: tokens\.spacing\[2\],/);
+  assert.match(toolbar, /borderBottomWidth: 1,\s+borderBottomColor: tokens\.colors\.gray\.gray2,/);
+  assert.match(
+    toolbar,
+    /paddingHorizontal: tokens\.spacing\[4\],\s+paddingVertical: tokens\.spacing\[3\],/,
+  );
+  for (const owned of [
+    "flexWrap",
+    "alignItems",
+    "gap",
+    "borderBottomWidth",
+    "borderBottomColor",
+    "paddingHorizontal",
+    "paddingVertical",
+  ]) {
+    assert.match(
+      toolbar,
+      new RegExp(String.raw`\|\s*"${owned}"`),
+      `ToolbarProps must omit the bar-owned ${owned}`,
+    );
+  }
+  assert.match(toolbar, /export type ToolbarProps = Omit<\s+StyledToolbarProps,/);
 });
 
 test("SectionHeading is the subheading treatment with no baked-in padding", () => {
