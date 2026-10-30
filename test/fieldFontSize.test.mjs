@@ -3,8 +3,9 @@
  *
  * On the recipe browse screens (RecipesPage — since #185 the single
  * recipes-list page, serving Shared-with-me too) the filter
- * bar mixes SearchField, TextField (incl. the page NumberFilters) and
- * SelectField — and SelectField rendered its value/item text at
+ * bar (the shared CatalogFiltersBar since the #119 dedupe) mixes
+ * SearchField, TextField and SelectField — and SelectField rendered
+ * its value/item text at
  * fontSize.sm (14) while every text input rendered at fontSize.md (16),
  * so the fields visibly mismatched. The fix pins every field component's
  * entered/selected text to the shared token tokens.typography.fontSize.md.
@@ -62,9 +63,17 @@ for (const [rel, constName] of FIELD_VALUE_BLOCKS) {
 test("the recipes page builds its filter bar from the shared field components (#67)", () => {
   // Since #185 RecipesPage is the single recipes-list page (it also
   // serves Shared-with-me); before that, SharedWithMePage carried an
-  // identical copy of this bar and was scanned alongside.
-  const code = codeOf("src/pages/RecipesPage.tsx");
+  // identical copy of this bar and was scanned alongside. Since the
+  // #119 dedupe the page renders the shared CatalogFiltersBar, which
+  // composes the shared fields — pin both links of that chain so the
+  // bar's fields stay the font-pinned shared components.
+  const page = codeOf("src/pages/RecipesPage.tsx");
+  assert.ok(
+    page.includes("CatalogFiltersBar"),
+    "RecipesPage filter bar should be the shared CatalogFiltersBar",
+  );
+  const bar = codeOf("src/components/CatalogFiltersBar.tsx");
   for (const comp of ["SearchField", "SelectField", "TextField"]) {
-    assert.ok(code.includes(comp), `RecipesPage filter bar should use the shared ${comp}`);
+    assert.ok(bar.includes(comp), `CatalogFiltersBar should use the shared ${comp}`);
   }
 });

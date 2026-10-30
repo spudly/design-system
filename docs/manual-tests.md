@@ -756,6 +756,21 @@ recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
+## RemovableField
+
+Open in `Components/RemovableField`: Default.
+
+1. A small ghost "Remove" button sits right-aligned above the
+   Ingredient field at a 4px gap; its accessible name names the
+   field ("Remove Ingredient filter").
+2. The field under it renders at full width, unchanged.
+
+**Run when:** `src/components/RemovableField.tsx`, its
+stories, the catalog pages' filter bars, or a changeset naming
+RemovableField.
+
+---
+
 ## LegalDocumentPage
 
 Open in `Pages/Eciperay/LegalDocumentPage`: PrivacyPolicy,
@@ -983,9 +998,27 @@ SharedDefault, SharedFiltered, SharedEmpty, SharedLoading.
 7. LoadingMore keeps the recipe rows rendered with the footer
    spinner below them (the next-page-in-flight state,
    `isFetchingNextPage`), like DiscoverPage's LoadingMore story.
+8. Rows: each row is an elevated card with a 64px cover-cropped
+   thumbnail (or the gray placeholder well when the recipe has
+   no image), a semibold title, and a hint subtitle. Both the
+   thumbnail and the text are links to the recipe — the card
+   itself is not pressable. At a narrow width the text block
+   wraps under the thumbnail rather than collapsing beside it
+   (the 60dp basis). ExpandedAccessory shows the accessory
+   content under the card inside the same list item, 12px
+   below it.
+9. Log-cook control: a rated row's stars are one button with a
+   44dp target, filled by rounding (a 4.5 rating shows five
+   amber stars), named "Log a cook of <title>, rated <N> out
+   of 5 stars"; an unrated row shows a single gray star as the
+   button, named "Log a cook of <title>". The control flows
+   inline after the subtitle text, never as a trailing row
+   item, and it hides on the row whose accessory is open.
 
-**Run when:** `src/pages/RecipesPage.tsx`, its stories, or a
-changeset naming RecipesPage or the Shared-with-me screen.
+**Run when:** `src/pages/RecipesPage.tsx` (including its
+page-local row and log-cook control compositions), its
+stories, or a changeset naming RecipesPage or the
+Shared-with-me screen.
 
 ---
 
