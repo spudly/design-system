@@ -1,15 +1,8 @@
-import { YStack, styled } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
+import { FormStack } from "./FormStack.js";
 import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "./TextLink.js";
-
-const StyledForm = styled(YStack, {
-  name: "ForgotPasswordForm",
-
-  gap: tokens.spacing[4],
-});
 
 /**
  * ForgotPasswordForm (#119): the reset-request form — the
@@ -57,7 +50,7 @@ export function ForgotPasswordForm({
     }
   };
   return (
-    <StyledForm>
+    <FormStack>
       <TextField
         label="Email"
         value={email}
@@ -83,6 +76,6 @@ export function ForgotPasswordForm({
           Back to sign in
         </TextLink>
       ) : null}
-    </StyledForm>
+    </FormStack>
   );
 }

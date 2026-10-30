@@ -1,14 +1,7 @@
-import { YStack, styled } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
+import { FormStack } from "./FormStack.js";
 import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
-
-const StyledForm = styled(YStack, {
-  name: "ResetPasswordForm",
-
-  gap: tokens.spacing[4],
-});
 
 /**
  * ResetPasswordForm (#119): the new-password form — the field
@@ -51,7 +44,7 @@ export function ResetPasswordForm({
     }
   };
   return (
-    <StyledForm>
+    <FormStack>
       <TextField
         label="New password"
         value={password}
@@ -71,6 +64,6 @@ export function ResetPasswordForm({
       >
         {loading ? "Updating…" : "Update password"}
       </Button>
-    </StyledForm>
+    </FormStack>
   );
 }

@@ -12,8 +12,10 @@
  *   the built dist, and each auth page composes its form unit
  *   (the page keeps its prop surface — the b3cPages pins hold
  *   the declarations);
- * - the forms own their layout: the field rhythm is the form's
- *   own gap, and the pages render no fields directly;
+ * - the forms compose the shared FormStack (the #119 dedupe
+ *   canonical form stack), which owns the 16px field rhythm —
+ *   no form defines a local form stack — and the pages render
+ *   no fields directly;
  * - SignUpForm keeps the legalNotice slot between the submit
  *   button and the sign-in link (the app view's order);
  * - LegalSection renders its title in the app profile screen's
@@ -60,13 +62,19 @@ test("the auth pages compose their form units and render no fields directly", ()
   }
 });
 
-test("each form owns its field rhythm and its submit handling", () => {
+test("each form composes the shared FormStack and owns its submit handling", () => {
   for (const form of FORMS) {
     const source = read(`src/components/${form}.tsx`);
     assert.match(
       source,
-      /gap: tokens\.spacing\[4\]/,
-      `${form}'s column carries the 16px field rhythm`,
+      /import \{ FormStack \} from "\.\/FormStack\.js";/,
+      `${form} imports the shared FormStack`,
+    );
+    assert.match(source, /<FormStack>/, `${form} renders its sections in the FormStack`);
+    assert.doesNotMatch(
+      source,
+      /const StyledForm\b/,
+      `${form} defines no local form stack (FormStack owns the 16px field rhythm)`,
     );
     assert.match(source, /onSubmit: \(\) => void/, `${form} submits a bare intent`);
     assert.doesNotMatch(

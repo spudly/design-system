@@ -1,15 +1,10 @@
 import { YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
+import { FormStack } from "./FormStack.js";
 import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "./TextLink.js";
-
-const StyledForm = styled(YStack, {
-  name: "SignInForm",
-
-  gap: tokens.spacing[4],
-});
 
 const StyledLinks = styled(YStack, {
   name: "SignInFormLinks",
@@ -76,7 +71,7 @@ export function SignInForm({
     }
   };
   return (
-    <StyledForm>
+    <FormStack>
       <TextField
         label="Email"
         value={email}
@@ -111,6 +106,6 @@ export function SignInForm({
           ) : null}
         </StyledLinks>
       ) : null}
-    </StyledForm>
+    </FormStack>
   );
 }

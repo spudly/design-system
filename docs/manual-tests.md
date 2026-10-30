@@ -1211,8 +1211,10 @@ Open in `Components/SignInForm`, `Components/SignUpForm`,
 `Components/LegalSection` (each form's Default story — the
 stories are interactive: fields can be typed in).
 
-The auth pages' forms as standalone components: each form owns
-its field rhythm and footer layout, and the pages compose them.
+The auth pages' forms as standalone components: each form
+composes the shared FormStack (which owns the 16px field
+rhythm) and its own footer layout, and the pages compose the
+forms.
 
 1. Each form's fields stack at a 16px rhythm, and an error (the
    WithError story) renders directly above the submit button in

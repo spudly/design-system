@@ -1,16 +1,9 @@
 import type { ReactNode } from "react";
-import { YStack, styled } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
+import { FormStack } from "./FormStack.js";
 import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "./TextLink.js";
-
-const StyledForm = styled(YStack, {
-  name: "SignUpForm",
-
-  gap: tokens.spacing[4],
-});
 
 /**
  * SignUpForm (#119): the create-account form — the fields and
@@ -74,7 +67,7 @@ export function SignUpForm({
     }
   };
   return (
-    <StyledForm>
+    <FormStack>
       <TextField
         label="Your name"
         value={displayName}
@@ -117,6 +110,6 @@ export function SignUpForm({
           Already have an account? Sign in
         </TextLink>
       ) : null}
-    </StyledForm>
+    </FormStack>
   );
 }
