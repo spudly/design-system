@@ -36,11 +36,12 @@
  * - src/components/accessibility.ts — ARIA helper utilities.
  * - src/components/tagColors.ts — the shared tag-color resolver hook
  *   (#207); exercised through the Badge/ColorPickerField stories.
- * - src/pages/PageFrame.tsx — internal page scaffolding shared by the
- *   page components; NOT exported from src/pages/index.ts, so it is
- *   not part of the @spudly/ui/pages surface. It is exercised through
+ * - src/components/PageFrame.tsx — internal page-story scaffolding
+ *   shared by the page stories; NOT exported from either barrel, so
+ *   it is not part of the @spudly/ui surface. It is exercised through
  *   every page story. If it is ever exported, this test fails and a
- *   story decision is required.
+ *   story decision is required. (It lived in src/pages until #119's
+ *   auth tranche moved it out of the no-page-styling rule's scope.)
  * - src/pages/BoundedList.tsx — internal page scaffolding (#119): the
  *   shared bounded FlatList the fixed-shell list pages render. It
  *   imports react-native, so it cannot be a root-exported component;
@@ -99,22 +100,34 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches })
   assert.ok(storyExportCount(story) >= 1, `${base}.stories.tsx exports no stories`);
 }
 
+// Internal helpers, not widgets: accessibility.ts / tagColors.ts
+// are prop/style translators, linkOverlay.tsx is the native-only
+// link layer other components compose, labelRow.tsx is the
+// shared label-row implementation LabeledField / LabeledGroup
+// compose, and PageFrame.tsx is page-story scaffolding (the
+// demo stories' phone-width frame, relocated out of src/pages
+// for #119) — none is a standalone component with a story of
+// its own, and none is exported from the components barrel.
+const COMPONENT_STORY_EXCEPTIONS = new Set([
+  "accessibility.ts",
+  "index.ts",
+  "tagColors.ts",
+  "linkOverlay.tsx",
+  "labelRow.tsx",
+  "PageFrame.tsx",
+]);
+
 test("every widget component has a story file titled Components/<Name>", () => {
   const dir = join(root, "src", "components");
   const index = read("src/components/index.ts");
-  // Internal helpers, not widgets: accessibility.ts / tagColors.ts
-  // are prop/style translators, linkOverlay.tsx is the
-  // native-only link layer other components compose, and
-  // labelRow.tsx is the shared label-row implementation
-  // LabeledField / LabeledGroup compose — none is a standalone
-  // component with a story of its own.
-  const exceptions = new Set([
-    "accessibility.ts",
-    "index.ts",
-    "tagColors.ts",
-    "linkOverlay.tsx",
-    "labelRow.tsx",
-  ]);
+  const exceptions = COMPONENT_STORY_EXCEPTIONS;
+  // The exception files stay unexported (see header): if one is
+  // ever exported from the barrel, it becomes public surface and
+  // owes a story decision.
+  assert.ok(
+    !index.includes('from "./PageFrame.js"'),
+    "PageFrame must stay unexported from src/components/index.ts (internal scaffolding)",
+  );
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),
@@ -139,13 +152,14 @@ test("every widget component has a story file titled Components/<Name>", () => {
 test("every page component has a story file titled Pages/<App>/<Name>", () => {
   const dir = join(root, "src", "pages");
   const index = read("src/pages/index.ts");
-  // Internal files with no story of their own (see header): PageFrame
-  // and BoundedList are scaffolding exercised through the page stories;
+  // Internal files with no story of their own (see header):
+  // BoundedList is scaffolding exercised through the page stories;
   // fixtures.ts is data; useCatalogPagination.ts is the shared hook
   // (#285) exercised through the RecipesPage/DiscoverPage stories.
-  // None is exported from src/pages/index.ts.
+  // None is exported from src/pages/index.ts. (PageFrame, the other
+  // scaffolding file, moved to src/components for #119 — see the
+  // components scan's exceptions.)
   const exceptions = new Set([
-    "PageFrame.tsx",
     "BoundedList.tsx",
     "fixtures.ts",
     "useCatalogPagination.ts",

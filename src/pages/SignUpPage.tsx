@@ -1,10 +1,8 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
-import { Button } from "../components/Button.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import { SectionStack } from "../components/SectionStack.js";
+import { SignUpForm } from "../components/SignUpForm.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
-import { TextLink } from "../components/TextLink.js";
 
 /**
  * SignUpPage (#126, B3c): the create-account view — the split
@@ -22,7 +20,9 @@ import { TextLink } from "../components/TextLink.js";
  * legal copy's links are app content (the URLs are app
  * constants — the B2 audit keeps `LegalLinks` app-side), so
  * the host renders its LegalLinks into `legalNotice`, at the
- * position the app view renders it.
+ * position the app view renders it — inside the form's footer
+ * block, which SignUpForm (#119) owns; the page composes the
+ * heading and the form as the screen's two sections.
  */
 
 export type SignUpPageProps = {
@@ -56,64 +56,24 @@ export function SignUpPage({
   signInHref,
   legalNotice,
 }: SignUpPageProps) {
-  // Enter/return in a field submits (#255), mirroring the
-  // native-form behavior the retired web views had; while
-  // loading the submit button is disabled, so field
-  // submission is held the same way.
-  const submitFromField = () => {
-    if (!loading) {
-      onSubmit();
-    }
-  };
   return (
     <ScreenContainer scrollable={false} variant="auth">
-      <YStack paddingBottom="$8">
+      <SectionStack>
         <Text variant="heading">Create account</Text>
-      </YStack>
-      <TextField
-        label="Your name"
-        value={displayName}
-        onChangeText={onDisplayNameChange}
-        accessibilityLabel="Your name"
-        onSubmitEditing={submitFromField}
-      />
-      <TextField
-        label="Email"
-        value={email}
-        onChangeText={onEmailChange}
-        autoComplete="email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        accessibilityLabel="Email"
-        onSubmitEditing={submitFromField}
-      />
-      <TextField
-        label="Password"
-        value={password}
-        onChangeText={onPasswordChange}
-        autoComplete="password-new"
-        secureTextEntry
-        accessibilityLabel="Password"
-        onSubmitEditing={submitFromField}
-        returnKeyType="go"
-      />
-      {error ? <Text variant="error">{error}</Text> : null}
-      <Button
-        variant="primary"
-        disabled={loading}
-        onPress={onSubmit}
-        accessibilityLabel="Create Account"
-      >
-        {loading ? "Creating account…" : "Create Account"}
-      </Button>
-      {legalNotice}
-      {signInHref ? (
-        <YStack paddingTop="$4">
-          <TextLink textAlign="center" href={signInHref}>
-            Already have an account? Sign in
-          </TextLink>
-        </YStack>
-      ) : null}
+        <SignUpForm
+          displayName={displayName}
+          email={email}
+          password={password}
+          onDisplayNameChange={onDisplayNameChange}
+          onEmailChange={onEmailChange}
+          onPasswordChange={onPasswordChange}
+          loading={loading}
+          error={error}
+          onSubmit={onSubmit}
+          signInHref={signInHref}
+          legalNotice={legalNotice}
+        />
+      </SectionStack>
     </ScreenContainer>
   );
 }

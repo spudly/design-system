@@ -139,3 +139,16 @@ test("the three fixed-shell list pages render BoundedList", () => {
     assert.match(pageSource, /<BoundedList/, `${page} must render BoundedList`);
   }
 });
+
+test("the retired loading slot helpers stay retired (#119 dedupe)", () => {
+  assert.ok(
+    !code.includes("BoundedListLoading"),
+    "BoundedListLoading/BoundedListLoadingMore were this tranche's local helpers — the dedupe retired them for the shared ListLoadingState and they must not come back",
+  );
+});
+
+test("RecipesPage renders its loading slots through ListLoadingState directly (#119)", () => {
+  const page = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
+  assert.match(page, /isLoading \? \(\s*<ListLoadingState label="Loading" \/>/);
+  assert.match(page, /isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined/);
+});

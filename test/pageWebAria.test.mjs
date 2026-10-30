@@ -22,7 +22,13 @@
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
  *   generic CardRow / ListRow components; the routing moved with
- *   them and the rows test below pins it there.)
+ *   them and the rows test below pins it there. RecipeFormPage's
+ *   revert actions and changed-list banner joined them in the
+ *   #119 forms tranche as the RevertAction / ChangedListBanner
+ *   components; since the #119 dedupe both compose TextAction,
+ *   so their press role is TextAction's routing, pinned with
+ *   TextAction — the de-styled-pages test below pins that no
+ *   stack pressable remains in RecipeFormPage itself.)
  * - Tamagui semantic primitives used directly: Checkbox in
  *   ChecklistRow (its `accessibilityLabel` leaked; Tamagui supplies
  *   role/aria-checked itself) and Progress in ProgressBar (role,
@@ -100,8 +106,11 @@ function sourceFiles(dir) {
 // it routes its `accessibilityLabel` through
 // platformAccessibilityProps internally. (ActionChip was too,
 // until the #119 dedupe retired it; its consumers are Buttons.)
+// RatingStars (RecipesPage's page-local log-cook control) is
+// sanctioned on the same ground: its pressable form routes
+// the label through platformAccessibilityProps onto its target.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars".split(
     ",",
   ),
 );
@@ -139,20 +148,19 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 });
 
 // Compact split form (the SANCTIONED_TAGS pattern above): this
-// file sits at the max-lines cap. MealPlansPage and
-// MealPlanDetailPage are deliberately absent: their rows render
-// through the generic CardRow / ListRow components in those
-// rows' link forms (#248, after the #119 tranche-2 extraction),
-// so neither page has a stack pressable left to translate —
-// pinned by the dedicated test below. The #119 meals & planning
-// tranche moved four more pages off the list the same way:
-// ShoppingListPage (its row is CheckRow), MealDetailPage (its
-// rows are ListRow), MealsHubPage (TextActionCardRow), and
-// MealCookingModePage (its Done pill is StepOverlay's).
-const PAGE_STACKS =
-  "src/pages/AiSessionPage.tsx,src/pages/RecipeDetailPage.tsx,src/pages/RecipeFormPage.tsx".split(
-    ",",
-  );
+// file sits at the max-lines cap. MealPlansPage,
+// MealPlanDetailPage, and RecipeFormPage are deliberately
+// absent: their rows and revert pressables render through the
+// generic components the #119 extractions moved them into
+// (CardRow / ListRow; RevertAction / ChangedListBanner), so
+// none of the three pages has a stack pressable left to
+// translate — pinned by the dedicated test below. The #119
+// meals & planning tranche moved four more pages off the list
+// the same way: ShoppingListPage (its row is CheckRow),
+// MealDetailPage (its rows are ListRow), MealsHubPage
+// (TextActionCardRow), and MealCookingModePage (its Done pill
+// is StepOverlay's).
+const PAGE_STACKS = "src/pages/AiSessionPage.tsx,src/pages/RecipeDetailPage.tsx".split(",");
 
 // Shared by the stack scans below (compact form: this file sits
 // at the max-lines cap). RAW matches a raw RN accessibility JSX
@@ -192,16 +200,18 @@ test("CheckRow (ShoppingListPage's row) translates role, checked state, and labe
 });
 
 test("the de-styled pages have no stack pressable left to translate (#237, #248, #119)", () => {
-  // These pages' rows render through the generic row components
-  // in their link forms (and MealCookingModePage's pressable is
-  // StepOverlay's pill) — no stack pressable remains in any of
-  // them, so the translator must not be imported or used, and no
-  // raw RN accessibility JSX props may appear either (props on
-  // DS primitives / LinkOverlay are the sanctioned exceptions,
+  // These pages' rows and revert pressables render through the
+  // generic components the #119 extractions moved them into
+  // (and MealCookingModePage's pressable is StepOverlay's pill)
+  // — no stack pressable remains in any of them, so the
+  // translator must not be imported or used, and no raw RN
+  // accessibility JSX props may appear either (props on DS
+  // primitives / LinkOverlay are the sanctioned exceptions,
   // stripped via the shared TAGS before RAW is applied).
   for (const rel of [
     "src/pages/MealPlansPage.tsx",
     "src/pages/MealPlanDetailPage.tsx",
+    "src/pages/RecipeFormPage.tsx",
     "src/pages/ShoppingListPage.tsx",
     "src/pages/MealDetailPage.tsx",
     "src/pages/MealsHubPage.tsx",
@@ -223,8 +233,12 @@ test("rows translate the disabled state; the generic rows keep the button role i
   // moved into the generic ListRow / CardRow components (#119
   // tranche 2) and the routing moved with them: their press
   // forms carry the button role, ListRow also translates its
-  // disabled state, and CardRow has no disabled state. Compact
-  // table form: this file is at its line cap.
+  // disabled state, and CardRow has no disabled state.
+  // RecipeFormPage's revert pressables (RevertAction /
+  // ChangedListBanner, #119 forms tranche) carry no row here:
+  // since the #119 dedupe both compose TextAction, whose own
+  // routing carries their role. Compact table form: this file
+  // is at its line cap.
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases = [

@@ -49,14 +49,17 @@ function count(code, literal) {
 }
 
 // The family's render-content functions flag their decorative
-// variant `decorative` (RecipesPage's is named `native`), and
-// the third element is the file's decorative-text count. Two of
-// the surfaces live in the generic row components since the #119
-// tranche-2 extraction merged with the stage-2 remodel: the plan
-// rows in CardRow, the entry rows in ListRow. The meals &
-// planning tranche added the third: MealsHubPage's meal rows in
-// TextActionCardRow (MealDetailPage's member rows are ListRow's
-// surface, already counted above).
+// variant `decorative` (MediaRow's is named `native`, inherited
+// from RecipesPage), and the third element is the file's
+// decorative-text count. Two of the surfaces live in the
+// generic row components since the #119 extractions: the plan
+// rows in CardRow and the entry rows in ListRow. The meals &
+// planning tranche added a third generic surface: MealsHubPage's
+// meal rows in TextActionCardRow (MealDetailPage's member rows
+// are ListRow's surface, already counted above). The recipe
+// list's rows are RecipesPage's page-local MediaRow
+// composition (Stephen's tranche rule, 2026-10-29), so its
+// surface is the page file itself.
 const FAMILY = [
   ["src/components/OptionCard.tsx", "decorative", 3],
   ["src/components/CardRow.tsx", "decorative", 2],
