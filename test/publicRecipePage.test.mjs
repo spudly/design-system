@@ -53,13 +53,17 @@
  * invariant is a per-literal property of the source. Comments are
  * stripped before scanning so prose cannot satisfy the patterns.
  *
- * The #119 de-styling extracted the page's four sections into
- * shared components (RecipeOverviewPanel, RecipeIngredientsPanel,
- * RecipeInstructionsPanel, RatingsCard) and its shells into
- * ScrollShell / LoadingGate / MessageCard; pins for invariants
- * that live inside a section now scan that component's source,
- * while the page-level pins (union, CTA contract, section order,
- * slot) scan the page.
+ * The #119 de-styling composes the page's sections from shared
+ * components: RatingsCard carries the engagement section,
+ * ScrollShell / LoadingGate the shells, and the three recipe
+ * sections are composed in the page file itself from the shared
+ * primitives (Thumbnail/StatusBadge/StatBand/TagList,
+ * NumberStepper/PresetValueSelector/MarkableRow/SuggestionPanel,
+ * StepList) — under the #119 program rule (2026-10-29) a tranche
+ * page adds no library components, so the section compositions
+ * live in the page until a separate component-only change
+ * extracts them. All pins scan the page (the section scans use
+ * the page source under the section names).
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -74,8 +78,6 @@ const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
 const frameSource = readFileSync(join(pagesDir, "PublicPageFrame.tsx"), "utf8");
 const stories = readFileSync(join(pagesDir, "PublicRecipePage.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
-const overviewSource = readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8");
-const ingredientsSource = readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8");
 const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
 const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
 
@@ -86,8 +88,10 @@ const strip = (text) =>
 const code = strip(source);
 const frameCode = strip(frameSource);
 const storiesCode = strip(stories);
-const overviewCode = strip(overviewSource);
-const ingredientsCode = strip(ingredientsSource);
+// The recipe sections are composed in the page file (see the
+// header), so the section scans read the page source.
+const overviewCode = code;
+const ingredientsCode = code;
 const ratingsCode = strip(ratingsSource);
 const scrollShellCode = strip(scrollShellSource);
 
@@ -137,10 +141,10 @@ test("error states live inside the props union, branched before the ready render
     /<LoadingGate label="Loading recipe" \/>/,
     "the loading state renders the DS LoadingGate",
   );
-  assert.match(code, /<MessageCard title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
+  assert.match(code, /<MessageState title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
   assert.match(
     code,
-    /<MessageCard title=\{UNAVAILABLE_TITLE\} message=\{UNAVAILABLE_MESSAGE\} \/>/,
+    /<MessageState title=\{UNAVAILABLE_TITLE\} message=\{UNAVAILABLE_MESSAGE\} \/>/,
   );
 });
 
@@ -176,11 +180,11 @@ test("single scroll, no tabs: the sections render in tab order inside one Scroll
   assert.ok(!code.includes("onTabChange"), "the tab-change callback left the contract");
   const sequence = [
     "<CtaBar",
-    "<RecipeOverviewPanel",
+    "<OverviewSection",
     "<SectionHeading>Ingredients</SectionHeading>",
-    "<RecipeIngredientsPanel",
+    "<IngredientsSection",
     "<SectionHeading>Instructions</SectionHeading>",
-    "<RecipeInstructionsPanel",
+    "<InstructionsSection",
     "<RatingsCard",
     "{comments}",
   ];
@@ -319,16 +323,16 @@ test("the status badge map is page-owned with the idea fallback", () => {
     assert.ok(code.includes(`${status}: { label: "${label}"`), `STATUS_BADGES must map ${status} to ${label}`);
   }
   assert.match(code, /STATUS_BADGES\[overview\.status\] \?\? STATUS_BADGES\.idea/);
-  assert.match(code, /statusTone=\{statusBadge\?\.tone \?\? "neutral"\}/);
-  assert.match(code, /statusLabel=\{statusBadge\?\.label \?\? "Idea"\}/);
+  assert.match(code, /tone=\{statusBadge\?\.tone \?\? "neutral"\}/);
+  assert.match(code, /label=\{statusBadge\?\.label \?\? "Idea"\}/);
 });
 
 test("no explicit lineHeight anywhere in the new files (#162)", () => {
   assert.ok(!code.includes("lineHeight"), "the page must not set lineHeight");
   assert.ok(!frameCode.includes("lineHeight"), "the frame must not set lineHeight");
   for (const [name, text] of [
-    ["RecipeOverviewPanel", overviewCode],
-    ["RecipeIngredientsPanel", ingredientsCode],
+    ["the overview section", overviewCode],
+    ["the ingredients section", ingredientsCode],
     ["RatingsCard", ratingsCode],
     ["ScrollShell", scrollShellCode],
   ]) {

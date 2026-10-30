@@ -763,96 +763,19 @@ PublicRecipePage, or a changeset naming ScrollShell.
 
 ---
 
-## EqualButtonRow
-
-Open in `Components/EqualButtonRow`: Default, Wrapping.
-
-1. Default: the three buttons share the row's width equally —
-   none hugs its label — with a 12px gap between them.
-2. Wrapping: at the narrow width the third button wraps onto a
-   second line at the same width as the two above it, instead of
-   shrinking below readable width; the two buttons on the first
-   line share its height even though one label wraps to two
-   lines.
-
-**Run when:** `src/components/EqualButtonRow.tsx`, its stories,
-PublicRecipePage's CTA bar, or a changeset naming EqualButtonRow.
-
----
-
-## MessageCard
-
-Open in `Components/MessageCard`: Default.
-
-1. The card sits centered — horizontally and vertically — on a
-   surface background that fills the frame, with the heading
-   above the explanatory line, both centered.
-
-**Run when:** `src/components/MessageCard.tsx`, its stories,
-PublicRecipePage's error states, or a changeset naming
-MessageCard.
-
----
-
-## RecipeOverviewPanel
-
-Open in `Components/RecipeOverviewPanel`: Default, Minimal.
-
-1. Default: the title, status pill, description, stat band, and
-   tag pills stack with even 16px separation; the tag pills carry
-   their named colors. Minimal shows the title, the "Idea" pill,
-   and the Servings stat only — no description, Prep/Cook stats,
-   or tag row.
-
-**Run when:** `src/components/RecipeOverviewPanel.tsx`, its
-stories, PublicRecipePage, or a changeset naming
-RecipeOverviewPanel.
-
----
-
-## RecipeIngredientsPanel
-
-Open in `Components/RecipeIngredientsPanel`: Default, Plain.
-
-1. Default: the servings stepper and the Scale chip row fit the
-   width without the Scale row wrapping; the Custom chip turns
-   into a number input when pressed and, once a value is
-   entered, shows it selected (e.g. "4×"). The dimmed "heavy
-   cream" row is marked missing and the Substitutions panel
-   shows below the list; pressing the row clears the dim.
-2. Plain: two unadorned rows with hairline separators and no
-   substitutions panel.
-
-**Run when:** `src/components/RecipeIngredientsPanel.tsx`, its
-stories, PublicRecipePage, or a changeset naming
-RecipeIngredientsPanel.
-
----
-
-## RecipeInstructionsPanel
-
-Open in `Components/RecipeInstructionsPanel`: Default.
-
-1. The first step card is highlighted (primary border and tint)
-   on open; pressing another card moves the highlight to it.
-   Steps render in step-number order.
-
-**Run when:** `src/components/RecipeInstructionsPanel.tsx`, its
-stories, PublicRecipePage, or a changeset naming
-RecipeInstructionsPanel.
-
----
-
 ## RatingsCard
 
-Open in `Components/RatingsCard`: Default, SignedOut, NoRatings.
+Open in `Components/RatingsCard`: Default, Stale, No Ratings Yet.
 
-1. Default: the community average shows with the stale-ratings
-   hint under it; "Your rating" shows the viewer's stars with
-   the stale hint below — pressing the currently selected star
-   clears the rating, and pressing another star changes it.
-2. SignedOut: no "Your rating" block renders. NoRatings shows
-   "No community ratings yet" with an empty star input.
+1. Default: the community average shows ("4.6 (9)"); "Your
+   rating" shows the viewer's stars — pressing the currently
+   selected star clears the rating, and pressing another star
+   changes it.
+2. Stale: the stale-ratings hint shows under the community
+   average and under "Your rating". No Ratings Yet shows "No
+   community ratings yet" with an empty star input. The
+   signed-out form (no "Your rating" block) is exercised by
+   PublicRecipePage's Default story.
 
 **Run when:** `src/components/RatingsCard.tsx`, its stories,
 PublicRecipePage's engagement block, or a changeset naming
@@ -1036,18 +959,34 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
    "Clone this recipe", and "Get the mobile app"; the ratings
    card shows the community rating only — no "Your rating" star
    input. SignedIn shows the star input; ClonePending's primary
-   button reads "Saving…" and is disabled.
+   button reads "Saving…" and is disabled. The CTA buttons size
+   to equal shares of the bar with a 40% minimum width: the
+   first two share the first line and "Get the mobile app" wraps
+   onto a second line filling its width rather than shrinking
+   below the minimum; buttons sharing a line share its height.
 3. NotFound shows the card "Recipe not found" / "This recipe may
-   be private or no longer available."; Unavailable shows "Recipe
+   be private or no longer available.", centered horizontally
+   and vertically on the surface; Unavailable shows "Recipe
    unavailable" / "This recipe link is invalid or has expired."
-4. Ingredients: the Ingredients story opens with the "Heavy
+4. Overview: on Default the title, status pill, description,
+   stat band, and tag pills stack — 8px below the title, 16px
+   between the other blocks — and the tag pills carry their
+   named colors. Minimal shows the title, the "Idea" pill, and
+   the Servings stat only: no description, Prep/Cook stats, or
+   tag row.
+5. Ingredients: the Ingredients story opens with the "Heavy
    cream" row already marked missing — the row is dimmed and the
    substitutions panel shows below the list. Tapping the row
    clears the missing mark (the dim and the panel disappear);
    tapping it again restores them. The servings stepper and the
    Scale preset buttons fit the story width without wrapping the
-   Scale row; the selected scale is primary-filled.
-5. Open in `Pages/Eciperay/PublicPageFrame`: Default, Content,
+   Scale row; the selected scale is primary-filled, and the
+   Custom button turns into a number input when pressed and
+   shows the applied value selected (e.g. "4×").
+6. Instructions: the first step card is highlighted (primary
+   border and tint) on open; pressing another card moves the
+   highlight to it. Steps render in step-number order.
+7. Open in `Pages/Eciperay/PublicPageFrame`: Default, Content,
    NarrowViewport. The header (Eciperay brand, Sign in) and footer (the
    without-an-account note, Privacy Policy, Terms of Service)
    frame the centered wide column; in NarrowViewport the column fills the
