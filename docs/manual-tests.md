@@ -935,6 +935,39 @@ recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
+## ScrollShell
+
+Open in `Components/ScrollShell`: Default.
+
+1. The shell's blocks sit 16px from the canvas edges and from
+   each other, on a surface background that fills the frame; the
+   content scrolls as one region when it overflows.
+
+**Run when:** `src/components/ScrollShell.tsx`, its stories,
+PublicRecipePage, or a changeset naming ScrollShell.
+
+---
+
+## RatingsCard
+
+Open in `Components/RatingsCard`: Default, Stale, No Ratings Yet.
+
+1. Default: the community average shows ("4.6 (9)"); "Your
+   rating" shows the viewer's stars — pressing the currently
+   selected star clears the rating, and pressing another star
+   changes it.
+2. Stale: the stale-ratings hint shows under the community
+   average and under "Your rating". No Ratings Yet shows "No
+   community ratings yet" with an empty star input. The
+   signed-out form (no "Your rating" block) is exercised by
+   PublicRecipePage's Default story.
+
+**Run when:** `src/components/RatingsCard.tsx`, its stories,
+PublicRecipePage's engagement block, or a changeset naming
+RatingsCard.
+
+---
+
 ## RemovableField
 
 Open in `Components/RemovableField`: Default.
@@ -1275,26 +1308,44 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
    "Clone this recipe", and "Get the mobile app"; the ratings
    card shows the community rating only — no "Your rating" star
    input. SignedIn shows the star input; ClonePending's primary
-   button reads "Saving…" and is disabled.
+   button reads "Saving…" and is disabled. The CTA buttons size
+   to equal shares of the bar with a 40% minimum width: the
+   first two share the first line and "Get the mobile app" wraps
+   onto a second line filling its width rather than shrinking
+   below the minimum; buttons sharing a line share its height.
 3. NotFound shows the card "Recipe not found" / "This recipe may
-   be private or no longer available."; Unavailable shows "Recipe
+   be private or no longer available.", centered horizontally
+   and vertically on the surface; Unavailable shows "Recipe
    unavailable" / "This recipe link is invalid or has expired."
-4. Ingredients: the Ingredients story opens with the "Heavy
+4. Overview: on Default the title, status pill, description,
+   stat band, and tag pills stack — 8px below the title, 16px
+   between the other blocks — and the tag pills carry their
+   named colors. Minimal shows the title, the "Idea" pill, and
+   the Servings stat only: no description, Prep/Cook stats, or
+   tag row.
+5. Ingredients: the Ingredients story opens with the "Heavy
    cream" row already marked missing — the row is dimmed and the
    substitutions panel shows below the list. Tapping the row
    clears the missing mark (the dim and the panel disappear);
    tapping it again restores them. The servings stepper and the
    Scale preset buttons fit the story width without wrapping the
-   Scale row; the selected scale is primary-filled.
-5. Open in `Pages/Eciperay/PublicPageFrame`: Default, Content,
+   Scale row; the selected scale is primary-filled, and the
+   Custom button turns into a number input when pressed and
+   shows the applied value selected (e.g. "4×").
+6. Instructions: the first step card is highlighted (primary
+   border and tint) on open; pressing another card moves the
+   highlight to it. Steps render in step-number order.
+7. Open in `Pages/Eciperay/PublicPageFrame`: Default, Content,
    NarrowViewport. The header (Eciperay brand, Sign in) and footer (the
    without-an-account note, Privacy Policy, Terms of Service)
    frame the centered wide column; in NarrowViewport the column fills the
    phone width and the footer wraps without overlap.
 
 **Run when:** `src/pages/PublicRecipePage.tsx`,
-`src/pages/PublicPageFrame.tsx`, their stories, or a changeset
-naming PublicRecipePage or PublicPageFrame.
+`src/pages/PublicPageFrame.tsx`, their stories, the recipe
+panels the page composes (RecipeOverviewPanel,
+RecipeIngredientsPanel, RecipeInstructionsPanel), or a
+changeset naming PublicRecipePage or PublicPageFrame.
 
 ---
 

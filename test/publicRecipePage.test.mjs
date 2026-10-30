@@ -15,10 +15,12 @@
  *    and unavailable are union members alongside ready, each
  *    non-ready state branches before the ready render, and the
  *    error copy is the web surface's verbatim copy.
- * 3. Single scroll, no tabs: exactly one ScrollView in the page,
- *    no tab state in the contract, and the sections render in tab
- *    order (CTA bar, overview, ingredients, instructions,
- *    engagement) so every section stays in the document.
+ * 3. Single scroll, no tabs: exactly one scroll region in the
+ *    page — owned by ScrollShell since the #119 de-styling moved
+ *    the page's hand-rolled ScrollView into it — no tab state in
+ *    the contract, and the sections render in tab order (CTA bar,
+ *    overview, ingredients, instructions, engagement) so every
+ *    section stays in the document.
  * 4. The CTA bar's variant is chosen by the host's auth state:
  *    signed-out shows the three navigation intents with their
  *    verbatim labels; signed-in shows the clone button (with its
@@ -50,6 +52,20 @@
  * these components (Chromatic screenshots in CI), and the
  * invariant is a per-literal property of the source. Comments are
  * stripped before scanning so prose cannot satisfy the patterns.
+ *
+ * The #119 de-styling composes the page's sections from shared
+ * components: RatingsCard carries the engagement section,
+ * ScrollShell / LoadingGate the shells, and the three recipe
+ * sections are the shared library panels (RecipeOverviewPanel,
+ * RecipeIngredientsPanel, RecipeInstructionsPanel) — first
+ * composed in the page file itself from the shared primitives
+ * under the #119 program rule (2026-10-29) that a tranche page
+ * adds no library components, then extracted in the
+ * component-only change (#331) and adopted back here. The
+ * wiring pins scan the page (render order, the status map);
+ * the section-internal pins scan the panel sources, and the
+ * panels carry their own contract tests
+ * (test/recipeOverviewPanel.test.mjs and siblings).
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -59,10 +75,12 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "..", "src", "pages");
+const componentsDir = join(here, "..", "src", "components");
 const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
 const frameSource = readFileSync(join(pagesDir, "PublicPageFrame.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "PublicRecipePage.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
+const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
+const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
@@ -70,7 +88,15 @@ const strip = (text) =>
   text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const code = strip(source);
 const frameCode = strip(frameSource);
-const storiesCode = strip(stories);
+// The recipe sections are the shared library panels (see the
+// header), so the section scans read the panel sources; the
+// page source hosts the wiring pins (render order, status map).
+const overviewCode = strip(readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8"));
+const ingredientsCode = strip(
+  readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8"),
+);
+const ratingsCode = strip(ratingsSource);
+const scrollShellCode = strip(scrollShellSource);
 
 test("PublicRecipePage and PublicPageFrame are exported from the pages subpath", () => {
   assert.match(index, /PublicRecipePage,/, "index.ts must export PublicRecipePage");
@@ -115,11 +141,14 @@ test("error states live inside the props union, branched before the ready render
   }
   assert.match(
     code,
-    /<Spinner label="Loading recipe" \/>/,
-    "the loading state renders the DS Spinner shell",
+    /<LoadingGate label="Loading recipe" \/>/,
+    "the loading state renders the DS LoadingGate",
   );
-  assert.match(code, /<ErrorState title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
-  assert.match(code, /<ErrorState title=\{UNAVAILABLE_TITLE\} message=\{UNAVAILABLE_MESSAGE\} \/>/);
+  assert.match(code, /<MessageCard title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
+  assert.match(
+    code,
+    /<MessageCard title=\{UNAVAILABLE_TITLE\} message=\{UNAVAILABLE_MESSAGE\} \/>/,
+  );
 });
 
 test("the error copy is the web surface's verbatim copy", () => {
@@ -133,27 +162,32 @@ test("the error copy is the web surface's verbatim copy", () => {
   }
 });
 
-test("single scroll, no tabs: the sections render in tab order inside one ScrollView", () => {
+test("single scroll, no tabs: the sections render in tab order inside one ScrollShell", () => {
   assert.equal(
     code.split("<ScrollView").length - 1,
+    0,
+    "the page renders no ScrollView of its own: ScrollShell owns the page's single scroll",
+  );
+  assert.equal(
+    code.split("<ScrollShell").length - 1,
     1,
-    "exactly one ScrollView: the page's single section scroll",
+    "exactly one ScrollShell: the page's single section scroll",
   );
   assert.match(
-    code,
-    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">/,
-    "the scroll view must persist handled taps (slotted comments keep their presses)",
+    scrollShellCode,
+    /<ScrollRegion>/,
+    "the shell's scroll is ScrollRegion (which persists handled taps, so slotted comments keep their presses)",
   );
   assert.ok(!code.includes("<Tabs"), "the page must not render a tab bar");
   assert.ok(!code.includes("activeTab"), "the tab state left the contract");
   assert.ok(!code.includes("onTabChange"), "the tab-change callback left the contract");
   const sequence = [
     "<CtaBar",
-    "<OverviewPanel",
+    "<OverviewSection",
     "<SectionHeading>Ingredients</SectionHeading>",
-    "<IngredientsPanel",
+    "<IngredientsSection",
     "<SectionHeading>Instructions</SectionHeading>",
-    "<InstructionsPanel",
+    "<InstructionsSection",
     "<RatingsCard",
     "{comments}",
   ];
@@ -163,8 +197,8 @@ test("single scroll, no tabs: the sections render in tab order inside one Scroll
     assert.ok(at > lastAt, `sections must render in tab order: ${marker} after the previous one`);
     lastAt = at;
   }
-  const scrollAt = code.indexOf("<ScrollView");
-  assert.ok(code.indexOf("<CtaBar") > scrollAt, "the sections render inside the scroll view");
+  const scrollAt = code.indexOf("<ScrollShell");
+  assert.ok(code.indexOf("<CtaBar") > scrollAt, "the sections render inside the scroll shell");
 });
 
 test("the CTA bar switches on the auth-state variant with verbatim labels", () => {
@@ -200,6 +234,13 @@ test("the CTA bar switches on the auth-state variant with verbatim labels", () =
       `the ${intent} intent is a plain callback out`,
     );
   }
+  for (const key of ['key="sign-up"', 'key="clone"', 'key="get-app"']) {
+    assert.match(
+      code,
+      new RegExp(key.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)),
+      `the CTA buttons carry stable per-action keys (${key})`,
+    );
+  }
 });
 
 test("engagement is in v1: ratings reuse the detail page's view-model, comments take the slot", () => {
@@ -224,7 +265,7 @@ test("engagement is in v1: ratings reuse the detail page's view-model, comments 
     "the slot is called once per render, only when provided",
   );
   assert.match(
-    code,
+    ratingsCode,
     /\{ratings\.viewer \? \(/,
     "the viewer star input renders only with a viewer (signed out hides it)",
   );
@@ -248,86 +289,83 @@ test("the shared section shapes are reused from RecipeDetailPage by alias", () =
     ["3", "3×"],
   ]) {
     assert.ok(
-      code.includes(`{ value: "${value}", label: "${label}" }`),
+      ingredientsCode.includes(`{ value: "${value}", label: "${label}" }`),
       `SCALE_OPTIONS must include ${value} / ${label}, as on the detail page`,
     );
   }
   assert.match(
-    code,
+    ingredientsCode,
     /<NumberStepper\s+label="Servings"\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
     "the servings stepper mirrors the detail page's (label Servings, floor of 1, inline layout)",
   );
 });
 
 test("optional content is omitted cleanly, never rendered as a shell", () => {
-  assert.match(code, /\{imageUrl \? \(/, "the hero image renders only with an imageUrl");
-  assert.match(code, /\{description \? \(/, "the description renders only when present");
+  assert.match(overviewCode, /\{imageUrl \? \(/, "the hero image renders only with an imageUrl");
+  assert.match(overviewCode, /\{description \? \(/, "the description renders only when present");
   assert.match(
-    code,
+    overviewCode,
     /\{prepTimeLabel \? <StatCard label="Prep"/,
     "the Prep stat needs a prep time",
   );
   assert.match(
-    code,
+    overviewCode,
     /\{cookTimeLabel \? <StatCard label="Cook"/,
     "the Cook stat needs a cook time",
   );
-  assert.match(code, /\{tags\.length > 0 \? \(/, "the tag row renders only with tags");
+  assert.match(overviewCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
+  assert.match(code, /\{ratings \? \(/, "the ratings card renders only with ratings");
   assert.match(
     code,
-    /\{ratings \|\| comments \? \(/,
-    "the engagement stack renders only with ratings or comments",
+    /\{comments\}/,
+    "the comments slot renders its content directly (no shell when the slot is empty)",
   );
   assert.match(
-    code,
+    ingredientsCode,
     /view\.substitutions && view\.substitutions\.length > 0/,
     "the substitutions panel renders only with substitutions",
   );
 });
 
 test("tags render through Badge's color form, not an inline pill (#211)", () => {
-  assert.match(code, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/, "tags render as Badge");
+  assert.match(
+    overviewCode,
+    /<TagList tags=\{tags\} \/>/,
+    "tags render through TagList (Badge's color form)",
+  );
   assert.ok(!code.includes("{tag.color}22"), "the page must not re-implement the tag tint inline");
+  assert.ok(
+    !overviewCode.includes("{tag.color}22"),
+    "the overview panel must not re-implement the tag tint inline",
+  );
+});
+
+test("the status badge map is page-owned with the idea fallback", () => {
+  for (const [status, label] of [
+    ["idea", "Idea"],
+    ["evolving", "Evolving"],
+    ["perfected", "Perfected"],
+    ["abandoned", "Abandoned"],
+  ]) {
+    assert.ok(
+      code.includes(`${status}: { label: "${label}"`),
+      `STATUS_BADGES must map ${status} to ${label}`,
+    );
+  }
+  assert.match(code, /STATUS_BADGES\[overview\.status\] \?\? STATUS_BADGES\.idea/);
+  assert.match(code, /statusTone=\{statusBadge\?\.tone \?\? "neutral"\}/);
+  assert.match(code, /statusLabel=\{statusBadge\?\.label \?\? "Idea"\}/);
 });
 
 test("no explicit lineHeight anywhere in the new files (#162)", () => {
   assert.ok(!code.includes("lineHeight"), "the page must not set lineHeight");
   assert.ok(!frameCode.includes("lineHeight"), "the frame must not set lineHeight");
-});
-
-test("stories exercise every union state and both CTA variants", () => {
-  for (const name of [
-    "Default",
-    "SignedIn",
-    "ClonePending",
-    "Minimal",
-    "Loading",
-    "NotFound",
-    "Unavailable",
-    "Ingredients",
+  for (const [name, text] of [
+    ["the overview section", overviewCode],
+    ["the ingredients section", ingredientsCode],
+    ["RatingsCard", ratingsCode],
+    ["ScrollShell", scrollShellCode],
   ]) {
-    assert.match(
-      storiesCode,
-      new RegExp(`export const ${name}: Story`),
-      `PublicRecipePage.stories.tsx must export a ${name} story`,
-    );
+    assert.ok(!text.includes("lineHeight"), `${name} must not set lineHeight`);
   }
-  for (const state of ["loading", "notFound", "unavailable"]) {
-    assert.match(
-      storiesCode,
-      new RegExp(`<PublicRecipePage state="${state}" />`),
-      `a story must render the ${state} union member`,
-    );
-  }
-  assert.match(storiesCode, /variant: "signedIn"/, "a story must exercise the signed-in CTA bar");
-  assert.match(
-    storiesCode,
-    /isClonePending: clonePending/,
-    "a story must exercise the pending clone",
-  );
-  assert.match(
-    storiesCode,
-    /renderComments: \(\) =>/,
-    "a story must pass the comments slot with stand-in content",
-  );
 });
