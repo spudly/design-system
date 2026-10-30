@@ -48,11 +48,13 @@ export const listItemRoleProps = isWeb ? ({ role: "listitem" } as const) : ({} a
  * throw). Web gets the ARIA pair — `role="dialog"` with
  * `aria-modal`, so assistive technology treats the covered
  * content as inert while the shell is mounted. Native gets
- * `accessibilityViewIsModal`, the platform's own modal
- * containment: VoiceOver stays inside the shell while it is
- * mounted (Android has no equivalent prop; a full-screen shell
- * there is the only mounted interactive surface in its host's
- * flow).
+ * `accessibilityViewIsModal`, iOS's own modal containment:
+ * VoiceOver stays inside the shell while it is mounted.
+ * Android has no equivalent prop — TalkBack is not contained
+ * by it — so an Android host must not leave interactive
+ * content mounted behind the shell: hide the covered content
+ * from accessibility services or unmount it. Containment on
+ * Android cannot be done from inside the shell.
  */
 export const dialogRoleProps = isWeb
   ? ({ role: "dialog", "aria-modal": true } as const)

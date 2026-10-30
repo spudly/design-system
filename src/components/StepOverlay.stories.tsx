@@ -37,50 +37,70 @@ function Demo({
 }) {
   const [stepIndex, setStepIndex] = useState(initialStep);
   const [donePresses, setDonePresses] = useState(0);
+  // Done closes the overlay for real, as a host would: the
+  // focus-restore half of the shell's contract (focus returns
+  // to the control that opened it) is only exercisable when
+  // the overlay actually unmounts, so the demo unmounts it
+  // and offers a reopen control below the frame.
+  const [open, setOpen] = useState(true);
   return (
     <YStack maxWidth={430}>
       <YStack height={frameHeight} position="relative">
-        <StepOverlay
-          title="Beef tacos"
-          stepLabel={`Step ${stepIndex + 1} of ${steps.length}`}
-          body={steps[stepIndex] ?? ""}
-          onDone={() => {
-            setDonePresses((count) => count + 1);
-          }}
-        >
-          <XStack gap={tokens.spacing[2]} justifyContent="center" paddingBlockEnd="$6">
-            {steps.map((step, index) => (
-              <YStack
-                key={step}
-                width={tokens.spacing[2]}
-                height={tokens.spacing[2]}
-                borderRadius={tokens.radii.full}
-                backgroundColor="$surface"
-                opacity={index === stepIndex ? 1 : 0.35}
-              />
-            ))}
-          </XStack>
-          <XStack justifyContent="space-between" alignItems="center">
-            <Button
-              variant="secondary"
-              disabled={stepIndex === 0}
-              onPress={() => {
-                setStepIndex((index) => Math.max(0, index - 1));
-              }}
-            >
-              Back
-            </Button>
-            <Button
-              disabled={stepIndex === steps.length - 1}
-              onPress={() => {
-                setStepIndex((index) => Math.min(steps.length - 1, index + 1));
-              }}
-            >
-              Next step
-            </Button>
-          </XStack>
-        </StepOverlay>
+        {open ? (
+          <StepOverlay
+            title="Beef tacos"
+            stepLabel={`Step ${stepIndex + 1} of ${steps.length}`}
+            body={steps[stepIndex] ?? ""}
+            onDone={() => {
+              setDonePresses((count) => count + 1);
+              setOpen(false);
+            }}
+          >
+            <XStack gap={tokens.spacing[2]} justifyContent="center" paddingBlockEnd="$6">
+              {steps.map((step, index) => (
+                <YStack
+                  key={step}
+                  width={tokens.spacing[2]}
+                  height={tokens.spacing[2]}
+                  borderRadius={tokens.radii.full}
+                  backgroundColor="$surface"
+                  opacity={index === stepIndex ? 1 : 0.35}
+                />
+              ))}
+            </XStack>
+            <XStack justifyContent="space-between" alignItems="center">
+              <Button
+                variant="secondary"
+                disabled={stepIndex === 0}
+                onPress={() => {
+                  setStepIndex((index) => Math.max(0, index - 1));
+                }}
+              >
+                Back
+              </Button>
+              <Button
+                disabled={stepIndex === steps.length - 1}
+                onPress={() => {
+                  setStepIndex((index) => Math.min(steps.length - 1, index + 1));
+                }}
+              >
+                Next step
+              </Button>
+            </XStack>
+          </StepOverlay>
+        ) : null}
       </YStack>
+      {open ? null : (
+        <YStack paddingBlockStart="$3">
+          <Button
+            onPress={() => {
+              setOpen(true);
+            }}
+          >
+            Reopen the overlay
+          </Button>
+        </YStack>
+      )}
       {donePresses > 0 ? (
         <Text variant="hint">
           Done activated ({donePresses}) — the host would exit the steps here.

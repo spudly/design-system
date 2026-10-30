@@ -62,12 +62,15 @@ const scrollContentContainerStyle = { flexGrow: 1, justifyContent: "center" } as
  *
  * The shell manages focus (#332): it carries dialog semantics
  * (dialogRoleProps — a modal dialog named for its title on
- * web, view-modal on native) and, on web, moves focus into
+ * web, view-modal on iOS) and, on web, moves focus into
  * itself on mount, so a host that mounts it over still-mounted
  * interactive content does not leave that content as the
  * keyboard or screen-reader starting point behind the opaque
- * shell. The host does not need to unmount or inert the
- * covered content. The move happens once per mount, never per
+ * shell. On web and iOS the host does not need to unmount or
+ * inert the covered content; on Android there is no view-modal
+ * equivalent, so an Android host must hide covered content
+ * from accessibility services or unmount it (see
+ * dialogRoleProps). The move happens once per mount, never per
  * step change, so stepping keeps focus where the user put it.
  * Tab and Shift+Tab wrap at the overlay's edges, so keyboard
  * focus cannot escape into the covered content, and when the
@@ -97,8 +100,9 @@ export function StepOverlay({
   // The mount focus move (web): the shell is focusable without
   // being a tab stop (tabIndex={-1} below), and focus lands on
   // it once when the overlay mounts. On native there is no DOM
-  // focus to move; dialogRoleProps' view-modal containment is
-  // the native half of the contract.
+  // focus to move; dialogRoleProps' view-modal is the iOS half
+  // of the containment contract (Android hosts carry it — see
+  // dialogRoleProps).
   useEffect(() => {
     if (!isWeb) {
       return;
@@ -136,7 +140,15 @@ export function StepOverlay({
       node.querySelectorAll<HTMLElement>(
         'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
       ),
-    ).filter((element) => element.offsetParent !== null || element === document.activeElement);
+    ).filter(
+      (element) =>
+        // Effective tab stops only: the selector also matches
+        // elements that carry a negative tabIndex (a link with
+        // tabIndex={-1}), which Tab always skips — counting one
+        // as the first or last stop would break the wrap.
+        element.tabIndex >= 0 &&
+        (element.offsetParent !== null || element === document.activeElement),
+    );
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
     if (!first || !last) {

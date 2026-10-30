@@ -633,6 +633,11 @@ Open in `Components/StepOverlay`: Default, LongBody.
    and the Back / Next row; the Done pill stays pinned at the
    top right at every scroll position, and the short Default
    body stays vertically centered.
+5. Close and reopen (web): press Done — the overlay closes.
+   Focus the "Reopen the overlay" button under the frame and
+   activate it: the overlay reopens with focus inside it.
+   Press Done again: the overlay closes and keyboard focus
+   returns to the "Reopen the overlay" button.
 
 **Run when:** `src/components/StepOverlay.tsx`, its stories,
 MealCookingModePage, or a changeset naming StepOverlay.
@@ -1901,6 +1906,12 @@ Open in `Components/StepOverlay`: Default, LongBody.
    the region scrolls — scroll to the bottom to reach the
    dots and the Back / Next row; the Done pill stays
    pinned at the top right at every scroll position.
+5. Close and reopen (web): press Done — the overlay
+   closes. Focus the "Reopen the overlay" button under
+   the frame and activate it: the overlay reopens with
+   focus inside it. Press Done again: the overlay closes
+   and keyboard focus returns to the "Reopen the overlay"
+   button.
 
 **Run when:** `src/components/StepOverlay.tsx`, its
 stories, MealCookingModePage, or a changeset naming

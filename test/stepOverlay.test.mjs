@@ -103,6 +103,10 @@ test("the shell manages focus: dialog semantics and a web mount focus move (#332
   assert.match(code, /event\.key !== "Tab"/);
   assert.match(code, /last\.focus\(\)/);
   assert.match(code, /first\.focus\(\)/);
+  // Candidates are filtered to effective tab stops: an
+  // element the selector matches but Tab skips (a negative
+  // tabIndex) must not count as the first or last stop.
+  assert.match(code, /element\.tabIndex >= 0/);
 });
 
 test("the Done pill routes its button semantics through the translator (#237)", () => {
