@@ -36,9 +36,10 @@ export type TagListProps = {
  * tint is Badge's own resolution, never re-implemented at the
  * call site). Extracted from RecipeDetailPage's tag row; the
  * list owns the row's rhythm, and its separation from
- * surrounding content is the parent stack's. The badges are
- * display-only — tags are not chips (the chip components are
- * retired; a tag that ACTS would be a Button).
+ * surrounding content is the parent stack's. These badges are
+ * display-only (no press handler is passed); Badge's selectable
+ * form is what tag pickers render — a tag is a Badge in both
+ * forms.
  */
 export function TagList({ tags }: TagListProps) {
   return (

@@ -9,6 +9,7 @@ import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { ButtonRow } from "../components/ButtonRow.js";
+import { Badge } from "../components/Badge.js";
 
 /**
  * RecipeFormPage (#124, B3a): the recipe form's view layer — the
@@ -29,9 +30,11 @@ import { ButtonRow } from "../components/ButtonRow.js";
  *   the host builds the recipe input from its own state.
  * - Option data is app data: status options and tag options cross
  *   as { value, label } view-models (the app owns the status set
- *   and the tags query); the option selectors themselves are
- *   rows of DS toggle Buttons (Button's `selected` form in a
- *   ButtonRow — the chip components are retired). Tag loading
+ *   and the tags query); the status selector is a row of DS toggle
+ *   Buttons (Button's `selected` form in a ButtonRow — the chip
+ *   components are retired), and the tag selector is a row of
+ *   selectable Badges (Badge's selectable form — a tag renders as
+ *   a Badge, including when it selects). Tag loading
  *   crosses as `isLoadingTags` — the
  *   view renders the DS Spinner where the app renders its branded
  *   loader (the branded loader stays app-side by recorded decision).
@@ -434,21 +437,19 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
           {isLoadingTags ? (
             <Spinner label="Loading tags" />
           ) : (
-            <ButtonRow>
+            <XStack flexWrap="wrap" gap={tokens.spacing[2]}>
               {tagOptions.map((option) => (
-                <Button
+                <Badge
                   key={option.value}
-                  variant="secondary"
-                  size="sm"
                   selected={tagIds.includes(option.value)}
                   onPress={() => {
                     toggleTag(option.value);
                   }}
                 >
                   {option.label}
-                </Button>
+                </Badge>
               ))}
-            </ButtonRow>
+            </XStack>
           )}
         </YStack>
 

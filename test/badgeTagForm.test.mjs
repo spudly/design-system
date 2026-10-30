@@ -12,7 +12,10 @@
  *    `color` is set. The `color`
  *    prop is the strict `TagColorName` token union (#207) — never a
  *    raw string — and resolution goes through the shared
- *    `useTagColorResolver` hook, exactly as TagPill did.
+ *    `useTagColorResolver` hook, exactly as TagPill did. The
+ *    assertions below pin the RESTING form; the selectable form's
+ *    selected state overrides the surface with the primary fill
+ *    and is pinned by test/badgeSelectable.test.mjs.
  * 3. No source file in src/ still imports TagPill.
  *
  * Run against the built output: `npm run build` first (the `test`
@@ -57,12 +60,12 @@ test("Badge's color form keeps TagPill's tint and type contract", () => {
   );
   assert.ok(source.includes("borderWidth: 1"), "Badge must carry the 1px border (#174)");
   assert.ok(
-    source.includes("borderColor={resolvedColor}"),
-    "the color form's border must be the resolved tag color itself (#211)",
+    source.includes('borderColor={isSelected ? "$primary" : resolvedColor}'),
+    "the color form's border must be the resolved tag color itself while unselected (#211)",
   );
   assert.ok(
-    source.includes("borderColor={styles.text}"),
-    "the tone form's border must match its text color (#174)",
+    source.includes('borderColor={isSelected ? "$primary" : styles.text}'),
+    "the tone form's border must match its text color while unselected (#174)",
   );
 });
 

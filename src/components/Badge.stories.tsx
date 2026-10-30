@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack } from "tamagui";
 import { tagColorNames } from "../themes/tagColors.js";
@@ -12,6 +13,7 @@ const meta: Meta<typeof Badge> = {
       options: ["neutral", "info", "success", "warning", "danger"],
     },
     color: { control: "select", options: [...tagColorNames] },
+    selected: { control: "boolean" },
   },
 };
 
@@ -61,4 +63,38 @@ export const AllTones: Story = {
       <Badge tone="danger">Danger</Badge>
     </XStack>
   ),
+};
+
+export const Selected: Story = {
+  args: { selected: true, onPress: () => undefined, children: "Weeknight" },
+};
+
+export const Selectable: Story = {
+  render: function SelectableStory() {
+    const [values, setValues] = useState<string[]>(["weeknight"]);
+    const options = [
+      { value: "weeknight", label: "Weeknight" },
+      { value: "comfort", label: "Comfort food" },
+      { value: "freezer", label: "Freezer friendly" },
+    ];
+    return (
+      <XStack gap={8}>
+        {options.map((option) => (
+          <Badge
+            key={option.value}
+            selected={values.includes(option.value)}
+            onPress={() => {
+              setValues((current) =>
+                current.includes(option.value)
+                  ? current.filter((value) => value !== option.value)
+                  : [...current, option.value],
+              );
+            }}
+          >
+            {option.label}
+          </Badge>
+        ))}
+      </XStack>
+    );
+  },
 };

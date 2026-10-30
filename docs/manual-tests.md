@@ -107,7 +107,7 @@ changeset naming Collapsible.
 ## Badge
 
 Open in `Components/Badge`: Neutral, Info, Success, Warning, Danger,
-AllTones.
+AllTones, Selectable, Selected.
 
 1. Every tone renders as a pill with a **visible 1px border in the
    same color as its label text** — no tone is borderless or uses a
@@ -116,6 +116,16 @@ AllTones.
    spacing; no pill is taller or wider than its label needs.
 3. Long labels (type one in via Controls) wrap or truncate without
    breaking the pill shape or overlapping neighbors.
+4. Selectable: pressing a pill toggles it — the pressed pill takes
+   the **primary fill with the on-primary label**, the others keep
+   the resting tint; pressing it again returns it to the tint.
+   Only the pressed pill changes.
+5. Selected: the pill renders in the selected treatment and is a
+   toggle button (aria-pressed true); in Selectable, unpressed
+   pills announce aria-pressed false.
+6. The display-only stories (Neutral through AllTones) carry no
+   button role and no pressed state — the selectable form is
+   opt-in only.
 
 **Run when:** `src/components/Badge.tsx`, `src/components/Badge.stories.tsx`,
 or a changeset naming Badge (including TagPill-into-Badge changes).
