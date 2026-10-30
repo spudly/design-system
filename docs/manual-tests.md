@@ -815,8 +815,9 @@ RecipeFormPage, or a changeset naming FieldColumns.
 
 Open in `Components/FormSubmit`: Default.
 
-1. FormSubmit Default: the Save meal button sits 16px below the
-   field above it, full width.
+1. FormSubmit Default: the Save meal button sits 32px below the
+   field above it — FormSubmit's own 16px of top padding on top
+   of the layout's 16px gap — full width.
 
 **Run when:** `src/components/FormSubmit.tsx`, its stories, a
 form page composing it, or a changeset naming it. (FormStack
@@ -845,11 +846,13 @@ Default, NoSelection, SaveError. Open in
 `Pages/Eciperay/MealPlanFormPage`: Default, NoSelection.
 
 1. RecipeFormPage Default: Title, the Status toggle buttons,
-   Description with its "Describe with AI" action, the Servings
+   Description with its "Generate with AI" action, the Servings
    / Prep / Cook columns, image, Ingredients and Instructions
    slots, the selectable Tag badges, Source URL, and the
-   full-width Save Changes button, evenly spaced in one
-   scrolling form.
+   full-width Create Recipe button, evenly spaced in one
+   scrolling form. On web, clicking a field label (Title,
+   Description, Servings, Prep, Cook, Source URL) focuses its
+   input.
 2. ContentLocked: the lock notice renders in place of the
    Ingredients and Instructions slots — the slots disappear —
    while the scalar fields and tags remain editable.

@@ -231,8 +231,9 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
   return (
     <ScrollRegion>
       <FormStack>
-        <LabeledField label="Title" action={revertAction("title")}>
+        <LabeledField label="Title" fieldId="recipe-title" action={revertAction("title")}>
           <TextField
+            id="recipe-title"
             accessibilityLabel="Title"
             changed={isChanged("title")}
             value={title}
@@ -260,6 +261,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
 
         <LabeledField
           label="Description"
+          fieldId="recipe-description"
           action={
             <>
               {revertAction("description")}
@@ -279,6 +281,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
           error={descriptionError}
         >
           <TextAreaField
+            id="recipe-description"
             accessibilityLabel="Description"
             changed={isChanged("description")}
             numberOfLines={3}
@@ -288,8 +291,13 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
         </LabeledField>
 
         <FieldColumns>
-          <LabeledField label="Servings" action={revertAction("servings")}>
+          <LabeledField
+            label="Servings"
+            fieldId="recipe-servings"
+            action={revertAction("servings")}
+          >
             <TextField
+              id="recipe-servings"
               accessibilityLabel="Servings"
               changed={isChanged("servings")}
               keyboardType="number-pad"
@@ -297,8 +305,13 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               onChangeText={onServingsChange}
             />
           </LabeledField>
-          <LabeledField label="Prep (min)" action={revertAction("prepTimeMin")}>
+          <LabeledField
+            label="Prep (min)"
+            fieldId="recipe-prep-time"
+            action={revertAction("prepTimeMin")}
+          >
             <TextField
+              id="recipe-prep-time"
               accessibilityLabel="Prep (min)"
               changed={isChanged("prepTimeMin")}
               keyboardType="number-pad"
@@ -306,8 +319,13 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               onChangeText={onPrepTimeMinChange}
             />
           </LabeledField>
-          <LabeledField label="Cook (min)" action={revertAction("cookTimeMin")}>
+          <LabeledField
+            label="Cook (min)"
+            fieldId="recipe-cook-time"
+            action={revertAction("cookTimeMin")}
+          >
             <TextField
+              id="recipe-cook-time"
               accessibilityLabel="Cook (min)"
               changed={isChanged("cookTimeMin")}
               keyboardType="number-pad"
@@ -319,8 +337,13 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
 
         {renderImageSection ? renderImageSection(revertAction("image")) : null}
 
-        <LabeledField label="Source URL" action={revertAction("sourceUrl")}>
+        <LabeledField
+          label="Source URL"
+          fieldId="recipe-source-url"
+          action={revertAction("sourceUrl")}
+        >
           <TextField
+            id="recipe-source-url"
             accessibilityLabel="Source URL"
             changed={isChanged("sourceUrl")}
             value={sourceUrl}
