@@ -23,7 +23,7 @@ export const fontFamily = {
    * `fontFamily` takes ONE font name — the CSS fallback list in `sans`
    * is invalid there.
    */
-  sansNative: "Raleway",
+  sansNative: "UiSans",
   /**
    * iOS per-weight face names (weight → font name) for the `sans`
    * role: native apps register one STATIC font per DS weight under
@@ -40,21 +40,30 @@ export const fontFamily = {
    * frame's sign-in and footer links) in two different weights from
    * launch to launch (#326). A static face can only render its own
    * weight, so face selection is deterministic by construction.
+   *
+   * Why the family is named "UiSans", not "Raleway": the bundled
+   * faces are static instances of Raleway — modified versions of
+   * the font — and Raleway's OFL license reserves "Raleway" as a
+   * Reserved Font Name, which a modified version may not use (see
+   * apps/storybook/assets/fonts/OFL-Raleway.txt). The instances
+   * are therefore renamed UiSans with their glyphs unchanged; web
+   * keeps loading the unmodified Raleway under its own name.
    */
   sansNativeFaces: {
-    "400": "Raleway",
-    "500": "Raleway-Medium",
-    "600": "Raleway-SemiBold",
-    "700": "Raleway-Bold",
+    "400": "UiSans",
+    "500": "UiSans-Medium",
+    "600": "UiSans-SemiBold",
+    "700": "UiSans-Bold",
   },
   /**
    * Single font name for React Native on Android for the `sans` role:
-   * the same registered "Raleway" family as iOS. (The previous
+   * the same registered "UiSans" family as iOS. (The previous
    * per-brand generics existed because Georgia / Avenir Next could
-   * not be bundled by the apps; Raleway is a free Google font the
-   * apps bundle deliberately, so the Android role names it too.)
+   * not be bundled by the apps; the Raleway static instances are
+   * bundled deliberately under their renamed family, so the
+   * Android role names it too.)
    */
-  sansNativeAndroid: "Raleway",
+  sansNativeAndroid: "UiSans",
   /**
    * Android per-weight face names for the `sans` role: the same
    * static faces as iOS (see `sansNativeFaces` for why). Android
@@ -62,10 +71,10 @@ export const fontFamily = {
    * resolution against the variable font is exactly what flipped.
    */
   sansNativeAndroidFaces: {
-    "400": "Raleway",
-    "500": "Raleway-Medium",
-    "600": "Raleway-SemiBold",
-    "700": "Raleway-Bold",
+    "400": "UiSans",
+    "500": "UiSans-Medium",
+    "600": "UiSans-SemiBold",
+    "700": "UiSans-Bold",
   },
   /** Serif stack for display titles and verse/reading text (system serif). */
   serif: "Georgia, 'Times New Roman', serif",

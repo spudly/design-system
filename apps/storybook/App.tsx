@@ -259,17 +259,19 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
 
 export default function App() {
   // The library's font contract: apps register faces under these
-  // exact names (see src/tokens/typography.ts — Raleway's static
+  // exact names (see src/tokens/typography.ts — the UiSans static
   // per-weight faces for body in every theme, "Alegreya" for Quiet
-  // Dawn verse text). The Raleway faces are static instances of the
-  // brand's variable font, one file per weight: a single variable
-  // registration left the medium weight to Android's numeric
-  // resolution, which rendered it nondeterministically (#326).
+  // Dawn verse text). The UiSans faces are static instances of the
+  // brand's Raleway variable font, renamed because Raleway's OFL
+  // license reserves its name against modified versions; one file
+  // per weight: a single variable registration left the medium
+  // weight to Android's numeric resolution, which rendered it
+  // nondeterministically (#326).
   const [fontsLoaded, fontError] = useFonts({
-    Raleway: require("./assets/fonts/Raleway.ttf"),
-    "Raleway-Medium": require("./assets/fonts/Raleway-Medium.ttf"),
-    "Raleway-SemiBold": require("./assets/fonts/Raleway-SemiBold.ttf"),
-    "Raleway-Bold": require("./assets/fonts/Raleway-Bold.ttf"),
+    UiSans: require("./assets/fonts/UiSans.ttf"),
+    "UiSans-Medium": require("./assets/fonts/UiSans-Medium.ttf"),
+    "UiSans-SemiBold": require("./assets/fonts/UiSans-SemiBold.ttf"),
+    "UiSans-Bold": require("./assets/fonts/UiSans-Bold.ttf"),
     Alegreya: require("./assets/fonts/Alegreya.ttf"),
   });
   const capture = useCaptureTarget();

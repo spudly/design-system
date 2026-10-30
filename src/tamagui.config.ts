@@ -170,9 +170,9 @@ type BrandFontFamily = {
   sansNative?: string | undefined;
   /** iOS per-weight face names (weight → font name), for families whose weights are separate named fonts. */
   sansNativeFaces?: Record<string, string> | undefined;
-  /** Android family: a SINGLE font name — the family the app registers on Android (Raleway, #65), or a generic for a theme that declares none. */
+  /** Android family: a SINGLE font name — the family the app registers on Android (UiSans, the renamed Raleway instances, #65/#326), or a generic for a theme that declares none. */
   sansNativeAndroid?: string | undefined;
-  /** Android per-weight face names (weight → font name), for families whose weights are separate named fonts (the static Raleway faces, #326). */
+  /** Android per-weight face names (weight → font name), for families whose weights are separate named fonts (the static UiSans faces, #326). */
   sansNativeAndroidFaces?: Record<string, string> | undefined;
   /** Verse/reading-text web family: a full CSS fallback stack (the base serif stack when a theme declares none; Alegreya under Quiet Dawn, #66). */
   verse?: string | undefined;
@@ -218,8 +218,11 @@ function toFaces(
  * nondeterministic across app launches (the same text rendered in two
  * weights from launch to launch); a theme that declares no Android
  * faces still resolves its Android weights numerically. Since #65
- * every theme names Raleway on all three platforms — a family the
- * apps register deliberately (it is not a stock font; an unregistered
+ * every theme's UI typeface is Raleway — named directly on web,
+ * where the unmodified font loads under its own name, and as
+ * UiSans on native, where the bundled instances are modified
+ * versions the OFL's Reserved Font Name rule keeps from carrying
+ * the Raleway name — a family the apps register deliberately (it is not a stock font; an unregistered
  * name silently falls back to the platform default sans, which is the
  * pre-registration state, not a different design). A brand that
  * declares no native names gets the generic "sans-serif" on either
@@ -427,11 +430,13 @@ export function createStorybookTamaguiConfig() {
  * see its note), but with fonts registered the native way instead of
  * through the web preview's CSS vars, which do not exist on device.
  *
- * Body/heading: every brand's UI stack is Raleway on native (#65), and
+ * Body/heading: every brand's UI stack is the UiSans family (static
+ * Raleway instances, renamed per the OFL Reserved Font Name) on
+ * native (#65), and
  * the host app registers the static per-weight faces under the exact
  * names the tokens declare, so the registration passes the base
  * family's native names and faces through resolveFontFamily — on
- * Android that resolves to the registered Raleway faces, exactly as
+ * Android that resolves to the registered UiSans faces, exactly as
  * the per-brand app configs resolve them.
  *
  * Verse: fonts are config-global, so the one registered verse family

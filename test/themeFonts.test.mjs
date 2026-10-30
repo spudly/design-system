@@ -7,9 +7,11 @@
  * buildBrandFonts), so pinning the `sans` role pins both. The
  * contract:
  * 1. The base token stack leads with Raleway, and the native and
- *    Android single names are exactly "Raleway" (apps register a
- *    font under that name; a different name here would silently
- *    fall back to the platform default sans).
+ *    Android single names are exactly "UiSans" (apps register the
+ *    renamed static instances under that name — the instances are
+ *    modified versions of Raleway, whose OFL license reserves the
+ *    "Raleway" name against modified versions; a different name
+ *    here would silently fall back to the platform default sans).
  * 2. Every theme (base, Warm Harvest, Quiet Dawn) resolves its
  *    `sans` role to the same Raleway values — no per-theme UI
  *    stack survives (Warm Harvest was Georgia, Quiet Dawn was
@@ -49,16 +51,16 @@ test("the base sans stack leads with Raleway on every platform", () => {
     fontFamily.sans.startsWith("Raleway,"),
     `web stack must lead with Raleway, got: ${fontFamily.sans}`,
   );
-  assert.equal(fontFamily.sansNative, "Raleway");
-  assert.equal(fontFamily.sansNativeAndroid, "Raleway");
+  assert.equal(fontFamily.sansNative, "UiSans");
+  assert.equal(fontFamily.sansNativeAndroid, "UiSans");
 });
 
 /** The static per-weight faces every native registration declares (#326). */
 const EXPECTED_FACES = {
-  "400": "Raleway",
-  "500": "Raleway-Medium",
-  "600": "Raleway-SemiBold",
-  "700": "Raleway-Bold",
+  "400": "UiSans",
+  "500": "UiSans-Medium",
+  "600": "UiSans-SemiBold",
+  "700": "UiSans-Bold",
 };
 
 test("all themes resolve the sans role to the base Raleway values", () => {
@@ -75,8 +77,8 @@ test("all themes resolve the sans role to the base Raleway values", () => {
   ]) {
     const family = theme.tokens.typography.fontFamily;
     assert.equal(family.sans, base.sans, `${name} web stack must be the base Raleway stack`);
-    assert.equal(family.sansNative, "Raleway", `${name} native name must be Raleway`);
-    assert.equal(family.sansNativeAndroid, "Raleway", `${name} Android name must be Raleway`);
+    assert.equal(family.sansNative, "UiSans", `${name} native name must be UiSans`);
+    assert.equal(family.sansNativeAndroid, "UiSans", `${name} Android name must be UiSans`);
     assert.deepEqual(
       family.sansNativeFaces,
       EXPECTED_FACES,

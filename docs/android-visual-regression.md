@@ -25,8 +25,10 @@ the field to 1826px on a Pixel 8a) passed every web check.
 | Sanity patch     | `tools/visualRegression/sanity/searchfield-162.patch`              | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                    |
 | CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job + jobs that commit regenerated baselines to a PR branch (PR auto-commit) or the dispatched branch (update mode) (below).                                                                                                               |
 
-Fonts: the app loads the same faces the apps register — Raleway as
-four static per-weight faces (Regular/Medium/SemiBold/Bold TTFs, all
+Fonts: the app loads the same faces the apps register — the UiSans
+family (four static per-weight faces instanced from Raleway and
+renamed per its OFL Reserved Font Name; Regular/Medium/SemiBold/Bold
+TTFs, all
 themes' body/heading; static faces since #326 — the variable TTF's
 medium weight resolved nondeterministically on Android) and Alegreya
 (variable TTF, Quiet Dawn verse) — from

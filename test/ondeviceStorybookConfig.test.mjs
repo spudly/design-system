@@ -10,8 +10,8 @@
  * registers native font families:
  *
  * - body/heading resolve to the family every brand registers on native:
- *   "Raleway" (the host app bundles its static per-weight faces under
- *   the declared names, #326).
+ *   "UiSans" (the host app bundles its static per-weight faces —
+ *   renamed Raleway instances — under the declared names, #326).
  * - verse resolves to Quiet Dawn's "Alegreya" (also bundled): fonts are
  *   config-global, Quiet Dawn is the brand that ships verse text, and
  *   Base / Warm Harvest verse-role text deviating to Alegreya on
@@ -67,14 +67,15 @@ test("createOnDeviceStorybookTamaguiConfig combines all brands as sub-themes", a
   );
 });
 
-test("on-device config registers the Raleway body and Alegreya verse stacks", async () => {
+test("on-device config registers the UiSans body and Alegreya verse stacks", async () => {
   const pkg = await import("../dist/index.js");
   const config = pkg.createOnDeviceStorybookTamaguiConfig();
 
   // The stacks fed to the registration: base family for body (every
-  // brand's native UI family is Raleway, #65) and Quiet Dawn's verse
+  // brand's native UI family is UiSans, the renamed Raleway
+  // instances, #65) and Quiet Dawn's verse
   // family (Alegreya, #66). On device these resolve through the native
-  // names declared beside them ("Raleway" / "Alegreya"); in Node the
+  // names declared beside them ("UiSans" / "Alegreya"); in Node the
   // web stacks assert directly.
   assert.equal(familyOf(config.fonts.body), pkg.baseTheme.tokens.typography.fontFamily.sans);
   assert.equal(familyOf(config.fonts.heading), pkg.baseTheme.tokens.typography.fontFamily.sans);
