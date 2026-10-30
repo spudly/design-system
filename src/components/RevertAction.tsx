@@ -1,7 +1,5 @@
-import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
-import { Text } from "./Text.js";
+import { TextAction } from "./TextAction.js";
 
 export type RevertActionProps = {
   /** The pre-formatted parent value, rendered after "Revert
@@ -14,35 +12,29 @@ export type RevertActionProps = {
  * The version-diff revert affordance (#119, extracted from
  * RecipeFormPage): small warning-tone text, pressable — the
  * app's RevertButton treatment for a field or list whose value
- * differs from the version it was derived from. Web keyboard
- * support follows the MealPlansPage row pattern — Enter and
- * Space invoke the same callback as a press — and the button
- * role routes through platformAccessibilityProps (#237), so on
- * web it renders as a real button role, never a leaked RN prop.
+ * differs from the version it was derived from.
+ *
+ * The pressable itself is TextAction (#119 dedupe): the
+ * tranche's first cut hand-built the button role, the web
+ * Enter/Space handler, and the focus ring on a raw stack —
+ * TextAction's exact job, which the shared component already
+ * owns (role through platformAccessibilityProps, #237, so on
+ * web it renders as a real button role, never a leaked RN
+ * prop, and a held key does not re-activate). This component
+ * contributes only the treatment (extra-small, medium,
+ * warning-tone, slightly faded) and the "Revert to:" copy
+ * shape.
  */
 export function RevertAction({ label, onPress }: RevertActionProps) {
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onPress();
-    }
-  };
   return (
-    <YStack
-      {...platformAccessibilityProps({ accessibilityRole: "button" })}
+    <TextAction
       onPress={onPress}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-      cursor="web:pointer"
+      fontSize={tokens.typography.fontSize.xs}
+      fontWeight={tokens.typography.fontWeight.medium}
+      color={tokens.colors.warning.warning9}
+      opacity={0.8}
     >
-      <Text
-        fontSize={tokens.typography.fontSize.xs}
-        fontWeight={tokens.typography.fontWeight.medium}
-        color={tokens.colors.warning.warning9}
-        opacity={0.8}
-      >
-        {`Revert to: ${label}`}
-      </Text>
-    </YStack>
+      {`Revert to: ${label}`}
+    </TextAction>
   );
 }

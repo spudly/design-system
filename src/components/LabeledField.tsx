@@ -1,12 +1,21 @@
 import type { ReactNode } from "react";
-import { XStack, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { FieldLabel } from "./FieldLabel.js";
+import { LabelRow } from "./labelRow.js";
 import { Text } from "./Text.js";
 
 export type LabeledFieldProps = {
   /** The field's label, rendered in the FieldLabel treatment. */
   label: string;
+  /** The field control's id. Pass the same id to the control
+   * itself (the field components take an `id` prop): on web the
+   * label then renders as a real label element whose `for`
+   * names the control, and the error below the field carries
+   * the deterministic id `${fieldId}-error` — the same error-id
+   * shape the field components use for their own `error` prop —
+   * so a host wiring a raw control can point its
+   * `aria-describedby` at it. */
+  fieldId?: string | undefined;
   /** Optional trailing action for the label row (a revert
    * affordance, a generate button, or several composed in a
    * fragment): the row right-aligns it beside the label, with
@@ -16,7 +25,7 @@ export type LabeledFieldProps = {
    * error separation (the TextField `error` idiom, for fields
    * whose error the host places itself). */
   error?: string | null | undefined;
-  /** The field itself (a TextField, a chip group, …). */
+  /** The field itself (a TextField, an option group, …). */
   children: ReactNode;
 };
 
@@ -26,29 +35,20 @@ export type LabeledFieldProps = {
  * and the field itself 4px below the row — the label-to-field
  * separation every field section of the form pages used, owned
  * here so no page sets it. LabeledGroup is the sibling for a
- * labeled control GROUP (a chip group, a select list), whose
- * label sits 8px above the group instead.
+ * labeled control GROUP (an option group, a select list), whose
+ * label sits 8px above the group instead. The label row itself
+ * is the one implementation both wrappers share (labelRow).
  */
-export function LabeledField({ label, action, error, children }: LabeledFieldProps) {
+export function LabeledField({ label, fieldId, action, error, children }: LabeledFieldProps) {
   return (
     <YStack>
-      <XStack
-        paddingBlockEnd={tokens.spacing[1]}
-        alignItems="center"
-        justifyContent="space-between"
-        gap={tokens.spacing[3]}
-      >
-        <FieldLabel>{label}</FieldLabel>
-        {action ? (
-          <XStack alignItems="center" gap={tokens.spacing[2]}>
-            {action}
-          </XStack>
-        ) : null}
-      </XStack>
+      <LabelRow label={label} action={action} separation={1} htmlFor={fieldId} />
       {children}
       {error ? (
         <YStack paddingBlockStart={tokens.spacing[2]}>
-          <Text variant="error">{error}</Text>
+          <Text variant="error" {...(fieldId ? { id: `${fieldId}-error` } : {})}>
+            {error}
+          </Text>
         </YStack>
       ) : null}
     </YStack>

@@ -46,6 +46,15 @@ type StyledTextLinkProps = GetProps<typeof StyledTextLink>;
  */
 type TextLinkOwnProps = Omit<StyledTextLinkProps, "onPress" | "href"> & {
   children: ReactNode;
+  /**
+   * The link's color treatment: `default` is the link color;
+   * `muted` renders the de-emphasized treatment for secondary
+   * destinations that sit below a screen's primary actions
+   * ("Forgot password?", "Back to sign in" — the app link
+   * button's muted variant). An explicit `color` prop still
+   * wins over the tone.
+   */
+  tone?: "default" | "muted";
 };
 
 export type TextLinkProps =
@@ -106,6 +115,7 @@ export function TextLink(props: TextLinkProps) {
   const {
     onPress,
     href,
+    tone,
     children,
     accessible,
     accessibilityElementsHidden,
@@ -129,11 +139,12 @@ export function TextLink(props: TextLinkProps) {
     accessibilityState,
     accessibilityValue,
   });
+  const toneColor = tone === "muted" ? "$textMuted" : "$link";
   if (href !== undefined) {
     // A real anchor is keyboard-operable by default on web — no
     // tabIndex/key handler shim (the callback form's, below) needed.
     return (
-      <StyledTextAnchor {...a11yProps} href={href} cursor="web:pointer" {...rest}>
+      <StyledTextAnchor {...a11yProps} href={href} cursor="web:pointer" color={toneColor} {...rest}>
         {children}
       </StyledTextAnchor>
     );
@@ -157,6 +168,7 @@ export function TextLink(props: TextLinkProps) {
       tabIndex={0}
       onKeyDown={handleKeyDown}
       cursor="web:pointer"
+      color={toneColor}
       {...rest}
     >
       {children}

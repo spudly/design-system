@@ -12,7 +12,8 @@ import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { TextField } from "../components/TextField.js";
-import { ToggleChipGroup } from "../components/ToggleChipGroup.js";
+import { ButtonRow } from "../components/ButtonRow.js";
+import { Badge } from "../components/Badge.js";
 
 /**
  * RecipeFormPage (#124, B3a): the recipe form's view layer — the
@@ -33,8 +34,12 @@ import { ToggleChipGroup } from "../components/ToggleChipGroup.js";
  *   the host builds the recipe input from its own state.
  * - Option data is app data: status options and tag options cross
  *   as { value, label } view-models (the app owns the status set
- *   and the tags query); the chips themselves are the DS
- *   ToggleChipGroup. Tag loading crosses as `isLoadingTags` — the
+ *   and the tags query); the status selector is a row of DS toggle
+ *   Buttons (Button's `selected` form in a ButtonRow — the chip
+ *   components are retired), and the tag selector is a row of
+ *   selectable Badges (Badge's selectable form — a tag renders as
+ *   a Badge, including when it selects). Tag loading
+ *   crosses as `isLoadingTags` — the
  *   view renders the DS Spinner where the app renders its branded
  *   loader (the branded loader stays app-side by recorded decision).
  * - Version-diff presentation is view-model data: the host computes
@@ -236,12 +241,21 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
         </LabeledField>
 
         <LabeledField label="Status">
-          <ToggleChipGroup
-            mode="single"
-            options={statusOptions}
-            value={status}
-            onChange={onStatusChange}
-          />
+          <ButtonRow>
+            {statusOptions.map((option) => (
+              <Button
+                key={option.value}
+                variant="secondary"
+                size="sm"
+                selected={status === option.value}
+                onPress={() => {
+                  onStatusChange(option.value);
+                }}
+              >
+                {option.label}
+              </Button>
+            ))}
+          </ButtonRow>
         </LabeledField>
 
         <LabeledField
@@ -325,12 +339,19 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
           {isLoadingTags ? (
             <Spinner label="Loading tags" />
           ) : (
-            <ToggleChipGroup
-              mode="multiple"
-              options={tagOptions}
-              values={tagIds}
-              onChange={toggleTag}
-            />
+            <ButtonRow>
+              {tagOptions.map((option) => (
+                <Badge
+                  key={option.value}
+                  selected={tagIds.includes(option.value)}
+                  onPress={() => {
+                    toggleTag(option.value);
+                  }}
+                >
+                  {option.label}
+                </Badge>
+              ))}
+            </ButtonRow>
           )}
         </LabeledGroup>
 

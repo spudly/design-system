@@ -19,3 +19,12 @@ export const Default: Story = {
     </FormScreenLayout>
   ),
 };
+
+export const WithSubtitle: Story = {
+  render: () => (
+    <FormScreenLayout>
+      <FormHeading subtitle="Import a recipe from any web page">Import from URL</FormHeading>
+      <TextField label="Recipe URL" value="" onChangeText={() => {}} placeholder="https://" />
+    </FormScreenLayout>
+  ),
+};

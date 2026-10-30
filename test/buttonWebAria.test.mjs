@@ -34,8 +34,8 @@
  *    the same path (role "button" — "link" in the #248 href form —
  *    disabled mirrored into state).
  * 3. The component-internal pressables/containers that set the RN
- *    props on raw Tamagui stacks — ToggleChipGroup chips,
- *    RatingForm's two actions, ColorPickerField swatches,
+ *    props on raw Tamagui stacks — RatingForm's two actions,
+ *    ColorPickerField swatches,
  *    SearchField's clear button, StarRatingInput's stars and
  *    containers, StepDots, Avatar, NumberStepper's group — route
  *    them through the translator too; none of them passes a raw
@@ -144,7 +144,6 @@ test("BlankWord still labels its hidden button through Button (the label text is
 });
 
 const STACK_PRESSABLES = [
-  "src/components/ToggleChipGroup.tsx",
   "src/components/RatingForm.tsx",
   "src/components/ColorPickerField.tsx",
   "src/components/SearchField.tsx",

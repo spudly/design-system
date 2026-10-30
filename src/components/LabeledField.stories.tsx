@@ -16,8 +16,13 @@ type Story = StoryObj<typeof LabeledField>;
 export const Default: Story = {
   render: () => (
     <YStack maxWidth={430}>
-      <LabeledField label="Title">
-        <TextField accessibilityLabel="Title" value="Tuscan chicken" onChangeText={() => {}} />
+      <LabeledField label="Title" fieldId="title">
+        <TextField
+          id="title"
+          accessibilityLabel="Title"
+          value="Tuscan chicken"
+          onChangeText={() => {}}
+        />
       </LabeledField>
     </YStack>
   ),
@@ -28,9 +33,11 @@ export const WithAction: Story = {
     <YStack maxWidth={430}>
       <LabeledField
         label="Title"
+        fieldId="title"
         action={<RevertAction label="Chicken, plain" onPress={() => {}} />}
       >
         <TextField
+          id="title"
           accessibilityLabel="Title"
           changed
           value="Tuscan chicken"
@@ -44,8 +51,13 @@ export const WithAction: Story = {
 export const WithError: Story = {
   render: () => (
     <YStack maxWidth={430}>
-      <LabeledField label="Description" error="Description could not be generated. Try again.">
+      <LabeledField
+        label="Description"
+        fieldId="description"
+        error="Description could not be generated. Try again."
+      >
         <TextAreaField
+          id="description"
           accessibilityLabel="Description"
           numberOfLines={3}
           value=""

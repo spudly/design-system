@@ -32,7 +32,7 @@ test("the badge pill has a 1px border (#174)", () => {
 
 test("the badge border uses the tone's text color (#174)", () => {
   assert.ok(
-    /borderColor=\{styles\.text\}/.test(text),
-    "Badge must pass borderColor={styles.text} so the border is the same color as the badge text for every tone (#174)",
+    /borderColor=\{isSelected \? "\$primary" : styles\.text\}/.test(text),
+    "Badge must pass borderColor={styles.text} while unselected so the border is the same color as the badge text for every tone (#174); the selectable form's selected state takes the primary fill instead (test/badgeSelectable.test.mjs)",
   );
 });

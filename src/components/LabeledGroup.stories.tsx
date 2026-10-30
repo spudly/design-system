@@ -1,9 +1,10 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
+import { Button } from "./Button.js";
+import { ButtonRow } from "./ButtonRow.js";
 import { LabeledGroup } from "./LabeledGroup.js";
 import { RevertAction } from "./RevertAction.js";
-import { ToggleChipGroup } from "./ToggleChipGroup.js";
 
 const meta: Meta<typeof LabeledGroup> = {
   title: "Components/LabeledGroup",
@@ -31,10 +32,26 @@ function TagsDemo({ withAction = false }: { withAction?: boolean }) {
       <LabeledGroup
         label="Tags"
         action={
-          withAction ? <RevertAction label="Weeknight, Kid-approved" onPress={() => {}} /> : undefined
+          withAction ? (
+            <RevertAction label="Weeknight, Kid-approved" onPress={() => {}} />
+          ) : undefined
         }
       >
-        <ToggleChipGroup mode="multiple" options={tagOptions} values={values} onChange={toggle} />
+        <ButtonRow>
+          {tagOptions.map((option) => (
+            <Button
+              key={option.value}
+              variant="secondary"
+              size="sm"
+              selected={values.includes(option.value)}
+              onPress={() => {
+                toggle(option.value);
+              }}
+            >
+              {option.label}
+            </Button>
+          ))}
+        </ButtonRow>
       </LabeledGroup>
     </YStack>
   );

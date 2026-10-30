@@ -17,14 +17,18 @@
  *   MealsHubPage rows (YStack), AiSessionPage's
  *   Cancel action (YStack), MealCookingModePage's Done action (YStack),
  *   RecipeFormPage's revert actions (YStack), and RecipeDetailPage's
- *   viewer-rating wrapper (View) and Custom scale chip (XStack).
+ *   viewer-rating wrapper (View). (The Custom scale chip left this
+ *   list in the #119 dedupe: it is a PresetValueSelector Button now.)
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
  *   generic CardRow / ListRow components; the routing moved with
  *   them and the rows test below pins it there. RecipeFormPage's
  *   revert actions and changed-list banner joined them in the
- *   #119 forms tranche: they are the RevertAction /
- *   ChangedListBanner components now, pinned the same way.)
+ *   #119 forms tranche as the RevertAction / ChangedListBanner
+ *   components; since the #119 dedupe both compose TextAction,
+ *   so their press role is TextAction's routing, pinned with
+ *   TextAction — the de-styled-pages test below pins that no
+ *   stack pressable remains in RecipeFormPage itself.)
  * - Tamagui semantic primitives used directly: Checkbox in
  *   ChecklistRow (its `accessibilityLabel` leaked; Tamagui supplies
  *   role/aria-checked itself) and Progress in ProgressBar (role,
@@ -98,11 +102,12 @@ function sourceFiles(dir) {
 // translate caller RN props themselves. LinkOverlay is sanctioned
 // on the same ground again: it is the native link layer for
 // view-level link surfaces and spreads platformAccessibilityProps
-// onto its Anchor. ActionChip and Thumbnail are sanctioned on
-// the same ground: each routes its `accessibilityLabel` through
-// platformAccessibilityProps internally.
+// onto its Anchor. Thumbnail is sanctioned on the same ground:
+// it routes its `accessibilityLabel` through
+// platformAccessibilityProps internally. (ActionChip was too,
+// until the #119 dedupe retired it; its consumers are Buttons.)
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,ActionChip,Thumbnail".split(
+  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail".split(
     ",",
   ),
 );
@@ -197,11 +202,8 @@ test("de-styled pages have no stack pressable left to translate (#237, #248, #11
   // accessibility JSX props may appear either (props on DS
   // primitives / LinkOverlay are the sanctioned exceptions,
   // stripped via the shared TAGS before RAW is applied).
-  for (const rel of [
-    "src/pages/MealPlansPage.tsx",
-    "src/pages/MealPlanDetailPage.tsx",
-    "src/pages/RecipeFormPage.tsx",
-  ]) {
+  const PAGES = "MealPlansPage,MealPlanDetailPage,RecipeFormPage".split(",");
+  for (const rel of PAGES.map((page) => `src/pages/${page}.tsx`)) {
     const code = readCode(rel);
     assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
     assert.ok(
@@ -216,20 +218,19 @@ test("rows translate the disabled state; the generic rows keep the button role i
   // routes only the unavailable row's disabled state through the
   // translator, never a button role. The plan pages' rows moved
   // into the generic ListRow / CardRow components (#119 tranche
-  // 2) and RecipeFormPage's revert pressables into RevertAction
-  // / ChangedListBanner (#119 forms tranche), and the routing
-  // moved with them: their press forms carry the button role,
-  // ListRow also translates its disabled state, and CardRow has
-  // no disabled state. Compact table form: this file is at its
-  // line cap.
+  // 2) and the routing moved with them: their press forms carry
+  // the button role, ListRow also translates its disabled state,
+  // and CardRow has no disabled state. RecipeFormPage's revert
+  // pressables (RevertAction / ChangedListBanner, #119 forms
+  // tranche) carry no row here: since the #119 dedupe both
+  // compose TextAction, whose own routing carries their role.
+  // Compact table form: this file is at its line cap.
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases = [
     ["src/pages/MealDetailPage.tsx", null, DISABLED],
     ["src/components/ListRow.tsx", ROLE, DISABLED],
     ["src/components/CardRow.tsx", ROLE, null],
-    ["src/components/RevertAction.tsx", ROLE, null],
-    ["src/components/ChangedListBanner.tsx", ROLE, null],
   ];
   for (const [rel, role, disabled] of cases) {
     const code = readCode(rel);
@@ -456,8 +457,10 @@ test("button-role stack pressables are keyboard-operable on web (#237, CodeRabbi
   // RecipeDetailPage Custom scale chip must follow it.
   assert.match(aiSession, /onKeyDown=\{handleCancelKeyDown\}/);
   assert.match(aiSession, /tabIndex=\{0\}/);
-  assert.match(recipeDetail, /onKeyDown=\{handleCustomScaleKeyDown\}/);
-  assert.match(recipeDetail, /tabIndex=\{0\}/);
+  // The scale control is no longer a page-level stack pressable:
+  // PresetValueSelector's Custom slot is a DS Button.
+  assert.ok(!recipeDetail.includes("handleCustomScaleKeyDown"), "the scale pressable retired");
+  assert.match(recipeDetail, /<PresetValueSelector/);
 });
 
 test("busy Cancel is keyboard-guarded and the Custom scale name carries the multiplier (#237)", () => {
@@ -471,7 +474,13 @@ test("busy Cancel is keyboard-guarded and the Custom scale name carries the mult
   // (CodeRabbit finding on PR #241).
   assert.match(aiSession, /onPress=\{handleCancel\}/);
   assert.match(aiSession, /const handleCancel = \(\) => \{\s+if \(busy\) return;/);
-  // The selected custom-scale chip shows the multiplier as its visible
-  // text; the accessible name must include it.
-  assert.match(recipeDetail, /`Custom scale \$\{formatScaleValue\(view\.scaleValue\)\}×`/);
+  // The selected custom-scale button shows the multiplier as its visible
+  // text; the accessible name must include it (composed in the selector).
+  assert.match(recipeDetail, /customAccessibilityLabel="Custom scale"/);
+  assert.match(
+    recipeDetail,
+    /formatCustomValue=\{\(custom\) => `\$\{formatScaleValue\(custom\)\}×`\}/,
+  );
+  const selector = readCode("src/components/PresetValueSelector.tsx");
+  assert.match(selector, /`\$\{customAccessibilityLabel\} \$\{formattedCustom\}`/);
 });

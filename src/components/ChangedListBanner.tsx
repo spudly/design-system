@@ -1,7 +1,7 @@
-import { XStack, YStack } from "tamagui";
+import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
+import { TextAction } from "./TextAction.js";
 
 export type ChangedListBannerProps = {
   /** The host-formatted summary line (the parent summary is
@@ -16,17 +16,15 @@ export type ChangedListBannerProps = {
  * RecipeFormPage): a warning wash row with the host's summary
  * line for a list that differs from the version it was derived
  * from, and an underlined Revert action when the host offers
- * one (the app form's treatment). The Revert pressable routes
- * its button role through platformAccessibilityProps (#237)
- * and takes Enter / Space on web, like RevertAction.
+ * one (the app form's treatment).
+ *
+ * The Revert pressable is TextAction (#119 dedupe): the
+ * tranche's first cut hand-built the button role and the web
+ * Enter/Space handler inline — TextAction's exact job — so the
+ * banner now composes it with the banner's treatment, the
+ * same composition RevertAction makes.
  */
 export function ChangedListBanner({ label, onRevert }: ChangedListBannerProps) {
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if ((event.key === "Enter" || event.key === " ") && onRevert) {
-      event.preventDefault();
-      onRevert();
-    }
-  };
   return (
     <XStack
       alignItems="center"
@@ -37,26 +35,23 @@ export function ChangedListBanner({ label, onRevert }: ChangedListBannerProps) {
       paddingHorizontal={tokens.spacing[3]}
       paddingVertical={tokens.spacing[2]}
     >
-      <Text flex={1} fontSize={tokens.typography.fontSize.sm} color={tokens.colors.warning.warning10}>
+      <Text
+        flex={1}
+        fontSize={tokens.typography.fontSize.sm}
+        color={tokens.colors.warning.warning10}
+      >
         {label}
       </Text>
       {onRevert ? (
-        <YStack
-          {...platformAccessibilityProps({ accessibilityRole: "button" })}
+        <TextAction
           onPress={onRevert}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          cursor="web:pointer"
+          fontSize={tokens.typography.fontSize.sm}
+          fontWeight={tokens.typography.fontWeight.medium}
+          color={tokens.colors.warning.warning10}
+          textDecorationLine="underline"
         >
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.medium}
-            color={tokens.colors.warning.warning10}
-            textDecorationLine="underline"
-          >
-            Revert
-          </Text>
-        </YStack>
+          Revert
+        </TextAction>
       ) : null}
     </XStack>
   );

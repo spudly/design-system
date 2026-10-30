@@ -12,7 +12,7 @@ export type FieldLabelBlockProps = {
  * its own block in a form's stack, carrying the 8px bottom
  * padding the meal forms' list labels carry — the stack's own
  * gap then separates the block from the control that follows
- * it (a checkbox list, a chip group rendered as its own
+ * it (a checkbox list, an option group rendered as its own
  * block). Distinct from LabeledGroup, which wraps a label and
  * its control in one block: a form whose label and control
  * are separate stack blocks uses this instead, so the stack

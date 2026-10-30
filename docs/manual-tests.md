@@ -107,7 +107,7 @@ changeset naming Collapsible.
 ## Badge
 
 Open in `Components/Badge`: Neutral, Info, Success, Warning, Danger,
-AllTones.
+AllTones, Selectable, Selected, SelectableDisabled.
 
 1. Every tone renders as a pill with a **visible 1px border in the
    same color as its label text** — no tone is borderless or uses a
@@ -116,6 +116,20 @@ AllTones.
    spacing; no pill is taller or wider than its label needs.
 3. Long labels (type one in via Controls) wrap or truncate without
    breaking the pill shape or overlapping neighbors.
+4. Selectable: pressing a pill toggles it — the pressed pill takes
+   the **primary fill with the on-primary label**, the others keep
+   the resting tint; pressing it again returns it to the tint.
+   Only the pressed pill changes. The pills are keyboard-operable:
+   Tab reaches them and Enter/Space toggles the focused pill.
+5. Selected: the pill renders in the selected treatment and is a
+   toggle button (aria-pressed true); in Selectable, unpressed
+   pills announce aria-pressed false.
+6. The display-only stories (Neutral through AllTones) carry no
+   button role and no pressed state — the selectable form is
+   opt-in only.
+7. SelectableDisabled: the pill is dimmed, Tab skips it, and it
+   does not toggle by pointer or keyboard; it still announces
+   its pressed and disabled state.
 
 **Run when:** `src/components/Badge.tsx`, `src/components/Badge.stories.tsx`,
 or a changeset naming Badge (including TagPill-into-Badge changes).
@@ -471,30 +485,216 @@ Open in `Components/CardRow`: Default, WithAction, TitleOnly.
 **Run when:** `src/components/CardRow.tsx`, its stories,
 MealPlansPage's list, or a changeset naming CardRow.
 
+## PresetValueSelector
+
+Open in `Components/PresetValueSelector`: Default,
+CustomSelected.
+
+1. Default: the Scale row shows ½× / 1× / 2× / 3× preset buttons
+   at equal width in one non-wrapping row, 1× selected
+   (primary-filled, light label), plus the narrower Custom
+   button unselected.
+2. CustomSelected: the Custom button shows "2.5×" and is
+   selected (primary-filled); no preset is selected.
+3. Pressing Custom swaps it in place for a decimal number
+   input; entering 4 and blurring applies 4× (the button
+   returns showing "4×", selected); entering 0 or text commits
+   nothing and restores the previous value. On web the Custom
+   button carries `aria-pressed` matching its selected state.
+
+**Run when:** `src/components/PresetValueSelector.tsx`, its
+stories, the recipe pages' scale rows, or a changeset naming
+PresetValueSelector.
+
 ---
 
-## ActionChip
+## CatalogFiltersBar & CatalogHeader
 
-Open in `Components/ActionChip`: Tones, WithIcon, IconOnly,
-Sizes, Disabled.
+Open in `Components/CatalogFiltersBar`: Collapsed, ChooserOpen,
+WithFiltersAdded; and `Components/CatalogHeader`: Default.
 
-1. Tones: five small labeled chips — Edit on a gray fill,
-   Delete on a soft red fill, Mark perfected on a soft green
-   fill, Tweak with AI with a primary-tinted fill and primary
-   outline, Add to plan transparent with a hairline border; each
-   label in its tone's darker ink, semibold.
-2. WithIcon: the Print and Share chips show their glyph left of
-   the label in the same gray ink as the label.
-3. IconOnly: two square 48px gray targets with the printer /
-   share glyph centered; their accessible names are "Print
-   recipe" and "Share recipe".
-4. Sizes: the sm row's chips are compact; the md row matches
-   the standard button's height and label size.
-5. Disabled: both chips are dimmed and do not press — the
-   "Pressed N times" counter under them stays at 0.
+1. Collapsed: a search field with its clear button and a
+   Filters button; below them the caller-supplied sorter row
+   and the result count line. Nothing about the filter set is
+   built in — the story's filters come from its args.
+2. ChooserOpen: the filter chooser lists the passed-in filter
+   definitions with their controls (the demo's tag, status,
+   numeric, and availability shapes).
+3. WithFiltersAdded: each added filter renders as a removable
+   row naming its filter; its remove button reads "Remove
+   <label> filter" and removing it returns the row to the
+   chooser.
+4. CatalogHeader Default: the title renders as the heading
+   above the composed bar, left-aligned at the column inset.
 
-**Run when:** `src/components/ActionChip.tsx`, its stories,
-the recipe pages' action rows, or a changeset naming ActionChip.
+**Run when:** `src/components/CatalogFiltersBar.tsx`,
+`src/components/CatalogHeader.tsx`, their stories, the catalog
+pages, or a changeset naming either.
+
+---
+
+## RatingsCard, StatusBadge & SectionHeading
+
+Open in `Components/RatingsCard`: Default, NoRatingsYet,
+Stale; `Components/StatusBadge`: Tones;
+`Components/SectionHeading`: Default.
+
+1. RatingsCard Default: the eyebrow label, the community stars
+   with the numeric average and rating count, and the viewer's
+   own star row; tapping a viewer star updates it.
+2. NoRatingsYet: the empty community line renders in place of
+   the average; the viewer row still rates.
+3. Stale: the stale treatment renders as the story defines it,
+   with no layout shift against Default.
+4. StatusBadge Tones: one badge per tone, each showing the
+   caller-passed label — the tones are Badge's, the words are
+   the caller's.
+5. SectionHeading Default: the heading renders in the
+   subheading treatment, flush to its parent's inset — the
+   heading itself carries no padding; the story's panel
+   supplies the inset.
+
+**Run when:** `src/components/RatingsCard.tsx`,
+`src/components/StatusBadge.tsx`,
+`src/components/SectionHeading.tsx`, their stories, or a
+changeset naming any of them.
+
+---
+
+## Page shells (ScreenShell, ScrollShell, SessionShell, PinnedHeaderShell)
+
+Open in `Components/ScreenShell`: Default;
+`Components/ScrollShell`: Default; `Components/SessionShell`:
+Fixed, Scrollable; `Components/PinnedHeaderShell`: Default.
+
+1. ScreenShell: the pinned bar stays fixed while the region
+   below scrolls; the surface behind is the shell's paint.
+2. ScrollShell: the whole column scrolls inside the surface
+   frame, content inset by the standard padding with even
+   separation.
+3. SessionShell Fixed: heading and actions stay put with a
+   short form; Scrollable: a long form scrolls under the
+   pinned heading/actions.
+4. PinnedHeaderShell: the header block stays pinned while the
+   body scrolls beneath it.
+
+**Run when:** any of the four shell components, their stories,
+or a changeset naming them.
+
+---
+
+## Public frame & document chrome
+
+Open in `Components/PublicFrameLayout`: Default;
+`Components/PublicFrameHeader`: Default;
+`Components/PublicFrameFooter`: Default;
+`Components/BrandLink`: Default;
+`Components/DocumentHeader`: Default;
+`Components/DocumentFooter`: Default.
+
+1. The header band: wordmark left, Sign in right — both are
+   real links (the DOM nodes are anchors carrying their
+   hrefs; right-click offers "Open in new tab"). The wordmark
+   is the semibold primary wordmark with no underline.
+2. The footer band: the note in muted ink and the links the
+   caller passed in (the story passes Privacy / Terms),
+   rendered in the caller's order as real links and wrapping
+   without overlap on narrow widths.
+3. The layout centers its content column at 768px on wide
+   viewports and fills narrow ones; header and footer bands
+   span the full width.
+4. DocumentHeader: the same wordmark + sign-in link contract
+   in the lighter in-column row (no band); DocumentFooter
+   renders the caller's links as links under its divider.
+
+**Run when:** `src/components/PublicFrameLayout.tsx`,
+`PublicFrameHeader.tsx`, `PublicFrameFooter.tsx`,
+`BrandLink.tsx`, `DocumentHeader.tsx`, `DocumentFooter.tsx`,
+their stories, or a changeset naming any of them.
+
+---
+
+## List states (ListLoadingState)
+
+Open in `Components/ListLoadingState`: Default.
+
+1. ListLoadingState: the spinner renders centered in its
+   parent with its label; the state carries no padding or
+   margin of its own — spacing around it is the parent's.
+   The same component renders directly at the foot of a list
+   for the loading-more slot — check that rendering in
+   `Pages/Eciperay/DiscoverPage`: LoadingMore, where the
+   spinner follows the last card with the list's own gap.
+2. A list's error state has no wrapper component: the page
+   renders the Alert component directly — check in
+   `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
+   sits under the filter bar, flush to the parent's inset.
+
+**Run when:** `src/components/ListLoadingState.tsx`, its
+stories, or a changeset naming it.
+
+---
+
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, SearchRow, RemovableField)
+
+Open in `Components/StepList`: Default;
+`Components/MarkableRow`: Default;
+`Components/SuggestionPanel`: Default;
+`Components/TagList`: Default; `Components/FieldStack`: (its
+stories); `Components/TextActionCardRow`: (its stories);
+`Components/CenteredText`: (its stories);
+`Components/SearchRow`: (its stories);
+`Components/RemovableField`: (its stories).
+
+1. StepList: steps render numbered in order; a step with a
+   heading shows it above its body.
+2. MarkableRow: the row's mark toggle flips its marked state
+   treatment without shifting the row layout.
+3. SuggestionPanel: the panel title sits over one entry per
+   suggestion, in the caller's order.
+4. TagList: one Badge per tag in the caller's tag colors,
+   wrapping onto the next line at the story width — display
+   only, nothing presses.
+5. SearchRow: the search field claims the row's width and its
+   trailing action sits at the end; RemovableField's remove
+   button names the value it removes.
+
+**Run when:** any of these components, their stories, or a
+changeset naming them.
+
+---
+
+## Form set (FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)
+
+Open in `Components/FormStack`: Default;
+`Components/FormHeading`: Default, WithSubtitle;
+`Components/LabeledField`: Default, WithAction, WithError;
+`Components/LabeledGroup`: Default, WithAction;
+`Components/FieldLabel`: Default, Associated;
+`Components/RevertAction` and `Components/ChangedListBanner`
+(their stories).
+
+1. FormStack: fields render in order with the form rhythm —
+   even 16px separation and the longer tail below the last
+   field.
+2. FormHeading: the title renders in the form-title treatment;
+   WithSubtitle shows the hint line under the title.
+3. LabeledField: the label sits 4px over the field; on web the
+   label is a real label element — clicking it focuses the
+   field. WithError shows the error line below the field in
+   the error treatment; WithAction shows the action at the
+   label row's end.
+4. LabeledGroup: the label sits 8px over the grouped control —
+   the wider separation than a field's; the group announces
+   itself by the label's name.
+5. RevertAction: the "Revert to: <label>" text action renders
+   in the warning ink and presses like a button.
+6. ChangedListBanner: the changed-lines list renders on the
+   warning wash; the "Revert changes" action appears only in
+   the story that passes a revert handler.
+
+**Run when:** any of these components, their stories, the form
+pages, or a changeset naming them.
 
 ---
 
@@ -582,51 +782,19 @@ naming either page.
 
 ---
 
-## FieldLabel, LabeledField, LabeledGroup & FieldLabelBlock
+## FieldLabelBlock
 
-Open in `Components/FieldLabel`: Default. Open in
-`Components/LabeledField`: Default, WithAction, WithError. Open
-in `Components/LabeledGroup`: Default, WithAction. Open in
-`Components/FieldLabelBlock`: Default.
+Open in `Components/FieldLabelBlock`: Default.
 
-1. FieldLabel Default: the "Title" label in the small medium
-   label treatment sits directly over its field.
-2. LabeledField Default: the label sits 4px over the field;
-   WithAction adds the revert action at the label row's right
-   edge, vertically centered with the label; WithError renders
-   the error text below the field in the error treatment.
-3. LabeledGroup: the label sits 8px over the chip group (visibly
-   wider separation than LabeledField's); WithAction shows the
-   revert action at the row's right edge; chips toggle on press.
-4. FieldLabelBlock Default: the "Recipes" label stands as its
+1. FieldLabelBlock Default: the "Recipes" label stands as its
    own block over the checkbox list — 8px of padding under the
    label plus the stack's 16px gap before the first row (the
    meal forms' list-label rhythm); rows toggle on press.
 
-**Run when:** `src/components/FieldLabel.tsx`,
-`src/components/LabeledField.tsx`, `src/components/LabeledGroup.tsx`,
-`src/components/FieldLabelBlock.tsx`, their stories, a form page
-composing them, or a changeset naming any of them.
-
----
-
-## RevertAction & ChangedListBanner
-
-Open in `Components/RevertAction`: Default. Open in
-`Components/ChangedListBanner`: Default, WithoutRevert.
-
-1. RevertAction Default: the warning-colored "Revert to:
-   Chicken, plain" text; pressing it (or Enter/Space on web)
-   increments the counter below.
-2. ChangedListBanner Default: the banner on its pale warning
-   wash with the difference text and an underlined Revert action
-   at its right edge; pressing Revert increments the counter.
-3. WithoutRevert: the banner shows only the difference text —
-   no Revert action.
-
-**Run when:** `src/components/RevertAction.tsx`,
-`src/components/ChangedListBanner.tsx`, their stories,
-RecipeFormPage, or a changeset naming either component.
+**Run when:** `src/components/FieldLabelBlock.tsx`, its
+stories, a form page composing it, or a changeset naming it.
+(The shared label components it composes are covered by the
+Form set section above.)
 
 ---
 
@@ -643,26 +811,16 @@ RecipeFormPage, or a changeset naming FieldColumns.
 
 ---
 
-## FormStack, FormHeading & FormSubmit
+## FormSubmit
 
-Open in `Components/FormStack`: Default. Open in
-`Components/FormHeading`: Default. Open in
-`Components/FormSubmit`: Default.
+Open in `Components/FormSubmit`: Default.
 
-1. FormStack Default: the fields stack at an even 16px rhythm,
-   stretched to the column width (the Save Changes button
-   included), with clear space below the last element.
-2. FormHeading Default: the "Meal plan" title in the form-title
-   treatment (2xl bold, heading level 1) sits above the first
-   field with 40px of total separation — the heading's own 24px
-   padding plus the form layout's 16px gap.
-3. FormSubmit Default: the Save meal button sits 16px below the
+1. FormSubmit Default: the Save meal button sits 16px below the
    field above it, full width.
 
-**Run when:** `src/components/FormStack.tsx`,
-`src/components/FormHeading.tsx`, `src/components/FormSubmit.tsx`,
-their stories, a form page composing them, or a changeset naming
-any of them.
+**Run when:** `src/components/FormSubmit.tsx`, its stories, a
+form page composing it, or a changeset naming it. (FormStack
+and FormHeading are covered by the Form set section above.)
 
 ---
 
@@ -686,11 +844,12 @@ ContentLocked, VersionDiff. Open in `Pages/Eciperay/MealFormPage`:
 Default, NoSelection, SaveError. Open in
 `Pages/Eciperay/MealPlanFormPage`: Default, NoSelection.
 
-1. RecipeFormPage Default: Title, Status chips, Description with
-   its "Describe with AI" action, the Servings / Prep / Cook
-   columns, image, Ingredients and Instructions slots, Tags
-   chips, Source URL, and the full-width Save Changes button,
-   evenly spaced in one scrolling form.
+1. RecipeFormPage Default: Title, the Status toggle buttons,
+   Description with its "Describe with AI" action, the Servings
+   / Prep / Cook columns, image, Ingredients and Instructions
+   slots, the selectable Tag badges, Source URL, and the
+   full-width Save Changes button, evenly spaced in one
+   scrolling form.
 2. ContentLocked: the lock notice renders in place of the
    Ingredients and Instructions slots — the slots disappear —
    while the scalar fields and tags remain editable.
@@ -832,7 +991,7 @@ Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition.
 
 1. The overview action row: Print and Share render as **real icons**
    (printer / share-2 from `@spudly/ui/icons`) in the same neutral
-   chip treatment as Edit/Delete — no emoji or text glyphs, no
+   button treatment as Edit/Delete — no emoji or text glyphs, no
    color-rendered printer.
 2. Tags render as bordered Badge pills whose border matches the tag
    label color.
@@ -865,9 +1024,9 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
    cream" row already marked missing — the row is dimmed and the
    substitutions panel shows below the list. Tapping the row
    clears the missing mark (the dim and the panel disappear);
-   tapping it again restores them. The servings stepper and
-   scale chips fit the story width without wrapping the Scale
-   row.
+   tapping it again restores them. The servings stepper and the
+   Scale preset buttons fit the story width without wrapping the
+   Scale row; the selected scale is primary-filled.
 5. Open in `Pages/Eciperay/PublicPageFrame`: Default, Content,
    NarrowViewport. The header (Eciperay brand, Sign in) and footer (the
    without-an-account note, Privacy Policy, Terms of Service)
@@ -898,7 +1057,8 @@ naming TagsPage.
 
 Open in `Components/Button`: Primary, Secondary, Ghost, Danger,
 Sizes, Disabled, AllVariants, WithIcon, WithIconVariants, IconOnly,
-IconOnlyVariants, IconSizes, IconDisabled, IconPressCounter.
+IconOnlyVariants, IconSizes, IconDisabled, IconPressCounter,
+Toggle, ToggleStates.
 
 The plain stories (Primary → AllVariants) are the unchanged labeled
 button. The icon-slot stories:
@@ -924,6 +1084,13 @@ button. The icon-slot stories:
    rendered DOM (or the Storybook accessibility panel) the IconOnly
    story's button carries `aria-label="Print recipe"` and there is
    no `accessibilitylabel` attribute.
+7. Toggle: the pill row's selected member is primary-filled with
+   a light label; pressing another pill moves the selection and
+   the fill. On web the selected button carries
+   `aria-pressed="true"` and the others `aria-pressed="false"`.
+8. ToggleStates: unselected renders in the resting secondary
+   treatment, selected primary-filled, and selected-disabled is
+   dimmed and inert.
 
 **Run when:** `src/components/Button.tsx`, its stories, or a
 changeset naming Button or the Button icon slot.
