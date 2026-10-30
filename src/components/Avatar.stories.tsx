@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { storyImageSquare } from "../storyFixtures.js";
 import { Avatar } from "./Avatar.js";
 
 const meta: Meta<typeof Avatar> = {
@@ -29,6 +30,8 @@ export const Large: Story = {
 export const WithImage: Story = {
   args: {
     name: "Stephen Sorensen",
-    src: "https://picsum.photos/seed/avatar/160",
+    // Inline fixture, never a remote URL — story images must
+    // render identically on every run (issue #352).
+    src: storyImageSquare,
   },
 };
