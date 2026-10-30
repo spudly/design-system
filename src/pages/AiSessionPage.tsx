@@ -3,6 +3,7 @@ import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
 import { FormHeading } from "../components/FormHeading.js";
+import { PreviewCard } from "../components/PreviewCard.js";
 import { SessionShell } from "../components/SessionShell.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
@@ -56,14 +57,16 @@ import { tokens } from "../tokens/index.js";
  * running state's scrolling; FormHeading owns the title block;
  * the prompt and follow-up fields take TextAreaField's `xl` /
  * `lg` height steps instead of a raw minHeight; the start
- * action grows through Button's `grow` prop. The pieces only
- * this page needs — the transcript bubbles, the preview
- * stage's bordered frame, and the cancel control — are
- * composed inline below from library primitives rather than
- * added as new library components: the bubbles are Text in
- * token-inked stacks, the frame is a bordered surface stack
- * (ImportReviewPage composes the same frame around its
- * preview), and the cancel control is TextAction (its keyboard
+ * action grows through Button's `grow` prop. The preview
+ * stage's frame is the library's PreviewCard — the bordered
+ * surface card extracted in #331 from this page's and
+ * ImportReviewPage's identical hand-styled frames — titled by
+ * the config's preview title, with the finalize action as its
+ * actions row. The pieces only this page needs — the
+ * transcript bubbles and the cancel control — are composed
+ * inline below from library primitives rather than added as
+ * new library components: the bubbles are Text in token-inked
+ * stacks, and the cancel control is TextAction (its keyboard
  * and disabled semantics, which also refuse held-key repeats)
  * under the muted underlined treatment in a stack that dims
  * and blocks the pointer while a request is in flight —
@@ -225,29 +228,16 @@ export function AiSessionPage({
         </>
       ) : null}
       {preview ? (
-        <YStack
-          borderRadius={tokens.radii.lg}
-          borderWidth={1}
-          borderColor={tokens.colors.gray.gray3}
-          backgroundColor="$surface"
-          padding="$4"
-        >
-          <YStack paddingBottom="$3">
-            <Text
-              fontSize={tokens.typography.fontSize.sm}
-              fontWeight={tokens.typography.fontWeight.semibold}
-              color={tokens.colors.gray.gray10}
-            >
-              {config.previewTitle}
-            </Text>
-          </YStack>
-          {preview}
-          <YStack paddingTop="$4">
+        <PreviewCard
+          title={config.previewTitle}
+          actions={
             <Button variant="primary" disabled={busy} onPress={onFinalize}>
               {finalizePending ? config.finalizePendingLabel : config.finalizeLabel}
             </Button>
-          </YStack>
-        </YStack>
+          }
+        >
+          {preview}
+        </PreviewCard>
       ) : null}
       {error ? <Text variant="error">{error}</Text> : null}
       {session.canCancel ? (

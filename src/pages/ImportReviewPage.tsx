@@ -1,11 +1,10 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
+import { PreviewCard } from "../components/PreviewCard.js";
 import { Text } from "../components/Text.js";
 import { Thumbnail } from "../components/Thumbnail.js";
-import { tokens } from "../tokens/index.js";
 
 /**
  * ImportReviewPage (#126, B3c): the import review step — the
@@ -28,10 +27,12 @@ import { tokens } from "../tokens/index.js";
  * full-width 192px cover shape it was extracted from), the
  * title is Text's `formTitle` variant, the actions sit in a
  * ButtonRow, and the section rhythm is FormScreenLayout's
- * own. The preview slot's bordered surface frame is composed
- * inline below (AiSessionPage composes the same frame around
- * its preview stage) rather than added as a new library
- * component.
+ * own. The preview slot sits in the library's PreviewCard —
+ * the bordered surface frame extracted in #331 from this
+ * page's and AiSessionPage's identical hand-styled frames
+ * (AiSessionPage frames its preview stage with the same
+ * component, titled, with its finalize action as the actions
+ * row).
  */
 
 export type ImportReviewPageProps = {
@@ -81,15 +82,7 @@ export function ImportReviewPage({
           {...(imageAlt ? { accessibilityLabel: imageAlt } : {})}
         />
       ) : null}
-      <YStack
-        borderRadius={tokens.radii.lg}
-        borderWidth={1}
-        borderColor={tokens.colors.gray.gray3}
-        backgroundColor="$surface"
-        padding="$4"
-      >
-        {preview}
-      </YStack>
+      <PreviewCard>{preview}</PreviewCard>
       {error ? <Text variant="error">{error}</Text> : null}
       <ButtonRow>
         <Button variant="primary" disabled={busy} onPress={onAccept}>
