@@ -162,6 +162,7 @@ export { SearchRow, type SearchRowProps } from "./SearchRow.js";
 export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./SessionShell.js";
 export { StatusBadge, type StatusBadgeProps, type StatusBadgeTone } from "./StatusBadge.js";
+export { StatusMessage, type StatusMessageProps } from "./StatusMessage.js";
 export { StepList, type StepListProps, type StepListStep } from "./StepList.js";
 export {
   SuggestionPanel,
