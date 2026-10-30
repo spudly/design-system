@@ -55,5 +55,10 @@ test("the selector is a labeled preset row of toggle buttons plus the editable c
     /onChange\(String\(parsed\)\)/,
     "a committed custom entry flows through the presets' onChange",
   );
+  assert.match(
+    code,
+    /onBlur=\{handleCustomBlur\}/,
+    "the editor's blur is guarded so a move to a preset cannot commit the draft (#315)",
+  );
   assert.ok(!code.includes("Chip"), "no chip component survives in the selector");
 });

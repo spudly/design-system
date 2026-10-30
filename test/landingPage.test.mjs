@@ -55,6 +55,14 @@ const page = readCode("src/pages/LandingPage.tsx");
 const stories = readCode("src/pages/LandingPage.stories.tsx");
 const pagesIndex = readCode("src/pages/index.ts");
 const fixtures = readCode("src/pages/fixtures.ts");
+// The page's sections are composed inline in the page itself:
+// an earlier #119 tranche cut extracted them as Hero / CtaRow /
+// FeatureCard / CardGrid library components, but Stephen's
+// no-new-components rule for tranche PRs (2026-10-29) folded
+// them back — they had no second consumer. Every scan below
+// pins against the page source, which is where the treatments
+// now live.
+const landingUnit = page;
 
 test("LandingPage source is readable and exports the page and its view-model types", () => {
   assert.ok(page.length > 1000, "expected the full LandingPage source");
@@ -101,41 +109,42 @@ test("the CTAs cross as {label, href} data — no CTA press callbacks", () => {
   }
 });
 
-test("the CTAs render through an anchor fed by the CTA's href", () => {
-  assert.match(
-    page,
-    /<Anchor\s+href=\{cta\.href\}/,
-    "the CTA helper must render an Anchor with href={cta.href}",
-  );
-  // The three CTAs render in contract order: Discover (primary),
-  // Sign up (secondary), Get the app (secondary).
+test("the CTAs render through Button's href form fed by the CTA data", () => {
+  // Button's href form (ButtonLink) renders the real anchor —
+  // its anchor rendering is pinned by
+  // test/navigationLinks.test.mjs; here the page's wiring pins:
+  // each CTA crosses into a <Button href> with its emphasis.
+  // (A dedicated CtaLink duplicated this form and was deleted —
+  // Stephen's ruling on PR #311.)
   const order = ["discoverCta", "signUpCta", "getAppCta"].map((prop) =>
-    page.indexOf(`cta={${prop}}`),
+    page.indexOf(`${prop}.href`),
   );
   assert.ok(
     order.every((index) => index !== -1),
-    "all three CTAs must render through the helper",
+    "all three CTAs must render through Button's href form",
   );
   assert.ok(
     order[0] < order[1] && order[1] < order[2],
     "the CTAs must render in Discover / Sign up / Get-the-app order",
   );
-  assert.match(page, /cta=\{discoverCta\} variant="primary"/);
-  assert.match(page, /cta=\{signUpCta\} variant="secondary"/);
-  assert.match(page, /cta=\{getAppCta\} variant="secondary"/);
+  assert.match(page, /<Button href=\{discoverCta\.href\} variant="primary">/);
+  assert.match(page, /<Button href=\{signUpCta\.href\} variant="secondary">/);
+  assert.match(page, /<Button href=\{getAppCta\.href\} variant="secondary">/);
+  assert.ok(!page.includes("CtaLink"), "the page must not render the deleted CtaLink");
 });
 
 test("the CTA container stacks narrow and rows on web — no wrapping CTA row", () => {
   assert.match(
     page,
-    /flexDirection="web:row"/,
-    "the CTA container must become a row only on web — the #171 contract is stacked narrow / row on wide, and its narrow rendering is the native one while wide is web (the DS config defines no width breakpoints)",
+    /<YStack flexDirection="web:row" gap="\$3" alignItems="center" justifyContent="center">/,
+    "the CTA row must become a row only on web — the #171 contract is stacked narrow / row on wide, and its narrow rendering is the native one while wide is web (the DS config defines no width breakpoints)",
   );
   assert.equal(
-    page.split("flexWrap").length - 1,
+    landingUnit.split("flexWrap").length - 1,
     1,
     "only the feature grid may flexWrap — a wrapping CTA row could seat two CTAs side by side at the 430px story viewport instead of the contracted stack",
   );
+  assert.match(page, /flexWrap="wrap"/, "the one flexWrap is the feature grid's");
 });
 
 test("frame structure: ScreenContainer shell, sections in hero → CTAs → features order", () => {
@@ -145,17 +154,22 @@ test("frame structure: ScreenContainer shell, sections in hero → CTAs → feat
     "the view must render inside the ScreenContainer page shell",
   );
   const heroAt = page.indexOf("{heroTitle}");
-  const ctasAt = page.indexOf("cta={discoverCta}");
-  const featuresAt = page.indexOf("feature={featureOne}");
+  const ctasAt = page.indexOf("href={discoverCta.href}");
+  const featuresAt = page.indexOf("[featureOne, featureTwo, featureThree]");
   assert.ok(heroAt !== -1 && ctasAt !== -1 && featuresAt !== -1, "all three sections must render");
   assert.ok(
     heroAt < ctasAt && ctasAt < featuresAt,
     "sections must render hero, then CTAs, then features",
   );
   assert.equal(
-    page.split('variant="heading"').length - 1,
+    landingUnit.split('variant="heading"').length - 1,
     1,
     "the hero title must be the page's only heading-variant (level-1) Text",
+  );
+  assert.match(
+    page,
+    /<Text variant="heading" textAlign="center">/,
+    "the hero renders the heading-variant (level-1) title",
   );
   assert.match(
     page,
@@ -252,10 +266,17 @@ async function renderLanding() {
 
 function renderedAnchors(html) {
   const anchors = [];
-  const pattern = /<a [^>]*href="([^"]+)"[^>]*>([^<]*)<\/a>/g;
+  // The label may be nested (Button's href form wraps it in a
+  // Text, which renders a <span> on web): read the anchor's text
+  // content, not just direct text children.
+  const pattern = /<a [^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/g;
   let match;
   while ((match = pattern.exec(html)) !== null) {
-    anchors.push({ href: match[1], label: match[2].trim(), tag: match[0] });
+    anchors.push({
+      href: match[1],
+      label: match[2].replaceAll(/<[^>]*>/g, "").trim(),
+      tag: match[0],
+    });
   }
   return anchors;
 }

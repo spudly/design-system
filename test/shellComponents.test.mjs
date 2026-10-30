@@ -5,9 +5,9 @@
  * treatment outright — the pins hold the treatments and the
  * package-root exports.
  *
- * The recipedetail tranche's version of this file also pinned
- * Toolbar and StatusMessage; neither ships here — Toolbar stays
- * with its tranche, and StatusMessage retired into CenteredText
+ * Toolbar — the recipedetail tranche's pinned bar — joins the
+ * set in the #119 extraction round and is pinned here;
+ * StatusMessage retired into CenteredText
  * (test/centeredText.test.mjs) in the dedupe.
  */
 import "./registerSvgStub.mjs";
@@ -27,7 +27,7 @@ function code(file) {
 
 test("the shell components are exported from the built package root", async () => {
   const dist = await import("../dist/index.js");
-  for (const name of ["ScreenShell", "SectionHeading"]) {
+  for (const name of ["ScreenShell", "SectionHeading", "Toolbar"]) {
     assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
   }
 });
@@ -39,12 +39,57 @@ test("ScreenShell owns the fixed-shell frame", () => {
   assert.match(shell, /Omit<StyledScreenShellProps, "flex" \| "backgroundColor">/);
 });
 
+test("Toolbar owns the pinned bar's inset, gap, wrap, and hairline divider", () => {
+  const toolbar = code("Toolbar.tsx");
+  assert.match(toolbar, /styled\(XStack, \{\s+name: "Toolbar",/);
+  assert.match(toolbar, /flexWrap: "wrap",\s+alignItems: "center",/);
+  assert.match(toolbar, /gap: tokens\.spacing\[2\],/);
+  assert.match(toolbar, /borderBottomWidth: 1,\s+borderBottomColor: tokens\.colors\.gray\.gray2,/);
+  assert.match(
+    toolbar,
+    /paddingHorizontal: tokens\.spacing\[4\],\s+paddingVertical: tokens\.spacing\[3\],/,
+  );
+  for (const owned of [
+    "flexWrap",
+    "alignItems",
+    "gap",
+    "borderBottomWidth",
+    "borderBottomColor",
+    "paddingHorizontal",
+    "paddingVertical",
+  ]) {
+    assert.match(
+      toolbar,
+      new RegExp(String.raw`\|\s*"${owned}"`),
+      `ToolbarProps must omit the bar-owned ${owned}`,
+    );
+  }
+  assert.match(toolbar, /export type ToolbarProps = Omit<\s+StyledToolbarProps,/);
+});
+
 test("SectionHeading is the subheading treatment with no baked-in padding", () => {
   const heading = code("SectionHeading.tsx");
-  assert.match(heading, /<Text variant="subheading">\{children\}<\/Text>/);
+  assert.match(
+    heading,
+    /<Text\s+variant="subheading"\s+accessibilityRole="header"\s+aria-level=\{2\}\s*>/,
+  );
   assert.doesNotMatch(
     heading,
     /padding/,
     "the heading carries no inset or offset — the parent owns separation (Stephen's dedupe ruling)",
+  );
+});
+
+test("SectionHeading carries the header role at level 2 (#317)", () => {
+  const heading = code("SectionHeading.tsx");
+  assert.match(
+    heading,
+    /accessibilityRole="header"/,
+    "SectionHeading must carry the RN header role explicitly (#317)",
+  );
+  assert.match(
+    heading,
+    /aria-level=\{2\}/,
+    "SectionHeading must carry heading level 2 explicitly — under the page title's level 1 (#263 regime, #317)",
   );
 });

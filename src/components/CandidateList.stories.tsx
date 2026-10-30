@@ -25,6 +25,19 @@ export const Default: Story = {
   ),
 };
 
+export const Pending: Story = {
+  render: () => (
+    <YStack maxWidth={430} padding="$4">
+      <CandidateList
+        title="Ready to activate"
+        candidates={[{ id: "v4", label: "v4 — Adds the slow-cooker variant" }]}
+        isActivationPending
+        onActivatePress={() => {}}
+      />
+    </YStack>
+  ),
+};
+
 export const ReadOnly: Story = {
   render: () => (
     <YStack maxWidth={430} padding="$4">

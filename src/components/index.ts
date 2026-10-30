@@ -67,16 +67,6 @@ export { FieldRow, type FieldRowProps } from "./FieldRow.js";
 export { SectionStack, type SectionStackProps } from "./SectionStack.js";
 export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
 export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";
-export { CandidateList, type CandidateListItem, type CandidateListProps } from "./CandidateList.js";
-export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
-export {
-  NutritionPanel,
-  type NutritionPanelData,
-  type NutritionPanelProps,
-  type NutritionPanelRow,
-} from "./NutritionPanel.js";
-export { PanelStack, type PanelStackProps } from "./PanelStack.js";
-export { Toolbar, type ToolbarProps } from "./Toolbar.js";
 export { SearchField, type SearchFieldProps } from "./SearchField.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./SecretRevealPanel.js";
 export { SectionCard, type SectionCardProps } from "./SectionCard.js";
@@ -109,6 +99,11 @@ export {
   type NutritionGoalsValues,
 } from "./NutritionGoalsForm.js";
 export { VerseText, type VerseTextProps } from "./VerseText.js";
+export { SignInForm, type SignInFormProps } from "./SignInForm.js";
+export { SignUpForm, type SignUpFormProps } from "./SignUpForm.js";
+export { ForgotPasswordForm, type ForgotPasswordFormProps } from "./ForgotPasswordForm.js";
+export { ResetPasswordForm, type ResetPasswordFormProps } from "./ResetPasswordForm.js";
+export { LegalSection, type LegalSectionProps } from "./LegalSection.js";
 
 // The #119 dedupe set: the canonical components the tranche
 // branches coined independently, shipped once here (the
@@ -172,6 +167,7 @@ export { SearchRow, type SearchRowProps } from "./SearchRow.js";
 export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./SessionShell.js";
 export { StatusBadge, type StatusBadgeProps, type StatusBadgeTone } from "./StatusBadge.js";
+export { StatusMessage, type StatusMessageProps } from "./StatusMessage.js";
 export { StepList, type StepListProps, type StepListStep } from "./StepList.js";
 export {
   SuggestionPanel,
@@ -180,3 +176,43 @@ export {
 } from "./SuggestionPanel.js";
 export { TagList, type TagListProps, type TagListTag } from "./TagList.js";
 export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCardRow.js";
+
+// The #119 extraction set: the components the tranche PRs
+// inventoried as extraction-required during their adoption
+// rounds, shipped once here (the tranche PRs adopt these in
+// their post-extraction rounds).
+export { BadgeCardRow, type BadgeCardRowAction, type BadgeCardRowProps } from "./BadgeCardRow.js";
+export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
+export { CandidateList, type CandidateListItem, type CandidateListProps } from "./CandidateList.js";
+export { CheckRow, type CheckRowProps } from "./CheckRow.js";
+export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";
+export { FormSubmit, type FormSubmitProps } from "./FormSubmit.js";
+export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
+export {
+  NutritionPanel,
+  type NutritionPanelData,
+  type NutritionPanelProps,
+  type NutritionPanelRow,
+} from "./NutritionPanel.js";
+export { PanelStack, type PanelStackProps } from "./PanelStack.js";
+export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
+export {
+  RecipeIngredientsPanel,
+  type RecipeIngredientsPanelIngredient,
+  type RecipeIngredientsPanelProps,
+  type RecipeIngredientsPanelSubstitution,
+  type RecipeIngredientsPanelView,
+} from "./RecipeIngredientsPanel.js";
+export {
+  RecipeInstructionsPanel,
+  type RecipeInstructionsPanelProps,
+  type RecipeInstructionsPanelStep,
+} from "./RecipeInstructionsPanel.js";
+export {
+  RecipeOverviewPanel,
+  type RecipeOverviewPanelProps,
+  type RecipeOverviewPanelTag,
+} from "./RecipeOverviewPanel.js";
+export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
+export { Toolbar, type ToolbarProps } from "./Toolbar.js";
+export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";

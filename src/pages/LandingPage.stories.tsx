@@ -24,7 +24,13 @@ function Viewport({ children }: { children: ReactNode }) {
 /**
  * The landing is a static view — one state, all content from
  * props — so a single story renders the whole page: hero, the
- * three link CTAs, and the three fixed feature cards.
+ * three link CTAs, and the three fixed feature cards. Default
+ * pins the phone viewport (430×844) like the other page
+ * stories; Wide renders the same page unconstrained so the
+ * wide-web layout can be checked (the CTA row in one row, the
+ * three feature cards sharing a row at their 260px basis) —
+ * the manual-tests LandingPage section names which story each
+ * layout check uses.
  */
 export const Default: Story = {
   render: () => (
@@ -32,4 +38,8 @@ export const Default: Story = {
       <LandingPage {...landingFixture} />
     </Viewport>
   ),
+};
+
+export const Wide: Story = {
+  render: () => <LandingPage {...landingFixture} />,
 };

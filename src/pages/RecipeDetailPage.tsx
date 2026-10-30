@@ -5,7 +5,6 @@ import { ButtonRow } from "../components/ButtonRow.js";
 import { CandidateList } from "../components/CandidateList.js";
 import { CardStack } from "../components/CardStack.js";
 import { Center } from "../components/Center.js";
-import { CenteredText } from "../components/CenteredText.js";
 import { ListStack } from "../components/ListStack.js";
 import { LoadingGate } from "../components/LoadingGate.js";
 import { LogEntryCard } from "../components/LogEntryCard.js";
@@ -32,6 +31,7 @@ import { Spinner } from "../components/Spinner.js";
 import { StatBand } from "../components/StatBand.js";
 import { StatCard } from "../components/StatCard.js";
 import { StatusBadge, type StatusBadgeTone } from "../components/StatusBadge.js";
+import { StatusMessage } from "../components/StatusMessage.js";
 import { StepList } from "../components/StepList.js";
 import { SuggestionPanel } from "../components/SuggestionPanel.js";
 import { TagList } from "../components/TagList.js";
@@ -113,12 +113,15 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  * chrome over a ScrollRegion, PanelStack panels, and the widgets
  * extracted from this page's clusters (RatingsCard, NutritionPanel,
  * CandidateList, LogEntryCard, StepList, MarkableRow,
- * PresetValueSelector, SuggestionPanel, SectionHeading, CenteredText)
+ * PresetValueSelector, SuggestionPanel, SectionHeading, StatusMessage)
  * — passing data and callbacks only. The widgets the pass first
- * extracted as this page's local copies shipped as the shared
- * components in the #119 dedupe (#320), and the page now composes
- * those; the chip components the first extraction leaned on were
- * retired there, so the page's chip-shaped actions render as
+ * extracted as this page's local copies shipped as shared
+ * components — the deduped set in the #119 dedupe (#320), the
+ * five this page's clusters still owned (PanelStack, Toolbar,
+ * CandidateList, LogEntryCard, NutritionPanel) in the #119
+ * extraction set (#331) — and the page now composes those; the
+ * chip components the first extraction leaned on were retired
+ * in the dedupe, so the page's chip-shaped actions render as
  * Buttons. The pass is a refactor, not a redesign; the treatment
  * normalizations it makes are the design system's canonical ones,
  * each small and deliberate:
@@ -133,6 +136,10 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  *   the button's own label ink at its standard glyph size).
  * - The single-version picker's static text takes the hint
  *   treatment (it was xs muted text).
+ * - The transient action message renders through StatusMessage,
+ *   mounted unconditionally so its polite live region announces
+ *   the change (#318); the pass first rendered it as a
+ *   conditional static centered line, which never announced.
  * - Panel block separations are PanelStack's 16px rhythm: the
  *   servings → scale separation (12px) and the missing-ingredients
  *   hint's offset (12px) normalize to it, as does the last
@@ -633,7 +640,12 @@ function OverviewPanel({
           </Button>
         ) : null}
       </ButtonRow>
-      {actionMessage ? <CenteredText variant="hint">{actionMessage}</CenteredText> : null}
+      {/* StatusMessage renders unconditionally (#318): its polite
+          live region must be mounted before the message changes
+          for the change to announce, so there is no conditional
+          block here — the component renders its empty region when
+          there is no message. */}
+      <StatusMessage message={actionMessage} />
       {showLifecycle && lifecycle ? (
         <LifecycleSection
           lifecycle={lifecycle}
