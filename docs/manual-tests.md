@@ -591,12 +591,11 @@ PinnedHeaderShell.
 
 ---
 
-## FieldStack, TrailingActionsRow & CompactCard
+## FieldStack & TrailingActionsRow; Card's compact variant
 
 Open in `Components/FieldStack`: Default;
 `Components/TrailingActionsRow`: FieldAndAction,
-ContentAndTextActions, Narrow; `Components/CompactCard`:
-Default.
+ContentAndTextActions, Narrow; `Components/Card`: Compact.
 
 1. FieldStack: the form's fields stack at an even 12px rhythm
    with the button row last.
@@ -606,12 +605,14 @@ Default.
    right, at a 12px gap between the actions. Narrow: when the
    groups cannot fit, the action wraps below the leading group
    instead of overflowing.
-3. CompactCard: the surface is the small card treatment —
-   12px padding, medium corners, small shadow.
+3. Card Compact: the surface is the small card treatment —
+   12px padding, medium corners, small shadow, no border (the
+   former CompactCard, folded into Card as `variant="compact"`
+   under Stephen's 2026-10-29 ruling).
 
 **Run when:** `src/components/FieldStack.tsx`,
 `src/components/TrailingActionsRow.tsx`,
-`src/components/CompactCard.tsx`, their stories, TagsPage's
+`src/components/Card.tsx`, their stories, TagsPage's
 forms or rows, or a changeset naming any of them.
 
 ---

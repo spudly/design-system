@@ -1,9 +1,9 @@
 import type { TagColorName } from "../themes/tagColors.js";
 import { BadgeCardRow } from "../components/BadgeCardRow.js";
 import { Button } from "../components/Button.js";
+import { Card } from "../components/Card.js";
 import { CardStack } from "../components/CardStack.js";
 import { ColorPickerField } from "../components/ColorPickerField.js";
-import { CompactCard } from "../components/CompactCard.js";
 import { FieldStack } from "../components/FieldStack.js";
 import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
@@ -60,8 +60,8 @@ import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
  * the sections stack in SectionStack, the title is Text's
  * `title` variant, each form's fields stack in FieldStack,
  * the picker-and-actions rows are TrailingActionsRow (which
- * carries the #219 wrap), the editor card is CompactCard,
- * each display row renders through BadgeCardRow (the badge
+ * carries the #219 wrap), the editor card is Card's `compact`
+ * variant, each display row renders through BadgeCardRow (the badge
  * and its actions cross as data — the badge's color among
  * them), and the rows stack in CardStack at its 8px rhythm
  * (the per-row bottom padding they carried before). The
@@ -161,7 +161,7 @@ export function TagsPage({
           <CardStack>
             {tags.map((tag) =>
               editingTagId === tag.id ? (
-                <CompactCard key={tag.id}>
+                <Card key={tag.id} variant="compact">
                   <FieldStack>
                     <TextField
                       placeholder="Tag name"
@@ -204,7 +204,7 @@ export function TagsPage({
                       </Button>
                     </TrailingActionsRow>
                   </FieldStack>
-                </CompactCard>
+                </Card>
               ) : (
                 <BadgeCardRow
                   key={tag.id}

@@ -12,7 +12,9 @@
  * renders through TextAction with its caller-composed
  * accessibility label (#248: actions are button-role text
  * controls), and the groups compose through
- * TrailingActionsRow inside CompactCard.
+ * TrailingActionsRow inside a compact Card (Card's `compact`
+ * variant — the former CompactCard, folded into Card under
+ * Stephen's 2026-10-29 ruling).
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -46,7 +48,7 @@ test("each action renders through TextAction with its composed label (#248)", ()
   assert.match(code, /\{\.\.\.\(action\.variant \? \{ variant: action\.variant \} : \{\}\)\}/);
 });
 
-test("the row composes CompactCard and TrailingActionsRow", () => {
-  assert.match(code, /<CompactCard>/);
+test("the row composes a compact Card and TrailingActionsRow", () => {
+  assert.match(code, /<Card variant="compact">/);
   assert.match(code, /<TrailingActionsRow leading=\{/);
 });

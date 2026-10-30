@@ -9,7 +9,6 @@ export { BlankWord, type BlankWordProps } from "./BlankWord.js";
 export { BulkSelectToolbar, type BulkSelectToolbarProps } from "./BulkSelectToolbar.js";
 export { Button, type ButtonProps } from "./Button.js";
 export { Card, type CardProps } from "./Card.js";
-export { CompactCard, type CompactCardProps } from "./CompactCard.js";
 export { BadgeCardRow, type BadgeCardRowAction, type BadgeCardRowProps } from "./BadgeCardRow.js";
 export { CheckboxField, type CheckboxFieldProps } from "./CheckboxField.js";
 export {
