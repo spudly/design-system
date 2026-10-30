@@ -22,7 +22,10 @@
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
  *   generic CardRow / ListRow components; the routing moved with
- *   them and the rows test below pins it there. RecipeFormPage's
+ *   them and the rows test below pins it there. AiSessionPage's
+ *   Cancel action was in this list until the #119 ai-import
+ *   tranche composed it inline as a TextAction — pinned below
+ *   the same way. RecipeFormPage's
  *   revert actions and changed-list banner joined them in the
  *   #119 forms tranche as the RevertAction / ChangedListBanner
  *   components; since the #119 dedupe both compose TextAction,
@@ -149,18 +152,19 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 
 // Compact split form (the SANCTIONED_TAGS pattern above): this
 // file sits at the max-lines cap. MealPlansPage,
-// MealPlanDetailPage, and RecipeFormPage are deliberately
-// absent: their rows and revert pressables render through the
-// generic components the #119 extractions moved them into
-// (CardRow / ListRow; RevertAction / ChangedListBanner), so
-// none of the three pages has a stack pressable left to
-// translate — pinned by the dedicated test below. The #119
-// meals & planning tranche moved four more pages off the list
-// the same way: ShoppingListPage (its row is CheckRow),
-// MealDetailPage (its rows are ListRow), MealsHubPage
-// (TextActionCardRow), and MealCookingModePage (its Done pill
-// is StepOverlay's).
-const PAGE_STACKS = "src/pages/AiSessionPage.tsx,src/pages/RecipeDetailPage.tsx".split(",");
+// MealPlanDetailPage, AiSessionPage, and RecipeFormPage are
+// deliberately absent: their rows and revert pressables render
+// through the generic components the #119 extractions moved
+// them into (CardRow / ListRow; RevertAction /
+// ChangedListBanner), and AiSessionPage's Cancel control is an
+// inline TextAction (#119 ai-import tranche), so none of the
+// four pages has a stack pressable left to translate — pinned
+// by the dedicated test below. The #119 meals & planning
+// tranche moved four more pages off the list the same way:
+// ShoppingListPage (its row is CheckRow), MealDetailPage (its
+// rows are ListRow), MealsHubPage (TextActionCardRow), and
+// MealCookingModePage (its Done pill is StepOverlay's).
+const PAGE_STACKS = "src/pages/RecipeDetailPage.tsx".split(",");
 
 // Shared by the stack scans below (compact form: this file sits
 // at the max-lines cap). RAW matches a raw RN accessibility JSX
@@ -211,6 +215,7 @@ test("the de-styled pages have no stack pressable left to translate (#237, #248,
   for (const rel of [
     "src/pages/MealPlansPage.tsx",
     "src/pages/MealPlanDetailPage.tsx",
+    "src/pages/AiSessionPage.tsx",
     "src/pages/RecipeFormPage.tsx",
     "src/pages/ShoppingListPage.tsx",
     "src/pages/MealDetailPage.tsx",
