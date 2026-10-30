@@ -12,6 +12,7 @@ import { SelectField } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { StarRatingInput } from "../components/StarRatingInput.js";
 import { StatCard } from "../components/StatCard.js";
+import { StatusMessage } from "../components/StatusMessage.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
@@ -836,18 +837,13 @@ function OverviewPanel({
             </Button>
           ) : null}
         </XStack>
-        {actionMessage ? (
-          <YStack paddingBlockEnd="$4">
-            <Text
-              accessibilityRole="text"
-              textAlign="center"
-              fontSize={tokens.typography.fontSize.sm}
-              color={tokens.colors.gray.gray7}
-            >
-              {actionMessage}
-            </Text>
-          </YStack>
-        ) : null}
+        {/* StatusMessage renders unconditionally (#318): its polite
+            live region must be mounted before the message changes
+            for the change to announce, so the old conditional block
+            (accessibilityRole="text", gray7 ink) is gone — the
+            component renders its empty region when there is no
+            message. */}
+        <StatusMessage message={actionMessage} />
         {showLifecycle && lifecycle ? (
           <LifecycleSection
             lifecycle={lifecycle}

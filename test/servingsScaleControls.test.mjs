@@ -38,6 +38,15 @@
  *    value renders the Custom button selected showing that value
  *    (the page's formatCustomValue appends the multiplier sign).
  *    Pressing a preset leaves custom editing.
+ * 7. Commit timing (#315): the custom entry commits on submit,
+ *    and on blur only when focus leaves the selector entirely.
+ *    A blur whose focus lands inside the group (web: the blur
+ *    event's relatedTarget is contained by the group element)
+ *    ends the edit WITHOUT committing, so a preset press that
+ *    follows applies its own value instead of being swallowed
+ *    or overridden by the draft; on native, where blur carries
+ *    no relatedTarget, a preset's onPressIn ahead of the blur
+ *    suppresses that blur's commit the same way.
  *
  * Source-pinning test in the style of recipeDetailPage.test.mjs;
  * run via `npm test` (which builds first).
@@ -190,8 +199,65 @@ test("committing a custom scale applies any positive multiplier and ignores inva
     /if \(Number\.isFinite\(parsed\) && parsed > 0\) \{\s+onChange\(String\(parsed\)\);/,
     "a positive entry (e.g. 4 or 2.5) applies through onChange; else nothing commits",
   );
-  assert.match(selector, /onBlur=\{commitCustom\}/, "the custom entry commits on blur");
+  assert.match(
+    selector,
+    /onBlur=\{handleCustomBlur\}/,
+    "blur goes through the within-group guard before it can commit",
+  );
   assert.match(selector, /onSubmitEditing=\{commitCustom\}/, "the custom entry commits on submit");
+});
+
+test("on web, blurring the custom editor to inside the group does not commit (#315)", () => {
+  assert.match(
+    selector,
+    /const groupRef = useRef<TamaguiElement>\(null\);/,
+    "the selector keeps a ref on its group element",
+  );
+  assert.match(selector, /<XStack\s+ref=\{groupRef\}/, "the group element carries the ref");
+  assert.match(
+    selector,
+    /const relatedTarget = blurEvent\.relatedTarget \?\? blurEvent\.nativeEvent\?\.relatedTarget;/,
+    "the blur destination is read from relatedTarget (direct or nativeEvent-wrapped)",
+  );
+  assert.match(
+    selector,
+    /groupElement\?\.contains\(relatedTarget as Node\)\) \{\s+setCustomEditing\(false\);\s+return;/,
+    "focus landing inside the group ends the edit without committing",
+  );
+});
+
+test("on native, a preset press in flight suppresses the blur commit (#315)", () => {
+  // Native blur carries no relatedTarget, so the press stands in.
+  assert.match(
+    selector,
+    /onPressIn=\{\(\) => \{\s+if \(isCustomEditing\) \{\s+presetPressPendingRef\.current = true;/,
+    "a preset's onPressIn ahead of the blur marks the press pending",
+  );
+  assert.match(
+    selector,
+    /if \(presetPressPendingRef\.current\) \{\s+presetPressPendingRef\.current = false;\s+setCustomEditing\(false\);\s+return;/,
+    "the blur handler consumes a pending preset press without committing",
+  );
+  assert.match(
+    selector,
+    /onPress=\{\(\) => \{\s+presetPressPendingRef\.current = false;/,
+    "the preset press clears the pending flag so a later blur still commits",
+  );
+  assert.match(
+    selector,
+    /onPressOut=\{\(\) => \{\s+\/\/ #315 cancel path:[\s\S]*?queueMicrotask\(\(\) => \{\s+presetPressPendingRef\.current = false;/,
+    "a canceled preset press (press-out with no onPress) clears the pending flag in a microtask, so a later genuine blur still commits",
+  );
+  assert.match(
+    selector,
+    /onPointerCancel=\{\(\) => \{\s+\/\/ #315 web touch-cancel path:[\s\S]*?queueMicrotask\(\(\) => \{\s+presetPressPendingRef\.current = false;/,
+    "a web touch-canceled preset press (pointer-cancel, which Tamagui does not map to press-out) clears the pending flag in a microtask, so a canceled touch followed by an outside blur still commits the draft",
+  );
+  assert.match(
+    selector,
+    /const handleCustomBlur =[\s\S]*?commitCustom\(\);\s+\};/,
+    "a blur leaving the group falls through to commitCustom",
+  );
 });
 
 test("a non-preset scale renders the Custom button selected with its value; presets leave editing", () => {

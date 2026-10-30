@@ -20,6 +20,10 @@
  *   spacing[2] (8px), centered.
  * - ListStack: hairline rows as one list — no gap of its own;
  *   the rows own their separation.
+ * - PanelStack: a section panel's blocks — padding and gap both
+ *   spacing[4] (16px), stretch.
+ * - ButtonStack: a stack of full-width buttons — gap
+ *   spacing[3] (12px), stretch (ButtonRow's vertical form).
  * - Center: centers a single child — boolean `horizontal` /
  *   `vertical`, both defaulting to true.
  * - FieldStack: one form's fields — gap spacing[3] (12px),
@@ -57,6 +61,8 @@ const cardStackCode = code("CardStack.tsx");
 const sectionStackCode = code("SectionStack.tsx");
 const fieldRowCode = code("FieldRow.tsx");
 const listStackCode = code("ListStack.tsx");
+const panelStackCode = code("PanelStack.tsx");
+const buttonStackCode = code("ButtonStack.tsx");
 const centerCode = code("Center.tsx");
 const fieldStackCode = code("FieldStack.tsx");
 const buttonStackCode = code("ButtonStack.tsx");
@@ -70,6 +76,8 @@ test("the layout components are exported from the built package root", async () 
     "SectionStack",
     "FieldRow",
     "ListStack",
+    "PanelStack",
+    "ButtonStack",
     "Center",
     "FieldStack",
     "ButtonStack",
@@ -120,6 +128,19 @@ test("FieldRow owns the search row's gap and centering", () => {
   assert.match(fieldRowCode, /Omit<StyledFieldRowProps, "gap" \| "alignItems">/);
 });
 
+test("PanelStack owns the section panel's inset and block rhythm", () => {
+  assert.match(panelStackCode, /styled\(YStack, \{\s+name: "PanelStack",/);
+  assert.match(panelStackCode, /padding: tokens\.spacing\[4\],\s+gap: tokens\.spacing\[4\],/);
+  assert.match(panelStackCode, /alignItems: "stretch",/);
+  assert.match(panelStackCode, /Omit<StyledPanelStackProps, "padding" \| "gap" \| "alignItems">/);
+});
+
+test("ButtonStack owns the full-width button stack's rhythm", () => {
+  assert.match(buttonStackCode, /styled\(YStack, \{\s+name: "ButtonStack",/);
+  assert.match(buttonStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
+  assert.match(buttonStackCode, /Omit<StyledButtonStackProps, "gap" \| "alignItems">/);
+});
+
 test("ListStack adds no gap of its own — the rows own their separation", () => {
   assert.match(listStackCode, /styled\(YStack, \{\s+name: "ListStack",\s+\}\)/);
   assert.ok(!/gap:/.test(listStackCode), "ListStack must not set a gap");
@@ -157,6 +178,7 @@ test("no layout component offers step, role, or margin props", () => {
     ["FieldRow", fieldRowCode],
     ["ListStack", listStackCode],
     ["FieldStack", fieldStackCode],
+    ["PanelStack", panelStackCode],
     ["ButtonStack", buttonStackCode],
   ]) {
     for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {

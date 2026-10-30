@@ -1,17 +1,15 @@
-import { useState, type ReactNode } from "react";
-import { FlatList } from "react-native";
-import { View, XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Alert } from "../components/Alert.js";
-import { Button } from "../components/Button.js";
+import {
+  CatalogFiltersBar,
+  type CatalogFilterDefinition,
+} from "../components/CatalogFiltersBar.js";
+import { CatalogHeader } from "../components/CatalogHeader.js";
 import { DiscoveryCard } from "../components/DiscoveryCard.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SearchField } from "../components/SearchField.js";
-import { SelectField, type SelectOption } from "../components/SelectField.js";
-import { Spinner } from "../components/Spinner.js";
-import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
+import type { SelectOption } from "../components/SelectField.js";
+import { BoundedList } from "./BoundedList.js";
 import { useCatalogPagination } from "./useCatalogPagination.js";
 
 /**
@@ -30,17 +28,18 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * blocks; the app owns the content and composes).
  *
  * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root (this
- * component imports react-native's FlatList; the root entry must
- * stay importable in plain Node).
+ * `@spudly/ui/pages` subpath export, not the package root (the
+ * pages' lists ride react-native's FlatList, via BoundedList;
+ * the root entry must stay importable in plain Node).
  *
  * The composition mirrors RecipesPage — the sibling recipe
  * catalog — including its structural rules:
- * - #188: the FlatList is bounded to the fixed `list` shell with
- *   `flex: 1` (see listStyle), and the title + filter bar render
- *   as the list's header so they scroll with the recipes. The
- *   list stays mounted while loading; the spinner renders as the
- *   list's empty state.
+ * - #188: the list is bounded to the fixed `list` shell
+ *   (BoundedList owns the bounding and the list geometry — the
+ *   flex, the content insets, the row separation), and the
+ *   title + filter bar render as the list's header so they
+ *   scroll with the recipes. The list stays mounted while
+ *   loading; the spinner renders as the list's empty state.
  * - #96: the collapsed filter bar — search and a small "Filters"
  *   button initially; a filter's control renders only after it
  *   has been added from the chooser, and each added filter
@@ -48,9 +47,14 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  *   same change callbacks. Stephen's decision (2026-10-28): the
  *   public catalog uses the same collapsed chooser as RecipesPage
  *   rather than the retired web view's always-expanded bar, so
- *   the two catalogs behave the same. The filter prop contract is
+ *   the two catalogs behave the same. The bar is the shared
+ *   CatalogFiltersBar component; the filter prop contract is
  *   RecipesPage's, mirrored 1:1 — plain strings at the boundary,
- *   the app maps its own unions.
+ *   the app maps its own unions. The bar is definition-driven
+ *   (Stephen's ruling on PR #311): which filters exist, their
+ *   labels, option sets, and defaults are THIS page's data,
+ *   passed in as filter definitions — the bar owns only the
+ *   control design.
  * - #162: search uses the DS SearchField as-is; no lineHeight is
  *   set on any glyph or text in this file.
  *
@@ -81,20 +85,12 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * is in flight. Pagination rides the list's own end-reached
  * signal → `onLoadMore` (the retired view's host-owned
  * IntersectionObserver sentinel goes away).
+ *
+ * The page composes components and passes data and callbacks
+ * only (#119): the list geometry lives in BoundedList, the
+ * header in CatalogHeader, the bar in CatalogFiltersBar, and the
+ * list states in the shared List*State components.
  */
-
-// List content geometry on the DS spacing scale, mirroring
-// RecipesPage (plain object, no StyleSheet).
-const listContentStyle = {
-  paddingHorizontal: tokens.spacing[4],
-  paddingBottom: tokens.spacing[8],
-} as const;
-
-// The FlatList must be bounded to the space the fixed `list`
-// shell leaves it (#188): without flex: 1 it sizes to its full
-// content height inside the non-scrolling shell, overflows the
-// viewport, and never gets a scrollable viewport of its own.
-const listStyle = { flex: 1 } as const;
 
 /** One catalog row's view-model. The app formats `subtitle` (its
  * discovery meta line — "By {author} · {rating} · {satiety}",
@@ -114,10 +110,18 @@ export type DiscoverPageItem = {
   href: string;
 };
 
-// The filter option sets the app's filter bar hardcodes, moved
-// with the bar (the same sets RecipesPage carries). Values stay
-// plain strings so no app type leaks into the DS: the app maps
-// its own status/sort unions at the boundary.
+/** The addable filters of the collapsed filter bar (#96). The
+ * calorie and satiety ranges each count as one filter (their
+ * min/max fields add and remove together), as do the Sort by /
+ * Order selects. */
+export type DiscoverPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
+
+// The catalog's filter option sets — this page's DATA, passed
+// into CatalogFiltersBar as filter definitions (the bar owns
+// the control design, not the data — Stephen's ruling on PR
+// #311). Values stay plain strings so no app type leaks into
+// the DS: the app maps its own status/sort unions at the
+// boundary.
 const STATUS_OPTIONS: SelectOption[] = [
   { value: "all", label: "All statuses" },
   { value: "idea", label: "Idea" },
@@ -136,28 +140,6 @@ const SORT_OPTIONS: SelectOption[] = [
 const SORT_DIR_OPTIONS: SelectOption[] = [
   { value: "desc", label: "High to low" },
   { value: "asc", label: "Low to high" },
-];
-
-/** The addable filters of the collapsed filter bar (#96). The
- * calorie and satiety ranges each count as one filter (their
- * min/max fields add and remove together), as do the Sort by /
- * Order selects. */
-export type DiscoverPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
-
-const FILTER_LABELS: Record<DiscoverPageFilterId, string> = {
-  status: "Status",
-  ingredient: "Ingredient",
-  calories: "Calories",
-  satiety: "Satiety",
-  sort: "Sort",
-};
-
-const ALL_FILTER_IDS: DiscoverPageFilterId[] = [
-  "status",
-  "ingredient",
-  "calories",
-  "satiety",
-  "sort",
 ];
 
 export type DiscoverPageProps = {
@@ -234,276 +216,6 @@ export type DiscoverPageProps = {
   onFilterChooserOpenChange?: (open: boolean) => void;
 };
 
-type FilterControlsProps = Pick<
-  DiscoverPageProps,
-  | "searchPlaceholder"
-  | "search"
-  | "onSearchChange"
-  | "statusFilter"
-  | "onStatusFilterChange"
-  | "showStatusFilter"
-  | "ingredient"
-  | "onIngredientChange"
-  | "minCalories"
-  | "onMinCaloriesChange"
-  | "maxCalories"
-  | "onMaxCaloriesChange"
-  | "minSatiety"
-  | "onMinSatietyChange"
-  | "maxSatiety"
-  | "onMaxSatietyChange"
-  | "sort"
-  | "onSortChange"
-  | "sortDir"
-  | "onSortDirChange"
-  | "activeFilters"
-  | "onActiveFiltersChange"
-  | "filterChooserOpen"
-  | "onFilterChooserOpenChange"
->;
-
-function NumberFilter({
-  label,
-  value,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <YStack flex={1}>
-      <TextField
-        label={label}
-        accessibilityLabel={label}
-        keyboardType="numeric"
-        value={value}
-        onChangeText={onChange}
-      />
-    </YStack>
-  );
-}
-
-/** One added filter: its control(s) plus the Remove control that
- * clears and hides it (#96). */
-function AddedFilter({
-  id,
-  onRemove,
-  children,
-}: {
-  id: DiscoverPageFilterId;
-  onRemove: (id: DiscoverPageFilterId) => void;
-  children: ReactNode;
-}) {
-  return (
-    <YStack gap={tokens.spacing[1]}>
-      <XStack justifyContent="flex-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          accessibilityLabel={`Remove ${FILTER_LABELS[id]} filter`}
-          onPress={() => {
-            onRemove(id);
-          }}
-        >
-          Remove
-        </Button>
-      </XStack>
-      {children}
-    </YStack>
-  );
-}
-
-/** The collapsed filter bar (#96), the same bar RecipesPage
- * renders: search and a small Filters button initially; the
- * button opens a chooser of the filters not yet added, and a
- * filter's control renders only once that filter has been
- * added. The only difference from RecipesPage's bar is the
- * search placeholder, which is a prop here because the two
- * catalogs' copy differs. */
-function DiscoverFiltersBar({
-  searchPlaceholder,
-  search,
-  onSearchChange,
-  statusFilter,
-  onStatusFilterChange,
-  ingredient,
-  onIngredientChange,
-  minCalories,
-  onMinCaloriesChange,
-  maxCalories,
-  onMaxCaloriesChange,
-  minSatiety,
-  onMinSatietyChange,
-  maxSatiety,
-  onMaxSatietyChange,
-  sort,
-  onSortChange,
-  sortDir,
-  onSortDirChange,
-  showStatusFilter = true,
-  activeFilters,
-  onActiveFiltersChange,
-  filterChooserOpen,
-  onFilterChooserOpenChange,
-}: FilterControlsProps) {
-  const statusAvailable =
-    showStatusFilter && statusFilter !== undefined && onStatusFilterChange !== undefined;
-  const available = ALL_FILTER_IDS.filter((id) => id !== "status" || statusAvailable);
-  // Uncontrolled seed: a filter that already carries a non-default
-  // value starts added, so existing callers that preset filter
-  // values keep seeing (and can clear) those filters.
-  const [internalActiveFilters, setInternalActiveFilters] = useState<DiscoverPageFilterId[]>(() => {
-    const seeded: DiscoverPageFilterId[] = [];
-    if (statusAvailable && statusFilter !== "all") seeded.push("status");
-    if (ingredient !== "") seeded.push("ingredient");
-    if (minCalories !== "" || maxCalories !== "") seeded.push("calories");
-    if (minSatiety !== "" || maxSatiety !== "") seeded.push("satiety");
-    if (sort !== "newest" || sortDir !== "desc") seeded.push("sort");
-    return seeded;
-  });
-  const [internalChooserOpen, setInternalChooserOpen] = useState(false);
-  const active = activeFilters ?? internalActiveFilters;
-  const chooserOpen = filterChooserOpen ?? internalChooserOpen;
-  const addable = available.filter((id) => !active.includes(id));
-
-  const setActive = (next: DiscoverPageFilterId[]) => {
-    if (activeFilters === undefined) setInternalActiveFilters(next);
-    onActiveFiltersChange?.(next);
-  };
-  const setChooserOpen = (open: boolean) => {
-    if (filterChooserOpen === undefined) setInternalChooserOpen(open);
-    onFilterChooserOpenChange?.(open);
-  };
-  const addFilter = (id: DiscoverPageFilterId) => {
-    setActive([...active, id]);
-    setChooserOpen(false);
-  };
-  const removeFilter = (id: DiscoverPageFilterId) => {
-    // Removal clears the filter's values through the ordinary
-    // change callbacks, so a hidden filter never keeps filtering.
-    if (id === "status") onStatusFilterChange?.("all");
-    if (id === "ingredient") onIngredientChange("");
-    if (id === "calories") {
-      onMinCaloriesChange("");
-      onMaxCaloriesChange("");
-    }
-    if (id === "satiety") {
-      onMinSatietyChange("");
-      onMaxSatietyChange("");
-    }
-    if (id === "sort") {
-      onSortChange("newest");
-      onSortDirChange("desc");
-    }
-    setActive(active.filter((filterId) => filterId !== id));
-  };
-
-  return (
-    <YStack gap={tokens.spacing[3]}>
-      {/* The row stretches its children (#188): the small Filters
-          button's natural height is shorter than the SearchField,
-          so the button stretches to the search field's height and
-          the two line up. Do not switch this back to flex-start —
-          that is what made the button shorter than the field. */}
-      <XStack gap={tokens.spacing[2]} alignItems="stretch">
-        <YStack flex={1}>
-          <SearchField
-            value={search}
-            onChangeText={onSearchChange}
-            placeholder={searchPlaceholder}
-          />
-        </YStack>
-        {addable.length > 0 ? (
-          <Button
-            variant="secondary"
-            size="sm"
-            accessibilityLabel="Add a filter"
-            aria-expanded={chooserOpen}
-            onPress={() => {
-              setChooserOpen(!chooserOpen);
-            }}
-          >
-            Filters
-          </Button>
-        ) : null}
-      </XStack>
-      {chooserOpen && addable.length > 0 ? (
-        <XStack gap={tokens.spacing[2]} flexWrap="wrap">
-          {addable.map((id) => (
-            <Button
-              key={id}
-              variant="secondary"
-              size="sm"
-              accessibilityLabel={`Add ${FILTER_LABELS[id]} filter`}
-              onPress={() => {
-                addFilter(id);
-              }}
-            >
-              {FILTER_LABELS[id]}
-            </Button>
-          ))}
-        </XStack>
-      ) : null}
-      {active.includes("status") && statusAvailable ? (
-        <AddedFilter id="status" onRemove={removeFilter}>
-          <SelectField
-            label="Status"
-            value={statusFilter}
-            options={STATUS_OPTIONS}
-            onValueChange={onStatusFilterChange}
-          />
-        </AddedFilter>
-      ) : null}
-      {active.includes("ingredient") ? (
-        <AddedFilter id="ingredient" onRemove={removeFilter}>
-          <TextField
-            label="Ingredient"
-            accessibilityLabel="Ingredient"
-            value={ingredient}
-            onChangeText={onIngredientChange}
-            placeholder="e.g. chicken"
-          />
-        </AddedFilter>
-      ) : null}
-      {active.includes("calories") ? (
-        <AddedFilter id="calories" onRemove={removeFilter}>
-          <XStack gap={tokens.spacing[2]}>
-            <NumberFilter label="Min cal" value={minCalories} onChange={onMinCaloriesChange} />
-            <NumberFilter label="Max cal" value={maxCalories} onChange={onMaxCaloriesChange} />
-          </XStack>
-        </AddedFilter>
-      ) : null}
-      {active.includes("satiety") ? (
-        <AddedFilter id="satiety" onRemove={removeFilter}>
-          <XStack gap={tokens.spacing[2]}>
-            <NumberFilter label="Min satiety" value={minSatiety} onChange={onMinSatietyChange} />
-            <NumberFilter label="Max satiety" value={maxSatiety} onChange={onMaxSatietyChange} />
-          </XStack>
-        </AddedFilter>
-      ) : null}
-      {active.includes("sort") ? (
-        <AddedFilter id="sort" onRemove={removeFilter}>
-          <YStack gap={tokens.spacing[3]}>
-            <SelectField
-              label="Sort by"
-              value={sort}
-              options={SORT_OPTIONS}
-              onValueChange={onSortChange}
-            />
-            <SelectField
-              label="Order"
-              value={sortDir}
-              options={SORT_DIR_OPTIONS}
-              onValueChange={onSortDirChange}
-            />
-          </YStack>
-        </AddedFilter>
-      ) : null}
-    </YStack>
-  );
-}
-
 /**
  * Full-page public recipe catalog view: the title, the collapsed
  * filter bar, and the DiscoveryCard list in the fixed `list`
@@ -513,12 +225,36 @@ function DiscoverFiltersBar({
 export function DiscoverPage(props: DiscoverPageProps) {
   const {
     title,
+    searchPlaceholder,
     emptyMessage,
     errorMessage,
     recipes,
     isLoading,
     isFetchingNextPage = false,
     onLoadMore,
+    search,
+    onSearchChange,
+    statusFilter,
+    onStatusFilterChange,
+    showStatusFilter,
+    ingredient,
+    onIngredientChange,
+    minCalories,
+    onMinCaloriesChange,
+    maxCalories,
+    onMaxCaloriesChange,
+    minSatiety,
+    onMinSatietyChange,
+    maxSatiety,
+    onMaxSatietyChange,
+    sort,
+    onSortChange,
+    sortDir,
+    onSortDirChange,
+    activeFilters,
+    onActiveFiltersChange,
+    filterChooserOpen,
+    onFilterChooserOpenChange,
   } = props;
 
   // Pagination: the shared catalog pattern (#285) — the same
@@ -536,17 +272,91 @@ export function DiscoverPage(props: DiscoverPageProps) {
     canPaginate: !isLoading && !errorMessage,
   });
 
+  // The catalog's filter definitions — the page's data in the
+  // bar's control shapes (see the option sets above). The status
+  // filter joins only when the host wires it (value + callback
+  // provided, not hidden), the same condition RecipesPage's bar
+  // carries; the public host passes no status filter today.
+  const catalogFilters: CatalogFilterDefinition<DiscoverPageFilterId>[] = [];
+  if (
+    showStatusFilter !== false &&
+    statusFilter !== undefined &&
+    onStatusFilterChange !== undefined
+  ) {
+    catalogFilters.push({
+      kind: "select",
+      id: "status",
+      label: "Status",
+      options: STATUS_OPTIONS,
+      value: statusFilter,
+      onChange: onStatusFilterChange,
+      defaultValue: "all",
+    });
+  }
+  catalogFilters.push(
+    {
+      kind: "text",
+      id: "ingredient",
+      label: "Ingredient",
+      value: ingredient,
+      onChange: onIngredientChange,
+      placeholder: "e.g. chicken",
+      defaultValue: "",
+    },
+    {
+      kind: "range",
+      id: "calories",
+      label: "Calories",
+      minLabel: "Min cal",
+      maxLabel: "Max cal",
+      minValue: minCalories,
+      maxValue: maxCalories,
+      onMinChange: onMinCaloriesChange,
+      onMaxChange: onMaxCaloriesChange,
+    },
+    {
+      kind: "range",
+      id: "satiety",
+      label: "Satiety",
+      minLabel: "Min satiety",
+      maxLabel: "Max satiety",
+      minValue: minSatiety,
+      maxValue: maxSatiety,
+      onMinChange: onMinSatietyChange,
+      onMaxChange: onMaxSatietyChange,
+    },
+    {
+      kind: "sort",
+      id: "sort",
+      label: "Sort",
+      sortLabel: "Sort by",
+      sortOptions: SORT_OPTIONS,
+      sortValue: sort,
+      onSortChange,
+      defaultSortValue: "newest",
+      dirLabel: "Order",
+      dirOptions: SORT_DIR_OPTIONS,
+      dirValue: sortDir,
+      onDirChange: onSortDirChange,
+      defaultDirValue: "desc",
+    },
+  );
+
   return (
     <ScreenContainer variant="list" scrollable={false}>
-      <FlatList
-        style={listStyle}
+      <BoundedList
+        // Rows are separated by the list's own spacer, not by
+        // margins on the cards: the card is a standalone widget
+        // other surfaces compose, and its spacing in a layout is
+        // the layout's to own (the direction of #209).
+        separator="md"
+        contentInset="page"
         // The filter controls live inside this scroll view, so taps
         // on them must land while the keyboard is open instead of
         // being consumed to dismiss it.
         keyboardShouldPersistTaps="handled"
         data={isLoading ? [] : recipes}
         keyExtractor={(recipe) => recipe.id}
-        contentContainerStyle={listContentStyle}
         // The title and filters render as the list's header so they
         // scroll together with the recipes (#188). The header sits
         // inside the list's content container, which already
@@ -556,10 +366,18 @@ export function DiscoverPage(props: DiscoverPageProps) {
         // filter input mid-typing; the loading indicator renders as
         // the list's empty state instead.
         ListHeaderComponent={
-          <YStack paddingBlockStart="$4" paddingBlockEnd="$2" gap="$4">
-            <Text variant="heading">{title}</Text>
-            <DiscoverFiltersBar {...props} />
-          </YStack>
+          <CatalogHeader title={title}>
+            <CatalogFiltersBar
+              searchPlaceholder={searchPlaceholder}
+              search={search}
+              onSearchChange={onSearchChange}
+              filters={catalogFilters}
+              {...(activeFilters ? { activeFilters } : {})}
+              {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
+              {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
+              {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
+            />
+          </CatalogHeader>
         }
         renderItem={({ item }) => (
           <DiscoveryCard
@@ -569,12 +387,16 @@ export function DiscoverPage(props: DiscoverPageProps) {
             href={item.href}
           />
         )}
-        // Rows are separated by a spacer, not by margins on the
-        // cards: the card is a standalone widget other surfaces
-        // compose, and its spacing in a layout is the layout's to
-        // own (the direction of #209 — gap/separation over margins
-        // for inter-item spacing).
-        ItemSeparatorComponent={() => <View height={tokens.spacing[3]} />}
+        ListEmptyComponent={
+          isLoading ? (
+            <ListLoadingState label="Loading" />
+          ) : errorMessage ? (
+            <Alert severity="error">{errorMessage}</Alert>
+          ) : (
+            <EmptyState title={emptyMessage} />
+          )
+        }
+        ListFooterComponent={isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined}
         // Pagination: the shared catalog pattern's handler —
         // see useCatalogPagination above. It stays mounted (but
         // guarded) during a next-page fetch and is unmounted
@@ -583,26 +405,6 @@ export function DiscoverPage(props: DiscoverPageProps) {
         onEndReached={onEndReached}
         onScroll={onScroll}
         onEndReachedThreshold={onEndReachedThreshold}
-        ListEmptyComponent={
-          isLoading ? (
-            <YStack marginBlockStart="$8" alignItems="center">
-              <Spinner label="Loading" />
-            </YStack>
-          ) : errorMessage ? (
-            <YStack marginBlockStart="$8">
-              <Alert severity="error">{errorMessage}</Alert>
-            </YStack>
-          ) : (
-            <EmptyState title={emptyMessage} />
-          )
-        }
-        ListFooterComponent={
-          isFetchingNextPage ? (
-            <YStack alignItems="center" justifyContent="center" paddingVertical="$4">
-              <Spinner label="Loading" />
-            </YStack>
-          ) : undefined
-        }
       />
     </ScreenContainer>
   );
