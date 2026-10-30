@@ -323,6 +323,32 @@ MealPlanDetailPage), or a changeset naming ButtonRow.
 
 ---
 
+## EqualButtonRow
+
+Open in `Components/EqualButtonRow`: Default, ThreeButtons,
+InCard.
+
+An EqualButtonRow is a row of action buttons that share the
+row's width equally. It owns the bar's whole treatment — the
+12px gap, the wrap, and the sizing of every button (flex 1
+with a 40% minimum width) — so there are no sizing or spacing
+props to pass.
+
+1. Default: the two buttons split the row as equal halves at
+   the same height, 12px apart, their labels on one line each.
+2. ThreeButtons: the first two buttons share line 1 as equal
+   halves and the third wraps to line 2 at the full row width —
+   no line of three thirds, and no label wraps inside a button.
+3. InCard: the same two-over-one treatment inside the card,
+   inset by the card's own padding (the CTA-bar composition
+   PublicRecipePage adopts).
+
+**Run when:** `src/components/EqualButtonRow.tsx`, its stories,
+PublicRecipePage's CTA bar, RecipeDetailPage's cooking-action
+bar, or a changeset naming EqualButtonRow.
+
+---
+
 ## CardStack
 
 Open in `Components/CardStack`: Default.
@@ -447,6 +473,32 @@ Open in `Components/LoadingGate`: Default.
 **Run when:** `src/components/LoadingGate.tsx`, its stories,
 MealPlanDetailPage's loading state, or a changeset naming
 LoadingGate.
+
+---
+
+## MessageCard
+
+Open in `Components/MessageCard`: Default, LongMessage.
+
+A MessageCard is a whole-screen message state: a card carrying
+a heading and one explanatory line, centered — horizontally
+and vertically — on a surface-filled shell that fills the
+story frame's height, inset 16px from the frame's edges. It
+owns the whole treatment; the caller supplies only the two
+strings.
+
+1. Default: the card sits at the vertical center of the frame
+   (not the top), the heading reads centered over the muted
+   message line, also centered.
+2. LongMessage: the message wraps inside the card and every
+   wrapped line stays centered; the card grows taller and
+   remains vertically centered.
+3. PublicRecipePage's NotFound and Unavailable stories show
+   the identical state once the page adopts the component.
+
+**Run when:** `src/components/MessageCard.tsx`, its stories,
+PublicRecipePage's notFound and unavailable states, or a
+changeset naming MessageCard.
 
 ---
 
