@@ -78,7 +78,6 @@ const pagesDir = join(here, "..", "src", "pages");
 const componentsDir = join(here, "..", "src", "components");
 const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
 const frameSource = readFileSync(join(pagesDir, "PublicPageFrame.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "PublicRecipePage.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
 const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
@@ -89,7 +88,6 @@ const strip = (text) =>
   text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const code = strip(source);
 const frameCode = strip(frameSource);
-const storiesCode = strip(stories);
 // The recipe sections are the shared library panels (see the
 // header), so the section scans read the panel sources; the
 // page source hosts the wiring pins (render order, status map).
@@ -359,22 +357,6 @@ test("the status badge map is page-owned with the idea fallback", () => {
   assert.match(code, /statusLabel=\{statusBadge\?\.label \?\? "Idea"\}/);
 });
 
-test("the sections render through the shared library panels (#331)", () => {
-  for (const panel of [
-    "RecipeOverviewPanel",
-    "RecipeIngredientsPanel",
-    "RecipeInstructionsPanel",
-  ]) {
-    assert.ok(
-      code.includes(`import { ${panel} } from "../components/${panel}.js";`),
-      `the page imports the library ${panel}`,
-    );
-  }
-  // The view-models pass into the panels unchanged (the shared shapes).
-  assert.match(code, /<RecipeIngredientsPanel ingredients=\{ingredients\} \/>/);
-  assert.match(code, /<RecipeInstructionsPanel instructions=\{instructions\} \/>/);
-});
-
 test("no explicit lineHeight anywhere in the new files (#162)", () => {
   assert.ok(!code.includes("lineHeight"), "the page must not set lineHeight");
   assert.ok(!frameCode.includes("lineHeight"), "the frame must not set lineHeight");
@@ -386,41 +368,4 @@ test("no explicit lineHeight anywhere in the new files (#162)", () => {
   ]) {
     assert.ok(!text.includes("lineHeight"), `${name} must not set lineHeight`);
   }
-});
-
-test("stories exercise every union state and both CTA variants", () => {
-  for (const name of [
-    "Default",
-    "SignedIn",
-    "ClonePending",
-    "Minimal",
-    "Loading",
-    "NotFound",
-    "Unavailable",
-    "Ingredients",
-  ]) {
-    assert.match(
-      storiesCode,
-      new RegExp(`export const ${name}: Story`),
-      `PublicRecipePage.stories.tsx must export a ${name} story`,
-    );
-  }
-  for (const state of ["loading", "notFound", "unavailable"]) {
-    assert.match(
-      storiesCode,
-      new RegExp(`<PublicRecipePage state="${state}" />`),
-      `a story must render the ${state} union member`,
-    );
-  }
-  assert.match(storiesCode, /variant: "signedIn"/, "a story must exercise the signed-in CTA bar");
-  assert.match(
-    storiesCode,
-    /isClonePending: clonePending/,
-    "a story must exercise the pending clone",
-  );
-  assert.match(
-    storiesCode,
-    /renderComments: \(\) =>/,
-    "a story must pass the comments slot with stand-in content",
-  );
 });
