@@ -67,7 +67,7 @@ export function ForgotPasswordForm({
         variant="primary"
         disabled={loading}
         onPress={onSubmit}
-        accessibilityLabel="Send Reset Link"
+        accessibilityLabel={loading ? "Sending…" : "Send Reset Link"}
       >
         {loading ? "Sending…" : "Send Reset Link"}
       </Button>

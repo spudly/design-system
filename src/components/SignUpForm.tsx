@@ -100,7 +100,7 @@ export function SignUpForm({
         variant="primary"
         disabled={loading}
         onPress={onSubmit}
-        accessibilityLabel="Create Account"
+        accessibilityLabel={loading ? "Creating account…" : "Create Account"}
       >
         {loading ? "Creating account…" : "Create Account"}
       </Button>

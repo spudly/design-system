@@ -67,6 +67,26 @@ test("each form composes the shared FormStack and owns its submit handling", () 
   }
 });
 
+test("each form's submit button is named for the label it renders, in both states", () => {
+  // The visible label swaps while loading; the accessible name
+  // follows it (a static name would contradict the rendered
+  // label on web, where the button's label forwards as its
+  // aria-label).
+  const BUTTON_LABELS = {
+    SignInForm: ["Signing in…", "Sign In"],
+    SignUpForm: ["Creating account…", "Create Account"],
+    ForgotPasswordForm: ["Sending…", "Send Reset Link"],
+    ResetPasswordForm: ["Updating…", "Update password"],
+  };
+  for (const [form, [busy, idle]] of Object.entries(BUTTON_LABELS)) {
+    const source = read(`src/components/${form}.tsx`);
+    assert.ok(
+      source.includes(`accessibilityLabel={loading ? "${busy}" : "${idle}"}`),
+      `${form} names its submit button for the state it renders`,
+    );
+  }
+});
+
 test("SignUpForm keeps the legal notice between submit and the sign-in link", () => {
   const source = read("src/components/SignUpForm.tsx");
   const submitAt = source.indexOf("Create Account");
