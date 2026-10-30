@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, YStack } from "tamagui";
 import { Text } from "../components/Text.js";
+import { storyImageWide } from "../storyFixtures.js";
 import { ImportReviewPage } from "./ImportReviewPage.js";
 
 const meta: Meta<typeof ImportReviewPage> = {
@@ -58,13 +59,16 @@ export const Ready: Story = {
  * name), and the banner renders above the preview frame. This
  * story exists so the hero-banner re-check in the changeset and
  * docs/manual-tests.md is performable — Ready passes no image.
+ * The image itself is the inline fixture from storyFixtures.ts:
+ * a remote URL raced the VR verify pass (issue #352), so story
+ * images are never fetched over the network.
  */
 export const WithImage: Story = {
   render: () => (
     <Viewport>
       <ImportReviewPage
         versionLabel="v1"
-        imageUrl="https://picsum.photos/seed/import-review/800/400"
+        imageUrl={storyImageWide}
         imageAlt="Creamy Mushroom Stroganoff"
         preview={<PreviewStandIn />}
         busy={false}
