@@ -1,9 +1,9 @@
 import { CheckRow } from "../components/CheckRow.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ListStack } from "../components/ListStack.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
-import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 
 /**
@@ -34,10 +34,10 @@ import { Text } from "../components/Text.js";
  *   keyboard activation — the ChecklistRow pattern with the
  *   MealPlansPage row's keyboard handling).
  *
- * States mirror the app view's swaps: while `isLoading`, a
- * spinner replaces the list (the app renders its branded
- * loader there; the DS Spinner stands in, the RecipeFormPage
- * precedent — the branded loader stays app-side by recorded
+ * States mirror the app view's swaps: while `isLoading`, the
+ * shared ListLoadingState replaces the list (the app renders
+ * its branded loader there; ListLoadingState stands in, the
+ * RecipeFormPage precedent — the branded loader stays app-side by recorded
  * decision); an empty list renders the DS EmptyState with the
  * app's message.
  *
@@ -77,7 +77,7 @@ export function ShoppingListPage({
       <SectionStack>
         <Text variant="title">Shopping list</Text>
         {isLoading ? (
-          <Spinner label="Loading shopping list" />
+          <ListLoadingState label="Loading shopping list" />
         ) : lines.length === 0 ? (
           <EmptyState title="No items on this list." />
         ) : (

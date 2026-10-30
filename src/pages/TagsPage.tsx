@@ -5,9 +5,9 @@ import { CardStack } from "../components/CardStack.js";
 import { ColorPickerField } from "../components/ColorPickerField.js";
 import { CompactCard } from "../components/CompactCard.js";
 import { FieldStack } from "../components/FieldStack.js";
+import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
-import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
@@ -31,9 +31,9 @@ import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
  * action rendered through the shared TextAction (#229), so it
  * is keyboard-focusable and Enter/Space-operable on web; the
  * row card treatment is the app view's, on DS
- * tokens. While `isLoading`, a spinner replaces the list (the
- * DS Spinner stands in for the app's branded loader — the
- * RecipeFormPage precedent).
+ * tokens. While `isLoading`, the shared ListLoadingState
+ * replaces the list (it stands in for the app's branded
+ * loader — the RecipeFormPage precedent).
  *
  * The create form is stacked (#189): the name field takes its
  * own full-width row, and the color swatches and Add button
@@ -156,7 +156,7 @@ export function TagsPage({
           </TrailingActionsRow>
         </FieldStack>
         {isLoading ? (
-          <Spinner label="Loading tags" />
+          <ListLoadingState label="Loading tags" />
         ) : (
           <CardStack>
             {tags.map((tag) =>

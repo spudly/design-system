@@ -1,10 +1,10 @@
 import { Button } from "../components/Button.js";
 import { CardStack } from "../components/CardStack.js";
 import { EmptyState } from "../components/EmptyState.js";
+import { ListLoadingState } from "../components/ListLoadingState.js";
 import { PinnedHeaderShell } from "../components/PinnedHeaderShell.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
-import { Spinner } from "../components/Spinner.js";
 import { Tabs } from "../components/Tabs.js";
 import { Text } from "../components/Text.js";
 import { TextActionCardRow } from "../components/TextActionCardRow.js";
@@ -39,9 +39,10 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * switch is reported as an intent (`onSelectTab`) — the
  * active tab is the screen's state, as today.
  *
- * States mirror the app view's swaps: while `isLoading`, a
- * spinner replaces the active tab's list (the app renders
- * its branded loader there; the DS Spinner stands in — the
+ * States mirror the app view's swaps: while `isLoading`, the
+ * shared ListLoadingState replaces the active tab's list (the
+ * app renders its branded loader there; ListLoadingState
+ * stands in — the
  * branded loader stays app-side by recorded decision); an
  * empty meals list renders the DS EmptyState with the app's
  * message. The plans tab's states are MealPlansPage's own.
@@ -138,7 +139,7 @@ export function MealsHubPage({
           New meal
         </Button>
         {isLoading ? (
-          <Spinner label="Loading meals" />
+          <ListLoadingState label="Loading meals" />
         ) : meals.length === 0 ? (
           <EmptyState title="No meals yet." />
         ) : (

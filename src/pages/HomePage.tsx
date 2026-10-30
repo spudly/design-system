@@ -1,12 +1,11 @@
 import { Fragment, type ReactNode } from "react";
 import { Button } from "../components/Button.js";
 import { ButtonStack } from "../components/ButtonStack.js";
-import { Center } from "../components/Center.js";
 import { CenteredText } from "../components/CenteredText.js";
+import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ListStack } from "../components/ListStack.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
-import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 
 /**
@@ -26,9 +25,9 @@ import { Text } from "../components/Text.js";
  * the audit records its deletion for B6, once the Home list
  * renders DS rows directly. Until then the host renders each
  * row; this page keys the rows by the view-model's `id` and
- * owns the surrounding states: while `isLoading` a spinner
- * replaces the list (the DS Spinner stands in for the app's
- * branded loader — the RecipeFormPage precedent; the branded
+ * owns the surrounding states: while `isLoading` the shared
+ * ListLoadingState replaces the list (it stands in for the
+ * app's branded loader — the RecipeFormPage precedent; the branded
  * loader stays app-side by recorded decision), and an empty
  * list renders the host's empty message.
  *
@@ -102,9 +101,7 @@ export function HomePage({
         </ButtonStack>
         <Text variant="subheading">{recipesTitle}</Text>
         {isLoading ? (
-          <Center horizontal vertical={false}>
-            <Spinner label="Loading recipes" />
-          </Center>
+          <ListLoadingState label="Loading recipes" />
         ) : recipes.length === 0 ? (
           <CenteredText>{emptyMessage}</CenteredText>
         ) : (
