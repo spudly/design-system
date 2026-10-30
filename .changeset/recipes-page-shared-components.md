@@ -1,5 +1,5 @@
 ---
-"@spudly/ui": patch
+"@spudly/ui": minor
 ---
 
 RecipesPage is rebuilt from shared components (the #119 page de-styling tranche for the recipes list), with no visual or behavior change intended: its rows are the new MediaRow component (thumbnail, title/subtitle, and the two link targets with their accessible names), its log-cook control is the new RatingStars component (a rated recipe's stars are the button; an unrated recipe gets the single-star button), and its filter bar is the shared CatalogFiltersBar — the page passes its filter definitions (status, ingredient, calorie and satiety ranges, sort) in as data, and the bar renders the search row, the add-filter chooser, and each added filter's control with its Remove affordance. Its loading states render the shared ListLoadingState directly (first load as the list's empty state, next page as its footer). On a @spudly/ui bump, re-check in Storybook: Pages/Eciperay/RecipesPage (all stories, including the narrow variants and the Shared-with-me configurations) — rows, star controls, the collapsed filter bar with the Filters button exactly as tall as the search field, added filters with their Remove controls, and pagination/loading states must render and behave as before; plus the new component stories: Components/MediaRow, Components/RatingStars.
