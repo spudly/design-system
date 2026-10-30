@@ -137,7 +137,7 @@ export function RecipeIngredientsPanel({ ingredients: view }: RecipeIngredientsP
             : {})}
         />
       ))}
-      {hasMissing ? (
+      {hasMissing && view.onIngredientPress ? (
         <YStack paddingBlockStart="$3">
           <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text>
         </YStack>

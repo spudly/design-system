@@ -1272,13 +1272,15 @@ fixed-shell page composing it, or a changeset naming Toolbar.
 
 ## CandidateList
 
-Open in `Components/CandidateList`: Default, ReadOnly.
+Open in `Components/CandidateList`: Default, Pending,
+ReadOnly.
 
 1. Default: the heading sits over one tinted card per
    candidate, each card carrying the candidate's label and
-   its Activate button; while an activation is pending the
-   buttons disable.
-2. ReadOnly: the cards render their labels with no Activate
+   its Activate button.
+2. Pending: the Activate button renders disabled while the
+   activation is in flight.
+3. ReadOnly: the cards render their labels with no Activate
    button — candidate data alone exposes no dead action.
 
 **Run when:** `src/components/CandidateList.tsx`, its
@@ -1305,15 +1307,16 @@ stories, or a changeset naming LogEntryCard.
 ## NutritionPanel
 
 Open in `Components/NutritionPanel`: Ready, Loading,
-Unavailable.
+Unavailable, UnavailableRefreshing.
 
 1. Ready: the "Per Serving" header with its Refresh action,
    one hairline label/value row per nutrient, and the
    disclaimer in small muted text below.
 2. Loading: a single "Estimating nutrition…" line.
 3. Unavailable: the not-available line with the Estimate
-   nutrition action below it; the action disables while a
-   refresh is in flight.
+   nutrition action below it. UnavailableRefreshing: the
+   action reads "Refreshing…" and renders disabled while
+   the refresh is in flight.
 
 **Run when:** `src/components/NutritionPanel.tsx`, its
 stories, or a changeset naming NutritionPanel.
@@ -1466,7 +1469,9 @@ Open in `Components/StepOverlay`: Default.
 1. The dark overlay fills its frame: title and step eyebrows
    render uppercase and dimmed over the step body in large
    light text, and the translucent Done pill sits at the
-   top right (focusable on web; Enter/Space activate it).
+   top right (focusable on web; Enter/Space activate it —
+   each activation adds to the "Done activated" line under
+   the frame).
 2. The story's dots and Back / Next row render below the
    body, composed by the caller — the shell adds no spacing
    or controls of its own there.

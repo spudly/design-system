@@ -24,14 +24,33 @@ function IngredientsDemo({
 }) {
   const [servings, setServings] = useState(4);
   const [scaleValue, setScaleValue] = useState("1");
+  const [ingredients, setIngredients] = useState(initial.ingredients);
+  const hasMissing = ingredients.some((ingredient) => ingredient.isMissing);
   return (
     <RecipeIngredientsPanel
       ingredients={{
-        ...initial,
         servings,
         onServingsChange: setServings,
         scaleValue,
         onScaleChange: setScaleValue,
+        ingredients,
+        ...(initial.onIngredientPress
+          ? {
+              onIngredientPress: (ingredientId: string) => {
+                setIngredients((current) =>
+                  current.map((ingredient) =>
+                    ingredient.id === ingredientId
+                      ? { ...ingredient, isMissing: !ingredient.isMissing }
+                      : ingredient,
+                  ),
+                );
+              },
+            }
+          : {}),
+        ...(initial.isLoadingSubstitutions
+          ? { isLoadingSubstitutions: initial.isLoadingSubstitutions }
+          : {}),
+        ...(initial.substitutions && hasMissing ? { substitutions: initial.substitutions } : {}),
       }}
     />
   );

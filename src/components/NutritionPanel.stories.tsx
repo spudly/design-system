@@ -45,3 +45,13 @@ export const Unavailable: Story = {
     </YStack>
   ),
 };
+
+export const UnavailableRefreshing: Story = {
+  render: () => (
+    <YStack maxWidth={430}>
+      <NutritionPanel
+        nutrition={{ state: "unavailable", isRefreshing: true, onEstimatePress: () => {} }}
+      />
+    </YStack>
+  ),
+};
