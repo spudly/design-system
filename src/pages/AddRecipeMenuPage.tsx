@@ -1,5 +1,3 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { OptionCard } from "../components/OptionCard.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
@@ -12,6 +10,18 @@ import { Text } from "../components/Text.js";
  * table), so they cross as view-models; each option navigates,
  * so its destination crosses as an href (#248's navigation
  * rule) and the option card renders as a link.
+ *
+ * De-styled for #119: the page renders no layout primitives
+ * and sets no styling props. The title takes Text's `title`
+ * variant: the hand-styled title set the heading variant
+ * plus xl/bold overrides, and the overrides are exactly
+ * what #119 bans in pages, so — as MealPlanDetailPage's
+ * title did in tranche 2 — the size and weight are owned by
+ * the `title` variant (xl bold) instead; rendering and the
+ * #263 level-1 heading semantics are unchanged. The options
+ * render through OptionCard's href form unchanged (the
+ * #248 stage-2 remodel), and the section rhythm is
+ * ScreenContainer's own.
  */
 
 export type AddRecipeMenuPageOption = {
@@ -29,15 +39,7 @@ export type AddRecipeMenuPageProps = {
 export function AddRecipeMenuPage({ options }: AddRecipeMenuPageProps) {
   return (
     <ScreenContainer variant="padded">
-      <YStack paddingBottom="$4">
-        <Text
-          variant="heading"
-          fontSize={tokens.typography.fontSize.xl}
-          fontWeight={tokens.typography.fontWeight.bold}
-        >
-          Add Recipe
-        </Text>
-      </YStack>
+      <Text variant="title">Add Recipe</Text>
       {options.map((option) => (
         <OptionCard
           key={option.href}

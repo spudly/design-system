@@ -1,11 +1,14 @@
 import type { ReactNode } from "react";
-import { ScrollView } from "react-native";
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
+import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
+import { ButtonRow } from "../components/ButtonRow.js";
+import { FormHeading } from "../components/FormHeading.js";
+import { PreviewCard } from "../components/PreviewCard.js";
+import { SessionShell } from "../components/SessionShell.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
+import { TextAction } from "../components/TextAction.js";
+import { tokens } from "../tokens/index.js";
 
 /**
  * AiSessionPage (#126, B3c): the AI session view — the split
@@ -47,6 +50,28 @@ import { Text } from "../components/Text.js";
  * dark text on the terracotta fill was hard to read next to
  * the real primary button. Ghost's label color is Button's
  * dark-aware $link role, readable on the page background.
+ *
+ * De-styled for #119: the shared pieces are the library's —
+ * SessionShell owns the two states' frames (the recessed
+ * background, content padding, and the section rhythm) and the
+ * running state's scrolling; FormHeading owns the title block;
+ * the prompt and follow-up fields take TextAreaField's `xl` /
+ * `lg` height steps instead of a raw minHeight; the start
+ * action grows through Button's `grow` prop. The preview
+ * stage's frame is the library's PreviewCard — the bordered
+ * surface card extracted in #331 from this page's and
+ * ImportReviewPage's identical hand-styled frames — titled by
+ * the config's preview title, with the finalize action as its
+ * actions row. The pieces only this page needs — the
+ * transcript bubbles and the cancel control — are composed
+ * inline below from library primitives rather than added as
+ * new library components: the bubbles are Text in token-inked
+ * stacks, and the cancel control is TextAction (its keyboard
+ * and disabled semantics, which also refuse held-key repeats)
+ * under the muted underlined treatment in a stack that dims
+ * and blocks the pointer while a request is in flight —
+ * replacing the hand-built pressable stack this page used to
+ * carry, including its own keyboard handler.
  */
 
 export type AiSessionPageConfig = {
@@ -118,69 +143,25 @@ export function AiSessionPage({
   onCancel,
   onEmptyCancel,
 }: AiSessionPageProps) {
-  // Web keyboard support (the TextLink/MealPlansPage pattern): the
-  // Cancel control below carries the button role on web, and a div
-  // with a role is not keyboard-operable on its own, so Enter and
-  // Space invoke the same callback as a press. `tabIndex` and
-  // `onKeyDown` are web-only props in Tamagui and are ignored on
-  // native, where onPress is the activation path.
-  // Both activation paths route through one busy-guarded callback:
-  // pointerEvents="none" blocks pointer input while busy, but a
-  // focused control can still receive key events and an assistive-
-  // technology virtual click can still reach onPress.
-  const handleCancel = () => {
-    if (busy) return;
-    onCancel();
-  };
-  const handleCancelKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      handleCancel();
-    }
-  };
   if (!session) {
     return (
-      <YStack
-        flex={1}
-        backgroundColor={tokens.colors.gray.gray1}
-        paddingHorizontal="$4"
-        paddingTop="$4"
-      >
-        <YStack paddingBottom="$2">
-          <Text
-            fontSize={tokens.typography.fontSize["2xl"]}
-            fontWeight={tokens.typography.fontWeight.bold}
-            color={tokens.colors.gray.gray10}
-          >
-            {config.title}
-          </Text>
-        </YStack>
-        <YStack paddingBottom="$6">
-          <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-            {config.intro}
-          </Text>
-        </YStack>
-        <YStack paddingBottom="$4">
-          <TextAreaField
-            value={prompt}
-            onChangeText={onPromptChange}
-            placeholder={config.promptPlaceholder}
-            minHeight={192}
-            textAlignVertical="top"
-          />
-        </YStack>
-        {error ? (
-          <YStack paddingBottom="$4">
-            <Text variant="error">{error}</Text>
-          </YStack>
-        ) : null}
-        <XStack gap="$3">
+      <SessionShell>
+        <FormHeading subtitle={config.intro}>{config.title}</FormHeading>
+        <TextAreaField
+          value={prompt}
+          onChangeText={onPromptChange}
+          placeholder={config.promptPlaceholder}
+          size="xl"
+          textAlignVertical="top"
+        />
+        {error ? <Text variant="error">{error}</Text> : null}
+        <ButtonRow>
           <Button variant="ghost" onPress={onEmptyCancel}>
             Cancel
           </Button>
           <Button
             variant="primary"
-            flex={1}
+            grow
             disabled={busy || !prompt.trim()}
             onPress={() => {
               onStart(prompt);
@@ -188,73 +169,48 @@ export function AiSessionPage({
           >
             {startPending ? config.startPendingLabel : config.startLabel}
           </Button>
-        </XStack>
-      </YStack>
+        </ButtonRow>
+      </SessionShell>
     );
   }
 
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: tokens.colors.gray.gray1 }}
-      contentContainerStyle={{
-        paddingHorizontal: tokens.spacing[4],
-        paddingTop: tokens.spacing[4],
-      }}
-    >
-      <YStack paddingBottom="$2">
-        <Text
-          fontSize={tokens.typography.fontSize["2xl"]}
-          fontWeight={tokens.typography.fontWeight.bold}
-          color={tokens.colors.gray.gray10}
-        >
-          {config.title}
-        </Text>
-      </YStack>
-      <YStack paddingBottom="$4">
-        <Text color="$textMuted" fontSize={tokens.typography.fontSize.sm}>
-          {session.phaseLabel}
-        </Text>
-      </YStack>
-      <YStack gap="$3" paddingBottom="$4">
-        {session.messages.map((message, index) => (
-          <YStack
-            key={index}
-            paddingStart={message.role === "user" ? "$8" : undefined}
-            paddingEnd={message.role === "assistant" ? "$8" : undefined}
-          >
+    <SessionShell scrollable>
+      <FormHeading subtitle={session.phaseLabel}>{config.title}</FormHeading>
+      <YStack gap="$3">
+        {session.messages.map((message, index) => {
+          const own = message.role === "user";
+          return (
             <YStack
-              borderRadius={tokens.radii.md}
-              backgroundColor={
-                message.role === "user" ? tokens.colors.gray.gray2 : "$primarySubtle"
-              }
-              padding="$3"
+              key={index}
+              paddingStart={own ? "$8" : undefined}
+              paddingEnd={own ? undefined : "$8"}
             >
-              <YStack paddingBottom="$1">
-                <Text
-                  fontSize={tokens.typography.fontSize.xs}
-                  fontWeight={tokens.typography.fontWeight.semibold}
-                  color={tokens.colors.gray.gray6}
-                  textTransform="uppercase"
-                >
-                  {message.role === "user" ? "You" : "Plan"}
+              <YStack
+                borderRadius={tokens.radii.md}
+                backgroundColor={own ? tokens.colors.gray.gray2 : "$primarySubtle"}
+                padding="$3"
+              >
+                <YStack paddingBottom="$1">
+                  <Text variant="label">{own ? "You" : "Plan"}</Text>
+                </YStack>
+                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
+                  {message.content}
                 </Text>
               </YStack>
-              <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
-                {message.content}
-              </Text>
             </YStack>
-          </YStack>
-        ))}
+          );
+        })}
       </YStack>
       {session.canRefine ? (
-        <YStack paddingBottom="$4" gap="$3">
+        <>
           <TextAreaField
             value={followUp}
             onChangeText={onFollowUpChange}
             placeholder="Ask for changes to the plan…"
-            minHeight={96}
+            size="lg"
           />
-          <XStack flexWrap="wrap" gap="$2">
+          <ButtonRow>
             <Button
               variant="ghost"
               size="sm"
@@ -268,66 +224,36 @@ export function AiSessionPage({
             <Button variant="primary" size="sm" disabled={busy} onPress={onApprovePlan}>
               {approvePending ? "Building preview…" : "Approve plan"}
             </Button>
-          </XStack>
-        </YStack>
+          </ButtonRow>
+        </>
       ) : null}
       {preview ? (
-        <YStack paddingBottom="$4">
-          <YStack
-            borderRadius={tokens.radii.lg}
-            borderWidth={1}
-            borderColor={tokens.colors.gray.gray3}
-            backgroundColor="$surface"
-            padding="$4"
-          >
-            <YStack paddingBottom="$3">
-              <Text
-                fontSize={tokens.typography.fontSize.sm}
-                fontWeight={tokens.typography.fontWeight.semibold}
-                color={tokens.colors.gray.gray10}
-              >
-                {config.previewTitle}
-              </Text>
-            </YStack>
-            {preview}
-            <YStack paddingTop="$4">
-              <Button variant="primary" disabled={busy} onPress={onFinalize}>
-                {finalizePending ? config.finalizePendingLabel : config.finalizeLabel}
-              </Button>
-            </YStack>
-          </YStack>
-        </YStack>
+        <PreviewCard
+          title={config.previewTitle}
+          actions={
+            <Button variant="primary" disabled={busy} onPress={onFinalize}>
+              {finalizePending ? config.finalizePendingLabel : config.finalizeLabel}
+            </Button>
+          }
+        >
+          {preview}
+        </PreviewCard>
       ) : null}
-      {error ? (
-        <YStack paddingBottom="$4">
-          <Text variant="error">{error}</Text>
-        </YStack>
-      ) : null}
+      {error ? <Text variant="error">{error}</Text> : null}
       {session.canCancel ? (
-        <YStack paddingBottom={tokens.spacing[8]}>
-          <YStack
-            opacity={busy ? 0.5 : 1}
-            pointerEvents={busy ? "none" : "auto"}
-            onPress={handleCancel}
-            {...platformAccessibilityProps({
-              accessibilityRole: "button",
-              accessibilityLabel: "Cancel session",
-              accessibilityState: { disabled: busy },
-            })}
-            tabIndex={0}
-            onKeyDown={handleCancelKeyDown}
-            cursor="web:pointer"
+        <YStack opacity={busy ? 0.5 : 1} pointerEvents={busy ? "none" : "auto"}>
+          <TextAction
+            onPress={onCancel}
+            disabled={busy}
+            accessibilityLabel="Cancel session"
+            fontSize={tokens.typography.fontSize.sm}
+            color={tokens.colors.gray.gray6}
+            textDecorationLine="underline"
           >
-            <Text
-              fontSize={tokens.typography.fontSize.sm}
-              color={tokens.colors.gray.gray6}
-              textDecorationLine="underline"
-            >
-              Cancel session
-            </Text>
-          </YStack>
+            Cancel session
+          </TextAction>
         </YStack>
       ) : null}
-    </ScrollView>
+    </SessionShell>
   );
 }

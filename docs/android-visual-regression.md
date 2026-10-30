@@ -184,8 +184,8 @@ Warm Harvest and `pages-memorize` under Quiet Dawn. Since
 2026-10-24 the set is **light themes only**: dark captures doubled
 the snapshot count (and the job's emulator time) without catching
 layout regressions the light set misses, so the dark baselines were
-deleted outright. With the current story set that is 79 + 23 =
-**102 baselines**. Curating hundreds of component screenshots was
+deleted outright. With the current story set that is 121 + 22 =
+**143 baselines**. Curating hundreds of component screenshots was
 more review surface than the Android check needs; component stories
 stay covered by Chromatic on web, and wrong-brand page captures are
 excluded because pages pin their brand. The rule lives in the
@@ -225,7 +225,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-forgotpasswordpage           | light_warmHarvest |       2 |         2 |
 | pages-eciperay-homepage                     | light_warmHarvest |       3 |         3 |
 | pages-eciperay-importimagepage              | light_warmHarvest |       1 |         1 |
-| pages-eciperay-importreviewpage             | light_warmHarvest |       1 |         1 |
+| pages-eciperay-importreviewpage             | light_warmHarvest |       2 |         2 |
 | pages-eciperay-importtextpage               | light_warmHarvest |       2 |         2 |
 | pages-eciperay-importurlpage                | light_warmHarvest |       2 |         2 |
 | pages-eciperay-landingpage                  | light_warmHarvest |       2 |         2 |
@@ -256,7 +256,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **142** |   **142** |
+| **Total**                                   |                   | **143** |   **143** |
 
 <!-- VR-COVERAGE-END -->
 
@@ -298,7 +298,7 @@ The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
 12 `pages-eciperay-recipespage` stories x light = **12
-baselines** (142 total). RecipesPage only, deliberately — a second
+baselines** (143 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
