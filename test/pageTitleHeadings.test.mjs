@@ -27,7 +27,13 @@
  *    still exposes exactly one level-1 heading. The SSR tests below
  *    count rendered headings per tab (a source-level count cannot
  *    see the nested heading).
- * 5. MealPlanDetailPage is the pinned exception since #119
+ * 5. Section headings sit UNDER the page title (#317): the
+ *    shared SectionHeading component states its heading level
+ *    explicitly — the header role at level 2 on its subheading
+ *    Text — so a detail page's sections are level-2 headings
+ *    beneath the title's level 1, and no page gains a second
+ *    level-1 heading from its sections.
+ * 6. MealPlanDetailPage is the pinned exception since #119
  *    tranche 2: its title was the `heading` variant plus xl/bold
  *    styling overrides — the overrides are exactly what #119 bans
  *    in pages — so the title now takes Text's `title` variant,
@@ -122,6 +128,20 @@ test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 
     text,
     /title: \{\s+fontSize: tokens\.typography\.fontSize\.xl,\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+\}/,
     "Text's title variant must carry the xl/bold treatment the page title rendered with",
+  );
+});
+
+test("SectionHeading is a level-2 heading under the page title (#317)", () => {
+  const code = readCode("src/components/SectionHeading.tsx");
+  assert.match(
+    code,
+    /<Text\s+variant="subheading"\s+accessibilityRole="header"\s+aria-level=\{2\}\s*>/,
+    "SectionHeading must state the header role at level 2 explicitly (#317)",
+  );
+  assert.doesNotMatch(
+    code,
+    /aria-level=\{1\}/,
+    "SectionHeading must never render at level 1 — that is the page title's level (#263)",
   );
 });
 

@@ -43,22 +43,40 @@ function readCode(rel) {
 }
 
 const code = readCode("src/pages/LegalDocumentPage.tsx");
+// The document's prose model and renderer live in the page
+// itself: an earlier #119 tranche cut extracted them as a
+// ProseDocument library component, but Stephen's
+// no-new-components rule for tranche PRs (2026-10-29) folded
+// them back — the page was the only consumer, and its public
+// Legal* type names now define the model directly. The frame
+// stays in the shared DocumentHeader / DocumentFooter. The
+// model and rendering pins below scan the page (`prose` is the
+// page source), the frame pins scan the frame components.
+const prose = code;
+const docHeader = readCode("src/components/DocumentHeader.tsx");
+const docFooter = readCode("src/components/DocumentFooter.tsx");
 
 test("content crosses as structured section/block/span data (#170)", () => {
   for (const spanType of ['"text"', '"strong"', '"code"', '"link"']) {
     assert.ok(
-      code.includes(`type: ${spanType}`),
-      `LegalDocumentSpan must include the ${spanType} span`,
+      prose.includes(`type: ${spanType}`),
+      `the span model must include the ${spanType} span`,
     );
   }
-  assert.match(code, /type: "link"; label: string; href: string/, "link spans carry label + href");
-  assert.match(code, /type: "paragraph"; spans: LegalDocumentSpan\[\]/, "paragraph block shape");
-  assert.match(code, /type: "list"; items: LegalDocumentSpan\[\]\[\]/, "list block shape");
+  assert.match(prose, /type: "link"; label: string; href: string/, "link spans carry label + href");
+  assert.match(prose, /type: "paragraph"; spans: LegalDocumentSpan\[\]/, "paragraph block shape");
+  assert.match(prose, /type: "list"; items: LegalDocumentSpan\[\]\[\]/, "list block shape");
   assert.match(
-    code,
+    prose,
     /LegalDocumentSection = \{\s*title: string;\s*blocks: LegalDocumentBlock\[\];/,
     "section shape",
   );
+  // The page's public names are the #170 contract: the page
+  // defines the model under them directly (no separate renderer
+  // component exists to alias).
+  assert.match(code, /export type LegalDocumentSpan =/, "the page defines the span model");
+  assert.match(code, /export type LegalDocumentBlock =/, "the page defines the block model");
+  assert.match(code, /export type LegalDocumentSection =/, "the page defines the section model");
   // No app JSX crosses the boundary: the props carry no ReactNode.
   const propsAt = code.indexOf("LegalDocumentPageProps = {");
   const propsBlock = code.slice(propsAt, code.indexOf("};", propsAt));
@@ -68,24 +86,35 @@ test("content crosses as structured section/block/span data (#170)", () => {
 test("link spans render as real anchors with the data's href — no press callback (#170)", () => {
   assert.ok(!code.includes("onLinkPress"), "content links must not report through a callback");
   assert.ok(!code.includes("onPress"), "the page has no press intents at all — links carry hrefs");
-  assert.match(code, /<Anchor\s+key=\{key\}\s+href=\{span\.href\}/, "link span renders an Anchor");
+  assert.ok(
+    !prose.includes("onPress"),
+    "the renderer has no press intents either — links carry hrefs",
+  );
+  assert.match(prose, /<Anchor\s+key=\{key\}\s+href=\{span\.href\}/, "link span renders an Anchor");
 });
 
 test("the full public frame renders: brand, sign-in, and footer links as hrefs (#170)", () => {
-  assert.match(code, /href=\{brandHref\}/, "brand wordmark is a link with the brand href");
-  assert.match(code, /href=\{signInHref\}/, "sign-in is a link with the sign-in href");
-  assert.match(code, /footerLinks\.map/, "footer renders the host's footer links");
-  assert.match(code, /href=\{link\.href\}/, "footer links render as anchors with their hrefs");
-  assert.match(code, /<Divider \/>/, "the footer is set off by the frame divider");
+  assert.match(docHeader, /href=\{brandHref\}/, "brand wordmark is a link with the brand href");
+  assert.match(docHeader, /href=\{signInHref\}/, "sign-in is a link with the sign-in href");
+  assert.match(code, /brandHref=\{brandHref\}/, "the page passes its brand href to the header");
+  assert.match(code, /signInHref=\{signInHref\}/, "the page passes its sign-in href to the header");
+  assert.match(
+    code,
+    /links=\{footerLinks\}/,
+    "the page passes the host's footer links to the footer",
+  );
+  assert.match(docFooter, /links\.map/, "footer renders the host's footer links");
+  assert.match(docFooter, /href=\{link\.href\}/, "footer links render as anchors with their hrefs");
+  assert.match(docFooter, /<Divider \/>/, "the footer is set off by the frame divider");
 });
 
 test("the document renders in a prose column; list blocks carry list semantics (#170)", () => {
   // Prose column: title + sections sit in the centered 768px
   // column (the public surfaces' max-w-3xl), not stretched across
   // a wide viewport; ScreenContainer itself has no cap.
-  assert.match(code, /const PROSE_MAX_WIDTH = 768;/, "prose column width is the public 768px");
+  assert.match(prose, /const PROSE_MAX_WIDTH = 768;/, "prose column width is the public 768px");
   assert.match(
-    code,
+    prose,
     /<YStack width="100%" maxWidth=\{PROSE_MAX_WIDTH\} alignSelf="center" gap="\$4">/,
     "title and sections render inside the centered prose column",
   );
@@ -93,12 +122,12 @@ test("the document renders in a prose column; list blocks carry list semantics (
   // each item row the listitem role (platform-split props from
   // components/accessibility — native has no listitem role).
   assert.match(
-    code,
-    /<YStack gap="\$2" \{\.\.\.listRoleProps\}>/,
+    prose,
+    /<YStack key=\{key\} gap="\$2" \{\.\.\.listRoleProps\}>/,
     "list block carries the list role",
   );
   assert.match(
-    code,
+    prose,
     /<XStack key=\{index\} gap="\$2" \{\.\.\.listItemRoleProps\}>/,
     "list items carry the listitem role",
   );

@@ -1,8 +1,7 @@
 import type { ReactNode } from "react";
-import { View, XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { PublicFrameFooter } from "../components/PublicFrameFooter.js";
+import { PublicFrameHeader } from "../components/PublicFrameHeader.js";
+import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
 
 /**
  * PublicPageFrame (#169): the public (signed-out) page chrome as a
@@ -16,10 +15,15 @@ import { TextLink } from "../components/TextLink.js";
  * alike): the DS owns the design — this frame included — and the
  * app owns the content. The frame's copy is therefore DS-owned
  * constants that move with the frame (the copy precedent from
- * RecipeDetailPage), and every navigation leaves through an intent
- * callback: the host routes (brand → home, Sign in → the login
- * route, Privacy/Terms → the legal routes). Nothing here imports
- * an app package or fetches anything.
+ * RecipeDetailPage), while the destinations are the host's.
+ * Navigation leaves as hrefs throughout, per #248's rule: every
+ * control here navigates to another page — the brand wordmark
+ * home, Sign in to the login route, Privacy/Terms to the legal
+ * routes — so each crosses as a real link's href, never as an
+ * intent callback (Stephen's rulings on PR #311 and the #320
+ * dedupe: a control that navigates is a link with an href, and
+ * the footer's legal links are caller-supplied {label, href}
+ * data). Nothing here imports an app package or fetches anything.
  *
  * This is the wide public counterpart to PageFrame (the 430px
  * phone frame the app-page stories render in): the content column
@@ -28,19 +32,29 @@ import { TextLink } from "../components/TextLink.js";
  * same split as the web PublicPageLayout it replaces, whose header
  * and footer sit outside the scrolling document flow.
  *
+ * The composition (#119, deduped in #320): the frame is assembled
+ * from the shared frame components — PublicFrameLayout owns the
+ * shell and the column, PublicFrameHeader / PublicFrameFooter own
+ * the bands and their link treatments, BrandLink owns the
+ * wordmark — and this file keeps what is the frame's own: the
+ * navigation contract (the hrefs) and the DS-owned copy
+ * constants, passed into the bands as data (the footer receives
+ * its legal links as the {label, href} array its contract takes,
+ * built here from the frame's labels and the host's hrefs).
+ *
  * Placement: page components live in src/pages behind the
  * `@spudly/ui/pages` subpath export, not the package root.
  */
 
 export type PublicPageFrameProps = {
-  /** Brand intent: the host navigates to the public home. */
-  onBrandPress: () => void;
-  /** Sign-in intent: the host navigates to the login route. */
-  onSignInPress: () => void;
-  /** Privacy intent: the host navigates to the privacy policy. */
-  onPrivacyPress: () => void;
-  /** Terms intent: the host navigates to the terms of service. */
-  onTermsPress: () => void;
+  /** The brand wordmark's href — the host's home route (the wordmark navigates, so it is a link). */
+  brandHref: string;
+  /** The Sign in link's href — the host's login route. */
+  signInHref: string;
+  /** The Privacy Policy link's href — the host's privacy route. */
+  privacyHref: string;
+  /** The Terms of Service link's href — the host's terms route. */
+  termsHref: string;
   children: ReactNode;
 };
 
@@ -53,98 +67,39 @@ const FOOTER_NOTE = "Recipes shared on Eciperay may be viewed without an account
 const PRIVACY_LABEL = "Privacy Policy";
 const TERMS_LABEL = "Terms of Service";
 
-// The wide public column: the web layout's max-w-3xl.
-const COLUMN_MAX_WIDTH = 768;
-
-/** The brand wordmark: a link-styled pressable that carries the
- * link role and web keyboard activation (Enter), like TextLink,
- * but in the brand treatment (primary ink, semibold, no underline)
- * the web header uses. */
-function BrandLink({ onPress }: { onPress: () => void }) {
-  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
-    if (event.key === "Enter") {
-      event.preventDefault();
-      onPress();
-    }
-  };
-  return (
-    <Text
-      fontSize={tokens.typography.fontSize.lg}
-      fontWeight={tokens.typography.fontWeight.semibold}
-      color="$primary"
-      accessibilityRole="link"
-      accessibilityLabel={BRAND_LABEL}
-      onPress={onPress}
-      tabIndex={0}
-      onKeyDown={handleKeyDown}
-    >
-      {BRAND_LABEL}
-    </Text>
-  );
-}
-
 /**
  * The public chrome: pinned header and footer around the wide
  * centered column the page renders into. Controlled — see the
  * file header for the contract and the ownership split.
  */
 export function PublicPageFrame({
-  onBrandPress,
-  onSignInPress,
-  onPrivacyPress,
-  onTermsPress,
+  brandHref,
+  signInHref,
+  privacyHref,
+  termsHref,
   children,
 }: PublicPageFrameProps) {
   return (
-    <YStack flex={1} backgroundColor="$background">
-      <YStack
-        backgroundColor="$surface"
-        borderBottomWidth={1}
-        borderColor={tokens.colors.gray.gray2}
-      >
-        <XStack
-          width="100%"
-          maxWidth={COLUMN_MAX_WIDTH}
-          alignSelf="center"
-          alignItems="center"
-          justifyContent="space-between"
-          paddingHorizontal="$6"
-          paddingVertical="$4"
-        >
-          <BrandLink onPress={onBrandPress} />
-          <TextLink fontSize={tokens.typography.fontSize.sm} onPress={onSignInPress}>
-            {SIGN_IN_LABEL}
-          </TextLink>
-        </XStack>
-      </YStack>
-      <View flex={1} width="100%" maxWidth={COLUMN_MAX_WIDTH} alignSelf="center">
-        {children}
-      </View>
-      <YStack backgroundColor="$surface" borderTopWidth={1} borderColor={tokens.colors.gray.gray2}>
-        <XStack
-          width="100%"
-          maxWidth={COLUMN_MAX_WIDTH}
-          alignSelf="center"
-          flexWrap="wrap"
-          alignItems="center"
-          justifyContent="space-between"
-          gap="$3"
-          paddingHorizontal="$6"
-          paddingVertical="$4"
-        >
-          <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray6}>
-            {FOOTER_NOTE}
-          </Text>
-          <XStack flexWrap="wrap" gap="$4">
-            <TextLink fontSize={tokens.typography.fontSize.sm} onPress={onPrivacyPress}>
-              {PRIVACY_LABEL}
-            </TextLink>
-            <TextLink fontSize={tokens.typography.fontSize.sm} onPress={onTermsPress}>
-              {TERMS_LABEL}
-            </TextLink>
-          </XStack>
-        </XStack>
-      </YStack>
-    </YStack>
+    <PublicFrameLayout
+      header={
+        <PublicFrameHeader
+          brandLabel={BRAND_LABEL}
+          brandHref={brandHref}
+          signInLabel={SIGN_IN_LABEL}
+          signInHref={signInHref}
+        />
+      }
+      footer={
+        <PublicFrameFooter
+          note={FOOTER_NOTE}
+          links={[
+            { label: PRIVACY_LABEL, href: privacyHref },
+            { label: TERMS_LABEL, href: termsHref },
+          ]}
+        />
+      }
+    >
+      {children}
+    </PublicFrameLayout>
   );
 }
