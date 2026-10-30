@@ -52,6 +52,53 @@ export async function waitForLog(needle, timeoutMs) {
   return false;
 }
 
+// Parse the story index out of a logcat dump: one
+// `DSVR INDEX_ITEM <storyId>` line per story, deduped while
+// preserving order (the boot log can repeat on relaunch).
+export function parseStoryIndex(logs) {
+  const items = [...logs.matchAll(/DSVR INDEX_ITEM (\S+)/g)].map((m) => ({ id: m[1] }));
+  return [...new Map(items.map((s) => [s.id, s])).values()];
+}
+
+// Launch the host app and read the story index it logs at boot
+// (`DSVR INDEX_END` marks the end of the index). Bounded retry
+// (issue #352): when the index never arrives — the observed
+// cause is the emulator killing the app process during a cold
+// boot — relaunch ONCE and wait again before giving up, so a
+// single dead launch cannot fail the whole run. Returns the
+// parsed story list, or null when no attempt produced an index.
+export async function launchAndReadStoryIndex(config) {
+  const pkg = config.packageName;
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    // Fresh app start; the app writes its story index at boot.
+    await adb("shell", "am", "force-stop", pkg).catch(() => {
+      // Best effort: the app may not be running yet.
+    });
+    await adb("logcat", "-c").catch(() => {
+      // Best effort: clearing the log must not abort the run.
+    });
+    await adb(
+      "shell",
+      "am",
+      "start",
+      "-a",
+      "android.intent.action.MAIN",
+      "-c",
+      "android.intent.category.LAUNCHER",
+      "-n",
+      `${pkg}/.MainActivity`,
+    );
+    const indexReady = await waitForLog("DSVR INDEX_END", config.indexTimeoutMs);
+    if (indexReady) return parseStoryIndex(await logcatDump());
+    if (attempt < 2) {
+      console.error(
+        "WARN: app did not report its story index (DSVR INDEX_END) in time; relaunching once (issue #352)",
+      );
+    }
+  }
+  return null;
+}
+
 // Leave evidence for the next diagnosis when the app does not
 // report its story index in time: is the app process even alive,
 // what did it log last (any tag), and what is on screen?

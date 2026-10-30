@@ -85,7 +85,9 @@ For a native build instead of Expo Go-style loading:
   `DSVR INDEX_ITEM <storyId>` per story, `DSVR INDEX_END`.
 
 The driver (`run.mjs`) force-stops and launches the app, reads the
-index, then for each theme × story: sends the capture deep link,
+index (one relaunch if the index never arrives — an emulator
+app-process death at boot must not fail the whole run, issue #352),
+then for each theme × story: sends the capture deep link,
 waits for the READY line with the matching nonce, settles, and
 captures the frame. By default the frame is **app-drawn**: the deep
 link carries `&appcapture=1`, the app draws the story's full

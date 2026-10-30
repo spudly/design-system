@@ -17,7 +17,7 @@ import {
   adb,
   adbBuffer,
   captureFailureEvidence,
-  logcatDump,
+  launchAndReadStoryIndex,
   sleep,
   waitForLog,
 } from "./device.mjs";
@@ -26,34 +26,15 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
   await adb("wait-for-device");
   const pkg = config.packageName;
 
-  // Fresh app start; the app writes its story index at boot.
-  await adb("shell", "am", "force-stop", pkg).catch(() => {
-    // Best effort: the app may not be running yet.
-  });
-  await adb("logcat", "-c").catch(() => {
-    // Best effort: clearing the log must not abort the run.
-  });
-  await adb(
-    "shell",
-    "am",
-    "start",
-    "-a",
-    "android.intent.action.MAIN",
-    "-c",
-    "android.intent.category.LAUNCHER",
-    "-n",
-    `${pkg}/.MainActivity`,
-  );
-  const indexReady = await waitForLog("DSVR INDEX_END", config.indexTimeoutMs);
-  if (!indexReady) {
+  // Fresh app start; the app writes its story index at boot. The
+  // launch gets one relaunch when the index never arrives (issue
+  // #352 — see launchAndReadStoryIndex in device.mjs).
+  let stories = await launchAndReadStoryIndex(config);
+  if (!stories) {
     console.error("FAIL: app did not report its story index (DSVR INDEX_END) in time");
     await captureFailureEvidence(pkg, config.outDir);
     return 1;
   }
-  const logs = await logcatDump();
-  let stories = [...logs.matchAll(/DSVR INDEX_ITEM (\S+)/g)].map((m) => ({ id: m[1] }));
-  // Dedupe while preserving order (the boot log can repeat on relaunch).
-  stories = [...new Map(stories.map((s) => [s.id, s])).values()];
   if (stories.length === 0) {
     console.error("FAIL: story index was empty");
     return 1;
