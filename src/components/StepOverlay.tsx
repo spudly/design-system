@@ -25,14 +25,19 @@ export type StepOverlayProps = {
   children?: ReactNode;
 };
 
-// The scroll region's content grows to at least the region's
-// own height (#332): the column inside can then keep the
-// vertically centered treatment for short bodies, while a
-// taller column overflows the grown container and scrolls.
-// (The shared ScrollRegion cannot be used here — it exposes
-// no way to grow its content container, and the centered
-// treatment depends on it.)
-const scrollContentContainerStyle = { flexGrow: 1 } as const;
+// The scroll region's content container grows to at least
+// the region's own height and centers its column (#332):
+// short bodies keep the vertically centered treatment, while
+// a taller column overflows the grown container and scrolls.
+// The centering lives on the container, not on a flexed
+// child — the ScrollRegion pattern; a flex={1} child makes
+// the native ScrollView size its content to the child's full
+// height and paint it past the region's bounds (the Android
+// VR LongBody capture on the first #332 head showed exactly
+// that). (The shared ScrollRegion cannot be used here — it
+// exposes no way to grow its content container, and the
+// centered treatment depends on it.)
+const scrollContentContainerStyle = { flexGrow: 1, justifyContent: "center" } as const;
 
 /**
  * A full-screen step-reader overlay (#119): a dark, opaque
@@ -185,7 +190,7 @@ export function StepOverlay({
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={scrollContentContainerStyle}
       >
-        <YStack flex={1} justifyContent="center" paddingHorizontal="$6" paddingVertical="$12">
+        <YStack paddingHorizontal="$6" paddingVertical="$12">
           <YStack paddingBlockEnd="$2">
             <Text
               fontSize={tokens.typography.fontSize.sm}

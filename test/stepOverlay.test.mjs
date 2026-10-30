@@ -52,8 +52,11 @@ test("the body and navigation scroll in a bounded region; short bodies stay cent
   assert.match(code, /<ScrollView\s+flex=\{1\}/);
   assert.match(code, /keyboardShouldPersistTaps="handled"/);
   assert.match(code, /contentContainerStyle=\{scrollContentContainerStyle\}/);
-  assert.match(code, /const scrollContentContainerStyle = \{ flexGrow: 1 \} as const;/);
-  assert.match(code, /justifyContent="center"/);
+  assert.match(
+    code,
+    /const scrollContentContainerStyle = \{ flexGrow: 1, justifyContent: "center" \} as const;/,
+  );
+  assert.match(code, /<YStack paddingHorizontal="\$6" paddingVertical="\$12">/);
   assert.match(code, /paddingHorizontal="\$6"/);
   // The Done pill is NOT inside the scroll region: it renders
   // after the region closes, a fixed sibling of it, so it stays
