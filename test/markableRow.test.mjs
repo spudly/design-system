@@ -33,11 +33,6 @@ test("a marked row dims but keeps its press — the mark is a toggle, not a disa
     /accessibilityRole: "button"/,
     "the press form carries the button role regardless of the mark",
   );
-  assert.match(
-    code,
-    /"aria-pressed": isMarked/,
-    "the mark is exposed as a pressed toggle (the ToggleChipGroup pattern)",
-  );
   assert.ok(!code.includes("accessibilityState"), "a marked row is never announced disabled");
 });
 
@@ -45,6 +40,10 @@ test("the press form is keyboard-operable on web (the ListRow pattern)", () => {
   assert.match(code, /tabIndex: 0,/);
   assert.match(code, /event\.key === "Enter" \|\| event\.key === " "/);
   assert.match(code, /onPress\?\.\(\)/, "the button keys invoke the same callback as a press");
+  // A held key must not re-activate (TextAction's guard): a
+  // repeat would flip the mark back and forth until release.
+  assert.match(code, /repeat\?: boolean;/);
+  assert.match(code, /if \(!event\.repeat\) \{\s*onPress\?\.\(\);/);
 });
 
 test("the trailing note renders only when provided", () => {

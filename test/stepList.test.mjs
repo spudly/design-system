@@ -34,11 +34,7 @@ test("the list owns the active step, first step active by default", () => {
     /borderColor=\{isActive \? "\$primary" : tokens\.colors\.gray\.gray2\}/,
     "the active card takes the primary treatment",
   );
-  assert.match(
-    code,
-    /aria-pressed=\{isActive\}/,
-    "the active step is exposed as a pressed toggle (aria-selected is invalid on a button role)",
-  );
+  assert.match(code, /accessibilityState: \{ selected: isActive \}/);
 });
 
 test("step activation is keyboard-operable on web (the ListRow pattern)", () => {

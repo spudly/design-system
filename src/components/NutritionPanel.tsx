@@ -61,21 +61,19 @@ function NutritionRow({ label, valueLabel }: NutritionPanelRow) {
  * header with an optional Refresh action, one hairline
  * label/value row per nutrient, and the disclaimer). Extracted
  * from RecipeDetailPage's nutrition section; the panel owns its
- * inset and internal rhythm outright, and the row values are
- * caller-supplied pre-composed strings, so the panel serves
+ * internal rhythm outright, while the inset belongs to the
+ * composing section stack (the panel renders flush, the same
+ * rule the canonical SectionHeading follows). The row values
+ * are caller-supplied pre-composed strings, so the panel serves
  * any app's nutrition displays.
  */
 export function NutritionPanel({ nutrition }: NutritionPanelProps) {
   if (nutrition.state === "loading") {
-    return (
-      <Text color="$textMuted" padding="$4">
-        Estimating nutrition…
-      </Text>
-    );
+    return <Text color="$textMuted">Estimating nutrition…</Text>;
   }
   if (nutrition.state === "unavailable") {
     return (
-      <YStack padding="$4">
+      <YStack>
         <YStack paddingBlockEnd="$3">
           <Text color="$textMuted">Nutrition is not available yet.</Text>
         </YStack>
@@ -94,7 +92,7 @@ export function NutritionPanel({ nutrition }: NutritionPanelProps) {
     );
   }
   return (
-    <YStack padding="$4">
+    <YStack>
       <XStack paddingBlockEnd="$3" alignItems="center" justifyContent="space-between" gap="$3">
         <Text
           fontSize={tokens.typography.fontSize.sm}

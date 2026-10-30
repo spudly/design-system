@@ -20,24 +20,26 @@
  *    the custom sheet widget had.
  * 4. The sections render in the order the tabs had (overview,
  *    ingredients, instructions, cook history, nutrition), each
- *    section after the overview under its own heading with the
- *    tab's label; the tab state is gone from the contract. The
- *    scale option set moved with the page as a DS-owned constant
- *    with the app's keys and labels.
+ *    section panel opening with its own heading carrying the
+ *    tab's label (the canonical SectionHeading carries no
+ *    padding, so the heading renders inside its panel, whose
+ *    inset it takes); the tab state is gone from the contract.
+ *    The scale option set moved with the page as a DS-owned
+ *    constant with the app's keys and labels.
  * 5. The three render slots sit at the positions the app panels
  *    occupy today: the cook-log form replaces the "Log a cook"
  *    button while it renders content; sharing renders after the
  *    lifecycle section and before the tags; comments render in
  *    the overview panel after the ratings card.
  * 6. Optional content is omitted cleanly: no image, description,
- *    prep/cook stats, edit chips, lifecycle section, substitutions
- *    panel, or ratings card appears unless its data/callback is
- *    provided (no placeholder shells).
+ *    prep/cook stats, edit actions, lifecycle section,
+ *    substitutions panel, or ratings card appears unless its
+ *    data/callback is provided (no placeholder shells).
  * 7. No explicit lineHeight anywhere (the #162 rule).
  * 8. Stories exercise the states and the cook-log form slot, so
  *    Chromatic captures them.
- * 9. The print/share chips render the icons module's PrintIcon /
- *    ShareIcon (#187) through ActionChip's icon slot — no emoji
+ * 9. The print/share buttons render the icons module's PrintIcon /
+ *    ShareIcon (#187) through Button's icon slot — no emoji
  *    or text glyphs, no hand-drawn glyph components.
  *
  * The #119 de-styling pass (recipes-detail tranche) rebuilt the
@@ -45,9 +47,10 @@
  * about a widget's internals moved with the widget into its own
  * contract test (the Activate conditional to candidateList, the
  * nutrition union to nutritionPanel, the tag Badge form to
- * tagList, the custom-scale chip to pageWebAria's
- * EditableChipGroup pins). The pins below hold the page-level
- * contract: composition, ordering, slots, and pass-throughs.
+ * tagList, the preset-or-custom scale selector to
+ * pageWebAria's PresetValueSelector pins). The pins below hold
+ * the page-level contract: composition, ordering, slots, and
+ * pass-throughs.
  *
  * This is a source scan, not a render test, for the same reason as
  * test/recipesPageAccessory.test.mjs: the repo has no JS
@@ -139,13 +142,20 @@ test("there are no tabs: every section renders in one scroll, in tab order, unde
     !index.includes("RecipeDetailPageTab"),
     "the pages index must not export the removed tab type",
   );
+  // First-occurrence order pins both orderings at once: the
+  // panels render in tab order in the page body, and each
+  // section's heading sits inside its own panel (the canonical
+  // SectionHeading carries no padding of its own, so it renders
+  // inside the PanelStack whose inset it takes — the panel
+  // definitions precede the page body, and Nutrition's section
+  // stack is composed in the body, its heading before the panel).
   const sequence = [
-    "<OverviewPanel",
     "<SectionHeading>Ingredients</SectionHeading>",
-    "<IngredientsPanel",
     "<SectionHeading>Instructions</SectionHeading>",
-    "<InstructionsPanel",
     "<SectionHeading>Cook History</SectionHeading>",
+    "<OverviewPanel",
+    "<IngredientsPanel",
+    "<InstructionsPanel",
     "<HistoryPanel",
     "<SectionHeading>Nutrition</SectionHeading>",
     "<NutritionPanel",
@@ -153,10 +163,7 @@ test("there are no tabs: every section renders in one scroll, in tab order, unde
   let lastAt = -1;
   for (const marker of sequence) {
     const at = code.indexOf(marker);
-    assert.ok(
-      at > lastAt,
-      `sections must render in tab order: ${marker} after the previous section`,
-    );
+    assert.ok(at > lastAt, `${marker} must render after the previous marker`);
     lastAt = at;
   }
 });
@@ -276,8 +283,8 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
     /\{cookTimeLabel \? <StatCard label="Cook"/,
     "the Cook stat renders only with a cook time",
   );
-  assert.match(code, /\{editHref \? <ActionChip href=\{editHref\}>Edit<\/ActionChip>/);
-  assert.match(code, /\{editDraftHref \? <ActionChip href/, "Edit draft needs its href");
+  assert.match(code, /\{editHref \? \(\s*<Button[^>]*href=\{editHref\}/, "Edit is href-gated");
+  assert.match(code, /\{editDraftHref \? \(\s*<Button[^>]*href=\{editDraftHref\}/, "Edit draft");
   assert.match(
     code,
     /lifecycle\.isEditable \|\| lifecycle\.candidates\.length > 0/,
@@ -387,7 +394,7 @@ test("stories exercise the states and the cook-log form slot", () => {
 test("print/share render the icons module's Feather icons, not text glyphs (#187)", () => {
   for (const name of ["PrintIcon", "ShareIcon"]) {
     assert.match(code, new RegExp(String.raw`import \{ ${name} \} from "\.\./icons/${name}\.js";`));
-    assert.match(code, new RegExp(String.raw`icon=\{${name}\}`), "the chip's icon slot");
+    assert.match(code, new RegExp(String.raw`icon=\{${name}\}`), "the button's icon slot");
   }
   assert.ok(!code.includes("🖨") && !code.includes("↗"), "no emoji/text glyph button labels");
   assert.ok(!code.includes("PrinterGlyph") && !code.includes("ShareGlyph"), "no hand-drawn glyphs");

@@ -6,7 +6,7 @@
  * The pins hold the #211 contract: tags render through Badge's
  * color form (the name-typed color, resolved by Badge — never a
  * re-implemented tint or a raw hex at the call site), one badge
- * per tag in the caller's order, in a wrapping chip row.
+ * per tag in the caller's order, in a wrapping row.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -28,7 +28,8 @@ test("tags render through Badge's color form, one per tag", () => {
   assert.match(code, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/);
   assert.match(code, /\{tag\.name\}/, "the badge label is the tag's name");
   assert.match(code, /tags\.map\(\(tag\) =>/, "one badge per tag, in order");
-  assert.match(code, /<ChipRow>/, "the badges flow in a chip row");
+  assert.match(code, /<StyledTagRow>/, "the badges flow in the list's wrapping row");
+  assert.ok(!code.includes("ChipRow"), "the retired ChipRow must not come back");
   assert.match(code, /color: TagColorName;/, "the color is a strictly-typed tag color name");
   assert.ok(!code.includes("{tag.color}22"), "the list must not re-implement the tag tint inline");
 });

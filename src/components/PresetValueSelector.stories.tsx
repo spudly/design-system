@@ -1,15 +1,15 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { EditableChipGroup } from "./EditableChipGroup.js";
+import { PresetValueSelector } from "./PresetValueSelector.js";
 
-const meta: Meta<typeof EditableChipGroup> = {
-  title: "Components/EditableChipGroup",
-  component: EditableChipGroup,
+const meta: Meta<typeof PresetValueSelector> = {
+  title: "Components/PresetValueSelector",
+  component: PresetValueSelector,
 };
 
 export default meta;
-type Story = StoryObj<typeof EditableChipGroup>;
+type Story = StoryObj<typeof PresetValueSelector>;
 
 const SCALE_OPTIONS = [
   { value: "0.5", label: "½×" },
@@ -23,7 +23,7 @@ export const Default: Story = {
     const [value, setValue] = useState("1");
     return (
       <YStack maxWidth={430} padding="$4">
-        <EditableChipGroup
+        <PresetValueSelector
           label="Scale"
           options={SCALE_OPTIONS}
           value={value}
@@ -42,7 +42,7 @@ export const CustomSelected: Story = {
     const [value, setValue] = useState("2.5");
     return (
       <YStack maxWidth={430} padding="$4">
-        <EditableChipGroup
+        <PresetValueSelector
           label="Scale"
           options={SCALE_OPTIONS}
           value={value}

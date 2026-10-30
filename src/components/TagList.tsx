@@ -1,6 +1,15 @@
+import { XStack, styled } from "tamagui";
 import type { TagColorName } from "../themes/tagColors.js";
+import { tokens } from "../tokens/index.js";
 import { Badge } from "./Badge.js";
-import { ChipRow } from "./ChipRow.js";
+
+const StyledTagRow = styled(XStack, {
+  name: "TagListRow",
+
+  flexWrap: "wrap",
+  gap: tokens.spacing[2],
+  alignItems: "flex-start",
+});
 
 export type TagListTag = {
   /** Stable key for the tag. */
@@ -23,20 +32,23 @@ export type TagListProps = {
 
 /**
  * A display list of tags (#119): one Badge per tag in a wrapping
- * ChipRow, each badge in its tag color (#211's color form — the
+ * row, each badge in its tag color (#211's color form — the
  * tint is Badge's own resolution, never re-implemented at the
  * call site). Extracted from RecipeDetailPage's tag row; the
  * list owns the row's rhythm, and its separation from
- * surrounding content is the parent stack's.
+ * surrounding content is the parent stack's. These badges are
+ * display-only (no press handler is passed); Badge's selectable
+ * form is what tag pickers render — a tag is a Badge in both
+ * forms.
  */
 export function TagList({ tags }: TagListProps) {
   return (
-    <ChipRow>
+    <StyledTagRow>
       {tags.map((tag) => (
         <Badge key={tag.id} color={tag.color}>
           {tag.name}
         </Badge>
       ))}
-    </ChipRow>
+    </StyledTagRow>
   );
 }

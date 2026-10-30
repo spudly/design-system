@@ -1,34 +1,28 @@
-import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
 export type SectionHeadingProps = {
-  /** The heading's label. */
+  /** The section's heading text. */
   children: string;
 };
 
 /**
- * A bare section heading (#119): the label a single-scroll
- * detail page scans by — one section's name standing over its
- * panel, at the panel's horizontal inset, with the heading's
- * own offset above it (the separation from the previous panel
- * is the heading's trait, as a SectionCard's title spacing is
- * the card's). Extracted from RecipeDetailPage's section
- * headings, which PublicRecipePage renders identically; the
- * heading owns its treatment (large, semibold) outright, so
- * pages pass only the label.
+ * A detail page's section heading (#119 dedupe): the heading
+ * that opens a section of a detail page — a recipe's
+ * Ingredients, its Instructions, a profile's sections.
+ *
+ * The canonical treatment is Text's `subheading` variant and
+ * nothing else (Stephen's ruling on the #119 dedupe,
+ * 2026-10-29): the two recipe tranches had shipped two
+ * different headings under this name — an extracted block
+ * carrying a large semibold treatment with its inset and top
+ * offset baked in, and a bare subheading Text — and the bare
+ * subheading is the form that survives. There is deliberately
+ * NO padding here: separation and inset are the parent's (a
+ * panel's padding, a stack's gap), the same parent-owns-spacing
+ * rule that removed the padded offsets from the list states —
+ * a heading that carries its own offset is a margin by another
+ * name.
  */
 export function SectionHeading({ children }: SectionHeadingProps) {
-  return (
-    <YStack paddingBlockStart="$2">
-      <Text
-        paddingHorizontal="$4"
-        fontSize={tokens.typography.fontSize.lg}
-        fontWeight={tokens.typography.fontWeight.semibold}
-        color={tokens.colors.gray.gray10}
-      >
-        {children}
-      </Text>
-    </YStack>
-  );
+  return <Text variant="subheading">{children}</Text>;
 }

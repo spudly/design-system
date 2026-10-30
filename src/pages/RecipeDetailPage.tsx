@@ -1,14 +1,11 @@
 import { useMemo, type ReactNode } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
-import { ActionChip } from "../components/ActionChip.js";
-import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
 import { CandidateList } from "../components/CandidateList.js";
 import { CardStack } from "../components/CardStack.js";
 import { Center } from "../components/Center.js";
-import { ChipRow } from "../components/ChipRow.js";
-import { EditableChipGroup } from "../components/EditableChipGroup.js";
+import { CenteredText } from "../components/CenteredText.js";
 import { ListStack } from "../components/ListStack.js";
 import { LoadingGate } from "../components/LoadingGate.js";
 import { LogEntryCard } from "../components/LogEntryCard.js";
@@ -20,6 +17,7 @@ import {
 } from "../components/NutritionPanel.js";
 import { NumberStepper } from "../components/NumberStepper.js";
 import { PanelStack } from "../components/PanelStack.js";
+import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
 import {
   RatingsCard,
   type RatingsCardCommunityRating,
@@ -33,14 +31,13 @@ import { SelectField } from "../components/SelectField.js";
 import { Spinner } from "../components/Spinner.js";
 import { StatBand } from "../components/StatBand.js";
 import { StatCard } from "../components/StatCard.js";
-import { StatusMessage } from "../components/StatusMessage.js";
+import { StatusBadge, type StatusBadgeTone } from "../components/StatusBadge.js";
 import { StepList } from "../components/StepList.js";
 import { SuggestionPanel } from "../components/SuggestionPanel.js";
 import { TagList } from "../components/TagList.js";
 import { Text } from "../components/Text.js";
 import { Thumbnail } from "../components/Thumbnail.js";
 import { Toolbar } from "../components/Toolbar.js";
-import { type ToggleChipOption } from "../components/ToggleChipGroup.js";
 import { PrintIcon } from "../icons/PrintIcon.js";
 import { ShareIcon } from "../icons/ShareIcon.js";
 
@@ -104,7 +101,7 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  * the app components they replace: the instructions section's
  * active step lives in StepList (the app's InstructionsTab holds
  * it in useState), and the scale row's custom-value editing lives
- * in EditableChipGroup. Neither is business state. The version
+ * in PresetValueSelector. Neither is business state. The version
  * picker is the standard SelectField (#72 — it replaced a custom
  * bottom-sheet widget whose options appeared at the bottom of the
  * screen, unlike every other select in the system); its open/close
@@ -116,19 +113,24 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  * chrome over a ScrollRegion, PanelStack panels, and the widgets
  * extracted from this page's clusters (RatingsCard, NutritionPanel,
  * CandidateList, LogEntryCard, StepList, MarkableRow,
- * EditableChipGroup, SuggestionPanel, SectionHeading, StatusMessage)
- * — passing data and callbacks only. The pass is a refactor, not a
- * redesign; the treatment normalizations it makes are the
- * design system's canonical ones, each small and deliberate:
+ * PresetValueSelector, SuggestionPanel, SectionHeading, CenteredText)
+ * — passing data and callbacks only. The widgets the pass first
+ * extracted as this page's local copies shipped as the shared
+ * components in the #119 dedupe (#320), and the page now composes
+ * those; the chip components the first extraction leaned on were
+ * retired there, so the page's chip-shaped actions render as
+ * Buttons. The pass is a refactor, not a redesign; the treatment
+ * normalizations it makes are the design system's canonical ones,
+ * each small and deliberate:
  * - The description renders through Text's body variant (theme
  *   foreground ink; it was a fixed gray step).
- * - The overview Delete and the lifecycle Abandon actions adopt
- *   ActionChip's canonical danger pair (danger1 fill / danger8
- *   ink; they rendered danger7 ink and a danger2/danger9 pair).
- * - The print/share chips take ActionChip's square md target
- *   (48px; they were a 48×40 Button with the glyph as a child —
- *   the glyph now crosses as the chip's icon slot, at the same
- *   24px in the same gray8 ink).
+ * - The overview Delete and the lifecycle Abandon actions render
+ *   as danger-variant Buttons (they rendered danger7 ink and a
+ *   danger2/danger9 pair).
+ * - The print/share actions take Button's square icon-only md
+ *   target (48px; they were a 48×40 Button with the glyph as a
+ *   child — the glyph now crosses as the button's icon slot, in
+ *   the button's own label ink at its standard glyph size).
  * - The single-version picker's static text takes the hint
  *   treatment (it was xs muted text).
  * - Panel block separations are PanelStack's 16px rhythm: the
@@ -336,9 +338,10 @@ export type RecipeDetailPageNutritionProps = NutritionPanelData;
 
 export type RecipeDetailPageReadyProps = {
   state: "ready";
-  /** Recipe status as a plain string; the badge label/tone map
-   * below is DS-owned. Unknown values fall back to "idea", as the
-   * app's status normalizer does. */
+  /** Recipe status as a plain string; the page maps it to the
+   * shared StatusBadge's tone/label below as caller data (the
+   * design system owns no status vocabulary). Unknown values
+   * fall back to "idea", as the app's status normalizer does. */
   status: string;
   versions: RecipeDetailPageVersion[];
   selectedVersionId: string;
@@ -360,10 +363,10 @@ export type RecipeDetailPageProps = { state: "loading" } | RecipeDetailPageReady
 // Status badge map: labels and tones for the app's four statuses
 // (idea → neutral gray, evolving → info blue, perfected → success
 // green, abandoned → danger red, matching the app's badge tints).
-const STATUS_BADGES: Record<
-  string,
-  { label: string; tone: "neutral" | "info" | "success" | "danger" }
-> = {
+// The vocabulary is this page's caller data — the shared
+// StatusBadge takes tone + label and owns only the rendering
+// (Stephen's #119 dedupe ruling: no DS-owned status vocabulary).
+const STATUS_BADGES: Record<string, { label: string; tone: StatusBadgeTone }> = {
   idea: { label: "Idea", tone: "neutral" },
   evolving: { label: "Evolving", tone: "info" },
   perfected: { label: "Perfected", tone: "success" },
@@ -372,21 +375,22 @@ const STATUS_BADGES: Record<
 
 // Scale multipliers from the app's scaling constants; labels are
 // presentation, the servings math stays app-side.
-const SCALE_OPTIONS: ToggleChipOption[] = [
+const SCALE_OPTIONS: PresetValueOption[] = [
   { value: "0.5", label: "½×" },
   { value: "1", label: "1×" },
   { value: "2", label: "2×" },
   { value: "3", label: "3×" },
 ];
 
-// The custom scale chip's resting label (#73): beside the presets,
-// one more chip that turns into a number input when pressed, so any
-// scale beyond the presets (4× and up, or a fraction like 2.5×) is
-// directly enterable. Once a custom value applies, the chip shows
-// that value ("4×") selected instead of this label.
+// The scale selector's custom resting label (#73): beside the
+// presets, one more option that turns into a number input when
+// pressed, so any scale beyond the presets (4× and up, or a
+// fraction like 2.5×) is directly enterable. Once a custom value
+// applies, the option shows that value ("4×") selected instead of
+// this label.
 const CUSTOM_SCALE_LABEL = "Custom";
 
-/** A scale value as the custom chip shows it: the number without
+/** A scale value as the custom option shows it: the number without
  * trailing zeros ("2.50" → "2.5"); non-numeric values pass through. */
 function formatScaleValue(value: string): string {
   const parsed = Number(value);
@@ -403,9 +407,9 @@ const MISSING_INGREDIENTS_HINT =
 // region).
 // ---------------------------------------------------------------------------
 
-function StatusBadge({ status }: { status: string }) {
+function RecipeStatusBadge({ status }: { status: string }) {
   const badge = STATUS_BADGES[status] ?? STATUS_BADGES.idea;
-  return <Badge tone={badge?.tone ?? "neutral"}>{badge?.label ?? "Idea"}</Badge>;
+  return <StatusBadge tone={badge?.tone ?? "neutral"} label={badge?.label ?? "Idea"} />;
 }
 
 // The version picker is the standard SelectField (#72): the same
@@ -450,14 +454,18 @@ function VersionPicker({
 // ---------------------------------------------------------------------------
 
 /**
- * The lifecycle block of the overview: the tweak / status action
- * chips of an editable version, over the activation candidates.
- * Both blocks are design-system compositions (a ChipRow of
- * ActionChips, a CandidateList); their separation — and theirs
- * from the blocks around them — is the overview PanelStack's gap.
+ * The lifecycle block of the overview: the tweak / status actions
+ * of an editable version, over the activation candidates. Both
+ * blocks are design-system compositions (a ButtonRow of Buttons,
+ * a CandidateList); their separation — and theirs from the blocks
+ * around them — is the overview PanelStack's gap. The actions
+ * were chips in the page's first extraction; the #119 dedupe
+ * retired the chip components (buttons everywhere), so they
+ * render as small Buttons — "Mark perfected" in the neutral
+ * secondary form, as Button carries no success variant.
  *
  * The tweak controls split on the #248 ruling: "Tweak with AI"
- * navigates, so it is the primary chip's href form; "Tweak
+ * navigates, so it is the primary button's href form; "Tweak
  * manually" is exempt — its primary job is the mutation (create
  * the draft, then open the editor), so it stays a callback and
  * the host does not pre-create drafts.
@@ -480,40 +488,43 @@ function LifecycleSection({
   return (
     <>
       {lifecycle.isEditable ? (
-        <ChipRow>
+        <ButtonRow>
           {onTweakManuallyPress ? (
-            <ActionChip
-              tone="outline"
+            <Button
+              variant="secondary"
+              size="sm"
               disabled={lifecycle.isTweakPending ?? false}
               onPress={onTweakManuallyPress}
             >
               Tweak manually
-            </ActionChip>
+            </Button>
           ) : null}
           {tweakAiHref ? (
-            <ActionChip tone="primary" href={tweakAiHref}>
+            <Button variant="primary" size="sm" href={tweakAiHref}>
               Tweak with AI
-            </ActionChip>
+            </Button>
           ) : null}
           {onMarkPerfectedPress ? (
-            <ActionChip
-              tone="success"
+            <Button
+              variant="secondary"
+              size="sm"
               disabled={lifecycle.isStatusChangePending ?? false}
               onPress={onMarkPerfectedPress}
             >
               Mark perfected
-            </ActionChip>
+            </Button>
           ) : null}
           {onAbandonPress ? (
-            <ActionChip
-              tone="danger"
+            <Button
+              variant="danger"
+              size="sm"
               disabled={lifecycle.isStatusChangePending ?? false}
               onPress={onAbandonPress}
             >
               Abandon
-            </ActionChip>
+            </Button>
           ) : null}
-        </ChipRow>
+        </ButtonRow>
       ) : null}
       {lifecycle.candidates.length > 0 ? (
         <CandidateList
@@ -556,14 +567,14 @@ function OverviewPanel({
     renderComments,
   } = overview;
 
-  // The print and share chips carry the icons module's PrintIcon /
-  // ShareIcon (#187, reworked after #217) through ActionChip's icon
-  // slot: the official Feather printer / share-2 glyphs, inked by
-  // the chip in its neutral tone (gray8) at the md glyph size
-  // (24px) — not the "🖨" emoji and "↗" text glyph the page
-  // originally used, which render in full color at font-dependent
-  // sizes. Do not reintroduce text glyphs or hand-drawn icons for
-  // these: icons come from src/icons (see that module's header).
+  // The print and share buttons carry the icons module's PrintIcon /
+  // ShareIcon (#187, reworked after #217) through Button's icon
+  // slot: the official Feather printer / share-2 glyphs, inked in
+  // the button's label color at its standard glyph size — not the
+  // "🖨" emoji and "↗" text glyph the page originally used, which
+  // render in full color at font-dependent sizes. Do not
+  // reintroduce text glyphs or hand-drawn icons for these: icons
+  // come from src/icons (see that module's header).
   const showLifecycle =
     lifecycle !== undefined &&
     lifecycle !== null &&
@@ -576,7 +587,7 @@ function OverviewPanel({
       {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
       <CardStack>
         <Text variant="formTitle">{title}</Text>
-        <StatusBadge status={status} />
+        <RecipeStatusBadge status={status} />
       </CardStack>
       {description ? <Text variant="body">{description}</Text> : null}
       <StatBand>
@@ -589,7 +600,8 @@ function OverviewPanel({
           Start Cooking
         </Button>
         {onPrintPress ? (
-          <ActionChip
+          <Button
+            variant="secondary"
             size="md"
             icon={PrintIcon}
             accessibilityLabel="Print recipe"
@@ -597,22 +609,31 @@ function OverviewPanel({
           />
         ) : null}
         {onSharePress ? (
-          <ActionChip
+          <Button
+            variant="secondary"
             size="md"
             icon={ShareIcon}
             accessibilityLabel="Share recipe"
             onPress={onSharePress}
           />
         ) : null}
-        {editHref ? <ActionChip href={editHref}>Edit</ActionChip> : null}
-        {editDraftHref ? <ActionChip href={editDraftHref}>Edit draft</ActionChip> : null}
+        {editHref ? (
+          <Button variant="secondary" size="sm" href={editHref}>
+            Edit
+          </Button>
+        ) : null}
+        {editDraftHref ? (
+          <Button variant="secondary" size="sm" href={editDraftHref}>
+            Edit draft
+          </Button>
+        ) : null}
         {onDeletePress ? (
-          <ActionChip tone="danger" onPress={onDeletePress}>
+          <Button variant="danger" size="sm" onPress={onDeletePress}>
             Delete
-          </ActionChip>
+          </Button>
         ) : null}
       </ButtonRow>
-      {actionMessage ? <StatusMessage>{actionMessage}</StatusMessage> : null}
+      {actionMessage ? <CenteredText variant="hint">{actionMessage}</CenteredText> : null}
       {showLifecycle && lifecycle ? (
         <LifecycleSection
           lifecycle={lifecycle}
@@ -645,17 +666,18 @@ function IngredientsPanel({
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
   return (
     <PanelStack>
+      <SectionHeading>Ingredients</SectionHeading>
       {/* Servings + scale controls (#73): one compact block, two
           fixed rows, and every value directly enterable — stepping
           is no longer the only way to reach a large batch. Servings
           is an inline editable stepper (label beside the stepper,
           the value a number input in a fixed-width box); Scale is
-          a single non-wrapping row of equal-width preset chips
-          plus a Custom chip that turns into a number input when
-          pressed and afterwards shows the applied custom value
-          selected (the EditableChipGroup owns that editing state).
-          Same props contract as before — the app wiring is
-          untouched. */}
+          the PresetValueSelector — a single non-wrapping row of
+          equal-width preset buttons plus a Custom option that
+          turns into a number input when pressed and afterwards
+          shows the applied custom value selected (the selector
+          owns that editing state). Same props contract as before —
+          the app wiring is untouched. */}
       <NumberStepper
         label="Servings"
         layout="inline"
@@ -664,14 +686,14 @@ function IngredientsPanel({
         onChange={view.onServingsChange}
         editable
       />
-      <EditableChipGroup
+      <PresetValueSelector
         label="Scale"
         options={SCALE_OPTIONS}
         value={view.scaleValue}
         onChange={view.onScaleChange}
         customLabel={CUSTOM_SCALE_LABEL}
         customAccessibilityLabel="Custom scale"
-        formatCustomValue={(value) => `${formatScaleValue(value)}×`}
+        formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
       />
       <ListStack>
         {view.ingredients.map((ingredient) => (
@@ -719,6 +741,7 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
   );
   return (
     <PanelStack>
+      <SectionHeading>Instructions</SectionHeading>
       <StepList
         steps={sorted.map((step) => ({
           id: step.id,
@@ -738,6 +761,7 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
   if (history.isLoading) {
     return (
       <PanelStack>
+        <SectionHeading>Cook History</SectionHeading>
         <Center vertical={false}>
           <Spinner label="Loading cook history" />
         </Center>
@@ -750,6 +774,7 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
 
   return (
     <PanelStack>
+      <SectionHeading>Cook History</SectionHeading>
       {form !== null && form !== undefined ? (
         form
       ) : history.onLogCookPress ? (
@@ -804,7 +829,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
   return (
     <ScreenShell>
       <Toolbar>
-        <StatusBadge status={status} />
+        <RecipeStatusBadge status={status} />
         <VersionPicker
           versions={versions}
           selectedVersionId={selectedVersionId}
@@ -813,14 +838,18 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
       </Toolbar>
       <ScrollRegion>
         <OverviewPanel status={status} overview={props.overview} />
-        <SectionHeading>Ingredients</SectionHeading>
         <IngredientsPanel ingredients={props.ingredients} />
-        <SectionHeading>Instructions</SectionHeading>
         <InstructionsPanel instructions={props.instructions.instructions} />
-        <SectionHeading>Cook History</SectionHeading>
         <HistoryPanel history={props.history} />
-        <SectionHeading>Nutrition</SectionHeading>
-        <NutritionPanel nutrition={props.nutrition} />
+        {/* The section headings render inside their panels as the
+            PanelStack's first block (the canonical SectionHeading
+            carries no padding of its own — the panel's inset is
+            the heading's). NutritionPanel is a bare widget, so its
+            section stack is composed here. */}
+        <PanelStack>
+          <SectionHeading>Nutrition</SectionHeading>
+          <NutritionPanel nutrition={props.nutrition} />
+        </PanelStack>
       </ScrollRegion>
     </ScreenShell>
   );
