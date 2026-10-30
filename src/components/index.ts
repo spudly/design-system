@@ -99,6 +99,11 @@ export {
   type NutritionGoalsValues,
 } from "./NutritionGoalsForm.js";
 export { VerseText, type VerseTextProps } from "./VerseText.js";
+export { SignInForm, type SignInFormProps } from "./SignInForm.js";
+export { SignUpForm, type SignUpFormProps } from "./SignUpForm.js";
+export { ForgotPasswordForm, type ForgotPasswordFormProps } from "./ForgotPasswordForm.js";
+export { ResetPasswordForm, type ResetPasswordFormProps } from "./ResetPasswordForm.js";
+export { LegalSection, type LegalSectionProps } from "./LegalSection.js";
 
 // The #119 dedupe set: the canonical components the tranche
 // branches coined independently, shipped once here (the
