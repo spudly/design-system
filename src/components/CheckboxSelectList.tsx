@@ -11,7 +11,7 @@ export type CheckboxSelectItem = {
 
 export type CheckboxSelectListProps = {
   items: CheckboxSelectItem[];
-  /** Ids of the selected items (the ToggleChipGroup multi-select convention: a plain array). */
+  /** Ids of the selected items (the multi-select convention: a plain array). */
   selectedIds: string[];
   /** Called with the id of the item whose checkbox was toggled. */
   onToggle: (id: string) => void;
