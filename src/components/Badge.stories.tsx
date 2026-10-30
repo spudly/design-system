@@ -69,6 +69,10 @@ export const Selected: Story = {
   args: { selected: true, onPress: () => undefined, children: "Weeknight" },
 };
 
+export const SelectableDisabled: Story = {
+  args: { selected: true, disabled: true, onPress: () => undefined, children: "Weeknight" },
+};
+
 export const Selectable: Story = {
   render: function SelectableStory() {
     const [values, setValues] = useState<string[]>(["weeknight"]);

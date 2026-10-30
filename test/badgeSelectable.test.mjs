@@ -13,7 +13,9 @@
  *    (source-pinned), under the button role — and on web it is
  *    keyboard-operable like the DS's other pressable blocks:
  *    focusable, Enter/Space activating the press callback, a
- *    held key never re-activating.
+ *    held key never re-activating; a disabled selectable Badge
+ *    is inert — out of the tab order, announced disabled, and
+ *    it never activates.
  * 3. The selected treatment is the primary fill with the
  *    on-primary label ink — the treatment a selected toggle
  *    Button takes (source-pinned).
@@ -49,7 +51,7 @@ test("a selectable Badge announces a toggle: aria-pressed on web, selected state
     "web must announce the toggle with aria-pressed",
   );
   assert.ok(
-    badgeSource.includes("accessibilityState: { selected: selected ?? false }"),
+    badgeSource.includes("accessibilityState: { selected: selected ?? false, disabled }"),
     "native must announce the toggle with the selected accessibility state",
   );
   assert.ok(
@@ -59,7 +61,10 @@ test("a selectable Badge announces a toggle: aria-pressed on web, selected state
 });
 
 test("a selectable Badge is keyboard-operable on web: focusable, Enter/Space, no held-key repeats", () => {
-  assert.ok(badgeSource.includes("tabIndex: 0"), "a selectable badge must be focusable on web");
+  assert.ok(
+    badgeSource.includes("tabIndex: disabled ? -1 : 0"),
+    "an enabled selectable badge must be focusable on web; a disabled one leaves the tab order",
+  );
   assert.ok(
     badgeSource.includes("onKeyDown: handleKeyDown"),
     "a selectable badge must wire the activation-keys handler",
@@ -124,6 +129,32 @@ test("SSR: a selectable Badge renders the button role with aria-pressed tracking
     React.createElement(Badge, { selected: false, onPress: () => null }, "Weeknight"),
   );
   assert.match(unselectedHtml, /aria-pressed="false"/, "an unselected badge announces not pressed");
+});
+
+test("a disabled selectable Badge never activates and announces its state", async () => {
+  assert.ok(
+    badgeSource.includes('if (!disabled && (event.key === "Enter"'),
+    "the keyboard handler must not activate a disabled badge",
+  );
+  assert.ok(
+    badgeSource.includes("onPress: disabled ? undefined : onPress"),
+    "a disabled badge carries no press handler",
+  );
+  assert.ok(
+    badgeSource.includes('"aria-disabled": disabled'),
+    "web must announce a disabled selectable badge",
+  );
+  const { React, Badge } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(
+      Badge,
+      { selected: true, disabled: true, onPress: () => null },
+      "Weeknight",
+    ),
+  );
+  assert.match(html, /aria-pressed="true"/, "a disabled badge still announces its toggle state");
+  assert.match(html, /aria-disabled="true"/, "a disabled badge announces disabled");
+  assert.match(html, /tabindex="-1"/, "a disabled badge is out of the tab order");
 });
 
 test("SSR: a display-only Badge renders no button role and no pressed state", async () => {

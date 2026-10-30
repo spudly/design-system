@@ -93,13 +93,16 @@ export type BadgeProps = Omit<StyledBadgeProps, "onPress"> & {
  * treatment a selected toggle Button takes. On web it is
  * keyboard-operable like the DS's other pressable blocks:
  * focusable, with Enter and Space invoking the press callback.
- * With no press handler the badge is display-only.
+ * A `disabled` selectable badge is inert: out of the tab order,
+ * announced disabled, dimmed, and it never activates. With no
+ * press handler the badge is display-only.
  */
 export function Badge({
   tone = "neutral",
   color,
   selected,
   onPress,
+  disabled = false,
   children,
   ...rest
 }: BadgeProps) {
@@ -116,9 +119,11 @@ export function Badge({
   // button activation keys — Enter and Space — invoke the same
   // callback as a press. `tabIndex` and `onKeyDown` are web-only
   // props in Tamagui and are ignored on native, where onPress is
-  // the activation path.
+  // the activation path. A disabled badge leaves the tab order,
+  // announces itself disabled, dims, and never activates
+  // (TextAction's treatment of `disabled`).
   const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
+    if (!disabled && (event.key === "Enter" || event.key === " ")) {
       event.preventDefault();
       // A held key repeats keydown events; a native button does
       // not re-activate on repeats, and a repeat here would flip
@@ -131,13 +136,14 @@ export function Badge({
   const selectableProps = selectable
     ? {
         ...platformAccessibilityProps({ accessibilityRole: "button" }),
-        onPress,
-        tabIndex: 0,
+        onPress: disabled ? undefined : onPress,
+        tabIndex: disabled ? -1 : 0,
         onKeyDown: handleKeyDown,
         cursor: "web:pointer" as const,
+        opacity: disabled ? 0.5 : undefined,
         ...(isWeb
-          ? { "aria-pressed": selected ?? false }
-          : { accessibilityState: { selected: selected ?? false } }),
+          ? { "aria-pressed": selected ?? false, "aria-disabled": disabled }
+          : { accessibilityState: { selected: selected ?? false, disabled } }),
       }
     : null;
   if (color) {
