@@ -41,3 +41,11 @@ test("the Activate action renders only with its callback, and reports the candid
   );
   assert.match(code, /key=\{candidate\.id\}/, "cards are keyed by the candidate id");
 });
+
+test("each Activate button carries its candidate's name as its accessible name", () => {
+  assert.match(
+    code,
+    /accessibilityLabel=\{`Activate \$\{candidate\.label\}`\}/,
+    "a list of identical 'Activate' names would be ambiguous to a screen reader",
+  );
+});

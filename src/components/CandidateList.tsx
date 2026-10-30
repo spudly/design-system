@@ -69,6 +69,7 @@ export function CandidateList({
               variant="primary"
               size="sm"
               alignSelf="flex-start"
+              accessibilityLabel={`Activate ${candidate.label}`}
               disabled={isActivationPending}
               onPress={() => {
                 onActivatePress(candidate.id);

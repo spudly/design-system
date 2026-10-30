@@ -1277,7 +1277,8 @@ ReadOnly.
 
 1. Default: the heading sits over one tinted card per
    candidate, each card carrying the candidate's label and
-   its Activate button.
+   its Activate button; each button's accessible name
+   includes its candidate ("Activate Pea soup").
 2. Pending: the Activate button renders disabled while the
    activation is in flight.
 3. ReadOnly: the cards render their labels with no Activate
