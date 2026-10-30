@@ -1473,8 +1473,10 @@ Open in `Components/StepOverlay`: Default.
    each activation adds to the "Done activated" line under
    the frame).
 2. The story's dots and Back / Next row render below the
-   body, composed by the caller — the shell adds no spacing
-   or controls of its own there.
+   body, composed by the caller, and walk the demo's three
+   steps (Back disables on the first step, Next on the
+   last) — the shell adds no spacing or controls of its own
+   there.
 
 **Run when:** `src/components/StepOverlay.tsx`, its
 stories, MealCookingModePage, or a changeset naming
