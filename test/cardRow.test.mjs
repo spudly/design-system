@@ -134,6 +134,15 @@ test("CardRow's link form renders an anchor on web and a LinkOverlay on native (
   );
 });
 
+test("CardRow's action accessible name composes the label with the row title (#359)", () => {
+  // In a list of rows a bare "Delete" does not say which row it
+  // acts on (the TextActionCardRow convention): the action button
+  // announces "Delete {title}" while its visible text stays the
+  // bare label. This is what gives MealPlansPage's meal-plan rows
+  // the same treatment MealsHubPage's meal rows already had.
+  assert.match(cardRowCode, /accessibilityLabel=\{`\$\{actionLabel\} \$\{title\}`\}/);
+});
+
 test("CardRow's action renders only when its label and callback are both wired", () => {
   assert.match(cardRowCode, /\{onActionPress && actionLabel \? \(/);
   assert.match(cardRowCode, /variant="secondary"/);

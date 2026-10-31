@@ -13,7 +13,11 @@ type CardRowOwnProps = {
    * render the title alone. */
   subtitle?: string;
   /** Optional trailing action: the action button renders only
-   * when both the label and the callback are provided. */
+   * when both the label and the callback are provided. Its
+   * accessible name composes the label with the row's title
+   * ("Delete {title}", the TextActionCardRow convention), so
+   * repeated row actions stay distinguishable to screen
+   * readers; the visible text stays the bare label. */
   actionLabel?: string;
   /** Optional trailing action press. */
   onActionPress?: () => void;
@@ -162,6 +166,7 @@ export function CardRow({
           <Button
             variant="secondary"
             size="sm"
+            accessibilityLabel={`${actionLabel} ${title}`}
             {...(actionTone === "danger"
               ? {
                   backgroundColor: tokens.colors.danger.danger1,
