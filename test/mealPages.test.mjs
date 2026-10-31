@@ -188,6 +188,42 @@ test("MealCookingModePage progression is controlled and bounded by the PrevNextN
   );
 });
 
+test("MealCookingModePage header numbers steps by their combined position, not the per-recipe stepNumber (eciperay#324)", () => {
+  const page = pageSource("MealCookingModePage");
+  // The header's numerator is the combined index (stepIndex + 1)
+  // and its denominator is the combined total (steps.length) —
+  // the same combined position StepDots reports as its
+  // progressbar label ("Step N of M" from activeIndex + 1).
+  assert.ok(
+    // eslint-disable-next-line no-template-curly-in-string -- expected source text intentionally contains a template literal
+    page.includes("Step ${stepIndex + 1} of ${steps.length}"),
+    "the step header must read the combined position: stepIndex + 1 of steps.length",
+  );
+  assert.ok(
+    page.includes("StepDots count={steps.length} activeIndex={stepIndex}"),
+    "progress must keep reporting the same combined stepIndex the header uses",
+  );
+  // A step's stepNumber is per-recipe: in the fixture's combined
+  // sequence (3 steps from the first recipe, then the second
+  // recipe's first step) the final step carries stepNumber 1 at
+  // combined index 3, so a header built from stepNumber reads
+  // "Step 1 of 4" while progress reads "Step 4 of 4".
+  assert.ok(
+    !page.includes("current.stepNumber"),
+    "the step header must not use current.stepNumber — it restarts per recipe",
+  );
+  const fixture = readFileSync(join(root, "src", "pages", "fixtures.ts"), "utf8");
+  const cookingFixture = fixture.slice(fixture.indexOf("mealCookingFixture"));
+  const stepNumbers = [...cookingFixture.matchAll(/stepNumber: (\d+)/g)]
+    .slice(0, 4)
+    .map((match) => Number(match[1]));
+  assert.deepEqual(
+    stepNumbers,
+    [1, 2, 3, 1],
+    "the cooking fixture must keep a combined sequence whose per-recipe stepNumber restarts, so the LastStep story exercises this regression",
+  );
+});
+
 test("MealDetailPage members are view-models with pre-composed subtitles", () => {
   const page = pageSource("MealDetailPage");
   assert.ok(page.includes("subtitle"), "member subtitles cross pre-composed");
