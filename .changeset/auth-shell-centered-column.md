@@ -1,5 +1,0 @@
----
-"@spudly/ui": patch
----
-
-Fix the auth pages stretching full width on wide screens: the `ScreenContainer` `auth` shell (used by SignInPage, SignUpPage, ForgotPasswordPage, and ResetPasswordPage) now renders its content in a centered column capped at 480px, matching the FormScreenLayout geometry the web auth screens had before — the shell's surface background still paints the full screen width; only the form column is capped. Phone-width rendering is unchanged (the cap does not bind). On a @spudly/ui bump, re-check: in Storybook, open Components/ScreenContainer's Auth story at a desktop width and confirm the content sits in a centered column about 480px wide with the surface color extending edge-to-edge behind it (the Pages/SignInPage and Pages/SignUpPage stories render inside a 430px phone viewport, so use them only for the phone-width check: form unchanged, filling the viewport as before). On the live web surface at a desktop viewport, the Sign in page's Email field and Sign In button sit in the same centered narrow column instead of stretching edge-to-edge.
