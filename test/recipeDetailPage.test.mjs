@@ -221,7 +221,7 @@ test("the status badge map covers the four statuses with a fallback", () => {
   // #363 (eciperay #278 ruling): the status renders exactly once — the
   // toolbar badge beside the version picker, not again in the overview.
   assert.equal((code.match(/<RecipeStatusBadge status=\{status\} \/>/g) ?? []).length, 1);
-  assert.match(code, /<Toolbar>[\s\S]*?<RecipeStatusBadge/, "the one badge is in the toolbar");
+  assert.match(code, /<Toolbar>[\s\S]*?<RecipeStatusBadge[\s\S]*?<\/Toolbar>/, "badge in toolbar");
 });
 
 test("the cook-log form slot replaces the Log a cook button while it renders content", () => {
