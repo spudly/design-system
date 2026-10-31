@@ -21,6 +21,23 @@ import { Thumbnail } from "./Thumbnail.js";
  * stack's; the panel's own blocks separate with padding
  * wrappers, the recipe pages' settled form.
  *
+ * The title carries Text's `heading` treatment (#364): level-1
+ * heading semantics on web, so a page composing this panel
+ * exposes its recipe title as its level-1 heading (the panel's
+ * section headings sit at level 2, #317). The explicit
+ * fontSize/fontWeight below pin the title's appearance, so the
+ * variant changes semantics only — the same move #263 made for
+ * standalone page titles. Rendering is unchanged on both
+ * targets; on native the title gains the `header` role every
+ * heading-variant title carries (#256 — VoiceOver/TalkBack
+ * heading navigation), while the level itself is web-only.
+ * Verified
+ * for #364: PublicRecipePage (the panel's composing page)
+ * renders no other level-1 heading, and RecipeDetailPage does
+ * not compose this panel — its inline overview title already
+ * carries level-1 semantics through the `formTitle` variant —
+ * so no recipe surface gains a second level-1 heading.
+ *
  * The pieces are the shared ones (#119 dedupe): the status
  * badge is the StatusBadge component, the tag row is the
  * TagList, the stats compose StatBand/StatCard, and the hero is
@@ -80,6 +97,7 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
       ) : null}
       <YStack paddingBlockEnd="$2">
         <Text
+          variant="heading"
           fontSize={tokens.typography.fontSize["2xl"]}
           fontWeight={tokens.typography.fontWeight.bold}
           color={tokens.colors.gray.gray10}
