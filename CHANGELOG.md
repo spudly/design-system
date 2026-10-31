@@ -1,5 +1,12 @@
 # @spudly/ui
 
+## 1.16.2
+
+### Patch Changes
+
+- bb84f3f: PublicFrameLayout / PublicPageFrame and LegalDocumentPage: the public frame and legal page now carry web landmarks again — the header band (PublicFrameHeader, and LegalDocumentPage's DocumentHeader) renders as the banner landmark, the content/document column renders as the main landmark, and the footer band (PublicFrameFooter, and LegalDocumentPage's DocumentFooter) renders as the contentinfo landmark. On web, verify in Storybook (Components/PublicFrameLayout, Pages/Eciperay/PublicPageFrame, Pages/Eciperay/LegalDocumentPage) that a screen reader's landmark navigation finds exactly one banner, one main, and one contentinfo per page, with the page/document content inside main. Native rendering is unchanged.
+- ff52ab5: RecipeOverviewPanel: the recipe title now carries level-1 heading semantics on web (Text's `heading` treatment), with its rendered appearance unchanged. PublicRecipePage, which composes the panel, now exposes the recipe title as the page's level-1 heading, so screen-reader navigation and SEO tooling can find it as a heading (e.g. `getByRole('heading', { name: <recipe title> })`); the page's section headings remain level 2 and the page has no other level-1 heading. RecipeDetailPage is unchanged — it does not compose the panel and its title already carried level-1 semantics. Native rendering is unaffected.
+
 ## 1.16.1
 
 ### Patch Changes
