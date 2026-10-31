@@ -147,6 +147,8 @@ test("CardRow's action accessible name composes the label with the row title (#3
 // tests above still run and report when the build output is missing
 // or broken, instead of the whole file failing at import time (the
 // buttonWebAria.test.mjs pattern).
+const noop = () => null;
+
 let runtimePromise;
 function loadRuntime() {
   runtimePromise ??= (async () => {
@@ -164,7 +166,6 @@ test("SSR: two CardRow Delete actions render distinct composed aria-labels (#359
   const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, CardRow } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
-  const noop = () => null;
   const html = renderToString(
     React.createElement(
       TamaguiProvider,
