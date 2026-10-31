@@ -4,7 +4,7 @@ import { DocumentFooter } from "../components/DocumentFooter.js";
 import { DocumentHeader } from "../components/DocumentHeader.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
-import { listItemRoleProps, listRoleProps } from "../components/accessibility.js";
+import { listItemRoleProps, listRoleProps, mainRoleProps } from "../components/accessibility.js";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -52,6 +52,13 @@ import { tokens } from "../tokens/index.js";
  *
  * Stays app-side: the legal text itself, routing, document
  * head/SEO, and the analytics consent banner.
+ *
+ * Landmarks (#366): on web the document column is the page's
+ * `main` landmark (via `mainRoleProps`), DocumentHeader is
+ * `banner`, and DocumentFooter is `contentinfo` — this page
+ * renders the full frame itself and is the outermost chrome,
+ * so it owns the landmarks; hosts must not wrap it in another
+ * landmark-owning frame. Native is unaffected.
  */
 
 /** A prose span: the document's inline semantics — plain text,
@@ -179,7 +186,13 @@ export function LegalDocumentPage({
         signInLabel={signInLabel}
         signInHref={signInHref}
       />
-      <YStack width="100%" maxWidth={PROSE_MAX_WIDTH} alignSelf="center" gap="$4">
+      <YStack
+        width="100%"
+        maxWidth={PROSE_MAX_WIDTH}
+        alignSelf="center"
+        gap="$4"
+        {...mainRoleProps}
+      >
         <YStack gap="$3">
           <Text variant="heading">{title}</Text>
           <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>

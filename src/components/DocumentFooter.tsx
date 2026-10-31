@@ -2,6 +2,7 @@ import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Divider } from "./Divider.js";
 import { TextLink } from "./TextLink.js";
+import { contentInfoRoleProps } from "./accessibility.js";
 
 export type DocumentFooterLink = {
   label: string;
@@ -26,10 +27,15 @@ export type DocumentFooterProps = {
  * here while the public frame's footer composed TextLinks for
  * the same job — one link treatment for public chrome, owned
  * by TextLink.
+ *
+ * Landmarks (#366): on web this footer is the page's
+ * `contentinfo` landmark (via `contentInfoRoleProps`) —
+ * LegalDocumentPage renders it as its outermost footer chrome;
+ * native is unaffected.
  */
 export function DocumentFooter({ links }: DocumentFooterProps) {
   return (
-    <YStack gap="$4">
+    <YStack gap="$4" {...contentInfoRoleProps}>
       <Divider />
       <XStack gap="$4" flexWrap="wrap">
         {links.map((link) => (

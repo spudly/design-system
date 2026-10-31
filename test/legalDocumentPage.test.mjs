@@ -115,8 +115,8 @@ test("the document renders in a prose column; list blocks carry list semantics (
   assert.match(prose, /const PROSE_MAX_WIDTH = 768;/, "prose column width is the public 768px");
   assert.match(
     prose,
-    /<YStack width="100%" maxWidth=\{PROSE_MAX_WIDTH\} alignSelf="center" gap="\$4">/,
-    "title and sections render inside the centered prose column",
+    /<YStack\s+width="100%"\s+maxWidth=\{PROSE_MAX_WIDTH\}\s+alignSelf="center"\s+gap="\$4"\s+\{\.\.\.mainRoleProps\}\s*>/,
+    "title and sections render inside the centered prose column, which is the main landmark (#366)",
   );
   // List semantics: the block's stack carries the web list role and
   // each item row the listitem role (platform-split props from

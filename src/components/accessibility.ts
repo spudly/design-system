@@ -39,6 +39,30 @@ export const listRoleProps = isWeb ? ({ role: "list" } as const) : ({} as const)
 export const listItemRoleProps = isWeb ? ({ role: "listitem" } as const) : ({} as const);
 
 /**
+ * Landmark semantics for page frame chrome (#366).
+ *
+ * `banner`, `main`, and `contentinfo` are web ARIA landmark
+ * roles. They are NOT members of React Native's
+ * `accessibilityRole` set, so — like `list` / `listitem` above —
+ * they go through the separate web `role` prop, web only, and
+ * native gets no landmark prop at all (native navigation does
+ * not use web landmarks; the visual frame is unchanged there).
+ *
+ * - The frame's header band is `role="banner"` on web.
+ * - The frame's content column is `role="main"` on web.
+ * - The frame's footer band is `role="contentinfo"` on web.
+ *
+ * Only the outermost frame chrome owns these landmarks: a page
+ * composed inside the frame must not add a second banner, main,
+ * or contentinfo of its own.
+ */
+export const bannerRoleProps = isWeb ? ({ role: "banner" } as const) : ({} as const);
+
+export const mainRoleProps = isWeb ? ({ role: "main" } as const) : ({} as const);
+
+export const contentInfoRoleProps = isWeb ? ({ role: "contentinfo" } as const) : ({} as const);
+
+/**
  * Dialog semantics for a hand-rolled modal shell — a component
  * that covers its frame and takes interaction over without
  * Tamagui's Dialog primitive. `dialog` is an ARIA role with no

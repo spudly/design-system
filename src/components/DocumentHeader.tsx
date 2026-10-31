@@ -2,6 +2,7 @@ import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { BrandLink } from "./BrandLink.js";
 import { TextLink } from "./TextLink.js";
+import { bannerRoleProps } from "./accessibility.js";
 
 export type DocumentHeaderProps = {
   /** Brand wordmark text (the document surface's own label). */
@@ -28,6 +29,10 @@ export type DocumentHeaderProps = {
  * hand-rolled a second wordmark as a raw Anchor, in a different
  * treatment) and sign-in is a TextLink href form, exactly the
  * public frame header's shapes.
+ *
+ * Landmarks (#366): on web this row is the page's `banner`
+ * landmark (via `bannerRoleProps`) — LegalDocumentPage renders
+ * it as its outermost header chrome; native is unaffected.
  */
 export function DocumentHeader({
   brandHref,
@@ -36,7 +41,7 @@ export function DocumentHeader({
   signInLabel,
 }: DocumentHeaderProps) {
   return (
-    <XStack alignItems="center" justifyContent="space-between" gap="$4">
+    <XStack alignItems="center" justifyContent="space-between" gap="$4" {...bannerRoleProps}>
       <BrandLink label={brandLabel} href={brandHref} />
       <TextLink href={signInHref} fontWeight={tokens.typography.fontWeight.medium}>
         {signInLabel}

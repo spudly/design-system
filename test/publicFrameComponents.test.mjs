@@ -65,8 +65,8 @@ test("PublicFrameLayout owns the shell and the wide centered column", () => {
   assert.match(layout, /<YStack flex=\{1\} backgroundColor="\$background">/);
   assert.match(
     layout,
-    /<View flex=\{1\} width="100%" maxWidth=\{COLUMN_MAX_WIDTH\} alignSelf="center">/,
-    "the content column is the wide centered column",
+    /<View flex=\{1\} width="100%" maxWidth=\{COLUMN_MAX_WIDTH\} alignSelf="center" \{\.\.\.mainRoleProps\}>/,
+    "the content column is the wide centered column and the page's main landmark (#366)",
   );
   assert.match(layout, /header: ReactNode;/);
   assert.match(layout, /footer: ReactNode;/);
