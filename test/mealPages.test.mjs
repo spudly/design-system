@@ -132,6 +132,21 @@ test("MealPlanFormPage is controlled per field and submits as a bare intent", ()
   );
 });
 
+test("meal form steppers floor servings and quantity at 1 (#362)", () => {
+  for (const name of ["MealFormPage", "MealPlanFormPage"]) {
+    const source = pageSource(name);
+    const steppers = source.split("<NumberStepper").slice(1);
+    assert.ok(steppers.length > 0, `${name} renders at least one NumberStepper`);
+    for (const stepper of steppers) {
+      const props = stepper.split("/>")[0];
+      assert.ok(
+        props.includes("min={1}"),
+        `${name}: every NumberStepper must pass min={1} so servings/quantity cannot reach 0`,
+      );
+    }
+  }
+});
+
 test("ShoppingListPage check-off is controlled per line with real checkbox semantics", () => {
   const page = pageSource("ShoppingListPage");
   assert.ok(page.includes("isChecked"), "each line carries its checked state in");
