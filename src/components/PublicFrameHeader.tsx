@@ -1,6 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { BrandLink } from "./BrandLink.js";
+import { bannerRoleProps } from "./accessibility.js";
 import { COLUMN_MAX_WIDTH } from "./PublicFrameLayout.js";
 import { TextLink } from "./TextLink.js";
 
@@ -33,6 +34,9 @@ export type PublicFrameHeaderProps = {
  * navigation rule settles it: a control that navigates to
  * another page is a link with an href, so the canonical
  * contract is hrefs in, on both surfaces.
+ *
+ * Landmarks (#366): on web this band is the page's `banner`
+ * landmark (via `bannerRoleProps`); native is unaffected.
  */
 export function PublicFrameHeader({
   brandLabel,
@@ -41,7 +45,12 @@ export function PublicFrameHeader({
   signInHref,
 }: PublicFrameHeaderProps) {
   return (
-    <YStack backgroundColor="$surface" borderBottomWidth={1} borderColor={tokens.colors.gray.gray2}>
+    <YStack
+      backgroundColor="$surface"
+      borderBottomWidth={1}
+      borderColor={tokens.colors.gray.gray2}
+      {...bannerRoleProps}
+    >
       <XStack
         width="100%"
         maxWidth={COLUMN_MAX_WIDTH}

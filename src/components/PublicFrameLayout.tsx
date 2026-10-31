@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { View, YStack } from "tamagui";
+import { mainRoleProps } from "./accessibility.js";
 
 /**
  * The wide public column: the web layout's max-w-3xl (768px),
@@ -32,12 +33,20 @@ export type PublicFrameLayoutProps = {
  * header and footer bands as slots and its page as the child;
  * every layout decision (the background, the column's width and
  * centering, the column's share of the height) stays here.
+ *
+ * Landmarks (#366): on web the content column is the page's
+ * `main` landmark (via `mainRoleProps` from the shared
+ * accessibility translation); the header and footer bands carry
+ * their own banner / contentinfo landmarks. This frame is the
+ * outermost chrome on public surfaces, so it is the landmark
+ * owner — pages composed inside it must not add duplicates.
+ * Native is unaffected.
  */
 export function PublicFrameLayout({ header, footer, children }: PublicFrameLayoutProps) {
   return (
     <YStack flex={1} backgroundColor="$background">
       {header}
-      <View flex={1} width="100%" maxWidth={COLUMN_MAX_WIDTH} alignSelf="center">
+      <View flex={1} width="100%" maxWidth={COLUMN_MAX_WIDTH} alignSelf="center" {...mainRoleProps}>
         {children}
       </View>
       {footer}

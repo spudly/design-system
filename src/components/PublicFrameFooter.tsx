@@ -1,6 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { COLUMN_MAX_WIDTH } from "./PublicFrameLayout.js";
+import { contentInfoRoleProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 import { TextLink } from "./TextLink.js";
 
@@ -40,10 +41,19 @@ export type PublicFrameFooterProps = {
  * is hrefs in, on both surfaces — and which links those are is
  * the caller's data, so the footer takes the `links` array
  * rather than naming any route itself.
+ *
+ * Landmarks (#366): on web this band is the page's
+ * `contentinfo` landmark (via `contentInfoRoleProps`); native
+ * is unaffected.
  */
 export function PublicFrameFooter({ note, links }: PublicFrameFooterProps) {
   return (
-    <YStack backgroundColor="$surface" borderTopWidth={1} borderColor={tokens.colors.gray.gray2}>
+    <YStack
+      backgroundColor="$surface"
+      borderTopWidth={1}
+      borderColor={tokens.colors.gray.gray2}
+      {...contentInfoRoleProps}
+    >
       <XStack
         width="100%"
         maxWidth={COLUMN_MAX_WIDTH}
