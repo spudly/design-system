@@ -18,6 +18,12 @@ import { StepOverlay } from "../components/StepOverlay.js";
  *   prop, and prev / next / done are bare callbacks. The
  *   screen keeps the index (and its clamping); nothing here
  *   owns navigation state.
+ * - A step's `stepNumber` is its number within its own
+ *   recipe, so it restarts when a meal moves to the next
+ *   recipe. The header and the progress dots both position
+ *   the step within the combined sequence instead: the
+ *   header reads `stepIndex + 1` of `steps.length`, the same
+ *   combined position StepDots reports (eciperay#324).
  * - The overlay chrome is the generic StepOverlay shell
  *   (#119): the dark full-screen shell, the absolute Done
  *   button, the uppercase step headers. The page composes
@@ -85,7 +91,7 @@ export function MealCookingModePage({
   return (
     <StepOverlay
       title={mealTitle}
-      stepLabel={`Step ${current.stepNumber} of ${steps.length} · ${current.recipeTitle}`}
+      stepLabel={`Step ${stepIndex + 1} of ${steps.length} · ${current.recipeTitle}`}
       body={current.body}
       onDone={onDone}
     >
