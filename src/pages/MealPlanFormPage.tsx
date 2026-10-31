@@ -158,6 +158,7 @@ export function MealPlanFormPage({
           <NumberStepper
             label={`Quantity · ${option.title}`}
             value={quantityByKey[key] ?? 1}
+            min={1}
             onChange={(value) => {
               onQuantityChange(key, value);
             }}
@@ -173,6 +174,7 @@ export function MealPlanFormPage({
             <NumberStepper
               label={`Servings · ${option.title}`}
               value={servingsByRecipeId[recipeId] ?? option.servings ?? 1}
+              min={1}
               onChange={(value) => {
                 onRecipeServingsChange(recipeId, value);
               }}

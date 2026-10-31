@@ -128,6 +128,7 @@ export function MealFormPage({
             key={recipeId}
             label={`Servings · ${recipe.label}`}
             value={servingsByRecipeId[recipeId] ?? recipe.servings}
+            min={1}
             onChange={(value) => {
               onServingsChange(recipeId, value);
             }}
