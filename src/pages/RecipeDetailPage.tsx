@@ -559,13 +559,7 @@ function LifecycleSection({
   );
 }
 
-function OverviewPanel({
-  status,
-  overview,
-}: {
-  status: string;
-  overview: RecipeDetailPageOverviewProps;
-}) {
+function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }) {
   const {
     imageUrl,
     title,
@@ -609,7 +603,6 @@ function OverviewPanel({
       {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
       <CardStack>
         <Text variant="formTitle">{title}</Text>
-        <RecipeStatusBadge status={status} />
       </CardStack>
       {description ? <Text variant="body">{description}</Text> : null}
       <StatBand>
@@ -868,7 +861,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
         />
       </Toolbar>
       <ScrollRegion>
-        <OverviewPanel status={status} overview={props.overview} />
+        <OverviewPanel overview={props.overview} />
         <IngredientsPanel ingredients={props.ingredients} />
         <InstructionsPanel instructions={props.instructions.instructions} />
         <HistoryPanel history={props.history} />
