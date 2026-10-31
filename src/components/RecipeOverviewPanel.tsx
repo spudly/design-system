@@ -27,8 +27,11 @@ import { Thumbnail } from "./Thumbnail.js";
  * section headings sit at level 2, #317). The explicit
  * fontSize/fontWeight below pin the title's appearance, so the
  * variant changes semantics only — the same move #263 made for
- * standalone page titles. Heading semantics are web-only in
- * Text's translator; native rendering is unaffected. Verified
+ * standalone page titles. Rendering is unchanged on both
+ * targets; on native the title gains the `header` role every
+ * heading-variant title carries (#256 — VoiceOver/TalkBack
+ * heading navigation), while the level itself is web-only.
+ * Verified
  * for #364: PublicRecipePage (the panel's composing page)
  * renders no other level-1 heading, and RecipeDetailPage does
  * not compose this panel — its inline overview title already
