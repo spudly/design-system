@@ -1,5 +1,12 @@
 # @spudly/ui
 
+## 1.16.1
+
+### Patch Changes
+
+- b8704d1: MealFormPage and MealPlanFormPage: the servings and quantity steppers can no longer be decremented below 1. Previously they accepted 0, which the server rejects (minimum 1), so a meal or meal plan could be put into an unsubmittable state from the form. Test: open MealFormPage or MealPlanFormPage, select a recipe/entry, and decrement its Servings (and Quantity on the plan form) — the stepper stops at 1 and the decrement button disables there.
+- 755960a: RecipeDetailPage now renders the recipe status badge exactly once: the duplicate badge beside the recipe title in the overview panel's title card is removed, so the status appears only in the pinned toolbar beside the version picker.
+
 ## 1.16.0
 
 ### Minor Changes
