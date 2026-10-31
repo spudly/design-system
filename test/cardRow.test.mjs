@@ -143,6 +143,55 @@ test("CardRow's action accessible name composes the label with the row title (#3
   assert.match(cardRowCode, /accessibilityLabel=\{`\$\{actionLabel\} \$\{title\}`\}/);
 });
 
+// Runtime imports are lazy (inside the SSR test) so the source-scan
+// tests above still run and report when the build output is missing
+// or broken, instead of the whole file failing at import time (the
+// buttonWebAria.test.mjs pattern).
+let runtimePromise;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const reactModule = await import("react");
+    const React = reactModule.default;
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider } = await import("tamagui");
+    const dist = await import("../dist/index.js");
+    return { React, renderToString, TamaguiProvider, ...dist };
+  })();
+  return runtimePromise;
+}
+
+test("SSR: two CardRow Delete actions render distinct composed aria-labels (#359)", async () => {
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, CardRow } =
+    await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const noop = () => null;
+  const html = renderToString(
+    React.createElement(
+      TamaguiProvider,
+      { config, defaultTheme: "light" },
+      React.createElement(CardRow, {
+        title: "Plan A",
+        href: "/plans/a",
+        actionLabel: "Delete",
+        onActionPress: noop,
+      }),
+      React.createElement(CardRow, {
+        title: "Plan B",
+        href: "/plans/b",
+        actionLabel: "Delete",
+        onActionPress: noop,
+      }),
+    ),
+  );
+  // The rendered accessible names are composed per row — this is
+  // the behavior MealPlansPage's plan rows rely on — while the
+  // visible button text stays the bare label.
+  assert.ok(html.includes('aria-label="Delete Plan A"'), "Plan A's Delete must be labeled");
+  assert.ok(html.includes('aria-label="Delete Plan B"'), "Plan B's Delete must be labeled");
+  assert.ok(html.includes(">Delete<"), "the visible action text stays the bare label");
+  assert.ok(!/accessibilitylabel/i.test(html), "accessibilitylabel must not leak to the DOM");
+});
+
 test("CardRow's action renders only when its label and callback are both wired", () => {
   assert.match(cardRowCode, /\{onActionPress && actionLabel \? \(/);
   assert.match(cardRowCode, /variant="secondary"/);
