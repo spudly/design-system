@@ -194,11 +194,14 @@ test("MealCookingModePage header numbers steps by their combined position, not t
   // and its denominator is the combined total (steps.length) —
   // the same combined position StepDots reports as its
   // progressbar label ("Step N of M" from activeIndex + 1).
+  /* eslint-disable no-template-curly-in-string -- the expected source text intentionally contains a template literal */
   assert.ok(
-    // eslint-disable-next-line no-template-curly-in-string -- expected source text intentionally contains a template literal
-    page.includes("Step ${stepIndex + 1} of ${steps.length}"),
+    page.includes(
+      "stepLabel={`Step ${stepIndex + 1} of ${steps.length} · ${current.recipeTitle}`}",
+    ),
     "the step header must read the combined position: stepIndex + 1 of steps.length",
   );
+  /* eslint-enable no-template-curly-in-string -- end of the expected source-text literal block */
   assert.ok(
     page.includes("StepDots count={steps.length} activeIndex={stepIndex}"),
     "progress must keep reporting the same combined stepIndex the header uses",
