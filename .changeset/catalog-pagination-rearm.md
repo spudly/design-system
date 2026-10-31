@@ -1,5 +1,0 @@
----
-"@spudly/ui": patch
----
-
-RecipesPage and DiscoverPage now paginate through pages that add no new visible rows. Both catalog pages share one pagination pattern (useCatalogPagination): the list's end-reached handler stays mounted but guarded while the next page loads (no duplicate requests), and when a fetch completes without adding rows — for example when every item in the fetched page was filtered out client-side — the page requests the next page again on its own instead of stalling until the user scrolls away and back. Previously RecipesPage stalled on any such page, and DiscoverPage stalled the same way whenever the completed fetch produced no layout change. On a @spudly/ui bump, re-check in Storybook: Pages/Eciperay/RecipesPage and Pages/Eciperay/DiscoverPage — with a host whose next page adds no rows, the list keeps requesting pages without any scrolling until a page adds rows or the host stops reporting a next-page fetch; the LoadingMore stories still show the footer spinner while a next page is in flight.

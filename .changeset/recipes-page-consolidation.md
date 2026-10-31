@@ -1,5 +1,0 @@
----
-"@spudly/ui": minor
----
-
-RecipesPage is now the single recipes-list page for both the Recipes screen and Shared-with-me — SharedWithMePage is removed, and hosts render the shared screen with RecipesPage (passing neither `onLogCookPress` nor `renderRecipeAccessory`). Shared-with-me now uses the same collapsed filter bar as Recipes — search plus a Filters button that adds filters — instead of showing every filter control at once. Shared rows stay press-only (no log-cook control), and each screen keeps its own empty-state message through the new `emptyTitle`/`emptyBody` props: Recipes still shows "No recipes found." and Shared-with-me still shows its "Recipes others share with you will appear here." message. On a @spudly/ui bump, re-test: open Shared-with-me and confirm the filter bar starts collapsed behind the Filters button, a filter can be added and removed, rows show no star/log-cook control, and the empty state shows the shared-with-me message; open Recipes and confirm its behavior and empty state are unchanged.
