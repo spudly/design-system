@@ -10,7 +10,11 @@
  * owns no status map — status words are caller data, #119
  * dedupe), the stat band composes StatBand/StatCard with
  * conditional Prep and Cook stats, and tags render through
- * TagList (Badge's color form, #207).
+ * TagList (Badge's color form, #207). Since #364 the title
+ * also carries Text's `heading` treatment — level-1 heading
+ * semantics on web with its rendered appearance unchanged —
+ * pinned below together with the check that neither recipe
+ * surface gains a second level-1 heading.
  *
  * Source scan plus a dist export check, like the other component
  * contract tests. The dist import needs the harness's
@@ -62,6 +66,59 @@ test("the panel composes the shared building blocks with its conditional content
     "tags render through TagList (Badge's color form)",
   );
   assert.ok(!panelCode.includes("{tag.color}22"), "no inline tag tint");
+});
+
+test("the title carries level-1 heading semantics with unchanged rendering (#364)", () => {
+  // The title Text takes the `heading` variant — the level-1
+  // treatment — while its explicit fontSize (2xl) / fontWeight
+  // (bold) instance props keep pinning the appearance the plain
+  // Text rendered with, so the move is semantics-only (the #263
+  // pattern).
+  assert.match(
+    panelCode,
+    /<Text\s+variant="heading"\s+fontSize=\{tokens\.typography\.fontSize\["2xl"\]\}\s+fontWeight=\{tokens\.typography\.fontWeight\.bold\}/,
+    "the title is a heading-variant Text with its 2xl/bold appearance pinned",
+  );
+  assert.equal(
+    panelCode.match(/variant="heading"/g)?.length,
+    1,
+    "the panel renders exactly one heading-variant Text (its title)",
+  );
+  // Pin the variant's semantics against Text itself: the
+  // `heading` variant maps to heading level 1.
+  const textSource = readFileSync(join(componentsDir, "Text.tsx"), "utf8");
+  assert.match(
+    textSource,
+    /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle"\s*\?\s*1/,
+    "Text maps the heading variant to heading level 1",
+  );
+});
+
+test("no recipe surface gains a second level-1 heading from the panel (#364)", () => {
+  const pagesDir = join(here, "..", "src", "pages");
+  const readCode = (name) =>
+    readFileSync(join(pagesDir, name), "utf8")
+      .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+      .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  // PublicRecipePage composes the panel and renders no
+  // level-1 heading variant of its own — the panel's title is
+  // its page's sole level-1 heading (its section headings are
+  // SectionHeading, level 2).
+  const publicCode = readCode("PublicRecipePage.tsx");
+  assert.match(publicCode, /<RecipeOverviewPanel/);
+  assert.ok(
+    !/variant="(heading|title|formTitle)"/.test(publicCode),
+    "PublicRecipePage renders no level-1 heading variant besides the panel's title",
+  );
+  // RecipeDetailPage does not compose the panel; its inline
+  // overview title already carries level-1 semantics through
+  // the `formTitle` variant, so it is untouched by this change.
+  const detailCode = readCode("RecipeDetailPage.tsx");
+  assert.ok(
+    !detailCode.includes("RecipeOverviewPanel"),
+    "RecipeDetailPage does not compose the panel",
+  );
+  assert.match(detailCode, /<Text variant="formTitle">\{title\}<\/Text>/);
 });
 
 test("the status badge is the shared StatusBadge fed caller-resolved tone and label", () => {
