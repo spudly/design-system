@@ -150,6 +150,34 @@ function countRole(html, role) {
   return (html.match(new RegExp(`role="${role}"`, "g")) ?? []).length;
 }
 
+/**
+ * The content range of the rendered `main` element: from the end
+ * of its opening tag to the start of its matching close tag,
+ * found by balancing tags of the same name (the SSR tree is
+ * well-formed and the landmark element is a `div` whose nested
+ * children include same-tag elements). String order alone cannot
+ * prove descendance — content sitting between main's close and
+ * the footer would pass an order check — so the SSR tests assert
+ * the fixture content's index falls inside this range.
+ */
+function mainContentRange(html) {
+  const roleAt = html.indexOf('role="main"');
+  assert.ok(roleAt !== -1, "a main landmark renders");
+  const openStart = html.lastIndexOf("<", roleAt);
+  const openEnd = html.indexOf(">", roleAt);
+  const tagName = /^<([a-zA-Z][\w-]*)/.exec(html.slice(openStart, openEnd))[1];
+  const tagPattern = new RegExp(String.raw`</?${tagName}(?=[\s>])[^>]*>`, "g");
+  tagPattern.lastIndex = openStart;
+  let depth = 0;
+  let match;
+  while ((match = tagPattern.exec(html)) !== null) {
+    if (match[0].startsWith("</")) depth -= 1;
+    else if (!match[0].endsWith("/>")) depth += 1;
+    if (depth === 0) return { start: openEnd + 1, end: match.index };
+  }
+  return null;
+}
+
 function assertLandmarks(html, insideMain) {
   assert.equal(countRole(html, "banner"), 1, "exactly one banner landmark");
   assert.equal(countRole(html, "main"), 1, "exactly one main landmark");
@@ -159,10 +187,12 @@ function assertLandmarks(html, insideMain) {
       html.indexOf('role="main"') < html.indexOf('role="contentinfo"'),
     "landmarks render in banner / main / contentinfo order",
   );
+  const range = mainContentRange(html);
+  assert.ok(range, "the main element has a matching close tag");
+  const contentAt = html.indexOf(insideMain);
   assert.ok(
-    html.indexOf('role="main"') < html.indexOf(insideMain) &&
-      html.indexOf(insideMain) < html.indexOf('role="contentinfo"'),
-    "the content renders inside main, before the footer",
+    range.start <= contentAt && contentAt < range.end,
+    "the content is a descendant of the main element, not merely after it in the string",
   );
 }
 
