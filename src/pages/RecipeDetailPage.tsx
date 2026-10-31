@@ -236,6 +236,20 @@ export type RecipeDetailPageOverviewProps = {
    * when the action applies). */
   editHref?: string;
   editDraftHref?: string;
+  /** Create-a-draft action (#357): the draft action for a recipe
+   * with NO existing draft — the host creates a draft version via
+   * mutation, then opens the new draft in the version editor.
+   * That is mutation-then-navigate, which Stephen's #248
+   * borderline ruling (1) exempts from the href rule (the
+   * `onTweakManuallyPress` precedent below: it creates a version,
+   * then navigates), so it crosses as a press callback, not an
+   * href, and the host does not pre-create drafts. It renders
+   * the same "Edit draft" button as `editDraftHref`, only when
+   * provided AND there is no `editDraftHref` (an existing draft
+   * opens through the href form instead). The host composes
+   * visibility — it passes this callback only when the displayed
+   * version and status allow a draft to be created. */
+  onCreateDraftPress?: () => void;
   onDeletePress?: () => void;
   /** Lifecycle section; renders only when editable or candidates
    * exist, exactly as the app's OverviewActions returns null
@@ -565,6 +579,7 @@ function OverviewPanel({
     onSharePress,
     editHref,
     editDraftHref,
+    onCreateDraftPress,
     onDeletePress,
     lifecycle,
     tags,
@@ -631,6 +646,10 @@ function OverviewPanel({
         ) : null}
         {editDraftHref ? (
           <Button variant="secondary" size="sm" href={editDraftHref}>
+            Edit draft
+          </Button>
+        ) : onCreateDraftPress ? (
+          <Button variant="secondary" size="sm" onPress={onCreateDraftPress}>
             Edit draft
           </Button>
         ) : null}
