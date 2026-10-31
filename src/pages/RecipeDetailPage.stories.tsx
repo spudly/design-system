@@ -127,11 +127,13 @@ function RecipeDetailPageDemo({
   initialMissing = [],
   cookLogFormOpen = false,
   showPanelSlots = false,
+  createDraft = false,
 }: {
   variant?: "full" | "minimal";
   initialMissing?: string[];
   cookLogFormOpen?: boolean;
   showPanelSlots?: boolean;
+  createDraft?: boolean;
 }) {
   const isFull = variant === "full";
   const baseServings = isFull ? 4 : 2;
@@ -157,7 +159,7 @@ function RecipeDetailPageDemo({
 
   const readyProps: RecipeDetailPageProps = {
     state: "ready",
-    status: isFull ? "evolving" : "idea",
+    status: createDraft ? "perfected" : isFull ? "evolving" : "idea",
     versions: isFull
       ? [
           { id: "version-3", label: "v3 — Active: Sear the chicken harder", versionNumber: 3 },
@@ -182,7 +184,8 @@ function RecipeDetailPageDemo({
       onPrintPress: () => undefined,
       onSharePress: () => undefined,
       editHref: "/recipes/1/edit",
-      ...(isFull ? { editDraftHref: "/recipes/1/edit-draft" } : {}),
+      ...(isFull && !createDraft ? { editDraftHref: "/recipes/1/edit-draft" } : {}),
+      ...(createDraft ? { onCreateDraftPress: () => undefined } : {}),
       onDeletePress: () => undefined,
       lifecycle: isFull
         ? {
@@ -320,6 +323,15 @@ export const Default: Story = {
 
 export const Minimal: Story = {
   render: () => <RecipeDetailPageDemo variant="minimal" />,
+};
+
+export const CreateDraft: Story = {
+  // A Perfected recipe with no existing draft (#357): the
+  // overview's "Edit draft" button is the create-a-draft callback
+  // form (the host creates a draft, then opens it) — the same
+  // button the href form renders in Default, with no editDraftHref
+  // passed.
+  render: () => <RecipeDetailPageDemo createDraft />,
 };
 
 export const Loading: Story = {

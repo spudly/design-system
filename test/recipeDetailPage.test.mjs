@@ -273,16 +273,8 @@ test("the comments slot renders in the overview panel after the ratings card", (
 test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(code, /\{imageUrl \? <Thumbnail/, "the hero image renders only with an imageUrl");
   assert.match(code, /\{description \? <Text variant="body">/, "description renders when present");
-  assert.match(
-    code,
-    /\{prepTimeLabel \? <StatCard label="Prep"/,
-    "the Prep stat renders only with a prep time",
-  );
-  assert.match(
-    code,
-    /\{cookTimeLabel \? <StatCard label="Cook"/,
-    "the Cook stat renders only with a cook time",
-  );
+  assert.match(code, /\{prepTimeLabel \? <StatCard label="Prep"/, "Prep stat needs a prep time");
+  assert.match(code, /\{cookTimeLabel \? <StatCard label="Cook"/, "Cook stat needs a cook time");
   assert.match(code, /\{editHref \? \(\s*<Button[^>]*href=\{editHref\}/, "Edit is href-gated");
   assert.match(code, /\{editDraftHref \? \(\s*<Button[^>]*href=\{editDraftHref\}/, "Edit draft");
   assert.match(
@@ -301,6 +293,17 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
     "the substitutions panel renders only with substitutions",
   );
   assert.match(code, /\{tags\.length > 0 \? <TagList/, "the tag row renders only with tags");
+});
+
+test("the create-a-draft action is an exempt callback, offered only with no existing draft (#357)", () => {
+  // No existing draft = nothing to link to: the host CREATEs the draft (mutation), then navigates — Stephen's #248 ruling (1) exempts it, like onTweakManuallyPress; deliberately no createDraftHref.
+  assert.match(code, /onCreateDraftPress\?: \(\) => void;/);
+  assert.doesNotMatch(code, /createDraftHref/); // no href form for a draft that does not exist yet
+  assert.match(
+    code,
+    /editDraftHref \? \([\s\S]*?href=\{editDraftHref\}[\s\S]*?: onCreateDraftPress \? \(\s*<Button[^>]*onPress=\{onCreateDraftPress\}/,
+  );
+  assert.match(storiesCode, /onCreateDraftPress: \(\) => undefined/);
 });
 
 test("the tweak controls split on the #248 ruling: AI is a link, manual is an exempt callback", () => {
@@ -361,6 +364,7 @@ test("stories exercise the states and the cook-log form slot", () => {
   for (const name of [
     "Default",
     "Minimal",
+    "CreateDraft",
     "Loading",
     "Ingredients",
     "Instructions",

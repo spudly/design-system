@@ -1293,8 +1293,8 @@ Shared-with-me screen.
 
 ## RecipeDetailPage
 
-Open in `Pages/Eciperay/RecipeDetailPage`: Default, Minimal, Loading,
-Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition.
+Open in `Pages/Eciperay/RecipeDetailPage`: Default, Minimal, CreateDraft,
+Loading, Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition.
 
 1. The overview action row: Print and Share render as **real icons**
    (printer / share-2 from `@spudly/ui/icons`) in the same neutral
@@ -1304,6 +1304,12 @@ Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition.
    label color.
 3. CookLogFormOpen: the inline form fits the section width; its
    rating stars and fields do not overflow the card.
+4. CreateDraft: the recipe is Perfected and has no existing draft,
+   so the overview action row's "Edit draft" is the create-a-draft
+   callback form — on web it renders as a **button, not an anchor**
+   (there is no draft to link to yet; the host creates one, then
+   navigates). In Default, where a draft exists, "Edit draft"
+   renders as a link carrying the existing draft's href.
 
 **Run when:** `src/pages/RecipeDetailPage.tsx`, its stories, or a
 changeset naming RecipeDetailPage.

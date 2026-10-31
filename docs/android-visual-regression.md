@@ -247,7 +247,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-profilepage                  | light_warmHarvest |       1 |         1 |
 | pages-eciperay-publicpageframe              | light_warmHarvest |       3 |         3 |
 | pages-eciperay-publicrecipepage             | light_warmHarvest |       8 |         8 |
-| pages-eciperay-recipedetailpage             | light_warmHarvest |       8 |         8 |
+| pages-eciperay-recipedetailpage             | light_warmHarvest |       9 |         8 |
 | pages-eciperay-recipeformpage               | light_warmHarvest |       4 |         4 |
 | pages-eciperay-recipespage                  | light_warmHarvest |      12 |        12 |
 | pages-eciperay-recipespage — narrow variant | light_warmHarvest |      12 |        12 |
@@ -262,7 +262,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **144** |   **144** |
+| **Total**                                   |                   | **145** |   **144** |
 
 <!-- VR-COVERAGE-END -->
 
