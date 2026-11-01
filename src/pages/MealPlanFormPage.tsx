@@ -25,10 +25,14 @@ import { TextField } from "../components/TextField.js";
  *   The fields render as date fields (`type="date"`, so web
  *   gets a real date input with the same YYYY-MM-DD value
  *   contract; eciperay#334). On native, where `type` has no
- *   date-picker equivalent, the fields stay text entry and
- *   `keyboardType="numbers-and-punctuation"` gives a digits-
- *   and-hyphen keyboard for typing the same format. Parsing
- *   and validation stay app-side, as in the app view.
+ *   date-picker equivalent, the fields stay text entry with
+ *   `keyboardType="numbers-and-punctuation"`: on iOS that is
+ *   the digits-and-punctuation pad; on Android no RN
+ *   keyboardType offers a digits-and-hyphen pad (`numeric`
+ *   and `phone-pad` omit the hyphen and would break the
+ *   format), so Android falls back to the default keyboard,
+ *   which retains digits and hyphen entry. Parsing and
+ *   validation stay app-side, as in the app view.
  * - The selectable entries are meals and recipes in one list.
  *   Each option crosses as a view-model carrying its host-
  *   composed selection `key` (the app keys entries

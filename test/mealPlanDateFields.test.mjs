@@ -12,7 +12,10 @@
  *    web renders a real `<input type="date">` with the existing
  *    YYYY-MM-DD value contract) plus
  *    `keyboardType="numbers-and-punctuation"` for native text
- *    entry, where `type` has no date-picker equivalent.
+ *    entry, where `type` has no date-picker equivalent (the
+ *    iOS digits-and-punctuation pad; Android has no
+ *    digits-and-hyphen RN keyboardType, so it falls back to
+ *    the default keyboard, which keeps digits + hyphen).
  * 2. `TextField` gives placeholders a visible theme color by
  *    default: it destructures `placeholderTextColor` out of its
  *    rest props and passes
