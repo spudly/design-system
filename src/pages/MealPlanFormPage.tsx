@@ -21,9 +21,14 @@ import { TextField } from "../components/TextField.js";
  * The contract is MealFormPage's, with the plan's two extra
  * shapes:
  * - The date range crosses as the two raw date strings the
- *   screen edits (`startsOn` / `endsOn`, "YYYY-MM-DD" text
- *   fields) — parsing and validation stay app-side, as in the
- *   app view.
+ *   screen edits (`startsOn` / `endsOn`, "YYYY-MM-DD" values).
+ *   The fields render as date fields (`type="date"`, so web
+ *   gets a real date input with the same YYYY-MM-DD value
+ *   contract; eciperay#334). On native, where `type` has no
+ *   date-picker equivalent, the fields stay text entry and
+ *   `keyboardType="numbers-and-punctuation"` gives a digits-
+ *   and-hyphen keyboard for typing the same format. Parsing
+ *   and validation stay app-side, as in the app view.
  * - The selectable entries are meals and recipes in one list.
  *   Each option crosses as a view-model carrying its host-
  *   composed selection `key` (the app keys entries
@@ -129,12 +134,16 @@ export function MealPlanFormPage({
       />
       <TextField
         label="Starts on"
+        type="date"
+        keyboardType="numbers-and-punctuation"
         value={startsOn}
         onChangeText={onStartsOnChange}
         placeholder="YYYY-MM-DD"
       />
       <TextField
         label="Ends on"
+        type="date"
+        keyboardType="numbers-and-punctuation"
         value={endsOn}
         onChangeText={onEndsOnChange}
         placeholder="YYYY-MM-DD"

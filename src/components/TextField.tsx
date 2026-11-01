@@ -64,6 +64,9 @@ export type TextFieldProps = StyledInputProps & {
  * and enforces a 44px minimum touch target. Pass `secureTextEntry` for
  * password fields. `autoComplete` accepts React Native's values; the
  * password tokens are translated to the HTML tokens on web (#321).
+ * Placeholders default to the theme's `$textMuted` color so they stay
+ * visible on native (eciperay#334); a caller-supplied
+ * `placeholderTextColor` wins over the default.
  */
 /**
  * The auth forms pass React Native's Android-vocabulary autocomplete
@@ -89,6 +92,7 @@ export function TextField({
   id: idProp,
   secureTextEntry,
   type,
+  placeholderTextColor,
   autoComplete,
   onSubmitEditing,
   onCompositionStart,
@@ -204,6 +208,7 @@ export function TextField({
       <StyledInput
         id={id}
         error={!!error}
+        placeholderTextColor={placeholderTextColor ?? "$textMuted"}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         {...a11yProps}
