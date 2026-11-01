@@ -131,6 +131,12 @@ export const Editing: Story = {
  * (returns `false`), so Add, Save (the first tag's editor is
  * open), and Delete on the other rows each surface the page's
  * own dismissible error alert naming the failed operation.
+ * The create failure is also seeded via
+ * `initialFailedOperation`, so the alert is already on screen
+ * in a static capture — the Android visual-regression driver
+ * and Chromatic snapshots never press a control, and an
+ * unseeded baseline would cover only the editor, not the
+ * error surface this story exists to pin.
  */
 export const FailingSaves: Story = {
   render: () => {
@@ -152,6 +158,7 @@ export const FailingSaves: Story = {
           onColorChange={() => undefined}
           onCreate={() => false}
           onDelete={() => false}
+          initialFailedOperation="create"
           editingTagId={editingTagId}
           editName={editName}
           editColor={editColor}

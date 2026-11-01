@@ -75,8 +75,9 @@ import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
  * mutating handlers (create, save-edit, delete) may report
  * failure by returning `false` — synchronously or from a
  * promise — or by rejecting/throwing; any other result
- * (including the `void` existing hosts return) is success.
- * The page tracks which operation failed and renders the
+ * (including the `void` existing hosts return, and any other
+ * value a host's handler returns for its own purposes) is
+ * success. The page tracks which operation failed and renders the
  * page-level error pattern — a dismissible error `Alert`
  * (its error severity announces with role="alert", the
  * #329-governed announcement mechanics) above the create
@@ -85,7 +86,20 @@ import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
  * to render one, and the copy is the page's own.
  */
 
-export type TagsPageOperationResult = boolean | void | Promise<boolean | void>;
+/**
+ * What a mutating handler (create / save-edit / delete) may
+ * return (#374): `false` — synchronously or from a promise —
+ * reports failure, as does a rejection or throw; every other
+ * result is success. The type is `unknown` on purpose: the
+ * pre-#374 contract typed the handlers `() => void`, which
+ * silently discarded return values, so existing handlers that
+ * return a created tag, a mutation result, a count, or a
+ * promise of any of those must keep typechecking unchanged.
+ * Narrowing this to a boolean union would break those hosts
+ * on a patch upgrade for no runtime gain — the page only
+ * ever compares the awaited result against `false`.
+ */
+export type TagsPageOperationResult = unknown;
 
 type TagsPageFailedOperation = "create" | "update" | "delete";
 
@@ -141,6 +155,18 @@ export type TagsPageProps = {
   onSaveEdit?: () => TagsPageOperationResult;
   onCancelEdit?: () => void;
   isUpdating?: boolean;
+  /**
+   * Seeds the page's failed-operation state (#374): the error
+   * alert for the named operation renders from the first frame,
+   * before any handler runs. Hosts normally leave this unset —
+   * failures arrive through the handlers — but a static capture
+   * (the Android visual-regression driver, a Chromatic snapshot)
+   * never presses a control, so the FailingSaves story seeds
+   * `"create"` to pin the error surface deterministically. The
+   * copy stays the page's own; this names an operation, never a
+   * message.
+   */
+  initialFailedOperation?: TagsPageFailedOperation | null;
 };
 
 export function TagsPage({
@@ -163,8 +189,11 @@ export function TagsPage({
   onSaveEdit,
   onCancelEdit,
   isUpdating = false,
+  initialFailedOperation = null,
 }: TagsPageProps) {
-  const [failedOperation, setFailedOperation] = useState<TagsPageFailedOperation | null>(null);
+  const [failedOperation, setFailedOperation] = useState<TagsPageFailedOperation | null>(
+    initialFailedOperation,
+  );
 
   const runOperation = async (
     operation: TagsPageFailedOperation,
