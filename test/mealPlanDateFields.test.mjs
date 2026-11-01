@@ -78,8 +78,8 @@ test("TextField destructures placeholderTextColor out of rest (eciperay#334)", (
 test("TextField defaults placeholderTextColor to $textMuted, caller wins (eciperay#334)", () => {
   assert.match(
     textField,
-    /placeholderTextColor=\{placeholderTextColor \?\? "\$textMuted"\}/,
-    'the input must receive placeholderTextColor ?? "$textMuted" explicitly',
+    /placeholderTextColor=\{\s*placeholderTextColor \?\? \(changed \? tokens\.colors\.warning\.warning10 : "\$textMuted"\)\s*\}/,
+    'the input must receive placeholderTextColor ?? (changed ? warning10 : "$textMuted") explicitly',
   );
 });
 
@@ -195,6 +195,37 @@ test("SSR: a caller placeholderTextColor wins over the default (eciperay#334)", 
       label: "Title",
       value: "",
       placeholder: "Plan title",
+      placeholderTextColor: "#123456",
+      onChangeText: noop,
+    }),
+  );
+  const [input] = inputTags(html);
+  assert.equal(placeholderColorOf(html, input), "#123456");
+});
+
+test("SSR: a changed TextField defaults its placeholder to warning10 for contrast on the warning wash (eciperay#334)", async () => {
+  const { React, TextField } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(TextField, {
+      label: "Title",
+      value: "",
+      placeholder: "Plan title",
+      changed: true,
+      onChangeText: noop,
+    }),
+  );
+  const [input] = inputTags(html);
+  assert.equal(placeholderColorOf(html, input), "#78350f");
+});
+
+test("SSR: a caller placeholderTextColor wins on a changed field too (eciperay#334)", async () => {
+  const { React, TextField } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(TextField, {
+      label: "Title",
+      value: "",
+      placeholder: "Plan title",
+      changed: true,
       placeholderTextColor: "#123456",
       onChangeText: noop,
     }),
