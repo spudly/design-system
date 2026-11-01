@@ -1,4 +1,6 @@
+import { useState } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
+import { Alert } from "../components/Alert.js";
 import { BadgeCardRow } from "../components/BadgeCardRow.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -68,7 +70,30 @@ import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
  * display row composes through the same TrailingActionsRow
  * as the form rows, so it gains the same wrap at narrow
  * widths instead of squeezing.
+ *
+ * Save failures surface on the page itself (#374): the
+ * mutating handlers (create, save-edit, delete) may report
+ * failure by returning `false` — synchronously or from a
+ * promise — or by rejecting/throwing; any other result
+ * (including the `void` existing hosts return) is success.
+ * The page tracks which operation failed and renders the
+ * page-level error pattern — a dismissible error `Alert`
+ * (its error severity announces with role="alert", the
+ * #329-governed announcement mechanics) above the create
+ * form, with a message naming the failed operation. There
+ * is deliberately no error-string prop: hosts own no markup
+ * to render one, and the copy is the page's own.
  */
+
+export type TagsPageOperationResult = boolean | void | Promise<boolean | void>;
+
+type TagsPageFailedOperation = "create" | "update" | "delete";
+
+const tagsPageFailureMessages: Record<TagsPageFailedOperation, string> = {
+  create: "Couldn't create the tag. Please try again.",
+  update: "Couldn't save the tag changes. Please try again.",
+  delete: "Couldn't delete the tag. Please try again.",
+};
 
 export type TagsPageTag = {
   id: string;
@@ -91,8 +116,10 @@ export type TagsPageProps = {
   colorOptions: TagColorName[];
   onNameChange: (value: string) => void;
   onColorChange: (value: TagColorName) => void;
-  onCreate: () => void;
-  onDelete: (id: string) => void;
+  /** Creates the tag; returning `false` (or rejecting) reports failure (#374). */
+  onCreate: () => TagsPageOperationResult;
+  /** Deletes the tag; returning `false` (or rejecting) reports failure (#374). */
+  onDelete: (id: string) => TagsPageOperationResult;
   isCreating?: boolean;
   /** Id of the tag whose row is showing the inline edit form, if any. */
   editingTagId?: string | null;
@@ -107,8 +134,11 @@ export type TagsPageProps = {
   onStartEdit?: (tag: TagsPageTag) => void;
   onEditNameChange?: (value: string) => void;
   onEditColorChange?: (value: TagColorName) => void;
-  /** Applies the edit draft to the tag named by `editingTagId`. */
-  onSaveEdit?: () => void;
+  /**
+   * Applies the edit draft to the tag named by `editingTagId`;
+   * returning `false` (or rejecting) reports failure (#374).
+   */
+  onSaveEdit?: () => TagsPageOperationResult;
   onCancelEdit?: () => void;
   isUpdating?: boolean;
 };
@@ -134,10 +164,47 @@ export function TagsPage({
   onCancelEdit,
   isUpdating = false,
 }: TagsPageProps) {
+  const [failedOperation, setFailedOperation] = useState<TagsPageFailedOperation | null>(null);
+
+  const runOperation = async (
+    operation: TagsPageFailedOperation,
+    action: () => TagsPageOperationResult,
+  ) => {
+    try {
+      const result = await action();
+      setFailedOperation(result === false ? operation : null);
+    } catch {
+      setFailedOperation(operation);
+    }
+  };
+
+  const handleCreate = () => {
+    void runOperation("create", onCreate);
+  };
+
+  const handleSaveEdit = () => {
+    void runOperation("update", () => onSaveEdit?.());
+  };
+
+  const handleDelete = (id: string) => {
+    void runOperation("delete", () => onDelete(id));
+  };
+
   return (
     <ScreenContainer>
       <SectionStack>
         <Text variant="title">Tags</Text>
+        {failedOperation ? (
+          <Alert
+            severity="error"
+            dismissible
+            onDismiss={() => {
+              setFailedOperation(null);
+            }}
+          >
+            {tagsPageFailureMessages[failedOperation]}
+          </Alert>
+        ) : null}
         <FieldStack>
           <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
           <TrailingActionsRow
@@ -148,7 +215,7 @@ export function TagsPage({
             <Button
               variant="primary"
               disabled={!name.trim() || isCreating}
-              onPress={onCreate}
+              onPress={handleCreate}
               accessibilityLabel="Add"
             >
               Add
@@ -195,9 +262,7 @@ export function TagsPage({
                       <Button
                         variant="primary"
                         disabled={!editName.trim() || isUpdating}
-                        onPress={() => {
-                          onSaveEdit?.();
-                        }}
+                        onPress={handleSaveEdit}
                         accessibilityLabel="Save"
                       >
                         Save
@@ -227,7 +292,7 @@ export function TagsPage({
                       accessibilityLabel: `Delete tag ${tag.name}`,
                       variant: "error" as const,
                       onPress: () => {
-                        onDelete(tag.id);
+                        handleDelete(tag.id);
                       },
                     },
                   ]}
