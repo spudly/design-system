@@ -104,7 +104,12 @@ export {
   type LandingPageCta,
   type LandingPageFeature,
 } from "./LandingPage.js";
-export { TagsPage, type TagsPageProps, type TagsPageTag } from "./TagsPage.js";
+export {
+  TagsPage,
+  type TagsPageOperationResult,
+  type TagsPageProps,
+  type TagsPageTag,
+} from "./TagsPage.js";
 export { FeedbackPage, type FeedbackPageProps } from "./FeedbackPage.js";
 export {
   AddRecipeMenuPage,

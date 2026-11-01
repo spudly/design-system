@@ -245,7 +245,8 @@ test("TagsPage supports inline rename through a controlled edit draft (eciperay#
   assert.match(source, /onStartEdit\?: \(tag: TagsPageTag\) => void/);
   assert.match(source, /onEditNameChange\?: \(value: string\) => void/);
   assert.match(source, /onEditColorChange\?: \(value: TagColorName\) => void/);
-  assert.match(source, /onSaveEdit\?: \(\) => void/);
+  // #374: save-edit reports failure through its result, like create/delete.
+  assert.match(source, /onSaveEdit\?: \(\) => TagsPageOperationResult/);
   assert.match(source, /onCancelEdit\?: \(\) => void/);
   // The row offers an accessible Edit action and the editor a Save action.
   // Since #119 the Edit action crosses as BadgeCardRow action

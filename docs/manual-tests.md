@@ -1376,12 +1376,20 @@ changeset naming PublicRecipePage or PublicPageFrame.
 
 ## TagsPage
 
-Open in `Pages/Eciperay/TagsPage`: WithTags, Loading.
+Open in `Pages/Eciperay/TagsPage`: WithTags, Loading, FailingSaves.
 
 1. In the create form, the **name input and the color swatches never
    overlap** at the story width — the form stacks cleanly.
 2. Existing tags render their color swatch and name on one line with
    even row spacing.
+3. In FailingSaves (every save handler reports failure): the story
+   opens with the "Couldn't create the tag" alert already showing
+   (the create failure is seeded so static captures cover the
+   error surface). Pressing **Add**, **Save** in the open editor,
+   and **Delete** on another row each shows the error alert above
+   the create form naming the failed operation ("Couldn't create
+   the tag" / "Couldn't save the tag changes" / "Couldn't delete
+   the tag"); the alert's dismiss (×) clears it.
 
 **Run when:** `src/pages/TagsPage.tsx`, its stories, or a changeset
 naming TagsPage.
