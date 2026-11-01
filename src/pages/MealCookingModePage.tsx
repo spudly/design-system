@@ -1,6 +1,11 @@
+import { Alert } from "../components/Alert.js";
+import { Button } from "../components/Button.js";
 import { PrevNextNav } from "../components/PrevNextNav.js";
+import { ScreenContainer } from "../components/ScreenContainer.js";
+import { SectionStack } from "../components/SectionStack.js";
 import { StepDots } from "../components/StepDots.js";
 import { StepOverlay } from "../components/StepOverlay.js";
+import { Text } from "../components/Text.js";
 
 /**
  * MealCookingModePage (#125, B3b): the meal cooking mode's
@@ -39,6 +44,28 @@ import { StepOverlay } from "../components/StepOverlay.js";
  * - There is no swipe navigation here: the app view has none
  *   (swipe is the recipe mode's app-side shell), and adding
  *   it would be a behavior change, not a port.
+ * - Error state (eciperay#338): the props are a union, as on
+ *   PublicRecipePage — the error state is carried in the
+ *   props, not inferred from missing data. Before this state
+ *   existed, a failed cook-plan request (the endpoint can
+ *   answer 404 / 409 / 502) left hosts gating on
+ *   loading / no-plan forever: the page never mounted and
+ *   the user sat on a loading spinner with no error text.
+ *   The `{ state: "error" }` member needs no steps at all,
+ *   so a host renders it the moment its cook-plan (or meal)
+ *   query fails, in place of its loading gate. It renders
+ *   the established page-level error pattern — an error
+ *   `Alert` (whose error severity carries the alert role;
+ *   the wider announcement mechanics are #329's and are not
+ *   prejudged here) in the standard page shell — under the
+ *   meal's title when the host has it, with the cooking
+ *   mode's own Done intent as the way out. The host may
+ *   supply `errorMessage` when it has specific wording for
+ *   the failure; omitted, the page's own generic copy
+ *   renders (the PublicRecipePage DS-owned-copy precedent).
+ *   The ready member's `state` stays optional, so existing
+ *   hosts passing the flat ready props keep working
+ *   unchanged.
  *
  * Documented deviations from the app view's rendering:
  * - The overlay's "white" is the theme's $surface, and its
@@ -55,9 +82,10 @@ import { StepOverlay } from "../components/StepOverlay.js";
  *
  * De-styled for #119: the page renders no layout primitives
  * and sets no styling props — the overlay shell (formerly
- * this page's own chrome) is the StepOverlay component, and
- * the page contributes only the bounds logic, the composed
- * step line, and its navigation controls.
+ * this page's own chrome) is the StepOverlay component, the
+ * error state's shell and separation are ScreenContainer and
+ * SectionStack, and the page contributes only the bounds
+ * logic, the composed step line, and its navigation controls.
  */
 
 export type MealCookingModePageStep = {
@@ -66,7 +94,11 @@ export type MealCookingModePageStep = {
   body: string;
 };
 
-export type MealCookingModePageProps = {
+export type MealCookingModePageReadyProps = {
+  /** Discriminator for the union; optional so existing hosts
+   * passing the flat ready props keep working unchanged —
+   * only the error member must name its state. */
+  state?: "ready";
   mealTitle: string;
   steps: MealCookingModePageStep[];
   stepIndex: number;
@@ -75,14 +107,48 @@ export type MealCookingModePageProps = {
   onDone: () => void;
 };
 
-export function MealCookingModePage({
-  mealTitle,
-  steps,
-  stepIndex,
-  onPrev,
-  onNext,
-  onDone,
-}: MealCookingModePageProps) {
+export type MealCookingModePageErrorProps = {
+  state: "error";
+  /** The meal's title, when the host has it (its meal query
+   * may have succeeded while the cook plan failed); the
+   * generic cooking-mode title renders without it. */
+  mealTitle?: string;
+  /** The failure's wording, when the host has specific copy
+   * for it; omitted, the page's own generic copy renders. */
+  errorMessage?: string;
+  /** The way out of cooking mode — the same Done intent the
+   * ready state reports. */
+  onDone: () => void;
+};
+
+export type MealCookingModePageProps =
+  MealCookingModePageReadyProps | MealCookingModePageErrorProps;
+
+// The error state's generic copy (DS-owned, the
+// PublicRecipePage precedent): it names the failed load and
+// the user's recourse, without claiming a cause — the host's
+// failures range from a missing meal to an unavailable
+// cook-plan service.
+const LOAD_ERROR_MESSAGE = "Couldn't load the cook plan for this meal. Please try again.";
+const LOAD_ERROR_TITLE = "Cooking mode";
+
+export function MealCookingModePage(props: MealCookingModePageProps) {
+  if (props.state === "error") {
+    const { mealTitle, errorMessage, onDone } = props;
+    return (
+      <ScreenContainer>
+        <SectionStack>
+          <Text variant="title">{mealTitle ?? LOAD_ERROR_TITLE}</Text>
+          <Alert severity="error">{errorMessage ?? LOAD_ERROR_MESSAGE}</Alert>
+          <Button variant="secondary" onPress={onDone}>
+            Done
+          </Button>
+        </SectionStack>
+      </ScreenContainer>
+    );
+  }
+
+  const { mealTitle, steps, stepIndex, onPrev, onNext, onDone } = props;
   const current = steps.at(stepIndex);
   if (current === undefined) {
     return null;

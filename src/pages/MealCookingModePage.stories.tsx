@@ -74,6 +74,27 @@ export const LastStep: Story = {
 };
 
 /**
+ * The load-error state (eciperay#338): the cook-plan request
+ * failed, so there are no steps to show — the page renders
+ * its error alert under the meal's title, with Done as the
+ * way out, instead of the host sitting on its loading gate
+ * forever. Static captures never press a control, so the
+ * state is a story of its own: the alert renders from the
+ * first frame.
+ */
+export const LoadError: Story = {
+  render: () => (
+    <Viewport>
+      <MealCookingModePage
+        state="error"
+        mealTitle={mealCookingFixture.mealTitle}
+        onDone={() => undefined}
+      />
+    </Viewport>
+  ),
+};
+
+/**
  * The tall-body case (#332): a long step body in a short frame
  * (430px stands in for a short viewport). StepOverlay's bounded
  * scroll region holds the body and the navigation — the capture
