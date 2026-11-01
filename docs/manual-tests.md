@@ -1088,7 +1088,7 @@ NoNotesOrNutrition; `Pages/Eciperay/MealsHubPage`: Default,
 PlansTab, Empty; `Pages/Eciperay/ShoppingListPage`: Default,
 Loading, Empty; `Pages/Eciperay/HomePage`: WithRecipes, Empty,
 Loading; `Pages/Eciperay/MealCookingModePage`: Default,
-FirstStep, LastStep.
+FirstStep, LastStep, LoadError.
 
 1. MealDetailPage Default: xl bold title, muted notes and
    nutrition lines, Cook meal / Edit side by side, then the
@@ -1116,6 +1116,10 @@ FirstStep, LastStep.
    over the step body, Done pill at the top right, dots and
    Back / Next below. FirstStep has no Back; LastStep disables
    Next.
+6. MealCookingModePage LoadError: no overlay and no step UI —
+   the meal title over an error alert reading "Couldn't load
+   the cook plan for this meal. Please try again.", with a
+   Done button below it as the way out.
 
 **Run when:** any of the five pages' sources or stories, or a
 changeset naming any of them. Run only the numbered cases for

@@ -273,7 +273,7 @@ test("stories cover the captured states for each B3b page", () => {
     MealFormPage: ["Default", "NoSelection", "SaveError"],
     MealPlanFormPage: ["Default", "NoSelection"],
     ShoppingListPage: ["Default", "Loading", "Empty"],
-    MealCookingModePage: ["Default", "FirstStep", "LastStep"],
+    MealCookingModePage: ["Default", "FirstStep", "LastStep", "LoadError"],
     MealDetailPage: ["Default", "NoNotesOrNutrition"],
     MealsHubPage: ["Default", "PlansTab", "Empty"],
   };
