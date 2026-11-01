@@ -126,6 +126,59 @@ export const Editing: Story = {
   },
 };
 
+/**
+ * Save failures (#374): every mutating handler reports failure
+ * (returns `false`), so Add, Save (the first tag's editor is
+ * open), and Delete on the other rows each surface the page's
+ * own dismissible error alert naming the failed operation.
+ * The create failure is also seeded via
+ * `initialFailedOperation`, so the alert is already on screen
+ * in a static capture — the Android visual-regression driver
+ * and Chromatic snapshots never press a control, and an
+ * unseeded baseline would cover only the editor, not the
+ * error surface this story exists to pin.
+ */
+export const FailingSaves: Story = {
+  render: () => {
+    const [editingTagId, setEditingTagId] = useState<string | null>(
+      tagsFixture.tags[0]?.id ?? null,
+    );
+    const [editName, setEditName] = useState(tagsFixture.tags[0]?.name ?? "");
+    const [editColor, setEditColor] = useState<TagColorName>(
+      tagsFixture.tags[0]?.color ?? "indigo",
+    );
+    return (
+      <Viewport>
+        <TagsPage
+          tags={tagsFixture.tags}
+          name="Baking"
+          color="purple"
+          colorOptions={tagsFixture.colorOptions}
+          onNameChange={() => undefined}
+          onColorChange={() => undefined}
+          onCreate={() => false}
+          onDelete={() => false}
+          initialFailedOperation="create"
+          editingTagId={editingTagId}
+          editName={editName}
+          editColor={editColor}
+          onStartEdit={(tag: TagsPageTag) => {
+            setEditingTagId(tag.id);
+            setEditName(tag.name);
+            setEditColor(tag.color);
+          }}
+          onEditNameChange={setEditName}
+          onEditColorChange={setEditColor}
+          onSaveEdit={() => false}
+          onCancelEdit={() => {
+            setEditingTagId(null);
+          }}
+        />
+      </Viewport>
+    );
+  },
+};
+
 export const Loading: Story = {
   render: () => (
     <Viewport>
