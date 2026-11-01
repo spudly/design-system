@@ -26,10 +26,20 @@ function Viewport({ children }: { children: ReactNode }) {
  * The page's primary story wires the full inline-edit contract
  * (eciperay#254) the way a host screen would: rows offer Edit, and
  * the story holds the controlled draft, starting with no editor open.
+ *
+ * The last row is a preset-style tag (#375): the host marks it
+ * `canEdit: false, canDelete: false`, so its row renders the
+ * badge with no Edit/Delete actions — the server would reject
+ * either operation, so the page offers neither. The other rows
+ * carry no eligibility flags and stay fully actionable, the
+ * pre-#375 behavior.
  */
 export const WithTags: Story = {
   render: () => {
-    const [tags, setTags] = useState<TagsPageTag[]>(tagsFixture.tags);
+    const [tags, setTags] = useState<TagsPageTag[]>([
+      ...tagsFixture.tags,
+      { id: "tag-preset", name: "Preset", color: "gray", canEdit: false, canDelete: false },
+    ]);
     const [editingTagId, setEditingTagId] = useState<string | null>(null);
     const [editName, setEditName] = useState(tagsFixture.tags[0]?.name ?? "");
     const [editColor, setEditColor] = useState<TagColorName>(

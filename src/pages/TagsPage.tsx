@@ -58,6 +58,18 @@ import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
  * `onSaveEdit`. Without `onStartEdit` the rows stay read-only
  * apart from Delete, as before.
  *
+ * Row actions are per-row eligible (#375): a host whose server
+ * only permits changing some tags (Eciperay's preset tags are
+ * read-only to callers, eciperay#254) marks those tags with
+ * `canEdit: false` and/or `canDelete: false` on the tag data
+ * itself, and the page renders Edit/Delete only where the row
+ * is eligible — an ineligible row shows no control that could
+ * only fail server-side. Both flags default to eligible when
+ * absent, so hosts that pass neither see the actions on every
+ * row, exactly as before. An edit-ineligible row never swaps
+ * to the edit form either, even if the host's `editingTagId`
+ * names it.
+ *
  * De-styled for #119: the page composes DS components only —
  * the sections stack in SectionStack, the title is Text's
  * `title` variant, each form's fields stack in FieldStack,
@@ -118,6 +130,20 @@ export type TagsPageTag = {
    * to a name through `tagColorNameForHex` before passing tags in.
    */
   color: TagColorName;
+  /**
+   * Whether this tag's row offers the Edit action (#375): the
+   * host sets `false` for tags its server will not let the
+   * caller update (preset tags). Absent means eligible — the
+   * row offers Edit whenever the host supplies `onStartEdit`.
+   */
+  canEdit?: boolean;
+  /**
+   * Whether this tag's row offers the Delete action (#375):
+   * the host sets `false` for tags its server will not let the
+   * caller delete (preset tags). Absent means eligible — the
+   * row offers Delete, as every row did before #375.
+   */
+  canDelete?: boolean;
 };
 
 export type TagsPageProps = {
@@ -256,7 +282,7 @@ export function TagsPage({
         ) : (
           <CardStack>
             {tags.map((tag) =>
-              editingTagId === tag.id ? (
+              editingTagId === tag.id && tag.canEdit !== false ? (
                 <Card key={tag.id} variant="compact">
                   <FieldStack>
                     <TextField
@@ -305,7 +331,7 @@ export function TagsPage({
                   badgeLabel={tag.name}
                   badgeColor={tag.color}
                   actions={[
-                    ...(onStartEdit
+                    ...(onStartEdit && tag.canEdit !== false
                       ? [
                           {
                             label: "Edit",
@@ -316,14 +342,18 @@ export function TagsPage({
                           },
                         ]
                       : []),
-                    {
-                      label: "Delete",
-                      accessibilityLabel: `Delete tag ${tag.name}`,
-                      variant: "error" as const,
-                      onPress: () => {
-                        handleDelete(tag.id);
-                      },
-                    },
+                    ...(tag.canDelete !== false
+                      ? [
+                          {
+                            label: "Delete",
+                            accessibilityLabel: `Delete tag ${tag.name}`,
+                            variant: "error" as const,
+                            onPress: () => {
+                              handleDelete(tag.id);
+                            },
+                          },
+                        ]
+                      : []),
                   ]}
                 />
               ),
