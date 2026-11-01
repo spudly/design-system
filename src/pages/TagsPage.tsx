@@ -55,8 +55,10 @@ import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
  * controlled exactly like the create form and the CommentItem
  * editor: the host seeds the draft from the tag it is handed,
  * holds it while the user types, and applies it on
- * `onSaveEdit`. Without `onStartEdit` the rows stay read-only
- * apart from Delete, as before.
+ * `onSaveEdit`. Without `onStartEdit`, rows offer no Edit action,
+ * but a host can still show the inline editor by supplying
+ * `editingTagId` for an eligible row. Delete remains available
+ * unless `canDelete: false`.
  *
  * Row actions are per-row eligible (#375): a host whose server
  * only permits changing some tags (Eciperay's preset tags are
