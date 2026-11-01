@@ -31,7 +31,8 @@ import { TextField } from "../components/TextField.js";
  *   keyboardType offers a digits-and-hyphen pad (`numeric`
  *   and `phone-pad` omit the hyphen and would break the
  *   format), so Android falls back to the default keyboard,
- *   which retains digits and hyphen entry. Parsing and
+ *   whose available characters are set by the user's IME
+ *   rather than guaranteed here. Parsing and
  *   validation stay app-side, as in the app view.
  * - The selectable entries are meals and recipes in one list.
  *   Each option crosses as a view-model carrying its host-

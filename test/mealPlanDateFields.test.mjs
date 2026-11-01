@@ -15,7 +15,8 @@
  *    entry, where `type` has no date-picker equivalent (the
  *    iOS digits-and-punctuation pad; Android has no
  *    digits-and-hyphen RN keyboardType, so it falls back to
- *    the default keyboard, which keeps digits + hyphen).
+ *    the default keyboard, whose characters are set by the
+ *    user's IME).
  * 2. `TextField` gives placeholders a visible theme color by
  *    default: it destructures `placeholderTextColor` out of its
  *    rest props and passes
