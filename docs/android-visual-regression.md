@@ -190,8 +190,8 @@ Warm Harvest and `pages-memorize` under Quiet Dawn. Since
 2026-10-24 the set is **light themes only**: dark captures doubled
 the snapshot count (and the job's emulator time) without catching
 layout regressions the light set misses, so the dark baselines were
-deleted outright. With the current story set that is 121 + 22 =
-**143 baselines**. Curating hundreds of component screenshots was
+deleted outright. With the current story set, that is
+**146 baselines** in total. Curating hundreds of component screenshots was
 more review surface than the Android check needs; component stories
 stay covered by Chromatic on web, and wrong-brand page captures are
 excluded because pages pin their brand. The rule lives in the
@@ -304,7 +304,7 @@ The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
 12 `pages-eciperay-recipespage` stories x light = **12
-baselines** (143 total). RecipesPage only, deliberately — a second
+baselines** (146 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
