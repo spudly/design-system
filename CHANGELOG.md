@@ -1,5 +1,13 @@
 # @spudly/ui
 
+## 1.16.4
+
+### Patch Changes
+
+- f3e201b: MealCookingModePage: when the meal cook plan fails to load, the page now shows an error message instead of staying on the loading state indefinitely. Hosts render the new `state: "error"` props (with the meal title and an optional error message) when the cook-plan request fails; the page shows the message with a Done action to leave cooking mode.
+- 3f2b6c1: MealPlanFormPage: the Starts on and Ends on fields are now date fields on web — they render as real date inputs (`type="date"`) carrying the same YYYY-MM-DD values, so a date can be picked/typed in the browser's date control instead of being entered as free text; on native they keep text entry with the iOS digits-and-punctuation pad (Android falls back to the default keyboard). TextField: placeholders now render in the theme's muted text color by default, so field placeholders (including the meal plan date fields' YYYY-MM-DD hint) are visible on Android/native instead of blending into the field background; a placeholder color a caller passes still wins; on a `changed` field (warning-wash fill) the default is the warning ramp's dark step so the placeholder keeps contrast in dark mode too. Test: open MealPlanFormPage, confirm Starts on and Ends on present as date fields on web and accept a date that round-trips as YYYY-MM-DD, and confirm TextField placeholders are legible on Android/native, including on a changed field in dark mode.
+- b7e66f9: TagsPage now surfaces save failures itself: when creating a tag, saving an inline tag edit, or deleting a tag fails (the handler returns `false` or rejects), TagsPage shows a dismissible error alert above the create form naming the operation that failed — "Couldn't create the tag", "Couldn't save the tag changes", or "Couldn't delete the tag" — instead of failing silently. The alert clears on the next successful operation or when dismissed. Existing hosts are unaffected: handlers that return nothing — or any other value, as the previous void contract allowed — behave as before, and hosts that can report failure simply return `false` (or reject) from the existing `onCreate` / `onSaveEdit` / `onDelete` handlers. Test in Storybook (Pages/Eciperay/TagsPage, FailingSaves story): the story opens with the create-failure alert already showing (seeded so static captures cover it); press Add, Save, and Delete and confirm the matching error alert appears and dismisses.
+
 ## 1.16.3
 
 ### Patch Changes
