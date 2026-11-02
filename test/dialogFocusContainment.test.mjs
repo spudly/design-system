@@ -44,7 +44,15 @@ test("Tab is swallowed only when the dialog content holds no effectively tabbabl
   // negative-tabindex-only controls, and unrendered elements are
   // not Tab stops; summary and contenteditable elements are.
   assert.match(code, /content\.querySelectorAll\(/);
+  assert.match(code, /a\[href\], area\[href\], button/);
   assert.match(code, /summary, iframe, audio\[controls\], video\[controls\]/);
+  // Effective state beyond the element itself (Copilot review on
+  // PR #392, head 3d1cd1c): inert ancestors and disabled
+  // fieldsets remove Tab stops; an image-map area is a stop
+  // despite having no layout box of its own.
+  assert.match(code, /candidate\.closest\("\[inert\]"\)/);
+  assert.match(code, /candidate\.closest\("fieldset\[disabled\]"\)/);
+  assert.match(code, /candidate instanceof HTMLAreaElement/);
   assert.match(code, /\[contenteditable=""\], \[contenteditable="true"\]/);
   assert.doesNotMatch(code, /\[contenteditable\],/);
   assert.match(code, /candidate\.hasAttribute\("disabled"\)/);

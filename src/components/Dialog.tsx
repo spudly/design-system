@@ -382,11 +382,14 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // Cancel <-> Delete correctly there (manual QA on PR #386).
   // Refinements from review rounds on PR #392: (1) tabbability
   // is effective, not selector-shaped — a hidden input, a
-  // disabled or visibility-hidden control, a negative-tabindex-
+  // disabled or visibility-hidden control, a control inside an
+  // inert subtree or a disabled fieldset, a negative-tabindex-
   // only control, or an unrendered element is not a Tab stop,
   // while native stops a naive selector misses (summary, iframe,
-  // media controls, genuinely editable content) are; an element
-  // marked contenteditable="false" is not a stop either. (2) Only
+  // media controls, image-map areas, genuinely editable content)
+  // are; an element marked contenteditable="false" is not a stop
+  // either, and an image-map area counts without a layout box of
+  // its own (its image carries the geometry). (2) Only
   // the topmost modal intercepts — a covered dialog's listener
   // must not swallow Tab for the dialog above it, where covered
   // means a LATER, still-open modal frame (aria-modal or the
@@ -423,14 +426,27 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         }
       }
       const candidates = content.querySelectorAll(
-        'a[href], button, input, select, textarea, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
+        'a[href], area[href], button, input, select, textarea, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
       );
       const hasTabbable = Array.from(candidates).some((candidate) => {
         if (candidate.hasAttribute("disabled")) {
           return false;
         }
+        if (candidate.closest("[inert]")) {
+          return false;
+        }
+        const disabledFieldset = candidate.closest("fieldset[disabled]");
+        if (disabledFieldset) {
+          const firstLegend = disabledFieldset.querySelector(":scope > legend");
+          if (!firstLegend || !firstLegend.contains(candidate)) {
+            return false;
+          }
+        }
         if (candidate instanceof HTMLInputElement && candidate.type === "hidden") {
           return false;
+        }
+        if (candidate instanceof HTMLAreaElement) {
+          return true;
         }
         const tabStopAttr = candidate.getAttribute("tabindex");
         if (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) < 0) {
