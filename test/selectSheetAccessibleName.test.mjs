@@ -22,6 +22,6 @@ const source = readFileSync(join(here, "..", "src", "components", "SelectField.t
 test("the touch Sheet carries the field label as its accessible name, with a fallback", () => {
   assert.match(
     source,
-    /<Sheet modal dismissOnSnapToBottom aria-label=\{label \|\| "Select an option"\}>/,
+    /<Sheet\s+modal\s+dismissOnSnapToBottom\s+aria-label=\{label\?\.trim\(\) \? label : "Select an option"\}/,
   );
 });
