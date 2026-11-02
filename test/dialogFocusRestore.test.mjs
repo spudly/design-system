@@ -146,7 +146,7 @@ test("unmount while open schedules a deferred restore that a StrictMode replay s
 
 test("the restore re-asserts on a deferred tick only while focus sits on the body (#385)", () => {
   assert.match(code, /requestAnimationFrame\(reassert\);/);
-  assert.match(code, /setTimeout\(reassert, 350\);/);
+  assert.match(code, /reassertTimerRef\.current = setTimeout\(\(\) => \{/);
   assert.match(
     code,
     /document\.activeElement === document\.body && document\.contains\(restoreTarget\)/,
@@ -165,6 +165,37 @@ test("a successful restore retains its target, and unmount leaves no live retrie
   assert.match(code, /cancelAnimationFrame\(reassertRafRef\.current\);/);
   assert.match(code, /unmountRestoreRef\.current = true;/);
   assert.match(code, /if \(!fromUnmount\) \{/);
+});
+
+test("closing-commit focus is retained even when the opener is missing or detached (#385)", () => {
+  // The yield-to-host-placement retention must run before the
+  // target-validity guard: a missing (null) or detached (no
+  // longer contained) opener goes through that guard, and if it
+  // returned first, the host's closing-commit control — whose
+  // focusin was ignored while the dialog was open — would never
+  // be retained, leaving a reopening from it targetless (Copilot
+  // review on PR #386, head b298361).
+  const retainIndex = code.indexOf("restoreTargetRef.current = activeElement;");
+  const guardIndex = code.indexOf("!document.contains(restoreTarget)");
+  assert.notEqual(retainIndex, -1);
+  assert.notEqual(guardIndex, -1);
+  assert.ok(
+    retainIndex < guardIndex,
+    "the closing-commit retention must precede the target-validity guard",
+  );
+});
+
+test("the 350 ms retry does not reclaim an opener intentionally blurred after the frame retry (#385)", () => {
+  // An intentional blur of the restored opener retires the target
+  // through the staleness check; the long retry then has nothing
+  // it may reclaim. The overlay's own focus reset still recovers:
+  // the frame retry's refocus re-tracks the opener via focusin,
+  // so the target matches again when the long retry runs (Copilot
+  // review on PR #386, head b298361).
+  assert.match(
+    code,
+    /reassertTimerRef\.current = setTimeout\(\(\) => \{\s+if \(restoreTargetRef\.current !== restoreTarget\) \{\s+return;\s+\}\s+reassert\(\);\s+\}, 350\);/,
+  );
 });
 
 test("rejected shapes stay out: no render-time capture, no autofocus-event handlers (#385)", () => {

@@ -91,13 +91,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     // carry this restore's generation and no-op once it moves on.
     const restoreGen = ++restoreGenRef.current;
     lastRestoreTargetRef.current = restoreTarget;
-    if (
-      !isWeb ||
-      !restoreTarget ||
-      typeof document === "undefined" ||
-      !document.contains(restoreTarget) ||
-      typeof restoreTarget.focus !== "function"
-    ) {
+    if (!isWeb || typeof document === "undefined") {
       return;
     }
     // Respect focus a host deliberately placed in the closing
@@ -106,7 +100,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     // closed the dialog, say — that placement wins over returning
     // focus to the opener. Focus inside the dialog's own content
     // or portal frame is not such a placement: it is where the
-    // trap left focus, and the restore proceeds as usual.
+    // trap left focus, and the restore proceeds as usual. This
+    // runs BEFORE the target-validity guard below: a missing or
+    // detached opener must not discard the host's placement,
+    // whose own focusin was ignored while the dialog was still
+    // open — dropping it would leave a reopening from that
+    // still-focused control with no restore target at all
+    // (Copilot review on PR #386, head b298361).
     const activeElement = document.activeElement as HTMLElement | null;
     if (activeElement && activeElement !== document.body && activeElement !== restoreTarget) {
       const content = contentRef.current as unknown as HTMLElement | null;
@@ -125,6 +125,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         restoreTargetRef.current = activeElement;
         return;
       }
+    }
+    if (
+      !restoreTarget ||
+      !document.contains(restoreTarget) ||
+      typeof restoreTarget.focus !== "function"
+    ) {
+      return;
     }
     restoreTarget.focus();
     // Retain the target after a successful restore: when the
@@ -158,7 +165,21 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         }
       };
       reassertRafRef.current = requestAnimationFrame(reassert);
-      reassertTimerRef.current = setTimeout(reassert, 350);
+      reassertTimerRef.current = setTimeout(() => {
+        // The long retry must not reclaim a target the staleness
+        // check has since retired — an intentional blur of the
+        // restored opener after the animation-frame retry (focus
+        // to the body, target cleared) means focus was
+        // deliberately surrendered, and refocusing would steal it
+        // back. The overlay's own focus reset is unaffected: the
+        // frame retry's recovery re-tracks the opener through its
+        // focusin, so the target matches again by the time this
+        // runs (Copilot review on PR #386, head b298361).
+        if (restoreTargetRef.current !== restoreTarget) {
+          return;
+        }
+        reassert();
+      }, 350);
     }
   }, []);
 
