@@ -26,10 +26,13 @@ const StyledContent = styled(TamaguiDialog.Content, {
 // containment, #391): portal frames mount in tree order, which
 // is not necessarily the order dialogs were opened in, so the
 // topmost-modal test cannot rely on document order alone among
-// DS dialogs themselves. Each open Dialog registers a token
-// here for as long as it is open; the last registered token is
-// the topmost DS dialog.
-const openDialogStack: symbol[] = [];
+// DS dialogs themselves. Each open Dialog registers an entry
+// here for as long as it is open — its identity plus the portal
+// frame it renders into, so the document-order fallback for
+// foreign modals can recognize (and skip) DS frames; the last
+// registered entry is the topmost DS dialog.
+type OpenDialogEntry = { token: symbol; frame: Element | null };
+const openDialogStack: OpenDialogEntry[] = [];
 
 export type DialogProps = {
   open: boolean;
@@ -89,7 +92,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const reassertRafRef = useRef<number | null>(null);
   const unmountRestoreRef = useRef(false);
   const blurredTargetRef = useRef<HTMLElement | null>(null);
-  const stackTokenRef = useRef(Symbol("dialog"));
+  const stackEntryRef = useRef<OpenDialogEntry>({ token: Symbol("dialog"), frame: null });
 
   // Restore helper: focus the tracked element if it is still in the
   // document and focusable, and clear the target either way so a
@@ -384,10 +387,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     if (!open || !isWeb) {
       return;
     }
-    const token = stackTokenRef.current;
-    openDialogStack.push(token);
+    const entry = stackEntryRef.current;
+    const content = contentRef.current as unknown as HTMLElement | null;
+    entry.frame =
+      content && typeof content.closest === "function" ? content.closest("dialog") : null;
+    openDialogStack.push(entry);
     return () => {
-      const index = openDialogStack.indexOf(token);
+      const index = openDialogStack.indexOf(entry);
       if (index >= 0) {
         openDialogStack.splice(index, 1);
       }
@@ -446,14 +452,19 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (!content || typeof content.querySelectorAll !== "function") {
         return;
       }
-      const stackIndex = openDialogStack.indexOf(stackTokenRef.current);
+      const ownEntry = stackEntryRef.current;
+      const stackIndex = openDialogStack.indexOf(ownEntry);
       if (stackIndex >= 0 && stackIndex < openDialogStack.length - 1) {
         return;
       }
       const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
+      ownEntry.frame = frame;
       if (frame) {
+        const dsFrames = new Set(
+          openDialogStack.map((entry) => entry.frame).filter((entryFrame) => entryFrame !== null),
+        );
         const covered = Array.from(document.querySelectorAll("dialog")).some((other) => {
-          if (other === frame || frame.contains(other)) {
+          if (other === frame || frame.contains(other) || dsFrames.has(other)) {
             return false;
           }
           if ((frame.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING) === 0) {
@@ -485,7 +496,12 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           return false;
         }
         const editableAttr = candidate.getAttribute("contenteditable");
-        if (editableAttr !== null && editableAttr !== "false") {
+        const independentlyTabbable =
+          candidate.matches(
+            "a[href], area[href], button, input, select, textarea, summary, iframe, audio[controls], video[controls]",
+          ) ||
+          (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) >= 0);
+        if (editableAttr !== null && editableAttr !== "false" && !independentlyTabbable) {
           let host: Element | null = candidate.parentElement;
           while (host && host !== content) {
             const hostAttr = host.getAttribute("contenteditable");

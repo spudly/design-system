@@ -70,6 +70,7 @@ test("Tab is swallowed only when the dialog content holds no effectively tabbabl
   // host is not a Tab stop (review on PR #392, head a459ad8).
   assert.match(code, /style\.visibility === "collapse"/);
   assert.match(code, /hostAttr === "false"/);
+  assert.match(code, /!independentlyTabbable/);
   assert.match(code, /\[contenteditable=""\], \[contenteditable="true"\]/);
   assert.doesNotMatch(code, /\[contenteditable\],/);
   assert.match(code, /candidate\.hasAttribute\("disabled"\)/);
