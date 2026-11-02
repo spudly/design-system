@@ -133,17 +133,22 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     ) {
       return;
     }
-    restoreTarget.focus();
-    // Retain the target after a successful restore: when the
-    // element already held focus at close time (a host focused the
-    // opener itself in the closing commit), focus() emits no
-    // focusin, so nothing else would repopulate the tracker — and
-    // a reopening from that still-focused opener, again with no
-    // focus change to track, would dismiss to the body. Retention
-    // is safe alongside the staleness rule: if the retained element
-    // later loses focus to the body while closed, the focusout
-    // check retires it as usual.
+    // Retain the target BEFORE focusing it: when the element
+    // already held focus at close time (a host focused the opener
+    // itself in the closing commit), focus() emits no focusin, so
+    // nothing else would repopulate the tracker — and a reopening
+    // from that still-focused opener, again with no focus change
+    // to track, would dismiss to the body. Retaining first also
+    // lets a synchronous focus redirection supersede it: if a host
+    // focus handler moves focus from the opener to another control
+    // during focus(), that control's focusin re-tracks it as the
+    // target, and a reopening from it dismisses back to it rather
+    // than to the opener (Copilot review on PR #386, head
+    // 47ca297). Retention is safe alongside the staleness rule: if
+    // the retained element later loses focus to the body while
+    // closed, the focusout check retires it as usual.
     restoreTargetRef.current = restoreTarget;
+    restoreTarget.focus();
     // Re-assert on a deferred tick: an overlay-click dismissal's
     // own pointer sequence resets focus to the body AFTER this
     // restore runs (manual QA on PR #386: Cancel/Delete/Escape

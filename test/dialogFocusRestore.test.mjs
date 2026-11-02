@@ -198,6 +198,21 @@ test("the 350 ms retry does not reclaim an opener intentionally blurred after th
   );
 });
 
+test("the restore retains its target before focusing, so a synchronous redirect supersedes it (#385)", () => {
+  // Retention repopulates the tracker for the no-focusin case
+  // (the opener already held focus), but it must be in place
+  // before focus() runs: a host focus handler that synchronously
+  // redirects focus to another control during the restore fires
+  // that control's focusin mid-focus(), and the tracker must end
+  // on the redirected control, not be overwritten back to the
+  // opener (Copilot review on PR #386, head 47ca297).
+  const retainIndex = code.indexOf("restoreTargetRef.current = restoreTarget;");
+  const focusIndex = code.indexOf("restoreTarget.focus();");
+  assert.notEqual(retainIndex, -1);
+  assert.notEqual(focusIndex, -1);
+  assert.ok(retainIndex < focusIndex, "retention must precede the restore focus() call");
+});
+
 test("rejected shapes stay out: no render-time capture, no autofocus-event handlers (#385)", () => {
   assert.doesNotMatch(code, /if \(isWeb && open/);
   assert.doesNotMatch(code, /onOpenAutoFocus/);
