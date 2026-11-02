@@ -90,7 +90,7 @@ test("a tracked target that loses focus to the body while closed stops being a c
   assert.match(code, /document\.addEventListener\("focusout", handleFocusOut\);/);
   assert.match(code, /document\.removeEventListener\("focusout", handleFocusOut\);/);
   assert.match(code, /event\.target !== restoreTargetRef\.current/);
-  assert.match(code, /if \(event\.relatedTarget\) \{/);
+  assert.match(code, /if \(event\.relatedTarget && event\.relatedTarget !== document\.body\) \{/);
   assert.match(code, /document\.activeElement === document\.body/);
   // Validating inside the open effect is the rejected shape: it
   // runs after focus has moved into the dialog and clears every

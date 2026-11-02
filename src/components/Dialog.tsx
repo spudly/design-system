@@ -229,7 +229,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (!restoreTargetRef.current || event.target !== restoreTargetRef.current) {
         return;
       }
-      if (event.relatedTarget) {
+      if (event.relatedTarget && event.relatedTarget !== document.body) {
         return;
       }
       setTimeout(() => {
