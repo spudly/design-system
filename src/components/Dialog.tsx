@@ -48,7 +48,10 @@ export type DialogProps = {
  * while open), when that element is still in the document and focusable.
  * A tracked element that loses focus to the body while the dialog is
  * closed stops being a candidate (focus history alone is not an
- * opener); a successful restore retains its target (an already-
+ * opener) — including when that blur and a programmatic opening land
+ * in the same task: the blur is recorded as it happens and consumed
+ * by the opening commit, so racing the open does not forgive it; a
+ * successful restore retains its target (an already-
  * focused opener emits no focusin to re-track it), and the deferred
  * re-asserts a restore schedules are generation-guarded so
  * a newer restore, a reopening, or intervening focus activity retires
@@ -71,6 +74,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const reassertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const reassertRafRef = useRef<number | null>(null);
   const unmountRestoreRef = useRef(false);
+  const blurredTargetRef = useRef<HTMLElement | null>(null);
 
   // Restore helper: focus the tracked element if it is still in the
   // document and focusable, and clear the target either way so a
@@ -200,6 +204,9 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (frame && (target === frame || frame.contains(target))) {
         return;
       }
+      // A fresh (re)focus supersedes any recorded blur of an older
+      // target: the record names a candidate this focus replaces.
+      blurredTargetRef.current = null;
       restoreTargetRef.current = target;
     };
     // Mount sample: if the opener already holds focus when this
@@ -245,6 +252,20 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     // focus has already moved into the dialog, and cleared every
     // legitimate opener (manual QA on PR #386, head 4d775a8: all
     // dismissal paths in all stories left focus on the body).
+    // The blur itself is recorded synchronously, though: if the
+    // host blurs the opener and opens the dialog in the same task
+    // (`button.blur(); setOpen(true)`), the opening commits before
+    // the deferred check runs and the check's open guard would
+    // forgive a blur that genuinely preceded the open — dismissal
+    // would then focus an element focus had already left before
+    // the dialog ever appeared. The opening commit consumes the
+    // record instead (see the open-transition effect). This does
+    // not misfire on the primitive's own opening autofocus: that
+    // focus move out of the opener either carries a relatedTarget
+    // inside the dialog (rejected by the guard below) or happens
+    // while the dialog is already open (the handler above returns
+    // first), so it never records a blur (Copilot review on PR
+    // #386, head 39e9223).
     const handleFocusOut = (event: FocusEvent) => {
       if (openRef.current) {
         return;
@@ -255,7 +276,12 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (event.relatedTarget && event.relatedTarget !== document.body) {
         return;
       }
+      const blurredTarget = restoreTargetRef.current;
+      blurredTargetRef.current = blurredTarget;
       setTimeout(() => {
+        if (blurredTargetRef.current === blurredTarget) {
+          blurredTargetRef.current = null;
+        }
         if (openRef.current) {
           return;
         }
@@ -293,6 +319,19 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     wasOpenRef.current = open;
     openRef.current = open;
     if (!wasOpen && open) {
+      // An explicit blur of the tracked element to the body that
+      // landed before this opening (same-task blur + open) retires
+      // that element: focus was on the body when the dialog
+      // opened, so a close has nothing it should return to. The
+      // record is consumed either way — a later opening starts
+      // from whatever the tracker holds then.
+      if (
+        blurredTargetRef.current !== null &&
+        blurredTargetRef.current === restoreTargetRef.current
+      ) {
+        restoreTargetRef.current = null;
+      }
+      blurredTargetRef.current = null;
       // A (re)opening supersedes any deferred re-assert still
       // pending from the previous close.
       restoreGenRef.current++;

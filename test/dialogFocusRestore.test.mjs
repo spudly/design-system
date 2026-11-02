@@ -60,10 +60,12 @@ test("focus returns to the tracked element on the open -> closed transition, whe
   assert.match(code, /typeof restoreTarget.focus !== "function"/);
   assert.match(code, /restoreTarget\.focus\(\);/);
   assert.match(code, /\}, \[open, restoreFocus\]\);/);
-  // The target is cleared in exactly two places: when a restore
-  // consumes it, and when the focusout staleness check below
-  // retires it after it loses focus to the body while closed.
-  assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 2);
+  // The target is cleared in exactly three places: when a restore
+  // consumes it, when the focusout staleness check below retires
+  // it after it loses focus to the body while closed, and when an
+  // opening commit consumes a recorded pre-open blur (same-task
+  // blur + open, pinned by its own test below).
+  assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 3);
 });
 
 test("stale deferred retries are invalidated by newer restores, reopening, and intervening focus (#385)", () => {
@@ -96,6 +98,29 @@ test("a tracked target that loses focus to the body while closed stops being a c
   // runs after focus has moved into the dialog and clears every
   // legitimate opener (manual QA on PR #386, head 4d775a8).
   assert.doesNotMatch(code, /target !== document\.activeElement/);
+});
+
+test("an explicit blur to the body in the same task as an opening retires the target (#385)", () => {
+  // The blur is recorded synchronously in the focusout handler,
+  // before the deferred staleness check can be outraced by the
+  // opening commit (Copilot review on PR #386, head 39e9223:
+  // `button.blur(); setOpen(true)` left the blurred button saved,
+  // and dismissal focused it even though focus was on the body
+  // when the dialog opened).
+  assert.match(code, /const blurredTargetRef = useRef<HTMLElement \| null>\(null\);/);
+  assert.match(code, /const blurredTarget = restoreTargetRef\.current;/);
+  assert.match(code, /blurredTargetRef\.current = blurredTarget;/);
+  // The opening commit consumes the record: a recorded blur that
+  // names the tracked target clears it, and the record itself is
+  // reset for the next opening either way.
+  assert.match(
+    code,
+    /blurredTargetRef\.current === restoreTargetRef\.current\s*\) \{\s+restoreTargetRef\.current = null;/,
+  );
+  // The record is reset in exactly three places: a fresh tracked
+  // focus supersedes it, the deferred staleness check drops its
+  // own record after running, and the opening commit consumes it.
+  assert.equal((code.match(/blurredTargetRef\.current = null;/g) ?? []).length, 3);
 });
 
 test("unmount while open schedules a deferred restore that a StrictMode replay setup cancels (#385)", () => {
