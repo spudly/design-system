@@ -73,7 +73,22 @@ test("stale deferred retries are invalidated by newer restores, reopening, and i
   assert.match(code, /const restoreGen = \+\+restoreGenRef\.current;/);
   assert.match(code, /if \(restoreGenRef\.current !== restoreGen\) \{/);
   assert.match(code, /const lastRestoreTargetRef = useRef<HTMLElement \| null>\(null\);/);
-  assert.match(code, /event\.target !== lastRestoreTargetRef\.current/);
+  assert.match(code, /currentTarget !== lastRestoreTargetRef\.current/);
+});
+
+test("the focusin tracker reads the current active element, not the possibly stale event target (#385)", () => {
+  // If a host's onFocus for A synchronously focuses B, B's focusin
+  // reaches the document listener first and A's original event then
+  // resumes bubbling: trusting event.target ends the tracker on
+  // stale A while focus actually rests on B, and a one-shot
+  // redirect means reopening from still-focused B emits no new
+  // focusin, so dismissal would restore A instead of B. The
+  // handler therefore derives the tracked element from
+  // document.activeElement at listener time (Copilot review on
+  // PR #386, head d2abcf5).
+  assert.match(code, /const currentTarget = document\.activeElement as HTMLElement \| null;/);
+  assert.match(code, /trackTarget\(currentTarget\);/);
+  assert.doesNotMatch(code, /trackTarget\(event\.target/);
 });
 
 test("a restore yields to focus a host placed outside the dialog in the closing commit (#385)", () => {

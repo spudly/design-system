@@ -46,6 +46,9 @@ export type DialogProps = {
  * the dialog therefore tracks the element that most recently held focus
  * outside the dialog and returns focus to it on close (and on unmount
  * while open), when that element is still in the document and focusable.
+ * The tracker reads the current active element rather than a focus
+ * event's target, which can be stale after a synchronous focus
+ * redirect nested inside another element's focus handling.
  * A tracked element that loses focus to the body while the dialog is
  * closed stops being a candidate (focus history alone is not an
  * opener) — including when that blur and a programmatic opening land
@@ -242,7 +245,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     // mount handling but before its idle-delayed focus move into
     // the dialog, so the sampled element is still the opener.
     trackTarget(document.activeElement as HTMLElement | null);
-    const handleFocusIn = (event: FocusEvent) => {
+    const handleFocusIn = () => {
       // While this dialog is open its restore target is frozen at
       // the opener: focus events from outside the frame in that
       // window belong to something else — a nested dialog's
@@ -253,6 +256,18 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (openRef.current) {
         return;
       }
+      // Track the CURRENT active element, never the event's own
+      // target: the target can be stale by the time this listener
+      // runs. If a host's focus handler for element A synchronously
+      // redirects focus to B, B's focusin reaches this listener
+      // first, then A's original event resumes bubbling and would
+      // overwrite the tracked target with A — yet focus rests on
+      // B, and a one-shot redirect means reopening from the
+      // still-focused B emits no new focusin, so dismissal would
+      // restore A instead of B. document.activeElement is the
+      // ground truth at listener time in both orders (Copilot
+      // review on PR #386, head d2abcf5).
+      const currentTarget = document.activeElement as HTMLElement | null;
       // Intervening focus activity supersedes a pending deferred
       // re-assert from the last close: once focus has moved to a
       // different element than the one just restored, the retry
@@ -260,11 +275,11 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       // body inside the retry window. (The restore's own focus()
       // lands here with the restored element itself as the target
       // and does not invalidate.)
-      if (lastRestoreTargetRef.current && event.target !== lastRestoreTargetRef.current) {
+      if (lastRestoreTargetRef.current && currentTarget !== lastRestoreTargetRef.current) {
         restoreGenRef.current++;
         lastRestoreTargetRef.current = null;
       }
-      trackTarget(event.target as HTMLElement | null);
+      trackTarget(currentTarget);
     };
     // Staleness: a tracked element that loses focus to nowhere
     // (the body) while the dialog is closed stops being a restore
