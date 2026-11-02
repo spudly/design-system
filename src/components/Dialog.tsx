@@ -114,6 +114,22 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (content && typeof content.contains === "function" && content.contains(target)) {
         return;
       }
+      // The portal frame itself (the native <dialog> element the
+      // primitive renders the portal into) and everything else in
+      // it — the overlay, the focus-scope wrapper — are this
+      // dialog's own chrome, not the opener: the frame can receive
+      // focus when the primitive shows it, and when the dialog has
+      // no focusable descendants the focus scope lands focus on its
+      // own wrapper inside the frame. Tracking any of those would
+      // replace the opener with an element that unmounts on close
+      // (manual QA on PR #386: the no-actions dialog lost its
+      // restore target this way while the with-actions one, whose
+      // focus lands inside the content, did not).
+      const frame =
+        content && typeof content.closest === "function" ? content.closest("dialog") : null;
+      if (frame && (target === frame || frame.contains(target))) {
+        return;
+      }
       restoreTargetRef.current = target;
     };
     // Mount sample: if the opener already holds focus when this

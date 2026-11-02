@@ -46,6 +46,8 @@ test("the restore target is tracked from committed focusin events outside the di
   assert.match(code, /trackTarget\(document\.activeElement as HTMLElement \| null\);/);
   assert.doesNotMatch(code, /tabIndex/);
   assert.match(code, /content\.contains\(target\)/);
+  assert.match(code, /content\.closest\("dialog"\)/);
+  assert.match(code, /target === frame \|\| frame\.contains\(target\)/);
   assert.match(code, /restoreTargetRef\.current = target;/);
   assert.match(code, /<StyledContent ref=\{contentRef\}>/);
 });
