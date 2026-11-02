@@ -5,21 +5,22 @@
  * own trigger and flips the controlled `open` prop — and Tamagui cancels
  * its fallback focus restoration while trying to focus that missing
  * trigger, so a dismissed dialog left keyboard focus nowhere. The pins
- * hold the fix in the Dialog component itself: on web it captures the
- * element that held focus when the dialog opened and returns focus to
- * it on close (and on unmount while open), only while that element is
- * still in the document and focusable.
+ * hold the fix in the Dialog component itself: on web it tracks the
+ * element that most recently held focus outside the dialog and returns
+ * focus to it on close (and on unmount while open), only while that
+ * element is still in the document and focusable.
  *
- * The lifecycle is pinned to the primitive's autofocus events on
- * purpose (review round on PR #386): the FocusScope inside Tamagui's
- * Dialog dispatches `onOpenAutoFocus` from its committed mount effect,
- * after reading document.activeElement but before moving focus into
- * the dialog, and `onCloseAutoFocus` from its cleanup, which runs on
- * every close path and on unmount while open. Capturing during render
- * could leave a stale target from an abandoned render, and restoring
- * from this component's own mount-effect cleanup loses the opener to
- * a StrictMode effect replay — so the pins also forbid both of those
- * shapes.
+ * The mechanism is pinned to this component's own focus tracking on
+ * purpose (PR #386 review + QA rounds): capturing during render can
+ * leave a stale target from an abandoned render; a mount-effect
+ * cleanup restore loses the opener to a StrictMode effect replay; and
+ * the primitive's autofocus events, tried in between, did not restore
+ * focus at all in the shipped Storybook build (manual QA on head
+ * 5888465 failed every dismissal path). So the pins hold: targets come
+ * from committed `focusin` events outside the dialog's content,
+ * restore happens in the open-transition effect, unmount restore is a
+ * deferred schedule the effect setup cancels (StrictMode replay
+ * safety), and none of the three rejected shapes come back.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -37,26 +38,33 @@ test("Dialog is exported from the built package root", async () => {
   assert.equal(typeof dist.Dialog, "function", "Dialog must be exported from @spudly/ui");
 });
 
-test("the element focused at open is captured in the committed onOpenAutoFocus event, web only (#385)", () => {
-  assert.match(code, /const previouslyFocusedRef = useRef<HTMLElement \| null>\(null\);/);
-  assert.match(code, /const handleOpenAutoFocus = \(\) => \{/);
-  assert.match(code, /if \(!isWeb \|\| typeof document === "undefined"\) \{\s+return;\s+\}/);
-  assert.match(code, /const activeElement = document\.activeElement as HTMLElement \| null;/);
-  assert.match(code, /activeElement !== document\.body/);
-  assert.match(code, /previouslyFocusedRef\.current = activeElement;/);
-  assert.match(code, /onOpenAutoFocus=\{handleOpenAutoFocus\}/);
+test("the restore target is tracked from committed focusin events outside the dialog, web only (#385)", () => {
+  assert.match(code, /const restoreTargetRef = useRef<HTMLElement \| null>\(null\);/);
+  assert.match(code, /document\.addEventListener\("focusin", handleFocusIn\);/);
+  assert.match(code, /document\.removeEventListener\("focusin", handleFocusIn\);/);
+  assert.match(code, /target === document\.body \|\| target\.tabIndex < 0/);
+  assert.match(code, /content\.contains\(target\)/);
+  assert.match(code, /restoreTargetRef\.current = target;/);
+  assert.match(code, /<StyledContent ref=\{contentRef\}>/);
 });
 
-test("focus returns to the captured element in onCloseAutoFocus, when it is still available (#385)", () => {
-  assert.match(code, /const handleCloseAutoFocus = \(\) => \{/);
-  assert.match(code, /document\.contains\(previouslyFocused\)/);
-  assert.match(code, /typeof previouslyFocused\.focus === "function"/);
-  assert.match(code, /previouslyFocused\.focus\(\);/);
-  assert.match(code, /onCloseAutoFocus=\{handleCloseAutoFocus\}/);
-  assert.equal((code.match(/previouslyFocusedRef\.current = null;/g) ?? []).length, 1);
+test("focus returns to the tracked element on the open -> closed transition, when it is still available (#385)", () => {
+  assert.match(code, /const wasOpen = wasOpenRef\.current;/);
+  assert.match(code, /wasOpenRef\.current = open;/);
+  assert.match(code, /document\.contains\(restoreTarget\)/);
+  assert.match(code, /typeof restoreTarget\.focus === "function"/);
+  assert.match(code, /restoreTarget\.focus\(\);/);
+  assert.match(code, /\}, \[open, restoreFocus\]\);/);
+  assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 1);
 });
 
-test("no render-time capture and no own-effect restore: nothing can go stale or lose the opener to a StrictMode replay (#385)", () => {
+test("unmount while open schedules a deferred restore that a StrictMode replay setup cancels (#385)", () => {
+  assert.match(code, /pendingRestoreTimerRef\.current = setTimeout\(\(\) => \{/);
+  assert.match(code, /clearTimeout\(pendingRestoreTimerRef\.current\);/);
+});
+
+test("rejected shapes stay out: no render-time capture, no autofocus-event handlers (#385)", () => {
   assert.doesNotMatch(code, /if \(isWeb && open/);
-  assert.doesNotMatch(code, /useEffect/);
+  assert.doesNotMatch(code, /onOpenAutoFocus/);
+  assert.doesNotMatch(code, /onCloseAutoFocus/);
 });

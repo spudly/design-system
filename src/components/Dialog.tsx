@@ -1,6 +1,7 @@
-import { useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import type { ReactNode } from "react";
 import { Dialog as TamaguiDialog, XStack, YStack, isWeb, styled } from "tamagui";
+import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
@@ -42,71 +43,111 @@ export type DialogProps = {
  * fallback focus restoration while trying to focus that missing trigger, so
  * without help a dismissed dialog leaves keyboard focus nowhere and the user
  * must navigate back through the page to the control that opened it. On web
- * the dialog therefore captures the element that held focus when it opened
- * and returns focus to it on close (and on unmount while open), when that
- * element is still in the document and focusable. Capture and restore ride
- * the primitive's autofocus events (see the handlers below), so they happen
- * at committed lifecycle points only. On native there is no DOM focus to
- * restore.
+ * the dialog therefore tracks the element that most recently held focus
+ * outside the dialog and returns focus to it on close (and on unmount
+ * while open), when that element is still in the document and focusable.
+ * The mechanism is this component's own (see the effects below): an
+ * earlier version rode the primitive's autofocus events, which manual
+ * Storybook QA on PR #386 showed do not restore focus in the shipped
+ * build. On native there is no DOM focus to restore.
  */
 export function Dialog({ open, onOpenChange, title, description, children, actions }: DialogProps) {
-  const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+  const restoreTargetRef = useRef<HTMLElement | null>(null);
+  const contentRef = useRef<TamaguiElement>(null);
+  const wasOpenRef = useRef(false);
+  const pendingRestoreTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Capture and restore ride the primitive's own autofocus events,
-  // which the FocusScope inside Tamagui's Dialog dispatches at the
-  // committed lifecycle points:
-  //
-  // - `onOpenAutoFocus` fires in the FocusScope's mount effect,
-  //   after it has read document.activeElement but before it moves
-  //   focus into the dialog — so the element read here is still the
-  //   opener, never a control inside the dialog. Capturing here
-  //   (not during render, not in this component's own effects)
-  //   means an abandoned or suspended render can never leave a
-  //   stale target behind, and a StrictMode effect replay simply
-  //   re-dispatches the same pair of events. The body is not a
-  //   useful restore target (a programmatically opened dialog),
-  //   so it is never captured.
-  const handleOpenAutoFocus = () => {
+  // Restore helper: focus the tracked element if it is still in the
+  // document and focusable, and clear the target either way so a
+  // later open tracks fresh.
+  const restoreFocus = useCallback(() => {
+    const restoreTarget = restoreTargetRef.current;
+    restoreTargetRef.current = null;
+    if (
+      isWeb &&
+      restoreTarget &&
+      typeof document !== "undefined" &&
+      document.contains(restoreTarget) &&
+      typeof restoreTarget.focus === "function"
+    ) {
+      restoreTarget.focus();
+    }
+  }, []);
+
+  // Track the restore target from real focus events (web): while
+  // this component is mounted, a `focusin` anywhere outside the
+  // dialog's own content names the element focus would return to —
+  // in practice the control the user last used, which is the opener
+  // when they open the dialog from it. Because the target comes from
+  // committed focus events, an abandoned or suspended render can
+  // never leave a stale one behind, and effect replays (StrictMode)
+  // only re-register the listener. Focus inside the dialog (the
+  // trap moving it between the dialog's controls) never updates the
+  // target; the body and non-focusable elements (the overlay, layout
+  // containers) are not useful targets, so they are ignored too.
+  useEffect(() => {
     if (!isWeb || typeof document === "undefined") {
       return;
     }
-    const activeElement = document.activeElement as HTMLElement | null;
-    if (activeElement && activeElement !== document.body) {
-      previouslyFocusedRef.current = activeElement;
-    }
-  };
+    const handleFocusIn = (event: FocusEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target || target === document.body || target.tabIndex < 0) {
+        return;
+      }
+      const content = contentRef.current as unknown as HTMLElement | null;
+      if (content && typeof content.contains === "function" && content.contains(target)) {
+        return;
+      }
+      restoreTargetRef.current = target;
+    };
+    document.addEventListener("focusin", handleFocusIn);
+    return () => {
+      document.removeEventListener("focusin", handleFocusIn);
+    };
+  }, []);
 
-  // - `onCloseAutoFocus` fires from the FocusScope's cleanup, on
-  //   every close path AND when the scope unmounts while the dialog
-  //   is still open — there is no separate unmount effect to lose
-  //   the opener to a StrictMode replay. Tamagui's modal content
-  //   composes its own handler after this one: it cancels the
-  //   FocusScope's fallback restore and focuses the trigger ref,
-  //   which is empty here (the host owns the trigger), so the
-  //   restore below is the focus move that stands. The event is
-  //   deliberately NOT canceled from here before that composition
-  //   runs. The captured element is restored only while it is
-  //   still in the document and focusable; the ref is cleared
-  //   either way so a later open captures fresh.
-  const handleCloseAutoFocus = () => {
-    const previouslyFocused = previouslyFocusedRef.current;
-    previouslyFocusedRef.current = null;
-    if (
-      isWeb &&
-      previouslyFocused &&
-      typeof document !== "undefined" &&
-      document.contains(previouslyFocused) &&
-      typeof previouslyFocused.focus === "function"
-    ) {
-      previouslyFocused.focus();
+  // Restore on close: when `open` flips true -> false, return focus
+  // to the tracked element. This effect is this component's own, so
+  // it runs after the primitive's close-time focus handling in the
+  // same commit — the restore is the last focus move.
+  useEffect(() => {
+    const wasOpen = wasOpenRef.current;
+    wasOpenRef.current = open;
+    if (!wasOpen || open) {
+      return;
     }
-  };
+    restoreFocus();
+  }, [open, restoreFocus]);
+
+  // Unmount while open: the close effect above never sees a closed
+  // state, so the restore is scheduled from this cleanup instead —
+  // deferred by a tick, and the effect's own setup cancels a pending
+  // schedule. That cancel is what a StrictMode effect replay runs
+  // into: replay = cleanup (schedule) + setup (cancel), so the
+  // opener is neither restored prematurely while the dialog is still
+  // open nor lost; a real unmount has no following setup, so the
+  // scheduled restore fires.
+  useEffect(() => {
+    if (pendingRestoreTimerRef.current !== null) {
+      clearTimeout(pendingRestoreTimerRef.current);
+      pendingRestoreTimerRef.current = null;
+    }
+    return () => {
+      if (!isWeb) {
+        return;
+      }
+      pendingRestoreTimerRef.current = setTimeout(() => {
+        pendingRestoreTimerRef.current = null;
+        restoreFocus();
+      }, 0);
+    };
+  }, [restoreFocus]);
 
   return (
     <TamaguiDialog open={open} onOpenChange={onOpenChange}>
       <TamaguiDialog.Portal>
         <StyledOverlay />
-        <StyledContent onOpenAutoFocus={handleOpenAutoFocus} onCloseAutoFocus={handleCloseAutoFocus}>
+        <StyledContent ref={contentRef}>
           <YStack gap={tokens.spacing[3]}>
             <TamaguiDialog.Title
               fontSize={tokens.typography.fontSize.xl}
