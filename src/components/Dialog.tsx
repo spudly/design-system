@@ -64,14 +64,28 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     const restoreTarget = restoreTargetRef.current;
     restoreTargetRef.current = null;
     if (
-      isWeb &&
-      restoreTarget &&
-      typeof document !== "undefined" &&
-      document.contains(restoreTarget) &&
-      typeof restoreTarget.focus === "function"
+      !isWeb ||
+      !restoreTarget ||
+      typeof document === "undefined" ||
+      !document.contains(restoreTarget) ||
+      typeof restoreTarget.focus !== "function"
     ) {
-      restoreTarget.focus();
+      return;
     }
+    restoreTarget.focus();
+    // Re-assert on a deferred tick: an overlay-click dismissal's
+    // own pointer sequence resets focus to the body AFTER this
+    // restore runs (manual QA on PR #386: Cancel/Delete/Escape
+    // restored, overlay click did not). The re-assert fires only
+    // while focus sits on the body, so it never steals focus from
+    // a control the user has actually moved to in the meantime.
+    const reassert = () => {
+      if (document.activeElement === document.body && document.contains(restoreTarget)) {
+        restoreTarget.focus();
+      }
+    };
+    requestAnimationFrame(reassert);
+    setTimeout(reassert, 350);
   }, []);
 
   // Track the restore target from real focus events (web): while
@@ -83,15 +97,17 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // never leave a stale one behind, and effect replays (StrictMode)
   // only re-register the listener. Focus inside the dialog (the
   // trap moving it between the dialog's controls) never updates the
-  // target; the body and non-focusable elements (the overlay, layout
-  // containers) are not useful targets, so they are ignored too.
+  // target; the body is not a useful target (a programmatically
+  // opened dialog), so it is ignored. A negative-tabIndex element
+  // is NOT excluded: it cannot be tabbed to, but a host can focus
+  // it programmatically and open the dialog from it, and it can
+  // receive focus() on the way back.
   useEffect(() => {
     if (!isWeb || typeof document === "undefined") {
       return;
     }
-    const handleFocusIn = (event: FocusEvent) => {
-      const target = event.target as HTMLElement | null;
-      if (!target || target === document.body || target.tabIndex < 0) {
+    const trackTarget = (target: HTMLElement | null) => {
+      if (!target || target === document.body) {
         return;
       }
       const content = contentRef.current as unknown as HTMLElement | null;
@@ -99,6 +115,16 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         return;
       }
       restoreTargetRef.current = target;
+    };
+    // Mount sample: if the opener already holds focus when this
+    // dialog mounts already open, its focusin predates the listener
+    // below, so sample the active element once here. This setup runs
+    // in the same committed effect flush as the primitive's own
+    // mount handling but before its idle-delayed focus move into
+    // the dialog, so the sampled element is still the opener.
+    trackTarget(document.activeElement as HTMLElement | null);
+    const handleFocusIn = (event: FocusEvent) => {
+      trackTarget(event.target as HTMLElement | null);
     };
     document.addEventListener("focusin", handleFocusIn);
     return () => {
@@ -133,7 +159,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       pendingRestoreTimerRef.current = null;
     }
     return () => {
-      if (!isWeb) {
+      if (!isWeb || !wasOpenRef.current) {
         return;
       }
       pendingRestoreTimerRef.current = setTimeout(() => {

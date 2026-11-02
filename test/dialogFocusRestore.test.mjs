@@ -42,7 +42,9 @@ test("the restore target is tracked from committed focusin events outside the di
   assert.match(code, /const restoreTargetRef = useRef<HTMLElement \| null>\(null\);/);
   assert.match(code, /document\.addEventListener\("focusin", handleFocusIn\);/);
   assert.match(code, /document\.removeEventListener\("focusin", handleFocusIn\);/);
-  assert.match(code, /target === document\.body \|\| target\.tabIndex < 0/);
+  assert.match(code, /if \(!target \|\| target === document\.body\) \{/);
+  assert.match(code, /trackTarget\(document\.activeElement as HTMLElement \| null\);/);
+  assert.doesNotMatch(code, /tabIndex/);
   assert.match(code, /content\.contains\(target\)/);
   assert.match(code, /restoreTargetRef\.current = target;/);
   assert.match(code, /<StyledContent ref=\{contentRef\}>/);
@@ -52,7 +54,7 @@ test("focus returns to the tracked element on the open -> closed transition, whe
   assert.match(code, /const wasOpen = wasOpenRef\.current;/);
   assert.match(code, /wasOpenRef\.current = open;/);
   assert.match(code, /document\.contains\(restoreTarget\)/);
-  assert.match(code, /typeof restoreTarget\.focus === "function"/);
+  assert.match(code, /typeof restoreTarget.focus !== "function"/);
   assert.match(code, /restoreTarget\.focus\(\);/);
   assert.match(code, /\}, \[open, restoreFocus\]\);/);
   assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 1);
@@ -61,6 +63,16 @@ test("focus returns to the tracked element on the open -> closed transition, whe
 test("unmount while open schedules a deferred restore that a StrictMode replay setup cancels (#385)", () => {
   assert.match(code, /pendingRestoreTimerRef\.current = setTimeout\(\(\) => \{/);
   assert.match(code, /clearTimeout\(pendingRestoreTimerRef\.current\);/);
+  assert.match(code, /if \(!isWeb \|\| !wasOpenRef\.current\) \{/);
+});
+
+test("the restore re-asserts on a deferred tick only while focus sits on the body (#385)", () => {
+  assert.match(code, /requestAnimationFrame\(reassert\);/);
+  assert.match(code, /setTimeout\(reassert, 350\);/);
+  assert.match(
+    code,
+    /document\.activeElement === document\.body && document\.contains\(restoreTarget\)/,
+  );
 });
 
 test("rejected shapes stay out: no render-time capture, no autofocus-event handlers (#385)", () => {
