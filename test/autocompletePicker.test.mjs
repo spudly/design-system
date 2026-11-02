@@ -86,7 +86,11 @@ test("selecting a result and removing a selected item report their ids", () => {
   assert.match(picker, /onSelectResult\(id\)/);
   assert.match(picker, /selectedItems: AutocompletePickerSelectedItem\[\]/);
   assert.match(picker, /onRemoveSelectedItem: \(id: string\) => void/);
-  assert.match(picker, /onRemoveSelectedItem\(item\.id\)/);
+  // Removal routes through handleRemoveSelectedItem (#384: it
+  // also returns focus to the search field, like selection),
+  // which reports the item's id onward.
+  assert.match(picker, /handleRemoveSelectedItem\(item\.id\)/);
+  assert.match(picker, /onRemoveSelectedItem\(id\)/);
   assert.match(
     picker,
     /accessibilityLabel=\{`Remove \$\{item\.label\}`\}/,
