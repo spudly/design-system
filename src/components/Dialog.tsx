@@ -55,6 +55,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const restoreTargetRef = useRef<HTMLElement | null>(null);
   const contentRef = useRef<TamaguiElement>(null);
   const wasOpenRef = useRef(false);
+  const openRef = useRef(open);
   const pendingRestoreTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Restore helper: focus the tracked element if it is still in the
@@ -140,6 +141,16 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     // the dialog, so the sampled element is still the opener.
     trackTarget(document.activeElement as HTMLElement | null);
     const handleFocusIn = (event: FocusEvent) => {
+      // While this dialog is open its restore target is frozen at
+      // the opener: focus events from outside the frame in that
+      // window belong to something else — a nested dialog's
+      // portaled controls, say — and must not replace the opener,
+      // which is the only element a close should return to. (The
+      // mount sample above is exempt: it runs once at setup, for
+      // the already-focused-opener capture.)
+      if (openRef.current) {
+        return;
+      }
       trackTarget(event.target as HTMLElement | null);
     };
     document.addEventListener("focusin", handleFocusIn);
@@ -155,6 +166,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   useEffect(() => {
     const wasOpen = wasOpenRef.current;
     wasOpenRef.current = open;
+    openRef.current = open;
     if (!wasOpen || open) {
       return;
     }

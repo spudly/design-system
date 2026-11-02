@@ -44,6 +44,7 @@ test("the restore target is tracked from committed focusin events outside the di
   assert.match(code, /document\.removeEventListener\("focusin", handleFocusIn\);/);
   assert.match(code, /if \(!target \|\| target === document\.body\) \{/);
   assert.match(code, /trackTarget\(document\.activeElement as HTMLElement \| null\);/);
+  assert.match(code, /if \(openRef\.current\) \{\s+return;\s+\}/);
   assert.doesNotMatch(code, /tabIndex/);
   assert.match(code, /content\.contains\(target\)/);
   assert.match(code, /content\.closest\("dialog"\)/);
