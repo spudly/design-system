@@ -60,7 +60,31 @@ test("focus returns to the tracked element on the open -> closed transition, whe
   assert.match(code, /typeof restoreTarget.focus !== "function"/);
   assert.match(code, /restoreTarget\.focus\(\);/);
   assert.match(code, /\}, \[open, restoreFocus\]\);/);
-  assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 1);
+  // The target is cleared in exactly two places: when a restore
+  // consumes it, and when the committed-opening validation below
+  // rejects it.
+  assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 2);
+});
+
+test("stale deferred retries are invalidated by newer restores, reopening, and intervening focus (#385)", () => {
+  assert.match(code, /const restoreGenRef = useRef\(0\);/);
+  assert.match(code, /const restoreGen = \+\+restoreGenRef\.current;/);
+  assert.match(code, /if \(restoreGenRef\.current !== restoreGen\) \{/);
+  assert.match(code, /const lastRestoreTargetRef = useRef<HTMLElement \| null>\(null\);/);
+  assert.match(code, /event\.target !== lastRestoreTargetRef\.current/);
+});
+
+test("a restore yields to focus a host placed outside the dialog in the closing commit (#385)", () => {
+  assert.match(code, /const activeElement = document\.activeElement as HTMLElement \| null;/);
+  assert.match(code, /activeElement !== document\.body && activeElement !== restoreTarget/);
+  assert.match(code, /content\.contains\(activeElement\)/);
+  assert.match(code, /frame\.contains\(activeElement\)/);
+  assert.match(code, /if \(!insideOwnDialog\) \{/);
+});
+
+test("the tracked target is validated against the active element at the committed opening (#385)", () => {
+  assert.match(code, /if \(!wasOpen && open\) \{/);
+  assert.match(code, /target !== document\.activeElement/);
 });
 
 test("unmount while open schedules a deferred restore that a StrictMode replay setup cancels (#385)", () => {

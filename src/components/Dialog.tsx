@@ -46,6 +46,13 @@ export type DialogProps = {
  * the dialog therefore tracks the element that most recently held focus
  * outside the dialog and returns focus to it on close (and on unmount
  * while open), when that element is still in the document and focusable.
+ * The tracked element is validated at the committed opening (it is the
+ * opener only if it actually holds focus then, not merely earlier), and
+ * the deferred re-asserts a restore schedules are generation-guarded so
+ * a newer restore, a reopening, or intervening focus activity retires
+ * them instead of letting a stale retry focus the wrong control. A
+ * restore also yields to focus a host deliberately placed on a control
+ * outside the dialog in the closing commit itself.
  * The mechanism is this component's own (see the effects below): an
  * earlier version rode the primitive's autofocus events, which manual
  * Storybook QA on PR #386 showed do not restore focus in the shipped
@@ -56,6 +63,8 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const contentRef = useRef<TamaguiElement>(null);
   const wasOpenRef = useRef(false);
   const openRef = useRef(open);
+  const restoreGenRef = useRef(0);
+  const lastRestoreTargetRef = useRef<HTMLElement | null>(null);
   const pendingRestoreTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Restore helper: focus the tracked element if it is still in the
@@ -64,6 +73,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const restoreFocus = useCallback(() => {
     const restoreTarget = restoreTargetRef.current;
     restoreTargetRef.current = null;
+    // Every restore supersedes the deferred re-asserts of any
+    // earlier one: with overlapping dismissals (close, reopen,
+    // close again) a stale retry must never focus an opener a
+    // newer close has already replaced, so the re-asserts below
+    // carry this restore's generation and no-op once it moves on.
+    const restoreGen = ++restoreGenRef.current;
+    lastRestoreTargetRef.current = restoreTarget;
     if (
       !isWeb ||
       !restoreTarget ||
@@ -73,6 +89,26 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     ) {
       return;
     }
+    // Respect focus a host deliberately placed in the closing
+    // commit: if focus already rests on a real control outside
+    // this dialog — an autoFocus input the host mounted as it
+    // closed the dialog, say — that placement wins over returning
+    // focus to the opener. Focus inside the dialog's own content
+    // or portal frame is not such a placement: it is where the
+    // trap left focus, and the restore proceeds as usual.
+    const activeElement = document.activeElement as HTMLElement | null;
+    if (activeElement && activeElement !== document.body && activeElement !== restoreTarget) {
+      const content = contentRef.current as unknown as HTMLElement | null;
+      const frame =
+        content && typeof content.closest === "function" ? content.closest("dialog") : null;
+      const insideOwnDialog = Boolean(
+        (content && typeof content.contains === "function" && content.contains(activeElement)) ||
+        (frame && frame.contains(activeElement)),
+      );
+      if (!insideOwnDialog) {
+        return;
+      }
+    }
     restoreTarget.focus();
     // Re-assert on a deferred tick: an overlay-click dismissal's
     // own pointer sequence resets focus to the body AFTER this
@@ -81,6 +117,9 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     // while focus sits on the body, so it never steals focus from
     // a control the user has actually moved to in the meantime.
     const reassert = () => {
+      if (restoreGenRef.current !== restoreGen) {
+        return;
+      }
       if (document.activeElement === document.body && document.contains(restoreTarget)) {
         restoreTarget.focus();
       }
@@ -151,6 +190,17 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (openRef.current) {
         return;
       }
+      // Intervening focus activity supersedes a pending deferred
+      // re-assert from the last close: once focus has moved to a
+      // different element than the one just restored, the retry
+      // must not pull it back later if that element blurs to the
+      // body inside the retry window. (The restore's own focus()
+      // lands here with the restored element itself as the target
+      // and does not invalidate.)
+      if (lastRestoreTargetRef.current && event.target !== lastRestoreTargetRef.current) {
+        restoreGenRef.current++;
+        lastRestoreTargetRef.current = null;
+      }
       trackTarget(event.target as HTMLElement | null);
     };
     document.addEventListener("focusin", handleFocusIn);
@@ -167,6 +217,23 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     const wasOpen = wasOpenRef.current;
     wasOpenRef.current = open;
     openRef.current = open;
+    if (!wasOpen && open) {
+      // A (re)opening supersedes any deferred re-assert still
+      // pending from the previous close.
+      restoreGenRef.current++;
+      // Validate the tracked target at the committed opening: it
+      // is the opener only if it actually holds focus now. Focus
+      // history alone is not an opener — focus button A, blur it
+      // back to the body, then open programmatically, and a close
+      // has nothing it should return to.
+      if (typeof document !== "undefined") {
+        const target = restoreTargetRef.current;
+        if (target && target !== document.activeElement) {
+          restoreTargetRef.current = null;
+        }
+      }
+      return;
+    }
     if (!wasOpen || open) {
       return;
     }
