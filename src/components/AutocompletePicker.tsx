@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import { XStack, YStack } from "tamagui";
+import { XStack, YStack, isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { politeLiveRegionProps } from "./accessibility.js";
@@ -117,8 +117,11 @@ export type AutocompletePickerProps = {
  * anything (it mounts WITH its text). The region's text is
  * announcement-only: the visible counterparts (the Spinner,
  * the hint, the rows) are unchanged, so the region is clipped
- * to a 1×1 box at full transparency — present in the
- * accessibility tree, absent from the layout.
+ * to a 1×1 box — present in the accessibility tree, absent
+ * from the layout. Full transparency is WEB ONLY: on iOS an
+ * alpha-0 view drops out of VoiceOver's accessibility tree
+ * entirely, so native keeps the 1×1 clipped box opaque and
+ * VoiceOver still reads the announcements.
  *
  * Focus on selection and removal: picking a result unmounts
  * its row (the caller adds it to `selectedItems`, and selected
@@ -201,7 +204,7 @@ export function AutocompletePicker({
         width={1}
         height={1}
         overflow="hidden"
-        opacity={0}
+        {...(isWeb ? { opacity: 0 } : {})}
       >
         {statusMessage ? <Text>{statusMessage}</Text> : null}
       </YStack>

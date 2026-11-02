@@ -113,6 +113,15 @@ test("the picker mounts a polite live region and its text tracks the search stat
   assert.match(picker, /\? "Searching"/, "the searching state is announced");
   assert.match(picker, /\? noResultsMessage/, "the no-matches state announces the no-results text");
   assert.match(picker, /results"} available`/, "the results state announces the result count");
+  assert.ok(
+    !picker.includes("opacity={0}"),
+    "the region is not transparent on every platform — iOS VoiceOver drops alpha-0 views",
+  );
+  assert.match(
+    picker,
+    /\{\.\.\.\(isWeb \? \{ opacity: 0 \} : \{\}\)\}/,
+    "full transparency applies on web only; native keeps the clipped 1×1 region opaque",
+  );
 });
 
 test("the meal form story hooks seed state from the story's initial values", () => {
