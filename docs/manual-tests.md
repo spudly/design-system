@@ -49,6 +49,28 @@ from the components with the most review churn first (design-system
 
 ---
 
+## Dialog
+
+Open in `Components/Dialog`: Interactive, WithoutActions.
+
+1. Interactive: the "Delete recipe" button opens the dialog with
+   its title, description, body text, and Cancel / Delete actions
+   laid out in a centered card over a dimmed overlay.
+2. Focus restoration (web, #385): focus the "Delete recipe"
+   button (Tab to it), open the dialog, then dismiss it each
+   way — Cancel, Delete, Escape, and clicking the overlay.
+   After every dismissal keyboard focus returns to the
+   "Delete recipe" button; focus never lands on the page body
+   leaving the user to navigate back from the top.
+3. WithoutActions: the "About" button opens a dialog with no
+   footer row; dismissing it likewise returns focus to the
+   "About" button.
+
+**Run when:** `src/components/Dialog.tsx`, its stories, or a
+changeset naming Dialog.
+
+---
+
 ## Accordion
 
 Open in `Components/Accordion`: Default, FirstOpen, Controlled,
