@@ -1,5 +1,5 @@
+import { AutocompletePicker } from "../components/AutocompletePicker.js";
 import { Button } from "../components/Button.js";
-import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
 import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { FormSubmit } from "../components/FormSubmit.js";
@@ -34,24 +34,34 @@ import { TextField } from "../components/TextField.js";
  *   whose available characters are set by the user's IME
  *   rather than guaranteed here. Parsing and
  *   validation stay app-side, as in the app view.
- * - The selectable entries are meals and recipes in one list.
- *   Each option crosses as a view-model carrying its host-
+ * - The searchable entries are meals and recipes in one list.
+ *   Each entry crosses as a view-model carrying its host-
  *   composed selection `key` (the app keys entries
  *   `meal:<id>` / `recipe:<id>` — the key format is the host's
  *   form-state shape, so it is composed there, not here), its
- *   `kind`, and its title; the checkbox label's kind prefix
+ *   `kind`, and its title; the picker label's kind prefix
  *   ("Meal · " / "Recipe · ") is presentation, composed here
- *   (the MealPlanDetailPage entry-row precedent). A selected
- *   meal gets a quantity stepper; a selected recipe gets
- *   quantity and servings steppers, the servings value falling
- *   back to the recipe's own servings when the host has no
- *   override.
+ *   (the MealPlanDetailPage entry-row precedent).
+ * - The entry picker is a search autocomplete (#383, the
+ *   MealFormPage contract): NOT a checkbox list of every meal
+ *   and recipe. The host runs the server-side search — the
+ *   search text crosses out through `onSearchTextChange`, the
+ *   results and the in-flight flag cross back in as
+ *   `searchResults` / `isSearching`, and picking a result
+ *   reports its key through `onSelectEntry`. The selected
+ *   entries cross as their own view-models
+ *   (`selectedEntries`), SEPARATELY from the search results,
+ *   and render as the picker's removable list (removal
+ *   reports through `onRemoveEntry`). A selected meal gets a
+ *   quantity stepper; a selected recipe gets quantity and
+ *   servings steppers, the servings value falling back to
+ *   the recipe's own servings when the host has no override.
  *
  * Submission is a bare intent (`onSubmit`); the disabled rule
  * is the app view's one presentation rule (a title and at
  * least one selected entry). The page applies no styling
- * itself (#119): the heading is a FormHeading, the entry list
- * is a LabeledGroup (the label over the select list, the
+ * itself (#119): the heading is a FormHeading, the entry
+ * picker is a LabeledGroup (the label over the picker, the
  * group carrying the label as its name), each selected
  * entry's steppers are a FieldStack, and the submit button
  * sits in a FormSubmit (the submit row's separation from the
@@ -81,16 +91,28 @@ export type MealPlanFormPageProps = {
   onStartsOnChange: (value: string) => void;
   endsOn: string;
   onEndsOnChange: (value: string) => void;
-  /** The selectable meals and recipes, in the host's order. */
-  entryOptions: MealPlanFormPageEntryOption[];
-  /** Selected entry keys, in selection order — the steppers
-   * render in this order. */
-  selectedKeys: string[];
+  /** The entry search text, held by the host, which runs
+   * the server-side search it drives. */
+  searchText: string;
+  onSearchTextChange: (value: string) => void;
+  /** Results of the host's search for `searchText`, in the
+   * host's order. A selected entry need not appear here. */
+  searchResults: MealPlanFormPageEntryOption[];
+  /** The host's search is in flight: the picker shows its
+   * searching state instead of the (stale) results. */
+  isSearching?: boolean;
+  /** The selected entries' view-models, in selection order —
+   * the removable list and the steppers render in this
+   * order. */
+  selectedEntries: MealPlanFormPageEntryOption[];
   /** Quantity overrides by entry key (default 1). */
   quantityByKey: Record<string, number>;
   /** Servings overrides by recipe id. */
   servingsByRecipeId: Record<string, number>;
-  onToggleEntry: (key: string) => void;
+  /** Add the search result with this key to the selection. */
+  onSelectEntry: (key: string) => void;
+  /** Remove the selected entry with this key. */
+  onRemoveEntry: (key: string) => void;
   onQuantityChange: (key: string, quantity: number) => void;
   onRecipeServingsChange: (recipeId: string, servings: number) => void;
   /** Save in flight: the submit button disables. */
@@ -99,6 +121,12 @@ export type MealPlanFormPageProps = {
   error?: string | null;
   onSubmit: () => void;
 };
+
+/** The picker's label for an entry: the kind prefix is
+ * presentation, composed here (the entry-row precedent). */
+function entryLabel(entry: MealPlanFormPageEntryOption): string {
+  return `${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}`;
+}
 
 export function MealPlanFormPage({
   title,
@@ -109,19 +137,21 @@ export function MealPlanFormPage({
   onStartsOnChange,
   endsOn,
   onEndsOnChange,
-  entryOptions,
-  selectedKeys,
+  searchText,
+  onSearchTextChange,
+  searchResults,
+  isSearching = false,
+  selectedEntries,
   quantityByKey,
   servingsByRecipeId,
-  onToggleEntry,
+  onSelectEntry,
+  onRemoveEntry,
   onQuantityChange,
   onRecipeServingsChange,
   isSaving = false,
   error,
   onSubmit,
 }: MealPlanFormPageProps) {
-  const optionByKey = new Map(entryOptions.map((option) => [option.key, option]));
-
   return (
     <FormScreenLayout>
       <FormHeading>{title.trim() ? title : "Meal plan"}</FormHeading>
@@ -154,20 +184,28 @@ export function MealPlanFormPage({
         placeholder="YYYY-MM-DD"
       />
       <LabeledGroup label="Meals & recipes">
-        <CheckboxSelectList
-          items={entryOptions.map((entry) => ({
+        <AutocompletePicker
+          searchText={searchText}
+          onSearchTextChange={onSearchTextChange}
+          searchResults={searchResults.map((entry) => ({
             id: entry.key,
-            label: `${entry.kind === "meal" ? "Meal" : "Recipe"} · ${entry.title}`,
+            label: entryLabel(entry),
+            ...(entry.servings !== undefined ? { detail: `${entry.servings} servings` } : {}),
           }))}
-          selectedIds={selectedKeys}
-          onToggle={onToggleEntry}
+          isSearching={isSearching}
+          onSelectResult={onSelectEntry}
+          selectedItems={selectedEntries.map((entry) => ({
+            id: entry.key,
+            label: entryLabel(entry),
+          }))}
+          onRemoveSelectedItem={onRemoveEntry}
+          placeholder="Search meals & recipes…"
+          searchAccessibilityLabel="Search meals and recipes"
+          noResultsMessage="No meals or recipes found."
         />
       </LabeledGroup>
-      {selectedKeys.map((key) => {
-        const option = optionByKey.get(key);
-        if (!option) {
-          return null;
-        }
+      {selectedEntries.map((option) => {
+        const key = option.key;
         const quantityStepper = (
           <NumberStepper
             label={`Quantity · ${option.title}`}
@@ -201,7 +239,7 @@ export function MealPlanFormPage({
         <Button
           variant="primary"
           accessibilityLabel="Save plan"
-          disabled={!title.trim() || selectedKeys.length === 0 || isSaving}
+          disabled={!title.trim() || selectedEntries.length === 0 || isSaving}
           onPress={onSubmit}
         >
           Save plan

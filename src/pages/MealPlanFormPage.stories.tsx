@@ -2,7 +2,11 @@ import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { mealPlanFormFixture } from "./fixtures.js";
-import { MealPlanFormPage, type MealPlanFormPageProps } from "./MealPlanFormPage.js";
+import {
+  MealPlanFormPage,
+  type MealPlanFormPageEntryOption,
+  type MealPlanFormPageProps,
+} from "./MealPlanFormPage.js";
 
 /**
  * Stories for the real MealPlanFormPage (#125): the meal plan
@@ -11,6 +15,12 @@ import { MealPlanFormPage, type MealPlanFormPageProps } from "./MealPlanFormPage
  * as the app screen's edit-form hook holds it. Theme pinned
  * to Warm Harvest; the frame matches the other page stories
  * (430×844).
+ *
+ * The entry picker is a search autocomplete (#383): the
+ * story stands in for the host's server-side search by
+ * filtering the fixture's entry library by the search text
+ * (the Default story opens mid-search, with the Taco Night
+ * meal result ready to add over the two selected entries).
  */
 const meta: Meta<typeof MealPlanFormPage> = {
   title: "Pages/Eciperay/MealPlanFormPage",
@@ -31,16 +41,46 @@ function Viewport({ children }: { children: ReactNode }) {
 
 function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormPageProps {
   const fixture = mealPlanFormFixture;
-  const [title, setTitle] = useState(fixture.title);
-  const [notes, setNotes] = useState(fixture.notes);
-  const [startsOn, setStartsOn] = useState(fixture.startsOn);
-  const [endsOn, setEndsOn] = useState(fixture.endsOn);
-  const [selectedKeys, setSelectedKeys] = useState<string[]>(fixture.selectedKeys);
-  const [quantityByKey, setQuantityByKey] = useState<Record<string, number>>(fixture.quantityByKey);
-  const [servingsByRecipeId, setServingsByRecipeId] = useState<Record<string, number>>(
-    fixture.servingsByRecipeId,
+  // A story's props are the form's INITIAL state, not a fixed
+  // overlay: the stateful values (title, notes, dates, search,
+  // selection, quantities, servings) seed the hook's state, and
+  // the returned props are driven by that state plus the
+  // derived search — so a story that starts with no selection
+  // can still accept a search and add its first entry. Only
+  // the stateless props (error, isSearching, isSaving, a
+  // caller's onSubmit) ride in `restOverrides`, spread first
+  // so the state-driven fields below always win.
+  const {
+    title: initialTitle,
+    notes: initialNotes,
+    startsOn: initialStartsOn,
+    endsOn: initialEndsOn,
+    searchText: initialSearchText,
+    selectedEntries: initialSelectedEntries,
+    quantityByKey: initialQuantityByKey,
+    servingsByRecipeId: initialServingsByRecipeId,
+    ...restOverrides
+  } = overrides ?? {};
+  const [title, setTitle] = useState(initialTitle ?? fixture.title);
+  const [notes, setNotes] = useState(initialNotes ?? fixture.notes);
+  const [startsOn, setStartsOn] = useState(initialStartsOn ?? fixture.startsOn);
+  const [endsOn, setEndsOn] = useState(initialEndsOn ?? fixture.endsOn);
+  const [searchText, setSearchText] = useState(initialSearchText ?? fixture.searchText);
+  const [selectedEntries, setSelectedEntries] = useState<MealPlanFormPageEntryOption[]>(
+    initialSelectedEntries ?? fixture.selectedEntries,
   );
+  const [quantityByKey, setQuantityByKey] = useState<Record<string, number>>(
+    initialQuantityByKey ?? fixture.quantityByKey,
+  );
+  const [servingsByRecipeId, setServingsByRecipeId] = useState<Record<string, number>>(
+    initialServingsByRecipeId ?? fixture.servingsByRecipeId,
+  );
+  const query = searchText.trim().toLowerCase();
+  const searchResults = query
+    ? fixture.entryOptions.filter((entry) => entry.title.toLowerCase().includes(query))
+    : [];
   return {
+    ...restOverrides,
     title,
     onTitleChange: setTitle,
     notes,
@@ -49,14 +89,22 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     onStartsOnChange: setStartsOn,
     endsOn,
     onEndsOnChange: setEndsOn,
-    entryOptions: fixture.entryOptions,
-    selectedKeys,
+    searchText,
+    onSearchTextChange: setSearchText,
+    searchResults,
+    selectedEntries,
     quantityByKey,
     servingsByRecipeId,
-    onToggleEntry: (key) => {
-      setSelectedKeys((current) =>
-        current.includes(key) ? current.filter((k) => k !== key) : [...current, key],
-      );
+    onSelectEntry: (key) => {
+      const entry = fixture.entryOptions.find((option) => option.key === key);
+      if (entry) {
+        setSelectedEntries((current) =>
+          current.some((option) => option.key === key) ? current : [...current, entry],
+        );
+      }
+    },
+    onRemoveEntry: (key) => {
+      setSelectedEntries((current) => current.filter((option) => option.key !== key));
     },
     onQuantityChange: (key, quantity) => {
       setQuantityByKey((current) => ({ ...current, [key]: quantity }));
@@ -64,8 +112,7 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     onRecipeServingsChange: (recipeId, servings) => {
       setServingsByRecipeId((current) => ({ ...current, [recipeId]: servings }));
     },
-    onSubmit: () => undefined,
-    ...overrides,
+    onSubmit: restOverrides.onSubmit ?? (() => undefined),
   };
 }
 
@@ -85,7 +132,13 @@ export const Default: Story = {
 export const NoSelection: Story = {
   render: () => (
     <Viewport>
-      <Form selectedKeys={[]} quantityByKey={{}} servingsByRecipeId={{}} />
+      <Form
+        selectedEntries={[]}
+        quantityByKey={{}}
+        servingsByRecipeId={{}}
+        searchText=""
+        searchResults={[]}
+      />
     </Viewport>
   ),
 };

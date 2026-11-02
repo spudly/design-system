@@ -1,6 +1,6 @@
-import { useId } from "react";
+import { forwardRef, useId } from "react";
 import { Input as TamaguiInput, Label, View, XStack, YStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
@@ -161,16 +161,30 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
  * when there is a value. The clear button is a real button with
  * `accessibilityLabel="Clear search"` and a 44px touch target. An optional
  * visible `label` is associated via `htmlFor`.
+ *
+ * `disabled` disables the whole field, clear button included: the
+ * input takes the prop as before, and the clear button drops its
+ * press handler entirely and reports the disabled state through
+ * the platform translator (the ListRow disabled treatment) — a
+ * disabled field's text cannot be cleared out from under its
+ * owner. The component forwards a ref to the inner input, so a
+ * caller that must move focus back to the field — the
+ * AutocompletePicker after a selection unmounts the focused
+ * result row — can do so through the input's own `focus()`.
  */
-export function SearchField({
-  value,
-  onChangeText,
-  label,
-  id: idProp,
-  placeholder,
-  grow = false,
-  ...rest
-}: SearchFieldProps) {
+export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function SearchField(
+  {
+    value,
+    onChangeText,
+    label,
+    id: idProp,
+    placeholder,
+    grow = false,
+    disabled = false,
+    ...rest
+  }: SearchFieldProps,
+  ref,
+) {
   const autoId = useId();
   const id = idProp ?? autoId;
 
@@ -186,18 +200,21 @@ export function SearchField({
           <SearchGlyph />
         </StyledGlyphBox>
         <StyledInput
+          ref={ref}
           id={id}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
+          disabled={disabled}
           {...rest}
         />
         {value ? (
           <XStack
-            onPress={() => onChangeText("")}
+            onPress={disabled ? undefined : () => onChangeText("")}
             {...platformAccessibilityProps({
               accessibilityRole: "button",
               accessibilityLabel: "Clear search",
+              accessibilityState: { disabled },
             })}
             alignItems="center"
             justifyContent="center"
@@ -218,4 +235,4 @@ export function SearchField({
       </StyledContainer>
     </YStack>
   );
-}
+});

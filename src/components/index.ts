@@ -3,6 +3,12 @@ export { AccordionSection, type AccordionSectionProps } from "./AccordionSection
 export { Alert, type AlertAction, type AlertProps, type AlertSeverity } from "./Alert.js";
 export { ActionBar, type ActionBarProps } from "./ActionBar.js";
 export { Avatar, type AvatarProps } from "./Avatar.js";
+export {
+  AutocompletePicker,
+  type AutocompletePickerProps,
+  type AutocompletePickerResult,
+  type AutocompletePickerSelectedItem,
+} from "./AutocompletePicker.js";
 export { BackLink, type BackLinkProps } from "./BackLink.js";
 export { Badge, type BadgeProps } from "./Badge.js";
 export { BlankWord, type BlankWordProps } from "./BlankWord.js";
