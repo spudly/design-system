@@ -1,5 +1,8 @@
+import { useRef } from "react";
 import { XStack, YStack } from "tamagui";
+import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { politeLiveRegionProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { ListRow } from "./ListRow.js";
 import { SearchField } from "./SearchField.js";
@@ -102,6 +105,28 @@ export type AutocompletePickerProps = {
  * field is the DS SearchField, result rows are DS ListRows,
  * removal is a ghost DS Button, and the stacks are the
  * picker's own layout — callers pass data and callbacks only.
+ *
+ * Search-state announcements: an always-mounted polite live
+ * region (the StatusMessage pattern — `politeLiveRegionProps`
+ * on a `collapsable={false}` root that renders in every state)
+ * carries the search state's text: searching, the no-results
+ * message, or how many results are available. A live region
+ * only announces changes that happen after it mounts, so the
+ * region must exist before the search state changes — the
+ * conditionally rendered no-results hint below cannot announce
+ * anything (it mounts WITH its text). The region's text is
+ * announcement-only: the visible counterparts (the Spinner,
+ * the hint, the rows) are unchanged, so the region is clipped
+ * to a 1×1 box at full transparency — present in the
+ * accessibility tree, absent from the layout.
+ *
+ * Focus on selection: picking a result unmounts its row (the
+ * caller adds it to `selectedItems`, and selected results are
+ * filtered out of the rows), which would strand a keyboard
+ * user's focus on the page body. Selection therefore returns
+ * focus to the search input — the stable target, and where
+ * the user continues, since the picker stays open to add
+ * more — through the SearchField's forwarded input ref.
  */
 export function AutocompletePicker({
   searchText,
@@ -119,16 +144,54 @@ export function AutocompletePicker({
   const selectedIds = new Set(selectedItems.map((item) => item.id));
   const visibleResults = searchResults.filter((result) => !selectedIds.has(result.id));
   const hasSearchText = searchText.trim().length > 0;
+  const searchFieldRef = useRef<TamaguiElement>(null);
+
+  // The live region's text for the current search state (see
+  // the announcement note above): nothing before a search,
+  // then exactly one of searching / no matches / the count of
+  // results on offer.
+  const statusMessage = !hasSearchText
+    ? null
+    : isSearching
+      ? "Searching"
+      : visibleResults.length === 0
+        ? noResultsMessage
+        : `${visibleResults.length} ${visibleResults.length === 1 ? "result" : "results"} available`;
+
+  const handleSelectResult = (id: string) => {
+    onSelectResult(id);
+    // The selected row unmounts (it is filtered out as
+    // selected), so focus would fall to the page body; return
+    // it to the search input instead (see the focus note
+    // above). The input element carries `focus()` on web and
+    // the TextInput instance carries it on native; the
+    // optional call (the DropdownButton pattern) keeps this a
+    // no-op anywhere no focus method exists.
+    const node = searchFieldRef.current as unknown as { focus?: () => void } | null;
+    node?.focus?.();
+  };
 
   return (
-    <YStack gap={tokens.spacing[2]}>
+    <YStack gap={tokens.spacing[2]} position="relative">
       <SearchField
+        ref={searchFieldRef}
         value={searchText}
         onChangeText={onSearchTextChange}
         placeholder={placeholder}
         aria-label={searchAccessibilityLabel}
         disabled={disabled}
       />
+      <YStack
+        collapsable={false}
+        {...politeLiveRegionProps}
+        position="absolute"
+        width={1}
+        height={1}
+        overflow="hidden"
+        opacity={0}
+      >
+        {statusMessage ? <Text>{statusMessage}</Text> : null}
+      </YStack>
       {hasSearchText ? (
         isSearching ? (
           <YStack alignItems="center" padding={tokens.spacing[3]}>
@@ -145,7 +208,7 @@ export function AutocompletePicker({
                 {...(result.detail !== undefined ? { subtitle: result.detail } : {})}
                 isDisabled={disabled}
                 onPress={() => {
-                  onSelectResult(result.id);
+                  handleSelectResult(result.id);
                 }}
               />
             ))}

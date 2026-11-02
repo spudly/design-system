@@ -41,20 +41,38 @@ function Viewport({ children }: { children: ReactNode }) {
 
 function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps {
   const fixture = mealFormFixture;
-  const [title, setTitle] = useState(fixture.title);
-  const [notes, setNotes] = useState(fixture.notes);
-  const [searchText, setSearchText] = useState(fixture.searchText);
+  // A story's props are the form's INITIAL state, not a fixed
+  // overlay: the stateful values (title, notes, search,
+  // selection, servings) seed the hook's state, and the
+  // returned props are driven by that state plus the derived
+  // search — so a story that starts with no selection can
+  // still accept a search and add its first recipe. Only the
+  // stateless props (error, isSearching, isSaving, a caller's
+  // onSubmit) ride in `restOverrides`, spread first so the
+  // state-driven fields below always win.
+  const {
+    title: initialTitle,
+    notes: initialNotes,
+    searchText: initialSearchText,
+    selectedRecipes: initialSelectedRecipes,
+    servingsByRecipeId: initialServingsByRecipeId,
+    ...restOverrides
+  } = overrides ?? {};
+  const [title, setTitle] = useState(initialTitle ?? fixture.title);
+  const [notes, setNotes] = useState(initialNotes ?? fixture.notes);
+  const [searchText, setSearchText] = useState(initialSearchText ?? fixture.searchText);
   const [selectedRecipes, setSelectedRecipes] = useState<MealFormPageRecipeOption[]>(
-    fixture.selectedRecipes,
+    initialSelectedRecipes ?? fixture.selectedRecipes,
   );
   const [servingsByRecipeId, setServingsByRecipeId] = useState<Record<string, number>>(
-    fixture.servingsByRecipeId,
+    initialServingsByRecipeId ?? fixture.servingsByRecipeId,
   );
   const query = searchText.trim().toLowerCase();
   const searchResults = query
     ? fixture.recipeOptions.filter((recipe) => recipe.label.toLowerCase().includes(query))
     : [];
   return {
+    ...restOverrides,
     title,
     onTitleChange: setTitle,
     notes,
@@ -78,8 +96,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
     onServingsChange: (recipeId, servings) => {
       setServingsByRecipeId((current) => ({ ...current, [recipeId]: servings }));
     },
-    onSubmit: () => undefined,
-    ...overrides,
+    onSubmit: restOverrides.onSubmit ?? (() => undefined),
   };
 }
 

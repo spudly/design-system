@@ -79,7 +79,11 @@ test("results render only for a non-empty search, and selected results are not o
 
 test("selecting a result and removing a selected item report their ids", () => {
   assert.match(picker, /onSelectResult: \(id: string\) => void/);
-  assert.match(picker, /onSelectResult\(result\.id\)/);
+  // Selection routes through handleSelectResult (#384: it also
+  // returns focus to the search field — see the review-round
+  // contracts below), which reports the row's id onward.
+  assert.match(picker, /handleSelectResult\(result\.id\)/);
+  assert.match(picker, /onSelectResult\(id\)/);
   assert.match(picker, /selectedItems: AutocompletePickerSelectedItem\[\]/);
   assert.match(picker, /onRemoveSelectedItem: \(id: string\) => void/);
   assert.match(picker, /onRemoveSelectedItem\(item\.id\)/);
