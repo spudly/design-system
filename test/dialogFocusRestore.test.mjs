@@ -60,12 +60,31 @@ test("focus returns to the tracked element on the open -> closed transition, whe
   assert.match(code, /typeof restoreTarget.focus !== "function"/);
   assert.match(code, /restoreTarget\.focus\(\);/);
   assert.match(code, /\}, \[open, restoreFocus\]\);/);
-  // The target is cleared in exactly three places: when a restore
+  // The target is cleared in exactly four places: when a restore
   // consumes it, when the focusout staleness check below retires
-  // it after it loses focus to the body while closed, and when an
+  // it after it loses focus to the body while closed, when an
   // opening commit consumes a recorded pre-open blur (same-task
-  // blur + open, pinned by its own test below).
-  assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 3);
+  // blur + open, pinned by its own test below), and when the
+  // focusin handler observes focus on the body after a nested
+  // blur (pinned by its own test below).
+  assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 4);
+});
+
+test("a nested blur to the body clears the saved restore candidate (#385)", () => {
+  // Focus moves A -> B and B's onFocus immediately calls B.blur():
+  // the focusin handler observes document.activeElement === body,
+  // and no control holds focus, so the previously tracked A must
+  // not survive as a candidate — a later programmatic opening and
+  // dismissal would otherwise restore A even though focus was on
+  // the body when the dialog opened. Neither focusout guard sees
+  // this sequence (A's focusout names B as relatedTarget; B's
+  // focusout does not name the tracked target), so the clear
+  // lives in the focusin handler itself (Copilot review on
+  // PR #386, head 7ee1f4e).
+  assert.match(
+    code,
+    /if \(currentTarget === document\.body\) \{\s+restoreTargetRef\.current = null;\s+\}\s+trackTarget\(currentTarget\);/,
+  );
 });
 
 test("stale deferred retries are invalidated by newer restores, reopening, and intervening focus (#385)", () => {

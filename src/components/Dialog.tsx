@@ -48,7 +48,9 @@ export type DialogProps = {
  * while open), when that element is still in the document and focusable.
  * The tracker reads the current active element rather than a focus
  * event's target, which can be stale after a synchronous focus
- * redirect nested inside another element's focus handling.
+ * redirect nested inside another element's focus handling, and a
+ * focus event observed with focus on the body clears the candidate
+ * (a nested blur left no control holding focus).
  * A tracked element that loses focus to the body while the dialog is
  * closed stops being a candidate (focus history alone is not an
  * opener) — including when that blur and a programmatic opening land
@@ -278,6 +280,19 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (lastRestoreTargetRef.current && currentTarget !== lastRestoreTargetRef.current) {
         restoreGenRef.current++;
         lastRestoreTargetRef.current = null;
+      }
+      // A focus event observed with focus on the body means no
+      // control holds focus, so any saved candidate is stale:
+      // focus moved A -> B and B's focus handler immediately
+      // blurred B (B.blur() in onFocus). Neither focusout guard
+      // catches that sequence — A's focusout names B as its
+      // relatedTarget, and B's focusout does not name the tracked
+      // target — so without this clear, a later programmatic
+      // opening and dismissal would restore A even though focus
+      // was on the body when the dialog opened (Copilot review
+      // on PR #386, head 7ee1f4e).
+      if (currentTarget === document.body) {
+        restoreTargetRef.current = null;
       }
       trackTarget(currentTarget);
     };
