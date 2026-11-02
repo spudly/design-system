@@ -46,9 +46,10 @@ export type DialogProps = {
  * the dialog therefore tracks the element that most recently held focus
  * outside the dialog and returns focus to it on close (and on unmount
  * while open), when that element is still in the document and focusable.
- * The tracked element is validated at the committed opening (it is the
- * opener only if it actually holds focus then, not merely earlier), and
- * the deferred re-asserts a restore schedules are generation-guarded so
+ * A tracked element that loses focus to the body while the dialog is
+ * closed stops being a candidate (focus history alone is not an
+ * opener), and the deferred re-asserts a restore schedules are
+ * generation-guarded so
  * a newer restore, a reopening, or intervening focus activity retires
  * them instead of letting a stale retry focus the wrong control. A
  * restore also yields to focus a host deliberately placed on a control
@@ -106,6 +107,12 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         (frame && frame.contains(activeElement)),
       );
       if (!insideOwnDialog) {
+        // Retain the yielded-to control as the restore target: it
+        // holds focus now, outside the dialog, and if it reopens
+        // this dialog without a focus change there is no focusin
+        // to name it — the next dismissal returns to it just as
+        // if it had been tracked all along.
+        restoreTargetRef.current = activeElement;
         return;
       }
     }
@@ -203,9 +210,42 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       }
       trackTarget(event.target as HTMLElement | null);
     };
+    // Staleness: a tracked element that loses focus to nowhere
+    // (the body) while the dialog is closed stops being a restore
+    // candidate — focus history alone is not an opener (focus
+    // button A, blur it back to the body, then open the dialog
+    // programmatically, and a close has nothing it should return
+    // to). The check is deferred a tick and re-verified then, so
+    // it can never race an opening commit or the primitive's own
+    // focus move into the dialog: an earlier version validated
+    // the target inside the open effect itself, which runs after
+    // focus has already moved into the dialog, and cleared every
+    // legitimate opener (manual QA on PR #386, head 4d775a8: all
+    // dismissal paths in all stories left focus on the body).
+    const handleFocusOut = (event: FocusEvent) => {
+      if (openRef.current) {
+        return;
+      }
+      if (!restoreTargetRef.current || event.target !== restoreTargetRef.current) {
+        return;
+      }
+      if (event.relatedTarget) {
+        return;
+      }
+      setTimeout(() => {
+        if (openRef.current) {
+          return;
+        }
+        if (document.activeElement === document.body) {
+          restoreTargetRef.current = null;
+        }
+      }, 0);
+    };
     document.addEventListener("focusin", handleFocusIn);
+    document.addEventListener("focusout", handleFocusOut);
     return () => {
       document.removeEventListener("focusin", handleFocusIn);
+      document.removeEventListener("focusout", handleFocusOut);
     };
   }, []);
 
@@ -221,17 +261,6 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       // A (re)opening supersedes any deferred re-assert still
       // pending from the previous close.
       restoreGenRef.current++;
-      // Validate the tracked target at the committed opening: it
-      // is the opener only if it actually holds focus now. Focus
-      // history alone is not an opener — focus button A, blur it
-      // back to the body, then open programmatically, and a close
-      // has nothing it should return to.
-      if (typeof document !== "undefined") {
-        const target = restoreTargetRef.current;
-        if (target && target !== document.activeElement) {
-          restoreTargetRef.current = null;
-        }
-      }
       return;
     }
     if (!wasOpen || open) {

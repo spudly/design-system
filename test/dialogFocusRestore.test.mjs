@@ -61,8 +61,8 @@ test("focus returns to the tracked element on the open -> closed transition, whe
   assert.match(code, /restoreTarget\.focus\(\);/);
   assert.match(code, /\}, \[open, restoreFocus\]\);/);
   // The target is cleared in exactly two places: when a restore
-  // consumes it, and when the committed-opening validation below
-  // rejects it.
+  // consumes it, and when the focusout staleness check below
+  // retires it after it loses focus to the body while closed.
   assert.equal((code.match(/restoreTargetRef\.current = null;/g) ?? []).length, 2);
 });
 
@@ -80,11 +80,22 @@ test("a restore yields to focus a host placed outside the dialog in the closing 
   assert.match(code, /content\.contains\(activeElement\)/);
   assert.match(code, /frame\.contains\(activeElement\)/);
   assert.match(code, /if \(!insideOwnDialog\) \{/);
+  // The yielded-to control is retained as the restore target, so a
+  // later reopening from it (with no focus change to track) still
+  // has somewhere to return to.
+  assert.match(code, /restoreTargetRef\.current = activeElement;/);
 });
 
-test("the tracked target is validated against the active element at the committed opening (#385)", () => {
-  assert.match(code, /if \(!wasOpen && open\) \{/);
-  assert.match(code, /target !== document\.activeElement/);
+test("a tracked target that loses focus to the body while closed stops being a candidate (#385)", () => {
+  assert.match(code, /document\.addEventListener\("focusout", handleFocusOut\);/);
+  assert.match(code, /document\.removeEventListener\("focusout", handleFocusOut\);/);
+  assert.match(code, /event\.target !== restoreTargetRef\.current/);
+  assert.match(code, /if \(event\.relatedTarget\) \{/);
+  assert.match(code, /document\.activeElement === document\.body/);
+  // Validating inside the open effect is the rejected shape: it
+  // runs after focus has moved into the dialog and clears every
+  // legitimate opener (manual QA on PR #386, head 4d775a8).
+  assert.doesNotMatch(code, /target !== document\.activeElement/);
 });
 
 test("unmount while open schedules a deferred restore that a StrictMode replay setup cancels (#385)", () => {
