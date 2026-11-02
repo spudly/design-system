@@ -382,14 +382,16 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // Cancel <-> Delete correctly there (manual QA on PR #386).
   // Refinements from review rounds on PR #392: (1) tabbability
   // is effective, not selector-shaped — a hidden input, a
-  // disabled or visibility-hidden control, a control inside an
-  // inert subtree or a disabled fieldset, a negative-tabindex-
-  // only control, or an unrendered element is not a Tab stop,
-  // while native stops a naive selector misses (summary, iframe,
-  // media controls, image-map areas, genuinely editable content)
-  // are; an element marked contenteditable="false" is not a stop
-  // either, and an image-map area counts without a layout box of
-  // its own (its image carries the geometry). (2) Only
+  // disabled or visibility-hidden control (the :disabled
+  // pseudo-class carries the fieldset semantics, first-legend
+  // exception included, and never matches links), a control
+  // inside an inert subtree, a negative-tabindex-only control,
+  // or an unrendered element is not a Tab stop, while native
+  // stops a naive selector misses (summary, iframe, media
+  // controls, genuinely editable content) are; an element marked
+  // contenteditable="false" is not a stop either, and an
+  // image-map area counts only when the image using its map is
+  // rendered (the area itself has no layout box). (2) Only
   // the topmost modal intercepts — a covered dialog's listener
   // must not swallow Tab for the dialog above it, where covered
   // means a LATER, still-open modal frame (aria-modal or the
@@ -429,28 +431,23 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         'a[href], area[href], button, input, select, textarea, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
       );
       const hasTabbable = Array.from(candidates).some((candidate) => {
-        if (candidate.hasAttribute("disabled")) {
+        if (candidate.hasAttribute("disabled") || candidate.matches(":disabled")) {
           return false;
         }
         if (candidate.closest("[inert]")) {
           return false;
         }
-        const disabledFieldset = candidate.closest("fieldset[disabled]");
-        if (disabledFieldset) {
-          const firstLegend = disabledFieldset.querySelector(":scope > legend");
-          if (!firstLegend || !firstLegend.contains(candidate)) {
-            return false;
-          }
-        }
         if (candidate instanceof HTMLInputElement && candidate.type === "hidden") {
           return false;
-        }
-        if (candidate instanceof HTMLAreaElement) {
-          return true;
         }
         const tabStopAttr = candidate.getAttribute("tabindex");
         if (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) < 0) {
           return false;
+        }
+        if (candidate instanceof HTMLAreaElement) {
+          const mapName = candidate.closest("map")?.getAttribute("name");
+          const image = mapName ? content.querySelector(`img[usemap="#${mapName}"]`) : null;
+          return Boolean(image && image.getClientRects().length > 0);
         }
         const style = window.getComputedStyle(candidate);
         if (style.display === "none" || style.visibility === "hidden") {

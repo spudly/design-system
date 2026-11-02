@@ -46,13 +46,23 @@ test("Tab is swallowed only when the dialog content holds no effectively tabbabl
   assert.match(code, /content\.querySelectorAll\(/);
   assert.match(code, /a\[href\], area\[href\], button/);
   assert.match(code, /summary, iframe, audio\[controls\], video\[controls\]/);
-  // Effective state beyond the element itself (Copilot review on
-  // PR #392, head 3d1cd1c): inert ancestors and disabled
-  // fieldsets remove Tab stops; an image-map area is a stop
-  // despite having no layout box of its own.
+  // Effective state beyond the element itself (Copilot +
+  // CodeRabbit review on PR #392): inert ancestors remove Tab
+  // stops; the :disabled pseudo-class carries fieldset semantics
+  // (and never matches links, which a fieldset cannot disable);
+  // an image-map area is a stop only when the image using its
+  // map is rendered, and only after the negative-tabindex check.
   assert.match(code, /candidate\.closest\("\[inert\]"\)/);
-  assert.match(code, /candidate\.closest\("fieldset\[disabled\]"\)/);
+  assert.match(code, /candidate\.matches\(":disabled"\)/);
+  assert.doesNotMatch(code, /fieldset\[disabled\]/);
   assert.match(code, /candidate instanceof HTMLAreaElement/);
+  assert.match(code, /img\[usemap=/);
+  const areaIndex = code.indexOf("candidate instanceof HTMLAreaElement");
+  const tabStopIndex = code.indexOf('candidate.getAttribute("tabindex")');
+  assert.ok(
+    tabStopIndex !== -1 && areaIndex !== -1 && tabStopIndex < areaIndex,
+    "the negative-tabindex check must precede the image-map area exception",
+  );
   assert.match(code, /\[contenteditable=""\], \[contenteditable="true"\]/);
   assert.doesNotMatch(code, /\[contenteditable\],/);
   assert.match(code, /candidate\.hasAttribute\("disabled"\)/);
