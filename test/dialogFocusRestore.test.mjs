@@ -113,6 +113,20 @@ test("the restore re-asserts on a deferred tick only while focus sits on the bod
   );
 });
 
+test("a successful restore retains its target, and unmount leaves no live retries behind (#385)", () => {
+  // Retention: an already-focused opener emits no focusin when
+  // focus() lands on it, so the tracker must be repopulated by the
+  // restore itself (Copilot review on PR #386, head aeea1fb).
+  assert.match(code, /restoreTargetRef\.current = restoreTarget;/);
+  // Teardown cancels a close's pending re-asserts, and the
+  // unmount-scheduled restore is flagged so it schedules none —
+  // after unmount the invalidating focus listener is gone.
+  assert.match(code, /clearTimeout\(reassertTimerRef\.current\);/);
+  assert.match(code, /cancelAnimationFrame\(reassertRafRef\.current\);/);
+  assert.match(code, /unmountRestoreRef\.current = true;/);
+  assert.match(code, /if \(!fromUnmount\) \{/);
+});
+
 test("rejected shapes stay out: no render-time capture, no autofocus-event handlers (#385)", () => {
   assert.doesNotMatch(code, /if \(isWeb && open/);
   assert.doesNotMatch(code, /onOpenAutoFocus/);

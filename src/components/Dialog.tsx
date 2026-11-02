@@ -48,8 +48,9 @@ export type DialogProps = {
  * while open), when that element is still in the document and focusable.
  * A tracked element that loses focus to the body while the dialog is
  * closed stops being a candidate (focus history alone is not an
- * opener), and the deferred re-asserts a restore schedules are
- * generation-guarded so
+ * opener); a successful restore retains its target (an already-
+ * focused opener emits no focusin to re-track it), and the deferred
+ * re-asserts a restore schedules are generation-guarded so
  * a newer restore, a reopening, or intervening focus activity retires
  * them instead of letting a stale retry focus the wrong control. A
  * restore also yields to focus a host deliberately placed on a control
@@ -67,11 +68,16 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const restoreGenRef = useRef(0);
   const lastRestoreTargetRef = useRef<HTMLElement | null>(null);
   const pendingRestoreTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reassertTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const reassertRafRef = useRef<number | null>(null);
+  const unmountRestoreRef = useRef(false);
 
   // Restore helper: focus the tracked element if it is still in the
   // document and focusable, and clear the target either way so a
   // later open tracks fresh.
   const restoreFocus = useCallback(() => {
+    const fromUnmount = unmountRestoreRef.current;
+    unmountRestoreRef.current = false;
     const restoreTarget = restoreTargetRef.current;
     restoreTargetRef.current = null;
     // Every restore supersedes the deferred re-asserts of any
@@ -117,22 +123,39 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       }
     }
     restoreTarget.focus();
+    // Retain the target after a successful restore: when the
+    // element already held focus at close time (a host focused the
+    // opener itself in the closing commit), focus() emits no
+    // focusin, so nothing else would repopulate the tracker — and
+    // a reopening from that still-focused opener, again with no
+    // focus change to track, would dismiss to the body. Retention
+    // is safe alongside the staleness rule: if the retained element
+    // later loses focus to the body while closed, the focusout
+    // check retires it as usual.
+    restoreTargetRef.current = restoreTarget;
     // Re-assert on a deferred tick: an overlay-click dismissal's
     // own pointer sequence resets focus to the body AFTER this
     // restore runs (manual QA on PR #386: Cancel/Delete/Escape
     // restored, overlay click did not). The re-assert fires only
     // while focus sits on the body, so it never steals focus from
     // a control the user has actually moved to in the meantime.
-    const reassert = () => {
-      if (restoreGenRef.current !== restoreGen) {
-        return;
-      }
-      if (document.activeElement === document.body && document.contains(restoreTarget)) {
-        restoreTarget.focus();
-      }
-    };
-    requestAnimationFrame(reassert);
-    setTimeout(reassert, 350);
+    // A restore scheduled from unmount schedules NO re-asserts:
+    // teardown has removed the focus listener whose intervening-
+    // activity check is what retires a stale retry, so a retry
+    // scheduled then could steal focus back after the user has
+    // moved on (Copilot review on PR #386, head aeea1fb).
+    if (!fromUnmount) {
+      const reassert = () => {
+        if (restoreGenRef.current !== restoreGen) {
+          return;
+        }
+        if (document.activeElement === document.body && document.contains(restoreTarget)) {
+          restoreTarget.focus();
+        }
+      };
+      reassertRafRef.current = requestAnimationFrame(reassert);
+      reassertTimerRef.current = setTimeout(reassert, 350);
+    }
   }, []);
 
   // Track the restore target from real focus events (web): while
@@ -246,6 +269,18 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     return () => {
       document.removeEventListener("focusin", handleFocusIn);
       document.removeEventListener("focusout", handleFocusOut);
+      // Teardown also cancels any deferred re-assert a close
+      // scheduled: with the focus listener gone, nothing remains
+      // to invalidate a stale retry, so it must not fire at all
+      // after unmount (Copilot review on PR #386, head aeea1fb).
+      if (reassertTimerRef.current !== null) {
+        clearTimeout(reassertTimerRef.current);
+        reassertTimerRef.current = null;
+      }
+      if (reassertRafRef.current !== null) {
+        cancelAnimationFrame(reassertRafRef.current);
+        reassertRafRef.current = null;
+      }
     };
   }, []);
 
@@ -286,6 +321,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (!isWeb || !wasOpenRef.current) {
         return;
       }
+      unmountRestoreRef.current = true;
       pendingRestoreTimerRef.current = setTimeout(() => {
         pendingRestoreTimerRef.current = null;
         restoreFocus();
