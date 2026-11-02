@@ -321,9 +321,18 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (!isWeb || !wasOpenRef.current) {
         return;
       }
-      unmountRestoreRef.current = true;
+      // The unmount flag is set only when the timer actually
+      // fires, never in this cleanup: a StrictMode replay runs
+      // cleanup (schedule) + setup (cancel), and a flag set here
+      // would survive that cancel — the first real close would
+      // then read fromUnmount, skip its deferred re-asserts, and
+      // an overlay dismissal (whose pointer sequence resets focus
+      // to the body after the restore) would strand focus on the
+      // body (Copilot + CodeRabbit review on PR #386, head
+      // 8ac05f4).
       pendingRestoreTimerRef.current = setTimeout(() => {
         pendingRestoreTimerRef.current = null;
+        unmountRestoreRef.current = true;
         restoreFocus();
       }, 0);
     };

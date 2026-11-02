@@ -102,6 +102,17 @@ test("unmount while open schedules a deferred restore that a StrictMode replay s
   assert.match(code, /pendingRestoreTimerRef\.current = setTimeout\(\(\) => \{/);
   assert.match(code, /clearTimeout\(pendingRestoreTimerRef\.current\);/);
   assert.match(code, /if \(!isWeb \|\| !wasOpenRef\.current\) \{/);
+  // The unmount flag is set only inside the timer callback, when
+  // the scheduled restore actually fires — never in the cleanup
+  // itself. A cleanup-set flag survives the replay setup's timer
+  // cancel, so the first real close would read fromUnmount, skip
+  // its deferred re-asserts, and an overlay dismissal would strand
+  // focus on the body (Copilot + CodeRabbit review on PR #386,
+  // head 8ac05f4).
+  assert.match(
+    code,
+    /pendingRestoreTimerRef\.current = setTimeout\(\(\) => \{\s+pendingRestoreTimerRef\.current = null;\s+unmountRestoreRef\.current = true;\s+restoreFocus\(\);/,
+  );
 });
 
 test("the restore re-asserts on a deferred tick only while focus sits on the body (#385)", () => {
