@@ -112,3 +112,24 @@ test("focus outside the dialog is pulled back onto the landing wrapper inside it
   assert.match(code, /frame\.querySelector\('\[tabindex="-1"\]'\)/);
   assert.match(code, /landing\.focus\(\)/);
 });
+
+test("a details with no summary child counts as a Tab stop, and the fallback landing is focusable (#391)", () => {
+  // Copilot review on PR #392 (head fbf5aea): a details without
+  // an explicit summary gets a UA fallback summary that is a
+  // real Tab stop but not in the DOM, so the details element
+  // itself must stand in for it; with an explicit summary child
+  // the summary is the stop instead.
+  assert.match(code, /details, summary, iframe/);
+  assert.match(code, /candidate instanceof HTMLDetailsElement/);
+  assert.match(code, /Array\.from\(candidate\.children\)/);
+  assert.match(code, /child\.tagName === "SUMMARY"/);
+  // CodeRabbit review on PR #392 (head fbf5aea): the fallback
+  // landing is the content itself when the frame has no wrapper,
+  // so the content must be focusable on web (tabIndex -1) or the
+  // pull-back focus() is a no-op and focus stays behind the
+  // overlay. A -1 tabindex never makes it a sequential Tab stop.
+  assert.match(
+    code,
+    /<StyledContent ref=\{contentRef\} \{\.\.\.\(isWeb \? \{ tabIndex: -1 \} : \{\}\)\}>/,
+  );
+});

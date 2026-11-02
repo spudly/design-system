@@ -439,7 +439,14 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // frame (aria-modal or the :modal state — a merely open,
   // modeless dialog covers nothing — and actually rendered): a closed
   // dialog element parked later in the document — or nested
-  // inside this dialog — covers nothing.
+  // inside this dialog — covers nothing. (3) A details
+  // element with no summary child counts as a stop (its UA
+  // fallback summary is tabbable but not in the DOM), and the
+  // fallback landing itself must be focusable: the content
+  // carries tabIndex={-1} on web so the pull-back focus()
+  // actually lands inside the dialog when the frame has no
+  // landing wrapper of its own (CodeRabbit review on PR #392,
+  // head fbf5aea).
   useEffect(() => {
     if (!open || !isWeb || typeof document === "undefined") {
       return;
@@ -479,7 +486,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         }
       }
       const candidates = content.querySelectorAll(
-        'a[href], area[href], button, input, select, textarea, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
+        'a[href], area[href], button, input, select, textarea, details, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
       );
       const hasTabbable = Array.from(candidates).some((candidate) => {
         if (candidate.hasAttribute("disabled") || candidate.matches(":disabled")) {
@@ -498,7 +505,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         const editableAttr = candidate.getAttribute("contenteditable");
         const independentlyTabbable =
           candidate.matches(
-            "a[href], area[href], button, input, select, textarea, summary, iframe, audio[controls], video[controls]",
+            "a[href], area[href], button, input, select, textarea, details, summary, iframe, audio[controls], video[controls]",
           ) ||
           (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) >= 0);
         if (editableAttr !== null && editableAttr !== "false" && !independentlyTabbable) {
@@ -512,6 +519,21 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
               break;
             }
             host = host.parentElement;
+          }
+        }
+        if (candidate instanceof HTMLDetailsElement && tabStopAttr === null) {
+          // A details element with no summary child gets a UA
+          // fallback summary that IS a Tab stop — but it is not
+          // in the DOM, so the details element itself must stand
+          // in for it here. With an explicit summary child, the
+          // summary is the stop (counted on its own candidate
+          // pass) and the details element is not (Copilot review
+          // on PR #392, head fbf5aea).
+          const hasOwnSummary = Array.from(candidate.children).some(
+            (child) => child.tagName === "SUMMARY",
+          );
+          if (hasOwnSummary) {
+            return false;
           }
         }
         if (candidate instanceof HTMLAreaElement) {
@@ -635,7 +657,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     <TamaguiDialog open={open} onOpenChange={onOpenChange}>
       <TamaguiDialog.Portal>
         <StyledOverlay />
-        <StyledContent ref={contentRef}>
+        <StyledContent ref={contentRef} {...(isWeb ? { tabIndex: -1 } : {})}>
           <YStack gap={tokens.spacing[3]}>
             <TamaguiDialog.Title
               fontSize={tokens.typography.fontSize.xl}
