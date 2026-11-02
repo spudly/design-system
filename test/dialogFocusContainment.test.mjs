@@ -38,11 +38,31 @@ test("an open web dialog registers a capture-phase Tab containment listener (#39
   assert.match(code, /\}, \[open\]\);/);
 });
 
-test("Tab is swallowed only when the dialog content holds no focusable element (#391)", () => {
+test("Tab is swallowed only when the dialog content holds no effectively tabbable element (#391)", () => {
+  // Effective tabbability, not selector shape (Copilot + CodeRabbit
+  // review on PR #392): hidden inputs, disabled controls,
+  // negative-tabindex-only controls, and unrendered elements are
+  // not Tab stops; summary and contenteditable elements are.
   assert.match(code, /content\.querySelectorAll\(/);
-  assert.match(code, /button:not\(\[disabled\]\)/);
-  assert.match(code, /if \(focusable\.length > 0\) \{\s+return;\s+\}/);
+  assert.match(code, /summary, \[contenteditable\], \[tabindex\]/);
+  assert.match(code, /candidate\.hasAttribute\("disabled"\)/);
+  assert.match(code, /candidate\.type === "hidden"/);
+  assert.match(code, /candidate\.getAttribute\("tabindex"\)/);
+  assert.match(code, /Number\.parseInt\(tabStopAttr, 10\) < 0/);
+  assert.match(code, /candidate\.getClientRects\(\)\.length > 0/);
+  assert.match(code, /if \(hasTabbable\) \{\s+return;\s+\}/);
   assert.match(code, /event\.preventDefault\(\);\s+event\.stopPropagation\(\);/);
+});
+
+test("only the topmost modal intercepts Tab — a covered dialog stands down (#391)", () => {
+  // Stacked dialogs: a text-only dialog left open beneath a newer
+  // modal must not swallow Tab for the dialog above it (Copilot +
+  // CodeRabbit review on PR #392). Portal frames mount in open
+  // order, so a frame followed in document order by another
+  // dialog frame is covered.
+  assert.match(code, /document\.querySelectorAll\("dialog"\)/);
+  assert.match(code, /frame\.compareDocumentPosition\(other\) & Node\.DOCUMENT_POSITION_FOLLOWING/);
+  assert.match(code, /if \(covered\) \{\s+return;\s+\}/);
 });
 
 test("focus outside the dialog is pulled back onto the landing wrapper inside it (#391)", () => {

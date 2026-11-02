@@ -366,20 +366,29 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     };
   }, []);
 
-  // Focus containment for a dialog with nothing focusable (#391):
+  // Focus containment for a dialog with nothing tabbable (#391):
   // the primitive's focus scope traps Tab between the dialog's
-  // focusable descendants, and when there are none its own landing
+  // tabbable descendants, and when there are none its own landing
   // wrapper is the only stop — sequential navigation then escapes
   // to the page behind the overlay on the next Tab (and a first
   // Shift+Tab lands directly on the opener). While the dialog is
   // open on web, a capture-phase keydown listener therefore takes
-  // over Tab handling ONLY when the content holds no focusable
-  // element: the keypress is swallowed (default and the scope's
-  // own handling both stopped) so focus stays on the wrapper
-  // inside the dialog, and if focus somehow sits outside the
-  // dialog it is pulled back onto that wrapper. Dialogs with
-  // focusable content are untouched — the primitive already wraps
+  // over Tab handling ONLY when the content holds no effectively
+  // tabbable element: the keypress is swallowed (default and the
+  // scope's own handling both stopped) so focus stays on the
+  // wrapper inside the dialog, and if focus somehow sits outside
+  // the dialog it is pulled back onto that wrapper. Dialogs with
+  // tabbable content are untouched — the primitive already wraps
   // Cancel <-> Delete correctly there (manual QA on PR #386).
+  // Two refinements from review on PR #392: (1) tabbability is
+  // effective, not selector-shaped — a hidden input, a disabled
+  // control, a negative-tabindex-only control, or an unrendered
+  // element is not a Tab stop, while native stops the first
+  // selector missed (summary, contenteditable) are; (2) only the
+  // topmost modal intercepts — a covered dialog's listener must
+  // not swallow Tab for the dialog above it, so a dialog whose
+  // portal frame is followed in document order by another dialog
+  // frame stands down entirely.
   useEffect(() => {
     if (!open || !isWeb || typeof document === "undefined") {
       return;
@@ -392,16 +401,39 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (!content || typeof content.querySelectorAll !== "function") {
         return;
       }
-      const focusable = content.querySelectorAll(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
+      if (frame) {
+        const covered = Array.from(document.querySelectorAll("dialog")).some(
+          (other) =>
+            other !== frame &&
+            (frame.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
+        );
+        if (covered) {
+          return;
+        }
+      }
+      const candidates = content.querySelectorAll(
+        "a[href], button, input, select, textarea, summary, [contenteditable], [tabindex]",
       );
-      if (focusable.length > 0) {
+      const hasTabbable = Array.from(candidates).some((candidate) => {
+        if (candidate.hasAttribute("disabled")) {
+          return false;
+        }
+        if (candidate instanceof HTMLInputElement && candidate.type === "hidden") {
+          return false;
+        }
+        const tabStopAttr = candidate.getAttribute("tabindex");
+        if (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) < 0) {
+          return false;
+        }
+        return candidate.getClientRects().length > 0;
+      });
+      if (hasTabbable) {
         return;
       }
       event.preventDefault();
       event.stopPropagation();
       const activeElement = document.activeElement as HTMLElement | null;
-      const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
       const inside = Boolean(
         activeElement &&
         (content.contains(activeElement) || (frame && frame.contains(activeElement))),
