@@ -120,13 +120,15 @@ export type AutocompletePickerProps = {
  * to a 1×1 box at full transparency — present in the
  * accessibility tree, absent from the layout.
  *
- * Focus on selection: picking a result unmounts its row (the
- * caller adds it to `selectedItems`, and selected results are
- * filtered out of the rows), which would strand a keyboard
- * user's focus on the page body. Selection therefore returns
- * focus to the search input — the stable target, and where
- * the user continues, since the picker stays open to add
- * more — through the SearchField's forwarded input ref.
+ * Focus on selection and removal: picking a result unmounts
+ * its row (the caller adds it to `selectedItems`, and selected
+ * results are filtered out of the rows), and removing a
+ * selected item likewise unmounts its Remove button — either
+ * would strand a keyboard user's focus on the page body.
+ * Selection and removal therefore both return focus to the
+ * search input — the stable target, and where the user
+ * continues, since the picker stays open to add more —
+ * through the SearchField's forwarded input ref.
  */
 export function AutocompletePicker({
   searchText,
@@ -158,17 +160,28 @@ export function AutocompletePicker({
         ? noResultsMessage
         : `${visibleResults.length} ${visibleResults.length === 1 ? "result" : "results"} available`;
 
-  const handleSelectResult = (id: string) => {
-    onSelectResult(id);
-    // The selected row unmounts (it is filtered out as
-    // selected), so focus would fall to the page body; return
-    // it to the search input instead (see the focus note
-    // above). The input element carries `focus()` on web and
-    // the TextInput instance carries it on native; the
-    // optional call (the DropdownButton pattern) keeps this a
-    // no-op anywhere no focus method exists.
+  // Both the select and remove paths unmount the control the
+  // user just activated (the result row is filtered out as
+  // selected; the selected item's row leaves the list), so
+  // focus would fall to the page body; return it to the
+  // search input instead (see the focus note above). The
+  // input element carries `focus()` on web and the TextInput
+  // instance carries it on native; the optional call (the
+  // DropdownButton pattern) keeps this a no-op anywhere no
+  // focus method exists.
+  const returnFocusToSearch = () => {
     const node = searchFieldRef.current as unknown as { focus?: () => void } | null;
     node?.focus?.();
+  };
+
+  const handleSelectResult = (id: string) => {
+    onSelectResult(id);
+    returnFocusToSearch();
+  };
+
+  const handleRemoveSelectedItem = (id: string) => {
+    onRemoveSelectedItem(id);
+    returnFocusToSearch();
   };
 
   return (
@@ -232,7 +245,7 @@ export function AutocompletePicker({
                 accessibilityLabel={`Remove ${item.label}`}
                 disabled={disabled}
                 onPress={() => {
-                  onRemoveSelectedItem(item.id);
+                  handleRemoveSelectedItem(item.id);
                 }}
               >
                 Remove

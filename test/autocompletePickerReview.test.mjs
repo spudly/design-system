@@ -25,6 +25,16 @@
  *    the returned props, so the NoSelection story can accept a
  *    search and add its first item — no fixed override spread
  *    over live state.
+ * 5. Removing a selected item returns focus to the search
+ *    input too (Copilot, second head): the item's Remove
+ *    button unmounts with the item, stranding focus the same
+ *    way selection did, so the remove path shares the select
+ *    path's focus-return helper.
+ * 6. The SSR live-region assertions inspect the status
+ *    region's own content (CodeRabbit, second head): the
+ *    visible hint can carry the no-results text even if the
+ *    region is empty, and the searching state must be asserted
+ *    inside the region too — not just that the region exists.
  */
 import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
@@ -74,6 +84,25 @@ test("SearchField forwards a ref to its input, and the picker focuses it on sele
     picker,
     /onPress=\{\(\) => \{\s*handleSelectResult\(result\.id\);/,
     "result rows select through the focus-returning handler",
+  );
+});
+
+test("removing a selected item returns focus to the search input through the shared helper", () => {
+  assert.match(picker, /const returnFocusToSearch = \(\) => \{/, "one shared focus-return helper");
+  assert.match(picker, /onRemoveSelectedItem\(id\)/);
+  assert.match(
+    picker,
+    /const handleRemoveSelectedItem[\s\S]*?returnFocusToSearch\(\);/,
+    "the remove path returns focus after reporting the removal",
+  );
+  assert.match(
+    picker,
+    /onPress=\{\(\) => \{\s*handleRemoveSelectedItem\(item\.id\);/,
+    "Remove buttons act through the focus-returning handler",
+  );
+  assert.ok(
+    !picker.includes("onRemoveSelectedItem(item.id)"),
+    "no Remove button calls the raw callback directly, bypassing the focus return",
   );
 });
 
@@ -136,6 +165,20 @@ async function renderToHtml(element) {
   );
 }
 
+/**
+ * The status region's own markup: from its role="status" tag
+ * to its closing tag. Announcements must be asserted HERE —
+ * the visible spinner/hint can carry the same words elsewhere
+ * in the page even when the region itself is empty.
+ */
+function statusRegion(html) {
+  const at = html.indexOf('role="status"');
+  assert.ok(at !== -1, "the status region is mounted");
+  const end = html.indexOf("</div>", at);
+  assert.ok(end !== -1, "the status region closes");
+  return html.slice(at, end);
+}
+
 const noop = () => null;
 
 function pickerProps(overrides = {}) {
@@ -172,24 +215,28 @@ test("SSR: the live region announces the results count and the no-matches messag
       }),
     ),
   );
-  assert.ok(withResults.includes('role="status"'), "the region stays mounted with results");
-  assert.ok(withResults.includes("2 results available"), "the results count is announced");
+  assert.ok(
+    statusRegion(withResults).includes("2 results available"),
+    "the results count is announced inside the region",
+  );
   const fruitless = await renderToHtml(
     React.createElement(AutocompletePicker, pickerProps({ searchText: "sushi" })),
   );
-  assert.ok(fruitless.includes('role="status"'), "the region stays mounted with no matches");
   assert.ok(
-    (fruitless.match(/No results found\./g) ?? []).length > 0,
-    "the no-results message reaches the region",
+    statusRegion(fruitless).includes("No results found."),
+    "the no-results message is inside the region, not just in the visible hint",
   );
 });
 
-test("SSR: the live region stays mounted while searching", async () => {
+test("SSR: the live region announces Searching while a search is in flight", async () => {
   const { React, AutocompletePicker } = await loadRuntime();
   const html = await renderToHtml(
     React.createElement(AutocompletePicker, pickerProps({ searchText: "pep", isSearching: true })),
   );
-  assert.ok(html.includes('role="status"'), "the region stays mounted in the searching state");
+  assert.ok(
+    statusRegion(html).includes("Searching"),
+    "the searching state is announced inside the region, not just that the region exists",
+  );
 });
 
 test("SSR: a disabled SearchField's clear control reports aria-disabled; an enabled one does not", async () => {
