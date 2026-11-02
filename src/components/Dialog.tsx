@@ -22,6 +22,15 @@ const StyledContent = styled(TamaguiDialog.Content, {
   maxWidth: 400,
 });
 
+// Activation order of the currently open DS dialogs (web
+// containment, #391): portal frames mount in tree order, which
+// is not necessarily the order dialogs were opened in, so the
+// topmost-modal test cannot rely on document order alone among
+// DS dialogs themselves. Each open Dialog registers a token
+// here for as long as it is open; the last registered token is
+// the topmost DS dialog.
+const openDialogStack: symbol[] = [];
+
 export type DialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -80,6 +89,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const reassertRafRef = useRef<number | null>(null);
   const unmountRestoreRef = useRef(false);
   const blurredTargetRef = useRef<HTMLElement | null>(null);
+  const stackTokenRef = useRef(Symbol("dialog"));
 
   // Restore helper: focus the tracked element if it is still in the
   // document and focusable, and clear the target either way so a
@@ -366,6 +376,24 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     };
   }, []);
 
+  // Register in the open-dialog stack while open (see
+  // openDialogStack above). The cleanup removes exactly this
+  // registration, so a StrictMode replay (cleanup + setup) nets
+  // a single entry.
+  useEffect(() => {
+    if (!open || !isWeb) {
+      return;
+    }
+    const token = stackTokenRef.current;
+    openDialogStack.push(token);
+    return () => {
+      const index = openDialogStack.indexOf(token);
+      if (index >= 0) {
+        openDialogStack.splice(index, 1);
+      }
+    };
+  }, [open]);
+
   // Focus containment for a dialog with nothing tabbable (#391):
   // the primitive's focus scope traps Tab between the dialog's
   // tabbable descendants, and when there are none its own landing
@@ -374,10 +402,15 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // Shift+Tab lands directly on the opener). While the dialog is
   // open on web, a capture-phase keydown listener therefore takes
   // over Tab handling ONLY when the content holds no effectively
-  // tabbable element: the keypress is swallowed (default and the
-  // scope's own handling both stopped) so focus stays on the
-  // wrapper inside the dialog, and if focus somehow sits outside
-  // the dialog it is pulled back onto that wrapper. Dialogs with
+  // tabbable element: the keypress's default traversal is
+  // prevented so focus stays on the wrapper inside the dialog,
+  // and if focus somehow sits outside the dialog it is pulled
+  // back onto that wrapper. Propagation is deliberately NOT
+  // stopped: a control inside the dialog that handles Tab itself
+  // (an editor that indents, say) must still receive the key —
+  // preventing the default is what keeps focus from escaping,
+  // and with no tabbable candidates the scope has nowhere to
+  // move focus either. Dialogs with
   // tabbable content are untouched — the primitive already wraps
   // Cancel <-> Delete correctly there (manual QA on PR #386).
   // Refinements from review rounds on PR #392: (1) tabbability
@@ -393,9 +426,12 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // image-map area counts only when the image using its map is
   // rendered (the area itself has no layout box). (2) Only
   // the topmost modal intercepts — a covered dialog's listener
-  // must not swallow Tab for the dialog above it, where covered
-  // means a LATER, still-open modal frame (aria-modal or the
-  // native open attribute, and actually rendered): a closed
+  // must not swallow Tab for the dialog above it. Among DS
+  // dialogs, covered is decided by the open-dialog stack's
+  // activation order (frames mount in tree order, not open
+  // order); for foreign frames it means a LATER, still-modal
+  // frame (aria-modal or the :modal state — a merely open,
+  // modeless dialog covers nothing — and actually rendered): a closed
   // dialog element parked later in the document — or nested
   // inside this dialog — covers nothing.
   useEffect(() => {
@@ -410,6 +446,10 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (!content || typeof content.querySelectorAll !== "function") {
         return;
       }
+      const stackIndex = openDialogStack.indexOf(stackTokenRef.current);
+      if (stackIndex >= 0 && stackIndex < openDialogStack.length - 1) {
+        return;
+      }
       const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
       if (frame) {
         const covered = Array.from(document.querySelectorAll("dialog")).some((other) => {
@@ -420,7 +460,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
             return false;
           }
           const isOpenModal =
-            other.getAttribute("aria-modal") === "true" || other.hasAttribute("open");
+            other.getAttribute("aria-modal") === "true" || other.matches(":modal");
           return isOpenModal && other.getClientRects().length > 0;
         });
         if (covered) {
@@ -444,13 +484,41 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         if (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) < 0) {
           return false;
         }
+        const editableAttr = candidate.getAttribute("contenteditable");
+        if (editableAttr !== null && editableAttr !== "false") {
+          let host: Element | null = candidate.parentElement;
+          while (host && host !== content) {
+            const hostAttr = host.getAttribute("contenteditable");
+            if (hostAttr !== null) {
+              if (hostAttr === "false") {
+                return false;
+              }
+              break;
+            }
+            host = host.parentElement;
+          }
+        }
         if (candidate instanceof HTMLAreaElement) {
           const mapName = candidate.closest("map")?.getAttribute("name");
-          const image = mapName ? content.querySelector(`img[usemap="#${mapName}"]`) : null;
-          return Boolean(image && image.getClientRects().length > 0);
+          if (!mapName) {
+            return false;
+          }
+          return Array.from(content.querySelectorAll("img[usemap]")).some((image) => {
+            if (image.getAttribute("usemap") !== `#${mapName}`) {
+              return false;
+            }
+            if (image.closest("[inert]")) {
+              return false;
+            }
+            return image.getClientRects().length > 0;
+          });
         }
         const style = window.getComputedStyle(candidate);
-        if (style.display === "none" || style.visibility === "hidden") {
+        if (
+          style.display === "none" ||
+          style.visibility === "hidden" ||
+          style.visibility === "collapse"
+        ) {
           return false;
         }
         return candidate.getClientRects().length > 0;
@@ -459,7 +527,6 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         return;
       }
       event.preventDefault();
-      event.stopPropagation();
       const activeElement = document.activeElement as HTMLElement | null;
       const inside = Boolean(
         activeElement &&

@@ -56,13 +56,20 @@ test("Tab is swallowed only when the dialog content holds no effectively tabbabl
   assert.match(code, /candidate\.matches\(":disabled"\)/);
   assert.doesNotMatch(code, /fieldset\[disabled\]/);
   assert.match(code, /candidate instanceof HTMLAreaElement/);
-  assert.match(code, /img\[usemap=/);
+  assert.match(code, /content\.querySelectorAll\("img\[usemap\]"\)/);
+  assert.match(code, /image\.getAttribute\("usemap"\) !== `#\$\{mapName\}`/);
+  assert.match(code, /image\.closest\("\[inert\]"\)/);
   const areaIndex = code.indexOf("candidate instanceof HTMLAreaElement");
   const tabStopIndex = code.indexOf('candidate.getAttribute("tabindex")');
   assert.ok(
     tabStopIndex !== -1 && areaIndex !== -1 && tabStopIndex < areaIndex,
     "the negative-tabindex check must precede the image-map area exception",
   );
+  // visibility: collapse removes a control from Tab order just
+  // like hidden, and a nested editable inside a non-editable
+  // host is not a Tab stop (review on PR #392, head a459ad8).
+  assert.match(code, /style\.visibility === "collapse"/);
+  assert.match(code, /hostAttr === "false"/);
   assert.match(code, /\[contenteditable=""\], \[contenteditable="true"\]/);
   assert.doesNotMatch(code, /\[contenteditable\],/);
   assert.match(code, /candidate\.hasAttribute\("disabled"\)/);
@@ -72,7 +79,10 @@ test("Tab is swallowed only when the dialog content holds no effectively tabbabl
   assert.match(code, /style\.visibility === "hidden"/);
   assert.match(code, /candidate\.getClientRects\(\)\.length > 0/);
   assert.match(code, /if \(hasTabbable\) \{\s+return;\s+\}/);
-  assert.match(code, /event\.preventDefault\(\);\s+event\.stopPropagation\(\);/);
+  assert.match(code, /event\.preventDefault\(\);/);
+  // Propagation is not stopped: an in-dialog control that
+  // handles Tab itself must still receive the key.
+  assert.doesNotMatch(code, /stopPropagation/);
 });
 
 test("only the topmost modal intercepts Tab — a covered dialog stands down (#391)", () => {
@@ -89,7 +99,7 @@ test("only the topmost modal intercepts Tab — a covered dialog stands down (#3
   // head 5f84f47).
   assert.match(
     code,
-    /other\.getAttribute\("aria-modal"\) === "true" \|\| other\.hasAttribute\("open"\)/,
+    /other\.getAttribute\("aria-modal"\) === "true" \|\| other\.matches\(":modal"\)/,
   );
   assert.match(code, /frame\.contains\(other\)/);
   assert.match(code, /other\.getClientRects\(\)\.length > 0/);
