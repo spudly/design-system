@@ -86,9 +86,11 @@ jobs:
   # enforces it: this job fails while the PR body still contains
   # unchecked task-list items. An item struck through with ~~ counts
   # as waived, per the template's own convention, and items inside
-  # fenced code blocks or HTML comments don't count. Dependabot is
-  # exempt — its bodies quote upstream changelogs that can contain
-  # task lists the PR author didn't write.
+  # fenced code blocks or HTML comments don't count. Self-referential
+  # items — ones whose truth depends on this workflow's own result —
+  # are exempt (see the scan below). Dependabot is exempt — its bodies
+  # quote upstream changelogs that can contain task lists the PR
+  # author didn't write.
   merge-guard:
     name: merge-guard
     if: github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]'
@@ -129,12 +131,29 @@ jobs:
           }
           // Drop HTML comments: the template's guidance lives there.
           const text = kept.join('\n').replace(/<!--[\s\S]*?-->/g, '');
-          const unchecked = text
+          // Self-referential items are exempt: "CI is green for the
+          // exact head commit" asserts the result of the very workflow
+          // this job belongs to (ci-gate needs merge-guard), so the box
+          // can only be honestly checked once the gate has already
+          // passed, and the gate could never pass while the box was
+          // enforced — every intermediate head failed on it. Keep the
+          // pattern in sync with .github/pull_request_template.md;
+          // every other checklist item stays enforced.
+          const selfReferential = [/^ci is green for the exact head commit\b/i];
+          const itemText = (line) => line.replace(/^[-*+]\s+\[\s\]\s+/, '');
+          const candidates = text
             .split('\n')
             .map((line) => line.trim())
             .filter(
               (line) => /^\s*[-*+]\s+\[\s\]\s+\S/.test(line) && !line.includes('~~'),
             );
+          const exempt = candidates.filter((line) =>
+            selfReferential.some((pattern) => pattern.test(itemText(line))),
+          );
+          for (const line of exempt) {
+            console.log(`Exempt (self-referential): ${line}`);
+          }
+          const unchecked = candidates.filter((line) => !exempt.includes(line));
           if (unchecked.length > 0) {
             console.error('Unchecked task-list items in the PR body:');
             for (const line of unchecked) {
