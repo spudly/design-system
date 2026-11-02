@@ -113,6 +113,10 @@ test("unmount while open schedules a deferred restore that a StrictMode replay s
     code,
     /pendingRestoreTimerRef\.current = setTimeout\(\(\) => \{\s+pendingRestoreTimerRef\.current = null;\s+unmountRestoreRef\.current = true;\s+restoreFocus\(\);/,
   );
+  // The timer callback holds the ONLY assignment of the flag —
+  // a second one in cleanup would reintroduce the replay bug
+  // above (CodeRabbit review on PR #386, head 6d267f6).
+  assert.equal((code.match(/unmountRestoreRef\.current = true;/g) ?? []).length, 1);
 });
 
 test("the restore re-asserts on a deferred tick only while focus sits on the body (#385)", () => {
