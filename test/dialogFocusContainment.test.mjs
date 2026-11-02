@@ -44,11 +44,14 @@ test("Tab is swallowed only when the dialog content holds no effectively tabbabl
   // negative-tabindex-only controls, and unrendered elements are
   // not Tab stops; summary and contenteditable elements are.
   assert.match(code, /content\.querySelectorAll\(/);
-  assert.match(code, /summary, \[contenteditable\], \[tabindex\]/);
+  assert.match(code, /summary, iframe, audio\[controls\], video\[controls\]/);
+  assert.match(code, /\[contenteditable=""\], \[contenteditable="true"\]/);
+  assert.doesNotMatch(code, /\[contenteditable\],/);
   assert.match(code, /candidate\.hasAttribute\("disabled"\)/);
   assert.match(code, /candidate\.type === "hidden"/);
   assert.match(code, /candidate\.getAttribute\("tabindex"\)/);
   assert.match(code, /Number\.parseInt\(tabStopAttr, 10\) < 0/);
+  assert.match(code, /style\.visibility === "hidden"/);
   assert.match(code, /candidate\.getClientRects\(\)\.length > 0/);
   assert.match(code, /if \(hasTabbable\) \{\s+return;\s+\}/);
   assert.match(code, /event\.preventDefault\(\);\s+event\.stopPropagation\(\);/);
@@ -62,6 +65,16 @@ test("only the topmost modal intercepts Tab — a covered dialog stands down (#3
   // dialog frame is covered.
   assert.match(code, /document\.querySelectorAll\("dialog"\)/);
   assert.match(code, /frame\.compareDocumentPosition\(other\) & Node\.DOCUMENT_POSITION_FOLLOWING/);
+  // Only a still-open modal covers: a closed dialog element later
+  // in the document (or one nested inside this dialog) must not
+  // disable containment (Copilot + CodeRabbit review on PR #392,
+  // head 5f84f47).
+  assert.match(
+    code,
+    /other\.getAttribute\("aria-modal"\) === "true" \|\| other\.hasAttribute\("open"\)/,
+  );
+  assert.match(code, /frame\.contains\(other\)/);
+  assert.match(code, /other\.getClientRects\(\)\.length > 0/);
   assert.match(code, /if \(covered\) \{\s+return;\s+\}/);
 });
 

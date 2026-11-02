@@ -380,15 +380,19 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // the dialog it is pulled back onto that wrapper. Dialogs with
   // tabbable content are untouched — the primitive already wraps
   // Cancel <-> Delete correctly there (manual QA on PR #386).
-  // Two refinements from review on PR #392: (1) tabbability is
-  // effective, not selector-shaped — a hidden input, a disabled
-  // control, a negative-tabindex-only control, or an unrendered
-  // element is not a Tab stop, while native stops the first
-  // selector missed (summary, contenteditable) are; (2) only the
-  // topmost modal intercepts — a covered dialog's listener must
-  // not swallow Tab for the dialog above it, so a dialog whose
-  // portal frame is followed in document order by another dialog
-  // frame stands down entirely.
+  // Refinements from review rounds on PR #392: (1) tabbability
+  // is effective, not selector-shaped — a hidden input, a
+  // disabled or visibility-hidden control, a negative-tabindex-
+  // only control, or an unrendered element is not a Tab stop,
+  // while native stops a naive selector misses (summary, iframe,
+  // media controls, genuinely editable content) are; an element
+  // marked contenteditable="false" is not a stop either. (2) Only
+  // the topmost modal intercepts — a covered dialog's listener
+  // must not swallow Tab for the dialog above it, where covered
+  // means a LATER, still-open modal frame (aria-modal or the
+  // native open attribute, and actually rendered): a closed
+  // dialog element parked later in the document — or nested
+  // inside this dialog — covers nothing.
   useEffect(() => {
     if (!open || !isWeb || typeof document === "undefined") {
       return;
@@ -403,17 +407,23 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       }
       const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
       if (frame) {
-        const covered = Array.from(document.querySelectorAll("dialog")).some(
-          (other) =>
-            other !== frame &&
-            (frame.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING) !== 0,
-        );
+        const covered = Array.from(document.querySelectorAll("dialog")).some((other) => {
+          if (other === frame || frame.contains(other)) {
+            return false;
+          }
+          if ((frame.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING) === 0) {
+            return false;
+          }
+          const isOpenModal =
+            other.getAttribute("aria-modal") === "true" || other.hasAttribute("open");
+          return isOpenModal && other.getClientRects().length > 0;
+        });
         if (covered) {
           return;
         }
       }
       const candidates = content.querySelectorAll(
-        "a[href], button, input, select, textarea, summary, [contenteditable], [tabindex]",
+        'a[href], button, input, select, textarea, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
       );
       const hasTabbable = Array.from(candidates).some((candidate) => {
         if (candidate.hasAttribute("disabled")) {
@@ -424,6 +434,10 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         }
         const tabStopAttr = candidate.getAttribute("tabindex");
         if (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) < 0) {
+          return false;
+        }
+        const style = window.getComputedStyle(candidate);
+        if (style.display === "none" || style.visibility === "hidden") {
           return false;
         }
         return candidate.getClientRects().length > 0;
