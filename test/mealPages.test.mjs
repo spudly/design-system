@@ -13,10 +13,13 @@
  *    (stories hold state instead), no app imports, no
  *    react-native imports, no fetching.
  * 3. The form pages are controlled per-field (value +
- *    change callback), feed the DS CheckboxSelectList array
- *    selected-ids (never a Set), render per-selected
- *    quantity/servings steppers, and submit as a bare
- *    `onSubmit` intent.
+ *    change callback), pick entries through the DS
+ *    AutocompletePicker search contract (#383: search text
+ *    out, results/isSearching in, select/remove intents out,
+ *    selected view-models in separately from the results —
+ *    never a Set, never a full option list), render
+ *    per-selected quantity/servings steppers, and submit as
+ *    a bare `onSubmit` intent.
  * 4. ShoppingListPage's check-off is controlled per line
  *    (`isChecked` in, `onToggleLine` out), its rows carry
  *    real checkbox semantics (never the app's ☑/☐ text
@@ -90,17 +93,25 @@ test("MealFormPage is controlled per field and submits as a bare intent", () => 
   for (const prop of [
     "onTitleChange",
     "onNotesChange",
-    "onToggleRecipe",
+    "onSearchTextChange",
+    "onSelectRecipe",
+    "onRemoveRecipe",
     "onServingsChange",
     "onSubmit",
   ]) {
     assert.ok(mealForm.includes(prop), `MealFormPage must take ${prop}`);
   }
-  assert.ok(
-    mealForm.includes("CheckboxSelectList"),
-    "MealFormPage renders the DS CheckboxSelectList",
-  );
-  assert.ok(mealForm.includes("selectedRecipeIds"), "MealFormPage takes array selected ids");
+  assert.ok(mealForm.includes("AutocompletePicker"), "MealFormPage renders the AutocompletePicker");
+  assert.ok(mealForm.includes("searchResults"), "MealFormPage takes the host's search results");
+  assert.ok(mealForm.includes("selectedRecipes"), "selected view-models cross separately (#383)");
+  for (const retired of [
+    "CheckboxSelectList",
+    "recipeOptions",
+    "selectedRecipeIds",
+    "onToggleRecipe",
+  ]) {
+    assert.ok(!mealForm.includes(retired), `MealFormPage must not keep ${retired} (#383)`);
+  }
   assert.ok(
     !mealForm.includes("new Set"),
     "MealFormPage must not convert to a Set — the host does",
@@ -114,7 +125,9 @@ test("MealPlanFormPage is controlled per field and submits as a bare intent", ()
     "onNotesChange",
     "onStartsOnChange",
     "onEndsOnChange",
-    "onToggleEntry",
+    "onSearchTextChange",
+    "onSelectEntry",
+    "onRemoveEntry",
     "onQuantityChange",
     "onRecipeServingsChange",
     "onSubmit",
@@ -122,10 +135,14 @@ test("MealPlanFormPage is controlled per field and submits as a bare intent", ()
     assert.ok(planForm.includes(prop), `MealPlanFormPage must take ${prop}`);
   }
   assert.ok(
-    planForm.includes("CheckboxSelectList"),
-    "MealPlanFormPage renders the DS CheckboxSelectList",
+    planForm.includes("AutocompletePicker"),
+    "MealPlanFormPage renders the AutocompletePicker",
   );
-  assert.ok(planForm.includes("selectedKeys"), "MealPlanFormPage takes array selected keys");
+  assert.ok(planForm.includes("searchResults"), "MealPlanFormPage takes the host's search results");
+  assert.ok(planForm.includes("selectedEntries"), "selected view-models cross separately (#383)");
+  for (const retired of ["CheckboxSelectList", "entryOptions", "selectedKeys", "onToggleEntry"]) {
+    assert.ok(!planForm.includes(retired), `MealPlanFormPage must not keep ${retired} (#383)`);
+  }
   assert.ok(
     !planForm.includes("new Set"),
     "MealPlanFormPage must not convert to a Set — the host does",

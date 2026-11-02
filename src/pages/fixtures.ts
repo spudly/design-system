@@ -128,13 +128,20 @@ export const recipeFormFixture = {
 export const mealFormFixture = {
   title: "Sunday Chicken Dinner",
   notes: "The kids asked for the Tuscan chicken again.",
+  // The story's simulated library (#383): the story filters
+  // it by the search text to stand in for the host's
+  // server-side search, and resolves selections from it.
   recipeOptions: [
     { id: "tuscan-chicken", label: "Creamy Tuscan Garlic Chicken", servings: 4 },
     { id: "stuffed-peppers", label: "Classic Stuffed Peppers", servings: 6 },
     { id: "arroz-con-pollo", label: "Arroz con Pollo", servings: 8 },
     { id: "fudgy-brownies", label: "Fudgy Brownies", servings: 12 },
   ],
-  selectedRecipeIds: ["tuscan-chicken", "fudgy-brownies"],
+  searchText: "peppers",
+  selectedRecipes: [
+    { id: "tuscan-chicken", label: "Creamy Tuscan Garlic Chicken", servings: 4 },
+    { id: "fudgy-brownies", label: "Fudgy Brownies", servings: 12 },
+  ],
   servingsByRecipeId: { "tuscan-chicken": 6, "fudgy-brownies": 12 },
 };
 
@@ -161,7 +168,21 @@ export const mealPlanFormFixture = {
       servings: 6,
     },
   ],
-  selectedKeys: ["meal:sunday-dinner", "recipe:tuscan-chicken"],
+  // The story's search state (#383): "taco" matches the
+  // unselected Taco Night meal in entryOptions above, which
+  // the story filters by the search text to stand in for the
+  // host's server-side search.
+  searchText: "taco",
+  selectedEntries: [
+    { key: "meal:sunday-dinner", kind: "meal" as const, title: "Sunday Chicken Dinner" },
+    {
+      key: "recipe:tuscan-chicken",
+      kind: "recipe" as const,
+      title: "Creamy Tuscan Garlic Chicken",
+      recipeId: "tuscan-chicken",
+      servings: 4,
+    },
+  ],
   quantityByKey: { "meal:sunday-dinner": 1, "recipe:tuscan-chicken": 2 },
   servingsByRecipeId: { "tuscan-chicken": 6 },
 };

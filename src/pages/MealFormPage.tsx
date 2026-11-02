@@ -1,5 +1,5 @@
+import { AutocompletePicker } from "../components/AutocompletePicker.js";
 import { Button } from "../components/Button.js";
-import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
 import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { FormSubmit } from "../components/FormSubmit.js";
@@ -25,13 +25,23 @@ import { TextField } from "../components/TextField.js";
  *   button's disabled state is the one presentation rule the
  *   app view encodes (a title and at least one selected
  *   recipe), and `onSubmit` is a bare intent.
- * - The recipe options are app data (the screen's recipes
- *   query): they cross as { id, label, servings } view-models
- *   and render through the DS CheckboxSelectList. Selection
- *   crosses as a plain id array (the DS multi-select
- *   convention); the app view's Set conversion is the host's
- *   concern, exactly as the audit recorded for the list's B2
- *   move.
+ * - The recipe picker is a search autocomplete (#383, Stephen's
+ *   directive from eciperay#359): NOT a checkbox list of the
+ *   whole library. The host runs the server-side search — the
+ *   search text crosses out through `onSearchTextChange`, the
+ *   results and the in-flight flag cross back in as
+ *   `searchResults` / `isSearching`, and picking a result
+ *   reports through `onSelectRecipe`. The picker is the DS
+ *   AutocompletePicker, which also renders the selected
+ *   recipes as a removable list (removal reports through
+ *   `onRemoveRecipe`) and stays available to add more after
+ *   each selection.
+ * - Selected recipes cross as their own view-models
+ *   (`selectedRecipes`), SEPARATELY from the search results:
+ *   under a server-side search a selected recipe need not be
+ *   in the current results at all, so the servings steppers
+ *   below read the recipe's own servings from the selection,
+ *   never from a results lookup.
  * - Each selected recipe gets a servings stepper in selection
  *   order, falling back to the recipe's own servings when the
  *   host has no override — the fallback is presentation of the
@@ -43,12 +53,11 @@ import { TextField } from "../components/TextField.js";
  * column the app screens render today), with the heading
  * composed through FormHeading — the app composes the same
  * two through its adapters. The page applies no styling
- * itself (#119): the recipe list is a LabeledGroup (the label
- * over the select list, the group carrying the label as its
- * name) and the submit button sits in a FormSubmit (the
- * submit row's separation from the last field is the row's
- * own); the page composes DS components and passes data and
- * callbacks only.
+ * itself (#119): the picker is a LabeledGroup (the label over
+ * the picker, the group carrying the label as its name) and
+ * the submit button sits in a FormSubmit (the submit row's
+ * separation from the last field is the row's own); the page
+ * composes DS components and passes data and callbacks only.
  */
 
 export type MealFormPageRecipeOption = {
@@ -64,14 +73,26 @@ export type MealFormPageProps = {
   onTitleChange: (value: string) => void;
   notes: string;
   onNotesChange: (value: string) => void;
-  /** The selectable recipes, in the host's order. */
-  recipeOptions: MealFormPageRecipeOption[];
-  /** Selected recipe ids, in selection order — the steppers
-   * render in this order. */
-  selectedRecipeIds: string[];
+  /** The recipe search text, held by the host, which runs
+   * the server-side search it drives. */
+  searchText: string;
+  onSearchTextChange: (value: string) => void;
+  /** Results of the host's search for `searchText`, in the
+   * host's order. A selected recipe need not appear here. */
+  searchResults: MealFormPageRecipeOption[];
+  /** The host's search is in flight: the picker shows its
+   * searching state instead of the (stale) results. */
+  isSearching?: boolean;
+  /** The selected recipes' view-models, in selection order —
+   * the removable list and the steppers render in this
+   * order. */
+  selectedRecipes: MealFormPageRecipeOption[];
   /** Servings overrides by recipe id. */
   servingsByRecipeId: Record<string, number>;
-  onToggleRecipe: (recipeId: string) => void;
+  /** Add the search result with this id to the selection. */
+  onSelectRecipe: (recipeId: string) => void;
+  /** Remove the selected recipe with this id. */
+  onRemoveRecipe: (recipeId: string) => void;
   onServingsChange: (recipeId: string, servings: number) => void;
   /** Save in flight: the submit button disables. */
   isSaving?: boolean;
@@ -85,17 +106,19 @@ export function MealFormPage({
   onTitleChange,
   notes,
   onNotesChange,
-  recipeOptions,
-  selectedRecipeIds,
+  searchText,
+  onSearchTextChange,
+  searchResults,
+  isSearching = false,
+  selectedRecipes,
   servingsByRecipeId,
-  onToggleRecipe,
+  onSelectRecipe,
+  onRemoveRecipe,
   onServingsChange,
   isSaving = false,
   error,
   onSubmit,
 }: MealFormPageProps) {
-  const optionById = new Map(recipeOptions.map((option) => [option.id, option]));
-
   return (
     <FormScreenLayout>
       <FormHeading>{title.trim() ? title : "Meal"}</FormHeading>
@@ -112,35 +135,43 @@ export function MealFormPage({
         numberOfLines={4}
       />
       <LabeledGroup label="Recipes">
-        <CheckboxSelectList
-          items={recipeOptions.map((recipe) => ({ id: recipe.id, label: recipe.label }))}
-          selectedIds={selectedRecipeIds}
-          onToggle={onToggleRecipe}
+        <AutocompletePicker
+          searchText={searchText}
+          onSearchTextChange={onSearchTextChange}
+          searchResults={searchResults.map((recipe) => ({
+            id: recipe.id,
+            label: recipe.label,
+            detail: `${recipe.servings} servings`,
+          }))}
+          isSearching={isSearching}
+          onSelectResult={onSelectRecipe}
+          selectedItems={selectedRecipes.map((recipe) => ({
+            id: recipe.id,
+            label: recipe.label,
+          }))}
+          onRemoveSelectedItem={onRemoveRecipe}
+          placeholder="Search recipes…"
+          searchAccessibilityLabel="Search recipes"
+          noResultsMessage="No recipes found."
         />
       </LabeledGroup>
-      {selectedRecipeIds.map((recipeId) => {
-        const recipe = optionById.get(recipeId);
-        if (!recipe) {
-          return null;
-        }
-        return (
-          <NumberStepper
-            key={recipeId}
-            label={`Servings · ${recipe.label}`}
-            value={servingsByRecipeId[recipeId] ?? recipe.servings}
-            min={1}
-            onChange={(value) => {
-              onServingsChange(recipeId, value);
-            }}
-          />
-        );
-      })}
+      {selectedRecipes.map((recipe) => (
+        <NumberStepper
+          key={recipe.id}
+          label={`Servings · ${recipe.label}`}
+          value={servingsByRecipeId[recipe.id] ?? recipe.servings}
+          min={1}
+          onChange={(value) => {
+            onServingsChange(recipe.id, value);
+          }}
+        />
+      ))}
       {error ? <Text variant="error">{error}</Text> : null}
       <FormSubmit>
         <Button
           variant="primary"
           accessibilityLabel="Save meal"
-          disabled={!title.trim() || selectedRecipeIds.length === 0 || isSaving}
+          disabled={!title.trim() || selectedRecipes.length === 0 || isSaving}
           onPress={onSubmit}
         >
           Save meal

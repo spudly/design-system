@@ -2,7 +2,11 @@ import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { mealFormFixture } from "./fixtures.js";
-import { MealFormPage, type MealFormPageProps } from "./MealFormPage.js";
+import {
+  MealFormPage,
+  type MealFormPageProps,
+  type MealFormPageRecipeOption,
+} from "./MealFormPage.js";
 
 /**
  * Stories for the real MealFormPage (#125): the meal form's
@@ -11,6 +15,12 @@ import { MealFormPage, type MealFormPageProps } from "./MealFormPage.js";
  * it. Theme pinned to Warm Harvest; the frame matches the
  * other page stories (430×844) so Chromatic / Android VR
  * captures stay deterministic.
+ *
+ * The recipe picker is a search autocomplete (#383): the
+ * story stands in for the host's server-side search by
+ * filtering the fixture's recipe library by the search text
+ * (the Default story opens mid-search, with the stuffed
+ * peppers result ready to add over the two selected recipes).
  */
 const meta: Meta<typeof MealFormPage> = {
   title: "Pages/Eciperay/MealFormPage",
@@ -33,24 +43,37 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
   const fixture = mealFormFixture;
   const [title, setTitle] = useState(fixture.title);
   const [notes, setNotes] = useState(fixture.notes);
-  const [selectedRecipeIds, setSelectedRecipeIds] = useState<string[]>(fixture.selectedRecipeIds);
+  const [searchText, setSearchText] = useState(fixture.searchText);
+  const [selectedRecipes, setSelectedRecipes] = useState<MealFormPageRecipeOption[]>(
+    fixture.selectedRecipes,
+  );
   const [servingsByRecipeId, setServingsByRecipeId] = useState<Record<string, number>>(
     fixture.servingsByRecipeId,
   );
+  const query = searchText.trim().toLowerCase();
+  const searchResults = query
+    ? fixture.recipeOptions.filter((recipe) => recipe.label.toLowerCase().includes(query))
+    : [];
   return {
     title,
     onTitleChange: setTitle,
     notes,
     onNotesChange: setNotes,
-    recipeOptions: fixture.recipeOptions,
-    selectedRecipeIds,
+    searchText,
+    onSearchTextChange: setSearchText,
+    searchResults,
+    selectedRecipes,
     servingsByRecipeId,
-    onToggleRecipe: (recipeId) => {
-      setSelectedRecipeIds((current) =>
-        current.includes(recipeId)
-          ? current.filter((id) => id !== recipeId)
-          : [...current, recipeId],
-      );
+    onSelectRecipe: (recipeId) => {
+      const recipe = fixture.recipeOptions.find((option) => option.id === recipeId);
+      if (recipe) {
+        setSelectedRecipes((current) =>
+          current.some((option) => option.id === recipeId) ? current : [...current, recipe],
+        );
+      }
+    },
+    onRemoveRecipe: (recipeId) => {
+      setSelectedRecipes((current) => current.filter((option) => option.id !== recipeId));
     },
     onServingsChange: (recipeId, servings) => {
       setServingsByRecipeId((current) => ({ ...current, [recipeId]: servings }));
@@ -76,7 +99,7 @@ export const Default: Story = {
 export const NoSelection: Story = {
   render: () => (
     <Viewport>
-      <Form selectedRecipeIds={[]} servingsByRecipeId={{}} />
+      <Form selectedRecipes={[]} servingsByRecipeId={{}} searchText="" searchResults={[]} />
     </Viewport>
   ),
 };
