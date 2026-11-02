@@ -1,5 +1,11 @@
 # @spudly/ui
 
+## 2.0.0
+
+### Major Changes
+
+- 5400766: MealFormPage and MealPlanFormPage replace their checkbox-list pickers with a search autocomplete (#383), and the new AutocompletePicker component ships in @spudly/ui. Breaking: MealFormPage no longer takes `recipeOptions`, `selectedRecipeIds`, or `onToggleRecipe`, and MealPlanFormPage no longer takes `entryOptions`, `selectedKeys`, or `onToggleEntry`. Both pages now take `searchText` + `onSearchTextChange` (the host runs the server-side search), `searchResults` + `isSearching`, a select callback (`onSelectRecipe` / `onSelectEntry`) and a remove callback (`onRemoveRecipe` / `onRemoveEntry`), and the selected items as their own view-models (`selectedRecipes` / `selectedEntries`) passed separately from the search results. On a @spudly/ui bump, re-check in Storybook: in Pages/Eciperay/MealFormPage's Default story, typing in the "Search recipes" field shows matching recipes as results (with their servings), selecting a result adds it to the selected list under the search field, each selected recipe shows a Remove action and keeps its servings stepper (steppers work even for a recipe that is not in the current results), the picker stays available to add another recipe after each selection, and a search with no matches shows "No recipes found." MealPlanFormPage's Default story behaves the same way for meals and recipes together: results and selected entries carry their "Meal · " / "Recipe · " kind prefix, a selected meal keeps its quantity stepper, and a selected recipe keeps both quantity and servings steppers. Components/AutocompletePicker's stories show the same picker states directly: WithResults, Searching (a spinner instead of results), NoResults, and NoSelection.
+
 ## 1.16.5
 
 ### Patch Changes
