@@ -366,6 +366,62 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     };
   }, []);
 
+  // Focus containment for a dialog with nothing focusable (#391):
+  // the primitive's focus scope traps Tab between the dialog's
+  // focusable descendants, and when there are none its own landing
+  // wrapper is the only stop — sequential navigation then escapes
+  // to the page behind the overlay on the next Tab (and a first
+  // Shift+Tab lands directly on the opener). While the dialog is
+  // open on web, a capture-phase keydown listener therefore takes
+  // over Tab handling ONLY when the content holds no focusable
+  // element: the keypress is swallowed (default and the scope's
+  // own handling both stopped) so focus stays on the wrapper
+  // inside the dialog, and if focus somehow sits outside the
+  // dialog it is pulled back onto that wrapper. Dialogs with
+  // focusable content are untouched — the primitive already wraps
+  // Cancel <-> Delete correctly there (manual QA on PR #386).
+  useEffect(() => {
+    if (!open || !isWeb || typeof document === "undefined") {
+      return;
+    }
+    const handleTabContainment = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") {
+        return;
+      }
+      const content = contentRef.current as unknown as HTMLElement | null;
+      if (!content || typeof content.querySelectorAll !== "function") {
+        return;
+      }
+      const focusable = content.querySelectorAll(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+      if (focusable.length > 0) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      const activeElement = document.activeElement as HTMLElement | null;
+      const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
+      const inside = Boolean(
+        activeElement &&
+        (content.contains(activeElement) || (frame && frame.contains(activeElement))),
+      );
+      if (!inside) {
+        const wrapper = frame
+          ? (frame.querySelector('[tabindex="-1"]') as HTMLElement | null)
+          : null;
+        const landing = wrapper ?? content;
+        if (typeof landing.focus === "function") {
+          landing.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", handleTabContainment, true);
+    return () => {
+      document.removeEventListener("keydown", handleTabContainment, true);
+    };
+  }, [open]);
+
   // Restore on close: when `open` flips true -> false, return focus
   // to the tracked element. This effect is this component's own, so
   // it runs after the primitive's close-time focus handling in the
