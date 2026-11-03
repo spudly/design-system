@@ -72,6 +72,9 @@ test("page-level error lines of the same shape render through Alert", () => {
       `${name} no longer renders its error as plain error Text`,
     );
   }
+});
+
+test("AiSessionPage and RecipeFormPage pin their extra error regions", () => {
   // AiSessionPage renders its error in BOTH branches (no-session and
   // active-session); pin each region so deleting one line can't pass.
   const aiSession = read("src/pages/AiSessionPage.tsx");
