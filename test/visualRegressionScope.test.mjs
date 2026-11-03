@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import process from "node:process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -217,10 +218,12 @@ test("isFallbackPath classifies the guardrail list", () => {
 // that the committed table matches what the generator derives from
 // the capture set and the baseline files on disk.
 
-// Both directions of the completeness gate: every committed
-// baseline must be derivable, and every derivable in-scope story
-// must have a committed baseline.
-function assertBaselinesMatchScope(scope, baselineFiles) {
+// The baseline-to-story direction of the completeness gate:
+// every committed baseline must be derivable from the capture
+// set. This runs unconditionally — it does not depend on the
+// baselines being complete, so an orphaned baseline (a renamed
+// or removed story's PNG) is caught on the PR that causes it.
+function assertBaselinesDerivable(scope, baselineFiles) {
   const standard = new Set(scope.standard);
   const narrow = new Set(scope.narrow);
   for (const files of baselineFiles.values()) {
@@ -232,6 +235,14 @@ function assertBaselinesMatchScope(scope, baselineFiles) {
       }
     }
   }
+}
+
+// The story-to-baseline direction: every derivable in-scope
+// story must HAVE a committed baseline. Enforced on the release
+// PR only (see enforceBaselineGate below): baselines are
+// generated there, so an ordinary PR may legitimately add a
+// story whose baseline does not exist yet.
+function assertScopeCoveredByBaselines(scope, baselineFiles) {
   for (const id of scope.standard) {
     assert.ok(
       baselineFiles.get(themeOfStory(id)).has(`${id}.png`),
@@ -246,12 +257,33 @@ function assertBaselinesMatchScope(scope, baselineFiles) {
   }
 }
 
+// Release-only VR (Stephen's directive, 2026-11-02): native VR
+// runs only on the changesets release PR, which is also where
+// baselines are generated. The real-repo test below therefore
+// splits its enforcement: the parts that do not depend on the
+// baselines being complete — the pinned story counts, the
+// baseline-to-story direction, and the generated coverage
+// listing — run on EVERY PR, so a PR that adds, renames, or
+// removes a story must update the counts, drop obsolete
+// baselines, and refresh the listing itself (baseline
+// automation does none of those, and its listing refresh only
+// runs when baselines change, so a stale listing would
+// otherwise surface for the first time on the release PR).
+// Only the missing-baseline direction is gated on the release
+// PR (ci.yml sets DSVR_ENFORCE_BASELINE_GATE=true for release
+// PRs): an ordinary PR may add a story without committed
+// baselines, and the release PR's VR run generates them before
+// the release ships.
+const enforceBaselineGate = process.env.DSVR_ENFORCE_BASELINE_GATE === "true";
+
 test("real repo: derived capture set matches the committed baselines", () => {
   // Completeness gate (issue #128): the mapper's story inventory
   // and the committed baselines must agree in BOTH directions —
-  // every baseline derivable, and every derivable in-scope story
-  // HAS a committed baseline — and the coverage listing in
-  // docs/android-visual-regression.md must match both. The
+  // every baseline derivable and the coverage listing in
+  // docs/android-visual-regression.md matching both (checked
+  // everywhere), and every derivable in-scope story HAS a
+  // committed baseline (that direction checked on the release
+  // PR only — see the gate comment above). The
   // Current light set: 135 standard-width stories (111 light_warmHarvest + 22
   // light_quietDawn on disk minus the 3 Reading-screen stories the capture app
   // excludes, ReadingView replicating Memorize's reading screen and landing in
@@ -299,8 +331,11 @@ test("real repo: derived capture set matches the committed baselines", () => {
   assert.equal(scope.narrow.length, 12);
   const baselineRoot = join(repoRoot, "tools/visualRegression/baselines");
   const baselineFiles = readBaselineFiles(baselineRoot);
-  assertBaselinesMatchScope(scope, baselineFiles);
+  assertBaselinesDerivable(scope, baselineFiles);
   assert.ok(existsSync(baselineRoot));
+  if (enforceBaselineGate) {
+    assertScopeCoveredByBaselines(scope, baselineFiles);
+  }
   const docs = readFileSync(join(repoRoot, "docs/android-visual-regression.md"), "utf8");
   assert.equal(
     docs,

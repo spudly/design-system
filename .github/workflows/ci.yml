@@ -81,6 +81,14 @@ jobs:
       - run: npm run lint
       - run: npm run build
       - run: node --test test/*.test.mjs
+        env:
+          # Release-only VR (Stephen's directive, 2026-11-02): the
+          # VR baseline-completeness gate in
+          # test/visualRegressionScope.test.mjs is enforced only
+          # where baselines are generated — the changesets release
+          # PR. Ordinary PRs may add stories without committed
+          # baselines; the release PR's VR run generates them.
+          DSVR_ENFORCE_BASELINE_GATE: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'changeset-release/') }}
 
   # The PR template's pre-merge checklist is only useful if something
   # enforces it: this job fails while the PR body still contains

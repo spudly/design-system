@@ -10,11 +10,42 @@
 # docs/android-visual-regression.md for the full workflow, including
 # how baselines are generated and updated.
 #
-# Scoping: the job is path-filtered to the surfaces that can
-# change a story screenshot (library source, the host app, the VR
-# tooling, this workflow) instead of running on every PR. Within a
-# run, PR compare runs capture only the stories the PR's changes
-# can affect (issue #114: the "Compute VR capture scope" step and
+# Release-only PR gating (Stephen's directive, 2026-11-02): the
+# expensive jobs (visual-regression and the baseline-commit jobs)
+# run on pull requests ONLY when the head branch is a changesets
+# release branch (changeset-release/*, i.e. the Version Packages
+# PR). Ordinary PRs no longer run those jobs — native rendering
+# changes surface, and baselines update, on the release PR
+# instead. One exception: the sanity job (below) is NOT part of
+# this gating — it still runs on any PR carrying the
+# `android-sanity` label, as an explicit opt-in, and on
+# workflow_dispatch runs with mode=sanity. Adding that label
+# starts a run of its own (the trigger includes the `labeled`
+# activity type — Stephen's directive, 2026-11-03): on a
+# label-triggered run ONLY the sanity job runs (the heavy jobs
+# stay gated off, even on a release PR), and a `labeled` event
+# for any other label starts a run in which every job skips, so
+# label churn costs nothing. The pull_request
+# trigger therefore carries no paths filter: a release PR's
+# diff is manifests and changelogs only,
+# which the old path filter (src/**, apps/storybook/**,
+# tools/visualRegression/**) would have excluded, so gating lives
+# in the jobs' `if:` conditions. The push-to-main trigger is gone
+# too: it existed to run a full compare on main, which warmed the
+# Gradle cache from the default branch — with the heavy jobs
+# release-only, that run no longer happens and release-PR runs
+# save their own cache. workflow_dispatch stays available as the
+# manual path (compare/update/sanity on demand). One interaction
+# to expect on the release PR: while a release is pending, the
+# changesets action recreates the release branch whenever main
+# advances, force-updating it and dropping any VR baseline commits
+# the commit-pr-baselines job pushed there. The synchronize event
+# re-runs this workflow, which regenerates and re-commits the
+# baselines — so the baseline commit is recreated after merges to
+# main, and the diff to review is the one on the final head.
+# Within a run, PR compare runs
+# capture only the stories the PR's changes can affect (issue #114:
+# the "Compute VR capture scope" step and
 # tools/visualRegression/scope.mjs; anything shared or unmappable
 # falls back to the full set), and the emulator boots from a
 # cached AVD (issue #114) instead of paying AVD creation +
@@ -26,9 +57,10 @@
 # them through the luminance guard (tools/visualRegression/
 # guard.mjs, issue #101), proves them with an in-job re-capture and
 # re-compare, and the commit-pr-baselines job below pushes them
-# onto the PR branch — no manual update dispatch. Pushes to main
-# and workflow_dispatch runs never take this path (update mode has
-# its own commit job, commit-baselines). See
+# onto the PR branch — no manual update dispatch. Since the
+# 2026-11-02 gating above, this auto-commit cycle runs on release
+# PRs only. workflow_dispatch runs never take this path (update
+# mode has its own commit job, commit-baselines). See
 # docs/android-visual-regression.md.
 #
 # Bot-head pass-through (Stephen's directive, 2026-10-24): the
@@ -51,23 +83,17 @@
 name: React Native storybook VR
 
 on:
+  # No paths filter and no push trigger (Stephen's directive,
+  # 2026-11-02 — see the header comment): the heavy jobs gate
+  # themselves on the PR head branch, and release PR diffs
+  # (manifests/changelogs only) would never match the old filter.
+  # The types list restates the defaults plus `labeled` so that
+  # adding the `android-sanity` label starts a run (2026-11-03);
+  # the jobs' `if:` conditions confine label-triggered runs to
+  # the sanity job, and only when the added label IS
+  # `android-sanity`.
   pull_request:
-    paths:
-      - "src/**"
-      - "apps/storybook/**"
-      - "tools/visualRegression/**"
-      - ".github/workflows/android-storybook.yml"
-  # Pushes to main run a full compare (no commit jobs fire) so the
-  # Gradle cache is saved from the default branch, which every PR
-  # can read: GitHub scopes PR caches to the PR itself plus the
-  # default branch, so this is what gives a new PR a warm start.
-  push:
-    branches: [main]
-    paths:
-      - "src/**"
-      - "apps/storybook/**"
-      - "tools/visualRegression/**"
-      - ".github/workflows/android-storybook.yml"
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
     inputs:
       mode:
@@ -90,17 +116,28 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-storybook-vr-${{ github.ref }}
+  group: android-storybook-vr-${{ github.ref }}${{ github.event.action == 'labeled' && format('-labeled-{0}', github.event.label.name) || '' }}
   cancel-in-progress: true
   # Concurrency acts on whole runs, never individual jobs, so a run
   # cannot cancel its own commit job mid-push. The bot's baseline
   # push starts a follow-up run that GitHub parks as
   # "action_required" (see commit-pr-baselines), so it cannot
   # cancel a successor either.
+  # Label-triggered runs get their own per-label group (the suffix
+  # above): adding a label must not cancel an in-progress heavy
+  # run on the same PR, and an unrelated label event must not
+  # cancel a sanity run the `android-sanity` label started.
 
 jobs:
   visual-regression:
-    if: github.event_name == 'pull_request' || inputs.mode != 'sanity'
+    # Release-only PR gating (Stephen's directive, 2026-11-02):
+    # PR runs only for changesets release branches; dispatched
+    # compare/update runs remain the manual path. Label-triggered
+    # runs never start this job (2026-11-03): a labeled event runs
+    # the sanity job only, even on a release PR.
+    if: >-
+      (github.event_name == 'pull_request' && github.event.action != 'labeled' && startsWith(github.head_ref, 'changeset-release/')) ||
+      (github.event_name == 'workflow_dispatch' && inputs.mode != 'sanity')
     # Set by the "Note PR auto-commit readiness" step when a PR
     # compare run regenerated baselines and proved them green
     # in-job; gates the commit-pr-baselines job.
@@ -128,7 +165,11 @@ jobs:
       # docs/android-visual-regression.md). A maintainer merge or
       # any later commit changes the head and the full run resumes.
       # Update dispatches are excluded on purpose: an explicit
-      # regeneration request always runs in full.
+      # regeneration request always runs in full. Manual update
+      # commits also never qualify: commit-baselines gives them a
+      # distinct subject (see that job), because update mode runs
+      # neither the luminance guard nor the in-job re-compare — a
+      # later compare on such a head must capture for real.
       - name: Detect VR bot baseline head
         id: vrbot
         if: github.event_name == 'pull_request' || inputs.mode == 'compare'
@@ -406,6 +447,12 @@ jobs:
       - name: Refresh the VR coverage listing
         run: node tools/visualRegression/coverageListing.mjs
 
+      # The subject deliberately differs from the PR auto-commit
+      # subject: update mode runs neither the luminance guard nor
+      # the in-job re-compare, so its commits must never match the
+      # visual-regression job's bot-head pass-through (which treats
+      # an exact-subject head as already verified). A later compare
+      # on a branch headed by this commit captures for real.
       - name: Commit and push if baselines changed
         run: |
           if [ -z "$(git status --porcelain -- tools/visualRegression/baselines docs/android-visual-regression.md)" ]; then
@@ -415,7 +462,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add tools/visualRegression/baselines docs/android-visual-regression.md
-          git commit -m "chore(vr): update Android Storybook baselines"
+          git commit -m "chore(vr): update Android Storybook baselines (manual update)"
           git push origin "HEAD:${{ github.ref_name }}"
 
   # PR runs only: push the baselines the visual-regression job
@@ -441,6 +488,8 @@ jobs:
     needs: visual-regression
     if: >-
       github.event_name == 'pull_request' &&
+      github.event.action != 'labeled' &&
+      startsWith(github.head_ref, 'changeset-release/') &&
       needs.visual-regression.outputs.pr_autocommit_ready == 'true' &&
       github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
@@ -499,9 +548,19 @@ jobs:
   # clip-box hardening — on web the same change renders identically,
   # which is the asymmetry that let #162 ship. Runs on demand: add
   # the `android-sanity` label to a PR, or dispatch with mode=sanity.
+  # Adding the label starts a run (the trigger includes the
+  # `labeled` activity type — Stephen's directive, 2026-11-03): on
+  # a label-triggered run this is the ONLY job that runs, and only
+  # when the added label is `android-sanity` itself; a `labeled`
+  # event for any other label starts a run in which every job
+  # skips. On ordinary PR events the label's presence at run start
+  # is what counts, as before.
   # Succeeds only if the mutated capture differs from the clean one.
   sanity:
-    if: (github.event_name == 'workflow_dispatch' && inputs.mode == 'sanity') || contains(github.event.pull_request.labels.*.name, 'android-sanity')
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.mode == 'sanity') ||
+      (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'android-sanity') ||
+      (github.event_name == 'pull_request' && github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'android-sanity'))
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:
