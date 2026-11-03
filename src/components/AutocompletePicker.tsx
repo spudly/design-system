@@ -68,6 +68,17 @@ export type AutocompletePickerProps = {
   /** Shown when a non-empty search returns no results.
    * Defaults to "No results found." */
   noResultsMessage?: string;
+  /**
+   * The caller's search failed (e.g. "Could not load
+   * recipes: …"). While set, the empty state renders this
+   * error — and the live region announces it — INSTEAD of
+   * `noResultsMessage`: a failed search must never read as
+   * "no matches" (#393). Pass search failures here rather
+   * than only in a surrounding form's error slot, so the
+   * picker itself never contradicts the error. Cleared by
+   * the caller when a search succeeds again.
+   */
+  searchError?: string | null | undefined;
   /** Disables the search field, the results, and removal. */
   disabled?: boolean;
 };
@@ -91,6 +102,11 @@ export type AutocompletePickerProps = {
  *   search is the pre-search state and shows no result area
  *   at all, and a non-empty search with no (unselected)
  *   results shows `noResultsMessage` instead of blank space.
+ * - A failed search is its own state (#393): while the
+ *   caller passes `searchError`, the empty state renders the
+ *   error and the live region announces it instead of the
+ *   no-results message — "search failed" and "search matched
+ *   nothing" never share a message.
  * - Selection is multi: picking a result reports its id
  *   through `onSelectResult` and the picker stays available
  *   to add more; the caller appends the item to
@@ -144,6 +160,7 @@ export function AutocompletePicker({
   placeholder = "Search…",
   searchAccessibilityLabel = "Search",
   noResultsMessage = "No results found.",
+  searchError,
   disabled = false,
 }: AutocompletePickerProps) {
   const selectedIds = new Set(selectedItems.map((item) => item.id));
@@ -153,14 +170,16 @@ export function AutocompletePicker({
 
   // The live region's text for the current search state (see
   // the announcement note above): nothing before a search,
-  // then exactly one of searching / no matches / the count of
-  // results on offer.
+  // then exactly one of searching / the search error / no
+  // matches / the count of results on offer. A failed search
+  // (searchError set, no results) announces the error, never
+  // the no-results message (#393).
   const statusMessage = !hasSearchText
     ? null
     : isSearching
       ? "Searching"
       : visibleResults.length === 0
-        ? noResultsMessage
+        ? (searchError ?? noResultsMessage)
         : `${visibleResults.length} ${visibleResults.length === 1 ? "result" : "results"} available`;
 
   // Both the select and remove paths unmount the control the
@@ -214,7 +233,11 @@ export function AutocompletePicker({
             <Spinner label="Searching" />
           </YStack>
         ) : visibleResults.length === 0 ? (
-          <Text variant="hint">{noResultsMessage}</Text>
+          searchError ? (
+            <Text variant="error">{searchError}</Text>
+          ) : (
+            <Text variant="hint">{noResultsMessage}</Text>
+          )
         ) : (
           <YStack>
             {visibleResults.map((result) => (

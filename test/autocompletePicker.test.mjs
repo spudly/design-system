@@ -77,6 +77,29 @@ test("results render only for a non-empty search, and selected results are not o
   assert.match(picker, /noResultsMessage/, "an empty result set shows the no-results message");
 });
 
+test("a failed search is its own state: searchError replaces the no-results message (#393)", () => {
+  assert.match(picker, /searchError\?: string \| null/);
+  assert.match(
+    picker,
+    /searchError \?\? noResultsMessage/,
+    "the live region announces the error instead of the no-results message",
+  );
+  assert.match(
+    picker,
+    /<Text variant="error">\{searchError\}<\/Text>/,
+    "the visible empty state renders the error, not the no-results hint",
+  );
+  for (const page of ["src/pages/MealFormPage.tsx", "src/pages/MealPlanFormPage.tsx"]) {
+    const source = codeOf(page);
+    assert.match(source, /searchError\?: string \| null/, `${page} accepts searchError`);
+    assert.match(
+      source,
+      /searchError=\{searchError\}/,
+      `${page} threads searchError to the picker`,
+    );
+  }
+});
+
 test("selecting a result and removing a selected item report their ids", () => {
   assert.match(picker, /onSelectResult: \(id: string\) => void/);
   // Selection routes through handleSelectResult (#384: it also
@@ -109,7 +132,7 @@ test("DS hard rules: type aliases only, no styling props, no react-native import
 test("stories cover the picker's captured states", () => {
   const story = readFileSync(join(root, "src/components/AutocompletePicker.stories.tsx"), "utf8");
   assert.ok(story.includes('title: "Components/AutocompletePicker"'));
-  for (const name of ["WithResults", "NoSelection", "Searching", "NoResults"]) {
+  for (const name of ["WithResults", "NoSelection", "Searching", "NoResults", "SearchError"]) {
     assert.ok(story.includes(`export const ${name}`), `missing the ${name} story`);
   }
 });
@@ -208,6 +231,58 @@ test("SSR: a fruitless search shows the no-results message; an empty search show
   assert.ok(!preSearch.includes("Hidden Result"), "results need a search text to render");
   assert.ok(!preSearch.includes("No results found."), "the pre-search state shows no message");
 });
+
+test("SSR: a failed search shows the error and never the no-results message (#393)", async () => {
+  const { React, AutocompletePicker } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(
+      AutocompletePicker,
+      pickerProps({
+        searchText: "chicken",
+        searchError: "Could not load recipes: network error.",
+        noResultsMessage: "No recipes found.",
+      }),
+    ),
+  );
+  assert.ok(
+    html.includes("Could not load recipes: network error."),
+    `expected the search error in: ${html}`,
+  );
+  assert.ok(
+    !html.includes("No recipes found."),
+    "a failed search must not read as no matches — visibly or in the live region",
+  );
+});
+
+test("SSR: both meal form pages thread searchError to the picker (#393)", async () => {
+  const { React, MealFormPage, MealPlanFormPage } = await loadRuntime();
+  const mealHtml = await renderToHtml(
+    React.createElement(MealFormPage, mealFormSsrPropsWithSearchError()),
+  );
+  assert.ok(mealHtml.includes("Could not load recipes: network error."));
+  assert.ok(!mealHtml.includes("No recipes found."));
+  const planHtml = await renderToHtml(
+    React.createElement(MealPlanFormPage, mealPlanFormSsrPropsWithSearchError()),
+  );
+  assert.ok(planHtml.includes("Could not load recipes: network error."));
+  assert.ok(!planHtml.includes("No meals or recipes found."));
+});
+
+function mealFormSsrPropsWithSearchError() {
+  return {
+    ...mealFormSsrProps(),
+    searchText: "chicken",
+    searchError: "Could not load recipes: network error.",
+  };
+}
+
+function mealPlanFormSsrPropsWithSearchError() {
+  return {
+    ...mealPlanFormSsrProps(),
+    searchText: "chicken",
+    searchError: "Could not load recipes: network error.",
+  };
+}
 
 /** SSR props for the two page tests: one selected recipe/entry
  * and NO search results — the separation #383 requires. */
