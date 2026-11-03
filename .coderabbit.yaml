@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 # CodeRabbit configuration for the @spudly/ui design system.
-# Review conventions mirror .github/muse-instructions.md.
+# Review conventions mirror .github/copilot-instructions.md.
 language: "en-US"
 reviews:
   profile: "chill"
@@ -49,4 +49,4 @@ knowledge_base:
   code_guidelines:
     enabled: true
     filePatterns:
-      - ".github/muse-instructions.md"
+      - ".github/copilot-instructions.md"
