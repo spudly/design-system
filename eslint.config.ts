@@ -69,10 +69,9 @@ export default [
     },
   },
   {
-    // #119: page components must not apply styling directly — no
-    // className, no inline style prop, no Tamagui styling props on any
-    // element (not even a DS component's designed style props), no
-    // layout primitives, no styling pass-through. Styling belongs in
+    // #119 (simplified shape per #297): page components must not
+    // apply styling directly — no direct Tamagui imports, no
+    // className, no inline style prop. Styling belongs in
     // reusable components under src/components, driven by semantic
     // props. DORMANT today: the typescriptPendingIgnores block above
     // ignores every .ts/.tsx file (typescript-eslint has no TS7 parser
