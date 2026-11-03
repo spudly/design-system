@@ -244,10 +244,19 @@ test("SSR: a failed search shows the error and never the no-results message (#39
       }),
     ),
   );
-  assert.ok(
-    html.includes("Could not load recipes: network error."),
-    `expected the search error in: ${html}`,
-  );
+  // Assert the two presentations SEPARATELY (Copilot review on
+  // PR #395, head 1a28c6e): a whole-page includes() passes if
+  // the error survives in only one of them, so the live region
+  // (role="status" through its closing tag) and the markup
+  // outside it are each checked for the error on their own.
+  const regionAt = html.indexOf('role="status"');
+  assert.ok(regionAt !== -1, "the live region is mounted");
+  const regionEnd = html.indexOf("</div>", regionAt);
+  const region = html.slice(regionAt, regionEnd);
+  const visible = html.slice(0, regionAt) + html.slice(regionEnd);
+  const errorText = "Could not load recipes: network error.";
+  assert.ok(region.includes(errorText), "the live region announces the search error");
+  assert.ok(visible.includes(errorText), "the visible empty state shows the search error");
   assert.ok(
     !html.includes("No recipes found."),
     "a failed search must not read as no matches — visibly or in the live region",
@@ -266,6 +275,15 @@ test("SSR: both meal form pages thread searchError to the picker (#393)", async 
   );
   assert.ok(planHtml.includes("Could not load recipes: network error."));
   assert.ok(!planHtml.includes("No meals or recipes found."));
+  // Same split as the picker test above: each page's live
+  // region must announce the error, not just the page as a
+  // whole (Copilot review on PR #395, head 1a28c6e).
+  for (const pageHtml of [mealHtml, planHtml]) {
+    const at = pageHtml.indexOf('role="status"');
+    assert.ok(at !== -1, "the page's live region is mounted");
+    const regionText = pageHtml.slice(at, pageHtml.indexOf("</div>", at));
+    assert.ok(regionText.includes("Could not load recipes:"), "the region announces the error");
+  }
 });
 
 function mealFormSsrPropsWithSearchError() {
