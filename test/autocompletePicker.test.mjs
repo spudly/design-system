@@ -81,8 +81,8 @@ test("a failed search is its own state: searchError replaces the no-results mess
   assert.match(picker, /searchError\?: string \| null/);
   assert.match(
     picker,
-    /searchError \?\? noResultsMessage/,
-    "the live region announces the error instead of the no-results message",
+    /searchError \|\| noResultsMessage/,
+    "the live region announces the error instead of the no-results message (an empty-string error counts as no error, matching the visible branch)",
   );
   assert.match(
     picker,
@@ -251,6 +251,24 @@ test("SSR: a failed search shows the error and never the no-results message (#39
   assert.ok(
     !html.includes("No recipes found."),
     "a failed search must not read as no matches — visibly or in the live region",
+  );
+});
+
+test("SSR: an empty-string searchError is no error — the no-results message shows and announces (#393)", async () => {
+  const { React, AutocompletePicker } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(
+      AutocompletePicker,
+      pickerProps({
+        searchText: "chicken",
+        searchError: "",
+        noResultsMessage: "No recipes found.",
+      }),
+    ),
+  );
+  assert.ok(
+    html.includes("No recipes found."),
+    `expected the no-results message for an empty-string error in: ${html}`,
   );
 });
 

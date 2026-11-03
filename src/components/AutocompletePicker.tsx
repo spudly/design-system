@@ -179,7 +179,7 @@ export function AutocompletePicker({
     : isSearching
       ? "Searching"
       : visibleResults.length === 0
-        ? (searchError ?? noResultsMessage)
+        ? searchError || noResultsMessage
         : `${visibleResults.length} ${visibleResults.length === 1 ? "result" : "results"} available`;
 
   // Both the select and remove paths unmount the control the
