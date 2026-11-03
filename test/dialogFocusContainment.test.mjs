@@ -184,7 +184,10 @@ test("a covered dialog stands down for the DS layer above it — the registry ar
   );
   assert.match(code, /foreignModal !== hostModalRef\.current/);
   assert.match(code, /const opener = restoreTargetRef\.current;/);
-  assert.match(code, /hostModalRef\.current =\s+opener/);
+  assert.match(
+    code,
+    /hostModalRef\.current =[^;]*opener\.closest\('\[role="dialog"\]\[aria-modal="true"\]'\)/,
+  );
   assert.match(code, /!foreignModal\.contains\(content\)/);
   assert.match(code, /!registeredModalRoots\(\)\.has\(foreignModal\)/);
 });
