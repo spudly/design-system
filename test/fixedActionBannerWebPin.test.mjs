@@ -148,13 +148,15 @@ test("SSR: the banner root caps height at the viewport and scrolls on web (#405)
       primaryAction: { label: "Accept", onPress: () => "accept" },
     }),
   );
-  assert.ok(
-    rootCssValues(html, "max-height").includes("100%"),
-    "expected a max-height:100% rule on the banner root",
+  assert.equal(
+    rootCssValues(html, "max-height").at(-1),
+    "100%",
+    "the banner root's effective max-height must be 100% (the last matching rule wins the cascade)",
   );
-  assert.ok(
-    rootCssValues(html, "overflow").includes("auto"),
-    "expected an overflow:auto rule on the banner root",
+  assert.equal(
+    rootCssValues(html, "overflow").at(-1),
+    "auto",
+    "the banner root's effective overflow must be auto (the last matching rule wins the cascade)",
   );
 });
 
