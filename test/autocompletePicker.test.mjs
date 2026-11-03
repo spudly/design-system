@@ -254,24 +254,6 @@ test("SSR: a failed search shows the error and never the no-results message (#39
   );
 });
 
-test("SSR: an empty-string searchError is no error — the no-results message shows and announces (#393)", async () => {
-  const { React, AutocompletePicker } = await loadRuntime();
-  const html = await renderToHtml(
-    React.createElement(
-      AutocompletePicker,
-      pickerProps({
-        searchText: "chicken",
-        searchError: "",
-        noResultsMessage: "No recipes found.",
-      }),
-    ),
-  );
-  assert.ok(
-    html.includes("No recipes found."),
-    `expected the no-results message for an empty-string error in: ${html}`,
-  );
-});
-
 test("SSR: both meal form pages thread searchError to the picker (#393)", async () => {
   const { React, MealFormPage, MealPlanFormPage } = await loadRuntime();
   const mealHtml = await renderToHtml(

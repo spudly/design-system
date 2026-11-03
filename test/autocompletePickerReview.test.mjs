@@ -252,6 +252,24 @@ test("SSR: the live region announces Searching while a search is in flight", asy
   );
 });
 
+test("SSR: an empty-string searchError is no error — the region announces the no-results message (#393)", async () => {
+  const { React, AutocompletePicker } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(
+      AutocompletePicker,
+      pickerProps({
+        searchText: "chicken",
+        searchError: "",
+        noResultsMessage: "No recipes found.",
+      }),
+    ),
+  );
+  assert.ok(
+    statusRegion(html).includes("No recipes found."),
+    "an empty-string error falls back to the no-results announcement, not silence",
+  );
+});
+
 test("SSR: a disabled SearchField's clear control reports aria-disabled; an enabled one does not", async () => {
   const { React, SearchField } = await loadRuntime();
   const renderField = (extra) =>
