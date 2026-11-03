@@ -55,17 +55,21 @@ test("the modal registry is internal — not exported from the built package roo
 test("a layer presented from within another is above it, regardless of stamps (#394 case 1)", () => {
   // Ancestry is recorded from composition: each layer carries
   // the token of the layer it was presented from within, and
-  // the descendant test walks that chain. Registration order
+  // the comparison walks that chain into a presentation path.
+  // Registration order
   // (child effects before parent effects on a simultaneous
   // mount) therefore cannot invert the stacking.
   assert.match(registry, /parentToken: symbol \| null;/);
   assert.match(registry, /export const ModalLayerContext = createContext<symbol \| null>\(null\);/);
-  assert.match(
-    registry,
-    /function isDescendantLayer\(candidate: ModalLayer, other: ModalLayer\): boolean \{/,
-  );
-  assert.match(registry, /if \(isDescendantLayer\(a, b\)\) \{\s+return true;\s+\}/);
-  assert.match(registry, /if \(isDescendantLayer\(b, a\)\) \{\s+return false;\s+\}/);
+  // The comparison walks the ancestry chain into a full
+  // presentation path (supersedes the pairwise descendant
+  // test: CodeRabbit review on PR #398 showed pairwise
+  // ancestry-then-stamps is non-transitive and can cycle —
+  // see the behavioral cycle test below).
+  assert.match(registry, /function presentationPath\(layer: ModalLayer\): number\[\] \{/);
+  assert.match(registry, /path\.unshift\(current\.presentedAt\)/);
+  assert.match(registry, /return pathA\.length > pathB\.length;/);
+  assert.doesNotMatch(registry, /isDescendantLayer/);
 });
 
 test("unrelated layers stack in presentation order — focus is never consulted (#394 cases 2 and 3)", () => {
@@ -73,7 +77,11 @@ test("unrelated layers stack in presentation order — focus is never consulted 
   // the StepOverlay mounted over an open Dialog is above it
   // wherever focus happens to rest, the body included.
   assert.match(registry, /presentedAt: \+\+presentationCounter,/);
-  assert.match(registry, /return a\.presentedAt > b\.presentedAt;/);
+  // Unrelated layers differ at the first path level, where
+  // the path elements ARE their own stamps — presentation
+  // order falls out of the path comparison.
+  assert.match(registry, /const stampA = pathA\[i\]!;/);
+  assert.match(registry, /if \(stampA !== stampB\) \{\s+return stampA > stampB;\s+\}/);
   assert.match(registry, /export function isActiveModalLayer\(layer: ModalLayer\): boolean \{/);
   assert.doesNotMatch(registry, /activeElement/);
   assert.doesNotMatch(registry, /document\./);
@@ -186,5 +194,47 @@ test("registry behavior: a Dialog inside a StepOverlay is above it; a covering S
   } finally {
     registry.unregisterModalLayer(dialog2);
     registry.unregisterModalLayer(overlay2);
+  }
+});
+
+test("registry behavior: a re-presented ancestor cannot cycle the stacking order (CodeRabbit, PR #398)", async () => {
+  const registry = await import("../dist/components/modalRegistry.js");
+  const parentToken = Symbol("parent");
+  const childToken = Symbol("child");
+  const unrelatedToken = Symbol("unrelated");
+  // The descendant registers first (child effects before the
+  // parent's own registration), an unrelated layer is
+  // presented next, and the ancestor is (re)presented last
+  // with the freshest stamp — the registration sequence a
+  // parent Dialog's close-and-reopen produces while a nested
+  // layer stays registered. Pairwise ancestry-then-stamps
+  // ordered these three in a cycle (descendant above ancestor
+  // by ancestry, ancestor above unrelated by stamp, unrelated
+  // above descendant by stamp) in which NO layer is active
+  // and every containment stands down; the presentation-path
+  // order is total, so exactly one layer — the descendant —
+  // is active.
+  const child = registry.registerModalLayer(childToken, parentToken);
+  const unrelated = registry.registerModalLayer(unrelatedToken, null);
+  const parent = registry.registerModalLayer(parentToken, null);
+  try {
+    assert.equal(registry.isAboveModalLayer(child, parent), true);
+    assert.equal(registry.isAboveModalLayer(parent, unrelated), true);
+    assert.equal(registry.isAboveModalLayer(child, unrelated), true);
+    assert.equal(registry.isAboveModalLayer(parent, child), false);
+    assert.equal(registry.isAboveModalLayer(unrelated, parent), false);
+    assert.equal(registry.isAboveModalLayer(unrelated, child), false);
+    assert.equal(registry.isActiveModalLayer(child), true);
+    assert.equal(registry.isActiveModalLayer(parent), false);
+    assert.equal(registry.isActiveModalLayer(unrelated), false);
+    // Once the descendant goes away, the re-presented
+    // ancestor is the active layer.
+    registry.unregisterModalLayer(child);
+    assert.equal(registry.isActiveModalLayer(parent), true);
+    assert.equal(registry.isActiveModalLayer(unrelated), false);
+  } finally {
+    registry.unregisterModalLayer(child);
+    registry.unregisterModalLayer(unrelated);
+    registry.unregisterModalLayer(parent);
   }
 });

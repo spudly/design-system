@@ -119,36 +119,52 @@ function layerByToken(token: symbol | null): ModalLayer | null {
   return modalLayers.find((layer) => layer.token === token) ?? null;
 }
 
-// Is `candidate` presented from within `other` (transitively)?
-// Walks candidate's recorded ancestry; an ancestor that has
-// since unregistered ends the chain — its layer is gone, so
-// nothing can be covered through it anymore.
-function isDescendantLayer(candidate: ModalLayer, other: ModalLayer): boolean {
-  let ancestor = layerByToken(candidate.parentToken);
-  while (ancestor) {
-    if (ancestor === other) {
-      return true;
-    }
-    ancestor = layerByToken(ancestor.parentToken);
+// The stamps from the root layer down to `layer`, built by
+// walking its recorded ancestry; an ancestor that has since
+// unregistered ends the walk — its layer is gone, so the path
+// just stops there. Each layer's presentation path extends
+// its ancestor's path, so a layer always sorts above the
+// ancestors it was presented from.
+function presentationPath(layer: ModalLayer): number[] {
+  const path: number[] = [];
+  let current: ModalLayer | null = layer;
+  while (current) {
+    path.unshift(current.presentedAt);
+    current = layerByToken(current.parentToken);
   }
-  return false;
+  return path;
 }
 
-// Is layer `a` presented above layer `b`? A layer presented
-// from within another is above that ancestor regardless of
-// stamps (the simultaneous-mount cases); layers that do not
-// contain one another stack in presentation order.
+// Is layer `a` presented above layer `b`? Layers compare by
+// their full presentation paths: ancestors sort below their
+// descendants (a descendant's path extends the ancestor's),
+// and unrelated branches sort by their stamps at the first
+// level where their paths differ — for unrelated layers that
+// is simply presentation order. Comparing pairwise ancestry
+// and stamps instead is NOT transitive (CodeRabbit review on
+// PR #398): a re-presented ancestor (fresh stamp), its
+// still-registered descendant (older stamp), and an unrelated
+// layer stamped between them form a cycle — descendant above
+// ancestor by ancestry, ancestor above unrelated by stamp,
+// unrelated above descendant by stamp — in which NO layer is
+// active and every containment stands down. The path order
+// is a total order, so exactly one layer is active whenever
+// any layer is registered.
 export function isAboveModalLayer(a: ModalLayer, b: ModalLayer): boolean {
   if (a === b) {
     return false;
   }
-  if (isDescendantLayer(a, b)) {
-    return true;
+  const pathA = presentationPath(a);
+  const pathB = presentationPath(b);
+  const shared = Math.min(pathA.length, pathB.length);
+  for (let i = 0; i < shared; i++) {
+    const stampA = pathA[i]!;
+    const stampB = pathB[i]!;
+    if (stampA !== stampB) {
+      return stampA > stampB;
+    }
   }
-  if (isDescendantLayer(b, a)) {
-    return false;
-  }
-  return a.presentedAt > b.presentedAt;
+  return pathA.length > pathB.length;
 }
 
 // The active layer is the one no other registered layer is
