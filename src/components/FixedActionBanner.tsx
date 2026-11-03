@@ -28,6 +28,17 @@ export type FixedActionBannerProps = {
  * dismiss button labeled "Dismiss". Content sits in a centered column
  * capped at 1024px so the bar reads the same on wide screens.
  *
+ * Pinning is to the viewport (#405): on web the bar is viewport-fixed,
+ * so it stays at the viewport edge at any scroll position instead of
+ * scrolling away with the document; a viewport-fixed bar taller than
+ * the viewport is capped at the viewport height and scrolls internally,
+ * so its action row stays reachable on short screens or at high zoom.
+ * On native there is no viewport/document split, so the bar pins
+ * absolute inside its full-screen container. All of those styles live
+ * inside ActionBar's own styled definition — DS components own their
+ * styles and never take styling props — and this banner selects the
+ * behavior through ActionBar's semantic `pinning="viewport"` prop.
+ *
  * This exists alongside Alert because that component's contract cannot
  * express this shape: it is not pinned to a screen edge, and every one
  * of its actions renders as a secondary button (design-system #123,
@@ -42,7 +53,7 @@ export function FixedActionBanner({
   position = "bottom",
 }: FixedActionBannerProps) {
   return (
-    <ActionBar placement={position}>
+    <ActionBar placement={position} pinning="viewport">
       <YStack width="100%" maxWidth={1024} alignSelf="center" gap="$3">
         <Alert severity="info">{message}</Alert>
         <XStack flexWrap="wrap" alignItems="center" gap="$2">
