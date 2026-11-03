@@ -66,14 +66,20 @@ test("Tab is swallowed only when the dialog content holds no effectively tabbabl
     "the negative-tabindex check must precede the image-map area exception",
   );
   // visibility: collapse removes a control from Tab order just
-  // like hidden, and a nested editable inside a non-editable
-  // host is not a Tab stop (review on PR #392, head a459ad8).
+  // like hidden. Disabled means :disabled only: the disabled
+  // attribute is inert on non-disableable elements (<a href
+  // disabled>, <div tabindex="0" disabled> stay Tab stops), so
+  // an attribute check would wrongly reject them (Copilot
+  // review on PR #392, head 3bbf165).
   assert.match(code, /style\.visibility === "collapse"/);
-  assert.match(code, /hostAttr === "false"/);
-  assert.match(code, /!independentlyTabbable/);
+  assert.doesNotMatch(code, /candidate\.hasAttribute\("disabled"\)/);
+  // An explicitly editable element is its own editing host and
+  // a Tab stop even inside a contenteditable="false" region —
+  // the ancestor walk added at head a459ad8 was superseded by
+  // the Copilot review on head 3bbf165.
+  assert.doesNotMatch(code, /hostAttr/);
   assert.match(code, /\[contenteditable=""\], \[contenteditable="true"\]/);
   assert.doesNotMatch(code, /\[contenteditable\],/);
-  assert.match(code, /candidate\.hasAttribute\("disabled"\)/);
   assert.match(code, /candidate\.type === "hidden"/);
   assert.match(code, /candidate\.getAttribute\("tabindex"\)/);
   assert.match(code, /Number\.parseInt\(tabStopAttr, 10\) < 0/);
@@ -132,4 +138,19 @@ test("a details with no summary child counts as a Tab stop, and the fallback lan
     code,
     /<StyledContent ref=\{contentRef\} \{\.\.\.\(isWeb \? \{ tabIndex: -1 \} : \{\}\)\}>/,
   );
+});
+
+test("summary and image-map stops follow the native rules (#391)", () => {
+  // Copilot review on PR #392 (head 3bbf165): only the FIRST
+  // summary child of a details is its disclosure control and a
+  // native Tab stop; a later summary is plain content unless it
+  // is an editing host or carries a nonnegative tabindex.
+  assert.match(code, /candidate\.tagName === "SUMMARY"/);
+  assert.match(code, /parent instanceof HTMLDetailsElement/);
+  assert.match(code, /firstSummary !== candidate/);
+  // A visibility-hidden/collapsed image still has client rects
+  // but its map's areas are not Tab stops, so the image-map
+  // exception checks the image's computed visibility too.
+  assert.match(code, /imageStyle\.visibility === "hidden"/);
+  assert.match(code, /imageStyle\.visibility === "collapse"/);
 });

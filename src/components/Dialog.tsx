@@ -446,7 +446,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // carries tabIndex={-1} on web so the pull-back focus()
   // actually lands inside the dialog when the frame has no
   // landing wrapper of its own (CodeRabbit review on PR #392,
-  // head fbf5aea).
+  // head fbf5aea). (4) Disabled means :disabled only (the
+  // attribute is inert on non-disableable elements), an
+  // explicitly editable element is a stop even inside a
+  // contenteditable="false" region, only a details' FIRST
+  // summary child is a native stop, and an image map counts
+  // only when its image is actually visible, not merely laid
+  // out (Copilot review on PR #392, head 3bbf165).
   useEffect(() => {
     if (!open || !isWeb || typeof document === "undefined") {
       return;
@@ -489,7 +495,12 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         'a[href], area[href], button, input, select, textarea, details, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
       );
       const hasTabbable = Array.from(candidates).some((candidate) => {
-        if (candidate.hasAttribute("disabled") || candidate.matches(":disabled")) {
+        // :disabled only — the disabled ATTRIBUTE has no effect
+        // on elements that are not disableable (an <a href
+        // disabled> or a <div tabindex="0" disabled> is still a
+        // Tab stop), so an attribute check would wrongly reject
+        // them (Copilot review on PR #392, head 3bbf165).
+        if (candidate.matches(":disabled")) {
           return false;
         }
         if (candidate.closest("[inert]")) {
@@ -503,24 +514,17 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           return false;
         }
         const editableAttr = candidate.getAttribute("contenteditable");
-        const independentlyTabbable =
-          candidate.matches(
-            "a[href], area[href], button, input, select, textarea, details, summary, iframe, audio[controls], video[controls]",
-          ) ||
-          (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) >= 0);
-        if (editableAttr !== null && editableAttr !== "false" && !independentlyTabbable) {
-          let host: Element | null = candidate.parentElement;
-          while (host && host !== content) {
-            const hostAttr = host.getAttribute("contenteditable");
-            if (hostAttr !== null) {
-              if (hostAttr === "false") {
-                return false;
-              }
-              break;
-            }
-            host = host.parentElement;
-          }
-        }
+        // An explicitly editable candidate (contenteditable "",
+        // "true", or "plaintext-only") is its own editing host
+        // and a Tab stop even inside a contenteditable="false"
+        // ancestor — the false region only governs descendants
+        // WITHOUT an explicit state of their own (Copilot review
+        // on PR #392, head 3bbf165; this supersedes the ancestor
+        // walk added at head a459ad8, which rejected exactly
+        // those re-enabled descendants). Candidates with
+        // contenteditable="false" or no attribute are never
+        // counted via editability — only via the native/tabindex
+        // paths, which need no ancestor check either.
         if (candidate instanceof HTMLDetailsElement && tabStopAttr === null) {
           // A details element with no summary child gets a UA
           // fallback summary that IS a Tab stop — but it is not
@@ -536,6 +540,25 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
             return false;
           }
         }
+        if (candidate.tagName === "SUMMARY" && tabStopAttr === null) {
+          // Only the FIRST summary child of a details is its
+          // disclosure control and a native Tab stop; a later
+          // summary is plain content (Copilot review on PR #392,
+          // head 3bbf165). An explicitly editable summary is an
+          // editing host instead and still counts, as does one
+          // with a nonnegative tabindex (handled above — this
+          // branch only runs when tabStopAttr is null).
+          const parent = candidate.parentElement;
+          const editableHost = editableAttr !== null && editableAttr !== "false";
+          if (!editableHost && parent instanceof HTMLDetailsElement) {
+            const firstSummary = Array.from(parent.children).find(
+              (child) => child.tagName === "SUMMARY",
+            );
+            if (firstSummary !== candidate) {
+              return false;
+            }
+          }
+        }
         if (candidate instanceof HTMLAreaElement) {
           const mapName = candidate.closest("map")?.getAttribute("name");
           if (!mapName) {
@@ -546,6 +569,17 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
               return false;
             }
             if (image.closest("[inert]")) {
+              return false;
+            }
+            // A visibility-hidden/collapsed image still has
+            // client rects, but its map's areas are not Tab
+            // stops (Copilot review on PR #392, head 3bbf165).
+            const imageStyle = window.getComputedStyle(image);
+            if (
+              imageStyle.display === "none" ||
+              imageStyle.visibility === "hidden" ||
+              imageStyle.visibility === "collapse"
+            ) {
               return false;
             }
             return image.getClientRects().length > 0;
