@@ -36,6 +36,14 @@ export type FixedActionBannerProps = {
  * container is correct — so the native form keeps ActionBar's absolute
  * default via the platform-conditional position below.
  *
+ * A fixed bar also cannot be reached by page scroll, so on web the bar
+ * is capped at the viewport height (a fixed element's containing block
+ * is the viewport, so `maxHeight: "100%"` is the viewport height) and
+ * scrolls internally (`overflow: "auto"`): a banner whose message is
+ * taller than the viewport — short screens, high zoom — keeps its
+ * action row reachable instead of pushing it past the viewport edge.
+ * The cap and scroll are web-only conditionals; native is unchanged.
+ *
  * This exists alongside Alert because that component's contract cannot
  * express this shape: it is not pinned to a screen edge, and every one
  * of its actions renders as a secondary button (design-system #123,
@@ -58,6 +66,11 @@ export function FixedActionBanner({
       // in SSR output (the generated CSS carries position:fixed for
       // this bar's class).
       position={{ default: "absolute", web: "fixed" }}
+      // Viewport cap + internal scroll on web only (see the doc above):
+      // a fixed element's containing block is the viewport, so 100%
+      // caps the bar at the viewport height.
+      maxHeight={{ web: "100%" }}
+      overflow={{ web: "auto" }}
     >
       <YStack width="100%" maxWidth={1024} alignSelf="center" gap="$3">
         <Alert severity="info">{message}</Alert>

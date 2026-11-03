@@ -52,6 +52,19 @@ test("FixedActionBanner pins viewport-fixed on web and absolute on native (#405)
   );
 });
 
+test("FixedActionBanner caps web height at the viewport and scrolls internally (#405)", () => {
+  assert.match(
+    banner,
+    /maxHeight=\{\{\s*web: "100%"\s*\}\}/,
+    "FixedActionBanner must cap the web bar at the viewport height (100% of the fixed containing block)",
+  );
+  assert.match(
+    banner,
+    /overflow=\{\{\s*web: "auto"\s*\}\}/,
+    "FixedActionBanner must let an over-height web bar scroll internally so its actions stay reachable",
+  );
+});
+
 test("ActionBar's styled base stays absolute (#405)", () => {
   assert.match(
     actionBar,
