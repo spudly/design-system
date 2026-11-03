@@ -28,21 +28,16 @@ export type FixedActionBannerProps = {
  * dismiss button labeled "Dismiss". Content sits in a centered column
  * capped at 1024px so the bar reads the same on wide screens.
  *
- * Pinning is viewport-fixed on web (#405): an absolutely-positioned bar
- * pins to its nearest positioned ancestor and scrolls with the document,
- * so a consent bar could scroll out of view; `position: "fixed"` keeps
- * it at the viewport edge at any scroll position. On native there is no
- * viewport/document split — absolute edge-pinning inside the full-screen
- * container is correct — so the native form keeps ActionBar's absolute
- * default via the platform-conditional position below.
- *
- * A fixed bar also cannot be reached by page scroll, so on web the bar
- * is capped at the viewport height (a fixed element's containing block
- * is the viewport, so `maxHeight: "100%"` is the viewport height) and
- * scrolls internally (`overflow: "auto"`): a banner whose message is
- * taller than the viewport — short screens, high zoom — keeps its
- * action row reachable instead of pushing it past the viewport edge.
- * The cap and scroll are web-only conditionals; native is unchanged.
+ * Pinning is to the viewport (#405): on web the bar is viewport-fixed,
+ * so it stays at the viewport edge at any scroll position instead of
+ * scrolling away with the document; a viewport-fixed bar taller than
+ * the viewport is capped at the viewport height and scrolls internally,
+ * so its action row stays reachable on short screens or at high zoom.
+ * On native there is no viewport/document split, so the bar pins
+ * absolute inside its full-screen container. All of those styles live
+ * inside ActionBar's own styled definition — DS components own their
+ * styles and never take styling props — and this banner selects the
+ * behavior through ActionBar's semantic `pinning="viewport"` prop.
  *
  * This exists alongside Alert because that component's contract cannot
  * express this shape: it is not pinned to a screen edge, and every one
@@ -58,20 +53,7 @@ export function FixedActionBanner({
   position = "bottom",
 }: FixedActionBannerProps) {
   return (
-    <ActionBar
-      placement={position}
-      // #405: viewport-fixed on web, absolute on native (see the
-      // component doc above). Tamagui v3's conditional-object syntax
-      // resolves `web` on web builds and `default` elsewhere; verified
-      // in SSR output (the generated CSS carries position:fixed for
-      // this bar's class).
-      position={{ default: "absolute", web: "fixed" }}
-      // Viewport cap + internal scroll on web only (see the doc above):
-      // a fixed element's containing block is the viewport, so 100%
-      // caps the bar at the viewport height.
-      maxHeight={{ web: "100%" }}
-      overflow={{ web: "auto" }}
-    >
+    <ActionBar placement={position} pinning="viewport">
       <YStack width="100%" maxWidth={1024} alignSelf="center" gap="$3">
         <Alert severity="info">{message}</Alert>
         <XStack flexWrap="wrap" alignItems="center" gap="$2">

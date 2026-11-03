@@ -7,14 +7,22 @@
  * with the viewport as its containing block.
  *
  * The contract now:
- * 1. FixedActionBanner overrides ActionBar's position with the
- *    platform-conditional `{ default: "absolute", web: "fixed" }`:
- *    viewport-fixed on web, absolute on native (native has no
- *    viewport/document split; absolute edge-pinning inside the
- *    full-screen container is correct there).
- * 2. ActionBar's own styled base keeps `position: "absolute"` — a
+ * 1. The pinning styles live inside ActionBar's own styled
+ *    definition, in its `pinning` variant: the "viewport" mode
+ *    carries the platform-conditional position
+ *    `{ default: "absolute", web: "fixed" }` (viewport-fixed on web,
+ *    absolute on native — native has no viewport/document split;
+ *    absolute edge-pinning inside the full-screen container is
+ *    correct there) plus the web-only viewport cap
+ *    (`maxHeight: "100%"`) and internal scroll (`overflow: "auto"`).
+ *    FixedActionBanner selects that mode through the semantic
+ *    `pinning="viewport"` prop and passes NO style props — DS
+ *    components own their styles; styling props never cross a
+ *    component boundary, not even between DS components.
+ * 2. ActionBar's own styled base keeps `position: "absolute"` and
+ *    `pinning` defaults to "container", which adds no styles — a
  *    plain ActionBar still pins to its screen container, not the
- *    viewport.
+ *    viewport, and carries neither the cap nor the scroll.
  * 3. Runtime (SSR, against the built output): the banner root's
  *    position class carries both rules with `fixed` LAST (same
  *    specificity, so source order decides — fixed wins on web),
@@ -44,36 +52,57 @@ function readCode(rel) {
 const banner = readCode("src/components/FixedActionBanner.tsx");
 const actionBar = readCode("src/components/ActionBar.tsx");
 
-test("FixedActionBanner pins viewport-fixed on web and absolute on native (#405)", () => {
+test("FixedActionBanner selects viewport pinning and passes no style props (#405)", () => {
   assert.match(
     banner,
-    /position=\{\{\s*default: "absolute",\s*web: "fixed"\s*\}\}/,
-    "FixedActionBanner must pass the platform-conditional position to ActionBar",
+    /pinning="viewport"/,
+    "FixedActionBanner must select ActionBar's viewport pinning through the semantic pinning prop",
+  );
+  for (const styleProp of ["position=", "maxHeight=", "overflow="]) {
+    assert.ok(
+      !banner.includes(styleProp),
+      `FixedActionBanner must not pass the ${styleProp} style prop — ActionBar owns its styles`,
+    );
+  }
+});
+
+test("ActionBar owns the viewport pinning styles in its pinning variant (#405)", () => {
+  assert.match(
+    actionBar,
+    /position: \{\s*default: "absolute",\s*web: "fixed"\s*\}/,
+    "ActionBar's viewport pinning must carry the platform-conditional position (fixed on web, absolute on native)",
+  );
+  assert.match(
+    actionBar,
+    /maxHeight: \{\s*web: "100%"\s*\}/,
+    "ActionBar's viewport pinning must cap the web bar at the viewport height (100% of the fixed containing block)",
+  );
+  assert.match(
+    actionBar,
+    /overflow: \{\s*web: "auto"\s*\}/,
+    "ActionBar's viewport pinning must let an over-height web bar scroll internally so its content stays reachable",
+  );
+  assert.ok(
+    actionBar.indexOf("pinning:") < actionBar.indexOf('web: "fixed"'),
+    "the pinning styles must live inside ActionBar's pinning variant, not its base styles",
   );
 });
 
-test("FixedActionBanner caps web height at the viewport and scrolls internally (#405)", () => {
-  assert.match(
-    banner,
-    /maxHeight=\{\{\s*web: "100%"\s*\}\}/,
-    "FixedActionBanner must cap the web bar at the viewport height (100% of the fixed containing block)",
-  );
-  assert.match(
-    banner,
-    /overflow=\{\{\s*web: "auto"\s*\}\}/,
-    "FixedActionBanner must let an over-height web bar scroll internally so its actions stay reachable",
-  );
-});
-
-test("ActionBar's styled base stays absolute (#405)", () => {
+test("ActionBar's styled base stays absolute and pinning defaults to container (#405)", () => {
   assert.match(
     actionBar,
     /position: "absolute"/,
     "ActionBar's base must keep absolute positioning for plain (non-banner) use",
   );
-  assert.ok(
-    !actionBar.includes('"fixed"'),
-    "ActionBar must not pin fixed itself — viewport pinning is FixedActionBanner's contract",
+  assert.match(
+    actionBar,
+    /container: \{\}/,
+    "container pinning must add no styles over the absolute base",
+  );
+  assert.match(
+    actionBar,
+    /pinning: "container"/,
+    "pinning must default to container so a plain ActionBar keeps its existing contract",
   );
 });
 
