@@ -95,9 +95,11 @@ test("Tab is swallowed only when the dialog content holds no effectively tabbabl
 test("only the topmost modal intercepts Tab — a covered dialog stands down (#391)", () => {
   // Stacked dialogs: a text-only dialog left open beneath a newer
   // modal must not swallow Tab for the dialog above it (Copilot +
-  // CodeRabbit review on PR #392). Portal frames mount in open
-  // order, so a frame followed in document order by another
-  // dialog frame is covered.
+  // CodeRabbit review on PR #392). DS layers are arbitrated by
+  // the modal registry (dialogModalRegistry.test.mjs, #394);
+  // this scan covers FOREIGN native frames no DS layer records.
+  // Portal frames mount in open order, so a frame followed in
+  // document order by another dialog frame is covered.
   assert.match(code, /document\.querySelectorAll\("dialog"\)/);
   assert.match(code, /frame\.compareDocumentPosition\(other\) & Node\.DOCUMENT_POSITION_FOLLOWING/);
   // Only a still-open modal covers: a closed dialog element later
@@ -137,33 +139,57 @@ test("a details with no summary child counts as a Tab stop, and the fallback lan
   );
 });
 
-test("a foreign modal layer holding focus is the active layer — this dialog stands down (#391)", () => {
-  // Copilot review on PR #392 (head f32fd7d): StepOverlay is a
-  // role="dialog" aria-modal shell, not a native <dialog>
-  // element, so the frame scan cannot see it covering this
-  // dialog; when it holds focus, the pull-back must not yank
-  // focus into the covered dialog. DS dialogs are exempt (the
-  // stack arbitrates between them, via the registered content
-  // elements), as is a layer containing this dialog.
-  assert.match(code, /closest\('\[role="dialog"\]\[aria-modal="true"\]'\)/);
-  assert.match(code, /entry\.content === foreignModal/);
-  assert.match(code, /!foreignModal\.contains\(content\)/);
-  assert.match(code, /entry\.content = content;/);
-  // …but never for the host layer this dialog was opened FROM
-  // (Copilot review on PR #392, head 646fe94): the host is
-  // recorded at the open transition from the tracked opener —
-  // focus sitting in the host (the state right after opening a
-  // text-only dialog from an overlay control) means this dialog
-  // is still the active layer above it.
-  assert.match(code, /foreignModal !== hostModalRef\.current/);
-  assert.match(code, /const opener = restoreTargetRef\.current;/);
-  assert.match(code, /hostModalRef\.current =\s+opener/);
-  // The stack entry re-syncs when the portal content attaches,
-  // not only in the open effect: an initially open dialog can
-  // hydrate with its content mounted in a later Portal update
-  // (CodeRabbit review on PR #392, head 646fe94).
+test("a covered dialog stands down for the DS layer above it — the registry arbitrates, not focus (#394)", () => {
+  // Issue #394 (Stephen's Option A ruling): which presented
+  // DS layer is active is decided by the modal registry from
+  // recorded presentation — ancestry and presentation order.
+  // This test supersedes the PR #392 pins for the stand-down
+  // as it applied between DS layers (Copilot review on
+  // PR #392, heads f32fd7d and 646fe94): keying DS arbitration
+  // on the focused element misjudged a Dialog mounted inside
+  // a new StepOverlay (its host recorded before the overlay's
+  // mount focus move) and a covering StepOverlay while focus
+  // rested on the body, and the registration-order stack it
+  // also replaced inverted simultaneously-open nested dialogs.
+  assert.match(code, /registerModalLayer\(layerToken, parentLayerToken\)/);
+  assert.match(code, /unregisterModalLayer\(layer\)/);
+  assert.match(code, /const ownLayer = layerRef\.current;/);
+  assert.match(code, /if \(ownLayer && !isActiveModalLayer\(ownLayer\)\) \{\s+return;\s+\}/);
+  // The layer this dialog was composed inside is read from
+  // context, and this dialog provides its own token to layers
+  // composed inside it.
+  assert.match(code, /useContext\(ModalLayerContext\)/);
+  assert.match(code, /<ModalLayerContext\.Provider value=\{layerToken\}>/);
+  // The registry layer re-syncs when the portal content
+  // attaches, not only in the registration effect: an initially
+  // open dialog can hydrate with its content mounted in a later
+  // Portal update (CodeRabbit review on PR #392, head 646fe94).
   assert.match(code, /const setContentRef = useCallback\(/);
   assert.match(code, /contentRef\.current = node;/);
+  assert.match(code, /layer\.root = content;/);
+  // The mechanism the registry replaced is gone: no
+  // registration-order stack.
+  assert.doesNotMatch(code, /openDialogStack/);
+  // What survives is the stand-down for a FOREIGN aria-modal
+  // element only (CodeRabbit review on PR #398): a host-built
+  // modal has no registry record and no native frame, so focus
+  // remains its only signal — with DS layers exempt through
+  // their registered roots, and the host this dialog was
+  // opened FROM exempt through the opener record (PR #392,
+  // head 646fe94 — a foreign host has no registered root, so
+  // the record is its only exemption signal).
+  assert.match(
+    code,
+    /const foreignModal = focusedElement\.closest\('\[role="dialog"\]\[aria-modal="true"\]'\)/,
+  );
+  assert.match(code, /foreignModal !== hostModalRef\.current/);
+  assert.match(code, /const opener = restoreTargetRef\.current;/);
+  assert.match(
+    code,
+    /hostModalRef\.current =[^;]*opener\.closest\('\[role="dialog"\]\[aria-modal="true"\]'\)/,
+  );
+  assert.match(code, /!foreignModal\.contains\(content\)/);
+  assert.match(code, /!registeredModalRoots\(\)\.has\(foreignModal\)/);
 });
 
 test("the f0fd374 review round: invisible ARIA-only frames, editable details, stray summaries (#391)", () => {

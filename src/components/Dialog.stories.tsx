@@ -64,3 +64,55 @@ export const WithoutActions: Story = {
     );
   },
 };
+
+// Nested dialogs open in the same commit (#394): the parent
+// carries no controls of its own — on the pre-registry stack
+// the parent registered last and its containment swallowed
+// Tab, leaving the nested dialog keyboard-unreachable. Tab and
+// Shift+Tab now cycle only between the nested dialog's two
+// actions; closing the nested dialog returns containment to
+// the parent.
+function NestedDialogsDemo() {
+  const [parentOpen, setParentOpen] = useState(true);
+  const [childOpen, setChildOpen] = useState(true);
+  return (
+    <YStack>
+      <Button
+        onPress={() => {
+          setParentOpen(true);
+          setChildOpen(true);
+        }}
+      >
+        Open nested dialogs
+      </Button>
+      <Dialog open={parentOpen} onOpenChange={setParentOpen} title="Archive this recipe?">
+        <Text variant="body">
+          The parent dialog carries no controls of its own — the nested dialog below is the layer
+          keyboard focus belongs in.
+        </Text>
+        <Dialog
+          open={childOpen}
+          onOpenChange={setChildOpen}
+          title="Discard the draft instead?"
+          description="Opened in the same commit as its parent."
+          actions={
+            <>
+              <Button variant="secondary" size="sm" onPress={() => setChildOpen(false)}>
+                Keep draft
+              </Button>
+              <Button variant="primary" size="sm" onPress={() => setChildOpen(false)}>
+                Discard
+              </Button>
+            </>
+          }
+        >
+          <Text variant="body">Tab cycles between Keep draft and Discard.</Text>
+        </Dialog>
+      </Dialog>
+    </YStack>
+  );
+}
+
+export const NestedDialogs: Story = {
+  render: () => <NestedDialogsDemo />,
+};
