@@ -1,3 +1,4 @@
+import process from "node:process";
 import test from "node:test";
 
 // TEMPORARY diagnostic (diag/278-ci-probe): find which import in the
