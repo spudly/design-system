@@ -51,7 +51,6 @@ function importSourceValue(source) {
   if (source.type === "TemplateLiteral" && source.expressions.length === 0) {
     return source.quasis[0].value.cooked;
   }
-  return undefined;
 }
 
 function isTamaguiSource(source) {
