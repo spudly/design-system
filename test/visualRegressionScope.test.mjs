@@ -261,13 +261,16 @@ function assertScopeCoveredByBaselines(scope, baselineFiles) {
 // runs only on the changesets release PR, which is also where
 // baselines are generated. The real-repo test below therefore
 // splits its enforcement: the parts that do not depend on the
-// baselines being complete — the pinned story counts and the
-// baseline-to-story direction — run on EVERY PR, so a PR that
-// adds, renames, or removes a story must update the counts and
-// drop obsolete baselines itself (baseline automation does
-// neither). Only the missing-baseline direction and the
-// generated coverage listing are gated on the release PR
-// (ci.yml sets DSVR_ENFORCE_BASELINE_GATE=true for release
+// baselines being complete — the pinned story counts, the
+// baseline-to-story direction, and the generated coverage
+// listing — run on EVERY PR, so a PR that adds, renames, or
+// removes a story must update the counts, drop obsolete
+// baselines, and refresh the listing itself (baseline
+// automation does none of those, and its listing refresh only
+// runs when baselines change, so a stale listing would
+// otherwise surface for the first time on the release PR).
+// Only the missing-baseline direction is gated on the release
+// PR (ci.yml sets DSVR_ENFORCE_BASELINE_GATE=true for release
 // PRs): an ordinary PR may add a story without committed
 // baselines, and the release PR's VR run generates them before
 // the release ships.
@@ -276,11 +279,11 @@ const enforceBaselineGate = process.env.DSVR_ENFORCE_BASELINE_GATE === "true";
 test("real repo: derived capture set matches the committed baselines", () => {
   // Completeness gate (issue #128): the mapper's story inventory
   // and the committed baselines must agree in BOTH directions —
-  // every baseline derivable (checked everywhere), and every
-  // derivable in-scope story HAS a committed baseline, with the
-  // coverage listing in docs/android-visual-regression.md
-  // matching both (those two checked on the release PR only —
-  // see the gate comment above). The
+  // every baseline derivable and the coverage listing in
+  // docs/android-visual-regression.md matching both (checked
+  // everywhere), and every derivable in-scope story HAS a
+  // committed baseline (that direction checked on the release
+  // PR only — see the gate comment above). The
   // Current light set: 135 standard-width stories (111 light_warmHarvest + 22
   // light_quietDawn on disk minus the 3 Reading-screen stories the capture app
   // excludes, ReadingView replicating Memorize's reading screen and landing in
@@ -332,11 +335,11 @@ test("real repo: derived capture set matches the committed baselines", () => {
   assert.ok(existsSync(baselineRoot));
   if (enforceBaselineGate) {
     assertScopeCoveredByBaselines(scope, baselineFiles);
-    const docs = readFileSync(join(repoRoot, "docs/android-visual-regression.md"), "utf8");
-    assert.equal(
-      docs,
-      generateCoverageDocs(repoRoot, docs),
-      "docs coverage listing matches the generated table (run tools/visualRegression/coverageListing.mjs)",
-    );
   }
+  const docs = readFileSync(join(repoRoot, "docs/android-visual-regression.md"), "utf8");
+  assert.equal(
+    docs,
+    generateCoverageDocs(repoRoot, docs),
+    "docs coverage listing matches the generated table (run tools/visualRegression/coverageListing.mjs)",
+  );
 });
