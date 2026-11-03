@@ -99,6 +99,22 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const [layerToken] = useState(() => Symbol("dialogLayer"));
   const parentLayerToken = useContext(ModalLayerContext);
   const layerRef = useRef<ModalLayer | null>(null);
+  // The modal layer this dialog was opened FROM, if the opener
+  // sat inside an aria-modal element at the open transition —
+  // the foreign-modal stand-down in the containment handler
+  // must never stand down for it: this dialog is the active
+  // layer above its host, even though its content is portalled
+  // outside the host's subtree, so focus sitting in the host
+  // (the state right after opening a text-only dialog from a
+  // host control, when the primitive's autofocus has nowhere
+  // to land) must not cost it containment (Copilot review on
+  // PR #392, head 646fe94). A DS host is ALSO exempt through
+  // its registered root (modalRegistry.ts); a foreign host has
+  // no registry record, so this opener record is its only
+  // signal — the registry round of #394 dropped it and
+  // CodeRabbit review on PR #398 restored it for foreign
+  // hosts.
+  const hostModalRef = useRef<Element | null>(null);
   // The content ref is a callback, not an object ref: when an
   // initially open dialog hydrates, Tamagui's Portal mounts the
   // content in a later update than the open-transition effects,
@@ -541,13 +557,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       // PR #392, head f32fd7d; retained for foreign modals at
       // CodeRabbit review on PR #398). DS layers are exempt —
       // the registry above arbitrates them, and their roots
-      // are recognized through the registry, which is what
-      // replaces the host record the #392 version of this rule
-      // needed: a DS host layer this dialog was opened from is
-      // a registered root, so focus sitting in it never stands
-      // this dialog down. Layers that merely contain this
-      // dialog (or are contained by it) are likewise not
-      // foreign covers.
+      // are recognized through the registry. The host layer
+      // this dialog was opened FROM is exempt too (hostModalRef,
+      // recorded at the open transition): a DS host via its
+      // registered root, a foreign host via the record — focus
+      // sitting in the host never stands this dialog down.
+      // Layers that merely contain this dialog (or are
+      // contained by it) are likewise not foreign covers.
       const focusedElement = document.activeElement as HTMLElement | null;
       if (
         focusedElement &&
@@ -559,6 +575,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         const foreignModal = focusedElement.closest('[role="dialog"][aria-modal="true"]');
         if (
           foreignModal &&
+          foreignModal !== hostModalRef.current &&
           !foreignModal.contains(content) &&
           !content.contains(foreignModal) &&
           !registeredModalRoots().has(foreignModal)
@@ -771,13 +788,15 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         restoreTargetRef.current = null;
       }
       blurredTargetRef.current = null;
-      // (The host layer this dialog was opened from is no
-      // longer recorded here, #394: the tracked-opener record
-      // this effect used to take fed the focus-keyed
-      // stand-down's host exemption — a DS host is now
-      // recognized through its registered root in the modal
-      // registry, and this dialog's own ancestry comes from
-      // composition at registration.)
+      // Record the host layer from the tracked opener (see
+      // hostModalRef above): the aria-modal element the opener
+      // sits in at this opening is the layer this dialog was
+      // opened from.
+      const opener = restoreTargetRef.current;
+      hostModalRef.current =
+        opener && typeof opener.closest === "function"
+          ? opener.closest('[role="dialog"][aria-modal="true"]')
+          : null;
       // A (re)opening supersedes any deferred re-assert still
       // pending from the previous close.
       restoreGenRef.current++;

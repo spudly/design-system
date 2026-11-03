@@ -167,19 +167,24 @@ test("a covered dialog stands down for the DS layer above it — the registry ar
   assert.match(code, /const setContentRef = useCallback\(/);
   assert.match(code, /contentRef\.current = node;/);
   assert.match(code, /layer\.root = content;/);
-  // The mechanisms the registry replaced are gone: no
-  // registration-order stack, no opener-derived host record.
+  // The mechanism the registry replaced is gone: no
+  // registration-order stack.
   assert.doesNotMatch(code, /openDialogStack/);
-  assert.doesNotMatch(code, /hostModalRef/);
   // What survives is the stand-down for a FOREIGN aria-modal
   // element only (CodeRabbit review on PR #398): a host-built
   // modal has no registry record and no native frame, so focus
   // remains its only signal — with DS layers exempt through
-  // their registered roots instead of the old host record.
+  // their registered roots, and the host this dialog was
+  // opened FROM exempt through the opener record (PR #392,
+  // head 646fe94 — a foreign host has no registered root, so
+  // the record is its only exemption signal).
   assert.match(
     code,
     /const foreignModal = focusedElement\.closest\('\[role="dialog"\]\[aria-modal="true"\]'\)/,
   );
+  assert.match(code, /foreignModal !== hostModalRef\.current/);
+  assert.match(code, /const opener = restoreTargetRef\.current;/);
+  assert.match(code, /hostModalRef\.current =\s+opener/);
   assert.match(code, /!foreignModal\.contains\(content\)/);
   assert.match(code, /!registeredModalRoots\(\)\.has\(foreignModal\)/);
 });
