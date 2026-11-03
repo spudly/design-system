@@ -16,11 +16,10 @@ test("probe imports", async () => {
   for (const [name, fn] of steps) {
     try {
       await fn();
-      console.log("PROBE-OK", name);
-    } catch (e) {
-      console.log("PROBE-FAIL", name);
-      console.log(e.stack);
-      throw e;
+      process.stdout.write(`# PROBE-OK ${name}\n`);
+    } catch (error) {
+      process.stdout.write(`# PROBE-FAIL ${name}\n${error.stack}\n`);
+      throw error;
     }
   }
 });
