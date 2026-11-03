@@ -58,7 +58,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "build:tests": "tsc -p tsconfig.test.json",
+    "build:tests": "rm -rf test-dist && tsc -p tsconfig.test.json",
     "build-storybook": "npm run build-storybook:react --",
     "build-storybook:react": "storybook build",
     "changeset": "changeset",
