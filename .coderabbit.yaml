@@ -1,0 +1,52 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+# CodeRabbit configuration for the @spudly/ui design system.
+# Review conventions mirror .github/muse-instructions.md.
+language: "en-US"
+reviews:
+  profile: "chill"
+  path_instructions:
+    - path: "src/**"
+      instructions: >-
+        This is the shared design system (@spudly/ui) used by multiple apps.
+        Enforce these conventions and flag violations; do not flag code that
+        follows them. TypeScript uses type aliases, never interfaces (one
+        allowlisted exception: TamaguiCustomConfig must stay an interface for
+        declaration merging). Components own their styles completely and must
+        NOT accept styling props (style, className, spacing/color props, or
+        Tamagui styling props) - flag any new styling prop; variants and
+        semantic props are the mechanism. Internal styled-component names must
+        not carry the Spudly prefix. A control that navigates to another page
+        is a link with an href, otherwise a button element with a callback;
+        a component named *Link with the link role must be a real href link -
+        flag callback-only links (settled exceptions: mutation-then-navigate
+        controls and genuinely dynamic back destinations stay callbacks).
+        Shared components must be reusable across apps - flag single-app
+        domain concepts in component names or prop shapes; domain content is
+        caller-supplied. No spaceBefore/spaceAfter-style spacing props
+        (spacing is parent-controlled); centering a single element uses the
+        dedicated Center component; no role/type/variant prop on Column/Row.
+        Tag colors are strictly the TagColorName union - flag raw hex values
+        in color props. User-visible changes under src/** require a changeset
+        describing the change in testable, user-visible terms naming the
+        affected pages/components - flag src/** changes without one. New
+        interactive elements need accessible names/labels; new data surfaces
+        need explicit error and empty states (no empty-result message on a
+        failed load).
+    - path: "src/icons/**"
+      instructions: >-
+        Icons are official Feather SVG path data rendered with
+        react-native-svg, one module per icon, exported under semantic usage
+        names (e.g. PrintIcon, ShareIcon). Flag hand-drawn glyph paths, icon
+        fonts, and exports named after Feather icons.
+    - path: "package-lock.json"
+      instructions: >-
+        package-lock.json is never hand-edited; it is regenerated with the
+        pinned npm (npm@10.9.4 via the packageManager field/Corepack). Only
+        flag lockfile changes that are inconsistent with the package.json
+        changes in the same PR; do not nitpick routine version/resolution
+        updates.
+knowledge_base:
+  code_guidelines:
+    enabled: true
+    filePatterns:
+      - ".github/muse-instructions.md"
