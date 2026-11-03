@@ -555,10 +555,12 @@ capture entirely. (Local development still uses Metro via
 ### Scoped PR runs: capture only the affected stories (issue #114)
 
 Without scoping, a full run captures all 147 baselines (135
-standard + 12 narrow) — a 20–30 minute emulator job gating every
-PR, including one-line component fixes. Since issue #114, a PR
-compare run first computes the stories the PR can actually
-affect and captures only those:
+standard + 12 narrow) — a 20–30 minute emulator job, far too
+expensive to gate every PR on, one-line component fixes
+included. Since issue #114, a PR compare run first computes
+the stories the PR can actually affect and captures only
+those (and since 2026-11-02 the run itself happens on release
+PRs only — see "CI scoping" above):
 
 - The workflow's **Compute VR capture scope** step lists the PR's
   changed files and runs `tools/visualRegression/scope.mjs`,

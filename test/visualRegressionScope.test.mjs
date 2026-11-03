@@ -10,6 +10,7 @@ import assert from "node:assert/strict";
 import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import process from "node:process";
 import test from "node:test";
 import { fileURLToPath } from "node:url";
 
@@ -217,10 +218,12 @@ test("isFallbackPath classifies the guardrail list", () => {
 // that the committed table matches what the generator derives from
 // the capture set and the baseline files on disk.
 
-// Both directions of the completeness gate: every committed
-// baseline must be derivable, and every derivable in-scope story
-// must have a committed baseline.
-function assertBaselinesMatchScope(scope, baselineFiles) {
+// The baseline-to-story direction of the completeness gate:
+// every committed baseline must be derivable from the capture
+// set. This runs unconditionally — it does not depend on the
+// baselines being complete, so an orphaned baseline (a renamed
+// or removed story's PNG) is caught on the PR that causes it.
+function assertBaselinesDerivable(scope, baselineFiles) {
   const standard = new Set(scope.standard);
   const narrow = new Set(scope.narrow);
   for (const files of baselineFiles.values()) {
@@ -232,6 +235,14 @@ function assertBaselinesMatchScope(scope, baselineFiles) {
       }
     }
   }
+}
+
+// The story-to-baseline direction: every derivable in-scope
+// story must HAVE a committed baseline. Enforced on the release
+// PR only (see enforceBaselineGate below): baselines are
+// generated there, so an ordinary PR may legitimately add a
+// story whose baseline does not exist yet.
+function assertScopeCoveredByBaselines(scope, baselineFiles) {
   for (const id of scope.standard) {
     assert.ok(
       baselineFiles.get(themeOfStory(id)).has(`${id}.png`),
@@ -248,81 +259,84 @@ function assertBaselinesMatchScope(scope, baselineFiles) {
 
 // Release-only VR (Stephen's directive, 2026-11-02): native VR
 // runs only on the changesets release PR, which is also where
-// baselines are generated — so the completeness gate below is
-// enforced there and only there (ci.yml sets
-// DSVR_ENFORCE_BASELINE_GATE=true for release PRs). Everywhere
-// else it skips: an ordinary PR may add a story without committed
+// baselines are generated. The real-repo test below therefore
+// splits its enforcement: the parts that do not depend on the
+// baselines being complete — the pinned story counts and the
+// baseline-to-story direction — run on EVERY PR, so a PR that
+// adds, renames, or removes a story must update the counts and
+// drop obsolete baselines itself (baseline automation does
+// neither). Only the missing-baseline direction and the
+// generated coverage listing are gated on the release PR
+// (ci.yml sets DSVR_ENFORCE_BASELINE_GATE=true for release
+// PRs): an ordinary PR may add a story without committed
 // baselines, and the release PR's VR run generates them before
 // the release ships.
 const enforceBaselineGate = process.env.DSVR_ENFORCE_BASELINE_GATE === "true";
 
-test(
-  "real repo: derived capture set matches the committed baselines",
-  {
-    skip: enforceBaselineGate
-      ? false
-      : "baseline completeness is enforced on the release PR only (release-only VR, 2026-11-02)",
-  },
-  () => {
-    // Completeness gate (issue #128): the mapper's story inventory
-    // and the committed baselines must agree in BOTH directions —
-    // every baseline derivable, and every derivable in-scope story
-    // HAS a committed baseline — and the coverage listing in
-    // docs/android-visual-regression.md must match both. The
-    // Current light set: 135 standard-width stories (111 light_warmHarvest + 22
-    // light_quietDawn on disk minus the 3 Reading-screen stories the capture app
-    // excludes, ReadingView replicating Memorize's reading screen and landing in
-    // B4; the #168 DiscoverPage/DiscoveryCard baselines joined through merges
-    // after the #169 +11 / #170 +2 page growth, and #171 added the
-    // LandingPage story (+1 standard)). (Component stories are not
-    // in the capture set — STANDARD_PREFIXES covers Pages only; the
-    // #119 tranches' component stories are Chromatic-covered.)
-    const EXPECTED_LIGHT_STORY_COUNT = 135;
-    // the standard set grew by the eight B3a recipe-form stories,
-    // #124, the sixteen B3b meals/shopping stories, #125, the
-    // twenty-three B3c account/auth stories, #126, the three
-    // B4 Memorize settings stories, #127, and the TagsPage
-    // inline-edit story, eciperay#254; #185 then retired the
-    // RecipesBrowse/SharedWithMe demos and the four
-    // SharedWithMePage stories (−6 standard) and added the four
-    // Shared* RecipesPage stories (+4 standard, +4 narrow — every
-    // RecipesPage story carries the narrow variant), and #242
-    // added the VerseSearchPage added-state story (+1 standard),
-    // and #255 added the four auth pages' Loading stories
-    // (+4 standard) and #254 added the ImportUrlPage
-    // Interactive story (+1 standard), #169 added the eight
-    // PublicRecipePage stories and three PublicPageFrame stories
-    // (+11 standard), #170 added the two LegalDocumentPage
-    // stories (+2 standard), and #168 added the eight
-    // DiscoverPage stories (+8 standard), and #292 added the
-    // RecipesPage LoadingMore story (+1 standard, +1 narrow —
-    // every RecipesPage story carries the narrow variant), and
-    // #311 added the LandingPage and LegalDocumentPage Wide
-    // stories (+2 standard — the wide-viewport manual-QA stories)
-    // and #310 added the ImportReviewPage WithImage story
-    // (+1 standard — the hero-banner re-check needs an
-    // image-bearing story), and #332 added the
-    // MealCookingModePage LongBody story (+1 standard — the
-    // tall-body scroll case for StepOverlay), and #357 added the
-    // RecipeDetailPage CreateDraft story (+1 standard — the
-    // create-a-draft callback case), and #374 added the
-    // TagsPage FailingSaves story (+1 standard — the
-    // create/edit/delete error-surface case), and eciperay#338
-    // added the MealCookingModePage LoadError story (+1 standard
-    // — the cook-plan load-error surface) — their baselines
-    // are generated by the pipeline's auto-commit flow).
-    const scope = computeScope({ repoRoot, changedFiles: [], forceFull: true });
-    assert.equal(scope.standard.length, EXPECTED_LIGHT_STORY_COUNT);
-    assert.equal(scope.narrow.length, 12);
-    const baselineRoot = join(repoRoot, "tools/visualRegression/baselines");
-    const baselineFiles = readBaselineFiles(baselineRoot);
-    assertBaselinesMatchScope(scope, baselineFiles);
-    assert.ok(existsSync(baselineRoot));
+test("real repo: derived capture set matches the committed baselines", () => {
+  // Completeness gate (issue #128): the mapper's story inventory
+  // and the committed baselines must agree in BOTH directions —
+  // every baseline derivable (checked everywhere), and every
+  // derivable in-scope story HAS a committed baseline, with the
+  // coverage listing in docs/android-visual-regression.md
+  // matching both (those two checked on the release PR only —
+  // see the gate comment above). The
+  // Current light set: 135 standard-width stories (111 light_warmHarvest + 22
+  // light_quietDawn on disk minus the 3 Reading-screen stories the capture app
+  // excludes, ReadingView replicating Memorize's reading screen and landing in
+  // B4; the #168 DiscoverPage/DiscoveryCard baselines joined through merges
+  // after the #169 +11 / #170 +2 page growth, and #171 added the
+  // LandingPage story (+1 standard)). (Component stories are not
+  // in the capture set — STANDARD_PREFIXES covers Pages only; the
+  // #119 tranches' component stories are Chromatic-covered.)
+  const EXPECTED_LIGHT_STORY_COUNT = 135;
+  // the standard set grew by the eight B3a recipe-form stories,
+  // #124, the sixteen B3b meals/shopping stories, #125, the
+  // twenty-three B3c account/auth stories, #126, the three
+  // B4 Memorize settings stories, #127, and the TagsPage
+  // inline-edit story, eciperay#254; #185 then retired the
+  // RecipesBrowse/SharedWithMe demos and the four
+  // SharedWithMePage stories (−6 standard) and added the four
+  // Shared* RecipesPage stories (+4 standard, +4 narrow — every
+  // RecipesPage story carries the narrow variant), and #242
+  // added the VerseSearchPage added-state story (+1 standard),
+  // and #255 added the four auth pages' Loading stories
+  // (+4 standard) and #254 added the ImportUrlPage
+  // Interactive story (+1 standard), #169 added the eight
+  // PublicRecipePage stories and three PublicPageFrame stories
+  // (+11 standard), #170 added the two LegalDocumentPage
+  // stories (+2 standard), and #168 added the eight
+  // DiscoverPage stories (+8 standard), and #292 added the
+  // RecipesPage LoadingMore story (+1 standard, +1 narrow —
+  // every RecipesPage story carries the narrow variant), and
+  // #311 added the LandingPage and LegalDocumentPage Wide
+  // stories (+2 standard — the wide-viewport manual-QA stories)
+  // and #310 added the ImportReviewPage WithImage story
+  // (+1 standard — the hero-banner re-check needs an
+  // image-bearing story), and #332 added the
+  // MealCookingModePage LongBody story (+1 standard — the
+  // tall-body scroll case for StepOverlay), and #357 added the
+  // RecipeDetailPage CreateDraft story (+1 standard — the
+  // create-a-draft callback case), and #374 added the
+  // TagsPage FailingSaves story (+1 standard — the
+  // create/edit/delete error-surface case), and eciperay#338
+  // added the MealCookingModePage LoadError story (+1 standard
+  // — the cook-plan load-error surface) — their baselines
+  // are generated by the pipeline's auto-commit flow).
+  const scope = computeScope({ repoRoot, changedFiles: [], forceFull: true });
+  assert.equal(scope.standard.length, EXPECTED_LIGHT_STORY_COUNT);
+  assert.equal(scope.narrow.length, 12);
+  const baselineRoot = join(repoRoot, "tools/visualRegression/baselines");
+  const baselineFiles = readBaselineFiles(baselineRoot);
+  assertBaselinesDerivable(scope, baselineFiles);
+  assert.ok(existsSync(baselineRoot));
+  if (enforceBaselineGate) {
+    assertScopeCoveredByBaselines(scope, baselineFiles);
     const docs = readFileSync(join(repoRoot, "docs/android-visual-regression.md"), "utf8");
     assert.equal(
       docs,
       generateCoverageDocs(repoRoot, docs),
       "docs coverage listing matches the generated table (run tools/visualRegression/coverageListing.mjs)",
     );
-  },
-);
+  }
+});

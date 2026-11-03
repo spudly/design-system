@@ -14,10 +14,14 @@
 # expensive jobs (visual-regression and the baseline-commit jobs)
 # run on pull requests ONLY when the head branch is a changesets
 # release branch (changeset-release/*, i.e. the Version Packages
-# PR). Ordinary PRs no longer run native VR at all — native
-# rendering changes surface, and baselines update, on the release
-# PR instead. The pull_request trigger therefore carries no paths
-# filter: a release PR's diff is manifests and changelogs only,
+# PR). Ordinary PRs no longer run those jobs — native rendering
+# changes surface, and baselines update, on the release PR
+# instead. One exception: the sanity job (below) is NOT part of
+# this gating — it still runs on any PR carrying the
+# `android-sanity` label, as an explicit opt-in, and on
+# workflow_dispatch runs with mode=sanity. The pull_request
+# trigger therefore carries no paths filter: a release PR's
+# diff is manifests and changelogs only,
 # which the old path filter (src/**, apps/storybook/**,
 # tools/visualRegression/**) would have excluded, so gating lives
 # in the jobs' `if:` conditions. The push-to-main trigger is gone
