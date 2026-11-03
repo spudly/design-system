@@ -351,10 +351,17 @@ device.
 ## Baselines: generating and updating
 
 Baselines are created by the CI job, never by hand-editing images.
-On a pull request the whole cycle is automatic (Stephen's
-directive, 2026-10-23 — no manual dispatch):
+On a release pull request the whole cycle is automatic (Stephen's
+directive, 2026-10-23 — no manual dispatch). Since 2026-11-02
+(Stephen's directive) the automatic PR cycle runs ONLY on release
+PRs — PRs whose head branch is a changesets release branch
+(`changeset-release/*`, i.e. the Version Packages PR). Ordinary
+PRs do not run native VR at all: rendering changes and baseline
+updates surface on the release PR instead. To regenerate baselines
+from an ordinary PR branch before then, use the manual
+mode = `update` dispatch (point 3).
 
-1. **PRs: automatic.** The PR compare run (`capture-compare.sh`,
+1. **Release PRs: automatic.** The PR compare run (`capture-compare.sh`,
    mode `pr-autocommit`) starts with the ordinary strict compare
    of both capture sets (standard + narrow variant). If every
    story matches and every story has a baseline, nothing else
@@ -397,14 +404,14 @@ directive, 2026-10-23 — no manual dispatch):
    compare — the driver captures the story, warns `WARN … no
 baseline yet` and skips it (a BOOTSTRAP note when nothing at all
    was compared), so a story that crashes the app still fails the
-   job before it has a baseline. On a PR that bootstrap state is
-   not terminal: it triggers the same guarded regeneration as a
-   pixel diff (point 1), so the new story's baseline is committed
-   to the PR branch by the auto-commit flow. (Before issue #128
-   it did not — regeneration was entered only on a failed compare,
-   so the B3a–B4 page stories bootstrap-passed with no baselines
-   ever landing. Compare-only runs — main pushes, dispatched
-   compares — still just warn.)
+   job before it has a baseline. On a release PR that bootstrap
+   state is not terminal: it triggers the same guarded regeneration
+   as a pixel diff (point 1), so the new story's baseline is
+   committed to the PR branch by the auto-commit flow. (Before
+   issue #128 it did not — regeneration was entered only on a
+   failed compare, so the B3a–B4 page stories bootstrap-passed with
+   no baselines ever landing. Dispatched compare runs still just
+   warn.)
 3. **Regenerate deliberately**: dispatch the workflow
    (Actions → "React Native storybook VR" → Run workflow) with
    mode = `update`, **from the PR branch**. It captures everything
