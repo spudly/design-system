@@ -34,6 +34,9 @@
  *
  * Documented exceptions (not components/pages, so no stories):
  * - src/components/accessibility.ts — ARIA helper utilities.
+ * - src/components/modalRegistry.ts — the internal modal-layer
+ *   registry (#394); exercised through the Dialog/StepOverlay
+ *   stories.
  * - src/components/tagColors.ts — the shared tag-color resolver hook
  *   (#207); exercised through the Badge/ColorPickerField stories.
  * - src/components/PageFrame.tsx — internal page-story scaffolding
@@ -101,17 +104,20 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches })
 }
 
 // Internal helpers, not widgets: accessibility.ts / tagColors.ts
-// are prop/style translators, linkOverlay.tsx is the native-only
-// link layer other components compose, labelRow.tsx is the
-// shared label-row implementation LabeledField / LabeledGroup
-// compose, PageFrame.tsx is page-story scaffolding (the
-// demo stories' phone-width frame, relocated out of src/pages
-// for #119), and LoadingScope.tsx is the internal loading-state
-// context composites compose (#278) — none is a standalone component with a story of
-// its own, and none is exported from the components barrel.
+// are prop/style translators, modalRegistry.ts is the internal
+// modal-layer registry Dialog/StepOverlay register in (#394),
+// linkOverlay.tsx is the native-only link layer other components
+// compose, labelRow.tsx is the shared label-row implementation
+// LabeledField / LabeledGroup compose, PageFrame.tsx is page-story
+// scaffolding (the demo stories' phone-width frame, relocated out
+// of src/pages for #119), and LoadingScope.tsx is the internal
+// loading-state context composites compose (#278) — none is a
+// standalone component with a story of its own, and none is
+// exported from the components barrel.
 const COMPONENT_STORY_EXCEPTIONS = new Set([
   "accessibility.ts",
   "index.ts",
+  "modalRegistry.ts",
   "tagColors.ts",
   "linkOverlay.tsx",
   "labelRow.tsx",

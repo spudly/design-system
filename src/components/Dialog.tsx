@@ -1,8 +1,17 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Dialog as TamaguiDialog, XStack, YStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import {
+  ModalLayerContext,
+  isActiveModalLayer,
+  registerModalLayer,
+  registeredModalFrames,
+  registeredModalRoots,
+  unregisterModalLayer,
+} from "./modalRegistry.js";
+import type { ModalLayer } from "./modalRegistry.js";
 import { Text } from "./Text.js";
 
 const StyledOverlay = styled(TamaguiDialog.Overlay, {
@@ -21,22 +30,6 @@ const StyledContent = styled(TamaguiDialog.Content, {
   width: "90%",
   maxWidth: 400,
 });
-
-// Activation order of the currently open DS dialogs (web
-// containment, #391): portal frames mount in tree order, which
-// is not necessarily the order dialogs were opened in, so the
-// topmost-modal test cannot rely on document order alone among
-// DS dialogs themselves. Each open Dialog registers an entry
-// here for as long as it is open — its identity plus the portal
-// frame it renders into, so the document-order fallback for
-// foreign modals can recognize (and skip) DS frames; the last
-// registered entry is the topmost DS dialog.
-type OpenDialogEntry = {
-  token: symbol;
-  frame: Element | null;
-  content: Element | null;
-};
-const openDialogStack: OpenDialogEntry[] = [];
 
 export type DialogProps = {
   open: boolean;
@@ -96,33 +89,48 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const reassertRafRef = useRef<number | null>(null);
   const unmountRestoreRef = useRef(false);
   const blurredTargetRef = useRef<HTMLElement | null>(null);
-  const stackEntryRef = useRef<OpenDialogEntry>({
-    token: Symbol("dialog"),
-    frame: null,
-    content: null,
-  });
-  // The modal layer this dialog was opened FROM, if any (the
-  // layer holding the tracked opener at the open transition) —
+  // This dialog's identity and ancestry in the modal registry
+  // (#394, see modalRegistry.ts): the token is stable for the
+  // component's lifetime so layers composed inside this
+  // dialog's children can record it as their parent layer;
+  // the parent token is the layer this dialog was itself
+  // composed inside, if any. The registered layer (while open)
+  // lives in layerRef.
+  const [layerToken] = useState(() => Symbol("dialogLayer"));
+  const parentLayerToken = useContext(ModalLayerContext);
+  const layerRef = useRef<ModalLayer | null>(null);
+  // The modal layer this dialog was opened FROM, if the opener
+  // sat inside an aria-modal element at the open transition —
   // the foreign-modal stand-down in the containment handler
   // must never stand down for it: this dialog is the active
   // layer above its host, even though its content is portalled
-  // outside the host's subtree (Copilot review on PR #392,
-  // head 646fe94).
+  // outside the host's subtree, so focus sitting in the host
+  // (the state right after opening a text-only dialog from a
+  // host control, when the primitive's autofocus has nowhere
+  // to land) must not cost it containment (Copilot review on
+  // PR #392, head 646fe94). A DS host is ALSO exempt through
+  // its registered root (modalRegistry.ts); a foreign host has
+  // no registry record, so this opener record is its only
+  // signal — the registry round of #394 dropped it and
+  // CodeRabbit review on PR #398 restored it for foreign
+  // hosts.
   const hostModalRef = useRef<Element | null>(null);
   // The content ref is a callback, not an object ref: when an
   // initially open dialog hydrates, Tamagui's Portal mounts the
   // content in a later update than the open-transition effects,
-  // so an effect-time read can store a null frame/content in
-  // the stack entry that nothing later repairs. The callback
-  // re-syncs the entry at attach time, whenever that happens
+  // so an effect-time read can store a null frame/root in the
+  // registry layer that nothing later repairs. The callback
+  // re-syncs the layer at attach time, whenever that happens
   // (CodeRabbit review on PR #392, head 646fe94).
   const setContentRef = useCallback((node: TamaguiElement | null) => {
     contentRef.current = node;
     const content = node as unknown as HTMLElement | null;
-    const entry = stackEntryRef.current;
-    entry.frame =
-      content && typeof content.closest === "function" ? content.closest("dialog") : null;
-    entry.content = content;
+    const layer = layerRef.current;
+    if (layer) {
+      layer.frame =
+        content && typeof content.closest === "function" ? content.closest("dialog") : null;
+      layer.root = content;
+    }
   }, []);
 
   // Restore helper: focus the tracked element if it is still in the
@@ -410,27 +418,29 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     };
   }, []);
 
-  // Register in the open-dialog stack while open (see
-  // openDialogStack above). The cleanup removes exactly this
-  // registration, so a StrictMode replay (cleanup + setup) nets
-  // a single entry.
+  // Register this dialog's layer in the modal registry while
+  // open (#394, see modalRegistry.ts): the registry — not
+  // registration order, not the focused element — arbitrates
+  // which presented layer is the active one. The cleanup
+  // removes exactly this registration, so a StrictMode replay
+  // (cleanup + setup) nets a single layer.
   useEffect(() => {
     if (!open || !isWeb) {
       return;
     }
-    const entry = stackEntryRef.current;
+    const layer = registerModalLayer(layerToken, parentLayerToken);
+    layerRef.current = layer;
     const content = contentRef.current as unknown as HTMLElement | null;
-    entry.frame =
+    layer.frame =
       content && typeof content.closest === "function" ? content.closest("dialog") : null;
-    entry.content = content;
-    openDialogStack.push(entry);
+    layer.root = content;
     return () => {
-      const index = openDialogStack.indexOf(entry);
-      if (index >= 0) {
-        openDialogStack.splice(index, 1);
+      unregisterModalLayer(layer);
+      if (layerRef.current === layer) {
+        layerRef.current = null;
       }
     };
-  }, [open]);
+  }, [open, parentLayerToken]);
 
   // Focus containment for a dialog with nothing tabbable (#391):
   // the primitive's focus scope traps Tab between the dialog's
@@ -465,9 +475,9 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // rendered (the area itself has no layout box). (2) Only
   // the topmost modal intercepts — a covered dialog's listener
   // must not swallow Tab for the dialog above it. Among DS
-  // dialogs, covered is decided by the open-dialog stack's
-  // activation order (frames mount in tree order, not open
-  // order); for foreign frames it means a LATER, still-modal
+  // dialogs, covered is decided by the modal registry (#394):
+  // recorded presentation ancestry and order, never the
+  // focused element; for foreign frames it means a LATER, still-modal
   // frame (aria-modal or the :modal state — a merely open,
   // modeless dialog covers nothing — and actually rendered): a closed
   // dialog element parked later in the document — or nested
@@ -484,13 +494,16 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // contenteditable="false" region, only a details' FIRST
   // summary child is a native stop, and an image map counts
   // only when its image is actually visible, not merely laid
-  // out (Copilot review on PR #392, head 3bbf165). (5) A
-  // foreign modal layer that currently holds focus (a
-  // role="dialog" aria-modal shell such as StepOverlay, which
-  // is not a native <dialog> element) is the active layer —
-  // this listener stands down for it instead of pulling focus
-  // back into the covered dialog (Copilot review on PR #392,
-  // head f32fd7d). (6) An ARIA-only foreign modal frame that is
+  // out (Copilot review on PR #392, head 3bbf165). (5) A DS
+  // modal layer presented above this dialog (a nested Dialog,
+  // a covering StepOverlay) is the active layer — this
+  // listener stands down for it instead of pulling focus back
+  // into the covered dialog. The modal registry's arbitration
+  // (#394) decides it for DS layers; the focus-keyed stand-down
+  // added at Copilot review on PR #392, head f32fd7d survives
+  // only for FOREIGN aria-modal elements (host-built modals
+  // with no registry record), with DS layers exempt through
+  // their registered roots. (6) An ARIA-only foreign modal frame that is
   // invisible does not cover (native :modal frames keep the
   // old behavior), an explicitly editable details element is
   // a stop even with a summary child, and a summary outside a
@@ -508,32 +521,49 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (!content || typeof content.querySelectorAll !== "function") {
         return;
       }
-      const ownEntry = stackEntryRef.current;
-      const stackIndex = openDialogStack.indexOf(ownEntry);
-      if (stackIndex >= 0 && stackIndex < openDialogStack.length - 1) {
+      // A covered dialog stands down: the modal registry
+      // (#394) decides which presented DS layer is active from
+      // recorded presentation — ancestry and presentation
+      // order — never from the focused element. This subsumes
+      // the arbitrations this handler used to make between DS
+      // layers on its own: the open-dialog stack's registration
+      // order (which inverted simultaneously-open nested
+      // dialogs) and the focus-keyed stand-down as it applied
+      // to StepOverlay (which misjudged both a Dialog mounted
+      // inside a new StepOverlay and a covering StepOverlay
+      // while focus rested on the body). StepOverlay registers
+      // in the same registry, so DS layers are all arbitrated
+      // here. What the registry cannot see stays below: the
+      // focus-keyed stand-down for a FOREIGN aria-modal
+      // element, and the frame scan for foreign native
+      // <dialog> modals.
+      const ownLayer = layerRef.current;
+      if (ownLayer && !isActiveModalLayer(ownLayer)) {
         return;
       }
       const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
-      ownEntry.frame = frame;
-      ownEntry.content = content;
-      // A foreign modal layer that currently holds focus is the
-      // active layer, whatever this dialog's state: a non-DS
-      // modal such as StepOverlay (a role="dialog" aria-modal
-      // shell, not a native <dialog> element — the frame scan
-      // below cannot see it) mounted over this dialog moves
-      // focus into itself on mount, and this listener must not
-      // pull that focus back into the covered dialog (Copilot
-      // review on PR #392, head f32fd7d). DS dialogs are exempt
-      // — the stack order above already arbitrates between
-      // them — as is a layer that merely CONTAINS this dialog
-      // (this dialog is then the top layer inside it), and the
-      // host layer this dialog was opened FROM (hostModalRef):
-      // focus sitting in the host — the state right after
-      // opening a text-only dialog from an overlay control, or
-      // after a programmatic return to it — means this dialog
-      // is still the active layer above it, because the dialog
-      // content is portalled outside the host's subtree
-      // (Copilot review on PR #392, head 646fe94).
+      if (ownLayer) {
+        ownLayer.frame = frame;
+        ownLayer.root = content;
+      }
+      // A FOREIGN modal layer that currently holds focus is
+      // the active layer, whatever this dialog's state: a
+      // host-built role="dialog" aria-modal element (not a DS
+      // layer, so the registry has no record of it, and not a
+      // native <dialog> element, so the frame scan below
+      // cannot see it) mounted over this dialog holds the
+      // user's Tab, and this listener must not pull that focus
+      // back into the covered dialog (Copilot review on
+      // PR #392, head f32fd7d; retained for foreign modals at
+      // CodeRabbit review on PR #398). DS layers are exempt —
+      // the registry above arbitrates them, and their roots
+      // are recognized through the registry. The host layer
+      // this dialog was opened FROM is exempt too (hostModalRef,
+      // recorded at the open transition): a DS host via its
+      // registered root, a foreign host via the record — focus
+      // sitting in the host never stands this dialog down.
+      // Layers that merely contain this dialog (or are
+      // contained by it) are likewise not foreign covers.
       const focusedElement = document.activeElement as HTMLElement | null;
       if (
         focusedElement &&
@@ -548,15 +578,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           foreignModal !== hostModalRef.current &&
           !foreignModal.contains(content) &&
           !content.contains(foreignModal) &&
-          !openDialogStack.some((entry) => entry.content === foreignModal)
+          !registeredModalRoots().has(foreignModal)
         ) {
           return;
         }
       }
       if (frame) {
-        const dsFrames = new Set(
-          openDialogStack.map((entry) => entry.frame).filter((entryFrame) => entryFrame !== null),
-        );
+        const dsFrames = registeredModalFrames();
         const covered = Array.from(document.querySelectorAll("dialog")).some((other) => {
           if (other === frame || frame.contains(other) || dsFrames.has(other)) {
             return false;
@@ -761,8 +789,9 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       }
       blurredTargetRef.current = null;
       // Record the host layer from the tracked opener (see
-      // hostModalRef above): the layer the opener sits in at
-      // this opening is the layer this dialog was opened from.
+      // hostModalRef above): the aria-modal element the opener
+      // sits in at this opening is the layer this dialog was
+      // opened from.
       const opener = restoreTargetRef.current;
       hostModalRef.current =
         opener && typeof opener.closest === "function"
@@ -814,32 +843,41 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   }, [restoreFocus]);
 
   return (
-    <TamaguiDialog open={open} onOpenChange={onOpenChange}>
-      <TamaguiDialog.Portal>
-        <StyledOverlay />
-        <StyledContent ref={setContentRef} {...(isWeb ? { tabIndex: -1 } : {})}>
-          <YStack gap={tokens.spacing[3]}>
-            <TamaguiDialog.Title
-              fontSize={tokens.typography.fontSize.xl}
-              fontWeight={tokens.typography.fontWeight.semibold}
-              color="$color"
-            >
-              {title}
-            </TamaguiDialog.Title>
-            {description ? (
-              <TamaguiDialog.Description>
-                <Text variant="hint">{description}</Text>
-              </TamaguiDialog.Description>
-            ) : null}
-            <YStack>{children}</YStack>
-            {actions ? (
-              <XStack gap={tokens.spacing[2]} justifyContent="flex-end">
-                {actions}
-              </XStack>
-            ) : null}
-          </YStack>
-        </StyledContent>
-      </TamaguiDialog.Portal>
-    </TamaguiDialog>
+    // Provide this dialog's layer token to its children: a DS
+    // modal layer composed inside the dialog (a nested Dialog,
+    // a StepOverlay) records it as its parent layer, which is
+    // what arbitrates it above this dialog however the two
+    // mount (modalRegistry.ts, #394). React context reaches
+    // the nested layer through Tamagui's portal even though
+    // the DOM does not nest.
+    <ModalLayerContext.Provider value={layerToken}>
+      <TamaguiDialog open={open} onOpenChange={onOpenChange}>
+        <TamaguiDialog.Portal>
+          <StyledOverlay />
+          <StyledContent ref={setContentRef} {...(isWeb ? { tabIndex: -1 } : {})}>
+            <YStack gap={tokens.spacing[3]}>
+              <TamaguiDialog.Title
+                fontSize={tokens.typography.fontSize.xl}
+                fontWeight={tokens.typography.fontWeight.semibold}
+                color="$color"
+              >
+                {title}
+              </TamaguiDialog.Title>
+              {description ? (
+                <TamaguiDialog.Description>
+                  <Text variant="hint">{description}</Text>
+                </TamaguiDialog.Description>
+              ) : null}
+              <YStack>{children}</YStack>
+              {actions ? (
+                <XStack gap={tokens.spacing[2]} justifyContent="flex-end">
+                  {actions}
+                </XStack>
+              ) : null}
+            </YStack>
+          </StyledContent>
+        </TamaguiDialog.Portal>
+      </TamaguiDialog>
+    </ModalLayerContext.Provider>
   );
 }

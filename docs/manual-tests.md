@@ -51,7 +51,8 @@ from the components with the most review churn first (design-system
 
 ## Dialog
 
-Open in `Components/Dialog`: Interactive, WithoutActions.
+Open in `Components/Dialog`: Interactive, WithoutActions,
+NestedDialogs.
 
 1. Interactive: the "Delete recipe" button opens the dialog with
    its title, description, body text, and Cancel / Delete actions
@@ -65,6 +66,13 @@ Open in `Components/Dialog`: Interactive, WithoutActions.
 3. WithoutActions: the "About" button opens a dialog with no
    footer row; dismissing it likewise returns focus to the
    "About" button.
+4. NestedDialogs (web, #394): both dialogs start open, the
+   nested one on top of its parent. Tab and Shift+Tab cycle
+   only between the nested dialog's Keep draft / Discard
+   buttons — focus never lands in the parent dialog (which
+   has no controls of its own) or on the "Open nested
+   dialogs" button behind the overlays. Dismiss the nested
+   dialog (Keep draft) and the parent dialog remains open.
 
 **Run when:** `src/components/Dialog.tsx`, its stories, or a
 changeset naming Dialog.
