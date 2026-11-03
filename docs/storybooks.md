@@ -74,7 +74,7 @@ their own.
 Every widget component exported from `src/components/index.ts` and
 every page component exported from `src/pages/index.ts` must have
 stories — and therefore appears in both storybooks. Parity is
-enforced by `test/storybookParity.test.mjs` (run by `npm test` and
+enforced by `test/storybookParity.test.ts` (run by `npm test` and
 CI), which fails when:
 
 - a widget or page module has no sibling `.stories.tsx`, or its title

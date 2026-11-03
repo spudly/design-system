@@ -21,6 +21,7 @@ export default [
   {
     ignores: [
       "**/dist/**",
+      "**/test-dist/**",
       "**/node_modules/**",
       "**/.turbo/**",
       "**/.expo/**",
