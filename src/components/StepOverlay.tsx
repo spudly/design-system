@@ -1,9 +1,16 @@
-import { useEffect, useRef } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { ScrollView, YStack, isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { dialogRoleProps, platformAccessibilityProps } from "./accessibility.js";
+import {
+  ModalLayerContext,
+  isActiveModalLayer,
+  registerModalLayer,
+  unregisterModalLayer,
+} from "./modalRegistry.js";
+import type { ModalLayer } from "./modalRegistry.js";
 import { Text } from "./Text.js";
 
 export type StepOverlayProps = {
@@ -96,6 +103,40 @@ export function StepOverlay({
   children,
 }: StepOverlayProps) {
   const shellRef = useRef<TamaguiElement>(null);
+  // This overlay's identity and ancestry in the modal
+  // registry (#394, see modalRegistry.ts): the token is stable
+  // for the component's lifetime so layers composed inside
+  // the overlay record it as their parent layer; the parent
+  // token is the layer this overlay was itself composed
+  // inside, if any. The registered layer (while mounted) lives
+  // in layerRef.
+  const [layerToken] = useState(() => Symbol("stepOverlayLayer"));
+  const parentLayerToken = useContext(ModalLayerContext);
+  const layerRef = useRef<ModalLayer | null>(null);
+
+  // Register the shell as a modal layer while mounted (#394):
+  // the registry arbitrates this overlay against Dialog layers
+  // presented with it — a Dialog composed inside the overlay
+  // is the active layer above it, and an overlay mounted over
+  // an already-open Dialog is the active layer above that —
+  // from recorded presentation, never from the focused
+  // element (this replaces the focus-keyed stand-down Dialog
+  // used to apply to this shell). The Tab wrap below stands
+  // down while a layer above this one is active.
+  useEffect(() => {
+    if (!isWeb) {
+      return;
+    }
+    const layer = registerModalLayer(parentLayerToken);
+    layerRef.current = layer;
+    layer.root = shellRef.current as unknown as Element | null;
+    return () => {
+      unregisterModalLayer(layer);
+      if (layerRef.current === layer) {
+        layerRef.current = null;
+      }
+    };
+  }, [parentLayerToken]);
 
   // The mount focus move (web): the shell is focusable without
   // being a tab stop (tabIndex={-1} below), and focus lands on
@@ -130,6 +171,16 @@ export function StepOverlay({
     preventDefault: () => void;
   }) => {
     if (!isWeb || event.key !== "Tab") {
+      return;
+    }
+    // A covered overlay does not wrap Tab (#394): while a DS
+    // layer above this one is the active layer (a Dialog
+    // composed inside the overlay, say), the key belongs to
+    // that layer — wrapping here would cycle focus inside the
+    // covered overlay instead of letting the active layer's
+    // containment govern.
+    const ownLayer = layerRef.current;
+    if (ownLayer && !isActiveModalLayer(ownLayer)) {
       return;
     }
     const node = shellRef.current as unknown as HTMLElement | null;
@@ -184,89 +235,95 @@ export function StepOverlay({
     }
   };
   return (
-    <YStack
-      ref={shellRef}
-      position="absolute"
-      top={0}
-      left={0}
-      right={0}
-      bottom={0}
-      backgroundColor={tokens.colors.gray.gray10}
-      tabIndex={-1}
-      onKeyDown={handleShellKeyDown}
-      {...dialogRoleProps}
-      {...platformAccessibilityProps({ accessibilityLabel: title })}
-    >
-      <ScrollView
-        flex={1}
-        keyboardShouldPersistTaps="handled"
-        contentContainerStyle={scrollContentContainerStyle}
-      >
-        <YStack paddingHorizontal="$6" paddingVertical="$12">
-          <YStack paddingBlockEnd="$2">
-            <Text
-              fontSize={tokens.typography.fontSize.sm}
-              letterSpacing={1.4}
-              color="$surface"
-              opacity={0.6}
-              textTransform="uppercase"
-            >
-              {title}
-            </Text>
-          </YStack>
-          <YStack paddingBlockEnd="$4">
-            <Text
-              fontSize={tokens.typography.fontSize.sm}
-              letterSpacing={1.4}
-              color="$surface"
-              opacity={0.6}
-              textTransform="uppercase"
-            >
-              {stepLabel}
-            </Text>
-          </YStack>
-          <YStack paddingBlockEnd="$8">
-            <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
-              {body}
-            </Text>
-          </YStack>
-          {children}
-        </YStack>
-      </ScrollView>
+    // Provide this overlay's layer token to its children: a DS
+    // modal layer composed inside the overlay (a Dialog, say)
+    // records it as its parent layer, which is what arbitrates
+    // it above this overlay (modalRegistry.ts, #394).
+    <ModalLayerContext.Provider value={layerToken}>
       <YStack
+        ref={shellRef}
         position="absolute"
-        right={tokens.spacing[6]}
-        top={tokens.spacing[12]}
-        borderRadius={tokens.radii.full}
-        overflow="hidden"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
         backgroundColor={tokens.colors.gray.gray10}
-        {...platformAccessibilityProps({
-          accessibilityRole: "button",
-          accessibilityLabel: doneLabel,
-        })}
-        onPress={onDone}
-        tabIndex={0}
-        onKeyDown={handleDoneKeyDown}
-        cursor="web:pointer"
+        tabIndex={-1}
+        onKeyDown={handleShellKeyDown}
+        {...dialogRoleProps}
+        {...platformAccessibilityProps({ accessibilityLabel: title })}
       >
+        <ScrollView
+          flex={1}
+          keyboardShouldPersistTaps="handled"
+          contentContainerStyle={scrollContentContainerStyle}
+        >
+          <YStack paddingHorizontal="$6" paddingVertical="$12">
+            <YStack paddingBlockEnd="$2">
+              <Text
+                fontSize={tokens.typography.fontSize.sm}
+                letterSpacing={1.4}
+                color="$surface"
+                opacity={0.6}
+                textTransform="uppercase"
+              >
+                {title}
+              </Text>
+            </YStack>
+            <YStack paddingBlockEnd="$4">
+              <Text
+                fontSize={tokens.typography.fontSize.sm}
+                letterSpacing={1.4}
+                color="$surface"
+                opacity={0.6}
+                textTransform="uppercase"
+              >
+                {stepLabel}
+              </Text>
+            </YStack>
+            <YStack paddingBlockEnd="$8">
+              <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
+                {body}
+              </Text>
+            </YStack>
+            {children}
+          </YStack>
+        </ScrollView>
         <YStack
           position="absolute"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          backgroundColor="$surface"
-          opacity={0.1}
-        />
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          color="$surface"
-          paddingHorizontal="$4"
-          paddingVertical="$2"
+          right={tokens.spacing[6]}
+          top={tokens.spacing[12]}
+          borderRadius={tokens.radii.full}
+          overflow="hidden"
+          backgroundColor={tokens.colors.gray.gray10}
+          {...platformAccessibilityProps({
+            accessibilityRole: "button",
+            accessibilityLabel: doneLabel,
+          })}
+          onPress={onDone}
+          tabIndex={0}
+          onKeyDown={handleDoneKeyDown}
+          cursor="web:pointer"
         >
-          {doneLabel}
-        </Text>
+          <YStack
+            position="absolute"
+            top={0}
+            left={0}
+            right={0}
+            bottom={0}
+            backgroundColor="$surface"
+            opacity={0.1}
+          />
+          <Text
+            fontSize={tokens.typography.fontSize.sm}
+            color="$surface"
+            paddingHorizontal="$4"
+            paddingVertical="$2"
+          >
+            {doneLabel}
+          </Text>
+        </YStack>
       </YStack>
-    </YStack>
+    </ModalLayerContext.Provider>
   );
 }
