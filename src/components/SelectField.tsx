@@ -119,7 +119,11 @@ export function SelectField({
         </StyledTrigger>
 
         <Adapt platform="touch">
-          <Sheet modal dismissOnSnapToBottom>
+          <Sheet
+            modal
+            dismissOnSnapToBottom
+            aria-label={label?.trim() ? label : "Select an option"}
+          >
             <Sheet.Overlay />
             <Sheet.ScrollView>
               <Adapt.Contents />
