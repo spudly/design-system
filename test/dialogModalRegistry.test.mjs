@@ -80,20 +80,103 @@ test("unrelated layers stack in presentation order — focus is never consulted 
 });
 
 test("Dialog registers while open and provides its layer token to its children (#394)", () => {
-  assert.match(dialog, /registerModalLayer\(parentLayerToken\)/);
+  // The registration carries the component's OWN layerToken —
+  // the symbol it provides to descendants — so a nested layer
+  // recording that token as its parent resolves to this layer
+  // (CodeRabbit review on PR #398: a registration minting its
+  // own symbol leaves ancestry unresolvable).
+  assert.match(dialog, /registerModalLayer\(layerToken, parentLayerToken\)/);
   assert.match(dialog, /unregisterModalLayer\(layer\)/);
   assert.match(dialog, /useContext\(ModalLayerContext\)/);
   assert.match(dialog, /<ModalLayerContext\.Provider value=\{layerToken\}>/);
 });
 
 test("StepOverlay registers in the same registry and its Tab wrap stands down while covered (#394)", () => {
-  assert.match(overlay, /registerModalLayer\(parentLayerToken\)/);
+  assert.match(overlay, /registerModalLayer\(layerToken, parentLayerToken\)/);
   assert.match(overlay, /unregisterModalLayer\(layer\)/);
   assert.match(overlay, /<ModalLayerContext\.Provider value=\{layerToken\}>/);
   assert.match(overlay, /if \(ownLayer && !isActiveModalLayer\(ownLayer\)\) \{\s+return;\s+\}/);
+  // …and the active overlay also contains Tab pressed from
+  // OUTSIDE its shell (focus on the body) — the shell wrap
+  // alone never sees that key (CodeRabbit review on PR #398).
+  assert.match(overlay, /document\.addEventListener\("keydown", handleOutsideTab, true\);/);
+  assert.match(overlay, /document\.removeEventListener\("keydown", handleOutsideTab, true\);/);
+  assert.match(overlay, /if \(active && node\.contains\(active\)\) \{\s+return;\s+\}/);
 });
 
 test("the foreign-frame scan skips the frames the registry already arbitrates (#394)", () => {
   assert.match(registry, /export function registeredModalFrames\(\): Set<Element> \{/);
   assert.match(dialog, /const dsFrames = registeredModalFrames\(\);/);
+  // DS layer roots are likewise reported, so Dialog's retained
+  // stand-down for foreign aria-modal elements can exempt DS
+  // layers without an opener-derived host record.
+  assert.match(registry, /export function registeredModalRoots\(\): Set<Element> \{/);
+  assert.match(dialog, /!registeredModalRoots\(\)\.has\(foreignModal\)/);
+});
+
+// Behavioral pins against the built registry module: the
+// source pins above hold the shape, these hold the arbitration
+// itself — the token-identity break CodeRabbit caught on
+// PR #398 (registrations minting their own symbols) passes
+// every source pin and fails here.
+test("registry behavior: simultaneously-open nested layers — the inner layer is active (#394 case 1)", async () => {
+  const registry = await import("../dist/components/modalRegistry.js");
+  const parentToken = Symbol("parent");
+  const childToken = Symbol("child");
+  // Child effects run before parent effects on a simultaneous
+  // mount, so the child registers FIRST; ancestry must still
+  // put it above the parent.
+  const child = registry.registerModalLayer(childToken, parentToken);
+  const parent = registry.registerModalLayer(parentToken, null);
+  try {
+    assert.equal(registry.isActiveModalLayer(child), true);
+    assert.equal(registry.isActiveModalLayer(parent), false);
+  } finally {
+    registry.unregisterModalLayer(child);
+    registry.unregisterModalLayer(parent);
+  }
+  // Registered in the opposite order (the child opened after
+  // the parent), the child is still the active layer.
+  const parent2 = registry.registerModalLayer(parentToken, null);
+  const child2 = registry.registerModalLayer(childToken, parentToken);
+  try {
+    assert.equal(registry.isActiveModalLayer(child2), true);
+    assert.equal(registry.isActiveModalLayer(parent2), false);
+    // Once the child layer goes away, the parent is active again.
+    registry.unregisterModalLayer(child2);
+    assert.equal(registry.isActiveModalLayer(parent2), true);
+  } finally {
+    registry.unregisterModalLayer(child2);
+    registry.unregisterModalLayer(parent2);
+  }
+});
+
+test("registry behavior: a Dialog inside a StepOverlay is above it; a covering StepOverlay is above a Dialog (#394 cases A and B)", async () => {
+  const registry = await import("../dist/components/modalRegistry.js");
+  const overlayToken = Symbol("overlay");
+  const dialogToken = Symbol("dialog");
+  // Case A: the Dialog is composed inside the overlay and
+  // registers before the overlay's own registration (child
+  // effects first) — ancestry puts the Dialog on top.
+  const dialog = registry.registerModalLayer(dialogToken, overlayToken);
+  const overlay = registry.registerModalLayer(overlayToken, null);
+  try {
+    assert.equal(registry.isActiveModalLayer(dialog), true);
+    assert.equal(registry.isActiveModalLayer(overlay), false);
+  } finally {
+    registry.unregisterModalLayer(dialog);
+    registry.unregisterModalLayer(overlay);
+  }
+  // Case B: an unrelated overlay presented after an open
+  // Dialog covers it — presentation order decides, wherever
+  // focus rests.
+  const dialog2 = registry.registerModalLayer(dialogToken, null);
+  const overlay2 = registry.registerModalLayer(overlayToken, null);
+  try {
+    assert.equal(registry.isActiveModalLayer(overlay2), true);
+    assert.equal(registry.isActiveModalLayer(dialog2), false);
+  } finally {
+    registry.unregisterModalLayer(dialog2);
+    registry.unregisterModalLayer(overlay2);
+  }
 });

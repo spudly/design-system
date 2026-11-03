@@ -94,6 +94,24 @@ const scrollContentContainerStyle = { flexGrow: 1, justifyContent: "center" } as
  * step-by-step reader — a guided flow, a workout — composes
  * the same shell with its own navigation.
  */
+
+// The shell's effective Tab stops, shared by the shell wrap
+// and the outside-Tab containment (#394): the selector also
+// matches elements that carry a negative tabIndex (a link
+// with tabIndex={-1}), which Tab always skips — counting one
+// as the first or last stop would break the wrap.
+function shellTabbables(node: HTMLElement): HTMLElement[] {
+  return Array.from(
+    node.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
+    ),
+  ).filter(
+    (element) =>
+      element.tabIndex >= 0 &&
+      (element.offsetParent !== null || element === document.activeElement),
+  );
+}
+
 export function StepOverlay({
   title,
   stepLabel,
@@ -127,7 +145,7 @@ export function StepOverlay({
     if (!isWeb) {
       return;
     }
-    const layer = registerModalLayer(parentLayerToken);
+    const layer = registerModalLayer(layerToken, parentLayerToken);
     layerRef.current = layer;
     layer.root = shellRef.current as unknown as Element | null;
     return () => {
@@ -187,19 +205,7 @@ export function StepOverlay({
     if (!node || typeof node.querySelectorAll !== "function") {
       return;
     }
-    const focusables = Array.from(
-      node.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex="0"]',
-      ),
-    ).filter(
-      (element) =>
-        // Effective tab stops only: the selector also matches
-        // elements that carry a negative tabIndex (a link with
-        // tabIndex={-1}), which Tab always skips — counting one
-        // as the first or last stop would break the wrap.
-        element.tabIndex >= 0 &&
-        (element.offsetParent !== null || element === document.activeElement),
-    );
+    const focusables = shellTabbables(node);
     const first = focusables[0];
     const last = focusables[focusables.length - 1];
     if (!first || !last) {
@@ -216,6 +222,54 @@ export function StepOverlay({
       first.focus();
     }
   };
+
+  // Tab containment from OUTSIDE the shell (web, #394
+  // sub-case B): the shell wrap above only sees Tab presses
+  // that begin inside the shell. When focus rests outside it —
+  // on the body, say, after the content under the overlay
+  // moved focus — Tab would walk into the covered page behind
+  // the overlay, and the covered Dialog's own containment now
+  // correctly stands down (the registry says this overlay is
+  // the active layer), so nothing else catches the key
+  // (CodeRabbit review on PR #398). While this overlay is the
+  // active layer, a document-level capture listener lands an
+  // outside Tab inside the shell instead: forward Tab on the
+  // first tabbable, Shift+Tab on the last, the shell itself
+  // when it has none. Focus already inside the shell is left
+  // to the wrap; a covered overlay leaves the key to the
+  // active layer entirely.
+  useEffect(() => {
+    if (!isWeb || typeof document === "undefined") {
+      return;
+    }
+    const handleOutsideTab = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") {
+        return;
+      }
+      const ownLayer = layerRef.current;
+      if (ownLayer && !isActiveModalLayer(ownLayer)) {
+        return;
+      }
+      const node = shellRef.current as unknown as HTMLElement | null;
+      if (!node || typeof node.querySelectorAll !== "function") {
+        return;
+      }
+      const active = document.activeElement as HTMLElement | null;
+      if (active && node.contains(active)) {
+        return;
+      }
+      event.preventDefault();
+      const focusables = shellTabbables(node);
+      const landing = event.shiftKey
+        ? (focusables[focusables.length - 1] ?? node)
+        : (focusables[0] ?? node);
+      landing.focus();
+    };
+    document.addEventListener("keydown", handleOutsideTab, true);
+    return () => {
+      document.removeEventListener("keydown", handleOutsideTab, true);
+    };
+  }, []);
 
   // Web keyboard support (the MealPlansPage row pattern): a
   // view carrying a role is made focusable and the activation

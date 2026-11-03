@@ -8,6 +8,7 @@ import {
   isActiveModalLayer,
   registerModalLayer,
   registeredModalFrames,
+  registeredModalRoots,
   unregisterModalLayer,
 } from "./modalRegistry.js";
 import type { ModalLayer } from "./modalRegistry.js";
@@ -411,7 +412,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     if (!open || !isWeb) {
       return;
     }
-    const layer = registerModalLayer(parentLayerToken);
+    const layer = registerModalLayer(layerToken, parentLayerToken);
     layerRef.current = layer;
     const content = contentRef.current as unknown as HTMLElement | null;
     layer.frame =
@@ -482,10 +483,11 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // a covering StepOverlay) is the active layer — this
   // listener stands down for it instead of pulling focus back
   // into the covered dialog. The modal registry's arbitration
-  // (#394) decides it; it replaced the focus-keyed stand-down
-  // added for StepOverlay at Copilot review on PR #392, head
-  // f32fd7d, which misjudged layers whenever focus was not
-  // the carrier. (6) An ARIA-only foreign modal frame that is
+  // (#394) decides it for DS layers; the focus-keyed stand-down
+  // added at Copilot review on PR #392, head f32fd7d survives
+  // only for FOREIGN aria-modal elements (host-built modals
+  // with no registry record), with DS layers exempt through
+  // their registered roots. (6) An ARIA-only foreign modal frame that is
   // invisible does not cover (native :modal frames keep the
   // old behavior), an explicitly editable details element is
   // a stop even with a summary child, and a summary outside a
@@ -504,19 +506,21 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         return;
       }
       // A covered dialog stands down: the modal registry
-      // (#394) decides which presented layer is active from
+      // (#394) decides which presented DS layer is active from
       // recorded presentation — ancestry and presentation
       // order — never from the focused element. This subsumes
-      // both arbitrations this handler used to make on its
-      // own: the open-dialog stack's registration order (which
-      // inverted simultaneously-open nested dialogs) and the
-      // focus-keyed stand-down for a foreign modal shell
-      // holding focus (which misjudged both a Dialog mounted
+      // the arbitrations this handler used to make between DS
+      // layers on its own: the open-dialog stack's registration
+      // order (which inverted simultaneously-open nested
+      // dialogs) and the focus-keyed stand-down as it applied
+      // to StepOverlay (which misjudged both a Dialog mounted
       // inside a new StepOverlay and a covering StepOverlay
       // while focus rested on the body). StepOverlay registers
       // in the same registry, so DS layers are all arbitrated
-      // here; the frame scan below still covers FOREIGN
-      // native <dialog> modals, which no DS layer records.
+      // here. What the registry cannot see stays below: the
+      // focus-keyed stand-down for a FOREIGN aria-modal
+      // element, and the frame scan for foreign native
+      // <dialog> modals.
       const ownLayer = layerRef.current;
       if (ownLayer && !isActiveModalLayer(ownLayer)) {
         return;
@@ -525,6 +529,42 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       if (ownLayer) {
         ownLayer.frame = frame;
         ownLayer.root = content;
+      }
+      // A FOREIGN modal layer that currently holds focus is
+      // the active layer, whatever this dialog's state: a
+      // host-built role="dialog" aria-modal element (not a DS
+      // layer, so the registry has no record of it, and not a
+      // native <dialog> element, so the frame scan below
+      // cannot see it) mounted over this dialog holds the
+      // user's Tab, and this listener must not pull that focus
+      // back into the covered dialog (Copilot review on
+      // PR #392, head f32fd7d; retained for foreign modals at
+      // CodeRabbit review on PR #398). DS layers are exempt —
+      // the registry above arbitrates them, and their roots
+      // are recognized through the registry, which is what
+      // replaces the host record the #392 version of this rule
+      // needed: a DS host layer this dialog was opened from is
+      // a registered root, so focus sitting in it never stands
+      // this dialog down. Layers that merely contain this
+      // dialog (or are contained by it) are likewise not
+      // foreign covers.
+      const focusedElement = document.activeElement as HTMLElement | null;
+      if (
+        focusedElement &&
+        focusedElement !== document.body &&
+        !content.contains(focusedElement) &&
+        !(frame && frame.contains(focusedElement)) &&
+        typeof focusedElement.closest === "function"
+      ) {
+        const foreignModal = focusedElement.closest('[role="dialog"][aria-modal="true"]');
+        if (
+          foreignModal &&
+          !foreignModal.contains(content) &&
+          !content.contains(foreignModal) &&
+          !registeredModalRoots().has(foreignModal)
+        ) {
+          return;
+        }
       }
       if (frame) {
         const dsFrames = registeredModalFrames();
@@ -732,11 +772,12 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       }
       blurredTargetRef.current = null;
       // (The host layer this dialog was opened from is no
-      // longer recorded here: the modal registry derives it
-      // from composition — this dialog's parent layer — at
-      // registration, #394. The tracked-opener record this
-      // effect used to take fed the focus-keyed stand-down
-      // the registry replaced.)
+      // longer recorded here, #394: the tracked-opener record
+      // this effect used to take fed the focus-keyed
+      // stand-down's host exemption — a DS host is now
+      // recognized through its registered root in the modal
+      // registry, and this dialog's own ancestry comes from
+      // composition at registration.)
       // A (re)opening supersedes any deferred re-assert still
       // pending from the previous close.
       restoreGenRef.current++;

@@ -26,7 +26,11 @@ import { createContext } from "react";
  *   overlay as active and Tab never reached the Dialog; and a
  *   covering StepOverlay with focus resting on the body never
  *   stood the covered Dialog down at all, so the Dialog
- *   pulled focus back into itself.
+ *   pulled focus back into itself. (A focus-keyed stand-down
+ *   survives in Dialog for FOREIGN aria-modal elements only —
+ *   host-built modals with no registry record; DS layers,
+ *   whose roots registeredModalRoots reports, are exempt from
+ *   it and arbitrated here.)
  *
  * The registry replaces both inferences with one recorded
  * fact per layer, taken when the layer is presented:
@@ -59,6 +63,15 @@ import { createContext } from "react";
  * Option A ruling on #394 — no public stacking contract).
  */
 export type ModalLayer = {
+  /** The presenting component's stable identity — the same
+   * symbol it provides to its children through
+   * ModalLayerContext, so a layer presented from within it
+   * can record (and the registry can resolve) its parent. A
+   * registration minted its own symbol instead until CodeRabbit
+   * review on PR #398: children recorded the PROVIDED token as
+   * their parent, which no registered layer carried, so
+   * ancestry never resolved and simultaneous mounts fell back
+   * to stamps — the parent, registering second, won. */
   token: symbol;
   parentToken: symbol | null;
   presentedAt: number;
@@ -80,9 +93,9 @@ export const ModalLayerContext = createContext<symbol | null>(null);
 const modalLayers: ModalLayer[] = [];
 let presentationCounter = 0;
 
-export function registerModalLayer(parentToken: symbol | null): ModalLayer {
+export function registerModalLayer(token: symbol, parentToken: symbol | null): ModalLayer {
   const layer: ModalLayer = {
-    token: Symbol("modalLayer"),
+    token,
     parentToken,
     presentedAt: ++presentationCounter,
     root: null,
@@ -155,4 +168,20 @@ export function registeredModalFrames(): Set<Element> {
     }
   }
   return frames;
+}
+
+// The content roots of the registered layers — the elements
+// that ARE DS modal layers (a Dialog's content, a StepOverlay
+// shell). Dialog's stand-down for a FOREIGN aria-modal element
+// (one with no registry record: a host-built modal) exempts
+// these: a DS layer is arbitrated by the registry above, never
+// by that focus-keyed rule.
+export function registeredModalRoots(): Set<Element> {
+  const roots = new Set<Element>();
+  for (const layer of modalLayers) {
+    if (layer.root) {
+      roots.add(layer.root);
+    }
+  }
+  return roots;
 }

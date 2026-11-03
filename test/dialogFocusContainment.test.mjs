@@ -141,17 +141,17 @@ test("a details with no summary child counts as a Tab stop, and the fallback lan
 
 test("a covered dialog stands down for the DS layer above it — the registry arbitrates, not focus (#394)", () => {
   // Issue #394 (Stephen's Option A ruling): which presented
-  // layer is active is decided by the modal registry from
+  // DS layer is active is decided by the modal registry from
   // recorded presentation — ancestry and presentation order.
-  // This test supersedes the PR #392 pins for the focus-keyed
-  // stand-down it replaced (Copilot review on PR #392, heads
-  // f32fd7d and 646fe94): keying on the focused element
-  // misjudged a Dialog mounted inside a new StepOverlay (its
-  // host recorded before the overlay's mount focus move) and
-  // a covering StepOverlay while focus rested on the body, and
-  // the registration-order stack it also replaced inverted
-  // simultaneously-open nested dialogs.
-  assert.match(code, /registerModalLayer\(parentLayerToken\)/);
+  // This test supersedes the PR #392 pins for the stand-down
+  // as it applied between DS layers (Copilot review on
+  // PR #392, heads f32fd7d and 646fe94): keying DS arbitration
+  // on the focused element misjudged a Dialog mounted inside
+  // a new StepOverlay (its host recorded before the overlay's
+  // mount focus move) and a covering StepOverlay while focus
+  // rested on the body, and the registration-order stack it
+  // also replaced inverted simultaneously-open nested dialogs.
+  assert.match(code, /registerModalLayer\(layerToken, parentLayerToken\)/);
   assert.match(code, /unregisterModalLayer\(layer\)/);
   assert.match(code, /const ownLayer = layerRef\.current;/);
   assert.match(code, /if \(ownLayer && !isActiveModalLayer\(ownLayer\)\) \{\s+return;\s+\}/);
@@ -168,11 +168,20 @@ test("a covered dialog stands down for the DS layer above it — the registry ar
   assert.match(code, /contentRef\.current = node;/);
   assert.match(code, /layer\.root = content;/);
   // The mechanisms the registry replaced are gone: no
-  // registration-order stack, no focus-keyed stand-down, no
-  // opener-derived host record.
+  // registration-order stack, no opener-derived host record.
   assert.doesNotMatch(code, /openDialogStack/);
   assert.doesNotMatch(code, /hostModalRef/);
-  assert.doesNotMatch(code, /foreignModal/);
+  // What survives is the stand-down for a FOREIGN aria-modal
+  // element only (CodeRabbit review on PR #398): a host-built
+  // modal has no registry record and no native frame, so focus
+  // remains its only signal — with DS layers exempt through
+  // their registered roots instead of the old host record.
+  assert.match(
+    code,
+    /const foreignModal = focusedElement\.closest\('\[role="dialog"\]\[aria-modal="true"\]'\)/,
+  );
+  assert.match(code, /!foreignModal\.contains\(content\)/);
+  assert.match(code, /!registeredModalRoots\(\)\.has\(foreignModal\)/);
 });
 
 test("the f0fd374 review round: invisible ARIA-only frames, editable details, stray summaries (#391)", () => {
