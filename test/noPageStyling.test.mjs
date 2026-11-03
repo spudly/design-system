@@ -64,6 +64,7 @@ test("dynamic Tamagui imports are banned in pages", () => {
   assert.deepEqual(messageIds(`const m = import("tamagui");`), ["tamaguiImport"]);
   assert.deepEqual(messageIds(`const m = import("@tamagui/core");`), ["tamaguiImport"]);
   assert.deepEqual(messageIds(`const m = import("react");`), []);
+  assert.deepEqual(messageIds(`const m = import(null);`), []);
 });
 
 test("className and the inline style prop are banned in pages", () => {

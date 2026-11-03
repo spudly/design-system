@@ -41,7 +41,8 @@
 
 function isTamaguiSource(source) {
   return (
-    source === "tamagui" || source.startsWith("tamagui/") || source.startsWith("@tamagui/")
+    typeof source === "string" &&
+    (source === "tamagui" || source.startsWith("tamagui/") || source.startsWith("@tamagui/"))
   );
 }
 
