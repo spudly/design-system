@@ -36,7 +36,7 @@ function Hub({ initialTab }: { initialTab: MealsHubPageTab }) {
       onSelectTab={setActiveTab}
       meals={mealsHubFixture.meals}
       plans={mealsHubFixture.plans}
-      isLoading={false}
+      loading={false}
       createMealHref="/meals/new"
       createPlanHref="/meal-plans/new"
       onDeleteMeal={() => undefined}
@@ -69,7 +69,7 @@ export const Empty: Story = {
         onSelectTab={() => undefined}
         meals={[]}
         plans={[]}
-        isLoading={false}
+        loading={false}
         createMealHref="/meals/new"
         createPlanHref="/meal-plans/new"
         onDeleteMeal={() => undefined}

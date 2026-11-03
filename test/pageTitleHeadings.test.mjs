@@ -268,7 +268,7 @@ function hubProps(React, MealsHubPage, activeTab) {
     onSelectTab: noop,
     meals: [],
     plans: [hubPlan],
-    isLoading: false,
+    loading: false,
     onCreateMeal: noop,
     onCreatePlan: noop,
     onMealPress: noop,
@@ -302,7 +302,7 @@ test("SSR: standalone MealPlansPage keeps its title at level 1 (#263)", async ()
   const html = await renderToHtml(
     React.createElement(MealPlansPage, {
       plans: [hubPlan],
-      isLoading: false,
+      loading: false,
       onPlanPress: noop,
       onCreatePlan: noop,
     }),

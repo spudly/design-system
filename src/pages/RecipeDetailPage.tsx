@@ -306,7 +306,7 @@ export type RecipeDetailPageIngredientsProps = {
   ingredients: RecipeDetailPageIngredient[];
   onIngredientPress?: (ingredientId: string) => void;
   /** Substitutions lookup in flight ("Finding substitutions…"). */
-  isLoadingSubstitutions?: boolean;
+  loadingSubstitutions?: boolean;
   substitutions?: RecipeDetailPageSubstitution[];
 };
 
@@ -332,7 +332,7 @@ export type RecipeDetailPageCookLog = {
 export type RecipeDetailPageHistoryProps = {
   /** Cook-log query in flight: the panel renders only a spinner,
    * as the app's tab returns early on loading. */
-  isLoading?: boolean;
+  loading?: boolean;
   cookLogs: RecipeDetailPageCookLog[];
   /** Renders the "Log a cook" button; hidden while the form slot
    * renders content. */
@@ -737,7 +737,7 @@ function IngredientsPanel({
         ))}
       </ListStack>
       {hasMissing ? <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text> : null}
-      {view.isLoadingSubstitutions ? <Text variant="hint">Finding substitutions…</Text> : null}
+      {view.loadingSubstitutions ? <Text variant="hint">Finding substitutions…</Text> : null}
       {view.substitutions && view.substitutions.length > 0 ? (
         <SuggestionPanel
           title="Substitutions"
@@ -782,7 +782,7 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
 // ---------------------------------------------------------------------------
 
 function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
-  if (history.isLoading) {
+  if (history.loading) {
     return (
       <PanelStack>
         <SectionHeading>Cook History</SectionHeading>

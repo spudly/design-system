@@ -33,7 +33,7 @@ import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
  * action rendered through the shared TextAction (#229), so it
  * is keyboard-focusable and Enter/Space-operable on web; the
  * row card treatment is the app view's, on DS
- * tokens. While `isLoading`, the shared ListLoadingState
+ * tokens. While `loading`, the shared ListLoadingState
  * replaces the list (it stands in for the app's branded
  * loader — the RecipeFormPage precedent).
  *
@@ -150,7 +150,7 @@ export type TagsPageTag = {
 
 export type TagsPageProps = {
   tags: TagsPageTag[];
-  isLoading?: boolean;
+  loading?: boolean;
   name: string;
   /** The form's color value: a tag color token name. */
   color: TagColorName;
@@ -199,7 +199,7 @@ export type TagsPageProps = {
 
 export function TagsPage({
   tags,
-  isLoading = false,
+  loading = false,
   name,
   color,
   colorOptions,
@@ -279,7 +279,7 @@ export function TagsPage({
             </Button>
           </TrailingActionsRow>
         </FieldStack>
-        {isLoading ? (
+        {loading ? (
           <ListLoadingState label="Loading tags" />
         ) : (
           <CardStack>

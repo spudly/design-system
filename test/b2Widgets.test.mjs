@@ -81,7 +81,7 @@ test("Badge's colored-tag form tints its surface and label from the resolved tok
 
 test("CheckboxSelectList branches loading / empty / rows and toggles by id", () => {
   const list = source("CheckboxSelectList");
-  assert.ok(list.includes("isLoading"), "loading branch missing");
+  assert.ok(list.includes("loading"), "loading branch missing");
   assert.ok(list.includes("<Spinner"), "loading branch must render the DS Spinner");
   assert.ok(list.includes("items.length === 0"), "empty branch missing");
   assert.ok(list.includes("<EmptyState"), "empty branch must render the DS EmptyState");

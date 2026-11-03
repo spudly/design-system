@@ -187,8 +187,8 @@ test("both catalog pages wire the hook's handlers and threshold to their lists",
 test("each page's mount gate matches its states", () => {
   // RecipesPage gates on the first load only (it has no error
   // state); DiscoverPage also gates on its error state.
-  assert.match(recipesPage, /canPaginate: !isLoading,\s*\}\);/);
-  assert.match(discoverPage, /canPaginate: !isLoading && !errorMessage,\s*\}\);/);
+  assert.match(recipesPage, /canPaginate: !loading,\s*\}\);/);
+  assert.match(discoverPage, /canPaginate: !loading && !errorMessage,\s*\}\);/);
 });
 
 test("RecipesPage no longer wires the plain stalling handler", () => {

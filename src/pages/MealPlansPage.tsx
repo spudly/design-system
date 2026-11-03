@@ -102,7 +102,7 @@ export type MealPlansPageProps = {
   plans: MealPlansPageItem[];
   /** Load in flight: the spinner renders in place of the list,
    * mirroring the app's content swap (see the header). */
-  isLoading: boolean;
+  loading: boolean;
   /** Optional: the "New meal plan" action renders only when the
    * href is provided (#248: it navigates, so it is a link). */
   createHref?: string;
@@ -124,7 +124,7 @@ export type MealPlansPageProps = {
  */
 export function MealPlansPage({
   plans,
-  isLoading,
+  loading,
   createHref,
   onPlanDelete,
   titleLevel,
@@ -135,7 +135,7 @@ export function MealPlansPage({
         Meal plans
       </Text>
       {createHref ? <Button href={createHref}>New meal plan</Button> : null}
-      {isLoading ? (
+      {loading ? (
         <Center>
           <Spinner label="Loading" />
         </Center>

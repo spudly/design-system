@@ -229,7 +229,7 @@ test("the title renders as the page heading and pagination rides the shared cata
   // page with a live continuation still paginates.
   assert.match(
     page,
-    /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{\s*onLoadMore,\s*isFetchingNextPage,\s*itemCount: recipes\.length,\s*canPaginate: !isLoading && !errorMessage,\s*\}\);/,
+    /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{\s*onLoadMore,\s*isFetchingNextPage,\s*itemCount: recipes\.length,\s*canPaginate: !loading && !errorMessage,\s*\}\);/,
   );
   assert.match(page, /onEndReached=\{onEndReached\}/);
   assert.match(page, /onScroll=\{onScroll\}/);

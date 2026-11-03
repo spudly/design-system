@@ -44,7 +44,7 @@ export type AccessTokensPanelToken = {
 
 export type AccessTokensPanelProps = {
   tokens: AccessTokensPanelToken[];
-  isLoading?: boolean;
+  loading?: boolean;
   tokenName: string;
   onTokenNameChange: (value: string) => void;
   onCreate: () => void;
@@ -64,7 +64,7 @@ export type AccessTokensPanelProps = {
 
 export function AccessTokensPanel({
   tokens: accessTokens,
-  isLoading = false,
+  loading = false,
   tokenName,
   onTokenNameChange,
   onCreate,
@@ -149,7 +149,7 @@ export function AccessTokensPanel({
         </YStack>
       )}
       {error ? <Alert severity="error" message={error} /> : null}
-      {isLoading ? (
+      {loading ? (
         <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray6}>
           Loading tokens…
         </Text>

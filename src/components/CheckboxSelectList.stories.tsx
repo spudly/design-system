@@ -34,7 +34,7 @@ export const Default: Story = {
 };
 
 export const Loading: Story = {
-  args: { items: [], selectedIds: [], onToggle: () => {}, isLoading: true },
+  args: { items: [], selectedIds: [], onToggle: () => {}, loading: true },
 };
 
 export const Empty: Story = {

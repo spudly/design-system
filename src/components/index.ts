@@ -80,6 +80,10 @@ export { SecretRevealPanel, type SecretRevealPanelProps } from "./SecretRevealPa
 export { SectionCard, type SectionCardProps } from "./SectionCard.js";
 export { SelectField, type SelectFieldProps, type SelectOption } from "./SelectField.js";
 export { Slider, type SliderProps, type SliderTick } from "./Slider.js";
+export { BoxSkeleton, type BoxSkeletonProps } from "./BoxSkeleton.js";
+export { CircleSkeleton, type CircleSkeletonProps } from "./CircleSkeleton.js";
+export { SkeletonClock, type SkeletonClockProps } from "./SkeletonClock.js";
+export { TextSkeleton, type TextSkeletonProps } from "./TextSkeleton.js";
 export { Spinner, type SpinnerProps } from "./Spinner.js";
 export { StarRatingInput, type StarRatingInputProps } from "./StarRatingInput.js";
 export { StatBand, type StatBandProps } from "./StatBand.js";

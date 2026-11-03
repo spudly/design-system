@@ -75,7 +75,7 @@ const discoverItems: DiscoverPageItem[] = [
 function DiscoverPageDemo({
   initialSearch = "",
   recipes = discoverItems,
-  isLoading = false,
+  loading = false,
   isFetchingNextPage = false,
   errorMessage = null,
   initialActiveFilters,
@@ -83,7 +83,7 @@ function DiscoverPageDemo({
 }: {
   initialSearch?: string;
   recipes?: DiscoverPageItem[];
-  isLoading?: boolean;
+  loading?: boolean;
   isFetchingNextPage?: boolean;
   errorMessage?: string | null;
   initialActiveFilters?: DiscoverPageFilterId[];
@@ -120,7 +120,7 @@ function DiscoverPageDemo({
         emptyMessage="No public recipes match your search."
         errorMessage={errorMessage}
         recipes={visible}
-        isLoading={isLoading}
+        loading={loading}
         isFetchingNextPage={isFetchingNextPage}
         search={search}
         onSearchChange={setSearch}
@@ -160,7 +160,7 @@ export const Empty: Story = {
 };
 
 export const Loading: Story = {
-  render: () => <DiscoverPageDemo isLoading recipes={[]} />,
+  render: () => <DiscoverPageDemo loading recipes={[]} />,
 };
 
 export const ErrorState: Story = {

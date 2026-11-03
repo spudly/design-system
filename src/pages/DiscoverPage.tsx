@@ -159,7 +159,7 @@ export type DiscoverPageProps = {
   recipes: DiscoverPageItem[];
   /** First-load in flight: the list renders empty with a spinner
    * as its empty state, and the filter bar stays mounted. */
-  isLoading: boolean;
+  loading: boolean;
   /** Next page in flight: a spinner renders as the list footer,
    * and it is the shared pagination pattern's only fetch signal
    * (see useCatalogPagination, #285): while it is set the
@@ -229,7 +229,7 @@ export function DiscoverPage(props: DiscoverPageProps) {
     emptyMessage,
     errorMessage,
     recipes,
-    isLoading,
+    loading,
     isFetchingNextPage = false,
     onLoadMore,
     search,
@@ -269,7 +269,7 @@ export function DiscoverPage(props: DiscoverPageProps) {
     onLoadMore,
     isFetchingNextPage,
     itemCount: recipes.length,
-    canPaginate: !isLoading && !errorMessage,
+    canPaginate: !loading && !errorMessage,
   });
 
   // The catalog's filter definitions — the page's data in the
@@ -355,14 +355,14 @@ export function DiscoverPage(props: DiscoverPageProps) {
         // on them must land while the keyboard is open instead of
         // being consumed to dismiss it.
         keyboardShouldPersistTaps="handled"
-        data={isLoading ? [] : recipes}
+        data={loading ? [] : recipes}
         keyExtractor={(recipe) => recipe.id}
         // The title and filters render as the list's header so they
         // scroll together with the recipes (#188). The header sits
         // inside the list's content container, which already
         // supplies the horizontal padding. The list (and therefore
         // the header) stays mounted while loading — a filter edit
-        // flips isLoading and a tree swap would unmount the focused
+        // flips loading and a tree swap would unmount the focused
         // filter input mid-typing; the loading indicator renders as
         // the list's empty state instead.
         ListHeaderComponent={
@@ -388,7 +388,7 @@ export function DiscoverPage(props: DiscoverPageProps) {
           />
         )}
         ListEmptyComponent={
-          isLoading ? (
+          loading ? (
             <ListLoadingState label="Loading" />
           ) : errorMessage ? (
             <Alert severity="error">{errorMessage}</Alert>

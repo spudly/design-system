@@ -56,7 +56,7 @@ export type RecipeIngredientsPanelView = {
   /** Toggles the missing marking on rows and drives the
    * substitutions fetch below. */
   onIngredientPress?: ((ingredientId: string) => void) | undefined;
-  isLoadingSubstitutions?: boolean;
+  loadingSubstitutions?: boolean;
   substitutions?: RecipeIngredientsPanelSubstitution[];
 };
 
@@ -142,7 +142,7 @@ export function RecipeIngredientsPanel({ ingredients: view }: RecipeIngredientsP
           <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text>
         </YStack>
       ) : null}
-      {view.isLoadingSubstitutions ? (
+      {view.loadingSubstitutions ? (
         <YStack paddingBlockStart="$4">
           <Text variant="hint">Finding substitutions…</Text>
         </YStack>

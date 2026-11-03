@@ -75,12 +75,12 @@ test("the list takes separating taps while the keyboard is open", () => {
 test("loading keeps the list mounted and shows the spinner as its empty state", () => {
   assert.match(
     code,
-    /data=\{isLoading \? \[\] : recipes\}/,
+    /data=\{loading \? \[\] : recipes\}/,
     "loading empties the DATA, never the list — swapping the tree would unmount the focused filter input mid-typing",
   );
   assert.match(
     code,
-    /ListEmptyComponent=\{\s*isLoading \? \(\s*<ListLoadingState label="Loading" \/>/,
+    /ListEmptyComponent=\{\s*loading \? \(\s*<ListLoadingState label="Loading" \/>/,
     "the loading spinner renders as the list's EMPTY state, not in any other slot",
   );
   assert.match(

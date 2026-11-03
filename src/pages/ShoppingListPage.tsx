@@ -34,7 +34,7 @@ import { Text } from "../components/Text.js";
  *   keyboard activation — the ChecklistRow pattern with the
  *   MealPlansPage row's keyboard handling).
  *
- * States mirror the app view's swaps: while `isLoading`, the
+ * States mirror the app view's swaps: while `loading`, the
  * shared ListLoadingState replaces the list (the app renders
  * its branded loader there; ListLoadingState stands in, the
  * RecipeFormPage precedent — the branded loader stays app-side by recorded
@@ -63,20 +63,20 @@ export type ShoppingListPageLine = {
 
 export type ShoppingListPageProps = {
   lines: ShoppingListPageLine[];
-  isLoading?: boolean;
+  loading?: boolean;
   onToggleLine: (key: string) => void;
 };
 
 export function ShoppingListPage({
   lines,
-  isLoading = false,
+  loading = false,
   onToggleLine,
 }: ShoppingListPageProps) {
   return (
     <ScreenContainer>
       <SectionStack>
         <Text variant="title">Shopping list</Text>
-        {isLoading ? (
+        {loading ? (
           <ListLoadingState label="Loading shopping list" />
         ) : lines.length === 0 ? (
           <EmptyState title="No items on this list." />
