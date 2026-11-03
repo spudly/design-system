@@ -25,7 +25,7 @@ import { Text } from "../components/Text.js";
  * the audit records its deletion for B6, once the Home list
  * renders DS rows directly. Until then the host renders each
  * row; this page keys the rows by the view-model's `id` and
- * owns the surrounding states: while `isLoading` the shared
+ * owns the surrounding states: while `loading` the shared
  * ListLoadingState replaces the list (it stands in for the
  * app's branded loader — the RecipeFormPage precedent; the branded
  * loader stays app-side by recorded decision), and an empty
@@ -60,7 +60,7 @@ export type HomePageProps = {
   emptyMessage: string;
   recipes: HomePageRecipe[];
   renderRecipeRow: (recipe: HomePageRecipe) => ReactNode;
-  isLoading?: boolean;
+  loading?: boolean;
   /** Navigation destinations (#248: navigation crosses as hrefs,
    * not press callbacks); the host composes them from its routes. */
   browseHref: string;
@@ -78,7 +78,7 @@ export function HomePage({
   emptyMessage,
   recipes,
   renderRecipeRow,
-  isLoading = false,
+  loading = false,
   browseHref,
   addHref,
   sharedWithMeHref,
@@ -100,7 +100,7 @@ export function HomePage({
           </Button>
         </ButtonStack>
         <Text variant="subheading">{recipesTitle}</Text>
-        {isLoading ? (
+        {loading ? (
           <ListLoadingState label="Loading recipes" />
         ) : recipes.length === 0 ? (
           <CenteredText>{emptyMessage}</CenteredText>

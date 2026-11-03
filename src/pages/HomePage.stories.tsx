@@ -66,7 +66,7 @@ export const Loading: Story = {
       <HomePage
         {...homeFixture}
         recipes={[]}
-        isLoading
+        loading
         renderRecipeRow={() => null}
         browseHref="/recipes"
         addHref="/recipes/new"

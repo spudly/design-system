@@ -47,8 +47,8 @@ function IngredientsDemo({
               },
             }
           : {}),
-        ...(initial.isLoadingSubstitutions
-          ? { isLoadingSubstitutions: initial.isLoadingSubstitutions }
+        ...(initial.loadingSubstitutions
+          ? { loadingSubstitutions: initial.loadingSubstitutions }
           : {}),
         ...(initial.substitutions && hasMissing ? { substitutions: initial.substitutions } : {}),
       }}

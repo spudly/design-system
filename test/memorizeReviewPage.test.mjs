@@ -155,7 +155,7 @@ test("the actions are exactly the app screen's two review outcomes", () => {
 test("there is no loading state — the app gates readiness above the tab shell", () => {
   assert.doesNotMatch(
     code,
-    /Spinner|isLoading/,
+    /Spinner|loading/,
     "the app screen has no loading state of its own — the union must not invent one",
   );
 });

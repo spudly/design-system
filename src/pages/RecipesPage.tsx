@@ -199,7 +199,7 @@ export type RecipesPageProps = {
   recipes: RecipesPageItem[];
   /** First-load in flight: the list renders empty with a spinner as
    * its empty state, and the filter bar stays mounted. */
-  isLoading: boolean;
+  loading: boolean;
   /** Next page in flight: a spinner renders as the list footer,
    * and it is the shared pagination pattern's only fetch signal
    * (see useCatalogPagination, #285): while it is set the
@@ -290,7 +290,7 @@ export type RecipesPageProps = {
 export function RecipesPage(props: RecipesPageProps) {
   const {
     recipes,
-    isLoading,
+    loading,
     isFetchingNextPage = false,
     onLogCookPress,
     onLoadMore,
@@ -333,7 +333,7 @@ export function RecipesPage(props: RecipesPageProps) {
     onLoadMore,
     isFetchingNextPage,
     itemCount: recipes.length,
-    canPaginate: !isLoading,
+    canPaginate: !loading,
   });
 
   // The catalog's filter definitions — this page's data in the
@@ -416,13 +416,13 @@ export function RecipesPage(props: RecipesPageProps) {
         // them must land while the keyboard is open instead of being
         // consumed to dismiss it.
         keyboardShouldPersistTaps="handled"
-        data={isLoading ? [] : recipes}
+        data={loading ? [] : recipes}
         keyExtractor={(recipe) => recipe.id}
         // The filters render as the list's header so they scroll
         // together with the recipes (#188). The header sits inside
         // the list's content container, which already supplies the
         // horizontal padding. The list (and therefore the header)
-        // stays mounted while loading — a filter edit flips isLoading
+        // stays mounted while loading — a filter edit flips loading
         // and a tree swap would unmount the focused filter input
         // mid-typing; the loading indicator renders as the list's
         // empty state instead.
@@ -470,7 +470,7 @@ export function RecipesPage(props: RecipesPageProps) {
         onScroll={onScroll}
         onEndReachedThreshold={onEndReachedThreshold}
         ListEmptyComponent={
-          isLoading ? (
+          loading ? (
             <ListLoadingState label="Loading" />
           ) : (
             <EmptyState title={emptyTitle} {...(emptyBody ? { body: emptyBody } : {})} />

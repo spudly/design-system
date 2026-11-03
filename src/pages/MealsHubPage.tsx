@@ -39,7 +39,7 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * switch is reported as an intent (`onSelectTab`) — the
  * active tab is the screen's state, as today.
  *
- * States mirror the app view's swaps: while `isLoading`, the
+ * States mirror the app view's swaps: while `loading`, the
  * shared ListLoadingState replaces the active tab's list (the
  * app renders its branded loader there; ListLoadingState
  * stands in — the
@@ -81,7 +81,7 @@ export type MealsHubPageProps = {
   onSelectTab: (tab: MealsHubPageTab) => void;
   meals: MealsHubPageMeal[];
   plans: MealPlansPageItem[];
-  isLoading: boolean;
+  loading: boolean;
   /** The create destinations (#248: both create actions
    * navigate, so they cross as hrefs, not press callbacks). */
   createMealHref: string;
@@ -95,7 +95,7 @@ export function MealsHubPage({
   onSelectTab,
   meals,
   plans,
-  isLoading,
+  loading,
   createMealHref,
   createPlanHref,
   onDeleteMeal,
@@ -122,7 +122,7 @@ export function MealsHubPage({
       <PinnedHeaderShell header={<SectionStack>{hubChrome}</SectionStack>}>
         <MealPlansPage
           plans={plans}
-          isLoading={isLoading}
+          loading={loading}
           createHref={createPlanHref}
           onPlanDelete={onDeletePlan}
           titleLevel={2}
@@ -138,7 +138,7 @@ export function MealsHubPage({
         <Button variant="primary" accessibilityLabel="New meal" href={createMealHref}>
           New meal
         </Button>
-        {isLoading ? (
+        {loading ? (
           <ListLoadingState label="Loading meals" />
         ) : meals.length === 0 ? (
           <EmptyState title="No meals yet." />

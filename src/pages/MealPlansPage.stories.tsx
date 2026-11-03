@@ -71,7 +71,7 @@ export const Default: Story = {
     <Viewport>
       <MealPlansPage
         plans={planItems}
-        isLoading={false}
+        loading={false}
         createHref="/meal-plans/new"
         onPlanDelete={() => undefined}
       />
@@ -84,7 +84,7 @@ export const Empty: Story = {
     <Viewport>
       <MealPlansPage
         plans={[]}
-        isLoading={false}
+        loading={false}
         createHref="/meal-plans/new"
         onPlanDelete={() => undefined}
       />
@@ -95,7 +95,7 @@ export const Empty: Story = {
 export const Loading: Story = {
   render: () => (
     <Viewport>
-      <MealPlansPage plans={[]} isLoading />
+      <MealPlansPage plans={[]} loading />
     </Viewport>
   ),
 };
@@ -105,7 +105,7 @@ export const NoActions: Story = {
   // per-row Delete buttons omit cleanly, leaving a read-only list.
   render: () => (
     <Viewport>
-      <MealPlansPage plans={planItems} isLoading={false} />
+      <MealPlansPage plans={planItems} loading={false} />
     </Viewport>
   ),
 };

@@ -149,6 +149,6 @@ test("the retired loading slot helpers stay retired (#119 dedupe)", () => {
 
 test("RecipesPage renders its loading slots through ListLoadingState directly (#119)", () => {
   const page = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  assert.match(page, /isLoading \? \(\s*<ListLoadingState label="Loading" \/>/);
+  assert.match(page, /loading \? \(\s*<ListLoadingState label="Loading" \/>/);
   assert.match(page, /isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined/);
 });

@@ -127,10 +127,10 @@ test("optional actions render only when their props are provided", () => {
 });
 
 test("loading swaps content before the empty and list branches", () => {
-  const loadingAt = code.indexOf("{isLoading ? (");
+  const loadingAt = code.indexOf("{loading ? (");
   const emptyAt = code.indexOf("plans.length === 0");
   const listAt = code.indexOf("plans.map");
-  assert.ok(loadingAt !== -1, "the loading branch must key off isLoading");
+  assert.ok(loadingAt !== -1, "the loading branch must key off loading");
   assert.ok(emptyAt > loadingAt, "the empty branch must follow the loading branch");
   assert.ok(listAt > emptyAt, "the list branch must follow the empty branch");
   assert.match(code, /<Spinner label="Loading" \/>/, "loading must render the Spinner");

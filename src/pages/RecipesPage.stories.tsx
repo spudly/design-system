@@ -102,7 +102,7 @@ const recipeItems: RecipesPageItem[] = [
 function RecipesPageDemo({
   initialSearch = "",
   recipes = recipeItems,
-  isLoading = false,
+  loading = false,
   isFetchingNextPage = false,
   expandedRecipeId,
   initialActiveFilters,
@@ -110,7 +110,7 @@ function RecipesPageDemo({
 }: {
   initialSearch?: string;
   recipes?: RecipesPageItem[];
-  isLoading?: boolean;
+  loading?: boolean;
   isFetchingNextPage?: boolean;
   expandedRecipeId?: string;
   initialActiveFilters?: RecipesPageFilterId[];
@@ -142,7 +142,7 @@ function RecipesPageDemo({
     <Viewport>
       <RecipesPage
         recipes={visible}
-        isLoading={isLoading}
+        loading={loading}
         isFetchingNextPage={isFetchingNextPage}
         onLogCookPress={() => undefined}
         {...(expandedRecipeId
@@ -208,7 +208,7 @@ export const Empty: Story = {
 };
 
 export const Loading: Story = {
-  render: () => <RecipesPageDemo isLoading recipes={[]} />,
+  render: () => <RecipesPageDemo loading recipes={[]} />,
 };
 
 export const LoadingMore: Story = {
@@ -298,11 +298,11 @@ const sharedItems: RecipesPageItem[] = [
 function SharedRecipesPageDemo({
   initialSearch = "",
   recipes = sharedItems,
-  isLoading = false,
+  loading = false,
 }: {
   initialSearch?: string;
   recipes?: RecipesPageItem[];
-  isLoading?: boolean;
+  loading?: boolean;
 }) {
   const [search, setSearch] = useState(initialSearch);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -325,7 +325,7 @@ function SharedRecipesPageDemo({
     <Viewport>
       <RecipesPage
         recipes={visible}
-        isLoading={isLoading}
+        loading={loading}
         emptyTitle="Recipes others share with you will appear here."
         emptyBody="Open a share link while signed in to save recipes to this list."
         search={search}
@@ -364,5 +364,5 @@ export const SharedEmpty: Story = {
 };
 
 export const SharedLoading: Story = {
-  render: () => <SharedRecipesPageDemo isLoading recipes={[]} />,
+  render: () => <SharedRecipesPageDemo loading recipes={[]} />,
 };

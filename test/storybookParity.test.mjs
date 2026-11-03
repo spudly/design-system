@@ -104,9 +104,10 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches })
 // are prop/style translators, linkOverlay.tsx is the native-only
 // link layer other components compose, labelRow.tsx is the
 // shared label-row implementation LabeledField / LabeledGroup
-// compose, and PageFrame.tsx is page-story scaffolding (the
+// compose, PageFrame.tsx is page-story scaffolding (the
 // demo stories' phone-width frame, relocated out of src/pages
-// for #119) — none is a standalone component with a story of
+// for #119), and LoadingScope.tsx is the internal loading-state
+// context composites compose (#278) — none is a standalone component with a story of
 // its own, and none is exported from the components barrel.
 const COMPONENT_STORY_EXCEPTIONS = new Set([
   "accessibility.ts",
@@ -114,6 +115,7 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "tagColors.ts",
   "linkOverlay.tsx",
   "labelRow.tsx",
+  "LoadingScope.tsx",
   "PageFrame.tsx",
 ]);
 

@@ -143,7 +143,7 @@ test("status and tag options cross as view-models; status picks by Button, tags 
   // view-model props as before.
   assert.ok(form.includes("statusOptions"), "status options must cross as props");
   assert.ok(form.includes("tagOptions"), "tag options must cross as props");
-  assert.ok(form.includes("isLoadingTags"), "tag loading must cross as a prop");
+  assert.ok(form.includes("loadingTags"), "tag loading must cross as a prop");
   assert.ok(
     form.includes("selected={status === option.value}"),
     "the status picker marks the current status selected",

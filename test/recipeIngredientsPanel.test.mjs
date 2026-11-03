@@ -114,7 +114,7 @@ test("rows and substitutions keep their conditional rendering", () => {
   );
   assert.match(
     panelCode,
-    /\{view\.isLoadingSubstitutions \? \(/,
+    /\{view\.loadingSubstitutions \? \(/,
     "the loading line is conditional",
   );
   assert.ok(

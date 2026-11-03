@@ -39,7 +39,7 @@ import { Badge } from "../components/Badge.js";
  *   components are retired), and the tag selector is a row of
  *   selectable Badges (Badge's selectable form — a tag renders as
  *   a Badge, including when it selects). Tag loading
- *   crosses as `isLoadingTags` — the
+ *   crosses as `loadingTags` — the
  *   view renders the DS Spinner where the app renders its branded
  *   loader (the branded loader stays app-side by recorded decision).
  * - Version-diff presentation is view-model data: the host computes
@@ -112,7 +112,7 @@ export type RecipeFormPageProps = {
   tagIds: string[];
   onTagIdsChange: (ids: string[]) => void;
   /** Tags query in flight: a spinner renders in place of the chips. */
-  isLoadingTags?: boolean;
+  loadingTags?: boolean;
 
   /** Version-diff presentation (host-computed; see the header). A
    * field listed here gets the `changed` wash and, when its revert
@@ -183,7 +183,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
     tagOptions,
     tagIds,
     onTagIdsChange,
-    isLoadingTags = false,
+    loadingTags = false,
     changedFields = [],
     revertLabels = {},
     onRevertField,
@@ -360,7 +360,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
             ) : null
           }
         >
-          {isLoadingTags ? (
+          {loadingTags ? (
             <Spinner label="Loading tags" />
           ) : (
             <ButtonRow>

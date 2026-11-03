@@ -55,7 +55,7 @@ export const Default: Story = {
 export const Loading: Story = {
   render: () => (
     <Viewport>
-      <ShoppingListPage lines={[]} isLoading onToggleLine={() => undefined} />
+      <ShoppingListPage lines={[]} loading onToggleLine={() => undefined} />
     </Viewport>
   ),
 };

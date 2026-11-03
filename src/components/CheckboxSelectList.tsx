@@ -16,14 +16,14 @@ export type CheckboxSelectListProps = {
   /** Called with the id of the item whose checkbox was toggled. */
   onToggle: (id: string) => void;
   disabled?: boolean;
-  isLoading?: boolean;
+  loading?: boolean;
   /** Shown through EmptyState when there are no items. */
   emptyMessage?: string;
 };
 
 /**
  * Multi-select list of labeled checkboxes with loading and empty states:
- * while `isLoading`, a centered Spinner; with no items, an EmptyState
+ * while `loading`, a centered Spinner; with no items, an EmptyState
  * carrying `emptyMessage`; otherwise one CheckboxField per item, checked
  * when its id is in `selectedIds`. Selection state is the caller's —
  * `onToggle` reports the toggled id and the caller updates `selectedIds`.
@@ -33,10 +33,10 @@ export function CheckboxSelectList({
   selectedIds,
   onToggle,
   disabled = false,
-  isLoading = false,
+  loading = false,
   emptyMessage = "No items found.",
 }: CheckboxSelectListProps) {
-  if (isLoading) {
+  if (loading) {
     return (
       <YStack flex={1} alignItems="center" justifyContent="center" padding={tokens.spacing[4]}>
         <Spinner />

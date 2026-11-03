@@ -194,7 +194,7 @@ export const Loading: Story = {
     <Viewport>
       <TagsPage
         tags={[]}
-        isLoading
+        loading
         name=""
         color={tagsFixture.colorOptions[0] ?? "indigo"}
         colorOptions={tagsFixture.colorOptions}
