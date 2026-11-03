@@ -83,6 +83,15 @@ const noPageStyling = {
           });
         }
       },
+      ImportExpression(node) {
+        if (node.source.type === "Literal" && isTamaguiSource(node.source.value)) {
+          context.report({
+            node,
+            messageId: "tamaguiImport",
+            data: { source: node.source.value },
+          });
+        }
+      },
       JSXOpeningElement(node) {
         for (const attribute of node.attributes) checkAttribute(context, attribute);
       },
