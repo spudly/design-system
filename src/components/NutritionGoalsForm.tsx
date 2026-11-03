@@ -1,7 +1,7 @@
+import { Alert } from "./Alert.js";
 import { YStack } from "tamagui";
 import { Button } from "./Button.js";
 import { SectionCard } from "./SectionCard.js";
-import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
 
 /**
@@ -121,7 +121,7 @@ export function NutritionGoalsForm({
           patch({ satietyScore });
         }}
       />
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       <YStack paddingTop="$3">
         <Button variant="primary" disabled={saving} onPress={onSave}>
           Save goals

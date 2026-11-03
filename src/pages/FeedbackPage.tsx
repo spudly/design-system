@@ -1,3 +1,4 @@
+import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { CheckboxField } from "../components/CheckboxField.js";
 import { TextAreaField } from "../components/TextAreaField.js";
@@ -93,7 +94,7 @@ export function FeedbackPage({
             accessibilityLabel="Email me back (optional)"
           />
           <CheckboxField label="This is a bug" checked={isBug} onCheckedChange={onIsBugChange} />
-          {error ? <Text variant="error">{error}</Text> : null}
+          {error ? <Alert severity="error" message={error} /> : null}
           <Button
             variant="primary"
             disabled={submitDisabled || submitting}

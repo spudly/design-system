@@ -1,3 +1,4 @@
+import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { Text } from "../components/Text.js";
@@ -55,7 +56,7 @@ export function ImportImagePage({
         Choose from Library
       </Button>
       {loading ? <Text variant="hint">Importing…</Text> : null}
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
     </FormScreenLayout>
   );
 }

@@ -1,3 +1,4 @@
+import { Alert } from "../components/Alert.js";
 import { AutocompletePicker } from "../components/AutocompletePicker.js";
 import { Button } from "../components/Button.js";
 import { FormHeading } from "../components/FormHeading.js";
@@ -5,7 +6,6 @@ import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { FormSubmit } from "../components/FormSubmit.js";
 import { LabeledGroup } from "../components/LabeledGroup.js";
 import { NumberStepper } from "../components/NumberStepper.js";
-import { Text } from "../components/Text.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { TextField } from "../components/TextField.js";
 
@@ -174,7 +174,7 @@ export function MealFormPage({
           }}
         />
       ))}
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       <FormSubmit>
         <Button
           variant="primary"

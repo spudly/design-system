@@ -9,7 +9,6 @@ import { LabeledGroup } from "../components/LabeledGroup.js";
 import { RevertAction } from "../components/RevertAction.js";
 import { ScrollRegion } from "../components/ScrollRegion.js";
 import { Spinner } from "../components/Spinner.js";
-import { Text } from "../components/Text.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { TextField } from "../components/TextField.js";
 import { ButtonRow } from "../components/ButtonRow.js";
@@ -402,7 +401,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
         ) : null}
         {contentLocked ? null : renderInstructionsSection ? renderInstructionsSection() : null}
 
-        {submitError ? <Text variant="error">{submitError}</Text> : null}
+        {submitError ? <Alert severity="error" message={submitError} /> : null}
         <Button disabled={isSubmitting} onPress={onSubmit}>
           {isSubmitting ? submittingLabel : submitLabel}
         </Button>
