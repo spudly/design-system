@@ -1,3 +1,4 @@
+import { Alert } from "../components/Alert.js";
 import { useState } from "react";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
@@ -46,7 +47,7 @@ export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextP
         placeholder="Paste your recipe here…"
         accessibilityLabel="Recipe text"
       />
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       <Button
         variant="primary"
         disabled={!text.trim() || loading}

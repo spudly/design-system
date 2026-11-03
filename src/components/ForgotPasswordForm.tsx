@@ -1,6 +1,6 @@
+import { Alert } from "./Alert.js";
 import { Button } from "./Button.js";
 import { FormStack } from "./FormStack.js";
-import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "./TextLink.js";
 
@@ -62,7 +62,7 @@ export function ForgotPasswordForm({
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       <Button
         variant="primary"
         disabled={loading}

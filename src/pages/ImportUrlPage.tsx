@@ -1,3 +1,4 @@
+import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { Text } from "../components/Text.js";
@@ -56,7 +57,7 @@ export function ImportUrlPage({
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       <Button
         variant="primary"
         disabled={!url.trim() || loading}

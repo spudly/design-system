@@ -1,8 +1,8 @@
+import { Alert } from "./Alert.js";
 import { YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 import { FormStack } from "./FormStack.js";
-import { Text } from "./Text.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "./TextLink.js";
 
@@ -92,7 +92,7 @@ export function SignInForm({
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       <Button
         variant="primary"
         disabled={loading}
