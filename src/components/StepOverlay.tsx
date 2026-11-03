@@ -263,13 +263,17 @@ export function StepOverlay({
       // review on PR #398): a host-built role="dialog"
       // aria-modal element that is not a DS layer has the
       // user's Tab — the same rule Dialog's containment keeps
-      // for foreign modals. DS layers are exempt through their
-      // registered roots (a covered DS Dialog's focus is this
-      // overlay's to reclaim), as are modals containing the
-      // shell or contained by it.
+      // for foreign modals. A native <dialog> shown with
+      // showModal() carries neither attribute but is just as
+      // foreign (and makes the shell inert, so redirecting
+      // would strand the key entirely) — the :modal arm of
+      // the selector covers it. DS layers are exempt through
+      // their registered roots (a covered DS Dialog's focus is
+      // this overlay's to reclaim), as are modals containing
+      // the shell or contained by it.
       const foreignModal =
         active && typeof active.closest === "function"
-          ? active.closest('[role="dialog"][aria-modal="true"]')
+          ? active.closest('[role="dialog"][aria-modal="true"], dialog:modal')
           : null;
       if (
         foreignModal &&

@@ -105,8 +105,11 @@ test("StepOverlay registers in the same registry and its Tab wrap stands down wh
   // …but it yields to a foreign modal holding focus, exactly
   // as Dialog's containment does (CodeRabbit review on
   // PR #398): no DS component pulls Tab out of a host-built
-  // modal the user is in.
+  // modal the user is in — including a native <dialog> shown
+  // with showModal(), which carries neither role nor
+  // aria-modal, hence the :modal arm of the selector.
   assert.match(overlay, /!registeredModalRoots\(\)\.has\(foreignModal\)/);
+  assert.match(overlay, /'\[role="dialog"\]\[aria-modal="true"\], dialog:modal'/);
 });
 
 test("the foreign-frame scan skips the frames the registry already arbitrates (#394)", () => {
