@@ -19,7 +19,13 @@
 # instead. One exception: the sanity job (below) is NOT part of
 # this gating — it still runs on any PR carrying the
 # `android-sanity` label, as an explicit opt-in, and on
-# workflow_dispatch runs with mode=sanity. The pull_request
+# workflow_dispatch runs with mode=sanity. Adding that label
+# starts a run of its own (the trigger includes the `labeled`
+# activity type — Stephen's directive, 2026-11-03): on a
+# label-triggered run ONLY the sanity job runs (the heavy jobs
+# stay gated off, even on a release PR), and a `labeled` event
+# for any other label starts a run in which every job skips, so
+# label churn costs nothing. The pull_request
 # trigger therefore carries no paths filter: a release PR's
 # diff is manifests and changelogs only,
 # which the old path filter (src/**, apps/storybook/**,
@@ -81,7 +87,13 @@ on:
   # 2026-11-02 — see the header comment): the heavy jobs gate
   # themselves on the PR head branch, and release PR diffs
   # (manifests/changelogs only) would never match the old filter.
+  # The types list restates the defaults plus `labeled` so that
+  # adding the `android-sanity` label starts a run (2026-11-03);
+  # the jobs' `if:` conditions confine label-triggered runs to
+  # the sanity job, and only when the added label IS
+  # `android-sanity`.
   pull_request:
+    types: [opened, synchronize, reopened, labeled]
   workflow_dispatch:
     inputs:
       mode:
@@ -104,21 +116,27 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-storybook-vr-${{ github.ref }}
+  group: android-storybook-vr-${{ github.ref }}${{ github.event.action == 'labeled' && format('-labeled-{0}', github.event.label.name) || '' }}
   cancel-in-progress: true
   # Concurrency acts on whole runs, never individual jobs, so a run
   # cannot cancel its own commit job mid-push. The bot's baseline
   # push starts a follow-up run that GitHub parks as
   # "action_required" (see commit-pr-baselines), so it cannot
   # cancel a successor either.
+  # Label-triggered runs get their own per-label group (the suffix
+  # above): adding a label must not cancel an in-progress heavy
+  # run on the same PR, and an unrelated label event must not
+  # cancel a sanity run the `android-sanity` label started.
 
 jobs:
   visual-regression:
     # Release-only PR gating (Stephen's directive, 2026-11-02):
     # PR runs only for changesets release branches; dispatched
-    # compare/update runs remain the manual path.
+    # compare/update runs remain the manual path. Label-triggered
+    # runs never start this job (2026-11-03): a labeled event runs
+    # the sanity job only, even on a release PR.
     if: >-
-      (github.event_name == 'pull_request' && startsWith(github.head_ref, 'changeset-release/')) ||
+      (github.event_name == 'pull_request' && github.event.action != 'labeled' && startsWith(github.head_ref, 'changeset-release/')) ||
       (github.event_name == 'workflow_dispatch' && inputs.mode != 'sanity')
     # Set by the "Note PR auto-commit readiness" step when a PR
     # compare run regenerated baselines and proved them green
@@ -470,6 +488,7 @@ jobs:
     needs: visual-regression
     if: >-
       github.event_name == 'pull_request' &&
+      github.event.action != 'labeled' &&
       startsWith(github.head_ref, 'changeset-release/') &&
       needs.visual-regression.outputs.pr_autocommit_ready == 'true' &&
       github.event.pull_request.head.repo.full_name == github.repository
@@ -529,9 +548,19 @@ jobs:
   # clip-box hardening — on web the same change renders identically,
   # which is the asymmetry that let #162 ship. Runs on demand: add
   # the `android-sanity` label to a PR, or dispatch with mode=sanity.
+  # Adding the label starts a run (the trigger includes the
+  # `labeled` activity type — Stephen's directive, 2026-11-03): on
+  # a label-triggered run this is the ONLY job that runs, and only
+  # when the added label is `android-sanity` itself; a `labeled`
+  # event for any other label starts a run in which every job
+  # skips. On ordinary PR events the label's presence at run start
+  # is what counts, as before.
   # Succeeds only if the mutated capture differs from the clean one.
   sanity:
-    if: (github.event_name == 'workflow_dispatch' && inputs.mode == 'sanity') || contains(github.event.pull_request.labels.*.name, 'android-sanity')
+    if: >-
+      (github.event_name == 'workflow_dispatch' && inputs.mode == 'sanity') ||
+      (github.event_name == 'pull_request' && github.event.action == 'labeled' && github.event.label.name == 'android-sanity') ||
+      (github.event_name == 'pull_request' && github.event.action != 'labeled' && contains(github.event.pull_request.labels.*.name, 'android-sanity'))
     runs-on: ubuntu-latest
     timeout-minutes: 90
     env:

@@ -360,7 +360,8 @@ PRs — PRs whose head branch is a changesets release branch
 PRs do not run the native VR compare or baseline jobs: rendering
 changes and baseline updates surface on the release PR instead.
 The only exception is the `sanity` job, which also runs on a PR
-carrying the `android-sanity` label (see "CI scoping"). To
+carrying the `android-sanity` label — adding that label starts a
+run of the sanity job (see "CI scoping"). To
 regenerate baselines
 from an ordinary PR branch before then, use the manual
 mode = `update` dispatch (point 3). The ci suite's
@@ -530,7 +531,9 @@ The `sanity` CI job: captures the SearchField stories clean, applies
 the patch, rebuilds and reinstalls, recaptures, and compares the two
 captures. **The job succeeds only if the comparison FAILS.** Run it
 by dispatching the workflow with mode = `sanity`, or by adding the
-`android-sanity` label to a PR. If SearchField changes so the patch
+`android-sanity` label to a PR — the label starts a workflow run
+in which only the sanity job runs (even on a release PR). If
+SearchField changes so the patch
 no longer applies, the job fails at `git apply` — refresh the patch
 (edit the file the same way, `git diff` it into the patch file,
 revert) in the same PR.
@@ -545,7 +548,11 @@ skip native VR entirely, so the emulator job's cost lands once
 per release instead of on every change that could affect a story
 screenshot. The one exception is the `sanity` job, which also
 runs on any PR carrying the `android-sanity` label — an explicit
-opt-in, never automatic. It
+opt-in, never automatic. Adding the label starts a run (the
+trigger includes the `labeled` activity type): on a
+label-triggered run only the sanity job runs — the heavy jobs
+stay off even on a release PR — and a `labeled` event for any
+other label starts a run in which every job skips. It
 builds a **release** APK with the JS bundle embedded (the
 generated template signs it with the debug keystore, so it
 installs as-is). Serving the bundle from a Metro dev server
