@@ -539,7 +539,9 @@ the head branch is a changesets release branch
 (`changeset-release/*`), plus manual dispatches — ordinary PRs
 skip native VR entirely, so the emulator job's cost lands once
 per release instead of on every change that could affect a story
-screenshot. It
+screenshot. The one exception is the `sanity` job, which also
+runs on any PR carrying the `android-sanity` label — an explicit
+opt-in, never automatic. It
 builds a **release** APK with the JS bundle embedded (the
 generated template signs it with the debug keystore, so it
 installs as-is). Serving the bundle from a Metro dev server
@@ -552,8 +554,8 @@ capture entirely. (Local development still uses Metro via
 
 ### Scoped PR runs: capture only the affected stories (issue #114)
 
-Without scoping, a full run captures all 115 baselines (104
-standard + 11 narrow) — a 20–30 minute emulator job gating every
+Without scoping, a full run captures all 147 baselines (135
+standard + 12 narrow) — a 20–30 minute emulator job gating every
 PR, including one-line component fixes. Since issue #114, a PR
 compare run first computes the stories the PR can actually
 affect and captures only those:
