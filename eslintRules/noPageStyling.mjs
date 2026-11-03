@@ -39,6 +39,21 @@
  * it is a non-event.
  */
 
+/**
+ * The statically known value of a dynamic import's source, or
+ * undefined when it is not static: string literals and
+ * substitution-free template literals are known; anything else
+ * (identifiers, interpolated templates, calls) is a runtime value
+ * the rule cannot classify.
+ */
+function importSourceValue(source) {
+  if (source.type === "Literal") return source.value;
+  if (source.type === "TemplateLiteral" && source.expressions.length === 0) {
+    return source.quasis[0].value.cooked;
+  }
+  return undefined;
+}
+
 function isTamaguiSource(source) {
   return (
     typeof source === "string" &&
@@ -85,12 +100,9 @@ const noPageStyling = {
         }
       },
       ImportExpression(node) {
-        if (node.source.type === "Literal" && isTamaguiSource(node.source.value)) {
-          context.report({
-            node,
-            messageId: "tamaguiImport",
-            data: { source: node.source.value },
-          });
+        const source = importSourceValue(node.source);
+        if (isTamaguiSource(source)) {
+          context.report({ node, messageId: "tamaguiImport", data: { source } });
         }
       },
       JSXOpeningElement(node) {
