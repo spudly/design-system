@@ -1,5 +1,6 @@
 node_modules
 dist
+test-dist
 .turbo
 coverage
 .expo

@@ -80,11 +80,11 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
-      - run: node --test test/*.test.mjs
+      - run: npm run build:tests && node --test test-dist/*.test.js
         env:
           # Release-only VR (Stephen's directive, 2026-11-02): the
           # VR baseline-completeness gate in
-          # test/visualRegressionScope.test.mjs is enforced only
+          # test/visualRegressionScope.test.ts is enforced only
           # where baselines are generated — the changesets release
           # PR. Ordinary PRs may add stories without committed
           # baselines; the release PR's VR run generates them.

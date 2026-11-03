@@ -208,7 +208,7 @@ aggregate story file); `PageFrame` is the internal page shell —
 it has no stories of its own and renders inside every page
 capture below. The narrow-variant row is the RecipesPage
 exception set (see the next section). This table is pinned by
-`test/visualRegressionScope.test.mjs` against the derived
+`test/visualRegressionScope.test.ts` against the derived
 capture set and the baseline files on disk. A row that drifts from
 the files fails the test suite on every PR. A page story without a
 committed baseline fails it on release PRs only (see "Baselines:
@@ -520,7 +520,7 @@ exists for. `tools/visualRegression/sanity/searchfield-162.patch`
 reintroduces the bug into `src/components/SearchField.tsx`: the drawn
 shapes glyph becomes the pre-fix text glyph with a numeric
 `lineHeight` equal to its `fontSize` (the exact pattern
-`test/glyphLineHeight.test.mjs` bans in committed source), and the
+`test/glyphLineHeight.test.ts` bans in committed source), and the
 post-#162 clip-box hardening (`height: 44; overflow: hidden` on the
 glyph box) is removed. On web this renders identically (a web line
 box honors lineHeight exactly); on Android the text glyph's line box
@@ -621,7 +621,7 @@ The scope step reads it and forces the full set; the decision and
 its reasons are echoed into the job's step summary on every run,
 so what was captured (and why) is always auditable after the
 fact. The mapper itself is unit-tested in
-`test/visualRegressionScope.test.mjs`, including an invariant
+`test/visualRegressionScope.test.ts`, including an invariant
 that pins the derived story inventory against the committed
 baselines.
 
