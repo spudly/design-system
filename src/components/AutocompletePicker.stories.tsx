@@ -31,10 +31,12 @@ function PickerDemo({
   initialSearchText = "",
   initialSelectedIds = ["tuscan-chicken"],
   isSearching = false,
+  searchError,
 }: {
   initialSearchText?: string;
   initialSelectedIds?: string[];
   isSearching?: boolean;
+  searchError?: string;
 }) {
   const [searchText, setSearchText] = useState(initialSearchText);
   const [selectedItems, setSelectedItems] = useState<AutocompletePickerSelectedItem[]>(
@@ -44,9 +46,13 @@ function PickerDemo({
     })),
   );
   const query = searchText.trim().toLowerCase();
-  const searchResults = query
-    ? LIBRARY.filter((item) => item.label.toLowerCase().includes(query))
-    : [];
+  // A failed search (searchError set) loads no results at
+  // all — that is exactly the state #393 is about.
+  const searchResults = searchError
+    ? []
+    : query
+      ? LIBRARY.filter((item) => item.label.toLowerCase().includes(query))
+      : [];
   return (
     <YStack maxWidth={430}>
       <AutocompletePicker
@@ -54,6 +60,7 @@ function PickerDemo({
         onSearchTextChange={setSearchText}
         searchResults={searchResults}
         isSearching={isSearching}
+        searchError={searchError}
         onSelectResult={(id) => {
           const result = LIBRARY.find((item) => item.id === id);
           if (result) {
@@ -85,4 +92,19 @@ export const Searching: Story = {
 
 export const NoResults: Story = {
   render: () => <PickerDemo initialSearchText="sushi" />,
+};
+
+/**
+ * The search FAILED (#393): the picker shows the error —
+ * never "No results found." — because the search did not
+ * actually match nothing; it never completed.
+ */
+export const SearchError: Story = {
+  render: () => (
+    <PickerDemo
+      initialSearchText="chicken"
+      initialSelectedIds={[]}
+      searchError="Could not load recipes: network error."
+    />
+  ),
 };

@@ -111,7 +111,11 @@ test("the picker mounts a polite live region and its text tracks the search stat
   assert.match(picker, /collapsable=\{false\}/, "the region's node cannot be flattened away");
   assert.match(picker, /statusMessage/, "the region's text is the search-state message");
   assert.match(picker, /\? "Searching"/, "the searching state is announced");
-  assert.match(picker, /\? noResultsMessage/, "the no-matches state announces the no-results text");
+  assert.match(
+    picker,
+    /\|\| noResultsMessage/,
+    "the no-matches state announces the no-results text (falling back from a search error; an empty-string error counts as no error, #393)",
+  );
   assert.match(picker, /results"} available`/, "the results state announces the result count");
   assert.ok(
     !picker.includes("opacity={0}"),
@@ -245,6 +249,24 @@ test("SSR: the live region announces Searching while a search is in flight", asy
   assert.ok(
     statusRegion(html).includes("Searching"),
     "the searching state is announced inside the region, not just that the region exists",
+  );
+});
+
+test("SSR: an empty-string searchError is no error — the region announces the no-results message (#393)", async () => {
+  const { React, AutocompletePicker } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(
+      AutocompletePicker,
+      pickerProps({
+        searchText: "chicken",
+        searchError: "",
+        noResultsMessage: "No recipes found.",
+      }),
+    ),
+  );
+  assert.ok(
+    statusRegion(html).includes("No recipes found."),
+    "an empty-string error falls back to the no-results announcement, not silence",
   );
 });
 

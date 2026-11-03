@@ -101,6 +101,12 @@ export type MealPlanFormPageProps = {
   /** The host's search is in flight: the picker shows its
    * searching state instead of the (stale) results. */
   isSearching?: boolean;
+  /** The host's entry search failed. Threaded to the
+   * picker (#393): while set, the picker shows this error
+   * instead of "No meals or recipes found." — a failed
+   * search must not read as no matches. Distinct from
+   * `error` (save failures): pass search failures here. */
+  searchError?: string | null | undefined;
   /** The selected entries' view-models, in selection order —
    * the removable list and the steppers render in this
    * order. */
@@ -141,6 +147,7 @@ export function MealPlanFormPage({
   onSearchTextChange,
   searchResults,
   isSearching = false,
+  searchError,
   selectedEntries,
   quantityByKey,
   servingsByRecipeId,
@@ -193,6 +200,7 @@ export function MealPlanFormPage({
             ...(entry.servings !== undefined ? { detail: `${entry.servings} servings` } : {}),
           }))}
           isSearching={isSearching}
+          searchError={searchError}
           onSelectResult={onSelectEntry}
           selectedItems={selectedEntries.map((entry) => ({
             id: entry.key,
