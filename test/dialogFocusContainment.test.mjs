@@ -104,12 +104,9 @@ test("only the topmost modal intercepts Tab — a covered dialog stands down (#3
   // in the document (or one nested inside this dialog) must not
   // disable containment (Copilot + CodeRabbit review on PR #392,
   // head 5f84f47).
-  assert.match(
-    code,
-    /other\.getAttribute\("aria-modal"\) === "true" \|\| other\.matches\(":modal"\)/,
-  );
+  assert.match(code, /other\.getAttribute\("aria-modal"\) === "true" \|\| isNativeModal/);
   assert.match(code, /frame\.contains\(other\)/);
-  assert.match(code, /other\.getClientRects\(\)\.length > 0/);
+  assert.match(code, /other\.getClientRects\(\)\.length === 0/);
   assert.match(code, /if \(covered\) \{\s+return;\s+\}/);
 });
 
@@ -167,6 +164,30 @@ test("a foreign modal layer holding focus is the active layer — this dialog st
   // (CodeRabbit review on PR #392, head 646fe94).
   assert.match(code, /const setContentRef = useCallback\(/);
   assert.match(code, /contentRef\.current = node;/);
+});
+
+test("the f0fd374 review round: invisible ARIA-only frames, editable details, stray summaries (#391)", () => {
+  // Copilot review on PR #392 (head f0fd374), three findings:
+  // (1) a later foreign <dialog aria-modal> with
+  // visibility:hidden still has client rects but covers
+  // nothing — the covered scan checks computed visibility for
+  // ARIA-only frames, while a native :modal frame covers as
+  // before.
+  assert.match(code, /const isNativeModal = other\.matches\(":modal"\);/);
+  assert.match(code, /window\.getComputedStyle\(other\)/);
+  assert.match(code, /otherStyle\.visibility !== "hidden"/);
+  assert.match(code, /otherStyle\.visibility !== "collapse"/);
+  assert.match(code, /if \(isNativeModal\) \{\s+return true;\s+\}/);
+  // (2) a <details contenteditable> is itself an editing host
+  // and a Tab stop even with a summary child — the summary
+  // exclusion applies only when the details is not editable.
+  assert.match(code, /const editableHost = editableAttr !== null && editableAttr !== "false";/);
+  assert.match(code, /if \(hasOwnSummary && !editableHost\) \{\s+return false;\s+\}/);
+  // (3) a plain <summary> outside a <details> is not a
+  // disclosure control or a Tab stop — it is excluded unless
+  // editable or independently tabbable (tabindex handled
+  // earlier in the candidate pass).
+  assert.match(code, /if \(!\(parent instanceof HTMLDetailsElement\)\) \{\s+return false;\s+\}/);
 });
 
 test("summary and image-map stops follow the native rules (#391)", () => {

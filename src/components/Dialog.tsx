@@ -490,7 +490,12 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // is not a native <dialog> element) is the active layer —
   // this listener stands down for it instead of pulling focus
   // back into the covered dialog (Copilot review on PR #392,
-  // head f32fd7d).
+  // head f32fd7d). (6) An ARIA-only foreign modal frame that is
+  // invisible does not cover (native :modal frames keep the
+  // old behavior), an explicitly editable details element is
+  // a stop even with a summary child, and a summary outside a
+  // details is not a stop unless independently tabbable or
+  // editable (Copilot review on PR #392, head f0fd374).
   useEffect(() => {
     if (!open || !isWeb || typeof document === "undefined") {
       return;
@@ -559,9 +564,28 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           if ((frame.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING) === 0) {
             return false;
           }
-          const isOpenModal =
-            other.getAttribute("aria-modal") === "true" || other.matches(":modal");
-          return isOpenModal && other.getClientRects().length > 0;
+          const isNativeModal = other.matches(":modal");
+          const isOpenModal = other.getAttribute("aria-modal") === "true" || isNativeModal;
+          if (!isOpenModal || other.getClientRects().length === 0) {
+            return false;
+          }
+          // A native :modal dialog is the browser's top layer
+          // and covers as before. An ARIA-only modal frame
+          // (aria-modal without the :modal state) that is
+          // invisible — display:none or visibility hidden /
+          // collapse — still has client rects when merely
+          // visibility-hidden, but it is not covering anything
+          // the user can see, so it must not stand this dialog
+          // down (Copilot review on PR #392, head f0fd374).
+          if (isNativeModal) {
+            return true;
+          }
+          const otherStyle = window.getComputedStyle(other);
+          return (
+            otherStyle.display !== "none" &&
+            otherStyle.visibility !== "hidden" &&
+            otherStyle.visibility !== "collapse"
+          );
         });
         if (covered) {
           return;
@@ -590,6 +614,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           return false;
         }
         const editableAttr = candidate.getAttribute("contenteditable");
+        const editableHost = editableAttr !== null && editableAttr !== "false";
         // An explicitly editable candidate (contenteditable "",
         // "true", or "plaintext-only") is its own editing host
         // and a Tab stop even inside a contenteditable="false"
@@ -612,7 +637,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           const hasOwnSummary = Array.from(candidate.children).some(
             (child) => child.tagName === "SUMMARY",
           );
-          if (hasOwnSummary) {
+          // An explicitly editable details is itself an editing
+          // host and a Tab stop even though it has a summary
+          // child — the summary exclusion must not reject it, or
+          // a <details contenteditable> whose summary carries
+          // tabindex="-1" would leave the editor unreachable
+          // (Copilot review on PR #392, head f0fd374).
+          if (hasOwnSummary && !editableHost) {
             return false;
           }
         }
@@ -625,8 +656,19 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
           // with a nonnegative tabindex (handled above — this
           // branch only runs when tabStopAttr is null).
           const parent = candidate.parentElement;
-          const editableHost = editableAttr !== null && editableAttr !== "false";
-          if (!editableHost && parent instanceof HTMLDetailsElement) {
+          if (!editableHost) {
+            // A summary whose parent is not a details is not a
+            // disclosure control at all and is not a native Tab
+            // stop — counting it would let Tab escape through a
+            // plain <summary> element (Copilot review on
+            // PR #392, head f0fd374). This branch only runs
+            // when tabStopAttr is null, so an independently
+            // tabbable summary (nonnegative tabindex, handled
+            // above) or an editable one (editableHost) is not
+            // affected.
+            if (!(parent instanceof HTMLDetailsElement)) {
+              return false;
+            }
             const firstSummary = Array.from(parent.children).find(
               (child) => child.tagName === "SUMMARY",
             );
