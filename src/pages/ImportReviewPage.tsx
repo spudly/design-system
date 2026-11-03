@@ -1,3 +1,4 @@
+import { Alert } from "../components/Alert.js";
 import type { ReactNode } from "react";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
@@ -83,7 +84,7 @@ export function ImportReviewPage({
         />
       ) : null}
       <PreviewCard>{preview}</PreviewCard>
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       <ButtonRow>
         <Button variant="primary" disabled={busy} onPress={onAccept}>
           {acceptPending ? "Saving…" : "Looks good"}

@@ -148,7 +148,7 @@ export function AccessTokensPanel({
           </YStack>
         </YStack>
       )}
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       {loading ? (
         <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray6}>
           Loading tokens…

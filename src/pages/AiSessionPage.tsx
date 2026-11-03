@@ -1,3 +1,4 @@
+import { Alert } from "../components/Alert.js";
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { Button } from "../components/Button.js";
@@ -154,7 +155,7 @@ export function AiSessionPage({
           size="xl"
           textAlignVertical="top"
         />
-        {error ? <Text variant="error">{error}</Text> : null}
+        {error ? <Alert severity="error" message={error} /> : null}
         <ButtonRow>
           <Button variant="ghost" onPress={onEmptyCancel}>
             Cancel
@@ -239,7 +240,7 @@ export function AiSessionPage({
           {preview}
         </PreviewCard>
       ) : null}
-      {error ? <Text variant="error">{error}</Text> : null}
+      {error ? <Alert severity="error" message={error} /> : null}
       {session.canCancel ? (
         <YStack opacity={busy ? 0.5 : 1} pointerEvents={busy ? "none" : "auto"}>
           <TextAction
