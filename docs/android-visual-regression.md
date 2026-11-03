@@ -431,7 +431,12 @@ baseline yet` and skips it (a BOOTSTRAP note when nothing at all
    `tools/visualRegression/baselines/` and — only if something
    actually changed — commits them to the dispatched branch as
    github-actions[bot] ("chore(vr): update Android Storybook
-   baselines") and pushes. The regenerated baselines therefore show
+   baselines (manual update)") and pushes. The subject deliberately
+   differs from the PR auto-commit subject: update mode verifies
+   nothing (no luminance guard, no in-job re-compare), so its
+   commits must never match the bot-head pass-through (point 5) —
+   a later compare on a branch headed by one captures for real.
+   The regenerated baselines therefore show
    up in the PR diff for review like any other change; nobody has
    to download and commit them by hand. (The fresh screenshots are
    still uploaded as the `dsvr-baselines` artifact, as a
@@ -443,9 +448,9 @@ baseline yet` and skips it (a BOOTSTRAP note when nothing at all
 4. Dispatching mode = `update` from the default branch (`main`) is
    refused: the commit job fails with an error, because baselines
    must land via a PR branch so they are reviewed in a diff. The PR
-   auto-commit jobs refuse the default branch the same way — main
-   pushes are always compare-only and never receive baseline
-   commits.
+   auto-commit jobs refuse the default branch the same way. (Main
+   pushes no longer run this workflow at all — see "CI scoping"
+   below.)
 5. A baseline commit's push does not auto-run the PR's checks:
    GitHub parks workflow runs for bot-token pushes as
    "action_required", so a maintainer approves the follow-up run in
@@ -519,9 +524,13 @@ revert) in the same PR.
 
 ## CI scoping
 
-The workflow is path-filtered to `src/**`, `apps/storybook/**`,
-`tools/visualRegression/**` and itself, so the emulator job does
-not run on changes that cannot affect a story screenshot. It
+Since 2026-11-02 the workflow is neither path-filtered nor run
+on main pushes: the emulator jobs run on pull requests only when
+the head branch is a changesets release branch
+(`changeset-release/*`), plus manual dispatches — ordinary PRs
+skip native VR entirely, so the emulator job's cost lands once
+per release instead of on every change that could affect a story
+screenshot. It
 builds a **release** APK with the JS bundle embedded (the
 generated template signs it with the debug keystore, so it
 installs as-is). Serving the bundle from a Metro dev server
@@ -534,7 +543,7 @@ capture entirely. (Local development still uses Metro via
 
 ### Scoped PR runs: capture only the affected stories (issue #114)
 
-Even path-filtered, a full run captures all 115 baselines (104
+Without scoping, a full run captures all 115 baselines (104
 standard + 11 narrow) — a 20–30 minute emulator job gating every
 PR, including one-line component fixes. Since issue #114, a PR
 compare run first computes the stories the PR can actually

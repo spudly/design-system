@@ -135,7 +135,11 @@ jobs:
       # docs/android-visual-regression.md). A maintainer merge or
       # any later commit changes the head and the full run resumes.
       # Update dispatches are excluded on purpose: an explicit
-      # regeneration request always runs in full.
+      # regeneration request always runs in full. Manual update
+      # commits also never qualify: commit-baselines gives them a
+      # distinct subject (see that job), because update mode runs
+      # neither the luminance guard nor the in-job re-compare — a
+      # later compare on such a head must capture for real.
       - name: Detect VR bot baseline head
         id: vrbot
         if: github.event_name == 'pull_request' || inputs.mode == 'compare'
@@ -413,6 +417,12 @@ jobs:
       - name: Refresh the VR coverage listing
         run: node tools/visualRegression/coverageListing.mjs
 
+      # The subject deliberately differs from the PR auto-commit
+      # subject: update mode runs neither the luminance guard nor
+      # the in-job re-compare, so its commits must never match the
+      # visual-regression job's bot-head pass-through (which treats
+      # an exact-subject head as already verified). A later compare
+      # on a branch headed by this commit captures for real.
       - name: Commit and push if baselines changed
         run: |
           if [ -z "$(git status --porcelain -- tools/visualRegression/baselines docs/android-visual-regression.md)" ]; then
@@ -422,7 +432,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add tools/visualRegression/baselines docs/android-visual-regression.md
-          git commit -m "chore(vr): update Android Storybook baselines"
+          git commit -m "chore(vr): update Android Storybook baselines (manual update)"
           git push origin "HEAD:${{ github.ref_name }}"
 
   # PR runs only: push the baselines the visual-regression job
