@@ -31,7 +31,11 @@ const StyledContent = styled(TamaguiDialog.Content, {
 // frame it renders into, so the document-order fallback for
 // foreign modals can recognize (and skip) DS frames; the last
 // registered entry is the topmost DS dialog.
-type OpenDialogEntry = { token: symbol; frame: Element | null };
+type OpenDialogEntry = {
+  token: symbol;
+  frame: Element | null;
+  content: Element | null;
+};
 const openDialogStack: OpenDialogEntry[] = [];
 
 export type DialogProps = {
@@ -92,7 +96,11 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const reassertRafRef = useRef<number | null>(null);
   const unmountRestoreRef = useRef(false);
   const blurredTargetRef = useRef<HTMLElement | null>(null);
-  const stackEntryRef = useRef<OpenDialogEntry>({ token: Symbol("dialog"), frame: null });
+  const stackEntryRef = useRef<OpenDialogEntry>({
+    token: Symbol("dialog"),
+    frame: null,
+    content: null,
+  });
 
   // Restore helper: focus the tracked element if it is still in the
   // document and focusable, and clear the target either way so a
@@ -391,6 +399,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     const content = contentRef.current as unknown as HTMLElement | null;
     entry.frame =
       content && typeof content.closest === "function" ? content.closest("dialog") : null;
+    entry.content = content;
     openDialogStack.push(entry);
     return () => {
       const index = openDialogStack.indexOf(entry);
@@ -452,7 +461,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   // contenteditable="false" region, only a details' FIRST
   // summary child is a native stop, and an image map counts
   // only when its image is actually visible, not merely laid
-  // out (Copilot review on PR #392, head 3bbf165).
+  // out (Copilot review on PR #392, head 3bbf165). (5) A
+  // foreign modal layer that currently holds focus (a
+  // role="dialog" aria-modal shell such as StepOverlay, which
+  // is not a native <dialog> element) is the active layer —
+  // this listener stands down for it instead of pulling focus
+  // back into the covered dialog (Copilot review on PR #392,
+  // head f32fd7d).
   useEffect(() => {
     if (!open || !isWeb || typeof document === "undefined") {
       return;
@@ -472,6 +487,36 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       }
       const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
       ownEntry.frame = frame;
+      ownEntry.content = content;
+      // A foreign modal layer that currently holds focus is the
+      // active layer, whatever this dialog's state: a non-DS
+      // modal such as StepOverlay (a role="dialog" aria-modal
+      // shell, not a native <dialog> element — the frame scan
+      // below cannot see it) mounted over this dialog moves
+      // focus into itself on mount, and this listener must not
+      // pull that focus back into the covered dialog (Copilot
+      // review on PR #392, head f32fd7d). DS dialogs are exempt
+      // — the stack order above already arbitrates between
+      // them — as is a layer that merely CONTAINS this dialog
+      // (this dialog is then the top layer inside it).
+      const focusedElement = document.activeElement as HTMLElement | null;
+      if (
+        focusedElement &&
+        focusedElement !== document.body &&
+        !content.contains(focusedElement) &&
+        !(frame && frame.contains(focusedElement)) &&
+        typeof focusedElement.closest === "function"
+      ) {
+        const foreignModal = focusedElement.closest('[role="dialog"][aria-modal="true"]');
+        if (
+          foreignModal &&
+          !foreignModal.contains(content) &&
+          !content.contains(foreignModal) &&
+          !openDialogStack.some((entry) => entry.content === foreignModal)
+        ) {
+          return;
+        }
+      }
       if (frame) {
         const dsFrames = new Set(
           openDialogStack.map((entry) => entry.frame).filter((entryFrame) => entryFrame !== null),

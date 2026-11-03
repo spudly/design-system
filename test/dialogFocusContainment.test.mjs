@@ -140,6 +140,20 @@ test("a details with no summary child counts as a Tab stop, and the fallback lan
   );
 });
 
+test("a foreign modal layer holding focus is the active layer — this dialog stands down (#391)", () => {
+  // Copilot review on PR #392 (head f32fd7d): StepOverlay is a
+  // role="dialog" aria-modal shell, not a native <dialog>
+  // element, so the frame scan cannot see it covering this
+  // dialog; when it holds focus, the pull-back must not yank
+  // focus into the covered dialog. DS dialogs are exempt (the
+  // stack arbitrates between them, via the registered content
+  // elements), as is a layer containing this dialog.
+  assert.match(code, /closest\('\[role="dialog"\]\[aria-modal="true"\]'\)/);
+  assert.match(code, /entry\.content === foreignModal/);
+  assert.match(code, /!foreignModal\.contains\(content\)/);
+  assert.match(code, /entry\.content = content;/);
+});
+
 test("summary and image-map stops follow the native rules (#391)", () => {
   // Copilot review on PR #392 (head 3bbf165): only the FIRST
   // summary child of a details is its disclosure control and a
