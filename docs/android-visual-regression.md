@@ -359,7 +359,16 @@ PRs — PRs whose head branch is a changesets release branch
 PRs do not run native VR at all: rendering changes and baseline
 updates surface on the release PR instead. To regenerate baselines
 from an ordinary PR branch before then, use the manual
-mode = `update` dispatch (point 3).
+mode = `update` dispatch (point 3). The ci suite's
+baseline-completeness test is likewise enforced only on the
+release PR (`DSVR_ENFORCE_BASELINE_GATE` in ci.yml), so a
+story-adding PR merges without committed baselines and the
+release PR generates them. While a release is pending, the
+changesets action recreates the release branch whenever main
+advances — force-updating it and dropping any VR baseline commits
+on it; the release PR then re-runs VR, which regenerates and
+re-commits them, so review the baseline diff on the final head
+before merging the release.
 
 1. **Release PRs: automatic.** The PR compare run (`capture-compare.sh`,
    mode `pr-autocommit`) starts with the ordinary strict compare

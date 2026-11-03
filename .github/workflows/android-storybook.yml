@@ -25,7 +25,15 @@
 # Gradle cache from the default branch — with the heavy jobs
 # release-only, that run no longer happens and release-PR runs
 # save their own cache. workflow_dispatch stays available as the
-# manual path (compare/update/sanity on demand). Within a run, PR compare runs
+# manual path (compare/update/sanity on demand). One interaction
+# to expect on the release PR: while a release is pending, the
+# changesets action recreates the release branch whenever main
+# advances, force-updating it and dropping any VR baseline commits
+# the commit-pr-baselines job pushed there. The synchronize event
+# re-runs this workflow, which regenerates and re-commits the
+# baselines — so the baseline commit is recreated after merges to
+# main, and the diff to review is the one on the final head.
+# Within a run, PR compare runs
 # capture only the stories the PR's changes can affect (issue #114:
 # the "Compute VR capture scope" step and
 # tools/visualRegression/scope.mjs; anything shared or unmappable
