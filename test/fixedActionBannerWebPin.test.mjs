@@ -99,21 +99,28 @@ async function renderSsr(element) {
   );
 }
 
-// The position rules (in source order) for the classes on the
-// rendered ActionBar root element. Tamagui emits one class per
-// position value; a platform-conditional value emits both rules
-// under one class, and the later rule wins the cascade.
-function rootPositionRules(html) {
+// The values of one CSS property for the classes on the rendered
+// ActionBar root element, collected in STYLESHEET order (the order
+// the rules appear in the rendered document), because the cascade —
+// not the class attribute's order — decides which of two
+// same-specificity rules wins. Tamagui emits one class per value; a
+// platform-conditional value emits both rules under one class, and
+// the later rule in the stylesheet wins.
+function rootCssValues(html, property) {
   const match = html.match(/<div name="ActionBar" class="([^"]*)"/);
   assert.ok(match, "expected a rendered ActionBar root element");
-  const rules = [];
-  for (const cls of match[1].split(/\s+/)) {
-    if (!cls.startsWith("_p-")) continue;
-    for (const rule of html.matchAll(new RegExp(String.raw`\.${cls}\{position:([a-z]+)\}`, "g"))) {
-      rules.push(rule[1]);
-    }
+  const rootClasses = new Set(match[1].split(/\s+/));
+  const values = [];
+  for (const rule of html.matchAll(/\.([_a-zA-Z0-9-]+)\{([^}]*)\}/g)) {
+    if (!rootClasses.has(rule[1])) continue;
+    const declaration = rule[2].match(new RegExp(String.raw`${property}\s*:\s*([^;}]+)`));
+    if (declaration) values.push(declaration[1]);
   }
-  return rules;
+  return values;
+}
+
+function rootPositionRules(html) {
+  return rootCssValues(html, "position");
 }
 
 test("SSR: the banner root's effective web position is fixed (#405)", async () => {
@@ -133,6 +140,24 @@ test("SSR: the banner root's effective web position is fixed (#405)", async () =
   );
 });
 
+test("SSR: the banner root caps height at the viewport and scrolls on web (#405)", async () => {
+  const { React, FixedActionBanner } = await loadRuntime();
+  const html = await renderSsr(
+    React.createElement(FixedActionBanner, {
+      message: "We use cookies.",
+      primaryAction: { label: "Accept", onPress: () => "accept" },
+    }),
+  );
+  assert.ok(
+    rootCssValues(html, "max-height").includes("100%"),
+    "expected a max-height:100% rule on the banner root",
+  );
+  assert.ok(
+    rootCssValues(html, "overflow").includes("auto"),
+    "expected an overflow:auto rule on the banner root",
+  );
+});
+
 test("SSR: a plain ActionBar root stays absolute (#405)", async () => {
   const { React, ActionBar, Text } = await loadRuntime();
   const html = await renderSsr(
@@ -143,5 +168,15 @@ test("SSR: a plain ActionBar root stays absolute (#405)", async () => {
   assert.ok(
     rules.every((rule) => rule === "absolute"),
     `a plain ActionBar must carry only absolute position rules, got: ${rules.join(", ")}`,
+  );
+  assert.deepEqual(
+    rootCssValues(html, "max-height"),
+    [],
+    "a plain ActionBar must not carry the banner's viewport cap",
+  );
+  assert.deepEqual(
+    rootCssValues(html, "overflow"),
+    [],
+    "a plain ActionBar must not carry the banner's internal scroll",
   );
 });
