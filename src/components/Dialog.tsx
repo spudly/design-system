@@ -22,6 +22,22 @@ const StyledContent = styled(TamaguiDialog.Content, {
   maxWidth: 400,
 });
 
+// Activation order of the currently open DS dialogs (web
+// containment, #391): portal frames mount in tree order, which
+// is not necessarily the order dialogs were opened in, so the
+// topmost-modal test cannot rely on document order alone among
+// DS dialogs themselves. Each open Dialog registers an entry
+// here for as long as it is open — its identity plus the portal
+// frame it renders into, so the document-order fallback for
+// foreign modals can recognize (and skip) DS frames; the last
+// registered entry is the topmost DS dialog.
+type OpenDialogEntry = {
+  token: symbol;
+  frame: Element | null;
+  content: Element | null;
+};
+const openDialogStack: OpenDialogEntry[] = [];
+
 export type DialogProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -80,6 +96,34 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
   const reassertRafRef = useRef<number | null>(null);
   const unmountRestoreRef = useRef(false);
   const blurredTargetRef = useRef<HTMLElement | null>(null);
+  const stackEntryRef = useRef<OpenDialogEntry>({
+    token: Symbol("dialog"),
+    frame: null,
+    content: null,
+  });
+  // The modal layer this dialog was opened FROM, if any (the
+  // layer holding the tracked opener at the open transition) —
+  // the foreign-modal stand-down in the containment handler
+  // must never stand down for it: this dialog is the active
+  // layer above its host, even though its content is portalled
+  // outside the host's subtree (Copilot review on PR #392,
+  // head 646fe94).
+  const hostModalRef = useRef<Element | null>(null);
+  // The content ref is a callback, not an object ref: when an
+  // initially open dialog hydrates, Tamagui's Portal mounts the
+  // content in a later update than the open-transition effects,
+  // so an effect-time read can store a null frame/content in
+  // the stack entry that nothing later repairs. The callback
+  // re-syncs the entry at attach time, whenever that happens
+  // (CodeRabbit review on PR #392, head 646fe94).
+  const setContentRef = useCallback((node: TamaguiElement | null) => {
+    contentRef.current = node;
+    const content = node as unknown as HTMLElement | null;
+    const entry = stackEntryRef.current;
+    entry.frame =
+      content && typeof content.closest === "function" ? content.closest("dialog") : null;
+    entry.content = content;
+  }, []);
 
   // Restore helper: focus the tracked element if it is still in the
   // document and focusable, and clear the target either way so a
@@ -366,6 +410,334 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     };
   }, []);
 
+  // Register in the open-dialog stack while open (see
+  // openDialogStack above). The cleanup removes exactly this
+  // registration, so a StrictMode replay (cleanup + setup) nets
+  // a single entry.
+  useEffect(() => {
+    if (!open || !isWeb) {
+      return;
+    }
+    const entry = stackEntryRef.current;
+    const content = contentRef.current as unknown as HTMLElement | null;
+    entry.frame =
+      content && typeof content.closest === "function" ? content.closest("dialog") : null;
+    entry.content = content;
+    openDialogStack.push(entry);
+    return () => {
+      const index = openDialogStack.indexOf(entry);
+      if (index >= 0) {
+        openDialogStack.splice(index, 1);
+      }
+    };
+  }, [open]);
+
+  // Focus containment for a dialog with nothing tabbable (#391):
+  // the primitive's focus scope traps Tab between the dialog's
+  // tabbable descendants, and when there are none its own landing
+  // wrapper is the only stop — sequential navigation then escapes
+  // to the page behind the overlay on the next Tab (and a first
+  // Shift+Tab lands directly on the opener). While the dialog is
+  // open on web, a capture-phase keydown listener therefore takes
+  // over Tab handling ONLY when the content holds no effectively
+  // tabbable element: the keypress's default traversal is
+  // prevented so focus stays on the wrapper inside the dialog,
+  // and if focus somehow sits outside the dialog it is pulled
+  // back onto that wrapper. Propagation is deliberately NOT
+  // stopped: a control inside the dialog that handles Tab itself
+  // (an editor that indents, say) must still receive the key —
+  // preventing the default is what keeps focus from escaping,
+  // and with no tabbable candidates the scope has nowhere to
+  // move focus either. Dialogs with
+  // tabbable content are untouched — the primitive already wraps
+  // Cancel <-> Delete correctly there (manual QA on PR #386).
+  // Refinements from review rounds on PR #392: (1) tabbability
+  // is effective, not selector-shaped — a hidden input, a
+  // disabled or visibility-hidden control (the :disabled
+  // pseudo-class carries the fieldset semantics, first-legend
+  // exception included, and never matches links), a control
+  // inside an inert subtree, a negative-tabindex-only control,
+  // or an unrendered element is not a Tab stop, while native
+  // stops a naive selector misses (summary, iframe, media
+  // controls, genuinely editable content) are; an element marked
+  // contenteditable="false" is not a stop either, and an
+  // image-map area counts only when the image using its map is
+  // rendered (the area itself has no layout box). (2) Only
+  // the topmost modal intercepts — a covered dialog's listener
+  // must not swallow Tab for the dialog above it. Among DS
+  // dialogs, covered is decided by the open-dialog stack's
+  // activation order (frames mount in tree order, not open
+  // order); for foreign frames it means a LATER, still-modal
+  // frame (aria-modal or the :modal state — a merely open,
+  // modeless dialog covers nothing — and actually rendered): a closed
+  // dialog element parked later in the document — or nested
+  // inside this dialog — covers nothing. (3) A details
+  // element with no summary child counts as a stop (its UA
+  // fallback summary is tabbable but not in the DOM), and the
+  // fallback landing itself must be focusable: the content
+  // carries tabIndex={-1} on web so the pull-back focus()
+  // actually lands inside the dialog when the frame has no
+  // landing wrapper of its own (CodeRabbit review on PR #392,
+  // head fbf5aea). (4) Disabled means :disabled only (the
+  // attribute is inert on non-disableable elements), an
+  // explicitly editable element is a stop even inside a
+  // contenteditable="false" region, only a details' FIRST
+  // summary child is a native stop, and an image map counts
+  // only when its image is actually visible, not merely laid
+  // out (Copilot review on PR #392, head 3bbf165). (5) A
+  // foreign modal layer that currently holds focus (a
+  // role="dialog" aria-modal shell such as StepOverlay, which
+  // is not a native <dialog> element) is the active layer —
+  // this listener stands down for it instead of pulling focus
+  // back into the covered dialog (Copilot review on PR #392,
+  // head f32fd7d). (6) An ARIA-only foreign modal frame that is
+  // invisible does not cover (native :modal frames keep the
+  // old behavior), an explicitly editable details element is
+  // a stop even with a summary child, and a summary outside a
+  // details is not a stop unless independently tabbable or
+  // editable (Copilot review on PR #392, head f0fd374).
+  useEffect(() => {
+    if (!open || !isWeb || typeof document === "undefined") {
+      return;
+    }
+    const handleTabContainment = (event: KeyboardEvent) => {
+      if (event.key !== "Tab") {
+        return;
+      }
+      const content = contentRef.current as unknown as HTMLElement | null;
+      if (!content || typeof content.querySelectorAll !== "function") {
+        return;
+      }
+      const ownEntry = stackEntryRef.current;
+      const stackIndex = openDialogStack.indexOf(ownEntry);
+      if (stackIndex >= 0 && stackIndex < openDialogStack.length - 1) {
+        return;
+      }
+      const frame = typeof content.closest === "function" ? content.closest("dialog") : null;
+      ownEntry.frame = frame;
+      ownEntry.content = content;
+      // A foreign modal layer that currently holds focus is the
+      // active layer, whatever this dialog's state: a non-DS
+      // modal such as StepOverlay (a role="dialog" aria-modal
+      // shell, not a native <dialog> element — the frame scan
+      // below cannot see it) mounted over this dialog moves
+      // focus into itself on mount, and this listener must not
+      // pull that focus back into the covered dialog (Copilot
+      // review on PR #392, head f32fd7d). DS dialogs are exempt
+      // — the stack order above already arbitrates between
+      // them — as is a layer that merely CONTAINS this dialog
+      // (this dialog is then the top layer inside it), and the
+      // host layer this dialog was opened FROM (hostModalRef):
+      // focus sitting in the host — the state right after
+      // opening a text-only dialog from an overlay control, or
+      // after a programmatic return to it — means this dialog
+      // is still the active layer above it, because the dialog
+      // content is portalled outside the host's subtree
+      // (Copilot review on PR #392, head 646fe94).
+      const focusedElement = document.activeElement as HTMLElement | null;
+      if (
+        focusedElement &&
+        focusedElement !== document.body &&
+        !content.contains(focusedElement) &&
+        !(frame && frame.contains(focusedElement)) &&
+        typeof focusedElement.closest === "function"
+      ) {
+        const foreignModal = focusedElement.closest('[role="dialog"][aria-modal="true"]');
+        if (
+          foreignModal &&
+          foreignModal !== hostModalRef.current &&
+          !foreignModal.contains(content) &&
+          !content.contains(foreignModal) &&
+          !openDialogStack.some((entry) => entry.content === foreignModal)
+        ) {
+          return;
+        }
+      }
+      if (frame) {
+        const dsFrames = new Set(
+          openDialogStack.map((entry) => entry.frame).filter((entryFrame) => entryFrame !== null),
+        );
+        const covered = Array.from(document.querySelectorAll("dialog")).some((other) => {
+          if (other === frame || frame.contains(other) || dsFrames.has(other)) {
+            return false;
+          }
+          if ((frame.compareDocumentPosition(other) & Node.DOCUMENT_POSITION_FOLLOWING) === 0) {
+            return false;
+          }
+          const isNativeModal = other.matches(":modal");
+          const isOpenModal = other.getAttribute("aria-modal") === "true" || isNativeModal;
+          if (!isOpenModal || other.getClientRects().length === 0) {
+            return false;
+          }
+          // A native :modal dialog is the browser's top layer
+          // and covers as before. An ARIA-only modal frame
+          // (aria-modal without the :modal state) that is
+          // invisible — display:none or visibility hidden /
+          // collapse — still has client rects when merely
+          // visibility-hidden, but it is not covering anything
+          // the user can see, so it must not stand this dialog
+          // down (Copilot review on PR #392, head f0fd374).
+          if (isNativeModal) {
+            return true;
+          }
+          const otherStyle = window.getComputedStyle(other);
+          return (
+            otherStyle.display !== "none" &&
+            otherStyle.visibility !== "hidden" &&
+            otherStyle.visibility !== "collapse"
+          );
+        });
+        if (covered) {
+          return;
+        }
+      }
+      const candidates = content.querySelectorAll(
+        'a[href], area[href], button, input, select, textarea, details, summary, iframe, audio[controls], video[controls], [contenteditable=""], [contenteditable="true"], [contenteditable="plaintext-only"], [tabindex]',
+      );
+      const hasTabbable = Array.from(candidates).some((candidate) => {
+        // :disabled only — the disabled ATTRIBUTE has no effect
+        // on elements that are not disableable (an <a href
+        // disabled> or a <div tabindex="0" disabled> is still a
+        // Tab stop), so an attribute check would wrongly reject
+        // them (Copilot review on PR #392, head 3bbf165).
+        if (candidate.matches(":disabled")) {
+          return false;
+        }
+        if (candidate.closest("[inert]")) {
+          return false;
+        }
+        if (candidate instanceof HTMLInputElement && candidate.type === "hidden") {
+          return false;
+        }
+        const tabStopAttr = candidate.getAttribute("tabindex");
+        if (tabStopAttr !== null && Number.parseInt(tabStopAttr, 10) < 0) {
+          return false;
+        }
+        const editableAttr = candidate.getAttribute("contenteditable");
+        const editableHost = editableAttr !== null && editableAttr !== "false";
+        // An explicitly editable candidate (contenteditable "",
+        // "true", or "plaintext-only") is its own editing host
+        // and a Tab stop even inside a contenteditable="false"
+        // ancestor — the false region only governs descendants
+        // WITHOUT an explicit state of their own (Copilot review
+        // on PR #392, head 3bbf165; this supersedes the ancestor
+        // walk added at head a459ad8, which rejected exactly
+        // those re-enabled descendants). Candidates with
+        // contenteditable="false" or no attribute are never
+        // counted via editability — only via the native/tabindex
+        // paths, which need no ancestor check either.
+        if (candidate instanceof HTMLDetailsElement && tabStopAttr === null) {
+          // A details element with no summary child gets a UA
+          // fallback summary that IS a Tab stop — but it is not
+          // in the DOM, so the details element itself must stand
+          // in for it here. With an explicit summary child, the
+          // summary is the stop (counted on its own candidate
+          // pass) and the details element is not (Copilot review
+          // on PR #392, head fbf5aea).
+          const hasOwnSummary = Array.from(candidate.children).some(
+            (child) => child.tagName === "SUMMARY",
+          );
+          // An explicitly editable details is itself an editing
+          // host and a Tab stop even though it has a summary
+          // child — the summary exclusion must not reject it, or
+          // a <details contenteditable> whose summary carries
+          // tabindex="-1" would leave the editor unreachable
+          // (Copilot review on PR #392, head f0fd374).
+          if (hasOwnSummary && !editableHost) {
+            return false;
+          }
+        }
+        if (candidate.tagName === "SUMMARY" && tabStopAttr === null) {
+          // Only the FIRST summary child of a details is its
+          // disclosure control and a native Tab stop; a later
+          // summary is plain content (Copilot review on PR #392,
+          // head 3bbf165). An explicitly editable summary is an
+          // editing host instead and still counts, as does one
+          // with a nonnegative tabindex (handled above — this
+          // branch only runs when tabStopAttr is null).
+          const parent = candidate.parentElement;
+          if (!editableHost) {
+            // A summary whose parent is not a details is not a
+            // disclosure control at all and is not a native Tab
+            // stop — counting it would let Tab escape through a
+            // plain <summary> element (Copilot review on
+            // PR #392, head f0fd374). This branch only runs
+            // when tabStopAttr is null, so an independently
+            // tabbable summary (nonnegative tabindex, handled
+            // above) or an editable one (editableHost) is not
+            // affected.
+            if (!(parent instanceof HTMLDetailsElement)) {
+              return false;
+            }
+            const firstSummary = Array.from(parent.children).find(
+              (child) => child.tagName === "SUMMARY",
+            );
+            if (firstSummary !== candidate) {
+              return false;
+            }
+          }
+        }
+        if (candidate instanceof HTMLAreaElement) {
+          const mapName = candidate.closest("map")?.getAttribute("name");
+          if (!mapName) {
+            return false;
+          }
+          return Array.from(content.querySelectorAll("img[usemap]")).some((image) => {
+            if (image.getAttribute("usemap") !== `#${mapName}`) {
+              return false;
+            }
+            if (image.closest("[inert]")) {
+              return false;
+            }
+            // A visibility-hidden/collapsed image still has
+            // client rects, but its map's areas are not Tab
+            // stops (Copilot review on PR #392, head 3bbf165).
+            const imageStyle = window.getComputedStyle(image);
+            if (
+              imageStyle.display === "none" ||
+              imageStyle.visibility === "hidden" ||
+              imageStyle.visibility === "collapse"
+            ) {
+              return false;
+            }
+            return image.getClientRects().length > 0;
+          });
+        }
+        const style = window.getComputedStyle(candidate);
+        if (
+          style.display === "none" ||
+          style.visibility === "hidden" ||
+          style.visibility === "collapse"
+        ) {
+          return false;
+        }
+        return candidate.getClientRects().length > 0;
+      });
+      if (hasTabbable) {
+        return;
+      }
+      event.preventDefault();
+      const activeElement = document.activeElement as HTMLElement | null;
+      const inside = Boolean(
+        activeElement &&
+        (content.contains(activeElement) || (frame && frame.contains(activeElement))),
+      );
+      if (!inside) {
+        const wrapper = frame
+          ? (frame.querySelector('[tabindex="-1"]') as HTMLElement | null)
+          : null;
+        const landing = wrapper ?? content;
+        if (typeof landing.focus === "function") {
+          landing.focus();
+        }
+      }
+    };
+    document.addEventListener("keydown", handleTabContainment, true);
+    return () => {
+      document.removeEventListener("keydown", handleTabContainment, true);
+    };
+  }, [open]);
+
   // Restore on close: when `open` flips true -> false, return focus
   // to the tracked element. This effect is this component's own, so
   // it runs after the primitive's close-time focus handling in the
@@ -388,6 +760,14 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         restoreTargetRef.current = null;
       }
       blurredTargetRef.current = null;
+      // Record the host layer from the tracked opener (see
+      // hostModalRef above): the layer the opener sits in at
+      // this opening is the layer this dialog was opened from.
+      const opener = restoreTargetRef.current;
+      hostModalRef.current =
+        opener && typeof opener.closest === "function"
+          ? opener.closest('[role="dialog"][aria-modal="true"]')
+          : null;
       // A (re)opening supersedes any deferred re-assert still
       // pending from the previous close.
       restoreGenRef.current++;
@@ -437,7 +817,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     <TamaguiDialog open={open} onOpenChange={onOpenChange}>
       <TamaguiDialog.Portal>
         <StyledOverlay />
-        <StyledContent ref={contentRef}>
+        <StyledContent ref={setContentRef} {...(isWeb ? { tabIndex: -1 } : {})}>
           <YStack gap={tokens.spacing[3]}>
             <TamaguiDialog.Title
               fontSize={tokens.typography.fontSize.xl}

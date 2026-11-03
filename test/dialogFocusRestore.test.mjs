@@ -45,12 +45,21 @@ test("the restore target is tracked from committed focusin events outside the di
   assert.match(code, /if \(!target \|\| target === document\.body\) \{/);
   assert.match(code, /trackTarget\(document\.activeElement as HTMLElement \| null\);/);
   assert.match(code, /if \(openRef\.current\) \{\s+return;\s+\}/);
-  assert.doesNotMatch(code, /tabIndex/);
+  // The restore mechanism itself uses no tabIndex — the single
+  // tabIndex in the file is the #391 containment landing on the
+  // content (tabIndex -1, web only, PR #392): it makes the
+  // pull-back focus() land inside a dialog with no tabbable
+  // content, and it cannot be tracked as a restore target
+  // (targets inside the content are excluded below).
+  assert.equal((code.match(/tabIndex/g) ?? []).length, 1);
   assert.match(code, /content\.contains\(target\)/);
   assert.match(code, /content\.closest\("dialog"\)/);
   assert.match(code, /target === frame \|\| frame\.contains\(target\)/);
   assert.match(code, /restoreTargetRef\.current = target;/);
-  assert.match(code, /<StyledContent ref=\{contentRef\}>/);
+  assert.match(
+    code,
+    /<StyledContent ref=\{setContentRef\} \{\.\.\.\(isWeb \? \{ tabIndex: -1 \} : \{\}\)\}>/,
+  );
 });
 
 test("focus returns to the tracked element on the open -> closed transition, when it is still available (#385)", () => {
