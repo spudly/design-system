@@ -8,6 +8,7 @@ import {
   ModalLayerContext,
   isActiveModalLayer,
   registerModalLayer,
+  registeredModalRoots,
   unregisterModalLayer,
 } from "./modalRegistry.js";
 import type { ModalLayer } from "./modalRegistry.js";
@@ -256,6 +257,26 @@ export function StepOverlay({
       }
       const active = document.activeElement as HTMLElement | null;
       if (active && node.contains(active)) {
+        return;
+      }
+      // Yield to a FOREIGN modal holding focus (CodeRabbit
+      // review on PR #398): a host-built role="dialog"
+      // aria-modal element that is not a DS layer has the
+      // user's Tab — the same rule Dialog's containment keeps
+      // for foreign modals. DS layers are exempt through their
+      // registered roots (a covered DS Dialog's focus is this
+      // overlay's to reclaim), as are modals containing the
+      // shell or contained by it.
+      const foreignModal =
+        active && typeof active.closest === "function"
+          ? active.closest('[role="dialog"][aria-modal="true"]')
+          : null;
+      if (
+        foreignModal &&
+        !foreignModal.contains(node) &&
+        !node.contains(foreignModal) &&
+        !registeredModalRoots().has(foreignModal)
+      ) {
         return;
       }
       event.preventDefault();

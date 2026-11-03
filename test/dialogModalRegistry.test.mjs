@@ -102,6 +102,11 @@ test("StepOverlay registers in the same registry and its Tab wrap stands down wh
   assert.match(overlay, /document\.addEventListener\("keydown", handleOutsideTab, true\);/);
   assert.match(overlay, /document\.removeEventListener\("keydown", handleOutsideTab, true\);/);
   assert.match(overlay, /if \(active && node\.contains\(active\)\) \{\s+return;\s+\}/);
+  // …but it yields to a foreign modal holding focus, exactly
+  // as Dialog's containment does (CodeRabbit review on
+  // PR #398): no DS component pulls Tab out of a host-built
+  // modal the user is in.
+  assert.match(overlay, /!registeredModalRoots\(\)\.has\(foreignModal\)/);
 });
 
 test("the foreign-frame scan skips the frames the registry already arbitrates (#394)", () => {
