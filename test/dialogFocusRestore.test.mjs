@@ -58,7 +58,7 @@ test("the restore target is tracked from committed focusin events outside the di
   assert.match(code, /restoreTargetRef\.current = target;/);
   assert.match(
     code,
-    /<StyledContent ref=\{contentRef\} \{\.\.\.\(isWeb \? \{ tabIndex: -1 \} : \{\}\)\}>/,
+    /<StyledContent ref=\{setContentRef\} \{\.\.\.\(isWeb \? \{ tabIndex: -1 \} : \{\}\)\}>/,
   );
 });
 

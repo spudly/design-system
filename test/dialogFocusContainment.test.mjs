@@ -136,7 +136,7 @@ test("a details with no summary child counts as a Tab stop, and the fallback lan
   // overlay. A -1 tabindex never makes it a sequential Tab stop.
   assert.match(
     code,
-    /<StyledContent ref=\{contentRef\} \{\.\.\.\(isWeb \? \{ tabIndex: -1 \} : \{\}\)\}>/,
+    /<StyledContent ref=\{setContentRef\} \{\.\.\.\(isWeb \? \{ tabIndex: -1 \} : \{\}\)\}>/,
   );
 });
 
@@ -152,6 +152,21 @@ test("a foreign modal layer holding focus is the active layer — this dialog st
   assert.match(code, /entry\.content === foreignModal/);
   assert.match(code, /!foreignModal\.contains\(content\)/);
   assert.match(code, /entry\.content = content;/);
+  // …but never for the host layer this dialog was opened FROM
+  // (Copilot review on PR #392, head 646fe94): the host is
+  // recorded at the open transition from the tracked opener —
+  // focus sitting in the host (the state right after opening a
+  // text-only dialog from an overlay control) means this dialog
+  // is still the active layer above it.
+  assert.match(code, /foreignModal !== hostModalRef\.current/);
+  assert.match(code, /const opener = restoreTargetRef\.current;/);
+  assert.match(code, /hostModalRef\.current =\s+opener/);
+  // The stack entry re-syncs when the portal content attaches,
+  // not only in the open effect: an initially open dialog can
+  // hydrate with its content mounted in a later Portal update
+  // (CodeRabbit review on PR #392, head 646fe94).
+  assert.match(code, /const setContentRef = useCallback\(/);
+  assert.match(code, /contentRef\.current = node;/);
 });
 
 test("summary and image-map stops follow the native rules (#391)", () => {

@@ -101,6 +101,29 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     frame: null,
     content: null,
   });
+  // The modal layer this dialog was opened FROM, if any (the
+  // layer holding the tracked opener at the open transition) —
+  // the foreign-modal stand-down in the containment handler
+  // must never stand down for it: this dialog is the active
+  // layer above its host, even though its content is portalled
+  // outside the host's subtree (Copilot review on PR #392,
+  // head 646fe94).
+  const hostModalRef = useRef<Element | null>(null);
+  // The content ref is a callback, not an object ref: when an
+  // initially open dialog hydrates, Tamagui's Portal mounts the
+  // content in a later update than the open-transition effects,
+  // so an effect-time read can store a null frame/content in
+  // the stack entry that nothing later repairs. The callback
+  // re-syncs the entry at attach time, whenever that happens
+  // (CodeRabbit review on PR #392, head 646fe94).
+  const setContentRef = useCallback((node: TamaguiElement | null) => {
+    contentRef.current = node;
+    const content = node as unknown as HTMLElement | null;
+    const entry = stackEntryRef.current;
+    entry.frame =
+      content && typeof content.closest === "function" ? content.closest("dialog") : null;
+    entry.content = content;
+  }, []);
 
   // Restore helper: focus the tracked element if it is still in the
   // document and focusable, and clear the target either way so a
@@ -498,7 +521,14 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
       // review on PR #392, head f32fd7d). DS dialogs are exempt
       // — the stack order above already arbitrates between
       // them — as is a layer that merely CONTAINS this dialog
-      // (this dialog is then the top layer inside it).
+      // (this dialog is then the top layer inside it), and the
+      // host layer this dialog was opened FROM (hostModalRef):
+      // focus sitting in the host — the state right after
+      // opening a text-only dialog from an overlay control, or
+      // after a programmatic return to it — means this dialog
+      // is still the active layer above it, because the dialog
+      // content is portalled outside the host's subtree
+      // (Copilot review on PR #392, head 646fe94).
       const focusedElement = document.activeElement as HTMLElement | null;
       if (
         focusedElement &&
@@ -510,6 +540,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         const foreignModal = focusedElement.closest('[role="dialog"][aria-modal="true"]');
         if (
           foreignModal &&
+          foreignModal !== hostModalRef.current &&
           !foreignModal.contains(content) &&
           !content.contains(foreignModal) &&
           !openDialogStack.some((entry) => entry.content === foreignModal)
@@ -687,6 +718,14 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         restoreTargetRef.current = null;
       }
       blurredTargetRef.current = null;
+      // Record the host layer from the tracked opener (see
+      // hostModalRef above): the layer the opener sits in at
+      // this opening is the layer this dialog was opened from.
+      const opener = restoreTargetRef.current;
+      hostModalRef.current =
+        opener && typeof opener.closest === "function"
+          ? opener.closest('[role="dialog"][aria-modal="true"]')
+          : null;
       // A (re)opening supersedes any deferred re-assert still
       // pending from the previous close.
       restoreGenRef.current++;
@@ -736,7 +775,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
     <TamaguiDialog open={open} onOpenChange={onOpenChange}>
       <TamaguiDialog.Portal>
         <StyledOverlay />
-        <StyledContent ref={contentRef} {...(isWeb ? { tabIndex: -1 } : {})}>
+        <StyledContent ref={setContentRef} {...(isWeb ? { tabIndex: -1 } : {})}>
           <YStack gap={tokens.spacing[3]}>
             <TamaguiDialog.Title
               fontSize={tokens.typography.fontSize.xl}
