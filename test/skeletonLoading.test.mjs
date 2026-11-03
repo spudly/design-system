@@ -1,3 +1,4 @@
+import "./registerSvgStub.mjs";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -100,6 +101,11 @@ test("every bone pulses on the one shared clock — primitives own no loop", () 
     clock,
     /Date\.now\(\) % CYCLE_MS|now % CYCLE_MS/,
     "the phase derives from absolute time, so staggered mounts stay in sync",
+  );
+  assert.match(
+    clock,
+    /addEventListener\("change", \(event\) => store\.setFrozen\(event\.matches\)\)/,
+    "the provider-less default store live-tracks the reduced-motion preference",
   );
 });
 

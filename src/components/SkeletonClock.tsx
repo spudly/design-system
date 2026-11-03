@@ -150,7 +150,19 @@ let defaultStore: SkeletonClockStore | null = null;
 
 function getDefaultStore(): SkeletonClockStore {
   if (defaultStore === null) {
-    defaultStore = createSkeletonClockStore(webPrefersReducedMotion());
+    const store = createSkeletonClockStore(webPrefersReducedMotion());
+    defaultStore = store;
+    // The provider path live-tracks the web reduced-motion
+    // preference; the shared default store must too, or
+    // provider-less bones would keep pulsing after the user
+    // enables reduced motion mid-session. setFrozen is
+    // idempotent, and a provider-less tree has no explicit
+    // freeze for the preference to override.
+    if (isWeb && typeof window !== "undefined" && typeof window.matchMedia === "function") {
+      window
+        .matchMedia("(prefers-reduced-motion: reduce)")
+        .addEventListener("change", (event) => store.setFrozen(event.matches));
+    }
   }
   return defaultStore;
 }
