@@ -127,6 +127,16 @@ test("bones are hidden from assistive tech and filled with the theme border role
   assert.equal(hiddenBones(circleHtml), 1, "a CircleSkeleton renders exactly 1 hidden bone");
 });
 
+test("TextSkeleton tolerates non-finite line counts", async () => {
+  const { React, TextSkeleton } = await loadRuntime();
+  const nanHtml = await renderToHtml(React.createElement(TextSkeleton, { lines: Number.NaN }));
+  assert.equal(hiddenBones(nanHtml), 1, "a NaN line count falls back to exactly 1 bone");
+  const infHtml = await renderToHtml(
+    React.createElement(TextSkeleton, { lines: Number.POSITIVE_INFINITY }),
+  );
+  assert.equal(hiddenBones(infHtml), 1, "an infinite line count falls back to exactly 1 bone");
+});
+
 test("a frozen clock renders static, deterministic output", async () => {
   const { React, SkeletonClock, TextSkeleton, CircleSkeleton } = await loadRuntime();
   const composition = () =>

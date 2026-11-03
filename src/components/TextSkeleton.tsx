@@ -20,7 +20,9 @@ const LINE_HEIGHT = 12;
  * region it stands in for carries the busy state).
  */
 export function TextSkeleton({ lines = 1 }: TextSkeletonProps) {
-  const count = Math.max(1, Math.floor(lines));
+  // Non-finite counts fall back to a single line: NaN would render
+  // zero bones and Infinity would throw in Array.from.
+  const count = Number.isFinite(lines) ? Math.max(1, Math.floor(lines)) : 1;
   return (
     <View gap={tokens.spacing[2]} width="100%">
       {Array.from({ length: count }, (_, index) => (
