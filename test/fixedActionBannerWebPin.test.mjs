@@ -108,7 +108,7 @@ test("SSR: the banner root's effective web position is fixed (#405)", async () =
   const html = await renderSsr(
     React.createElement(FixedActionBanner, {
       message: "We use cookies.",
-      primaryAction: { label: "Accept", onPress: () => undefined },
+      primaryAction: { label: "Accept", onPress: () => "accept" },
     }),
   );
   const rules = rootPositionRules(html);
