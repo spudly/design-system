@@ -35,8 +35,10 @@ export type ChunkErrorBoundaryState = {
  *
  * The fallback is composed from the design system's own Alert and
  * Button: an error Alert ("This section failed to load.") and a
- * "Reload the app" button. The button's label is its accessible
- * name; the Alert announces itself with the error live region.
+ * "Reload the app" button, rendered only when a recovery action
+ * exists (the web default reload or a caller-supplied `onReload`).
+ * The button's label is its accessible name; the Alert announces
+ * itself with the error live region.
  */
 export class ChunkErrorBoundary extends Component<
   ChunkErrorBoundaryProps,
@@ -58,12 +60,23 @@ export class ChunkErrorBoundary extends Component<
     }
   };
 
+  /**
+   * Whether pressing "Reload the app" would do anything: a
+   * caller-supplied recovery action, or the web default reload.
+   * Where neither exists (native with no `onReload`), the button
+   * is not rendered at all — a control that does nothing when
+   * pressed is worse than no control.
+   */
+  get canReload(): boolean {
+    return this.props.onReload !== undefined || (isWeb && typeof window !== "undefined");
+  }
+
   render(): ReactNode {
     if (this.state.failed) {
       return (
         <>
           <Alert severity="error">This section failed to load.</Alert>
-          <Button onPress={this.handleReload}>Reload the app</Button>
+          {this.canReload ? <Button onPress={this.handleReload}>Reload the app</Button> : null}
         </>
       );
     }

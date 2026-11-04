@@ -16,7 +16,9 @@
  *    `window`; a caller-supplied `onReload` replaces the default.
  * 4. The fallback is composed from the internal Alert (severity
  *    "error") and Button components — no styling props, no
- *    app-domain concepts.
+ *    app-domain concepts. The Button renders only when a recovery
+ *    action exists (the web reload or a caller-supplied
+ *    `onReload`); a no-op control is never shown.
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -60,7 +62,13 @@ test("a rejected chunk flips the boundary into its failed state", () => {
   assert.deepEqual(dist.ChunkErrorBoundary.getDerivedStateFromError(new Error("chunk 404")), {
     failed: true,
   });
-  const instance = new dist.ChunkErrorBoundary({ children: "surface content" });
+  // A caller-supplied recovery action stands in for the web
+  // reload here, so the fallback renders both of its elements in
+  // any environment (see the no-action test below).
+  const instance = new dist.ChunkErrorBoundary({
+    children: "surface content",
+    onReload: () => {},
+  });
   assert.equal(instance.render(), "surface content", "children render untouched before a failure");
   instance.state = { failed: true };
   const fallback = instance.render();
@@ -71,6 +79,17 @@ test("a rejected chunk flips the boundary into its failed state", () => {
   assert.equal(button.type, dist.Button);
   assert.equal(button.props.children, "Reload the app");
   assert.equal(typeof button.props.onPress, "function");
+});
+
+test("no reload button renders when no recovery action exists", () => {
+  // The test environment has no `window` (and no caller-supplied
+  // onReload here), so there is nothing for a reload button to
+  // do: the fallback is the Alert alone, never a dead control.
+  const instance = new dist.ChunkErrorBoundary({ children: "surface content" });
+  instance.state = { failed: true };
+  const [alert, button] = instance.render().props.children;
+  assert.equal(alert.type, dist.Alert);
+  assert.equal(button, null);
 });
 
 test("recovery is a guarded full reload, replaceable by onReload", () => {
@@ -91,6 +110,27 @@ test("recovery is a guarded full reload, replaceable by onReload", () => {
   const [, button] = fallback.props.children;
   button.props.onPress();
   assert.equal(calls, 1, "a caller-supplied onReload replaces the default reload");
+  // The default path: with a web `window` present, handleReload
+  // calls window.location.reload() exactly once.
+  let reloads = 0;
+  (globalThis as any).window = {
+    location: {
+      reload: () => {
+        reloads += 1;
+      },
+    },
+  };
+  try {
+    const webDefault = new dist.ChunkErrorBoundary({ children: "surface content" });
+    webDefault.handleReload();
+    assert.equal(reloads, 1, "the default recovery is window.location.reload()");
+    // With a window present, the fallback offers the button too.
+    webDefault.state = { failed: true };
+    const [, webButton] = webDefault.render().props.children;
+    assert.equal(webButton.type, dist.Button);
+  } finally {
+    delete (globalThis as any).window;
+  }
   // Without onReload, the default reload is a no-op (and must not
   // throw) where there is no window to reload.
   const webLess = new dist.ChunkErrorBoundary({ children: "surface content" });
