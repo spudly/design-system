@@ -48,6 +48,14 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * empty meals list renders the DS EmptyState with the app's
  * message. The plans tab's states are MealPlansPage's own.
  *
+ * Footer ownership (#410, adjusted on PR #413 review): the
+ * hub owns the footer on BOTH tabs. On the plans tab the
+ * BigFooterShell encloses the PinnedHeaderShell (header plus
+ * MealPlansPage) so the shell's viewport minimum spans the
+ * full pinned layout, and MealPlansPage is rendered without a
+ * footer prop — its list keeps its bounded scroll region
+ * inside the hub's shell.
+ *
  * De-styled for #119: the page composes DS components only.
  * The chrome is a SectionStack (the "Meals" title in Text's
  * `title` variant over the tab bar); on the meals tab the
@@ -122,17 +130,31 @@ export function MealsHubPage({
   );
 
   if (activeTab === "plans") {
+    // Footer ownership sits at the hub level on this tab
+    // (CodeRabbit review, PR #413): the footer shell encloses
+    // BOTH the pinned header and the plans content, so its
+    // viewport-height minimum is measured against the full
+    // pinned layout. When MealPlansPage owned the shell inside
+    // PinnedHeaderShell instead, the shell started below the
+    // header and its 100dvh minimum pushed the footer's bottom
+    // edge about one header height below the viewport bottom
+    // on a short plan list. MealPlansPage therefore receives
+    // NO footer here: with no footer data its own shell is just
+    // the growing column, and its ScreenContainer keeps the
+    // bounded scroll region under the header inside the hub's
+    // shell — exactly one footer renders on this tab.
     return (
-      <PinnedHeaderShell header={<SectionStack>{hubChrome}</SectionStack>}>
-        <MealPlansPage
-          plans={plans}
-          loading={loading}
-          createHref={createPlanHref}
-          onPlanDelete={onDeletePlan}
-          titleLevel={2}
-          {...(footer !== undefined ? { footer } : {})}
-        />
-      </PinnedHeaderShell>
+      <BigFooterShell footer={footer}>
+        <PinnedHeaderShell header={<SectionStack>{hubChrome}</SectionStack>}>
+          <MealPlansPage
+            plans={plans}
+            loading={loading}
+            createHref={createPlanHref}
+            onPlanDelete={onDeletePlan}
+            titleLevel={2}
+          />
+        </PinnedHeaderShell>
+      </BigFooterShell>
     );
   }
 

@@ -42,6 +42,14 @@ import { Text } from "../components/Text.js";
  *   component has no disabled-back state), and Next disables
  *   on the last step. An out-of-range index renders nothing,
  *   as the app view does.
+ * - Footer vs overlay (PR #413 review): in the ready state
+ *   StepOverlay fills its nearest positioned ancestor with
+ *   absolute positioning. BigFooterShell's content region IS
+ *   that positioned ancestor and ends above the footer, so
+ *   the overlay is bounded to the cooking content region and
+ *   can never cover BigFooter — the footer's links stay
+ *   reachable for the whole ready state. (The error state has
+ *   no overlay; its footer follows the alert in flow.)
  * - There is no swipe navigation here: the app view has none
  *   (swipe is the recipe mode's app-side shell), and adding
  *   it would be a behavior change, not a port.

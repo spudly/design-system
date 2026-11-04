@@ -15,6 +15,6 @@ const youtubeIconElements: IconElement[] = [
 ];
 
 /** The Feather youtube glyph: a social destination's icon in BigFooter. Rendered through the Icon base component. */
-export function YoutubeIcon(props: IconComponentProps) {
+export function SocialYoutubeIcon(props: IconComponentProps) {
   return <Icon elements={youtubeIconElements} {...props} />;
 }

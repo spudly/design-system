@@ -60,14 +60,16 @@ test("store and social entries are real links with accessible names", () => {
   // Social entries: an anchor carrying the href, named by the label.
   assert.match(bigFooter, /accessibilityRole: "link",\s*accessibilityLabel: link\.label/);
   assert.match(bigFooter, /href=\{link\.href\}/);
-  // Social glyphs are the Feather social icons (Stephen's adjustment).
+  // Social glyphs are the Feather social icons (Stephen's adjustment),
+  // exported under semantic usage names (Social*Icon), never the raw
+  // Feather glyph names (icons module convention, PR #413 review).
   for (const icon of [
-    "FacebookIcon",
-    "InstagramIcon",
-    "TwitterIcon",
-    "YoutubeIcon",
-    "GithubIcon",
-    "LinkedinIcon",
+    "SocialFacebookIcon",
+    "SocialInstagramIcon",
+    "SocialTwitterIcon",
+    "SocialYoutubeIcon",
+    "SocialGithubIcon",
+    "SocialLinkedinIcon",
   ]) {
     assert.ok(bigFooter.includes(icon), `BigFooter maps a Feather social glyph: ${icon}`);
   }
@@ -79,8 +81,24 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   assert.match(bigFooter, /flexBasis=\{BIG_FOOTER_COLUMN_BASIS\}/);
   assert.match(bigFooter, /flexWrap="wrap"/);
   // Sticky: full-viewport-height column, content grows, footer last.
-  assert.match(bigFooter, /<YStack minHeight="100dvh" flexDirection="column">/);
+  // The minimum height is platform-specific (PR #413 review): 100dvh
+  // on web, 100% of the parent's available height by default —
+  // React Native does not support viewport units for minHeight.
+  assert.match(
+    bigFooter,
+    /<YStack minHeight=\{\{ default: "100%", web: "100dvh" \}\} flexDirection="column">/,
+  );
+  assert.ok(
+    !/<YStack minHeight="100dvh"/.test(bigFooter),
+    "the shell must not pass a raw 100dvh minHeight to native",
+  );
   assert.match(bigFooter, /flexGrow=\{1\}/);
+  // Bounded content region (PR #413 review): the region the list /
+  // scroll child fills is definite-height (shrink 1, basis 0), not
+  // sized to its children, so a BoundedList page's footer stays
+  // reachable; and the region is the positioned ancestor, so an
+  // absolute-fill child (StepOverlay) cannot cover the footer.
+  assert.match(bigFooter, /flexShrink=\{1\} flexBasis=\{0\} position="relative"/);
   assert.ok(!/position="(fixed|absolute)"/.test(bigFooter), "the footer is in flow, never pinned");
 });
 
@@ -144,7 +162,7 @@ test("the shell reserves viewport height only when a footer is supplied", () => 
   const noFooterBranch = bigFooter.indexOf("if (!footer)");
   assert.ok(noFooterBranch >= 0, "BigFooterShell handles the no-footer case explicitly");
   assert.ok(
-    noFooterBranch < bigFooter.indexOf('minHeight="100dvh"'),
+    noFooterBranch < bigFooter.indexOf('minHeight={{ default: "100%", web: "100dvh" }}'),
     "the no-footer branch precedes the viewport-height shell",
   );
   assert.match(bigFooter, /padding: tokens\.spacing\[3\]/, "social links keep a ≥44px target");
@@ -160,13 +178,21 @@ test("composed pages and stories render exactly one footer", () => {
     2,
     "AiSessionPage renders the footer in the start and in-session states",
   );
-  // MealsHubPage: the plans tab forwards the footer to
-  // MealPlansPage (which owns its own shell); the meals tab keeps
-  // the hub's shell — exactly one footer per tab.
+  // MealsHubPage: the hub owns the footer on BOTH tabs (PR #413
+  // review). On the plans tab the hub's shell encloses the pinned
+  // header AND MealPlansPage, so the shell's viewport minimum spans
+  // the full pinned layout; MealPlansPage gets NO footer there (an
+  // inner shell below the header pushed the footer one header
+  // height past the viewport bottom on short lists).
   const mealsHub = readCode("src/pages/MealsHubPage.tsx");
   assert.match(
     mealsHub,
-    /<MealPlansPage[\s\S]*?\{\.\.\.\(footer !== undefined \? \{ footer \} : \{\}\)\}/,
+    /<BigFooterShell footer=\{footer\}>\s*<PinnedHeaderShell[\s\S]*?<MealPlansPage/,
+    "the plans tab's footer shell encloses the pinned header and MealPlansPage",
+  );
+  assert.ok(
+    !mealsHub.includes("{...(footer !== undefined ? { footer } : {})}"),
+    "MealPlansPage must not receive the footer on the plans tab — the hub shell owns it",
   );
   // Nested compositions: the outer page owns the footer; the
   // nested form/page gets no footer prop.

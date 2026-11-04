@@ -43,7 +43,7 @@ function Viewport({ children }: { children: ReactNode }) {
 export const PrivacyPolicy: Story = {
   render: () => (
     <Viewport>
-      <LegalDocumentPage footer={eciperayFooterFixture} {...legalPrivacyFixture} />
+      <LegalDocumentPage {...legalPrivacyFixture} footer={eciperayFooterFixture} />
     </Viewport>
   ),
 };
@@ -51,11 +51,11 @@ export const PrivacyPolicy: Story = {
 export const TermsOfService: Story = {
   render: () => (
     <Viewport>
-      <LegalDocumentPage footer={eciperayFooterFixture} {...legalTermsFixture} />
+      <LegalDocumentPage {...legalTermsFixture} footer={eciperayFooterFixture} />
     </Viewport>
   ),
 };
 
 export const Wide: Story = {
-  render: () => <LegalDocumentPage footer={eciperayFooterFixture} {...legalPrivacyFixture} />,
+  render: () => <LegalDocumentPage {...legalPrivacyFixture} footer={eciperayFooterFixture} />,
 };

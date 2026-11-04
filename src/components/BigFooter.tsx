@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import { Anchor, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { FacebookIcon } from "../icons/FacebookIcon.js";
-import { GithubIcon } from "../icons/GithubIcon.js";
-import { InstagramIcon } from "../icons/InstagramIcon.js";
-import { LinkedinIcon } from "../icons/LinkedinIcon.js";
-import { TwitterIcon } from "../icons/TwitterIcon.js";
-import { YoutubeIcon } from "../icons/YoutubeIcon.js";
+import { SocialFacebookIcon } from "../icons/SocialFacebookIcon.js";
+import { SocialGithubIcon } from "../icons/SocialGithubIcon.js";
+import { SocialInstagramIcon } from "../icons/SocialInstagramIcon.js";
+import { SocialLinkedinIcon } from "../icons/SocialLinkedinIcon.js";
+import { SocialTwitterIcon } from "../icons/SocialTwitterIcon.js";
+import { SocialYoutubeIcon } from "../icons/SocialYoutubeIcon.js";
 import type { IconComponentProps } from "../icons/Icon.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
@@ -129,12 +129,12 @@ export const BIG_FOOTER_STACK_BREAKPOINT = 640;
 export const BIG_FOOTER_COLUMN_BASIS = 300;
 
 const SOCIAL_ICONS: Record<BigFooterSocialIcon, (props: IconComponentProps) => ReactNode> = {
-  facebook: FacebookIcon,
-  instagram: InstagramIcon,
-  twitter: TwitterIcon,
-  youtube: YoutubeIcon,
-  github: GithubIcon,
-  linkedin: LinkedinIcon,
+  facebook: SocialFacebookIcon,
+  instagram: SocialInstagramIcon,
+  twitter: SocialTwitterIcon,
+  youtube: SocialYoutubeIcon,
+  github: SocialGithubIcon,
+  linkedin: SocialLinkedinIcon,
 };
 
 /**
@@ -257,13 +257,12 @@ export type BigFooterShellProps = {
 
 /**
  * The sticky-footer page shell (#410, Stephen's addendum): a
- * full-viewport-height column — min-height 100dvh, the platform
- * equivalent the Tamagui stack resolves on each target — with
- * the page content as the growing region and BigFooter last in
- * flow. On a short page the footer sits at the viewport bottom
- * (the empty space is above it, never below); on a long page it
- * scrolls naturally after the content. This is in-flow layout,
- * never fixed/absolute pinning. Every page renders through this
+ * full-viewport-height column with the page content as the
+ * bounded region and BigFooter last in flow. On a short page
+ * the footer sits at the viewport bottom (the empty space is
+ * above it, never below); on a long page it scrolls naturally
+ * after the content. This is in-flow layout, never
+ * fixed/absolute pinning. Every page renders through this
  * shell with no opt-outs; a page whose host supplied no footer
  * data renders NO footer band and reserves NO viewport height —
  * just a growing column around its content — until the host
@@ -272,18 +271,47 @@ export type BigFooterShellProps = {
  * page inside PublicPageFrame): the frame is the sole footer
  * owner and the nested page adds neither a second footer nor a
  * full-viewport inner shell.
+ *
+ * Platform height (CodeRabbit review, PR #413): the minimum
+ * height is platform-specific — `100dvh` on web, `100%` (the
+ * parent layout's available height) by default — because React
+ * Native does not support viewport units for `minHeight`; a
+ * raw `100dvh` on native can fail to reserve the viewport
+ * height a short page needs to place the footer at the bottom.
+ *
+ * Bounded content region (CodeRabbit review, PR #413): the
+ * content region is a definite-height flex region
+ * (flexGrow 1 / flexShrink 1 / flexBasis 0), not a region sized
+ * to its children. A self-bounding child — a BoundedList
+ * FlatList inside a non-scrolling ScreenContainer (RecipesPage,
+ * DiscoverPage), or a ScrollView — therefore fills exactly the
+ * space the shell leaves above the footer and scrolls inside
+ * it, so the footer stays reachable on bounded screens instead
+ * of sitting below a list that grew to its full content height
+ * with nothing left to scroll. Content that is not itself a
+ * scroll region keeps its intrinsic size (flex items do not
+ * shrink below their content), so long in-flow pages still
+ * push the shell taller and the footer follows the content.
+ *
+ * Positioned region (CodeRabbit review, PR #413): the content
+ * region is the positioned ancestor for its children
+ * (position="relative"), so an absolutely-positioned
+ * full-region child (StepOverlay in MealCookingModePage's ready
+ * state) fills the content region above the footer instead of
+ * escaping to a higher positioned ancestor and covering the
+ * footer's links.
  */
 export function BigFooterShell({ footer, children }: BigFooterShellProps) {
   if (!footer) {
     return (
-      <YStack flexGrow={1} flexDirection="column">
+      <YStack flexGrow={1} flexDirection="column" position="relative">
         {children}
       </YStack>
     );
   }
   return (
-    <YStack minHeight="100dvh" flexDirection="column">
-      <YStack flexGrow={1} flexShrink={0} flexBasis="auto">
+    <YStack minHeight={{ default: "100%", web: "100dvh" }} flexDirection="column">
+      <YStack flexGrow={1} flexShrink={1} flexBasis={0} position="relative">
         {children}
       </YStack>
       <BigFooter footer={footer} />

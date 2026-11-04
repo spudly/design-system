@@ -14,6 +14,6 @@ const githubIconElements: IconElement[] = [
 ];
 
 /** The Feather github glyph: a social destination's icon in BigFooter. Rendered through the Icon base component. */
-export function GithubIcon(props: IconComponentProps) {
+export function SocialGithubIcon(props: IconComponentProps) {
   return <Icon elements={githubIconElements} {...props} />;
 }

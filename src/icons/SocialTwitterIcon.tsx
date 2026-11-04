@@ -14,6 +14,6 @@ const twitterIconElements: IconElement[] = [
 ];
 
 /** The Feather twitter glyph: a social destination's icon in BigFooter. Rendered through the Icon base component. */
-export function TwitterIcon(props: IconComponentProps) {
+export function SocialTwitterIcon(props: IconComponentProps) {
   return <Icon elements={twitterIconElements} {...props} />;
 }

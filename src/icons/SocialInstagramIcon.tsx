@@ -13,6 +13,6 @@ const instagramIconElements: IconElement[] = [
 ];
 
 /** The Feather instagram glyph: a social destination's icon in BigFooter. Rendered through the Icon base component. */
-export function InstagramIcon(props: IconComponentProps) {
+export function SocialInstagramIcon(props: IconComponentProps) {
   return <Icon elements={instagramIconElements} {...props} />;
 }

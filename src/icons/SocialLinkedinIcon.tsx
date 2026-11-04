@@ -13,6 +13,6 @@ const linkedinIconElements: IconElement[] = [
 ];
 
 /** The Feather linkedin glyph: a social destination's icon in BigFooter. Rendered through the Icon base component. */
-export function LinkedinIcon(props: IconComponentProps) {
+export function SocialLinkedinIcon(props: IconComponentProps) {
   return <Icon elements={linkedinIconElements} {...props} />;
 }
