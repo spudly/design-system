@@ -27,7 +27,8 @@ import { TextLink } from "../components/TextLink.js";
  * The screen inventory this mirrors (MealPlanDetailView in
  * spudly/eciperay packages/app), in render order: the plan title,
  * its notes, its date range, a nutrition summary line, the
- * "Nutrition goals" section, a Shopping list / Edit action row,
+ * "Nutrition goals" section, the optional weekly-totals band
+ * (#414, below), a Shopping list / Edit action row,
  * and the "Entries" section — a flat list of entry rows, NOT the
  * week grid the #44 demo story imagined (the real plan has no
  * day/week structure; MealPlansPage's header records the same
@@ -70,6 +71,21 @@ import { TextLink } from "../components/TextLink.js";
  * nothing here. `goalsSectionVisibility` ("auto" | "shown" |
  * "hidden", default "auto") lets the app reproduce that case —
  * and suppress the section — without a render-slot hack.
+ *
+ * The weekly-totals band (#414) is likewise view-modeled data:
+ * eciperay computes the plan's weekly nutrition totals and
+ * per-day averages from servings eaten (averages over the days
+ * that have entries) and passes both as pre-labelled
+ * `{ label, valueLabel }` rows in `weeklyTotals` — the numbers
+ * and their formatting stay app-side; the band owns only the
+ * presentation. It renders as its own "Weekly totals" section
+ * beside the goals section, pairing each field's weekly-total
+ * row with its daily-average row (the rows pair by matching
+ * `label`; an average with no matching total still renders,
+ * after the paired fields). The band is optional and
+ * backwards-compatible: it renders only when the prop is
+ * present with at least one row, and the page renders exactly
+ * as before when it is omitted, null, or empty.
  *
  * The nutrition-goals section is view-modeled, NOT slotted —
  * the cook-log audit, applied before the fact: the app's goal
@@ -158,6 +174,29 @@ export type MealPlanDetailPageNutritionGoals = {
   rows: MealPlanDetailPageGoalRow[];
 };
 
+/** One row of the weekly-totals band (#414). Same
+ * `{ label, valueLabel }` convention as
+ * MealPlanDetailPageGoalRow: the app composes the formatted
+ * value label (its rounding and units stay app-side); the band
+ * only renders it, distinguishing the row kind through the
+ * label it composes ("Calories · Weekly total" vs
+ * "Calories · Daily average"). */
+export type MealPlanDetailPageWeeklyTotalsRow = {
+  label: string;
+  valueLabel: string;
+};
+
+/** The weekly-totals band's view-model (#414): per nutrition
+ * field, the plan's weekly-total row and its per-day-average
+ * row. The band pairs the rows per field (matched by `label`,
+ * weekly total first), so both lists should carry the same
+ * fields in the same order; a field present in only one list
+ * renders only its own row. */
+export type MealPlanDetailPageWeeklyTotals = {
+  totals: MealPlanDetailPageWeeklyTotalsRow[];
+  averages: MealPlanDetailPageWeeklyTotalsRow[];
+};
+
 export type MealPlanDetailPageReadyProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
@@ -181,6 +220,12 @@ export type MealPlanDetailPageReadyProps = {
    * or `nutritionLabel` is present, mirroring the app view,
    * which renders nothing when the plan has neither. */
   nutritionGoals?: MealPlanDetailPageNutritionGoals | null;
+  /** Optional weekly totals / per-day averages band (#414):
+   * the app's computed totals and averages for the plan's
+   * nutrition fields, as pre-labelled rows. Omit, pass null, or
+   * pass empty row lists to hide the band — the page then
+   * renders exactly as it did before the band existed. */
+  weeklyTotals?: MealPlanDetailPageWeeklyTotals | null;
   /** Explicit control over the goals section's visibility (#78).
    * `"auto"` (the default) keeps the original rule: the section
    * renders when the plan has goal progress or a nutrition
@@ -231,6 +276,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     dateRangeLabel,
     nutritionLabel,
     nutritionGoals,
+    weeklyTotals,
     goalsSectionVisibility = "auto",
     goalsHref,
     shoppingListHref,
@@ -248,6 +294,43 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     (nutritionGoals !== undefined && nutritionGoals !== null) || !!nutritionLabel;
   const showGoals =
     goalsSectionVisibility === "shown" || (goalsSectionVisibility !== "hidden" && autoShowGoals);
+
+  // The weekly-totals band (#414) renders only when the caller
+  // supplies at least one row. Its rows pair per field — each
+  // field's weekly total followed by its daily average, matched
+  // by label; an average whose field has no total renders after
+  // the paired fields. The kind wording is composed into the
+  // row label here so the two row kinds stay plainly labelled.
+  const weeklyTotalsBand = weeklyTotals
+    ? [
+        ...weeklyTotals.totals.flatMap((total) => {
+          const average = weeklyTotals.averages.find((row) => row.label === total.label);
+          return [
+            {
+              key: `total-${total.label}`,
+              label: `${total.label} · Weekly total`,
+              valueLabel: total.valueLabel,
+            },
+            ...(average
+              ? [
+                  {
+                    key: `average-${average.label}`,
+                    label: `${average.label} · Daily average`,
+                    valueLabel: average.valueLabel,
+                  },
+                ]
+              : []),
+          ];
+        }),
+        ...weeklyTotals.averages
+          .filter((average) => !weeklyTotals.totals.some((row) => row.label === average.label))
+          .map((average) => ({
+            key: `average-${average.label}`,
+            label: `${average.label} · Daily average`,
+            valueLabel: average.valueLabel,
+          })),
+      ]
+    : [];
 
   return (
     <BigFooterShell footer={props.footer}>
@@ -268,6 +351,13 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
                 <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
               )}
               {goalsHref ? <TextLink href={goalsHref}>Set nutrition goals</TextLink> : null}
+            </SectionCard>
+          ) : null}
+          {weeklyTotalsBand.length > 0 ? (
+            <SectionCard title="Weekly totals">
+              {weeklyTotalsBand.map((row) => (
+                <DetailRow key={row.key} label={row.label} value={row.valueLabel} />
+              ))}
             </SectionCard>
           ) : null}
           <ButtonRow>

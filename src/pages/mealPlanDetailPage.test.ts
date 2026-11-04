@@ -43,8 +43,15 @@
  *    this screen has no empty message, unlike the list pages.
  * 7. The component is exported from the pages barrel index,
  *    and stories exercise the Default, Empty, Loading, NoGoals,
- *    and NutritionUnavailable (#78) states so Chromatic
- *    captures them.
+ *    NutritionUnavailable (#78), and WeeklyTotals (#414) states
+ *    so Chromatic captures them.
+ * 9. The weekly-totals band (#414) is an optional view-model
+ *    prop: the app supplies per-field weekly-total and
+ *    per-day-average rows as pre-labelled `{ label, valueLabel }`
+ *    rows, the band pairs them per field in its own "Weekly
+ *    totals" section with the row kinds plainly labelled, and
+ *    it renders nothing when the prop is omitted, null, or
+ *    empty — the page then renders exactly as before.
  * 8. The page carries no styling of its own (#119, tranche 2):
  *    the loading state is the LoadingGate component, the entry
  *    rows are the generic ListRow widget (its pressable area,
@@ -86,7 +93,10 @@ test("MealPlanDetailPage source is readable and non-trivial", () => {
 });
 
 test("the props are a loading | ready union, with no not-found member", () => {
-  assert.match(code, /export type MealPlanDetailPageProps =\s+\{ state: "loading"; footer\?: BigFooterData \} \| MealPlanDetailPageReadyProps;/);
+  assert.match(
+    code,
+    /export type MealPlanDetailPageProps =\s+\{ state: "loading"; footer\?: BigFooterData \} \| MealPlanDetailPageReadyProps;/,
+  );
   assert.match(
     code,
     /props\.state === "loading"/,
@@ -295,6 +305,81 @@ test("the page carries no styling of its own (#119)", () => {
     /<Text variant="title">\{title\}<\/Text>/,
     "the plan title must take the title variant",
   );
+});
+
+test("the weekly-totals band is an optional view-model prop (#414)", () => {
+  assert.match(
+    code,
+    /weeklyTotals\?: MealPlanDetailPageWeeklyTotals \| null;/,
+    "the band's data must cross as one optional prop on the ready props, null included so hosts can pass their nullable query result straight through",
+  );
+  assert.match(
+    code,
+    /export type MealPlanDetailPageWeeklyTotalsRow = \{/,
+    "band rows must be their own view-model type",
+  );
+  assert.match(code, /totals: MealPlanDetailPageWeeklyTotalsRow\[\];/);
+  assert.match(code, /averages: MealPlanDetailPageWeeklyTotalsRow\[\];/);
+  assert.match(
+    index,
+    /type MealPlanDetailPageWeeklyTotals,/,
+    "the band's view-model type must be exported from the pages barrel index",
+  );
+  assert.match(index, /type MealPlanDetailPageWeeklyTotalsRow/);
+});
+
+test("the band renders both row kinds labelled, paired per field (#414)", () => {
+  assert.match(
+    code,
+    /weeklyTotalsBand\.length > 0 \? \(/,
+    "the band section must be guarded on having at least one row",
+  );
+  assert.match(
+    code,
+    /<SectionCard title="Weekly totals">/,
+    "the band must render as its own Weekly totals section",
+  );
+  assert.match(
+    code,
+    /\$\{total\.label\} · Weekly total/,
+    "each field's weekly-total row label must name its kind",
+  );
+  assert.match(
+    code,
+    /· Daily average/,
+    "each field's per-day-average row label must name its kind",
+  );
+  assert.match(
+    code,
+    /weeklyTotals\.averages\.find\(\(row\) => row\.label === total\.label\)/,
+    "the rows must pair per field — each total followed by the average carrying the same field label",
+  );
+  assert.match(
+    code,
+    /<DetailRow key=\{row\.key\} label=\{row\.label\} value=\{row\.valueLabel\} \/>/,
+    "band rows must render through DetailRow, like the goal rows",
+  );
+});
+
+test("the band is absent when weeklyTotals is omitted, null, or empty (#414)", () => {
+  assert.match(
+    code,
+    /const weeklyTotalsBand = weeklyTotals\s+\? \[/,
+    "an omitted or null prop must collapse to an empty band row list",
+  );
+  assert.match(
+    code,
+    /: \[\];/,
+    "the no-prop case must produce the empty band, so the length guard above renders no section",
+  );
+  assert.match(stories, /export const WeeklyTotals/, "a story must exercise the populated band");
+  assert.match(
+    stories,
+    /weeklyTotals=\{detailWeeklyTotals\}/,
+    "the WeeklyTotals story must pass the band's view-model",
+  );
+  assert.match(stories, /totals: \[/, "the story fixture must carry weekly-total rows");
+  assert.match(stories, /averages: \[/, "the story fixture must carry per-day-average rows");
 });
 
 test("the page composes through the purpose-named layout components (#119)", () => {

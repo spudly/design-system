@@ -6,6 +6,7 @@ import {
   MealPlanDetailPage,
   type MealPlanDetailPageEntry,
   type MealPlanDetailPageNutritionGoals,
+  type MealPlanDetailPageWeeklyTotals,
 } from "./MealPlanDetailPage.js";
 
 /**
@@ -96,6 +97,47 @@ export const Default: Story = {
         dateRangeLabel="2026-10-19 – 2026-10-25"
         nutritionLabel="2,140 cal · Protein 118 g"
         nutritionGoals={detailGoals}
+        goalsHref="/meal-plans/this-week/goals"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
+        entries={detailEntries}
+      />
+    </Viewport>
+  ),
+};
+
+// The #414 band's fixture: weekly totals and per-day averages
+// for the plan's nutrition fields, as the app composes them
+// from servings eaten (averages over the days with entries).
+const detailWeeklyTotals: MealPlanDetailPageWeeklyTotals = {
+  totals: [
+    { label: "Calories", valueLabel: "12,950 cal" },
+    { label: "Protein", valueLabel: "826 g" },
+    { label: "Fiber", valueLabel: "154 g" },
+  ],
+  averages: [
+    { label: "Calories", valueLabel: "1,850 cal / day" },
+    { label: "Protein", valueLabel: "118 g / day" },
+    { label: "Fiber", valueLabel: "22 g / day" },
+  ],
+};
+
+export const WeeklyTotals: Story = {
+  // The weekly-totals band populated: each field renders its
+  // weekly-total row paired with its daily-average row in the
+  // "Weekly totals" section, beside the goals section. Every
+  // other story omits the prop — the band renders only when
+  // the caller supplies it.
+  render: () => (
+    <Viewport>
+      <MealPlanDetailPage
+        state="ready"
+        title="This week"
+        notes="Family dinners — keep weeknights simple."
+        dateRangeLabel="2026-10-19 – 2026-10-25"
+        nutritionLabel="2,140 cal · Protein 118 g"
+        nutritionGoals={detailGoals}
+        weeklyTotals={detailWeeklyTotals}
         goalsHref="/meal-plans/this-week/goals"
         shoppingListHref="/meal-plans/this-week/shopping-list"
         editHref="/meal-plans/this-week/edit"
