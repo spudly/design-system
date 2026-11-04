@@ -112,8 +112,8 @@ test("the pages barrel has no wildcard re-exports (#298)", () => {
   // the barrel must name every export explicitly.
   assert.doesNotMatch(
     readCode("src/pages/index.ts"),
-    /export\s*\*/,
-    "src/pages/index.ts must name each export; a wildcard re-export can expose internal barrels",
+    /export(?:\s+type)?\s*\*/,
+    "src/pages/index.ts must name each export; a wildcard re-export (value or type) can expose internal barrels",
   );
 });
 
