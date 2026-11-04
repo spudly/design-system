@@ -235,8 +235,9 @@ test("composed pages and stories render exactly one footer", () => {
     /<BigFooterShell footer=\{footer\}>\s*<PinnedHeaderShell[\s\S]*?<MealPlansPage/,
     "the plans tab's footer shell encloses the pinned header and MealPlansPage",
   );
-  assert.ok(
-    !mealsHub.includes("{...(footer !== undefined ? { footer } : {})}"),
+  assert.doesNotMatch(
+    mealsHub,
+    /<MealPlansPage\b[^>]*\bfooter\b/,
     "MealPlansPage must not receive the footer on the plans tab — the hub shell owns it",
   );
   // Nested compositions: the outer page owns the footer; the
@@ -246,13 +247,15 @@ test("composed pages and stories render exactly one footer", () => {
     "src/pages/ManualEntryPage.stories.tsx",
     "src/pages/EditVersionPage.stories.tsx",
   ]) {
-    assert.ok(
-      !readCode(story).includes("<RecipeFormPage footer="),
+    assert.doesNotMatch(
+      readCode(story),
+      /<RecipeFormPage\b[^>]*\bfooter\b/,
       `${story} must not supply a footer to the nested RecipeFormPage`,
     );
   }
-  assert.ok(
-    !readCode("src/pages/PublicPageFrame.stories.tsx").includes("<PublicRecipePage footer="),
+  assert.doesNotMatch(
+    readCode("src/pages/PublicPageFrame.stories.tsx"),
+    /<PublicRecipePage\b[^>]*\bfooter\b/,
     "the frame story must not supply a footer to the nested PublicRecipePage — the frame owns it",
   );
 });
@@ -331,9 +334,11 @@ test("SSR: BigFooter renders brand, columns, store and social links as anchors",
     assert.ok(new RegExp(`<a [^>]*href="${href}"`).test(html), `${label} is an anchor to ${href}`);
   }
   assert.ok(html.includes("Eciperay"), "the brand wordmark renders");
+  const socialAnchor = /<a [^>]*href="\/social\/facebook"[^>]*>/.exec(html)?.[0];
+  assert.ok(socialAnchor, "the social link renders as an anchor to its href");
   assert.ok(
-    html.includes('aria-label="Eciperay on Facebook"') || html.includes("Eciperay on Facebook"),
-    "the social link carries its accessible name",
+    socialAnchor.includes('aria-label="Eciperay on Facebook"'),
+    "the social anchor carries its accessible name as aria-label",
   );
 });
 
