@@ -141,7 +141,12 @@ test("every widget component has a story file titled Components/<Name>", () => {
       entry.isFile(),
       `src/components/${entry.name}: unexpected directory — the parity scan is flat`,
     );
-    if (exceptions.has(entry.name) || entry.name.endsWith(".stories.tsx")) continue;
+    if (
+      exceptions.has(entry.name) ||
+      entry.name.endsWith(".stories.tsx") ||
+      entry.name.endsWith(".test.ts")
+    )
+      continue;
     assert.ok(
       entry.name.endsWith(".tsx"),
       `src/components/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
@@ -186,7 +191,12 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
       entry.isFile(),
       `src/pages/${entry.name}: unexpected directory — the parity scan is flat`,
     );
-    if (exceptions.has(entry.name) || entry.name.endsWith(".stories.tsx")) continue;
+    if (
+      exceptions.has(entry.name) ||
+      entry.name.endsWith(".stories.tsx") ||
+      entry.name.endsWith(".test.ts")
+    )
+      continue;
     assert.ok(
       entry.name.endsWith(".tsx"),
       `src/pages/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,

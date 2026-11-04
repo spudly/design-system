@@ -80,7 +80,7 @@ jobs:
       - run: npm run typecheck
       - run: npm run lint
       - run: npm run build
-      - run: npm run build:tests && node --test test-dist/*.test.js
+      - run: npm test
         env:
           # Release-only VR (Stephen's directive, 2026-11-02): the
           # VR baseline-completeness gate in

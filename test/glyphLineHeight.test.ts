@@ -54,7 +54,7 @@ function* sourceFiles(dir: string): Generator<string> {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) yield* sourceFiles(path);
-    else if (/\.(ts|tsx)$/.test(entry.name)) yield path;
+    else if (/\.(ts|tsx)$/.test(entry.name) && !entry.name.endsWith(".test.ts")) yield path;
   }
 }
 
