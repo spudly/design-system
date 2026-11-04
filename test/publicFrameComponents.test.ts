@@ -75,7 +75,31 @@ test("PublicFrameLayout owns the shell and the wide centered column", () => {
   );
   assert.match(layout, /header: ReactNode;/);
   assert.match(layout, /footer: ReactNode;/);
-  assert.ok(!layout.includes("<ScrollView"), "the frame does not scroll — the page inside does");
+  // Native footer scroll path (PR #413 review): the frame itself
+  // does not scroll — the page inside owns the content scroll —
+  // but on native the footer gets its OWN bounded scroll region
+  // (the BigFooterShell pattern), because BigFooter has no
+  // internal scroll region and a tall footer was clipped with no
+  // scroll path. Web renders the footer bare (the document
+  // scrolls the whole frame).
+  assert.match(
+    layout,
+    /isWeb \? \(\s*footer\s*\) : \(\s*<ScrollView flexGrow=\{0\} flexShrink=\{1\} keyboardShouldPersistTaps="handled">\s*\{footer\}\s*<\/ScrollView>\s*\)/,
+    "on native the footer renders inside its own bounded scroll region; on web it renders bare",
+  );
+  assert.equal(
+    (layout.match(/<ScrollView/g) ?? []).length,
+    1,
+    "PublicFrameLayout's only ScrollView is the native footer region",
+  );
+  assert.ok(
+    !/<ScrollView[^>]*>\s*\{children\}/.test(layout),
+    "the frame's children are not wrapped in a ScrollView — the page inside owns its scroll",
+  );
+  assert.ok(
+    !/<ScrollView[^>]*>\s*\{header\}/.test(layout),
+    "the frame's header is not wrapped in a ScrollView",
+  );
 });
 
 test("PublicFrameHeader is the surface band with wordmark and sign-in link", () => {

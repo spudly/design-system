@@ -280,25 +280,30 @@ export type BigFooterShellProps = {
  * height a short page needs to place the footer at the bottom.
  *
  * Bounded content region (CodeRabbit review, PR #413): the
- * content region is a definite-height flex region
- * (flexGrow 1 / flexShrink 1 / flexBasis 0), not a region sized
- * to its children. A self-bounding child — a BoundedList
- * FlatList inside a non-scrolling ScreenContainer (RecipesPage,
- * DiscoverPage), or a ScrollView — therefore fills exactly the
- * space the shell leaves above the footer and scrolls inside
- * it, so the footer stays reachable on bounded screens instead
- * of sitting below a list that grew to its full content height
- * with nothing left to scroll. Content that is not itself a
- * scroll region keeps its intrinsic size (flex items do not
- * shrink below their content), so long in-flow pages still
- * push the shell taller and the footer follows the content.
+ * content region is a flex region with an intrinsic basis
+ * (flexGrow 1 / flexShrink 1 / flexBasis "auto"). A
+ * self-bounding child — a BoundedList FlatList inside a
+ * non-scrolling ScreenContainer (RecipesPage, DiscoverPage),
+ * or a ScrollView — therefore fills the space the shell
+ * leaves above the footer and scrolls inside it, so the
+ * footer stays reachable on bounded screens instead of
+ * sitting below a list that grew to its full content height
+ * with nothing left to scroll. The intrinsic basis matters
+ * when the footer is tall: with a zero basis the content
+ * region could be allocated zero height on a short native
+ * screen (a BoundedList would get a zero-height viewport),
+ * while "auto" lets it participate in the shrink allocation
+ * and preserve a content viewport. Content that is not
+ * itself a scroll region keeps its intrinsic size (flex
+ * items do not shrink below their content), so long in-flow
+ * pages still push the shell taller and the footer follows
+ * the content.
  *
  * Native footer scroll path (CodeRabbit review, PR #413): on
  * native the footer renders inside its own bounded scroll
  * region — a ScrollView that takes the footer's intrinsic
  * height when it fits (flexGrow 0) but can shrink below it
- * (flexShrink 1). The bounded content region above it can
- * already shrink to nothing (flexBasis 0), so when a stacked
+ * (flexShrink 1). When a stacked
  * footer alone is taller than a short or landscape screen
  * leaves for it, the footer region caps at the space the
  * shell leaves it and the footer's lower links stay reachable
@@ -334,7 +339,7 @@ export function BigFooterShell({ footer, children }: BigFooterShellProps) {
   }
   return (
     <YStack minHeight={{ default: "100%", web: "100dvh" }} flexDirection="column">
-      <YStack flexGrow={1} flexShrink={1} flexBasis={0} position="relative">
+      <YStack flexGrow={1} flexShrink={1} flexBasis="auto" position="relative">
         {children}
       </YStack>
       {isWeb ? (

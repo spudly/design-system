@@ -94,11 +94,13 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   );
   assert.match(bigFooter, /flexGrow=\{1\}/);
   // Bounded content region (PR #413 review): the region the list /
-  // scroll child fills is definite-height (shrink 1, basis 0), not
-  // sized to its children, so a BoundedList page's footer stays
-  // reachable; and the region is the positioned ancestor, so an
+  // scroll child fills carries an intrinsic flex basis (shrink 1,
+  // basis "auto"), so it participates in shrink allocation and
+  // keeps a content viewport even when the native footer is
+  // taller than the screen (a zero basis could allocate it zero
+  // height); and the region is the positioned ancestor, so an
   // absolute-fill child (StepOverlay) cannot cover the footer.
-  assert.match(bigFooter, /flexShrink=\{1\} flexBasis=\{0\} position="relative"/);
+  assert.match(bigFooter, /flexShrink=\{1\} flexBasis="auto" position="relative"/);
   assert.ok(!/position="(fixed|absolute)"/.test(bigFooter), "the footer is in flow, never pinned");
 });
 

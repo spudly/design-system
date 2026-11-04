@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { View, YStack } from "tamagui";
+import { ScrollView, View, YStack, isWeb } from "tamagui";
 import { mainRoleProps } from "./accessibility.js";
 
 /**
@@ -41,6 +41,22 @@ export type PublicFrameLayoutProps = {
  * outermost chrome on public surfaces, so it is the landmark
  * owner — pages composed inside it must not add duplicates.
  * Native is unaffected.
+ *
+ * Native footer scroll path (CodeRabbit review, PR #413): the
+ * "frame does not scroll" split above covers the header and the
+ * content column, but BigFooter has no internal scroll region,
+ * so on native a footer taller than the space left after the
+ * header was clipped with no scroll path to its lower links.
+ * On native the footer therefore renders inside its own
+ * bounded scroll region — the same pattern as BigFooterShell:
+ * a ScrollView that takes the footer's intrinsic height when
+ * it fits (flexGrow 0) but can shrink below it (flexShrink 1),
+ * so the region caps at the available space and the lower
+ * links scroll into reach. Web renders the footer bare: the
+ * document scrolls the whole frame, so the same links stay
+ * reachable there. The scroll region wraps ONLY the footer —
+ * the header and the page content keep their existing layout
+ * and scroll behavior.
  */
 export function PublicFrameLayout({ header, footer, children }: PublicFrameLayoutProps) {
   return (
@@ -49,7 +65,13 @@ export function PublicFrameLayout({ header, footer, children }: PublicFrameLayou
       <View flex={1} width="100%" maxWidth={COLUMN_MAX_WIDTH} alignSelf="center" {...mainRoleProps}>
         {children}
       </View>
-      {footer}
+      {isWeb ? (
+        footer
+      ) : (
+        <ScrollView flexGrow={0} flexShrink={1} keyboardShouldPersistTaps="handled">
+          {footer}
+        </ScrollView>
+      )}
     </YStack>
   );
 }
