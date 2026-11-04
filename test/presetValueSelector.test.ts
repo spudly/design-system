@@ -9,7 +9,7 @@
  * custom value, presets leaving editing) is pinned in
  * servingsScaleControls.test.ts and pageWebAria.test.ts; the
  * pins here hold the component's shape: exported from the
- * package root, presets and the custom slot rendered as
+ * internal components barrel, presets and the custom slot rendered as
  * Button's toggle form, the editor swapped in place of the
  * custom button, and the committed value flowing through the
  * same onChange as the presets.
@@ -28,12 +28,12 @@ const source = readFileSync(
 );
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("PresetValueSelector is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("PresetValueSelector is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   assert.equal(
     typeof dist.PresetValueSelector,
     "function",
-    "PresetValueSelector must be exported from @spudly/ui",
+    "PresetValueSelector must be exported from the internal components barrel",
   );
 });
 

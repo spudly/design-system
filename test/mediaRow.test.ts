@@ -9,7 +9,7 @@
  * shared Card, Thumbnail, Text, and LinkOverlay components and
  * exported from nowhere. This test pins both halves of that:
  * the compositions' contracts below, and their absence from
- * the built package root.
+ * the built internal components barrel.
  *
  * MediaRow owns the row's card geometry (elevated card, row/wrap/
  * center, 12px rhythm), its 64px media well (the shared row
@@ -35,6 +35,7 @@
  * stripped before scanning.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -57,18 +58,18 @@ const mediaRow = page.slice(page.indexOf("const textBlockStyle"), page.indexOf("
 const ratingStars = page.slice(page.indexOf("const STAR_STEPS"));
 const removableField = code("RemovableField.tsx");
 
-test("RemovableField is exported from the built package root; the page-local row and star control are not", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("RemovableField is exported from the built internal components barrel; the page-local row and star control are not", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
     typeof dist.RemovableField,
     "function",
-    "RemovableField must be exported from @spudly/ui",
+    "RemovableField must be exported from the internal components barrel",
   );
   for (const name of ["MediaRow", "RatingStars"]) {
     assert.equal(
       dist[name],
       undefined,
-      `${name} is a RecipesPage-local composition — it must not be exported from @spudly/ui`,
+      `${name} is a RecipesPage-local composition — it must not be exported from the internal components barrel`,
     );
   }
 });

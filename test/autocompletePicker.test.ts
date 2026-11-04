@@ -6,7 +6,7 @@
  * NOT a longer checkbox list).
  *
  * The contracts pinned here:
- * 1. AutocompletePicker is exported from the package root.
+ * 1. AutocompletePicker is exported from the internal components barrel.
  * 2. The search is the caller's: `searchText` in,
  *    `onSearchTextChange` out, `searchResults` / `isSearching`
  *    back in — the picker never fetches. While searching, a
@@ -27,6 +27,7 @@
  *    search results — the separation #383 requires.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -43,8 +44,8 @@ function codeOf(rel: string) {
 
 const picker = codeOf("src/components/AutocompletePicker.tsx");
 
-test("AutocompletePicker is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("AutocompletePicker is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   assert.equal(typeof dist.AutocompletePicker, "function");
 });
 
@@ -144,7 +145,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     const { MealFormPage }: Record<string, any> = await import("../dist/pages/MealFormPage.js");
     const { MealPlanFormPage }: Record<string, any> =
       await import("../dist/pages/MealPlanFormPage.js");

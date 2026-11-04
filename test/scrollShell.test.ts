@@ -30,9 +30,13 @@ const scrollShellCode = scrollShellSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("ScrollShell is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.ScrollShell, "function", "ScrollShell must be exported from @spudly/ui");
+test("ScrollShell is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
+  assert.equal(
+    typeof dist.ScrollShell,
+    "function",
+    "ScrollShell must be exported from the internal components barrel",
+  );
 });
 
 test("ScrollShellProps is a type-only export from the built components barrel", () => {

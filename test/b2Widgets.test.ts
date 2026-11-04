@@ -8,7 +8,7 @@
  * form carries its tint contract.
  *
  * The contracts pinned here:
- * 1. The six remaining widgets are exported from the package root
+ * 1. The six remaining widgets are exported from the internal components barrel
  *    (dist), next to the widgets they compose.
  * 2. Badge's colored-tag form (the former TagPill) tints from the data
  *    color: surface = color + "22" alpha, label = the color itself,
@@ -34,6 +34,7 @@
  * script does both).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -41,7 +42,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const dist: Record<string, any> = await import("../dist/index.js");
+const dist: Record<string, any> = await loadInternalDist();
 
 function source(name: string) {
   return readFileSync(join(root, "src", "components", `${name}.tsx`), "utf8");
@@ -56,9 +57,13 @@ const MOVED = [
   "TokenRow",
 ];
 
-test("the six remaining B2 widgets are exported from the package root", () => {
+test("the six remaining B2 widgets are exported from the internal components barrel", () => {
   for (const name of MOVED) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from dist/index.js`);
+    assert.equal(
+      typeof dist[name],
+      "function",
+      `${name} must be exported from the internal components barrel`,
+    );
   }
   assert.equal(dist.TagPill, undefined, "TagPill was merged into Badge (#183)");
 });

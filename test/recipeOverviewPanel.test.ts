@@ -22,6 +22,7 @@
  * registerSvgStub.ts before anything else.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -36,12 +37,12 @@ const panelCode = panelSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("RecipeOverviewPanel is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("RecipeOverviewPanel is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
     typeof dist.RecipeOverviewPanel,
     "function",
-    "RecipeOverviewPanel must be exported from @spudly/ui",
+    "RecipeOverviewPanel must be exported from the internal components barrel",
   );
 });
 

@@ -29,7 +29,7 @@
  *    content inside the app's list rows. This test pins the
  *    absence so a slot is added by a conscious contract change
  *    (with the cook-log reasoning revisited), not by drift.
- * 6. The component is exported from the pages subpath index, and
+ * 6. The component is exported from the pages barrel index, and
  *    stories exercise the Default, Empty, Loading, and
  *    no-actions states so Chromatic captures them.
  * 7. The page carries no styling of its own (#119, tranche 2):
@@ -154,7 +154,7 @@ test("there is deliberately no app-content render slot", () => {
   );
 });
 
-test("the component is exported from the pages subpath index", () => {
+test("the component is exported from the pages barrel index", () => {
   assert.match(index, /MealPlansPage/);
   assert.match(index, /type MealPlansPageProps/);
   assert.match(index, /from "\.\/MealPlansPage\.js"/);

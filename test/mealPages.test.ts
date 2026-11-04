@@ -8,7 +8,7 @@
  * app-side).
  *
  * The contracts pinned here:
- * 1. All six pages are exported from the pages subpath index.
+ * 1. All six pages are exported from the pages barrel index.
  * 2. Every page is a controlled view: no state of its own
  *    (stories hold state instead), no app imports, no
  *    react-native imports, no fetching.
@@ -67,7 +67,7 @@ const PAGES = [
   "MealsHubPage",
 ];
 
-test("all six B3b pages are exported from the pages subpath", () => {
+test("all six B3b pages are exported from the pages barrel", () => {
   const index = readFileSync(join(root, "src", "pages", "index.ts"), "utf8");
   for (const name of PAGES) {
     assert.ok(index.includes(name), `${name} must be exported from src/pages/index.ts`);

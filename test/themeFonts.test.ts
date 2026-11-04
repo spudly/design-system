@@ -34,6 +34,7 @@
  * script does both). The hardcoded-family scan reads source.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -44,7 +45,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const srcDir = join(here, "..", "src");
 
 const { tokens, baseTheme, eciperayTheme, memorizeTheme }: Record<string, any> =
-  await import("../dist/index.js");
+  await loadInternalDist();
 
 test("the base sans stack leads with Raleway on every platform", () => {
   const { fontFamily } = tokens.typography;

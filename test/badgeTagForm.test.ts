@@ -3,7 +3,7 @@
  * (spudly/design-system#183).
  *
  * The contracts pinned here:
- * 1. Badge is exported from the package root (dist) and TagPill is no
+ * 1. Badge is exported from the internal components barrel (dist) and TagPill is no
  *    longer exported under its own name.
  * 2. Badge's `color` form carries TagPill's rendering contract: the
  *    surface is the resolved token color at `22` hex alpha, the label
@@ -22,6 +22,7 @@
  * script does both).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -29,7 +30,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const dist: Record<string, any> = await import("../dist/index.js");
+const dist: Record<string, any> = await loadInternalDist();
 
 test("Badge is exported and TagPill is gone (#183)", () => {
   assert.equal(typeof dist.Badge, "function", "Badge must be exported");

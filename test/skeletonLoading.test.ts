@@ -1,4 +1,5 @@
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
@@ -36,7 +37,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     const loadingScope: Record<string, any> = await import("../dist/components/LoadingScope.js");
     return { React, renderToString, TamaguiProvider, ...dist, ...loadingScope };
   })();
@@ -58,7 +59,7 @@ async function renderToHtml(element: any) {
 const hiddenBones = (html: string) =>
   (html.match(/name="SkeletonBone" aria-hidden="true"/g) ?? []).length;
 
-test("the skeleton primitives and the clock are package-root exports", async () => {
+test("the skeleton primitives and the clock are exported from the internal components barrel", async () => {
   const { BoxSkeleton, CircleSkeleton, TextSkeleton, SkeletonClock } = await loadRuntime();
   for (const [name, value] of Object.entries({
     BoxSkeleton,
@@ -66,16 +67,25 @@ test("the skeleton primitives and the clock are package-root exports", async () 
     TextSkeleton,
     SkeletonClock,
   })) {
-    assert.equal(typeof value, "function", `${name} must be exported from the package root`);
+    assert.equal(typeof value, "function", `${name} must be exported from the components barrel`);
   }
 });
 
-test("LoadingScope and the clock internals stay off the public surface", async () => {
-  const publicDist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(publicDist.LoadingScope, undefined, "LoadingScope is internal — composites only");
-  assert.equal(publicDist.useLoadingScope, undefined, "useLoadingScope is internal");
-  assert.equal(publicDist.useSkeletonOpacity, undefined, "the clock's reader hook is internal");
-  assert.equal(publicDist.SkeletonBone, undefined, "SkeletonBone is an internal building block");
+test("LoadingScope and the clock internals stay off every export surface", async () => {
+  // Not on the internal surface the other tests load…
+  const internalDist: Record<string, any> = await loadInternalDist();
+  assert.equal(internalDist.LoadingScope, undefined, "LoadingScope is internal — composites only");
+  assert.equal(internalDist.useLoadingScope, undefined, "useLoadingScope is internal");
+  assert.equal(internalDist.useSkeletonOpacity, undefined, "the clock's reader hook is internal");
+  assert.equal(internalDist.SkeletonBone, undefined, "SkeletonBone is an internal building block");
+  // …and not on the public surface either: the package root's
+  // type entry (dist/index.d.ts, the pages barrel) names none of
+  // them — the runtime root is not Node-importable (#298), so the
+  // public check scans its declarations.
+  const publicTypes = read("dist/index.d.ts");
+  for (const name of ["LoadingScope", "useLoadingScope", "useSkeletonOpacity", "SkeletonBone"]) {
+    assert.ok(!publicTypes.includes(name), `${name} must not appear in the public type surface`);
+  }
   assert.ok(
     !read("src/components/index.ts").includes("LoadingScope"),
     "the components barrel must not export LoadingScope",

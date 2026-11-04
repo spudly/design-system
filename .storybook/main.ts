@@ -95,7 +95,7 @@ const config: StorybookConfig = {
       resolve: {
         ...config.resolve,
         // Platform extensions, web first: react-native-svg (the icons
-        // module, @spudly/ui/icons) ships parallel .web.js builds of
+        // module, the internal icons module) ships parallel .web.js builds of
         // its entry and element files; without this, Vite resolves the
         // native entry, whose fabric components import
         // codegenNativeComponent from "react-native" — which the

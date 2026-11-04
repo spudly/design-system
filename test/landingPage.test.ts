@@ -37,6 +37,7 @@
  * react-native).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -198,7 +199,7 @@ test("no app copy is baked in and nothing app- or react-native-side is imported"
   assert.ok(!/from\s+"[^"]*eciperay/i.test(page), "the page must not import app code");
 });
 
-test("the page is exported from @spudly/ui/pages and storied under Pages/Eciperay", () => {
+test("the page is exported from the package root (@spudly/ui) and storied under Pages/Eciperay", () => {
   const normalizedIndex = pagesIndex.replaceAll(/\s+/g, " ");
   assert.ok(
     normalizedIndex.includes(
@@ -225,7 +226,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     // The pages barrel is not Node-importable (some pages import
     // react-native), so the page under test is loaded from its
     // own module — it is a plain component composition.

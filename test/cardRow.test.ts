@@ -27,6 +27,7 @@
  * registerSvgStub.ts before anything else.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -41,9 +42,13 @@ const cardRowCode = cardRowSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("CardRow is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.CardRow, "function", "CardRow must be exported from @spudly/ui");
+test("CardRow is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  assert.equal(
+    typeof dist.CardRow,
+    "function",
+    "CardRow must be exported from the internal components barrel",
+  );
 });
 
 test("CardRowProps is a type-only export from the built components barrel", () => {
@@ -156,7 +161,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...dist };
   })();
   return runtimePromise;

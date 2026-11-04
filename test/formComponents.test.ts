@@ -19,6 +19,7 @@
  * dedupe set.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -26,7 +27,7 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const dist = await import(join(here, "..", "dist", "index.js"));
+const dist = await loadInternalDist();
 // Comments are stripped before asserting: the components' doc
 // comments legitimately name the abolished props they refuse.
 const readRepoFile = (rel: string) =>
@@ -47,7 +48,7 @@ const COMPONENTS = [
 ];
 
 for (const name of COMPONENTS) {
-  test(`${name} is exported from the built package root`, () => {
+  test(`${name} is exported from the built internal components barrel`, () => {
     assert.equal(typeof dist[name], "function", `${name} must be a runtime export`);
   });
   test(`${name}Props is a type-only export from the built components barrel`, () => {
@@ -166,7 +167,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const distRuntime = await import(join(here, "..", "dist", "index.js"));
+    const distRuntime = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...distRuntime };
   })();
   return runtimePromise;

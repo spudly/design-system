@@ -17,10 +17,9 @@ import { VerseText } from "../components/VerseText.js";
  * user intents out. Nothing here imports an app package,
  * computes a blank, grades a round, or holds state.
  *
- * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root —
- * see RecipesPage.tsx for why (react-native imports must stay
- * out of the Node-importable root entry).
+ * Placement: page components live in src/pages and are exported
+ * from the package root (#298) — pages are the package's only
+ * exports.
  *
  * The screen inventory this mirrors (DrillScreen in
  * spudly/memorize packages/app), in render order: the shared

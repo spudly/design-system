@@ -9,6 +9,7 @@
  * off-screen) and the actions group's own 12px gap.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -22,12 +23,12 @@ const source = readFileSync(
 );
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("TrailingActionsRow is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("TrailingActionsRow is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
     typeof dist.TrailingActionsRow,
     "function",
-    "TrailingActionsRow must be exported from @spudly/ui",
+    "TrailingActionsRow must be exported from the internal components barrel",
   );
 });
 

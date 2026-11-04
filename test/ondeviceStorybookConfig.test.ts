@@ -27,6 +27,7 @@
  * script does both).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -37,7 +38,7 @@ function familyOf(font: any) {
 }
 
 test("createOnDeviceStorybookTamaguiConfig combines all brands as sub-themes", async () => {
-  const pkg: Record<string, any> = await import("../dist/index.js");
+  const pkg: Record<string, any> = await loadInternalDist();
   assert.equal(
     typeof pkg.createOnDeviceStorybookTamaguiConfig,
     "function",
@@ -68,7 +69,7 @@ test("createOnDeviceStorybookTamaguiConfig combines all brands as sub-themes", a
 });
 
 test("on-device config registers the UiSans body and Alegreya verse stacks", async () => {
-  const pkg: Record<string, any> = await import("../dist/index.js");
+  const pkg: Record<string, any> = await loadInternalDist();
   const config = pkg.createOnDeviceStorybookTamaguiConfig();
 
   // The stacks fed to the registration: base family for body (every

@@ -4,7 +4,7 @@
  * RecipeDetailPage's cook history.
  *
  * The pins hold the shape the page's contract depends on: the
- * card is exported from the package root, the delete action
+ * card is exported from the internal components barrel, the delete action
  * renders ONLY when its callback is provided (entry data alone
  * exposes no dead action), and the delete button carries the
  * caller-composed entry-specific accessible name (position +
@@ -21,12 +21,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "LogEntryCard.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("LogEntryCard is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("LogEntryCard is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   assert.equal(
     typeof dist.LogEntryCard,
     "function",
-    "LogEntryCard must be exported from @spudly/ui",
+    "LogEntryCard must be exported from the internal components barrel",
   );
 });
 

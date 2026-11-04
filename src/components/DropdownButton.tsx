@@ -21,7 +21,7 @@ export type DropdownButtonProps = DropdownButtonCommonProps &
     | {
         /** The trigger's visible label; it also names the button. */
         label: string;
-        /** Optional leading glyph: a DS icon component from `@spudly/ui/icons`. Content, not styling — Button's icon slot owns its rendering. */
+        /** Optional leading glyph: a DS icon component from the internal icons module. Content, not styling — Button's icon slot owns its rendering. */
         icon?: ComponentType<IconComponentProps>;
         accessibilityLabel?: string;
       }

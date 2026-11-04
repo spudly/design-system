@@ -11,6 +11,7 @@
  * (test/centeredText.test.ts) in the dedupe.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -25,10 +26,14 @@ function code(file: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-test("the shell components are exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("the shell components are exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   for (const name of ["ScreenShell", "SectionHeading", "Toolbar"]) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+    assert.equal(
+      typeof dist[name],
+      "function",
+      `${name} must be exported from the internal components barrel`,
+    );
   }
 });
 

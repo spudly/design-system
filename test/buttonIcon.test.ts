@@ -33,6 +33,7 @@
  * that the stories use the real DS icons.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -73,7 +74,7 @@ test("the icon slot takes a DS icon component, imported type-only from the icons
   assert.match(button, /icon\?: ComponentType<IconComponentProps>;/);
   assert.ok(
     !/^import \{[^}]*\} from "\.\.\/icons\//m.test(button),
-    "no runtime icons import: the root entry must stay importable in plain Node",
+    "no runtime icons import: Button takes its icon as a caller-supplied component type and stays decoupled from the icons module runtime",
   );
 });
 
@@ -176,7 +177,7 @@ function loadRuntime() {
     stubGlyphRuntime.React = React;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...dist };
   })();
   return runtimePromise;

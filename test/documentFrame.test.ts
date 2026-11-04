@@ -10,6 +10,7 @@
  * wrapping row of the host's legal links.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -28,8 +29,8 @@ function readCode(name: string) {
 const header = readCode("DocumentHeader.tsx");
 const footer = readCode("DocumentFooter.tsx");
 
-test("the document frame components are exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("the document frame components are exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   assert.equal(typeof dist.DocumentHeader, "function", "DocumentHeader must be exported");
   assert.equal(typeof dist.DocumentFooter, "function", "DocumentFooter must be exported");
 });

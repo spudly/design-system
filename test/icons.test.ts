@@ -16,9 +16,10 @@
  * (printer / share-2 in full — the two icons RecipeDetailPage
  * needs, spudly/design-system#187), no module carries another
  * icon's glyph, the rendering goes through react-native-svg (never
- * an icon font or a text glyph), and the package exposes the module
- * behind the ./icons subpath so the Node-importable root entry
- * stays clean.
+ * an icon font or a text glyph), and — since #298 — the icons are
+ * internal only: the package exports no ./icons subpath (and no
+ * subpath at all); the module's own barrel still collects every
+ * icon for the repo's internal consumers.
  *
  * Source scan, like this repo's other contract tests: the
  * invariants are per-literal properties of the source. Comments are
@@ -174,14 +175,20 @@ test("the name-based API and tabIcons are gone (#246)", () => {
   }
 });
 
-test("the package exposes the module behind the ./icons subpath (#246)", () => {
+test("the icons module is internal — no ./icons subpath export (#246, #298)", () => {
   const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-  assert.ok(pkg.exports["./icons"], "package.json has no ./icons export");
-  assert.equal(pkg.exports["./icons"].default, "./dist/icons/index.js");
+  assert.equal(pkg.exports["./icons"], undefined, "package.json must not export ./icons (#298)");
+  assert.deepEqual(
+    Object.keys(pkg.exports),
+    ["."],
+    "the package root is the only export — pages only (#298)",
+  );
   assert.ok(
     pkg.dependencies["react-native-svg"] || pkg.peerDependencies["react-native-svg"],
     "react-native-svg is not declared as a dependency or peer",
   );
+  // The internal barrel still collects every icon for the repo's
+  // own components, pages, and stories.
   const index = codeOf("src/icons/index.ts");
   assert.match(index, /Icon/);
   for (const [name] of ICONS) {

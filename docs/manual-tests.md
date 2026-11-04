@@ -1339,7 +1339,7 @@ Open in `Pages/Eciperay/RecipeDetailPage`: Default, Minimal, CreateDraft,
 Loading, Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition.
 
 1. The overview action row: Print and Share render as **real icons**
-   (printer / share-2 from `@spudly/ui/icons`) in the same neutral
+   (printer / share-2 from the DS internal icons module) in the same neutral
    button treatment as Edit/Delete — no emoji or text glyphs, no
    color-rendered printer.
 2. Tags render as bordered Badge pills whose border matches the tag

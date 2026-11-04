@@ -23,6 +23,7 @@
  *    state (SSR-pinned below) — the selectable form is opt-in.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -100,7 +101,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const distRuntime = await import(join(here, "..", "dist", "index.js"));
+    const distRuntime = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...distRuntime };
   })();
   return runtimePromise;

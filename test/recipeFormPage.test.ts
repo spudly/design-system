@@ -7,7 +7,7 @@
  * and submission stay app-side).
  *
  * The contracts pinned here:
- * 1. All four pages are exported from the pages subpath index.
+ * 1. All four pages are exported from the pages barrel index.
  * 2. RecipeFormPage is a controlled view: no state of its own, no
  *    app imports, no react-native imports — field values and
  *    change callbacks cross as props, and submission is a bare
@@ -58,7 +58,7 @@ function storySource(name: string) {
   return readFileSync(join(root, "src", "pages", `${name}.stories.tsx`), "utf8");
 }
 
-test("all four B3a pages are exported from the pages subpath", () => {
+test("all four B3a pages are exported from the pages barrel", () => {
   // Source scan of the subpath index: dist/pages is not
   // Node-importable (page components may import react-native),
   // the same reason the other page contract tests scan source.

@@ -16,6 +16,7 @@
  * built page rendered at runtime.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -29,7 +30,7 @@ const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/
 const componentsBarrel = readFileSync(join(root, "src", "components", "index.ts"), "utf8");
 
 test("ProseDocument is not a library component — the page carries the model types", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+  const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
     dist.ProseDocument,
     undefined,
@@ -70,7 +71,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     const { LegalDocumentPage }: Record<string, any> =
       await import("../dist/pages/LegalDocumentPage.js");
     return { React, renderToString, TamaguiProvider, ...dist, LegalDocumentPage };

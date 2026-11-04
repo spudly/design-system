@@ -5,7 +5,7 @@
  *
  * The contracts pinned here:
  * 1. Dropdown, DropdownButton, and useDropdownClose are exported
- *    from the package root (dist).
+ *    from the internal components barrel (dist).
  * 2. Dropdown is a shell with ONE children slot: the panel content
  *    arrives as `children`, the trigger as a `trigger` element, and
  *    there is NO items view-model (no `items`, no `onSelect`) — the
@@ -48,6 +48,7 @@
  * importing dist (see registerSvgStub.ts).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -56,7 +57,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const dist: Record<string, any> = await import("../dist/index.js");
+const dist: Record<string, any> = await loadInternalDist();
 
 function codeOf(rel: string) {
   const source = readFileSync(join(root, rel), "utf8");
@@ -68,18 +69,22 @@ const dropdownButton = codeOf("src/components/DropdownButton.tsx");
 const button = codeOf("src/components/Button.tsx");
 const family = { Dropdown: dropdown, DropdownButton: dropdownButton };
 
-test("Dropdown, DropdownButton, and useDropdownClose are exported from the package root", () => {
-  assert.equal(typeof dist.Dropdown, "function", "Dropdown must be exported from dist/index.js");
+test("Dropdown, DropdownButton, and useDropdownClose are exported from the internal components barrel", () => {
+  assert.equal(
+    typeof dist.Dropdown,
+    "function",
+    "Dropdown must be exported from the internal components barrel",
+  );
   assert.equal(
     typeof dist.useDropdownClose,
     "function",
-    "useDropdownClose must be exported from dist/index.js",
+    "useDropdownClose must be exported from the internal components barrel",
   );
   // DropdownButton is a forwardRef component: an exotic component
   // object, not a plain function.
   assert.ok(
     ["function", "object"].includes(typeof dist.DropdownButton) && dist.DropdownButton !== null,
-    "DropdownButton must be exported from dist/index.js",
+    "DropdownButton must be exported from the internal components barrel",
   );
 });
 
@@ -241,7 +246,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const distModule: Record<string, any> = await import("../dist/index.js");
+    const distModule: Record<string, any> = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...distModule };
   })();
   return runtimePromise;

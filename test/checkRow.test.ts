@@ -14,6 +14,7 @@
  * invokes the same callback as a press.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -24,9 +25,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "CheckRow.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("CheckRow is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.CheckRow, "function", "CheckRow must be exported from @spudly/ui");
+test("CheckRow is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  assert.equal(
+    typeof dist.CheckRow,
+    "function",
+    "CheckRow must be exported from the internal components barrel",
+  );
 });
 
 test("the row carries checkbox semantics through the translator, never raw RN props (#237)", () => {

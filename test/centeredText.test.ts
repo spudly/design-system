@@ -20,12 +20,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "CenteredText.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("CenteredText is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("CenteredText is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   assert.equal(
     typeof dist.CenteredText,
     "function",
-    "CenteredText must be exported from @spudly/ui",
+    "CenteredText must be exported from the internal components barrel",
   );
 });
 

@@ -41,7 +41,7 @@
  *    the hint-only section.
  * 6. An entry-less plan renders the bare "Entries" section —
  *    this screen has no empty message, unlike the list pages.
- * 7. The component is exported from the pages subpath index,
+ * 7. The component is exported from the pages barrel index,
  *    and stories exercise the Default, Empty, Loading, NoGoals,
  *    and NutritionUnavailable (#78) states so Chromatic
  *    captures them.
@@ -228,7 +228,7 @@ test("there is deliberately no app-content render slot", () => {
   );
 });
 
-test("the component is exported from the pages subpath index", () => {
+test("the component is exported from the pages barrel index", () => {
   assert.match(index, /MealPlanDetailPage/);
   assert.match(index, /type MealPlanDetailPageProps/);
   assert.match(index, /from "\.\/MealPlanDetailPage\.js"/);

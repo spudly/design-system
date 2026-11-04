@@ -42,8 +42,9 @@ import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
  * its legal links as the {label, href} array its contract takes,
  * built here from the frame's labels and the host's hrefs).
  *
- * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root.
+ * Placement: page components live in src/pages and are exported
+ * from the package root (#298) — pages are the package's only
+ * exports.
  */
 
 export type PublicPageFrameProps = {

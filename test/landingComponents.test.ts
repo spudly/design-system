@@ -8,7 +8,7 @@
  * src/components/ — the four had no second consumer, so they
  * were composed back into LandingPage, and this test guards
  * the end state: the components and their stories do not
- * exist, the package root does not export them, and the
+ * exist, the internal components barrel does not export them, and the
  * treatments they carried are pinned where they now live, in
  * the page source.
  *
@@ -40,12 +40,12 @@ const componentsBarrel = readCode("src/components/index.ts");
 const ELIMINATED = ["Hero", "CtaRow", "FeatureCard", "CardGrid"];
 
 test("the landing components are not library components anymore", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   for (const name of ELIMINATED) {
     assert.equal(
       dist[name],
       undefined,
-      `${name} must not be exported from @spudly/ui — it is composed inside LandingPage`,
+      `${name} must not be exported from the internal components barrel — it is composed inside LandingPage`,
     );
     assert.ok(
       !existsSync(join(root, "src", "components", `${name}.tsx`)),

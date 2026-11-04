@@ -8,13 +8,14 @@
  * RecipesPage's 64px row thumbnail (its in-page `Thumbnail`
  * helper, generalized here).
  *
- * The pins hold the shape: exported from the package root, the
+ * The pins hold the shape: exported from the internal components barrel, the
  * contract is a URL plus a semantic `variant`, each variant owns
  * the exact geometry/fit its pages render today, and an accessible
  * name is opt-in (set only when the caller supplies one, the
  * import review's pattern).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -25,9 +26,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "Thumbnail.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("Thumbnail is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.Thumbnail, "function", "Thumbnail must be exported from @spudly/ui");
+test("Thumbnail is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  assert.equal(
+    typeof dist.Thumbnail,
+    "function",
+    "Thumbnail must be exported from the internal components barrel",
+  );
 });
 
 test("ThumbnailProps is a type-only export from the built components barrel", () => {
@@ -90,7 +95,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const distRuntime = await import(join(here, "..", "dist", "index.js"));
+    const distRuntime = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...distRuntime };
   })();
   return runtimePromise;

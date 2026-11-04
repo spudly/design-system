@@ -36,11 +36,10 @@ import type {
  * props: a view-model per section in, intent callbacks out.
  * Nothing here imports an app package or fetches anything.
  *
- * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root —
- * members of the page family import react-native
- * (TouchableOpacity), and the root entry must stay importable
- * in plain Node.
+ * Placement: page components live in src/pages and are exported
+ * from the package root (#298) — pages are the package's only
+ * exports; members of the page family import react-native
+ * (TouchableOpacity).
  *
  * The contract decisions (Stephen, 2026-10-28, on #169):
  * - Single scroll, no tabs: the web surface's Overview /

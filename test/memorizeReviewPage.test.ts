@@ -32,7 +32,7 @@
  * 6. There is no render slot: the app's rows render only DS
  *    primitives over per-verse data, so the contract is
  *    callbacks-only and the absence is pinned.
- * 7. The component is exported from the pages subpath index,
+ * 7. The component is exported from the pages barrel index,
  *    and stories exercise the Default and Empty states in
  *    the Quiet Dawn theme so Chromatic captures them.
  *
@@ -173,7 +173,7 @@ test("there is deliberately no app-content render slot", () => {
   );
 });
 
-test("the component is exported from the pages subpath index", () => {
+test("the component is exported from the pages barrel index", () => {
   assert.match(index, /MemorizeReviewPage/);
   assert.match(index, /type MemorizeReviewPageProps/);
   assert.match(index, /from "\.\/MemorizeReviewPage\.js"/);

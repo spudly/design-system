@@ -26,6 +26,7 @@
  * first (the `test` script does both).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -44,7 +45,7 @@ const {
   resolveTagColorValue,
   createTamaguiConfig,
   createStorybookTamaguiConfig,
-}: Record<string, any> = await import("../dist/index.js");
+}: Record<string, any> = await loadInternalDist();
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 function read(rel: string) {

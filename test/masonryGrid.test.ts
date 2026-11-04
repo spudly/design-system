@@ -17,7 +17,7 @@
  *    feeds the width through `masonryColumnCount` — no hard-coded
  *    column count anywhere — and spaces columns/items with `gap`,
  *    never margins (the DS spacing rule).
- * 4. The widget and both helpers are exported from the package root,
+ * 4. The widget and both helpers are exported from the internal components barrel,
  *    and its props are a type alias (Stephen's #214 rule).
  *
  * Runtime assertions run against the built output: `npm run build`
@@ -34,7 +34,7 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 
 const { masonryColumnCount, distributeMasonryItems, MasonryGrid } = await import(
-  join(here, "..", "dist", "index.js")
+  join(here, "..", "dist", "components", "index.js")
 );
 
 function codeOf(rel: string) {
@@ -91,7 +91,7 @@ test("distributeMasonryItems never returns an empty column", () => {
   assert.deepEqual(distributeMasonryItems(["a", "b", "c"], 0), [["a", "b", "c"]]);
 });
 
-test("MasonryGrid and its helpers are exported from the package root", () => {
+test("MasonryGrid and its helpers are exported from the internal components barrel", () => {
   assert.equal(typeof MasonryGrid, "function");
   assert.equal(typeof masonryColumnCount, "function");
   assert.equal(typeof distributeMasonryItems, "function");

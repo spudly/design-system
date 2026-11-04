@@ -6,7 +6,7 @@
  *
  * The invariants pinned here are Stephen's decisions on #169
  * (2026-10-28):
- * 1. The frame is exported from the pages subpath index, imports
+ * 1. The frame is exported from the pages barrel index, imports
  *    nothing from an app package, and runs no queries or
  *    mutations — business logic stays app-side.
  * 2. The frame owns the public chrome: brand + Sign in header,
@@ -70,7 +70,7 @@ const frameCode = strip(
 const pageCode = strip(frameSource);
 const frameStoriesCode = strip(frameStories);
 
-test("PublicPageFrame is exported from the pages subpath", () => {
+test("PublicPageFrame is exported from the pages barrel", () => {
   assert.match(index, /PublicPageFrame,/, "index.ts must export PublicPageFrame");
   assert.match(
     index,

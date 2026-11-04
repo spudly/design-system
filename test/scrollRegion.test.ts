@@ -8,7 +8,7 @@
  * without rendering a layout primitive (#119 bans ScrollView in
  * pages outright).
  *
- * The pins hold the shape: exported from the package root, the
+ * The pins hold the shape: exported from the internal components barrel, the
  * contract is children only, and the ScrollView carries the
  * treatments the three pages render today plus web keyboard
  * focus (`tabIndex={0}`), so a region whose content has no
@@ -25,12 +25,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "ScrollRegion.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("ScrollRegion is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("ScrollRegion is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   assert.equal(
     typeof dist.ScrollRegion,
     "function",
-    "ScrollRegion must be exported from @spudly/ui",
+    "ScrollRegion must be exported from the internal components barrel",
   );
 });
 

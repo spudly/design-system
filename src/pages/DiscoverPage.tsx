@@ -27,10 +27,10 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * confirmed 2026-10-28 (the DS owns the design and the building
  * blocks; the app owns the content and composes).
  *
- * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root (the
- * pages' lists ride react-native's FlatList, via BoundedList;
- * the root entry must stay importable in plain Node).
+ * Placement: page components live in src/pages and are exported
+ * from the package root (#298) — pages are the package's only
+ * exports (the pages' lists ride react-native's FlatList, via
+ * BoundedList).
  *
  * The composition mirrors RecipesPage — the sibling recipe
  * catalog — including its structural rules:

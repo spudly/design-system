@@ -5,13 +5,14 @@
  * the identical band — a recessed gray rounded row spreading its
  * StatCards with space-around — above their ingredient sections.
  *
- * The pins hold the shape: exported from the package root, the
+ * The pins hold the shape: exported from the internal components barrel, the
  * contract is children only (the caller composes the stats), and
  * the band owns exactly the fill, radius, vertical padding, and
  * spread the two pages render today — with no outer spacing of its
  * own (separation is the parent stack's, per the layout rules).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -22,9 +23,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "StatBand.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("StatBand is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.StatBand, "function", "StatBand must be exported from @spudly/ui");
+test("StatBand is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  assert.equal(
+    typeof dist.StatBand,
+    "function",
+    "StatBand must be exported from the internal components barrel",
+  );
 });
 
 test("StatBandProps is a type-only export from the built components barrel", () => {
