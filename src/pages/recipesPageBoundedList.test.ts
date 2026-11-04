@@ -72,16 +72,30 @@ test("the list takes separating taps while the keyboard is open", () => {
   );
 });
 
-test("loading keeps the list mounted and shows the spinner as its empty state", () => {
+test("loading keeps the list mounted and shows the spinner as the section's own row", () => {
+  // Since #415 the list's data is the unified row sequence: a
+  // section's loading flag swaps only that section's rows for
+  // its spinner row — the DATA is never emptied and the list
+  // never unmounts, so the focused filter input survives a
+  // filter edit mid-typing (the #188 rule, per-section now).
   assert.match(
     code,
-    /data=\{loading \? \[\] : recipes\}/,
-    "loading empties the DATA, never the list — swapping the tree would unmount the focused filter input mid-typing",
+    /data=\{rows\}/,
+    "the list takes the unified row sequence, never a loading-emptied array",
   );
   assert.match(
     code,
-    /ListEmptyComponent=\{\s*loading \? \(\s*<ListLoadingState label="Loading" \/>/,
-    "the loading spinner renders as the list's EMPTY state, not in any other slot",
+    /case "loadingOwn":\s*return <ListLoadingState label="Loading" \/>;/,
+    "the own section's spinner renders as that section's row in the list",
+  );
+  assert.match(
+    code,
+    /case "loadingDiscovery":\s*return <ListLoadingState label="Loading" \/>;/,
+    "the discovery section's spinner renders as that section's row in the list",
+  );
+  assert.ok(
+    !code.includes("ListEmptyComponent"),
+    "there is no list-level empty state anymore — each section carries its own empty row (#415)",
   );
   assert.match(
     code,
@@ -91,7 +105,7 @@ test("loading keeps the list mounted and shows the spinner as its empty state", 
 });
 
 test("rows render through MediaRow, standalone (no list-item wrapper)", () => {
-  assert.match(code, /renderItem=\{\(\{ item \}\) => \{/);
+  assert.match(code, /renderItem=\{\(\{ item: row \}\) => \{/);
   assert.match(code, /<MediaRow/);
   assert.ok(
     !code.includes('role="listitem"'),

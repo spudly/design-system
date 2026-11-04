@@ -149,6 +149,10 @@ test("the retired loading slot helpers stay retired (#119 dedupe)", () => {
 
 test("RecipesPage renders its loading slots through ListLoadingState directly (#119)", () => {
   const page = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  assert.match(page, /loading \? \(\s*<ListLoadingState label="Loading" \/>/);
+  // Since #415 the loading slots are the two sections' own
+  // rows in the unified list (each section loads independently)
+  // plus the shared loading-more footer.
+  assert.match(page, /case "loadingOwn":\s*return <ListLoadingState label="Loading" \/>;/);
+  assert.match(page, /case "loadingDiscovery":\s*return <ListLoadingState label="Loading" \/>;/);
   assert.match(page, /isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined/);
 });

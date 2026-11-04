@@ -65,7 +65,7 @@ const FAMILY: [string, string, number][] = [
   ["src/components/CardRow.tsx", "decorative", 2],
   ["src/components/ListRow.tsx", "decorative", 2],
   ["src/components/TextActionCardRow.tsx", "decorative", 2],
-  ["src/pages/RecipesPage.tsx", "native", 2],
+  ["src/pages/RecipesPage.tsx", "native", 3],
 ];
 
 for (const [rel, flag, expectedCount] of FAMILY) {

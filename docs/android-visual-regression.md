@@ -250,8 +250,8 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-publicrecipepage             | light_warmHarvest |       8 |         8 |
 | pages-eciperay-recipedetailpage             | light_warmHarvest |       9 |         9 |
 | pages-eciperay-recipeformpage               | light_warmHarvest |       4 |         4 |
-| pages-eciperay-recipespage                  | light_warmHarvest |      12 |        12 |
-| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      12 |        12 |
+| pages-eciperay-recipespage                  | light_warmHarvest |      11 |         8 |
+| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      11 |         8 |
 | pages-eciperay-resetpasswordpage            | light_warmHarvest |       2 |         2 |
 | pages-eciperay-shoppinglistpage             | light_warmHarvest |       3 |         3 |
 | pages-eciperay-signinpage                   | light_warmHarvest |       3 |         3 |
@@ -263,7 +263,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       3 |         3 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **148** |   **147** |
+| **Total**                                   |                   | **146** |   **139** |
 
 <!-- VR-COVERAGE-END -->
 
@@ -304,8 +304,8 @@ the variant follows the light-only policy):
 The standard display is restored after the pass, whatever its
 outcome. Scope lives in the `NARROW_SCOPE` table in
 `tools/visualRegression/run.mjs` (driver flag `--variant narrow`):
-12 `pages-eciperay-recipespage` stories x light = **12
-baselines** (147 total). RecipesPage only, deliberately — a second
+11 `pages-eciperay-recipespage` stories x light = **8
+baselines** (139 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 

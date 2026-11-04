@@ -1,33 +1,35 @@
 /**
- * Contract test for the RecipesPage shared configuration
- * (spudly/design-system#185).
+ * Contract test for shared-with-me surfacing in RecipesPage
+ * (spudly/design-system#185, reshaped by #415).
  *
- * SharedWithMePage — the #49 sibling port of Eciperay's
- * Shared-with-me screen — is consolidated into RecipesPage:
- * one recipes-list page serves both screens. What was separate
- * about the shared screen, and must survive the consolidation,
- * is pinned here:
- * 1. SharedWithMePage is gone: no component file, no stories
+ * History: SharedWithMePage — the #49 sibling port of
+ * Eciperay's Shared-with-me screen — was consolidated into
+ * RecipesPage in #185 as a second configuration of the same
+ * component (shared-only data, its own empty copy, link-only
+ * rows). The unified browse (#415) retires that configuration:
+ * there is one browse page and one contract, and shared-with-me
+ * lives inside it. What must survive, pinned here:
+ * 1. SharedWithMePage stays gone: no component file, no stories
  *    file, and no export from src/pages/index.ts — RecipesPage
- *    is the single recipes-list page.
- * 2. The empty-state copy is per-screen props (`emptyTitle` /
- *    `emptyBody`): the Recipes default is unchanged
- *    ("No recipes found.", no body), and the shared
- *    configuration's stories pass the app's shared-with-me
- *    message verbatim, both sentences.
- * 3. The shared configuration is link-only: its stories pass
- *    neither `onLogCookPress` nor `renderRecipeAccessory`, so
- *    shared rows render no log-cook control and no accessory —
- *    the #49 contract. Since #248 the rows navigate, so each
- *    item carries its `href` and there is no row press wiring
- *    at all.
- * 4. The shared configuration leaves the collapsed filter bar
- *    uncontrolled (no `activeFilters` / `filterChooserOpen`
- *    props): the shared host adopts the bar with no new state,
- *    its added set seeded from non-default values.
- * 5. The stories render the shared configuration in the four
- *    states the SharedWithMePage stories carried (Default,
- *    Filtered, Empty, Loading) for Chromatic and Android VR.
+ *    is the single recipes browse page.
+ * 2. Shared recipes render inside the own section (the section
+ *    the caller fills with created + shared items), in the
+ *    caller's order — not as a separate section, tab, or page:
+ *    the page's row model has exactly two sections (own,
+ *    discovery) and no shared row kind.
+ * 3. A shared item is distinguishable by its caller-supplied
+ *    `badgeLabel` on the item view-model, rendered as a badge
+ *    on the row (the unified test pins the rendering and the
+ *    accessible-name composition in detail).
+ * 4. The shared screen's empty-state copy survives as caller
+ *    data: the own section's empty copy is per-host props
+ *    (`ownEmptyTitle` / `ownEmptyBody`) whose defaults are the
+ *    Recipes screen's ("No recipes found.", no body) — a host
+ *    showing a shared-only list can still pass the app's
+ *    shared-with-me message verbatim through them.
+ * 5. The stories exercise shared items the way the unified
+ *    page presents them: badged rows inside Default's own
+ *    section, carrying their permalink hrefs.
  *
  * This is a source scan, not a render test, for the same reason
  * as test/recipesPageBoundedList.test.ts: the failures it
@@ -52,22 +54,14 @@ const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 // cannot pass the scan.
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-// The shared configuration's demo, scoped to its own function so
-// the Recipes configuration's props cannot satisfy the checks.
-const sharedStart = stories.indexOf("function SharedRecipesPageDemo");
-assert.notEqual(sharedStart, -1, "SharedRecipesPageDemo function not found in the stories");
-const sharedEnd = stories.indexOf("export const SharedDefault", sharedStart);
-assert.notEqual(sharedEnd, -1, "SharedDefault story export not found after the shared demo");
-const sharedDemo = stories.slice(sharedStart, sharedEnd);
-
 test("SharedWithMePage is retired: no file, no stories, no export (#185)", () => {
   assert.ok(
     !existsSync(join(pagesDir, "SharedWithMePage.tsx")),
-    "SharedWithMePage.tsx must not exist — RecipesPage is the single recipes-list page",
+    "SharedWithMePage.tsx must not exist — RecipesPage is the single recipes browse page",
   );
   assert.ok(
     !existsSync(join(pagesDir, "SharedWithMePage.stories.tsx")),
-    "SharedWithMePage.stories.tsx must not exist — its states live in RecipesPage.stories.tsx",
+    "SharedWithMePage.stories.tsx must not exist — shared-with-me lives in RecipesPage.stories.tsx",
   );
   assert.ok(
     !index.includes("SharedWithMePage"),
@@ -75,70 +69,66 @@ test("SharedWithMePage is retired: no file, no stories, no export (#185)", () =>
   );
 });
 
-test("the empty state is per-screen copy props with the Recipes default unchanged", () => {
-  assert.match(code, /emptyTitle\?: string;/, "RecipesPageProps must declare emptyTitle");
-  assert.match(code, /emptyBody\?: string;/, "RecipesPageProps must declare emptyBody");
-  assert.match(
-    code,
-    /emptyTitle = "No recipes found\."/,
-    'the default empty title must stay the Recipes screen\'s "No recipes found."',
-  );
-  assert.match(
-    code,
-    /<EmptyState title=\{emptyTitle\}/,
-    "the empty state must render the emptyTitle prop, not a hardcoded title",
-  );
-});
-
-test("the shared configuration passes the app's shared-with-me empty message verbatim", () => {
+test("there is no shared section: the row model is own + discovery only (#415)", () => {
   assert.ok(
-    sharedDemo.includes('emptyTitle="Recipes others share with you will appear here."'),
-    "the shared demo must pass the first sentence of the app's empty message as emptyTitle",
+    !code.includes('"shared'),
+    "the row model must not grow a shared row kind — shared items are own-section items with a badge",
   );
   assert.ok(
-    sharedDemo.includes(
-      'emptyBody="Open a share link while signed in to save recipes to this list."',
-    ),
-    "the shared demo must pass the second sentence of the app's empty message as emptyBody",
+    !stories.includes("SharedRecipesPageDemo"),
+    "the #185 shared-configuration demo is retired — one demo drives the unified page",
   );
-});
-
-test("the shared configuration is link-only: no row actions, no accessory slot", () => {
-  for (const banned of ["onLogCookPress", "renderRecipeAccessory"]) {
+  for (const retired of ["SharedDefault", "SharedFiltered", "SharedEmpty", "SharedLoading"]) {
     assert.ok(
-      !sharedDemo.includes(banned),
-      `the shared demo must not pass ${banned} — shared rows carry no row actions (#49 contract)`,
+      !new RegExp(String.raw`export const ${retired}\b`).test(stories),
+      `the ${retired} story belonged to the retired shared configuration and must not return`,
     );
   }
-  assert.ok(
-    !sharedDemo.includes("onRecipePress"),
-    "the shared demo must not wire a row press — rows navigate by item href (#248)",
+});
+
+test("shared items are own-section items carrying the caller-supplied badge", () => {
+  assert.match(
+    code,
+    /badgeLabel\?: string;/,
+    "RecipesPageItem must declare the caller-supplied badgeLabel shared items carry",
   );
+  assert.match(
+    code,
+    /badgeLabel=\{item\.badgeLabel\}/,
+    "own rows must pass the item's badge through to the row",
+  );
+  const badged = (stories.match(/badgeLabel: "Shared with you"/g) ?? []).length;
+  assert.ok(
+    badged >= 2,
+    `the stories must mark at least two own items as shared — found ${badged}`,
+  );
+});
+
+test("the own empty state is per-host copy props with the Recipes default unchanged", () => {
+  assert.match(code, /ownEmptyTitle\?: string;/, "RecipesPageProps must declare ownEmptyTitle");
+  assert.match(code, /ownEmptyBody\?: string;/, "RecipesPageProps must declare ownEmptyBody");
+  assert.match(
+    code,
+    /ownEmptyTitle = "No recipes found\."/,
+    'the default own empty title must stay the Recipes screen\'s "No recipes found."',
+  );
+  assert.match(
+    code,
+    /title=\{ownEmptyTitle\}/,
+    "the own empty row must render the ownEmptyTitle prop, not a hardcoded title",
+  );
+});
+
+test("every story item carries its href — shared rows navigate by permalink (#248)", () => {
   assert.ok(
     !code.includes("onRecipePress"),
     "RecipesPage must not declare a row press callback at all (#248)",
   );
-  const hrefCount = (stories.match(/href: "\/recipes\//g) ?? []).length;
+  const hrefCount =
+    (stories.match(/href: "\/recipes\//g) ?? []).length +
+    (stories.match(/href: "\/recipe\//g) ?? []).length;
   assert.ok(
-    hrefCount >= 14,
-    `every story item (both configurations) must carry its href — found ${hrefCount}`,
+    hrefCount >= 12,
+    `every story item (own + discovery) must carry its href — found ${hrefCount}`,
   );
-});
-
-test("the shared configuration leaves the collapsed filter bar uncontrolled", () => {
-  for (const prop of ["activeFilters", "filterChooserOpen"]) {
-    assert.ok(
-      !sharedDemo.includes(prop),
-      `the shared demo must not pass ${prop} — the shared host adopts the bar uncontrolled`,
-    );
-  }
-});
-
-test("stories render the shared configuration in its four states", () => {
-  for (const story of ["SharedDefault", "SharedFiltered", "SharedEmpty", "SharedLoading"]) {
-    assert.ok(
-      new RegExp(String.raw`export const ${story}\b`).test(stories),
-      `RecipesPage.stories.tsx must export a ${story} story (the shared configuration's states)`,
-    );
-  }
 });
