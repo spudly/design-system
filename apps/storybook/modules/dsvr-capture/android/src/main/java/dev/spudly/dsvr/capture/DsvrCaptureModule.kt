@@ -108,9 +108,13 @@ class DsvrCaptureModule : Module() {
             val spanned = System.currentTimeMillis() - firstDrawAt >= MIN_SETTLE_SPAN_MS
             val settled = spanned && prev != null && bitmapsEqual(prev!!, frame.bitmap)
             if (settled || draws >= MAX_SETTLE_DRAWS) {
-              prev?.recycle()
-              result = writeResult(fileName, frame, draws, started)
-              frame.bitmap.recycle()
+              try {
+                result = writeResult(fileName, frame, draws, started)
+              } finally {
+                prev?.recycle()
+                prev = null
+                frame.bitmap.recycle()
+              }
               latch.countDown()
             } else {
               prev?.recycle()
