@@ -141,8 +141,34 @@ test("the frame owns the public chrome: href navigation throughout, no scroll of
     /maxWidth=\{COLUMN_MAX_WIDTH\}/,
     "the header, column, and footer share the wide public column",
   );
+  // The frame must not scroll — the page inside owns its scroll.
+  // The scan covers what the frame actually renders: its own
+  // sources plus the BigFooter COMPONENT. BigFooterShell shares
+  // BigFooter.tsx but is page chrome the frame never renders (a
+  // page nested in the frame gets no footer from the shell), and
+  // since the PR #413 native tall-footer fix the shell owns a
+  // footer-only ScrollView — that scroll region is the shell's,
+  // not the frame's, so only the component segment of
+  // BigFooter.tsx is scanned here; test/bigFooter.test.ts pins
+  // the shell's footer region.
+  const bigFooterStripped = strip(readFileSync(join(componentsDir, "BigFooter.tsx"), "utf8"));
+  const bigFooterComponent = bigFooterStripped.slice(
+    bigFooterStripped.indexOf("export function BigFooter("),
+    bigFooterStripped.indexOf("export type BigFooterShellProps"),
+  );
   assert.ok(
-    !frameCode.includes("<ScrollView"),
+    bigFooterComponent.length > 0,
+    "the BigFooter component segment is found for the frame scroll scan",
+  );
+  const frameScrollScan = [
+    pageCode,
+    strip(readFileSync(join(componentsDir, "PublicFrameLayout.tsx"), "utf8")),
+    strip(readFileSync(join(componentsDir, "PublicFrameHeader.tsx"), "utf8")),
+    strip(readFileSync(join(componentsDir, "BrandLink.tsx"), "utf8")),
+    bigFooterComponent,
+  ].join("\n");
+  assert.ok(
+    !frameScrollScan.includes("<ScrollView"),
     "the frame must not scroll — the page inside owns its scroll",
   );
   assert.match(

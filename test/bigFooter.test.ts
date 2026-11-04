@@ -168,6 +168,49 @@ test("the shell reserves viewport height only when a footer is supplied", () => 
   assert.match(bigFooter, /padding: tokens\.spacing\[3\]/, "social links keep a ≥44px target");
 });
 
+test("on native a tall footer keeps a scroll path of its own (PR #413 review)", () => {
+  // The defect: on native the shell places the footer OUTSIDE the
+  // content region's scroll paths (a BoundedList FlatList inside a
+  // non-scrolling ScreenContainer, or ScreenContainer's own
+  // ScrollView) and native has no document scroll, so a stacked
+  // footer taller than the remaining screen space extended past
+  // the visible area with its lower links unreachable.
+  //
+  // Web renders the footer bare — the document scrolls the whole
+  // shell, so the footer is already reachable there.
+  assert.match(bigFooter, /isWeb \? \(\s*<BigFooter footer=\{footer\} \/>/);
+  // Native renders it inside the footer's OWN bounded scroll
+  // region: intrinsic height when it fits (flexGrow 0, so the
+  // sticky placement is unchanged), shrinkable below it
+  // (flexShrink 1) so the region caps at the available space and
+  // the lower links scroll into reach.
+  assert.match(
+    bigFooter,
+    /<ScrollView flexGrow=\{0\} flexShrink=\{1\} keyboardShouldPersistTaps="handled">\s*<BigFooter footer=\{footer\} \/>\s*<\/ScrollView>/,
+  );
+  assert.match(bigFooter, /import \{[^}]*ScrollView[^}]*isWeb[^}]*\} from "tamagui";/);
+  // The scroll path wraps ONLY the footer: the shell's children
+  // (and any BoundedList inside them) never sit inside this
+  // ScrollView, so list windowing and end-reached pagination are
+  // untouched — the file's one ScrollView is the footer region.
+  assert.equal(
+    (bigFooter.match(/<ScrollView/g) ?? []).length,
+    1,
+    "BigFooterShell's only ScrollView is the native footer region",
+  );
+  assert.ok(
+    !/<ScrollView[^>]*>\s*\{children\}/.test(bigFooter),
+    "the shell's children are not wrapped in a ScrollView",
+  );
+  // Exactly one footer renders per platform: the two source
+  // occurrences are the web and native branches of one shell.
+  assert.equal(
+    (bigFooter.match(/<BigFooter footer=\{footer\} \/>/g) ?? []).length,
+    2,
+    "the shell renders BigFooter once per platform branch, never twice",
+  );
+});
+
 test("composed pages and stories render exactly one footer", () => {
   // AiSessionPage: BOTH states (start and in-session) render
   // through the shell — the start state used to return early

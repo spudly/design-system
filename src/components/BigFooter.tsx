@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Anchor, XStack, YStack, styled } from "tamagui";
+import { Anchor, ScrollView, XStack, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { SocialFacebookIcon } from "../icons/SocialFacebookIcon.js";
 import { SocialGithubIcon } from "../icons/SocialGithubIcon.js";
@@ -293,6 +293,29 @@ export type BigFooterShellProps = {
  * shrink below their content), so long in-flow pages still
  * push the shell taller and the footer follows the content.
  *
+ * Native footer scroll path (CodeRabbit review, PR #413): on
+ * native the footer renders inside its own bounded scroll
+ * region — a ScrollView that takes the footer's intrinsic
+ * height when it fits (flexGrow 0) but can shrink below it
+ * (flexShrink 1). The bounded content region above it can
+ * already shrink to nothing (flexBasis 0), so when a stacked
+ * footer alone is taller than a short or landscape screen
+ * leaves for it, the footer region caps at the space the
+ * shell leaves it and the footer's lower links stay reachable
+ * by scrolling the footer itself; when it fits, the sticky
+ * placement is unchanged. Web needs no such region: the
+ * document scrolls the whole shell, so the footer renders
+ * bare there and the same links stay reachable. The scroll
+ * path is the footer's OWN region, never a scroll view around
+ * the shell: wrapping the shell would nest a BoundedList
+ * page's FlatList inside a same-direction ScrollView,
+ * breaking its windowing and end-reached pagination (and a
+ * ScreenContainer page's own ScrollView likewise). The footer
+ * region contains only the footer's links — no virtualized
+ * list — so it nests safely beside those scroll paths, list
+ * pagination is untouched, and exactly one footer renders on
+ * every platform.
+ *
  * Positioned region (CodeRabbit review, PR #413): the content
  * region is the positioned ancestor for its children
  * (position="relative"), so an absolutely-positioned
@@ -314,7 +337,13 @@ export function BigFooterShell({ footer, children }: BigFooterShellProps) {
       <YStack flexGrow={1} flexShrink={1} flexBasis={0} position="relative">
         {children}
       </YStack>
-      <BigFooter footer={footer} />
+      {isWeb ? (
+        <BigFooter footer={footer} />
+      ) : (
+        <ScrollView flexGrow={0} flexShrink={1} keyboardShouldPersistTaps="handled">
+          <BigFooter footer={footer} />
+        </ScrollView>
+      )}
     </YStack>
   );
 }
