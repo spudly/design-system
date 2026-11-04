@@ -124,6 +124,21 @@ test("one row sequence: the own section precedes the discovery section in the on
   assert.match(code, /<SectionHeading>\{discoveryTitle\}<\/SectionHeading>/);
 });
 
+test("recipe row keys live in their own namespace, never colliding with heading/state keys", () => {
+  // A recipe id like "heading", "loading", "error" or "empty" must
+  // not produce the section heading's or a state row's key.
+  assert.match(code, /return `own-recipe-\$\{row\.item\.id\}`;/);
+  assert.match(code, /return `discovery-recipe-\$\{row\.item\.id\}`;/);
+  assert.ok(
+    !code.includes("return `own-${row.item.id}`;"),
+    "bare own- recipe keys collide with own-heading/own-loading/own-error/own-empty",
+  );
+  assert.ok(
+    !code.includes("return `discovery-${row.item.id}`;"),
+    "bare discovery- recipe keys collide with the discovery heading/state keys",
+  );
+});
+
 test("exactly one search/filter bar covers the unified collection", () => {
   assert.equal(
     count(code, "<CatalogFiltersBar"),

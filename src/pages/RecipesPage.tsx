@@ -411,7 +411,7 @@ function recipesPageRowKey(row: RecipesPageRow): string {
     case "ownHeading":
       return "own-heading";
     case "ownRecipe":
-      return `own-${row.item.id}`;
+      return `own-recipe-${row.item.id}`;
     case "loadingOwn":
       return "own-loading";
     case "ownError":
@@ -421,7 +421,7 @@ function recipesPageRowKey(row: RecipesPageRow): string {
     case "discoveryHeading":
       return "discovery-heading";
     case "discoveryRecipe":
-      return `discovery-${row.item.id}`;
+      return `discovery-recipe-${row.item.id}`;
     case "loadingDiscovery":
       return "discovery-loading";
     case "discoveryError":
