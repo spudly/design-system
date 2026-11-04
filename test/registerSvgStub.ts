@@ -17,4 +17,4 @@
  */
 import { register } from "node:module";
 
-register("./svgStub.hooks.js", import.meta.url);
+register("./svgStub.hooks.ts", import.meta.url);

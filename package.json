@@ -15,6 +15,7 @@
     "react-native": "^0.88.1",
     "react-native-web": "^0.21.4",
     "storybook": "^10.6.2",
+    "tsx": "^4.23.15",
     "typescript": "^7.0.2"
   },
   "engines": {
@@ -50,11 +51,10 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "build:tests": "rm -rf test-dist && tsc -p tsconfig.test.json",
     "build-storybook": "npm run build-storybook:react --",
     "build-storybook:react": "storybook build",
     "changeset": "changeset",
-    "clean": "rm -rf dist test-dist",
+    "clean": "rm -rf dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "prepare": "husky",
@@ -65,7 +65,7 @@
     "storybook:react": "storybook dev -p 6006",
     "storybook:react-native": "npm --prefix apps/storybook run storybook:react-native",
     "typecheck": "tsc --noEmit -p tsconfig.json",
-    "test": "npm run build && npm run build:tests && node --test test-dist/*.test.js"
+    "test": "npm run build && tsx --test \"src/**/*.test.ts\" \"test/**/*.test.ts\" \"eslintRules/*.test.ts\""
   },
   "type": "module",
   "types": "./dist/index.d.ts",
@@ -73,7 +73,7 @@
   "dependencies": {
     "@tamagui/animations-css": "^3.1.9",
     "@tamagui/constants": "3.1.9",
-    "tamagui": "^3.1.9",
-    "react-native-svg": "^15.15.1"
+    "react-native-svg": "^15.15.1",
+    "tamagui": "^3.1.9"
   }
 }

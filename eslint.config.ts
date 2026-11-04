@@ -64,7 +64,7 @@ export default [
     // preserved verbatim; only the max changes. src/ and tools/ keep
     // the shared 150, and max-lines-per-function is NOT relaxed
     // anywhere (the per-function findings stay warnings).
-    files: ["test/**"],
+    files: ["test/**", "src/**/*.test.ts", "eslintRules/*.test.ts"],
     rules: {
       "max-lines": ["error", { max: 300, skipBlankLines: true, skipComments: true }],
     },
