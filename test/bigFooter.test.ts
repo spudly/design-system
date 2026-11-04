@@ -133,7 +133,7 @@ test("every page component renders BigFooter through the shell from a footer pro
   ]);
   const pages: string[] = [];
   for (const entry of readdirSync(pagesDir)) {
-    if (entry.endsWith(".stories.tsx") || exceptions.has(entry)) continue;
+    if (entry.endsWith(".stories.tsx") || entry.endsWith(".test.ts") || entry.endsWith(".test.tsx") || exceptions.has(entry)) continue;
     assert.ok(entry.endsWith(".tsx"), `unaccounted pages file ${entry}`);
     pages.push(entry);
   }
