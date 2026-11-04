@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { mealCookingFixture } from "./fixtures.js";
+import { mealCookingFixture, eciperayFooterFixture } from "./fixtures.js";
 import { MealCookingModePage } from "./MealCookingModePage.js";
 
 /**
@@ -35,6 +35,7 @@ function Cooking({ initialStep }: { initialStep: number }) {
   const steps = mealCookingFixture.steps;
   return (
     <MealCookingModePage
+      footer={eciperayFooterFixture}
       mealTitle={mealCookingFixture.mealTitle}
       steps={steps}
       stepIndex={stepIndex}
@@ -86,6 +87,7 @@ export const LoadError: Story = {
   render: () => (
     <Viewport>
       <MealCookingModePage
+        footer={eciperayFooterFixture}
         state="error"
         mealTitle={mealCookingFixture.mealTitle}
         onDone={() => undefined}
@@ -119,6 +121,7 @@ export const LongBody: Story = {
   render: () => (
     <Viewport height={430}>
       <MealCookingModePage
+        footer={eciperayFooterFixture}
         mealTitle={mealCookingFixture.mealTitle}
         steps={LONG_BODY_STEPS}
         stepIndex={0}

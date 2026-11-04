@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
@@ -102,6 +103,8 @@ export type AiSessionPageSession = {
 };
 
 export type AiSessionPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   config: AiSessionPageConfig;
   session: AiSessionPageSession | null;
   /** The host-rendered recipe preview for the preview stage. */
@@ -143,118 +146,123 @@ export function AiSessionPage({
   onFinalize,
   onCancel,
   onEmptyCancel,
+  footer,
 }: AiSessionPageProps) {
   if (!session) {
     return (
-      <SessionShell>
-        <FormHeading subtitle={config.intro}>{config.title}</FormHeading>
-        <TextAreaField
-          value={prompt}
-          onChangeText={onPromptChange}
-          placeholder={config.promptPlaceholder}
-          size="xl"
-          textAlignVertical="top"
-        />
-        {error ? <Alert severity="error" message={error} /> : null}
-        <ButtonRow>
-          <Button variant="ghost" onPress={onEmptyCancel}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            grow
-            disabled={busy || !prompt.trim()}
-            onPress={() => {
-              onStart(prompt);
-            }}
-          >
-            {startPending ? config.startPendingLabel : config.startLabel}
-          </Button>
-        </ButtonRow>
-      </SessionShell>
+      <BigFooterShell footer={footer}>
+        <SessionShell>
+          <FormHeading subtitle={config.intro}>{config.title}</FormHeading>
+          <TextAreaField
+            value={prompt}
+            onChangeText={onPromptChange}
+            placeholder={config.promptPlaceholder}
+            size="xl"
+            textAlignVertical="top"
+          />
+          {error ? <Alert severity="error" message={error} /> : null}
+          <ButtonRow>
+            <Button variant="ghost" onPress={onEmptyCancel}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              grow
+              disabled={busy || !prompt.trim()}
+              onPress={() => {
+                onStart(prompt);
+              }}
+            >
+              {startPending ? config.startPendingLabel : config.startLabel}
+            </Button>
+          </ButtonRow>
+        </SessionShell>
+      </BigFooterShell>
     );
   }
 
   return (
-    <SessionShell scrollable>
-      <FormHeading subtitle={session.phaseLabel}>{config.title}</FormHeading>
-      <YStack gap="$3">
-        {session.messages.map((message, index) => {
-          const own = message.role === "user";
-          return (
-            <YStack
-              key={index}
-              paddingStart={own ? "$8" : undefined}
-              paddingEnd={own ? undefined : "$8"}
-            >
+    <BigFooterShell footer={footer}>
+      <SessionShell scrollable>
+        <FormHeading subtitle={session.phaseLabel}>{config.title}</FormHeading>
+        <YStack gap="$3">
+          {session.messages.map((message, index) => {
+            const own = message.role === "user";
+            return (
               <YStack
-                borderRadius={tokens.radii.md}
-                backgroundColor={own ? tokens.colors.gray.gray2 : "$primarySubtle"}
-                padding="$3"
+                key={index}
+                paddingStart={own ? "$8" : undefined}
+                paddingEnd={own ? undefined : "$8"}
               >
-                <YStack paddingBottom="$1">
-                  <Text variant="label">{own ? "You" : "Plan"}</Text>
+                <YStack
+                  borderRadius={tokens.radii.md}
+                  backgroundColor={own ? tokens.colors.gray.gray2 : "$primarySubtle"}
+                  padding="$3"
+                >
+                  <YStack paddingBottom="$1">
+                    <Text variant="label">{own ? "You" : "Plan"}</Text>
+                  </YStack>
+                  <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
+                    {message.content}
+                  </Text>
                 </YStack>
-                <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
-                  {message.content}
-                </Text>
               </YStack>
-            </YStack>
-          );
-        })}
-      </YStack>
-      {session.canRefine ? (
-        <>
-          <TextAreaField
-            value={followUp}
-            onChangeText={onFollowUpChange}
-            placeholder="Ask for changes to the plan…"
-            size="lg"
-          />
-          <ButtonRow>
-            <Button
-              variant="ghost"
-              size="sm"
-              disabled={busy || !followUp.trim()}
-              onPress={() => {
-                onSendMessage(followUp);
-              }}
-            >
-              Refine plan
-            </Button>
-            <Button variant="primary" size="sm" disabled={busy} onPress={onApprovePlan}>
-              {approvePending ? "Building preview…" : "Approve plan"}
-            </Button>
-          </ButtonRow>
-        </>
-      ) : null}
-      {preview ? (
-        <PreviewCard
-          title={config.previewTitle}
-          actions={
-            <Button variant="primary" disabled={busy} onPress={onFinalize}>
-              {finalizePending ? config.finalizePendingLabel : config.finalizeLabel}
-            </Button>
-          }
-        >
-          {preview}
-        </PreviewCard>
-      ) : null}
-      {error ? <Alert severity="error" message={error} /> : null}
-      {session.canCancel ? (
-        <YStack opacity={busy ? 0.5 : 1} pointerEvents={busy ? "none" : "auto"}>
-          <TextAction
-            onPress={onCancel}
-            disabled={busy}
-            accessibilityLabel="Cancel session"
-            fontSize={tokens.typography.fontSize.sm}
-            color={tokens.colors.gray.gray6}
-            textDecorationLine="underline"
-          >
-            Cancel session
-          </TextAction>
+            );
+          })}
         </YStack>
-      ) : null}
-    </SessionShell>
+        {session.canRefine ? (
+          <>
+            <TextAreaField
+              value={followUp}
+              onChangeText={onFollowUpChange}
+              placeholder="Ask for changes to the plan…"
+              size="lg"
+            />
+            <ButtonRow>
+              <Button
+                variant="ghost"
+                size="sm"
+                disabled={busy || !followUp.trim()}
+                onPress={() => {
+                  onSendMessage(followUp);
+                }}
+              >
+                Refine plan
+              </Button>
+              <Button variant="primary" size="sm" disabled={busy} onPress={onApprovePlan}>
+                {approvePending ? "Building preview…" : "Approve plan"}
+              </Button>
+            </ButtonRow>
+          </>
+        ) : null}
+        {preview ? (
+          <PreviewCard
+            title={config.previewTitle}
+            actions={
+              <Button variant="primary" disabled={busy} onPress={onFinalize}>
+                {finalizePending ? config.finalizePendingLabel : config.finalizeLabel}
+              </Button>
+            }
+          >
+            {preview}
+          </PreviewCard>
+        ) : null}
+        {error ? <Alert severity="error" message={error} /> : null}
+        {session.canCancel ? (
+          <YStack opacity={busy ? 0.5 : 1} pointerEvents={busy ? "none" : "auto"}>
+            <TextAction
+              onPress={onCancel}
+              disabled={busy}
+              accessibilityLabel="Cancel session"
+              fontSize={tokens.typography.fontSize.sm}
+              color={tokens.colors.gray.gray6}
+              textDecorationLine="underline"
+            >
+              Cancel session
+            </TextAction>
+          </YStack>
+        ) : null}
+      </SessionShell>
+    </BigFooterShell>
   );
 }

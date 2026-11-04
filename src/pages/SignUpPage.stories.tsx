@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -63,6 +64,7 @@ function Interactive({
   return (
     <Viewport>
       <SignUpPage
+        footer={eciperayFooterFixture}
         displayName={displayName}
         email={email}
         password={password}

@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { AutocompletePicker } from "../components/AutocompletePicker.js";
 import { Button } from "../components/Button.js";
@@ -69,6 +70,8 @@ export type MealFormPageRecipeOption = {
 };
 
 export type MealFormPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   title: string;
   onTitleChange: (value: string) => void;
   notes: string;
@@ -125,66 +128,69 @@ export function MealFormPage({
   isSaving = false,
   error,
   onSubmit,
+  footer,
 }: MealFormPageProps) {
   return (
-    <FormScreenLayout>
-      <FormHeading>{title.trim() ? title : "Meal"}</FormHeading>
-      <TextField
-        label="Title"
-        value={title}
-        onChangeText={onTitleChange}
-        placeholder="Meal title"
-      />
-      <TextAreaField
-        value={notes}
-        onChangeText={onNotesChange}
-        placeholder="Notes (optional)"
-        numberOfLines={4}
-      />
-      <LabeledGroup label="Recipes">
-        <AutocompletePicker
-          searchText={searchText}
-          onSearchTextChange={onSearchTextChange}
-          searchResults={searchResults.map((recipe) => ({
-            id: recipe.id,
-            label: recipe.label,
-            detail: `${recipe.servings} servings`,
-          }))}
-          isSearching={isSearching}
-          searchError={searchError}
-          onSelectResult={onSelectRecipe}
-          selectedItems={selectedRecipes.map((recipe) => ({
-            id: recipe.id,
-            label: recipe.label,
-          }))}
-          onRemoveSelectedItem={onRemoveRecipe}
-          placeholder="Search recipes…"
-          searchAccessibilityLabel="Search recipes"
-          noResultsMessage="No recipes found."
+    <BigFooterShell footer={footer}>
+      <FormScreenLayout>
+        <FormHeading>{title.trim() ? title : "Meal"}</FormHeading>
+        <TextField
+          label="Title"
+          value={title}
+          onChangeText={onTitleChange}
+          placeholder="Meal title"
         />
-      </LabeledGroup>
-      {selectedRecipes.map((recipe) => (
-        <NumberStepper
-          key={recipe.id}
-          label={`Servings · ${recipe.label}`}
-          value={servingsByRecipeId[recipe.id] ?? recipe.servings}
-          min={1}
-          onChange={(value) => {
-            onServingsChange(recipe.id, value);
-          }}
+        <TextAreaField
+          value={notes}
+          onChangeText={onNotesChange}
+          placeholder="Notes (optional)"
+          numberOfLines={4}
         />
-      ))}
-      {error ? <Alert severity="error" message={error} /> : null}
-      <FormSubmit>
-        <Button
-          variant="primary"
-          accessibilityLabel="Save meal"
-          disabled={!title.trim() || selectedRecipes.length === 0 || isSaving}
-          onPress={onSubmit}
-        >
-          Save meal
-        </Button>
-      </FormSubmit>
-    </FormScreenLayout>
+        <LabeledGroup label="Recipes">
+          <AutocompletePicker
+            searchText={searchText}
+            onSearchTextChange={onSearchTextChange}
+            searchResults={searchResults.map((recipe) => ({
+              id: recipe.id,
+              label: recipe.label,
+              detail: `${recipe.servings} servings`,
+            }))}
+            isSearching={isSearching}
+            searchError={searchError}
+            onSelectResult={onSelectRecipe}
+            selectedItems={selectedRecipes.map((recipe) => ({
+              id: recipe.id,
+              label: recipe.label,
+            }))}
+            onRemoveSelectedItem={onRemoveRecipe}
+            placeholder="Search recipes…"
+            searchAccessibilityLabel="Search recipes"
+            noResultsMessage="No recipes found."
+          />
+        </LabeledGroup>
+        {selectedRecipes.map((recipe) => (
+          <NumberStepper
+            key={recipe.id}
+            label={`Servings · ${recipe.label}`}
+            value={servingsByRecipeId[recipe.id] ?? recipe.servings}
+            min={1}
+            onChange={(value) => {
+              onServingsChange(recipe.id, value);
+            }}
+          />
+        ))}
+        {error ? <Alert severity="error" message={error} /> : null}
+        <FormSubmit>
+          <Button
+            variant="primary"
+            accessibilityLabel="Save meal"
+            disabled={!title.trim() || selectedRecipes.length === 0 || isSaving}
+            onPress={onSubmit}
+          >
+            Save meal
+          </Button>
+        </FormSubmit>
+      </FormScreenLayout>
+    </BigFooterShell>
   );
 }

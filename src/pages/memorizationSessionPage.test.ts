@@ -75,7 +75,7 @@ test("the props are a not-found | ready union, with no loading or complete membe
   assert.match(code, /export type MemorizationSessionPageProps =/);
   assert.match(
     code,
-    /\{ state: "not-found"; onBack: \(\) => void \}/,
+    /\{ state: "not-found"; onBack: \(\) => void; footer\?: BigFooterData \}/,
     "the not-found member carries its own Back intent (its branch renders a Back button)",
   );
   assert.match(

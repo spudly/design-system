@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import type { ReactNode } from "react";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -158,6 +159,8 @@ export type PublicRecipePageCtas =
   { variant: "signedOut" } | { variant: "signedIn"; isClonePending?: boolean };
 
 export type PublicRecipePageReadyProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   state: "ready";
   overview: PublicRecipePageOverviewProps;
   ctas: PublicRecipePageCtas;
@@ -180,9 +183,9 @@ export type PublicRecipePageReadyProps = {
 };
 
 export type PublicRecipePageProps =
-  | { state: "loading" }
-  | { state: "notFound" }
-  | { state: "unavailable" }
+  | { state: "loading"; footer?: BigFooterData }
+  | { state: "notFound"; footer?: BigFooterData }
+  | { state: "unavailable"; footer?: BigFooterData }
   | PublicRecipePageReadyProps;
 
 // ---------------------------------------------------------------------------
@@ -355,15 +358,27 @@ function InstructionsSection({ instructions }: { instructions: PublicRecipePageI
  */
 export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "loading") {
-    return <LoadingGate label="Loading recipe" />;
+    return (
+      <BigFooterShell footer={props.footer}>
+        <LoadingGate label="Loading recipe" />
+      </BigFooterShell>
+    );
   }
 
   if (props.state === "notFound") {
-    return <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />;
+    return (
+      <BigFooterShell footer={props.footer}>
+        <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />
+      </BigFooterShell>
+    );
   }
 
   if (props.state === "unavailable") {
-    return <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />;
+    return (
+      <BigFooterShell footer={props.footer}>
+        <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />
+      </BigFooterShell>
+    );
   }
 
   const { ratings, onViewerRatingChange, renderComments } = props;
@@ -372,22 +387,24 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   const comments = renderComments ? renderComments() : null;
 
   return (
-    <ScrollShell>
-      <CtaBar
-        ctas={props.ctas}
-        onSignUpPress={props.onSignUpPress}
-        onClonePress={props.onClonePress}
-        onGetAppPress={props.onGetAppPress}
-      />
-      <OverviewSection overview={props.overview} />
-      <SectionHeading>Ingredients</SectionHeading>
-      <IngredientsSection ingredients={props.ingredients} />
-      <SectionHeading>Instructions</SectionHeading>
-      <InstructionsSection instructions={props.instructions.instructions} />
-      {ratings ? (
-        <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
-      ) : null}
-      {comments}
-    </ScrollShell>
+    <BigFooterShell footer={props.footer}>
+      <ScrollShell>
+        <CtaBar
+          ctas={props.ctas}
+          onSignUpPress={props.onSignUpPress}
+          onClonePress={props.onClonePress}
+          onGetAppPress={props.onGetAppPress}
+        />
+        <OverviewSection overview={props.overview} />
+        <SectionHeading>Ingredients</SectionHeading>
+        <IngredientsSection ingredients={props.ingredients} />
+        <SectionHeading>Instructions</SectionHeading>
+        <InstructionsSection instructions={props.instructions.instructions} />
+        {ratings ? (
+          <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
+        ) : null}
+        {comments}
+      </ScrollShell>
+    </BigFooterShell>
   );
 }

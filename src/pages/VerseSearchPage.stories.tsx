@@ -1,3 +1,4 @@
+import { memorizeFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -69,6 +70,7 @@ export const Default: Story = {
   render: () => (
     <Viewport>
       <VerseSearchPage
+        footer={memorizeFooterFixture}
         query="charity"
         onQueryChange={() => undefined}
         onSearch={() => undefined}
@@ -89,6 +91,7 @@ export const WithAddedResult: Story = {
   render: () => (
     <Viewport>
       <VerseSearchPage
+        footer={memorizeFooterFixture}
         query="charity"
         onQueryChange={() => undefined}
         onSearch={() => undefined}
@@ -110,6 +113,7 @@ export const DemoMode: Story = {
   render: () => (
     <Viewport>
       <VerseSearchPage
+        footer={memorizeFooterFixture}
         query=""
         onQueryChange={() => undefined}
         onSearch={() => undefined}
@@ -129,6 +133,7 @@ export const Searching: Story = {
   render: () => (
     <Viewport>
       <VerseSearchPage
+        footer={memorizeFooterFixture}
         query="Ether 12:27"
         onQueryChange={() => undefined}
         onSearch={() => undefined}
@@ -148,6 +153,7 @@ export const Error: Story = {
   render: () => (
     <Viewport>
       <VerseSearchPage
+        footer={memorizeFooterFixture}
         query="charity"
         onQueryChange={() => undefined}
         onSearch={() => undefined}
@@ -168,6 +174,7 @@ export const NoResults: Story = {
   render: () => (
     <Viewport>
       <VerseSearchPage
+        footer={memorizeFooterFixture}
         query="xyz"
         onQueryChange={() => undefined}
         onSearch={() => undefined}

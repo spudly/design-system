@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import type { ReactNode } from "react";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
@@ -26,6 +27,8 @@ import { Text } from "../components/Text.js";
  */
 
 export type SignUpPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   displayName: string;
   email: string;
   password: string;
@@ -55,25 +58,28 @@ export function SignUpPage({
   onSubmit,
   signInHref,
   legalNotice,
+  footer,
 }: SignUpPageProps) {
   return (
-    <ScreenContainer scrollable={false} variant="auth">
-      <SectionStack>
-        <Text variant="heading">Create account</Text>
-        <SignUpForm
-          displayName={displayName}
-          email={email}
-          password={password}
-          onDisplayNameChange={onDisplayNameChange}
-          onEmailChange={onEmailChange}
-          onPasswordChange={onPasswordChange}
-          loading={loading}
-          error={error}
-          onSubmit={onSubmit}
-          signInHref={signInHref}
-          legalNotice={legalNotice}
-        />
-      </SectionStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false} variant="auth">
+        <SectionStack>
+          <Text variant="heading">Create account</Text>
+          <SignUpForm
+            displayName={displayName}
+            email={email}
+            password={password}
+            onDisplayNameChange={onDisplayNameChange}
+            onEmailChange={onEmailChange}
+            onPasswordChange={onPasswordChange}
+            loading={loading}
+            error={error}
+            onSubmit={onSubmit}
+            signInHref={signInHref}
+            legalNotice={legalNotice}
+          />
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { BackLink } from "../components/BackLink.js";
 import { BlankWord } from "../components/BlankWord.js";
 import { Button } from "../components/Button.js";
@@ -142,6 +143,8 @@ export type MemorizationSessionPageWord = {
 };
 
 export type MemorizationSessionPageReadyProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   state: "ready";
   /** The verse's reference, rendered as the heading. */
   reference: string;
@@ -174,7 +177,8 @@ export type MemorizationSessionPageReadyProps = {
 };
 
 export type MemorizationSessionPageProps =
-  { state: "not-found"; onBack: () => void } | MemorizationSessionPageReadyProps;
+  | { state: "not-found"; onBack: () => void; footer?: BigFooterData }
+  | MemorizationSessionPageReadyProps;
 
 /**
  * Full-page memorization session view: back affordance, the
@@ -186,10 +190,12 @@ export type MemorizationSessionPageProps =
 export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
   if (props.state === "not-found") {
     return (
-      <ScreenContainer>
-        <Text>Verse not found.</Text>
-        <Button onPress={props.onBack}>Back</Button>
-      </ScreenContainer>
+      <BigFooterShell footer={props.footer}>
+        <ScreenContainer>
+          <Text>Verse not found.</Text>
+          <Button onPress={props.onBack}>Back</Button>
+        </ScreenContainer>
+      </BigFooterShell>
     );
   }
 
@@ -219,40 +225,44 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
   );
 
   return (
-    <ScreenContainer>
-      <BackLink onPress={onBack} />
-      <Text variant="heading">{reference}</Text>
-      <Text variant="hint">
-        Round {roundIndex + 1} of {roundCount} — tap a blank to peek at the word.
-      </Text>
-      <StepDots count={roundCount} activeIndex={roundIndex} />
-      <Card>
-        <VerseText>
-          {words.map((word, i) => {
-            if (word.blank) {
-              const ordinal = blankOrdinals[i] ?? 0;
+    <BigFooterShell footer={props.footer}>
+      <ScreenContainer>
+        <BackLink onPress={onBack} />
+        <Text variant="heading">{reference}</Text>
+        <Text variant="hint">
+          Round {roundIndex + 1} of {roundCount} — tap a blank to peek at the word.
+        </Text>
+        <StepDots count={roundCount} activeIndex={roundIndex} />
+        <Card>
+          <VerseText>
+            {words.map((word, i) => {
+              if (word.blank) {
+                const ordinal = blankOrdinals[i] ?? 0;
+                return (
+                  <Text key={i} variant="verse">
+                    <BlankWord
+                      word={word.text}
+                      revealed={word.blank.revealed}
+                      onReveal={() => onBlankReveal(i)}
+                      index={ordinal}
+                      total={blankCount}
+                    />{" "}
+                  </Text>
+                );
+              }
               return (
                 <Text key={i} variant="verse">
-                  <BlankWord
-                    word={word.text}
-                    revealed={word.blank.revealed}
-                    onReveal={() => onBlankReveal(i)}
-                    index={ordinal}
-                    total={blankCount}
-                  />{" "}
+                  {word.text}{" "}
                 </Text>
               );
-            }
-            return (
-              <Text key={i} variant="verse">
-                {word.text}{" "}
-              </Text>
-            );
-          })}
-        </VerseText>
-      </Card>
-      {feedback ? <Alert severity="warning">{feedback}</Alert> : null}
-      <Button onPress={onAdvance}>{isFinalRound ? "Finish — mark memorized" : "Next round"}</Button>
-    </ScreenContainer>
+            })}
+          </VerseText>
+        </Card>
+        {feedback ? <Alert severity="warning">{feedback}</Alert> : null}
+        <Button onPress={onAdvance}>
+          {isFinalRound ? "Finish — mark memorized" : "Next round"}
+        </Button>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

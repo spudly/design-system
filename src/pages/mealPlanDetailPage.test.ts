@@ -93,7 +93,10 @@ test("MealPlanDetailPage source is readable and non-trivial", () => {
 });
 
 test("the props are a loading | ready union, with no not-found member", () => {
-  assert.match(code, /export type MealPlanDetailPageProps = \{ state: "loading" \}/);
+  assert.match(
+    code,
+    /export type MealPlanDetailPageProps =\s+\{ state: "loading"; footer\?: BigFooterData \} \| MealPlanDetailPageReadyProps;/,
+  );
   assert.match(
     code,
     /props\.state === "loading"/,

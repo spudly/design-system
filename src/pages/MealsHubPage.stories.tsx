@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { mealsHubFixture } from "./fixtures.js";
+import { mealsHubFixture, eciperayFooterFixture } from "./fixtures.js";
 import { MealsHubPage, type MealsHubPageTab } from "./MealsHubPage.js";
 
 /**
@@ -32,6 +32,7 @@ function Hub({ initialTab }: { initialTab: MealsHubPageTab }) {
   const [activeTab, setActiveTab] = useState<MealsHubPageTab>(initialTab);
   return (
     <MealsHubPage
+      footer={eciperayFooterFixture}
       activeTab={activeTab}
       onSelectTab={setActiveTab}
       meals={mealsHubFixture.meals}
@@ -65,6 +66,7 @@ export const Empty: Story = {
   render: () => (
     <Viewport>
       <MealsHubPage
+        footer={eciperayFooterFixture}
         activeTab="meals"
         onSelectTab={() => undefined}
         meals={[]}

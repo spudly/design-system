@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { Alert } from "../components/Alert.js";
@@ -125,6 +126,8 @@ export type VerseSearchPageItem = {
 };
 
 export type VerseSearchPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** The query text, held by the app (it runs the search). */
   query: string;
   onQueryChange: (value: string) => void;
@@ -194,48 +197,51 @@ export function VerseSearchPage({
   results,
   hasSearched,
   onAddVerse,
+  footer,
 }: VerseSearchPageProps) {
   return (
-    <ScreenContainer scrollable={false}>
-      <Text variant="heading">Search verses</Text>
-      {usingDemo ? (
-        <Alert severity="info">
-          Searching the built-in demo set. Add a gospel-engine API key in Settings for full-library
-          search.
-        </Alert>
-      ) : null}
-      <FieldRow>
-        <SearchField
-          value={query}
-          onChangeText={onQueryChange}
-          placeholder={
-            usingDemo ? "e.g. Ether 12:27 or “weakness”" : "e.g. Ether 12:27 or “charity”"
-          }
-          onSubmitEditing={onSearch}
-          grow
-        />
-        <Button onPress={onSearch} disabled={isSearching || query.trim() === ""}>
-          Search
-        </Button>
-      </FieldRow>
-      {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
-      {isSearching ? <Spinner label="Loading" /> : null}
-      {hasSearched && !isSearching && !errorMessage && results.length === 0 ? (
-        <EmptyState title="No results" body="Try a different word or reference." announce />
-      ) : (
-        <BoundedList
-          data={results}
-          keyExtractor={(verse) => verse.id}
-          renderItem={({ item }) => (
-            <VerseResultRow
-              item={item}
-              onAddPress={() => {
-                onAddVerse(item.id);
-              }}
-            />
-          )}
-        />
-      )}
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false}>
+        <Text variant="heading">Search verses</Text>
+        {usingDemo ? (
+          <Alert severity="info">
+            Searching the built-in demo set. Add a gospel-engine API key in Settings for
+            full-library search.
+          </Alert>
+        ) : null}
+        <FieldRow>
+          <SearchField
+            value={query}
+            onChangeText={onQueryChange}
+            placeholder={
+              usingDemo ? "e.g. Ether 12:27 or “weakness”" : "e.g. Ether 12:27 or “charity”"
+            }
+            onSubmitEditing={onSearch}
+            grow
+          />
+          <Button onPress={onSearch} disabled={isSearching || query.trim() === ""}>
+            Search
+          </Button>
+        </FieldRow>
+        {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
+        {isSearching ? <Spinner label="Loading" /> : null}
+        {hasSearched && !isSearching && !errorMessage && results.length === 0 ? (
+          <EmptyState title="No results" body="Try a different word or reference." announce />
+        ) : (
+          <BoundedList
+            data={results}
+            keyExtractor={(verse) => verse.id}
+            renderItem={({ item }) => (
+              <VerseResultRow
+                item={item}
+                onAddPress={() => {
+                  onAddVerse(item.id);
+                }}
+              />
+            )}
+          />
+        )}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

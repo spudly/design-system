@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import type { ReactNode } from "react";
 import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
@@ -87,6 +88,8 @@ export type RecipeFormPageOption = {
 };
 
 export type RecipeFormPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** Controlled field values (text — the host parses numerics). */
   title: string;
   onTitleChange: (value: string) => void;
@@ -229,183 +232,185 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
   };
 
   return (
-    <ScrollRegion>
-      <FormStack>
-        <LabeledField label="Title" fieldId="recipe-title" action={revertAction("title")}>
-          <TextField
-            id="recipe-title"
-            accessibilityLabel="Title"
-            changed={isChanged("title")}
-            value={title}
-            onChangeText={onTitleChange}
-          />
-        </LabeledField>
-
-        <LabeledField label="Status">
-          <ButtonRow>
-            {statusOptions.map((option) => (
-              <Button
-                key={option.value}
-                variant="secondary"
-                size="sm"
-                selected={status === option.value}
-                onPress={() => {
-                  onStatusChange(option.value);
-                }}
-              >
-                {option.label}
-              </Button>
-            ))}
-          </ButtonRow>
-        </LabeledField>
-
-        <LabeledField
-          label="Description"
-          fieldId="recipe-description"
-          action={
-            <>
-              {revertAction("description")}
-              {onGenerateDescription ? (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  accessibilityLabel="Generate description with AI"
-                  disabled={!title.trim() || isGeneratingDescription}
-                  onPress={onGenerateDescription}
-                >
-                  {isGeneratingDescription ? "Generating…" : "Generate with AI"}
-                </Button>
-              ) : null}
-            </>
-          }
-          error={descriptionError}
-        >
-          <TextAreaField
-            id="recipe-description"
-            accessibilityLabel="Description"
-            changed={isChanged("description")}
-            numberOfLines={3}
-            value={description}
-            onChangeText={onDescriptionChange}
-          />
-        </LabeledField>
-
-        <FieldColumns>
-          <LabeledField
-            label="Servings"
-            fieldId="recipe-servings"
-            action={revertAction("servings")}
-          >
+    <BigFooterShell footer={props.footer}>
+      <ScrollRegion>
+        <FormStack>
+          <LabeledField label="Title" fieldId="recipe-title" action={revertAction("title")}>
             <TextField
-              id="recipe-servings"
-              accessibilityLabel="Servings"
-              changed={isChanged("servings")}
-              keyboardType="number-pad"
-              value={servings}
-              onChangeText={onServingsChange}
+              id="recipe-title"
+              accessibilityLabel="Title"
+              changed={isChanged("title")}
+              value={title}
+              onChangeText={onTitleChange}
             />
           </LabeledField>
-          <LabeledField
-            label="Prep (min)"
-            fieldId="recipe-prep-time"
-            action={revertAction("prepTimeMin")}
-          >
-            <TextField
-              id="recipe-prep-time"
-              accessibilityLabel="Prep (min)"
-              changed={isChanged("prepTimeMin")}
-              keyboardType="number-pad"
-              value={prepTimeMin}
-              onChangeText={onPrepTimeMinChange}
-            />
-          </LabeledField>
-          <LabeledField
-            label="Cook (min)"
-            fieldId="recipe-cook-time"
-            action={revertAction("cookTimeMin")}
-          >
-            <TextField
-              id="recipe-cook-time"
-              accessibilityLabel="Cook (min)"
-              changed={isChanged("cookTimeMin")}
-              keyboardType="number-pad"
-              value={cookTimeMin}
-              onChangeText={onCookTimeMinChange}
-            />
-          </LabeledField>
-        </FieldColumns>
 
-        {renderImageSection ? renderImageSection(revertAction("image")) : null}
-
-        <LabeledField
-          label="Source URL"
-          fieldId="recipe-source-url"
-          action={revertAction("sourceUrl")}
-        >
-          <TextField
-            id="recipe-source-url"
-            accessibilityLabel="Source URL"
-            changed={isChanged("sourceUrl")}
-            value={sourceUrl}
-            onChangeText={onSourceUrlChange}
-          />
-        </LabeledField>
-
-        <LabeledGroup
-          label="Tags"
-          action={
-            tagsRevertLabel && onRevertTags ? (
-              <RevertAction label={tagsRevertLabel} onPress={onRevertTags} />
-            ) : null
-          }
-        >
-          {loadingTags ? (
-            <Spinner label="Loading tags" />
-          ) : (
+          <LabeledField label="Status">
             <ButtonRow>
-              {tagOptions.map((option) => (
-                <Badge
+              {statusOptions.map((option) => (
+                <Button
                   key={option.value}
-                  selected={tagIds.includes(option.value)}
+                  variant="secondary"
+                  size="sm"
+                  selected={status === option.value}
                   onPress={() => {
-                    toggleTag(option.value);
+                    onStatusChange(option.value);
                   }}
                 >
                   {option.label}
-                </Badge>
+                </Button>
               ))}
             </ButtonRow>
-          )}
-        </LabeledGroup>
+          </LabeledField>
 
-        {contentLocked ? (
-          <Alert severity="warning">
-            Ingredients and instructions are locked on the active version. Create a draft to change
-            them.
-          </Alert>
-        ) : null}
+          <LabeledField
+            label="Description"
+            fieldId="recipe-description"
+            action={
+              <>
+                {revertAction("description")}
+                {onGenerateDescription ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    accessibilityLabel="Generate description with AI"
+                    disabled={!title.trim() || isGeneratingDescription}
+                    onPress={onGenerateDescription}
+                  >
+                    {isGeneratingDescription ? "Generating…" : "Generate with AI"}
+                  </Button>
+                ) : null}
+              </>
+            }
+            error={descriptionError}
+          >
+            <TextAreaField
+              id="recipe-description"
+              accessibilityLabel="Description"
+              changed={isChanged("description")}
+              numberOfLines={3}
+              value={description}
+              onChangeText={onDescriptionChange}
+            />
+          </LabeledField>
 
-        {ingredientsChangedLabel && !contentLocked ? (
-          <ChangedListBanner
-            label={ingredientsChangedLabel}
-            {...(onRevertIngredients ? { onRevert: onRevertIngredients } : {})}
-          />
-        ) : null}
-        {contentLocked ? null : renderIngredientsSection ? renderIngredientsSection() : null}
+          <FieldColumns>
+            <LabeledField
+              label="Servings"
+              fieldId="recipe-servings"
+              action={revertAction("servings")}
+            >
+              <TextField
+                id="recipe-servings"
+                accessibilityLabel="Servings"
+                changed={isChanged("servings")}
+                keyboardType="number-pad"
+                value={servings}
+                onChangeText={onServingsChange}
+              />
+            </LabeledField>
+            <LabeledField
+              label="Prep (min)"
+              fieldId="recipe-prep-time"
+              action={revertAction("prepTimeMin")}
+            >
+              <TextField
+                id="recipe-prep-time"
+                accessibilityLabel="Prep (min)"
+                changed={isChanged("prepTimeMin")}
+                keyboardType="number-pad"
+                value={prepTimeMin}
+                onChangeText={onPrepTimeMinChange}
+              />
+            </LabeledField>
+            <LabeledField
+              label="Cook (min)"
+              fieldId="recipe-cook-time"
+              action={revertAction("cookTimeMin")}
+            >
+              <TextField
+                id="recipe-cook-time"
+                accessibilityLabel="Cook (min)"
+                changed={isChanged("cookTimeMin")}
+                keyboardType="number-pad"
+                value={cookTimeMin}
+                onChangeText={onCookTimeMinChange}
+              />
+            </LabeledField>
+          </FieldColumns>
 
-        {instructionsChangedLabel && !contentLocked ? (
-          <ChangedListBanner
-            label={instructionsChangedLabel}
-            {...(onRevertInstructions ? { onRevert: onRevertInstructions } : {})}
-          />
-        ) : null}
-        {contentLocked ? null : renderInstructionsSection ? renderInstructionsSection() : null}
+          {renderImageSection ? renderImageSection(revertAction("image")) : null}
 
-        {submitError ? <Alert severity="error" message={submitError} /> : null}
-        <Button disabled={isSubmitting} onPress={onSubmit}>
-          {isSubmitting ? submittingLabel : submitLabel}
-        </Button>
-      </FormStack>
-    </ScrollRegion>
+          <LabeledField
+            label="Source URL"
+            fieldId="recipe-source-url"
+            action={revertAction("sourceUrl")}
+          >
+            <TextField
+              id="recipe-source-url"
+              accessibilityLabel="Source URL"
+              changed={isChanged("sourceUrl")}
+              value={sourceUrl}
+              onChangeText={onSourceUrlChange}
+            />
+          </LabeledField>
+
+          <LabeledGroup
+            label="Tags"
+            action={
+              tagsRevertLabel && onRevertTags ? (
+                <RevertAction label={tagsRevertLabel} onPress={onRevertTags} />
+              ) : null
+            }
+          >
+            {loadingTags ? (
+              <Spinner label="Loading tags" />
+            ) : (
+              <ButtonRow>
+                {tagOptions.map((option) => (
+                  <Badge
+                    key={option.value}
+                    selected={tagIds.includes(option.value)}
+                    onPress={() => {
+                      toggleTag(option.value);
+                    }}
+                  >
+                    {option.label}
+                  </Badge>
+                ))}
+              </ButtonRow>
+            )}
+          </LabeledGroup>
+
+          {contentLocked ? (
+            <Alert severity="warning">
+              Ingredients and instructions are locked on the active version. Create a draft to
+              change them.
+            </Alert>
+          ) : null}
+
+          {ingredientsChangedLabel && !contentLocked ? (
+            <ChangedListBanner
+              label={ingredientsChangedLabel}
+              {...(onRevertIngredients ? { onRevert: onRevertIngredients } : {})}
+            />
+          ) : null}
+          {contentLocked ? null : renderIngredientsSection ? renderIngredientsSection() : null}
+
+          {instructionsChangedLabel && !contentLocked ? (
+            <ChangedListBanner
+              label={instructionsChangedLabel}
+              {...(onRevertInstructions ? { onRevert: onRevertInstructions } : {})}
+            />
+          ) : null}
+          {contentLocked ? null : renderInstructionsSection ? renderInstructionsSection() : null}
+
+          {submitError ? <Alert severity="error" message={submitError} /> : null}
+          <Button disabled={isSubmitting} onPress={onSubmit}>
+            {isSubmitting ? submittingLabel : submitLabel}
+          </Button>
+        </FormStack>
+      </ScrollRegion>
+    </BigFooterShell>
   );
 }

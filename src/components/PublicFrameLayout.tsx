@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
-import { View, YStack } from "tamagui";
+import { ScrollView, View, YStack, isWeb } from "tamagui";
 import { mainRoleProps } from "./accessibility.js";
 
 /**
  * The wide public column: the web layout's max-w-3xl (768px),
  * shared by the public frame's header band, content column, and
- * footer band (PublicFrameHeader / PublicFrameFooter import this
+ * footer band (PublicFrameHeader / BigFooter import this
  * constant), and the same column the legal prose renders into
  * (LegalDocumentPage's PROSE_MAX_WIDTH).
  */
@@ -14,7 +14,7 @@ export const COLUMN_MAX_WIDTH = 768;
 export type PublicFrameLayoutProps = {
   /** The frame's header band (a PublicFrameHeader). */
   header: ReactNode;
-  /** The frame's footer band (a PublicFrameFooter). */
+  /** The frame's footer band (a BigFooter, #410). */
   footer: ReactNode;
   /** The page content, rendered into the wide centered column. */
   children: ReactNode;
@@ -41,15 +41,56 @@ export type PublicFrameLayoutProps = {
  * outermost chrome on public surfaces, so it is the landmark
  * owner — pages composed inside it must not add duplicates.
  * Native is unaffected.
+ *
+ * Native footer scroll path (CodeRabbit review, PR #413): the
+ * "frame does not scroll" split above covers the header and the
+ * content column, but BigFooter has no internal scroll region,
+ * so on native a footer taller than the space left after the
+ * header was clipped with no scroll path to its lower links.
+ * On native the footer therefore renders inside its own
+ * bounded scroll region — the same pattern as BigFooterShell:
+ * a ScrollView that takes the footer's intrinsic height when
+ * it fits (flexGrow 0) but can shrink below it (flexShrink 1),
+ * so the region caps at the available space and the lower
+ * links scroll into reach. Web renders the footer bare: the
+ * document scrolls the whole frame, so the same links stay
+ * reachable there. The scroll region wraps ONLY the footer —
+ * the header and the page content keep their existing layout
+ * and scroll behavior.
+ *
+ * Bounded content region (CodeRabbit review, PR #413): the
+ * content column is a flex region with an intrinsic basis
+ * (flexGrow 1 / flexShrink 1 / flexBasis "auto") — the same
+ * shape as BigFooterShell's content region. With a zero basis
+ * (a plain `flex={1}`) a native footer taller than the space
+ * left after the header could consume the available height
+ * and leave the page content with no usable viewport, while
+ * "auto" lets the content region participate in the shrink
+ * allocation alongside the footer ScrollView (which starts
+ * from its intrinsic height) and preserve a content viewport.
  */
 export function PublicFrameLayout({ header, footer, children }: PublicFrameLayoutProps) {
   return (
     <YStack flex={1} backgroundColor="$background">
       {header}
-      <View flex={1} width="100%" maxWidth={COLUMN_MAX_WIDTH} alignSelf="center" {...mainRoleProps}>
+      <View
+        flexGrow={1}
+        flexShrink={1}
+        flexBasis="auto"
+        width="100%"
+        maxWidth={COLUMN_MAX_WIDTH}
+        alignSelf="center"
+        {...mainRoleProps}
+      >
         {children}
       </View>
-      {footer}
+      {isWeb ? (
+        footer
+      ) : (
+        <ScrollView flexGrow={0} flexShrink={1} keyboardShouldPersistTaps="handled">
+          {footer}
+        </ScrollView>
+      )}
     </YStack>
   );
 }

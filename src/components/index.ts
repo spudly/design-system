@@ -153,11 +153,6 @@ export {
   type PresetValueOption,
   type PresetValueSelectorProps,
 } from "./PresetValueSelector.js";
-export {
-  PublicFrameFooter,
-  type PublicFrameFooterLink,
-  type PublicFrameFooterProps,
-} from "./PublicFrameFooter.js";
 export { PublicFrameHeader, type PublicFrameHeaderProps } from "./PublicFrameHeader.js";
 export {
   COLUMN_MAX_WIDTH,

@@ -1,3 +1,4 @@
+import { memorizeFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -63,6 +64,7 @@ export const Default: Story = {
   render: () => (
     <Viewport>
       <MemorizeReviewPage
+        footer={memorizeFooterFixture}
         verses={dueVerses}
         onRememberedPress={() => undefined}
         onForgotPress={() => undefined}
@@ -75,6 +77,7 @@ export const Empty: Story = {
   render: () => (
     <Viewport>
       <MemorizeReviewPage
+        footer={memorizeFooterFixture}
         verses={[]}
         onRememberedPress={() => undefined}
         onForgotPress={() => undefined}

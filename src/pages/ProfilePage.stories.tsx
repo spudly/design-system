@@ -5,7 +5,7 @@ import { AccessTokensPanel } from "../components/AccessTokensPanel.js";
 import { CheckboxField } from "../components/CheckboxField.js";
 import { NutritionGoalsForm } from "../components/NutritionGoalsForm.js";
 import { TextLink } from "../components/TextLink.js";
-import { accessTokensFixture, nutritionGoalsFixture } from "./fixtures.js";
+import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ProfilePage } from "./ProfilePage.js";
 
 const meta: Meta<typeof ProfilePage> = {
@@ -37,6 +37,7 @@ export const WithSections: Story = {
   render: () => (
     <Viewport>
       <ProfilePage
+        footer={eciperayFooterFixture}
         email="cook@example.com"
         onSignOut={() => undefined}
         tagsHref="/profile/tags"

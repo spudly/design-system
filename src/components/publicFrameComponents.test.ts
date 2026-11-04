@@ -34,11 +34,11 @@ function readCode(name: string) {
 const brandLink = readCode("BrandLink.tsx");
 const layout = readCode("PublicFrameLayout.tsx");
 const header = readCode("PublicFrameHeader.tsx");
-const footer = readCode("PublicFrameFooter.tsx");
+const footer = readCode("BigFooter.tsx");
 
 test("the frame components are exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  for (const name of ["BrandLink", "PublicFrameLayout", "PublicFrameHeader", "PublicFrameFooter"]) {
+  for (const name of ["BrandLink", "PublicFrameLayout", "PublicFrameHeader"]) {
     assert.equal(
       typeof dist[name],
       "function",
@@ -68,14 +68,50 @@ test("BrandLink is a real anchor carrying the href, in the wordmark treatment", 
 test("PublicFrameLayout owns the shell and the wide centered column", () => {
   assert.match(layout, /export const COLUMN_MAX_WIDTH = 768;/);
   assert.match(layout, /<YStack flex=\{1\} backgroundColor="\$background">/);
+  // Bounded content region (PR #413 review): the content column
+  // carries an intrinsic flex basis (grow 1 / shrink 1 / basis
+  // "auto", the BigFooterShell pattern), not a plain flex={1} —
+  // with a zero basis a native footer taller than the remaining
+  // space could leave the page content with no usable viewport.
+  // This is a shape pin, as in test/bigFooter.test.ts: no JS
+  // renderer in this repo performs native (Yoga) layout, so a
+  // rendered native-viewport check is not available here.
   assert.match(
     layout,
-    /<View flex=\{1\} width="100%" maxWidth=\{COLUMN_MAX_WIDTH\} alignSelf="center" \{\.\.\.mainRoleProps\}>/,
+    /<View\s+flexGrow=\{1\}\s+flexShrink=\{1\}\s+flexBasis="auto"\s+width="100%"\s+maxWidth=\{COLUMN_MAX_WIDTH\}\s+alignSelf="center"\s+\{\.\.\.mainRoleProps\}\s*>/,
     "the content column is the wide centered column and the page's main landmark (#366)",
+  );
+  assert.ok(
+    !/<View flex=\{1\}/.test(layout),
+    "the content column must not use a plain flex={1} (zero basis)",
   );
   assert.match(layout, /header: ReactNode;/);
   assert.match(layout, /footer: ReactNode;/);
-  assert.ok(!layout.includes("<ScrollView"), "the frame does not scroll — the page inside does");
+  // Native footer scroll path (PR #413 review): the frame itself
+  // does not scroll — the page inside owns the content scroll —
+  // but on native the footer gets its OWN bounded scroll region
+  // (the BigFooterShell pattern), because BigFooter has no
+  // internal scroll region and a tall footer was clipped with no
+  // scroll path. Web renders the footer bare (the document
+  // scrolls the whole frame).
+  assert.match(
+    layout,
+    /isWeb \? \(\s*footer\s*\) : \(\s*<ScrollView flexGrow=\{0\} flexShrink=\{1\} keyboardShouldPersistTaps="handled">\s*\{footer\}\s*<\/ScrollView>\s*\)/,
+    "on native the footer renders inside its own bounded scroll region; on web it renders bare",
+  );
+  assert.equal(
+    (layout.match(/<ScrollView/g) ?? []).length,
+    1,
+    "PublicFrameLayout's only ScrollView is the native footer region",
+  );
+  assert.ok(
+    !/<ScrollView[^>]*>\s*\{children\}/.test(layout),
+    "the frame's children are not wrapped in a ScrollView — the page inside owns its scroll",
+  );
+  assert.ok(
+    !/<ScrollView[^>]*>\s*\{header\}/.test(layout),
+    "the frame's header is not wrapped in a ScrollView",
+  );
 });
 
 test("PublicFrameHeader is the surface band with wordmark and sign-in link", () => {
@@ -92,29 +128,17 @@ test("PublicFrameHeader is the surface band with wordmark and sign-in link", () 
   );
 });
 
-test("PublicFrameFooter is the surface band with the note and the caller's links", () => {
+test("BigFooter replaced PublicFrameFooter as the frame footer (#410)", () => {
+  // PublicFrameFooter is retired: BigFooter covers every page-frame
+  // use (PublicPageFrame renders it), and it stays unexported.
   assert.match(footer, /backgroundColor="\$surface"/);
   assert.match(footer, /borderTopWidth=\{1\}/);
-  assert.match(footer, /maxWidth=\{COLUMN_MAX_WIDTH\}/, "the band's row shares the column");
-  assert.match(footer, /flexWrap="wrap"/, "the footer row wraps on narrow widths");
-  assert.match(footer, /color=\{tokens\.colors\.gray\.gray6\}/, "the note is muted ink");
-  // The links are caller-supplied data (Stephen's ruling on
-  // PR #320): an array of {label, href} rendered in order — the
-  // component names no route itself.
-  assert.match(footer, /export type PublicFrameFooterLink = \{\s*label: string;/);
-  assert.match(footer, /links: PublicFrameFooterLink\[\];/);
-  assert.match(footer, /links\.map\(\(link\) =>/);
-  assert.match(
-    footer,
-    /<TextLink key=\{link\.href\} fontSize=\{tokens\.typography\.fontSize\.sm\} href=\{link\.href\}>/,
-  );
-  assert.match(footer, /\{link\.label\}/);
-  for (const baked of ["privacy", "Privacy", "terms", "Terms", "/privacy", "/terms"]) {
-    assert.ok(
-      !footer.includes(baked),
-      `the footer must not hardcode ${baked} — footer links are passed in as data`,
-    );
-  }
+  assert.match(footer, /flexWrap="wrap"/, "the columns wrap — the mobile collapse");
+  assert.match(footer, /export type BigFooterData = \{/);
+  assert.match(footer, /columns: BigFooterColumn\[\];/);
+  assert.match(footer, /storeLinks: BigFooterStoreLink\[\];/);
+  assert.match(footer, /socialLinks: BigFooterSocialLink\[\];/);
+  assert.match(footer, /column\.links\.map\(\(link\) =>/, "column links render from caller data");
   assert.ok(
     !footer.includes("onPrivacyPress"),
     "no press callbacks survive on links (Stephen's ruling)",
@@ -153,16 +177,26 @@ test("SSR: BrandLink renders as a real anchor carrying the given href", async ()
   assert.ok(!/<button/.test(html), "the wordmark must not render as a button");
 });
 
-test("SSR: PublicFrameFooter renders exactly the caller's links, in order", async () => {
-  const { React, PublicFrameFooter } = await loadRuntime();
+test("SSR: BigFooter renders exactly the caller's links, in order", async () => {
+  const { React } = await loadRuntime();
+  const { BigFooter }: Record<string, any> = await import("../../dist/components/BigFooter.js");
   const html = await renderToHtml(
-    React.createElement(PublicFrameFooter, {
-      note: "A note.",
-      links: [
-        { label: "Privacy Policy", href: "/privacy" },
-        { label: "Terms of Service", href: "/terms" },
-        { label: "Cookies", href: "/cookies" },
-      ],
+    React.createElement(BigFooter, {
+      footer: {
+        brand: { label: "Eciperay", href: "/" },
+        columns: [
+          {
+            title: "Legal",
+            links: [
+              { label: "Privacy Policy", href: "/privacy" },
+              { label: "Terms of Service", href: "/terms" },
+              { label: "Cookies", href: "/cookies" },
+            ],
+          },
+        ],
+        storeLinks: [],
+        socialLinks: [],
+      },
     }),
   );
   for (const [label, href] of [

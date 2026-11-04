@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import type { ReactNode } from "react";
 import { Alert } from "../components/Alert.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
@@ -18,6 +19,8 @@ import { TextLink } from "../components/TextLink.js";
  * never mounts).
  */
 export type EditVersionPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** Draft version number, rendered in the heading. */
   versionNumber: number;
   /** Host-composed summary of what the draft changes, rendered
@@ -50,23 +53,27 @@ export function EditVersionPage(props: EditVersionPageProps) {
 
   if (notEditable) {
     return (
-      <ScreenContainer scrollable={false}>
-        <Text variant="error">This version can no longer be edited.</Text>
-        {backHref ? <TextLink href={backHref}>Back to recipe</TextLink> : null}
-      </ScreenContainer>
+      <BigFooterShell footer={props.footer}>
+        <ScreenContainer scrollable={false}>
+          <Text variant="error">This version can no longer be edited.</Text>
+          {backHref ? <TextLink href={backHref}>Back to recipe</TextLink> : null}
+        </ScreenContainer>
+      </BigFooterShell>
     );
   }
 
   return (
-    <ScreenContainer scrollable={false}>
-      <Text variant="heading">{`Edit Draft (v${versionNumber})`}</Text>
-      {showImportBanner && parentVersionNumber !== undefined ? (
-        <Alert severity="info">
-          {`Editing draft (v${versionNumber}) based on imported v${parentVersionNumber}.`}
-        </Alert>
-      ) : null}
-      {changeSummary ? <Text variant="hint">{changeSummary}</Text> : null}
-      {children}
-    </ScreenContainer>
+    <BigFooterShell footer={props.footer}>
+      <ScreenContainer scrollable={false}>
+        <Text variant="heading">{`Edit Draft (v${versionNumber})`}</Text>
+        {showImportBanner && parentVersionNumber !== undefined ? (
+          <Alert severity="info">
+            {`Editing draft (v${versionNumber}) based on imported v${parentVersionNumber}.`}
+          </Alert>
+        ) : null}
+        {changeSummary ? <Text variant="hint">{changeSummary}</Text> : null}
+        {children}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

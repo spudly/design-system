@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { ResetPasswordForm } from "../components/ResetPasswordForm.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
@@ -24,6 +25,8 @@ import { Text } from "../components/Text.js";
  */
 
 export type ResetPasswordPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   password: string;
   onPasswordChange: (value: string) => void;
   loading?: boolean;
@@ -37,20 +40,23 @@ export function ResetPasswordPage({
   loading = false,
   error,
   onSubmit,
+  footer,
 }: ResetPasswordPageProps) {
   return (
-    <ScreenContainer scrollable={false} variant="auth">
-      <SectionStack>
-        <Text variant="heading">New password</Text>
-        <Text variant="muted">Choose a new password for your account.</Text>
-        <ResetPasswordForm
-          password={password}
-          onPasswordChange={onPasswordChange}
-          loading={loading}
-          error={error}
-          onSubmit={onSubmit}
-        />
-      </SectionStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false} variant="auth">
+        <SectionStack>
+          <Text variant="heading">New password</Text>
+          <Text variant="muted">Choose a new password for your account.</Text>
+          <ResetPasswordForm
+            password={password}
+            onPasswordChange={onPasswordChange}
+            loading={loading}
+            error={error}
+            onSubmit={onSubmit}
+          />
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

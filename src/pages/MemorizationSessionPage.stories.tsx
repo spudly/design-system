@@ -1,3 +1,4 @@
+import { memorizeFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -70,6 +71,7 @@ export const FirstRound: Story = {
   render: () => (
     <Viewport>
       <MemorizationSessionPage
+        footer={memorizeFooterFixture}
         state="ready"
         reference="Practice Passage 1"
         roundIndex={0}
@@ -91,6 +93,7 @@ export const MidSession: Story = {
   render: () => (
     <Viewport>
       <MemorizationSessionPage
+        footer={memorizeFooterFixture}
         state="ready"
         reference="Practice Passage 1"
         roundIndex={3}
@@ -114,6 +117,7 @@ export const RetryFeedback: Story = {
   render: () => (
     <Viewport>
       <MemorizationSessionPage
+        footer={memorizeFooterFixture}
         state="ready"
         reference="Practice Passage 1"
         roundIndex={3}
@@ -135,6 +139,7 @@ export const FinalRound: Story = {
   render: () => (
     <Viewport>
       <MemorizationSessionPage
+        footer={memorizeFooterFixture}
         state="ready"
         reference="Practice Passage 1"
         roundIndex={6}
@@ -156,7 +161,7 @@ export const NotFound: Story = {
   // the primary Back button (not the drill's ghost one).
   render: () => (
     <Viewport>
-      <MemorizationSessionPage state="not-found" onBack={noop} />
+      <MemorizationSessionPage footer={memorizeFooterFixture} state="not-found" onBack={noop} />
     </Viewport>
   ),
 };

@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -70,6 +71,7 @@ export const Default: Story = {
   render: () => (
     <Viewport>
       <MealPlansPage
+        footer={eciperayFooterFixture}
         plans={planItems}
         loading={false}
         createHref="/meal-plans/new"
@@ -83,6 +85,7 @@ export const Empty: Story = {
   render: () => (
     <Viewport>
       <MealPlansPage
+        footer={eciperayFooterFixture}
         plans={[]}
         loading={false}
         createHref="/meal-plans/new"
@@ -95,7 +98,7 @@ export const Empty: Story = {
 export const Loading: Story = {
   render: () => (
     <Viewport>
-      <MealPlansPage plans={[]} loading />
+      <MealPlansPage footer={eciperayFooterFixture} plans={[]} loading />
     </Viewport>
   ),
 };
@@ -105,7 +108,7 @@ export const NoActions: Story = {
   // per-row Delete buttons omit cleanly, leaving a read-only list.
   render: () => (
     <Viewport>
-      <MealPlansPage plans={planItems} loading={false} />
+      <MealPlansPage footer={eciperayFooterFixture} plans={planItems} loading={false} />
     </Viewport>
   ),
 };

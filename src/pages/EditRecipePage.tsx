@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
 
@@ -12,11 +13,20 @@ import { Text } from "../components/Text.js";
  * save mutation. Mirrors the app's EditRecipeView shell
  * control-for-control.
  */
-export function EditRecipePage({ children }: { children: ReactNode }) {
+export function EditRecipePage({
+  children,
+  footer,
+}: {
+  children: ReactNode;
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
+}) {
   return (
-    <ScreenContainer scrollable={false}>
-      <Text variant="heading">Edit Recipe</Text>
-      {children}
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false}>
+        <Text variant="heading">Edit Recipe</Text>
+        {children}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

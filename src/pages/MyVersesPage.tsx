@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Badge } from "../components/Badge.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -91,6 +92,8 @@ export type MyVersesPageItem = {
 };
 
 export type MyVersesPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** The app's memorize list, in the app's order. */
   verses: MyVersesPageItem[];
   /** Row action: remove this verse from the app's list. */
@@ -128,26 +131,28 @@ function MyVerseRow({
  * Controlled — see the file header for the contract and the
  * screen inventory it mirrors.
  */
-export function MyVersesPage({ verses, onRemoveVerse }: MyVersesPageProps) {
+export function MyVersesPage({ verses, onRemoveVerse, footer }: MyVersesPageProps) {
   return (
-    <ScreenContainer scrollable={false}>
-      <Text variant="heading">My verses</Text>
-      {verses.length === 0 ? (
-        <EmptyState title="No verses yet" body="Find one in the Search tab to get started." />
-      ) : (
-        <BoundedList
-          data={verses}
-          keyExtractor={(verse) => verse.id}
-          renderItem={({ item }) => (
-            <MyVerseRow
-              item={item}
-              onRemovePress={() => {
-                onRemoveVerse(item.id);
-              }}
-            />
-          )}
-        />
-      )}
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false}>
+        <Text variant="heading">My verses</Text>
+        {verses.length === 0 ? (
+          <EmptyState title="No verses yet" body="Find one in the Search tab to get started." />
+        ) : (
+          <BoundedList
+            data={verses}
+            keyExtractor={(verse) => verse.id}
+            renderItem={({ item }) => (
+              <MyVerseRow
+                item={item}
+                onRemovePress={() => {
+                  onRemoveVerse(item.id);
+                }}
+              />
+            )}
+          />
+        )}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

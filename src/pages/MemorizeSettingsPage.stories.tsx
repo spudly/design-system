@@ -1,3 +1,4 @@
+import { memorizeFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -45,6 +46,7 @@ export const Default: Story = {
   render: () => (
     <Viewport>
       <MemorizeSettingsPage
+        footer={memorizeFooterFixture}
         apiKeyValue="example-api-key"
         onApiKeyValueChange={noop}
         hasSavedApiKey
@@ -71,6 +73,7 @@ export const NoApiKeyDriveDisconnected: Story = {
   render: () => (
     <Viewport>
       <MemorizeSettingsPage
+        footer={memorizeFooterFixture}
         apiKeyValue=""
         onApiKeyValueChange={noop}
         hasSavedApiKey={false}
@@ -97,6 +100,7 @@ export const SyncConflict: Story = {
   render: () => (
     <Viewport>
       <MemorizeSettingsPage
+        footer={memorizeFooterFixture}
         apiKeyValue="example-api-key"
         onApiKeyValueChange={noop}
         hasSavedApiKey

@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, YStack } from "tamagui";
@@ -41,6 +42,7 @@ export const Ready: Story = {
   render: () => (
     <Viewport>
       <ImportReviewPage
+        footer={eciperayFooterFixture}
         versionLabel="v1"
         preview={<PreviewStandIn />}
         busy={false}
@@ -67,6 +69,7 @@ export const WithImage: Story = {
   render: () => (
     <Viewport>
       <ImportReviewPage
+        footer={eciperayFooterFixture}
         versionLabel="v1"
         imageUrl={storyImageWide}
         imageAlt="Creamy Mushroom Stroganoff"

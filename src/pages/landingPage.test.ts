@@ -151,7 +151,7 @@ test("the CTA container stacks narrow and rows on web — no wrapping CTA row", 
 test("frame structure: ScreenContainer shell, sections in hero → CTAs → features order", () => {
   assert.match(
     page,
-    /return \(\s+<ScreenContainer>/,
+    /return \(\s+<BigFooterShell[^>]*>\s+<ScreenContainer>/,
     "the view must render inside the ScreenContainer page shell",
   );
   const heroAt = page.indexOf("{heroTitle}");

@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { PrevNextNav } from "../components/PrevNextNav.js";
@@ -41,6 +42,14 @@ import { Text } from "../components/Text.js";
  *   component has no disabled-back state), and Next disables
  *   on the last step. An out-of-range index renders nothing,
  *   as the app view does.
+ * - Footer vs overlay (PR #413 review): in the ready state
+ *   StepOverlay fills its nearest positioned ancestor with
+ *   absolute positioning. BigFooterShell's content region IS
+ *   that positioned ancestor and ends above the footer, so
+ *   the overlay is bounded to the cooking content region and
+ *   can never cover BigFooter — the footer's links stay
+ *   reachable for the whole ready state. (The error state has
+ *   no overlay; its footer follows the alert in flow.)
  * - There is no swipe navigation here: the app view has none
  *   (swipe is the recipe mode's app-side shell), and adding
  *   it would be a behavior change, not a port.
@@ -95,6 +104,8 @@ export type MealCookingModePageStep = {
 };
 
 export type MealCookingModePageReadyProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** Discriminator for the union; optional so existing hosts
    * passing the flat ready props keep working unchanged —
    * only the error member must name its state. */
@@ -108,6 +119,8 @@ export type MealCookingModePageReadyProps = {
 };
 
 export type MealCookingModePageErrorProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   state: "error";
   /** The meal's title, when the host has it (its meal query
    * may have succeeded while the cook plan failed); the
@@ -136,15 +149,17 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
   if (props.state === "error") {
     const { mealTitle, errorMessage, onDone } = props;
     return (
-      <ScreenContainer>
-        <SectionStack>
-          <Text variant="title">{mealTitle ?? LOAD_ERROR_TITLE}</Text>
-          <Alert severity="error">{errorMessage ?? LOAD_ERROR_MESSAGE}</Alert>
-          <Button variant="secondary" onPress={onDone}>
-            Done
-          </Button>
-        </SectionStack>
-      </ScreenContainer>
+      <BigFooterShell footer={props.footer}>
+        <ScreenContainer>
+          <SectionStack>
+            <Text variant="title">{mealTitle ?? LOAD_ERROR_TITLE}</Text>
+            <Alert severity="error">{errorMessage ?? LOAD_ERROR_MESSAGE}</Alert>
+            <Button variant="secondary" onPress={onDone}>
+              Done
+            </Button>
+          </SectionStack>
+        </ScreenContainer>
+      </BigFooterShell>
     );
   }
 
@@ -155,20 +170,22 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
   }
 
   return (
-    <StepOverlay
-      title={mealTitle}
-      stepLabel={`Step ${stepIndex + 1} of ${steps.length} · ${current.recipeTitle}`}
-      body={current.body}
-      onDone={onDone}
-    >
-      <StepDots count={steps.length} activeIndex={stepIndex} />
-      <PrevNextNav
-        {...(stepIndex === 0 ? {} : { onBack: onPrev })}
-        onNext={onNext}
-        backLabel="← Back"
-        nextLabel="Next →"
-        nextDisabled={stepIndex >= steps.length - 1}
-      />
-    </StepOverlay>
+    <BigFooterShell footer={props.footer}>
+      <StepOverlay
+        title={mealTitle}
+        stepLabel={`Step ${stepIndex + 1} of ${steps.length} · ${current.recipeTitle}`}
+        body={current.body}
+        onDone={onDone}
+      >
+        <StepDots count={steps.length} activeIndex={stepIndex} />
+        <PrevNextNav
+          {...(stepIndex === 0 ? {} : { onBack: onPrev })}
+          onNext={onNext}
+          backLabel="← Back"
+          nextLabel="Next →"
+          nextDisabled={stepIndex >= steps.length - 1}
+        />
+      </StepOverlay>
+    </BigFooterShell>
   );
 }

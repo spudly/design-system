@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import type { ReactNode } from "react";
 import { Button } from "../components/Button.js";
 import { LegalSection } from "../components/LegalSection.js";
@@ -40,6 +41,8 @@ import { Text } from "../components/Text.js";
  */
 
 export type ProfilePageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   email?: string | null;
   onSignOut: () => void;
   /** The tags destination (#248: navigation crosses as an href,
@@ -65,28 +68,31 @@ export function ProfilePage({
   feedbackPreference,
   sectionsAfterFeedback,
   legalLinks,
+  footer,
 }: ProfilePageProps) {
   return (
-    <ScreenContainer variant="padded">
-      <Text variant="title">Profile</Text>
-      {email ? <Text variant="muted">{email}</Text> : null}
-      {showcaseHref ? (
-        <Button variant="secondary" href={showcaseHref}>
-          Component Showcase
+    <BigFooterShell footer={footer}>
+      <ScreenContainer variant="padded">
+        <Text variant="title">Profile</Text>
+        {email ? <Text variant="muted">{email}</Text> : null}
+        {showcaseHref ? (
+          <Button variant="secondary" href={showcaseHref}>
+            Component Showcase
+          </Button>
+        ) : null}
+        {sectionsBeforeFeedback}
+        {tagsHref ? (
+          <Button variant="secondary" href={tagsHref}>
+            Manage Tags
+          </Button>
+        ) : null}
+        {feedbackPreference}
+        {sectionsAfterFeedback}
+        <LegalSection title="Legal">{legalLinks}</LegalSection>
+        <Button variant="danger" onPress={onSignOut}>
+          Sign Out
         </Button>
-      ) : null}
-      {sectionsBeforeFeedback}
-      {tagsHref ? (
-        <Button variant="secondary" href={tagsHref}>
-          Manage Tags
-        </Button>
-      ) : null}
-      {feedbackPreference}
-      {sectionsAfterFeedback}
-      <LegalSection title="Legal">{legalLinks}</LegalSection>
-      <Button variant="danger" onPress={onSignOut}>
-        Sign Out
-      </Button>
-    </ScreenContainer>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

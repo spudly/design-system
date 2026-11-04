@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { legalPrivacyFixture, legalTermsFixture } from "./fixtures.js";
+import { legalPrivacyFixture, legalTermsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { LegalDocumentPage } from "./LegalDocumentPage.js";
 
 /**
@@ -43,7 +43,7 @@ function Viewport({ children }: { children: ReactNode }) {
 export const PrivacyPolicy: Story = {
   render: () => (
     <Viewport>
-      <LegalDocumentPage {...legalPrivacyFixture} />
+      <LegalDocumentPage {...legalPrivacyFixture} footer={eciperayFooterFixture} />
     </Viewport>
   ),
 };
@@ -51,11 +51,11 @@ export const PrivacyPolicy: Story = {
 export const TermsOfService: Story = {
   render: () => (
     <Viewport>
-      <LegalDocumentPage {...legalTermsFixture} />
+      <LegalDocumentPage {...legalTermsFixture} footer={eciperayFooterFixture} />
     </Viewport>
   ),
 };
 
 export const Wide: Story = {
-  render: () => <LegalDocumentPage {...legalPrivacyFixture} />,
+  render: () => <LegalDocumentPage {...legalPrivacyFixture} footer={eciperayFooterFixture} />,
 };

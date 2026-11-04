@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { XStack, YStack } from "tamagui";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
@@ -73,6 +74,8 @@ export type LandingPageFeature = {
 };
 
 export type LandingPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   heroTitle: string;
   heroSubtitle: string;
   discoverCta: LandingPageCta;
@@ -92,36 +95,39 @@ export function LandingPage({
   featureOne,
   featureTwo,
   featureThree,
+  footer,
 }: LandingPageProps) {
   return (
-    <ScreenContainer>
-      <YStack alignItems="center" gap="$3" paddingTop="$6">
-        <Text variant="heading" textAlign="center">
-          {heroTitle}
-        </Text>
-        <Text color="$textMuted" textAlign="center">
-          {heroSubtitle}
-        </Text>
-      </YStack>
-      <YStack flexDirection="web:row" gap="$3" alignItems="center" justifyContent="center">
-        <Button href={discoverCta.href} variant="primary">
-          {discoverCta.label}
-        </Button>
-        <Button href={signUpCta.href} variant="secondary">
-          {signUpCta.label}
-        </Button>
-        <Button href={getAppCta.href} variant="secondary">
-          {getAppCta.label}
-        </Button>
-      </YStack>
-      <XStack flexWrap="wrap" gap="$3">
-        {[featureOne, featureTwo, featureThree].map((feature) => (
-          <Card key={feature.title} flex={1} flexBasis={260} gap="$2">
-            <Text variant="subheading">{feature.title}</Text>
-            <Text color="$textMuted">{feature.description}</Text>
-          </Card>
-        ))}
-      </XStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <YStack alignItems="center" gap="$3" paddingTop="$6">
+          <Text variant="heading" textAlign="center">
+            {heroTitle}
+          </Text>
+          <Text color="$textMuted" textAlign="center">
+            {heroSubtitle}
+          </Text>
+        </YStack>
+        <YStack flexDirection="web:row" gap="$3" alignItems="center" justifyContent="center">
+          <Button href={discoverCta.href} variant="primary">
+            {discoverCta.label}
+          </Button>
+          <Button href={signUpCta.href} variant="secondary">
+            {signUpCta.label}
+          </Button>
+          <Button href={getAppCta.href} variant="secondary">
+            {getAppCta.label}
+          </Button>
+        </YStack>
+        <XStack flexWrap="wrap" gap="$3">
+          {[featureOne, featureTwo, featureThree].map((feature) => (
+            <Card key={feature.title} flex={1} flexBasis={260} gap="$2">
+              <Text variant="subheading">{feature.title}</Text>
+              <Text color="$textMuted">{feature.description}</Text>
+            </Card>
+          ))}
+        </XStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

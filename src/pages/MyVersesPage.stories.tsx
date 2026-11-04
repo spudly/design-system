@@ -1,3 +1,4 @@
+import { memorizeFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -71,7 +72,11 @@ const verseItems: MyVersesPageItem[] = [
 export const Default: Story = {
   render: () => (
     <Viewport>
-      <MyVersesPage verses={verseItems} onRemoveVerse={() => undefined} />
+      <MyVersesPage
+        footer={memorizeFooterFixture}
+        verses={verseItems}
+        onRemoveVerse={() => undefined}
+      />
     </Viewport>
   ),
 };
@@ -79,7 +84,7 @@ export const Default: Story = {
 export const Empty: Story = {
   render: () => (
     <Viewport>
-      <MyVersesPage verses={[]} onRemoveVerse={() => undefined} />
+      <MyVersesPage footer={memorizeFooterFixture} verses={[]} onRemoveVerse={() => undefined} />
     </Viewport>
   ),
 };

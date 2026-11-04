@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { EmptyState } from "../components/EmptyState.js";
@@ -84,6 +85,8 @@ export type MemorizeReviewPageVerse = {
 };
 
 export type MemorizeReviewPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** Verses due for review, in the app's order (oldest due
    * first). The app computes dueness from its
    * spaced-repetition schedule; the view only renders. */
@@ -132,31 +135,34 @@ export function MemorizeReviewPage({
   verses,
   onRememberedPress,
   onForgotPress,
+  footer,
 }: MemorizeReviewPageProps) {
   return (
-    <ScreenContainer scrollable={false}>
-      <Text variant="heading">
-        {verses.length === 0 ? "Review" : `Review (${verses.length} due)`}
-      </Text>
-      {verses.length === 0 ? (
-        <EmptyState title="Nothing due" body="Nice work." />
-      ) : (
-        <BoundedList
-          data={verses}
-          keyExtractor={(verse) => verse.id}
-          renderItem={({ item }) => (
-            <ReviewVerseRow
-              verse={item}
-              onRememberedPress={() => {
-                onRememberedPress(item.id);
-              }}
-              onForgotPress={() => {
-                onForgotPress(item.id);
-              }}
-            />
-          )}
-        />
-      )}
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false}>
+        <Text variant="heading">
+          {verses.length === 0 ? "Review" : `Review (${verses.length} due)`}
+        </Text>
+        {verses.length === 0 ? (
+          <EmptyState title="Nothing due" body="Nice work." />
+        ) : (
+          <BoundedList
+            data={verses}
+            keyExtractor={(verse) => verse.id}
+            renderItem={({ item }) => (
+              <ReviewVerseRow
+                verse={item}
+                onRememberedPress={() => {
+                  onRememberedPress(item.id);
+                }}
+                onForgotPress={() => {
+                  onForgotPress(item.id);
+                }}
+              />
+            )}
+          />
+        )}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

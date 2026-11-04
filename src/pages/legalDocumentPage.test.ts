@@ -99,14 +99,16 @@ test("the full public frame renders: brand, sign-in, and footer links as hrefs (
   assert.match(docHeader, /href=\{signInHref\}/, "sign-in is a link with the sign-in href");
   assert.match(code, /brandHref=\{brandHref\}/, "the page passes its brand href to the header");
   assert.match(code, /signInHref=\{signInHref\}/, "the page passes its sign-in href to the header");
+  // #410: the page footer is BigFooter, rendered by the page's
+  // BigFooterShell from the ONE footer prop object; the host's
+  // legal links cross as that object's column data.
   assert.match(
     code,
-    /links=\{footerLinks\}/,
-    "the page passes the host's footer links to the footer",
+    /<BigFooterShell footer=\{footer\}>/,
+    "the page renders BigFooter through its shell from the footer prop",
   );
-  assert.match(docFooter, /links\.map/, "footer renders the host's footer links");
-  assert.match(docFooter, /href=\{link\.href\}/, "footer links render as anchors with their hrefs");
-  assert.match(docFooter, /<Divider \/>/, "the footer is set off by the frame divider");
+  assert.match(code, /footer\?: BigFooterData/, "the footer crosses as one BigFooterData object");
+  assert.ok(!code.includes("DocumentFooter"), "the page keeps no distinct footer (#410)");
 });
 
 test("the document renders in a prose column; list blocks carry list semantics (#170)", () => {
@@ -210,10 +212,20 @@ const fixtureProps = {
   brandHref: "/",
   signInLabel: "Sign in",
   signInHref: "/login",
-  footerLinks: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-  ],
+  footer: {
+    brand: { label: "Eciperay", href: "/" },
+    columns: [
+      {
+        title: "Legal",
+        links: [
+          { label: "Privacy Policy", href: "/privacy" },
+          { label: "Terms of Service", href: "/terms" },
+        ],
+      },
+    ],
+    storeLinks: [],
+    socialLinks: [],
+  },
   sections: [
     {
       title: "Information we collect",

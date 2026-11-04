@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
 
@@ -12,11 +13,20 @@ import { Text } from "../components/Text.js";
  * upload. Mirrors the app's ManualEntryView shell
  * control-for-control.
  */
-export function ManualEntryPage({ children }: { children: ReactNode }) {
+export function ManualEntryPage({
+  children,
+  footer,
+}: {
+  children: ReactNode;
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
+}) {
   return (
-    <ScreenContainer scrollable={false}>
-      <Text variant="heading">Manual Entry</Text>
-      {children}
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false}>
+        <Text variant="heading">Manual Entry</Text>
+        {children}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

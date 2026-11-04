@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../components/Text.js";
@@ -141,6 +142,7 @@ function RecipesPageDemo({
   return (
     <Viewport>
       <RecipesPage
+        footer={eciperayFooterFixture}
         recipes={visible}
         loading={loading}
         isFetchingNextPage={isFetchingNextPage}
@@ -324,6 +326,7 @@ function SharedRecipesPageDemo({
   return (
     <Viewport>
       <RecipesPage
+        footer={eciperayFooterFixture}
         recipes={visible}
         loading={loading}
         emptyTitle="Recipes others share with you will appear here."

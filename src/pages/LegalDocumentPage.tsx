@@ -1,6 +1,6 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import type { ReactNode } from "react";
 import { Anchor, XStack, YStack } from "tamagui";
-import { DocumentFooter } from "../components/DocumentFooter.js";
 import { DocumentHeader } from "../components/DocumentHeader.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
@@ -41,8 +41,11 @@ import { tokens } from "../tokens/index.js";
  * the same frame shape serves the other public surfaces.
  *
  * The page composes components and passes data only (#119): the
- * frame's header and footer are the shared DocumentHeader /
- * DocumentFooter, and the document itself renders through the
+ * frame's header is the shared DocumentHeader, its page footer
+ * is BigFooter (#410 — the document's own closing link row was
+ * retired with it; hosts pass legal links as BigFooter column
+ * data through the page's `footer` prop), and the document
+ * itself renders through the
  * page-local prose renderer below (Stephen's no-new-components
  * rule for tranche PRs, 2026-10-29). An earlier tranche cut
  * extracted the renderer as a ProseDocument library component;
@@ -55,7 +58,7 @@ import { tokens } from "../tokens/index.js";
  *
  * Landmarks (#366): on web the document column is the page's
  * `main` landmark (via `mainRoleProps`), DocumentHeader is
- * `banner`, and DocumentFooter is `contentinfo` — this page
+ * `banner`, and BigFooter is `contentinfo` — this page
  * renders the full frame itself and is the outermost chrome,
  * so it owns the landmarks; hosts must not wrap it in another
  * landmark-owning frame. Native is unaffected.
@@ -150,6 +153,8 @@ function renderBlock(block: LegalDocumentBlock, key: number): ReactNode {
 }
 
 export type LegalDocumentPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** Document title, rendered as the page's level-1 heading. */
   title: string;
   /**
@@ -164,8 +169,6 @@ export type LegalDocumentPageProps = {
   /** Sign-in link in the frame header. */
   signInLabel: string;
   signInHref: string;
-  /** The frame footer's links (the privacy/terms links today). */
-  footerLinks: LegalDocumentLink[];
 };
 
 export function LegalDocumentPage({
@@ -176,35 +179,36 @@ export function LegalDocumentPage({
   brandHref,
   signInLabel,
   signInHref,
-  footerLinks,
+  footer,
 }: LegalDocumentPageProps) {
   return (
-    <ScreenContainer>
-      <DocumentHeader
-        brandLabel={brandLabel}
-        brandHref={brandHref}
-        signInLabel={signInLabel}
-        signInHref={signInHref}
-      />
-      <YStack
-        width="100%"
-        maxWidth={PROSE_MAX_WIDTH}
-        alignSelf="center"
-        gap="$4"
-        {...mainRoleProps}
-      >
-        <YStack gap="$3">
-          <Text variant="heading">{title}</Text>
-          <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>
-        </YStack>
-        {sections.map((section) => (
-          <YStack key={section.title} gap="$3">
-            <Text variant="subheading">{section.title}</Text>
-            {section.blocks.map((block, index) => renderBlock(block, index))}
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <DocumentHeader
+          brandLabel={brandLabel}
+          brandHref={brandHref}
+          signInLabel={signInLabel}
+          signInHref={signInHref}
+        />
+        <YStack
+          width="100%"
+          maxWidth={PROSE_MAX_WIDTH}
+          alignSelf="center"
+          gap="$4"
+          {...mainRoleProps}
+        >
+          <YStack gap="$3">
+            <Text variant="heading">{title}</Text>
+            <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>
           </YStack>
-        ))}
-      </YStack>
-      <DocumentFooter links={footerLinks} />
-    </ScreenContainer>
+          {sections.map((section) => (
+            <YStack key={section.title} gap="$3">
+              <Text variant="subheading">{section.title}</Text>
+              {section.blocks.map((block, index) => renderBlock(block, index))}
+            </YStack>
+          ))}
+        </YStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }
