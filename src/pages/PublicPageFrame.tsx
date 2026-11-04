@@ -1,13 +1,12 @@
 import type { ReactNode } from "react";
-import { PublicFrameFooter } from "../components/PublicFrameFooter.js";
+import { BigFooter, type BigFooterData } from "../components/BigFooter.js";
 import { PublicFrameHeader } from "../components/PublicFrameHeader.js";
 import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
 
 /**
  * PublicPageFrame (#169): the public (signed-out) page chrome as a
  * design-system building block — header (brand + Sign in), the wide
- * public content column, and footer (the viewed-without-an-account
- * note + Privacy/Terms links) — shared by every public surface
+ * public content column, and footer (BigFooter, #410) — shared by every public surface
  * (PublicRecipePage here; Discover #168, Legal #170, and the
  * marketing landing #171 reuse it as they land).
  *
@@ -56,6 +55,14 @@ export type PublicPageFrameProps = {
   privacyHref: string;
   /** The Terms of Service link's href — the host's terms route. */
   termsHref: string;
+  /**
+   * The frame's BigFooter data (#410): the ONE footer object for
+   * the page. When omitted, the frame builds a minimal BigFooter
+   * from its existing contract — the brand wordmark plus a Legal
+   * column carrying the Privacy/Terms links above — so every
+   * public page renders BigFooter with no distinct frame footer.
+   */
+  footer?: BigFooterData;
   children: ReactNode;
 };
 
@@ -64,7 +71,7 @@ export type PublicPageFrameProps = {
 // and the legal link labels, verbatim from the web layout.
 const BRAND_LABEL = "Eciperay";
 const SIGN_IN_LABEL = "Sign in";
-const FOOTER_NOTE = "Recipes shared on Eciperay may be viewed without an account.";
+const LEGAL_COLUMN_TITLE = "Legal";
 const PRIVACY_LABEL = "Privacy Policy";
 const TERMS_LABEL = "Terms of Service";
 
@@ -78,6 +85,7 @@ export function PublicPageFrame({
   signInHref,
   privacyHref,
   termsHref,
+  footer,
   children,
 }: PublicPageFrameProps) {
   return (
@@ -91,12 +99,23 @@ export function PublicPageFrame({
         />
       }
       footer={
-        <PublicFrameFooter
-          note={FOOTER_NOTE}
-          links={[
-            { label: PRIVACY_LABEL, href: privacyHref },
-            { label: TERMS_LABEL, href: termsHref },
-          ]}
+        <BigFooter
+          footer={
+            footer ?? {
+              brand: { label: BRAND_LABEL, href: brandHref },
+              columns: [
+                {
+                  title: LEGAL_COLUMN_TITLE,
+                  links: [
+                    { label: PRIVACY_LABEL, href: privacyHref },
+                    { label: TERMS_LABEL, href: termsHref },
+                  ],
+                },
+              ],
+              storeLinks: [],
+              socialLinks: [],
+            }
+          }
         />
       }
     >

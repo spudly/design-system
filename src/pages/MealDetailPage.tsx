@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
 import { ListRow } from "../components/ListRow.js";
@@ -69,6 +70,8 @@ export type MealDetailPageMember = {
 };
 
 export type MealDetailPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   title: string;
   /** The meal's notes; omit or pass null to hide the line. */
   notes?: string | null;
@@ -90,35 +93,38 @@ export function MealDetailPage({
   members,
   cookHref,
   editHref,
+  footer,
 }: MealDetailPageProps) {
   return (
-    <ScreenContainer>
-      <SectionStack>
-        <Text variant="title">{title}</Text>
-        {notes ? <Text variant="hint">{notes}</Text> : null}
-        {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
-        <ButtonRow>
-          <Button href={cookHref}>Cook meal</Button>
-          <Button variant="secondary" href={editHref}>
-            Edit
-          </Button>
-        </ButtonRow>
-        <SectionCard title="Recipes">
-          <ListStack>
-            {members.map((member) => (
-              <ListRow
-                key={member.recipeId}
-                title={member.title}
-                subtitle={member.subtitle}
-                href={member.href}
-                {...(member.isUnavailable
-                  ? { isDisabled: true, titleSuffix: " (unavailable)" }
-                  : {})}
-              />
-            ))}
-          </ListStack>
-        </SectionCard>
-      </SectionStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <SectionStack>
+          <Text variant="title">{title}</Text>
+          {notes ? <Text variant="hint">{notes}</Text> : null}
+          {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
+          <ButtonRow>
+            <Button href={cookHref}>Cook meal</Button>
+            <Button variant="secondary" href={editHref}>
+              Edit
+            </Button>
+          </ButtonRow>
+          <SectionCard title="Recipes">
+            <ListStack>
+              {members.map((member) => (
+                <ListRow
+                  key={member.recipeId}
+                  title={member.title}
+                  subtitle={member.subtitle}
+                  href={member.href}
+                  {...(member.isUnavailable
+                    ? { isDisabled: true, titleSuffix: " (unavailable)" }
+                    : {})}
+                />
+              ))}
+            </ListStack>
+          </SectionCard>
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

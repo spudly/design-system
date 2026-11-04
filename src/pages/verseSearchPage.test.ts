@@ -104,7 +104,7 @@ test("the demo-mode notice carries the app's text verbatim, above the search row
   );
   assert.match(
     code,
-    /Searching the built-in demo set\. Add a gospel-engine API key in Settings for full-library\s+search\./,
+    /Searching the built-in demo set\.\s+Add a gospel-engine API key in Settings for\s+full-library\s+search\./,
     "the demo notice text must be the app's, verbatim",
   );
   assert.ok(

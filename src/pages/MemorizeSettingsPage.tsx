@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Button } from "../components/Button.js";
 import { Alert } from "../components/Alert.js";
 import { ButtonRow } from "../components/ButtonRow.js";
@@ -82,6 +83,8 @@ import { TextField } from "../components/TextField.js";
  * and the two button pairs are ButtonRows.
  */
 export type MemorizeSettingsPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** The API-key field's current text. The host holds this
    * state; its Save handler reads it. */
   apiKeyValue: string;
@@ -156,65 +159,68 @@ export function MemorizeSettingsPage({
   onSyncDrivePress,
   onKeepDevicePress,
   onKeepDrivePress,
+  footer,
 }: MemorizeSettingsPageProps) {
   return (
-    <ScreenContainer scrollable={false}>
-      <Text variant="heading">Settings</Text>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false}>
+        <Text variant="heading">Settings</Text>
 
-      <SectionCard title="Scripture source">
-        <Text variant="hint">
-          A gospel-engine API key unlocks full-library search. The key stays on this device and is
-          never synced.
-        </Text>
-        <TextField
-          label="API key"
-          value={apiKeyValue}
-          onChangeText={onApiKeyValueChange}
-          placeholder="gospel-engine API key"
-          secureTextEntry
-          autoCapitalize="none"
-        />
-        <ButtonRow>
-          <Button size="sm" onPress={onSaveApiKeyPress} disabled={!apiKeyValue.trim()}>
-            Save key
-          </Button>
-          {hasSavedApiKey ? (
-            <Button size="sm" variant="secondary" onPress={onClearApiKeyPress}>
-              Clear key
-            </Button>
-          ) : null}
-        </ButtonRow>
-      </SectionCard>
-
-      <SectionCard title="Google Drive sync">
-        <Text variant="hint">
-          Syncs your verse list (never your API key) to memorize-data.json in the “{driveFolderName}
-          ” Drive folder.
-        </Text>
-        {driveConnected ? (
-          <Button onPress={onSyncDrivePress} disabled={isSyncing}>
-            Sync with Drive
-          </Button>
-        ) : (
-          <Button onPress={onConnectDrivePress} disabled={!driveConnectReady || isSyncing}>
-            Connect Google Drive
-          </Button>
-        )}
-        {driveError ? <Alert severity="error">{driveError}</Alert> : null}
-        {syncMessage ? (
-          <Alert severity={syncConflict ? "warning" : "info"}>{syncMessage}</Alert>
-        ) : null}
-        {syncConflict ? (
+        <SectionCard title="Scripture source">
+          <Text variant="hint">
+            A gospel-engine API key unlocks full-library search. The key stays on this device and is
+            never synced.
+          </Text>
+          <TextField
+            label="API key"
+            value={apiKeyValue}
+            onChangeText={onApiKeyValueChange}
+            placeholder="gospel-engine API key"
+            secureTextEntry
+            autoCapitalize="none"
+          />
           <ButtonRow>
-            <Button size="sm" onPress={onKeepDevicePress} disabled={isSyncing}>
-              Keep this device
+            <Button size="sm" onPress={onSaveApiKeyPress} disabled={!apiKeyValue.trim()}>
+              Save key
             </Button>
-            <Button size="sm" variant="secondary" onPress={onKeepDrivePress} disabled={isSyncing}>
-              Keep Drive
-            </Button>
+            {hasSavedApiKey ? (
+              <Button size="sm" variant="secondary" onPress={onClearApiKeyPress}>
+                Clear key
+              </Button>
+            ) : null}
           </ButtonRow>
-        ) : null}
-      </SectionCard>
-    </ScreenContainer>
+        </SectionCard>
+
+        <SectionCard title="Google Drive sync">
+          <Text variant="hint">
+            Syncs your verse list (never your API key) to memorize-data.json in the “
+            {driveFolderName}” Drive folder.
+          </Text>
+          {driveConnected ? (
+            <Button onPress={onSyncDrivePress} disabled={isSyncing}>
+              Sync with Drive
+            </Button>
+          ) : (
+            <Button onPress={onConnectDrivePress} disabled={!driveConnectReady || isSyncing}>
+              Connect Google Drive
+            </Button>
+          )}
+          {driveError ? <Alert severity="error">{driveError}</Alert> : null}
+          {syncMessage ? (
+            <Alert severity={syncConflict ? "warning" : "info"}>{syncMessage}</Alert>
+          ) : null}
+          {syncConflict ? (
+            <ButtonRow>
+              <Button size="sm" onPress={onKeepDevicePress} disabled={isSyncing}>
+                Keep this device
+              </Button>
+              <Button size="sm" variant="secondary" onPress={onKeepDrivePress} disabled={isSyncing}>
+                Keep Drive
+              </Button>
+            </ButtonRow>
+          ) : null}
+        </SectionCard>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

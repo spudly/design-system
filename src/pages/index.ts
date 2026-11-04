@@ -168,3 +168,17 @@ export {
   type LegalDocumentSpan,
   type LegalDocumentLink,
 } from "./LegalDocumentPage.js";
+
+// BigFooter (#410): the footer data types are part of the public
+// page contract — hosts supply one footer object per page through
+// each page's `footer` prop. The BigFooter component itself stays
+// internal (pages-only surface, #298).
+export {
+  type BigFooterBrand,
+  type BigFooterColumn,
+  type BigFooterData,
+  type BigFooterLink,
+  type BigFooterSocialIcon,
+  type BigFooterSocialLink,
+  type BigFooterStoreLink,
+} from "../components/BigFooter.js";

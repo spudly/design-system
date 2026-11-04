@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { AutocompletePicker } from "../components/AutocompletePicker.js";
 import { Button } from "../components/Button.js";
@@ -83,6 +84,8 @@ export type MealPlanFormPageEntryOption = {
 };
 
 export type MealPlanFormPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   title: string;
   onTitleChange: (value: string) => void;
   notes: string;
@@ -158,101 +161,104 @@ export function MealPlanFormPage({
   isSaving = false,
   error,
   onSubmit,
+  footer,
 }: MealPlanFormPageProps) {
   return (
-    <FormScreenLayout>
-      <FormHeading>{title.trim() ? title : "Meal plan"}</FormHeading>
-      <TextField
-        label="Title"
-        value={title}
-        onChangeText={onTitleChange}
-        placeholder="Plan title"
-      />
-      <TextAreaField
-        value={notes}
-        onChangeText={onNotesChange}
-        placeholder="Notes (optional)"
-        numberOfLines={4}
-      />
-      <TextField
-        label="Starts on"
-        type="date"
-        keyboardType="numbers-and-punctuation"
-        value={startsOn}
-        onChangeText={onStartsOnChange}
-        placeholder="YYYY-MM-DD"
-      />
-      <TextField
-        label="Ends on"
-        type="date"
-        keyboardType="numbers-and-punctuation"
-        value={endsOn}
-        onChangeText={onEndsOnChange}
-        placeholder="YYYY-MM-DD"
-      />
-      <LabeledGroup label="Meals & recipes">
-        <AutocompletePicker
-          searchText={searchText}
-          onSearchTextChange={onSearchTextChange}
-          searchResults={searchResults.map((entry) => ({
-            id: entry.key,
-            label: entryLabel(entry),
-            ...(entry.servings !== undefined ? { detail: `${entry.servings} servings` } : {}),
-          }))}
-          isSearching={isSearching}
-          searchError={searchError}
-          onSelectResult={onSelectEntry}
-          selectedItems={selectedEntries.map((entry) => ({
-            id: entry.key,
-            label: entryLabel(entry),
-          }))}
-          onRemoveSelectedItem={onRemoveEntry}
-          placeholder="Search meals & recipes…"
-          searchAccessibilityLabel="Search meals and recipes"
-          noResultsMessage="No meals or recipes found."
+    <BigFooterShell footer={footer}>
+      <FormScreenLayout>
+        <FormHeading>{title.trim() ? title : "Meal plan"}</FormHeading>
+        <TextField
+          label="Title"
+          value={title}
+          onChangeText={onTitleChange}
+          placeholder="Plan title"
         />
-      </LabeledGroup>
-      {selectedEntries.map((option) => {
-        const key = option.key;
-        const quantityStepper = (
-          <NumberStepper
-            label={`Quantity · ${option.title}`}
-            value={quantityByKey[key] ?? 1}
-            min={1}
-            onChange={(value) => {
-              onQuantityChange(key, value);
-            }}
+        <TextAreaField
+          value={notes}
+          onChangeText={onNotesChange}
+          placeholder="Notes (optional)"
+          numberOfLines={4}
+        />
+        <TextField
+          label="Starts on"
+          type="date"
+          keyboardType="numbers-and-punctuation"
+          value={startsOn}
+          onChangeText={onStartsOnChange}
+          placeholder="YYYY-MM-DD"
+        />
+        <TextField
+          label="Ends on"
+          type="date"
+          keyboardType="numbers-and-punctuation"
+          value={endsOn}
+          onChangeText={onEndsOnChange}
+          placeholder="YYYY-MM-DD"
+        />
+        <LabeledGroup label="Meals & recipes">
+          <AutocompletePicker
+            searchText={searchText}
+            onSearchTextChange={onSearchTextChange}
+            searchResults={searchResults.map((entry) => ({
+              id: entry.key,
+              label: entryLabel(entry),
+              ...(entry.servings !== undefined ? { detail: `${entry.servings} servings` } : {}),
+            }))}
+            isSearching={isSearching}
+            searchError={searchError}
+            onSelectResult={onSelectEntry}
+            selectedItems={selectedEntries.map((entry) => ({
+              id: entry.key,
+              label: entryLabel(entry),
+            }))}
+            onRemoveSelectedItem={onRemoveEntry}
+            placeholder="Search meals & recipes…"
+            searchAccessibilityLabel="Search meals and recipes"
+            noResultsMessage="No meals or recipes found."
           />
-        );
-        if (option.kind === "meal" || !option.recipeId) {
-          return <FieldStack key={key}>{quantityStepper}</FieldStack>;
-        }
-        const recipeId = option.recipeId;
-        return (
-          <FieldStack key={key}>
-            {quantityStepper}
+        </LabeledGroup>
+        {selectedEntries.map((option) => {
+          const key = option.key;
+          const quantityStepper = (
             <NumberStepper
-              label={`Servings · ${option.title}`}
-              value={servingsByRecipeId[recipeId] ?? option.servings ?? 1}
+              label={`Quantity · ${option.title}`}
+              value={quantityByKey[key] ?? 1}
               min={1}
               onChange={(value) => {
-                onRecipeServingsChange(recipeId, value);
+                onQuantityChange(key, value);
               }}
             />
-          </FieldStack>
-        );
-      })}
-      {error ? <Alert severity="error" message={error} /> : null}
-      <FormSubmit>
-        <Button
-          variant="primary"
-          accessibilityLabel="Save plan"
-          disabled={!title.trim() || selectedEntries.length === 0 || isSaving}
-          onPress={onSubmit}
-        >
-          Save plan
-        </Button>
-      </FormSubmit>
-    </FormScreenLayout>
+          );
+          if (option.kind === "meal" || !option.recipeId) {
+            return <FieldStack key={key}>{quantityStepper}</FieldStack>;
+          }
+          const recipeId = option.recipeId;
+          return (
+            <FieldStack key={key}>
+              {quantityStepper}
+              <NumberStepper
+                label={`Servings · ${option.title}`}
+                value={servingsByRecipeId[recipeId] ?? option.servings ?? 1}
+                min={1}
+                onChange={(value) => {
+                  onRecipeServingsChange(recipeId, value);
+                }}
+              />
+            </FieldStack>
+          );
+        })}
+        {error ? <Alert severity="error" message={error} /> : null}
+        <FormSubmit>
+          <Button
+            variant="primary"
+            accessibilityLabel="Save plan"
+            disabled={!title.trim() || selectedEntries.length === 0 || isSaving}
+            onPress={onSubmit}
+          >
+            Save plan
+          </Button>
+        </FormSubmit>
+      </FormScreenLayout>
+    </BigFooterShell>
   );
 }

@@ -4,7 +4,7 @@ import { Text } from "../components/Text.js";
 import { View } from "tamagui";
 import { PublicRecipePage, type PublicRecipePageProps } from "./PublicRecipePage.js";
 import { tagColorNameForHex } from "../themes/tagColors.js";
-import { recipeDetailFixture } from "./fixtures.js";
+import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
 
 /**
  * Stories for the real PublicRecipePage component (#169) — not a
@@ -255,7 +255,7 @@ function PublicRecipePageDemo({
 
   return (
     <Viewport>
-      <PublicRecipePage {...readyProps} />
+      <PublicRecipePage footer={eciperayFooterFixture} {...readyProps} />
     </Viewport>
   );
 }
@@ -281,7 +281,7 @@ export const Minimal: Story = {
 export const Loading: Story = {
   render: () => (
     <Viewport>
-      <PublicRecipePage state="loading" />
+      <PublicRecipePage footer={eciperayFooterFixture} state="loading" />
     </Viewport>
   ),
 };
@@ -289,7 +289,7 @@ export const Loading: Story = {
 export const NotFound: Story = {
   render: () => (
     <Viewport>
-      <PublicRecipePage state="notFound" />
+      <PublicRecipePage footer={eciperayFooterFixture} state="notFound" />
     </Viewport>
   ),
 };
@@ -297,7 +297,7 @@ export const NotFound: Story = {
 export const Unavailable: Story = {
   render: () => (
     <Viewport>
-      <PublicRecipePage state="unavailable" />
+      <PublicRecipePage footer={eciperayFooterFixture} state="unavailable" />
     </Viewport>
   ),
 };

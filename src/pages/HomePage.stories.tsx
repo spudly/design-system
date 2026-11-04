@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, YStack } from "tamagui";
 import { Text } from "../components/Text.js";
-import { homeFixture } from "./fixtures.js";
+import { homeFixture, eciperayFooterFixture } from "./fixtures.js";
 import { HomePage } from "./HomePage.js";
 
 const meta: Meta<typeof HomePage> = {
@@ -31,6 +31,7 @@ export const WithRecipes: Story = {
   render: () => (
     <Viewport>
       <HomePage
+        footer={eciperayFooterFixture}
         {...homeFixture}
         renderRecipeRow={(recipe) => (
           <YStack marginBottom="$3" borderRadius="$3" backgroundColor="$surface" padding="$3">
@@ -49,6 +50,7 @@ export const Empty: Story = {
   render: () => (
     <Viewport>
       <HomePage
+        footer={eciperayFooterFixture}
         {...homeFixture}
         recipes={[]}
         renderRecipeRow={() => null}
@@ -64,6 +66,7 @@ export const Loading: Story = {
   render: () => (
     <Viewport>
       <HomePage
+        footer={eciperayFooterFixture}
         {...homeFixture}
         recipes={[]}
         loading

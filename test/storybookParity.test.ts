@@ -115,6 +115,11 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches }:
 // standalone component with a story of its own, and none is
 // exported from the components barrel.
 const COMPONENT_STORY_EXCEPTIONS = new Set([
+  // BigFooter (#410): internal page chrome — NOT exported from the
+  // components barrel (pages render it; its data types are the
+  // pages barrel's contract). It has its own stories
+  // (Components/BigFooter) and is exercised through every page story.
+  "BigFooter.tsx",
   "accessibility.ts",
   "index.ts",
   "modalRegistry.ts",

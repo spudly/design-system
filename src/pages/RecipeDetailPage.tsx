@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { useMemo, type ReactNode } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../components/Button.js";
@@ -359,6 +360,8 @@ export type RecipeDetailPageNutritionRow = NutritionPanelRow;
 export type RecipeDetailPageNutritionProps = NutritionPanelData;
 
 export type RecipeDetailPageReadyProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   state: "ready";
   /** Recipe status as a plain string; the page maps it to the
    * shared StatusBadge's tone/label below as caller data (the
@@ -375,7 +378,8 @@ export type RecipeDetailPageReadyProps = {
   nutrition: RecipeDetailPageNutritionProps;
 };
 
-export type RecipeDetailPageProps = { state: "loading" } | RecipeDetailPageReadyProps;
+export type RecipeDetailPageProps =
+  { state: "loading"; footer?: BigFooterData } | RecipeDetailPageReadyProps;
 
 // ---------------------------------------------------------------------------
 // Constants moved with the page (the pilot's rule for option sets
@@ -846,36 +850,42 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
  */
 export function RecipeDetailPage(props: RecipeDetailPageProps) {
   if (props.state === "loading") {
-    return <LoadingGate label="Loading recipe" />;
+    return (
+      <BigFooterShell footer={props.footer}>
+        <LoadingGate label="Loading recipe" />
+      </BigFooterShell>
+    );
   }
 
   const { status, versions, selectedVersionId, onSelectVersion } = props;
 
   return (
-    <ScreenShell>
-      <Toolbar>
-        <RecipeStatusBadge status={status} />
-        <VersionPicker
-          versions={versions}
-          selectedVersionId={selectedVersionId}
-          onSelectVersion={onSelectVersion}
-        />
-      </Toolbar>
-      <ScrollRegion>
-        <OverviewPanel overview={props.overview} />
-        <IngredientsPanel ingredients={props.ingredients} />
-        <InstructionsPanel instructions={props.instructions.instructions} />
-        <HistoryPanel history={props.history} />
-        {/* The section headings render inside their panels as the
+    <BigFooterShell footer={props.footer}>
+      <ScreenShell>
+        <Toolbar>
+          <RecipeStatusBadge status={status} />
+          <VersionPicker
+            versions={versions}
+            selectedVersionId={selectedVersionId}
+            onSelectVersion={onSelectVersion}
+          />
+        </Toolbar>
+        <ScrollRegion>
+          <OverviewPanel overview={props.overview} />
+          <IngredientsPanel ingredients={props.ingredients} />
+          <InstructionsPanel instructions={props.instructions.instructions} />
+          <HistoryPanel history={props.history} />
+          {/* The section headings render inside their panels as the
             PanelStack's first block (the canonical SectionHeading
             carries no padding of its own — the panel's inset is
             the heading's). NutritionPanel is a bare widget, so its
             section stack is composed here. */}
-        <PanelStack>
-          <SectionHeading>Nutrition</SectionHeading>
-          <NutritionPanel nutrition={props.nutrition} />
-        </PanelStack>
-      </ScrollRegion>
-    </ScreenShell>
+          <PanelStack>
+            <SectionHeading>Nutrition</SectionHeading>
+            <NutritionPanel nutrition={props.nutrition} />
+          </PanelStack>
+        </ScrollRegion>
+      </ScreenShell>
+    </BigFooterShell>
   );
 }

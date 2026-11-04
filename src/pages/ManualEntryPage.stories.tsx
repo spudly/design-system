@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { recipeFormFixture } from "./fixtures.js";
+import { recipeFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ManualEntryPage } from "./ManualEntryPage.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
@@ -66,8 +66,13 @@ function useFormProps(): RecipeFormPageProps {
 
 function Shell() {
   const formProps = useFormProps();
+  // Footer ownership: the OUTER page owns the one footer in this
+  // composition — the nested RecipeFormPage gets no footer prop,
+  // so the composed screen renders exactly one footer (and one
+  // contentinfo landmark). Hosts composing these pages follow
+  // the same rule: supply the footer to the outer page only.
   return (
-    <ManualEntryPage>
+    <ManualEntryPage footer={eciperayFooterFixture}>
       <RecipeFormPage {...formProps} />
     </ManualEntryPage>
   );

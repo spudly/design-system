@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { CheckRow } from "../components/CheckRow.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { ListLoadingState } from "../components/ListLoadingState.js";
@@ -62,6 +63,8 @@ export type ShoppingListPageLine = {
 };
 
 export type ShoppingListPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   lines: ShoppingListPageLine[];
   loading?: boolean;
   onToggleLine: (key: string) => void;
@@ -71,35 +74,38 @@ export function ShoppingListPage({
   lines,
   loading = false,
   onToggleLine,
+  footer,
 }: ShoppingListPageProps) {
   return (
-    <ScreenContainer>
-      <SectionStack>
-        <Text variant="title">Shopping list</Text>
-        {loading ? (
-          <ListLoadingState label="Loading shopping list" />
-        ) : lines.length === 0 ? (
-          <EmptyState title="No items on this list." />
-        ) : (
-          <ListStack>
-            {lines.map((line) => (
-              <CheckRow
-                key={line.key}
-                label={line.name}
-                detail={
-                  [line.quantityLabel, line.isOptional ? "optional" : null]
-                    .filter(Boolean)
-                    .join(" · ") || null
-                }
-                checked={line.isChecked}
-                onToggle={() => {
-                  onToggleLine(line.key);
-                }}
-              />
-            ))}
-          </ListStack>
-        )}
-      </SectionStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <SectionStack>
+          <Text variant="title">Shopping list</Text>
+          {loading ? (
+            <ListLoadingState label="Loading shopping list" />
+          ) : lines.length === 0 ? (
+            <EmptyState title="No items on this list." />
+          ) : (
+            <ListStack>
+              {lines.map((line) => (
+                <CheckRow
+                  key={line.key}
+                  label={line.name}
+                  detail={
+                    [line.quantityLabel, line.isOptional ? "optional" : null]
+                      .filter(Boolean)
+                      .join(" · ") || null
+                  }
+                  checked={line.isChecked}
+                  onToggle={() => {
+                    onToggleLine(line.key);
+                  }}
+                />
+              ))}
+            </ListStack>
+          )}
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

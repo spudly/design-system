@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { OptionCard } from "../components/OptionCard.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
@@ -33,21 +34,25 @@ export type AddRecipeMenuPageOption = {
 };
 
 export type AddRecipeMenuPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   options: AddRecipeMenuPageOption[];
 };
 
-export function AddRecipeMenuPage({ options }: AddRecipeMenuPageProps) {
+export function AddRecipeMenuPage({ options, footer }: AddRecipeMenuPageProps) {
   return (
-    <ScreenContainer variant="padded">
-      <Text variant="title">Add Recipe</Text>
-      {options.map((option) => (
-        <OptionCard
-          key={option.href}
-          title={option.label}
-          description={option.description}
-          href={option.href}
-        />
-      ))}
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer variant="padded">
+        <Text variant="title">Add Recipe</Text>
+        {options.map((option) => (
+          <OptionCard
+            key={option.href}
+            title={option.label}
+            description={option.description}
+            href={option.href}
+          />
+        ))}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

@@ -18,8 +18,10 @@
  *    never as an intent callback (#248's navigation rule;
  *    Stephen's rulings on PR #311 and the #320 dedupe, which
  *    canonized the shared bands this frame composes on the href
- *    contract). The frame has no scroll view of its own (the
- *    page inside owns the scroll).
+ *    contract). The frame has no scroll view of its own for its
+ *    content (the page inside owns that scroll); the one
+ *    exception is PublicFrameLayout's native footer-only scroll
+ *    region (PR #413), which wraps only the footer slot.
  * 3. No explicit lineHeight (the #162 rule).
  * 4. Stories exercise the frame around real page content and a
  *    stand-in, at desktop and phone widths, so Chromatic
@@ -63,7 +65,7 @@ const frameCode = strip(
     frameSource,
     readFileSync(join(componentsDir, "PublicFrameLayout.tsx"), "utf8"),
     readFileSync(join(componentsDir, "PublicFrameHeader.tsx"), "utf8"),
-    readFileSync(join(componentsDir, "PublicFrameFooter.tsx"), "utf8"),
+    readFileSync(join(componentsDir, "BigFooter.tsx"), "utf8"),
     readFileSync(join(componentsDir, "BrandLink.tsx"), "utf8"),
   ].join("\n"),
 );
@@ -126,7 +128,7 @@ test("the frame owns the public chrome: href navigation throughout, no scroll of
   for (const copy of [
     'BRAND_LABEL = "Eciperay"',
     'SIGN_IN_LABEL = "Sign in"',
-    'FOOTER_NOTE = "Recipes shared on Eciperay may be viewed without an account."',
+    'LEGAL_COLUMN_TITLE = "Legal"',
     'PRIVACY_LABEL = "Privacy Policy"',
     'TERMS_LABEL = "Terms of Service"',
   ]) {
@@ -141,9 +143,58 @@ test("the frame owns the public chrome: href navigation throughout, no scroll of
     /maxWidth=\{COLUMN_MAX_WIDTH\}/,
     "the header, column, and footer share the wide public column",
   );
+  // The frame must not scroll — the page inside owns its scroll.
+  // The scan covers what the frame actually renders: its own
+  // sources plus the BigFooter COMPONENT. BigFooterShell shares
+  // BigFooter.tsx but is page chrome the frame never renders (a
+  // page nested in the frame gets no footer from the shell), and
+  // since the PR #413 native tall-footer fix the shell owns a
+  // footer-only ScrollView — that scroll region is the shell's,
+  // not the frame's, so only the component segment of
+  // BigFooter.tsx is scanned here; test/bigFooter.test.ts pins
+  // the shell's footer region.
+  //
+  // The frame's OWN footer-only exception (PR #413 review):
+  // PublicFrameLayout renders the frame's footer through
+  // BigFooter directly, not through BigFooterShell, and
+  // BigFooter has no internal scroll region — so on native the
+  // layout gives the footer the same footer-only bounded scroll
+  // region the shell uses, or a tall footer is clipped with no
+  // scroll path. That region wraps ONLY the footer slot: the
+  // page, the header, and the content column never scroll here.
+  const bigFooterStripped = strip(readFileSync(join(componentsDir, "BigFooter.tsx"), "utf8"));
+  const bigFooterComponent = bigFooterStripped.slice(
+    bigFooterStripped.indexOf("export function BigFooter("),
+    bigFooterStripped.indexOf("export type BigFooterShellProps"),
+  );
   assert.ok(
-    !frameCode.includes("<ScrollView"),
-    "the frame must not scroll — the page inside owns its scroll",
+    bigFooterComponent.length > 0,
+    "the BigFooter component segment is found for the frame scroll scan",
+  );
+  const layoutCode = strip(readFileSync(join(componentsDir, "PublicFrameLayout.tsx"), "utf8"));
+  const frameScrollScan = [
+    pageCode,
+    strip(readFileSync(join(componentsDir, "PublicFrameHeader.tsx"), "utf8")),
+    strip(readFileSync(join(componentsDir, "BrandLink.tsx"), "utf8")),
+    bigFooterComponent,
+  ].join("\n");
+  assert.ok(
+    !frameScrollScan.includes("<ScrollView"),
+    "apart from the layout's footer region, the frame must not scroll — the page inside owns its scroll",
+  );
+  assert.equal(
+    (layoutCode.match(/<ScrollView/g) ?? []).length,
+    1,
+    "PublicFrameLayout's only ScrollView is the native footer region",
+  );
+  assert.match(
+    layoutCode,
+    /isWeb \? \(\s*footer\s*\) : \(\s*<ScrollView flexGrow=\{0\} flexShrink=\{1\} keyboardShouldPersistTaps="handled">\s*\{footer\}\s*<\/ScrollView>\s*\)/,
+    "on native the layout's footer renders inside its own bounded scroll region; on web it renders bare",
+  );
+  assert.ok(
+    !/<ScrollView[^>]*>\s*\{(children|header)\}/.test(layoutCode),
+    "the layout's scroll region wraps only the footer — never the page or the header",
   );
   assert.match(
     frameCode,
@@ -176,7 +227,7 @@ test("frame stories exercise the frame at desktop and phone widths", () => {
   }
   assert.match(
     frameStoriesCode,
-    /<PublicPageFrame \{\.\.\.frameProps\}>/,
+    /<PublicPageFrame[^>]*\{\.\.\.frameProps\}>/,
     "the frame stories render the real frame",
   );
 });

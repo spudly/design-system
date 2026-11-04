@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
@@ -21,6 +22,8 @@ import { Text } from "../components/Text.js";
  */
 
 export type ImportImagePageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   loading?: boolean;
   error?: string | null;
   onPickCamera?: () => void;
@@ -32,31 +35,34 @@ export function ImportImagePage({
   error,
   onPickCamera,
   onPickLibrary,
+  footer,
 }: ImportImagePageProps) {
   return (
-    <FormScreenLayout>
-      <Text variant="formTitle">Import from Image</Text>
-      <Button
-        variant="primary"
-        disabled={loading}
-        onPress={() => {
-          onPickCamera?.();
-        }}
-        accessibilityLabel="Take Photo"
-      >
-        Take Photo
-      </Button>
-      <Button
-        variant="secondary"
-        disabled={loading}
-        onPress={() => {
-          onPickLibrary?.();
-        }}
-      >
-        Choose from Library
-      </Button>
-      {loading ? <Text variant="hint">Importing…</Text> : null}
-      {error ? <Alert severity="error" message={error} /> : null}
-    </FormScreenLayout>
+    <BigFooterShell footer={footer}>
+      <FormScreenLayout>
+        <Text variant="formTitle">Import from Image</Text>
+        <Button
+          variant="primary"
+          disabled={loading}
+          onPress={() => {
+            onPickCamera?.();
+          }}
+          accessibilityLabel="Take Photo"
+        >
+          Take Photo
+        </Button>
+        <Button
+          variant="secondary"
+          disabled={loading}
+          onPress={() => {
+            onPickLibrary?.();
+          }}
+        >
+          Choose from Library
+        </Button>
+        {loading ? <Text variant="hint">Importing…</Text> : null}
+        {error ? <Alert severity="error" message={error} /> : null}
+      </FormScreenLayout>
+    </BigFooterShell>
   );
 }

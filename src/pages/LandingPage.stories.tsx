@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { landingFixture } from "./fixtures.js";
+import { landingFixture, eciperayFooterFixture } from "./fixtures.js";
 import { LandingPage } from "./LandingPage.js";
 
 const meta: Meta<typeof LandingPage> = {
@@ -35,11 +35,11 @@ function Viewport({ children }: { children: ReactNode }) {
 export const Default: Story = {
   render: () => (
     <Viewport>
-      <LandingPage {...landingFixture} />
+      <LandingPage footer={eciperayFooterFixture} {...landingFixture} />
     </Viewport>
   ),
 };
 
 export const Wide: Story = {
-  render: () => <LandingPage {...landingFixture} />,
+  render: () => <LandingPage footer={eciperayFooterFixture} {...landingFixture} />,
 };

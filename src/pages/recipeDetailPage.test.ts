@@ -98,7 +98,7 @@ test("the view imports no app package and runs no data hooks", () => {
 test("the loading state renders only the spinner shell", () => {
   assert.match(
     code,
-    /export type RecipeDetailPageProps = \{ state: "loading" \} \| RecipeDetailPageReadyProps;/,
+    /export type RecipeDetailPageProps =\s+\{ state: "loading"; footer\?: BigFooterData \} \| RecipeDetailPageReadyProps;/,
     "the props must be the loading | ready union",
   );
   const loadingAt = code.indexOf('props.state === "loading"');
@@ -394,7 +394,7 @@ test("stories exercise the states and the cook-log form slot", () => {
   );
   assert.match(
     storiesCode,
-    /<RecipeDetailPage state="loading" \/>/,
+    /<RecipeDetailPage[^>]*state="loading"[^>]*\/>/,
     "the Loading story must render the loading props member",
   );
 });

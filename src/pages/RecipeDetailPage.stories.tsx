@@ -4,7 +4,7 @@ import { Text } from "../components/Text.js";
 import { View } from "tamagui";
 import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
 import { tagColorNameForHex } from "../themes/tagColors.js";
-import { recipeDetailFixture } from "./fixtures.js";
+import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -312,7 +312,7 @@ function RecipeDetailPageDemo({
 
   return (
     <Viewport>
-      <RecipeDetailPage {...readyProps} />
+      <RecipeDetailPage footer={eciperayFooterFixture} {...readyProps} />
     </Viewport>
   );
 }
@@ -337,7 +337,7 @@ export const CreateDraft: Story = {
 export const Loading: Story = {
   render: () => (
     <Viewport>
-      <RecipeDetailPage state="loading" />
+      <RecipeDetailPage footer={eciperayFooterFixture} state="loading" />
     </Viewport>
   ),
 };

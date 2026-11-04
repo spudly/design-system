@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, YStack } from "tamagui";
@@ -25,6 +26,7 @@ export const Filled: Story = {
   render: () => (
     <Viewport>
       <ImportUrlPage
+        footer={eciperayFooterFixture}
         url="https://example.com/recipes/mushroom-stroganoff"
         onUrlChange={() => undefined}
         onSubmit={() => undefined}
@@ -45,6 +47,7 @@ function InteractiveDemo() {
   return (
     <YStack>
       <ImportUrlPage
+        footer={eciperayFooterFixture}
         url={url}
         onUrlChange={setUrl}
         onSubmit={() => {
