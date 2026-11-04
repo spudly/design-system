@@ -149,8 +149,8 @@ test("both catalog pages call the shared hook with the same shape", () => {
     );
     assert.match(
       page,
-      /onLoadMore,\s*isFetchingNextPage,\s*itemCount: recipes\.length,/,
-      `${name} must pass onLoadMore, isFetchingNextPage, and its recipe count to the hook`,
+      /onLoadMore,\s*isFetchingNextPage,/,
+      `${name} must pass onLoadMore and isFetchingNextPage to the hook`,
     );
     assert.match(
       page,
@@ -184,10 +184,24 @@ test("both catalog pages wire the hook's handlers and threshold to their lists",
   }
 });
 
+test("each page counts the rows its continuation extends", () => {
+  // DiscoverPage's continuation extends its one list; the
+  // unified RecipesPage's continuation is its discovery
+  // section's, so it counts the discovery rows (#415).
+  assert.match(discoverPage, /itemCount: recipes\.length,/);
+  assert.match(recipesPage, /itemCount: discoveryRecipes\.length,/);
+});
+
 test("each page's mount gate matches its states", () => {
-  // RecipesPage gates on the first load only (it has no error
-  // state); DiscoverPage also gates on its error state.
-  assert.match(recipesPage, /canPaginate: !loading,\s*\}\);/);
+  // DiscoverPage gates on its first load and its error state;
+  // the unified RecipesPage gates on BOTH sections' first
+  // loads and its discovery section's error state (#415 — the
+  // own section has an error state too now, but it does not
+  // gate the discovery continuation).
+  assert.match(
+    recipesPage,
+    /canPaginate: !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,\s*\}\);/,
+  );
   assert.match(discoverPage, /canPaginate: !loading && !errorMessage,\s*\}\);/);
 });
 

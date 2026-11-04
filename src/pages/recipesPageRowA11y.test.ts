@@ -7,7 +7,10 @@
  * subtitle ("Title, Subtitle") — a title-only label would
  * override the name React Native derives from its Text children
  * and drop the subtitle's announcement (the count and nutrition
- * summary). On web both are real anchors with the labels routed
+ * summary). Since #415 the composed name also carries the
+ * item's caller-supplied badge when one is present ("Title,
+ * Subtitle, Shared with you"), so a shared-with-me row
+ * announces its marker instead of leaving it as decoration. On web both are real anchors with the labels routed
  * through the accessibility translator; on native the childless
  * stretched LinkOverlays carry the same labels while the visible
  * texts are decorative (that pairing is pinned in
@@ -57,11 +60,11 @@ test("both row links exist on both platforms, each carrying the row href", () =>
   );
 });
 
-test("the media link is named by the title; the text link composes title and subtitle", () => {
+test("the media link is named by the title; the text link composes title, subtitle and badge", () => {
   assert.match(
     mediaRow,
-    /const textLabel = subtitle \? `\$\{title\}, \$\{subtitle\}` : title;/,
-    "the text link's label composes title and subtitle with the comma separator",
+    /const labelParts = \[title\];\s*if \(subtitle\) labelParts\.push\(subtitle\);\s*if \(badgeLabel\) labelParts\.push\(badgeLabel\);\s*const textLabel = labelParts\.join\(", "\);/,
+    "the text link's label composes title, subtitle, and the caller-supplied badge (#415) with the comma separator, in that order",
   );
   assert.equal(count(mediaRow, "accessibilityLabel: title"), 1, "the web media anchor's label");
   assert.equal(
@@ -78,7 +81,10 @@ test("the media link is named by the title; the text link composes title and sub
 });
 
 test("native hit testing falls through the decorative texts; the action keeps its presses", () => {
-  assert.equal(count(mediaRow, 'pointerEvents={native ? "none" : undefined}'), 2);
+  // Three pointer-transparent natives: the title text, the
+  // subtitle text, and the badge row (#415 — the badge is
+  // display-only, so its row falls through like the texts).
+  assert.equal(count(mediaRow, 'pointerEvents={native ? "none" : undefined}'), 3);
   assert.equal(count(mediaRow, 'pointerEvents={native ? "box-none" : undefined}'), 1);
 });
 

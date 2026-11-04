@@ -8,7 +8,12 @@
  * old rule that the root entry must stay importable in plain
  * Node is superseded by the pages-only contract.
  */
-export { RecipesPage, type RecipesPageItem, type RecipesPageProps } from "./RecipesPage.js";
+export {
+  RecipesPage,
+  type RecipesPageDiscoveryItem,
+  type RecipesPageItem,
+  type RecipesPageProps,
+} from "./RecipesPage.js";
 export {
   DiscoverPage,
   type DiscoverPageFilterId,

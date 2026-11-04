@@ -3,28 +3,34 @@ import type { ReactNode } from "react";
 import { Anchor, View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../components/accessibility.js";
+import { Alert } from "../components/Alert.js";
+import { Badge } from "../components/Badge.js";
 import { Card } from "../components/Card.js";
 import {
   CatalogFiltersBar,
   type CatalogFilterDefinition,
 } from "../components/CatalogFiltersBar.js";
+import { DiscoveryCard } from "../components/DiscoveryCard.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { LinkOverlay } from "../components/linkOverlay.js";
 import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
+import { SectionHeading } from "../components/SectionHeading.js";
 import type { SelectOption } from "../components/SelectField.js";
 import { Text } from "../components/Text.js";
 import { Thumbnail } from "../components/Thumbnail.js";
 import { BoundedList } from "./BoundedList.js";
+import type { DiscoverPageItem } from "./DiscoverPage.js";
 import { useCatalogPagination } from "./useCatalogPagination.js";
 
 /**
- * RecipesPage (#49, pilot): Eciperay's Browse/Recipes screen as a
- * controlled @spudly/ui page component. The app keeps all state and
- * business logic — queries, filter state, mutations, navigation — and
- * drives this view entirely through props: filter values in, change
- * callbacks out, recipe view-models in, press callbacks out. Nothing
- * here imports an app package or fetches anything.
+ * RecipesPage (#49 pilot; unified in #415): Eciperay's single
+ * "Recipes" browse page as a controlled @spudly/ui page
+ * component. The app keeps all state and business logic —
+ * queries, filter state, mutations, navigation — and drives
+ * this view entirely through props: filter values in, change
+ * callbacks out, recipe view-models in, press callbacks out.
+ * Nothing here imports an app package or fetches anything.
  *
  * Placement: page components live in src/pages and are exported
  * from the package root (#298) — pages are the package's only
@@ -33,141 +39,198 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * entry like the apps' own builds; the old rule that the root
  * must stay importable in plain Node is superseded.
  *
- * The composition mirrors the app's RecipesListView (spudly/eciperay
- * packages/app) exactly, including its two layout regressions kept as
- * structural rules:
- * - #188: the list is the shared BoundedList (#119), bounded to the
- *   fixed `list` shell with `flex: 1` — its own styling, owned by
- *   BoundedList — and the filter bar renders as the list's header so
- *   it scrolls with the recipes instead of pinning above a sliver of
- *   list. The list — and therefore the focused filter input — stays
- *   mounted while loading; the spinner renders as the list's empty
- *   state (ListLoadingState). test/recipesPageBoundedList.test.mjs
- *   guards these patterns in source.
- * - #162: search uses the DS SearchField as-is. No lineHeight is set
- *   on any glyph or text in this file — the SearchField's own glyph
- *   box is the containment for that failure (see SearchField.tsx).
+ * Unified browse (#415, companion to eciperay #409): this page
+ * REPLACES the pre-#415 RecipesPage contract (a major change).
+ * One page renders, in order, on one scroll surface:
+ * 1. The user's own material — recipes they created plus
+ *    recipes shared with them — under the caller-supplied
+ *    `ownTitle` heading, with preferred placement (first).
+ * 2. Public discovery content under the caller-supplied
+ *    `discoveryTitle` heading, rendered through the same
+ *    DiscoveryCard DiscoverPage uses, each card a real link to
+ *    the recipe's permalink.
+ * DiscoverPage stays in place untouched; its removal is a
+ * follow-up once the app adopts this page.
  *
- * Per-row accessory slot (`renderRecipeAccessory`): the one place
- * app-rendered content enters the list. The app's cook-log form
- * expands inline under the tapped card (its state and mutation live
- * in the app's RecipeListCard), so the stage-1 contract — a bare
- * `onLogCookPress(id)` callback with rows rendered end to end here —
- * left it nowhere to render. The slot keeps the boundary intact:
- * the view calls the render prop once per row with the row's id and
- * hands the result to the row (MediaRow's `accessory`), which
- * renders it directly under that row's card; returning
+ * ONE search field and ONE filter set cover the unified
+ * collection: the single CatalogFiltersBar in the list header
+ * is the only search/filter UI on the page, and its filter-id
+ * set is the one both predecessor pages already shared. The
+ * page does no searching or filtering computation — the caller
+ * supplies both sections' data already filtered by the one
+ * search/filter state, plus the filter definitions' values and
+ * change callbacks (the bar's data lives in this file, below).
+ *
+ * Section independence: each section carries its own loading /
+ * error / empty state, rendered as rows of the one list. A
+ * failed or empty discovery load never hides the user's own
+ * recipes, and a failed or empty own load never hides discovery
+ * content. When the user has no own/shared recipes, the own
+ * section collapses to its empty state rather than disappearing,
+ * so the layout stays stable (Stephen's plan ruling, #415).
+ * Section titles and empty-state copy are caller-supplied.
+ *
+ * Shared-with-me (#185, reshaped by #415): shared recipes are
+ * no longer a separate screen or a separate section — they
+ * render inside the own section, in the caller's order, and a
+ * shared item is distinguishable by its caller-supplied
+ * `badgeLabel` (see RecipesPageItem), rendered as a badge on
+ * the row and folded into the row's accessible name. Created
+ * recipes simply omit the badge. The #185 shared configuration
+ * (a second host driving this component with shared-only data
+ * and its own empty copy) is retired with the old contract; a
+ * host can still pass the shared screen's copy through
+ * `ownEmptyTitle` / `ownEmptyBody`.
+ *
+ * The composition mirrors the app's RecipesListView (spudly/eciperay
+ * packages/app), including its two layout regressions kept as
+ * structural rules:
+ * - #188: the list is the shared BoundedList (#119), bounded to
+ *   the fixed `list` shell with `flex: 1` — its own styling,
+ *   owned by BoundedList — and the filter bar renders as the
+ *   list's header so it scrolls with the recipes instead of
+ *   pinning above a sliver of list. The list — and therefore
+ *   the focused filter input — stays mounted while either
+ *   section loads; each section's spinner renders as that
+ *   section's row in the list (ListLoadingState), never as a
+ *   tree swap.
+ * - #162: search uses the DS SearchField as-is. No lineHeight
+ *   is set on any glyph or text in this file — the SearchField's
+ *   own glyph box is the containment for that failure (see
+ *   SearchField.tsx).
+ *
+ * Per-row accessory slot (`renderRecipeAccessory`): the one
+ * place app-rendered content enters the list. The app's
+ * cook-log form expands inline under the tapped own-section
+ * card (its state and mutation live in the app's
+ * RecipeListCard), so a bare `onLogCookPress(id)` callback with
+ * rows rendered end to end here would leave it nowhere to
+ * render. The slot keeps the boundary intact: the view calls
+ * the render prop once per own-section row with the row's id
+ * and hands the result to the row (MediaRow's `accessory`),
+ * which renders it directly under that row's card; returning
  * null/undefined renders nothing. When a row's accessory is
  * non-null, that row's log-cook control is hidden — the app
  * reproduces its card's control-hides-while-the-form-is-open
- * behavior purely by what it returns (the form for the open row,
- * null everywhere else). The form itself, its state, and its
- * mutation stay in the app; other rows' controls and the
- * `onLogCookPress` firing semantics are unchanged.
+ * behavior purely by what it returns (the form for the open
+ * row, null everywhere else). The form itself, its state, and
+ * its mutation stay in the app; other rows' controls and the
+ * `onLogCookPress` firing semantics are unchanged. Discovery
+ * rows are public content: they carry no accessory and no
+ * log-cook control.
  *
- * Row actions: the row's only action is logging a cook, and the
- * control is the recipe's rating. A rated recipe renders its stars
- * (see `RecipesPageItem.rating`) and pressing them fires
- * `onLogCookPress`; an unrated recipe renders a single icon-only
- * button — one unfilled star, no text — firing the same callback.
- * Both states are the page-local RatingStars composition's
- * pressable form (bottom of this file). There is deliberately no
- * Delete in the list: deleting a recipe lives on RecipeDetailPage
- * (its `onDeletePress` chip).
+ * Row actions: an own row's only action is logging a cook, and
+ * the control is the recipe's rating. A rated recipe renders
+ * its stars (see `RecipesPageItem.rating`) and pressing them
+ * fires `onLogCookPress`; an unrated recipe renders a single
+ * icon-only button — one unfilled star, no text — firing the
+ * same callback. Both states are the page-local RatingStars
+ * composition's pressable form (bottom of this file). There is
+ * deliberately no Delete in the list: deleting a recipe lives
+ * on RecipeDetailPage (its `onDeletePress` chip).
  *
  * Placement is structural, not cosmetic (Stephen's direction,
- * 2026-10-24, after inspecting PR #120's final narrow baseline):
- * the control renders INLINE inside the text block — in the
- * subtitle's wrapping flow, immediately after the subtitle text —
- * and is never a flex item of the card row. As a trailing row item
- * it still competed with the text block for the row's width and
- * the narrow capture showed the same #205 failure (title wrapping
- * a character at a time while the stars held their width at the
- * row's right edge). Inside the text block the control can only
- * wrap within the block's own full width, below the subtitle it
- * follows; the row keeps exactly two flex children — thumbnail
- * and text block. The page-local MediaRow composition owns
- * that geometry (see its `subtitleAction` slot).
+ * 2026-10-24, after inspecting PR #120's final narrow
+ * baseline): the control renders INLINE inside the text block —
+ * in the subtitle's wrapping flow, immediately after the
+ * subtitle text — and is never a flex item of the card row. As
+ * a trailing row item it still competed with the text block for
+ * the row's width and the narrow capture showed the same #205
+ * failure (title wrapping a character at a time while the stars
+ * held their width at the row's right edge). Inside the text
+ * block the control can only wrap within the block's own full
+ * width, below the subtitle it follows; the row keeps exactly
+ * two flex children — thumbnail and text block. The page-local
+ * MediaRow composition owns that geometry (see its
+ * `subtitleAction` slot).
  *
- * Collapsed filters (#96): the filter bar used to render every
- * filter control at once, and the form filled most of the
- * viewport. Now only the search field and a small "Filters"
- * button render initially. The button opens an add-filter
- * chooser; a filter's control renders only after it has been
- * added, and each added filter carries a Remove control that
- * clears its values (through the same change callbacks) and
- * hides it again. Which filters are added — and whether the
- * chooser is open — are controlled props (`activeFilters`,
- * `filterChooserOpen`, with matching change callbacks) so the
- * app can own the state per the #49 architecture; when the app
- * does not provide them, the view keeps them internally,
- * seeding the added set from any filter that already carries a
- * non-default value so a pre-filtered screen never hides its
- * own active filters.
+ * Collapsed filters (#96): the filter bar renders only the
+ * search field and a small "Filters" button initially. The
+ * button opens an add-filter chooser; a filter's control
+ * renders only after it has been added, and each added filter
+ * carries a Remove control that clears its values (through the
+ * same change callbacks) and hides it again. Which filters are
+ * added — and whether the chooser is open — are controlled
+ * props (`activeFilters`, `filterChooserOpen`, with matching
+ * change callbacks) so the app can own the state per the #49
+ * architecture; when the app does not provide them, the view
+ * keeps them internally, seeding the added set from any filter
+ * that already carries a non-default value so a pre-filtered
+ * screen never hides its own active filters.
  *
- * One list page, two screens (#185): this component is also
- * Eciperay's Shared-with-me screen — SharedWithMePage, the #49
- * sibling port, is consolidated into this page. The shared
- * configuration is a strict subset of this contract: the host
- * passes neither `onLogCookPress` nor `renderRecipeAccessory`,
- * so shared rows stay press-only (the #49 contract — in the app
- * the press opens the recipe's permalink externally), and it
- * passes its own empty-state copy through `emptyTitle` /
- * `emptyBody`, so neither screen's empty message changes. The
- * collapsed filter bar serves both screens; its uncontrolled
- * mode seeds the added set from non-default values, so the
- * shared host adopts it with no new state. Two deliberate
- * unifications ride along (accepted in the #185 decisions):
- * shared rows gain this page's "title, subtitle" accessible
- * label and the `flexBasis: 60` narrow-width row geometry
- * (#205) the shared page's rows lacked.
+ * Pagination: `onLoadMore` is the DISCOVERY section's
+ * continuation — the own section is the caller's complete
+ * collection, so the list's end-reached signal can only mean
+ * "more public recipes". It rides the shared catalog
+ * pagination pattern (useCatalogPagination, #285), gated on
+ * both sections' first loads and on the discovery error state.
  *
  * #119: the page composes design-system components and passes
  * data and callbacks only. The layout it used to hand-style
  * lives in the components it renders: BoundedList (the bounded
  * list, its content inset, the 12px row separation),
  * ListLoadingState (the loading states), CatalogFiltersBar
- * (the shared catalog filter bar — the page supplies its filter
- * definitions as data; the bar owns the control design). The
- * row and its rating control are the page-local MediaRow /
- * RatingStars compositions at the bottom of this file, built
- * from the shared Card / Thumbnail / Text / LinkOverlay
- * components: a tranche page adds no library components
- * (Stephen's rule, 2026-10-29), so single-page compositions
- * live in the page. DiscoverPage renders the same
- * CatalogFiltersBar with its own definitions.
+ * (the shared catalog filter bar — the page supplies its
+ * filter definitions as data; the bar owns the control design),
+ * SectionHeading (the section titles), DiscoveryCard (the
+ * discovery rows). The own row and its rating control are the
+ * page-local MediaRow / RatingStars compositions at the bottom
+ * of this file, built from the shared Card / Thumbnail / Text /
+ * LinkOverlay components: a tranche page adds no library
+ * components (Stephen's rule, 2026-10-29), so single-page
+ * compositions live in the page.
  */
 
-/** One recipe row's view-model. The app formats `subtitle` (its list
- * meta line — servings · time · rating/satiety); the view only
- * renders it. */
+/** One own-section recipe row's view-model. The app formats
+ * `subtitle` (its list meta line — servings · time ·
+ * rating/satiety); the view only renders it. Own-section items
+ * are the user's created recipes and the recipes shared with
+ * them, in the caller's order (preferred placement is the
+ * section's, ordering inside it is the caller's). */
 export type RecipesPageItem = {
   id: string;
   /** The recipe's destination (#248's navigation rule: the row
    * navigates, so it is a link): the host composes it from the
-   * recipe id — in the shared-with-me configuration, the recipe's
+   * recipe id — for a shared-with-me recipe, the recipe's
    * permalink. Both of the row's targets (thumbnail and text
    * block) render as links carrying this href. */
   href: string;
   title: string;
   subtitle?: string;
   /** Display rating, 0–5, or null/absent when the recipe is
-   * unrated. The app computes it by its display-rating rule (the
-   * owner's star rating, else the community average); the view
-   * renders it as the row's log-cook control — a rated recipe's
-   * stars are the control, an unrated recipe gets an icon-only
-   * button — and never formats it into the subtitle, so an app
-   * that passes `rating` keeps the rating text out of `subtitle`. */
+   * unrated. The app computes it by its display-rating rule
+   * (the owner's star rating, else the community average); the
+   * view renders it as the row's log-cook control — a rated
+   * recipe's stars are the control, an unrated recipe gets an
+   * icon-only button — and never formats it into the subtitle,
+   * so an app that passes `rating` keeps the rating text out
+   * of `subtitle`. */
   rating?: number | null;
   imageUrl?: string | null;
+  /** Caller-supplied marker distinguishing this item inside the
+   * own section — the shared-with-me badge (#415): the host
+   * passes its shared label (e.g. "Shared with you") for
+   * recipes someone shared with the user and omits it for
+   * recipes the user created. The view renders it as a badge
+   * on the row and folds it into the row's accessible name; it
+   * never invents the copy or decides which items earn it. */
+  badgeLabel?: string;
 };
+
+/** One discovery-section recipe row's view-model: exactly
+ * DiscoverPage's item (the public catalog's shape — the host
+ * formats `subtitle` and builds the permalink `href`), reused
+ * so the two pages' public rows cannot drift while both exist. */
+export type RecipesPageDiscoveryItem = DiscoverPageItem;
 
 // The filter option sets are this catalog's data, passed to the
 // shared CatalogFiltersBar as filter definitions (the bar owns
 // the control design; option sets and labels are the caller's
 // data — the #311 ruling). Values stay plain strings so no app
 // type leaks into the DS: the app maps its own status/sort
-// unions at the boundary.
+// unions at the boundary. The sets are the ones RecipesPage and
+// DiscoverPage have always shared — the unified page keeps the
+// one set both already used.
 const STATUS_OPTIONS: SelectOption[] = [
   { value: "all", label: "All statuses" },
   { value: "idea", label: "Idea" },
@@ -197,54 +260,95 @@ export type RecipesPageFilterId = "status" | "ingredient" | "calories" | "satiet
 export type RecipesPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
-  /** Recipes to render, already filtered/sorted by the app. */
-  recipes: RecipesPageItem[];
-  /** First-load in flight: the list renders empty with a spinner as
-   * its empty state, and the filter bar stays mounted. */
-  loading: boolean;
-  /** Next page in flight: a spinner renders as the list footer,
-   * and it is the shared pagination pattern's only fetch signal
-   * (see useCatalogPagination, #285): while it is set the
-   * end-reached handler swallows duplicate requests, and when a
-   * fetch completes having added no new visible rows the
-   * pattern re-fires `onLoadMore` so consecutive no-new-rows
+
+  /** The own section's title — caller-supplied copy (e.g. "Your
+   * recipes"), rendered as the section's heading above its
+   * rows. The section always renders, even when it holds no
+   * recipes: it collapses to its empty state, never disappears
+   * (#415). */
+  ownTitle: string;
+  /** The user's own recipes (created + shared-with-me, shared
+   * items carrying `badgeLabel`), already filtered/sorted by
+   * the app under the page's one search/filter state. */
+  ownRecipes: RecipesPageItem[];
+  /** Own section's first load in flight: the section renders
+   * its spinner row; the discovery section is unaffected. */
+  loadingOwn: boolean;
+  /** The own section's failed-load message, composed by the
+   * app; null/absent renders no error state. A failure here
+   * never hides the discovery section. */
+  ownErrorMessage?: string | null;
+  /** Own section's empty-state title, shown when the section
+   * is empty and not loading and has no error. Defaults to the
+   * Recipes screen's "No recipes found.". */
+  ownEmptyTitle?: string;
+  /** Own section's empty-state body shown under
+   * `ownEmptyTitle`. The Recipes screen has none; a host can
+   * pass the shared-with-me screen's second sentence here
+   * (#185's copy survives as caller data). */
+  ownEmptyBody?: string;
+
+  /** The discovery section's title — caller-supplied copy
+   * (e.g. "Discover"), rendered as the section's heading above
+   * its rows. */
+  discoveryTitle: string;
+  /** Public discovery recipes, already filtered/sorted by the
+   * app under the same one search/filter state as the own
+   * section. */
+  discoveryRecipes: RecipesPageDiscoveryItem[];
+  /** Discovery section's first load in flight: the section
+   * renders its spinner row; the own section is unaffected. */
+  loadingDiscovery: boolean;
+  /** The discovery section's failed-load message, composed by
+   * the app; null/absent renders no error state. A failure
+   * here never hides the own section. */
+  discoveryErrorMessage?: string | null;
+  /** Discovery section's empty-state title, shown when the
+   * section is empty and not loading and has no error.
+   * Defaults to the public catalog's "No public recipes match
+   * your search.". */
+  discoveryEmptyTitle?: string;
+  /** Discovery section's empty-state body shown under
+   * `discoveryEmptyTitle`. */
+  discoveryEmptyBody?: string;
+
+  /** Discovery next page in flight: a spinner renders as the
+   * list footer, and it is the shared pagination pattern's only
+   * fetch signal (see useCatalogPagination, #285): while it is
+   * set the end-reached handler swallows duplicate requests,
+   * and when a fetch completes having added no new visible rows
+   * the pattern re-fires `onLoadMore` so consecutive no-new-rows
    * pages cannot stall pagination. A host whose pages can
    * return no new visible rows (e.g. after client-side
    * filtering) should pass it — without it the list keeps plain
    * fire-once-per-content-length end-reached semantics and an
    * empty page cannot re-arm the signal on its own. */
   isFetchingNextPage?: boolean;
-  /** Optional row action, mirroring the app card's log-cook
-   * affordance. "Log cook" is a callback only — the cook-log form
-   * and its mutation stay in the app, which renders them (see
-   * `renderRecipeAccessory`); the view owns the control: the
-   * recipe's stars when it has a rating, a single icon-only button
-   * when it does not. There is no delete callback — deleting a
-   * recipe is a RecipeDetailPage action, not a list action. */
+  /** Optional own-row action, mirroring the app card's log-cook
+   * affordance. "Log cook" is a callback only — the cook-log
+   * form and its mutation stay in the app, which renders them
+   * (see `renderRecipeAccessory`); the view owns the control:
+   * the recipe's stars when it has a rating, a single icon-only
+   * button when it does not. There is no delete callback —
+   * deleting a recipe is a RecipeDetailPage action, not a list
+   * action. Own-section rows only: discovery rows are links. */
   onLogCookPress?: (recipeId: string) => void;
-  /** Optional per-row accessory slot: called once per row with the
-   * row's id; the returned node renders directly under that row's
-   * card, inside the list item. Return null/undefined to render
-   * nothing. When a row's accessory renders non-null content, that
-   * row's log-cook control is hidden — the app returns its inline
-   * cook-log form for the row whose form is open and null elsewhere,
-   * which reproduces the app card's control-hides-while-open
-   * behavior. */
+  /** Optional per-row accessory slot for own-section rows:
+   * called once per own row with the row's id; the returned
+   * node renders directly under that row's card, inside the
+   * list item. Return null/undefined to render nothing. When a
+   * row's accessory renders non-null content, that row's
+   * log-cook control is hidden — the app returns its inline
+   * cook-log form for the row whose form is open and null
+   * elsewhere, which reproduces the app card's
+   * control-hides-while-open behavior. */
   renderRecipeAccessory?: (recipeId: string) => ReactNode;
-  /** Pagination hook, wired to the list's end-reached signal
-   * through the shared catalog pagination pattern
-   * (useCatalogPagination, #285 — the same pattern DiscoverPage
-   * uses, so the two catalogs share one pagination contract). */
+  /** The discovery section's pagination hook, wired to the
+   * list's end-reached signal through the shared catalog
+   * pagination pattern (useCatalogPagination, #285 — the same
+   * pattern DiscoverPage uses, so the catalogs share one
+   * pagination contract). */
   onLoadMore?: () => void;
-  /** Empty-state copy, per screen (#185): the title shown when
-   * the list is empty and not loading. Defaults to the Recipes
-   * screen's "No recipes found."; the Shared-with-me host passes
-   * its own message so consolidation changes no visible copy. */
-  emptyTitle?: string;
-  /** Empty-state body shown under `emptyTitle`. The Recipes
-   * screen has none; the Shared-with-me host passes its second
-   * sentence here. */
-  emptyBody?: string;
 
   search: string;
   onSearchChange: (value: string) => void;
@@ -283,22 +387,76 @@ export type RecipesPageProps = {
 };
 
 /**
- * Full-page recipes-list view — the Recipes/Browse screen and,
- * since #185, the Shared-with-me screen: the filter bar and
- * recipe list in the fixed `list` shell. Controlled — see the
- * file header for the contract and the layout regressions its
+ * The unified list's row model: the one list renders both
+ * sections as a single row sequence — each section's heading,
+ * then either its state row (loading / error / empty) or its
+ * recipe rows. Building the sequence explicitly is what keeps
+ * the sections independent: a section's state replaces only
+ * its own rows, never the other section's.
+ */
+type RecipesPageRow =
+  | { kind: "ownHeading" }
+  | { kind: "ownRecipe"; item: RecipesPageItem }
+  | { kind: "loadingOwn" }
+  | { kind: "ownError"; message: string }
+  | { kind: "ownEmpty" }
+  | { kind: "discoveryHeading" }
+  | { kind: "discoveryRecipe"; item: RecipesPageDiscoveryItem }
+  | { kind: "loadingDiscovery" }
+  | { kind: "discoveryError"; message: string }
+  | { kind: "discoveryEmpty" };
+
+function recipesPageRowKey(row: RecipesPageRow): string {
+  switch (row.kind) {
+    case "ownHeading":
+      return "own-heading";
+    case "ownRecipe":
+      return `own-${row.item.id}`;
+    case "loadingOwn":
+      return "own-loading";
+    case "ownError":
+      return "own-error";
+    case "ownEmpty":
+      return "own-empty";
+    case "discoveryHeading":
+      return "discovery-heading";
+    case "discoveryRecipe":
+      return `discovery-${row.item.id}`;
+    case "loadingDiscovery":
+      return "discovery-loading";
+    case "discoveryError":
+      return "discovery-error";
+    case "discoveryEmpty":
+      return "discovery-empty";
+  }
+}
+
+/**
+ * Full-page unified Recipes browse view (#415): the one filter
+ * bar, the own section (created + shared-with-me, preferred
+ * placement), and the discovery section in the fixed `list`
+ * shell, on one scroll surface. Controlled — see the file
+ * header for the contract and the layout regressions its
  * structure guards.
  */
 export function RecipesPage(props: RecipesPageProps) {
   const {
-    recipes,
-    loading,
+    ownTitle,
+    ownRecipes,
+    loadingOwn,
+    ownErrorMessage = null,
+    ownEmptyTitle = "No recipes found.",
+    ownEmptyBody,
+    discoveryTitle,
+    discoveryRecipes,
+    loadingDiscovery,
+    discoveryErrorMessage = null,
+    discoveryEmptyTitle = "No public recipes match your search.",
+    discoveryEmptyBody,
     isFetchingNextPage = false,
     onLogCookPress,
     onLoadMore,
     renderRecipeAccessory,
-    emptyTitle = "No recipes found.",
-    emptyBody,
     search,
     onSearchChange,
     statusFilter,
@@ -325,25 +483,23 @@ export function RecipesPage(props: RecipesPageProps) {
   } = props;
 
   // Pagination: the shared catalog pattern (#285) — the same
-  // hook DiscoverPage uses. It gates the end-reached handler
-  // during the first load, swallows duplicate requests while a
-  // next-page fetch is in flight, and re-fires onLoadMore when
-  // a fetch completes having added no new visible rows, so
-  // consecutive no-new-rows pages paginate through without a
-  // scroll-away. See useCatalogPagination for the full pattern.
+  // hook DiscoverPage uses. The continuation is the discovery
+  // section's, so the item count is the discovery count and
+  // the mount gate covers both sections' first loads plus the
+  // discovery error state: while any of those shows, the
+  // list's end must not start a page request.
   const { onEndReached, onScroll, onEndReachedThreshold } = useCatalogPagination({
     onLoadMore,
     isFetchingNextPage,
-    itemCount: recipes.length,
-    canPaginate: !loading,
+    itemCount: discoveryRecipes.length,
+    canPaginate: !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,
   });
 
   // The catalog's filter definitions — this page's data in the
   // shared bar's control shapes (see the option sets above).
   // The status filter joins only when the host wires it (value
   // + callback provided, not hidden) — the same condition the
-  // page's own bar carried before the #119 dedupe unified the
-  // two catalogs' bars into CatalogFiltersBar.
+  // predecessor pages' bars carried.
   const catalogFilters: CatalogFilterDefinition<RecipesPageFilterId>[] = [];
   if (
     showStatusFilter !== false &&
@@ -409,6 +565,36 @@ export function RecipesPage(props: RecipesPageProps) {
     },
   );
 
+  // The unified row sequence: own section first (preferred
+  // placement), then discovery. Each section contributes its
+  // heading plus exactly one of — its loading row, its error
+  // row, its empty row, or its recipe rows — so the sections'
+  // states are independent by construction.
+  const rows: RecipesPageRow[] = [{ kind: "ownHeading" }];
+  if (loadingOwn) {
+    rows.push({ kind: "loadingOwn" });
+  } else if (ownErrorMessage) {
+    rows.push({ kind: "ownError", message: ownErrorMessage });
+  } else if (ownRecipes.length === 0) {
+    rows.push({ kind: "ownEmpty" });
+  } else {
+    for (const item of ownRecipes) {
+      rows.push({ kind: "ownRecipe", item });
+    }
+  }
+  rows.push({ kind: "discoveryHeading" });
+  if (loadingDiscovery) {
+    rows.push({ kind: "loadingDiscovery" });
+  } else if (discoveryErrorMessage) {
+    rows.push({ kind: "discoveryError", message: discoveryErrorMessage });
+  } else if (discoveryRecipes.length === 0) {
+    rows.push({ kind: "discoveryEmpty" });
+  } else {
+    for (const item of discoveryRecipes) {
+      rows.push({ kind: "discoveryRecipe", item });
+    }
+  }
+
   return (
     <BigFooterShell footer={props.footer}>
       <ScreenContainer variant="list" scrollable={false}>
@@ -419,16 +605,16 @@ export function RecipesPage(props: RecipesPageProps) {
           // them must land while the keyboard is open instead of being
           // consumed to dismiss it.
           keyboardShouldPersistTaps="handled"
-          data={loading ? [] : recipes}
-          keyExtractor={(recipe) => recipe.id}
+          data={rows}
+          keyExtractor={(row) => recipesPageRowKey(row)}
           // The filters render as the list's header so they scroll
           // together with the recipes (#188). The header sits inside
           // the list's content container, which already supplies the
           // horizontal padding. The list (and therefore the header)
-          // stays mounted while loading — a filter edit flips loading
-          // and a tree swap would unmount the focused filter input
-          // mid-typing; the loading indicator renders as the list's
-          // empty state instead.
+          // stays mounted while either section loads — a filter edit
+          // flips a section's loading flag and a tree swap would
+          // unmount the focused filter input mid-typing; the loading
+          // indicators render as the sections' own rows instead.
           ListHeaderComponent={
             <CatalogFiltersBar
               searchPlaceholder="Search recipes…"
@@ -441,44 +627,90 @@ export function RecipesPage(props: RecipesPageProps) {
               {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
             />
           }
-          renderItem={({ item }) => {
-            const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
-            const hasAccessory = accessory !== null && accessory !== undefined;
-            return (
-              <MediaRow
-                href={item.href}
-                title={item.title}
-                subtitle={item.subtitle}
-                imageUrl={item.imageUrl}
-                subtitleAction={
-                  onLogCookPress && !hasAccessory ? (
-                    <RatingStars
-                      rating={item.rating}
-                      accessibilityLabel={
-                        item.rating !== null && item.rating !== undefined && item.rating > 0
-                          ? `Log a cook of ${item.title}, rated ${item.rating} out of 5 stars`
-                          : `Log a cook of ${item.title}`
-                      }
-                      onPress={() => {
-                        onLogCookPress(item.id);
-                      }}
+          renderItem={({ item: row }) => {
+            switch (row.kind) {
+              case "ownHeading":
+                return (
+                  <YStack paddingBlockEnd="$3">
+                    <SectionHeading>{ownTitle}</SectionHeading>
+                  </YStack>
+                );
+              case "ownRecipe": {
+                const item = row.item;
+                const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
+                const hasAccessory = accessory !== null && accessory !== undefined;
+                return (
+                  <MediaRow
+                    href={item.href}
+                    title={item.title}
+                    subtitle={item.subtitle}
+                    badgeLabel={item.badgeLabel}
+                    imageUrl={item.imageUrl}
+                    subtitleAction={
+                      onLogCookPress && !hasAccessory ? (
+                        <RatingStars
+                          rating={item.rating}
+                          accessibilityLabel={
+                            item.rating !== null && item.rating !== undefined && item.rating > 0
+                              ? `Log a cook of ${item.title}, rated ${item.rating} out of 5 stars`
+                              : `Log a cook of ${item.title}`
+                          }
+                          onPress={() => {
+                            onLogCookPress(item.id);
+                          }}
+                        />
+                      ) : undefined
+                    }
+                    accessory={hasAccessory ? accessory : undefined}
+                  />
+                );
+              }
+              case "loadingOwn":
+                return <ListLoadingState label="Loading" />;
+              case "ownError":
+                return <Alert severity="error">{row.message}</Alert>;
+              case "ownEmpty":
+                return (
+                  <EmptyState
+                    title={ownEmptyTitle}
+                    {...(ownEmptyBody ? { body: ownEmptyBody } : {})}
+                  />
+                );
+              case "discoveryHeading":
+                return (
+                  <YStack paddingBlockEnd="$3">
+                    <SectionHeading>{discoveryTitle}</SectionHeading>
+                  </YStack>
+                );
+              case "discoveryRecipe": {
+                const item = row.item;
+                return (
+                  <YStack paddingBlockEnd="$3">
+                    <DiscoveryCard
+                      title={item.title}
+                      {...(item.subtitle ? { subtitle: item.subtitle } : {})}
+                      imageUrl={item.imageUrl}
+                      href={item.href}
                     />
-                  ) : undefined
-                }
-                accessory={hasAccessory ? accessory : undefined}
-              />
-            );
+                  </YStack>
+                );
+              }
+              case "loadingDiscovery":
+                return <ListLoadingState label="Loading" />;
+              case "discoveryError":
+                return <Alert severity="error">{row.message}</Alert>;
+              case "discoveryEmpty":
+                return (
+                  <EmptyState
+                    title={discoveryEmptyTitle}
+                    {...(discoveryEmptyBody ? { body: discoveryEmptyBody } : {})}
+                  />
+                );
+            }
           }}
           onEndReached={onEndReached}
           onScroll={onScroll}
           onEndReachedThreshold={onEndReachedThreshold}
-          ListEmptyComponent={
-            loading ? (
-              <ListLoadingState label="Loading" />
-            ) : (
-              <EmptyState title={emptyTitle} {...(emptyBody ? { body: emptyBody } : {})} />
-            )
-          }
           ListFooterComponent={
             isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined
           }
@@ -492,10 +724,10 @@ export function RecipesPage(props: RecipesPageProps) {
  * Page-local compositions (Stephen's tranche rule, 2026-10-29):
  * a tranche page adds no library components, so the compositions
  * only this page uses live here, built from the shared
- * components — MediaRow (the list row) and RatingStars (its
- * log-cook control). If another page ever needs either, it
- * graduates to the library through a component-only PR; it is
- * never exported from this file.
+ * components — MediaRow (the own-section list row) and
+ * RatingStars (its log-cook control). If another page ever
+ * needs either, it graduates to the library through a
+ * component-only PR; it is never exported from this file.
  */
 
 // Structural flex only: the card's text block expands and may shrink
@@ -529,6 +761,14 @@ type MediaRowProps = {
    * derives from its Text children and drop the subtitle
    * announcement. */
   subtitle?: string | undefined;
+  /** Optional caller-supplied marker (the item's `badgeLabel` —
+   * the shared-with-me badge, #415): rendered as a Badge under
+   * the subtitle line and folded into the text link's
+   * accessible name after the subtitle, so the row announces
+   * its marker ("Title, Subtitle, Shared with you") instead of
+   * leaving it as unannounced decoration inside a link whose
+   * label overrides its content. */
+  badgeLabel?: string | undefined;
   /** Optional image URL; absent renders the placeholder well. */
   imageUrl?: string | null | undefined;
   /** Optional control rendered inline in the subtitle flow
@@ -546,22 +786,24 @@ type MediaRowProps = {
 };
 
 /**
- * The recipe list's media row: an elevated card holding a 64px
+ * The own section's media row: an elevated card holding a 64px
  * thumbnail (or the placeholder well), the title and optional
+ * subtitle, an optional caller-supplied badge under the
  * subtitle, and an optional accessory after the row. Composed
- * here in the page from the shared Card, Thumbnail, Text, and
- * LinkOverlay components (Stephen's tranche rule, 2026-10-29:
- * single-page compositions live in the page, not the library);
- * the row renderer supplies only domain content (href, title,
- * subtitle, image) and slots (subtitleAction, accessory).
+ * here in the page from the shared Card, Thumbnail, Text,
+ * Badge, and LinkOverlay components (Stephen's tranche rule,
+ * 2026-10-29: single-page compositions live in the page, not
+ * the library); the row renderer supplies only domain content
+ * (href, title, subtitle, badge, image) and slots
+ * (subtitleAction, accessory).
  *
  * Both navigation targets are links carrying the row's href
  * (#248) and an accessible name built from the title: the media
  * target wraps only an image (or an empty placeholder), so
  * without the label a screen reader meets an unidentified link
  * for every row; the text target's label also carries the
- * subtitle when present. A subtitleAction is a third press
- * target nested in the text block's subtitle flow.
+ * subtitle and the badge when present. A subtitleAction is a
+ * third press target nested in the text block's subtitle flow.
  *
  * On native the anchors are Texts and cannot carry these view
  * subtrees (the text block's texts would flow inline and the
@@ -575,7 +817,15 @@ type MediaRowProps = {
  * action stays nested in the subtitle flow and keeps its own
  * presses.
  */
-function MediaRow({ href, title, subtitle, imageUrl, subtitleAction, accessory }: MediaRowProps) {
+function MediaRow({
+  href,
+  title,
+  subtitle,
+  badgeLabel,
+  imageUrl,
+  subtitleAction,
+  accessory,
+}: MediaRowProps) {
   // The native rendering (`native` true) makes two adjustments
   // for the text frame's LinkOverlay: the visible texts are
   // decorative for accessibility (the overlay's composed label
@@ -583,7 +833,8 @@ function MediaRow({ href, title, subtitle, imageUrl, subtitleAction, accessory }
   // hit testing falls through them to the overlay beneath,
   // while the subtitle action — which keeps the default pointer
   // events inside the box-none flow — still takes its own
-  // presses.
+  // presses. The badge is display-only, so its row is
+  // pointer-transparent on native for the same reason.
   const renderTextContent = (native: boolean) => (
     <>
       <Text
@@ -624,6 +875,11 @@ function MediaRow({ href, title, subtitle, imageUrl, subtitleAction, accessory }
           {subtitleAction}
         </XStack>
       ) : null}
+      {badgeLabel ? (
+        <XStack paddingTop="$1" pointerEvents={native ? "none" : undefined}>
+          <Badge tone="info">{badgeLabel}</Badge>
+        </XStack>
+      ) : null}
     </>
   );
   const textContent = renderTextContent(false);
@@ -637,7 +893,10 @@ function MediaRow({ href, title, subtitle, imageUrl, subtitleAction, accessory }
       backgroundColor={tokens.colors.gray.gray2}
     />
   );
-  const textLabel = subtitle ? `${title}, ${subtitle}` : title;
+  const labelParts = [title];
+  if (subtitle) labelParts.push(subtitle);
+  if (badgeLabel) labelParts.push(badgeLabel);
+  const textLabel = labelParts.join(", ");
   return (
     <>
       <YStack paddingBlockEnd="$3">

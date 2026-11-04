@@ -1288,48 +1288,60 @@ changeset naming MemorizeSettingsPage.
 
 Open in `Pages/Eciperay/RecipesPage`: Default, Filtered, Empty,
 Loading, LoadingMore, FilterChooserOpen, WithFiltersAdded,
-ExpandedAccessory — and the Shared-with-me configuration (#185):
-SharedDefault, SharedFiltered, SharedEmpty, SharedLoading.
+ExpandedAccessory, OwnOnly, DiscoveryOnly, DiscoveryError.
+
+Since #415 this is the unified "Recipes" browse: the user's own
+material (created + shared-with-me) first under its heading,
+then public discovery content under its heading, on one scroll
+surface with ONE search field and ONE filter set above both
+sections.
 
 1. The **Filters button is exactly as tall as the search field**
-   beside it — top and bottom edges align.
+   beside it — top and bottom edges align. There is exactly
+   **one** search field and one Filters button on the page,
+   above both section headings.
 2. FilterChooserOpen shows only the collapsed filter affordance by
    default (no full filter panel) until filters are added in
-   WithFiltersAdded.
-3. Empty and Loading render their states centered in the page frame
-   with no leftover list chrome.
-4. SharedDefault: the shared configuration shows the **same
-   collapsed filter bar** (search + Filters button, no always-visible
-   filter panel) and its rows are **press-only** — no star/log-cook
-   control on any row.
-5. SharedEmpty shows the shared screen's own empty message —
-   "Recipes others share with you will appear here." with its
-   second sentence — **not** "No recipes found."; the Recipes
-   configuration's Empty still shows "No recipes found."
-6. SharedFiltered lists the two matching rows, Creamy Tuscan
-   Garlic Chicken and Chicken Tikka Masala, below the collapsed
-   filter bar. SharedLoading shows the spinner centered below the
-   filter bar with no recipe rows, like the Recipes configuration's
-   Loading state.
-7. LoadingMore keeps the recipe rows rendered with the footer
+   WithFiltersAdded. Filtered ("chicken") narrows BOTH sections
+   with the one search: the own section lists its matching rows
+   and the discovery section lists its matching card.
+3. Default: own rows render first under "Your recipes", then
+   discovery cards under "Discover" (preferred placement). The
+   shared-with-me rows (Arroz con Pollo, Fudgy Brownies) carry
+   the caller-supplied **"Shared with you" badge** under their
+   subtitle; created rows carry no badge.
+4. Section independence: DiscoveryOnly shows the own section
+   collapsed to its empty state ("No recipes found.") under its
+   heading — the section does **not** disappear — with the
+   discovery cards below it; OwnOnly shows the discovery
+   section's empty state ("No public recipes match your
+   search.") under its heading with the own rows above it;
+   DiscoveryError shows the discovery error alert while the own
+   rows above it render untouched.
+5. Empty shows both sections' empty states under their
+   headings; Loading shows a spinner row under each heading
+   with no recipe rows in either section.
+6. LoadingMore keeps the recipe rows rendered with the footer
    spinner below them (the next-page-in-flight state,
    `isFetchingNextPage`), like DiscoverPage's LoadingMore story.
-8. Rows: each row is an elevated card with a 64px cover-cropped
+7. Rows: each own row is an elevated card with a 64px cover-cropped
    thumbnail (or the gray placeholder well when the recipe has
    no image), a semibold title, and a hint subtitle. Both the
    thumbnail and the text are links to the recipe — the card
-   itself is not pressable. At a narrow width the text block
-   wraps under the thumbnail rather than collapsing beside it
-   (the 60dp basis). ExpandedAccessory shows the accessory
-   content under the card inside the same list item, 12px
-   below it.
-9. Log-cook control: a rated row's stars are one button with a
-   44dp target, filled by rounding (a 4.5 rating shows five
-   amber stars), named "Log a cook of <title>, rated <N> out
-   of 5 stars"; an unrated row shows a single gray star as the
-   button, named "Log a cook of <title>". The control flows
-   inline after the subtitle text, never as a trailing row
-   item, and it hides on the row whose accessory is open.
+   itself is not pressable. Discovery rows are DiscoveryCards,
+   each a real link to the recipe's permalink. At a narrow
+   width the text block wraps under the thumbnail rather than
+   collapsing beside it (the 60dp basis). ExpandedAccessory
+   shows the accessory content under the card inside the same
+   list item, 12px below it.
+8. Log-cook control (own rows only; discovery cards have none):
+   a rated row's stars are one button with a 44dp target,
+   filled by rounding (a 4.5 rating shows five amber stars),
+   named "Log a cook of <title>, rated <N> out of 5 stars"; an
+   unrated row shows a single gray star as the button, named
+   "Log a cook of <title>". The control flows inline after the
+   subtitle text, never as a trailing row item, and it hides
+   on the row whose accessory is open.
 
 **Run when:** `src/pages/RecipesPage.tsx` (including its
 page-local row and log-cook control compositions), its

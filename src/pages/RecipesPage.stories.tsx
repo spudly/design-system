@@ -3,22 +3,31 @@ import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../components/Text.js";
 import { View } from "tamagui";
-import { RecipesPage, type RecipesPageFilterId, type RecipesPageItem } from "./RecipesPage.js";
+import {
+  RecipesPage,
+  type RecipesPageDiscoveryItem,
+  type RecipesPageFilterId,
+  type RecipesPageItem,
+} from "./RecipesPage.js";
 import { tokens } from "../tokens/index.js";
 
 /**
- * Stories for the real RecipesPage component (#49 pilot) — not a
- * made-up page composition: this renders the same component the
- * Eciperay app will consume, driven by fixture props. It succeeds
- * the Recipes browse demo in Pages/Eciperay (#44), whose fixtures
- * below mirror that demo's data; the #44 demos are retired
- * (#185) and these stories are the spec.
+ * Stories for the real unified RecipesPage component (#415) —
+ * not a made-up page composition: this renders the same
+ * component the Eciperay app will consume for its single
+ * "Recipes" browse, driven by fixture props. The page renders
+ * the user's own material (created + shared-with-me, shared
+ * items carrying their caller-supplied badge) first, then
+ * public discovery content, under ONE search/filter bar.
  *
- * The Shared* stories carry the Shared-with-me configuration of
- * the same component (#185 — SharedWithMePage is consolidated
- * into RecipesPage): press-only rows (no log-cook control, no
- * accessory slot) and the shared screen's own empty-state copy,
- * succeeding SharedWithMePage.stories.tsx and its four states.
+ * The own-section fixtures below mirror the retired #44 browse
+ * demo's data; the discovery fixtures mirror DiscoverPage's
+ * stories (the app's composed "By {author} · {rating} ·
+ * {satiety}" subtitle and the permalink href shape). The
+ * Shared* stories of the #185 consolidation are retired with
+ * that contract: shared-with-me is no longer a separate
+ * configuration of this page — it is the badged items inside
+ * Default's own section.
  *
  * The frame differs from the Pages PageFrame on purpose: PageFrame
  * leaves height unbounded so the story canvas owns it, but a real
@@ -49,7 +58,10 @@ function Viewport({ children }: { children: ReactNode }) {
 // app passes its display rating; the subtitle stays rating-free.
 // The mix is deliberate: rated rows render their stars as the
 // log-cook control, unrated rows (Arroz con Pollo, Beef Chili)
-// render the icon-only button.
+// render the icon-only button. Two rows (Arroz con Pollo, Fudgy
+// Brownies) carry the caller-supplied shared-with-me badge —
+// they are the recipes someone shared with the user; the rest
+// are the user's own creations and carry no badge.
 const recipeItems: RecipesPageItem[] = [
   {
     id: "tuscan-chicken",
@@ -70,6 +82,7 @@ const recipeItems: RecipesPageItem[] = [
     href: "/recipes/arroz-con-pollo",
     title: "Arroz con Pollo",
     subtitle: "8 servings · 50 min · Satiety 68",
+    badgeLabel: "Shared with you",
   },
   {
     id: "fudgy-brownies",
@@ -77,6 +90,7 @@ const recipeItems: RecipesPageItem[] = [
     title: "Fudgy Brownies",
     subtitle: "12 servings · 35 min · Satiety 40",
     rating: 3,
+    badgeLabel: "Shared with you",
   },
   {
     id: "chicken-tikka",
@@ -100,18 +114,62 @@ const recipeItems: RecipesPageItem[] = [
   },
 ];
 
+// The discovery section's fixtures: DiscoverPage's story items,
+// unchanged — the public catalog's composed subtitle line and
+// permalink hrefs.
+const discoveryItems: RecipesPageDiscoveryItem[] = [
+  {
+    id: "tuscan-chicken",
+    title: "Creamy Tuscan Garlic Chicken",
+    subtitle: "By Maria · ★ 4.5 · Satiety 60",
+    href: "/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken",
+  },
+  {
+    id: "stuffed-peppers",
+    title: "Classic Stuffed Peppers",
+    subtitle: "By Anonymous · ★ 5 · Satiety 72",
+    href: "/recipe/stuffed-peppers/classic-stuffed-peppers",
+  },
+  {
+    id: "arroz-con-pollo",
+    title: "Arroz con Pollo",
+    subtitle: "By Diego · ★ 4 · Satiety 68",
+    href: "/recipe/arroz-con-pollo/arroz-con-pollo",
+  },
+  {
+    id: "fudgy-brownies",
+    title: "Fudgy Brownies",
+    subtitle: "By Priya · ★ 3.5 · Satiety 40",
+    href: "/recipe/fudgy-brownies/fudgy-brownies",
+  },
+  {
+    id: "beef-chili",
+    title: "Beef Chili",
+    subtitle: "By Sam · ★ 4 · Satiety 75",
+    href: "/recipe/beef-chili/beef-chili",
+  },
+];
+
 function RecipesPageDemo({
   initialSearch = "",
-  recipes = recipeItems,
-  loading = false,
+  ownRecipes = recipeItems,
+  discoveryRecipes = discoveryItems,
+  loadingOwn = false,
+  loadingDiscovery = false,
+  ownErrorMessage = null,
+  discoveryErrorMessage = null,
   isFetchingNextPage = false,
   expandedRecipeId,
   initialActiveFilters,
   initialFilterChooserOpen = false,
 }: {
   initialSearch?: string;
-  recipes?: RecipesPageItem[];
-  loading?: boolean;
+  ownRecipes?: RecipesPageItem[];
+  discoveryRecipes?: RecipesPageDiscoveryItem[];
+  loadingOwn?: boolean;
+  loadingDiscovery?: boolean;
+  ownErrorMessage?: string | null;
+  discoveryErrorMessage?: string | null;
   isFetchingNextPage?: boolean;
   expandedRecipeId?: string;
   initialActiveFilters?: RecipesPageFilterId[];
@@ -132,10 +190,14 @@ function RecipesPageDemo({
   const [activeFilters, setActiveFilters] = useState(initialActiveFilters ?? []);
   const [filterChooserOpen, setFilterChooserOpen] = useState(initialFilterChooserOpen);
 
-  // The app filters server-side; the demo filters its fixtures by the
-  // search text so the filtered state is honest about what the app
-  // would pass back.
-  const visible = recipes.filter((recipe) =>
+  // The app filters server-side; the demo filters BOTH sections'
+  // fixtures by the one search text so the filtered state is
+  // honest about what the app would pass back for the unified
+  // collection.
+  const visibleOwn = ownRecipes.filter((recipe) =>
+    recipe.title.toLowerCase().includes(search.toLowerCase()),
+  );
+  const visibleDiscovery = discoveryRecipes.filter((recipe) =>
     recipe.title.toLowerCase().includes(search.toLowerCase()),
   );
 
@@ -143,8 +205,14 @@ function RecipesPageDemo({
     <Viewport>
       <RecipesPage
         footer={eciperayFooterFixture}
-        recipes={visible}
-        loading={loading}
+        ownTitle="Your recipes"
+        ownRecipes={visibleOwn}
+        loadingOwn={loadingOwn}
+        ownErrorMessage={ownErrorMessage}
+        discoveryTitle="Discover"
+        discoveryRecipes={visibleDiscovery}
+        loadingDiscovery={loadingDiscovery}
+        discoveryErrorMessage={discoveryErrorMessage}
         isFetchingNextPage={isFetchingNextPage}
         onLogCookPress={() => undefined}
         {...(expandedRecipeId
@@ -198,6 +266,9 @@ function RecipesPageDemo({
 }
 
 export const Default: Story = {
+  // The populated unified page: own + shared (badged) recipes
+  // first under "Your recipes", then public discovery content
+  // under "Discover", one search/filter bar above both.
   render: () => <RecipesPageDemo />,
 };
 
@@ -206,17 +277,22 @@ export const Filtered: Story = {
 };
 
 export const Empty: Story = {
+  // Both sections empty: each collapses to its own empty state
+  // under its heading — the own section does not disappear.
   render: () => <RecipesPageDemo initialSearch="quiche" />,
 };
 
 export const Loading: Story = {
-  render: () => <RecipesPageDemo loading recipes={[]} />,
+  render: () => (
+    <RecipesPageDemo loadingOwn loadingDiscovery ownRecipes={[]} discoveryRecipes={[]} />
+  ),
 };
 
 export const LoadingMore: Story = {
   // The pagination-in-flight state (#292): rows stay rendered and
-  // the footer spinner shows below them while the next page loads —
-  // the DiscoverPage LoadingMore story's counterpart.
+  // the footer spinner shows below them while the discovery
+  // section's next page loads — the DiscoverPage LoadingMore
+  // story's counterpart.
   render: () => <RecipesPageDemo isFetchingNextPage />,
 };
 
@@ -241,131 +317,27 @@ export const ExpandedAccessory: Story = {
   render: () => <RecipesPageDemo expandedRecipeId="tuscan-chicken" />,
 };
 
-// The Shared-with-me configuration's fixtures: the old
-// SharedWithMePage stories' items, unchanged. No ratings — the
-// shared screen's rows are links, so no rating ever renders.
-const sharedItems: RecipesPageItem[] = [
-  {
-    id: "arroz-con-pollo",
-    href: "/recipes/arroz-con-pollo",
-    title: "Arroz con Pollo",
-    subtitle: "8 servings · 50 min · Satiety 68",
-  },
-  {
-    id: "fudgy-brownies",
-    href: "/recipes/fudgy-brownies",
-    title: "Fudgy Brownies",
-    subtitle: "12 servings · 35 min · Satiety 40",
-  },
-  {
-    id: "banana-bread",
-    href: "/recipes/banana-bread",
-    title: "Banana Bread",
-    subtitle: "10 servings · 60 min · Satiety 55",
-  },
-  {
-    id: "tuscan-chicken",
-    href: "/recipes/tuscan-chicken",
-    title: "Creamy Tuscan Garlic Chicken",
-    subtitle: "4 servings · 30 min · Satiety 60",
-  },
-  {
-    id: "beef-chili",
-    href: "/recipes/beef-chili",
-    title: "Beef Chili",
-    subtitle: "6 servings · 60 min · Satiety 75",
-  },
-  {
-    id: "stuffed-peppers",
-    href: "/recipes/stuffed-peppers",
-    title: "Classic Stuffed Peppers",
-    subtitle: "6 servings · 45 min · Satiety 72",
-  },
-  {
-    id: "chicken-tikka",
-    href: "/recipes/chicken-tikka",
-    title: "Chicken Tikka Masala",
-    subtitle: "4 servings · 40 min · Satiety 64",
-  },
-];
-
-/**
- * The Shared-with-me configuration (#185): the same component with
- * the shared host's contract — no `onLogCookPress` and no
- * `renderRecipeAccessory` (link rows), the shared screen's
- * empty-state copy, and the collapsed filter bar left uncontrolled
- * (no `activeFilters` / `filterChooserOpen` props), the way the
- * SharedWithMe host adopts it with no new state.
- */
-function SharedRecipesPageDemo({
-  initialSearch = "",
-  recipes = sharedItems,
-  loading = false,
-}: {
-  initialSearch?: string;
-  recipes?: RecipesPageItem[];
-  loading?: boolean;
-}) {
-  const [search, setSearch] = useState(initialSearch);
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [ingredient, setIngredient] = useState("");
-  const [minCalories, setMinCalories] = useState("");
-  const [maxCalories, setMaxCalories] = useState("");
-  const [minSatiety, setMinSatiety] = useState("");
-  const [maxSatiety, setMaxSatiety] = useState("");
-  const [sort, setSort] = useState("newest");
-  const [sortDir, setSortDir] = useState("desc");
-
-  // The app filters server-side; the demo filters its fixtures by
-  // the search text so the filtered state is honest about what the
-  // app would pass back.
-  const visible = recipes.filter((recipe) =>
-    recipe.title.toLowerCase().includes(search.toLowerCase()),
-  );
-
-  return (
-    <Viewport>
-      <RecipesPage
-        footer={eciperayFooterFixture}
-        recipes={visible}
-        loading={loading}
-        emptyTitle="Recipes others share with you will appear here."
-        emptyBody="Open a share link while signed in to save recipes to this list."
-        search={search}
-        onSearchChange={setSearch}
-        statusFilter={statusFilter}
-        onStatusFilterChange={setStatusFilter}
-        ingredient={ingredient}
-        onIngredientChange={setIngredient}
-        minCalories={minCalories}
-        onMinCaloriesChange={setMinCalories}
-        maxCalories={maxCalories}
-        onMaxCaloriesChange={setMaxCalories}
-        minSatiety={minSatiety}
-        onMinSatietyChange={setMinSatiety}
-        maxSatiety={maxSatiety}
-        onMaxSatietyChange={setMaxSatiety}
-        sort={sort}
-        onSortChange={setSort}
-        sortDir={sortDir}
-        onSortDirChange={setSortDir}
-      />
-    </Viewport>
-  );
-}
-
-export const SharedDefault: Story = {
-  render: () => <SharedRecipesPageDemo />,
+export const OwnOnly: Story = {
+  // Own material only: the discovery section collapses to its
+  // empty state under its heading; the own rows render above it.
+  render: () => <RecipesPageDemo discoveryRecipes={[]} />,
 };
 
-export const SharedFiltered: Story = {
-  render: () => <SharedRecipesPageDemo initialSearch="chicken" />,
+export const DiscoveryOnly: Story = {
+  // Discovery only (the user has no own/shared recipes yet): the
+  // own section collapses to its empty state rather than
+  // disappearing, and the public content renders below it.
+  render: () => <RecipesPageDemo ownRecipes={[]} />,
 };
 
-export const SharedEmpty: Story = {
-  render: () => <SharedRecipesPageDemo initialSearch="quiche" />,
-};
-
-export const SharedLoading: Story = {
-  render: () => <SharedRecipesPageDemo loading recipes={[]} />,
+export const DiscoveryError: Story = {
+  // Section independence: the discovery load failed, so its
+  // section shows the error alert — the user's own recipes
+  // above it render untouched.
+  render: () => (
+    <RecipesPageDemo
+      discoveryRecipes={[]}
+      discoveryErrorMessage="We couldn't load public recipes. Check your connection and try again."
+    />
+  ),
 };
