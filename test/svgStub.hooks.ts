@@ -8,7 +8,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const stubUrl = pathToFileURL(
-  join(dirname(fileURLToPath(import.meta.url)), "stubs", "reactNativeSvg.js"),
+  join(dirname(fileURLToPath(import.meta.url)), "stubs", "reactNativeSvg.ts"),
 ).href;
 
 type NextResolve = (

@@ -109,7 +109,7 @@ test("no other source file adds a landmark role — no duplicates inside the fra
     return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) return files(path);
-      return /\.tsx?$/.test(entry.name) ? [path] : [];
+      return /\.tsx?$/.test(entry.name) && !entry.name.endsWith(".test.ts") ? [path] : [];
     });
   }
   for (const file of files(srcDir)) {
