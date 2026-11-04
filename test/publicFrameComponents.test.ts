@@ -68,10 +68,22 @@ test("BrandLink is a real anchor carrying the href, in the wordmark treatment", 
 test("PublicFrameLayout owns the shell and the wide centered column", () => {
   assert.match(layout, /export const COLUMN_MAX_WIDTH = 768;/);
   assert.match(layout, /<YStack flex=\{1\} backgroundColor="\$background">/);
+  // Bounded content region (PR #413 review): the content column
+  // carries an intrinsic flex basis (grow 1 / shrink 1 / basis
+  // "auto", the BigFooterShell pattern), not a plain flex={1} —
+  // with a zero basis a native footer taller than the remaining
+  // space could leave the page content with no usable viewport.
+  // This is a shape pin, as in test/bigFooter.test.ts: no JS
+  // renderer in this repo performs native (Yoga) layout, so a
+  // rendered native-viewport check is not available here.
   assert.match(
     layout,
-    /<View flex=\{1\} width="100%" maxWidth=\{COLUMN_MAX_WIDTH\} alignSelf="center" \{\.\.\.mainRoleProps\}>/,
+    /<View\s+flexGrow=\{1\}\s+flexShrink=\{1\}\s+flexBasis="auto"\s+width="100%"\s+maxWidth=\{COLUMN_MAX_WIDTH\}\s+alignSelf="center"\s+\{\.\.\.mainRoleProps\}\s*>/,
     "the content column is the wide centered column and the page's main landmark (#366)",
+  );
+  assert.ok(
+    !/<View flex=\{1\}/.test(layout),
+    "the content column must not use a plain flex={1} (zero basis)",
   );
   assert.match(layout, /header: ReactNode;/);
   assert.match(layout, /footer: ReactNode;/);

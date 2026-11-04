@@ -57,12 +57,31 @@ export type PublicFrameLayoutProps = {
  * reachable there. The scroll region wraps ONLY the footer —
  * the header and the page content keep their existing layout
  * and scroll behavior.
+ *
+ * Bounded content region (CodeRabbit review, PR #413): the
+ * content column is a flex region with an intrinsic basis
+ * (flexGrow 1 / flexShrink 1 / flexBasis "auto") — the same
+ * shape as BigFooterShell's content region. With a zero basis
+ * (a plain `flex={1}`) a native footer taller than the space
+ * left after the header could consume the available height
+ * and leave the page content with no usable viewport, while
+ * "auto" lets the content region participate in the shrink
+ * allocation alongside the footer ScrollView (which starts
+ * from its intrinsic height) and preserve a content viewport.
  */
 export function PublicFrameLayout({ header, footer, children }: PublicFrameLayoutProps) {
   return (
     <YStack flex={1} backgroundColor="$background">
       {header}
-      <View flex={1} width="100%" maxWidth={COLUMN_MAX_WIDTH} alignSelf="center" {...mainRoleProps}>
+      <View
+        flexGrow={1}
+        flexShrink={1}
+        flexBasis="auto"
+        width="100%"
+        maxWidth={COLUMN_MAX_WIDTH}
+        alignSelf="center"
+        {...mainRoleProps}
+      >
         {children}
       </View>
       {isWeb ? (
