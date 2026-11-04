@@ -57,17 +57,31 @@ import java.util.concurrent.TimeUnit
  * different points of the same fade. So the module draws, waits
  * 400ms (past the 300ms fade), and draws again, repeating until
  * two consecutive draws are pixel-identical — a frame is settled
- * only when drawing it again changes nothing. The waits are
- * Handler.postDelayed, never a sleep on the UI thread: sleeping
- * there would freeze the fade animator itself and make a
- * mid-fade frame look (falsely) settled. Perpetually animated
- * stories never settle; the cap below bounds them to the last
- * draw, which is exactly the old single-draw behaviour.
+ * only when drawing it again changes nothing. The match must
+ * also span at least 1000ms from the first draw: two early draws
+ * could match pre-decode (both showing the image's empty well)
+ * and settle on a frame the decoded image later replaces. Story
+ * images are inline data URIs by repo rule (#352 — nothing is
+ * fetched), so decode is local work with room to land inside
+ * that span. The waits are Handler.postDelayed, never a sleep on
+ * the UI thread: sleeping there would freeze the fade animator
+ * itself and make a mid-fade frame look (falsely) settled.
+ * Perpetually animated stories never settle; the cap below
+ * bounds them to the last draw, which is exactly the old
+ * single-draw behaviour.
  */
 class DsvrCaptureModule : Module() {
   companion object {
     /** Past React Native's 300ms image fade; see the class doc. */
     private const val SETTLE_INTERVAL_MS = 400L
+    /** A match only counts once the draws span at least this
+     * long from the first draw: two early draws could match
+     * pre-decode (both showing the image's empty well) and settle
+     * on a frame the image later replaces. Story images are
+     * inline data URIs by repo rule (issue #352 — no network), so
+     * decode is local work; this span gives it room to land
+     * before a match is believed. See the class doc. */
+    private const val MIN_SETTLE_SPAN_MS = 1000L
     /** Max draws per capture (1 first draw + 5 re-draws). */
     private const val MAX_SETTLE_DRAWS = 6
   }
@@ -84,12 +98,15 @@ class DsvrCaptureModule : Module() {
       val stepper = object : Runnable {
         var prev: Bitmap? = null
         var draws = 0
+        var firstDrawAt = 0L
 
         override fun run() {
           try {
             val frame = drawFrame()
             draws++
-            val settled = prev != null && bitmapsEqual(prev!!, frame.bitmap)
+            if (draws == 1) firstDrawAt = System.currentTimeMillis()
+            val spanned = System.currentTimeMillis() - firstDrawAt >= MIN_SETTLE_SPAN_MS
+            val settled = spanned && prev != null && bitmapsEqual(prev!!, frame.bitmap)
             if (settled || draws >= MAX_SETTLE_DRAWS) {
               prev?.recycle()
               result = writeResult(fileName, frame, draws, started)
@@ -116,16 +133,10 @@ class DsvrCaptureModule : Module() {
     }
   }
 
-  /** True when two drawn frames are pixel-identical. */
-  private fun bitmapsEqual(a: Bitmap, b: Bitmap): Boolean {
-    if (a.width != b.width || a.height != b.height) return false
-    val size = a.width * a.height
-    val pixelsA = IntArray(size)
-    val pixelsB = IntArray(size)
-    a.getPixels(pixelsA, 0, a.width, 0, 0, a.width, a.height)
-    b.getPixels(pixelsB, 0, b.width, 0, 0, b.width, b.height)
-    return pixelsA.contentEquals(pixelsB)
-  }
+  /** True when two drawn frames are pixel-identical. Bitmap.sameAs
+   * compares natively — materializing both frames as IntArrays
+   * would cost ~45MB of heap on a tall page frame. */
+  private fun bitmapsEqual(a: Bitmap, b: Bitmap): Boolean = a.sameAs(b)
 
   /** The React root view: the largest child of the activity's
    * android:id/content frame. Null when the frame cannot be found. */

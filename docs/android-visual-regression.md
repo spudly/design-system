@@ -157,10 +157,15 @@ FALLBACK` line. There is no silent fallback to screencap for
   second, the diff confined to the hero-image band. The module
   therefore draws repeatedly (400ms apart, on the UI thread's
   Handler so animations keep running between draws) until two
-  consecutive draws are pixel-identical, and only that settled
-  frame is written; the APPCAP line reports the draw count as
-  `settle=<n>`. A story that never settles (perpetual animation)
-  is capped at 6 draws and the last draw is used, as before.
+  consecutive draws are pixel-identical — and the match only
+  counts once the draws span at least 1000ms from the first
+  draw, so two pre-decode draws (both showing the image's empty
+  well) cannot settle a frame the decoded image later replaces
+  (story images are inline, so decode is local work with room
+  to land inside the span). Only that settled frame is written;
+  the APPCAP line reports the draw count as `settle=<n>`. A
+  story that never settles (perpetual animation) is capped at
+  6 draws and the last draw is used, as before.
 - **FlatList caveat**: pages rendered with a virtualized list
   only mount the rows near the viewport (React Native's default
   `initialNumToRender` is 10), and unrendered rows exist only as
