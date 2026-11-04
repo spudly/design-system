@@ -52,8 +52,12 @@ import { RecipesPage } from "@spudly/ui";
 // Pages are controlled components: the app keeps all state and
 // business logic and drives the page entirely through props.
 <RecipesPage
-  recipes={recipes}
-  loading={loading}
+  ownTitle="Your recipes"
+  ownRecipes={ownRecipes}
+  loadingOwn={loadingOwn}
+  discoveryTitle="Discover"
+  discoveryRecipes={discoveryRecipes}
+  loadingDiscovery={loadingDiscovery}
   // …the rest of the page's props: filter values in, change
   // callbacks out, press callbacks out
 />;

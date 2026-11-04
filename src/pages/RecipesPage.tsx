@@ -876,7 +876,12 @@ function MediaRow({
         </XStack>
       ) : null}
       {badgeLabel ? (
-        <XStack paddingTop="$1" pointerEvents={native ? "none" : undefined}>
+        <XStack
+          paddingTop="$1"
+          accessible={native ? false : undefined}
+          importantForAccessibility={native ? "no-hide-descendants" : undefined}
+          pointerEvents={native ? "none" : undefined}
+        >
           <Badge tone="info">{badgeLabel}</Badge>
         </XStack>
       ) : null}
