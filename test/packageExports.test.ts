@@ -1,19 +1,24 @@
 /**
- * Export-surface contract test for spudly/design-system#298
- * (Stephen's decision, 2026-11-03): the package exports page
- * components only.
+ * Export-surface contract test for spudly/design-system#298 as
+ * amended by spudly/design-system#411 (Stephen's amendment,
+ * 2026-11-03): the package exports page components, plus the
+ * minimal theme/config surface the consumer apps build on.
  *
  * The contract:
  * 1. package.json has exactly one export, the root "." — no
  *    "./pages", "./icons", or any other subpath.
  * 2. The root entry (src/index.ts → dist/index.js) re-exports the
- *    pages barrel and nothing else: no widget components, no
- *    icons, no composite (form) components, and no tokens,
- *    themes, tag colors, or Tamagui config factories.
- * 3. The public surface (the pages barrel's export names, which
- *    the root re-exports verbatim) contains none of the internal
- *    barrels' export names (components / icons / tokens / themes
- *    / tamagui.config) — those modules stay in the repo as
+ *    pages barrel and exactly the #411 additions beside it:
+ *    the brand themes (`baseTheme`, `eciperayTheme`,
+ *    `memorizeTheme`) and their types (`Theme`, `SemanticColors`,
+ *    `EciperayTheme`, `MemorizeTheme`) from src/themes/;
+ *    `createTamaguiConfig` from src/tamagui.config.ts; and
+ *    `ChunkErrorBoundary` with its prop/state types from
+ *    src/components/ChunkErrorBoundary.tsx.
+ * 3. Nothing else is on the public surface: no other widget
+ *    components, no icons, no composite (form) components, and
+ *    no tokens, tag colors, Storybook config factories, or other
+ *    Tamagui config helpers — those modules stay in the repo as
  *    internal building blocks, reachable by relative path from
  *    this repo's own pages, Storybook apps, and tests, but they
  *    are not exported from the package anywhere.
@@ -46,7 +51,7 @@ function readJson(rel: string) {
 /** Every name a barrel module exports: `export { a, type B }` lists plus `export const/function/type` declarations. */
 function exportNames(code: string): Set<string> {
   const names = new Set<string>();
-  for (const match of code.matchAll(/export\s+(?:declare\s+)?\{([^}]*)\}/g)) {
+  for (const match of code.matchAll(/export\s+(?:declare\s+)?(?:type\s+)?\{([^}]*)\}/g)) {
     for (const part of match[1]!.split(",")) {
       const name = part
         .trim()
@@ -65,7 +70,41 @@ function exportNames(code: string): Set<string> {
   return names;
 }
 
+/** Every module specifier a file re-exports from (`export ... from "<specifier>"`). */
+function exportSpecifiers(code: string): Set<string> {
+  const specifiers = new Set<string>();
+  for (const match of code.matchAll(/export\s+(?:type\s+)?(?:\{[^}]*\}|\*)\s+from\s+"([^"]+)"/g)) {
+    specifiers.add(match[1]!);
+  }
+  return specifiers;
+}
+
 const pagesNames = exportNames(readCode("src/pages/index.ts"));
+
+/** The exact #411 additions to the public surface, by source module. */
+const restoredByModule: [string, string[]][] = [
+  [
+    "./themes/index.js",
+    [
+      "baseTheme",
+      "eciperayTheme",
+      "memorizeTheme",
+      "Theme",
+      "SemanticColors",
+      "EciperayTheme",
+      "MemorizeTheme",
+    ],
+  ],
+  ["./tamagui.config.js", ["createTamaguiConfig"]],
+  [
+    "./components/ChunkErrorBoundary.js",
+    ["ChunkErrorBoundary", "ChunkErrorBoundaryProps", "ChunkErrorBoundaryState"],
+  ],
+];
+
+const restoredNames = new Set(restoredByModule.flatMap(([, names]) => names));
+
+const publicNames = new Set([...pagesNames, ...restoredNames]);
 
 const internalBarrels: [string, string][] = [
   ["components", "src/components/index.ts"],
@@ -84,25 +123,42 @@ test("package.json exports the root only — no subpaths (#298)", () => {
   assert.equal(pkg.types, "./dist/index.d.ts");
 });
 
-test("the root entry re-exports the pages barrel and nothing else (#298)", () => {
-  const srcIndex = readCode("src/index.ts").trim();
-  assert.equal(
-    srcIndex,
-    'export * from "./pages/index.js";',
-    "src/index.ts must be exactly the pages re-export",
-  );
-  const distIndex = readCode("dist/index.js").trim();
-  assert.equal(
-    distIndex,
-    'export * from "./pages/index.js";',
-    "dist/index.js must be exactly the pages re-export",
-  );
-  const distTypes = readCode("dist/index.d.ts").trim();
-  assert.equal(
-    distTypes,
-    'export * from "./pages/index.js";',
-    "dist/index.d.ts must be exactly the pages re-export",
-  );
+test("the root entry re-exports the pages barrel and exactly the #411 additions", () => {
+  for (const rel of ["src/index.ts", "dist/index.js", "dist/index.d.ts"]) {
+    const code = readCode(rel);
+    assert.ok(
+      code.includes('export * from "./pages/index.js";'),
+      `${rel} must re-export the pages barrel`,
+    );
+    assert.deepEqual(
+      exportSpecifiers(code),
+      new Set([
+        "./pages/index.js",
+        "./themes/index.js",
+        "./tamagui.config.js",
+        "./components/ChunkErrorBoundary.js",
+      ]),
+      `${rel} must re-export from exactly the pages barrel and the three #411 source modules`,
+    );
+    // The built JS drops the type-only names (they are erased at
+    // compile time); the source and the built declarations carry
+    // the full restored set.
+    const expectedNames =
+      rel === "dist/index.js"
+        ? new Set([
+            "baseTheme",
+            "eciperayTheme",
+            "memorizeTheme",
+            "createTamaguiConfig",
+            "ChunkErrorBoundary",
+          ])
+        : restoredNames;
+    assert.deepEqual(
+      exportNames(code),
+      expectedNames,
+      `${rel} must name exactly the #411 additions beside the pages wildcard`,
+    );
+  }
 });
 
 test("the pages barrel has no wildcard re-exports (#298)", () => {
@@ -117,7 +173,7 @@ test("the pages barrel has no wildcard re-exports (#298)", () => {
   );
 });
 
-test("the public surface is exactly the pages barrel's names (#298)", () => {
+test("the public surface is exactly the pages barrel's names plus the #411 additions", () => {
   assert.ok(pagesNames.size > 0, "the pages barrel exports names");
   // Every pages-barrel name is a page component or one of its
   // view-model types: value exports all end in "Page" or are the
@@ -129,34 +185,58 @@ test("the public surface is exactly the pages barrel's names (#298)", () => {
       `${name} is exported from src/pages/index.ts but missing from the built pages declarations`,
     );
   }
+  // Every restored name really exists in the module the root
+  // re-exports it from — the root cannot invent a surface the
+  // internal modules do not have.
+  for (const [specifier, names] of restoredByModule) {
+    const sourceRel = `src/${specifier.replace(/^\.\//, "").replace(/\.js$/, "")}`;
+    const sourceNames = exportNames(
+      readCode(
+        specifier.endsWith("ChunkErrorBoundary.js") ? `${sourceRel}.tsx` : `${sourceRel}.ts`,
+      ),
+    );
+    for (const name of names) {
+      assert.ok(sourceNames.has(name), `${name} must be exported by ${specifier}'s source module`);
+    }
+  }
 });
 
-test("no widget, icon, token, theme, or config name is on the public surface (#298)", () => {
+test("no other widget, icon, token, theme, or config name is on the public surface (#298/#411)", () => {
   for (const [label, rel] of internalBarrels) {
     const internalNames = exportNames(readCode(rel));
     assert.ok(internalNames.size > 0, `${label} barrel exports names (scan sanity)`);
     for (const name of internalNames) {
+      if (restoredNames.has(name)) continue;
       assert.ok(
-        !pagesNames.has(name),
-        `${name} (${label}) must not be exported from the package — pages only (#298)`,
+        !publicNames.has(name),
+        `${name} (${label}) must not be exported from the package — pages plus the #411 additions only`,
       );
     }
   }
   // Spot-pin the names downstream apps used to import from the
-  // root, so a regression names the offender plainly.
+  // root, so a regression names the offender plainly. The #411
+  // names (baseTheme, eciperayTheme, memorizeTheme,
+  // createTamaguiConfig, ChunkErrorBoundary) are deliberately NOT
+  // here — they are restored, and pinned as present above.
   for (const banned of [
     "Button",
+    "Alert",
     "Dialog",
     "SignInForm",
     "Icon",
     "PrintIcon",
     "tokens",
-    "baseTheme",
-    "eciperayTheme",
-    "memorizeTheme",
     "tagColorNames",
-    "createTamaguiConfig",
+    "defaultTagColorName",
+    "tagColorNameForHex",
+    "resolveTagColorValue",
+    "createStorybookTamaguiConfig",
+    "createOnDeviceStorybookTamaguiConfig",
+    "resolveFontFamily",
+    "FontPlatform",
+    "ResolvedFont",
+    "StorybookThemeName",
   ]) {
-    assert.ok(!pagesNames.has(banned), `${banned} must not be a package export (#298)`);
+    assert.ok(!publicNames.has(banned), `${banned} must not be a package export (#298/#411)`);
   }
 });

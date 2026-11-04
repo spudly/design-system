@@ -2,8 +2,10 @@
  * Internal dist surface for the contract tests (#298).
  *
  * The published package root (dist/index.js) exports page
- * components only — no widgets, icons, tokens, themes, or
- * Tamagui config factories, and no subpaths. The tests in this
+ * components plus the #411 additions (the brand themes and their
+ * types, `createTamaguiConfig`, and `ChunkErrorBoundary`) — no
+ * other widgets, icons, tokens, tag colors, or Tamagui config
+ * factories, and no subpaths. The tests in this
  * repo still exercise those internal building blocks directly,
  * so they load them from their internal dist modules instead.
  * These are file paths inside this repo, not package imports:
