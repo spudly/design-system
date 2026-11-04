@@ -105,6 +105,18 @@ test("the root entry re-exports the pages barrel and nothing else (#298)", () =>
   );
 });
 
+test("the pages barrel has no wildcard re-exports (#298)", () => {
+  // exportNames collects named exports only: a wildcard re-export
+  // added to the barrel would smuggle an internal barrel's names
+  // onto the public surface without tripping the checks below, so
+  // the barrel must name every export explicitly.
+  assert.doesNotMatch(
+    readCode("src/pages/index.ts"),
+    /export\s*\*/,
+    "src/pages/index.ts must name each export; a wildcard re-export can expose internal barrels",
+  );
+});
+
 test("the public surface is exactly the pages barrel's names (#298)", () => {
   assert.ok(pagesNames.size > 0, "the pages barrel exports names");
   // Every pages-barrel name is a page component or one of its
