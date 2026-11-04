@@ -147,6 +147,20 @@ FALLBACK` line. There is no silent fallback to screencap for
   Because comparisons are like-vs-like, this cost exactly one
   full baseline regeneration when #137 landed; every baseline in
   the tree is now an app-drawn frame.
+- **Settle loop** (issue #420): one draw is not necessarily the
+  settled frame. React Native's Android Image view fades a
+  non-resource image in over 300ms once it decodes (Fresco's
+  default when no `fadeDuration` prop is set; data-URI story
+  fixtures count as remote), and decode timing varies between
+  passes — the ImportReviewPage WithImage re-compare failed with
+  the first pass caught at a uniform ~0.83–0.90 alpha of the
+  second, the diff confined to the hero-image band. The module
+  therefore draws repeatedly (400ms apart, on the UI thread's
+  Handler so animations keep running between draws) until two
+  consecutive draws are pixel-identical, and only that settled
+  frame is written; the APPCAP line reports the draw count as
+  `settle=<n>`. A story that never settles (perpetual animation)
+  is capped at 6 draws and the last draw is used, as before.
 - **FlatList caveat**: pages rendered with a virtualized list
   only mount the rows near the viewport (React Native's default
   `initialNumToRender` is 10), and unrendered rows exist only as

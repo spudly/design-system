@@ -43,30 +43,88 @@ import java.util.concurrent.TimeUnit
  * so the driver can enforce the truncation guard: the content
  * region of the drawn frame must equal the measured content
  * height exactly, or the capture is rejected loudly.
+ *
+ * Settle (design-system issue #420): a single draw can catch an
+ * image mid fade-in. React Native's Android Image view fades a
+ * non-resource image in over 300ms (Fresco, when no fadeDuration
+ * prop is set — and data-URI story fixtures count as remote), and
+ * the fade starts only once the image decodes, which lands at a
+ * variable time after the story renders. Two failing baseline
+ * auto-commit runs proved it: the WithImage re-compare differed
+ * ONLY in the hero-image band, and the first pass was the second
+ * pass blended toward the page background at a uniform alpha —
+ * 0.898 in one run, 0.831 in the other — i.e. two captures at
+ * different points of the same fade. So the module draws, waits
+ * 400ms (past the 300ms fade), and draws again, repeating until
+ * two consecutive draws are pixel-identical — a frame is settled
+ * only when drawing it again changes nothing. The waits are
+ * Handler.postDelayed, never a sleep on the UI thread: sleeping
+ * there would freeze the fade animator itself and make a
+ * mid-fade frame look (falsely) settled. Perpetually animated
+ * stories never settle; the cap below bounds them to the last
+ * draw, which is exactly the old single-draw behaviour.
  */
 class DsvrCaptureModule : Module() {
+  companion object {
+    /** Past React Native's 300ms image fade; see the class doc. */
+    private const val SETTLE_INTERVAL_MS = 400L
+    /** Max draws per capture (1 first draw + 5 re-draws). */
+    private const val MAX_SETTLE_DRAWS = 6
+  }
+
   override fun definition() = ModuleDefinition {
     Name("DsvrCapture")
 
     AsyncFunction("captureFullPage") { fileName: String ->
+      val started = System.currentTimeMillis()
       val latch = CountDownLatch(1)
       var result: Map<String, Any>? = null
       var failure: Throwable? = null
-      Handler(Looper.getMainLooper()).post {
-        try {
-          result = doCapture(fileName)
-        } catch (t: Throwable) {
-          failure = t
-        } finally {
-          latch.countDown()
+      val handler = Handler(Looper.getMainLooper())
+      val stepper = object : Runnable {
+        var prev: Bitmap? = null
+        var draws = 0
+
+        override fun run() {
+          try {
+            val frame = drawFrame()
+            draws++
+            val settled = prev != null && bitmapsEqual(prev!!, frame.bitmap)
+            if (settled || draws >= MAX_SETTLE_DRAWS) {
+              prev?.recycle()
+              result = writeResult(fileName, frame, draws, started)
+              frame.bitmap.recycle()
+              latch.countDown()
+            } else {
+              prev?.recycle()
+              prev = frame.bitmap
+              handler.postDelayed(this, SETTLE_INTERVAL_MS)
+            }
+          } catch (t: Throwable) {
+            prev?.recycle()
+            failure = t
+            latch.countDown()
+          }
         }
       }
+      handler.post(stepper)
       if (!latch.await(120, TimeUnit.SECONDS)) {
         throw Exception("DSVR capture timed out waiting for the UI thread")
       }
       failure?.let { throw Exception("DSVR capture failed: ${it.message}", it) }
       result ?: throw Exception("DSVR capture produced no result")
     }
+  }
+
+  /** True when two drawn frames are pixel-identical. */
+  private fun bitmapsEqual(a: Bitmap, b: Bitmap): Boolean {
+    if (a.width != b.width || a.height != b.height) return false
+    val size = a.width * a.height
+    val pixelsA = IntArray(size)
+    val pixelsB = IntArray(size)
+    a.getPixels(pixelsA, 0, a.width, 0, 0, a.width, a.height)
+    b.getPixels(pixelsB, 0, b.width, 0, 0, b.width, b.height)
+    return pixelsA.contentEquals(pixelsB)
   }
 
   /** The React root view: the largest child of the activity's
@@ -96,8 +154,59 @@ class DsvrCaptureModule : Module() {
     return null
   }
 
-  private fun doCapture(fileName: String): Map<String, Any> {
-    val started = System.currentTimeMillis()
+  /** One drawn frame plus the geometry the driver checks. The
+   * caller owns the bitmap and must recycle it. */
+  private class DrawFrame(
+    val bitmap: Bitmap,
+    val contentHeight: Int,
+    val viewportHeight: Int,
+    val rootHeight: Int,
+    val mode: String,
+    val scrollViews: Int,
+    val chainDepth: Int,
+  )
+
+  /** Writes a settled frame to app storage and builds the result
+   * map the JS side returns to the driver. */
+  private fun writeResult(
+    fileName: String,
+    frame: DrawFrame,
+    settleDraws: Int,
+    started: Long,
+  ): Map<String, Any> {
+    val activity = appContext.currentActivity
+      ?: throw Exception("no current activity")
+    val bmp = frame.bitmap
+    val internalFile = File(activity.filesDir, fileName)
+    FileOutputStream(internalFile).use { out ->
+      bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
+    }
+    var externalPath = ""
+    val externalDir = activity.getExternalFilesDir(null)
+    if (externalDir != null) {
+      val externalFile = File(externalDir, fileName)
+      FileOutputStream(externalFile).use { out ->
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
+      }
+      externalPath = externalFile.absolutePath
+    }
+    return mapOf(
+      "path" to externalPath,
+      "internalPath" to internalFile.absolutePath,
+      "width" to bmp.width,
+      "height" to bmp.height,
+      "contentHeight" to frame.contentHeight,
+      "viewportHeight" to frame.viewportHeight,
+      "rootHeight" to frame.rootHeight,
+      "mode" to frame.mode,
+      "scrollViews" to frame.scrollViews,
+      "chainDepth" to frame.chainDepth,
+      "settleDraws" to settleDraws,
+      "drawMs" to (System.currentTimeMillis() - started).toInt()
+    )
+  }
+
+  private fun drawFrame(): DrawFrame {
     val activity = appContext.currentActivity
       ?: throw Exception("no current activity")
     val decor = activity.window.decorView as? ViewGroup
@@ -204,6 +313,7 @@ class DsvrCaptureModule : Module() {
     val frames = ArrayList<IntArray>(chain.size)
     for (v in chain) frames.add(intArrayOf(v.left, v.top, v.right, v.bottom))
     val originalLayerType = root.layerType
+    var keepBitmap = false
     var bitmap: Bitmap? = null
     try {
       if (scroll != null && delta > 0) {
@@ -237,32 +347,15 @@ class DsvrCaptureModule : Module() {
       root.draw(canvas)
       canvas.restore()
 
-      val internalFile = File(activity.filesDir, fileName)
-      FileOutputStream(internalFile).use { out ->
-        bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
-      }
-      var externalPath = ""
-      val externalDir = activity.getExternalFilesDir(null)
-      if (externalDir != null) {
-        val externalFile = File(externalDir, fileName)
-        FileOutputStream(externalFile).use { out ->
-          bmp.compress(Bitmap.CompressFormat.PNG, 100, out)
-        }
-        externalPath = externalFile.absolutePath
-      }
-
-      return mapOf(
-        "path" to externalPath,
-        "internalPath" to internalFile.absolutePath,
-        "width" to rootWidth,
-        "height" to drawnHeight,
-        "contentHeight" to contentHeight,
-        "viewportHeight" to viewportHeight,
-        "rootHeight" to rootHeight,
-        "mode" to mode,
-        "scrollViews" to scrolls.size,
-        "chainDepth" to chain.size,
-        "drawMs" to (System.currentTimeMillis() - started).toInt()
+      keepBitmap = true
+      return DrawFrame(
+        bitmap = bmp,
+        contentHeight = contentHeight,
+        viewportHeight = viewportHeight,
+        rootHeight = rootHeight,
+        mode = mode,
+        scrollViews = scrolls.size,
+        chainDepth = chain.size
       )
     } finally {
       // Restore every frame exactly as found, whatever happened.
@@ -281,7 +374,10 @@ class DsvrCaptureModule : Module() {
       } catch (ignored: Throwable) {
         // Best effort, same reasoning as above.
       }
-      bitmap?.recycle()
+      // On success the bitmap's ownership passed to the caller
+      // (the settle loop in captureFullPage); on any failure it
+      // is still ours to recycle here.
+      if (!keepBitmap) bitmap?.recycle()
     }
   }
 }
