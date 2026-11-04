@@ -135,6 +135,57 @@ test("every page component renders BigFooter through the shell from a footer pro
   }
 });
 
+test("the shell reserves viewport height only when a footer is supplied", () => {
+  // No footer data: no footer band and no full-viewport inner
+  // shell, so a page composed inside a frame that owns the layout
+  // (PublicPageFrame) adds neither a second footer nor a 100dvh
+  // reservation. The no-footer branch must come before (and stay
+  // clear of) the sticky viewport shell.
+  const noFooterBranch = bigFooter.indexOf("if (!footer)");
+  assert.ok(noFooterBranch >= 0, "BigFooterShell handles the no-footer case explicitly");
+  assert.ok(
+    noFooterBranch < bigFooter.indexOf('minHeight="100dvh"'),
+    "the no-footer branch precedes the viewport-height shell",
+  );
+  assert.match(bigFooter, /padding: tokens\.spacing\[3\]/, "social links keep a ≥44px target");
+});
+
+test("composed pages and stories render exactly one footer", () => {
+  // AiSessionPage: BOTH states (start and in-session) render
+  // through the shell — the start state used to return early
+  // without it.
+  const aiSession = readCode("src/pages/AiSessionPage.tsx");
+  assert.equal(
+    (aiSession.match(/<BigFooterShell footer=\{footer\}>/g) ?? []).length,
+    2,
+    "AiSessionPage renders the footer in the start and in-session states",
+  );
+  // MealsHubPage: the plans tab forwards the footer to
+  // MealPlansPage (which owns its own shell); the meals tab keeps
+  // the hub's shell — exactly one footer per tab.
+  const mealsHub = readCode("src/pages/MealsHubPage.tsx");
+  assert.match(
+    mealsHub,
+    /<MealPlansPage[\s\S]*?\{\.\.\.\(footer !== undefined \? \{ footer \} : \{\}\)\}/,
+  );
+  // Nested compositions: the outer page owns the footer; the
+  // nested form/page gets no footer prop.
+  for (const story of [
+    "src/pages/EditRecipePage.stories.tsx",
+    "src/pages/ManualEntryPage.stories.tsx",
+    "src/pages/EditVersionPage.stories.tsx",
+  ]) {
+    assert.ok(
+      !readCode(story).includes("<RecipeFormPage footer="),
+      `${story} must not supply a footer to the nested RecipeFormPage`,
+    );
+  }
+  assert.ok(
+    !readCode("src/pages/PublicPageFrame.stories.tsx").includes("<PublicRecipePage footer="),
+    "the frame story must not supply a footer to the nested PublicRecipePage — the frame owns it",
+  );
+});
+
 test("the eciperay story fixture carries the Legal column convention as data", () => {
   const fixtures = readCode("src/pages/fixtures.ts");
   assert.ok(fixtures.includes("eciperayFooterFixture"), "eciperay footer fixture exists");

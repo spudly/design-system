@@ -60,7 +60,14 @@ export const Default: Story = {
   render: () => (
     <Viewport width={1024}>
       <PublicPageFrame footer={eciperayFooterFixture} {...frameProps}>
-        <PublicRecipePage footer={eciperayFooterFixture} state="notFound" />
+        {/*
+          Footer/layout ownership: the FRAME is the sole owner in
+          this composition — the nested PublicRecipePage gets no
+          footer prop, so it renders no footer band (one footer,
+          one contentinfo landmark) and no full-viewport inner
+          shell; the frame owns the layout height.
+        */}
+        <PublicRecipePage state="notFound" />
       </PublicPageFrame>
     </Viewport>
   ),

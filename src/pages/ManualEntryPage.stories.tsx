@@ -66,9 +66,14 @@ function useFormProps(): RecipeFormPageProps {
 
 function Shell() {
   const formProps = useFormProps();
+  // Footer ownership: the OUTER page owns the one footer in this
+  // composition — the nested RecipeFormPage gets no footer prop,
+  // so the composed screen renders exactly one footer (and one
+  // contentinfo landmark). Hosts composing these pages follow
+  // the same rule: supply the footer to the outer page only.
   return (
     <ManualEntryPage footer={eciperayFooterFixture}>
-      <RecipeFormPage footer={eciperayFooterFixture} {...formProps} />
+      <RecipeFormPage {...formProps} />
     </ManualEntryPage>
   );
 }

@@ -139,14 +139,14 @@ const SOCIAL_ICONS: Record<BigFooterSocialIcon, (props: IconComponentProps) => R
 
 /**
  * A social icon link's frame: a comfortably tappable padded box
- * (the glyph plus $2 padding on every side) around the Feather
+ * (the glyph plus $3 padding on every side) around the Feather
  * glyph, so social entries meet the same tap-target expectations
  * as the footer's other links at every width.
  */
 const StyledBigFooterSocialAnchor = styled(Anchor, {
   name: "BigFooterSocialAnchor",
   color: "$primary",
-  padding: tokens.spacing[2],
+  padding: tokens.spacing[3],
   textDecorationLine: "none",
 });
 
@@ -265,16 +265,28 @@ export type BigFooterShellProps = {
  * scrolls naturally after the content. This is in-flow layout,
  * never fixed/absolute pinning. Every page renders through this
  * shell with no opt-outs; a page whose host supplied no footer
- * data renders the shell without the footer band until the host
- * supplies it.
+ * data renders NO footer band and reserves NO viewport height —
+ * just a growing column around its content — until the host
+ * supplies it. That is what lets a page compose inside a frame
+ * that already owns the layout and the one footer (e.g. a public
+ * page inside PublicPageFrame): the frame is the sole footer
+ * owner and the nested page adds neither a second footer nor a
+ * full-viewport inner shell.
  */
 export function BigFooterShell({ footer, children }: BigFooterShellProps) {
+  if (!footer) {
+    return (
+      <YStack flexGrow={1} flexDirection="column">
+        {children}
+      </YStack>
+    );
+  }
   return (
     <YStack minHeight="100dvh" flexDirection="column">
       <YStack flexGrow={1} flexShrink={0} flexBasis="auto">
         {children}
       </YStack>
-      {footer ? <BigFooter footer={footer} /> : null}
+      <BigFooter footer={footer} />
     </YStack>
   );
 }

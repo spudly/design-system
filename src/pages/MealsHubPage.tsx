@@ -130,6 +130,7 @@ export function MealsHubPage({
           createHref={createPlanHref}
           onPlanDelete={onDeletePlan}
           titleLevel={2}
+          {...(footer !== undefined ? { footer } : {})}
         />
       </PinnedHeaderShell>
     );

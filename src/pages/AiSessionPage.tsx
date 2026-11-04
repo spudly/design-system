@@ -150,32 +150,34 @@ export function AiSessionPage({
 }: AiSessionPageProps) {
   if (!session) {
     return (
-      <SessionShell>
-        <FormHeading subtitle={config.intro}>{config.title}</FormHeading>
-        <TextAreaField
-          value={prompt}
-          onChangeText={onPromptChange}
-          placeholder={config.promptPlaceholder}
-          size="xl"
-          textAlignVertical="top"
-        />
-        {error ? <Alert severity="error" message={error} /> : null}
-        <ButtonRow>
-          <Button variant="ghost" onPress={onEmptyCancel}>
-            Cancel
-          </Button>
-          <Button
-            variant="primary"
-            grow
-            disabled={busy || !prompt.trim()}
-            onPress={() => {
-              onStart(prompt);
-            }}
-          >
-            {startPending ? config.startPendingLabel : config.startLabel}
-          </Button>
-        </ButtonRow>
-      </SessionShell>
+      <BigFooterShell footer={footer}>
+        <SessionShell>
+          <FormHeading subtitle={config.intro}>{config.title}</FormHeading>
+          <TextAreaField
+            value={prompt}
+            onChangeText={onPromptChange}
+            placeholder={config.promptPlaceholder}
+            size="xl"
+            textAlignVertical="top"
+          />
+          {error ? <Alert severity="error" message={error} /> : null}
+          <ButtonRow>
+            <Button variant="ghost" onPress={onEmptyCancel}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              grow
+              disabled={busy || !prompt.trim()}
+              onPress={() => {
+                onStart(prompt);
+              }}
+            >
+              {startPending ? config.startPendingLabel : config.startLabel}
+            </Button>
+          </ButtonRow>
+        </SessionShell>
+      </BigFooterShell>
     );
   }
 

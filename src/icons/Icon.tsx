@@ -42,7 +42,7 @@ export type IconElement =
   | { kind: "polyline"; points: string }
   | { kind: "line"; x1: string; y1: string; x2: string; y2: string }
   | { kind: "circle"; cx: string; cy: string; r: string }
-  | { kind: "rect"; x: string; y: string; width: string; height: string };
+  | { kind: "rect"; x: string; y: string; width: string; height: string; rx?: string; ry?: string };
 
 function renderElement(element: IconElement, index: number) {
   switch (element.kind) {
@@ -62,6 +62,8 @@ function renderElement(element: IconElement, index: number) {
           y={element.y}
           width={element.width}
           height={element.height}
+          {...(element.rx !== undefined ? { rx: element.rx } : {})}
+          {...(element.ry !== undefined ? { ry: element.ry } : {})}
         />
       );
   }
