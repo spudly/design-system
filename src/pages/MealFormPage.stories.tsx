@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { mealFormFixture } from "./fixtures.js";
+import { mealFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import {
   MealFormPage,
   type MealFormPageProps,
@@ -102,7 +102,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
 
 function Form(props: Partial<MealFormPageProps>) {
   const formProps = useFormProps(props);
-  return <MealFormPage {...formProps} />;
+  return <MealFormPage footer={eciperayFooterFixture} {...formProps} />;
 }
 
 export const Default: Story = {

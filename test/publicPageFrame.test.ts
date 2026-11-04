@@ -63,7 +63,7 @@ const frameCode = strip(
     frameSource,
     readFileSync(join(componentsDir, "PublicFrameLayout.tsx"), "utf8"),
     readFileSync(join(componentsDir, "PublicFrameHeader.tsx"), "utf8"),
-    readFileSync(join(componentsDir, "PublicFrameFooter.tsx"), "utf8"),
+    readFileSync(join(componentsDir, "BigFooter.tsx"), "utf8"),
     readFileSync(join(componentsDir, "BrandLink.tsx"), "utf8"),
   ].join("\n"),
 );
@@ -126,7 +126,7 @@ test("the frame owns the public chrome: href navigation throughout, no scroll of
   for (const copy of [
     'BRAND_LABEL = "Eciperay"',
     'SIGN_IN_LABEL = "Sign in"',
-    'FOOTER_NOTE = "Recipes shared on Eciperay may be viewed without an account."',
+    'LEGAL_COLUMN_TITLE = "Legal"',
     'PRIVACY_LABEL = "Privacy Policy"',
     'TERMS_LABEL = "Terms of Service"',
   ]) {
@@ -176,7 +176,7 @@ test("frame stories exercise the frame at desktop and phone widths", () => {
   }
   assert.match(
     frameStoriesCode,
-    /<PublicPageFrame \{\.\.\.frameProps\}>/,
+    /<PublicPageFrame[^>]*\{\.\.\.frameProps\}>/,
     "the frame stories render the real frame",
   );
 });

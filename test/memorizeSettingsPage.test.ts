@@ -129,10 +129,12 @@ test("Save disables on a whitespace-only value and Clear keys off the saved key"
 });
 
 test("the sync hint composes around the raw folder name", () => {
-  assert.ok(
-    code.includes(
-      "Syncs your verse list (never your API key) to memorize-data.json in the “{driveFolderName}",
-    ),
+  // Whitespace-tolerant (#410): the BigFooterShell wrap reindented
+  // the page, so the verbatim sentence may break at other spaces —
+  // the words and the folder-name interpolation stay pinned.
+  assert.match(
+    code,
+    /Syncs your verse list \(never your API key\) to memorize-data\.json in the “\s*\{driveFolderName\}/,
     "the sync hint must be the app's sentence composed around the folder-name prop",
   );
   assert.ok(code.includes("Drive folder."), "the sync hint's close must be the app's, verbatim");

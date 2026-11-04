@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Fragment, type ReactNode } from "react";
 import { Button } from "../components/Button.js";
 import { ButtonStack } from "../components/ButtonStack.js";
@@ -51,6 +52,8 @@ export type HomePageRecipe = {
 };
 
 export type HomePageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   title: string;
   subtitle: string;
   browseLabel: string;
@@ -82,36 +85,39 @@ export function HomePage({
   browseHref,
   addHref,
   sharedWithMeHref,
+  footer,
 }: HomePageProps) {
   return (
-    <ScreenContainer>
-      <SectionStack>
-        <Text variant="heading">{title}</Text>
-        <CenteredText muted>{subtitle}</CenteredText>
-        <ButtonStack>
-          <Button variant="primary" href={browseHref}>
-            {browseLabel}
-          </Button>
-          <Button variant="secondary" href={addHref}>
-            {addLabel}
-          </Button>
-          <Button variant="secondary" href={sharedWithMeHref}>
-            {sharedWithMeLabel}
-          </Button>
-        </ButtonStack>
-        <Text variant="subheading">{recipesTitle}</Text>
-        {loading ? (
-          <ListLoadingState label="Loading recipes" />
-        ) : recipes.length === 0 ? (
-          <CenteredText>{emptyMessage}</CenteredText>
-        ) : (
-          <ListStack>
-            {recipes.map((recipe) => (
-              <Fragment key={recipe.id}>{renderRecipeRow(recipe)}</Fragment>
-            ))}
-          </ListStack>
-        )}
-      </SectionStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <SectionStack>
+          <Text variant="heading">{title}</Text>
+          <CenteredText muted>{subtitle}</CenteredText>
+          <ButtonStack>
+            <Button variant="primary" href={browseHref}>
+              {browseLabel}
+            </Button>
+            <Button variant="secondary" href={addHref}>
+              {addLabel}
+            </Button>
+            <Button variant="secondary" href={sharedWithMeHref}>
+              {sharedWithMeLabel}
+            </Button>
+          </ButtonStack>
+          <Text variant="subheading">{recipesTitle}</Text>
+          {loading ? (
+            <ListLoadingState label="Loading recipes" />
+          ) : recipes.length === 0 ? (
+            <CenteredText>{emptyMessage}</CenteredText>
+          ) : (
+            <ListStack>
+              {recipes.map((recipe) => (
+                <Fragment key={recipe.id}>{renderRecipeRow(recipe)}</Fragment>
+              ))}
+            </ListStack>
+          )}
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

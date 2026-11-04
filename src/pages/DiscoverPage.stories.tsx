@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -115,6 +116,7 @@ function DiscoverPageDemo({
   return (
     <Viewport>
       <DiscoverPage
+        footer={eciperayFooterFixture}
         title="Discover recipes"
         searchPlaceholder="Search public recipes…"
         emptyMessage="No public recipes match your search."

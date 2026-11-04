@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
 import { DetailRow } from "../components/DetailRow.js";
@@ -158,6 +159,8 @@ export type MealPlanDetailPageNutritionGoals = {
 };
 
 export type MealPlanDetailPageReadyProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   state: "ready";
   /** The plan's title. */
   title: string;
@@ -204,7 +207,8 @@ export type MealPlanDetailPageReadyProps = {
   entries: MealPlanDetailPageEntry[];
 };
 
-export type MealPlanDetailPageProps = { state: "loading" } | MealPlanDetailPageReadyProps;
+export type MealPlanDetailPageProps =
+  { state: "loading"; footer?: BigFooterData } | MealPlanDetailPageReadyProps;
 
 /**
  * Full-page meal plan detail view: plan meta, the nutrition
@@ -214,7 +218,11 @@ export type MealPlanDetailPageProps = { state: "loading" } | MealPlanDetailPageR
  */
 export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   if (props.state === "loading") {
-    return <LoadingGate label="Loading meal plan" />;
+    return (
+      <BigFooterShell footer={props.footer}>
+        <LoadingGate label="Loading meal plan" />
+      </BigFooterShell>
+    );
   }
 
   const {
@@ -242,48 +250,50 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     goalsSectionVisibility === "shown" || (goalsSectionVisibility !== "hidden" && autoShowGoals);
 
   return (
-    <ScreenContainer>
-      <SectionStack>
-        <Text variant="title">{title}</Text>
-        {notes ? <Text variant="hint">{notes}</Text> : null}
-        {dateRangeLabel ? <Text variant="hint">{dateRangeLabel}</Text> : null}
-        {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
-        {showGoals ? (
-          <SectionCard title="Nutrition goals">
-            {nutritionLabel ? <Text variant="hint">Plan total: {nutritionLabel}</Text> : null}
-            {nutritionGoals ? (
-              nutritionGoals.rows.map((row) => (
-                <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
-              ))
-            ) : (
-              <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
-            )}
-            {goalsHref ? <TextLink href={goalsHref}>Set nutrition goals</TextLink> : null}
+    <BigFooterShell footer={props.footer}>
+      <ScreenContainer>
+        <SectionStack>
+          <Text variant="title">{title}</Text>
+          {notes ? <Text variant="hint">{notes}</Text> : null}
+          {dateRangeLabel ? <Text variant="hint">{dateRangeLabel}</Text> : null}
+          {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
+          {showGoals ? (
+            <SectionCard title="Nutrition goals">
+              {nutritionLabel ? <Text variant="hint">Plan total: {nutritionLabel}</Text> : null}
+              {nutritionGoals ? (
+                nutritionGoals.rows.map((row) => (
+                  <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
+                ))
+              ) : (
+                <Text variant="hint">Set daily nutrition goals to compare this plan.</Text>
+              )}
+              {goalsHref ? <TextLink href={goalsHref}>Set nutrition goals</TextLink> : null}
+            </SectionCard>
+          ) : null}
+          <ButtonRow>
+            <Button href={shoppingListHref}>Shopping list</Button>
+            <Button variant="secondary" href={editHref}>
+              Edit
+            </Button>
+          </ButtonRow>
+          <SectionCard title="Entries">
+            <ListStack>
+              {entries.map((entry) => (
+                <ListRow
+                  key={entry.id}
+                  prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
+                  title={entry.title}
+                  {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
+                  {...(entry.kind === "recipe" && entry.isUnavailable
+                    ? { isDisabled: true, titleSuffix: " (unavailable)" }
+                    : {})}
+                  href={entry.href}
+                />
+              ))}
+            </ListStack>
           </SectionCard>
-        ) : null}
-        <ButtonRow>
-          <Button href={shoppingListHref}>Shopping list</Button>
-          <Button variant="secondary" href={editHref}>
-            Edit
-          </Button>
-        </ButtonRow>
-        <SectionCard title="Entries">
-          <ListStack>
-            {entries.map((entry) => (
-              <ListRow
-                key={entry.id}
-                prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
-                title={entry.title}
-                {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
-                {...(entry.kind === "recipe" && entry.isUnavailable
-                  ? { isDisabled: true, titleSuffix: " (unavailable)" }
-                  : {})}
-                href={entry.href}
-              />
-            ))}
-          </ListStack>
-        </SectionCard>
-      </SectionStack>
-    </ScreenContainer>
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

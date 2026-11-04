@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { ForgotPasswordForm } from "../components/ForgotPasswordForm.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
@@ -25,6 +26,8 @@ import { Text } from "../components/Text.js";
  */
 
 export type ForgotPasswordPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   email: string;
   onEmailChange: (value: string) => void;
   loading?: boolean;
@@ -43,21 +46,24 @@ export function ForgotPasswordPage({
   error,
   onSubmit,
   signInHref,
+  footer,
 }: ForgotPasswordPageProps) {
   return (
-    <ScreenContainer scrollable={false} variant="auth">
-      <SectionStack>
-        <Text variant="heading">Reset password</Text>
-        <Text variant="muted">We&apos;ll send a reset link to your email.</Text>
-        <ForgotPasswordForm
-          email={email}
-          onEmailChange={onEmailChange}
-          loading={loading}
-          error={error}
-          onSubmit={onSubmit}
-          signInHref={signInHref}
-        />
-      </SectionStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false} variant="auth">
+        <SectionStack>
+          <Text variant="heading">Reset password</Text>
+          <Text variant="muted">We&apos;ll send a reset link to your email.</Text>
+          <ForgotPasswordForm
+            email={email}
+            onEmailChange={onEmailChange}
+            loading={loading}
+            error={error}
+            onSubmit={onSubmit}
+            signInHref={signInHref}
+          />
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

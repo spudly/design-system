@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import type { ReactNode } from "react";
 import { Anchor, View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
@@ -194,6 +195,8 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
 export type RecipesPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
 
 export type RecipesPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** Recipes to render, already filtered/sorted by the app. */
   recipes: RecipesPageItem[];
   /** First-load in flight: the list renders empty with a spinner as
@@ -407,77 +410,81 @@ export function RecipesPage(props: RecipesPageProps) {
   );
 
   return (
-    <ScreenContainer variant="list" scrollable={false}>
-      <BoundedList
-        separator="none"
-        contentInset="page"
-        // The filter controls live inside this scroll view, so taps on
-        // them must land while the keyboard is open instead of being
-        // consumed to dismiss it.
-        keyboardShouldPersistTaps="handled"
-        data={loading ? [] : recipes}
-        keyExtractor={(recipe) => recipe.id}
-        // The filters render as the list's header so they scroll
-        // together with the recipes (#188). The header sits inside
-        // the list's content container, which already supplies the
-        // horizontal padding. The list (and therefore the header)
-        // stays mounted while loading — a filter edit flips loading
-        // and a tree swap would unmount the focused filter input
-        // mid-typing; the loading indicator renders as the list's
-        // empty state instead.
-        ListHeaderComponent={
-          <CatalogFiltersBar
-            searchPlaceholder="Search recipes…"
-            search={search}
-            onSearchChange={onSearchChange}
-            filters={catalogFilters}
-            {...(activeFilters ? { activeFilters } : {})}
-            {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
-            {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
-            {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
-          />
-        }
-        renderItem={({ item }) => {
-          const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
-          const hasAccessory = accessory !== null && accessory !== undefined;
-          return (
-            <MediaRow
-              href={item.href}
-              title={item.title}
-              subtitle={item.subtitle}
-              imageUrl={item.imageUrl}
-              subtitleAction={
-                onLogCookPress && !hasAccessory ? (
-                  <RatingStars
-                    rating={item.rating}
-                    accessibilityLabel={
-                      item.rating !== null && item.rating !== undefined && item.rating > 0
-                        ? `Log a cook of ${item.title}, rated ${item.rating} out of 5 stars`
-                        : `Log a cook of ${item.title}`
-                    }
-                    onPress={() => {
-                      onLogCookPress(item.id);
-                    }}
-                  />
-                ) : undefined
-              }
-              accessory={hasAccessory ? accessory : undefined}
+    <BigFooterShell footer={props.footer}>
+      <ScreenContainer variant="list" scrollable={false}>
+        <BoundedList
+          separator="none"
+          contentInset="page"
+          // The filter controls live inside this scroll view, so taps on
+          // them must land while the keyboard is open instead of being
+          // consumed to dismiss it.
+          keyboardShouldPersistTaps="handled"
+          data={loading ? [] : recipes}
+          keyExtractor={(recipe) => recipe.id}
+          // The filters render as the list's header so they scroll
+          // together with the recipes (#188). The header sits inside
+          // the list's content container, which already supplies the
+          // horizontal padding. The list (and therefore the header)
+          // stays mounted while loading — a filter edit flips loading
+          // and a tree swap would unmount the focused filter input
+          // mid-typing; the loading indicator renders as the list's
+          // empty state instead.
+          ListHeaderComponent={
+            <CatalogFiltersBar
+              searchPlaceholder="Search recipes…"
+              search={search}
+              onSearchChange={onSearchChange}
+              filters={catalogFilters}
+              {...(activeFilters ? { activeFilters } : {})}
+              {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
+              {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
+              {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
             />
-          );
-        }}
-        onEndReached={onEndReached}
-        onScroll={onScroll}
-        onEndReachedThreshold={onEndReachedThreshold}
-        ListEmptyComponent={
-          loading ? (
-            <ListLoadingState label="Loading" />
-          ) : (
-            <EmptyState title={emptyTitle} {...(emptyBody ? { body: emptyBody } : {})} />
-          )
-        }
-        ListFooterComponent={isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined}
-      />
-    </ScreenContainer>
+          }
+          renderItem={({ item }) => {
+            const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
+            const hasAccessory = accessory !== null && accessory !== undefined;
+            return (
+              <MediaRow
+                href={item.href}
+                title={item.title}
+                subtitle={item.subtitle}
+                imageUrl={item.imageUrl}
+                subtitleAction={
+                  onLogCookPress && !hasAccessory ? (
+                    <RatingStars
+                      rating={item.rating}
+                      accessibilityLabel={
+                        item.rating !== null && item.rating !== undefined && item.rating > 0
+                          ? `Log a cook of ${item.title}, rated ${item.rating} out of 5 stars`
+                          : `Log a cook of ${item.title}`
+                      }
+                      onPress={() => {
+                        onLogCookPress(item.id);
+                      }}
+                    />
+                  ) : undefined
+                }
+                accessory={hasAccessory ? accessory : undefined}
+              />
+            );
+          }}
+          onEndReached={onEndReached}
+          onScroll={onScroll}
+          onEndReachedThreshold={onEndReachedThreshold}
+          ListEmptyComponent={
+            loading ? (
+              <ListLoadingState label="Loading" />
+            ) : (
+              <EmptyState title={emptyTitle} {...(emptyBody ? { body: emptyBody } : {})} />
+            )
+          }
+          ListFooterComponent={
+            isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined
+          }
+        />
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }
 

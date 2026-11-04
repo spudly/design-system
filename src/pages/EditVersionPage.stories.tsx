@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { recipeFormFixture } from "./fixtures.js";
+import { recipeFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import { EditVersionPage } from "./EditVersionPage.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
@@ -72,12 +72,13 @@ function Shell() {
   const formProps = useFormProps();
   return (
     <EditVersionPage
+      footer={eciperayFooterFixture}
       versionNumber={2}
       changeSummary="Reduced sugar and added citrus."
       showImportBanner
       parentVersionNumber={1}
     >
-      <RecipeFormPage {...formProps} />
+      <RecipeFormPage footer={eciperayFooterFixture} {...formProps} />
     </EditVersionPage>
   );
 }
@@ -93,7 +94,12 @@ export const Default: Story = {
 export const NotEditable: Story = {
   render: () => (
     <Viewport>
-      <EditVersionPage versionNumber={1} notEditable backHref="/recipes/1" />
+      <EditVersionPage
+        footer={eciperayFooterFixture}
+        versionNumber={1}
+        notEditable
+        backHref="/recipes/1"
+      />
     </Viewport>
   ),
 };

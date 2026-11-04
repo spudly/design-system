@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -23,7 +24,7 @@ function Viewport({ children }: { children: ReactNode }) {
 export const Empty: Story = {
   render: () => (
     <Viewport>
-      <ImportTextPage onSubmit={() => undefined} />
+      <ImportTextPage footer={eciperayFooterFixture} onSubmit={() => undefined} />
     </Viewport>
   ),
 };
@@ -32,6 +33,7 @@ export const WithError: Story = {
   render: () => (
     <Viewport>
       <ImportTextPage
+        footer={eciperayFooterFixture}
         error="We couldn't find a recipe in that text. Check it and try again."
         onSubmit={() => undefined}
       />

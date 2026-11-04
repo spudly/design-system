@@ -1,0 +1,5 @@
+---
+"@spudly/ui": major
+---
+
+Every page now renders a BigFooter: a fat footer with a big brand wordmark, multi-column link lists, app-store links, and social icon links, supplied to each page as one `footer` prop object ({ brand, columns, storeLinks, socialLinks }) so hosts can test that their brand, link columns (including a Legal column with Privacy, Terms, and "Do Not Sell or Share My Personal Information"), store links, and social links appear on every page. The footer sticks to the bottom of the viewport on short pages (in-flow, full-viewport-height page shell) and scrolls naturally on long pages. On narrow viewports below the 640px stack breakpoint the columns collapse to a stacked single column — brand, store links, and social links included — with no horizontal scrolling, verifiable in Storybook at a 430px mobile width. PublicPageFrame's old footer is replaced by BigFooter (PublicFrameFooter is retired), and LegalDocumentPage's `footerLinks` prop is replaced by the same `footer` object.

@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -23,7 +24,11 @@ function Viewport({ children }: { children: ReactNode }) {
 export const Idle: Story = {
   render: () => (
     <Viewport>
-      <ImportImagePage onPickCamera={() => undefined} onPickLibrary={() => undefined} />
+      <ImportImagePage
+        footer={eciperayFooterFixture}
+        onPickCamera={() => undefined}
+        onPickLibrary={() => undefined}
+      />
     </Viewport>
   ),
 };

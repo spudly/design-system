@@ -4,7 +4,7 @@ import { Text } from "../components/Text.js";
 import { View, YStack } from "tamagui";
 import { PublicPageFrame } from "./PublicPageFrame.js";
 import { PublicRecipePage } from "./PublicRecipePage.js";
-import { recipeDetailFixture } from "./fixtures.js";
+import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
 
 /**
  * Stories for the real PublicPageFrame component (#169) — the
@@ -59,8 +59,8 @@ function StandInContent() {
 export const Default: Story = {
   render: () => (
     <Viewport width={1024}>
-      <PublicPageFrame {...frameProps}>
-        <PublicRecipePage state="notFound" />
+      <PublicPageFrame footer={eciperayFooterFixture} {...frameProps}>
+        <PublicRecipePage footer={eciperayFooterFixture} state="notFound" />
       </PublicPageFrame>
     </Viewport>
   ),
@@ -69,7 +69,7 @@ export const Default: Story = {
 export const Content: Story = {
   render: () => (
     <Viewport width={1024}>
-      <PublicPageFrame {...frameProps}>
+      <PublicPageFrame footer={eciperayFooterFixture} {...frameProps}>
         <StandInContent />
       </PublicPageFrame>
     </Viewport>
@@ -79,7 +79,7 @@ export const Content: Story = {
 export const NarrowViewport: Story = {
   render: () => (
     <Viewport width={430}>
-      <PublicPageFrame {...frameProps}>
+      <PublicPageFrame footer={eciperayFooterFixture} {...frameProps}>
         <StandInContent />
       </PublicPageFrame>
     </Viewport>

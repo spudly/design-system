@@ -5,7 +5,7 @@ import { mainRoleProps } from "./accessibility.js";
 /**
  * The wide public column: the web layout's max-w-3xl (768px),
  * shared by the public frame's header band, content column, and
- * footer band (PublicFrameHeader / PublicFrameFooter import this
+ * footer band (PublicFrameHeader / BigFooter import this
  * constant), and the same column the legal prose renders into
  * (LegalDocumentPage's PROSE_MAX_WIDTH).
  */
@@ -14,7 +14,7 @@ export const COLUMN_MAX_WIDTH = 768;
 export type PublicFrameLayoutProps = {
   /** The frame's header band (a PublicFrameHeader). */
   header: ReactNode;
-  /** The frame's footer band (a PublicFrameFooter). */
+  /** The frame's footer band (a BigFooter, #410). */
   footer: ReactNode;
   /** The page content, rendered into the wide centered column. */
   children: ReactNode;

@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import type { TagColorName } from "../themes/tagColors.js";
-import { tagsFixture } from "./fixtures.js";
+import { tagsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { TagsPage, type TagsPageTag } from "./TagsPage.js";
 
 const meta: Meta<typeof TagsPage> = {
@@ -48,6 +48,7 @@ export const WithTags: Story = {
     return (
       <Viewport>
         <TagsPage
+          footer={eciperayFooterFixture}
           tags={tags}
           name="Baking"
           color="purple"
@@ -101,6 +102,7 @@ export const Editing: Story = {
     return (
       <Viewport>
         <TagsPage
+          footer={eciperayFooterFixture}
           tags={tags}
           name=""
           color={tagsFixture.colorOptions[0] ?? "indigo"}
@@ -160,6 +162,7 @@ export const FailingSaves: Story = {
     return (
       <Viewport>
         <TagsPage
+          footer={eciperayFooterFixture}
           tags={tagsFixture.tags}
           name="Baking"
           color="purple"
@@ -193,6 +196,7 @@ export const Loading: Story = {
   render: () => (
     <Viewport>
       <TagsPage
+        footer={eciperayFooterFixture}
         tags={[]}
         loading
         name=""

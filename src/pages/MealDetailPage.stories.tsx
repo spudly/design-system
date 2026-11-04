@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { mealDetailFixture } from "./fixtures.js";
+import { mealDetailFixture, eciperayFooterFixture } from "./fixtures.js";
 import { MealDetailPage } from "./MealDetailPage.js";
 
 /**
@@ -34,6 +34,7 @@ export const Default: Story = {
   render: () => (
     <Viewport>
       <MealDetailPage
+        footer={eciperayFooterFixture}
         title={fixture.title}
         notes={fixture.notes}
         nutritionLabel={fixture.nutritionLabel}
@@ -49,6 +50,7 @@ export const NoNotesOrNutrition: Story = {
   render: () => (
     <Viewport>
       <MealDetailPage
+        footer={eciperayFooterFixture}
         title={fixture.title}
         members={fixture.members.slice(0, 1)}
         cookHref="/meals/sunday-chicken-dinner/cook"

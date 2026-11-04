@@ -811,7 +811,7 @@ or a changeset naming them.
 
 Open in `Components/PublicFrameLayout`: Default;
 `Components/PublicFrameHeader`: Default;
-`Components/PublicFrameFooter`: Default;
+`Components/BigFooter`: Default, Memorize, NoSocialsYet, MobileStacked, StickyOnShortPage;
 `Components/BrandLink`: Default;
 `Components/DocumentHeader`: Default;
 `Components/DocumentFooter`: Default.
@@ -820,10 +820,15 @@ Open in `Components/PublicFrameLayout`: Default;
    real links (the DOM nodes are anchors carrying their
    hrefs; right-click offers "Open in new tab"). The wordmark
    is the semibold primary wordmark with no underline.
-2. The footer band: the note in muted ink and the links the
-   caller passed in (the story passes Privacy / Terms),
-   rendered in the caller's order as real links and wrapping
-   without overlap on narrow widths.
+2. The footer band (BigFooter, #410): the big brand wordmark,
+   the link columns, app-store links, and social icon links the
+   caller passed in as the one `footer` object (the story passes
+   a Legal column with Privacy / Terms / Do Not Sell or Share),
+   rendered in the caller's order as real links. Below the
+   640px stack breakpoint (check at a 430px mobile width, the
+   MobileStacked story) the columns collapse to a stacked
+   single column with no horizontal scrolling; on a short page
+   (StickyOnShortPage) the footer sits at the viewport bottom.
 3. The layout centers its content column at 768px on wide
    viewports and fills narrow ones; header and footer bands
    span the full width.
@@ -832,7 +837,7 @@ Open in `Components/PublicFrameLayout`: Default;
    renders the caller's links as links under its divider.
 
 **Run when:** `src/components/PublicFrameLayout.tsx`,
-`PublicFrameHeader.tsx`, `PublicFrameFooter.tsx`,
+`PublicFrameHeader.tsx`, `BigFooter.tsx`,
 `BrandLink.tsx`, `DocumentHeader.tsx`, `DocumentFooter.tsx`,
 their stories, or a changeset naming any of them.
 

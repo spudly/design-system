@@ -1,7 +1,7 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { recipeFormFixture } from "./fixtures.js";
+import { recipeFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ManualEntryPage } from "./ManualEntryPage.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
@@ -67,8 +67,8 @@ function useFormProps(): RecipeFormPageProps {
 function Shell() {
   const formProps = useFormProps();
   return (
-    <ManualEntryPage>
-      <RecipeFormPage {...formProps} />
+    <ManualEntryPage footer={eciperayFooterFixture}>
+      <RecipeFormPage footer={eciperayFooterFixture} {...formProps} />
     </ManualEntryPage>
   );
 }

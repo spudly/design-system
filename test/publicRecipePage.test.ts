@@ -130,7 +130,7 @@ test("the views import no app package and run no data hooks", () => {
 test("error states live inside the props union, branched before the ready render", () => {
   assert.match(
     code,
-    /export type PublicRecipePageProps =\s*\| \{ state: "loading" \}\s*\| \{ state: "notFound" \}\s*\| \{ state: "unavailable" \}\s*\| PublicRecipePageReadyProps;/,
+    /export type PublicRecipePageProps =\s*\| \{ state: "loading"; footer\?: BigFooterData \}\s*\| \{ state: "notFound"; footer\?: BigFooterData \}\s*\| \{ state: "unavailable"; footer\?: BigFooterData \}\s*\| PublicRecipePageReadyProps;/,
     "the props must be the loading | notFound | unavailable | ready union",
   );
   const readyAt = code.indexOf("<CtaBar");

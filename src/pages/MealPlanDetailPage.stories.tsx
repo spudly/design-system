@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -88,6 +89,7 @@ export const Default: Story = {
   render: () => (
     <Viewport>
       <MealPlanDetailPage
+        footer={eciperayFooterFixture}
         state="ready"
         title="This week"
         notes="Family dinners — keep weeknights simple."
@@ -110,6 +112,7 @@ export const Empty: Story = {
   render: () => (
     <Viewport>
       <MealPlanDetailPage
+        footer={eciperayFooterFixture}
         state="ready"
         title="New plan draft"
         shoppingListHref="/meal-plans/this-week/shopping-list"
@@ -123,7 +126,7 @@ export const Empty: Story = {
 export const Loading: Story = {
   render: () => (
     <Viewport>
-      <MealPlanDetailPage state="loading" />
+      <MealPlanDetailPage footer={eciperayFooterFixture} state="loading" />
     </Viewport>
   ),
 };
@@ -137,6 +140,7 @@ export const NutritionUnavailable: Story = {
   render: () => (
     <Viewport>
       <MealPlanDetailPage
+        footer={eciperayFooterFixture}
         state="ready"
         title="Harvest week"
         dateRangeLabel="2026-10-19 – 2026-10-25"
@@ -157,6 +161,7 @@ export const NoGoals: Story = {
   render: () => (
     <Viewport>
       <MealPlanDetailPage
+        footer={eciperayFooterFixture}
         state="ready"
         title="Meal prep Sunday"
         dateRangeLabel="2026-10-26 – 2026-10-28"

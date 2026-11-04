@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { CheckboxField } from "../components/CheckboxField.js";
@@ -39,6 +40,8 @@ import { TextField } from "../components/TextField.js";
  */
 
 export type FeedbackPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   message: string;
   onMessageChange: (value: string) => void;
   replyEmail: string;
@@ -65,46 +68,49 @@ export function FeedbackPage({
   submitted = false,
   submitDisabled = false,
   onSubmit,
+  footer,
 }: FeedbackPageProps) {
   return (
-    <ScreenContainer variant="padded">
-      <Text variant="title">Feedback</Text>
-      <Text variant="hint">
-        Share ideas, confusion, or problems. We&apos;ll include session context to help us
-        investigate.
-      </Text>
-      {submitted ? (
-        <Text variant="success">Thanks — we got your feedback.</Text>
-      ) : (
-        <>
-          <TextAreaField
-            label="What's on your mind?"
-            accessibilityLabel="What's on your mind?"
-            value={message}
-            onChangeText={onMessageChange}
-            placeholder="Tell us what happened or what you'd like to see improved."
-          />
-          <TextField
-            label="Email me back (optional)"
-            value={replyEmail}
-            onChangeText={onReplyEmailChange}
-            autoCapitalize="none"
-            keyboardType="email-address"
-            placeholder="you@example.com"
-            accessibilityLabel="Email me back (optional)"
-          />
-          <CheckboxField label="This is a bug" checked={isBug} onCheckedChange={onIsBugChange} />
-          {error ? <Alert severity="error" message={error} /> : null}
-          <Button
-            variant="primary"
-            disabled={submitDisabled || submitting}
-            onPress={onSubmit}
-            accessibilityLabel="Submit feedback"
-          >
-            {submitting ? "Submitting…" : "Submit feedback"}
-          </Button>
-        </>
-      )}
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer variant="padded">
+        <Text variant="title">Feedback</Text>
+        <Text variant="hint">
+          Share ideas, confusion, or problems. We&apos;ll include session context to help us
+          investigate.
+        </Text>
+        {submitted ? (
+          <Text variant="success">Thanks — we got your feedback.</Text>
+        ) : (
+          <>
+            <TextAreaField
+              label="What's on your mind?"
+              accessibilityLabel="What's on your mind?"
+              value={message}
+              onChangeText={onMessageChange}
+              placeholder="Tell us what happened or what you'd like to see improved."
+            />
+            <TextField
+              label="Email me back (optional)"
+              value={replyEmail}
+              onChangeText={onReplyEmailChange}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              placeholder="you@example.com"
+              accessibilityLabel="Email me back (optional)"
+            />
+            <CheckboxField label="This is a bug" checked={isBug} onCheckedChange={onIsBugChange} />
+            {error ? <Alert severity="error" message={error} /> : null}
+            <Button
+              variant="primary"
+              disabled={submitDisabled || submitting}
+              onPress={onSubmit}
+              accessibilityLabel="Submit feedback"
+            >
+              {submitting ? "Submitting…" : "Submit feedback"}
+            </Button>
+          </>
+        )}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

@@ -6,6 +6,7 @@ import {
   aiSessionGenerateConfigFixture,
   aiSessionPlanningFixture,
   aiSessionPreviewFixture,
+  eciperayFooterFixture,
 } from "./fixtures.js";
 import { AiSessionPage } from "./AiSessionPage.js";
 
@@ -41,6 +42,7 @@ export const Start: Story = {
   render: () => (
     <Viewport>
       <AiSessionPage
+        footer={eciperayFooterFixture}
         config={aiSessionGenerateConfigFixture}
         session={null}
         prompt="A cozy vegetarian dinner for four, something with mushrooms."
@@ -56,6 +58,7 @@ export const Planning: Story = {
   render: () => (
     <Viewport>
       <AiSessionPage
+        footer={eciperayFooterFixture}
         config={aiSessionGenerateConfigFixture}
         session={aiSessionPlanningFixture}
         prompt=""
@@ -76,6 +79,7 @@ export const PreviewReady: Story = {
   render: () => (
     <Viewport>
       <AiSessionPage
+        footer={eciperayFooterFixture}
         config={aiSessionGenerateConfigFixture}
         session={aiSessionPreviewFixture}
         preview={

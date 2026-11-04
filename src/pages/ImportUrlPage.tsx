@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
@@ -24,6 +25,8 @@ import { TextField } from "../components/TextField.js";
  */
 
 export type ImportUrlPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   url: string;
   onUrlChange: (value: string) => void;
   loading?: boolean;
@@ -37,6 +40,7 @@ export function ImportUrlPage({
   loading = false,
   error,
   onSubmit,
+  footer,
 }: ImportUrlPageProps) {
   // Enter in the URL field submits, as the retired web form did —
   // guarded exactly like the Import button (non-blank URL, not
@@ -48,24 +52,26 @@ export function ImportUrlPage({
   };
 
   return (
-    <FormScreenLayout>
-      <Text variant="formTitle">Import from URL</Text>
-      <TextField
-        value={url}
-        onChangeText={onUrlChange}
-        placeholder="https://example.com/recipe"
-        onSubmitEditing={submitFromField}
-        returnKeyType="go"
-      />
-      {error ? <Alert severity="error" message={error} /> : null}
-      <Button
-        variant="primary"
-        disabled={!url.trim() || loading}
-        onPress={onSubmit}
-        accessibilityLabel="Import"
-      >
-        {loading ? "Importing…" : "Import"}
-      </Button>
-    </FormScreenLayout>
+    <BigFooterShell footer={footer}>
+      <FormScreenLayout>
+        <Text variant="formTitle">Import from URL</Text>
+        <TextField
+          value={url}
+          onChangeText={onUrlChange}
+          placeholder="https://example.com/recipe"
+          onSubmitEditing={submitFromField}
+          returnKeyType="go"
+        />
+        {error ? <Alert severity="error" message={error} /> : null}
+        <Button
+          variant="primary"
+          disabled={!url.trim() || loading}
+          onPress={onSubmit}
+          accessibilityLabel="Import"
+        >
+          {loading ? "Importing…" : "Import"}
+        </Button>
+      </FormScreenLayout>
+    </BigFooterShell>
   );
 }

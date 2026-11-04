@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -33,6 +34,7 @@ function Interactive({ initialLoading = false }: { initialLoading?: boolean }) {
   return (
     <Viewport>
       <ForgotPasswordPage
+        footer={eciperayFooterFixture}
         email={email}
         onEmailChange={setEmail}
         loading={loading}

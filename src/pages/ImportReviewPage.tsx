@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import type { ReactNode } from "react";
 import { Button } from "../components/Button.js";
@@ -37,6 +38,8 @@ import { Thumbnail } from "../components/Thumbnail.js";
  */
 
 export type ImportReviewPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   versionLabel: string;
   imageUrl?: string | null;
   /**
@@ -68,31 +71,34 @@ export function ImportReviewPage({
   editsPending,
   onAccept,
   onStartEdits,
+  footer,
 }: ImportReviewPageProps) {
   return (
-    <FormScreenLayout>
-      <Text variant="formTitle">Review Import</Text>
-      <Text variant="hint">
-        This is your imported recipe ({versionLabel}). Looks good, or make edits to create a draft
-        version.
-      </Text>
-      {imageUrl ? (
-        <Thumbnail
-          variant="banner"
-          src={imageUrl}
-          {...(imageAlt ? { accessibilityLabel: imageAlt } : {})}
-        />
-      ) : null}
-      <PreviewCard>{preview}</PreviewCard>
-      {error ? <Alert severity="error" message={error} /> : null}
-      <ButtonRow>
-        <Button variant="primary" disabled={busy} onPress={onAccept}>
-          {acceptPending ? "Saving…" : "Looks good"}
-        </Button>
-        <Button variant="secondary" disabled={busy} onPress={onStartEdits}>
-          {editsPending ? "Creating draft…" : "Make edits"}
-        </Button>
-      </ButtonRow>
-    </FormScreenLayout>
+    <BigFooterShell footer={footer}>
+      <FormScreenLayout>
+        <Text variant="formTitle">Review Import</Text>
+        <Text variant="hint">
+          This is your imported recipe ({versionLabel}). Looks good, or make edits to create a draft
+          version.
+        </Text>
+        {imageUrl ? (
+          <Thumbnail
+            variant="banner"
+            src={imageUrl}
+            {...(imageAlt ? { accessibilityLabel: imageAlt } : {})}
+          />
+        ) : null}
+        <PreviewCard>{preview}</PreviewCard>
+        {error ? <Alert severity="error" message={error} /> : null}
+        <ButtonRow>
+          <Button variant="primary" disabled={busy} onPress={onAccept}>
+            {acceptPending ? "Saving…" : "Looks good"}
+          </Button>
+          <Button variant="secondary" disabled={busy} onPress={onStartEdits}>
+            {editsPending ? "Creating draft…" : "Make edits"}
+          </Button>
+        </ButtonRow>
+      </FormScreenLayout>
+    </BigFooterShell>
   );
 }

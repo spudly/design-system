@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { useState } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Alert } from "../components/Alert.js";
@@ -149,6 +150,8 @@ export type TagsPageTag = {
 };
 
 export type TagsPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   tags: TagsPageTag[];
   loading?: boolean;
   name: string;
@@ -218,6 +221,7 @@ export function TagsPage({
   onCancelEdit,
   isUpdating = false,
   initialFailedOperation = null,
+  footer,
 }: TagsPageProps) {
   const [failedOperation, setFailedOperation] = useState<TagsPageFailedOperation | null>(
     initialFailedOperation,
@@ -248,121 +252,123 @@ export function TagsPage({
   };
 
   return (
-    <ScreenContainer>
-      <SectionStack>
-        <Text variant="title">Tags</Text>
-        {failedOperation ? (
-          <Alert
-            severity="error"
-            dismissible
-            onDismiss={() => {
-              setFailedOperation(null);
-            }}
-          >
-            {tagsPageFailureMessages[failedOperation]}
-          </Alert>
-        ) : null}
-        <FieldStack>
-          <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
-          <TrailingActionsRow
-            leading={
-              <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
-            }
-          >
-            <Button
-              variant="primary"
-              disabled={!name.trim() || isCreating}
-              onPress={handleCreate}
-              accessibilityLabel="Add"
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <SectionStack>
+          <Text variant="title">Tags</Text>
+          {failedOperation ? (
+            <Alert
+              severity="error"
+              dismissible
+              onDismiss={() => {
+                setFailedOperation(null);
+              }}
             >
-              Add
-            </Button>
-          </TrailingActionsRow>
-        </FieldStack>
-        {loading ? (
-          <ListLoadingState label="Loading tags" />
-        ) : (
-          <CardStack>
-            {tags.map((tag) =>
-              editingTagId === tag.id && tag.canEdit !== false ? (
-                <Card key={tag.id} variant="compact">
-                  <FieldStack>
-                    <TextField
-                      placeholder="Tag name"
-                      value={editName}
-                      onChangeText={(value) => {
-                        onEditNameChange?.(value);
-                      }}
-                      accessibilityLabel={`Rename tag ${tag.name}`}
-                    />
-                    <TrailingActionsRow
-                      leading={
-                        <ColorPickerField
-                          colors={colorOptions}
-                          value={editColor ?? tag.color}
-                          onChange={(value) => {
-                            onEditColorChange?.(value);
-                          }}
-                        />
-                      }
-                    >
-                      <Button
-                        variant="secondary"
-                        disabled={isUpdating}
-                        onPress={() => {
-                          onCancelEdit?.();
+              {tagsPageFailureMessages[failedOperation]}
+            </Alert>
+          ) : null}
+          <FieldStack>
+            <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
+            <TrailingActionsRow
+              leading={
+                <ColorPickerField colors={colorOptions} value={color} onChange={onColorChange} />
+              }
+            >
+              <Button
+                variant="primary"
+                disabled={!name.trim() || isCreating}
+                onPress={handleCreate}
+                accessibilityLabel="Add"
+              >
+                Add
+              </Button>
+            </TrailingActionsRow>
+          </FieldStack>
+          {loading ? (
+            <ListLoadingState label="Loading tags" />
+          ) : (
+            <CardStack>
+              {tags.map((tag) =>
+                editingTagId === tag.id && tag.canEdit !== false ? (
+                  <Card key={tag.id} variant="compact">
+                    <FieldStack>
+                      <TextField
+                        placeholder="Tag name"
+                        value={editName}
+                        onChangeText={(value) => {
+                          onEditNameChange?.(value);
                         }}
-                        accessibilityLabel="Cancel"
+                        accessibilityLabel={`Rename tag ${tag.name}`}
+                      />
+                      <TrailingActionsRow
+                        leading={
+                          <ColorPickerField
+                            colors={colorOptions}
+                            value={editColor ?? tag.color}
+                            onChange={(value) => {
+                              onEditColorChange?.(value);
+                            }}
+                          />
+                        }
                       >
-                        Cancel
-                      </Button>
-                      <Button
-                        variant="primary"
-                        disabled={!editName.trim() || isUpdating}
-                        onPress={handleSaveEdit}
-                        accessibilityLabel="Save"
-                      >
-                        Save
-                      </Button>
-                    </TrailingActionsRow>
-                  </FieldStack>
-                </Card>
-              ) : (
-                <BadgeCardRow
-                  key={tag.id}
-                  badgeLabel={tag.name}
-                  badgeColor={tag.color}
-                  actions={[
-                    ...(onStartEdit && tag.canEdit !== false
-                      ? [
-                          {
-                            label: "Edit",
-                            accessibilityLabel: `Edit tag ${tag.name}`,
-                            onPress: () => {
-                              onStartEdit(tag);
+                        <Button
+                          variant="secondary"
+                          disabled={isUpdating}
+                          onPress={() => {
+                            onCancelEdit?.();
+                          }}
+                          accessibilityLabel="Cancel"
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          variant="primary"
+                          disabled={!editName.trim() || isUpdating}
+                          onPress={handleSaveEdit}
+                          accessibilityLabel="Save"
+                        >
+                          Save
+                        </Button>
+                      </TrailingActionsRow>
+                    </FieldStack>
+                  </Card>
+                ) : (
+                  <BadgeCardRow
+                    key={tag.id}
+                    badgeLabel={tag.name}
+                    badgeColor={tag.color}
+                    actions={[
+                      ...(onStartEdit && tag.canEdit !== false
+                        ? [
+                            {
+                              label: "Edit",
+                              accessibilityLabel: `Edit tag ${tag.name}`,
+                              onPress: () => {
+                                onStartEdit(tag);
+                              },
                             },
-                          },
-                        ]
-                      : []),
-                    ...(tag.canDelete !== false
-                      ? [
-                          {
-                            label: "Delete",
-                            accessibilityLabel: `Delete tag ${tag.name}`,
-                            variant: "error" as const,
-                            onPress: () => {
-                              handleDelete(tag.id);
+                          ]
+                        : []),
+                      ...(tag.canDelete !== false
+                        ? [
+                            {
+                              label: "Delete",
+                              accessibilityLabel: `Delete tag ${tag.name}`,
+                              variant: "error" as const,
+                              onPress: () => {
+                                handleDelete(tag.id);
+                              },
                             },
-                          },
-                        ]
-                      : []),
-                  ]}
-                />
-              ),
-            )}
-          </CardStack>
-        )}
-      </SectionStack>
-    </ScreenContainer>
+                          ]
+                        : []),
+                    ]}
+                  />
+                ),
+              )}
+            </CardStack>
+          )}
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

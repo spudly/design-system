@@ -1,3 +1,4 @@
+import { eciperayFooterFixture } from "./fixtures.js";
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
@@ -24,6 +25,7 @@ export const Form: Story = {
   render: () => (
     <Viewport>
       <FeedbackPage
+        footer={eciperayFooterFixture}
         message="The shopping list didn't keep my checks after I closed the app."
         onMessageChange={() => undefined}
         replyEmail="cook@example.com"
@@ -40,6 +42,7 @@ export const Submitted: Story = {
   render: () => (
     <Viewport>
       <FeedbackPage
+        footer={eciperayFooterFixture}
         message=""
         onMessageChange={() => undefined}
         replyEmail=""

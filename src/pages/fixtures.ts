@@ -1,4 +1,5 @@
 import { tagColorNames, type TagColorName } from "../themes/tagColors.js";
+import type { BigFooterData } from "../components/BigFooter.js";
 import type { LegalDocumentPageProps } from "./LegalDocumentPage.js";
 import type { TagsPageTag } from "./TagsPage.js";
 
@@ -513,10 +514,27 @@ export const legalPrivacyFixture: LegalDocumentPageProps = {
   brandHref: "/",
   signInLabel: "Sign in",
   signInHref: "/login",
-  footerLinks: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-  ],
+  footer: {
+    brand: { label: "Eciperay", href: "/" },
+    columns: [
+      {
+        title: "Legal",
+        links: [
+          { label: "Privacy Policy", href: "/privacy" },
+          { label: "Terms of Service", href: "/terms" },
+          {
+            label: "Do Not Sell or Share My Personal Information",
+            href: "/do-not-sell-or-share",
+          },
+        ],
+      },
+    ],
+    storeLinks: [
+      { label: "Download on the App Store", href: "/app-store" },
+      { label: "Get it on Google Play", href: "/google-play" },
+    ],
+    socialLinks: [],
+  },
   sections: [
     {
       title: "Information we collect",
@@ -584,10 +602,27 @@ export const legalTermsFixture: LegalDocumentPageProps = {
   brandHref: "/",
   signInLabel: "Sign in",
   signInHref: "/login",
-  footerLinks: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-  ],
+  footer: {
+    brand: { label: "Eciperay", href: "/" },
+    columns: [
+      {
+        title: "Legal",
+        links: [
+          { label: "Privacy Policy", href: "/privacy" },
+          { label: "Terms of Service", href: "/terms" },
+          {
+            label: "Do Not Sell or Share My Personal Information",
+            href: "/do-not-sell-or-share",
+          },
+        ],
+      },
+    ],
+    storeLinks: [
+      { label: "Download on the App Store", href: "/app-store" },
+      { label: "Get it on Google Play", href: "/google-play" },
+    ],
+    socialLinks: [],
+  },
   sections: [
     {
       title: "Using Eciperay",
@@ -629,5 +664,86 @@ export const legalTermsFixture: LegalDocumentPageProps = {
         },
       ],
     },
+  ],
+};
+
+/**
+ * BigFooter fixtures (#410): the footer data objects the page
+ * stories pass through each page's `footer` prop, in the shape a
+ * real app host supplies. The Eciperay fixture carries the Legal
+ * column convention — Privacy, Terms, and "Do Not Sell or Share
+ * My Personal Information" (eciperay #408) — as caller data.
+ * Storybook socials use the Feather social glyphs the component
+ * supports; production hosts ship an empty socialLinks array
+ * until they have socials. Hrefs are root-relative story
+ * destinations (the fixtures ban external URLs outright).
+ */
+export const eciperayFooterFixture: BigFooterData = {
+  brand: { label: "Eciperay", href: "/" },
+  columns: [
+    {
+      title: "Product",
+      links: [
+        { label: "Recipes", href: "/recipes" },
+        { label: "Meal plans", href: "/meal-plans" },
+        { label: "Discover", href: "/discover" },
+      ],
+    },
+    {
+      title: "Company",
+      links: [
+        { label: "About", href: "/about" },
+        { label: "Feedback", href: "/feedback" },
+      ],
+    },
+    {
+      title: "Legal",
+      links: [
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+        {
+          label: "Do Not Sell or Share My Personal Information",
+          href: "/do-not-sell-or-share",
+        },
+      ],
+    },
+  ],
+  storeLinks: [
+    { label: "Download on the App Store", href: "/app-store" },
+    { label: "Get it on Google Play", href: "/google-play" },
+  ],
+  socialLinks: [
+    { label: "Eciperay on Facebook", href: "/social/facebook", icon: "facebook" },
+    { label: "Eciperay on Instagram", href: "/social/instagram", icon: "instagram" },
+    { label: "Eciperay on Twitter", href: "/social/twitter", icon: "twitter" },
+  ],
+};
+
+export const memorizeFooterFixture: BigFooterData = {
+  brand: { label: "Memorize", href: "/" },
+  columns: [
+    {
+      title: "Product",
+      links: [
+        { label: "My verses", href: "/my-verses" },
+        { label: "Search verses", href: "/search" },
+        { label: "Review", href: "/review" },
+      ],
+    },
+    {
+      title: "Legal",
+      links: [
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+      ],
+    },
+  ],
+  storeLinks: [
+    { label: "Download on the App Store", href: "/app-store" },
+    { label: "Get it on Google Play", href: "/google-play" },
+  ],
+  socialLinks: [
+    { label: "Memorize on YouTube", href: "/social/youtube", icon: "youtube" },
+    { label: "Memorize on GitHub", href: "/social/github", icon: "github" },
   ],
 };

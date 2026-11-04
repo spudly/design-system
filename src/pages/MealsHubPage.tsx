@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Button } from "../components/Button.js";
 import { CardStack } from "../components/CardStack.js";
 import { EmptyState } from "../components/EmptyState.js";
@@ -77,6 +78,8 @@ export type MealsHubPageMeal = {
 };
 
 export type MealsHubPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   activeTab: MealsHubPageTab;
   onSelectTab: (tab: MealsHubPageTab) => void;
   meals: MealsHubPageMeal[];
@@ -100,6 +103,7 @@ export function MealsHubPage({
   createPlanHref,
   onDeleteMeal,
   onDeletePlan,
+  footer,
 }: MealsHubPageProps) {
   const hubChrome = (
     <>
@@ -132,33 +136,35 @@ export function MealsHubPage({
   }
 
   return (
-    <ScreenContainer>
-      <SectionStack>
-        {hubChrome}
-        <Button variant="primary" accessibilityLabel="New meal" href={createMealHref}>
-          New meal
-        </Button>
-        {loading ? (
-          <ListLoadingState label="Loading meals" />
-        ) : meals.length === 0 ? (
-          <EmptyState title="No meals yet." />
-        ) : (
-          <CardStack>
-            {meals.map((meal) => (
-              <TextActionCardRow
-                key={meal.id}
-                title={meal.title}
-                subtitle={meal.subtitle}
-                href={meal.href}
-                actionLabel="Delete"
-                onActionPress={() => {
-                  onDeleteMeal(meal.id);
-                }}
-              />
-            ))}
-          </CardStack>
-        )}
-      </SectionStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <SectionStack>
+          {hubChrome}
+          <Button variant="primary" accessibilityLabel="New meal" href={createMealHref}>
+            New meal
+          </Button>
+          {loading ? (
+            <ListLoadingState label="Loading meals" />
+          ) : meals.length === 0 ? (
+            <EmptyState title="No meals yet." />
+          ) : (
+            <CardStack>
+              {meals.map((meal) => (
+                <TextActionCardRow
+                  key={meal.id}
+                  title={meal.title}
+                  subtitle={meal.subtitle}
+                  href={meal.href}
+                  actionLabel="Delete"
+                  onActionPress={() => {
+                    onDeleteMeal(meal.id);
+                  }}
+                />
+              ))}
+            </CardStack>
+          )}
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

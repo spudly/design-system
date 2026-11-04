@@ -49,7 +49,7 @@ function readCode(rel: string) {
 const a11y = readCode("src/components/accessibility.ts");
 const layout = readCode("src/components/PublicFrameLayout.tsx");
 const publicHeader = readCode("src/components/PublicFrameHeader.tsx");
-const publicFooter = readCode("src/components/PublicFrameFooter.tsx");
+const publicFooter = readCode("src/components/BigFooter.tsx");
 const docHeader = readCode("src/components/DocumentHeader.tsx");
 const docFooter = readCode("src/components/DocumentFooter.tsx");
 const legalPage = readCode("src/pages/LegalDocumentPage.tsx");
@@ -70,7 +70,7 @@ test("the shared translation exports web-only landmark props (#366)", () => {
   // Landmarks must never go through accessibilityRole: banner /
   // main / contentinfo are not RN roles and would crash Android
   // (the accessibilityRoles scan pins that invariant globally).
-  for (const code of [layout, publicHeader, publicFooter, docHeader, docFooter, legalPage]) {
+  for (const code of [layout, publicHeader, docHeader, docFooter, legalPage]) {
     assert.ok(
       !code.includes("accessibilityRole"),
       "landmarks use the web role prop, not accessibilityRole",
@@ -81,13 +81,17 @@ test("the shared translation exports web-only landmark props (#366)", () => {
 test("the public frame components carry their landmarks (#366)", () => {
   assert.match(publicHeader, /\{\.\.\.bannerRoleProps\}/, "PublicFrameHeader is banner");
   assert.match(layout, /\{\.\.\.mainRoleProps\}/, "PublicFrameLayout's content column is main");
-  assert.match(publicFooter, /\{\.\.\.contentInfoRoleProps\}/, "PublicFrameFooter is contentinfo");
+  assert.match(publicFooter, /\{\.\.\.contentInfoRoleProps\}/, "BigFooter is contentinfo (#410)");
 });
 
 test("the legal page's frame composition carries its landmarks (#366)", () => {
   assert.match(docHeader, /\{\.\.\.bannerRoleProps\}/, "DocumentHeader is banner");
   assert.match(legalPage, /\{\.\.\.mainRoleProps\}/, "the document column is main");
-  assert.match(docFooter, /\{\.\.\.contentInfoRoleProps\}/, "DocumentFooter is contentinfo");
+  assert.match(
+    publicFooter,
+    /\{\.\.\.contentInfoRoleProps\}/,
+    "BigFooter is the legal page contentinfo (#410)",
+  );
 });
 
 test("no other source file adds a landmark role — no duplicates inside the frames (#366)", () => {
@@ -96,7 +100,7 @@ test("no other source file adds a landmark role — no duplicates inside the fra
     join(srcDir, "components", "accessibility.ts"),
     join(srcDir, "components", "PublicFrameLayout.tsx"),
     join(srcDir, "components", "PublicFrameHeader.tsx"),
-    join(srcDir, "components", "PublicFrameFooter.tsx"),
+    join(srcDir, "components", "BigFooter.tsx"),
     join(srcDir, "components", "DocumentHeader.tsx"),
     join(srcDir, "components", "DocumentFooter.tsx"),
     join(srcDir, "pages", "LegalDocumentPage.tsx"),
@@ -132,7 +136,10 @@ function loadRuntime() {
     const dist: Record<string, any> = await loadInternalDist();
     const { LegalDocumentPage }: Record<string, any> =
       await import("../dist/pages/LegalDocumentPage.js");
-    return { React, renderToString, TamaguiProvider, ...dist, LegalDocumentPage };
+    // BigFooter is internal (not in the components barrel, #410/#298):
+    // load its dist module directly, like the icons module's tests do.
+    const { BigFooter }: Record<string, any> = await import("../dist/components/BigFooter.js");
+    return { React, renderToString, TamaguiProvider, ...dist, LegalDocumentPage, BigFooter };
   })();
   return runtimePromise;
 }
@@ -200,7 +207,7 @@ function assertLandmarks(html: string, insideMain: any) {
 
 function publicFrameElement(
   React: any,
-  { PublicFrameLayout, PublicFrameHeader, PublicFrameFooter, Text }: any,
+  { PublicFrameLayout, PublicFrameHeader, BigFooter, Text }: any,
 ) {
   return React.createElement(
     PublicFrameLayout,
@@ -211,9 +218,13 @@ function publicFrameElement(
         signInLabel: "Sign in",
         signInHref: "/sign-in",
       }),
-      footer: React.createElement(PublicFrameFooter, {
-        note: "A note.",
-        links: [{ label: "Privacy Policy", href: "/privacy" }],
+      footer: React.createElement(BigFooter, {
+        footer: {
+          brand: { label: "Eciperay", href: "/" },
+          columns: [{ title: "Legal", links: [{ label: "Privacy Policy", href: "/privacy" }] }],
+          storeLinks: [],
+          socialLinks: [],
+        },
       }),
     },
     React.createElement(Text, null, "Page content"),
@@ -227,10 +238,20 @@ const legalFixture = {
   brandHref: "/",
   signInLabel: "Sign in",
   signInHref: "/login",
-  footerLinks: [
-    { label: "Privacy Policy", href: "/privacy" },
-    { label: "Terms of Service", href: "/terms" },
-  ],
+  footer: {
+    brand: { label: "Eciperay", href: "/" },
+    columns: [
+      {
+        title: "Legal",
+        links: [
+          { label: "Privacy Policy", href: "/privacy" },
+          { label: "Terms of Service", href: "/terms" },
+        ],
+      },
+    ],
+    storeLinks: [],
+    socialLinks: [],
+  },
   sections: [
     {
       title: "Information we collect",

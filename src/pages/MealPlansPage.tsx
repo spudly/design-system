@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Button } from "../components/Button.js";
 import { CardStack } from "../components/CardStack.js";
 import { Center } from "../components/Center.js";
@@ -98,6 +99,8 @@ export type MealPlansPageItem = {
 };
 
 export type MealPlansPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** Meal plans to render, in the app's order. */
   plans: MealPlansPageItem[];
   /** Load in flight: the spinner renders in place of the list,
@@ -128,40 +131,43 @@ export function MealPlansPage({
   createHref,
   onPlanDelete,
   titleLevel,
+  footer,
 }: MealPlansPageProps) {
   return (
-    <ScreenContainer>
-      <Text variant="heading" aria-level={titleLevel}>
-        Meal plans
-      </Text>
-      {createHref ? <Button href={createHref}>New meal plan</Button> : null}
-      {loading ? (
-        <Center>
-          <Spinner label="Loading" />
-        </Center>
-      ) : plans.length === 0 ? (
-        <EmptyState title="No meal plans yet." />
-      ) : (
-        <CardStack>
-          {plans.map((plan) => (
-            <CardRow
-              key={plan.id}
-              title={plan.title}
-              {...(plan.subtitle ? { subtitle: plan.subtitle } : {})}
-              href={plan.href}
-              actionLabel="Delete"
-              actionTone="danger"
-              {...(onPlanDelete
-                ? {
-                    onActionPress: () => {
-                      onPlanDelete(plan.id);
-                    },
-                  }
-                : {})}
-            />
-          ))}
-        </CardStack>
-      )}
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer>
+        <Text variant="heading" aria-level={titleLevel}>
+          Meal plans
+        </Text>
+        {createHref ? <Button href={createHref}>New meal plan</Button> : null}
+        {loading ? (
+          <Center>
+            <Spinner label="Loading" />
+          </Center>
+        ) : plans.length === 0 ? (
+          <EmptyState title="No meal plans yet." />
+        ) : (
+          <CardStack>
+            {plans.map((plan) => (
+              <CardRow
+                key={plan.id}
+                title={plan.title}
+                {...(plan.subtitle ? { subtitle: plan.subtitle } : {})}
+                href={plan.href}
+                actionLabel="Delete"
+                actionTone="danger"
+                {...(onPlanDelete
+                  ? {
+                      onActionPress: () => {
+                        onPlanDelete(plan.id);
+                      },
+                    }
+                  : {})}
+              />
+            ))}
+          </CardStack>
+        )}
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

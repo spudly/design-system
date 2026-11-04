@@ -93,7 +93,7 @@ test("stories exercise every union state and both CTA variants", () => {
   for (const state of ["loading", "notFound", "unavailable"]) {
     assert.match(
       storiesCode,
-      new RegExp(`<PublicRecipePage state="${state}" />`),
+      new RegExp(`<PublicRecipePage[^>]*state="${state}"[^>]*/>`),
       `a story must render the ${state} union member`,
     );
   }

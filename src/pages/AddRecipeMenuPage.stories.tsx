@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { addRecipeMenuFixture } from "./fixtures.js";
+import { addRecipeMenuFixture, eciperayFooterFixture } from "./fixtures.js";
 import { AddRecipeMenuPage } from "./AddRecipeMenuPage.js";
 
 const meta: Meta<typeof AddRecipeMenuPage> = {
@@ -24,7 +24,7 @@ function Viewport({ children }: { children: ReactNode }) {
 export const Menu: Story = {
   render: () => (
     <Viewport>
-      <AddRecipeMenuPage options={addRecipeMenuFixture.options} />
+      <AddRecipeMenuPage footer={eciperayFooterFixture} options={addRecipeMenuFixture.options} />
     </Viewport>
   ),
 };

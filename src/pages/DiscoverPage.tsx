@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import {
   CatalogFiltersBar,
@@ -143,6 +144,8 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
 ];
 
 export type DiscoverPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   /** Page title copy — app-owned, like all copy on this page. */
   title: string;
   /** Search field placeholder copy ("Search public recipes…"
@@ -343,69 +346,73 @@ export function DiscoverPage(props: DiscoverPageProps) {
   );
 
   return (
-    <ScreenContainer variant="list" scrollable={false}>
-      <BoundedList
-        // Rows are separated by the list's own spacer, not by
-        // margins on the cards: the card is a standalone widget
-        // other surfaces compose, and its spacing in a layout is
-        // the layout's to own (the direction of #209).
-        separator="md"
-        contentInset="page"
-        // The filter controls live inside this scroll view, so taps
-        // on them must land while the keyboard is open instead of
-        // being consumed to dismiss it.
-        keyboardShouldPersistTaps="handled"
-        data={loading ? [] : recipes}
-        keyExtractor={(recipe) => recipe.id}
-        // The title and filters render as the list's header so they
-        // scroll together with the recipes (#188). The header sits
-        // inside the list's content container, which already
-        // supplies the horizontal padding. The list (and therefore
-        // the header) stays mounted while loading — a filter edit
-        // flips loading and a tree swap would unmount the focused
-        // filter input mid-typing; the loading indicator renders as
-        // the list's empty state instead.
-        ListHeaderComponent={
-          <CatalogHeader title={title}>
-            <CatalogFiltersBar
-              searchPlaceholder={searchPlaceholder}
-              search={search}
-              onSearchChange={onSearchChange}
-              filters={catalogFilters}
-              {...(activeFilters ? { activeFilters } : {})}
-              {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
-              {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
-              {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
+    <BigFooterShell footer={props.footer}>
+      <ScreenContainer variant="list" scrollable={false}>
+        <BoundedList
+          // Rows are separated by the list's own spacer, not by
+          // margins on the cards: the card is a standalone widget
+          // other surfaces compose, and its spacing in a layout is
+          // the layout's to own (the direction of #209).
+          separator="md"
+          contentInset="page"
+          // The filter controls live inside this scroll view, so taps
+          // on them must land while the keyboard is open instead of
+          // being consumed to dismiss it.
+          keyboardShouldPersistTaps="handled"
+          data={loading ? [] : recipes}
+          keyExtractor={(recipe) => recipe.id}
+          // The title and filters render as the list's header so they
+          // scroll together with the recipes (#188). The header sits
+          // inside the list's content container, which already
+          // supplies the horizontal padding. The list (and therefore
+          // the header) stays mounted while loading — a filter edit
+          // flips loading and a tree swap would unmount the focused
+          // filter input mid-typing; the loading indicator renders as
+          // the list's empty state instead.
+          ListHeaderComponent={
+            <CatalogHeader title={title}>
+              <CatalogFiltersBar
+                searchPlaceholder={searchPlaceholder}
+                search={search}
+                onSearchChange={onSearchChange}
+                filters={catalogFilters}
+                {...(activeFilters ? { activeFilters } : {})}
+                {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
+                {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
+                {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
+              />
+            </CatalogHeader>
+          }
+          renderItem={({ item }) => (
+            <DiscoveryCard
+              title={item.title}
+              {...(item.subtitle ? { subtitle: item.subtitle } : {})}
+              imageUrl={item.imageUrl}
+              href={item.href}
             />
-          </CatalogHeader>
-        }
-        renderItem={({ item }) => (
-          <DiscoveryCard
-            title={item.title}
-            {...(item.subtitle ? { subtitle: item.subtitle } : {})}
-            imageUrl={item.imageUrl}
-            href={item.href}
-          />
-        )}
-        ListEmptyComponent={
-          loading ? (
-            <ListLoadingState label="Loading" />
-          ) : errorMessage ? (
-            <Alert severity="error">{errorMessage}</Alert>
-          ) : (
-            <EmptyState title={emptyMessage} />
-          )
-        }
-        ListFooterComponent={isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined}
-        // Pagination: the shared catalog pattern's handler —
-        // see useCatalogPagination above. It stays mounted (but
-        // guarded) during a next-page fetch and is unmounted
-        // only for the first load, the error state, or a host
-        // with no continuation.
-        onEndReached={onEndReached}
-        onScroll={onScroll}
-        onEndReachedThreshold={onEndReachedThreshold}
-      />
-    </ScreenContainer>
+          )}
+          ListEmptyComponent={
+            loading ? (
+              <ListLoadingState label="Loading" />
+            ) : errorMessage ? (
+              <Alert severity="error">{errorMessage}</Alert>
+            ) : (
+              <EmptyState title={emptyMessage} />
+            )
+          }
+          ListFooterComponent={
+            isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined
+          }
+          // Pagination: the shared catalog pattern's handler —
+          // see useCatalogPagination above. It stays mounted (but
+          // guarded) during a next-page fetch and is unmounted
+          // only for the first load, the error state, or a host
+          // with no continuation.
+          onEndReached={onEndReached}
+          onScroll={onScroll}
+          onEndReachedThreshold={onEndReachedThreshold}
+        />
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

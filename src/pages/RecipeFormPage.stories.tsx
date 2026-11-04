@@ -5,7 +5,7 @@ import { TextAreaField } from "../components/TextAreaField.js";
 import { Text } from "../components/Text.js";
 import { TextField } from "../components/TextField.js";
 import { tokens } from "../tokens/index.js";
-import { recipeFormFixture } from "./fixtures.js";
+import { recipeFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
 /**
@@ -171,6 +171,7 @@ function FormHarness({
   const noop = () => undefined;
   return (
     <RecipeFormPage
+      footer={eciperayFooterFixture}
       title={title}
       onTitleChange={setTitle}
       description={description}

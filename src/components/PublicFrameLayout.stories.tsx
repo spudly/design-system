@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { PublicFrameFooter } from "./PublicFrameFooter.js";
+import { BigFooter } from "./BigFooter.js";
+import { eciperayFooterFixture } from "../pages/fixtures.js";
 import { PublicFrameHeader } from "./PublicFrameHeader.js";
 import { PublicFrameLayout } from "./PublicFrameLayout.js";
 import { Text } from "./Text.js";
@@ -25,15 +26,7 @@ export const Default: Story = {
             signInHref="/sign-in"
           />
         }
-        footer={
-          <PublicFrameFooter
-            note="Recipes shared on Eciperay may be viewed without an account."
-            links={[
-              { label: "Privacy Policy", href: "/privacy" },
-              { label: "Terms of Service", href: "/terms" },
-            ]}
-          />
-        }
+        footer={<BigFooter footer={eciperayFooterFixture} />}
       >
         <YStack padding="$6" gap="$3">
           <Text variant="heading">A public page</Text>

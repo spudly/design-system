@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
 import { SignInForm } from "../components/SignInForm.js";
@@ -28,6 +29,8 @@ import { Text } from "../components/Text.js";
  */
 
 export type SignInPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   email: string;
   password: string;
   onEmailChange: (value: string) => void;
@@ -54,23 +57,26 @@ export function SignInPage({
   onSubmit,
   signUpHref,
   forgotPasswordHref,
+  footer,
 }: SignInPageProps) {
   return (
-    <ScreenContainer scrollable={false} variant="auth">
-      <SectionStack>
-        <Text variant="heading">Welcome back</Text>
-        <SignInForm
-          email={email}
-          password={password}
-          onEmailChange={onEmailChange}
-          onPasswordChange={onPasswordChange}
-          loading={loading}
-          error={error}
-          onSubmit={onSubmit}
-          signUpHref={signUpHref}
-          forgotPasswordHref={forgotPasswordHref}
-        />
-      </SectionStack>
-    </ScreenContainer>
+    <BigFooterShell footer={footer}>
+      <ScreenContainer scrollable={false} variant="auth">
+        <SectionStack>
+          <Text variant="heading">Welcome back</Text>
+          <SignInForm
+            email={email}
+            password={password}
+            onEmailChange={onEmailChange}
+            onPasswordChange={onPasswordChange}
+            loading={loading}
+            error={error}
+            onSubmit={onSubmit}
+            signUpHref={signUpHref}
+            forgotPasswordHref={forgotPasswordHref}
+          />
+        </SectionStack>
+      </ScreenContainer>
+    </BigFooterShell>
   );
 }

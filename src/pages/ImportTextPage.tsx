@@ -1,3 +1,4 @@
+import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { useState } from "react";
 import { Button } from "../components/Button.js";
@@ -29,35 +30,39 @@ import { Text } from "../components/Text.js";
  */
 
 export type ImportTextPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
   loading?: boolean;
   error?: string | null;
   onSubmit: (text: string) => void;
 };
 
-export function ImportTextPage({ loading = false, error, onSubmit }: ImportTextPageProps) {
+export function ImportTextPage({ loading = false, error, onSubmit, footer }: ImportTextPageProps) {
   const [text, setText] = useState("");
 
   return (
-    <FormScreenLayout>
-      <Text variant="formTitle">Import from text</Text>
-      <Text variant="hint">Paste a recipe from Word, a web page, or any rich text source.</Text>
-      <TextAreaField
-        value={text}
-        onChangeText={setText}
-        placeholder="Paste your recipe here…"
-        accessibilityLabel="Recipe text"
-      />
-      {error ? <Alert severity="error" message={error} /> : null}
-      <Button
-        variant="primary"
-        disabled={!text.trim() || loading}
-        onPress={() => {
-          onSubmit(text);
-        }}
-        accessibilityLabel="Import"
-      >
-        {loading ? "Importing…" : "Import"}
-      </Button>
-    </FormScreenLayout>
+    <BigFooterShell footer={footer}>
+      <FormScreenLayout>
+        <Text variant="formTitle">Import from text</Text>
+        <Text variant="hint">Paste a recipe from Word, a web page, or any rich text source.</Text>
+        <TextAreaField
+          value={text}
+          onChangeText={setText}
+          placeholder="Paste your recipe here…"
+          accessibilityLabel="Recipe text"
+        />
+        {error ? <Alert severity="error" message={error} /> : null}
+        <Button
+          variant="primary"
+          disabled={!text.trim() || loading}
+          onPress={() => {
+            onSubmit(text);
+          }}
+          accessibilityLabel="Import"
+        >
+          {loading ? "Importing…" : "Import"}
+        </Button>
+      </FormScreenLayout>
+    </BigFooterShell>
   );
 }
