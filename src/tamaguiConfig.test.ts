@@ -11,9 +11,10 @@
  *
  * The contract now: importing the package's modules registers NO
  * global config; each app creates its own exactly once via
- * `createTamaguiConfig`. (Since #298 the factories are internal —
- * the package exports pages only — so this test loads the internal
- * dist surface via loadInternalDist; the no-global-config contract
+ * `createTamaguiConfig`. (Since #298 — and still under #411, which
+ * restored `createTamaguiConfig` alone to the root — the Storybook
+ * factories are internal, so this test loads the internal dist
+ * surface via loadInternalDist; the no-global-config contract
  * is about these modules' module scope, exactly as before.)
  *
  * Run against the built output: `npm run build` first (the `test`

@@ -22,6 +22,11 @@ export {
   type CheckboxSelectListProps,
 } from "./CheckboxSelectList.js";
 export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
+export {
+  ChunkErrorBoundary,
+  type ChunkErrorBoundaryProps,
+  type ChunkErrorBoundaryState,
+} from "./ChunkErrorBoundary.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField.js";

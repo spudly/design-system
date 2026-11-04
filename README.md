@@ -4,12 +4,17 @@ The shared design system for Spudly apps — currently **Eciperay** and **Memori
 plus any future apps. One brand-neutral core, per-app themes, universal
 (React web + React Native) components.
 
-**Exports (#298): the package exports page components only, from the
-package root.** Apps consume pages — `import { RecipesPage } from "@spudly/ui"` —
-and nothing else: no widget components, no icons, no composite (form)
-components, no tokens, themes, or Tamagui config factories, and no
-subpath exports. The modules under `src/components/`, `src/icons/`,
-`src/tokens/`, and `src/themes/` (and `src/tamagui.config.ts`) are the
+**Exports (#298, amended by #411): the package exports page
+components from the package root, plus a minimal theme/config
+surface.** Apps consume pages — `import { RecipesPage } from "@spudly/ui"` —
+and, to build their app-level Tamagui config, the brand themes
+(`baseTheme`, `eciperayTheme`, `memorizeTheme`, and their types) and
+`createTamaguiConfig`; `ChunkErrorBoundary` is also exported for
+lazily loaded surfaces. Nothing else comes back: no other widget
+components, no icons, no composite (form) components, no tokens or
+tag colors, no Storybook config factories, and no subpath exports.
+The modules under `src/components/`, `src/icons/`, and `src/tokens/`
+(and the rest of `src/themes/` and `src/tamagui.config.ts`) are the
 internal building blocks the pages are composed from; they are not
 part of the published package surface.
 
@@ -62,10 +67,13 @@ import { RecipesPage } from "@spudly/ui";
 ## How theming works
 
 Components never hardcode app branding. They read the raw `tokens` (or a
-theme's `semantic` roles) — all internal to this repo since #298: themes
-and tokens are not exported from the package, so consuming apps do not
-pick a theme from `@spudly/ui`; the pages render in the design system's
-own theming. To theme a new app inside this repo, copy
+theme's `semantic` roles). Since #411 the brand themes are exported
+from the package again, so a consuming app picks its theme from
+`@spudly/ui` and creates its own Tamagui config with it —
+`createTamaguiConfig(eciperayTheme)` (or `memorizeTheme` /
+`baseTheme`) — in app-owned code, exactly once (Tamagui keeps one
+global config; see `src/tamagui.config.ts`). Tokens themselves stay
+internal. To theme a new app inside this repo, copy
 `src/themes/memorize.ts`, override the semantic colors and font family,
 and export it. The base ramp stays shared so components keep working
 everywhere.

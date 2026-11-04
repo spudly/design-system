@@ -1,14 +1,28 @@
 /**
- * Package root (#298): page components only.
+ * Package root (#298, amended by #411): page components, plus the
+ * minimal theme/config surface the consumer apps build on.
  *
- * The root entry re-exports the pages barrel and nothing else:
- * no widget components, no icons, no composite (form) components,
- * and no tokens, themes, tag colors, or Tamagui config factories.
- * There are no subpath exports either — apps consume pages from
- * the package root, full stop.
+ * The root entry re-exports the pages barrel, and — Stephen's
+ * #411 amendment to the #298 pages-only cut (2026-11-03: "DS
+ * should own themes and tamagui configs") — exactly these
+ * additions:
  *
- * Widgets, icons, tokens, themes, and the config factories remain
- * in the repo as internal building blocks (src/components,
+ * - the brand themes (`baseTheme`, `eciperayTheme`,
+ *   `memorizeTheme`) and their types from src/themes/;
+ * - `createTamaguiConfig` from src/tamagui.config.ts, the factory
+ *   each app uses to create its own app-level Tamagui config;
+ * - `ChunkErrorBoundary` (and its prop/state types), the recovery
+ *   boundary for lazily loaded surfaces, lifted from Memorize's
+ *   app shell.
+ *
+ * Nothing else comes back: no widget components (ChunkErrorBoundary
+ * is the one named exception), no icons, no composite (form)
+ * components, and no tokens, tag colors, or Storybook config
+ * factories. There are no subpath exports either — apps consume
+ * everything from the package root, full stop.
+ *
+ * Widgets, icons, tokens, tag colors, and the Storybook factories
+ * remain in the repo as internal building blocks (src/components,
  * src/icons, src/tokens, src/themes, src/tamagui.config.ts) that
  * the pages are composed from and that this repo's own Storybook
  * apps and tests reach by relative path; they are not part of the
@@ -20,3 +34,11 @@
  * the pages entry, and page components may import react-native.
  */
 export * from "./pages/index.js";
+export { baseTheme, eciperayTheme, memorizeTheme } from "./themes/index.js";
+export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
+export { createTamaguiConfig } from "./tamagui.config.js";
+export {
+  ChunkErrorBoundary,
+  type ChunkErrorBoundaryProps,
+  type ChunkErrorBoundaryState,
+} from "./components/ChunkErrorBoundary.js";
