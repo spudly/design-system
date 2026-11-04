@@ -42,6 +42,8 @@ export {
   type MealPlanDetailPageEntry,
   type MealPlanDetailPageNutritionGoals,
   type MealPlanDetailPageProps,
+  type MealPlanDetailPageWeeklyTotals,
+  type MealPlanDetailPageWeeklyTotalsRow,
 } from "./MealPlanDetailPage.js";
 export {
   PublicRecipePage,
