@@ -50,17 +50,25 @@ const bar = readCode("CatalogFiltersBar.tsx");
 const header = readCode("CatalogHeader.tsx");
 const loadingState = readCode("ListLoadingState.tsx");
 
-test("the catalog components are exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("the catalog components are exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   for (const name of ["CatalogFiltersBar", "CatalogHeader", "ListLoadingState"]) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+    assert.equal(
+      typeof dist[name],
+      "function",
+      `${name} must be exported from the internal components barrel`,
+    );
   }
 });
 
 test("the middleman list states are not shipped (PR #320)", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   for (const name of ["ListErrorState", "ListLoadingFooter"]) {
-    assert.equal(dist[name], undefined, `${name} must not be exported from @spudly/ui`);
+    assert.equal(
+      dist[name],
+      undefined,
+      `${name} must not be exported from the internal components barrel`,
+    );
     assert.ok(
       !existsSync(join(componentsDir, `${name}.tsx`)),
       `${name}.tsx must not exist — render Alert / ListLoadingState directly`,

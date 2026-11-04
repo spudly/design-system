@@ -14,11 +14,11 @@
  *    the row cards' bottom margin used to provide.
  *
  * It lives in src/pages as internal scaffolding (the PageFrame
- * pattern): it imports react-native, which no root-exported
- * component may do (the package root is imported in plain Node),
- * and it is NOT exported from src/pages/index.ts — the pages
- * that use it import it directly. Those placements are pinned
- * here and in test/storybookParity.test.ts.
+ * pattern): it imports react-native and it is not a page, so
+ * under the pages-only export contract (#298) it is NOT exported
+ * from src/pages/index.ts — the pages that use it import it
+ * directly. Those placements are pinned here and in
+ * test/storybookParity.test.ts.
  *
  * This is a source scan, not a render test, for the same reason
  * as test/verseSearchPage.test.ts: the failures it guards

@@ -25,13 +25,12 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * callbacks out, recipe view-models in, press callbacks out. Nothing
  * here imports an app package or fetches anything.
  *
- * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root. This
- * component imports react-native's FlatList (through BoundedList);
- * the root entry must stay importable in plain Node (SSR, tooling,
- * this repo's own config tests), where react-native's Flow-typed
- * source cannot load. Apps opt into the subpath explicitly when they
- * rewire a screen onto a page component.
+ * Placement: page components live in src/pages and are exported
+ * from the package root (#298) — pages are the package's only
+ * exports. This component imports react-native's FlatList
+ * (through BoundedList), so the root entry is a react-native
+ * entry like the apps' own builds; the old rule that the root
+ * must stay importable in plain Node is superseded.
  *
  * The composition mirrors the app's RecipesListView (spudly/eciperay
  * packages/app) exactly, including its two layout regressions kept as

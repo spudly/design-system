@@ -41,6 +41,7 @@
  * registerSvgStub.ts before anything else.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -70,8 +71,8 @@ const textFieldSource = readFileSync(join(componentsDir, "TextField.tsx"), "utf8
 const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
 const buttonCode = code("Button.tsx");
 
-test("the layout components are exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("the layout components are exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   for (const name of [
     "ButtonRow",
     "CardStack",
@@ -83,7 +84,11 @@ test("the layout components are exported from the built package root", async () 
     "Center",
     "FieldStack",
   ]) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+    assert.equal(
+      typeof dist[name],
+      "function",
+      `${name} must be exported from the internal components barrel`,
+    );
   }
   assert.equal(
     dist.Row,
@@ -200,10 +205,14 @@ test("Button's grow keeps a content-sized basis in both forms (no wrapping-row c
   );
 });
 
-test("the filter-bar shells are exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("the filter-bar shells are exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   for (const name of ["FieldStack", "SearchRow"]) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+    assert.equal(
+      typeof dist[name],
+      "function",
+      `${name} must be exported from the internal components barrel`,
+    );
   }
   assert.equal(
     dist.FilterBar,

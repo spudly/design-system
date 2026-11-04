@@ -51,8 +51,9 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  * section in, intent callbacks out. Nothing here imports an app
  * package or fetches anything.
  *
- * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root.
+ * Placement: page components live in src/pages and are exported
+ * from the package root (#298) — pages are the package's only
+ * exports.
  *
  * Composition mirrors the app's RecipeDetailScreen +
  * RecipeDetailChrome (spudly/eciperay packages/app): a pinned

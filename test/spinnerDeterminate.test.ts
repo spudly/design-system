@@ -20,7 +20,7 @@
  *    platformAccessibilityProps translator (ProgressBar's pattern):
  *    role "progressbar", accessibilityValue {min 0, max 100, now}.
  * 4. The component source imports NO react-native-svg and NO
- *    react-native: Spinner is exported from the package root, whose
+ *    react-native: Spinner is exported from the internal components barrel, whose
  *    entry must stay importable in plain Node (the icons module
  *    lives behind ./icons for exactly this reason), and the dist
  *    root still loads with the ring in its graph.
@@ -37,6 +37,7 @@
  * too, the same way pageWebAria.test.ts pins ProgressBar's.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -98,7 +99,7 @@ test("Spinner stays free of react-native-svg and react-native imports (#178)", (
 });
 
 test("the dist root still loads in plain Node with the ring in its graph (#178)", async () => {
-  const mod: Record<string, any> = await import("../dist/index.js");
+  const mod: Record<string, any> = await loadInternalDist();
   assert.equal(typeof mod.Spinner, "function");
 });
 
@@ -113,7 +114,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...dist };
   })();
   return runtimePromise;

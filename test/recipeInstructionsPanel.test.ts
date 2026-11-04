@@ -31,12 +31,12 @@ const panelCode = panelSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("RecipeInstructionsPanel is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("RecipeInstructionsPanel is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   assert.equal(
     typeof dist.RecipeInstructionsPanel,
     "function",
-    "RecipeInstructionsPanel must be exported from @spudly/ui",
+    "RecipeInstructionsPanel must be exported from the internal components barrel",
   );
 });
 

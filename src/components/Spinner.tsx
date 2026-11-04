@@ -39,13 +39,14 @@ function ringSizePx(size: SpinnerProps["size"]): number {
  * and track.
  *
  * Why the arc is built from bordered views instead of an SVG circle
- * (the shuoink original's technique): Spinner is exported from the
- * package root, and the root entry must stay importable in plain Node
- * — the reason the icons module, the one react-native-svg consumer,
- * lives behind the ./icons subpath. An SVG import here would drag
- * react-native's untranspiled sources into the root graph and break
- * that import (verified: the dist root fails to load in Node with
- * react-native-svg in this file).
+ * (the shuoink original's technique): historically, the package
+ * root had to stay importable in plain Node, and an SVG import
+ * here would drag react-native's untranspiled sources into the
+ * root graph and break that import (verified at the time: the
+ * dist root failed to load in Node with react-native-svg in this
+ * file). The bordered-view arc stays: it is the settled technique
+ * and needs no icon dependency. (The root-importability rule
+ * itself is superseded by the pages-only export contract, #298.)
  *
  * So the arc is two half-clipped rings. A ring whose border is colored
  * on two adjacent sides shows a semicircle (each border side paints a

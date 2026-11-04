@@ -22,6 +22,7 @@
  *    the surface in every brand theme and both modes.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -37,7 +38,7 @@ const pageCode = pageSource
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 const { baseTheme, eciperayTheme, memorizeTheme, createTamaguiConfig, tokens } =
-  await import("../dist/index.js");
+  await loadInternalDist();
 
 function luminance(hex: any) {
   const [r, g, b] = [1, 3, 5]
@@ -54,12 +55,12 @@ function contrast(a: any, b: any) {
   return (l1 + 0.05) / (l2 + 0.05);
 }
 
-test("StatusMessage is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("StatusMessage is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
     typeof dist.StatusMessage,
     "function",
-    "StatusMessage must be exported from @spudly/ui",
+    "StatusMessage must be exported from the internal components barrel",
   );
 });
 

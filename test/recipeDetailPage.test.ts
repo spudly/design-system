@@ -5,7 +5,7 @@
  *
  * The invariants pinned here are the ones the Eciperay rewire will
  * depend on, and each is a per-literal property of the source:
- * 1. The component is exported from the pages subpath index, and
+ * 1. The component is exported from the pages barrel index, and
  *    the view imports nothing from an app package and runs no
  *    queries or mutations — business logic stays app-side.
  * 2. The loading member of the props union renders only the
@@ -78,7 +78,7 @@ const storiesCode = stories
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("RecipeDetailPage is exported from the pages subpath", () => {
+test("RecipeDetailPage is exported from the pages barrel", () => {
   assert.match(index, /RecipeDetailPage,/, "index.ts must export RecipeDetailPage");
   assert.match(
     index,

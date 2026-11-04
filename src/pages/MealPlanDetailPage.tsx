@@ -19,10 +19,9 @@ import { TextLink } from "../components/TextLink.js";
  * in, destinations and callbacks out. Nothing here imports an app
  * package or fetches anything.
  *
- * Placement: page components live in src/pages behind the
- * `@spudly/ui/pages` subpath export, not the package root — see
- * RecipesPage.tsx for why (react-native imports must stay out of
- * the Node-importable root entry).
+ * Placement: page components live in src/pages and are exported
+ * from the package root (#298) — pages are the package's only
+ * exports.
  *
  * The screen inventory this mirrors (MealPlanDetailView in
  * spudly/eciperay packages/app), in render order: the plan title,

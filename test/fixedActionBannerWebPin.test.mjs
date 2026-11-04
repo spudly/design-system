@@ -113,7 +113,16 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider } = await import("tamagui");
-    const dist = await import("../dist/index.js");
+    // #298: the package root is pages-only; the internal surface
+    // is loaded from its dist modules directly (this .mjs test is
+    // not part of the compiled test suite, so it cannot use the
+    // test/internalDist.ts helper the .ts tests share).
+    const dist = {
+      ...(await import("../dist/tokens/index.js")),
+      ...(await import("../dist/themes/index.js")),
+      ...(await import("../dist/tamagui.config.js")),
+      ...(await import("../dist/components/index.js")),
+    };
     return { React, renderToString, TamaguiProvider, ...dist };
   })();
   return runtimePromise;

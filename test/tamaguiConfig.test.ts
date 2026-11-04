@@ -9,13 +9,18 @@
  * at module scope, so importing the package left the last-created
  * (Memorize) config in charge of the Eciperay app's rendering.
  *
- * The contract now: importing the package registers NO global config;
- * each app creates its own exactly once via `createTamaguiConfig`.
+ * The contract now: importing the package's modules registers NO
+ * global config; each app creates its own exactly once via
+ * `createTamaguiConfig`. (Since #298 the factories are internal —
+ * the package exports pages only — so this test loads the internal
+ * dist surface via loadInternalDist; the no-global-config contract
+ * is about these modules' module scope, exactly as before.)
  *
  * Run against the built output: `npm run build` first (the `test`
  * script does both).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
@@ -32,15 +37,15 @@ function getConfigMaybe() {
   return config;
 }
 
-test("importing the package registers no global Tamagui config", async () => {
+test("importing the package's internal modules registers no global Tamagui config", async () => {
   assert.equal(getConfigMaybe(), undefined, "no config before import");
 
-  const pkg: Record<string, any> = await import("../dist/index.js");
+  const pkg: Record<string, any> = await loadInternalDist();
 
   assert.equal(
     getConfigMaybe(),
     undefined,
-    "importing @spudly/ui must not call createTamagui at module scope",
+    "importing the internal modules must not call createTamagui at module scope",
   );
 
   // The pre-built config exports are gone so consumers cannot
@@ -57,7 +62,7 @@ test("importing the package registers no global Tamagui config", async () => {
 
 test("createTamaguiConfig installs the caller's brand as the global config", async () => {
   const { createTamaguiConfig, eciperayTheme, memorizeTheme }: Record<string, any> =
-    await import("../dist/index.js");
+    await loadInternalDist();
 
   const config = createTamaguiConfig(eciperayTheme);
   assert.equal(getConfigMaybe(), config);
@@ -72,7 +77,7 @@ test("createTamaguiConfig installs the caller's brand as the global config", asy
 });
 
 test("resolveFontFamily attaches the declared static faces on native, none on web (#326)", async () => {
-  const { resolveFontFamily, tokens }: Record<string, any> = await import("../dist/index.js");
+  const { resolveFontFamily, tokens }: Record<string, any> = await loadInternalDist();
   const { fontFamily } = tokens.typography;
 
   // The faces Tamagui registers for the base brand on either native

@@ -21,9 +21,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "MarkableRow.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("MarkableRow is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.MarkableRow, "function", "MarkableRow must be exported from @spudly/ui");
+test("MarkableRow is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
+  assert.equal(
+    typeof dist.MarkableRow,
+    "function",
+    "MarkableRow must be exported from the internal components barrel",
+  );
 });
 
 test("a marked row dims but keeps its press — the mark is a toggle, not a disable", () => {

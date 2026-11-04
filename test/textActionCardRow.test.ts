@@ -24,12 +24,12 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "TextActionCardRow.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("TextActionCardRow is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("TextActionCardRow is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   assert.equal(
     typeof dist.TextActionCardRow,
     "function",
-    "TextActionCardRow must be exported from @spudly/ui",
+    "TextActionCardRow must be exported from the internal components barrel",
   );
 });
 

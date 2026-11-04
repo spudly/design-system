@@ -11,6 +11,7 @@
  * ratings yet" line.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -21,9 +22,13 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "..", "src", "components", "RatingsCard.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("RatingsCard is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.RatingsCard, "function", "RatingsCard must be exported from @spudly/ui");
+test("RatingsCard is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  assert.equal(
+    typeof dist.RatingsCard,
+    "function",
+    "RatingsCard must be exported from the internal components barrel",
+  );
 });
 
 test("the viewer's star input keeps the adapter's clear-on-repress and pending semantics", () => {
@@ -54,7 +59,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...dist };
   })();
   return runtimePromise;

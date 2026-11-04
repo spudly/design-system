@@ -30,9 +30,13 @@ const loadingGateCode = loadingGateSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("LoadingGate is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.LoadingGate, "function", "LoadingGate must be exported from @spudly/ui");
+test("LoadingGate is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
+  assert.equal(
+    typeof dist.LoadingGate,
+    "function",
+    "LoadingGate must be exported from the internal components barrel",
+  );
 });
 
 test("LoadingGateProps is a type-only export from the built components barrel", () => {

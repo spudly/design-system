@@ -1,8 +1,12 @@
 /**
  * Page components (#49): full-page, props-controlled views for the
- * apps' screens. Exported from the `@spudly/ui/pages` subpath, not
- * the package root — page components may import react-native (e.g.
- * FlatList), and the root entry must stay importable in plain Node.
+ * apps' screens. This barrel is the package's entire public
+ * surface (#298): the package root re-exports it, there are no
+ * subpath exports, and nothing else — no widgets, icons, tokens,
+ * themes, or config factories — is exported from the package.
+ * Page components may import react-native (e.g. FlatList); the
+ * old rule that the root entry must stay importable in plain
+ * Node is superseded by the pages-only contract.
  */
 export { RecipesPage, type RecipesPageItem, type RecipesPageProps } from "./RecipesPage.js";
 export {

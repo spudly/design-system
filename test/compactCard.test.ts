@@ -14,6 +14,7 @@
  * variant.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -26,8 +27,12 @@ const source = readFileSync(join(root, "src", "components", "Card.tsx"), "utf8")
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("CompactCard is gone — the treatment lives on Card as a variant", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.Card, "function", "Card must be exported from @spudly/ui");
+  const dist: Record<string, any> = await loadInternalDist();
+  assert.equal(
+    typeof dist.Card,
+    "function",
+    "Card must be exported from the internal components barrel",
+  );
   assert.equal(
     dist.CompactCard,
     undefined,

@@ -4,6 +4,15 @@ The shared design system for Spudly apps — currently **Eciperay** and **Memori
 plus any future apps. One brand-neutral core, per-app themes, universal
 (React web + React Native) components.
 
+**Exports (#298): the package exports page components only, from the
+package root.** Apps consume pages — `import { RecipesPage } from "@spudly/ui"` —
+and nothing else: no widget components, no icons, no composite (form)
+components, no tokens, themes, or Tamagui config factories, and no
+subpath exports. The modules under `src/components/`, `src/icons/`,
+`src/tokens/`, and `src/themes/` (and `src/tamagui.config.ts`) are the
+internal building blocks the pages are composed from; they are not
+part of the published package surface.
+
 ## What's inside
 
 - `src/tokens/` — design tokens: colors, typography, spacing, radii, shadows.
@@ -38,34 +47,28 @@ Local auth is a one-time `npm login --registry=https://npm.pkg.github.com`
 built-in `GITHUB_TOKEN` — see `.github/workflows/`.
 
 ```tsx
-import { Button, createTamaguiConfig, eciperayTheme } from "@spudly/ui";
-import { TamaguiProvider } from "tamagui";
+import { RecipesPage } from "@spudly/ui";
 
-// Create the app's config exactly once, in app-owned code outside
-// rendering. Tamagui resolves all styling against the config from the
-// most recent createTamagui() call, so the package ships factories
-// only — never pre-built configs (see src/tamagui.config.ts).
-const tamaguiConfig = createTamaguiConfig(eciperayTheme);
-
-<TamaguiProvider config={tamaguiConfig}>
-  <Button variant="primary" size="md" onPress={save}>
-    Save recipe
-  </Button>
-</TamaguiProvider>;
+// Pages are controlled components: the app keeps all state and
+// business logic and drives the page entirely through props.
+<RecipesPage
+  recipes={recipes}
+  loading={loading}
+  // …the rest of the page's props: filter values in, change
+  // callbacks out, press callbacks out
+/>;
 ```
 
 ## How theming works
 
 Components never hardcode app branding. They read the raw `tokens` (or a
-theme's `semantic` roles). Each app picks its theme:
-
-```ts
-import { eciperayTheme, memorizeTheme } from "@spudly/ui";
-```
-
-To theme a new app, copy `src/themes/memorize.ts`, override the semantic
-colors and font family, and export it. The base ramp stays shared so
-components keep working everywhere.
+theme's `semantic` roles) — all internal to this repo since #298: themes
+and tokens are not exported from the package, so consuming apps do not
+pick a theme from `@spudly/ui`; the pages render in the design system's
+own theming. To theme a new app inside this repo, copy
+`src/themes/memorize.ts`, override the semantic colors and font family,
+and export it. The base ramp stays shared so components keep working
+everywhere.
 
 ## Release process
 

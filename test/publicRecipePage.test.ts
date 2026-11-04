@@ -8,7 +8,7 @@
  * The invariants pinned here are the ones the Eciperay web rewire
  * will depend on, and the decisions Stephen resolved on #169
  * (2026-10-28):
- * 1. Both components are exported from the pages subpath index,
+ * 1. Both components are exported from the pages barrel index,
  *    and the views import nothing from an app package and run no
  *    queries or mutations — business logic stays app-side.
  * 2. Error states live inside the props union: loading, notFound,
@@ -98,7 +98,7 @@ const ingredientsCode = strip(
 const ratingsCode = strip(ratingsSource);
 const scrollShellCode = strip(scrollShellSource);
 
-test("PublicRecipePage and PublicPageFrame are exported from the pages subpath", () => {
+test("PublicRecipePage and PublicPageFrame are exported from the pages barrel", () => {
   assert.match(index, /PublicRecipePage,/, "index.ts must export PublicRecipePage");
   assert.match(
     index,

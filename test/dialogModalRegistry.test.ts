@@ -45,8 +45,8 @@ const registry = read("src/components/modalRegistry.ts");
 const dialog = read("src/components/Dialog.tsx");
 const overlay = read("src/components/StepOverlay.tsx");
 
-test("the modal registry is internal — not exported from the built package root (#394)", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("the modal registry is internal — not exported from the built internal components barrel (#394)", async () => {
+  const dist: Record<string, any> = await import("../dist/components/index.js");
   assert.equal("registerModalLayer" in dist, false, "the registry must not be public API");
   assert.equal("ModalLayerContext" in dist, false, "the layer context must not be public API");
   assert.equal("isActiveModalLayer" in dist, false, "arbitration must not be public API");

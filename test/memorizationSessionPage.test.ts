@@ -37,7 +37,7 @@
  *    element is a DS primitive over view-model data, and the
  *    drill's one interactive primitive (BlankWord) is
  *    already a DS component.
- * 6. The component is exported from the pages subpath
+ * 6. The component is exported from the pages barrel
  *    index, and stories exercise the FirstRound, MidSession,
  *    RetryFeedback, FinalRound, and NotFound states so
  *    Chromatic captures them.
@@ -244,7 +244,7 @@ test("there is deliberately no app-content render slot", () => {
   );
 });
 
-test("the component is exported from the pages subpath index", () => {
+test("the component is exported from the pages barrel index", () => {
   assert.match(index, /MemorizationSessionPage/);
   assert.match(index, /type MemorizationSessionPageProps/);
   assert.match(index, /from "\.\/MemorizationSessionPage\.js"/);

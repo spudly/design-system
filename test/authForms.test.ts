@@ -27,6 +27,7 @@
  *   link frames, and an explicit color still wins over it.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -225,7 +226,7 @@ test("TextLink's muted tone is the muted role on both frames, under an explicit 
 });
 
 test("the built dist exports the auth forms and LegalSection", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+  const dist: Record<string, any> = await loadInternalDist();
   for (const name of [...FORMS, "LegalSection"]) {
     assert.equal(typeof dist[name], "function", `${name} is exported from dist`);
   }

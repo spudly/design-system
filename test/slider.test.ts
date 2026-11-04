@@ -65,6 +65,7 @@
  * dist (see registerSvgStub.ts).
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -73,7 +74,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const dist: Record<string, any> = await import("../dist/index.js");
+const dist: Record<string, any> = await loadInternalDist();
 
 function codeOf(rel: string) {
   const source = readFileSync(join(root, rel), "utf8");
@@ -83,8 +84,12 @@ function codeOf(rel: string) {
 const slider = codeOf("src/components/Slider.tsx");
 const stories = codeOf("src/components/Slider.stories.tsx");
 
-test("Slider is exported from the package root", () => {
-  assert.equal(typeof dist.Slider, "function", "Slider must be exported from dist/index.js");
+test("Slider is exported from the internal components barrel", () => {
+  assert.equal(
+    typeof dist.Slider,
+    "function",
+    "Slider must be exported from the internal components barrel",
+  );
 });
 
 test("the contract is scalar and controlled; the Tamagui array API stays inside", () => {
@@ -224,7 +229,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const distModule: Record<string, any> = await import("../dist/index.js");
+    const distModule: Record<string, any> = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...distModule };
   })();
   return runtimePromise;

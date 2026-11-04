@@ -41,11 +41,9 @@ import { tokens } from "../tokens/index.js";
  * fixed-shell pages have always rendered.
  *
  * Why this lives in src/pages and not src/components: it imports
- * react-native's FlatList, and no root-exported component may do
- * that — the package root (dist/index.js) is imported in plain
- * Node by the test suite, and react-native does not load there.
- * The pages subpath is the package's react-native-importing area,
- * so the shared list sits with its consumers as internal page
+ * react-native's FlatList, and it is page scaffolding, not a
+ * page — the package exports page components only (#298), so
+ * the shared list sits with its consumers as internal page
  * scaffolding — the PageFrame pattern: not exported from
  * src/pages/index.ts, exercised through the pages that render it
  * (VerseSearchPage, MemorizeReviewPage, MyVersesPage today;

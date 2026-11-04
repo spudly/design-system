@@ -3,7 +3,7 @@
  * (spudly/design-system#180).
  *
  * The contracts pinned here:
- * 1. TextAreaField is exported from the package root (dist) and
+ * 1. TextAreaField is exported from the internal components barrel (dist) and
  *    MultilineField is no longer exported under its old name.
  * 2. The component source keeps the field contract MultilineField had:
  *    a styled Tamagui TextArea named TextAreaField, a label wired
@@ -22,7 +22,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const dist: Record<string, any> = await import("../dist/index.js");
+const dist: Record<string, any> = await import("../dist/components/index.js");
 
 test("TextAreaField is exported and MultilineField is gone (#180)", () => {
   assert.equal(typeof dist.TextAreaField, "function", "TextAreaField must be exported");

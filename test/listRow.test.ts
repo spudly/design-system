@@ -23,6 +23,7 @@
  * registerSvgStub.ts before anything else.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -37,9 +38,13 @@ const listRowCode = listRowSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("ListRow is exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
-  assert.equal(typeof dist.ListRow, "function", "ListRow must be exported from @spudly/ui");
+test("ListRow is exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  assert.equal(
+    typeof dist.ListRow,
+    "function",
+    "ListRow must be exported from the internal components barrel",
+  );
 });
 
 test("ListRowProps is a type-only export from the built components barrel", () => {

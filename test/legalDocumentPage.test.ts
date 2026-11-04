@@ -28,6 +28,7 @@
  * their hrefs, and the footer present.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -133,7 +134,7 @@ test("the document renders in a prose column; list blocks carry list semantics (
   );
 });
 
-test("LegalDocumentPage is exported from the pages subpath with its view-model types (#170)", () => {
+test("LegalDocumentPage is exported from the pages barrel with its view-model types (#170)", () => {
   const index = readCode("src/pages/index.ts");
   assert.match(index, /LegalDocumentPage,/, "page exported");
   for (const typeName of [
@@ -166,7 +167,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     const { LegalDocumentPage }: Record<string, any> =
       await import("../dist/pages/LegalDocumentPage.js");
     return { React, renderToString, TamaguiProvider, ...dist, LegalDocumentPage };

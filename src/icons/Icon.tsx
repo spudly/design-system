@@ -30,10 +30,10 @@ import { Circle, Line, Path, Polyline, Rect, Svg } from "react-native-svg";
  * (e.g. which icon a tab uses). That is app configuration and
  * belongs to the consuming app.
  *
- * Placement: icons live behind the `@spudly/ui/icons` subpath
- * export, not the package root — this module imports
- * react-native-svg, and the root entry must stay importable in
- * plain Node (the same reason pages live behind `@spudly/ui/pages`).
+ * Placement: icons are internal building blocks (#298) — they
+ * are not exported from the package anywhere; pages and
+ * components reach them by relative path inside this repo.
+ * This module imports react-native-svg.
  */
 
 /** One SVG child element of an icon, in Feather's own terms. */

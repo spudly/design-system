@@ -4,7 +4,7 @@
  * spec, re-implemented in DS conventions).
  *
  * The contracts pinned here:
- * 1. All three components are exported from the package root (dist).
+ * 1. All three components are exported from the internal components barrel (dist).
  * 2. Accordion is single-open and data-driven: sections arrive as
  *    AccordionItem data, the open section is tracked by value
  *    (openValue / defaultOpenValue / onOpenValueChange — the Tabs
@@ -44,7 +44,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const dist: Record<string, any> = await import("../dist/index.js");
+const dist: Record<string, any> = await import("../dist/components/index.js");
 
 function codeOf(rel: string): string {
   const source = readFileSync(join(root, rel), "utf8");
@@ -56,9 +56,13 @@ const section = codeOf("src/components/AccordionSection.tsx");
 const collapsible = codeOf("src/components/Collapsible.tsx");
 const family = { Accordion: accordion, AccordionSection: section, Collapsible: collapsible };
 
-test("Accordion, AccordionSection, and Collapsible are exported from the package root", () => {
+test("Accordion, AccordionSection, and Collapsible are exported from the internal components barrel", () => {
   for (const name of ["Accordion", "AccordionSection", "Collapsible"]) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from dist/index.js`);
+    assert.equal(
+      typeof dist[name],
+      "function",
+      `${name} must be exported from the internal components barrel`,
+    );
   }
 });
 

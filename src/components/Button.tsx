@@ -170,7 +170,7 @@ type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" |
   grow?: boolean;
   /**
    * The icon slot: one of the design system's semantic icon
-   * components from `@spudly/ui/icons` (PrintIcon, ShareIcon, …).
+   * components from the internal icons module (PrintIcon, ShareIcon, …).
    * This is CONTENT, not styling — Button renders the glyph itself,
    * at the size's standard glyph size (18/20/24px for sm/md/lg),
    * inked in the variant's label color resolved from the active

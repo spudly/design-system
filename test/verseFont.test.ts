@@ -24,6 +24,7 @@
  * script does both). The source scan reads source.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -34,7 +35,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const srcDir = join(here, "..", "src");
 
 const { tokens, baseTheme, eciperayTheme, memorizeTheme, createTamaguiConfig } =
-  await import("../dist/index.js");
+  await loadInternalDist();
 
 test("the base verse role is the serif stack on every platform", () => {
   const { fontFamily } = tokens.typography;

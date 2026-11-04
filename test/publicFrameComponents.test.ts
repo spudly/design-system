@@ -15,6 +15,7 @@
  * the frame rendered before the extraction.
  */
 import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -35,10 +36,14 @@ const layout = readCode("PublicFrameLayout.tsx");
 const header = readCode("PublicFrameHeader.tsx");
 const footer = readCode("PublicFrameFooter.tsx");
 
-test("the frame components are exported from the built package root", async () => {
-  const dist: Record<string, any> = await import("../dist/index.js");
+test("the frame components are exported from the built internal components barrel", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
   for (const name of ["BrandLink", "PublicFrameLayout", "PublicFrameHeader", "PublicFrameFooter"]) {
-    assert.equal(typeof dist[name], "function", `${name} must be exported from @spudly/ui`);
+    assert.equal(
+      typeof dist[name],
+      "function",
+      `${name} must be exported from the internal components barrel`,
+    );
   }
   assert.equal(dist.COLUMN_MAX_WIDTH, 768, "the shared column constant is exported");
 });
@@ -123,7 +128,7 @@ function loadRuntime() {
     const React = reactModule.default;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await import("../dist/index.js");
+    const dist: Record<string, any> = await loadInternalDist();
     return { React, renderToString, TamaguiProvider, ...dist };
   })();
   return runtimePromise;

@@ -24,14 +24,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./icons": {
-      "types": "./dist/icons/index.d.ts",
-      "default": "./dist/icons/index.js"
-    },
-    "./pages": {
-      "types": "./dist/pages/index.d.ts",
-      "default": "./dist/pages/index.js"
     }
   },
   "files": [

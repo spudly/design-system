@@ -16,10 +16,8 @@ import { TextField } from "../components/TextField.js";
  * @memorize/core — and drives this view entirely through
  * props. Nothing here imports an app package.
  *
- * Placement: src/pages behind the `@spudly/ui/pages` subpath
- * export, not the package root — see RecipesPage.tsx for why
- * (react-native imports must stay out of the Node-importable
- * root entry).
+ * Placement: src/pages, exported from the package root (#298)
+ * — pages are the package's only exports.
  *
  * Which screen this is: the app's Settings tab (SettingsScreen
  * in spudly/memorize packages/app). The app chrome (its
