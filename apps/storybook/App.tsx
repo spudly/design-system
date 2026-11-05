@@ -229,7 +229,7 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
         const r = await captureFullPageNative(`dsvr-appcap-${nonce}.png`);
         if (!cancelled) {
           console.log(
-            `DSVR APPCAP ${nonce} ${storyId} path=${r.path} ipath=${r.internalPath} w=${r.width} h=${r.height} content=${r.contentHeight} viewport=${r.viewportHeight} root=${r.rootHeight} mode=${r.mode} scrolls=${r.scrollViews} chain=${r.chainDepth} ms=${r.drawMs}`,
+            `DSVR APPCAP ${nonce} ${storyId} path=${r.path} ipath=${r.internalPath} w=${r.width} h=${r.height} content=${r.contentHeight} viewport=${r.viewportHeight} root=${r.rootHeight} mode=${r.mode} scrolls=${r.scrollViews} chain=${r.chainDepth} ms=${r.drawMs} settle=${r.settleDraws}`,
           );
         }
       } catch (error) {

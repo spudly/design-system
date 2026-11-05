@@ -32,6 +32,13 @@ export interface FullPageCaptureResult {
   mode: "scroll" | "root";
   scrollViews: number;
   chainDepth: number;
+  /** Draws the settle loop needed before two consecutive frames
+   * matched (design-system #420: a capture is only settled when
+   * drawing it again changes nothing — an image caught mid
+   * fade-in is the case this exists for). Capped inside the
+   * module; a perpetually animated story reports the cap and its
+   * last draw is used, as before. */
+  settleDraws: number;
   /** Measure + draw + write time inside the module, ms. */
   drawMs: number;
 }
