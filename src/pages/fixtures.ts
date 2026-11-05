@@ -144,6 +144,12 @@ export const mealFormFixture = {
     { id: "fudgy-brownies", label: "Fudgy Brownies", servings: 12 },
   ],
   servingsByRecipeId: { "tuscan-chicken": 6, "fudgy-brownies": 12 },
+  // Direct ingredients (#440): entered on the meal itself, in
+  // the form's free-text field shape.
+  ingredients: [
+    { id: "ing-olive-oil", name: "Olive oil", quantity: "2", unit: "tbsp", servings: "6" },
+    { id: "ing-parmesan", name: "Parmesan", quantity: "1/2", unit: "cup", servings: "6" },
+  ],
 };
 
 export const mealPlanFormFixture = {
@@ -238,6 +244,12 @@ export const mealDetailFixture = {
       subtitle: "8 servings",
       isUnavailable: true,
     },
+  ],
+  // Direct ingredients (#440): no destination page, so their
+  // rows are plain rows carrying a pre-composed subtitle.
+  ingredients: [
+    { id: "ing-olive-oil", name: "Olive oil", subtitle: "2 tbsp · 240 cal" },
+    { id: "ing-parmesan", name: "Parmesan", subtitle: "1/2 cup · 210 cal · 19g protein" },
   ],
 };
 

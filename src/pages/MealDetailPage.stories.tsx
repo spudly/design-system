@@ -46,6 +46,23 @@ export const Default: Story = {
   ),
 };
 
+export const WithDirectIngredients: Story = {
+  render: () => (
+    <Viewport>
+      <MealDetailPage
+        footer={eciperayFooterFixture}
+        title={fixture.title}
+        notes={fixture.notes}
+        nutritionLabel={fixture.nutritionLabel}
+        members={fixture.members}
+        ingredients={fixture.ingredients}
+        cookHref="/meals/sunday-chicken-dinner/cook"
+        editHref="/meals/sunday-chicken-dinner/edit"
+      />
+    </Viewport>
+  ),
+};
+
 export const NoNotesOrNutrition: Story = {
   render: () => (
     <Viewport>

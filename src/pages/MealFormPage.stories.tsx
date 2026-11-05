@@ -4,6 +4,7 @@ import { View } from "tamagui";
 import { mealFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import {
   MealFormPage,
+  type MealFormPageIngredient,
   type MealFormPageProps,
   type MealFormPageRecipeOption,
 } from "./MealFormPage.js";
@@ -56,6 +57,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
     searchText: initialSearchText,
     selectedRecipes: initialSelectedRecipes,
     servingsByRecipeId: initialServingsByRecipeId,
+    ingredients: initialIngredients,
     ...restOverrides
   } = overrides ?? {};
   const [title, setTitle] = useState(initialTitle ?? fixture.title);
@@ -66,6 +68,9 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
   );
   const [servingsByRecipeId, setServingsByRecipeId] = useState<Record<string, number>>(
     initialServingsByRecipeId ?? fixture.servingsByRecipeId,
+  );
+  const [ingredients, setIngredients] = useState<MealFormPageIngredient[]>(
+    initialIngredients ?? [],
   );
   const query = searchText.trim().toLowerCase();
   const searchResults = query
@@ -96,6 +101,35 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
     onServingsChange: (recipeId, servings) => {
       setServingsByRecipeId((current) => ({ ...current, [recipeId]: servings }));
     },
+    // Direct ingredients (#440): the section renders only for
+    // stories that opt in by passing initial ingredients — the
+    // harness wires the callbacks only then, mirroring a host
+    // that has adopted the section.
+    ...(initialIngredients
+      ? {
+          ingredients,
+          onAddIngredient: () => {
+            setIngredients((current) => [
+              ...current,
+              {
+                id: `ing-new-${current.length + 1}`,
+                name: "",
+                quantity: "",
+                unit: "",
+                servings: "",
+              },
+            ]);
+          },
+          onRemoveIngredient: (ingredientId: string) => {
+            setIngredients((current) => current.filter((entry) => entry.id !== ingredientId));
+          },
+          onIngredientChange: (ingredientId: string, patch: Partial<MealFormPageIngredient>) => {
+            setIngredients((current) =>
+              current.map((entry) => (entry.id === ingredientId ? { ...entry, ...patch } : entry)),
+            );
+          },
+        }
+      : {}),
     onSubmit: restOverrides.onSubmit ?? (() => undefined),
   };
 }
@@ -117,6 +151,20 @@ export const NoSelection: Story = {
   render: () => (
     <Viewport>
       <Form selectedRecipes={[]} servingsByRecipeId={{}} searchText="" searchResults={[]} />
+    </Viewport>
+  ),
+};
+
+export const WithDirectIngredients: Story = {
+  render: () => (
+    <Viewport>
+      <Form
+        selectedRecipes={[]}
+        servingsByRecipeId={{}}
+        searchText=""
+        searchResults={[]}
+        ingredients={mealFormFixture.ingredients}
+      />
     </Viewport>
   ),
 };
