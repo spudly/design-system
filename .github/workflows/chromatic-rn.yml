@@ -65,7 +65,11 @@ jobs:
     timeout-minutes: 60
     concurrency:
       group: chromatic-rn-${{ github.event.pull_request.number || github.ref }}
-      cancel-in-progress: true
+      # Cancel superseded PR runs only: a main build anchors the
+      # baselines and snapshots the full suite, so a second main push
+      # must queue behind it rather than cancelling it mid-capture
+      # and wasting the shared snapshot budget.
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     permissions:
       contents: read
       checks: read
