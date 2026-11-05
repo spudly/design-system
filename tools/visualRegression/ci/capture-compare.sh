@@ -32,7 +32,11 @@
 # issue #296: a capture replaces its baseline in the staged set
 # only when its differing-pixel ratio exceeds the gate, so noise
 # never lands as baseline churn), and an in-job re-capture/re-compare
-# against the regenerated set — and hand the proven-green set to the
+# against the regenerated set — scoped to the staged baselines
+# (issue #432 phase 1: a zero-staged run skips the verification pass
+# entirely, a staged set over 25% of the capture scope falls back
+# to a full re-capture, and a scoped re-compare that disagrees
+# falls back to a full one) — and hand the proven-green set to the
 # workflow's commit-pr-baselines job, which pushes it onto the PR
 # branch. Anything short of proven green (capture failures, a guard
 # trip, a failed re-compare) commits NOTHING and fails the job. A
@@ -259,18 +263,89 @@ pr_autocommit() {
     return 1
   fi
 
-  # In-job verification: capture everything AGAIN (both sets) and
-  # compare against the regenerated set. The commit is only as good
-  # as this proof - a set that cannot pass a fresh capture pass is
-  # not committed, and the job fails instead.
-  echo "PR auto-commit: re-capturing and comparing against the regenerated baselines (in-job verification, tolerance = commit gate ${gate_ratio})..."
-  if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify" --max-ratio "$gate_ratio" "${SCOPE_ARGS[@]}"; then
-    echo "::error::PR auto-commit: in-job re-compare of the standard set against the regenerated baselines failed - committing NOTHING."
+  # The commit-gate counts, read before verification: the staged
+  # count drives the verification scope below (issue #432) and the
+  # publish decision after it.
+  local staged_count
+  staged_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).staged)')"
+  # The verification ratio's denominator: the number of captures
+  # the commit gate gated — i.e. this run's capture scope (issue
+  # #432 review: dividing by the staged tree's full baseline count
+  # would understate the staged share in a scoped run).
+  local captured_count
+  captured_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).captured)')"
+
+  # In-job verification scope (issue #432 phase 1): re-capture only
+  # what the commit gate actually staged. verifyScope.mjs compares
+  # the staged tree against the committed baselines and writes a
+  # scope decision in the scope.mjs shape. The luminance guard
+  # above still runs over the FULL fresh capture sets and a trip
+  # still commits nothing — scoping never bypasses it.
+  local verify_scope_file=/tmp/dsvr-verify-scope.json
+  if ! node "$tool_dir/verifyScope.mjs" --baselines "$tool_dir/baselines" --staged "$staged" --capture-total "$captured_count" --out "$verify_scope_file"; then
+    echo "::error::PR auto-commit: could not compute the verification scope via verifyScope.mjs - committing NOTHING."
     return 1
   fi
-  if ! run_narrow --baselines "$staged" --out "$out_narrow/verify" --max-ratio "$gate_ratio" "${SCOPE_ARGS[@]}"; then
-    echo "::error::PR auto-commit: in-job re-compare of the narrow-variant set against the regenerated baselines failed - committing NOTHING."
-    return 1
+  local verify_mode verify_std_count verify_narrow_count
+  verify_mode="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-verify-scope.json", "utf8")).mode)')"
+  verify_std_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-verify-scope.json", "utf8")).standard.length)')"
+  verify_narrow_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-verify-scope.json", "utf8")).narrow.length)')"
+
+  # Full verification: capture everything in the run's original
+  # scope AGAIN (both sets) and compare against the regenerated
+  # set — the pre-#432 proof, used when the staged set is wide and
+  # as the fallback when a scoped re-compare disagrees.
+  run_full_verification() {
+    if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify" --max-ratio "$gate_ratio" "${SCOPE_ARGS[@]}"; then
+      echo "::error::PR auto-commit: in-job re-compare of the standard set against the regenerated baselines failed - committing NOTHING."
+      return 1
+    fi
+    if ! run_narrow --baselines "$staged" --out "$out_narrow/verify" --max-ratio "$gate_ratio" "${SCOPE_ARGS[@]}"; then
+      echo "::error::PR auto-commit: in-job re-compare of the narrow-variant set against the regenerated baselines failed - committing NOTHING."
+      return 1
+    fi
+  }
+
+  if [ "$verify_mode" = "skip" ]; then
+    # Zero staged files: the "regenerated" set is byte-identical to
+    # the committed baselines, already proven by the compare pass
+    # itself — a re-capture would prove nothing (issue #432).
+    echo "PR auto-commit: skipping the in-job verification re-capture — the commit gate staged 0 files, so the regenerated set is the committed set the compare pass already proved."
+  elif [ "$verify_mode" = "scoped" ]; then
+    echo "PR auto-commit: re-capturing and comparing ONLY the staged baselines against the regenerated set (in-job verification, scoped by issue #432; tolerance = commit gate ${gate_ratio})..."
+    local scoped_failed=0
+    if [ "$verify_std_count" != "0" ]; then
+      if ! node "$tool_dir/run.mjs" --baselines "$staged" --out "$out/verify" --max-ratio "$gate_ratio" --scope-file "$verify_scope_file"; then
+        scoped_failed=1
+      fi
+    else
+      echo "PR auto-commit: no staged standard baselines — skipping the standard verification set."
+    fi
+    if [ "$verify_narrow_count" != "0" ]; then
+      if ! run_narrow --baselines "$staged" --out "$out_narrow/verify" --max-ratio "$gate_ratio" --scope-file "$verify_scope_file"; then
+        scoped_failed=1
+      fi
+    else
+      echo "PR auto-commit: no staged narrow baselines or counterparts — skipping the narrow verification set."
+    fi
+    if [ "$scoped_failed" != "0" ]; then
+      # A staged file's re-capture disagreed: do not trust the
+      # scoped proof either way — fall back to the full re-capture,
+      # whose verdict decides (issue #432 safety rail).
+      echo "::warning::PR auto-commit: the scoped verification re-compare failed — falling back to a full verification re-capture before deciding."
+      if ! run_full_verification; then
+        return 1
+      fi
+    fi
+  else
+    # In-job verification: capture everything AGAIN (both sets) and
+    # compare against the regenerated set. The commit is only as
+    # good as this proof - a set that cannot pass a fresh capture
+    # pass is not committed, and the job fails instead.
+    echo "PR auto-commit: re-capturing and comparing against the regenerated baselines (in-job verification, tolerance = commit gate ${gate_ratio})..."
+    if ! run_full_verification; then
+      return 1
+    fi
   fi
 
   # Proven green — but if the commit gate staged zero changed
@@ -278,8 +353,6 @@ pr_autocommit() {
   # baselines: publish nothing, so the run produces NO baseline
   # commit (issue #296's acceptance). The commit job's own
   # git-status guard is a second safety net, never the mechanism.
-  local staged_count
-  staged_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).staged)')"
   local skipped_strict_count
   skipped_strict_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).skippedStrict)')"
   if [ "$skipped_strict_count" != "0" ]; then
