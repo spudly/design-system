@@ -17,11 +17,11 @@ import test from "node:test";
  * Source-scan style, like the other batch tests.
  */
 
-const source = readFileSync("src/components/RatingForm.tsx", "utf8");
-const stories = readFileSync("src/components/RatingForm.stories.tsx", "utf8");
+const source = readFileSync("src/views/RatingForm.tsx", "utf8");
+const stories = readFileSync("src/views/RatingForm.stories.tsx", "utf8");
 
-test("RatingForm is exported from the components barrel; CookLogForm is gone", () => {
-  const barrel = readFileSync("src/components/index.ts", "utf8");
+test("RatingForm is exported from the views barrel; CookLogForm is gone", () => {
+  const barrel = readFileSync("src/views/index.ts", "utf8");
   assert.match(barrel, /export \{[^}]*\bRatingForm\b[^}]*\} from "\.\/RatingForm\.js"/);
   assert.match(barrel, /type RatingFormProps/);
   assert.match(barrel, /type RatingFormValues/);
@@ -86,7 +86,7 @@ test("isPending disables Save (half opacity); the secondary action stays live", 
 });
 
 test("reuses the DS StarRatingInput as-is; no forked star rendering", () => {
-  assert.match(source, /import \{ StarRatingInput \} from "\.\/StarRatingInput\.js"/);
+  assert.match(source, /import \{ StarRatingInput \} from "\.\.\/components\/StarRatingInput\.js"/);
   assert.doesNotMatch(source, /★/, "stars come from StarRatingInput, not a local copy");
 });
 
@@ -98,7 +98,7 @@ test("no app imports, no data layer, no lineHeight (#162)", () => {
 });
 
 test("stories cover both variants and the custom labels in the shared CSF tree", () => {
-  assert.match(stories, /title: "Components\/RatingForm"/);
+  assert.match(stories, /title: "Views\/RatingForm"/);
   assert.match(stories, /export const Dark: Story/);
   assert.match(stories, /export const Light: Story/);
   assert.match(stories, /export const Pending: Story/);

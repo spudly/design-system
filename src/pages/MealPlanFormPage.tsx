@@ -7,9 +7,9 @@ import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { FormSubmit } from "../components/FormSubmit.js";
 import { FieldStack } from "../components/FieldStack.js";
 import { LabeledGroup } from "../components/LabeledGroup.js";
-import { NumberStepper } from "../components/NumberStepper.js";
-import { TextAreaField } from "../components/TextAreaField.js";
-import { TextField } from "../components/TextField.js";
+import { NumberStepper } from "../views/NumberStepper.js";
+import { TextAreaField } from "../views/TextAreaField.js";
+import { TextField } from "../views/TextField.js";
 
 /**
  * MealPlanFormPage (#125, B3b): the meal plan form's view

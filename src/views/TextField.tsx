@@ -2,8 +2,8 @@ import { useId, useRef } from "react";
 import { Input as TamaguiInput, Label, YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
-import { Text } from "./Text.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
+import { Text } from "../components/Text.js";
 
 const StyledInput = styled(TamaguiInput, {
   name: "TextField",

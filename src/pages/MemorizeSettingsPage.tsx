@@ -4,7 +4,7 @@ import { ButtonRow } from "../components/ButtonRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
+import { TextField } from "../views/TextField.js";
 
 /**
  * MemorizeSettingsPage (#127, B4): Memorize's Settings screen

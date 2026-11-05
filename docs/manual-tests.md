@@ -206,7 +206,7 @@ naming DismissibleBanner, InlineAlert, or Alert.
 
 ## NumberStepper
 
-Open in `Components/NumberStepper`: Default, AtMinBound, AtMaxBound,
+Open in `Views/NumberStepper`: Default, AtMinBound, AtMaxBound,
 CustomStep, Inline, Editable.
 
 1. Exactly **one pair** of step buttons renders — the browser's native
@@ -220,14 +220,14 @@ CustomStep, Inline, Editable.
    value returns to / stays at the last committed value) — an empty
    entry never commits 0 or NaN.
 
-**Run when:** `src/components/NumberStepper.tsx`, its stories, or a
+**Run when:** `src/views/NumberStepper.tsx`, its stories, or a
 changeset naming NumberStepper.
 
 ---
 
 ## CheckboxField
 
-Open in `Components/CheckboxField`: Default, WithDescription, Checked,
+Open in `Views/CheckboxField`: Default, WithDescription, Checked,
 WithRichDescription, WithChildren, WithError.
 
 1. WithRichDescription: rich (multi-element) description content
@@ -239,7 +239,7 @@ WithRichDescription, WithChildren, WithError.
    and the checkbox remains toggleable in the story.
 4. Toggling in Default/Checked flips the check with no layout shift.
 
-**Run when:** `src/components/CheckboxField.tsx`, its stories, or a
+**Run when:** `src/views/CheckboxField.tsx`, its stories, or a
 changeset naming CheckboxField.
 
 ---
@@ -426,7 +426,7 @@ here a search field with its submit button.
    row is the live case).
 
 **Run when:** `src/components/FieldRow.tsx`, its stories,
-`src/components/SearchField.tsx` (the `grow` prop), the pages
+`src/views/SearchField.tsx` (the `grow` prop), the pages
 that compose FieldRow (VerseSearchPage), or a changeset
 naming FieldRow.
 
@@ -1236,7 +1236,7 @@ changeset naming Spinner.
 
 ## AccessTokensPanel
 
-Open in `Components/AccessTokensPanel`: WithTokens,
+Open in `Views/AccessTokensPanel`: WithTokens,
 SecretJustCreated, PlanNotice.
 
 1. SecretJustCreated: there is a **visible gap** between the info
@@ -1247,7 +1247,7 @@ SecretJustCreated, PlanNotice.
 3. PlanNotice renders its notice without pushing the token list into
    overlap or horizontal scroll.
 
-**Run when:** `src/components/AccessTokensPanel.tsx`, its stories, or
+**Run when:** `src/views/AccessTokensPanel.tsx`, its stories, or
 a changeset naming AccessTokensPanel.
 
 ---
@@ -1471,7 +1471,7 @@ button. The icon-slot stories:
    (sm → lg); the icon-only row's squares grow sm → lg with the
    glyph centered in each, and the smallest is still a full 44px
    touch target (compare it with the 44px SearchField clear target
-   in `Components/SearchField` — it is no smaller).
+   in `Views/SearchField` — it is no smaller).
 4. IconDisabled: both the labeled and the icon-only button render
    dimmed and pressing them does nothing.
 5. IconPressCounter: pressing the icon-only button increments the

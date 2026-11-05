@@ -1,11 +1,11 @@
 import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
-import { CheckboxField } from "../components/CheckboxField.js";
-import { TextAreaField } from "../components/TextAreaField.js";
+import { CheckboxField } from "../views/CheckboxField.js";
+import { TextAreaField } from "../views/TextAreaField.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
+import { TextField } from "../views/TextField.js";
 
 /**
  * FeedbackPage (#126, B3c): the feedback view — the split

@@ -5,7 +5,7 @@ import { Alert } from "../components/Alert.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { FieldRow } from "../components/FieldRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SearchField } from "../components/SearchField.js";
+import { SearchField } from "../views/SearchField.js";
 import { Spinner } from "../components/Spinner.js";
 import { Text } from "../components/Text.js";
 import { BoundedList } from "./BoundedList.js";

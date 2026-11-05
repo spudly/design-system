@@ -7,10 +7,10 @@ import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { FormSubmit } from "../components/FormSubmit.js";
 import { LabeledGroup } from "../components/LabeledGroup.js";
-import { NumberStepper } from "../components/NumberStepper.js";
+import { NumberStepper } from "../views/NumberStepper.js";
 import { Text } from "../components/Text.js";
-import { TextAreaField } from "../components/TextAreaField.js";
-import { TextField } from "../components/TextField.js";
+import { TextAreaField } from "../views/TextAreaField.js";
+import { TextField } from "../views/TextField.js";
 
 /**
  * MealFormPage (#125, B3b): the meal form's view layer — the

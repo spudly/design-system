@@ -145,16 +145,16 @@ test("BlankWord still labels its hidden button through Button (the label text is
 });
 
 const STACK_PRESSABLES = [
-  "src/components/RatingForm.tsx",
+  "src/views/RatingForm.tsx",
   "src/components/ColorPickerField.tsx",
-  "src/components/SearchField.tsx",
+  "src/views/SearchField.tsx",
   "src/components/StarRatingInput.tsx",
   "src/components/StepDots.tsx",
   "src/components/Avatar.tsx",
 ];
 
 test("NumberStepper: group container and value input route through the translator; its buttons are DS Buttons (#235)", () => {
-  const code = readCode("src/components/NumberStepper.tsx");
+  const code = readCode("src/views/NumberStepper.tsx");
   assert.ok(code.includes("platformAccessibilityProps"));
   // The only raw accessibilityLabel props left in the file are the
   // ones passed TO the DS Button primitive (Decrease / Increase),

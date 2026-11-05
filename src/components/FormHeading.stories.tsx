@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { FormHeading } from "./FormHeading.js";
 import { FormScreenLayout } from "./FormScreenLayout.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 
 const meta: Meta<typeof FormHeading> = {
   title: "Components/FormHeading",

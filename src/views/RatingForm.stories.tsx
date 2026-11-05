@@ -5,7 +5,7 @@ import { tokens } from "../tokens/index.js";
 import { RatingForm } from "./RatingForm.js";
 
 const meta: Meta<typeof RatingForm> = {
-  title: "Components/RatingForm",
+  title: "Views/RatingForm",
   component: RatingForm,
   globals: { theme: "light_warmHarvest" },
 };

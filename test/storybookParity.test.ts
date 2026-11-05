@@ -15,10 +15,12 @@
  * .rnstorybook/storybook.requires.ts (Metro require.context). Parity
  * is therefore a property of three things, all pinned here:
  *
- * 1. Every widget module in src/components and every page module in
- *    src/pages has a sibling .stories.tsx with the organized title
- *    (Components/<Name>, Pages/<App>/<Name>) and at least one story —
- *    a module without a story file is invisible in BOTH storybooks.
+ * 1. Every widget module in src/components, every view module in
+ *    src/views (#438 Part 2: the page fragments pages share, forms
+ *    included), and every page module in src/pages has a sibling
+ *    .stories.tsx with the organized title (Components/<Name>,
+ *    Views/<Name>, Pages/<App>/<Name>) and at least one story — a
+ *    module without a story file is invisible in BOTH storybooks.
  * 2. Both storybook configs declare the same stories glob (modulo the
  *    relative prefix), so neither side can quietly narrow its set.
  * 3. The committed storybook.requires.ts still matches the
@@ -167,6 +169,36 @@ test("every widget component has a story file titled Components/<Name>", () => {
   }
 });
 
+test("every view component has a story file titled Views/<Name>", () => {
+  const dir = join(root, "src", "views");
+  const index = read("src/views/index.ts");
+  const exceptions = new Set(["index.ts"]);
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    assert.ok(
+      entry.isFile(),
+      `src/views/${entry.name}: unexpected directory — the parity scan is flat`,
+    );
+    if (
+      exceptions.has(entry.name) ||
+      entry.name.endsWith(".stories.tsx") ||
+      entry.name.endsWith(".test.ts")
+    )
+      continue;
+    assert.ok(
+      entry.name.endsWith(".tsx"),
+      `src/views/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
+    );
+    const base = entry.name.replace(/\.tsx$/, "");
+    assertModuleStory({
+      dir,
+      index,
+      base,
+      titleDescription: `title "Views/${base}"`,
+      titleMatches: (t: any) => t === `Views/${base}`,
+    });
+  }
+});
+
 test("every page component has a story file titled Pages/<App>/<Name>", () => {
   const dir = join(root, "src", "pages");
   const index = read("src/pages/index.ts");
@@ -217,8 +249,8 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
   }
 });
 
-test("every story file is organized under Components/ or Pages/<App>/ and exports stories", () => {
-  for (const area of ["components", "pages"]) {
+test("every story file is organized under Components/, Views/, or Pages/<App>/ and exports stories", () => {
+  for (const area of ["components", "views", "pages"]) {
     const dir = join(root, "src", area);
     for (const name of readdirSync(dir)) {
       if (!name.endsWith(".stories.tsx")) continue;
@@ -227,11 +259,12 @@ test("every story file is organized under Components/ or Pages/<App>/ and export
       assert.ok(
         title !== null &&
           (title.startsWith("Components/") ||
+            title.startsWith("Views/") ||
             title === "Pages/Eciperay" ||
             title === "Pages/Memorize" ||
             title.startsWith("Pages/Eciperay/") ||
             title.startsWith("Pages/Memorize/")),
-        `src/${area}/${name} declares title "${title}" — stories live under Components/ or Pages/<App>/`,
+        `src/${area}/${name} declares title "${title}" — stories live under Components/, Views/, or Pages/<App>/`,
       );
       assert.ok(storyExportCount(story) >= 1, `src/${area}/${name} exports no stories`);
     }

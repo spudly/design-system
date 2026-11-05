@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, YStack } from "tamagui";
-import { AccessTokensPanel } from "../components/AccessTokensPanel.js";
-import { CheckboxField } from "../components/CheckboxField.js";
-import { NutritionGoalsForm } from "../components/NutritionGoalsForm.js";
+import { AccessTokensPanel } from "../views/AccessTokensPanel.js";
+import { CheckboxField } from "../views/CheckboxField.js";
+import { NutritionGoalsForm } from "../views/NutritionGoalsForm.js";
 import { TextLink } from "../components/TextLink.js";
 import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ProfilePage } from "./ProfilePage.js";

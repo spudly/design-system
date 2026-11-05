@@ -113,6 +113,7 @@ const publicNames = new Set([...pagesNames, ...restoredNames]);
 
 const internalBarrels: [string, string][] = [
   ["components", "src/components/index.ts"],
+  ["views", "src/views/index.ts"],
   ["icons", "src/icons/index.ts"],
   ["tokens", "src/tokens/index.ts"],
   ["themes", "src/themes/index.ts"],

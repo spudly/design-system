@@ -286,7 +286,7 @@ test("ChecklistRow's Checkbox and ProgressBar's Progress route through the trans
 test("field/primitive wrappers destructure caller RN props out of rest and translate them (#237)", () => {
   // Compact split form: this file sits at the max-lines cap.
   const wrappers =
-    "src/components/TextField.tsx,src/components/TextAreaField.tsx,src/components/CheckboxField.tsx,src/components/TextLink.tsx,src/components/OptionCard.tsx,src/components/Alert.tsx".split(
+    "src/views/TextField.tsx,src/views/TextAreaField.tsx,src/views/CheckboxField.tsx,src/components/TextLink.tsx,src/components/OptionCard.tsx,src/components/Alert.tsx".split(
       ",",
     );
   for (const rel of wrappers) {

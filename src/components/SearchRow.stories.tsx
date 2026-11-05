@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { Button } from "./Button.js";
-import { SearchField } from "./SearchField.js";
+import { SearchField } from "../views/SearchField.js";
 import { SearchRow } from "./SearchRow.js";
 
 const meta: Meta<typeof SearchRow> = {

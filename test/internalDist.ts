@@ -16,16 +16,18 @@
  * module, as before.)
  *
  * The merge mirrors the pre-#298 root surface minus the pages:
- * components over themes over tokens over the config factories.
+ * components and views (#438 Part 2) over themes over tokens
+ * over the config factories.
  * Loads lazily so a test file's source-scan tests still run when
  * the build output is missing.
  */
 export async function loadInternalDist(): Promise<Record<string, any>> {
-  const [components, themes, tokens, config] = await Promise.all([
+  const [components, views, themes, tokens, config] = await Promise.all([
     import("../dist/components/index.js"),
+    import("../dist/views/index.js"),
     import("../dist/themes/index.js"),
     import("../dist/tokens/index.js"),
     import("../dist/tamagui.config.js"),
   ]);
-  return { ...tokens, ...themes, ...config, ...components };
+  return { ...tokens, ...themes, ...config, ...views, ...components };
 }

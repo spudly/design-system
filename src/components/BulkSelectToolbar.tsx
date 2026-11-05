@@ -1,6 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { Button } from "./Button.js";
-import { SearchField } from "./SearchField.js";
+import { SearchField } from "../views/SearchField.js";
 import { Text } from "./Text.js";
 
 export type BulkSelectToolbarProps = {

@@ -15,7 +15,7 @@ import {
   type NutritionPanelData,
   type NutritionPanelRow,
 } from "../components/NutritionPanel.js";
-import { NumberStepper } from "../components/NumberStepper.js";
+import { NumberStepper } from "../views/NumberStepper.js";
 import { PanelStack } from "../components/PanelStack.js";
 import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
 import {

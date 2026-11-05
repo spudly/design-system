@@ -5,7 +5,7 @@ import { tokens } from "../tokens/index.js";
 import { politeLiveRegionProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { ListRow } from "./ListRow.js";
-import { SearchField } from "./SearchField.js";
+import { SearchField } from "../views/SearchField.js";
 import { Spinner } from "./Spinner.js";
 import { Text } from "./Text.js";
 

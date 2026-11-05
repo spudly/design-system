@@ -1,7 +1,7 @@
 import { Alert } from "./Alert.js";
 import { Button } from "./Button.js";
 import { FormStack } from "./FormStack.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 
 /**
  * ResetPasswordForm (#119): the new-password form — the field

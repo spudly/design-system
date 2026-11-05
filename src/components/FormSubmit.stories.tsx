@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "./Button.js";
 import { FormScreenLayout } from "./FormScreenLayout.js";
 import { FormSubmit } from "./FormSubmit.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 
 const meta: Meta<typeof FormSubmit> = {
   title: "Components/FormSubmit",

@@ -84,7 +84,7 @@ test("stories cover the severities, the dismissible forms, and actions", () => {
 
 test("in-repo consumers render Alert, not the removed components", () => {
   for (const file of [
-    "src/components/AccessTokensPanel.tsx",
+    "src/views/AccessTokensPanel.tsx",
     "src/components/FixedActionBanner.tsx",
     "src/pages/EditVersionPage.tsx",
     "src/pages/MemorizationSessionPage.tsx",

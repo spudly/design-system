@@ -3,7 +3,7 @@ import { YStack } from "tamagui";
 import { Button } from "./Button.js";
 import { ButtonRow } from "./ButtonRow.js";
 import { FieldStack } from "./FieldStack.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 
 const meta: Meta<typeof FieldStack> = {
   title: "Components/FieldStack",

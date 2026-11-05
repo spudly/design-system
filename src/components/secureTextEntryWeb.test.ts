@@ -38,7 +38,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const textField = readCode("src/components/TextField.tsx");
+const textField = readCode("src/views/TextField.tsx");
 
 test("TextField destructures secureTextEntry and type out of rest (#262)", () => {
   assert.match(textField, /secureTextEntry,/);

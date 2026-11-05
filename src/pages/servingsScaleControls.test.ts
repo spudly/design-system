@@ -58,7 +58,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
-const stepper = readFileSync(join(root, "src/components/NumberStepper.tsx"), "utf8");
+const stepper = readFileSync(join(root, "src/views/NumberStepper.tsx"), "utf8");
 const selector = readFileSync(join(root, "src/components/PresetValueSelector.tsx"), "utf8");
 const page = readFileSync(join(root, "src/pages/RecipeDetailPage.tsx"), "utf8");
 // PublicRecipePage's ingredients section is the shared library

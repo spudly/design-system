@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { FieldColumns } from "./FieldColumns.js";
 import { LabeledField } from "./LabeledField.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 
 const meta: Meta<typeof FieldColumns> = {
   title: "Components/FieldColumns",

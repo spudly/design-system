@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, XStack, YStack } from "tamagui";
-import { TextAreaField } from "../components/TextAreaField.js";
+import { TextAreaField } from "../views/TextAreaField.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
+import { TextField } from "../views/TextField.js";
 import { tokens } from "../tokens/index.js";
 import { recipeFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";

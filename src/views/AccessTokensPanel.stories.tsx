@@ -5,7 +5,7 @@ import { AccessTokensPanel } from "./AccessTokensPanel.js";
 import { accessTokensFixture } from "../pages/fixtures.js";
 
 const meta: Meta<typeof AccessTokensPanel> = {
-  title: "Components/AccessTokensPanel",
+  title: "Views/AccessTokensPanel",
   component: AccessTokensPanel,
   globals: { theme: "light_warmHarvest" },
 };

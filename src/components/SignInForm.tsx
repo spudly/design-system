@@ -3,7 +3,7 @@ import { YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 import { FormStack } from "./FormStack.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 import { TextLink } from "./TextLink.js";
 
 const StyledLinks = styled(YStack, {

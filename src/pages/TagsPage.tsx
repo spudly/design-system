@@ -12,7 +12,7 @@ import { ListLoadingState } from "../components/ListLoadingState.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
+import { TextField } from "../views/TextField.js";
 import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
 
 /**

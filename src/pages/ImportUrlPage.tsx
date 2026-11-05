@@ -3,7 +3,7 @@ import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { Text } from "../components/Text.js";
-import { TextField } from "../components/TextField.js";
+import { TextField } from "../views/TextField.js";
 
 /**
  * ImportUrlPage (#126, B3c): the import-from-URL step — the

@@ -11,15 +11,15 @@ structure is B1 of the design-system completion program (#121,
 
 ## The pair
 
-|                     | React storybook (web)                                                                                                   | React Native storybook                                                                                         |
-| ------------------- | ----------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Config              | `.storybook/` at the repo root                                                                                          | `apps/storybook/.rnstorybook/`                                                                                 |
-| Renderer            | `@storybook/react-vite`                                                                                                 | `@storybook/react-native` in the Expo host app `apps/storybook`                                                |
-| Stories glob        | `../src/**/*.stories.@(ts                                                                                               | tsx)`                                                                                                          | `../../../src/**/*.stories.@(ts | tsx)` (same tree) |
-| Inclusion mechanism | Storybook indexer over the glob                                                                                         | Generated `.rnstorybook/storybook.requires.ts` (Metro `require.context` over the same glob)                    |
-| Dev command         | `npm run storybook:react` (repo root)                                                                                   | `npm run storybook:react-native` (repo root or in `apps/storybook`)                                            |
-| Build command       | `npm run build-storybook:react`                                                                                         | The host app build (Expo); registry refresh: `npm run generate` in `apps/storybook`                            |
-| CI                  | `.github/workflows/chromatic.yml` — publishes to Chromatic                                                              | `.github/workflows/android-storybook.yml` — emulator captures vs baselines; `.github/workflows/chromatic-rn.yml` — publishes to the Chromatic React Native project (#302) |
+|                     | React storybook (web)                                                                                                   | React Native storybook                                                                                                                                                                                    |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Config              | `.storybook/` at the repo root                                                                                          | `apps/storybook/.rnstorybook/`                                                                                                                                                                            |
+| Renderer            | `@storybook/react-vite`                                                                                                 | `@storybook/react-native` in the Expo host app `apps/storybook`                                                                                                                                           |
+| Stories glob        | `../src/**/*.stories.@(ts                                                                                               | tsx)`                                                                                                                                                                                                     | `../../../src/**/*.stories.@(ts | tsx)` (same tree) |
+| Inclusion mechanism | Storybook indexer over the glob                                                                                         | Generated `.rnstorybook/storybook.requires.ts` (Metro `require.context` over the same glob)                                                                                                               |
+| Dev command         | `npm run storybook:react` (repo root)                                                                                   | `npm run storybook:react-native` (repo root or in `apps/storybook`)                                                                                                                                       |
+| Build command       | `npm run build-storybook:react`                                                                                         | The host app build (Expo); registry refresh: `npm run generate` in `apps/storybook`                                                                                                                       |
+| CI                  | `.github/workflows/chromatic.yml` — publishes to Chromatic                                                              | `.github/workflows/android-storybook.yml` — emulator captures vs baselines; `.github/workflows/chromatic-rn.yml` — publishes to the Chromatic React Native project (#302)                                 |
 | Publish trigger     | Push to `main` always; PRs only via the `visual-check` label (see [README](../README.md#react-storybook-web-chromatic)) | Android VR: path-filtered PR runs + `workflow_dispatch`; Chromatic RN: push to `main` always, PRs only via the `visual-check-rn` label (see [android-visual-regression.md](android-visual-regression.md)) |
 
 The legacy script names `storybook` and `build-storybook` still work
@@ -34,6 +34,9 @@ the code they cover:
 
 - Widget components: `src/components/<Name>.stories.tsx`, titled
   `Components/<Name>`.
+- View components: `src/views/<Name>.stories.tsx`, titled
+  `Views/<Name>` — the page fragments pages share, forms included
+  (#438 Part 2).
 - Page components: `src/pages/<Name>.stories.tsx`, titled
   `Pages/Eciperay/<Name>` or `Pages/Memorize/<Name>` — page stories
   are organized by app in both storybooks (#70). The two
@@ -71,7 +74,8 @@ their own.
 
 ## Coverage parity
 
-Every widget component exported from `src/components/index.ts` and
+Every widget component exported from `src/components/index.ts`,
+every view component exported from `src/views/index.ts`, and
 every page component exported from `src/pages/index.ts` must have
 stories — and therefore appears in both storybooks. Parity is
 enforced by `test/storybookParity.test.ts` (run by `npm test` and

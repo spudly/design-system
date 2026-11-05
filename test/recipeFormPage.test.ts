@@ -113,7 +113,7 @@ test("the pending-contract sections are slots, and the lock replaces the list sl
   );
 });
 
-test("the diff wash is the fields' semantic `changed` variant, defined in the components", () => {
+test("the diff wash is the fields' semantic `changed` variant, defined in the field views", () => {
   const form = pageSource("RecipeFormPage");
   assert.ok(form.includes('changed={isChanged("title")}'), "title field must pass `changed`");
   assert.ok(
@@ -121,7 +121,7 @@ test("the diff wash is the fields' semantic `changed` variant, defined in the co
     "description field must pass `changed`",
   );
   for (const component of ["TextField", "TextAreaField"]) {
-    const src = source("components", component);
+    const src = source("views", component);
     assert.ok(src.includes("changed: {"), `${component} must define the changed variant`);
     assert.ok(
       src.includes("tokens.colors.warning.warning5"),

@@ -1,6 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { TextAreaField } from "./TextAreaField.js";
+import { TextAreaField } from "../views/TextAreaField.js";
 import { Text } from "./Text.js";
 import { TextAction } from "./TextAction.js";
 

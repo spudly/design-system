@@ -68,7 +68,7 @@ for (const { name, fields } of AUTH_FORMS) {
 }
 
 test("TextField: submit-editing is held while an IME composition is active (web)", () => {
-  const source = readFileSync("src/components/TextField.tsx", "utf8");
+  const source = readFileSync("src/views/TextField.tsx", "utf8");
   // Composition is tracked on the field itself (web only —
   // Tamagui's Enter handler fires onSubmitEditing without a
   // composition check, so the guard must live in the shared

@@ -3,10 +3,10 @@ import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 import { RemovableField } from "./RemovableField.js";
-import { SearchField } from "./SearchField.js";
+import { SearchField } from "../views/SearchField.js";
 import { SearchRow } from "./SearchRow.js";
 import { SelectField, type SelectOption } from "./SelectField.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 
 /**
  * The catalog filter bar (#96, #168): the collapsed filter
