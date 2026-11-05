@@ -83,7 +83,7 @@ const pagesNames = exportNames(readCode("src/pages/index.ts"));
 
 /** The exact #411 additions to the public surface, by source module. */
 const restoredByModule: [string, string[]][] = [
-  ["./tokens/index.js", ["tokens", "Tokens"]],
+  ["./tokens/index.js", ["tokens"]],
   [
     "./themes/index.js",
     [
@@ -95,15 +95,9 @@ const restoredByModule: [string, string[]][] = [
       "EciperayTheme",
       "MemorizeTheme",
       "tagColorNames",
-      "defaultTagColorName",
       "warmHarvestTagColors",
-      "quietDawnTagColors",
-      "isTagColorName",
       "tagColorNameForHex",
-      "resolveTagColorValue",
-      "tagColorThemeKey",
       "TagColorName",
-      "TagColorValues",
     ],
   ],
   ["./tamagui.config.js", ["createTamaguiConfig"]],
@@ -163,13 +157,8 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions"
             "eciperayTheme",
             "memorizeTheme",
             "tagColorNames",
-            "defaultTagColorName",
             "warmHarvestTagColors",
-            "quietDawnTagColors",
-            "isTagColorName",
             "tagColorNameForHex",
-            "resolveTagColorValue",
-            "tagColorThemeKey",
             "createTamaguiConfig",
             "ChunkErrorBoundary",
           ])
@@ -246,6 +235,13 @@ test("no other widget, icon, token, theme, or config name is on the public surfa
     "SignInForm",
     "Icon",
     "PrintIcon",
+    "Tokens",
+    "defaultTagColorName",
+    "quietDawnTagColors",
+    "isTagColorName",
+    "resolveTagColorValue",
+    "tagColorThemeKey",
+    "TagColorValues",
     "createStorybookTamaguiConfig",
     "createOnDeviceStorybookTamaguiConfig",
     "resolveFontFamily",

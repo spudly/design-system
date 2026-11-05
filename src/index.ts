@@ -15,15 +15,16 @@
  *   boundary for lazily loaded surfaces, lifted from Memorize's
  *   app shell.
  *
- * #438 Part 1 (2026-11-05) adds back exactly one more category:
- * the design tokens (`tokens` and its `Tokens` type, from
- * src/tokens/) and the tag-color data/helpers (from src/themes/),
- * which hosts consume as data alongside the themes. Nothing else
- * comes back: no widget components (ChunkErrorBoundary is the one
- * named exception), no icons, no composite (form) components, and
- * no Storybook config factories. There are no subpath exports
- * either — apps consume everything from the package root, full
- * stop.
+ * #438 Part 1 (2026-11-05) adds back exactly the 5 specifiers
+ * dispositioned as TOKENS in the Part 0 audit: `tokens` (from
+ * src/tokens/) and `warmHarvestTagColors`, `tagColorNames`,
+ * `tagColorNameForHex`, and the `TagColorName` type (from
+ * src/themes/), which hosts consume as data alongside the themes.
+ * Nothing else comes back: no widget components (ChunkErrorBoundary
+ * is the one named exception), no icons, no composite (form)
+ * components, and no Storybook config factories. There are no
+ * subpath exports either — apps consume everything from the
+ * package root, full stop.
  *
  * Widgets, icons, and the Storybook factories remain in the repo
  * as internal building blocks (src/components, src/icons,
@@ -37,19 +38,13 @@
  * the pages entry, and page components may import react-native.
  */
 export * from "./pages/index.js";
-export { tokens, type Tokens } from "./tokens/index.js";
+export { tokens } from "./tokens/index.js";
 export { baseTheme, eciperayTheme, memorizeTheme } from "./themes/index.js";
 export {
   tagColorNames,
-  defaultTagColorName,
   warmHarvestTagColors,
-  quietDawnTagColors,
-  isTagColorName,
   tagColorNameForHex,
-  resolveTagColorValue,
-  tagColorThemeKey,
   type TagColorName,
-  type TagColorValues,
 } from "./themes/index.js";
 export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
 export { createTamaguiConfig } from "./tamagui.config.js";
