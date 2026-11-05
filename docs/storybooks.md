@@ -114,7 +114,7 @@ one-sided story file, which the shared glob makes impossible anyway.
 - **React Native storybook (Chromatic, #302)** — since #302 the RN
   storybook also publishes to a separate Chromatic React Native
   project, which captures the full story set on Chromatic's hosted
-  simulators/emulators and diffs against baselines accepted in
+  Android Emulator (the host app is Android-only) and diffs against baselines accepted in
   Chromatic's UI. It runs **in parallel** with the Android VR above:
   the in-repo pipeline remains the authoritative native gate during
   the parallel period, and decommissioning it (if ever) is a separate
