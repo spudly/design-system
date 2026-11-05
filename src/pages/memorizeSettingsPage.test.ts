@@ -11,27 +11,20 @@
  * 1. The shell is the non-scrolling ScreenContainer (the app
  *    renders every tab inside <ScreenContainer scrollable=
  *    {false}>; its "Memorize" title and tab bar stay app-side).
- * 2. The two cards mirror the app: "Scripture source" (hint
- *    verbatim, secure key field, Save / Clear pair) and "Google
- *    Drive sync" (hint composed around the folder name,
- *    Connect / Sync button, alerts, conflict pair).
+ * 2. The page renders one card, "Scripture source" (hint
+ *    verbatim, secure key field, Save / Clear pair). The
+ *    "Google Drive sync" card was removed entirely in #424
+ *    (Stephen removed Drive sync from Memorize, memorize#96):
+ *    no Drive props, no Drive card, no Drive copy may return.
  * 3. The key field is controlled (value + change callback);
  *    Save disables on a whitespace-only value, the app's rule,
  *    and Clear renders only when a key is saved.
- * 4. The sync button's label and intent follow connection
- *    state; Connect disables until the auth flow is ready or
- *    while syncing, Sync disables while syncing.
- * 5. Feedback mirrors the app: auth error as an error alert,
- *    sync message as info — warning during a conflict — and
- *    the conflict pair as two named callbacks (the sync
- *    directions are app vocabulary and do not cross).
- * 6. No loading member and no render slot: the app gates store
+ * 4. No loading member and no render slot: the app gates store
  *    readiness above the tab shell, and the screen renders no
  *    app-owned content inside itself. No app package is
  *    imported.
- * 7. The stories render the real component in its three states
- *    (Default, NoApiKeyDriveDisconnected, SyncConflict) in the
- *    Quiet Dawn theme.
+ * 5. The stories render the real component in its two states
+ *    (Default, NoApiKey) in the Quiet Dawn theme.
  *
  * This is a source scan, not a render test, for the same reason
  * as test/myVersesPage.test.ts: the failures it guards happen
@@ -87,9 +80,34 @@ test("the heading is the app screen's own heading", () => {
   );
 });
 
-test("the two cards carry the app's titles", () => {
+test("the one card carries the app's title", () => {
   assert.match(code, /<SectionCard title="Scripture source">/);
-  assert.match(code, /<SectionCard title="Google Drive sync">/);
+});
+
+test("the Drive sync section is removed entirely (#424)", () => {
+  for (const banned of [
+    "Google Drive sync",
+    "driveFolderName",
+    "driveConnected",
+    "driveConnectReady",
+    "isSyncing",
+    "driveError",
+    "syncMessage",
+    "syncConflict",
+    "onConnectDrivePress",
+    "onSyncDrivePress",
+    "onKeepDevicePress",
+    "onKeepDrivePress",
+    "Connect Google Drive",
+    "Sync with Drive",
+    "Keep this device",
+    "Keep Drive",
+  ]) {
+    assert.ok(
+      !code.includes(banned),
+      `MemorizeSettingsPage must not contain "${banned}" — Drive sync was removed from Memorize (#424)`,
+    );
+  }
 });
 
 test("the scripture-source hint is the app's, verbatim", () => {
@@ -128,63 +146,6 @@ test("Save disables on a whitespace-only value and Clear keys off the saved key"
   assert.ok(code.includes("Clear key"), "the clear button must carry the app's label");
 });
 
-test("the sync hint composes around the raw folder name", () => {
-  // Whitespace-tolerant (#410): the BigFooterShell wrap reindented
-  // the page, so the verbatim sentence may break at other spaces —
-  // the words and the folder-name interpolation stay pinned.
-  assert.match(
-    code,
-    /Syncs your verse list \(never your API key\) to memorize-data\.json in the “\s*\{driveFolderName\}/,
-    "the sync hint must be the app's sentence composed around the folder-name prop",
-  );
-  assert.ok(code.includes("Drive folder."), "the sync hint's close must be the app's, verbatim");
-});
-
-test("the sync button follows connection state, with the app's disabled rules", () => {
-  assert.match(code, /driveConnected \? \(/, "the button must branch on connection state");
-  assert.ok(code.includes("Sync with Drive"), "the connected button must carry the app's label");
-  assert.ok(
-    code.includes("Connect Google Drive"),
-    "the disconnected button must carry the app's label",
-  );
-  assert.match(
-    code,
-    /disabled=\{!driveConnectReady \|\| isSyncing\}/,
-    "Connect must disable until the auth flow is ready or while syncing, as in the app",
-  );
-  assert.match(
-    code,
-    /onPress=\{onSyncDrivePress\} disabled=\{isSyncing\}/,
-    "Sync must disable while a sync runs",
-  );
-});
-
-test("feedback renders as the app renders it", () => {
-  assert.match(
-    code,
-    /driveError \? <Alert severity="error">\{driveError\}<\/Alert> : null/,
-    "the auth error must render as an error alert",
-  );
-  assert.match(
-    code,
-    /severity=\{syncConflict \? "warning" : "info"\}/,
-    "the sync message must be a warning during a conflict and info otherwise, as in the app",
-  );
-});
-
-test("the conflict pair is two named callbacks, and sync directions never cross", () => {
-  assert.match(code, /onPress=\{onKeepDevicePress\}/);
-  assert.match(code, /onPress=\{onKeepDrivePress\}/);
-  assert.ok(code.includes("Keep this device"), "the device button must carry the app's label");
-  assert.ok(code.includes("Keep Drive"), "the Drive button must carry the app's label");
-  for (const banned of ['"push"', '"pull"', "onResolveConflict"]) {
-    assert.ok(
-      !code.includes(banned),
-      `MemorizeSettingsPage must not contain ${banned} — the sync directions are the app's business vocabulary`,
-    );
-  }
-});
-
 test("there is no loading member: no spinner, no state union", () => {
   assert.ok(
     !code.includes("Spinner"),
@@ -205,8 +166,8 @@ test("no render slot: no ReactNode prop, no accessory", () => {
   }
 });
 
-test("stories render the real component in its three states, in Quiet Dawn", () => {
-  for (const story of ["Default", "NoApiKeyDriveDisconnected", "SyncConflict"]) {
+test("stories render the real component in its two states, in Quiet Dawn", () => {
+  for (const story of ["Default", "NoApiKey"]) {
     assert.ok(
       new RegExp(String.raw`export const ${story}\b`).test(stories),
       `MemorizeSettingsPage.stories.tsx must export a ${story} story`,

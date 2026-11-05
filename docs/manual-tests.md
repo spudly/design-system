@@ -1270,14 +1270,13 @@ changeset naming AiSessionPage.
 
 ## MemorizeSettingsPage
 
-Open in `Pages/Memorize/MemorizeSettingsPage`: Default, NoApiKeyDriveDisconnected,
-SyncConflict.
+Open in `Pages/Memorize/MemorizeSettingsPage`: Default, NoApiKey.
 
-1. There is **visible spacing above the action buttons** in each
+1. There is **visible spacing above the action buttons** in the
    card — buttons never sit flush against the field or text above
    them (spacing comes from the parent stack's gap).
-2. SyncConflict renders the conflict notice and both resolution
-   actions legibly, with nothing overlapping the notice.
+2. Only the Scripture source card renders — there is no Google
+   Drive sync card or Drive action anywhere on the page (#424).
 
 **Run when:** `src/pages/MemorizeSettingsPage.tsx`, its stories, or a
 changeset naming MemorizeSettingsPage.
