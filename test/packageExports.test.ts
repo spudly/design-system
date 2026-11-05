@@ -1,6 +1,6 @@
 /**
  * Export-surface contract test for spudly/design-system#298 as
- * amended by spudly/design-system#411 (Stephen's amendment,
+ * amended by spudly/design-system#411 and #438 Part 1 (Stephen's amendments,
  * 2026-11-03): the package exports page components, plus the
  * minimal theme/config surface the consumer apps build on.
  *
@@ -17,7 +17,7 @@
  *    src/components/ChunkErrorBoundary.tsx.
  * 3. Nothing else is on the public surface: no other widget
  *    components, no icons, no composite (form) components, and
- *    no tokens, tag colors, Storybook config factories, or other
+ *    no Storybook config factories or other
  *    Tamagui config helpers — those modules stay in the repo as
  *    internal building blocks, reachable by relative path from
  *    this repo's own pages, Storybook apps, and tests, but they
@@ -83,6 +83,7 @@ const pagesNames = exportNames(readCode("src/pages/index.ts"));
 
 /** The exact #411 additions to the public surface, by source module. */
 const restoredByModule: [string, string[]][] = [
+  ["./tokens/index.js", ["tokens", "Tokens"]],
   [
     "./themes/index.js",
     [
@@ -93,6 +94,16 @@ const restoredByModule: [string, string[]][] = [
       "SemanticColors",
       "EciperayTheme",
       "MemorizeTheme",
+      "tagColorNames",
+      "defaultTagColorName",
+      "warmHarvestTagColors",
+      "quietDawnTagColors",
+      "isTagColorName",
+      "tagColorNameForHex",
+      "resolveTagColorValue",
+      "tagColorThemeKey",
+      "TagColorName",
+      "TagColorValues",
     ],
   ],
   ["./tamagui.config.js", ["createTamaguiConfig"]],
@@ -134,6 +145,7 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions"
       exportSpecifiers(code),
       new Set([
         "./pages/index.js",
+        "./tokens/index.js",
         "./themes/index.js",
         "./tamagui.config.js",
         "./components/ChunkErrorBoundary.js",
@@ -146,9 +158,18 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions"
     const expectedNames =
       rel === "dist/index.js"
         ? new Set([
+            "tokens",
             "baseTheme",
             "eciperayTheme",
             "memorizeTheme",
+            "tagColorNames",
+            "defaultTagColorName",
+            "warmHarvestTagColors",
+            "quietDawnTagColors",
+            "isTagColorName",
+            "tagColorNameForHex",
+            "resolveTagColorValue",
+            "tagColorThemeKey",
             "createTamaguiConfig",
             "ChunkErrorBoundary",
           ])
@@ -225,11 +246,6 @@ test("no other widget, icon, token, theme, or config name is on the public surfa
     "SignInForm",
     "Icon",
     "PrintIcon",
-    "tokens",
-    "tagColorNames",
-    "defaultTagColorName",
-    "tagColorNameForHex",
-    "resolveTagColorValue",
     "createStorybookTamaguiConfig",
     "createOnDeviceStorybookTamaguiConfig",
     "resolveFontFamily",
