@@ -1,5 +1,15 @@
 # @spudly/ui
 
+## 5.0.0
+
+### Major Changes
+
+- b12674b: MemorizeSettingsPage: the Google Drive sync section is removed entirely. The page now renders only the Scripture source (API key) card, and all Drive props (`driveFolderName`, `driveConnected`, `driveConnectReady`, `isSyncing`, `driveError`, `syncMessage`, `syncConflict`, `onConnectDrivePress`, `onSyncDrivePress`, `onKeepDevicePress`, `onKeepDrivePress`) are deleted from `MemorizeSettingsPageProps`. Hosts no longer pass any Drive props; the Settings page shows no Connect/Sync card.
+
+### Patch Changes
+
+- b8253ec: MyVersesPage: the `drillHref` contract is now documented on the page — the host owns a canonical drill destination for every verse (web hosts parse `/drill/:id`, native hosts handle their scheme's `drill/<id>` deep link, e.g. `memorize://drill/<id>`), and there is no callback form of the Drill control. No API change: `drillHref` was already required; hosts that pass an href their own routing ignores should add the destination handling host-side.
+
 ## 4.0.0
 
 ### Major Changes
