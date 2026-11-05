@@ -164,6 +164,22 @@ test("the next-review line renders only when the app composed one", () => {
   );
 });
 
+test("the drillHref host contract is documented on the page (#425)", () => {
+  // Scans the raw source: the contract lives in the header and
+  // prop documentation, which the stripped `code` scan removes.
+  for (const phrase of [
+    "canonical drill destination",
+    "/drill/:id",
+    "memorize://drill/<id>",
+    "NO\n *   callback form",
+  ]) {
+    assert.ok(
+      source.includes(phrase.replace("\\n", "\n")),
+      `MyVersesPage must document the drillHref host contract — missing: ${phrase}`,
+    );
+  }
+});
+
 test("row controls split on the navigation rule: Drill is a link, Remove an intent", () => {
   assert.match(
     code,
