@@ -154,6 +154,29 @@ test("the CLI rejects an omitted --capture-total instead of reading it as 0", ()
   assert.match(String(error.stderr), /--capture-total <n> are required/);
 });
 
+test("the CLI rejects a --capture-total flag with no operand", () => {
+  let error: any = null;
+  try {
+    execFileSync(
+      "node",
+      [
+        join(repoRoot, "tools/visualRegression/verifyScope.mjs"),
+        "--baselines",
+        "baselines",
+        "--staged",
+        "staged",
+        "--capture-total",
+      ],
+      { stdio: "pipe" },
+    );
+  } catch (e) {
+    error = e;
+  }
+  assert.ok(error, "CLI must fail when --capture-total has no operand");
+  assert.equal(error.status, 1);
+  assert.match(String(error.stderr), /--capture-total <n> are required/);
+});
+
 test("the ratio divides by the capture scope, not the baseline tree", () => {
   // A scoped run (#114) captures fewer stories than the full
   // baseline tree holds: 1 staged file is 1/8 of the tree but 1/3

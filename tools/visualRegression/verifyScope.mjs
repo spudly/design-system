@@ -162,7 +162,7 @@ function main(argv) {
   // silently pass validation and bypass the ratio check — reject
   // the empty raw value before converting (same trap
   // parseCommitGateRatio guards against in commitGate.mjs).
-  const captureTotalRaw = value("--capture-total", "");
+  const captureTotalRaw = value("--capture-total", "") ?? "";
   const captureTotal = captureTotalRaw.trim() === "" ? Number.NaN : Number(captureTotalRaw);
   if (!baselinesDir || !stagedDir || !Number.isInteger(captureTotal) || captureTotal < 0) {
     console.error(
