@@ -57,6 +57,18 @@ import { BoundedList } from "./BoundedList.js";
  *   and the Drill control renders in Button's href form.
  *   Remove is a bare intent by id, `onRemoveVerse(id)` (the
  *   app's store mutation stays app-side).
+ * - Host contract for `drillHref` (#425, decided by Stephen
+ *   2026-11-05): the HOST owns a canonical drill destination
+ *   for every verse — a host in Memorize's position creates
+ *   one rather than expecting a callback form. On web that is
+ *   a `/drill/:id` path the host parses on load; on native
+ *   that is a `<scheme>://drill/<id>` deep link (Memorize:
+ *   `memorize://drill/<id>`) the host handles. There is NO
+ *   callback form of the Drill control: a drill destination
+ *   is a canonical destination, so the #248 dynamic-
+ *   destination exemption does not apply, and a host must not
+ *   pass an href its own routing ignores — following the link
+ *   must land on that verse's drill in that host.
  *
  * #188: the list is the shared BoundedList, bounded to the
  * fixed shell with `flex: 1` (owned by BoundedList, #119), the
@@ -82,7 +94,10 @@ export type MyVersesPageItem = {
   id: string;
   /** The drill destination for this verse (#248's navigation
    * rule: starting the drill navigates, so it is a link): the
-   * host composes it from the verse id. The row's Drill control
+   * host composes it from the verse id, and the destination
+   * must be one the host itself routes — web hosts parse
+   * `/drill/:id` on load, native hosts handle their scheme's
+   * `drill/<id>` deep link (#425). The row's Drill control
    * renders as a link carrying this href. */
   drillHref: string;
   reference: string;
