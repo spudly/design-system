@@ -450,8 +450,14 @@ before merging the release.
    and stops the flow) — or if any captured story has **no
    baseline yet** (point 2) — the job regenerates the baselines from the
    fresh captures, runs them through the **luminance guard**
-   (below), and then **captures everything a second time and
-   compares against the regenerated set, in the same job**. The
+   (below), and then **re-captures the staged baselines and
+   compares them against the regenerated set, in the same job**
+   (issue #432 phase 1, `verifyScope.mjs`: when the gate stages
+   zero files the verification pass is skipped — the regenerated
+   set is the committed set the compare pass already proved; when
+   the staged set exceeds 25% of the capture scope, or a scoped
+   re-compare disagrees, verification falls back to re-capturing
+   the full original scope). The
    regenerated set is built by the **pixel-diff commit gate**
    (issue #296, `commitGate.mjs`): each fresh capture is
    pixel-diffed against its committed baseline and staged only
