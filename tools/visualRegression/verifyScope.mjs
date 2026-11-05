@@ -48,6 +48,8 @@ import { NARROW_PREFIXES } from "./scope.mjs";
 // trusted on its own.
 export const VERIFY_SCOPE_MAX_STAGED_RATIO = 0.25;
 
+// Recursively list the PNG files under a directory as
+// slash-separated paths relative to it (the baseline-tree layout).
 function listPngs(dir, prefix = "") {
   if (!existsSync(dir)) return [];
   const out = [];
@@ -118,6 +120,11 @@ function scopedLists(changed, stagedFiles) {
   return { standard: [...standard].sort(), narrow: [...narrow].sort() };
 }
 
+// Compute the verification decision ({ mode, reasons, standard,
+// narrow, stagedCount, totalCount }) for one pr-autocommit run:
+// "skip" when nothing was staged, "full" when the staged share of
+// the capture scope exceeds VERIFY_SCOPE_MAX_STAGED_RATIO, and
+// "scoped" (with the two story lists) otherwise.
 export function computeVerifyScope({ baselinesDir, stagedDir, captureTotal }) {
   const stagedFiles = listPngs(stagedDir);
   const changed = changedFiles(baselinesDir, stagedDir, stagedFiles);
@@ -150,6 +157,9 @@ export function computeVerifyScope({ baselinesDir, stagedDir, captureTotal }) {
 
 // --- CLI ---------------------------------------------------------------
 
+// CLI entry: parse --baselines/--staged/--capture-total/--out,
+// compute the decision, optionally write it as JSON, and log the
+// one-line summary the CI job shows. Returns the process exit code.
 function main(argv) {
   const value = (name, fallback) => {
     const i = argv.indexOf(name);
