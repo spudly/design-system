@@ -7,13 +7,13 @@ import { MemorizeSettingsPage } from "./MemorizeSettingsPage.js";
 /**
  * Stories for the real MemorizeSettingsPage component
  * (#127) — not a made-up page composition: this renders the
- * same component the Memorize app will consume, driven by
- * fixture props. The states below are the screen's real
- * display states, as the app's host composes them: a saved
- * key (the resting state) and a fresh install (no key yet).
- * The page renders only the "Scripture source" card — the
- * Google Drive sync section was removed entirely in #424
- * when Stephen removed Drive sync from Memorize.
+ * same component the Memorize app will consume. The page
+ * renders only its "Settings" heading — the Google Drive
+ * sync section was removed entirely in #424 when Stephen
+ * removed Drive sync from Memorize, and the API key section
+ * was removed entirely in #439 when Stephen ruled Memorize
+ * search is server-key-only on every platform. With both
+ * sections gone the page has a single display state.
  *
  * The frame matches the other page stories: a phone viewport
  * (430×844) pinned so Chromatic screenshots are deterministic
@@ -37,39 +37,12 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
-const noop = (): void => undefined;
-
-// The resting state: the host holds a saved key (the field
-// mirrors it, masked by the secure entry), so Clear renders
-// beside Save.
+// The page's only state: the heading in the shared shell,
+// with the host-supplied footer.
 export const Default: Story = {
   render: () => (
     <Viewport>
-      <MemorizeSettingsPage
-        footer={memorizeFooterFixture}
-        apiKeyValue="example-api-key"
-        onApiKeyValueChange={noop}
-        hasSavedApiKey
-        onSaveApiKeyPress={noop}
-        onClearApiKeyPress={noop}
-      />
-    </Viewport>
-  ),
-};
-
-// A fresh install: no key typed or saved, so Save is
-// disabled and Clear does not render.
-export const NoApiKey: Story = {
-  render: () => (
-    <Viewport>
-      <MemorizeSettingsPage
-        footer={memorizeFooterFixture}
-        apiKeyValue=""
-        onApiKeyValueChange={noop}
-        hasSavedApiKey={false}
-        onSaveApiKeyPress={noop}
-        onClearApiKeyPress={noop}
-      />
+      <MemorizeSettingsPage footer={memorizeFooterFixture} />
     </Viewport>
   ),
 };
