@@ -1,5 +1,0 @@
----
-"@spudly/ui": minor
----
-
-Restore the minimal theme/config exports and add ChunkErrorBoundary (amends the #298 pages-only cut). The package root now exports the brand themes `baseTheme`, `eciperayTheme`, and `memorizeTheme` (with their types `Theme`, `SemanticColors`, `EciperayTheme`, and `MemorizeTheme`) and the `createTamaguiConfig` factory, so each consuming app can again create its own app-level Tamagui config in app-owned code: test that an app importing `createTamaguiConfig` with its brand theme (Eciperay's `eciperayTheme`, Memorize's `memorizeTheme`) renders its pages in that brand's colors and fonts. The root also exports the new `ChunkErrorBoundary` component: wrap a lazily loaded surface in it (keyed by the active surface) and, when the surface's chunk fails to load, the boundary shows an error alert reading "This section failed to load." with a "Reload the app" button that reloads the page to recover. No other exports return — pages plus these named additions are the whole public surface.
