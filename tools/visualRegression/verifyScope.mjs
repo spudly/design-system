@@ -158,7 +158,12 @@ function main(argv) {
   const baselinesDir = value("--baselines", "");
   const stagedDir = value("--staged", "");
   const out = value("--out", "");
-  const captureTotal = Number(value("--capture-total", ""));
+  // An omitted flag reads as "" and Number("") is 0, which would
+  // silently pass validation and bypass the ratio check — reject
+  // the empty raw value before converting (same trap
+  // parseCommitGateRatio guards against in commitGate.mjs).
+  const captureTotalRaw = value("--capture-total", "");
+  const captureTotal = captureTotalRaw.trim() === "" ? Number.NaN : Number(captureTotalRaw);
   if (!baselinesDir || !stagedDir || !Number.isInteger(captureTotal) || captureTotal < 0) {
     console.error(
       "verify-scope FAIL (issue #432): --baselines <dir>, --staged <dir>, and --capture-total <n> are required.",

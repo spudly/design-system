@@ -8,6 +8,7 @@
  * the staged story ids plus their standard/narrow counterparts.
  */
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
@@ -129,6 +130,28 @@ test("a staged set exactly at the ratio stays scoped", () => {
   // 2 of 8 = 25%, not over the threshold.
   assert.equal(decision.mode, "scoped");
   assert.equal(decision.standard.length, 2);
+});
+
+test("the CLI rejects an omitted --capture-total instead of reading it as 0", () => {
+  let error: any = null;
+  try {
+    execFileSync(
+      "node",
+      [
+        join(repoRoot, "tools/visualRegression/verifyScope.mjs"),
+        "--baselines",
+        "baselines",
+        "--staged",
+        "staged",
+      ],
+      { stdio: "pipe" },
+    );
+  } catch (e) {
+    error = e;
+  }
+  assert.ok(error, "CLI must fail without --capture-total");
+  assert.equal(error.status, 1);
+  assert.match(String(error.stderr), /--capture-total <n> are required/);
 });
 
 test("the ratio divides by the capture scope, not the baseline tree", () => {
