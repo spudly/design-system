@@ -268,6 +268,12 @@ pr_autocommit() {
   # publish decision after it.
   local staged_count
   staged_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).staged)')"
+  # The verification ratio's denominator: the number of captures
+  # the commit gate gated — i.e. this run's capture scope (issue
+  # #432 review: dividing by the staged tree's full baseline count
+  # would understate the staged share in a scoped run).
+  local captured_count
+  captured_count="$(node -e 'console.log(JSON.parse(require("node:fs").readFileSync("/tmp/dsvr-commit-gate-summary.json", "utf8")).captured)')"
 
   # In-job verification scope (issue #432 phase 1): re-capture only
   # what the commit gate actually staged. verifyScope.mjs compares
@@ -276,7 +282,7 @@ pr_autocommit() {
   # above still runs over the FULL fresh capture sets and a trip
   # still commits nothing — scoping never bypasses it.
   local verify_scope_file=/tmp/dsvr-verify-scope.json
-  if ! node "$tool_dir/verifyScope.mjs" --baselines "$tool_dir/baselines" --staged "$staged" --out "$verify_scope_file"; then
+  if ! node "$tool_dir/verifyScope.mjs" --baselines "$tool_dir/baselines" --staged "$staged" --capture-total "$captured_count" --out "$verify_scope_file"; then
     echo "::error::PR auto-commit: could not compute the verification scope via verifyScope.mjs - committing NOTHING."
     return 1
   fi

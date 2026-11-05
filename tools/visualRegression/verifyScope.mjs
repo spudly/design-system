@@ -33,11 +33,13 @@
 // decisions are written with mode "full", which run.mjs treats as
 // the untouched capture set. Importable (unit tests) and runnable
 // as a CLI:
-//   node verifyScope.mjs --baselines <dir> --staged <dir> --out <json>
+//   node verifyScope.mjs --baselines <dir> --staged <dir> --capture-total <n> --out <json>
 
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
+
+import { NARROW_PREFIXES } from "./scope.mjs";
 
 // The named setting for the full-verification fallback (issue
 // #432's approved plan: "fall back to the full re-capture when the
@@ -60,14 +62,26 @@ function listPngs(dir, prefix = "") {
 
 // Baselines live at <theme>/<storyId>.png, with the narrow variant
 // beside the standard one as <theme>/<storyId>-narrow.png (see
-// run.mjs baselineFileName). Returns { storyId, narrow } or null
-// for a path that is not a baseline PNG in that layout.
+// run.mjs baselineFileName; compare.mjs splits the two sets by the
+// same suffix). A file counts as narrow only when the stripped id
+// is in the narrow capture scope (scope.mjs NARROW_PREFIXES): a
+// STANDARD story whose id merely ends in "-narrow" keeps its full
+// id. (A narrow-scope story id ending in "-narrow" would collide
+// with its own variant's filename — the driver's naming scheme
+// itself cannot tell those apart, upstream of this module.)
+// Returns { storyId, narrow } or null for a path that is not a
+// baseline PNG in that layout.
 export function parseBaselineRel(rel) {
   const file = rel.split("/").at(-1) ?? "";
   if (!file.endsWith(".png")) return null;
-  const narrow = file.endsWith("-narrow.png");
-  const storyId = file.slice(0, narrow ? -"-narrow.png".length : -".png".length);
-  return storyId ? { storyId, narrow } : null;
+  const base = file.slice(0, -".png".length);
+  if (base.endsWith("-narrow")) {
+    const storyId = base.slice(0, -"-narrow".length);
+    if (storyId && NARROW_PREFIXES.some((p) => storyId.startsWith(p))) {
+      return { storyId, narrow: true };
+    }
+  }
+  return base ? { storyId: base, narrow: false } : null;
 }
 
 // The staged set is a full copy of the committed baselines with
@@ -104,17 +118,24 @@ function scopedLists(changed, stagedFiles) {
   return { standard: [...standard].sort(), narrow: [...narrow].sort() };
 }
 
-export function computeVerifyScope({ baselinesDir, stagedDir }) {
+export function computeVerifyScope({ baselinesDir, stagedDir, captureTotal }) {
   const stagedFiles = listPngs(stagedDir);
-  const total = stagedFiles.length;
   const changed = changedFiles(baselinesDir, stagedDir, stagedFiles);
+  // The ratio's denominator is the CAPTURE SCOPE of the run that
+  // produced the staged set (the commit gate's gated-capture count,
+  // passed in by the caller), NOT the staged tree's file count: the
+  // staged tree is a full copy of every committed baseline, so in a
+  // scoped run (#114) dividing by it would understate the staged
+  // share of the scope that was actually captured. Absent a count,
+  // fall back to the tree size (a full-scope run, where they agree).
+  const total = captureTotal ?? stagedFiles.length;
   const base = { standard: [], narrow: [], stagedCount: changed.length, totalCount: total };
   const skipReason =
     "commit gate staged 0 files — the regenerated set is byte-identical to the committed baselines, already proven by the compare pass";
   if (changed.length === 0) return { ...base, mode: "skip", reasons: [skipReason] };
   if (total > 0 && changed.length / total > VERIFY_SCOPE_MAX_STAGED_RATIO) {
     const pct = (VERIFY_SCOPE_MAX_STAGED_RATIO * 100).toFixed(0);
-    const reason = `commit gate staged ${changed.length} of ${total} baselines (> ${pct}% of the capture scope) — full verification re-capture`;
+    const reason = `commit gate staged ${changed.length} of ${total} captures in scope (> ${pct}% of the capture scope) — full verification re-capture`;
     return { ...base, mode: "full", reasons: [reason] };
   }
   return {
@@ -122,7 +143,7 @@ export function computeVerifyScope({ baselinesDir, stagedDir }) {
     ...scopedLists(changed, stagedFiles),
     mode: "scoped",
     reasons: [
-      `commit gate staged ${changed.length} of ${total} baselines — verification re-captures only the staged baselines and their counterparts (issue #432)`,
+      `commit gate staged ${changed.length} of ${total} captures in scope — verification re-captures only the staged baselines and their counterparts (issue #432)`,
     ],
   };
 }
@@ -137,16 +158,17 @@ function main(argv) {
   const baselinesDir = value("--baselines", "");
   const stagedDir = value("--staged", "");
   const out = value("--out", "");
-  if (!baselinesDir || !stagedDir) {
+  const captureTotal = Number(value("--capture-total", ""));
+  if (!baselinesDir || !stagedDir || !Number.isInteger(captureTotal) || captureTotal < 0) {
     console.error(
-      "verify-scope FAIL (issue #432): --baselines <dir> and --staged <dir> are required.",
+      "verify-scope FAIL (issue #432): --baselines <dir>, --staged <dir>, and --capture-total <n> are required.",
     );
     return 1;
   }
-  const decision = computeVerifyScope({ baselinesDir, stagedDir });
+  const decision = computeVerifyScope({ baselinesDir, stagedDir, captureTotal });
   if (out) writeFileSync(out, `${JSON.stringify(decision, null, 2)}\n`);
   console.log(
-    `VR verify scope (#432): ${decision.mode} — staged ${decision.stagedCount} of ${decision.totalCount} baselines; ` +
+    `VR verify scope (#432): ${decision.mode} — staged ${decision.stagedCount} of ${decision.totalCount} captures in scope; ` +
       `standard ${decision.standard.length}, narrow ${decision.narrow.length}. ${decision.reasons.join("; ")}`,
   );
   return 0;

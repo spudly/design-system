@@ -49,6 +49,13 @@ test("parseBaselineRel splits story id and narrow suffix", () => {
     parseBaselineRel("light_warmHarvest/pages-eciperay-recipespage--default-narrow.png"),
     { storyId: "pages-eciperay-recipespage--default", narrow: true },
   );
+  // A standard story outside the narrow scope whose id ends in
+  // "-narrow" keeps its full id — the suffix alone is not the
+  // variant signal.
+  assert.deepEqual(parseBaselineRel("light_quietDawn/pages-memorize-home--narrow.png"), {
+    storyId: "pages-memorize-home--narrow",
+    narrow: false,
+  });
   assert.equal(parseBaselineRel("README.md"), null);
 });
 
@@ -122,4 +129,20 @@ test("a staged set exactly at the ratio stays scoped", () => {
   // 2 of 8 = 25%, not over the threshold.
   assert.equal(decision.mode, "scoped");
   assert.equal(decision.standard.length, 2);
+});
+
+test("the ratio divides by the capture scope, not the baseline tree", () => {
+  // A scoped run (#114) captures fewer stories than the full
+  // baseline tree holds: 1 staged file is 1/8 of the tree but 1/3
+  // of a 3-capture scope — over the threshold, so full verification.
+  const rel = "light_warmHarvest/pages-eciperay-page3--default.png";
+  const { baselines, staged } = syntheticTrees({ changed: [rel] });
+  const decision = computeVerifyScope({
+    baselinesDir: baselines,
+    stagedDir: staged,
+    captureTotal: 3,
+  });
+  assert.equal(decision.mode, "full");
+  assert.equal(decision.stagedCount, 1);
+  assert.equal(decision.totalCount, 3);
 });
