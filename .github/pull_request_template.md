@@ -11,7 +11,6 @@
 All boxes must be checked (or struck through with a one-line reason)
 before this PR is merged.
 
-- [ ] CI is green for the exact head commit
 - [ ] Review feedback addressed (Copilot and/or human)
 - [ ] Manual Storybook QA pass posted for this head SHA (changed
       components/pages/stories only), or exempt (no component/page/story
