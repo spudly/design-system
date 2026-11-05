@@ -19,8 +19,8 @@ structure is B1 of the design-system completion program (#121,
 | Inclusion mechanism | Storybook indexer over the glob                                                                                         | Generated `.rnstorybook/storybook.requires.ts` (Metro `require.context` over the same glob)                    |
 | Dev command         | `npm run storybook:react` (repo root)                                                                                   | `npm run storybook:react-native` (repo root or in `apps/storybook`)                                            |
 | Build command       | `npm run build-storybook:react`                                                                                         | The host app build (Expo); registry refresh: `npm run generate` in `apps/storybook`                            |
-| CI                  | `.github/workflows/chromatic.yml` — publishes to Chromatic                                                              | `.github/workflows/android-storybook.yml` — emulator captures vs baselines                                     |
-| Publish trigger     | Push to `main` always; PRs only via the `visual-check` label (see [README](../README.md#react-storybook-web-chromatic)) | Path-filtered PR runs + `workflow_dispatch` (see [android-visual-regression.md](android-visual-regression.md)) |
+| CI                  | `.github/workflows/chromatic.yml` — publishes to Chromatic                                                              | `.github/workflows/android-storybook.yml` — emulator captures vs baselines; `.github/workflows/chromatic-rn.yml` — publishes to the Chromatic React Native project (#302) |
+| Publish trigger     | Push to `main` always; PRs only via the `visual-check` label (see [README](../README.md#react-storybook-web-chromatic)) | Android VR: path-filtered PR runs + `workflow_dispatch`; Chromatic RN: push to `main` always, PRs only via the `visual-check-rn` label (see [android-visual-regression.md](android-visual-regression.md)) |
 
 The legacy script names `storybook` and `build-storybook` still work
 as aliases for the react storybook commands — Chromatic's action
@@ -111,3 +111,14 @@ one-sided story file, which the shared glob makes impossible anyway.
   (a story that fails to load breaks the app build) and browsable on
   device, but are not screenshot-compared — page-level VR is the
   agreed native gate (#121 rule 4).
+- **React Native storybook (Chromatic, #302)** — since #302 the RN
+  storybook also publishes to a separate Chromatic React Native
+  project, which captures the full story set on Chromatic's hosted
+  simulators/emulators and diffs against baselines accepted in
+  Chromatic's UI. It runs **in parallel** with the Android VR above:
+  the in-repo pipeline remains the authoritative native gate during
+  the parallel period, and decommissioning it (if ever) is a separate
+  later decision. TurboSnap is not supported for React Native, so
+  each Chromatic RN build snapshots the full story set — PR runs are
+  therefore gated behind the one-shot `visual-check-rn` label (see
+  [android-visual-regression.md](android-visual-regression.md)).
