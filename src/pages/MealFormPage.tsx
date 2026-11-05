@@ -2,11 +2,13 @@ import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
 import { AutocompletePicker } from "../components/AutocompletePicker.js";
 import { Button } from "../components/Button.js";
+import { FieldStack } from "../components/FieldStack.js";
 import { FormHeading } from "../components/FormHeading.js";
 import { FormScreenLayout } from "../components/FormScreenLayout.js";
 import { FormSubmit } from "../components/FormSubmit.js";
 import { LabeledGroup } from "../components/LabeledGroup.js";
 import { NumberStepper } from "../components/NumberStepper.js";
+import { Text } from "../components/Text.js";
 import { TextAreaField } from "../components/TextAreaField.js";
 import { TextField } from "../components/TextField.js";
 
@@ -69,6 +71,27 @@ export type MealFormPageRecipeOption = {
   servings: number;
 };
 
+export type MealFormPageIngredient = {
+  id: string;
+  /** The ingredient's name, as entered. */
+  name: string;
+  /** Free-text quantity ("2", "1/2"), as entered — the host
+   * validates and parses it (#440: quantity/unit cross as
+   * free-text strings matching the host's meal-ingredient
+   * shape; unit and nutrition knowledge stays host-side). */
+  quantity: string;
+  /** Free-text unit ("cups", "tbsp"), as entered. */
+  unit: string;
+  /** Free-text entry servings, as entered — the servings this
+   * entry's quantity covers (the eciperay #363 entry-level
+   * servings correction). */
+  servings: string;
+};
+
+/** A partial edit to one ingredient entry, reported through
+ * `onIngredientChange` — the fields the user changed. */
+export type MealFormPageIngredientPatch = Partial<Omit<MealFormPageIngredient, "id">>;
+
 export type MealFormPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
@@ -103,6 +126,23 @@ export type MealFormPageProps = {
   /** Remove the selected recipe with this id. */
   onRemoveRecipe: (recipeId: string) => void;
   onServingsChange: (recipeId: string, servings: number) => void;
+  /** The meal's direct ingredients (#440), in entry order —
+   * ingredients entered on the meal itself, not through a
+   * selected recipe. The section renders only when the host
+   * opts in by passing BOTH `onAddIngredient` and
+   * `onIngredientChange` (an editable section needs its edit
+   * handler — add alone would render fields that cannot
+   * change); hosts that have not adopted direct ingredients
+   * see the form exactly as before. */
+  ingredients?: MealFormPageIngredient[];
+  /** Append a new, empty direct-ingredient entry. Passing this
+   * callback together with `onIngredientChange` opts the form
+   * into the ingredients section. */
+  onAddIngredient?: () => void;
+  /** Remove the direct-ingredient entry with this id. */
+  onRemoveIngredient?: (ingredientId: string) => void;
+  /** Report an edit to one direct-ingredient entry. */
+  onIngredientChange?: (ingredientId: string, patch: MealFormPageIngredientPatch) => void;
   /** Save in flight: the submit button disables. */
   isSaving?: boolean;
   /** Host-reported save failure, rendered above the submit row. */
@@ -125,6 +165,10 @@ export function MealFormPage({
   onSelectRecipe,
   onRemoveRecipe,
   onServingsChange,
+  ingredients = [],
+  onAddIngredient,
+  onRemoveIngredient,
+  onIngredientChange,
   isSaving = false,
   error,
   onSubmit,
@@ -179,12 +223,85 @@ export function MealFormPage({
             }}
           />
         ))}
+        {onAddIngredient && onIngredientChange ? (
+          <LabeledGroup label="Ingredients">
+            <FieldStack>
+              {ingredients.map((ingredient, index) => {
+                const entryLabel = ingredient.name.trim() || `Ingredient ${index + 1}`;
+                return (
+                  <FieldStack key={ingredient.id}>
+                    <Text variant="subheading">{entryLabel}</Text>
+                    <TextField
+                      label={`${entryLabel} — Name`}
+                      value={ingredient.name}
+                      onChangeText={(value) => {
+                        onIngredientChange?.(ingredient.id, { name: value });
+                      }}
+                      placeholder="Ingredient name"
+                    />
+                    <TextField
+                      label={`${entryLabel} — Quantity`}
+                      value={ingredient.quantity}
+                      onChangeText={(value) => {
+                        onIngredientChange?.(ingredient.id, { quantity: value });
+                      }}
+                      placeholder="Quantity"
+                    />
+                    <TextField
+                      label={`${entryLabel} — Unit`}
+                      value={ingredient.unit}
+                      onChangeText={(value) => {
+                        onIngredientChange?.(ingredient.id, { unit: value });
+                      }}
+                      placeholder="Unit (e.g. cups)"
+                    />
+                    <TextField
+                      label={`${entryLabel} — Servings`}
+                      value={ingredient.servings}
+                      onChangeText={(value) => {
+                        onIngredientChange?.(ingredient.id, { servings: value });
+                      }}
+                      placeholder="Servings this entry covers"
+                    />
+                    {onRemoveIngredient ? (
+                      <Button
+                        variant="secondary"
+                        accessibilityLabel={`Remove ${entryLabel}`}
+                        onPress={() => {
+                          onRemoveIngredient(ingredient.id);
+                        }}
+                      >
+                        Remove ingredient
+                      </Button>
+                    ) : null}
+                  </FieldStack>
+                );
+              })}
+              <Button
+                variant="secondary"
+                accessibilityLabel="Add ingredient"
+                onPress={onAddIngredient}
+              >
+                Add ingredient
+              </Button>
+            </FieldStack>
+          </LabeledGroup>
+        ) : null}
         {error ? <Alert severity="error" message={error} /> : null}
         <FormSubmit>
           <Button
             variant="primary"
             accessibilityLabel="Save meal"
-            disabled={!title.trim() || selectedRecipes.length === 0 || isSaving}
+            disabled={
+              !title.trim() ||
+              (selectedRecipes.length === 0 &&
+                !(
+                  onAddIngredient &&
+                  onIngredientChange &&
+                  ingredients.some((ingredient) => ingredient.name.trim().length > 0)
+                )) ||
+              isSaving
+            }
             onPress={onSubmit}
           >
             Save meal

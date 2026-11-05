@@ -259,6 +259,58 @@ test("MealDetailPage members are view-models with pre-composed subtitles", () =>
   }
 });
 
+test("MealDetailPage direct ingredients render as plain rows in their own section (#440)", () => {
+  const page = pageSource("MealDetailPage");
+  assert.ok(page.includes("MealDetailPageIngredient"), "direct ingredients cross as view-models");
+  assert.ok(
+    page.includes("ingredients?: MealDetailPageIngredient[]"),
+    "the prop is optional (additive)",
+  );
+  assert.ok(
+    page.includes('<SectionCard title="Ingredients">'),
+    "direct ingredients render in an Ingredients section after Recipes",
+  );
+  assert.ok(
+    page.includes("ingredients.length > 0"),
+    "the section is omitted when there are no direct ingredients",
+  );
+  // A direct ingredient has no destination: its row must be a
+  // plain row — no href, no press (Stephen's link-naming rule).
+  const ingredientsBlock = page.split('<SectionCard title="Ingredients">')[1] ?? "";
+  assert.ok(ingredientsBlock.includes("MarkableRow"), "ingredient rows render through MarkableRow");
+  assert.ok(!ingredientsBlock.includes("href"), "ingredient rows carry no href");
+  assert.ok(!ingredientsBlock.includes("onPress"), "ingredient rows carry no press callback");
+});
+
+test("MealFormPage direct ingredients are controlled entries with an opt-in section (#440)", () => {
+  const page = pageSource("MealFormPage");
+  for (const prop of [
+    "ingredients",
+    "onAddIngredient",
+    "onRemoveIngredient",
+    "onIngredientChange",
+  ]) {
+    assert.ok(page.includes(prop), `MealFormPage must take ${prop}`);
+  }
+  assert.ok(page.includes("MealFormPageIngredient"), "ingredient entries cross as view-models");
+  assert.ok(
+    page.includes("ingredients.some((ingredient) => ingredient.name.trim().length > 0)"),
+    "a meal of only direct ingredients is submittable once an entry has a name (no recipe required; an empty draft does not count)",
+  );
+  assert.ok(
+    page.includes("onAddIngredient && onIngredientChange"),
+    "the editable section renders only when both its add and edit handlers are present",
+  );
+  assert.ok(
+    page.includes("accessibilityLabel={`Remove ${entryLabel}`}"),
+    "each entry's remove control carries an accessible name",
+  );
+  assert.ok(
+    page.includes('accessibilityLabel="Add ingredient"'),
+    "the add control carries an accessible name",
+  );
+});
+
 test("MealsHubPage composes MealPlansPage for the plans tab and reports the tab intent", () => {
   const page = pageSource("MealsHubPage");
   assert.ok(page.includes("MealPlansPage"), "the plans tab hosts the DS MealPlansPage");
@@ -287,11 +339,11 @@ test("MealsHubPage composes MealPlansPage for the plans tab and reports the tab 
 
 test("stories cover the captured states for each B3b page", () => {
   const expectedStories = {
-    MealFormPage: ["Default", "NoSelection", "SaveError"],
+    MealFormPage: ["Default", "NoSelection", "SaveError", "WithDirectIngredients"],
     MealPlanFormPage: ["Default", "NoSelection"],
     ShoppingListPage: ["Default", "Loading", "Empty"],
     MealCookingModePage: ["Default", "FirstStep", "LastStep", "LoadError"],
-    MealDetailPage: ["Default", "NoNotesOrNutrition"],
+    MealDetailPage: ["Default", "NoNotesOrNutrition", "WithDirectIngredients"],
     MealsHubPage: ["Default", "PlansTab", "Empty"],
   };
   for (const [name, stories] of Object.entries(expectedStories)) {

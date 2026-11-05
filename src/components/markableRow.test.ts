@@ -53,3 +53,8 @@ test("the press form is keyboard-operable on web (the ListRow pattern)", () => {
 test("the trailing note renders only when provided", () => {
   assert.match(code, /\{trailingNote \? \(/);
 });
+
+test("the subtitle renders only when provided, as hint text under the label (#440)", () => {
+  assert.match(code, /\{subtitle \? \(/);
+  assert.match(code, /<Text variant="hint">\{subtitle\}<\/Text>/);
+});

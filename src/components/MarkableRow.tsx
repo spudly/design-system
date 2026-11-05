@@ -6,6 +6,11 @@ import { Text } from "./Text.js";
 export type MarkableRowProps = {
   /** The row's label. */
   label: string;
+  /** Optional meta line under the label, pre-composed by the
+   * caller (e.g. a quantity/nutrition line) — the ListRow
+   * title/subtitle composition, for plain rows that carry
+   * more than a name (#440). */
+  subtitle?: string;
   /** Optional note at the row's trailing edge (e.g. "optional"). */
   trailingNote?: string;
   /**
@@ -36,7 +41,13 @@ export type MarkableRowProps = {
  * the button role, is focusable on web, and the button keys
  * (Enter and Space) invoke the same callback as a press.
  */
-export function MarkableRow({ label, trailingNote, isMarked = false, onPress }: MarkableRowProps) {
+export function MarkableRow({
+  label,
+  subtitle,
+  trailingNote,
+  isMarked = false,
+  onPress,
+}: MarkableRowProps) {
   const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
@@ -65,7 +76,14 @@ export function MarkableRow({ label, trailingNote, isMarked = false, onPress }: 
           }
         : null)}
     >
-      <Text flex={1}>{label}</Text>
+      {subtitle ? (
+        <YStack flex={1}>
+          <Text>{label}</Text>
+          <Text variant="hint">{subtitle}</Text>
+        </YStack>
+      ) : (
+        <Text flex={1}>{label}</Text>
+      )}
       {trailingNote ? (
         <YStack paddingInlineStart="$2">
           <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted">

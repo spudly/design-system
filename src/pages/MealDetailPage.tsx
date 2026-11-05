@@ -3,6 +3,7 @@ import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
 import { ListRow } from "../components/ListRow.js";
 import { ListStack } from "../components/ListStack.js";
+import { MarkableRow } from "../components/MarkableRow.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionCard } from "../components/SectionCard.js";
 import { SectionStack } from "../components/SectionStack.js";
@@ -69,6 +70,16 @@ export type MealDetailPageMember = {
   isUnavailable?: boolean;
 };
 
+export type MealDetailPageIngredient = {
+  id: string;
+  /** The ingredient's name, as the host stores it. */
+  name: string;
+  /** Pre-composed meta line ("2 cups · 120 cal · 3g protein"):
+   * the host composes the quantity/unit line and the nutrition
+   * summary, as it does for each member's `subtitle`. */
+  subtitle: string;
+};
+
 export type MealDetailPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
@@ -79,6 +90,13 @@ export type MealDetailPageProps = {
    * app's formatter; omit when the meal has no summary. */
   nutritionLabel?: string | null;
   members: MealDetailPageMember[];
+  /** The meal's direct ingredients (#440): ingredients entered
+   * on the meal itself, not through a member recipe. A direct
+   * ingredient has no destination page, so its row is a plain
+   * row — no href, no press — never a link-shaped row without
+   * a real link (Stephen's link-naming rule). Omit or pass an
+   * empty list and the "Ingredients" section is omitted. */
+  ingredients?: MealDetailPageIngredient[];
   /** The cooking-mode destination (#248: navigation crosses as
    * an href, not a press callback). */
   cookHref: string;
@@ -91,6 +109,7 @@ export function MealDetailPage({
   notes,
   nutritionLabel,
   members,
+  ingredients,
   cookHref,
   editHref,
   footer,
@@ -123,6 +142,19 @@ export function MealDetailPage({
               ))}
             </ListStack>
           </SectionCard>
+          {ingredients && ingredients.length > 0 ? (
+            <SectionCard title="Ingredients">
+              <ListStack>
+                {ingredients.map((ingredient) => (
+                  <MarkableRow
+                    key={ingredient.id}
+                    label={ingredient.name}
+                    subtitle={ingredient.subtitle}
+                  />
+                ))}
+              </ListStack>
+            </SectionCard>
+          ) : null}
         </SectionStack>
       </ScreenContainer>
     </BigFooterShell>
