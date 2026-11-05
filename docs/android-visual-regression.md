@@ -10,6 +10,51 @@ differently than the web — is invisible to web screenshots:
 spudly/eciperay#162 (the SearchField glyph whose line box stretched
 the field to 1826px on a Pixel 8a) passed every web check.
 
+## Chromatic React Native visual testing (parallel system, #302)
+
+Since #302, the react-native storybook is ALSO published to a
+separate Chromatic React Native project via
+`.github/workflows/chromatic-rn.yml`. Chromatic builds the Expo
+Storybook app itself (no custom build commands — the
+`reactNative.*BuildCommand` config keys are a non-Expo escape hatch
+only), drives it over WebSockets (the env-controlled options in
+`apps/storybook/Storybook.tsx`; config in
+`apps/storybook/chromatic.config.json`), captures the full story set
+on its hosted Android Emulator, and diffs against baselines
+accepted in Chromatic's UI. Its project token is the
+`CHROMATIC_RN_PROJECT_TOKEN` repository secret — NOT the web
+project's `CHROMATIC_PROJECT_TOKEN`. Capture is Android only: the
+host app declares `platforms: ["android"]` in
+`apps/storybook/app.json` (the same platform the in-repo VR covers);
+an iOS capture path would need the iOS platform added to the app
+plus a macOS build path, which is a separate future decision.
+
+**Which system is authoritative:** during the parallel period, THIS
+in-repo Android VR pipeline remains the working, authoritative
+native gate. The Chromatic RN system runs alongside it for its
+review/acceptance workflow; decommissioning the in-repo pipeline,
+if ever, is a separate later decision. Nothing in the Chromatic RN
+setup touches `tools/visualRegression`, its baselines, or
+`android-storybook.yml`.
+
+**Requesting a run:** pushes to `main` always run (baseline
+anchoring). PRs run only on request — add the **`visual-check-rn`**
+label (separate from the web `visual-check` label, so the two
+budgets are requested independently). The label is one-shot and is
+consumed when a run actually starts, after the same two gates as
+web Chromatic: the pixel gate (docs/CI/changeset/manifest-only
+diffs skip, label kept) and the CI-green gate for the exact head.
+
+**Snapshot budget:** the 5,000 snapshots/month free-tier cap is
+shared with web Chromatic. TurboSnap is NOT supported for React
+Native, so every RN build snapshots the full story set — ~273
+stories at introduction, per enabled platform. A full-suite build
+is therefore a significant fraction of a month's budget, which is
+why PR runs are label-gated and main builds are the baseline
+anchors. Baseline seeding (the first full capture) is sequenced to
+just after a Chromatic billing-cycle reset, and Stephen accepts
+the seeded baselines in Chromatic himself.
+
 ## Pieces
 
 | Piece            | Where                                                              | What it does                                                                                                                                                                                                                                                                     |

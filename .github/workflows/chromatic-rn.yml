@@ -1,0 +1,211 @@
+name: React Native storybook (Chromatic)
+
+# Publishes the react-native storybook (the Expo host app in
+# apps/storybook — one of the repo's two storybooks, #122; the react
+# storybook is covered by chromatic.yml) to a SEPARATE Chromatic
+# React Native project for visual snapshot diffs (design-system
+# #302). Chromatic captures the stories on its hosted Android
+# Emulator and diffs them against the accepted baseline; changes
+# report as an unreviewed build until they are accepted in
+# Chromatic's UI. Android only: the host app declares
+# `platforms: ["android"]` in apps/storybook/app.json, matching the
+# in-repo Android VR; an iOS capture path would need the iOS
+# platform added plus a macOS build, which is out of this scope.
+#
+# This runs IN PARALLEL with the in-repo Android VR
+# (android-storybook.yml, tools/visualRegression): that pipeline is
+# untouched and remains the authoritative native gate during the
+# parallel period. This workflow never writes baselines or touches
+# tools/visualRegression.
+#
+# Snapshot budget: the Chromatic free tier allows 5,000
+# snapshots/month SHARED with the web project. TurboSnap is NOT
+# supported for React Native (per Chromatic's RN docs), so every RN
+# build snapshots the full story set (~273 stories at introduction;
+# per enabled platform) — the label gating below carries the whole
+# budget discipline:
+#
+# - Pushes to main: ALWAYS run. Main builds anchor the baselines PR
+#   diffs compare against, and they are comparatively rare.
+# - Pull requests: run ONLY on request. Add the `visual-check-rn`
+#   label to a PR to request one snapshot run. The label is
+#   deliberately separate from the web `visual-check` label so the
+#   two budgets are requested independently. It is one-shot: the job
+#   removes it as soon as a run actually starts. Two gates run before
+#   the label is consumed, and a gate skip KEEPS the label, so a
+#   later push (synchronize) retries automatically:
+#     1. CI-green gate: the `ci` check for the PR's exact head SHA
+#        must have concluded success (bounded ~5 min wait).
+#     2. Pixel gate: PRs whose diff touches only files that cannot
+#        change pixels (markdown, docs/, .github/, changesets,
+#        LICENSE, .gitignore, package manifests) skip.
+#   Exception (#53, same as web): a run triggered by dependabot[bot]
+#   gets a read-only token, so it cannot consume the label; it
+#   publishes with a warning instead.
+#
+# Setup (one-time): a Chromatic React Native project for this repo,
+# with its token stored as the CHROMATIC_RN_PROJECT_TOKEN repository
+# secret (added by Stephen, verified 2026-11-05). Baseline seeding is held until just
+# after the ~2026-11-09 billing-cycle reset; Stephen accepts the
+# seeded baselines himself.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [opened, reopened, synchronize, labeled]
+
+# NOTE: concurrency lives on the job (below), not here — same
+# reasoning as chromatic.yml: workflow-level concurrency would let
+# events the job's own `if` skips cancel a deliberately requested
+# run mid-flight.
+
+jobs:
+  chromatic-rn:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    concurrency:
+      group: chromatic-rn-${{ github.event.pull_request.number || github.ref }}
+      # Cancel superseded PR runs only: a main build anchors the
+      # baselines and snapshots the full suite, so a second main push
+      # must queue behind it rather than cancelling it mid-capture
+      # and wasting the shared snapshot budget.
+      cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+    permissions:
+      contents: read
+      checks: read
+      issues: write
+      pull-requests: write
+    # Fork PRs never receive repository secrets — skip them.
+    # PR runs additionally require the visual-check-rn label, and a
+    # `labeled` event for any other label must not start a run.
+    if: |
+      github.event_name == 'push' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       contains(github.event.pull_request.labels.*.name, 'visual-check-rn') &&
+       (github.event.action != 'labeled' || github.event.label.name == 'visual-check-rn'))
+    steps:
+      - name: Gate PR snapshot runs (pixel diff + CI green)
+        id: pr-gate
+        if: github.event_name == 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -euo pipefail
+          # Default when anything is undetermined: run (conservative).
+          echo "run=true" >> "$GITHUB_OUTPUT"
+
+          # --- Pixel gate ------------------------------------------------
+          if files="$(gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" --name-only 2>/dev/null)" && [ -n "$files" ]; then
+            visual=0
+            while IFS= read -r file; do
+              [ -z "$file" ] && continue
+              base="$(basename "$file")"
+              case "$file" in
+                *.md | docs/* | .github/* | .changeset/*) ;;
+                *)
+                  case "$base" in
+                    LICENSE* | .gitignore | package.json | package-lock.json) ;;
+                    *) visual=1 ;;
+                  esac
+                  ;;
+              esac
+            done <<< "$files"
+            if [ "$visual" -eq 0 ]; then
+              echo "::notice::Skipping Chromatic RN for PR #${PR_NUMBER}: no changed file can change pixels. The visual-check-rn label is kept; a later push re-checks the gates."
+              echo "run=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+          fi
+
+          # --- CI-green gate ---------------------------------------------
+          ci_state="missing"
+          for attempt in $(seq 1 16); do
+            ci_state="$(gh api "repos/${{ github.repository }}/commits/${HEAD_SHA}/check-runs?per_page=100" \
+              --jq '[.check_runs[] | select(.name == "ci" and .app.slug == "github-actions")] | sort_by(.started_at) | last | if . == null then "missing" else "\(.status):\(.conclusion)" end' \
+              2>/dev/null || echo "unknown")"
+            case "$ci_state" in
+              completed:*) break ;;
+              *)
+                if [ "$attempt" -lt 16 ]; then
+                  echo "ci check for ${HEAD_SHA} is '${ci_state}'; waiting 20s for it to finish (attempt ${attempt}/16)..."
+                  sleep 20
+                fi
+                ;;
+            esac
+          done
+          if [ "$ci_state" != "completed:success" ]; then
+            echo "::notice::Skipping Chromatic RN for PR #${PR_NUMBER}: ci check for ${HEAD_SHA} is '${ci_state}', not completed:success. The visual-check-rn label is kept; a later push re-checks the gates."
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "Gates passed: snapshotting PR #${PR_NUMBER} at ${HEAD_SHA}."
+
+      - name: Warn that a Dependabot-triggered run cannot consume the label
+        if: github.event_name == 'pull_request' && steps.pr-gate.outputs.run == 'true' && github.actor == 'dependabot[bot]'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          echo "::warning::This run was triggered by dependabot[bot], whose token is read-only: the visual-check-rn label on PR #${PR_NUMBER} cannot be removed by this run and must be removed manually. Publication proceeds."
+
+      - name: Consume the visual-check-rn label (one-shot)
+        if: github.event_name == 'pull_request' && steps.pr-gate.outputs.run == 'true' && github.actor != 'dependabot[bot]'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          output="$(gh api --method DELETE "repos/${{ github.repository }}/issues/${PR_NUMBER}/labels/visual-check-rn" 2>&1)" && delete_rc=0 || delete_rc=$?
+          if [ "$delete_rc" -eq 0 ]; then
+            echo "Removed the visual-check-rn label from PR #${PR_NUMBER}: the one-shot request is consumed."
+          elif grep -Eq '"status": *"404"' <<< "$output"; then
+            echo "::notice::visual-check-rn was already absent on PR #${PR_NUMBER} (consumed by a concurrent run); continuing to publish."
+          else
+            echo "$output" >&2
+            exit 1
+          fi
+
+      - name: Checkout
+        if: steps.pr-gate.outputs.run != 'false'
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Setup Node
+        if: steps.pr-gate.outputs.run != 'false'
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          # GitHub Packages auth for @spudly/* deps in the root
+          # lockfile (@spudly/eslint-config) — same setup as ci.yml.
+          registry-url: https://npm.pkg.github.com
+          scope: "@spudly"
+
+      - name: Enable Corepack (pinned npm)
+        if: steps.pr-gate.outputs.run != 'false'
+        run: corepack enable npm
+
+      - name: Install dependencies
+        if: steps.pr-gate.outputs.run != 'false'
+        run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
+
+      - name: Publish RN Storybook to Chromatic
+        if: steps.pr-gate.outputs.run != 'false'
+        working-directory: apps/storybook
+        env:
+          CHROMATIC_RN_PROJECT_TOKEN: ${{ secrets.CHROMATIC_RN_PROJECT_TOKEN }}
+        run: |
+          # Expo project: the Chromatic CLI builds the Storybook
+          # .apk/.app itself — no custom build commands (the
+          # reactNative.*BuildCommand config keys are a non-Expo
+          # escape hatch only). The CLI reads chromatic.config.json
+          # in this directory and sets the STORYBOOK_*/EXPO_PUBLIC_
+          # websocket variables the Storybook.tsx wiring consumes.
+          npx --yes chromatic --project-token "$CHROMATIC_RN_PROJECT_TOKEN" --ci --exit-zero-on-changes
