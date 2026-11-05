@@ -20,11 +20,14 @@ Storybook app itself (no custom build commands — the
 only), drives it over WebSockets (the env-controlled options in
 `apps/storybook/Storybook.tsx`; config in
 `apps/storybook/chromatic.config.json`), captures the full story set
-on its hosted iOS Simulator / Android Emulator, and diffs against
-baselines accepted in Chromatic's UI. Its project token is the
+on its hosted Android Emulator, and diffs against baselines
+accepted in Chromatic's UI. Its project token is the
 `CHROMATIC_RN_PROJECT_TOKEN` repository secret — NOT the web
-project's `CHROMATIC_PROJECT_TOKEN`. Which platforms are captured is
-toggled on the project's Configure screen in the Chromatic app.
+project's `CHROMATIC_PROJECT_TOKEN`. Capture is Android only: the
+host app declares `platforms: ["android"]` in
+`apps/storybook/app.json` (the same platform the in-repo VR covers);
+an iOS capture path would need the iOS platform added to the app
+plus a macOS build path, which is a separate future decision.
 
 **Which system is authoritative:** during the parallel period, THIS
 in-repo Android VR pipeline remains the working, authoritative

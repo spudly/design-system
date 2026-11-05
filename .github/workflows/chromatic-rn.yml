@@ -4,10 +4,13 @@ name: React Native storybook (Chromatic)
 # apps/storybook — one of the repo's two storybooks, #122; the react
 # storybook is covered by chromatic.yml) to a SEPARATE Chromatic
 # React Native project for visual snapshot diffs (design-system
-# #302). Chromatic captures the stories on its hosted iOS Simulator /
-# Android Emulator and diffs them against the accepted baseline;
-# changes report as an unreviewed build until they are accepted in
-# Chromatic's UI.
+# #302). Chromatic captures the stories on its hosted Android
+# Emulator and diffs them against the accepted baseline; changes
+# report as an unreviewed build until they are accepted in
+# Chromatic's UI. Android only: the host app declares
+# `platforms: ["android"]` in apps/storybook/app.json, matching the
+# in-repo Android VR; an iOS capture path would need the iOS
+# platform added plus a macOS build, which is out of this scope.
 #
 # This runs IN PARALLEL with the in-repo Android VR
 # (android-storybook.yml, tools/visualRegression): that pipeline is
@@ -42,9 +45,7 @@ name: React Native storybook (Chromatic)
 #
 # Setup (one-time): a Chromatic React Native project for this repo,
 # with its token stored as the CHROMATIC_RN_PROJECT_TOKEN repository
-# secret (added by Stephen, verified 2026-11-05). The platforms
-# captured (iOS / Android) are toggled on the project's Configure
-# screen in the Chromatic app. Baseline seeding is held until just
+# secret (added by Stephen, verified 2026-11-05). Baseline seeding is held until just
 # after the ~2026-11-09 billing-cycle reset; Stephen accepts the
 # seeded baselines himself.
 
@@ -180,12 +181,20 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          # GitHub Packages auth for @spudly/* deps in the root
+          # lockfile (@spudly/eslint-config) — same setup as ci.yml.
+          registry-url: https://npm.pkg.github.com
+          scope: "@spudly"
+
+      - name: Enable Corepack (pinned npm)
+        if: steps.pr-gate.outputs.run != 'false'
+        run: corepack enable npm
 
       - name: Install dependencies
         if: steps.pr-gate.outputs.run != 'false'
         run: npm ci
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
 
       - name: Publish RN Storybook to Chromatic
         if: steps.pr-gate.outputs.run != 'false'
