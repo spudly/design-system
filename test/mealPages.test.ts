@@ -294,8 +294,12 @@ test("MealFormPage direct ingredients are controlled entries with an opt-in sect
   }
   assert.ok(page.includes("MealFormPageIngredient"), "ingredient entries cross as view-models");
   assert.ok(
-    page.includes("selectedRecipes.length === 0 && ingredients.length === 0"),
-    "a meal of only direct ingredients is submittable (no recipe required)",
+    page.includes("ingredients.some((ingredient) => ingredient.name.trim().length > 0)"),
+    "a meal of only direct ingredients is submittable once an entry has a name (no recipe required; an empty draft does not count)",
+  );
+  assert.ok(
+    page.includes("onAddIngredient && onIngredientChange"),
+    "the editable section renders only when both its add and edit handlers are present",
   );
   assert.ok(
     page.includes("accessibilityLabel={`Remove ${entryLabel}`}"),

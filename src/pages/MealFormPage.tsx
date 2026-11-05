@@ -129,11 +129,15 @@ export type MealFormPageProps = {
   /** The meal's direct ingredients (#440), in entry order —
    * ingredients entered on the meal itself, not through a
    * selected recipe. The section renders only when the host
-   * opts in by passing `onAddIngredient`; hosts that have not
-   * adopted direct ingredients see the form exactly as before. */
+   * opts in by passing BOTH `onAddIngredient` and
+   * `onIngredientChange` (an editable section needs its edit
+   * handler — add alone would render fields that cannot
+   * change); hosts that have not adopted direct ingredients
+   * see the form exactly as before. */
   ingredients?: MealFormPageIngredient[];
   /** Append a new, empty direct-ingredient entry. Passing this
-   * callback opts the form into the ingredients section. */
+   * callback together with `onIngredientChange` opts the form
+   * into the ingredients section. */
   onAddIngredient?: () => void;
   /** Remove the direct-ingredient entry with this id. */
   onRemoveIngredient?: (ingredientId: string) => void;
@@ -219,7 +223,7 @@ export function MealFormPage({
             }}
           />
         ))}
-        {onAddIngredient ? (
+        {onAddIngredient && onIngredientChange ? (
           <LabeledGroup label="Ingredients">
             <FieldStack>
               {ingredients.map((ingredient, index) => {
@@ -228,7 +232,7 @@ export function MealFormPage({
                   <FieldStack key={ingredient.id}>
                     <Text variant="subheading">{entryLabel}</Text>
                     <TextField
-                      label="Name"
+                      label={`${entryLabel} — Name`}
                       value={ingredient.name}
                       onChangeText={(value) => {
                         onIngredientChange?.(ingredient.id, { name: value });
@@ -236,7 +240,7 @@ export function MealFormPage({
                       placeholder="Ingredient name"
                     />
                     <TextField
-                      label="Quantity"
+                      label={`${entryLabel} — Quantity`}
                       value={ingredient.quantity}
                       onChangeText={(value) => {
                         onIngredientChange?.(ingredient.id, { quantity: value });
@@ -244,7 +248,7 @@ export function MealFormPage({
                       placeholder="Quantity"
                     />
                     <TextField
-                      label="Unit"
+                      label={`${entryLabel} — Unit`}
                       value={ingredient.unit}
                       onChangeText={(value) => {
                         onIngredientChange?.(ingredient.id, { unit: value });
@@ -252,7 +256,7 @@ export function MealFormPage({
                       placeholder="Unit (e.g. cups)"
                     />
                     <TextField
-                      label="Servings"
+                      label={`${entryLabel} — Servings`}
                       value={ingredient.servings}
                       onChangeText={(value) => {
                         onIngredientChange?.(ingredient.id, { servings: value });
@@ -290,7 +294,12 @@ export function MealFormPage({
             accessibilityLabel="Save meal"
             disabled={
               !title.trim() ||
-              (selectedRecipes.length === 0 && ingredients.length === 0) ||
+              (selectedRecipes.length === 0 &&
+                !(
+                  onAddIngredient &&
+                  onIngredientChange &&
+                  ingredients.some((ingredient) => ingredient.name.trim().length > 0)
+                )) ||
               isSaving
             }
             onPress={onSubmit}

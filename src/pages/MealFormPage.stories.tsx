@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { mealFormFixture, eciperayFooterFixture } from "./fixtures.js";
@@ -72,6 +72,10 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
   const [ingredients, setIngredients] = useState<MealFormPageIngredient[]>(
     initialIngredients ?? [],
   );
+  // Added-entry ids come from a monotonic counter, never from
+  // the list length: a length-derived id is reused after a
+  // removal, and two entries would share a key and an id.
+  const nextIngredientId = useRef((initialIngredients ?? []).length + 1);
   const query = searchText.trim().toLowerCase();
   const searchResults = query
     ? fixture.recipeOptions.filter((recipe) => recipe.label.toLowerCase().includes(query))
@@ -112,7 +116,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
             setIngredients((current) => [
               ...current,
               {
-                id: `ing-new-${current.length + 1}`,
+                id: `ing-new-${nextIngredientId.current++}`,
                 name: "",
                 quantity: "",
                 unit: "",
