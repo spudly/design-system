@@ -3,6 +3,7 @@ import { XStack, YStack, isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { politeLiveRegionProps } from "./accessibility.js";
+import { Alert } from "./Alert.js";
 import { Button } from "./Button.js";
 import { ListRow } from "./ListRow.js";
 import { SearchField } from "../views/SearchField.js";
@@ -234,7 +235,7 @@ export function AutocompletePicker({
           </YStack>
         ) : visibleResults.length === 0 ? (
           searchError ? (
-            <Text variant="error">{searchError}</Text>
+            <Alert severity="error" message={searchError} />
           ) : (
             <Text variant="hint">{noResultsMessage}</Text>
           )

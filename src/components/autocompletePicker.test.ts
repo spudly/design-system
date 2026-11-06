@@ -87,8 +87,8 @@ test("a failed search is its own state: searchError replaces the no-results mess
   );
   assert.match(
     picker,
-    /<Text variant="error">\{searchError\}<\/Text>/,
-    "the visible empty state renders the error, not the no-results hint",
+    /<Alert severity="error" message=\{searchError\} \/>/,
+    "the visible empty state renders the error inside an Alert, not the no-results hint (#460)",
   );
   for (const page of ["src/pages/MealFormPage.tsx", "src/pages/MealPlanFormPage.tsx"]) {
     const source = codeOf(page);
