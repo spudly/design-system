@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Anchor, ScrollView, XStack, YStack, isWeb, styled } from "tamagui";
+import { Anchor, ScrollView, XStack, YStack, isWeb, styled, useTheme } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { SocialFacebookIcon } from "../icons/SocialFacebookIcon.js";
 import { SocialGithubIcon } from "../icons/SocialGithubIcon.js";
@@ -168,6 +168,12 @@ const StyledBigFooterBrandAnchor = styled(Anchor, {
  */
 export function BigFooter({ footer }: BigFooterProps) {
   const { brand, columns, storeLinks, socialLinks } = footer;
+  // The social glyphs' ink, resolved to a concrete value: react-native-svg
+  // cannot inherit the anchor's text color on native (the Button
+  // useGlyphInk precedent), so the on-primary role is read from the
+  // active theme and passed to the glyph explicitly.
+  const theme = useTheme();
+  const socialInk = typeof theme.onPrimary?.val === "string" ? theme.onPrimary.val : "#ffffff";
   return (
     <YStack
       backgroundColor="$primary"
@@ -210,7 +216,7 @@ export function BigFooter({ footer }: BigFooterProps) {
                   href={link.href}
                   cursor="web:pointer"
                 >
-                  <IconGlyph size={24} />
+                  <IconGlyph size={24} color={socialInk} />
                 </StyledBigFooterSocialAnchor>
               );
             })}

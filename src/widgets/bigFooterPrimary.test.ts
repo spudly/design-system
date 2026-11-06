@@ -48,6 +48,15 @@ test("column titles and column links ink in $onPrimary (#465)", () => {
   assert.match(footer, /<TextLink[\s\S]*?color="\$onPrimary"/);
 });
 
+test("social glyphs receive the resolved on-primary ink explicitly (#465)", () => {
+  // react-native-svg cannot inherit the anchor's text color on
+  // native, so the glyph color is the theme's onPrimary role
+  // resolved through useTheme — never currentColor inheritance.
+  assert.match(footer, /useTheme\(\)/);
+  assert.match(footer, /theme\.onPrimary\?\.val/);
+  assert.match(footer, /<IconGlyph size=\{24\} color=\{socialInk\} \/>/);
+});
+
 test("store links stay secondary Buttons (#465)", () => {
   assert.match(footer, /<Button key=\{link\.href\} href=\{link\.href\} variant="secondary">/);
 });
