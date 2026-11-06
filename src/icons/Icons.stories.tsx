@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
 import { Text } from "../widgets/Text.js";
 import { AddIcon } from "./AddIcon.js";
+import { BackIcon } from "./BackIcon.js";
 import { CollapsedIcon } from "./CollapsedIcon.js";
 import { CollapsibleIcon } from "./CollapsibleIcon.js";
 import { ExpandedIcon } from "./ExpandedIcon.js";
@@ -48,6 +49,7 @@ export const Large: Story = {
 
 const galleryIcons = [
   { name: "AddIcon", Icon: AddIcon },
+  { name: "BackIcon", Icon: BackIcon },
   { name: "CollapsedIcon", Icon: CollapsedIcon },
   { name: "ExpandedIcon", Icon: ExpandedIcon },
   { name: "FeedbackIcon", Icon: FeedbackIcon },

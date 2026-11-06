@@ -1,4 +1,5 @@
-import { Anchor, View, XStack, styled } from "tamagui";
+import { Anchor, XStack, styled, useTheme } from "tamagui";
+import { BackIcon } from "../icons/BackIcon.js";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
@@ -11,48 +12,24 @@ import { Text } from "./Text.js";
  * Android VR baselines, 2026-10-23; design-system#95). It is the same
  * glyph bug class as the SearchField search icon (#45 / eciperay#162):
  * no font size or lineHeight centers asymmetric ink, and an explicit
- * lineHeight is the banned #162 mechanism. BackArrow below draws the
- * arrow from fixed-dimension shapes inside a fixed 20px box, so the
- * row's flex centering centers the arrow itself, identically on web
- * and native. Do not reintroduce a text glyph for this arrow.
+ * lineHeight is the banned #162 mechanism. The arrow is now the
+ * Feather arrow-left SVG (BackIcon, #462) — not a text glyph and not
+ * hand-drawn: an SVG box has no font metrics, so the row's flex
+ * centering centers the arrow itself, identically on web and native,
+ * and the #95 centering guarantee survives the swap. Do not
+ * reintroduce a text glyph for this arrow.
  */
-function BackArrow() {
-  return (
-    <View aria-hidden position="relative" width={20} height={20} flexShrink={0}>
-      {/* Shaft: a horizontal bar through the box's vertical center. */}
-      <View
-        position="absolute"
-        left={3}
-        top={8.75}
-        width={14}
-        height={2.5}
-        borderRadius={1.25}
-        backgroundColor="$link"
-      />
-      {/* Arrowhead: two bars rotated ±45°, their left ends meeting at
-          the shaft's left end, forming the chevron point. */}
-      <View
-        position="absolute"
-        left={1.8}
-        top={5.9}
-        width={8}
-        height={2.5}
-        borderRadius={1.25}
-        backgroundColor="$link"
-        rotate="-45deg"
-      />
-      <View
-        position="absolute"
-        left={1.8}
-        top={11.6}
-        width={8}
-        height={2.5}
-        borderRadius={1.25}
-        backgroundColor="$link"
-        rotate="45deg"
-      />
-    </View>
-  );
+
+/**
+ * The arrow's ink: the label's $link role color, resolved to a
+ * concrete value because react-native-svg cannot resolve Tamagui
+ * theme variables (the Button glyph-ink pattern). The fallback is
+ * the base theme's link value.
+ */
+function useBackArrowInk(): string {
+  const theme = useTheme();
+  const variable = theme["link"];
+  return typeof variable?.val === "string" ? variable.val : tokens.colors.primary.primary8;
 }
 
 /**
@@ -61,7 +38,7 @@ function BackArrow() {
  * padding and gap), carried by a Tamagui Anchor — a real `<a href>`
  * on web; on native a press opens the href through the platform
  * link path (Tamagui's Anchor calls Linking.openURL internally, so
- * no DS component imports react-native). The drawn arrow and the
+ * no DS component imports react-native). The arrow icon and the
  * label render inside it unchanged, so both forms are one control
  * with one layout.
  *
@@ -122,7 +99,7 @@ export type BackLinkProps =
     };
 
 /**
- * The shared back link for page tops: a drawn left arrow plus a label,
+ * The shared back link for page tops: the Feather left-arrow icon plus a label,
  * laid out as one pressable row whose `alignItems: "center"` centers
  * the arrow against the label by construction (#95). Before this
  * component existed, pages rendered the back affordance inline as a
@@ -145,10 +122,11 @@ export type BackLinkProps =
  */
 export function BackLink(props: BackLinkProps) {
   const { label = "Back" } = props;
+  const arrowInk = useBackArrowInk();
   if (props.href !== undefined) {
     return (
       <StyledBackAnchor href={props.href} cursor="web:pointer">
-        <BackArrow />
+        <BackIcon size={20} color={arrowInk} />
         <Text color="$link" fontWeight={tokens.typography.fontWeight.semibold}>
           {label}
         </Text>
@@ -175,7 +153,7 @@ export function BackLink(props: BackLinkProps) {
       minHeight={44}
       paddingHorizontal={tokens.spacing[2]}
     >
-      <BackArrow />
+      <BackIcon size={20} color={arrowInk} />
       <Text color="$link" fontWeight={tokens.typography.fontWeight.semibold}>
         {label}
       </Text>

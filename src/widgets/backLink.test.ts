@@ -12,10 +12,11 @@
  * lineHeight is the banned eciperay#162 mechanism.
  *
  * The contract now:
- * 1. The arrow is drawn, not a glyph: BackLink defines a BackArrow
- *    drawn from fixed-dimension shapes in a fixed 20x20 box (the
- *    SearchGlyph pattern), and the "←" character appears nowhere
- *    in the component's rendered code.
+ * 1. The arrow is an SVG icon, not a glyph: BackLink renders
+ *    BackIcon — the official Feather arrow-left element data
+ *    through the icons module (#462) — at a fixed 20px size, defines
+ *    no local hand-drawn arrow shapes, and the "←" character
+ *    appears nowhere in the component's rendered code.
  * 2. The row centers by construction: an XStack with
  *    `alignItems: "center"` lays the arrow box and the label side
  *    by side, so flex centering — not font metrics — decides where
@@ -53,24 +54,36 @@ test("BackLink source is readable and non-trivial", () => {
   assert.match(code, /export function BackLink/);
 });
 
-test("the arrow is drawn shapes in a fixed box, not the ← text glyph (#95)", () => {
+test("the arrow is the Feather arrow-left BackIcon, not the ← text glyph (#95, #462)", () => {
   assert.ok(
     !code.includes("←"),
-    "BackLink still renders the ← text glyph — its ink cannot center vertically on Android (#95); draw the arrow from fixed-dimension shapes instead",
+    "BackLink still renders the ← text glyph — its ink cannot center vertically on Android (#95); use the Feather arrow-left SVG (BackIcon) instead",
   );
   assert.match(
     code,
-    /function BackArrow\(\)/,
-    "BackLink must define the BackArrow drawn-icon component",
-  );
-  const arrowFn = code.slice(code.indexOf("function BackArrow()"));
-  assert.ok(
-    /width=\{20\}/.test(arrowFn) && /height=\{20\}/.test(arrowFn),
-    "BackArrow's box must be fixed at 20x20 so the row's flex centering centers the icon itself",
+    /<BackIcon size=\{20\} color=\{arrowInk\} \/>/,
+    "BackLink must render BackIcon at the fixed 20px size the stories/VR baselines show, in the resolved $link ink",
   );
   assert.ok(
-    /rotate="-45deg"/.test(arrowFn) && /rotate="45deg"/.test(arrowFn),
-    "the arrowhead is two bars rotated ±45° (the SearchGlyph drawn-icon pattern)",
+    !code.includes("function BackArrow()") && !/rotate="-?45deg"/.test(code),
+    "BackLink still defines the hand-drawn BackArrow bars — the custom drawing was cut off and is replaced by BackIcon (#462)",
+  );
+  const icon = readFileSync(join(componentsDir, "..", "icons", "BackIcon.tsx"), "utf8");
+  const iconCode = icon.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  assert.match(
+    iconCode,
+    /x1: "19", y1: "12", x2: "5", y2: "12"/,
+    "BackIcon must carry the official Feather arrow-left shaft",
+  );
+  assert.match(
+    iconCode,
+    /points: "12 19 5 12 12 5"/,
+    "BackIcon must carry the official Feather arrow-left head",
+  );
+  assert.match(
+    iconCode,
+    /export function BackIcon\(/,
+    "BackIcon must export its component through the base Icon",
   );
 });
 

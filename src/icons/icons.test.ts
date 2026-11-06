@@ -58,6 +58,7 @@ const ICONS: [string, string | null][] = [
   // AddIcon (two bare lines) and ShareIcon (circles and lines) have
   // no path literal; their data is pinned by dedicated tests below.
   ["AddIcon", null],
+  ["BackIcon", "12 19 5 12 12 5"],
   ["CollapsedIcon", "6 9 12 15 18 9"],
   ["ExpandedIcon", "18 15 12 9 6 15"],
   ["FeedbackIcon", "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7"],
