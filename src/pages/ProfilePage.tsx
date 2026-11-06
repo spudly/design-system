@@ -4,6 +4,25 @@ import { Button } from "../components/Button.js";
 import { LegalSection } from "../components/LegalSection.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { Text } from "../components/Text.js";
+import { AccountDataView, type AccountDataViewProps } from "../views/AccountDataView.js";
+import {
+  FeedbackPreferenceView,
+  type FeedbackPreferenceViewProps,
+} from "../views/FeedbackPreferenceView.js";
+import { SubscriptionView, type SubscriptionViewProps } from "../views/SubscriptionView.js";
+import {
+  TransferRecipesView,
+  type TransferRecipesViewProps,
+} from "../views/TransferRecipesView.js";
+
+// The section view-models live with the views (#438 Part 3);
+// the page's contract names are aliases, so consumers of the
+// page's types are untouched (the RecipeDetailPage ratings
+// precedent).
+export type ProfilePageSubscription = SubscriptionViewProps;
+export type ProfilePageAccountData = AccountDataViewProps;
+export type ProfilePageTransfer = TransferRecipesViewProps;
+export type ProfilePageFeedbackPreference = FeedbackPreferenceViewProps;
 
 /**
  * ProfilePage (#126, B3c): the profile view — the split view
@@ -57,6 +76,22 @@ export type ProfilePageProps = {
   sectionsAfterFeedback?: ReactNode;
   /** The app's LegalLinks, rendered inside the Legal section. */
   legalLinks?: ReactNode;
+  /**
+   * Typed section data (#438 Part 3): the profile sections the
+   * design system now covers as views. Each renders at its
+   * slot position — `subscription` with the before-feedback
+   * sections, `feedbackPreferenceSection` at the feedback
+   * position, `transfer` and `accountData` with the
+   * after-feedback sections — and the ReactNode slots stay as
+   * the fallback for sections the DS does not cover. A data
+   * prop and its slot position's ReactNode are alternatives:
+   * when both are supplied for the feedback position, the slot
+   * wins (it is the more specific composition).
+   */
+  subscription?: ProfilePageSubscription;
+  feedbackPreferenceSection?: ProfilePageFeedbackPreference;
+  transfer?: ProfilePageTransfer;
+  accountData?: ProfilePageAccountData;
 };
 
 export function ProfilePage({
@@ -68,6 +103,10 @@ export function ProfilePage({
   feedbackPreference,
   sectionsAfterFeedback,
   legalLinks,
+  subscription,
+  feedbackPreferenceSection,
+  transfer,
+  accountData,
   footer,
 }: ProfilePageProps) {
   return (
@@ -80,6 +119,7 @@ export function ProfilePage({
             Component Showcase
           </Button>
         ) : null}
+        {subscription ? <SubscriptionView {...subscription} /> : null}
         {sectionsBeforeFeedback}
         {tagsHref ? (
           <Button variant="secondary" href={tagsHref}>
@@ -87,6 +127,11 @@ export function ProfilePage({
           </Button>
         ) : null}
         {feedbackPreference}
+        {!feedbackPreference && feedbackPreferenceSection ? (
+          <FeedbackPreferenceView {...feedbackPreferenceSection} />
+        ) : null}
+        {transfer ? <TransferRecipesView {...transfer} /> : null}
+        {accountData ? <AccountDataView {...accountData} /> : null}
         {sectionsAfterFeedback}
         <LegalSection title="Legal">{legalLinks}</LegalSection>
         <Button variant="danger" onPress={onSignOut}>

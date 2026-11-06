@@ -28,6 +28,16 @@ export type ImportImagePageProps = {
   error?: string | null;
   onPickCamera?: () => void;
   onPickLibrary?: () => void;
+  /**
+   * The duplicate-override intent (#438 Part 3): when the
+   * import hit an existing recipe and the host offers the
+   * "Import anyway" override, it passes this callback and the
+   * button renders inside the page's own stack — the host used
+   * to compose that one Button itself under the page (the
+   * audit's Button coverage row for the import screen). The
+   * duplicate detection and the override import stay host-side.
+   */
+  onImportAnyway?: () => void;
 };
 
 export function ImportImagePage({
@@ -35,6 +45,7 @@ export function ImportImagePage({
   error,
   onPickCamera,
   onPickLibrary,
+  onImportAnyway,
   footer,
 }: ImportImagePageProps) {
   return (
@@ -62,6 +73,11 @@ export function ImportImagePage({
         </Button>
         {loading ? <Text variant="hint">Importing…</Text> : null}
         {error ? <Alert severity="error" message={error} /> : null}
+        {onImportAnyway ? (
+          <Button variant="primary" disabled={loading} onPress={onImportAnyway}>
+            Import anyway
+          </Button>
+        ) : null}
       </FormScreenLayout>
     </BigFooterShell>
   );

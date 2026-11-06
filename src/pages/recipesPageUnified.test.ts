@@ -223,8 +223,8 @@ test("section states are independent: each section's state keys off its own prop
   );
   assert.equal(
     count(code, '<ListLoadingState label="Loading" />'),
-    3,
-    "three spinner renders: the two sections' loading rows and the loading-more footer",
+    4,
+    "four spinner renders: the two sections' loading rows, the own section's load-more row (#438 Part 3), and the loading-more footer",
   );
 });
 

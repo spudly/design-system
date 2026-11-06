@@ -128,12 +128,14 @@ function RecipeDetailPageDemo({
   cookLogFormOpen = false,
   showPanelSlots = false,
   createDraft = false,
+  withCoverageSections = false,
 }: {
   variant?: "full" | "minimal";
   initialMissing?: string[];
   cookLogFormOpen?: boolean;
   showPanelSlots?: boolean;
   createDraft?: boolean;
+  withCoverageSections?: boolean;
 }) {
   const isFull = variant === "full";
   const baseServings = isFull ? 4 : 2;
@@ -222,6 +224,53 @@ function RecipeDetailPageDemo({
             renderComments: () => (
               <SlotStandIn label="Comments render here (app-side fixture stand-in)" />
             ),
+          }
+        : {}),
+      ...(withCoverageSections
+        ? {
+            sharing: {
+              options: [
+                {
+                  value: "private",
+                  label: "Private",
+                  description: "Only you can see this recipe.",
+                },
+                {
+                  value: "unlisted",
+                  label: "Unlisted",
+                  description: "Anyone with the link can view it.",
+                },
+                { value: "public", label: "Public", description: "Anyone can find and view it." },
+              ],
+              value: "unlisted",
+              onValueChange: () => undefined,
+              onSave: () => undefined,
+              shareLinkUrl: "https://example.com/s/abc123",
+              onRotateShareLink: () => undefined,
+              rotateShareLinkLabel: "Rotate share link",
+              onCopyShareLink: () => undefined,
+            },
+            comments: {
+              comments: [
+                {
+                  id: "c1",
+                  authorName: "Alex",
+                  body: "Doubled the garlic — perfect.",
+                  canEdit: true,
+                  canDelete: true,
+                },
+                {
+                  id: "c2",
+                  authorName: "Sam",
+                  body: "Worked great with chicken thighs instead.",
+                  isStale: true,
+                },
+              ],
+              staleHintLabel: "Based on an older version",
+              draft: "",
+              onDraftChange: () => undefined,
+              onPost: () => undefined,
+            },
           }
         : {}),
     },
@@ -367,4 +416,12 @@ export const CookLogFormOpen: Story = {
 
 export const Nutrition: Story = {
   render: () => <RecipeDetailPageDemo />,
+};
+
+export const SharingAndComments: Story = {
+  // The #438 Part 3 data-prop sections: the overview renders
+  // RecipeSharingView and RecipeCommentsView from the `sharing`
+  // and `comments` data props (the migrated form of the two
+  // render slots Default exercises with stand-ins).
+  render: () => <RecipeDetailPageDemo withCoverageSections />,
 };
