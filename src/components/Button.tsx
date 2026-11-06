@@ -27,7 +27,15 @@ const buttonFrameConfig = {
   // brand-neutral primary ramp.
   backgroundColor: "$primary",
   borderRadius: tokens.radii.md,
-  borderWidth: 0,
+  // Every filled variant carries a 1px border so the variants share
+  // one geometry: the secondary variant's border is visible (#459),
+  // the primary/danger borders are transparent — a borderless
+  // primary next to a bordered secondary would render 2px smaller
+  // in a ButtonRow. Ghost opts out explicitly (borderWidth 0 in its
+  // variant): it is chrome-less by design and never sits in a row
+  // as a filled peer.
+  borderColor: "transparent",
+  borderWidth: 1,
   color: "$onPrimary",
   fontSize: tokens.typography.fontSize.md,
   fontWeight: tokens.typography.fontWeight.semibold,
@@ -42,6 +50,15 @@ const buttonFrameConfig = {
       },
       secondary: {
         backgroundColor: tokens.colors.gray.gray3,
+        // #459: a 1px border in the variant's text color — without
+        // it the light-gray fill reads borderless and looks bad on
+        // tinted surfaces (e.g. a secondary button inside an info
+        // Alert). The border color is the same gray10 token as the
+        // label color below and in `variantLabelColors`, so border
+        // and text always match; the disabled state's frame opacity
+        // dims the border with the rest of the button.
+        borderColor: tokens.colors.gray.gray10,
+        borderWidth: 1,
         color: tokens.colors.gray.gray10,
       },
       ghost: {
@@ -495,6 +512,12 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         variant={variant}
         size={size}
         color={labelColor}
+        // Same #459 rule as the button form: the secondary
+        // variant's border always takes the label color (gray10 by
+        // default, a caller-passed `color` when one is given). The
+        // link form has no selected state, so this is the only
+        // departure it needs to cover.
+        {...(variant === "secondary" ? { borderColor: labelColor } : null)}
         // Same instance-prop rule as the button form's `color`: the
         // BARE font name ("body", no "$") is the form that makes
         // Tamagui emit the font-context class defining `--f-family`
@@ -578,6 +601,15 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
       size={size}
       {...(selected !== undefined ? { selected } : null)}
       color={labelColor}
+      // #459's border-matches-text rule, applied wherever the
+      // label color can depart from the variant's gray10: a
+      // SELECTED secondary button takes the primary fill and the
+      // on-primary label, and a caller-passed `color` overrides
+      // the label on any secondary button. Both are exactly
+      // `labelColor` (gray10 in the default case), so the
+      // secondary border simply always takes the label color.
+      // Other variants keep the frame's transparent border.
+      {...(variant === "secondary" ? { borderColor: labelColor } : null)}
       // Same instance-prop rule as `color` above, for the family:
       // Tamagui Button forwards an instance `fontFamily` to its
       // internal text element, and the BARE font name ("body", no
