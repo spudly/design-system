@@ -30,7 +30,7 @@ export const TokenForm: Story = {
       <Text variant="heading">New access token</Text>
       <TextField label="Token name" placeholder="e.g. CI deploy" />
       <Button variant="primary">Create token</Button>
-      <Button variant="ghost">Cancel</Button>
+      <Button ghost>Cancel</Button>
     </FormScreenLayout>
   ),
 };

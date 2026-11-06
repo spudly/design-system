@@ -54,7 +54,7 @@ export function BulkSelectToolbar({
       <SearchField value={search} onChangeText={onSearchChange} placeholder={searchPlaceholder} />
       <XStack flexWrap="wrap" alignItems="center" gap="$3" paddingBlockEnd="$3">
         <Button
-          variant="ghost"
+          ghost
           size="sm"
           disabled={controlsDisabled || filteredCount === 0}
           onPress={onSelectAll}
@@ -62,7 +62,7 @@ export function BulkSelectToolbar({
           {selectAllLabel}
         </Button>
         <Button
-          variant="ghost"
+          ghost
           size="sm"
           disabled={controlsDisabled || selectedCount === 0}
           onPress={onClearSelection}

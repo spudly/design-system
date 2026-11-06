@@ -154,7 +154,7 @@ export function RecipeSharingView({
             <Text variant="hint">{permalinkLabel}</Text>
             <XStack gap="$2" alignItems="center" flexWrap="wrap">
               <Text variant="muted">{permalinkUrl}</Text>
-              <Button variant="ghost" size="sm" onPress={onCopyPermalink}>
+              <Button ghost size="sm" onPress={onCopyPermalink}>
                 {copyPermalinkLabel}
               </Button>
             </XStack>

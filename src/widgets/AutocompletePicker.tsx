@@ -283,7 +283,7 @@ export function AutocompletePicker({
             >
               <Text flex={1}>{item.label}</Text>
               <Button
-                variant="ghost"
+                ghost
                 size="sm"
                 accessibilityLabel={`Remove ${item.label}`}
                 disabled={disabled}

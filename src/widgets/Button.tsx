@@ -62,6 +62,9 @@ const buttonFrameConfig = {
         color: tokens.colors.gray.gray10,
       },
       ghost: {
+        // DEPRECATED (#463): the ghost VARIANT is kept working for
+        // hosts that still spell it, but new code uses the `ghost`
+        // boolean prop below, which composes with the real variants.
         // Text-only by design: no fill and no border at rest. (An earlier
         // revision added a subtle fill plus border for visibility, but
         // ghost means chrome-less — the fill made it read as a secondary
@@ -94,6 +97,20 @@ const buttonFrameConfig = {
         fontSize: tokens.typography.fontSize.lg,
         paddingHorizontal: tokens.spacing[6],
         paddingVertical: tokens.spacing[4],
+      },
+    },
+    // The ghost treatment (#463): a boolean, not a variant, so it
+    // composes with primary/secondary/danger — the background
+    // becomes transparent and any border is removed (overriding the
+    // secondary variant's #459 border), while the label/glyph ink
+    // follows the variant (the wrapper's ghost ink maps below).
+    // Declared BEFORE `selected` so a selected toggle's filled
+    // primary treatment still overrides it: the toggle's meaning
+    // is its fill, ghost composes with the resting variants only.
+    ghost: {
+      true: {
+        backgroundColor: "transparent",
+        borderWidth: 0,
       },
     },
     // The toggle treatment: a selected toggle button takes the
@@ -164,6 +181,17 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
  */
 type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" | "href"> & {
   disabled?: boolean;
+  /**
+   * The ghost treatment (#463): a boolean prop, NOT a variant —
+   * it composes with the real variants. When set, the background
+   * becomes transparent and any border is removed, and the label
+   * and glyph ink match the variant (primary: `$primary`,
+   * secondary: gray10, danger: danger7). A selected toggle's
+   * filled treatment still wins over it. (The legacy
+   * `ghost` spelling is deprecated: it keeps rendering
+   * with the old `$link` ink until hosts migrate to this prop.)
+   */
+  ghost?: boolean;
   /**
    * Toggle-button state: when the caller passes `selected` (true
    * or false), the button is a TOGGLE — it renders the selected
@@ -246,6 +274,10 @@ type StyledLinkButtonProps = GetProps<typeof StyledLinkButton>;
  */
 type ButtonLinkProps = Omit<StyledLinkButtonProps, "disabled" | "children" | "icon" | "onPress"> & {
   disabled?: boolean;
+  /** The ghost treatment (#463): see ButtonOwnProps — the link
+   * form composes it with its variant exactly as the button form
+   * does. */
+  ghost?: boolean;
   /**
    * The link's destination. Giving Button an `href` makes it a
    * LINK (#248's navigation rule: a control that navigates to
@@ -314,9 +346,24 @@ const variantLabelColors = {
   // $link is the dark-aware text role: a dark step on light surfaces and
   // the lightened step in dark themes, so the text-only ghost label keeps
   // AA contrast in both modes (the base $onPrimary white was invisible on
-  // light backgrounds — the original defect).
+  // light backgrounds — the original defect). DEPRECATED (#463): this
+  // entry serves only the legacy `ghost` spelling; the
+  // `ghost` prop inks per variant from `ghostLabelColors` below.
   ghost: "$link",
   danger: "#ffffff",
+} as const;
+
+/**
+ * Label colors for the `ghost` PROP (#463): the ghost treatment
+ * keeps the variant's own ink — the fill tokens the variants
+ * already use ($primary fill / gray10 label / danger7 fill) —
+ * because on a transparent background the filled variants' label
+ * colors ($onPrimary white, #ffffff) would be invisible.
+ */
+const ghostLabelColors = {
+  primary: "$primary",
+  secondary: tokens.colors.gray.gray10,
+  danger: tokens.colors.danger.danger7,
 } as const;
 
 /** Standard glyph size per Button size, for the icon slot. */
@@ -347,12 +394,25 @@ const iconOnlyBoxes = {
  * (widgets/tagColors). The fallbacks are the base theme's values
  * for those roles.
  */
-function useGlyphInk(variant: string | undefined): string {
+function useGlyphInk(variant: string | undefined, ghost = false): string {
   const theme = useTheme();
   const roleValue = (key: string): string | undefined => {
     const variable = theme[key];
     return typeof variable?.val === "string" ? variable.val : undefined;
   };
+  // The ghost prop's glyph ink follows `ghostLabelColors`: the
+  // variant's own ink, resolved like the label colors above.
+  if (ghost) {
+    switch (variant) {
+      case "secondary":
+        return tokens.colors.gray.gray10;
+      case "danger":
+        return tokens.colors.danger.danger7;
+      case "primary":
+      default:
+        return roleValue("primary") ?? tokens.colors.primary.primary7;
+    }
+  }
   switch (variant) {
     case "secondary":
       return tokens.colors.gray.gray10;
@@ -369,7 +429,10 @@ function useGlyphInk(variant: string | undefined): string {
 /**
  * Universal cross-platform button (web + React Native via Tamagui).
  *
- * Props: `variant` ("primary" | "secondary" | "ghost" | "danger"), `size`
+ * Props: `variant` ("primary" | "secondary" | "danger" — the
+ * "ghost" variant value is DEPRECATED, #463), `ghost` (boolean:
+ * transparent background, no border, ink matching the variant —
+ * it composes with the variants instead of being one), `size`
  * ("sm" | "md" | "lg"), `disabled`, `grow` (claim the row's remaining
  * width). All styling is token-driven. Use
  * `danger` for destructive actions (delete, revoke, remove).
@@ -418,6 +481,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
   const {
     disabled = false,
     variant = "primary",
+    ghost = false,
     size = "md",
     grow = false,
     selected,
@@ -443,12 +507,24 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
   const IconGlyph = icon !== undefined ? iconsByName[icon] : undefined;
   // `variant`'s prop type also admits Tamagui Button's built-in variant
   // names; only the four design-system variants have a mapped label color.
-  // A selected toggle takes the primary ink, matching its fill.
+  // A selected toggle takes the primary ink, matching its fill. The
+  // ghost PROP (#463) inks from the ghost map — the variant's own
+  // ink — unless selected (the toggle fill wins) or the caller
+  // passed a color (which wins over every map, as before).
+  const ghostInkApplies =
+    ghost &&
+    !selected &&
+    (variant === "primary" || variant === "secondary" || variant === "danger");
   const labelColor =
     color ??
-    (selected ? "$onPrimary" : variantLabelColors[variant as keyof typeof variantLabelColors]);
+    (selected
+      ? "$onPrimary"
+      : ghostInkApplies
+        ? ghostLabelColors[variant as keyof typeof ghostLabelColors]
+        : variantLabelColors[variant as keyof typeof variantLabelColors]);
   const glyphInk = useGlyphInk(
     selected ? "primary" : typeof variant === "string" ? variant : undefined,
+    ghostInkApplies,
   );
   const isLink = href !== undefined;
   const a11yProps = platformAccessibilityProps({
@@ -510,6 +586,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         {...(disabled ? {} : { href })}
         disabled={disabled}
         variant={variant}
+        {...(ghost ? { ghost: true } : null)}
         size={size}
         color={labelColor}
         // Same #459 rule as the button form: the secondary
@@ -598,6 +675,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
       onPress={onPress}
       disabled={disabled}
       variant={variant}
+      {...(ghost ? { ghost: true } : null)}
       size={size}
       {...(selected !== undefined ? { selected } : null)}
       color={labelColor}

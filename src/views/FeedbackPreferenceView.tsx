@@ -109,17 +109,17 @@ export function FeedbackPreferenceView({
           ) : (
             <XStack gap="$2" flexWrap="wrap">
               {consent !== true ? (
-                <Button variant="ghost" size="sm" onPress={onAcceptConsent}>
+                <Button ghost size="sm" onPress={onAcceptConsent}>
                   {acceptLabel}
                 </Button>
               ) : null}
               {consent !== false ? (
-                <Button variant="ghost" size="sm" onPress={onDeclineConsent}>
+                <Button ghost size="sm" onPress={onDeclineConsent}>
                   {declineLabel}
                 </Button>
               ) : null}
               {consent !== null && onWithdrawConsent ? (
-                <Button variant="ghost" size="sm" onPress={onWithdrawConsent}>
+                <Button ghost size="sm" onPress={onWithdrawConsent}>
                   {withdrawLabel}
                 </Button>
               ) : null}

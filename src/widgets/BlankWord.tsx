@@ -71,7 +71,7 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
 
   return (
     <Button
-      variant="ghost"
+      ghost
       size="sm"
       // Flow inline within the surrounding sentence on web (Tamagui
       // buttons are display:flex, which block-ifies in text flow), and

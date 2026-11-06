@@ -271,7 +271,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
                 {revertAction("description")}
                 {onGenerateDescription ? (
                   <Button
-                    variant="ghost"
+                    ghost
                     size="sm"
                     accessibilityLabel="Generate description with AI"
                     disabled={!title.trim() || isGeneratingDescription}

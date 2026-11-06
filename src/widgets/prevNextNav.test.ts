@@ -35,7 +35,7 @@ test("PrevNextNav declares backDisabled alongside nextDisabled (#158)", () => {
 });
 
 test("backDisabled is passed to the Back ghost button (#158)", () => {
-  assert.match(code, /<Button variant="ghost" onPress=\{onBack\} disabled=\{backDisabled\}>/);
+  assert.match(code, /<Button ghost onPress=\{onBack\} disabled=\{backDisabled\}>/);
   assert.match(code, /<Button variant="primary" onPress=\{onNext\} disabled=\{nextDisabled\}>/);
 });
 

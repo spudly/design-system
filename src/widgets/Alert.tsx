@@ -152,7 +152,7 @@ export function Alert({
         <Text style={{ color: styles.text, flex: 1 }}>{content}</Text>
         {showDismiss ? (
           <Button
-            variant="ghost"
+            ghost
             // Shift the 44px target into the corner with relative
             // positioning: the alert's own padding (spacing[3]) plus
             // the glyph centering inside the target otherwise leaves

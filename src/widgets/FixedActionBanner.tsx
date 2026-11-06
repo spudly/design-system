@@ -68,12 +68,7 @@ export function FixedActionBanner({
             </Button>
           ) : null}
           {onDismiss ? (
-            <Button
-              variant="ghost"
-              size="sm"
-              accessibilityLabel={dismissAriaLabel}
-              onPress={onDismiss}
-            >
+            <Button ghost size="sm" accessibilityLabel={dismissAriaLabel} onPress={onDismiss}>
               Dismiss
             </Button>
           ) : null}

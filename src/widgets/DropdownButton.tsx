@@ -8,8 +8,10 @@ import { Button } from "./Button.js";
 import { useDropdownContext } from "./Dropdown.js";
 
 type DropdownButtonCommonProps = {
-  /** Button variant, rendered by the DS Button the trigger is built on. Defaults to "secondary" — a menu trigger is a secondary action. */
+  /** Button variant, rendered by the DS Button the trigger is built on. Defaults to "secondary" — a menu trigger is a secondary action. (The "ghost" value is DEPRECATED, #463 — use the `ghost` prop.) */
   variant?: "primary" | "secondary" | "ghost" | "danger";
+  /** The ghost treatment (#463), passed through to Button: transparent background, no border, ink matching the variant. */
+  ghost?: boolean;
   /** Button size. Defaults to "md". */
   size?: "sm" | "md" | "lg";
   /** A disabled trigger does not open its dropdown. */
@@ -74,12 +76,25 @@ const glyphSizes = {
  * directly), because react-native-svg cannot resolve Tamagui theme
  * variables.
  */
-function useChevronInk(variant: string): string {
+function useChevronInk(variant: string, ghost = false): string {
   const theme = useTheme();
   const roleValue = (key: string): string | undefined => {
     const variable = theme[key];
     return typeof variable?.val === "string" ? variable.val : undefined;
   };
+  // The ghost prop's chevron ink follows Button's ghost ink map
+  // (#463): the variant's own ink.
+  if (ghost) {
+    switch (variant) {
+      case "secondary":
+        return tokens.colors.gray.gray10;
+      case "danger":
+        return tokens.colors.danger.danger7;
+      case "primary":
+      default:
+        return roleValue("primary") ?? tokens.colors.primary.primary7;
+    }
+  }
   switch (variant) {
     case "secondary":
       return tokens.colors.gray.gray10;
@@ -119,6 +134,7 @@ export const DropdownButton = forwardRef<
     icon,
     accessibilityLabel,
     variant = "secondary",
+    ghost = false,
     size = "md",
     disabled = false,
     onFocus,
@@ -130,7 +146,7 @@ export const DropdownButton = forwardRef<
 ) {
   const context = useDropdownContext();
   const open = context?.open ?? false;
-  const chevronInk = useChevronInk(variant);
+  const chevronInk = useChevronInk(variant, ghost);
   const glyphSize = glyphSizes[size];
 
   // Focus the trigger as part of activation (onPress, immediately
@@ -170,6 +186,7 @@ export const DropdownButton = forwardRef<
       onPressIn={onPressIn}
       onMouseEnter={onMouseEnter}
       variant={variant}
+      {...(ghost ? { ghost: true } : null)}
       size={size}
       disabled={disabled}
       {...(icon ? { icon } : null)}
