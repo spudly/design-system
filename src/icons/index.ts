@@ -1,6 +1,7 @@
 export { Icon, type IconComponentProps, type IconElement, type IconProps } from "./Icon.js";
 export { iconNames, iconsByName, type IconName } from "./iconRegistry.js";
 export { AddIcon } from "./AddIcon.js";
+export { BackIcon } from "./BackIcon.js";
 export { CollapsedIcon } from "./CollapsedIcon.js";
 export { CollapsibleIcon, type CollapsibleIconProps } from "./CollapsibleIcon.js";
 export { ExpandedIcon } from "./ExpandedIcon.js";
