@@ -50,8 +50,15 @@ test("the ghost prop inks per variant: primary $primary, secondary gray10, dange
 test("the deprecated ghost variant still renders for hosts that spell it (#463)", () => {
   // Deprecation, not removal (Stephen's 2026-11-06 adjustment):
   // the variant block and its legacy $link label color stay until
-  // the host repos' usages are removed.
+  // the host repos' usages are removed. The variant's own frame
+  // stays transparent and borderless (the first `ghost:` block in
+  // the frame config is the variant's, ahead of the boolean
+  // treatment), so a host still spelling it renders unchanged.
   assert.match(button, /ghost: "\$link"/);
+  const variantBlock = /ghost: \{([^}]*)\}/.exec(button);
+  assert.ok(variantBlock, "the deprecated ghost variant block must exist in the frame config");
+  assert.match(variantBlock[1], /backgroundColor: "transparent"/);
+  assert.match(variantBlock[1], /borderWidth: 0/);
 });
 
 test("no in-repo call site spells the deprecated ghost variant (#463)", () => {
@@ -61,11 +68,17 @@ test("no in-repo call site spells the deprecated ghost variant (#463)", () => {
       (entry) => (entry.endsWith(".ts") || entry.endsWith(".tsx")) && !entry.endsWith(".test.ts"),
     );
   assert.ok(srcFiles.length > 100, "the scan must cover the source tree");
+  // Every spelling of the deprecated value: the JSX attribute
+  // form, the JSX expression form, and the object-property form
+  // (story args).
+  const spellings = ['variant="ghost"', 'variant={"ghost"}', 'variant: "ghost"'];
   for (const rel of srcFiles) {
     const code = readCode(join("src", rel));
-    assert.ok(
-      !code.includes('variant="ghost"') && !code.includes('variant: "ghost"'),
-      `${rel} must use the ghost prop, not the deprecated ghost variant`,
-    );
+    for (const spelling of spellings) {
+      assert.ok(
+        !code.includes(spelling),
+        `${rel} must use the ghost prop, not the deprecated ghost variant (${spelling})`,
+      );
+    }
   }
 });
