@@ -1,7 +1,6 @@
 import { Component, type ReactNode } from "react";
 import { isWeb } from "tamagui";
 import { Alert } from "../widgets/Alert.js";
-import { Button } from "../widgets/Button.js";
 
 export type ChunkErrorBoundaryProps = {
   children: ReactNode;
@@ -33,9 +32,10 @@ export type ChunkErrorBoundaryState = {
  * by the active surface, so switching surfaces clears the error
  * state and the other surfaces stay usable.
  *
- * The fallback is composed from the design system's own Alert and
- * Button: an error Alert ("This section failed to load.") and a
- * "Reload the app" button, rendered only when a recovery action
+ * The fallback is the design system's own error Alert ("This
+ * section failed to load.") with the "Reload the app" button
+ * rendered inside it as an Alert action (content-width, not a
+ * full-width sibling under the Alert), only when a recovery action
  * exists (the web default reload or a caller-supplied `onReload`).
  * The button's label is its accessible name; the Alert announces
  * itself with the error live region.
@@ -74,10 +74,14 @@ export class ChunkErrorBoundary extends Component<
   render(): ReactNode {
     if (this.state.failed) {
       return (
-        <>
-          <Alert severity="error">This section failed to load.</Alert>
-          {this.canReload ? <Button onPress={this.handleReload}>Reload the app</Button> : null}
-        </>
+        <Alert
+          severity="error"
+          {...(this.canReload
+            ? { actions: [{ label: "Reload the app", onPress: this.handleReload }] }
+            : {})}
+        >
+          This section failed to load.
+        </Alert>
       );
     }
     return this.props.children;
