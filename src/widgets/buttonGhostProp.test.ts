@@ -22,11 +22,62 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 
-function readCode(rel: string) {
-  return readFileSync(join(root, rel), "utf8")
-    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+/**
+ * Strip comments without touching string literals: a `//` inside
+ * a URL (or any quoted string) is data, not a comment — eating the
+ * rest of that line could hide a real call site from the scan
+ * below (CodeRabbit round on PR #502).
+ */
+function stripComments(code: string) {
+  let out = "";
+  let quote: string | null = null;
+  for (let i = 0; i < code.length; i += 1) {
+    const ch = code[i] ?? "";
+    const next = code[i + 1] ?? "";
+    if (quote !== null) {
+      out += ch;
+      if (ch === "\\") {
+        out += next;
+        i += 1;
+      } else if (ch === quote) {
+        quote = null;
+      }
+      continue;
+    }
+    if (ch === '"' || ch === "'" || ch === "`") {
+      quote = ch;
+      out += ch;
+      continue;
+    }
+    if (ch === "/" && next === "/") {
+      while (i < code.length && code[i] !== "\n") i += 1;
+      out += "\n";
+      continue;
+    }
+    if (ch === "/" && next === "*") {
+      i += 2;
+      while (i < code.length && !(code[i] === "*" && code[i + 1] === "/")) i += 1;
+      i += 1;
+      continue;
+    }
+    out += ch;
+  }
+  return out;
 }
+
+function readCode(rel: string) {
+  return stripComments(readFileSync(join(root, rel), "utf8"));
+}
+
+// Every spelling of the deprecated value, as patterns so quote
+// style and whitespace cannot slip a call site past the scan:
+// the JSX attribute form, the JSX expression form, and the
+// object-property form (story args, quoted key included).
+const spellings = [
+  /\bvariant\s*=\s*(["'])ghost\1/,
+  /\bvariant\s*=\s*\{\s*(["'])ghost\1\s*\}/,
+  /(?:\bvariant|["']variant["'])\s*:\s*(["'])ghost\1/,
+];
 
 const button = readCode("src/widgets/Button.tsx");
 
@@ -83,15 +134,6 @@ test("no in-repo call site spells the deprecated ghost variant (#463)", () => {
       (entry) => (entry.endsWith(".ts") || entry.endsWith(".tsx")) && !entry.endsWith(".test.ts"),
     );
   assert.ok(srcFiles.length > 100, "the scan must cover the source tree");
-  // Every spelling of the deprecated value, as patterns so quote
-  // style and whitespace cannot slip a call site past the scan:
-  // the JSX attribute form, the JSX expression form, and the
-  // object-property form (story args).
-  const spellings = [
-    /\bvariant\s*=\s*(["'])ghost\1/,
-    /\bvariant\s*=\s*\{\s*(["'])ghost\1\s*\}/,
-    /\bvariant\s*:\s*(["'])ghost\1/,
-  ];
   for (const rel of srcFiles) {
     const code = readCode(join("src", rel));
     for (const spelling of spellings) {
@@ -101,4 +143,23 @@ test("no in-repo call site spells the deprecated ghost variant (#463)", () => {
       );
     }
   }
+});
+
+test("the scan's comment stripping preserves string literals (PR #502 round)", () => {
+  // A `//` inside a URL string must not eat the rest of the line:
+  // a deprecated spelling after it on the same line stays visible.
+  const line = 'const u = "https://example.com//a"; <Button variant="ghost" />;';
+  const stripped = stripComments(line);
+  assert.ok(
+    spellings.some((spelling) => spelling.test(stripped)),
+    "the spelling after the URL must be detected",
+  );
+  // A real line comment still strips.
+  assert.ok(!stripComments('// <Button variant="ghost" />').includes("variant"));
+});
+
+test("the scan detects a quoted object key for the deprecated variant (PR #502 round)", () => {
+  assert.ok(spellings.some((spelling) => spelling.test('{ "variant": "ghost" }')));
+  assert.ok(spellings.some((spelling) => spelling.test("{ 'variant': 'ghost' }")));
+  assert.ok(spellings.some((spelling) => spelling.test('{ variant: "ghost" }')));
 });
