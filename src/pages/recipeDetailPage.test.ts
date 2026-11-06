@@ -38,9 +38,10 @@
  * 7. No explicit lineHeight anywhere (the #162 rule).
  * 8. Stories exercise the states and the cook-log form slot, so
  *    Chromatic captures them.
- * 9. The print/share buttons render the icons module's PrintIcon /
- *    ShareIcon (#187) through Button's icon slot — no emoji
- *    or text glyphs, no hand-drawn glyph components.
+ * 9. The print/share buttons name the icons module's "print" /
+ *    "share" glyphs (#187; by name since #438 Part 4) through
+ *    Button's icon slot — no emoji or text glyphs, no hand-drawn
+ *    glyph components, no icon component crossing the slot.
  *
  * The #119 de-styling pass (recipes-detail tranche) rebuilt the
  * page as a composition of design-system components; invariants
@@ -413,10 +414,20 @@ test("stories exercise the states and the cook-log form slot", () => {
   );
 });
 
-test("print/share render the icons module's Feather icons, not text glyphs (#187)", () => {
-  for (const name of ["PrintIcon", "ShareIcon"]) {
-    assert.match(code, new RegExp(String.raw`import \{ ${name} \} from "\.\./icons/${name}\.js";`));
-    assert.match(code, new RegExp(String.raw`icon=\{${name}\}`), "the button's icon slot");
+test("print/share name the icons module's Feather icons, not text glyphs (#187, #438 Part 4)", () => {
+  for (const [name, component] of [
+    ["print", "PrintIcon"],
+    ["share", "ShareIcon"],
+  ] as const) {
+    assert.match(
+      code,
+      new RegExp(String.raw`icon="${name}"`),
+      "the button's icon slot takes the name as data",
+    );
+    assert.ok(
+      !code.includes(component),
+      `the page must not reference the ${component} component — names only (#438 Part 4)`,
+    );
   }
   assert.ok(!code.includes("🖨") && !code.includes("↗"), "no emoji/text glyph button labels");
   assert.ok(!code.includes("PrinterGlyph") && !code.includes("ShareGlyph"), "no hand-drawn glyphs");

@@ -1,10 +1,7 @@
-import { useState, type ComponentType } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { PrintIcon } from "../icons/PrintIcon.js";
-import { ProfileIcon } from "../icons/ProfileIcon.js";
-import { ShareIcon } from "../icons/ShareIcon.js";
-import type { IconComponentProps } from "../icons/Icon.js";
+import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
@@ -28,16 +25,17 @@ type Story = StoryObj<typeof Dropdown>;
  * through useDropdownClose (close-on-select).
  */
 function MenuRow({
-  icon: Icon,
+  icon,
   label,
   destructive = false,
   onAction,
 }: {
-  icon?: ComponentType<IconComponentProps>;
+  icon?: IconName;
   label: string;
   destructive?: boolean;
   onAction: (label: string) => void;
 }) {
+  const Icon = icon !== undefined ? iconsByName[icon] : undefined;
   const close = useDropdownClose();
   const activate = () => {
     onAction(label);
@@ -86,8 +84,8 @@ function RecipeActionsMenu() {
         trigger={<DropdownButton label="Recipe actions" />}
       >
         <YStack>
-          <MenuRow icon={PrintIcon} label="Print recipe" onAction={setLastAction} />
-          <MenuRow icon={ShareIcon} label="Share recipe" onAction={setLastAction} />
+          <MenuRow icon="print" label="Print recipe" onAction={setLastAction} />
+          <MenuRow icon="share" label="Share recipe" onAction={setLastAction} />
           <MenuRow label="Duplicate recipe" onAction={setLastAction} />
           <MenuRow label="Delete recipe" destructive onAction={setLastAction} />
         </YStack>
@@ -105,7 +103,7 @@ export const IconOnlyTrigger: Story = {
   render: () => (
     <Dropdown
       accessibilityLabel="Account menu"
-      trigger={<DropdownButton icon={ProfileIcon} accessibilityLabel="Account menu" />}
+      trigger={<DropdownButton icon="profile" accessibilityLabel="Account menu" />}
     >
       <YStack>
         <MenuRow label="Profile" onAction={() => undefined} />
@@ -157,8 +155,8 @@ export const InitiallyOpen: Story = {
       defaultOpen
     >
       <YStack>
-        <MenuRow icon={PrintIcon} label="Print recipe" onAction={() => undefined} />
-        <MenuRow icon={ShareIcon} label="Share recipe" onAction={() => undefined} />
+        <MenuRow icon="print" label="Print recipe" onAction={() => undefined} />
+        <MenuRow icon="share" label="Share recipe" onAction={() => undefined} />
         <MenuRow label="Delete recipe" destructive onAction={() => undefined} />
       </YStack>
     </Dropdown>

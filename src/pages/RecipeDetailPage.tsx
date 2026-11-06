@@ -39,8 +39,6 @@ import { TagList } from "../components/TagList.js";
 import { Text } from "../components/Text.js";
 import { Thumbnail } from "../components/Thumbnail.js";
 import { Toolbar } from "../components/Toolbar.js";
-import { PrintIcon } from "../icons/PrintIcon.js";
-import { ShareIcon } from "../icons/ShareIcon.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../views/ConfirmActionView.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
 import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeSharingView.js";
@@ -644,14 +642,15 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
     comments: commentsData,
   } = overview;
 
-  // The print and share buttons carry the icons module's PrintIcon /
-  // ShareIcon (#187, reworked after #217) through Button's icon
-  // slot: the official Feather printer / share-2 glyphs, inked in
-  // the button's label color at its standard glyph size — not the
-  // "🖨" emoji and "↗" text glyph the page originally used, which
-  // render in full color at font-dependent sizes. Do not
-  // reintroduce text glyphs or hand-drawn icons for these: icons
-  // come from src/icons (see that module's header).
+  // The print and share buttons name the icons module's "print" /
+  // "share" glyphs (#187, reworked after #217; by name since #438
+  // Part 4) through Button's icon slot: the official Feather
+  // printer / share-2 glyphs, inked in the button's label color at
+  // its standard glyph size — not the "🖨" emoji and "↗" text glyph
+  // the page originally used, which render in full color at
+  // font-dependent sizes. Do not reintroduce text glyphs or
+  // hand-drawn icons for these: icons come from src/icons (see
+  // that module's header).
   const showLifecycle =
     lifecycle !== undefined &&
     lifecycle !== null &&
@@ -685,7 +684,7 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
           <Button
             variant="secondary"
             size="md"
-            icon={PrintIcon}
+            icon="print"
             accessibilityLabel="Print recipe"
             onPress={onPrintPress}
           />
@@ -694,7 +693,7 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
           <Button
             variant="secondary"
             size="md"
-            icon={ShareIcon}
+            icon="share"
             accessibilityLabel="Share recipe"
             onPress={onSharePress}
           />

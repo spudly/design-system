@@ -1,10 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { AddIcon } from "../icons/AddIcon.js";
-import { PrintIcon } from "../icons/PrintIcon.js";
-import { ShareIcon } from "../icons/ShareIcon.js";
-import { WarningIcon } from "../icons/WarningIcon.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
 
@@ -82,7 +78,7 @@ export const WithIcon: Story = {
   args: {
     variant: "primary",
     size: "md",
-    icon: PrintIcon,
+    icon: "print",
     children: "Print recipe",
     onPress: noop,
   },
@@ -91,16 +87,16 @@ export const WithIcon: Story = {
 export const WithIconVariants: Story = {
   render: () => (
     <XStack gap={12} alignItems="center">
-      <Button variant="primary" icon={AddIcon} onPress={noop}>
+      <Button variant="primary" icon="add" onPress={noop}>
         Add recipe
       </Button>
-      <Button variant="secondary" icon={PrintIcon} onPress={noop}>
+      <Button variant="secondary" icon="print" onPress={noop}>
         Print
       </Button>
-      <Button variant="ghost" icon={ShareIcon} onPress={noop}>
+      <Button variant="ghost" icon="share" onPress={noop}>
         Share
       </Button>
-      <Button variant="danger" icon={WarningIcon} onPress={noop}>
+      <Button variant="danger" icon="warning" onPress={noop}>
         Delete
       </Button>
     </XStack>
@@ -111,7 +107,7 @@ export const IconOnly: Story = {
   args: {
     variant: "secondary",
     size: "md",
-    icon: PrintIcon,
+    icon: "print",
     accessibilityLabel: "Print recipe",
     onPress: noop,
   },
@@ -120,20 +116,10 @@ export const IconOnly: Story = {
 export const IconOnlyVariants: Story = {
   render: () => (
     <XStack gap={12} alignItems="center">
-      <Button variant="primary" icon={AddIcon} accessibilityLabel="Add recipe" onPress={noop} />
-      <Button
-        variant="secondary"
-        icon={PrintIcon}
-        accessibilityLabel="Print recipe"
-        onPress={noop}
-      />
-      <Button variant="ghost" icon={ShareIcon} accessibilityLabel="Share recipe" onPress={noop} />
-      <Button
-        variant="danger"
-        icon={WarningIcon}
-        accessibilityLabel="Delete recipe"
-        onPress={noop}
-      />
+      <Button variant="primary" icon="add" accessibilityLabel="Add recipe" onPress={noop} />
+      <Button variant="secondary" icon="print" accessibilityLabel="Print recipe" onPress={noop} />
+      <Button variant="ghost" icon="share" accessibilityLabel="Share recipe" onPress={noop} />
+      <Button variant="danger" icon="warning" accessibilityLabel="Delete recipe" onPress={noop} />
     </XStack>
   ),
 };
@@ -142,20 +128,20 @@ export const IconSizes: Story = {
   render: () => (
     <YStack gap={12}>
       <XStack gap={12} alignItems="center">
-        <Button size="sm" icon={PrintIcon} onPress={noop}>
+        <Button size="sm" icon="print" onPress={noop}>
           Print
         </Button>
-        <Button size="md" icon={PrintIcon} onPress={noop}>
+        <Button size="md" icon="print" onPress={noop}>
           Print
         </Button>
-        <Button size="lg" icon={PrintIcon} onPress={noop}>
+        <Button size="lg" icon="print" onPress={noop}>
           Print
         </Button>
       </XStack>
       <XStack gap={12} alignItems="center">
-        <Button size="sm" icon={PrintIcon} accessibilityLabel="Print recipe" onPress={noop} />
-        <Button size="md" icon={PrintIcon} accessibilityLabel="Print recipe" onPress={noop} />
-        <Button size="lg" icon={PrintIcon} accessibilityLabel="Print recipe" onPress={noop} />
+        <Button size="sm" icon="print" accessibilityLabel="Print recipe" onPress={noop} />
+        <Button size="md" icon="print" accessibilityLabel="Print recipe" onPress={noop} />
+        <Button size="lg" icon="print" accessibilityLabel="Print recipe" onPress={noop} />
       </XStack>
     </YStack>
   ),
@@ -164,10 +150,10 @@ export const IconSizes: Story = {
 export const IconDisabled: Story = {
   render: () => (
     <XStack gap={12} alignItems="center">
-      <Button icon={PrintIcon} disabled onPress={noop}>
+      <Button icon="print" disabled onPress={noop}>
         Print recipe
       </Button>
-      <Button icon={PrintIcon} accessibilityLabel="Print recipe" disabled onPress={noop} />
+      <Button icon="print" accessibilityLabel="Print recipe" disabled onPress={noop} />
     </XStack>
   ),
 };
@@ -177,7 +163,7 @@ function IconPressCounterDemo() {
   return (
     <YStack gap={12}>
       <Button
-        icon={AddIcon}
+        icon="add"
         accessibilityLabel="Add one"
         variant="primary"
         onPress={() => {
