@@ -15,18 +15,22 @@
  *   boundary for lazily loaded surfaces, lifted from Memorize's
  *   app shell.
  *
+ * #438 Part 1 (2026-11-05) adds back exactly the 5 specifiers
+ * dispositioned as TOKENS in the Part 0 audit: `tokens` (from
+ * src/tokens/) and `warmHarvestTagColors`, `tagColorNames`,
+ * `tagColorNameForHex`, and the `TagColorName` type (from
+ * src/themes/), which hosts consume as data alongside the themes.
  * Nothing else comes back: no widget components (ChunkErrorBoundary
  * is the one named exception), no icons, no composite (form)
- * components, and no tokens, tag colors, or Storybook config
- * factories. There are no subpath exports either — apps consume
- * everything from the package root, full stop.
+ * components, and no Storybook config factories. There are no
+ * subpath exports either — apps consume everything from the
+ * package root, full stop.
  *
- * Widgets, icons, tokens, tag colors, and the Storybook factories
- * remain in the repo as internal building blocks (src/components,
- * src/icons, src/tokens, src/themes, src/tamagui.config.ts) that
- * the pages are composed from and that this repo's own Storybook
- * apps and tests reach by relative path; they are not part of the
- * published package surface.
+ * Widgets, icons, and the Storybook factories remain in the repo
+ * as internal building blocks (src/components, src/icons,
+ * src/tamagui.config.ts) that the pages are composed from and that
+ * this repo's own Storybook apps and tests reach by relative path;
+ * they are not part of the published package surface.
  *
  * Note the superseded invariant: the root entry used to stay
  * importable in plain Node, which is why pages used to live
@@ -34,7 +38,14 @@
  * the pages entry, and page components may import react-native.
  */
 export * from "./pages/index.js";
+export { tokens } from "./tokens/index.js";
 export { baseTheme, eciperayTheme, memorizeTheme } from "./themes/index.js";
+export {
+  tagColorNames,
+  warmHarvestTagColors,
+  tagColorNameForHex,
+  type TagColorName,
+} from "./themes/index.js";
 export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
 export { createTamaguiConfig } from "./tamagui.config.js";
 export {
