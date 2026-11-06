@@ -1,5 +1,7 @@
-import { Anchor, Tabs as TamaguiTabs, XStack, isWeb, styled } from "tamagui";
+import { Anchor, Tabs as TamaguiTabs, XStack, isWeb, styled, useTheme } from "tamagui";
+import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const listFrameStyles = {
@@ -44,6 +46,13 @@ const StyledTab = styled(TamaguiTabs.Tab, {
   name: "TabsTab",
   ...tabFrameStyles,
 
+  // Row layout so a tab's optional icon glyph (button variant,
+  // #438 Part 5) sits left of its label with the shared item gap;
+  // inert for a label-only tab (a single child lays out the same).
+  flexDirection: "row",
+  alignItems: "center",
+  gap: tokens.spacing[2],
+
   variants: {
     active: {
       true: {
@@ -86,6 +95,17 @@ const StyledLinkTab = styled(Anchor, {
 export type TabItem = {
   value: string;
   label: string;
+  /**
+   * The tab's icon, as a NAME from the design system's semantic
+   * icon set (#438 Part 4's registry) — data, never a component:
+   * Tabs resolves the name and renders the glyph left of the
+   * label, inked to match the label (the active tab's $link,
+   * otherwise $textMuted). The glyph is decorative; the label is
+   * the tab's accessible name. Button-variant only, mirroring
+   * Button's contract: the href (link) form takes no icon (its
+   * props omit the slot the way ButtonLinkProps does).
+   */
+  icon?: IconName;
 };
 
 export type LinkTabItem = {
@@ -115,6 +135,8 @@ export type TabsProps =
       tabs: TabItem[];
       value: string;
       onValueChange: (value: string) => void;
+      /** The tab list's accessible name (e.g. "Memorize sections"). */
+      label?: string;
     }
   | {
       /**
@@ -128,7 +150,28 @@ export type TabsProps =
       tabs: LinkTabItem[];
       value: string;
       onValueChange?: never;
+      /** The tab list's accessible name (e.g. "Memorize sections"). */
+      label?: string;
     };
+
+/**
+ * The concrete ink for a tab glyph: the label's theme color
+ * resolved through the active theme (the glyph renders in SVG,
+ * where theme token strings do not resolve), with the same
+ * fallbacks Button's glyph ink uses. Active tabs take $link,
+ * inactive $textMuted — the label's own colors.
+ */
+function useTabGlyphInks(): { active: string; inactive: string } {
+  const theme = useTheme();
+  const roleValue = (key: string): string | undefined => {
+    const variable = theme[key];
+    return typeof variable?.val === "string" ? variable.val : undefined;
+  };
+  return {
+    active: roleValue("link") ?? tokens.colors.primary.primary8,
+    inactive: roleValue("textMuted") ?? tokens.colors.gray.gray10,
+  };
+}
 
 /**
  * Tab navigation in two variants (#248's navigation rule, and
@@ -151,12 +194,18 @@ export type TabsProps =
  *   page's tab (`value`) is marked `aria-current="page"` on web and
  *   selected on native. Use it for section navigation (the app
  *   sections a tab bar switches between when each is its own page).
+ *
+ * A button-variant tab may carry an icon NAME (#438 Part 4's
+ * registry — see TabItem.icon); the link variant takes no icon,
+ * mirroring Button (its href form omits the icon slot). Both
+ * variants accept `label`, the tab list's accessible name.
  */
 export function Tabs(props: TabsProps) {
+  const glyphInks = useTabGlyphInks();
   if (props.variant === "link") {
-    const { tabs, value } = props;
+    const { tabs, value, label } = props;
     return (
-      <StyledLinkList>
+      <StyledLinkList {...platformAccessibilityProps({ accessibilityLabel: label })}>
         {tabs.map((tab) => {
           const active = tab.value === value;
           return (
@@ -175,30 +224,36 @@ export function Tabs(props: TabsProps) {
       </StyledLinkList>
     );
   }
-  const { tabs, value, onValueChange } = props;
+  const { tabs, value, onValueChange, label } = props;
   return (
     <TamaguiTabs value={value} onValueChange={onValueChange} orientation="horizontal">
-      <StyledList>
-        {tabs.map((tab) => (
-          <StyledTab key={tab.value} value={tab.value} active={tab.value === value}>
-            {/* Selected label uses $link, not $primaryEmphasis:
+      <StyledList {...platformAccessibilityProps({ accessibilityLabel: label })}>
+        {tabs.map((tab) => {
+          const active = tab.value === value;
+          const Glyph = tab.icon !== undefined ? iconsByName[tab.icon] : undefined;
+          return (
+            <StyledTab key={tab.value} value={tab.value} active={active}>
+              {Glyph ? (
+                <Glyph size={20} color={active ? glyphInks.active : glyphInks.inactive} />
+              ) : null}
+              {/* Selected label uses $link, not $primaryEmphasis:
                 $primaryEmphasis has no dark variant and drops to
                 ~2.3:1 on dark backgrounds, while the dark-aware $link
                 holds ≥5:1 in every brand and mode. */}
-            <Text
-              variant="body"
-              style={{
-                fontWeight:
-                  tab.value === value
+              <Text
+                variant="body"
+                style={{
+                  fontWeight: active
                     ? tokens.typography.fontWeight.semibold
                     : tokens.typography.fontWeight.regular,
-                color: tab.value === value ? "$link" : "$textMuted",
-              }}
-            >
-              {tab.label}
-            </Text>
-          </StyledTab>
-        ))}
+                  color: active ? "$link" : "$textMuted",
+                }}
+              >
+                {tab.label}
+              </Text>
+            </StyledTab>
+          );
+        })}
       </StyledList>
     </TamaguiTabs>
   );

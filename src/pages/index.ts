@@ -73,6 +73,12 @@ export {
 } from "./PublicRecipePage.js";
 export { PublicPageFrame, type PublicPageFrameProps } from "./PublicPageFrame.js";
 export {
+  TabbedShellPage,
+  type TabbedShellPageLinkTab,
+  type TabbedShellPageProps,
+  type TabbedShellPageTab,
+} from "./TabbedShellPage.js";
+export {
   MemorizeReviewPage,
   type MemorizeReviewPageProps,
   type MemorizeReviewPageVerse,
