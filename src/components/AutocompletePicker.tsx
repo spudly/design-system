@@ -3,6 +3,7 @@ import { XStack, YStack, isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { politeLiveRegionProps } from "./accessibility.js";
+import { Alert } from "./Alert.js";
 import { Button } from "./Button.js";
 import { ListRow } from "./ListRow.js";
 import { SearchField } from "../views/SearchField.js";
@@ -234,7 +235,23 @@ export function AutocompletePicker({
           </YStack>
         ) : visibleResults.length === 0 ? (
           searchError ? (
-            <Text variant="error">{searchError}</Text>
+            // The visible Alert carries NO live semantics of its
+            // own: an error Alert's assertive role would announce
+            // the error a second time (and interrupt), on top of
+            // the polite live region above, which already announces
+            // it. The Alert's caller overrides are the off switch:
+            // accessibilityRole="none" removes the alert role
+            // itself (an alert role can fire a system alert event
+            // even with aria-live="off"), and
+            // accessibilityLiveRegion="none" clears the live
+            // region (aria-live="off" on web) — the polite region
+            // above stays the only announcement.
+            <Alert
+              severity="error"
+              message={searchError}
+              accessibilityRole="none"
+              accessibilityLiveRegion="none"
+            />
           ) : (
             <Text variant="hint">{noResultsMessage}</Text>
           )
