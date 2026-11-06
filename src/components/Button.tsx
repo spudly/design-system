@@ -512,6 +512,12 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         variant={variant}
         size={size}
         color={labelColor}
+        // Same #459 rule as the button form: the secondary
+        // variant's border always takes the label color (gray10 by
+        // default, a caller-passed `color` when one is given). The
+        // link form has no selected state, so this is the only
+        // departure it needs to cover.
+        {...(variant === "secondary" ? { borderColor: labelColor } : null)}
         // Same instance-prop rule as the button form's `color`: the
         // BARE font name ("body", no "$") is the form that makes
         // Tamagui emit the font-context class defining `--f-family`
@@ -595,13 +601,15 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
       size={size}
       {...(selected !== undefined ? { selected } : null)}
       color={labelColor}
-      // A selected secondary button takes the primary fill and the
-      // on-primary label (the `selected` variant), so #459's
-      // border-matches-text rule follows the label: the border
-      // takes the label color instead of staying gray10 on the
-      // primary fill. Unselected buttons and other variants keep
-      // the frame's border behavior.
-      {...(selected && variant === "secondary" ? { borderColor: labelColor } : null)}
+      // #459's border-matches-text rule, applied wherever the
+      // label color can depart from the variant's gray10: a
+      // SELECTED secondary button takes the primary fill and the
+      // on-primary label, and a caller-passed `color` overrides
+      // the label on any secondary button. Both are exactly
+      // `labelColor` (gray10 in the default case), so the
+      // secondary border simply always takes the label color.
+      // Other variants keep the frame's transparent border.
+      {...(variant === "secondary" ? { borderColor: labelColor } : null)}
       // Same instance-prop rule as `color` above, for the family:
       // Tamagui Button forwards an instance `fontFamily` to its
       // internal text element, and the BARE font name ("body", no

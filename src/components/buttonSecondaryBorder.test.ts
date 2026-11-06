@@ -12,8 +12,9 @@
  * visible border at rest: primary/danger carry the base frame's
  * 1px TRANSPARENT border (shared geometry, so a secondary is
  * never 2px larger than its row peers), ghost is chrome-less by
- * design. A selected secondary button's border follows its label
- * color onto the primary fill.
+ * design. A secondary button's border always follows its label
+ * color — onto the primary fill when selected, and to a
+ * caller-passed label color when one is given.
  *
  * Source scan like this repo's other contract tests (comments
  * stripped first, so the assertions pin the styling code itself,
@@ -74,12 +75,18 @@ test("all filled variants share one geometry: the base frame carries a 1px trans
   assert.ok(base, "the base frame must carry borderColor transparent + borderWidth 1");
 });
 
-test("a selected secondary button's border follows its label color (#459)", () => {
-  // Selected takes the primary fill and the on-primary label, so a
-  // gray10 border would no longer match the text. The wrapper
-  // passes the label color as the border color for that one case.
-  assert.match(
-    button,
-    /\{\.\.\.\(selected && variant === "secondary" \? \{ borderColor: labelColor \} : null\)\}/,
+test("a secondary button's border always follows its label color (#459)", () => {
+  // Selected takes the primary fill and the on-primary label, and a
+  // caller-passed `color` overrides the label on any secondary
+  // button — a gray10 border would match the text in neither case.
+  // Both departures are exactly `labelColor` (gray10 by default),
+  // so BOTH render forms pass it as the secondary border color.
+  const applications = button.match(
+    /\{\.\.\.\(variant === "secondary" \? \{ borderColor: labelColor \} : null\)\}/g,
+  );
+  assert.equal(
+    applications?.length,
+    2,
+    "the button form and the href form must both apply the label color as the secondary border",
   );
 });
