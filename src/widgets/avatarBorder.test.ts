@@ -4,7 +4,7 @@
  *
  * This is a source scan, not a render test: the invariant is a
  * per-literal property of the Avatar source (same rationale as
- * src/components/badgeBorder.test.ts) — the Fallback styled definition
+ * src/widgets/badgeBorder.test.ts) — the Fallback styled definition
  * carries a fixed 1px border in "$primaryEmphasis", the exact token
  * the initials Text renders in, while the image path carries no border.
  */
@@ -18,7 +18,7 @@ const srcPath = join(
   dirname(fileURLToPath(import.meta.url)),
   "../..",
   "src",
-  "components",
+  "widgets",
   "Avatar.tsx",
 );
 const text = readFileSync(srcPath, "utf8");
@@ -27,10 +27,7 @@ const fallbackDef = text.slice(
   text.indexOf("const Fallback"),
   text.indexOf("type StyledImageProps"),
 );
-const imageDef = text.slice(
-  text.indexOf("const StyledImage"),
-  text.indexOf("const Fallback"),
-);
+const imageDef = text.slice(text.indexOf("const StyledImage"), text.indexOf("const Fallback"));
 
 test("the initials fallback has a 1px border (#461)", () => {
   assert.ok(
