@@ -152,6 +152,34 @@ function satisfiesBound(versionToCheck: Version, operator: string, bound: Versio
   return false;
 }
 
+// Rewrite a hyphen range ("1.2.3 - 2.3.4") as comparator bounds
+// (">=1.2.3 <=2.3.4"). Partial endpoints desugar per node-semver:
+// the lower bound fills with 0, a partial upper bound is exclusive
+// at the next component ("1.2 - 2.3" → ">=1.2.0 <2.4.0"). Returns
+// null when an endpoint is not a plain partial version.
+function expandHyphenRanges(alternative: string): string | null {
+  const match = /^(\S+)\s+-\s+(\S+)$/.exec(alternative.trim());
+  if (!match) return alternative;
+  const parsePartial = (text: string): (number | null)[] | null => {
+    const parts = text.split(".");
+    if (parts.length > 3) return null;
+    if (parts.some((part) => !isWild(part) && !/^\d+$/.test(part))) return null;
+    const nums = parts.map((part) => (isWild(part) ? null : Number(part)));
+    while (nums.length < 3) nums.push(null);
+    return nums;
+  };
+  const lower = parsePartial(match[1]);
+  const upper = parsePartial(match[2]);
+  if (!lower || !upper) return null;
+  const [loMajor, loMinor, loPatch] = lower;
+  const [upMajor, upMinor, upPatch] = upper;
+  if (loMajor === null || upMajor === null) return null;
+  const lowerText = `>=${loMajor}.${loMinor ?? 0}.${loPatch ?? 0}`;
+  if (upMinor === null) return `${lowerText} <${upMajor + 1}.0.0`;
+  if (upPatch === null) return `${lowerText} <${upMajor}.${upMinor + 1}.0`;
+  return `${lowerText} <=${upMajor}.${upMinor}.${upPatch}`;
+}
+
 // Returns true/false when the spec is a semver range this checker
 // understands, or null when the spec is non-semver and must be
 // skipped (file:, link:, workspace:, npm:, URLs, tags, "*").
@@ -161,7 +189,9 @@ export function satisfies(versionText: string, spec: string): boolean | null {
   const trimmed = spec.trim();
   if (trimmed === "" || trimmed === "*" || trimmed === "latest") return null;
   if (!/^[\^~>=<=\d\s.|xX*-]+$/.test(trimmed)) return null;
-  for (const alternative of trimmed.split("||")) {
+  for (const rawAlternative of trimmed.split("||")) {
+    const alternative = expandHyphenRanges(rawAlternative);
+    if (alternative === null) return null;
     const tokens = alternative.trim().split(/\s+/).filter(Boolean);
     if (tokens.length === 0) continue;
     let all = true;
@@ -249,6 +279,16 @@ test("satisfies: partial comparators desugar the node-semver way", () => {
   assert.equal(satisfies("1.3.0", "<=1.2"), false);
   assert.equal(satisfies("1.9.9", "<=1"), true);
   assert.equal(satisfies("2.0.0", "<=1"), false);
+});
+
+test("satisfies: hyphen ranges, including partial endpoints", () => {
+  assert.equal(satisfies("2.0.0", "1.2.3 - 2.3.4"), true);
+  assert.equal(satisfies("2.3.4", "1.2.3 - 2.3.4"), true);
+  assert.equal(satisfies("2.3.5", "1.2.3 - 2.3.4"), false);
+  assert.equal(satisfies("1.2.2", "1.2.3 - 2.3.4"), false);
+  assert.equal(satisfies("2.3.9", "1.2 - 2.3"), true);
+  assert.equal(satisfies("2.4.0", "1.2 - 2.3"), false);
+  assert.equal(satisfies("1.1.9", "1.2 - 2.3"), false);
 });
 
 test("satisfies: prerelease versions are excluded from ordinary ranges", () => {
