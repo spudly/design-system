@@ -126,6 +126,19 @@ function expandComparator(token: string): Bound[] | null {
     return major === null ? [] : exactBounds(major, minor, patch);
   }
   if (major === null) return null;
+  // Partial comparators desugar per node-semver: ">1" is ">=2.0.0",
+  // ">1.2" is ">=1.3.0", "<=1.2" is "<1.3.0", "<=1" is "<2.0.0";
+  // ">=" and "<" fill the missing components with 0.
+  if (operator === ">") {
+    if (minor === null) return [[">=", version(major + 1, 0, 0)]];
+    if (patch === null) return [[">=", version(major, minor + 1, 0)]];
+    return [[">", version(major, minor, patch)]];
+  }
+  if (operator === "<=") {
+    if (minor === null) return [["<", version(major + 1, 0, 0)]];
+    if (patch === null) return [["<", version(major, minor + 1, 0)]];
+    return [["<=", version(major, minor, patch)]];
+  }
   return [[operator, version(major, minor ?? 0, patch ?? 0)]];
 }
 
@@ -152,16 +165,42 @@ export function satisfies(versionText: string, spec: string): boolean | null {
     const tokens = alternative.trim().split(/\s+/).filter(Boolean);
     if (tokens.length === 0) continue;
     let all = true;
+    const boundsList: Bound[] = [];
     for (const token of tokens) {
       const bounds = expandComparator(token);
       if (bounds === null) return null;
+      boundsList.push(...bounds);
       for (const [operator, bound] of bounds) {
         if (!satisfiesBound(parsed, operator, bound)) all = false;
       }
     }
+    // npm's prerelease rule: a prerelease version satisfies a range
+    // only when some comparator in the same alternative carries a
+    // prerelease for the same [major, minor, patch] tuple. (This
+    // checker's own bounds never carry prereleases, so a prerelease
+    // locked version never satisfies an ordinary range here.)
+    if (all && parsed.prerelease.length > 0) {
+      const hasPrereleaseComparator = boundsList.some(
+        ([, bound]) =>
+          bound.prerelease.length > 0 &&
+          bound.major === parsed.major &&
+          bound.minor === parsed.minor &&
+          bound.patch === parsed.patch,
+      );
+      if (!hasPrereleaseComparator) all = false;
+    }
     if (all) return true;
   }
   return false;
+}
+
+// True when the spec is a semver range this checker evaluates (as
+// opposed to a non-semver spec it skips: file:, workspace:, npm:,
+// URLs, tags, "*").
+export function isCheckableSpec(spec: string): boolean {
+  const trimmed = spec.trim();
+  if (trimmed === "" || trimmed === "*" || trimmed === "latest") return false;
+  return /^[\^~>=<=\d\s.|xX*-]+$/.test(trimmed);
 }
 
 // Returns the direct dependencies whose locked version does not
@@ -171,6 +210,9 @@ export function findOutOfSync(manifest: Manifest, lockfile: Lockfile): OutOfSync
   const packages = lockfile.packages ?? {};
   const outOfSync: OutOfSync[] = [];
   for (const [name, spec] of Object.entries(specs)) {
+    // Classify the spec first: non-semver specs are skipped entirely —
+    // a file:/link: entry may legitimately have no lockfile version.
+    if (!isCheckableSpec(spec)) continue;
     const locked = packages[`node_modules/${name}`]?.version;
     if (typeof locked !== "string") {
       outOfSync.push({ name, spec, locked: null });
@@ -196,6 +238,32 @@ test("satisfies: caret, tilde, exact and range comparators", () => {
   assert.equal(satisfies("3.0.0", ">=1.5.0 <3.0.0"), false);
   assert.equal(satisfies("1.2.7", "1.2.x"), true);
   assert.equal(satisfies("1.3.0", "1.2.x"), false);
+});
+
+test("satisfies: partial comparators desugar the node-semver way", () => {
+  assert.equal(satisfies("1.0.1", ">1"), false);
+  assert.equal(satisfies("2.0.0", ">1"), true);
+  assert.equal(satisfies("1.2.9", ">1.2"), false);
+  assert.equal(satisfies("1.3.0", ">1.2"), true);
+  assert.equal(satisfies("1.2.1", "<=1.2"), true);
+  assert.equal(satisfies("1.3.0", "<=1.2"), false);
+  assert.equal(satisfies("1.9.9", "<=1"), true);
+  assert.equal(satisfies("2.0.0", "<=1"), false);
+});
+
+test("satisfies: prerelease versions are excluded from ordinary ranges", () => {
+  assert.equal(satisfies("1.3.0-beta.1", "^1.2.3"), false);
+  assert.equal(satisfies("1.3.0", "^1.2.3"), true);
+});
+
+test("findOutOfSync skips non-semver specs even with no locked version", () => {
+  const manifest: Manifest = {
+    dependencies: { local: "file:../local", pinned: "^1.0.0" },
+  };
+  const lockfile: Lockfile = {
+    packages: { "node_modules/pinned": { version: "1.0.0" } },
+  };
+  assert.deepEqual(findOutOfSync(manifest, lockfile), []);
 });
 
 test("satisfies: non-semver specs are skipped", () => {
