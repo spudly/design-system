@@ -132,6 +132,8 @@ test("recovery is a guarded full reload, replaceable by onReload", () => {
     webDefault.state = { failed: true };
     const webFallback = webDefault.render();
     assert.equal(webFallback.props.actions[0].label, "Reload the app");
+    webFallback.props.actions[0].onPress();
+    assert.equal(reloads, 2, "the default Alert action reloads the page");
   } finally {
     delete (globalThis as any).window;
   }
