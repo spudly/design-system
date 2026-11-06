@@ -3,7 +3,7 @@ import { useMemo, type ReactNode } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../components/Button.js";
 import { ButtonRow } from "../components/ButtonRow.js";
-import { CandidateList } from "../components/CandidateList.js";
+import { CandidateList } from "../views/CandidateList.js";
 import { CardStack } from "../components/CardStack.js";
 import { Center } from "../components/Center.js";
 import { ListStack } from "../components/ListStack.js";

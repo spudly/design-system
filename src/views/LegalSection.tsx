@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Text as TamaguiText, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
 
 const StyledSection = styled(YStack, {
   name: "LegalSection",

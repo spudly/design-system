@@ -72,7 +72,7 @@ test("the recipes page builds its filter bar from the shared field components (#
     page.includes("CatalogFiltersBar"),
     "RecipesPage filter bar should be the shared CatalogFiltersBar",
   );
-  const bar = codeOf("src/components/CatalogFiltersBar.tsx");
+  const bar = codeOf("src/views/CatalogFiltersBar.tsx");
   for (const comp of ["SearchField", "SelectField", "TextField"]) {
     assert.ok(bar.includes(comp), `CatalogFiltersBar should use the shared ${comp}`);
   }

@@ -4,7 +4,7 @@ import { YStack } from "tamagui";
 import { Button } from "./Button.js";
 import { ButtonRow } from "./ButtonRow.js";
 import { LabeledGroup } from "./LabeledGroup.js";
-import { RevertAction } from "./RevertAction.js";
+import { RevertAction } from "../views/RevertAction.js";
 
 const meta: Meta<typeof LabeledGroup> = {
   title: "Components/LabeledGroup",

@@ -1,7 +1,7 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "./Button.js";
-import { Text } from "./Text.js";
+import { Button } from "../components/Button.js";
+import { Text } from "../components/Text.js";
 
 export type CandidateListItem = {
   /** Stable key for the candidate. */

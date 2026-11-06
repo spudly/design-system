@@ -4,7 +4,7 @@
  * extracted from RecipeDetailPage's lifecycle section.
  *
  * The pins hold the shape the page's contract depends on: the
- * list is exported from the internal components barrel, a candidate renders
+ * list is exported from the internal views barrel (#470), a candidate renders
  * its Activate action ONLY when the activation callback is
  * provided (candidate data alone exposes no dead action — the
  * invariant recipeDetailPage.test.ts pinned while the block
@@ -19,15 +19,15 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "components", "CandidateList.tsx"), "utf8");
+const source = readFileSync(join(here, "../..", "src", "views", "CandidateList.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("CandidateList is exported from the built internal components barrel", async () => {
-  const dist: Record<string, any> = await import("../../dist/components/index.js");
+test("CandidateList is exported from the built internal views barrel", async () => {
+  const dist: Record<string, any> = await import("../../dist/views/index.js");
   assert.equal(
     typeof dist.CandidateList,
     "function",
-    "CandidateList must be exported from the internal components barrel",
+    "CandidateList must be exported from the internal views barrel",
   );
 });
 

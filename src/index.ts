@@ -52,4 +52,4 @@ export {
   ChunkErrorBoundary,
   type ChunkErrorBoundaryProps,
   type ChunkErrorBoundaryState,
-} from "./components/ChunkErrorBoundary.js";
+} from "./views/ChunkErrorBoundary.js";

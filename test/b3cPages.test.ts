@@ -74,13 +74,13 @@ test("auth pages use the DS auth shell and secure password entry", () => {
   // (the extracted form components) — the masking pin follows
   // the fields there.
   for (const name of ["SignInForm", "SignUpForm", "ResetPasswordForm"]) {
-    assert.match(component(name), /secureTextEntry/, `${name} masks the password`);
+    assert.match(view(name), /secureTextEntry/, `${name} masks the password`);
   }
   // The reset token is app-side business logic: it never
   // crosses the DS boundary, not even as a prop — neither on
   // the page nor on its form unit.
   assert.doesNotMatch(page("ResetPasswordPage"), /\btoken\??:/);
-  assert.doesNotMatch(component("ResetPasswordForm"), /\btoken\??:/);
+  assert.doesNotMatch(view("ResetPasswordForm"), /\btoken\??:/);
 });
 
 test("SignUpForm footer block is consistently centered (eciperay#294)", () => {
@@ -91,7 +91,7 @@ test("SignUpForm footer block is consistently centered (eciperay#294)", () => {
   // SignUpForm unit the page composes, and the separation is
   // the form's own field rhythm — the pin follows the rendered
   // shape that carries the centering today.
-  const source = component("SignUpForm");
+  const source = view("SignUpForm");
   assert.match(
     source,
     /<TextLink textAlign="center" href={signInHref}>\s*Already have an account\? Sign in/,
@@ -132,12 +132,9 @@ test("auth cross-links render their href destinations (#248)", () => {
   // de-emphasized destinations take TextLink's muted tone (the
   // app link button's muted variant) instead of a hard-coded
   // gray — the pins follow the links into the forms.
-  assert.match(
-    component("SignInForm"),
-    /<TextLink href=\{signUpHref\}>Create an account<\/TextLink>/,
-  );
-  assert.match(component("SignInForm"), /<TextLink tone="muted" href=\{forgotPasswordHref\}>/);
-  assert.match(component("ForgotPasswordForm"), /<TextLink tone="muted" href=\{signInHref\}>/);
+  assert.match(view("SignInForm"), /<TextLink href=\{signUpHref\}>Create an account<\/TextLink>/);
+  assert.match(view("SignInForm"), /<TextLink tone="muted" href=\{forgotPasswordHref\}>/);
+  assert.match(view("ForgotPasswordForm"), /<TextLink tone="muted" href=\{signInHref\}>/);
   for (const name of ["SignInPage", "SignUpPage", "ForgotPasswordPage"]) {
     assert.doesNotMatch(
       page(name),

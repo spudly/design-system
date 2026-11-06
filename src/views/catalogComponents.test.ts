@@ -1,8 +1,8 @@
 /**
  * Contract test for the catalog components
- * (spudly/design-system#168/#119): CatalogFiltersBar,
- * CatalogHeader, and the shared list loading state
- * (ListLoadingState) — extracted from DiscoverPage in the
+ * (spudly/design-system#168/#119): CatalogFiltersBar and
+ * CatalogHeader (views since #470), and the shared list
+ * loading state (ListLoadingState) — extracted from DiscoverPage in the
  * public-pages de-styling tranche so the catalog pages compose
  * them and pass data and callbacks only. (The bar's behavior
  * contract — the #96 chooser, the removal/clearing semantics —
@@ -39,26 +39,37 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const componentsDir = join(here, "../..", "src", "components");
+const viewsDir = join(here, "../..", "src", "views");
 
-function readCode(name: string) {
-  return readFileSync(join(componentsDir, name), "utf8")
+function readCodeFrom(dir: string, name: string) {
+  return readFileSync(join(dir, name), "utf8")
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const bar = readCode("CatalogFiltersBar.tsx");
-const header = readCode("CatalogHeader.tsx");
+function readCode(name: string) {
+  return readCodeFrom(componentsDir, name);
+}
+
+const bar = readCodeFrom(viewsDir, "CatalogFiltersBar.tsx");
+const header = readCodeFrom(viewsDir, "CatalogHeader.tsx");
 const loadingState = readCode("ListLoadingState.tsx");
 
-test("the catalog components are exported from the built internal components barrel", async () => {
-  const dist: Record<string, any> = await import("../../dist/components/index.js");
-  for (const name of ["CatalogFiltersBar", "CatalogHeader", "ListLoadingState"]) {
+test("the catalog views and the loading state are exported from their built internal barrels", async () => {
+  const distViews: Record<string, any> = await import("../../dist/views/index.js");
+  for (const name of ["CatalogFiltersBar", "CatalogHeader"]) {
     assert.equal(
-      typeof dist[name],
+      typeof distViews[name],
       "function",
-      `${name} must be exported from the internal components barrel`,
+      `${name} must be exported from the internal views barrel`,
     );
   }
+  const dist: Record<string, any> = await import("../../dist/components/index.js");
+  assert.equal(
+    typeof dist.ListLoadingState,
+    "function",
+    "ListLoadingState must be exported from the internal components barrel",
+  );
 });
 
 test("the middleman list states are not shipped (PR #320)", async () => {

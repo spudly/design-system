@@ -14,7 +14,7 @@
  *    `EciperayTheme`, `MemorizeTheme`) from src/themes/;
  *    `createTamaguiConfig` from src/tamagui.config.ts; and
  *    `ChunkErrorBoundary` with its prop/state types from
- *    src/components/ChunkErrorBoundary.tsx.
+ *    src/views/ChunkErrorBoundary.tsx.
  * 3. Nothing else is on the public surface: no other widget
  *    components, no icons, no composite (form) components, and
  *    no Storybook config factories or other
@@ -102,7 +102,7 @@ const restoredByModule: [string, string[]][] = [
   ],
   ["./tamagui.config.js", ["createTamaguiConfig"]],
   [
-    "./components/ChunkErrorBoundary.js",
+    "./views/ChunkErrorBoundary.js",
     ["ChunkErrorBoundary", "ChunkErrorBoundaryProps", "ChunkErrorBoundaryState"],
   ],
 ];
@@ -143,7 +143,7 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions"
         "./tokens/index.js",
         "./themes/index.js",
         "./tamagui.config.js",
-        "./components/ChunkErrorBoundary.js",
+        "./views/ChunkErrorBoundary.js",
       ]),
       `${rel} must re-export from exactly the pages barrel and the three #411 source modules`,
     );

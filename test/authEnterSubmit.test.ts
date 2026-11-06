@@ -18,7 +18,7 @@ import test from "node:test";
  * intent.
  */
 
-const form = (name: string) => readFileSync(`src/components/${name}.tsx`, "utf8");
+const form = (name: string) => readFileSync(`src/views/${name}.tsx`, "utf8");
 
 const AUTH_FORMS = [
   { name: "SignInForm", fields: 2 },

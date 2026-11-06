@@ -3,7 +3,7 @@ import { YStack } from "tamagui";
 import { CandidateList } from "./CandidateList.js";
 
 const meta: Meta<typeof CandidateList> = {
-  title: "Components/CandidateList",
+  title: "Views/CandidateList",
   component: CandidateList,
 };
 

@@ -1,7 +1,7 @@
 import { Component, type ReactNode } from "react";
 import { isWeb } from "tamagui";
-import { Alert } from "./Alert.js";
-import { Button } from "./Button.js";
+import { Alert } from "../components/Alert.js";
+import { Button } from "../components/Button.js";
 
 export type ChunkErrorBoundaryProps = {
   children: ReactNode;

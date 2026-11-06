@@ -70,9 +70,9 @@ test("TextField translates autoComplete on web only; native passes through (#321
 });
 
 test("auth forms keep passing the native password tokens (#321)", () => {
-  assert.match(readCode("src/components/SignInForm.tsx"), /autoComplete="password"/);
-  assert.match(readCode("src/components/SignUpForm.tsx"), /autoComplete="password-new"/);
-  assert.match(readCode("src/components/ResetPasswordForm.tsx"), /autoComplete="password-new"/);
+  assert.match(readCode("src/views/SignInForm.tsx"), /autoComplete="password"/);
+  assert.match(readCode("src/views/SignUpForm.tsx"), /autoComplete="password-new"/);
+  assert.match(readCode("src/views/ResetPasswordForm.tsx"), /autoComplete="password-new"/);
 });
 
 // Runtime imports are lazy (inside the SSR tests) so the source-scan

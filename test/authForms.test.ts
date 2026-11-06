@@ -8,7 +8,7 @@
  * de-emphasized auth links take TextLink's `muted` tone.
  *
  * The pins:
- * - each form is exported from the components barrel and from
+ * - each form is exported from the views barrel and from
  *   the built dist, and each auth page composes its form unit
  *   (the page keeps its prop surface — the b3cPages pins hold
  *   the declarations);
@@ -45,8 +45,8 @@ const FORM_PAGES = {
   ResetPasswordForm: "ResetPasswordPage",
 };
 
-test("the auth forms and LegalSection are exported from the components barrel", () => {
-  const barrel = read("src/components/index.ts");
+test("the auth forms and LegalSection are exported from the views barrel", () => {
+  const barrel = read("src/views/index.ts");
   for (const name of [...FORMS, "LegalSection"]) {
     assert.match(barrel, new RegExp(String.raw`export \{ ${name},`), name);
   }
@@ -67,10 +67,10 @@ test("the auth pages compose their form units and render no fields directly", ()
 
 test("each form composes the shared FormStack and owns its submit handling", () => {
   for (const form of FORMS) {
-    const source = read(`src/components/${form}.tsx`);
+    const source = read(`src/views/${form}.tsx`);
     assert.match(
       source,
-      /import \{ FormStack \} from "\.\/FormStack\.js";/,
+      /import \{ FormStack \} from "\.\.\/components\/FormStack\.js";/,
       `${form} imports the shared FormStack`,
     );
     assert.match(source, /<FormStack>/, `${form} renders its sections in the FormStack`);
@@ -153,7 +153,7 @@ test("each form's submit button is named for the label it renders, in both state
     ResetPasswordForm: ["Updating…", "Update password"],
   };
   for (const [form, [busy, idle]] of Object.entries(BUTTON_LABELS)) {
-    const source = read(`src/components/${form}.tsx`);
+    const source = read(`src/views/${form}.tsx`);
     assert.ok(
       source.includes(`accessibilityLabel={loading ? "${busy}" : "${idle}"}`),
       `${form} names its submit button for the state it renders`,
@@ -172,7 +172,7 @@ test("each form's submit button is named for the label it renders, in both state
 });
 
 test("SignUpForm keeps the legal notice between submit and the sign-in link", () => {
-  const source = read("src/components/SignUpForm.tsx");
+  const source = read("src/views/SignUpForm.tsx");
   const submitAt = source.indexOf("Create Account");
   const noticeAt = source.indexOf("{legalNotice}");
   const linkAt = source.indexOf("Already have an account? Sign in");
@@ -184,7 +184,7 @@ test("SignUpForm keeps the legal notice between submit and the sign-in link", ()
 });
 
 test("LegalSection frames the host's links under its title in the app treatment", () => {
-  const source = read("src/components/LegalSection.tsx");
+  const source = read("src/views/LegalSection.tsx");
   assert.match(source, /title: string/, "the title crosses as the host's copy");
   assert.match(source, /children: ReactNode/, "the links cross as children");
   assert.match(

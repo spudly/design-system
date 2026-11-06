@@ -3,7 +3,7 @@
  * (design-system#411, lifted from Memorize's app shell, memorize#54).
  *
  * The contracts pinned here:
- * 1. The boundary is exported from the components barrel (and, per
+ * 1. The boundary is exported from the views barrel (and, per
  *    #411, from the package root — pinned in
  *    test/packageExports.test.ts).
  * 2. Its props/state are type aliases, not interfaces (the repo-wide
@@ -29,18 +29,23 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
-const dist: Record<string, any> = await import("../../dist/components/index.js");
+// The boundary itself is a view (#470); the Alert and Button it
+// composes are widgets, so the runtime surface spans both barrels.
+const dist: Record<string, any> = {
+  ...(await import("../../dist/components/index.js")),
+  ...(await import("../../dist/views/index.js")),
+};
 
 function codeOf(rel: string): string {
   const source = readFileSync(join(root, rel), "utf8");
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const boundary = codeOf("src/components/ChunkErrorBoundary.tsx");
-const stories = readFileSync(join(root, "src/components/ChunkErrorBoundary.stories.tsx"), "utf8");
+const boundary = codeOf("src/views/ChunkErrorBoundary.tsx");
+const stories = readFileSync(join(root, "src/views/ChunkErrorBoundary.stories.tsx"), "utf8");
 
-test("ChunkErrorBoundary is exported from the components barrel", () => {
-  const barrel = readFileSync(join(root, "src/components/index.ts"), "utf8");
+test("ChunkErrorBoundary is exported from the views barrel", () => {
+  const barrel = readFileSync(join(root, "src/views/index.ts"), "utf8");
   assert.match(
     barrel,
     /export \{\s*ChunkErrorBoundary,\s*type ChunkErrorBoundaryProps,\s*type ChunkErrorBoundaryState,\s*\} from "\.\/ChunkErrorBoundary\.js";/,
@@ -138,7 +143,7 @@ test("recovery is a guarded full reload, replaceable by onReload", () => {
 });
 
 test("stories cover the loaded and failed-to-load states", () => {
-  assert.match(stories, /title: "Components\/ChunkErrorBoundary"/);
+  assert.match(stories, /title: "Views\/ChunkErrorBoundary"/);
   assert.match(stories, /export const Loaded: Story/);
   assert.match(stories, /export const FailedToLoad: Story/);
 });

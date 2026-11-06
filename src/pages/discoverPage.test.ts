@@ -50,6 +50,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
 const pagesDir = join(root, "src", "pages");
 const componentsDir = join(root, "src", "components");
+const viewsDir = join(root, "src", "views");
 
 function readCode(path: string) {
   return readFileSync(path, "utf8")
@@ -69,8 +70,8 @@ const pageStories = readCode(join(pagesDir, "DiscoverPage.stories.tsx"));
 // bar, the heading against the header, the states against the
 // page's own composition — while the page-level pins (contract,
 // pagination wiring, composition) stay on the page.
-const bar = readCode(join(componentsDir, "CatalogFiltersBar.tsx"));
-const catalogHeader = readCode(join(componentsDir, "CatalogHeader.tsx"));
+const bar = readCode(join(viewsDir, "CatalogFiltersBar.tsx"));
+const catalogHeader = readCode(join(viewsDir, "CatalogHeader.tsx"));
 const loadingState = readCode(join(componentsDir, "ListLoadingState.tsx"));
 const card = readCode(join(componentsDir, "DiscoveryCard.tsx"));
 const cardStories = readCode(join(componentsDir, "DiscoveryCard.stories.tsx"));

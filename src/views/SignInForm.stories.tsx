@@ -4,7 +4,7 @@ import { YStack } from "tamagui";
 import { SignInForm } from "./SignInForm.js";
 
 const meta: Meta<typeof SignInForm> = {
-  title: "Components/SignInForm",
+  title: "Views/SignInForm",
   component: SignInForm,
 };
 

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { ChunkErrorBoundary } from "./ChunkErrorBoundary.js";
-import { Text } from "./Text.js";
+import { Text } from "../components/Text.js";
 
 const meta: Meta<typeof ChunkErrorBoundary> = {
-  title: "Components/ChunkErrorBoundary",
+  title: "Views/ChunkErrorBoundary",
   component: ChunkErrorBoundary,
 };
 

@@ -21,11 +21,6 @@ export {
   type CheckboxSelectListProps,
 } from "./CheckboxSelectList.js";
 export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
-export {
-  ChunkErrorBoundary,
-  type ChunkErrorBoundaryProps,
-  type ChunkErrorBoundaryState,
-} from "./ChunkErrorBoundary.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField.js";
@@ -95,28 +90,11 @@ export { TextLink, type TextLinkProps } from "./TextLink.js";
 export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./Toast.js";
 export { TokenRow, type TokenRowProps } from "./TokenRow.js";
 export { VerseText, type VerseTextProps } from "./VerseText.js";
-export { SignInForm, type SignInFormProps } from "./SignInForm.js";
-export { SignUpForm, type SignUpFormProps } from "./SignUpForm.js";
-export { ForgotPasswordForm, type ForgotPasswordFormProps } from "./ForgotPasswordForm.js";
-export { ResetPasswordForm, type ResetPasswordFormProps } from "./ResetPasswordForm.js";
-export { LegalSection, type LegalSectionProps } from "./LegalSection.js";
-
 // The #119 dedupe set: the canonical components the tranche
 // branches coined independently, shipped once here (the
 // tranche PRs adopt these in their update rounds).
 export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
-export {
-  CatalogFiltersBar,
-  type CatalogFilterDefinition,
-  type CatalogFiltersBarProps,
-  type CatalogRangeFilter,
-  type CatalogSelectFilter,
-  type CatalogSortFilter,
-  type CatalogTextFilter,
-} from "./CatalogFiltersBar.js";
-export { CatalogHeader, type CatalogHeaderProps } from "./CatalogHeader.js";
 export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
-export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
 export {
   DocumentFooter,
   type DocumentFooterLink,
@@ -151,7 +129,6 @@ export {
   type RatingsCardViewerRating,
 } from "./RatingsCard.js";
 export { RemovableField, type RemovableFieldProps } from "./RemovableField.js";
-export { RevertAction, type RevertActionProps } from "./RevertAction.js";
 export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
 export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
 export { SearchRow, type SearchRowProps } from "./SearchRow.js";
@@ -174,7 +151,6 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // their post-extraction rounds).
 export { BadgeCardRow, type BadgeCardRowAction, type BadgeCardRowProps } from "./BadgeCardRow.js";
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
-export { CandidateList, type CandidateListItem, type CandidateListProps } from "./CandidateList.js";
 export { CheckRow, type CheckRowProps } from "./CheckRow.js";
 export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";
 export { FormSubmit, type FormSubmitProps } from "./FormSubmit.js";

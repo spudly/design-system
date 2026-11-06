@@ -1,5 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { ResetPasswordForm } from "../components/ResetPasswordForm.js";
+import { ResetPasswordForm } from "../views/ResetPasswordForm.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
 import { Text } from "../components/Text.js";
