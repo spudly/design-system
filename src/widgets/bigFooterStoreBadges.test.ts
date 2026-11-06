@@ -46,6 +46,14 @@ test("each store value maps to its matching badge component (#466)", () => {
   assert.match(footer, /"google-play": GooglePlayBadge/);
   assert.match(footer, /const Badge = STORE_BADGES\[link\.store\];/);
   assert.match(footer, /<Badge \/>/);
+  // The badge renders INSIDE its anchor: the SSR harness's
+  // react-native-svg stub renders no badge artwork, so the
+  // nesting is pinned here at source level — the same pattern
+  // icons.test.ts uses for glyph rendering (#246).
+  assert.match(
+    footer,
+    /<StyledBigFooterStoreAnchor[\s\S]*?<Badge \/>\s*<\/StyledBigFooterStoreAnchor>/,
+  );
 });
 
 test("the badges are bundled SVG artwork at the stores' required sizes (#466)", () => {
