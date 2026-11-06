@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Anchor, ScrollView, XStack, YStack, isWeb, styled } from "tamagui";
+import { Anchor, ScrollView, XStack, YStack, isWeb, styled, useTheme } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { SocialFacebookIcon } from "../icons/SocialFacebookIcon.js";
 import { SocialGithubIcon } from "../icons/SocialGithubIcon.js";
@@ -145,15 +145,15 @@ const SOCIAL_ICONS: Record<BigFooterSocialIcon, (props: IconComponentProps) => R
  */
 const StyledBigFooterSocialAnchor = styled(Anchor, {
   name: "BigFooterSocialAnchor",
-  color: "$primary",
+  color: "$onPrimary",
   padding: tokens.spacing[3],
   textDecorationLine: "none",
 });
 
-/** The big wordmark's treatment: primary ink, bold, at the heading size, never underlined. */
+/** The big wordmark's treatment: on-primary ink, bold, at the heading size, never underlined. */
 const StyledBigFooterBrandAnchor = styled(Anchor, {
   name: "BigFooterBrandAnchor",
-  color: "$primary",
+  color: "$onPrimary",
   fontSize: tokens.typography.fontSize["3xl"],
   fontWeight: tokens.typography.fontWeight.bold,
   textDecorationLine: "none",
@@ -168,11 +168,15 @@ const StyledBigFooterBrandAnchor = styled(Anchor, {
  */
 export function BigFooter({ footer }: BigFooterProps) {
   const { brand, columns, storeLinks, socialLinks } = footer;
+  // The social glyphs' ink, resolved to a concrete value: react-native-svg
+  // cannot inherit the anchor's text color on native (the Button
+  // useGlyphInk precedent), so the on-primary role is read from the
+  // active theme and passed to the glyph explicitly.
+  const theme = useTheme();
+  const socialInk = typeof theme.onPrimary?.val === "string" ? theme.onPrimary.val : "#ffffff";
   return (
     <YStack
-      backgroundColor="$surface"
-      borderTopWidth={1}
-      borderColor={tokens.colors.gray.gray2}
+      backgroundColor="$primary"
       paddingHorizontal="$6"
       paddingVertical="$6"
       gap="$5"
@@ -212,7 +216,7 @@ export function BigFooter({ footer }: BigFooterProps) {
                   href={link.href}
                   cursor="web:pointer"
                 >
-                  <IconGlyph size={24} />
+                  <IconGlyph size={24} color={socialInk} />
                 </StyledBigFooterSocialAnchor>
               );
             })}
@@ -229,12 +233,15 @@ export function BigFooter({ footer }: BigFooterProps) {
               flexBasis={BIG_FOOTER_COLUMN_BASIS}
               gap="$3"
             >
-              <Text variant="label">{column.title}</Text>
+              <Text variant="label" color="$onPrimary">
+                {column.title}
+              </Text>
               <YStack gap="$2">
                 {column.links.map((link) => (
                   <TextLink
                     key={link.href}
                     href={link.href}
+                    color="$onPrimary"
                     fontSize={tokens.typography.fontSize.sm}
                   >
                     {link.label}

@@ -131,8 +131,7 @@ test("PublicFrameHeader is the surface band with wordmark and sign-in link", () 
 test("BigFooter replaced PublicFrameFooter as the frame footer (#410)", () => {
   // PublicFrameFooter is retired: BigFooter covers every page-frame
   // use (PublicPageFrame renders it), and it stays unexported.
-  assert.match(footer, /backgroundColor="\$surface"/);
-  assert.match(footer, /borderTopWidth=\{1\}/);
+  assert.match(footer, /backgroundColor="\$primary"/, "the primary band (#465)");
   assert.match(footer, /flexWrap="wrap"/, "the columns wrap — the mobile collapse");
   assert.match(footer, /export type BigFooterData = \{/);
   assert.match(footer, /columns: BigFooterColumn\[\];/);
