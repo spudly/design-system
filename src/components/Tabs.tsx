@@ -237,7 +237,23 @@ export function Tabs(props: TabsProps) {
           const active = tab.value === value;
           const Glyph = tab.icon !== undefined ? iconsByName[tab.icon] : undefined;
           return (
-            <StyledTab key={tab.value} value={tab.value} active={active}>
+            <StyledTab
+              key={tab.value}
+              value={tab.value}
+              active={active}
+              // #454: Tamagui's headless useTab puts a generated
+              // panel id in every tab's aria-controls, but this
+              // widget renders triggers only — no tabpanel ever
+              // exists for a consumer to pair with (the id is a
+              // per-instance useId value, so a host cannot render
+              // a matching panel either). Suppress the dangling
+              // reference at the widget level; caller props spread
+              // after the primitive's a11y props in Tamagui's Tab,
+              // so an explicit undefined wins. Consumers render
+              // their panels conditionally on `value` (see the
+              // Tabs doc comment) without a controls pairing.
+              {...{ "aria-controls": undefined }}
+            >
               {Glyph ? (
                 <Glyph size={20} color={active ? glyphInks.active : glyphInks.inactive} />
               ) : null}
