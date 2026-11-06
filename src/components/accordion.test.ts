@@ -128,6 +128,13 @@ test("the section header is keyboard-operable on web and at least 44px tall", ()
   assert.match(section, /minHeight=\{44\}/);
 });
 
+test("the section's CollapsibleIcon sits to the left of the title (#458)", () => {
+  const iconAt = section.indexOf("<CollapsibleIcon");
+  const titleAt = section.indexOf('<Text variant="subheading"');
+  assert.ok(iconAt >= 0 && titleAt >= 0, "header must render both the icon and the title");
+  assert.ok(iconAt < titleAt, "the icon must precede the title in the header row");
+});
+
 test("the section's indicator is the icons module's CollapsibleIcon (#250)", () => {
   assert.match(section, /import \{ CollapsibleIcon \} from "\.\.\/icons\/CollapsibleIcon\.js"/);
   assert.match(section, /<CollapsibleIcon isOpen=\{open\} size=\{20\}/);

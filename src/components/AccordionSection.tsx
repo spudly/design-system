@@ -32,10 +32,11 @@ export type AccordionSectionProps = {
 /**
  * One expandable section (spudly/design-system#178, adopting the
  * shuoink/ui AccordionSection as spec): a bordered frame whose header
- * row is a real button (title + chevron) and whose body expands and
+ * row is a real button (chevron + title) and whose body expands and
  * collapses with the Collapsible height animation. The chevron is
  * the icons module's CollapsibleIcon — one glyph pointing right
- * while closed, rotating down while open (#455).
+ * while closed, rotating down while open (#455) — and it sits to
+ * the left of the section title (#458).
  *
  * State follows the DS controlled/uncontrolled pair: pass `isOpen`
  * to control it (with `onOpenChange` reporting presses), or omit it
@@ -108,16 +109,15 @@ export function AccordionSection({
         tabIndex={0}
         cursor="web:pointer"
         alignItems="center"
-        justifyContent="space-between"
         gap={tokens.spacing[3]}
         minHeight={44}
         paddingHorizontal={tokens.spacing[4]}
         paddingVertical={tokens.spacing[3]}
       >
+        <CollapsibleIcon isOpen={open} size={20} color={tokens.colors.gray.gray7} />
         <Text variant="subheading" flex={1}>
           {title}
         </Text>
-        <CollapsibleIcon isOpen={open} size={20} color={tokens.colors.gray.gray7} />
       </XStack>
       <Collapsible isOpen={open}>
         <YStack borderTopWidth={1} borderColor="$borderColor" padding={tokens.spacing[4]}>
