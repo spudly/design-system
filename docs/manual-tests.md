@@ -1352,7 +1352,8 @@ Shared-with-me screen.
 ## RecipeDetailPage
 
 Open in `Pages/Eciperay/RecipeDetailPage`: Default, Minimal, CreateDraft,
-Loading, Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition.
+Loading, Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition,
+SharingAndComments.
 
 1. The overview action row: Print and Share render as **real icons**
    (printer / share-2 from the DS internal icons module) in the same neutral
@@ -1368,6 +1369,12 @@ Loading, Ingredients, Instructions, CookHistory, CookLogFormOpen, Nutrition.
    (there is no draft to link to yet; the host creates one, then
    navigates). In Default, where a draft exists, "Edit draft"
    renders as a link carrying the existing draft's href.
+5. SharingAndComments: the Sharing card renders in the overview
+   after the lifecycle section (visibility radio group with the
+   Unlisted option selected, share-link row with Rotate and Copy
+   buttons), and the Comments card renders under the ratings
+   card — two comments (the stale one carrying its warning
+   marker) over an empty composer with a disabled Post button.
 
 **Run when:** `src/pages/RecipeDetailPage.tsx`, its stories, or a
 changeset naming RecipeDetailPage.
@@ -2039,3 +2046,250 @@ Open in `Components/FormSubmit`: Default.
 a form page composing it, or a changeset naming it.
 (FormStack and FormHeading are covered by the Form set
 section above.)
+
+---
+
+## CookingModePage
+
+Open in `Pages/Eciperay/CookingModePage`: WithIngredientsPanel,
+FirstStep, LastStep.
+
+1. WithIngredientsPanel: the scaled-ingredients panel renders
+   between the "Step 2 of 3" label and the step body — heading
+   line plus the four ingredient lines on the translucent
+   panel, readable against the dark overlay.
+2. FirstStep: no Back control renders (the nav shows only
+   Next); LastStep: the Next control renders disabled and Back
+   is present.
+3. The progress dots track the step (second dot active in
+   WithIngredientsPanel, first in FirstStep, third in LastStep).
+
+**Run when:** `src/pages/CookingModePage.tsx`, its stories,
+`src/components/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
+or a changeset naming CookingModePage.
+
+---
+
+## PayPage
+
+Open in `Pages/Eciperay/PayPage`: Opening, Closed, ErrorState,
+NeedsTransaction, Unconfigured.
+
+1. Opening: a spinner and "Opening the secure payment window…"
+   render inside the card; no action button renders.
+2. Closed offers "Reopen checkout"; ErrorState offers
+   "Try again"; NeedsTransaction's card title reads "Checkout"
+   and its button carries the host-supplied home label;
+   Unconfigured renders its explanatory line with no button.
+
+**Run when:** `src/pages/PayPage.tsx`, its stories, or a
+changeset naming PayPage.
+
+---
+
+## ConsentPreferencesPage
+
+Open in `Pages/Eciperay/ConsentPreferencesPage`: Accepted,
+NotSet.
+
+1. Accepted: the current-choice line reads "Your current
+   choice: Accepted"; NotSet reads "Not set". Accept / Decline
+   / Withdraw render in one row under the choice line, with
+   the withdraw hint under the row.
+
+**Run when:** `src/pages/ConsentPreferencesPage.tsx`, its
+stories, or a changeset naming ConsentPreferencesPage.
+
+---
+
+## AuthConfirmationPage
+
+Open in `Pages/Eciperay/AuthConfirmationPage`: CheckYourEmail,
+WithoutBackLink.
+
+1. CheckYourEmail: title, muted body, and the "Back to sign in"
+   link render in the auth shell; the link is a real anchor
+   carrying its href. WithoutBackLink renders no link.
+
+**Run when:** `src/pages/AuthConfirmationPage.tsx`, its
+stories, or a changeset naming AuthConfirmationPage.
+
+---
+
+## RouteErrorPage
+
+Open in `Pages/Eciperay/RouteErrorPage`: NotFound, ErrorState.
+
+1. NotFound reads "Page not found" and ErrorState reads
+   "Something went wrong", each with its own message and the
+   "Go to the home page" link as a real anchor.
+
+**Run when:** `src/pages/RouteErrorPage.tsx`, its stories, or
+a changeset naming RouteErrorPage.
+
+---
+
+## ProfilePage coverage sections
+
+Open in `Pages/Eciperay/ProfilePage`: WithCoverageSections
+(WithSections covers the slot form).
+
+1. The four typed sections render in slot order: Subscription
+   (plan + status + Manage button) before the feedback
+   Preferences card; Transfer recipes (picker with one selected
+   recipe and "Export selected (1)") and Your data (Download /
+   Delete account) after it; Legal and Sign Out close the page.
+
+**Run when:** `src/pages/ProfilePage.tsx`, its stories, the
+four section views below, or a changeset naming ProfilePage.
+
+---
+
+## RecipeCommentsView
+
+Open in `Views/RecipeCommentsView`: WithComposer, Editing,
+Empty, Loading, SignedOut.
+
+1. WithComposer: two comments render in the bordered card (the
+   stale one with its warning marker), and the composer shows
+   an empty field with a disabled Post button.
+2. Editing: the first comment renders its inline editor with
+   the draft text and Save / Cancel actions. Empty shows
+   "No comments yet" with the composer; Loading shows only a
+   spinner; SignedOut shows the comments with no composer.
+
+**Run when:** `src/views/RecipeCommentsView.tsx`, its
+stories, RecipeDetailPage, or a changeset naming
+RecipeCommentsView.
+
+---
+
+## RecipeSharingView
+
+Open in `Views/RecipeSharingView`: PublicWithConsent, Private.
+
+1. PublicWithConsent: the Public option is selected, the
+   discoverability warning shows, the consent checkbox is
+   unchecked and **Save visibility is disabled** until it is
+   checked; the share-link row (Rotate / Copy) and the public
+   permalink row render under the Save button.
+2. Private: no warning, no consent checkbox, no permalink row.
+
+**Run when:** `src/views/RecipeSharingView.tsx`, its stories,
+RecipeDetailPage, or a changeset naming RecipeSharingView.
+
+---
+
+## SubscriptionView
+
+Open in `Views/SubscriptionView`: Active, FreeUpsell, Loading.
+
+1. Active: plan name, status line, Manage subscription and
+   Check again buttons, and the portal link render on the
+   elevated card. FreeUpsell shows the upsell line and its
+   manage action only. Loading shows the spinner with its
+   "Loading subscription…" line.
+
+**Run when:** `src/views/SubscriptionView.tsx`, its stories,
+ProfilePage, or a changeset naming SubscriptionView.
+
+---
+
+## FeedbackPreferenceView
+
+Open in `Views/FeedbackPreferenceView`: ConsentAccepted,
+PromptOpen, ShortcutUnavailable.
+
+1. ConsentAccepted: the shortcut checkbox is checked, the
+   status line reads "Analytics consent: Accepted", Decline
+   and Withdraw consent actions render (no Accept), and the
+   privacy-choices sentence ends in a real link.
+2. PromptOpen: the consent prompt text renders with Decline /
+   Accept buttons in place of the action row.
+3. ShortcutUnavailable: the checkbox is disabled and the
+   unavailable hint shows under it.
+
+**Run when:** `src/views/FeedbackPreferenceView.tsx`, its
+stories, ProfilePage, or a changeset naming
+FeedbackPreferenceView.
+
+---
+
+## TransferRecipesView & RecipeExportPickerView
+
+Open in `Views/TransferRecipesView`: Default; and in
+`Views/RecipeExportPickerView`: WithSelection, Loading.
+
+1. Transfer Default: the section hint, the picker (toolbar
+   with "1 selected", two listed recipes, "Export selected
+   (1)"), the Import recipes button, and the success summary
+   line render in order on the elevated card.
+2. Picker Loading: the list region shows the loading spinner
+   and the export button is disabled.
+
+**Run when:** `src/views/TransferRecipesView.tsx`,
+`src/views/RecipeExportPickerView.tsx`, their stories,
+ProfilePage, or a changeset naming either view.
+
+---
+
+## AccountDataView
+
+Open in `Views/AccountDataView`: Default, WithError.
+
+1. Default: the hint line and the Download my data / Delete
+   account row render on the elevated card, Delete in the
+   danger treatment. WithError adds the error line under the
+   buttons.
+
+**Run when:** `src/views/AccountDataView.tsx`, its stories,
+ProfilePage, or a changeset naming AccountDataView.
+
+---
+
+## ConfirmActionView
+
+Open in `Views/ConfirmActionView`: DeleteConfirmation,
+WithError, Notice.
+
+1. DeleteConfirmation: the dialog is titled with its
+   description, Cancel in the secondary treatment and Delete
+   recipe in the danger treatment; keyboard focus lands inside
+   the dialog and Tab cycles within it.
+2. WithError: the error alert renders inside the dialog above
+   the actions. Notice: a single primary OK action, no Cancel.
+
+**Run when:** `src/views/ConfirmActionView.tsx`, its stories,
+RecipeDetailPage, or a changeset naming ConfirmActionView.
+
+---
+
+## ConsentBannerView & InstallBannerView
+
+Open in `Views/ConsentBannerView`: Default; and in
+`Views/InstallBannerView`: Default.
+
+1. Consent banner: the message renders with the Privacy
+   Policy link inline (a real anchor), Decline before Accept
+   in the action row, pinned to the bottom edge.
+2. Install banner: pinned to the top edge, message followed by
+   the App Store and Google Play links, with a dismiss control
+   whose accessible name is "Dismiss install banner".
+
+**Run when:** `src/views/ConsentBannerView.tsx`,
+`src/views/InstallBannerView.tsx`, their stories, or a
+changeset naming either view.
+
+---
+
+## ScaledIngredientsView
+
+Open in `Views/ScaledIngredientsView`: OnOverlay.
+
+1. The panel renders on the dark surface with its heading and
+   five ingredient lines readable; with more lines than fit,
+   the list scrolls inside the panel instead of growing it.
+
+**Run when:** `src/views/ScaledIngredientsView.tsx`, its
+stories, CookingModePage, or a changeset naming
+ScaledIngredientsView.

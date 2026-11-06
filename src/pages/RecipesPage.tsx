@@ -324,6 +324,28 @@ export type RecipesPageProps = {
    * fire-once-per-content-length end-reached semantics and an
    * empty page cannot re-arm the signal on its own. */
   isFetchingNextPage?: boolean;
+  /**
+   * Own-section next page in flight (#438 Part 3): a loading
+   * row renders after the own rows. The own section paginates
+   * separately from discovery (its continuation is the host's
+   * own query, not the shared catalog pattern), so it carries
+   * its own fetch signal; hosts whose own section does not
+   * paginate omit it. The host app screens used to compose
+   * this row themselves from Alert / Spinner (the audit's
+   * coverage rows for the browse screens).
+   */
+  isFetchingNextOwnPage?: boolean;
+  /**
+   * Own-section next-page failure (#438 Part 3): an error row
+   * with a retry action renders after the own rows, in place
+   * of the loading row. The first-page failure stays
+   * `ownErrorMessage`; this is only the load-more failure.
+   */
+  ownLoadMoreErrorMessage?: string | null;
+  /** The load-more error row's retry intent; the row renders only with the message. */
+  onOwnLoadMoreRetry?: () => void;
+  /** The retry action's label ("Try again"). */
+  ownLoadMoreRetryLabel?: string;
   /** Optional own-row action, mirroring the app card's log-cook
    * affordance. "Log cook" is a callback only — the cook-log
    * form and its mutation stay in the app, which renders them
@@ -400,6 +422,8 @@ type RecipesPageRow =
   | { kind: "loadingOwn" }
   | { kind: "ownError"; message: string }
   | { kind: "ownEmpty" }
+  | { kind: "loadingOwnMore" }
+  | { kind: "ownLoadMoreError"; message: string }
   | { kind: "discoveryHeading" }
   | { kind: "discoveryRecipe"; item: RecipesPageDiscoveryItem }
   | { kind: "loadingDiscovery" }
@@ -418,6 +442,10 @@ function recipesPageRowKey(row: RecipesPageRow): string {
       return "own-error";
     case "ownEmpty":
       return "own-empty";
+    case "loadingOwnMore":
+      return "own-loading-more";
+    case "ownLoadMoreError":
+      return "own-load-more-error";
     case "discoveryHeading":
       return "discovery-heading";
     case "discoveryRecipe":
@@ -454,6 +482,10 @@ export function RecipesPage(props: RecipesPageProps) {
     discoveryEmptyTitle = "No public recipes match your search.",
     discoveryEmptyBody,
     isFetchingNextPage = false,
+    isFetchingNextOwnPage = false,
+    ownLoadMoreErrorMessage = null,
+    onOwnLoadMoreRetry,
+    ownLoadMoreRetryLabel = "Try again",
     onLogCookPress,
     onLoadMore,
     renderRecipeAccessory,
@@ -581,6 +613,14 @@ export function RecipesPage(props: RecipesPageProps) {
     for (const item of ownRecipes) {
       rows.push({ kind: "ownRecipe", item });
     }
+    // The own section's load-more state (#438 Part 3): the
+    // failure row wins over the loading row, as a section's
+    // error replaces its spinner in the sections above.
+    if (ownLoadMoreErrorMessage) {
+      rows.push({ kind: "ownLoadMoreError", message: ownLoadMoreErrorMessage });
+    } else if (isFetchingNextOwnPage) {
+      rows.push({ kind: "loadingOwnMore" });
+    }
   }
   rows.push({ kind: "discoveryHeading" });
   if (loadingDiscovery) {
@@ -674,6 +714,20 @@ export function RecipesPage(props: RecipesPageProps) {
                   <EmptyState
                     title={ownEmptyTitle}
                     {...(ownEmptyBody ? { body: ownEmptyBody } : {})}
+                  />
+                );
+              case "loadingOwnMore":
+                return <ListLoadingState label="Loading" />;
+              case "ownLoadMoreError":
+                return (
+                  <Alert
+                    severity="error"
+                    message={row.message}
+                    {...(onOwnLoadMoreRetry
+                      ? {
+                          actions: [{ label: ownLoadMoreRetryLabel, onPress: onOwnLoadMoreRetry }],
+                        }
+                      : {})}
                   />
                 );
               case "discoveryHeading":
