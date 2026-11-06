@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "./Button.js";
-import { RemovableField } from "./RemovableField.js";
-import { SearchField } from "../views/SearchField.js";
-import { SearchRow } from "./SearchRow.js";
-import { SelectField, type SelectOption } from "./SelectField.js";
-import { TextField } from "../views/TextField.js";
+import { Button } from "../components/Button.js";
+import { RemovableField } from "../components/RemovableField.js";
+import { SearchField } from "./SearchField.js";
+import { SearchRow } from "../components/SearchRow.js";
+import { SelectField, type SelectOption } from "../components/SelectField.js";
+import { TextField } from "./TextField.js";
 
 /**
  * The catalog filter bar (#96, #168): the collapsed filter

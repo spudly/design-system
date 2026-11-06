@@ -1,10 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { Alert } from "../components/Alert.js";
-import {
-  CatalogFiltersBar,
-  type CatalogFilterDefinition,
-} from "../components/CatalogFiltersBar.js";
-import { CatalogHeader } from "../components/CatalogHeader.js";
+import { CatalogFiltersBar, type CatalogFilterDefinition } from "../views/CatalogFiltersBar.js";
+import { CatalogHeader } from "../views/CatalogHeader.js";
 import { DiscoveryCard } from "../components/DiscoveryCard.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { ListLoadingState } from "../components/ListLoadingState.js";

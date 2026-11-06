@@ -1,8 +1,8 @@
-import { Alert } from "./Alert.js";
-import { Button } from "./Button.js";
-import { FormStack } from "./FormStack.js";
-import { TextField } from "../views/TextField.js";
-import { TextLink } from "./TextLink.js";
+import { Alert } from "../components/Alert.js";
+import { Button } from "../components/Button.js";
+import { FormStack } from "../components/FormStack.js";
+import { TextField } from "./TextField.js";
+import { TextLink } from "../components/TextLink.js";
 
 /**
  * ForgotPasswordForm (#119): the reset-request form — the

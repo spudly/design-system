@@ -60,7 +60,7 @@ test("the slot composes the internal boundary around a Suspense", () => {
   const element = distViews.LazySlot({ children: "surface content" });
   assert.equal(
     element.type,
-    distComponents.ChunkErrorBoundary,
+    distViews.ChunkErrorBoundary,
     "the outer element is the internal ChunkErrorBoundary — its fallback is the established one",
   );
   assert.equal(

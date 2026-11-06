@@ -6,10 +6,7 @@ import { platformAccessibilityProps } from "../components/accessibility.js";
 import { Alert } from "../components/Alert.js";
 import { Badge } from "../components/Badge.js";
 import { Card } from "../components/Card.js";
-import {
-  CatalogFiltersBar,
-  type CatalogFilterDefinition,
-} from "../components/CatalogFiltersBar.js";
+import { CatalogFiltersBar, type CatalogFilterDefinition } from "../views/CatalogFiltersBar.js";
 import { DiscoveryCard } from "../components/DiscoveryCard.js";
 import { EmptyState } from "../components/EmptyState.js";
 import { LinkOverlay } from "../components/linkOverlay.js";

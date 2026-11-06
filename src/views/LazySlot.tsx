@@ -1,6 +1,6 @@
 import { Suspense, type ReactNode } from "react";
 import { Center } from "../components/Center.js";
-import { ChunkErrorBoundary } from "../components/ChunkErrorBoundary.js";
+import { ChunkErrorBoundary } from "./ChunkErrorBoundary.js";
 import { Spinner } from "../components/Spinner.js";
 
 export type LazySlotProps = {

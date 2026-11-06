@@ -1,7 +1,7 @@
 import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Text } from "./Text.js";
-import { TextAction } from "./TextAction.js";
+import { Text } from "../components/Text.js";
+import { TextAction } from "../components/TextAction.js";
 
 export type ChangedListBannerProps = {
   /** The host-formatted summary line (the parent summary is

@@ -2,10 +2,10 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { RevertAction } from "./RevertAction.js";
-import { Text } from "./Text.js";
+import { Text } from "../components/Text.js";
 
 const meta: Meta<typeof RevertAction> = {
-  title: "Components/RevertAction",
+  title: "Views/RevertAction",
   component: RevertAction,
 };
 

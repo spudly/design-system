@@ -4,7 +4,7 @@ import { YStack } from "tamagui";
 import { ResetPasswordForm } from "./ResetPasswordForm.js";
 
 const meta: Meta<typeof ResetPasswordForm> = {
-  title: "Components/ResetPasswordForm",
+  title: "Views/ResetPasswordForm",
   component: ResetPasswordForm,
 };
 

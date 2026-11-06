@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
-import { SignInForm } from "../components/SignInForm.js";
+import { SignInForm } from "../views/SignInForm.js";
 import { Text } from "../components/Text.js";
 
 /**

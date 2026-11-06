@@ -31,13 +31,17 @@ const read = (rel: string) => readFileSync(join(root, rel), "utf8");
 const ERROR_ALERT = '<Alert severity="error" message={error} />';
 
 // #438 Part 2: the form fragments the pages share live in
-// src/views; the auth forms remain widgets in src/components.
+// src/views; the auth forms joined them as views in #470.
 const VIEW_FORM_COMPONENTS = new Set([
   "NutritionGoalsForm",
   "AccessTokensPanel",
   "TextField",
   "TextAreaField",
   "CheckboxField",
+  "SignInForm",
+  "SignUpForm",
+  "ForgotPasswordForm",
+  "ResetPasswordForm",
 ]);
 const formSource = (name: string) =>
   read(`src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : "components"}/${name}.tsx`);

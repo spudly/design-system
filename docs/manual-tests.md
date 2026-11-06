@@ -734,8 +734,8 @@ header, or a changeset naming either.
 
 ## CatalogFiltersBar & CatalogHeader
 
-Open in `Components/CatalogFiltersBar`: Collapsed, ChooserOpen,
-WithFiltersAdded; and `Components/CatalogHeader`: Default.
+Open in `Views/CatalogFiltersBar`: Collapsed, ChooserOpen,
+WithFiltersAdded; and `Views/CatalogHeader`: Default.
 
 1. Collapsed: a search field with its clear button and a
    Filters button; below them the caller-supplied sorter row
@@ -751,8 +751,8 @@ WithFiltersAdded; and `Components/CatalogHeader`: Default.
 4. CatalogHeader Default: the title renders as the heading
    above the composed bar, left-aligned at the column inset.
 
-**Run when:** `src/components/CatalogFiltersBar.tsx`,
-`src/components/CatalogHeader.tsx`, their stories, the catalog
+**Run when:** `src/views/CatalogFiltersBar.tsx`,
+`src/views/CatalogHeader.tsx`, their stories, the catalog
 pages, or a changeset naming either.
 
 ---
@@ -906,7 +906,7 @@ Open in `Components/FormStack`: Default;
 `Components/LabeledField`: Default, WithAction, WithError;
 `Components/LabeledGroup`: Default, WithAction;
 `Components/FieldLabel`: Default, Associated;
-`Components/RevertAction` and `Components/ChangedListBanner`
+`Views/RevertAction` and `Views/ChangedListBanner`
 (their stories).
 
 1. FormStack: fields render in order with the form rhythm —
@@ -1690,19 +1690,19 @@ submit switches the page to its loading state).
 **Run when:** `src/pages/SignInPage.tsx`,
 `src/pages/SignUpPage.tsx`, `src/pages/ForgotPasswordPage.tsx`,
 `src/pages/ResetPasswordPage.tsx`, the form components they
-compose (`src/components/SignInForm.tsx`,
-`src/components/SignUpForm.tsx`,
-`src/components/ForgotPasswordForm.tsx`,
-`src/components/ResetPasswordForm.tsx`), their stories, or a
+compose (`src/views/SignInForm.tsx`,
+`src/views/SignUpForm.tsx`,
+`src/views/ForgotPasswordForm.tsx`,
+`src/views/ResetPasswordForm.tsx`), their stories, or a
 changeset naming the auth pages or Enter-to-submit.
 
 ---
 
 ## Auth forms (SignInForm, SignUpForm, ForgotPasswordForm, ResetPasswordForm) & LegalSection
 
-Open in `Components/SignInForm`, `Components/SignUpForm`,
-`Components/ForgotPasswordForm`, `Components/ResetPasswordForm`,
-`Components/LegalSection` (each form's Default story — the
+Open in `Views/SignInForm`, `Views/SignUpForm`,
+`Views/ForgotPasswordForm`, `Views/ResetPasswordForm`,
+`Views/LegalSection` (each form's Default story — the
 stories are interactive: fields can be typed in).
 
 The auth pages' forms as standalone components: each form
@@ -1727,11 +1727,11 @@ forms.
    semibold) sits 12px above the two links, which stack 12px
    apart — the Profile page's legal block.
 
-**Run when:** `src/components/SignInForm.tsx`,
-`src/components/SignUpForm.tsx`,
-`src/components/ForgotPasswordForm.tsx`,
-`src/components/ResetPasswordForm.tsx`,
-`src/components/LegalSection.tsx`, their stories, the auth or
+**Run when:** `src/views/SignInForm.tsx`,
+`src/views/SignUpForm.tsx`,
+`src/views/ForgotPasswordForm.tsx`,
+`src/views/ResetPasswordForm.tsx`,
+`src/views/LegalSection.tsx`, their stories, the auth or
 Profile pages that compose them, or a changeset naming the
 auth forms or LegalSection.
 
@@ -1792,7 +1792,7 @@ stories, or a changeset naming AutocompletePicker.
 
 ## CandidateList
 
-Open in `Components/CandidateList`: Default, Pending,
+Open in `Views/CandidateList`: Default, Pending,
 ReadOnly.
 
 1. Default: the heading sits over one tinted card per
@@ -1804,7 +1804,7 @@ ReadOnly.
 3. ReadOnly: the cards render their labels with no Activate
    button — candidate data alone exposes no dead action.
 
-**Run when:** `src/components/CandidateList.tsx`, its
+**Run when:** `src/views/CandidateList.tsx`, its
 stories, or a changeset naming CandidateList.
 
 ---

@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
 import type { ReactNode } from "react";
 import { ScreenContainer } from "../components/ScreenContainer.js";
 import { SectionStack } from "../components/SectionStack.js";
-import { SignUpForm } from "../components/SignUpForm.js";
+import { SignUpForm } from "../views/SignUpForm.js";
 import { Text } from "../components/Text.js";
 
 /**

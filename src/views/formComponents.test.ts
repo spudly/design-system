@@ -47,16 +47,21 @@ const COMPONENTS = [
   "FormSubmit",
 ];
 
+// RevertAction and ChangedListBanner are views since #470; the
+// rest of the set remains in src/components.
+const VIEWS = new Set(["RevertAction", "ChangedListBanner"]);
+const homeOf = (name: string) => (VIEWS.has(name) ? "views" : "components");
+
 for (const name of COMPONENTS) {
-  test(`${name} is exported from the built internal components barrel`, () => {
+  test(`${name} is exported from the built internal dist surface`, () => {
     assert.equal(typeof dist[name], "function", `${name} must be a runtime export`);
   });
-  test(`${name}Props is a type-only export from the built components barrel`, () => {
-    const barrel = readRepoFile("dist/components/index.d.ts");
+  test(`${name}Props is a type-only export from its built internal barrel`, () => {
+    const barrel = readRepoFile(`dist/${homeOf(name)}/index.d.ts`);
     assert.match(barrel, new RegExp(String.raw`export \{[^}]*type ${name}Props[^}]*\}`));
   });
   test(`${name} offers no styling or spacing props and uses type aliases only`, () => {
-    const source = readRepoFile(`src/components/${name}.tsx`);
+    const source = readRepoFile(`src/${homeOf(name)}/${name}.tsx`);
     assert.doesNotMatch(source, /spaceBefore|spaceAfter|className|style\??:/);
     assert.doesNotMatch(source, /\binterface\s/);
   });
@@ -140,7 +145,7 @@ test("FormHeading owns the title treatment, its 24px separation, and the optiona
 });
 
 test("RevertAction is the warning text action composed on TextAction", () => {
-  const source = readRepoFile("src/components/RevertAction.tsx");
+  const source = readRepoFile("src/views/RevertAction.tsx");
   assert.match(source, /Revert to: \$\{label\}/);
   // Cluster C3 of the dedupe: the button role and its keyboard
   // behavior are TextAction's — no hand-rolled pressable.
@@ -150,7 +155,7 @@ test("RevertAction is the warning text action composed on TextAction", () => {
 });
 
 test("ChangedListBanner keeps the warning wash and offers its revert only when given one", () => {
-  const source = readRepoFile("src/components/ChangedListBanner.tsx");
+  const source = readRepoFile("src/views/ChangedListBanner.tsx");
   assert.match(source, /backgroundColor=\{tokens\.colors\.warning\.warning1\}/);
   assert.match(source, /\{onRevert \? \(/);
   assert.match(source, /<TextAction/, "the revert renders through TextAction (cluster C3)");

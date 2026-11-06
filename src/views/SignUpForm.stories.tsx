@@ -2,11 +2,11 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { SignUpForm } from "./SignUpForm.js";
-import { Text } from "./Text.js";
-import { TextLink } from "./TextLink.js";
+import { Text } from "../components/Text.js";
+import { TextLink } from "../components/TextLink.js";
 
 const meta: Meta<typeof SignUpForm> = {
-  title: "Components/SignUpForm",
+  title: "Views/SignUpForm",
   component: SignUpForm,
 };
 

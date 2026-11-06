@@ -2,10 +2,10 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { CatalogFiltersBar, type CatalogFilterDefinition } from "./CatalogFiltersBar.js";
 import { CatalogHeader } from "./CatalogHeader.js";
-import type { SelectOption } from "./SelectField.js";
+import type { SelectOption } from "../components/SelectField.js";
 
 const meta: Meta<typeof CatalogHeader> = {
-  title: "Components/CatalogHeader",
+  title: "Views/CatalogHeader",
   component: CatalogHeader,
 };
 
