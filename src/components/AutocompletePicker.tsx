@@ -235,7 +235,14 @@ export function AutocompletePicker({
           </YStack>
         ) : visibleResults.length === 0 ? (
           searchError ? (
-            <Alert severity="error" message={searchError} />
+            // The visible Alert carries NO live semantics of its
+            // own: an error Alert's assertive role would announce
+            // the error a second time (and interrupt), on top of
+            // the polite live region above, which already announces
+            // it. accessibilityLiveRegion="none" is the Alert's
+            // cross-platform off switch (aria-live="off" on web,
+            // overriding the alert role's implicit assertive).
+            <Alert severity="error" message={searchError} accessibilityLiveRegion="none" />
           ) : (
             <Text variant="hint">{noResultsMessage}</Text>
           )
