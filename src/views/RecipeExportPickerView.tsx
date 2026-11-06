@@ -1,4 +1,5 @@
 import { ScrollView, YStack } from "tamagui";
+import { Alert } from "../components/Alert.js";
 import { BulkSelectToolbar } from "../components/BulkSelectToolbar.js";
 import { Button } from "../components/Button.js";
 import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
@@ -23,6 +24,8 @@ export type RecipeExportPickerViewProps = {
   disabled?: boolean;
   /** The item query is in flight: the list renders its spinner. */
   loading?: boolean;
+  /** The item query failed: renders this message instead of the list and its empty state. */
+  error?: string | null;
   emptyMessage?: string;
   exporting?: boolean;
   onExport: () => void;
@@ -57,6 +60,7 @@ export function RecipeExportPickerView({
   onClearSelection,
   disabled = false,
   loading = false,
+  error,
   emptyMessage = "No recipes to export yet.",
   exporting = false,
   onExport,
@@ -84,14 +88,18 @@ export function RecipeExportPickerView({
         overflow="hidden"
       >
         <ScrollView>
-          <CheckboxSelectList
-            items={items}
-            selectedIds={selectedIds}
-            onToggle={onToggle}
-            disabled={disabled || exporting}
-            loading={loading}
-            emptyMessage={emptyMessage}
-          />
+          {error ? (
+            <Alert severity="error" message={error} />
+          ) : (
+            <CheckboxSelectList
+              items={items}
+              selectedIds={selectedIds}
+              onToggle={onToggle}
+              disabled={disabled || exporting}
+              loading={loading}
+              emptyMessage={emptyMessage}
+            />
+          )}
         </ScrollView>
       </YStack>
       <Button

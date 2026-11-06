@@ -20,9 +20,10 @@ import { Text } from "../components/Text.js";
  * the states' presentation and the generic copy (the
  * PublicRecipePage DS-owned-copy precedent — the copy names
  * no brand, so both apps share the page); the way out of the
- * terminal states crosses as intents (`onRetryPress`,
- * `onHomePress`), with the home button's label supplied by
- * the host because it names the host's home.
+ * terminal states crosses as intents (`onRetryPress`), and
+ * home is an href (`homeHref`) because it navigates, with
+ * the home button's label supplied by the host because it
+ * names the host's home.
  */
 export type PayPageStatus = "unconfigured" | "needs-transaction" | "opening" | "closed" | "error";
 
@@ -32,8 +33,8 @@ export type PayPageProps = {
   status: PayPageStatus;
   /** Reopen the checkout window (the closed and error states). */
   onRetryPress?: () => void;
-  /** Leave for the host's home (the needs-transaction state). */
-  onHomePress?: () => void;
+  /** Leave for the host's home (the needs-transaction state): an href, because it navigates. */
+  homeHref?: string;
   /** The home button's label; it names the host's home, so the host supplies it. */
   homeLabel?: string;
 };
@@ -63,7 +64,7 @@ const STATUS_COPY: Record<PayPageStatus, { title: string; body?: string }> = {
 export function PayPage({
   status,
   onRetryPress,
-  onHomePress,
+  homeHref,
   homeLabel = "Go to home",
   footer,
 }: PayPageProps) {
@@ -81,8 +82,8 @@ export function PayPage({
             ) : (
               <>
                 {copy.body ? <Text variant="body">{copy.body}</Text> : null}
-                {status === "needs-transaction" && onHomePress ? (
-                  <Button variant="primary" onPress={onHomePress}>
+                {status === "needs-transaction" && homeHref ? (
+                  <Button variant="primary" href={homeHref}>
                     {homeLabel}
                   </Button>
                 ) : null}

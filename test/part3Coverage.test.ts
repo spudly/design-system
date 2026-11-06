@@ -144,3 +144,20 @@ test("ConfirmActionView locks dismissal while pending", () => {
   assert.match(source, /if \(!next && pending\)/);
   assert.match(source, /confirmTone = "danger"/);
 });
+
+test("review round: explicit error states, href home control, negative step guard, nested scrolling", () => {
+  const comments = read("src/views/RecipeCommentsView.tsx");
+  assert.match(comments, /error\?: string \| null/);
+  assert.match(comments, /<Alert severity="error" message=\{error\} \/>/);
+  const picker = read("src/views/RecipeExportPickerView.tsx");
+  assert.match(picker, /error\?: string \| null/);
+  assert.match(picker, /<Alert severity="error" message=\{error\} \/>/);
+  const pay = read("src/pages/PayPage.tsx");
+  assert.match(pay, /homeHref\?: string/);
+  assert.doesNotMatch(pay, /onHomePress/);
+  assert.match(pay, /<Button variant="primary" href=\{homeHref\}>/);
+  const cooking = read("src/pages/CookingModePage.tsx");
+  assert.match(cooking, /stepIndex >= 0 \? steps\.at\(stepIndex\) : undefined/);
+  const scaled = read("src/views/ScaledIngredientsView.tsx");
+  assert.match(scaled, /nestedScrollEnabled/);
+});

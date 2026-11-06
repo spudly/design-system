@@ -51,7 +51,7 @@ export const NeedsTransaction: Story = {
       <PayPage
         footer={eciperayFooterFixture}
         status="needs-transaction"
-        onHomePress={() => undefined}
+        homeHref="/"
         homeLabel="Go to Eciperay home"
       />
     </Viewport>

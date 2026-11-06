@@ -1,4 +1,5 @@
 import { XStack, YStack } from "tamagui";
+import { Alert } from "../components/Alert.js";
 import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { CommentItem } from "../components/CommentItem.js";
@@ -22,6 +23,8 @@ export type RecipeCommentsViewProps = {
   comments: RecipeCommentsViewComment[];
   /** The comments query is in flight: the card renders only a spinner. */
   loading?: boolean;
+  /** The comments query failed: the card renders this message instead of the empty state. */
+  error?: string | null;
   /** Section heading ("Comments"). */
   title?: string;
   /** Shown when the list is empty and not loading ("No comments yet"). */
@@ -69,6 +72,7 @@ export type RecipeCommentsViewProps = {
 export function RecipeCommentsView({
   comments,
   loading = false,
+  error,
   title = "Comments",
   emptyMessage = "No comments yet",
   staleHintLabel,
@@ -97,6 +101,8 @@ export function RecipeCommentsView({
           <YStack alignItems="center" paddingVertical="$4">
             <Spinner label="Loading comments" />
           </YStack>
+        ) : error ? (
+          <Alert severity="error" message={error} />
         ) : comments.length === 0 ? (
           <Text variant="muted">{emptyMessage}</Text>
         ) : (

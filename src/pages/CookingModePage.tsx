@@ -72,7 +72,7 @@ export type CookingModePageProps = {
 
 export function CookingModePage(props: CookingModePageProps) {
   const { recipeTitle, steps, stepIndex, ingredients, onPrev, onNext, onDone } = props;
-  const current = steps.at(stepIndex);
+  const current = stepIndex >= 0 ? steps.at(stepIndex) : undefined;
   if (current === undefined) {
     return null;
   }

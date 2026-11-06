@@ -46,7 +46,7 @@ export function ScaledIngredientsView({ heading, lines }: ScaledIngredientsViewP
         >
           {heading}
         </Text>
-        <ScrollView maxHeight={160}>
+        <ScrollView maxHeight={160} nestedScrollEnabled>
           <YStack gap="$1">
             {lines.map((line, index) => (
               <Text key={index} fontSize={tokens.typography.fontSize.sm} color="$surface">
