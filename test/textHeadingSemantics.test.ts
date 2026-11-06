@@ -45,7 +45,7 @@ function readCode(rel: string) {
 }
 
 test("Text defaults heading variants to the header role with a level (#256)", () => {
-  const source = readCode("src/components/Text.tsx");
+  const source = readCode("src/widgets/Text.tsx");
   assert.match(
     source,
     /accessibilityRole \?\? \(headingLevel !== undefined \? "header" : undefined\)/,
@@ -69,7 +69,7 @@ test("Text defaults heading variants to the header role with a level (#256)", ()
 });
 
 test("the translator passes aria-level on web and drops it on native (#256)", () => {
-  const source = readCode("src/components/accessibility.ts");
+  const source = readCode("src/widgets/accessibility.ts");
   assert.match(source, /"aria-level": ariaLevel/, "web path must forward aria-level");
   assert.match(
     source,
@@ -163,7 +163,7 @@ test("SSR: heading and subheading Text render heading semantics (#256)", async (
 });
 
 test("SectionHeading states header role and level 2 explicitly (#317)", () => {
-  const source = readCode("src/components/SectionHeading.tsx");
+  const source = readCode("src/widgets/SectionHeading.tsx");
   assert.match(
     source,
     /<Text\s+variant="subheading"\s+accessibilityRole="header"\s+aria-level=\{2\}\s*>/,

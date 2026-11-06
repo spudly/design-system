@@ -29,7 +29,7 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
 const distViews: Record<string, any> = await import("../../dist/views/index.js");
-const distComponents: Record<string, any> = await import("../../dist/components/index.js");
+const distComponents: Record<string, any> = await import("../../dist/widgets/index.js");
 
 function codeOf(rel: string): string {
   const source = readFileSync(join(root, rel), "utf8");

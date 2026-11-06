@@ -2,8 +2,8 @@ import { eciperayFooterFixture } from "./fixtures.js";
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 import { SignUpPage } from "./SignUpPage.js";
 
 const meta: Meta<typeof SignUpPage> = {

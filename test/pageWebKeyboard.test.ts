@@ -64,6 +64,6 @@ test("busy Cancel is activation-guarded and the Custom scale name carries the mu
     recipeDetail,
     /formatCustomValue=\{\(custom\) => `\$\{formatScaleValue\(custom\)\}×`\}/,
   );
-  const selector = readCode("src/components/PresetValueSelector.tsx");
+  const selector = readCode("src/widgets/PresetValueSelector.tsx");
   assert.match(selector, /`\$\{customAccessibilityLabel\} \$\{formattedCustom\}`/);
 });

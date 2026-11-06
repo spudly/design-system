@@ -1,7 +1,7 @@
-import { Alert } from "../components/Alert.js";
+import { Alert } from "../widgets/Alert.js";
 import { YStack } from "tamagui";
-import { Button } from "../components/Button.js";
-import { SectionCard } from "../components/SectionCard.js";
+import { Button } from "../widgets/Button.js";
+import { SectionCard } from "../widgets/SectionCard.js";
 import { TextField } from "./TextField.js";
 
 /**

@@ -1,6 +1,6 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Text } from "../components/Text.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * MemorizeSettingsPage (#127, B4): Memorize's Settings screen

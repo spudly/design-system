@@ -62,12 +62,12 @@ test("parseStoryFile reads the meta title, not fixture titles", () => {
 test("parseStoryFile falls back to the unique slash-bearing title", () => {
   const text = [
     "export default {",
-    '  title: "Components/Button",',
+    '  title: "Widgets/Button",',
     "};",
     "export const Primary = {};",
     "",
   ].join("\n");
-  assert.equal(parseStoryFile(text).title, "Components/Button");
+  assert.equal(parseStoryFile(text).title, "Widgets/Button");
   assert.equal(parseStoryFile("export const A = {};\n").title, null);
 });
 
@@ -79,15 +79,15 @@ function syntheticRepo() {
     mkdirSync(dirname(join(root, rel)), { recursive: true });
     writeFileSync(join(root, rel), text);
   };
-  put("src/components/Leaf.tsx", "export const Leaf = () => null;\n");
-  put("src/components/Shared.tsx", "export const Shared = () => null;\n");
+  put("src/widgets/Leaf.tsx", "export const Leaf = () => null;\n");
+  put("src/widgets/Shared.tsx", "export const Shared = () => null;\n");
   put(
     "src/pages/PageA.tsx",
-    'import { Leaf } from "../components/Leaf.js";\nimport { Shared } from "../components/Shared.js";\nexport const PageA = () => null;\n',
+    'import { Leaf } from "../widgets/Leaf.js";\nimport { Shared } from "../widgets/Shared.js";\nexport const PageA = () => null;\n',
   );
   put(
     "src/pages/PageB.tsx",
-    'import { Shared } from "../components/Shared.js";\nexport const PageB = () => null;\n',
+    'import { Shared } from "../widgets/Shared.js";\nexport const PageB = () => null;\n',
   );
   put(
     "src/pages/RecipesPage.stories.tsx",
@@ -102,7 +102,7 @@ function syntheticRepo() {
 
 test("mapper: changed files map to story ids through the import graph", () => {
   const root = syntheticRepo();
-  const leaf = computeScope({ repoRoot: root, changedFiles: ["src/components/Leaf.tsx"] });
+  const leaf = computeScope({ repoRoot: root, changedFiles: ["src/widgets/Leaf.tsx"] });
   assert.equal(leaf.mode, "scoped");
   assert.deepEqual(leaf.standard, [
     "pages-eciperay-recipespage--default",
@@ -113,7 +113,7 @@ test("mapper: changed files map to story ids through the import graph", () => {
     "pages-eciperay-recipespage--default",
     "pages-eciperay-recipespage--empty",
   ]);
-  const shared = computeScope({ repoRoot: root, changedFiles: ["src/components/Shared.tsx"] });
+  const shared = computeScope({ repoRoot: root, changedFiles: ["src/widgets/Shared.tsx"] });
   assert.deepEqual(shared.standard, [
     "pages-eciperay-pageb--default",
     "pages-eciperay-recipespage--default",
@@ -153,19 +153,19 @@ test("fallback: shared/harness paths force the full set", () => {
   // One fallback file among mappable ones still forces full.
   const mixed = computeScope({
     repoRoot: root,
-    changedFiles: ["src/components/Leaf.tsx", "src/tokens/spacing.ts"],
+    changedFiles: ["src/widgets/Leaf.tsx", "src/tokens/spacing.ts"],
   });
   assert.equal(mixed.mode, "full");
 });
 
 test("fallback: deleted src files, unparseable stories, explicit override", () => {
   const root = syntheticRepo();
-  const deleted = computeScope({ repoRoot: root, changedFiles: ["src/components/Gone.tsx"] });
+  const deleted = computeScope({ repoRoot: root, changedFiles: ["src/widgets/Gone.tsx"] });
   assert.equal(deleted.mode, "full");
   const forced = computeScope({ repoRoot: root, changedFiles: [], forceFull: true });
   assert.equal(forced.mode, "full");
   writeFileSync(join(root, "src/pages/Broken.stories.tsx"), "export const A = {};\n");
-  const broken = computeScope({ repoRoot: root, changedFiles: ["src/components/Leaf.tsx"] });
+  const broken = computeScope({ repoRoot: root, changedFiles: ["src/widgets/Leaf.tsx"] });
   assert.equal(broken.mode, "full");
   assert.match(broken.reasons[0], /Broken\.stories\.tsx/);
 });
@@ -206,7 +206,7 @@ test("coverage listing: rows derive from the scope and the files on disk (#284)"
 
 test("isFallbackPath classifies the guardrail list", () => {
   assert.equal(isFallbackPath("tools/visualRegression/scope.mjs"), true);
-  assert.equal(isFallbackPath("src/components/Button.tsx"), false);
+  assert.equal(isFallbackPath("src/widgets/Button.tsx"), false);
   assert.equal(isFallbackPath("metro.config.js"), true);
   assert.equal(isFallbackPath("README.md"), false);
 });

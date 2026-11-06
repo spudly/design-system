@@ -8,7 +8,7 @@
  * - Rule behaviour, driven through ESLint's Linter with espree on
  *   plain-JSX snippets: espree cannot parse TypeScript syntax, but
  *   the rule operates purely on JSX nodes, so JSX snippets exercise
- *   it fully. The config below mirrors the src/components/** and
+ *   it fully. The config below mirrors the src/widgets/** and
  *   src/pages/** blocks in eslint.config.ts.
  * - Dormancy, driven through the repo's REAL eslint.config.ts
  *   (loaded with jiti): typescriptPendingIgnores currently ignores
@@ -32,7 +32,7 @@ const linter = new Linter();
 
 const spacingConfig: Linter.Config[] = [
   {
-    files: ["src/components/**/*.tsx", "src/pages/**/*.tsx"],
+    files: ["src/widgets/**/*.tsx", "src/pages/**/*.tsx"],
     plugins: { "design-system": plugin },
     languageOptions: {
       parserOptions: { ecmaVersion: 2022, ecmaFeatures: { jsx: true } },
@@ -41,7 +41,7 @@ const spacingConfig: Linter.Config[] = [
   },
 ];
 
-function messageIds(code: string, filename = "src/components/Example.tsx") {
+function messageIds(code: string, filename = "src/widgets/Example.tsx") {
   return linter.verify(code, spacingConfig, { filename }).map((message) => message.messageId);
 }
 
@@ -197,9 +197,9 @@ test("eslint.config.ts wires the rule at error for components and pages, off for
   const jiti = createJiti(import.meta.url);
   const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
   const componentsBlock = config.find(
-    (block: any) => block.files?.includes("src/components/**/*.tsx") && block.rules,
+    (block: any) => block.files?.includes("src/widgets/**/*.tsx") && block.rules,
   );
-  assert.ok(componentsBlock, "a config block must target src/components/**/*.tsx");
+  assert.ok(componentsBlock, "a config block must target src/widgets/**/*.tsx");
   assert.equal(componentsBlock.rules!["design-system/no-margin-spacing"], "error");
   assert.ok(
     componentsBlock.plugins?.["design-system"],
@@ -210,7 +210,7 @@ test("eslint.config.ts wires the rule at error for components and pages, off for
   );
   assert.ok(pagesBlock, "a config block must target src/pages/**/*.tsx");
   assert.equal(pagesBlock.rules!["design-system/no-margin-spacing"], "error");
-  for (const storiesGlob of ["src/pages/**/*.stories.tsx", "src/components/**/*.stories.tsx"]) {
+  for (const storiesGlob of ["src/pages/**/*.stories.tsx", "src/widgets/**/*.stories.tsx"]) {
     const storiesBlock = config.find(
       (block: any) => block.files?.includes(storiesGlob) && block.rules,
     );
@@ -222,7 +222,7 @@ test("eslint.config.ts wires the rule at error for components and pages, off for
 test("dormant today: the real config reports nothing for violating components or pages", async () => {
   const jiti = createJiti(import.meta.url);
   const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
-  for (const filename of ["src/components/Example.tsx", "src/pages/ExamplePage.tsx"]) {
+  for (const filename of ["src/widgets/Example.tsx", "src/pages/ExamplePage.tsx"]) {
     const messages = linter.verify(`<YStack marginTop="$4" />`, config, { filename });
     const ruleReports = messages.filter(
       (message) => message.ruleId === "design-system/no-margin-spacing",

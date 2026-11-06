@@ -116,7 +116,7 @@ test("failed create, edit and delete each show their own message (#374)", () => 
 });
 
 test("the error renders as a dismissible error Alert and success/dismiss clear it (#374)", () => {
-  assert.match(page, /import \{ Alert \} from "\.\.\/components\/Alert\.js";/);
+  assert.match(page, /import \{ Alert \} from "\.\.\/widgets\/Alert\.js";/);
   assert.match(
     page,
     /\{failedOperation \? \(\s*<Alert\s+severity="error"\s+dismissible\s+onDismiss=\{\(\) => \{\s*setFailedOperation\(null\);\s*\}\}\s*>\s*\{tagsPageFailureMessages\[failedOperation\]\}\s*<\/Alert>\s*\) : null\}/,

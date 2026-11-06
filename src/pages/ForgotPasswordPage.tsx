@@ -1,8 +1,8 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { ForgotPasswordForm } from "../views/ForgotPasswordForm.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SectionStack } from "../components/SectionStack.js";
-import { Text } from "../components/Text.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { SectionStack } from "../widgets/SectionStack.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * ForgotPasswordPage (#126, B3c): the reset-request view —

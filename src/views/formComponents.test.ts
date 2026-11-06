@@ -48,9 +48,9 @@ const COMPONENTS = [
 ];
 
 // RevertAction and ChangedListBanner are views since #470; the
-// rest of the set remains in src/components.
+// rest of the set remains in src/widgets.
 const VIEWS = new Set(["RevertAction", "ChangedListBanner"]);
-const homeOf = (name: string) => (VIEWS.has(name) ? "views" : "components");
+const homeOf = (name: string) => (VIEWS.has(name) ? "views" : "widgets");
 
 for (const name of COMPONENTS) {
   test(`${name} is exported from the built internal dist surface`, () => {
@@ -68,15 +68,15 @@ for (const name of COMPONENTS) {
 }
 
 test("the label row is one shared implementation behind both labeled wrappers", () => {
-  const row = readRepoFile("src/components/labelRow.tsx");
+  const row = readRepoFile("src/widgets/labelRow.tsx");
   assert.match(row, /paddingBlockEnd=\{tokens\.spacing\[separation\]\}/);
   assert.match(row, /<FieldLabel htmlFor=\{htmlFor\}>\{label\}<\/FieldLabel>/);
-  const field = readRepoFile("src/components/LabeledField.tsx");
+  const field = readRepoFile("src/widgets/LabeledField.tsx");
   assert.match(
     field,
     /<LabelRow label=\{label\} action=\{action\} separation=\{1\} htmlFor=\{fieldId\} \/>/,
   );
-  const group = readRepoFile("src/components/LabeledGroup.tsx");
+  const group = readRepoFile("src/widgets/LabeledGroup.tsx");
   assert.match(
     group,
     /<LabelRow label=\{label\} action=\{action\} separation=\{2\} htmlFor=\{fieldId\} \/>/,
@@ -84,7 +84,7 @@ test("the label row is one shared implementation behind both labeled wrappers", 
 });
 
 test("FieldLabel renders a real label element on web and keeps the text treatment on native", () => {
-  const source = readRepoFile("src/components/FieldLabel.tsx");
+  const source = readRepoFile("src/widgets/FieldLabel.tsx");
   // Stephen's ruling on PR #320: web uses an HTML label element
   // with a proper `for`; native keeps the plain Text treatment.
   assert.match(source, /if \(isWeb\) \{/);
@@ -94,7 +94,7 @@ test("FieldLabel renders a real label element on web and keeps the text treatmen
 });
 
 test("LabeledField owns the 4px label separation and renders the error below the field", () => {
-  const source = readRepoFile("src/components/LabeledField.tsx");
+  const source = readRepoFile("src/widgets/LabeledField.tsx");
   assert.match(source, /label: string;/);
   assert.match(source, /fieldId\?: string | undefined;/);
   assert.match(source, /error\?: string \| null \| undefined;/);
@@ -106,7 +106,7 @@ test("LabeledField owns the 4px label separation and renders the error below the
 });
 
 test("LabeledGroup owns the wider 8px label separation for non-field controls", () => {
-  const source = readRepoFile("src/components/LabeledGroup.tsx");
+  const source = readRepoFile("src/widgets/LabeledGroup.tsx");
   assert.match(source, /separation=\{2\}/);
   assert.match(source, /fieldId\?: string | undefined;/);
   // The group is programmatically named by its label (the
@@ -116,26 +116,26 @@ test("LabeledGroup owns the wider 8px label separation for non-field controls", 
 });
 
 test("FormStack owns the form rhythm: 16px section gaps, stretched children, 32px tail", () => {
-  const source = readRepoFile("src/components/FormStack.tsx");
+  const source = readRepoFile("src/widgets/FormStack.tsx");
   assert.match(source, /gap: tokens\.spacing\[4\]/);
   assert.match(source, /alignItems: "stretch"/);
   assert.match(source, /paddingBlockEnd: tokens\.spacing\[8\]/);
 });
 
 test("FieldColumns gives every child an equal flex column with an owned 12px gutter", () => {
-  const source = readRepoFile("src/components/FieldColumns.tsx");
+  const source = readRepoFile("src/widgets/FieldColumns.tsx");
   assert.match(source, /gap=\{tokens\.spacing\[3\]\}/);
   assert.match(source, /<YStack flex=\{1\}>/);
   assert.match(source, /typeof child === "boolean"/);
 });
 
 test("FormSubmit owns the 16px separation above the submit row", () => {
-  const source = readRepoFile("src/components/FormSubmit.tsx");
+  const source = readRepoFile("src/widgets/FormSubmit.tsx");
   assert.match(source, /paddingBlockStart=\{tokens\.spacing\[4\]\}/);
 });
 
 test("FormHeading owns the title treatment, its 24px separation, and the optional subtitle", () => {
-  const source = readRepoFile("src/components/FormHeading.tsx");
+  const source = readRepoFile("src/widgets/FormHeading.tsx");
   assert.match(source, /paddingBottom=\{tokens\.spacing\[6\]\}/);
   assert.match(source, /variant="formTitle"/);
   // The import tranche's SessionHeader retired into this

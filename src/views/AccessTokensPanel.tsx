@@ -1,11 +1,11 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "../components/Button.js";
-import { Alert } from "../components/Alert.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { Text } from "../components/Text.js";
+import { Button } from "../widgets/Button.js";
+import { Alert } from "../widgets/Alert.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { Text } from "../widgets/Text.js";
 import { TextField } from "./TextField.js";
-import { TokenRow } from "../components/TokenRow.js";
+import { TokenRow } from "../widgets/TokenRow.js";
 
 /**
  * AccessTokensPanel (#126, B3c): the API access tokens section

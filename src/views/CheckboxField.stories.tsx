@@ -1,8 +1,8 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { CheckboxField } from "./CheckboxField.js";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 
 const meta: Meta<typeof CheckboxField> = {
   title: "Views/CheckboxField",

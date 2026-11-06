@@ -1,12 +1,12 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Alert } from "../components/Alert.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Alert } from "../widgets/Alert.js";
 import { CatalogFiltersBar, type CatalogFilterDefinition } from "../views/CatalogFiltersBar.js";
 import { CatalogHeader } from "../views/CatalogHeader.js";
-import { DiscoveryCard } from "../components/DiscoveryCard.js";
-import { EmptyState } from "../components/EmptyState.js";
-import { ListLoadingState } from "../components/ListLoadingState.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import type { SelectOption } from "../components/SelectField.js";
+import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
+import { EmptyState } from "../widgets/EmptyState.js";
+import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import type { SelectOption } from "../widgets/SelectField.js";
 import { BoundedList } from "./BoundedList.js";
 import { useCatalogPagination } from "./useCatalogPagination.js";
 

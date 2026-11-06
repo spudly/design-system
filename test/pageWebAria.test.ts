@@ -2,7 +2,7 @@
  * Contract test for spudly/design-system#237: the follow-up to #235.
  * #235 routed Button, Text, and the component-internal stack
  * pressables through the shared `platformAccessibilityProps`
- * translator in src/components/accessibility.ts, but remaining render
+ * translator in src/widgets/accessibility.ts, but remaining render
  * paths still set React Native accessibility props on raw Tamagui
  * stacks or Tamagui semantic primitives, where Tamagui's web renderer
  * forwards them verbatim to the DOM as raw attributes — no
@@ -199,7 +199,7 @@ test("page-level stack pressables route through the translator, never raw RN JSX
 });
 
 test("CheckRow (ShoppingListPage's row) translates role, checked state, and label together (#237)", () => {
-  const code = readCode("src/components/CheckRow.tsx");
+  const code = readCode("src/widgets/CheckRow.tsx");
   assert.match(
     code,
     /\{\.\.\.platformAccessibilityProps\(\{\s+accessibilityRole: "checkbox"/,
@@ -248,8 +248,8 @@ test("rows translate the disabled state; the generic rows keep the button role i
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases: [string, RegExp, RegExp | null][] = [
-    ["src/components/ListRow.tsx", ROLE, DISABLED],
-    ["src/components/CardRow.tsx", ROLE, null],
+    ["src/widgets/ListRow.tsx", ROLE, DISABLED],
+    ["src/widgets/CardRow.tsx", ROLE, null],
   ];
   for (const [rel, role, disabled] of cases) {
     const code = readCode(rel);
@@ -270,11 +270,11 @@ test("rows translate the disabled state; the generic rows keep the button role i
 });
 
 test("ChecklistRow's Checkbox and ProgressBar's Progress route through the translator (#237)", () => {
-  const checklist = readCode("src/components/ChecklistRow.tsx");
+  const checklist = readCode("src/widgets/ChecklistRow.tsx");
   assert.match(checklist, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
   assert.ok(!/accessibility(Label|State|Role|Value)=/.test(checklist));
 
-  const progress = readCode("src/components/ProgressBar.tsx");
+  const progress = readCode("src/widgets/ProgressBar.tsx");
   assert.match(progress, /platformAccessibilityProps\(\{/);
   assert.match(progress, /accessibilityRole: accessibilityRole \?\? "progressbar"/);
   assert.match(progress, /accessibilityValue: accessibilityValue \?\? \{ min: 0, max: 100, now:/);
@@ -289,7 +289,7 @@ test("ChecklistRow's Checkbox and ProgressBar's Progress route through the trans
 test("field/primitive wrappers destructure caller RN props out of rest and translate them (#237)", () => {
   // Compact split form: this file sits at the max-lines cap.
   const wrappers =
-    "src/views/TextField.tsx,src/views/TextAreaField.tsx,src/views/CheckboxField.tsx,src/components/TextLink.tsx,src/components/OptionCard.tsx,src/components/Alert.tsx".split(
+    "src/views/TextField.tsx,src/views/TextAreaField.tsx,src/views/CheckboxField.tsx,src/widgets/TextLink.tsx,src/widgets/OptionCard.tsx,src/widgets/Alert.tsx".split(
       ",",
     );
   for (const rel of wrappers) {
@@ -301,9 +301,9 @@ test("field/primitive wrappers destructure caller RN props out of rest and trans
     for (const needle of NEEDLES)
       assert.ok(code.includes(needle), `${rel} must satisfy the translator routing (${needle})`);
   }
-  const backLink = readCode("src/components/BackLink.tsx");
+  const backLink = readCode("src/widgets/BackLink.tsx");
   assert.match(backLink, /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/);
-  const alert = readCode("src/components/Alert.tsx");
+  const alert = readCode("src/widgets/Alert.tsx");
   assert.match(alert, /platformAccessibilityProps\(\{ accessibilityRole: "alert" \}\)/);
 });
 

@@ -26,7 +26,7 @@ function readCode(rel: string): string {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const bigFooter = readCode("src/components/BigFooter.tsx");
+const bigFooter = readCode("src/widgets/BigFooter.tsx");
 
 test("BigFooter renders all sections from the one footer data object", () => {
   assert.match(bigFooter, /export type BigFooterData = \{/);
@@ -105,10 +105,10 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
 });
 
 test("BigFooter is internal — not exported from the components barrel or the package (#298)", () => {
-  const barrel = readCode("src/components/index.ts");
+  const barrel = readCode("src/widgets/index.ts");
   assert.ok(
     !barrel.includes("BigFooter"),
-    "BigFooter must not be exported from src/components/index.ts",
+    "BigFooter must not be exported from src/widgets/index.ts",
   );
   const pagesBarrel = readCode("src/pages/index.ts");
   assert.match(pagesBarrel, /type BigFooterData/, "the footer data types are the pages contract");
@@ -117,7 +117,7 @@ test("BigFooter is internal — not exported from the components barrel or the p
     "the component itself is not a package export",
   );
   assert.ok(
-    !existsSync(join(root, "src/components/PublicFrameFooter.tsx")),
+    !existsSync(join(root, "src/widgets/PublicFrameFooter.tsx")),
     "PublicFrameFooter is retired (#410)",
   );
   assert.ok(!barrel.includes("PublicFrameFooter"), "PublicFrameFooter is removed from the barrel");
@@ -133,7 +133,13 @@ test("every page component renders BigFooter through the shell from a footer pro
   ]);
   const pages: string[] = [];
   for (const entry of readdirSync(pagesDir)) {
-    if (entry.endsWith(".stories.tsx") || entry.endsWith(".test.ts") || entry.endsWith(".test.tsx") || exceptions.has(entry)) continue;
+    if (
+      entry.endsWith(".stories.tsx") ||
+      entry.endsWith(".test.ts") ||
+      entry.endsWith(".test.tsx") ||
+      exceptions.has(entry)
+    )
+      continue;
     assert.ok(entry.endsWith(".tsx"), `unaccounted pages file ${entry}`);
     pages.push(entry);
   }
@@ -283,7 +289,7 @@ function loadRuntime() {
         return { ...configModule, ...themes };
       });
     const { BigFooter, BigFooterShell }: Record<string, any> =
-      await import("../dist/components/BigFooter.js");
+      await import("../dist/widgets/BigFooter.js");
     return {
       React,
       renderToString,

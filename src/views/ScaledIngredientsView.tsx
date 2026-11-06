@@ -1,5 +1,5 @@
 import { ScrollView, YStack } from "tamagui";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 import { tokens } from "../tokens/index.js";
 
 export type ScaledIngredientsViewProps = {

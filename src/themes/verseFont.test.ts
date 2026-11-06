@@ -86,7 +86,7 @@ test("the registered verse font follows the brand config", () => {
 });
 
 test("verse components reference the registered $verse font", () => {
-  for (const rel of ["components/VerseText.tsx", "components/Text.tsx"]) {
+  for (const rel of ["widgets/VerseText.tsx", "widgets/Text.tsx"]) {
     const text = readFileSync(join(srcDir, rel), "utf8");
     assert.ok(text.includes('fontFamily: "$verse"'), `${rel} must use the $verse font`);
     assert.ok(

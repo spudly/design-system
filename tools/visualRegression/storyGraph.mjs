@@ -47,7 +47,7 @@ export function storyId(title, exportName) {
 // carries `title:` fields, so a bare first-match is not safe. The
 // fallback — the file's unique slash-bearing title — covers meta
 // shapes the object scan cannot follow; story titles in this repo
-// always contain a "/" ("Pages/Eciperay/...", "Components/..."),
+// always contain a "/" ("Pages/Eciperay/...", "Widgets/..."),
 // fixture titles never do. Returns title: null when neither works.
 export function parseStoryFile(text) {
   const storyExports = [
@@ -117,7 +117,7 @@ function extractSpecifiers(text) {
 
 const RESOLVE_EXTS = [".ts", ".tsx", ".js", ".jsx", ".json"];
 
-// Resolve a relative specifier ("../components/Button.js") to a
+// Resolve a relative specifier ("../widgets/Button.js") to a
 // graph node, mirroring the bundler: strip the source extension,
 // then try file extensions and directory indexes in order. Returns
 // null for external packages and unresolvable paths.

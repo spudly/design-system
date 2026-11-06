@@ -1,7 +1,7 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { PrevNextNav } from "../components/PrevNextNav.js";
-import { StepDots } from "../components/StepDots.js";
-import { StepOverlay } from "../components/StepOverlay.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { PrevNextNav } from "../widgets/PrevNextNav.js";
+import { StepDots } from "../widgets/StepDots.js";
+import { StepOverlay } from "../widgets/StepOverlay.js";
 import { ScaledIngredientsView } from "../views/ScaledIngredientsView.js";
 
 /**

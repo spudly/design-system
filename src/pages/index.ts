@@ -224,4 +224,4 @@ export {
   type BigFooterSocialIcon,
   type BigFooterSocialLink,
   type BigFooterStoreLink,
-} from "../components/BigFooter.js";
+} from "../widgets/BigFooter.js";

@@ -35,11 +35,11 @@ const storiesCode = strip(stories);
 
 test("the CTA sizing and message shell are the shared components' (#341)", () => {
   assert.ok(
-    code.includes('import { EqualButtonRow } from "../components/EqualButtonRow.js";'),
+    code.includes('import { EqualButtonRow } from "../widgets/EqualButtonRow.js";'),
     "the page imports the library EqualButtonRow",
   );
   assert.ok(
-    code.includes('import { MessageCard } from "../components/MessageCard.js";'),
+    code.includes('import { MessageCard } from "../widgets/MessageCard.js";'),
     "the page imports the library MessageCard",
   );
   assert.match(
@@ -64,7 +64,7 @@ test("the sections render through the shared library panels (#331)", () => {
     "RecipeInstructionsPanel",
   ]) {
     assert.ok(
-      code.includes(`import { ${panel} } from "../components/${panel}.js";`),
+      code.includes(`import { ${panel} } from "../widgets/${panel}.js";`),
       `the page imports the library ${panel}`,
     );
   }

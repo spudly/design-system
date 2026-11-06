@@ -1,10 +1,10 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Alert } from "../components/Alert.js";
-import { Button } from "../components/Button.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Alert } from "../widgets/Alert.js";
+import { Button } from "../widgets/Button.js";
 import { CheckboxField } from "../views/CheckboxField.js";
 import { TextAreaField } from "../views/TextAreaField.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Text } from "../components/Text.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { Text } from "../widgets/Text.js";
 import { TextField } from "../views/TextField.js";
 
 /**

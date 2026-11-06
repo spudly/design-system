@@ -1,7 +1,7 @@
 import { XStack } from "tamagui";
-import { FixedActionBanner } from "../components/FixedActionBanner.js";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { FixedActionBanner } from "../widgets/FixedActionBanner.js";
+import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 
 export type InstallBannerViewLink = {
   label: string;

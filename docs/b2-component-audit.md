@@ -1,9 +1,9 @@
-# B2 audit: eciperay `packages/app/src/components` (issue #123)
+# B2 audit: eciperay `packages/app/src/widgets` (issue #123)
 
 Part of the design-system completion program (epic #121): **all views are
 owned by the design system; all business logic is owned by the app repos.**
 This audit covers 100% of the source files under eciperay's
-`packages/app/src/components` — 113 source files (52 test files follow their
+`packages/app/src/widgets` — 113 source files (52 test files follow their
 component; 165 files total) — read at eciperay `master` (`cf2820f`, the
 v1.32.0 release commit). Every file was read in full and cross-checked
 against its importers across `packages/app/src` (screens included), so

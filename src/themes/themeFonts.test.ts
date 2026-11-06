@@ -127,7 +127,7 @@ test("no component, page, or story hardcodes a UI font family", () => {
       }
     }
   };
-  walk(join(srcDir, "components"));
+  walk(join(srcDir, "widgets"));
   walk(join(srcDir, "pages"));
   assert.deepEqual(offenders, [], "UI font families must come from the theme token (#65)");
 });

@@ -1,8 +1,8 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SectionStack } from "../components/SectionStack.js";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { SectionStack } from "../widgets/SectionStack.js";
+import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 
 /**
  * RouteErrorPage (#438 Part 3): the router's fallback page —

@@ -40,7 +40,7 @@ import { tokens } from "../tokens/index.js";
  * a page that passes none of them renders exactly the list the
  * fixed-shell pages have always rendered.
  *
- * Why this lives in src/pages and not src/components: it imports
+ * Why this lives in src/pages and not src/widgets: it imports
  * react-native's FlatList, and it is page scaffolding, not a
  * page — the package exports page components only (#298), so
  * the shared list sits with its consumers as internal page

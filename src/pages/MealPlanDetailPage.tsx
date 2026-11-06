@@ -1,15 +1,15 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Button } from "../components/Button.js";
-import { ButtonRow } from "../components/ButtonRow.js";
-import { DetailRow } from "../components/DetailRow.js";
-import { LoadingGate } from "../components/LoadingGate.js";
-import { ListRow } from "../components/ListRow.js";
-import { ListStack } from "../components/ListStack.js";
-import { SectionStack } from "../components/SectionStack.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Button } from "../widgets/Button.js";
+import { ButtonRow } from "../widgets/ButtonRow.js";
+import { DetailRow } from "../widgets/DetailRow.js";
+import { LoadingGate } from "../widgets/LoadingGate.js";
+import { ListRow } from "../widgets/ListRow.js";
+import { ListStack } from "../widgets/ListStack.js";
+import { SectionStack } from "../widgets/SectionStack.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 
 /**
  * MealPlanDetailPage (#49): Eciperay's meal plan detail screen as

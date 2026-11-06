@@ -1,13 +1,13 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Button } from "../components/Button.js";
-import { ButtonRow } from "../components/ButtonRow.js";
-import { ListRow } from "../components/ListRow.js";
-import { ListStack } from "../components/ListStack.js";
-import { MarkableRow } from "../components/MarkableRow.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { SectionStack } from "../components/SectionStack.js";
-import { Text } from "../components/Text.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Button } from "../widgets/Button.js";
+import { ButtonRow } from "../widgets/ButtonRow.js";
+import { ListRow } from "../widgets/ListRow.js";
+import { ListStack } from "../widgets/ListStack.js";
+import { MarkableRow } from "../widgets/MarkableRow.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { SectionStack } from "../widgets/SectionStack.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * MealDetailPage (#125, B3b): Eciperay's meal detail screen

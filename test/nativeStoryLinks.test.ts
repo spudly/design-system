@@ -135,7 +135,7 @@ test("premise: fixtures and stories still pass root-relative hrefs (#300)", () =
   const fixtures = readFileSync(join(root, "src/pages/fixtures.ts"), "utf8");
   assert.match(fixtures, /href: "\//);
   let storyFilesWithAppHrefs = 0;
-  for (const dir of ["src/pages", "src/components"]) {
+  for (const dir of ["src/pages", "src/widgets"]) {
     for (const file of readdirSync(join(root, dir))) {
       if (!file.endsWith(".stories.tsx")) continue;
       const source = readFileSync(join(root, dir, file), "utf8");

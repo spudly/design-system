@@ -49,7 +49,7 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
 const pagesDir = join(root, "src", "pages");
-const componentsDir = join(root, "src", "components");
+const componentsDir = join(root, "src", "widgets");
 const viewsDir = join(root, "src", "views");
 
 function readCode(path: string) {
@@ -260,7 +260,7 @@ test("no app imports in the page or the card", () => {
           specifier === "react-native" ||
           specifier === "tamagui" ||
           specifier.startsWith("../tokens/") ||
-          specifier.startsWith("../components/") ||
+          specifier.startsWith("../widgets/") ||
           specifier.startsWith("../views/") ||
           specifier.startsWith("./"),
         `${name} must not import "${specifier}" — app logic stays app-side`,
@@ -294,7 +294,7 @@ test("stories cover the contract states in Warm Harvest", () => {
       `DiscoverPage.stories.tsx must export a ${story} story`,
     );
   }
-  assert.match(cardStories, /title: "Components\/DiscoveryCard"/);
+  assert.match(cardStories, /title: "Widgets\/DiscoveryCard"/);
   assert.match(cardStories, /export const Default/);
   assert.match(cardStories, /export const WithoutSubtitle/);
 });

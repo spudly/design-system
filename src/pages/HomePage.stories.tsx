@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View, YStack } from "tamagui";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 import { homeFixture, eciperayFooterFixture } from "./fixtures.js";
 import { HomePage } from "./HomePage.js";
 

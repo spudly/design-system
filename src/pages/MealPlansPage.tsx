@@ -1,12 +1,12 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Button } from "../components/Button.js";
-import { CardStack } from "../components/CardStack.js";
-import { Center } from "../components/Center.js";
-import { EmptyState } from "../components/EmptyState.js";
-import { CardRow } from "../components/CardRow.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Spinner } from "../components/Spinner.js";
-import { Text } from "../components/Text.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Button } from "../widgets/Button.js";
+import { CardStack } from "../widgets/CardStack.js";
+import { Center } from "../widgets/Center.js";
+import { EmptyState } from "../widgets/EmptyState.js";
+import { CardRow } from "../widgets/CardRow.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { Spinner } from "../widgets/Spinner.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * MealPlansPage (#49): Eciperay's meal plan list as a controlled

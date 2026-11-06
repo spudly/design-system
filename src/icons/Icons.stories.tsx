@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 import { AddIcon } from "./AddIcon.js";
 import { CollapsedIcon } from "./CollapsedIcon.js";
 import { CollapsibleIcon } from "./CollapsibleIcon.js";
@@ -18,7 +18,7 @@ import { TagsIcon } from "./TagsIcon.js";
 import { WarningIcon } from "./WarningIcon.js";
 
 const meta: Meta<typeof Icon> = {
-  title: "Components/Icons",
+  title: "Widgets/Icons",
   component: Icon,
   argTypes: {
     size: { control: "number" },

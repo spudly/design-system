@@ -15,10 +15,10 @@
  * .rnstorybook/storybook.requires.ts (Metro require.context). Parity
  * is therefore a property of three things, all pinned here:
  *
- * 1. Every widget module in src/components, every view module in
+ * 1. Every widget module in src/widgets, every view module in
  *    src/views (#438 Part 2: the page fragments pages share, forms
  *    included), and every page module in src/pages has a sibling
- *    .stories.tsx with the organized title (Components/<Name>,
+ *    .stories.tsx with the organized title (Widgets/<Name>,
  *    Views/<Name>, Pages/<App>/<Name>) and at least one story — a
  *    module without a story file is invisible in BOTH storybooks.
  * 2. Both storybook configs declare the same stories glob (modulo the
@@ -35,13 +35,13 @@
  * apps/storybook carries storybook:react-native.
  *
  * Documented exceptions (not components/pages, so no stories):
- * - src/components/accessibility.ts — ARIA helper utilities.
- * - src/components/modalRegistry.ts — the internal modal-layer
+ * - src/widgets/accessibility.ts — ARIA helper utilities.
+ * - src/widgets/modalRegistry.ts — the internal modal-layer
  *   registry (#394); exercised through the Dialog/StepOverlay
  *   stories.
- * - src/components/tagColors.ts — the shared tag-color resolver hook
+ * - src/widgets/tagColors.ts — the shared tag-color resolver hook
  *   (#207); exercised through the Badge/ColorPickerField stories.
- * - src/components/PageFrame.tsx — internal page-story scaffolding
+ * - src/widgets/PageFrame.tsx — internal page-story scaffolding
  *   shared by the page stories; NOT exported from either barrel, so
  *   it is not part of the @spudly/ui surface. It is exercised through
  *   every page story. If it is ever exported, this test fails and a
@@ -120,7 +120,7 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   // BigFooter (#410): internal page chrome — NOT exported from the
   // components barrel (pages render it; its data types are the
   // pages barrel's contract). It has its own stories
-  // (Components/BigFooter) and is exercised through every page story.
+  // (Widgets/BigFooter) and is exercised through every page story.
   "BigFooter.tsx",
   "accessibility.ts",
   "index.ts",
@@ -132,21 +132,21 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "PageFrame.tsx",
 ]);
 
-test("every widget component has a story file titled Components/<Name>", () => {
-  const dir = join(root, "src", "components");
-  const index = read("src/components/index.ts");
+test("every widget component has a story file titled Widgets/<Name>", () => {
+  const dir = join(root, "src", "widgets");
+  const index = read("src/widgets/index.ts");
   const exceptions = COMPONENT_STORY_EXCEPTIONS;
   // The exception files stay unexported (see header): if one is
   // ever exported from the barrel, it becomes public surface and
   // owes a story decision.
   assert.ok(
     !index.includes('from "./PageFrame.js"'),
-    "PageFrame must stay unexported from src/components/index.ts (internal scaffolding)",
+    "PageFrame must stay unexported from src/widgets/index.ts (internal scaffolding)",
   );
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),
-      `src/components/${entry.name}: unexpected directory — the parity scan is flat`,
+      `src/widgets/${entry.name}: unexpected directory — the parity scan is flat`,
     );
     if (
       exceptions.has(entry.name) ||
@@ -156,15 +156,15 @@ test("every widget component has a story file titled Components/<Name>", () => {
       continue;
     assert.ok(
       entry.name.endsWith(".tsx"),
-      `src/components/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
+      `src/widgets/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
     );
     const base = entry.name.replace(/\.tsx$/, "");
     assertModuleStory({
       dir,
       index,
       base,
-      titleDescription: `title "Components/${base}"`,
-      titleMatches: (t: any) => t === `Components/${base}`,
+      titleDescription: `title "Widgets/${base}"`,
+      titleMatches: (t: any) => t === `Widgets/${base}`,
     });
   }
 });
@@ -207,7 +207,7 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
   // fixtures.ts is data; useCatalogPagination.ts is the shared hook
   // (#285) exercised through the RecipesPage/DiscoverPage stories.
   // None is exported from src/pages/index.ts. (PageFrame, the other
-  // scaffolding file, moved to src/components for #119 — see the
+  // scaffolding file, moved to src/widgets for #119 — see the
   // components scan's exceptions.)
   const exceptions = new Set([
     "BoundedList.tsx",
@@ -249,8 +249,8 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
   }
 });
 
-test("every story file is organized under Components/, Views/, or Pages/<App>/ and exports stories", () => {
-  for (const area of ["components", "views", "pages"]) {
+test("every story file is organized under Widgets/, Views/, or Pages/<App>/ and exports stories", () => {
+  for (const area of ["widgets", "views", "pages"]) {
     const dir = join(root, "src", area);
     for (const name of readdirSync(dir)) {
       if (!name.endsWith(".stories.tsx")) continue;
@@ -258,13 +258,13 @@ test("every story file is organized under Components/, Views/, or Pages/<App>/ a
       const title = declaredTitle(story);
       assert.ok(
         title !== null &&
-          (title.startsWith("Components/") ||
+          (title.startsWith("Widgets/") ||
             title.startsWith("Views/") ||
             title === "Pages/Eciperay" ||
             title === "Pages/Memorize" ||
             title.startsWith("Pages/Eciperay/") ||
             title.startsWith("Pages/Memorize/")),
-        `src/${area}/${name} declares title "${title}" — stories live under Components/, Views/, or Pages/<App>/`,
+        `src/${area}/${name} declares title "${title}" — stories live under Widgets/, Views/, or Pages/<App>/`,
       );
       assert.ok(storyExportCount(story) >= 1, `src/${area}/${name} exports no stories`);
     }

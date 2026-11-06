@@ -1,14 +1,14 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Alert } from "../components/Alert.js";
-import { AutocompletePicker } from "../components/AutocompletePicker.js";
-import { Button } from "../components/Button.js";
-import { FieldStack } from "../components/FieldStack.js";
-import { FormHeading } from "../components/FormHeading.js";
-import { FormScreenLayout } from "../components/FormScreenLayout.js";
-import { FormSubmit } from "../components/FormSubmit.js";
-import { LabeledGroup } from "../components/LabeledGroup.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Alert } from "../widgets/Alert.js";
+import { AutocompletePicker } from "../widgets/AutocompletePicker.js";
+import { Button } from "../widgets/Button.js";
+import { FieldStack } from "../widgets/FieldStack.js";
+import { FormHeading } from "../widgets/FormHeading.js";
+import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
+import { FormSubmit } from "../widgets/FormSubmit.js";
+import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { NumberStepper } from "../views/NumberStepper.js";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "../views/TextAreaField.js";
 import { TextField } from "../views/TextField.js";
 

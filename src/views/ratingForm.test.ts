@@ -26,8 +26,8 @@ test("RatingForm is exported from the views barrel; CookLogForm is gone", () => 
   assert.match(barrel, /type RatingFormProps/);
   assert.match(barrel, /type RatingFormValues/);
   assert.doesNotMatch(barrel, /CookLogForm/);
-  assert.equal(existsSync("src/components/CookLogForm.tsx"), false);
-  assert.equal(existsSync("src/components/CookLogForm.stories.tsx"), false);
+  assert.equal(existsSync("src/widgets/CookLogForm.tsx"), false);
+  assert.equal(existsSync("src/widgets/CookLogForm.stories.tsx"), false);
 });
 
 test("the submit view-model is generic: rating, not a domain field name", () => {
@@ -86,7 +86,7 @@ test("isPending disables Save (half opacity); the secondary action stays live", 
 });
 
 test("reuses the DS StarRatingInput as-is; no forked star rendering", () => {
-  assert.match(source, /import \{ StarRatingInput \} from "\.\.\/components\/StarRatingInput\.js"/);
+  assert.match(source, /import \{ StarRatingInput \} from "\.\.\/widgets\/StarRatingInput\.js"/);
   assert.doesNotMatch(source, /★/, "stars come from StarRatingInput, not a local copy");
 });
 

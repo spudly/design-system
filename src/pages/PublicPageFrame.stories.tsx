@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 import { View, YStack } from "tamagui";
 import { PublicPageFrame } from "./PublicPageFrame.js";
 import { PublicRecipePage } from "./PublicRecipePage.js";

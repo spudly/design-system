@@ -13,7 +13,7 @@ and, to build their app-level Tamagui config, the brand themes
 lazily loaded surfaces. Nothing else comes back: no other widget
 components, no icons, no composite (form) components, no tokens or
 tag colors, no Storybook config factories, and no subpath exports.
-The modules under `src/components/`, `src/views/`, `src/icons/`, and `src/tokens/`
+The modules under `src/widgets/`, `src/views/`, `src/icons/`, and `src/tokens/`
 (and the rest of `src/themes/` and `src/tamagui.config.ts`) are the
 internal building blocks the pages are composed from; they are not
 part of the published package surface.
@@ -26,7 +26,7 @@ part of the published package surface.
 - `src/themes/` — `baseTheme` (brand-neutral) plus per-app overrides:
   `eciperayTheme`, `memorizeTheme`. Themes override semantic colors and font
   family only, proving the mechanism; real brand values come later.
-- `src/components/` — universal components built with
+- `src/widgets/` — universal components built with
   [Tamagui](https://tamagui.dev) `styled()`. Today: `Button`
   (`variant`: primary | secondary | ghost; `size`: sm | md | lg; `disabled`).
 - `src/views/` — page fragments shared between pages, forms

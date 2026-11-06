@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
-import { BigFooter, type BigFooterData } from "../components/BigFooter.js";
-import { PublicFrameHeader } from "../components/PublicFrameHeader.js";
-import { PublicFrameLayout } from "../components/PublicFrameLayout.js";
+import { BigFooter, type BigFooterData } from "../widgets/BigFooter.js";
+import { PublicFrameHeader } from "../widgets/PublicFrameHeader.js";
+import { PublicFrameLayout } from "../widgets/PublicFrameLayout.js";
 
 /**
  * PublicPageFrame (#169): the public (signed-out) page chrome as a

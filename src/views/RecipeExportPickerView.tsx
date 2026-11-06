@@ -1,8 +1,8 @@
 import { ScrollView, YStack } from "tamagui";
-import { Alert } from "../components/Alert.js";
-import { BulkSelectToolbar } from "../components/BulkSelectToolbar.js";
-import { Button } from "../components/Button.js";
-import { CheckboxSelectList } from "../components/CheckboxSelectList.js";
+import { Alert } from "../widgets/Alert.js";
+import { BulkSelectToolbar } from "../widgets/BulkSelectToolbar.js";
+import { Button } from "../widgets/Button.js";
+import { CheckboxSelectList } from "../widgets/CheckboxSelectList.js";
 import { tokens } from "../tokens/index.js";
 
 export type RecipeExportPickerViewItem = {

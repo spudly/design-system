@@ -1,19 +1,19 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
-import { Alert } from "../components/Alert.js";
-import { Button } from "../components/Button.js";
+import { Alert } from "../widgets/Alert.js";
+import { Button } from "../widgets/Button.js";
 import { ChangedListBanner } from "../views/ChangedListBanner.js";
-import { FieldColumns } from "../components/FieldColumns.js";
-import { FormStack } from "../components/FormStack.js";
-import { LabeledField } from "../components/LabeledField.js";
-import { LabeledGroup } from "../components/LabeledGroup.js";
+import { FieldColumns } from "../widgets/FieldColumns.js";
+import { FormStack } from "../widgets/FormStack.js";
+import { LabeledField } from "../widgets/LabeledField.js";
+import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { RevertAction } from "../views/RevertAction.js";
-import { ScrollRegion } from "../components/ScrollRegion.js";
-import { Spinner } from "../components/Spinner.js";
+import { ScrollRegion } from "../widgets/ScrollRegion.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { TextAreaField } from "../views/TextAreaField.js";
 import { TextField } from "../views/TextField.js";
-import { ButtonRow } from "../components/ButtonRow.js";
-import { Badge } from "../components/Badge.js";
+import { ButtonRow } from "../widgets/ButtonRow.js";
+import { Badge } from "../widgets/Badge.js";
 
 /**
  * RecipeFormPage (#124, B3a): the recipe form's view layer — the

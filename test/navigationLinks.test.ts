@@ -56,11 +56,11 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const button = readCode("src/components/Button.tsx");
-const textLink = readCode("src/components/TextLink.tsx");
-const backLink = readCode("src/components/BackLink.tsx");
-const tabs = readCode("src/components/Tabs.tsx");
-const index = readCode("src/components/index.ts");
+const button = readCode("src/widgets/Button.tsx");
+const textLink = readCode("src/widgets/TextLink.tsx");
+const backLink = readCode("src/widgets/BackLink.tsx");
+const tabs = readCode("src/widgets/Tabs.tsx");
+const index = readCode("src/widgets/index.ts");
 
 test("Button: one shared frame config feeds the button and anchor frames (#248)", () => {
   assert.match(button, /const buttonFrameConfig = \{/);

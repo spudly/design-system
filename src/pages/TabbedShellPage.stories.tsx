@@ -1,9 +1,9 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { Card } from "../components/Card.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { Text } from "../components/Text.js";
+import { Card } from "../widgets/Card.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { Text } from "../widgets/Text.js";
 import { TabbedShellPage, type TabbedShellPageTab } from "./TabbedShellPage.js";
 
 /**

@@ -1,8 +1,8 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SectionStack } from "../components/SectionStack.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { SectionStack } from "../widgets/SectionStack.js";
 import { SignInForm } from "../views/SignInForm.js";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * SignInPage (#126, B3c): the sign-in view — the split view half

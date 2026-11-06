@@ -4,7 +4,7 @@ import { View, YStack } from "tamagui";
 import { AccessTokensPanel } from "../views/AccessTokensPanel.js";
 import { CheckboxField } from "../views/CheckboxField.js";
 import { NutritionGoalsForm } from "../views/NutritionGoalsForm.js";
-import { TextLink } from "../components/TextLink.js";
+import { TextLink } from "../widgets/TextLink.js";
 import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ProfilePage } from "./ProfilePage.js";
 

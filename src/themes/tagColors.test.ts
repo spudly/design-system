@@ -20,7 +20,7 @@
  *    under the tag<Name> keys the component resolver reads.
  * 5. Source scan: Badge, ColorPickerField, TagsPage, and
  *    RecipeDetailPage all resolve through the one shared resolver
- *    (src/components/tagColors.ts) instead of consuming raw hex.
+ *    (src/widgets/tagColors.ts) instead of consuming raw hex.
  *
  * Runtime assertions run against the built output: `npm run build`
  * first (the `test` script does both).
@@ -135,16 +135,16 @@ test("registered Tamagui themes expose the active brand's tag hexes", () => {
 });
 
 test("components resolve tag colors through the one shared resolver", () => {
-  const hook = read("src/components/tagColors.ts");
+  const hook = read("src/widgets/tagColors.ts");
   assert.match(hook, /export function useTagColorResolver/);
   assert.match(hook, /resolveTagColorValue\(name, themeColors\)/);
 
-  const badge = read("src/components/Badge.tsx");
+  const badge = read("src/widgets/Badge.tsx");
   assert.match(badge, /useTagColorResolver\(\)/);
   assert.match(badge, /resolveTagColor\(color\)/);
   assert.doesNotMatch(badge, /backgroundColor=\{`\$\{color\}22`\}/);
 
-  const picker = read("src/components/ColorPickerField.tsx");
+  const picker = read("src/widgets/ColorPickerField.tsx");
   assert.match(picker, /colors: TagColorName\[\]/);
   assert.match(picker, /useTagColorResolver\(\)/);
 
@@ -156,7 +156,7 @@ test("components resolve tag colors through the one shared resolver", () => {
 
   // RecipeDetailPage's tags render through TagList since the #119
   // extraction; the Badge color form lives inside it.
-  const tagList = read("src/components/TagList.tsx");
+  const tagList = read("src/widgets/TagList.tsx");
   assert.match(tagList, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/);
 });
 
@@ -167,13 +167,13 @@ test("the tag color API is strictly typed: names only, no hex pass-through", () 
   assert.match(themeModule, /export function resolveTagColorValue\(\s*name: TagColorName,/);
   assert.doesNotMatch(themeModule, /passes through unchanged/);
 
-  const hook = read("src/components/tagColors.ts");
+  const hook = read("src/widgets/tagColors.ts");
   assert.match(hook, /useTagColorResolver\(\): \(name: TagColorName\) => string/);
 
-  const badge = read("src/components/Badge.tsx");
+  const badge = read("src/widgets/Badge.tsx");
   assert.match(badge, /color\?: TagColorName;/);
 
-  const picker = read("src/components/ColorPickerField.tsx");
+  const picker = read("src/widgets/ColorPickerField.tsx");
   assert.match(picker, /value\?: TagColorName;/);
 
   const tagsPage = read("src/pages/TagsPage.tsx");

@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Tabs } from "../components/Tabs.js";
-import { Text } from "../components/Text.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { Tabs } from "../widgets/Tabs.js";
+import { Text } from "../widgets/Text.js";
 import type { IconName } from "../icons/iconRegistry.js";
 import { LazySlot } from "../views/LazySlot.js";
 

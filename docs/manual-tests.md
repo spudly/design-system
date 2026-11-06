@@ -51,7 +51,7 @@ from the components with the most review churn first (design-system
 
 ## Dialog
 
-Open in `Components/Dialog`: Interactive, WithoutActions,
+Open in `Widgets/Dialog`: Interactive, WithoutActions,
 NestedDialogs.
 
 1. Interactive: the "Delete recipe" button opens the dialog with
@@ -74,14 +74,14 @@ NestedDialogs.
    dialogs" button behind the overlays. Dismiss the nested
    dialog (Keep draft) and the parent dialog remains open.
 
-**Run when:** `src/components/Dialog.tsx`, its stories, or a
+**Run when:** `src/widgets/Dialog.tsx`, its stories, or a
 changeset naming Dialog.
 
 ---
 
 ## Accordion
 
-Open in `Components/Accordion`: Default, FirstOpen, Controlled,
+Open in `Widgets/Accordion`: Default, FirstOpen, Controlled,
 SingleSection.
 
 1. Default: all sections start closed. Opening one section expands
@@ -97,14 +97,14 @@ SingleSection.
    closed section and flips up over the open one; on web, Tab reaches
    a header and Enter/Space toggles it.
 
-**Run when:** `src/components/Accordion.tsx`, its stories, or a
+**Run when:** `src/widgets/Accordion.tsx`, its stories, or a
 changeset naming Accordion.
 
 ---
 
 ## AccordionSection
 
-Open in `Components/AccordionSection`: Closed, Open, LongTitle.
+Open in `Widgets/AccordionSection`: Closed, Open, LongTitle.
 
 1. Closed: only the header row renders (title + chevron pointing
    down) inside the bordered frame; no body text is visible.
@@ -114,14 +114,14 @@ Open in `Components/AccordionSection`: Closed, Open, LongTitle.
 3. LongTitle: the title wraps to two lines beside the chevron
    without truncating or pushing the chevron out of the frame.
 
-**Run when:** `src/components/AccordionSection.tsx`, its stories, or
+**Run when:** `src/widgets/AccordionSection.tsx`, its stories, or
 a changeset naming AccordionSection.
 
 ---
 
 ## Collapsible
 
-Open in `Components/Collapsible`: Closed, Open, Interactive.
+Open in `Widgets/Collapsible`: Closed, Open, Interactive.
 
 1. Closed renders nothing visible; Open renders the full content
    block.
@@ -129,14 +129,14 @@ Open in `Components/Collapsible`: Closed, Open, Interactive.
    closed — height grows/shrinks smoothly rather than snapping, and
    no content spills outside the frame mid-animation.
 
-**Run when:** `src/components/Collapsible.tsx`, its stories, or a
+**Run when:** `src/widgets/Collapsible.tsx`, its stories, or a
 changeset naming Collapsible.
 
 ---
 
 ## Badge
 
-Open in `Components/Badge`: Neutral, Info, Success, Warning, Danger,
+Open in `Widgets/Badge`: Neutral, Info, Success, Warning, Danger,
 AllTones, Selectable, Selected, SelectableDisabled.
 
 1. Every tone renders as a pill with a **visible 1px border in the
@@ -161,14 +161,14 @@ AllTones, Selectable, Selected, SelectableDisabled.
    does not toggle by pointer or keyboard; it still announces
    its pressed and disabled state.
 
-**Run when:** `src/components/Badge.tsx`, `src/components/Badge.stories.tsx`,
+**Run when:** `src/widgets/Badge.tsx`, `src/widgets/Badge.stories.tsx`,
 or a changeset naming Badge (including TagPill-into-Badge changes).
 
 ---
 
 ## BulkSelectToolbar
 
-Open in `Components/BulkSelectToolbar`: Default, NothingFiltered.
+Open in `Widgets/BulkSelectToolbar`: Default, NothingFiltered.
 
 1. The selection count sits **on the same visual center line as the
    action buttons** beside it — not raised, dropped, or offset.
@@ -177,15 +177,15 @@ Open in `Components/BulkSelectToolbar`: Default, NothingFiltered.
 3. Buttons remain legible and tappable-looking at the story's default
    size; nothing overlaps the count text.
 
-**Run when:** `src/components/BulkSelectToolbar.tsx`, its stories, or
+**Run when:** `src/widgets/BulkSelectToolbar.tsx`, its stories, or
 a changeset naming BulkSelectToolbar.
 
 ---
 
 ## DismissibleBanner & InlineAlert
 
-Open in `Components/DismissibleBanner`: Info, Warning, WithActions —
-and `Components/InlineAlert`: Info, Success, Warning, Error.
+Open in `Widgets/DismissibleBanner`: Info, Warning, WithActions —
+and `Widgets/InlineAlert`: Info, Success, Warning, Error.
 
 1. The dismiss (×) glyph renders **large and clearly visible** (2xl
    class), centered in its 44px touch target — not a tiny × in the
@@ -198,8 +198,8 @@ and `Components/InlineAlert`: Info, Success, Warning, Error.
    is distinguishable and the message is readable against its
    background in all four stories.
 
-**Run when:** `src/components/DismissibleBanner.tsx`,
-`src/components/InlineAlert.tsx`, their stories, or a changeset
+**Run when:** `src/widgets/DismissibleBanner.tsx`,
+`src/widgets/InlineAlert.tsx`, their stories, or a changeset
 naming DismissibleBanner, InlineAlert, or Alert.
 
 ---
@@ -246,7 +246,7 @@ changeset naming CheckboxField.
 
 ## StarRatingInput
 
-Open in `Components/StarRatingInput`: Default, Unrated, WithoutLabel,
+Open in `Widgets/StarRatingInput`: Default, Unrated, WithoutLabel,
 DarkTone, AllowClear, ReadOnly, Disabled.
 
 1. Tapping the currently-selected star in AllowClear clears the
@@ -257,14 +257,14 @@ DarkTone, AllowClear, ReadOnly, Disabled.
    Disabled reads as disabled (dimmed) and does not respond.
 4. Unrated renders five empty stars with no partial fill.
 
-**Run when:** `src/components/StarRatingInput.tsx`, its stories, or
+**Run when:** `src/widgets/StarRatingInput.tsx`, its stories, or
 a changeset naming StarRatingInput.
 
 ---
 
 ## Slider
 
-Open in `Components/Slider`: Default, Ticks, CustomRange, WithError,
+Open in `Widgets/Slider`: Default, Ticks, CustomRange, WithError,
 Disabled.
 
 1. Default: dragging the knob (or focusing it and pressing the arrow
@@ -286,14 +286,14 @@ Disabled.
    centered on the track, over a brand-primary fill that runs from
    the track's left end to the knob.
 
-**Run when:** `src/components/Slider.tsx`, its stories, or a
+**Run when:** `src/widgets/Slider.tsx`, its stories, or a
 changeset naming Slider.
 
 ---
 
 ## MasonryGrid
 
-Open in `Components/MasonryGrid`: VariableHeights, Narrow, TwoColumns,
+Open in `Widgets/MasonryGrid`: VariableHeights, Narrow, TwoColumns,
 Wide, CappedColumns, FewItems, Empty.
 
 1. VariableHeights: the twelve cards form staggered columns — cards
@@ -310,14 +310,14 @@ Wide, CappedColumns, FewItems, Empty.
    browser window — the column count steps down/up as the width
    crosses the breakpoints and the cards re-flow without overlap.
 
-**Run when:** `src/components/MasonryGrid.tsx`, its stories, or a
+**Run when:** `src/widgets/MasonryGrid.tsx`, its stories, or a
 changeset naming MasonryGrid.
 
 ---
 
 ## PrevNextNav
 
-Open in `Components/PrevNextNav`: Both, CustomLabels, NextOnly,
+Open in `Widgets/PrevNextNav`: Both, CustomLabels, NextOnly,
 NextDisabled, BackDisabled.
 
 1. BackDisabled: the Back button is hidden or visibly disabled (per
@@ -326,14 +326,14 @@ NextDisabled, BackDisabled.
 2. NextDisabled: Next reads as disabled; Back remains usable.
 3. CustomLabels render verbatim with no truncation at story width.
 
-**Run when:** `src/components/PrevNextNav.tsx`, its stories, or a
+**Run when:** `src/widgets/PrevNextNav.tsx`, its stories, or a
 changeset naming PrevNextNav.
 
 ---
 
 ## ButtonRow
 
-Open in `Components/ButtonRow`: Default.
+Open in `Widgets/ButtonRow`: Default.
 
 A ButtonRow is a row of action buttons that follows content.
 It owns the bar's whole treatment — there are no spacing props
@@ -347,7 +347,7 @@ to pass.
    list / Edit bar and the Memorize card footers are the live
    cases).
 
-**Run when:** `src/components/ButtonRow.tsx`, its stories, the
+**Run when:** `src/widgets/ButtonRow.tsx`, its stories, the
 pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
 MealPlanDetailPage), or a changeset naming ButtonRow.
 
@@ -355,7 +355,7 @@ MealPlanDetailPage), or a changeset naming ButtonRow.
 
 ## EqualButtonRow
 
-Open in `Components/EqualButtonRow`: Default, ThreeButtons,
+Open in `Widgets/EqualButtonRow`: Default, ThreeButtons,
 InCard.
 
 An EqualButtonRow is a row of action buttons that share the
@@ -373,14 +373,14 @@ props to pass.
    inset by the card's own padding (the CTA-bar composition
    PublicRecipePage adopts).
 
-**Run when:** `src/components/EqualButtonRow.tsx`, its stories,
+**Run when:** `src/widgets/EqualButtonRow.tsx`, its stories,
 PublicRecipePage's CTA bar, or a changeset naming EqualButtonRow.
 
 ---
 
 ## CardStack
 
-Open in `Components/CardStack`: Default.
+Open in `Widgets/CardStack`: Default.
 
 A CardStack is a stack of cards — a list whose rows are cards.
 
@@ -389,7 +389,7 @@ A CardStack is a stack of cards — a list whose rows are cards.
    (MealPlansPage's plan list is the live case, including the
    first card's danger Delete action).
 
-**Run when:** `src/components/CardStack.tsx`, its stories, the
+**Run when:** `src/widgets/CardStack.tsx`, its stories, the
 pages that compose CardStack (MealPlansPage), or a changeset
 naming CardStack.
 
@@ -397,7 +397,7 @@ naming CardStack.
 
 ## SectionStack
 
-Open in `Components/SectionStack`: Default.
+Open in `Widgets/SectionStack`: Default.
 
 A SectionStack is a stack of a page's sections — its major
 blocks in order.
@@ -407,7 +407,7 @@ blocks in order.
    stack's width (MealPlanDetailPage's page stack is the live
    case: every section separation on the page is that one gap).
 
-**Run when:** `src/components/SectionStack.tsx`, its stories,
+**Run when:** `src/widgets/SectionStack.tsx`, its stories,
 the pages that compose SectionStack (MealPlanDetailPage), or a
 changeset naming SectionStack.
 
@@ -415,7 +415,7 @@ changeset naming SectionStack.
 
 ## FieldRow
 
-Open in `Components/FieldRow`: Default.
+Open in `Widgets/FieldRow`: Default.
 
 A FieldRow composes form fields and their action on one line —
 here a search field with its submit button.
@@ -425,7 +425,7 @@ here a search field with its submit button.
    vertically centered on each other (VerseSearchPage's search
    row is the live case).
 
-**Run when:** `src/components/FieldRow.tsx`, its stories,
+**Run when:** `src/widgets/FieldRow.tsx`, its stories,
 `src/views/SearchField.tsx` (the `grow` prop), the pages
 that compose FieldRow (VerseSearchPage), or a changeset
 naming FieldRow.
@@ -434,7 +434,7 @@ naming FieldRow.
 
 ## ListStack
 
-Open in `Components/ListStack`: Default.
+Open in `Widgets/ListStack`: Default.
 
 A ListStack composes hairline rows as one continuous list; the
 stack adds no gap of its own — the rows own their separation.
@@ -445,7 +445,7 @@ stack adds no gap of its own — the rows own their separation.
    (MealPlanDetailPage's Entries card and MealDetailPage's
    Recipes card are the live cases).
 
-**Run when:** `src/components/ListStack.tsx`, its stories, the
+**Run when:** `src/widgets/ListStack.tsx`, its stories, the
 pages that compose ListStack (MealPlanDetailPage,
 MealDetailPage), or a changeset naming ListStack.
 
@@ -453,7 +453,7 @@ MealDetailPage), or a changeset naming ListStack.
 
 ## Center
 
-Open in `Components/Center`: Centered, HorizontalOnly.
+Open in `Widgets/Center`: Centered, HorizontalOnly.
 
 Center centers a single child; `horizontal` and `vertical` are
 booleans, both defaulting to true.
@@ -468,7 +468,7 @@ booleans, both defaulting to true.
    live page case — the spinner centered under the heading and
    create button).
 
-**Run when:** `src/components/Center.tsx`, its stories, the
+**Run when:** `src/widgets/Center.tsx`, its stories, the
 pages that compose Center (MealPlansPage), or a changeset
 naming Center.
 
@@ -476,7 +476,7 @@ naming Center.
 
 ## DetailRow
 
-Open in `Components/DetailRow`: Default, Stacked.
+Open in `Widgets/DetailRow`: Default, Stacked.
 
 1. Default: the muted label sits on the left edge and the value on
    the right edge of the same line, over a light hairline.
@@ -484,7 +484,7 @@ Open in `Components/DetailRow`: Default, Stacked.
    aligned left, values aligned right, even vertical padding on
    every row.
 
-**Run when:** `src/components/DetailRow.tsx`, its stories,
+**Run when:** `src/widgets/DetailRow.tsx`, its stories,
 MealPlanDetailPage (the nutrition-goal rows), or a changeset
 naming DetailRow.
 
@@ -492,14 +492,14 @@ naming DetailRow.
 
 ## LoadingGate
 
-Open in `Components/LoadingGate`: Default.
+Open in `Widgets/LoadingGate`: Default.
 
 1. The spinner sits centered — horizontally and vertically — on a
    plain surface background that fills the story canvas, with its
    accessible label naming what is loading ("Loading meal plan").
 2. MealPlanDetailPage's Loading story shows the identical gate.
 
-**Run when:** `src/components/LoadingGate.tsx`, its stories,
+**Run when:** `src/widgets/LoadingGate.tsx`, its stories,
 MealPlanDetailPage's loading state, or a changeset naming
 LoadingGate.
 
@@ -507,7 +507,7 @@ LoadingGate.
 
 ## MessageCard
 
-Open in `Components/MessageCard`: Default, LongMessage.
+Open in `Widgets/MessageCard`: Default, LongMessage.
 
 A MessageCard is a whole-screen message state: a card carrying
 a heading and one explanatory line, centered — horizontally
@@ -525,7 +525,7 @@ strings.
 3. PublicRecipePage's NotFound and Unavailable stories show
    the identical state once the page adopts the component.
 
-**Run when:** `src/components/MessageCard.tsx`, its stories,
+**Run when:** `src/widgets/MessageCard.tsx`, its stories,
 PublicRecipePage's notFound and unavailable states, or a
 changeset naming MessageCard.
 
@@ -533,7 +533,7 @@ changeset naming MessageCard.
 
 ## ListRow
 
-Open in `Components/ListRow`: Prefixed, Plain, Disabled.
+Open in `Widgets/ListRow`: Prefixed, Plain, Disabled.
 
 1. Prefixed: the title line reads "Meal · Taco Tuesday" (the
    prefix is caller-supplied content) in medium weight over the
@@ -545,14 +545,14 @@ Open in `Components/ListRow`: Prefixed, Plain, Disabled.
    suffix; the row does not press, is not focusable, and is
    exposed as disabled.
 
-**Run when:** `src/components/ListRow.tsx`, its stories,
+**Run when:** `src/widgets/ListRow.tsx`, its stories,
 MealPlanDetailPage's entries, or a changeset naming ListRow.
 
 ---
 
 ## CardRow
 
-Open in `Components/CardRow`: Default, WithAction, TitleOnly.
+Open in `Widgets/CardRow`: Default, WithAction, TitleOnly.
 
 1. Default: an elevated card with the title in semibold over its
    muted meta line; the text block presses (pointer cursor on
@@ -563,12 +563,12 @@ Open in `Components/CardRow`: Default, WithAction, TitleOnly.
 3. TitleOnly: the card shows the title alone, no meta line and no
    empty gap where it would sit.
 
-**Run when:** `src/components/CardRow.tsx`, its stories,
+**Run when:** `src/widgets/CardRow.tsx`, its stories,
 MealPlansPage's list, or a changeset naming CardRow.
 
 ## PresetValueSelector
 
-Open in `Components/PresetValueSelector`: Default,
+Open in `Widgets/PresetValueSelector`: Default,
 CustomSelected.
 
 1. Default: the Scale row shows ½× / 1× / 2× / 3× preset buttons
@@ -584,7 +584,7 @@ CustomSelected.
    nothing and restores the previous value. On web the Custom
    button carries `aria-pressed` matching its selected state.
 
-**Run when:** `src/components/PresetValueSelector.tsx`, its
+**Run when:** `src/widgets/PresetValueSelector.tsx`, its
 stories, the recipe pages' scale rows, or a changeset naming
 PresetValueSelector.
 
@@ -592,7 +592,7 @@ PresetValueSelector.
 
 ## CheckRow
 
-Open in `Components/CheckRow`: Default, Checked, LabelOnly.
+Open in `Widgets/CheckRow`: Default, Checked, LabelOnly.
 
 1. Default: an outlined box sits left of a bold label with its
    muted detail ("2 tbsp · optional") on the same line, over a
@@ -604,14 +604,14 @@ Open in `Components/CheckRow`: Default, Checked, LabelOnly.
 3. LabelOnly: no detail segment renders — the label stands
    alone with no trailing separator.
 
-**Run when:** `src/components/CheckRow.tsx`, its stories,
+**Run when:** `src/widgets/CheckRow.tsx`, its stories,
 ShoppingListPage's list, or a changeset naming CheckRow.
 
 ---
 
 ## TextActionCardRow
 
-Open in `Components/TextActionCardRow`: Default, TitleOnly.
+Open in `Widgets/TextActionCardRow`: Default, TitleOnly.
 
 1. Default: an elevated card with the title in semibold over
    its muted subtitle; the text block is a link (anchor on
@@ -620,7 +620,7 @@ Open in `Components/TextActionCardRow`: Default, TitleOnly.
 2. TitleOnly: the card shows the title alone, no subtitle line
    and no empty gap where it would sit.
 
-**Run when:** `src/components/TextActionCardRow.tsx`, its
+**Run when:** `src/widgets/TextActionCardRow.tsx`, its
 stories, MealsHubPage's meal list, or a changeset naming
 TextActionCardRow.
 
@@ -628,7 +628,7 @@ TextActionCardRow.
 
 ## BadgeCardRow
 
-Open in `Components/BadgeCardRow`: Default, DeleteOnly.
+Open in `Widgets/BadgeCardRow`: Default, DeleteOnly.
 
 1. Default: a compact card (small padding and shadow) with the
    colored badge at the left and Edit / Delete as bare text
@@ -636,14 +636,14 @@ Open in `Components/BadgeCardRow`: Default, DeleteOnly.
 2. DeleteOnly: only the Delete action shows; the badge keeps
    its color and the row height is unchanged.
 
-**Run when:** `src/components/BadgeCardRow.tsx`, its stories,
+**Run when:** `src/widgets/BadgeCardRow.tsx`, its stories,
 TagsPage's rows, or a changeset naming BadgeCardRow.
 
 ---
 
 ## StepOverlay
 
-Open in `Components/StepOverlay`: Default, LongBody.
+Open in `Widgets/StepOverlay`: Default, LongBody.
 
 1. The dark overlay fills its frame: title and step eyebrows
    render uppercase and dimmed over the step body in large
@@ -669,21 +669,21 @@ Open in `Components/StepOverlay`: Default, LongBody.
    Press Done again: the overlay closes and keyboard focus
    returns to the "Reopen the overlay" button.
 
-**Run when:** `src/components/StepOverlay.tsx`, its stories,
+**Run when:** `src/widgets/StepOverlay.tsx`, its stories,
 MealCookingModePage, or a changeset naming StepOverlay.
 
 ---
 
 ## PinnedHeaderShell
 
-Open in `Components/PinnedHeaderShell`: Default.
+Open in `Widgets/PinnedHeaderShell`: Default.
 
 1. The header block (title over the tab bar) stays pinned at
    the top on the light page background while the content
    region below it scrolls; the header's inset matches the
    page inset (16px sides and top).
 
-**Run when:** `src/components/PinnedHeaderShell.tsx`, its
+**Run when:** `src/widgets/PinnedHeaderShell.tsx`, its
 stories, MealsHubPage's plans tab, or a changeset naming
 PinnedHeaderShell.
 
@@ -691,9 +691,9 @@ PinnedHeaderShell.
 
 ## FieldStack & TrailingActionsRow; Card's compact variant
 
-Open in `Components/FieldStack`: Default;
-`Components/TrailingActionsRow`: FieldAndAction,
-ContentAndTextActions, Narrow; `Components/Card`: Compact.
+Open in `Widgets/FieldStack`: Default;
+`Widgets/TrailingActionsRow`: FieldAndAction,
+ContentAndTextActions, Narrow; `Widgets/Card`: Compact.
 
 1. FieldStack: the form's fields stack at an even 12px rhythm
    with the button row last.
@@ -708,17 +708,17 @@ ContentAndTextActions, Narrow; `Components/Card`: Compact.
    former CompactCard, folded into Card as `variant="compact"`
    under Stephen's 2026-10-29 ruling).
 
-**Run when:** `src/components/FieldStack.tsx`,
-`src/components/TrailingActionsRow.tsx`,
-`src/components/Card.tsx`, their stories, TagsPage's
+**Run when:** `src/widgets/FieldStack.tsx`,
+`src/widgets/TrailingActionsRow.tsx`,
+`src/widgets/Card.tsx`, their stories, TagsPage's
 forms or rows, or a changeset naming any of them.
 
 ---
 
 ## ButtonStack & CenteredText
 
-Open in `Components/ButtonStack`: Default;
-`Components/CenteredText`: Default.
+Open in `Widgets/ButtonStack`: Default;
+`Widgets/CenteredText`: Default.
 
 1. ButtonStack: the three buttons stretch full width at an
    even 12px rhythm.
@@ -726,8 +726,8 @@ Open in `Components/ButtonStack`: Default;
    centered) in the muted ink; the plain line centers in the
    default ink.
 
-**Run when:** `src/components/ButtonStack.tsx`,
-`src/components/CenteredText.tsx`, their stories, HomePage's
+**Run when:** `src/widgets/ButtonStack.tsx`,
+`src/widgets/CenteredText.tsx`, their stories, HomePage's
 header, or a changeset naming either.
 
 ---
@@ -759,9 +759,9 @@ pages, or a changeset naming either.
 
 ## RatingsCard, StatusBadge & SectionHeading
 
-Open in `Components/RatingsCard`: Default, NoRatingsYet,
-Stale; `Components/StatusBadge`: Tones;
-`Components/SectionHeading`: Default.
+Open in `Widgets/RatingsCard`: Default, NoRatingsYet,
+Stale; `Widgets/StatusBadge`: Tones;
+`Widgets/SectionHeading`: Default.
 
 1. RatingsCard Default: the eyebrow label, the community stars
    with the numeric average and rating count, and the viewer's
@@ -778,18 +778,18 @@ Stale; `Components/StatusBadge`: Tones;
    heading itself carries no padding; the story's panel
    supplies the inset.
 
-**Run when:** `src/components/RatingsCard.tsx`,
-`src/components/StatusBadge.tsx`,
-`src/components/SectionHeading.tsx`, their stories, or a
+**Run when:** `src/widgets/RatingsCard.tsx`,
+`src/widgets/StatusBadge.tsx`,
+`src/widgets/SectionHeading.tsx`, their stories, or a
 changeset naming any of them.
 
 ---
 
 ## Page shells (ScreenShell, ScrollShell, SessionShell, PinnedHeaderShell)
 
-Open in `Components/ScreenShell`: Default;
-`Components/ScrollShell`: Default; `Components/SessionShell`:
-Fixed, Scrollable; `Components/PinnedHeaderShell`: Default.
+Open in `Widgets/ScreenShell`: Default;
+`Widgets/ScrollShell`: Default; `Widgets/SessionShell`:
+Fixed, Scrollable; `Widgets/PinnedHeaderShell`: Default.
 
 1. ScreenShell: the pinned bar stays fixed while the region
    below scrolls; the surface behind is the shell's paint.
@@ -809,12 +809,12 @@ or a changeset naming them.
 
 ## Public frame & document chrome
 
-Open in `Components/PublicFrameLayout`: Default;
-`Components/PublicFrameHeader`: Default;
-`Components/BigFooter`: Default, Memorize, NoSocialsYet, MobileStacked, StickyOnShortPage;
-`Components/BrandLink`: Default;
-`Components/DocumentHeader`: Default;
-`Components/DocumentFooter`: Default.
+Open in `Widgets/PublicFrameLayout`: Default;
+`Widgets/PublicFrameHeader`: Default;
+`Widgets/BigFooter`: Default, Memorize, NoSocialsYet, MobileStacked, StickyOnShortPage;
+`Widgets/BrandLink`: Default;
+`Widgets/DocumentHeader`: Default;
+`Widgets/DocumentFooter`: Default.
 
 1. The header band: wordmark left, Sign in right — both are
    real links (the DOM nodes are anchors carrying their
@@ -836,7 +836,7 @@ Open in `Components/PublicFrameLayout`: Default;
    in the lighter in-column row (no band); DocumentFooter
    renders the caller's links as links under its divider.
 
-**Run when:** `src/components/PublicFrameLayout.tsx`,
+**Run when:** `src/widgets/PublicFrameLayout.tsx`,
 `PublicFrameHeader.tsx`, `BigFooter.tsx`,
 `BrandLink.tsx`, `DocumentHeader.tsx`, `DocumentFooter.tsx`,
 their stories, or a changeset naming any of them.
@@ -845,7 +845,7 @@ their stories, or a changeset naming any of them.
 
 ## List states (ListLoadingState)
 
-Open in `Components/ListLoadingState`: Default.
+Open in `Widgets/ListLoadingState`: Default.
 
 1. ListLoadingState: the spinner renders centered in its
    parent with its label; the state carries no padding or
@@ -859,22 +859,22 @@ Open in `Components/ListLoadingState`: Default.
    `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
    sits under the filter bar, flush to the parent's inset.
 
-**Run when:** `src/components/ListLoadingState.tsx`, its
+**Run when:** `src/widgets/ListLoadingState.tsx`, its
 stories, or a changeset naming it.
 
 ---
 
 ## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, StatusMessage, SearchRow, RemovableField)
 
-Open in `Components/StepList`: Default;
-`Components/MarkableRow`: Default;
-`Components/SuggestionPanel`: Default;
-`Components/TagList`: Default; `Components/FieldStack`: (its
-stories); `Components/TextActionCardRow`: (its stories);
-`Components/CenteredText`: (its stories);
-`Components/StatusMessage`: Default, Empty, Transient;
-`Components/SearchRow`: (its stories);
-`Components/RemovableField`: (its stories).
+Open in `Widgets/StepList`: Default;
+`Widgets/MarkableRow`: Default;
+`Widgets/SuggestionPanel`: Default;
+`Widgets/TagList`: Default; `Widgets/FieldStack`: (its
+stories); `Widgets/TextActionCardRow`: (its stories);
+`Widgets/CenteredText`: (its stories);
+`Widgets/StatusMessage`: Default, Empty, Transient;
+`Widgets/SearchRow`: (its stories);
+`Widgets/RemovableField`: (its stories).
 
 1. StepList: steps render numbered in order; a step with a
    heading shows it above its body.
@@ -901,11 +901,11 @@ changeset naming them.
 
 ## Form set (FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)
 
-Open in `Components/FormStack`: Default;
-`Components/FormHeading`: Default, WithSubtitle;
-`Components/LabeledField`: Default, WithAction, WithError;
-`Components/LabeledGroup`: Default, WithAction;
-`Components/FieldLabel`: Default, Associated;
+Open in `Widgets/FormStack`: Default;
+`Widgets/FormHeading`: Default, WithSubtitle;
+`Widgets/LabeledField`: Default, WithAction, WithError;
+`Widgets/LabeledGroup`: Default, WithAction;
+`Widgets/FieldLabel`: Default, Associated;
 `Views/RevertAction` and `Views/ChangedListBanner`
 (their stories).
 
@@ -935,7 +935,7 @@ pages, or a changeset naming them.
 
 ## Thumbnail
 
-Open in `Components/Thumbnail`: Hero, Banner, Row.
+Open in `Widgets/Thumbnail`: Hero, Banner, Row.
 
 1. Hero: the image sits contained (whole image visible) inside
    a recessed light-gray frame 256px tall with large rounded
@@ -945,7 +945,7 @@ Open in `Components/Thumbnail`: Hero, Banner, Row.
 3. Row: a 64px square image, cover-cropped, medium rounded
    corners, over the hint line.
 
-**Run when:** `src/components/Thumbnail.tsx`, its stories, the
+**Run when:** `src/widgets/Thumbnail.tsx`, its stories, the
 recipe pages' imagery or the import review's preview, or a
 changeset naming Thumbnail.
 
@@ -953,7 +953,7 @@ changeset naming Thumbnail.
 
 ## ScrollRegion
 
-Open in `Components/ScrollRegion`: Default.
+Open in `Widgets/ScrollRegion`: Default.
 
 1. The "Pinned header" block stays at the top and the "Pinned
    footer" block at the bottom of the 480px frame while the
@@ -964,7 +964,7 @@ Open in `Components/ScrollRegion`: Default.
    paragraphs contain no focusable elements) and the arrow /
    Page Down keys scroll it.
 
-**Run when:** `src/components/ScrollRegion.tsx`, its stories,
+**Run when:** `src/widgets/ScrollRegion.tsx`, its stories,
 a fixed-shell page's scroll region, or a changeset naming
 ScrollRegion.
 
@@ -972,7 +972,7 @@ ScrollRegion.
 
 ## StatBand
 
-Open in `Components/StatBand`: Default, TwoStats.
+Open in `Widgets/StatBand`: Default, TwoStats.
 
 1. Default: Servings, Prep, and Cook stat cards spread evenly
    across a recessed light-gray band with large rounded corners
@@ -980,27 +980,27 @@ Open in `Components/StatBand`: Default, TwoStats.
 2. TwoStats: the two cards spread to the band's ends with the
    same fill and padding.
 
-**Run when:** `src/components/StatBand.tsx`, its stories, the
+**Run when:** `src/widgets/StatBand.tsx`, its stories, the
 recipe detail pages' stat band, or a changeset naming StatBand.
 
 ---
 
 ## ScrollShell
 
-Open in `Components/ScrollShell`: Default.
+Open in `Widgets/ScrollShell`: Default.
 
 1. The shell's blocks sit 16px from the canvas edges and from
    each other, on a surface background that fills the frame; the
    content scrolls as one region when it overflows.
 
-**Run when:** `src/components/ScrollShell.tsx`, its stories,
+**Run when:** `src/widgets/ScrollShell.tsx`, its stories,
 PublicRecipePage, or a changeset naming ScrollShell.
 
 ---
 
 ## RatingsCard
 
-Open in `Components/RatingsCard`: Default, Stale, No Ratings Yet.
+Open in `Widgets/RatingsCard`: Default, Stale, No Ratings Yet.
 
 1. Default: the community average shows ("4.6 (9)"); "Your
    rating" shows the viewer's stars — pressing the currently
@@ -1012,7 +1012,7 @@ Open in `Components/RatingsCard`: Default, Stale, No Ratings Yet.
    signed-out form (no "Your rating" block) is exercised by
    PublicRecipePage's Default story.
 
-**Run when:** `src/components/RatingsCard.tsx`, its stories,
+**Run when:** `src/widgets/RatingsCard.tsx`, its stories,
 PublicRecipePage's engagement block, or a changeset naming
 RatingsCard.
 
@@ -1020,14 +1020,14 @@ RatingsCard.
 
 ## RemovableField
 
-Open in `Components/RemovableField`: Default.
+Open in `Widgets/RemovableField`: Default.
 
 1. A small ghost "Remove" button sits right-aligned above the
    Ingredient field at a 4px gap; its accessible name names the
    field ("Remove Ingredient filter").
 2. The field under it renders at full width, unchanged.
 
-**Run when:** `src/components/RemovableField.tsx`, its
+**Run when:** `src/widgets/RemovableField.tsx`, its
 stories, the catalog pages' filter bars, or a changeset naming
 RemovableField.
 
@@ -1203,14 +1203,14 @@ Default, NoSelection, SaveError. Open in
 
 **Run when:** `src/pages/RecipeFormPage.tsx`,
 `src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
-`src/components/AutocompletePicker.tsx`, their stories, or a
+`src/widgets/AutocompletePicker.tsx`, their stories, or a
 changeset naming any of the three pages or AutocompletePicker.
 
 ---
 
 ## Spinner
 
-Open in `Components/Spinner`: Default, Large, Determinate,
+Open in `Widgets/Spinner`: Default, Large, Determinate,
 DeterminateComplete, DeterminateLarge, DeterminateStates.
 
 1. Default and Large still spin continuously (indeterminate); Large
@@ -1229,7 +1229,7 @@ DeterminateComplete, DeterminateLarge, DeterminateStates.
    smoothly between the states above; setting `size` to large grows
    the ring without changing its proportions.
 
-**Run when:** `src/components/Spinner.tsx`, its stories, or a
+**Run when:** `src/widgets/Spinner.tsx`, its stories, or a
 changeset naming Spinner.
 
 ---
@@ -1459,7 +1459,7 @@ naming TagsPage.
 
 ## Button
 
-Open in `Components/Button`: Primary, Secondary, Ghost, Danger,
+Open in `Widgets/Button`: Primary, Secondary, Ghost, Danger,
 Sizes, Disabled, AllVariants, WithIcon, WithIconVariants, IconOnly,
 IconOnlyVariants, IconSizes, IconDisabled, IconPressCounter,
 Toggle, ToggleStates.
@@ -1496,16 +1496,16 @@ button. The icon-slot stories:
    treatment, selected primary-filled, and selected-disabled is
    dimmed and inert.
 
-**Run when:** `src/components/Button.tsx`, its stories, or a
+**Run when:** `src/widgets/Button.tsx`, its stories, or a
 changeset naming Button or the Button icon slot.
 
 ---
 
 ## Navigation link forms (Button, TextLink, BackLink, Tabs)
 
-Open in `Components/Button`: Link, LinkVariants, LinkSizes,
-LinkDisabled. Open in `Components/TextLink`: Href, HrefInProse.
-Open in `Components/BackLink`: Href. Open in `Components/Tabs`:
+Open in `Widgets/Button`: Link, LinkVariants, LinkSizes,
+LinkDisabled. Open in `Widgets/TextLink`: Href, HrefInProse.
+Open in `Widgets/BackLink`: Href. Open in `Widgets/Tabs`:
 LinkNavigation.
 
 The href (link) forms from #248 stage 1 — a navigating control
@@ -1531,7 +1531,7 @@ renders as a real anchor carrying its href:
    label treatment. The button-variant stories (RecipeDetail,
    AppNavigation) still switch the selection in place.
 
-**Run when:** `src/components/Button.tsx`, `TextLink.tsx`,
+**Run when:** `src/widgets/Button.tsx`, `TextLink.tsx`,
 `BackLink.tsx`, or `Tabs.tsx`, their stories, or a changeset
 naming the navigation link forms or #248.
 
@@ -1539,7 +1539,7 @@ naming the navigation link forms or #248.
 
 ## Dropdown
 
-Open in `Components/Dropdown`: ActionMenu, IconOnlyTrigger,
+Open in `Widgets/Dropdown`: ActionMenu, IconOnlyTrigger,
 AlignEnd, SideTop, InitiallyOpen, Controlled.
 
 1. ActionMenu: pressing "Recipe actions" opens the panel anchored
@@ -1564,14 +1564,14 @@ AlignEnd, SideTop, InitiallyOpen, Controlled.
    is toggled, and "Open from outside" opens it — the host owns the
    state.
 
-**Run when:** `src/components/Dropdown.tsx`, its stories, or a
+**Run when:** `src/widgets/Dropdown.tsx`, its stories, or a
 changeset naming Dropdown.
 
 ---
 
 ## DropdownButton
 
-Open in `Components/DropdownButton`: Labeled, WithIcon, IconOnly,
+Open in `Widgets/DropdownButton`: Labeled, WithIcon, IconOnly,
 Variants, Disabled. Each story's button is the trigger of a small
 dropdown whose panel reads "Menu content".
 
@@ -1587,14 +1587,14 @@ dropdown whose panel reads "Menu content".
 5. Disabled: the trigger renders dimmed and pressing it does not
    open the menu.
 
-**Run when:** `src/components/DropdownButton.tsx`, its stories, or
+**Run when:** `src/widgets/DropdownButton.tsx`, its stories, or
 a changeset naming DropdownButton.
 
 ---
 
 ## Text
 
-Open in `Components/Text`: AllVariants (or any page story, e.g.
+Open in `Widgets/Text`: AllVariants (or any page story, e.g.
 `Pages/Eciperay/SignInPage`).
 
 1. The `heading` variant ("Heading" in AllVariants; the page title
@@ -1626,8 +1626,8 @@ Open in `Components/Text`: AllVariants (or any page story, e.g.
 8. Visually nothing changes: heading/subheading keep their sizes
    and weights, and all variants keep their theme fonts.
 
-**Run when:** `src/components/Text.tsx`, its stories, the
-accessibility translator (`src/components/accessibility.ts`), or a
+**Run when:** `src/widgets/Text.tsx`, its stories, the
+accessibility translator (`src/widgets/accessibility.ts`), or a
 changeset naming Text or heading semantics.
 
 ---
@@ -1739,21 +1739,21 @@ auth forms or LegalSection.
 
 ## PanelStack
 
-Open in `Components/PanelStack`: Default.
+Open in `Widgets/PanelStack`: Default.
 
 1. The panel's blocks (the title, the body text, the stat
    band) sit inside an even 16px inset with 16px between
    blocks, and the panel stretches to its column's width —
    the blocks are listed, never spaced by hand.
 
-**Run when:** `src/components/PanelStack.tsx`, its stories, a
+**Run when:** `src/widgets/PanelStack.tsx`, its stories, a
 detail page composing it, or a changeset naming PanelStack.
 
 ---
 
 ## Toolbar
 
-Open in `Components/Toolbar`: Default.
+Open in `Widgets/Toolbar`: Default.
 
 1. The status badge and the Version select share one line
    over a hairline divider, the select growing to take the
@@ -1762,14 +1762,14 @@ Open in `Components/Toolbar`: Default.
    select wraps onto a second line instead of overflowing
    the bar.
 
-**Run when:** `src/components/Toolbar.tsx`, its stories, a
+**Run when:** `src/widgets/Toolbar.tsx`, its stories, a
 fixed-shell page composing it, or a changeset naming Toolbar.
 
 ---
 
 ## AutocompletePicker
 
-Open in `Components/AutocompletePicker`: WithResults,
+Open in `Widgets/AutocompletePicker`: WithResults,
 NoSelection, Searching, NoResults.
 
 1. WithResults: the search field (opened mid-search,
@@ -1785,7 +1785,7 @@ NoSelection, Searching, NoResults.
    NoSelection: no selected list renders, and the empty
    search field shows no result area at all.
 
-**Run when:** `src/components/AutocompletePicker.tsx`, its
+**Run when:** `src/widgets/AutocompletePicker.tsx`, its
 stories, or a changeset naming AutocompletePicker.
 
 ---
@@ -1811,7 +1811,7 @@ stories, or a changeset naming CandidateList.
 
 ## LogEntryCard
 
-Open in `Components/LogEntryCard`: Default, WithoutAction.
+Open in `Widgets/LogEntryCard`: Default, WithoutAction.
 
 1. Default: the date and the star rating head the card, the
    notes body follows, and the Delete action sits below,
@@ -1820,14 +1820,14 @@ Open in `Components/LogEntryCard`: Default, WithoutAction.
 2. WithoutAction: the card renders its date and rating with
    no Delete action.
 
-**Run when:** `src/components/LogEntryCard.tsx`, its
+**Run when:** `src/widgets/LogEntryCard.tsx`, its
 stories, or a changeset naming LogEntryCard.
 
 ---
 
 ## NutritionPanel
 
-Open in `Components/NutritionPanel`: Ready, Loading,
+Open in `Widgets/NutritionPanel`: Ready, Loading,
 Unavailable, UnavailableRefreshing.
 
 1. Ready: the "Per Serving" header with its Refresh action,
@@ -1839,14 +1839,14 @@ Unavailable, UnavailableRefreshing.
    action reads "Refreshing…" and renders disabled while
    the refresh is in flight.
 
-**Run when:** `src/components/NutritionPanel.tsx`, its
+**Run when:** `src/widgets/NutritionPanel.tsx`, its
 stories, or a changeset naming NutritionPanel.
 
 ---
 
 ## RecipeOverviewPanel
 
-Open in `Components/RecipeOverviewPanel`: Default, Minimal.
+Open in `Widgets/RecipeOverviewPanel`: Default, Minimal.
 
 1. Default: the title, status pill, description, stat band,
    and tag pills stack with even 16px separation; the tag
@@ -1854,7 +1854,7 @@ Open in `Components/RecipeOverviewPanel`: Default, Minimal.
    the "Idea" pill, and the Servings stat only — no
    description, Prep/Cook stats, or tag row.
 
-**Run when:** `src/components/RecipeOverviewPanel.tsx`, its
+**Run when:** `src/widgets/RecipeOverviewPanel.tsx`, its
 stories, PublicRecipePage, RecipeDetailPage, or a changeset
 naming RecipeOverviewPanel.
 
@@ -1862,7 +1862,7 @@ naming RecipeOverviewPanel.
 
 ## RecipeIngredientsPanel
 
-Open in `Components/RecipeIngredientsPanel`: Default, Plain.
+Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
 
 1. Default: the servings stepper and the Scale preset row
    fit the width without the Scale row wrapping; the Custom
@@ -1874,7 +1874,7 @@ Open in `Components/RecipeIngredientsPanel`: Default, Plain.
 2. Plain: two unadorned rows with hairline separators and no
    substitutions panel.
 
-**Run when:** `src/components/RecipeIngredientsPanel.tsx`,
+**Run when:** `src/widgets/RecipeIngredientsPanel.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeIngredientsPanel.
 
@@ -1882,13 +1882,13 @@ changeset naming RecipeIngredientsPanel.
 
 ## RecipeInstructionsPanel
 
-Open in `Components/RecipeInstructionsPanel`: Default.
+Open in `Widgets/RecipeInstructionsPanel`: Default.
 
 1. The first step card is highlighted (primary border and
    tint) on open; pressing another card moves the highlight
    to it. Steps render in step-number order.
 
-**Run when:** `src/components/RecipeInstructionsPanel.tsx`,
+**Run when:** `src/widgets/RecipeInstructionsPanel.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeInstructionsPanel.
 
@@ -1896,7 +1896,7 @@ changeset naming RecipeInstructionsPanel.
 
 ## PreviewCard
 
-Open in `Components/PreviewCard`: Default, NoTitle,
+Open in `Widgets/PreviewCard`: Default, NoTitle,
 NoActions.
 
 1. Default: the title heads the framed preview in its own
@@ -1907,7 +1907,7 @@ NoActions.
    the card's inset.
 3. NoActions: no actions row renders below the content.
 
-**Run when:** `src/components/PreviewCard.tsx`, its stories,
+**Run when:** `src/widgets/PreviewCard.tsx`, its stories,
 AiSessionPage, ImportReviewPage, or a changeset naming
 PreviewCard.
 
@@ -1915,7 +1915,7 @@ PreviewCard.
 
 ## BadgeCardRow
 
-Open in `Components/BadgeCardRow`: Default, DeleteOnly.
+Open in `Widgets/BadgeCardRow`: Default, DeleteOnly.
 
 1. Default: a compact card (small padding and shadow) with
    the colored badge at the left and Edit / Delete as bare
@@ -1923,7 +1923,7 @@ Open in `Components/BadgeCardRow`: Default, DeleteOnly.
 2. DeleteOnly: only the Delete action shows; the badge
    keeps its color and the row height is unchanged.
 
-**Run when:** `src/components/BadgeCardRow.tsx`, its
+**Run when:** `src/widgets/BadgeCardRow.tsx`, its
 stories, TagsPage's rows, or a changeset naming
 BadgeCardRow.
 
@@ -1931,8 +1931,8 @@ BadgeCardRow.
 
 ## TrailingActionsRow; Card's compact variant
 
-Open in `Components/TrailingActionsRow`: FieldAndAction,
-ContentAndTextActions, Narrow; `Components/Card`: Compact.
+Open in `Widgets/TrailingActionsRow`: FieldAndAction,
+ContentAndTextActions, Narrow; `Widgets/Card`: Compact.
 
 1. FieldAndAction: the leading group sits at the left and
    the action at the right on one line.
@@ -1945,20 +1945,20 @@ ContentAndTextActions, Narrow; `Components/Card`: Compact.
    (the former CompactCard, folded into Card as
    `variant="compact"` under Stephen's 2026-10-29 ruling).
 
-**Run when:** `src/components/TrailingActionsRow.tsx`,
-`src/components/Card.tsx`, their stories, TagsPage's forms
+**Run when:** `src/widgets/TrailingActionsRow.tsx`,
+`src/widgets/Card.tsx`, their stories, TagsPage's forms
 or rows, or a changeset naming any of them.
 
 ---
 
 ## ButtonStack
 
-Open in `Components/ButtonStack`: Default.
+Open in `Widgets/ButtonStack`: Default.
 
 1. The three buttons stretch full width at an even 12px
    rhythm.
 
-**Run when:** `src/components/ButtonStack.tsx`, its
+**Run when:** `src/widgets/ButtonStack.tsx`, its
 stories, HomePage's actions, or a changeset naming
 ButtonStack.
 
@@ -1966,7 +1966,7 @@ ButtonStack.
 
 ## CheckRow
 
-Open in `Components/CheckRow`: Default, Checked, LabelOnly.
+Open in `Widgets/CheckRow`: Default, Checked, LabelOnly.
 
 1. Default: an outlined box sits left of a bold label with
    its muted detail ("2 tbsp · optional") on the same line,
@@ -1978,14 +1978,14 @@ Open in `Components/CheckRow`: Default, Checked, LabelOnly.
 3. LabelOnly: no detail segment renders — the label stands
    alone with no trailing separator.
 
-**Run when:** `src/components/CheckRow.tsx`, its stories,
+**Run when:** `src/widgets/CheckRow.tsx`, its stories,
 ShoppingListPage's list, or a changeset naming CheckRow.
 
 ---
 
 ## StepOverlay
 
-Open in `Components/StepOverlay`: Default, LongBody.
+Open in `Widgets/StepOverlay`: Default, LongBody.
 
 1. The dark overlay fills its frame: title and step eyebrows
    render uppercase and dimmed over the step body in large
@@ -2015,7 +2015,7 @@ Open in `Components/StepOverlay`: Default, LongBody.
    and keyboard focus returns to the "Reopen the overlay"
    button.
 
-**Run when:** `src/components/StepOverlay.tsx`, its
+**Run when:** `src/widgets/StepOverlay.tsx`, its
 stories, MealCookingModePage, or a changeset naming
 StepOverlay.
 
@@ -2023,26 +2023,26 @@ StepOverlay.
 
 ## FieldColumns
 
-Open in `Components/FieldColumns`: Default.
+Open in `Widgets/FieldColumns`: Default.
 
 1. Servings, Prep (min), and Cook (min) fields sit in three
    equal-width columns with an even gutter between them;
    each label sits over its own field.
 
-**Run when:** `src/components/FieldColumns.tsx`, its
+**Run when:** `src/widgets/FieldColumns.tsx`, its
 stories, RecipeFormPage, or a changeset naming FieldColumns.
 
 ---
 
 ## FormSubmit
 
-Open in `Components/FormSubmit`: Default.
+Open in `Widgets/FormSubmit`: Default.
 
 1. FormSubmit Default: the Save meal button sits 32px below
    the field above it — FormSubmit's own 16px of top padding
    on top of the layout's 16px gap — full width.
 
-**Run when:** `src/components/FormSubmit.tsx`, its stories,
+**Run when:** `src/widgets/FormSubmit.tsx`, its stories,
 a form page composing it, or a changeset naming it.
 (FormStack and FormHeading are covered by the Form set
 section above.)
@@ -2065,7 +2065,7 @@ FirstStep, LastStep.
    WithIngredientsPanel, first in FirstStep, third in LastStep).
 
 **Run when:** `src/pages/CookingModePage.tsx`, its stories,
-`src/components/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
+`src/widgets/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
 or a changeset naming CookingModePage.
 
 ---
