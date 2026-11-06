@@ -27,7 +27,15 @@ const buttonFrameConfig = {
   // brand-neutral primary ramp.
   backgroundColor: "$primary",
   borderRadius: tokens.radii.md,
-  borderWidth: 0,
+  // Every filled variant carries a 1px border so the variants share
+  // one geometry: the secondary variant's border is visible (#459),
+  // the primary/danger borders are transparent — a borderless
+  // primary next to a bordered secondary would render 2px smaller
+  // in a ButtonRow. Ghost opts out explicitly (borderWidth 0 in its
+  // variant): it is chrome-less by design and never sits in a row
+  // as a filled peer.
+  borderColor: "transparent",
+  borderWidth: 1,
   color: "$onPrimary",
   fontSize: tokens.typography.fontSize.md,
   fontWeight: tokens.typography.fontWeight.semibold,
@@ -587,6 +595,13 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
       size={size}
       {...(selected !== undefined ? { selected } : null)}
       color={labelColor}
+      // A selected secondary button takes the primary fill and the
+      // on-primary label (the `selected` variant), so #459's
+      // border-matches-text rule follows the label: the border
+      // takes the label color instead of staying gray10 on the
+      // primary fill. Unselected buttons and other variants keep
+      // the frame's border behavior.
+      {...(selected && variant === "secondary" ? { borderColor: labelColor } : null)}
       // Same instance-prop rule as `color` above, for the family:
       // Tamagui Button forwards an instance `fontFamily` to its
       // internal text element, and the BARE font name ("body", no

@@ -8,9 +8,12 @@
  * tinted surfaces — the case Stephen named is a secondary button
  * inside an info Alert. The border lives inside Button's own
  * variant styling (Button owns its styles completely; no caller
- * changes, no styling props), and the other variants stay
- * borderless at rest: primary/danger rely on their fills, ghost is
- * chrome-less by design.
+ * changes, no styling props), and the other variants show no
+ * visible border at rest: primary/danger carry the base frame's
+ * 1px TRANSPARENT border (shared geometry, so a secondary is
+ * never 2px larger than its row peers), ghost is chrome-less by
+ * design. A selected secondary button's border follows its label
+ * color onto the primary fill.
  *
  * Source scan like this repo's other contract tests (comments
  * stripped first, so the assertions pin the styling code itself,
@@ -51,12 +54,32 @@ test("the border color token matches the secondary label color the wrapper passe
   assert.match(button, /secondary: tokens\.colors\.gray\.gray10,/);
 });
 
-test("the other variants stay borderless at rest (#459)", () => {
+test("the other variants have no VISIBLE border at rest (#459)", () => {
   for (const name of ["primary", "danger"]) {
     const block = variantBlock(name);
-    assert.ok(!/borderColor/.test(block), `${name} must not gain a border`);
-    assert.ok(!/borderWidth: 1/.test(block), `${name} must not gain a 1px border`);
+    assert.ok(!/borderColor/.test(block), `${name} must not set a visible border color`);
+    assert.ok(!/borderWidth/.test(block), `${name} inherits the shared frame geometry`);
   }
   // Ghost is chrome-less by design: it explicitly zeroes the border.
   assert.match(variantBlock("ghost"), /borderWidth: 0/);
+});
+
+test("all filled variants share one geometry: the base frame carries a 1px transparent border (#459)", () => {
+  // If only secondary had a border, it would render 2px wider and
+  // taller than a primary/danger button with the same label in a
+  // ButtonRow (CodeRabbit finding on PR #490). The base frame
+  // therefore carries the 1px border for every variant, transparent
+  // except where a variant (secondary) colors it.
+  const base = /borderColor: "transparent",\s*borderWidth: 1,/.exec(button);
+  assert.ok(base, "the base frame must carry borderColor transparent + borderWidth 1");
+});
+
+test("a selected secondary button's border follows its label color (#459)", () => {
+  // Selected takes the primary fill and the on-primary label, so a
+  // gray10 border would no longer match the text. The wrapper
+  // passes the label color as the border color for that one case.
+  assert.match(
+    button,
+    /\{\.\.\.\(selected && variant === "secondary" \? \{ borderColor: labelColor \} : null\)\}/,
+  );
 });
