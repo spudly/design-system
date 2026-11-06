@@ -1,8 +1,8 @@
 import { forwardRef } from "react";
-import type { ComponentProps, ComponentType, ReactElement } from "react";
+import type { ComponentProps, ReactElement } from "react";
 import { useTheme, type TamaguiElement } from "tamagui";
 import { CollapsibleIcon } from "../icons/CollapsibleIcon.js";
-import type { IconComponentProps } from "../icons/Icon.js";
+import type { IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 import { useDropdownContext } from "./Dropdown.js";
@@ -21,8 +21,8 @@ export type DropdownButtonProps = DropdownButtonCommonProps &
     | {
         /** The trigger's visible label; it also names the button. */
         label: string;
-        /** Optional leading glyph: a DS icon component from the internal icons module. Content, not styling — Button's icon slot owns its rendering. */
-        icon?: ComponentType<IconComponentProps>;
+        /** Optional leading glyph, named from the DS semantic icon set (#438 Part 4): data, not a component — Button's icon slot owns its rendering. */
+        icon?: IconName;
         accessibilityLabel?: string;
       }
     | {
@@ -33,7 +33,7 @@ export type DropdownButtonProps = DropdownButtonCommonProps &
          * icon-only rule).
          */
         label?: undefined;
-        icon: ComponentType<IconComponentProps>;
+        icon: IconName;
         accessibilityLabel: string;
       }
   );

@@ -8,9 +8,14 @@
  * base `Icon` renderer plus one module per icon, each embedding only
  * its own glyph's data and exporting one component under a semantic
  * usage name (PrintIcon, not "printer") — so unused icons
- * tree-shake, call sites never name the icon set, and no
- * name-based API (featherIconNames / featherIconElements /
- * FeatherIcon) or app mapping (tabIcons) exists here. This test
+ * tree-shake and call sites never name the icon set. No
+ * Feather-set name API (featherIconNames / featherIconElements /
+ * FeatherIcon) or app mapping (tabIcons) exists here; the one
+ * name-based surface is the DS's own semantic name registry
+ * (iconRegistry.ts, #438 Part 4), which maps the DS's semantic
+ * usage names to these components for the DS's icon slots — it
+ * names neither the Feather glyphs nor any app concept, and its
+ * contract lives in iconRegistry.test.ts. This test
  * pins: every icon module exports its component and renders through
  * the base Icon, each carries its glyph's official Feather data
  * (printer / share-2 in full — the two icons RecipeDetailPage
@@ -161,7 +166,7 @@ test("Icon renders through react-native-svg with Feather stroke treatment (#246)
   }
 });
 
-test("the name-based API and tabIcons are gone (#246)", () => {
+test("the Feather-set name API and tabIcons are gone (#246)", () => {
   const files = [
     "src/icons/index.ts",
     "src/icons/Icon.tsx",

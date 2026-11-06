@@ -76,3 +76,61 @@ export const WithSections: Story = {
     </Viewport>
   ),
 };
+
+export const WithCoverageSections: Story = {
+  // The #438 Part 3 typed sections: subscription,
+  // feedback-preference, transfer, and account-data render from
+  // their data props (the migrated form of the slot sections
+  // WithSections exercises with stand-ins).
+  render: () => (
+    <Viewport>
+      <ProfilePage
+        footer={eciperayFooterFixture}
+        email="cook@example.com"
+        onSignOut={() => undefined}
+        subscription={{
+          planLabel: "Plus plan",
+          statusText: "Your Plus plan is active and renews on Dec 1, 2026.",
+          onManage: () => undefined,
+        }}
+        feedbackPreferenceSection={{
+          shortcutEnabled: true,
+          onShortcutEnabledChange: () => undefined,
+          consent: true,
+          consentStatusText: "Analytics consent: Accepted",
+          onAcceptConsent: () => undefined,
+          onDeclineConsent: () => undefined,
+          onWithdrawConsent: () => undefined,
+          choicesHref: "/privacy/consent",
+        }}
+        transfer={{
+          exportPicker: {
+            search: "",
+            onSearchChange: () => undefined,
+            items: [
+              { id: "r1", label: "Skillet Chicken" },
+              { id: "r2", label: "First Soup" },
+            ],
+            selectedIds: ["r1"],
+            onToggle: () => undefined,
+            onSelectAll: () => undefined,
+            onClearSelection: () => undefined,
+            onExport: () => undefined,
+            exportLabel: "Export selected (1)",
+          },
+          onImportPress: () => undefined,
+        }}
+        accountData={{
+          onExportData: () => undefined,
+          onDeleteAccount: () => undefined,
+        }}
+        legalLinks={
+          <YStack gap="$2">
+            <TextLink onPress={() => undefined}>Terms of Service</TextLink>
+            <TextLink onPress={() => undefined}>Privacy Policy</TextLink>
+          </YStack>
+        }
+      />
+    </Viewport>
+  ),
+};

@@ -27,6 +27,15 @@ export type StepOverlayProps = {
   doneLabel?: string;
   /** The Done pill's callback: leaving the steps. */
   onDone: () => void;
+  /**
+   * Optional accessory rendered between the step label and
+   * the body — a panel belonging to the step as a whole (the
+   * recipe cooking mode's scaled-ingredients panel, #438
+   * Part 3). The overlay owns only its placement in the
+   * column; the accessory's own content and treatment are the
+   * caller's composition (a view, in the pages' usage).
+   */
+  accessory?: ReactNode;
   /** The step navigation under the body — progress dots, a
    * prev/next row — composed by the caller; the overlay owns
    * the shell and the header treatment, not the controls. */
@@ -119,6 +128,7 @@ export function StepOverlay({
   body,
   doneLabel = "Done",
   onDone,
+  accessory,
   children,
 }: StepOverlayProps) {
   const shellRef = useRef<TamaguiElement>(null);
@@ -360,6 +370,7 @@ export function StepOverlay({
                 {stepLabel}
               </Text>
             </YStack>
+            {accessory ? <YStack paddingBlockEnd="$4">{accessory}</YStack> : null}
             <YStack paddingBlockEnd="$8">
               <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
                 {body}

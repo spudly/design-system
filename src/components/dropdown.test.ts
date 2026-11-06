@@ -191,7 +191,7 @@ test("DropdownButton is props-described: label/icon in, DS Button + CollapsibleI
   );
   assert.match(dropdownButton, /<CollapsibleIcon key="chevron" isOpen=\{open\}/);
   assert.match(dropdownButton, /label: string/);
-  assert.match(dropdownButton, /icon: ComponentType<IconComponentProps>/);
+  assert.match(dropdownButton, /icon: IconName/);
 });
 
 test("an icon-only DropdownButton requires its accessibility label at the type level", () => {

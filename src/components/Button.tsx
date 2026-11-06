@@ -1,10 +1,10 @@
 import { Children, forwardRef } from "react";
-import type { ComponentType, ReactNode } from "react";
+import type { ReactNode } from "react";
 import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme } from "tamagui";
 import { isWeb } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import type { IconComponentProps } from "../icons/Icon.js";
+import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
 /**
@@ -169,19 +169,21 @@ type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" |
    */
   grow?: boolean;
   /**
-   * The icon slot: one of the design system's semantic icon
-   * components from the internal icons module (PrintIcon, ShareIcon, …).
-   * This is CONTENT, not styling — Button renders the glyph itself,
-   * at the size's standard glyph size (18/20/24px for sm/md/lg),
-   * inked in the variant's label color resolved from the active
-   * theme, to the LEFT of the label; with no label it is the
-   * button's only content. There is deliberately no icon color,
-   * size, or style prop: Button owns its styling completely, the
-   * same rule that keeps styling props off every DS component.
-   * The glyph is decorative — the button carries the accessible
-   * name (the label text, or `accessibilityLabel` when icon-only).
+   * The icon slot: the NAME of one of the design system's semantic
+   * icons ("print", "share", "add", … — the internal registry's
+   * `IconName` set, #438 Part 4). The name is data, not a
+   * component: Button resolves it through the icon registry and
+   * renders the glyph itself, at the size's standard glyph size
+   * (18/20/24px for sm/md/lg), inked in the variant's label color
+   * resolved from the active theme, to the LEFT of the label; with
+   * no label it is the button's only content. This is CONTENT, not
+   * styling — there is deliberately no icon color, size, or style
+   * prop: Button owns its styling completely, the same rule that
+   * keeps styling props off every DS component. The glyph is
+   * decorative — the button carries the accessible name (the label
+   * text, or `accessibilityLabel` when icon-only).
    */
-  icon?: ComponentType<IconComponentProps>;
+  icon?: IconName;
 };
 
 /** The button form's label/icon shapes (activation by callback). */
@@ -200,7 +202,7 @@ type ButtonIconShapes =
        * so it belongs to the icon-only shape below, where the
        * label requirement lives.
        */
-      icon: ComponentType<IconComponentProps>;
+      icon: IconName;
       children: Exclude<NonNullable<ReactNode>, boolean>;
       accessibilityLabel?: string;
     }
@@ -212,7 +214,7 @@ type ButtonIconShapes =
        * assistive tech (and tests querying by role + name) can
        * find the button by.
        */
-      icon: ComponentType<IconComponentProps>;
+      icon: IconName;
       children?: boolean | null;
       accessibilityLabel: string;
     };
@@ -275,7 +277,7 @@ export type ButtonProps =
  */
 type ButtonRenderProps = ButtonOwnProps & {
   href?: string;
-  icon?: ComponentType<IconComponentProps>;
+  icon?: IconName;
   children?: ReactNode;
   accessibilityLabel?: string;
   selected?: boolean;
@@ -376,7 +378,7 @@ function useGlyphInk(variant: string | undefined): string {
  * retired chip components (#119 dedupe — chips are removed from
  * the design system entirely; a selectable pill is a button).
  *
- * Icon slot: pass a DS icon component as `icon` and it renders to
+ * Icon slot: pass an icon NAME as `icon` (#438 Part 4) and the glyph renders to
  * the left of the label, in the variant's label color; pass no label
  * and the button is icon-only — a square target (44/48/56px) that
  * then requires `accessibilityLabel` (see ButtonProps). Button owns
@@ -402,7 +404,7 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     size = "md",
     grow = false,
     selected,
-    icon: IconGlyph,
+    icon,
     children,
     color,
     href,
@@ -418,6 +420,10 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     accessibilityValue,
     ...rest
   } = props as ButtonRenderProps;
+  // The icon slot takes a NAME (#438 Part 4): resolve it to the
+  // registry's glyph component here; an absent name renders no
+  // glyph, exactly as an absent icon prop did before.
+  const IconGlyph = icon !== undefined ? iconsByName[icon] : undefined;
   // `variant`'s prop type also admits Tamagui Button's built-in variant
   // names; only the four design-system variants have a mapped label color.
   // A selected toggle takes the primary ink, matching its fill.

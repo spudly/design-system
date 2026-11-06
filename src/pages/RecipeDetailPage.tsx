@@ -39,8 +39,9 @@ import { TagList } from "../components/TagList.js";
 import { Text } from "../components/Text.js";
 import { Thumbnail } from "../components/Thumbnail.js";
 import { Toolbar } from "../components/Toolbar.js";
-import { PrintIcon } from "../icons/PrintIcon.js";
-import { ShareIcon } from "../icons/ShareIcon.js";
+import { ConfirmActionView, type ConfirmActionViewProps } from "../views/ConfirmActionView.js";
+import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
+import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeSharingView.js";
 
 /**
  * RecipeDetailPage (#49): Eciperay's recipe detail screen as a
@@ -94,6 +95,20 @@ import { ShareIcon } from "../icons/ShareIcon.js";
  * - `renderComments` (overview, engagement stack): the comments
  *   section — its own query, compose/edit draft state, and three
  *   mutations, auth-gated.
+ * #438 Part 3 view-modeled both sections after all, on the
+ * ratings pattern below: RecipeSharingView and
+ * RecipeCommentsView compose the sections from the shared
+ * widgets, with every piece of state the old rationale listed
+ * (pending selection, consent flag, drafts, pending flags)
+ * crossing as controlled props and every mutation staying
+ * behind a callback. The overview's `sharing` and `comments`
+ * data props render the views; the two render slots remain as
+ * the fallback for hosts that have not migrated. The host's
+ * three confirmation dialogs (recipe delete, cook-log delete,
+ * nutrition notice) are view-modeled the same way through
+ * ConfirmActionView, carried on the ready props'
+ * `recipeDeleteConfirmation`, `cookLogDeleteConfirmation`,
+ * and `nutritionNotice` data props.
  * Ratings, by contrast, ARE view-modeled: the community rating is
  * display data, and the viewer's star input is a controlled input
  * (value in, change out, pending disables it) with the mutation
@@ -212,6 +227,14 @@ export type RecipeDetailPageCommunityRating = RatingsCardCommunityRating;
 export type RecipeDetailPageViewerRating = RatingsCardViewerRating;
 export type RecipeDetailPageRatings = RatingsCardRatings;
 
+// The sharing / comments view-models live with the views
+// (#438 Part 3); the page's contract names are aliases, as
+// with the ratings types above.
+export type RecipeDetailPageSharing = RecipeSharingViewProps;
+export type RecipeDetailPageComments = RecipeCommentsViewProps;
+/** A confirmation-dialog view-model (ConfirmActionView's props). */
+export type RecipeDetailPageConfirmation = ConfirmActionViewProps;
+
 export type RecipeDetailPageOverviewProps = {
   imageUrl?: string | null;
   title: string;
@@ -275,6 +298,19 @@ export type RecipeDetailPageOverviewProps = {
   /** Slot: the app's comments section, rendered in the engagement
    * stack under the ratings card. */
   renderComments?: () => ReactNode;
+  /**
+   * The sharing section as data (#438 Part 3): renders
+   * RecipeSharingView at the slot's position. The data prop
+   * and the render slot are alternatives — when both are
+   * supplied, the data prop wins (it is the migrated form).
+   */
+  sharing?: RecipeDetailPageSharing | null;
+  /**
+   * The comments section as data (#438 Part 3): renders
+   * RecipeCommentsView at the slot's position, under the
+   * ratings card. Same alternative rule as `sharing`.
+   */
+  comments?: RecipeDetailPageComments | null;
 };
 
 export type RecipeDetailPageIngredient = {
@@ -376,6 +412,22 @@ export type RecipeDetailPageReadyProps = {
   instructions: RecipeDetailPageInstructionsProps;
   history: RecipeDetailPageHistoryProps;
   nutrition: RecipeDetailPageNutritionProps;
+  /**
+   * The recipe-delete confirmation (#438 Part 3): renders
+   * ConfirmActionView beside the page shell when provided.
+   * The host opens it from the overview's Delete intent and
+   * owns the mutation; the view-model carries the dialog's
+   * open flag, pending flag, and error.
+   */
+  recipeDeleteConfirmation?: RecipeDetailPageConfirmation | null;
+  /** The cook-log-delete confirmation; same contract as `recipeDeleteConfirmation`. */
+  cookLogDeleteConfirmation?: RecipeDetailPageConfirmation | null;
+  /**
+   * The nutrition-error notice: a single-action
+   * ConfirmActionView (no cancel label) the host opens when
+   * nutrition cannot be shown for a version.
+   */
+  nutritionNotice?: RecipeDetailPageConfirmation | null;
 };
 
 export type RecipeDetailPageProps =
@@ -586,22 +638,31 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
     onViewerRatingChange,
     renderSharingControls,
     renderComments,
+    sharing,
+    comments: commentsData,
   } = overview;
 
-  // The print and share buttons carry the icons module's PrintIcon /
-  // ShareIcon (#187, reworked after #217) through Button's icon
-  // slot: the official Feather printer / share-2 glyphs, inked in
-  // the button's label color at its standard glyph size — not the
-  // "🖨" emoji and "↗" text glyph the page originally used, which
-  // render in full color at font-dependent sizes. Do not
-  // reintroduce text glyphs or hand-drawn icons for these: icons
-  // come from src/icons (see that module's header).
+  // The print and share buttons name the icons module's "print" /
+  // "share" glyphs (#187, reworked after #217; by name since #438
+  // Part 4) through Button's icon slot: the official Feather
+  // printer / share-2 glyphs, inked in the button's label color at
+  // its standard glyph size — not the "🖨" emoji and "↗" text glyph
+  // the page originally used, which render in full color at
+  // font-dependent sizes. Do not reintroduce text glyphs or
+  // hand-drawn icons for these: icons come from src/icons (see
+  // that module's header).
   const showLifecycle =
     lifecycle !== undefined &&
     lifecycle !== null &&
     (lifecycle.isEditable || lifecycle.candidates.length > 0);
-  const sharingControls = renderSharingControls ? renderSharingControls() : null;
-  const comments = renderComments ? renderComments() : null;
+  // The sections have two sources (#438 Part 3): the data
+  // props render the DS views; the render slots are the
+  // fallback for hosts that have not migrated. A slot is
+  // called once per render, only when provided.
+  const sharingSlot = renderSharingControls ? renderSharingControls() : null;
+  const commentsSlot = renderComments ? renderComments() : null;
+  const sharingControls = sharing ? <RecipeSharingView {...sharing} /> : sharingSlot;
+  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : commentsSlot;
 
   return (
     <PanelStack>
@@ -623,7 +684,7 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
           <Button
             variant="secondary"
             size="md"
-            icon={PrintIcon}
+            icon="print"
             accessibilityLabel="Print recipe"
             onPress={onPrintPress}
           />
@@ -632,7 +693,7 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
           <Button
             variant="secondary"
             size="md"
-            icon={ShareIcon}
+            icon="share"
             accessibilityLabel="Share recipe"
             onPress={onSharePress}
           />
@@ -886,6 +947,13 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
           </PanelStack>
         </ScrollRegion>
       </ScreenShell>
+      {props.recipeDeleteConfirmation ? (
+        <ConfirmActionView {...props.recipeDeleteConfirmation} />
+      ) : null}
+      {props.cookLogDeleteConfirmation ? (
+        <ConfirmActionView {...props.cookLogDeleteConfirmation} />
+      ) : null}
+      {props.nutritionNotice ? <ConfirmActionView {...props.nutritionNotice} /> : null}
     </BigFooterShell>
   );
 }
