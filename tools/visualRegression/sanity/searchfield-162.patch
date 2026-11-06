@@ -2,17 +2,6 @@ diff --git a/src/views/SearchField.tsx b/src/views/SearchField.tsx
 index 7b0f1eb..9d94a40 100644
 --- a/src/views/SearchField.tsx
 +++ b/src/views/SearchField.tsx
-@@ -2,8 +2,8 @@ import { forwardRef, useId } from "react";
- import { Input as TamaguiInput, Label, View, XStack, YStack, styled } from "tamagui";
- import type { GetProps, TamaguiElement } from "tamagui";
- import { tokens } from "../tokens/index.js";
--import { platformAccessibilityProps } from "./accessibility.js";
--import { Text } from "./Text.js";
-+import { platformAccessibilityProps } from "../components/accessibility.js";
-+import { Text } from "../components/Text.js";
- 
- /**
-  * The ⌕ glyph must NOT get an explicit lineHeight. It previously received
 @@ -71,13 +71,8 @@ const StyledContainer = styled(XStack, {
  const StyledGlyphBox = styled(XStack, {
    name: "SearchFieldGlyphBox",
