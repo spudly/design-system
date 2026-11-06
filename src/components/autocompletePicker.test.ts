@@ -87,8 +87,8 @@ test("a failed search is its own state: searchError replaces the no-results mess
   );
   assert.match(
     picker,
-    /<Alert severity="error" message=\{searchError\} accessibilityLiveRegion="none" \/>/,
-    "the visible empty state renders the error inside an Alert, not the no-results hint (#460) — with the Alert's own live semantics off, so the polite live region is the only announcement (an error Alert's assertive role would announce the same error twice)",
+    /<Alert\s+severity="error"\s+message=\{searchError\}\s+accessibilityRole="none"\s+accessibilityLiveRegion="none"\s+\/>/,
+    "the visible empty state renders the error inside an Alert, not the no-results hint (#460) — with the Alert's own live semantics fully off (no alert role, no live region), so the polite live region is the only announcement (an error Alert's assertive role would announce the same error twice)",
   );
   for (const page of ["src/pages/MealFormPage.tsx", "src/pages/MealPlanFormPage.tsx"]) {
     const source = codeOf(page);
@@ -262,6 +262,10 @@ test("SSR: a failed search shows the error and never the no-results message (#39
   assert.ok(
     visible.includes('aria-live="off"'),
     "the visible Alert's live semantics are off — the polite live region is the only announcement, so the error is not announced twice (assertively) by the Alert's role",
+  );
+  assert.ok(
+    !visible.includes('role="alert"'),
+    'the visible Alert carries no alert role — an alert role can fire a system alert event even with aria-live off, so the role itself is removed (accessibilityRole="none")',
   );
   assert.ok(
     !html.includes("No recipes found."),

@@ -239,10 +239,19 @@ export function AutocompletePicker({
             // own: an error Alert's assertive role would announce
             // the error a second time (and interrupt), on top of
             // the polite live region above, which already announces
-            // it. accessibilityLiveRegion="none" is the Alert's
-            // cross-platform off switch (aria-live="off" on web,
-            // overriding the alert role's implicit assertive).
-            <Alert severity="error" message={searchError} accessibilityLiveRegion="none" />
+            // it. The Alert's caller overrides are the off switch:
+            // accessibilityRole="none" removes the alert role
+            // itself (an alert role can fire a system alert event
+            // even with aria-live="off"), and
+            // accessibilityLiveRegion="none" clears the live
+            // region (aria-live="off" on web) — the polite region
+            // above stays the only announcement.
+            <Alert
+              severity="error"
+              message={searchError}
+              accessibilityRole="none"
+              accessibilityLiveRegion="none"
+            />
           ) : (
             <Text variant="hint">{noResultsMessage}</Text>
           )
