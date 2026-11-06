@@ -82,6 +82,33 @@ test("Accordion is single-open: each section's isOpen is openValue === its value
   assert.match(accordion, /const next = isOpen \? value : null/);
 });
 
+test("Accordion sections form one connected stack: no gap, position passed per section (#456)", () => {
+  assert.doesNotMatch(accordion, /<YStack gap=/);
+  assert.match(
+    accordion,
+    /stackPosition=\{\s*sections\.length === 1\s*\?\s*"only"\s*:\s*index === 0\s*\?\s*"first"\s*:\s*index === sections\.length - 1\s*\?\s*"last"\s*:\s*"middle"\s*\}/,
+  );
+});
+
+test("AccordionSection rounds only the stack's outer corners and keeps a single dividing border (#456)", () => {
+  assert.match(section, /stackPosition = "only"/);
+  assert.match(section, /borderTopLeftRadius=\{topRadius\}/);
+  assert.match(section, /borderBottomRightRadius=\{bottomRadius\}/);
+  assert.match(
+    section,
+    /const topRadius = stackPosition === "first" \|\| stackPosition === "only" \? outerRadius : 0/,
+  );
+  assert.match(
+    section,
+    /const bottomRadius = stackPosition === "last" \|\| stackPosition === "only" \? outerRadius : 0/,
+  );
+  assert.match(
+    section,
+    /borderTopWidth=\{stackPosition === "first" \|\| stackPosition === "only" \? 1 : 0\}/,
+  );
+  assert.doesNotMatch(section, /borderRadius=\{tokens\.radii\.lg\}/);
+});
+
 test("AccordionSection resolves controlled vs uncontrolled open state", () => {
   assert.match(section, /const open = isOpen \?\? internalOpen/);
   assert.match(section, /onOpenChange\?\.\(next\)/);
