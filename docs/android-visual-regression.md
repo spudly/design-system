@@ -324,10 +324,10 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize                              | light_quietDawn   |       4 |         4 |
 | pages-memorize-memorizationsessionpage      | light_quietDawn   |       5 |         5 |
 | pages-memorize-memorizereviewpage           | light_quietDawn   |       2 |         2 |
-| pages-memorize-memorizesettingspage         | light_quietDawn   |       2 |         2 |
+| pages-memorize-memorizesettingspage         | light_quietDawn   |       1 |         1 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **147** |   **147** |
+| **Total**                                   |                   | **146** |   **146** |
 
 <!-- VR-COVERAGE-END -->
 

@@ -292,7 +292,7 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // LandingPage story (+1 standard)). (Component stories are not
   // in the capture set — STANDARD_PREFIXES covers Pages only; the
   // #119 tranches' component stories are Chromatic-covered.)
-  const EXPECTED_LIGHT_STORY_COUNT = 136;
+  const EXPECTED_LIGHT_STORY_COUNT = 135;
   // the standard set grew by the eight B3a recipe-form stories,
   // #124, the sixteen B3b meals/shopping stories, #125, the
   // twenty-three B3c account/auth stories, #126, the three
@@ -333,7 +333,10 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // carries the narrow variant), and #424 retired the
   // MemorizeSettingsPage SyncConflict story and renamed
   // NoApiKeyDriveDisconnected to NoApiKey (−1 standard —
-  // Drive sync removed from Memorize), and #440 added the
+  // Drive sync removed from Memorize), and #439 retired the
+  // MemorizeSettingsPage NoApiKey story (−1 standard — the
+  // API key section removed from Memorize settings), and
+  // #440 added the
   // MealDetailPage and MealFormPage WithDirectIngredients
   // stories (+2 standard — the direct-ingredients section
   // cases) — their baselines

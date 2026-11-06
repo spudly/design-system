@@ -11,20 +11,21 @@
  * 1. The shell is the non-scrolling ScreenContainer (the app
  *    renders every tab inside <ScreenContainer scrollable=
  *    {false}>; its "Memorize" title and tab bar stay app-side).
- * 2. The page renders one card, "Scripture source" (hint
- *    verbatim, secure key field, Save / Clear pair). The
- *    "Google Drive sync" card was removed entirely in #424
- *    (Stephen removed Drive sync from Memorize, memorize#96):
- *    no Drive props, no Drive card, no Drive copy may return.
- * 3. The key field is controlled (value + change callback);
- *    Save disables on a whitespace-only value, the app's rule,
- *    and Clear renders only when a key is saved.
- * 4. No loading member and no render slot: the app gates store
+ * 2. The page renders no cards. The "Google Drive sync" card
+ *    was removed entirely in #424 (Stephen removed Drive sync
+ *    from Memorize, memorize#96): no Drive props, no Drive
+ *    card, no Drive copy may return. The "Scripture source"
+ *    card — the secure API-key field and its Save / Clear
+ *    pair — was removed entirely in #439 (Stephen ruled
+ *    Memorize search is server-key-only on every platform,
+ *    memorize#101): no API-key props, no API-key card, no
+ *    API-key copy may return.
+ * 3. No loading member and no render slot: the app gates store
  *    readiness above the tab shell, and the screen renders no
  *    app-owned content inside itself. No app package is
  *    imported.
- * 5. The stories render the real component in its two states
- *    (Default, NoApiKey) in the Quiet Dawn theme.
+ * 4. The stories render the real component in its one state
+ *    (Default) in the Quiet Dawn theme.
  *
  * This is a source scan, not a render test, for the same reason
  * as test/myVersesPage.test.ts: the failures it guards happen
@@ -49,7 +50,7 @@ const stories = readFileSync(join(pagesDir, "MemorizeSettingsPage.stories.tsx"),
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("MemorizeSettingsPage source is readable and non-trivial", () => {
-  assert.ok(code.length > 1000, "expected the full MemorizeSettingsPage source");
+  assert.ok(code.length > 300, "expected the full MemorizeSettingsPage source");
   assert.match(code, /export function MemorizeSettingsPage/);
 });
 
@@ -80,10 +81,6 @@ test("the heading is the app screen's own heading", () => {
   );
 });
 
-test("the one card carries the app's title", () => {
-  assert.match(code, /<SectionCard title="Scripture source">/);
-});
-
 test("the Drive sync section is removed entirely (#424)", () => {
   for (const banned of [
     "Google Drive sync",
@@ -110,40 +107,28 @@ test("the Drive sync section is removed entirely (#424)", () => {
   }
 });
 
-test("the scripture-source hint is the app's, verbatim", () => {
-  assert.ok(
-    code.includes("A gospel-engine API key unlocks full-library search. The key stays on this"),
-    "the hint's first line must be the app's, verbatim",
-  );
-  assert.ok(code.includes("never synced."), "the hint's closing words must be the app's, verbatim");
-});
-
-test("the key field is controlled and secure, as in the app", () => {
-  assert.match(code, /label="API key"/);
-  assert.match(code, /value=\{apiKeyValue\}/, "the field must take the controlled value prop");
-  assert.match(
-    code,
-    /onChangeText=\{onApiKeyValueChange\}/,
-    "the field must report changes through the callback prop",
-  );
-  assert.match(code, /placeholder="gospel-engine API key"/);
-  assert.match(code, /secureTextEntry/);
-  assert.match(code, /autoCapitalize="none"/);
-});
-
-test("Save disables on a whitespace-only value and Clear keys off the saved key", () => {
-  assert.match(
-    code,
-    /disabled=\{!apiKeyValue\.trim\(\)\}/,
-    "Save must disable when the trimmed field value is empty, the app's rule",
-  );
-  assert.ok(code.includes("Save key"), "the save button must carry the app's label");
-  assert.match(
-    code,
-    /hasSavedApiKey \? \(/,
-    "Clear must render only when a key is saved, as in the app",
-  );
-  assert.ok(code.includes("Clear key"), "the clear button must carry the app's label");
+test("the API key section is removed entirely (#439)", () => {
+  for (const banned of [
+    "Scripture source",
+    "apiKeyValue",
+    "onApiKeyValueChange",
+    "hasSavedApiKey",
+    "onSaveApiKeyPress",
+    "onClearApiKeyPress",
+    "API key",
+    "gospel-engine API key",
+    "A gospel-engine API key unlocks full-library search",
+    "Save key",
+    "Clear key",
+    "secureTextEntry",
+    "TextField",
+    "SectionCard",
+  ]) {
+    assert.ok(
+      !code.includes(banned),
+      `MemorizeSettingsPage must not contain "${banned}" — the API key section was removed from Memorize settings (#439)`,
+    );
+  }
 });
 
 test("there is no loading member: no spinner, no state union", () => {
@@ -166,13 +151,15 @@ test("no render slot: no ReactNode prop, no accessory", () => {
   }
 });
 
-test("stories render the real component in its two states, in Quiet Dawn", () => {
-  for (const story of ["Default", "NoApiKey"]) {
-    assert.ok(
-      new RegExp(String.raw`export const ${story}\b`).test(stories),
-      `MemorizeSettingsPage.stories.tsx must export a ${story} story`,
-    );
-  }
+test("stories render the real component in its one state, in Quiet Dawn", () => {
+  assert.ok(
+    /export const Default\b/.test(stories),
+    "MemorizeSettingsPage.stories.tsx must export a Default story",
+  );
+  assert.ok(
+    !/export const NoApiKey\b/.test(stories),
+    "MemorizeSettingsPage.stories.tsx must not export a NoApiKey story — the API key section is removed (#439)",
+  );
   assert.match(
     stories,
     /title: "Pages\/Memorize\/MemorizeSettingsPage"/,
