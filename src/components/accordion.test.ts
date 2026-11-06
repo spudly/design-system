@@ -84,9 +84,10 @@ test("Accordion is single-open: each section's isOpen is openValue === its value
 
 test("Accordion sections form one connected stack: no gap, position passed per section (#456)", () => {
   assert.doesNotMatch(accordion, /<YStack gap=/);
-  assert.match(accordion, /stackPosition=\{/);
-  assert.match(accordion, /sections\.length === 1/);
-  assert.match(accordion, /index === sections\.length - 1/);
+  assert.match(
+    accordion,
+    /stackPosition=\{\s*sections\.length === 1\s*\?\s*"only"\s*:\s*index === 0\s*\?\s*"first"\s*:\s*index === sections\.length - 1\s*\?\s*"last"\s*:\s*"middle"\s*\}/,
+  );
 });
 
 test("AccordionSection rounds only the stack's outer corners and keeps a single dividing border (#456)", () => {
