@@ -1,5 +1,0 @@
----
-"@spudly/ui": patch
----
-
-Accordion sections now animate open and closed instead of snapping instantly: the Collapsible frame's height runs on the shared "fast" spring transition, quick with a slight spring settle, and the accordion's disclosure chevron rotates smoothly on the same transition. Root cause: the components used Tamagui's `animation` prop, which compiles on web to a 0-second keyframe-animation reference, so nothing ever transitioned; they now use the `transition` prop the animation driver actually turns into a transition. Testable terms: in the Accordion and AccordionSection stories, toggle a section — the body visibly expands and collapses over a fraction of a second, the chevron rotates between pointing right (closed) and pointing down (open), and aria-expanded still flips immediately on press. In the Collapsible stories, toggle the region — its body expands and collapses with the same smooth height animation (the standalone Collapsible has no chevron or aria-expanded state of its own).
