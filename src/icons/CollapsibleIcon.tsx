@@ -1,6 +1,11 @@
-import { CollapsedIcon } from "./CollapsedIcon.js";
-import { ExpandedIcon } from "./ExpandedIcon.js";
-import type { IconComponentProps } from "./Icon.js";
+import { YStack } from "tamagui";
+import { Icon, type IconComponentProps, type IconElement } from "./Icon.js";
+
+/**
+ * The official Feather chevron-right element data (feathericons/feather,
+ * MIT licensed) — copied from the Feather SVG source, not redrawn.
+ */
+const chevronRightElements: IconElement[] = [{ kind: "polyline", points: "9 18 15 12 9 6" }];
 
 export type CollapsibleIconProps = IconComponentProps & {
   /** Whether the disclosure this icon marks is currently expanded. */
@@ -8,11 +13,18 @@ export type CollapsibleIconProps = IconComponentProps & {
 };
 
 /**
- * The disclosure indicator for collapsible content: ExpandedIcon
- * while open, CollapsedIcon while closed. Carries no glyph data of
- * its own — it composes the two state icons (Stephen's split of the
- * accordion chevron, spudly/design-system#250).
+ * The disclosure indicator for collapsible content: ONE chevron-right
+ * glyph that rotates 90° to point down while open (Stephen,
+ * spudly/design-system#455 — a single icon rotating between states,
+ * never a switch between two glyphs; this supersedes the #250
+ * CollapsedIcon/ExpandedIcon composition for this indicator). The
+ * rotation runs on the DS "fast" animation, matching the Collapsible
+ * height animation it accompanies.
  */
 export function CollapsibleIcon({ isOpen, ...props }: CollapsibleIconProps) {
-  return isOpen ? <ExpandedIcon {...props} /> : <CollapsedIcon {...props} />;
+  return (
+    <YStack animation="fast" rotate={isOpen ? "90deg" : "0deg"}>
+      <Icon elements={chevronRightElements} {...props} />
+    </YStack>
+  );
 }

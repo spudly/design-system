@@ -205,19 +205,22 @@ test("the icons module is internal — no ./icons subpath export (#246, #298)", 
   }
 });
 
-test("CollapsibleIcon composes CollapsedIcon/ExpandedIcon by isOpen and carries no glyph data (#250)", () => {
+test("CollapsibleIcon is one chevron-right glyph that rotates 90deg when open (#455)", () => {
   const code = codeOf("src/icons/CollapsibleIcon.tsx");
   assert.match(code, /export function CollapsibleIcon\(/);
-  assert.match(code, /from "\.\/CollapsedIcon\.js"/);
-  assert.match(code, /from "\.\/ExpandedIcon\.js"/);
-  assert.match(
-    code,
-    /isOpen \? <ExpandedIcon \{\.\.\.props\} \/> : <CollapsedIcon \{\.\.\.props\} \/>/,
-  );
-  // The switcher embeds no glyph data of its own: the chevron
-  // polylines live only in the two state icons it composes.
+  assert.match(code, /from "\.\/Icon\.js"/);
+  // One glyph in both states: the Feather chevron-right data. The old
+  // two-icon switch (#250) is gone — no CollapsedIcon/ExpandedIcon
+  // composition and neither state chevron's data is embedded.
+  assert.ok(code.includes("9 18 15 12 9 6"), "CollapsibleIcon lost the chevron-right data");
+  assert.ok(!code.includes("CollapsedIcon"), "CollapsibleIcon still composes CollapsedIcon");
+  assert.ok(!code.includes("ExpandedIcon"), "CollapsibleIcon still composes ExpandedIcon");
   assert.ok(!code.includes("6 9 12 15 18 9"), "CollapsibleIcon embeds the chevron-down data");
   assert.ok(!code.includes("18 15 12 9 6 15"), "CollapsibleIcon embeds the chevron-up data");
+  // Rotation is derived from isOpen: pointing right while closed,
+  // rotated down while open, animated on the DS "fast" animation.
+  assert.match(code, /rotate=\{isOpen \? "90deg" : "0deg"\}/);
+  assert.match(code, /animation="fast"/);
   for (const banned of ["FeatherIcon", "featherIconNames", "featherIconElements", "tabIcons"]) {
     assert.ok(!code.includes(banned), `CollapsibleIcon still references ${banned}`);
   }

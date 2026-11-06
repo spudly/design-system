@@ -34,8 +34,8 @@ export type AccordionSectionProps = {
  * shuoink/ui AccordionSection as spec): a bordered frame whose header
  * row is a real button (title + chevron) and whose body expands and
  * collapses with the Collapsible height animation. The chevron is
- * the icons module's CollapsibleIcon — ExpandedIcon while open,
- * CollapsedIcon while closed (Stephen's split, #250).
+ * the icons module's CollapsibleIcon — one glyph pointing right
+ * while closed, rotating down while open (#455).
  *
  * State follows the DS controlled/uncontrolled pair: pass `isOpen`
  * to control it (with `onOpenChange` reporting presses), or omit it
