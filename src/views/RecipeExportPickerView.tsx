@@ -74,7 +74,12 @@ export function RecipeExportPickerView({
         onSearchChange={onSearchChange}
         searchPlaceholder={searchPlaceholder}
         selectedCount={selectedIds.length}
-        filteredCount={items.length}
+        // While the error state hides the items behind the alert, the
+        // toolbar must see an empty visible set: Select all disables
+        // instead of selecting items the user cannot see. An existing
+        // selection can still be cleared (the toolbar gates Clear on
+        // the selection, not the visible count).
+        filteredCount={error ? 0 : items.length}
         disabled={disabled}
         busy={exporting}
         onSelectAll={onSelectAll}

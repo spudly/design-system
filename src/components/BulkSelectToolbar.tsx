@@ -8,7 +8,7 @@ export type BulkSelectToolbarProps = {
   onSearchChange: (text: string) => void;
   searchPlaceholder?: string;
   selectedCount: number;
-  /** How many items the current filter shows; selection actions disable at zero. */
+  /** How many items the current filter shows; Select all disables at zero. */
   filteredCount: number;
   disabled?: boolean;
   /** A bulk operation is in flight: controls disable as if `disabled`. */
@@ -25,10 +25,14 @@ export type BulkSelectToolbarProps = {
  * "N selected" count (rendered only when something is selected). The row
  * centers its children vertically, so the count — a bare text element
  * without the buttons' vertical padding — sits on the buttons' midline
- * instead of hugging the top of the row (#175). The
- * selection buttons disable when the controls are disabled or busy, or
- * when the filter shows nothing. Selection state is the caller's — the
- * toolbar only reports presses and renders the counts it is given.
+ * instead of hugging the top of the row (#175). Select all
+ * disables when the controls are disabled or busy, or when the filter
+ * shows nothing; Clear selection disables when the controls are
+ * disabled or busy, or when nothing is selected — a selection can
+ * always be cleared, even when the current filter (or an error state
+ * in the caller) hides the selected items. Selection state is the
+ * caller's — the toolbar only reports presses and renders the counts
+ * it is given.
  */
 export function BulkSelectToolbar({
   search,
@@ -60,7 +64,7 @@ export function BulkSelectToolbar({
         <Button
           variant="ghost"
           size="sm"
-          disabled={controlsDisabled || filteredCount === 0}
+          disabled={controlsDisabled || selectedCount === 0}
           onPress={onClearSelection}
         >
           {clearSelectionLabel}
