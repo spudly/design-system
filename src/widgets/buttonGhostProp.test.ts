@@ -61,6 +61,21 @@ test("the deprecated ghost variant still renders for hosts that spell it (#463)"
   assert.match(variantBlock[1], /borderWidth: 0/);
 });
 
+test("both Button forms forward the ghost prop to their frames (#463)", () => {
+  // If either frame stopped receiving `ghost`, the config checks
+  // above would still pass while the button kept its fill/border —
+  // so pin the wiring itself, the same both-forms count pattern
+  // the #459 border contract uses. (Rendered-frame assertions are
+  // Storybook/Chromatic QA's layer; every Button contract in this
+  // repo is a source scan like this one.)
+  const applications = button.match(/\{\.\.\.\(ghost \? \{ ghost: true \} : null\)\}/g);
+  assert.equal(
+    applications?.length,
+    2,
+    "the button form and the href form must both pass ghost to their frames",
+  );
+});
+
 test("no in-repo call site spells the deprecated ghost variant (#463)", () => {
   const srcFiles = readdirSync(join(root, "src"), { recursive: true })
     .map((entry) => String(entry))
@@ -68,15 +83,20 @@ test("no in-repo call site spells the deprecated ghost variant (#463)", () => {
       (entry) => (entry.endsWith(".ts") || entry.endsWith(".tsx")) && !entry.endsWith(".test.ts"),
     );
   assert.ok(srcFiles.length > 100, "the scan must cover the source tree");
-  // Every spelling of the deprecated value: the JSX attribute
-  // form, the JSX expression form, and the object-property form
-  // (story args).
-  const spellings = ['variant="ghost"', 'variant={"ghost"}', 'variant: "ghost"'];
+  // Every spelling of the deprecated value, as patterns so quote
+  // style and whitespace cannot slip a call site past the scan:
+  // the JSX attribute form, the JSX expression form, and the
+  // object-property form (story args).
+  const spellings = [
+    /\bvariant\s*=\s*(["'])ghost\1/,
+    /\bvariant\s*=\s*\{\s*(["'])ghost\1\s*\}/,
+    /\bvariant\s*:\s*(["'])ghost\1/,
+  ];
   for (const rel of srcFiles) {
     const code = readCode(join("src", rel));
     for (const spelling of spellings) {
       assert.ok(
-        !code.includes(spelling),
+        !spelling.test(code),
         `${rel} must use the ghost prop, not the deprecated ghost variant (${spelling})`,
       );
     }
