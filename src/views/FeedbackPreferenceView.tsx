@@ -1,9 +1,9 @@
 import { XStack, YStack } from "tamagui";
-import { Alert } from "../components/Alert.js";
-import { Button } from "../components/Button.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { Alert } from "../widgets/Alert.js";
+import { Button } from "../widgets/Button.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 import { CheckboxField } from "./CheckboxField.js";
 
 export type FeedbackPreferenceViewProps = {

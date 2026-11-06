@@ -70,7 +70,7 @@ test("no app imports: every import is react-native, tamagui, a DS component or v
     assert.ok(
       specifier === "react-native" ||
         specifier === "tamagui" ||
-        specifier.startsWith("../components/") ||
+        specifier.startsWith("../widgets/") ||
         specifier.startsWith("../views/") ||
         // Internal page scaffolding (the PageFrame pattern): the
         // shared bounded list lives with the pages because it

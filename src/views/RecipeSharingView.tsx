@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
-import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { Text } from "../components/Text.js";
+import { Button } from "../widgets/Button.js";
+import { Card } from "../widgets/Card.js";
+import { Text } from "../widgets/Text.js";
 import { CheckboxField } from "./CheckboxField.js";
 import { RadioOptionGroup, type RadioOption } from "./RadioOptionGroup.js";
 

@@ -1,10 +1,10 @@
 import { XStack, YStack } from "tamagui";
-import { Alert } from "../components/Alert.js";
-import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { CommentItem } from "../components/CommentItem.js";
-import { Spinner } from "../components/Spinner.js";
-import { Text } from "../components/Text.js";
+import { Alert } from "../widgets/Alert.js";
+import { Button } from "../widgets/Button.js";
+import { Card } from "../widgets/Card.js";
+import { CommentItem } from "../widgets/CommentItem.js";
+import { Spinner } from "../widgets/Spinner.js";
+import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "./TextAreaField.js";
 
 export type RecipeCommentsViewComment = {

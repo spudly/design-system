@@ -1,9 +1,9 @@
 import { XStack, YStack } from "tamagui";
-import { Button } from "../components/Button.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { Spinner } from "../components/Spinner.js";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { Button } from "../widgets/Button.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { Spinner } from "../widgets/Spinner.js";
+import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 
 export type SubscriptionViewProps = {
   /** Section heading ("Subscription"). */

@@ -1,19 +1,19 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { BlankWord } from "../components/BlankWord.js";
-import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { PrevNextNav } from "../components/PrevNextNav.js";
-import { ProgressBar } from "../components/ProgressBar.js";
+import { BlankWord } from "../widgets/BlankWord.js";
+import { Button } from "../widgets/Button.js";
+import { Card } from "../widgets/Card.js";
+import { PrevNextNav } from "../widgets/PrevNextNav.js";
+import { ProgressBar } from "../widgets/ProgressBar.js";
 import { SearchField } from "../views/SearchField.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { StatCard } from "../components/StatCard.js";
-import { StepDots } from "../components/StepDots.js";
-import { Text } from "../components/Text.js";
-import { VerseText } from "../components/VerseText.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { StatCard } from "../widgets/StatCard.js";
+import { StepDots } from "../widgets/StepDots.js";
+import { Text } from "../widgets/Text.js";
+import { VerseText } from "../widgets/VerseText.js";
 import { tokens } from "../tokens/index.js";
-import { PageFrame } from "../components/PageFrame.js";
+import { PageFrame } from "../widgets/PageFrame.js";
 import { passageFixture, progressFixtures, verseListFixtures } from "./fixtures.js";
 
 /**

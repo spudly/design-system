@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 import { View } from "tamagui";
 import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
 import { tagColorNameForHex } from "../themes/tagColors.js";

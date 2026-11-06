@@ -23,7 +23,7 @@
  */
 export async function loadInternalDist(): Promise<Record<string, any>> {
   const [components, views, themes, tokens, config] = await Promise.all([
-    import("../dist/components/index.js"),
+    import("../dist/widgets/index.js"),
     import("../dist/views/index.js"),
     import("../dist/themes/index.js"),
     import("../dist/tokens/index.js"),

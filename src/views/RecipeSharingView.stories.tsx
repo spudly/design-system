@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
-import { TextLink } from "../components/TextLink.js";
+import { TextLink } from "../widgets/TextLink.js";
 import { RecipeSharingView } from "./RecipeSharingView.js";
 
 const meta: Meta<typeof RecipeSharingView> = {

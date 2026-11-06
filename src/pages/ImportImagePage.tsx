@@ -1,8 +1,8 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Alert } from "../components/Alert.js";
-import { Button } from "../components/Button.js";
-import { FormScreenLayout } from "../components/FormScreenLayout.js";
-import { Text } from "../components/Text.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Alert } from "../widgets/Alert.js";
+import { Button } from "../widgets/Button.js";
+import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * ImportImagePage (#126, B3c): the import-from-image step —

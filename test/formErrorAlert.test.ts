@@ -44,7 +44,7 @@ const VIEW_FORM_COMPONENTS = new Set([
   "ResetPasswordForm",
 ]);
 const formSource = (name: string) =>
-  read(`src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : "components"}/${name}.tsx`);
+  read(`src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : "widgets"}/${name}.tsx`);
 
 const FORM_COMPONENTS = [
   "NutritionGoalsForm",

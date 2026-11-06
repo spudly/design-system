@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "../components/Button.js";
-import { RemovableField } from "../components/RemovableField.js";
+import { Button } from "../widgets/Button.js";
+import { RemovableField } from "../widgets/RemovableField.js";
 import { SearchField } from "./SearchField.js";
-import { SearchRow } from "../components/SearchRow.js";
-import { SelectField, type SelectOption } from "../components/SelectField.js";
+import { SearchRow } from "../widgets/SearchRow.js";
+import { SelectField, type SelectOption } from "../widgets/SelectField.js";
 import { TextField } from "./TextField.js";
 
 /**

@@ -1,9 +1,9 @@
-import { Alert } from "../components/Alert.js";
+import { Alert } from "../widgets/Alert.js";
 import type { ReactNode } from "react";
-import { Button } from "../components/Button.js";
-import { FormStack } from "../components/FormStack.js";
+import { Button } from "../widgets/Button.js";
+import { FormStack } from "../widgets/FormStack.js";
 import { TextField } from "./TextField.js";
-import { TextLink } from "../components/TextLink.js";
+import { TextLink } from "../widgets/TextLink.js";
 
 /**
  * SignUpForm (#119): the create-account form — the fields and

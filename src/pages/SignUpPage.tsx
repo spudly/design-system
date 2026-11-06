@@ -1,9 +1,9 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SectionStack } from "../components/SectionStack.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { SectionStack } from "../widgets/SectionStack.js";
 import { SignUpForm } from "../views/SignUpForm.js";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * SignUpPage (#126, B3c): the create-account view — the split

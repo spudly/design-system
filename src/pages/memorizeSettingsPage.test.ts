@@ -60,7 +60,7 @@ test("no app imports: every import is tamagui, a DS component, or a DS view", ()
   for (const specifier of specifiers) {
     assert.ok(
       specifier === "tamagui" ||
-        specifier.startsWith("../components/") ||
+        specifier.startsWith("../widgets/") ||
         specifier.startsWith("../views/"),
       `MemorizeSettingsPage must not import "${specifier}" — app logic stays app-side`,
     );

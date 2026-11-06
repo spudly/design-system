@@ -1,15 +1,15 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { Badge } from "../components/Badge.js";
-import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { ChecklistRow } from "../components/ChecklistRow.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { Text } from "../components/Text.js";
-import { TextLink } from "../components/TextLink.js";
+import { Badge } from "../widgets/Badge.js";
+import { Button } from "../widgets/Button.js";
+import { Card } from "../widgets/Card.js";
+import { ChecklistRow } from "../widgets/ChecklistRow.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 import { tokens } from "../tokens/index.js";
-import { PageFrame } from "../components/PageFrame.js";
+import { PageFrame } from "../widgets/PageFrame.js";
 import { mealPlanFixture, recipeDetailFixture } from "./fixtures.js";
 
 /**

@@ -1,7 +1,7 @@
 import { YStack } from "tamagui";
-import { Button } from "../components/Button.js";
-import { SectionCard } from "../components/SectionCard.js";
-import { Text } from "../components/Text.js";
+import { Button } from "../widgets/Button.js";
+import { SectionCard } from "../widgets/SectionCard.js";
+import { Text } from "../widgets/Text.js";
 import {
   RecipeExportPickerView,
   type RecipeExportPickerViewProps,

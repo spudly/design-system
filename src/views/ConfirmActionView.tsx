@@ -1,6 +1,6 @@
-import { Alert } from "../components/Alert.js";
-import { Button } from "../components/Button.js";
-import { Dialog } from "../components/Dialog.js";
+import { Alert } from "../widgets/Alert.js";
+import { Button } from "../widgets/Button.js";
+import { Dialog } from "../widgets/Dialog.js";
 
 export type ConfirmActionViewProps = {
   open: boolean;

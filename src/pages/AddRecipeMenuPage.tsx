@@ -1,7 +1,7 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { OptionCard } from "../components/OptionCard.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Text } from "../components/Text.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { OptionCard } from "../widgets/OptionCard.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * AddRecipeMenuPage (#126, B3c): the add-recipe menu — the

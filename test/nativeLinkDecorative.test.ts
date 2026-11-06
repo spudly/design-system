@@ -61,10 +61,10 @@ function count(code: string, literal: any) {
 // composition (Stephen's tranche rule, 2026-10-29), so its
 // surface is the page file itself.
 const FAMILY: [string, string, number][] = [
-  ["src/components/OptionCard.tsx", "decorative", 3],
-  ["src/components/CardRow.tsx", "decorative", 2],
-  ["src/components/ListRow.tsx", "decorative", 2],
-  ["src/components/TextActionCardRow.tsx", "decorative", 2],
+  ["src/widgets/OptionCard.tsx", "decorative", 3],
+  ["src/widgets/CardRow.tsx", "decorative", 2],
+  ["src/widgets/ListRow.tsx", "decorative", 2],
+  ["src/widgets/TextActionCardRow.tsx", "decorative", 2],
   ["src/pages/RecipesPage.tsx", "native", 3],
 ];
 
@@ -95,7 +95,7 @@ for (const [rel, flag, expectedCount] of FAMILY) {
 }
 
 test("TextActionCardRow's native overlay label composes the subtitle; the web anchor keeps its title-only label", () => {
-  const code = codeOf("src/components/TextActionCardRow.tsx");
+  const code = codeOf("src/widgets/TextActionCardRow.tsx");
   // The matched source literal itself contains template
   // placeholders; interpolate the "$" signs so this file's lint
   // (no placeholder-looking text in plain strings) stays quiet.

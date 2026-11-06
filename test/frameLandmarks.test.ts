@@ -7,7 +7,7 @@
  * so screen-reader users could not navigate the public surfaces
  * by landmark. The fix gives the frame components landmark
  * semantics on web through the shared accessibility translation
- * in src/components/accessibility.ts (the #256 pattern):
+ * in src/widgets/accessibility.ts (the #256 pattern):
  *
  * - PublicFrameHeader / DocumentHeader — `banner`
  * - PublicFrameLayout's content column / LegalDocumentPage's
@@ -46,12 +46,12 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const a11y = readCode("src/components/accessibility.ts");
-const layout = readCode("src/components/PublicFrameLayout.tsx");
-const publicHeader = readCode("src/components/PublicFrameHeader.tsx");
-const publicFooter = readCode("src/components/BigFooter.tsx");
-const docHeader = readCode("src/components/DocumentHeader.tsx");
-const docFooter = readCode("src/components/DocumentFooter.tsx");
+const a11y = readCode("src/widgets/accessibility.ts");
+const layout = readCode("src/widgets/PublicFrameLayout.tsx");
+const publicHeader = readCode("src/widgets/PublicFrameHeader.tsx");
+const publicFooter = readCode("src/widgets/BigFooter.tsx");
+const docHeader = readCode("src/widgets/DocumentHeader.tsx");
+const docFooter = readCode("src/widgets/DocumentFooter.tsx");
 const legalPage = readCode("src/pages/LegalDocumentPage.tsx");
 
 test("the shared translation exports web-only landmark props (#366)", () => {
@@ -97,12 +97,12 @@ test("the legal page's frame composition carries its landmarks (#366)", () => {
 test("no other source file adds a landmark role — no duplicates inside the frames (#366)", () => {
   const srcDir = join(root, "src");
   const owners = new Set([
-    join(srcDir, "components", "accessibility.ts"),
-    join(srcDir, "components", "PublicFrameLayout.tsx"),
-    join(srcDir, "components", "PublicFrameHeader.tsx"),
-    join(srcDir, "components", "BigFooter.tsx"),
-    join(srcDir, "components", "DocumentHeader.tsx"),
-    join(srcDir, "components", "DocumentFooter.tsx"),
+    join(srcDir, "widgets", "accessibility.ts"),
+    join(srcDir, "widgets", "PublicFrameLayout.tsx"),
+    join(srcDir, "widgets", "PublicFrameHeader.tsx"),
+    join(srcDir, "widgets", "BigFooter.tsx"),
+    join(srcDir, "widgets", "DocumentHeader.tsx"),
+    join(srcDir, "widgets", "DocumentFooter.tsx"),
     join(srcDir, "pages", "LegalDocumentPage.tsx"),
   ]);
   function files(dir: string): string[] {
@@ -138,7 +138,7 @@ function loadRuntime() {
       await import("../dist/pages/LegalDocumentPage.js");
     // BigFooter is internal (not in the components barrel, #410/#298):
     // load its dist module directly, like the icons module's tests do.
-    const { BigFooter }: Record<string, any> = await import("../dist/components/BigFooter.js");
+    const { BigFooter }: Record<string, any> = await import("../dist/widgets/BigFooter.js");
     return { React, renderToString, TamaguiProvider, ...dist, LegalDocumentPage, BigFooter };
   })();
   return runtimePromise;

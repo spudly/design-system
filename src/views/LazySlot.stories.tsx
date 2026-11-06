@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 import { LazySlot } from "./LazySlot.js";
 
 const meta: Meta<typeof LazySlot> = {

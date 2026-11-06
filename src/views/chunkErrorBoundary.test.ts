@@ -32,7 +32,7 @@ const root = join(here, "../..");
 // The boundary itself is a view (#470); the Alert and Button it
 // composes are widgets, so the runtime surface spans both barrels.
 const dist: Record<string, any> = {
-  ...(await import("../../dist/components/index.js")),
+  ...(await import("../../dist/widgets/index.js")),
   ...(await import("../../dist/views/index.js")),
 };
 

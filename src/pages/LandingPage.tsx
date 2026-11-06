@@ -1,9 +1,9 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { XStack, YStack } from "tamagui";
-import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Text } from "../components/Text.js";
+import { Button } from "../widgets/Button.js";
+import { Card } from "../widgets/Card.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * LandingPage (#171, B7/C11): the signed-out marketing landing —

@@ -54,8 +54,8 @@ const code = readCode("src/pages/LegalDocumentPage.tsx");
 // model and rendering pins below scan the page (`prose` is the
 // page source), the frame pins scan the frame components.
 const prose = code;
-const docHeader = readCode("src/components/DocumentHeader.tsx");
-const docFooter = readCode("src/components/DocumentFooter.tsx");
+const docHeader = readCode("src/widgets/DocumentHeader.tsx");
+const docFooter = readCode("src/widgets/DocumentFooter.tsx");
 
 test("content crosses as structured section/block/span data (#170)", () => {
   for (const spanType of ['"text"', '"strong"', '"code"', '"link"']) {
@@ -123,7 +123,7 @@ test("the document renders in a prose column; list blocks carry list semantics (
   );
   // List semantics: the block's stack carries the web list role and
   // each item row the listitem role (platform-split props from
-  // components/accessibility — native has no listitem role).
+  // widgets/accessibility — native has no listitem role).
   assert.match(
     prose,
     /<YStack key=\{key\} gap="\$2" \{\.\.\.listRoleProps\}>/,

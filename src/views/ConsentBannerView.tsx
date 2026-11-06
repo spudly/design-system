@@ -1,5 +1,5 @@
-import { FixedActionBanner } from "../components/FixedActionBanner.js";
-import { TextLink } from "../components/TextLink.js";
+import { FixedActionBanner } from "../widgets/FixedActionBanner.js";
+import { TextLink } from "../widgets/TextLink.js";
 
 export type ConsentBannerViewProps = {
   /** The message up to the policy link. */

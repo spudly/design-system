@@ -95,7 +95,7 @@ test("semantic props, data and callbacks are untouched", () => {
 });
 
 test("the rule only applies where the config scopes it (src/pages/**)", () => {
-  const messages = lintPage(`<div className="x" />`, "src/components/Example.tsx");
+  const messages = lintPage(`<div className="x" />`, "src/widgets/Example.tsx");
   const ruleReports = messages.filter(
     (message) => message.ruleId === "design-system/no-page-styling",
   );

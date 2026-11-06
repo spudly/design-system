@@ -27,7 +27,7 @@
  * package root, full stop.
  *
  * Widgets, icons, and the Storybook factories remain in the repo
- * as internal building blocks (src/components, src/icons,
+ * as internal building blocks (src/widgets, src/icons,
  * src/tamagui.config.ts) that the pages are composed from and that
  * this repo's own Storybook apps and tests reach by relative path;
  * they are not part of the published package surface.

@@ -15,7 +15,7 @@
  * The contract now: every `accessibilityRole` literal in `src/` is a
  * member of React Native's supported set (the `AccessibilityRole` union
  * in react-native's ViewAccessibility types). ARIA-only semantics go
- * through the platform split in `src/components/accessibility.ts`:
+ * through the platform split in `src/widgets/accessibility.ts`:
  * the web `role` prop on web, `accessibilityLiveRegion` on native.
  *
  * This is a source scan, not a render test: the crash happens in the
@@ -25,7 +25,7 @@
  * appears in a form it cannot extract literals from.
  *
  * A small set of files is excluded from the literal scan, by design
- * (#235, extended in #237): `src/components/accessibility.ts`
+ * (#235, extended in #237): `src/widgets/accessibility.ts`
  * implements `platformAccessibilityProps`, the generic RN->ARIA
  * translator whose whole job is handling this prop non-literally,
  * and the DS primitives/wrappers that destructure a caller's role
@@ -131,20 +131,20 @@ function accessibilityRoleLiterals(source: string) {
  * `platformAccessibilityProps`.
  */
 const TRANSLATOR_FILES = new Set([
-  join(srcDir, "components", "accessibility.ts"),
-  join(srcDir, "components", "Button.tsx"),
-  join(srcDir, "components", "Text.tsx"),
-  join(srcDir, "components", "ProgressBar.tsx"),
-  join(srcDir, "components", "TextLink.tsx"),
-  join(srcDir, "components", "OptionCard.tsx"),
+  join(srcDir, "widgets", "accessibility.ts"),
+  join(srcDir, "widgets", "Button.tsx"),
+  join(srcDir, "widgets", "Text.tsx"),
+  join(srcDir, "widgets", "ProgressBar.tsx"),
+  join(srcDir, "widgets", "TextLink.tsx"),
+  join(srcDir, "widgets", "OptionCard.tsx"),
   join(srcDir, "views", "TextField.tsx"),
   join(srcDir, "views", "TextAreaField.tsx"),
   join(srcDir, "views", "CheckboxField.tsx"),
-  join(srcDir, "components", "Alert.tsx"),
+  join(srcDir, "widgets", "Alert.tsx"),
   // Spinner joined with its determinate ring (#178): the ring
   // destructures a caller's role and forwards it through the same
   // translator, defaulting to "progressbar".
-  join(srcDir, "components", "Spinner.tsx"),
+  join(srcDir, "widgets", "Spinner.tsx"),
 ]);
 
 test("no component passes an accessibilityRole outside React Native's supported set", () => {
@@ -169,7 +169,7 @@ test("no component passes an accessibilityRole outside React Native's supported 
         checked += 1;
         assert.ok(
           REACT_NATIVE_ACCESSIBILITY_ROLES.has(value),
-          `${file}: accessibilityRole="${value}" is not a React Native role and will crash Android (spudly/eciperay#156); use the platform split in src/components/accessibility.ts for ARIA-only roles`,
+          `${file}: accessibilityRole="${value}" is not a React Native role and will crash Android (spudly/eciperay#156); use the platform split in src/widgets/accessibility.ts for ARIA-only roles`,
         );
       }
     }
@@ -186,7 +186,7 @@ test("the excluded translator/forwarder files route through platformAccessibilit
     );
   }
   const translator = stripComments(
-    readFileSync(join(srcDir, "components", "accessibility.ts"), "utf8"),
+    readFileSync(join(srcDir, "widgets", "accessibility.ts"), "utf8"),
   );
   assert.match(
     translator,

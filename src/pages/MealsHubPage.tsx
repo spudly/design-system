@@ -1,14 +1,14 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Button } from "../components/Button.js";
-import { CardStack } from "../components/CardStack.js";
-import { EmptyState } from "../components/EmptyState.js";
-import { ListLoadingState } from "../components/ListLoadingState.js";
-import { PinnedHeaderShell } from "../components/PinnedHeaderShell.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SectionStack } from "../components/SectionStack.js";
-import { Tabs } from "../components/Tabs.js";
-import { Text } from "../components/Text.js";
-import { TextActionCardRow } from "../components/TextActionCardRow.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Button } from "../widgets/Button.js";
+import { CardStack } from "../widgets/CardStack.js";
+import { EmptyState } from "../widgets/EmptyState.js";
+import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { PinnedHeaderShell } from "../widgets/PinnedHeaderShell.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { SectionStack } from "../widgets/SectionStack.js";
+import { Tabs } from "../widgets/Tabs.js";
+import { Text } from "../widgets/Text.js";
+import { TextActionCardRow } from "../widgets/TextActionCardRow.js";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
 
 /**

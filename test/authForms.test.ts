@@ -70,7 +70,7 @@ test("each form composes the shared FormStack and owns its submit handling", () 
     const source = read(`src/views/${form}.tsx`);
     assert.match(
       source,
-      /import \{ FormStack \} from "\.\.\/components\/FormStack\.js";/,
+      /import \{ FormStack \} from "\.\.\/widgets\/FormStack\.js";/,
       `${form} imports the shared FormStack`,
     );
     assert.match(source, /<FormStack>/, `${form} renders its sections in the FormStack`);
@@ -211,7 +211,7 @@ test("LegalSection frames the host's links under its title in the app treatment"
 });
 
 test("TextLink's muted tone is the muted role on both frames, under an explicit color", () => {
-  const source = read("src/components/TextLink.tsx");
+  const source = read("src/widgets/TextLink.tsx");
   assert.match(source, /tone\?: "default" \| "muted"/, "the tone prop is declared");
   assert.match(
     source,

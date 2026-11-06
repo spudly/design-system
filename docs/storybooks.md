@@ -32,8 +32,8 @@ must not be removed.
 Stories are platform-neutral CSF (Tamagui views only) living next to
 the code they cover:
 
-- Widget components: `src/components/<Name>.stories.tsx`, titled
-  `Components/<Name>`.
+- Widget components: `src/widgets/<Name>.stories.tsx`, titled
+  `Widgets/<Name>`.
 - View components: `src/views/<Name>.stories.tsx`, titled
   `Views/<Name>` — the page fragments pages share, forms included
   (#438 Part 2).
@@ -74,7 +74,7 @@ their own.
 
 ## Coverage parity
 
-Every widget component exported from `src/components/index.ts`,
+Every widget component exported from `src/widgets/index.ts`,
 every view component exported from `src/views/index.ts`, and
 every page component exported from `src/pages/index.ts` must have
 stories — and therefore appears in both storybooks. Parity is
@@ -92,8 +92,8 @@ CI), which fails when:
 Exceptions — files that are not components/pages and carry no
 stories, by design:
 
-- `src/components/accessibility.ts` — ARIA helper utilities.
-- `src/components/PageFrame.tsx` — internal page-story scaffolding
+- `src/widgets/accessibility.ts` — ARIA helper utilities.
+- `src/widgets/PageFrame.tsx` — internal page-story scaffolding
   shared by the page stories; not exported from `@spudly/ui`, and
   exercised through every page story.
 - `src/pages/fixtures.ts` — the static fixtures the page stories

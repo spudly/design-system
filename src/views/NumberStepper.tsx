@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Input as TamaguiInput, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { groupRoleProps, platformAccessibilityProps } from "../components/accessibility.js";
-import { Button } from "../components/Button.js";
-import { Text } from "../components/Text.js";
+import { groupRoleProps, platformAccessibilityProps } from "../widgets/accessibility.js";
+import { Button } from "../widgets/Button.js";
+import { Text } from "../widgets/Text.js";
 
 const StyledValueInput = styled(TamaguiInput, {
   name: "NumberStepperValue",

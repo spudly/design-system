@@ -105,7 +105,7 @@ test("the ready member stays backward compatible (eciperay#338)", () => {
 });
 
 test("the error state renders the page-level error Alert instead of the step UI (eciperay#338)", () => {
-  assert.match(page, /import \{ Alert \} from "\.\.\/components\/Alert\.js";/);
+  assert.match(page, /import \{ Alert \} from "\.\.\/widgets\/Alert\.js";/);
   const errorBranch = page.indexOf('props.state === "error"');
   assert.ok(errorBranch !== -1, "the page must branch on the error state");
   const stepsRead = page.indexOf("steps.at(stepIndex)");

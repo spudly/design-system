@@ -9,7 +9,7 @@
  * > not by setting margin on individual elements.
  *
  * So this rule reports margin usage in the files the config scopes
- * it to (src/components/** and src/pages/**):
+ * it to (src/widgets/** and src/pages/**):
  *
  * - Any Tamagui margin prop set on an element: `margin`,
  *   `marginTop`, `marginBottom`, `marginLeft`, `marginRight`,

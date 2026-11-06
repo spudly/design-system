@@ -1,12 +1,12 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Alert } from "../components/Alert.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Alert } from "../widgets/Alert.js";
 import type { ReactNode } from "react";
-import { Button } from "../components/Button.js";
-import { ButtonRow } from "../components/ButtonRow.js";
-import { FormScreenLayout } from "../components/FormScreenLayout.js";
-import { PreviewCard } from "../components/PreviewCard.js";
-import { Text } from "../components/Text.js";
-import { Thumbnail } from "../components/Thumbnail.js";
+import { Button } from "../widgets/Button.js";
+import { ButtonRow } from "../widgets/ButtonRow.js";
+import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
+import { PreviewCard } from "../widgets/PreviewCard.js";
+import { Text } from "../widgets/Text.js";
+import { Thumbnail } from "../widgets/Thumbnail.js";
 
 /**
  * ImportReviewPage (#126, B3c): the import review step — the

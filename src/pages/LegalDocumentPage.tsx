@@ -1,10 +1,10 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
 import { Anchor, XStack, YStack } from "tamagui";
-import { DocumentHeader } from "../components/DocumentHeader.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Text } from "../components/Text.js";
-import { listItemRoleProps, listRoleProps, mainRoleProps } from "../components/accessibility.js";
+import { DocumentHeader } from "../widgets/DocumentHeader.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { Text } from "../widgets/Text.js";
+import { listItemRoleProps, listRoleProps, mainRoleProps } from "../widgets/accessibility.js";
 import { tokens } from "../tokens/index.js";
 
 /**

@@ -34,8 +34,8 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const screenContainer = readCode("src/components/ScreenContainer.tsx");
-const formScreenLayout = readCode("src/components/FormScreenLayout.tsx");
+const screenContainer = readCode("src/widgets/ScreenContainer.tsx");
+const formScreenLayout = readCode("src/widgets/FormScreenLayout.tsx");
 
 test("FormScreenLayout's cap is the geometry the auth shell mirrors (#265)", () => {
   assert.match(formScreenLayout, /maxWidth: 480/);

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
-import { Text } from "../components/Text.js";
+import { Text } from "../widgets/Text.js";
 
 export type CatalogHeaderProps = {
   /** The catalog's title, rendered as the list header's heading. */

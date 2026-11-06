@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { CatalogFiltersBar, type CatalogFilterDefinition } from "./CatalogFiltersBar.js";
-import type { SelectOption } from "../components/SelectField.js";
+import type { SelectOption } from "../widgets/SelectField.js";
 
 const meta: Meta<typeof CatalogFiltersBar> = {
   title: "Views/CatalogFiltersBar",

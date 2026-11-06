@@ -1,44 +1,44 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { useMemo, type ReactNode } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
-import { Button } from "../components/Button.js";
-import { ButtonRow } from "../components/ButtonRow.js";
+import { Button } from "../widgets/Button.js";
+import { ButtonRow } from "../widgets/ButtonRow.js";
 import { CandidateList } from "../views/CandidateList.js";
-import { CardStack } from "../components/CardStack.js";
-import { Center } from "../components/Center.js";
-import { ListStack } from "../components/ListStack.js";
-import { LoadingGate } from "../components/LoadingGate.js";
-import { LogEntryCard } from "../components/LogEntryCard.js";
-import { MarkableRow } from "../components/MarkableRow.js";
+import { CardStack } from "../widgets/CardStack.js";
+import { Center } from "../widgets/Center.js";
+import { ListStack } from "../widgets/ListStack.js";
+import { LoadingGate } from "../widgets/LoadingGate.js";
+import { LogEntryCard } from "../widgets/LogEntryCard.js";
+import { MarkableRow } from "../widgets/MarkableRow.js";
 import {
   NutritionPanel,
   type NutritionPanelData,
   type NutritionPanelRow,
-} from "../components/NutritionPanel.js";
+} from "../widgets/NutritionPanel.js";
 import { NumberStepper } from "../views/NumberStepper.js";
-import { PanelStack } from "../components/PanelStack.js";
-import { PresetValueSelector, type PresetValueOption } from "../components/PresetValueSelector.js";
+import { PanelStack } from "../widgets/PanelStack.js";
+import { PresetValueSelector, type PresetValueOption } from "../widgets/PresetValueSelector.js";
 import {
   RatingsCard,
   type RatingsCardCommunityRating,
   type RatingsCardRatings,
   type RatingsCardViewerRating,
-} from "../components/RatingsCard.js";
-import { ScreenShell } from "../components/ScreenShell.js";
-import { ScrollRegion } from "../components/ScrollRegion.js";
-import { SectionHeading } from "../components/SectionHeading.js";
-import { SelectField } from "../components/SelectField.js";
-import { Spinner } from "../components/Spinner.js";
-import { StatBand } from "../components/StatBand.js";
-import { StatCard } from "../components/StatCard.js";
-import { StatusBadge, type StatusBadgeTone } from "../components/StatusBadge.js";
-import { StatusMessage } from "../components/StatusMessage.js";
-import { StepList } from "../components/StepList.js";
-import { SuggestionPanel } from "../components/SuggestionPanel.js";
-import { TagList } from "../components/TagList.js";
-import { Text } from "../components/Text.js";
-import { Thumbnail } from "../components/Thumbnail.js";
-import { Toolbar } from "../components/Toolbar.js";
+} from "../widgets/RatingsCard.js";
+import { ScreenShell } from "../widgets/ScreenShell.js";
+import { ScrollRegion } from "../widgets/ScrollRegion.js";
+import { SectionHeading } from "../widgets/SectionHeading.js";
+import { SelectField } from "../widgets/SelectField.js";
+import { Spinner } from "../widgets/Spinner.js";
+import { StatBand } from "../widgets/StatBand.js";
+import { StatCard } from "../widgets/StatCard.js";
+import { StatusBadge, type StatusBadgeTone } from "../widgets/StatusBadge.js";
+import { StatusMessage } from "../widgets/StatusMessage.js";
+import { StepList } from "../widgets/StepList.js";
+import { SuggestionPanel } from "../widgets/SuggestionPanel.js";
+import { TagList } from "../widgets/TagList.js";
+import { Text } from "../widgets/Text.js";
+import { Thumbnail } from "../widgets/Thumbnail.js";
+import { Toolbar } from "../widgets/Toolbar.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../views/ConfirmActionView.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
 import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeSharingView.js";

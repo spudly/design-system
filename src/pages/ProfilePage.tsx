@@ -1,9 +1,9 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
-import { Button } from "../components/Button.js";
+import { Button } from "../widgets/Button.js";
 import { LegalSection } from "../views/LegalSection.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { Text } from "../components/Text.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { Text } from "../widgets/Text.js";
 import { AccountDataView, type AccountDataViewProps } from "../views/AccountDataView.js";
 import {
   FeedbackPreferenceView,

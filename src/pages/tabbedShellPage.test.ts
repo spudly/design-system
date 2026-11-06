@@ -82,7 +82,7 @@ test("the page composes DS components only and never touches the boundary itself
     "lazy content goes through the internal LazySlot — the page never names the boundary",
   );
   assert.match(page, /import \{ LazySlot \} from "\.\.\/views\/LazySlot\.js";/);
-  assert.match(page, /import \{ Tabs \} from "\.\.\/components\/Tabs\.js";/);
+  assert.match(page, /import \{ Tabs \} from "\.\.\/widgets\/Tabs\.js";/);
   assert.match(page, /<ScreenContainer scrollable=\{false\}>/);
   assert.match(page, /import type \{ IconName \} from "\.\.\/icons\/iconRegistry\.js";/);
   assert.doesNotMatch(page, /from "\.\.\/icons\/[A-Z]/, "no icon component crosses into the page");

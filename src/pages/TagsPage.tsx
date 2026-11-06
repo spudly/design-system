@@ -1,19 +1,19 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { useState } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
-import { Alert } from "../components/Alert.js";
-import { BadgeCardRow } from "../components/BadgeCardRow.js";
-import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { CardStack } from "../components/CardStack.js";
-import { ColorPickerField } from "../components/ColorPickerField.js";
-import { FieldStack } from "../components/FieldStack.js";
-import { ListLoadingState } from "../components/ListLoadingState.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
-import { SectionStack } from "../components/SectionStack.js";
-import { Text } from "../components/Text.js";
+import { Alert } from "../widgets/Alert.js";
+import { BadgeCardRow } from "../widgets/BadgeCardRow.js";
+import { Button } from "../widgets/Button.js";
+import { Card } from "../widgets/Card.js";
+import { CardStack } from "../widgets/CardStack.js";
+import { ColorPickerField } from "../widgets/ColorPickerField.js";
+import { FieldStack } from "../widgets/FieldStack.js";
+import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { SectionStack } from "../widgets/SectionStack.js";
+import { Text } from "../widgets/Text.js";
 import { TextField } from "../views/TextField.js";
-import { TrailingActionsRow } from "../components/TrailingActionsRow.js";
+import { TrailingActionsRow } from "../widgets/TrailingActionsRow.js";
 
 /**
  * TagsPage (#126, B3c): the tag management view — the split

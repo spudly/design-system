@@ -3,8 +3,8 @@ import type { ReactNode } from "react";
 import { Checkbox as TamaguiCheckbox, Label, XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../components/accessibility.js";
-import { Text } from "../components/Text.js";
+import { platformAccessibilityProps } from "../widgets/accessibility.js";
+import { Text } from "../widgets/Text.js";
 
 /**
  * The ✓ glyph must NOT get an explicit lineHeight: it previously

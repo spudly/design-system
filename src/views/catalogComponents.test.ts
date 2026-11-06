@@ -38,7 +38,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "components");
+const componentsDir = join(here, "../..", "src", "widgets");
 const viewsDir = join(here, "../..", "src", "views");
 
 function readCodeFrom(dir: string, name: string) {
@@ -64,7 +64,7 @@ test("the catalog views and the loading state are exported from their built inte
       `${name} must be exported from the internal views barrel`,
     );
   }
-  const dist: Record<string, any> = await import("../../dist/components/index.js");
+  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
   assert.equal(
     typeof dist.ListLoadingState,
     "function",
@@ -73,7 +73,7 @@ test("the catalog views and the loading state are exported from their built inte
 });
 
 test("the middleman list states are not shipped (PR #320)", async () => {
-  const dist: Record<string, any> = await import("../../dist/components/index.js");
+  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
   for (const name of ["ListErrorState", "ListLoadingFooter"]) {
     assert.equal(
       dist[name],

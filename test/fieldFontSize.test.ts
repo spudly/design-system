@@ -42,8 +42,8 @@ const FIELD_VALUE_BLOCKS = [
   ["src/views/TextField.tsx", "StyledInput"],
   ["src/views/SearchField.tsx", "StyledInput"],
   ["src/views/TextAreaField.tsx", "StyledTextArea"],
-  ["src/components/SelectField.tsx", "StyledValue"],
-  ["src/components/SelectField.tsx", "StyledItemText"],
+  ["src/widgets/SelectField.tsx", "StyledValue"],
+  ["src/widgets/SelectField.tsx", "StyledItemText"],
 ];
 
 for (const [rel, constName] of FIELD_VALUE_BLOCKS) {

@@ -44,7 +44,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../..", "src", "pages");
-const componentsDir = join(here, "../..", "src", "components");
+const componentsDir = join(here, "../..", "src", "widgets");
 const frameSource = readFileSync(join(pagesDir, "PublicPageFrame.tsx"), "utf8");
 const frameStories = readFileSync(join(pagesDir, "PublicPageFrame.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");

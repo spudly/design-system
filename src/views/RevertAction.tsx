@@ -1,5 +1,5 @@
 import { tokens } from "../tokens/index.js";
-import { TextAction } from "../components/TextAction.js";
+import { TextAction } from "../widgets/TextAction.js";
 
 export type RevertActionProps = {
   /** The pre-formatted parent value, rendered after "Revert

@@ -1,13 +1,13 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
-import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { Alert } from "../components/Alert.js";
-import { EmptyState } from "../components/EmptyState.js";
-import { FieldRow } from "../components/FieldRow.js";
-import { ScreenContainer } from "../components/ScreenContainer.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Button } from "../widgets/Button.js";
+import { Card } from "../widgets/Card.js";
+import { Alert } from "../widgets/Alert.js";
+import { EmptyState } from "../widgets/EmptyState.js";
+import { FieldRow } from "../widgets/FieldRow.js";
+import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SearchField } from "../views/SearchField.js";
-import { Spinner } from "../components/Spinner.js";
-import { Text } from "../components/Text.js";
+import { Spinner } from "../widgets/Spinner.js";
+import { Text } from "../widgets/Text.js";
 import { BoundedList } from "./BoundedList.js";
 
 /**

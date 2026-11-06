@@ -2,7 +2,7 @@
  * Registers the react-native-svg stub for this test process.
  *
  * Import this module FIRST in any contract test that imports the
- * built internal modules (dist/components/index.js or anything
+ * built internal modules (dist/widgets/index.js or anything
  * whose module graph reaches the icons module). Since #250,
  * AccordionSection renders the icons module's CollapsibleIcon, so
  * the components graph includes react-native-svg — whose

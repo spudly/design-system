@@ -1,16 +1,16 @@
-import { BigFooterShell, type BigFooterData } from "../components/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
-import { Button } from "../components/Button.js";
-import { Card } from "../components/Card.js";
-import { EqualButtonRow } from "../components/EqualButtonRow.js";
-import { LoadingGate } from "../components/LoadingGate.js";
-import { MessageCard } from "../components/MessageCard.js";
-import { RatingsCard } from "../components/RatingsCard.js";
-import { RecipeIngredientsPanel } from "../components/RecipeIngredientsPanel.js";
-import { RecipeInstructionsPanel } from "../components/RecipeInstructionsPanel.js";
-import { RecipeOverviewPanel } from "../components/RecipeOverviewPanel.js";
-import { ScrollShell } from "../components/ScrollShell.js";
-import { SectionHeading } from "../components/SectionHeading.js";
+import { Button } from "../widgets/Button.js";
+import { Card } from "../widgets/Card.js";
+import { EqualButtonRow } from "../widgets/EqualButtonRow.js";
+import { LoadingGate } from "../widgets/LoadingGate.js";
+import { MessageCard } from "../widgets/MessageCard.js";
+import { RatingsCard } from "../widgets/RatingsCard.js";
+import { RecipeIngredientsPanel } from "../widgets/RecipeIngredientsPanel.js";
+import { RecipeInstructionsPanel } from "../widgets/RecipeInstructionsPanel.js";
+import { RecipeOverviewPanel } from "../widgets/RecipeOverviewPanel.js";
+import { ScrollShell } from "../widgets/ScrollShell.js";
+import { SectionHeading } from "../widgets/SectionHeading.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,

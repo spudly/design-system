@@ -367,7 +367,7 @@ test("nutrition models its three states as a union", () => {
   // the page's contract name aliases it, so the app's contract
   // is unchanged. The union's members and the state branch are
   // pinned here against the component's source.
-  const panelFile = join(here, "../..", "src", "components", "NutritionPanel.tsx");
+  const panelFile = join(here, "../..", "src", "widgets", "NutritionPanel.tsx");
   const nutritionPanel = readFileSync(panelFile, "utf8");
   assert.match(code, /RecipeDetailPageNutritionProps = NutritionPanelData;/);
   assert.match(nutritionPanel, /state: "unavailable";/, "unavailable is a union member");

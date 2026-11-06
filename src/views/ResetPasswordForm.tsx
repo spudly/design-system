@@ -1,6 +1,6 @@
-import { Alert } from "../components/Alert.js";
-import { Button } from "../components/Button.js";
-import { FormStack } from "../components/FormStack.js";
+import { Alert } from "../widgets/Alert.js";
+import { Button } from "../widgets/Button.js";
+import { FormStack } from "../widgets/FormStack.js";
 import { TextField } from "./TextField.js";
 
 /**

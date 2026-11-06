@@ -73,7 +73,7 @@ export default [
     // #119 (simplified shape per #297): page components must not
     // apply styling directly — no direct Tamagui imports, no
     // className, no inline style prop. Styling belongs in
-    // reusable components under src/components, driven by semantic
+    // reusable components under src/widgets, driven by semantic
     // props. DORMANT today: the typescriptPendingIgnores block above
     // ignores every .ts/.tsx file (typescript-eslint has no TS7 parser
     // yet), so this cannot fire until the TS lint restoration removes
@@ -98,7 +98,7 @@ export default [
     // at which point it activates with no further change. The
     // codebase was swept proactively on #209 so activation is a
     // non-event. Rule: eslintRules/noMarginSpacing.mjs.
-    files: ["src/components/**/*.tsx", "src/views/**/*.tsx"],
+    files: ["src/widgets/**/*.tsx", "src/views/**/*.tsx"],
     plugins: { "design-system": designSystem },
     rules: { "design-system/no-margin-spacing": "error" },
   },
@@ -115,7 +115,7 @@ export default [
     },
   },
   {
-    files: ["src/components/**/*.stories.tsx", "src/views/**/*.stories.tsx"],
+    files: ["src/widgets/**/*.stories.tsx", "src/views/**/*.stories.tsx"],
     rules: { "design-system/no-margin-spacing": "off" },
   },
   {

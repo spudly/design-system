@@ -9,7 +9,7 @@
  * 1. No direct Tamagui imports: a page must not import from
  *    `tamagui` or any `@tamagui/*` package. Tamagui elements and
  *    layout primitives live inside reusable components under
- *    src/components; pages compose those components.
+ *    src/widgets; pages compose those components.
  * 2. No `className` on any element.
  * 3. No inline `style` prop on any element.
  *
@@ -79,11 +79,11 @@ const noPageStyling = {
     },
     messages: {
       tamaguiImport:
-        "Pages must not import from '{{source}}' directly. Tamagui belongs inside reusable components in src/components; pages compose those components with semantic props instead.",
+        "Pages must not import from '{{source}}' directly. Tamagui belongs inside reusable components in src/widgets; pages compose those components with semantic props instead.",
       className:
-        "Pages must not set className. Move the styling into a reusable component in src/components and pass semantic props instead.",
+        "Pages must not set className. Move the styling into a reusable component in src/widgets and pass semantic props instead.",
       styleProp:
-        "Pages must not set the inline style prop. Move the styling into a reusable component in src/components and pass semantic props instead.",
+        "Pages must not set the inline style prop. Move the styling into a reusable component in src/widgets and pass semantic props instead.",
     },
     schema: [],
   },

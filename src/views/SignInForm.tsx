@@ -1,10 +1,10 @@
-import { Alert } from "../components/Alert.js";
+import { Alert } from "../widgets/Alert.js";
 import { YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "../components/Button.js";
-import { FormStack } from "../components/FormStack.js";
+import { Button } from "../widgets/Button.js";
+import { FormStack } from "../widgets/FormStack.js";
 import { TextField } from "./TextField.js";
-import { TextLink } from "../components/TextLink.js";
+import { TextLink } from "../widgets/TextLink.js";
 
 const StyledLinks = styled(YStack, {
   name: "SignInFormLinks",

@@ -1,7 +1,7 @@
 /**
  * Contract tests for the B2 widget moves (design-system #123): the
  * seven components audited out of eciperay's
- * `packages/app/src/components` into @spudly/ui — BulkSelectToolbar,
+ * `packages/app/src/widgets` into @spudly/ui — BulkSelectToolbar,
  * CheckboxSelectList, CommentItem, FixedActionBanner, StatRow, TagPill,
  * TokenRow (see docs/b2-component-audit.md). TagPill was later merged
  * into Badge (#183): it is no longer exported, and Badge's `color`
@@ -45,7 +45,7 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist: Record<string, any> = await loadInternalDist();
 
 function source(name: string) {
-  return readFileSync(join(root, "src", "components", `${name}.tsx`), "utf8");
+  return readFileSync(join(root, "src", "widgets", `${name}.tsx`), "utf8");
 }
 
 const MOVED = [
