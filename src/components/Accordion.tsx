@@ -1,6 +1,5 @@
 import { useState, type ReactNode } from "react";
 import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { AccordionSection } from "./AccordionSection.js";
 
 export type AccordionItem = {
@@ -45,11 +44,13 @@ export type AccordionProps = {
  * remains the standalone building block for one-off collapsible
  * sections outside a group.
  *
- * Sections are separate framed blocks stacked with the parent's gap:
- * the spec's joined/docked edges conflict with the DS spacing rule
- * (parents space children with gap/padding, never margins — #209),
- * which the #178 audit already flagged and rejected. Candidate homes:
- * settings groups, recipe detail sections, help content.
+ * Sections render as one connected stack (#456, Stephen's Storybook
+ * review ruling, superseding the #178 audit's separate-blocks shape):
+ * flush against each other with no gap, radius only on the stack's
+ * outer corners, and a single border dividing neighbouring sections —
+ * the position-aware frame lives in AccordionSection via its
+ * `stackPosition` prop. Candidate homes: settings groups, recipe
+ * detail sections, help content.
  */
 export function Accordion({
   sections,
@@ -69,11 +70,20 @@ export function Accordion({
   };
 
   return (
-    <YStack gap={tokens.spacing[2]}>
-      {sections.map((section) => (
+    <YStack>
+      {sections.map((section, index) => (
         <AccordionSection
           key={section.value}
           title={section.title}
+          stackPosition={
+            sections.length === 1
+              ? "only"
+              : index === 0
+                ? "first"
+                : index === sections.length - 1
+                  ? "last"
+                  : "middle"
+          }
           isOpen={resolvedOpenValue === section.value}
           onOpenChange={(isOpen) => {
             handleSectionChange(section.value, isOpen);

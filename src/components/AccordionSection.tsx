@@ -19,6 +19,13 @@ export type AccordionSectionProps = {
   defaultOpen?: boolean;
   /** Called with the next open state whenever the header is pressed. */
   onOpenChange?: (isOpen: boolean) => void;
+  /**
+   * Where this section sits in a connected stack (#456): `Accordion`
+   * passes it so grouped sections sit flush — radius only on the
+   * stack's outer corners and a single border between sections.
+   * Standalone sections omit it and keep the full frame ("only").
+   */
+  stackPosition?: "only" | "first" | "middle" | "last";
   children?: ReactNode;
 };
 
@@ -47,6 +54,7 @@ export function AccordionSection({
   isOpen,
   defaultOpen = false,
   onOpenChange,
+  stackPosition = "only",
   children,
 }: AccordionSectionProps) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
@@ -70,11 +78,22 @@ export function AccordionSection({
     }
   };
 
+  // Connected stack (#456): radius lives only on the stack's outer
+  // corners, and sections after the first drop their top border so
+  // exactly one border divides neighbouring sections.
+  const outerRadius = tokens.radii.lg;
+  const topRadius = stackPosition === "first" || stackPosition === "only" ? outerRadius : 0;
+  const bottomRadius = stackPosition === "last" || stackPosition === "only" ? outerRadius : 0;
+
   return (
     <YStack
       borderWidth={1}
+      borderTopWidth={stackPosition === "first" || stackPosition === "only" ? 1 : 0}
       borderColor="$borderColor"
-      borderRadius={tokens.radii.lg}
+      borderTopLeftRadius={topRadius}
+      borderTopRightRadius={topRadius}
+      borderBottomLeftRadius={bottomRadius}
+      borderBottomRightRadius={bottomRadius}
       backgroundColor="$surface"
       overflow="hidden"
     >
