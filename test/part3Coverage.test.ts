@@ -149,9 +149,21 @@ test("review round: explicit error states, href home control, negative step guar
   const comments = read("src/views/RecipeCommentsView.tsx");
   assert.match(comments, /error\?: string \| null/);
   assert.match(comments, /<Alert severity="error" message=\{error\} \/>/);
+  // The error branch precedes the empty branch in one ternary chain, so
+  // the alert and the empty message can never render together.
+  assert.match(
+    comments,
+    /: error \? \(\s*<Alert severity="error" message=\{error\} \/>\s*\) : comments\.length === 0 \? \(\s*<Text variant="muted">\{emptyMessage\}<\/Text>/,
+  );
   const picker = read("src/views/RecipeExportPickerView.tsx");
   assert.match(picker, /error\?: string \| null/);
   assert.match(picker, /<Alert severity="error" message=\{error\} \/>/);
+  // Same precedence: the list (and its empty message) renders only in the
+  // error branch's else, so an error suppresses the empty state.
+  assert.match(
+    picker,
+    /\{error \? \(\s*<Alert severity="error" message=\{error\} \/>\s*\) : \(\s*<CheckboxSelectList[\s\S]*?emptyMessage=\{emptyMessage\}/,
+  );
   const pay = read("src/pages/PayPage.tsx");
   assert.match(pay, /homeHref\?: string/);
   assert.doesNotMatch(pay, /onHomePress/);
