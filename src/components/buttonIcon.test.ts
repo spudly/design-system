@@ -9,8 +9,11 @@
  * styling props. The replacement shape: NO separate component.
  * `Button` itself gains an icon slot:
  *
- * 1. The caller passes a DS icon COMPONENT (`icon` prop) — content,
- *    not styling. Button renders the glyph itself, left of the
+ * 1. The caller passes an icon NAME (`icon` prop) — data, not a
+ *    component and not styling (#438 Part 4: the slot took the DS
+ *    icon component itself until Part 4 converted it to the
+ *    registry's name set). Button resolves the name through the
+ *    internal icon registry and renders the glyph itself, left of the
  *    label, at the size's standard glyph size (18/20/24px for
  *    sm/md/lg), inked in the variant's label color resolved from
  *    the active theme (react-native-svg cannot resolve Tamagui
@@ -25,12 +28,13 @@
  *
  * Source scan like this repo's other contract tests (comments
  * stripped first), plus SSR runtime checks against the built
- * output. The runtime glyph is a stub component: the real icon
- * components pull in react-native-svg → react-native, which does
- * not load under plain Node SSR (the same reason the icons contract
- * test is source-scan only); the stub pins exactly what Button
- * passes the glyph (size + color, no label), and a source scan pins
- * that the stories use the real DS icons.
+ * output. The real icon components pull in react-native-svg →
+ * react-native, which does not load under plain Node SSR, so the
+ * harness stub renders glyphs inert (the same reason the icons
+ * contract test is source-scan only): what Button passes the glyph
+ * (size + color, no label) is pinned by the source scans below and
+ * the registry's own contract test, and the runtime checks pin the
+ * button's own markup around the glyph slot.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -69,12 +73,20 @@ test("the standalone IconButton is removed everywhere (#178 decision change)", (
   );
 });
 
-test("the icon slot takes a DS icon component, imported type-only from the icons module (#178)", () => {
-  assert.match(button, /import type \{ IconComponentProps \} from "\.\.\/icons\/Icon\.js";/);
-  assert.match(button, /icon\?: ComponentType<IconComponentProps>;/);
+test("the icon slot takes an icon NAME, resolved through the internal registry (#178, #438 Part 4)", () => {
+  assert.match(
+    button,
+    /import \{ iconsByName, type IconName \} from "\.\.\/icons\/iconRegistry\.js";/,
+  );
+  assert.match(button, /icon\?: IconName;/);
+  assert.match(button, /iconsByName\[icon\]/);
   assert.ok(
-    !/^import \{[^}]*\} from "\.\.\/icons\//m.test(button),
-    "no runtime icons import: Button takes its icon as a caller-supplied component type and stays decoupled from the icons module runtime",
+    !/from "\.\.\/icons\/[A-Z][\w]*Icon\.js"/.test(button),
+    "Button must not import per-icon components directly — glyphs resolve only through the registry",
+  );
+  assert.ok(
+    !/ComponentType<IconComponentProps>/.test(button),
+    "the slot no longer takes a caller-supplied icon component",
   );
 });
 
@@ -88,12 +100,12 @@ test("icon-only requires accessibilityLabel at the type level; the labeled shape
   // renders no label, so it must fall into the icon-only branch.
   assert.match(
     button,
-    /icon: ComponentType<IconComponentProps>;\s*children: Exclude<NonNullable<ReactNode>, boolean>;\s*accessibilityLabel\?: string;/,
+    /icon: IconName;\s*children: Exclude<NonNullable<ReactNode>, boolean>;\s*accessibilityLabel\?: string;/,
   );
   // Icon-only branch: label is a required string, never optional.
   assert.match(
     button,
-    /icon: ComponentType<IconComponentProps>;\s*children\?: boolean \| null;\s*accessibilityLabel: string;/,
+    /icon: IconName;\s*children\?: boolean \| null;\s*accessibilityLabel: string;/,
   );
 });
 
@@ -157,12 +169,12 @@ test("stories cover icon+label and icon-only across variants, sizes, disabled, a
   ]) {
     assert.match(stories, new RegExp(`export const ${story}: Story`), `missing story ${story}`);
   }
-  // The stories exercise the real DS icons, not stand-ins.
-  for (const icon of ["PrintIcon", "AddIcon", "ShareIcon", "WarningIcon"]) {
+  // The stories exercise the real DS icon names, not stand-ins.
+  for (const name of ["print", "add", "share", "warning"]) {
     assert.match(
       stories,
-      new RegExp(String.raw`from "\.\./icons/${icon}\.js"`),
-      `stories must import ${icon} from the icons module`,
+      new RegExp(String.raw`icon[:=]\s*(?:\{\s*)?"${name}"`),
+      `stories must pass the "${name}" icon by name`,
     );
   }
 });
@@ -174,7 +186,6 @@ function loadRuntime() {
   runtimePromise ??= (async () => {
     const reactModule = await import("react");
     const React = reactModule.default;
-    stubGlyphRuntime.React = React;
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
@@ -193,48 +204,36 @@ async function renderToHtml(element: any) {
 }
 
 /**
- * Stub glyph: stands in for a DS icon component and records what
- * Button passes it as data attributes on a plain <svg>.
+ * The glyph itself renders inert under the harness's
+ * react-native-svg stub (see the header): the runtime checks
+ * below pin the button's own markup — element, accessible name,
+ * label presence — while the source scans above pin what Button
+ * passes the glyph (the standard size and variant ink, the glyph
+ * element before the label).
  */
-function stubGlyph({ size, color }: any) {
-  const { React } = stubGlyphRuntime;
-  return React.createElement("svg", {
-    "data-glyph-size": size,
-    "data-glyph-color": color,
-    "aria-hidden": true,
-  });
-}
-const stubGlyphRuntime = { React: null as any };
 
 const noop = () => null;
 
-test("SSR: icon + label renders the glyph left of the text, at md size in the variant ink (#178)", async () => {
+test("SSR: icon + label renders the label in a real button, with no leaked RN attributes (#178)", async () => {
   const { React, Button } = await loadRuntime();
   const html = await renderToHtml(
     React.createElement(
       Button,
-      { icon: stubGlyph, variant: "secondary", onPress: noop },
+      { icon: "print", variant: "secondary", onPress: noop },
       "Print recipe",
     ),
   );
   assert.ok(html.includes("<button"), "renders a real button element");
-  const glyphAt = html.indexOf('data-glyph-size="20"');
-  assert.ok(glyphAt !== -1, "md glyph size is 20");
-  assert.ok(
-    html.includes('data-glyph-color="#171717"'),
-    "secondary ink is the gray ramp step 10 (#171717), like Button's secondary label",
-  );
-  const labelAt = html.indexOf("Print recipe", glyphAt);
-  assert.ok(labelAt > glyphAt, "the label text renders after (right of) the glyph");
+  assert.ok(html.includes("Print recipe"), "the label text renders");
   assert.ok(!/accessibilitylabel/i.test(html), "no leaked RN accessibility attributes");
   assert.ok(!html.includes("[object Object]"), "no stringified state object in the DOM");
 });
 
-test("SSR: icon-only renders no text, carries the required label as its name, and scales with size (#178)", async () => {
+test("SSR: icon-only renders no text and carries the required label as its name (#178)", async () => {
   const { React, Button } = await loadRuntime();
   const html = await renderToHtml(
     React.createElement(Button, {
-      icon: stubGlyph,
+      icon: "warning",
       variant: "danger",
       size: "lg",
       accessibilityLabel: "Delete recipe",
@@ -243,18 +242,16 @@ test("SSR: icon-only renders no text, carries the required label as its name, an
   );
   assert.ok(html.includes('aria-label="Delete recipe"'), "the label names the button on web");
   assert.ok(!html.includes(">Delete recipe<"), "no visible label text is rendered");
-  assert.ok(html.includes('data-glyph-size="24"'), "lg glyph size is 24");
-  assert.ok(html.includes('data-glyph-color="#ffffff"'), "danger ink is white");
   const sm = await renderToHtml(
     React.createElement(Button, {
-      icon: stubGlyph,
+      icon: "print",
       size: "sm",
       accessibilityLabel: "Print recipe",
       onPress: noop,
     }),
   );
-  assert.ok(sm.includes('data-glyph-size="18"'), "sm glyph size is 18");
   assert.ok(sm.includes('aria-label="Print recipe"'));
+  assert.ok(!sm.includes(">Print recipe<"), "no visible label text is rendered");
 });
 
 test('SSR: children that render nothing (false, "") are treated as icon-only, never left unnamed (#178)', async () => {
@@ -263,7 +260,7 @@ test('SSR: children that render nothing (false, "") are treated as icon-only, ne
     const html = await renderToHtml(
       React.createElement(
         Button,
-        { icon: stubGlyph, accessibilityLabel: "Print recipe", onPress: noop },
+        { icon: "print", accessibilityLabel: "Print recipe", onPress: noop },
         emptyChild,
       ),
     );
@@ -271,7 +268,6 @@ test('SSR: children that render nothing (false, "") are treated as icon-only, ne
       html.includes('aria-label="Print recipe"'),
       `child ${JSON.stringify(emptyChild)}: the required label names the button`,
     );
-    assert.ok(html.includes('data-glyph-size="20"'), "the glyph still renders at md size");
     assert.ok(!html.includes(">Print recipe<"), "no visible label text is rendered");
   }
 });
@@ -280,7 +276,7 @@ test("SSR: a disabled icon-only Button reports aria-disabled; a plain Button ren
   const { React, Button } = await loadRuntime();
   const disabled = await renderToHtml(
     React.createElement(Button, {
-      icon: stubGlyph,
+      icon: "print",
       accessibilityLabel: "Print recipe",
       disabled: true,
       onPress: noop,
@@ -289,5 +285,8 @@ test("SSR: a disabled icon-only Button reports aria-disabled; a plain Button ren
   assert.ok(disabled.includes('aria-disabled="true"'), "disabled is reported on web");
   const plain = await renderToHtml(React.createElement(Button, { onPress: noop }, "Save recipe"));
   assert.ok(plain.includes("Save recipe"), "the plain labeled button is unchanged");
-  assert.ok(!plain.includes("data-glyph"), "no glyph renders without the icon prop");
+  assert.ok(
+    !plain.includes("aria-label"),
+    "no accessible name beyond the label text without the icon prop",
+  );
 });

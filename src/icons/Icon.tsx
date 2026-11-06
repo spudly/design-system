@@ -28,7 +28,12 @@ import { Circle, Line, Path, Polyline, Rect, Svg } from "react-native-svg";
  *
  * What does NOT live here: any mapping from app concepts to icons
  * (e.g. which icon a tab uses). That is app configuration and
- * belongs to the consuming app.
+ * belongs to the consuming app. What DOES live here, since #438
+ * Part 4, is the registry (iconRegistry.ts): the DS's own semantic
+ * icon names as data for the DS's icon slots, so a caller names a
+ * glyph ("print") instead of passing its component — the names are
+ * the DS's usage names, not app concepts and not Feather glyph
+ * names.
  *
  * Placement: icons are internal building blocks (#298) — they
  * are not exported from the package anywhere; pages and

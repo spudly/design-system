@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { ProfileIcon } from "../icons/ProfileIcon.js";
-import { ShareIcon } from "../icons/ShareIcon.js";
 import { tokens } from "../tokens/index.js";
 import { Dropdown } from "./Dropdown.js";
 import { DropdownButton } from "./DropdownButton.js";
@@ -33,10 +31,7 @@ export const Labeled: Story = {
 
 export const WithIcon: Story = {
   render: () => (
-    <Dropdown
-      accessibilityLabel="Share"
-      trigger={<DropdownButton label="Share" icon={ShareIcon} />}
-    >
+    <Dropdown accessibilityLabel="Share" trigger={<DropdownButton label="Share" icon="share" />}>
       <Panel />
     </Dropdown>
   ),
@@ -46,7 +41,7 @@ export const IconOnly: Story = {
   render: () => (
     <Dropdown
       accessibilityLabel="Account menu"
-      trigger={<DropdownButton icon={ProfileIcon} accessibilityLabel="Account menu" />}
+      trigger={<DropdownButton icon="profile" accessibilityLabel="Account menu" />}
     >
       <Panel />
     </Dropdown>
