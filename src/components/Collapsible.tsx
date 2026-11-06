@@ -32,7 +32,7 @@ export type CollapsibleProps = {
  * animating) the frame clips with overflow hidden; content that
  * mounts already open renders at its natural height with no
  * animation, then joins the animated contract once measured. The
- * animation is the shared "fast" spring from the Tamagui config —
+ * transition is the shared "fast" spring from the Tamagui config —
  * the same driver every DS config installs.
  *
  * Accessibility: closed content is aria-hidden AND inert — a
@@ -41,11 +41,22 @@ export type CollapsibleProps = {
  * descendants (a button or link in the content) from the web Tab
  * sequence; inert does, including while the collapse animation runs.
  * Inert is web-only by construction (see inertPropsWhenClosed).
+ *
+ * The height change animates through Tamagui v3's `transition`
+ * prop, NOT its `animation` prop (#457): `animation` compiles to a
+ * CSS keyframe-animation reference (the generated class is
+ * `animation: auto ease 0s … running fast` — a 0s animation with no
+ * keyframes), so under it the height snapped instantly on web and
+ * accordion sections never visibly animated. `transition` is the
+ * prop the CSS animation driver turns into a real transition of the
+ * changed style values, converting the "fast" spring to its
+ * linear-easing CSS form; on native the same prop drives the
+ * spring directly.
  */
 export function Collapsible({ isOpen = false, children }: CollapsibleProps) {
   const [contentHeight, setContentHeight] = useState<number | null>(null);
   return (
-    <YStack overflow="hidden" animation="fast" height={isOpen ? (contentHeight ?? undefined) : 0}>
+    <YStack overflow="hidden" transition="fast" height={isOpen ? (contentHeight ?? undefined) : 0}>
       <View
         aria-hidden={!isOpen}
         {...inertPropsWhenClosed(isOpen)}

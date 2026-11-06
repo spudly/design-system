@@ -18,7 +18,7 @@
  *    raw accessibility* prop on a Tamagui element), with web keyboard
  *    activation (Enter/Space) and a 44px minimum height.
  * 5. Collapsible animates its frame height with the shared "fast"
- *    animation between 0 and the onLayout-measured content height,
+ *    transition between 0 and the onLayout-measured content height,
  *    clips overflow, and aria-hides closed content.
  * 6. DS hard rules across the family: type aliases only (no
  *    `interface`), no margins for spacing (#209 — gap/padding only),
@@ -136,7 +136,11 @@ test("the section's indicator is the icons module's CollapsibleIcon (#250)", () 
 });
 
 test("Collapsible animates height between 0 and the measured content height", () => {
-  assert.match(collapsible, /animation="fast"/);
+  // The animation runs on Tamagui v3's `transition` prop: the
+  // `animation` prop compiles to a 0s keyframe reference on web and
+  // the height snapped instantly (#457).
+  assert.match(collapsible, /transition="fast"/);
+  assert.doesNotMatch(collapsible, /animation="fast"/);
   assert.match(collapsible, /overflow="hidden"/);
   assert.match(collapsible, /height=\{isOpen \? \(contentHeight \?\? undefined\) : 0\}/);
   assert.match(collapsible, /onLayout=/);
