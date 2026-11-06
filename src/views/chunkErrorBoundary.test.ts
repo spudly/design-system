@@ -14,11 +14,12 @@
  *    recovers from a stale-chunk 404. The web reload is guarded
  *    (`isWeb` + `typeof window`) so non-web renders never touch
  *    `window`; a caller-supplied `onReload` replaces the default.
- * 4. The fallback is composed from the internal Alert (severity
- *    "error") and Button components — no styling props, no
- *    app-domain concepts. The Button renders only when a recovery
- *    action exists (the web reload or a caller-supplied
- *    `onReload`); a no-op control is never shown.
+ * 4. The fallback is the internal Alert (severity "error") alone —
+ *    no styling props, no app-domain concepts. The "Reload the app"
+ *    button renders inside the Alert as an Alert action (content
+ *    width, never a full-width sibling under the Alert; #471), and
+ *    only when a recovery action exists (the web reload or a
+ *    caller-supplied `onReload`); a no-op control is never shown.
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -68,7 +69,7 @@ test("a rejected chunk flips the boundary into its failed state", () => {
     failed: true,
   });
   // A caller-supplied recovery action stands in for the web
-  // reload here, so the fallback renders both of its elements in
+  // reload here, so the fallback renders its Alert action in
   // any environment (see the no-action test below).
   const instance = new dist.ChunkErrorBoundary({
     children: "surface content",
@@ -77,13 +78,12 @@ test("a rejected chunk flips the boundary into its failed state", () => {
   assert.equal(instance.render(), "surface content", "children render untouched before a failure");
   instance.state = { failed: true };
   const fallback = instance.render();
-  const [alert, button] = fallback.props.children;
-  assert.equal(alert.type, dist.Alert);
-  assert.equal(alert.props.severity, "error");
-  assert.equal(alert.props.children, "This section failed to load.");
-  assert.equal(button.type, dist.Button);
-  assert.equal(button.props.children, "Reload the app");
-  assert.equal(typeof button.props.onPress, "function");
+  assert.equal(fallback.type, dist.Alert);
+  assert.equal(fallback.props.severity, "error");
+  assert.equal(fallback.props.children, "This section failed to load.");
+  assert.equal(fallback.props.actions.length, 1);
+  assert.equal(fallback.props.actions[0].label, "Reload the app");
+  assert.equal(typeof fallback.props.actions[0].onPress, "function");
 });
 
 test("no reload button renders when no recovery action exists", () => {
@@ -92,9 +92,9 @@ test("no reload button renders when no recovery action exists", () => {
   // do: the fallback is the Alert alone, never a dead control.
   const instance = new dist.ChunkErrorBoundary({ children: "surface content" });
   instance.state = { failed: true };
-  const [alert, button] = instance.render().props.children;
-  assert.equal(alert.type, dist.Alert);
-  assert.equal(button, null);
+  const fallback = instance.render();
+  assert.equal(fallback.type, dist.Alert);
+  assert.equal(fallback.props.actions, undefined);
 });
 
 test("recovery is a guarded full reload, replaceable by onReload", () => {
@@ -112,8 +112,7 @@ test("recovery is a guarded full reload, replaceable by onReload", () => {
   });
   instance.state = { failed: true };
   const fallback = instance.render();
-  const [, button] = fallback.props.children;
-  button.props.onPress();
+  fallback.props.actions[0].onPress();
   assert.equal(calls, 1, "a caller-supplied onReload replaces the default reload");
   // The default path: with a web `window` present, handleReload
   // calls window.location.reload() exactly once.
@@ -131,8 +130,8 @@ test("recovery is a guarded full reload, replaceable by onReload", () => {
     assert.equal(reloads, 1, "the default recovery is window.location.reload()");
     // With a window present, the fallback offers the button too.
     webDefault.state = { failed: true };
-    const [, webButton] = webDefault.render().props.children;
-    assert.equal(webButton.type, dist.Button);
+    const webFallback = webDefault.render();
+    assert.equal(webFallback.props.actions[0].label, "Reload the app");
   } finally {
     delete (globalThis as any).window;
   }
