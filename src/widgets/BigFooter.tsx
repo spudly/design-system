@@ -145,15 +145,15 @@ const SOCIAL_ICONS: Record<BigFooterSocialIcon, (props: IconComponentProps) => R
  */
 const StyledBigFooterSocialAnchor = styled(Anchor, {
   name: "BigFooterSocialAnchor",
-  color: "$primary",
+  color: "$onPrimary",
   padding: tokens.spacing[3],
   textDecorationLine: "none",
 });
 
-/** The big wordmark's treatment: primary ink, bold, at the heading size, never underlined. */
+/** The big wordmark's treatment: on-primary ink, bold, at the heading size, never underlined. */
 const StyledBigFooterBrandAnchor = styled(Anchor, {
   name: "BigFooterBrandAnchor",
-  color: "$primary",
+  color: "$onPrimary",
   fontSize: tokens.typography.fontSize["3xl"],
   fontWeight: tokens.typography.fontWeight.bold,
   textDecorationLine: "none",
@@ -170,9 +170,7 @@ export function BigFooter({ footer }: BigFooterProps) {
   const { brand, columns, storeLinks, socialLinks } = footer;
   return (
     <YStack
-      backgroundColor="$surface"
-      borderTopWidth={1}
-      borderColor={tokens.colors.gray.gray2}
+      backgroundColor="$primary"
       paddingHorizontal="$6"
       paddingVertical="$6"
       gap="$5"
@@ -229,12 +227,15 @@ export function BigFooter({ footer }: BigFooterProps) {
               flexBasis={BIG_FOOTER_COLUMN_BASIS}
               gap="$3"
             >
-              <Text variant="label">{column.title}</Text>
+              <Text variant="label" color="$onPrimary">
+                {column.title}
+              </Text>
               <YStack gap="$2">
                 {column.links.map((link) => (
                   <TextLink
                     key={link.href}
                     href={link.href}
+                    color="$onPrimary"
                     fontSize={tokens.typography.fontSize.sm}
                   >
                     {link.label}
