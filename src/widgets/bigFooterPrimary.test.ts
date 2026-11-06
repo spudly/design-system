@@ -53,7 +53,10 @@ test("social glyphs receive the resolved on-primary ink explicitly (#465)", () =
   // native, so the glyph color is the theme's onPrimary role
   // resolved through useTheme — never currentColor inheritance.
   assert.match(footer, /useTheme\(\)/);
-  assert.match(footer, /theme\.onPrimary\?\.val/);
+  assert.match(
+    footer,
+    /const socialInk = typeof theme\.onPrimary\?\.val === "string" \? theme\.onPrimary\.val : "#ffffff";/,
+  );
   assert.match(footer, /<IconGlyph size=\{24\} color=\{socialInk\} \/>/);
 });
 
