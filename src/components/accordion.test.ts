@@ -24,8 +24,8 @@
  *    `interface`), no margins for spacing (#209 — gap/padding only),
  *    and no direct import of react-native / react-native-svg. The
  *    section's chevron is the icons module's CollapsibleIcon
- *    (Stephen's #250 split into CollapsedIcon / ExpandedIcon /
- *    CollapsibleIcon) — the one sanctioned icons import from a root
+ *    (one rotating chevron glyph since #455) — the one sanctioned
+ *    icons import from a root
  *    component, which is why this file registers the test harness's
  *    react-native-svg stub before importing dist (see
  *    registerSvgStub.ts).

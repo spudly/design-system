@@ -76,7 +76,7 @@ export const AllIcons: Story = {
   ),
 };
 
-/** CollapsibleIcon in both states: collapsed (chevron-down) and expanded (chevron-up). */
+/** CollapsibleIcon in both states: one chevron pointing right while collapsed, rotated down while expanded (#455). */
 export const Collapsible: Story = {
   render: () => (
     <XStack gap={16}>
