@@ -1,7 +1,7 @@
 import { Anchor, Tabs as TamaguiTabs, XStack, isWeb, styled, useTheme } from "tamagui";
 import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
+import { navigationRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
 const listFrameStyles = {
@@ -198,14 +198,19 @@ function useTabGlyphInks(): { active: string; inactive: string } {
  * A button-variant tab may carry an icon NAME (#438 Part 4's
  * registry — see TabItem.icon); the link variant takes no icon,
  * mirroring Button (its href form omits the icon slot). Both
- * variants accept `label`, the tab list's accessible name.
+ * variants accept `label`, the tab list's accessible name — the
+ * button list exposes it through its tablist role; the link list
+ * through the web navigation landmark (navigationRoleProps).
  */
 export function Tabs(props: TabsProps) {
   const glyphInks = useTabGlyphInks();
   if (props.variant === "link") {
     const { tabs, value, label } = props;
     return (
-      <StyledLinkList {...platformAccessibilityProps({ accessibilityLabel: label })}>
+      <StyledLinkList
+        {...navigationRoleProps}
+        {...platformAccessibilityProps({ accessibilityLabel: label })}
+      >
         {tabs.map((tab) => {
           const active = tab.value === value;
           return (

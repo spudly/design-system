@@ -51,6 +51,10 @@ export const listItemRoleProps = isWeb ? ({ role: "listitem" } as const) : ({} a
  * - The frame's header band is `role="banner"` on web.
  * - The frame's content column is `role="main"` on web.
  * - The frame's footer band is `role="contentinfo"` on web.
+ * - A navigation list (the Tabs link variant's list, #438
+ *   Part 5) is `role="navigation"` on web, so the list's
+ *   accessible name is exposed (a label on a role-less element
+ *   is inert); native carries the name on the container itself.
  *
  * Only the outermost frame chrome owns these landmarks: a page
  * composed inside the frame must not add a second banner, main,
@@ -61,6 +65,8 @@ export const bannerRoleProps = isWeb ? ({ role: "banner" } as const) : ({} as co
 export const mainRoleProps = isWeb ? ({ role: "main" } as const) : ({} as const);
 
 export const contentInfoRoleProps = isWeb ? ({ role: "contentinfo" } as const) : ({} as const);
+
+export const navigationRoleProps = isWeb ? ({ role: "navigation" } as const) : ({} as const);
 
 /**
  * Dialog semantics for a hand-rolled modal shell — a component

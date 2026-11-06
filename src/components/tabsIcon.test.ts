@@ -53,6 +53,15 @@ test("Tabs resolves names through the registry and labels the list", () => {
   assert.match(tabs, /iconsByName\[tab\.icon\]/);
   assert.match(tabs, /label\?: string;/);
   assert.match(tabs, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
+  // The link list is a plain container, so its label needs the
+  // web navigation landmark to be exposed at all (the button
+  // list's tablist role carries its label natively).
+  assert.match(tabs, /\{\.\.\.navigationRoleProps\}/);
+  const accessibility = codeOf("src/components/accessibility.ts");
+  assert.match(
+    accessibility,
+    /export const navigationRoleProps = isWeb \? \(\{ role: "navigation" \} as const\) : \(\{\} as const\);/,
+  );
 });
 
 // Runtime imports are lazy, like buttonIcon.test.ts, so the
@@ -114,6 +123,7 @@ test("SSR: link tabs render as anchors carrying their hrefs", async () => {
     }),
   );
   assert.match(html, /aria-label="Memorize sections"/);
+  assert.match(html, /role="navigation"/, "the link list is a navigation landmark on web");
   assert.match(html, /href="\/verses"/, "the current tab is a real link with its href");
   assert.match(html, /href="\/search"/);
   assert.match(html, /aria-current="page"/, "the current page's tab is marked current");
