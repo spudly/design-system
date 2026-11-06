@@ -14,6 +14,8 @@ const Fallback = styled(YStack, {
   name: "AvatarFallback",
 
   backgroundColor: "$primarySubtle",
+  borderWidth: 1,
+  borderColor: "$primaryEmphasis",
   borderRadius: tokens.radii.full,
   alignItems: "center",
   justifyContent: "center",
