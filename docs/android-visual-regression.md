@@ -303,8 +303,8 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-legaldocumentpage            | light_warmHarvest |       3 |         3 |
 | pages-eciperay-manualentrypage              | light_warmHarvest |       1 |         1 |
 | pages-eciperay-mealcookingmodepage          | light_warmHarvest |       5 |         5 |
-| pages-eciperay-mealdetailpage               | light_warmHarvest |       3 |         2 |
-| pages-eciperay-mealformpage                 | light_warmHarvest |       4 |         3 |
+| pages-eciperay-mealdetailpage               | light_warmHarvest |       3 |         3 |
+| pages-eciperay-mealformpage                 | light_warmHarvest |       4 |         4 |
 | pages-eciperay-mealplandetailpage           | light_warmHarvest |       6 |         6 |
 | pages-eciperay-mealplanformpage             | light_warmHarvest |       2 |         2 |
 | pages-eciperay-mealplanspage                | light_warmHarvest |       4 |         4 |
@@ -324,10 +324,10 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize                              | light_quietDawn   |       4 |         4 |
 | pages-memorize-memorizationsessionpage      | light_quietDawn   |       5 |         5 |
 | pages-memorize-memorizereviewpage           | light_quietDawn   |       2 |         2 |
-| pages-memorize-memorizesettingspage         | light_quietDawn   |       2 |         2 |
+| pages-memorize-memorizesettingspage         | light_quietDawn   |       1 |         1 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **147** |   **145** |
+| **Total**                                   |                   | **146** |   **146** |
 
 <!-- VR-COVERAGE-END -->
 
