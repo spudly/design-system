@@ -42,6 +42,15 @@ const buttonFrameConfig = {
       },
       secondary: {
         backgroundColor: tokens.colors.gray.gray3,
+        // #459: a 1px border in the variant's text color — without
+        // it the light-gray fill reads borderless and looks bad on
+        // tinted surfaces (e.g. a secondary button inside an info
+        // Alert). The border color is the same gray10 token as the
+        // label color below and in `variantLabelColors`, so border
+        // and text always match; the disabled state's frame opacity
+        // dims the border with the rest of the button.
+        borderColor: tokens.colors.gray.gray10,
+        borderWidth: 1,
         color: tokens.colors.gray.gray10,
       },
       ghost: {
