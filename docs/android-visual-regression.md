@@ -331,8 +331,9 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-memorizereviewpage           | light_quietDawn   |       2 |         2 |
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       1 |         1 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
+| pages-memorize-tabbedshellpage              | light_quietDawn   |       6 |         0 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **162** |   **146** |
+| **Total**                                   |                   | **168** |   **146** |
 
 <!-- VR-COVERAGE-END -->
 

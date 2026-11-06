@@ -25,6 +25,7 @@ export {
   type InstallBannerViewProps,
   type InstallBannerViewLink,
 } from "./InstallBannerView.js";
+export { LazySlot, type LazySlotProps } from "./LazySlot.js";
 export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
 export {
   NutritionGoalsForm,
