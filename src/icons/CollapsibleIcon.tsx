@@ -18,12 +18,14 @@ export type CollapsibleIconProps = IconComponentProps & {
  * spudly/design-system#455 — a single icon rotating between states,
  * never a switch between two glyphs; this supersedes the #250
  * CollapsedIcon/ExpandedIcon composition for this indicator). The
- * rotation runs on the DS "fast" animation, matching the Collapsible
- * height animation it accompanies.
+ * rotation runs on the DS "fast" transition (Tamagui v3's
+ * `transition` prop — the `animation` prop compiles to a 0s
+ * keyframe reference on web and never animates, #457), matching
+ * the Collapsible height transition it accompanies.
  */
 export function CollapsibleIcon({ isOpen, ...props }: CollapsibleIconProps) {
   return (
-    <YStack animation="fast" rotate={isOpen ? "90deg" : "0deg"}>
+    <YStack transition="fast" rotate={isOpen ? "90deg" : "0deg"}>
       <Icon elements={chevronRightElements} {...props} />
     </YStack>
   );

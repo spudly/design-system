@@ -218,9 +218,10 @@ test("CollapsibleIcon is one chevron-right glyph that rotates 90deg when open (#
   assert.ok(!code.includes("6 9 12 15 18 9"), "CollapsibleIcon embeds the chevron-down data");
   assert.ok(!code.includes("18 15 12 9 6 15"), "CollapsibleIcon embeds the chevron-up data");
   // Rotation is derived from isOpen: pointing right while closed,
-  // rotated down while open, animated on the DS "fast" animation.
+  // rotated down while open, animated on the DS "fast" transition
+  // (the `animation` prop never animates on web, #457).
   assert.match(code, /rotate=\{isOpen \? "90deg" : "0deg"\}/);
-  assert.match(code, /animation="fast"/);
+  assert.match(code, /transition="fast"/);
   for (const banned of ["FeatherIcon", "featherIconNames", "featherIconElements", "tabIcons"]) {
     assert.ok(!code.includes(banned), `CollapsibleIcon still references ${banned}`);
   }
