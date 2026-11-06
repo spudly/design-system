@@ -4,6 +4,11 @@
 language: "en-US"
 reviews:
   profile: "chill"
+  # Automatic Approvals: approve once the review of the latest commit is
+  # clean, threads are resolved, and pre-merge checks pass — so a clean
+  # review satisfies the branch rules' 1-approval requirement.
+  auto_approvals:
+    enabled: true
   path_instructions:
     - path: "src/**"
       instructions: >-
