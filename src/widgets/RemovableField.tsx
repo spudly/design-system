@@ -33,12 +33,7 @@ export function RemovableField({
   return (
     <YStack gap={tokens.spacing[1]}>
       <XStack justifyContent="flex-end">
-        <Button
-          variant="ghost"
-          size="sm"
-          accessibilityLabel={removeAccessibilityLabel}
-          onPress={onRemove}
-        >
+        <Button ghost size="sm" accessibilityLabel={removeAccessibilityLabel} onPress={onRemove}>
           Remove
         </Button>
       </XStack>

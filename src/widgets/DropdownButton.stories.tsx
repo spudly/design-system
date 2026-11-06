@@ -60,10 +60,7 @@ export const Variants: Story = {
       <Dropdown accessibilityLabel="Secondary" trigger={<DropdownButton label="Secondary" />}>
         <Panel />
       </Dropdown>
-      <Dropdown
-        accessibilityLabel="Ghost"
-        trigger={<DropdownButton label="Ghost" variant="ghost" />}
-      >
+      <Dropdown accessibilityLabel="Ghost" trigger={<DropdownButton label="Ghost" ghost />}>
         <Panel />
       </Dropdown>
     </XStack>

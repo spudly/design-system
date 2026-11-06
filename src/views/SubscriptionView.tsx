@@ -92,7 +92,7 @@ export function SubscriptionView({
               </Button>
             ) : null}
             {onRefresh ? (
-              <Button variant="ghost" disabled={refreshPending} onPress={onRefresh}>
+              <Button ghost disabled={refreshPending} onPress={onRefresh}>
                 {refreshPending ? refreshPendingLabel : refreshLabel}
               </Button>
             ) : null}

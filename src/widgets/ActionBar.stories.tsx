@@ -57,7 +57,7 @@ export const Top: Story = {
     <ScreenFrame>
       <ActionBar {...args} placement="top">
         <XStack gap={12} justifyContent="flex-end">
-          <Button variant="ghost" size="sm">
+          <Button ghost size="sm">
             Dismiss
           </Button>
           <Button variant="primary" size="sm">

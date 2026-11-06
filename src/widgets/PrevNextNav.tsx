@@ -34,7 +34,7 @@ export function PrevNextNav({
       gap={tokens.spacing[3]}
     >
       {onBack ? (
-        <Button variant="ghost" onPress={onBack} disabled={backDisabled}>
+        <Button ghost onPress={onBack} disabled={backDisabled}>
           {backLabel}
         </Button>
       ) : null}

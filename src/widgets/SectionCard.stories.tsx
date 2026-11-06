@@ -37,7 +37,7 @@ export const WithAction: Story = {
       {...args}
       style={{ maxWidth: 480 }}
       action={
-        <Button variant="ghost" size="sm">
+        <Button ghost size="sm">
           Edit
         </Button>
       }

@@ -10,7 +10,10 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "secondary", "ghost", "danger"],
+      options: ["primary", "secondary", "danger"],
+    },
+    ghost: {
+      control: "boolean",
     },
     size: {
       control: "select",
@@ -42,7 +45,21 @@ export const Secondary: Story = {
 };
 
 export const Ghost: Story = {
-  args: { variant: "ghost", size: "md", children: "Learn more" },
+  // The ghost PROP composed with each real variant (#463): the
+  // background is transparent, there is no border, and the ink
+  // matches the variant (primary $primary, secondary gray10,
+  // danger danger7).
+  render: () => (
+    <XStack gap={12} alignItems="center">
+      <Button ghost>Ghost primary</Button>
+      <Button ghost variant="secondary">
+        Ghost secondary
+      </Button>
+      <Button ghost variant="danger">
+        Ghost danger
+      </Button>
+    </XStack>
+  ),
 };
 
 export const Danger: Story = {
@@ -68,7 +85,7 @@ export const AllVariants: Story = {
     <XStack gap={12} alignItems="center">
       <Button variant="primary">Primary</Button>
       <Button variant="secondary">Secondary</Button>
-      <Button variant="ghost">Ghost</Button>
+      <Button ghost>Ghost</Button>
       <Button variant="danger">Danger</Button>
     </XStack>
   ),
@@ -93,7 +110,7 @@ export const WithIconVariants: Story = {
       <Button variant="secondary" icon="print" onPress={noop}>
         Print
       </Button>
-      <Button variant="ghost" icon="share" onPress={noop}>
+      <Button ghost icon="share" onPress={noop}>
         Share
       </Button>
       <Button variant="danger" icon="warning" onPress={noop}>
@@ -118,7 +135,7 @@ export const IconOnlyVariants: Story = {
     <XStack gap={12} alignItems="center">
       <Button variant="primary" icon="add" accessibilityLabel="Add recipe" onPress={noop} />
       <Button variant="secondary" icon="print" accessibilityLabel="Print recipe" onPress={noop} />
-      <Button variant="ghost" icon="share" accessibilityLabel="Share recipe" onPress={noop} />
+      <Button ghost icon="share" accessibilityLabel="Share recipe" onPress={noop} />
       <Button variant="danger" icon="warning" accessibilityLabel="Delete recipe" onPress={noop} />
     </XStack>
   ),
@@ -192,7 +209,7 @@ export const LinkVariants: Story = {
       <Button variant="secondary" href="/sign-in">
         Sign in
       </Button>
-      <Button variant="ghost" href="/about">
+      <Button ghost href="/about">
         Learn more
       </Button>
       <Button variant="danger" href="/account/delete">

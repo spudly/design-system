@@ -133,6 +133,6 @@ test("RatingStars' button is keyboard-operable on web (the CardRow pattern)", ()
 test("RemovableField pairs the field with its end-aligned ghost Remove button at a 4px gap", () => {
   assert.match(removableField, /<YStack gap=\{tokens\.spacing\[1\]\}>/);
   assert.match(removableField, /<XStack justifyContent="flex-end">/);
-  assert.match(removableField, /variant="ghost"\s+size="sm"/);
+  assert.match(removableField, /ghost\s+size="sm"/);
   assert.match(removableField, /onPress=\{onRemove\}/);
 });

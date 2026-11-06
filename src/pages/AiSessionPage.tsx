@@ -162,7 +162,7 @@ export function AiSessionPage({
           />
           {error ? <Alert severity="error" message={error} /> : null}
           <ButtonRow>
-            <Button variant="ghost" onPress={onEmptyCancel}>
+            <Button ghost onPress={onEmptyCancel}>
               Cancel
             </Button>
             <Button
@@ -220,7 +220,7 @@ export function AiSessionPage({
             />
             <ButtonRow>
               <Button
-                variant="ghost"
+                ghost
                 size="sm"
                 disabled={busy || !followUp.trim()}
                 onPress={() => {
