@@ -119,10 +119,10 @@ concurrency:
   group: android-storybook-vr-${{ github.ref }}${{ github.event.action == 'labeled' && format('-labeled-{0}', github.event.label.name) || '' }}
   cancel-in-progress: true
   # Concurrency acts on whole runs, never individual jobs, so a run
-  # cannot cancel its own commit job mid-push. The bot's baseline
-  # push starts a follow-up run that GitHub parks as
-  # "action_required" (see commit-pr-baselines), so it cannot
-  # cancel a successor either.
+  # cannot cancel its own commit job mid-push: the push is the
+  # commit job's last act, and the follow-up run it triggers (the
+  # baseline push uses the changesets PAT — see
+  # commit-pr-baselines) can only start once that push has landed.
   # Label-triggered runs get their own per-label group (the suffix
   # above): adding a label must not cancel an in-progress heavy
   # run on the same PR, and an unrelated label event must not
@@ -401,12 +401,14 @@ jobs:
   # appear in the PR diff for review instead of living only in a
   # workflow artifact someone has to download and commit by hand
   # (Stephen's directive, 2026-10-23). This is the only job with
-  # write access; the capture jobs above stay read-only. Note: the
-  # bot's push does not auto-run the PR's checks — GitHub parks
-  # workflow runs for GITHUB_TOKEN pushes as "action_required", so
-  # the follow-up compare run starts only after a maintainer
-  # approves it in the Actions UI or pushes to the branch
-  # (verified live on PR #97, 2026-10-23).
+  # write access; the capture jobs above stay read-only. The push
+  # uses the changesets PAT (issue #487): a GITHUB_TOKEN push
+  # triggers no follow-up runs — GitHub creates no
+  # pull_request_target run for token pushes, which stranded the
+  # required blocked-label-gate check on PR #453's bot-pushed head
+  # (the parking behavior was verified live on PR #97,
+  # 2026-10-23) — while a PAT push triggers every workflow,
+  # the gate included.
   commit-baselines:
     needs: visual-regression
     if: github.event_name == 'workflow_dispatch' && inputs.mode == 'update'
@@ -426,6 +428,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.ref_name }}
+          token: ${{ secrets.CHANGESETS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Download regenerated baselines
         uses: actions/download-artifact@v8
@@ -477,11 +480,12 @@ jobs:
   # branch, never on main. Same-repo PRs only: a fork's head branch
   # is not pushable from here.
   #
-  # The bot's push parks the follow-up workflow run as
-  # "action_required" (the same GITHUB_TOKEN behavior verified on
-  # PR #97), so the follow-up run starts only after a maintainer
-  # approves it. When it does run, the visual-regression job's
-  # bot-head detection passes it immediately — the in-job
+  # The push uses the changesets PAT (issue #487), so the
+  # follow-up run starts on its own: with the built-in token,
+  # GitHub created no pull_request_target run for the bot-pushed
+  # head, stranding the required blocked-label-gate check
+  # (PR #453). The follow-up run's visual-regression job detects
+  # the bot head and passes it immediately — the in-job
   # re-compare is the verification — and the bot never commits
   # twice for the same change (no loop).
   commit-pr-baselines:
@@ -508,6 +512,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           ref: ${{ github.head_ref }}
+          token: ${{ secrets.CHANGESETS_TOKEN || secrets.GITHUB_TOKEN }}
 
       - name: Download PR-regenerated baselines
         uses: actions/download-artifact@v8
