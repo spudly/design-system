@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { RadioOptionGroup } from "./RadioOptionGroup.js";
 
 const meta: Meta<typeof RadioOptionGroup> = {
-  title: "Components/RadioOptionGroup",
+  title: "Views/RadioOptionGroup",
   component: RadioOptionGroup,
   argTypes: {
     label: { control: "text" },

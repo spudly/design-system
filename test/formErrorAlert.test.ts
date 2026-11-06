@@ -30,6 +30,18 @@ const read = (rel: string) => readFileSync(join(root, rel), "utf8");
 
 const ERROR_ALERT = '<Alert severity="error" message={error} />';
 
+// #438 Part 2: the form fragments the pages share live in
+// src/views; the auth forms remain widgets in src/components.
+const VIEW_FORM_COMPONENTS = new Set([
+  "NutritionGoalsForm",
+  "AccessTokensPanel",
+  "TextField",
+  "TextAreaField",
+  "CheckboxField",
+]);
+const formSource = (name: string) =>
+  read(`src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : "components"}/${name}.tsx`);
+
 const FORM_COMPONENTS = [
   "NutritionGoalsForm",
   "SignInForm",
@@ -52,7 +64,7 @@ const ERROR_PAGES = [
 
 test("form components render their form-level error through Alert (assertive)", () => {
   for (const name of FORM_COMPONENTS) {
-    const source = read(`src/components/${name}.tsx`);
+    const source = formSource(name);
     assert.ok(source.includes(ERROR_ALERT), `${name} renders its error via Alert severity="error"`);
     assert.doesNotMatch(
       source,
@@ -110,7 +122,7 @@ test("field-level errors keep their id-wired plain Text rendering", () => {
     "CheckboxField",
     "ColorPickerField",
   ]) {
-    const source = read(`src/components/${name}.tsx`);
+    const source = formSource(name);
     assert.match(
       source,
       /<Text variant="error" id=\{errorId\}>/,

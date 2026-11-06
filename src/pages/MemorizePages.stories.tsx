@@ -6,7 +6,7 @@ import { Button } from "../components/Button.js";
 import { Card } from "../components/Card.js";
 import { PrevNextNav } from "../components/PrevNextNav.js";
 import { ProgressBar } from "../components/ProgressBar.js";
-import { SearchField } from "../components/SearchField.js";
+import { SearchField } from "../views/SearchField.js";
 import { SectionCard } from "../components/SectionCard.js";
 import { StatCard } from "../components/StatCard.js";
 import { StepDots } from "../components/StepDots.js";

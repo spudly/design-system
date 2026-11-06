@@ -2,8 +2,8 @@ import { useId } from "react";
 import { TextArea as TamaguiTextArea, Label, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
-import { Text } from "./Text.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
+import { Text } from "../components/Text.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {
   name: "TextAreaField",

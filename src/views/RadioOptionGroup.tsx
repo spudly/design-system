@@ -2,7 +2,7 @@ import { useId } from "react";
 import { RadioGroup as TamaguiRadioGroup, Label, XStack, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Text } from "./Text.js";
+import { Text } from "../components/Text.js";
 
 const StyledItem = styled(TamaguiRadioGroup.Item, {
   name: "RadioItem",

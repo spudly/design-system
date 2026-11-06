@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { RemovableField } from "./RemovableField.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 
 const meta: Meta<typeof RemovableField> = {
   title: "Components/RemovableField",

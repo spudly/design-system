@@ -587,7 +587,7 @@ capture-path change.
 
 Acceptance requires proof the pipeline catches the bug class it
 exists for. `tools/visualRegression/sanity/searchfield-162.patch`
-reintroduces the bug into `src/components/SearchField.tsx`: the drawn
+reintroduces the bug into `src/views/SearchField.tsx`: the drawn
 shapes glyph becomes the pre-fix text glyph with a numeric
 `lineHeight` equal to its `fontSize` (the exact pattern
 `test/glyphLineHeight.test.ts` bans in committed source), and the

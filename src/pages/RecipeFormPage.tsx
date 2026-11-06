@@ -10,8 +10,8 @@ import { LabeledGroup } from "../components/LabeledGroup.js";
 import { RevertAction } from "../components/RevertAction.js";
 import { ScrollRegion } from "../components/ScrollRegion.js";
 import { Spinner } from "../components/Spinner.js";
-import { TextAreaField } from "../components/TextAreaField.js";
-import { TextField } from "../components/TextField.js";
+import { TextAreaField } from "../views/TextAreaField.js";
+import { TextField } from "../views/TextField.js";
 import { ButtonRow } from "../components/ButtonRow.js";
 import { Badge } from "../components/Badge.js";
 

@@ -7,7 +7,7 @@ import { ButtonRow } from "../components/ButtonRow.js";
 import { FormHeading } from "../components/FormHeading.js";
 import { PreviewCard } from "../components/PreviewCard.js";
 import { SessionShell } from "../components/SessionShell.js";
-import { TextAreaField } from "../components/TextAreaField.js";
+import { TextAreaField } from "../views/TextAreaField.js";
 import { Text } from "../components/Text.js";
 import { TextAction } from "../components/TextAction.js";
 import { tokens } from "../tokens/index.js";

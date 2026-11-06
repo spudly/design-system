@@ -53,7 +53,7 @@ function codeOf(rel: string) {
 }
 
 const picker = codeOf("src/components/AutocompletePicker.tsx");
-const searchField = codeOf("src/components/SearchField.tsx");
+const searchField = codeOf("src/views/SearchField.tsx");
 
 test("SearchField's clear button honors disabled: no press handler, disabled state reported", () => {
   assert.match(searchField, /disabled = false/, "disabled is destructured out of the input props");

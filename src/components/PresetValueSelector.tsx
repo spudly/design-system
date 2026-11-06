@@ -6,7 +6,7 @@ import { tokens } from "../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../views/TextField.js";
 
 export type PresetValueOption = {
   value: string;

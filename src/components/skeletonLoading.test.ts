@@ -206,7 +206,7 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   }
   // Spot-pin the renamed surfaces, plain and qualified.
   assert.match(read("src/components/CheckboxSelectList.tsx"), /\bloading\?: boolean/);
-  assert.match(read("src/components/AccessTokensPanel.tsx"), /\bloading\?: boolean/);
+  assert.match(read("src/views/AccessTokensPanel.tsx"), /\bloading\?: boolean/);
   // RecipesPage's loading props are the qualified forms since
   // #415 (one per section of the unified page): loading +
   // qualifier, never isLoading.

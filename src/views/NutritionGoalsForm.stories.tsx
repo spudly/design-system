@@ -5,7 +5,7 @@ import { NutritionGoalsForm } from "./NutritionGoalsForm.js";
 import { nutritionGoalsFixture } from "../pages/fixtures.js";
 
 const meta: Meta<typeof NutritionGoalsForm> = {
-  title: "Components/NutritionGoalsForm",
+  title: "Views/NutritionGoalsForm",
   component: NutritionGoalsForm,
   globals: { theme: "light_warmHarvest" },
 };

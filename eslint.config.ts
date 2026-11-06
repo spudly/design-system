@@ -98,7 +98,7 @@ export default [
     // at which point it activates with no further change. The
     // codebase was swept proactively on #209 so activation is a
     // non-event. Rule: eslintRules/noMarginSpacing.mjs.
-    files: ["src/components/**/*.tsx"],
+    files: ["src/components/**/*.tsx", "src/views/**/*.tsx"],
     plugins: { "design-system": designSystem },
     rules: { "design-system/no-margin-spacing": "error" },
   },
@@ -115,7 +115,7 @@ export default [
     },
   },
   {
-    files: ["src/components/**/*.stories.tsx"],
+    files: ["src/components/**/*.stories.tsx", "src/views/**/*.stories.tsx"],
     rules: { "design-system/no-margin-spacing": "off" },
   },
   {

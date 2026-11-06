@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { TextArea as TamaguiTextArea, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "./accessibility.js";
-import { StarRatingInput } from "./StarRatingInput.js";
-import { Text } from "./Text.js";
+import { platformAccessibilityProps } from "../components/accessibility.js";
+import { StarRatingInput } from "../components/StarRatingInput.js";
+import { Text } from "../components/Text.js";
 
 const NotesArea = styled(TamaguiTextArea, {
   name: "RatingFormNotesArea",

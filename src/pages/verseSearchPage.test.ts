@@ -63,7 +63,7 @@ test("VerseSearchPage source is readable and non-trivial", () => {
   assert.match(code, /export function VerseSearchPage/);
 });
 
-test("no app imports: every import is react-native, tamagui, a DS component, or the internal BoundedList", () => {
+test("no app imports: every import is react-native, tamagui, a DS component or view, or the internal BoundedList", () => {
   const specifiers = [...code.matchAll(/from\s+"([^"]+)"/g)].map((m) => m[1]);
   assert.ok(specifiers.length > 0, "expected import specifiers to scan");
   for (const specifier of specifiers) {
@@ -71,6 +71,7 @@ test("no app imports: every import is react-native, tamagui, a DS component, or 
       specifier === "react-native" ||
         specifier === "tamagui" ||
         specifier.startsWith("../components/") ||
+        specifier.startsWith("../views/") ||
         // Internal page scaffolding (the PageFrame pattern): the
         // shared bounded list lives with the pages because it
         // imports react-native (#119).

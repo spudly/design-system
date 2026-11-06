@@ -21,6 +21,7 @@ import test from "node:test";
 
 const page = (name: string) => readFileSync(`src/pages/${name}.tsx`, "utf8");
 const component = (name: string) => readFileSync(`src/components/${name}.tsx`, "utf8");
+const view = (name: string) => readFileSync(`src/views/${name}.tsx`, "utf8");
 
 const B3C_PAGES = [
   "SignInPage",
@@ -165,8 +166,8 @@ test("ProfilePage exposes the section and legal slots in the app view's order", 
 });
 
 test("AccessTokensPanel renders display state only, via the DS TokenRow", () => {
-  const source = component("AccessTokensPanel");
-  const barrel = readFileSync("src/components/index.ts", "utf8");
+  const source = view("AccessTokensPanel");
+  const barrel = readFileSync("src/views/index.ts", "utf8");
   assert.match(barrel, /AccessTokensPanel/);
   assert.match(source, /TokenRow/, "rows render through the DS TokenRow");
   assert.match(source, /metaLabel: string/, "dates cross pre-formatted");
@@ -180,8 +181,8 @@ test("AccessTokensPanel renders display state only, via the DS TokenRow", () => 
 });
 
 test("NutritionGoalsForm crosses whole-goals values, numbers or null", () => {
-  const source = component("NutritionGoalsForm");
-  const barrel = readFileSync("src/components/index.ts", "utf8");
+  const source = view("NutritionGoalsForm");
+  const barrel = readFileSync("src/views/index.ts", "utf8");
   assert.match(barrel, /NutritionGoalsForm/);
   assert.match(source, /onChange: \(goals: NutritionGoalsValues\) => void/);
   assert.match(source, /number \| null/);

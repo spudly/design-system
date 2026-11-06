@@ -260,6 +260,7 @@ test("no app imports in the page or the card", () => {
           specifier === "tamagui" ||
           specifier.startsWith("../tokens/") ||
           specifier.startsWith("../components/") ||
+          specifier.startsWith("../views/") ||
           specifier.startsWith("./"),
         `${name} must not import "${specifier}" — app logic stays app-side`,
       );

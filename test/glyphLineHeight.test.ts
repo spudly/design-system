@@ -338,8 +338,8 @@ test("no lineHeight value is derived from a font size", () => {
 });
 
 test("SearchField glyph is capped in its own fixed box; the row keeps minHeight", () => {
-  const file = sources.find(({ posixPath }) => posixPath.endsWith("components/SearchField.tsx"));
-  assert.ok(file, "src/components/SearchField.tsx not found");
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("views/SearchField.tsx"));
+  assert.ok(file, "src/views/SearchField.tsx not found");
   // Declarations are checked on comment-stripped text so prose in the
   // block's comments can neither satisfy nor trip them.
   const stripped = stripComments(file.text);
@@ -358,8 +358,8 @@ test("SearchField glyph is capped in its own fixed box; the row keeps minHeight"
 });
 
 test("SearchField search icon is drawn shapes, not a text glyph, so it centers by construction (#45)", () => {
-  const file = sources.find(({ posixPath }) => posixPath.endsWith("components/SearchField.tsx"));
-  assert.ok(file, "src/components/SearchField.tsx not found");
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("views/SearchField.tsx"));
+  assert.ok(file, "src/views/SearchField.tsx not found");
   const stripped = stripComments(file.text);
   // The ⌕ character (U+2315) must not survive as rendered content:
   // its ink is asymmetric inside its em box, so no font size centers
@@ -385,8 +385,8 @@ test("SearchField search icon is drawn shapes, not a text glyph, so it centers b
 });
 
 test("CheckboxField box clips its glyph with hidden overflow", () => {
-  const file = sources.find(({ posixPath }) => posixPath.endsWith("components/CheckboxField.tsx"));
-  assert.ok(file, "src/components/CheckboxField.tsx not found");
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("views/CheckboxField.tsx"));
+  assert.ok(file, "src/views/CheckboxField.tsx not found");
   const block = styledBlock(stripComments(file.text), "CheckboxBox");
   assert.ok(
     /overflow:\s*"hidden"/.test(block),

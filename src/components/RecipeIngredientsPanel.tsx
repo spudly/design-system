@@ -1,6 +1,6 @@
 import { YStack } from "tamagui";
 import { MarkableRow } from "./MarkableRow.js";
-import { NumberStepper } from "./NumberStepper.js";
+import { NumberStepper } from "../views/NumberStepper.js";
 import { PresetValueSelector, type PresetValueOption } from "./PresetValueSelector.js";
 import { SuggestionPanel } from "./SuggestionPanel.js";
 import { Text } from "./Text.js";

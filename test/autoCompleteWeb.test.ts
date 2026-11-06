@@ -43,7 +43,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const textField = readCode("src/components/TextField.tsx");
+const textField = readCode("src/views/TextField.tsx");
 
 test("TextField destructures autoComplete out of rest (#321)", () => {
   assert.match(textField, /\n {2}autoComplete,/);

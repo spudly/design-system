@@ -1,6 +1,6 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { CheckboxField } from "./CheckboxField.js";
+import { CheckboxField } from "../views/CheckboxField.js";
 import { EmptyState } from "./EmptyState.js";
 import { Spinner } from "./Spinner.js";
 

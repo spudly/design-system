@@ -1,8 +1,8 @@
-diff --git a/src/components/SearchField.tsx b/src/components/SearchField.tsx
-index 66e9268..4b36a14 100644
---- a/src/components/SearchField.tsx
-+++ b/src/components/SearchField.tsx
-@@ -70,13 +70,8 @@ const StyledContainer = styled(XStack, {
+diff --git a/src/views/SearchField.tsx b/src/views/SearchField.tsx
+index 7b0f1eb..9d94a40 100644
+--- a/src/views/SearchField.tsx
++++ b/src/views/SearchField.tsx
+@@ -71,13 +71,8 @@ const StyledContainer = styled(XStack, {
  const StyledGlyphBox = styled(XStack, {
    name: "SearchFieldGlyphBox",
  
@@ -16,7 +16,7 @@ index 66e9268..4b36a14 100644
    flexShrink: 0,
  });
  
-@@ -91,28 +86,9 @@ const StyledGlyphBox = styled(XStack, {
+@@ -92,28 +87,9 @@ const StyledGlyphBox = styled(XStack, {
   */
  function SearchGlyph() {
    return (

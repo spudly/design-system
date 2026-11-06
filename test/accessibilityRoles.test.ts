@@ -137,9 +137,9 @@ const TRANSLATOR_FILES = new Set([
   join(srcDir, "components", "ProgressBar.tsx"),
   join(srcDir, "components", "TextLink.tsx"),
   join(srcDir, "components", "OptionCard.tsx"),
-  join(srcDir, "components", "TextField.tsx"),
-  join(srcDir, "components", "TextAreaField.tsx"),
-  join(srcDir, "components", "CheckboxField.tsx"),
+  join(srcDir, "views", "TextField.tsx"),
+  join(srcDir, "views", "TextAreaField.tsx"),
+  join(srcDir, "views", "CheckboxField.tsx"),
   join(srcDir, "components", "Alert.tsx"),
   // Spinner joined with its determinate ring (#178): the ring
   // destructures a caller's role and forwards it through the same

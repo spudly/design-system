@@ -54,12 +54,14 @@ test("MemorizeSettingsPage source is readable and non-trivial", () => {
   assert.match(code, /export function MemorizeSettingsPage/);
 });
 
-test("no app imports: every import is tamagui or a DS component", () => {
+test("no app imports: every import is tamagui, a DS component, or a DS view", () => {
   const specifiers = [...code.matchAll(/from\s+"([^"]+)"/g)].map((m) => m[1]);
   assert.ok(specifiers.length > 0, "expected import specifiers to scan");
   for (const specifier of specifiers) {
     assert.ok(
-      specifier === "tamagui" || specifier.startsWith("../components/"),
+      specifier === "tamagui" ||
+        specifier.startsWith("../components/") ||
+        specifier.startsWith("../views/"),
       `MemorizeSettingsPage must not import "${specifier}" — app logic stays app-side`,
     );
   }
