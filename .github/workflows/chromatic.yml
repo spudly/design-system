@@ -32,6 +32,10 @@ name: React storybook (Chromatic)
 #        change pixels (markdown, docs/, .github/, changesets,
 #        LICENSE, .gitignore, package manifests) skip. If the diff
 #        can't be determined, the run proceeds (conservative).
+#        Exception: the Version Packages PR is exempt — its diff is
+#        only release metadata, so it would always skip, but its
+#        labeled run is the release's visual check under the
+#        finalization model.
 #   Exception (#53): a run triggered by dependabot[bot] gets a
 #   read-only token, so it cannot consume the label; it publishes with
 #   a warning instead and the label must be removed manually (a later
@@ -101,8 +105,15 @@ jobs:
           # --- Pixel gate ------------------------------------------------
           # Skip when every changed file is one that cannot change
           # pixels. An empty or failed diff lookup means "unknown" and
-          # falls through to run.
-          if files="$(gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" --name-only 2>/dev/null)" && [ -n "$files" ]; then
+          # falls through to run. The Version Packages PR (head branch
+          # changeset-release/main — the same signal the changeset
+          # check uses) is exempt: its diff is only release metadata,
+          # so this gate would always skip it, but under the
+          # finalization model its labeled run snapshots the release's
+          # accumulated visual delta, so it must proceed to the
+          # CI-green gate below.
+          head_ref="$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json headRefName --jq '.headRefName' 2>/dev/null || echo "")"
+          if [ "$head_ref" != "changeset-release/main" ] && files="$(gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" --name-only 2>/dev/null)" && [ -n "$files" ]; then
             visual=0
             while IFS= read -r file; do
               [ -z "$file" ] && continue

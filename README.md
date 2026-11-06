@@ -144,7 +144,10 @@ keeps the label so the next push retries automatically:
 
 1. **Pixel gate** — the PR's diff must touch at least one file that can
    change pixels. Markdown, `docs/`, `.github/`, changeset, LICENSE,
-   `.gitignore`, and package-manifest-only changes are skipped.
+   `.gitignore`, and package-manifest-only changes are skipped. The
+   Version Packages PR is exempt: its diff is only release metadata, but
+   its labeled run is the release's visual check, so it always proceeds
+   (the CI-green gate still applies).
 2. **CI-green gate** — the `ci` check for the PR's exact head commit must
    have concluded successfully. If it is still running, the gate waits up
    to ~5 minutes for it before giving up.
