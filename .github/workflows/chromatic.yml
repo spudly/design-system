@@ -3,20 +3,24 @@ name: React storybook (Chromatic)
 # Publishes the react storybook (the web Storybook at the repo root —
 # one of the repo's two storybooks, #122; the react-native storybook
 # is covered by android-storybook.yml) to Chromatic for visual
-# snapshot diffs against the accepted main-branch baseline (the check
-# reports changes until they are accepted in Chromatic's UI — that is
-# the review gate working).
+# snapshot diffs against the accepted baseline (the check reports
+# changes until they are accepted in Chromatic's UI — that is the
+# review gate working).
 #
 # Snapshot budget: Chromatic's free tier allows 5,000 snapshots/month,
 # and the old run-on-every-push model burned ~284 snapshots per build
 # (142 stories × 2 themes) — 45 runs in 2026-10-19..22 alone. The
-# trigger model is now:
+# trigger model is now (release-finalization model, 2026-11-06):
 #
-# - Pushes to main: ALWAYS run. Main builds anchor the baselines that
-#   PR diffs compare against, and they are comparatively rare.
+# - Pushes to main: NEVER run. Chromatic is an expensive step, and
+#   expensive steps run only on version/release PRs at release
+#   finalization. PR builds compare against the newest build with
+#   accepted baselines reachable in git ancestry, so the finalization
+#   run surfaces the release's accumulated visual delta.
 # - Pull requests: run ONLY on request. Add the `visual-check` label
-#   to a PR to request one snapshot run (typically once the PR is
-#   merge-ready). The label is one-shot: the job removes it as soon as
+#   to a PR to request one snapshot run (under the finalization model,
+#   only on the Version Packages PR while its release is being
+#   finalized). The label is one-shot: the job removes it as soon as
 #   a run actually starts, so later pushes don't silently re-burn
 #   snapshots — re-add the label for another run. Two gates run before
 #   the label is consumed, and a gate skip KEEPS the label, so a later
@@ -41,9 +45,8 @@ name: React storybook (Chromatic)
 # publish step fails (confined to its own check; CI is unaffected).
 
 on:
-  # Baselines: main-branch builds are the comparison target for PR diffs.
-  push:
-    branches: [main]
+  # No push trigger: main pushes never run Chromatic (release-
+  # finalization model, 2026-11-06). PR runs are label-gated below.
   pull_request:
     # `labeled` makes the visual-check request work; the other types let
     # an already-labeled PR retry the gates when new commits land.
@@ -52,8 +55,9 @@ on:
 # NOTE: concurrency lives on the job (below), not here. Workflow-level
 # concurrency cancels an in-flight run for ANY new event in the group —
 # including events the job's own `if` would skip (an unrelated label, a
-# push after a run consumed the visual-check label) — which could kill
-# a deliberately requested snapshot build mid-flight and lose it.
+# synchronize after a run consumed the visual-check label) — which
+# could kill a deliberately requested snapshot build mid-flight and
+# lose it.
 
 jobs:
   chromatic:
@@ -78,10 +82,9 @@ jobs:
     # additionally require the visual-check label (see header), and a
     # `labeled` event for any other label must not start a run.
     if: |
-      github.event_name == 'push' ||
-      (github.event.pull_request.head.repo.full_name == github.repository &&
-       contains(github.event.pull_request.labels.*.name, 'visual-check') &&
-       (github.event.action != 'labeled' || github.event.label.name == 'visual-check'))
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      contains(github.event.pull_request.labels.*.name, 'visual-check') &&
+      (github.event.action != 'labeled' || github.event.label.name == 'visual-check')
     steps:
       - name: Gate PR snapshot runs (pixel diff + CI green)
         id: pr-gate

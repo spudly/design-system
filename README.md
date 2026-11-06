@@ -119,18 +119,22 @@ files — this react (web) storybook and the react-native storybook
 below. The structure, commands, and the coverage-parity rule are
 documented in [docs/storybooks.md](docs/storybooks.md).
 
-Every push to `main` publishes its Storybook build to
-[Chromatic](https://www.chromatic.com/) via `.github/workflows/chromatic.yml`:
-each run gets a browsable build URL for review, and Chromatic diffs story
-snapshots against the accepted `main` baseline. Visual changes show up as a
+Chromatic runs only at release finalization (the release-finalization
+model, 2026-11-06): pushes to `main` never publish. When a release is
+being finalized, the Version Packages PR gets one labeled run via
+`.github/workflows/chromatic.yml`: the run gets a browsable build URL
+for review, and Chromatic diffs story snapshots against the newest
+build with accepted baselines. Visual changes show up as a
 failing/check-pending Chromatic status until they are accepted in
-Chromatic's UI — that acceptance is the visual-regression gate. Pushes to
-`main` publish the new baseline.
+Chromatic's UI — that acceptance is the visual-regression gate, and
+accepting the finalization build sets the baseline for the next
+release.
 
 Pull requests do **not** publish on every push: snapshots are metered
 (Chromatic's free tier allows 5,000/month, and a full build is ~284
 snapshots — 142 stories × 2 themes). To request a snapshot run on a PR —
-typically once it is merge-ready — add the **`visual-check`** label. The
+under the finalization model, only on the Version Packages PR while its
+release is being finalized — add the **`visual-check`** label. The
 label is one-shot: the job removes it as soon as a run actually starts, so
 re-add it when you want another run. One exception: a run triggered by
 Dependabot itself gets a read-only token and cannot remove the label — it
