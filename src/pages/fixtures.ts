@@ -542,8 +542,8 @@ export const legalPrivacyFixture: LegalDocumentPageProps = {
       },
     ],
     storeLinks: [
-      { label: "Download on the App Store", href: "/app-store" },
-      { label: "Get it on Google Play", href: "/google-play" },
+      { label: "Download on the App Store", href: "/app-store", store: "app-store" },
+      { label: "Get it on Google Play", href: "/google-play", store: "google-play" },
     ],
     socialLinks: [],
   },
@@ -630,8 +630,8 @@ export const legalTermsFixture: LegalDocumentPageProps = {
       },
     ],
     storeLinks: [
-      { label: "Download on the App Store", href: "/app-store" },
-      { label: "Get it on Google Play", href: "/google-play" },
+      { label: "Download on the App Store", href: "/app-store", store: "app-store" },
+      { label: "Get it on Google Play", href: "/google-play", store: "google-play" },
     ],
     socialLinks: [],
   },
@@ -721,8 +721,8 @@ export const eciperayFooterFixture: BigFooterData = {
     },
   ],
   storeLinks: [
-    { label: "Download on the App Store", href: "/app-store" },
-    { label: "Get it on Google Play", href: "/google-play" },
+    { label: "Download on the App Store", href: "/app-store", store: "app-store" },
+    { label: "Get it on Google Play", href: "/google-play", store: "google-play" },
   ],
   socialLinks: [
     { label: "Eciperay on Facebook", href: "/social/facebook", icon: "facebook" },
@@ -751,8 +751,8 @@ export const memorizeFooterFixture: BigFooterData = {
     },
   ],
   storeLinks: [
-    { label: "Download on the App Store", href: "/app-store" },
-    { label: "Get it on Google Play", href: "/google-play" },
+    { label: "Download on the App Store", href: "/app-store", store: "app-store" },
+    { label: "Get it on Google Play", href: "/google-play", store: "google-play" },
   ],
   socialLinks: [
     { label: "Memorize on YouTube", href: "/social/youtube", icon: "youtube" },
