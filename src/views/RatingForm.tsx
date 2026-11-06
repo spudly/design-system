@@ -99,6 +99,7 @@ export function RatingForm({
       {isLight ? null : (
         <YStack
           position="absolute"
+          pointerEvents="none"
           top={0}
           left={0}
           right={0}
@@ -123,6 +124,7 @@ export function RatingForm({
           {isLight ? null : (
             <YStack
               position="absolute"
+              pointerEvents="none"
               top={0}
               left={0}
               right={0}
@@ -163,6 +165,7 @@ export function RatingForm({
             {isLight ? null : (
               <YStack
                 position="absolute"
+                pointerEvents="none"
                 top={0}
                 left={0}
                 right={0}

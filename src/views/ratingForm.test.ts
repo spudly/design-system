@@ -105,3 +105,16 @@ test("stories cover both variants and the custom labels in the shared CSF tree",
   assert.match(stories, /export const CustomLabels: Story/);
   assert.match(stories, /title="Rate this recipe"/);
 });
+
+test("dark decorative overlays never intercept presses (#450)", () => {
+  // The dark variant paints its 10%-surface tint as absolutely-positioned
+  // layers sized to their containers. Without pointerEvents="none" the
+  // form-wide layer sits over the star row and swallows mouse/touch
+  // presses (keyboard worked, mouse did not). Every such layer must be
+  // press-transparent.
+  const overlays = source.match(/position="absolute"[\s\S]*?\/>/g) ?? [];
+  assert.equal(overlays.length, 3, "form, notes-field and skip-action tint layers");
+  for (const overlay of overlays) {
+    assert.match(overlay, /pointerEvents="none"/);
+  }
+});
