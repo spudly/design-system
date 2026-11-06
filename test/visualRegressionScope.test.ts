@@ -284,7 +284,7 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // everywhere), and every derivable in-scope story HAS a
   // committed baseline (that direction checked on the release
   // PR only — see the gate comment above). The
-  // Current light set: 152 standard-width stories (128 light_warmHarvest + 22
+  // Current light set: 151 standard-width stories (126 light_warmHarvest + 20
   // light_quietDawn on disk minus the 3 Reading-screen stories the capture app
   // excludes, ReadingView replicating Memorize's reading screen and landing in
   // B4; the #168 DiscoverPage/DiscoveryCard baselines joined through merges
@@ -292,7 +292,7 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // LandingPage story (+1 standard)). (Component stories are not
   // in the capture set — STANDARD_PREFIXES covers Pages only; the
   // #119 tranches' component stories are Chromatic-covered.)
-  const EXPECTED_LIGHT_STORY_COUNT = 152;
+  const EXPECTED_LIGHT_STORY_COUNT = 151;
   // the standard set grew by the eight B3a recipe-form stories,
   // #124, the sixteen B3b meals/shopping stories, #125, the
   // twenty-three B3c account/auth stories, #126, the three
@@ -333,7 +333,10 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // carries the narrow variant), and #424 retired the
   // MemorizeSettingsPage SyncConflict story and renamed
   // NoApiKeyDriveDisconnected to NoApiKey (−1 standard —
-  // Drive sync removed from Memorize), and #440 added the
+  // Drive sync removed from Memorize), and #439 retired the
+  // MemorizeSettingsPage NoApiKey story (−1 standard — the
+  // API key section removed from Memorize settings), and
+  // #440 added the
   // MealDetailPage and MealFormPage WithDirectIngredients
   // stories (+2 standard — the direct-ingredients section
   // cases), and #438 Part 3 added the sixteen coverage

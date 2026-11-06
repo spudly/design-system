@@ -1,5 +1,12 @@
 # @spudly/ui
 
+## 5.1.0
+
+### Minor Changes
+
+- 34d32cb: MealDetailPage and MealFormPage now support a meal's direct ingredients (ingredients entered on the meal itself, not through a recipe). MealDetailPage accepts an optional `ingredients` list and, when it is non-empty, renders an "Ingredients" section after "Recipes" with plain, non-link rows showing each ingredient's name and its quantity/nutrition line. MealFormPage accepts optional direct-ingredient entries (name, quantity, unit, and entry servings as free-text fields) with add, remove, and change callbacks in a new "Ingredients" section; a meal with a title and only direct ingredients — no selected recipes — is now submittable. MarkableRow gains an optional pre-composed `subtitle` line under its label.
+- a810b28: Export the design tokens from the package root (#438 Part 1): hosts can now import exactly the 5 token specifiers dispositioned in the Part 0 audit — `tokens`, `warmHarvestTagColors`, `tagColorNames`, `tagColorNameForHex`, and the `TagColorName` type — from `@spudly/ui` alongside the themes and pages. No widget or icon exports change.
+
 ## 5.0.0
 
 ### Major Changes
