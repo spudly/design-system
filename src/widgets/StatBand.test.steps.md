@@ -1,7 +1,7 @@
 ---
 component: StatBand
 run_when:
-  - src/widgets/StatBand.tsx, its stories, the recipe detail pages' stat band, or a changeset naming StatBand.
+  - "src/widgets/StatBand.tsx, its stories, the recipe detail pages' stat band, or a changeset naming StatBand."
 ---
 
 # StatBand — manual test steps

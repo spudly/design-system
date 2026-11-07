@@ -1,8 +1,8 @@
 ---
 component: TextActionCardRow
 run_when:
-  - src/widgets/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow.
-  - any of these components, their stories, or a changeset naming them.
+  - "src/widgets/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow."
+  - "any of these components, their stories, or a changeset naming them. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
 ---
 
 # TextActionCardRow — manual test steps

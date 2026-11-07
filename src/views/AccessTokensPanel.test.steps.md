@@ -1,7 +1,7 @@
 ---
 component: AccessTokensPanel
 run_when:
-  - src/views/AccessTokensPanel.tsx, its stories, or a changeset naming AccessTokensPanel.
+  - "src/views/AccessTokensPanel.tsx, its stories, or a changeset naming AccessTokensPanel."
 ---
 
 # AccessTokensPanel — manual test steps

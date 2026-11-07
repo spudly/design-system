@@ -1,7 +1,7 @@
 ---
 component: PanelStack
 run_when:
-  - src/widgets/PanelStack.tsx, its stories, a detail page composing it, or a changeset naming PanelStack.
+  - "src/widgets/PanelStack.tsx, its stories, a detail page composing it, or a changeset naming PanelStack."
 ---
 
 # PanelStack — manual test steps

@@ -1,7 +1,7 @@
 ---
 component: Dialog
 run_when:
-  - src/widgets/Dialog.tsx, its stories, or a changeset naming Dialog.
+  - "src/widgets/Dialog.tsx, its stories, or a changeset naming Dialog."
 ---
 
 # Dialog — manual test steps

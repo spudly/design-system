@@ -1,8 +1,8 @@
 ---
 component: ScrollShell
 run_when:
-  - any of the four shell components, their stories, or a changeset naming them.
-  - src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell.
+  - "any of the four shell components, their stories, or a changeset naming them. (namely: ScreenShell, ScrollShell, SessionShell, PinnedHeaderShell)"
+  - "src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
 ---
 
 # ScrollShell — manual test steps

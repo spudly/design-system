@@ -1,7 +1,7 @@
 ---
 component: FieldColumns
 run_when:
-  - src/widgets/FieldColumns.tsx, its stories, RecipeFormPage, or a changeset naming FieldColumns.
+  - "src/widgets/FieldColumns.tsx, its stories, RecipeFormPage, or a changeset naming FieldColumns."
 ---
 
 # FieldColumns — manual test steps

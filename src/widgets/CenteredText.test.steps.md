@@ -1,8 +1,8 @@
 ---
 component: CenteredText
 run_when:
-  - src/widgets/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either.
-  - any of these components, their stories, or a changeset naming them.
+  - "src/widgets/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
+  - "any of these components, their stories, or a changeset naming them. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
 ---
 
 # CenteredText — manual test steps

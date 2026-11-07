@@ -1,7 +1,7 @@
 ---
 component: Toolbar
 run_when:
-  - src/widgets/Toolbar.tsx, its stories, a fixed-shell page composing it, or a changeset naming Toolbar.
+  - "src/widgets/Toolbar.tsx, its stories, a fixed-shell page composing it, or a changeset naming Toolbar."
 ---
 
 # Toolbar — manual test steps

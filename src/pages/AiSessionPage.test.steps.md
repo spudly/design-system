@@ -1,8 +1,8 @@
 ---
 component: AiSessionPage
 run_when:
-  - src/pages/AiSessionPage.tsx, its stories, or a changeset naming AiSessionPage.
-  - src/widgets/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard.
+  - "src/pages/AiSessionPage.tsx, its stories, or a changeset naming AiSessionPage."
+  - "src/widgets/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard."
 ---
 
 # AiSessionPage — manual test steps

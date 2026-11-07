@@ -1,7 +1,7 @@
 ---
 component: Accordion
 run_when:
-  - src/widgets/Accordion.tsx, its stories, or a changeset naming Accordion.
+  - "src/widgets/Accordion.tsx, its stories, or a changeset naming Accordion."
 ---
 
 # Accordion — manual test steps

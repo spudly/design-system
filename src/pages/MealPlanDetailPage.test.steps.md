@@ -1,12 +1,12 @@
 ---
 component: MealPlanDetailPage
 run_when:
-  - src/widgets/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow.
-  - src/widgets/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack.
-  - src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack.
-  - src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow.
-  - src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow.
-  - src/pages/MealPlansPage.tsx, src/pages/MealPlanDetailPage.tsx, their stories, or a changeset naming either page.
+  - "src/widgets/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
+  - "src/widgets/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack."
+  - "src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
+  - "src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow."
+  - "src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow."
+  - "src/pages/MealPlansPage.tsx, src/pages/MealPlanDetailPage.tsx, their stories, or a changeset naming either page."
 ---
 
 # MealPlanDetailPage — manual test steps

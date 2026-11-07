@@ -1,7 +1,7 @@
 ---
 component: SubscriptionView
 run_when:
-  - src/views/SubscriptionView.tsx, its stories, ProfilePage, or a changeset naming SubscriptionView.
+  - "src/views/SubscriptionView.tsx, its stories, ProfilePage, or a changeset naming SubscriptionView."
 ---
 
 # SubscriptionView — manual test steps

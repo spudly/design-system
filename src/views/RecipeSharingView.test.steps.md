@@ -1,7 +1,7 @@
 ---
 component: RecipeSharingView
 run_when:
-  - src/views/RecipeSharingView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeSharingView.
+  - "src/views/RecipeSharingView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeSharingView."
 ---
 
 # RecipeSharingView — manual test steps

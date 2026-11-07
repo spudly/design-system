@@ -1,7 +1,7 @@
 ---
 component: StarRatingInput
 run_when:
-  - src/widgets/StarRatingInput.tsx, its stories, or a changeset naming StarRatingInput.
+  - "src/widgets/StarRatingInput.tsx, its stories, or a changeset naming StarRatingInput."
 ---
 
 # StarRatingInput — manual test steps

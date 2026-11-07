@@ -1,7 +1,7 @@
 ---
 component: NumberStepper
 run_when:
-  - src/views/NumberStepper.tsx, its stories, or a changeset naming NumberStepper.
+  - "src/views/NumberStepper.tsx, its stories, or a changeset naming NumberStepper."
 ---
 
 # NumberStepper — manual test steps

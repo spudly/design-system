@@ -1,7 +1,7 @@
 ---
 component: SectionStack
 run_when:
-  - src/widgets/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack.
+  - "src/widgets/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack."
 ---
 
 # SectionStack — manual test steps

@@ -1,7 +1,7 @@
 ---
 component: LandingPage
 run_when:
-  - src/pages/LandingPage.tsx, its stories, Button's href form, or a changeset naming LandingPage.
+  - "src/pages/LandingPage.tsx, its stories, Button's href form, or a changeset naming LandingPage."
 ---
 
 # LandingPage — manual test steps

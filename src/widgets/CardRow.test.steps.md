@@ -1,7 +1,8 @@
 ---
 component: CardRow
 run_when:
-  - src/widgets/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow.
+  - "src/widgets/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow."
+  - "src/widgets/PresetValueSelector.tsx, its stories, the recipe pages' scale rows, or a changeset naming PresetValueSelector."
 ---
 
 # CardRow — manual test steps

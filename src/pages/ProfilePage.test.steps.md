@@ -1,11 +1,11 @@
 ---
 component: ProfilePage
 run_when:
-  - src/pages/ProfilePage.tsx, its stories, the four section views below, or a changeset naming ProfilePage.
-  - src/views/SubscriptionView.tsx, its stories, ProfilePage, or a changeset naming SubscriptionView.
-  - src/views/FeedbackPreferenceView.tsx, its stories, ProfilePage, or a changeset naming FeedbackPreferenceView.
-  - src/views/TransferRecipesView.tsx, src/views/RecipeExportPickerView.tsx, their stories, ProfilePage, or a changeset naming either view.
-  - src/views/AccountDataView.tsx, its stories, ProfilePage, or a changeset naming AccountDataView.
+  - "src/pages/ProfilePage.tsx, its stories, the four section views below, or a changeset naming ProfilePage."
+  - "src/views/SubscriptionView.tsx, its stories, ProfilePage, or a changeset naming SubscriptionView."
+  - "src/views/FeedbackPreferenceView.tsx, its stories, ProfilePage, or a changeset naming FeedbackPreferenceView."
+  - "src/views/TransferRecipesView.tsx, src/views/RecipeExportPickerView.tsx, their stories, ProfilePage, or a changeset naming either view."
+  - "src/views/AccountDataView.tsx, its stories, ProfilePage, or a changeset naming AccountDataView."
 ---
 
 # ProfilePage — manual test steps

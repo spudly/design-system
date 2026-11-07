@@ -1,7 +1,7 @@
 ---
 component: CheckboxField
 run_when:
-  - src/views/CheckboxField.tsx, its stories, or a changeset naming CheckboxField.
+  - "src/views/CheckboxField.tsx, its stories, or a changeset naming CheckboxField."
 ---
 
 # CheckboxField — manual test steps

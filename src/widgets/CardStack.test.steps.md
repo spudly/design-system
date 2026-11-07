@@ -1,7 +1,7 @@
 ---
 component: CardStack
 run_when:
-  - src/widgets/CardStack.tsx, its stories, the pages that compose CardStack (MealPlansPage), or a changeset naming CardStack.
+  - "src/widgets/CardStack.tsx, its stories, the pages that compose CardStack (MealPlansPage), or a changeset naming CardStack."
 ---
 
 # CardStack — manual test steps

@@ -1,8 +1,8 @@
 ---
 component: AutocompletePicker
 run_when:
-  - src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker.
-  - src/widgets/AutocompletePicker.tsx, its stories, or a changeset naming AutocompletePicker.
+  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker."
+  - "src/widgets/AutocompletePicker.tsx, its stories, or a changeset naming AutocompletePicker."
 ---
 
 # AutocompletePicker — manual test steps

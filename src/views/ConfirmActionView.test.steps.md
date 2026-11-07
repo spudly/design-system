@@ -1,7 +1,7 @@
 ---
 component: ConfirmActionView
 run_when:
-  - src/views/ConfirmActionView.tsx, its stories, RecipeDetailPage, or a changeset naming ConfirmActionView.
+  - "src/views/ConfirmActionView.tsx, its stories, RecipeDetailPage, or a changeset naming ConfirmActionView."
 ---
 
 # ConfirmActionView — manual test steps

@@ -1,7 +1,7 @@
 ---
 component: ScreenShell
 run_when:
-  - any of the four shell components, their stories, or a changeset naming them.
+  - "any of the four shell components, their stories, or a changeset naming them. (namely: ScreenShell, ScrollShell, SessionShell, PinnedHeaderShell)"
 ---
 
 # ScreenShell — manual test steps

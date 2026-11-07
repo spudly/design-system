@@ -1,8 +1,8 @@
 ---
 component: ImportReviewPage
 run_when:
-  - src/pages/ImportTextPage.tsx, src/pages/ImportUrlPage.tsx, src/pages/ImportReviewPage.tsx, their stories, or a changeset naming the import pages.
-  - src/widgets/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard.
+  - "src/pages/ImportTextPage.tsx, src/pages/ImportUrlPage.tsx, src/pages/ImportReviewPage.tsx, their stories, or a changeset naming the import pages."
+  - "src/widgets/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard."
 ---
 
 # ImportReviewPage — manual test steps

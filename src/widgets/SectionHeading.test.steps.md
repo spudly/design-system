@@ -1,7 +1,7 @@
 ---
 component: SectionHeading
 run_when:
-  - src/widgets/RatingsCard.tsx, src/widgets/SectionHeading.tsx, their stories, or a changeset naming any of them.
+  - "src/widgets/RatingsCard.tsx, src/widgets/SectionHeading.tsx, their stories, or a changeset naming any of them. (namely: RatingsCard, SectionHeading)"
 ---
 
 # SectionHeading — manual test steps

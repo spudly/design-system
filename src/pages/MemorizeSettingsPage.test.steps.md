@@ -1,7 +1,7 @@
 ---
 component: MemorizeSettingsPage
 run_when:
-  - src/pages/MemorizeSettingsPage.tsx, its stories, or a changeset naming MemorizeSettingsPage.
+  - "src/pages/MemorizeSettingsPage.tsx, its stories, or a changeset naming MemorizeSettingsPage."
 ---
 
 # MemorizeSettingsPage — manual test steps

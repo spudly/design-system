@@ -1,7 +1,7 @@
 ---
 component: ListStack
 run_when:
-  - src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack.
+  - "src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
 ---
 
 # ListStack — manual test steps

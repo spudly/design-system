@@ -1,7 +1,7 @@
 ---
 component: StatusMessage
 run_when:
-  - any of these components, their stories, or a changeset naming them.
+  - "any of these components, their stories, or a changeset naming them. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
 ---
 
 # StatusMessage — manual test steps

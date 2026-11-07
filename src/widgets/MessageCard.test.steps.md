@@ -1,7 +1,7 @@
 ---
 component: MessageCard
 run_when:
-  - src/widgets/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard.
+  - "src/widgets/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
 ---
 
 # MessageCard — manual test steps

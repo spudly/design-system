@@ -1,7 +1,7 @@
 ---
 component: ScrollRegion
 run_when:
-  - src/widgets/ScrollRegion.tsx, its stories, a fixed-shell page's scroll region, or a changeset naming ScrollRegion.
+  - "src/widgets/ScrollRegion.tsx, its stories, a fixed-shell page's scroll region, or a changeset naming ScrollRegion."
 ---
 
 # ScrollRegion — manual test steps

@@ -1,8 +1,8 @@
 ---
 component: RecipeOverviewPanel
 run_when:
-  - src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, RecipeInstructionsPanel), or a changeset naming PublicRecipePage.
-  - src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel.
+  - "src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, RecipeInstructionsPanel), or a changeset naming PublicRecipePage."
+  - "src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
 ---
 
 # RecipeOverviewPanel — manual test steps

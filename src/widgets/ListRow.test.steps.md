@@ -1,7 +1,7 @@
 ---
 component: ListRow
 run_when:
-  - src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow.
+  - "src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow."
 ---
 
 # ListRow — manual test steps

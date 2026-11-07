@@ -1,10 +1,10 @@
 ---
 component: HomePage
 run_when:
-  - src/widgets/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either.
-  - a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states.
-  - any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed.
-  - src/widgets/ButtonStack.tsx, its stories, HomePage's actions, or a changeset naming ButtonStack.
+  - "src/widgets/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
+  - "a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states."
+  - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
+  - "src/widgets/ButtonStack.tsx, its stories, HomePage's actions, or a changeset naming ButtonStack."
 ---
 
 # HomePage — manual test steps

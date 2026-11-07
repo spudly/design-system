@@ -1,7 +1,7 @@
 ---
 component: Thumbnail
 run_when:
-  - src/widgets/Thumbnail.tsx, its stories, the recipe pages' imagery or the import review's preview, or a changeset naming Thumbnail.
+  - "src/widgets/Thumbnail.tsx, its stories, the recipe pages' imagery or the import review's preview, or a changeset naming Thumbnail."
 ---
 
 # Thumbnail — manual test steps

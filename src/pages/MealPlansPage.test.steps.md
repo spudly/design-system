@@ -1,10 +1,11 @@
 ---
 component: MealPlansPage
 run_when:
-  - src/widgets/CardStack.tsx, its stories, the pages that compose CardStack (MealPlansPage), or a changeset naming CardStack.
-  - src/widgets/Center.tsx, its stories, the pages that compose Center (MealPlansPage), or a changeset naming Center.
-  - src/widgets/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow.
-  - src/pages/MealPlansPage.tsx, src/pages/MealPlanDetailPage.tsx, their stories, or a changeset naming either page.
+  - "src/widgets/CardStack.tsx, its stories, the pages that compose CardStack (MealPlansPage), or a changeset naming CardStack."
+  - "src/widgets/Center.tsx, its stories, the pages that compose Center (MealPlansPage), or a changeset naming Center."
+  - "src/widgets/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow."
+  - "src/widgets/PresetValueSelector.tsx, its stories, the recipe pages' scale rows, or a changeset naming PresetValueSelector."
+  - "src/pages/MealPlansPage.tsx, src/pages/MealPlanDetailPage.tsx, their stories, or a changeset naming either page."
 ---
 
 # MealPlansPage — manual test steps

@@ -1,7 +1,7 @@
 ---
 component: PayPage
 run_when:
-  - src/pages/PayPage.tsx, its stories, or a changeset naming PayPage.
+  - "src/pages/PayPage.tsx, its stories, or a changeset naming PayPage."
 ---
 
 # PayPage — manual test steps

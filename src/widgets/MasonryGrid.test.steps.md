@@ -1,7 +1,7 @@
 ---
 component: MasonryGrid
 run_when:
-  - src/widgets/MasonryGrid.tsx, its stories, or a changeset naming MasonryGrid.
+  - "src/widgets/MasonryGrid.tsx, its stories, or a changeset naming MasonryGrid."
 ---
 
 # MasonryGrid — manual test steps

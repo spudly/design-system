@@ -1,7 +1,7 @@
 ---
 component: AccountDataView
 run_when:
-  - src/views/AccountDataView.tsx, its stories, ProfilePage, or a changeset naming AccountDataView.
+  - "src/views/AccountDataView.tsx, its stories, ProfilePage, or a changeset naming AccountDataView."
 ---
 
 # AccountDataView — manual test steps

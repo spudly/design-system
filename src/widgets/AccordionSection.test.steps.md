@@ -1,7 +1,7 @@
 ---
 component: AccordionSection
 run_when:
-  - src/widgets/AccordionSection.tsx, its stories, or a changeset naming AccordionSection.
+  - "src/widgets/AccordionSection.tsx, its stories, or a changeset naming AccordionSection."
 ---
 
 # AccordionSection — manual test steps

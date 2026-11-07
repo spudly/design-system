@@ -1,7 +1,7 @@
 ---
 component: AuthConfirmationPage
 run_when:
-  - src/pages/AuthConfirmationPage.tsx, its stories, or a changeset naming AuthConfirmationPage.
+  - "src/pages/AuthConfirmationPage.tsx, its stories, or a changeset naming AuthConfirmationPage."
 ---
 
 # AuthConfirmationPage — manual test steps

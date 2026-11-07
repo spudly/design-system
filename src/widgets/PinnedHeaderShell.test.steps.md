@@ -1,8 +1,8 @@
 ---
 component: PinnedHeaderShell
 run_when:
-  - src/widgets/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell.
-  - any of the four shell components, their stories, or a changeset naming them.
+  - "src/widgets/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell."
+  - "any of the four shell components, their stories, or a changeset naming them. (namely: ScreenShell, ScrollShell, SessionShell, PinnedHeaderShell)"
 ---
 
 # PinnedHeaderShell — manual test steps

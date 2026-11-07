@@ -1,8 +1,8 @@
 ---
 component: RecipeFormPage
 run_when:
-  - src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker.
-  - src/widgets/FieldColumns.tsx, its stories, RecipeFormPage, or a changeset naming FieldColumns.
+  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker."
+  - "src/widgets/FieldColumns.tsx, its stories, RecipeFormPage, or a changeset naming FieldColumns."
 ---
 
 # RecipeFormPage — manual test steps

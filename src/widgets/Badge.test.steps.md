@@ -1,7 +1,7 @@
 ---
 component: Badge
 run_when:
-  - src/widgets/Badge.tsx, src/widgets/Badge.stories.tsx, or a changeset naming Badge (including TagPill-into-Badge changes).
+  - "src/widgets/Badge.tsx, src/widgets/Badge.stories.tsx, or a changeset naming Badge (including TagPill-into-Badge changes)."
 ---
 
 # Badge — manual test steps

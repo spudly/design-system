@@ -1,7 +1,7 @@
 ---
 component: Spinner
 run_when:
-  - src/widgets/Spinner.tsx, its stories, or a changeset naming Spinner.
+  - "src/widgets/Spinner.tsx, its stories, or a changeset naming Spinner."
 ---
 
 # Spinner — manual test steps

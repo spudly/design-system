@@ -1,8 +1,8 @@
 ---
 component: ResetPasswordForm
 run_when:
-  - src/pages/SignInPage.tsx, src/pages/SignUpPage.tsx, src/pages/ForgotPasswordPage.tsx, src/pages/ResetPasswordPage.tsx, the form components they compose (src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx), their stories, or a changeset naming the auth pages or Enter-to-submit.
-  - src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/views/LegalSection.tsx, their stories, the auth or Profile pages that compose them, or a changeset naming the auth forms or LegalSection.
+  - "src/pages/SignInPage.tsx, src/pages/SignUpPage.tsx, src/pages/ForgotPasswordPage.tsx, src/pages/ResetPasswordPage.tsx, the form components they compose (src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx), their stories, or a changeset naming the auth pages or Enter-to-submit."
+  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/views/LegalSection.tsx, their stories, the auth or Profile pages that compose them, or a changeset naming the auth forms or LegalSection."
 ---
 
 # ResetPasswordForm — manual test steps
@@ -58,11 +58,11 @@ Open in `Views/SignInForm`, `Views/SignUpForm`,
 stories are interactive: fields can be typed in).
 
 The auth pages' forms as standalone components: each form
-composes the shared FormStack (which owns the 16px field
+composes the shared FormStack (which owns the 12px field
 rhythm) and its own footer layout, and the pages compose the
 forms.
 
-1. Each form's fields stack at a 16px rhythm, and an error (the
+1. Each form's fields stack at a 12px rhythm, and an error (the
    WithError story) renders directly above the submit button in
    the error treatment.
 2. In SignInForm's Default story, both footer links render

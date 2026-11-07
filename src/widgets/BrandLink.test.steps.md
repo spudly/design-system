@@ -1,7 +1,7 @@
 ---
 component: BrandLink
 run_when:
-  - src/widgets/BigFooter.tsx, BrandLink.tsx, their stories, or a changeset naming any of them.
+  - "src/widgets/BigFooter.tsx, BrandLink.tsx, their stories, or a changeset naming any of them. (namely: BigFooter, BrandLink, StickyOnShortPage, LegalDocumentPage)"
 ---
 
 # BrandLink — manual test steps

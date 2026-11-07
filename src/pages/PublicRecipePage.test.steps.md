@@ -1,14 +1,14 @@
 ---
 component: PublicRecipePage
 run_when:
-  - src/widgets/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow.
-  - src/widgets/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard.
-  - src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell.
-  - src/widgets/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard.
-  - src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, RecipeInstructionsPanel), or a changeset naming PublicRecipePage.
-  - src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel.
-  - src/widgets/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel.
-  - src/widgets/RecipeInstructionsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeInstructionsPanel.
+  - "src/widgets/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
+  - "src/widgets/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
+  - "src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
+  - "src/widgets/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
+  - "src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, RecipeInstructionsPanel), or a changeset naming PublicRecipePage."
+  - "src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
+  - "src/widgets/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
+  - "src/widgets/RecipeInstructionsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeInstructionsPanel."
 ---
 
 # PublicRecipePage — manual test steps

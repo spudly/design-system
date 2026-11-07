@@ -1,7 +1,7 @@
 ---
 component: LegalDocumentPage
 run_when:
-  - src/pages/LegalDocumentPage.tsx, its stories, or a changeset naming LegalDocumentPage.
+  - "src/pages/LegalDocumentPage.tsx, its stories, or a changeset naming LegalDocumentPage."
 ---
 
 # LegalDocumentPage — manual test steps

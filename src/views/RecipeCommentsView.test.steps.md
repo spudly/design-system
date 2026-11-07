@@ -1,7 +1,7 @@
 ---
 component: RecipeCommentsView
 run_when:
-  - src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView.
+  - "src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
 ---
 
 # RecipeCommentsView — manual test steps

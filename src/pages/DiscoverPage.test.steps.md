@@ -1,7 +1,7 @@
 ---
 component: DiscoverPage
 run_when:
-  - a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states.
+  - "a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states."
 ---
 
 # DiscoverPage — manual test steps

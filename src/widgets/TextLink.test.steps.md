@@ -1,7 +1,7 @@
 ---
 component: TextLink
 run_when:
-  - src/widgets/Button.tsx, TextLink.tsx, BackLink.tsx, or Tabs.tsx, their stories, or a changeset naming the navigation link forms or #248.
+  - "src/widgets/Button.tsx, TextLink.tsx, BackLink.tsx, or Tabs.tsx, their stories, or a changeset naming the navigation link forms or #248."
 ---
 
 # TextLink — manual test steps

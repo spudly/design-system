@@ -1,7 +1,7 @@
 ---
 component: PreviewCard
 run_when:
-  - src/widgets/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard.
+  - "src/widgets/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard."
 ---
 
 # PreviewCard — manual test steps

@@ -1,7 +1,7 @@
 ---
 component: DropdownButton
 run_when:
-  - src/widgets/DropdownButton.tsx, its stories, or a changeset naming DropdownButton.
+  - "src/widgets/DropdownButton.tsx, its stories, or a changeset naming DropdownButton."
 ---
 
 # DropdownButton — manual test steps

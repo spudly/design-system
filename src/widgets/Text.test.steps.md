@@ -1,7 +1,7 @@
 ---
 component: Text
 run_when:
-  - src/widgets/Text.tsx, its stories, the accessibility translator (src/widgets/accessibility.ts), or a changeset naming Text or heading semantics.
+  - "src/widgets/Text.tsx, its stories, the accessibility translator (src/widgets/accessibility.ts), or a changeset naming Text or heading semantics."
 ---
 
 # Text — manual test steps

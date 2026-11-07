@@ -34,7 +34,17 @@ function parseFrontMatter(text) {
   const match = text.match(/^---\n([\s\S]*?)\n---\n/);
   if (!match) return null;
   const component = match[1].match(/^component:\s*(.+)$/m)?.[1]?.trim();
-  const runWhen = [...match[1].matchAll(/^\s+-\s+(.+)$/gm)].map((m) => m[1].trim());
+  const runWhen = [...match[1].matchAll(/^\s+-\s+(.+)$/gm)].map((m) => {
+    const raw = m[1].trim();
+    if (raw.startsWith('"')) {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        return raw;
+      }
+    }
+    return raw;
+  });
   return { component, runWhen };
 }
 

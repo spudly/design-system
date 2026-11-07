@@ -1,7 +1,7 @@
 ---
 component: InstallBannerView
 run_when:
-  - src/views/ConsentBannerView.tsx, src/views/InstallBannerView.tsx, their stories, or a changeset naming either view.
+  - "src/views/ConsentBannerView.tsx, src/views/InstallBannerView.tsx, their stories, or a changeset naming either view."
 ---
 
 # InstallBannerView — manual test steps

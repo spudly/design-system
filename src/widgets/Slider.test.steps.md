@@ -1,7 +1,7 @@
 ---
 component: Slider
 run_when:
-  - src/widgets/Slider.tsx, its stories, or a changeset naming Slider.
+  - "src/widgets/Slider.tsx, its stories, or a changeset naming Slider."
 ---
 
 # Slider — manual test steps

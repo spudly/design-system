@@ -1,7 +1,7 @@
 ---
 component: RouteErrorPage
 run_when:
-  - src/pages/RouteErrorPage.tsx, its stories, or a changeset naming RouteErrorPage.
+  - "src/pages/RouteErrorPage.tsx, its stories, or a changeset naming RouteErrorPage."
 ---
 
 # RouteErrorPage — manual test steps

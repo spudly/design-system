@@ -1,7 +1,7 @@
 ---
 component: LabeledField
 run_when:
-  - any of these components, their stories, the form pages, or a changeset naming them.
+  - "any of these components, their stories, the form pages, or a changeset naming them. (namely: FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)"
 ---
 
 # LabeledField — manual test steps
@@ -22,8 +22,9 @@ Open in `Widgets/FormStack`: Default, FieldsWithActions;
 (their stories).
 
 1. FormStack: fields render in order with the form rhythm —
-   even 16px separation and the longer tail below the last
-   field.
+   even 12px separation, with no extra tail below the
+   last field (FormStack's gap is spacing[3] = 12px and it
+   adds no bottom padding).
 2. FormHeading: the title renders in the form-title treatment;
    WithSubtitle shows the hint line under the title.
 3. LabeledField: the label sits 4px over the field; on web the

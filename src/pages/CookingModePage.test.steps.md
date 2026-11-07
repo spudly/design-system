@@ -1,8 +1,8 @@
 ---
 component: CookingModePage
 run_when:
-  - src/pages/CookingModePage.tsx, its stories, src/widgets/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage.
-  - src/views/ScaledIngredientsView.tsx, its stories, CookingModePage, or a changeset naming ScaledIngredientsView.
+  - "src/pages/CookingModePage.tsx, its stories, src/widgets/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
+  - "src/views/ScaledIngredientsView.tsx, its stories, CookingModePage, or a changeset naming ScaledIngredientsView."
 ---
 
 # CookingModePage — manual test steps

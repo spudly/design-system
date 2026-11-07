@@ -1,7 +1,7 @@
 ---
 component: AppTopBar
 run_when:
-  - src/pages/AppShellPage.tsx, src/pages/TabbedShellPage.tsx, src/views/AppTopBar.tsx, their stories, or a changeset naming any of them.
+  - "src/pages/AppShellPage.tsx, src/pages/TabbedShellPage.tsx, src/views/AppTopBar.tsx, their stories, or a changeset naming any of them. (namely: AppShellPage, TabbedShellPage, AppTopBar)"
 ---
 
 # AppTopBar — manual test steps

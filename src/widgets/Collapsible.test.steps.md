@@ -1,7 +1,7 @@
 ---
 component: Collapsible
 run_when:
-  - src/widgets/Collapsible.tsx, its stories, or a changeset naming Collapsible.
+  - "src/widgets/Collapsible.tsx, its stories, or a changeset naming Collapsible."
 ---
 
 # Collapsible — manual test steps

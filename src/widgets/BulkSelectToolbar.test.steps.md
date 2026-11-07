@@ -1,7 +1,7 @@
 ---
 component: BulkSelectToolbar
 run_when:
-  - src/widgets/BulkSelectToolbar.tsx, its stories, or a changeset naming BulkSelectToolbar.
+  - "src/widgets/BulkSelectToolbar.tsx, its stories, or a changeset naming BulkSelectToolbar."
 ---
 
 # BulkSelectToolbar — manual test steps

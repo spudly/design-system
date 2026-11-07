@@ -1,7 +1,7 @@
 ---
 component: ConsentPreferencesPage
 run_when:
-  - src/pages/ConsentPreferencesPage.tsx, its stories, or a changeset naming ConsentPreferencesPage.
+  - "src/pages/ConsentPreferencesPage.tsx, its stories, or a changeset naming ConsentPreferencesPage."
 ---
 
 # ConsentPreferencesPage — manual test steps

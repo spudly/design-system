@@ -1,7 +1,7 @@
 ---
 component: NutritionPanel
 run_when:
-  - src/widgets/NutritionPanel.tsx, its stories, or a changeset naming NutritionPanel.
+  - "src/widgets/NutritionPanel.tsx, its stories, or a changeset naming NutritionPanel."
 ---
 
 # NutritionPanel — manual test steps

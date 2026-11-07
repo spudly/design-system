@@ -1,7 +1,7 @@
 ---
 component: Dropdown
 run_when:
-  - src/widgets/Dropdown.tsx, its stories, or a changeset naming Dropdown.
+  - "src/widgets/Dropdown.tsx, its stories, or a changeset naming Dropdown."
 ---
 
 # Dropdown — manual test steps

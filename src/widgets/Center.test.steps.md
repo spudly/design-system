@@ -1,7 +1,7 @@
 ---
 component: Center
 run_when:
-  - src/widgets/Center.tsx, its stories, the pages that compose Center (MealPlansPage), or a changeset naming Center.
+  - "src/widgets/Center.tsx, its stories, the pages that compose Center (MealPlansPage), or a changeset naming Center."
 ---
 
 # Center — manual test steps

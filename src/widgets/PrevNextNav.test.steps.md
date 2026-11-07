@@ -1,7 +1,7 @@
 ---
 component: PrevNextNav
 run_when:
-  - src/widgets/PrevNextNav.tsx, its stories, or a changeset naming PrevNextNav.
+  - "src/widgets/PrevNextNav.tsx, its stories, or a changeset naming PrevNextNav."
 ---
 
 # PrevNextNav — manual test steps

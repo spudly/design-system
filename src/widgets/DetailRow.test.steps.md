@@ -1,7 +1,7 @@
 ---
 component: DetailRow
 run_when:
-  - src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow.
+  - "src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow."
 ---
 
 # DetailRow — manual test steps

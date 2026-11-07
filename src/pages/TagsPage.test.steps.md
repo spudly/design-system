@@ -1,11 +1,11 @@
 ---
 component: TagsPage
 run_when:
-  - src/widgets/BadgeCardRow.tsx, its stories, TagsPage's rows, or a changeset naming BadgeCardRow.
-  - src/widgets/FormStack.tsx, src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them.
-  - a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states.
-  - src/pages/TagsPage.tsx, its stories, or a changeset naming TagsPage.
-  - src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them.
+  - "src/widgets/FormStack.tsx, src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
+  - "a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states."
+  - "src/pages/TagsPage.tsx, its stories, or a changeset naming TagsPage."
+  - "src/widgets/BadgeCardRow.tsx, its stories, TagsPage's rows, or a changeset naming BadgeCardRow."
+  - "src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: TrailingActionsRow, Card, TagsPage)"
 ---
 
 # TagsPage — manual test steps
@@ -14,19 +14,6 @@ Colocated manual test steps for `src/pages/TagsPage.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
-
-## BadgeCardRow
-
-Open in `Widgets/BadgeCardRow`: Default, DeleteOnly.
-
-1. Default: a compact card (small padding and shadow) with the
-   colored badge at the left and Edit / Delete as bare text
-   actions at the right, Delete in the error treatment.
-2. DeleteOnly: only the Delete action shows; the badge keeps
-   its color and the row height is unchanged.
-
-**Run when:** `src/widgets/BadgeCardRow.tsx`, its stories,
-TagsPage's rows, or a changeset naming BadgeCardRow.
 
 ## FormStack & TrailingActionsRow; Card's compact variant
 

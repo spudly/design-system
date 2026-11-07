@@ -1,7 +1,7 @@
 ---
 component: ImportUrlPage
 run_when:
-  - src/pages/ImportTextPage.tsx, src/pages/ImportUrlPage.tsx, src/pages/ImportReviewPage.tsx, their stories, or a changeset naming the import pages.
+  - "src/pages/ImportTextPage.tsx, src/pages/ImportUrlPage.tsx, src/pages/ImportReviewPage.tsx, their stories, or a changeset naming the import pages."
 ---
 
 # ImportUrlPage — manual test steps

@@ -1,7 +1,7 @@
 ---
 component: CandidateList
 run_when:
-  - src/views/CandidateList.tsx, its stories, or a changeset naming CandidateList.
+  - "src/views/CandidateList.tsx, its stories, or a changeset naming CandidateList."
 ---
 
 # CandidateList — manual test steps

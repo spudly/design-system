@@ -1,7 +1,7 @@
 ---
 component: RecipeExportPickerView
 run_when:
-  - src/views/TransferRecipesView.tsx, src/views/RecipeExportPickerView.tsx, their stories, ProfilePage, or a changeset naming either view.
+  - "src/views/TransferRecipesView.tsx, src/views/RecipeExportPickerView.tsx, their stories, ProfilePage, or a changeset naming either view."
 ---
 
 # RecipeExportPickerView — manual test steps

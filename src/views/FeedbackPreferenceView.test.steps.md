@@ -1,7 +1,7 @@
 ---
 component: FeedbackPreferenceView
 run_when:
-  - src/views/FeedbackPreferenceView.tsx, its stories, ProfilePage, or a changeset naming FeedbackPreferenceView.
+  - "src/views/FeedbackPreferenceView.tsx, its stories, ProfilePage, or a changeset naming FeedbackPreferenceView."
 ---
 
 # FeedbackPreferenceView — manual test steps

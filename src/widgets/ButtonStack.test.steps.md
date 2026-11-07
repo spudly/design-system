@@ -1,8 +1,8 @@
 ---
 component: ButtonStack
 run_when:
-  - src/widgets/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either.
-  - src/widgets/ButtonStack.tsx, its stories, HomePage's actions, or a changeset naming ButtonStack.
+  - "src/widgets/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
+  - "src/widgets/ButtonStack.tsx, its stories, HomePage's actions, or a changeset naming ButtonStack."
 ---
 
 # ButtonStack — manual test steps

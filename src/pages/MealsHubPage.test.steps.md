@@ -1,10 +1,10 @@
 ---
 component: MealsHubPage
 run_when:
-  - src/widgets/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow.
-  - src/widgets/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell.
-  - a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states.
-  - any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed.
+  - "src/widgets/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow."
+  - "src/widgets/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell."
+  - "a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states."
+  - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
 ---
 
 # MealsHubPage — manual test steps

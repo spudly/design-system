@@ -1,7 +1,7 @@
 ---
 component: LogEntryCard
 run_when:
-  - src/widgets/LogEntryCard.tsx, its stories, or a changeset naming LogEntryCard.
+  - "src/widgets/LogEntryCard.tsx, its stories, or a changeset naming LogEntryCard."
 ---
 
 # LogEntryCard — manual test steps

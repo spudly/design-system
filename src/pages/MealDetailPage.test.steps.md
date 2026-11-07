@@ -1,8 +1,8 @@
 ---
 component: MealDetailPage
 run_when:
-  - src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack.
-  - any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed.
+  - "src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
+  - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
 ---
 
 # MealDetailPage — manual test steps

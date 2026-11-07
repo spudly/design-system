@@ -1,8 +1,8 @@
 ---
 component: RecipesPage
 run_when:
-  - a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states.
-  - src/pages/RecipesPage.tsx (including its page-local row and log-cook control compositions), its stories, or a changeset naming RecipesPage or the Shared-with-me screen.
+  - "a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states."
+  - "src/pages/RecipesPage.tsx (including its page-local row and log-cook control compositions), its stories, or a changeset naming RecipesPage or the Shared-with-me screen."
 ---
 
 # RecipesPage — manual test steps
