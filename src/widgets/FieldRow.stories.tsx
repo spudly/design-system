@@ -22,3 +22,16 @@ export const Default: Story = {
     </YStack>
   ),
 };
+
+export const SmallAction: Story = {
+  render: () => (
+    <YStack maxWidth={430}>
+      <FieldRow>
+        <SearchField grow value="" onChangeText={() => {}} placeholder="Search recipes…" />
+        <Button variant="secondary" size="sm" accessibilityLabel="Add a filter">
+          Filters
+        </Button>
+      </FieldRow>
+    </YStack>
+  ),
+};

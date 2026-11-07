@@ -415,15 +415,18 @@ changeset naming SectionStack.
 
 ## FieldRow
 
-Open in `Widgets/FieldRow`: Default.
+Open in `Widgets/FieldRow`: Default, SmallAction.
 
 A FieldRow composes form fields and their action on one line —
 here a search field with its submit button.
 
 1. The search field fills the row's remaining width, the Search
-   button keeps its natural width, and field and button are
-   vertically centered on each other (VerseSearchPage's search
-   row is the live case).
+   button keeps its natural width, and the action stretches to
+   the field's height so field and button line up as one bar
+   (VerseSearchPage's search row is the live case); SmallAction
+   shows the same with a small action (the catalog bar's
+   Filters button), which stretches to the search field's
+   height instead of sitting shorter.
 
 **Run when:** `src/widgets/FieldRow.tsx`, its stories,
 `src/views/SearchField.tsx` (the `grow` prop), the pages
@@ -885,7 +888,7 @@ stories, or a changeset naming it.
 
 ---
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, StatusMessage, SearchRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
@@ -894,7 +897,7 @@ Open in `Widgets/StepList`: Default;
 stories); `Widgets/TextActionCardRow`: (its stories);
 `Widgets/CenteredText`: (its stories);
 `Widgets/StatusMessage`: Default, Empty, Transient;
-`Widgets/SearchRow`: (its stories);
+`Widgets/FieldRow`: (its stories);
 `Widgets/RemovableField`: (its stories).
 
 1. StepList: steps render numbered in order; a step with a
@@ -906,8 +909,9 @@ stories); `Widgets/TextActionCardRow`: (its stories);
 4. TagList: one Badge per tag in the caller's tag colors,
    wrapping onto the next line at the story width — display
    only, nothing presses.
-5. SearchRow: the search field claims the row's width and its
-   trailing action sits at the end; RemovableField's remove
+5. FieldRow: the search field claims the row's width and its
+   trailing action stretches to the field's height and sits at
+   the end; RemovableField's remove
    button names the value it removes.
 6. StatusMessage: the message line is centered, small, and in
    muted ink that stays readable in the dark theme; Empty shows
