@@ -2,8 +2,8 @@ import type { ReactNode } from "react";
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Tabs } from "../widgets/Tabs.js";
-import { Text } from "../widgets/Text.js";
 import type { IconName } from "../icons/iconRegistry.js";
+import { AppTopBar } from "../views/AppTopBar.js";
 import { LazySlot } from "../views/LazySlot.js";
 
 /**
@@ -17,8 +17,10 @@ import { LazySlot } from "../views/LazySlot.js";
  * chrome: header/nav, outer layout; the app owns content).
  *
  * The composition mirrors the real Memorize shell it replaces:
- * the app title (the host's `title`, rendered in Text's `heading`
- * treatment — the Pages/Memorize demos' app-title precedent), the
+ * the app title (the host's `title`, rendered through the shared
+ * AppTopBar view as its brand — #437 aligned this frame's header
+ * onto the same top-bar composition the routed shell
+ * (AppShellPage) renders, so the two shells are one chrome), the
  * tab bar, and the active surface below it, stacked in a
  * non-scrolling ScreenContainer — the tab surfaces own their own
  * scroll, exactly as they do in the host shell today (a scrolling
@@ -220,7 +222,7 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer scrollable={false}>
-        <Text variant="heading">{title}</Text>
+        <AppTopBar brand={{ label: title }} />
         {tabBar}
         {content !== undefined ? (
           <LazySlot

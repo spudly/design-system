@@ -78,6 +78,12 @@ export {
   type TabbedShellPageTab,
 } from "./TabbedShellPage.js";
 export {
+  AppShellPage,
+  type AppShellPageAction,
+  type AppShellPageNavItem,
+  type AppShellPageProps,
+} from "./AppShellPage.js";
+export {
   MemorizeReviewPage,
   type MemorizeReviewPageProps,
   type MemorizeReviewPageVerse,

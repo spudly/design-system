@@ -13,6 +13,13 @@ export {
   type AccessTokensPanelToken,
 } from "./AccessTokensPanel.js";
 export { AccountDataView, type AccountDataViewProps } from "./AccountDataView.js";
+export {
+  AppTopBar,
+  type AppTopBarAction,
+  type AppTopBarBrand,
+  type AppTopBarNavItem,
+  type AppTopBarProps,
+} from "./AppTopBar.js";
 export { CandidateList, type CandidateListItem, type CandidateListProps } from "./CandidateList.js";
 export {
   CatalogFiltersBar,
