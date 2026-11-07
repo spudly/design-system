@@ -117,7 +117,6 @@ export {
 export { RemovableField, type RemovableFieldProps } from "./RemovableField.js";
 export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
 export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
-export { SearchRow, type SearchRowProps } from "./SearchRow.js";
 export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./SessionShell.js";
 export { StatusBadge, type StatusBadgeProps, type StatusBadgeTone } from "./StatusBadge.js";
