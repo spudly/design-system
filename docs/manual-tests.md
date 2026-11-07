@@ -671,13 +671,13 @@ PinnedHeaderShell.
 
 ---
 
-## FieldStack & TrailingActionsRow; Card's compact variant
+## FormStack & TrailingActionsRow; Card's compact variant
 
-Open in `Widgets/FieldStack`: Default;
+Open in `Widgets/FormStack`: Default, FieldsWithActions;
 `Widgets/TrailingActionsRow`: FieldAndAction,
 ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
 
-1. FieldStack: the form's fields stack at an even 12px rhythm
+1. FormStack: the form's fields stack at an even 12px rhythm
    with the button row last.
 2. TrailingActionsRow FieldAndAction: the leading group sits
    at the left and the action at the right on one line.
@@ -690,7 +690,7 @@ ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
    former CompactCard, folded into Card as `variant="compact"`
    under Stephen's 2026-10-29 ruling).
 
-**Run when:** `src/widgets/FieldStack.tsx`,
+**Run when:** `src/widgets/FormStack.tsx`,
 `src/widgets/TrailingActionsRow.tsx`,
 `src/widgets/Card.tsx`, their stories, TagsPage's
 forms or rows, or a changeset naming any of them.
@@ -871,12 +871,12 @@ changeset naming the list loading states.
 
 ---
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
 `Widgets/SuggestionPanel`: Default;
-`Widgets/TagList`: Default; `Widgets/FieldStack`: (its
+`Widgets/TagList`: Default; `Widgets/FormStack`: (its
 stories); `Widgets/TextActionCardRow`: (its stories);
 `Widgets/CenteredText`: (its stories);
 `Widgets/StatusMessage`: Default, Empty, Transient;
@@ -909,7 +909,7 @@ changeset naming them.
 
 ## Form set (FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)
 
-Open in `Widgets/FormStack`: Default;
+Open in `Widgets/FormStack`: Default, FieldsWithActions;
 `Widgets/FormHeading`: Default, WithSubtitle;
 `Widgets/LabeledField`: Default, WithAction, WithError;
 `Widgets/LabeledGroup`: Default, WithAction;

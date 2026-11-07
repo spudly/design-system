@@ -13,7 +13,7 @@
  *
  * The forms tranche's wider set was split by disposition in the
  * adoption rounds: FieldLabelBlock and StepperGroup composed
- * away into LabeledGroup and FieldStack, while FieldColumns
+ * away into LabeledGroup and FormStack, while FieldColumns
  * is a genuine library component — it ships in the #119
  * extraction set and is pinned here alongside the dedupe set.
  * FormSubmit was removed in #478 (a logic-free wrapper whose
@@ -115,11 +115,18 @@ test("LabeledGroup owns the wider 8px label separation for non-field controls", 
   assert.match(source, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
 });
 
-test("FormStack owns the form rhythm: 16px section gaps, stretched children, 32px tail", () => {
+test("FormStack owns the form rhythm: 12px field gaps, stretched children, no tail padding (#477)", () => {
   const source = readRepoFile("src/widgets/FormStack.tsx");
-  assert.match(source, /gap: tokens\.spacing\[4\]/);
+  assert.match(source, /gap: tokens\.spacing\[3\]/);
   assert.match(source, /alignItems: "stretch"/);
-  assert.match(source, /paddingBlockEnd: tokens\.spacing\[8\]/);
+  assert.match(source, /Omit<StyledFormStackProps, "gap" \| "alignItems" \| "paddingBlockEnd">/);
+  assert.doesNotMatch(source, /paddingBlockEnd: tokens/);
+});
+
+test("FieldStack does not survive the #477 consolidation", () => {
+  assert.throws(() => readRepoFile("src/widgets/FieldStack.tsx"));
+  const barrel = readRepoFile("src/widgets/index.ts");
+  assert.doesNotMatch(barrel, /FieldStack/);
 });
 
 test("FieldColumns gives every child an equal flex column with an owned 12px gutter", () => {

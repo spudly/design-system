@@ -4,7 +4,7 @@ import { AutocompletePicker } from "../widgets/AutocompletePicker.js";
 import { Button } from "../widgets/Button.js";
 import { FormHeading } from "../widgets/FormHeading.js";
 import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
-import { FieldStack } from "../widgets/FieldStack.js";
+import { FormStack } from "../widgets/FormStack.js";
 import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { NumberStepper } from "../views/NumberStepper.js";
 import { TextAreaField } from "../views/TextAreaField.js";
@@ -63,7 +63,7 @@ import { TextField } from "../views/TextField.js";
  * itself (#119): the heading is a FormHeading, the entry
  * picker is a LabeledGroup (the label over the picker, the
  * group carrying the label as its name), each selected
- * entry's steppers are a FieldStack, and the submit button
+ * entry's steppers are a FormStack, and the submit button
  * is the column's last direct child (its separation from the
  * last field is the layout's own gap); the page composes DS
  * components and passes data and callbacks only.
@@ -229,11 +229,11 @@ export function MealPlanFormPage({
             />
           );
           if (option.kind === "meal" || !option.recipeId) {
-            return <FieldStack key={key}>{quantityStepper}</FieldStack>;
+            return <FormStack key={key}>{quantityStepper}</FormStack>;
           }
           const recipeId = option.recipeId;
           return (
-            <FieldStack key={key}>
+            <FormStack key={key}>
               {quantityStepper}
               <NumberStepper
                 label={`Servings · ${option.title}`}
@@ -243,7 +243,7 @@ export function MealPlanFormPage({
                   onRecipeServingsChange(recipeId, value);
                 }}
               />
-            </FieldStack>
+            </FormStack>
           );
         })}
         {error ? <Alert severity="error" message={error} /> : null}
