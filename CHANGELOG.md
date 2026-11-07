@@ -1,5 +1,24 @@
 # @spudly/ui
 
+## 9.0.0
+
+### Major Changes
+
+- 6d4edc9: Remove the `ChunkErrorBoundary` export (and its `ChunkErrorBoundaryProps` / `ChunkErrorBoundaryState` types) from the package root — the final step of the #438 export-surface program. Hosts no longer import the boundary directly: pages that slot lazy content (TabbedShellPage, AppShellPage) already wrap it in the internal error boundary, so lazy surfaces keep the same failure fallback and reload recovery with no host-side change beyond deleting any direct `ChunkErrorBoundary` import. Eciperay and Memorize have already migrated onto the pages-only surface, so nothing in either app imports the boundary.
+
+### Minor Changes
+
+- 6d35d58: StatusBadge is removed. The status pills it rendered now render as Badge directly, with the same tones and caller-supplied labels: the recipe overview panel (shown on the public recipe page), and the status badge in the recipe detail page's toolbar. Rendered output is unchanged — the same Badge element with the same tone and label. Test: open the Badge stories (Widgets/Badge: Neutral, Info, Success, Warning, Danger) and confirm one pill per tone; open the RecipeDetailPage and PublicRecipePage stories and confirm the status pill beside the version picker and in the overview header shows the same label and tone color as before.
+
+### Patch Changes
+
+- 2814d41: Auth pages: SignInPage, SignUpPage, and ForgotPasswordPage now accept an `emailError` prop for a field-level email validation error. When a host passes `emailError`, the message renders under the email field with the field's error styling (red border, `aria-invalid`, `aria-describedby`) — separate from the form-level `error` alert above the submit button, which is unchanged. Hosts can set either error, both, or neither. This lets hosts (e.g. eciperay's sign-in validation) attach a validation error to the email field itself instead of only showing a form-level alert. Each auth page gains a `WithEmailError` story showing the field-level rendering on a filled, otherwise-valid form.
+- 5885314: Button Toggle story: the "Selected" readout now names the option actually pressed — previously it read one step above the pressed button (the ½× button read as 1×, 2× read as 3×). Test: open the Button Toggle story and confirm the readout reads "Selected: ½×" on load with ½× pressed, and that clicking 1× / 2× / 3× makes the readout name the clicked option exactly.
+- 39374e5: Internal test layout only: unit tests now live under their subject's exact base name (scenario-split tests merged into the canonical test file). No component, page, or API changes; nothing user-visible to test.
+- 208547c: RecipeDetailPage: hosts can now confirm a version activation before it fires. The ready props gain an `activationConfirmation` prop in the same shape as the existing `recipeDeleteConfirmation` / `cookLogDeleteConfirmation` view-models — the host opens it from `onActivateCandidatePress` with the pressed version's label in the title/description, and the activation mutation fires from the dialog's `onConfirm` (activation is reversible, so hosts pass `confirmTone: "primary"`). When the prop is absent or null, no activation dialog renders and activation behavior is unchanged. Test: open the RecipeDetailPage ActivationConfirmationOpen story and confirm the "Activate this version?" dialog shows the candidate version's label with a primary Activate action; open the Default story and confirm no activation dialog renders.
+- f5e0fe5: RecipesPage: hosts can now suppress the log-cook control per row. `RecipesPageItem` gains an optional `canLogCook` field — set it `false` for a row the user cannot log a cook for (e.g. a shared-with-me recipe, since cook logs are owner-only) and that row renders no log-cook control at all, in both its rated (stars) and unrated (star button) states; the row stays a link with its badge unchanged. Rows that omit the field keep the control exactly as before, and the badge alone does not suppress it. Test: open the RecipesPage unified-browse story and confirm the two "Shared with you" rows show no stars or star button while the created rows keep theirs; press a created row's control and confirm it still fires.
+- e4d5de3: Switch: the knob now sits on the right of the track in the On state and animates its travel when toggled. The thumb's horizontal offset is driven from the switch state (20px when on) and transitioned with the shared fast spring, instead of relying on Tamagui's runtime-measured travel, which was not applied with this repo's custom styled frame.
+
 ## 8.0.0
 
 ### Major Changes
