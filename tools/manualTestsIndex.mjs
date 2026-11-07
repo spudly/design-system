@@ -20,6 +20,9 @@ import { fileURLToPath, URL } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 
+/**
+ * Recursively collects every `.test.steps.md` file under `dir`.
+ */
 function stepsFiles(dir) {
   const out = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
@@ -30,6 +33,11 @@ function stepsFiles(dir) {
   return out;
 }
 
+/**
+ * Parses a steps file's YAML front-matter: the `component:` scalar
+ * and the `run_when:` list, whose values are YAML double-quoted
+ * strings (decoded with JSON.parse) or plain scalars.
+ */
 function parseFrontMatter(text) {
   const match = text.match(/^---\n([\s\S]*?)\n---\n/);
   if (!match) return null;
