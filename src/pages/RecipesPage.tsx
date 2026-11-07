@@ -217,6 +217,16 @@ export type RecipesPageItem = {
    * on the row and folds it into the row's accessible name; it
    * never invents the copy or decides which items earn it. */
   badgeLabel?: string;
+  /** Whether the user may log a cook for this item. The host
+   * sets it `false` for rows the user cannot log cooks for —
+   * shared-with-me rows (cook logs are owner-only in the host)
+   * — and the row then renders no log-cook control at all; the
+   * row stays a link with its badge and accessory behavior
+   * unchanged. Absent or `true` keeps the control, exactly as
+   * before. This is a capability the host computes, deliberately
+   * NOT inferred from `badgeLabel`: the badge is a display
+   * marker, and a badged-but-cookable row must stay expressible. */
+  canLogCook?: boolean;
 };
 
 /** One discovery-section recipe row's view-model: exactly
@@ -704,7 +714,7 @@ export function RecipesPage(props: RecipesPageProps) {
                     badgeLabel={item.badgeLabel}
                     imageUrl={item.imageUrl}
                     subtitleAction={
-                      onLogCookPress && !hasAccessory ? (
+                      onLogCookPress && !hasAccessory && item.canLogCook !== false ? (
                         <RatingStars
                           rating={item.rating}
                           accessibilityLabel={

@@ -99,6 +99,33 @@ test("the pressable form cancels the click default before firing (the row's link
   );
 });
 
+test("a per-item canLogCook opt-out suppresses the control (#518)", () => {
+  assert.match(
+    code,
+    /canLogCook\?: boolean;/,
+    "RecipesPageItem carries the optional canLogCook capability field",
+  );
+  assert.match(
+    code,
+    /onLogCookPress && !hasAccessory && item\.canLogCook !== false \? \(/,
+    "the subtitleAction gate omits the control when canLogCook is false, in both rated and unrated states (the one render site)",
+  );
+  const gate = code.slice(code.indexOf("subtitleAction={"), code.indexOf("accessory={"));
+  assert.ok(
+    !gate.includes("badgeLabel"),
+    "suppression is decoupled from badgeLabel — the badge is a display marker, not a capability",
+  );
+});
+
+test("the stories suppress the control on the shared (badged) rows only", () => {
+  assert.equal(
+    stories.split("canLogCook: false").length - 1,
+    2,
+    "both shared-with-me fixture rows opt out of the log-cook control",
+  );
+  assert.match(stories, /badgeLabel: "Shared with you",\s+canLogCook: false,/);
+});
+
 test("the stories exercise the control across rated and unrated rows", () => {
   assert.match(stories, /onLogCookPress/);
   assert.match(stories, /rating: 5/);

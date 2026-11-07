@@ -61,7 +61,9 @@ function Viewport({ children }: { children: ReactNode }) {
 // render the icon-only button. Two rows (Arroz con Pollo, Fudgy
 // Brownies) carry the caller-supplied shared-with-me badge —
 // they are the recipes someone shared with the user; the rest
-// are the user's own creations and carry no badge.
+// are the user's own creations and carry no badge. The shared
+// rows also set `canLogCook` to false (cook logs are owner-only),
+// so they render no log-cook control — link-only rows.
 const recipeItems: RecipesPageItem[] = [
   {
     id: "tuscan-chicken",
@@ -83,6 +85,7 @@ const recipeItems: RecipesPageItem[] = [
     title: "Arroz con Pollo",
     subtitle: "8 servings · 50 min · Satiety 68",
     badgeLabel: "Shared with you",
+    canLogCook: false,
   },
   {
     id: "fudgy-brownies",
@@ -91,6 +94,7 @@ const recipeItems: RecipesPageItem[] = [
     subtitle: "12 servings · 35 min · Satiety 40",
     rating: 3,
     badgeLabel: "Shared with you",
+    canLogCook: false,
   },
   {
     id: "chicken-tikka",
