@@ -83,18 +83,25 @@ const buttonFrameConfig = {
       },
     },
     size: {
+      // #469: one explicit height per size, shared by every form
+      // (labeled, icon+label, icon-only, link) — the values are the
+      // icon-only boxes below, so no form can drift shorter than
+      // the 44px touch-target floor again.
       sm: {
         fontSize: tokens.typography.fontSize.sm,
+        height: 44,
         paddingHorizontal: tokens.spacing[3],
         paddingVertical: tokens.spacing[2],
       },
       md: {
         fontSize: tokens.typography.fontSize.md,
+        height: 48,
         paddingHorizontal: tokens.spacing[4],
         paddingVertical: tokens.spacing[3],
       },
       lg: {
         fontSize: tokens.typography.fontSize.lg,
+        height: 56,
         paddingHorizontal: tokens.spacing[6],
         paddingVertical: tokens.spacing[4],
       },
