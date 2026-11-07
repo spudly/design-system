@@ -25,7 +25,8 @@
  * - ButtonStack: a stack of full-width buttons — gap
  *   spacing[3] (12px), stretch (ButtonRow's vertical form).
  * - Center: centers a single child — boolean `horizontal` /
- *   `vertical`, both defaulting to true.
+ *   `vertical`, both defaulting to true, plus the semantic
+ *   `fill` variant (grow to the parent's offered height).
  * - FieldStack: one form's fields — gap spacing[3] (12px),
  *   stretch (the meals & planning tranche of #119).
  * The pins hold each component's treatment, its Omit of the
@@ -153,16 +154,20 @@ test("ListStack adds no gap of its own — the rows own their separation", () =>
   assert.ok(!/gap:/.test(listStackCode), "ListStack must not set a gap");
 });
 
-test("Center centers a single child on boolean dimensions defaulting to true", () => {
+test("Center centers a single child on boolean dimensions, with a semantic fill variant", () => {
   assert.match(centerCode, /styled\(YStack, \{\s+name: "Center",/);
   assert.match(centerCode, /horizontal: \{\s+true: \{ alignItems: "center" \},/);
   assert.match(centerCode, /vertical: \{\s+true: \{ justifyContent: "center" \},/);
-  assert.match(centerCode, /defaultVariants: \{\s+horizontal: true,\s+vertical: true,\s+\}/);
+  assert.match(centerCode, /fill: \{\s+true: \{ flex: 1 \},/);
   assert.match(
     centerCode,
-    /export function Center\(\{ horizontal = true, vertical = true, \.\.\.rest \}: CenterProps\)/,
+    /defaultVariants: \{\s+horizontal: true,\s+vertical: true,\s+fill: false,\s+\}/,
   );
-  assert.match(centerCode, /Omit<StyledCenterProps, "alignItems" \| "justifyContent">/);
+  assert.match(
+    centerCode,
+    /export function Center\(\{ horizontal = true, vertical = true, fill = false, \.\.\.rest \}: CenterProps\)/,
+  );
+  assert.match(centerCode, /Omit<StyledCenterProps, "alignItems" \| "justifyContent" \| "flex">/);
 });
 
 test("FieldStack owns the form-field rhythm", () => {

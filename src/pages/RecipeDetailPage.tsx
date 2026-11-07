@@ -912,7 +912,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
   if (props.state === "loading") {
     return (
       <BigFooterShell footer={props.footer}>
-        <Center flex={1}>
+        <Center fill>
           <Spinner label="Loading recipe" />
         </Center>
       </BigFooterShell>

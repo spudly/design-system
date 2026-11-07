@@ -104,7 +104,7 @@ test("the props are a loading | ready union, with no not-found member", () => {
   );
   assert.match(
     code,
-    /<Center flex=\{1\}>\s*<Spinner label="Loading meal plan" \/>\s*<\/Center>/,
+    /<Center fill>\s*<Spinner label="Loading meal plan" \/>\s*<\/Center>/,
     "the loading state must render only the centered Spinner composition (Center + Spinner)",
   );
   assert.doesNotMatch(

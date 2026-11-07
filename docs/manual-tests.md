@@ -456,7 +456,10 @@ MealDetailPage), or a changeset naming ListStack.
 Open in `Widgets/Center`: Centered, HorizontalOnly.
 
 Center centers a single child; `horizontal` and `vertical` are
-booleans, both defaulting to true.
+booleans, both defaulting to true. `fill` is the semantic
+full-area form (the Center grows to the height its parent
+offers) — the detail pages' loading states use it, so their
+spinner centers in the shell's content area.
 
 1. Centered: the spinner sits at the center of the framed
    block, both dimensions on. Toggle `vertical` off in the
