@@ -173,7 +173,10 @@ test("Center centers a single child on boolean dimensions defaulting to true", (
 test("FormStack owns the form-field rhythm", () => {
   assert.match(formStackCode, /styled\(YStack, \{\s+name: "FormStack",/);
   assert.match(formStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
-  assert.match(formStackCode, /Omit<StyledFormStackProps, "gap" \| "alignItems">/);
+  assert.match(
+    formStackCode,
+    /Omit<StyledFormStackProps, "gap" \| "alignItems" \| "paddingBlockEnd">/,
+  );
 });
 
 test("no layout component offers step, role, or margin props", () => {
@@ -235,7 +238,10 @@ test("the filter-bar shells are exported from the built internal components barr
 test("FormStack owns the stacked-fields rhythm (#119)", () => {
   assert.match(formStackCode, /styled\(YStack, \{\s+name: "FormStack",/);
   assert.match(formStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
-  assert.match(formStackCode, /Omit<StyledFormStackProps, "gap" \| "alignItems">/);
+  assert.match(
+    formStackCode,
+    /Omit<StyledFormStackProps, "gap" \| "alignItems" \| "paddingBlockEnd">/,
+  );
 });
 
 test("SearchRow stretches its children — the Filters button matches the search field's height (#119)", () => {

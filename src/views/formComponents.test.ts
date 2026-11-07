@@ -119,7 +119,8 @@ test("FormStack owns the form rhythm: 12px field gaps, stretched children, no ta
   const source = readRepoFile("src/widgets/FormStack.tsx");
   assert.match(source, /gap: tokens\.spacing\[3\]/);
   assert.match(source, /alignItems: "stretch"/);
-  assert.doesNotMatch(source, /paddingBlockEnd/);
+  assert.match(source, /Omit<StyledFormStackProps, "gap" \| "alignItems" \| "paddingBlockEnd">/);
+  assert.doesNotMatch(source, /paddingBlockEnd: tokens/);
 });
 
 test("FieldStack does not survive the #477 consolidation", () => {

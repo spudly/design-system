@@ -691,7 +691,7 @@ PinnedHeaderShell.
 
 ## FormStack & TrailingActionsRow; Card's compact variant
 
-Open in `Widgets/FormStack`: Default;
+Open in `Widgets/FormStack`: Default, FieldsWithActions;
 `Widgets/TrailingActionsRow`: FieldAndAction,
 ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
 
@@ -922,7 +922,7 @@ changeset naming them.
 
 ## Form set (FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)
 
-Open in `Widgets/FormStack`: Default;
+Open in `Widgets/FormStack`: Default, FieldsWithActions;
 `Widgets/FormHeading`: Default, WithSubtitle;
 `Widgets/LabeledField`: Default, WithAction, WithError;
 `Widgets/LabeledGroup`: Default, WithAction;

@@ -41,8 +41,10 @@ export const FieldsWithActions: Story = {
         <TextField label="Tag name" placeholder="e.g. Weeknight" />
         <TextField label="Note" placeholder="Optional note" />
         <ButtonRow>
-          <Button variant="secondary">Cancel</Button>
-          <Button>Save</Button>
+          <Button variant="secondary" onPress={() => {}}>
+            Cancel
+          </Button>
+          <Button onPress={() => {}}>Save</Button>
         </ButtonRow>
       </FormStack>
     </YStack>

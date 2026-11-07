@@ -11,7 +11,7 @@ const StyledFormStack = styled(YStack, {
 
 type StyledFormStackProps = GetProps<typeof StyledFormStack>;
 
-export type FormStackProps = Omit<StyledFormStackProps, "gap" | "alignItems">;
+export type FormStackProps = Omit<StyledFormStackProps, "gap" | "alignItems" | "paddingBlockEnd">;
 
 /**
  * The one form stack (#119, #477): a form's fields and sections
