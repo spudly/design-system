@@ -2,7 +2,7 @@
 component: RemovableField
 run_when:
   - "any of these components, their stories, or a changeset naming them. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
-  - "src/widgets/RemovableField.tsx, its stories, the catalog pages' filter bars, or a changeset naming RemovableField. (namely: RemovableField)"
+  - "src/widgets/RemovableField.tsx, its stories, the catalog pages' filter bars, or a changeset naming RemovableField. (namely: RemovableField, CatalogFiltersBar, RecipesPage, DiscoverPage)"
 ---
 
 # RemovableField — manual test steps

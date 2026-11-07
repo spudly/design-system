@@ -23,11 +23,12 @@ at the unified component's stories.)
    renders **large and clearly visible** (2xl class), centered
    in its 44px touch target — not a tiny × in the corner.
 2. Dismissible / DismissibleWarning: pressing the dismiss
-   target fires the dismiss callback. The stories pass a
-   no-op callback and Alert does not hide itself — visibility
-   is the host's state — so the alert stays mounted; this
-   check verifies the target is reachable and activates
-   cleanly, with no layout shift around it.
+   target fires the dismiss callback — the stories count
+   activations, so each press increments the "Dismiss
+   activated (N)" line under the alert. Alert does not hide
+   itself (visibility is the host's state), so the alert
+   stays mounted; the counter is what verifies the callback
+   fired, with no layout shift around the alert.
 3. WithActions: the action buttons sit clear of the dismiss
    target and the message text; nothing overlaps at the story
    width.
