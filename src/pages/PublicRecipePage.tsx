@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
-import { EqualButtonRow } from "../widgets/EqualButtonRow.js";
+import { ButtonRow } from "../widgets/ButtonRow.js";
 import { LoadingGate } from "../widgets/LoadingGate.js";
 import { MainLandmark } from "../widgets/MainLandmark.js";
 import { MessageCard } from "../widgets/MessageCard.js";
@@ -86,7 +86,7 @@ import type {
  * surface paint, the single scroll region, and the content
  * column's inset and separation rhythm; RatingsCard carries the
  * engagement section and LoadingGate the loading state. The CTA
- * bar's equal-width button treatment is EqualButtonRow's and
+ * bar's equal-width button treatment is ButtonRow's (`equal`) and
  * the two message states are MessageCard — both extracted from
  * this page's hand-rolled stacks in the component-only change
  * (#341) after the #119 review found the page sizing its own
@@ -239,11 +239,11 @@ const STATUS_BADGES: Record<
 // CTA bar (above the sections; variant chosen by auth state). The
 // bar's card has no outer spacing of its own: the shell column
 // insets it and owns its separation from the overview below
-// (#119). Inside the card, EqualButtonRow owns the buttons'
+// (#119). Inside the card, ButtonRow (`equal`) owns the buttons'
 // treatment: they share the card's width equally — flex 1 with
 // a 40% minimum, wrapping instead of shrinking — so no caller
-// sizes a button itself (the treatment ButtonRow's natural-width
-// row is the sibling of). The bar passes the row the variant's
+// sizes a button itself (the treatment the row's natural-width
+// form is the sibling of). The bar passes the row the variant's
 // buttons as one fragment; the row flattens and sizes them.
 // ---------------------------------------------------------------------------
 
@@ -288,7 +288,7 @@ function CtaBar({
     );
   return (
     <Card>
-      <EqualButtonRow>{buttons}</EqualButtonRow>
+      <ButtonRow equal>{buttons}</ButtonRow>
     </Card>
   );
 }

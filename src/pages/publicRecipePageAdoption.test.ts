@@ -1,6 +1,6 @@
 /**
  * PublicRecipePage's adoption pins: the #341 extraction set
- * (EqualButtonRow + MessageCard), the #331 library panels, and
+ * (ButtonRow `equal` + MessageCard), the #331 library panels, and
  * the stories coverage.
  *
  * Split out of publicRecipePage.test.ts, which sits at the
@@ -12,7 +12,7 @@
  * reserves to library components. The component-only change
  * (#341) extracted both treatments; these pins keep the page
  * from growing them back: the bar passes its buttons to
- * EqualButtonRow, the message states render MessageCard, and
+ * ButtonRow with `equal`, the message states render MessageCard, and
  * no tamagui import remains in the page at all.
  */
 import assert from "node:assert/strict";
@@ -35,8 +35,8 @@ const storiesCode = strip(stories);
 
 test("the CTA sizing and message shell are the shared components' (#341)", () => {
   assert.ok(
-    code.includes('import { EqualButtonRow } from "../widgets/EqualButtonRow.js";'),
-    "the page imports the library EqualButtonRow",
+    code.includes('import { ButtonRow } from "../widgets/ButtonRow.js";'),
+    "the page imports the library ButtonRow",
   );
   assert.ok(
     code.includes('import { MessageCard } from "../widgets/MessageCard.js";'),
@@ -44,12 +44,12 @@ test("the CTA sizing and message shell are the shared components' (#341)", () =>
   );
   assert.match(
     code,
-    /<EqualButtonRow>\{buttons\}<\/EqualButtonRow>/,
-    "the CTA bar passes its buttons to EqualButtonRow, which owns their equal sizing",
+    /<ButtonRow equal>\{buttons\}<\/ButtonRow>/,
+    "the CTA bar passes its buttons to ButtonRow with `equal`, which owns their equal sizing",
   );
   assert.ok(
     !code.includes("cloneElement"),
-    "the page must not size its own buttons (EqualButtonRow owns the cloneElement sizing)",
+    "the page must not size its own buttons (ButtonRow owns the cloneElement sizing)",
   );
   assert.ok(
     !code.includes('from "tamagui"'),

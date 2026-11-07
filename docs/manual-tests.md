@@ -333,7 +333,8 @@ changeset naming PrevNextNav.
 
 ## ButtonRow
 
-Open in `Widgets/ButtonRow`: Default.
+Open in `Widgets/ButtonRow`: Default, Equal,
+EqualThreeButtons, EqualInCard.
 
 A ButtonRow is a row of action buttons that follows content.
 It owns the bar's whole treatment — there are no spacing props
@@ -347,34 +348,24 @@ to pass.
    list / Edit bar and the Memorize card footers are the live
    cases).
 
+With `equal`, the row's buttons share the row's width equally:
+the row owns the sizing of every button (flex 1 with a 40%
+minimum width), so there are no sizing props to pass.
+
+2. Equal: the two buttons split the row as equal halves at the
+   same height, 12px apart, their labels on one line each.
+3. EqualThreeButtons: the first two buttons share line 1 as
+   equal halves and the third wraps to line 2 at the full row
+   width — no line of three thirds, and no label wraps inside
+   a button.
+4. EqualInCard: the same two-over-one treatment inside the
+   card, inset by the card's own padding (the CTA-bar
+   composition PublicRecipePage adopts).
+
 **Run when:** `src/widgets/ButtonRow.tsx`, its stories, the
 pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
-MealPlanDetailPage), or a changeset naming ButtonRow.
-
----
-
-## EqualButtonRow
-
-Open in `Widgets/EqualButtonRow`: Default, ThreeButtons,
-InCard.
-
-An EqualButtonRow is a row of action buttons that share the
-row's width equally. It owns the bar's whole treatment — the
-12px gap, the wrap, and the sizing of every button (flex 1
-with a 40% minimum width) — so there are no sizing or spacing
-props to pass.
-
-1. Default: the two buttons split the row as equal halves at
-   the same height, 12px apart, their labels on one line each.
-2. ThreeButtons: the first two buttons share line 1 as equal
-   halves and the third wraps to line 2 at the full row width —
-   no line of three thirds, and no label wraps inside a button.
-3. InCard: the same two-over-one treatment inside the card,
-   inset by the card's own padding (the CTA-bar composition
-   PublicRecipePage adopts).
-
-**Run when:** `src/widgets/EqualButtonRow.tsx`, its stories,
-PublicRecipePage's CTA bar, or a changeset naming EqualButtonRow.
+MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset
+naming ButtonRow.
 
 ---
 
