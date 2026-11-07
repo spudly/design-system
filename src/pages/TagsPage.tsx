@@ -30,10 +30,11 @@ import { TrailingActionsRow } from "../widgets/TrailingActionsRow.js";
  * with them, resolving each name through the active theme.
  *
  * Rows render the DS Badge in its colored-tag form (the
- * former TagPill, merged into Badge in #183) with a delete
- * action rendered through the shared TextAction (#229), so it
- * is keyboard-focusable and Enter/Space-operable on web; the
- * row card treatment is the app view's, on DS
+ * former TagPill, merged into Badge in #183) with Edit /
+ * Delete actions rendered as ghost Buttons through
+ * BadgeCardRow (#464, retiring TextAction), so they are real
+ * buttons — keyboard-focusable and Enter/Space-operable on
+ * web; the row card treatment is the app view's, on DS
  * tokens. While `loading`, the shared ListLoadingState
  * replaces the list (it stands in for the app's branded
  * loader — the RecipeFormPage precedent).

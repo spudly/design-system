@@ -144,13 +144,13 @@ test("FormHeading owns the title treatment, its 24px separation, and the optiona
   assert.match(source, /variant="hint"/);
 });
 
-test("RevertAction is the warning text action composed on TextAction", () => {
+test("RevertAction is the revert affordance composed on a ghost Button (#464)", () => {
   const source = readRepoFile("src/views/RevertAction.tsx");
   assert.match(source, /Revert to: \$\{label\}/);
   // Cluster C3 of the dedupe: the button role and its keyboard
-  // behavior are TextAction's — no hand-rolled pressable.
-  assert.match(source, /<TextAction/);
-  assert.match(source, /tokens\.colors\.warning/);
+  // behavior are the shared Button's — no hand-rolled pressable
+  // (#464 retired TextAction in favor of Button's ghost form).
+  assert.match(source, /<Button ghost size="sm" onPress=\{onPress\}>/);
   assert.ok(!source.includes("platformAccessibilityProps"), "no hand-rolled a11y translation");
 });
 
@@ -158,7 +158,11 @@ test("ChangedListBanner keeps the warning wash and offers its revert only when g
   const source = readRepoFile("src/views/ChangedListBanner.tsx");
   assert.match(source, /backgroundColor=\{tokens\.colors\.warning\.warning1\}/);
   assert.match(source, /\{onRevert \? \(/);
-  assert.match(source, /<TextAction/, "the revert renders through TextAction (cluster C3)");
+  assert.match(
+    source,
+    /<Button ghost size="sm" onPress=\{onRevert\}>/,
+    "the revert renders as a ghost Button (#464)",
+  );
 });
 
 // Runtime imports are lazy (inside the SSR tests) so the

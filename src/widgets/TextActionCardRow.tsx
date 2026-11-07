@@ -1,10 +1,10 @@
 import { Anchor, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
+import { Button } from "./Button.js";
 import { Card } from "./Card.js";
 import { LinkOverlay } from "./linkOverlay.js";
 import { Text } from "./Text.js";
-import { TextAction } from "./TextAction.js";
 
 export type TextActionCardRowProps = {
   /** The row's main line, and the link's accessible name. */
@@ -26,15 +26,17 @@ export type TextActionCardRowProps = {
 
 /**
  * A card row whose text block is a link and whose trailing
- * action is a text action (#119): an elevated card holding a
- * title (and optional subtitle) that navigates, beside a
- * lightweight text control — Delete — that acts in place.
+ * action is a lightweight action (#119): an elevated card
+ * holding a title (and optional subtitle) that navigates,
+ * beside a ghost Button — Delete — that acts in place.
  *
  * CardRow is the sibling shape, not a variant of this one:
  * its trailing action is a full Button. Where the design
  * calls for the action to read as text rather than as a
- * button, this is the row (the #248 ruling recorded on
- * MealsHubPage: the row's Delete stays a TextAction).
+ * filled button, this is the row: its trailing action is a
+ * ghost Button (#464 retired the TextAction text control;
+ * the row keeps its name and public shape, only the inner
+ * action rendering switched).
  *
  * Link forms, per platform (mirrors CardRow): on web the text
  * block is a real anchor element — keyboard-operable by
@@ -111,9 +113,14 @@ export function TextActionCardRow({
           />
         </YStack>
       )}
-      <TextAction accessibilityLabel={`${actionLabel} ${title}`} onPress={onActionPress}>
+      <Button
+        ghost
+        size="sm"
+        accessibilityLabel={`${actionLabel} ${title}`}
+        onPress={onActionPress}
+      >
         {actionLabel}
-      </TextAction>
+      </Button>
     </Card>
   );
 }

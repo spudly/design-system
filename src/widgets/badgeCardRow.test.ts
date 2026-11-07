@@ -9,9 +9,10 @@
  * badge's label and color name plus the actions as data. The
  * pins hold that shape: the Badge renders in its colored-tag
  * form from the row's props (#207 token names), each action
- * renders through TextAction with its caller-composed
- * accessibility label (#248: actions are button-role text
- * controls), and the groups compose through
+ * renders as a ghost Button with its caller-composed
+ * accessibility label (#248: actions are buttons; #464
+ * retired TextAction in favor of Button's ghost treatment),
+ * and the groups compose through
  * TrailingActionsRow inside a compact Card (Card's `compact`
  * variant — the former CompactCard, folded into Card under
  * Stephen's 2026-10-29 ruling).
@@ -41,11 +42,13 @@ test("the badge renders in its colored-tag form from the row's data (#207)", () 
   assert.match(code, /badgeColor: TagColorName;/);
 });
 
-test("each action renders through TextAction with its composed label (#248)", () => {
-  assert.match(code, /<TextAction/);
+test("each action renders as a ghost Button with its composed label (#248, #464)", () => {
+  assert.match(code, /<Button/);
+  assert.match(code, /ghost/);
+  assert.match(code, /size="sm"/);
   assert.match(code, /accessibilityLabel=\{action\.accessibilityLabel\}/);
   assert.match(code, /onPress=\{action\.onPress\}/);
-  assert.match(code, /\{\.\.\.\(action\.variant \? \{ variant: action\.variant \} : \{\}\)\}/);
+  assert.match(code, /variant=\{action\.variant === "error" \? "danger" : "primary"\}/);
 });
 
 test("the row composes a compact Card and TrailingActionsRow", () => {

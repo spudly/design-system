@@ -44,7 +44,7 @@ test("the press form is keyboard-operable on web (the ListRow pattern)", () => {
   assert.match(code, /tabIndex: 0,/);
   assert.match(code, /event\.key === "Enter" \|\| event\.key === " "/);
   assert.match(code, /onPress\?\.\(\)/, "the button keys invoke the same callback as a press");
-  // A held key must not re-activate (TextAction's guard): a
+  // A held key must not re-activate (the native-button guard): a
   // repeat would flip the mark back and forth until release.
   assert.match(code, /repeat\?: boolean;/);
   assert.match(code, /if \(!event\.repeat\) \{\s*onPress\?\.\(\);/);

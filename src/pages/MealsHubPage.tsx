@@ -62,7 +62,7 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * whole screen stacks in SectionStack inside the
  * ScreenContainer, and each meal renders through the generic
  * TextActionCardRow — its text block the meal's link, its
- * trailing Delete the #248 text action — stacked in
+ * trailing Delete the #248 action (a ghost Button, #464) — stacked in
  * CardStack, so row separation is the stack's 8px card rhythm
  * (the plans tab's own rhythm) instead of a per-row bottom
  * padding. On the plans tab the pinned chrome and the

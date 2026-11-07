@@ -121,7 +121,7 @@ export function Badge({
   // props in Tamagui and are ignored on native, where onPress is
   // the activation path. A disabled badge leaves the tab order,
   // announces itself disabled, dims, and never activates
-  // (TextAction's treatment of `disabled`).
+  // (the same treatment Button gives `disabled`).
   const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
     if (!disabled && (event.key === "Enter" || event.key === " ")) {
       event.preventDefault();

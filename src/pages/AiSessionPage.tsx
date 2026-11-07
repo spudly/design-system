@@ -9,7 +9,6 @@ import { PreviewCard } from "../widgets/PreviewCard.js";
 import { SessionShell } from "../widgets/SessionShell.js";
 import { TextAreaField } from "../views/TextAreaField.js";
 import { Text } from "../widgets/Text.js";
-import { TextAction } from "../widgets/TextAction.js";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -68,10 +67,10 @@ import { tokens } from "../tokens/index.js";
  * transcript bubbles and the cancel control — are composed
  * inline below from library primitives rather than added as
  * new library components: the bubbles are Text in token-inked
- * stacks, and the cancel control is TextAction (its keyboard
- * and disabled semantics, which also refuse held-key repeats)
- * under the muted underlined treatment in a stack that dims
- * and blocks the pointer while a request is in flight —
+ * stacks, and the cancel control is a ghost Button (#464,
+ * retiring TextAction): a real button's keyboard and disabled
+ * semantics — disabled while a request is in flight, which
+ * dims it and refuses activation, held-key repeats included —
  * replacing the hand-built pressable stack this page used to
  * carry, including its own keyboard handler.
  */
@@ -249,18 +248,15 @@ export function AiSessionPage({
         ) : null}
         {error ? <Alert severity="error" message={error} /> : null}
         {session.canCancel ? (
-          <YStack opacity={busy ? 0.5 : 1} pointerEvents={busy ? "none" : "auto"}>
-            <TextAction
-              onPress={onCancel}
-              disabled={busy}
-              accessibilityLabel="Cancel session"
-              fontSize={tokens.typography.fontSize.sm}
-              color={tokens.colors.gray.gray6}
-              textDecorationLine="underline"
-            >
-              Cancel session
-            </TextAction>
-          </YStack>
+          <Button
+            ghost
+            size="sm"
+            onPress={onCancel}
+            disabled={busy}
+            accessibilityLabel="Cancel session"
+          >
+            Cancel session
+          </Button>
         ) : null}
       </SessionShell>
     </BigFooterShell>

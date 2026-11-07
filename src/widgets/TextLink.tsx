@@ -73,7 +73,7 @@ export type TextLinkProps =
        * href on web; on native a press opens it through the
        * platform link path. This is the navigation form — a control
        * that navigates to another page is a link with an href
-       * (#248); in-page actions are buttons (see TextAction).
+       * (#248); in-page actions are buttons (see Button).
        * Native contract (shared by every DS href form): the href
        * is forwarded verbatim to `Linking.openURL`, which requires
        * a scheme-bearing URL an installed app can open — so on

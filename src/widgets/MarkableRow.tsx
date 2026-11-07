@@ -52,7 +52,7 @@ export function MarkableRow({
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       // A held key repeats keydown events; a native button does
-      // not re-activate on repeats (TextAction's guard), and a
+      // not re-activate on repeats (the native-button guard), and a
       // repeat here would flip the mark back and forth.
       if (!event.repeat) {
         onPress?.();
