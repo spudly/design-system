@@ -2048,21 +2048,6 @@ stories, RecipeFormPage, or a changeset naming FieldColumns.
 
 ---
 
-## FormSubmit
-
-Open in `Widgets/FormSubmit`: Default.
-
-1. FormSubmit Default: the Save meal button sits 32px below
-   the field above it — FormSubmit's own 16px of top padding
-   on top of the layout's 16px gap — full width.
-
-**Run when:** `src/widgets/FormSubmit.tsx`, its stories,
-a form page composing it, or a changeset naming it.
-(FormStack and FormHeading are covered by the Form set
-section above.)
-
----
-
 ## CookingModePage
 
 Open in `Pages/Eciperay/CookingModePage`: WithIngredientsPanel,

@@ -141,7 +141,6 @@ export { BadgeCardRow, type BadgeCardRowAction, type BadgeCardRowProps } from ".
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
 export { CheckRow, type CheckRowProps } from "./CheckRow.js";
 export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";
-export { FormSubmit, type FormSubmitProps } from "./FormSubmit.js";
 export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
   NutritionPanel,
