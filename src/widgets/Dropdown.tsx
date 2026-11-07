@@ -1,5 +1,5 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
-import { Popover, styled } from "tamagui";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { Popover, View, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
@@ -10,7 +10,89 @@ type DropdownContextValue = {
   open: boolean;
   toggle: () => void;
   close: () => void;
+  /** Which side of the trigger the panel opens on (the shell's `side`). */
+  side: DropdownSide;
+  /** Panel alignment against the trigger (the shell's `align`). */
+  align: DropdownAlign;
+  /**
+   * The trigger's laid-out width in px, measured by the shell on
+   * the trigger wrapper's onLayout; null until it has laid out.
+   */
+  triggerWidth: number | null;
+  /**
+   * The panel's laid-out width in px, measured by the shell on the
+   * panel itself; null until the open panel has laid out.
+   */
+  panelWidth: number | null;
+  /**
+   * Whether the two measured widths match (within 1px): the far
+   * touching corner pair counts as touching only then. Computed
+   * once here so every consumer applies the same rule.
+   */
+  widthsMatch: boolean;
 };
+
+/** Per-corner radius overrides for one element's touching edge. */
+export type TouchingCornerRadii = {
+  borderTopLeftRadius?: number;
+  borderTopRightRadius?: number;
+  borderBottomLeftRadius?: number;
+  borderBottomRightRadius?: number;
+};
+
+/**
+ * The connected-surface radii for one element of the dropdown pair
+ * (#474): while the menu is open, the trigger and the panel read as
+ * ONE surface, so the corners where they touch lose their radius —
+ * but only the corners that actually touch. The two widths are
+ * independent (the trigger is content-sized; the panel is
+ * content-sized with a 200px minimum), so on the touching edge only
+ * ONE vertical edge coincides: the edge `align` selects ("start"
+ * lines the leading edges up, "end" the trailing edges). That
+ * aligned corner is coincident by construction and is always
+ * squared. The far corner touches only when the two widths match
+ * (within 1px after layout); squaring it otherwise would cut a
+ * notch into a corner that overhangs (panel wider) or falls short
+ * (panel narrower) and touches nothing.
+ *
+ * `touchingEdge` is the edge of THIS element that meets the other:
+ * the panel's top edge when it opens below the trigger, its bottom
+ * edge when it opens above; the trigger's edges mirror that.
+ */
+export function touchingCornerRadii(
+  touchingEdge: "top" | "bottom",
+  align: DropdownAlign,
+  widthsMatch: boolean,
+): TouchingCornerRadii {
+  const zero = tokens.radii.zero;
+  const radii: TouchingCornerRadii = {};
+  const squareStart = () => {
+    if (touchingEdge === "top") {
+      radii.borderTopLeftRadius = zero;
+    } else {
+      radii.borderBottomLeftRadius = zero;
+    }
+  };
+  const squareEnd = () => {
+    if (touchingEdge === "top") {
+      radii.borderTopRightRadius = zero;
+    } else {
+      radii.borderBottomRightRadius = zero;
+    }
+  };
+  if (align === "start") {
+    squareStart();
+    if (widthsMatch) {
+      squareEnd();
+    }
+  } else {
+    squareEnd();
+    if (widthsMatch) {
+      squareStart();
+    }
+  }
+  return radii;
+}
 
 const DropdownContext = createContext<DropdownContextValue | null>(null);
 
@@ -133,6 +215,26 @@ export function Dropdown({
 }: DropdownProps) {
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const open = openProp ?? internalOpen;
+  // The connected-surface geometry (#474): both widths are measured
+  // through onLayout — the trigger's on its wrapper below, the
+  // panel's on the panel itself — and the far corner pair counts
+  // as touching only when the widths match within 1px.
+  const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
+  const [panelWidth, setPanelWidth] = useState<number | null>(null);
+  const widthsMatch =
+    triggerWidth !== null && panelWidth !== null && Math.abs(triggerWidth - panelWidth) <= 1;
+
+  // The panel unmounts while closed, so a measured panelWidth goes
+  // stale across a close (the content may change width while the
+  // menu is shut). Reset it on close: until the reopened panel lays
+  // out again it reports null, widthsMatch stays false, and only
+  // the always-coincident aligned corner squares — no first-frame
+  // far-corner flip from a stale width.
+  useEffect(() => {
+    if (!open) {
+      setPanelWidth(null);
+    }
+  }, [open]);
 
   const setOpen = (next: boolean) => {
     if (openProp === undefined) {
@@ -149,7 +251,16 @@ export function Dropdown({
     close: () => {
       setOpen(false);
     },
+    side,
+    align,
+    triggerWidth,
+    panelWidth,
+    widthsMatch,
   };
+
+  // The panel's touching edge faces the trigger: its top edge when
+  // it opens below, its bottom edge when it opens above.
+  const panelRadii = touchingCornerRadii(side === "bottom" ? "top" : "bottom", align, widthsMatch);
 
   return (
     <DropdownContext.Provider value={contextValue}>
@@ -160,9 +271,25 @@ export function Dropdown({
         allowFlip
         stayInFrame={{ padding: tokens.spacing[2] }}
       >
-        <Popover.Trigger asChild disablePressTrigger>
-          {trigger}
-        </Popover.Trigger>
+        {/*
+          The trigger wrapper exists to measure the trigger (#474):
+          its onLayout width is the trigger's laid-out width, kept
+          in the shell for the connected-surface geometry. It
+          shrink-wraps the trigger (alignSelf flex-start) so it
+          never sizes the trigger itself, and the Popover.Trigger
+          composition inside it still registers the trigger element
+          directly — registration and focus return are unaffected.
+        */}
+        <View
+          alignSelf="flex-start"
+          onLayout={(event) => {
+            setTriggerWidth(event.nativeEvent.layout.width);
+          }}
+        >
+          <Popover.Trigger asChild disablePressTrigger>
+            {trigger}
+          </Popover.Trigger>
+        </View>
         {/*
           onCloseAutoFocus={false}: the Popover's own close-focus
           composition cancels FocusScope's previous-focus restoration
@@ -178,6 +305,10 @@ export function Dropdown({
         */}
         <StyledContent
           onCloseAutoFocus={false}
+          onLayout={(event) => {
+            setPanelWidth(event.nativeEvent.layout.width);
+          }}
+          {...panelRadii}
           {...platformAccessibilityProps({ accessibilityLabel })}
         >
           {children}
