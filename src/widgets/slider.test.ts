@@ -201,7 +201,10 @@ test("the styled parts are token-driven and the thumb target is 44px around a 24
   // spacing[2]), and the thumb frame carries no border — the
   // primitive's default border rendered as a square black frame
   // around the round knob; the knob's own round border stays.
-  assert.match(slider, /height: tokens\.spacing\[4\]/);
+  // The track height rides the call-site prop, not the styled
+  // config: the primitive's internal 6px track height overrides a
+  // styled-config height (see the rendered-height SSR test below).
+  assert.match(slider, /<StyledTrack height=\{tokens\.spacing\[4\]\}>/);
   assert.match(slider, /borderWidth: 0/);
   assert.match(slider, /width: 44/);
   assert.match(slider, /height: 44/);
@@ -306,6 +309,31 @@ test("on native the error text rides in the accessible name", () => {
   // when the slider is unnamed.
   assert.match(slider, /const nativeAccessibleName = error/);
   assert.match(slider, /`\$\{accessibleName\}: \$\{error\}`/);
+});
+
+test("SSR: the track renders at the spacing[4] height, not the primitive's 6px", async () => {
+  // Regression test for the #482 review finding: a styled-config
+  // height on the Track is overridden by the primitive's internal
+  // 6px track height, so the height must ride the call-site prop —
+  // and only the rendered output proves it landed.
+  const { React, Slider } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(Slider, {
+      label: "Volume",
+      value: 40,
+      onValueChange: () => null,
+    }),
+  );
+  const rules = new Map<string, string>();
+  for (const m of html.matchAll(/\._([a-zA-Z0-9_-]+)\{([^}]*)\}/g)) rules.set(m[1], m[2]);
+  const track = /<div[^>]*name="SliderTrack"[^>]*class="([^"]*)"/.exec(html);
+  assert.ok(track, "the track element must render");
+  const heights = track[1]
+    .split(/\s+/)
+    .map((c) => rules.get(c.replace(/^_/, "")))
+    .filter((r) => r && /(^|;)height:/.test(r))
+    .map((r) => /(?:^|;)height:([^;]+)/.exec(r as string)?.[1]);
+  assert.deepEqual(heights, ["16px"], `track height must be 16px, got ${JSON.stringify(heights)}`);
 });
 
 test("the stories demo syncs with the value arg after mount", () => {

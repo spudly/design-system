@@ -7,7 +7,10 @@ import { Text } from "./Text.js";
 const StyledTrack = styled(TamaguiSlider.Track, {
   name: "SliderTrack",
 
-  height: tokens.spacing[4],
+  // No height here: the primitive resolves its own 6px track height
+  // internally, which overrides a styled-config height (verified in
+  // the rendered output, #482) — the height rides the call-site prop
+  // on <StyledTrack> below instead, which the primitive honors.
   borderRadius: tokens.radii.full,
   // The unfilled track is the theme's progressTrack role, exactly as
   // on ProgressBar and Spinner's determinate ring: the $primary fill
@@ -206,7 +209,7 @@ export function Slider({
           disabled={disabled}
           height={44}
         >
-          <StyledTrack>
+          <StyledTrack height={tokens.spacing[4]}>
             <StyledTrackActive />
           </StyledTrack>
           <StyledThumb
