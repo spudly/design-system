@@ -113,7 +113,7 @@ test("the discovery section is host-optional (#512): omitted props produce no di
   assert.match(code, /const hasDiscovery = discoveryRecipes !== undefined;/);
   // Every discovery row is built only inside the presence guard.
   const guardAt = code.indexOf("if (discoveryRecipes !== undefined) {");
-  const headingAt = code.indexOf('rows.push({ kind: "discoveryHeading" });');
+  const headingAt = code.indexOf('rows.push({ kind: "discoveryHeading", title: discoveryTitle });');
   const emptyAt = code.indexOf('rows.push({ kind: "discoveryEmpty" });');
   assert.ok(
     guardAt !== -1 && headingAt > guardAt,
@@ -124,7 +124,7 @@ test("the discovery section is host-optional (#512): omitted props produce no di
     "the discovery empty row is built only when the section is supplied",
   );
   // The heading itself renders only when the host supplies a title.
-  assert.match(code, /if \(discoveryTitle\) \{\s*rows\.push\(\{ kind: "discoveryHeading" \}\);/);
+  assert.match(code, /if \(discoveryTitle\) \{\s*rows\.push\(\{ kind: "discoveryHeading", title: discoveryTitle \}\);/);
   // Pagination stays inert when the section is absent.
   assert.match(code, /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,/);
   assert.match(code, /hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage/);
@@ -138,7 +138,7 @@ test("the discovery section is host-optional (#512): omitted props produce no di
 test("one row sequence: the own section precedes the discovery section in the one list", () => {
   assert.match(code, /const rows: RecipesPageRow\[\] = \[\{ kind: "ownHeading" \}\];/);
   const ownAt = code.indexOf('rows.push({ kind: "ownRecipe", item });');
-  const discoveryHeadingAt = code.indexOf('rows.push({ kind: "discoveryHeading" });');
+  const discoveryHeadingAt = code.indexOf('rows.push({ kind: "discoveryHeading", title: discoveryTitle });');
   const discoveryAt = code.indexOf('rows.push({ kind: "discoveryRecipe", item });');
   assert.ok(
     ownAt !== -1 && discoveryHeadingAt > ownAt,
@@ -152,7 +152,7 @@ test("one row sequence: the own section precedes the discovery section in the on
   );
   assert.match(code, /data=\{rows\}/, "the one list takes the unified row sequence");
   assert.match(code, /<SectionHeading>\{ownTitle\}<\/SectionHeading>/);
-  assert.match(code, /<SectionHeading>\{discoveryTitle \?\? ""\}<\/SectionHeading>/);
+  assert.match(code, /<SectionHeading>\{row\.title\}<\/SectionHeading>/);
 });
 
 test("recipe row keys live in their own namespace, never colliding with heading/state keys", () => {

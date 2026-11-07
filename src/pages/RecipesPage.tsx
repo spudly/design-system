@@ -432,7 +432,7 @@ type RecipesPageRow =
   | { kind: "ownEmpty" }
   | { kind: "loadingOwnMore" }
   | { kind: "ownLoadMoreError"; message: string }
-  | { kind: "discoveryHeading" }
+  | { kind: "discoveryHeading"; title: string }
   | { kind: "discoveryRecipe"; item: RecipesPageDiscoveryItem }
   | { kind: "loadingDiscovery" }
   | { kind: "discoveryError"; message: string }
@@ -637,7 +637,7 @@ export function RecipesPage(props: RecipesPageProps) {
   }
   if (discoveryRecipes !== undefined) {
     if (discoveryTitle) {
-      rows.push({ kind: "discoveryHeading" });
+      rows.push({ kind: "discoveryHeading", title: discoveryTitle });
     }
     if (loadingDiscovery) {
       rows.push({ kind: "loadingDiscovery" });
@@ -756,11 +756,9 @@ export function RecipesPage(props: RecipesPageProps) {
                   />
                 );
               case "discoveryHeading":
-                // The heading row is only built when the host
-                // supplied a title (see the row model above).
                 return (
                   <YStack paddingBlockEnd="$3">
-                    <SectionHeading>{discoveryTitle ?? ""}</SectionHeading>
+                    <SectionHeading>{row.title}</SectionHeading>
                   </YStack>
                 );
               case "discoveryRecipe": {
