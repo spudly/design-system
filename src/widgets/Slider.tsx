@@ -7,7 +7,10 @@ import { Text } from "./Text.js";
 const StyledTrack = styled(TamaguiSlider.Track, {
   name: "SliderTrack",
 
-  height: tokens.spacing[2],
+  // No height here: the primitive resolves its own 6px track height
+  // internally, which overrides a styled-config height (verified in
+  // the rendered output, #482) — the height rides the call-site prop
+  // on <StyledTrack> below instead, which the primitive honors.
   borderRadius: tokens.radii.full,
   // The unfilled track is the theme's progressTrack role, exactly as
   // on ProgressBar and Spinner's determinate ring: the $primary fill
@@ -20,7 +23,18 @@ const StyledTrackActive = styled(TamaguiSlider.TrackActive, {
   name: "SliderTrackActive",
 
   backgroundColor: "$primary",
-  borderRadius: tokens.radii.full,
+  // The left end rounds with the track; the right end is SQUARE.
+  // The fill's right end meets the knob mid-track, and a rounded
+  // corner there shows as a visible notch of unfilled track against
+  // the knob when it sits toward the left (#517 review). Squared,
+  // the fill runs clean under the knob, which covers the joint.
+  // At the maximum value the fill reaches the track's own right
+  // end, where the track's rounded, overflow-hidden box clips it
+  // to the track's curve — so the squared corner never shows there.
+  borderTopLeftRadius: tokens.radii.full,
+  borderBottomLeftRadius: tokens.radii.full,
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
 });
 
 const StyledThumb = styled(TamaguiSlider.Thumb, {
@@ -34,6 +48,11 @@ const StyledThumb = styled(TamaguiSlider.Thumb, {
   alignItems: "center",
   justifyContent: "center",
   backgroundColor: "transparent",
+  // The primitive's default thumb border renders as a square black
+  // frame around the round knob (#482) — the frame carries no border
+  // of its own; the knob's own round border is the visible boundary.
+  borderWidth: 0,
+  borderRadius: tokens.radii.full,
   cursor: "pointer",
 });
 
@@ -201,7 +220,7 @@ export function Slider({
           disabled={disabled}
           height={44}
         >
-          <StyledTrack>
+          <StyledTrack height={tokens.spacing[3]}>
             <StyledTrackActive />
           </StyledTrack>
           <StyledThumb

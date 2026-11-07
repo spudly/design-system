@@ -197,6 +197,24 @@ test("the styled parts are token-driven and the thumb target is 44px around a 24
   // ring): $progressTrack under a $primary fill.
   assert.match(slider, /backgroundColor: "\$progressTrack"/);
   assert.match(slider, /backgroundColor: "\$primary"/);
+  // #482: the track is spacing[3] thick (12px, up from the
+  // original spacing[2]; the first cut doubled it to 16px and
+  // Stephen trimmed it back on review), and the thumb frame
+  // carries no border — the primitive's default border rendered
+  // as a square black frame around the round knob; the knob's
+  // own round border stays.
+  // The track height rides the call-site prop, not the styled
+  // config: the primitive's internal 6px track height overrides a
+  // styled-config height (see the rendered-height SSR test below).
+  assert.match(slider, /<StyledTrack height=\{tokens\.spacing\[3\]\}>/);
+  // #517 review: the fill's right end is square (it meets the knob
+  // mid-track; a rounded corner showed as a notch against the
+  // knob), its left end keeps the track's full rounding.
+  assert.match(slider, /borderTopRightRadius: 0/);
+  assert.match(slider, /borderBottomRightRadius: 0/);
+  assert.match(slider, /borderTopLeftRadius: tokens\.radii\.full/);
+  assert.match(slider, /borderBottomLeftRadius: tokens\.radii\.full/);
+  assert.match(slider, /borderWidth: 0/);
   assert.match(slider, /width: 44/);
   assert.match(slider, /height: 44/);
   assert.match(slider, /width: tokens\.spacing\[6\]/);
@@ -300,6 +318,91 @@ test("on native the error text rides in the accessible name", () => {
   // when the slider is unnamed.
   assert.match(slider, /const nativeAccessibleName = error/);
   assert.match(slider, /`\$\{accessibleName\}: \$\{error\}`/);
+});
+
+test("SSR: the track renders at the spacing[3] height, not the primitive's 6px", async () => {
+  // Regression test for the #482 review finding: a styled-config
+  // height on the Track is overridden by the primitive's internal
+  // 6px track height, so the height must ride the call-site prop —
+  // and only the rendered output proves it landed.
+  const { React, Slider } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(Slider, {
+      label: "Volume",
+      value: 40,
+      onValueChange: () => null,
+    }),
+  );
+  const rules = new Map<string, string>();
+  for (const m of html.matchAll(/\._([a-zA-Z0-9_-]+)\{([^}]*)\}/g)) rules.set(m[1], m[2]);
+  const track = /<div[^>]*name="SliderTrack"[^>]*class="([^"]*)"/.exec(html);
+  assert.ok(track, "the track element must render");
+  const heights = track[1]
+    .split(/\s+/)
+    .map((c) => rules.get(c.replace(/^_/, "")))
+    .filter((r) => r && /(^|;)height:/.test(r))
+    .map((r) => /(?:^|;)height:([^;]+)/.exec(r as string)?.[1]);
+  assert.deepEqual(heights, ["12px"], `track height must be 12px, got ${JSON.stringify(heights)}`);
+});
+
+test("SSR: the active track's right end renders square, its left end round", async () => {
+  // Regression test for the #517 review finding: the fill's rounded
+  // right corner showed against the knob as a notch of unfilled
+  // track when the knob sat toward the left. Only the rendered CSS
+  // proves the radii landed — collect every radius declaration the
+  // stylesheet makes for the active element's classes, in order
+  // (the shorthand expands to all four corners), and read the
+  // effective value per corner.
+  const { React, Slider } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(Slider, {
+      label: "Volume",
+      value: 40,
+      onValueChange: () => null,
+    }),
+  );
+  const active = /<div[^>]*name="SliderTrackActive"[^>]*class="([^"]*)"/.exec(html);
+  assert.ok(active, "the active track element must render");
+  const classes = new Set(active[1].split(/\s+/).map((c) => c.replace(/^_/, "")));
+  const corners = [
+    "border-top-left-radius",
+    "border-top-right-radius",
+    "border-bottom-right-radius",
+    "border-bottom-left-radius",
+  ];
+  const effective = new Map<string, string>();
+  for (const m of html.matchAll(/\._([a-zA-Z0-9_-]+)[^{]*\{([^}]*)\}/g)) {
+    if (!classes.has(m[1])) continue;
+    for (const decl of m[2].split(";")) {
+      const [prop, val] = decl.split(":").map((s) => s?.trim());
+      if (!prop || !val) continue;
+      if (prop === "border-radius") {
+        for (const corner of corners) effective.set(corner, val);
+      } else if (corners.includes(prop)) {
+        effective.set(prop, val);
+      }
+    }
+  }
+  assert.equal(
+    effective.get("border-top-right-radius"),
+    "0px",
+    `the fill's top-right corner must be square, got ${JSON.stringify([...effective])}`,
+  );
+  assert.equal(
+    effective.get("border-bottom-right-radius"),
+    "0px",
+    `the fill's bottom-right corner must be square, got ${JSON.stringify([...effective])}`,
+  );
+  assert.equal(
+    effective.get("border-top-left-radius"),
+    "9999px",
+    "the fill's left end must keep the track's full rounding",
+  );
+  assert.equal(
+    effective.get("border-bottom-left-radius"),
+    "9999px",
+    "the fill's left end must keep the track's full rounding",
+  );
 });
 
 test("the stories demo syncs with the value arg after mount", () => {
