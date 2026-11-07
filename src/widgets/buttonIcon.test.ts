@@ -152,6 +152,25 @@ test("icon-only pins the square standard box (44/48/56) with text padding zeroed
   assert.match(button, /paddingVertical: 0/);
 });
 
+test("every form shares one height per size in the frame config (#469)", () => {
+  // Regression for #469: the labeled form's height was content-derived
+  // while icon-only was pinned to its box, so the two rendered at
+  // different heights. The shared frame's size variants now carry the
+  // same per-size heights as the icon-only boxes (44/48/56).
+  assert.match(button, /sm: \{\s*fontSize: tokens\.typography\.fontSize\.sm,\s*minHeight: 44,/);
+  assert.match(button, /md: \{\s*fontSize: tokens\.typography\.fontSize\.md,\s*minHeight: 48,/);
+  assert.match(button, /lg: \{\s*fontSize: tokens\.typography\.fontSize\.lg,\s*minHeight: 56,/);
+  // lg vertical padding is spacing[3]: at spacing[4] the 24px glyph + padding + border totals 58px, above the 56px box.
+  const lgVariant = button.slice(
+    button.indexOf("minHeight: 56,"),
+    button.indexOf("minHeight: 56,") + 400,
+  );
+  assert.ok(
+    lgVariant.includes("paddingVertical: tokens.spacing[3],"),
+    "the lg size variant must use spacing[3] vertical padding so its content fits the 56px height",
+  );
+});
+
 test("the glyph-to-label gap is Button's own fixed spacing (#178)", () => {
   assert.match(button, /gap: tokens\.spacing\[2\]/);
 });
