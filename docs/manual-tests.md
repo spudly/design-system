@@ -406,15 +406,18 @@ changeset naming SectionStack.
 
 ## FieldRow
 
-Open in `Widgets/FieldRow`: Default.
+Open in `Widgets/FieldRow`: Default, SmallAction.
 
 A FieldRow composes form fields and their action on one line —
 here a search field with its submit button.
 
 1. The search field fills the row's remaining width, the Search
-   button keeps its natural width, and field and button are
-   vertically centered on each other (VerseSearchPage's search
-   row is the live case).
+   button keeps its natural width, and the action stretches to
+   the field's height so field and button line up as one bar
+   (VerseSearchPage's search row is the live case); SmallAction
+   shows the same with a small action (the catalog bar's
+   Filters button), which stretches to the search field's
+   height instead of sitting shorter.
 
 **Run when:** `src/widgets/FieldRow.tsx`, its stories,
 `src/views/SearchField.tsx` (the `grow` prop), the pages
@@ -447,7 +450,10 @@ MealDetailPage), or a changeset naming ListStack.
 Open in `Widgets/Center`: Centered, HorizontalOnly.
 
 Center centers a single child; `horizontal` and `vertical` are
-booleans, both defaulting to true.
+booleans, both defaulting to true. `fill` is the semantic
+full-area form (the Center grows to the height its parent
+offers) — the detail pages' loading states use it, so their
+spinner centers in the shell's content area.
 
 1. Centered: the spinner sits at the center of the framed
    block, both dimensions on. Toggle `vertical` off in the
@@ -478,21 +484,6 @@ Open in `Widgets/DetailRow`: Default, Stacked.
 **Run when:** `src/widgets/DetailRow.tsx`, its stories,
 MealPlanDetailPage (the nutrition-goal rows), or a changeset
 naming DetailRow.
-
----
-
-## LoadingGate
-
-Open in `Widgets/LoadingGate`: Default.
-
-1. The spinner sits centered — horizontally and vertically — on a
-   plain surface background that fills the story canvas, with its
-   accessible label naming what is loading ("Loading meal plan").
-2. MealPlanDetailPage's Loading story shows the identical gate.
-
-**Run when:** `src/widgets/LoadingGate.tsx`, its stories,
-MealPlanDetailPage's loading state, or a changeset naming
-LoadingGate.
 
 ---
 
@@ -855,28 +846,32 @@ their stories, or a changeset naming any of them.
 
 ---
 
-## List states (ListLoadingState)
+## List states
 
-Open in `Widgets/ListLoadingState`: Default.
+Open in `Pages/Eciperay/DiscoverPage`: Loading,
+LoadingMore.
 
-1. ListLoadingState: the spinner renders centered in its
-   parent with its label; the state carries no padding or
-   margin of its own — spacing around it is the parent's.
-   The same component renders directly at the foot of a list
-   for the loading-more slot — check that rendering in
-   `Pages/Eciperay/DiscoverPage`: LoadingMore, where the
-   spinner follows the last card with the list's own gap.
+1. The loading state is a centered Spinner (Center +
+   Spinner) composed by the page: the spinner renders
+   centered in its parent with its label; the state carries
+   no padding or margin of its own — spacing around it is
+   the parent's. The same composition renders directly at
+   the foot of a list for the loading-more slot — check
+   that rendering in `Pages/Eciperay/DiscoverPage`:
+   LoadingMore, where the spinner follows the last card
+   with the list's own gap.
 2. A list's error state has no wrapper component: the page
    renders the Alert component directly — check in
    `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
    sits under the filter bar, flush to the parent's inset.
 
-**Run when:** `src/widgets/ListLoadingState.tsx`, its
-stories, or a changeset naming it.
+**Run when:** a catalog page's loading state (Discover,
+Home, MealsHub, Recipes, ShoppingList, Tags), or a
+changeset naming the list loading states.
 
 ---
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, StatusMessage, SearchRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FieldStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
@@ -885,7 +880,7 @@ Open in `Widgets/StepList`: Default;
 stories); `Widgets/TextActionCardRow`: (its stories);
 `Widgets/CenteredText`: (its stories);
 `Widgets/StatusMessage`: Default, Empty, Transient;
-`Widgets/SearchRow`: (its stories);
+`Widgets/FieldRow`: (its stories);
 `Widgets/RemovableField`: (its stories).
 
 1. StepList: steps render numbered in order; a step with a
@@ -897,8 +892,9 @@ stories); `Widgets/TextActionCardRow`: (its stories);
 4. TagList: one Badge per tag in the caller's tag colors,
    wrapping onto the next line at the story width — display
    only, nothing presses.
-5. SearchRow: the search field claims the row's width and its
-   trailing action sits at the end; RemovableField's remove
+5. FieldRow: the search field claims the row's width and its
+   trailing action stretches to the field's height and sits at
+   the end; RemovableField's remove
    button names the value it removes.
 6. StatusMessage: the message line is centered, small, and in
    muted ink that stays readable in the dark theme; Empty shows
@@ -2036,21 +2032,6 @@ Open in `Widgets/FieldColumns`: Default.
 
 **Run when:** `src/widgets/FieldColumns.tsx`, its
 stories, RecipeFormPage, or a changeset naming FieldColumns.
-
----
-
-## FormSubmit
-
-Open in `Widgets/FormSubmit`: Default.
-
-1. FormSubmit Default: the Save meal button sits 32px below
-   the field above it — FormSubmit's own 16px of top padding
-   on top of the layout's 16px gap — full width.
-
-**Run when:** `src/widgets/FormSubmit.tsx`, its stories,
-a form page composing it, or a changeset naming it.
-(FormStack and FormHeading are covered by the Form set
-section above.)
 
 ---
 

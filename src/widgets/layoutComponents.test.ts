@@ -17,7 +17,8 @@
  * - SectionStack: a page's sections — gap spacing[8] (32px),
  *   stretch.
  * - FieldRow: a search field with its button — gap
- *   spacing[2] (8px), centered.
+ *   spacing[2] (8px), stretch (SearchRow, which differed
+ *   only in that stretch, was consolidated into it — #481).
  * - ListStack: hairline rows as one list — no gap of its own;
  *   the rows own their separation.
  * - PanelStack: a section panel's blocks — padding and gap both
@@ -25,7 +26,8 @@
  * - ButtonStack: a stack of full-width buttons — gap
  *   spacing[3] (12px), stretch (ButtonRow's vertical form).
  * - Center: centers a single child — boolean `horizontal` /
- *   `vertical`, both defaulting to true.
+ *   `vertical`, both defaulting to true, plus the semantic
+ *   `fill` variant (grow to the parent's offered height).
  * - FieldStack: one form's fields — gap spacing[3] (12px),
  *   stretch (the meals & planning tranche of #119).
  * The pins hold each component's treatment, its Omit of the
@@ -66,7 +68,6 @@ const panelStackCode = code("PanelStack.tsx");
 const buttonStackCode = code("ButtonStack.tsx");
 const centerCode = code("Center.tsx");
 const fieldStackCode = code("FieldStack.tsx");
-const searchRowCode = code("SearchRow.tsx");
 const viewsDir = join(here, "../..", "src", "views");
 const textFieldSource = readFileSync(join(viewsDir, "TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(viewsDir, "SearchField.tsx"), "utf8");
@@ -129,9 +130,9 @@ test("SectionStack owns the page-section rhythm", () => {
   assert.match(sectionStackCode, /Omit<StyledSectionStackProps, "gap" \| "alignItems">/);
 });
 
-test("FieldRow owns the search row's gap and centering", () => {
+test("FieldRow owns the search row's gap and stretch", () => {
   assert.match(fieldRowCode, /styled\(XStack, \{\s+name: "FieldRow",/);
-  assert.match(fieldRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "center",/);
+  assert.match(fieldRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "stretch",/);
   assert.match(fieldRowCode, /Omit<StyledFieldRowProps, "gap" \| "alignItems">/);
 });
 
@@ -153,16 +154,20 @@ test("ListStack adds no gap of its own — the rows own their separation", () =>
   assert.ok(!/gap:/.test(listStackCode), "ListStack must not set a gap");
 });
 
-test("Center centers a single child on boolean dimensions defaulting to true", () => {
+test("Center centers a single child on boolean dimensions, with a semantic fill variant", () => {
   assert.match(centerCode, /styled\(YStack, \{\s+name: "Center",/);
   assert.match(centerCode, /horizontal: \{\s+true: \{ alignItems: "center" \},/);
   assert.match(centerCode, /vertical: \{\s+true: \{ justifyContent: "center" \},/);
-  assert.match(centerCode, /defaultVariants: \{\s+horizontal: true,\s+vertical: true,\s+\}/);
+  assert.match(centerCode, /fill: \{\s+true: \{ flex: 1 \},/);
   assert.match(
     centerCode,
-    /export function Center\(\{ horizontal = true, vertical = true, \.\.\.rest \}: CenterProps\)/,
+    /defaultVariants: \{\s+horizontal: true,\s+vertical: true,\s+fill: false,\s+\}/,
   );
-  assert.match(centerCode, /Omit<StyledCenterProps, "alignItems" \| "justifyContent">/);
+  assert.match(
+    centerCode,
+    /export function Center\(\{ horizontal = true, vertical = true, fill = false, \.\.\.rest \}: CenterProps\)/,
+  );
+  assert.match(centerCode, /Omit<StyledCenterProps, "alignItems" \| "justifyContent" \| "flex">/);
 });
 
 test("FieldStack owns the form-field rhythm", () => {
@@ -208,7 +213,7 @@ test("Button's grow keeps a content-sized basis in both forms (no wrapping-row c
 
 test("the filter-bar shells are exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  for (const name of ["FieldStack", "SearchRow"]) {
+  for (const name of ["FieldStack"]) {
     assert.equal(
       typeof dist[name],
       "function",
@@ -219,6 +224,11 @@ test("the filter-bar shells are exported from the built internal components barr
     dist.FilterBar,
     undefined,
     "FilterBar was this tranche's local shell — the #119 dedupe subsumed it into CatalogFiltersBar and it must not survive as package API",
+  );
+  assert.equal(
+    dist.SearchRow,
+    undefined,
+    "SearchRow duplicated FieldRow except for its stretch alignment — the #481 consolidation folded it into FieldRow and it must not survive as package API",
   );
   assert.equal(
     dist.ChoiceRow,
@@ -233,17 +243,8 @@ test("FieldStack owns the stacked-fields rhythm (#119)", () => {
   assert.match(fieldStackCode, /Omit<StyledFieldStackProps, "gap" \| "alignItems">/);
 });
 
-test("SearchRow stretches its children — the Filters button matches the search field's height (#119)", () => {
-  assert.match(searchRowCode, /styled\(XStack, \{\s+name: "SearchRow",/);
-  assert.match(searchRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "stretch",/);
-  assert.match(searchRowCode, /Omit<StyledSearchRowProps, "gap" \| "alignItems">/);
-});
-
 test("no filter-bar shell offers spacing or margin props", () => {
-  for (const [name, src] of [
-    ["FieldStack", fieldStackCode],
-    ["SearchRow", searchRowCode],
-  ]) {
+  for (const [name, src] of [["FieldStack", fieldStackCode]]) {
     for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {
       assert.ok(
         !new RegExp(String.raw`${banned}\?:`).test(src),

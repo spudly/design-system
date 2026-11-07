@@ -4,7 +4,8 @@ import { CatalogFiltersBar, type CatalogFilterDefinition } from "../views/Catalo
 import { CatalogHeader } from "../views/CatalogHeader.js";
 import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
 import { EmptyState } from "../widgets/EmptyState.js";
-import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { Center } from "../widgets/Center.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import type { SelectOption } from "../widgets/SelectField.js";
 import { BoundedList } from "./BoundedList.js";
@@ -390,7 +391,9 @@ export function DiscoverPage(props: DiscoverPageProps) {
           )}
           ListEmptyComponent={
             loading ? (
-              <ListLoadingState label="Loading" />
+              <Center>
+                <Spinner label="Loading" />
+              </Center>
             ) : errorMessage ? (
               <Alert severity="error">{errorMessage}</Alert>
             ) : (
@@ -398,7 +401,11 @@ export function DiscoverPage(props: DiscoverPageProps) {
             )
           }
           ListFooterComponent={
-            isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined
+            isFetchingNextPage ? (
+              <Center>
+                <Spinner label="Loading" />
+              </Center>
+            ) : undefined
           }
           // Pagination: the shared catalog pattern's handler —
           // see useCatalogPagination above. It stays mounted (but

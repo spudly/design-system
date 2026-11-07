@@ -9,14 +9,14 @@
  * hand-rolled this shell in the page (two styled YStacks plus
  * styling props on Text) — styling a page may not apply itself
  * under #119 — so the state is a component here and the page
- * adopts it. LoadingGate is the sibling full-screen state (the
- * same shell with a spinner); ScreenShell + Center + Card do
+ * adopts it. The detail pages' loading state is the sibling full-screen
+ * state (the same shell with a centered spinner); ScreenShell + Center + Card do
  * not compose to this treatment, because the centering layer
  * must also fill the shell's height or the card sits at the
  * top of the screen.
  *
  * The pins hold the state's identity: the contract is the two
- * caller strings, the shell is the LoadingGate shell plus the
+ * caller strings, the shell is the full-screen shell plus the
  * 16px page padding, and the card carries the heading-variant
  * title over the gray6 message on the 8px separation.
  *

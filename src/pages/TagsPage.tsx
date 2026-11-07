@@ -8,7 +8,8 @@ import { Card } from "../widgets/Card.js";
 import { CardStack } from "../widgets/CardStack.js";
 import { ColorPickerField } from "../widgets/ColorPickerField.js";
 import { FieldStack } from "../widgets/FieldStack.js";
-import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { Center } from "../widgets/Center.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
@@ -35,8 +36,8 @@ import { TrailingActionsRow } from "../widgets/TrailingActionsRow.js";
  * BadgeCardRow (#464, retiring TextAction), so they are real
  * buttons — keyboard-focusable and Enter/Space-operable on
  * web; the row card treatment is the app view's, on DS
- * tokens. While `loading`, the shared ListLoadingState
- * replaces the list (it stands in for the app's branded
+ * tokens. While `loading`, the centered Spinner (Center +
+ * Spinner) replaces the list (it stands in for the app's branded
  * loader — the RecipeFormPage precedent).
  *
  * The create form is stacked (#189): the name field takes its
@@ -286,7 +287,9 @@ export function TagsPage({
             </TrailingActionsRow>
           </FieldStack>
           {loading ? (
-            <ListLoadingState label="Loading tags" />
+            <Center>
+              <Spinner label="Loading tags" />
+            </Center>
           ) : (
             <CardStack>
               {tags.map((tag) =>
