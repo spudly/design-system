@@ -78,9 +78,13 @@ test("the contract is sectioned: caller-supplied titles, data, and per-section s
   assert.match(code, /ownErrorMessage\?: string \| null;/);
   assert.match(code, /ownEmptyTitle\?: string;/);
   assert.match(code, /ownEmptyBody\?: string;/);
-  assert.match(code, /discoveryTitle: string;/, "the discovery section's title is caller-supplied");
-  assert.match(code, /discoveryRecipes: RecipesPageDiscoveryItem\[\];/);
-  assert.match(code, /loadingDiscovery: boolean;/);
+  assert.match(
+    code,
+    /discoveryTitle\?: string;/,
+    "the discovery section's title is caller-supplied",
+  );
+  assert.match(code, /discoveryRecipes\?: RecipesPageDiscoveryItem\[\];/);
+  assert.match(code, /loadingDiscovery\?: boolean;/);
   assert.match(code, /discoveryErrorMessage\?: string \| null;/);
   assert.match(code, /discoveryEmptyTitle\?: string;/);
   assert.match(code, /discoveryEmptyBody\?: string;/);
@@ -104,6 +108,33 @@ test("the contract is sectioned: caller-supplied titles, data, and per-section s
   assert.ok(!/^\s+emptyTitle\?: string;/m.test(code), "the old `emptyTitle` prop must not return");
 });
 
+test("the discovery section is host-optional (#512): omitted props produce no discovery rows and inert pagination", () => {
+  // Presence is keyed off discoveryRecipes being supplied.
+  assert.match(code, /const hasDiscovery = discoveryRecipes !== undefined;/);
+  // Every discovery row is built only inside the presence guard.
+  const guardAt = code.indexOf("if (discoveryRecipes !== undefined) {");
+  const headingAt = code.indexOf('rows.push({ kind: "discoveryHeading" });');
+  const emptyAt = code.indexOf('rows.push({ kind: "discoveryEmpty" });');
+  assert.ok(
+    guardAt !== -1 && headingAt > guardAt,
+    "the discovery heading is built only when the section is supplied",
+  );
+  assert.ok(
+    emptyAt > guardAt,
+    "the discovery empty row is built only when the section is supplied",
+  );
+  // The heading itself renders only when the host supplies a title.
+  assert.match(code, /if \(discoveryTitle\) \{\s*rows\.push\(\{ kind: "discoveryHeading" \}\);/);
+  // Pagination stays inert when the section is absent.
+  assert.match(code, /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,/);
+  assert.match(code, /hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage/);
+  // The OwnOnly story proves the omission path: it passes no discovery props.
+  assert.match(
+    stories,
+    /export const OwnOnly: Story = \{\s*\/\/[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*render: \(\) => <RecipesPageDemo omitDiscovery \/>/,
+  );
+});
+
 test("one row sequence: the own section precedes the discovery section in the one list", () => {
   assert.match(code, /const rows: RecipesPageRow\[\] = \[\{ kind: "ownHeading" \}\];/);
   const ownAt = code.indexOf('rows.push({ kind: "ownRecipe", item });');
@@ -121,7 +152,7 @@ test("one row sequence: the own section precedes the discovery section in the on
   );
   assert.match(code, /data=\{rows\}/, "the one list takes the unified row sequence");
   assert.match(code, /<SectionHeading>\{ownTitle\}<\/SectionHeading>/);
-  assert.match(code, /<SectionHeading>\{discoveryTitle\}<\/SectionHeading>/);
+  assert.match(code, /<SectionHeading>\{discoveryTitle \?\? ""\}<\/SectionHeading>/);
 });
 
 test("recipe row keys live in their own namespace, never colliding with heading/state keys", () => {
@@ -243,8 +274,8 @@ test("discovery rows are permalink DiscoveryCards; the view-model is DiscoverPag
 test("pagination is the discovery continuation, gated on both loads and the discovery error", () => {
   assert.match(
     code,
-    /itemCount: discoveryRecipes\.length,\s*canPaginate: !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,/,
-    "the shared pattern counts discovery rows and gates on both first loads + the discovery error",
+    /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,\s*canPaginate:\s*hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,/,
+    "the shared pattern counts discovery rows and gates on both first loads + the discovery error — and on the section being supplied at all (#512)",
   );
 });
 
@@ -271,8 +302,8 @@ test("stories cover the unified states", () => {
   assert.match(stories, /ownTitle="Your recipes"/, "the demo supplies the own section's title");
   assert.match(
     stories,
-    /discoveryTitle="Discover"/,
-    "the demo supplies the discovery section's title",
+    /discoveryTitle: "Discover"/,
+    "the demo supplies the discovery section's title (spread in unless the story omits the section, #512)",
   );
   // The demo's one search filters both sections — the honest
   // stand-in for the app's unified server-side filtering.

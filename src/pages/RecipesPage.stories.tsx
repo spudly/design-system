@@ -159,6 +159,7 @@ function RecipesPageDemo({
   ownErrorMessage = null,
   discoveryErrorMessage = null,
   isFetchingNextPage = false,
+  omitDiscovery = false,
   expandedRecipeId,
   initialActiveFilters,
   initialFilterChooserOpen = false,
@@ -166,6 +167,7 @@ function RecipesPageDemo({
   initialSearch?: string;
   ownRecipes?: RecipesPageItem[];
   discoveryRecipes?: RecipesPageDiscoveryItem[];
+  omitDiscovery?: boolean;
   loadingOwn?: boolean;
   loadingDiscovery?: boolean;
   ownErrorMessage?: string | null;
@@ -209,10 +211,14 @@ function RecipesPageDemo({
         ownRecipes={visibleOwn}
         loadingOwn={loadingOwn}
         ownErrorMessage={ownErrorMessage}
-        discoveryTitle="Discover"
-        discoveryRecipes={visibleDiscovery}
-        loadingDiscovery={loadingDiscovery}
-        discoveryErrorMessage={discoveryErrorMessage}
+        {...(omitDiscovery
+          ? {}
+          : {
+              discoveryTitle: "Discover",
+              discoveryRecipes: visibleDiscovery,
+              loadingDiscovery,
+              discoveryErrorMessage,
+            })}
         isFetchingNextPage={isFetchingNextPage}
         onLogCookPress={() => undefined}
         {...(expandedRecipeId
@@ -318,9 +324,10 @@ export const ExpandedAccessory: Story = {
 };
 
 export const OwnOnly: Story = {
-  // Own material only: the discovery section collapses to its
-  // empty state under its heading; the own rows render above it.
-  render: () => <RecipesPageDemo discoveryRecipes={[]} />,
+  // Own material only (#512): the host omits the discovery
+  // props entirely, so no discovery heading or empty state
+  // renders at all — the own rows are the whole list.
+  render: () => <RecipesPageDemo omitDiscovery />,
 };
 
 export const DiscoveryOnly: Story = {

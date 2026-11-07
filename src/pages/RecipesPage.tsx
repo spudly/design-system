@@ -47,6 +47,10 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  *    `discoveryTitle` heading, rendered through the same
  *    DiscoveryCard DiscoverPage uses, each card a real link to
  *    the recipe's permalink.
+ * The discovery section is host-optional (#512): a host with
+ * no discovery feed for a surface omits the discovery props
+ * entirely and the section — heading, loading, error, and
+ * empty rows alike — does not render at all.
  * DiscoverPage stays in place untouched; its removal is a
  * follow-up once the app adopts this page.
  *
@@ -288,15 +292,21 @@ export type RecipesPageProps = {
 
   /** The discovery section's title — caller-supplied copy
    * (e.g. "Discover"), rendered as the section's heading above
-   * its rows. */
-  discoveryTitle: string;
+   * its rows. Optional: the heading renders only when a title
+   * is supplied. The whole discovery section is omitted when
+   * `discoveryRecipes` is not supplied (#512). */
+  discoveryTitle?: string;
   /** Public discovery recipes, already filtered/sorted by the
    * app under the same one search/filter state as the own
-   * section. */
-  discoveryRecipes: RecipesPageDiscoveryItem[];
+   * section. Optional (#512): when omitted, the discovery
+   * section does not render at all — no heading, spinner,
+   * error, or empty row — and discovery pagination stays
+   * inert. */
+  discoveryRecipes?: RecipesPageDiscoveryItem[];
   /** Discovery section's first load in flight: the section
-   * renders its spinner row; the own section is unaffected. */
-  loadingDiscovery: boolean;
+   * renders its spinner row; the own section is unaffected.
+   * Defaults to false when the section is supplied. */
+  loadingDiscovery?: boolean;
   /** The discovery section's failed-load message, composed by
    * the app; null/absent renders no error state. A failure
    * here never hides the own section. */
@@ -475,7 +485,7 @@ export function RecipesPage(props: RecipesPageProps) {
     ownEmptyBody,
     discoveryTitle,
     discoveryRecipes,
-    loadingDiscovery,
+    loadingDiscovery = false,
     discoveryErrorMessage = null,
     discoveryEmptyTitle = "No public recipes match your search.",
     discoveryEmptyBody,
@@ -518,11 +528,16 @@ export function RecipesPage(props: RecipesPageProps) {
   // the mount gate covers both sections' first loads plus the
   // discovery error state: while any of those shows, the
   // list's end must not start a page request.
+  // The discovery section is present only when the host
+  // supplies its recipes (#512); when absent, pagination is
+  // inert — item count 0 and canPaginate false — so the
+  // end-reached handler can never fire a discovery request.
+  const hasDiscovery = discoveryRecipes !== undefined;
   const { onEndReached, onScroll, onEndReachedThreshold } = useCatalogPagination({
     onLoadMore,
     isFetchingNextPage,
-    itemCount: discoveryRecipes.length,
-    canPaginate: !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,
+    itemCount: discoveryRecipes !== undefined ? discoveryRecipes.length : 0,
+    canPaginate: hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,
   });
 
   // The catalog's filter definitions — this page's data in the
@@ -620,16 +635,20 @@ export function RecipesPage(props: RecipesPageProps) {
       rows.push({ kind: "loadingOwnMore" });
     }
   }
-  rows.push({ kind: "discoveryHeading" });
-  if (loadingDiscovery) {
-    rows.push({ kind: "loadingDiscovery" });
-  } else if (discoveryErrorMessage) {
-    rows.push({ kind: "discoveryError", message: discoveryErrorMessage });
-  } else if (discoveryRecipes.length === 0) {
-    rows.push({ kind: "discoveryEmpty" });
-  } else {
-    for (const item of discoveryRecipes) {
-      rows.push({ kind: "discoveryRecipe", item });
+  if (discoveryRecipes !== undefined) {
+    if (discoveryTitle) {
+      rows.push({ kind: "discoveryHeading" });
+    }
+    if (loadingDiscovery) {
+      rows.push({ kind: "loadingDiscovery" });
+    } else if (discoveryErrorMessage) {
+      rows.push({ kind: "discoveryError", message: discoveryErrorMessage });
+    } else if (discoveryRecipes.length === 0) {
+      rows.push({ kind: "discoveryEmpty" });
+    } else {
+      for (const item of discoveryRecipes) {
+        rows.push({ kind: "discoveryRecipe", item });
+      }
     }
   }
 
@@ -737,9 +756,11 @@ export function RecipesPage(props: RecipesPageProps) {
                   />
                 );
               case "discoveryHeading":
+                // The heading row is only built when the host
+                // supplied a title (see the row model above).
                 return (
                   <YStack paddingBlockEnd="$3">
-                    <SectionHeading>{discoveryTitle}</SectionHeading>
+                    <SectionHeading>{discoveryTitle ?? ""}</SectionHeading>
                   </YStack>
                 );
               case "discoveryRecipe": {
