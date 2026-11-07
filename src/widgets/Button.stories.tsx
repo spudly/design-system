@@ -246,23 +246,22 @@ export const LinkDisabled: Story = {
 };
 
 function ToggleDemo() {
-  const [picked, setPicked] = useState("1");
+  const [picked, setPicked] = useState("½");
   return (
     <YStack gap={12}>
       <XStack gap={8} alignItems="center">
-        {["½×", "1×", "2×", "3×"].map((label, index) => {
-          const value = String(index + 1);
+        {["½", "1", "2", "3"].map((amount) => {
           return (
             <Button
-              key={value}
+              key={amount}
               variant="secondary"
               size="sm"
-              selected={picked === value}
+              selected={picked === amount}
               onPress={() => {
-                setPicked(value);
+                setPicked(amount);
               }}
             >
-              {label}
+              {amount}×
             </Button>
           );
         })}
