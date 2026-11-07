@@ -30,12 +30,31 @@ export type ScrollShellProps = {
  * dedupe): ScreenShell supplies the surface frame and
  * ScrollRegion the scroll, and this shell adds only the inset
  * column the blocks stack in.
+ *
+ * The column is capped and centered: at most
+ * SCROLL_SHELL_COLUMN_MAX_WIDTH (768px, the retired public
+ * frame's COLUMN_MAX_WIDTH — the web layout's max-w-3xl) wide,
+ * centered in the scroll region, so a public page's sections
+ * keep the wide public column's measure on desktop instead of
+ * stretching edge to edge (#473: the cap moved here from the
+ * retired PublicFrameLayout, whose column this shell's sole
+ * consumer, PublicRecipePage, rendered inside). The footer is
+ * not the shell's: BigFooterShell renders it outside this
+ * column, uncapped.
  */
+export const SCROLL_SHELL_COLUMN_MAX_WIDTH = 768;
+
 export function ScrollShell({ children }: ScrollShellProps) {
   return (
     <ScreenShell>
       <ScrollRegion>
-        <YStack padding="$4" gap="$4">
+        <YStack
+          width="100%"
+          maxWidth={SCROLL_SHELL_COLUMN_MAX_WIDTH}
+          alignSelf="center"
+          padding="$4"
+          gap="$4"
+        >
           {children}
         </YStack>
       </ScrollRegion>

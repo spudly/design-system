@@ -196,9 +196,7 @@ export function LegalDocumentPage({
       <ScreenContainer>
         <XStack alignItems="center" justifyContent="space-between" gap="$4" {...bannerRoleProps}>
           <BrandLink label={brandLabel} href={brandHref} />
-          <TextLink href={signInHref} fontWeight={tokens.typography.fontWeight.medium}>
-            {signInLabel}
-          </TextLink>
+          <TextLink href={signInHref}>{signInLabel}</TextLink>
         </XStack>
         <YStack
           width="100%"
