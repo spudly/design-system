@@ -54,6 +54,7 @@ export {
 export { CardRow, type CardRowProps } from "./CardRow.js";
 export { ListRow, type ListRowProps } from "./ListRow.js";
 export { LoadingGate, type LoadingGateProps } from "./LoadingGate.js";
+export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./MessageCard.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";

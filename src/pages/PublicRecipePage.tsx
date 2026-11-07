@@ -4,6 +4,7 @@ import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { EqualButtonRow } from "../widgets/EqualButtonRow.js";
 import { LoadingGate } from "../widgets/LoadingGate.js";
+import { MainLandmark } from "../widgets/MainLandmark.js";
 import { MessageCard } from "../widgets/MessageCard.js";
 import { RatingsCard } from "../widgets/RatingsCard.js";
 import { RecipeIngredientsPanel } from "../widgets/RecipeIngredientsPanel.js";
@@ -66,6 +67,11 @@ import type {
  *   state's `footer` prop, the standard page pattern (#410).
  *   #473 retired the separate PublicPageFrame page the host
  *   once wrapped this page in — there is no host-side frame.
+ *   Landmarks (#366): the retired frame's layout owned the
+ *   `main` landmark, so the page owns it now — every state's
+ *   content renders inside exactly one `main` (the MainLandmark
+ *   component below), and BigFooterShell keeps the footer
+ *   (`contentinfo`) outside it, after it in flow.
  *
  * The CTA bar sits above the sections, its variant chosen by the
  * host's auth state: signed-out visitors get sign-up / clone /
@@ -361,7 +367,9 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "loading") {
     return (
       <BigFooterShell footer={props.footer}>
-        <LoadingGate label="Loading recipe" />
+        <MainLandmark>
+          <LoadingGate label="Loading recipe" />
+        </MainLandmark>
       </BigFooterShell>
     );
   }
@@ -369,7 +377,9 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "notFound") {
     return (
       <BigFooterShell footer={props.footer}>
-        <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />
+        <MainLandmark>
+          <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />
+        </MainLandmark>
       </BigFooterShell>
     );
   }
@@ -377,7 +387,9 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "unavailable") {
     return (
       <BigFooterShell footer={props.footer}>
-        <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />
+        <MainLandmark>
+          <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />
+        </MainLandmark>
       </BigFooterShell>
     );
   }
@@ -389,23 +401,25 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
 
   return (
     <BigFooterShell footer={props.footer}>
-      <ScrollShell>
-        <CtaBar
-          ctas={props.ctas}
-          onSignUpPress={props.onSignUpPress}
-          onClonePress={props.onClonePress}
-          onGetAppPress={props.onGetAppPress}
-        />
-        <OverviewSection overview={props.overview} />
-        <SectionHeading>Ingredients</SectionHeading>
-        <IngredientsSection ingredients={props.ingredients} />
-        <SectionHeading>Instructions</SectionHeading>
-        <InstructionsSection instructions={props.instructions.instructions} />
-        {ratings ? (
-          <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
-        ) : null}
-        {comments}
-      </ScrollShell>
+      <MainLandmark>
+        <ScrollShell>
+          <CtaBar
+            ctas={props.ctas}
+            onSignUpPress={props.onSignUpPress}
+            onClonePress={props.onClonePress}
+            onGetAppPress={props.onGetAppPress}
+          />
+          <OverviewSection overview={props.overview} />
+          <SectionHeading>Ingredients</SectionHeading>
+          <IngredientsSection ingredients={props.ingredients} />
+          <SectionHeading>Instructions</SectionHeading>
+          <InstructionsSection instructions={props.instructions.instructions} />
+          {ratings ? (
+            <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
+          ) : null}
+          {comments}
+        </ScrollShell>
+      </MainLandmark>
     </BigFooterShell>
   );
 }

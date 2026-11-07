@@ -27,6 +27,13 @@
  * the outermost chrome on its surface, so it owns its
  * landmarks; no inner page component adds landmarks of its own
  * (pinned by the source scan below).
+ *
+ * PublicRecipePage (#473): the retired PublicPageFrame's layout
+ * owned this surface's `main`; with the frame gone the page is
+ * the outermost chrome, so the page owns `main` — every state
+ * (ready, loading, not-found, unavailable) renders its content
+ * inside exactly one `main`, with BigFooter (`contentinfo`)
+ * outside it. The SSR tests below cover each state.
  */
 import "./registerSvgStub.js";
 import { loadInternalDist } from "./internalDist.js";
@@ -88,6 +95,9 @@ test("no other source file adds a landmark role — no duplicates inside the fra
     join(srcDir, "widgets", "accessibility.ts"),
     join(srcDir, "widgets", "BigFooter.tsx"),
     join(srcDir, "pages", "LegalDocumentPage.tsx"),
+    // #473: MainLandmark owns the `main` role for the public
+    // recipe surface now the frame page is retired.
+    join(srcDir, "widgets", "MainLandmark.tsx"),
   ]);
   function files(dir: string): string[] {
     return readdirSync(dir, { withFileTypes: true }).flatMap((entry) => {
@@ -120,10 +130,23 @@ function loadRuntime() {
     const dist: Record<string, any> = await loadInternalDist();
     const { LegalDocumentPage }: Record<string, any> =
       await import("../dist/pages/LegalDocumentPage.js");
+    const { PublicRecipePage }: Record<string, any> =
+      await import("../dist/pages/PublicRecipePage.js");
+    const { eciperayFooterFixture }: Record<string, any> =
+      await import("../dist/pages/fixtures.js");
     // BigFooter is internal (not in the components barrel, #410/#298):
     // load its dist module directly, like the icons module's tests do.
     const { BigFooter }: Record<string, any> = await import("../dist/widgets/BigFooter.js");
-    return { React, renderToString, TamaguiProvider, ...dist, LegalDocumentPage, BigFooter };
+    return {
+      React,
+      renderToString,
+      TamaguiProvider,
+      ...dist,
+      LegalDocumentPage,
+      PublicRecipePage,
+      eciperayFooterFixture,
+      BigFooter,
+    };
   })();
   return runtimePromise;
 }
@@ -218,8 +241,101 @@ const legalFixture = {
   ],
 };
 
+const publicRecipePage = readCode("src/pages/PublicRecipePage.tsx");
+
+test("PublicRecipePage carries its main landmark on every state (#473)", () => {
+  // One MainLandmark per state branch: loading, notFound,
+  // unavailable, and the ready ScrollShell branch. The role
+  // itself lives in the MainLandmark component — the page
+  // spreads no landmark props of its own.
+  const wraps = publicRecipePage.match(/<MainLandmark>/g) ?? [];
+  assert.equal(wraps.length, 4, "each of the four states renders its content inside main");
+  assert.ok(
+    !publicRecipePage.includes("mainRoleProps"),
+    "the landmark role is MainLandmark's, not the page's",
+  );
+});
+
 test("SSR: LegalDocumentPage renders exactly one banner, main, and contentinfo (#366)", async () => {
   const { React, LegalDocumentPage } = await loadRuntime();
   const html = await renderToHtml(React.createElement(LegalDocumentPage, legalFixture));
   assertLandmarks(html, "Body text.");
+});
+
+function assertPublicRecipeLandmarks(html: string, insideMain?: string) {
+  assert.equal(countRole(html, "main"), 1, "exactly one main landmark");
+  assert.equal(countRole(html, "contentinfo"), 1, "exactly one contentinfo landmark");
+  assert.ok(
+    html.indexOf('role="main"') < html.indexOf('role="contentinfo"'),
+    "main renders before the footer contentinfo",
+  );
+  const range = mainContentRange(html);
+  assert.ok(range, "the main element has a matching close tag");
+  assert.ok(
+    range.end < html.indexOf('role="contentinfo"'),
+    "the footer is outside main, not nested inside it",
+  );
+  if (insideMain !== undefined) {
+    const contentAt = html.indexOf(insideMain);
+    assert.ok(
+      range.start <= contentAt && contentAt < range.end,
+      "the state content is a descendant of the main element",
+    );
+  }
+}
+
+const publicRecipeReadyFixture = {
+  state: "ready",
+  overview: { title: "Landmark Soup", status: "idea", servingsLabel: "4", tags: [] },
+  ctas: { variant: "signedOut" },
+  onSignUpPress: () => undefined,
+  onClonePress: () => undefined,
+  onGetAppPress: () => undefined,
+  ingredients: {
+    servings: 4,
+    onServingsChange: () => undefined,
+    scaleValue: "1",
+    onScaleChange: () => undefined,
+    ingredients: [{ id: "salt", label: "1 tsp salt", isOptional: false, isMissing: false }],
+    onIngredientPress: () => undefined,
+    substitutions: [],
+  },
+  instructions: {
+    instructions: [{ id: "step-1", stepNumber: 1, body: "Stir everything together." }],
+  },
+};
+
+test("SSR: PublicRecipePage ready state renders its content inside exactly one main, footer outside (#473)", async () => {
+  const { React, PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(PublicRecipePage, {
+      ...publicRecipeReadyFixture,
+      footer: eciperayFooterFixture,
+    }),
+  );
+  assertPublicRecipeLandmarks(html, "Landmark Soup");
+});
+
+test("SSR: PublicRecipePage loading state renders inside exactly one main, footer outside (#473)", async () => {
+  const { React, PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(PublicRecipePage, { state: "loading", footer: eciperayFooterFixture }),
+  );
+  assertPublicRecipeLandmarks(html);
+});
+
+test("SSR: PublicRecipePage not-found state renders its card inside exactly one main, footer outside (#473)", async () => {
+  const { React, PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(PublicRecipePage, { state: "notFound", footer: eciperayFooterFixture }),
+  );
+  assertPublicRecipeLandmarks(html, "Recipe not found");
+});
+
+test("SSR: PublicRecipePage unavailable state renders its card inside exactly one main, footer outside (#473)", async () => {
+  const { React, PublicRecipePage, eciperayFooterFixture } = await loadRuntime();
+  const html = await renderToHtml(
+    React.createElement(PublicRecipePage, { state: "unavailable", footer: eciperayFooterFixture }),
+  );
+  assertPublicRecipeLandmarks(html, "Recipe unavailable");
 });
