@@ -1,5 +1,15 @@
 # @spudly/ui
 
+## 7.0.0
+
+### Major Changes
+
+- 68b3f65: PublicPageFrame is removed. Hosts no longer wrap public pages in the frame — the DS public pages render their own footer through the shared BigFooter pattern from their `footer` prop, so a host renders the page directly (for example, PublicRecipePage with its `footer` data) and gets the same wide public surface — the recipe sections keep their 768px centered content column, now owned by the page's scroll shell — with the page's BigFooter at the bottom, outside that column. LegalDocumentPage keeps its brand wordmark and Sign in header links and its footer in place, rendered by the page itself. Test: open the PublicRecipePage Default story and confirm the recipe sections and the BigFooter (brand, link columns) render with no frame wrapper, the recipe content inside the page's main landmark and the footer after it, and open the LegalDocumentPage PrivacyPolicy story and confirm the wordmark and Sign in links sit above the document and the footer below it.
+
+### Patch Changes
+
+- d1c2419: BigFooter: app-store links now show the official store badges instead of plain text buttons. Each footer store link names its store (`store: "app-store"` or `store: "google-play"` — a required new field on the footer data hosts supply), and the footer renders Apple's "Download on the App Store" badge for App Store links and Google's "Get it on Google Play" badge for Google Play links, each as a real link whose accessible name is the link's label. Testable terms: open the BigFooter stories (or any page story with a footer) — the Eciperay and Memorize footers show the black App Store badge with the Apple logo and the black Google Play badge with the multicolor Play triangle instead of labeled buttons; each badge links to the same store URL as before, a screen reader announces it by its label ("Download on the App Store" / "Get it on Google Play"), and a footer whose storeLinks array is empty still shows no store section.
+
 ## 6.1.0
 
 ### Minor Changes
