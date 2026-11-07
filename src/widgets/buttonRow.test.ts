@@ -69,6 +69,19 @@ test("the equal row sizes its buttons itself: flex 1 with the 40% floor", () => 
   assert.match(code, /flex: 1,\s+minWidth: EQUAL_BUTTON_MIN_WIDTH/);
 });
 
+test("generated keys are collision-free against caller-supplied keys", () => {
+  // A caller key of `button-1` on one button and no key on the next
+  // must not give both rendered siblings the same key: generated
+  // keys are checked against the row's explicit keys (and each
+  // other) before one is assigned.
+  assert.match(code, /explicitKeys/);
+  assert.match(code, /generatedKey\(index\)/);
+  assert.ok(
+    !/key: \(item as ReactElement\)\.key \?\? `button-\$\{index\}`/.test(code),
+    "the bare index fallback collides with caller keys of the same shape",
+  );
+});
+
 test("elements lifted out of a fragment are re-keyed under the fragment's scope", () => {
   // Two fragments may each hold a child keyed the same; the
   // flattened list must not carry duplicate keys.

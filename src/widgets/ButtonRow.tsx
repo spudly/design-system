@@ -105,6 +105,28 @@ export function ButtonRow({ children, equal = false, ...rest }: ButtonRowProps) 
     return <StyledButtonRow {...rest}>{children}</StyledButtonRow>;
   }
   const items = flattenRowChildren(children);
+  // Generated keys must stay distinct from every caller-supplied key
+  // in the row (a caller key of `button-1` on the first button and no
+  // key on the second would otherwise give both siblings `button-1`),
+  // so collect the explicit keys first and skip any that collide.
+  const explicitKeys = new Set(
+    items.flatMap((item) =>
+      isValidElement(item) && (item as ReactElement).key != null
+        ? [String((item as ReactElement).key)]
+        : [],
+    ),
+  );
+  const generatedKeys = new Set<string>();
+  const generatedKey = (index: number) => {
+    let key = `button-${index}`;
+    let suffix = 0;
+    while (explicitKeys.has(key) || generatedKeys.has(key)) {
+      suffix += 1;
+      key = `button-${index}-generated-${suffix}`;
+    }
+    generatedKeys.add(key);
+    return key;
+  };
   return (
     <StyledButtonRow {...rest}>
       {items.map((item, index) =>
@@ -112,10 +134,10 @@ export function ButtonRow({ children, equal = false, ...rest }: ButtonRowProps) 
           cloneElement(item as ReactElement<{ flex?: number; minWidth?: string }>, {
             flex: 1,
             minWidth: EQUAL_BUTTON_MIN_WIDTH,
-            key: (item as ReactElement).key ?? `button-${index}`,
+            key: (item as ReactElement).key ?? generatedKey(index),
           })
         ) : (
-          <Fragment key={`button-${index}`}>{item}</Fragment>
+          <Fragment key={generatedKey(index)}>{item}</Fragment>
         ),
       )}
     </StyledButtonRow>
