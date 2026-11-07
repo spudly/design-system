@@ -30,7 +30,7 @@ import { SelectField } from "../widgets/SelectField.js";
 import { Spinner } from "../widgets/Spinner.js";
 import { StatBand } from "../widgets/StatBand.js";
 import { StatCard } from "../widgets/StatCard.js";
-import { StatusBadge, type StatusBadgeTone } from "../widgets/StatusBadge.js";
+import { Badge, type BadgeProps } from "../widgets/Badge.js";
 import { StatusMessage } from "../widgets/StatusMessage.js";
 import { StepList } from "../widgets/StepList.js";
 import { SuggestionPanel } from "../widgets/SuggestionPanel.js";
@@ -399,7 +399,7 @@ export type RecipeDetailPageReadyProps = {
   footer?: BigFooterData;
   state: "ready";
   /** Recipe status as a plain string; the page maps it to the
-   * shared StatusBadge's tone/label below as caller data (the
+   * shared Badge's tone/label below as caller data (the
    * design system owns no status vocabulary). Unknown values
    * fall back to "idea", as the app's status normalizer does. */
   status: string;
@@ -441,9 +441,10 @@ export type RecipeDetailPageProps =
 // (idea → neutral gray, evolving → info blue, perfected → success
 // green, abandoned → danger red, matching the app's badge tints).
 // The vocabulary is this page's caller data — the shared
-// StatusBadge takes tone + label and owns only the rendering
-// (Stephen's #119 dedupe ruling: no DS-owned status vocabulary).
-const STATUS_BADGES: Record<string, { label: string; tone: StatusBadgeTone }> = {
+// Badge takes the tone and the label as its child and owns
+// only the rendering (Stephen's #119 dedupe ruling: no
+// DS-owned status vocabulary).
+const STATUS_BADGES: Record<string, { label: string; tone: NonNullable<BadgeProps["tone"]> }> = {
   idea: { label: "Idea", tone: "neutral" },
   evolving: { label: "Evolving", tone: "info" },
   perfected: { label: "Perfected", tone: "success" },
@@ -486,7 +487,7 @@ const MISSING_INGREDIENTS_HINT =
 
 function RecipeStatusBadge({ status }: { status: string }) {
   const badge = STATUS_BADGES[status] ?? STATUS_BADGES.idea;
-  return <StatusBadge tone={badge?.tone ?? "neutral"} label={badge?.label ?? "Idea"} />;
+  return <Badge tone={badge?.tone ?? "neutral"}>{badge?.label ?? "Idea"}</Badge>;
 }
 
 // The version picker is the standard SelectField (#72): the same
