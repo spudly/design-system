@@ -149,7 +149,10 @@ test("the slot renders only the active tab's content, keyed by the active surfac
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
   const [title, tabBar, slot] = tree.props.children.props.children;
-  assert.equal(title.props.children, "Memorize");
+  // #437: the header is the shared AppTopBar view, with the
+  // shell's title as its brand (no href — the title navigates
+  // nowhere).
+  assert.deepEqual(title.props.brand, { label: "Memorize" });
   // The tab bar receives the tabs mapped to the Tabs contract:
   // id → value, icon name carried through as data.
   assert.deepEqual(tabBar.props.tabs, [
