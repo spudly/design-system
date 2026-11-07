@@ -96,7 +96,6 @@ export { VerseText, type VerseTextProps } from "./VerseText.js";
 export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
 export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
 export { FieldLabel, type FieldLabelProps } from "./FieldLabel.js";
-export { FieldStack, type FieldStackProps } from "./FieldStack.js";
 export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
 export { FormStack, type FormStackProps } from "./FormStack.js";
 export { LabeledField, type LabeledFieldProps } from "./LabeledField.js";

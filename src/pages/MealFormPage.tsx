@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Alert } from "../widgets/Alert.js";
 import { AutocompletePicker } from "../widgets/AutocompletePicker.js";
 import { Button } from "../widgets/Button.js";
-import { FieldStack } from "../widgets/FieldStack.js";
+import { FormStack } from "../widgets/FormStack.js";
 import { FormHeading } from "../widgets/FormHeading.js";
 import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
 import { FormSubmit } from "../widgets/FormSubmit.js";
@@ -225,11 +225,11 @@ export function MealFormPage({
         ))}
         {onAddIngredient && onIngredientChange ? (
           <LabeledGroup label="Ingredients">
-            <FieldStack>
+            <FormStack>
               {ingredients.map((ingredient, index) => {
                 const entryLabel = ingredient.name.trim() || `Ingredient ${index + 1}`;
                 return (
-                  <FieldStack key={ingredient.id}>
+                  <FormStack key={ingredient.id}>
                     <Text variant="subheading">{entryLabel}</Text>
                     <TextField
                       label={`${entryLabel} — Name`}
@@ -274,7 +274,7 @@ export function MealFormPage({
                         Remove ingredient
                       </Button>
                     ) : null}
-                  </FieldStack>
+                  </FormStack>
                 );
               })}
               <Button
@@ -284,7 +284,7 @@ export function MealFormPage({
               >
                 Add ingredient
               </Button>
-            </FieldStack>
+            </FormStack>
           </LabeledGroup>
         ) : null}
         {error ? <Alert severity="error" message={error} /> : null}

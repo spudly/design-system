@@ -26,8 +26,8 @@
  *   spacing[3] (12px), stretch (ButtonRow's vertical form).
  * - Center: centers a single child — boolean `horizontal` /
  *   `vertical`, both defaulting to true.
- * - FieldStack: one form's fields — gap spacing[3] (12px),
- *   stretch (the meals & planning tranche of #119).
+ * - FormStack: the one form stack — gap spacing[3] (12px),
+ *   stretch (#477 combined the former FieldStack into it).
  * The pins hold each component's treatment, its Omit of the
  * style keys it owns, SearchField's `grow` (the other half
  * of the FieldRow pattern: the field takes the row's
@@ -65,7 +65,7 @@ const listStackCode = code("ListStack.tsx");
 const panelStackCode = code("PanelStack.tsx");
 const buttonStackCode = code("ButtonStack.tsx");
 const centerCode = code("Center.tsx");
-const fieldStackCode = code("FieldStack.tsx");
+const formStackCode = code("FormStack.tsx");
 const searchRowCode = code("SearchRow.tsx");
 const viewsDir = join(here, "../..", "src", "views");
 const textFieldSource = readFileSync(join(viewsDir, "TextField.tsx"), "utf8");
@@ -83,7 +83,7 @@ test("the layout components are exported from the built internal components barr
     "PanelStack",
     "ButtonStack",
     "Center",
-    "FieldStack",
+    "FormStack",
   ]) {
     assert.equal(
       typeof dist[name],
@@ -100,6 +100,11 @@ test("the layout components are exported from the built internal components barr
     dist.Column,
     undefined,
     "the generic step-prop Column must not survive as page-facing API (#119)",
+  );
+  assert.equal(
+    dist.FieldStack,
+    undefined,
+    "FieldStack was combined into FormStack (#477) and must not survive as package API",
   );
 });
 
@@ -165,10 +170,10 @@ test("Center centers a single child on boolean dimensions defaulting to true", (
   assert.match(centerCode, /Omit<StyledCenterProps, "alignItems" \| "justifyContent">/);
 });
 
-test("FieldStack owns the form-field rhythm", () => {
-  assert.match(fieldStackCode, /styled\(YStack, \{\s+name: "FieldStack",/);
-  assert.match(fieldStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
-  assert.match(fieldStackCode, /Omit<StyledFieldStackProps, "gap" \| "alignItems">/);
+test("FormStack owns the form-field rhythm", () => {
+  assert.match(formStackCode, /styled\(YStack, \{\s+name: "FormStack",/);
+  assert.match(formStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
+  assert.match(formStackCode, /Omit<StyledFormStackProps, "gap" \| "alignItems">/);
 });
 
 test("no layout component offers step, role, or margin props", () => {
@@ -178,7 +183,7 @@ test("no layout component offers step, role, or margin props", () => {
     ["SectionStack", sectionStackCode],
     ["FieldRow", fieldRowCode],
     ["ListStack", listStackCode],
-    ["FieldStack", fieldStackCode],
+    ["FormStack", formStackCode],
     ["PanelStack", panelStackCode],
     ["ButtonStack", buttonStackCode],
   ]) {
@@ -208,7 +213,7 @@ test("Button's grow keeps a content-sized basis in both forms (no wrapping-row c
 
 test("the filter-bar shells are exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  for (const name of ["FieldStack", "SearchRow"]) {
+  for (const name of ["FormStack", "SearchRow"]) {
     assert.equal(
       typeof dist[name],
       "function",
@@ -227,10 +232,10 @@ test("the filter-bar shells are exported from the built internal components barr
   );
 });
 
-test("FieldStack owns the stacked-fields rhythm (#119)", () => {
-  assert.match(fieldStackCode, /styled\(YStack, \{\s+name: "FieldStack",/);
-  assert.match(fieldStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
-  assert.match(fieldStackCode, /Omit<StyledFieldStackProps, "gap" \| "alignItems">/);
+test("FormStack owns the stacked-fields rhythm (#119)", () => {
+  assert.match(formStackCode, /styled\(YStack, \{\s+name: "FormStack",/);
+  assert.match(formStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
+  assert.match(formStackCode, /Omit<StyledFormStackProps, "gap" \| "alignItems">/);
 });
 
 test("SearchRow stretches its children — the Filters button matches the search field's height (#119)", () => {
@@ -241,7 +246,7 @@ test("SearchRow stretches its children — the Filters button matches the search
 
 test("no filter-bar shell offers spacing or margin props", () => {
   for (const [name, src] of [
-    ["FieldStack", fieldStackCode],
+    ["FormStack", formStackCode],
     ["SearchRow", searchRowCode],
   ]) {
     for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {

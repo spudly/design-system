@@ -5,23 +5,25 @@ import { tokens } from "../tokens/index.js";
 const StyledFormStack = styled(YStack, {
   name: "FormStack",
 
-  gap: tokens.spacing[4],
+  gap: tokens.spacing[3],
   alignItems: "stretch",
-  paddingBlockEnd: tokens.spacing[8],
 });
 
 type StyledFormStackProps = GetProps<typeof StyledFormStack>;
 
-export type FormStackProps = Omit<StyledFormStackProps, "gap" | "alignItems" | "paddingBlockEnd">;
+export type FormStackProps = Omit<StyledFormStackProps, "gap" | "alignItems">;
 
 /**
- * A form's body stack (#119): the form's sections (labeled
- * fields, banners, slots, the submit row) in order, separated
- * by the forms' 16px section rhythm, with the 32px bottom
- * padding a scrollable form body ends with. Section separation
- * is the stack's gap by construction — a section never wraps
- * itself to set its own separation. Call sites pass only the
- * sections: there are no spacing props, by design.
+ * The one form stack (#119, #477): a form's fields and sections
+ * (labeled fields, banners, slots, the submit row) in order,
+ * separated by the 12px field rhythm, children stretched. It
+ * combines the former FormStack and FieldStack into a single
+ * component (Stephen's #477 ruling: no level variant — the
+ * field-level styling survives, so there is no extra bottom
+ * padding; former section-level usages take the tighter rhythm).
+ * Separation is the stack's gap by construction — a child never
+ * wraps itself to set its own separation. Call sites pass only
+ * the children: there are no spacing props, by design.
  */
 export function FormStack({ ...rest }: FormStackProps) {
   return <StyledFormStack {...rest} />;

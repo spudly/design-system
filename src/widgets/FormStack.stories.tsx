@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { Button } from "./Button.js";
+import { ButtonRow } from "./ButtonRow.js";
 import { FormStack } from "./FormStack.js";
 import { LabeledField } from "./LabeledField.js";
 import { TextField } from "../views/TextField.js";
@@ -28,6 +29,21 @@ export const Default: Story = {
           />
         </LabeledField>
         <Button onPress={() => {}}>Save Changes</Button>
+      </FormStack>
+    </YStack>
+  ),
+};
+
+export const FieldsWithActions: Story = {
+  render: () => (
+    <YStack maxWidth={430}>
+      <FormStack>
+        <TextField label="Tag name" placeholder="e.g. Weeknight" />
+        <TextField label="Note" placeholder="Optional note" />
+        <ButtonRow>
+          <Button variant="secondary">Cancel</Button>
+          <Button>Save</Button>
+        </ButtonRow>
       </FormStack>
     </YStack>
   ),

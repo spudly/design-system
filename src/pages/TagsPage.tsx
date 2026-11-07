@@ -7,7 +7,7 @@ import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { CardStack } from "../widgets/CardStack.js";
 import { ColorPickerField } from "../widgets/ColorPickerField.js";
-import { FieldStack } from "../widgets/FieldStack.js";
+import { FormStack } from "../widgets/FormStack.js";
 import { ListLoadingState } from "../widgets/ListLoadingState.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
@@ -76,7 +76,7 @@ import { TrailingActionsRow } from "../widgets/TrailingActionsRow.js";
  *
  * De-styled for #119: the page composes DS components only —
  * the sections stack in SectionStack, the title is Text's
- * `title` variant, each form's fields stack in FieldStack,
+ * `title` variant, each form's fields stack in FormStack,
  * the picker-and-actions rows are TrailingActionsRow (which
  * carries the #219 wrap), the editor card is Card's `compact`
  * variant, each display row renders through BadgeCardRow (the badge
@@ -268,7 +268,7 @@ export function TagsPage({
               {tagsPageFailureMessages[failedOperation]}
             </Alert>
           ) : null}
-          <FieldStack>
+          <FormStack>
             <TextField placeholder="Tag name" value={name} onChangeText={onNameChange} />
             <TrailingActionsRow
               leading={
@@ -284,7 +284,7 @@ export function TagsPage({
                 Add
               </Button>
             </TrailingActionsRow>
-          </FieldStack>
+          </FormStack>
           {loading ? (
             <ListLoadingState label="Loading tags" />
           ) : (
@@ -292,7 +292,7 @@ export function TagsPage({
               {tags.map((tag) =>
                 editingTagId === tag.id && tag.canEdit !== false ? (
                   <Card key={tag.id} variant="compact">
-                    <FieldStack>
+                    <FormStack>
                       <TextField
                         placeholder="Tag name"
                         value={editName}
@@ -331,7 +331,7 @@ export function TagsPage({
                           Save
                         </Button>
                       </TrailingActionsRow>
-                    </FieldStack>
+                    </FormStack>
                   </Card>
                 ) : (
                   <BadgeCardRow
