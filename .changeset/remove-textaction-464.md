@@ -1,5 +1,0 @@
----
-"@spudly/ui": minor
----
-
-TextAction is removed. The inline text actions it rendered now render as ghost Buttons with the same labels and behavior: a comment's Edit / Save / Cancel / Delete, a tag row's Edit / Delete on the Tags page, a meal row's Delete, the Revert actions on changed fields and lists, and the AI session's Cancel session. Each keeps its accessible name (for example "Delete tag Weeknight", "Delete {meal}", "Cancel session"), its disabled behavior (Save disables while an update is pending or the draft is blank; Delete disables while a delete is pending; Cancel session disables while a request is in flight), and its keyboard behavior (Tab to reach, Enter or Space to activate on web). Test: open the CommentItem Default story and confirm Edit / Save / Cancel / Delete render as chrome-less buttons with the same labels; open the TagsPage Default story and confirm each tag row's Edit / Delete do the same; open the MealsHubPage Default story and confirm each meal row's Delete renders the same way; trigger a changed field's Revert and the AI session's Cancel session and confirm both render as ghost buttons.
