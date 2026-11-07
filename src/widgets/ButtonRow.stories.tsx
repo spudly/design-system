@@ -3,6 +3,7 @@ import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
 import { ButtonRow } from "./ButtonRow.js";
+import { Card } from "./Card.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof ButtonRow> = {
@@ -25,6 +26,43 @@ export const Default: Story = {
         <Button>Shopping list</Button>
         <Button variant="secondary">Edit</Button>
       </ButtonRow>
+    </YStack>
+  ),
+};
+
+export const Equal: Story = {
+  render: () => (
+    <YStack width={400} maxWidth="100%">
+      <ButtonRow equal>
+        <Button variant="primary">Get started</Button>
+        <Button variant="secondary">Learn more</Button>
+      </ButtonRow>
+    </YStack>
+  ),
+};
+
+export const EqualThreeButtons: Story = {
+  render: () => (
+    <YStack width={400} maxWidth="100%">
+      <ButtonRow equal>
+        <Button variant="primary">Get started</Button>
+        <Button variant="secondary">Save a copy</Button>
+        <Button variant="secondary">Get the mobile app</Button>
+      </ButtonRow>
+    </YStack>
+  ),
+};
+
+export const EqualInCard: Story = {
+  render: () => (
+    <YStack width={400} maxWidth="100%">
+      <Card>
+        <ButtonRow equal>
+          <Button variant="primary">Get started</Button>
+          <Button variant="secondary">Save a copy</Button>
+          <Button variant="secondary">Get the mobile app</Button>
+        </ButtonRow>
+      </Card>
     </YStack>
   ),
 };

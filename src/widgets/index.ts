@@ -59,7 +59,6 @@ export { OptionCard, type OptionCardProps } from "./OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";
 export { ProgressBar, type ProgressBarProps } from "./ProgressBar.js";
 export { ButtonRow, type ButtonRowProps } from "./ButtonRow.js";
-export { EqualButtonRow, type EqualButtonRowProps } from "./EqualButtonRow.js";
 export { CardStack, type CardStackProps } from "./CardStack.js";
 export { ListStack, type ListStackProps } from "./ListStack.js";
 export { FieldRow, type FieldRowProps } from "./FieldRow.js";
