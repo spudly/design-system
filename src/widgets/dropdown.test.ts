@@ -31,6 +31,12 @@
  *    of react-native / react-native-svg, no "Spudly"-prefixed
  *    styled names, and no styling props (`style` / `className`) in
  *    either props type — DS components own their styles completely.
+ * 8. The connected surface (#474): while open, the trigger and
+ *    the panel square the corners where they touch — the aligned
+ *    edge's corner always, the far corner only when the two
+ *    laid-out widths match within 1px — through the context's
+ *    side/align/measured widths and the shared touchingCornerRadii
+ *    helper. Closed, the trigger passes no radius override.
  * 7. Runtime (SSR, against the built output): a closed dropdown
  *    renders its trigger as a button with `aria-haspopup` and
  *    `aria-expanded="false"` and does NOT render the panel content;
@@ -175,6 +181,39 @@ test("close-on-select is the context affordance (the spec's ExitContext descenda
   assert.match(dropdown, /export function useDropdownClose\(\): \(\) => void/);
   assert.match(dropdown, /return context\?\.close \?\? \(\(\) => undefined\)/);
   assert.match(dropdown, /<DropdownContext\.Provider value=\{contextValue\}>/);
+});
+
+test("the context carries the connected-surface geometry: side, align, and both measured widths (#474)", () => {
+  assert.match(dropdown, /side: DropdownSide/);
+  assert.match(dropdown, /align: DropdownAlign/);
+  assert.match(dropdown, /triggerWidth: number \| null/);
+  assert.match(dropdown, /panelWidth: number \| null/);
+  // The shell measures both widths itself: the trigger's on the
+  // trigger wrapper's onLayout, the panel's on the panel.
+  assert.match(dropdown, /setTriggerWidth\(event\.nativeEvent\.layout\.width\)/);
+  assert.match(dropdown, /setPanelWidth\(event\.nativeEvent\.layout\.width\)/);
+});
+
+test("only the corners that touch are squared: the aligned corner always, the far corner only when the widths match (#474)", () => {
+  assert.match(dropdown, /export function touchingCornerRadii\(/);
+  assert.match(dropdown, /if \(widthsMatch\)/);
+  assert.match(dropdown, /tokens\.radii\.zero/);
+  // The widths match within 1px after layout — the test both
+  // elements apply before squaring a far corner.
+  assert.match(dropdown, /Math\.abs\(triggerWidth - panelWidth\) <= 1/);
+  assert.match(dropdownButton, /Math\.abs\(context\.triggerWidth - context\.panelWidth\) <= 1/);
+  // The panel squares the edge facing the trigger; the trigger
+  // mirrors it on its own touching edge.
+  assert.match(
+    dropdown,
+    /touchingCornerRadii\(side === "bottom" \? "top" : "bottom", align, widthsMatch\)/,
+  );
+  assert.match(
+    dropdownButton,
+    /touchingCornerRadii\(context\.side === "bottom" \? "bottom" : "top", context\.align, widthsMatch\)/,
+  );
+  // Closed, the trigger computes no override at all.
+  assert.match(dropdownButton, /open && context !== null/);
 });
 
 test("the panel is a styled Popover.Content frame with the a11y label routed through the translator", () => {

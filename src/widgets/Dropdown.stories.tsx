@@ -188,3 +188,45 @@ function ControlledMenu() {
 export const Controlled: Story = {
   render: () => <ControlledMenu />,
 };
+
+/**
+ * The unequal-width case, panel wider (#474): a short trigger over
+ * long menu rows. Only the aligned (leading) touching corners
+ * square; the panel's far corner keeps its rounding where it
+ * overhangs the trigger and touches nothing.
+ */
+export const WidePanelShortButton: Story = {
+  render: () => (
+    <Dropdown
+      accessibilityLabel="Wide panel menu"
+      trigger={<DropdownButton label="More" />}
+      defaultOpen
+    >
+      <YStack>
+        <MenuRow label="Move this recipe to another collection" onAction={() => undefined} />
+        <MenuRow label="Remove from this week's meal plan" onAction={() => undefined} />
+      </YStack>
+    </Dropdown>
+  ),
+};
+
+/**
+ * The unequal-width case, trigger wider (#474): a long trigger
+ * label over short rows (the panel sits at its 200px minimum).
+ * Only the aligned touching corners square; the trigger's far
+ * corner keeps its rounding where the panel falls short.
+ */
+export const WideButtonShortPanel: Story = {
+  render: () => (
+    <Dropdown
+      accessibilityLabel="Wide button menu"
+      trigger={<DropdownButton label="Recipe actions for this week" />}
+      defaultOpen
+    >
+      <YStack>
+        <MenuRow label="Open" onAction={() => undefined} />
+        <MenuRow label="Print" onAction={() => undefined} />
+      </YStack>
+    </Dropdown>
+  ),
+};
