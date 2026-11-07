@@ -9,8 +9,7 @@ components from the package root, plus a minimal theme/config
 surface.** Apps consume pages — `import { RecipesPage } from "@spudly/ui"` —
 and, to build their app-level Tamagui config, the brand themes
 (`baseTheme`, `eciperayTheme`, `memorizeTheme`, and their types) and
-`createTamaguiConfig`; `ChunkErrorBoundary` is also exported for
-lazily loaded surfaces. Nothing else comes back: no other widget
+`createTamaguiConfig`. Nothing else comes back: no other widget
 components, no icons, no composite (form) components, no tokens or
 tag colors, no Storybook config factories, and no subpath exports.
 The modules under `src/widgets/`, `src/views/`, `src/icons/`, and `src/tokens/`

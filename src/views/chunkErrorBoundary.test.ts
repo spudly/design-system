@@ -3,8 +3,9 @@
  * (design-system#411, lifted from Memorize's app shell, memorize#54).
  *
  * The contracts pinned here:
- * 1. The boundary is exported from the views barrel (and, per
- *    #411, from the package root — pinned in
+ * 1. The boundary is exported from the views barrel (internal
+ *    only — #438's final major removed the #411 package-root
+ *    export; that removal is pinned in
  *    test/packageExports.test.ts).
  * 2. Its props/state are type aliases, not interfaces (the repo-wide
  *    rule, #214), and its only required prop is `children` — callers

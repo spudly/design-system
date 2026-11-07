@@ -12,9 +12,9 @@
  *    the brand themes (`baseTheme`, `eciperayTheme`,
  *    `memorizeTheme`) and their types (`Theme`, `SemanticColors`,
  *    `EciperayTheme`, `MemorizeTheme`) from src/themes/;
- *    `createTamaguiConfig` from src/tamagui.config.ts; and
- *    `ChunkErrorBoundary` with its prop/state types from
- *    src/views/ChunkErrorBoundary.tsx.
+ *    `createTamaguiConfig` from src/tamagui.config.ts.
+ *    (#438's final major removed the former `ChunkErrorBoundary`
+ *    root export; the boundary is an internal view now.)
  * 3. Nothing else is on the public surface: no other widget
  *    components, no icons, no composite (form) components, and
  *    no Storybook config factories or other
@@ -101,10 +101,6 @@ const restoredByModule: [string, string[]][] = [
     ],
   ],
   ["./tamagui.config.js", ["createTamaguiConfig"]],
-  [
-    "./views/ChunkErrorBoundary.js",
-    ["ChunkErrorBoundary", "ChunkErrorBoundaryProps", "ChunkErrorBoundaryState"],
-  ],
 ];
 
 const restoredNames = new Set(restoredByModule.flatMap(([, names]) => names));
@@ -143,9 +139,8 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions"
         "./tokens/index.js",
         "./themes/index.js",
         "./tamagui.config.js",
-        "./views/ChunkErrorBoundary.js",
       ]),
-      `${rel} must re-export from exactly the pages barrel and the three #411 source modules`,
+      `${rel} must re-export from exactly the pages barrel and the #411 source modules`,
     );
     // The built JS drops the type-only names (they are erased at
     // compile time); the source and the built declarations carry
@@ -161,7 +156,6 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions"
             "warmHarvestTagColors",
             "tagColorNameForHex",
             "createTamaguiConfig",
-            "ChunkErrorBoundary",
           ])
         : restoredNames;
     assert.deepEqual(
@@ -201,11 +195,7 @@ test("the public surface is exactly the pages barrel's names plus the #411 addit
   // internal modules do not have.
   for (const [specifier, names] of restoredByModule) {
     const sourceRel = `src/${specifier.replace(/^\.\//, "").replace(/\.js$/, "")}`;
-    const sourceNames = exportNames(
-      readCode(
-        specifier.endsWith("ChunkErrorBoundary.js") ? `${sourceRel}.tsx` : `${sourceRel}.ts`,
-      ),
-    );
+    const sourceNames = exportNames(readCode(`${sourceRel}.ts`));
     for (const name of names) {
       assert.ok(sourceNames.has(name), `${name} must be exported by ${specifier}'s source module`);
     }
@@ -227,9 +217,14 @@ test("no other widget, icon, token, theme, or config name is on the public surfa
   // Spot-pin the names downstream apps used to import from the
   // root, so a regression names the offender plainly. The #411
   // names (baseTheme, eciperayTheme, memorizeTheme,
-  // createTamaguiConfig, ChunkErrorBoundary) are deliberately NOT
-  // here — they are restored, and pinned as present above.
+  // createTamaguiConfig) are deliberately NOT here — they are
+  // restored, and pinned as present above. ChunkErrorBoundary
+  // WAS a #411 restoration, but #438's final major removed it
+  // from the root, so it is pinned as absent here.
   for (const banned of [
+    "ChunkErrorBoundary",
+    "ChunkErrorBoundaryProps",
+    "ChunkErrorBoundaryState",
     "Button",
     "Alert",
     "Dialog",

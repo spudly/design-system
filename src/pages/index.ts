@@ -2,8 +2,8 @@
  * Page components (#49): full-page, props-controlled views for the
  * apps' screens. The package root re-exports this barrel and,
  * since #411 amended #298, a minimal set of additions beside it
- * (the brand themes and their types, `createTamaguiConfig`, and
- * `ChunkErrorBoundary`); there are no subpath exports, and no
+ * (the brand themes and their types, and `createTamaguiConfig`);
+ * there are no subpath exports, and no
  * other widgets, icons, tokens, tag colors, or config factories
  * are exported from the package. Page components may import
  * react-native (e.g. FlatList); the old rule that the root entry

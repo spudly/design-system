@@ -38,9 +38,10 @@ export type LazySlotProps = {
  * Placement: a view (#438 Part 2's category) — internal to this
  * package, NOT exported from the package root. Pages compose it;
  * hosts pass lazy components INTO pages (Stephen's ChunkErrorBoundary
- * ruling on #438) and the pages slot them through here. The
- * `ChunkErrorBoundary` root export stays until Part 6's major,
- * once both apps render through pages that use this slot.
+ * ruling on #438) and the pages slot them through here.
+ * (#438's final major removed the `ChunkErrorBoundary` root
+ * export once both apps rendered through pages that use this
+ * slot; the boundary is internal now.)
  */
 export function LazySlot({ children, onReload }: LazySlotProps) {
   return (
