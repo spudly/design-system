@@ -95,12 +95,6 @@ export { VerseText, type VerseTextProps } from "./VerseText.js";
 // tranche PRs adopt these in their update rounds).
 export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
 export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
-export {
-  DocumentFooter,
-  type DocumentFooterLink,
-  type DocumentFooterProps,
-} from "./DocumentFooter.js";
-export { DocumentHeader, type DocumentHeaderProps } from "./DocumentHeader.js";
 export { FieldLabel, type FieldLabelProps } from "./FieldLabel.js";
 export { FieldStack, type FieldStackProps } from "./FieldStack.js";
 export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
@@ -115,12 +109,6 @@ export {
   type PresetValueOption,
   type PresetValueSelectorProps,
 } from "./PresetValueSelector.js";
-export { PublicFrameHeader, type PublicFrameHeaderProps } from "./PublicFrameHeader.js";
-export {
-  COLUMN_MAX_WIDTH,
-  PublicFrameLayout,
-  type PublicFrameLayoutProps,
-} from "./PublicFrameLayout.js";
 export {
   RatingsCard,
   type RatingsCardCommunityRating,

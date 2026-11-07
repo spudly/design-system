@@ -164,7 +164,7 @@ test("every page component renders BigFooter through the shell from a footer pro
 test("the shell reserves viewport height only when a footer is supplied", () => {
   // No footer data: no footer band and no full-viewport inner
   // shell, so a page composed inside a frame that owns the layout
-  // (PublicPageFrame) adds neither a second footer nor a 100dvh
+  // (a hub page composing a nested page) adds neither a second footer nor a 100dvh
   // reservation. The no-footer branch must come before (and stay
   // clear of) the sticky viewport shell.
   const noFooterBranch = bigFooter.indexOf("if (!footer)");
@@ -259,10 +259,12 @@ test("composed pages and stories render exactly one footer", () => {
       `${story} must not supply a footer to the nested RecipeFormPage`,
     );
   }
-  assert.doesNotMatch(
-    readCode("src/pages/PublicPageFrame.stories.tsx"),
-    /<PublicRecipePage\b[^>]*\bfooter\b/,
-    "the frame story must not supply a footer to the nested PublicRecipePage — the frame owns it",
+  // #473: PublicPageFrame is retired — PublicRecipePage owns its
+  // footer itself, so its stories supply the footer to the page.
+  assert.match(
+    readCode("src/pages/PublicRecipePage.stories.tsx"),
+    /<PublicRecipePage footer=\{eciperayFooterFixture\}/,
+    "the PublicRecipePage stories supply the footer to the page itself — the page owns it (#473)",
   );
 });
 

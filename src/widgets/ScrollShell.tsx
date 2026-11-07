@@ -16,8 +16,8 @@ export type ScrollShellProps = {
  * padding or spacing any of them itself (#119).
  *
  * The paint is the point: a public page renders inside a frame
- * that paints the theme background around its column
- * (PublicPageFrame), and the page's own surface paint is what the
+ * that paints the theme background around its column,
+ * and the page's own surface paint is what the
  * column's content sits on — in Warm Harvest that is #fffdf8 over
  * the frame's #faf6f0, so dropping the paint would visibly re-tint
  * every section. ScreenContainer is the unpainted alternative for

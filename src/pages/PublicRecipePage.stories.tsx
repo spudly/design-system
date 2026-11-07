@@ -13,15 +13,16 @@ import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
  * Tuscan chicken from recipeDetailFixture, as in the
  * RecipeDetailPage stories).
  *
- * The public surface is wide (the PublicPageFrame column is
+ * The public surface is wide (the public column is
  * max-w-3xl), so the frame pins a desktop viewport (1024×900)
  * instead of the phone frame the app pages use: the page is a
  * flex column over a single scroll view, so a bounded viewport is
  * what it composes against, and fixed dimensions keep Chromatic
  * screenshots deterministic. Theme pinned to Warm Harvest,
- * Eciperay's brand. The host wraps the page in PublicPageFrame;
- * these stories render the page alone, as the RecipeDetailPage
- * stories render that page alone.
+ * Eciperay's brand. The page renders its own BigFooter from
+ * its `footer` prop (#473 retired the PublicPageFrame page the
+ * host once wrapped it in); these stories render the page
+ * alone, as the RecipeDetailPage stories render that page alone.
  */
 const meta: Meta<typeof PublicRecipePage> = {
   title: "Pages/Eciperay/PublicRecipePage",

@@ -1,10 +1,16 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
 import { Anchor, XStack, YStack } from "tamagui";
-import { DocumentHeader } from "../widgets/DocumentHeader.js";
+import { BrandLink } from "../widgets/BrandLink.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Text } from "../widgets/Text.js";
-import { listItemRoleProps, listRoleProps, mainRoleProps } from "../widgets/accessibility.js";
+import { TextLink } from "../widgets/TextLink.js";
+import {
+  bannerRoleProps,
+  listItemRoleProps,
+  listRoleProps,
+  mainRoleProps,
+} from "../widgets/accessibility.js";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -41,7 +47,11 @@ import { tokens } from "../tokens/index.js";
  * the same frame shape serves the other public surfaces.
  *
  * The page composes components and passes data only (#119): the
- * frame's header is the shared DocumentHeader, its page footer
+ * header row — the brand wordmark (BrandLink) and the sign-in
+ * TextLink at the ends of a banner row — renders directly in
+ * this page (#473 retired the DocumentHeader /
+ * DocumentFooter / public-frame components it once composed;
+ * the row's shape is unchanged), its page footer
  * is BigFooter (#410 — the document's own closing link row was
  * retired with it; hosts pass legal links as BigFooter column
  * data through the page's `footer` prop), and the document
@@ -57,8 +67,8 @@ import { tokens } from "../tokens/index.js";
  * head/SEO, and the analytics consent banner.
  *
  * Landmarks (#366): on web the document column is the page's
- * `main` landmark (via `mainRoleProps`), DocumentHeader is
- * `banner`, and BigFooter is `contentinfo` — this page
+ * `main` landmark (via `mainRoleProps`), the header row is
+ * `banner` (via `bannerRoleProps`), and BigFooter is `contentinfo` — this page
  * renders the full frame itself and is the outermost chrome,
  * so it owns the landmarks; hosts must not wrap it in another
  * landmark-owning frame. Native is unaffected.
@@ -94,7 +104,7 @@ export type LegalDocumentLink = {
 /**
  * The document's prose column width: the same 768px (the web
  * layout's max-w-3xl) centered column the other public surfaces
- * render into (PublicFrameLayout's COLUMN_MAX_WIDTH), so the
+ * render into, so the
  * prose stays readable on wide viewports. The frame header and
  * footer stay outside the column, spanning the container as
  * before; on phone-width viewports the cap does not bind.
@@ -184,12 +194,12 @@ export function LegalDocumentPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <DocumentHeader
-          brandLabel={brandLabel}
-          brandHref={brandHref}
-          signInLabel={signInLabel}
-          signInHref={signInHref}
-        />
+        <XStack alignItems="center" justifyContent="space-between" gap="$4" {...bannerRoleProps}>
+          <BrandLink label={brandLabel} href={brandHref} />
+          <TextLink href={signInHref} fontWeight={tokens.typography.fontWeight.medium}>
+            {signInLabel}
+          </TextLink>
+        </XStack>
         <YStack
           width="100%"
           maxWidth={PROSE_MAX_WIDTH}

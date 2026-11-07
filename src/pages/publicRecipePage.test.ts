@@ -1,9 +1,10 @@
 /**
- * Contract test for PublicRecipePage + PublicPageFrame
+ * Contract test for PublicRecipePage
  * (spudly/design-system#169): Eciperay's public (signed-out, SEO)
  * recipe surface as a controlled DS page component, following the
- * RecipeDetailPage precedent, plus the public chrome as a DS
- * building block the other public surfaces (#168/#170/#171) reuse.
+ * RecipeDetailPage precedent. (#473 retired the PublicPageFrame
+ * page this test once also pinned — the page now renders its own
+ * BigFooter through BigFooterShell, like every other page.)
  *
  * The invariants pinned here are the ones the Eciperay web rewire
  * will depend on, and the decisions Stephen resolved on #169
@@ -33,12 +34,9 @@
  * 6. The shared section shapes (ingredients, instructions) are
  *    likewise reused from RecipeDetailPage by alias; the servings
  *    stepper and scale option set match the detail page's.
- * 7. The frame owns the public chrome: brand + Sign in header,
- *    the wide (max-w-3xl) centered column, the footer note and
- *    legal links — with navigation leaving through intent
- *    callbacks only, and no scroll view of its own (the page
- *    inside owns the scroll). (Pinned in
- *    test/publicPageFrame.test.ts.)
+ * 7. The page owns its public chrome: every state renders
+ *    BigFooter through BigFooterShell from its `footer` prop —
+ *    there is no separate frame page wrapping it (#473).
  * 8. Optional content is omitted cleanly: no image, description,
  *    prep/cook stats, tags row, ratings card, or comments appear
  *    unless their data/callback is provided.
@@ -77,7 +75,6 @@ const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../..", "src", "pages");
 const componentsDir = join(here, "../..", "src", "widgets");
 const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
-const frameSource = readFileSync(join(pagesDir, "PublicPageFrame.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
 const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
@@ -87,7 +84,6 @@ const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "
 const strip = (text: string) =>
   text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const code = strip(source);
-const frameCode = strip(frameSource);
 // The recipe sections are the shared library panels (see the
 // header), so the section scans read the panel sources; the
 // page source hosts the wiring pins (render order, status map).
@@ -98,33 +94,28 @@ const ingredientsCode = strip(
 const ratingsCode = strip(ratingsSource);
 const scrollShellCode = strip(scrollShellSource);
 
-test("PublicRecipePage and PublicPageFrame are exported from the pages barrel", () => {
+test("PublicRecipePage is exported from the pages barrel; PublicPageFrame is retired (#473)", () => {
   assert.match(index, /PublicRecipePage,/, "index.ts must export PublicRecipePage");
   assert.match(
     index,
     /from "\.\/PublicRecipePage\.js"/,
     "the export must come from ./PublicRecipePage.js",
   );
-  assert.match(index, /PublicPageFrame,/, "index.ts must export PublicPageFrame");
-  assert.match(
-    index,
-    /from "\.\/PublicPageFrame\.js"/,
-    "the frame export must come from ./PublicPageFrame.js",
+  assert.ok(
+    !index.includes("PublicPageFrame"),
+    "PublicPageFrame must no longer be exported (#473)",
   );
   assert.match(code, /export function PublicRecipePage/);
-  assert.match(frameCode, /export function PublicPageFrame/);
 });
 
-test("the views import no app package and run no data hooks", () => {
-  for (const [name, text] of [
-    ["PublicRecipePage", code],
-    ["PublicPageFrame", frameCode],
-  ]) {
-    assert.ok(!text.includes("@eciperay"), `${name} must not import an app package`);
-    assert.ok(!text.includes("useQuery"), `${name} must not fetch (queries stay app-side)`);
-    assert.ok(!text.includes("useMutation"), `${name} must not mutate (mutations stay app-side)`);
-    assert.ok(!text.includes("@tanstack"), `no react-query in ${name}`);
-  }
+test("the view imports no app package and runs no data hooks", () => {
+  assert.ok(!code.includes("@eciperay"), "PublicRecipePage must not import an app package");
+  assert.ok(!code.includes("useQuery"), "PublicRecipePage must not fetch (queries stay app-side)");
+  assert.ok(
+    !code.includes("useMutation"),
+    "PublicRecipePage must not mutate (mutations stay app-side)",
+  );
+  assert.ok(!code.includes("@tanstack"), "no react-query in PublicRecipePage");
 });
 
 test("error states live inside the props union, branched before the ready render", () => {
@@ -359,7 +350,6 @@ test("the status badge map is page-owned with the idea fallback", () => {
 
 test("no explicit lineHeight anywhere in the new files (#162)", () => {
   assert.ok(!code.includes("lineHeight"), "the page must not set lineHeight");
-  assert.ok(!frameCode.includes("lineHeight"), "the frame must not set lineHeight");
   for (const [name, text] of [
     ["the overview section", overviewCode],
     ["the ingredients section", ingredientsCode],

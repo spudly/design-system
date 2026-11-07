@@ -807,20 +807,12 @@ or a changeset naming them.
 
 ---
 
-## Public frame & document chrome
+## Public chrome (BigFooter & BrandLink)
 
-Open in `Widgets/PublicFrameLayout`: Default;
-`Widgets/PublicFrameHeader`: Default;
-`Widgets/BigFooter`: Default, Memorize, NoSocialsYet, MobileStacked, StickyOnShortPage;
-`Widgets/BrandLink`: Default;
-`Widgets/DocumentHeader`: Default;
-`Widgets/DocumentFooter`: Default.
+Open in `Widgets/BigFooter`: Default, Memorize, NoSocialsYet, MobileStacked, StickyOnShortPage;
+`Widgets/BrandLink`: Default.
 
-1. The header band: wordmark left, Sign in right — both are
-   real links (the DOM nodes are anchors carrying their
-   hrefs; right-click offers "Open in new tab"). The wordmark
-   is the semibold primary wordmark with no underline.
-2. The footer band (BigFooter, #410): the big brand wordmark,
+1. The footer band (BigFooter, #410): the big brand wordmark,
    the link columns, app-store links, and social icon links the
    caller passed in as the one `footer` object (the story passes
    a Legal column with Privacy / Terms / Do Not Sell or Share),
@@ -829,17 +821,16 @@ Open in `Widgets/PublicFrameLayout`: Default;
    MobileStacked story) the columns collapse to a stacked
    single column with no horizontal scrolling; on a short page
    (StickyOnShortPage) the footer sits at the viewport bottom.
-3. The layout centers its content column at 768px on wide
-   viewports and fills narrow ones; header and footer bands
-   span the full width.
-4. DocumentHeader: the same wordmark + sign-in link contract
-   in the lighter in-column row (no band); DocumentFooter
-   renders the caller's links as links under its divider.
+2. BrandLink: the wordmark is the semibold primary wordmark
+   with no underline, rendered as a real link (the DOM node is
+   an anchor carrying its href; right-click offers "Open in
+   new tab"). Public pages render it in their header rows —
+   check LegalDocumentPage's header row for the same contract
+   in place.
 
-**Run when:** `src/widgets/PublicFrameLayout.tsx`,
-`PublicFrameHeader.tsx`, `BigFooter.tsx`,
-`BrandLink.tsx`, `DocumentHeader.tsx`, `DocumentFooter.tsx`,
-their stories, or a changeset naming any of them.
+**Run when:** `src/widgets/BigFooter.tsx`,
+`BrandLink.tsx`, their stories, or a changeset naming any of
+them.
 
 ---
 
@@ -1053,8 +1044,7 @@ TermsOfService, Wide.
    host's legal links) render as real links.
 
 **Run when:** `src/pages/LegalDocumentPage.tsx`, its stories,
-DocumentHeader / DocumentFooter, or a changeset naming
-LegalDocumentPage.
+or a changeset naming LegalDocumentPage.
 
 ---
 
@@ -1421,17 +1411,11 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
 6. Instructions: the first step card is highlighted (primary
    border and tint) on open; pressing another card moves the
    highlight to it. Steps render in step-number order.
-7. Open in `Pages/Eciperay/PublicPageFrame`: Default, Content,
-   NarrowViewport. The header (Eciperay brand, Sign in) and footer (the
-   without-an-account note, Privacy Policy, Terms of Service)
-   frame the centered wide column; in NarrowViewport the column fills the
-   phone width and the footer wraps without overlap.
-
-**Run when:** `src/pages/PublicRecipePage.tsx`,
-`src/pages/PublicPageFrame.tsx`, their stories, the recipe
-panels the page composes (RecipeOverviewPanel,
-RecipeIngredientsPanel, RecipeInstructionsPanel), or a
-changeset naming PublicRecipePage or PublicPageFrame.
+   **Run when:** `src/pages/PublicRecipePage.tsx`,
+   its stories, the recipe
+   panels the page composes (RecipeOverviewPanel,
+   RecipeIngredientsPanel, RecipeInstructionsPanel), or a
+   changeset naming PublicRecipePage.
 
 ---
 

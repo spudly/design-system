@@ -1,18 +1,17 @@
 /**
- * Landmark test for the public frame and legal page
- * (spudly/design-system#366).
+ * Landmark test for the legal page
+ * (spudly/design-system#366; frame components retired by #473).
  *
  * The retired web layouts rendered real `<header>`, `<main>`,
  * and `<footer>` elements; their DS replacements rendered none,
  * so screen-reader users could not navigate the public surfaces
- * by landmark. The fix gives the frame components landmark
+ * by landmark. The fix gives the page landmark
  * semantics on web through the shared accessibility translation
  * in src/widgets/accessibility.ts (the #256 pattern):
  *
- * - PublicFrameHeader / DocumentHeader — `banner`
- * - PublicFrameLayout's content column / LegalDocumentPage's
- *   document column — `main`
- * - PublicFrameFooter / DocumentFooter — `contentinfo`
+ * - LegalDocumentPage's header row — `banner`
+ * - LegalDocumentPage's document column — `main`
+ * - BigFooter — `contentinfo`
  *
  * `banner`, `main`, and `contentinfo` are ARIA-only roles: they
  * are not members of React Native's `accessibilityRole` set, so
@@ -22,11 +21,10 @@
  * is unaffected.
  *
  * Duplicate-landmark care: each composed surface must render
- * exactly one banner, one main, and one contentinfo. The public
- * frame (PublicFrameLayout + its bands, composed by
- * PublicPageFrame) and LegalDocumentPage (ScreenContainer +
- * DocumentHeader / DocumentFooter + its document column) are
- * each the outermost chrome on their surface, so each owns its
+ * exactly one banner, one main, and one contentinfo.
+ * LegalDocumentPage (ScreenContainer + its inline header row +
+ * its document column, with BigFooter through BigFooterShell) is
+ * the outermost chrome on its surface, so it owns its
  * landmarks; no inner page component adds landmarks of its own
  * (pinned by the source scan below).
  */
@@ -47,11 +45,7 @@ function readCode(rel: string) {
 }
 
 const a11y = readCode("src/widgets/accessibility.ts");
-const layout = readCode("src/widgets/PublicFrameLayout.tsx");
-const publicHeader = readCode("src/widgets/PublicFrameHeader.tsx");
 const publicFooter = readCode("src/widgets/BigFooter.tsx");
-const docHeader = readCode("src/widgets/DocumentHeader.tsx");
-const docFooter = readCode("src/widgets/DocumentFooter.tsx");
 const legalPage = readCode("src/pages/LegalDocumentPage.tsx");
 
 test("the shared translation exports web-only landmark props (#366)", () => {
@@ -70,7 +64,7 @@ test("the shared translation exports web-only landmark props (#366)", () => {
   // Landmarks must never go through accessibilityRole: banner /
   // main / contentinfo are not RN roles and would crash Android
   // (the accessibilityRoles scan pins that invariant globally).
-  for (const code of [layout, publicHeader, docHeader, docFooter, legalPage]) {
+  for (const code of [legalPage]) {
     assert.ok(
       !code.includes("accessibilityRole"),
       "landmarks use the web role prop, not accessibilityRole",
@@ -78,14 +72,8 @@ test("the shared translation exports web-only landmark props (#366)", () => {
   }
 });
 
-test("the public frame components carry their landmarks (#366)", () => {
-  assert.match(publicHeader, /\{\.\.\.bannerRoleProps\}/, "PublicFrameHeader is banner");
-  assert.match(layout, /\{\.\.\.mainRoleProps\}/, "PublicFrameLayout's content column is main");
-  assert.match(publicFooter, /\{\.\.\.contentInfoRoleProps\}/, "BigFooter is contentinfo (#410)");
-});
-
-test("the legal page's frame composition carries its landmarks (#366)", () => {
-  assert.match(docHeader, /\{\.\.\.bannerRoleProps\}/, "DocumentHeader is banner");
+test("the legal page's composition carries its landmarks (#366)", () => {
+  assert.match(legalPage, /\{\.\.\.bannerRoleProps\}/, "the header row is banner");
   assert.match(legalPage, /\{\.\.\.mainRoleProps\}/, "the document column is main");
   assert.match(
     publicFooter,
@@ -98,11 +86,7 @@ test("no other source file adds a landmark role — no duplicates inside the fra
   const srcDir = join(root, "src");
   const owners = new Set([
     join(srcDir, "widgets", "accessibility.ts"),
-    join(srcDir, "widgets", "PublicFrameLayout.tsx"),
-    join(srcDir, "widgets", "PublicFrameHeader.tsx"),
     join(srcDir, "widgets", "BigFooter.tsx"),
-    join(srcDir, "widgets", "DocumentHeader.tsx"),
-    join(srcDir, "widgets", "DocumentFooter.tsx"),
     join(srcDir, "pages", "LegalDocumentPage.tsx"),
   ]);
   function files(dir: string): string[] {
@@ -205,32 +189,6 @@ function assertLandmarks(html: string, insideMain: any) {
   );
 }
 
-function publicFrameElement(
-  React: any,
-  { PublicFrameLayout, PublicFrameHeader, BigFooter, Text }: any,
-) {
-  return React.createElement(
-    PublicFrameLayout,
-    {
-      header: React.createElement(PublicFrameHeader, {
-        brandLabel: "Eciperay",
-        brandHref: "/",
-        signInLabel: "Sign in",
-        signInHref: "/sign-in",
-      }),
-      footer: React.createElement(BigFooter, {
-        footer: {
-          brand: { label: "Eciperay", href: "/" },
-          columns: [{ title: "Legal", links: [{ label: "Privacy Policy", href: "/privacy" }] }],
-          storeLinks: [],
-          socialLinks: [],
-        },
-      }),
-    },
-    React.createElement(Text, null, "Page content"),
-  );
-}
-
 const legalFixture = {
   title: "Privacy Policy",
   lastUpdated: "July 22, 2026",
@@ -259,12 +217,6 @@ const legalFixture = {
     },
   ],
 };
-
-test("SSR: the public frame renders exactly one banner, main, and contentinfo (#366)", async () => {
-  const runtime = await loadRuntime();
-  const html = await renderToHtml(publicFrameElement(runtime.React, runtime));
-  assertLandmarks(html, "Page content");
-});
 
 test("SSR: LegalDocumentPage renders exactly one banner, main, and contentinfo (#366)", async () => {
   const { React, LegalDocumentPage } = await loadRuntime();

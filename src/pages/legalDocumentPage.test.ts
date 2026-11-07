@@ -49,13 +49,12 @@ const code = readCode("src/pages/LegalDocumentPage.tsx");
 // ProseDocument library component, but Stephen's
 // no-new-components rule for tranche PRs (2026-10-29) folded
 // them back — the page was the only consumer, and its public
-// Legal* type names now define the model directly. The frame
-// stays in the shared DocumentHeader / DocumentFooter. The
-// model and rendering pins below scan the page (`prose` is the
-// page source), the frame pins scan the frame components.
+// Legal* type names now define the model directly. The header
+// row likewise renders directly in the page since #473 retired
+// the DocumentHeader / DocumentFooter components. The model,
+// rendering, and frame pins below all scan the page (`prose`
+// is the page source).
 const prose = code;
-const docHeader = readCode("src/widgets/DocumentHeader.tsx");
-const docFooter = readCode("src/widgets/DocumentFooter.tsx");
 
 test("content crosses as structured section/block/span data (#170)", () => {
   for (const spanType of ['"text"', '"strong"', '"code"', '"link"']) {
@@ -95,10 +94,17 @@ test("link spans render as real anchors with the data's href — no press callba
 });
 
 test("the full public frame renders: brand, sign-in, and footer links as hrefs (#170)", () => {
-  assert.match(docHeader, /href=\{brandHref\}/, "brand wordmark is a link with the brand href");
-  assert.match(docHeader, /href=\{signInHref\}/, "sign-in is a link with the sign-in href");
-  assert.match(code, /brandHref=\{brandHref\}/, "the page passes its brand href to the header");
-  assert.match(code, /signInHref=\{signInHref\}/, "the page passes its sign-in href to the header");
+  // #473: the header row renders directly in the page — the
+  // brand wordmark is BrandLink and sign-in is a TextLink, both
+  // real links carrying the page's href props, in a banner row.
+  assert.match(
+    code,
+    /<BrandLink label=\{brandLabel\} href=\{brandHref\} \/>/,
+    "brand wordmark is a link with the brand href",
+  );
+  assert.match(code, /<TextLink href=\{signInHref\}/, "sign-in is a link with the sign-in href");
+  assert.match(code, /\{signInLabel\}/, "the page renders its sign-in label in the header row");
+  assert.match(code, /\{\.\.\.bannerRoleProps\}/, "the header row is the page's banner landmark");
   // #410: the page footer is BigFooter, rendered by the page's
   // BigFooterShell from the ONE footer prop object; the host's
   // legal links cross as that object's column data.
@@ -109,6 +115,7 @@ test("the full public frame renders: brand, sign-in, and footer links as hrefs (
   );
   assert.match(code, /footer\?: BigFooterData/, "the footer crosses as one BigFooterData object");
   assert.ok(!code.includes("DocumentFooter"), "the page keeps no distinct footer (#410)");
+  assert.ok(!code.includes("DocumentHeader"), "the retired DocumentHeader is not composed (#473)");
 });
 
 test("the document renders in a prose column; list blocks carry list semantics (#170)", () => {

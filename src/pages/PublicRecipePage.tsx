@@ -61,10 +61,11 @@ import type {
  *   no-error-state stance does not bind here — there the app has
  *   no error UI at all, while here the error cards are designed
  *   surface.
- * - The public chrome is a separate DS building block,
- *   PublicPageFrame: the host wraps every state of this page
- *   (loading, errors, ready) in the frame, as the web host wraps
- *   its states in its public layout today.
+ * - The page renders its own footer: every state (loading,
+ *   errors, ready) renders through BigFooterShell from the
+ *   state's `footer` prop, the standard page pattern (#410).
+ *   #473 retired the separate PublicPageFrame page the host
+ *   once wrapped this page in — there is no host-side frame.
  *
  * The CTA bar sits above the sections, its variant chosen by the
  * host's auth state: signed-out visitors get sign-up / clone /
@@ -352,9 +353,9 @@ function InstructionsSection({ instructions }: { instructions: PublicRecipePageI
  * in a single scroll view (no tabs — overview, ingredients,
  * instructions, engagement, in the order the tabs had), or one of
  * the union's non-ready states (loading gate, not-found card,
- * unavailable card). The host wraps every state in
- * PublicPageFrame. Controlled — see the file header for the
- * contract, the decisions, and the slot design.
+ * unavailable card). Every state renders its own BigFooter
+ * through BigFooterShell. Controlled — see the file header for
+ * the contract, the decisions, and the slot design.
  */
 export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "loading") {
