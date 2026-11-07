@@ -7,7 +7,7 @@
  * them and pass data and callbacks only. (The bar's behavior
  * contract — the #96 chooser, the removal/clearing semantics —
  * is pinned here against the bar's own source;
- * test/discoverPage.test.ts pins the page's composition, not
+ * src/pages/DiscoverPage.test.ts pins the page's composition, not
  * the bar. This file pins the extraction shape — exports, the
  * header geometry, and the loading state's treatment — plus
  * that behavior.)

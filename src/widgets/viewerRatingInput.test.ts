@@ -12,8 +12,8 @@
  * passes readOnly={onChange === undefined} and
  * disabled={isPending} to StarRatingInput, so the semantics
  * reach the star controls themselves. The card- and input-level
- * behavior is pinned in ratingsCard.test.ts and
- * starRatingInput.test.ts (including the SSR pins: no focusable
+ * behavior is pinned in RatingsCard.test.ts and
+ * StarRatingInput.test.ts (including the SSR pins: no focusable
  * controls when read-only, unfocusable + announced disabled +
  * dimmed exactly once while pending). These pins hold the page
  * surface so the defect cannot return page-locally.
@@ -57,7 +57,7 @@ for (const [name, rel] of pages) {
 
   test(`${name} routes the viewer rating through the shared RatingsCard (#330)`, () => {
     // RatingsCard's adapter owns the readOnly/disabled semantics
-    // (pinned in ratingsCard.test.ts); the page only threads its
+    // (pinned in RatingsCard.test.ts); the page only threads its
     // view-model and change handler through.
     assert.match(
       code,

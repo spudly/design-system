@@ -9,7 +9,7 @@
  *    through the accessibility translator (an accessibility
  *    element named on both platforms) and renders an unnamed
  *    image decorative; that mechanism is pinned in
- *    thumbnail.test.ts. (Before the #119 ai-import tranche
+ *    Thumbnail.test.ts. (Before the #119 ai-import tranche
  *    the page applied the name to a raw RN Image itself.)
  * 2. ImportTextPage's paste field carries the accessible name
  *    "Recipe text" (the retired web editor's name), not just a
@@ -83,7 +83,7 @@ test("ImportReviewPage applies imageAlt as the hero image's accessible name", ()
   assert.match(
     code,
     /\{\.\.\.\(imageAlt \? \{ accessibilityLabel: imageAlt \} : \{\}\)\}/,
-    "imageAlt must cross as Thumbnail's accessibilityLabel when supplied (Thumbnail makes a named image an accessibility element and keeps an unnamed one decorative — pinned in thumbnail.test.ts)",
+    "imageAlt must cross as Thumbnail's accessibilityLabel when supplied (Thumbnail makes a named image an accessibility element and keeps an unnamed one decorative — pinned in Thumbnail.test.ts)",
   );
   assert.doesNotMatch(
     code,

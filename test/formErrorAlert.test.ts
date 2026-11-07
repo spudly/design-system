@@ -2,7 +2,7 @@
  * Contract tests for #329 (Stephen's decision, Option B): form-level
  * errors are announced to screen readers by rendering them through
  * the Alert component with severity "error" — Alert's error severity
- * carries the assertive alert role (pinned in alert.test.ts) —
+ * carries the assertive alert role (pinned in Alert.test.ts) —
  * instead of a plain error-variant Text line with no live-region
  * semantics.
  *

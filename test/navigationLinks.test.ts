@@ -167,7 +167,7 @@ test("BackLink: href is optional and renders the row inside a styled Anchor (#24
   assert.match(backLink, /if \(props\.href !== undefined\) \{/);
   assert.match(backLink, /<StyledBackAnchor href=\{props\.href\}/);
   // The callback form is untouched: the pinned XStack pressable and
-  // its translator call survive (see also test/backLink.test.ts).
+  // its translator call survive (see also src/widgets/BackLink.test.ts).
   assert.match(backLink, /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/);
 });
 

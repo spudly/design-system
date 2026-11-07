@@ -8,7 +8,7 @@
  * Toolbar — the recipedetail tranche's pinned bar — joins the
  * set in the #119 extraction round and is pinned here;
  * StatusMessage retired into CenteredText
- * (test/centeredText.test.ts) in the dedupe.
+ * (src/widgets/CenteredText.test.ts) in the dedupe.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
