@@ -370,7 +370,7 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
     return (
       <BigFooterShell footer={props.footer}>
         <MainLandmark>
-          <Center>
+          <Center flex={1}>
             <Spinner label="Loading recipe" />
           </Center>
         </MainLandmark>

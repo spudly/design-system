@@ -132,7 +132,7 @@ test("error states live inside the props union, branched before the ready render
   }
   assert.match(
     code,
-    /<Center>\s*<Spinner label="Loading recipe" \/>\s*<\/Center>/,
+    /<Center flex=\{1\}>\s*<Spinner label="Loading recipe" \/>\s*<\/Center>/,
     "the loading state renders a centered DS Spinner (Center + Spinner)",
   );
   assert.match(code, /<MessageCard title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);

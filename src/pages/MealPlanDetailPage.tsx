@@ -266,7 +266,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   if (props.state === "loading") {
     return (
       <BigFooterShell footer={props.footer}>
-        <Center>
+        <Center flex={1}>
           <Spinner label="Loading meal plan" />
         </Center>
       </BigFooterShell>

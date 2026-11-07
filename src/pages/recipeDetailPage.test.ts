@@ -108,7 +108,7 @@ test("the loading state renders only the spinner shell", () => {
   assert.ok(loadingAt < chromeAt, "the loading branch must come before the chrome render");
   assert.match(
     code,
-    /<Center>\s*<Spinner label="Loading recipe" \/>\s*<\/Center>/,
+    /<Center flex=\{1\}>\s*<Spinner label="Loading recipe" \/>\s*<\/Center>/,
     "the loading shell renders a centered DS Spinner (Center + Spinner, the spinner carrying the label)",
   );
 });
