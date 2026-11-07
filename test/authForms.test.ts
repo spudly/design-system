@@ -96,6 +96,7 @@ const PAGE_FORM_PROPS: Record<string, string[]> = {
     "onPasswordChange={onPasswordChange}",
     "loading={loading}",
     "error={error}",
+    "emailError={emailError}",
     "onSubmit={onSubmit}",
     "signUpHref={signUpHref}",
     "forgotPasswordHref={forgotPasswordHref}",
@@ -109,6 +110,7 @@ const PAGE_FORM_PROPS: Record<string, string[]> = {
     "onPasswordChange={onPasswordChange}",
     "loading={loading}",
     "error={error}",
+    "emailError={emailError}",
     "onSubmit={onSubmit}",
     "signInHref={signInHref}",
     "legalNotice={legalNotice}",
@@ -118,6 +120,7 @@ const PAGE_FORM_PROPS: Record<string, string[]> = {
     "onEmailChange={onEmailChange}",
     "loading={loading}",
     "error={error}",
+    "emailError={emailError}",
     "onSubmit={onSubmit}",
     "signInHref={signInHref}",
   ],
@@ -139,6 +142,30 @@ test("auth pages forward their props to their forms", () => {
       assert.ok(invocation[0].includes(prop), `${page} forwards ${prop}`);
     }
   }
+});
+
+test("the email-bearing forms thread emailError to the email field only (#535)", () => {
+  for (const form of ["SignInForm", "SignUpForm", "ForgotPasswordForm"]) {
+    const source = read(`src/views/${form}.tsx`);
+    assert.ok(
+      source.includes("emailError?: string | null | undefined;"),
+      `${form} declares emailError`,
+    );
+    assert.ok(
+      source.includes("{...(emailError ? { error: emailError } : {})}"),
+      `${form} passes emailError to its email TextField`,
+    );
+    assert.equal(
+      source.split("{...(emailError ? { error: emailError } : {})}").length - 1,
+      1,
+      `${form} threads emailError exactly once (the email field only)`,
+    );
+  }
+  const reset = read("src/views/ResetPasswordForm.tsx");
+  assert.ok(
+    !reset.includes("emailError"),
+    "ResetPasswordForm has no email field and no emailError",
+  );
 });
 
 test("each form's submit button is named for the label it renders, in both states", () => {

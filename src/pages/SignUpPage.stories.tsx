@@ -50,10 +50,12 @@ function LegalNotice() {
  */
 function Interactive({
   error,
+  emailError,
   initialLoading = false,
   initialPassword = filledValue,
 }: {
   error?: string;
+  emailError?: string;
   initialLoading?: boolean;
   initialPassword?: string;
 }) {
@@ -73,6 +75,7 @@ function Interactive({
         onPasswordChange={setPassword}
         loading={loading}
         error={error ?? null}
+        emailError={emailError ?? null}
         onSubmit={() => setLoading(true)}
         signInHref="/signin"
         legalNotice={<LegalNotice />}
@@ -91,6 +94,10 @@ export const WithError: Story = {
   render: () => (
     <Interactive error="Password must be at least 8 characters." initialPassword="short" />
   ),
+};
+
+export const WithEmailError: Story = {
+  render: () => <Interactive emailError="Enter a valid email address." />,
 };
 
 export const Loading: Story = {

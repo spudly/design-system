@@ -37,6 +37,10 @@ export type SignInPageProps = {
   onPasswordChange: (value: string) => void;
   loading?: boolean;
   error?: string | null;
+  /** The host's field-level email validation error (#535):
+   * renders under the email field with the field's error
+   * styling, distinct from the form-level `error` alert. */
+  emailError?: string | null;
   onSubmit: () => void;
   /** The create-account destination (#248: navigation crosses as
    * an href, not a press callback); the link renders only when
@@ -54,6 +58,7 @@ export function SignInPage({
   onPasswordChange,
   loading = false,
   error,
+  emailError,
   onSubmit,
   signUpHref,
   forgotPasswordHref,
@@ -71,6 +76,7 @@ export function SignInPage({
             onPasswordChange={onPasswordChange}
             loading={loading}
             error={error}
+            emailError={emailError}
             onSubmit={onSubmit}
             signUpHref={signUpHref}
             forgotPasswordHref={forgotPasswordHref}

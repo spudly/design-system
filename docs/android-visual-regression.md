@@ -297,7 +297,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-editrecipepage               | light_warmHarvest |       1 |         1 |
 | pages-eciperay-editversionpage              | light_warmHarvest |       2 |         2 |
 | pages-eciperay-feedbackpage                 | light_warmHarvest |       2 |         2 |
-| pages-eciperay-forgotpasswordpage           | light_warmHarvest |       2 |         2 |
+| pages-eciperay-forgotpasswordpage           | light_warmHarvest |       3 |         2 |
 | pages-eciperay-homepage                     | light_warmHarvest |       3 |         3 |
 | pages-eciperay-importimagepage              | light_warmHarvest |       1 |         1 |
 | pages-eciperay-importreviewpage             | light_warmHarvest |       2 |         2 |
@@ -323,8 +323,8 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-resetpasswordpage            | light_warmHarvest |       2 |         2 |
 | pages-eciperay-routeerrorpage               | light_warmHarvest |       2 |         2 |
 | pages-eciperay-shoppinglistpage             | light_warmHarvest |       3 |         3 |
-| pages-eciperay-signinpage                   | light_warmHarvest |       3 |         3 |
-| pages-eciperay-signuppage                   | light_warmHarvest |       3 |         3 |
+| pages-eciperay-signinpage                   | light_warmHarvest |       4 |         3 |
+| pages-eciperay-signuppage                   | light_warmHarvest |       4 |         3 |
 | pages-eciperay-tagspage                     | light_warmHarvest |       4 |         4 |
 | pages-memorize                              | light_quietDawn   |       4 |         4 |
 | pages-memorize-memorizationsessionpage      | light_quietDawn   |       5 |         5 |
@@ -333,7 +333,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-tabbedshellpage              | light_quietDawn   |       6 |         6 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **171** |   **171** |
+| **Total**                                   |                   | **174** |   **171** |
 
 <!-- VR-COVERAGE-END -->
 

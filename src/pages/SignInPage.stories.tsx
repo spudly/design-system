@@ -32,9 +32,11 @@ function Viewport({ children }: { children: ReactNode }) {
  */
 function Interactive({
   error,
+  emailError,
   initialLoading = false,
 }: {
   error?: string;
+  emailError?: string;
   initialLoading?: boolean;
 }) {
   const [email, setEmail] = useState("cook@example.com");
@@ -50,6 +52,7 @@ function Interactive({
         onPasswordChange={setPassword}
         loading={loading}
         error={error ?? null}
+        emailError={emailError ?? null}
         onSubmit={() => setLoading(true)}
         signUpHref="/signup"
         forgotPasswordHref="/forgot-password"
@@ -64,6 +67,10 @@ export const Filled: Story = {
 
 export const WithError: Story = {
   render: () => <Interactive error="Invalid email or password." />,
+};
+
+export const WithEmailError: Story = {
+  render: () => <Interactive emailError="Enter a valid email address." />,
 };
 
 export const Loading: Story = {

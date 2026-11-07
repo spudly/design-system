@@ -29,6 +29,10 @@ export type ForgotPasswordFormProps = {
   onEmailChange: (value: string) => void;
   loading?: boolean | undefined;
   error?: string | null | undefined;
+  /** The host's field-level email validation error (#535):
+   * renders under the email field with the field's error
+   * styling, distinct from the form-level `error` alert. */
+  emailError?: string | null | undefined;
   onSubmit: () => void;
   /** The sign-in destination (#248: navigation crosses as an
    * href, not a press callback); the "Back to sign in" link
@@ -41,6 +45,7 @@ export function ForgotPasswordForm({
   onEmailChange,
   loading = false,
   error,
+  emailError,
   onSubmit,
   signInHref,
 }: ForgotPasswordFormProps) {
@@ -59,6 +64,7 @@ export function ForgotPasswordForm({
         autoCapitalize="none"
         keyboardType="email-address"
         accessibilityLabel="Email"
+        {...(emailError ? { error: emailError } : {})}
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
