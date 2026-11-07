@@ -116,11 +116,11 @@ function sourceFiles(dir: string): string[] {
 // RatingStars (RecipesPage's page-local log-cook control) is
 // sanctioned on the same ground: its pressable form routes
 // the label through platformAccessibilityProps onto its target.
-// Alert is sanctioned on the same ground again (#460): it
-// destructures the caller's RN props out of rest and routes
-// them through platformAccessibilityProps like Button/Text.
+// Alert is sanctioned on the same ground again (#460): it routes
+// caller RN props through platformAccessibilityProps like Button/Text;
+// ButtonInternal (#480) is Button's own internal form — same routing.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert".split(
+  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert".split(
     ",",
   ),
 );
