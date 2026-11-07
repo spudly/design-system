@@ -160,6 +160,15 @@ test("every form shares one height per size in the frame config (#469)", () => {
   assert.match(button, /sm: \{\s*fontSize: tokens\.typography\.fontSize\.sm,\s*minHeight: 44,/);
   assert.match(button, /md: \{\s*fontSize: tokens\.typography\.fontSize\.md,\s*minHeight: 48,/);
   assert.match(button, /lg: \{\s*fontSize: tokens\.typography\.fontSize\.lg,\s*minHeight: 56,/);
+  // lg vertical padding is spacing[3]: at spacing[4] the 24px glyph + padding + border totals 58px, above the 56px box.
+  const lgVariant = button.slice(
+    button.indexOf("minHeight: 56,"),
+    button.indexOf("minHeight: 56,") + 400,
+  );
+  assert.ok(
+    lgVariant.includes("paddingVertical: tokens.spacing[3],"),
+    "the lg size variant must use spacing[3] vertical padding so its content fits the 56px height",
+  );
 });
 
 test("the glyph-to-label gap is Button's own fixed spacing (#178)", () => {

@@ -105,7 +105,12 @@ const buttonFrameConfig = {
         fontSize: tokens.typography.fontSize.lg,
         minHeight: 56,
         paddingHorizontal: tokens.spacing[6],
-        paddingVertical: tokens.spacing[4],
+        // spacing[3], not [4]: with the 24px lg glyph, spacing[4]
+        // padding totals 58px with the border — taller than the
+        // 56px icon-only box this size must match (#469, CodeRabbit
+        // finding on PR #520). At spacing[3] the content totals
+        // 50px, so minHeight governs the single-line height.
+        paddingVertical: tokens.spacing[3],
       },
     },
     // The ghost treatment (#463): a boolean, not a variant, so it
