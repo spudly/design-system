@@ -23,7 +23,18 @@ const StyledTrackActive = styled(TamaguiSlider.TrackActive, {
   name: "SliderTrackActive",
 
   backgroundColor: "$primary",
-  borderRadius: tokens.radii.full,
+  // The left end rounds with the track; the right end is SQUARE.
+  // The fill's right end meets the knob mid-track, and a rounded
+  // corner there shows as a visible notch of unfilled track against
+  // the knob when it sits toward the left (#517 review). Squared,
+  // the fill runs clean under the knob, which covers the joint.
+  // At the maximum value the fill reaches the track's own right
+  // end, where the track's rounded, overflow-hidden box clips it
+  // to the track's curve — so the squared corner never shows there.
+  borderTopLeftRadius: tokens.radii.full,
+  borderBottomLeftRadius: tokens.radii.full,
+  borderTopRightRadius: 0,
+  borderBottomRightRadius: 0,
 });
 
 const StyledThumb = styled(TamaguiSlider.Thumb, {
@@ -209,7 +220,7 @@ export function Slider({
           disabled={disabled}
           height={44}
         >
-          <StyledTrack height={tokens.spacing[4]}>
+          <StyledTrack height={tokens.spacing[3]}>
             <StyledTrackActive />
           </StyledTrack>
           <StyledThumb
