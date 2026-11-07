@@ -188,20 +188,27 @@ test("the context carries the connected-surface geometry: side, align, and both 
   assert.match(dropdown, /align: DropdownAlign/);
   assert.match(dropdown, /triggerWidth: number \| null/);
   assert.match(dropdown, /panelWidth: number \| null/);
+  assert.match(dropdown, /widthsMatch: boolean/);
   // The shell measures both widths itself: the trigger's on the
   // trigger wrapper's onLayout, the panel's on the panel.
   assert.match(dropdown, /setTriggerWidth\(event\.nativeEvent\.layout\.width\)/);
   assert.match(dropdown, /setPanelWidth\(event\.nativeEvent\.layout\.width\)/);
+  // The panel unmounts while closed, so its measured width goes
+  // stale across a close: the shell resets it, and until the
+  // reopened panel lays out, widthsMatch stays false.
+  assert.match(dropdown, /setPanelWidth\(null\)/);
 });
 
 test("only the corners that touch are squared: the aligned corner always, the far corner only when the widths match (#474)", () => {
   assert.match(dropdown, /export function touchingCornerRadii\(/);
   assert.match(dropdown, /if \(widthsMatch\)/);
   assert.match(dropdown, /tokens\.radii\.zero/);
-  // The widths match within 1px after layout — the test both
-  // elements apply before squaring a far corner.
+  // The widths match within 1px after layout — computed once in
+  // the shell and shared through the context, so the two elements
+  // can never apply different rules.
   assert.match(dropdown, /Math\.abs\(triggerWidth - panelWidth\) <= 1/);
-  assert.match(dropdownButton, /Math\.abs\(context\.triggerWidth - context\.panelWidth\) <= 1/);
+  assert.match(dropdownButton, /context\.widthsMatch/);
+  assert.doesNotMatch(dropdownButton, /Math\.abs/, "the width-match rule lives in the shell");
   // The panel squares the edge facing the trigger; the trigger
   // mirrors it on its own touching edge.
   assert.match(
@@ -210,10 +217,36 @@ test("only the corners that touch are squared: the aligned corner always, the fa
   );
   assert.match(
     dropdownButton,
-    /touchingCornerRadii\(context\.side === "bottom" \? "bottom" : "top", context\.align, widthsMatch\)/,
+    /touchingCornerRadii\(\s*context\.side === "bottom" \? "bottom" : "top",\s*context\.align,\s*context\.widthsMatch,?\s*\)/,
   );
   // Closed, the trigger computes no override at all.
   assert.match(dropdownButton, /open && context !== null/);
+});
+
+test("touchingCornerRadii squares only the corners that touch, for every edge/alignment/width combination (#474)", async () => {
+  // Behavioral, against the built module (the source scans above
+  // cannot catch the helper returning the wrong corners).
+  const { touchingCornerRadii } = await import("../../dist/widgets/Dropdown.js");
+  // Widths differ: only the aligned corner on the touching edge.
+  assert.deepEqual(touchingCornerRadii("top", "start", false), { borderTopLeftRadius: 0 });
+  assert.deepEqual(touchingCornerRadii("top", "end", false), { borderTopRightRadius: 0 });
+  assert.deepEqual(touchingCornerRadii("bottom", "start", false), {
+    borderBottomLeftRadius: 0,
+  });
+  assert.deepEqual(touchingCornerRadii("bottom", "end", false), {
+    borderBottomRightRadius: 0,
+  });
+  // Widths match: both corners on the touching edge, either align.
+  for (const align of ["start", "end"] as const) {
+    assert.deepEqual(touchingCornerRadii("top", align, true), {
+      borderTopLeftRadius: 0,
+      borderTopRightRadius: 0,
+    });
+    assert.deepEqual(touchingCornerRadii("bottom", align, true), {
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    });
+  }
 });
 
 test("the panel is a styled Popover.Content frame with the a11y label routed through the translator", () => {

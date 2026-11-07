@@ -158,14 +158,13 @@ export const DropdownButton = forwardRef<
   // edge when the panel opens below, its top edge when above. The
   // overrides ride Button's existing frame pass-through (instance
   // radius props) — no new public prop on either component.
-  const widthsMatch =
-    context !== null &&
-    context.triggerWidth !== null &&
-    context.panelWidth !== null &&
-    Math.abs(context.triggerWidth - context.panelWidth) <= 1;
   const triggerRadii =
     open && context !== null
-      ? touchingCornerRadii(context.side === "bottom" ? "bottom" : "top", context.align, widthsMatch)
+      ? touchingCornerRadii(
+          context.side === "bottom" ? "bottom" : "top",
+          context.align,
+          context.widthsMatch,
+        )
       : null;
 
   // Focus the trigger as part of activation (onPress, immediately

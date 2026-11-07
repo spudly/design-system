@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import { Popover, View, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
@@ -24,6 +24,12 @@ type DropdownContextValue = {
    * panel itself; null until the open panel has laid out.
    */
   panelWidth: number | null;
+  /**
+   * Whether the two measured widths match (within 1px): the far
+   * touching corner pair counts as touching only then. Computed
+   * once here so every consumer applies the same rule.
+   */
+  widthsMatch: boolean;
 };
 
 /** Per-corner radius overrides for one element's touching edge. */
@@ -218,6 +224,18 @@ export function Dropdown({
   const widthsMatch =
     triggerWidth !== null && panelWidth !== null && Math.abs(triggerWidth - panelWidth) <= 1;
 
+  // The panel unmounts while closed, so a measured panelWidth goes
+  // stale across a close (the content may change width while the
+  // menu is shut). Reset it on close: until the reopened panel lays
+  // out again it reports null, widthsMatch stays false, and only
+  // the always-coincident aligned corner squares — no first-frame
+  // far-corner flip from a stale width.
+  useEffect(() => {
+    if (!open) {
+      setPanelWidth(null);
+    }
+  }, [open]);
+
   const setOpen = (next: boolean) => {
     if (openProp === undefined) {
       setInternalOpen(next);
@@ -237,6 +255,7 @@ export function Dropdown({
     align,
     triggerWidth,
     panelWidth,
+    widthsMatch,
   };
 
   // The panel's touching edge faces the trigger: its top edge when
