@@ -60,7 +60,7 @@ export const Ready: Story = {
  * pass its URL (and the recipe title as the image's accessible
  * name), and the banner renders above the preview frame. This
  * story exists so the hero-banner re-check in the changeset and
- * docs/manual-tests.md is performable — Ready passes no image.
+ * the colocated ImportReviewPage.test.steps.md is performable — Ready passes no image.
  * The image itself is the inline fixture from storyFixtures.ts:
  * a remote URL raced the VR verify pass (issue #352), so story
  * images are never fetched over the network.

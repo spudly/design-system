@@ -57,6 +57,7 @@
     "clean": "rm -rf dist",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
+    "manual-tests:index": "node tools/manualTestsIndex.mjs && prettier --write docs/manual-tests.md",
     "prepare": "husky",
     "prepublishOnly": "npm run build",
     "prettier": "prettier --write .",
