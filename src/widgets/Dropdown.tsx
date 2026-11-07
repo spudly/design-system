@@ -24,12 +24,6 @@ type DropdownContextValue = {
    * panel itself; null until the open panel has laid out.
    */
   panelWidth: number | null;
-  /**
-   * Whether the two measured widths match (within 1px): the far
-   * touching corner pair counts as touching only then. Computed
-   * once here so every consumer applies the same rule.
-   */
-  widthsMatch: boolean;
 };
 
 /** Per-corner radius overrides for one element's touching edge. */
@@ -41,19 +35,42 @@ export type TouchingCornerRadii = {
 };
 
 /**
+ * Whether one element's FAR corner on the touching edge actually
+ * touches the other element of the dropdown pair (#474): the far
+ * corner touches iff this element's far edge lies within the other
+ * element's span — this element's laid-out width no greater than
+ * the other's, within the 1px tolerance layout widths have always
+ * been compared with here. Each element answers for itself: the
+ * panel's far corner touches when the panel is no wider than the
+ * trigger (its far edge lands on the trigger's facing edge); the
+ * trigger's far corner touches when the trigger is no wider than
+ * the panel. Equal widths answer true for both, so all four
+ * touching corners square. An unmeasured width (null — the panel
+ * has not laid out yet) answers false: only the aligned corner
+ * squares until layout reports.
+ */
+export function farCornerTouches(ownWidth: number | null, otherWidth: number | null): boolean {
+  return ownWidth !== null && otherWidth !== null && ownWidth <= otherWidth + 1;
+}
+
+/**
  * The connected-surface radii for one element of the dropdown pair
  * (#474): while the menu is open, the trigger and the panel read as
  * ONE surface, so the corners where they touch lose their radius —
  * but only the corners that actually touch. The two widths are
  * independent (the trigger is content-sized; the panel is
  * content-sized with a 200px minimum), so on the touching edge only
- * ONE vertical edge coincides: the edge `align` selects ("start"
- * lines the leading edges up, "end" the trailing edges). That
- * aligned corner is coincident by construction and is always
- * squared. The far corner touches only when the two widths match
- * (within 1px after layout); squaring it otherwise would cut a
- * notch into a corner that overhangs (panel wider) or falls short
- * (panel narrower) and touches nothing.
+ * ONE vertical edge coincides by construction: the edge `align`
+ * selects ("start" lines the leading edges up, "end" the trailing
+ * edges). That aligned corner is always squared. The far corner
+ * squares only when it actually touches — when this element's far
+ * edge lies within the other element's span, which the caller
+ * answers with `farCornerTouches` for its own width against the
+ * other's. Squaring a far corner that overhangs the other element
+ * (this element wider) would cut a notch into a corner that
+ * touches nothing; leaving one rounded when its edge does land on
+ * the other element leaves a stray radius breaking the connected
+ * surface.
  *
  * `touchingEdge` is the edge of THIS element that meets the other:
  * the panel's top edge when it opens below the trigger, its bottom
@@ -62,7 +79,7 @@ export type TouchingCornerRadii = {
 export function touchingCornerRadii(
   touchingEdge: "top" | "bottom",
   align: DropdownAlign,
-  widthsMatch: boolean,
+  farTouches: boolean,
 ): TouchingCornerRadii {
   const zero = tokens.radii.zero;
   const radii: TouchingCornerRadii = {};
@@ -82,12 +99,12 @@ export function touchingCornerRadii(
   };
   if (align === "start") {
     squareStart();
-    if (widthsMatch) {
+    if (farTouches) {
       squareEnd();
     }
   } else {
     squareEnd();
-    if (widthsMatch) {
+    if (farTouches) {
       squareStart();
     }
   }
@@ -217,19 +234,18 @@ export function Dropdown({
   const open = openProp ?? internalOpen;
   // The connected-surface geometry (#474): both widths are measured
   // through onLayout — the trigger's on its wrapper below, the
-  // panel's on the panel itself — and the far corner pair counts
-  // as touching only when the widths match within 1px.
+  // panel's on the panel itself — and each element squares its far
+  // corner only when that corner actually touches the other
+  // element (farCornerTouches, judged per element from the pair).
   const [triggerWidth, setTriggerWidth] = useState<number | null>(null);
   const [panelWidth, setPanelWidth] = useState<number | null>(null);
-  const widthsMatch =
-    triggerWidth !== null && panelWidth !== null && Math.abs(triggerWidth - panelWidth) <= 1;
 
   // The panel unmounts while closed, so a measured panelWidth goes
   // stale across a close (the content may change width while the
   // menu is shut). Reset it on close: until the reopened panel lays
-  // out again it reports null, widthsMatch stays false, and only
-  // the always-coincident aligned corner squares — no first-frame
-  // far-corner flip from a stale width.
+  // out again it reports null, both elements' far corners count as
+  // not touching, and only the always-coincident aligned corner
+  // squares — no first-frame far-corner flip from a stale width.
   useEffect(() => {
     if (!open) {
       setPanelWidth(null);
@@ -255,12 +271,16 @@ export function Dropdown({
     align,
     triggerWidth,
     panelWidth,
-    widthsMatch,
   };
 
   // The panel's touching edge faces the trigger: its top edge when
-  // it opens below, its bottom edge when it opens above.
-  const panelRadii = touchingCornerRadii(side === "bottom" ? "top" : "bottom", align, widthsMatch);
+  // it opens below, its bottom edge when it opens above. Its far
+  // corner touches when the panel is no wider than the trigger.
+  const panelRadii = touchingCornerRadii(
+    side === "bottom" ? "top" : "bottom",
+    align,
+    farCornerTouches(panelWidth, triggerWidth),
+  );
 
   return (
     <DropdownContext.Provider value={contextValue}>

@@ -191,9 +191,10 @@ export const Controlled: Story = {
 
 /**
  * The unequal-width case, panel wider (#474): a short trigger over
- * long menu rows. Only the aligned (leading) touching corners
- * square; the panel's far corner keeps its rounding where it
- * overhangs the trigger and touches nothing.
+ * long menu rows. The trigger squares BOTH of its touching corners
+ * — its far edge lands on the panel's top edge — while the panel
+ * squares only the aligned (leading) corner; its far corner
+ * overhangs the trigger, touches nothing, and keeps its rounding.
  */
 export const WidePanelShortButton: Story = {
   render: () => (
@@ -213,8 +214,10 @@ export const WidePanelShortButton: Story = {
 /**
  * The unequal-width case, trigger wider (#474): a long trigger
  * label over short rows (the panel sits at its 200px minimum).
- * Only the aligned touching corners square; the trigger's far
- * corner keeps its rounding where the panel falls short.
+ * The panel squares BOTH of its touching corners — its far edge
+ * lands under the button — while the trigger squares only the
+ * aligned (leading) corner; its far corner overhangs the panel,
+ * touches nothing, and keeps its rounding.
  */
 export const WideButtonShortPanel: Story = {
   render: () => (
@@ -284,9 +287,10 @@ function MatchedWidthRow({
 
 /**
  * The equal-width case (#474): the button and the dropdown come
- * out the SAME width, so the measured widths match and BOTH
- * touching corner pairs square — button and panel read as one
- * continuous surface, with no rounded far corner on either.
+ * out the SAME width, so each element's far edge lands exactly on
+ * the other's span and BOTH touching corner pairs square — button
+ * and panel read as one continuous surface, with no rounded far
+ * corner on either.
  *
  * The match is by construction, not by eye. The widest row repeats
  * the trigger's label in the trigger's own typography, so the same
@@ -318,10 +322,11 @@ export const EqualWidthButtonAndPanel: Story = {
 /**
  * The button-wider case (#474), by a decisive margin: a long
  * trigger label over minimal rows, so the panel sits at its 200px
- * minimum while the button runs far past it. Only the aligned
- * (leading) touching corners square; the panel's far corner keeps
- * its rounding where it falls short of the button's edge and
- * touches nothing.
+ * minimum while the button runs far past it. The panel squares
+ * BOTH of its touching corners — its far edge lands under the
+ * button — while the trigger squares only the aligned (leading)
+ * corner; its far corner overhangs the panel, touches nothing,
+ * and keeps its rounding.
  */
 export const ButtonWiderThanPanel: Story = {
   render: () => (
