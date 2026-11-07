@@ -421,6 +421,44 @@ test("stories exercise the states and the cook-log form slot", () => {
   );
 });
 
+test("the activation confirmation mirrors the other confirmations' contract (#532)", () => {
+  assert.match(
+    code,
+    /activationConfirmation\?: RecipeDetailPageConfirmation \| null;/,
+    "the ready props carry activationConfirmation in the shared confirmation type",
+  );
+  assert.match(
+    code,
+    /\{props\.activationConfirmation \? \(\s*<ConfirmActionView \{\.\.\.props\.activationConfirmation\} \/>\s*\) : null\}/,
+    "a provided activationConfirmation renders ConfirmActionView beside the page shell",
+  );
+  // It renders alongside the existing three, after the cook-log
+  // delete confirmation and before the nutrition notice.
+  const cookLogAt = code.indexOf("<ConfirmActionView {...props.cookLogDeleteConfirmation} />");
+  const activationAt = code.indexOf("<ConfirmActionView {...props.activationConfirmation} />");
+  const nutritionAt = code.indexOf("<ConfirmActionView {...props.nutritionNotice} />");
+  assert.ok(
+    cookLogAt !== -1 && activationAt > cookLogAt,
+    "activation renders after cook-log delete",
+  );
+  assert.ok(nutritionAt > activationAt, "activation renders before the nutrition notice");
+  assert.match(
+    storiesCode,
+    /export const ActivationConfirmationOpen: Story/,
+    "a story exercises the activation confirmation open over the page",
+  );
+  assert.match(
+    storiesCode,
+    /activationConfirmation: \{\s*open: true,/,
+    "the story passes the confirmation open, in the host view-model shape",
+  );
+  assert.match(
+    storiesCode,
+    /confirmTone: "primary" as const,/,
+    "the story's activation confirmation uses the primary tone (reversible action)",
+  );
+});
+
 test("print/share name the icons module's Feather icons, not text glyphs (#187, #438 Part 4)", () => {
   for (const [name, component] of [
     ["print", "PrintIcon"],

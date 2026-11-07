@@ -129,6 +129,7 @@ function RecipeDetailPageDemo({
   showPanelSlots = false,
   createDraft = false,
   withCoverageSections = false,
+  activationConfirmationOpen = false,
 }: {
   variant?: "full" | "minimal";
   initialMissing?: string[];
@@ -136,6 +137,7 @@ function RecipeDetailPageDemo({
   showPanelSlots?: boolean;
   createDraft?: boolean;
   withCoverageSections?: boolean;
+  activationConfirmationOpen?: boolean;
 }) {
   const isFull = variant === "full";
   const baseServings = isFull ? 4 : 2;
@@ -171,6 +173,21 @@ function RecipeDetailPageDemo({
       : [{ id: "version-1", label: "v1 — Active", versionNumber: 1 }],
     selectedVersionId,
     onSelectVersion: setSelectedVersionId,
+    ...(activationConfirmationOpen
+      ? {
+          activationConfirmation: {
+            open: true,
+            onOpenChange: () => undefined,
+            title: "Activate this version?",
+            description:
+              "v4: Add the spinach at the very end becomes the active version. Meal plans, shopping lists, and API reads will serve it.",
+            confirmLabel: "Activate",
+            confirmTone: "primary" as const,
+            cancelLabel: "Cancel",
+            onConfirm: () => undefined,
+          },
+        }
+      : {}),
     overview: {
       title: isFull ? recipeDetailFixture.title : "Weeknight Tomato Pasta",
       ...(isFull
@@ -416,6 +433,13 @@ export const CookLogFormOpen: Story = {
 
 export const Nutrition: Story = {
   render: () => <RecipeDetailPageDemo />,
+};
+
+export const ActivationConfirmationOpen: Story = {
+  // #532: the host passes `activationConfirmation` open over a
+  // candidates-bearing overview — the deliberate-confirm
+  // safeguard before a version activation fires.
+  render: () => <RecipeDetailPageDemo activationConfirmationOpen />,
 };
 
 export const SharingAndComments: Story = {

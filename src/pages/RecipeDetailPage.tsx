@@ -103,11 +103,12 @@ import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeS
  * behind a callback. The overview's `sharing` and `comments`
  * data props render the views; the two render slots remain as
  * the fallback for hosts that have not migrated. The host's
- * three confirmation dialogs (recipe delete, cook-log delete,
- * nutrition notice) are view-modeled the same way through
- * ConfirmActionView, carried on the ready props'
- * `recipeDeleteConfirmation`, `cookLogDeleteConfirmation`,
- * and `nutritionNotice` data props.
+ * four confirmation dialogs (recipe delete, cook-log delete,
+ * version activation, nutrition notice) are view-modeled the
+ * same way through ConfirmActionView, carried on the ready
+ * props' `recipeDeleteConfirmation`,
+ * `cookLogDeleteConfirmation`, `activationConfirmation`, and
+ * `nutritionNotice` data props.
  * Ratings, by contrast, ARE view-modeled: the community rating is
  * display data, and the viewer's star input is a controlled input
  * (value in, change out, pending disables it) with the mutation
@@ -421,6 +422,17 @@ export type RecipeDetailPageReadyProps = {
   recipeDeleteConfirmation?: RecipeDetailPageConfirmation | null;
   /** The cook-log-delete confirmation; same contract as `recipeDeleteConfirmation`. */
   cookLogDeleteConfirmation?: RecipeDetailPageConfirmation | null;
+  /**
+   * The version-activation confirmation (#532): same contract
+   * as `recipeDeleteConfirmation`. The host opens it from
+   * `onActivateCandidatePress` — recording the pressed version
+   * and carrying its label in the title/description — instead
+   * of activating immediately; the activation mutation fires
+   * from the dialog's `onConfirm`. Activation is
+   * non-destructive and reversible, so hosts should pass
+   * `confirmTone: "primary"` in the view-model.
+   */
+  activationConfirmation?: RecipeDetailPageConfirmation | null;
   /**
    * The nutrition-error notice: a single-action
    * ConfirmActionView (no cancel label) the host opens when
@@ -954,6 +966,9 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
       ) : null}
       {props.cookLogDeleteConfirmation ? (
         <ConfirmActionView {...props.cookLogDeleteConfirmation} />
+      ) : null}
+      {props.activationConfirmation ? (
+        <ConfirmActionView {...props.activationConfirmation} />
       ) : null}
       {props.nutritionNotice ? <ConfirmActionView {...props.nutritionNotice} /> : null}
     </BigFooterShell>
