@@ -124,7 +124,10 @@ test("the discovery section is host-optional (#512): omitted props produce no di
     "the discovery empty row is built only when the section is supplied",
   );
   // The heading itself renders only when the host supplies a title.
-  assert.match(code, /if \(discoveryTitle\) \{\s*rows\.push\(\{ kind: "discoveryHeading", title: discoveryTitle \}\);/);
+  assert.match(
+    code,
+    /if \(discoveryTitle\) \{\s*rows\.push\(\{ kind: "discoveryHeading", title: discoveryTitle \}\);/,
+  );
   // Pagination stays inert when the section is absent.
   assert.match(code, /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,/);
   assert.match(code, /hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage/);
@@ -138,7 +141,9 @@ test("the discovery section is host-optional (#512): omitted props produce no di
 test("one row sequence: the own section precedes the discovery section in the one list", () => {
   assert.match(code, /const rows: RecipesPageRow\[\] = \[\{ kind: "ownHeading" \}\];/);
   const ownAt = code.indexOf('rows.push({ kind: "ownRecipe", item });');
-  const discoveryHeadingAt = code.indexOf('rows.push({ kind: "discoveryHeading", title: discoveryTitle });');
+  const discoveryHeadingAt = code.indexOf(
+    'rows.push({ kind: "discoveryHeading", title: discoveryTitle });',
+  );
   const discoveryAt = code.indexOf('rows.push({ kind: "discoveryRecipe", item });');
   assert.ok(
     ownAt !== -1 && discoveryHeadingAt > ownAt,
