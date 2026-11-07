@@ -1,7 +1,7 @@
 ---
 component: FieldLabel
 run_when:
-  - "any of these components, their stories, the form pages, or a changeset naming them. (namely: FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)"
+  - "any of these components, their stories, the form pages, or a changeset naming them. (namely: FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner, RecipeFormPage, MealFormPage, MealPlanFormPage, TagsPage)"
 ---
 
 # FieldLabel — manual test steps

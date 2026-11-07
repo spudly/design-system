@@ -22,9 +22,12 @@ at the unified component's stories.)
 1. Dismissible / DismissibleWarning: the dismiss (×) glyph
    renders **large and clearly visible** (2xl class), centered
    in its 44px touch target — not a tiny × in the corner.
-2. Clicking dismiss in the story removes the alert (actions
-   addon / story state) without leaving an empty gap band
-   behind.
+2. Dismissible / DismissibleWarning: pressing the dismiss
+   target fires the dismiss callback. The stories pass a
+   no-op callback and Alert does not hide itself — visibility
+   is the host's state — so the alert stays mounted; this
+   check verifies the target is reachable and activates
+   cleanly, with no layout shift around it.
 3. WithActions: the action buttons sit clear of the dismiss
    target and the message text; nothing overlaps at the story
    width.
