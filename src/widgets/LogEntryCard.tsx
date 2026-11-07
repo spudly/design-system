@@ -79,8 +79,7 @@ export function LogEntryCard({
           <Button
             variant="secondary"
             size="sm"
-            backgroundColor={tokens.colors.danger.danger1}
-            color={tokens.colors.danger.danger8}
+            tone="danger"
             {...(deleteAccessibilityLabel ? { accessibilityLabel: deleteAccessibilityLabel } : {})}
             onPress={onDeletePress}
           >

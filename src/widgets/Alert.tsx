@@ -3,7 +3,7 @@ import { XStack, YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "./accessibility.js";
-import { Button } from "./Button.js";
+import { Button, ButtonInternal } from "./Button.js";
 import { Text } from "./Text.js";
 
 const severityStyles = {
@@ -151,7 +151,7 @@ export function Alert({
       <XStack justifyContent="space-between" alignItems="flex-start" gap={tokens.spacing[2]}>
         <Text style={{ color: styles.text, flex: 1 }}>{content}</Text>
         {showDismiss ? (
-          <Button
+          <ButtonInternal
             ghost
             // Shift the 44px target into the corner with relative
             // positioning: the alert's own padding (spacing[3]) plus
@@ -174,14 +174,14 @@ export function Alert({
             // page backgrounds — drops below the 3:1 minimum for control
             // icons against it. The alert's own text color is the
             // contrasting foreground for this background in both modes.
-            color={styles.text}
+            internalInk={styles.text}
             onPress={onDismiss}
             accessibilityLabel="Dismiss"
             minWidth={44}
             minHeight={44}
           >
             ×
-          </Button>
+          </ButtonInternal>
         ) : null}
       </XStack>
       {actions && actions.length > 0 ? (
