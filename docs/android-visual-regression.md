@@ -289,7 +289,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay                              | light_warmHarvest |       2 |         2 |
 | pages-eciperay-addrecipemenupage            | light_warmHarvest |       1 |         1 |
 | pages-eciperay-aisessionpage                | light_warmHarvest |       3 |         3 |
-| pages-eciperay-appshellpage                 | light_warmHarvest |       5 |         0 |
+| pages-eciperay-appshellpage                 | light_warmHarvest |       5 |         5 |
 | pages-eciperay-authconfirmationpage         | light_warmHarvest |       2 |         2 |
 | pages-eciperay-consentpreferencespage       | light_warmHarvest |       2 |         2 |
 | pages-eciperay-cookingmodepage              | light_warmHarvest |       3 |         3 |
@@ -312,7 +312,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-mealplandetailpage           | light_warmHarvest |       6 |         6 |
 | pages-eciperay-mealplanformpage             | light_warmHarvest |       2 |         2 |
 | pages-eciperay-mealplanspage                | light_warmHarvest |       4 |         4 |
-| pages-eciperay-mealshubpage                 | light_warmHarvest |       4 |         3 |
+| pages-eciperay-mealshubpage                 | light_warmHarvest |       4 |         4 |
 | pages-eciperay-paypage                      | light_warmHarvest |       5 |         5 |
 | pages-eciperay-profilepage                  | light_warmHarvest |       2 |         2 |
 | pages-eciperay-publicrecipepage             | light_warmHarvest |       8 |         8 |
@@ -333,7 +333,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-tabbedshellpage              | light_quietDawn   |       6 |         6 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **171** |   **165** |
+| **Total**                                   |                   | **171** |   **171** |
 
 <!-- VR-COVERAGE-END -->
 
