@@ -67,7 +67,10 @@ export type SelectFieldProps = {
    * Grow to fill the row's remaining width (SearchField's `grow`
    * pattern): the field flexes within its row — a toolbar's
    * version picker beside a status badge, a field beside its
-   * button in a FieldRow. A growing select never renders
+   * button in a FieldRow. On the grow path the trigger also
+   * fills the root's height, so in a FieldRow (stretch
+   * alignment, one common height) the field's box matches its
+   * button exactly (#476). A growing select never renders
    * narrower than its own menu (the 200px the options viewport
    * enforces), so in a wrapping row it drops to its own line
    * instead of crushing.
@@ -104,6 +107,7 @@ export function SelectField({
       ) : null}
       <TamaguiSelect value={value ?? ""} onValueChange={(v) => onValueChange?.(v)} zIndex={200000}>
         <StyledTrigger
+          {...(grow ? { flex: 1 } : {})}
           id={id}
           error={!!error}
           aria-invalid={error ? true : undefined}
