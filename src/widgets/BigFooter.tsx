@@ -35,6 +35,12 @@ import { contentInfoRoleProps, platformAccessibilityProps } from "./accessibilit
  * as a real anchor carrying its href. Social entries are icon
  * links whose accessible name is the entry's label.
  *
+ * Brand logo (#468): the brand data may carry a `logo` slot —
+ * when supplied it renders inside the brand anchor in place of
+ * the text wordmark, in a DS-owned box of height
+ * BIG_FOOTER_BRAND_LOGO_HEIGHT; the anchor's accessible name is
+ * the brand label in both forms.
+ *
  * Store links (#466, Option A): each entry names its store and
  * renders that store's OFFICIAL badge artwork — Apple's
  * "Download on the App Store" badge or Google's "Get it on
@@ -116,10 +122,25 @@ export type BigFooterSocialLink = {
   icon: BigFooterSocialIcon;
 };
 
-/** The brand block: the big wordmark, linking to the host's home. */
+/**
+ * The brand block: the big wordmark, linking to the host's home.
+ *
+ * Logo slot (#468, Stephen's approval 2026-11-06 — Option A):
+ * when the host supplies `logo`, the brand anchor renders the
+ * logo INSTEAD of the text wordmark, inside a DS-owned box of
+ * height BIG_FOOTER_BRAND_LOGO_HEIGHT; the anchor's accessible
+ * name stays `label` either way. The host owns the logo asset
+ * and sizes it to that height with its aspect ratio preserved;
+ * the DS owns placement and geometry. When `logo` is absent the
+ * text wordmark renders exactly as before. (Stephen's note on
+ * approval: a slot for now — eventually the DS should own the
+ * logos as well.)
+ */
 export type BigFooterBrand = {
   label: string;
   href: string;
+  /** The host's logo, rendered in place of the text wordmark when supplied. */
+  logo?: ReactNode;
 };
 
 /**
@@ -152,6 +173,15 @@ export type BigFooterProps = {
  */
 export const BIG_FOOTER_STACK_BREAKPOINT = 640;
 export const BIG_FOOTER_COLUMN_BASIS = 300;
+
+/**
+ * The DS-owned height of the brand logo box (#468): a supplied
+ * logo renders inside a box of exactly this height, so hosts
+ * size their logo asset to it (aspect ratio preserved) and the
+ * footer's brand row keeps one geometry whether the brand is a
+ * logo or the text wordmark.
+ */
+export const BIG_FOOTER_BRAND_LOGO_HEIGHT = 40;
 
 /** The official badge artwork per store (#466): bundled in the DS, never host-supplied. */
 const STORE_BADGES: Record<BigFooterStore, () => ReactNode> = {
@@ -227,7 +257,13 @@ export function BigFooter({ footer }: BigFooterProps) {
         href={brand.href}
         cursor="web:pointer"
       >
-        {brand.label}
+        {brand.logo ? (
+          <XStack height={BIG_FOOTER_BRAND_LOGO_HEIGHT} alignItems="center">
+            {brand.logo}
+          </XStack>
+        ) : (
+          brand.label
+        )}
       </StyledBigFooterBrandAnchor>
       <XStack flexWrap="wrap" gap="$5" alignItems="stretch">
         {columns.length > 0 ? (
