@@ -542,6 +542,13 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
   // The danger tone (#480) applies to the secondary form: Button
   // owns the danger1 fill / danger8 ink treatment internally.
   const dangerToneApplies = tone === "danger" && variant === "secondary" && !selected;
+  // The fill is a separate decision from the ink: the ghost
+  // treatment (#463) keeps its transparent background, so a ghost
+  // danger button keeps the danger label/glyph ink (and the
+  // border color, hidden by ghost's zero border width) but takes
+  // no danger1 fill — the instance backgroundColor would otherwise
+  // override the ghost variant's transparent fill.
+  const dangerFillApplies = dangerToneApplies && !ghost;
   const labelColor =
     internalInk ??
     (selected
@@ -619,7 +626,7 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
         {...(ghost ? { ghost: true } : null)}
         size={size}
         color={labelColor}
-        {...(dangerToneApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null)}
+        {...(dangerFillApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null)}
         // Same #459 rule as the button form: the secondary
         // variant's border always takes the label color (gray10 by
         // default, the danger8 ink under the danger tone). The
@@ -710,7 +717,7 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
       size={size}
       {...(selected !== undefined ? { selected } : null)}
       color={labelColor}
-      {...(dangerToneApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null)}
+      {...(dangerFillApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null)}
       // #459's border-matches-text rule, applied wherever the
       // label color can depart from the variant's gray10: a
       // SELECTED secondary button takes the primary fill and the

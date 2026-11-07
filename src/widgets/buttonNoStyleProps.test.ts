@@ -43,9 +43,10 @@ test("the danger tone is a semantic Button prop with an owned treatment (#480)",
     button,
     /dangerToneApplies = tone === "danger" && variant === "secondary" && !selected/,
   );
+  assert.match(button, /dangerFillApplies = dangerToneApplies && !ghost/);
   assert.match(
     button,
-    /dangerToneApplies \? \{ backgroundColor: tokens\.colors\.danger\.danger1 \}/,
+    /dangerFillApplies \? \{ backgroundColor: tokens\.colors\.danger\.danger1 \}/,
   );
   assert.match(button, /tokens\.colors\.danger\.danger8/);
 });
