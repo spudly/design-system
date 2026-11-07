@@ -215,15 +215,15 @@ test("RecipesPage no longer wires the plain stalling handler", () => {
 test("both pages keep the loading-more footer on isFetchingNextPage", () => {
   assert.match(
     recipesPage,
-    /ListFooterComponent=\{\s*isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined\s*\}/,
-    "RecipesPage's footer is the shared ListLoadingState, keyed off isFetchingNextPage",
+    /ListFooterComponent={\s*isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/,
+    "RecipesPage's footer is the shared Center + Spinner composition, keyed off isFetchingNextPage",
   );
-  // DiscoverPage renders the shared ListLoadingState directly
+  // DiscoverPage renders the shared Center + Spinner composition directly
   // in the same form (#320 removed the ListLoadingFooter
   // middleman).
   assert.match(
     discoverPage,
-    /ListFooterComponent=\{\s*isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined\s*\}/,
-    "DiscoverPage's footer is the shared ListLoadingState, keyed off isFetchingNextPage",
+    /ListFooterComponent={\s*isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/,
+    "DiscoverPage's footer is the shared Center + Spinner composition, keyed off isFetchingNextPage",
   );
 });

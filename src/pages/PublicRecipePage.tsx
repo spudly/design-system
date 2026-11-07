@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { EqualButtonRow } from "../widgets/EqualButtonRow.js";
-import { LoadingGate } from "../widgets/LoadingGate.js";
+import { Center } from "../widgets/Center.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { MainLandmark } from "../widgets/MainLandmark.js";
 import { MessageCard } from "../widgets/MessageCard.js";
 import { RatingsCard } from "../widgets/RatingsCard.js";
@@ -85,7 +86,8 @@ import type {
  * and passes data and callbacks only. ScrollShell owns the
  * surface paint, the single scroll region, and the content
  * column's inset and separation rhythm; RatingsCard carries the
- * engagement section and LoadingGate the loading state. The CTA
+ * engagement section, and the loading state is a centered
+ * Spinner (Center + Spinner). The CTA
  * bar's equal-width button treatment is EqualButtonRow's and
  * the two message states are MessageCard — both extracted from
  * this page's hand-rolled stacks in the component-only change
@@ -368,7 +370,9 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
     return (
       <BigFooterShell footer={props.footer}>
         <MainLandmark>
-          <LoadingGate label="Loading recipe" />
+          <Center fill>
+            <Spinner label="Loading recipe" />
+          </Center>
         </MainLandmark>
       </BigFooterShell>
     );

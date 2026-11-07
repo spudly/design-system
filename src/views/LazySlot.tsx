@@ -47,7 +47,7 @@ export function LazySlot({ children, onReload }: LazySlotProps) {
     <ChunkErrorBoundary {...(onReload !== undefined ? { onReload } : null)}>
       <Suspense
         fallback={
-          <Center flex={1}>
+          <Center fill>
             <Spinner size="large" />
           </Center>
         }

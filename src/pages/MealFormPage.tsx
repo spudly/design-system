@@ -5,7 +5,6 @@ import { Button } from "../widgets/Button.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { FormHeading } from "../widgets/FormHeading.js";
 import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
-import { FormSubmit } from "../widgets/FormSubmit.js";
 import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { NumberStepper } from "../views/NumberStepper.js";
 import { Text } from "../widgets/Text.js";
@@ -58,9 +57,10 @@ import { TextField } from "../views/TextField.js";
  * two through its adapters. The page applies no styling
  * itself (#119): the picker is a LabeledGroup (the label over
  * the picker, the group carrying the label as its name) and
- * the submit button sits in a FormSubmit (the submit row's
- * separation from the last field is the row's own); the page
- * composes DS components and passes data and callbacks only.
+ * the submit button is the column's last direct child (its
+ * separation from the last field is the layout's own gap);
+ * the page composes DS components and passes data and
+ * callbacks only.
  */
 
 export type MealFormPageRecipeOption = {
@@ -288,25 +288,23 @@ export function MealFormPage({
           </LabeledGroup>
         ) : null}
         {error ? <Alert severity="error" message={error} /> : null}
-        <FormSubmit>
-          <Button
-            variant="primary"
-            accessibilityLabel="Save meal"
-            disabled={
-              !title.trim() ||
-              (selectedRecipes.length === 0 &&
-                !(
-                  onAddIngredient &&
-                  onIngredientChange &&
-                  ingredients.some((ingredient) => ingredient.name.trim().length > 0)
-                )) ||
-              isSaving
-            }
-            onPress={onSubmit}
-          >
-            Save meal
-          </Button>
-        </FormSubmit>
+        <Button
+          variant="primary"
+          accessibilityLabel="Save meal"
+          disabled={
+            !title.trim() ||
+            (selectedRecipes.length === 0 &&
+              !(
+                onAddIngredient &&
+                onIngredientChange &&
+                ingredients.some((ingredient) => ingredient.name.trim().length > 0)
+              )) ||
+            isSaving
+          }
+          onPress={onSubmit}
+        >
+          Save meal
+        </Button>
       </FormScreenLayout>
     </BigFooterShell>
   );

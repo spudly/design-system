@@ -14,9 +14,10 @@
  * The forms tranche's wider set was split by disposition in the
  * adoption rounds: FieldLabelBlock and StepperGroup composed
  * away into LabeledGroup and FormStack, while FieldColumns
- * and FormSubmit are genuine library components — they ship in
- * the #119 extraction set and are pinned here alongside the
- * dedupe set.
+ * is a genuine library component — it ships in the #119
+ * extraction set and is pinned here alongside the dedupe set.
+ * FormSubmit was removed in #478 (a logic-free wrapper whose
+ * only effect was extra separation above the submit row).
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -44,7 +45,6 @@ const COMPONENTS = [
   "FieldColumns",
   "FormStack",
   "FormHeading",
-  "FormSubmit",
 ];
 
 // RevertAction and ChangedListBanner are views since #470; the
@@ -134,11 +134,6 @@ test("FieldColumns gives every child an equal flex column with an owned 12px gut
   assert.match(source, /gap=\{tokens\.spacing\[3\]\}/);
   assert.match(source, /<YStack flex=\{1\}>/);
   assert.match(source, /typeof child === "boolean"/);
-});
-
-test("FormSubmit owns the 16px separation above the submit row", () => {
-  const source = readRepoFile("src/widgets/FormSubmit.tsx");
-  assert.match(source, /paddingBlockStart=\{tokens\.spacing\[4\]\}/);
 });
 
 test("FormHeading owns the title treatment, its 24px separation, and the optional subtitle", () => {
