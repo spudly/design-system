@@ -80,3 +80,22 @@ export const Empty: Story = {
     </Viewport>
   ),
 };
+
+export const Loading: Story = {
+  render: () => (
+    <Viewport>
+      <MealsHubPage
+        footer={eciperayFooterFixture}
+        activeTab="meals"
+        onSelectTab={() => undefined}
+        meals={[]}
+        plans={[]}
+        loading
+        createMealHref="/meals/new"
+        createPlanHref="/meal-plans/new"
+        onDeleteMeal={() => undefined}
+        onDeletePlan={() => undefined}
+      />
+    </Viewport>
+  ),
+};

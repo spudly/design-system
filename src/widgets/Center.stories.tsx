@@ -18,9 +18,10 @@ export default meta;
 type Story = StoryObj<typeof Center>;
 
 export const Centered: Story = {
+  args: { fill: true },
   render: (args) => (
     <YStack maxWidth={430} height={200} borderWidth={1} borderColor="$borderColor">
-      <Center {...args} fill>
+      <Center {...args}>
         <Spinner label="Loading" />
       </Center>
     </YStack>
