@@ -7,10 +7,9 @@
  * on-primary ink role: the brand wordmark, the social icon links,
  * the column titles, and the column links. The top divider is
  * gone (a solid primary band needs no divider, and the light
- * gray line would read as a stray stripe). Store links stay
- * secondary Buttons: their own light fill keeps them legible as
- * pills on the primary band, and switching them to the primary
- * variant would make them invisible on the identical fill.
+ * gray line would read as a stray stripe). Store links were
+ * secondary Buttons under #465; #466 superseded that — they are
+ * now official store badges (see bigFooterStoreBadges.test.ts).
  *
  * Source scan like this repo's other contract tests (comments
  * stripped first, so the assertions pin the styling code itself).
@@ -60,6 +59,11 @@ test("social glyphs receive the resolved on-primary ink explicitly (#465)", () =
   assert.match(footer, /<IconGlyph size=\{24\} color=\{socialInk\} \/>/);
 });
 
-test("store links stay secondary Buttons (#465)", () => {
-  assert.match(footer, /<Button key=\{link\.href\} href=\{link\.href\} variant="secondary">/);
+test("store links are official badges, not secondary Buttons (#465 superseded by #466)", () => {
+  // #465 kept store links as secondary Buttons on the primary
+  // band; #466 superseded that: each store link is now a real
+  // anchor wrapping its store's official badge artwork.
+  assert.ok(!/<Button/.test(footer), "store links must not render as Buttons (#466)");
+  assert.match(footer, /<StyledBigFooterStoreAnchor/);
+  assert.match(footer, /STORE_BADGES/);
 });

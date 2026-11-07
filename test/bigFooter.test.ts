@@ -55,8 +55,11 @@ test("BigFooter renders all sections from the one footer data object", () => {
 });
 
 test("store and social entries are real links with accessible names", () => {
-  // Store links render through Button's href form (a real anchor).
-  assert.match(bigFooter, /<Button key=\{link\.href\} href=\{link\.href\} variant="secondary">/);
+  // Store links (#466): a real anchor wrapping the store's
+  // official badge, named by the label — never a plain Button.
+  assert.match(bigFooter, /<StyledBigFooterStoreAnchor/);
+  assert.match(bigFooter, /store: BigFooterStore;/);
+  assert.ok(!/<Button/.test(bigFooter), "store links must not render as Buttons (#466)");
   // Social entries: an anchor carrying the href, named by the label.
   assert.match(bigFooter, /accessibilityRole: "link",\s*accessibilityLabel: link\.label/);
   assert.match(bigFooter, /href=\{link\.href\}/);
@@ -317,7 +320,7 @@ const footerData = {
       ],
     },
   ],
-  storeLinks: [{ label: "Download on the App Store", href: "/app-store" }],
+  storeLinks: [{ label: "Download on the App Store", href: "/app-store", store: "app-store" }],
   socialLinks: [{ label: "Eciperay on Facebook", href: "/social/facebook", icon: "facebook" }],
 };
 

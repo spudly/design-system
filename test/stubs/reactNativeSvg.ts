@@ -20,3 +20,4 @@ export const Line = inert;
 export const Path = inert;
 export const Polyline = inert;
 export const Rect = inert;
+export const Text = inert;

@@ -8,7 +8,8 @@ import { SocialLinkedinIcon } from "../icons/SocialLinkedinIcon.js";
 import { SocialTwitterIcon } from "../icons/SocialTwitterIcon.js";
 import { SocialYoutubeIcon } from "../icons/SocialYoutubeIcon.js";
 import type { IconComponentProps } from "../icons/Icon.js";
-import { Button } from "./Button.js";
+import { AppStoreBadge } from "../icons/AppStoreBadge.js";
+import { GooglePlayBadge } from "../icons/GooglePlayBadge.js";
 import { Text } from "./Text.js";
 import { TextLink } from "./TextLink.js";
 import { contentInfoRoleProps, platformAccessibilityProps } from "./accessibility.js";
@@ -33,6 +34,15 @@ import { contentInfoRoleProps, platformAccessibilityProps } from "./accessibilit
  * column link, every store link, and every social entry renders
  * as a real anchor carrying its href. Social entries are icon
  * links whose accessible name is the entry's label.
+ *
+ * Store links (#466, Option A): each entry names its store and
+ * renders that store's OFFICIAL badge artwork — Apple's
+ * "Download on the App Store" badge or Google's "Get it on
+ * Google Play" badge, bundled in the DS (src/icons/AppStoreBadge,
+ * src/icons/GooglePlayBadge) at the stores' required sizes with
+ * no recoloring or stretching — wrapped in a real anchor whose
+ * accessible name is the entry's label. Never a plain text
+ * button.
  *
  * Social icons are Feather icons (#410, Stephen's adjustment):
  * an entry names one of the Feather social glyphs the DS ships
@@ -74,10 +84,18 @@ export type BigFooterColumn = {
   links: BigFooterLink[];
 };
 
-/** An app-store link (e.g. App Store, Google Play), rendered as a real link. */
+/** The stores a store link can point at: the discriminator selects the official badge artwork (#466). */
+export type BigFooterStore = "app-store" | "google-play";
+
+/**
+ * An app-store link, rendered as a real link wrapping the store's
+ * official badge (#466). The label is the badge link's accessible
+ * name; `store` selects which official badge renders.
+ */
 export type BigFooterStoreLink = {
   label: string;
   href: string;
+  store: BigFooterStore;
 };
 
 /** The Feather social glyphs BigFooter can render for a social link. */
@@ -128,6 +146,12 @@ export type BigFooterProps = {
 export const BIG_FOOTER_STACK_BREAKPOINT = 640;
 export const BIG_FOOTER_COLUMN_BASIS = 300;
 
+/** The official badge artwork per store (#466): bundled in the DS, never host-supplied. */
+const STORE_BADGES: Record<BigFooterStore, () => ReactNode> = {
+  "app-store": AppStoreBadge,
+  "google-play": GooglePlayBadge,
+};
+
 const SOCIAL_ICONS: Record<BigFooterSocialIcon, (props: IconComponentProps) => ReactNode> = {
   facebook: SocialFacebookIcon,
   instagram: SocialInstagramIcon,
@@ -147,6 +171,12 @@ const StyledBigFooterSocialAnchor = styled(Anchor, {
   name: "BigFooterSocialAnchor",
   color: "$onPrimary",
   padding: tokens.spacing[3],
+  textDecorationLine: "none",
+});
+
+/** A store badge link's frame: the badge artwork at its fixed size, never underlined or recolored. */
+const StyledBigFooterStoreAnchor = styled(Anchor, {
+  name: "BigFooterStoreAnchor",
   textDecorationLine: "none",
 });
 
@@ -194,12 +224,23 @@ export function BigFooter({ footer }: BigFooterProps) {
           {brand.label}
         </StyledBigFooterBrandAnchor>
         {storeLinks.length > 0 ? (
-          <XStack flexWrap="wrap" gap="$3">
-            {storeLinks.map((link) => (
-              <Button key={link.href} href={link.href} variant="secondary">
-                {link.label}
-              </Button>
-            ))}
+          <XStack flexWrap="wrap" gap="$3" alignItems="center">
+            {storeLinks.map((link) => {
+              const Badge = STORE_BADGES[link.store];
+              return (
+                <StyledBigFooterStoreAnchor
+                  key={link.href}
+                  {...platformAccessibilityProps({
+                    accessibilityRole: "link",
+                    accessibilityLabel: link.label,
+                  })}
+                  href={link.href}
+                  cursor="web:pointer"
+                >
+                  <Badge />
+                </StyledBigFooterStoreAnchor>
+              );
+            })}
           </XStack>
         ) : null}
         {socialLinks.length > 0 ? (
