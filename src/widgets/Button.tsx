@@ -191,7 +191,10 @@ type ButtonOwnProps = Omit<
    * border-takes-label-color rule) — instead of the caller passing
    * background/color styling props, which Button no longer accepts
    * (its styles are its own). Default "default": the variant's
-   * ordinary treatment.
+   * ordinary treatment. The tone ONLY takes effect on an unselected
+   * `secondary` button: on any other variant, or on a selected
+   * toggle, `tone="danger"` is ignored — for a danger-styled action
+   * in another form, use `variant="danger"` instead.
    */
   tone?: "default" | "danger";
   /**
@@ -290,7 +293,9 @@ type ButtonLinkProps = Omit<
   "disabled" | "children" | "icon" | "onPress" | "backgroundColor" | "color"
 > & {
   disabled?: boolean;
-  /** The semantic tone (#480): see ButtonOwnProps. */
+  /** The semantic tone (#480): see ButtonOwnProps — it only takes
+   * effect on an unselected `secondary` button and is ignored on
+   * other variants; use `variant="danger"` for those. */
   tone?: "default" | "danger";
   /** The ghost treatment (#463): see ButtonOwnProps — the link
    * form composes it with its variant exactly as the button form
