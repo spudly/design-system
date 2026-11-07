@@ -27,7 +27,7 @@
  * star when unrated, press cancels the click default first — the
  * control typically sits inside the row's text link). Its
  * contract depth lives here and in
- * test/recipesPageRowActions.test.ts.
+ * the recipesPageRowActions block in src/pages/RecipesPage.test.ts.
  *
  * Source scan plus dist export checks, like the other contract
  * tests. The scans slice RecipesPage.tsx at the compositions'

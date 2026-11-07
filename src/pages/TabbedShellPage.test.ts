@@ -87,13 +87,13 @@ test("the page composes DS components only and never touches the boundary itself
   assert.match(page, /import type \{ IconName \} from "\.\.\/icons\/iconRegistry\.js";/);
   assert.doesNotMatch(page, /from "\.\.\/icons\/[A-Z]/, "no icon component crosses into the page");
   // The standard page footer contract (#410, pinned for every
-  // page by test/bigFooter.test.ts): an optional footer prop
+  // page by src/widgets/BigFooter.test.ts): an optional footer prop
   // rendered through the shell — no data, no footer band.
   assert.match(page, /footer\?: BigFooterData;/);
   assert.match(page, /<BigFooterShell footer=\{footer\}>/);
 });
 
-// Runtime imports are lazy, like landingPage.test.ts: the page
+// Runtime imports are lazy, like LandingPage.test.ts: the page
 // is loaded from its own module (the pages barrel is not
 // Node-importable).
 let runtimePromise: Promise<Record<string, any>> | undefined;
@@ -249,8 +249,8 @@ test("SSR: a pending surface shows the loading state; a failed one the boundary 
   // inside a Suspense boundary — it marks the segment for client
   // rendering, where ChunkErrorBoundary catches and shows its
   // fallback (the fallback copy and recovery are pinned by
-  // chunkErrorBoundary.test.ts; the composition that puts them
-  // around the slot is pinned by lazySlot.test.ts). What SSR
+  // ChunkErrorBoundary.test.ts; the composition that puts them
+  // around the slot is pinned by LazySlot.test.ts). What SSR
   // proves here: the failure stays INSIDE the slot — the shell
   // and its tab bar render around the degraded segment.
   assert.match(failedHtml, /Switched to client rendering because the server rendering errored/);

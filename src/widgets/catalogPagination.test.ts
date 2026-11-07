@@ -28,7 +28,7 @@
  *    scroll-away. A fetch that added rows clears the end latch
  *    (the list's own content-length change re-arms it).
  *
- * The source scans follow test/discoverPage.test.ts: the repo
+ * The source scans follow src/pages/DiscoverPage.test.ts: the repo
  * has no JS renderer for page components (they import
  * react-native), and the invariants are per-literal properties
  * of the source. Comments are stripped before scanning so prose

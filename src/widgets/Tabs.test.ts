@@ -24,7 +24,7 @@ describe("tabsAriaControls", () => {
     );
   });
 
-  // Runtime imports are lazy, like tabsIcon.test.ts, so the
+  // Runtime imports are lazy, like the tabsIcon block in this file, so the
   // source scans still report when the build output is missing.
   let runtimePromise: Promise<Record<string, any>> | undefined;
   function loadRuntime() {
@@ -138,7 +138,7 @@ describe("tabsIcon", () => {
     );
   });
 
-  // Runtime imports are lazy, like buttonIcon.test.ts, so the
+  // Runtime imports are lazy, like the buttonIcon block in Button.test.ts, so the
   // source scans still report when the build output is missing.
   let runtimePromise: Promise<Record<string, any>> | undefined;
   function loadRuntime() {

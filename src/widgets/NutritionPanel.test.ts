@@ -5,7 +5,7 @@
  *
  * The pins hold the panel's shape: exported from the package
  * root, three states branched on the data union (the union
- * itself is pinned in recipeDetailPage.test.ts), the Estimate
+ * itself is pinned in RecipeDetailPage.test.ts), the Estimate
  * and Refresh actions render only with their callbacks, and
  * the ready state renders one row per nutrient plus the
  * disclaimer.

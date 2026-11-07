@@ -85,7 +85,7 @@ describe("dialogFocusContainment", () => {
     // Stacked dialogs: a text-only dialog left open beneath a newer
     // modal must not swallow Tab for the dialog above it (Copilot +
     // CodeRabbit review on PR #392). DS layers are arbitrated by
-    // the modal registry (dialogModalRegistry.test.ts, #394);
+    // the modal registry (the dialogModalRegistry block below, #394);
     // this scan covers FOREIGN native frames no DS layer records.
     // Portal frames mount in open order, so a frame followed in
     // document order by another dialog frame is covered.

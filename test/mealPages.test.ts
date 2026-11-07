@@ -170,7 +170,7 @@ test("ShoppingListPage check-off is controlled per line with real checkbox seman
   assert.ok(page.includes("onToggleLine"), "toggles report out through onToggleLine");
   assert.ok(
     page.includes("CheckRow"),
-    "rows render through the generic CheckRow since the #119 de-styling — the checkbox semantics (routed through the platform translator, #237) and the checked strike-through are pinned in test/checkRow.test.ts",
+    "rows render through the generic CheckRow since the #119 de-styling — the checkbox semantics (routed through the platform translator, #237) and the checked strike-through are pinned in src/widgets/CheckRow.test.ts",
   );
   assert.ok(page.includes("label={line.name}"), "row labels use each line's name");
   assert.ok(
@@ -329,7 +329,7 @@ test("MealsHubPage composes MealPlansPage for the plans tab and reports the tab 
   // the row Delete is a ghost Button (#464), never a TextLink.
   // Since the #119 de-styling the row renders through the generic
   // TextActionCardRow; the ghost Button rendering itself is pinned
-  // in test/textActionCardRow.test.ts.
+  // in src/widgets/TextActionCardRow.test.ts.
   assert.ok(
     page.includes("TextActionCardRow"),
     "meal rows render through the generic TextActionCardRow (#119)",

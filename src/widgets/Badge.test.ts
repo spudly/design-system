@@ -26,7 +26,7 @@ describe("badgeBorder", () => {
   test("the badge border uses the tone's text color (#174)", () => {
     assert.ok(
       /borderColor=\{isSelected \? "\$primary" : styles\.text\}/.test(text),
-      "Badge must pass borderColor={styles.text} while unselected so the border is the same color as the badge text for every tone (#174); the selectable form's selected state takes the primary fill instead (test/badgeSelectable.test.ts)",
+      "Badge must pass borderColor={styles.text} while unselected so the border is the same color as the badge text for every tone (#174); the selectable form's selected state takes the primary fill instead (the badgeSelectable block in this file)",
     );
   });
 });

@@ -48,7 +48,7 @@
  *    no relatedTarget, a preset's onPressIn ahead of the blur
  *    suppresses that blur's commit the same way.
  *
- * Source-pinning test in the style of recipeDetailPage.test.ts;
+ * Source-pinning test in the style of RecipeDetailPage.test.ts;
  * run via `npm test` (which builds first).
  */
 import assert from "node:assert/strict";
@@ -64,7 +64,7 @@ const page = readFileSync(join(root, "src/pages/RecipeDetailPage.tsx"), "utf8");
 // PublicRecipePage's ingredients section is the shared library
 // panel since the #331 extraction, so its control pins scan the
 // panel source (the page wires its view-model into the panel;
-// test/publicRecipePage.test.ts pins that wiring).
+// src/pages/PublicRecipePage.test.ts pins that wiring).
 const ingredientsPanel = readFileSync(join(root, "src/widgets/RecipeIngredientsPanel.tsx"), "utf8");
 
 test("NumberStepper layout is additive with stacked as the default", () => {

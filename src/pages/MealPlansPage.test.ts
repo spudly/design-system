@@ -35,7 +35,7 @@
  * 7. The page carries no styling of its own (#119, tranche 2):
  *    the plan row is the generic CardRow widget in its link form
  *    (its card layout, link area, and action treatment live
- *    there — pinned in test/cardRow.test.ts; the page supplies
+ *    there — pinned in src/widgets/CardRow.test.ts; the page supplies
  *    the plan's href, the Delete label, and the danger tone as
  *    content), the list stacks in a CardStack,
  *    the loading block centers its spinner in a Center, and the
@@ -44,7 +44,7 @@
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
  * and the invariant is a per-literal property of the source (same
- * rationale as test/recipesPageBoundedList.test.ts). Comments
+ * rationale as the recipesPageBoundedList block in src/pages/RecipesPage.test.ts). Comments
  * are stripped before scanning so prose cannot satisfy — or, for
  * the no-slot pin, accidentally trip — the patterns.
  */
@@ -94,7 +94,7 @@ test("the view-model and navigation contract matches the declared props", () => 
   assert.match(
     code,
     /<CardRow[\s\S]*?href=\{plan\.href\}/,
-    "rows must render through CardRow in its link form, carrying the plan's href (#248; the link rendering itself is pinned in test/cardRow.test.ts)",
+    "rows must render through CardRow in its link form, carrying the plan's href (#248; the link rendering itself is pinned in src/widgets/CardRow.test.ts)",
   );
   assert.match(
     code,
@@ -117,7 +117,7 @@ test("optional actions render only when their props are provided", () => {
   assert.match(
     code,
     /<CardRow/,
-    "rows must render through the CardRow widget, whose action renders only when its label and callback are wired (pinned in test/cardRow.test.ts)",
+    "rows must render through the CardRow widget, whose action renders only when its label and callback are wired (pinned in src/widgets/CardRow.test.ts)",
   );
   assert.match(
     code,

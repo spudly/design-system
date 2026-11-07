@@ -7,7 +7,7 @@
  * list is exported from the internal views barrel (#470), a candidate renders
  * its Activate action ONLY when the activation callback is
  * provided (candidate data alone exposes no dead action — the
- * invariant recipeDetailPage.test.ts pinned while the block
+ * invariant RecipeDetailPage.test.ts pinned while the block
  * lived in the page), a pending activation disables the
  * actions, and activating reports the candidate's id.
  */

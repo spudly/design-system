@@ -16,7 +16,7 @@
  * href form and was deleted on Stephen's ruling on PR #311 —
  * the landing's CTAs are <Button href>. The page-level SSR
  * pins for the rendered anchors and headings live in
- * test/landingPage.test.ts.)
+ * src/pages/LandingPage.test.ts.)
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";

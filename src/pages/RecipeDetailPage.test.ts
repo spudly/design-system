@@ -54,7 +54,7 @@
  * pass-throughs.
  *
  * This is a source scan, not a render test, for the same reason as
- * test/recipesPageAccessory.test.ts: the repo has no JS
+ * the recipesPageAccessory block in src/pages/RecipesPage.test.ts: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
  * and the invariant is a per-literal property of the source.
  * Comments are stripped before scanning so prose cannot satisfy
@@ -311,7 +311,7 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(
     code,
     /onActivateCandidatePress\s*\?\s*\{ onActivatePress: onActivateCandidatePress \}/,
-    "the page passes the activation callback into CandidateList only when provided (the Activate conditional itself is pinned in candidateList.test.ts)",
+    "the page passes the activation callback into CandidateList only when provided (the Activate conditional itself is pinned in CandidateList.test.ts)",
   );
   assert.match(
     code,

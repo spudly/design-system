@@ -7,7 +7,7 @@
  * accessible name, so a screen reader met an unnamed dialog. The
  * pin holds the fix in the component: the Sheet carries the
  * field's label, with a fixed fallback when the field has no
- * label. Source-contract pattern follows test/textFontContext.test.ts.
+ * label. Source-contract pattern follows the textFontContext block in src/widgets/Text.test.ts.
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";

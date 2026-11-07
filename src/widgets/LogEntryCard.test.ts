@@ -8,7 +8,7 @@
  * renders ONLY when its callback is provided (entry data alone
  * exposes no dead action), and the delete button carries the
  * caller-composed entry-specific accessible name (position +
- * date — recipeDetailPage.test.ts pins the composition).
+ * date — RecipeDetailPage.test.ts pins the composition).
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";

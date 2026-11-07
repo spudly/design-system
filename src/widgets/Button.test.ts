@@ -307,7 +307,7 @@ describe("buttonIcon", () => {
     }
   });
 
-  // Runtime imports are lazy, like buttonWebAria.test.ts, so the
+  // Runtime imports are lazy, like the buttonWebAria block in this file, so the
   // source scans still report when the build output is missing.
   let runtimePromise: Promise<Record<string, any>> | undefined;
   function loadRuntime() {

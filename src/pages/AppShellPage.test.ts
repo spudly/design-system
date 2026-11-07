@@ -93,7 +93,7 @@ test("the page composes DS components only and never touches the boundary itself
   assert.match(page, /import \{\s*AppTopBar,/);
   assert.match(page, /<ScreenContainer scrollable=\{false\}>/);
   // The standard page footer contract (#410, pinned for every
-  // page by test/bigFooter.test.ts): an optional footer prop
+  // page by src/widgets/BigFooter.test.ts): an optional footer prop
   // rendered through the shell — no data, no footer band.
   assert.match(page, /footer\?: BigFooterData;/);
   assert.match(page, /<BigFooterShell footer=\{footer\}>/);
@@ -116,7 +116,7 @@ test("the stories cover the shell's contracted cases", () => {
   }
 });
 
-// Runtime imports are lazy, like tabbedShellPage.test.ts: the
+// Runtime imports are lazy, like TabbedShellPage.test.ts: the
 // page is loaded from its own module (the pages barrel is not
 // Node-importable).
 let runtimePromise: Promise<Record<string, any>> | undefined;
@@ -274,7 +274,7 @@ test("SSR: a pending surface shows the loading state; a failed one stays in the 
       React.createElement(FailingContent),
     ),
   );
-  // As in tabbedShellPage.test.ts: SSR marks the errored segment
+  // As in TabbedShellPage.test.ts: SSR marks the errored segment
   // for client rendering; what it proves here is the failure
   // stays INSIDE the slot — the shell renders around it.
   assert.match(failedHtml, /Switched to client rendering because the server rendering errored/);

@@ -151,7 +151,7 @@ test("CardRow's action accessible name composes the label with the row title (#3
 // Runtime imports are lazy (inside the SSR test) so the source-scan
 // tests above still run and report when the build output is missing
 // or broken, instead of the whole file failing at import time (the
-// buttonWebAria.test.ts pattern).
+// buttonWebAria block pattern in Button.test.ts).
 const noop = () => null;
 
 let runtimePromise;

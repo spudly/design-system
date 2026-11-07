@@ -21,7 +21,7 @@
  * test/storybookParity.test.ts.
  *
  * This is a source scan, not a render test, for the same reason
- * as test/verseSearchPage.test.ts: the failures it guards
+ * as src/pages/VerseSearchPage.test.ts: the failures it guards
  * happen in native layout, which no JS renderer in this repo
  * performs, and the invariant is a per-literal property of the
  * source. Comments are stripped before scanning so prose cannot

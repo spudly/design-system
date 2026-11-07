@@ -4,7 +4,7 @@
  *
  * This is a source scan, not a render test: the invariant is a
  * per-literal property of the Avatar source (same rationale as
- * src/widgets/badgeBorder.test.ts) — the Fallback styled definition
+ * the badgeBorder block in src/widgets/Badge.test.ts) — the Fallback styled definition
  * carries a fixed 1px border in "$primaryEmphasis", the exact token
  * the initials Text renders in, while the image path carries no border.
  */

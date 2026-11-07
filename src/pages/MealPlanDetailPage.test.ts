@@ -56,7 +56,7 @@
  *    the loading state is a centered Spinner (Center + Spinner), the entry
  *    rows are the generic ListRow widget (its pressable area,
  *    hairline, and disabled treatment live there — pinned in
- *    test/listRow.test.ts; the page supplies the kind prefix,
+ *    src/widgets/ListRow.test.ts; the page supplies the kind prefix,
  *    the unavailable suffix, and the disabled flag as content),
  *    the goal rows are DetailRow
  *    widgets, the plan title takes Text's `title` variant, the
@@ -67,7 +67,7 @@
  * This is a source scan, not a render test: the repo has no JS
  * renderer for these components (Chromatic screenshots in CI),
  * and the invariant is a per-literal property of the source (same
- * rationale as test/mealPlansPage.test.ts). Comments are
+ * rationale as src/pages/MealPlansPage.test.ts). Comments are
  * stripped before scanning so prose cannot satisfy — or, for the
  * pinned absences, accidentally trip — the patterns.
  */
@@ -156,7 +156,7 @@ test("entry rows are links carrying the entry href, by kind", () => {
   assert.match(
     code,
     /<ListRow[\s\S]*?href=\{entry\.href\}/,
-    "entry rows must render through ListRow in its link form, carrying the entry's href (the link rendering itself is pinned in test/listRow.test.ts)",
+    "entry rows must render through ListRow in its link form, carrying the entry's href (the link rendering itself is pinned in src/widgets/ListRow.test.ts)",
   );
   assert.match(code, /kind: "meal" \| "recipe";/, "entries must carry their kind");
   assert.match(
@@ -171,7 +171,7 @@ test("entries render through ListRow, with the kind prefix and availability as c
   assert.match(
     code,
     /<ListRow/,
-    "entry rows must render through the ListRow widget — its disabled state and link wiring are pinned in test/listRow.test.ts",
+    "entry rows must render through the ListRow widget — its disabled state and link wiring are pinned in src/widgets/ListRow.test.ts",
   );
   assert.match(
     code,

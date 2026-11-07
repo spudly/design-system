@@ -28,7 +28,7 @@
  *    (Default) in the Quiet Dawn theme.
  *
  * This is a source scan, not a render test, for the same reason
- * as test/myVersesPage.test.ts: the failures it guards happen
+ * as src/pages/MyVersesPage.test.ts: the failures it guards happen
  * in native layout and prop wiring, which no JS renderer in
  * this repo performs, and the invariant is a per-literal
  * property of the source. Comments are stripped before

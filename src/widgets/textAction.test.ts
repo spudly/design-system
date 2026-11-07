@@ -21,7 +21,7 @@
  *    callback.
  *
  * Source scan, like the other contract tests in this repo
- * (test/backLink.test.ts): the invariant is a per-literal
+ * (src/widgets/BackLink.test.ts): the invariant is a per-literal
  * property of the sources, and no JS renderer here performs the
  * web keyboard path. Comments are stripped before scanning so
  * prose cannot satisfy — or accidentally trip — the patterns.
