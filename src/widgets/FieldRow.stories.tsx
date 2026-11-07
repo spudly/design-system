@@ -32,7 +32,7 @@ export const SmallAction: Story = {
           value=""
           onChangeText={() => {}}
           placeholder="Search recipes…"
-          accessibilityLabel="Search recipes"
+          aria-label="Search recipes"
         />
         <Button variant="secondary" size="sm" accessibilityLabel="Add a filter">
           Filters
