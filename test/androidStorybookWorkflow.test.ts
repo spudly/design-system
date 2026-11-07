@@ -99,6 +99,71 @@ test("the sanity job keeps its label-presence behavior on ordinary PR events", (
   );
 });
 
+test("phase 2: the visual-regression job is a matrix over the plan job's shards", () => {
+  const block = jobBlock("visual-regression");
+  assert.match(block, /needs: plan/, "visual-regression must consume the plan job");
+  assert.match(
+    block,
+    /matrix:\s*\n\s*shard: \$\{\{ fromJSON\(needs\.plan\.outputs\.shards\) \}\}/,
+    "the matrix must expand the plan job's shard list",
+  );
+  assert.match(block, /fail-fast: false/, "one shard failing must not cancel the others");
+  assert.match(
+    block,
+    /capture-compare\.sh "\$\{\{ github\.event_name == 'pull_request' && 'pr-shard' \|\| inputs\.mode \}\}"/,
+    "PR shards must run the pr-shard compare-only mode; dispatches keep their mode",
+  );
+  assert.match(
+    block,
+    /name: dsvr-shard-\$\{\{ matrix\.shard \}\}/,
+    "each shard must upload its captures under the dsvr-shard-<index> artifact name mergeShards.mjs reads",
+  );
+});
+
+test("phase 2: merge-verify unions the shards and gates commit-pr-baselines", () => {
+  const block = jobBlock("merge-verify");
+  assert.match(block, /needs: \[plan, visual-regression\]/);
+  assert.match(block, /mergeShards\.mjs/, "merge-verify must union the shard artifacts");
+  assert.match(
+    block,
+    /capture-compare\.sh stage-merged/,
+    "the gate + guard must run over the union before any verification",
+  );
+  assert.match(
+    block,
+    /capture-compare\.sh verify-merged/,
+    "the phase-1 verification re-capture must run once over the merged staged set",
+  );
+  // The verification emulator steps must be gated on the gate
+  // having staged something — a zero-staged run boots no emulator.
+  assert.match(
+    block,
+    /steps\.stage\.outputs\.staged != '' && steps\.stage\.outputs\.staged != '0'/,
+    "verification steps must skip when the gate staged zero files",
+  );
+  assert.match(
+    jobCondition("commit-pr-baselines"),
+    /needs\.merge-verify\.outputs\.pr_autocommit_ready == 'true'/,
+    "commit-pr-baselines must gate on merge-verify's readiness, not the old single job's",
+  );
+});
+
+test("phase 2: the plan job owns bot-head detection and the scope computation", () => {
+  const plan = jobBlock("plan");
+  assert.match(plan, /id: vrbot/, "bot-head detection must live in the plan job");
+  assert.match(plan, /scope\.mjs/, "the capture scope must be computed once, in the plan job");
+  assert.match(
+    plan,
+    /shardScope\.mjs --scope .* --plan/,
+    "the plan job must ask shardScope.mjs for the shard plan",
+  );
+  assert.match(
+    jobCondition("visual-regression"),
+    /needs\.plan\.outputs\.skip != 'true'/,
+    "a bot baseline head must skip the matrix jobs via the plan job's skip output",
+  );
+});
+
 test("label-triggered runs get their own per-label concurrency group", () => {
   const group = workflow.match(/\n {2}group: android-storybook-vr-(.*)/);
   assert.ok(group, "concurrency group not found in android-storybook.yml");

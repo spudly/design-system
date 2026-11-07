@@ -488,8 +488,29 @@ before merging the release.
    like any other change — a green VR check on a PR whose head
    carries such a bot commit means "the change is real and its
    baselines were re-verified", not "nothing changed". The diff
-   images from the first compare pass are in the `dsvr-output`
-   artifact.
+   images from the first compare pass are in the
+   `dsvr-output-<shard>` artifacts.
+
+   The compare pass is **sharded** (issue #432 phase 2,
+   `shardScope.mjs`): the workflow's `plan` job computes the
+   capture scope once and, for scopes over the tooling's serial
+   threshold (20 captures), splits it round-robin across up to
+   four parallel emulator jobs, each running only its slice's
+   compare (`capture-compare.sh` mode `pr-shard`). The
+   `merge-verify` job then unions the shards' captures
+   (`ci/mergeShards.mjs` — the merge refuses a missing shard, a
+   shard's non-diff failure, or a capture two shards both
+   produced), runs the commit gate and luminance guard over the
+   union (mode `stage-merged`), and runs the phase-1 verification
+   re-capture once over the merged staged set (mode
+   `verify-merged`) before `commit-pr-baselines` pushes anything.
+   Scopes at or under the threshold — and `update` dispatches —
+   stay on a single shard, the pre-#432 serial shape, and the
+   driver's serial `pr-autocommit` mode remains as the reference
+   flow the sharded one is checked against: the shards are
+   disjoint and union to the scope, so a sharded run stages and
+   proves exactly the set a serial run on the same head would.
+
 2. **First run / new stories**: a missing baseline never fails a
    compare — the driver captures the story, warns `WARN … no
 baseline yet` and skips it (a BOOTSTRAP note when nothing at all
