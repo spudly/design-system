@@ -7,7 +7,7 @@ import { Text } from "./Text.js";
 const StyledTrack = styled(TamaguiSlider.Track, {
   name: "SliderTrack",
 
-  height: tokens.spacing[2],
+  height: tokens.spacing[4],
   borderRadius: tokens.radii.full,
   // The unfilled track is the theme's progressTrack role, exactly as
   // on ProgressBar and Spinner's determinate ring: the $primary fill
@@ -34,6 +34,11 @@ const StyledThumb = styled(TamaguiSlider.Thumb, {
   alignItems: "center",
   justifyContent: "center",
   backgroundColor: "transparent",
+  // The primitive's default thumb border renders as a square black
+  // frame around the round knob (#482) — the frame carries no border
+  // of its own; the knob's own round border is the visible boundary.
+  borderWidth: 0,
+  borderRadius: tokens.radii.full,
   cursor: "pointer",
 });
 

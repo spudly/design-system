@@ -197,6 +197,12 @@ test("the styled parts are token-driven and the thumb target is 44px around a 24
   // ring): $progressTrack under a $primary fill.
   assert.match(slider, /backgroundColor: "\$progressTrack"/);
   assert.match(slider, /backgroundColor: "\$primary"/);
+  // #482: the track is spacing[4] thick (twice the original
+  // spacing[2]), and the thumb frame carries no border — the
+  // primitive's default border rendered as a square black frame
+  // around the round knob; the knob's own round border stays.
+  assert.match(slider, /height: tokens\.spacing\[4\]/);
+  assert.match(slider, /borderWidth: 0/);
   assert.match(slider, /width: 44/);
   assert.match(slider, /height: 44/);
   assert.match(slider, /width: tokens\.spacing\[6\]/);
