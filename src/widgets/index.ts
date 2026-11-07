@@ -54,6 +54,7 @@ export {
 export { CardRow, type CardRowProps } from "./CardRow.js";
 export { ListRow, type ListRowProps } from "./ListRow.js";
 export { LoadingGate, type LoadingGateProps } from "./LoadingGate.js";
+export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./MessageCard.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";
@@ -95,12 +96,6 @@ export { VerseText, type VerseTextProps } from "./VerseText.js";
 // tranche PRs adopt these in their update rounds).
 export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
 export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
-export {
-  DocumentFooter,
-  type DocumentFooterLink,
-  type DocumentFooterProps,
-} from "./DocumentFooter.js";
-export { DocumentHeader, type DocumentHeaderProps } from "./DocumentHeader.js";
 export { FieldLabel, type FieldLabelProps } from "./FieldLabel.js";
 export { FieldStack, type FieldStackProps } from "./FieldStack.js";
 export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
@@ -115,12 +110,6 @@ export {
   type PresetValueOption,
   type PresetValueSelectorProps,
 } from "./PresetValueSelector.js";
-export { PublicFrameHeader, type PublicFrameHeaderProps } from "./PublicFrameHeader.js";
-export {
-  COLUMN_MAX_WIDTH,
-  PublicFrameLayout,
-  type PublicFrameLayoutProps,
-} from "./PublicFrameLayout.js";
 export {
   RatingsCard,
   type RatingsCardCommunityRating,

@@ -187,8 +187,8 @@ test("the pages barrel has no wildcard re-exports (#298)", () => {
 test("the public surface is exactly the pages barrel's names plus the #411 additions", () => {
   assert.ok(pagesNames.size > 0, "the pages barrel exports names");
   // Every pages-barrel name is a page component or one of its
-  // view-model types: value exports all end in "Page" or are the
-  // PublicPageFrame page frame; type exports belong to a page.
+  // view-model types: value exports all end in "Page"; type
+  // exports belong to a page.
   const builtPagesTypes = readFileSync(join(root, "dist", "pages", "index.d.ts"), "utf8");
   for (const name of pagesNames) {
     assert.ok(

@@ -55,6 +55,18 @@ test("ScrollShell paints the surface and scrolls its inset column through Scroll
     1,
     "exactly one scroll region: the shell's single scroll",
   );
-  assert.match(scrollShellCode, /<YStack padding="\$4" gap="\$4">/);
+  assert.match(scrollShellCode, /<YStack\s+width="100%"/);
+  assert.match(scrollShellCode, /padding="\$4"\s+gap="\$4"/);
   assert.ok(!scrollShellCode.includes("lineHeight"), "the shell must not set lineHeight");
+});
+
+test("ScrollShell caps and centers its column at the public column width (#473)", () => {
+  // The cap moved here from the retired PublicFrameLayout: the
+  // shell's column is at most 768px wide and centered, so the
+  // public recipe sections keep their measure on desktop while
+  // the footer (BigFooterShell's, outside this column) stays
+  // uncapped.
+  assert.match(scrollShellCode, /SCROLL_SHELL_COLUMN_MAX_WIDTH = 768/);
+  assert.match(scrollShellCode, /maxWidth=\{SCROLL_SHELL_COLUMN_MAX_WIDTH\}/);
+  assert.match(scrollShellCode, /alignSelf="center"/);
 });

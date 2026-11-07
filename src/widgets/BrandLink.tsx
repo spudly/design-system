@@ -50,9 +50,9 @@ export type BrandLinkProps = {
 /**
  * The brand wordmark link (#119): a real anchor in the brand
  * treatment (primary ink, semibold, no underline) a site header
- * uses for its wordmark. Extracted from PublicPageFrame for the
- * #119 page de-styling program, so chrome composes the wordmark
- * without setting text styling itself.
+ * uses for its wordmark. Extracted from the public page frame
+ * for the #119 page de-styling program, so chrome composes the
+ * wordmark without setting text styling itself.
  *
  * The rendering is the TextLink href form's: a Tamagui Anchor —
  * a real `<a href>` on web (keyboard-operable by default, so no

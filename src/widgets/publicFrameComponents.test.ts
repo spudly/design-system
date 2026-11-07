@@ -1,18 +1,16 @@
 /**
- * Contract test for the public frame components
- * (spudly/design-system#119): BrandLink, PublicFrameLayout,
- * PublicFrameHeader, and PublicFrameFooter — the pieces
- * PublicPageFrame composes, extracted in the public-pages
- * de-styling tranche so the frame page passes copy and intent
- * callbacks only.
+ * Contract test for the surviving public chrome components
+ * (spudly/design-system#119, trimmed by #473): BrandLink and
+ * BigFooter — the pieces the public pages still compose after
+ * #473 retired PublicFrameLayout, PublicFrameHeader, and the
+ * PublicPageFrame page (LegalDocumentPage now renders its
+ * header row directly from BrandLink + TextLink, and every
+ * public page renders BigFooter through BigFooterShell).
  *
- * The pins hold the frame's design where it now lives: the
+ * The pins hold the chrome's design where it now lives: the
  * wordmark's brand treatment on a real anchor (BrandLink takes
  * an href, never a press callback — Stephen's ruling on PR
- * #311), the wide column (768px) shared by the layout and both
- * bands, the bands' surface fills and hairline borders, and the
- * footer's note + legal-link treatments — the exact treatments
- * the frame rendered before the extraction.
+ * #311), and the footer's caller-data treatments.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -32,20 +30,25 @@ function readCode(name: string) {
 }
 
 const brandLink = readCode("BrandLink.tsx");
-const layout = readCode("PublicFrameLayout.tsx");
-const header = readCode("PublicFrameHeader.tsx");
 const footer = readCode("BigFooter.tsx");
 
-test("the frame components are exported from the built internal components barrel", async () => {
+test("BrandLink is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  for (const name of ["BrandLink", "PublicFrameLayout", "PublicFrameHeader"]) {
-    assert.equal(
-      typeof dist[name],
-      "function",
-      `${name} must be exported from the internal components barrel`,
-    );
+  assert.equal(
+    typeof dist.BrandLink,
+    "function",
+    "BrandLink must be exported from the internal components barrel",
+  );
+  // #473: the retired frame components are gone from the barrel.
+  for (const name of [
+    "DocumentHeader",
+    "DocumentFooter",
+    "PublicFrameLayout",
+    "PublicFrameHeader",
+    "COLUMN_MAX_WIDTH",
+  ]) {
+    assert.equal(dist[name], undefined, `${name} must no longer be exported (#473)`);
   }
-  assert.equal(dist.COLUMN_MAX_WIDTH, 768, "the shared column constant is exported");
 });
 
 test("BrandLink is a real anchor carrying the href, in the wordmark treatment", () => {
@@ -65,72 +68,10 @@ test("BrandLink is a real anchor carrying the href, in the wordmark treatment", 
   );
 });
 
-test("PublicFrameLayout owns the shell and the wide centered column", () => {
-  assert.match(layout, /export const COLUMN_MAX_WIDTH = 768;/);
-  assert.match(layout, /<YStack flex=\{1\} backgroundColor="\$background">/);
-  // Bounded content region (PR #413 review): the content column
-  // carries an intrinsic flex basis (grow 1 / shrink 1 / basis
-  // "auto", the BigFooterShell pattern), not a plain flex={1} —
-  // with a zero basis a native footer taller than the remaining
-  // space could leave the page content with no usable viewport.
-  // This is a shape pin, as in test/bigFooter.test.ts: no JS
-  // renderer in this repo performs native (Yoga) layout, so a
-  // rendered native-viewport check is not available here.
-  assert.match(
-    layout,
-    /<View\s+flexGrow=\{1\}\s+flexShrink=\{1\}\s+flexBasis="auto"\s+width="100%"\s+maxWidth=\{COLUMN_MAX_WIDTH\}\s+alignSelf="center"\s+\{\.\.\.mainRoleProps\}\s*>/,
-    "the content column is the wide centered column and the page's main landmark (#366)",
-  );
-  assert.ok(
-    !/<View flex=\{1\}/.test(layout),
-    "the content column must not use a plain flex={1} (zero basis)",
-  );
-  assert.match(layout, /header: ReactNode;/);
-  assert.match(layout, /footer: ReactNode;/);
-  // Native footer scroll path (PR #413 review): the frame itself
-  // does not scroll — the page inside owns the content scroll —
-  // but on native the footer gets its OWN bounded scroll region
-  // (the BigFooterShell pattern), because BigFooter has no
-  // internal scroll region and a tall footer was clipped with no
-  // scroll path. Web renders the footer bare (the document
-  // scrolls the whole frame).
-  assert.match(
-    layout,
-    /isWeb \? \(\s*footer\s*\) : \(\s*<ScrollView flexGrow=\{0\} flexShrink=\{1\} keyboardShouldPersistTaps="handled">\s*\{footer\}\s*<\/ScrollView>\s*\)/,
-    "on native the footer renders inside its own bounded scroll region; on web it renders bare",
-  );
-  assert.equal(
-    (layout.match(/<ScrollView/g) ?? []).length,
-    1,
-    "PublicFrameLayout's only ScrollView is the native footer region",
-  );
-  assert.ok(
-    !/<ScrollView[^>]*>\s*\{children\}/.test(layout),
-    "the frame's children are not wrapped in a ScrollView — the page inside owns its scroll",
-  );
-  assert.ok(
-    !/<ScrollView[^>]*>\s*\{header\}/.test(layout),
-    "the frame's header is not wrapped in a ScrollView",
-  );
-});
-
-test("PublicFrameHeader is the surface band with wordmark and sign-in link", () => {
-  assert.match(header, /backgroundColor="\$surface"/);
-  assert.match(header, /borderBottomWidth=\{1\}/);
-  assert.match(header, /borderColor=\{tokens\.colors\.gray\.gray2\}/);
-  assert.match(header, /maxWidth=\{COLUMN_MAX_WIDTH\}/, "the band's row shares the column");
-  assert.match(header, /<BrandLink label=\{brandLabel\} href=\{brandHref\} \/>/);
-  assert.match(header, /<TextLink[^>]*href=\{signInHref\}/, "Sign in is a real link with an href");
-  assert.match(header, /signInHref: string;/, "the sign-in destination crosses as an href");
-  assert.ok(
-    !header.includes("onSignInPress"),
-    "no press callback survives on a link (Stephen's ruling)",
-  );
-});
-
-test("BigFooter replaced PublicFrameFooter as the frame footer (#410)", () => {
-  // PublicFrameFooter is retired: BigFooter covers every page-frame
-  // use (PublicPageFrame renders it), and it stays unexported.
+test("BigFooter is the public pages' footer (#410)", () => {
+  // BigFooter covers every page-frame use (every page renders it
+  // through BigFooterShell), and it stays unexported from the
+  // package root.
   assert.match(footer, /backgroundColor="\$primary"/, "the primary band (#465)");
   assert.match(footer, /flexWrap="wrap"/, "the columns wrap — the mobile collapse");
   assert.match(footer, /export type BigFooterData = \{/);

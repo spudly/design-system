@@ -314,7 +314,6 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-mealshubpage                 | light_warmHarvest |       3 |         3 |
 | pages-eciperay-paypage                      | light_warmHarvest |       5 |         5 |
 | pages-eciperay-profilepage                  | light_warmHarvest |       2 |         2 |
-| pages-eciperay-publicpageframe              | light_warmHarvest |       3 |         3 |
 | pages-eciperay-publicrecipepage             | light_warmHarvest |       8 |         8 |
 | pages-eciperay-recipedetailpage             | light_warmHarvest |      10 |        10 |
 | pages-eciperay-recipeformpage               | light_warmHarvest |       4 |         4 |
@@ -333,7 +332,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-tabbedshellpage              | light_quietDawn   |       6 |         6 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **168** |   **168** |
+| **Total**                                   |                   | **165** |   **165** |
 
 <!-- VR-COVERAGE-END -->
 

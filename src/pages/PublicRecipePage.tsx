@@ -4,6 +4,7 @@ import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { EqualButtonRow } from "../widgets/EqualButtonRow.js";
 import { LoadingGate } from "../widgets/LoadingGate.js";
+import { MainLandmark } from "../widgets/MainLandmark.js";
 import { MessageCard } from "../widgets/MessageCard.js";
 import { RatingsCard } from "../widgets/RatingsCard.js";
 import { RecipeIngredientsPanel } from "../widgets/RecipeIngredientsPanel.js";
@@ -61,10 +62,16 @@ import type {
  *   no-error-state stance does not bind here — there the app has
  *   no error UI at all, while here the error cards are designed
  *   surface.
- * - The public chrome is a separate DS building block,
- *   PublicPageFrame: the host wraps every state of this page
- *   (loading, errors, ready) in the frame, as the web host wraps
- *   its states in its public layout today.
+ * - The page renders its own footer: every state (loading,
+ *   errors, ready) renders through BigFooterShell from the
+ *   state's `footer` prop, the standard page pattern (#410).
+ *   #473 retired the separate PublicPageFrame page the host
+ *   once wrapped this page in — there is no host-side frame.
+ *   Landmarks (#366): the retired frame's layout owned the
+ *   `main` landmark, so the page owns it now — every state's
+ *   content renders inside exactly one `main` (the MainLandmark
+ *   component below), and BigFooterShell keeps the footer
+ *   (`contentinfo`) outside it, after it in flow.
  *
  * The CTA bar sits above the sections, its variant chosen by the
  * host's auth state: signed-out visitors get sign-up / clone /
@@ -352,15 +359,17 @@ function InstructionsSection({ instructions }: { instructions: PublicRecipePageI
  * in a single scroll view (no tabs — overview, ingredients,
  * instructions, engagement, in the order the tabs had), or one of
  * the union's non-ready states (loading gate, not-found card,
- * unavailable card). The host wraps every state in
- * PublicPageFrame. Controlled — see the file header for the
- * contract, the decisions, and the slot design.
+ * unavailable card). Every state renders its own BigFooter
+ * through BigFooterShell. Controlled — see the file header for
+ * the contract, the decisions, and the slot design.
  */
 export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "loading") {
     return (
       <BigFooterShell footer={props.footer}>
-        <LoadingGate label="Loading recipe" />
+        <MainLandmark>
+          <LoadingGate label="Loading recipe" />
+        </MainLandmark>
       </BigFooterShell>
     );
   }
@@ -368,7 +377,9 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "notFound") {
     return (
       <BigFooterShell footer={props.footer}>
-        <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />
+        <MainLandmark>
+          <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />
+        </MainLandmark>
       </BigFooterShell>
     );
   }
@@ -376,7 +387,9 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "unavailable") {
     return (
       <BigFooterShell footer={props.footer}>
-        <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />
+        <MainLandmark>
+          <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />
+        </MainLandmark>
       </BigFooterShell>
     );
   }
@@ -388,23 +401,25 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
 
   return (
     <BigFooterShell footer={props.footer}>
-      <ScrollShell>
-        <CtaBar
-          ctas={props.ctas}
-          onSignUpPress={props.onSignUpPress}
-          onClonePress={props.onClonePress}
-          onGetAppPress={props.onGetAppPress}
-        />
-        <OverviewSection overview={props.overview} />
-        <SectionHeading>Ingredients</SectionHeading>
-        <IngredientsSection ingredients={props.ingredients} />
-        <SectionHeading>Instructions</SectionHeading>
-        <InstructionsSection instructions={props.instructions.instructions} />
-        {ratings ? (
-          <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
-        ) : null}
-        {comments}
-      </ScrollShell>
+      <MainLandmark>
+        <ScrollShell>
+          <CtaBar
+            ctas={props.ctas}
+            onSignUpPress={props.onSignUpPress}
+            onClonePress={props.onClonePress}
+            onGetAppPress={props.onGetAppPress}
+          />
+          <OverviewSection overview={props.overview} />
+          <SectionHeading>Ingredients</SectionHeading>
+          <IngredientsSection ingredients={props.ingredients} />
+          <SectionHeading>Instructions</SectionHeading>
+          <InstructionsSection instructions={props.instructions.instructions} />
+          {ratings ? (
+            <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
+          ) : null}
+          {comments}
+        </ScrollShell>
+      </MainLandmark>
     </BigFooterShell>
   );
 }

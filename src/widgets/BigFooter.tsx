@@ -273,11 +273,11 @@ export type BigFooterShellProps = {
  * shell with no opt-outs; a page whose host supplied no footer
  * data renders NO footer band and reserves NO viewport height —
  * just a growing column around its content — until the host
- * supplies it. That is what lets a page compose inside a frame
- * that already owns the layout and the one footer (e.g. a public
- * page inside PublicPageFrame): the frame is the sole footer
- * owner and the nested page adds neither a second footer nor a
- * full-viewport inner shell.
+ * supplies it. That is what lets a page compose inside a shell
+ * that already owns the layout and the one footer (e.g. a hub
+ * page composing a nested page): the outer shell is the sole
+ * footer owner and the nested page adds neither a second footer
+ * nor a full-viewport inner shell.
  *
  * Platform height (CodeRabbit review, PR #413): the minimum
  * height is platform-specific — `100dvh` on web, `100%` (the

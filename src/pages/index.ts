@@ -71,7 +71,6 @@ export {
   type PublicRecipePageInstructionsProps,
   type PublicRecipePageInstruction,
 } from "./PublicRecipePage.js";
-export { PublicPageFrame, type PublicPageFrameProps } from "./PublicPageFrame.js";
 export {
   TabbedShellPage,
   type TabbedShellPageLinkTab,
