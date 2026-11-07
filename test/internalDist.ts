@@ -3,7 +3,7 @@
  *
  * The published package root (dist/index.js) exports page
  * components plus the #411 additions (the brand themes and their
- * types, `createTamaguiConfig`, and `ChunkErrorBoundary`) — no
+ * types and `createTamaguiConfig`) — no
  * other widgets, icons, tokens, tag colors, or Tamagui config
  * factories, and no subpaths. The tests in this
  * repo still exercise those internal building blocks directly,

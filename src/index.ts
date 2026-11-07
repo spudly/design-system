@@ -10,21 +10,25 @@
  * - the brand themes (`baseTheme`, `eciperayTheme`,
  *   `memorizeTheme`) and their types from src/themes/;
  * - `createTamaguiConfig` from src/tamagui.config.ts, the factory
- *   each app uses to create its own app-level Tamagui config;
- * - `ChunkErrorBoundary` (and its prop/state types), the recovery
- *   boundary for lazily loaded surfaces, lifted from Memorize's
- *   app shell.
+ *   each app uses to create its own app-level Tamagui config.
  *
  * #438 Part 1 (2026-11-05) adds back exactly the 5 specifiers
  * dispositioned as TOKENS in the Part 0 audit: `tokens` (from
  * src/tokens/) and `warmHarvestTagColors`, `tagColorNames`,
  * `tagColorNameForHex`, and the `TagColorName` type (from
  * src/themes/), which hosts consume as data alongside the themes.
- * Nothing else comes back: no widget components (ChunkErrorBoundary
- * is the one named exception), no icons, no composite (form)
- * components, and no Storybook config factories. There are no
- * subpath exports either — apps consume everything from the
- * package root, full stop.
+ * Nothing else comes back: no widget components, no icons, no
+ * composite (form) components, and no Storybook config factories.
+ * There are no subpath exports either — apps consume everything
+ * from the package root, full stop.
+ *
+ * #438's final major (2026-11-07) removes the last named exception:
+ * `ChunkErrorBoundary` (and its prop/state types) is no longer
+ * exported from the package root. The boundary stays in the repo
+ * as an internal view (src/views/) composed by the internal
+ * lazy-slot view, so hosts keep the same recovery behavior by
+ * passing lazy components into pages — they just no longer
+ * import the boundary themselves.
  *
  * Widgets, icons, and the Storybook factories remain in the repo
  * as internal building blocks (src/widgets, src/icons,
@@ -48,8 +52,3 @@ export {
 } from "./themes/index.js";
 export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
 export { createTamaguiConfig } from "./tamagui.config.js";
-export {
-  ChunkErrorBoundary,
-  type ChunkErrorBoundaryProps,
-  type ChunkErrorBoundaryState,
-} from "./views/ChunkErrorBoundary.js";

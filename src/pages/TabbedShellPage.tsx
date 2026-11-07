@@ -69,9 +69,9 @@ import { LazySlot } from "../views/LazySlot.js";
  * today). Deep-link parsing and drill state stay app-side; only
  * the chrome moved.
  *
- * The `ChunkErrorBoundary` root export stays until Part 6's
- * major removes it, once both apps render through pages that
- * slot content this way.
+ * (#438's final major removed the `ChunkErrorBoundary` root
+ * export once both apps rendered through pages that slot
+ * content this way; the boundary is internal now.)
  *
  * Placement: page components live in src/pages and are exported
  * from the package root (#298) — pages are the package's only
