@@ -31,6 +31,14 @@
  *    of react-native / react-native-svg, no "Spudly"-prefixed
  *    styled names, and no styling props (`style` / `className`) in
  *    either props type — DS components own their styles completely.
+ * 8. The connected surface (#474): while open, the trigger and
+ *    the panel square the corners where they touch — the aligned
+ *    edge's corner always, each element's far corner only when
+ *    that corner actually touches (its far edge within the other
+ *    element's span, judged per element by the shared
+ *    farCornerTouches / touchingCornerRadii helpers over the
+ *    context's side/align/measured widths). Closed, the trigger
+ *    passes no radius override.
  * 7. Runtime (SSR, against the built output): a closed dropdown
  *    renders its trigger as a button with `aria-haspopup` and
  *    `aria-expanded="false"` and does NOT render the panel content;
@@ -175,6 +183,151 @@ test("close-on-select is the context affordance (the spec's ExitContext descenda
   assert.match(dropdown, /export function useDropdownClose\(\): \(\) => void/);
   assert.match(dropdown, /return context\?\.close \?\? \(\(\) => undefined\)/);
   assert.match(dropdown, /<DropdownContext\.Provider value=\{contextValue\}>/);
+});
+
+test("the context carries the connected-surface geometry: side, align, and both measured widths (#474)", () => {
+  assert.match(dropdown, /side: DropdownSide/);
+  assert.match(dropdown, /align: DropdownAlign/);
+  assert.match(dropdown, /triggerWidth: number \| null/);
+  assert.match(dropdown, /panelWidth: number \| null/);
+  // The shell measures both widths itself: the trigger's on the
+  // trigger wrapper's onLayout, the panel's on the panel.
+  assert.match(dropdown, /setTriggerWidth\(event\.nativeEvent\.layout\.width\)/);
+  assert.match(dropdown, /setPanelWidth\(event\.nativeEvent\.layout\.width\)/);
+  // The panel unmounts while closed, so its measured width goes
+  // stale across a close: the shell resets it, and until the
+  // reopened panel lays out, its far corner counts as not touching.
+  assert.match(dropdown, /setPanelWidth\(null\)/);
+});
+
+test("only the corners that touch are squared: the aligned corner always, the far corner only when it actually touches (#474)", () => {
+  assert.match(dropdown, /export function touchingCornerRadii\(/);
+  assert.match(dropdown, /if \(farTouches\)/);
+  assert.match(dropdown, /tokens\.radii\.zero/);
+  // The far-corner rule lives in the shell's shared helper: an
+  // element's far corner touches iff its own laid-out width is no
+  // greater than the other's (within the 1px layout tolerance).
+  // Both elements judge it from the same measured pair through
+  // the context, so they can never apply different rules.
+  assert.match(dropdown, /export function farCornerTouches\(/);
+  assert.match(dropdown, /ownWidth <= otherWidth \+ 1/);
+  assert.match(dropdownButton, /farCornerTouches\(context\.triggerWidth, context\.panelWidth\)/);
+  assert.doesNotMatch(
+    dropdownButton,
+    /otherWidth/,
+    "the far-corner comparison lives in the shell's helper, not the trigger",
+  );
+  // The panel squares the edge facing the trigger; the trigger
+  // mirrors it on its own touching edge.
+  assert.match(
+    dropdown,
+    /touchingCornerRadii\(\s*side === "bottom" \? "top" : "bottom",\s*align,\s*farCornerTouches\(panelWidth, triggerWidth\),?\s*\)/,
+  );
+  assert.match(
+    dropdownButton,
+    /touchingCornerRadii\(\s*context\.side === "bottom" \? "bottom" : "top",\s*context\.align,\s*farCornerTouches\(context\.triggerWidth, context\.panelWidth\),?\s*\)/,
+  );
+  // Closed, the trigger computes no override at all.
+  assert.match(dropdownButton, /open && context !== null/);
+});
+
+test("touchingCornerRadii squares only the corners that touch, for every edge/alignment combination (#474)", async () => {
+  // Behavioral, against the built module (the source scans above
+  // cannot catch the helper returning the wrong corners).
+  const { touchingCornerRadii } = await import("../../dist/widgets/Dropdown.js");
+  // Far corner does not touch: only the aligned corner on the
+  // touching edge.
+  assert.deepEqual(touchingCornerRadii("top", "start", false), { borderTopLeftRadius: 0 });
+  assert.deepEqual(touchingCornerRadii("top", "end", false), { borderTopRightRadius: 0 });
+  assert.deepEqual(touchingCornerRadii("bottom", "start", false), {
+    borderBottomLeftRadius: 0,
+  });
+  assert.deepEqual(touchingCornerRadii("bottom", "end", false), {
+    borderBottomRightRadius: 0,
+  });
+  // Far corner touches: both corners on the touching edge, either
+  // align.
+  for (const align of ["start", "end"] as const) {
+    assert.deepEqual(touchingCornerRadii("top", align, true), {
+      borderTopLeftRadius: 0,
+      borderTopRightRadius: 0,
+    });
+    assert.deepEqual(touchingCornerRadii("bottom", align, true), {
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    });
+  }
+});
+
+test("farCornerTouches judges each element's far corner against the other's span, across the three width geometries (#474)", async () => {
+  // Behavioral, against the built module. The panel and the
+  // trigger each compose the two helpers with their own width
+  // first: the panel farCornerTouches(panelWidth, triggerWidth),
+  // the trigger farCornerTouches(triggerWidth, panelWidth).
+  const { touchingCornerRadii, farCornerTouches } = await import("../../dist/widgets/Dropdown.js");
+  // The predicate itself: an element's far corner touches iff its
+  // own width is no greater than the other's (1px tolerance), and
+  // never before both widths are measured.
+  assert.equal(farCornerTouches(200, 300), true, "own far edge lands inside the other's span");
+  assert.equal(farCornerTouches(300, 200), false, "own far corner overhangs and touches nothing");
+  assert.equal(farCornerTouches(240, 240), true, "equal widths: the far corners coincide");
+  assert.equal(farCornerTouches(241, 240), true, "within the 1px layout tolerance");
+  assert.equal(farCornerTouches(242, 240), false, "past the tolerance the corner overhangs");
+  assert.equal(farCornerTouches(null, 240), false, "own width unmeasured");
+  assert.equal(farCornerTouches(240, null), false, "other width unmeasured");
+
+  // Geometry 1 — button wider than the panel (trigger 300, panel
+  // at its 200px minimum), align start, panel below the trigger:
+  // the panel squares BOTH top corners (its right edge lands under
+  // the button); the trigger squares only its bottom-left — its
+  // bottom-right overhangs the panel and keeps its radius. (This
+  // is the case an equality-only rule got wrong: the panel's
+  // top-right stayed rounded under the button.)
+  assert.deepEqual(touchingCornerRadii("top", "start", farCornerTouches(200, 300)), {
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+  });
+  assert.deepEqual(touchingCornerRadii("bottom", "start", farCornerTouches(300, 200)), {
+    borderBottomLeftRadius: 0,
+  });
+
+  // Geometry 2 — panel wider than the button (panel 250 over a
+  // short-label trigger at 150), align start: the mirror image.
+  // The trigger squares BOTH bottom corners (its right edge lands
+  // on the panel's top edge); the panel squares only its top-left —
+  // its top-right overhangs the trigger and keeps its radius.
+  assert.deepEqual(touchingCornerRadii("top", "start", farCornerTouches(250, 150)), {
+    borderTopLeftRadius: 0,
+  });
+  assert.deepEqual(touchingCornerRadii("bottom", "start", farCornerTouches(150, 250)), {
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
+  });
+
+  // Geometry 3 — equal widths (240/240): all four touching corners
+  // square, on either alignment.
+  for (const align of ["start", "end"] as const) {
+    assert.deepEqual(touchingCornerRadii("top", align, farCornerTouches(240, 240)), {
+      borderTopLeftRadius: 0,
+      borderTopRightRadius: 0,
+    });
+    assert.deepEqual(touchingCornerRadii("bottom", align, farCornerTouches(240, 240)), {
+      borderBottomLeftRadius: 0,
+      borderBottomRightRadius: 0,
+    });
+  }
+
+  // The same button-wider geometry under align end: the coincident
+  // edge is the right one, so the panel squares both top corners
+  // (its left edge now lands on the button) and the trigger only
+  // its bottom-right.
+  assert.deepEqual(touchingCornerRadii("top", "end", farCornerTouches(200, 300)), {
+    borderTopLeftRadius: 0,
+    borderTopRightRadius: 0,
+  });
+  assert.deepEqual(touchingCornerRadii("bottom", "end", farCornerTouches(300, 200)), {
+    borderBottomRightRadius: 0,
+  });
 });
 
 test("the panel is a styled Popover.Content frame with the a11y label routed through the translator", () => {

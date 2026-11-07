@@ -5,7 +5,7 @@ import { CollapsibleIcon } from "../icons/CollapsibleIcon.js";
 import type { IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
-import { useDropdownContext } from "./Dropdown.js";
+import { farCornerTouches, touchingCornerRadii, useDropdownContext } from "./Dropdown.js";
 
 type DropdownButtonCommonProps = {
   /** Button variant, rendered by the DS Button the trigger is built on. Defaults to "secondary" — a menu trigger is a secondary action. (The "ghost" value is DEPRECATED, #463 — use the `ghost` prop.) */
@@ -149,6 +149,26 @@ export const DropdownButton = forwardRef<
   const chevronInk = useChevronInk(variant, ghost);
   const glyphSize = glyphSizes[size];
 
+  // The connected surface (#474): while open, the trigger squares
+  // the corners where it touches the panel — the aligned edge's
+  // corner always, the far corner only when it actually touches:
+  // when the trigger is no wider than the panel, so its far edge
+  // lands on the panel's facing edge (see farCornerTouches /
+  // touchingCornerRadii in Dropdown). Closed, it passes no radius
+  // override and keeps Button's full rounding. The trigger's
+  // touching edge mirrors the panel's: its bottom edge when the
+  // panel opens below, its top edge when above. The overrides ride
+  // Button's existing frame pass-through (instance radius props) —
+  // no new public prop on either component.
+  const triggerRadii =
+    open && context !== null
+      ? touchingCornerRadii(
+          context.side === "bottom" ? "bottom" : "top",
+          context.align,
+          farCornerTouches(context.triggerWidth, context.panelWidth),
+        )
+      : null;
+
   // Focus the trigger as part of activation (onPress, immediately
   // before the toggle) — NOT on press-in: press-in also fires for
   // touch-start / mouse-down, so focusing there would blur the
@@ -194,6 +214,7 @@ export const DropdownButton = forwardRef<
       accessibilityState={{ expanded: open }}
       aria-haspopup="dialog"
       gap={tokens.spacing[2]}
+      {...(triggerRadii ?? {})}
       onPress={handlePress}
     >
       {content}
