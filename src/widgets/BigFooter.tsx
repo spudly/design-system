@@ -51,14 +51,21 @@ import { contentInfoRoleProps, platformAccessibilityProps } from "./accessibilit
  * ship an EMPTY socialLinks array today (no socials exist yet);
  * the component supports the entries whenever a host has them.
  *
+ * Layout (#467): below the brand wordmark, a wrapping row holds
+ * the link columns on the left and a right-hand column carrying
+ * the store links at its top and the social icon row pinned to
+ * its bottom (space-between within the stretched column). The
+ * right column renders only when it has content.
+ *
  * Mobile collapse (Stephen's addendum, 2026-11-03): the link
  * columns live in a wrapping row whose columns carry a 300px
  * flex basis (BIG_FOOTER_COLUMN_BASIS). Below the named stack
  * breakpoint — a 640px-wide footer container
  * (BIG_FOOTER_STACK_BREAKPOINT) — two columns no longer fit side
  * by side, so the columns wrap into a stacked, single-column
- * arrangement; the brand block, store links, and social links
- * stack above them the same way. There is no horizontal scroll
+ * arrangement, and the right-hand store/social column wraps
+ * below the link columns the same way (store links first,
+ * socials after). There is no horizontal scroll
  * at any width and every link stays at its full tappable size.
  * Verify in Storybook at a 430px (mobile) width: one column,
  * stacked.
@@ -212,87 +219,102 @@ export function BigFooter({ footer }: BigFooterProps) {
       gap="$5"
       {...contentInfoRoleProps}
     >
-      <YStack gap="$3">
-        <StyledBigFooterBrandAnchor
-          {...platformAccessibilityProps({
-            accessibilityRole: "link",
-            accessibilityLabel: brand.label,
-          })}
-          href={brand.href}
-          cursor="web:pointer"
-        >
-          {brand.label}
-        </StyledBigFooterBrandAnchor>
-        {storeLinks.length > 0 ? (
-          <XStack flexWrap="wrap" gap="$3" alignItems="center">
-            {storeLinks.map((link) => {
-              const Badge = STORE_BADGES[link.store];
-              return (
-                <StyledBigFooterStoreAnchor
-                  key={link.href}
-                  {...platformAccessibilityProps({
-                    accessibilityRole: "link",
-                    accessibilityLabel: link.label,
-                  })}
-                  href={link.href}
-                  cursor="web:pointer"
-                >
-                  <Badge />
-                </StyledBigFooterStoreAnchor>
-              );
-            })}
-          </XStack>
-        ) : null}
-        {socialLinks.length > 0 ? (
-          <XStack flexWrap="wrap" gap="$3">
-            {socialLinks.map((link) => {
-              const IconGlyph = SOCIAL_ICONS[link.icon];
-              return (
-                <StyledBigFooterSocialAnchor
-                  key={link.href}
-                  {...platformAccessibilityProps({
-                    accessibilityRole: "link",
-                    accessibilityLabel: link.label,
-                  })}
-                  href={link.href}
-                  cursor="web:pointer"
-                >
-                  <IconGlyph size={24} color={socialInk} />
-                </StyledBigFooterSocialAnchor>
-              );
-            })}
-          </XStack>
-        ) : null}
-      </YStack>
-      {columns.length > 0 ? (
-        <XStack flexWrap="wrap" gap="$5">
-          {columns.map((column) => (
-            <YStack
-              key={column.title}
-              flexGrow={1}
-              flexShrink={1}
-              flexBasis={BIG_FOOTER_COLUMN_BASIS}
-              gap="$3"
-            >
-              <Text variant="label" color="$onPrimary">
-                {column.title}
-              </Text>
-              <YStack gap="$2">
-                {column.links.map((link) => (
-                  <TextLink
-                    key={link.href}
-                    href={link.href}
-                    color="$onPrimary"
-                    fontSize={tokens.typography.fontSize.sm}
-                  >
-                    {link.label}
-                  </TextLink>
-                ))}
+      <StyledBigFooterBrandAnchor
+        {...platformAccessibilityProps({
+          accessibilityRole: "link",
+          accessibilityLabel: brand.label,
+        })}
+        href={brand.href}
+        cursor="web:pointer"
+      >
+        {brand.label}
+      </StyledBigFooterBrandAnchor>
+      <XStack flexWrap="wrap" gap="$5" alignItems="stretch">
+        {columns.length > 0 ? (
+          <XStack
+            flexWrap="wrap"
+            gap="$5"
+            flexGrow={1}
+            flexShrink={1}
+            flexBasis={BIG_FOOTER_COLUMN_BASIS}
+          >
+            {columns.map((column) => (
+              <YStack
+                key={column.title}
+                flexGrow={1}
+                flexShrink={1}
+                flexBasis={BIG_FOOTER_COLUMN_BASIS}
+                gap="$3"
+              >
+                <Text variant="label" color="$onPrimary">
+                  {column.title}
+                </Text>
+                <YStack gap="$2">
+                  {column.links.map((link) => (
+                    <TextLink
+                      key={link.href}
+                      href={link.href}
+                      color="$onPrimary"
+                      fontSize={tokens.typography.fontSize.sm}
+                    >
+                      {link.label}
+                    </TextLink>
+                  ))}
+                </YStack>
               </YStack>
-            </YStack>
-          ))}
-        </XStack>
-      ) : null}
+            ))}
+          </XStack>
+        ) : null}
+        {storeLinks.length > 0 || socialLinks.length > 0 ? (
+          <YStack
+            flexShrink={1}
+            justifyContent="space-between"
+            gap="$3"
+            testID="big-footer-side-column"
+          >
+            {storeLinks.length > 0 ? (
+              <YStack gap="$3" alignItems="flex-start">
+                {storeLinks.map((link) => {
+                  const Badge = STORE_BADGES[link.store];
+                  return (
+                    <StyledBigFooterStoreAnchor
+                      key={link.href}
+                      {...platformAccessibilityProps({
+                        accessibilityRole: "link",
+                        accessibilityLabel: link.label,
+                      })}
+                      href={link.href}
+                      cursor="web:pointer"
+                    >
+                      <Badge />
+                    </StyledBigFooterStoreAnchor>
+                  );
+                })}
+              </YStack>
+            ) : null}
+            {socialLinks.length > 0 ? (
+              <XStack flexWrap="wrap" gap="$3">
+                {socialLinks.map((link) => {
+                  const IconGlyph = SOCIAL_ICONS[link.icon];
+                  return (
+                    <StyledBigFooterSocialAnchor
+                      key={link.href}
+                      {...platformAccessibilityProps({
+                        accessibilityRole: "link",
+                        accessibilityLabel: link.label,
+                      })}
+                      href={link.href}
+                      cursor="web:pointer"
+                    >
+                      <IconGlyph size={24} color={socialInk} />
+                    </StyledBigFooterSocialAnchor>
+                  );
+                })}
+              </XStack>
+            ) : null}
+          </YStack>
+        ) : null}
+      </XStack>
     </YStack>
   );
 }
