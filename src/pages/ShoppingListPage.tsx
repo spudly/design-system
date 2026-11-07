@@ -1,7 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { CheckRow } from "../widgets/CheckRow.js";
 import { EmptyState } from "../widgets/EmptyState.js";
-import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { Center } from "../widgets/Center.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
@@ -36,8 +37,9 @@ import { Text } from "../widgets/Text.js";
  *   MealPlansPage row's keyboard handling).
  *
  * States mirror the app view's swaps: while `loading`, the
- * shared ListLoadingState replaces the list (the app renders
- * its branded loader there; ListLoadingState stands in, the
+ * centered Spinner (Center + Spinner) replaces the list (the
+ * app renders its branded loader there; the centered Spinner
+ * stands in, the
  * RecipeFormPage precedent — the branded loader stays app-side by recorded
  * decision); an empty list renders the DS EmptyState with the
  * app's message.
@@ -82,7 +84,9 @@ export function ShoppingListPage({
         <SectionStack>
           <Text variant="title">Shopping list</Text>
           {loading ? (
-            <ListLoadingState label="Loading shopping list" />
+            <Center>
+              <Spinner label="Loading shopping list" />
+            </Center>
           ) : lines.length === 0 ? (
             <EmptyState title="No items on this list." />
           ) : (

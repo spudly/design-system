@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { Button } from "../widgets/Button.js";
 import { RemovableField } from "../widgets/RemovableField.js";
 import { SearchField } from "./SearchField.js";
-import { SearchRow } from "../widgets/SearchRow.js";
+import { FieldRow } from "../widgets/FieldRow.js";
 import { SelectField, type SelectOption } from "../widgets/SelectField.js";
 import { TextField } from "./TextField.js";
 
@@ -253,7 +253,7 @@ function FilterControl<FilterId extends string>({
  * filter's control renders only once that filter has been
  * added. The search placeholder and the filter definitions are
  * props because the catalogs' copy and data differ. The bar
- * composes the shared primitives for its rows: SearchRow for
+ * composes the shared primitives for its rows: FieldRow for
  * the search row and RemovableField for each added filter —
  * the two catalogs' bars had converged on those exact shapes
  * independently before this component unified them (#119
@@ -299,13 +299,13 @@ export function CatalogFiltersBar<FilterId extends string = string>({
 
   return (
     <YStack gap={tokens.spacing[3]}>
-      {/* SearchRow stretches its children (#188): the small
+      {/* FieldRow stretches its children (#188): the small
           Filters button's natural height is shorter than the
           SearchField, so the button stretches to the search
           field's height and the two line up. Do not switch this
           back to flex-start — that is what made the button
           shorter than the field. */}
-      <SearchRow>
+      <FieldRow>
         <SearchField
           grow
           value={search}
@@ -325,7 +325,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
             Filters
           </Button>
         ) : null}
-      </SearchRow>
+      </FieldRow>
       {chooserOpen && addable.length > 0 ? (
         <XStack gap={tokens.spacing[2]} flexWrap="wrap">
           {addable.map((definition) => (

@@ -18,6 +18,9 @@
  * - field-level errors are untouched: they keep their id wiring
  *   (LabeledField / the field components), which is a separate,
  *   already-announced path.
+ * - exception (#472): ColorPickerField's field error renders
+ *   through Alert instead, keeping its errorId on the Alert so the
+ *   swatch group's aria-describedby wiring is unchanged.
  */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
@@ -119,13 +122,7 @@ test("AiSessionPage and RecipeFormPage pin their extra error regions", () => {
 });
 
 test("field-level errors keep their id-wired plain Text rendering", () => {
-  for (const name of [
-    "TextField",
-    "TextAreaField",
-    "SelectField",
-    "CheckboxField",
-    "ColorPickerField",
-  ]) {
+  for (const name of ["TextField", "TextAreaField", "SelectField", "CheckboxField"]) {
     const source = formSource(name);
     assert.match(
       source,
@@ -133,4 +130,21 @@ test("field-level errors keep their id-wired plain Text rendering", () => {
       `${name} still renders its field error with the errorId wiring`,
     );
   }
+});
+
+test("ColorPickerField renders its field error through Alert, keeping the errorId wiring (#472)", () => {
+  // Stephen's #472 directive overrides the field-level plain-Text
+  // treatment for ColorPickerField alone: the error renders inside
+  // an Alert (which announces it), and the Alert carries the
+  // errorId so the swatch group's aria-describedby still resolves.
+  const source = formSource("ColorPickerField");
+  assert.ok(
+    source.includes('<Alert severity="error" message={error} id={errorId} />'),
+    'ColorPickerField renders its error via Alert severity="error" with the errorId',
+  );
+  assert.doesNotMatch(
+    source,
+    /<Text variant="error" id=\{errorId\}>/,
+    "ColorPickerField no longer renders its field error as plain error Text",
+  );
 });

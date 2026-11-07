@@ -143,16 +143,25 @@ test("the three fixed-shell list pages render BoundedList", () => {
 test("the retired loading slot helpers stay retired (#119 dedupe)", () => {
   assert.ok(
     !code.includes("BoundedListLoading"),
-    "BoundedListLoading/BoundedListLoadingMore were this tranche's local helpers — the dedupe retired them for the shared ListLoadingState and they must not come back",
+    "BoundedListLoading/BoundedListLoadingMore were this tranche's local helpers — the dedupe retired them for the shared Center + Spinner composition and they must not come back",
   );
 });
 
-test("RecipesPage renders its loading slots through ListLoadingState directly (#119)", () => {
+test("RecipesPage renders its loading slots through Center + Spinner directly (#119)", () => {
   const page = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
   // Since #415 the loading slots are the two sections' own
   // rows in the unified list (each section loads independently)
   // plus the shared loading-more footer.
-  assert.match(page, /case "loadingOwn":\s*return <ListLoadingState label="Loading" \/>;/);
-  assert.match(page, /case "loadingDiscovery":\s*return <ListLoadingState label="Loading" \/>;/);
-  assert.match(page, /isFetchingNextPage \? <ListLoadingState label="Loading" \/> : undefined/);
+  assert.match(
+    page,
+    /case "loadingOwn":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
+  );
+  assert.match(
+    page,
+    /case "loadingDiscovery":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
+  );
+  assert.match(
+    page,
+    /isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined/,
+  );
 });
