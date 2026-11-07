@@ -1,74 +1,7 @@
-/**
- * Contract test for PublicRecipePage
- * (spudly/design-system#169): Eciperay's public (signed-out, SEO)
- * recipe surface as a controlled DS page component, following the
- * RecipeDetailPage precedent. (#473 retired the PublicPageFrame
- * page this test once also pinned — the page now renders its own
- * BigFooter through BigFooterShell, like every other page.)
- *
- * The invariants pinned here are the ones the Eciperay web rewire
- * will depend on, and the decisions Stephen resolved on #169
- * (2026-10-28):
- * 1. Both components are exported from the pages barrel index,
- *    and the views import nothing from an app package and run no
- *    queries or mutations — business logic stays app-side.
- * 2. Error states live inside the props union: loading, notFound,
- *    and unavailable are union members alongside ready, each
- *    non-ready state branches before the ready render, and the
- *    error copy is the web surface's verbatim copy.
- * 3. Single scroll, no tabs: exactly one scroll region in the
- *    page — owned by ScrollShell since the #119 de-styling moved
- *    the page's hand-rolled ScrollView into it — no tab state in
- *    the contract, and the sections render in tab order (CTA bar,
- *    overview, ingredients, instructions, engagement) so every
- *    section stays in the document.
- * 4. The CTA bar's variant is chosen by the host's auth state:
- *    signed-out shows the three navigation intents with their
- *    verbatim labels; signed-in shows the clone button (with its
- *    "Saving…" pending label and disabled state) and get-the-app.
- * 5. Engagement is in v1: the ratings view-model is the detail
- *    page's, reused by type alias (no second shape to drift), the
- *    viewer's star input hides when the viewer is null (the
- *    signed-out case), and the comments slot renders in the
- *    engagement stack after the ratings card.
- * 6. The shared section shapes (ingredients, instructions) are
- *    likewise reused from RecipeDetailPage by alias; the servings
- *    stepper and scale option set match the detail page's.
- * 7. The page owns its public chrome: every state renders
- *    BigFooter through BigFooterShell from its `footer` prop —
- *    there is no separate frame page wrapping it (#473).
- * 8. Optional content is omitted cleanly: no image, description,
- *    prep/cook stats, tags row, ratings card, or comments appear
- *    unless their data/callback is provided.
- * 9. No explicit lineHeight anywhere (the #162 rule), and tags
- *    render through Badge's color form (#211).
- * 10. Stories exercise every union state and both CTA variants,
- *     so Chromatic captures them.
- *
- * This is a source scan, not a render test, for the same reason as
- * test/recipeDetailPage.test.ts: the repo has no JS renderer for
- * these components (Chromatic screenshots in CI), and the
- * invariant is a per-literal property of the source. Comments are
- * stripped before scanning so prose cannot satisfy the patterns.
- *
- * The #119 de-styling composes the page's sections from shared
- * components: RatingsCard carries the engagement section,
- * ScrollShell the shell and a centered Spinner (Center + Spinner) the loading state, and the three recipe
- * sections are the shared library panels (RecipeOverviewPanel,
- * RecipeIngredientsPanel, RecipeInstructionsPanel) — first
- * composed in the page file itself from the shared primitives
- * under the #119 program rule (2026-10-29) that a tranche page
- * adds no library components, then extracted in the
- * component-only change (#331) and adopted back here. The
- * wiring pins scan the page (render order, the status map);
- * the section-internal pins scan the panel sources, and the
- * panels carry their own contract tests
- * (test/recipeOverviewPanel.test.ts and siblings).
- */
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { test } from "node:test";
+import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -358,4 +291,95 @@ test("no explicit lineHeight anywhere in the new files (#162)", () => {
   ]) {
     assert.ok(!text.includes("lineHeight"), `${name} must not set lineHeight`);
   }
+});
+
+describe("publicRecipePageAdoption", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pagesDir = join(here, "../..", "src", "pages");
+  const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "PublicRecipePage.stories.tsx"), "utf8");
+
+  // Strip block and line comments so documented patterns in prose
+  // cannot pass the scan.
+  const strip = (text: string) =>
+    text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const code = strip(source);
+  const storiesCode = strip(stories);
+
+  test("the CTA sizing and message shell are the shared components' (#341)", () => {
+    assert.ok(
+      code.includes('import { ButtonRow } from "../widgets/ButtonRow.js";'),
+      "the page imports the library ButtonRow",
+    );
+    assert.ok(
+      code.includes('import { MessageCard } from "../widgets/MessageCard.js";'),
+      "the page imports the library MessageCard",
+    );
+    assert.match(
+      code,
+      /<ButtonRow equal>\{buttons\}<\/ButtonRow>/,
+      "the CTA bar passes its buttons to ButtonRow with `equal`, which owns their equal sizing",
+    );
+    assert.ok(
+      !code.includes("cloneElement"),
+      "the page must not size its own buttons (ButtonRow owns the cloneElement sizing)",
+    );
+    assert.ok(
+      !code.includes('from "tamagui"'),
+      "the page imports no tamagui primitives: every treatment it renders is a DS component's",
+    );
+  });
+
+  test("the sections render through the shared library panels (#331)", () => {
+    for (const panel of [
+      "RecipeOverviewPanel",
+      "RecipeIngredientsPanel",
+      "RecipeInstructionsPanel",
+    ]) {
+      assert.ok(
+        code.includes(`import { ${panel} } from "../widgets/${panel}.js";`),
+        `the page imports the library ${panel}`,
+      );
+    }
+    // The view-models pass into the panels unchanged (the shared shapes).
+    assert.match(code, /<RecipeIngredientsPanel ingredients=\{ingredients\} \/>/);
+    assert.match(code, /<RecipeInstructionsPanel instructions=\{instructions\} \/>/);
+  });
+
+  test("stories exercise every union state and both CTA variants", () => {
+    for (const name of [
+      "Default",
+      "SignedIn",
+      "ClonePending",
+      "Minimal",
+      "Loading",
+      "NotFound",
+      "Unavailable",
+      "Ingredients",
+    ]) {
+      assert.match(
+        storiesCode,
+        new RegExp(`export const ${name}: Story`),
+        `PublicRecipePage.stories.tsx must export a ${name} story`,
+      );
+    }
+    for (const state of ["loading", "notFound", "unavailable"]) {
+      assert.match(
+        storiesCode,
+        new RegExp(`<PublicRecipePage[^>]*state="${state}"[^>]*/>`),
+        `a story must render the ${state} union member`,
+      );
+    }
+    assert.match(storiesCode, /variant: "signedIn"/, "a story must exercise the signed-in CTA bar");
+    assert.match(
+      storiesCode,
+      /isClonePending: clonePending/,
+      "a story must exercise the pending clone",
+    );
+    assert.match(
+      storiesCode,
+      /renderComments: \(\) =>/,
+      "a story must pass the comments slot with stand-in content",
+    );
+  });
 });
