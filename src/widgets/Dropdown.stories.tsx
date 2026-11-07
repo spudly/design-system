@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { XStack, YStack } from "tamagui";
+import { View, XStack, YStack } from "tamagui";
 import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
@@ -221,6 +221,113 @@ export const WideButtonShortPanel: Story = {
     <Dropdown
       accessibilityLabel="Wide button menu"
       trigger={<DropdownButton label="Recipe actions for this week" />}
+      defaultOpen
+    >
+      <YStack>
+        <MenuRow label="Open" onAction={() => undefined} />
+        <MenuRow label="Print" onAction={() => undefined} />
+      </YStack>
+    </Dropdown>
+  ),
+};
+
+/**
+ * A menu row whose label renders in the TRIGGER's typography —
+ * body family, md size, semibold weight (the Button label's own)
+ * instead of MenuRow's regular-weight body text — with a trailing
+ * spacer after the label. It mirrors MenuRow's geometry and
+ * behavior exactly; only the label's weight and the spacer differ.
+ * It exists for the equal-width fixture below: the spacer is sized
+ * so the panel the row drives lands exactly on the trigger's
+ * width (see that story's comment for the arithmetic).
+ */
+function MatchedWidthRow({
+  label,
+  onAction,
+}: {
+  label: string;
+  onAction: (label: string) => void;
+}) {
+  const close = useDropdownClose();
+  const activate = () => {
+    onAction(label);
+    close();
+  };
+  const handleKeyDown = (event: { key: string; preventDefault: () => void }) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      activate();
+    }
+  };
+  return (
+    <XStack
+      {...platformAccessibilityProps({
+        accessibilityRole: "button",
+        accessibilityLabel: label,
+      })}
+      onPress={activate}
+      onKeyDown={handleKeyDown}
+      tabIndex={0}
+      cursor="web:pointer"
+      alignItems="center"
+      gap={tokens.spacing[2]}
+      minHeight={44}
+      paddingHorizontal={tokens.spacing[3]}
+      paddingVertical={tokens.spacing[2]}
+      borderRadius={tokens.radii.md}
+    >
+      <Text fontWeight={tokens.typography.fontWeight.semibold}>{label}</Text>
+      <View width={tokens.spacing[3]} />
+    </XStack>
+  );
+}
+
+/**
+ * The equal-width case (#474): the button and the dropdown come
+ * out the SAME width, so the measured widths match and BOTH
+ * touching corner pairs square — button and panel read as one
+ * continuous surface, with no rounded far corner on either.
+ *
+ * The match is by construction, not by eye. The widest row repeats
+ * the trigger's label in the trigger's own typography, so the same
+ * text run drives both widths and cancels out of the difference.
+ * What remains is each frame's fixed extras: the trigger's border
+ * + horizontal padding + label/chevron gap + chevron
+ * (2 + 32 + 8 + 20 = 62) against the panel's border + padding +
+ * row padding (2 + 16 + 24 = 42) — and the row's trailing spacer
+ * plus the gap before it (12 + 8 = 20) covers exactly that
+ * difference. The label is long enough that the panel's content
+ * clears its 200px minimum, so the minimum never drives the
+ * panel's width.
+ */
+export const EqualWidthButtonAndPanel: Story = {
+  render: () => (
+    <Dropdown
+      accessibilityLabel="Add to collection menu"
+      trigger={<DropdownButton label="Add recipe to a collection" />}
+      defaultOpen
+    >
+      <YStack>
+        <MatchedWidthRow label="Add recipe to a collection" onAction={() => undefined} />
+        <MenuRow label="Print recipe" onAction={() => undefined} />
+      </YStack>
+    </Dropdown>
+  ),
+};
+
+/**
+ * The button-wider case (#474), by a decisive margin: a long
+ * trigger label over minimal rows, so the panel sits at its 200px
+ * minimum while the button runs far past it. Only the aligned
+ * (leading) touching corners square; the panel's far corner keeps
+ * its rounding where it falls short of the button's edge and
+ * touches nothing.
+ */
+export const ButtonWiderThanPanel: Story = {
+  render: () => (
+    <Dropdown
+      accessibilityLabel="Meal plan actions"
+      trigger={<DropdownButton label="Recipe actions for this week's meal plan" />}
       defaultOpen
     >
       <YStack>
