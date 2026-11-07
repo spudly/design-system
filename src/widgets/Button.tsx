@@ -83,25 +83,27 @@ const buttonFrameConfig = {
       },
     },
     size: {
-      // #469: one explicit height per size, shared by every form
-      // (labeled, icon+label, icon-only, link) — the values are the
+      // #469: one explicit minimum height per size, shared by every form
+      // (labeled, icon+label, icon-only, link) — a minimum, not a fixed
+      // height, so a wrapped label in a grow button can still expand
+      // the frame (CodeRabbit finding on PR #520). The values are the
       // icon-only boxes below, so no form can drift shorter than
       // the 44px touch-target floor again.
       sm: {
         fontSize: tokens.typography.fontSize.sm,
-        height: 44,
+        minHeight: 44,
         paddingHorizontal: tokens.spacing[3],
         paddingVertical: tokens.spacing[2],
       },
       md: {
         fontSize: tokens.typography.fontSize.md,
-        height: 48,
+        minHeight: 48,
         paddingHorizontal: tokens.spacing[4],
         paddingVertical: tokens.spacing[3],
       },
       lg: {
         fontSize: tokens.typography.fontSize.lg,
-        height: 56,
+        minHeight: 56,
         paddingHorizontal: tokens.spacing[6],
         paddingVertical: tokens.spacing[4],
       },
