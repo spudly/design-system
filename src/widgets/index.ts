@@ -53,7 +53,6 @@ export {
 } from "./MasonryGrid.js";
 export { CardRow, type CardRowProps } from "./CardRow.js";
 export { ListRow, type ListRowProps } from "./ListRow.js";
-export { LoadingGate, type LoadingGateProps } from "./LoadingGate.js";
 export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./MessageCard.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
@@ -101,7 +100,6 @@ export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
 export { FormStack, type FormStackProps } from "./FormStack.js";
 export { LabeledField, type LabeledFieldProps } from "./LabeledField.js";
 export { LabeledGroup, type LabeledGroupProps } from "./LabeledGroup.js";
-export { ListLoadingState, type ListLoadingStateProps } from "./ListLoadingState.js";
 export { MarkableRow, type MarkableRowProps } from "./MarkableRow.js";
 export { PinnedHeaderShell, type PinnedHeaderShellProps } from "./PinnedHeaderShell.js";
 export {

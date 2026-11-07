@@ -63,7 +63,7 @@ const pageStories = readCode(join(pagesDir, "DiscoverPage.stories.tsx"));
 // The page's internals moved into shared components in the #119
 // de-styling tranche, canonized in the #320 dedupe: the filter
 // bar is CatalogFiltersBar, the list header is CatalogHeader,
-// and the list's loading state is ListLoadingState; the error
+// and the list's loading state is a centered Spinner (Center + Spinner); the error
 // state renders Alert directly (the ListErrorState middleman was
 // removed in #320 — Stephen's no-middleman ruling). The scans
 // below follow the code — the bar's decisions pin against the
@@ -72,7 +72,6 @@ const pageStories = readCode(join(pagesDir, "DiscoverPage.stories.tsx"));
 // pagination wiring, composition) stay on the page.
 const bar = readCode(join(viewsDir, "CatalogFiltersBar.tsx"));
 const catalogHeader = readCode(join(viewsDir, "CatalogHeader.tsx"));
-const loadingState = readCode(join(componentsDir, "ListLoadingState.tsx"));
 const card = readCode(join(componentsDir, "DiscoveryCard.tsx"));
 const cardStories = readCode(join(componentsDir, "DiscoveryCard.stories.tsx"));
 const pagesBarrel = readCode(join(pagesDir, "index.ts"));
@@ -95,13 +94,13 @@ test("the page contract carries copy in and the error state (decision 3)", () =>
   );
   assert.match(
     page,
-    /<ListLoadingState label="Loading" \/>/,
+    /<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>/,
     "loading renders the spinner empty state",
   );
   assert.match(
-    loadingState,
-    /<Spinner label=\{label\} \/>/,
-    "the loading state renders the spinner",
+    page,
+    /<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>/,
+    "the loading state centers the spinner with <Center>",
   );
 });
 
@@ -242,7 +241,7 @@ test("the title renders as the page heading and pagination rides the shared cata
   );
   assert.match(
     page,
-    /isFetchingNextPage \? <ListLoadingState label="Loading" \/>/,
+    /isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\)/,
     "the loading-more footer keys off isFetchingNextPage",
   );
 });

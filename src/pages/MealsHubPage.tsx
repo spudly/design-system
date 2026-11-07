@@ -2,7 +2,8 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { CardStack } from "../widgets/CardStack.js";
 import { EmptyState } from "../widgets/EmptyState.js";
-import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { Center } from "../widgets/Center.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { PinnedHeaderShell } from "../widgets/PinnedHeaderShell.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
@@ -41,9 +42,9 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * active tab is the screen's state, as today.
  *
  * States mirror the app view's swaps: while `loading`, the
- * shared ListLoadingState replaces the active tab's list (the
- * app renders its branded loader there; ListLoadingState
- * stands in — the
+ * centered Spinner (Center + Spinner) replaces the active
+ * tab's list (the app renders its branded loader there; the
+ * centered Spinner stands in — the
  * branded loader stays app-side by recorded decision); an
  * empty meals list renders the DS EmptyState with the app's
  * message. The plans tab's states are MealPlansPage's own.
@@ -167,7 +168,9 @@ export function MealsHubPage({
             New meal
           </Button>
           {loading ? (
-            <ListLoadingState label="Loading meals" />
+            <Center>
+              <Spinner label="Loading meals" />
+            </Center>
           ) : meals.length === 0 ? (
             <EmptyState title="No meals yet." />
           ) : (

@@ -10,7 +10,8 @@ import { CatalogFiltersBar, type CatalogFilterDefinition } from "../views/Catalo
 import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
 import { EmptyState } from "../widgets/EmptyState.js";
 import { LinkOverlay } from "../widgets/linkOverlay.js";
-import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { Center } from "../widgets/Center.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import type { SelectOption } from "../widgets/SelectField.js";
@@ -89,7 +90,7 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  *   pinning above a sliver of list. The list — and therefore
  *   the focused filter input — stays mounted while either
  *   section loads; each section's spinner renders as that
- *   section's row in the list (ListLoadingState), never as a
+ *   section's row in the list (a centered Spinner), never as a
  *   tree swap.
  * - #162: search uses the DS SearchField as-is. No lineHeight
  *   is set on any glyph or text in this file — the SearchField's
@@ -166,7 +167,7 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * data and callbacks only. The layout it used to hand-style
  * lives in the components it renders: BoundedList (the bounded
  * list, its content inset, the 12px row separation),
- * ListLoadingState (the loading states), CatalogFiltersBar
+ * Center + Spinner (the loading states), CatalogFiltersBar
  * (the shared catalog filter bar — the page supplies its
  * filter definitions as data; the bar owns the control design),
  * SectionHeading (the section titles), DiscoveryCard (the
@@ -703,7 +704,11 @@ export function RecipesPage(props: RecipesPageProps) {
                 );
               }
               case "loadingOwn":
-                return <ListLoadingState label="Loading" />;
+                return (
+                  <Center>
+                    <Spinner label="Loading" />
+                  </Center>
+                );
               case "ownError":
                 return <Alert severity="error">{row.message}</Alert>;
               case "ownEmpty":
@@ -714,7 +719,11 @@ export function RecipesPage(props: RecipesPageProps) {
                   />
                 );
               case "loadingOwnMore":
-                return <ListLoadingState label="Loading" />;
+                return (
+                  <Center>
+                    <Spinner label="Loading" />
+                  </Center>
+                );
               case "ownLoadMoreError":
                 return (
                   <Alert
@@ -747,7 +756,11 @@ export function RecipesPage(props: RecipesPageProps) {
                 );
               }
               case "loadingDiscovery":
-                return <ListLoadingState label="Loading" />;
+                return (
+                  <Center>
+                    <Spinner label="Loading" />
+                  </Center>
+                );
               case "discoveryError":
                 return <Alert severity="error">{row.message}</Alert>;
               case "discoveryEmpty":
@@ -763,7 +776,11 @@ export function RecipesPage(props: RecipesPageProps) {
           onScroll={onScroll}
           onEndReachedThreshold={onEndReachedThreshold}
           ListFooterComponent={
-            isFetchingNextPage ? <ListLoadingState label="Loading" /> : undefined
+            isFetchingNextPage ? (
+              <Center>
+                <Spinner label="Loading" />
+              </Center>
+            ) : undefined
           }
         />
       </ScreenContainer>

@@ -2,7 +2,7 @@
  * Contract test for the catalog components
  * (spudly/design-system#168/#119): CatalogFiltersBar and
  * CatalogHeader (views since #470), and the shared list
- * loading state (ListLoadingState) — extracted from DiscoverPage in the
+ * loading state — extracted from DiscoverPage in the
  * public-pages de-styling tranche so the catalog pages compose
  * them and pass data and callbacks only. (The bar's behavior
  * contract — the #96 chooser, the removal/clearing semantics —
@@ -21,14 +21,15 @@
  * The loading state carries no offset of its own (Stephen's
  * ruling on PR #311): an internal top padding is the margin
  * loophole in another form — parents own the spacing between
- * their children — so the state centers its spinner with
- * <Center>.
+ * their children — so the page centers its spinner with
+ * <Center> directly (#479 removed the ListLoadingState and
+ * LoadingGate wrapper components).
  *
  * There is deliberately no ListErrorState and no
  * ListLoadingFooter (Stephen's ruling on PR #320: no middleman
  * components): a list's error renders the Alert component
  * directly where it occurs, and a list's loading-more slot
- * renders ListLoadingState directly.
+ * renders the centered Spinner (Center + Spinner) directly.
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -53,9 +54,9 @@ function readCode(name: string) {
 
 const bar = readCodeFrom(viewsDir, "CatalogFiltersBar.tsx");
 const header = readCodeFrom(viewsDir, "CatalogHeader.tsx");
-const loadingState = readCode("ListLoadingState.tsx");
+const discoverPage = readCodeFrom(join(here, "../..", "src", "pages"), "DiscoverPage.tsx");
 
-test("the catalog views and the loading state are exported from their built internal barrels", async () => {
+test("the catalog views are exported from their built internal barrels", async () => {
   const distViews: Record<string, any> = await import("../../dist/views/index.js");
   for (const name of ["CatalogFiltersBar", "CatalogHeader"]) {
     assert.equal(
@@ -64,17 +65,11 @@ test("the catalog views and the loading state are exported from their built inte
       `${name} must be exported from the internal views barrel`,
     );
   }
-  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
-  assert.equal(
-    typeof dist.ListLoadingState,
-    "function",
-    "ListLoadingState must be exported from the internal components barrel",
-  );
 });
 
 test("the middleman list states are not shipped (PR #320)", async () => {
   const dist: Record<string, any> = await import("../../dist/widgets/index.js");
-  for (const name of ["ListErrorState", "ListLoadingFooter"]) {
+  for (const name of ["ListErrorState", "ListLoadingFooter", "ListLoadingState", "LoadingGate"]) {
     assert.equal(
       dist[name],
       undefined,
@@ -82,7 +77,7 @@ test("the middleman list states are not shipped (PR #320)", async () => {
     );
     assert.ok(
       !existsSync(join(componentsDir, `${name}.tsx`)),
-      `${name}.tsx must not exist — render Alert / ListLoadingState directly`,
+      `${name}.tsx must not exist — render Alert / Center + Spinner directly`,
     );
     assert.ok(
       !existsSync(join(componentsDir, `${name}.stories.tsx`)),
@@ -157,14 +152,18 @@ test("CatalogHeader renders the title as the heading over its controls", () => {
   assert.match(header, /children: ReactNode;/, "the bar composes in as the child");
 });
 
-test("the loading state centers with <Center> and carries no offset of its own", () => {
-  assert.match(loadingState, /<Center>\s*<Spinner label=\{label\} \/>\s*<\/Center>/);
-  assert.ok(
-    !/margin/.test(loadingState),
-    "ListLoadingState must not space itself with margins (#209)",
+test("the loading state is the page's own Center + Spinner composition (#479)", () => {
+  assert.match(
+    discoverPage,
+    /<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>/,
+    "DiscoverPage centers its loading spinner with <Center> directly — the wrapper components are removed (#479)",
   );
   assert.ok(
-    !/padding/.test(loadingState),
-    "ListLoadingState must not carry a padding offset — parents own spacing between children (PR #311)",
+    !discoverPage.includes("ListLoadingState"),
+    "DiscoverPage must not render the removed ListLoadingState (#479)",
+  );
+  assert.ok(
+    !discoverPage.includes("LoadingGate"),
+    "DiscoverPage must not render the removed LoadingGate (#479)",
   );
 });

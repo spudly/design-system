@@ -3,7 +3,8 @@ import { Fragment, type ReactNode } from "react";
 import { Button } from "../widgets/Button.js";
 import { ButtonStack } from "../widgets/ButtonStack.js";
 import { CenteredText } from "../widgets/CenteredText.js";
-import { ListLoadingState } from "../widgets/ListLoadingState.js";
+import { Center } from "../widgets/Center.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
@@ -27,8 +28,8 @@ import { Text } from "../widgets/Text.js";
  * renders DS rows directly. Until then the host renders each
  * row; this page keys the rows by the view-model's `id` and
  * owns the surrounding states: while `loading` the shared
- * ListLoadingState replaces the list (it stands in for the
- * app's branded loader — the RecipeFormPage precedent; the branded
+ * centered Spinner (Center + Spinner) replaces the list (it
+ * stands in for the app's branded loader — the RecipeFormPage precedent; the branded
  * loader stays app-side by recorded decision), and an empty
  * list renders the host's empty message.
  *
@@ -106,7 +107,9 @@ export function HomePage({
           </ButtonStack>
           <Text variant="subheading">{recipesTitle}</Text>
           {loading ? (
-            <ListLoadingState label="Loading recipes" />
+            <Center>
+              <Spinner label="Loading recipes" />
+            </Center>
           ) : recipes.length === 0 ? (
             <CenteredText>{emptyMessage}</CenteredText>
           ) : (

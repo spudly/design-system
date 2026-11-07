@@ -13,22 +13,32 @@ const StyledCenter = styled(YStack, {
       true: { justifyContent: "center" },
       false: { justifyContent: "flex-start" },
     },
+    fill: {
+      true: { flex: 1 },
+      false: {},
+    },
   } as const,
 
   defaultVariants: {
     horizontal: true,
     vertical: true,
+    fill: false,
   },
 });
 
 type StyledCenterProps = GetProps<typeof StyledCenter>;
 
-export type CenterProps = Omit<StyledCenterProps, "alignItems" | "justifyContent"> & {
+export type CenterProps = Omit<StyledCenterProps, "alignItems" | "justifyContent" | "flex"> & {
   /** Center the child horizontally (default true). */
   horizontal?: boolean;
   /** Center the child vertically within the Center's own
    * height (default true). */
   vertical?: boolean;
+  /** Grow to fill the height the parent offers (default
+   * false) — the full-area form, e.g. a detail page's loading
+   * state filling its shell's content region so the spinner
+   * centers on the page, not just within its own height. */
+  fill?: boolean;
 };
 
 /**
@@ -40,6 +50,6 @@ export type CenterProps = Omit<StyledCenterProps, "alignItems" | "justifyContent
  * hardcoded child is a sign Center was meant, so stacks do not
  * offer alignment props for this.
  */
-export function Center({ horizontal = true, vertical = true, ...rest }: CenterProps) {
-  return <StyledCenter horizontal={horizontal} vertical={vertical} {...rest} />;
+export function Center({ horizontal = true, vertical = true, fill = false, ...rest }: CenterProps) {
+  return <StyledCenter horizontal={horizontal} vertical={vertical} fill={fill} {...rest} />;
 }

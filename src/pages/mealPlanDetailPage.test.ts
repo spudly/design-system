@@ -53,7 +53,7 @@
  *    it renders nothing when the prop is omitted, null, or
  *    empty — the page then renders exactly as before.
  * 8. The page carries no styling of its own (#119, tranche 2):
- *    the loading state is the LoadingGate component, the entry
+ *    the loading state is a centered Spinner (Center + Spinner), the entry
  *    rows are the generic ListRow widget (its pressable area,
  *    hairline, and disabled treatment live there — pinned in
  *    test/listRow.test.ts; the page supplies the kind prefix,
@@ -104,8 +104,8 @@ test("the props are a loading | ready union, with no not-found member", () => {
   );
   assert.match(
     code,
-    /<LoadingGate label="Loading meal plan" \/>/,
-    "the loading state must render only the LoadingGate shell (the gate's spinner is pinned in test/loadingGate.test.ts)",
+    /<Center fill>\s*<Spinner label="Loading meal plan" \/>\s*<\/Center>/,
+    "the loading state must render only the centered Spinner composition (Center + Spinner)",
   );
   assert.doesNotMatch(
     code,
@@ -297,7 +297,7 @@ test("the page carries no styling of its own (#119)", () => {
   for (const item of banned) {
     assert.ok(
       !code.includes(item),
-      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in SectionStack / ButtonRow / LoadingGate / ListRow / ListStack / DetailRow since the #119 tranche-2 fix`,
+      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in SectionStack / ButtonRow / ListRow / ListStack / DetailRow since the #119 tranche-2 fix`,
     );
   }
   assert.match(

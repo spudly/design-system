@@ -456,7 +456,10 @@ MealDetailPage), or a changeset naming ListStack.
 Open in `Widgets/Center`: Centered, HorizontalOnly.
 
 Center centers a single child; `horizontal` and `vertical` are
-booleans, both defaulting to true.
+booleans, both defaulting to true. `fill` is the semantic
+full-area form (the Center grows to the height its parent
+offers) — the detail pages' loading states use it, so their
+spinner centers in the shell's content area.
 
 1. Centered: the spinner sits at the center of the framed
    block, both dimensions on. Toggle `vertical` off in the
@@ -487,21 +490,6 @@ Open in `Widgets/DetailRow`: Default, Stacked.
 **Run when:** `src/widgets/DetailRow.tsx`, its stories,
 MealPlanDetailPage (the nutrition-goal rows), or a changeset
 naming DetailRow.
-
----
-
-## LoadingGate
-
-Open in `Widgets/LoadingGate`: Default.
-
-1. The spinner sits centered — horizontally and vertically — on a
-   plain surface background that fills the story canvas, with its
-   accessible label naming what is loading ("Loading meal plan").
-2. MealPlanDetailPage's Loading story shows the identical gate.
-
-**Run when:** `src/widgets/LoadingGate.tsx`, its stories,
-MealPlanDetailPage's loading state, or a changeset naming
-LoadingGate.
 
 ---
 
@@ -864,24 +852,28 @@ their stories, or a changeset naming any of them.
 
 ---
 
-## List states (ListLoadingState)
+## List states
 
-Open in `Widgets/ListLoadingState`: Default.
+Open in `Pages/Eciperay/DiscoverPage`: Loading,
+LoadingMore.
 
-1. ListLoadingState: the spinner renders centered in its
-   parent with its label; the state carries no padding or
-   margin of its own — spacing around it is the parent's.
-   The same component renders directly at the foot of a list
-   for the loading-more slot — check that rendering in
-   `Pages/Eciperay/DiscoverPage`: LoadingMore, where the
-   spinner follows the last card with the list's own gap.
+1. The loading state is a centered Spinner (Center +
+   Spinner) composed by the page: the spinner renders
+   centered in its parent with its label; the state carries
+   no padding or margin of its own — spacing around it is
+   the parent's. The same composition renders directly at
+   the foot of a list for the loading-more slot — check
+   that rendering in `Pages/Eciperay/DiscoverPage`:
+   LoadingMore, where the spinner follows the last card
+   with the list's own gap.
 2. A list's error state has no wrapper component: the page
    renders the Alert component directly — check in
    `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
    sits under the filter bar, flush to the parent's inset.
 
-**Run when:** `src/widgets/ListLoadingState.tsx`, its
-stories, or a changeset naming it.
+**Run when:** a catalog page's loading state (Discover,
+Home, MealsHub, Recipes, ShoppingList, Tags), or a
+changeset naming the list loading states.
 
 ---
 

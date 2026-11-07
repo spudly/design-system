@@ -10,6 +10,7 @@ const meta: Meta<typeof Center> = {
   argTypes: {
     horizontal: { control: "boolean" },
     vertical: { control: "boolean" },
+    fill: { control: "boolean" },
   },
 };
 
@@ -17,9 +18,10 @@ export default meta;
 type Story = StoryObj<typeof Center>;
 
 export const Centered: Story = {
+  args: { fill: true },
   render: (args) => (
     <YStack maxWidth={430} height={200} borderWidth={1} borderColor="$borderColor">
-      <Center {...args} flex={1}>
+      <Center {...args}>
         <Spinner label="Loading" />
       </Center>
     </YStack>
