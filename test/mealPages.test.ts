@@ -326,9 +326,9 @@ test("MealsHubPage composes MealPlansPage for the plans tab and reports the tab 
     assert.ok(!page.includes(prop), `MealsHubPage must not take ${prop} (#248)`);
   }
   // Stephen's #248 ruling: an action never renders in link form —
-  // the row Delete is the button-role TextAction, never a TextLink.
+  // the row Delete is a ghost Button (#464), never a TextLink.
   // Since the #119 de-styling the row renders through the generic
-  // TextActionCardRow; the TextAction rendering itself is pinned
+  // TextActionCardRow; the ghost Button rendering itself is pinned
   // in test/textActionCardRow.test.ts.
   assert.ok(
     page.includes("TextActionCardRow"),

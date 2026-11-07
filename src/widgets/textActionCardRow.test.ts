@@ -6,8 +6,9 @@
  *
  * The pins hold the #248 semantics the page's contract
  * (test/mealPages.test.ts) used to pin in the page source: the
- * row's Delete renders through TextAction (Stephen's ruling: an
- * action never renders in link form), the text block navigates
+ * row's Delete renders as a ghost Button (Stephen's ruling: an
+ * action never renders in link form; #464 retired TextAction
+ * in favor of Button's ghost treatment), the text block navigates
  * as a link on both platforms (a real anchor on web, a
  * LinkOverlay carrying the composed label over decorative
  * texts on native), and the row carries no separation of its
@@ -33,14 +34,14 @@ test("TextActionCardRow is exported from the built internal components barrel", 
   );
 });
 
-test("the trailing action renders through TextAction, never a link (#248 ruling)", () => {
+test("the trailing action renders as a ghost Button, never a link (#248 ruling, #464)", () => {
   // The action's accessible name composes the row's title (the
   // TagsPage convention — "Delete tag X"): in a list of rows,
   // a bare "Delete" does not say which row it acts on. The
   // visible text stays the bare action label.
   assert.match(
     code,
-    /<TextAction accessibilityLabel=\{`\$\{actionLabel\} \$\{title\}`\} onPress=\{onActionPress\}>/,
+    /<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`\$\{actionLabel\} \$\{title\}`\}\s+onPress=\{onActionPress\}/,
   );
   assert.ok(!code.includes("TextLink"), "the row must not render a TextLink");
 });

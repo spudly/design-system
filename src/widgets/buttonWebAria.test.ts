@@ -26,7 +26,7 @@
  *    aria-live, elementsHidden -> aria-hidden, and drops the RN-only
  *    props; on native it returns the input unchanged.
  * 2. The DS primitives that forward caller accessibility props —
- *    Button and Text (the pressable paths: BlankWord, TextAction,
+ *    Button and Text (the pressable paths: BlankWord,
  *    TextLink, BackLink, and every Button caller) — destructure the
  *    RN accessibility props OUT of their rest props and route them
  *    through the translator, so the RN forms can never reach a

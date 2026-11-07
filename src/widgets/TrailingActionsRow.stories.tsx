@@ -3,7 +3,6 @@ import { YStack } from "tamagui";
 import { Badge } from "./Badge.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
-import { TextAction } from "./TextAction.js";
 import { TrailingActionsRow } from "./TrailingActionsRow.js";
 
 const meta: Meta<typeof TrailingActionsRow> = {
@@ -26,14 +25,16 @@ export const FieldAndAction: Story = {
   ),
 };
 
-export const ContentAndTextActions: Story = {
+export const ContentAndGhostButtons: Story = {
   render: () => (
     <YStack maxWidth={430}>
       <TrailingActionsRow leading={<Badge color="green">Weeknight</Badge>}>
-        <TextAction onPress={noop}>Edit</TextAction>
-        <TextAction variant="error" onPress={noop}>
+        <Button ghost size="sm" onPress={noop}>
+          Edit
+        </Button>
+        <Button ghost size="sm" variant="danger" onPress={noop}>
           Delete
-        </TextAction>
+        </Button>
       </TrailingActionsRow>
     </YStack>
   ),

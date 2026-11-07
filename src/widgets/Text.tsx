@@ -103,7 +103,7 @@ export type TextProps = StyledTextProps & {
  *
  * Accessibility props go through `platformAccessibilityProps` (#235),
  * the same translation as Button: text is a pressable path too
- * (TextAction, TextLink, BackLink carry `accessibilityRole="button"`
+ * (TextLink, BackLink carry `accessibilityRole="button"`
  * and callers' `accessibilityLabel`s), and Tamagui's web renderer
  * would otherwise leak the RN props to the DOM as raw attributes with
  * no accessible name. On native they pass through unchanged; a

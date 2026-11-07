@@ -80,7 +80,7 @@ test("disabled stars leave the focus order on both platforms (#316)", () => {
   assert.match(code, /disabled && !isWeb/);
   assert.match(code, /focusable: false/);
   // Web: the tab order mirrors it — disabled stars carry
-  // tabIndex -1, enabled stars 0 (the Badge / TextAction pattern).
+  // tabIndex -1, enabled stars 0 (the Badge / Button pattern).
   assert.match(code, /tabIndex=\{disabled \? -1 : 0\}/);
 });
 

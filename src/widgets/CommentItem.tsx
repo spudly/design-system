@@ -1,8 +1,8 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { TextAreaField } from "../views/TextAreaField.js";
+import { Button } from "./Button.js";
 import { Text } from "./Text.js";
-import { TextAction } from "./TextAction.js";
 
 export type CommentItemProps = {
   authorName: string;
@@ -32,9 +32,10 @@ export type CommentItemProps = {
  * TextAreaField editor while editing — and a row of small text actions.
  * All state is the caller's: the item renders the edit draft and pending
  * flags it is given and reports presses through the callbacks. Save
- * disables while an update is pending or the draft is blank. The text
- * actions render through the shared TextAction (#229), so they are
- * keyboard-focusable and Enter/Space-operable on web. The stale
+ * disables while an update is pending or the draft is blank. The
+ * actions render as ghost Buttons (#464, retiring TextAction), so
+ * they are real buttons — keyboard-focusable and
+ * Enter/Space-operable on web. The stale
  * marker is a ⚠ glyph whose accessible name is `staleHintLabel` (the
  * design system has no icon set; the glyph is decorative next to the
  * author name and the label carries its meaning).
@@ -102,53 +103,51 @@ export function CommentItem({
             {canEdit ? (
               isEditing ? (
                 <>
-                  <TextAction
+                  <Button
+                    ghost
+                    size="sm"
                     disabled={saveDisabled}
-                    color="$primary"
-                    fontSize={tokens.typography.fontSize.xs}
-                    fontWeight={tokens.typography.fontWeight.medium}
-                    opacity={saveDisabled ? 0.5 : 1}
                     onPress={() => {
                       onSaveEdit?.();
                     }}
                   >
                     Save
-                  </TextAction>
-                  <TextAction
-                    fontSize={tokens.typography.fontSize.xs}
-                    color={tokens.colors.gray.gray7}
+                  </Button>
+                  <Button
+                    ghost
+                    size="sm"
+                    variant="secondary"
                     onPress={() => {
                       onCancelEdit?.();
                     }}
                   >
                     Cancel
-                  </TextAction>
+                  </Button>
                 </>
               ) : (
-                <TextAction
-                  color="$primary"
-                  fontSize={tokens.typography.fontSize.xs}
-                  fontWeight={tokens.typography.fontWeight.medium}
+                <Button
+                  ghost
+                  size="sm"
                   onPress={() => {
                     onStartEdit?.();
                   }}
                 >
                   Edit
-                </TextAction>
+                </Button>
               )
             ) : null}
             {canDelete ? (
-              <TextAction
+              <Button
+                ghost
+                size="sm"
+                variant="danger"
                 disabled={isDeletePending}
-                fontSize={tokens.typography.fontSize.xs}
-                color={tokens.colors.danger.danger7}
-                opacity={isDeletePending ? 0.5 : 1}
                 onPress={() => {
                   onDelete?.();
                 }}
               >
                 Delete
-              </TextAction>
+              </Button>
             ) : null}
           </XStack>
         ) : null}

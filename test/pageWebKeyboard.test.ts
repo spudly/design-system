@@ -34,10 +34,11 @@ test("button-role pressables are keyboard-operable on web (#237, CodeRabbit PR #
   // tabIndex + an Enter/Space handler it announces as a button that
   // the keyboard cannot reach. The MealPlansPage rows set the
   // pattern; AiSessionPage's Cancel control reaches the same
-  // semantics by composing TextAction inline (whose tabIndex +
-  // Enter/Space handler textAction.test.ts pins), and the
+  // semantics as a real ghost Button (#464, retiring TextAction —
+  // a native <button> on web, keyboard-operable by default, its
+  // shape pinned in textAction.test.ts), and the
   // RecipeDetailPage Custom scale chip must follow it.
-  assert.match(aiSession, /<TextAction\s+onPress=\{onCancel\}\s+disabled=\{busy\}/);
+  assert.match(aiSession, /<Button\s+ghost\s+size="sm"\s+onPress=\{onCancel\}\s+disabled=\{busy\}/);
   assert.match(aiSession, /accessibilityLabel="Cancel session"/);
   // The scale control is no longer a page-level stack pressable:
   // PresetValueSelector's Custom slot is a DS Button.
@@ -46,16 +47,14 @@ test("button-role pressables are keyboard-operable on web (#237, CodeRabbit PR #
 });
 
 test("busy Cancel is activation-guarded and the Custom scale name carries the multiplier (#237)", () => {
-  // pointerEvents="none" does not stop key events on a focused
-  // control, so the Cancel control must refuse activation while
-  // busy and expose its disabled state: the page's busy flag
-  // drives the wrapper stack, which dims and blocks the pointer,
-  // and the TextAction's `disabled`, whose press/key handlers
-  // refuse activation while disabled (pinned in
-  // textAction.test.ts) — covering the assistive-technology
-  // virtual click that can reach onPress despite
-  // pointerEvents="none" (CodeRabbit finding on PR #241).
-  assert.match(aiSession, /opacity=\{busy \? 0\.5 : 1\} pointerEvents=\{busy \? "none" : "auto"\}/);
+  // A disabled native button refuses activation and leaves the
+  // tab order, so the Cancel control must expose its disabled
+  // state while busy: the page's busy flag drives the ghost
+  // Button's `disabled` (#464 — Button's own disabled handling
+  // dims the button and refuses press/key activation, pinned in
+  // textAction.test.ts), covering the assistive-technology
+  // virtual click that can reach a press handler on an enabled
+  // control (CodeRabbit finding on PR #241).
   assert.match(aiSession, /disabled=\{busy\}/);
   // The selected custom-scale button shows the multiplier as its visible
   // text; the accessible name must include it (composed in the selector).

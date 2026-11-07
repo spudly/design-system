@@ -27,13 +27,13 @@
  *   generic CardRow / ListRow components; the routing moved with
  *   them and the rows test below pins it there. AiSessionPage's
  *   Cancel action was in this list until the #119 ai-import
- *   tranche composed it inline as a TextAction — pinned below
- *   the same way. RecipeFormPage's
+ *   tranche composed it inline as a text action — since #464 it
+ *   is a ghost Button, pinned below the same way. RecipeFormPage's
  *   revert actions and changed-list banner joined them in the
  *   #119 forms tranche as the RevertAction / ChangedListBanner
- *   components; since the #119 dedupe both compose TextAction,
- *   so their press role is TextAction's routing, pinned with
- *   TextAction — the de-styled-pages test below pins that no
+ *   components; since #464 both compose a ghost Button,
+ *   so their press role is Button's routing — the
+ *   de-styled-pages test below pins that no
  *   stack pressable remains in RecipeFormPage itself.)
  * - Tamagui semantic primitives used directly: Checkbox in
  *   ChecklistRow (its `accessibilityLabel` leaked; Tamagui supplies
@@ -56,7 +56,7 @@
  *    `accessibilityRole=` / `accessibilityValue=` JSX prop in src/
  *    lands on anything but a sanctioned translating target: a DS
  *    primitive that itself translates (Button, Text, TextField,
- *    TextAreaField, TextAction — via Text — and ProgressBar), or a
+ *    TextAreaField, and ProgressBar), or a
  *    React Native element (TouchableOpacity in RecipesPage /
  *    SharedWithMePage / RecipeDetailPage; Image in
  *    ImportReviewPage, whose `accessibilityLabel`
@@ -120,7 +120,7 @@ function sourceFiles(dir: string): string[] {
 // destructures the caller's RN props out of rest and routes
 // them through platformAccessibilityProps like Button/Text.
 const SANCTIONED_TAGS = new Set(
-  "Button,Text,TextField,TextAreaField,TextAction,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert".split(
+  "Button,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert".split(
     ",",
   ),
 );
@@ -164,8 +164,8 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 // tranches: ShoppingListPage (its row is CheckRow),
 // MealDetailPage (its rows are ListRow), MealsHubPage
 // (TextActionCardRow), MealCookingModePage (its Done pill is
-// StepOverlay's), AiSessionPage (its Cancel control is an
-// inline TextAction), RecipeFormPage and the plan pages
+// StepOverlay's), AiSessionPage (its Cancel control is a
+// ghost Button), RecipeFormPage and the plan pages
 // (CardRow / ListRow; RevertAction / ChangedListBanner), and
 // RecipeDetailPage (its rows/steps through MarkableRow /
 // StepList). The list is empty; the dedicated test below pins
@@ -178,7 +178,7 @@ const PAGE_STACKS: string[] = [];
 // TouchableOpacity / LinkOverlay) before RAW is applied.
 const RAW = /accessibility(Label|State|Role|Value)=/;
 const TAGS =
-  /<(Button|Text|TextField|TextAreaField|TextAction|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g;
+  /<(Button|Text|TextField|TextAreaField|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g;
 
 test("page-level stack pressables route through the translator, never raw RN JSX props (#237)", () => {
   for (const rel of PAGE_STACKS) {
@@ -242,7 +242,7 @@ test("rows translate the disabled state; the generic rows keep the button role i
   // disabled state, and CardRow has no disabled state.
   // RecipeFormPage's revert pressables (RevertAction /
   // ChangedListBanner, #119 forms tranche) carry no row here:
-  // since the #119 dedupe both compose TextAction, whose own
+  // since #464 both compose a ghost Button, whose own
   // routing carries their role. Compact table form: this file
   // is at its line cap.
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;

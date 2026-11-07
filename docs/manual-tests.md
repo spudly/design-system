@@ -693,13 +693,13 @@ PinnedHeaderShell.
 
 Open in `Widgets/FieldStack`: Default;
 `Widgets/TrailingActionsRow`: FieldAndAction,
-ContentAndTextActions, Narrow; `Widgets/Card`: Compact.
+ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
 
 1. FieldStack: the form's fields stack at an even 12px rhythm
    with the button row last.
 2. TrailingActionsRow FieldAndAction: the leading group sits
    at the left and the action at the right on one line.
-   ContentAndTextActions: the badge sits left, Edit / Delete
+   ContentAndGhostButtons: the badge sits left, Edit / Delete
    right, at a 12px gap between the actions. Narrow: when the
    groups cannot fit, the action wraps below the leading group
    instead of overflowing.
@@ -1916,11 +1916,11 @@ BadgeCardRow.
 ## TrailingActionsRow; Card's compact variant
 
 Open in `Widgets/TrailingActionsRow`: FieldAndAction,
-ContentAndTextActions, Narrow; `Widgets/Card`: Compact.
+ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
 
 1. FieldAndAction: the leading group sits at the left and
    the action at the right on one line.
-   ContentAndTextActions: the badge sits left, Edit / Delete
+   ContentAndGhostButtons: the badge sits left, Edit / Delete
    right, at a 12px gap between the actions. Narrow: when
    the groups cannot fit, the action wraps below the leading
    group instead of overflowing.

@@ -64,7 +64,7 @@ export type StarRatingInputProps = {
  * the same stars render as a static, non-interactive display. With
  * `disabled`, the stars leave the focus order on both platforms —
  * `focusable={false}` on native, `tabIndex={-1}` on web (the Badge /
- * TextAction disabled treatment) — and the disabled state is
+ * Button disabled treatment) — and the disabled state is
  * announced consistently: the translator's `aria-disabled` is
  * restated explicitly on web after the Tamagui `disabled` prop, so
  * a disabled star can never render with a contradictory
