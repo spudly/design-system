@@ -85,12 +85,12 @@ test("loading keeps the list mounted and shows the spinner as the section's own 
   );
   assert.match(
     code,
-    /case "loadingOwn":\s*return <ListLoadingState label="Loading" \/>;/,
+    /case "loadingOwn":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
     "the own section's spinner renders as that section's row in the list",
   );
   assert.match(
     code,
-    /case "loadingDiscovery":\s*return <ListLoadingState label="Loading" \/>;/,
+    /case "loadingDiscovery":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
     "the discovery section's spinner renders as that section's row in the list",
   );
   assert.ok(

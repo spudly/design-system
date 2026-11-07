@@ -23,8 +23,8 @@ export type MessageCardProps = {
  * the copy is the caller's content, and there are no styling
  * props.
  *
- * The full-screen sibling is LoadingGate: the same surface shell
- * with a centered spinner for the loading state. The shell, the
+ * The detail pages' loading state is the same surface shell
+ * with a centered spinner (Center + Spinner). The shell, the
  * centering, and the fill are one component here because the
  * pieces do not compose to this treatment — a shell plus a
  * centering box plus a card leaves the card at the top of the

@@ -9,7 +9,7 @@
  *    the view imports nothing from an app package and runs no
  *    queries or mutations — business logic stays app-side.
  * 2. The loading member of the props union renders only the
- *    LoadingGate, before (and instead of) the chrome — the app
+ *    a centered Spinner (Center + Spinner), before (and instead of) the chrome — the app
  *    screen's gate replaces the whole screen, and it has no
  *    distinct not-found state to model.
  * 3. The chrome is pinned: status badge + version picker toolbar
@@ -108,8 +108,8 @@ test("the loading state renders only the spinner shell", () => {
   assert.ok(loadingAt < chromeAt, "the loading branch must come before the chrome render");
   assert.match(
     code,
-    /<LoadingGate label="Loading recipe" \/>/,
-    "the loading shell renders the DS LoadingGate (whose spinner carries the label)",
+    /<Center>\s*<Spinner label="Loading recipe" \/>\s*<\/Center>/,
+    "the loading shell renders a centered DS Spinner (Center + Spinner, the spinner carrying the label)",
   );
 });
 

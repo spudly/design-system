@@ -2,7 +2,8 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { DetailRow } from "../widgets/DetailRow.js";
-import { LoadingGate } from "../widgets/LoadingGate.js";
+import { Center } from "../widgets/Center.js";
+import { Spinner } from "../widgets/Spinner.js";
 import { ListRow } from "../widgets/ListRow.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { SectionStack } from "../widgets/SectionStack.js";
@@ -125,9 +126,9 @@ import { TextLink } from "../widgets/TextLink.js";
  * No lineHeight is set anywhere in this file (the #162 rule).
  *
  * De-styled for #119: the page renders no layout primitives and
- * sets no styling props. The loading state is the LoadingGate
- * component, the entry rows are the generic ListRow widget in
- * its link form (the page supplies the kind prefix, the entry's
+ * sets no styling props. The loading state is a centered
+ * Spinner (Center + Spinner), the entry rows are the generic
+ * ListRow widget in its link form (the page supplies the kind prefix, the entry's
  * href, the unavailable suffix, and the disabled flag as
  * content), the goal rows are DetailRow widgets, the plan title
  * takes Text's `title` variant, the meta lines take its `hint`
@@ -265,7 +266,9 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   if (props.state === "loading") {
     return (
       <BigFooterShell footer={props.footer}>
-        <LoadingGate label="Loading meal plan" />
+        <Center>
+          <Spinner label="Loading meal plan" />
+        </Center>
       </BigFooterShell>
     );
   }

@@ -7,7 +7,6 @@ import { CandidateList } from "../views/CandidateList.js";
 import { CardStack } from "../widgets/CardStack.js";
 import { Center } from "../widgets/Center.js";
 import { ListStack } from "../widgets/ListStack.js";
-import { LoadingGate } from "../widgets/LoadingGate.js";
 import { LogEntryCard } from "../widgets/LogEntryCard.js";
 import { MarkableRow } from "../widgets/MarkableRow.js";
 import {
@@ -913,7 +912,9 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
   if (props.state === "loading") {
     return (
       <BigFooterShell footer={props.footer}>
-        <LoadingGate label="Loading recipe" />
+        <Center>
+          <Spinner label="Loading recipe" />
+        </Center>
       </BigFooterShell>
     );
   }

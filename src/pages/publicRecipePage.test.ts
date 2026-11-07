@@ -53,7 +53,7 @@
  *
  * The #119 de-styling composes the page's sections from shared
  * components: RatingsCard carries the engagement section,
- * ScrollShell / LoadingGate the shells, and the three recipe
+ * ScrollShell the shell and a centered Spinner (Center + Spinner) the loading state, and the three recipe
  * sections are the shared library panels (RecipeOverviewPanel,
  * RecipeIngredientsPanel, RecipeInstructionsPanel) — first
  * composed in the page file itself from the shared primitives
@@ -132,8 +132,8 @@ test("error states live inside the props union, branched before the ready render
   }
   assert.match(
     code,
-    /<LoadingGate label="Loading recipe" \/>/,
-    "the loading state renders the DS LoadingGate",
+    /<Center>\s*<Spinner label="Loading recipe" \/>\s*<\/Center>/,
+    "the loading state renders a centered DS Spinner (Center + Spinner)",
   );
   assert.match(code, /<MessageCard title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
   assert.match(
