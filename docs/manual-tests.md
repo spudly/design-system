@@ -739,11 +739,10 @@ pages, or a changeset naming either.
 
 ---
 
-## RatingsCard, StatusBadge & SectionHeading
+## RatingsCard & SectionHeading
 
 Open in `Widgets/RatingsCard`: Default, NoRatingsYet,
-Stale; `Widgets/StatusBadge`: Tones;
-`Widgets/SectionHeading`: Default.
+Stale; `Widgets/SectionHeading`: Default.
 
 1. RatingsCard Default: the eyebrow label, the community stars
    with the numeric average and rating count, and the viewer's
@@ -752,16 +751,12 @@ Stale; `Widgets/StatusBadge`: Tones;
    the average; the viewer row still rates.
 3. Stale: the stale treatment renders as the story defines it,
    with no layout shift against Default.
-4. StatusBadge Tones: one badge per tone, each showing the
-   caller-passed label — the tones are Badge's, the words are
-   the caller's.
-5. SectionHeading Default: the heading renders in the
+4. SectionHeading Default: the heading renders in the
    subheading treatment, flush to its parent's inset — the
    heading itself carries no padding; the story's panel
    supplies the inset.
 
 **Run when:** `src/widgets/RatingsCard.tsx`,
-`src/widgets/StatusBadge.tsx`,
 `src/widgets/SectionHeading.tsx`, their stories, or a
 changeset naming any of them.
 

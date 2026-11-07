@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
 import { StatBand } from "./StatBand.js";
 import { StatCard } from "./StatCard.js";
-import { StatusBadge, type StatusBadgeTone } from "./StatusBadge.js";
+import { Badge, type BadgeProps } from "./Badge.js";
 import { TagList } from "./TagList.js";
 import { Text } from "./Text.js";
 import { Thumbnail } from "./Thumbnail.js";
@@ -39,7 +39,7 @@ import { Thumbnail } from "./Thumbnail.js";
  * so no recipe surface gains a second level-1 heading.
  *
  * The pieces are the shared ones (#119 dedupe): the status
- * badge is the StatusBadge component, the tag row is the
+ * badge is the Badge component, the tag row is the
  * TagList, the stats compose StatBand/StatCard, and the hero is
  * Thumbnail's frame. The status itself arrives as a tone and a
  * label the caller resolved from its own status vocabulary —
@@ -65,7 +65,7 @@ export type RecipeOverviewPanelProps = {
   description?: string | null;
   /** The status badge's tone, resolved by the caller from its
    * status vocabulary. */
-  statusTone: StatusBadgeTone;
+  statusTone: NonNullable<BadgeProps["tone"]>;
   /** The status badge's label, resolved by the caller. */
   statusLabel: string;
   /** Stat band values, app-formatted ("4", "15m", "30m"). */
@@ -106,7 +106,7 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
         </Text>
       </YStack>
       <YStack paddingBlockEnd="$4" alignSelf="flex-start">
-        <StatusBadge tone={statusTone} label={statusLabel} />
+        <Badge tone={statusTone}>{statusLabel}</Badge>
       </YStack>
       {description ? (
         <YStack paddingBlockEnd="$4">

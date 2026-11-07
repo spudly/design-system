@@ -5,7 +5,7 @@
  * row — shared by the two recipe surfaces, which each carried it
  * inline before it moved here. Its invariants: the hero renders
  * only with an image (through Thumbnail's hero frame), the
- * status badge is the shared StatusBadge fed a tone and label
+ * status badge is the shared Badge fed a tone and label
  * the caller resolved from its own status vocabulary (the panel
  * owns no status map — status words are caller data, #119
  * dedupe), the stat band composes StatBand/StatCard with
@@ -122,11 +122,11 @@ test("no recipe surface gains a second level-1 heading from the panel (#364)", (
   assert.match(detailCode, /<Text variant="formTitle">\{title\}<\/Text>/);
 });
 
-test("the status badge is the shared StatusBadge fed caller-resolved tone and label", () => {
+test("the status badge is the shared Badge fed caller-resolved tone and label", () => {
   assert.match(
     panelCode,
-    /<StatusBadge tone=\{statusTone\} label=\{statusLabel\} \/>/,
-    "the badge is the shared StatusBadge with the caller's tone and label",
+    /<Badge tone=\{statusTone\}>\{statusLabel\}<\/Badge>/,
+    "the badge is the shared Badge with the caller's tone and label",
   );
   assert.ok(
     !panelCode.includes("STATUS_BADGES"),
