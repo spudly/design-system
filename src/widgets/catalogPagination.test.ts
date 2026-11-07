@@ -189,7 +189,10 @@ test("each page counts the rows its continuation extends", () => {
   // unified RecipesPage's continuation is its discovery
   // section's, so it counts the discovery rows (#415).
   assert.match(discoverPage, /itemCount: recipes\.length,/);
-  assert.match(recipesPage, /itemCount: discoveryRecipes\.length,/);
+  assert.match(
+    recipesPage,
+    /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,/,
+  );
 });
 
 test("each page's mount gate matches its states", () => {
@@ -197,10 +200,11 @@ test("each page's mount gate matches its states", () => {
   // the unified RecipesPage gates on BOTH sections' first
   // loads and its discovery section's error state (#415 — the
   // own section has an error state too now, but it does not
-  // gate the discovery continuation).
+  // gate the discovery continuation). Since #512 the gate also
+  // requires the discovery section to be supplied at all.
   assert.match(
     recipesPage,
-    /canPaginate: !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,\s*\}\);/,
+    /canPaginate:\s*hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,\s*\}\);/,
   );
   assert.match(discoverPage, /canPaginate: !loading && !errorMessage,\s*\}\);/);
 });
