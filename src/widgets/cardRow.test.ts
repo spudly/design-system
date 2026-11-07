@@ -203,8 +203,9 @@ test("CardRow's action renders only when its label and callback are both wired",
   assert.match(cardRowCode, /variant="secondary"/);
   assert.match(cardRowCode, /size="sm"/);
   assert.match(cardRowCode, /actionTone === "danger"/);
-  assert.match(cardRowCode, /backgroundColor: tokens\.colors\.danger\.danger1,/);
-  assert.match(cardRowCode, /color: tokens\.colors\.danger\.danger8,/);
+  // #480: the danger treatment is Button's own tone prop, not
+  // caller-passed styling props.
+  assert.match(cardRowCode, /actionTone === "danger" \? \{ tone: "danger" as const \} : \{\}/);
   assert.match(cardRowCode, /onPress=\{onActionPress\}/);
   assert.match(cardRowCode, /\{actionLabel\}/);
 });

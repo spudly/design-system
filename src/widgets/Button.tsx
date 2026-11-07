@@ -1,5 +1,5 @@
 import { Children, forwardRef } from "react";
-import type { ReactNode } from "react";
+import type { ReactNode, Ref } from "react";
 import { Anchor, Button as TamaguiButton, Text as TamaguiText, styled, useTheme } from "tamagui";
 import { isWeb } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
@@ -179,8 +179,21 @@ type StyledButtonProps = GetProps<typeof StyledButton>;
  * shape below, and destructured by the wrapper so it can never leak
  * onto the rendered button element as a stray attribute).
  */
-type ButtonOwnProps = Omit<StyledButtonProps, "disabled" | "children" | "icon" | "href"> & {
+type ButtonOwnProps = Omit<
+  StyledButtonProps,
+  "disabled" | "children" | "icon" | "href" | "backgroundColor" | "color"
+> & {
   disabled?: boolean;
+  /**
+   * The semantic tone (#480): "danger" on a `secondary` button
+   * renders the danger treatment Button owns internally — danger1
+   * fill, danger8 label/glyph ink, and a danger8 border (the #459
+   * border-takes-label-color rule) — instead of the caller passing
+   * background/color styling props, which Button no longer accepts
+   * (its styles are its own). Default "default": the variant's
+   * ordinary treatment.
+   */
+  tone?: "default" | "danger";
   /**
    * The ghost treatment (#463): a boolean prop, NOT a variant —
    * it composes with the real variants. When set, the background
@@ -272,8 +285,13 @@ type StyledLinkButtonProps = GetProps<typeof StyledLinkButton>;
  * button-form-only entries (`icon`, `onPress` — a link navigates;
  * it does not take a press callback).
  */
-type ButtonLinkProps = Omit<StyledLinkButtonProps, "disabled" | "children" | "icon" | "onPress"> & {
+type ButtonLinkProps = Omit<
+  StyledLinkButtonProps,
+  "disabled" | "children" | "icon" | "onPress" | "backgroundColor" | "color"
+> & {
   disabled?: boolean;
+  /** The semantic tone (#480): see ButtonOwnProps. */
+  tone?: "default" | "danger";
   /** The ghost treatment (#463): see ButtonOwnProps — the link
    * form composes it with its variant exactly as the button form
    * does. */
@@ -326,6 +344,9 @@ export type ButtonProps =
  */
 type ButtonRenderProps = ButtonOwnProps & {
   href?: string;
+  /** Internal-only ink override (#480): NOT part of the public
+   * ButtonProps — see ButtonInternal below. */
+  internalInk?: string;
   icon?: IconName;
   children?: ReactNode;
   accessibilityLabel?: string;
@@ -394,8 +415,9 @@ const iconOnlyBoxes = {
  * (widgets/tagColors). The fallbacks are the base theme's values
  * for those roles.
  */
-function useGlyphInk(variant: string | undefined, ghost = false): string {
+function useGlyphInk(variant: string | undefined, ghost = false, dangerTone = false): string {
   const theme = useTheme();
+  if (dangerTone) return tokens.colors.danger.danger8;
   const roleValue = (key: string): string | undefined => {
     const variable = theme[key];
     return typeof variable?.val === "string" ? variable.val : undefined;
@@ -474,10 +496,7 @@ function useGlyphInk(variant: string | undefined, ghost = false): string {
  * they pass through unchanged. A caller-passed ARIA prop in `rest`
  * still wins over the translated one.
  */
-export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
-  props: ButtonProps,
-  ref,
-) {
+function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
   const {
     disabled = false,
     variant = "primary",
@@ -487,7 +506,8 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
     selected,
     icon,
     children,
-    color,
+    tone,
+    internalInk,
     href,
     onPress,
     accessible,
@@ -509,22 +529,27 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
   // names; only the four design-system variants have a mapped label color.
   // A selected toggle takes the primary ink, matching its fill. The
   // ghost PROP (#463) inks from the ghost map — the variant's own
-  // ink — unless selected (the toggle fill wins) or the caller
-  // passed a color (which wins over every map, as before).
+  // ink — unless selected (the toggle fill wins).
   const ghostInkApplies =
     ghost &&
     !selected &&
     (variant === "primary" || variant === "secondary" || variant === "danger");
+  // The danger tone (#480) applies to the secondary form: Button
+  // owns the danger1 fill / danger8 ink treatment internally.
+  const dangerToneApplies = tone === "danger" && variant === "secondary" && !selected;
   const labelColor =
-    color ??
+    internalInk ??
     (selected
       ? "$onPrimary"
-      : ghostInkApplies
-        ? ghostLabelColors[variant as keyof typeof ghostLabelColors]
-        : variantLabelColors[variant as keyof typeof variantLabelColors]);
+      : dangerToneApplies
+        ? tokens.colors.danger.danger8
+        : ghostInkApplies
+          ? ghostLabelColors[variant as keyof typeof ghostLabelColors]
+          : variantLabelColors[variant as keyof typeof variantLabelColors]);
   const glyphInk = useGlyphInk(
     selected ? "primary" : typeof variant === "string" ? variant : undefined,
     ghostInkApplies,
+    dangerToneApplies,
   );
   const isLink = href !== undefined;
   const a11yProps = platformAccessibilityProps({
@@ -589,9 +614,10 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
         {...(ghost ? { ghost: true } : null)}
         size={size}
         color={labelColor}
+        {...(dangerToneApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null)}
         // Same #459 rule as the button form: the secondary
         // variant's border always takes the label color (gray10 by
-        // default, a caller-passed `color` when one is given). The
+        // default, the danger8 ink under the danger tone). The
         // link form has no selected state, so this is the only
         // departure it needs to cover.
         {...(variant === "secondary" ? { borderColor: labelColor } : null)}
@@ -679,14 +705,14 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
       size={size}
       {...(selected !== undefined ? { selected } : null)}
       color={labelColor}
+      {...(dangerToneApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null)}
       // #459's border-matches-text rule, applied wherever the
       // label color can depart from the variant's gray10: a
       // SELECTED secondary button takes the primary fill and the
-      // on-primary label, and a caller-passed `color` overrides
-      // the label on any secondary button. Both are exactly
-      // `labelColor` (gray10 in the default case), so the
-      // secondary border simply always takes the label color.
-      // Other variants keep the frame's transparent border.
+      // on-primary label, and the danger tone takes danger8.
+      // Both are exactly `labelColor` (gray10 in the default
+      // case), so the secondary border simply always takes the
+      // label color. Other variants keep the frame's transparent border.
       {...(variant === "secondary" ? { borderColor: labelColor } : null)}
       // Same instance-prop rule as `color` above, for the family:
       // Tamagui Button forwards an instance `fontFamily` to its
@@ -732,4 +758,33 @@ export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(
       {children}
     </StyledButton>
   );
+}
+
+/**
+ * The public Button: its props (ButtonProps) accept NO styling
+ * props — `backgroundColor` and `color` are omitted from the type
+ * (#480), so label ink is purely variant/tone-derived and Button
+ * owns its styles completely.
+ */
+export const Button = forwardRef<TamaguiElement, ButtonProps>(function Button(props, ref) {
+  return ButtonImpl(props as ButtonRenderProps, ref);
 });
+
+/**
+ * The internal-only Button form (#480, Stephen-approved plan,
+ * option A for the Alert dismiss ink): identical to Button, plus
+ * the non-public `internalInk` prop, which overrides the label
+ * ink with a caller-supplied color. It exists for exactly one
+ * case — Alert's dismiss button, whose glyph must take the
+ * alert's own severity text color to keep 3:1 contrast on the
+ * alert's pale background (the ghost ink falls below it). It is
+ * deliberately NOT exported from the widgets barrel and NOT part
+ * of ButtonProps: no host and no other DS component may use it.
+ */
+export type ButtonInternalProps = ButtonProps & { internalInk?: string };
+
+export const ButtonInternal = forwardRef<TamaguiElement, ButtonInternalProps>(
+  function ButtonInternal(props, ref) {
+    return ButtonImpl(props as ButtonRenderProps, ref);
+  },
+);

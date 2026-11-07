@@ -85,8 +85,9 @@ export function BlankWord({ word, revealed, onReveal, index, total }: BlankWordP
       onFocus={() => setFocused(true)}
       onBlur={() => setFocused(false)}
       // No fill and no chrome: the blank line below is the affordance.
+      // The ghost treatment already gives the transparent fill
+      // (#480: Button no longer accepts a backgroundColor prop).
       // The ghost hover/press treatments still apply on interaction.
-      backgroundColor="transparent"
       borderColor="transparent"
       borderWidth={0}
       // The box is exactly the word's box — no padding in either axis

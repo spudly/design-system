@@ -55,3 +55,9 @@ test("the ready state renders a row per nutrient and the disclaimer", () => {
   );
   assert.match(code, /\{nutrition\.disclaimer\}/);
 });
+
+test("the panel passes no styling props into Button (#480)", () => {
+  assert.doesNotMatch(code, /backgroundColor=\{tokens\.colors\.gray/);
+  assert.doesNotMatch(code, /color=\{tokens\.colors\.gray\.gray[19]\}/);
+  assert.match(code, /variant="primary"/);
+});

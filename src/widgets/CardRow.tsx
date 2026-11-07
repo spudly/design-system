@@ -167,12 +167,7 @@ export function CardRow({
             variant="secondary"
             size="sm"
             accessibilityLabel={`${actionLabel} ${title}`}
-            {...(actionTone === "danger"
-              ? {
-                  backgroundColor: tokens.colors.danger.danger1,
-                  color: tokens.colors.danger.danger8,
-                }
-              : {})}
+            {...(actionTone === "danger" ? { tone: "danger" as const } : {})}
             onPress={onActionPress}
           >
             {actionLabel}

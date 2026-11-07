@@ -79,9 +79,7 @@ export function NutritionPanel({ nutrition }: NutritionPanelProps) {
         </YStack>
         {nutrition.onEstimatePress ? (
           <Button
-            variant="secondary"
-            backgroundColor={tokens.colors.gray.gray10}
-            color={tokens.colors.gray.gray1}
+            variant="primary"
             disabled={nutrition.isRefreshing ?? false}
             onPress={nutrition.onEstimatePress}
           >
@@ -107,8 +105,6 @@ export function NutritionPanel({ nutrition }: NutritionPanelProps) {
           <Button
             variant="secondary"
             size="sm"
-            backgroundColor={tokens.colors.gray.gray2}
-            color={tokens.colors.gray.gray9}
             disabled={(nutrition.isRefreshing ?? false) || (nutrition.isFetching ?? false)}
             onPress={nutrition.onRefreshPress}
           >
