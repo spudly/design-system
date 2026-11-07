@@ -143,7 +143,9 @@ test("FieldRow's field types fill the row height on their grow path (#476)", () 
   // SearchField: the bordered container fills its root when growing (no label).
   assert.match(searchFieldCode, /<StyledContainer \{\.\.\.\(grow && !label \? \{ flex: 1 \} : \{\}\)\}>/);
   // TextField: the styled input (the bordered box) fills its root when growing.
-  assert.match(textFieldCode, /\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)/);
+  // Scoped to the StyledInput block: the root YStack carries the same grow
+  // expression for its width, and must not be able to satisfy this pin.
+  assert.match(textFieldCode, /<StyledInput[\s\S]*?\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)/);
   // SelectField: the styled trigger (the bordered box) fills its root when growing.
   assert.match(selectFieldCode, /<StyledTrigger\s+\{\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)\}/);
 });
