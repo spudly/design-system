@@ -17,8 +17,10 @@
  * - SectionStack: a page's sections — gap spacing[8] (32px),
  *   stretch.
  * - FieldRow: a search field with its button — gap
- *   spacing[2] (8px), stretch (SearchRow, which differed
- *   only in that stretch, was consolidated into it — #481).
+ *   spacing[2] (8px), stretch (the equal-height contract,
+ *   #476: field and button render at one height; SearchRow,
+ *   which differed only in that stretch, was consolidated
+ *   into it — #481).
  * - ListStack: hairline rows as one list — no gap of its own;
  *   the rows own their separation.
  * - PanelStack: a section panel's blocks — padding and gap both
@@ -135,10 +137,27 @@ test("SectionStack owns the page-section rhythm", () => {
   assert.match(sectionStackCode, /Omit<StyledSectionStackProps, "gap" \| "alignItems">/);
 });
 
-test("FieldRow owns the search row's gap and stretch", () => {
+test("FieldRow owns the search row's gap and stretch — the equal-height contract (#476)", () => {
   assert.match(fieldRowCode, /styled\(XStack, \{\s+name: "FieldRow",/);
   assert.match(fieldRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "stretch",/);
   assert.match(fieldRowCode, /Omit<StyledFieldRowProps, "gap" \| "alignItems">/);
+});
+
+test("FieldRow's field types fill the row height on their grow path (#476)", () => {
+  const searchFieldCode = readFileSync(join(viewsDir, "SearchField.tsx"), "utf8");
+  const textFieldCode = readFileSync(join(viewsDir, "TextField.tsx"), "utf8");
+  const selectFieldCode = code("SelectField.tsx");
+  // SearchField: the bordered container fills its root when growing (no label).
+  assert.match(
+    searchFieldCode,
+    /<StyledContainer \{\.\.\.\(grow && !label \? \{ flex: 1 \} : \{\}\)\}>/,
+  );
+  // TextField: the styled input (the bordered box) fills its root when growing.
+  // Scoped to the StyledInput block: the root YStack carries the same grow
+  // expression for its width, and must not be able to satisfy this pin.
+  assert.match(textFieldCode, /<StyledInput[\s\S]*?\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)/);
+  // SelectField: the styled trigger (the bordered box) fills its root when growing.
+  assert.match(selectFieldCode, /<StyledTrigger\s+\{\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)\}/);
 });
 
 test("PanelStack owns the section panel's inset and block rhythm", () => {

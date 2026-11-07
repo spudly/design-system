@@ -54,6 +54,9 @@ export type TextFieldProps = StyledInputProps & {
    * (its root carries flex: 1) — the FieldRow pattern, mirroring
    * SearchField's `grow`: a field in a row of fields grows,
    * so the row's other children keep their natural widths.
+   * The input itself also fills the root's height on the grow
+   * path, so in a FieldRow (stretch alignment, one common
+   * height) the field's box matches its button exactly (#476).
    */
   grow?: boolean;
 };
@@ -220,6 +223,7 @@ export function TextField({
         aria-describedby={error ? errorId : undefined}
         {...a11yProps}
         {...rest}
+        {...(grow ? { flex: 1 } : {})}
         {...secureProps}
         {...autoCompleteProps}
         {...(onSubmitEditing ? { onSubmitEditing: handleSubmitEditing } : {})}

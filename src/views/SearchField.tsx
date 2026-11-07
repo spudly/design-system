@@ -150,7 +150,12 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
   /** Grow to fill the remaining width of a row the field sits in
    * (an inline search row beside a button — #119): the field's root
    * takes flex: 1 so the row's other children keep their natural
-   * width. Off by default; a standalone field sizes as before. */
+   * width. On the grow path the bordered container also fills the
+   * root's height (flex: 1, no-label case), so in a FieldRow —
+   * whose stretch alignment sets one common height — the field's
+   * box matches its button exactly (#476); the 44px glyph box
+   * inside stays 44 and centered. Off by default; a standalone
+   * field sizes as before. */
   grow?: boolean;
 };
 
@@ -195,7 +200,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
           {label}
         </Label>
       ) : null}
-      <StyledContainer>
+      <StyledContainer {...(grow && !label ? { flex: 1 } : {})}>
         <StyledGlyphBox>
           <SearchGlyph />
         </StyledGlyphBox>
