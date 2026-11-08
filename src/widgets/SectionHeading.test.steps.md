@@ -20,7 +20,8 @@ Stale; `Widgets/SectionHeading`: Default.
    with the numeric average and rating count, and the viewer's
    own star row; tapping a viewer star updates it.
 2. NoRatingsYet: the empty community line renders in place of
-   the average; the viewer row still rates.
+   the average, and no viewer row renders — the story passes
+   no viewer and no rating-change handler.
 3. Stale: the stale treatment renders as the story defines it,
    with no layout shift against Default.
 4. SectionHeading Default: the heading renders in the

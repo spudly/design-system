@@ -52,8 +52,8 @@ changeset naming RecipeDetailPage.
 Open in `Widgets/RecipeOverviewPanel`: Default, Minimal.
 
 1. Default: the title, status pill, description, stat band,
-   and tag pills stack with even 16px separation; the tag
-   pills carry their named colors. Minimal shows the title,
+   and tag pills stack — 8px below the title, 16px between
+   the other blocks; the tag pills carry their named colors. Minimal shows the title,
    the "Idea" pill, and the Servings stat only — no
    description, Prep/Cook stats, or tag row.
 

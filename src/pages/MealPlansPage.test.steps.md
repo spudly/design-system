@@ -102,8 +102,10 @@ Empty, Loading, NoGoals, NutritionUnavailable.
    "New meal plan" button under it, then the plan cards stacked
    at an even rhythm — each title over its meta line; NoActions
    drops the create button and the row Delete buttons.
-2. MealPlansPage Loading: the spinner sits centered horizontally,
-   16px below the create button; Empty shows "No meal plans yet."
+2. MealPlansPage Loading: the spinner sits centered horizontally
+   in place of the list — loading replaces the content, and the
+   Loading story renders no create button to measure from;
+   Empty shows "No meal plans yet."
 3. MealPlanDetailPage Default: the plan title (xl bold, heading
    level 1) and its muted meta lines separated by the page's
    uniform 32px section gap, the Nutrition goals card (plan

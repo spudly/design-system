@@ -17,12 +17,15 @@ Open in `Views/CatalogFiltersBar`: Collapsed, ChooserOpen,
 WithFiltersAdded; and `Views/CatalogHeader`: Default.
 
 1. Collapsed: a search field with its clear button and a
-   Filters button; below them the caller-supplied sorter row
-   and the result count line. Nothing about the filter set is
-   built in — the story's filters come from its args.
+   Filters button — nothing else. There is no sorter row or
+   result count line: sorting is one of the filter definitions
+   (Sort), rendered only once added, and the bar has no result
+   count. Nothing about the filter set is built in — the
+   story's filters come from its args.
 2. ChooserOpen: the filter chooser lists the passed-in filter
-   definitions with their controls (the demo's tag, status,
-   numeric, and availability shapes).
+   definitions by name (the demo's Ingredient, Calories,
+   Satiety, and Sort); a definition's controls render only
+   after it is added, not in the chooser list itself.
 3. WithFiltersAdded: each added filter renders as a removable
    row naming its filter; its remove button reads "Remove
    <label> filter" and removing it returns the row to the

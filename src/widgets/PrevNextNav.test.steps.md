@@ -16,9 +16,10 @@ release's changed components. The full index lives in
 Open in `Widgets/PrevNextNav`: Both, CustomLabels, NextOnly,
 NextDisabled, BackDisabled.
 
-1. BackDisabled: the Back button is hidden or visibly disabled (per
-   the story) while Next stays active and right-aligned as in
-   NextOnly.
+1. BackDisabled: the Back button remains visible in its disabled
+   state — it is not hidden (the story passes onBack with
+   backDisabled) — while Next stays active and right-aligned
+   as in NextOnly.
 2. NextDisabled: Next reads as disabled; Back remains usable.
 3. CustomLabels render verbatim with no truncation at story width.
 

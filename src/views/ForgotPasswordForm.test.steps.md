@@ -29,7 +29,11 @@ submit switches the page to its loading state).
 2. In each page's Loading story (and in a Filled story after
    step 1 has put it in the loading state), pressing Enter in
    a field does not submit again — the page stays in the
-   loading state with no further change.
+   loading state with no further change. (The stories' submit
+   handler only sets the loading flag, so a repeat submission
+   is not separately observable in Storybook; this step
+   verifies the visible end state — loading persists and the
+   submit button stays disabled.)
 3. Pressing the submit button itself in a Filled story still
    submits (same loading-state switch), and the "Create an
    account" / "Forgot password?" / "Back to sign in" /

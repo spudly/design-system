@@ -36,8 +36,9 @@ or a changeset naming CookingModePage.
 Open in `Views/ScaledIngredientsView`: OnOverlay.
 
 1. The panel renders on the dark surface with its heading and
-   five ingredient lines readable; with more lines than fit,
-   the list scrolls inside the panel instead of growing it.
+   five ingredient lines readable. The story's line set is
+   fixed at five, so the scrolls-inside-the-panel behavior
+   for longer lists is not exercised by this story.
 
 **Run when:** `src/views/ScaledIngredientsView.tsx`, its
 stories, CookingModePage, or a changeset naming

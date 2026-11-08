@@ -32,9 +32,11 @@ at the unified component's stories.)
 3. WithActions: the action buttons sit clear of the dismiss
    target and the message text; nothing overlaps at the story
    width.
-4. Info / Success / Warning / Error: each severity's icon/text
-   treatment is distinguishable and the message is readable
-   against its background in all four stories.
+4. Info / Success / Warning / Error: each severity's treatment
+   — severity-colored text, border, and background (Alert
+   renders no severity icon) — is distinguishable and the
+   message is readable against its background in all four
+   stories.
 
 **Run when:** `src/widgets/Alert.tsx`, its stories, or a
 changeset naming Alert.

@@ -16,9 +16,10 @@ release's changed components. The full index lives in
 Open in `Views/RecipeSharingView`: PublicWithConsent, Private.
 
 1. PublicWithConsent: the Public option is selected, the
-   discoverability warning shows, the consent checkbox is
-   unchecked and **Save visibility is disabled** until it is
-   checked; the share-link row (Rotate / Copy) and the public
+   discoverability warning shows, and the consent checkbox
+   starts unchecked with **Save visibility disabled**; check
+   the consent checkbox (the story is stateful) and Save
+   enables; the share-link row (Rotate / Copy) and the public
    permalink row render under the Save button.
 2. Private: no warning, no consent checkbox, no permalink row.
 

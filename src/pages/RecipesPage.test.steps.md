@@ -64,9 +64,9 @@ sections.
 4. Section independence: DiscoveryOnly shows the own section
    collapsed to its empty state ("No recipes found.") under its
    heading — the section does **not** disappear — with the
-   discovery cards below it; OwnOnly shows the discovery
-   section's empty state ("No public recipes match your
-   search.") under its heading with the own rows above it;
+   discovery cards below it; OwnOnly shows the own rows
+   alone — the host omits the discovery props entirely, so
+   no discovery heading or empty state renders at all;
    DiscoveryError shows the discovery error alert while the own
    rows above it render untouched.
 5. Empty shows both sections' empty states under their

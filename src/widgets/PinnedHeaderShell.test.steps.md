@@ -31,8 +31,12 @@ Open in `Widgets/ScreenShell`: Default;
 `Widgets/ScrollShell`: Default; `Widgets/SessionShell`:
 Fixed, Scrollable; `Widgets/PinnedHeaderShell`: Default.
 
-1. ScreenShell: the pinned bar stays fixed while the region
-   below scrolls; the surface behind is the shell's paint.
+1. ScreenShell: the pinned bar renders above the scroll
+   region, outside it, and the surface behind is the shell's
+   paint. The Default story's region content is a single
+   short paragraph that does not overflow its 480px frame,
+   so fixed-while-scrolling is verified structurally here
+   (bar outside the ScrollRegion), not by scrolling.
 2. ScrollShell: the whole column scrolls inside the surface
    frame, content inset by the standard padding with even
    separation.
