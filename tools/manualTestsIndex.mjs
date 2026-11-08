@@ -39,7 +39,7 @@ function stepsFiles(dir) {
  * strings (decoded with JSON.parse) or plain scalars.
  */
 function parseFrontMatter(text) {
-  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   if (!match) return null;
   // Line-based scan (not a block regex): only list items under the
   // `run_when:` key are triggers. Blank lines and comment lines are
