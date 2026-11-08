@@ -457,6 +457,29 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
   assert.ok(!section.includes("Scoped Section Title"), "the section title is skeletonized");
   assert.ok(!section.includes("Section Row Title"), "the section's row is skeletonized by scope");
 
+  // Nested shells (CodeRabbit on #551): a plain Card or
+  // SectionCard nested inside a loading Card must not reset the
+  // scope — the section's title skeletonizes, its action hides,
+  // and a row two shells deep still skeletonizes.
+  const nested = await renderToHtml(
+    React.createElement(
+      Card,
+      { loading: true },
+      React.createElement(
+        SectionCard,
+        {
+          title: "Nested Section Title",
+          action: React.createElement("span", null, "NestedAction"),
+        },
+        React.createElement(CardRow, { title: "Nested Row Title", onPress: noop }),
+      ),
+    ),
+  );
+  assert.equal(hiddenBones(nested), 2, "nested shells keep the scope: title + row bones");
+  assert.ok(!nested.includes("Nested Section Title"), "the nested section title is skeletonized");
+  assert.ok(!nested.includes("Nested Row Title"), "the doubly nested row is skeletonized");
+  assert.ok(!nested.includes("NestedAction"), "the nested section action is hidden while loading");
+
   const idleRow = await renderToHtml(
     React.createElement(CardRow, { title: "Visible Plan", subtitle: "4 entries", onPress: noop }),
   );

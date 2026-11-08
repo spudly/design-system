@@ -2,7 +2,7 @@ import { YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { LoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
 
 const StyledCard = styled(YStack, {
   name: "Card",
@@ -105,14 +105,21 @@ export function Card({
         ? tokens.shadows.sm.elevation
         : undefined;
   const composedStyle = [elevation !== undefined ? { elevation } : undefined, style];
+  // The scope this card provides combines its own flag with any
+  // enclosing scope: a plain Card nested inside a loading
+  // composite must not reset the scope to false for its subtree
+  // (CodeRabbit on #551 — an inner Card inside a loading Card
+  // would otherwise un-skeletonize everything below it).
+  const scopedLoading = useLoadingScope();
+  const showSkeleton = loading || scopedLoading;
   return (
     <StyledCard
       variant={resolvedVariant}
       style={composedStyle}
-      {...(loading ? platformAccessibilityProps({ accessibilityState: { busy: true } }) : {})}
+      {...(showSkeleton ? platformAccessibilityProps({ accessibilityState: { busy: true } }) : {})}
       {...rest}
     >
-      <LoadingScope active={loading}>{children}</LoadingScope>
+      <LoadingScope active={showSkeleton}>{children}</LoadingScope>
     </StyledCard>
   );
 }
