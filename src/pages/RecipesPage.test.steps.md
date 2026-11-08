@@ -87,14 +87,19 @@ sections.
    collapsing beside it (the 60dp basis). ExpandedAccessory
    shows the accessory content under the card inside the same
    list item, 12px below it.
-8. Log-cook control (own rows only; discovery cards have none):
-   a rated row's stars are one button with a 44dp target,
+8. Log-cook control (own rows that allow cook logging only;
+   discovery cards have none): a rated row's stars are one
+   button with a 44dp target,
    filled by rounding (a 4.5 rating shows five amber stars),
    named "Log a cook of <title>, rated <N> out of 5 stars"; an
    unrated row shows a single gray star as the button, named
    "Log a cook of <title>". The control flows inline after the
    subtitle text, never as a trailing row item, and it hides
-   on the row whose accessory is open.
+   on the row whose accessory is open. Rows whose data forbids
+   cook logging render no control at all: in Default those are
+   the shared rows — Fudgy Brownies (rated) and Arroz con Pollo
+   (unrated), both badged "Shared with you" — which stay
+   link-only, with no star button to check.
 
 **Run when:** `src/pages/RecipesPage.tsx` (including its
 page-local row and log-cook control compositions), its
