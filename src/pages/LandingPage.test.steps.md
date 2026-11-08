@@ -22,8 +22,7 @@ Open in `Pages/Eciperay/LandingPage`: Default, Wide.
    the ButtonLink form; there is no CtaLink): the primary CTA
    is the filled brand button link, the two secondaries are
    neutral button links, all real links (role link, their
-   hrefs), never buttons. On web they sit in one centered row
-   (check in Wide); on native (the RN storybook) they stack
+   hrefs), never buttons. On web in a consumer that compiles Tamagui they sit in one centered row (check in Wide in such a compiled environment); the root Chromatic Storybook runs no Tamagui compiler, so its Wide story may render the CTAs stacked vertically instead — do not report that stacking as a failure there. On native (the RN storybook) they stack
    vertically — the row never wraps two CTAs side by side at
    phone width.
 3. Feature cards: in Wide the three cards share one row, each

@@ -1,7 +1,7 @@
 ---
 component: MealPlanFormPage
 run_when:
-  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker."
+  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
 ---
 
 # MealPlanFormPage — manual test steps
@@ -53,4 +53,7 @@ Default, NoSelection, SaveError. Open in
 **Run when:** `src/pages/RecipeFormPage.tsx`,
 `src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
 `src/widgets/AutocompletePicker.tsx`, their stories, or a
-changeset naming any of the three pages or AutocompletePicker.
+changeset naming any of the three pages or
+AutocompletePicker. Run only the numbered cases for the
+page(s) that changed; an AutocompletePicker-only change
+runs only the autocomplete portions of cases 4 and 5.

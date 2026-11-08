@@ -66,18 +66,6 @@ function stripInlineComment(item) {
 }
 
 /**
- * Parses a steps file's YAML front-matter: the `component:` scalar
- * and the `run_when:` list, whose values are YAML double-quoted
- * strings (decoded with JSON.parse), single-quoted strings
- * (decoded by removing the outer quotes and undoubling escaped
- * single quotes), or plain scalars. A whitespace-separated inline
- * `#` comment after a value is stripped first, so the published
- * trigger is the scalar itself. A quoted value that does not
- * decode — no closing quote, or trailing text after it — is
- * rejected: publishing the raw text would silently index a
- * different trigger than the one the steps file declares.
- */
-/**
  * Decodes one `run_when:` list item: strips any inline comment, then
  * decodes a double-quoted scalar with JSON.parse, a single-quoted
  * scalar by removing the outer quotes and undoubling escaped single
@@ -102,6 +90,18 @@ function decodeScalar(item) {
   return scalar;
 }
 
+/**
+ * Parses a steps file's YAML front-matter: the `component:` scalar
+ * and the `run_when:` list, whose values are YAML double-quoted
+ * strings (decoded with JSON.parse), single-quoted strings
+ * (decoded by removing the outer quotes and undoubling escaped
+ * single quotes), or plain scalars. A whitespace-separated inline
+ * `#` comment after a value is stripped first, so the published
+ * trigger is the scalar itself. A quoted value that does not
+ * decode — no closing quote, or trailing text after it — is
+ * rejected: publishing the raw text would silently index a
+ * different trigger than the one the steps file declares.
+ */
 function parseFrontMatter(text) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   if (!match) return null;

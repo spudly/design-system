@@ -47,8 +47,10 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
    tapping it again restores them. The servings stepper and the
    Scale preset buttons fit the story width without wrapping the
    Scale row; the selected scale is primary-filled, and the
-   Custom button turns into a number input when pressed and
-   shows the applied value selected (e.g. "4×").
+   Custom button turns into a number input when pressed;
+   entering a value does not apply it immediately — press
+   Enter or move focus outside the selector, and only then
+   it shows the applied value selected (e.g. "4×").
 6. Instructions: the first step card is highlighted (primary
    border and tint) on open; pressing another card moves the
    highlight to it. Steps render in step-number order.

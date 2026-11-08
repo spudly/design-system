@@ -21,8 +21,12 @@ TermsOfService, Wide.
    in PrivacyPolicy, "Last updated: June 18, 2026" in
    TermsOfService (each story's fixture date); each section
    title is a level-2 heading.
-2. The paragraph renders its strong span bold and its mailto
-   link underlined in link ink; the list renders bulleted rows
+2. In PrivacyPolicy, the "Information we collect" paragraph
+   renders its strong span ("create an account") bold, and
+   the separate "Contact us" paragraph renders its mailto
+   link underlined in link ink (TermsOfService has no strong
+   paragraph — its contact paragraph carries the same mailto
+   link); the list renders bulleted rows
    with bold lead-ins; in PrivacyPolicy, the "Search engines"
    paragraph renders its `noindex` span in monospace code
    styling (the TermsOfService fixture has no code span).

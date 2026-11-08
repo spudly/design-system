@@ -1,7 +1,7 @@
 ---
 component: AutocompletePicker
 run_when:
-  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker."
+  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
   - "src/widgets/AutocompletePicker.tsx, its stories, or a changeset naming AutocompletePicker."
 ---
 
@@ -54,7 +54,10 @@ Default, NoSelection, SaveError. Open in
 **Run when:** `src/pages/RecipeFormPage.tsx`,
 `src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
 `src/widgets/AutocompletePicker.tsx`, their stories, or a
-changeset naming any of the three pages or AutocompletePicker.
+changeset naming any of the three pages or
+AutocompletePicker. Run only the numbered cases for the
+page(s) that changed; an AutocompletePicker-only change
+runs only the autocomplete portions of cases 4 and 5.
 
 ## AutocompletePicker
 
@@ -69,7 +72,13 @@ NoSelection, Searching, NoResults.
    available to add more, and an already-selected result is
    not offered again.
 2. Searching: a spinner replaces the results while the
-   search is in flight — no stale result is selectable.
+   search is in flight — no stale result is selectable. Do
+   not judge this by the chicken result: the story starts
+   with the only chicken result already selected, and the
+   picker filters selected results out even when it is not
+   searching. While the spinner is visible, enter `peppers`
+   instead and confirm its unselected result (Classic
+   Stuffed Peppers) is not offered while searching.
 3. NoResults: a fruitless search shows "No results found."
    NoSelection: no selected list renders, and the empty
    search field shows no result area at all.

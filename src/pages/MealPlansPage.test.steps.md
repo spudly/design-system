@@ -43,8 +43,11 @@ spinner centers in the shell's content area.
 1. Centered: the spinner sits at the center of the framed
    block, both dimensions on. Toggle `vertical` off in the
    controls: the spinner moves to the top, still centered
-   horizontally; toggle `horizontal` off instead: it moves to
-   the left edge, still centered vertically.
+   horizontally; toggle `horizontal` off instead: the
+   spinner's wrapper stretches to the full width, but the
+   wrapper centers its SVG, so the visible spinner stays
+   centered horizontally (it does not move to the left
+   edge), still centered vertically.
 2. HorizontalOnly: the notice sits at the top of its block,
    centered horizontally (MealPlansPage's loading block is the
    live page case — the spinner centered under the heading).
@@ -82,8 +85,10 @@ CustomSelected.
 2. CustomSelected: the Custom button shows "2.5×" and is
    selected (primary-filled); no preset is selected.
 3. Pressing Custom swaps it in place for a decimal number
-   input; entering 4 and blurring applies 4× (the button
-   returns showing "4×", selected); entering 0 or text commits
+   input; entering 4 and moving focus outside the selector
+   applies 4× (the button returns showing "4×", selected) —
+   do not move focus to a preset button to commit: pressing
+   a preset discards the draft instead; entering 0 or text commits
    nothing and restores the previous value. On web the Custom
    button carries `aria-pressed` matching its selected state.
 

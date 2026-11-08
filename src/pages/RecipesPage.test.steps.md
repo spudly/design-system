@@ -1,7 +1,7 @@
 ---
 component: RecipesPage
 run_when:
-  - "a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states."
+  - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "src/pages/RecipesPage.tsx (including its page-local row and log-cook control compositions), its stories, or a changeset naming RecipesPage or the Shared-with-me screen."
 ---
 
@@ -19,7 +19,7 @@ LoadingMore.
 
 1. The loading state is a centered Spinner (Center +
    Spinner) composed by the page: the spinner renders
-   centered in its parent with its label; the state carries
+   centered in its parent with its label as its accessible name (verify the rendered element's `aria-label` or the accessibility tree — the label is not displayed as visible text); the state carries
    no padding or margin of its own — spacing around it is
    the parent's. The same composition renders directly at
    the foot of a list for the loading-more slot — check
@@ -32,9 +32,9 @@ LoadingMore.
    `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
    sits under the filter bar, flush to the parent's inset.
 
-**Run when:** a catalog page's loading state (Discover,
-Home, MealsHub, Recipes, ShoppingList, Tags), or a
-changeset naming the list loading states.
+**Run when:** a catalog page's loading or error state
+(Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or
+a changeset naming the list loading or error states.
 
 ## RecipesPage
 

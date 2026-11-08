@@ -18,8 +18,10 @@ Open in `Widgets/BadgeCardRow`: Default, DeleteOnly.
 1. Default: a compact card (small padding and shadow) with
    the colored badge at the left and Edit / Delete as bare
    text actions at the right, Delete in the error treatment.
-2. DeleteOnly: only the Delete action shows; the badge
-   keeps its color and the row height is unchanged.
+2. DeleteOnly: only the Delete action shows; the badge is
+   the blue Freezer badge (Default's Weeknight badge is
+   green — that color difference is the stories' data, not
+   a regression) and the row height is unchanged.
 
 **Run when:** `src/widgets/BadgeCardRow.tsx`, its
 stories, TagsPage's rows, or a changeset naming

@@ -3,7 +3,7 @@ component: MealsHubPage
 run_when:
   - "src/widgets/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow."
   - "src/widgets/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell."
-  - "a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states."
+  - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
 ---
 
@@ -49,7 +49,7 @@ LoadingMore.
 
 1. The loading state is a centered Spinner (Center +
    Spinner) composed by the page: the spinner renders
-   centered in its parent with its label; the state carries
+   centered in its parent with its label as its accessible name (verify the rendered element's `aria-label` or the accessibility tree — the label is not displayed as visible text); the state carries
    no padding or margin of its own — spacing around it is
    the parent's. The same composition renders directly at
    the foot of a list for the loading-more slot — check
@@ -62,9 +62,9 @@ LoadingMore.
    `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
    sits under the filter bar, flush to the parent's inset.
 
-**Run when:** a catalog page's loading state (Discover,
-Home, MealsHub, Recipes, ShoppingList, Tags), or a
-changeset naming the list loading states.
+**Run when:** a catalog page's loading or error state
+(Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or
+a changeset naming the list loading or error states.
 
 ## Meals & planning pages (MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)
 
@@ -96,7 +96,7 @@ FirstStep, LastStep, LoadError.
    host-rendered rows at the rows' own rhythm. Loading centers
    the spinner under the section title; Empty centers the
    empty message there.
-5. MealCookingModePage: the dark overlay covers the frame —
+5. MealCookingModePage: the dark overlay covers only the content region above the footer (the footer remains reachable and is not covered) —
    uppercase meal title and "Step N of M · recipe" eyebrows
    over the step body, Done pill at the top right, dots and
    Back / Next below. FirstStep has no Back; LastStep disables

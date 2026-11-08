@@ -2,7 +2,7 @@
 component: FormStack
 run_when:
   - "src/widgets/FormStack.tsx, src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
-  - "any of these components, their stories, or a changeset naming them. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
+  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
   - "any of these components, their stories, the form pages, or a changeset naming them. (namely: FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner, RecipeFormPage, MealFormPage, MealPlanFormPage, TagsPage)"
 ---
 
@@ -56,7 +56,9 @@ stories); `Widgets/TextActionCardRow`: (its stories);
 3. SuggestionPanel: the panel title sits over one entry per
    suggestion, in the caller's order.
 4. TagList: one Badge per tag in the caller's tag colors,
-   wrapping onto the next line at the story width — display
+   wrapping onto the next line when the viewport is narrowed
+   to 360px (the four badges fit on one line at the story's
+   430px width, so do not expect wrapping there) — display
    only, nothing presses.
 5. FieldRow: the search field claims the row's width and its
    trailing action stretches to the field's height and sits at
@@ -71,7 +73,8 @@ stories); `Widgets/TextActionCardRow`: (its stories);
    button row without shifting focus.
 
 **Run when:** any of these components, their stories, or a
-changeset naming them.
+changeset naming them. Run only the numbered case for the
+component(s) that changed.
 
 ## Form set (FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)
 
@@ -97,7 +100,7 @@ Open in `Widgets/FormStack`: Default, FieldsWithActions;
 4. LabeledGroup: the label sits 8px over the grouped control —
    the wider separation than a field's; the group announces
    itself by the label's name.
-5. RevertAction: the "Revert to: <label>" text action renders
+5. RevertAction: the `Revert to: <label>` text action renders
    in the primary ink and presses like a button.
 6. ChangedListBanner: the single host-supplied summary line
    renders on the warning wash; the "Revert" action appears

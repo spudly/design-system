@@ -31,7 +31,12 @@ Fixed, Scrollable; `Widgets/PinnedHeaderShell`: Default.
    fixed column (neither story has a form or actions);
    Scrollable: the title and the transcript blocks scroll
    together inside the ScrollRegion — the title is not
-   pinned.
+   pinned. The story renders with no definite-height frame
+   in the Storybook preview, so it may grow to its full
+   height there instead of scrolling independently — verify
+   the scroll structurally (title and blocks inside the
+   ScrollRegion), or in a definite-height frame, rather than
+   reporting the preview's lack of overflow as a failure.
 4. PinnedHeaderShell: the header block stays pinned while the
    body scrolls beneath it.
 

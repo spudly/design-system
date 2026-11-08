@@ -24,8 +24,11 @@ spinner centers in the shell's content area.
 1. Centered: the spinner sits at the center of the framed
    block, both dimensions on. Toggle `vertical` off in the
    controls: the spinner moves to the top, still centered
-   horizontally; toggle `horizontal` off instead: it moves to
-   the left edge, still centered vertically.
+   horizontally; toggle `horizontal` off instead: the
+   spinner's wrapper stretches to the full width, but the
+   wrapper centers its SVG, so the visible spinner stays
+   centered horizontally (it does not move to the left
+   edge), still centered vertically.
 2. HorizontalOnly: the notice sits at the top of its block,
    centered horizontally (MealPlansPage's loading block is the
    live page case — the spinner centered under the heading).

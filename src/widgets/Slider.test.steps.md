@@ -29,7 +29,8 @@ Disabled.
 4. WithError: the error line "Choose a level before continuing."
    renders under the slider in the error color, and the slider still
    drags/steps normally.
-5. Disabled: the whole control reads dimmed, the knob cannot be
+5. Disabled: the slider track and knob read dimmed (the label
+   above them stays at full opacity), the knob cannot be
    dragged or focused, and the value does not change.
 6. In every story the knob is a circle in the active theme's
    surface color with a visible outline,

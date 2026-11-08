@@ -26,6 +26,14 @@ here a search field with its submit button.
    Filters button), which stretches to the search field's
    height instead of sitting shorter.
 
+2. Page composition: in `Pages/Memorize/VerseSearchPage`:
+   Default, the page's own search row renders the search
+   field filling the row's remaining width through
+   `SearchField`'s `grow` prop, with the Search button at
+   its natural width beside it — a page change that drops
+   `grow` fails this check even if the standalone FieldRow
+   stories pass.
+
 **Run when:** `src/widgets/FieldRow.tsx`, its stories,
 `src/views/SearchField.tsx` (the `grow` prop), the pages
 that compose FieldRow (VerseSearchPage), or a changeset

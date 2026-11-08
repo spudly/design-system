@@ -2,7 +2,7 @@
 component: FieldRow
 run_when:
   - "src/widgets/FieldRow.tsx, its stories, src/views/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
-  - "any of these components, their stories, or a changeset naming them. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
+  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
 ---
 
 # FieldRow — manual test steps
@@ -51,7 +51,9 @@ stories); `Widgets/TextActionCardRow`: (its stories);
 3. SuggestionPanel: the panel title sits over one entry per
    suggestion, in the caller's order.
 4. TagList: one Badge per tag in the caller's tag colors,
-   wrapping onto the next line at the story width — display
+   wrapping onto the next line when the viewport is narrowed
+   to 360px (the four badges fit on one line at the story's
+   430px width, so do not expect wrapping there) — display
    only, nothing presses.
 5. FieldRow: the search field claims the row's width and its
    trailing action stretches to the field's height and sits at
@@ -66,4 +68,5 @@ stories); `Widgets/TextActionCardRow`: (its stories);
    button row without shifting focus.
 
 **Run when:** any of these components, their stories, or a
-changeset naming them.
+changeset naming them. Run only the numbered case for the
+component(s) that changed.

@@ -24,7 +24,11 @@ submit switches the page to its loading state).
    loading state (the submit button's label changes to its
    loading label, e.g. "Signing in…", and the button disables),
    the same result as pressing the submit button. This holds
-   for the first field as well as the last.
+   for the first field as well as the last. Reload or
+   remount the story after each Enter-triggered submission:
+   the first submission puts the story in its loading state,
+   so every later field check must start from a freshly
+   loaded Filled story.
 2. In each page's Loading story (and in a Filled story after
    step 1 has put it in the loading state), pressing Enter in
    a field does not submit again — the page stays in the
@@ -33,7 +37,8 @@ submit switches the page to its loading state).
    is not separately observable in Storybook; this step
    verifies the visible end state — loading persists and the
    submit button stays disabled.)
-3. Pressing the submit button itself in a Filled story still
+3. In a freshly reloaded Filled story, pressing the submit
+   button itself still
    submits (same loading-state switch), and the "Create an
    account" / "Forgot password?" / "Back to sign in" /
    "Already have an account? Sign in" links do not submit —

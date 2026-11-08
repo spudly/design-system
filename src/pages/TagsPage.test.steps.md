@@ -2,7 +2,7 @@
 component: TagsPage
 run_when:
   - "src/widgets/FormStack.tsx, src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
-  - "a catalog page's loading state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading states."
+  - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "src/pages/TagsPage.tsx, its stories, or a changeset naming TagsPage."
   - "src/widgets/BadgeCardRow.tsx, its stories, TagsPage's rows, or a changeset naming BadgeCardRow."
   - "src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: TrailingActionsRow, Card, TagsPage)"
@@ -46,7 +46,7 @@ LoadingMore.
 
 1. The loading state is a centered Spinner (Center +
    Spinner) composed by the page: the spinner renders
-   centered in its parent with its label; the state carries
+   centered in its parent with its label as its accessible name (verify the rendered element's `aria-label` or the accessibility tree — the label is not displayed as visible text); the state carries
    no padding or margin of its own — spacing around it is
    the parent's. The same composition renders directly at
    the foot of a list for the loading-more slot — check
@@ -59,9 +59,9 @@ LoadingMore.
    `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
    sits under the filter bar, flush to the parent's inset.
 
-**Run when:** a catalog page's loading state (Discover,
-Home, MealsHub, Recipes, ShoppingList, Tags), or a
-changeset naming the list loading states.
+**Run when:** a catalog page's loading or error state
+(Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or
+a changeset naming the list loading or error states.
 
 ## TagsPage
 

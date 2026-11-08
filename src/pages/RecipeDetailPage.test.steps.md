@@ -25,12 +25,15 @@ SharingAndComments.
 
 1. The overview action row: Print and Share render as **real icons**
    (printer / share-2 from the DS internal icons module) in the same neutral
-   button treatment as Edit/Delete — no emoji or text glyphs, no
+   button treatment as Edit (Delete renders in the danger
+   treatment and is not part of this comparison) — no emoji or text glyphs, no
    color-rendered printer.
 2. Tags render as bordered Badge pills whose border matches the tag
    label color.
-3. CookLogFormOpen: the inline form fits the section width; its
-   rating stars and fields do not overflow the card.
+3. CookLogFormOpen: the text stand-in "Cook log form renders
+   here (app-side fixture stand-in)" replaces the "Log a cook"
+   button in the section — there is no form, rating stars, or
+   fields to check in this story.
 4. CreateDraft: the recipe is Perfected and has no existing draft,
    so the overview action row's "Edit draft" is the create-a-draft
    callback form — on web it renders as a **button, not an anchor**
@@ -68,7 +71,9 @@ Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
 1. Default: the servings stepper and the Scale preset row
    fit the width without the Scale row wrapping; the Custom
    button turns into a number input when pressed and, once a
-   value is entered, shows it selected (e.g. "4×"). The
+   value is entered and applied by pressing Enter or moving
+   focus outside the selector, shows it selected (e.g.
+   "4×"). The
    dimmed "heavy cream" row is marked missing and the
    Substitutions panel shows below the list; pressing the
    row clears the dim.

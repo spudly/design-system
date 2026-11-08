@@ -35,7 +35,7 @@ Open in `Widgets/FormStack`: Default, FieldsWithActions;
 4. LabeledGroup: the label sits 8px over the grouped control —
    the wider separation than a field's; the group announces
    itself by the label's name.
-5. RevertAction: the "Revert to: <label>" text action renders
+5. RevertAction: the `Revert to: <label>` text action renders
    in the primary ink and presses like a button.
 6. ChangedListBanner: the single host-supplied summary line
    renders on the warning wash; the "Revert" action appears

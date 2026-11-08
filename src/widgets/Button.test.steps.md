@@ -24,8 +24,7 @@ Open in `Pages/Eciperay/LandingPage`: Default, Wide.
    the ButtonLink form; there is no CtaLink): the primary CTA
    is the filled brand button link, the two secondaries are
    neutral button links, all real links (role link, their
-   hrefs), never buttons. On web they sit in one centered row
-   (check in Wide); on native (the RN storybook) they stack
+   hrefs), never buttons. On web in a consumer that compiles Tamagui they sit in one centered row (check in Wide in such a compiled environment); the root Chromatic Storybook runs no Tamagui compiler, so its Wide story may render the CTAs stacked vertically instead — do not report that stacking as a failure there. On native (the RN storybook) they stack
    vertically — the row never wraps two CTAs side by side at
    phone width.
 3. Feature cards: in Wide the three cards share one row, each
@@ -50,8 +49,11 @@ button. The icon-slot stories:
 1. WithIcon / WithIconVariants: the glyph sits to the **left** of
    the label with an even gap, vertically centered on the label's
    line, inked in the variant's label color — light glyph on the
-   primary fill, dark glyph on the secondary gray, link-colored
-   glyph with no fill on ghost, white glyph on the danger fill.
+   primary fill, dark glyph on the secondary gray, primary-
+   colored glyph with no fill on ghost (the ghost prop uses
+   the default primary variant, so its glyph matches the
+   primary label color, not the link color), white glyph on
+   the danger fill.
 2. IconOnly / IconOnlyVariants: only the glyph renders — no text —
    centered in a square target, in every variant.
 3. IconSizes: the labeled row's glyph grows with the button size
