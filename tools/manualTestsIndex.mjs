@@ -46,8 +46,11 @@ function parseFrontMatter(text) {
   // any other front-matter key must not be read as triggers (and a file
   // whose run_when is absent or empty yields no triggers, so the
   // missing-trigger validation below rejects it).
+  // Blank lines between list items are legal YAML and stay inside the
+  // block; the block ends at the next top-level key (a non-empty line
+  // starting at column 0).
   const runWhenBlock =
-    match[1].match(/^run_when:[ \t]*\r?\n((?:[ \t]+.*(?:\r?\n|$))*)/m)?.[1] ?? "";
+    match[1].match(/^run_when:[ \t]*\r?\n((?:(?:[ \t]+.*)?(?:\r?\n|$))*)/m)?.[1] ?? "";
   const runWhen = [...runWhenBlock.matchAll(/^\s+-\s+(.+)$/gm)].map((m) => {
     const raw = m[1].trim();
     if (raw.startsWith('"')) {
