@@ -493,6 +493,28 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
   assert.match(busyCard, /aria-busy="true"/, "a loading Card stays busy beside caller state");
   assert.match(busyCard, /aria-disabled="true"/, "the caller's disabled state is preserved");
 
+  // Explicit ARIA wins over the RN state form for every field
+  // except busy (CodeRabbit on #551, round 3): a loading Card
+  // handed aria-disabled={false} beside a disabled accessibility
+  // state renders aria-disabled="false" — and still renders busy.
+  const ariaCard = await renderToHtml(
+    React.createElement(
+      Card,
+      {
+        loading: true,
+        "aria-disabled": false,
+        accessibilityState: { disabled: true },
+      },
+      React.createElement(CardRow, { title: "Aria Row Title", onPress: noop }),
+    ),
+  );
+  assert.match(ariaCard, /aria-busy="true"/, "busy is forced even beside explicit ARIA state");
+  assert.match(
+    ariaCard,
+    /aria-disabled="false"/,
+    "the caller's explicit aria-disabled wins over the state form",
+  );
+
   const idleRow = await renderToHtml(
     React.createElement(CardRow, { title: "Visible Plan", subtitle: "4 entries", onPress: noop }),
   );

@@ -117,15 +117,38 @@ export function Card({
   // caller's state fields ride along, `busy` is forced on while
   // loading, and the merged props spread after `rest` so a
   // caller-supplied `accessibilityState` / `aria-busy` in `rest`
-  // cannot silently drop the busy state.
-  const callerState = (rest as { accessibilityState?: { busy?: boolean } }).accessibilityState;
+  // cannot silently drop the busy state. The caller's explicit
+  // ARIA state values are forwarded into the translation too, so
+  // the translator's ARIA-wins precedence still decides every
+  // field except `busy` itself (CodeRabbit on #551, round 3).
+  const caller = rest as {
+    accessibilityState?: {
+      disabled?: boolean;
+      selected?: boolean;
+      checked?: boolean | "mixed";
+      busy?: boolean;
+      expanded?: boolean;
+    };
+    "aria-busy"?: boolean;
+    "aria-checked"?: boolean | "mixed";
+    "aria-disabled"?: boolean;
+    "aria-expanded"?: boolean;
+    "aria-selected"?: boolean;
+  };
   return (
     <StyledCard
       variant={resolvedVariant}
       style={composedStyle}
       {...rest}
       {...(showSkeleton
-        ? platformAccessibilityProps({ accessibilityState: { ...callerState, busy: true } })
+        ? platformAccessibilityProps({
+            accessibilityState: { ...caller.accessibilityState, busy: true },
+            "aria-busy": true,
+            "aria-checked": caller["aria-checked"],
+            "aria-disabled": caller["aria-disabled"],
+            "aria-expanded": caller["aria-expanded"],
+            "aria-selected": caller["aria-selected"],
+          })
         : {})}
     >
       <LoadingScope active={showSkeleton}>{children}</LoadingScope>
