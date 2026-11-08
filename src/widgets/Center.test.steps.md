@@ -28,8 +28,7 @@ spinner centers in the shell's content area.
    the left edge, still centered vertically.
 2. HorizontalOnly: the notice sits at the top of its block,
    centered horizontally (MealPlansPage's loading block is the
-   live page case — the spinner centered under the heading and
-   create button).
+   live page case — the spinner centered under the heading).
 
 **Run when:** `src/widgets/Center.tsx`, its stories, the
 pages that compose Center (MealPlansPage), or a changeset

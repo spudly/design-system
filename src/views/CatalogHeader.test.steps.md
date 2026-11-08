@@ -16,8 +16,9 @@ release's changed components. The full index lives in
 Open in `Views/CatalogFiltersBar`: Collapsed, ChooserOpen,
 WithFiltersAdded; and `Views/CatalogHeader`: Default.
 
-1. Collapsed: a search field with its clear button and a
-   Filters button — nothing else. There is no sorter row or
+1. Collapsed: a search field and a Filters button — nothing
+   else. The search starts empty, so there is no clear button
+   yet: type into the field and the clear button appears. There is no sorter row or
    result count line: sorting is one of the filter definitions
    (Sort), rendered only once added, and the bar has no result
    count. Nothing about the filter set is built in — the
