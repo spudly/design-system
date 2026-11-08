@@ -81,7 +81,10 @@ export const WithCoverageSections: Story = {
   // The #438 Part 3 typed sections: subscription,
   // feedback-preference, transfer, and account-data render from
   // their data props (the migrated form of the slot sections
-  // WithSections exercises with stand-ins).
+  // WithSections exercises with stand-ins). The nutrition-goals
+  // and access-tokens sections (#511) render from their data
+  // props here too, in the same before-feedback position
+  // WithSections composes them in the slot.
   render: () => (
     <Viewport>
       <ProfilePage
@@ -123,6 +126,20 @@ export const WithCoverageSections: Story = {
         accountData={{
           onExportData: () => undefined,
           onDeleteAccount: () => undefined,
+        }}
+        nutritionGoals={{
+          goals: nutritionGoalsFixture,
+          onChange: () => undefined,
+          onSave: () => undefined,
+        }}
+        accessTokens={{
+          tokens: accessTokensFixture.tokens,
+          tokenName: "",
+          onTokenNameChange: () => undefined,
+          onCreate: () => undefined,
+          createdSecret: null,
+          onDismissSecret: () => undefined,
+          onRevoke: () => undefined,
         }}
         legalLinks={
           <YStack gap="$2">
