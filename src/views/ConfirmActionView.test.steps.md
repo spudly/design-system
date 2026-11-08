@@ -16,10 +16,12 @@ release's changed components. The full index lives in
 Open in `Views/ConfirmActionView`: DeleteConfirmation,
 WithError, Notice.
 
-1. DeleteConfirmation: the dialog is titled with its
-   description, Cancel in the secondary treatment and Delete
-   recipe in the danger treatment; keyboard focus lands inside
-   the dialog and Tab cycles within it.
+1. DeleteConfirmation: the dialog title is "Delete this
+   recipe?" and its description is "This permanently deletes
+   the recipe and its cook history."; Cancel in the secondary
+   treatment and Delete recipe in the danger treatment;
+   keyboard focus lands inside the dialog and Tab cycles
+   within it.
 2. WithError: the error alert renders inside the dialog above
    the actions. Notice: a single primary OK action, no Cancel.
 
