@@ -77,6 +77,31 @@ function stripInlineComment(item) {
  * rejected: publishing the raw text would silently index a
  * different trigger than the one the steps file declares.
  */
+/**
+ * Decodes one `run_when:` list item: strips any inline comment, then
+ * decodes a double-quoted scalar with JSON.parse, a single-quoted
+ * scalar by removing the outer quotes and undoubling escaped single
+ * quotes, or returns a plain scalar as-is. A quoted scalar that does
+ * not decode is rejected (see parseFrontMatter's contract above).
+ */
+function decodeScalar(item) {
+  const scalar = stripInlineComment(item);
+  if (scalar.startsWith('"')) {
+    try {
+      return JSON.parse(scalar);
+    } catch {
+      throw new Error(`manualTestsIndex: invalid double-quoted run_when scalar: ${item}`);
+    }
+  }
+  if (scalar.startsWith("'")) {
+    if (!/^'([^']|'')*'$/.test(scalar)) {
+      throw new Error(`manualTestsIndex: invalid single-quoted run_when scalar: ${item}`);
+    }
+    return scalar.slice(1, -1).replaceAll("''", "'");
+  }
+  return scalar;
+}
+
 function parseFrontMatter(text) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
   if (!match) return null;
@@ -95,21 +120,7 @@ function parseFrontMatter(text) {
     if (inRunWhen) {
       const item = line.match(/^\s*-\s+(.+)$/)?.[1]?.trim();
       if (item !== undefined) {
-        const scalar = stripInlineComment(item);
-        if (scalar.startsWith('"')) {
-          try {
-            runWhen.push(JSON.parse(scalar));
-          } catch {
-            throw new Error(`manualTestsIndex: invalid double-quoted run_when scalar: ${item}`);
-          }
-        } else if (scalar.startsWith("'")) {
-          if (!/^'([^']|'')*'$/.test(scalar)) {
-            throw new Error(`manualTestsIndex: invalid single-quoted run_when scalar: ${item}`);
-          }
-          runWhen.push(scalar.slice(1, -1).replaceAll("''", "'"));
-        } else {
-          runWhen.push(scalar);
-        }
+        runWhen.push(decodeScalar(item));
         continue;
       }
     }
