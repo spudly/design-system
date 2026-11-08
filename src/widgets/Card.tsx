@@ -112,12 +112,21 @@ export function Card({
   // would otherwise un-skeletonize everything below it).
   const scopedLoading = useLoadingScope();
   const showSkeleton = loading || scopedLoading;
+  // The busy marking merges with — never replaces or yields to —
+  // a caller's own accessibility state (CodeRabbit on #551): the
+  // caller's state fields ride along, `busy` is forced on while
+  // loading, and the merged props spread after `rest` so a
+  // caller-supplied `accessibilityState` / `aria-busy` in `rest`
+  // cannot silently drop the busy state.
+  const callerState = (rest as { accessibilityState?: { busy?: boolean } }).accessibilityState;
   return (
     <StyledCard
       variant={resolvedVariant}
       style={composedStyle}
-      {...(showSkeleton ? platformAccessibilityProps({ accessibilityState: { busy: true } }) : {})}
       {...rest}
+      {...(showSkeleton
+        ? platformAccessibilityProps({ accessibilityState: { ...callerState, busy: true } })
+        : {})}
     >
       <LoadingScope active={showSkeleton}>{children}</LoadingScope>
     </StyledCard>

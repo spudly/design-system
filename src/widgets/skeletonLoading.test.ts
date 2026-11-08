@@ -480,6 +480,19 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
   assert.ok(!nested.includes("Nested Row Title"), "the doubly nested row is skeletonized");
   assert.ok(!nested.includes("NestedAction"), "the nested section action is hidden while loading");
 
+  // The busy marking survives a caller's own accessibility
+  // state (CodeRabbit on #551): a loading Card handed a disabled
+  // state renders BOTH aria-disabled and aria-busy.
+  const busyCard = await renderToHtml(
+    React.createElement(
+      Card,
+      { loading: true, accessibilityState: { disabled: true } },
+      React.createElement(CardRow, { title: "Busy Row Title", onPress: noop }),
+    ),
+  );
+  assert.match(busyCard, /aria-busy="true"/, "a loading Card stays busy beside caller state");
+  assert.match(busyCard, /aria-disabled="true"/, "the caller's disabled state is preserved");
+
   const idleRow = await renderToHtml(
     React.createElement(CardRow, { title: "Visible Plan", subtitle: "4 entries", onPress: noop }),
   );
