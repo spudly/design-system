@@ -26,6 +26,14 @@ export const Stale: Story = {
   },
 };
 
+export const Loading: Story = {
+  args: {
+    authorName: "Chef Demo",
+    body: "Doubled the garlic — excellent.",
+    loading: true,
+  },
+};
+
 export const OwnComment: Story = {
   render: () => {
     const [editing, setEditing] = useState(false);

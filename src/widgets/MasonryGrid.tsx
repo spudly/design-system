@@ -1,6 +1,16 @@
 import { useState, type ReactNode } from "react";
 import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { BoxSkeleton } from "./BoxSkeleton.js";
+import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+
+// The loading grid's dummy items (#278): exactly 3 placeholder
+// items, from a frozen module-level constant — never generated
+// per render. While loading the grid renders one BoxSkeleton
+// per dummy item through its normal column distribution;
+// `renderItem` is never called with dummy data.
+const LOADING_ITEM_INDEXES = [0, 1, 2] as const;
 
 /** Default target column width in px (see `minColumnWidth`). */
 const DEFAULT_MIN_COLUMN_WIDTH = 160;
@@ -97,6 +107,12 @@ export type MasonryGridProps<Item> = {
    * in px. Default 12 (the spacing scale's 3).
    */
   gap?: number | undefined;
+  /** Loading state (#278): the grid renders exactly 3 dummy
+   * items — one BoxSkeleton each, laid out through the grid's
+   * normal column distribution — and never calls `renderItem`.
+   * An enclosing composite's LoadingScope can also put the
+   * grid into this state without prop-drilling. */
+  loading?: boolean | undefined;
 };
 
 /**
@@ -145,7 +161,10 @@ export function MasonryGrid<Item>({
   minColumns,
   maxColumns,
   gap = tokens.spacing[3],
+  loading = false,
 }: MasonryGridProps<Item>) {
+  const scopedLoading = useLoadingScope();
+  const showSkeleton = loading || scopedLoading;
   const [containerWidth, setContainerWidth] = useState(0);
   const columnCount = masonryColumnCount(containerWidth, {
     minColumnWidth,
@@ -154,7 +173,7 @@ export function MasonryGrid<Item>({
     gap,
   });
   const columns = distributeMasonryItems(
-    items.map((_, index) => index),
+    showSkeleton ? [...LOADING_ITEM_INDEXES] : items.map((_, index) => index),
     columnCount,
   );
   return (
@@ -163,24 +182,34 @@ export function MasonryGrid<Item>({
         const width = event.nativeEvent.layout.width;
         setContainerWidth((previous) => (Math.abs(previous - width) < 0.5 ? previous : width));
       }}
+      {...(showSkeleton ? platformAccessibilityProps({ accessibilityState: { busy: true } }) : {})}
     >
-      <XStack gap={gap} alignItems="flex-start">
-        {columns.map((column, columnIndex) => (
-          <YStack key={columnIndex} flex={1} gap={gap}>
-            {column.map((itemIndex) => {
-              const item = items[itemIndex];
-              if (item === undefined) {
-                return null;
-              }
-              return (
-                <View key={keyExtractor ? keyExtractor(item, itemIndex) : itemIndex}>
-                  {renderItem(item, itemIndex)}
-                </View>
-              );
-            })}
-          </YStack>
-        ))}
-      </XStack>
+      <LoadingScope active={showSkeleton}>
+        <XStack gap={gap} alignItems="flex-start">
+          {columns.map((column, columnIndex) => (
+            <YStack key={columnIndex} flex={1} gap={gap}>
+              {column.map((itemIndex) => {
+                if (showSkeleton) {
+                  return (
+                    <View key={`loading-${itemIndex}`}>
+                      <BoxSkeleton height={120} />
+                    </View>
+                  );
+                }
+                const item = items[itemIndex];
+                if (item === undefined) {
+                  return null;
+                }
+                return (
+                  <View key={keyExtractor ? keyExtractor(item, itemIndex) : itemIndex}>
+                    {renderItem(item, itemIndex)}
+                  </View>
+                );
+              })}
+            </YStack>
+          ))}
+        </XStack>
+      </LoadingScope>
     </View>
   );
 }

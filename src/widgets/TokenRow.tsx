@@ -1,7 +1,10 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
+import { useLoadingScope } from "./LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type TokenRowProps = {
   /** The token's display name. */
@@ -16,6 +19,11 @@ export type TokenRowProps = {
   revoking?: boolean;
   /** Without it (or when revoked) the row renders no action. */
   onRevoke?: () => void;
+  /** Loading state (#278): the row renders text skeletons in
+   * place of its name, prefix, and meta lines, with no action.
+   * An enclosing composite's LoadingScope can also put the row
+   * into this state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -33,7 +41,30 @@ export function TokenRow({
   revoked = false,
   revoking = false,
   onRevoke,
+  loading = false,
 }: TokenRowProps) {
+  const scopedLoading = useLoadingScope();
+  const showSkeleton = loading || scopedLoading;
+  if (showSkeleton) {
+    // Loading (#278): the same hairline row, with text skeletons
+    // standing in for the name, prefix, and meta lines — no
+    // revoke action, and the region marked busy.
+    return (
+      <XStack
+        alignItems="center"
+        justifyContent="space-between"
+        gap="$3"
+        borderBottomWidth={1}
+        borderBottomColor={tokens.colors.gray.gray2}
+        paddingVertical="$3"
+        {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+      >
+        <YStack flex={1} minWidth={0}>
+          <TextSkeleton lines={3} />
+        </YStack>
+      </XStack>
+    );
+  }
   return (
     <XStack
       alignItems="center"

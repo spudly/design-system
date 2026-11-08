@@ -1,6 +1,8 @@
 import { YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { LoadingScope } from "./LoadingScope.js";
 
 const StyledCard = styled(YStack, {
   name: "Card",
@@ -67,6 +69,12 @@ export type CardProps = StyledCardProps & {
   variant?: "default" | "bordered" | "muted" | "elevated" | "compact";
   /** @deprecated Use `variant="elevated"` instead. Kept for existing consumers. */
   elevated?: boolean;
+  /** Loading state (#278): the card marks its region busy and
+   * provides a LoadingScope to its children, so nested DS
+   * widgets render their skeleton states without the caller
+   * prop-drilling the flag into each one. The card's own frame
+   * (fill, border, padding) is unchanged. */
+  loading?: boolean;
 };
 
 /**
@@ -74,7 +82,14 @@ export type CardProps = StyledCardProps & {
  * from `variant` (see {@link CardProps}); the legacy `elevated` boolean maps
  * to `variant="elevated"` when no variant is given.
  */
-export function Card({ variant, elevated = false, style, ...rest }: CardProps) {
+export function Card({
+  variant,
+  elevated = false,
+  style,
+  loading = false,
+  children,
+  ...rest
+}: CardProps) {
   const resolvedVariant = variant ?? (elevated ? "elevated" : "default");
   // Android shadow for the shadowed variants: `elevation` comes from the same
   // shadow token as the iOS shadow props above and is applied via `style`,
@@ -90,5 +105,14 @@ export function Card({ variant, elevated = false, style, ...rest }: CardProps) {
         ? tokens.shadows.sm.elevation
         : undefined;
   const composedStyle = [elevation !== undefined ? { elevation } : undefined, style];
-  return <StyledCard variant={resolvedVariant} style={composedStyle} {...rest} />;
+  return (
+    <StyledCard
+      variant={resolvedVariant}
+      style={composedStyle}
+      {...(loading ? platformAccessibilityProps({ accessibilityState: { busy: true } }) : {})}
+      {...rest}
+    >
+      <LoadingScope active={loading}>{children}</LoadingScope>
+    </StyledCard>
+  );
 }

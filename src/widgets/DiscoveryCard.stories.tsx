@@ -47,3 +47,12 @@ export const WithoutSubtitle: Story = {
     href: "/recipe/beef-chili/beef-chili",
   },
 };
+
+export const Loading: Story = {
+  args: {
+    title: "Creamy Tuscan Garlic Chicken",
+    subtitle: "By Maria · ★ 4.5 · Satiety 60",
+    href: "/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken",
+    loading: true,
+  },
+};

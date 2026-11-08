@@ -36,3 +36,13 @@ export const Revoked: Story = {
     onRevoke: () => {},
   },
 };
+
+export const Loading: Story = {
+  args: {
+    name: "Claude Desktop",
+    prefix: "eci_pat_8f3k",
+    metaLabel: "Created Oct 2, 2026 · Last used Oct 20, 2026",
+    onRevoke: () => {},
+    loading: true,
+  },
+};

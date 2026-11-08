@@ -217,3 +217,259 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloadingSubstitutions\?: boolean/);
   assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloading\?: boolean/);
 });
+
+// ---------------------------------------------------------------------------
+// #278 Tranche 1 — list & card widgets: every converted composite
+// takes the explicit `loading` prop, reads the internal
+// LoadingScope (so a composite parent can skeletonize it without
+// prop-drilling), renders skeletons with no real content or
+// actions while loading, and renders unchanged while not loading.
+// The collection widgets (CheckboxSelectList, MasonryGrid,
+// StatBand) render exactly 3 dummy items while loading, and
+// CheckboxSelectList's centered spinner is gone.
+
+const T1_SCOPE_WIDGETS = [
+  "CardRow",
+  "ListRow",
+  "DiscoveryCard",
+  "PreviewCard",
+  "CommentItem",
+  "StatCard",
+  "StatBand",
+  "LogEntryCard",
+  "TokenRow",
+  "MasonryGrid",
+  "CheckboxSelectList",
+] as const;
+
+test("T1: every converted list/card widget declares `loading` and reads the LoadingScope", () => {
+  for (const name of T1_SCOPE_WIDGETS) {
+    const code = readCode(`src/widgets/${name}.tsx`);
+    assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
+    assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
+    assert.match(
+      code,
+      /TextSkeleton|BoxSkeleton|StatCard/,
+      `${name} must render skeletons (directly, or via a skeletonized child like StatBand's StatCards)`,
+    );
+  }
+  // The shells: Card provides the scope (it has no scope to read);
+  // SectionCard carries the flag through CardProps.
+  const card = readCode("src/widgets/Card.tsx");
+  assert.match(card, /\bloading\?: boolean/, "Card must declare the loading prop");
+  assert.match(card, /LoadingScope/, "Card must provide the LoadingScope while loading");
+  const sectionCard = readCode("src/widgets/SectionCard.tsx");
+  assert.match(sectionCard, /loading/, "SectionCard must handle the loading flag");
+  assert.match(sectionCard, /TextSkeleton/, "SectionCard must skeletonize its title");
+});
+
+test("T1: CheckboxSelectList's centered spinner is gone", () => {
+  const code = readCode("src/widgets/CheckboxSelectList.tsx");
+  assert.doesNotMatch(code, /Spinner/, "the loading list renders skeleton rows, not a spinner");
+  assert.match(code, /LOADING_ROW_KEYS/, "the dummy rows come from a frozen constant");
+});
+
+test("T1 SSR: loading rows and cards render skeletons and no real content or actions", async () => {
+  const { React, CardRow, ListRow, DiscoveryCard, CommentItem, LogEntryCard, TokenRow } =
+    await loadRuntime();
+  const noop = () => {};
+
+  const cardRow = await renderToHtml(
+    React.createElement(CardRow, {
+      title: "Secret Plan",
+      subtitle: "4 entries",
+      onPress: noop,
+      actionLabel: "Delete",
+      onActionPress: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(cardRow), 2, "a loading CardRow renders title+subtitle bones");
+  assert.ok(!cardRow.includes("Secret Plan"), "a loading CardRow shows no real title");
+  assert.ok(!cardRow.includes("Delete"), "a loading CardRow renders no action");
+  assert.match(cardRow, /aria-busy/, "a loading CardRow marks its region busy");
+
+  const listRow = await renderToHtml(
+    React.createElement(ListRow, {
+      title: "Secret Stew",
+      subtitle: "Serves 6",
+      onPress: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(listRow), 2, "a loading ListRow renders title+subtitle bones");
+  assert.ok(!listRow.includes("Secret Stew"), "a loading ListRow shows no real title");
+
+  const discovery = await renderToHtml(
+    React.createElement(DiscoveryCard, {
+      title: "Secret Soup",
+      subtitle: "By Maria",
+      href: "/recipe/secret",
+      loading: true,
+    }),
+  );
+  assert.equal(
+    hiddenBones(discovery),
+    3,
+    "a loading DiscoveryCard renders thumbnail + 2 text bones",
+  );
+  assert.ok(!discovery.includes("Secret Soup"), "a loading DiscoveryCard shows no real title");
+  assert.ok(!discovery.includes("/recipe/secret"), "a loading DiscoveryCard renders no link");
+
+  const comment = await renderToHtml(
+    React.createElement(CommentItem, {
+      authorName: "Secret Author",
+      body: "Secret body text",
+      canEdit: true,
+      canDelete: true,
+      onDelete: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(comment), 3, "a loading CommentItem renders 3 text bones");
+  assert.ok(!comment.includes("Secret Author"), "a loading CommentItem shows no author");
+  assert.ok(!comment.includes("Secret body text"), "a loading CommentItem shows no body");
+  assert.ok(!comment.includes("Delete"), "a loading CommentItem renders no actions");
+
+  const logEntry = await renderToHtml(
+    React.createElement(LogEntryCard, {
+      dateLabel: "Oct 12, 2026",
+      starRating: 4,
+      notes: "Secret notes",
+      onDeletePress: noop,
+      deleteAccessibilityLabel: "Delete entry",
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(logEntry), 2, "a loading LogEntryCard renders header+notes bones");
+  assert.ok(!logEntry.includes("Secret notes"), "a loading LogEntryCard shows no notes");
+  assert.ok(!logEntry.includes("Delete"), "a loading LogEntryCard renders no delete action");
+
+  const tokenRow = await renderToHtml(
+    React.createElement(TokenRow, {
+      name: "Secret Token",
+      prefix: "eci_pat_secret",
+      metaLabel: "Created Oct 2, 2026",
+      onRevoke: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(tokenRow), 3, "a loading TokenRow renders 3 text bones");
+  assert.ok(!tokenRow.includes("Secret Token"), "a loading TokenRow shows no token name");
+  assert.ok(!tokenRow.includes("Revoke"), "a loading TokenRow renders no revoke action");
+});
+
+test("T1 SSR: loading StatCard, PreviewCard, and the collections render exactly 3 dummies", async () => {
+  const { React, StatCard, StatBand, PreviewCard, CheckboxSelectList, MasonryGrid } =
+    await loadRuntime();
+  const noop = () => {};
+
+  const statCard = await renderToHtml(
+    React.createElement(StatCard, {
+      value: "42",
+      label: "secret label",
+      sublabel: "secret sub",
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(statCard), 3, "a loading StatCard renders value+label+sublabel bones");
+  assert.ok(!statCard.includes("secret label"), "a loading StatCard shows no real label");
+
+  const statBand = await renderToHtml(
+    React.createElement(
+      StatBand,
+      { loading: true },
+      React.createElement(StatCard, { value: "4", label: "Servings" }),
+    ),
+  );
+  assert.equal(hiddenBones(statBand), 6, "a loading StatBand renders 3 dummy stats (2 bones each)");
+  assert.ok(!statBand.includes("Servings"), "a loading StatBand shows none of its children");
+
+  const preview = await renderToHtml(
+    React.createElement(
+      PreviewCard,
+      {
+        title: "Your recipe",
+        loading: true,
+        actions: React.createElement("span", null, "ConfirmAction"),
+      },
+      React.createElement("span", null, "SecretPreviewBody"),
+    ),
+  );
+  assert.equal(hiddenBones(preview), 4, "a loading PreviewCard renders title + 3 body bones");
+  assert.ok(!preview.includes("SecretPreviewBody"), "a loading PreviewCard shows no content");
+  assert.ok(!preview.includes("ConfirmAction"), "a loading PreviewCard renders no actions");
+
+  const selectList = await renderToHtml(
+    React.createElement(CheckboxSelectList, {
+      items: [
+        { id: "a", label: "AlphaItem" },
+        { id: "b", label: "BetaItem" },
+      ],
+      selectedIds: [],
+      onToggle: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(selectList), 6, "a loading CheckboxSelectList renders 3 rows x 2 bones");
+  assert.ok(!selectList.includes("AlphaItem"), "a loading CheckboxSelectList shows no real items");
+
+  let renderCalls = 0;
+  const grid = await renderToHtml(
+    React.createElement(MasonryGrid, {
+      items: [{ id: "x" }, { id: "y" }],
+      renderItem: () => {
+        renderCalls += 1;
+        return React.createElement("span", null, "GridItemBody");
+      },
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(grid), 3, "a loading MasonryGrid renders exactly 3 dummy items");
+  assert.equal(renderCalls, 0, "a loading MasonryGrid never calls renderItem with dummy data");
+  assert.ok(!grid.includes("GridItemBody"), "a loading MasonryGrid shows no real items");
+});
+
+test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unchanged", async () => {
+  const { React, Card, SectionCard, CardRow, CheckboxSelectList } = await loadRuntime();
+  const noop = () => {};
+
+  // The Card shell's scope skeletonizes a nested row that was
+  // never handed a loading prop — no prop-drilling past the shell.
+  const card = await renderToHtml(
+    React.createElement(
+      Card,
+      { loading: true },
+      React.createElement(CardRow, { title: "Scoped Row Title", onPress: noop }),
+    ),
+  );
+  assert.equal(hiddenBones(card), 1, "a Card in loading scopes its nested row into skeletons");
+  assert.ok(!card.includes("Scoped Row Title"), "the scoped row shows no real title");
+
+  const section = await renderToHtml(
+    React.createElement(
+      SectionCard,
+      { title: "Scoped Section Title", loading: true },
+      React.createElement(CardRow, { title: "Section Row Title", onPress: noop }),
+    ),
+  );
+  assert.equal(hiddenBones(section), 2, "a loading SectionCard renders title + scoped row bones");
+  assert.ok(!section.includes("Scoped Section Title"), "the section title is skeletonized");
+  assert.ok(!section.includes("Section Row Title"), "the section's row is skeletonized by scope");
+
+  const idleRow = await renderToHtml(
+    React.createElement(CardRow, { title: "Visible Plan", subtitle: "4 entries", onPress: noop }),
+  );
+  assert.equal(hiddenBones(idleRow), 0, "a non-loading CardRow renders no bones");
+  assert.ok(idleRow.includes("Visible Plan"), "a non-loading CardRow renders its title");
+
+  const idleList = await renderToHtml(
+    React.createElement(CheckboxSelectList, {
+      items: [{ id: "a", label: "AlphaItem" }],
+      selectedIds: [],
+      onToggle: noop,
+    }),
+  );
+  assert.equal(hiddenBones(idleList), 0, "a non-loading CheckboxSelectList renders no bones");
+  assert.ok(idleList.includes("AlphaItem"), "a non-loading CheckboxSelectList renders its items");
+});

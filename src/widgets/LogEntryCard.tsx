@@ -1,11 +1,19 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
+import { useLoadingScope } from "./LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type LogEntryCardProps = {
   /** The entry's header label (e.g. its date, pre-composed by the caller). */
   dateLabel: string;
+  /** Loading state (#278): the card renders text skeletons in
+   * place of its header and notes, with no rating and no delete
+   * action. An enclosing composite's LoadingScope can also put
+   * the card into this state without prop-drilling. */
+  loading?: boolean;
   /** Optional star rating (1–5), rendered as filled stars in the header. */
   starRating?: number;
   /** Optional notes body. */
@@ -46,7 +54,27 @@ export function LogEntryCard({
   notes,
   onDeletePress,
   deleteAccessibilityLabel,
+  loading = false,
 }: LogEntryCardProps) {
+  const scopedLoading = useLoadingScope();
+  const showSkeleton = loading || scopedLoading;
+  if (showSkeleton) {
+    // Loading (#278): the same framed card, with text skeletons
+    // standing in for the header line and the notes — no rating,
+    // no delete action, and the region marked busy.
+    return (
+      <YStack
+        borderRadius={tokens.radii.md}
+        borderWidth={1}
+        borderColor={tokens.colors.gray.gray2}
+        backgroundColor={tokens.colors.gray.gray1}
+        padding="$4"
+        {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+      >
+        <TextSkeleton lines={notes ? 2 : 1} />
+      </YStack>
+    );
+  }
   return (
     <YStack
       borderRadius={tokens.radii.md}

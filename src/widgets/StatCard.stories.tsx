@@ -25,3 +25,12 @@ export const Default: Story = {
 export const WithoutSublabel: Story = {
   args: { value: "5", label: "day streak" },
 };
+
+export const Loading: Story = {
+  args: {
+    value: "12",
+    label: "verses mastered",
+    sublabel: "Keep going — you're building consistency",
+    loading: true,
+  },
+};

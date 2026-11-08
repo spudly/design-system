@@ -31,3 +31,18 @@ export const WithoutAction: Story = {
     </YStack>
   ),
 };
+
+export const Loading: Story = {
+  render: () => (
+    <YStack maxWidth={430} padding="$4">
+      <LogEntryCard
+        dateLabel="Oct 12, 2026"
+        starRating={4}
+        notes="Kids asked for seconds. Needed a pinch more salt."
+        onDeletePress={() => {}}
+        deleteAccessibilityLabel="Delete cook log 1 from Oct 12, 2026"
+        loading
+      />
+    </YStack>
+  ),
+};

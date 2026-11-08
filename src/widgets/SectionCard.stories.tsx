@@ -83,3 +83,14 @@ export const ElevatedVariant: Story = {
     </SectionCard>
   ),
 };
+
+export const Loading: Story = {
+  args: { title: "API access tokens", loading: true },
+  render: (args) => (
+    <SectionCard {...args} style={{ maxWidth: 480 }}>
+      <Text variant="body">
+        Tokens let scripts and integrations act on your behalf. Keep them secret.
+      </Text>
+    </SectionCard>
+  ),
+};

@@ -31,3 +31,11 @@ export const NoActions: Story = {
     children: <Text>The confirm controls live outside this card.</Text>,
   },
 };
+
+export const Loading: Story = {
+  args: {
+    title: "Your recipe",
+    children: <Text>Tuscan Chicken — 4 servings, 15 min prep, 30 min cook.</Text>,
+    loading: true,
+  },
+};

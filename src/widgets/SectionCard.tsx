@@ -3,6 +3,7 @@ import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Card, type CardProps } from "./Card.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type SectionCardProps = CardProps & {
   title: string;
@@ -16,13 +17,30 @@ export type SectionCardProps = CardProps & {
  * Appearance comes from Card's `variant` prop ("default" | "bordered" |
  * "muted" | "elevated"), passed through via {@link SectionCardProps}.
  */
-export function SectionCard({ title, action, children, ...rest }: SectionCardProps) {
+export function SectionCard({
+  title,
+  action,
+  children,
+  loading = false,
+  ...rest
+}: SectionCardProps) {
+  // Loading (#278): the header title swaps for a text skeleton
+  // and the header action is hidden; the Card shell carries the
+  // busy state and provides the LoadingScope, so the section's
+  // own widgets skeletonize without prop-drilling. `loading`
+  // arrives through CardProps (SectionCardProps extends it).
   return (
-    <Card {...rest}>
+    <Card loading={loading} {...rest}>
       <YStack paddingBottom={tokens.spacing[3]}>
         <XStack justifyContent="space-between" alignItems="center" gap={tokens.spacing[2]}>
-          <Text variant="subheading">{title}</Text>
-          {action}
+          {loading ? (
+            <YStack flex={1}>
+              <TextSkeleton lines={1} />
+            </YStack>
+          ) : (
+            <Text variant="subheading">{title}</Text>
+          )}
+          {loading ? null : action}
         </XStack>
       </YStack>
       <YStack gap={tokens.spacing[3]}>{children}</YStack>

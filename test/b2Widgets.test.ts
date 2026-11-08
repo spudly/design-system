@@ -87,7 +87,14 @@ test("Badge's colored-tag form tints its surface and label from the resolved tok
 test("CheckboxSelectList branches loading / empty / rows and toggles by id", () => {
   const list = source("CheckboxSelectList");
   assert.ok(list.includes("loading"), "loading branch missing");
-  assert.ok(list.includes("<Spinner"), "loading branch must render the DS Spinner");
+  // #278 T1: the loading branch renders skeleton rows, not the
+  // centered Spinner it used before the skeleton conversion.
+  assert.ok(!list.includes("Spinner"), "loading branch must not render a Spinner (#278)");
+  assert.ok(list.includes("TextSkeleton"), "loading branch must render skeleton rows");
+  assert.ok(
+    list.includes("LOADING_ROW_KEYS"),
+    "loading rows must come from the frozen dummy constant",
+  );
   assert.ok(list.includes("items.length === 0"), "empty branch missing");
   assert.ok(list.includes("<EmptyState"), "empty branch must render the DS EmptyState");
   assert.ok(list.includes("<CheckboxField"), "rows must render the DS CheckboxField");

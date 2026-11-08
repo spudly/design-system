@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Badge } from "./Badge.js";
 import { Card } from "./Card.js";
+import { CardRow } from "./CardRow.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof Card> = {
@@ -68,6 +69,14 @@ export const Compact: Story = {
     <Card {...args} variant="compact" style={{ maxWidth: 430 }}>
       <Badge color="green">Weeknight</Badge>
       <Text variant="hint">A dense row's worth of content on the compact surface.</Text>
+    </Card>
+  ),
+};
+
+export const Loading: Story = {
+  render: () => (
+    <Card loading style={{ maxWidth: 430 }}>
+      <CardRow title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
     </Card>
   ),
 };

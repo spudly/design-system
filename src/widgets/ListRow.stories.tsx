@@ -51,3 +51,18 @@ export const Disabled: Story = {
     onPress: () => {},
   },
 };
+
+export const Loading: Story = {
+  render: (args) => (
+    <YStack maxWidth={430}>
+      <ListRow {...args} />
+    </YStack>
+  ),
+  args: {
+    prefix: "Meal · ",
+    title: "Taco Tuesday",
+    subtitle: "Serves 4 · 2,150 cal",
+    onPress: () => {},
+    loading: true,
+  },
+};

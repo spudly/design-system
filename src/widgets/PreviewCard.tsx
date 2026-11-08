@@ -1,7 +1,10 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { useLoadingScope } from "./LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type PreviewCardProps = {
   /**
@@ -18,6 +21,11 @@ export type PreviewCardProps = {
   actions?: ReactNode;
   /** The preview content itself — host-rendered, framed here. */
   children: ReactNode;
+  /** Loading state (#278): the frame renders text skeletons in
+   * place of its title and preview content, with no actions.
+   * An enclosing composite's LoadingScope can also put the
+   * card into this state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -32,7 +40,32 @@ export type PreviewCardProps = {
  * preview stage framed their previews with identical
  * hand-styled stacks.
  */
-export function PreviewCard({ title, actions, children }: PreviewCardProps) {
+export function PreviewCard({ title, actions, children, loading = false }: PreviewCardProps) {
+  const scopedLoading = useLoadingScope();
+  const showSkeleton = loading || scopedLoading;
+  if (showSkeleton) {
+    // Loading (#278): the same frame, with a title skeleton when
+    // the card is titled and a three-line text skeleton standing
+    // in for the preview content — no host content, no actions,
+    // and the region marked busy.
+    return (
+      <YStack
+        borderRadius={tokens.radii.lg}
+        borderWidth={1}
+        borderColor={tokens.colors.gray.gray3}
+        backgroundColor="$surface"
+        padding="$4"
+        {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+      >
+        {title ? (
+          <YStack paddingBottom="$3">
+            <TextSkeleton lines={1} />
+          </YStack>
+        ) : null}
+        <TextSkeleton lines={3} />
+      </YStack>
+    );
+  }
   return (
     <YStack
       borderRadius={tokens.radii.lg}

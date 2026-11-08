@@ -155,3 +155,17 @@ export const Empty: Story = {
     </View>
   ),
 };
+
+export const Loading: Story = {
+  render: (args) => (
+    <View width={760}>
+      <MasonryGrid
+        {...layoutArgs(args)}
+        items={VARIED}
+        renderItem={renderDemoItem}
+        keyExtractor={(item: DemoItem) => item.id}
+        loading
+      />
+    </View>
+  ),
+};

@@ -1,8 +1,11 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { TextAreaField } from "../views/TextAreaField.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
+import { useLoadingScope } from "./LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type CommentItemProps = {
   authorName: string;
@@ -24,6 +27,11 @@ export type CommentItemProps = {
   onCancelEdit?: () => void;
   onSaveEdit?: () => void;
   onDelete?: () => void;
+  /** Loading state (#278): the item renders text skeletons in
+   * place of its author line and body, with no editor and no
+   * actions. An enclosing composite's LoadingScope can also
+   * put the item into this state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -56,7 +64,27 @@ export function CommentItem({
   onCancelEdit,
   onSaveEdit,
   onDelete,
+  loading = false,
 }: CommentItemProps) {
+  const scopedLoading = useLoadingScope();
+  const showSkeleton = loading || scopedLoading;
+  if (showSkeleton) {
+    // Loading (#278): the same framed item, with text skeletons
+    // standing in for the author line and the body — no editor,
+    // no actions, and the region marked busy.
+    return (
+      <YStack paddingBlockEnd="$3">
+        <YStack
+          borderRadius={tokens.radii.md}
+          backgroundColor={tokens.colors.gray.gray1}
+          padding="$3"
+          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+        >
+          <TextSkeleton lines={3} />
+        </YStack>
+      </YStack>
+    );
+  }
   const saveDisabled = isUpdatePending || !editDraft.trim();
 
   return (

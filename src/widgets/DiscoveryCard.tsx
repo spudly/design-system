@@ -1,8 +1,11 @@
 import { Anchor, View, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
+import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Card } from "./Card.js";
+import { useLoadingScope } from "./LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 import { Thumbnail } from "./Thumbnail.js";
 
 /**
@@ -56,6 +59,12 @@ export type DiscoveryCardProps = {
    * `/recipe/{id}/{slug}`). The card is an anchor to this URL on
    * web — see the header note. */
   href: string;
+  /** Loading state (#278): the card renders a box skeleton at
+   * the thumbnail's exact geometry and text skeletons in place
+   * of its title/subtitle, with no link. An enclosing
+   * composite's LoadingScope can also put the card into this
+   * state without prop-drilling. */
+  loading?: boolean;
 };
 
 // Structural flex only, mirroring the RecipesPage rows: the text
@@ -95,7 +104,35 @@ function CardThumbnail({ imageUrl }: { imageUrl?: string | null | undefined }) {
   );
 }
 
-export function DiscoveryCard({ title, subtitle, imageUrl, href }: DiscoveryCardProps) {
+export function DiscoveryCard({
+  title,
+  subtitle,
+  imageUrl,
+  href,
+  loading = false,
+}: DiscoveryCardProps) {
+  const scopedLoading = useLoadingScope();
+  const showSkeleton = loading || scopedLoading;
+  if (showSkeleton) {
+    // Loading (#278): the same card geometry — a 64dp box where
+    // the thumbnail sits and text skeletons at the title/subtitle
+    // line count — with no link and the region marked busy.
+    return (
+      <Card
+        variant="elevated"
+        flexDirection="row"
+        flexWrap="wrap"
+        alignItems="center"
+        gap="$3"
+        {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+      >
+        <BoxSkeleton width={64} height={64} />
+        <YStack style={textBlockStyle} gap="$1">
+          <TextSkeleton lines={subtitle ? 2 : 1} />
+        </YStack>
+      </Card>
+    );
+  }
   const card = (
     <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
       <CardThumbnail imageUrl={imageUrl} />

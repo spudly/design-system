@@ -33,3 +33,15 @@ export const TwoStats: Story = {
     </YStack>
   ),
 };
+
+export const Loading: Story = {
+  render: () => (
+    <YStack maxWidth={430}>
+      <StatBand loading>
+        <StatCard label="Servings" value="4" />
+        <StatCard label="Prep" value="15 min" />
+        <StatCard label="Cook" value="30 min" />
+      </StatBand>
+    </YStack>
+  ),
+};
