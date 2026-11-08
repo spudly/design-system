@@ -14,6 +14,8 @@ import {
   TransferRecipesView,
   type TransferRecipesViewProps,
 } from "../views/TransferRecipesView.js";
+import { AccessTokensPanel, type AccessTokensPanelProps } from "../views/AccessTokensPanel.js";
+import { NutritionGoalsForm, type NutritionGoalsFormProps } from "../views/NutritionGoalsForm.js";
 
 // The section view-models live with the views (#438 Part 3);
 // the page's contract names are aliases, so consumers of the
@@ -23,19 +25,23 @@ export type ProfilePageSubscription = SubscriptionViewProps;
 export type ProfilePageAccountData = AccountDataViewProps;
 export type ProfilePageTransfer = TransferRecipesViewProps;
 export type ProfilePageFeedbackPreference = FeedbackPreferenceViewProps;
+export type ProfilePageNutritionGoals = NutritionGoalsFormProps;
+export type ProfilePageAccessTokens = AccessTokensPanelProps;
 
 /**
  * ProfilePage (#126, B3c): the profile view — the split view
  * half of Eciperay's `ProfileView` (the B2 audit's page-view
  * disposition: "section slots stay as page slots"). The app
- * screen keeps the auth session, the section hosts (nutrition
- * goals, access tokens), and navigation; this view renders
- * the chrome and the slot regions in the app view's order.
+ * screen keeps the auth session and navigation; this view
+ * renders the chrome and the slot regions in the app view's
+ * order. The nutrition-goals and access-tokens sections are
+ * covered by the `nutritionGoals` / `accessTokens` data props
+ * (#511); the slots remain for sections the DS does not cover.
  *
  * The slots, in render order:
- * - `sectionsBeforeFeedback` — the app's section hosts
- *   (NutritionGoalsForm + AccessTokensPanel, wired by their
- *   app containers).
+ * - `sectionsBeforeFeedback` — any remaining app section
+ *   hosts, rendered after the covered before-feedback
+ *   sections.
  * - `feedbackPreference` — the app's feedback-preference
  *   container (a hook + analytics-config flag — business logic
  *   that stays app-side per the audit) rendered at the exact
@@ -87,11 +93,19 @@ export type ProfilePageProps = {
    * prop and its slot position's ReactNode are alternatives:
    * when both are supplied for the feedback position, the slot
    * wins (it is the more specific composition).
+   *
+   * `nutritionGoals` and `accessTokens` (#511) render at the
+   * before-feedback position, in that order, immediately
+   * before the `sectionsBeforeFeedback` slot content; the
+   * data props and the slot are alternatives for these two
+   * sections (a host uses one or the other).
    */
   subscription?: ProfilePageSubscription;
   feedbackPreferenceSection?: ProfilePageFeedbackPreference;
   transfer?: ProfilePageTransfer;
   accountData?: ProfilePageAccountData;
+  nutritionGoals?: ProfilePageNutritionGoals;
+  accessTokens?: ProfilePageAccessTokens;
 };
 
 export function ProfilePage({
@@ -107,6 +121,8 @@ export function ProfilePage({
   feedbackPreferenceSection,
   transfer,
   accountData,
+  nutritionGoals,
+  accessTokens,
   footer,
 }: ProfilePageProps) {
   return (
@@ -120,6 +136,8 @@ export function ProfilePage({
           </Button>
         ) : null}
         {subscription ? <SubscriptionView {...subscription} /> : null}
+        {nutritionGoals ? <NutritionGoalsForm {...nutritionGoals} /> : null}
+        {accessTokens ? <AccessTokensPanel {...accessTokens} /> : null}
         {sectionsBeforeFeedback}
         {tagsHref ? (
           <Button variant="secondary" href={tagsHref}>
