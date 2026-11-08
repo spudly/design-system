@@ -35,7 +35,9 @@ stories); `Widgets/TextActionCardRow`: (its stories);
 5. FieldRow: the search field claims the row's width and its
    trailing action stretches to the field's height and sits at
    the end; RemovableField's remove
-   button names the value it removes.
+   button's accessible name names the filter it
+   removes (e.g. "Remove Ingredient filter"), not the
+   field's value.
 6. StatusMessage: the message line is centered, small, and in
    muted ink that stays readable in the dark theme; Empty shows
    nothing (the live region is mounted but empty); Transient's

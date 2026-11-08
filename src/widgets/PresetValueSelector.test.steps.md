@@ -41,8 +41,11 @@ CustomSelected.
 2. CustomSelected: the Custom button shows "2.5×" and is
    selected (primary-filled); no preset is selected.
 3. Pressing Custom swaps it in place for a decimal number
-   input; entering 4 and blurring applies 4× (the button
-   returns showing "4×", selected); entering 0 or text commits
+   input; entering 4 and blurring out of the selector
+   entirely applies 4× (the button returns showing "4×",
+   selected) — focus must leave the selector: blurring by
+   pressing a preset discards the draft instead; entering
+   0 or text commits
    nothing and restores the previous value. On web the Custom
    button carries `aria-pressed` matching its selected state.
 

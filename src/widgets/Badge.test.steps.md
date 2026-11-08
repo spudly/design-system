@@ -23,10 +23,12 @@ AllTones, Selectable, Selected, SelectableDisabled.
    spacing; no pill is taller or wider than its label needs.
 3. Long labels (type one in via Controls) wrap or truncate without
    breaking the pill shape or overlapping neighbors.
-4. Selectable: pressing a pill toggles it — the pressed pill takes
-   the **primary fill with the on-primary label**, the others keep
-   the resting tint; pressing it again returns it to the tint.
-   Only the pressed pill changes. The pills are keyboard-operable:
+4. Selectable: Weeknight starts selected (primary fill).
+   Pressing a pill toggles it — a pressed pill takes the
+   **primary fill with the on-primary label**; pressing a
+   selected pill returns it to the resting tint, and pressing
+   another pill adds it to the selection (Weeknight stays
+   selected). The pills are keyboard-operable:
    Tab reaches them and Enter/Space toggles the focused pill.
 5. Selected: the pill renders in the selected treatment and is a
    toggle button (aria-pressed true); in Selectable, unpressed

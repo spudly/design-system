@@ -19,8 +19,9 @@ WithRichDescription, WithChildren, WithError.
 1. WithRichDescription: rich (multi-element) description content
    renders under the label with normal text spacing — not clipped,
    not squeezed against the checkbox.
-2. WithChildren: child content renders inside the field's frame,
-   aligned with the label column.
+2. WithChildren: child content renders below the checkbox
+   row, at the field frame's left edge — not indented to
+   the label column.
 3. WithError: the error message is visible, in the danger treatment,
    and the checkbox remains toggleable in the story.
 4. Toggling in Default/Checked flips the check with no layout shift.

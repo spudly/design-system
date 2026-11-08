@@ -26,7 +26,8 @@ LoadingMore.
    the foot of a list for the loading-more slot — check
    that rendering in `Pages/Eciperay/DiscoverPage`:
    LoadingMore, where the spinner follows the last card
-   with the list's own gap.
+   directly — the list's separator renders only between
+   cards, so no gap follows the last card.
 2. A list's error state has no wrapper component: the page
    renders the Alert component directly — check in
    `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert

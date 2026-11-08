@@ -61,7 +61,9 @@ stories); `Widgets/TextActionCardRow`: (its stories);
 5. FieldRow: the search field claims the row's width and its
    trailing action stretches to the field's height and sits at
    the end; RemovableField's remove
-   button names the value it removes.
+   button's accessible name names the filter it
+   removes (e.g. "Remove Ingredient filter"), not the
+   field's value.
 6. StatusMessage: the message line is centered, small, and in
    muted ink that stays readable in the dark theme; Empty shows
    nothing (the live region is mounted but empty); Transient's
@@ -96,7 +98,7 @@ Open in `Widgets/FormStack`: Default, FieldsWithActions;
    the wider separation than a field's; the group announces
    itself by the label's name.
 5. RevertAction: the "Revert to: <label>" text action renders
-   in the warning ink and presses like a button.
+   in the primary ink and presses like a button.
 6. ChangedListBanner: the single host-supplied summary line
    renders on the warning wash; the "Revert" action appears
    only in the story that passes a revert handler.

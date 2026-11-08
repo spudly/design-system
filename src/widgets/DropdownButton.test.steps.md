@@ -25,7 +25,9 @@ dropdown whose panel reads "Menu content".
    button's accessible name is "Account menu".
 4. Variants: Primary, Secondary, and Ghost triggers each open their
    menu; the chevron takes the variant's label color (light on the
-   primary fill, dark on the secondary gray, link-colored on ghost).
+   primary fill, dark gray on the secondary gray and on
+   ghost — the Ghost trigger is the default secondary
+   variant with the ghost treatment).
 5. Disabled: the trigger renders dimmed and pressing it does not
    open the menu.
 

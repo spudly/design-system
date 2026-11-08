@@ -28,9 +28,9 @@ WithFiltersAdded; and `Views/CatalogHeader`: Default.
    Satiety, and Sort); a definition's controls render only
    after it is added, not in the chooser list itself.
 3. WithFiltersAdded: each added filter renders as a removable
-   row naming its filter; its remove button reads "Remove
-   <label> filter" and removing it returns the row to the
-   chooser.
+   row naming its filter; its remove button visibly reads
+   "Remove" and its accessible name is "Remove <label>
+   filter"; removing it returns the row to the chooser.
 4. CatalogHeader Default: the title renders as the heading
    above the composed bar, left-aligned at the column inset.
 

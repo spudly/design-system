@@ -31,7 +31,8 @@ Disabled.
    drags/steps normally.
 5. Disabled: the whole control reads dimmed, the knob cannot be
    dragged or focused, and the value does not change.
-6. In every story the knob is a white circle with a visible outline,
+6. In every story the knob is a circle in the active theme's
+   surface color with a visible outline,
    centered on the track, over a brand-primary fill that runs from
    the track's left end to the knob.
 

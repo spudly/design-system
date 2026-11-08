@@ -23,12 +23,16 @@ Stale; `Widgets/SectionHeading`: Default.
 2. NoRatingsYet: the empty community line renders in place of
    the average, and no viewer row renders — the story passes
    no viewer and no rating-change handler.
-3. Stale: the stale treatment renders as the story defines it,
-   with no layout shift against Default.
+3. Stale: the community and viewer stale notices both
+   render (Default renders neither, so the viewer row sits
+   lower than in Default); check the notices render
+   without overlapping the star rows.
 4. SectionHeading Default: the heading renders in the
    subheading treatment, flush to its parent's inset — the
-   heading itself carries no padding; the story's panel
-   supplies the inset.
+   heading itself carries no padding. In the story the
+   padded panel is a sibling of the headings, not their
+   parent: it insets only its own content, not the
+   headings.
 
 **Run when:** `src/widgets/RatingsCard.tsx`,
 `src/widgets/SectionHeading.tsx`, their stories, or a

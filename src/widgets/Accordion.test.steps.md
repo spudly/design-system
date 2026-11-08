@@ -25,8 +25,9 @@ SingleSection.
 3. Controlled: the "Open section:" line under the accordion tracks
    the open section's name as headers are pressed, and reads "none"
    when all sections are closed.
-4. Section headers read as buttons: the chevron points down over a
-   closed section and flips up over the open one; on web, Tab reaches
+4. Section headers read as buttons: the chevron points right over
+   a closed section and rotates to point down over the open
+   one; on web, Tab reaches
    a header and Enter/Space toggles it.
 
 **Run when:** `src/widgets/Accordion.tsx`, its stories, or a

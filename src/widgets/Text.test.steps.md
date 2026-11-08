@@ -13,8 +13,10 @@ release's changed components. The full index lives in
 
 ## Text
 
-Open in `Widgets/Text`: AllVariants (or any page story, e.g.
-`Pages/Eciperay/SignInPage`).
+Open in `Widgets/Text`: AllVariants (required for the variant
+checks below, including `verse`); a page story, e.g.
+`Pages/Eciperay/SignInPage`, serves only as an additional
+heading check.
 
 1. The `heading` variant ("Heading" in AllVariants; the page title
    on a page story) is exposed as a heading at level 1: in the

@@ -36,7 +36,7 @@ Open in `Widgets/FormStack`: Default, FieldsWithActions;
    the wider separation than a field's; the group announces
    itself by the label's name.
 5. RevertAction: the "Revert to: <label>" text action renders
-   in the warning ink and presses like a button.
+   in the primary ink and presses like a button.
 6. ChangedListBanner: the single host-supplied summary line
    renders on the warning wash; the "Revert" action appears
    only in the story that passes a revert handler.

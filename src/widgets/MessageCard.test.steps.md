@@ -29,7 +29,8 @@ strings.
    wrapped line stays centered; the card grows taller and
    remains vertically centered.
 3. PublicRecipePage's NotFound and Unavailable stories show
-   the identical state once the page adopts the component.
+   the identical state — the page already renders
+   MessageCard for both states.
 
 **Run when:** `src/widgets/MessageCard.tsx`, its stories,
 PublicRecipePage's notFound and unavailable states, or a

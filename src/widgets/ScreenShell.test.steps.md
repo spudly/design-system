@@ -26,9 +26,11 @@ Fixed, Scrollable; `Widgets/PinnedHeaderShell`: Default.
 2. ScrollShell: the whole column scrolls inside the surface
    frame, content inset by the standard padding with even
    separation.
-3. SessionShell Fixed: heading and actions stay put with a
-   short form; Scrollable: a long form scrolls under the
-   pinned heading/actions.
+3. SessionShell Fixed: the title and hint render as a
+   fixed column (neither story has a form or actions);
+   Scrollable: the title and the transcript blocks scroll
+   together inside the ScrollRegion — the title is not
+   pinned.
 4. PinnedHeaderShell: the header block stays pinned while the
    body scrolls beneath it.
 

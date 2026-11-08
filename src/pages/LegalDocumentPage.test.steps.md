@@ -23,7 +23,9 @@ TermsOfService, Wide.
    title is a level-2 heading.
 2. The paragraph renders its strong span bold and its mailto
    link underlined in link ink; the list renders bulleted rows
-   with bold lead-ins and a monospace code span.
+   with bold lead-ins; in PrivacyPolicy, the "Search engines"
+   paragraph renders its `noindex` span in monospace code
+   styling (the TermsOfService fixture has no code span).
 3. In Wide (the unconstrained story — the other two pin a
    430px viewport, where the cap cannot bind): on a wide
    viewport the prose column caps at 768px and centers; the
