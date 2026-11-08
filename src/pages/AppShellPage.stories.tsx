@@ -82,6 +82,31 @@ export const Default: Story = {
   ),
 };
 
+/** Header search supplied (#542): the shell keeps the host's header search as DS chrome. */
+export const WithSearch: Story = {
+  render: () => (
+    <Viewport>
+      <AppShellPage
+        brand={{ label: "Eciperay", href: "/" }}
+        navItems={eciperayNav}
+        navLabel="Eciperay sections"
+        activeItemId="recipes"
+        search={{
+          label: "Search recipes",
+          placeholder: "Search recipes",
+          value: "soup",
+          onValueChange: () => {},
+          onSubmit: () => {},
+        }}
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        footer={eciperayFooterFixture}
+      >
+        <RecipesContent />
+      </AppShellPage>
+    </Viewport>
+  ),
+};
+
 /** Nav items may omit the icon name — the label alone renders. */
 export const NoIcons: Story = {
   render: () => (
