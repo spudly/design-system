@@ -42,7 +42,13 @@ function parseFrontMatter(text) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!match) return null;
   const component = match[1].match(/^component:\s*(.+)$/m)?.[1]?.trim();
-  const runWhen = [...match[1].matchAll(/^\s+-\s+(.+)$/gm)].map((m) => {
+  // Only the `run_when:` block's list items are triggers — a list under
+  // any other front-matter key must not be read as triggers (and a file
+  // whose run_when is absent or empty yields no triggers, so the
+  // missing-trigger validation below rejects it).
+  const runWhenBlock =
+    match[1].match(/^run_when:[ \t]*\r?\n((?:[ \t]+.*(?:\r?\n|$))*)/m)?.[1] ?? "";
+  const runWhen = [...runWhenBlock.matchAll(/^\s+-\s+(.+)$/gm)].map((m) => {
     const raw = m[1].trim();
     if (raw.startsWith('"')) {
       try {
