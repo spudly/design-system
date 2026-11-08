@@ -21,8 +21,9 @@ Empty, Loading, SignedOut.
    an empty field with a disabled Post button.
 2. Editing: the first comment renders its inline editor with
    the draft text and Save / Cancel actions. Empty shows
-   "No comments yet" with the composer; Loading shows only a
-   spinner; SignedOut shows the comments with no composer.
+   "No comments yet" with the composer; Loading shows the
+   "Comments" heading above a spinner; SignedOut shows the
+   comments with no composer.
 
 **Run when:** `src/views/RecipeCommentsView.tsx`, its
 stories, RecipeDetailPage, or a changeset naming
