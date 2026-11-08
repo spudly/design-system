@@ -34,9 +34,39 @@ function stepsFiles(dir) {
 }
 
 /**
+ * Strips a YAML inline comment from a scalar value. A quoted scalar
+ * runs to its closing quote — a `#` inside it, or escaped inside a
+ * double-quoted scalar, is part of the value, and only whitespace
+ * plus a comment may follow the closing quote. In a plain scalar a
+ * `#` preceded by whitespace begins the comment; a `#` anywhere
+ * else (and any quote character past the first position) is data.
+ */
+function stripInlineComment(item) {
+  if (item.startsWith('"') || item.startsWith("'")) {
+    const quote = item[0];
+    for (let i = 1; i < item.length; i++) {
+      if (quote === '"' && item[i] === "\\") i++;
+      else if (item[i] === quote) {
+        // A doubled single quote is an escaped quote, not the end.
+        if (quote === "'" && item[i + 1] === "'") i++;
+        else return item.slice(0, i + 1);
+      }
+    }
+    return item;
+  }
+  const comment = item.match(/\s#/);
+  return comment ? item.slice(0, comment.index).trimEnd() : item;
+}
+
+/**
  * Parses a steps file's YAML front-matter: the `component:` scalar
  * and the `run_when:` list, whose values are YAML double-quoted
- * strings (decoded with JSON.parse) or plain scalars.
+ * strings (decoded with JSON.parse) or plain scalars. A
+ * whitespace-separated inline `#` comment after a value is stripped
+ * first, so the published trigger is the scalar itself. A
+ * double-quoted value that still does not decode is rejected —
+ * publishing the raw text would silently index a different trigger
+ * than the one the steps file declares.
  */
 function parseFrontMatter(text) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
@@ -56,15 +86,16 @@ function parseFrontMatter(text) {
     if (inRunWhen) {
       const item = line.match(/^\s*-\s+(.+)$/)?.[1]?.trim();
       if (item !== undefined) {
-        if (item.startsWith('"')) {
+        const scalar = stripInlineComment(item);
+        if (scalar.startsWith('"')) {
           try {
-            runWhen.push(JSON.parse(item));
-            continue;
+            runWhen.push(JSON.parse(scalar));
           } catch {
-            // Not valid JSON — fall through and keep the raw scalar.
+            throw new Error(`manualTestsIndex: invalid double-quoted run_when scalar: ${item}`);
           }
+        } else {
+          runWhen.push(scalar);
         }
-        runWhen.push(item);
         continue;
       }
     }

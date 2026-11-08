@@ -44,9 +44,9 @@ Open in `Widgets/RatingsCard`: Default, Stale, No Ratings Yet.
    changes it.
 2. Stale: the stale-ratings hint shows under the community
    average and under "Your rating". No Ratings Yet shows "No
-   community ratings yet" with an empty star input. The
-   signed-out form (no "Your rating" block) is exercised by
-   PublicRecipePage's Default story.
+   community ratings yet" with no "Your rating" block.
+   PublicRecipePage's Default story also exercises the signed-out
+   form.
 
 **Run when:** `src/widgets/RatingsCard.tsx`, its stories,
 PublicRecipePage's engagement block, or a changeset naming

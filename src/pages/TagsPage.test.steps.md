@@ -70,7 +70,9 @@ Open in `Pages/Eciperay/TagsPage`: WithTags, Loading, FailingSaves.
    overlap** at the story width — the form stacks cleanly.
 2. Existing tags render their color swatch and name on one line with
    even row spacing.
-3. In FailingSaves (every save handler reports failure): the story
+3. In Loading, a spinner is centered below the create form and has
+   the accessible name "Loading tags".
+4. In FailingSaves (every save handler reports failure): the story
    opens with the "Couldn't create the tag" alert already showing
    (the create failure is seeded so static captures cover the
    error surface). Dismiss that seeded alert first (its × clears

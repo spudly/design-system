@@ -51,9 +51,11 @@ sections.
    beside it — top and bottom edges align. There is exactly
    **one** search field and one Filters button on the page,
    above both section headings.
-2. FilterChooserOpen shows only the collapsed filter affordance by
-   default (no full filter panel) until filters are added in
-   WithFiltersAdded. Filtered ("chicken") narrows BOTH sections
+2. Default shows only the collapsed filter affordance (no full
+   filter panel) until filters are added in WithFiltersAdded.
+   FilterChooserOpen starts with the chooser open, displaying
+   the available add-filter buttons (every filter not yet
+   added). Filtered ("chicken") narrows BOTH sections
    with the one search: the own section lists its matching rows
    and the discovery section lists its matching card.
 3. Default: own rows render first under "Your recipes", then
