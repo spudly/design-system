@@ -4,7 +4,7 @@
 
 ### Major Changes
 
-- 6d4edc9: Remove the `ChunkErrorBoundary` export (and its `ChunkErrorBoundaryProps` / `ChunkErrorBoundaryState` types) from the package root — the final step of the #438 export-surface program. Hosts no longer import the boundary directly: pages that slot lazy content (TabbedShellPage, AppShellPage) already wrap it in the internal error boundary, so lazy surfaces keep the same failure fallback and reload recovery with no host-side change beyond deleting any direct `ChunkErrorBoundary` import. Eciperay and Memorize have already migrated onto the pages-only surface, so nothing in either app imports the boundary.
+- 6d4edc9: Remove the `ChunkErrorBoundary` export (and its `ChunkErrorBoundaryProps` / `ChunkErrorBoundaryState` types) from the package root — the final step of the #438 export-surface program. Hosts no longer import the boundary directly: pages that slot lazy content (TabbedShellPage, AppShellPage) already wrap it in the internal error boundary, so lazy surfaces keep the same failure fallback and reload recovery with no host-side change beyond deleting any direct `ChunkErrorBoundary` import. Eciperay and Memorize have already migrated onto the pages-only surface, so nothing in either app imports the boundary. Migration: a host that passed a custom `onReload` callback to `ChunkErrorBoundary` should pass the same callback to the `onReload` prop of `AppShellPage` or `TabbedShellPage`. Without it, the fallback uses the default recovery (a full page reload on web); on native, the fallback's reload action renders only when a callback is supplied, so a native host that drops its callback loses the reload action. Hosts that relied on the default need no change beyond deleting the import.
 
 ### Minor Changes
 
