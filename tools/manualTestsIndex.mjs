@@ -106,7 +106,7 @@ function parseFrontMatter(text) {
           if (!/^'([^']|'')*'$/.test(scalar)) {
             throw new Error(`manualTestsIndex: invalid single-quoted run_when scalar: ${item}`);
           }
-          runWhen.push(scalar.slice(1, -1).replace(/''/g, "'"));
+          runWhen.push(scalar.slice(1, -1).replaceAll("''", "'"));
         } else {
           runWhen.push(scalar);
         }
