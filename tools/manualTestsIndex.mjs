@@ -41,27 +41,39 @@ function stepsFiles(dir) {
 function parseFrontMatter(text) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!match) return null;
-  const component = match[1].match(/^component:\s*(.+)$/m)?.[1]?.trim();
-  // Only the `run_when:` block's list items are triggers — a list under
-  // any other front-matter key must not be read as triggers (and a file
-  // whose run_when is absent or empty yields no triggers, so the
-  // missing-trigger validation below rejects it).
-  // Blank lines between list items are legal YAML and stay inside the
-  // block; the block ends at the next top-level key (a non-empty line
-  // starting at column 0).
-  const runWhenBlock =
-    match[1].match(/^run_when:[ \t]*\r?\n((?:(?:[ \t]+.*)?(?:\r?\n|$))*)/m)?.[1] ?? "";
-  const runWhen = [...runWhenBlock.matchAll(/^\s+-\s+(.+)$/gm)].map((m) => {
-    const raw = m[1].trim();
-    if (raw.startsWith('"')) {
-      try {
-        return JSON.parse(raw);
-      } catch {
-        return raw;
+  // Line-based scan (not a block regex): only list items under the
+  // `run_when:` key are triggers. Blank lines and comment lines are
+  // legal anywhere in YAML and never change the current key; any
+  // other top-level key ends the run_when list, so a list under a
+  // different key is never read as triggers — and a file whose
+  // run_when is absent or empty yields no triggers, so the
+  // missing-trigger validation below rejects it.
+  let component;
+  let inRunWhen = false;
+  const runWhen = [];
+  for (const line of match[1].split(/\r?\n/)) {
+    if (/^\s*$/.test(line) || /^\s*#/.test(line)) continue;
+    if (inRunWhen) {
+      const item = line.match(/^\s*-\s+(.+)$/)?.[1]?.trim();
+      if (item !== undefined) {
+        if (item.startsWith('"')) {
+          try {
+            runWhen.push(JSON.parse(item));
+            continue;
+          } catch {
+            // Not valid JSON — fall through and keep the raw scalar.
+          }
+        }
+        runWhen.push(item);
+        continue;
       }
     }
-    return raw;
-  });
+    const key = line.match(/^([A-Za-z_][\w-]*):\s*(.*)$/);
+    if (key) {
+      inRunWhen = key[1] === "run_when";
+      if (key[1] === "component") component = key[2].trim();
+    }
+  }
   return { component, runWhen };
 }
 

@@ -54,9 +54,11 @@ export const Error: Story = {
 function DismissDemo({
   message,
   severity = "info",
+  dismissible = true,
 }: {
   message: string;
   severity?: "info" | "success" | "warning" | "error";
+  dismissible?: boolean;
 }) {
   const [dismissals, setDismissals] = useState(0);
   return (
@@ -64,7 +66,7 @@ function DismissDemo({
       <Alert
         message={message}
         severity={severity}
-        dismissible
+        dismissible={dismissible}
         onDismiss={() => setDismissals((n) => n + 1)}
       />
       {dismissals > 0 ? (
@@ -77,14 +79,31 @@ function DismissDemo({
 }
 
 export const Dismissible: Story = {
-  render: () => <DismissDemo message="A new version of Eciperay is available for download." />,
+  args: {
+    message: "A new version of Eciperay is available for download.",
+    severity: "info",
+    dismissible: true,
+  },
+  render: ({ message, severity, dismissible }) => (
+    <DismissDemo
+      message={message ?? ""}
+      severity={severity ?? "info"}
+      dismissible={dismissible ?? true}
+    />
+  ),
 };
 
 export const DismissibleWarning: Story = {
-  render: () => (
+  args: {
+    message: "You're offline. Changes will sync when you reconnect.",
+    severity: "warning",
+    dismissible: true,
+  },
+  render: ({ message, severity, dismissible }) => (
     <DismissDemo
-      message="You're offline. Changes will sync when you reconnect."
-      severity="warning"
+      message={message ?? ""}
+      severity={severity ?? "warning"}
+      dismissible={dismissible ?? true}
     />
   ),
 };
