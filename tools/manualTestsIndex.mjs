@@ -49,7 +49,14 @@ function stripInlineComment(item) {
       else if (item[i] === quote) {
         // A doubled single quote is an escaped quote, not the end.
         if (quote === "'" && item[i + 1] === "'") i++;
-        else return item.slice(0, i + 1);
+        else {
+          // Only whitespace or an inline comment may follow the
+          // closing quote; anything else stays in the returned text
+          // so the decode step below rejects the scalar instead of
+          // silently dropping the trailing text.
+          const tail = item.slice(i + 1);
+          return /^\s*$/.test(tail) || /^\s+#/.test(tail) ? item.slice(0, i + 1) : item;
+        }
       }
     }
     return item;
@@ -61,12 +68,14 @@ function stripInlineComment(item) {
 /**
  * Parses a steps file's YAML front-matter: the `component:` scalar
  * and the `run_when:` list, whose values are YAML double-quoted
- * strings (decoded with JSON.parse) or plain scalars. A
- * whitespace-separated inline `#` comment after a value is stripped
- * first, so the published trigger is the scalar itself. A
- * double-quoted value that still does not decode is rejected —
- * publishing the raw text would silently index a different trigger
- * than the one the steps file declares.
+ * strings (decoded with JSON.parse), single-quoted strings
+ * (decoded by removing the outer quotes and undoubling escaped
+ * single quotes), or plain scalars. A whitespace-separated inline
+ * `#` comment after a value is stripped first, so the published
+ * trigger is the scalar itself. A quoted value that does not
+ * decode — no closing quote, or trailing text after it — is
+ * rejected: publishing the raw text would silently index a
+ * different trigger than the one the steps file declares.
  */
 function parseFrontMatter(text) {
   const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/);
@@ -93,6 +102,11 @@ function parseFrontMatter(text) {
           } catch {
             throw new Error(`manualTestsIndex: invalid double-quoted run_when scalar: ${item}`);
           }
+        } else if (scalar.startsWith("'")) {
+          if (!/^'([^']|'')*'$/.test(scalar)) {
+            throw new Error(`manualTestsIndex: invalid single-quoted run_when scalar: ${item}`);
+          }
+          runWhen.push(scalar.slice(1, -1).replace(/''/g, "'"));
         } else {
           runWhen.push(scalar);
         }
