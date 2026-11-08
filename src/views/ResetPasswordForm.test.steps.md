@@ -2,7 +2,7 @@
 component: ResetPasswordForm
 run_when:
   - "src/pages/SignInPage.tsx, src/pages/SignUpPage.tsx, src/pages/ForgotPasswordPage.tsx, src/pages/ResetPasswordPage.tsx, the form components they compose (src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx), their stories, or a changeset naming the auth pages or Enter-to-submit."
-  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/views/LegalSection.tsx, their stories, the auth or Profile pages that compose them, or a changeset naming the auth forms or LegalSection."
+  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/views/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
 ---
 
 # ResetPasswordForm — manual test steps

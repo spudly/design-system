@@ -1,7 +1,7 @@
 ---
 component: LegalSection
 run_when:
-  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/views/LegalSection.tsx, their stories, the auth or Profile pages that compose them, or a changeset naming the auth forms or LegalSection."
+  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/views/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
 ---
 
 # LegalSection — manual test steps

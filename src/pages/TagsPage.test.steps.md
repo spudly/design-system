@@ -73,11 +73,14 @@ Open in `Pages/Eciperay/TagsPage`: WithTags, Loading, FailingSaves.
 3. In FailingSaves (every save handler reports failure): the story
    opens with the "Couldn't create the tag" alert already showing
    (the create failure is seeded so static captures cover the
-   error surface). Pressing **Add**, **Save** in the open editor,
-   and **Delete** on another row each shows the error alert above
-   the create form naming the failed operation ("Couldn't create
-   the tag" / "Couldn't save the tag changes" / "Couldn't delete
-   the tag"); the alert's dismiss (×) clears it.
+   error surface). Dismiss that seeded alert first (its × clears
+   it), then press **Add** — a new "Couldn't create the tag" alert
+   must appear for Add's own failure; the seeded alert must not be
+   what makes this check pass. Pressing **Save** in the open
+   editor and **Delete** on another row each shows the error alert
+   above the create form naming the failed operation ("Couldn't
+   save the tag changes" / "Couldn't delete the tag"); the alert's
+   dismiss (×) clears it.
 
 **Run when:** `src/pages/TagsPage.tsx`, its stories, or a changeset
 naming TagsPage.

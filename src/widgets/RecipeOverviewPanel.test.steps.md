@@ -52,11 +52,11 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
 6. Instructions: the first step card is highlighted (primary
    border and tint) on open; pressing another card moves the
    highlight to it. Steps render in step-number order.
-   **Run when:** `src/pages/PublicRecipePage.tsx`,
-   its stories, the recipe
-   panels the page composes (RecipeOverviewPanel,
-   RecipeIngredientsPanel, RecipeInstructionsPanel), or a
-   changeset naming PublicRecipePage.
+
+**Run when:** `src/pages/PublicRecipePage.tsx`, its stories,
+the recipe panels the page composes (RecipeOverviewPanel,
+RecipeIngredientsPanel, RecipeInstructionsPanel), or a
+changeset naming PublicRecipePage.
 
 ## RecipeOverviewPanel
 

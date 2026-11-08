@@ -39,7 +39,7 @@ function stepsFiles(dir) {
  * strings (decoded with JSON.parse) or plain scalars.
  */
 function parseFrontMatter(text) {
-  const match = text.match(/^---\n([\s\S]*?)\n---\n/);
+  const match = text.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n/);
   if (!match) return null;
   const component = match[1].match(/^component:\s*(.+)$/m)?.[1]?.trim();
   const runWhen = [...match[1].matchAll(/^\s+-\s+(.+)$/gm)].map((m) => {
@@ -61,6 +61,10 @@ for (const file of stepsFiles(join(root, "src"))) {
   const parsed = parseFrontMatter(readFileSync(file, "utf8"));
   if (!parsed?.component) {
     console.error(`manualTestsIndex: no front-matter in ${file}`);
+    process.exit(1);
+  }
+  if (!parsed.runWhen.some((trigger) => trigger.trim())) {
+    console.error(`manualTestsIndex: no run_when trigger in ${file}`);
     process.exit(1);
   }
   rows.push({
