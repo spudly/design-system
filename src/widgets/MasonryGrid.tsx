@@ -5,12 +5,18 @@ import { platformAccessibilityProps } from "./accessibility.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
 
-// The loading grid's dummy items (#278): exactly 3 placeholder
-// items, from a frozen module-level constant — never generated
-// per render. While loading the grid renders one BoxSkeleton
-// per dummy item through its normal column distribution;
-// `renderItem` is never called with dummy data.
-const LOADING_ITEM_INDEXES = [0, 1, 2] as const;
+// The loading grid's dummy items (#278): 24 placeholder items
+// with varied heights, from a frozen module-level constant —
+// never generated per render. Three equal boxes do not read as
+// a masonry grid; 24 bones of varying heights keep the
+// Pinterest-style staggered look while loading (Stephen on
+// #551). While loading the grid renders one BoxSkeleton per
+// dummy item (at that item's height) through its normal column
+// distribution; `renderItem` is never called with dummy data.
+const LOADING_ITEM_HEIGHTS = [
+  180, 120, 240, 96, 160, 210, 110, 260, 140, 190, 100, 230, 150, 200, 96, 175, 220, 130, 165,
+  250, 105, 185, 145, 205,
+] as const;
 
 /** Default target column width in px (see `minColumnWidth`). */
 const DEFAULT_MIN_COLUMN_WIDTH = 160;
@@ -107,11 +113,12 @@ export type MasonryGridProps<Item> = {
    * in px. Default 12 (the spacing scale's 3).
    */
   gap?: number | undefined;
-  /** Loading state (#278): the grid renders exactly 3 dummy
-   * items — one BoxSkeleton each, laid out through the grid's
-   * normal column distribution — and never calls `renderItem`.
-   * An enclosing composite's LoadingScope can also put the
-   * grid into this state without prop-drilling. */
+  /** Loading state (#278): the grid renders 24 dummy items of
+   * varied heights — one BoxSkeleton each, laid out through the
+   * grid's normal column distribution, so the loading state
+   * still reads as a masonry grid — and never calls
+   * `renderItem`. An enclosing composite's LoadingScope can
+   * also put the grid into this state without prop-drilling. */
   loading?: boolean | undefined;
 };
 
@@ -172,7 +179,7 @@ export function MasonryGrid<Item>({
     gap,
   });
   const columns = distributeMasonryItems(
-    showSkeleton ? [...LOADING_ITEM_INDEXES] : items.map((_, index) => index),
+    showSkeleton ? LOADING_ITEM_HEIGHTS.map((_, index) => index) : items.map((_, index) => index),
     columnCount,
   );
   return (
@@ -191,7 +198,7 @@ export function MasonryGrid<Item>({
                 if (showSkeleton) {
                   return (
                     <View key={`loading-${itemIndex}`}>
-                      <BoxSkeleton height={120} />
+                      <BoxSkeleton height={LOADING_ITEM_HEIGHTS[itemIndex] ?? 120} />
                     </View>
                   );
                 }

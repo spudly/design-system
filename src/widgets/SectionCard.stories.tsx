@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { SectionCard } from "./SectionCard.js";
 import { Button } from "./Button.js";
+import { ListRow } from "./ListRow.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof SectionCard> = {
@@ -84,13 +85,16 @@ export const ElevatedVariant: Story = {
   ),
 };
 
+// Loading: the section's contents are rows that skeletonize
+// from the SectionCard's LoadingScope — raw text children would
+// stay readable under a skeleton title, which is not a loading
+// state (Stephen on #551).
 export const Loading: Story = {
   args: { title: "API access tokens", loading: true },
   render: (args) => (
     <SectionCard {...args} style={{ maxWidth: 480 }}>
-      <Text variant="body">
-        Tokens let scripts and integrations act on your behalf. Keep them secret.
-      </Text>
+      <ListRow title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
+      <ListRow title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
     </SectionCard>
   ),
 };

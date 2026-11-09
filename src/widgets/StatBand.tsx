@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { XStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
@@ -10,7 +10,10 @@ export type StatBandProps = {
   children: ReactNode;
   /** Loading state (#278): the band renders exactly 3 dummy
    * stats, each in its own loading state (propagated through
-   * LoadingScope), in place of its children. An enclosing
+   * LoadingScope) and each taking an equal share of the band's
+   * width — a skeleton tile has no text to size it, so without
+   * the equal share the boxes collapse narrow and empty
+   * (Stephen on #551). In place of its children. An enclosing
    * composite's LoadingScope can also put the band into this
    * state without prop-drilling. */
   loading?: boolean;
@@ -50,7 +53,9 @@ export function StatBand({ children, loading = false }: StatBandProps) {
       >
         <LoadingScope active>
           {LOADING_STAT_KEYS.map((key) => (
-            <StatCard key={key} value="" label="" />
+            <YStack key={key} flex={1} paddingHorizontal={tokens.spacing[2]}>
+              <StatCard value="" label="" />
+            </YStack>
           ))}
         </LoadingScope>
       </XStack>

@@ -235,9 +235,11 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 // LoadingScope (so a composite parent can skeletonize it without
 // prop-drilling), renders skeletons with no real content or
 // actions while loading, and renders unchanged while not loading.
-// The collection widgets (CheckboxSelectList, MasonryGrid,
-// StatBand) render exactly 3 dummy items while loading, and
-// CheckboxSelectList's centered spinner is gone.
+// The collection widgets (CheckboxSelectList, StatBand) render
+// exactly 3 dummy items while loading; MasonryGrid renders 24
+// varied-height dummies so its loading state still reads as a
+// masonry grid (Stephen on #551). CheckboxSelectList's centered
+// spinner is gone.
 
 const T1_SCOPE_WIDGETS = [
   "CardRow",
@@ -370,7 +372,7 @@ test("T1 SSR: loading rows and cards render skeletons and no real content or act
   assert.ok(!tokenRow.includes("Revoke"), "a loading TokenRow renders no revoke action");
 });
 
-test("T1 SSR: loading StatCard, PreviewCard, and the collections render exactly 3 dummies", async () => {
+test("T1 SSR: loading StatCard, PreviewCard, and the collections render their dummy items", async () => {
   const { React, StatCard, StatBand, PreviewCard, CheckboxSelectList, MasonryGrid } =
     await loadRuntime();
   const noop = () => {};
@@ -436,7 +438,7 @@ test("T1 SSR: loading StatCard, PreviewCard, and the collections render exactly 
       loading: true,
     }),
   );
-  assert.equal(hiddenBones(grid), 3, "a loading MasonryGrid renders exactly 3 dummy items");
+  assert.equal(hiddenBones(grid), 24, "a loading MasonryGrid renders 24 varied-height dummy items");
   assert.equal(renderCalls, 0, "a loading MasonryGrid never calls renderItem with dummy data");
   assert.ok(!grid.includes("GridItemBody"), "a loading MasonryGrid shows no real items");
 });
