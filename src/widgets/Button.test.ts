@@ -229,7 +229,14 @@ describe("buttonIcon", () => {
 
   test("the glyph renders LEFT of the label (#178)", () => {
     const glyphAt = button.indexOf("<IconGlyph size={glyphSize} color={glyphInk} />");
-    const labelAt = button.indexOf("{children}", glyphAt);
+    // The label renders as the frame's direct child (the ternary's
+    // bare `children` branch): Tamagui styles the frame's string
+    // children as the button text, so the label must not be
+    // wrapped — a fragment wrapper left it unstyled (#551).
+    const labelAt = button.indexOf(
+      "ghostSkeleton ? (hasLabel ? ghostLabelBone : null) : children",
+      glyphAt,
+    );
     assert.ok(glyphAt !== -1, "glyph element must be rendered");
     assert.ok(labelAt > glyphAt, "the label must render after (right of) the glyph");
   });

@@ -214,11 +214,7 @@ test("TextSkeleton lines occupy their size's line box, bone centered", async () 
   const source = readCode("src/widgets/TextSkeleton.tsx");
   assert.match(source, /size\?: TextSkeletonSize/, "TextSkeleton takes a size prop");
   assert.match(source, /md: \{ lineBox: 18, bone: 12 \}/, "the md line box is 18, its bone 12");
-  assert.match(
-    source,
-    /"3xl": \{ lineBox: 34, bone: 24 \}/,
-    "the 3xl line box is 34, its bone 24",
-  );
+  assert.match(source, /"3xl": \{ lineBox: 34, bone: 24 \}/, "the 3xl line box is 34, its bone 24");
   assert.match(
     source,
     /<View key=\{index\} height=\{lineBox\} justifyContent="center">/,
@@ -613,33 +609,47 @@ test("T1: the MasonryGrid skeleton fills its columns and the ListRow skeleton hi
 });
 
 test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelectList, LogEntryCard)", () => {
-  // StatCard: explicit per-row bones in each run's line box —
-  // value (34 box, 24 bone, 46%), label (21 box, 14 bone, 76%),
-  // sublabel (16 box, 11 bone, 58%) — not a one-size TextSkeleton.
+  // StatCard: explicit per-row bones in each run's line box, read
+  // from TextSkeleton's LINE_BOXES table (the one source of truth
+  // for skeleton text geometry) — value (3xl: 34 box, 24 bone,
+  // 46%), label (lg: 21 box, 14 bone, 76%), sublabel (sm: 16 box,
+  // 11 bone, 58%) — not a one-size TextSkeleton.
   const stat = readCode("src/widgets/StatCard.tsx");
-  assert.match(stat, /<View height=\{34\} justifyContent="center">/, "the value row's line box is 34");
   assert.match(
     stat,
-    /<SkeletonBone width="46%" height=\{24\}/,
-    "the value bone is 46% wide, 24 high",
-  );
-  assert.match(stat, /<View height=\{21\} justifyContent="center">/, "the label row's line box is 21");
-  assert.match(
-    stat,
-    /<SkeletonBone width="76%" height=\{14\}/,
-    "the label bone is 76% wide, 14 high",
+    /<View height=\{LINE_BOXES\["3xl"\]\.lineBox\} justifyContent="center">/,
+    "the value row uses the 3xl line box (34)",
   );
   assert.match(
     stat,
-    /<View height=\{16\} justifyContent="center">/,
-    "the sublabel row's line box is 16",
+    /<SkeletonBone\s+width="46%"\s+height=\{LINE_BOXES\["3xl"\]\.bone\}/,
+    "the value bone is 46% wide, the 3xl bone (24) high",
   );
   assert.match(
     stat,
-    /<SkeletonBone width="58%" height=\{11\}/,
-    "the sublabel bone is 58% wide, 11 high",
+    /<View height=\{LINE_BOXES\.lg\.lineBox\} justifyContent="center">/,
+    "the label row uses the lg line box (21)",
   );
-  assert.doesNotMatch(stat, /TextSkeleton/, "StatCard's mixed run sizes use explicit bones");
+  assert.match(
+    stat,
+    /<SkeletonBone\s+width="76%"\s+height=\{LINE_BOXES\.lg\.bone\}/,
+    "the label bone is 76% wide, the lg bone (14) high",
+  );
+  assert.match(
+    stat,
+    /<View height=\{LINE_BOXES\.sm\.lineBox\} justifyContent="center">/,
+    "the sublabel row uses the sm line box (16)",
+  );
+  assert.match(
+    stat,
+    /<SkeletonBone\s+width="58%"\s+height=\{LINE_BOXES\.sm\.bone\}/,
+    "the sublabel bone is 58% wide, the sm bone (11) high",
+  );
+  assert.doesNotMatch(
+    stat,
+    /<TextSkeleton/,
+    "StatCard's mixed run sizes use explicit bones, not the TextSkeleton component",
+  );
 
   // CheckboxSelectList: the box bone sits in the CheckboxField's
   // 44x44 touch-target slot, centered — the loaded field's visual
@@ -692,11 +702,7 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
     "the ghost skeleton frame has no filled background and no border",
   );
   assert.match(button, /ghostLabelBone/, "the ghost label is replaced by one text bone");
-  assert.match(
-    button,
-    /from "\.\/SkeletonClock\.js"/,
-    "the ghost bone is the shared clock's bone",
-  );
+  assert.match(button, /from "\.\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
 
   const { React, Button, LoadingScope } = await loadRuntime();
   const noop = () => {};
@@ -712,7 +718,11 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
     !scopedGhost.includes(">GhostAction<"),
     "the ghost skeleton shows no label text — the bone replaces it",
   );
-  assert.match(scopedGhost, /aria-hidden="true"/, "the ghost skeleton is hidden from assistive tech");
+  assert.match(
+    scopedGhost,
+    /aria-hidden="true"/,
+    "the ghost skeleton is hidden from assistive tech",
+  );
 
   const scopedGhostLink = await renderToHtml(
     React.createElement(

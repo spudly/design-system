@@ -8,6 +8,7 @@ import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { SkeletonBone } from "./SkeletonClock.js";
+import { LINE_BOXES } from "./TextSkeleton.js";
 
 /**
  * The button frame's styling: ONE config shared by the two frames
@@ -435,9 +436,9 @@ const iconOnlyBoxes = {
  * border to fill (Stephen on #551).
  */
 const ghostLabelBoneHeights = {
-  sm: 11,
-  md: 12,
-  lg: 14,
+  sm: LINE_BOXES.sm.bone,
+  md: LINE_BOXES.md.bone,
+  lg: LINE_BOXES.lg.bone,
 } as const;
 
 /** Label font size per Button size, for the ghost bone's width. */
@@ -912,8 +913,12 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
     >
       {IconGlyph ? <IconGlyph size={glyphSize} color={glyphInk} /> : null}
       {/* The ghost skeleton swaps the label for its text bone;
-          every other form renders the label after the glyph. */}
-      {ghostSkeleton ? (hasLabel ? ghostLabelBone : null) : <>{children}</>}
+          every other form renders the label after the glyph. The
+          label must stay a DIRECT child of the frame: Tamagui
+          styles the frame's string children as the button text,
+          and wrapping them — a fragment counts as wrapping —
+          leaves the label unstyled (Stephen on #551). */}
+      {ghostSkeleton ? (hasLabel ? ghostLabelBone : null) : children}
     </StyledButton>
   );
 }

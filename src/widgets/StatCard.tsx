@@ -4,6 +4,7 @@ import { platformAccessibilityProps } from "./accessibility.js";
 import { Card } from "./Card.js";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { SkeletonBone } from "./SkeletonClock.js";
+import { LINE_BOXES } from "./TextSkeleton.js";
 import { Text } from "./Text.js";
 
 export type StatCardProps = {
@@ -30,26 +31,35 @@ export function StatCard({ value, label, sublabel, loading = false }: StatCardPr
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same card, with one bone per text run.
-    // The rows are the tile's own layout constants, mirroring
-    // the runs they replace: each bone sits in a View of its
-    // run's line-box height with the bone vertically centered —
-    // the value run (3xl: 34 box, 24 bone), the label run (lg:
-    // 21 box, 14 bone), and the sublabel run when present (sm:
-    // 16 box, 11 bone). The widths are the runs' typical
-    // proportions: a short number, a longer label, a mid-length
-    // sublabel. The region is marked busy; no real values show.
+    // The rows mirror the runs they replace: each bone sits in a
+    // View of its run's line-box height with the bone vertically
+    // centered — the value run at 3xl, the label run at lg, and
+    // the sublabel run when present at sm, all read from
+    // TextSkeleton's LINE_BOXES table (the one source of truth
+    // for skeleton text geometry). The widths are the runs'
+    // typical proportions: a short number, a longer label, a
+    // mid-length sublabel. The region is marked busy; no real
+    // values show.
     return (
       <Card {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
         <YStack>
-          <View height={34} justifyContent="center">
-            <SkeletonBone width="46%" height={24} borderRadius={tokens.radii.md} />
+          <View height={LINE_BOXES["3xl"].lineBox} justifyContent="center">
+            <SkeletonBone
+              width="46%"
+              height={LINE_BOXES["3xl"].bone}
+              borderRadius={tokens.radii.md}
+            />
           </View>
-          <View height={21} justifyContent="center">
-            <SkeletonBone width="76%" height={14} borderRadius={tokens.radii.md} />
+          <View height={LINE_BOXES.lg.lineBox} justifyContent="center">
+            <SkeletonBone width="76%" height={LINE_BOXES.lg.bone} borderRadius={tokens.radii.md} />
           </View>
           {sublabel ? (
-            <View height={16} justifyContent="center">
-              <SkeletonBone width="58%" height={11} borderRadius={tokens.radii.md} />
+            <View height={LINE_BOXES.sm.lineBox} justifyContent="center">
+              <SkeletonBone
+                width="58%"
+                height={LINE_BOXES.sm.bone}
+                borderRadius={tokens.radii.md}
+              />
             </View>
           ) : null}
         </YStack>
