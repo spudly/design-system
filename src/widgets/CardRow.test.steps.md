@@ -18,10 +18,16 @@ Open in `Widgets/CardRow`: Default, WithAction, TitleOnly.
 
 1. Default: an elevated card with the title in semibold over its
    muted meta line; the text block presses (pointer cursor on
-   web, Enter/Space activate) and no action button shows.
+   web) and no action button shows. The "Row presses: N"
+   readout under the card increments on a pointer press, and
+   focusing the row and pressing Enter or Space increments
+   it too.
 2. WithAction: a small soft-red action button ("Delete",
    danger tone) sits at the card's right edge, vertically
-   centered, and pressing it does not trigger the row's press.
+   centered. Pressing Delete increments only the "Delete
+   presses: N" readout — the "Row presses: N" readout does
+   not change, so the action press does not trigger the
+   row's press.
 3. TitleOnly: the card shows the title alone, no meta line and no
    empty gap where it would sit.
 

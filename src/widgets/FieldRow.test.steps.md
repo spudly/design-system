@@ -2,7 +2,7 @@
 component: FieldRow
 run_when:
   - "src/widgets/FieldRow.tsx, its stories, src/views/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
-  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
+  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)"
 ---
 
 # FieldRow — manual test steps
@@ -32,14 +32,12 @@ here a search field with its submit button.
 that compose FieldRow (VerseSearchPage), or a changeset
 naming FieldRow.
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
 `Widgets/SuggestionPanel`: Default;
-`Widgets/TagList`: Default; `Widgets/FormStack`: (its
-stories); `Widgets/TextActionCardRow`: (its stories);
-`Widgets/CenteredText`: (its stories);
+`Widgets/TagList`: Default;
 `Widgets/StatusMessage`: Default, Empty, Transient;
 `Widgets/FieldRow`: (its stories);
 `Widgets/RemovableField`: (its stories).

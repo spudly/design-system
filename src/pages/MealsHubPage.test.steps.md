@@ -86,8 +86,9 @@ FirstStep, LastStep, LoadError.
    rhythm, each card's Delete a bare text action at its right
    edge. PlansTab: the same chrome stays pinned above the
    plans list. Empty: the empty state replaces the list.
-3. ShoppingListPage Default: each line's box, bold name, and
-   muted quantity / "optional" segments render on one line;
+3. ShoppingListPage Default: each line's box, medium-weight
+   (500) name, and muted quantity / "optional" segments
+   render on one line;
    checking a line fills its box and strikes the line through.
    Loading shows the spinner under the title; Empty shows the
    empty state.
@@ -104,7 +105,10 @@ FirstStep, LastStep, LoadError.
 6. MealCookingModePage LoadError: no overlay and no step UI —
    the meal title over an error alert reading "Couldn't load
    the cook plan for this meal. Please try again.", with a
-   Done button below it as the way out.
+   Done button below it. This check verifies the Done
+   button's presence only: the story's `onDone` is a no-op,
+   so pressing it does not leave the error state in
+   Storybook.
 
 **Run when:** any of the five pages' sources or stories, or a
 changeset naming any of them. Run only the numbered cases for

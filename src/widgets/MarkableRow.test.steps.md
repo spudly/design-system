@@ -1,7 +1,7 @@
 ---
 component: MarkableRow
 run_when:
-  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
+  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)"
 ---
 
 # MarkableRow — manual test steps
@@ -11,14 +11,12 @@ Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
 `Widgets/SuggestionPanel`: Default;
-`Widgets/TagList`: Default; `Widgets/FormStack`: (its
-stories); `Widgets/TextActionCardRow`: (its stories);
-`Widgets/CenteredText`: (its stories);
+`Widgets/TagList`: Default;
 `Widgets/StatusMessage`: Default, Empty, Transient;
 `Widgets/FieldRow`: (its stories);
 `Widgets/RemovableField`: (its stories).

@@ -1,7 +1,7 @@
 ---
 component: BackLink
 run_when:
-  - "src/widgets/Button.tsx, TextLink.tsx, BackLink.tsx, or Tabs.tsx, their stories, or a changeset naming the navigation link forms or #248."
+  - "src/widgets/Button.tsx, TextLink.tsx, BackLink.tsx, or Tabs.tsx, their stories, or a changeset naming any of Button, TextLink, BackLink, or Tabs, the navigation link forms, or #248."
 ---
 
 # BackLink — manual test steps
@@ -43,4 +43,5 @@ renders as a real anchor carrying its href:
 
 **Run when:** `src/widgets/Button.tsx`, `TextLink.tsx`,
 `BackLink.tsx`, or `Tabs.tsx`, their stories, or a changeset
-naming the navigation link forms or #248.
+naming any of Button, TextLink, BackLink, or Tabs, the
+navigation link forms, or #248.

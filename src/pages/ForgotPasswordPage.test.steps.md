@@ -16,14 +16,17 @@ release's changed components. The full index lives in
 Open in `Pages/Eciperay/SignInPage`, `Pages/Eciperay/SignUpPage`,
 `Pages/Eciperay/ForgotPasswordPage`,
 `Pages/Eciperay/ResetPasswordPage` (the Filled story of each —
-the stories are interactive: fields can be typed in, and a
-submit switches the page to its loading state).
+the stories are interactive: fields can be typed in, a
+submit switches the page to its loading state, and a
+"Submissions: N" readout under the story counts submissions).
 
 1. In every field of each page's Filled story, pressing Enter
    submits the page — visible as the page switching to its
    loading state (the submit button's label changes to its
    loading label, e.g. "Signing in…", and the button disables),
-   the same result as pressing the submit button. This holds
+   the same result as pressing the submit button; the
+   "Submissions: N" readout under the story increases to 1.
+   This holds
    for the first field as well as the last. Reload or
    remount the story after each Enter-triggered submission:
    the first submission puts the story in its loading state,
@@ -31,14 +34,14 @@ submit switches the page to its loading state).
    loaded Filled story.
 2. In each page's Loading story (and in a Filled story after
    step 1 has put it in the loading state), pressing Enter in
-   a field does not submit again — the page stays in the
-   loading state with no further change. (The stories' submit
-   handler only sets the loading flag, so a repeat submission
-   is not separately observable in Storybook; this step
-   verifies the visible end state — loading persists and the
-   submit button stays disabled.)
+   a field does not submit again: the "Submissions: N"
+   readout under the story does not increase (it reads 1
+   after the step 1 submission, and 0 in a Loading story),
+   the page stays in the loading state, and the submit
+   button stays disabled.
 3. In a freshly reloaded Filled story, press the submit button.
-   Check that the page switches to its loading state.
+   Check that the page switches to its loading state and the
+   "Submissions: N" readout increases to 1.
    Before checking each "Create an account" / "Forgot password?" /
    "Back to sign in" / "Already have an account? Sign in" link,
    reload or remount the corresponding Filled story. Preserve the

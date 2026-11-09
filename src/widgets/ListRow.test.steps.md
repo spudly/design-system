@@ -17,11 +17,11 @@ Open in `Widgets/ListRow`: Prefixed, Plain, Disabled.
 
 1. Prefixed: the title line reads "Meal · Taco Tuesday" (the
    prefix is caller-supplied content) in medium weight over the
-   muted meta line, with a hairline under the row; the row presses
-   (pointer cursor on web and focusable, so Enter/Space target
-   it — the story's `onPress` is a no-op, so activation has no
-   visible result in Storybook; judge the press/focus treatment
-   here and the disabled exposure below, not a callback effect).
+   muted meta line, with a hairline under the row; the row
+   presses (pointer cursor on web and focusable). The "Row
+   presses: N" readout under the row increments on a pointer
+   press, and focusing the row and pressing Enter or Space
+   increments it too.
 2. Plain: the title line reads "Garlic cream chicken" with no
    prefix and no meta line.
 3. Disabled: the title gains its caller-supplied " (unavailable)"

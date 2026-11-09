@@ -2,6 +2,7 @@ import { eciperayFooterFixture } from "./fixtures.js";
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+import { Text } from "../widgets/Text.js";
 import { ForgotPasswordPage } from "./ForgotPasswordPage.js";
 
 const meta: Meta<typeof ForgotPasswordPage> = {
@@ -26,7 +27,8 @@ function Viewport({ children }: { children: ReactNode }) {
  * can be typed in, and submit switches the page to its
  * loading state — so Enter-to-submit (#255) and the
  * held-while-loading guard are observable in Storybook
- * (submit shows "Sending…" and disables the button).
+ * (submit shows "Sending…" and disables the button; the "Submissions: N"
+ * readout under the page counts each submit).
  */
 function Interactive({
   emailError,
@@ -37,18 +39,25 @@ function Interactive({
 }) {
   const [email, setEmail] = useState("cook@example.com");
   const [loading, setLoading] = useState(initialLoading);
+  const [submissions, setSubmissions] = useState(0);
   return (
-    <Viewport>
-      <ForgotPasswordPage
-        footer={eciperayFooterFixture}
-        email={email}
-        onEmailChange={setEmail}
-        loading={loading}
-        emailError={emailError ?? null}
-        onSubmit={() => setLoading(true)}
-        signInHref="/signin"
-      />
-    </Viewport>
+    <>
+      <Viewport>
+        <ForgotPasswordPage
+          footer={eciperayFooterFixture}
+          email={email}
+          onEmailChange={setEmail}
+          loading={loading}
+          emailError={emailError ?? null}
+          onSubmit={() => {
+            setSubmissions((count) => count + 1);
+            setLoading(true);
+          }}
+          signInHref="/signin"
+        />
+      </Viewport>
+      <Text>Submissions: {submissions}</Text>
+    </>
   );
 }
 

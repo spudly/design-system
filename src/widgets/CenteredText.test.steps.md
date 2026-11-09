@@ -2,7 +2,7 @@
 component: CenteredText
 run_when:
   - "src/widgets/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
-  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
+  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)"
 ---
 
 # CenteredText — manual test steps
@@ -27,14 +27,12 @@ Open in `Widgets/ButtonStack`: Default;
 `src/widgets/CenteredText.tsx`, their stories, HomePage's
 header, or a changeset naming either.
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
 `Widgets/SuggestionPanel`: Default;
-`Widgets/TagList`: Default; `Widgets/FormStack`: (its
-stories); `Widgets/TextActionCardRow`: (its stories);
-`Widgets/CenteredText`: (its stories);
+`Widgets/TagList`: Default;
 `Widgets/StatusMessage`: Default, Empty, Transient;
 `Widgets/FieldRow`: (its stories);
 `Widgets/RemovableField`: (its stories).

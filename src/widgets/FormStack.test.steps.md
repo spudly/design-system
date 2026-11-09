@@ -2,7 +2,7 @@
 component: FormStack
 run_when:
   - "src/widgets/FormStack.tsx, src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
-  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)"
+  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)"
   - "any of these components, their stories, the form pages, or a changeset naming them. (namely: FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner, RecipeFormPage, MealFormPage, MealPlanFormPage, TagsPage)"
 ---
 
@@ -37,14 +37,12 @@ ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
 `src/widgets/Card.tsx`, their stories, TagsPage's
 forms or rows, or a changeset naming any of them.
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, FormStack, TextActionCardRow, CenteredText, StatusMessage, FieldRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
 `Widgets/SuggestionPanel`: Default;
-`Widgets/TagList`: Default; `Widgets/FormStack`: (its
-stories); `Widgets/TextActionCardRow`: (its stories);
-`Widgets/CenteredText`: (its stories);
+`Widgets/TagList`: Default;
 `Widgets/StatusMessage`: Default, Empty, Transient;
 `Widgets/FieldRow`: (its stories);
 `Widgets/RemovableField`: (its stories).

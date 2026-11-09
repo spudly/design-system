@@ -19,8 +19,11 @@ Open in `Widgets/BigFooter`: Default, Memorize, NoSocialsYet, MobileStacked, Sti
 1. The footer band (BigFooter, #410): the big brand wordmark,
    the link columns, app-store links, and social icon links the
    caller passed in as the one `footer` object (the story passes
-   a Legal column with Privacy / Terms / Do Not Sell or Share),
-   rendered in the caller's order as real links. Below the
+   a Legal column with Privacy / Terms / Do Not Sell or Share —
+   that three-link Legal column is specific to the Eciperay
+   fixture behind the Default story; the Memorize story's
+   Legal column carries only Privacy and Terms), rendered in
+   the caller's order as real links. Below the
    640px stack breakpoint (check at a 430px mobile width, the
    MobileStacked story) the columns collapse to a stacked
    single column with no horizontal scrolling; on a short page

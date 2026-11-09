@@ -15,11 +15,11 @@ release's changed components. The full index lives in
 
 Open in `Widgets/CheckRow`: Default, Checked, LabelOnly.
 
-1. Default: an outlined box sits left of a bold label with
-   its muted detail ("2 tbsp · optional") on the same line,
-   over a hairline; the whole row is the press target
-   (pointer cursor on web, Enter/Space toggle it, the
-   story's row checks and unchecks).
+1. Default: an outlined box sits left of a medium-weight
+   (500) label with its muted detail ("2 tbsp · optional")
+   on the same line, over a hairline; the whole row is the
+   press target (pointer cursor on web, Enter/Space toggle
+   it, the story's row checks and unchecks).
 2. Checked: the box fills with the primary color and a check
    glyph, and the label renders muted and struck through.
 3. LabelOnly: no detail segment renders — the label stands

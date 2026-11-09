@@ -47,9 +47,12 @@ or a changeset naming them.
 
 Open in `Widgets/ScrollShell`: Default.
 
-1. The shell's blocks sit 16px from the canvas edges and from
-   each other, on a surface background that fills the frame; the
-   content scrolls as one region when it overflows.
+1. The shell's blocks sit 16px from the shell frame's edges
+   (the edges of the story's 430px frame — not the Storybook
+   canvas edges, which sit a further 24px out from the
+   preview's padding) and 16px from each other, on a surface
+   background that fills the frame; the content scrolls as
+   one region when it overflows.
 
 **Run when:** `src/widgets/ScrollShell.tsx`, its stories,
 PublicRecipePage, or a changeset naming ScrollShell.

@@ -22,7 +22,8 @@ DarkTone, AllowClear, ReadOnly, Disabled.
    clearly visible against the story background.
 3. ReadOnly shows the value with no interactive affordance;
    Disabled reads as disabled (dimmed) and does not respond.
-4. Unrated renders five empty stars with no partial fill.
+4. Unrated renders five gray, unselected stars (solid ★
+   glyphs) with no partial fill.
 
 **Run when:** `src/widgets/StarRatingInput.tsx`, its stories, or
 a changeset naming StarRatingInput.

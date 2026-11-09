@@ -57,8 +57,9 @@ FirstStep, LastStep, LoadError.
    rhythm, each card's Delete a bare text action at its right
    edge. PlansTab: the same chrome stays pinned above the
    plans list. Empty: the empty state replaces the list.
-3. ShoppingListPage Default: each line's box, bold name, and
-   muted quantity / "optional" segments render on one line;
+3. ShoppingListPage Default: each line's box, medium-weight
+   (500) name, and muted quantity / "optional" segments
+   render on one line;
    checking a line fills its box and strikes the line through.
    Loading shows the spinner under the title; Empty shows the
    empty state.
@@ -75,7 +76,10 @@ FirstStep, LastStep, LoadError.
 6. MealCookingModePage LoadError: no overlay and no step UI —
    the meal title over an error alert reading "Couldn't load
    the cook plan for this meal. Please try again.", with a
-   Done button below it as the way out.
+   Done button below it. This check verifies the Done
+   button's presence only: the story's `onDone` is a no-op,
+   so pressing it does not leave the error state in
+   Storybook.
 
 **Run when:** any of the five pages' sources or stories, or a
 changeset naming any of them. Run only the numbered cases for
@@ -85,11 +89,11 @@ the page(s) that changed.
 
 Open in `Widgets/CheckRow`: Default, Checked, LabelOnly.
 
-1. Default: an outlined box sits left of a bold label with
-   its muted detail ("2 tbsp · optional") on the same line,
-   over a hairline; the whole row is the press target
-   (pointer cursor on web, Enter/Space toggle it, the
-   story's row checks and unchecks).
+1. Default: an outlined box sits left of a medium-weight
+   (500) label with its muted detail ("2 tbsp · optional")
+   on the same line, over a hairline; the whole row is the
+   press target (pointer cursor on web, Enter/Space toggle
+   it, the story's row checks and unchecks).
 2. Checked: the box fills with the primary color and a check
    glyph, and the label renders muted and struck through.
 3. LabelOnly: no detail segment renders — the label stands

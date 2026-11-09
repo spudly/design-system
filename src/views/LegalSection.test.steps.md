@@ -39,6 +39,11 @@ forms.
 5. In LegalSection's Default story, the "Legal" title (large,
    semibold) sits 12px above the two links, which stack 12px
    apart — the Profile page's legal block.
+6. In each form's Default story, pressing Enter in a field
+   submits the form: the "Submissions: N" readout under the
+   form increases to 1 and the form switches to its loading
+   state; pressing Enter again while loading does not
+   increase the readout.
 
 **Run when:** `src/views/SignInForm.tsx`,
 `src/views/SignUpForm.tsx`,

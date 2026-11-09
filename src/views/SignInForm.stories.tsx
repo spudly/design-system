@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { SignInForm } from "./SignInForm.js";
+import { Text } from "../widgets/Text.js";
 
 const meta: Meta<typeof SignInForm> = {
   title: "Views/SignInForm",
@@ -12,7 +13,7 @@ export default meta;
 type Story = StoryObj<typeof SignInForm>;
 
 function Controlled({
-  loading = false,
+  loading: initialLoading = false,
   error,
   withLinks = true,
 }: {
@@ -22,6 +23,8 @@ function Controlled({
 }) {
   const [email, setEmail] = useState("cook@example.com");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(initialLoading);
+  const [submissions, setSubmissions] = useState(0);
   return (
     <YStack maxWidth={430}>
       <SignInForm
@@ -31,10 +34,14 @@ function Controlled({
         onPasswordChange={setPassword}
         loading={loading}
         error={error}
-        onSubmit={() => undefined}
+        onSubmit={() => {
+          setSubmissions((count) => count + 1);
+          setLoading(true);
+        }}
         signUpHref={withLinks ? "#/sign-up" : undefined}
         forgotPasswordHref={withLinks ? "#/forgot-password" : undefined}
       />
+      <Text>Submissions: {submissions}</Text>
     </YStack>
   );
 }
