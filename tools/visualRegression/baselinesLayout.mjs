@@ -97,9 +97,15 @@ function parseTreeRel(rel) {
 export function publishBaselines(repoRoot, treeDir) {
   const { index, baselines, orphans } = listCommittedBaselines(repoRoot);
   if (orphans.length > 0) throw orphanError(orphans);
+  const treePngs = listTreePngs(treeDir);
+  if (treePngs.length === 0) {
+    throw new Error(
+      `no baselines found under ${treeDir} — refusing to publish (an empty tree would delete every committed baseline)`,
+    );
+  }
   const kept = new Set();
   let published = 0;
-  for (const rel of listTreePngs(treeDir)) {
+  for (const rel of treePngs) {
     const parsed = parseTreeRel(rel);
     const relPath = parsed
       ? baselineRelPath(index, parsed.storyId, parsed.theme, parsed.narrow)
