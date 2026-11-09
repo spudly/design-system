@@ -5,6 +5,7 @@ import { TextAreaField } from "../views/TextAreaField.js";
 import { Text } from "../widgets/Text.js";
 import { TextField } from "../views/TextField.js";
 import { tokens } from "../tokens/index.js";
+import { storyImageWide } from "../storyFixtures.js";
 import { recipeFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
 
@@ -12,13 +13,15 @@ import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
  * Stories for the real RecipeFormPage component (#124) — the
  * recipe form's view layer, driven by fixture props in a stateful
  * harness (the page is controlled; the harness plays the app
- * host's part). The three slotted sections render stand-ins
- * composed from DS fields: in the app those slots carry the app's
- * own image field and sortable lists, which stay app-side pending
- * the contract picks proposed on #124 — the stand-ins mirror their
- * layout (preview frame; qty/unit/name rows; numbered step rows)
- * so the page's composition and full height are what the
- * screenshots guard.
+ * host's part). The image section renders the real
+ * RecipeImageView through the page's `image` data prop (the
+ * #124 view-half contract, landed in #130). The two list
+ * sections render stand-ins composed from DS fields: in the
+ * app those slots carry the app's own sortable lists, which
+ * stay app-side under the #124 Option A interim — the
+ * stand-ins mirror their layout (qty/unit/name rows; numbered
+ * step rows) so the page's composition and full height are
+ * what the screenshots guard.
  *
  * The frame matches the other page stories: a phone viewport
  * (430×844) pinned so screenshots are deterministic. Theme pinned
@@ -38,35 +41,6 @@ function Viewport({ children }: { children: ReactNode }) {
     <View width={430} maxWidth="100%" height={844}>
       {children}
     </View>
-  );
-}
-
-function ImageSectionStandIn({ revertAction }: { revertAction: ReactNode }) {
-  return (
-    <YStack gap="$2">
-      <XStack alignItems="center" justifyContent="space-between" gap="$2">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          fontWeight={tokens.typography.fontWeight.medium}
-          color={tokens.colors.gray.gray8}
-        >
-          Recipe image
-        </Text>
-        {revertAction}
-      </XStack>
-      <YStack
-        overflow="hidden"
-        borderRadius={tokens.radii.md}
-        borderWidth={2}
-        borderStyle="dashed"
-        borderColor={tokens.colors.gray.gray4}
-        backgroundColor={tokens.colors.gray.gray1}
-        paddingVertical="$6"
-        alignItems="center"
-      >
-        <Text variant="hint">Choose an image from your library or generate one with AI</Text>
-      </YStack>
-    </YStack>
   );
 }
 
@@ -168,6 +142,7 @@ function FormHarness({
   const [sourceUrl, setSourceUrl] = useState(empty ? "" : fixture.sourceUrl);
   const [status, setStatus] = useState(fixture.status);
   const [tagIds, setTagIds] = useState<string[]>(empty ? [] : fixture.tagIds);
+  const [imageUri, setImageUri] = useState<string | null>(empty ? null : storyImageWide);
   const noop = () => undefined;
   return (
     <RecipeFormPage
@@ -195,7 +170,15 @@ function FormHarness({
       onRevertTags={noop}
       onRevertIngredients={noop}
       onRevertInstructions={noop}
-      renderImageSection={(revertAction) => <ImageSectionStandIn revertAction={revertAction} />}
+      image={{
+        imagePreviewUri: imageUri,
+        onPickImageRequest: noop,
+        onTakePhotoRequest: noop,
+        onGenerateImageRequest: noop,
+        onRemoveImage: () => {
+          setImageUri(null);
+        },
+      }}
       renderIngredientsSection={() => <IngredientsSectionStandIn />}
       renderInstructionsSection={() => <InstructionsSectionStandIn />}
       submitLabel={submitLabel}

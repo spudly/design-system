@@ -74,6 +74,7 @@ export {
   type RecipeExportPickerViewProps,
   type RecipeExportPickerViewItem,
 } from "./RecipeExportPickerView.js";
+export { RecipeImageView, type RecipeImageViewProps } from "./RecipeImageView.js";
 export { RecipeSharingView, type RecipeSharingViewProps } from "./RecipeSharingView.js";
 export { ResetPasswordForm, type ResetPasswordFormProps } from "./ResetPasswordForm.js";
 export { RevertAction, type RevertActionProps } from "./RevertAction.js";

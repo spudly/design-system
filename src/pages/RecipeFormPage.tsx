@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Alert } from "../widgets/Alert.js";
 import { Button } from "../widgets/Button.js";
 import { ChangedListBanner } from "../views/ChangedListBanner.js";
+import { RecipeImageView, type RecipeImageViewProps } from "../views/RecipeImageView.js";
 import { FieldColumns } from "../widgets/FieldColumns.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { LabeledField } from "../widgets/LabeledField.js";
@@ -49,17 +50,23 @@ import { Badge } from "../widgets/Badge.js";
  *   and the revert affordances, and reports revert intents through
  *   `onRevertField` / `onRevertTags` / `onRevertIngredients` /
  *   `onRevertInstructions`. Diffing itself never enters the view.
- * - Three sections are render slots, pending the contract picks
- *   proposed on #124: the image field (its picker invocation is
- *   native-only), and the sortable ingredient / instruction lists
- *   (built app-side on a drag library with no web equivalent).
- *   `renderImageSection` receives the image field's revert
- *   affordance as its argument — the app field renders that node in
- *   its header row, exactly where the app form puts it today; the
- *   list slots take no argument (the #49 `renderComments` shape).
- *   While `contentLocked` is set, the list slots are not rendered
- *   at all and the lock notice renders in their place — the app's
- *   behavior on the active version.
+ * - The image section renders from props: the `image` data
+ *   prop carries the view-half contract approved on #124
+ *   (preview URI, busy flags, error, generate gate), and the
+ *   page renders RecipeImageView with the image revert
+ *   affordance as its header action. `renderImageSection`
+ *   remains as the fallback for hosts that have not adopted
+ *   the data prop; it receives the same revert affordance as
+ *   its argument — the app field renders that node in its
+ *   header row, exactly where the app form puts it today.
+ *   The sortable ingredient / instruction lists stay render
+ *   slots (the #124 Option A interim: the lists are built
+ *   app-side on drag libraries with no cross-platform
+ *   equivalent in the DS); the list slots take no argument
+ *   (the #49 `renderComments` shape). While `contentLocked`
+ *   is set, the list slots are not rendered at all and the
+ *   lock notice renders in their place — the app's behavior
+ *   on the active version.
  *
  * Documented deviations from the app form's current rendering:
  * - The "Generate with AI" buttons use the DS ghost Button
@@ -86,6 +93,13 @@ export type RecipeFormPageOption = {
   value: string;
   label: string;
 };
+
+// The image section's view-model lives with the view (#130);
+// the page's contract name is an alias, so consumers of the
+// page's types are untouched (the RecipeDetailPage ratings
+// precedent). The view's `headerAction` is the page's own
+// revert affordance, so it is not part of the data prop.
+export type RecipeFormPageImage = Omit<RecipeImageViewProps, "headerAction">;
 
 export type RecipeFormPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
@@ -145,8 +159,16 @@ export type RecipeFormPageProps = {
    * notice; scalars and tags stay editable (the app's behavior). */
   contentLocked?: boolean;
 
-  /** Slot: the app's image field. Receives the image revert
-   * affordance (or null) for its header row — see the header. */
+  /** The image section's data (the #124 view-half contract):
+   * when provided, the page renders RecipeImageView from it
+   * and this prop wins over the slot; null / omitted falls
+   * back to the slot. The page supplies the view's
+   * `headerAction` itself (the image revert affordance). */
+  image?: RecipeFormPageImage | null;
+  /** Slot fallback: the app's image field, for hosts that
+   * have not adopted the `image` data prop. Receives the image
+   * revert affordance (or null) for its header row — see the
+   * header. */
   renderImageSection?: (revertAction: ReactNode) => ReactNode;
   /** Slot: the app's sortable ingredient list. */
   renderIngredientsSection?: () => ReactNode;
@@ -199,6 +221,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
     isGeneratingDescription = false,
     descriptionError,
     contentLocked = false,
+    image,
     renderImageSection,
     renderIngredientsSection,
     renderInstructionsSection,
@@ -339,7 +362,11 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
             </LabeledField>
           </FieldColumns>
 
-          {renderImageSection ? renderImageSection(revertAction("image")) : null}
+          {image ? (
+            <RecipeImageView {...image} headerAction={revertAction("image")} />
+          ) : renderImageSection ? (
+            renderImageSection(revertAction("image"))
+          ) : null}
 
           <LabeledField
             label="Source URL"
