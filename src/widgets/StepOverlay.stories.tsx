@@ -90,17 +90,19 @@ function Demo({
           </StepOverlay>
         ) : null}
       </YStack>
-      {open ? null : (
-        <YStack paddingBlockStart="$3">
-          <Button
-            onPress={() => {
-              setOpen(true);
-            }}
-          >
-            Reopen the overlay
-          </Button>
-        </YStack>
-      )}
+      {/* The reopen control stays mounted while the overlay is
+          open: it is the element that held focus when the overlay
+          opened, so the shell's focus-restore-on-close can only
+          return focus to it if it never unmounts. */}
+      <YStack paddingBlockStart="$3">
+        <Button
+          onPress={() => {
+            setOpen(true);
+          }}
+        >
+          Reopen the overlay
+        </Button>
+      </YStack>
       {donePresses > 0 ? (
         <Text variant="hint">
           Done activated ({donePresses}) — the host would exit the steps here.

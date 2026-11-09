@@ -4,7 +4,8 @@
  * section gap (`gap: tokens.spacing[4]`), and pages rely on it as
  * their only section separation (e.g. MealPlansPage's loading
  * spinner sits "16px below the create button" per
- * docs/manual-tests.md). On web the gap never reached the children:
+ * the shells' colocated .test.steps.md files). On web the gap never
+ * reached the children:
  * every scrollable-shell page stacked its blocks flush (measured
  * 0px at every joint in the react Storybook), while native rendered
  * the 16dp separation correctly.

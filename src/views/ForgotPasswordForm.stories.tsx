@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { ForgotPasswordForm } from "./ForgotPasswordForm.js";
+import { Text } from "../widgets/Text.js";
 
 const meta: Meta<typeof ForgotPasswordForm> = {
   title: "Views/ForgotPasswordForm",
@@ -11,8 +12,23 @@ const meta: Meta<typeof ForgotPasswordForm> = {
 export default meta;
 type Story = StoryObj<typeof ForgotPasswordForm>;
 
-function Controlled({ loading = false, error }: { loading?: boolean; error?: string | null }) {
+/**
+ * Controlled ForgotPasswordForm demo for the stories: holds the field
+ * values and loading state internally (seeded from the
+ * `loading` prop) and counts submissions in a readout, so a
+ * tester can confirm a repeat submit while loading does not
+ * submit again.
+ */
+function Controlled({
+  loading: initialLoading = false,
+  error,
+}: {
+  loading?: boolean;
+  error?: string | null;
+}) {
   const [email, setEmail] = useState("");
+  const [loading, setLoading] = useState(initialLoading);
+  const [submissions, setSubmissions] = useState(0);
   return (
     <YStack maxWidth={430}>
       <ForgotPasswordForm
@@ -20,9 +36,13 @@ function Controlled({ loading = false, error }: { loading?: boolean; error?: str
         onEmailChange={setEmail}
         loading={loading}
         error={error}
-        onSubmit={() => undefined}
+        onSubmit={() => {
+          setSubmissions((count) => count + 1);
+          setLoading(true);
+        }}
         signInHref="#/sign-in"
       />
+      <Text>Submissions: {submissions}</Text>
     </YStack>
   );
 }

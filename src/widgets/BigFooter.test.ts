@@ -127,6 +127,7 @@ test("every page component renders BigFooter through the shell from a footer pro
       entry.endsWith(".stories.tsx") ||
       entry.endsWith(".test.ts") ||
       entry.endsWith(".test.tsx") ||
+      entry.endsWith(".test.steps.md") ||
       exceptions.has(entry)
     )
       continue;
