@@ -12,6 +12,13 @@ const meta: Meta<typeof ResetPasswordForm> = {
 export default meta;
 type Story = StoryObj<typeof ResetPasswordForm>;
 
+/**
+ * Controlled ResetPasswordForm demo for the stories: holds the field
+ * values and loading state internally (seeded from the
+ * `loading` prop) and counts submissions in a readout, so a
+ * tester can confirm a repeat submit while loading does not
+ * submit again.
+ */
 function Controlled({
   loading: initialLoading = false,
   error,

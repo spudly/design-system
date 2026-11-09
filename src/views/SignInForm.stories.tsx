@@ -12,6 +12,13 @@ const meta: Meta<typeof SignInForm> = {
 export default meta;
 type Story = StoryObj<typeof SignInForm>;
 
+/**
+ * Controlled SignInForm demo for the stories: holds the field
+ * values and loading state internally (seeded from the
+ * `loading` prop) and counts submissions in a readout, so a
+ * tester can confirm a repeat submit while loading does not
+ * submit again.
+ */
 function Controlled({
   loading: initialLoading = false,
   error,
