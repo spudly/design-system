@@ -12,6 +12,7 @@
 import { writeFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 
+import { resolveBaselinesDir } from "./baselinesLayout.mjs";
 import { gateRatioFromArgs, parseCommitGateRatio, stageGatedBaselines } from "./commitGate.mjs";
 
 function argValue(args, name, fallback) {
@@ -51,6 +52,10 @@ function runCli() {
   const strictMaxRatio = parseCommitGateRatio(parsed.strictMaxRatioRaw, "--strict-max-ratio");
   const summary = stageGatedBaselines({
     ...parsed,
+    // --baselines may name a repo root (the committed colocated
+    // layout, issue #530) or a canonical tree; staging works on
+    // the tree either way.
+    baselinesDir: resolveBaselinesDir(parsed.baselinesDir),
     gateRatio,
     strictMaxRatio,
     log: (line) => console.log(line),

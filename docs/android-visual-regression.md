@@ -66,7 +66,7 @@ the seeded baselines in Chromatic himself.
 | Capture module   | `apps/storybook/modules/dsvr-capture/`                             | Local Expo native module (issue #137): draws the story's full content — below the fold included — into a PNG on a software canvas, which the driver pulls over ADB instead of screenshotting the display surface (see "Full-page captures" below).                               |
 | Luminance guard  | `tools/visualRegression/guard.mjs`                                 | Pre-commit check on fresh captures: rejects a set that looks uniformly dimmed or scrimmed (issue #101) before CI may turn it into baselines (below).                                                                                                                             |
 | Commit gate      | `tools/visualRegression/commitGate.mjs`                            | Pixel-diff gate on the commit step (issue #296): a fresh capture replaces its baseline only when its differing-pixel ratio exceeds `COMMIT_GATE_MAX_RATIO` (1%), so render/re-encode noise never lands as baseline churn. Used by the PR auto-commit staging and by update mode. |
-| Baselines        | `tools/visualRegression/baselines/<theme>/<storyId>.png`           | Committed reference screenshots. The narrow-viewport variant's baselines sit in the same folders with a `-narrow` filename suffix.                                                                                                                                               |
+| Baselines        | `src/**/__snapshots__/<StoryFileBase>--<storyExport>--<theme>.png` | Committed reference screenshots, colocated beside the story files they capture (issue #530). The narrow-viewport variant's baselines carry a `--narrow` segment before the theme. `tools/visualRegression/baselineResolver.mjs` maps storyId + theme to the path.                |
 | Sanity patch     | `tools/visualRegression/sanity/searchfield-162.patch`              | Reintroduces the #162 bug for the sanity job.                                                                                                                                                                                                                                    |
 | CI               | `.github/workflows/android-storybook.yml`                          | Emulator capture/compare job + sanity job + jobs that commit regenerated baselines to a PR branch (PR auto-commit) or the dispatched branch (update mode) (below).                                                                                                               |
 
@@ -379,8 +379,9 @@ baselines** (139 total). RecipesPage only, deliberately — a second
 full pass would roughly double the job's emulator time, and issue
 #114 is cutting VR time, not growing it.
 
-Baselines are named `<storyId>-narrow.png` in the same
-`baselines/<theme>/` folders, so the variant flows through the
+Variant baselines are the same stories' baselines with a
+`--narrow` filename segment before the theme
+(`baselineResolver.mjs`), so the variant flows through the
 existing machinery unchanged: PR compare runs check both sets,
 the luminance guard runs per set (each capture is judged against
 its own baseline), the PR auto-commit flow regenerates and commits
@@ -420,6 +421,30 @@ self-consistent; do not commit baselines captured on a physical
 device.
 
 ## Baselines: generating and updating
+
+Where they live (issue #530): committed baselines are colocated
+beside the story files they capture — `__snapshots__/` directories
+under `src/`, one PNG per story + theme, named
+`<StoryFileBase>--<storyExport>--<theme>.png` (e.g.
+`src/pages/__snapshots__/RecipesPage--default--light_warmHarvest.png`;
+the narrow variant inserts `--narrow` before the theme). Scope is
+unchanged (Stephen, 2026-10-23; light-only since 2026-10-24): page
+stories only, each in its own brand's LIGHT theme —
+`pages-eciperay` under light_warmHarvest, `pages-memorize` under
+light_quietDawn, plus the narrow-viewport RecipesPage variant; the
+enforcing rule is the `CAPTURE_SCOPE` / `NARROW_SCOPE` tables in
+`tools/visualRegression/run.mjs` (see "Capture scope" above).
+`tools/visualRegression/baselineResolver.mjs` maps storyId + theme
+to the colocated path from the story index, and
+`tools/visualRegression/baselinesLayout.mjs` converts between the
+colocated layout and the canonical tree (`<theme>/<storyId>.png`)
+the pipeline's intermediate sets use — fresh captures, the commit
+gate's staged set, and the workflow artifacts are trees;
+`materialize` builds a tree from the committed baselines and
+`publish` writes a tree back to the colocated paths (mirroring:
+a committed baseline absent from the tree is deleted). Never
+hand-edit or hand-create baseline images; generate them through
+the flows below.
 
 Baselines are created by the CI job, never by hand-editing images.
 On a release pull request the whole cycle is automatic (Stephen's
@@ -481,10 +506,10 @@ before merging the release.
    job log, and when the gate stages **zero** files the run
    publishes nothing — no baseline commit at all. Only a
    set that passes that in-job re-compare is committed: the
-   `commit-pr-baselines` job syncs it into
-   `tools/visualRegression/baselines/` and pushes it to the PR's
-   head branch as github-actions[bot] ("chore(vr): update Android
-   Storybook baselines"). Review the baseline PNGs in the PR diff
+   `commit-pr-baselines` job publishes it into the colocated
+   committed layout (`baselinesLayout.mjs publish`) and pushes it
+   to the PR's head branch as github-actions[bot]
+   ("chore(vr): update Android Storybook baselines"). Review the baseline PNGs in the PR diff
    like any other change — a green VR check on a PR whose head
    carries such a bot commit means "the change is real and its
    baselines were re-verified", not "nothing changed". The diff
@@ -538,11 +563,12 @@ baseline yet` and skips it (a BOOTSTRAP note when nothing at all
    `DSVR_COMMIT_MAX_RATIO` env var) — local runs only: the
    Actions dispatch accepts no gate override, so dispatched
    updates always use the default gate. The follow-on
-   `commit-baselines` job then syncs the fresh screenshots into
-   `tools/visualRegression/baselines/` and — only if something
-   actually changed — commits them to the dispatched branch as
-   github-actions[bot] ("chore(vr): update Android Storybook
-   baselines (manual update)") and pushes. The subject deliberately
+   `commit-baselines` job then publishes the fresh screenshots
+   into the colocated committed layout (`baselinesLayout.mjs
+publish`) and — only if something actually changed — commits
+   them to the dispatched branch as github-actions[bot]
+   ("chore(vr): update Android Storybook baselines (manual
+   update)") and pushes. The subject deliberately
    differs from the PR auto-commit subject: update mode verifies
    nothing (no luminance guard, no in-job re-compare), so its
    commits must never match the bot-head pass-through (point 5) —

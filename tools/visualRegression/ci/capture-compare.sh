@@ -78,11 +78,12 @@
 #      Stephen's Pixel 8a that shipped eciperay #205, whose fix
 #      (design-system PR #117) moved ZERO standard baselines
 #      because the standard surface is 540dp wide and the row
-#      never starves there. Variant baselines sit beside the
-#      standard ones with a "-narrow" filename suffix, so both
-#      sets flow through the same guard / regenerate / commit
-#      machinery; the standard display is restored after the
-#      variant pass no matter how it ends.
+#      never starves there. Variant baselines are the same
+#      stories' baselines with a "--narrow" filename segment
+#      (baselineResolver.mjs), so both sets flow through the same
+#      guard / regenerate / commit machinery; the standard
+#      display is restored after the variant pass no matter how
+#      it ends.
 set -euo pipefail
 
 MODE="${1:-compare}"
@@ -115,6 +116,18 @@ OUT_DIR=/tmp/dsvr-out
 OUT_NARROW_DIR=/tmp/dsvr-out-narrow
 STAGED_DIR=/tmp/dsvr-staged-baselines
 GATE_SUMMARY=/tmp/dsvr-commit-gate-summary.json
+# The committed baselines in canonical tree form
+# (<theme>/<storyId>.png), materialized from their colocated
+# committed layout (src/**/__snapshots__/, issue #530) by
+# baselinesLayout.mjs. The commit gate, the luminance guard, and
+# the verification scope all consume this tree; the update mode
+# refreshes it as the workflow artifact's source.
+BASELINES_TREE=/tmp/dsvr-baselines-tree
+
+materialize_baselines_tree() {
+  rm -rf "$BASELINES_TREE"
+  node "$VR_DIR/baselinesLayout.mjs" materialize --out "$BASELINES_TREE"
+}
 # The effective commit-gate ratio, set by read_gate_ratio (and by
 # stage_and_guard, which reads it as part of staging).
 GATE_RATIO=""
@@ -232,9 +245,13 @@ stage_and_guard() {
   if ! read_gate_ratio; then
     return 1
   fi
+  if ! materialize_baselines_tree; then
+    echo "::error::PR auto-commit: could not materialize the committed baselines - committing NOTHING."
+    return 1
+  fi
   rm -rf "$STAGED_DIR"
   if ! node "$VR_DIR/commitGateCli.mjs" \
-    --baselines "$VR_DIR/baselines" \
+    --baselines "$BASELINES_TREE" \
     --captures "$OUT_DIR/actual,$OUT_NARROW_DIR/actual" \
     --out "$STAGED_DIR" \
     --summary "$GATE_SUMMARY"; then
@@ -256,7 +273,7 @@ stage_and_guard() {
       echo "PR auto-commit: no fresh captures for the $2 set — skipping its luminance guard."
       return 0
     fi
-    node "$VR_DIR/guard.mjs" --captures "$1" --baselines "$VR_DIR/baselines"
+    node "$VR_DIR/guard.mjs" --captures "$1" --baselines "$BASELINES_TREE"
   }
   if ! guard_set "$OUT_DIR/actual" "standard"; then
     echo "::error::PR auto-commit: luminance guard tripped on the standard set - committing NOTHING. If the change is intentional and the captures are genuinely correct, investigate (issue #101) and regenerate via a manual mode=update dispatch from this branch."
@@ -295,7 +312,11 @@ verify_and_publish() {
   # above still runs over the FULL fresh capture sets and a trip
   # still commits nothing — scoping never bypasses it.
   local verify_scope_file=/tmp/dsvr-verify-scope.json
-  if ! node "$VR_DIR/verifyScope.mjs" --baselines "$VR_DIR/baselines" --staged "$STAGED_DIR" --capture-total "$captured_count" --out "$verify_scope_file"; then
+  if [ ! -d "$BASELINES_TREE" ] && ! materialize_baselines_tree; then
+    echo "::error::PR auto-commit: could not materialize the committed baselines for the verification scope - committing NOTHING."
+    return 1
+  fi
+  if ! node "$VR_DIR/verifyScope.mjs" --baselines "$BASELINES_TREE" --staged "$STAGED_DIR" --capture-total "$captured_count" --out "$verify_scope_file"; then
     echo "::error::PR auto-commit: could not compute the verification scope via verifyScope.mjs - committing NOTHING."
     return 1
   fi
@@ -514,6 +535,11 @@ fi
 if [ "$MODE" = "update" ]; then
   node "$VR_DIR/run.mjs" --update --out /tmp/dsvr-out
   run_narrow --update --out /tmp/dsvr-out-narrow
+  # Update mode wrote the baselines in-tree at their colocated
+  # paths (issue #530); materialize the canonical tree the
+  # workflow uploads as the dsvr-baselines artifact, which the
+  # commit-baselines job publishes back into the tree.
+  materialize_baselines_tree
 elif [ "$MODE" = "pr-autocommit" ]; then
   pr_autocommit
 elif [ "$MODE" = "pr-shard" ]; then

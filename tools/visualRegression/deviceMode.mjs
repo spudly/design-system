@@ -11,6 +11,7 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
 import { pullAppCapture } from "./appCapture.mjs";
+import { resolveBaselinePath } from "./baselinesLayout.mjs";
 import { updateBaselineThroughGate } from "./commitGate.mjs";
 import { comparePair } from "./compare.mjs";
 import {
@@ -123,7 +124,12 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
       writeFileSync(actualPath, png);
       summary.captured++;
 
-      const baselinePath = join(config.baselinesDir, rel);
+      // The committed baseline's path: the colocated path in
+      // repo layout (issue #530), the canonical tree join in
+      // tree layout; an unresolvable story falls back to the
+      // tree join, which simply does not exist ("no baseline").
+      const baselinePath =
+        resolveBaselinePath(config, story.id, theme) ?? join(config.baselinesDir, rel);
       if (config.update) {
         // Pixel-diff commit gate (issue #296) — see commitGate.mjs:
         // sub-gate captures keep their baseline; new ones write.

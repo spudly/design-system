@@ -25,10 +25,11 @@
 //   buildCoverageRows / renderCoverageTable /
 //   generateCoverageDocs / readBaselineFiles
 
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
+import { canonicalBaselineRel, listCommittedBaselines } from "./baselineResolver.mjs";
 import { computeScope } from "./scope.mjs";
 
 export const DOCS_PATH = "docs/android-visual-regression.md";
@@ -42,12 +43,17 @@ export const themeOfStory = (id) =>
   id.startsWith("pages-memorize") ? "light_quietDawn" : "light_warmHarvest";
 export const groupOfStory = (id) => id.split("--")[0];
 
-export function readBaselineFiles(baselineRoot) {
+// The committed baselines as canonical names, grouped by theme
+// (Map theme -> Set of `<storyId>.png` / `<storyId>-narrow.png`).
+// The files themselves live colocated beside their story files
+// (issue #530); baselineResolver.mjs maps them back to the
+// canonical names the coverage rows count.
+export function readBaselineFiles(repoRoot) {
+  const { baselines } = listCommittedBaselines(repoRoot);
   const files = new Map();
-  for (const theme of readdirSync(baselineRoot)) {
-    const dir = join(baselineRoot, theme);
-    if (!statSync(dir).isDirectory()) continue;
-    files.set(theme, new Set(readdirSync(dir).filter((f) => f.endsWith(".png"))));
+  for (const b of baselines) {
+    if (!files.has(b.theme)) files.set(b.theme, new Set());
+    files.get(b.theme).add(canonicalBaselineRel(b).split("/")[1]);
   }
   return files;
 }
@@ -129,7 +135,7 @@ export function renderCoverageTable(rows) {
 
 export function coverageTableForRepo(repoRoot) {
   const scope = computeScope({ repoRoot, changedFiles: [], forceFull: true });
-  const baselineFiles = readBaselineFiles(join(repoRoot, "tools/visualRegression/baselines"));
+  const baselineFiles = readBaselineFiles(repoRoot);
   return renderCoverageTable(buildCoverageRows(scope, baselineFiles));
 }
 
