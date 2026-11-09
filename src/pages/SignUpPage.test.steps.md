@@ -37,12 +37,13 @@ submit switches the page to its loading state).
    is not separately observable in Storybook; this step
    verifies the visible end state — loading persists and the
    submit button stays disabled.)
-3. In a freshly reloaded Filled story, pressing the submit
-   button itself still
-   submits (same loading-state switch), and the "Create an
-   account" / "Forgot password?" / "Back to sign in" /
-   "Already have an account? Sign in" links do not submit —
-   clicking one does not switch the page to its loading state.
+3. In a freshly reloaded Filled story, press the submit button.
+   Check that the page switches to its loading state.
+   Before checking each "Create an account" / "Forgot password?" /
+   "Back to sign in" / "Already have an account? Sign in" link,
+   reload or remount the corresponding Filled story. Preserve the
+   story when activating the link, and check that it does not
+   switch to its loading state.
 4. Native (separate QA step — not covered by the deployed web
    Storybook above): in the on-device Storybook
    (`npm run storybook:react-native`), the return key submits
