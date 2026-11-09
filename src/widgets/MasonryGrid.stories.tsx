@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
+import { View, YStack } from "tamagui";
 import { Card } from "./Card.js";
 import {
   MasonryGrid,
@@ -153,5 +153,50 @@ export const Empty: Story = {
         keyExtractor={(item: DemoItem) => item.id}
       />
     </View>
+  ),
+};
+
+export const Loading: Story = {
+  render: (args) => (
+    <View width={760}>
+      <MasonryGrid
+        {...layoutArgs(args)}
+        items={VARIED}
+        renderItem={renderDemoItem}
+        keyExtractor={(item: DemoItem) => item.id}
+        loading
+      />
+    </View>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: (args) => (
+    <YStack position="relative" width={760}>
+      <MasonryGrid
+        {...layoutArgs(args)}
+        items={VARIED}
+        renderItem={renderDemoItem}
+        keyExtractor={(item: DemoItem) => item.id}
+      />
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <MasonryGrid
+          {...layoutArgs(args)}
+          items={VARIED}
+          renderItem={renderDemoItem}
+          keyExtractor={(item: DemoItem) => item.id}
+          loading
+        />
+      </YStack>
+    </YStack>
   ),
 };

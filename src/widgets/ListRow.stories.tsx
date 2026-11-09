@@ -63,3 +63,49 @@ export const Disabled: Story = {
     onPress: () => {},
   },
 };
+
+export const Loading: Story = {
+  render: (args) => (
+    <YStack maxWidth={430}>
+      <ListRow {...args} />
+    </YStack>
+  ),
+  args: {
+    prefix: "Meal · ",
+    title: "Taco Tuesday",
+    subtitle: "Serves 4 · 2,150 cal",
+    onPress: () => {},
+    loading: true,
+  },
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative" maxWidth={430}>
+      <ListRow
+        prefix="Meal · "
+        title="Taco Tuesday"
+        subtitle="Serves 4 · 2,150 cal"
+        onPress={() => {}}
+      />
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <ListRow
+          prefix="Meal · "
+          title="Taco Tuesday"
+          subtitle="Serves 4 · 2,150 cal"
+          onPress={() => {}}
+          loading
+        />
+      </YStack>
+    </YStack>
+  ),
+};

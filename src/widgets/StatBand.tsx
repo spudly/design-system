@@ -1,11 +1,29 @@
 import type { ReactNode } from "react";
-import { XStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { StatCard } from "./StatCard.js";
 
 export type StatBandProps = {
   /** The band's stats — StatCards, composed by the caller. */
   children: ReactNode;
+  /** Loading state (#278): the band renders exactly 3 dummy
+   * stats, each in its own loading state (propagated through
+   * LoadingScope) and each taking an equal share of the band's
+   * width — a skeleton tile has no text to size it, so without
+   * the equal share the boxes collapse narrow and empty
+   * (Stephen on #551). In place of its children. An enclosing
+   * composite's LoadingScope can also put the band into this
+   * state without prop-drilling. */
+  loading?: boolean;
 };
+
+// The loading band's dummy stats (#278): exactly 3 placeholder
+// items, from a frozen module-level constant with stable keys —
+// never generated per render. Their content is inert: a loading
+// StatCard renders skeletons only.
+const LOADING_STAT_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
 /**
  * The stat band on a detail page: a recessed gray band that spreads
@@ -18,7 +36,31 @@ export type StatBandProps = {
  * app's detail pages. The band carries no outer spacing —
  * separation from the sections around it is the parent stack's.
  */
-export function StatBand({ children }: StatBandProps) {
+export function StatBand({ children, loading = false }: StatBandProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    // Loading (#278): the same recessed band, holding exactly 3
+    // dummy stats — each skeletonized through the LoadingScope
+    // this band provides, so no loading prop is drilled into
+    // them — and the region marked busy.
+    return (
+      <XStack
+        backgroundColor={tokens.colors.gray.gray1}
+        borderRadius={tokens.radii.lg}
+        paddingVertical="$4"
+        justifyContent="space-around"
+        {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+      >
+        <LoadingScope active>
+          {LOADING_STAT_KEYS.map((key) => (
+            <YStack key={key} flex={1} paddingHorizontal={tokens.spacing[2]}>
+              <StatCard value="" label="" />
+            </YStack>
+          ))}
+        </LoadingScope>
+      </XStack>
+    );
+  }
   return (
     <XStack
       backgroundColor={tokens.colors.gray.gray1}

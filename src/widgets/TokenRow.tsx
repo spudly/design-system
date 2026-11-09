@@ -1,7 +1,10 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type TokenRowProps = {
   /** The token's display name. */
@@ -16,6 +19,13 @@ export type TokenRowProps = {
   revoking?: boolean;
   /** Without it (or when revoked) the row renders no action. */
   onRevoke?: () => void;
+  /** Loading state (#278): the row renders text skeletons in
+   * place of its name, prefix, and meta lines; its revoke
+   * action stays in place as an inert rectangle skeleton
+   * inside the loading scope. An enclosing composite's
+   * LoadingScope can also put the row into this state without
+   * prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -33,7 +43,55 @@ export function TokenRow({
   revoked = false,
   revoking = false,
   onRevoke,
+  loading = false,
 }: TokenRowProps) {
+  const showSkeleton = useLoadingScope(loading);
+  // The revoke slot is one slot in both states: while loading
+  // it renders inside the loading scope, where the Button
+  // renders as an inert rectangle skeleton at its normal
+  // geometry (Stephen on #551) instead of dropping out.
+  const revokeAction =
+    revoked || !onRevoke ? null : (
+      <Button
+        variant="danger"
+        disabled={revoking}
+        onPress={() => {
+          onRevoke();
+        }}
+      >
+        {revoking ? "Revoking…" : "Revoke"}
+      </Button>
+    );
+  if (showSkeleton) {
+    // Loading (#278): the same hairline row, with structured
+    // text skeletons standing in for the name, prefix, and meta
+    // lines at their own sizes and offsets — the revoke action
+    // as a rectangle skeleton, and the region marked busy.
+    return (
+      <LoadingScope active>
+        <XStack
+          alignItems="center"
+          justifyContent="space-between"
+          gap="$3"
+          borderBottomWidth={1}
+          borderBottomColor={tokens.colors.gray.gray2}
+          paddingVertical="$3"
+          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+        >
+          <YStack flex={1} minWidth={0}>
+            <TextSkeleton size="sm" lines={1} />
+            <YStack paddingBlockStart={2}>
+              <TextSkeleton size="xs" lines={1} />
+            </YStack>
+            <YStack paddingBlockStart={2}>
+              <TextSkeleton size="xs" lines={1} />
+            </YStack>
+          </YStack>
+          {revokeAction}
+        </XStack>
+      </LoadingScope>
+    );
+  }
   return (
     <XStack
       alignItems="center"
@@ -75,17 +133,7 @@ export function TokenRow({
           </Text>
         </YStack>
       </YStack>
-      {revoked || !onRevoke ? null : (
-        <Button
-          variant="danger"
-          disabled={revoking}
-          onPress={() => {
-            onRevoke();
-          }}
-        >
-          {revoking ? "Revoking…" : "Revoke"}
-        </Button>
-      )}
+      {revokeAction}
     </XStack>
   );
 }

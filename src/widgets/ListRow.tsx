@@ -2,7 +2,9 @@ import { Anchor, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { LinkOverlay } from "./linkOverlay.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 type ListRowOwnProps = {
   /** Optional caller-supplied lead-in rendered in the title line
@@ -20,6 +22,11 @@ type ListRowOwnProps = {
    * not focusable, and is marked disabled for assistive
    * technology. */
   isDisabled?: boolean;
+  /** Loading state (#278): the row renders text skeletons in
+   * place of its title/subtitle, with no activation. An
+   * enclosing composite's LoadingScope can also put the row
+   * into this state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -56,9 +63,33 @@ export function ListRow({
   titleSuffix,
   subtitle,
   isDisabled = false,
+  loading = false,
   onPress,
   href,
 }: ListRowProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    // Loading (#278): the same hairline row geometry, with the
+    // text lines swapped for structured skeletons — the title's
+    // bone at the title's size, the subtitle's at the hint size —
+    // no link, no press target, and the region marked busy. The
+    // hairline keeps its width (the geometry is unchanged) but
+    // renders transparent: a visible rule between the skeleton
+    // lines reads as a section divider inside a composite's
+    // loading state (Stephen on #551).
+    return (
+      <YStack
+        borderBottomWidth={1}
+        borderBottomColor="transparent"
+        {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+      >
+        <YStack paddingVertical="$3">
+          <TextSkeleton size="md" lines={1} />
+          {subtitle ? <TextSkeleton size="sm" lines={1} /> : null}
+        </YStack>
+      </YStack>
+    );
+  }
   // Web keyboard support for the press form (the CardRow
   // pattern): a view carrying the button role is made focusable
   // and the button activation keys — Enter and Space — invoke

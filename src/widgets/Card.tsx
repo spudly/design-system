@@ -1,6 +1,8 @@
 import { YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 
 const StyledCard = styled(YStack, {
   name: "Card",
@@ -67,6 +69,12 @@ export type CardProps = StyledCardProps & {
   variant?: "default" | "bordered" | "muted" | "elevated" | "compact";
   /** @deprecated Use `variant="elevated"` instead. Kept for existing consumers. */
   elevated?: boolean;
+  /** Loading state (#278): the card marks its region busy and
+   * provides a LoadingScope to its children, so nested DS
+   * widgets render their skeleton states without the caller
+   * prop-drilling the flag into each one. The card's own frame
+   * (fill, border, padding) is unchanged. */
+  loading?: boolean;
 };
 
 /**
@@ -74,7 +82,14 @@ export type CardProps = StyledCardProps & {
  * from `variant` (see {@link CardProps}); the legacy `elevated` boolean maps
  * to `variant="elevated"` when no variant is given.
  */
-export function Card({ variant, elevated = false, style, ...rest }: CardProps) {
+export function Card({
+  variant,
+  elevated = false,
+  style,
+  loading = false,
+  children,
+  ...rest
+}: CardProps) {
   const resolvedVariant = variant ?? (elevated ? "elevated" : "default");
   // Android shadow for the shadowed variants: `elevation` comes from the same
   // shadow token as the iOS shadow props above and is applied via `style`,
@@ -90,5 +105,52 @@ export function Card({ variant, elevated = false, style, ...rest }: CardProps) {
         ? tokens.shadows.sm.elevation
         : undefined;
   const composedStyle = [elevation !== undefined ? { elevation } : undefined, style];
-  return <StyledCard variant={resolvedVariant} style={composedStyle} {...rest} />;
+  // The scope this card provides combines its own flag with any
+  // enclosing scope: a plain Card nested inside a loading
+  // composite must not reset the scope to false for its subtree
+  // (CodeRabbit on #551 — an inner Card inside a loading Card
+  // would otherwise un-skeletonize everything below it).
+  const showSkeleton = useLoadingScope(loading);
+  // The busy marking merges with — never replaces or yields to —
+  // a caller's own accessibility state (CodeRabbit on #551): the
+  // caller's state fields ride along, `busy` is forced on while
+  // loading, and the merged props spread after `rest` so a
+  // caller-supplied `accessibilityState` / `aria-busy` in `rest`
+  // cannot silently drop the busy state. The caller's explicit
+  // ARIA state values are forwarded into the translation too, so
+  // the translator's ARIA-wins precedence still decides every
+  // field except `busy` itself (CodeRabbit on #551, round 3).
+  const caller = rest as {
+    accessibilityState?: {
+      disabled?: boolean;
+      selected?: boolean;
+      checked?: boolean | "mixed";
+      busy?: boolean;
+      expanded?: boolean;
+    };
+    "aria-busy"?: boolean;
+    "aria-checked"?: boolean | "mixed";
+    "aria-disabled"?: boolean;
+    "aria-expanded"?: boolean;
+    "aria-selected"?: boolean;
+  };
+  return (
+    <StyledCard
+      variant={resolvedVariant}
+      style={composedStyle}
+      {...rest}
+      {...(showSkeleton
+        ? platformAccessibilityProps({
+            accessibilityState: { ...caller.accessibilityState, busy: true },
+            "aria-busy": true,
+            "aria-checked": caller["aria-checked"],
+            "aria-disabled": caller["aria-disabled"],
+            "aria-expanded": caller["aria-expanded"],
+            "aria-selected": caller["aria-selected"],
+          })
+        : {})}
+    >
+      <LoadingScope active={showSkeleton}>{children}</LoadingScope>
+    </StyledCard>
+  );
 }

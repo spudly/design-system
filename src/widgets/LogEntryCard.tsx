@@ -1,11 +1,22 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Button } from "./Button.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type LogEntryCardProps = {
   /** The entry's header label (e.g. its date, pre-composed by the caller). */
   dateLabel: string;
+  /** Loading state (#278): the card renders skeletons in
+   * place of its header, notes, and rating (a box bone where
+   * the stars sit); its delete action stays in place as an
+   * inert rectangle skeleton inside the loading scope. An
+   * enclosing composite's LoadingScope can also put the card
+   * into this state without prop-drilling. */
+  loading?: boolean;
   /** Optional star rating (1–5), rendered as filled stars in the header. */
   starRating?: number;
   /** Optional notes body. */
@@ -46,7 +57,60 @@ export function LogEntryCard({
   notes,
   onDeletePress,
   deleteAccessibilityLabel,
+  loading = false,
 }: LogEntryCardProps) {
+  const showSkeleton = useLoadingScope(loading);
+  // The delete slot is one slot in both states: while loading
+  // it renders inside the loading scope, where the Button
+  // renders as an inert rectangle skeleton at its normal
+  // geometry (Stephen on #551) instead of dropping out.
+  const deleteAction = onDeletePress ? (
+    <XStack paddingBlockStart="$2">
+      <Button
+        variant="secondary"
+        size="sm"
+        tone="danger"
+        {...(deleteAccessibilityLabel ? { accessibilityLabel: deleteAccessibilityLabel } : {})}
+        onPress={onDeletePress}
+      >
+        Delete
+      </Button>
+    </XStack>
+  ) : null;
+  if (showSkeleton) {
+    // Loading (#278): the same framed card, its skeleton branch
+    // mirroring the loaded structure exactly — the header row
+    // with a date bone at the date's size in a fixed-width slot
+    // and a box bone where the star rating sits, the notes line
+    // at its size when present, then the delete action as a
+    // rectangle skeleton — and the region marked busy.
+    return (
+      <LoadingScope active>
+        <YStack
+          borderRadius={tokens.radii.md}
+          borderWidth={1}
+          borderColor={tokens.colors.gray.gray2}
+          backgroundColor={tokens.colors.gray.gray1}
+          padding="$4"
+          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+        >
+          <XStack
+            paddingBlockEnd="$1"
+            alignItems="center"
+            justifyContent="space-between"
+            gap="$2"
+          >
+            <YStack width={104}>
+              <TextSkeleton size="sm" lines={1} />
+            </YStack>
+            {starRating ? <BoxSkeleton width={72} height={12} /> : null}
+          </XStack>
+          {notes ? <TextSkeleton size="sm" lines={1} /> : null}
+          {deleteAction}
+        </YStack>
+      </LoadingScope>
+    );
+  }
   return (
     <YStack
       borderRadius={tokens.radii.md}
@@ -74,19 +138,7 @@ export function LogEntryCard({
           {notes}
         </Text>
       ) : null}
-      {onDeletePress ? (
-        <XStack paddingBlockStart="$2">
-          <Button
-            variant="secondary"
-            size="sm"
-            tone="danger"
-            {...(deleteAccessibilityLabel ? { accessibilityLabel: deleteAccessibilityLabel } : {})}
-            onPress={onDeletePress}
-          >
-            Delete
-          </Button>
-        </XStack>
-      ) : null}
+      {deleteAction}
     </YStack>
   );
 }

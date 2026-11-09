@@ -1,8 +1,11 @@
-import { YStack } from "tamagui";
+import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { CheckboxField } from "../views/CheckboxField.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { BoxSkeleton } from "./BoxSkeleton.js";
 import { EmptyState } from "./EmptyState.js";
-import { Spinner } from "./Spinner.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type CheckboxSelectItem = {
   id: string;
@@ -21,12 +24,27 @@ export type CheckboxSelectListProps = {
   emptyMessage?: string;
 };
 
+// The loading list's dummy rows (#278): exactly 3 placeholder
+// rows, from a frozen module-level constant with stable keys —
+// never generated per render. Each row mirrors a CheckboxField
+// row's geometry exactly: the field's 24dp visual box is
+// centered in a 44dp touch target, and its label starts after
+// that target plus the row gap — so the box bone sits in a
+// 44x44 slot (not at the row's left edge) and the label bone
+// follows it. The row is inert: no checkbox, no toggle.
+const LOADING_ROW_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
 /**
  * Multi-select list of labeled checkboxes with loading and empty states:
- * while `loading`, a centered Spinner; with no items, an EmptyState
- * carrying `emptyMessage`; otherwise one CheckboxField per item, checked
- * when its id is in `selectedIds`. Selection state is the caller's —
- * `onToggle` reports the toggled id and the caller updates `selectedIds`.
+ * while `loading`, exactly 3 skeleton rows in the checkbox rows'
+ * geometry (the centered spinner this list used before #278's
+ * skeleton conversion is gone — a list's loading state mirrors
+ * the list); with no items, an EmptyState carrying
+ * `emptyMessage`; otherwise one CheckboxField per item, checked
+ * when its id is in `selectedIds`. Selection state is the
+ * caller's — `onToggle` reports the toggled id and the caller
+ * updates `selectedIds`. An enclosing composite's LoadingScope
+ * can also put the list into its loading state.
  */
 export function CheckboxSelectList({
   items,
@@ -36,10 +54,22 @@ export function CheckboxSelectList({
   loading = false,
   emptyMessage = "No items found.",
 }: CheckboxSelectListProps) {
-  if (loading) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
     return (
-      <YStack flex={1} alignItems="center" justifyContent="center" padding={tokens.spacing[4]}>
-        <Spinner />
+      <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+        <LoadingScope active>
+          {LOADING_ROW_KEYS.map((key) => (
+            <XStack key={key} alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
+              <View width={44} height={44} alignItems="center" justifyContent="center">
+                <BoxSkeleton width={24} height={24} />
+              </View>
+              <YStack flex={1}>
+                <TextSkeleton size="md" lines={1} />
+              </YStack>
+            </XStack>
+          ))}
+        </LoadingScope>
       </YStack>
     );
   }

@@ -4,7 +4,9 @@ import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Card } from "./Card.js";
 import { LinkOverlay } from "./linkOverlay.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 type CardRowOwnProps = {
   /** The row's title. */
@@ -25,6 +27,13 @@ type CardRowOwnProps = {
    * the plain secondary button; `danger` inks it in the soft
    * danger tones for destructive actions. */
   actionTone?: "danger" | "neutral";
+  /** Loading state (#278): the row renders text skeletons in
+   * place of its title/subtitle, with no activation; its action,
+   * when wired, stays in place as an inert rectangle skeleton
+   * (Button skeletonizes itself inside the loading scope). An
+   * enclosing composite's LoadingScope can also put the row
+   * into this state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -78,7 +87,50 @@ export function CardRow({
   actionLabel,
   onActionPress,
   actionTone = "neutral",
+  loading = false,
 }: CardRowProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    // Loading (#278): the same elevated card geometry, with the
+    // text block swapped for structured skeletons — the title's
+    // bone at the title's size, the subtitle's at the hint size,
+    // in the loaded block's own stack —
+    // no link, no press target, and the region marked busy. The
+    // action slot stays: inside the loading scope the Button
+    // renders as an inert rectangle skeleton at its normal
+    // geometry (Stephen on #551), so the row's shape does not
+    // change when the content lands. The bones are hidden from
+    // assistive tech.
+    return (
+      <LoadingScope active>
+        <Card
+          variant="elevated"
+          flexDirection="row"
+          alignItems="center"
+          gap="$3"
+          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+        >
+          <YStack flex={1} minWidth={0} gap="$1">
+            <TextSkeleton size="md" lines={1} />
+            {subtitle ? <TextSkeleton size="sm" lines={2} /> : null}
+          </YStack>
+          {actionLabel && onActionPress ? (
+            <XStack paddingInlineStart="$3" alignItems="center">
+              <Button
+                variant="secondary"
+                size="sm"
+                accessibilityLabel={`${actionLabel} ${title}`}
+                {...(actionTone === "danger" ? { tone: "danger" as const } : {})}
+                onPress={onActionPress}
+              >
+                {actionLabel}
+              </Button>
+            </XStack>
+          ) : null}
+        </Card>
+      </LoadingScope>
+    );
+  }
   // Web keyboard support for the press form (the TextLink
   // pattern): a div carrying the button role is not
   // keyboard-operable on its own, so it is made focusable and

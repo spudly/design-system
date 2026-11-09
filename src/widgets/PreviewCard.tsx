@@ -1,7 +1,10 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type PreviewCardProps = {
   /**
@@ -18,6 +21,12 @@ export type PreviewCardProps = {
   actions?: ReactNode;
   /** The preview content itself — host-rendered, framed here. */
   children: ReactNode;
+  /** Loading state (#278): the frame renders text skeletons in
+   * place of its title and preview content; its actions stay in
+   * place, rendered as inert rectangle skeletons inside the
+   * loading scope. An enclosing composite's LoadingScope can
+   * also put the card into this state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -32,7 +41,37 @@ export type PreviewCardProps = {
  * preview stage framed their previews with identical
  * hand-styled stacks.
  */
-export function PreviewCard({ title, actions, children }: PreviewCardProps) {
+export function PreviewCard({ title, actions, children, loading = false }: PreviewCardProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    // Loading (#278): the same frame, with a title skeleton at
+    // the title's size when the card is titled and a three-line
+    // text skeleton at the body size standing in for the preview
+    // content — no host content, and the
+    // region marked busy. The actions stay in their loaded slot
+    // inside the loading scope: a Button action renders as an
+    // inert rectangle skeleton (Stephen on #551).
+    return (
+      <LoadingScope active>
+        <YStack
+          borderRadius={tokens.radii.lg}
+          borderWidth={1}
+          borderColor={tokens.colors.gray.gray3}
+          backgroundColor="$surface"
+          padding="$4"
+          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+        >
+          {title ? (
+            <YStack paddingBottom="$3">
+              <TextSkeleton size="sm" lines={1} />
+            </YStack>
+          ) : null}
+          <TextSkeleton size="md" lines={3} />
+          {actions ? <YStack paddingTop="$4">{actions}</YStack> : null}
+        </YStack>
+      </LoadingScope>
+    );
+  }
   return (
     <YStack
       borderRadius={tokens.radii.lg}

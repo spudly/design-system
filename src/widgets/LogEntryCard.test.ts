@@ -31,7 +31,7 @@ test("LogEntryCard is exported from the built internal components barrel", async
 });
 
 test("the delete action renders only with its callback and carries its composed name", () => {
-  assert.match(code, /\{onDeletePress \? \(/, "no callback, no delete action");
+  assert.match(code, /onDeletePress \? \(/, "no callback, no delete action");
   assert.match(
     code,
     /accessibilityLabel: deleteAccessibilityLabel/,

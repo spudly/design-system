@@ -2,7 +2,9 @@ import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Card, type CardProps } from "./Card.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type SectionCardProps = CardProps & {
   title: string;
@@ -16,12 +18,36 @@ export type SectionCardProps = CardProps & {
  * Appearance comes from Card's `variant` prop ("default" | "bordered" |
  * "muted" | "elevated"), passed through via {@link SectionCardProps}.
  */
-export function SectionCard({ title, action, children, ...rest }: SectionCardProps) {
+export function SectionCard({
+  title,
+  action,
+  children,
+  loading = false,
+  ...rest
+}: SectionCardProps) {
+  // Loading (#278): the header title swaps for a text skeleton
+  // at the subheading variant's size (xl), so the bone occupies
+  // the title's own line box;
+  // the header action stays rendered — the Card shell carries
+  // the busy state and provides the LoadingScope, so a Button
+  // action renders as an inert rectangle skeleton and the
+  // section's own widgets skeletonize without prop-drilling. `loading`
+  // arrives through CardProps (SectionCardProps extends it), and
+  // an enclosing composite's LoadingScope puts the section into
+  // the same state (the showSkeleton pattern every other
+  // converted widget uses — CodeRabbit on #551).
+  const showSkeleton = useLoadingScope(loading);
   return (
-    <Card {...rest}>
+    <Card loading={showSkeleton} {...rest}>
       <YStack paddingBottom={tokens.spacing[3]}>
         <XStack justifyContent="space-between" alignItems="center" gap={tokens.spacing[2]}>
-          <Text variant="subheading">{title}</Text>
+          {showSkeleton ? (
+            <YStack flex={1}>
+              <TextSkeleton size="xl" lines={1} />
+            </YStack>
+          ) : (
+            <Text variant="subheading">{title}</Text>
+          )}
           {action}
         </XStack>
       </YStack>

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
+import { View, YStack } from "tamagui";
 import { DiscoveryCard } from "./DiscoveryCard.js";
 
 /**
@@ -46,4 +46,42 @@ export const WithoutSubtitle: Story = {
     title: "Beef Chili",
     href: "/recipe/beef-chili/beef-chili",
   },
+};
+
+export const Loading: Story = {
+  args: {
+    title: "Creamy Tuscan Garlic Chicken",
+    subtitle: "By Maria · ★ 4.5 · Satiety 60",
+    href: "/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken",
+    loading: true,
+  },
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative">
+      <DiscoveryCard
+        title="Creamy Tuscan Garlic Chicken"
+        subtitle="By Maria · ★ 4.5 · Satiety 60"
+        href="/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken"
+      />
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <DiscoveryCard
+          title="Creamy Tuscan Garlic Chicken"
+          subtitle="By Maria · ★ 4.5 · Satiety 60"
+          href="/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken"
+          loading
+        />
+      </YStack>
+    </YStack>
+  ),
 };
