@@ -26,7 +26,14 @@ export function LoadingScope({ active = false, children }: LoadingScopeProps) {
   return <LoadingScopeContext.Provider value={active}>{children}</LoadingScopeContext.Provider>;
 }
 
-/** Whether the nearest enclosing composite is loading. */
-export function useLoadingScope(): boolean {
-  return useContext(LoadingScopeContext);
+/**
+ * Whether this piece is loading: the caller's own `loading` prop
+ * (passed as the override) OR the nearest enclosing composite's
+ * scope — either one puts the piece into its loading state, so
+ * callers write `useLoadingScope(loading)` instead of repeating
+ * the `loading || scopedLoading` combination at every call site
+ * (Stephen on #551).
+ */
+export function useLoadingScope(loadingProp?: boolean): boolean {
+  return loadingProp || useContext(LoadingScopeContext);
 }

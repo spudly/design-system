@@ -67,8 +67,7 @@ export function ListRow({
   onPress,
   href,
 }: ListRowProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same hairline row geometry, with the
     // text lines swapped for skeletons at the same line count —

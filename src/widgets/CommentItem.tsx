@@ -66,8 +66,7 @@ export function CommentItem({
   onDelete,
   loading = false,
 }: CommentItemProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same framed item, with text skeletons
     // standing in for the author line and the body — no editor,

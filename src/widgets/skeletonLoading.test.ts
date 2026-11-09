@@ -176,6 +176,17 @@ test("LoadingScope carries the loading flag to internal consumers only", async (
   assert.match(active, />loading</, "inside an active scope the consumer sees the loading state");
   const idle = await renderToHtml(React.createElement(Probe));
   assert.match(idle, />idle</, "outside any scope the consumer sees the idle state");
+  // The override form (Stephen on #551): a caller's own loading
+  // prop passed to the hook wins even outside any scope, so call
+  // sites never repeat `loading || scopedLoading` themselves.
+  const OverrideProbe = () =>
+    React.createElement("span", null, useLoadingScope(true) ? "loading" : "idle");
+  const overridden = await renderToHtml(React.createElement(OverrideProbe));
+  assert.match(
+    overridden,
+    />loading</,
+    "the override prop alone puts the consumer in loading state",
+  );
 });
 
 test("primitive props are semantic geometry only — no styling props", () => {

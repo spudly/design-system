@@ -33,8 +33,7 @@ export function SectionCard({
   // an enclosing composite's LoadingScope puts the section into
   // the same state (the showSkeleton pattern every other
   // converted widget uses — CodeRabbit on #551).
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   return (
     <Card loading={showSkeleton} {...rest}>
       <YStack paddingBottom={tokens.spacing[3]}>

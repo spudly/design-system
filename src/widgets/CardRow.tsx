@@ -87,8 +87,7 @@ export function CardRow({
   actionTone = "neutral",
   loading = false,
 }: CardRowProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same elevated card geometry, with the
     // text block swapped for skeletons at the same line count —

@@ -56,8 +56,7 @@ export function LogEntryCard({
   deleteAccessibilityLabel,
   loading = false,
 }: LogEntryCardProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same framed card, with text skeletons
     // standing in for the header line and the notes — no rating,

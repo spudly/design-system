@@ -43,8 +43,7 @@ export function TokenRow({
   onRevoke,
   loading = false,
 }: TokenRowProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same hairline row, with text skeletons
     // standing in for the name, prefix, and meta lines — no

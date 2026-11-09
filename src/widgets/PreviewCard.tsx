@@ -41,8 +41,7 @@ export type PreviewCardProps = {
  * hand-styled stacks.
  */
 export function PreviewCard({ title, actions, children, loading = false }: PreviewCardProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same frame, with a title skeleton when
     // the card is titled and a three-line text skeleton standing

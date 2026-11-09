@@ -111,8 +111,7 @@ export function DiscoveryCard({
   href,
   loading = false,
 }: DiscoveryCardProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same card geometry — a 64dp box where
     // the thumbnail sits and text skeletons at the title/subtitle

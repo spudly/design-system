@@ -163,8 +163,7 @@ export function MasonryGrid<Item>({
   gap = tokens.spacing[3],
   loading = false,
 }: MasonryGridProps<Item>) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   const [containerWidth, setContainerWidth] = useState(0);
   const columnCount = masonryColumnCount(containerWidth, {
     minColumnWidth,

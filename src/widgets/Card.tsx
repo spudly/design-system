@@ -110,8 +110,7 @@ export function Card({
   // composite must not reset the scope to false for its subtree
   // (CodeRabbit on #551 — an inner Card inside a loading Card
   // would otherwise un-skeletonize everything below it).
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   // The busy marking merges with — never replaces or yields to —
   // a caller's own accessibility state (CodeRabbit on #551): the
   // caller's state fields ride along, `busy` is forced on while

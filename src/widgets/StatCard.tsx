@@ -24,8 +24,7 @@ export type StatCardProps = {
  * and stat rows alike.
  */
 export function StatCard({ value, label, sublabel, loading = false }: StatCardProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same card, with one text-skeleton line
     // per text run (value, label, and sublabel when present) —

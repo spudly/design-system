@@ -34,8 +34,7 @@ const LOADING_STAT_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
  * separation from the sections around it is the parent stack's.
  */
 export function StatBand({ children, loading = false }: StatBandProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same recessed band, holding exactly 3
     // dummy stats — each skeletonized through the LoadingScope

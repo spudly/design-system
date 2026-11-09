@@ -51,8 +51,7 @@ export function CheckboxSelectList({
   loading = false,
   emptyMessage = "No items found.",
 }: CheckboxSelectListProps) {
-  const scopedLoading = useLoadingScope();
-  const showSkeleton = loading || scopedLoading;
+  const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     return (
       <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
