@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Card, type CardProps } from "./Card.js";
-import { useLoadingScope } from "./LoadingScope.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
@@ -25,7 +25,9 @@ export function SectionCard({
   loading = false,
   ...rest
 }: SectionCardProps) {
-  // Loading (#278): the header title swaps for a text skeleton;
+  // Loading (#278): the header title swaps for a text skeleton
+  // at the subheading variant's size (xl), so the bone occupies
+  // the title's own line box;
   // the header action stays rendered — the Card shell carries
   // the busy state and provides the LoadingScope, so a Button
   // action renders as an inert rectangle skeleton and the
@@ -41,7 +43,7 @@ export function SectionCard({
         <XStack justifyContent="space-between" alignItems="center" gap={tokens.spacing[2]}>
           {showSkeleton ? (
             <YStack flex={1}>
-              <TextSkeleton lines={1} />
+              <TextSkeleton size="xl" lines={1} />
             </YStack>
           ) : (
             <Text variant="subheading">{title}</Text>

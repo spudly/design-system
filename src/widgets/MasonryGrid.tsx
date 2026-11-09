@@ -3,7 +3,7 @@ import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
-import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 
 // The loading grid's dummy items (#278): 24 placeholder items
 // with varied heights, from a frozen module-level constant —

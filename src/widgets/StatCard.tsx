@@ -1,9 +1,10 @@
+import { View, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Card } from "./Card.js";
-import { useLoadingScope } from "./LoadingScope.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
+import { SkeletonBone } from "./SkeletonClock.js";
 import { Text } from "./Text.js";
-import { TextSkeleton } from "./TextSkeleton.js";
 
 export type StatCardProps = {
   /** The headline number, e.g. "12". Rendered large and semibold. */
@@ -11,8 +12,10 @@ export type StatCardProps = {
   /** What the number measures, e.g. "verses mastered". */
   label: string;
   sublabel?: string;
-  /** Loading state (#278): the tile renders text skeletons in
-   * place of its value, label, and sublabel. An enclosing
+  /** Loading state (#278): the tile renders skeletons in place
+   * of its value, label, and sublabel — one bone per text run,
+   * each in that run's line box (a TextSkeleton at a single
+   * size cannot mix the tile's three run sizes). An enclosing
    * composite's LoadingScope can also put the tile into this
    * state without prop-drilling. */
   loading?: boolean;
@@ -26,12 +29,30 @@ export type StatCardProps = {
 export function StatCard({ value, label, sublabel, loading = false }: StatCardProps) {
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
-    // Loading (#278): the same card, with one text-skeleton line
-    // per text run (value, label, and sublabel when present) —
-    // the region marked busy, no real values shown.
+    // Loading (#278): the same card, with one bone per text run.
+    // The rows are the tile's own layout constants, mirroring
+    // the runs they replace: each bone sits in a View of its
+    // run's line-box height with the bone vertically centered —
+    // the value run (3xl: 34 box, 24 bone), the label run (lg:
+    // 21 box, 14 bone), and the sublabel run when present (sm:
+    // 16 box, 11 bone). The widths are the runs' typical
+    // proportions: a short number, a longer label, a mid-length
+    // sublabel. The region is marked busy; no real values show.
     return (
       <Card {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
-        <TextSkeleton lines={sublabel ? 3 : 2} />
+        <YStack>
+          <View height={34} justifyContent="center">
+            <SkeletonBone width="46%" height={24} borderRadius={tokens.radii.md} />
+          </View>
+          <View height={21} justifyContent="center">
+            <SkeletonBone width="76%" height={14} borderRadius={tokens.radii.md} />
+          </View>
+          {sublabel ? (
+            <View height={16} justifyContent="center">
+              <SkeletonBone width="58%" height={11} borderRadius={tokens.radii.md} />
+            </View>
+          ) : null}
+        </YStack>
       </Card>
     );
   }

@@ -4,7 +4,7 @@ import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Card } from "./Card.js";
 import { LinkOverlay } from "./linkOverlay.js";
-import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
@@ -92,7 +92,9 @@ export function CardRow({
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same elevated card geometry, with the
-    // text block swapped for skeletons at the same line count —
+    // text block swapped for structured skeletons — the title's
+    // bone at the title's size, the subtitle's at the hint size,
+    // in the loaded block's own stack —
     // no link, no press target, and the region marked busy. The
     // action slot stays: inside the loading scope the Button
     // renders as an inert rectangle skeleton at its normal
@@ -109,7 +111,8 @@ export function CardRow({
           {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
         >
           <YStack flex={1} minWidth={0} gap="$1">
-            <TextSkeleton lines={subtitle ? 2 : 1} />
+            <TextSkeleton size="md" lines={1} />
+            {subtitle ? <TextSkeleton size="sm" lines={2} /> : null}
           </YStack>
           {actionLabel && onActionPress ? (
             <XStack paddingInlineStart="$3" alignItems="center">

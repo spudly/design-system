@@ -1,10 +1,10 @@
-import { XStack, YStack } from "tamagui";
+import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { CheckboxField } from "../views/CheckboxField.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { EmptyState } from "./EmptyState.js";
-import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 export type CheckboxSelectItem = {
@@ -27,8 +27,11 @@ export type CheckboxSelectListProps = {
 // The loading list's dummy rows (#278): exactly 3 placeholder
 // rows, from a frozen module-level constant with stable keys —
 // never generated per render. Each row mirrors a CheckboxField
-// row's geometry (a 24dp box beside one label line at the 44dp
-// touch-target height) and is inert: no checkbox, no toggle.
+// row's geometry exactly: the field's 24dp visual box is
+// centered in a 44dp touch target, and its label starts after
+// that target plus the row gap — so the box bone sits in a
+// 44x44 slot (not at the row's left edge) and the label bone
+// follows it. The row is inert: no checkbox, no toggle.
 const LOADING_ROW_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
 /**
@@ -58,9 +61,11 @@ export function CheckboxSelectList({
         <LoadingScope active>
           {LOADING_ROW_KEYS.map((key) => (
             <XStack key={key} alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
-              <BoxSkeleton width={24} height={24} />
+              <View width={44} height={44} alignItems="center" justifyContent="center">
+                <BoxSkeleton width={24} height={24} />
+              </View>
               <YStack flex={1}>
-                <TextSkeleton lines={1} />
+                <TextSkeleton size="md" lines={1} />
               </YStack>
             </XStack>
           ))}

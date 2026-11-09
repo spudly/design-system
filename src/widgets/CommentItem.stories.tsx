@@ -36,12 +36,15 @@ export const Loading: Story = {
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
+// The body is long enough to wrap to two lines at this width —
+// the skeleton's two body lines stand in for a wrapped comment,
+// so the overlay pairs two loaded lines with two bones.
 export const LoadingOverlay: Story = {
   render: () => (
-    <YStack position="relative" maxWidth={430}>
+    <YStack position="relative" maxWidth={300}>
       <CommentItem
         authorName="Chef Demo"
-        body="Doubled the garlic — excellent."
+        body="Doubled the garlic — excellent. The kids asked for seconds."
         canEdit
         canDelete
         onDelete={() => {}}
@@ -57,7 +60,7 @@ export const LoadingOverlay: Story = {
       >
         <CommentItem
           authorName="Chef Demo"
-          body="Doubled the garlic — excellent."
+          body="Doubled the garlic — excellent. The kids asked for seconds."
           canEdit
           canDelete
           onDelete={() => {}}

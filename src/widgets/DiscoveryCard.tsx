@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Card } from "./Card.js";
-import { useLoadingScope } from "./LoadingScope.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 import { Thumbnail } from "./Thumbnail.js";
@@ -114,8 +114,9 @@ export function DiscoveryCard({
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same card geometry — a 64dp box where
-    // the thumbnail sits and text skeletons at the title/subtitle
-    // line count — with no link and the region marked busy.
+    // the thumbnail sits and structured text skeletons at the
+    // title's and subtitle's sizes — with no link and the region
+    // marked busy.
     return (
       <Card
         variant="elevated"
@@ -127,7 +128,8 @@ export function DiscoveryCard({
       >
         <BoxSkeleton width={64} height={64} />
         <YStack style={textBlockStyle} gap="$1">
-          <TextSkeleton lines={subtitle ? 2 : 1} />
+          <TextSkeleton size="md" lines={1} />
+          {subtitle ? <TextSkeleton size="sm" lines={1} /> : null}
         </YStack>
       </Card>
     );

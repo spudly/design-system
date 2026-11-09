@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
@@ -44,9 +44,10 @@ export type PreviewCardProps = {
 export function PreviewCard({ title, actions, children, loading = false }: PreviewCardProps) {
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
-    // Loading (#278): the same frame, with a title skeleton when
-    // the card is titled and a three-line text skeleton standing
-    // in for the preview content — no host content, and the
+    // Loading (#278): the same frame, with a title skeleton at
+    // the title's size when the card is titled and a three-line
+    // text skeleton at the body size standing in for the preview
+    // content — no host content, and the
     // region marked busy. The actions stay in their loaded slot
     // inside the loading scope: a Button action renders as an
     // inert rectangle skeleton (Stephen on #551).
@@ -62,10 +63,10 @@ export function PreviewCard({ title, actions, children, loading = false }: Previ
         >
           {title ? (
             <YStack paddingBottom="$3">
-              <TextSkeleton lines={1} />
+              <TextSkeleton size="sm" lines={1} />
             </YStack>
           ) : null}
-          <TextSkeleton lines={3} />
+          <TextSkeleton size="md" lines={3} />
           {actions ? <YStack paddingTop="$4">{actions}</YStack> : null}
         </YStack>
       </LoadingScope>

@@ -1,7 +1,7 @@
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { fileURLToPath, URL } from "node:url";
 import test from "node:test";
@@ -42,7 +42,7 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    const loadingScope: Record<string, any> = await import("../../dist/widgets/LoadingScope.js");
+    const loadingScope: Record<string, any> = await import("../../dist/contexts/LoadingScope.js");
     return { React, renderToString, TamaguiProvider, ...dist, ...loadingScope };
   })();
   return runtimePromise;
@@ -189,6 +189,53 @@ test("LoadingScope carries the loading flag to internal consumers only", async (
   );
 });
 
+test("LoadingScope lives in src/contexts — widgets import it from there", () => {
+  assert.ok(
+    existsSync(join(root, "src/contexts/LoadingScope.tsx")),
+    "the loading-state context's home is src/contexts/LoadingScope.tsx (Stephen on #551)",
+  );
+  assert.ok(
+    !existsSync(join(root, "src/widgets/LoadingScope.tsx")),
+    "the context no longer lives in src/widgets",
+  );
+  for (const name of ["Button", "Card", "CardRow", "StatCard"]) {
+    assert.match(
+      read(`src/widgets/${name}.tsx`),
+      /from "\.\.\/contexts\/LoadingScope\.js"/,
+      `${name} must import the scope from src/contexts`,
+    );
+  }
+});
+
+test("TextSkeleton lines occupy their size's line box, bone centered", async () => {
+  // Source pins: the size prop, the line-box table (md is the
+  // default: 18 box, 12 bone; 3xl: 34 box, 24 bone), and the
+  // centered wrapper — no flat 12px bone row, no inter-line gap.
+  const source = readCode("src/widgets/TextSkeleton.tsx");
+  assert.match(source, /size\?: TextSkeletonSize/, "TextSkeleton takes a size prop");
+  assert.match(source, /md: \{ lineBox: 18, bone: 12 \}/, "the md line box is 18, its bone 12");
+  assert.match(
+    source,
+    /"3xl": \{ lineBox: 34, bone: 24 \}/,
+    "the 3xl line box is 34, its bone 24",
+  );
+  assert.match(
+    source,
+    /<View key=\{index\} height=\{lineBox\} justifyContent="center">/,
+    "each line renders inside a View of its line-box height, bone vertically centered",
+  );
+  assert.doesNotMatch(source, /gap=/, "line boxes stack with no inter-line gap");
+
+  const { React, TextSkeleton } = await loadRuntime();
+  const md = await renderToHtml(React.createElement(TextSkeleton, { lines: 2 }));
+  assert.equal(hiddenBones(md), 2, "a 2-line TextSkeleton renders exactly 2 bones");
+  assert.ok(md.includes("height:18px"), "a default (md) line occupies the 18px line box");
+  assert.ok(md.includes("height:12px"), "the md bone is 12px, centered in its box");
+  const lg = await renderToHtml(React.createElement(TextSkeleton, { size: "lg", lines: 1 }));
+  assert.ok(lg.includes("height:21px"), "an lg line occupies the 21px line box");
+  assert.ok(lg.includes("height:14px"), "the lg bone is 14px");
+});
+
 test("primitive props are semantic geometry only — no styling props", () => {
   const box = read("src/widgets/BoxSkeleton.tsx");
   assert.match(box, /export type BoxSkeletonProps = \{/);
@@ -234,9 +281,10 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 // takes the explicit `loading` prop, reads the internal
 // LoadingScope (so a composite parent can skeletonize it without
 // prop-drilling), renders skeletons with no real content while
-// loading — its actions stay in place as inert rectangle
-// skeletons (Buttons skeletonize themselves inside the scope,
-// Stephen on #551) — and renders unchanged while not loading.
+// loading — its actions stay in place as inert skeletons
+// (Buttons skeletonize themselves inside the scope — filled
+// buttons as rectangles, ghost buttons as text bones, Stephen
+// on #551) — and renders unchanged while not loading.
 // The collection widgets (CheckboxSelectList, StatBand) render
 // exactly 3 dummy items while loading; MasonryGrid renders 24
 // varied-height dummies so its loading state still reads as a
@@ -299,7 +347,7 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
       loading: true,
     }),
   );
-  assert.equal(hiddenBones(cardRow), 2, "a loading CardRow renders title+subtitle bones");
+  assert.equal(hiddenBones(cardRow), 3, "a loading CardRow renders title + 2-line subtitle bones");
   assert.ok(!cardRow.includes("Secret Plan"), "a loading CardRow shows no real title");
   assert.ok(
     cardRow.includes("Delete"),
@@ -344,12 +392,19 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
       loading: true,
     }),
   );
-  assert.equal(hiddenBones(comment), 3, "a loading CommentItem renders 3 text bones");
+  assert.equal(
+    hiddenBones(comment),
+    5,
+    "a loading CommentItem renders author + 2 body bones + its 2 ghost action bones",
+  );
   assert.ok(!comment.includes("Secret Author"), "a loading CommentItem shows no author");
   assert.ok(!comment.includes("Secret body text"), "a loading CommentItem shows no body");
+  // Its actions are ghost Buttons: inside the scope they
+  // skeletonize as TEXT — one bone per label, the label text
+  // itself gone (Stephen on #551) — not as filled rectangles.
   assert.ok(
-    comment.includes("Edit") && comment.includes("Delete"),
-    "a loading CommentItem keeps its actions, as inert rectangle skeletons",
+    !comment.includes(">Edit<") && !comment.includes(">Delete<"),
+    "a loading CommentItem's ghost actions render as text bones, not labels",
   );
 
   const logEntry = await renderToHtml(
@@ -362,8 +417,13 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
       loading: true,
     }),
   );
-  assert.equal(hiddenBones(logEntry), 2, "a loading LogEntryCard renders header+notes bones");
+  assert.equal(
+    hiddenBones(logEntry),
+    3,
+    "a loading LogEntryCard renders date + rating + notes bones (its structured header)",
+  );
   assert.ok(!logEntry.includes("Secret notes"), "a loading LogEntryCard shows no notes");
+  assert.ok(!logEntry.includes("Oct 12, 2026"), "a loading LogEntryCard shows no date");
   assert.ok(
     logEntry.includes("Delete"),
     "a loading LogEntryCard keeps its delete action, as an inert rectangle skeleton",
@@ -378,7 +438,11 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
       loading: true,
     }),
   );
-  assert.equal(hiddenBones(tokenRow), 3, "a loading TokenRow renders 3 text bones");
+  assert.equal(
+    hiddenBones(tokenRow),
+    3,
+    "a loading TokenRow renders name (sm) + prefix (xs) + meta (xs) bones",
+  );
   assert.ok(!tokenRow.includes("Secret Token"), "a loading TokenRow shows no token name");
   assert.ok(
     tokenRow.includes("Revoke"),
@@ -548,6 +612,140 @@ test("T1: the MasonryGrid skeleton fills its columns and the ListRow skeleton hi
   );
 });
 
+test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelectList, LogEntryCard)", () => {
+  // StatCard: explicit per-row bones in each run's line box —
+  // value (34 box, 24 bone, 46%), label (21 box, 14 bone, 76%),
+  // sublabel (16 box, 11 bone, 58%) — not a one-size TextSkeleton.
+  const stat = readCode("src/widgets/StatCard.tsx");
+  assert.match(stat, /<View height=\{34\} justifyContent="center">/, "the value row's line box is 34");
+  assert.match(
+    stat,
+    /<SkeletonBone width="46%" height=\{24\}/,
+    "the value bone is 46% wide, 24 high",
+  );
+  assert.match(stat, /<View height=\{21\} justifyContent="center">/, "the label row's line box is 21");
+  assert.match(
+    stat,
+    /<SkeletonBone width="76%" height=\{14\}/,
+    "the label bone is 76% wide, 14 high",
+  );
+  assert.match(
+    stat,
+    /<View height=\{16\} justifyContent="center">/,
+    "the sublabel row's line box is 16",
+  );
+  assert.match(
+    stat,
+    /<SkeletonBone width="58%" height=\{11\}/,
+    "the sublabel bone is 58% wide, 11 high",
+  );
+  assert.doesNotMatch(stat, /TextSkeleton/, "StatCard's mixed run sizes use explicit bones");
+
+  // CheckboxSelectList: the box bone sits in the CheckboxField's
+  // 44x44 touch-target slot, centered — the loaded field's visual
+  // box is centered in its 44px target, so the skeleton's bone
+  // starts after the slot, not at the row's left edge.
+  const list = readCode("src/widgets/CheckboxSelectList.tsx");
+  assert.match(
+    list,
+    /<View width=\{44\} height=\{44\} alignItems="center" justifyContent="center">/,
+    "the checkbox bone sits in a 44x44 touch-target slot",
+  );
+  assert.match(list, /<BoxSkeleton width=\{24\} height=\{24\} \/>/, "the box bone is the 24dp box");
+  assert.match(
+    list,
+    /<TextSkeleton size="md" lines=\{1\} \/>/,
+    "the label bone is at the label's size (md)",
+  );
+
+  // LogEntryCard: the skeleton header mirrors the loaded header
+  // row — a date bone (sm) in a 104-wide slot, and a 72x12 box
+  // bone where the star rating sits.
+  const entry = readCode("src/widgets/LogEntryCard.tsx");
+  assert.match(entry, /<YStack width=\{104\}>/, "the date bone sits in a 104-wide slot");
+  assert.match(
+    entry,
+    /<TextSkeleton size="sm" lines=\{1\} \/>/,
+    "the date and notes bones are at the sm size",
+  );
+  assert.match(
+    entry,
+    /starRating \? <BoxSkeleton width=\{72\} height=\{12\} \/> : null/,
+    "the rating bone renders only when a rating is set, at 72x12",
+  );
+});
+
+test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled box", async () => {
+  // Source pins: ghostness comes from the `ghost` prop or the
+  // deprecated `ghost` variant; the skeleton frame stays
+  // transparent and borderless; the label is replaced by a
+  // SkeletonBone sized from the label.
+  const button = readCode("src/widgets/Button.tsx");
+  assert.match(
+    button,
+    /const ghostSkeleton = scopedLoading && \(ghost \|\| variant === "ghost"\)/,
+    "ghost skeletonization keys off the ghost prop or the ghost variant",
+  );
+  assert.match(
+    button,
+    /backgroundColor: "transparent", borderColor: "transparent", borderWidth: 0/,
+    "the ghost skeleton frame has no filled background and no border",
+  );
+  assert.match(button, /ghostLabelBone/, "the ghost label is replaced by one text bone");
+  assert.match(
+    button,
+    /from "\.\/SkeletonClock\.js"/,
+    "the ghost bone is the shared clock's bone",
+  );
+
+  const { React, Button, LoadingScope } = await loadRuntime();
+  const noop = () => {};
+  const scopedGhost = await renderToHtml(
+    React.createElement(
+      LoadingScope,
+      { active: true },
+      React.createElement(Button, { ghost: true, size: "sm", onPress: noop }, "GhostAction"),
+    ),
+  );
+  assert.equal(hiddenBones(scopedGhost), 1, "a scoped ghost Button renders exactly 1 text bone");
+  assert.ok(
+    !scopedGhost.includes(">GhostAction<"),
+    "the ghost skeleton shows no label text — the bone replaces it",
+  );
+  assert.match(scopedGhost, /aria-hidden="true"/, "the ghost skeleton is hidden from assistive tech");
+
+  const scopedGhostLink = await renderToHtml(
+    React.createElement(
+      LoadingScope,
+      { active: true },
+      React.createElement(Button, { ghost: true, href: "/ghost-destination" }, "GhostLink"),
+    ),
+  );
+  assert.equal(hiddenBones(scopedGhostLink), 1, "a scoped ghost link renders exactly 1 text bone");
+  assert.ok(
+    !scopedGhostLink.includes("/ghost-destination"),
+    "the ghost skeleton link's href is withheld",
+  );
+
+  // The deprecated variant spelling skeletonizes the same way.
+  const scopedVariant = await renderToHtml(
+    React.createElement(
+      LoadingScope,
+      { active: true },
+      React.createElement(Button, { variant: "ghost", onPress: noop }, "VariantGhost"),
+    ),
+  );
+  assert.equal(hiddenBones(scopedVariant), 1, "a scoped variant=ghost Button renders 1 text bone");
+  assert.ok(!scopedVariant.includes(">VariantGhost<"), "the variant ghost shows no label text");
+
+  // Outside a scope a ghost Button is unchanged: label, no bone.
+  const plainGhost = await renderToHtml(
+    React.createElement(Button, { ghost: true, onPress: noop }, "PlainGhost"),
+  );
+  assert.equal(hiddenBones(plainGhost), 0, "an unscoped ghost Button renders no bones");
+  assert.ok(plainGhost.includes("PlainGhost"), "an unscoped ghost Button renders its label");
+});
+
 test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unchanged", async () => {
   const { React, Card, SectionCard, CardRow, CheckboxSelectList, Button } = await loadRuntime();
   const noop = () => {};
@@ -598,12 +796,19 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
       ),
     ),
   );
-  assert.equal(hiddenBones(nested), 2, "nested shells keep the scope: title + row bones");
+  assert.equal(
+    hiddenBones(nested),
+    3,
+    "nested shells keep the scope: title + row bones + the ghost action's text bone",
+  );
   assert.ok(!nested.includes("Nested Section Title"), "the nested section title is skeletonized");
   assert.ok(!nested.includes("Nested Row Title"), "the doubly nested row is skeletonized");
+  // The section's action is a ghost Button: it stays in place,
+  // skeletonized as TEXT (one bone, no label — Stephen on #551),
+  // where a filled button would keep its label as a rectangle.
   assert.ok(
-    nested.includes("NestedAction"),
-    "the nested section's Button action stays, as an inert rectangle skeleton",
+    !nested.includes("NestedAction"),
+    "the nested section's ghost action renders as a text bone, not a label",
   );
 
   // The busy marking survives a caller's own accessibility

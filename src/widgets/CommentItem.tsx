@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { TextAreaField } from "../views/TextAreaField.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
-import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
@@ -29,10 +29,10 @@ export type CommentItemProps = {
   onDelete?: () => void;
   /** Loading state (#278): the item renders text skeletons in
    * place of its author line and body, with no editor; its
-   * actions stay in place as inert rectangle skeletons inside
-   * the loading scope. An enclosing composite's LoadingScope
-   * can also put the item into this state without
-   * prop-drilling. */
+   * actions stay in place as inert text skeletons (its ghost
+   * Buttons skeletonize as text) inside the loading scope. An
+   * enclosing composite's LoadingScope can also put the item
+   * into this state without prop-drilling. */
   loading?: boolean;
 };
 
@@ -72,8 +72,9 @@ export function CommentItem({
   const saveDisabled = isUpdatePending || !editDraft.trim();
   // The actions row is one row in both states: while loading it
   // renders inside the loading scope, where its ghost Buttons
-  // render as inert rectangle skeletons at their normal
-  // geometry (Stephen on #551) instead of dropping out.
+  // render as inert text skeletons (Stephen on #551: a ghost
+  // button has no fill to skeletonize, so its label becomes a
+  // text bone) instead of dropping out.
   const actionsRow =
     canEdit || canDelete ? (
       <XStack paddingBlockStart="$2" gap="$3">
@@ -129,10 +130,10 @@ export function CommentItem({
       </XStack>
     ) : null;
   if (showSkeleton) {
-    // Loading (#278): the same framed item, with text skeletons
-    // standing in for the author line and the body — no editor,
-    // the actions row as rectangle skeletons, and the region
-    // marked busy.
+    // Loading (#278): the same framed item, with structured
+    // text skeletons at the author line's and body's size
+    // standing in for both — no editor, the actions row's ghost
+    // buttons as text skeletons, and the region marked busy.
     return (
       <YStack paddingBlockEnd="$3">
         <LoadingScope active>
@@ -142,7 +143,10 @@ export function CommentItem({
             padding="$3"
             {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
           >
-            <TextSkeleton lines={3} />
+            <YStack paddingBlockEnd="$1">
+              <TextSkeleton size="sm" lines={1} />
+            </YStack>
+            <TextSkeleton size="sm" lines={2} />
             {actionsRow}
           </YStack>
         </LoadingScope>

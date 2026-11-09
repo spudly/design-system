@@ -6,7 +6,8 @@ import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { useLoadingScope } from "./LoadingScope.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
+import { SkeletonBone } from "./SkeletonClock.js";
 
 /**
  * The button frame's styling: ONE config shared by the two frames
@@ -427,6 +428,26 @@ const iconOnlyBoxes = {
 } as const;
 
 /**
+ * The ghost text skeleton's bone height per Button size (#278):
+ * the label size's bone from TextSkeleton's line-box table — a
+ * ghost button skeletonizes as TEXT (one bone where its label
+ * sits), not as a filled box, because it has no background or
+ * border to fill (Stephen on #551).
+ */
+const ghostLabelBoneHeights = {
+  sm: 11,
+  md: 12,
+  lg: 14,
+} as const;
+
+/** Label font size per Button size, for the ghost bone's width. */
+const ghostLabelFontSizes = {
+  sm: tokens.typography.fontSize.sm,
+  md: tokens.typography.fontSize.md,
+  lg: tokens.typography.fontSize.lg,
+} as const;
+
+/**
  * The icon glyph's ink for a variant: the same colors
  * `variantLabelColors` gives the text label, resolved to concrete
  * values because react-native-svg cannot resolve Tamagui theme
@@ -515,6 +536,13 @@ function useGlyphInk(variant: string | undefined, ghost = false, dangerTone = fa
  * the link form, and hidden from assistive tech. Composites
  * therefore keep rendering their action buttons while loading
  * instead of dropping them: the button skeletonizes itself.
+ * The ghost exception (Stephen on #551): a ghost button — the
+ * `ghost` prop or the deprecated `ghost` variant — has no
+ * background or border to fill, so it skeletonizes as TEXT
+ * instead: its frame stays transparent and borderless at its
+ * normal geometry, and its label is replaced by one text bone
+ * sized from the label, so the button reads as a text skeleton,
+ * not a box. An icon, when present, stays inked in the fill.
  * Accessibility: exposes `accessibilityRole="button"` ("link" in the
  * href form) and mirrors `disabled` into `accessibilityState`. Caller accessibility props
  * (`accessibilityLabel`, `accessibilityState`, …) go through
@@ -560,7 +588,9 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
   // SKELETON of itself (Stephen on #551) — the same frame at the
   // same geometry, filled with the skeleton bone fill, inert and
   // hidden from assistive tech (the composite's region carries
-  // the busy state). The bone fill is the theme's border role,
+  // the busy state) — unless it is a ghost button, which
+  // skeletonizes as text instead (see ghostSkeleton below). The
+  // bone fill is the theme's border role,
   // resolved the way SkeletonBone resolves it: the Tamagui theme
   // reference ("$borderColor") for the frame and label, the
   // concrete value for the glyph (react-native-svg cannot
@@ -573,6 +603,40 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
   // also withholds the link form's href below) and drops its
   // press handler at the render sites.
   const effectiveDisabled = disabled || scopedLoading;
+  // The ghost exception (Stephen on #551): a ghost button — the
+  // `ghost` prop, or the deprecated `ghost` variant spelling —
+  // has no background or border, so a filled rectangle would
+  // invent a box the loaded button never shows. It skeletonizes
+  // as TEXT instead: the frame stays transparent and borderless
+  // (its normal padding and minimum height keep the surrounding
+  // layout unchanged) and the label is replaced by ONE text
+  // bone, sized from the label the way TextSkeleton sizes a
+  // line — height from the size's bone height, width estimated
+  // from the label's length at the size's font size (a non-string
+  // label gets a standard mid-width bone).
+  const ghostSkeleton = scopedLoading && (ghost || variant === "ghost");
+  const ghostLabelBone = ghostSkeleton ? (
+    <SkeletonBone
+      width={
+        typeof children === "string"
+          ? Math.max(
+              24,
+              Math.round(
+                children.length *
+                  (ghostLabelFontSizes[size as keyof typeof ghostLabelFontSizes] ??
+                    ghostLabelFontSizes.md) *
+                  0.52,
+              ),
+            )
+          : 56
+      }
+      height={
+        ghostLabelBoneHeights[size as keyof typeof ghostLabelBoneHeights] ??
+        ghostLabelBoneHeights.md
+      }
+      borderRadius={tokens.radii.md}
+    />
+  ) : null;
   // `variant`'s prop type also admits Tamagui Button's built-in variant
   // names; only the four design-system variants have a mapped label color.
   // A selected toggle takes the primary ink, matching its fill. The
@@ -686,13 +750,16 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
         // link form has no selected state, so this is the only
         // departure it needs to cover.
         {...(variant === "secondary" ? { borderColor: labelColor } : null)}
-        // The skeleton fill wins over every variant fill —
-        // including the ghost treatment's transparent background:
-        // in a loading scope even a ghost button is a filled
-        // rectangle (Stephen on #551). The border takes the fill
-        // too, so a bordered variant's rectangle is one solid bone.
+        // The skeleton treatment wins over every variant fill:
+        // a filled variant's frame and border take the bone
+        // fill, so its rectangle is one solid bone. A ghost
+        // button is the exception — it keeps its transparent,
+        // borderless frame and its label becomes a text bone
+        // (Stephen on #551).
         {...(scopedLoading
-          ? { backgroundColor: "$borderColor", borderColor: "$borderColor" }
+          ? ghostSkeleton
+            ? { backgroundColor: "transparent", borderColor: "transparent", borderWidth: 0 }
+            : { backgroundColor: "$borderColor", borderColor: "$borderColor" }
           : null)}
         // Same instance-prop rule as the button form's `color`: the
         // BARE font name ("body", no "$") is the form that makes
@@ -733,7 +800,11 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
           "href" | "disabled" | "children" | "variant" | "size" | "color" | "fontFamily"
         >)}
       >
-        {Children.count(children) > 0 ? (
+        {ghostSkeleton && Children.count(children) > 0 ? (
+          // The ghost skeleton: one text bone where the label
+          // sits (the frame centers its content), not the label.
+          ghostLabelBone
+        ) : Children.count(children) > 0 ? (
           <TamaguiText
             color={labelColor}
             fontFamily={labelFontFamily}
@@ -788,12 +859,17 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
       // case), so the secondary border simply always takes the
       // label color. Other variants keep the frame's transparent border.
       {...(variant === "secondary" ? { borderColor: labelColor } : null)}
-      // The skeleton fill wins over every variant fill —
-      // including the ghost treatment's transparent background:
-      // in a loading scope even a ghost button is a filled
-      // rectangle (Stephen on #551). The border takes the fill
-      // too, so a bordered variant's rectangle is one solid bone.
-      {...(scopedLoading ? { backgroundColor: "$borderColor", borderColor: "$borderColor" } : null)}
+      // The skeleton treatment wins over every variant fill:
+      // a filled variant's frame and border take the bone
+      // fill, so its rectangle is one solid bone. A ghost
+      // button is the exception — it keeps its transparent,
+      // borderless frame and its label becomes a text bone
+      // (Stephen on #551).
+      {...(scopedLoading
+        ? ghostSkeleton
+          ? { backgroundColor: "transparent", borderColor: "transparent", borderWidth: 0 }
+          : { backgroundColor: "$borderColor", borderColor: "$borderColor" }
+        : null)}
       // Same instance-prop rule as `color` above, for the family:
       // Tamagui Button forwards an instance `fontFamily` to its
       // internal text element, and the BARE font name ("body", no
@@ -835,7 +911,9 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
       {...rest}
     >
       {IconGlyph ? <IconGlyph size={glyphSize} color={glyphInk} /> : null}
-      {children}
+      {/* The ghost skeleton swaps the label for its text bone;
+          every other form renders the label after the glyph. */}
+      {ghostSkeleton ? (hasLabel ? ghostLabelBone : null) : <>{children}</>}
     </StyledButton>
   );
 }

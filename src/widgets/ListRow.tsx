@@ -2,7 +2,7 @@ import { Anchor, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { LinkOverlay } from "./linkOverlay.js";
-import { useLoadingScope } from "./LoadingScope.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
@@ -70,7 +70,8 @@ export function ListRow({
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same hairline row geometry, with the
-    // text lines swapped for skeletons at the same line count —
+    // text lines swapped for structured skeletons — the title's
+    // bone at the title's size, the subtitle's at the hint size —
     // no link, no press target, and the region marked busy. The
     // hairline keeps its width (the geometry is unchanged) but
     // renders transparent: a visible rule between the skeleton
@@ -83,7 +84,8 @@ export function ListRow({
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
         <YStack paddingVertical="$3">
-          <TextSkeleton lines={subtitle ? 2 : 1} />
+          <TextSkeleton size="md" lines={1} />
+          {subtitle ? <TextSkeleton size="sm" lines={1} /> : null}
         </YStack>
       </YStack>
     );

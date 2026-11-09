@@ -114,12 +114,13 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches }:
 // modal-layer registry Dialog/StepOverlay register in (#394),
 // linkOverlay.tsx is the native-only link layer other components
 // compose, labelRow.tsx is the shared label-row implementation
-// LabeledField / LabeledGroup compose, PageFrame.tsx is page-story
-// scaffolding (the demo stories' phone-width frame, relocated out
-// of src/pages for #119), and LoadingScope.tsx is the internal
-// loading-state context composites compose (#278) — none is a
-// standalone component with a story of its own, and none is
-// exported from the components barrel.
+// LabeledField / LabeledGroup compose, and PageFrame.tsx is
+// page-story scaffolding (the demo stories' phone-width frame,
+// relocated out of src/pages for #119) — none is a standalone
+// component with a story of its own, and none is exported from
+// the components barrel. (The internal loading-state context,
+// LoadingScope, lives in src/contexts now (#278), outside this
+// directory entirely.)
 const COMPONENT_STORY_EXCEPTIONS = new Set([
   // BigFooter (#410): internal page chrome — NOT exported from the
   // components barrel (pages render it; its data types are the
@@ -132,7 +133,6 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "tagColors.ts",
   "linkOverlay.tsx",
   "labelRow.tsx",
-  "LoadingScope.tsx",
   "PageFrame.tsx",
 ]);
 

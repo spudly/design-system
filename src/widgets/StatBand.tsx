@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { StatCard } from "./StatCard.js";
 
 export type StatBandProps = {

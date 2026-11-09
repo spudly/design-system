@@ -1,20 +1,21 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
+import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Button } from "./Button.js";
-import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 export type LogEntryCardProps = {
   /** The entry's header label (e.g. its date, pre-composed by the caller). */
   dateLabel: string;
-  /** Loading state (#278): the card renders text skeletons in
-   * place of its header and notes, with no rating; its delete
-   * action stays in place as an inert rectangle skeleton
-   * inside the loading scope. An enclosing composite's
-   * LoadingScope can also put the card into this state without
-   * prop-drilling. */
+  /** Loading state (#278): the card renders skeletons in
+   * place of its header, notes, and rating (a box bone where
+   * the stars sit); its delete action stays in place as an
+   * inert rectangle skeleton inside the loading scope. An
+   * enclosing composite's LoadingScope can also put the card
+   * into this state without prop-drilling. */
   loading?: boolean;
   /** Optional star rating (1–5), rendered as filled stars in the header. */
   starRating?: number;
@@ -77,10 +78,12 @@ export function LogEntryCard({
     </XStack>
   ) : null;
   if (showSkeleton) {
-    // Loading (#278): the same framed card, with text skeletons
-    // standing in for the header line and the notes — no rating,
-    // the delete action as a rectangle skeleton, and the region
-    // marked busy.
+    // Loading (#278): the same framed card, its skeleton branch
+    // mirroring the loaded structure exactly — the header row
+    // with a date bone at the date's size in a fixed-width slot
+    // and a box bone where the star rating sits, the notes line
+    // at its size when present, then the delete action as a
+    // rectangle skeleton — and the region marked busy.
     return (
       <LoadingScope active>
         <YStack
@@ -91,7 +94,18 @@ export function LogEntryCard({
           padding="$4"
           {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
         >
-          <TextSkeleton lines={notes ? 2 : 1} />
+          <XStack
+            paddingBlockEnd="$1"
+            alignItems="center"
+            justifyContent="space-between"
+            gap="$2"
+          >
+            <YStack width={104}>
+              <TextSkeleton size="sm" lines={1} />
+            </YStack>
+            {starRating ? <BoxSkeleton width={72} height={12} /> : null}
+          </XStack>
+          {notes ? <TextSkeleton size="sm" lines={1} /> : null}
           {deleteAction}
         </YStack>
       </LoadingScope>

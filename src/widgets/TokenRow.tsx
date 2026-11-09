@@ -2,7 +2,7 @@ import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
-import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
@@ -63,10 +63,10 @@ export function TokenRow({
       </Button>
     );
   if (showSkeleton) {
-    // Loading (#278): the same hairline row, with text skeletons
-    // standing in for the name, prefix, and meta lines — the
-    // revoke action as a rectangle skeleton, and the region
-    // marked busy.
+    // Loading (#278): the same hairline row, with structured
+    // text skeletons standing in for the name, prefix, and meta
+    // lines at their own sizes and offsets — the revoke action
+    // as a rectangle skeleton, and the region marked busy.
     return (
       <LoadingScope active>
         <XStack
@@ -79,7 +79,13 @@ export function TokenRow({
           {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
         >
           <YStack flex={1} minWidth={0}>
-            <TextSkeleton lines={3} />
+            <TextSkeleton size="sm" lines={1} />
+            <YStack paddingBlockStart={2}>
+              <TextSkeleton size="xs" lines={1} />
+            </YStack>
+            <YStack paddingBlockStart={2}>
+              <TextSkeleton size="xs" lines={1} />
+            </YStack>
           </YStack>
           {revokeAction}
         </XStack>
