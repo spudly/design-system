@@ -1,7 +1,12 @@
 import type { ReactNode } from "react";
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
-import { AppTopBar, type AppTopBarAction, type AppTopBarNavItem } from "../views/AppTopBar.js";
+import {
+  AppTopBar,
+  type AppTopBarAction,
+  type AppTopBarNavItem,
+  type AppTopBarSearch,
+} from "../views/AppTopBar.js";
 import { LazySlot } from "../views/LazySlot.js";
 
 /**
@@ -37,6 +42,13 @@ import { LazySlot } from "../views/LazySlot.js";
  *   the same href-vs-callback split — an `href` action
  *   navigates (link form), an `onPress` action acts in place
  *   (button form).
+ * - Header search (optional, #542): caller-supplied data —
+ *   the field's accessible name, placeholder, and controlled
+ *   value plus change/submit callbacks — rendered by the top
+ *   bar as the DS SearchField inside a search landmark, so a
+ *   host adopting the shell keeps its header search (the
+ *   Eciperay #409 search its hand-built shell carries) without
+ *   host-built chrome.
  * - Content: the host's current page as `children`, rendered
  *   through the internal LazySlot exactly as TabbedShellPage
  *   slots its surfaces — Suspense with the DS loading state
@@ -69,6 +81,8 @@ export type AppShellPageNavItem = AppTopBarNavItem;
 
 export type AppShellPageAction = AppTopBarAction;
 
+export type AppShellPageSearch = AppTopBarSearch;
+
 export type AppShellPageProps = {
   /** The brand wordmark: its label and its home destination. */
   brand: { label: string; href: string };
@@ -81,6 +95,15 @@ export type AppShellPageProps = {
    * route — or null when no item is current.
    */
   activeItemId: string | null;
+  /**
+   * The header search, as data (#542): forwarded to the top
+   * bar, which renders the DS SearchField between the nav and
+   * the actions inside a search landmark. The host supplies
+   * the accessible name, placeholder, and controlled value
+   * (seeded/reflected from its route state) plus change and
+   * submit callbacks. Omit or pass null for no header search.
+   */
+  search?: AppShellPageSearch | null;
   /** The top-bar's right-side actions (e.g. Sign in / account). */
   actions?: AppShellPageAction[];
   /**
@@ -115,6 +138,7 @@ export function AppShellPage({
   navItems,
   navLabel,
   activeItemId,
+  search,
   actions,
   footer,
   onReload,
@@ -129,6 +153,7 @@ export function AppShellPage({
           navItems={navItems}
           activeItemId={activeItemId}
           {...(navLabel !== undefined ? { navLabel } : null)}
+          {...(search !== undefined ? { search } : null)}
           {...(actions !== undefined ? { actions } : null)}
         />
         <LazySlot

@@ -58,11 +58,12 @@ function typeBlock(source: string, name: string): string {
 test("AppShellPage is exported from the pages barrel with alias types", () => {
   assert.match(
     barrel,
-    /AppShellPage,\s*type AppShellPageAction,\s*type AppShellPageNavItem,\s*type AppShellPageProps,\s*\} from "\.\/AppShellPage\.js";/,
+    /AppShellPage,\s*type AppShellPageAction,\s*type AppShellPageNavItem,\s*type AppShellPageProps,\s*type AppShellPageSearch,\s*\} from "\.\/AppShellPage\.js";/,
   );
   assert.match(page, /export type AppShellPageProps = \{/);
   assert.match(page, /export type AppShellPageNavItem = AppTopBarNavItem;/);
   assert.match(page, /export type AppShellPageAction = AppTopBarAction;/);
+  assert.match(page, /export type AppShellPageSearch = AppTopBarSearch;/);
   assert.doesNotMatch(page, /\binterface\s+AppShellPage/);
 });
 
@@ -74,6 +75,42 @@ test("nav crosses as data: hrefs and icon names, never components or callbacks",
   assert.match(navItem, /icon\?: IconName;/);
   assert.doesNotMatch(navItem, /onPress|onSelect/, "nav items navigate — no callback form");
   assert.doesNotMatch(navItem, /content/, "the shell's content is the page child, not nav data");
+});
+
+test("header search crosses as data: a controlled field with change/submit callbacks (#542)", () => {
+  const search = typeBlock(topBar, "AppTopBarSearch");
+  assert.match(search, /label: string;/, "the input's accessible name is host content");
+  assert.match(search, /placeholder\?: string;/);
+  assert.match(search, /value: string;/, "the term is controlled — the host owns route state");
+  assert.match(search, /onValueChange: \(value: string\) => void;/);
+  assert.match(
+    search,
+    /onSubmit: \(\) => void;/,
+    "submit is a callback — the destination is built from the typed term (#248 exemption)",
+  );
+  assert.doesNotMatch(search, /href/, "no href form — no static destination exists");
+  assert.match(topBar, /search\?: AppTopBarSearch \| null;/);
+  assert.match(page, /search\?: AppShellPageSearch \| null;/);
+  assert.match(
+    topBar,
+    /import \{ SearchField \} from "\.\/SearchField\.js";/,
+    "the bar renders the DS SearchField — no new input widget",
+  );
+  assert.match(
+    topBar,
+    /accessibilityRole: "search"/,
+    "the field sits inside a search landmark (role=search on web via the platform translator)",
+  );
+  assert.match(
+    topBar,
+    /onSubmitEditing=\{search\.onSubmit\}/,
+    "Enter/submit fires the host callback",
+  );
+  assert.match(
+    topBar,
+    /accessibilityLabel: search\.label/,
+    "the field's accessible name comes from the supplied label",
+  );
 });
 
 test("header actions follow the href-vs-callback split", () => {
@@ -111,7 +148,14 @@ test("the top bar is one shared chrome: TabbedShellPage renders it too", () => {
 });
 
 test("the stories cover the shell's contracted cases", () => {
-  for (const name of ["Default", "NoIcons", "LinkActions", "NoFooter", "ChunkFailedContent"]) {
+  for (const name of [
+    "Default",
+    "WithSearch",
+    "NoIcons",
+    "LinkActions",
+    "NoFooter",
+    "ChunkFailedContent",
+  ]) {
     assert.match(stories, new RegExp(`export const ${name}: Story`), `${name} story exists`);
   }
 });
@@ -213,6 +257,64 @@ test("SSR: brand and nav render as real links; exactly the active item is curren
   assert.match(html, /Sign out/, "a callback action renders the button form");
   assert.match(html, /PAGE SURFACE/, "the page content renders through the slot");
   assert.doesNotMatch(html, /contentinfo/, "no footer data — no footer band");
+});
+
+test("search data forwards from the page to the top bar; SSR renders the landmark field", async () => {
+  const { React, AppShellPage } = await loadRuntime();
+  const search = {
+    label: "Search recipes",
+    placeholder: "Search recipes",
+    value: "soup",
+    onValueChange: () => {},
+    onSubmit: () => {},
+  };
+  const tree = AppShellPage({
+    brand: { label: "Eciperay", href: "/" },
+    navItems: sentinelNav,
+    activeItemId: "recipes",
+    search,
+    children: React.createElement("span", null, "PAGE SURFACE"),
+  });
+  const [topBarEl] = tree.props.children.props.children;
+  assert.deepEqual(topBarEl.props.search, search, "the page forwards search data to the bar");
+  const bare = AppShellPage({
+    brand: { label: "Eciperay", href: "/" },
+    navItems: sentinelNav,
+    activeItemId: "recipes",
+    children: React.createElement("span", null, "PAGE SURFACE"),
+  });
+  assert.equal(
+    bare.props.children.props.children[0].props.search,
+    undefined,
+    "no search data — no search in the bar",
+  );
+  const html = await renderToHtml(
+    React.createElement(
+      AppShellPage,
+      {
+        brand: { label: "Eciperay", href: "/" },
+        navItems: sentinelNav,
+        activeItemId: "recipes",
+        search,
+      },
+      React.createElement("span", null, "PAGE SURFACE"),
+    ),
+  );
+  assert.match(html, /role="search"/, "the field renders inside a search landmark");
+  assert.match(html, /aria-label="Search recipes"/, "the input's accessible name is the label");
+  assert.match(html, /value="soup"/, "the controlled value renders");
+  const bareHtml = await renderToHtml(
+    React.createElement(
+      AppShellPage,
+      {
+        brand: { label: "Eciperay", href: "/" },
+        navItems: sentinelNav,
+        activeItemId: "recipes",
+      },
+      React.createElement("span", null, "PAGE SURFACE"),
+    ),
+  );
+  assert.doesNotMatch(bareHtml, /role="search"/, "no search data — no landmark renders");
 });
 
 test("SSR: footer data renders the one BigFooter band", async () => {

@@ -6,6 +6,7 @@ import { BrandLink } from "../widgets/BrandLink.js";
 import { Button } from "../widgets/Button.js";
 import { LinkOverlay } from "../widgets/linkOverlay.js";
 import { Text } from "../widgets/Text.js";
+import { SearchField } from "./SearchField.js";
 
 /**
  * AppTopBar (#437): the shared top-bar composition both DS frame
@@ -48,6 +49,14 @@ import { Text } from "../widgets/Text.js";
  * acts in place and renders the Button callback form. Both take
  * the ghost treatment — header actions are chrome, not page
  * calls to action.
+ *
+ * Header search (#542) is caller DATA too, not a render slot:
+ * the host supplies the field's accessible name, placeholder,
+ * and controlled value plus change/submit callbacks, and the
+ * bar renders the DS SearchField between the nav and the
+ * actions inside a search landmark (web `role="search"`).
+ * Submit is a callback under #248's dynamic-destination
+ * exemption — the destination is built from the typed term.
  */
 
 export type AppTopBarBrand = {
@@ -100,6 +109,31 @@ export type AppTopBarAction =
       href?: never;
     };
 
+export type AppTopBarSearch = {
+  /** The search input's accessible name — host content (e.g. "Search recipes"). */
+  label: string;
+  /** The input's placeholder copy. */
+  placeholder?: string;
+  /**
+   * The current term, controlled: the host seeds and reflects
+   * it from its route state (Eciperay's host shell reflects the
+   * Recipes browse's `q` param), exactly as the host shell
+   * does today.
+   */
+  value: string;
+  /** Controlled change out — the SearchField contract. */
+  onValueChange: (value: string) => void;
+  /**
+   * Submit (Enter in the field). A callback, not an href: the
+   * destination is built from the term typed at runtime, so no
+   * static href exists to link to (#248's dynamic-destination
+   * exemption, the same reason create-a-draft is a callback on
+   * RecipeDetailPage). The host reads its current value and
+   * navigates.
+   */
+  onSubmit: () => void;
+};
+
 export type AppTopBarProps = {
   /** The brand at the bar's left. */
   brand: AppTopBarBrand;
@@ -109,6 +143,13 @@ export type AppTopBarProps = {
   navLabel?: string;
   /** The active nav item's id, or null when no item is current. */
   activeItemId?: string | null;
+  /**
+   * The header search, as data (#542): when supplied, the bar
+   * renders the DS SearchField between the nav and the actions
+   * inside a search landmark. Omit or pass null for no search —
+   * the bar renders exactly as before.
+   */
+  search?: AppTopBarSearch | null;
   /** The header actions at the bar's right, in display order. */
   actions?: AppTopBarAction[];
 };
@@ -246,8 +287,15 @@ function NavItem({
   );
 }
 
-/** The shared top bar: brand, nav links, and header actions. */
-export function AppTopBar({ brand, navItems, navLabel, activeItemId, actions }: AppTopBarProps) {
+/** The shared top bar: brand, nav links, optional header search, and header actions. */
+export function AppTopBar({
+  brand,
+  navItems,
+  navLabel,
+  activeItemId,
+  search,
+  actions,
+}: AppTopBarProps) {
   const glyphInks = useNavGlyphInks();
   return (
     <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[3]}>
@@ -270,6 +318,18 @@ export function AppTopBar({ brand, navItems, navLabel, activeItemId, actions }: 
             />
           ))}
         </StyledNavList>
+      ) : null}
+      {search !== undefined && search !== null ? (
+        <XStack flex={1} {...platformAccessibilityProps({ accessibilityRole: "search" })}>
+          <SearchField
+            grow
+            value={search.value}
+            onChangeText={search.onValueChange}
+            onSubmitEditing={search.onSubmit}
+            {...(search.placeholder !== undefined ? { placeholder: search.placeholder } : null)}
+            {...platformAccessibilityProps({ accessibilityLabel: search.label })}
+          />
+        </XStack>
       ) : null}
       {actions !== undefined && actions.length > 0 ? (
         <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[2]} marginLeft="auto">

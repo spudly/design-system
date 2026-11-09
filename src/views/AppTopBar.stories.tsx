@@ -39,6 +39,24 @@ export const Default: Story = {
   },
 };
 
+/** Header search supplied (#542): the labeled SearchField renders between nav and actions. */
+export const WithSearch: Story = {
+  args: {
+    brand: { label: "Eciperay", href: "/" },
+    navItems: eciperayNav,
+    navLabel: "Eciperay sections",
+    activeItemId: "recipes",
+    search: {
+      label: "Search recipes",
+      placeholder: "Search recipes",
+      value: "soup",
+      onValueChange: () => {},
+      onSubmit: () => {},
+    },
+    actions: [{ id: "sign-out", label: "Sign out", onPress: () => {} }],
+  },
+};
+
 /** The TabbedShellPage header case: a brand with no href, no nav, no actions. */
 export const BrandOnly: Story = {
   args: {
