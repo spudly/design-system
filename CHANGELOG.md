@@ -1,5 +1,16 @@
 # @spudly/ui
 
+## 9.1.0
+
+### Minor Changes
+
+- a212789: ProfilePage gains `nutritionGoals` and `accessTokens` data props: the daily-nutrition-goals form and the API-access-tokens panel now render inside ProfilePage from data, at the before-feedback position (nutrition goals first, then access tokens). Hosts pass the views' existing data shapes (`goals`/`onChange`/`onSave` for nutrition goals; `tokens`/`tokenName`/create/revoke handlers for access tokens) instead of composing those sections themselves. Test: open the ProfilePage WithCoverageSections story and confirm both the nutrition-goals form and the access-tokens panel render from the data props; open WithSections and confirm the slot-composed form is unchanged.
+
+### Patch Changes
+
+- 8b8700e: AppShellPage and AppTopBar now accept an optional `search` data prop for a header search. When a host passes `search` — the input's accessible label (e.g. "Search recipes"), an optional placeholder, the controlled value, an `onValueChange` callback, and an `onSubmit` callback — the top bar renders the design system's SearchField between the nav and the header actions, inside a search landmark (web `role="search"`), with the input's accessible name taken from the supplied label and Enter/submit firing `onSubmit`. When `search` is omitted or null, the bar renders exactly as before. Test: render AppShellPage (or the AppTopBar / AppShellPage WithSearch stories) with search data and confirm the labeled search field appears with the supplied value; type to confirm `onValueChange` fires, and press Enter to confirm `onSubmit` fires. This lets hosts adopting AppShellPage keep a header search (e.g. Eciperay's recipes search) as design-system chrome instead of host-built markup.
+- 79fe6ef: Internal test layout only: manual test steps now live beside the component they cover as `<Base>.test.steps.md` files, with `docs/manual-tests.md` regenerated as an index of them. Story-only changes: the auth page/form stories, CardRow (Default/WithAction), and ListRow (Prefixed) stories gained observable readouts (submission / press counts) so the manual steps can verify guarded repeat submissions and press behavior. No component, page, or API changes; nothing user-visible to test beyond the steps themselves.
+
 ## 9.0.0
 
 ### Major Changes
