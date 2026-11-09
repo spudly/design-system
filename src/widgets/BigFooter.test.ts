@@ -120,6 +120,10 @@ test("every page component renders BigFooter through the shell from a footer pro
     "fixtures.ts",
     "useCatalogPagination.ts",
     "index.ts",
+    // The colocated Android VR baselines (#530) — PNGs, not a page
+    // module; their placement is pinned by
+    // test/visualRegressionScope.test.ts.
+    "__snapshots__",
   ]);
   const pages: string[] = [];
   for (const entry of readdirSync(pagesDir)) {
