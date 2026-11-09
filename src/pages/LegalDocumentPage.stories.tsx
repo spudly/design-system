@@ -19,7 +19,7 @@ import { LegalDocumentPage } from "./LegalDocumentPage.js";
  * document scrolls inside it. The Wide story is the exception:
  * it renders the privacy document unconstrained so the prose
  * column's 768px cap and centering can be checked on a wide
- * viewport (the manual-tests LegalDocumentPage section names
+ * viewport (the colocated LegalDocumentPage.test.steps.md section names
  * it for that check). Theme pinned to Warm Harvest, Eciperay's
  * brand.
  */

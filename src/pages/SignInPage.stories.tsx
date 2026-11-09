@@ -2,6 +2,7 @@ import { eciperayFooterFixture } from "./fixtures.js";
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
+import { Text } from "../widgets/Text.js";
 import { SignInPage } from "./SignInPage.js";
 
 const meta: Meta<typeof SignInPage> = {
@@ -28,7 +29,8 @@ function Viewport({ children }: { children: ReactNode }) {
  * can be typed in, and submit switches the page to its
  * loading state — so Enter-to-submit (#255) and the
  * held-while-loading guard are observable in Storybook
- * (submit shows "Signing in…" and disables the button).
+ * (submit shows "Signing in…" and disables the button; the "Submissions: N"
+ * readout under the page counts each submit).
  */
 function Interactive({
   error,
@@ -42,22 +44,29 @@ function Interactive({
   const [email, setEmail] = useState("cook@example.com");
   const [password, setPassword] = useState(filledValue);
   const [loading, setLoading] = useState(initialLoading);
+  const [submissions, setSubmissions] = useState(0);
   return (
-    <Viewport>
-      <SignInPage
-        footer={eciperayFooterFixture}
-        email={email}
-        password={password}
-        onEmailChange={setEmail}
-        onPasswordChange={setPassword}
-        loading={loading}
-        error={error ?? null}
-        emailError={emailError ?? null}
-        onSubmit={() => setLoading(true)}
-        signUpHref="/signup"
-        forgotPasswordHref="/forgot-password"
-      />
-    </Viewport>
+    <>
+      <Viewport>
+        <SignInPage
+          footer={eciperayFooterFixture}
+          email={email}
+          password={password}
+          onEmailChange={setEmail}
+          onPasswordChange={setPassword}
+          loading={loading}
+          error={error ?? null}
+          emailError={emailError ?? null}
+          onSubmit={() => {
+            setSubmissions((count) => count + 1);
+            setLoading(true);
+          }}
+          signUpHref="/signup"
+          forgotPasswordHref="/forgot-password"
+        />
+      </Viewport>
+      <Text>Submissions: {submissions}</Text>
+    </>
   );
 }
 

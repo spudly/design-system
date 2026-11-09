@@ -1,5 +1,8 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { Alert } from "./Alert.js";
+import { Text } from "./Text.js";
 
 const meta: Meta<typeof Alert> = {
   title: "Widgets/Alert",
@@ -42,12 +45,52 @@ export const Error: Story = {
   },
 };
 
+/**
+ * Dismissal is host state (Alert never hides itself), so the
+ * dismissible stories count activations instead of unmounting:
+ * the line under the alert makes the callback observable in a
+ * manual pass, the same pattern as StepOverlay's Done counter.
+ */
+function DismissDemo({
+  message,
+  severity = "info",
+  dismissible = true,
+}: {
+  message: string;
+  severity?: "info" | "success" | "warning" | "error";
+  dismissible?: boolean;
+}) {
+  const [dismissals, setDismissals] = useState(0);
+  return (
+    <YStack gap="$2">
+      <Alert
+        message={message}
+        severity={severity}
+        dismissible={dismissible}
+        onDismiss={() => setDismissals((n) => n + 1)}
+      />
+      {dismissals > 0 ? (
+        <Text variant="hint">
+          Dismiss activated ({dismissals}) — the host would hide the alert here.
+        </Text>
+      ) : null}
+    </YStack>
+  );
+}
+
 export const Dismissible: Story = {
   args: {
     message: "A new version of Eciperay is available for download.",
+    severity: "info",
     dismissible: true,
-    onDismiss: () => {},
   },
+  render: ({ message, severity, dismissible }) => (
+    <DismissDemo
+      message={message ?? ""}
+      severity={severity ?? "info"}
+      dismissible={dismissible ?? true}
+    />
+  ),
 };
 
 export const DismissibleWarning: Story = {
@@ -55,8 +98,14 @@ export const DismissibleWarning: Story = {
     message: "You're offline. Changes will sync when you reconnect.",
     severity: "warning",
     dismissible: true,
-    onDismiss: () => {},
   },
+  render: ({ message, severity, dismissible }) => (
+    <DismissDemo
+      message={message ?? ""}
+      severity={severity ?? "warning"}
+      dismissible={dismissible ?? true}
+    />
+  ),
 };
 
 export const WithActions: Story = {

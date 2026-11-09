@@ -29,7 +29,7 @@ function Viewport({ children }: { children: ReactNode }) {
  * stories; Wide renders the same page unconstrained so the
  * wide-web layout can be checked (the CTA row in one row, the
  * three feature cards sharing a row at their 260px basis) —
- * the manual-tests LandingPage section names which story each
+ * the colocated LandingPage.test.steps.md section names which story each
  * layout check uses.
  */
 export const Default: Story = {

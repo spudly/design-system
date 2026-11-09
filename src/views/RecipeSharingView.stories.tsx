@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { TextLink } from "../widgets/TextLink.js";
@@ -27,8 +27,11 @@ const options = [
   { value: "public", label: "Public", description: "Anyone can find and view it." },
 ];
 
-export const PublicWithConsent: Story = {
-  render: () => (
+function PublicWithConsentDemo() {
+  // Stateful consent so the manual check can exercise the
+  // consent gate: Save stays disabled until the box is checked.
+  const [consentChecked, setConsentChecked] = useState(false);
+  return (
     <Viewport>
       <RecipeSharingView
         options={options}
@@ -41,8 +44,8 @@ export const PublicWithConsent: Story = {
             <TextLink href="/privacy">Privacy Policy</TextLink>.
           </>
         }
-        consentChecked={false}
-        onConsentCheckedChange={() => undefined}
+        consentChecked={consentChecked}
+        onConsentCheckedChange={setConsentChecked}
         consentRequired
         onSave={() => undefined}
         shareLinkUrl="https://example.com/s/abc123"
@@ -53,7 +56,11 @@ export const PublicWithConsent: Story = {
         onCopyPermalink={() => undefined}
       />
     </Viewport>
-  ),
+  );
+}
+
+export const PublicWithConsent: Story = {
+  render: () => <PublicWithConsentDemo />,
 };
 
 export const Private: Story = {

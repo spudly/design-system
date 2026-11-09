@@ -13,10 +13,25 @@ const meta: Meta<typeof SignUpForm> = {
 export default meta;
 type Story = StoryObj<typeof SignUpForm>;
 
-function Controlled({ loading = false, error }: { loading?: boolean; error?: string | null }) {
+/**
+ * Controlled SignUpForm demo for the stories: holds the field
+ * values and loading state internally (seeded from the
+ * `loading` prop) and counts submissions in a readout, so a
+ * tester can confirm a repeat submit while loading does not
+ * submit again.
+ */
+function Controlled({
+  loading: initialLoading = false,
+  error,
+}: {
+  loading?: boolean;
+  error?: string | null;
+}) {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(initialLoading);
+  const [submissions, setSubmissions] = useState(0);
   return (
     <YStack maxWidth={430}>
       <SignUpForm
@@ -28,7 +43,10 @@ function Controlled({ loading = false, error }: { loading?: boolean; error?: str
         onPasswordChange={setPassword}
         loading={loading}
         error={error}
-        onSubmit={() => undefined}
+        onSubmit={() => {
+          setSubmissions((count) => count + 1);
+          setLoading(true);
+        }}
         signInHref="#/sign-in"
         legalNotice={
           <Text textAlign="center" variant="hint">
@@ -37,6 +55,7 @@ function Controlled({ loading = false, error }: { loading?: boolean; error?: str
           </Text>
         }
       />
+      <Text>Submissions: {submissions}</Text>
     </YStack>
   );
 }

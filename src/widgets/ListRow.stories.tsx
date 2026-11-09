@@ -1,6 +1,8 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { ListRow } from "./ListRow.js";
+import { Text } from "./Text.js";
 
 const meta: Meta<typeof ListRow> = {
   title: "Widgets/ListRow",
@@ -10,18 +12,28 @@ const meta: Meta<typeof ListRow> = {
 export default meta;
 type Story = StoryObj<typeof ListRow>;
 
-export const Prefixed: Story = {
-  render: (args) => (
-    <YStack maxWidth={430}>
-      <ListRow {...args} />
+/**
+ * Press readout: the "Row presses: N" line under the row
+ * counts row presses, so pointer and Enter/Space activation
+ * are observable in Storybook.
+ */
+function PrefixedDemo() {
+  const [presses, setPresses] = useState(0);
+  return (
+    <YStack maxWidth={430} gap="$2">
+      <ListRow
+        prefix="Meal · "
+        title="Taco Tuesday"
+        subtitle="Serves 4 · 2,150 cal"
+        onPress={() => setPresses((count) => count + 1)}
+      />
+      <Text>Row presses: {presses}</Text>
     </YStack>
-  ),
-  args: {
-    prefix: "Meal · ",
-    title: "Taco Tuesday",
-    subtitle: "Serves 4 · 2,150 cal",
-    onPress: () => {},
-  },
+  );
+}
+
+export const Prefixed: Story = {
+  render: () => <PrefixedDemo />,
 };
 
 export const Plain: Story = {

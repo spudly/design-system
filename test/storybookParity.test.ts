@@ -34,6 +34,10 @@
  * default build script name is `build-storybook`), and
  * apps/storybook carries storybook:react-native.
  *
+ * Colocated manual test steps (`<Base>.test.steps.md`, #530) are
+ * documentation, not modules: the scans below skip them like
+ * `.test.ts` files.
+ *
  * Documented exceptions (not components/pages, so no stories):
  * - src/widgets/accessibility.ts — ARIA helper utilities.
  * - src/widgets/modalRegistry.ts — the internal modal-layer
@@ -151,7 +155,8 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
     if (
       exceptions.has(entry.name) ||
       entry.name.endsWith(".stories.tsx") ||
-      entry.name.endsWith(".test.ts")
+      entry.name.endsWith(".test.ts") ||
+      entry.name.endsWith(".test.steps.md")
     )
       continue;
     assert.ok(
@@ -181,7 +186,8 @@ test("every view component has a story file titled Views/<Name>", () => {
     if (
       exceptions.has(entry.name) ||
       entry.name.endsWith(".stories.tsx") ||
-      entry.name.endsWith(".test.ts")
+      entry.name.endsWith(".test.ts") ||
+      entry.name.endsWith(".test.steps.md")
     )
       continue;
     assert.ok(
@@ -231,7 +237,8 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
     if (
       exceptions.has(entry.name) ||
       entry.name.endsWith(".stories.tsx") ||
-      entry.name.endsWith(".test.ts")
+      entry.name.endsWith(".test.ts") ||
+      entry.name.endsWith(".test.steps.md")
     )
       continue;
     assert.ok(

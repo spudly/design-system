@@ -13,7 +13,7 @@ type Story = StoryObj<typeof ScrollShell>;
 
 // Four blocks whose combined height exceeds the 480px frame, so the
 // column visibly scrolls as one region — the behavior the manual
-// checks exercise (docs/manual-tests.md, Page shells). Shorter
+// checks exercise (the shells' colocated .test.steps.md files, Page shells). Shorter
 // content never overflows the frame and leaves scrolling untestable
 // (#340).
 export const Default: Story = {

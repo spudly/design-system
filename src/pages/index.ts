@@ -82,6 +82,7 @@ export {
   type AppShellPageAction,
   type AppShellPageNavItem,
   type AppShellPageProps,
+  type AppShellPageSearch,
 } from "./AppShellPage.js";
 export {
   MemorizeReviewPage,

@@ -46,7 +46,8 @@ function LegalNotice() {
  * can be typed in, and submit switches the page to its
  * loading state — so Enter-to-submit (#255) and the
  * held-while-loading guard are observable in Storybook
- * (submit shows "Creating account…" and disables the button).
+ * (submit shows "Creating account…" and disables the button; the "Submissions: N"
+ * readout under the page counts each submit).
  */
 function Interactive({
   error,
@@ -63,24 +64,31 @@ function Interactive({
   const [email, setEmail] = useState("cook@example.com");
   const [password, setPassword] = useState(initialPassword);
   const [loading, setLoading] = useState(initialLoading);
+  const [submissions, setSubmissions] = useState(0);
   return (
-    <Viewport>
-      <SignUpPage
-        footer={eciperayFooterFixture}
-        displayName={displayName}
-        email={email}
-        password={password}
-        onDisplayNameChange={setDisplayName}
-        onEmailChange={setEmail}
-        onPasswordChange={setPassword}
-        loading={loading}
-        error={error ?? null}
-        emailError={emailError ?? null}
-        onSubmit={() => setLoading(true)}
-        signInHref="/signin"
-        legalNotice={<LegalNotice />}
-      />
-    </Viewport>
+    <>
+      <Viewport>
+        <SignUpPage
+          footer={eciperayFooterFixture}
+          displayName={displayName}
+          email={email}
+          password={password}
+          onDisplayNameChange={setDisplayName}
+          onEmailChange={setEmail}
+          onPasswordChange={setPassword}
+          loading={loading}
+          error={error ?? null}
+          emailError={emailError ?? null}
+          onSubmit={() => {
+            setSubmissions((count) => count + 1);
+            setLoading(true);
+          }}
+          signInHref="/signin"
+          legalNotice={<LegalNotice />}
+        />
+      </Viewport>
+      <Text>Submissions: {submissions}</Text>
+    </>
   );
 }
 

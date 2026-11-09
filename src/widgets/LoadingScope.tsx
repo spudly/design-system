@@ -35,5 +35,6 @@ export function LoadingScope({ active = false, children }: LoadingScopeProps) {
  * (Stephen on #551).
  */
 export function useLoadingScope(loadingProp?: boolean): boolean {
-  return loadingProp || useContext(LoadingScopeContext);
+  const scopedLoading = useContext(LoadingScopeContext);
+  return loadingProp || scopedLoading;
 }
