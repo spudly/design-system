@@ -12,11 +12,14 @@
  *    app imports, no react-native imports — field values and
  *    change callbacks cross as props, and submission is a bare
  *    `onSubmit` intent (the host builds the recipe input).
- * 3. The three pending-contract sections are render slots:
- *    `renderImageSection` (receives the revert affordance),
- *    `renderIngredientsSection`, `renderInstructionsSection`;
- *    under `contentLocked` the list slots do not render and the
- *    lock notice does.
+ * 3. The image section renders RecipeImageView from the
+ *    `image` data prop (the #124 view-half contract, landed in
+ *    #130) with the revert affordance as its header action;
+ *    `renderImageSection` remains the slot fallback (receives
+ *    the revert affordance) for unmigrated hosts. The two list
+ *    sections are render slots: `renderIngredientsSection`,
+ *    `renderInstructionsSection`; under `contentLocked` the
+ *    list slots do not render and the lock notice does.
  * 4. The version-diff wash is the DS fields' semantic `changed`
  *    variant (warning step 5 border / step 1 fill on TextField and
  *    TextAreaField), never page-level color props on the fields.
@@ -90,7 +93,7 @@ test("RecipeFormPage is controlled: no own state, no app or react-native imports
   }
 });
 
-test("the pending-contract sections are slots, and the lock replaces the list slots", () => {
+test("the image section renders from its data prop with the slot as fallback, and the lock replaces the list slots", () => {
   const form = pageSource("RecipeFormPage");
   for (const slot of [
     "renderImageSection",
@@ -99,6 +102,15 @@ test("the pending-contract sections are slots, and the lock replaces the list sl
   ]) {
     assert.ok(form.includes(slot), `slot ${slot} missing`);
   }
+  assert.ok(
+    form.includes("image?: RecipeFormPageImage | null"),
+    "the image data prop must be on the form's contract",
+  );
+  assert.match(
+    form,
+    /<RecipeImageView \{\.\.\.image\} headerAction=\{revertAction\("image"\)\} \/>/,
+    "the image view must render from the data prop with the revert affordance as its header action",
+  );
   assert.ok(
     form.includes('renderImageSection(revertAction("image"))'),
     "the image slot must receive the image revert affordance",
