@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { SectionCard } from "./SectionCard.js";
 import { Button } from "./Button.js";
 import { ListRow } from "./ListRow.js";
@@ -96,5 +97,48 @@ export const Loading: Story = {
       <ListRow title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
       <ListRow title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
     </SectionCard>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative" maxWidth={480}>
+      <SectionCard
+        title="API access tokens"
+        style={{ maxWidth: 480 }}
+        action={
+          <Button ghost size="sm">
+            Edit
+          </Button>
+        }
+      >
+        <ListRow title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
+        <ListRow title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
+      </SectionCard>
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <SectionCard
+          title="API access tokens"
+          style={{ maxWidth: 480 }}
+          action={
+            <Button ghost size="sm">
+              Edit
+            </Button>
+          }
+          loading
+        >
+          <ListRow title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
+          <ListRow title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
+        </SectionCard>
+      </YStack>
+    </YStack>
   ),
 };

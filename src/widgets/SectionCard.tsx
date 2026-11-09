@@ -25,10 +25,11 @@ export function SectionCard({
   loading = false,
   ...rest
 }: SectionCardProps) {
-  // Loading (#278): the header title swaps for a text skeleton
-  // and the header action is hidden; the Card shell carries the
-  // busy state and provides the LoadingScope, so the section's
-  // own widgets skeletonize without prop-drilling. `loading`
+  // Loading (#278): the header title swaps for a text skeleton;
+  // the header action stays rendered — the Card shell carries
+  // the busy state and provides the LoadingScope, so a Button
+  // action renders as an inert rectangle skeleton and the
+  // section's own widgets skeletonize without prop-drilling. `loading`
   // arrives through CardProps (SectionCardProps extends it), and
   // an enclosing composite's LoadingScope puts the section into
   // the same state (the showSkeleton pattern every other
@@ -45,7 +46,7 @@ export function SectionCard({
           ) : (
             <Text variant="subheading">{title}</Text>
           )}
-          {showSkeleton ? null : action}
+          {action}
         </XStack>
       </YStack>
       <YStack gap={tokens.spacing[3]}>{children}</YStack>

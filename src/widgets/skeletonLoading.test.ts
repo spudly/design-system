@@ -233,8 +233,10 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 // #278 Tranche 1 — list & card widgets: every converted composite
 // takes the explicit `loading` prop, reads the internal
 // LoadingScope (so a composite parent can skeletonize it without
-// prop-drilling), renders skeletons with no real content or
-// actions while loading, and renders unchanged while not loading.
+// prop-drilling), renders skeletons with no real content while
+// loading — its actions stay in place as inert rectangle
+// skeletons (Buttons skeletonize themselves inside the scope,
+// Stephen on #551) — and renders unchanged while not loading.
 // The collection widgets (CheckboxSelectList, StatBand) render
 // exactly 3 dummy items while loading; MasonryGrid renders 24
 // varied-height dummies so its loading state still reads as a
@@ -282,7 +284,7 @@ test("T1: CheckboxSelectList's centered spinner is gone", () => {
   assert.match(code, /LOADING_ROW_KEYS/, "the dummy rows come from a frozen constant");
 });
 
-test("T1 SSR: loading rows and cards render skeletons and no real content or actions", async () => {
+test("T1 SSR: loading rows and cards render skeletons, no real content, actions as skeletons", async () => {
   const { React, CardRow, ListRow, DiscoveryCard, CommentItem, LogEntryCard, TokenRow } =
     await loadRuntime();
   const noop = () => {};
@@ -299,7 +301,10 @@ test("T1 SSR: loading rows and cards render skeletons and no real content or act
   );
   assert.equal(hiddenBones(cardRow), 2, "a loading CardRow renders title+subtitle bones");
   assert.ok(!cardRow.includes("Secret Plan"), "a loading CardRow shows no real title");
-  assert.ok(!cardRow.includes("Delete"), "a loading CardRow renders no action");
+  assert.ok(
+    cardRow.includes("Delete"),
+    "a loading CardRow keeps its action, as an inert rectangle skeleton",
+  );
   assert.match(cardRow, /aria-busy/, "a loading CardRow marks its region busy");
 
   const listRow = await renderToHtml(
@@ -342,7 +347,10 @@ test("T1 SSR: loading rows and cards render skeletons and no real content or act
   assert.equal(hiddenBones(comment), 3, "a loading CommentItem renders 3 text bones");
   assert.ok(!comment.includes("Secret Author"), "a loading CommentItem shows no author");
   assert.ok(!comment.includes("Secret body text"), "a loading CommentItem shows no body");
-  assert.ok(!comment.includes("Delete"), "a loading CommentItem renders no actions");
+  assert.ok(
+    comment.includes("Edit") && comment.includes("Delete"),
+    "a loading CommentItem keeps its actions, as inert rectangle skeletons",
+  );
 
   const logEntry = await renderToHtml(
     React.createElement(LogEntryCard, {
@@ -356,7 +364,10 @@ test("T1 SSR: loading rows and cards render skeletons and no real content or act
   );
   assert.equal(hiddenBones(logEntry), 2, "a loading LogEntryCard renders header+notes bones");
   assert.ok(!logEntry.includes("Secret notes"), "a loading LogEntryCard shows no notes");
-  assert.ok(!logEntry.includes("Delete"), "a loading LogEntryCard renders no delete action");
+  assert.ok(
+    logEntry.includes("Delete"),
+    "a loading LogEntryCard keeps its delete action, as an inert rectangle skeleton",
+  );
 
   const tokenRow = await renderToHtml(
     React.createElement(TokenRow, {
@@ -369,11 +380,14 @@ test("T1 SSR: loading rows and cards render skeletons and no real content or act
   );
   assert.equal(hiddenBones(tokenRow), 3, "a loading TokenRow renders 3 text bones");
   assert.ok(!tokenRow.includes("Secret Token"), "a loading TokenRow shows no token name");
-  assert.ok(!tokenRow.includes("Revoke"), "a loading TokenRow renders no revoke action");
+  assert.ok(
+    tokenRow.includes("Revoke"),
+    "a loading TokenRow keeps its revoke action, as an inert rectangle skeleton",
+  );
 });
 
 test("T1 SSR: loading StatCard, PreviewCard, and the collections render their dummy items", async () => {
-  const { React, StatCard, StatBand, PreviewCard, CheckboxSelectList, MasonryGrid } =
+  const { React, StatCard, StatBand, PreviewCard, CheckboxSelectList, MasonryGrid, Button } =
     await loadRuntime();
   const noop = () => {};
 
@@ -404,14 +418,17 @@ test("T1 SSR: loading StatCard, PreviewCard, and the collections render their du
       {
         title: "Your recipe",
         loading: true,
-        actions: React.createElement("span", null, "ConfirmAction"),
+        actions: React.createElement(Button, { onPress: noop }, "ConfirmAction"),
       },
       React.createElement("span", null, "SecretPreviewBody"),
     ),
   );
   assert.equal(hiddenBones(preview), 4, "a loading PreviewCard renders title + 3 body bones");
   assert.ok(!preview.includes("SecretPreviewBody"), "a loading PreviewCard shows no content");
-  assert.ok(!preview.includes("ConfirmAction"), "a loading PreviewCard renders no actions");
+  assert.ok(
+    preview.includes("ConfirmAction"),
+    "a loading PreviewCard keeps its actions, as inert rectangle skeletons",
+  );
 
   const selectList = await renderToHtml(
     React.createElement(CheckboxSelectList, {
@@ -443,8 +460,96 @@ test("T1 SSR: loading StatCard, PreviewCard, and the collections render their du
   assert.ok(!grid.includes("GridItemBody"), "a loading MasonryGrid shows no real items");
 });
 
+test("T1: a Button inside a LoadingScope renders the rectangle-skeleton treatment", async () => {
+  // Source pins: the scope drives the fill (the theme's border
+  // role, SkeletonBone's fill), the press handler is dropped,
+  // and the disabled skeleton state withholds the link href.
+  const button = readCode("src/widgets/Button.tsx");
+  assert.match(button, /const scopedLoading = useLoadingScope\(\)/, "Button reads the scope");
+  assert.match(
+    button,
+    /backgroundColor: "\$borderColor", borderColor: "\$borderColor"/,
+    "the skeleton frame and its border take the bone fill",
+  );
+  assert.match(
+    button,
+    /onPress=\{scopedLoading \? undefined : onPress\}/,
+    "a skeleton button carries no press handler",
+  );
+  assert.match(
+    button,
+    /const effectiveDisabled = disabled \|\| scopedLoading/,
+    "a skeleton button renders disabled (which withholds the link form's href)",
+  );
+  assert.match(
+    button,
+    /accessibilityElementsHidden: scopedLoading \? true : accessibilityElementsHidden/,
+    "a skeleton button is hidden from assistive tech",
+  );
+
+  const { React, Button, LoadingScope } = await loadRuntime();
+  const noop = () => {};
+  const scoped = await renderToHtml(
+    React.createElement(
+      LoadingScope,
+      { active: true },
+      React.createElement(Button, { onPress: noop }, "ScopedAction"),
+    ),
+  );
+  assert.ok(scoped.includes("ScopedAction"), "the skeleton button keeps its label (its size)");
+  assert.match(scoped, /aria-hidden="true"/, "the skeleton button is hidden from assistive tech");
+  assert.match(scoped, /aria-disabled="true"/, "the skeleton button renders disabled");
+
+  const scopedLink = await renderToHtml(
+    React.createElement(
+      LoadingScope,
+      { active: true },
+      React.createElement(Button, { href: "/secret-destination" }, "ScopedLink"),
+    ),
+  );
+  assert.ok(scopedLink.includes("ScopedLink"), "the skeleton link keeps its label");
+  assert.ok(
+    !scopedLink.includes("/secret-destination"),
+    "the skeleton link's href is withheld — it cannot be followed",
+  );
+
+  const plain = await renderToHtml(React.createElement(Button, { onPress: noop }, "PlainAction"));
+  assert.ok(plain.includes("PlainAction"), "a Button outside any scope renders its label");
+  assert.ok(
+    !plain.includes('aria-disabled="true"'),
+    "a Button outside any scope is not disabled by the scope",
+  );
+  const plainLink = await renderToHtml(
+    React.createElement(Button, { href: "/visible-destination" }, "PlainLink"),
+  );
+  assert.ok(
+    plainLink.includes('href="/visible-destination"'),
+    "a link Button outside any scope keeps its href",
+  );
+});
+
+test("T1: the MasonryGrid skeleton fills its columns and the ListRow skeleton hides its hairline", () => {
+  const grid = readCode("src/widgets/MasonryGrid.tsx");
+  assert.match(
+    grid,
+    /<View key=\{`loading-\$\{itemIndex\}`\} width="100%">/,
+    "a loading MasonryGrid item wrapper takes the column's full width",
+  );
+  const row = readCode("src/widgets/ListRow.tsx");
+  assert.match(
+    row,
+    /borderBottomColor="transparent"/,
+    "a loading ListRow's hairline renders transparent",
+  );
+  assert.equal(
+    (row.match(/borderBottomColor=\{tokens\.colors\.gray\.gray2\}/g) ?? []).length,
+    1,
+    "only the loaded ListRow keeps the visible gray hairline",
+  );
+});
+
 test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unchanged", async () => {
-  const { React, Card, SectionCard, CardRow, CheckboxSelectList } = await loadRuntime();
+  const { React, Card, SectionCard, CardRow, CheckboxSelectList, Button } = await loadRuntime();
   const noop = () => {};
 
   // The Card shell's scope skeletonizes a nested row that was
@@ -472,8 +577,9 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
 
   // Nested shells (CodeRabbit on #551): a plain Card or
   // SectionCard nested inside a loading Card must not reset the
-  // scope — the section's title skeletonizes, its action hides,
-  // and a row two shells deep still skeletonizes.
+  // scope — the section's title skeletonizes, its Button action
+  // stays as a rectangle skeleton, and a row two shells deep
+  // still skeletonizes.
   const nested = await renderToHtml(
     React.createElement(
       Card,
@@ -482,7 +588,11 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
         SectionCard,
         {
           title: "Nested Section Title",
-          action: React.createElement("span", null, "NestedAction"),
+          action: React.createElement(
+            Button,
+            { ghost: true, size: "sm", onPress: noop },
+            "NestedAction",
+          ),
         },
         React.createElement(CardRow, { title: "Nested Row Title", onPress: noop }),
       ),
@@ -491,7 +601,10 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
   assert.equal(hiddenBones(nested), 2, "nested shells keep the scope: title + row bones");
   assert.ok(!nested.includes("Nested Section Title"), "the nested section title is skeletonized");
   assert.ok(!nested.includes("Nested Row Title"), "the doubly nested row is skeletonized");
-  assert.ok(!nested.includes("NestedAction"), "the nested section action is hidden while loading");
+  assert.ok(
+    nested.includes("NestedAction"),
+    "the nested section's Button action stays, as an inert rectangle skeleton",
+  );
 
   // The busy marking survives a caller's own accessibility
   // state (CodeRabbit on #551): a loading Card handed a disabled

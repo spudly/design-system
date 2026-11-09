@@ -139,7 +139,10 @@ test("href anchors suppress the UA link underline the button forms never had (#2
 test("Button: href is destructured by the wrapper and withheld while disabled (#248)", () => {
   assert.match(button, /const isLink = href !== undefined;/);
   assert.match(button, /accessibilityRole: accessibilityRole \?\? \(isLink \? "link" : "button"\)/);
-  assert.match(button, /\{\.\.\.\(disabled \? \{\} : \{ href \}\)\}/);
+  // Withheld while `effectiveDisabled` — the caller's disabled OR
+  // the loading-scope skeleton state (#278): a skeleton link
+  // cannot be followed either.
+  assert.match(button, /\{\.\.\.\(effectiveDisabled \? \{\} : \{ href \}\)\}/);
   assert.match(button, /<StyledLinkButton/);
 });
 

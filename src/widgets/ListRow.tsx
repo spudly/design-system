@@ -71,11 +71,15 @@ export function ListRow({
   if (showSkeleton) {
     // Loading (#278): the same hairline row geometry, with the
     // text lines swapped for skeletons at the same line count —
-    // no link, no press target, and the region marked busy.
+    // no link, no press target, and the region marked busy. The
+    // hairline keeps its width (the geometry is unchanged) but
+    // renders transparent: a visible rule between the skeleton
+    // lines reads as a section divider inside a composite's
+    // loading state (Stephen on #551).
     return (
       <YStack
         borderBottomWidth={1}
-        borderBottomColor={tokens.colors.gray.gray2}
+        borderBottomColor="transparent"
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
         <YStack paddingVertical="$3">

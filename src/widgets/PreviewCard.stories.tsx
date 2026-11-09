@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { Button } from "./Button.js";
 import { PreviewCard } from "./PreviewCard.js";
 import { Text } from "./Text.js";
@@ -36,6 +37,36 @@ export const Loading: Story = {
   args: {
     title: "Your recipe",
     children: <Text>Tuscan Chicken — 4 servings, 15 min prep, 30 min cook.</Text>,
+    // The action stays while loading, as a rectangle skeleton.
+    actions: <Button variant="primary">Looks good</Button>,
     loading: true,
   },
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative" maxWidth={430}>
+      <PreviewCard title="Your recipe" actions={<Button variant="primary">Looks good</Button>}>
+        <Text>Tuscan Chicken — 4 servings, 15 min prep, 30 min cook.</Text>
+      </PreviewCard>
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <PreviewCard
+          title="Your recipe"
+          actions={<Button variant="primary">Looks good</Button>}
+          loading
+        >
+          <Text>Tuscan Chicken — 4 servings, 15 min prep, 30 min cook.</Text>
+        </PreviewCard>
+      </YStack>
+    </YStack>
+  ),
 };

@@ -3,7 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { TextAreaField } from "../views/TextAreaField.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
-import { useLoadingScope } from "./LoadingScope.js";
+import { LoadingScope, useLoadingScope } from "./LoadingScope.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
@@ -28,9 +28,11 @@ export type CommentItemProps = {
   onSaveEdit?: () => void;
   onDelete?: () => void;
   /** Loading state (#278): the item renders text skeletons in
-   * place of its author line and body, with no editor and no
-   * actions. An enclosing composite's LoadingScope can also
-   * put the item into this state without prop-drilling. */
+   * place of its author line and body, with no editor; its
+   * actions stay in place as inert rectangle skeletons inside
+   * the loading scope. An enclosing composite's LoadingScope
+   * can also put the item into this state without
+   * prop-drilling. */
   loading?: boolean;
 };
 
@@ -67,24 +69,86 @@ export function CommentItem({
   loading = false,
 }: CommentItemProps) {
   const showSkeleton = useLoadingScope(loading);
+  const saveDisabled = isUpdatePending || !editDraft.trim();
+  // The actions row is one row in both states: while loading it
+  // renders inside the loading scope, where its ghost Buttons
+  // render as inert rectangle skeletons at their normal
+  // geometry (Stephen on #551) instead of dropping out.
+  const actionsRow =
+    canEdit || canDelete ? (
+      <XStack paddingBlockStart="$2" gap="$3">
+        {canEdit ? (
+          isEditing ? (
+            <>
+              <Button
+                ghost
+                size="sm"
+                disabled={saveDisabled}
+                onPress={() => {
+                  onSaveEdit?.();
+                }}
+              >
+                Save
+              </Button>
+              <Button
+                ghost
+                size="sm"
+                variant="secondary"
+                onPress={() => {
+                  onCancelEdit?.();
+                }}
+              >
+                Cancel
+              </Button>
+            </>
+          ) : (
+            <Button
+              ghost
+              size="sm"
+              onPress={() => {
+                onStartEdit?.();
+              }}
+            >
+              Edit
+            </Button>
+          )
+        ) : null}
+        {canDelete ? (
+          <Button
+            ghost
+            size="sm"
+            variant="danger"
+            disabled={isDeletePending}
+            onPress={() => {
+              onDelete?.();
+            }}
+          >
+            Delete
+          </Button>
+        ) : null}
+      </XStack>
+    ) : null;
   if (showSkeleton) {
     // Loading (#278): the same framed item, with text skeletons
     // standing in for the author line and the body — no editor,
-    // no actions, and the region marked busy.
+    // the actions row as rectangle skeletons, and the region
+    // marked busy.
     return (
       <YStack paddingBlockEnd="$3">
-        <YStack
-          borderRadius={tokens.radii.md}
-          backgroundColor={tokens.colors.gray.gray1}
-          padding="$3"
-          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
-        >
-          <TextSkeleton lines={3} />
-        </YStack>
+        <LoadingScope active>
+          <YStack
+            borderRadius={tokens.radii.md}
+            backgroundColor={tokens.colors.gray.gray1}
+            padding="$3"
+            {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+          >
+            <TextSkeleton lines={3} />
+            {actionsRow}
+          </YStack>
+        </LoadingScope>
       </YStack>
     );
   }
-  const saveDisabled = isUpdatePending || !editDraft.trim();
 
   return (
     <YStack paddingBlockEnd="$3">
@@ -125,59 +189,7 @@ export function CommentItem({
             {body}
           </Text>
         )}
-        {canEdit || canDelete ? (
-          <XStack paddingBlockStart="$2" gap="$3">
-            {canEdit ? (
-              isEditing ? (
-                <>
-                  <Button
-                    ghost
-                    size="sm"
-                    disabled={saveDisabled}
-                    onPress={() => {
-                      onSaveEdit?.();
-                    }}
-                  >
-                    Save
-                  </Button>
-                  <Button
-                    ghost
-                    size="sm"
-                    variant="secondary"
-                    onPress={() => {
-                      onCancelEdit?.();
-                    }}
-                  >
-                    Cancel
-                  </Button>
-                </>
-              ) : (
-                <Button
-                  ghost
-                  size="sm"
-                  onPress={() => {
-                    onStartEdit?.();
-                  }}
-                >
-                  Edit
-                </Button>
-              )
-            ) : null}
-            {canDelete ? (
-              <Button
-                ghost
-                size="sm"
-                variant="danger"
-                disabled={isDeletePending}
-                onPress={() => {
-                  onDelete?.();
-                }}
-              >
-                Delete
-              </Button>
-            ) : null}
-          </XStack>
-        ) : null}
+        {actionsRow}
       </YStack>
     </YStack>
   );

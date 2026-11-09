@@ -197,7 +197,11 @@ export function MasonryGrid<Item>({
               {column.map((itemIndex) => {
                 if (showSkeleton) {
                   return (
-                    <View key={`loading-${itemIndex}`}>
+                    // The wrapper takes the column's full width:
+                    // shrink-wrapping the bone left the skeleton
+                    // grid narrower than the real grid, whose
+                    // items fill their columns (Stephen on #551).
+                    <View key={`loading-${itemIndex}`} width="100%">
                       <BoxSkeleton height={LOADING_ITEM_HEIGHTS[itemIndex] ?? 120} />
                     </View>
                   );
