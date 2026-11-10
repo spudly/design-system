@@ -7,7 +7,7 @@
 // away from what the pipeline actually captures.
 
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import process from "node:process";
@@ -29,6 +29,9 @@ const {
   renderCoverageTable,
   themeOfStory,
 } = await import(join(repoRoot, "tools/visualRegression/coverageListing.mjs"));
+const { baselineRelPath, listCommittedBaselines, parseBaselineFileName } = await import(
+  join(repoRoot, "tools/visualRegression/baselineResolver.mjs")
+);
 
 test("story id derivation mirrors Storybook's sanitize + startCase", () => {
   assert.equal(sanitizeStoryPart("Pages/Eciperay/RecipesPage"), "pages-eciperay-recipespage");
@@ -204,6 +207,31 @@ test("coverage listing: rows derive from the scope and the files on disk (#284)"
   assert.match(table, /\| \*\*Total\*\*.*\| +\*\*4\*\* \| +\*\*3\*\* \|/);
 });
 
+test("colocated baselines resolve through the story index (#530)", () => {
+  const { index, baselines, orphans } = listCommittedBaselines(repoRoot);
+  // No orphans: every committed baseline PNG sits under a
+  // __snapshots__/ directory and names a story file + export in
+  // the index, so a renamed story cannot silently strand its
+  // PNGs outside the resolver.
+  assert.deepEqual(orphans, []);
+  assert.ok(baselines.length > 0);
+  for (const b of baselines) {
+    // Round-trip both directions: the colocated path re-derives
+    // from the storyId, and the file name parses back to the
+    // same theme/variant.
+    assert.equal(baselineRelPath(index, b.storyId, b.theme, b.narrow), b.relPath);
+    const parsed = parseBaselineFileName(b.relPath.split("/").at(-1) ?? "");
+    assert.ok(parsed, b.relPath);
+    assert.equal(parsed.theme, b.theme);
+    assert.equal(parsed.narrow, b.narrow);
+  }
+  assert.equal(
+    baselineRelPath(index, "pages-eciperay-recipespage--default", "light_warmHarvest", true),
+    "src/pages/__snapshots__/RecipesPage--default--narrow--light_warmHarvest.png",
+  );
+  assert.equal(baselineRelPath(index, "pages-eciperay-nope--default", "light_warmHarvest"), null);
+});
+
 test("isFallbackPath classifies the guardrail list", () => {
   assert.equal(isFallbackPath("tools/visualRegression/scope.mjs"), true);
   assert.equal(isFallbackPath("src/widgets/Button.tsx"), false);
@@ -371,10 +399,8 @@ test("real repo: derived capture set matches the committed baselines", () => {
   const scope = computeScope({ repoRoot, changedFiles: [], forceFull: true });
   assert.equal(scope.standard.length, EXPECTED_LIGHT_STORY_COUNT);
   assert.equal(scope.narrow.length, 11);
-  const baselineRoot = join(repoRoot, "tools/visualRegression/baselines");
-  const baselineFiles = readBaselineFiles(baselineRoot);
+  const baselineFiles = readBaselineFiles(repoRoot);
   assertBaselinesDerivable(scope, baselineFiles);
-  assert.ok(existsSync(baselineRoot));
   if (enforceBaselineGate) {
     assertScopeCoveredByBaselines(scope, baselineFiles);
   }

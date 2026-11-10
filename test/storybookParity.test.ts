@@ -230,6 +230,9 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
     "BoundedList is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
   );
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    // The one expected directory: the colocated Android VR baselines
+    // (#530), pinned by test/visualRegressionScope.test.ts.
+    if (entry.name === "__snapshots__") continue;
     assert.ok(
       entry.isFile(),
       `src/pages/${entry.name}: unexpected directory — the parity scan is flat`,

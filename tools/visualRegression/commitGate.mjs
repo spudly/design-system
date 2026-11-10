@@ -3,8 +3,8 @@
 //
 // The capture pipeline turns fresh captures into committed
 // baselines in two places: the PR auto-commit flow
-// (ci/capture-compare.sh stages baselines/ + captures into the set
-// the commit job pushes) and update mode (deviceMode.mjs writes
+// (ci/capture-compare.sh stages the committed baselines +
+// captures into the set the commit job pushes) and update mode (deviceMode.mjs writes
 // each capture over its baseline). Both used to copy bytes
 // unconditionally, so any capture whose PNG bytes differed landed
 // as baseline churn — including pure render/re-encode noise. On PR

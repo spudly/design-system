@@ -175,8 +175,9 @@ The same stories also run on Android in the react-native storybook:
 the Expo host app in `apps/storybook` mounts them via
 @storybook/react-native, and the "React Native storybook VR"
 workflow screenshot-compares the page stories on an emulator
-against baselines committed in `tools/visualRegression/baselines/`
-— the on-device counterpart to Chromatic, covering the native-only
+against baselines committed beside their story files in
+`src/**/__snapshots__/` — the on-device counterpart to Chromatic,
+covering the native-only
 rendering bugs web snapshots cannot see (e.g. eciperay#162). Local
 runs, the baseline-update workflow, and the #162 sanity check are
 documented in

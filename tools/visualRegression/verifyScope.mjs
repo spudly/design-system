@@ -39,6 +39,7 @@ import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from "
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { resolveBaselinesDir } from "./baselinesLayout.mjs";
 import { NARROW_PREFIXES } from "./scope.mjs";
 
 // The named setting for the full-verification fallback (issue
@@ -62,10 +63,11 @@ function listPngs(dir, prefix = "") {
   return out;
 }
 
-// Baselines live at <theme>/<storyId>.png, with the narrow variant
-// beside the standard one as <theme>/<storyId>-narrow.png (see
-// run.mjs baselineFileName; compare.mjs splits the two sets by the
-// same suffix). A file counts as narrow only when the stripped id
+// In the canonical tree layout this module's inputs use,
+// baselines live at <theme>/<storyId>.png, with the narrow
+// variant beside the standard one as <theme>/<storyId>-narrow.png
+// (see run.mjs baselineFileName; compare.mjs splits the two sets
+// by the same suffix). A file counts as narrow only when the stripped id
 // is in the narrow capture scope (scope.mjs NARROW_PREFIXES): a
 // STANDARD story whose id merely ends in "-narrow" keeps its full
 // id. (A narrow-scope story id ending in "-narrow" would collide
@@ -165,7 +167,7 @@ function main(argv) {
     const i = argv.indexOf(name);
     return i === -1 ? fallback : argv[i + 1];
   };
-  const baselinesDir = value("--baselines", "");
+  const baselinesArg = value("--baselines", "");
   const stagedDir = value("--staged", "");
   const out = value("--out", "");
   // An omitted flag reads as "" and Number("") is 0, which would
@@ -174,12 +176,16 @@ function main(argv) {
   // parseCommitGateRatio guards against in commitGate.mjs).
   const captureTotalRaw = value("--capture-total", "") ?? "";
   const captureTotal = captureTotalRaw.trim() === "" ? Number.NaN : Number(captureTotalRaw);
-  if (!baselinesDir || !stagedDir || !Number.isInteger(captureTotal) || captureTotal < 0) {
+  if (!baselinesArg || !stagedDir || !Number.isInteger(captureTotal) || captureTotal < 0) {
     console.error(
       "verify-scope FAIL (issue #432): --baselines <dir>, --staged <dir>, and --capture-total <n> are required.",
     );
     return 1;
   }
+  // --baselines may name a repo root (the committed colocated
+  // layout, issue #530); the decision compares canonical trees,
+  // so resolve it to one first.
+  const baselinesDir = resolveBaselinesDir(baselinesArg);
   const decision = computeVerifyScope({ baselinesDir, stagedDir, captureTotal });
   if (out) writeFileSync(out, `${JSON.stringify(decision, null, 2)}\n`);
   console.log(

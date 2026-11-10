@@ -5,8 +5,8 @@
 # Separate from Chromatic (which gates the react/web Storybook): this
 # job renders the same CSF stories in the Expo host app
 # (apps/storybook) on an Android emulator and pixel-compares
-# screenshots against baselines committed under
-# tools/visualRegression/baselines/. See
+# screenshots against baselines committed beside their story
+# files (src/**/__snapshots__/, issue #530). See
 # docs/android-visual-regression.md for the full workflow, including
 # how baselines are generated and updated.
 #
@@ -76,10 +76,10 @@
 # the emulator display switched to a 345.6dp logical width +
 # font_scale 1.3 (the phone settings behind eciperay #205, whose
 # fix moved zero standard baselines — the standard surface is
-# 540dp wide and never starves the row). Variant baselines carry a
-# "-narrow" filename suffix and flow through the same compare /
-# guard / auto-commit path as the standard set. See
-# docs/android-visual-regression.md.
+# 540dp wide and never starves the row). Variant baselines are the
+# same stories' baselines with a "--narrow" filename segment and
+# flow through the same compare / guard / auto-commit path as the
+# standard set. See docs/android-visual-regression.md.
 #
 # Sharded capture (issue #432 phase 2): the plan job below
 # computes the capture scope once and splits it across a matrix
@@ -172,9 +172,10 @@ jobs:
       # (luminance guard + re-compare) by the run that created the
       # commit, so re-capturing everything is pure waste. All three
       # conditions must hold: authored by github-actions[bot], the
-      # exact auto-commit subject, and every changed file under
-      # tools/visualRegression/baselines/ or the VR coverage listing
-      # the commit jobs refresh alongside them (issue #284:
+      # exact auto-commit subject, and every changed file a
+      # colocated VR baseline (src/**/__snapshots__/*.png, issue
+      # #530) or the VR coverage listing the commit jobs refresh
+      # alongside them (issue #284:
       # docs/android-visual-regression.md). A maintainer merge or
       # any later commit changes the head and the full run resumes.
       # Update dispatches are excluded on purpose: an explicit
@@ -194,7 +195,7 @@ jobs:
           author="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.author.login // ""')"
           subject="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '.commit.message | split("\n")[0]')"
           if [ "$author" = "github-actions[bot]" ] && [ "$subject" = "chore(vr): update Android Storybook baselines" ]; then
-            outside="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '[.files[].filename | select((startswith("tools/visualRegression/baselines/") or . == "docs/android-visual-regression.md") | not)] | length')"
+            outside="$(gh api "repos/${{ github.repository }}/commits/$HEAD_SHA" --jq '[.files[].filename | select(((startswith("src/") and contains("/__snapshots__/") and endswith(".png")) or . == "docs/android-visual-regression.md") | not)] | length')"
             if [ "$outside" = "0" ]; then
               skip=true
             fi
@@ -481,12 +482,16 @@ jobs:
             /tmp/dsvr-shard-result.json
           if-no-files-found: error
 
+      # Update mode wrote the baselines in-tree at their colocated
+      # paths; capture-compare.sh materialized them into the
+      # canonical tree this artifact carries (issue #530), which
+      # the commit-baselines job publishes back into the tree.
       - name: Upload regenerated baselines (update mode)
         if: inputs.mode == 'update'
         uses: actions/upload-artifact@v7
         with:
           name: dsvr-baselines
-          path: tools/visualRegression/baselines
+          path: /tmp/dsvr-baselines-tree
           if-no-files-found: error
 
   # Shard merge + verification (issue #432 phase 2), PR runs
@@ -723,12 +728,15 @@ jobs:
           name: dsvr-baselines
           path: ${{ runner.temp }}/dsvr-baselines
 
-      - name: Sync baselines into the tree
-        run: rsync -a --delete "${{ runner.temp }}/dsvr-baselines/" tools/visualRegression/baselines/
-
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+
+      # Issue #530: the artifact is the canonical tree; publish it
+      # into the colocated committed layout (mirroring — a
+      # baseline absent from the tree is deleted).
+      - name: Publish baselines into the tree
+        run: node tools/visualRegression/baselinesLayout.mjs publish --from "${{ runner.temp }}/dsvr-baselines"
 
       # Issue #284: refresh the docs coverage listing from the
       # synced baselines so it lands in the same bot commit —
@@ -745,13 +753,13 @@ jobs:
       # on a branch headed by this commit captures for real.
       - name: Commit and push if baselines changed
         run: |
-          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines docs/android-visual-regression.md)" ]; then
+          if [ -z "$(git status --porcelain -- src docs/android-visual-regression.md)" ]; then
             echo "Baselines unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tools/visualRegression/baselines docs/android-visual-regression.md
+          git add -A -- src docs/android-visual-regression.md
           git commit -m "chore(vr): update Android Storybook baselines (manual update)"
           git push origin "HEAD:${{ github.ref_name }}"
 
@@ -807,12 +815,15 @@ jobs:
           name: dsvr-pr-baselines
           path: ${{ runner.temp }}/dsvr-pr-baselines
 
-      - name: Sync baselines into the tree
-        run: rsync -a --delete "${{ runner.temp }}/dsvr-pr-baselines/" tools/visualRegression/baselines/
-
       - uses: actions/setup-node@v7
         with:
           node-version: 22
+
+      # Issue #530: the artifact is the canonical (staged) tree;
+      # publish it into the colocated committed layout
+      # (mirroring — a baseline absent from the tree is deleted).
+      - name: Publish baselines into the tree
+        run: node tools/visualRegression/baselinesLayout.mjs publish --from "${{ runner.temp }}/dsvr-pr-baselines"
 
       # Issue #284: same listing refresh as the update-mode job —
       # the refreshed table lands in this bot commit, so the
@@ -822,13 +833,13 @@ jobs:
 
       - name: Commit and push regenerated baselines
         run: |
-          if [ -z "$(git status --porcelain -- tools/visualRegression/baselines docs/android-visual-regression.md)" ]; then
+          if [ -z "$(git status --porcelain -- src docs/android-visual-regression.md)" ]; then
             echo "Baselines unchanged; nothing to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add tools/visualRegression/baselines docs/android-visual-regression.md
+          git add -A -- src docs/android-visual-regression.md
           git commit -m "chore(vr): update Android Storybook baselines"
           git push origin "HEAD:${{ github.head_ref }}"
 

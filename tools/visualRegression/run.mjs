@@ -36,6 +36,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { baselinesLayoutOf } from "./baselinesLayout.mjs";
 import { gateRatioFromArgs } from "./commitGate.mjs";
 import { fromDirMode } from "./compare.mjs";
 import { deviceMode } from "./deviceMode.mjs";
@@ -76,7 +77,14 @@ const CONFIG = {
   // "" = the standard capture set; "narrow" = the narrow-viewport
   // variant (NARROW_SCOPE below, "-narrow" baseline filename suffix).
   variant: argValue("--variant", ""),
-  baselinesDir: argValue("--baselines", join(TOOL_DIR, "baselines")),
+  // Baselines (issue #530): the default is the repo root — the
+  // committed baselines live colocated beside their story files
+  // (src/**/__snapshots__/, resolved by baselineResolver.mjs).
+  // An explicit --baselines may instead name a canonical tree
+  // dir (<theme>/<storyId>.png — the staged set, an artifact);
+  // baselinesLayoutOf tells the two apart.
+  baselinesDir: argValue("--baselines", join(TOOL_DIR, "..", "..")),
+  baselinesLayout: baselinesLayoutOf(argValue("--baselines", join(TOOL_DIR, "..", ".."))),
   outDir: argValue("--out", join(TOOL_DIR, "out")),
   update: argFlag("--update"),
   fromDir: argValue("--from-dir", ""),
@@ -183,10 +191,11 @@ const CAPTURE_SCOPE = [
 // starved to ~0dp, and PR #117 — the #205 fix (row flexWrap + a
 // 60dp flexBasis on the text block) — passed the standard set with
 // ZERO baseline movement. This variant exists so that regression
-// class produces a failing diff instead. Baselines live beside the
-// standard ones with a "-narrow" filename suffix
-// (baselines/<theme>/<storyId>-narrow.png), so the auto-commit /
-// guard / commit-job machinery treats them as ordinary baselines.
+// class produces a failing diff instead. Variant baselines are
+// the same stories' committed baselines with a "--narrow"
+// filename segment before the theme (baselineResolver.mjs), so
+// the auto-commit / guard / commit-job machinery treats them as
+// ordinary baselines.
 // Current yield: 12 pages-eciperay-recipespage stories x light
 // warmHarvest = 12 baselines (140 total with the standard set). The
 // variant follows the light-only policy above (Stephen,

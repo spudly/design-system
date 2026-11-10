@@ -2,6 +2,7 @@ node_modules
 dist
 test-dist
 storybook-static
+tools/visualRegression/out/
 .turbo
 coverage
 .expo

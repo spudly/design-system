@@ -45,6 +45,7 @@ import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import { resolveBaselinesDir } from "./baselinesLayout.mjs";
 import { decodePng } from "./png.mjs";
 
 const TOOL_DIR = dirname(fileURLToPath(import.meta.url));
@@ -56,7 +57,10 @@ function argValue(name, fallback) {
 }
 
 const CAPTURES_DIR = argValue("--captures", "");
-const BASELINES_DIR = argValue("--baselines", join(TOOL_DIR, "baselines"));
+// --baselines names a canonical tree dir or a repo root (the
+// committed colocated layout, issue #530); the guard compares
+// canonical capture paths, so resolve it to a tree first.
+const BASELINES_DIR = resolveBaselinesDir(argValue("--baselines", join(TOOL_DIR, "..", "..")));
 // Sample every Nth pixel for the stats; full-page luminance stats
 // do not need every pixel and the full set is ~2.6M px per capture.
 const STRIDE = Number(argValue("--stride", "4"));

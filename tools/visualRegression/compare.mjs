@@ -7,6 +7,7 @@
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 
+import { canonicalBaselineRel, listCommittedBaselines } from "./baselineResolver.mjs";
 import { diffImages } from "./imageDiff.mjs";
 import { decodePng } from "./png.mjs";
 
@@ -55,13 +56,35 @@ export function comparePair(config, baselinePath, actualPath, diffPath) {
   return { ok: true, ...result };
 }
 
+// The committed baselines as canonical tree entries
+// ({ rel, absPath }): from the colocated layout when the
+// baselines argument is a repo root (baselineResolver.mjs), or
+// from a canonical tree dir (an intermediate set — a staged
+// tree, a captures dir) otherwise.
+export function committedBaselineEntries(config) {
+  if (config.baselinesLayout === "repo") {
+    const { baselines, orphans } = listCommittedBaselines(config.baselinesDir);
+    if (orphans.length > 0) {
+      throw new Error(`committed baseline(s) the story index cannot place: ${orphans.join(", ")}`);
+    }
+    return baselines.map((b) => ({
+      rel: canonicalBaselineRel(b),
+      absPath: join(config.baselinesDir, b.relPath),
+    }));
+  }
+  return listPngs(config.baselinesDir).map((rel) => ({
+    rel,
+    absPath: join(config.baselinesDir, rel),
+  }));
+}
+
 export function fromDirMode(config) {
   const actualDir = config.fromDir;
-  // Standard and narrow baselines share one tree (the "-narrow"
+  // Standard and narrow baselines share one set (the "-narrow"
   // suffix tells them apart); an offline compare covers exactly
   // one set — comparing a standard capture dir against the narrow
   // baselines (or vice versa) would fail every pair on dimensions.
-  const baselineFiles = listPngs(config.baselinesDir).filter((rel) =>
+  const baselineFiles = committedBaselineEntries(config).filter(({ rel }) =>
     config.variant === "narrow" ? rel.endsWith("-narrow.png") : !rel.endsWith("-narrow.png"),
   );
   console.log(
@@ -73,7 +96,7 @@ export function fromDirMode(config) {
   }
   let failed = 0;
   let compared = 0;
-  for (const rel of baselineFiles) {
+  for (const { rel, absPath } of baselineFiles) {
     const actualPath = join(actualDir, rel);
     if (!existsSync(actualPath)) {
       console.error(`FAIL ${rel}: no actual screenshot`);
@@ -81,12 +104,7 @@ export function fromDirMode(config) {
       continue;
     }
     compared++;
-    const r = comparePair(
-      config,
-      join(config.baselinesDir, rel),
-      actualPath,
-      join(config.outDir, "diff", rel),
-    );
+    const r = comparePair(config, absPath, actualPath, join(config.outDir, "diff", rel));
     if (!r.ok) {
       console.error(
         `FAIL ${rel}: ${(r.ratio * 100).toFixed(3)}% pixels differ (${r.diffCount}/${r.total})`,
