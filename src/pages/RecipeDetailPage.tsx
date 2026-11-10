@@ -924,7 +924,7 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
 export function RecipeDetailPage(props: RecipeDetailPageProps) {
   if (props.state === "loading") {
     return (
-      <BigFooterShell footer={props.footer}>
+      <BigFooterShell footer={props.footer} scrollMode="content">
         <Center fill>
           <Spinner label="Loading recipe" />
         </Center>
@@ -935,7 +935,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
   const { status, versions, selectedVersionId, onSelectVersion } = props;
 
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} scrollMode="content">
       <ScreenShell>
         <Toolbar>
           <RecipeStatusBadge status={status} />

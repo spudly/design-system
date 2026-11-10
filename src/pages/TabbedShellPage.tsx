@@ -220,7 +220,7 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
   }
 
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} scrollMode="content">
       <ScreenContainer>
         <AppTopBar brand={{ label: title }} />
         {tabBar}

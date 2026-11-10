@@ -168,6 +168,80 @@ test("the shell reserves viewport height only when a footer is supplied", () => 
   assert.match(bigFooter, /padding: tokens\.spacing\[3\]/, "social links keep a ≥44px target");
 });
 
+test("native scroll ownership is an explicit shell mode, independent of footer data (PR #556)", () => {
+  // The mode type is a type alias (Stephen's code style) with
+  // the three owners: the shell's ScrollView (default), the
+  // page content's own list/scroll region, or an enclosing
+  // shell (nested pages opt out of scrolling entirely).
+  assert.match(
+    bigFooter,
+    /export type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/,
+  );
+  assert.match(bigFooter, /scrollMode\?: BigFooterShellScrollMode;/);
+  assert.match(bigFooter, /scrollMode = "shell"/, "the shell scroller is the default mode");
+  // Native handling comes FIRST and never consults footer
+  // data: a standalone page with no footer scrolls on native
+  // exactly like one with a footer (the footerless SignUpPage
+  // stall CodeRabbit flagged on PR #556).
+  const nativeBranch = bigFooter.indexOf("if (!isWeb)");
+  assert.ok(nativeBranch >= 0, "BigFooterShell handles native explicitly");
+  assert.ok(
+    nativeBranch < bigFooter.indexOf("if (!footer)"),
+    "the native branch precedes the web footer branch — native scrolling ignores footer data",
+  );
+  // "content" mode: a bounded frame and NO scroller, so a
+  // page's FlatList / ScrollRegion is never nested inside the
+  // shell's plain ScrollView (the RecipesPage windowing bug).
+  assert.match(
+    bigFooter,
+    /if \(scrollMode === "content"\) \{\s*return \(\s*<YStack flex=\{1\} position="relative">\s*\{children\}/,
+  );
+  // "nested" mode: the growing column only — no scroller, no
+  // bounded frame; the enclosing shell stays the scroll owner.
+  assert.match(
+    bigFooter,
+    /if \(scrollMode === "nested"\) \{\s*return \(\s*<YStack flexGrow=\{1\} flexDirection="column" position="relative">\s*\{children\}/,
+  );
+});
+
+test("list and self-scrolling pages put the shell in content mode (PR #556)", () => {
+  // Every page whose content owns native scrolling — the
+  // BoundedList catalog/verse pages and the ScrollRegion /
+  // ScrollShell pages — renders its shell in "content" mode,
+  // and the two frame pages slot self-scrolling surfaces, so
+  // they do the same. A page left in the default mode would
+  // nest its scroller inside the shell's ScrollView whenever
+  // a host supplies footer data.
+  for (const entry of [
+    "RecipesPage.tsx",
+    "DiscoverPage.tsx",
+    "MyVersesPage.tsx",
+    "VerseSearchPage.tsx",
+    "MemorizeReviewPage.tsx",
+    "RecipeFormPage.tsx",
+    "RecipeDetailPage.tsx",
+    "PublicRecipePage.tsx",
+    "AppShellPage.tsx",
+    "TabbedShellPage.tsx",
+  ]) {
+    const code = readCode(join("src", "pages", entry));
+    assert.ok(
+      code.includes('scrollMode="content"'),
+      `${entry} must render BigFooterShell with scrollMode="content"`,
+    );
+    assert.ok(
+      !/<BigFooterShell footer=\{[^}]*\}>/.test(code),
+      `${entry} still renders a modeless BigFooterShell`,
+    );
+  }
+  // A plain content page keeps the default: SignUpPage renders
+  // the shell with no scrollMode, so the shell's ScrollView
+  // owns its native scrolling with or without footer data.
+  const signUp = readCode("src/pages/SignUpPage.tsx");
+  assert.match(signUp, /<BigFooterShell footer=\{footer\}>/);
+  assert.ok(!signUp.includes("scrollMode"), "SignUpPage stays in the default shell mode");
+});
+
 test("on native the shell renders one ScrollView and no BigFooter (#547)", () => {
   // BigFooter is web-only (Stephen's #547 addendum): native uses
   // bottom navigation instead, so the native branch renders no

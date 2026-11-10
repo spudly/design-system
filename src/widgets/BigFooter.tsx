@@ -355,9 +355,43 @@ export function BigFooter({ footer }: BigFooterProps) {
   );
 }
 
+/**
+ * Who owns native scrolling for a page in the shell (#547,
+ * CodeRabbit round on PR #556):
+ *
+ * - "shell" (default): the shell's own ScrollView is the
+ *   page's single native scroller. Plain content pages —
+ *   forms, detail stacks, settings — use this mode, WITH or
+ *   WITHOUT footer data: native scrolling never depends on
+ *   whether the host supplied a footer.
+ * - "content": the page's content owns native scrolling — a
+ *   windowed list (BoundedList's FlatList) or a page-owned
+ *   scroll region (ScrollRegion / ScrollShell) inside a
+ *   bounded frame. The shell renders NO ScrollView, so the
+ *   content's scroller is never nested inside a plain
+ *   same-direction ScrollView (which breaks FlatList
+ *   windowing and pagination). List pages and self-scrolling
+ *   pages use this mode.
+ * - "nested": the page is composed inside another shell that
+ *   already owns scrolling (a hub page or frame page slotting
+ *   this page inside its own scroller / bounded frame). The
+ *   shell adds neither a scroller nor a bounded frame — just
+ *   the growing column — so the outer shell stays the sole
+ *   scroll owner.
+ *
+ * The mode is a native-only concern: on web the document
+ * scrolls the whole page in every mode (no windowing, the
+ * catalogs paginate by scroll sentinel), and the mode never
+ * changes the web layout. It is a semantic scroll-ownership
+ * prop, not a styling prop.
+ */
+export type BigFooterShellScrollMode = "shell" | "content" | "nested";
+
 export type BigFooterShellProps = {
   /** The page's footer data, when its host supplied any. */
   footer?: BigFooterData | undefined;
+  /** Who owns native scrolling; see BigFooterShellScrollMode. */
+  scrollMode?: BigFooterShellScrollMode;
   children: ReactNode;
 };
 
@@ -377,41 +411,75 @@ export type BigFooterShellProps = {
  *
  * BigFooter is WEB-ONLY (#547 addendum, Stephen 2026-11-09):
  * native never renders it — native uses bottom navigation
- * (the tab shells' tab bar) instead. On native this shell
- * renders ONE ScrollView wrapping the page content (React
- * Native has no document scroll), whose content container
- * grows to at least the available height. ScreenContainer
+ * (the tab shells' tab bar) instead. On native, React Native
+ * has no document scroll, so exactly one scroller must own
+ * the page: WHICH one is the shell's `scrollMode` (see
+ * BigFooterShellScrollMode) — the shell's own ScrollView in
+ * the default "shell" mode, the page content's own list or
+ * scroll region in "content" mode, or the enclosing shell's
+ * scroller in "nested" mode. Native scrolling is independent
+ * of footer data: a standalone page with no footer scrolls
+ * exactly like one with a footer (PR #556 review: a footerless
+ * standalone SignUpPage could not scroll at all when the
+ * scroller lived only in the footer branch). ScreenContainer
  * renders no scroller of its own on either platform (#547).
  *
- * A page whose host supplied no footer data renders NO footer
- * band and reserves NO viewport height — just a growing column
- * around its content — so a page can compose inside a shell
- * that already owns the layout (e.g. a hub page composing a
- * nested page): the outer shell is the sole layout owner and
- * the nested page adds neither a second footer nor a
- * full-viewport inner shell.
+ * On web, a page whose host supplied no footer data renders
+ * NO footer band and reserves NO viewport height — just a
+ * growing column around its content — so a page can compose
+ * inside a shell that already owns the layout (e.g. a hub
+ * page composing a nested page): the outer shell is the sole
+ * layout owner and the nested page adds neither a second
+ * footer nor a full-viewport inner shell. A page composed
+ * inside another shell's scroller on native says so with
+ * scrollMode "nested" — the same opt-out, for the platform
+ * whose scroller is explicit.
  */
-export function BigFooterShell({ footer, children }: BigFooterShellProps) {
-  if (!footer) {
-    return (
-      <YStack flexGrow={1} flexDirection="column" position="relative">
-        {children}
-      </YStack>
-    );
-  }
+export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFooterShellProps) {
   if (!isWeb) {
-    // Native (#547 addendum): no BigFooter — native uses bottom
-    // navigation (the tab shells' Tabs) instead. The shell's ONE
-    // ScrollView wraps the page content; its content container
-    // grows to at least the viewport height so short pages fill
-    // the screen exactly as the web model's space-between shell
-    // fills the viewport.
+    // Native (#547 addendum): no BigFooter in any mode — native
+    // uses bottom navigation (the tab shells' Tabs) instead.
+    if (scrollMode === "content") {
+      // The content owns scrolling (a windowed list or a
+      // page-owned scroll region): the shell is only the
+      // bounded frame that gives that scroller its height —
+      // no ScrollView of its own, so the content's scroller
+      // is never nested inside a plain ScrollView.
+      return (
+        <YStack flex={1} position="relative">
+          {children}
+        </YStack>
+      );
+    }
+    if (scrollMode === "nested") {
+      // Composed inside another shell's scroller: add neither
+      // a scroller nor a bounded frame — the outer shell is
+      // the sole scroll owner.
+      return (
+        <YStack flexGrow={1} flexDirection="column" position="relative">
+          {children}
+        </YStack>
+      );
+    }
+    // Default "shell" mode: the shell's ONE ScrollView wraps
+    // the page content, whether or not the host supplied
+    // footer data; its content container grows to at least
+    // the viewport height so short pages fill the screen
+    // exactly as the web model's space-between shell fills
+    // the viewport.
     return (
       <ScrollView flex={1} keyboardShouldPersistTaps="handled">
         <YStack flexGrow={1} minHeight="100%" position="relative">
           {children}
         </YStack>
       </ScrollView>
+    );
+  }
+  if (!footer) {
+    return (
+      <YStack flexGrow={1} flexDirection="column" position="relative">
+        {children}
+      </YStack>
     );
   }
   // Web (#547): Stephen's page-scroll model, literally — a flex

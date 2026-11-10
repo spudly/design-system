@@ -83,8 +83,10 @@ export type ScreenContainerProps = StyledContentProps & {
  *
  * Scroll model (#547, Stephen's page-scroll ruling): this
  * container renders NO scroller on either platform. On web the
- * document is the page's scroller; on native the single scroller
- * lives in BigFooterShell, which wraps the page content. The
+ * document is the page's scroller; on native the page's single
+ * scroller is owned per BigFooterShell's scroll mode — the
+ * shell's own ScrollView for plain pages, or the page content's
+ * list / scroll region for list and self-scrolling pages. The
  * pre-#547 `scrollable` prop — which wrapped the content in this
  * container's own ScrollView and produced a nested scroller
  * inside the shell's bounded region — is removed, along with

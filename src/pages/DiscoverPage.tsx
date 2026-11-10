@@ -121,7 +121,7 @@ export type DiscoverPageProps = {
 export function DiscoverPage(props: DiscoverPageProps) {
   const { footer, ...rest } = props;
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} scrollMode="content">
       <RecipesPage variant="public" {...rest} />
     </BigFooterShell>
   );

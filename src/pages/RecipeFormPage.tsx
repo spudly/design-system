@@ -255,7 +255,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
   };
 
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} scrollMode="content">
       <ScrollRegion>
         <FormStack>
           <LabeledField label="Title" fieldId="recipe-title" action={revertAction("title")}>

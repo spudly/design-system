@@ -200,7 +200,7 @@ export function VerseSearchPage({
   footer,
 }: VerseSearchPageProps) {
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">Search verses</Text>
         {usingDemo ? (

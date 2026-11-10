@@ -82,8 +82,8 @@ test("the mount gate: the handler is undefined unless pagination may run", () =>
 test("the fetch guard: the mounted handler swallows requests during a fetch", () => {
   assert.match(
     hook,
-    /const handleEndReached = \(\) => \{\s*endReachedRef\.current = true;\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
-    "the handler must latch the end and fire onLoadMore only when no fetch is in flight",
+    /const handleEndReached = \(\) => \{\s*endReachedRef\.current = true;\s*if \(wasFetchingRef\.current && !isFetchingNextPage\) \{\s*completionClaimedRef\.current = true;\s*\}\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
+    "the handler must latch the end, claim an unprocessed completion (the web sentinel's recheck), and fire onLoadMore only when no fetch is in flight",
   );
 });
 
@@ -106,8 +106,8 @@ test("the re-arm: a no-new-rows fetch completion at the end re-fires onLoadMore"
   // gate open — fire exactly once more via the latest callback.
   assert.match(
     hook,
-    /else if \(canPaginate && endReachedRef\.current && countAtFetchStart !== null\) \{\s*onLoadMoreRef\.current\?\.\(\);\s*\}/,
-    "a no-new-rows completion at the end must re-fire onLoadMore once",
+    /else if \(\s*!completionClaimed &&\s*canPaginate &&\s*endReachedRef\.current &&\s*countAtFetchStart !== null\s*\) \{\s*onLoadMoreRef\.current\?\.\(\);\s*\}/,
+    "a no-new-rows completion at the end must re-fire onLoadMore once — unless the web sentinel's recheck already claimed the completion",
   );
   // Edge bookkeeping: the previous-fetching ref is updated on
   // every pass so the edge fires once per completed fetch.
@@ -179,8 +179,14 @@ test("the unified page wires the hook's handlers to its lists and its web sentin
   assert.match(recipesPage, /onScroll=\{publicPagination\.onScroll\}/);
   // Web has no list: the scroll sentinel drives the same
   // guarded handler (#547, no windowing on web).
-  assert.match(recipesPage, /<WebScrollSentinel onVisible=\{onEndReached\} \/>/);
-  assert.match(recipesPage, /<WebScrollSentinel onVisible=\{publicPagination\.onEndReached\} \/>/);
+  assert.match(
+    recipesPage,
+    /<WebScrollSentinel\s+isFetchingNextPage=\{isFetchingNextPage\}\s+onVisible=\{onEndReached\}\s*\/>/,
+  );
+  assert.match(
+    recipesPage,
+    /<WebScrollSentinel\s+isFetchingNextPage=\{isFetchingNextPage\}\s+onVisible=\{publicPagination\.onEndReached\}\s*\/>/,
+  );
 });
 
 test("each mode counts the rows its continuation extends", () => {
@@ -220,4 +226,29 @@ test("both modes keep the loading-more footer on isFetchingNextPage", () => {
     2,
     "both native modes' list footers are the shared Center + Spinner composition, keyed off isFetchingNextPage",
   );
+});
+
+test("the web sentinel rechecks when pagination opens and when a fetch completes (PR #556)", () => {
+  // The sentinel tracks its own visibility: the observer's
+  // verdict (and the fallback's near-bottom computation) lands
+  // in a ref, because no new observer callback arrives while
+  // the sentinel simply stays within the 400px margin.
+  assert.match(recipesPage, /const visibleRef = useRef\(false\);/);
+  assert.match(recipesPage, /visibleRef\.current = visible;/);
+  assert.match(recipesPage, /visibleRef\.current = nearBottom;/);
+  // The recheck fires the latest handler once per transition:
+  // pagination becoming available (handler absent -> present)
+  // and a fetch completing (isFetchingNextPage falling).
+  assert.match(recipesPage, /const paginationAvailable = onVisible !== undefined;/);
+  assert.match(
+    recipesPage,
+    /useEffect\(\(\) => \{\s*if \(visibleRef\.current\) \{\s*callbackRef\.current\?\.\(\);\s*\}\s*\}, \[isFetchingNextPage, paginationAvailable\]\);/,
+    "the sentinel must recheck its visibility on pagination-available and fetch-completion transitions",
+  );
+  // Coordination: the hook carries the completion-claim ref the
+  // handler sets and the re-arm consults, so a completion is
+  // requested exactly once from either path.
+  assert.match(hook, /const completionClaimedRef = useRef\(false\);/);
+  assert.match(hook, /const completionClaimed = completionClaimedRef\.current;/);
+  assert.match(hook, /completionClaimedRef\.current = false;/);
 });

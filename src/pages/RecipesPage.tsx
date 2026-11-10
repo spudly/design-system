@@ -511,10 +511,36 @@ function recipesPageRowKey(row: RecipesPageRow): string {
  * (non-DOM refs), a window scroll listener performs the same
  * near-bottom check as a fallback. Native never renders this —
  * native keeps its FlatList and its end-reached signal.
+ *
+ * Recheck (PR #556 review): the observer only calls back when
+ * the sentinel's intersection CHANGES, so two stalls are
+ * possible — the first callback arrives while pagination is
+ * gated (no handler), or a fetch adds rows yet leaves the
+ * sentinel inside the 400px margin. The sentinel therefore
+ * tracks its own visibility and rechecks it whenever
+ * pagination becomes available (the handler goes from absent
+ * to present) and whenever a fetch completes
+ * (`isFetchingNextPage` falls): if it is still within the
+ * margin, it fires the handler again. The recheck coordinates
+ * with the hook's no-new-rows re-arm through the hook itself
+ * (useCatalogPagination's completion claim): a recheck fire on
+ * the completion commit claims that completion, the re-arm
+ * stands down, and the continuation is requested exactly once.
  */
-function WebScrollSentinel({ onVisible }: { onVisible?: (() => void) | undefined }) {
+function WebScrollSentinel({
+  onVisible,
+  isFetchingNextPage = false,
+}: {
+  onVisible?: (() => void) | undefined;
+  isFetchingNextPage?: boolean;
+}) {
   const ref = useRef<{ nodeType?: number } | null>(null);
   const callbackRef = useRef(onVisible);
+  // Whether the sentinel is currently within the 400px margin
+  // (the observer's last verdict, or the fallback's near-bottom
+  // computation): the recheck below consults it, because no new
+  // observer callback arrives while it simply stays true.
+  const visibleRef = useRef(false);
   useEffect(() => {
     callbackRef.current = onVisible;
   });
@@ -527,7 +553,9 @@ function WebScrollSentinel({ onVisible }: { onVisible?: (() => void) | undefined
     if (node && typeof IntersectionObserver !== "undefined" && "nodeType" in node) {
       const observer = new IntersectionObserver(
         (entries) => {
-          if (entries.some((entry) => entry.isIntersecting)) fire();
+          const visible = entries.some((entry) => entry.isIntersecting);
+          visibleRef.current = visible;
+          if (visible) fire();
         },
         { rootMargin: "400px" },
       );
@@ -539,7 +567,9 @@ function WebScrollSentinel({ onVisible }: { onVisible?: (() => void) | undefined
     if (typeof document === "undefined") return;
     const check = () => {
       const doc = document.documentElement;
-      if (doc.scrollHeight - window.innerHeight - window.scrollY <= 400) fire();
+      const nearBottom = doc.scrollHeight - window.innerHeight - window.scrollY <= 400;
+      visibleRef.current = nearBottom;
+      if (nearBottom) fire();
     };
     check();
     window.addEventListener("scroll", check, { passive: true });
@@ -549,6 +579,17 @@ function WebScrollSentinel({ onVisible }: { onVisible?: (() => void) | undefined
       window.removeEventListener("resize", check);
     };
   }, []);
+  // The recheck: pagination becoming available, or a fetch
+  // completing, can each leave a visible sentinel with no
+  // pending observer callback — fire the (guarded) handler
+  // once per such transition. Declared after the callback-ref
+  // effect above, so it always calls the latest handler.
+  const paginationAvailable = onVisible !== undefined;
+  useEffect(() => {
+    if (visibleRef.current) {
+      callbackRef.current?.();
+    }
+  }, [isFetchingNextPage, paginationAvailable]);
   if (!isWeb) return null;
   return <View ref={ref as never} style={{ height: 1 }} testID="catalog-scroll-sentinel" />;
 }
@@ -881,7 +922,7 @@ export function RecipesPage(props: RecipesPageProps) {
       // windowing — cards render in document order and the
       // scroll sentinel drives pagination.
       return (
-        <BigFooterShell footer={props.footer}>
+        <BigFooterShell footer={props.footer} scrollMode="content">
           <ScreenContainer variant="list">
             <YStack paddingHorizontal="$4" paddingBottom="$8" gap="$3">
               <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
@@ -909,16 +950,20 @@ export function RecipesPage(props: RecipesPageProps) {
                   <Spinner label="Loading" />
                 </Center>
               ) : null}
-              <WebScrollSentinel onVisible={publicPagination.onEndReached} />
+              <WebScrollSentinel
+                isFetchingNextPage={isFetchingNextPage}
+                onVisible={publicPagination.onEndReached}
+              />
             </YStack>
           </ScreenContainer>
         </BigFooterShell>
       );
     }
     // Public catalog on native: the BoundedList FlatList keeps
-    // its windowing inside the shell's single scroller model.
+    // its windowing as the page's scroll owner — the shell is
+    // in "content" mode, so no shell ScrollView wraps it.
     return (
-      <BigFooterShell footer={props.footer}>
+      <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
           <BoundedList
             separator="md"
@@ -972,7 +1017,7 @@ export function RecipesPage(props: RecipesPageProps) {
     // handler the FlatList's end-reached signal uses on
     // native, so the shared pagination pattern is unchanged).
     return (
-      <BigFooterShell footer={props.footer}>
+      <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
           <YStack paddingHorizontal="$4" paddingBottom="$8">
             {filtersBar}
@@ -984,15 +1029,18 @@ export function RecipesPage(props: RecipesPageProps) {
                 <Spinner label="Loading" />
               </Center>
             ) : null}
-            <WebScrollSentinel onVisible={onEndReached} />
+            <WebScrollSentinel isFetchingNextPage={isFetchingNextPage} onVisible={onEndReached} />
           </YStack>
         </ScreenContainer>
       </BigFooterShell>
     );
   }
 
+  // Signed-in catalog on native: the BoundedList FlatList is
+  // the scroll owner, exactly as in public mode — the shell's
+  // "content" mode keeps it outside any shell ScrollView.
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} scrollMode="content">
       <ScreenContainer variant="list">
         <BoundedList
           separator="none"

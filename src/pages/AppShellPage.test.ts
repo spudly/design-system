@@ -133,7 +133,7 @@ test("the page composes DS components only and never touches the boundary itself
   // page by src/widgets/BigFooter.test.ts): an optional footer prop
   // rendered through the shell — no data, no footer band.
   assert.match(page, /footer\?: BigFooterData;/);
-  assert.match(page, /<BigFooterShell footer=\{footer\}>/);
+  assert.match(page, /<BigFooterShell footer=\{footer\} scrollMode="content">/);
 });
 
 test("the top bar is one shared chrome: TabbedShellPage renders it too", () => {

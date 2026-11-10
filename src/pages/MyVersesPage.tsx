@@ -148,7 +148,7 @@ function MyVerseRow({
  */
 export function MyVersesPage({ verses, onRemoveVerse, footer }: MyVersesPageProps) {
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">My verses</Text>
         {verses.length === 0 ? (
