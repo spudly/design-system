@@ -263,8 +263,13 @@ test("the web sentinel rechecks when pagination opens and when a fetch completes
   );
   assert.match(
     recipesPage,
-    /requestedRef\.current = false;/,
-    "the latch must clear when the sentinel leaves the margin and when the fetch state changes",
+    /if \(fetchingChanged\) \{\s*requestedRef\.current = false;\s*\}/,
+    "the latch must clear when the fetch state changes",
+  );
+  assert.equal(
+    recipesPage.match(/\} else \{\s*requestedRef\.current = false;\s*\}/g)?.length,
+    2,
+    "the latch must clear when the sentinel leaves the margin (observer and fallback paths)",
   );
   // Coordination: the hook carries the completion-claim ref the
   // handler sets and the re-arm consults, so a completion is
