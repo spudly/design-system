@@ -526,6 +526,19 @@ function recipesPageRowKey(row: RecipesPageRow): string {
  * (useCatalogPagination's completion claim): a recheck fire on
  * the completion commit claims that completion, the re-arm
  * stands down, and the continuation is requested exactly once.
+ *
+ * Deduplication (PR #556 review, round 2): every notification
+ * path — the observer, the no-observer fallback's near-bottom
+ * check, and the recheck — goes through ONE latched fire: a
+ * visibility episode may request a continuation only once,
+ * until the sentinel leaves the margin or the fetch state
+ * changes. Without the latch the fallback's mount-time check
+ * and the recheck effect's mount run both fired before the
+ * host could commit `isFetchingNextPage`, requesting the same
+ * continuation twice — and a host that omits the fetching
+ * flag had no guard against it at all. The latch never
+ * assumes that flag: a host that omits it simply gets one
+ * request per visibility episode.
  */
 function WebScrollSentinel({
   onVisible,
@@ -541,21 +554,37 @@ function WebScrollSentinel({
   // computation): the recheck below consults it, because no new
   // observer callback arrives while it simply stays true.
   const visibleRef = useRef(false);
+  // Whether this visibility episode has already requested its
+  // continuation: the dedup latch every notification path
+  // shares (see the header). Cleared when the sentinel leaves
+  // the margin and when the fetch state changes, so each new
+  // episode — and each completed fetch — may request once more.
+  const requestedRef = useRef(false);
+  // The one latched fire: a no-op while no handler is mounted
+  // (pagination gated — that absence must NOT latch, or the
+  // recheck on pagination becoming available could not fire)
+  // and a no-op once this episode has already requested.
+  const fire = () => {
+    if (!callbackRef.current || requestedRef.current) return;
+    requestedRef.current = true;
+    callbackRef.current();
+  };
   useEffect(() => {
     callbackRef.current = onVisible;
   });
   useEffect(() => {
     if (!isWeb || typeof window === "undefined") return;
-    const fire = () => {
-      callbackRef.current?.();
-    };
     const node = ref.current as unknown as Element | null;
     if (node && typeof IntersectionObserver !== "undefined" && "nodeType" in node) {
       const observer = new IntersectionObserver(
         (entries) => {
           const visible = entries.some((entry) => entry.isIntersecting);
           visibleRef.current = visible;
-          if (visible) fire();
+          if (visible) {
+            fire();
+          } else {
+            requestedRef.current = false;
+          }
         },
         { rootMargin: "400px" },
       );
@@ -569,7 +598,11 @@ function WebScrollSentinel({
       const doc = document.documentElement;
       const nearBottom = doc.scrollHeight - window.innerHeight - window.scrollY <= 400;
       visibleRef.current = nearBottom;
-      if (nearBottom) fire();
+      if (nearBottom) {
+        fire();
+      } else {
+        requestedRef.current = false;
+      }
     };
     check();
     window.addEventListener("scroll", check, { passive: true });
@@ -580,14 +613,30 @@ function WebScrollSentinel({
     };
   }, []);
   // The recheck: pagination becoming available, or a fetch
-  // completing, can each leave a visible sentinel with no
-  // pending observer callback — fire the (guarded) handler
-  // once per such transition. Declared after the callback-ref
-  // effect above, so it always calls the latest handler.
+  // state change, can each leave a visible sentinel with no
+  // pending observer callback — fire the latched handler once
+  // per such TRANSITION. The previous values are tracked so
+  // the effect's mount run is not itself a transition: at
+  // mount the fallback check above has already fired for this
+  // episode, and a second mount fire is exactly the duplicate
+  // round 2 flagged. A fetch-state change clears the latch
+  // first, so a completed fetch may request its continuation
+  // even while the sentinel never left the margin. Declared
+  // after the callback-ref effect above, so it always calls
+  // the latest handler.
   const paginationAvailable = onVisible !== undefined;
+  const prevFetchingRef = useRef(isFetchingNextPage);
+  const prevAvailableRef = useRef(paginationAvailable);
   useEffect(() => {
-    if (visibleRef.current) {
-      callbackRef.current?.();
+    const fetchingChanged = prevFetchingRef.current !== isFetchingNextPage;
+    const availableChanged = prevAvailableRef.current !== paginationAvailable;
+    prevFetchingRef.current = isFetchingNextPage;
+    prevAvailableRef.current = paginationAvailable;
+    if (fetchingChanged) {
+      requestedRef.current = false;
+    }
+    if ((fetchingChanged || availableChanged) && visibleRef.current) {
+      fire();
     }
   }, [isFetchingNextPage, paginationAvailable]);
   if (!isWeb) return null;

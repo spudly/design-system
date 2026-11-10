@@ -242,6 +242,43 @@ test("list and self-scrolling pages put the shell in content mode (PR #556)", ()
   assert.ok(!signUp.includes("scrollMode"), "SignUpPage stays in the default shell mode");
 });
 
+test("composed pages keep exactly one native scroll owner (PR #556 round 2)", () => {
+  // MealsHubPage plans tab: the hub shell is a content-mode
+  // bounded frame, so MealPlansPage's own shell ScrollView is
+  // the tab's single native scroller and the pinned header
+  // stays outside it. (The meals tab keeps the default shell:
+  // its plain ScreenContainer content has no scroller of its
+  // own.)
+  const mealsHub = readCode("src/pages/MealsHubPage.tsx");
+  assert.match(
+    mealsHub,
+    /<BigFooterShell footer=\{footer\} scrollMode="content">\s*<PinnedHeaderShell/,
+    "the plans tab's hub shell must be content mode",
+  );
+  // The form-shell pages compose RecipeFormPage, whose
+  // ScrollRegion is the screen's single native scroller: their
+  // shells are content-mode frames, never a second ScrollView
+  // around the region. EditVersionPage's not-editable state
+  // renders no form, so that branch keeps the default shell.
+  for (const entry of ["EditRecipePage.tsx", "ManualEntryPage.tsx"]) {
+    const code = readCode(join("src", "pages", entry));
+    assert.ok(
+      code.includes('<BigFooterShell footer={footer} scrollMode="content">'),
+      `${entry} must render its shell in content mode`,
+    );
+  }
+  const editVersion = readCode("src/pages/EditVersionPage.tsx");
+  assert.ok(
+    editVersion.includes('<BigFooterShell footer={props.footer} scrollMode="content">'),
+    "EditVersionPage's editable branch must render its shell in content mode",
+  );
+  assert.match(
+    editVersion,
+    /<BigFooterShell footer=\{props\.footer\}>\s*<ScreenContainer>\s*<Text variant="error">/,
+    "EditVersionPage's not-editable branch keeps the default shell — it renders no form",
+  );
+});
+
 test("on native the shell renders one ScrollView and no BigFooter (#547)", () => {
   // BigFooter is web-only (Stephen's #547 addendum): native uses
   // bottom navigation instead, so the native branch renders no
@@ -286,7 +323,7 @@ test("composed pages and stories render exactly one footer", () => {
   const mealsHub = readCode("src/pages/MealsHubPage.tsx");
   assert.match(
     mealsHub,
-    /<BigFooterShell footer=\{footer\}>\s*<PinnedHeaderShell[\s\S]*?<MealPlansPage/,
+    /<BigFooterShell footer=\{footer\} scrollMode="content">\s*<PinnedHeaderShell[\s\S]*?<MealPlansPage/,
     "the plans tab's footer shell encloses the pinned header and MealPlansPage",
   );
   assert.doesNotMatch(

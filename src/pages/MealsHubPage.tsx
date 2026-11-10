@@ -143,9 +143,16 @@ export function MealsHubPage({
     // NO footer here: with no footer data its own shell is just
     // the growing column, and its ScreenContainer keeps the
     // bounded scroll region under the header inside the hub's
-    // shell — exactly one footer renders on this tab.
+    // shell — exactly one footer renders on this tab. Native
+    // scroll ownership (PR #556 review): the hub shell is in
+    // "content" mode — a bounded frame with NO ScrollView — so
+    // MealPlansPage's own shell ScrollView is the plans tab's
+    // single native scroller and the pinned header stays
+    // outside it (PinnedHeaderShell holds it above the content
+    // region). Two default shells here rendered two nested
+    // ScrollViews on native.
     return (
-      <BigFooterShell footer={footer}>
+      <BigFooterShell footer={footer} scrollMode="content">
         <PinnedHeaderShell header={<SectionStack>{hubChrome}</SectionStack>}>
           <MealPlansPage
             plans={plans}

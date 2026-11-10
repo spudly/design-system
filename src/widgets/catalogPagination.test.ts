@@ -242,8 +242,29 @@ test("the web sentinel rechecks when pagination opens and when a fetch completes
   assert.match(recipesPage, /const paginationAvailable = onVisible !== undefined;/);
   assert.match(
     recipesPage,
-    /useEffect\(\(\) => \{\s*if \(visibleRef\.current\) \{\s*callbackRef\.current\?\.\(\);\s*\}\s*\}, \[isFetchingNextPage, paginationAvailable\]\);/,
-    "the sentinel must recheck its visibility on pagination-available and fetch-completion transitions",
+    /const fetchingChanged = prevFetchingRef\.current !== isFetchingNextPage;/,
+    "the recheck must track the previous fetching state so only real transitions fire",
+  );
+  assert.match(
+    recipesPage,
+    /if \(\(fetchingChanged \|\| availableChanged\) && visibleRef\.current\) \{\s*fire\(\);\s*\}/,
+    "the sentinel must recheck its visibility on pagination-available and fetch-completion transitions — and not on mount",
+  );
+  // Deduplication (round 2): every notification path shares
+  // ONE latched fire, so the fallback's mount-time check and
+  // the recheck cannot both request the same continuation
+  // before the host commits isFetchingNextPage — including
+  // hosts that omit the fetching flag entirely.
+  assert.match(recipesPage, /const requestedRef = useRef\(false\);/);
+  assert.match(
+    recipesPage,
+    /const fire = \(\) => \{\s*if \(!callbackRef\.current \|\| requestedRef\.current\) return;\s*requestedRef\.current = true;\s*callbackRef\.current\(\);\s*\};/,
+    "the latched fire must no-op without a handler (gated absence must not latch) and after this episode's one request",
+  );
+  assert.match(
+    recipesPage,
+    /requestedRef\.current = false;/,
+    "the latch must clear when the sentinel leaves the margin and when the fetch state changes",
   );
   // Coordination: the hook carries the completion-claim ref the
   // handler sets and the re-arm consults, so a completion is

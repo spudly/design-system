@@ -63,7 +63,7 @@ export function EditVersionPage(props: EditVersionPageProps) {
   }
 
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">{`Edit Draft (v${versionNumber})`}</Text>
         {showImportBanner && parentVersionNumber !== undefined ? (
