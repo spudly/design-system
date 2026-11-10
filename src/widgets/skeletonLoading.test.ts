@@ -264,7 +264,7 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   // RecipesPage's loading props are the qualified forms since
   // #415 (one per section of the unified page): loading +
   // qualifier, never isLoading.
-  assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingOwn: boolean/);
+  assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
   assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
   assert.match(read("src/pages/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
   assert.match(read("src/widgets/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);

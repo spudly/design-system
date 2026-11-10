@@ -81,11 +81,11 @@ test("no app imports: every import is react-native, tamagui, a DS component or v
   }
 });
 
-test("the shell is the non-scrolling ScreenContainer", () => {
+test("the shell is the plain ScreenContainer (#547: no scroller in the container)", () => {
   assert.match(
     code,
-    /<ScreenContainer\s+scrollable=\{false\}>/,
-    "VerseSearchPage must render <ScreenContainer scrollable={false}>, the app shell's container",
+    /<ScreenContainer>/,
+    "VerseSearchPage must render the plain <ScreenContainer>, the app shell's container (#547)",
   );
 });
 

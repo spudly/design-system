@@ -135,78 +135,74 @@ test("the end latch is live: scroll metrics set and clear it with the shared thr
   );
 });
 
-const catalogPages = [
-  ["RecipesPage", recipesPage],
-  ["DiscoverPage", discoverPage],
-];
-
-test("both catalog pages call the shared hook with the same shape", () => {
-  for (const [name, page] of catalogPages) {
-    assert.match(
-      page,
-      /import \{ useCatalogPagination \} from "\.\/useCatalogPagination\.js";/,
-      `${name} must import the shared hook`,
-    );
-    assert.match(
-      page,
-      /onLoadMore,\s*isFetchingNextPage,/,
-      `${name} must pass onLoadMore and isFetchingNextPage to the hook`,
-    );
-    assert.match(
-      page,
-      /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{/,
-      `${name} must take the hook's handlers and threshold`,
-    );
-    assert.ok(
-      !page.includes("handleEndReached"),
-      `${name} must not define a local end-reached handler — the pattern is shared`,
-    );
-  }
+// #547: the two catalogs are ONE page component — RecipesPage
+// implements both modes and DiscoverPage delegates to it — so
+// the per-page pins below run against RecipesPage's two modes,
+// plus a delegation pin on the wrapper.
+test("the unified catalog page calls the shared hook for both modes (#547)", () => {
+  assert.match(
+    recipesPage,
+    /import \{ useCatalogPagination \} from "\.\/useCatalogPagination\.js";/,
+    "RecipesPage must import the shared hook",
+  );
+  assert.match(
+    recipesPage,
+    /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{/,
+    "the signed-in mode takes the hook's handlers and threshold",
+  );
+  assert.match(
+    recipesPage,
+    /const publicPagination = useCatalogPagination\(\{/,
+    "the public mode calls the same shared hook (#547)",
+  );
+  assert.equal(
+    recipesPage.match(/onLoadMore,\s*isFetchingNextPage,/g)?.length,
+    2,
+    "both modes pass onLoadMore and isFetchingNextPage to the hook",
+  );
+  assert.ok(
+    !recipesPage.includes("handleEndReached"),
+    "the page must not define a local end-reached handler — the pattern is shared",
+  );
+  assert.match(
+    discoverPage,
+    /<RecipesPage variant="public"/,
+    "DiscoverPage delegates to the unified page's public variant (#547)",
+  );
 });
 
-test("both catalog pages wire the hook's handlers and threshold to their lists", () => {
-  for (const [name, page] of catalogPages) {
-    assert.match(
-      page,
-      /onEndReached=\{onEndReached\}/,
-      `${name} must wire the hook's handler to its list`,
-    );
-    assert.match(
-      page,
-      /onScroll=\{onScroll\}/,
-      `${name} must wire the hook's scroll handler so the end latch stays live`,
-    );
-    assert.match(
-      page,
-      /onEndReachedThreshold=\{onEndReachedThreshold\}/,
-      `${name} must use the hook's threshold for the list's own signal`,
-    );
-  }
+test("the unified page wires the hook's handlers to its lists and its web sentinel (#547)", () => {
+  assert.match(recipesPage, /onEndReached=\{onEndReached\}/);
+  assert.match(recipesPage, /onScroll=\{onScroll\}/);
+  assert.match(recipesPage, /onEndReachedThreshold=\{onEndReachedThreshold\}/);
+  assert.match(recipesPage, /onEndReached=\{publicPagination\.onEndReached\}/);
+  assert.match(recipesPage, /onScroll=\{publicPagination\.onScroll\}/);
+  // Web has no list: the scroll sentinel drives the same
+  // guarded handler (#547, no windowing on web).
+  assert.match(recipesPage, /<WebScrollSentinel onVisible=\{onEndReached\} \/>/);
+  assert.match(recipesPage, /<WebScrollSentinel onVisible=\{publicPagination\.onEndReached\} \/>/);
 });
 
-test("each page counts the rows its continuation extends", () => {
-  // DiscoverPage's continuation extends its one list; the
-  // unified RecipesPage's continuation is its discovery
-  // section's, so it counts the discovery rows (#415).
-  assert.match(discoverPage, /itemCount: recipes\.length,/);
+test("each mode counts the rows its continuation extends", () => {
+  // The public mode's continuation extends its one list; the
+  // signed-in mode's continuation is its discovery section's,
+  // so it counts the discovery rows (#415).
+  assert.match(recipesPage, /itemCount: publicRecipes !== undefined \? publicRecipes\.length : 0,/);
   assert.match(
     recipesPage,
     /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,/,
   );
 });
 
-test("each page's mount gate matches its states", () => {
-  // DiscoverPage gates on its first load and its error state;
-  // the unified RecipesPage gates on BOTH sections' first
-  // loads and its discovery section's error state (#415 — the
-  // own section has an error state too now, but it does not
-  // gate the discovery continuation). Since #512 the gate also
-  // requires the discovery section to be supplied at all.
+test("each mode's mount gate matches its states", () => {
   assert.match(
     recipesPage,
     /canPaginate:\s*hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,\s*\}\);/,
   );
-  assert.match(discoverPage, /canPaginate: !loading && !errorMessage,\s*\}\);/);
+  assert.match(
+    recipesPage,
+    /canPaginate: variant === "public" && !publicLoading && !publicErrorMessage,/,
+  );
 });
 
 test("RecipesPage no longer wires the plain stalling handler", () => {
@@ -216,18 +212,12 @@ test("RecipesPage no longer wires the plain stalling handler", () => {
   );
 });
 
-test("both pages keep the loading-more footer on isFetchingNextPage", () => {
-  assert.match(
-    recipesPage,
-    /ListFooterComponent={\s*isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/,
-    "RecipesPage's footer is the shared Center + Spinner composition, keyed off isFetchingNextPage",
-  );
-  // DiscoverPage renders the shared Center + Spinner composition directly
-  // in the same form (#320 removed the ListLoadingFooter
-  // middleman).
-  assert.match(
-    discoverPage,
-    /ListFooterComponent={\s*isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/,
-    "DiscoverPage's footer is the shared Center + Spinner composition, keyed off isFetchingNextPage",
+test("both modes keep the loading-more footer on isFetchingNextPage", () => {
+  const footerPattern =
+    /ListFooterComponent=\{\s*isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/g;
+  assert.equal(
+    recipesPage.match(footerPattern)?.length,
+    2,
+    "both native modes' list footers are the shared Center + Spinner composition, keyed off isFetchingNextPage",
   );
 });

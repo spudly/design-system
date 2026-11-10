@@ -87,9 +87,21 @@ const preview: Preview = {
           defaultTheme={theme}
         >
           <FontStackSync theme={theme} />
-          <YStack backgroundColor="$background" padding={24} style={{ minHeight: "100vh" }}>
-            <Story />
-          </YStack>
+          {context.title.startsWith("Pages/") ? (
+            // Page stories (#547): full-bleed — the page shell
+            // owns the viewport exactly as in an app, with no
+            // padded 100vh wrapper around it (that wrapper was
+            // half of the #547 Storybook overlap: a 100dvh page
+            // shell nested inside a padded viewport-height
+            // decorator mis-measured its height distribution).
+            <YStack backgroundColor="$background">
+              <Story />
+            </YStack>
+          ) : (
+            <YStack backgroundColor="$background" padding={24} style={{ minHeight: "100vh" }}>
+              <Story />
+            </YStack>
+          )}
         </TamaguiProvider>
       );
     },

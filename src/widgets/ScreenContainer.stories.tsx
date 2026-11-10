@@ -8,7 +8,6 @@ const meta: Meta<typeof ScreenContainer> = {
   title: "Widgets/ScreenContainer",
   component: ScreenContainer,
   argTypes: {
-    scrollable: { control: "boolean" },
     variant: {
       control: "select",
       options: ["default", "padded", "list", "auth"],
@@ -58,7 +57,7 @@ export const Scrollable: Story = {
 
 export const NotScrollable: Story = {
   render: (args) => (
-    <ScreenContainer {...args} scrollable={false}>
+    <ScreenContainer {...args}>
       <Text variant="heading">Sign in</Text>
       <Text variant="hint">Fixed-height content, no scroll view.</Text>
     </ScreenContainer>
@@ -79,7 +78,7 @@ export const Padded: Story = {
 export const List: Story = {
   render: (args) => (
     <YStack height={400} borderWidth={1} borderColor="#ccc" borderStyle="dashed">
-      <ScreenContainer {...args} variant="list" scrollable={false}>
+      <ScreenContainer {...args} variant="list">
         <Text variant="body">Flush shell — the list manages its own padding.</Text>
         <Card>
           <Text variant="body">Row one</Text>
@@ -95,7 +94,7 @@ export const List: Story = {
 export const Auth: Story = {
   render: (args) => (
     <YStack height={400} borderWidth={1} borderColor="#ccc" borderStyle="dashed">
-      <ScreenContainer {...args} variant="auth" scrollable={false}>
+      <ScreenContainer {...args} variant="auth">
         <Text variant="heading">Welcome back</Text>
         <Text variant="hint">Surface shell with the large auth top offset.</Text>
       </ScreenContainer>

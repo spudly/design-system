@@ -70,27 +70,24 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   assert.match(bigFooter, /export const BIG_FOOTER_STACK_BREAKPOINT = 640;/);
   assert.match(bigFooter, /flexBasis=\{BIG_FOOTER_COLUMN_BASIS\}/);
   assert.match(bigFooter, /flexWrap="wrap"/);
-  // Sticky: full-viewport-height column, content grows, footer last.
-  // The minimum height is platform-specific (PR #413 review): 100dvh
+  // Page-scroll model (#547): the web shell is a flex column with
+  // minHeight 100dvh and justifyContent "space-between" and
+  // exactly two children — the page content and the footer. The
+  // minimum height is platform-specific (PR #413 review): 100dvh
   // on web, 100% of the parent's available height by default —
   // React Native does not support viewport units for minHeight.
-  assert.match(
-    bigFooter,
-    /<YStack minHeight=\{\{ default: "100%", web: "100dvh" \}\} flexDirection="column">/,
-  );
+  assert.match(bigFooter, /minHeight=\{\{ default: "100%", web: "100dvh" \}\}/);
+  assert.match(bigFooter, /justifyContent="space-between"/);
   assert.ok(
     !/<YStack minHeight="100dvh"/.test(bigFooter),
     "the shell must not pass a raw 100dvh minHeight to native",
   );
-  assert.match(bigFooter, /flexGrow=\{1\}/);
-  // Bounded content region (PR #413 review): the region the list /
-  // scroll child fills carries an intrinsic flex basis (shrink 1,
-  // basis "auto"), so it participates in shrink allocation and
-  // keeps a content viewport even when the native footer is
-  // taller than the screen (a zero basis could allocate it zero
-  // height); and the region is the positioned ancestor, so an
-  // absolute-fill child (StepOverlay) cannot cover the footer.
-  assert.match(bigFooter, /flexShrink=\{1\} flexBasis="auto" position="relative"/);
+  // The content child is the positioned ancestor, so an
+  // absolute-fill child (StepOverlay) cannot cover the footer;
+  // there is no bounded flex region allocating it a height
+  // (#547 removed the bounded region and its nested scroller).
+  assert.match(bigFooter, /<YStack position="relative">\{children\}<\/YStack>/);
+  assert.ok(!/flexBasis="auto"/.test(bigFooter), "the bounded content region is gone (#547)");
   assert.ok(!/position="(fixed|absolute)"/.test(bigFooter), "the footer is in flow, never pinned");
 });
 
@@ -171,46 +168,28 @@ test("the shell reserves viewport height only when a footer is supplied", () => 
   assert.match(bigFooter, /padding: tokens\.spacing\[3\]/, "social links keep a ≥44px target");
 });
 
-test("on native a tall footer keeps a scroll path of its own (PR #413 review)", () => {
-  // The defect: on native the shell places the footer OUTSIDE the
-  // content region's scroll paths (a BoundedList FlatList inside a
-  // non-scrolling ScreenContainer, or ScreenContainer's own
-  // ScrollView) and native has no document scroll, so a stacked
-  // footer taller than the remaining screen space extended past
-  // the visible area with its lower links unreachable.
-  //
-  // Web renders the footer bare — the document scrolls the whole
-  // shell, so the footer is already reachable there.
-  assert.match(bigFooter, /isWeb \? \(\s*<BigFooter footer=\{footer\} \/>/);
-  // Native renders it inside the footer's OWN bounded scroll
-  // region: intrinsic height when it fits (flexGrow 0, so the
-  // sticky placement is unchanged), shrinkable below it
-  // (flexShrink 1) so the region caps at the available space and
-  // the lower links scroll into reach.
+test("on native the shell renders one ScrollView and no BigFooter (#547)", () => {
+  // BigFooter is web-only (Stephen's #547 addendum): native uses
+  // bottom navigation instead, so the native branch renders no
+  // BigFooter at all. Native has no document scroll, so the
+  // shell renders ONE ScrollView wrapping the page content —
+  // the page's single scroller — whose content container grows
+  // to at least the available height.
+  assert.match(bigFooter, /if \(!isWeb\) \{/);
   assert.match(
     bigFooter,
-    /<ScrollView flexGrow=\{0\} flexShrink=\{1\} keyboardShouldPersistTaps="handled">\s*<BigFooter footer=\{footer\} \/>\s*<\/ScrollView>/,
+    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">\s*<YStack flexGrow=\{1\} minHeight="100%" position="relative">\s*\{children\}/,
   );
-  assert.match(bigFooter, /import \{[^}]*ScrollView[^}]*isWeb[^}]*\} from "tamagui";/);
-  // The scroll path wraps ONLY the footer: the shell's children
-  // (and any BoundedList inside them) never sit inside this
-  // ScrollView, so list windowing and end-reached pagination are
-  // untouched — the file's one ScrollView is the footer region.
   assert.equal(
     (bigFooter.match(/<ScrollView/g) ?? []).length,
     1,
-    "BigFooterShell's only ScrollView is the native footer region",
+    "BigFooterShell's only ScrollView is the native shell scroller",
   );
-  assert.ok(
-    !/<ScrollView[^>]*>\s*\{children\}/.test(bigFooter),
-    "the shell's children are not wrapped in a ScrollView",
-  );
-  // Exactly one footer renders per platform: the two source
-  // occurrences are the web and native branches of one shell.
+  // Exactly one BigFooter renders, in the web branch only.
   assert.equal(
     (bigFooter.match(/<BigFooter footer=\{footer\} \/>/g) ?? []).length,
-    2,
-    "the shell renders BigFooter once per platform branch, never twice",
+    1,
+    "the shell renders BigFooter once, on web only (#547)",
   );
 });
 

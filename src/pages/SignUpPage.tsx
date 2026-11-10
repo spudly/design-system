@@ -67,7 +67,7 @@ export function SignUpPage({
 }: SignUpPageProps) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false} variant="auth">
+      <ScreenContainer variant="auth">
         <SectionStack>
           <Text variant="heading">Create account</Text>
           <SignUpForm

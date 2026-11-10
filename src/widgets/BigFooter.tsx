@@ -362,78 +362,34 @@ export type BigFooterShellProps = {
 };
 
 /**
- * The sticky-footer page shell (#410, Stephen's addendum): a
- * full-viewport-height column with the page content as the
- * bounded region and BigFooter last in flow. On a short page
- * the footer sits at the viewport bottom (the empty space is
- * above it, never below); on a long page it scrolls naturally
- * after the content. This is in-flow layout, never
- * fixed/absolute pinning. Every page renders through this
- * shell with no opt-outs; a page whose host supplied no footer
- * data renders NO footer band and reserves NO viewport height —
- * just a growing column around its content — until the host
- * supplies it. That is what lets a page compose inside a shell
- * that already owns the layout and the one footer (e.g. a hub
- * page composing a nested page): the outer shell is the sole
- * footer owner and the nested page adds neither a second footer
- * nor a full-viewport inner shell.
+ * The page shell (#547, Stephen's page-scroll model): on web the
+ * entire page is a flex container with `minHeight: 100dvh` and
+ * `justifyContent: "space-between"` and exactly two children —
+ * the page content and the BigFooter. If the page (including
+ * the footer) is shorter than the viewport, the footer is
+ * pushed to the bottom; if it is longer, the document scrolls
+ * the whole page — whole-page scroll, no nested scroller, and
+ * the footer is always in flow, never fixed/absolute. The
+ * content child keeps `position: "relative"` so an
+ * absolutely-positioned full-region child (StepOverlay in
+ * MealCookingModePage's ready state) anchors to the content
+ * area above the footer.
  *
- * Platform height (CodeRabbit review, PR #413): the minimum
- * height is platform-specific — `100dvh` on web, `100%` (the
- * parent layout's available height) by default — because React
- * Native does not support viewport units for `minHeight`; a
- * raw `100dvh` on native can fail to reserve the viewport
- * height a short page needs to place the footer at the bottom.
+ * BigFooter is WEB-ONLY (#547 addendum, Stephen 2026-11-09):
+ * native never renders it — native uses bottom navigation
+ * (the tab shells' tab bar) instead. On native this shell
+ * renders ONE ScrollView wrapping the page content (React
+ * Native has no document scroll), whose content container
+ * grows to at least the available height. ScreenContainer
+ * renders no scroller of its own on either platform (#547).
  *
- * Bounded content region (CodeRabbit review, PR #413): the
- * content region is a flex region with an intrinsic basis
- * (flexGrow 1 / flexShrink 1 / flexBasis "auto"). A
- * self-bounding child — a BoundedList FlatList inside a
- * non-scrolling ScreenContainer (RecipesPage, DiscoverPage),
- * or a ScrollView — therefore fills the space the shell
- * leaves above the footer and scrolls inside it, so the
- * footer stays reachable on bounded screens instead of
- * sitting below a list that grew to its full content height
- * with nothing left to scroll. The intrinsic basis matters
- * when the footer is tall: with a zero basis the content
- * region could be allocated zero height on a short native
- * screen (a BoundedList would get a zero-height viewport),
- * while "auto" lets it participate in the shrink allocation
- * and preserve a content viewport. Content that is not
- * itself a scroll region keeps its intrinsic size (flex
- * items do not shrink below their content), so long in-flow
- * pages still push the shell taller and the footer follows
- * the content.
- *
- * Native footer scroll path (CodeRabbit review, PR #413): on
- * native the footer renders inside its own bounded scroll
- * region — a ScrollView that takes the footer's intrinsic
- * height when it fits (flexGrow 0) but can shrink below it
- * (flexShrink 1). When a stacked
- * footer alone is taller than a short or landscape screen
- * leaves for it, the footer region caps at the space the
- * shell leaves it and the footer's lower links stay reachable
- * by scrolling the footer itself; when it fits, the sticky
- * placement is unchanged. Web needs no such region: the
- * document scrolls the whole shell, so the footer renders
- * bare there and the same links stay reachable. The scroll
- * path is the footer's OWN region, never a scroll view around
- * the shell: wrapping the shell would nest a BoundedList
- * page's FlatList inside a same-direction ScrollView,
- * breaking its windowing and end-reached pagination (and a
- * ScreenContainer page's own ScrollView likewise). The footer
- * region contains only the footer's links — no virtualized
- * list — so it nests safely beside those scroll paths, list
- * pagination is untouched, and exactly one footer renders on
- * every platform.
- *
- * Positioned region (CodeRabbit review, PR #413): the content
- * region is the positioned ancestor for its children
- * (position="relative"), so an absolutely-positioned
- * full-region child (StepOverlay in MealCookingModePage's ready
- * state) fills the content region above the footer instead of
- * escaping to a higher positioned ancestor and covering the
- * footer's links.
+ * A page whose host supplied no footer data renders NO footer
+ * band and reserves NO viewport height — just a growing column
+ * around its content — so a page can compose inside a shell
+ * that already owns the layout (e.g. a hub page composing a
+ * nested page): the outer shell is the sole layout owner and
+ * the nested page adds neither a second footer nor a
+ * full-viewport inner shell.
  */
 export function BigFooterShell({ footer, children }: BigFooterShellProps) {
   if (!footer) {
@@ -443,18 +399,36 @@ export function BigFooterShell({ footer, children }: BigFooterShellProps) {
       </YStack>
     );
   }
+  if (!isWeb) {
+    // Native (#547 addendum): no BigFooter — native uses bottom
+    // navigation (the tab shells' Tabs) instead. The shell's ONE
+    // ScrollView wraps the page content; its content container
+    // grows to at least the viewport height so short pages fill
+    // the screen exactly as the web model's space-between shell
+    // fills the viewport.
+    return (
+      <ScrollView flex={1} keyboardShouldPersistTaps="handled">
+        <YStack flexGrow={1} minHeight="100%" position="relative">
+          {children}
+        </YStack>
+      </ScrollView>
+    );
+  }
+  // Web (#547): Stephen's page-scroll model, literally — a flex
+  // column with minHeight 100dvh and justifyContent
+  // "space-between" and exactly two children: the page content
+  // (positioned, so absolute overlays anchor above the footer)
+  // and the BigFooter. Short page: the footer is pushed to the
+  // viewport bottom. Long page: the document scrolls the whole
+  // page — there is no nested scroller.
   return (
-    <YStack minHeight={{ default: "100%", web: "100dvh" }} flexDirection="column">
-      <YStack flexGrow={1} flexShrink={1} flexBasis="auto" position="relative">
-        {children}
-      </YStack>
-      {isWeb ? (
-        <BigFooter footer={footer} />
-      ) : (
-        <ScrollView flexGrow={0} flexShrink={1} keyboardShouldPersistTaps="handled">
-          <BigFooter footer={footer} />
-        </ScrollView>
-      )}
+    <YStack
+      minHeight={{ default: "100%", web: "100dvh" }}
+      flexDirection="column"
+      justifyContent="space-between"
+    >
+      <YStack position="relative">{children}</YStack>
+      <BigFooter footer={footer} />
     </YStack>
   );
 }

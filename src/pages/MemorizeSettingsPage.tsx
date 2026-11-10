@@ -62,7 +62,7 @@ export type MemorizeSettingsPageProps = {
 export function MemorizeSettingsPage({ footer }: MemorizeSettingsPageProps) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false}>
+      <ScreenContainer>
         <Text variant="heading">Settings</Text>
       </ScreenContainer>
     </BigFooterShell>

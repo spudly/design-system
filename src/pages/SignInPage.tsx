@@ -66,7 +66,7 @@ export function SignInPage({
 }: SignInPageProps) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false} variant="auth">
+      <ScreenContainer variant="auth">
         <SectionStack>
           <Text variant="heading">Welcome back</Text>
           <SignInForm

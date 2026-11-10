@@ -44,7 +44,7 @@ export function ResetPasswordPage({
 }: ResetPasswordPageProps) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false} variant="auth">
+      <ScreenContainer variant="auth">
         <SectionStack>
           <Text variant="heading">New password</Text>
           <Text variant="muted">Choose a new password for your account.</Text>

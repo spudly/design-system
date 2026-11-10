@@ -139,7 +139,7 @@ export function MemorizeReviewPage({
 }: MemorizeReviewPageProps) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false}>
+      <ScreenContainer>
         <Text variant="heading">
           {verses.length === 0 ? "Review" : `Review (${verses.length} due)`}
         </Text>

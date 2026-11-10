@@ -97,12 +97,8 @@ test("the heading carries the due count; the empty state matches the app verbati
   );
 });
 
-test("the shell is the fixed ScreenContainer; the list is the shared BoundedList (#119)", () => {
-  assert.match(
-    code,
-    /<ScreenContainer scrollable=\{false\}>/,
-    "the tab screens share the app's non-scrolling shell",
-  );
+test("the shell is the plain ScreenContainer; the list is the shared BoundedList (#119, #547)", () => {
+  assert.match(code, /<ScreenContainer>/, "the tab screens share the app's non-scrolling shell");
   assert.match(
     code,
     /<BoundedList\s+data=\{verses\}/,

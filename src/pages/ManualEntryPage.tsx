@@ -23,7 +23,7 @@ export function ManualEntryPage({
 }) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false}>
+      <ScreenContainer>
         <Text variant="heading">Manual Entry</Text>
         {children}
       </ScreenContainer>

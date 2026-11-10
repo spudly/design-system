@@ -59,6 +59,11 @@ function readCode(path: string) {
 }
 
 const page = readCode(join(pagesDir, "DiscoverPage.tsx"));
+// #547: DiscoverPage is the compatibility wrapper; the public
+// catalog's implementation (states, cards, filters, pagination)
+// lives in RecipesPage's public variant, so implementation pins
+// scan the unified page.
+const unified = readCode(join(pagesDir, "RecipesPage.tsx"));
 const pageStories = readCode(join(pagesDir, "DiscoverPage.stories.tsx"));
 // The page's internals moved into shared components in the #119
 // de-styling tranche, canonized in the #320 dedupe: the filter
@@ -82,25 +87,27 @@ test("the page contract carries copy in and the error state (decision 3)", () =>
   assert.match(page, /searchPlaceholder: string;/);
   assert.match(page, /emptyMessage: string;/);
   assert.match(page, /errorMessage: string \| null;/);
+  // The states render in the unified page's public mode (#547),
+  // where the props carry their public* local names.
   assert.match(
-    page,
-    /<Alert severity="error">\{errorMessage\}<\/Alert>/,
-    "the error state renders errorMessage as an error alert, directly (no middleman state component)",
+    unified,
+    /<Alert severity="error">\{publicErrorMessage\}<\/Alert>/,
+    "the error state renders the error message as an error alert, directly (no middleman state component)",
   );
   assert.match(
-    page,
-    /<EmptyState title=\{emptyMessage\} \/>/,
-    "the empty state must carry emptyMessage",
+    unified,
+    /<EmptyState title=\{publicEmptyMessage\} \/>/,
+    "the empty state must carry the empty message",
   );
   assert.match(
-    page,
+    unified,
     /<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>/,
-    "loading renders the spinner empty state",
+    "loading renders the centered spinner state",
   );
   assert.match(
     page,
-    /<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>/,
-    "the loading state centers the spinner with <Center>",
+    /<RecipesPage variant="public"/,
+    "DiscoverPage delegates to the unified page's public variant (#547)",
   );
 });
 
@@ -108,7 +115,7 @@ test("card navigation is an href, never a press callback (decision 1)", () => {
   assert.match(page, /href: string;/, "items must carry the host-built permalink");
   assert.ok(!page.includes("onRecipePress"), "the page must not declare an onRecipePress callback");
   assert.match(
-    page,
+    unified,
     /<DiscoveryCard/,
     "rows must render through the standalone DiscoveryCard widget (decision 4)",
   );
@@ -173,16 +180,16 @@ test("each filter control renders only when its filter is added", () => {
   assert.match(bar, /\{added\.map\(\(definition\) => \(/);
   assert.match(bar, /<FilterControl definition=\{definition\} \/>/);
   assert.match(
-    page,
+    unified,
     /filters=\{catalogFilters\}/,
     "the page passes its filter definitions into the bar",
   );
   // The option sets are the page's data (PR #311): they live in
   // the page and reach the bar inside the definitions.
-  assert.match(page, /const STATUS_OPTIONS: SelectOption\[\] = \[/);
-  assert.match(page, /options: STATUS_OPTIONS,/);
-  assert.match(page, /sortOptions: SORT_OPTIONS,/);
-  assert.match(page, /dirOptions: SORT_DIR_OPTIONS,/);
+  assert.match(unified, /const STATUS_OPTIONS: SelectOption\[\] = \[/);
+  assert.match(unified, /options: STATUS_OPTIONS,/);
+  assert.match(unified, /sortOptions: SORT_OPTIONS,/);
+  assert.match(unified, /dirOptions: SORT_DIR_OPTIONS,/);
 });
 
 test("the chooser offers exactly the filters not yet added, and adding closes it", () => {
@@ -215,9 +222,9 @@ test("the title renders as the page heading and pagination rides the shared cata
     "the list header renders the title as the heading",
   );
   assert.match(
-    page,
-    /<CatalogHeader title=\{title\}>/,
-    "the page renders its title through the list header",
+    unified,
+    /<CatalogHeader title=\{publicTitle \?\? ""\}>/,
+    "the public mode renders its title through the list header",
   );
   // Pagination is the shared catalog pattern (#285): the page
   // wires useCatalogPagination — the same hook RecipesPage
@@ -228,19 +235,21 @@ test("the title renders as the page heading and pagination rides the shared cata
   // mount gate, and the fetch-completion re-arm itself. No
   // recipes.length gate may appear in the wiring: an empty
   // page with a live continuation still paginates.
+  // #547: the public mode's hook call in the unified page —
+  // same shared pattern, gated on the public first load + error.
   assert.match(
-    page,
-    /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{\s*onLoadMore,\s*isFetchingNextPage,\s*itemCount: recipes\.length,\s*canPaginate: !loading && !errorMessage,\s*\}\);/,
+    unified,
+    /const publicPagination = useCatalogPagination\(\{\s*onLoadMore,\s*isFetchingNextPage,\s*itemCount: publicRecipes !== undefined \? publicRecipes\.length : 0,\s*canPaginate: variant === "public" && !publicLoading && !publicErrorMessage,\s*\}\);/,
   );
-  assert.match(page, /onEndReached=\{onEndReached\}/);
-  assert.match(page, /onScroll=\{onScroll\}/);
-  assert.match(page, /onEndReachedThreshold=\{onEndReachedThreshold\}/);
+  assert.match(unified, /onEndReached=\{publicPagination\.onEndReached\}/);
+  assert.match(unified, /onScroll=\{publicPagination\.onScroll\}/);
+  assert.match(unified, /onEndReachedThreshold=\{publicPagination\.onEndReachedThreshold\}/);
   assert.ok(
-    !page.includes("handleEndReached"),
+    !unified.includes("handleEndReached"),
     "the page must not keep a local end-reached handler — the pattern is shared (#285)",
   );
   assert.match(
-    page,
+    unified,
     /isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\)/,
     "the loading-more footer keys off isFetchingNextPage",
   );

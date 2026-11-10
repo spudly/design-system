@@ -23,7 +23,7 @@ export function EditRecipePage({
 }) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false}>
+      <ScreenContainer>
         <Text variant="heading">Edit Recipe</Text>
         {children}
       </ScreenContainer>

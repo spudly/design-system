@@ -201,7 +201,7 @@ export function VerseSearchPage({
 }: VerseSearchPageProps) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false}>
+      <ScreenContainer>
         <Text variant="heading">Search verses</Text>
         {usingDemo ? (
           <Alert severity="info">

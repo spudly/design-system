@@ -54,7 +54,10 @@ function readCode(name: string) {
 
 const bar = readCodeFrom(viewsDir, "CatalogFiltersBar.tsx");
 const header = readCodeFrom(viewsDir, "CatalogHeader.tsx");
-const discoverPage = readCodeFrom(join(here, "../..", "src", "pages"), "DiscoverPage.tsx");
+// #547: the public catalog's implementation lives in RecipesPage
+// (DiscoverPage is its compatibility wrapper), so the loading-state
+// contract pins RecipesPage's public mode.
+const discoverPage = readCodeFrom(join(here, "../..", "src", "pages"), "RecipesPage.tsx");
 
 test("the catalog views are exported from their built internal barrels", async () => {
   const distViews: Record<string, any> = await import("../../dist/views/index.js");
@@ -156,14 +159,14 @@ test("the loading state is the page's own Center + Spinner composition (#479)", 
   assert.match(
     discoverPage,
     /<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>/,
-    "DiscoverPage centers its loading spinner with <Center> directly — the wrapper components are removed (#479)",
+    "the public catalog centers its loading spinner with <Center> directly — the wrapper components are removed (#479)",
   );
   assert.ok(
     !discoverPage.includes("ListLoadingState"),
-    "DiscoverPage must not render the removed ListLoadingState (#479)",
+    "the public catalog must not render the removed ListLoadingState (#479)",
   );
   assert.ok(
     !discoverPage.includes("LoadingGate"),
-    "DiscoverPage must not render the removed LoadingGate (#479)",
+    "the public catalog must not render the removed LoadingGate (#479)",
   );
 });
