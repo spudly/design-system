@@ -7,7 +7,9 @@
 // oversubscribes the processors, which slows the suite down and can
 // starve individual tests into flaky timeouts. CI runners have
 // dedicated cores, so when the CI environment variable is set the cap
-// is omitted and the runner keeps its default parallelism.
+// is omitted and the runner keeps its default parallelism. The check
+// compares against the literal "true" (what CI systems set): any other
+// value, including "false", counts as a local run.
 //
 // The patterns are passed as arguments (never through a shell), so the
 // test runner expands the globs itself, exactly as it did when the
@@ -19,9 +21,13 @@ import { fileURLToPath, URL } from "node:url";
 const root = fileURLToPath(new URL("..", import.meta.url));
 
 const args = ["tsx", "--test"];
-if (!process.env.CI) args.push("--test-concurrency=2");
+if (process.env.CI !== "true") args.push("--test-concurrency=2");
 args.push("src/**/*.test.ts", "test/**/*.test.ts", "eslintRules/*.test.ts");
 
-const result = spawnSync("npx", args, { cwd: root, stdio: "inherit" });
+// On Windows, npx is a .cmd shim, which child_process cannot launch
+// by its bare name without a shell; naming the shim explicitly works
+// and keeps the arguments literal (no shell quoting involved).
+const npx = process.platform === "win32" ? "npx.cmd" : "npx";
+const result = spawnSync(npx, args, { cwd: root, stdio: "inherit" });
 if (result.error) throw result.error;
 process.exit(result.status ?? 1);
