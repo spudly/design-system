@@ -24,7 +24,7 @@
 // index in both directions.
 
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, join, relative, sep } from "node:path";
 
 import {
   collectStories,
@@ -129,10 +129,13 @@ export function listCommittedBaselines(repoRoot) {
   const baselines = [];
   const orphans = [];
   for (const dir of walkSnapshotDirs(join(repoRoot, "src"), [])) {
-    const storyDir = dir.slice(repoRoot.length + 1).replace(/\/__snapshots__$/, "");
+    // Derive both paths with path.relative (POSIX-normalized):
+    // string slicing off repoRoot breaks for a relative or
+    // unnormalized root ("." would slice "src/pages" to "c/pages").
+    const storyDir = relative(repoRoot, dirname(dir)).split(sep).join("/");
     for (const name of readdirSync(dir)) {
       if (!name.endsWith(".png")) continue;
-      const relPath = `${dir.slice(repoRoot.length + 1)}/${name}`;
+      const relPath = relative(repoRoot, join(dir, name)).split(sep).join("/");
       const parsed = parseBaselineFileName(name);
       const entry = parsed
         ? index.byFileKey.get(`${storyDir}|${parsed.base}|${parsed.exportSlug}`)
