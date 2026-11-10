@@ -66,18 +66,13 @@ if (tests.size === 0) process.exit(0);
 
 const testFiles = [...tests].sort();
 console.log(`[pre-commit] affected tests: ${testFiles.join(", ")}`);
-// If dist/ was removed (e.g. `npm run clean`) but the incremental
-// build info survived, tsc trusts the stale build info and emits
-// nothing — discard it so the build recreates the missing output.
-if (!existsSync("dist")) rmSync(".build.tsbuildinfo", { force: true });
-// The build gets its own tsBuildInfoFile: its options (emit) differ
-// from the typecheck's (noEmit), and sharing one file would thrash
-// both caches.
-execFileSync(
-  "npm",
-  ["run", "build", "--", "--incremental", "--tsBuildInfoFile", ".build.tsbuildinfo"],
-  {
-    stdio: "inherit",
-  },
-);
+// The build must start from a clean output state. dist/ is ignored,
+// so lint-staged's hiding never touches it: a dist/ built earlier
+// from unstaged changes would otherwise survive into this run, and
+// an incremental build could trust it and skip emission — running
+// the tests against JS that does not match the staged sources.
+rmSync("dist", { recursive: true, force: true });
+execFileSync("npm", ["run", "build"], {
+  stdio: "inherit",
+});
 execFileSync("npx", ["tsx", "--test", ...testFiles], { stdio: "inherit" });
