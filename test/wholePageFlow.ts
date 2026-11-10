@@ -38,13 +38,43 @@ export function makeRenderToHtml(
   };
 }
 
-const SCROLLING_OVERFLOW = /(?:overflow-y|overflow)\s*:\s*(?:[^;}]*\s)?(auto|scroll)\b/;
+/**
+ * Whether a CSS declaration block (an inline `style` value or a
+ * `<style>` rule body) gives its element a vertical scroller.
+ * `overflow-y` decides directly; the `overflow` shorthand's
+ * vertical value is its second token when present, otherwise
+ * its only token — so `overflow: auto hidden` (horizontal-only
+ * scrolling) does not count, and `overflow: hidden auto` does.
+ */
+function declaresVerticalScroller(declarations: string): boolean {
+  for (const declaration of declarations.split(";")) {
+    const colon = declaration.indexOf(":");
+    if (colon === -1) {
+      continue;
+    }
+    const property = declaration.slice(0, colon).trim();
+    const values = declaration
+      .slice(colon + 1)
+      .trim()
+      .split(/\s+/);
+    const vertical =
+      property === "overflow-y"
+        ? values[0]
+        : property === "overflow"
+          ? (values[1] ?? values[0])
+          : undefined;
+    if (vertical === "auto" || vertical === "scroll") {
+      return true;
+    }
+  }
+  return false;
+}
 
 function scrollingClassNames(html: string): Set<string> {
   const names = new Set<string>();
   for (const styleBlock of html.matchAll(/<style[^>]*>([\s\S]*?)<\/style>/g)) {
     for (const rule of styleBlock[1].matchAll(/\.([A-Za-z0-9_-]+)\s*\{([^}]*)\}/g)) {
-      if (SCROLLING_OVERFLOW.test(rule[2])) {
+      if (declaresVerticalScroller(rule[2])) {
         names.add(rule[1]);
       }
     }
@@ -58,7 +88,7 @@ export function verticalScrollers(html: string): string[] {
   for (const match of html.matchAll(/<[^>]+>/g)) {
     const tag = match[0];
     const style = /style="([^"]*)"/.exec(tag)?.[1];
-    if (style && SCROLLING_OVERFLOW.test(style)) {
+    if (style && declaresVerticalScroller(style)) {
       found.push(tag.slice(0, 160));
       continue;
     }

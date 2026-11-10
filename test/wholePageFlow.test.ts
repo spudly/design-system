@@ -21,6 +21,11 @@ test("verticalScrollers detects a class-based scroller (negative control)", () =
   assert.equal(verticalScrollers(html).length, 1);
 });
 
+test("verticalScrollers reads the overflow shorthand's vertical value", () => {
+  assert.deepEqual(verticalScrollers(`<div style="overflow: auto hidden"></div>`), []);
+  assert.equal(verticalScrollers(`<div style="overflow: hidden auto"></div>`).length, 1);
+});
+
 test("verticalScrollers ignores non-scrolling markup and hidden overflow", () => {
   const html =
     `<style>.clipped { overflow: hidden; }</style>` +
