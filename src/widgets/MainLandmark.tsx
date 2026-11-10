@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { YStack, isWeb } from "tamagui";
 import { mainRoleProps } from "./accessibility.js";
 
 export type MainLandmarkProps = {
@@ -24,8 +24,25 @@ export type MainLandmarkProps = {
  * landmark before: with no host-side frame, the page composes
  * MainLandmark around every state's content, and the footer
  * (BigFooterShell's `contentinfo`) stays outside it.
+ *
+ * Sizing follows the #547 page-scroll model, like ScreenShell
+ * and ScrollRegion: on native the column fills the space its
+ * shell leaves it (`flex: 1` inside the shell's bounded frame);
+ * on web the document scrolls the whole page, so the column
+ * grows with its content — `flex: 1`'s zero basis collapsed it
+ * inside BigFooterShell's unbounded space-between column and
+ * left PublicRecipePage's footer at the viewport's bottom edge
+ * while its content overflowed past (the rendered-Storybook
+ * audit on PR #556).
  */
 export function MainLandmark({ children }: MainLandmarkProps) {
+  if (isWeb) {
+    return (
+      <YStack flexGrow={1} flexDirection="column" {...mainRoleProps}>
+        {children}
+      </YStack>
+    );
+  }
   return (
     <YStack flex={1} {...mainRoleProps}>
       {children}

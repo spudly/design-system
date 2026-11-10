@@ -40,6 +40,11 @@ test("MainLandmarkProps is a type-only export from the built components barrel",
 test("MainLandmark fills its shell space and carries the web main role", () => {
   assert.match(code, /export type MainLandmarkProps = \{\s+children: ReactNode;\s+\};/);
   assert.match(code, /<YStack flex=\{1\} \{\.\.\.mainRoleProps\}>/);
+  // #547: on web the column grows with its content instead of
+  // flex:1's zero basis, which collapsed it inside the page
+  // shell's unbounded column (PR #556 rendered audit).
+  assert.match(code, /if \(isWeb\) \{/);
+  assert.match(code, /<YStack flexGrow=\{1\} flexDirection="column" \{\.\.\.mainRoleProps\}>/);
   assert.ok(
     !code.includes("accessibilityRole"),
     "the landmark uses the web role prop, not accessibilityRole (not an RN role)",

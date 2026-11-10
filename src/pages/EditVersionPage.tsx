@@ -54,7 +54,7 @@ export function EditVersionPage(props: EditVersionPageProps) {
   if (notEditable) {
     return (
       <BigFooterShell footer={props.footer}>
-        <ScreenContainer scrollable={false}>
+        <ScreenContainer>
           <Text variant="error">This version can no longer be edited.</Text>
           {backHref ? <TextLink href={backHref}>Back to recipe</TextLink> : null}
         </ScreenContainer>
@@ -63,8 +63,8 @@ export function EditVersionPage(props: EditVersionPageProps) {
   }
 
   return (
-    <BigFooterShell footer={props.footer}>
-      <ScreenContainer scrollable={false}>
+    <BigFooterShell footer={props.footer} scrollMode="content">
+      <ScreenContainer>
         <Text variant="heading">{`Edit Draft (v${versionNumber})`}</Text>
         {showImportBanner && parentVersionNumber !== undefined ? (
           <Alert severity="info">

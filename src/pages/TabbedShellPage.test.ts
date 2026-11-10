@@ -83,14 +83,14 @@ test("the page composes DS components only and never touches the boundary itself
   );
   assert.match(page, /import \{ LazySlot \} from "\.\.\/views\/LazySlot\.js";/);
   assert.match(page, /import \{ Tabs \} from "\.\.\/widgets\/Tabs\.js";/);
-  assert.match(page, /<ScreenContainer scrollable=\{false\}>/);
+  assert.match(page, /<ScreenContainer>/);
   assert.match(page, /import type \{ IconName \} from "\.\.\/icons\/iconRegistry\.js";/);
   assert.doesNotMatch(page, /from "\.\.\/icons\/[A-Z]/, "no icon component crosses into the page");
   // The standard page footer contract (#410, pinned for every
   // page by src/widgets/BigFooter.test.ts): an optional footer prop
   // rendered through the shell — no data, no footer band.
   assert.match(page, /footer\?: BigFooterData;/);
-  assert.match(page, /<BigFooterShell footer=\{footer\}>/);
+  assert.match(page, /<BigFooterShell footer=\{footer\} scrollMode="content">/);
 });
 
 // Runtime imports are lazy, like LandingPage.test.ts: the page

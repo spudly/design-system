@@ -55,7 +55,7 @@ export function ForgotPasswordPage({
 }: ForgotPasswordPageProps) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false} variant="auth">
+      <ScreenContainer variant="auth">
         <SectionStack>
           <Text variant="heading">Reset password</Text>
           <Text variant="muted">We&apos;ll send a reset link to your email.</Text>

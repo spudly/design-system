@@ -117,13 +117,13 @@ async function renderShell(props: any) {
   return renderToHtml(React.createElement(ScreenContainer, props, child("a"), child("b")));
 }
 
-test("SSR: the scrollable shell's column carries the 16px gap with no caller gap (#299)", async () => {
+test("SSR: the shell's column carries the 16px gap with no caller gap (#299, #547)", async () => {
   const html = await renderShell(null);
   assert.equal(renderedGap(html, "ScreenContainer"), "16px");
 });
 
-test("SSR: the non-scrollable shell's column carries the 16px gap with no caller gap (#299)", async () => {
-  const html = await renderShell({ scrollable: false });
+test("SSR: the shell renders no scroller — the same column carries the 16px gap (#547)", async () => {
+  const html = await renderShell({});
   assert.equal(renderedGap(html, "ScreenContainer"), "16px");
 });
 
@@ -133,6 +133,6 @@ test("SSR: a caller's explicit gap still overrides the shell column's gap (#265/
 });
 
 test("SSR: the auth shell's capped column carries the 16px gap with no caller gap (#299)", async () => {
-  const html = await renderShell({ variant: "auth", scrollable: false });
+  const html = await renderShell({ variant: "auth" });
   assert.equal(renderedGap(html, "ScreenContainerAuthContent"), "16px");
 });

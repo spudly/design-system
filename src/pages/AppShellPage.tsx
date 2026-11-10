@@ -146,8 +146,8 @@ export function AppShellPage({
   children,
 }: AppShellPageProps) {
   return (
-    <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false}>
+    <BigFooterShell footer={footer} scrollMode="content">
+      <ScreenContainer>
         <AppTopBar
           brand={brand}
           navItems={navItems}

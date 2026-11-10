@@ -368,7 +368,7 @@ function InstructionsSection({ instructions }: { instructions: PublicRecipePageI
 export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "loading") {
     return (
-      <BigFooterShell footer={props.footer}>
+      <BigFooterShell footer={props.footer} scrollMode="content">
         <MainLandmark>
           <Center fill>
             <Spinner label="Loading recipe" />
@@ -380,7 +380,7 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
 
   if (props.state === "notFound") {
     return (
-      <BigFooterShell footer={props.footer}>
+      <BigFooterShell footer={props.footer} scrollMode="content">
         <MainLandmark>
           <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />
         </MainLandmark>
@@ -390,7 +390,7 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
 
   if (props.state === "unavailable") {
     return (
-      <BigFooterShell footer={props.footer}>
+      <BigFooterShell footer={props.footer} scrollMode="content">
         <MainLandmark>
           <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />
         </MainLandmark>
@@ -404,7 +404,7 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
   const comments = renderComments ? renderComments() : null;
 
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} scrollMode="content">
       <MainLandmark>
         <ScrollShell>
           <CtaBar

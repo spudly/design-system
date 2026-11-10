@@ -70,27 +70,24 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   assert.match(bigFooter, /export const BIG_FOOTER_STACK_BREAKPOINT = 640;/);
   assert.match(bigFooter, /flexBasis=\{BIG_FOOTER_COLUMN_BASIS\}/);
   assert.match(bigFooter, /flexWrap="wrap"/);
-  // Sticky: full-viewport-height column, content grows, footer last.
-  // The minimum height is platform-specific (PR #413 review): 100dvh
+  // Page-scroll model (#547): the web shell is a flex column with
+  // minHeight 100dvh and justifyContent "space-between" and
+  // exactly two children — the page content and the footer. The
+  // minimum height is platform-specific (PR #413 review): 100dvh
   // on web, 100% of the parent's available height by default —
   // React Native does not support viewport units for minHeight.
-  assert.match(
-    bigFooter,
-    /<YStack minHeight=\{\{ default: "100%", web: "100dvh" \}\} flexDirection="column">/,
-  );
+  assert.match(bigFooter, /minHeight=\{\{ default: "100%", web: "100dvh" \}\}/);
+  assert.match(bigFooter, /justifyContent="space-between"/);
   assert.ok(
     !/<YStack minHeight="100dvh"/.test(bigFooter),
     "the shell must not pass a raw 100dvh minHeight to native",
   );
-  assert.match(bigFooter, /flexGrow=\{1\}/);
-  // Bounded content region (PR #413 review): the region the list /
-  // scroll child fills carries an intrinsic flex basis (shrink 1,
-  // basis "auto"), so it participates in shrink allocation and
-  // keeps a content viewport even when the native footer is
-  // taller than the screen (a zero basis could allocate it zero
-  // height); and the region is the positioned ancestor, so an
-  // absolute-fill child (StepOverlay) cannot cover the footer.
-  assert.match(bigFooter, /flexShrink=\{1\} flexBasis="auto" position="relative"/);
+  // The content child is the positioned ancestor, so an
+  // absolute-fill child (StepOverlay) cannot cover the footer;
+  // there is no bounded flex region allocating it a height
+  // (#547 removed the bounded region and its nested scroller).
+  assert.match(bigFooter, /<YStack position="relative">\{children\}<\/YStack>/);
+  assert.ok(!/flexBasis="auto"/.test(bigFooter), "the bounded content region is gone (#547)");
   assert.ok(!/position="(fixed|absolute)"/.test(bigFooter), "the footer is in flow, never pinned");
 });
 
@@ -171,46 +168,139 @@ test("the shell reserves viewport height only when a footer is supplied", () => 
   assert.match(bigFooter, /padding: tokens\.spacing\[3\]/, "social links keep a ≥44px target");
 });
 
-test("on native a tall footer keeps a scroll path of its own (PR #413 review)", () => {
-  // The defect: on native the shell places the footer OUTSIDE the
-  // content region's scroll paths (a BoundedList FlatList inside a
-  // non-scrolling ScreenContainer, or ScreenContainer's own
-  // ScrollView) and native has no document scroll, so a stacked
-  // footer taller than the remaining screen space extended past
-  // the visible area with its lower links unreachable.
-  //
-  // Web renders the footer bare — the document scrolls the whole
-  // shell, so the footer is already reachable there.
-  assert.match(bigFooter, /isWeb \? \(\s*<BigFooter footer=\{footer\} \/>/);
-  // Native renders it inside the footer's OWN bounded scroll
-  // region: intrinsic height when it fits (flexGrow 0, so the
-  // sticky placement is unchanged), shrinkable below it
-  // (flexShrink 1) so the region caps at the available space and
-  // the lower links scroll into reach.
+test("native scroll ownership is an explicit shell mode, independent of footer data (PR #556)", () => {
+  // The mode type is a type alias (Stephen's code style) with
+  // the three owners: the shell's ScrollView (default), the
+  // page content's own list/scroll region, or an enclosing
+  // shell (nested pages opt out of scrolling entirely).
   assert.match(
     bigFooter,
-    /<ScrollView flexGrow=\{0\} flexShrink=\{1\} keyboardShouldPersistTaps="handled">\s*<BigFooter footer=\{footer\} \/>\s*<\/ScrollView>/,
+    /export type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/,
   );
-  assert.match(bigFooter, /import \{[^}]*ScrollView[^}]*isWeb[^}]*\} from "tamagui";/);
-  // The scroll path wraps ONLY the footer: the shell's children
-  // (and any BoundedList inside them) never sit inside this
-  // ScrollView, so list windowing and end-reached pagination are
-  // untouched — the file's one ScrollView is the footer region.
+  assert.match(bigFooter, /scrollMode\?: BigFooterShellScrollMode;/);
+  assert.match(bigFooter, /scrollMode = "shell"/, "the shell scroller is the default mode");
+  // Native handling comes FIRST and never consults footer
+  // data: a standalone page with no footer scrolls on native
+  // exactly like one with a footer (the footerless SignUpPage
+  // stall CodeRabbit flagged on PR #556).
+  const nativeBranch = bigFooter.indexOf("if (!isWeb)");
+  assert.ok(nativeBranch >= 0, "BigFooterShell handles native explicitly");
+  assert.ok(
+    nativeBranch < bigFooter.indexOf("if (!footer)"),
+    "the native branch precedes the web footer branch — native scrolling ignores footer data",
+  );
+  // "content" mode: a bounded frame and NO scroller, so a
+  // page's FlatList / ScrollRegion is never nested inside the
+  // shell's plain ScrollView (the RecipesPage windowing bug).
+  assert.match(
+    bigFooter,
+    /if \(scrollMode === "content"\) \{\s*return \(\s*<YStack flex=\{1\} position="relative">\s*\{children\}/,
+  );
+  // "nested" mode: the growing column only — no scroller, no
+  // bounded frame; the enclosing shell stays the scroll owner.
+  assert.match(
+    bigFooter,
+    /if \(scrollMode === "nested"\) \{\s*return \(\s*<YStack flexGrow=\{1\} flexDirection="column" position="relative">\s*\{children\}/,
+  );
+});
+
+test("list and self-scrolling pages put the shell in content mode (PR #556)", () => {
+  // Every page whose content owns native scrolling — the
+  // BoundedList catalog/verse pages and the ScrollRegion /
+  // ScrollShell pages — renders its shell in "content" mode,
+  // and the two frame pages slot self-scrolling surfaces, so
+  // they do the same. A page left in the default mode would
+  // nest its scroller inside the shell's ScrollView whenever
+  // a host supplies footer data.
+  for (const entry of [
+    "RecipesPage.tsx",
+    "DiscoverPage.tsx",
+    "MyVersesPage.tsx",
+    "VerseSearchPage.tsx",
+    "MemorizeReviewPage.tsx",
+    "RecipeFormPage.tsx",
+    "RecipeDetailPage.tsx",
+    "PublicRecipePage.tsx",
+    "AppShellPage.tsx",
+    "TabbedShellPage.tsx",
+  ]) {
+    const code = readCode(join("src", "pages", entry));
+    assert.ok(
+      code.includes('scrollMode="content"'),
+      `${entry} must render BigFooterShell with scrollMode="content"`,
+    );
+    assert.ok(
+      !/<BigFooterShell footer=\{[^}]*\}>/.test(code),
+      `${entry} still renders a modeless BigFooterShell`,
+    );
+  }
+  // A plain content page keeps the default: SignUpPage renders
+  // the shell with no scrollMode, so the shell's ScrollView
+  // owns its native scrolling with or without footer data.
+  const signUp = readCode("src/pages/SignUpPage.tsx");
+  assert.match(signUp, /<BigFooterShell footer=\{footer\}>/);
+  assert.ok(!signUp.includes("scrollMode"), "SignUpPage stays in the default shell mode");
+});
+
+test("composed pages keep exactly one native scroll owner (PR #556 round 2)", () => {
+  // MealsHubPage plans tab: the hub shell is a content-mode
+  // bounded frame, so MealPlansPage's own shell ScrollView is
+  // the tab's single native scroller and the pinned header
+  // stays outside it. (The meals tab keeps the default shell:
+  // its plain ScreenContainer content has no scroller of its
+  // own.)
+  const mealsHub = readCode("src/pages/MealsHubPage.tsx");
+  assert.match(
+    mealsHub,
+    /<BigFooterShell footer=\{footer\} scrollMode="content">\s*<PinnedHeaderShell/,
+    "the plans tab's hub shell must be content mode",
+  );
+  // The form-shell pages compose RecipeFormPage, whose
+  // ScrollRegion is the screen's single native scroller: their
+  // shells are content-mode frames, never a second ScrollView
+  // around the region. EditVersionPage's not-editable state
+  // renders no form, so that branch keeps the default shell.
+  for (const entry of ["EditRecipePage.tsx", "ManualEntryPage.tsx"]) {
+    const code = readCode(join("src", "pages", entry));
+    assert.ok(
+      code.includes('<BigFooterShell footer={footer} scrollMode="content">'),
+      `${entry} must render its shell in content mode`,
+    );
+  }
+  const editVersion = readCode("src/pages/EditVersionPage.tsx");
+  assert.ok(
+    editVersion.includes('<BigFooterShell footer={props.footer} scrollMode="content">'),
+    "EditVersionPage's editable branch must render its shell in content mode",
+  );
+  assert.match(
+    editVersion,
+    /<BigFooterShell footer=\{props\.footer\}>\s*<ScreenContainer>\s*<Text variant="error">/,
+    "EditVersionPage's not-editable branch keeps the default shell — it renders no form",
+  );
+});
+
+test("on native the shell renders one ScrollView and no BigFooter (#547)", () => {
+  // BigFooter is web-only (Stephen's #547 addendum): native uses
+  // bottom navigation instead, so the native branch renders no
+  // BigFooter at all. Native has no document scroll, so the
+  // shell renders ONE ScrollView wrapping the page content —
+  // the page's single scroller — whose content container grows
+  // to at least the available height.
+  assert.match(bigFooter, /if \(!isWeb\) \{/);
+  assert.match(
+    bigFooter,
+    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">\s*<YStack flexGrow=\{1\} minHeight="100%" position="relative">\s*\{children\}/,
+  );
   assert.equal(
     (bigFooter.match(/<ScrollView/g) ?? []).length,
     1,
-    "BigFooterShell's only ScrollView is the native footer region",
+    "BigFooterShell's only ScrollView is the native shell scroller",
   );
-  assert.ok(
-    !/<ScrollView[^>]*>\s*\{children\}/.test(bigFooter),
-    "the shell's children are not wrapped in a ScrollView",
-  );
-  // Exactly one footer renders per platform: the two source
-  // occurrences are the web and native branches of one shell.
+  // Exactly one BigFooter renders, in the web branch only.
   assert.equal(
     (bigFooter.match(/<BigFooter footer=\{footer\} \/>/g) ?? []).length,
-    2,
-    "the shell renders BigFooter once per platform branch, never twice",
+    1,
+    "the shell renders BigFooter once, on web only (#547)",
   );
 });
 
@@ -233,7 +323,7 @@ test("composed pages and stories render exactly one footer", () => {
   const mealsHub = readCode("src/pages/MealsHubPage.tsx");
   assert.match(
     mealsHub,
-    /<BigFooterShell footer=\{footer\}>\s*<PinnedHeaderShell[\s\S]*?<MealPlansPage/,
+    /<BigFooterShell footer=\{footer\} scrollMode="content">\s*<PinnedHeaderShell[\s\S]*?<MealPlansPage/,
     "the plans tab's footer shell encloses the pinned header and MealPlansPage",
   );
   assert.doesNotMatch(

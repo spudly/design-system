@@ -25,7 +25,10 @@ Fixed, Scrollable; `Widgets/PinnedHeaderShell`: Default.
    (bar outside the ScrollRegion), not by scrolling.
 2. ScrollShell: the whole column scrolls inside the surface
    frame, content inset by the standard padding with even
-   separation.
+   separation. On web the scroll is the document's (#547):
+   the column flows at full height inside the page shell and
+   the page's footer follows it — no inner scroller, and the
+   shell itself does not bound the column's height.
 3. SessionShell Fixed: the title and hint render as a
    fixed column (neither story has a form or actions);
    Scrollable: the title and the transcript blocks scroll

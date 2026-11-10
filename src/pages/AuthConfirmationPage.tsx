@@ -38,7 +38,7 @@ export function AuthConfirmationPage({
 }: AuthConfirmationPageProps) {
   return (
     <BigFooterShell footer={footer}>
-      <ScreenContainer variant="auth" scrollable={false}>
+      <ScreenContainer variant="auth">
         <SectionStack>
           <Text variant="heading">{title}</Text>
           <Text variant="muted">{body}</Text>

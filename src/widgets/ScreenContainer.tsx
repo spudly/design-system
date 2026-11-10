@@ -1,12 +1,10 @@
-import { ScrollView, YStack, styled } from "tamagui";
+import { YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 const StyledContent = styled(YStack, {
   name: "ScreenContainer",
 
-  flex: 1,
-  minHeight: "100%",
   paddingHorizontal: tokens.spacing[4],
   paddingVertical: tokens.spacing[4],
   gap: tokens.spacing[4],
@@ -68,8 +66,6 @@ const StyledAuthContent = styled(YStack, {
 type StyledContentProps = GetProps<typeof StyledContent>;
 
 export type ScreenContainerProps = StyledContentProps & {
-  /** Wrap content in a scroll view. Defaults to true. */
-  scrollable?: boolean;
   /**
    * Shell mode: `default` page padding, `padded` (wider), `list` (flush —
    * caller manages padding), `auth` (surface background, large top offset,
@@ -81,18 +77,23 @@ export type ScreenContainerProps = StyledContentProps & {
 };
 
 /**
- * Page scaffold: full-height container with horizontal page padding and
- * consistent vertical spacing between sections. Scrollable by default;
- * pass `scrollable={false}` for fixed-height screens. Use `variant` for
- * the padded, list, and auth shell modes.
+ * Page scaffold: the plain content container for a page — page
+ * padding and consistent vertical spacing between sections, and
+ * nothing else (#547).
+ *
+ * Scroll model (#547, Stephen's page-scroll ruling): this
+ * container renders NO scroller on either platform. On web the
+ * document is the page's scroller; on native the page's single
+ * scroller is owned per BigFooterShell's scroll mode — the
+ * shell's own ScrollView for plain pages, or the page content's
+ * list / scroll region for list and self-scrolling pages. The
+ * pre-#547 `scrollable` prop — which wrapped the content in this
+ * container's own ScrollView and produced a nested scroller
+ * inside the shell's bounded region — is removed, along with
+ * every call site that passed it.
  */
-export function ScreenContainer({
-  scrollable = true,
-  children,
-  gap,
-  ...rest
-}: ScreenContainerProps) {
-  const content = (
+export function ScreenContainer({ children, gap, ...rest }: ScreenContainerProps) {
+  return (
     // The gap override is spread only when the caller actually passed
     // one: an explicit `gap={undefined}` overrides StyledContent's
     // static 16px gap in Tamagui's web style merge (the styled rule is
@@ -108,20 +109,5 @@ export function ScreenContainer({
         children
       )}
     </StyledContent>
-  );
-  if (!scrollable) {
-    return content;
-  }
-  return (
-    <ScrollView
-      flex={1}
-      // Tamagui v3 removed the $platform-web sub-object; web-only styles
-      // are now flat `web:` clauses on each property value.
-      display="web:flex"
-      flexDirection="web:column"
-      minHeight="web:100%"
-    >
-      {content}
-    </ScrollView>
   );
 }

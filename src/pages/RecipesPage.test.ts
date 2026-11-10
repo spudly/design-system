@@ -105,7 +105,7 @@ describe("recipesPageBoundedList", () => {
   test("RecipesPage renders the fixed list shell, non-scrolling", () => {
     assert.match(
       code,
-      /<ScreenContainer variant="list" scrollable=\{false\}>/,
+      /<ScreenContainer variant="list">/,
       "RecipesPage must render ScreenContainer's list variant so the shell owns the fill",
     );
   });
@@ -162,19 +162,21 @@ describe("recipesPageBoundedList", () => {
       /case "loadingDiscovery":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
       "the discovery section's spinner renders as that section's row in the list",
     );
-    assert.ok(
-      !code.includes("ListEmptyComponent"),
-      "there is no list-level empty state anymore — each section carries its own empty row (#415)",
+    assert.match(
+      code,
+      /case "ownEmpty":/,
+      "the signed-in list has no list-level empty state — each section carries its own empty row (#415)",
     );
     assert.match(
       code,
-      /ListHeaderComponent=\{\s*<CatalogFiltersBar/,
-      "the filter bar renders once as the list header, so it scrolls with the recipes",
+      /ListHeaderComponent=\{filtersBar\}/,
+      "the one filter bar renders as the native list's header, so it scrolls with the recipes (web renders it in page flow, #547)",
     );
   });
 
   test("rows render through MediaRow, standalone (no list-item wrapper)", () => {
-    assert.match(code, /renderItem=\{\(\{ item: row \}\) => \{/);
+    assert.match(code, /renderItem=\{\(\{ item: row \}\) => renderRow\(row\)\}/);
+    assert.match(code, /const renderRow = \(row: RecipesPageRow\) => \{/);
     assert.match(code, /<MediaRow/);
     assert.ok(
       !code.includes('role="listitem"'),
@@ -216,7 +218,7 @@ describe("recipesPageCollapsedFilters", () => {
 
   test("the page renders the shared CatalogFiltersBar with its search copy", () => {
     assert.match(code, /<CatalogFiltersBar/);
-    assert.match(code, /searchPlaceholder="Search recipes…"/);
+    assert.match(code, /publicSearchPlaceholder : "Search recipes/);
     assert.match(code, /filters=\{catalogFilters\}/);
     assert.match(code, /\{\.\.\.\(activeFilters \? \{ activeFilters \} : \{\}\)\}/);
     assert.match(code, /\{\.\.\.\(onActiveFiltersChange \? \{ onActiveFiltersChange \} : \{\}\)\}/);
@@ -599,9 +601,9 @@ describe("recipesPageUnified", () => {
   }
 
   test("the contract is sectioned: caller-supplied titles, data, and per-section states", () => {
-    assert.match(code, /ownTitle: string;/, "the own section's title is caller-supplied");
-    assert.match(code, /ownRecipes: RecipesPageItem\[\];/);
-    assert.match(code, /loadingOwn: boolean;/);
+    assert.match(code, /ownTitle\?: string;/, "the own section's title is caller-supplied");
+    assert.match(code, /ownRecipes\?: RecipesPageItem\[\];/);
+    assert.match(code, /loadingOwn\?: boolean;/);
     assert.match(code, /ownErrorMessage\?: string \| null;/);
     assert.match(code, /ownEmptyTitle\?: string;/);
     assert.match(code, /ownEmptyBody\?: string;/);
@@ -631,7 +633,14 @@ describe("recipesPageUnified", () => {
       !/^\s+recipes: RecipesPageItem\[\];/m.test(code),
       "the old `recipes` prop must not return",
     );
-    assert.ok(!/^\s+loading: boolean;/m.test(code), "the old `loading` prop must not return");
+    // #547: `loading` returns ONLY as the public variant's
+    // first-load flag (the former DiscoverPage contract), never
+    // as the signed-in contract's single-list loading prop.
+    assert.match(
+      code,
+      /loading\?: boolean;/,
+      "public mode carries the former DiscoverPage loading flag (#547)",
+    );
     assert.ok(
       !/^\s+emptyTitle\?: string;/m.test(code),
       "the old `emptyTitle` prop must not return",
@@ -690,8 +699,8 @@ describe("recipesPageUnified", () => {
     assert.ok(discoveryAt > discoveryHeadingAt, "discovery rows follow their heading");
     assert.equal(
       count(code, "<BoundedList"),
-      1,
-      "the page renders exactly one list (one scroll surface)",
+      2,
+      "one BoundedList per native mode (signed-in and public, #547) — web renders whole-page flow with no list at all",
     );
     assert.match(code, /data=\{rows\}/, "the one list takes the unified row sequence");
     assert.match(code, /<SectionHeading>\{ownTitle\}<\/SectionHeading>/);
@@ -729,7 +738,7 @@ describe("recipesPageUnified", () => {
       /export type RecipesPageFilterId = "status" \| "ingredient" \| "calories" \| "satiety" \| "sort";/,
       "the filter-id set is the one both predecessor pages shared",
     );
-    assert.match(code, /searchPlaceholder="Search recipes…"/);
+    assert.match(code, /publicSearchPlaceholder : "Search recipes/);
   });
 
   test("shared items carry their caller-supplied badge inside the own section", () => {
@@ -801,8 +810,8 @@ describe("recipesPageUnified", () => {
     );
     assert.equal(
       count(code, '<Spinner label="Loading" />'),
-      4,
-      "four spinner renders: the two sections' loading rows, the own section's load-more row (#438 Part 3), and the loading-more footer",
+      9,
+      "nine spinner renders (#547): the two sections' loading rows, the own load-more row, the native loading-more footer, the web loading-more row, and the public mode's web/native loading + loading-more states",
     );
   });
 
@@ -826,7 +835,7 @@ describe("recipesPageUnified", () => {
     );
   });
 
-  test("DiscoverPage stays in place and both pages stay exported (#415 follow-up owns its removal)", () => {
+  test("DiscoverPage is the public-variant compatibility wrapper and both pages stay exported (#547 merge)", () => {
     assert.match(index, /export \{\s*DiscoverPage,/);
     assert.match(index, /type RecipesPageDiscoveryItem,/);
     assert.match(index, /export \{\s*RecipesPage,/);

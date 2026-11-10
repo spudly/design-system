@@ -47,6 +47,17 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
  *    content-length change re-arms its signal, and it re-fires
  *    (re-latching here) if the viewport is still at the end.
  *
+ *    Web coordination (PR #556 review): the web catalogs have
+ *    no list, so their scroll sentinel rechecks itself after a
+ *    fetch completes and fires the end-reached handler if it is
+ *    still within its margin — including for a fetch that DID
+ *    add rows, which is exactly the case this re-arm leaves to
+ *    the signal. That recheck runs as a child effect, BEFORE
+ *    this hook's own effect processes the completion, so the
+ *    handler claims the completion (see handleEndReached) and
+ *    this re-arm then stands down: the continuation is
+ *    requested exactly once per completion, never twice.
+ *
  * The end latch is a live at-end state, not a one-shot flag:
  * the returned `onScroll` handler recomputes it from the
  * list's scroll metrics on every scroll event (within the
@@ -113,6 +124,13 @@ export function useCatalogPagination({
   // Item count captured when the in-flight fetch began; null
   // while no fetch is being tracked.
   const countAtFetchStartRef = useRef<number | null>(null);
+  // Whether an end signal already requested the continuation
+  // for a fetch whose completion this hook's effect has not
+  // processed yet (the web sentinel's post-completion recheck,
+  // which runs before this effect): the re-arm stands down for
+  // a claimed completion so the continuation is never
+  // requested twice for the same completion.
+  const completionClaimedRef = useRef(false);
   // The latest host callback, read by the re-arm effect so the
   // effect itself never has to subscribe to callback identity.
   // Written inside the effect, never during render: a discarded
@@ -131,12 +149,19 @@ export function useCatalogPagination({
     } else if (wasFetchingRef.current) {
       const countAtFetchStart = countAtFetchStartRef.current;
       countAtFetchStartRef.current = null;
+      const completionClaimed = completionClaimedRef.current;
+      completionClaimedRef.current = false;
       if (countAtFetchStart !== null && itemCount !== countAtFetchStart) {
         // The page added (or removed) rows: the list's content
         // length changed, its end-reached signal re-arms on its
         // own, and the latch's work is done.
         endReachedRef.current = false;
-      } else if (canPaginate && endReachedRef.current && countAtFetchStart !== null) {
+      } else if (
+        !completionClaimed &&
+        canPaginate &&
+        endReachedRef.current &&
+        countAtFetchStart !== null
+      ) {
         // The page added no new visible rows and the viewport
         // is still at the end: re-evaluate the continuation
         // instead of waiting for a scroll-away that the list's
@@ -149,6 +174,15 @@ export function useCatalogPagination({
 
   const handleEndReached = () => {
     endReachedRef.current = true;
+    if (wasFetchingRef.current && !isFetchingNextPage) {
+      // A fetch completed on this commit and the re-arm effect
+      // above has not processed the completion yet (the web
+      // sentinel's recheck runs first, as a child effect): this
+      // fire IS the post-completion recheck, so claim the
+      // completion — the re-arm stands down and the
+      // continuation is requested exactly once.
+      completionClaimedRef.current = true;
+    }
     if (!isFetchingNextPage) {
       onLoadMore?.();
     }

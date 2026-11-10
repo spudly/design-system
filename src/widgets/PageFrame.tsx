@@ -8,8 +8,9 @@ import { ScreenContainer } from "./ScreenContainer.js";
  * 430px-wide frame. A fixed frame width is also what keeps the page
  * screenshots comparable run to run — a fluid width would let the
  * capture viewport, not the layout, decide where things wrap.
- * `scrollable={false}`: the story canvas, not an inner scroll view,
- * owns the page height, so the screenshot captures the whole page.
+ * The story canvas, not an inner scroll view, owns the page
+ * height, so the screenshot captures the whole page (#547: pages
+ * have no inner scroller at all).
  *
  * Story scaffolding, not a widget: it lives in src/widgets so the
  * page directory carries only pages (#119 — the no-page-styling rule
@@ -31,9 +32,7 @@ export function PageFrame({
       {/* The variant spreads conditionally: the repo's
           exactOptionalPropertyTypes rejects an explicit
           undefined variant on the shell's props. */}
-      <ScreenContainer scrollable={false} {...(variant ? { variant } : {})}>
-        {children}
-      </ScreenContainer>
+      <ScreenContainer {...(variant ? { variant } : {})}>{children}</ScreenContainer>
     </View>
   );
 }

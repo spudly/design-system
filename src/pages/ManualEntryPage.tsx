@@ -5,13 +5,19 @@ import { Text } from "../widgets/Text.js";
 
 /**
  * ManualEntryPage (#124, B3a): the shell half of Eciperay's
- * manual recipe creation screen — the scrolling container and
+ * manual recipe creation screen — the container and
  * the "Manual Entry" heading around the recipe form
  * (RecipeFormPage, rendered by the app host as this page's
  * children — the shell/body split the app screens have). The app
  * screen keeps the create mutation and the post-create image
  * upload. Mirrors the app's ManualEntryView shell
  * control-for-control.
+ *
+ * Native scroll ownership (#547, PR #556 review): the shell is
+ * in "content" mode — a bounded frame with no ScrollView of its
+ * own — because the composed RecipeFormPage's ScrollRegion is
+ * the screen's single native scroller; a default shell here
+ * nested that region inside the shell's ScrollView.
  */
 export function ManualEntryPage({
   children,
@@ -22,8 +28,8 @@ export function ManualEntryPage({
   footer?: BigFooterData;
 }) {
   return (
-    <BigFooterShell footer={footer}>
-      <ScreenContainer scrollable={false}>
+    <BigFooterShell footer={footer} scrollMode="content">
+      <ScreenContainer>
         <Text variant="heading">Manual Entry</Text>
         {children}
       </ScreenContainer>

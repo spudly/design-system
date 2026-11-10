@@ -1,5 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Anchor, View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
@@ -7,6 +7,7 @@ import { Alert } from "../widgets/Alert.js";
 import { Badge } from "../widgets/Badge.js";
 import { Card } from "../widgets/Card.js";
 import { CatalogFiltersBar, type CatalogFilterDefinition } from "../views/CatalogFiltersBar.js";
+import { CatalogHeader } from "../views/CatalogHeader.js";
 import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
 import { EmptyState } from "../widgets/EmptyState.js";
 import { LinkOverlay } from "../widgets/linkOverlay.js";
@@ -273,19 +274,42 @@ export type RecipesPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
 
+  /**
+   * Which catalog this page renders (#547, Option 2 — RecipesPage
+   * and DiscoverPage merged into ONE page component):
+   * "signed-in" (default) is the unified own + discovery browse;
+   * "public" is the signed-out public catalog (the former
+   * DiscoverPage contract, whose props follow below). Public vs
+   * signed-in behavior is driven entirely by this prop and the
+   * props each mode supplies.
+   */
+  variant?: "signed-in" | "public";
+  /** Public mode: page title copy (the former DiscoverPage `title`). */
+  title?: string;
+  /** Public mode: search field placeholder copy. */
+  searchPlaceholder?: string;
+  /** Public mode: empty-state message. */
+  emptyMessage?: string;
+  /** Public mode: the failed first load's message; null/absent renders no error state. */
+  errorMessage?: string | null;
+  /** Public mode: the public recipes to render. */
+  recipes?: DiscoverPageItem[];
+  /** Public mode: first-load in flight. */
+  loading?: boolean;
+
   /** The own section's title — caller-supplied copy (e.g. "Your
    * recipes"), rendered as the section's heading above its
    * rows. The section always renders, even when it holds no
    * recipes: it collapses to its empty state, never disappears
    * (#415). */
-  ownTitle: string;
+  ownTitle?: string;
   /** The user's own recipes (created + shared-with-me, shared
    * items carrying `badgeLabel`), already filtered/sorted by
    * the app under the page's one search/filter state. */
-  ownRecipes: RecipesPageItem[];
+  ownRecipes?: RecipesPageItem[];
   /** Own section's first load in flight: the section renders
    * its spinner row; the discovery section is unaffected. */
-  loadingOwn: boolean;
+  loadingOwn?: boolean;
   /** The own section's failed-load message, composed by the
    * app; null/absent renders no error state. A failure here
    * never hides the discovery section. */
@@ -478,6 +502,148 @@ function recipesPageRowKey(row: RecipesPageRow): string {
 }
 
 /**
+ * Web scroll sentinel (#547): on web the catalogs render in
+ * whole-page document flow with NO windowing, so pagination is
+ * driven by this trailing sentinel instead of a FlatList's
+ * end-reached signal. An IntersectionObserver on the sentinel
+ * element fires the pagination handler as the reader approaches
+ * the bottom; where the sentinel's DOM node cannot be resolved
+ * (non-DOM refs), a window scroll listener performs the same
+ * near-bottom check as a fallback. Native never renders this —
+ * native keeps its FlatList and its end-reached signal.
+ *
+ * Recheck (PR #556 review): the observer only calls back when
+ * the sentinel's intersection CHANGES, so two stalls are
+ * possible — the first callback arrives while pagination is
+ * gated (no handler), or a fetch adds rows yet leaves the
+ * sentinel inside the 400px margin. The sentinel therefore
+ * tracks its own visibility and rechecks it whenever
+ * pagination becomes available (the handler goes from absent
+ * to present) and whenever a fetch completes
+ * (`isFetchingNextPage` falls): if it is still within the
+ * margin, it fires the handler again. The recheck coordinates
+ * with the hook's no-new-rows re-arm through the hook itself
+ * (useCatalogPagination's completion claim): a recheck fire on
+ * the completion commit claims that completion, the re-arm
+ * stands down, and the continuation is requested exactly once.
+ *
+ * Deduplication (PR #556 review, round 2): every notification
+ * path — the observer, the no-observer fallback's near-bottom
+ * check, and the recheck — goes through ONE latched fire: a
+ * visibility episode may request a continuation only once,
+ * until the sentinel leaves the margin or the fetch state
+ * changes. Without the latch the fallback's mount-time check
+ * and the recheck effect's mount run both fired before the
+ * host could commit `isFetchingNextPage`, requesting the same
+ * continuation twice — and a host that omits the fetching
+ * flag had no guard against it at all. The latch never
+ * assumes that flag: a host that omits it simply gets one
+ * request per visibility episode.
+ */
+function WebScrollSentinel({
+  onVisible,
+  isFetchingNextPage = false,
+}: {
+  onVisible?: (() => void) | undefined;
+  isFetchingNextPage?: boolean;
+}) {
+  const ref = useRef<{ nodeType?: number } | null>(null);
+  const callbackRef = useRef(onVisible);
+  // Whether the sentinel is currently within the 400px margin
+  // (the observer's last verdict, or the fallback's near-bottom
+  // computation): the recheck below consults it, because no new
+  // observer callback arrives while it simply stays true.
+  const visibleRef = useRef(false);
+  // Whether this visibility episode has already requested its
+  // continuation: the dedup latch every notification path
+  // shares (see the header). Cleared when the sentinel leaves
+  // the margin and when the fetch state changes, so each new
+  // episode — and each completed fetch — may request once more.
+  const requestedRef = useRef(false);
+  // The one latched fire: a no-op while no handler is mounted
+  // (pagination gated — that absence must NOT latch, or the
+  // recheck on pagination becoming available could not fire)
+  // and a no-op once this episode has already requested.
+  const fire = () => {
+    if (!callbackRef.current || requestedRef.current) return;
+    requestedRef.current = true;
+    callbackRef.current();
+  };
+  useEffect(() => {
+    callbackRef.current = onVisible;
+  });
+  useEffect(() => {
+    if (!isWeb || typeof window === "undefined") return;
+    const node = ref.current as unknown as Element | null;
+    if (node && typeof IntersectionObserver !== "undefined" && "nodeType" in node) {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          const visible = entries.some((entry) => entry.isIntersecting);
+          visibleRef.current = visible;
+          if (visible) {
+            fire();
+          } else {
+            requestedRef.current = false;
+          }
+        },
+        { rootMargin: "400px" },
+      );
+      observer.observe(node);
+      return () => {
+        observer.disconnect();
+      };
+    }
+    if (typeof document === "undefined") return;
+    const check = () => {
+      const doc = document.documentElement;
+      const nearBottom = doc.scrollHeight - window.innerHeight - window.scrollY <= 400;
+      visibleRef.current = nearBottom;
+      if (nearBottom) {
+        fire();
+      } else {
+        requestedRef.current = false;
+      }
+    };
+    check();
+    window.addEventListener("scroll", check, { passive: true });
+    window.addEventListener("resize", check);
+    return () => {
+      window.removeEventListener("scroll", check);
+      window.removeEventListener("resize", check);
+    };
+  }, []);
+  // The recheck: pagination becoming available, or a fetch
+  // state change, can each leave a visible sentinel with no
+  // pending observer callback — fire the latched handler once
+  // per such TRANSITION. The previous values are tracked so
+  // the effect's mount run is not itself a transition: at
+  // mount the fallback check above has already fired for this
+  // episode, and a second mount fire is exactly the duplicate
+  // round 2 flagged. A fetch-state change clears the latch
+  // first, so a completed fetch may request its continuation
+  // even while the sentinel never left the margin. Declared
+  // after the callback-ref effect above, so it always calls
+  // the latest handler.
+  const paginationAvailable = onVisible !== undefined;
+  const prevFetchingRef = useRef(isFetchingNextPage);
+  const prevAvailableRef = useRef(paginationAvailable);
+  useEffect(() => {
+    const fetchingChanged = prevFetchingRef.current !== isFetchingNextPage;
+    const availableChanged = prevAvailableRef.current !== paginationAvailable;
+    prevFetchingRef.current = isFetchingNextPage;
+    prevAvailableRef.current = paginationAvailable;
+    if (fetchingChanged) {
+      requestedRef.current = false;
+    }
+    if ((fetchingChanged || availableChanged) && visibleRef.current) {
+      fire();
+    }
+  }, [isFetchingNextPage, paginationAvailable]);
+  if (!isWeb) return null;
+  return <View ref={ref as never} style={{ height: 1 }} testID="catalog-scroll-sentinel" />;
+}
+
+/**
  * Full-page unified Recipes browse view (#415): the one filter
  * bar, the own section (created + shared-with-me, preferred
  * placement), and the discovery section in the fixed `list`
@@ -487,9 +653,16 @@ function recipesPageRowKey(row: RecipesPageRow): string {
  */
 export function RecipesPage(props: RecipesPageProps) {
   const {
-    ownTitle,
-    ownRecipes,
-    loadingOwn,
+    variant = "signed-in",
+    title: publicTitle,
+    searchPlaceholder: publicSearchPlaceholder = "Search public recipes\u2026",
+    emptyMessage: publicEmptyMessage = "",
+    errorMessage: publicErrorMessage = null,
+    recipes: publicRecipes,
+    loading: publicLoading = false,
+    ownTitle = "",
+    ownRecipes = [],
+    loadingOwn = false,
     ownErrorMessage = null,
     ownEmptyTitle = "No recipes found.",
     ownEmptyBody,
@@ -548,6 +721,17 @@ export function RecipesPage(props: RecipesPageProps) {
     isFetchingNextPage,
     itemCount: discoveryRecipes !== undefined ? discoveryRecipes.length : 0,
     canPaginate: hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,
+  });
+
+  // Public-mode pagination (#547): the same shared pattern,
+  // gated on the public catalog's own first load and error
+  // state. Inert in signed-in mode (canPaginate false there is
+  // not used — the signed-in branch above owns that mode).
+  const publicPagination = useCatalogPagination({
+    onLoadMore,
+    isFetchingNextPage,
+    itemCount: publicRecipes !== undefined ? publicRecipes.length : 0,
+    canPaginate: variant === "public" && !publicLoading && !publicErrorMessage,
   });
 
   // The catalog's filter definitions — this page's data in the
@@ -662,9 +846,251 @@ export function RecipesPage(props: RecipesPageProps) {
     }
   }
 
+  const renderRow = (row: RecipesPageRow) => {
+    switch (row.kind) {
+      case "ownHeading":
+        return (
+          <YStack paddingBlockEnd="$3">
+            <SectionHeading>{ownTitle}</SectionHeading>
+          </YStack>
+        );
+      case "ownRecipe": {
+        const item = row.item;
+        const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
+        const hasAccessory = accessory !== null && accessory !== undefined;
+        return (
+          <MediaRow
+            href={item.href}
+            title={item.title}
+            subtitle={item.subtitle}
+            badgeLabel={item.badgeLabel}
+            imageUrl={item.imageUrl}
+            subtitleAction={
+              onLogCookPress && !hasAccessory && item.canLogCook !== false ? (
+                <RatingStars
+                  rating={item.rating}
+                  accessibilityLabel={
+                    item.rating !== null && item.rating !== undefined && item.rating > 0
+                      ? `Log a cook of ${item.title}, rated ${item.rating} out of 5 stars`
+                      : `Log a cook of ${item.title}`
+                  }
+                  onPress={() => {
+                    onLogCookPress(item.id);
+                  }}
+                />
+              ) : undefined
+            }
+            accessory={hasAccessory ? accessory : undefined}
+          />
+        );
+      }
+      case "loadingOwn":
+        return (
+          <Center>
+            <Spinner label="Loading" />
+          </Center>
+        );
+      case "ownError":
+        return <Alert severity="error">{row.message}</Alert>;
+      case "ownEmpty":
+        return (
+          <EmptyState title={ownEmptyTitle} {...(ownEmptyBody ? { body: ownEmptyBody } : {})} />
+        );
+      case "loadingOwnMore":
+        return (
+          <Center>
+            <Spinner label="Loading" />
+          </Center>
+        );
+      case "ownLoadMoreError":
+        return (
+          <Alert
+            severity="error"
+            message={row.message}
+            {...(onOwnLoadMoreRetry
+              ? {
+                  actions: [{ label: ownLoadMoreRetryLabel, onPress: onOwnLoadMoreRetry }],
+                }
+              : {})}
+          />
+        );
+      case "discoveryHeading":
+        return (
+          <YStack paddingBlockEnd="$3">
+            <SectionHeading>{row.title}</SectionHeading>
+          </YStack>
+        );
+      case "discoveryRecipe": {
+        const item = row.item;
+        return (
+          <YStack paddingBlockEnd="$3">
+            <DiscoveryCard
+              title={item.title}
+              {...(item.subtitle ? { subtitle: item.subtitle } : {})}
+              imageUrl={item.imageUrl}
+              href={item.href}
+            />
+          </YStack>
+        );
+      }
+      case "loadingDiscovery":
+        return (
+          <Center>
+            <Spinner label="Loading" />
+          </Center>
+        );
+      case "discoveryError":
+        return <Alert severity="error">{row.message}</Alert>;
+      case "discoveryEmpty":
+        return (
+          <EmptyState
+            title={discoveryEmptyTitle}
+            {...(discoveryEmptyBody ? { body: discoveryEmptyBody } : {})}
+          />
+        );
+    }
+  };
+
+  const filtersBar = (
+    <CatalogFiltersBar
+      searchPlaceholder={variant === "public" ? publicSearchPlaceholder : "Search recipes\u2026"}
+      search={search}
+      onSearchChange={onSearchChange}
+      filters={catalogFilters}
+      {...(activeFilters ? { activeFilters } : {})}
+      {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
+      {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
+      {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
+    />
+  );
+
+  if (variant === "public") {
+    const publicItems: DiscoverPageItem[] = publicLoading ? [] : (publicRecipes ?? []);
+    if (isWeb) {
+      // Public catalog on web (#547): whole-page flow, no
+      // windowing — cards render in document order and the
+      // scroll sentinel drives pagination.
+      return (
+        <BigFooterShell footer={props.footer} scrollMode="content">
+          <ScreenContainer variant="list">
+            <YStack paddingHorizontal="$4" paddingBottom="$8" gap="$3">
+              <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
+              {publicLoading ? (
+                <Center>
+                  <Spinner label="Loading" />
+                </Center>
+              ) : publicErrorMessage ? (
+                <Alert severity="error">{publicErrorMessage}</Alert>
+              ) : publicItems.length === 0 ? (
+                <EmptyState title={publicEmptyMessage} />
+              ) : (
+                publicItems.map((item) => (
+                  <DiscoveryCard
+                    key={item.id}
+                    title={item.title}
+                    {...(item.subtitle ? { subtitle: item.subtitle } : {})}
+                    imageUrl={item.imageUrl}
+                    href={item.href}
+                  />
+                ))
+              )}
+              {isFetchingNextPage ? (
+                <Center>
+                  <Spinner label="Loading" />
+                </Center>
+              ) : null}
+              <WebScrollSentinel
+                isFetchingNextPage={isFetchingNextPage}
+                onVisible={publicPagination.onEndReached}
+              />
+            </YStack>
+          </ScreenContainer>
+        </BigFooterShell>
+      );
+    }
+    // Public catalog on native: the BoundedList FlatList keeps
+    // its windowing as the page's scroll owner — the shell is
+    // in "content" mode, so no shell ScrollView wraps it.
+    return (
+      <BigFooterShell footer={props.footer} scrollMode="content">
+        <ScreenContainer variant="list">
+          <BoundedList
+            separator="md"
+            contentInset="page"
+            keyboardShouldPersistTaps="handled"
+            data={publicItems}
+            keyExtractor={(recipe) => recipe.id}
+            ListHeaderComponent={
+              <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
+            }
+            renderItem={({ item }) => (
+              <DiscoveryCard
+                title={item.title}
+                {...(item.subtitle ? { subtitle: item.subtitle } : {})}
+                imageUrl={item.imageUrl}
+                href={item.href}
+              />
+            )}
+            ListEmptyComponent={
+              publicLoading ? (
+                <Center>
+                  <Spinner label="Loading" />
+                </Center>
+              ) : publicErrorMessage ? (
+                <Alert severity="error">{publicErrorMessage}</Alert>
+              ) : (
+                <EmptyState title={publicEmptyMessage} />
+              )
+            }
+            ListFooterComponent={
+              isFetchingNextPage ? (
+                <Center>
+                  <Spinner label="Loading" />
+                </Center>
+              ) : undefined
+            }
+            onEndReached={publicPagination.onEndReached}
+            onScroll={publicPagination.onScroll}
+            onEndReachedThreshold={publicPagination.onEndReachedThreshold}
+          />
+        </ScreenContainer>
+      </BigFooterShell>
+    );
+  }
+
+  if (isWeb) {
+    // Signed-in catalog on web (#547): whole-page flow, no
+    // windowing — every row renders in document order inside
+    // the page shell and the scroll sentinel drives the
+    // discovery section's pagination (the same guarded
+    // handler the FlatList's end-reached signal uses on
+    // native, so the shared pagination pattern is unchanged).
+    return (
+      <BigFooterShell footer={props.footer} scrollMode="content">
+        <ScreenContainer variant="list">
+          <YStack paddingHorizontal="$4" paddingBottom="$8">
+            {filtersBar}
+            {rows.map((row) => (
+              <YStack key={recipesPageRowKey(row)}>{renderRow(row)}</YStack>
+            ))}
+            {isFetchingNextPage ? (
+              <Center>
+                <Spinner label="Loading" />
+              </Center>
+            ) : null}
+            <WebScrollSentinel isFetchingNextPage={isFetchingNextPage} onVisible={onEndReached} />
+          </YStack>
+        </ScreenContainer>
+      </BigFooterShell>
+    );
+  }
+
+  // Signed-in catalog on native: the BoundedList FlatList is
+  // the scroll owner, exactly as in public mode — the shell's
+  // "content" mode keeps it outside any shell ScrollView.
   return (
-    <BigFooterShell footer={props.footer}>
-      <ScreenContainer variant="list" scrollable={false}>
+    <BigFooterShell footer={props.footer} scrollMode="content">
+      <ScreenContainer variant="list">
         <BoundedList
           separator="none"
           contentInset="page"
@@ -682,125 +1108,8 @@ export function RecipesPage(props: RecipesPageProps) {
           // flips a section's loading flag and a tree swap would
           // unmount the focused filter input mid-typing; the loading
           // indicators render as the sections' own rows instead.
-          ListHeaderComponent={
-            <CatalogFiltersBar
-              searchPlaceholder="Search recipes…"
-              search={search}
-              onSearchChange={onSearchChange}
-              filters={catalogFilters}
-              {...(activeFilters ? { activeFilters } : {})}
-              {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}
-              {...(filterChooserOpen !== undefined ? { filterChooserOpen } : {})}
-              {...(onFilterChooserOpenChange ? { onFilterChooserOpenChange } : {})}
-            />
-          }
-          renderItem={({ item: row }) => {
-            switch (row.kind) {
-              case "ownHeading":
-                return (
-                  <YStack paddingBlockEnd="$3">
-                    <SectionHeading>{ownTitle}</SectionHeading>
-                  </YStack>
-                );
-              case "ownRecipe": {
-                const item = row.item;
-                const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
-                const hasAccessory = accessory !== null && accessory !== undefined;
-                return (
-                  <MediaRow
-                    href={item.href}
-                    title={item.title}
-                    subtitle={item.subtitle}
-                    badgeLabel={item.badgeLabel}
-                    imageUrl={item.imageUrl}
-                    subtitleAction={
-                      onLogCookPress && !hasAccessory && item.canLogCook !== false ? (
-                        <RatingStars
-                          rating={item.rating}
-                          accessibilityLabel={
-                            item.rating !== null && item.rating !== undefined && item.rating > 0
-                              ? `Log a cook of ${item.title}, rated ${item.rating} out of 5 stars`
-                              : `Log a cook of ${item.title}`
-                          }
-                          onPress={() => {
-                            onLogCookPress(item.id);
-                          }}
-                        />
-                      ) : undefined
-                    }
-                    accessory={hasAccessory ? accessory : undefined}
-                  />
-                );
-              }
-              case "loadingOwn":
-                return (
-                  <Center>
-                    <Spinner label="Loading" />
-                  </Center>
-                );
-              case "ownError":
-                return <Alert severity="error">{row.message}</Alert>;
-              case "ownEmpty":
-                return (
-                  <EmptyState
-                    title={ownEmptyTitle}
-                    {...(ownEmptyBody ? { body: ownEmptyBody } : {})}
-                  />
-                );
-              case "loadingOwnMore":
-                return (
-                  <Center>
-                    <Spinner label="Loading" />
-                  </Center>
-                );
-              case "ownLoadMoreError":
-                return (
-                  <Alert
-                    severity="error"
-                    message={row.message}
-                    {...(onOwnLoadMoreRetry
-                      ? {
-                          actions: [{ label: ownLoadMoreRetryLabel, onPress: onOwnLoadMoreRetry }],
-                        }
-                      : {})}
-                  />
-                );
-              case "discoveryHeading":
-                return (
-                  <YStack paddingBlockEnd="$3">
-                    <SectionHeading>{row.title}</SectionHeading>
-                  </YStack>
-                );
-              case "discoveryRecipe": {
-                const item = row.item;
-                return (
-                  <YStack paddingBlockEnd="$3">
-                    <DiscoveryCard
-                      title={item.title}
-                      {...(item.subtitle ? { subtitle: item.subtitle } : {})}
-                      imageUrl={item.imageUrl}
-                      href={item.href}
-                    />
-                  </YStack>
-                );
-              }
-              case "loadingDiscovery":
-                return (
-                  <Center>
-                    <Spinner label="Loading" />
-                  </Center>
-                );
-              case "discoveryError":
-                return <Alert severity="error">{row.message}</Alert>;
-              case "discoveryEmpty":
-                return (
-                  <EmptyState
-                    title={discoveryEmptyTitle}
-                    {...(discoveryEmptyBody ? { body: discoveryEmptyBody } : {})}
-                  />
-                );
-            }
-          }}
+          ListHeaderComponent={filtersBar}
+          renderItem={({ item: row }) => renderRow(row)}
           onEndReached={onEndReached}
           onScroll={onScroll}
           onEndReachedThreshold={onEndReachedThreshold}
