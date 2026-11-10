@@ -14,10 +14,16 @@ the field to 1826px on a Pixel 8a) passed every web check.
 
 Since #302, the react-native storybook is ALSO published to a
 separate Chromatic React Native project via
-`.github/workflows/chromatic-rn.yml`. Chromatic builds the Expo
-Storybook app itself (no custom build commands — the
+`.github/workflows/chromatic-rn.yml`. The workflow builds the Expo
+Storybook app with the Chromatic CLI's `react-native-build`
+sub-command (no custom build commands — the
 `reactNative.*BuildCommand` config keys are a non-Expo escape hatch
-only), drives it over WebSockets (the env-controlled options in
+only) and publishes the prebuilt artifact with
+`chromatic --storybook-build-dir` — the split flow in Chromatic's
+React Native CI docs; a plain `chromatic` run enters the CLI's web
+Storybook path and fails demanding a `build-storybook` script this
+on-device Storybook does not have. Chromatic then drives the app
+over WebSockets (the env-controlled options in
 `apps/storybook/Storybook.tsx`; config in
 `apps/storybook/chromatic.config.json`), captures the full story set
 on its hosted Android Emulator, and diffs against baselines
