@@ -161,12 +161,18 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * that already carries a non-default value so a pre-filtered
  * screen never hides its own active filters.
  *
- * Pagination: `onLoadMore` is the DISCOVERY section's
- * continuation — the own section is the caller's complete
- * collection, so the list's end-reached signal can only mean
- * "more public recipes". It rides the shared catalog
- * pagination pattern (useCatalogPagination, #285), gated on
- * both sections' first loads and on the discovery error state.
+ * Pagination (#559): each section paginates independently
+ * through its OWN instance of the shared catalog pagination
+ * pattern (useCatalogPagination, #285) — `onLoadMore` is the
+ * DISCOVERY section's continuation and `onOwnLoadMore` is the
+ * OWN section's. The list's end-reached signal (and the web
+ * scroll sentinel) calls BOTH instances' handlers, and each
+ * instance latches, guards, and re-arms on its own section's
+ * state alone: the discovery instance gates on the discovery
+ * first load and discovery error states only, the own
+ * instance on the own first load and own error states only.
+ * A discovery failure therefore never stalls own pagination,
+ * and an own failure never stalls discovery pagination.
  *
  * #119: the page composes design-system components and passes
  * data and callbacks only. The layout it used to hand-style
@@ -388,6 +394,19 @@ export type RecipesPageProps = {
   onOwnLoadMoreRetry?: () => void;
   /** The retry action's label ("Try again"). */
   ownLoadMoreRetryLabel?: string;
+  /**
+   * Own-section pagination continuation (#559): the own
+   * section's next-page request, fired by the list's
+   * end-reached signal through the own section's own instance
+   * of the shared catalog pagination pattern (see
+   * useCatalogPagination, #285) — gated on the own section's
+   * first load and own error states only, never on the
+   * discovery section's state, so own pagination keeps firing
+   * while discovery is loading or in an error state. Hosts
+   * whose own section does not paginate omit it, and the own
+   * instance stays inert.
+   */
+  onOwnLoadMore?: () => void;
   /** Optional own-row action, mirroring the app card's log-cook
    * affordance. "Log cook" is a callback only — the cook-log
    * form and its mutation stay in the app, which renders them
@@ -413,6 +432,22 @@ export type RecipesPageProps = {
    * pattern DiscoverPage uses, so the catalogs share one
    * pagination contract). */
   onLoadMore?: () => void;
+  /**
+   * Discovery-section next-page failure (#559): an error row
+   * with a retry action renders after the discovery rows, in
+   * place of the discovery loading-more footer — the discovery
+   * counterpart of `ownLoadMoreErrorMessage`. The first-page
+   * failure stays `discoveryErrorMessage`; this is only the
+   * load-more failure. While it is set, the discovery
+   * pagination instance's gate is closed, so the end-reached
+   * signal cannot re-fire the failed continuation silently —
+   * the retry action is the way forward.
+   */
+  discoveryLoadMoreErrorMessage?: string | null;
+  /** The discovery load-more error row's retry intent; the row renders only with the message. */
+  onDiscoveryLoadMoreRetry?: () => void;
+  /** The discovery retry action's label ("Try again"). */
+  discoveryLoadMoreRetryLabel?: string;
 
   search: string;
   onSearchChange: (value: string) => void;
@@ -468,6 +503,7 @@ type RecipesPageRow =
   | { kind: "ownLoadMoreError"; message: string }
   | { kind: "discoveryHeading"; title: string }
   | { kind: "discoveryRecipe"; item: RecipesPageDiscoveryItem }
+  | { kind: "discoveryLoadMoreError"; message: string }
   | { kind: "loadingDiscovery" }
   | { kind: "discoveryError"; message: string }
   | { kind: "discoveryEmpty" };
@@ -492,6 +528,8 @@ function recipesPageRowKey(row: RecipesPageRow): string {
       return "discovery-heading";
     case "discoveryRecipe":
       return `discovery-recipe-${row.item.id}`;
+    case "discoveryLoadMoreError":
+      return "discovery-load-more-error";
     case "loadingDiscovery":
       return "discovery-loading";
     case "discoveryError":
@@ -677,8 +715,12 @@ export function RecipesPage(props: RecipesPageProps) {
     ownLoadMoreErrorMessage = null,
     onOwnLoadMoreRetry,
     ownLoadMoreRetryLabel = "Try again",
+    onOwnLoadMore,
     onLogCookPress,
     onLoadMore,
+    discoveryLoadMoreErrorMessage = null,
+    onDiscoveryLoadMoreRetry,
+    discoveryLoadMoreRetryLabel = "Try again",
     renderRecipeAccessory,
     search,
     onSearchChange,
@@ -706,11 +748,15 @@ export function RecipesPage(props: RecipesPageProps) {
   } = props;
 
   // Pagination: the shared catalog pattern (#285) — the same
-  // hook DiscoverPage uses. The continuation is the discovery
-  // section's, so the item count is the discovery count and
-  // the mount gate covers both sections' first loads plus the
-  // discovery error state: while any of those shows, the
-  // list's end must not start a page request.
+  // hook DiscoverPage uses — run as TWO independent instances
+  // (#559), one per section. The discovery instance's
+  // continuation is the discovery section's, so its item count
+  // is the discovery count and its mount gate covers the
+  // discovery first load plus the discovery error states (the
+  // first-page error and the load-more error): while any of
+  // those shows, the list's end must not start a discovery
+  // page request. The gate deliberately does NOT read the own
+  // section's state — the sections page independently.
   // The discovery section is present only when the host
   // supplies its recipes (#512); when absent, pagination is
   // inert — item count 0 and canPaginate false — so the
@@ -720,8 +766,38 @@ export function RecipesPage(props: RecipesPageProps) {
     onLoadMore,
     isFetchingNextPage,
     itemCount: discoveryRecipes !== undefined ? discoveryRecipes.length : 0,
-    canPaginate: hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,
+    canPaginate:
+      hasDiscovery && !loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,
   });
+
+  // The own section's pagination instance (#559): its own
+  // continuation (`onOwnLoadMore`), its own fetch signal
+  // (`isFetchingNextOwnPage`), and its own count and gate —
+  // the own first load plus the own error states only. It
+  // never reads the discovery section's state, so own
+  // pagination keeps firing while discovery is loading or in
+  // an error state (and vice versa).
+  const ownPagination = useCatalogPagination({
+    onLoadMore: onOwnLoadMore,
+    isFetchingNextPage: isFetchingNextOwnPage,
+    itemCount: ownRecipes.length,
+    canPaginate: !loadingOwn && !ownErrorMessage && !ownLoadMoreErrorMessage,
+  });
+
+  // The list's end-reached and scroll signals fan out to BOTH
+  // instances: each instance's handler applies its own gate,
+  // fetch guard, and end latch, so a signal one section must
+  // swallow never suppresses the other section's continuation.
+  // Both instances share the default end-reached threshold, so
+  // the discovery instance's threshold serves the list.
+  const handleListEndReached = () => {
+    onEndReached?.();
+    ownPagination.onEndReached?.();
+  };
+  const handleListScroll = (event: Parameters<typeof onScroll>[0]) => {
+    onScroll(event);
+    ownPagination.onScroll(event);
+  };
 
   // Public-mode pagination (#547): the same shared pattern,
   // gated on the public catalog's own first load and error
@@ -843,6 +919,14 @@ export function RecipesPage(props: RecipesPageProps) {
       for (const item of discoveryRecipes) {
         rows.push({ kind: "discoveryRecipe", item });
       }
+      // The discovery section's load-more state (#559): the
+      // failure row renders after the discovery rows and wins
+      // over the loading-more footer (the footer spinner below
+      // is suppressed while the error is set), exactly as
+      // ownLoadMoreError wins over loadingOwnMore above.
+      if (discoveryLoadMoreErrorMessage) {
+        rows.push({ kind: "discoveryLoadMoreError", message: discoveryLoadMoreErrorMessage });
+      }
     }
   }
 
@@ -933,6 +1017,20 @@ export function RecipesPage(props: RecipesPageProps) {
           </YStack>
         );
       }
+      case "discoveryLoadMoreError":
+        return (
+          <Alert
+            severity="error"
+            message={row.message}
+            {...(onDiscoveryLoadMoreRetry
+              ? {
+                  actions: [
+                    { label: discoveryLoadMoreRetryLabel, onPress: onDiscoveryLoadMoreRetry },
+                  ],
+                }
+              : {})}
+          />
+        );
       case "loadingDiscovery":
         return (
           <Center>
@@ -1061,10 +1159,13 @@ export function RecipesPage(props: RecipesPageProps) {
   if (isWeb) {
     // Signed-in catalog on web (#547): whole-page flow, no
     // windowing — every row renders in document order inside
-    // the page shell and the scroll sentinel drives the
-    // discovery section's pagination (the same guarded
-    // handler the FlatList's end-reached signal uses on
-    // native, so the shared pagination pattern is unchanged).
+    // the page shell and the scroll sentinel drives BOTH
+    // sections' pagination through the combined handler (the
+    // same guarded handlers the FlatList's end-reached signal
+    // uses on native, so the shared pagination pattern is
+    // unchanged). The sentinel's fetch signal is the two
+    // sections' combined fetch state, so a completed fetch in
+    // either section rechecks the sentinel.
     return (
       <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
@@ -1073,12 +1174,15 @@ export function RecipesPage(props: RecipesPageProps) {
             {rows.map((row) => (
               <YStack key={recipesPageRowKey(row)}>{renderRow(row)}</YStack>
             ))}
-            {isFetchingNextPage ? (
+            {isFetchingNextPage && !discoveryLoadMoreErrorMessage ? (
               <Center>
                 <Spinner label="Loading" />
               </Center>
             ) : null}
-            <WebScrollSentinel isFetchingNextPage={isFetchingNextPage} onVisible={onEndReached} />
+            <WebScrollSentinel
+              isFetchingNextPage={isFetchingNextPage || isFetchingNextOwnPage}
+              onVisible={handleListEndReached}
+            />
           </YStack>
         </ScreenContainer>
       </BigFooterShell>
@@ -1110,11 +1214,11 @@ export function RecipesPage(props: RecipesPageProps) {
           // indicators render as the sections' own rows instead.
           ListHeaderComponent={filtersBar}
           renderItem={({ item: row }) => renderRow(row)}
-          onEndReached={onEndReached}
-          onScroll={onScroll}
+          onEndReached={handleListEndReached}
+          onScroll={handleListScroll}
           onEndReachedThreshold={onEndReachedThreshold}
           ListFooterComponent={
-            isFetchingNextPage ? (
+            isFetchingNextPage && !discoveryLoadMoreErrorMessage ? (
               <Center>
                 <Spinner label="Loading" />
               </Center>

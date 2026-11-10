@@ -162,6 +162,9 @@ function RecipesPageDemo({
   loadingDiscovery = false,
   ownErrorMessage = null,
   discoveryErrorMessage = null,
+  discoveryLoadMoreErrorMessage = null,
+  onDiscoveryLoadMoreRetry,
+  paginateOwn = false,
   isFetchingNextPage = false,
   omitDiscovery = false,
   expandedRecipeId,
@@ -176,6 +179,9 @@ function RecipesPageDemo({
   loadingDiscovery?: boolean;
   ownErrorMessage?: string | null;
   discoveryErrorMessage?: string | null;
+  discoveryLoadMoreErrorMessage?: string | null;
+  onDiscoveryLoadMoreRetry?: () => void;
+  paginateOwn?: boolean;
   isFetchingNextPage?: boolean;
   expandedRecipeId?: string;
   initialActiveFilters?: RecipesPageFilterId[];
@@ -207,14 +213,25 @@ function RecipesPageDemo({
     recipe.title.toLowerCase().includes(search.toLowerCase()),
   );
 
+  // Own-section pagination stand-in (#559): when the story asks
+  // for it, the demo reveals the own fixtures three at a time and
+  // the page's own continuation reveals the next slice — the
+  // honest stand-in for the app's own next-page fetch.
+  const [ownVisibleCount, setOwnVisibleCount] = useState(3);
+  const pagedOwn = paginateOwn ? visibleOwn.slice(0, ownVisibleCount) : visibleOwn;
+  const handleOwnLoadMore = () => {
+    setOwnVisibleCount((count) => Math.min(count + 3, visibleOwn.length));
+  };
+
   return (
     <Viewport>
       <RecipesPage
         footer={eciperayFooterFixture}
         ownTitle="Your recipes"
-        ownRecipes={visibleOwn}
+        ownRecipes={pagedOwn}
         loadingOwn={loadingOwn}
         ownErrorMessage={ownErrorMessage}
+        {...(paginateOwn ? { onOwnLoadMore: handleOwnLoadMore } : {})}
         {...(omitDiscovery
           ? {}
           : {
@@ -222,6 +239,8 @@ function RecipesPageDemo({
               discoveryRecipes: visibleDiscovery,
               loadingDiscovery,
               discoveryErrorMessage,
+              discoveryLoadMoreErrorMessage,
+              ...(onDiscoveryLoadMoreRetry ? { onDiscoveryLoadMoreRetry } : {}),
             })}
         isFetchingNextPage={isFetchingNextPage}
         onLogCookPress={() => undefined}
@@ -347,6 +366,33 @@ export const DiscoveryError: Story = {
   // above it render untouched.
   render: () => (
     <RecipesPageDemo
+      discoveryRecipes={[]}
+      discoveryErrorMessage="We couldn't load public recipes. Check your connection and try again."
+    />
+  ),
+};
+
+export const DiscoveryLoadMoreError: Story = {
+  // Discovery next-page failure (#559): the discovery rows stay
+  // rendered and an error row with a retry action follows them,
+  // instead of pagination latching silently — the discovery
+  // counterpart of the own section's load-more error row.
+  render: () => (
+    <RecipesPageDemo
+      discoveryLoadMoreErrorMessage="We couldn't load more public recipes. Check your connection and try again."
+      onDiscoveryLoadMoreRetry={() => undefined}
+    />
+  ),
+};
+
+export const OwnLoadMoreWhileDiscoveryError: Story = {
+  // Decoupled pagination (#559): discovery is in its first-page
+  // error state, yet the own section still paginates — the demo
+  // reveals its own recipes three at a time through the page's
+  // own continuation, which the discovery error cannot gate.
+  render: () => (
+    <RecipesPageDemo
+      paginateOwn
       discoveryRecipes={[]}
       discoveryErrorMessage="We couldn't load public recipes. Check your connection and try again."
     />

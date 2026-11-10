@@ -676,7 +676,7 @@ describe("recipesPageUnified", () => {
     );
     assert.match(
       code,
-      /hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage/,
+      /hasDiscovery &&\s*!loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage/,
     );
     // The OwnOnly story proves the omission path: it passes no discovery props.
     assert.match(
@@ -827,11 +827,11 @@ describe("recipesPageUnified", () => {
     assert.ok(!code.includes("onRecipePress"), "no press callback may replace the permalink");
   });
 
-  test("pagination is the discovery continuation, gated on both loads and the discovery error", () => {
+  test("discovery pagination is decoupled: its gate reads discovery state only (#559)", () => {
     assert.match(
       code,
-      /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,\s*canPaginate:\s*hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,/,
-      "the shared pattern counts discovery rows and gates on both first loads + the discovery error — and on the section being supplied at all (#512)",
+      /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,\s*canPaginate:\s*hasDiscovery &&\s*!loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,/,
+      "the shared pattern counts discovery rows and gates on the discovery first load + the discovery errors — and on the section being supplied at all (#512) — never on the own section's state (#559)",
     );
   });
 
@@ -865,5 +865,142 @@ describe("recipesPageUnified", () => {
     // stand-in for the app's unified server-side filtering.
     assert.match(stories, /const visibleOwn = ownRecipes\.filter\(/);
     assert.match(stories, /const visibleDiscovery = discoveryRecipes\.filter\(/);
+  });
+});
+
+describe("recipesPageDecoupledPagination", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pagesDir = join(here, "../..", "src", "pages");
+  const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
+
+  // Strip block and line comments so documented patterns in prose
+  // cannot pass the scan.
+  const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
+  test("the new props mirror the own-section load-more trio (#559)", () => {
+    assert.match(code, /onOwnLoadMore\?: \(\) => void;/, "the own continuation prop");
+    assert.match(
+      code,
+      /discoveryLoadMoreErrorMessage\?: string \| null;/,
+      "the discovery load-more error prop",
+    );
+    assert.match(code, /onDiscoveryLoadMoreRetry\?: \(\) => void;/, "the discovery retry prop");
+    assert.match(code, /discoveryLoadMoreRetryLabel\?: string;/, "the discovery retry label prop");
+    assert.match(
+      code,
+      /discoveryLoadMoreRetryLabel = "Try again",/,
+      'the discovery retry label defaults to "Try again", mirroring ownLoadMoreRetryLabel',
+    );
+    // The own trio the new props mirror is unchanged.
+    assert.match(code, /ownLoadMoreErrorMessage\?: string \| null;/);
+    assert.match(code, /onOwnLoadMoreRetry\?: \(\) => void;/);
+    assert.match(code, /ownLoadMoreRetryLabel\?: string;/);
+  });
+
+  test("the own section runs its own pagination instance, gated on own state only", () => {
+    assert.match(
+      code,
+      /const ownPagination = useCatalogPagination\(\{\s*onLoadMore: onOwnLoadMore,\s*isFetchingNextPage: isFetchingNextOwnPage,\s*itemCount: ownRecipes\.length,\s*canPaginate: !loadingOwn && !ownErrorMessage && !ownLoadMoreErrorMessage,\s*\}\);/,
+      "the own instance counts own rows, uses the own fetch signal and continuation, and gates on the own first load + own errors only — never on discovery state",
+    );
+  });
+
+  test("the discovery instance's gate never reads own state", () => {
+    const discoveryGate = code.slice(
+      code.indexOf("const { onEndReached, onScroll, onEndReachedThreshold }"),
+      code.indexOf("const ownPagination"),
+    );
+    assert.match(
+      discoveryGate,
+      /canPaginate:\s*hasDiscovery &&\s*!loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,/,
+    );
+    assert.ok(
+      !discoveryGate.includes("loadingOwn") && !discoveryGate.includes("ownErrorMessage"),
+      "the discovery gate must not couple to the own section's loading or error state (#559)",
+    );
+  });
+
+  test("the list and sentinel handlers fan out to both instances", () => {
+    assert.match(
+      code,
+      /const handleListEndReached = \(\) => \{\s*onEndReached\?\.\(\);\s*ownPagination\.onEndReached\?\.\(\);\s*\};/,
+      "the combined end-reached handler calls both instances, so each applies its own gate and latch",
+    );
+    assert.match(
+      code,
+      /const handleListScroll = \(event: Parameters<typeof onScroll>\[0\]\) => \{\s*onScroll\(event\);\s*ownPagination\.onScroll\(event\);\s*\};/,
+      "the combined scroll handler keeps both instances' end latches current",
+    );
+    assert.match(
+      code,
+      /onEndReached=\{handleListEndReached\}/,
+      "the native list uses the combined handler",
+    );
+    assert.match(
+      code,
+      /onScroll=\{handleListScroll\}/,
+      "the native list uses the combined scroll handler",
+    );
+    assert.match(
+      code,
+      /<WebScrollSentinel\s*isFetchingNextPage=\{isFetchingNextPage \|\| isFetchingNextOwnPage\}\s*onVisible=\{handleListEndReached\}\s*\/>/,
+      "the web sentinel fires the combined handler and rechecks on either section's fetch state",
+    );
+  });
+
+  test("the discovery load-more error is a row after the discovery rows, winning over the loading-more footer", () => {
+    assert.match(code, /\| \{ kind: "discoveryLoadMoreError"; message: string \}/);
+    assert.match(code, /case "discoveryLoadMoreError":\s*return "discovery-load-more-error";/);
+    const recipeAt = code.indexOf('rows.push({ kind: "discoveryRecipe", item });');
+    const errorAt = code.indexOf(
+      'rows.push({ kind: "discoveryLoadMoreError", message: discoveryLoadMoreErrorMessage });',
+    );
+    assert.ok(
+      recipeAt !== -1 && errorAt > recipeAt,
+      "the error row is pushed after the discovery recipe rows",
+    );
+    assert.match(
+      code,
+      /if \(discoveryLoadMoreErrorMessage\) \{\s*rows\.push\(\{ kind: "discoveryLoadMoreError", message: discoveryLoadMoreErrorMessage \}\);/,
+    );
+    // The loading-more footer (native list footer and web row)
+    // is suppressed while the error shows — the error wins,
+    // exactly as ownLoadMoreError wins over loadingOwnMore.
+    assert.equal(
+      code.split("isFetchingNextPage && !discoveryLoadMoreErrorMessage").length - 1,
+      2,
+      "both signed-in loading-more footers (native and web) yield to the discovery load-more error",
+    );
+  });
+
+  test("the discovery error row renders with the own row's retry-action treatment", () => {
+    assert.match(
+      code,
+      /case "discoveryLoadMoreError":\s*return \(\s*<Alert\s*severity="error"\s*message=\{row\.message\}\s*\{\.\.\.\(onDiscoveryLoadMoreRetry\s*\?\s*\{\s*actions: \[\s*\{ label: discoveryLoadMoreRetryLabel, onPress: onDiscoveryLoadMoreRetry \},\s*\],\s*\}\s*: \{\}\)\}\s*\/>\s*\);/,
+      "the row is the same Alert + retry action composition as the own load-more error row",
+    );
+    assert.match(
+      code,
+      /case "ownLoadMoreError":\s*return \(\s*<Alert\s*severity="error"\s*message=\{row\.message\}/,
+      "the own row it mirrors is unchanged",
+    );
+  });
+
+  test("stories cover the discovery load-more error and own pagination during a discovery error", () => {
+    assert.match(stories, /export const DiscoveryLoadMoreError/);
+    assert.match(stories, /discoveryLoadMoreErrorMessage="We couldn't load more public recipes\./);
+    assert.match(stories, /onDiscoveryLoadMoreRetry=\{\(\) => undefined\}/);
+    assert.match(stories, /export const OwnLoadMoreWhileDiscoveryError/);
+    assert.match(
+      stories,
+      /paginateOwn\s+discoveryRecipes=\{\[\]\}\s+discoveryErrorMessage=/,
+      "the own-pagination story runs while discovery carries its first-page error",
+    );
+    assert.match(
+      stories,
+      /onOwnLoadMore: handleOwnLoadMore/,
+      "the demo wires its own continuation only when a story asks for own pagination",
+    );
   });
 });

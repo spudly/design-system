@@ -155,6 +155,16 @@ test("the unified catalog page calls the shared hook for both modes (#547)", () 
     /const publicPagination = useCatalogPagination\(\{/,
     "the public mode calls the same shared hook (#547)",
   );
+  assert.match(
+    recipesPage,
+    /const ownPagination = useCatalogPagination\(\{/,
+    "the signed-in mode's own section runs its own instance of the same shared hook (#559)",
+  );
+  assert.match(
+    recipesPage,
+    /const handleListEndReached = \(\) => \{\s*onEndReached\?\.\(\);\s*ownPagination\.onEndReached\?\.\(\);\s*\};/,
+    "the signed-in end-reached signal fans out to both instances (#559)",
+  );
   assert.equal(
     recipesPage.match(/onLoadMore,\s*isFetchingNextPage,/g)?.length,
     2,
@@ -162,7 +172,7 @@ test("the unified catalog page calls the shared hook for both modes (#547)", () 
   );
   assert.ok(
     !recipesPage.includes("handleEndReached"),
-    "the page must not define a local end-reached handler — the pattern is shared",
+    "the page must not define a local end-reached handler — the pattern is shared (its fan-out handler is handleListEndReached, #559)",
   );
   assert.match(
     discoverPage,
@@ -172,16 +182,20 @@ test("the unified catalog page calls the shared hook for both modes (#547)", () 
 });
 
 test("the unified page wires the hook's handlers to its lists and its web sentinel (#547)", () => {
-  assert.match(recipesPage, /onEndReached=\{onEndReached\}/);
-  assert.match(recipesPage, /onScroll=\{onScroll\}/);
+  // Signed-in mode wires the COMBINED handlers (#559): the list
+  // signal fans out to both sections' pagination instances.
+  assert.match(recipesPage, /onEndReached=\{handleListEndReached\}/);
+  assert.match(recipesPage, /onScroll=\{handleListScroll\}/);
   assert.match(recipesPage, /onEndReachedThreshold=\{onEndReachedThreshold\}/);
   assert.match(recipesPage, /onEndReached=\{publicPagination\.onEndReached\}/);
   assert.match(recipesPage, /onScroll=\{publicPagination\.onScroll\}/);
   // Web has no list: the scroll sentinel drives the same
-  // guarded handler (#547, no windowing on web).
+  // guarded handler (#547, no windowing on web) — in signed-in
+  // mode the combined handler, rechecked on either section's
+  // fetch state (#559).
   assert.match(
     recipesPage,
-    /<WebScrollSentinel\s+isFetchingNextPage=\{isFetchingNextPage\}\s+onVisible=\{onEndReached\}\s*\/>/,
+    /<WebScrollSentinel\s+isFetchingNextPage=\{isFetchingNextPage \|\| isFetchingNextOwnPage\}\s+onVisible=\{handleListEndReached\}\s*\/>/,
   );
   assert.match(
     recipesPage,
@@ -191,19 +205,27 @@ test("the unified page wires the hook's handlers to its lists and its web sentin
 
 test("each mode counts the rows its continuation extends", () => {
   // The public mode's continuation extends its one list; the
-  // signed-in mode's continuation is its discovery section's,
-  // so it counts the discovery rows (#415).
+  // signed-in mode's continuations extend their own sections,
+  // so each instance counts its own section's rows (#415, #559).
   assert.match(recipesPage, /itemCount: publicRecipes !== undefined \? publicRecipes\.length : 0,/);
   assert.match(
     recipesPage,
     /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,/,
   );
+  assert.match(recipesPage, /itemCount: ownRecipes\.length,/);
 });
 
 test("each mode's mount gate matches its states", () => {
+  // Signed-in: the two instances gate on their OWN section's
+  // states only (#559 decoupled the discovery gate from the
+  // own section's first load).
   assert.match(
     recipesPage,
-    /canPaginate:\s*hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,\s*\}\);/,
+    /canPaginate:\s*hasDiscovery &&\s*!loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,\s*\}\);/,
+  );
+  assert.match(
+    recipesPage,
+    /canPaginate: !loadingOwn && !ownErrorMessage && !ownLoadMoreErrorMessage,\s*\}\);/,
   );
   assert.match(
     recipesPage,
@@ -223,8 +245,18 @@ test("both modes keep the loading-more footer on isFetchingNextPage", () => {
     /ListFooterComponent=\{\s*isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/g;
   assert.equal(
     recipesPage.match(footerPattern)?.length,
-    2,
-    "both native modes' list footers are the shared Center + Spinner composition, keyed off isFetchingNextPage",
+    1,
+    "the public mode's list footer is the shared Center + Spinner composition, keyed off isFetchingNextPage",
+  );
+  // Signed-in mode: the same footer, suppressed while the
+  // discovery load-more error row shows — the error wins over
+  // the loading-more footer (#559).
+  const signedInFooterPattern =
+    /ListFooterComponent=\{\s*isFetchingNextPage && !discoveryLoadMoreErrorMessage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/g;
+  assert.equal(
+    recipesPage.match(signedInFooterPattern)?.length,
+    1,
+    "the signed-in mode's list footer is the same composition, yielding to the discovery load-more error",
   );
 });
 
