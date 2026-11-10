@@ -899,10 +899,27 @@ describe("recipesPageDecoupledPagination", () => {
   });
 
   test("the own section runs its own pagination instance, gated on own state only", () => {
-    assert.match(
-      code,
-      /const ownPagination = useCatalogPagination\(\{\s*onLoadMore: onOwnLoadMore,\s*isFetchingNextPage: isFetchingNextOwnPage,\s*itemCount: ownRecipes\.length,\s*canPaginate: !loadingOwn && !ownErrorMessage && !ownLoadMoreErrorMessage,\s*\}\);/,
-      "the own instance counts own rows, uses the own fetch signal and continuation, and gates on the own first load + own errors only — never on discovery state",
+    // Semantic checks (loosened from an exact call-shape pin,
+    // PR #563 review): the own instance must use the own
+    // continuation and fetch signal, count own rows, and gate
+    // on the own section's terms only — formatting may vary.
+    const ownBlock = code.slice(
+      code.indexOf("const ownPagination"),
+      code.indexOf("const handleListEndReached"),
+    );
+    assert.ok(ownBlock.length > 0, "the own pagination instance exists");
+    assert.match(ownBlock, /useCatalogPagination\(/);
+    assert.match(ownBlock, /onOwnLoadMore/, "the own continuation");
+    assert.match(ownBlock, /isFetchingNextOwnPage/, "the own fetch signal");
+    assert.match(ownBlock, /ownRecipes\.length/, "the own row count");
+    for (const gate of ["!loadingOwn", "!ownErrorMessage", "!ownLoadMoreErrorMessage"]) {
+      assert.ok(ownBlock.includes(gate), `the own gate includes ${gate}`);
+    }
+    assert.ok(
+      !ownBlock.includes("loadingDiscovery") &&
+        !ownBlock.includes("discoveryErrorMessage") &&
+        !ownBlock.includes("discoveryLoadMoreErrorMessage"),
+      "the own gate must not couple to the discovery section's state (#559)",
     );
   });
 
@@ -942,10 +959,27 @@ describe("recipesPageDecoupledPagination", () => {
       /onScroll=\{handleListScroll\}/,
       "the native list uses the combined scroll handler",
     );
+    // The web sentinel takes per-section wiring (#559, PR #563
+    // review): each section's own handler and fetching flag, so
+    // availability and dedup are tracked per section — never a
+    // single combined handler or combined fetching flag.
+    const signedInStart = code.lastIndexOf("<WebScrollSentinel");
+    const signedInSentinel = code.slice(signedInStart, code.indexOf("/>", signedInStart));
+    assert.match(signedInSentinel, /sections=\{\[/, "the sentinel takes a sections list");
     assert.match(
-      code,
-      /<WebScrollSentinel\s*isFetchingNextPage=\{isFetchingNextPage \|\| isFetchingNextOwnPage\}\s*onVisible=\{handleListEndReached\}\s*\/>/,
-      "the web sentinel fires the combined handler and rechecks on either section's fetch state",
+      signedInSentinel,
+      /onVisible: onEndReached, isFetchingNextPage/,
+      "the discovery section passes its own handler and fetching flag",
+    );
+    assert.match(
+      signedInSentinel,
+      /onVisible: ownPagination\.onEndReached,\s*isFetchingNextPage: isFetchingNextOwnPage/,
+      "the own section passes its own handler and fetching flag",
+    );
+    assert.ok(
+      !signedInSentinel.includes("handleListEndReached") &&
+        !signedInSentinel.includes("isFetchingNextPage || isFetchingNextOwnPage"),
+      "the web sentinel must not use the combined handler or a combined fetching flag (#559)",
     );
   });
 
@@ -975,15 +1009,62 @@ describe("recipesPageDecoupledPagination", () => {
   });
 
   test("the discovery error row renders with the own row's retry-action treatment", () => {
+    // Semantic checks (loosened from an exact Alert JSX pin,
+    // PR #563 review): the row kind must render an error Alert
+    // carrying its message and the discovery retry wiring —
+    // formatting and spread/ternary shape may vary.
+    const discoveryStart = code.indexOf(
+      'case "discoveryLoadMoreError":',
+      code.indexOf("const renderRow"),
+    );
+    const discoveryRow = code.slice(
+      discoveryStart,
+      code.indexOf('case "loadingDiscovery":', discoveryStart),
+    );
+    assert.ok(discoveryRow.length > 0, "the discovery load-more error row exists");
+    assert.match(discoveryRow, /<Alert/, "the row renders an Alert");
+    assert.match(discoveryRow, /severity="error"/, "the row is an error Alert");
+    assert.match(discoveryRow, /row\.message/, "the row carries its message");
+    assert.match(discoveryRow, /onDiscoveryLoadMoreRetry/, "the retry intent is wired");
+    assert.match(discoveryRow, /discoveryLoadMoreRetryLabel/, "the retry label is wired");
+    assert.match(discoveryRow, /actions:/, "the retry is offered as an Alert action");
+    const ownStart = code.indexOf('case "ownLoadMoreError":', code.indexOf("const renderRow"));
+    const ownRow = code.slice(ownStart, code.indexOf('case "discoveryHeading":', ownStart));
+    assert.match(ownRow, /<Alert/, "the own row it mirrors renders an Alert");
+    assert.match(ownRow, /row\.message/, "the own row carries its message");
+  });
+
+  test("the web sentinel tracks availability and dedup per section (#559)", () => {
+    assert.match(code, /type WebScrollSentinelSection = \{/, "the sentinel's section type exists");
     assert.match(
       code,
-      /case "discoveryLoadMoreError":\s*return \(\s*<Alert\s*severity="error"\s*message=\{row\.message\}\s*\{\.\.\.\(onDiscoveryLoadMoreRetry\s*\?\s*\{\s*actions: \[\s*\{ label: discoveryLoadMoreRetryLabel, onPress: onDiscoveryLoadMoreRetry \},\s*\],\s*\}\s*: \{\}\)\}\s*\/>\s*\);/,
-      "the row is the same Alert + retry action composition as the own load-more error row",
+      /function WebScrollSentinel\(\{ sections \}: \{ sections: WebScrollSentinelSection\[\] \}\)/,
+      "the sentinel takes per-section handlers instead of a single combined handler",
     );
     assert.match(
       code,
-      /case "ownLoadMoreError":\s*return \(\s*<Alert\s*severity="error"\s*message=\{row\.message\}/,
-      "the own row it mirrors is unchanged",
+      /const requestedRefs = useRef<boolean\[\]>\(\[\]\);/,
+      "one dedup latch per section",
+    );
+    assert.match(code, /const fireSection = \(index: number\) => \{/);
+    assert.match(
+      code,
+      /requestedRefs\.current\[index\] = false;/,
+      "a fetching change clears only that section's latch",
+    );
+    assert.match(code, /const prevAvailableRefs = useRef<boolean\[\]>\(/);
+    assert.match(code, /const prevFetchingRefs = useRef<boolean\[\]>\(/);
+    assert.match(
+      code,
+      /if \(\(fetchingChanged \|\| availableChanged\) && visibleRef\.current\) \{\s*fireSection\(index\);/,
+      "the recheck fires only the section whose availability or fetching changed",
+    );
+    // The public variant keeps single-catalog behavior through
+    // the same mechanism with one section.
+    assert.match(
+      code,
+      /onVisible: publicPagination\.onEndReached, isFetchingNextPage/,
+      "the public variant passes its single section to the sentinel",
     );
   });
 

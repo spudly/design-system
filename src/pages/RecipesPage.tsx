@@ -544,71 +544,99 @@ function recipesPageRowKey(row: RecipesPageRow): string {
  * whole-page document flow with NO windowing, so pagination is
  * driven by this trailing sentinel instead of a FlatList's
  * end-reached signal. An IntersectionObserver on the sentinel
- * element fires the pagination handler as the reader approaches
+ * element fires the pagination handlers as the reader approaches
  * the bottom; where the sentinel's DOM node cannot be resolved
  * (non-DOM refs), a window scroll listener performs the same
  * near-bottom check as a fallback. Native never renders this —
  * native keeps its FlatList and its end-reached signal.
+ *
+ * Per-section availability and deduplication (#559): the
+ * sentinel takes one section per paginating catalog section —
+ * each section's own pagination handler (`onVisible`, undefined
+ * while that section is gated) and its own fetching flag. All
+ * tracking is PER SECTION: each section carries its own dedup
+ * latch, availability is tracked per section, and fetching is
+ * tracked per section. A single combined handler/flag would
+ * stall pagination: if the sentinel became visible while BOTH
+ * sections were gated, a combined fire would consume the shared
+ * latch (both hooks swallow it), and when one section's gate
+ * later opened, neither the combined availability nor the
+ * combined fetching flag would change, so no recheck would
+ * fire for that section. With per-section wiring, a section
+ * that becomes available is rechecked on its own transition,
+ * and a fetching change clears only that section's latch.
  *
  * Recheck (PR #556 review): the observer only calls back when
  * the sentinel's intersection CHANGES, so two stalls are
  * possible — the first callback arrives while pagination is
  * gated (no handler), or a fetch adds rows yet leaves the
  * sentinel inside the 400px margin. The sentinel therefore
- * tracks its own visibility and rechecks it whenever
- * pagination becomes available (the handler goes from absent
- * to present) and whenever a fetch completes
- * (`isFetchingNextPage` falls): if it is still within the
- * margin, it fires the handler again. The recheck coordinates
- * with the hook's no-new-rows re-arm through the hook itself
- * (useCatalogPagination's completion claim): a recheck fire on
- * the completion commit claims that completion, the re-arm
- * stands down, and the continuation is requested exactly once.
+ * tracks its own visibility and rechecks it whenever a section
+ * becomes available (that section's handler goes from absent
+ * to present) and whenever that section's fetch completes
+ * (its `isFetchingNextPage` falls): if it is still within the
+ * margin, it fires that section's handler again. The recheck
+ * coordinates with the hook's no-new-rows re-arm through the
+ * hook itself (useCatalogPagination's completion claim): a
+ * recheck fire on the completion commit claims that
+ * completion, the re-arm stands down, and the continuation is
+ * requested exactly once.
  *
  * Deduplication (PR #556 review, round 2): every notification
  * path — the observer, the no-observer fallback's near-bottom
- * check, and the recheck — goes through ONE latched fire: a
- * visibility episode may request a continuation only once,
- * until the sentinel leaves the margin or the fetch state
- * changes. Without the latch the fallback's mount-time check
- * and the recheck effect's mount run both fired before the
- * host could commit `isFetchingNextPage`, requesting the same
- * continuation twice — and a host that omits the fetching
- * flag had no guard against it at all. The latch never
- * assumes that flag: a host that omits it simply gets one
- * request per visibility episode.
+ * check, and the recheck — goes through each section's latched
+ * fire: a visibility episode may request a section's
+ * continuation only once, until the sentinel leaves the margin
+ * or that section's fetch state changes. Without the latch the
+ * fallback's mount-time check and the recheck effect's mount
+ * run both fired before the host could commit
+ * `isFetchingNextPage`, requesting the same continuation
+ * twice — and a host that omits the fetching flag had no guard
+ * against it at all. The latch never assumes that flag: a host
+ * that omits it simply gets one request per visibility episode
+ * per section.
  */
-function WebScrollSentinel({
-  onVisible,
-  isFetchingNextPage = false,
-}: {
+type WebScrollSentinelSection = {
   onVisible?: (() => void) | undefined;
   isFetchingNextPage?: boolean;
-}) {
+};
+
+function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] }) {
   const ref = useRef<{ nodeType?: number } | null>(null);
-  const callbackRef = useRef(onVisible);
+  const sectionsRef = useRef(sections);
   // Whether the sentinel is currently within the 400px margin
   // (the observer's last verdict, or the fallback's near-bottom
   // computation): the recheck below consults it, because no new
   // observer callback arrives while it simply stays true.
   const visibleRef = useRef(false);
-  // Whether this visibility episode has already requested its
-  // continuation: the dedup latch every notification path
-  // shares (see the header). Cleared when the sentinel leaves
-  // the margin and when the fetch state changes, so each new
-  // episode — and each completed fetch — may request once more.
-  const requestedRef = useRef(false);
-  // The one latched fire: a no-op while no handler is mounted
-  // (pagination gated — that absence must NOT latch, or the
-  // recheck on pagination becoming available could not fire)
-  // and a no-op once this episode has already requested.
-  const fire = () => {
-    if (!callbackRef.current || requestedRef.current) return;
-    requestedRef.current = true;
-    callbackRef.current();
+  // Whether this visibility episode has already requested each
+  // section's continuation: one dedup latch per section (see
+  // the header). Cleared for all sections when the sentinel
+  // leaves the margin, and for a single section when that
+  // section's fetch state changes, so each new episode — and
+  // each completed fetch — may request once more.
+  const requestedRefs = useRef<boolean[]>([]);
+  // One section's latched fire: a no-op while that section has
+  // no handler mounted (pagination gated — that absence must
+  // NOT latch, or the recheck on that section becoming
+  // available could not fire) and a no-op once this episode
+  // has already requested that section's continuation.
+  const fireSection = (index: number) => {
+    const handler = sectionsRef.current[index]?.onVisible;
+    if (!handler || requestedRefs.current[index]) return;
+    requestedRefs.current[index] = true;
+    handler();
+  };
+  const fireAllSections = () => {
+    sectionsRef.current.forEach((_, index) => {
+      fireSection(index);
+    });
+  };
+  const clearAllLatches = () => {
+    requestedRefs.current = sectionsRef.current.map(() => false);
   };
   useEffect(() => {
-    callbackRef.current = onVisible;
+    sectionsRef.current = sections;
   });
   useEffect(() => {
     if (!isWeb || typeof window === "undefined") return;
@@ -619,9 +647,9 @@ function WebScrollSentinel({
           const visible = entries.some((entry) => entry.isIntersecting);
           visibleRef.current = visible;
           if (visible) {
-            fire();
+            fireAllSections();
           } else {
-            requestedRef.current = false;
+            clearAllLatches();
           }
         },
         { rootMargin: "400px" },
@@ -637,9 +665,9 @@ function WebScrollSentinel({
       const nearBottom = doc.scrollHeight - window.innerHeight - window.scrollY <= 400;
       visibleRef.current = nearBottom;
       if (nearBottom) {
-        fire();
+        fireAllSections();
       } else {
-        requestedRef.current = false;
+        clearAllLatches();
       }
     };
     check();
@@ -650,33 +678,43 @@ function WebScrollSentinel({
       window.removeEventListener("resize", check);
     };
   }, []);
-  // The recheck: pagination becoming available, or a fetch
-  // state change, can each leave a visible sentinel with no
-  // pending observer callback — fire the latched handler once
-  // per such TRANSITION. The previous values are tracked so
-  // the effect's mount run is not itself a transition: at
-  // mount the fallback check above has already fired for this
+  // The recheck, per section: a section becoming available, or
+  // that section's fetch state changing, can each leave a
+  // visible sentinel with no pending observer callback — fire
+  // that section's latched handler once per such TRANSITION.
+  // The previous per-section values are tracked so the
+  // effect's mount run is not itself a transition: at mount
+  // the fallback check above has already fired for this
   // episode, and a second mount fire is exactly the duplicate
-  // round 2 flagged. A fetch-state change clears the latch
-  // first, so a completed fetch may request its continuation
-  // even while the sentinel never left the margin. Declared
-  // after the callback-ref effect above, so it always calls
-  // the latest handler.
-  const paginationAvailable = onVisible !== undefined;
-  const prevFetchingRef = useRef(isFetchingNextPage);
-  const prevAvailableRef = useRef(paginationAvailable);
+  // round 2 flagged. A section's fetch-state change clears
+  // ONLY that section's latch first, so a completed fetch may
+  // request its continuation even while the sentinel never
+  // left the margin; an availability transition rechecks ONLY
+  // the section that became available. Declared after the
+  // sections-ref effect above, so it always calls the latest
+  // handlers.
+  const prevFetchingRefs = useRef<boolean[]>(
+    sections.map((section) => section.isFetchingNextPage ?? false),
+  );
+  const prevAvailableRefs = useRef<boolean[]>(
+    sections.map((section) => section.onVisible !== undefined),
+  );
   useEffect(() => {
-    const fetchingChanged = prevFetchingRef.current !== isFetchingNextPage;
-    const availableChanged = prevAvailableRef.current !== paginationAvailable;
-    prevFetchingRef.current = isFetchingNextPage;
-    prevAvailableRef.current = paginationAvailable;
-    if (fetchingChanged) {
-      requestedRef.current = false;
-    }
-    if ((fetchingChanged || availableChanged) && visibleRef.current) {
-      fire();
-    }
-  }, [isFetchingNextPage, paginationAvailable]);
+    sections.forEach((section, index) => {
+      const fetching = section.isFetchingNextPage ?? false;
+      const available = section.onVisible !== undefined;
+      const fetchingChanged = prevFetchingRefs.current[index] !== fetching;
+      const availableChanged = prevAvailableRefs.current[index] !== available;
+      prevFetchingRefs.current[index] = fetching;
+      prevAvailableRefs.current[index] = available;
+      if (fetchingChanged) {
+        requestedRefs.current[index] = false;
+      }
+      if ((fetchingChanged || availableChanged) && visibleRef.current) {
+        fireSection(index);
+      }
+    });
+  });
   if (!isWeb) return null;
   return <View ref={ref as never} style={{ height: 1 }} testID="catalog-scroll-sentinel" />;
 }
@@ -1098,8 +1136,7 @@ export function RecipesPage(props: RecipesPageProps) {
                 </Center>
               ) : null}
               <WebScrollSentinel
-                isFetchingNextPage={isFetchingNextPage}
-                onVisible={publicPagination.onEndReached}
+                sections={[{ onVisible: publicPagination.onEndReached, isFetchingNextPage }]}
               />
             </YStack>
           </ScreenContainer>
@@ -1160,12 +1197,13 @@ export function RecipesPage(props: RecipesPageProps) {
     // Signed-in catalog on web (#547): whole-page flow, no
     // windowing — every row renders in document order inside
     // the page shell and the scroll sentinel drives BOTH
-    // sections' pagination through the combined handler (the
-    // same guarded handlers the FlatList's end-reached signal
-    // uses on native, so the shared pagination pattern is
-    // unchanged). The sentinel's fetch signal is the two
-    // sections' combined fetch state, so a completed fetch in
-    // either section rechecks the sentinel.
+    // sections' pagination through per-section handlers (each
+    // section's own guarded handler — the same handlers the
+    // FlatList's end-reached signal fans out to on native, so
+    // the shared pagination pattern is unchanged). Each
+    // section carries its own fetch signal to the sentinel, so
+    // a completed fetch or a gate opening in either section
+    // rechecks that section alone (#559).
     return (
       <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
@@ -1180,8 +1218,13 @@ export function RecipesPage(props: RecipesPageProps) {
               </Center>
             ) : null}
             <WebScrollSentinel
-              isFetchingNextPage={isFetchingNextPage || isFetchingNextOwnPage}
-              onVisible={handleListEndReached}
+              sections={[
+                { onVisible: onEndReached, isFetchingNextPage },
+                {
+                  onVisible: ownPagination.onEndReached,
+                  isFetchingNextPage: isFetchingNextOwnPage,
+                },
+              ]}
             />
           </YStack>
         </ScreenContainer>
