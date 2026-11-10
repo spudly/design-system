@@ -1,2 +1,10 @@
 #!/bin/sh
-npx lint-staged
+# Serial tasks (--concurrent false): the lint-staged globs overlap, and
+# Prettier / ESLint --fix must not write a file while another task reads
+# it. --hide-all: tasks validate the staged state, not the working tree.
+npx lint-staged --concurrent false --hide-all || exit 1
+# The affected-test selector runs as its own lint-staged invocation:
+# it must also fire when a commit only deletes a source file, which the
+# default --diff-filter=ACMR never matches — while deleted paths must
+# not reach Prettier/ESLint as arguments in the main run above.
+npx lint-staged --config tools/lintstagedAffectedTests.json --diff-filter=ACMRD --concurrent false --hide-all || exit 1
