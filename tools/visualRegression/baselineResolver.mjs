@@ -44,8 +44,11 @@ export function storyFileBase(file) {
 // The story index the resolver works from: one entry per story
 // with its id, its file, the file's base name, and its export
 // slug (the part of the storyId after the title's). `byId` maps
-// storyId -> entry; `byFileKey` maps "<base>|<exportSlug>" ->
-// entry (the direction a colocated filename resolves in).
+// storyId -> entry; `byFileKey` maps
+// "<storyDir>|<base>|<exportSlug>" -> entry (the direction a
+// colocated filename resolves in — the directory is part of the
+// key so two story files sharing a base name in different
+// directories can never collide).
 export function buildStoryIndex(repoRoot, files = listSourceFiles(repoRoot)) {
   const { stories, unparseable } = collectStories(repoRoot, files);
   const byId = new Map();
@@ -61,7 +64,7 @@ export function buildStoryIndex(repoRoot, files = listSourceFiles(repoRoot)) {
         exportSlug: sanitizeStoryPart(storyNameFromExport(name)),
       };
       byId.set(entry.storyId, entry);
-      byFileKey.set(`${base}|${entry.exportSlug}`, entry);
+      byFileKey.set(`${dirname(story.file)}|${base}|${entry.exportSlug}`, entry);
     }
   }
   return { byId, byFileKey, unparseable };
@@ -126,11 +129,14 @@ export function listCommittedBaselines(repoRoot) {
   const baselines = [];
   const orphans = [];
   for (const dir of walkSnapshotDirs(join(repoRoot, "src"), [])) {
+    const storyDir = dir.slice(repoRoot.length + 1).replace(/\/__snapshots__$/, "");
     for (const name of readdirSync(dir)) {
       if (!name.endsWith(".png")) continue;
       const relPath = `${dir.slice(repoRoot.length + 1)}/${name}`;
       const parsed = parseBaselineFileName(name);
-      const entry = parsed ? index.byFileKey.get(`${parsed.base}|${parsed.exportSlug}`) : null;
+      const entry = parsed
+        ? index.byFileKey.get(`${storyDir}|${parsed.base}|${parsed.exportSlug}`)
+        : null;
       if (!parsed || !entry) orphans.push(relPath);
       else {
         baselines.push({

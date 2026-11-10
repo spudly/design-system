@@ -128,8 +128,19 @@ export async function deviceMode(config, inActiveScope, baselineFileName) {
       // repo layout (issue #530), the canonical tree join in
       // tree layout; an unresolvable story falls back to the
       // tree join, which simply does not exist ("no baseline").
-      const baselinePath =
-        resolveBaselinePath(config, story.id, theme) ?? join(config.baselinesDir, rel);
+      // Exception: a repo-layout UPDATE must never fall back —
+      // the tree join points outside src/**/__snapshots__, so
+      // the write would land where materialize/publish never
+      // look and still count as updated. Fail it instead.
+      const resolvedPath = resolveBaselinePath(config, story.id, theme);
+      if (!resolvedPath && config.update && config.baselinesLayout === "repo") {
+        summary.failed.push(
+          `${theme}/${story.id}: no committed baseline path resolves in repo layout — refusing an update outside src/**/__snapshots__`,
+        );
+        console.error(`FAIL ${theme}/${story.id}: unresolved baseline path (repo-layout update)`);
+        continue;
+      }
+      const baselinePath = resolvedPath ?? join(config.baselinesDir, rel);
       if (config.update) {
         // Pixel-diff commit gate (issue #296) — see commitGate.mjs:
         // sub-gate captures keep their baseline; new ones write.
