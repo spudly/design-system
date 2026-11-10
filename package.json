@@ -34,6 +34,9 @@
     "*.{ts,tsx,js,cjs,mjs,json,md}": [
       "prettier --write"
     ],
+    "*.{ts,tsx,js,cjs,mjs}": [
+      "eslint --fix --cache --cache-location .eslintcache"
+    ],
     "*.{ts,tsx}": [
       "bash -c 'npm run typecheck'"
     ]
@@ -65,7 +68,7 @@
     "storybook": "npm run storybook:react --",
     "storybook:react": "storybook dev -p 6006",
     "storybook:react-native": "npm --prefix apps/storybook run storybook:react-native",
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit --incremental --tsBuildInfoFile .tsbuildinfo -p tsconfig.json",
     "test": "npm run build && tsx --test \"src/**/*.test.ts\" \"test/**/*.test.ts\" \"eslintRules/*.test.ts\""
   },
   "type": "module",
