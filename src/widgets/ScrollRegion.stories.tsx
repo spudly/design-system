@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { YStack } from "tamagui";
+import { YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { ScrollRegion } from "./ScrollRegion.js";
 import { Text } from "./Text.js";
@@ -22,7 +22,12 @@ const paragraphs = Array.from({ length: 12 }, (_, index) => (
 
 export const Default: Story = {
   render: () => (
-    <YStack maxWidth={430} height={480} backgroundColor="$surface">
+    // The pinned frame is the native shape (#547): on native the
+    // region scrolls between the pinned header and footer inside
+    // the 480px frame. On web the region renders no scroller —
+    // the whole composition flows in the document — so the frame
+    // grows with the content instead of bounding it.
+    <YStack maxWidth={430} height={isWeb ? undefined : 480} backgroundColor="$surface">
       <YStack padding={tokens.spacing[4]}>
         <Text variant="subheading">Pinned header</Text>
       </YStack>
