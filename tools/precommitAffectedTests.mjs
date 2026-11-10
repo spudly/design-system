@@ -75,4 +75,9 @@ rmSync("dist", { recursive: true, force: true });
 execFileSync("npm", ["run", "build"], {
   stdio: "inherit",
 });
-execFileSync("npx", ["tsx", "--test", ...testFiles], { stdio: "inherit" });
+// Concurrency is capped at 2: this hook only ever runs locally, and
+// the runner's default (one worker per core) oversubscribes machines
+// with few or shared CPUs. Same cap as tools/runTests.mjs.
+execFileSync("npx", ["tsx", "--test", "--test-concurrency=2", ...testFiles], {
+  stdio: "inherit",
+});

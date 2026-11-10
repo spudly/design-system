@@ -69,7 +69,7 @@
     "storybook:react": "storybook dev -p 6006",
     "storybook:react-native": "npm --prefix apps/storybook run storybook:react-native",
     "typecheck": "tsc --noEmit --incremental --tsBuildInfoFile .tsbuildinfo -p tsconfig.json",
-    "test": "npm run build && tsx --test \"src/**/*.test.ts\" \"test/**/*.test.ts\" \"eslintRules/*.test.ts\""
+    "test": "npm run build && node tools/runTests.mjs"
   },
   "type": "module",
   "types": "./dist/index.d.ts",
