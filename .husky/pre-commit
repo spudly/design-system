@@ -1,3 +1,2 @@
 #!/bin/sh
-npx lint-staged --concurrent false || exit 1
-node tools/precommitAffectedTests.mjs
+npx lint-staged --concurrent false --hide-all || exit 1

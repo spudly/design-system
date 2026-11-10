@@ -38,7 +38,8 @@
       "eslint --fix --cache --cache-location .eslintcache"
     ],
     "*.{ts,tsx}": [
-      "bash -c 'npm run typecheck'"
+      "bash -c 'npm run typecheck'",
+      "node tools/precommitAffectedTests.mjs"
     ]
   },
   "main": "./dist/index.js",
