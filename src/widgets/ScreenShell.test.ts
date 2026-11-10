@@ -26,6 +26,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
+import { makeRenderToHtml, verticalScrollers } from "../../test/wholePageFlow.js";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "../..", "src", "widgets", "ScreenShell.tsx"), "utf8");
@@ -87,28 +88,7 @@ function loadRuntime() {
   return runtimePromise;
 }
 
-async function renderToHtml(element: any) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
-    await loadRuntime();
-  const config = createTamaguiConfig(baseTheme);
-  return renderToString(
-    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
-  );
-}
-
-function verticalScrollers(html: string): string[] {
-  const found: string[] = [];
-  for (const match of html.matchAll(/<[^>]+style="([^"]*)"[^>]*>/g)) {
-    const style = match[1];
-    if (
-      /overflow-y\s*:\s*(auto|scroll)/.test(style) ||
-      /(?:^|;)\s*overflow\s*:\s*(auto|scroll)/.test(style)
-    ) {
-      found.push(match[0].slice(0, 160));
-    }
-  }
-  return found;
-}
+const renderToHtml = makeRenderToHtml(loadRuntime);
 
 function assertWholePageFlow(html: string, markerPrefix: string, count: number) {
   assert.deepEqual(
