@@ -364,7 +364,7 @@ test("arming: a real scroll or content exceeding the viewport arms pagination (#
   );
   assert.match(
     hook,
-    /const armIfContentExceedsVisible = \(\) => \{\s*if \(\s*paginationArmedRef\.current \|\|\s*visibleLengthRef\.current <= 0 \|\|\s*contentLengthRef\.current <= visibleLengthRef\.current\s*\) \{\s*return;\s*\}\s*paginationArmedRef\.current = true;/,
+    /const armIfContentExceedsVisible = \(\) => \{\s*if \(visibleLengthRef\.current <= 0 \|\| contentLengthRef\.current <= visibleLengthRef\.current\) \{\s*return;\s*\}\s*paginationArmedRef\.current = true;/,
     "the layout signals arm only when laid-out content exceeds the visible length (zero/unknown layout never arms)",
   );
   assert.match(
@@ -446,8 +446,8 @@ test("a suppressed end signal is re-evaluated when layout arms pagination (#570e
   assert.match(hook, /const suppressedEndRef = useRef\(false\);/);
   assert.match(
     hook,
-    /paginationArmedRef\.current = true;\s*if \(suppressedEndRef\.current\) \{\s*suppressedEndRef\.current = false;\s*fireEndReached\(\);\s*\}\s*\};/,
-    "the layout-arming transition must re-evaluate a suppressed end signal exactly once, through the shared fire path",
+    /if \(\s*suppressedEndRef\.current &&\s*canPaginate &&\s*onLoadMore &&\s*contentLengthRef\.current - visibleLengthRef\.current <=\s*endReachedThreshold \* visibleLengthRef\.current\s*\) \{\s*suppressedEndRef\.current = false;\s*fireEndReached\(\);\s*\}/,
+    "the layout arming must re-evaluate a suppressed end signal exactly once, through the shared fire path — only while the mount gate is open and the laid-out end is still within the end threshold of the visible length",
   );
 });
 

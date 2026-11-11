@@ -94,9 +94,16 @@ import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 
  *    not fire again for that length. If a later layout signal
  *    arms pagination (the viewport shrank, so content that
  *    fitted now exceeds it), the suppressed signal is
- *    re-evaluated once at arming — through the same fetch
+ *    re-evaluated on layout events — through the same fetch
  *    guards as a live fire — instead of leaving pagination
- *    stuck with no signal left to arrive.
+ *    stuck with no signal left to arrive. The re-evaluation
+ *    fires only while the mount gate is open (pagination
+ *    allowed and a host handler present) and only while the
+ *    laid-out end is still within the end threshold of the
+ *    visible length: after a shrink the reader may no longer
+ *    be at the end at all, and a signal replayed from the top
+ *    of a long list would fetch just as unprompted as the
+ *    mount-time fire this guard exists to swallow.
  */
 export type CatalogPaginationOptions = {
   /** Pagination hook supplied by the host; absent means the
@@ -195,15 +202,17 @@ export function useCatalogPagination({
     }
   };
   const armIfContentExceedsVisible = () => {
-    if (
-      paginationArmedRef.current ||
-      visibleLengthRef.current <= 0 ||
-      contentLengthRef.current <= visibleLengthRef.current
-    ) {
+    if (visibleLengthRef.current <= 0 || contentLengthRef.current <= visibleLengthRef.current) {
       return;
     }
     paginationArmedRef.current = true;
-    if (suppressedEndRef.current) {
+    if (
+      suppressedEndRef.current &&
+      canPaginate &&
+      onLoadMore &&
+      contentLengthRef.current - visibleLengthRef.current <=
+        endReachedThreshold * visibleLengthRef.current
+    ) {
       suppressedEndRef.current = false;
       fireEndReached();
     }
