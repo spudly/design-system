@@ -86,8 +86,13 @@ test("the mount gate: the handler is undefined unless pagination may run", () =>
 test("the fetch guard: the mounted handler swallows requests during a fetch", () => {
   assert.match(
     hook,
-    /const handleEndReached = \(\) => \{\s*if \(!paginationArmedRef\.current\) \{\s*return;\s*\}\s*endReachedRef\.current = true;\s*if \(wasFetchingRef\.current && !isFetchingNextPage\) \{\s*completionClaimedRef\.current = true;\s*\}\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
-    "the handler must swallow a pre-arming fire, latch the end, claim an unprocessed completion (the web sentinel's recheck), and fire onLoadMore only when no fetch is in flight — so no duplicates while a fetch is in flight (#570 case c)",
+    /const handleEndReached = \(\) => \{\s*if \(!paginationArmedRef\.current\) \{\s*suppressedEndRef\.current = true;\s*return;\s*\}\s*suppressedEndRef\.current = false;\s*fireEndReached\(\);\s*\};/,
+    "the handler must record and swallow a pre-arming fire, then delegate an armed fire to the shared fire path",
+  );
+  assert.match(
+    hook,
+    /const fireEndReached = \(\) => \{\s*endReachedRef\.current = true;\s*if \(wasFetchingRef\.current && !isFetchingNextPage\) \{\s*completionClaimedRef\.current = true;\s*\}\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
+    "the shared fire must latch the end, claim an unprocessed completion (the web sentinel's recheck), and fire onLoadMore only when no fetch is in flight — so no duplicates while a fetch is in flight (#570 case c)",
   );
 });
 
@@ -342,8 +347,8 @@ test("the initial-fire guard: no onLoadMore before any scroll or layout signal (
   assert.match(hook, /const paginationArmedRef = useRef\(false\);/);
   assert.match(
     hook,
-    /const handleEndReached = \(\) => \{\s*if \(!paginationArmedRef\.current\) \{\s*return;\s*\}/,
-    "an end-reached fire before arming is swallowed before any latch or fetch",
+    /const handleEndReached = \(\) => \{\s*if \(!paginationArmedRef\.current\) \{\s*suppressedEndRef\.current = true;\s*return;\s*\}/,
+    "an end-reached fire before arming is swallowed before any latch or fetch (it is only remembered for a later layout arming, #570e)",
   );
   assert.ok(
     !/paginationArmedRef\.current = true;\s*endReachedRef/.test(hook),
@@ -359,7 +364,7 @@ test("arming: a real scroll or content exceeding the viewport arms pagination (#
   );
   assert.match(
     hook,
-    /const armIfContentExceedsVisible = \(\) => \{\s*if \(\s*visibleLengthRef\.current > 0 &&\s*contentLengthRef\.current > visibleLengthRef\.current\s*\) \{\s*paginationArmedRef\.current = true;\s*\}\s*\};/,
+    /const armIfContentExceedsVisible = \(\) => \{\s*if \(\s*paginationArmedRef\.current \|\|\s*visibleLengthRef\.current <= 0 \|\|\s*contentLengthRef\.current <= visibleLengthRef\.current\s*\) \{\s*return;\s*\}\s*paginationArmedRef\.current = true;/,
     "the layout signals arm only when laid-out content exceeds the visible length (zero/unknown layout never arms)",
   );
   assert.match(
@@ -428,6 +433,21 @@ test("the web sentinel distinguishes mount-time from post-scroll visibility (#57
     recipesPage,
     /if \(window\.scrollY > 0\) \{\s*markScrolled\(\);\s*\}/,
     "the fallback's near-bottom check counts only a scrolled page (zero metrics on mount never fire)",
+  );
+});
+
+test("a suppressed end signal is re-evaluated when layout arms pagination (#570e)", () => {
+  // The list's sentinel records the content length it fired
+  // for and may not fire again for that length: if content
+  // first fits (fire swallowed) and the viewport later shrinks
+  // so a layout signal arms pagination, the suppressed signal
+  // must be re-evaluated through the shared fire path —
+  // subject to the same fetch guards — or pagination sticks.
+  assert.match(hook, /const suppressedEndRef = useRef\(false\);/);
+  assert.match(
+    hook,
+    /paginationArmedRef\.current = true;\s*if \(suppressedEndRef\.current\) \{\s*suppressedEndRef\.current = false;\s*fireEndReached\(\);\s*\}\s*\};/,
+    "the layout-arming transition must re-evaluate a suppressed end signal exactly once, through the shared fire path",
   );
 });
 

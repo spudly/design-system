@@ -88,6 +88,15 @@ import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from 
  *    completion claim, so a later genuine signal still fires
  *    normally. Once armed, end-reached semantics are exactly
  *    parts 1–3 above.
+ *
+ *    A swallowed signal is remembered, though: the list's own
+ *    sentinel records the content length it fired for and may
+ *    not fire again for that length. If a later layout signal
+ *    arms pagination (the viewport shrank, so content that
+ *    fitted now exceeds it), the suppressed signal is
+ *    re-evaluated once at arming — through the same fetch
+ *    guards as a live fire — instead of leaving pagination
+ *    stuck with no signal left to arrive.
  */
 export type CatalogPaginationOptions = {
   /** Pagination hook supplied by the host; absent means the
@@ -166,9 +175,37 @@ export function useCatalogPagination({
   // content-size signal; zero while unknown (jsdom / pre-layout).
   const visibleLengthRef = useRef(0);
   const contentLengthRef = useRef(0);
+  // An end signal swallowed by the initial-fire guard (#570):
+  // remembered so a later layout arming can re-evaluate it —
+  // the list's sentinel may not fire again for the content
+  // length it already reported.
+  const suppressedEndRef = useRef(false);
+  // The armed end-reached fire, shared by the live handler and
+  // the layout-arming re-evaluation of a suppressed signal:
+  // latch the end, claim an unprocessed completion (the web
+  // sentinel's recheck), and request the continuation only
+  // when no fetch is in flight.
+  const fireEndReached = () => {
+    endReachedRef.current = true;
+    if (wasFetchingRef.current && !isFetchingNextPage) {
+      completionClaimedRef.current = true;
+    }
+    if (!isFetchingNextPage) {
+      onLoadMore?.();
+    }
+  };
   const armIfContentExceedsVisible = () => {
-    if (visibleLengthRef.current > 0 && contentLengthRef.current > visibleLengthRef.current) {
-      paginationArmedRef.current = true;
+    if (
+      paginationArmedRef.current ||
+      visibleLengthRef.current <= 0 ||
+      contentLengthRef.current <= visibleLengthRef.current
+    ) {
+      return;
+    }
+    paginationArmedRef.current = true;
+    if (suppressedEndRef.current) {
+      suppressedEndRef.current = false;
+      fireEndReached();
     }
   };
   // The latest host callback, read by the re-arm effect so the
@@ -214,21 +251,22 @@ export function useCatalogPagination({
 
   const handleEndReached = () => {
     if (!paginationArmedRef.current) {
+      // Swallowed by the initial-fire guard (#570) — but
+      // remembered: if a later layout signal arms pagination,
+      // armIfContentExceedsVisible re-evaluates this signal,
+      // because the list's sentinel may not fire again for
+      // the content length it already reported.
+      suppressedEndRef.current = true;
       return;
     }
-    endReachedRef.current = true;
-    if (wasFetchingRef.current && !isFetchingNextPage) {
-      // A fetch completed on this commit and the re-arm effect
-      // above has not processed the completion yet (the web
-      // sentinel's recheck runs first, as a child effect): this
-      // fire IS the post-completion recheck, so claim the
-      // completion — the re-arm stands down and the
-      // continuation is requested exactly once.
-      completionClaimedRef.current = true;
-    }
-    if (!isFetchingNextPage) {
-      onLoadMore?.();
-    }
+    suppressedEndRef.current = false;
+    // A fetch completed on this commit and the re-arm effect
+    // above has not processed the completion yet (the web
+    // sentinel's recheck runs first, as a child effect): this
+    // fire IS the post-completion recheck, so the shared fire
+    // claims the completion — the re-arm stands down and the
+    // continuation is requested exactly once.
+    fireEndReached();
   };
 
   // The live at-end latch: recomputed from the scroll metrics
