@@ -3,6 +3,7 @@
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
     "@spudly/eslint-config": "^0.2.0",
+    "@storybook/react-native": "10.6.2",
     "@storybook/react-vite": "^10.6.6",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
