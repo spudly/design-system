@@ -53,6 +53,7 @@ function readCode(path: string) {
 const hook = readCode(join(pagesDir, "useCatalogPagination.ts"));
 const recipesPage = readCode(join(pagesDir, "RecipesPage.tsx"));
 const discoverPage = readCode(join(pagesDir, "DiscoverPage.tsx"));
+const boundedList = readCode(join(pagesDir, "BoundedList.tsx"));
 
 test("the shared hook declares the catalog pagination contract", () => {
   assert.match(hook, /export type CatalogPaginationOptions = \{/);
@@ -66,6 +67,9 @@ test("the shared hook declares the catalog pagination contract", () => {
   assert.match(hook, /onEndReached: \(\(\) => void\) \| undefined;/);
   assert.match(hook, /onScroll: \(event: NativeSyntheticEvent<NativeScrollEvent>\) => void;/);
   assert.match(hook, /onEndReachedThreshold: number;/);
+  assert.match(hook, /onLayout: \(event: LayoutChangeEvent\) => void;/);
+  assert.match(hook, /onContentSizeChange: \(width: number, height: number\) => void;/);
+  assert.match(hook, /onScrollSignal: \(\) => void;/);
   assert.match(hook, /export function useCatalogPagination\(/);
   // Type aliases only (Stephen's code style, #214) — no interfaces.
   assert.ok(!/\binterface\b/.test(hook), "the hook must use type aliases, not interfaces");
@@ -82,8 +86,8 @@ test("the mount gate: the handler is undefined unless pagination may run", () =>
 test("the fetch guard: the mounted handler swallows requests during a fetch", () => {
   assert.match(
     hook,
-    /const handleEndReached = \(\) => \{\s*endReachedRef\.current = true;\s*if \(wasFetchingRef\.current && !isFetchingNextPage\) \{\s*completionClaimedRef\.current = true;\s*\}\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
-    "the handler must latch the end, claim an unprocessed completion (the web sentinel's recheck), and fire onLoadMore only when no fetch is in flight",
+    /const handleEndReached = \(\) => \{\s*if \(!paginationArmedRef\.current\) \{\s*return;\s*\}\s*endReachedRef\.current = true;\s*if \(wasFetchingRef\.current && !isFetchingNextPage\) \{\s*completionClaimedRef\.current = true;\s*\}\s*if \(!isFetchingNextPage\) \{\s*onLoadMore\?\.\(\);\s*\}\s*\};/,
+    "the handler must swallow a pre-arming fire, latch the end, claim an unprocessed completion (the web sentinel's recheck), and fire onLoadMore only when no fetch is in flight — so no duplicates while a fetch is in flight (#570 case c)",
   );
 });
 
@@ -122,8 +126,8 @@ test("the end latch is live: scroll metrics set and clear it with the shared thr
   // the completion does not chain in the background.
   assert.match(
     hook,
-    /const handleScroll = \(event: NativeSyntheticEvent<NativeScrollEvent>\) => \{\s*const \{ contentOffset, contentSize, layoutMeasurement \} = event\.nativeEvent;\s*const distanceFromEnd = contentSize\.height - contentOffset\.y - layoutMeasurement\.height;\s*endReachedRef\.current = distanceFromEnd <= endReachedThreshold \* layoutMeasurement\.height;\s*\};/,
-    "the scroll handler must recompute the end latch from the scroll metrics",
+    /const handleScroll = \(event: NativeSyntheticEvent<NativeScrollEvent>\) => \{\s*const \{ contentOffset, contentSize, layoutMeasurement \} = event\.nativeEvent;\s*if \(contentOffset\.y > 0 \|\| contentSize\.height > layoutMeasurement\.height\) \{\s*paginationArmedRef\.current = true;\s*\}\s*const distanceFromEnd = contentSize\.height - contentOffset\.y - layoutMeasurement\.height;\s*endReachedRef\.current = distanceFromEnd <= endReachedThreshold \* layoutMeasurement\.height;\s*\};/,
+    "the scroll handler must arm pagination on a real scroll (#570) and recompute the end latch from the scroll metrics",
   );
   // The callback ref is written inside the effect, never during
   // render, so a discarded render cannot leak its callback.
@@ -147,8 +151,8 @@ test("the unified catalog page calls the shared hook for both modes (#547)", () 
   );
   assert.match(
     recipesPage,
-    /const \{ onEndReached, onScroll, onEndReachedThreshold \} = useCatalogPagination\(\{/,
-    "the signed-in mode takes the hook's handlers and threshold",
+    /const \{\s*onEndReached,\s*onScroll,\s*onEndReachedThreshold,\s*onLayout: discoveryLayout,\s*onContentSizeChange: discoveryContentSizeChange,\s*onScrollSignal: discoveryScrollSignal,\s*\} = useCatalogPagination\(\{/,
+    "the signed-in mode takes the hook's handlers and threshold (plus the #570 guard signals)",
   );
   assert.match(
     recipesPage,
@@ -198,7 +202,7 @@ test("the unified page wires the hook's handlers to its lists and its web sentin
   // public mode passes its single section the same way.
   assert.match(
     recipesPage,
-    /onVisible: onEndReached, isFetchingNextPage/,
+    /onVisible: onEndReached,\s*isFetchingNextPage/,
     "the discovery section passes its own handler and fetching flag to the sentinel",
   );
   assert.match(
@@ -208,7 +212,7 @@ test("the unified page wires the hook's handlers to its lists and its web sentin
   );
   assert.match(
     recipesPage,
-    /onVisible: publicPagination\.onEndReached, isFetchingNextPage/,
+    /onVisible: publicPagination\.onEndReached,\s*isFetchingNextPage/,
     "the public mode passes its single section to the sentinel",
   );
   assert.ok(
@@ -305,8 +309,8 @@ test("the web sentinel rechecks when pagination opens and when a fetch completes
   );
   assert.match(
     recipesPage,
-    /if \(\(fetchingChanged \|\| availableChanged\) && visibleRef\.current\) \{\s*fireSection\(index\);\s*\}/,
-    "the sentinel must recheck only the changed section on its transitions — and not on mount",
+    /if \(\s*\(fetchingChanged \|\| availableChanged\) &&\s*visibleRef\.current &&\s*hasScrolledRef\.current\s*\) \{\s*fireSection\(index\);\s*\}/,
+    "the sentinel must recheck only the changed section on its transitions — and not on mount or before any scroll (#570)",
   );
   // Deduplication (round 2), per section: every notification
   // path shares each section's latched fire, so the fallback's
@@ -330,4 +334,109 @@ test("the web sentinel rechecks when pagination opens and when a fetch completes
   assert.match(hook, /const completionClaimedRef = useRef\(false\);/);
   assert.match(hook, /const completionClaimed = completionClaimedRef\.current;/);
   assert.match(hook, /completionClaimedRef\.current = false;/);
+});
+
+// #570: the initial-fire guard — a mount-time end-reached fire
+// (zero/unknown layout, no scroll) must not fetch page two.
+test("the initial-fire guard: no onLoadMore before any scroll or layout signal (#570a)", () => {
+  assert.match(hook, /const paginationArmedRef = useRef\(false\);/);
+  assert.match(
+    hook,
+    /const handleEndReached = \(\) => \{\s*if \(!paginationArmedRef\.current\) \{\s*return;\s*\}/,
+    "an end-reached fire before arming is swallowed before any latch or fetch",
+  );
+  assert.ok(
+    !/paginationArmedRef\.current = true;\s*endReachedRef/.test(hook),
+    "the swallowed mount-time fire must not latch a fetch",
+  );
+});
+
+test("arming: a real scroll or content exceeding the viewport arms pagination (#570b)", () => {
+  assert.match(
+    hook,
+    /if \(contentOffset\.y > 0 \|\| contentSize\.height > layoutMeasurement\.height\) \{\s*paginationArmedRef\.current = true;\s*\}/,
+    "the scroll handler arms on a non-zero offset or on content longer than the visible length",
+  );
+  assert.match(
+    hook,
+    /const armIfContentExceedsVisible = \(\) => \{\s*if \(\s*visibleLengthRef\.current > 0 &&\s*contentLengthRef\.current > visibleLengthRef\.current\s*\) \{\s*paginationArmedRef\.current = true;\s*\}\s*\};/,
+    "the layout signals arm only when laid-out content exceeds the visible length (zero/unknown layout never arms)",
+  );
+  assert.match(
+    hook,
+    /const handleLayout = \(event: LayoutChangeEvent\) => \{\s*visibleLengthRef\.current = event\.nativeEvent\.layout\.height;\s*armIfContentExceedsVisible\(\);\s*\};/,
+  );
+  assert.match(
+    hook,
+    /const handleContentSizeChange = \(_width: number, height: number\) => \{\s*contentLengthRef\.current = height;\s*armIfContentExceedsVisible\(\);\s*\};/,
+  );
+  assert.match(
+    hook,
+    /const handleScrollSignal = \(\) => \{\s*paginationArmedRef\.current = true;\s*\};/,
+    "the web sentinel's real-scroll signal arms the same guard",
+  );
+  // Once armed, the handler fires exactly once per genuine
+  // end-reached signal (the fetch guard test above pins the
+  // single onLoadMore call inside the armed handler).
+});
+
+test("BoundedList forwards the layout signals to the hook (#570)", () => {
+  assert.match(boundedList, /onLayout\?: \(\(event: LayoutChangeEvent\) => void\) \| undefined;/);
+  assert.match(
+    boundedList,
+    /onContentSizeChange\?: \(\(width: number, height: number\) => void\) \| undefined;/,
+  );
+  assert.match(boundedList, /\.\.\.\(onLayout !== undefined \? \{ onLayout \} : null\)/);
+  assert.match(
+    boundedList,
+    /\.\.\.\(onContentSizeChange !== undefined \? \{ onContentSizeChange \} : null\)/,
+  );
+});
+
+test("the pages wire the guard signals through their lists and sentinel (#570)", () => {
+  assert.match(
+    recipesPage,
+    /const handleListLayout = \(event: LayoutChangeEvent\) => \{\s*discoveryLayout\(event\);\s*ownPagination\.onLayout\(event\);\s*\};/,
+    "the signed-in list's layout signal fans out to both instances",
+  );
+  assert.match(
+    recipesPage,
+    /const handleListContentSizeChange = \(width: number, height: number\) => \{\s*discoveryContentSizeChange\(width, height\);\s*ownPagination\.onContentSizeChange\(width, height\);\s*\};/,
+  );
+  assert.match(recipesPage, /onLayout=\{handleListLayout\}/);
+  assert.match(recipesPage, /onContentSizeChange=\{handleListContentSizeChange\}/);
+  assert.match(recipesPage, /onLayout=\{publicPagination\.onLayout\}/);
+  assert.match(recipesPage, /onContentSizeChange=\{publicPagination\.onContentSizeChange\}/);
+  assert.match(recipesPage, /onScrollSignal: publicPagination\.onScrollSignal,/);
+  assert.match(recipesPage, /onScrollSignal: discoveryScrollSignal,/);
+  assert.match(recipesPage, /onScrollSignal: ownPagination\.onScrollSignal,/);
+});
+
+test("the web sentinel distinguishes mount-time from post-scroll visibility (#570)", () => {
+  assert.match(recipesPage, /const hasScrolledRef = useRef\(false\);/);
+  assert.match(
+    recipesPage,
+    /const markScrolled = \(\) => \{\s*hasScrolledRef\.current = true;\s*sectionsRef\.current\.forEach\(\(section\) => \{\s*section\.onScrollSignal\?\.\(\);\s*\}\);\s*\};/,
+    "a window scroll marks the sentinel scrolled and routes the signal into each section's hook guard",
+  );
+  assert.match(
+    recipesPage,
+    /if \(visible\) \{\s*if \(hasScrolledRef\.current\) \{\s*fireAllSections\(\);\s*\}\s*\}/,
+    "the observer fires only on post-scroll visibility — mount-time visibility is not a request",
+  );
+  assert.match(
+    recipesPage,
+    /if \(window\.scrollY > 0\) \{\s*markScrolled\(\);\s*\}/,
+    "the fallback's near-bottom check counts only a scrolled page (zero metrics on mount never fire)",
+  );
+});
+
+test("the no-new-rows re-arm is untouched by the guard: it still chains exactly once (#570d)", () => {
+  // The re-arm effect carries no arming condition — an armed
+  // end latch plus an unchanged count re-fires exactly once
+  // per completion (the re-arm test above pins its shape).
+  assert.ok(
+    !/else if \(\s*!completionClaimed &&\s*canPaginate &&\s*paginationArmedRef/.test(hook),
+    "the completion re-arm must not gain an arming condition",
+  );
 });

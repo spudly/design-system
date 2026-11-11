@@ -91,6 +91,8 @@ test("the catalog slots and handlers are optional and passed through only when g
     "onEndReached",
     "onEndReachedThreshold",
     "onScroll",
+    "onLayout",
+    "onContentSizeChange",
     "keyboardShouldPersistTaps",
   ]) {
     assert.match(

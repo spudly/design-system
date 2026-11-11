@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import type { LayoutChangeEvent, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
 
 /**
  * useCatalogPagination (#285): the shared pagination pattern for
@@ -73,6 +73,21 @@ import type { NativeScrollEvent, NativeSyntheticEvent } from "react-native";
  * host that omits it gets plain guarded end-reached semantics:
  * no duplicates while a fetch it does report is in flight, but
  * a no-new-rows page cannot re-arm on its own.
+ *
+ * 4. Initial-fire guard (#570): the end-reached handler does
+ *    not call `onLoadMore` until pagination is ARMED — a real
+ *    scroll signal has been observed (the scroll handler's
+ *    metrics show a non-zero offset, the layout metrics show
+ *    content longer than the visible length, or the web
+ *    sentinel reports a real scroll through `onScrollSignal`),
+ *    or a layout signal reports content length exceeding the
+ *    visible length. A mount-time fire (zero or unknown
+ *    layout, no scroll — in jsdom FlatList reports zero
+ *    lengths and fires on mount) is swallowed WITHOUT
+ *    latching a fetch: it sets neither the end latch nor the
+ *    completion claim, so a later genuine signal still fires
+ *    normally. Once armed, end-reached semantics are exactly
+ *    parts 1–3 above.
  */
 export type CatalogPaginationOptions = {
   /** Pagination hook supplied by the host; absent means the
@@ -106,6 +121,16 @@ export type CatalogPagination = {
    * the hook was configured with, so the list's signal and the
    * hook's latch share one value. */
   onEndReachedThreshold: number;
+  /** Wire to the list's `onLayout`: reports the visible length
+   * to the initial-fire guard (#570). */
+  onLayout: (event: LayoutChangeEvent) => void;
+  /** Wire to the list's `onContentSizeChange`: reports the
+   * content length to the initial-fire guard (#570). */
+  onContentSizeChange: (width: number, height: number) => void;
+  /** Report a real scroll with no native scroll metrics (the
+   * web sentinel's window scroll): arms the initial-fire guard
+   * (#570). */
+  onScrollSignal: () => void;
 };
 
 export function useCatalogPagination({
@@ -131,6 +156,21 @@ export function useCatalogPagination({
   // a claimed completion so the continuation is never
   // requested twice for the same completion.
   const completionClaimedRef = useRef(false);
+  // Initial-fire guard (#570): whether pagination is armed —
+  // a real scroll or a content-exceeds-viewport layout has
+  // been observed. Until then an end-reached fire is a
+  // mount-time artifact and is swallowed without latching.
+  const paginationArmedRef = useRef(false);
+  // Layout lengths for the guard: the visible length from the
+  // list's layout signal and the content length from its
+  // content-size signal; zero while unknown (jsdom / pre-layout).
+  const visibleLengthRef = useRef(0);
+  const contentLengthRef = useRef(0);
+  const armIfContentExceedsVisible = () => {
+    if (visibleLengthRef.current > 0 && contentLengthRef.current > visibleLengthRef.current) {
+      paginationArmedRef.current = true;
+    }
+  };
   // The latest host callback, read by the re-arm effect so the
   // effect itself never has to subscribe to callback identity.
   // Written inside the effect, never during render: a discarded
@@ -173,6 +213,9 @@ export function useCatalogPagination({
   });
 
   const handleEndReached = () => {
+    if (!paginationArmedRef.current) {
+      return;
+    }
     endReachedRef.current = true;
     if (wasFetchingRef.current && !isFetchingNextPage) {
       // A fetch completed on this commit and the re-arm effect
@@ -195,13 +238,38 @@ export function useCatalogPagination({
   // A ref write only — scrolling never re-renders the page.
   const handleScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
     const { contentOffset, contentSize, layoutMeasurement } = event.nativeEvent;
+    if (contentOffset.y > 0 || contentSize.height > layoutMeasurement.height) {
+      paginationArmedRef.current = true;
+    }
     const distanceFromEnd = contentSize.height - contentOffset.y - layoutMeasurement.height;
     endReachedRef.current = distanceFromEnd <= endReachedThreshold * layoutMeasurement.height;
+  };
+
+  // Layout signals for the initial-fire guard (#570): the
+  // list's visible length and content length, each arming
+  // pagination once laid-out content exceeds the viewport.
+  const handleLayout = (event: LayoutChangeEvent) => {
+    visibleLengthRef.current = event.nativeEvent.layout.height;
+    armIfContentExceedsVisible();
+  };
+
+  const handleContentSizeChange = (_width: number, height: number) => {
+    contentLengthRef.current = height;
+    armIfContentExceedsVisible();
+  };
+
+  // A real scroll reported without native metrics (the web
+  // sentinel's window scroll) arms pagination (#570).
+  const handleScrollSignal = () => {
+    paginationArmedRef.current = true;
   };
 
   return {
     onEndReached: canPaginate && onLoadMore ? handleEndReached : undefined,
     onScroll: handleScroll,
     onEndReachedThreshold: endReachedThreshold,
+    onLayout: handleLayout,
+    onContentSizeChange: handleContentSizeChange,
+    onScrollSignal: handleScrollSignal,
   };
 }

@@ -1,5 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { useEffect, useRef, type ReactNode } from "react";
+import type { LayoutChangeEvent } from "react-native";
 import { Anchor, View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
@@ -595,10 +596,23 @@ function recipesPageRowKey(row: RecipesPageRow): string {
  * against it at all. The latch never assumes that flag: a host
  * that omits it simply gets one request per visibility episode
  * per section.
+ *
+ * Mount-time visibility (#570): visibility before any real
+ * scroll — the observer's first verdict on a short first page,
+ * or the fallback's near-bottom computation from zero page
+ * metrics in jsdom — is NOT a request: the sentinel fires only
+ * once a window scroll has been observed. That scroll also
+ * routes into each section's hook through `onScrollSignal`,
+ * arming the hook's own initial-fire guard, so mount-time and
+ * post-scroll visibility are distinguished at both layers and
+ * the first page renders without an unprompted fetch.
  */
 type WebScrollSentinelSection = {
   onVisible?: (() => void) | undefined;
   isFetchingNextPage?: boolean;
+  /** Report a real window scroll to the section's pagination
+   * hook, arming its initial-fire guard (#570). */
+  onScrollSignal?: (() => void) | undefined;
 };
 
 function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] }) {
@@ -609,6 +623,13 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
   // computation): the recheck below consults it, because no new
   // observer callback arrives while it simply stays true.
   const visibleRef = useRef(false);
+  // Whether a real scroll has been observed (#570): visibility
+  // at mount — before any scroll, with zero/unknown page
+  // metrics — must not fire a section's continuation; only
+  // post-scroll visibility may. A window scroll marks this,
+  // routes the scroll signal into each section's hook guard,
+  // and re-fires a sentinel that is already visible.
+  const hasScrolledRef = useRef(false);
   // Whether this visibility episode has already requested each
   // section's continuation: one dedup latch per section (see
   // the header). Cleared for all sections when the sentinel
@@ -635,6 +656,12 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
   const clearAllLatches = () => {
     requestedRefs.current = sectionsRef.current.map(() => false);
   };
+  const markScrolled = () => {
+    hasScrolledRef.current = true;
+    sectionsRef.current.forEach((section) => {
+      section.onScrollSignal?.();
+    });
+  };
   useEffect(() => {
     sectionsRef.current = sections;
   });
@@ -647,15 +674,25 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
           const visible = entries.some((entry) => entry.isIntersecting);
           visibleRef.current = visible;
           if (visible) {
-            fireAllSections();
+            if (hasScrolledRef.current) {
+              fireAllSections();
+            }
           } else {
             clearAllLatches();
           }
         },
         { rootMargin: "400px" },
       );
+      const onWindowScroll = () => {
+        markScrolled();
+        if (visibleRef.current) {
+          fireAllSections();
+        }
+      };
+      window.addEventListener("scroll", onWindowScroll, { passive: true });
       observer.observe(node);
       return () => {
+        window.removeEventListener("scroll", onWindowScroll);
         observer.disconnect();
       };
     }
@@ -664,8 +701,13 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
       const doc = document.documentElement;
       const nearBottom = doc.scrollHeight - window.innerHeight - window.scrollY <= 400;
       visibleRef.current = nearBottom;
+      if (window.scrollY > 0) {
+        markScrolled();
+      }
       if (nearBottom) {
-        fireAllSections();
+        if (hasScrolledRef.current) {
+          fireAllSections();
+        }
       } else {
         clearAllLatches();
       }
@@ -710,7 +752,7 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
       if (fetchingChanged) {
         requestedRefs.current[index] = false;
       }
-      if ((fetchingChanged || availableChanged) && visibleRef.current) {
+      if ((fetchingChanged || availableChanged) && visibleRef.current && hasScrolledRef.current) {
         fireSection(index);
       }
     });
@@ -800,7 +842,14 @@ export function RecipesPage(props: RecipesPageProps) {
   // inert — item count 0 and canPaginate false — so the
   // end-reached handler can never fire a discovery request.
   const hasDiscovery = discoveryRecipes !== undefined;
-  const { onEndReached, onScroll, onEndReachedThreshold } = useCatalogPagination({
+  const {
+    onEndReached,
+    onScroll,
+    onEndReachedThreshold,
+    onLayout: discoveryLayout,
+    onContentSizeChange: discoveryContentSizeChange,
+    onScrollSignal: discoveryScrollSignal,
+  } = useCatalogPagination({
     onLoadMore,
     isFetchingNextPage,
     itemCount: discoveryRecipes !== undefined ? discoveryRecipes.length : 0,
@@ -835,6 +884,17 @@ export function RecipesPage(props: RecipesPageProps) {
   const handleListScroll = (event: Parameters<typeof onScroll>[0]) => {
     onScroll(event);
     ownPagination.onScroll(event);
+  };
+  // The list's layout signals fan out to both instances too
+  // (#570): each instance's initial-fire guard reads its own
+  // visible and content lengths from them.
+  const handleListLayout = (event: LayoutChangeEvent) => {
+    discoveryLayout(event);
+    ownPagination.onLayout(event);
+  };
+  const handleListContentSizeChange = (width: number, height: number) => {
+    discoveryContentSizeChange(width, height);
+    ownPagination.onContentSizeChange(width, height);
   };
 
   // Public-mode pagination (#547): the same shared pattern,
@@ -1136,7 +1196,13 @@ export function RecipesPage(props: RecipesPageProps) {
                 </Center>
               ) : null}
               <WebScrollSentinel
-                sections={[{ onVisible: publicPagination.onEndReached, isFetchingNextPage }]}
+                sections={[
+                  {
+                    onVisible: publicPagination.onEndReached,
+                    isFetchingNextPage,
+                    onScrollSignal: publicPagination.onScrollSignal,
+                  },
+                ]}
               />
             </YStack>
           </ScreenContainer>
@@ -1187,6 +1253,8 @@ export function RecipesPage(props: RecipesPageProps) {
             onEndReached={publicPagination.onEndReached}
             onScroll={publicPagination.onScroll}
             onEndReachedThreshold={publicPagination.onEndReachedThreshold}
+            onLayout={publicPagination.onLayout}
+            onContentSizeChange={publicPagination.onContentSizeChange}
           />
         </ScreenContainer>
       </BigFooterShell>
@@ -1219,10 +1287,15 @@ export function RecipesPage(props: RecipesPageProps) {
             ) : null}
             <WebScrollSentinel
               sections={[
-                { onVisible: onEndReached, isFetchingNextPage },
+                {
+                  onVisible: onEndReached,
+                  isFetchingNextPage,
+                  onScrollSignal: discoveryScrollSignal,
+                },
                 {
                   onVisible: ownPagination.onEndReached,
                   isFetchingNextPage: isFetchingNextOwnPage,
+                  onScrollSignal: ownPagination.onScrollSignal,
                 },
               ]}
             />
@@ -1260,6 +1333,8 @@ export function RecipesPage(props: RecipesPageProps) {
           onEndReached={handleListEndReached}
           onScroll={handleListScroll}
           onEndReachedThreshold={onEndReachedThreshold}
+          onLayout={handleListLayout}
+          onContentSizeChange={handleListContentSizeChange}
           ListFooterComponent={
             isFetchingNextPage && !discoveryLoadMoreErrorMessage ? (
               <Center>

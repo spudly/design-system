@@ -1,6 +1,11 @@
 import type { ComponentType, ReactElement } from "react";
 import { FlatList, View } from "react-native";
-import type { ListRenderItem, NativeScrollEvent, NativeSyntheticEvent } from "react-native";
+import type {
+  LayoutChangeEvent,
+  ListRenderItem,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+} from "react-native";
 import { tokens } from "../tokens/index.js";
 
 /**
@@ -108,6 +113,14 @@ export type BoundedListProps<Item> = {
   onEndReachedThreshold?: number | undefined;
   /** Scroll handler, as React Native's FlatList expects. */
   onScroll?: ((event: NativeSyntheticEvent<NativeScrollEvent>) => void) | undefined;
+  /** Layout handler, as React Native's FlatList expects: the
+   * catalog pagination guard (#570) reads the visible length
+   * from it. */
+  onLayout?: ((event: LayoutChangeEvent) => void) | undefined;
+  /** Content-size handler, as React Native's FlatList expects:
+   * the catalog pagination guard (#570) reads the content
+   * length from it. */
+  onContentSizeChange?: ((width: number, height: number) => void) | undefined;
   /** Whether taps on the list's controls land while the keyboard is
    * open (the catalog lists' filter inputs). */
   keyboardShouldPersistTaps?: "always" | "never" | "handled" | undefined;
@@ -131,6 +144,8 @@ export function BoundedList<Item>({
   onEndReached,
   onEndReachedThreshold,
   onScroll,
+  onLayout,
+  onContentSizeChange,
   keyboardShouldPersistTaps,
 }: BoundedListProps<Item>) {
   return (
@@ -147,6 +162,8 @@ export function BoundedList<Item>({
       {...(onEndReached !== undefined ? { onEndReached } : null)}
       {...(onEndReachedThreshold !== undefined ? { onEndReachedThreshold } : null)}
       {...(onScroll !== undefined ? { onScroll } : null)}
+      {...(onLayout !== undefined ? { onLayout } : null)}
+      {...(onContentSizeChange !== undefined ? { onContentSizeChange } : null)}
       {...(keyboardShouldPersistTaps !== undefined ? { keyboardShouldPersistTaps } : null)}
     />
   );
