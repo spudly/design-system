@@ -1,11 +1,16 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { StatBand } from "./StatBand.js";
 import { StatCard } from "./StatCard.js";
 import { Badge, type BadgeProps } from "./Badge.js";
+import { BoxSkeleton } from "./BoxSkeleton.js";
+import { SkeletonBone } from "./SkeletonClock.js";
 import { TagList } from "./TagList.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 import { Thumbnail } from "./Thumbnail.js";
 
 /**
@@ -73,6 +78,17 @@ export type RecipeOverviewPanelProps = {
   prepTimeLabel?: string;
   cookTimeLabel?: string;
   tags: RecipeOverviewPanelTag[];
+  /** Loading state (#278): the panel renders skeletons mirroring
+   * its layout block by block — a box skeleton at the hero
+   * frame's geometry when an image is present, title and
+   * description bones at their own sizes, a pill bone for the
+   * status badge, the stat band in its own loading state, and
+   * the tag list in its loading state — with no real title,
+   * values, or tag names. Blocks the loaded panel omits (no
+   * image, no description, no tags) stay omitted. An enclosing
+   * composite's LoadingScope can also put the panel into this
+   * state without prop-drilling. */
+  loading?: boolean;
 };
 
 export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
@@ -86,7 +102,59 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
     prepTimeLabel,
     cookTimeLabel,
     tags,
+    loading = false,
   } = props;
+  const showSkeleton = useLoadingScope(loading);
+
+  if (showSkeleton) {
+    // Loading (#278): the same block stack, skeletonized block
+    // by block in its own padding wrappers — the hero a box at
+    // Thumbnail's hero-frame height (256), the title a bone at
+    // the 2xl size, the status badge a pill bone at the badge's
+    // geometry (width estimated from its label, the TagList
+    // estimate), the description two bones at the body size,
+    // and the stat band and tag row in their own loading states
+    // (each renders its dummy items through the scope). The
+    // region is marked busy; no real content shows.
+    return (
+      <LoadingScope active>
+        <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+          {imageUrl ? (
+            <YStack paddingBlockEnd="$4">
+              <BoxSkeleton height={256} />
+            </YStack>
+          ) : null}
+          <YStack paddingBlockEnd="$2">
+            <TextSkeleton size="2xl" lines={1} />
+          </YStack>
+          <YStack paddingBlockEnd="$4" alignSelf="flex-start">
+            <SkeletonBone
+              width={
+                Math.round(statusLabel.length * tokens.typography.fontSize.xs * 0.62) +
+                tokens.spacing[2] * 2 +
+                2
+              }
+              height={14 + tokens.spacing[1] * 2 + 2}
+              borderRadius={tokens.radii.full}
+            />
+          </YStack>
+          {description ? (
+            <YStack paddingBlockEnd="$4">
+              <TextSkeleton size="md" lines={2} />
+            </YStack>
+          ) : null}
+          <YStack paddingBlockEnd="$4">
+            <StatBand loading>
+              <StatCard label="Servings" value={servingsLabel} />
+              {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
+              {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
+            </StatBand>
+          </YStack>
+          {tags.length > 0 ? <TagList tags={tags} loading /> : null}
+        </YStack>
+      </LoadingScope>
+    );
+  }
 
   return (
     <YStack>

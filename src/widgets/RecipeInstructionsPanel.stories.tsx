@@ -10,28 +10,56 @@ const meta: Meta<typeof RecipeInstructionsPanel> = {
 export default meta;
 type Story = StoryObj<typeof RecipeInstructionsPanel>;
 
+const INSTRUCTIONS = [
+  {
+    id: "step-1",
+    stepNumber: 1,
+    body: "Season the chicken and sear it in a hot pan until golden, about 5 minutes per side. Set aside.",
+  },
+  {
+    id: "step-2",
+    stepNumber: 2,
+    body: "In the same pan, soften the garlic and sun-dried tomatoes, then pour in the cream and simmer until slightly thickened.",
+  },
+  {
+    id: "step-3",
+    stepNumber: 3,
+    body: "Return the chicken to the pan, fold in the spinach until wilted, and serve with Parmesan.",
+  },
+];
+
 export const Default: Story = {
   render: () => (
     <YStack width={640} maxWidth="100%">
-      <RecipeInstructionsPanel
-        instructions={[
-          {
-            id: "step-1",
-            stepNumber: 1,
-            body: "Season the chicken and sear it in a hot pan until golden, about 5 minutes per side. Set aside.",
-          },
-          {
-            id: "step-2",
-            stepNumber: 2,
-            body: "In the same pan, soften the garlic and sun-dried tomatoes, then pour in the cream and simmer until slightly thickened.",
-          },
-          {
-            id: "step-3",
-            stepNumber: 3,
-            body: "Return the chicken to the pan, fold in the spinach until wilted, and serve with Parmesan.",
-          },
-        ]}
-      />
+      <RecipeInstructionsPanel instructions={INSTRUCTIONS} />
+    </YStack>
+  ),
+};
+
+export const Loading: Story = {
+  render: () => (
+    <YStack width={640} maxWidth="100%">
+      <RecipeInstructionsPanel instructions={INSTRUCTIONS} loading />
+    </YStack>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative" width={640} maxWidth="100%">
+      <RecipeInstructionsPanel instructions={INSTRUCTIONS} />
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <RecipeInstructionsPanel instructions={INSTRUCTIONS} loading />
+      </YStack>
     </YStack>
   ),
 };

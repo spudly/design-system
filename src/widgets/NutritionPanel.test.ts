@@ -33,8 +33,25 @@ test("NutritionPanel is exported from the built internal components barrel", asy
 test("the panel branches on its three states", () => {
   assert.match(code, /nutrition\.state === "loading"/);
   assert.match(code, /nutrition\.state === "unavailable"/);
-  assert.match(code, /Estimating nutrition…/);
   assert.match(code, /Nutrition is not available yet\./);
+});
+
+test("the loading state renders skeletons mirroring the ready layout (#278)", () => {
+  // The plain loading line is gone: the loading union state (and
+  // the explicit loading prop / an enclosing scope) render the
+  // ready layout's skeleton instead.
+  assert.doesNotMatch(code, /Estimating nutrition…/);
+  assert.match(code, /\bloading\?: boolean/);
+  assert.match(code, /useLoadingScope\(loading\)/);
+  assert.match(code, /LOADING_ROW_KEYS/);
+  assert.match(code, /<TextSkeleton size="sm" lines=\{1\} \/>/, "the header is an sm bone");
+  assert.match(code, /<TextSkeleton size="md" lines=\{1\} \/>/, "each row is label/value md bones");
+  assert.match(code, /<TextSkeleton size="xs" lines=\{1\} \/>/, "the disclaimer is an xs bone");
+  assert.match(
+    code,
+    /borderBottomColor="transparent"/,
+    "skeleton rows keep their geometry with transparent hairlines",
+  );
 });
 
 test("the Estimate and Refresh actions render only with their callbacks", () => {

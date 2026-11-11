@@ -1,9 +1,14 @@
-import { YStack } from "tamagui";
+import { View, XStack, YStack } from "tamagui";
+import { tokens } from "../tokens/index.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { MarkableRow } from "./MarkableRow.js";
 import { NumberStepper } from "../views/NumberStepper.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { Button } from "./Button.js";
 import { PresetValueSelector, type PresetValueOption } from "./PresetValueSelector.js";
 import { SuggestionPanel } from "./SuggestionPanel.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 /**
  * A recipe's ingredients panel: the servings stepper, the scale
@@ -62,6 +67,16 @@ export type RecipeIngredientsPanelView = {
 
 export type RecipeIngredientsPanelProps = {
   ingredients: RecipeIngredientsPanelView;
+  /** Loading state (#278): the panel renders skeletons mirroring
+   * its layout — the servings stepper and scale selector as
+   * inert skeleton Buttons at their own geometry inside the
+   * loading scope, one skeleton row per ingredient (exactly 3
+   * dummy rows when no ingredients are known yet), and the
+   * substitutions block as a skeleton panel — with no real
+   * labels, values, or live controls. An enclosing composite's
+   * LoadingScope can also put the panel into this state without
+   * prop-drilling. */
+  loading?: boolean;
 };
 
 // Scale multipliers from the app's scaling constants (shared with
@@ -90,8 +105,169 @@ function formatScaleValue(value: string): string {
 const MISSING_INGREDIENTS_HINT =
   "Tap an ingredient to mark it missing and see substitutions below.";
 
-export function RecipeIngredientsPanel({ ingredients: view }: RecipeIngredientsPanelProps) {
+// The loading panel's dummy rows (#278): exactly 3 placeholder
+// ingredients when none are known, from a frozen module-level
+// constant — never generated per render. A loading panel over
+// known ingredients mirrors its own rows instead.
+const LOADING_INGREDIENTS: RecipeIngredientsPanelIngredient[] = [
+  { id: "loading-1", label: "" },
+  { id: "loading-2", label: "" },
+  { id: "loading-3", label: "" },
+];
+
+/** The substitutions block's skeleton (#278): the SuggestionPanel's
+ * own frame (primary tint, large radius, $4 padding) holding a
+ * title bone and one label/detail bone pair per entry — used both
+ * for the panel's loading state and, with one entry, for the
+ * substitutions fetch state that used to render a plain
+ * "Finding substitutions…" line. */
+function SubstitutionsSkeleton({ entries }: { entries: number }) {
+  const count = Math.max(1, entries);
+  return (
+    <YStack borderRadius={tokens.radii.lg} backgroundColor="$primarySubtle" padding="$4">
+      <YStack paddingBlockEnd="$2">
+        <View width={110}>
+          <TextSkeleton size="sm" lines={1} />
+        </View>
+      </YStack>
+      {Array.from({ length: count }, (_, index) => (
+        <YStack key={index} paddingBlockEnd="$2">
+          <TextSkeleton size="sm" lines={1} />
+          <TextSkeleton size="sm" lines={1} />
+        </YStack>
+      ))}
+    </YStack>
+  );
+}
+
+export function RecipeIngredientsPanel({
+  ingredients: view,
+  loading = false,
+}: RecipeIngredientsPanelProps) {
+  const showSkeleton = useLoadingScope(loading);
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
+
+  if (showSkeleton) {
+    // Loading (#278): the panel's layout as skeletons — the two
+    // control rows keep their geometry with their Buttons
+    // rendered inside the loading scope (the stepper's −/+ and
+    // the scale presets/Custom render as inert rectangle
+    // skeletons at their normal size; the stepper's value and
+    // both row labels are text bones at their sizes), one
+    // skeleton row per ingredient in the MarkableRow geometry
+    // (its hairline transparent, its optional note a bone in its
+    // slot), and the substitutions area as the skeleton panel
+    // when substitutions are present or loading. No real
+    // ingredient labels, no live controls, region marked busy.
+    const rows = view.ingredients.length > 0 ? view.ingredients : LOADING_INGREDIENTS;
+    return (
+      <LoadingScope active>
+        <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+          <YStack gap="$3" paddingBlockEnd="$4">
+            <XStack alignItems="center" justifyContent="space-between" gap={tokens.spacing[3]}>
+              <View width={70}>
+                <TextSkeleton size="sm" lines={1} />
+              </View>
+              <XStack alignItems="center" gap={tokens.spacing[2]}>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  accessibilityLabel="Decrease Servings"
+                  onPress={() => {
+                    view.onServingsChange(view.servings - 1);
+                  }}
+                >
+                  −
+                </Button>
+                <View width={tokens.spacing[16]}>
+                  <TextSkeleton size="md" lines={1} />
+                </View>
+                <Button
+                  variant="secondary"
+                  size="md"
+                  accessibilityLabel="Increase Servings"
+                  onPress={() => {
+                    view.onServingsChange(view.servings + 1);
+                  }}
+                >
+                  +
+                </Button>
+              </XStack>
+            </XStack>
+            <XStack alignItems="center" gap="$2">
+              <XStack paddingInlineEnd="$1">
+                <View width={36}>
+                  <TextSkeleton size="sm" lines={1} />
+                </View>
+              </XStack>
+              <XStack flex={1} gap="$2">
+                {SCALE_OPTIONS.map((option) => (
+                  <Button
+                    key={option.value}
+                    variant="secondary"
+                    size="sm"
+                    grow
+                    flexBasis={0}
+                    flexShrink={1}
+                    selected={view.scaleValue === option.value}
+                    onPress={() => {
+                      view.onScaleChange(option.value);
+                    }}
+                  >
+                    {option.label}
+                  </Button>
+                ))}
+              </XStack>
+              <XStack flex={0.35}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  grow
+                  onPress={() => {
+                    view.onScaleChange(view.scaleValue);
+                  }}
+                >
+                  {CUSTOM_SCALE_LABEL}
+                </Button>
+              </XStack>
+            </XStack>
+          </YStack>
+          {rows.map((ingredient) => (
+            <XStack
+              key={ingredient.id}
+              alignItems="center"
+              borderBottomWidth={1}
+              borderBottomColor="transparent"
+              paddingVertical="$3"
+            >
+              <YStack flex={1}>
+                <TextSkeleton size="md" lines={1} />
+              </YStack>
+              {ingredient.isOptional ? (
+                <YStack paddingInlineStart="$2">
+                  <View width={44}>
+                    <TextSkeleton size="xs" lines={1} />
+                  </View>
+                </YStack>
+              ) : null}
+            </XStack>
+          ))}
+          {hasMissing && view.onIngredientPress ? (
+            <YStack paddingBlockStart="$3">
+              <View width="80%">
+                <TextSkeleton size="sm" lines={1} />
+              </View>
+            </YStack>
+          ) : null}
+          {view.loadingSubstitutions || (view.substitutions && view.substitutions.length > 0) ? (
+            <YStack paddingBlockStart="$4">
+              <SubstitutionsSkeleton entries={view.substitutions?.length ?? 1} />
+            </YStack>
+          ) : null}
+        </YStack>
+      </LoadingScope>
+    );
+  }
 
   return (
     <YStack>
@@ -144,7 +320,7 @@ export function RecipeIngredientsPanel({ ingredients: view }: RecipeIngredientsP
       ) : null}
       {view.loadingSubstitutions ? (
         <YStack paddingBlockStart="$4">
-          <Text variant="hint">Finding substitutions…</Text>
+          <SubstitutionsSkeleton entries={1} />
         </YStack>
       ) : null}
       {view.substitutions && view.substitutions.length > 0 ? (

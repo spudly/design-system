@@ -31,6 +31,75 @@ export const Default: Story = {
   ),
 };
 
+export const Loading: Story = {
+  render: () => (
+    <YStack width={640} maxWidth="100%">
+      <RecipeOverviewPanel
+        title="Tuscan Garlic Chicken"
+        description="A one-pan weeknight chicken in a garlicky cream sauce with sun-dried tomatoes and spinach."
+        statusTone="success"
+        statusLabel="Perfected"
+        servingsLabel="4"
+        prepTimeLabel="15m"
+        cookTimeLabel="30m"
+        tags={[
+          { id: "dinner", name: "Dinner", color: "orange" },
+          { id: "chicken", name: "Chicken", color: "indigo" },
+          { id: "one-pan", name: "One pan", color: "teal" },
+        ]}
+        loading
+      />
+    </YStack>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative" width={640} maxWidth="100%">
+      <RecipeOverviewPanel
+        title="Tuscan Garlic Chicken"
+        description="A one-pan weeknight chicken in a garlicky cream sauce with sun-dried tomatoes and spinach."
+        statusTone="success"
+        statusLabel="Perfected"
+        servingsLabel="4"
+        prepTimeLabel="15m"
+        cookTimeLabel="30m"
+        tags={[
+          { id: "dinner", name: "Dinner", color: "orange" },
+          { id: "chicken", name: "Chicken", color: "indigo" },
+          { id: "one-pan", name: "One pan", color: "teal" },
+        ]}
+      />
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <RecipeOverviewPanel
+          title="Tuscan Garlic Chicken"
+          description="A one-pan weeknight chicken in a garlicky cream sauce with sun-dried tomatoes and spinach."
+          statusTone="success"
+          statusLabel="Perfected"
+          servingsLabel="4"
+          prepTimeLabel="15m"
+          cookTimeLabel="30m"
+          tags={[
+            { id: "dinner", name: "Dinner", color: "orange" },
+            { id: "chicken", name: "Chicken", color: "indigo" },
+            { id: "one-pan", name: "One pan", color: "teal" },
+          ]}
+          loading
+        />
+      </YStack>
+    </YStack>
+  ),
+};
+
 export const Minimal: Story = {
   render: () => (
     <YStack width={640} maxWidth="100%">
