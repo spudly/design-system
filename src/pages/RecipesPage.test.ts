@@ -925,7 +925,7 @@ describe("recipesPageDecoupledPagination", () => {
 
   test("the discovery instance's gate never reads own state", () => {
     const discoveryGate = code.slice(
-      code.indexOf("const { onEndReached, onScroll, onEndReachedThreshold }"),
+      code.lastIndexOf("const {", code.indexOf("onLayout: discoveryLayout")),
       code.indexOf("const ownPagination"),
     );
     assert.match(
@@ -959,6 +959,20 @@ describe("recipesPageDecoupledPagination", () => {
       /onScroll=\{handleListScroll\}/,
       "the native list uses the combined scroll handler",
     );
+    // #570: the list's layout signals fan out to both instances
+    // so each instance's initial-fire guard sees its lengths.
+    assert.match(
+      code,
+      /const handleListLayout = \(event: LayoutChangeEvent\) => \{\s*discoveryLayout\(event\);\s*ownPagination\.onLayout\(event\);\s*\};/,
+    );
+    assert.match(
+      code,
+      /const handleListContentSizeChange = \(width: number, height: number\) => \{\s*discoveryContentSizeChange\(width, height\);\s*ownPagination\.onContentSizeChange\(width, height\);\s*\};/,
+    );
+    assert.match(code, /onLayout=\{handleListLayout\}/);
+    assert.match(code, /onContentSizeChange=\{handleListContentSizeChange\}/);
+    assert.match(code, /onLayout=\{publicPagination\.onLayout\}/);
+    assert.match(code, /onContentSizeChange=\{publicPagination\.onContentSizeChange\}/);
     // The web sentinel takes per-section wiring (#559, PR #563
     // review): each section's own handler and fetching flag, so
     // availability and dedup are tracked per section — never a
@@ -968,7 +982,7 @@ describe("recipesPageDecoupledPagination", () => {
     assert.match(signedInSentinel, /sections=\{\[/, "the sentinel takes a sections list");
     assert.match(
       signedInSentinel,
-      /onVisible: onEndReached, isFetchingNextPage/,
+      /onVisible: onEndReached,\s*isFetchingNextPage/,
       "the discovery section passes its own handler and fetching flag",
     );
     assert.match(
@@ -1056,14 +1070,19 @@ describe("recipesPageDecoupledPagination", () => {
     assert.match(code, /const prevFetchingRefs = useRef<boolean\[\]>\(/);
     assert.match(
       code,
-      /if \(\(fetchingChanged \|\| availableChanged\) && visibleRef\.current\) \{\s*fireSection\(index\);/,
-      "the recheck fires only the section whose availability or fetching changed",
+      /if \(\s*\(fetchingChanged \|\| availableChanged\) &&\s*visibleRef\.current &&\s*hasScrolledRef\.current\s*\) \{\s*fireSection\(index\);/,
+      "the recheck fires only the section whose availability or fetching changed, and only after a real scroll (#570)",
     );
+    // #570: the sentinel's sections carry each hook's scroll
+    // signal, and mount-time visibility alone never fires.
+    assert.match(code, /onScrollSignal\?: \(\(\) => void\) \| undefined;/);
+    assert.match(code, /const hasScrolledRef = useRef\(false\);/);
+    assert.match(code, /onScrollSignal: ownPagination\.onScrollSignal,/);
     // The public variant keeps single-catalog behavior through
     // the same mechanism with one section.
     assert.match(
       code,
-      /onVisible: publicPagination\.onEndReached, isFetchingNextPage/,
+      /onVisible: publicPagination\.onEndReached,\s*isFetchingNextPage/,
       "the public variant passes its single section to the sentinel",
     );
   });

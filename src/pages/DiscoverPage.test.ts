@@ -243,6 +243,11 @@ test("the title renders as the page heading and pagination rides the shared cata
   );
   assert.match(unified, /onEndReached=\{publicPagination\.onEndReached\}/);
   assert.match(unified, /onScroll=\{publicPagination\.onScroll\}/);
+  // #570: the public list forwards its layout signals to the
+  // same hook instance, arming its initial-fire guard.
+  assert.match(unified, /onLayout=\{publicPagination\.onLayout\}/);
+  assert.match(unified, /onContentSizeChange=\{publicPagination\.onContentSizeChange\}/);
+  assert.match(unified, /onScrollSignal: publicPagination\.onScrollSignal,/);
   assert.match(unified, /onEndReachedThreshold=\{publicPagination\.onEndReachedThreshold\}/);
   assert.ok(
     !unified.includes("handleEndReached"),
