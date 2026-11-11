@@ -1,0 +1,5 @@
+---
+"@spudly/ui": minor
+---
+
+RecipesPage sections page independently (#559). The own/shared section now paginates through the shared catalog pagination pattern via the new `onOwnLoadMore` prop, gated on the own section's own loading and error states only: own recipes keep loading more even while the discovery section is loading or showing an error, and discovery pagination likewise no longer waits on the own section's first load. A failed discovery next-page load now renders an error row with a retry action after the discovery rows (new `discoveryLoadMoreErrorMessage`, `onDiscoveryLoadMoreRetry`, and `discoveryLoadMoreRetryLabel` props, mirroring the own section's load-more error props) instead of latching silently, and that error row replaces the discovery loading-more spinner while it shows. Test: render RecipesPage with a discovery first-page error and an `onOwnLoadMore` handler and confirm scrolling to the end still requests the own section's next page; render it with `discoveryLoadMoreErrorMessage` set and confirm the error row with its retry action appears after the discovery rows and pressing retry fires `onDiscoveryLoadMoreRetry`.

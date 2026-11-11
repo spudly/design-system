@@ -155,6 +155,16 @@ test("the unified catalog page calls the shared hook for both modes (#547)", () 
     /const publicPagination = useCatalogPagination\(\{/,
     "the public mode calls the same shared hook (#547)",
   );
+  assert.match(
+    recipesPage,
+    /const ownPagination = useCatalogPagination\(\{/,
+    "the signed-in mode's own section runs its own instance of the same shared hook (#559)",
+  );
+  assert.match(
+    recipesPage,
+    /const handleListEndReached = \(\) => \{\s*onEndReached\?\.\(\);\s*ownPagination\.onEndReached\?\.\(\);\s*\};/,
+    "the signed-in end-reached signal fans out to both instances (#559)",
+  );
   assert.equal(
     recipesPage.match(/onLoadMore,\s*isFetchingNextPage,/g)?.length,
     2,
@@ -162,7 +172,7 @@ test("the unified catalog page calls the shared hook for both modes (#547)", () 
   );
   assert.ok(
     !recipesPage.includes("handleEndReached"),
-    "the page must not define a local end-reached handler — the pattern is shared",
+    "the page must not define a local end-reached handler — the pattern is shared (its fan-out handler is handleListEndReached, #559)",
   );
   assert.match(
     discoverPage,
@@ -172,38 +182,64 @@ test("the unified catalog page calls the shared hook for both modes (#547)", () 
 });
 
 test("the unified page wires the hook's handlers to its lists and its web sentinel (#547)", () => {
-  assert.match(recipesPage, /onEndReached=\{onEndReached\}/);
-  assert.match(recipesPage, /onScroll=\{onScroll\}/);
+  // Signed-in mode wires the COMBINED handlers (#559): the list
+  // signal fans out to both sections' pagination instances.
+  assert.match(recipesPage, /onEndReached=\{handleListEndReached\}/);
+  assert.match(recipesPage, /onScroll=\{handleListScroll\}/);
   assert.match(recipesPage, /onEndReachedThreshold=\{onEndReachedThreshold\}/);
   assert.match(recipesPage, /onEndReached=\{publicPagination\.onEndReached\}/);
   assert.match(recipesPage, /onScroll=\{publicPagination\.onScroll\}/);
   // Web has no list: the scroll sentinel drives the same
-  // guarded handler (#547, no windowing on web).
+  // guarded handler (#547, no windowing on web) — in signed-in
+  // mode the combined handler, rechecked on either section's
+  // fetch state (#559).
+  // Per-section sentinel wiring (#559): the signed-in mode
+  // passes each section's own handler and fetching flag; the
+  // public mode passes its single section the same way.
   assert.match(
     recipesPage,
-    /<WebScrollSentinel\s+isFetchingNextPage=\{isFetchingNextPage\}\s+onVisible=\{onEndReached\}\s*\/>/,
+    /onVisible: onEndReached, isFetchingNextPage/,
+    "the discovery section passes its own handler and fetching flag to the sentinel",
   );
   assert.match(
     recipesPage,
-    /<WebScrollSentinel\s+isFetchingNextPage=\{isFetchingNextPage\}\s+onVisible=\{publicPagination\.onEndReached\}\s*\/>/,
+    /onVisible: ownPagination\.onEndReached,\s*isFetchingNextPage: isFetchingNextOwnPage/,
+    "the own section passes its own handler and fetching flag to the sentinel",
+  );
+  assert.match(
+    recipesPage,
+    /onVisible: publicPagination\.onEndReached, isFetchingNextPage/,
+    "the public mode passes its single section to the sentinel",
+  );
+  assert.ok(
+    !recipesPage.includes("onVisible={handleListEndReached}"),
+    "the web sentinel must not use the combined handler (#559)",
   );
 });
 
 test("each mode counts the rows its continuation extends", () => {
   // The public mode's continuation extends its one list; the
-  // signed-in mode's continuation is its discovery section's,
-  // so it counts the discovery rows (#415).
+  // signed-in mode's continuations extend their own sections,
+  // so each instance counts its own section's rows (#415, #559).
   assert.match(recipesPage, /itemCount: publicRecipes !== undefined \? publicRecipes\.length : 0,/);
   assert.match(
     recipesPage,
     /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,/,
   );
+  assert.match(recipesPage, /itemCount: ownRecipes\.length,/);
 });
 
 test("each mode's mount gate matches its states", () => {
+  // Signed-in: the two instances gate on their OWN section's
+  // states only (#559 decoupled the discovery gate from the
+  // own section's first load).
   assert.match(
     recipesPage,
-    /canPaginate:\s*hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,\s*\}\);/,
+    /canPaginate:\s*hasDiscovery &&\s*!loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,\s*\}\);/,
+  );
+  assert.match(
+    recipesPage,
+    /canPaginate: !loadingOwn && !ownErrorMessage && !ownLoadMoreErrorMessage,\s*\}\);/,
   );
   assert.match(
     recipesPage,
@@ -223,8 +259,18 @@ test("both modes keep the loading-more footer on isFetchingNextPage", () => {
     /ListFooterComponent=\{\s*isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/g;
   assert.equal(
     recipesPage.match(footerPattern)?.length,
-    2,
-    "both native modes' list footers are the shared Center + Spinner composition, keyed off isFetchingNextPage",
+    1,
+    "the public mode's list footer is the shared Center + Spinner composition, keyed off isFetchingNextPage",
+  );
+  // Signed-in mode: the same footer, suppressed while the
+  // discovery load-more error row shows — the error wins over
+  // the loading-more footer (#559).
+  const signedInFooterPattern =
+    /ListFooterComponent=\{\s*isFetchingNextPage && !discoveryLoadMoreErrorMessage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/g;
+  assert.equal(
+    recipesPage.match(signedInFooterPattern)?.length,
+    1,
+    "the signed-in mode's list footer is the same composition, yielding to the discovery load-more error",
   );
 });
 
@@ -236,40 +282,47 @@ test("the web sentinel rechecks when pagination opens and when a fetch completes
   assert.match(recipesPage, /const visibleRef = useRef\(false\);/);
   assert.match(recipesPage, /visibleRef\.current = visible;/);
   assert.match(recipesPage, /visibleRef\.current = nearBottom;/);
-  // The recheck fires the latest handler once per transition:
-  // pagination becoming available (handler absent -> present)
-  // and a fetch completing (isFetchingNextPage falling).
-  assert.match(recipesPage, /const paginationAvailable = onVisible !== undefined;/);
+  // Per-section recheck (#559): availability and fetching are
+  // tracked per section, a fetching change clears only that
+  // section's latch, and a transition rechecks only the
+  // section that became available / whose fetch changed.
+  assert.match(recipesPage, /const prevAvailableRefs = useRef<boolean\[\]>\(/);
+  assert.match(recipesPage, /const prevFetchingRefs = useRef<boolean\[\]>\(/);
   assert.match(
     recipesPage,
-    /const fetchingChanged = prevFetchingRef\.current !== isFetchingNextPage;/,
-    "the recheck must track the previous fetching state so only real transitions fire",
+    /const fetchingChanged = prevFetchingRefs\.current\[index\] !== fetching;/,
+    "the recheck must track the previous fetching state per section so only real transitions fire",
   );
   assert.match(
     recipesPage,
-    /if \(\(fetchingChanged \|\| availableChanged\) && visibleRef\.current\) \{\s*fire\(\);\s*\}/,
-    "the sentinel must recheck its visibility on pagination-available and fetch-completion transitions — and not on mount",
-  );
-  // Deduplication (round 2): every notification path shares
-  // ONE latched fire, so the fallback's mount-time check and
-  // the recheck cannot both request the same continuation
-  // before the host commits isFetchingNextPage — including
-  // hosts that omit the fetching flag entirely.
-  assert.match(recipesPage, /const requestedRef = useRef\(false\);/);
-  assert.match(
-    recipesPage,
-    /const fire = \(\) => \{\s*if \(!callbackRef\.current \|\| requestedRef\.current\) return;\s*requestedRef\.current = true;\s*callbackRef\.current\(\);\s*\};/,
-    "the latched fire must no-op without a handler (gated absence must not latch) and after this episode's one request",
+    /const availableChanged = prevAvailableRefs\.current\[index\] !== available;/,
+    "the recheck must track the previous availability per section",
   );
   assert.match(
     recipesPage,
-    /if \(fetchingChanged\) \{\s*requestedRef\.current = false;\s*\}/,
-    "the latch must clear when the fetch state changes",
+    /if \(fetchingChanged\) \{\s*requestedRefs\.current\[index\] = false;\s*\}/,
+    "a fetching change must clear only that section's latch",
   );
-  assert.equal(
-    recipesPage.match(/\} else \{\s*requestedRef\.current = false;\s*\}/g)?.length,
-    2,
-    "the latch must clear when the sentinel leaves the margin (observer and fallback paths)",
+  assert.match(
+    recipesPage,
+    /if \(\(fetchingChanged \|\| availableChanged\) && visibleRef\.current\) \{\s*fireSection\(index\);\s*\}/,
+    "the sentinel must recheck only the changed section on its transitions — and not on mount",
+  );
+  // Deduplication (round 2), per section: every notification
+  // path shares each section's latched fire, so the fallback's
+  // mount-time check and the recheck cannot both request the
+  // same section's continuation before the host commits its
+  // fetching flag — including hosts that omit the flag.
+  assert.match(recipesPage, /const requestedRefs = useRef<boolean\[\]>\(\[\]\);/);
+  assert.match(
+    recipesPage,
+    /const fireSection = \(index: number\) => \{\s*const handler = sectionsRef\.current\[index\]\?\.onVisible;\s*if \(!handler \|\| requestedRefs\.current\[index\]\) return;\s*requestedRefs\.current\[index\] = true;\s*handler\(\);\s*\};/,
+    "the per-section latched fire must no-op without that section's handler (gated absence must not latch) and after that section's one request",
+  );
+  assert.match(
+    recipesPage,
+    /requestedRefs\.current = sectionsRef\.current\.map\(\(\) => false\);/,
+    "leaving the margin clears every section's latch",
   );
   // Coordination: the hook carries the completion-claim ref the
   // handler sets and the re-arm consults, so a completion is

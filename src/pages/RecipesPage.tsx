@@ -161,12 +161,18 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * that already carries a non-default value so a pre-filtered
  * screen never hides its own active filters.
  *
- * Pagination: `onLoadMore` is the DISCOVERY section's
- * continuation — the own section is the caller's complete
- * collection, so the list's end-reached signal can only mean
- * "more public recipes". It rides the shared catalog
- * pagination pattern (useCatalogPagination, #285), gated on
- * both sections' first loads and on the discovery error state.
+ * Pagination (#559): each section paginates independently
+ * through its OWN instance of the shared catalog pagination
+ * pattern (useCatalogPagination, #285) — `onLoadMore` is the
+ * DISCOVERY section's continuation and `onOwnLoadMore` is the
+ * OWN section's. The list's end-reached signal (and the web
+ * scroll sentinel) calls BOTH instances' handlers, and each
+ * instance latches, guards, and re-arms on its own section's
+ * state alone: the discovery instance gates on the discovery
+ * first load and discovery error states only, the own
+ * instance on the own first load and own error states only.
+ * A discovery failure therefore never stalls own pagination,
+ * and an own failure never stalls discovery pagination.
  *
  * #119: the page composes design-system components and passes
  * data and callbacks only. The layout it used to hand-style
@@ -388,6 +394,19 @@ export type RecipesPageProps = {
   onOwnLoadMoreRetry?: () => void;
   /** The retry action's label ("Try again"). */
   ownLoadMoreRetryLabel?: string;
+  /**
+   * Own-section pagination continuation (#559): the own
+   * section's next-page request, fired by the list's
+   * end-reached signal through the own section's own instance
+   * of the shared catalog pagination pattern (see
+   * useCatalogPagination, #285) — gated on the own section's
+   * first load and own error states only, never on the
+   * discovery section's state, so own pagination keeps firing
+   * while discovery is loading or in an error state. Hosts
+   * whose own section does not paginate omit it, and the own
+   * instance stays inert.
+   */
+  onOwnLoadMore?: () => void;
   /** Optional own-row action, mirroring the app card's log-cook
    * affordance. "Log cook" is a callback only — the cook-log
    * form and its mutation stay in the app, which renders them
@@ -413,6 +432,22 @@ export type RecipesPageProps = {
    * pattern DiscoverPage uses, so the catalogs share one
    * pagination contract). */
   onLoadMore?: () => void;
+  /**
+   * Discovery-section next-page failure (#559): an error row
+   * with a retry action renders after the discovery rows, in
+   * place of the discovery loading-more footer — the discovery
+   * counterpart of `ownLoadMoreErrorMessage`. The first-page
+   * failure stays `discoveryErrorMessage`; this is only the
+   * load-more failure. While it is set, the discovery
+   * pagination instance's gate is closed, so the end-reached
+   * signal cannot re-fire the failed continuation silently —
+   * the retry action is the way forward.
+   */
+  discoveryLoadMoreErrorMessage?: string | null;
+  /** The discovery load-more error row's retry intent; the row renders only with the message. */
+  onDiscoveryLoadMoreRetry?: () => void;
+  /** The discovery retry action's label ("Try again"). */
+  discoveryLoadMoreRetryLabel?: string;
 
   search: string;
   onSearchChange: (value: string) => void;
@@ -468,6 +503,7 @@ type RecipesPageRow =
   | { kind: "ownLoadMoreError"; message: string }
   | { kind: "discoveryHeading"; title: string }
   | { kind: "discoveryRecipe"; item: RecipesPageDiscoveryItem }
+  | { kind: "discoveryLoadMoreError"; message: string }
   | { kind: "loadingDiscovery" }
   | { kind: "discoveryError"; message: string }
   | { kind: "discoveryEmpty" };
@@ -492,6 +528,8 @@ function recipesPageRowKey(row: RecipesPageRow): string {
       return "discovery-heading";
     case "discoveryRecipe":
       return `discovery-recipe-${row.item.id}`;
+    case "discoveryLoadMoreError":
+      return "discovery-load-more-error";
     case "loadingDiscovery":
       return "discovery-loading";
     case "discoveryError":
@@ -506,71 +544,99 @@ function recipesPageRowKey(row: RecipesPageRow): string {
  * whole-page document flow with NO windowing, so pagination is
  * driven by this trailing sentinel instead of a FlatList's
  * end-reached signal. An IntersectionObserver on the sentinel
- * element fires the pagination handler as the reader approaches
+ * element fires the pagination handlers as the reader approaches
  * the bottom; where the sentinel's DOM node cannot be resolved
  * (non-DOM refs), a window scroll listener performs the same
  * near-bottom check as a fallback. Native never renders this —
  * native keeps its FlatList and its end-reached signal.
+ *
+ * Per-section availability and deduplication (#559): the
+ * sentinel takes one section per paginating catalog section —
+ * each section's own pagination handler (`onVisible`, undefined
+ * while that section is gated) and its own fetching flag. All
+ * tracking is PER SECTION: each section carries its own dedup
+ * latch, availability is tracked per section, and fetching is
+ * tracked per section. A single combined handler/flag would
+ * stall pagination: if the sentinel became visible while BOTH
+ * sections were gated, a combined fire would consume the shared
+ * latch (both hooks swallow it), and when one section's gate
+ * later opened, neither the combined availability nor the
+ * combined fetching flag would change, so no recheck would
+ * fire for that section. With per-section wiring, a section
+ * that becomes available is rechecked on its own transition,
+ * and a fetching change clears only that section's latch.
  *
  * Recheck (PR #556 review): the observer only calls back when
  * the sentinel's intersection CHANGES, so two stalls are
  * possible — the first callback arrives while pagination is
  * gated (no handler), or a fetch adds rows yet leaves the
  * sentinel inside the 400px margin. The sentinel therefore
- * tracks its own visibility and rechecks it whenever
- * pagination becomes available (the handler goes from absent
- * to present) and whenever a fetch completes
- * (`isFetchingNextPage` falls): if it is still within the
- * margin, it fires the handler again. The recheck coordinates
- * with the hook's no-new-rows re-arm through the hook itself
- * (useCatalogPagination's completion claim): a recheck fire on
- * the completion commit claims that completion, the re-arm
- * stands down, and the continuation is requested exactly once.
+ * tracks its own visibility and rechecks it whenever a section
+ * becomes available (that section's handler goes from absent
+ * to present) and whenever that section's fetch completes
+ * (its `isFetchingNextPage` falls): if it is still within the
+ * margin, it fires that section's handler again. The recheck
+ * coordinates with the hook's no-new-rows re-arm through the
+ * hook itself (useCatalogPagination's completion claim): a
+ * recheck fire on the completion commit claims that
+ * completion, the re-arm stands down, and the continuation is
+ * requested exactly once.
  *
  * Deduplication (PR #556 review, round 2): every notification
  * path — the observer, the no-observer fallback's near-bottom
- * check, and the recheck — goes through ONE latched fire: a
- * visibility episode may request a continuation only once,
- * until the sentinel leaves the margin or the fetch state
- * changes. Without the latch the fallback's mount-time check
- * and the recheck effect's mount run both fired before the
- * host could commit `isFetchingNextPage`, requesting the same
- * continuation twice — and a host that omits the fetching
- * flag had no guard against it at all. The latch never
- * assumes that flag: a host that omits it simply gets one
- * request per visibility episode.
+ * check, and the recheck — goes through each section's latched
+ * fire: a visibility episode may request a section's
+ * continuation only once, until the sentinel leaves the margin
+ * or that section's fetch state changes. Without the latch the
+ * fallback's mount-time check and the recheck effect's mount
+ * run both fired before the host could commit
+ * `isFetchingNextPage`, requesting the same continuation
+ * twice — and a host that omits the fetching flag had no guard
+ * against it at all. The latch never assumes that flag: a host
+ * that omits it simply gets one request per visibility episode
+ * per section.
  */
-function WebScrollSentinel({
-  onVisible,
-  isFetchingNextPage = false,
-}: {
+type WebScrollSentinelSection = {
   onVisible?: (() => void) | undefined;
   isFetchingNextPage?: boolean;
-}) {
+};
+
+function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] }) {
   const ref = useRef<{ nodeType?: number } | null>(null);
-  const callbackRef = useRef(onVisible);
+  const sectionsRef = useRef(sections);
   // Whether the sentinel is currently within the 400px margin
   // (the observer's last verdict, or the fallback's near-bottom
   // computation): the recheck below consults it, because no new
   // observer callback arrives while it simply stays true.
   const visibleRef = useRef(false);
-  // Whether this visibility episode has already requested its
-  // continuation: the dedup latch every notification path
-  // shares (see the header). Cleared when the sentinel leaves
-  // the margin and when the fetch state changes, so each new
-  // episode — and each completed fetch — may request once more.
-  const requestedRef = useRef(false);
-  // The one latched fire: a no-op while no handler is mounted
-  // (pagination gated — that absence must NOT latch, or the
-  // recheck on pagination becoming available could not fire)
-  // and a no-op once this episode has already requested.
-  const fire = () => {
-    if (!callbackRef.current || requestedRef.current) return;
-    requestedRef.current = true;
-    callbackRef.current();
+  // Whether this visibility episode has already requested each
+  // section's continuation: one dedup latch per section (see
+  // the header). Cleared for all sections when the sentinel
+  // leaves the margin, and for a single section when that
+  // section's fetch state changes, so each new episode — and
+  // each completed fetch — may request once more.
+  const requestedRefs = useRef<boolean[]>([]);
+  // One section's latched fire: a no-op while that section has
+  // no handler mounted (pagination gated — that absence must
+  // NOT latch, or the recheck on that section becoming
+  // available could not fire) and a no-op once this episode
+  // has already requested that section's continuation.
+  const fireSection = (index: number) => {
+    const handler = sectionsRef.current[index]?.onVisible;
+    if (!handler || requestedRefs.current[index]) return;
+    requestedRefs.current[index] = true;
+    handler();
+  };
+  const fireAllSections = () => {
+    sectionsRef.current.forEach((_, index) => {
+      fireSection(index);
+    });
+  };
+  const clearAllLatches = () => {
+    requestedRefs.current = sectionsRef.current.map(() => false);
   };
   useEffect(() => {
-    callbackRef.current = onVisible;
+    sectionsRef.current = sections;
   });
   useEffect(() => {
     if (!isWeb || typeof window === "undefined") return;
@@ -581,9 +647,9 @@ function WebScrollSentinel({
           const visible = entries.some((entry) => entry.isIntersecting);
           visibleRef.current = visible;
           if (visible) {
-            fire();
+            fireAllSections();
           } else {
-            requestedRef.current = false;
+            clearAllLatches();
           }
         },
         { rootMargin: "400px" },
@@ -599,9 +665,9 @@ function WebScrollSentinel({
       const nearBottom = doc.scrollHeight - window.innerHeight - window.scrollY <= 400;
       visibleRef.current = nearBottom;
       if (nearBottom) {
-        fire();
+        fireAllSections();
       } else {
-        requestedRef.current = false;
+        clearAllLatches();
       }
     };
     check();
@@ -612,33 +678,43 @@ function WebScrollSentinel({
       window.removeEventListener("resize", check);
     };
   }, []);
-  // The recheck: pagination becoming available, or a fetch
-  // state change, can each leave a visible sentinel with no
-  // pending observer callback — fire the latched handler once
-  // per such TRANSITION. The previous values are tracked so
-  // the effect's mount run is not itself a transition: at
-  // mount the fallback check above has already fired for this
+  // The recheck, per section: a section becoming available, or
+  // that section's fetch state changing, can each leave a
+  // visible sentinel with no pending observer callback — fire
+  // that section's latched handler once per such TRANSITION.
+  // The previous per-section values are tracked so the
+  // effect's mount run is not itself a transition: at mount
+  // the fallback check above has already fired for this
   // episode, and a second mount fire is exactly the duplicate
-  // round 2 flagged. A fetch-state change clears the latch
-  // first, so a completed fetch may request its continuation
-  // even while the sentinel never left the margin. Declared
-  // after the callback-ref effect above, so it always calls
-  // the latest handler.
-  const paginationAvailable = onVisible !== undefined;
-  const prevFetchingRef = useRef(isFetchingNextPage);
-  const prevAvailableRef = useRef(paginationAvailable);
+  // round 2 flagged. A section's fetch-state change clears
+  // ONLY that section's latch first, so a completed fetch may
+  // request its continuation even while the sentinel never
+  // left the margin; an availability transition rechecks ONLY
+  // the section that became available. Declared after the
+  // sections-ref effect above, so it always calls the latest
+  // handlers.
+  const prevFetchingRefs = useRef<boolean[]>(
+    sections.map((section) => section.isFetchingNextPage ?? false),
+  );
+  const prevAvailableRefs = useRef<boolean[]>(
+    sections.map((section) => section.onVisible !== undefined),
+  );
   useEffect(() => {
-    const fetchingChanged = prevFetchingRef.current !== isFetchingNextPage;
-    const availableChanged = prevAvailableRef.current !== paginationAvailable;
-    prevFetchingRef.current = isFetchingNextPage;
-    prevAvailableRef.current = paginationAvailable;
-    if (fetchingChanged) {
-      requestedRef.current = false;
-    }
-    if ((fetchingChanged || availableChanged) && visibleRef.current) {
-      fire();
-    }
-  }, [isFetchingNextPage, paginationAvailable]);
+    sections.forEach((section, index) => {
+      const fetching = section.isFetchingNextPage ?? false;
+      const available = section.onVisible !== undefined;
+      const fetchingChanged = prevFetchingRefs.current[index] !== fetching;
+      const availableChanged = prevAvailableRefs.current[index] !== available;
+      prevFetchingRefs.current[index] = fetching;
+      prevAvailableRefs.current[index] = available;
+      if (fetchingChanged) {
+        requestedRefs.current[index] = false;
+      }
+      if ((fetchingChanged || availableChanged) && visibleRef.current) {
+        fireSection(index);
+      }
+    });
+  });
   if (!isWeb) return null;
   return <View ref={ref as never} style={{ height: 1 }} testID="catalog-scroll-sentinel" />;
 }
@@ -677,8 +753,12 @@ export function RecipesPage(props: RecipesPageProps) {
     ownLoadMoreErrorMessage = null,
     onOwnLoadMoreRetry,
     ownLoadMoreRetryLabel = "Try again",
+    onOwnLoadMore,
     onLogCookPress,
     onLoadMore,
+    discoveryLoadMoreErrorMessage = null,
+    onDiscoveryLoadMoreRetry,
+    discoveryLoadMoreRetryLabel = "Try again",
     renderRecipeAccessory,
     search,
     onSearchChange,
@@ -706,11 +786,15 @@ export function RecipesPage(props: RecipesPageProps) {
   } = props;
 
   // Pagination: the shared catalog pattern (#285) — the same
-  // hook DiscoverPage uses. The continuation is the discovery
-  // section's, so the item count is the discovery count and
-  // the mount gate covers both sections' first loads plus the
-  // discovery error state: while any of those shows, the
-  // list's end must not start a page request.
+  // hook DiscoverPage uses — run as TWO independent instances
+  // (#559), one per section. The discovery instance's
+  // continuation is the discovery section's, so its item count
+  // is the discovery count and its mount gate covers the
+  // discovery first load plus the discovery error states (the
+  // first-page error and the load-more error): while any of
+  // those shows, the list's end must not start a discovery
+  // page request. The gate deliberately does NOT read the own
+  // section's state — the sections page independently.
   // The discovery section is present only when the host
   // supplies its recipes (#512); when absent, pagination is
   // inert — item count 0 and canPaginate false — so the
@@ -720,8 +804,38 @@ export function RecipesPage(props: RecipesPageProps) {
     onLoadMore,
     isFetchingNextPage,
     itemCount: discoveryRecipes !== undefined ? discoveryRecipes.length : 0,
-    canPaginate: hasDiscovery && !loadingOwn && !loadingDiscovery && !discoveryErrorMessage,
+    canPaginate:
+      hasDiscovery && !loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,
   });
+
+  // The own section's pagination instance (#559): its own
+  // continuation (`onOwnLoadMore`), its own fetch signal
+  // (`isFetchingNextOwnPage`), and its own count and gate —
+  // the own first load plus the own error states only. It
+  // never reads the discovery section's state, so own
+  // pagination keeps firing while discovery is loading or in
+  // an error state (and vice versa).
+  const ownPagination = useCatalogPagination({
+    onLoadMore: onOwnLoadMore,
+    isFetchingNextPage: isFetchingNextOwnPage,
+    itemCount: ownRecipes.length,
+    canPaginate: !loadingOwn && !ownErrorMessage && !ownLoadMoreErrorMessage,
+  });
+
+  // The list's end-reached and scroll signals fan out to BOTH
+  // instances: each instance's handler applies its own gate,
+  // fetch guard, and end latch, so a signal one section must
+  // swallow never suppresses the other section's continuation.
+  // Both instances share the default end-reached threshold, so
+  // the discovery instance's threshold serves the list.
+  const handleListEndReached = () => {
+    onEndReached?.();
+    ownPagination.onEndReached?.();
+  };
+  const handleListScroll = (event: Parameters<typeof onScroll>[0]) => {
+    onScroll(event);
+    ownPagination.onScroll(event);
+  };
 
   // Public-mode pagination (#547): the same shared pattern,
   // gated on the public catalog's own first load and error
@@ -843,6 +957,14 @@ export function RecipesPage(props: RecipesPageProps) {
       for (const item of discoveryRecipes) {
         rows.push({ kind: "discoveryRecipe", item });
       }
+      // The discovery section's load-more state (#559): the
+      // failure row renders after the discovery rows and wins
+      // over the loading-more footer (the footer spinner below
+      // is suppressed while the error is set), exactly as
+      // ownLoadMoreError wins over loadingOwnMore above.
+      if (discoveryLoadMoreErrorMessage) {
+        rows.push({ kind: "discoveryLoadMoreError", message: discoveryLoadMoreErrorMessage });
+      }
     }
   }
 
@@ -933,6 +1055,20 @@ export function RecipesPage(props: RecipesPageProps) {
           </YStack>
         );
       }
+      case "discoveryLoadMoreError":
+        return (
+          <Alert
+            severity="error"
+            message={row.message}
+            {...(onDiscoveryLoadMoreRetry
+              ? {
+                  actions: [
+                    { label: discoveryLoadMoreRetryLabel, onPress: onDiscoveryLoadMoreRetry },
+                  ],
+                }
+              : {})}
+          />
+        );
       case "loadingDiscovery":
         return (
           <Center>
@@ -1000,8 +1136,7 @@ export function RecipesPage(props: RecipesPageProps) {
                 </Center>
               ) : null}
               <WebScrollSentinel
-                isFetchingNextPage={isFetchingNextPage}
-                onVisible={publicPagination.onEndReached}
+                sections={[{ onVisible: publicPagination.onEndReached, isFetchingNextPage }]}
               />
             </YStack>
           </ScreenContainer>
@@ -1061,10 +1196,14 @@ export function RecipesPage(props: RecipesPageProps) {
   if (isWeb) {
     // Signed-in catalog on web (#547): whole-page flow, no
     // windowing — every row renders in document order inside
-    // the page shell and the scroll sentinel drives the
-    // discovery section's pagination (the same guarded
-    // handler the FlatList's end-reached signal uses on
-    // native, so the shared pagination pattern is unchanged).
+    // the page shell and the scroll sentinel drives BOTH
+    // sections' pagination through per-section handlers (each
+    // section's own guarded handler — the same handlers the
+    // FlatList's end-reached signal fans out to on native, so
+    // the shared pagination pattern is unchanged). Each
+    // section carries its own fetch signal to the sentinel, so
+    // a completed fetch or a gate opening in either section
+    // rechecks that section alone (#559).
     return (
       <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
@@ -1073,12 +1212,20 @@ export function RecipesPage(props: RecipesPageProps) {
             {rows.map((row) => (
               <YStack key={recipesPageRowKey(row)}>{renderRow(row)}</YStack>
             ))}
-            {isFetchingNextPage ? (
+            {isFetchingNextPage && !discoveryLoadMoreErrorMessage ? (
               <Center>
                 <Spinner label="Loading" />
               </Center>
             ) : null}
-            <WebScrollSentinel isFetchingNextPage={isFetchingNextPage} onVisible={onEndReached} />
+            <WebScrollSentinel
+              sections={[
+                { onVisible: onEndReached, isFetchingNextPage },
+                {
+                  onVisible: ownPagination.onEndReached,
+                  isFetchingNextPage: isFetchingNextOwnPage,
+                },
+              ]}
+            />
           </YStack>
         </ScreenContainer>
       </BigFooterShell>
@@ -1110,11 +1257,11 @@ export function RecipesPage(props: RecipesPageProps) {
           // indicators render as the sections' own rows instead.
           ListHeaderComponent={filtersBar}
           renderItem={({ item: row }) => renderRow(row)}
-          onEndReached={onEndReached}
-          onScroll={onScroll}
+          onEndReached={handleListEndReached}
+          onScroll={handleListScroll}
           onEndReachedThreshold={onEndReachedThreshold}
           ListFooterComponent={
-            isFetchingNextPage ? (
+            isFetchingNextPage && !discoveryLoadMoreErrorMessage ? (
               <Center>
                 <Spinner label="Loading" />
               </Center>
