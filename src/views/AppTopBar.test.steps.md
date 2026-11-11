@@ -34,6 +34,10 @@ LinkActions, NoFooter, ChunkFailedContent;
 4. TabbedShellPage TabbedShell: the header is the same top
    bar — the app title in the brand treatment, no nav, no
    actions — above the tab bar; the shells are one chrome.
+5. Phone width (#564): open `Views/AppTopBar` PhoneWidthNav
+   (390px frame, 6-item nav) — the nav wraps within the bar,
+   every link including Profile is fully visible, and the
+   page does not scroll sideways. Repeat at 430px.
 
 **Run when:** `src/pages/AppShellPage.tsx`,
 `src/pages/TabbedShellPage.tsx`, `src/views/AppTopBar.tsx`,

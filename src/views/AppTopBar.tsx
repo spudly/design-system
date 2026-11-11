@@ -208,6 +208,8 @@ const StyledNavFrame = styled(XStack, {
 const StyledNavList = styled(XStack, {
   name: "AppTopBarNavList",
   flexWrap: "wrap",
+  flexShrink: 1,
+  minWidth: 0,
   alignItems: "center",
   gap: tokens.spacing[1],
 });
