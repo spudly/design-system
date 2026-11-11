@@ -87,8 +87,9 @@ const preview: Preview = {
           defaultTheme={theme}
         >
           <FontStackSync theme={theme} />
-          {context.title.startsWith("Pages/") ? (
-            // Page stories (#547): full-bleed — the page shell
+          {context.title.startsWith("Pages/") || context.parameters.phoneWidthFrame ? (
+            // Page stories (#547) and phone-width frame stories
+            // (#564): full-bleed — the page shell
             // owns the viewport exactly as in an app, with no
             // padded 100vh wrapper around it (that wrapper was
             // half of the #547 Storybook overlap: a 100dvh page

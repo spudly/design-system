@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { View } from "tamagui";
 import { AppTopBar } from "./AppTopBar.js";
 
 /**
@@ -76,4 +77,54 @@ export const LabelOnlyNav: Story = {
       { id: "create-account", label: "Create account", href: "/sign-up" },
     ],
   },
+};
+
+const phoneNav = [
+  { id: "home", label: "Home", href: "/", icon: "home" as const },
+  { id: "recipes", label: "Recipes", href: "/recipes", icon: "recipes" as const },
+  { id: "meals", label: "Meals", href: "/meals", icon: "meals" as const },
+  { id: "add", label: "Add", href: "/add", icon: "add" as const },
+  { id: "tags", label: "Tags", href: "/tags", icon: "tags" as const },
+  { id: "profile", label: "Profile", href: "/profile", icon: "profile" as const },
+];
+
+const phoneWidthArgs = {
+  brand: { label: "Eciperay", href: "/" },
+  navItems: phoneNav,
+  navLabel: "Eciperay sections",
+  activeItemId: "recipes",
+  actions: [{ id: "sign-out", label: "Sign out", onPress: () => {} }],
+};
+
+/**
+ * Phone width (#564): the 6-item signed-in nav inside a 390px
+ * frame — the nav list shrinks and wraps within the bar, so
+ * every link (Profile included) stays fully visible and the
+ * page gains no horizontal scroll. The story renders
+ * full-bleed (phoneWidthFrame) so the preview's own padding
+ * cannot push the fixed frame past the viewport.
+ */
+export const PhoneWidthNav: Story = {
+  parameters: { layout: "fullscreen", phoneWidthFrame: true },
+  decorators: [
+    (Story) => (
+      <View width={390}>
+        <Story />
+      </View>
+    ),
+  ],
+  args: phoneWidthArgs,
+};
+
+/** Phone width, larger handset (#564): the same 6-item nav inside a 430px frame. */
+export const PhoneWidthNav430: Story = {
+  parameters: { layout: "fullscreen", phoneWidthFrame: true },
+  decorators: [
+    (Story) => (
+      <View width={430}>
+        <Story />
+      </View>
+    ),
+  ],
+  args: phoneWidthArgs,
 };
