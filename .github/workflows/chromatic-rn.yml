@@ -68,7 +68,13 @@ name: React Native storybook (Chromatic)
 # chromatic.config.json key makes the CLI treat a project as React
 # Native — the reactNative.*BuildCommand keys are a non-Expo escape
 # hatch only. The prebuilt-artifact flow is the documented Expo CI
-# shape and never enters the web metadata/build path.
+# shape and skips the web build path; its one remaining Core touch is
+# manifest generation, which loads .rnstorybook/main.ts via Core's
+# loadStorybook and therefore requires the config's `framework`
+# field ('@storybook/react-native') — added after main run
+# 42956366058 (build 2) failed there with
+# MissingFrameworkFieldError once the Chromatic project was
+# correctly flagged as a React Native app.
 
 on:
   push:
@@ -314,8 +320,10 @@ jobs:
           # docs): --storybook-build-dir points the CLI at the
           # artifact built by the previous job, so it generates the
           # story manifest from .rnstorybook and uploads the .apk
-          # WITHOUT the web Storybook metadata/build path — the path
-          # that failed every main run with "Build script not found"
-          # (see the header note). The CLI reads
-          # chromatic.config.json in this directory.
+          # WITHOUT the web Storybook build path — the path that
+          # failed every main run with "Build script not found"
+          # (see the header note). Manifest generation does load
+          # .rnstorybook/main.ts through Storybook Core, which is
+          # why that config carries a `framework` field. The CLI
+          # reads chromatic.config.json in this directory.
           npx --yes chromatic --project-token "$CHROMATIC_RN_PROJECT_TOKEN" --ci --exit-zero-on-changes --storybook-build-dir storybook-static
