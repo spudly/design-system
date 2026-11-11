@@ -25,7 +25,7 @@ export const Default: Story = {
 
 export const Loading: Story = {
   args: {
-    secret: "ecp_9f2b7d4a1c8e5f6a3b9d2e7f1a4c8b",
+    secret: "storybook-fixture-value",
     onCopy: (s) => console.log("copied", s),
     onDismiss: () => console.log("dismissed"),
     loading: true,
@@ -37,7 +37,7 @@ export const LoadingOverlay: Story = {
   render: () => (
     <YStack position="relative">
       <SecretRevealPanel
-        secret="ecp_9f2b7d4a1c8e5f6a3b9d2e7f1a4c8b"
+        secret="storybook-fixture-value"
         onCopy={(s) => console.log("copied", s)}
         onDismiss={() => console.log("dismissed")}
       />
@@ -51,7 +51,7 @@ export const LoadingOverlay: Story = {
         pointerEvents="none"
       >
         <SecretRevealPanel
-          secret="ecp_9f2b7d4a1c8e5f6a3b9d2e7f1a4c8b"
+          secret="storybook-fixture-value"
           onCopy={(s) => console.log("copied", s)}
           onDismiss={() => console.log("dismissed")}
           loading

@@ -472,6 +472,19 @@ test("T1 SSR: loading StatCard, PreviewCard, and the collections render their du
   assert.equal(hiddenBones(statBand), 6, "a loading StatBand renders 3 dummy stats (2 bones each)");
   assert.ok(!statBand.includes("Servings"), "a loading StatBand shows none of its children");
 
+  const statBandOne = await renderToHtml(
+    React.createElement(
+      StatBand,
+      { loading: true, loadingCount: 1 },
+      React.createElement(StatCard, { value: "4", label: "Servings" }),
+    ),
+  );
+  assert.equal(
+    hiddenBones(statBandOne),
+    2,
+    "a loading StatBand with loadingCount=1 renders 1 dummy stat (2 bones) — composites with a conditional stat count mirror their loaded composition",
+  );
+
   const preview = await renderToHtml(
     React.createElement(
       PreviewCard,
@@ -1065,7 +1078,7 @@ test("T2 SSR: loading SecretRevealPanel and RecipeInstructionsPanel hide their c
 
   const secret = await renderToHtml(
     React.createElement(SecretRevealPanel, {
-      secret: "ecp_secret_value",
+      secret: "fixture-hidden-value",
       onCopy: noop,
       onDismiss: noop,
       loading: true,
@@ -1077,7 +1090,7 @@ test("T2 SSR: loading SecretRevealPanel and RecipeInstructionsPanel hide their c
     "a loading SecretRevealPanel renders title + hint + secret-box bones",
   );
   assert.ok(
-    !secret.includes("ecp_secret_value"),
+    !secret.includes("fixture-hidden-value"),
     "a loading SecretRevealPanel never shows the secret",
   );
   assert.ok(secret.includes("Copy"), "its Copy action stays, as an inert rectangle skeleton");
@@ -1085,11 +1098,11 @@ test("T2 SSR: loading SecretRevealPanel and RecipeInstructionsPanel hide their c
   assert.match(secret, /aria-busy/, "a loading SecretRevealPanel marks its region busy");
 
   const idleSecret = await renderToHtml(
-    React.createElement(SecretRevealPanel, { secret: "ecp_visible_value", onCopy: noop }),
+    React.createElement(SecretRevealPanel, { secret: "fixture-shown-value", onCopy: noop }),
   );
   assert.equal(hiddenBones(idleSecret), 0, "a non-loading SecretRevealPanel renders no bones");
   assert.ok(
-    idleSecret.includes("ecp_visible_value"),
+    idleSecret.includes("fixture-shown-value"),
     "a non-loading SecretRevealPanel shows the secret",
   );
 

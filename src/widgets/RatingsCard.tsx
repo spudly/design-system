@@ -3,6 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Card } from "./Card.js";
+import { Center } from "./Center.js";
 import { StarRatingInput } from "./StarRatingInput.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
@@ -172,15 +173,9 @@ export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: 
               <EyebrowSkeleton />
               <XStack>
                 {LOADING_STAR_KEYS.map((key) => (
-                  <View
-                    key={key}
-                    width={44}
-                    height={44}
-                    alignItems="center"
-                    justifyContent="center"
-                  >
+                  <Center key={key} width={44} height={44}>
                     <BoxSkeleton width={24} height={24} />
-                  </View>
+                  </Center>
                 ))}
               </XStack>
               {ratings.viewer.isStale ? (

@@ -144,7 +144,7 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
             </YStack>
           ) : null}
           <YStack paddingBlockEnd="$4">
-            <StatBand loading>
+            <StatBand loading loadingCount={1 + (prepTimeLabel ? 1 : 0) + (cookTimeLabel ? 1 : 0)}>
               <StatCard label="Servings" value={servingsLabel} />
               {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
               {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
