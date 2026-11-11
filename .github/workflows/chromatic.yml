@@ -219,6 +219,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: "@spudly"
 
       - name: Enable Corepack (pinned npm)
         if: steps.pr-gate.outputs.run != 'false'
