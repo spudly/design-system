@@ -45,3 +45,9 @@ test("a story demonstrates the 6-item nav at phone width (#564)", () => {
   assert.match(stories, /export const PhoneWidthNav/);
   assert.match(stories, /width=\{390\}/);
 });
+
+test("the phone-width stories cover 430px too and render full-bleed (#564)", () => {
+  assert.match(stories, /export const PhoneWidthNav430/);
+  assert.match(stories, /width=\{430\}/);
+  assert.match(stories, /phoneWidthFrame: true/);
+});
