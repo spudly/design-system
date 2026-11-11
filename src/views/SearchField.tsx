@@ -200,8 +200,9 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
   // guard (#562): Tamagui's Input fires `onSubmitEditing` from
   // its Enter keydown handler without checking composition, so
   // a CJK user confirming a candidate with Enter would submit
-  // the search mid-typing (the AppShellPage header search and
-  // the Recipes/Discover search both consume this field). Track
+  // the search mid-typing (the AppShellPage header search, via
+  // AppTopBar, and VerseSearchPage both pass a submit handler
+  // to this field). Track
   // composition on the field itself and hold submit-editing
   // while it is active; composition events do not exist on
   // native, where the return key never fires during composition.

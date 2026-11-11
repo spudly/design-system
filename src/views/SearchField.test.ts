@@ -5,8 +5,9 @@
  * `onSubmitEditing` from its Enter keydown handler without
  * checking IME composition — so a CJK user confirming a
  * composition candidate with Enter submitted the search
- * mid-typing (the AppShellPage header search and the
- * Recipes/Discover search both consume this field).
+ * mid-typing (the AppShellPage header search, via AppTopBar,
+ * and VerseSearchPage both pass a submit handler to this
+ * field).
  *
  * The contract now mirrors TextField's shipped guard:
  * 1. `onSubmitEditing`, `onCompositionStart`, and
