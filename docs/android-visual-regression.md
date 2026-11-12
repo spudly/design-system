@@ -43,23 +43,36 @@ if ever, is a separate later decision. Nothing in the Chromatic RN
 setup touches `tools/visualRegression`, its baselines, or
 `android-storybook.yml`.
 
-**Requesting a run:** pushes to `main` always run (baseline
-anchoring). PRs run only on request — add the **`visual-check-rn`**
-label (separate from the web `visual-check` label, so the two
-budgets are requested independently). The label is one-shot and is
+**Requesting a run:** pushes to `main` never run (Stephen's
+directive, 2026-11-12 — the same release-finalization model as web
+Chromatic). PRs run only on request AND only on the release PR —
+add the **`visual-check-rn`** label to the Version Packages PR
+(head branch `changeset-release/*`) while its release is being
+finalized (separate from the web `visual-check` label, so the two
+budgets are requested independently); on any other PR the workflow
+skips and the label is not consumed. The label is one-shot and is
 consumed when a run actually starts, after the same two gates as
 web Chromatic: the pixel gate (docs/CI/changeset/manifest-only
-diffs skip, label kept) and the CI-green gate for the exact head.
+diffs skip, label kept; the release PR is exempt, since its diff
+is only release metadata) and the CI-green gate for the exact
+head. `workflow_dispatch` remains the manual path on any branch.
+Without main builds, baselines anchor the same way as web: builds
+compare against the newest build with accepted baselines reachable
+in git ancestry, so the finalization run surfaces the release's
+accumulated visual delta.
 
 **Snapshot budget:** the 5,000 snapshots/month free-tier cap is
 shared with web Chromatic. TurboSnap is NOT supported for React
 Native, so every RN build snapshots the full story set — ~273
 stories at introduction, per enabled platform. A full-suite build
-is therefore a significant fraction of a month's budget, which is
-why PR runs are label-gated and main builds are the baseline
-anchors. Baseline seeding (the first full capture) is sequenced to
-just after a Chromatic billing-cycle reset, and Stephen accepts
-the seeded baselines in Chromatic himself.
+is therefore a significant fraction of a month's budget: the
+original run-on-every-main-push model exhausted the shared budget
+in the Nov 2026 cycle (9 main pushes in 2026-11-08..12, plus the
+#302 seeding builds and the web finalization builds), which is
+why runs are now release-PR-only plus manual dispatch. Baseline
+seeding (the first full capture) is sequenced to just after a
+Chromatic billing-cycle reset, and Stephen accepts the seeded
+baselines in Chromatic himself.
 
 ## Pieces
 
