@@ -76,7 +76,7 @@ export function RecipeInstructionRowView({
       <YStack flex={1}>
         <TextAreaField
           accessibilityLabel={`Step ${position}`}
-          editable={onBodyChange !== undefined}
+          readOnly={onBodyChange === undefined}
           numberOfLines={2}
           value={row.body}
           onChangeText={(value) => {

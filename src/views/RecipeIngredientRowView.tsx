@@ -73,7 +73,7 @@ export function RecipeIngredientRowView({
       <TextField
         accessibilityLabel={`Ingredient ${position} quantity`}
         placeholder="Qty"
-        editable={onFieldChange !== undefined}
+        readOnly={onFieldChange === undefined}
         value={row.quantity}
         onChangeText={(value) => {
           onFieldChange?.(row.key, "quantity", value);
@@ -82,7 +82,7 @@ export function RecipeIngredientRowView({
       <TextField
         accessibilityLabel={`Ingredient ${position} unit`}
         placeholder="Unit"
-        editable={onFieldChange !== undefined}
+        readOnly={onFieldChange === undefined}
         value={row.unit}
         onChangeText={(value) => {
           onFieldChange?.(row.key, "unit", value);
@@ -92,7 +92,7 @@ export function RecipeIngredientRowView({
         grow
         accessibilityLabel={`Ingredient ${position} name`}
         placeholder="Name"
-        editable={onFieldChange !== undefined}
+        readOnly={onFieldChange === undefined}
         value={row.name}
         onChangeText={(value) => {
           onFieldChange?.(row.key, "name", value);
