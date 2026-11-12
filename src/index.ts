@@ -30,6 +30,12 @@
  * passing lazy components into pages — they just no longer
  * import the boundary themselves.
  *
+ * #539 (2026-11-08, approved plan) adds the voice-as-theme surface
+ * beside the #411 additions: `VoiceProvider`, `useVoice`, and the
+ * `Voice`, `VoiceFormatter`, and `VoiceProviderProps` types from
+ * src/voice/ — the DS owns the text system the way it owns themes,
+ * so the provider and slot types are part of the published surface.
+ *
  * Widgets, icons, and the Storybook factories remain in the repo
  * as internal building blocks (src/widgets, src/icons,
  * src/tamagui.config.ts) that the pages are composed from and that
@@ -52,3 +58,4 @@ export {
 } from "./themes/index.js";
 export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
 export { createTamaguiConfig } from "./tamagui.config.js";
+export { VoiceProvider, useVoice, type Voice, type VoiceFormatter, type VoiceProviderProps } from "./voice/index.js";

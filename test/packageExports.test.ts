@@ -101,6 +101,10 @@ const restoredByModule: [string, string[]][] = [
     ],
   ],
   ["./tamagui.config.js", ["createTamaguiConfig"]],
+  [
+    "./voice/index.js",
+    ["VoiceProvider", "useVoice", "Voice", "VoiceFormatter", "VoiceProviderProps"],
+  ],
 ];
 
 const restoredNames = new Set(restoredByModule.flatMap(([, names]) => names));
@@ -125,7 +129,7 @@ test("package.json exports the root only — no subpaths (#298)", () => {
   assert.equal(pkg.types, "./dist/index.d.ts");
 });
 
-test("the root entry re-exports the pages barrel and exactly the #411 additions", () => {
+test("the root entry re-exports the pages barrel and exactly the #411 additions plus the #539 voice surface", () => {
   for (const rel of ["src/index.ts", "dist/index.js", "dist/index.d.ts"]) {
     const code = readCode(rel);
     assert.ok(
@@ -139,8 +143,9 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions"
         "./tokens/index.js",
         "./themes/index.js",
         "./tamagui.config.js",
+        "./voice/index.js",
       ]),
-      `${rel} must re-export from exactly the pages barrel and the #411 source modules`,
+      `${rel} must re-export from exactly the pages barrel, the #411 source modules, and the #539 voice module`,
     );
     // The built JS drops the type-only names (they are erased at
     // compile time); the source and the built declarations carry
@@ -156,12 +161,14 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions"
             "warmHarvestTagColors",
             "tagColorNameForHex",
             "createTamaguiConfig",
+            "VoiceProvider",
+            "useVoice",
           ])
         : restoredNames;
     assert.deepEqual(
       exportNames(code),
       expectedNames,
-      `${rel} must name exactly the #411 additions beside the pages wildcard`,
+      `${rel} must name exactly the #411 additions and the #539 voice names beside the pages wildcard`,
     );
   }
 });
@@ -178,7 +185,7 @@ test("the pages barrel has no wildcard re-exports (#298)", () => {
   );
 });
 
-test("the public surface is exactly the pages barrel's names plus the #411 additions", () => {
+test("the public surface is exactly the pages barrel's names plus the #411 additions and the #539 voice surface", () => {
   assert.ok(pagesNames.size > 0, "the pages barrel exports names");
   // Every pages-barrel name is a page component or one of its
   // view-model types: value exports all end in "Page"; type
