@@ -1,10 +1,10 @@
-import { YStack } from "tamagui";
+import { View, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 
 export type SubscriptionViewProps = {
   /** Section heading ("Subscription"). */
@@ -88,11 +88,14 @@ export function SubscriptionView({
         {showSkeleton ? (
           // Loading (#278): text skeletons mirroring the
           // loaded lines — the plan line at xl size, the
-          // status/upsell line at md size. No real plan,
-          // status, reconciling, or error text renders.
+          // status/upsell line at md size in the two lines
+          // the status copy wraps to at the section's width
+          // (a single line left the actions shifted up by a
+          // line — Stephen on #579). No real plan, status,
+          // reconciling, or error text renders.
           <>
             <TextSkeleton size="xl" lines={1} />
-            <TextSkeleton size="md" lines={1} />
+            <TextSkeleton size="md" lines={2} />
           </>
         ) : (
           <>
@@ -121,8 +124,13 @@ export function SubscriptionView({
             {portalUrl ? (
               showSkeleton ? (
                 // TextLink does not read the loading scope,
-                // so a text skeleton stands in its place.
-                <TextSkeleton size="md" lines={1} />
+                // so a text skeleton stands in its place —
+                // centered in the link's own line box
+                // (SIZABLE_TEXT_LINE_BOX, 27), not a plain
+                // text line box (Stephen on #579).
+                <View width="100%" height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+                  <TextSkeleton size="md" lines={1} />
+                </View>
               ) : (
                 <TextLink href={portalUrl}>{portalLabel}</TextLink>
               )

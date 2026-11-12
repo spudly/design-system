@@ -4,7 +4,7 @@ import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/Button.js";
 import { SectionCard } from "../widgets/SectionCard.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { TextField } from "./TextField.js";
 
 /**
@@ -90,14 +90,18 @@ function GoalField({
 // The loading form's field keys (#278): the five goal fields in
 // display order, from a frozen module-level constant — never
 // generated per render. Each skeleton field mirrors a
-// TextField's own stack: the sm label's gap ($1) over the
-// input, whose minimum height is 44.
+// TextField's own stack: the label's gap ($1) over the input,
+// whose minimum height is 44. The label bone sits centered in
+// the field Label's own line box (SIZABLE_TEXT_LINE_BOX, 27) —
+// a TextSkeleton sm line box (16) in its place leaves each
+// field 11px short, and the five fields accumulate the drift,
+// so the bones slide off the loaded form (Stephen on #579).
 const LOADING_GOAL_FIELD_KEYS = ["calories", "protein", "carbs", "fat", "satiety"] as const;
 
 function GoalFieldSkeleton() {
   return (
     <YStack gap="$1">
-      <View width="35%">
+      <View width="35%" height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
         <TextSkeleton size="sm" lines={1} />
       </View>
       <BoxSkeleton height={44} />

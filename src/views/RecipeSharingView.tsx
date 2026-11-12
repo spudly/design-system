@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { XStack, YStack } from "tamagui";
+import { View, XStack, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { tokens } from "../tokens/index.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
@@ -8,7 +8,7 @@ import { Card } from "../widgets/Card.js";
 import { Center } from "../widgets/Center.js";
 import { CircleSkeleton } from "../widgets/CircleSkeleton.js";
 import { Text } from "../widgets/Text.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "./CheckboxField.js";
 import { RadioOptionGroup, type RadioOption } from "./RadioOptionGroup.js";
 
@@ -132,8 +132,12 @@ export function RecipeSharingView({
           // The radio rows' mirror (#278): RadioOptionGroup's
           // own stack (gap spacing 1) of rows (gap spacing 2,
           // centered) — the item's 44px touch-target slot
-          // centering a circle bone, the label bone at md, and
-          // a description bone at sm when the option carries
+          // centering a circle bone, the label bone at md
+          // centered in the option Label's own line box
+          // (SIZABLE_TEXT_LINE_BOX, 27 — a plain md line box
+          // left each row short and the drift accumulated
+          // down the group, Stephen on #579), and a
+          // description bone at sm when the option carries
           // one. No real labels or selection show.
           <YStack gap={tokens.spacing[1]}>
             {options.map((option) => (
@@ -142,7 +146,9 @@ export function RecipeSharingView({
                   <CircleSkeleton size={20} />
                 </Center>
                 <YStack flex={1} gap={tokens.spacing[1]}>
-                  <TextSkeleton size="md" lines={1} />
+                  <View height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+                    <TextSkeleton size="md" lines={1} />
+                  </View>
                   {option.description ? <TextSkeleton size="sm" lines={1} /> : null}
                 </YStack>
               </XStack>
@@ -168,14 +174,18 @@ export function RecipeSharingView({
             // The consent field's mirror (#278): CheckboxField's
             // own row (gap spacing 3, 44px minimum) — the 24px
             // visual box bone centered in its 44px touch-target
-            // slot, the label bone at md, and a description bone
-            // at sm when a description would render.
+            // slot, the label bone at md centered in the field
+            // Label's own line box (SIZABLE_TEXT_LINE_BOX, 27),
+            // and a description bone at sm when a description
+            // would render.
             <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
               <Center width={44} height={44}>
                 <BoxSkeleton width={24} height={24} />
               </Center>
               <YStack flex={1} gap={tokens.spacing[1]}>
-                <TextSkeleton size="md" lines={1} />
+                <View height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+                  <TextSkeleton size="md" lines={1} />
+                </View>
                 {consentDescription ? <TextSkeleton size="sm" lines={1} /> : null}
               </YStack>
             </XStack>

@@ -282,7 +282,9 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 // buttons as rectangles, ghost buttons as text bones, Stephen
 // on #551) — and renders unchanged while not loading.
 // The collection widgets (CheckboxSelectList, StatBand) render
-// exactly 3 dummy items while loading; MasonryGrid renders 24
+// exactly 3 dummy items while loading when their items are not
+// known — and mirror the known items' count when they are
+// (Stephen on #579); MasonryGrid renders 24
 // varied-height dummies so its loading state still reads as a
 // masonry grid (Stephen on #551). CheckboxSelectList's centered
 // spinner is gone.
@@ -390,8 +392,8 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
   );
   assert.equal(
     hiddenBones(comment),
-    5,
-    "a loading CommentItem renders author + 2 body bones + its 2 ghost action bones",
+    4,
+    "a loading CommentItem renders author + 1 body bone + its 2 ghost action bones",
   );
   assert.ok(!comment.includes("Secret Author"), "a loading CommentItem shows no author");
   assert.ok(!comment.includes("Secret body text"), "a loading CommentItem shows no body");
@@ -527,8 +529,26 @@ test("T1 SSR: loading StatCard, PreviewCard, and the collections render their du
       loading: true,
     }),
   );
-  assert.equal(hiddenBones(selectList), 6, "a loading CheckboxSelectList renders 3 rows x 2 bones");
+  assert.equal(
+    hiddenBones(selectList),
+    4,
+    "a loading CheckboxSelectList renders one row per known item (2 rows x 2 bones)",
+  );
   assert.ok(!selectList.includes("AlphaItem"), "a loading CheckboxSelectList shows no real items");
+
+  const unknownSelectList = await renderToHtml(
+    React.createElement(CheckboxSelectList, {
+      items: [],
+      selectedIds: [],
+      onToggle: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(
+    hiddenBones(unknownSelectList),
+    6,
+    "a loading CheckboxSelectList with no known items renders 3 dummy rows x 2 bones",
+  );
 
   let renderCalls = 0;
   const grid = await renderToHtml(
@@ -1318,7 +1338,7 @@ test("T3 SSR: loading RecipeCommentsView renders comment skeletons, no real cont
   const loading = await renderToHtml(
     React.createElement(RecipeCommentsView, { comments: [], loading: true }),
   );
-  assert.equal(hiddenBones(loading), 9, "3 dummy CommentItems x (author bone + 2 body-line bones)");
+  assert.equal(hiddenBones(loading), 6, "3 dummy CommentItems x (author bone + 1 body-line bone)");
   assert.ok(!loading.includes("No comments yet"), "the empty state does not show while loading");
   assert.match(loading, /aria-busy/, "a loading RecipeCommentsView marks its region busy");
 

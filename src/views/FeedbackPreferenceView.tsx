@@ -1,4 +1,4 @@
-import { XStack, YStack } from "tamagui";
+import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
@@ -8,7 +8,7 @@ import { Center } from "../widgets/Center.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "./CheckboxField.js";
 
 export type FeedbackPreferenceViewProps = {
@@ -116,8 +116,18 @@ export function FeedbackPreferenceView({
               <BoxSkeleton width={24} height={24} />
             </Center>
             <YStack flex={1} gap={tokens.spacing[1]}>
-              <TextSkeleton size="md" lines={1} />
-              <TextSkeleton size="sm" lines={1} />
+              {/* The label bone sits centered in the
+                  CheckboxField Label's own line box
+                  (SIZABLE_TEXT_LINE_BOX, 27), and the
+                  description bone takes the two lines the
+                  description copy wraps to — the loaded
+                  label column is 27 + gap + two lines, and
+                  a shorter column slid everything below the
+                  row up (Stephen on #579). */}
+              <View height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+                <TextSkeleton size="md" lines={1} />
+              </View>
+              <TextSkeleton size="sm" lines={2} />
             </YStack>
           </XStack>
           <YStack gap="$2">

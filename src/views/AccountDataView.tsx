@@ -63,7 +63,11 @@ export function AccountDataView({
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
       <YStack gap="$3">
         {showSkeleton ? (
-          <TextSkeleton size="md" lines={1} />
+          // The description bone takes the two lines the
+          // description copy wraps to at the section's width —
+          // a single line left the actions shifted up by a
+          // line (Stephen on #579).
+          <TextSkeleton size="md" lines={2} />
         ) : (
           <Text variant="muted">{description}</Text>
         )}

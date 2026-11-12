@@ -71,7 +71,15 @@ export function TransferRecipesView({
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
       <YStack gap="$3">
-        {showSkeleton ? <TextSkeleton size="md" lines={1} /> : <Text variant="muted">{hint}</Text>}
+        {showSkeleton ? (
+          // The hint bone takes the two lines the hint copy
+          // wraps to at the section's width — a single line
+          // left everything below it shifted up by a line
+          // (Stephen on #579).
+          <TextSkeleton size="md" lines={2} />
+        ) : (
+          <Text variant="muted">{hint}</Text>
+        )}
         <RecipeExportPickerView
           {...exportPicker}
           loading={showSkeleton || exportPicker.loading === true}
