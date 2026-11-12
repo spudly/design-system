@@ -959,6 +959,10 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
       <BigFooterShell footer={props.footer} scrollMode="content">
         <LoadingScope active>
           <ScreenShell>
+            <Toolbar>
+              <BoxSkeleton width={96} height={24} />
+              <BoxSkeleton width={180} height={40} />
+            </Toolbar>
             <ScrollRegion>
               <PanelStack>
                 <BoxSkeleton height={256} />

@@ -160,7 +160,7 @@ describe("recipesPageBoundedList", () => {
     );
     assert.match(
       code,
-      /case "loadingDiscovery":\s*return <LoadingDiscoveryRows padded \/>;/,
+      /case "loadingDiscovery":\s*return <LoadingDiscoveryRows variant="section" \/>;/,
       "the discovery section's skeleton rows render as that section's rows in the list",
     );
     assert.match(

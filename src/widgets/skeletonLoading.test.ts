@@ -1310,6 +1310,11 @@ test("T4: every converted page renders skeletons — no Spinner remains in its c
     /LOADING_COOK_LOG_KEYS\.map/,
     "RecipeDetailPage's cook history loads as dummy LogEntryCards",
   );
+  assert.match(
+    detail,
+    /state === "loading"[\s\S]*?<Toolbar>[\s\S]*?<\/Toolbar>[\s\S]*?<ScrollRegion>/,
+    "RecipeDetailPage's loading state keeps the pinned toolbar's skeleton above its scroll region, mirroring the ready chrome",
+  );
 });
 
 test("T4: the approved spinner survivors keep their Spinners", () => {
@@ -1502,8 +1507,8 @@ test("T4 SSR: the union pages' loading states render their skeleton compositions
   const detail = await renderToHtml(React.createElement(RecipeDetailPage, { state: "loading" }));
   assert.equal(
     hiddenBones(detail),
-    23,
-    "overview (hero 1 + title 1 + description 3 + stat band 6) + ingredients (4) + instructions (2) + cook history (3) + nutrition (3)",
+    25,
+    "skeleton toolbar (badge 1 + picker 1) + overview (hero 1 + title 1 + description 3 + stat band 6) + ingredients (4) + instructions (2) + cook history (3) + nutrition (3)",
   );
   assert.ok(detail.includes("Cook History"), "the section headings stay rendered while loading");
   assert.ok(detail.includes("Nutrition"), "the section headings stay rendered while loading");
@@ -1520,7 +1525,10 @@ test("T4: RecipesPage's loading sections and footers render the skeleton rows", 
   const code = readCode("src/pages/RecipesPage.tsx");
   assert.match(code, /case "loadingOwn":\s*return <LoadingOwnRows \/>;/);
   assert.match(code, /case "loadingOwnMore":\s*return <LoadingOwnRows \/>;/);
-  assert.match(code, /case "loadingDiscovery":\s*return <LoadingDiscoveryRows padded \/>;/);
+  assert.match(
+    code,
+    /case "loadingDiscovery":\s*return <LoadingDiscoveryRows variant="section" \/>;/,
+  );
   assert.match(
     code,
     /publicLoading \? \(\s*<LoadingDiscoveryRows \/>\s*\)/,

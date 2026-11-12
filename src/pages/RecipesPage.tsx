@@ -1129,7 +1129,7 @@ export function RecipesPage(props: RecipesPageProps) {
           />
         );
       case "loadingDiscovery":
-        return <LoadingDiscoveryRows padded />;
+        return <LoadingDiscoveryRows variant="section" />;
       case "discoveryError":
         return <Alert severity="error">{row.message}</Alert>;
       case "discoveryEmpty":
@@ -1389,16 +1389,17 @@ function LoadingOwnRows() {
 /**
  * A loading discovery/public section's rows: 3 DiscoveryCards
  * in their loading state (the widget's own skeleton — thumbnail
- * box and text bones in the card's geometry, no link). In the
- * unified list the cards sit in the discovery row's padded
- * wrapper (`padded`); in the public catalog's own layouts they
+ * box and text bones in the card's geometry, no link). The
+ * `section` variant is the unified list's form, where each card
+ * sits in the discovery row's padded wrapper; the `standalone`
+ * variant is the public catalog's own layouts, where the cards
  * render bare in the column's gap rhythm.
  */
-function LoadingDiscoveryRows({ padded = false }: { padded?: boolean }) {
+function LoadingDiscoveryRows({ variant = "standalone" }: { variant?: "section" | "standalone" }) {
   return (
     <>
       {LOADING_ROW_KEYS.map((key) =>
-        padded ? (
+        variant === "section" ? (
           <YStack key={key} paddingBlockEnd="$3">
             <DiscoveryCard title="Recipe" subtitle="Recipe details" href="/loading" loading />
           </YStack>
