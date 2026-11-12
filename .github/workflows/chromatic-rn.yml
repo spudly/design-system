@@ -22,32 +22,52 @@ name: React Native storybook (Chromatic)
 # snapshots/month SHARED with the web project. TurboSnap is NOT
 # supported for React Native (per Chromatic's RN docs), so every RN
 # build snapshots the full story set (~273 stories at introduction;
-# per enabled platform) — the label gating below carries the whole
-# budget discipline:
+# per enabled platform) — the trigger model below carries the whole
+# budget discipline. It mirrors the web model in chromatic.yml
+# (release-finalization model, 2026-11-06), extended to RN by
+# Stephen's directive of 2026-11-12:
 #
-# - Pushes to main: ALWAYS run. Main builds anchor the baselines PR
-#   diffs compare against, and they are comparatively rare.
-# - Pull requests: run ONLY on request. Add the `visual-check-rn`
-#   label to a PR to request one snapshot run. The label is
-#   deliberately separate from the web `visual-check` label so the
-#   two budgets are requested independently. It is one-shot: the job
-#   removes it as soon as a run actually starts. Two gates run before
-#   the label is consumed, and a gate skip KEEPS the label, so a
-#   later push (synchronize) retries automatically:
+# - Pushes to main: NEVER run. The original #302 model ran a full
+#   build on EVERY main push ("main builds anchor the baselines"),
+#   and in the Nov 2026 cycle that exhausted the shared 5,000
+#   budget: 9 main pushes in 2026-11-08..12 at ~303–606 snapshots
+#   each (iOS + Android until iOS capture was turned off
+#   mid-cycle), plus the #302 seeding builds and the web
+#   finalization builds. Baseline anchoring works the same way as
+#   web without them: builds compare against the newest build with
+#   accepted baselines reachable in git ancestry, so the
+#   finalization run surfaces the release's accumulated visual
+#   delta.
+# - Pull requests: run ONLY on request AND only on the release PR.
+#   Add the `visual-check-rn` label to the Version Packages PR
+#   (head branch changeset-release/*) while its release is being
+#   finalized to request one snapshot run; on any other PR the job
+#   skips and the label is NOT consumed. The label is deliberately
+#   separate from the web `visual-check` label so the two budgets
+#   are requested independently. It is one-shot: the job removes
+#   it as soon as a run actually starts. Two gates run before the
+#   label is consumed, and a gate skip KEEPS the label, so a later
+#   push (synchronize) retries automatically:
 #     1. CI-green gate: the `ci` check for the PR's exact head SHA
 #        must have concluded success (bounded ~5 min wait).
 #     2. Pixel gate: PRs whose diff touches only files that cannot
 #        change pixels (markdown, docs/, .github/, changesets,
-#        LICENSE, .gitignore, package manifests) skip.
+#        LICENSE, .gitignore, package manifests) skip. Exception:
+#        the release PR is exempt — its diff is only release
+#        metadata, so it would always skip, but its labeled run is
+#        the release's visual check under the finalization model.
 #   Exception (#53, same as web): a run triggered by dependabot[bot]
 #   gets a read-only token, so it cannot consume the label; it
 #   publishes with a warning instead.
+# - Manual runs: workflow_dispatch runs on any branch on demand —
+#   the escape hatch for re-seeding baselines or checking a
+#   specific branch outside a release.
 #
 # Setup (one-time): a Chromatic React Native project for this repo,
 # with its token stored as the CHROMATIC_RN_PROJECT_TOKEN repository
-# secret (added by Stephen, verified 2026-11-05). Baseline seeding is held until just
-# after the ~2026-11-09 billing-cycle reset; Stephen accepts the
-# seeded baselines himself.
+# secret (added by Stephen, verified 2026-11-05). Baseline seeding
+# ran just after the ~2026-11-09 billing-cycle reset; Stephen
+# accepts the seeded baselines himself.
 #
 # Build/publish split (#302 seeding fix): the run is TWO jobs, per
 # Chromatic's current React Native CI docs. The first job builds the
@@ -57,7 +77,7 @@ name: React Native storybook (Chromatic)
 # Storybook.tsx wiring consumes set by the CLI); the second job
 # publishes the prebuilt artifact directory with
 # `chromatic --storybook-build-dir`. The original single-step form
-# (`npx chromatic` alone) failed on EVERY main push at "Collecting
+# (`npx chromatic` alone) failed at introduction on EVERY run at "Collecting
 # Storybook metadata" with "Build script not found — the CLI didn't
 # find a script called \"build-storybook\"": that check is the CLI's
 # WEB Storybook path, and the CLI only skips it when its best-effort
@@ -77,10 +97,15 @@ name: React Native storybook (Chromatic)
 # correctly flagged as a React Native app.
 
 on:
-  push:
-    branches: [main]
+  # No push trigger: main pushes never run Chromatic RN (Stephen's
+  # directive, 2026-11-12 — the same model as chromatic.yml). PR runs
+  # are label-gated below and restricted to the release PR.
   pull_request:
+    # `labeled` makes the visual-check-rn request work; the other types
+    # let an already-labeled PR retry the gates when new commits land.
     types: [opened, reopened, synchronize, labeled]
+  # Manual path: run the workflow on any branch on demand.
+  workflow_dispatch:
 
 # NOTE: concurrency lives on the job (below), not here — same
 # reasoning as chromatic.yml: workflow-level concurrency would let
@@ -93,15 +118,16 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     outputs:
-      # Empty on push events (the gate step only runs for PRs) —
-      # the publish job treats anything but "false" as "run".
+      # Empty on workflow_dispatch events (the gate step only runs
+      # for PRs) — the publish job treats anything but "false" as
+      # "run".
       run: ${{ steps.pr-gate.outputs.run }}
     concurrency:
       group: chromatic-rn-${{ github.event.pull_request.number || github.ref }}
-      # Cancel superseded PR runs only: a main build anchors the
-      # baselines and snapshots the full suite, so a second main push
-      # must queue behind it rather than cancelling it mid-capture
-      # and wasting the shared snapshot budget.
+      # Cancel superseded PR runs only: a dispatch run snapshots the
+      # full suite, so a second dispatch on the same ref must queue
+      # behind it rather than cancelling it mid-capture and wasting
+      # the shared snapshot budget.
       cancel-in-progress: ${{ github.event_name == 'pull_request' }}
     permissions:
       contents: read
@@ -109,11 +135,17 @@ jobs:
       issues: write
       pull-requests: write
     # Fork PRs never receive repository secrets — skip them.
-    # PR runs additionally require the visual-check-rn label, and a
-    # `labeled` event for any other label must not start a run.
+    # PR runs additionally require the visual-check-rn label AND a
+    # release head branch (changeset-release/*): under the
+    # finalization model the only labeled PR run is the Version
+    # Packages PR's; any other PR skips here, before the label can
+    # be consumed. A `labeled` event for any other label must not
+    # start a run. Manual workflow_dispatch runs are admitted
+    # outright.
     if: |
-      github.event_name == 'push' ||
+      github.event_name == 'workflow_dispatch' ||
       (github.event.pull_request.head.repo.full_name == github.repository &&
+       startsWith(github.event.pull_request.head.ref, 'changeset-release/') &&
        contains(github.event.pull_request.labels.*.name, 'visual-check-rn') &&
        (github.event.action != 'labeled' || github.event.label.name == 'visual-check-rn'))
     steps:
@@ -130,7 +162,17 @@ jobs:
           echo "run=true" >> "$GITHUB_OUTPUT"
 
           # --- Pixel gate ------------------------------------------------
-          if files="$(gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" --name-only 2>/dev/null)" && [ -n "$files" ]; then
+          # Skip when every changed file is one that cannot change
+          # pixels. An empty or failed diff lookup means "unknown" and
+          # falls through to run. The release PR (head branch
+          # changeset-release/* — the only PR the job condition above
+          # admits) is exempt: its diff is only release metadata, so
+          # this gate would always skip it, but under the finalization
+          # model its labeled run snapshots the release's accumulated
+          # visual delta, so it must proceed to the CI-green gate
+          # below. (Same exemption as chromatic.yml.)
+          head_ref="$(gh pr view "$PR_NUMBER" --repo "${{ github.repository }}" --json headRefName --jq '.headRefName' 2>/dev/null || echo "")"
+          if [[ "$head_ref" != changeset-release/* ]] && files="$(gh pr diff "$PR_NUMBER" --repo "${{ github.repository }}" --name-only 2>/dev/null)" && [ -n "$files" ]; then
             visual=0
             while IFS= read -r file; do
               [ -z "$file" ] && continue
@@ -327,7 +369,7 @@ jobs:
           # artifact built by the previous job, so it generates the
           # story manifest from .rnstorybook and uploads the .apk
           # WITHOUT the web Storybook build path — the path that
-          # failed every main run with "Build script not found"
+          # failed every early run with "Build script not found"
           # (see the header note). Manifest generation does load
           # .rnstorybook/main.ts through Storybook Core, which is
           # why that config carries a `framework` field. The CLI
