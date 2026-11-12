@@ -69,3 +69,50 @@ export const ShortcutUnavailable: Story = {
     </Viewport>
   ),
 };
+
+export const Loading: Story = {
+  render: () => (
+    <Viewport>
+      <FeedbackPreferenceView
+        shortcutEnabled
+        consent={true}
+        consentStatusText="Analytics consent: Accepted"
+        {...actions}
+        loading
+      />
+    </Viewport>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <Viewport>
+      <View position="relative">
+        <FeedbackPreferenceView
+          shortcutEnabled
+          consent={true}
+          consentStatusText="Analytics consent: Accepted"
+          {...actions}
+        />
+        <View
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          opacity={0.45}
+          pointerEvents="none"
+        >
+          <FeedbackPreferenceView
+            shortcutEnabled
+            consent={true}
+            consentStatusText="Analytics consent: Accepted"
+            {...actions}
+            loading
+          />
+        </View>
+      </View>
+    </Viewport>
+  ),
+};

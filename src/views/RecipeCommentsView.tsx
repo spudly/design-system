@@ -1,9 +1,9 @@
 import { XStack, YStack } from "tamagui";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { CommentItem } from "../widgets/CommentItem.js";
-import { Spinner } from "../widgets/Spinner.js";
 import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "./TextAreaField.js";
 
@@ -21,7 +21,12 @@ export type RecipeCommentsViewComment = {
 
 export type RecipeCommentsViewProps = {
   comments: RecipeCommentsViewComment[];
-  /** The comments query is in flight: the card renders only a spinner. */
+  /** The comments query is in flight: the card renders
+   * skeleton CommentItems — one per real comment when
+   * comments are known, or exactly 3 dummy items when the
+   * list is not known yet. The title and the composer render
+   * as usual. An enclosing composite's LoadingScope can also
+   * put the view into this state without prop-drilling. */
   loading?: boolean;
   /** The comments query failed: the card renders this message instead of the empty state. */
   error?: string | null;
@@ -54,11 +59,22 @@ export type RecipeCommentsViewProps = {
   postLabel?: string;
 };
 
+// The dummy items for a comment-less loading view (#278):
+// exactly 3 placeholder items, from a frozen module-level
+// constant with stable keys — never generated per render.
+// Their author/body values never render (a loading
+// CommentItem renders bones only).
+const LOADING_COMMENTS: RecipeCommentsViewComment[] = [
+  { id: "loading-1", authorName: "Author", body: "Comment" },
+  { id: "loading-2", authorName: "Author", body: "Comment" },
+  { id: "loading-3", authorName: "Author", body: "Comment" },
+];
+
 /**
  * RecipeCommentsView (#438 Part 3): the recipe comments section
  * as a view — a bordered Card holding the CommentItem list and
  * the signed-in composer, composed from the shared widgets so
- * hosts no longer import Card / CommentItem / Spinner / Button
+ * hosts no longer import Card / CommentItem / Button
  * to build the section themselves (the eciperay audit's
  * coverage disposition for those specifiers).
  *
@@ -93,14 +109,31 @@ export function RecipeCommentsView({
   composerPlaceholder = "Share how it turned out…",
   postLabel = "Post comment",
 }: RecipeCommentsViewProps) {
+  const showSkeleton = useLoadingScope(loading);
   return (
     <Card variant="bordered">
       <YStack gap="$3">
         <Text variant="subheading">{title}</Text>
-        {loading ? (
-          <YStack alignItems="center" paddingVertical="$4">
-            <Spinner label="Loading comments" />
-          </YStack>
+        {showSkeleton ? (
+          // Loading (#278): skeleton CommentItems mirroring
+          // the loaded list — one per real comment (keeping
+          // its edit/delete flags so its ghost actions
+          // skeletonize in place), or exactly 3 dummy items
+          // when the list is not known yet. The items render
+          // as siblings of the title in the same stack, the
+          // way loaded comments do.
+          <LoadingScope active>
+            {(comments.length > 0 ? comments : LOADING_COMMENTS).map((comment) => (
+              <CommentItem
+                key={comment.id}
+                authorName={comment.authorName}
+                body={comment.body}
+                canEdit={comment.canEdit ?? false}
+                canDelete={comment.canDelete ?? false}
+                loading
+              />
+            ))}
+          </LoadingScope>
         ) : error ? (
           <Alert severity="error" message={error} />
         ) : comments.length === 0 ? (

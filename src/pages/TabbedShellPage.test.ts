@@ -233,9 +233,10 @@ test("SSR: a pending surface shows the loading state; a failed one the boundary 
   );
   assert.match(
     pendingHtml,
-    /aria-label="Loading"/,
-    "the slot's Suspense fallback is the DS spinner",
+    /name="SkeletonBone"/,
+    "the slot's Suspense fallback is the skeleton composition (#278 tranche 3)",
   );
+  assert.match(pendingHtml, /aria-busy/, "the skeleton fallback marks the slot busy");
   const failedHtml = await renderToHtml(
     React.createElement(TabbedShellPage, {
       title: "Memorize",

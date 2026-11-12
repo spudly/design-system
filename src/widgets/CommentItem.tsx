@@ -146,7 +146,15 @@ export function CommentItem({
             <YStack paddingBlockEnd="$1">
               <TextSkeleton size="sm" lines={1} />
             </YStack>
-            <TextSkeleton size="sm" lines={2} />
+            {/* The body bone is ONE line: a fixed second line
+                made every item taller than its loaded form, and
+                the excess accumulated down the list, sliding
+                everything below the comments off its loaded
+                position (Stephen on #579). Wrapped bodies
+                under-fill, as TextSkeleton's contract accepts —
+                the mirrored composition is the single-line
+                body. */}
+            <TextSkeleton size="sm" lines={1} />
             {actionsRow}
           </YStack>
         </LoadingScope>

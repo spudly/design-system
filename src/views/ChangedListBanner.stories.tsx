@@ -38,3 +38,42 @@ export const WithoutRevert: Story = {
     </YStack>
   ),
 };
+
+export const Loading: Story = {
+  render: () => (
+    <YStack maxWidth={430}>
+      <ChangedListBanner
+        label="Ingredients differ from the parent version (2 changed)."
+        onRevert={() => {}}
+        loading
+      />
+    </YStack>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative" maxWidth={430}>
+      <ChangedListBanner
+        label="Ingredients differ from the parent version (2 changed)."
+        onRevert={() => {}}
+      />
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <ChangedListBanner
+          label="Ingredients differ from the parent version (2 changed)."
+          onRevert={() => {}}
+          loading
+        />
+      </YStack>
+    </YStack>
+  ),
+};

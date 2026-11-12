@@ -1,9 +1,11 @@
-import { XStack, YStack } from "tamagui";
+import { YStack } from "tamagui";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
+import { Center } from "../widgets/Center.js";
 import { SectionCard } from "../widgets/SectionCard.js";
-import { Spinner } from "../widgets/Spinner.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 
 export type SubscriptionViewProps = {
   /** Section heading ("Subscription"). */
@@ -17,7 +19,21 @@ export type SubscriptionViewProps = {
   /** A status refresh is reconciling with the provider. */
   reconcilingText?: string | null;
   error?: string | null;
+  /** Loading state (#278): the section title skeletonizes
+   * through the SectionCard, the plan line renders as a text
+   * skeleton at xl size (the subheading size) and the status/upsell line at md
+   * size, and the manage / refresh / portal actions stay
+   * rendered inside the card's loading scope so each Button
+   * renders as a rectangle skeleton at its normal geometry
+   * (the portal TextLink, which does not read the scope,
+   * renders as a text skeleton in its place). No real plan,
+   * status, or error text shows. An enclosing composite's
+   * LoadingScope can also put the view into this state
+   * without prop-drilling. */
   loading?: boolean;
+  /** Kept for compatibility with existing hosts: the loading
+   * state is now a skeleton (#278), so this text no longer
+   * renders as visible text. */
   loadingText?: string;
   onManage?: () => void;
   manageLabel?: string;
@@ -55,7 +71,6 @@ export function SubscriptionView({
   reconcilingText,
   error,
   loading = false,
-  loadingText = "Loading subscription…",
   onManage,
   manageLabel = "Manage subscription",
   managePendingLabel = "Opening…",
@@ -67,23 +82,34 @@ export function SubscriptionView({
   portalUrl,
   portalLabel = "Open subscription portal",
 }: SubscriptionViewProps) {
+  const showSkeleton = useLoadingScope(loading);
   return (
-    <SectionCard title={title} variant="elevated">
+    <SectionCard title={title} variant="elevated" loading={showSkeleton}>
       <YStack gap="$2">
-        {planLabel ? <Text variant="subheading">{planLabel}</Text> : null}
-        {statusText ? (
-          <Text variant="body">{statusText}</Text>
-        ) : upsellText ? (
-          <Text variant="muted">{upsellText}</Text>
-        ) : null}
-        {reconcilingText ? <Text variant="muted">{reconcilingText}</Text> : null}
-        {error ? <Text variant="error">{error}</Text> : null}
-        {loading ? (
-          <XStack gap="$2" alignItems="center">
-            <Spinner label={loadingText} />
-            <Text variant="muted">{loadingText}</Text>
-          </XStack>
-        ) : null}
+        {showSkeleton ? (
+          // Loading (#278): text skeletons mirroring the
+          // loaded lines — the plan line at xl size, the
+          // status/upsell line at md size in the two lines
+          // the status copy wraps to at the section's width
+          // (a single line left the actions shifted up by a
+          // line — Stephen on #579). No real plan, status,
+          // reconciling, or error text renders.
+          <>
+            <TextSkeleton size="xl" lines={1} />
+            <TextSkeleton size="md" lines={2} />
+          </>
+        ) : (
+          <>
+            {planLabel ? <Text variant="subheading">{planLabel}</Text> : null}
+            {statusText ? (
+              <Text variant="body">{statusText}</Text>
+            ) : upsellText ? (
+              <Text variant="muted">{upsellText}</Text>
+            ) : null}
+            {reconcilingText ? <Text variant="muted">{reconcilingText}</Text> : null}
+            {error ? <Text variant="error">{error}</Text> : null}
+          </>
+        )}
         {onManage || onRefresh || portalUrl ? (
           <YStack gap="$2" alignItems="flex-start">
             {onManage ? (
@@ -96,7 +122,20 @@ export function SubscriptionView({
                 {refreshPending ? refreshPendingLabel : refreshLabel}
               </Button>
             ) : null}
-            {portalUrl ? <TextLink href={portalUrl}>{portalLabel}</TextLink> : null}
+            {portalUrl ? (
+              showSkeleton ? (
+                // TextLink does not read the loading scope,
+                // so a text skeleton stands in its place —
+                // centered in the link's own line box
+                // (SIZABLE_TEXT_LINE_BOX, 27), not a plain
+                // text line box (Stephen on #579).
+                <Center width="100%" height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
+                  <TextSkeleton size="md" lines={1} />
+                </Center>
+              ) : (
+                <TextLink href={portalUrl}>{portalLabel}</TextLink>
+              )
+            ) : null}
           </YStack>
         ) : null}
       </YStack>

@@ -1,8 +1,14 @@
 import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
+import { tokens } from "../tokens/index.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
+import { Center } from "../widgets/Center.js";
+import { CircleSkeleton } from "../widgets/CircleSkeleton.js";
 import { Text } from "../widgets/Text.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "./CheckboxField.js";
 import { RadioOptionGroup, type RadioOption } from "./RadioOptionGroup.js";
 
@@ -51,6 +57,20 @@ export type RecipeSharingViewProps = {
   permalinkUrl?: string | null;
   onCopyPermalink?: () => void;
   copyPermalinkLabel?: string;
+  /** Loading state (#278): the Card carries the loading scope
+   * and the view renders a mirror of its layout — the title as
+   * a text skeleton at its own (xl) size, one radio-row
+   * skeleton per option (a circle bone centered in the radio
+   * item's 44px touch-target slot, with label and description
+   * bones at sm), the warning and consent rows as bones in
+   * their slots when they would render, and the Save,
+   * share-link, and permalink Buttons kept inside the Card's
+   * loading scope so they render as inert skeletons when their
+   * blocks would render — their hint and URL lines as text
+   * bones. No real URLs, values, or selections show. An
+   * enclosing composite's LoadingScope can also put the view
+   * into this state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -97,26 +117,87 @@ export function RecipeSharingView({
   permalinkUrl,
   onCopyPermalink,
   copyPermalinkLabel = "Copy public link",
+  loading = false,
 }: RecipeSharingViewProps) {
+  const showSkeleton = useLoadingScope(loading);
   return (
-    <Card variant="bordered">
+    <Card variant="bordered" loading={showSkeleton}>
       <YStack gap="$3">
-        <Text variant="subheading">{title}</Text>
-        <RadioOptionGroup
-          options={options}
-          value={value}
-          onValueChange={onValueChange}
-          disabled={pending}
-        />
-        {publicWarning ? <Text variant="hint">{publicWarning}</Text> : null}
-        {onConsentCheckedChange ? (
-          <CheckboxField
-            label={consentLabel}
-            description={consentDescription}
-            checked={consentChecked}
-            onCheckedChange={onConsentCheckedChange}
+        {showSkeleton ? (
+          <TextSkeleton size="xl" lines={1} />
+        ) : (
+          <Text variant="subheading">{title}</Text>
+        )}
+        {showSkeleton ? (
+          // The radio rows' mirror (#278): RadioOptionGroup's
+          // own stack (gap spacing 1) of rows (gap spacing 2,
+          // centered) — the item's 44px touch-target slot
+          // centering a circle bone, the label bone at md
+          // centered in the option Label's own line box
+          // (SIZABLE_TEXT_LINE_BOX, 27 — a plain md line box
+          // left each row short and the drift accumulated
+          // down the group, Stephen on #579), and a
+          // description bone at sm when the option carries
+          // one. No real labels or selection show.
+          <YStack gap={tokens.spacing[1]}>
+            {options.map((option) => (
+              <XStack key={option.value} alignItems="center" gap={tokens.spacing[2]}>
+                <Center width={44} height={44}>
+                  <CircleSkeleton size={20} />
+                </Center>
+                <YStack flex={1} gap={tokens.spacing[1]}>
+                  <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
+                    <TextSkeleton size="md" lines={1} />
+                  </Center>
+                  {option.description ? <TextSkeleton size="sm" lines={1} /> : null}
+                </YStack>
+              </XStack>
+            ))}
+          </YStack>
+        ) : (
+          <RadioOptionGroup
+            options={options}
+            value={value}
+            onValueChange={onValueChange}
             disabled={pending}
           />
+        )}
+        {publicWarning ? (
+          showSkeleton ? (
+            <TextSkeleton size="sm" lines={1} />
+          ) : (
+            <Text variant="hint">{publicWarning}</Text>
+          )
+        ) : null}
+        {onConsentCheckedChange ? (
+          showSkeleton ? (
+            // The consent field's mirror (#278): CheckboxField's
+            // own row (gap spacing 3, 44px minimum) — the 24px
+            // visual box bone centered in its 44px touch-target
+            // slot, the label bone at md centered in the field
+            // Label's own line box (SIZABLE_TEXT_LINE_BOX, 27),
+            // and a description bone at sm when a description
+            // would render.
+            <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
+              <Center width={44} height={44}>
+                <BoxSkeleton width={24} height={24} />
+              </Center>
+              <YStack flex={1} gap={tokens.spacing[1]}>
+                <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
+                  <TextSkeleton size="md" lines={1} />
+                </Center>
+                {consentDescription ? <TextSkeleton size="sm" lines={1} /> : null}
+              </YStack>
+            </XStack>
+          ) : (
+            <CheckboxField
+              label={consentLabel}
+              description={consentDescription}
+              checked={consentChecked}
+              onCheckedChange={onConsentCheckedChange}
+              disabled={pending}
+            />
+          )
         ) : null}
         {onSave ? (
           <XStack>
@@ -131,7 +212,11 @@ export function RecipeSharingView({
         ) : null}
         {onRotateShareLink ? (
           <YStack gap="$2">
-            <Text variant="hint">{shareLinkLabel}</Text>
+            {showSkeleton ? (
+              <TextSkeleton size="sm" lines={1} />
+            ) : (
+              <Text variant="hint">{shareLinkLabel}</Text>
+            )}
             <XStack gap="$2" flexWrap="wrap">
               <Button
                 variant="secondary"
@@ -151,9 +236,19 @@ export function RecipeSharingView({
         ) : null}
         {permalinkUrl && onCopyPermalink ? (
           <YStack gap="$2">
-            <Text variant="hint">{permalinkLabel}</Text>
+            {showSkeleton ? (
+              <TextSkeleton size="sm" lines={1} />
+            ) : (
+              <Text variant="hint">{permalinkLabel}</Text>
+            )}
             <XStack gap="$2" alignItems="center" flexWrap="wrap">
-              <Text variant="muted">{permalinkUrl}</Text>
+              {showSkeleton ? (
+                <YStack flex={1}>
+                  <TextSkeleton size="md" lines={1} />
+                </YStack>
+              ) : (
+                <Text variant="muted">{permalinkUrl}</Text>
+              )}
               <Button ghost size="sm" onPress={onCopyPermalink}>
                 {copyPermalinkLabel}
               </Button>

@@ -1,7 +1,9 @@
 import { Suspense, type ReactNode } from "react";
-import { Center } from "../widgets/Center.js";
+import { YStack } from "tamagui";
+import { platformAccessibilityProps } from "../widgets/accessibility.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { ChunkErrorBoundary } from "./ChunkErrorBoundary.js";
-import { Spinner } from "../widgets/Spinner.js";
 
 export type LazySlotProps = {
   children: ReactNode;
@@ -21,9 +23,14 @@ export type LazySlotProps = {
  * Memorize's app shell hand-rolled before this view existed
  * (memorize#54's shell, lifted into the boundary in #411):
  *
- * - `Suspense` covers a pending chunk with the design system's
- *   loading state — a large Spinner (its accessible label is
- *   "Loading", the Spinner default) centered in the slot region.
+ * - `Suspense` covers a pending chunk with a skeleton
+ *   fallback (#278): a neutral content-region skeleton — a
+ *   large box bone, three text lines, and a second box bone
+ *   filling the slot's width. The incoming chunk's shape is
+ *   unknown at this level, so the fallback mirrors no
+ *   particular layout; it only holds the region at a
+ *   plausible content size, marked busy, while the chunk
+ *   loads.
  * - The internal `ChunkErrorBoundary` covers a REJECTED chunk: its
  *   established fallback (an error Alert, "This section failed to
  *   load.", plus the "Reload the app" recovery where a recovery
@@ -48,9 +55,16 @@ export function LazySlot({ children, onReload }: LazySlotProps) {
     <ChunkErrorBoundary {...(onReload !== undefined ? { onReload } : null)}>
       <Suspense
         fallback={
-          <Center fill>
-            <Spinner size="large" />
-          </Center>
+          <YStack
+            width="100%"
+            gap="$3"
+            padding="$4"
+            {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+          >
+            <BoxSkeleton height={120} />
+            <TextSkeleton lines={3} />
+            <BoxSkeleton height={80} />
+          </YStack>
         }
       >
         {children}

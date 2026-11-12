@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
+import { View, YStack } from "tamagui";
 import { RecipeCommentsView } from "./RecipeCommentsView.js";
 
 const meta: Meta<typeof RecipeCommentsView> = {
@@ -79,6 +79,45 @@ export const Loading: Story = {
   render: () => (
     <Viewport>
       <RecipeCommentsView comments={[]} loading />
+    </Viewport>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <Viewport>
+      <YStack position="relative">
+        <RecipeCommentsView
+          comments={comments}
+          staleHintLabel="Based on an older version"
+          draft=""
+          onDraftChange={() => undefined}
+          onPost={() => undefined}
+          onStartEdit={() => undefined}
+          onDeleteComment={() => undefined}
+        />
+        <YStack
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          opacity={0.45}
+          pointerEvents="none"
+        >
+          <RecipeCommentsView
+            comments={comments}
+            loading
+            staleHintLabel="Based on an older version"
+            draft=""
+            onDraftChange={() => undefined}
+            onPost={() => undefined}
+            onStartEdit={() => undefined}
+            onDeleteComment={() => undefined}
+          />
+        </YStack>
+      </YStack>
     </Viewport>
   ),
 };

@@ -1,7 +1,9 @@
 import type { ReactNode } from "react";
 import { Text as TamaguiText, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
 const StyledSection = styled(YStack, {
   name: "LegalSection",
@@ -41,20 +43,45 @@ export type LegalSectionProps = {
   title: string;
   /** The host's legal links, rendered under the title. */
   children: ReactNode;
+  /** Loading state (#278): the title renders as a text
+   * skeleton at its own (lg) size in the title's line box,
+   * inside a wrapper carrying the title's level-2 heading
+   * semantics, and the children render inside a loading scope
+   * so the host's links skeletonize themselves. An enclosing
+   * composite's LoadingScope can also put the section into
+   * this state without prop-drilling. */
+  loading?: boolean;
 };
 
-export function LegalSection({ title, children }: LegalSectionProps) {
+export function LegalSection({ title, children, loading = false }: LegalSectionProps) {
+  const showSkeleton = useLoadingScope(loading);
   return (
     <StyledSection>
       {/* A section title carries level-2 heading semantics, like
           the DS's other section titles (SectionCard's) — the page
-          title above it is the level-1 heading. */}
-      <StyledTitle
-        {...platformAccessibilityProps({ accessibilityRole: "header", "aria-level": 2 })}
-      >
-        {title}
-      </StyledTitle>
-      {children}
+          title above it is the level-1 heading. While loading the
+          bone sits in the title's line box inside a wrapper that
+          keeps those heading semantics. */}
+      {showSkeleton ? (
+        <YStack {...platformAccessibilityProps({ accessibilityRole: "header", "aria-level": 2 })}>
+          <TextSkeleton size="lg" lines={1} />
+        </YStack>
+      ) : (
+        <StyledTitle
+          {...platformAccessibilityProps({ accessibilityRole: "header", "aria-level": 2 })}
+        >
+          {title}
+        </StyledTitle>
+      )}
+      {showSkeleton ? (
+        // The host's links are live controls that do not read
+        // the loading scope, so bones stand in for the links
+        // block while loading rather than leaving real,
+        // clickable links under a loading section.
+        <TextSkeleton size="sm" lines={2} />
+      ) : (
+        children
+      )}
     </StyledSection>
   );
 }

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
+import { View, YStack } from "tamagui";
 import { storyImageWide } from "../storyFixtures.js";
 import { RecipeImageView } from "./RecipeImageView.js";
 
@@ -100,6 +100,58 @@ export const ErrorState: Story = {
         onGenerateImageRequest={noop}
         onRemoveImage={noop}
       />
+    </Viewport>
+  ),
+};
+
+/** Loading: the hero preview is a box skeleton at the hero
+ * frame's height and the actions skeletonize in place. */
+export const Loading: Story = {
+  render: () => (
+    <Viewport>
+      <RecipeImageView
+        imagePreviewUri={storyImageWide}
+        onPickImageRequest={noop}
+        onTakePhotoRequest={noop}
+        onGenerateImageRequest={noop}
+        onRemoveImage={noop}
+        loading
+      />
+    </Viewport>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <Viewport>
+      <YStack position="relative">
+        <RecipeImageView
+          imagePreviewUri={storyImageWide}
+          onPickImageRequest={noop}
+          onTakePhotoRequest={noop}
+          onGenerateImageRequest={noop}
+          onRemoveImage={noop}
+        />
+        <YStack
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          opacity={0.45}
+          pointerEvents="none"
+        >
+          <RecipeImageView
+            imagePreviewUri={storyImageWide}
+            onPickImageRequest={noop}
+            onTakePhotoRequest={noop}
+            onGenerateImageRequest={noop}
+            onRemoveImage={noop}
+            loading
+          />
+        </YStack>
+      </YStack>
     </Viewport>
   ),
 };
