@@ -70,9 +70,17 @@ export function RecipeIngredientRowView({
   return (
     <FieldRow>
       {dragHandle ?? null}
+      {/* The quantity and unit fields carry fixed widths: left
+          unconstrained in the flex row, each input renders at
+          its intrinsic width (~233px on web), the two of them
+          exhaust the row, the growing name field collapses to
+          zero, and the row overflows its container. The widths
+          fit the fields' content ("1 1/2", "tbsp") while the
+          name field takes whatever width remains. */}
       <TextField
         accessibilityLabel={`Ingredient ${position} quantity`}
         placeholder="Qty"
+        width={68}
         readOnly={onFieldChange === undefined}
         value={row.quantity}
         onChangeText={(value) => {
@@ -82,6 +90,7 @@ export function RecipeIngredientRowView({
       <TextField
         accessibilityLabel={`Ingredient ${position} unit`}
         placeholder="Unit"
+        width={84}
         readOnly={onFieldChange === undefined}
         value={row.unit}
         onChangeText={(value) => {
