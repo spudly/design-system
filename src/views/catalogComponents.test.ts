@@ -155,11 +155,15 @@ test("CatalogHeader renders the title as the heading over its controls", () => {
   assert.match(header, /children: ReactNode;/, "the bar composes in as the child");
 });
 
-test("the loading state is the page's own Center + Spinner composition (#479)", () => {
+test("the loading state is the page's own skeleton rows composition (#278; #479's no-wrapper rule stands)", () => {
   assert.match(
     discoverPage,
-    /<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>/,
-    "the public catalog centers its loading spinner with <Center> directly — the wrapper components are removed (#479)",
+    /publicLoading \? \(\s*<LoadingDiscoveryRows \/>\s*\)/,
+    "the public catalog's first load renders the page's own skeleton discovery rows — no loading wrapper components (#479), and the centered Spinner is gone (#278 tranche 4)",
+  );
+  assert.ok(
+    !discoverPage.includes("<Spinner"),
+    "no Spinner remains anywhere in the catalog page (#278 tranche 4)",
   );
   assert.ok(
     !discoverPage.includes("ListLoadingState"),

@@ -265,21 +265,21 @@ test("RecipesPage no longer wires the plain stalling handler", () => {
 
 test("both modes keep the loading-more footer on isFetchingNextPage", () => {
   const footerPattern =
-    /ListFooterComponent=\{\s*isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/g;
+    /ListFooterComponent=\{isFetchingNextPage \? <LoadingDiscoveryRows \/> : undefined\}/g;
   assert.equal(
     recipesPage.match(footerPattern)?.length,
     1,
-    "the public mode's list footer is the shared Center + Spinner composition, keyed off isFetchingNextPage",
+    "the public mode's list footer is the skeleton discovery rows, keyed off isFetchingNextPage (#278 tranche 4)",
   );
-  // Signed-in mode: the same footer, suppressed while the
+  // Signed-in mode: the skeleton own rows, suppressed while the
   // discovery load-more error row shows — the error wins over
   // the loading-more footer (#559).
   const signedInFooterPattern =
-    /ListFooterComponent=\{\s*isFetchingNextPage && !discoveryLoadMoreErrorMessage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined\s*\}/g;
+    /ListFooterComponent=\{\s*isFetchingNextPage && !discoveryLoadMoreErrorMessage \? <LoadingOwnRows \/> : undefined\s*\}/g;
   assert.equal(
     recipesPage.match(signedInFooterPattern)?.length,
     1,
-    "the signed-in mode's list footer is the same composition, yielding to the discovery load-more error",
+    "the signed-in mode's list footer is the skeleton own rows, yielding to the discovery load-more error",
   );
 });
 
