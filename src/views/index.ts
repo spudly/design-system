@@ -75,6 +75,25 @@ export {
   type RecipeExportPickerViewItem,
 } from "./RecipeExportPickerView.js";
 export { RecipeImageView, type RecipeImageViewProps } from "./RecipeImageView.js";
+export {
+  RecipeIngredientListView,
+  type RecipeIngredientField,
+  type RecipeIngredientListViewProps,
+  type RecipeIngredientRow,
+} from "./RecipeIngredientListView.js";
+export {
+  RecipeIngredientRowView,
+  type RecipeIngredientRowViewProps,
+} from "./RecipeIngredientRowView.js";
+export {
+  RecipeInstructionListView,
+  type RecipeInstructionListViewProps,
+  type RecipeInstructionRow,
+} from "./RecipeInstructionListView.js";
+export {
+  RecipeInstructionRowView,
+  type RecipeInstructionRowViewProps,
+} from "./RecipeInstructionRowView.js";
 export { RecipeSharingView, type RecipeSharingViewProps } from "./RecipeSharingView.js";
 export { ResetPasswordForm, type ResetPasswordFormProps } from "./ResetPasswordForm.js";
 export { RevertAction, type RevertActionProps } from "./RevertAction.js";
