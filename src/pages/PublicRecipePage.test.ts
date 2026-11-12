@@ -178,7 +178,7 @@ test("the CTA bar switches on the auth-state variant with verbatim labels", () =
   }
 });
 
-test("engagement is in v1: ratings reuse the detail page's view-model, comments take the slot", () => {
+test("engagement is in v1: ratings reuse the detail page's view-model, comments take the slot or data prop", () => {
   assert.match(
     code,
     /export type PublicRecipePageRatings = RecipeDetailPageRatings;/,
@@ -196,8 +196,23 @@ test("engagement is in v1: ratings reuse the detail page's view-model, comments 
   );
   assert.match(
     code,
-    /const comments = renderComments \? renderComments\(\) : null;/,
+    /export type PublicRecipePageComments = RecipeCommentsViewProps;/,
+    "the comments view-model is the view's props, aliased as on RecipeDetailPage (#130 T7)",
+  );
+  assert.match(
+    code,
+    /comments\?: PublicRecipePageComments \| null;/,
+    "comments also enter as a data prop (#130 T7)",
+  );
+  assert.match(
+    code,
+    /const commentsSlot = renderComments \? renderComments\(\) : null;/,
     "the slot is called once per render, only when provided",
+  );
+  assert.match(
+    code,
+    /const comments = commentsData \? <RecipeCommentsView \{\.\.\.commentsData\} \/> : commentsSlot;/,
+    "the data prop renders RecipeCommentsView and wins over the slot (#130 T7)",
   );
   assert.match(
     ratingsCode,
@@ -392,5 +407,11 @@ describe("publicRecipePageAdoption", () => {
       /renderComments: \(\) =>/,
       "a story must pass the comments slot with stand-in content",
     );
+    assert.match(
+      storiesCode,
+      /export const CommentsAsData: Story/,
+      "a story must exercise the comments data prop (#130 T7)",
+    );
+    assert.match(storiesCode, /comments: \{/, "a story must pass comments as data (#130 T7)");
   });
 });

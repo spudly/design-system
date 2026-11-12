@@ -70,6 +70,7 @@ export {
   type PublicRecipePageSubstitution,
   type PublicRecipePageInstructionsProps,
   type PublicRecipePageInstruction,
+  type PublicRecipePageComments,
 } from "./PublicRecipePage.js";
 export {
   TabbedShellPage,

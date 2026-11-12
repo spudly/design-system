@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { CatalogFiltersBar, type CatalogFilterDefinition } from "./CatalogFiltersBar.js";
 import { CatalogHeader } from "./CatalogHeader.js";
 import type { SelectOption } from "../widgets/SelectField.js";
@@ -24,7 +25,7 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
   { value: "asc", label: "Low to high" },
 ];
 
-function HeaderDemo() {
+function HeaderDemo({ loading = false }: { loading?: boolean }) {
   const [search, setSearch] = useState("");
   const [ingredient, setIngredient] = useState("");
   const [minCalories, setMinCalories] = useState("");
@@ -84,7 +85,7 @@ function HeaderDemo() {
   ];
 
   return (
-    <CatalogHeader title="Discover recipes">
+    <CatalogHeader title="Discover recipes" loading={loading}>
       <CatalogFiltersBar
         searchPlaceholder="Search public recipes…"
         search={search}
@@ -97,4 +98,28 @@ function HeaderDemo() {
 
 export const Default: Story = {
   render: () => <HeaderDemo />,
+};
+
+export const Loading: Story = {
+  render: () => <HeaderDemo loading />,
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative">
+      <HeaderDemo />
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <HeaderDemo loading />
+      </YStack>
+    </YStack>
+  ),
 };

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
+import { View, YStack } from "tamagui";
 import { RecipeExportPickerView } from "./RecipeExportPickerView.js";
 
 const meta: Meta<typeof RecipeExportPickerView> = {
@@ -59,6 +59,49 @@ export const Loading: Story = {
         onExport={() => undefined}
         exportLabel="Export selected (0)"
       />
+    </Viewport>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <Viewport>
+      <YStack position="relative">
+        <RecipeExportPickerView
+          search=""
+          onSearchChange={() => undefined}
+          items={items}
+          selectedIds={["r1", "r3"]}
+          onToggle={() => undefined}
+          onSelectAll={() => undefined}
+          onClearSelection={() => undefined}
+          onExport={() => undefined}
+          exportLabel="Export selected (2)"
+        />
+        <YStack
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          opacity={0.45}
+          pointerEvents="none"
+        >
+          <RecipeExportPickerView
+            search=""
+            onSearchChange={() => undefined}
+            items={items}
+            selectedIds={["r1", "r3"]}
+            onToggle={() => undefined}
+            onSelectAll={() => undefined}
+            onClearSelection={() => undefined}
+            loading
+            onExport={() => undefined}
+            exportLabel="Export selected (2)"
+          />
+        </YStack>
+      </YStack>
     </Viewport>
   ),
 };

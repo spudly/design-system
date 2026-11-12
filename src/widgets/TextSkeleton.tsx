@@ -44,6 +44,22 @@ export const LINE_BOXES: Record<TextSkeletonSize, { lineBox: number; bone: numbe
   "4xl": { lineBox: 41, bone: 28 },
 };
 
+// The line box of a Tamagui SizableText primitive — the field
+// Label (TextField / TextAreaField / CheckboxField /
+// SearchField) and TextLink. Those primitives take their line
+// height from the registered font's size step (27 at the
+// default step), NOT from the raw font size their callers set:
+// the DS Text line boxes above encode the browser-normal line
+// height of plain text, but a SizableText label or link
+// occupies 27px whatever its font size — measured against the
+// rendered components (a 14px field label and a 16px checkbox
+// label both render with a 27px line height). A bone standing
+// in for a label or a link therefore sits centered in a 27px
+// slot; a TextSkeleton line box in its place leaves everything
+// below the field shifted by the difference, accumulating per
+// field — the drift Stephen's overlay stories exposed on #579.
+export const SIZABLE_TEXT_LINE_BOX = 27;
+
 /**
  * A text-shaped skeleton (#278): one or more line bones with the
  * ragged right edge of real text. A line stands in for a text

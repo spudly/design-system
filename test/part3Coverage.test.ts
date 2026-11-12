@@ -162,7 +162,7 @@ test("review round: explicit error states, href home control, negative step guar
   // error branch's else, so an error suppresses the empty state.
   assert.match(
     picker,
-    /\{error \? \(\s*<Alert severity="error" message=\{error\} \/>\s*\) : \(\s*<CheckboxSelectList[\s\S]*?emptyMessage=\{emptyMessage\}/,
+    /\{error && !showSkeleton \? \(\s*<Alert severity="error" message=\{error\} \/>\s*\) : \(\s*<CheckboxSelectList[\s\S]*?emptyMessage=\{emptyMessage\}/,
   );
   const pay = read("src/pages/PayPage.tsx");
   assert.match(pay, /homeHref\?: string/);

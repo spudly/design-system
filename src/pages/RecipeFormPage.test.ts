@@ -17,9 +17,11 @@
  *    #130) with the revert affordance as its header action;
  *    `renderImageSection` remains the slot fallback (receives
  *    the revert affordance) for unmigrated hosts. The two list
- *    sections are render slots: `renderIngredientsSection`,
- *    `renderInstructionsSection`; under `contentLocked` the
- *    list slots do not render and the lock notice does.
+ *    sections render their list views from the `ingredients` /
+ *    `instructions` data props (#130, tranche T4), ahead of
+ *    the `renderIngredientsSection` / `renderInstructionsSection`
+ *    slot fallbacks; under `contentLocked` neither the data
+ *    props nor the list slots render and the lock notice does.
  * 4. The version-diff wash is the DS fields' semantic `changed`
  *    variant (warning step 5 border / step 1 fill on TextField and
  *    TextAreaField), never page-level color props on the fields.
@@ -93,7 +95,7 @@ test("RecipeFormPage is controlled: no own state, no app or react-native imports
   }
 });
 
-test("the image section renders from its data prop with the slot as fallback, and the lock replaces the list slots", () => {
+test("the image and list sections render from their data props with the slots as fallbacks, and the lock replaces the lists", () => {
   const form = pageSource("RecipeFormPage");
   for (const slot of [
     "renderImageSection",
@@ -116,8 +118,30 @@ test("the image section renders from its data prop with the slot as fallback, an
     "the image slot must receive the image revert affordance",
   );
   assert.ok(
-    form.includes("contentLocked ? null : renderIngredientsSection"),
-    "the ingredient slot must not render under the content lock",
+    form.includes("ingredients?: RecipeFormPageIngredients | null"),
+    "the ingredients data prop must be on the form's contract",
+  );
+  assert.ok(
+    form.includes("instructions?: RecipeFormPageInstructions | null"),
+    "the instructions data prop must be on the form's contract",
+  );
+  assert.match(
+    form,
+    /<RecipeIngredientListView \{\.\.\.ingredients\} \/>/,
+    "the ingredient list must render from the data prop",
+  );
+  assert.match(
+    form,
+    /<RecipeInstructionListView \{\.\.\.instructions\} \/>/,
+    "the instruction list must render from the data prop",
+  );
+  assert.ok(
+    form.includes("contentLocked ? null : ingredients ?"),
+    "the ingredient list must not render under the content lock",
+  );
+  assert.ok(
+    form.includes("contentLocked ? null : instructions ?"),
+    "the instruction list must not render under the content lock",
   );
   assert.ok(
     form.includes("Ingredients and instructions are locked on the active version"),

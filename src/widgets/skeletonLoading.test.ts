@@ -282,7 +282,9 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 // buttons as rectangles, ghost buttons as text bones, Stephen
 // on #551) — and renders unchanged while not loading.
 // The collection widgets (CheckboxSelectList, StatBand) render
-// exactly 3 dummy items while loading; MasonryGrid renders 24
+// exactly 3 dummy items while loading when their items are not
+// known — and mirror the known items' count when they are
+// (Stephen on #579); MasonryGrid renders 24
 // varied-height dummies so its loading state still reads as a
 // masonry grid (Stephen on #551). CheckboxSelectList's centered
 // spinner is gone.
@@ -390,8 +392,8 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
   );
   assert.equal(
     hiddenBones(comment),
-    5,
-    "a loading CommentItem renders author + 2 body bones + its 2 ghost action bones",
+    4,
+    "a loading CommentItem renders author + 1 body bone + its 2 ghost action bones",
   );
   assert.ok(!comment.includes("Secret Author"), "a loading CommentItem shows no author");
   assert.ok(!comment.includes("Secret body text"), "a loading CommentItem shows no body");
@@ -527,8 +529,26 @@ test("T1 SSR: loading StatCard, PreviewCard, and the collections render their du
       loading: true,
     }),
   );
-  assert.equal(hiddenBones(selectList), 6, "a loading CheckboxSelectList renders 3 rows x 2 bones");
+  assert.equal(
+    hiddenBones(selectList),
+    4,
+    "a loading CheckboxSelectList renders one row per known item (2 rows x 2 bones)",
+  );
   assert.ok(!selectList.includes("AlphaItem"), "a loading CheckboxSelectList shows no real items");
+
+  const unknownSelectList = await renderToHtml(
+    React.createElement(CheckboxSelectList, {
+      items: [],
+      selectedIds: [],
+      onToggle: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(
+    hiddenBones(unknownSelectList),
+    6,
+    "a loading CheckboxSelectList with no known items renders 3 dummy rows x 2 bones",
+  );
 
   let renderCalls = 0;
   const grid = await renderToHtml(
@@ -1559,4 +1579,158 @@ test("T4: RecipesPage's loading sections and footers render the skeleton rows", 
     /const LOADING_ROW_KEYS = \["loading-1", "loading-2", "loading-3"\] as const;/,
     "exactly 3 dummy rows per loading section, from the frozen constant",
   );
+});
+
+// #278 Tranche 3 — views: the data-bearing views take the same
+// explicit `loading` prop, read the internal LoadingScope,
+// render skeletons mirroring their loaded layout (actions kept
+// as inert skeleton Buttons inside the scope, hairlines
+// transparent), show no real content while loading, and render
+// unchanged while not loading. The three spinner views
+// (RecipeCommentsView, SubscriptionView, and LazySlot's Suspense
+// fallback) render skeletons instead of a Spinner.
+
+const T3_PROP_VIEWS = [
+  "AccessTokensPanel",
+  "AccountDataView",
+  "CandidateList",
+  "CatalogHeader",
+  "ChangedListBanner",
+  "FeedbackPreferenceView",
+  "LegalSection",
+  "NutritionGoalsForm",
+  "RecipeCommentsView",
+  "RecipeExportPickerView",
+  "RecipeImageView",
+  "RecipeSharingView",
+  "ScaledIngredientsView",
+  "SubscriptionView",
+  "TransferRecipesView",
+] as const;
+
+test("T3: every converted view declares `loading` and reads the LoadingScope", () => {
+  for (const name of T3_PROP_VIEWS) {
+    const code = readCode(`src/views/${name}.tsx`);
+    assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
+    assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
+    assert.match(
+      code,
+      /from "\.\.\/contexts\/LoadingScope\.js"/,
+      `${name} must import the scope from src/contexts`,
+    );
+    assert.match(
+      code,
+      /TextSkeleton|BoxSkeleton|CircleSkeleton|TokenRow|CommentItem|CheckboxSelectList/,
+      `${name} must render skeletons (directly, or via a skeletonized child)`,
+    );
+  }
+});
+
+test("T3: the spinner views' spinners are gone; LazySlot's fallback is a skeleton", () => {
+  for (const name of ["RecipeCommentsView", "SubscriptionView", "LazySlot"]) {
+    const code = readCode(`src/views/${name}.tsx`);
+    assert.doesNotMatch(code, /Spinner/, `${name} must not render a content-loading spinner`);
+  }
+  const lazySlot = readCode("src/views/LazySlot.tsx");
+  assert.match(lazySlot, /BoxSkeleton/, "LazySlot's fallback renders box skeletons");
+  assert.match(lazySlot, /TextSkeleton/, "LazySlot's fallback renders text skeletons");
+  const tokensPanel = readCode("src/views/AccessTokensPanel.tsx");
+  assert.doesNotMatch(
+    tokensPanel,
+    /Loading tokens/,
+    "AccessTokensPanel's plain loading line is gone — the list skeletonizes",
+  );
+});
+
+test("T3 SSR: loading RecipeCommentsView renders comment skeletons, no real content", async () => {
+  const { React, RecipeCommentsView } = await loadRuntime();
+  const loading = await renderToHtml(
+    React.createElement(RecipeCommentsView, { comments: [], loading: true }),
+  );
+  assert.equal(hiddenBones(loading), 6, "3 dummy CommentItems x (author bone + 1 body-line bone)");
+  assert.ok(!loading.includes("No comments yet"), "the empty state does not show while loading");
+  assert.match(loading, /aria-busy/, "a loading RecipeCommentsView marks its region busy");
+
+  const idle = await renderToHtml(
+    React.createElement(RecipeCommentsView, {
+      comments: [{ id: "c1", authorName: "Jamie", body: "Loved the crust" }],
+    }),
+  );
+  assert.equal(hiddenBones(idle), 0, "a non-loading RecipeCommentsView renders no bones");
+  assert.ok(idle.includes("Loved the crust"), "a non-loading view renders its comments");
+});
+
+test("T3 SSR: loading SubscriptionView and AccessTokensPanel hide their real content", async () => {
+  const { React, SubscriptionView, AccessTokensPanel } = await loadRuntime();
+  const noop = () => {};
+
+  const subscription = await renderToHtml(
+    React.createElement(SubscriptionView, {
+      planLabel: "Secret Plus plan",
+      statusText: "Secret status line",
+      onManage: noop,
+      onRefresh: noop,
+      portalUrl: "https://example.com/portal",
+      loading: true,
+    }),
+  );
+  assert.ok(hiddenBones(subscription) > 0, "a loading SubscriptionView renders bones");
+  assert.ok(!subscription.includes("Secret Plus plan"), "no real plan label while loading");
+  assert.ok(!subscription.includes("Secret status line"), "no real status text while loading");
+  assert.ok(!subscription.includes("Loading subscription"), "the spinner's loading line is gone");
+  assert.match(subscription, /aria-busy/, "a loading SubscriptionView marks its region busy");
+
+  const tokens = await renderToHtml(
+    React.createElement(AccessTokensPanel, {
+      tokens: [],
+      tokenName: "",
+      onTokenNameChange: noop,
+      onCreate: noop,
+      createdSecret: null,
+      onDismissSecret: noop,
+      onRevoke: noop,
+      loading: true,
+    }),
+  );
+  assert.ok(
+    hiddenBones(tokens) >= 9,
+    "a loading AccessTokensPanel renders 3 dummy token rows' bones",
+  );
+  assert.ok(!tokens.includes("No tokens yet"), "the empty state does not show while loading");
+  assert.match(tokens, /aria-busy/, "a loading AccessTokensPanel marks its region busy");
+});
+
+test("T3 SSR: loading CandidateList and NutritionGoalsForm render skeletons", async () => {
+  const { React, CandidateList, NutritionGoalsForm } = await loadRuntime();
+  const noop = () => {};
+
+  const candidates = await renderToHtml(
+    React.createElement(CandidateList, {
+      title: "Ready to activate",
+      candidates: [
+        { id: "v2", label: "Secret version two" },
+        { id: "v3", label: "Secret version three" },
+      ],
+      onActivatePress: noop,
+      loading: true,
+    }),
+  );
+  assert.ok(hiddenBones(candidates) > 0, "a loading CandidateList renders bones");
+  assert.ok(
+    !candidates.includes("Secret version two"),
+    "a loading CandidateList shows no real labels",
+  );
+  assert.match(candidates, /aria-busy/, "a loading CandidateList marks its region busy");
+
+  const goals = await renderToHtml(
+    React.createElement(NutritionGoalsForm, {
+      goals: { calories: 2000, proteinG: 120, carbsG: null, fatG: null, satietyScore: null },
+      onChange: noop,
+      onSave: noop,
+      loading: true,
+    }),
+  );
+  assert.ok(hiddenBones(goals) > 0, "a loading NutritionGoalsForm renders bones");
+  assert.ok(!goals.includes("2000"), "a loading NutritionGoalsForm shows no real goal values");
+  assert.match(goals, /aria-busy/, "a loading NutritionGoalsForm marks its region busy");
 });

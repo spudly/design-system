@@ -130,12 +130,14 @@ function PublicRecipePageDemo({
   clonePending = false,
   initialMissing = [],
   showCommentsSlot = false,
+  showCommentsData = false,
 }: {
   variant?: "full" | "minimal";
   signedIn?: boolean;
   clonePending?: boolean;
   initialMissing?: string[];
   showCommentsSlot?: boolean;
+  showCommentsData?: boolean;
 }) {
   const isFull = variant === "full";
   const baseServings = isFull ? 4 : 2;
@@ -252,6 +254,27 @@ function PublicRecipePageDemo({
           ),
         }
       : {}),
+    ...(showCommentsData
+      ? {
+          // The comments section as data (#130 T7): the page renders
+          // RecipeCommentsView from the view-model; signed out, no
+          // `onPost` is passed, so no composer renders.
+          comments: {
+            comments: [
+              {
+                id: "comment-1",
+                authorName: "Jamie",
+                body: "Made this last night — the sauce is excellent.",
+              },
+              {
+                id: "comment-2",
+                authorName: "Priya",
+                body: "Doubled the garlic and would do it again.",
+              },
+            ],
+          },
+        }
+      : {}),
   };
 
   return (
@@ -267,6 +290,13 @@ export const Default: Story = {
 
 export const SignedIn: Story = {
   render: () => <PublicRecipePageDemo signedIn showCommentsSlot />,
+};
+
+export const CommentsAsData: Story = {
+  // The comments section supplied as data (#130 T7): the page
+  // renders RecipeCommentsView under the ratings card, signed
+  // out — the comment list with no composer.
+  render: () => <PublicRecipePageDemo showCommentsData />,
 };
 
 export const ClonePending: Story = {

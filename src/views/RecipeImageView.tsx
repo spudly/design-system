@@ -1,12 +1,24 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { Text } from "../widgets/Text.js";
 import { Thumbnail } from "../widgets/Thumbnail.js";
 import { tokens } from "../tokens/index.js";
+
+// The preview frame's heights while loading (#278): with an
+// image, the bone fills Thumbnail's hero frame at its fixed
+// height (256, Thumbnail's StyledHeroFrame); with no image, it
+// fills the empty-state box — that box's $6 vertical padding
+// (spacing 6, each side) plus one hint line (sm at the font
+// config's 1.5 line height).
+const HERO_PREVIEW_HEIGHT = 256;
+const EMPTY_PREVIEW_HEIGHT =
+  tokens.spacing[6] * 2 + tokens.typography.fontSize.sm * tokens.typography.lineHeight.normal;
 
 export type RecipeImageViewProps = {
   /** Section label ("Recipe image"). */
@@ -26,6 +38,20 @@ export type RecipeImageViewProps = {
   /** Host-reported failure (upload / generation), rendered as
    * an error alert below the preview. */
   error?: string | null;
+  /** Loading state (#278): the preview area renders a box
+   * skeleton at the loaded frame's geometry — the Thumbnail
+   * hero frame's height when an image is present, the
+   * empty-state box's height when none is — and the action row
+   * stays rendered inside a LoadingScope so each Button
+   * renders as an inert skeleton at its normal geometry (with
+   * the same presence rules as loaded: Remove only while an
+   * image URI exists); the label row is static chrome and
+   * stays as-is, the error is hidden, and no real image shows.
+   * Distinct from `isUploading` / `isGenerating`, which are
+   * action waits on already-loaded data. An enclosing
+   * composite's LoadingScope can also put the view into this
+   * state without prop-drilling. */
+  loading?: boolean;
   /**
    * Whether AI generation is currently available (the host's
    * own gate — plan, configuration); false disables the
@@ -90,6 +116,7 @@ export function RecipeImageView({
   isUploading = false,
   isGenerating = false,
   error,
+  loading = false,
   canGenerateImage = true,
   emptyMessage = "Choose an image from your library or generate one with AI",
   headerAction,
@@ -98,53 +125,58 @@ export function RecipeImageView({
   onGenerateImageRequest,
   onRemoveImage,
 }: RecipeImageViewProps) {
+  const showSkeleton = useLoadingScope(loading);
   const busy = isUploading || isGenerating;
   return (
-    <LabeledGroup label={label} action={headerAction}>
-      <YStack gap="$3">
-        {imagePreviewUri ? (
-          <Thumbnail src={imagePreviewUri} variant="hero" accessibilityLabel="Recipe preview" />
-        ) : (
-          <YStack
-            overflow="hidden"
-            borderRadius={tokens.radii.md}
-            borderWidth={2}
-            borderStyle="dashed"
-            borderColor={tokens.colors.gray.gray4}
-            backgroundColor={tokens.colors.gray.gray1}
-            paddingVertical="$6"
-            alignItems="center"
-          >
-            <Text variant="hint">{emptyMessage}</Text>
-          </YStack>
-        )}
-        <ButtonRow>
-          <Button variant="primary" disabled={busy} onPress={onPickImageRequest}>
-            {isUploading ? "Uploading…" : "Browse images"}
-          </Button>
-          {onTakePhotoRequest ? (
-            <Button variant="secondary" disabled={busy} onPress={onTakePhotoRequest}>
-              Take photo
-            </Button>
-          ) : null}
-          {onGenerateImageRequest ? (
-            <Button
-              variant="secondary"
-              accessibilityLabel="Generate image with AI"
-              disabled={busy || !canGenerateImage}
-              onPress={onGenerateImageRequest}
+    <LoadingScope active={showSkeleton}>
+      <LabeledGroup label={label} action={headerAction}>
+        <YStack gap="$3">
+          {showSkeleton ? (
+            <BoxSkeleton height={imagePreviewUri ? HERO_PREVIEW_HEIGHT : EMPTY_PREVIEW_HEIGHT} />
+          ) : imagePreviewUri ? (
+            <Thumbnail src={imagePreviewUri} variant="hero" accessibilityLabel="Recipe preview" />
+          ) : (
+            <YStack
+              overflow="hidden"
+              borderRadius={tokens.radii.md}
+              borderWidth={2}
+              borderStyle="dashed"
+              borderColor={tokens.colors.gray.gray4}
+              backgroundColor={tokens.colors.gray.gray1}
+              paddingVertical="$6"
+              alignItems="center"
             >
-              {isGenerating ? "Generating…" : "Generate with AI"}
+              <Text variant="hint">{emptyMessage}</Text>
+            </YStack>
+          )}
+          <ButtonRow>
+            <Button variant="primary" disabled={busy} onPress={onPickImageRequest}>
+              {isUploading ? "Uploading…" : "Browse images"}
             </Button>
-          ) : null}
-          {imagePreviewUri ? (
-            <Button variant="secondary" disabled={busy} onPress={onRemoveImage}>
-              Remove image
-            </Button>
-          ) : null}
-        </ButtonRow>
-        {error ? <Alert severity="error" message={error} /> : null}
-      </YStack>
-    </LabeledGroup>
+            {onTakePhotoRequest ? (
+              <Button variant="secondary" disabled={busy} onPress={onTakePhotoRequest}>
+                Take photo
+              </Button>
+            ) : null}
+            {onGenerateImageRequest ? (
+              <Button
+                variant="secondary"
+                accessibilityLabel="Generate image with AI"
+                disabled={busy || !canGenerateImage}
+                onPress={onGenerateImageRequest}
+              >
+                {isGenerating ? "Generating…" : "Generate with AI"}
+              </Button>
+            ) : null}
+            {imagePreviewUri ? (
+              <Button variant="secondary" disabled={busy} onPress={onRemoveImage}>
+                Remove image
+              </Button>
+            ) : null}
+          </ButtonRow>
+          {error && !showSkeleton ? <Alert severity="error" message={error} /> : null}
+        </YStack>
+      </LabeledGroup>
+    </LoadingScope>
   );
 }
