@@ -1245,4 +1245,8 @@ test("T2 SSR: loading RecipeIngredientsPanel skeletonizes controls and rows", as
     /role="status"/,
     "the substitutions status is a polite live region, not a visible line",
   );
+  assert.ok(
+    fetching.indexOf('role="status"') < fetching.indexOf("aria-busy"),
+    "the substitutions status renders outside (before) the busy region so it is not deferred by aria-busy",
+  );
 });

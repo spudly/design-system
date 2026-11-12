@@ -319,18 +319,17 @@ export function RecipeIngredientsPanel({
         </YStack>
       ) : null}
       {view.loadingSubstitutions ? (
-        <YStack
-          paddingBlockStart="$4"
-          position="relative"
-          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
-        >
+        <YStack paddingBlockStart="$4" position="relative">
           {/* Screen-reader-only progress status (the
               AutocompletePicker StatusMessage pattern): the
               skeleton bones are hidden from assistive tech, so
               without this a screen-reader user cannot tell the
-              substitutions fetch started. The region above is
-              marked busy and this polite live region announces
-              the fetch; nothing renders visibly. */}
+              substitutions fetch started. This polite live region
+              announces the fetch and sits OUTSIDE the busy region
+              below — assistive tech may defer changes inside an
+              aria-busy element, which would suppress the
+              announcement; busy marks only the substitutions
+              skeleton content. Nothing renders visibly. */}
           <YStack
             collapsable={false}
             {...politeLiveRegionProps}
@@ -342,7 +341,9 @@ export function RecipeIngredientsPanel({
           >
             <Text>Finding substitutions…</Text>
           </YStack>
-          <SubstitutionsSkeleton entries={1} />
+          <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+            <SubstitutionsSkeleton entries={1} />
+          </YStack>
         </YStack>
       ) : null}
       {view.substitutions && view.substitutions.length > 0 ? (
