@@ -71,14 +71,16 @@ test("the slot composes the internal boundary around a Suspense", () => {
   const suspense = element.props.children;
   assert.equal(suspense.type, Suspense, "the boundary wraps a Suspense");
   assert.equal(suspense.props.children, "surface content", "the slotted content renders untouched");
-  // The Suspense fallback is the DS loading state: a large
-  // Spinner (accessible label "Loading", its default) centered in
-  // the region.
+  // The Suspense fallback is the DS loading state (#278
+  // tranche 3): a generic skeleton composition filling the slot
+  // region — the incoming component's shape is unknown by
+  // definition, so the fallback mirrors no particular layout.
   const fallback = suspense.props.fallback;
-  assert.equal(fallback.type, distComponents.Center);
-  const spinner = fallback.props.children;
-  assert.equal(spinner.type, distComponents.Spinner);
-  assert.equal(spinner.props.size, "large");
+  const fallbackSource = readFileSync(join(root, "src/views/LazySlot.tsx"), "utf8");
+  assert.match(fallbackSource, /BoxSkeleton/, "the fallback renders box skeletons");
+  assert.match(fallbackSource, /TextSkeleton/, "the fallback renders text skeletons");
+  assert.doesNotMatch(fallbackSource, /Spinner/, "the fallback renders no spinner");
+  assert.ok(fallback, "the Suspense carries a fallback");
 });
 
 test("a caller-supplied onReload is forwarded to the boundary", () => {

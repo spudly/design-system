@@ -1,7 +1,10 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { Button } from "../widgets/Button.js";
 import { Text } from "../widgets/Text.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
 export type CandidateListItem = {
   /** Stable key for the candidate. */
@@ -23,7 +26,23 @@ export type CandidateListProps = {
    * alone exposes no dead button.
    */
   onActivatePress?: (candidateId: string) => void;
+  /** Loading state (#278): the title renders as a text
+   * skeleton at its own (sm) size and the list renders one
+   * skeleton card per candidate — or exactly 3 dummy cards
+   * when there are no candidates to mirror — each keeping the
+   * tinted card frame with a transparent border (no visible
+   * hairline), a label text skeleton, and the Activate action
+   * kept inside the loading scope as a rectangle skeleton when
+   * `onActivatePress` is provided. An enclosing composite's
+   * LoadingScope can also put the list into this state without
+   * prop-drilling. */
+  loading?: boolean;
 };
+
+// The dummy cards for a candidate-less loading list (#278):
+// exactly 3 placeholder cards, from a frozen module-level
+// constant — never generated per render.
+const LOADING_CANDIDATE_IDS = ["loading-1", "loading-2", "loading-3"] as const;
 
 /**
  * A list of candidates awaiting activation (#119): a small
@@ -40,7 +59,49 @@ export function CandidateList({
   candidates,
   isActivationPending = false,
   onActivatePress,
+  loading = false,
 }: CandidateListProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    const skeletonItems: readonly { id: string; label: string }[] =
+      candidates.length > 0 ? candidates : LOADING_CANDIDATE_IDS.map((id) => ({ id, label: "" }));
+    return (
+      <YStack gap="$2" {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+        <TextSkeleton size="sm" lines={1} />
+        <LoadingScope active>
+          {skeletonItems.map((candidate) => (
+            <YStack
+              key={candidate.id}
+              width="100%"
+              borderRadius={tokens.radii.md}
+              borderWidth={1}
+              borderColor="transparent"
+              backgroundColor="$primarySubtle"
+              padding="$3"
+            >
+              <YStack paddingBlockEnd="$2">
+                <TextSkeleton size="sm" lines={1} />
+              </YStack>
+              {onActivatePress ? (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  alignSelf="flex-start"
+                  accessibilityLabel={`Activate ${candidate.label}`}
+                  disabled={isActivationPending}
+                  onPress={() => {
+                    onActivatePress(candidate.id);
+                  }}
+                >
+                  Activate
+                </Button>
+              ) : null}
+            </YStack>
+          ))}
+        </LoadingScope>
+      </YStack>
+    );
+  }
   return (
     <YStack gap="$2">
       <Text

@@ -1,4 +1,5 @@
 import { ScrollView, YStack } from "tamagui";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
 import { BulkSelectToolbar } from "../widgets/BulkSelectToolbar.js";
 import { Button } from "../widgets/Button.js";
@@ -22,7 +23,14 @@ export type RecipeExportPickerViewProps = {
   onSelectAll: () => void;
   onClearSelection: () => void;
   disabled?: boolean;
-  /** The item query is in flight: the list renders its spinner. */
+  /** Loading state (#278): the list renders its skeleton rows
+   * through the CheckboxSelectList, the bordered list frame's
+   * border turns transparent (no visible hairline), and the
+   * whole view renders inside a LoadingScope so the toolbar's
+   * Buttons and the Export Button render as inert skeletons at
+   * their normal geometry; the error is hidden and no real item
+   * labels show. An enclosing composite's LoadingScope can
+   * also put the picker into this state without prop-drilling. */
   loading?: boolean;
   /** The item query failed: renders this message instead of the list and its empty state. */
   error?: string | null;
@@ -67,53 +75,62 @@ export function RecipeExportPickerView({
   exportLabel,
   exportPendingLabel = "Exporting…",
 }: RecipeExportPickerViewProps) {
+  const showSkeleton = useLoadingScope(loading);
   return (
-    <YStack gap="$3">
-      <BulkSelectToolbar
-        search={search}
-        onSearchChange={onSearchChange}
-        searchPlaceholder={searchPlaceholder}
-        selectedCount={selectedIds.length}
-        // While the error state hides the items behind the alert, the
-        // toolbar must see an empty visible set: Select all disables
-        // instead of selecting items the user cannot see. An existing
-        // selection can still be cleared (the toolbar gates Clear on
-        // the selection, not the visible count).
-        filteredCount={error ? 0 : items.length}
-        disabled={disabled}
-        busy={exporting}
-        onSelectAll={onSelectAll}
-        onClearSelection={onClearSelection}
-      />
-      <YStack
-        borderWidth={1}
-        borderColor={tokens.colors.gray.gray3}
-        borderRadius={tokens.radii.xl}
-        maxHeight={256}
-        overflow="hidden"
-      >
-        <ScrollView>
-          {error ? (
-            <Alert severity="error" message={error} />
-          ) : (
-            <CheckboxSelectList
-              items={items}
-              selectedIds={selectedIds}
-              onToggle={onToggle}
-              disabled={disabled || exporting}
-              loading={loading}
-              emptyMessage={emptyMessage}
-            />
-          )}
-        </ScrollView>
+    <LoadingScope active={showSkeleton}>
+      <YStack gap="$3">
+        {/* The toolbar stays rendered inside the scope while
+            loading (#278): its Buttons skeletonize through
+            Button's own scope handling (its ghost buttons as
+            text bones), while its SearchField does not read the
+            scope and stays as rendered — the list below carries
+            the skeleton state. */}
+        <BulkSelectToolbar
+          search={search}
+          onSearchChange={onSearchChange}
+          searchPlaceholder={searchPlaceholder}
+          selectedCount={selectedIds.length}
+          // While the error state hides the items behind the alert, the
+          // toolbar must see an empty visible set: Select all disables
+          // instead of selecting items the user cannot see. An existing
+          // selection can still be cleared (the toolbar gates Clear on
+          // the selection, not the visible count).
+          filteredCount={error ? 0 : items.length}
+          disabled={disabled}
+          busy={exporting}
+          onSelectAll={onSelectAll}
+          onClearSelection={onClearSelection}
+        />
+        <YStack
+          borderWidth={1}
+          borderColor={showSkeleton ? "transparent" : tokens.colors.gray.gray3}
+          borderRadius={tokens.radii.xl}
+          maxHeight={256}
+          overflow="hidden"
+        >
+          <ScrollView>
+            {error && !showSkeleton ? (
+              <Alert severity="error" message={error} />
+            ) : (
+              <CheckboxSelectList
+                items={items}
+                selectedIds={selectedIds}
+                onToggle={onToggle}
+                disabled={disabled || exporting}
+                loading={showSkeleton}
+                emptyMessage={emptyMessage}
+              />
+            )}
+          </ScrollView>
+        </YStack>
+        <Button
+          variant="primary"
+          disabled={disabled || exporting || selectedIds.length === 0}
+          onPress={onExport}
+        >
+          {exporting ? exportPendingLabel : exportLabel}
+        </Button>
       </YStack>
-      <Button
-        variant="primary"
-        disabled={disabled || exporting || selectedIds.length === 0}
-        onPress={onExport}
-      >
-        {exporting ? exportPendingLabel : exportLabel}
-      </Button>
-    </YStack>
+    </LoadingScope>
   );
 }

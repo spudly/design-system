@@ -1,12 +1,21 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "../widgets/Text.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
 export type CatalogHeaderProps = {
   /** The catalog's title, rendered as the list header's heading. */
   title: string;
   /** The header's controls (the CatalogFiltersBar). */
   children: ReactNode;
+  /** Loading state (#278): the title renders as a text
+   * skeleton at the heading variant's size (3xl), and the
+   * children render inside a loading scope so a filters bar
+   * child skeletonizes itself. An enclosing composite's
+   * LoadingScope can also put the header into this state
+   * without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -19,11 +28,16 @@ export type CatalogHeaderProps = {
  * Extracted from DiscoverPage for the #119 page de-styling
  * program.
  */
-export function CatalogHeader({ children, title }: CatalogHeaderProps) {
+export function CatalogHeader({ children, title, loading = false }: CatalogHeaderProps) {
+  const showSkeleton = useLoadingScope(loading);
   return (
     <YStack paddingBlockStart="$4" paddingBlockEnd="$2" gap="$4">
-      <Text variant="heading">{title}</Text>
-      {children}
+      {showSkeleton ? (
+        <TextSkeleton size="3xl" lines={1} />
+      ) : (
+        <Text variant="heading">{title}</Text>
+      )}
+      <LoadingScope active={showSkeleton}>{children}</LoadingScope>
     </YStack>
   );
 }

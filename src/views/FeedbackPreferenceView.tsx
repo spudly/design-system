@@ -1,9 +1,13 @@
-import { XStack, YStack } from "tamagui";
+import { View, XStack, YStack } from "tamagui";
+import { tokens } from "../tokens/index.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/Button.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "./CheckboxField.js";
 
 export type FeedbackPreferenceViewProps = {
@@ -36,6 +40,18 @@ export type FeedbackPreferenceViewProps = {
   /** The privacy-choices destination (#248: an href, not a callback). */
   choicesHref?: string;
   error?: string | null;
+  /** Loading state (#278): the section title skeletonizes
+   * through the SectionCard, and the body renders a skeleton
+   * branch mirroring the layout — a checkbox row (a 24x24 box
+   * bone centered in the field's 44px touch-target slot, with
+   * label and description text skeletons), one consent-status
+   * text skeleton, and the non-prompt action row with the
+   * Accept/Decline ghost Buttons kept inside the loading
+   * scope so they render as text bones. No real consent text
+   * or values show, and the error is hidden. An enclosing
+   * composite's LoadingScope can also put the view into this
+   * state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -79,7 +95,47 @@ export function FeedbackPreferenceView({
   choicesLinkLabel = "privacy choices page",
   choicesHref,
   error,
+  loading = false,
 }: FeedbackPreferenceViewProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    // Loading (#278): a skeleton branch mirroring the loaded
+    // layout in the CheckboxField's own geometry — the 24px
+    // visual box centered in its 44px touch target, the label
+    // and description lines at their own sizes, one status
+    // line, and the non-prompt action row's Accept/Decline
+    // ghost buttons kept inside the loading scope (ghost
+    // buttons render as text bones). No real label, consent
+    // text, or error shows.
+    return (
+      <SectionCard title={title} variant="elevated" loading={showSkeleton}>
+        <YStack gap={tokens.spacing[1]}>
+          <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
+            <View width={44} height={44} alignItems="center" justifyContent="center">
+              <BoxSkeleton width={24} height={24} />
+            </View>
+            <YStack flex={1} gap={tokens.spacing[1]}>
+              <TextSkeleton size="md" lines={1} />
+              <TextSkeleton size="sm" lines={1} />
+            </YStack>
+          </XStack>
+          <YStack gap="$2">
+            <TextSkeleton size="md" lines={1} />
+            <LoadingScope active>
+              <XStack gap="$2" flexWrap="wrap">
+                <Button ghost size="sm" onPress={onAcceptConsent}>
+                  {acceptLabel}
+                </Button>
+                <Button ghost size="sm" onPress={onDeclineConsent}>
+                  {declineLabel}
+                </Button>
+              </XStack>
+            </LoadingScope>
+          </YStack>
+        </YStack>
+      </SectionCard>
+    );
+  }
   return (
     <SectionCard title={title} variant="elevated">
       <CheckboxField

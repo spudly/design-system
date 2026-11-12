@@ -1,7 +1,9 @@
 import { YStack } from "tamagui";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import {
   RecipeExportPickerView,
   type RecipeExportPickerViewProps,
@@ -26,6 +28,17 @@ export type TransferRecipesViewProps = {
   /** The last import's outcome line. */
   importSummary?: string | null;
   error?: string | null;
+  /** Loading state (#278): the section title skeletonizes
+   * through the SectionCard, the hint renders as a text
+   * skeleton at its own (md) size, the nested export picker
+   * receives the loading state (its own `loading` prop still
+   * applies on its own), the Import action stays rendered
+   * inside the card's loading scope so the Button renders as
+   * a rectangle skeleton at its normal geometry, and the
+   * import summary and error lines are hidden. An enclosing
+   * composite's LoadingScope can also put the view into this
+   * state without prop-drilling. */
+  loading?: boolean;
 };
 
 /**
@@ -52,17 +65,22 @@ export function TransferRecipesView({
   importPending = false,
   importSummary,
   error,
+  loading = false,
 }: TransferRecipesViewProps) {
+  const showSkeleton = useLoadingScope(loading);
   return (
-    <SectionCard title={title} variant="elevated">
+    <SectionCard title={title} variant="elevated" loading={showSkeleton}>
       <YStack gap="$3">
-        <Text variant="muted">{hint}</Text>
-        <RecipeExportPickerView {...exportPicker} />
+        {showSkeleton ? <TextSkeleton size="md" lines={1} /> : <Text variant="muted">{hint}</Text>}
+        <RecipeExportPickerView
+          {...exportPicker}
+          loading={showSkeleton || exportPicker.loading === true}
+        />
         <Button variant="secondary" disabled={importPending} onPress={onImportPress}>
           {importPending ? importPendingLabel : importLabel}
         </Button>
-        {importSummary ? <Text variant="success">{importSummary}</Text> : null}
-        {error ? <Text variant="error">{error}</Text> : null}
+        {importSummary && !showSkeleton ? <Text variant="success">{importSummary}</Text> : null}
+        {error && !showSkeleton ? <Text variant="error">{error}</Text> : null}
       </YStack>
     </SectionCard>
   );

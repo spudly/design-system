@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
+import { View, YStack } from "tamagui";
 import { TextLink } from "../widgets/TextLink.js";
 import { RecipeSharingView } from "./RecipeSharingView.js";
 
@@ -73,6 +73,56 @@ export const Private: Story = {
         onSave={() => undefined}
         onRotateShareLink={() => undefined}
       />
+    </Viewport>
+  ),
+};
+
+export const Loading: Story = {
+  render: () => (
+    <Viewport>
+      <RecipeSharingView
+        options={options}
+        value="private"
+        onValueChange={() => undefined}
+        onSave={() => undefined}
+        onRotateShareLink={() => undefined}
+        loading
+      />
+    </Viewport>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <Viewport>
+      <YStack position="relative">
+        <RecipeSharingView
+          options={options}
+          value="private"
+          onValueChange={() => undefined}
+          onSave={() => undefined}
+          onRotateShareLink={() => undefined}
+        />
+        <YStack
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          opacity={0.45}
+          pointerEvents="none"
+        >
+          <RecipeSharingView
+            options={options}
+            value="private"
+            onValueChange={() => undefined}
+            onSave={() => undefined}
+            onRotateShareLink={() => undefined}
+            loading
+          />
+        </YStack>
+      </YStack>
     </Viewport>
   ),
 };

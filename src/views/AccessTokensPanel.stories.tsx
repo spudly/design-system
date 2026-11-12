@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
+import { View, YStack } from "tamagui";
 import { AccessTokensPanel } from "./AccessTokensPanel.js";
 import { accessTokensFixture } from "../pages/fixtures.js";
 
@@ -33,6 +33,62 @@ export const WithTokens: Story = {
         onDismissSecret={() => undefined}
         onRevoke={() => undefined}
       />
+    </Viewport>
+  ),
+};
+
+export const Loading: Story = {
+  render: () => (
+    <Viewport>
+      <AccessTokensPanel
+        tokens={accessTokensFixture.tokens}
+        loading
+        tokenName=""
+        onTokenNameChange={() => undefined}
+        onCreate={() => undefined}
+        createdSecret={null}
+        onDismissSecret={() => undefined}
+        onRevoke={() => undefined}
+      />
+    </Viewport>
+  ),
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <Viewport>
+      <YStack position="relative">
+        <AccessTokensPanel
+          tokens={accessTokensFixture.tokens}
+          tokenName="Kitchen tablet"
+          onTokenNameChange={() => undefined}
+          onCreate={() => undefined}
+          createdSecret={null}
+          onDismissSecret={() => undefined}
+          onRevoke={() => undefined}
+        />
+        <YStack
+          position="absolute"
+          top={0}
+          left={0}
+          right={0}
+          bottom={0}
+          opacity={0.45}
+          pointerEvents="none"
+        >
+          <AccessTokensPanel
+            tokens={accessTokensFixture.tokens}
+            loading
+            tokenName="Kitchen tablet"
+            onTokenNameChange={() => undefined}
+            onCreate={() => undefined}
+            createdSecret={null}
+            onDismissSecret={() => undefined}
+            onRevoke={() => undefined}
+          />
+        </YStack>
+      </YStack>
     </Viewport>
   ),
 };

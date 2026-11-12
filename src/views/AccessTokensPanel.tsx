@@ -1,5 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
 import { Alert } from "../widgets/Alert.js";
 import { SectionCard } from "../widgets/SectionCard.js";
@@ -44,6 +45,13 @@ export type AccessTokensPanelToken = {
 
 export type AccessTokensPanelProps = {
   tokens: AccessTokensPanelToken[];
+  /** Loading state (#278): the token list renders skeleton
+   * TokenRows — one per real token when tokens are known, or
+   * exactly 3 dummy rows when the list is not known yet. The
+   * create form, the created-secret panel, and the error
+   * behavior are unchanged. An enclosing composite's
+   * LoadingScope can also put the panel into this state
+   * without prop-drilling. */
   loading?: boolean;
   tokenName: string;
   onTokenNameChange: (value: string) => void;
@@ -62,6 +70,18 @@ export type AccessTokensPanelProps = {
   planNotice?: string | null;
 };
 
+// The dummy rows for a token-less loading panel (#278):
+// exactly 3 placeholder rows, from a frozen module-level
+// constant with stable keys — never generated per render.
+// Their values never render (a loading TokenRow renders
+// bones only); each carries a noop revoke below so the
+// Revoke button's skeleton renders in its slot.
+const LOADING_TOKENS: AccessTokensPanelToken[] = [
+  { id: "loading-1", name: "Token", prefix: "token", metaLabel: "Created" },
+  { id: "loading-2", name: "Token", prefix: "token", metaLabel: "Created" },
+  { id: "loading-3", name: "Token", prefix: "token", metaLabel: "Created" },
+];
+
 export function AccessTokensPanel({
   tokens: accessTokens,
   loading = false,
@@ -76,6 +96,7 @@ export function AccessTokensPanel({
   error,
   planNotice,
 }: AccessTokensPanelProps) {
+  const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title="API access tokens">
       <Alert severity="info">
@@ -149,10 +170,36 @@ export function AccessTokensPanel({
         </YStack>
       )}
       {error ? <Alert severity="error" message={error} /> : null}
-      {loading ? (
-        <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray6}>
-          Loading tokens…
-        </Text>
+      {showSkeleton ? (
+        // Loading (#278): skeleton TokenRows mirroring the
+        // loaded list — one per real token (its own name /
+        // prefix / meta cross, but a loading row renders bones
+        // only), or exactly 3 dummy rows when the list is not
+        // known yet. Each non-revoked row keeps its Revoke
+        // action (a noop for the dummies) so the Button
+        // skeletonizes in its slot instead of dropping out.
+        <YStack>
+          {(accessTokens.length > 0 ? accessTokens : LOADING_TOKENS).map((token) => (
+            <TokenRow
+              key={token.id}
+              name={token.name}
+              prefix={token.prefix}
+              metaLabel={token.metaLabel}
+              revoked={token.revoked === true}
+              loading
+              {...(token.revoked
+                ? {}
+                : {
+                    onRevoke:
+                      accessTokens.length > 0
+                        ? () => {
+                            onRevoke(token.id);
+                          }
+                        : () => undefined,
+                  })}
+            />
+          ))}
+        </YStack>
       ) : accessTokens.length === 0 ? (
         <Text textAlign="center">No tokens yet.</Text>
       ) : (
