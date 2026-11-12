@@ -26,9 +26,10 @@ export type RecipeExportPickerViewProps = {
   /** Loading state (#278): the list renders its skeleton rows
    * through the CheckboxSelectList, the bordered list frame's
    * border turns transparent (no visible hairline), and the
-   * whole view renders inside a LoadingScope so the toolbar's
-   * Buttons and the Export Button render as inert skeletons at
-   * their normal geometry; the error is hidden and no real item
+   * whole view renders inside a LoadingScope so the toolbar
+   * (its Buttons, its search field, and its selection count)
+   * and the Export Button render as inert skeletons at their
+   * normal geometry; the error is hidden and no real item
    * labels show. An enclosing composite's LoadingScope can
    * also put the picker into this state without prop-drilling. */
   loading?: boolean;
@@ -80,11 +81,10 @@ export function RecipeExportPickerView({
     <LoadingScope active={showSkeleton}>
       <YStack gap="$3">
         {/* The toolbar stays rendered inside the scope while
-            loading (#278): its Buttons skeletonize through
-            Button's own scope handling (its ghost buttons as
-            text bones), while its SearchField does not read the
-            scope and stays as rendered — the list below carries
-            the skeleton state. */}
+            loading (#278): it reads the scope itself — its
+            ghost Buttons as text bones, its SearchField as a
+            field-shaped bone, and its selection count as a
+            text bone — so nothing in it renders live. */}
         <BulkSelectToolbar
           search={search}
           onSearchChange={onSearchChange}

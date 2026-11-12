@@ -20,8 +20,13 @@ Open in `Views/TransferRecipesView`: Default; and in
    with "1 selected", two listed recipes, "Export selected
    (1)"), the Import recipes button, and the success summary
    line render in order on the elevated card.
-2. Picker Loading: the list region shows the loading spinner
-   and the export button is disabled.
+2. Picker Loading: the whole picker skeletonizes at the loaded
+   layout's geometry — the search field renders as a
+   field-shaped bone, the toolbar's actions and the "1
+   selected" count render as text bones, the list shows
+   skeleton rows, and the export action renders as a skeleton.
+   No live input, placeholder text, real count, or item labels
+   show.
 
 **Run when:** `src/views/TransferRecipesView.tsx`,
 `src/views/RecipeExportPickerView.tsx`, their stories,

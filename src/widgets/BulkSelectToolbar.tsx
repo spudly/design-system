@@ -1,7 +1,12 @@
 import { XStack, YStack } from "tamagui";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
+import { tokens } from "../tokens/index.js";
+import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Button } from "./Button.js";
-import { SearchField } from "../views/SearchField.js";
+import { SkeletonBone } from "./SkeletonClock.js";
 import { Text } from "./Text.js";
+import { LINE_BOXES } from "./TextSkeleton.js";
+import { SearchField } from "../views/SearchField.js";
 
 export type BulkSelectToolbarProps = {
   search: string;
@@ -33,6 +38,18 @@ export type BulkSelectToolbarProps = {
  * in the caller) hides the selected items. Selection state is the
  * caller's — the toolbar only reports presses and renders the counts
  * it is given.
+ *
+ * Loading (#278): inside an active LoadingScope the toolbar
+ * skeletonizes with the composite it belongs to — the ghost
+ * buttons bone through Button's own scope handling, the search
+ * field renders as a field-shaped bone at the field's own box
+ * (its measured row height, its corner radius), and the
+ * selection count renders as a text bone in its slot, sized from
+ * the count text the way Button sizes a ghost label bone. No
+ * live input, placeholder, or real count shows while loading:
+ * the search filters the very list that is loading, and the
+ * count describes that list's selection, so both are content
+ * the skeleton stands in for (Stephen on #579).
  */
 export function BulkSelectToolbar({
   search,
@@ -48,10 +65,23 @@ export function BulkSelectToolbar({
   clearSelectionLabel = "Clear selection",
 }: BulkSelectToolbarProps) {
   const controlsDisabled = disabled || busy;
+  const showSkeleton = useLoadingScope();
+  const selectedText = `${selectedCount} selected`;
 
   return (
     <YStack>
-      <SearchField value={search} onChangeText={onSearchChange} placeholder={searchPlaceholder} />
+      {showSkeleton ? (
+        // The search field's bone (#278): the field's own box —
+        // measured against the rendered field, its row is 46px:
+        // the 44px glyph box plus the container's two 1px
+        // borders (a flat 44 left the toolbar below shifted up
+        // by the borders). The bone's radius is the field's own
+        // (radii.md). In the field's slot, the rows below keep
+        // their places.
+        <BoxSkeleton height={46} />
+      ) : (
+        <SearchField value={search} onChangeText={onSearchChange} placeholder={searchPlaceholder} />
+      )}
       <XStack flexWrap="wrap" alignItems="center" gap="$3" paddingBlockEnd="$3">
         <Button
           ghost
@@ -69,7 +99,24 @@ export function BulkSelectToolbar({
         >
           {clearSelectionLabel}
         </Button>
-        {selectedCount > 0 ? <Text variant="hint">{selectedCount} selected</Text> : null}
+        {selectedCount > 0 ? (
+          showSkeleton ? (
+            // The count's bone (#278): one text bone in the
+            // count's slot — the hint size's bone height, the
+            // width estimated from the count text the way
+            // Button estimates a ghost label bone's width.
+            <SkeletonBone
+              width={Math.max(
+                24,
+                Math.round(selectedText.length * tokens.typography.fontSize.sm * 0.52),
+              )}
+              height={LINE_BOXES.sm.bone}
+              borderRadius={tokens.radii.md}
+            />
+          ) : (
+            <Text variant="hint">{selectedText}</Text>
+          )
+        ) : null}
       </XStack>
     </YStack>
   );
