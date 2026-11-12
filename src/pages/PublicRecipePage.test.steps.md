@@ -113,7 +113,7 @@ RatingsCard.
 ## PublicRecipePage
 
 Open in `Pages/Eciperay/PublicRecipePage`: Default, SignedIn,
-ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
+CommentsAsData, ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
 
 1. One scroll, no tab bar: overview, Ingredients, Instructions,
    and the engagement block (ratings card above the comments
@@ -152,6 +152,10 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
 6. Instructions: the first step card is highlighted (primary
    border and tint) on open; pressing another card moves the
    highlight to it. Steps render in step-number order.
+7. CommentsAsData: the comments section renders from the
+   `comments` data prop under the ratings card — a Comments
+   card listing the two fixture comments, with no composer
+   (signed out, the host passes no `onPost`).
 
 **Run when:** `src/pages/PublicRecipePage.tsx`, its stories,
 the recipe panels the page composes (RecipeOverviewPanel,

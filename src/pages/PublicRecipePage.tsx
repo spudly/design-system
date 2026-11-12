@@ -13,6 +13,7 @@ import { RecipeInstructionsPanel } from "../widgets/RecipeInstructionsPanel.js";
 import { RecipeOverviewPanel } from "../widgets/RecipeOverviewPanel.js";
 import { ScrollShell } from "../widgets/ScrollShell.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
+import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,
@@ -55,7 +56,16 @@ import type {
  *   renderComments slot, exactly as on the detail page — the
  *   comments section carries its own query, draft/edit state, and
  *   three mutations, so it cannot be view-modeled without leaking
- *   business logic into props.
+ *   business logic into props. (#130 T7, Stephen's 2026-11-11
+ *   Q1 decision, option (a)): comments now also enter as a
+ *   `comments` data prop rendering RecipeCommentsView at the
+ *   slot's position — the view-model is the view's own props, so
+ *   the query, draft/edit state, and mutations still stay
+ *   host-side behind its callbacks; the view supports the
+ *   signed-out case (its composer renders only when the host
+ *   passes `onPost`). The data prop and the render slot are
+ *   alternatives — when both are supplied, the data prop wins
+ *   (it is the migrated form), as on RecipeDetailPage.
  * - Error states live inside the props union: `notFound` and
  *   `unavailable` are union members with DS-owned copy (the web
  *   messages verbatim), so the whole route is one component and
@@ -141,6 +151,10 @@ export type PublicRecipePageIngredientsProps = RecipeDetailPageIngredientsProps;
 export type PublicRecipePageInstruction = RecipeDetailPageInstruction;
 export type PublicRecipePageInstructionsProps = RecipeDetailPageInstructionsProps;
 
+// The comments view-model lives with the view (#130 T7); the
+// page's contract name is an alias, as on RecipeDetailPage.
+export type PublicRecipePageComments = RecipeCommentsViewProps;
+
 export type PublicRecipePageOverviewProps = {
   imageUrl?: string | null;
   title: string;
@@ -189,6 +203,14 @@ export type PublicRecipePageReadyProps = {
    * stack under the ratings card — its position on the web
    * surface today. */
   renderComments?: () => ReactNode;
+  /**
+   * The comments section as data (#130 T7): renders
+   * RecipeCommentsView at the slot's position, under the
+   * ratings card. The data prop and the render slot are
+   * alternatives — when both are supplied, the data prop wins
+   * (it is the migrated form).
+   */
+  comments?: PublicRecipePageComments | null;
 };
 
 export type PublicRecipePageProps =
@@ -398,10 +420,12 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
     );
   }
 
-  const { ratings, onViewerRatingChange, renderComments } = props;
-  // Called once per render; the slot's content renders in the
-  // engagement stack under the ratings card.
-  const comments = renderComments ? renderComments() : null;
+  const { ratings, onViewerRatingChange, renderComments, comments: commentsData } = props;
+  // The slot is called once per render; its content renders in
+  // the engagement stack under the ratings card. The `comments`
+  // data prop wins when both forms are supplied (#130 T7).
+  const commentsSlot = renderComments ? renderComments() : null;
+  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : commentsSlot;
 
   return (
     <BigFooterShell footer={props.footer} scrollMode="content">
