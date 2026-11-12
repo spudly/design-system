@@ -156,7 +156,10 @@ test("RecipesPage renders its loading slots as skeleton rows (#278 tranche 4)", 
   // plus the shared loading-more footer. Since #278 tranche 4
   // they render skeleton rows, not a centered Spinner.
   assert.match(page, /case "loadingOwn":\s*return <LoadingOwnRows \/>;/);
-  assert.match(page, /case "loadingDiscovery":\s*return <LoadingDiscoveryRows padded \/>;/);
+  assert.match(
+    page,
+    /case "loadingDiscovery":\s*return <LoadingDiscoveryRows variant="section" \/>;/,
+  );
   assert.match(page, /isFetchingNextPage \? <LoadingDiscoveryRows \/> : undefined/);
   const pageCode = page.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   assert.ok(
