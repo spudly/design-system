@@ -2,9 +2,9 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { DetailRow } from "../widgets/DetailRow.js";
-import { Center } from "../widgets/Center.js";
-import { Spinner } from "../widgets/Spinner.js";
 import { ListRow } from "../widgets/ListRow.js";
+import { LoadingScope } from "../contexts/LoadingScope.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
@@ -48,9 +48,13 @@ import { TextLink } from "../widgets/TextLink.js";
  * while the plan loads, and — deliberately mirrored here, as in
  * RecipeDetailPage — it has no distinct not-found or error UI: a
  * missing plan stays on the gate. So the props are a union:
- * `{ state: "loading" }` renders only the spinner shell (the
- * app's gate, including its delayed spinner, stays app-side),
- * and `{ state: "ready", ... }` renders the detail. If the app
+ * `{ state: "loading" }` renders the skeleton shell (#278,
+ * tranche 4 — the gate's composition mirrors the ready layout:
+ * title and meta bones, the goals section as a loading
+ * SectionCard, the action row's Buttons as inert skeletons
+ * inside the loading scope, and the Entries section holding
+ * exactly 3 dummy ListRows in their loading state), and
+ * `{ state: "ready", ... }` renders the detail. If the app
  * grows a not-found state, the union grows a member.
  *
  * The boundary is pre-composed strings, as in the sibling pages:
@@ -126,8 +130,8 @@ import { TextLink } from "../widgets/TextLink.js";
  * No lineHeight is set anywhere in this file (the #162 rule).
  *
  * De-styled for #119: the page renders no layout primitives and
- * sets no styling props. The loading state is a centered
- * Spinner (Center + Spinner), the entry rows are the generic
+ * sets no styling props. The loading state is the skeleton
+ * composition described above, the entry rows are the generic
  * ListRow widget in its link form (the page supplies the kind prefix, the entry's
  * href, the unavailable suffix, and the disabled flag as
  * content), the goal rows are DetailRow widgets, the plan title
@@ -262,13 +266,53 @@ export type MealPlanDetailPageProps =
  * entry list in a scrolling shell. Controlled — see the file
  * header for the contract and the screen inventory it mirrors.
  */
+// The dummy skeleton rows for the loading Entries list (#278):
+// exactly 3, from a frozen module-level constant — never
+// generated per render (the CheckboxSelectList convention).
+const LOADING_ENTRY_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
 export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   if (props.state === "loading") {
+    // Loading (#278, tranche 4): the skeleton mirrors the ready
+    // layout's composition — the title at its own size, the
+    // three meta lines, the goals SectionCard (its title bones
+    // through its own loading state; its body lines as bones),
+    // the Shopping list / Edit action row kept as inert
+    // skeleton Buttons inside the scope, and the Entries
+    // SectionCard holding the dummy ListRows. No real plan
+    // content exists in this state to leak.
     return (
       <BigFooterShell footer={props.footer}>
-        <Center fill>
-          <Spinner label="Loading meal plan" />
-        </Center>
+        <ScreenContainer>
+          <LoadingScope active>
+            <SectionStack>
+              <TextSkeleton size="2xl" lines={1} />
+              <TextSkeleton size="sm" lines={3} />
+              <SectionCard title="Nutrition goals" loading>
+                <TextSkeleton size="sm" lines={3} />
+              </SectionCard>
+              <ButtonRow>
+                <Button onPress={() => {}}>Shopping list</Button>
+                <Button variant="secondary" onPress={() => {}}>
+                  Edit
+                </Button>
+              </ButtonRow>
+              <SectionCard title="Entries" loading>
+                <ListStack>
+                  {LOADING_ENTRY_KEYS.map((key) => (
+                    <ListRow
+                      key={key}
+                      title="Entry"
+                      subtitle="Entry details"
+                      onPress={() => {}}
+                      loading
+                    />
+                  ))}
+                </ListStack>
+              </SectionCard>
+            </SectionStack>
+          </LoadingScope>
+        </ScreenContainer>
       </BigFooterShell>
     );
   }

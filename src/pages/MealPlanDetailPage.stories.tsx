@@ -216,3 +216,35 @@ export const NoGoals: Story = {
     </Viewport>
   ),
 };
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <View width={430} maxWidth="100%" height={844} position="relative">
+      <MealPlanDetailPage
+        footer={eciperayFooterFixture}
+        state="ready"
+        title="This week"
+        notes="Family dinners — keep weeknights simple."
+        dateRangeLabel="2026-10-19 – 2026-10-25"
+        nutritionLabel="2,140 cal · Protein 118 g"
+        nutritionGoals={detailGoals}
+        goalsHref="/meal-plans/this-week/goals"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
+        entries={detailEntries}
+      />
+      <View
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <MealPlanDetailPage footer={eciperayFooterFixture} state="loading" />
+      </View>
+    </View>
+  ),
+};

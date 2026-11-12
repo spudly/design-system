@@ -78,3 +78,43 @@ export const Loading: Story = {
     </Viewport>
   ),
 };
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <View width={430} maxWidth="100%" height={844} position="relative">
+      <HomePage
+        footer={eciperayFooterFixture}
+        {...homeFixture}
+        renderRecipeRow={(recipe) => (
+          <YStack marginBottom="$3" borderRadius="$3" backgroundColor="$surface" padding="$3">
+            <Text>{recipe.id === "tuscan-chicken" ? "Tuscan Chicken" : "Fudgy Brownies"}</Text>
+          </YStack>
+        )}
+        browseHref="/recipes"
+        addHref="/recipes/new"
+        sharedWithMeHref="/shared-with-me"
+      />
+      <View
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <HomePage
+          footer={eciperayFooterFixture}
+          {...homeFixture}
+          recipes={[]}
+          loading
+          renderRecipeRow={() => null}
+          browseHref="/recipes"
+          addHref="/recipes/new"
+          sharedWithMeHref="/shared-with-me"
+        />
+      </View>
+    </View>
+  ),
+};

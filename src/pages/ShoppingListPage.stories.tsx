@@ -73,3 +73,32 @@ export const Empty: Story = {
     </Viewport>
   ),
 };
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <View width={430} maxWidth="100%" height={844} position="relative">
+      <ShoppingListPage
+        footer={eciperayFooterFixture}
+        lines={shoppingListFixture.lines}
+        onToggleLine={() => undefined}
+      />
+      <View
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <ShoppingListPage
+          footer={eciperayFooterFixture}
+          lines={shoppingListFixture.lines}
+          loading
+          onToggleLine={() => undefined}
+        />
+      </View>
+    </View>
+  ),
+};

@@ -7,9 +7,9 @@ import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { CardStack } from "../widgets/CardStack.js";
 import { ColorPickerField } from "../widgets/ColorPickerField.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { FormStack } from "../widgets/FormStack.js";
-import { Center } from "../widgets/Center.js";
-import { Spinner } from "../widgets/Spinner.js";
+import { LoadingScope } from "../contexts/LoadingScope.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
@@ -36,9 +36,15 @@ import { TrailingActionsRow } from "../widgets/TrailingActionsRow.js";
  * BadgeCardRow (#464, retiring TextAction), so they are real
  * buttons — keyboard-focusable and Enter/Space-operable on
  * web; the row card treatment is the app view's, on DS
- * tokens. While `loading`, the centered Spinner (Center +
- * Spinner) replaces the list (it stands in for the app's branded
- * loader — the RecipeFormPage precedent).
+ * tokens. While `loading`, the list region renders skeleton
+ * rows (#278, tranche 4 — the centered-Spinner pattern is
+ * deleted): the title and the create form stay rendered (the
+ * form is user input, not loaded content) and the list holds
+ * exactly 3 dummy rows mirroring the BadgeCardRow composition
+ * — a pill bone at the badge's geometry in a compact card,
+ * with the row's ghost actions kept as inert text-bone
+ * Buttons inside the loading scope (Edit only when the host
+ * wires it, as the loaded rows render it).
  *
  * The create form is stacked (#189): the name field takes its
  * own full-width row, and the color swatches and Add button
@@ -202,6 +208,11 @@ export type TagsPageProps = {
   initialFailedOperation?: TagsPageFailedOperation | null;
 };
 
+// The dummy skeleton rows for the loading list (#278): exactly
+// 3, from a frozen module-level constant — never generated per
+// render (the CheckboxSelectList convention).
+const LOADING_TAG_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
 export function TagsPage({
   tags,
   loading = false,
@@ -287,9 +298,30 @@ export function TagsPage({
             </TrailingActionsRow>
           </FormStack>
           {loading ? (
-            <Center>
-              <Spinner label="Loading tags" />
-            </Center>
+            <LoadingScope active>
+              <CardStack>
+                {LOADING_TAG_KEYS.map((key) => (
+                  <Card key={key} variant="compact">
+                    <TrailingActionsRow leading={<BoxSkeleton width={96} height={24} />}>
+                      {onStartEdit ? (
+                        <Button ghost size="sm" accessibilityLabel="Edit tag" onPress={() => {}}>
+                          Edit
+                        </Button>
+                      ) : null}
+                      <Button
+                        ghost
+                        size="sm"
+                        variant="danger"
+                        accessibilityLabel="Delete tag"
+                        onPress={() => {}}
+                      >
+                        Delete
+                      </Button>
+                    </TrailingActionsRow>
+                  </Card>
+                ))}
+              </CardStack>
+            </LoadingScope>
           ) : (
             <CardStack>
               {tags.map((tag) =>

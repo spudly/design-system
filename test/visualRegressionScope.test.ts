@@ -320,7 +320,7 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // LandingPage story (+1 standard)). (Component stories are not
   // in the capture set — STANDARD_PREFIXES covers Pages only; the
   // #119 tranches' component stories are Chromatic-covered.)
-  const EXPECTED_LIGHT_STORY_COUNT = 167;
+  const EXPECTED_LIGHT_STORY_COUNT = 179;
   // the standard set grew by the eight B3a recipe-form stories,
   // #124, the sixteen B3b meals/shopping stories, #125, the
   // twenty-three B3c account/auth stories, #126, the three
@@ -402,7 +402,7 @@ test("real repo: derived capture set matches the committed baselines", () => {
   // auto-commit flow).
   const scope = computeScope({ repoRoot, changedFiles: [], forceFull: true });
   assert.equal(scope.standard.length, EXPECTED_LIGHT_STORY_COUNT);
-  assert.equal(scope.narrow.length, 13);
+  assert.equal(scope.narrow.length, 14);
   const baselineFiles = readBaselineFiles(repoRoot);
   assertBaselinesDerivable(scope, baselineFiles);
   if (enforceBaselineGate) {

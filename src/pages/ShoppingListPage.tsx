@@ -1,12 +1,14 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { CheckRow } from "../widgets/CheckRow.js";
 import { EmptyState } from "../widgets/EmptyState.js";
-import { Center } from "../widgets/Center.js";
-import { Spinner } from "../widgets/Spinner.js";
 import { ListStack } from "../widgets/ListStack.js";
+import { LoadingScope } from "../contexts/LoadingScope.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
+import { XStack, YStack } from "tamagui";
 
 /**
  * ShoppingListPage (#125, B3b): a meal plan's shopping list —
@@ -36,13 +38,17 @@ import { Text } from "../widgets/Text.js";
  *   keyboard activation — the ChecklistRow pattern with the
  *   MealPlansPage row's keyboard handling).
  *
- * States mirror the app view's swaps: while `loading`, the
- * centered Spinner (Center + Spinner) replaces the list (the
- * app renders its branded loader there; the centered Spinner
- * stands in, the
- * RecipeFormPage precedent — the branded loader stays app-side by recorded
- * decision); an empty list renders the DS EmptyState with the
- * app's message.
+ * States: while `loading`, the list region renders skeleton
+ * rows (#278, tranche 4 — the centered-Spinner pattern is
+ * deleted): the title stays rendered and the list holds
+ * exactly 3 dummy rows mirroring the CheckRow composition —
+ * a box bone at the row's checkbox geometry beside a text
+ * bone at the label's size, the row's hairline rendered
+ * transparent in the skeleton state. CheckRow itself has no
+ * loading state (a checkbox row's checked state is caller
+ * data), so the dummy rows are the page's own composition.
+ * An empty list renders the DS EmptyState with the app's
+ * message.
  *
  * De-styled for #119: the page composes DS components only —
  * the title is Text's `title` variant, the sections stack in
@@ -72,6 +78,11 @@ export type ShoppingListPageProps = {
   onToggleLine: (key: string) => void;
 };
 
+// The dummy skeleton rows for the loading list (#278): exactly
+// 3, from a frozen module-level constant — never generated per
+// render (the CheckboxSelectList convention).
+const LOADING_LINE_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
 export function ShoppingListPage({
   lines,
   loading = false,
@@ -84,9 +95,25 @@ export function ShoppingListPage({
         <SectionStack>
           <Text variant="title">Shopping list</Text>
           {loading ? (
-            <Center>
-              <Spinner label="Loading shopping list" />
-            </Center>
+            <LoadingScope active>
+              <ListStack>
+                {LOADING_LINE_KEYS.map((key) => (
+                  <XStack
+                    key={key}
+                    alignItems="flex-start"
+                    gap="$3"
+                    paddingVertical="$3"
+                    borderBottomWidth={1}
+                    borderBottomColor="transparent"
+                  >
+                    <BoxSkeleton width={24} height={24} />
+                    <YStack flex={1}>
+                      <TextSkeleton size="md" lines={1} />
+                    </YStack>
+                  </XStack>
+                ))}
+              </ListStack>
+            </LoadingScope>
           ) : lines.length === 0 ? (
             <EmptyState title="No items on this list." />
           ) : (

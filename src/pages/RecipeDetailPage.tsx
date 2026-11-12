@@ -4,9 +4,11 @@ import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { CandidateList } from "../views/CandidateList.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { CardStack } from "../widgets/CardStack.js";
-import { Center } from "../widgets/Center.js";
 import { ListStack } from "../widgets/ListStack.js";
+import { LoadingScope } from "../contexts/LoadingScope.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { LogEntryCard } from "../widgets/LogEntryCard.js";
 import { MarkableRow } from "../widgets/MarkableRow.js";
 import {
@@ -27,7 +29,6 @@ import { ScreenShell } from "../widgets/ScreenShell.js";
 import { ScrollRegion } from "../widgets/ScrollRegion.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import { SelectField } from "../widgets/SelectField.js";
-import { Spinner } from "../widgets/Spinner.js";
 import { StatBand } from "../widgets/StatBand.js";
 import { StatCard } from "../widgets/StatCard.js";
 import { Badge, type BadgeProps } from "../widgets/Badge.js";
@@ -70,8 +71,12 @@ import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeS
  * the recipe loads, and — deliberately mirrored here — it has no
  * distinct not-found or error UI: a missing recipe stays on the
  * gate. So the props are a union: `{ state: "loading" }` renders
- * only the spinner shell (the app's gate, including its delayed
- * spinner, stays app-side), and `{ state: "ready", ... }` renders
+ * the skeleton shell (#278, tranche 4 — the centered-Spinner
+ * pattern is deleted: the composition mirrors the ready layout's
+ * sections in order — hero box bone, title and description
+ * bones, the stat band in its loading state, then bone regions
+ * under the real Ingredients / Instructions / Cook History /
+ * Nutrition headings), and `{ state: "ready", ... }` renders
  * the chrome and panels. If the app grows a not-found state, the
  * union grows a member.
  *
@@ -368,8 +373,9 @@ export type RecipeDetailPageCookLog = {
 };
 
 export type RecipeDetailPageHistoryProps = {
-  /** Cook-log query in flight: the panel renders only a spinner,
-   * as the app's tab returns early on loading. */
+  /** Cook-log query in flight: the panel renders skeleton
+   * cook-log cards (#278, tranche 4), as the app's tab returns
+   * early on loading. */
   loading?: boolean;
   cookLogs: RecipeDetailPageCookLog[];
   /** Renders the "Log a cook" button; hidden while the form slot
@@ -859,14 +865,36 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
 // History section (cook logs + the form slot).
 // ---------------------------------------------------------------------------
 
+// The dummy skeleton cards for the loading cook history (#278):
+// exactly 3, from a frozen module-level constant — never
+// generated per render (the CheckboxSelectList convention).
+const LOADING_COOK_LOG_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
 function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
   if (history.loading) {
+    // Loading (#278, tranche 4): the heading stays and the
+    // entries render as exactly 3 dummy LogEntryCards in their
+    // loading state (date, rating, and notes bones; the Delete
+    // action kept as an inert skeleton Button when the host
+    // wires it, as the loaded cards render it).
     return (
       <PanelStack>
         <SectionHeading>Cook History</SectionHeading>
-        <Center vertical={false}>
-          <Spinner label="Loading cook history" />
-        </Center>
+        {LOADING_COOK_LOG_KEYS.map((key, index) => (
+          <LogEntryCard
+            key={key}
+            dateLabel="Cook log"
+            starRating={5}
+            notes="Cook log notes"
+            loading
+            {...(history.onDeleteCookLogPress
+              ? {
+                  onDeletePress: () => {},
+                  deleteAccessibilityLabel: `Delete cook log ${index + 1}`,
+                }
+              : {})}
+          />
+        ))}
       </PanelStack>
     );
   }
@@ -923,11 +951,43 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
  */
 export function RecipeDetailPage(props: RecipeDetailPageProps) {
   if (props.state === "loading") {
+    // Loading (#278, tranche 4): the skeleton composition in
+    // the header's States note — the ready layout's sections
+    // in order, every content region skeletonized inside the
+    // loading scope, no real recipe content.
     return (
       <BigFooterShell footer={props.footer} scrollMode="content">
-        <Center fill>
-          <Spinner label="Loading recipe" />
-        </Center>
+        <LoadingScope active>
+          <ScreenShell>
+            <ScrollRegion>
+              <PanelStack>
+                <BoxSkeleton height={256} />
+                <TextSkeleton size="2xl" lines={1} />
+                <TextSkeleton size="md" lines={3} />
+                <StatBand loading>
+                  <StatCard value="" label="" />
+                </StatBand>
+              </PanelStack>
+              <PanelStack>
+                <SectionHeading>Ingredients</SectionHeading>
+                <TextSkeleton size="md" lines={4} />
+              </PanelStack>
+              <PanelStack>
+                <SectionHeading>Instructions</SectionHeading>
+                <BoxSkeleton height={96} />
+                <BoxSkeleton height={96} />
+              </PanelStack>
+              <PanelStack>
+                <SectionHeading>Cook History</SectionHeading>
+                <TextSkeleton size="md" lines={3} />
+              </PanelStack>
+              <PanelStack>
+                <SectionHeading>Nutrition</SectionHeading>
+                <TextSkeleton size="md" lines={3} />
+              </PanelStack>
+            </ScrollRegion>
+          </ScreenShell>
+        </LoadingScope>
       </BigFooterShell>
     );
   }

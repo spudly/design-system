@@ -2,10 +2,13 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
-import { Center } from "../widgets/Center.js";
-import { Spinner } from "../widgets/Spinner.js";
+import { LoadingScope } from "../contexts/LoadingScope.js";
 import { MainLandmark } from "../widgets/MainLandmark.js";
+import { StatBand } from "../widgets/StatBand.js";
+import { StatCard } from "../widgets/StatCard.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { MessageCard } from "../widgets/MessageCard.js";
 import { RatingsCard } from "../widgets/RatingsCard.js";
 import { RecipeIngredientsPanel } from "../widgets/RecipeIngredientsPanel.js";
@@ -86,8 +89,14 @@ import type {
  * and passes data and callbacks only. ScrollShell owns the
  * surface paint, the single scroll region, and the content
  * column's inset and separation rhythm; RatingsCard carries the
- * engagement section, and the loading state is a centered
- * Spinner (Center + Spinner). The CTA
+ * engagement section, and the loading state is a skeleton
+ * composition mirroring the ready layout (#278, tranche 4 —
+ * the centered-Spinner pattern is deleted): the CTA card's
+ * buttons as inert skeletons inside the loading scope, a hero
+ * box bone where the overview's image sits, title and
+ * description bones, the stat band in its loading state, and
+ * text bones under the real Ingredients / Instructions
+ * section headings. The CTA
  * bar's equal-width button treatment is ButtonRow's (`equal`) and
  * the two message states are MessageCard — both extracted from
  * this page's hand-rolled stacks in the component-only change
@@ -367,12 +376,41 @@ function InstructionsSection({ instructions }: { instructions: PublicRecipePageI
  */
 export function PublicRecipePage(props: PublicRecipePageProps) {
   if (props.state === "loading") {
+    // Loading (#278, tranche 4): the skeleton composition in
+    // the header's composition note — same shell, same section
+    // order and headings as the ready layout, every content
+    // region skeletonized, no real recipe content.
     return (
       <BigFooterShell footer={props.footer} scrollMode="content">
         <MainLandmark>
-          <Center fill>
-            <Spinner label="Loading recipe" />
-          </Center>
+          <LoadingScope active>
+            <ScrollShell>
+              <Card>
+                <ButtonRow equal>
+                  <Button variant="primary" onPress={() => {}}>
+                    {SIGN_UP_LABEL}
+                  </Button>
+                  <Button variant="secondary" onPress={() => {}}>
+                    {CLONE_LABEL}
+                  </Button>
+                  <Button variant="secondary" onPress={() => {}}>
+                    {GET_APP_LABEL}
+                  </Button>
+                </ButtonRow>
+              </Card>
+              <BoxSkeleton height={256} />
+              <TextSkeleton size="2xl" lines={1} />
+              <TextSkeleton size="md" lines={3} />
+              <StatBand loading>
+                <StatCard value="" label="" />
+              </StatBand>
+              <SectionHeading>Ingredients</SectionHeading>
+              <TextSkeleton size="md" lines={4} />
+              <SectionHeading>Instructions</SectionHeading>
+              <BoxSkeleton height={96} />
+              <BoxSkeleton height={96} />
+            </ScrollShell>
+          </LoadingScope>
         </MainLandmark>
       </BigFooterShell>
     );

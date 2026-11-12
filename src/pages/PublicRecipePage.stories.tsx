@@ -310,3 +310,23 @@ export const Unavailable: Story = {
 export const Ingredients: Story = {
   render: () => <PublicRecipePageDemo initialMissing={["heavy-cream"]} />,
 };
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <View width={430} maxWidth="100%" height={844} position="relative">
+      <PublicRecipePageDemo showCommentsSlot />
+      <View
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <PublicRecipePage footer={eciperayFooterFixture} state="loading" />
+      </View>
+    </View>
+  ),
+};

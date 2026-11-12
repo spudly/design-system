@@ -54,10 +54,12 @@ export type DiscoverPageProps = {
   errorMessage: string | null;
   /** Recipes to render, already filtered/sorted by the app. */
   recipes: DiscoverPageItem[];
-  /** First-load in flight: the list renders empty with a spinner
-   * as its empty state, and the filter bar stays mounted. */
+  /** First-load in flight: the list renders skeleton cards
+   * (#278, tranche 4 — the unified page's public variant
+   * skeletonizes its loading sections) and the filter bar
+   * stays mounted. */
   loading: boolean;
-  /** Next page in flight: a spinner renders as the list footer,
+  /** Next page in flight: skeleton cards render as the list footer,
    * and it is the shared pagination pattern's only fetch signal
    * (see useCatalogPagination, #285): while it is set the
    * end-reached handler swallows duplicate requests, and when a

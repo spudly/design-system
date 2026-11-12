@@ -2,9 +2,10 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Fragment, type ReactNode } from "react";
 import { Button } from "../widgets/Button.js";
 import { ButtonStack } from "../widgets/ButtonStack.js";
+import { Card } from "../widgets/Card.js";
 import { CenteredText } from "../widgets/CenteredText.js";
-import { Center } from "../widgets/Center.js";
-import { Spinner } from "../widgets/Spinner.js";
+import { LoadingScope } from "../contexts/LoadingScope.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
@@ -17,6 +18,16 @@ import { Text } from "../widgets/Text.js";
  * the delete mutation and its confirmation, and navigation;
  * this view renders the chrome and the list states.
  *
+ * Loading (#278, tranche 4): the centered-Spinner pattern is
+ * deleted — while `loading`, the page keeps its real frame
+ * (title, subtitle, and the three navigation actions, which
+ * need no data) and the list region renders skeleton rows:
+ * exactly 3 dummy rows, each a card holding title and subtitle
+ * bones at the loaded rows' text sizes, inside a LoadingScope.
+ * The host's rows cannot skeletonize themselves (they cross
+ * through the render slot), so the dummy rows are the page's
+ * own composition in the rows' card shape.
+ *
  * The copy crosses as props: the strings are the app's
  * content constants (shared with the web mirror), so the host
  * passes them in rather than the DS baking in app copy.
@@ -27,11 +38,9 @@ import { Text } from "../widgets/Text.js";
  * the audit records its deletion for B6, once the Home list
  * renders DS rows directly. Until then the host renders each
  * row; this page keys the rows by the view-model's `id` and
- * owns the surrounding states: while `loading` the shared
- * centered Spinner (Center + Spinner) replaces the list (it
- * stands in for the app's branded loader — the RecipeFormPage precedent; the branded
- * loader stays app-side by recorded decision), and an empty
- * list renders the host's empty message.
+ * owns the surrounding states: while `loading` the list region
+ * renders its skeleton rows (see the loading note above), and
+ * an empty list renders the host's empty message.
  *
  * De-styled for #119: the page composes DS components only —
  * the whole screen stacks in SectionStack at its uniform
@@ -72,6 +81,11 @@ export type HomePageProps = {
   sharedWithMeHref: string;
 };
 
+// The dummy skeleton rows for the loading list (#278): exactly
+// 3, from a frozen module-level constant — never generated per
+// render (the CheckboxSelectList convention).
+const LOADING_ROW_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
 export function HomePage({
   title,
   subtitle,
@@ -107,9 +121,16 @@ export function HomePage({
           </ButtonStack>
           <Text variant="subheading">{recipesTitle}</Text>
           {loading ? (
-            <Center>
-              <Spinner label="Loading recipes" />
-            </Center>
+            <LoadingScope active>
+              <ListStack>
+                {LOADING_ROW_KEYS.map((key) => (
+                  <Card key={key}>
+                    <TextSkeleton size="md" lines={1} />
+                    <TextSkeleton size="sm" lines={1} />
+                  </Card>
+                ))}
+              </ListStack>
+            </LoadingScope>
           ) : recipes.length === 0 ? (
             <CenteredText>{emptyMessage}</CenteredText>
           ) : (

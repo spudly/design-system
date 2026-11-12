@@ -108,14 +108,23 @@ test("the loading state renders only the spinner shell", () => {
   assert.ok(loadingAt < chromeAt, "the loading branch must come before the chrome render");
   assert.match(
     code,
-    /<Center fill>\s*<Spinner label="Loading recipe" \/>\s*<\/Center>/,
-    "the loading shell renders a centered DS Spinner (Center + Spinner, the spinner carrying the label)",
+    /<LoadingScope active>[\s\S]*?<StatBand loading>/,
+    "the loading shell renders the skeleton composition in a LoadingScope (#278 tranche 4)",
   );
+  assert.ok(!code.includes("Spinner"), "the loading state renders skeletons, not a Spinner (#278)");
 });
 
 test("the chrome is pinned above a single scroll region", () => {
-  const toolbarAt = code.indexOf("<VersionPicker");
-  const scrollAt = code.indexOf("<ScrollRegion>");
+  // Scoped to the ready render: the loading state is a separate
+  // union branch with its own skeleton composition (#278
+  // tranche 4, pinned in skeletonLoading.test.ts T4) — the
+  // single-scroll-region invariant below is the ready layout's.
+  const readyCode = code.replace(
+    /if \(props\.state === "loading"\) \{[\s\S]*?(?=\n  const \{ status, versions)/,
+    "",
+  );
+  const toolbarAt = readyCode.indexOf("<VersionPicker");
+  const scrollAt = readyCode.indexOf("<ScrollRegion>");
   assert.ok(
     scrollAt !== -1,
     "the sections render in the ScrollRegion (its contract persists handled taps — slotted forms keep their presses)",
@@ -123,11 +132,11 @@ test("the chrome is pinned above a single scroll region", () => {
   assert.ok(toolbarAt !== -1, "the toolbar must render the version picker");
   assert.ok(scrollAt > toolbarAt, "the scroll region renders below the pinned chrome");
   assert.equal(
-    code.split("<ScrollRegion").length - 1,
+    readyCode.split("<ScrollRegion").length - 1,
     1,
-    "exactly one ScrollRegion: the section scroll (the version picker is a SelectField since #72 — its sheet scroll lives in that component)",
+    "exactly one ScrollRegion: the ready page's section scroll (the version picker is a SelectField since #72 — its sheet scroll lives in that component)",
   );
-  const panelAt = code.indexOf("<OverviewPanel");
+  const panelAt = readyCode.indexOf("<OverviewPanel");
   assert.ok(panelAt > scrollAt, "the sections render inside the scroll region");
 });
 
@@ -161,9 +170,16 @@ test("there are no tabs: every section renders in one scroll, in tab order, unde
     "<SectionHeading>Nutrition</SectionHeading>",
     "<NutritionPanel",
   ];
+  // The ordering is the ready layout's: the loading branch
+  // (a separate union state, #278 tranche 4) renders its own
+  // headings in the same order but is excised here, as above.
+  const readyCode = code.replace(
+    /if \(props\.state === "loading"\) \{[\s\S]*?(?=\n  const \{ status, versions)/,
+    "",
+  );
   let lastAt = -1;
   for (const marker of sequence) {
-    const at = code.indexOf(marker);
+    const at = readyCode.indexOf(marker);
     assert.ok(at > lastAt, `${marker} must render after the previous marker`);
     lastAt = at;
   }
