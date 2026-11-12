@@ -1272,6 +1272,315 @@ test("T2 SSR: loading RecipeIngredientsPanel skeletonizes controls and rows", as
 });
 
 // ---------------------------------------------------------------------------
+// #278 Tranche 4 — pages: the centered-Spinner-while-loading
+// pattern is deleted. A page in `loading` keeps its real frame
+// (shell, headings, filters, frame actions) and renders its
+// content regions as skeletons — dummy rows in the region's own
+// row shape (exactly 3 where a list loads), actions kept as
+// inert skeleton Buttons inside the loading scope, no real
+// content while loading, non-loading rendering unchanged.
+// DiscoverPage converts through RecipesPage's public variant
+// (it delegates, #547). The two approved spinner survivors
+// (Stephen approved the plan's survivor list, 2026-11-08) keep
+// their Spinners: PayPage's external payment window and
+// VerseSearchPage's inline search.
+
+const T4_CONVERTED_PAGES = [
+  "HomePage",
+  "MealPlansPage",
+  "MealsHubPage",
+  "MealPlanDetailPage",
+  "ShoppingListPage",
+  "TagsPage",
+  "PublicRecipePage",
+  "RecipeDetailPage",
+  "RecipeFormPage",
+  "RecipesPage",
+] as const;
+
+test("T4: every converted page renders skeletons — no Spinner remains in its code", () => {
+  for (const name of T4_CONVERTED_PAGES) {
+    const code = readCode(`src/pages/${name}.tsx`);
+    assert.doesNotMatch(code, /Spinner/, `${name} must not render a Spinner (#278 tranche 4)`);
+    assert.match(
+      code,
+      /LoadingScope|TextSkeleton|BoxSkeleton|TagList|CardRow|DiscoveryCard|LogEntryCard|StatBand/,
+      `${name} must render skeletons (directly, or via a skeletonized child)`,
+    );
+  }
+  // The per-page skeleton compositions, pinned:
+  assert.match(
+    readCode("src/pages/RecipeFormPage.tsx"),
+    /<TagList tags=\{\[\]\} loading \/>/,
+    "RecipeFormPage's tags fetch renders TagList's loading pills, not a spinner",
+  );
+  assert.match(
+    readCode("src/pages/RecipesPage.tsx"),
+    /function LoadingOwnRows\(\)/,
+    "RecipesPage's own section loads as MediaRow-shaped skeleton rows",
+  );
+  assert.match(
+    readCode("src/pages/RecipesPage.tsx"),
+    /function LoadingDiscoveryRows\(/,
+    "RecipesPage's discovery/public sections load as skeleton DiscoveryCards",
+  );
+  const detail = readCode("src/pages/RecipeDetailPage.tsx");
+  assert.match(
+    detail,
+    /LOADING_COOK_LOG_KEYS\.map/,
+    "RecipeDetailPage's cook history loads as dummy LogEntryCards",
+  );
+  assert.match(
+    detail,
+    /state === "loading"[\s\S]*?<Toolbar>[\s\S]*?<\/Toolbar>[\s\S]*?<ScrollRegion>/,
+    "RecipeDetailPage's loading state keeps the pinned toolbar's skeleton above its scroll region, mirroring the ready chrome",
+  );
+});
+
+test("T4: the approved spinner survivors keep their Spinners", () => {
+  assert.match(
+    readCode("src/pages/PayPage.tsx"),
+    /<Spinner label="Opening the secure payment window" \/>/,
+    "PayPage's wait is an external secure-payment window — no page content shape to skeletonize (approved survivor)",
+  );
+  assert.match(
+    readCode("src/pages/VerseSearchPage.tsx"),
+    /\{isSearching \? <Spinner label="Loading" \/> : null\}/,
+    "VerseSearchPage's inline search keeps its spinner — the field and existing results stay live (approved survivor)",
+  );
+});
+
+// Pages are the package's public surface (the internal dist
+// carries widgets/views). Load the page modules individually,
+// never the pages barrel: the barrel also pulls the pages that
+// import react-native directly (BoundedList's FlatList), whose
+// Flow-typed sources this harness cannot parse.
+let pagesPromise: Promise<Record<string, any>> | undefined;
+function loadPages() {
+  pagesPromise ??= (async () => {
+    const modules = await Promise.all([
+      import("../../dist/pages/HomePage.js"),
+      import("../../dist/pages/MealPlansPage.js"),
+      import("../../dist/pages/MealsHubPage.js"),
+      import("../../dist/pages/MealPlanDetailPage.js"),
+      import("../../dist/pages/ShoppingListPage.js"),
+      import("../../dist/pages/TagsPage.js"),
+      import("../../dist/pages/PublicRecipePage.js"),
+      import("../../dist/pages/RecipeDetailPage.js"),
+    ]);
+    return Object.assign({}, ...modules) as Record<string, any>;
+  })();
+  return pagesPromise;
+}
+
+test("T4 SSR: loading MealPlansPage and HomePage render skeleton rows, frames intact", async () => {
+  const { React } = await loadRuntime();
+  const { MealPlansPage, HomePage } = await loadPages();
+  const noop = () => {};
+
+  const plans = await renderToHtml(
+    React.createElement(MealPlansPage, {
+      plans: [{ id: "p1", href: "/plans/secret", title: "Secret Plan", subtitle: "Secret meta" }],
+      loading: true,
+      createHref: "/plans/new",
+      onPlanDelete: noop,
+    }),
+  );
+  assert.equal(hiddenBones(plans), 9, "3 dummy CardRows x (title + 2-line subtitle) bones");
+  assert.ok(!plans.includes("Secret Plan"), "a loading MealPlansPage shows no real plan titles");
+  assert.ok(plans.includes("Meal plans"), "the page heading stays rendered while loading");
+  assert.ok(plans.includes("New meal plan"), "the create action stays rendered while loading");
+  assert.match(plans, /aria-busy/, "a loading MealPlansPage marks its list busy");
+
+  const plansIdle = await renderToHtml(
+    React.createElement(MealPlansPage, {
+      plans: [{ id: "p1", href: "/plans/secret", title: "Secret Plan", subtitle: "Secret meta" }],
+      loading: false,
+      createHref: "/plans/new",
+      onPlanDelete: noop,
+    }),
+  );
+  assert.equal(hiddenBones(plansIdle), 0, "a non-loading MealPlansPage renders no bones");
+  assert.ok(plansIdle.includes("Secret Plan"), "a non-loading MealPlansPage renders its plans");
+
+  const home = await renderToHtml(
+    React.createElement(HomePage, {
+      title: "Home",
+      subtitle: "Welcome back",
+      browseLabel: "Browse recipes",
+      addLabel: "Add a recipe",
+      sharedWithMeLabel: "Shared with me",
+      recipesTitle: "Recently viewed",
+      emptyMessage: "Nothing here yet",
+      recipes: [{ id: "r1" }],
+      renderRecipeRow: () => null,
+      loading: true,
+      browseHref: "/recipes",
+      addHref: "/recipes/new",
+      sharedWithMeHref: "/shared-with-me",
+    }),
+  );
+  assert.equal(hiddenBones(home), 6, "3 dummy rows x (title + subtitle) bones");
+  assert.ok(home.includes("Browse recipes"), "the frame actions stay rendered while loading");
+  assert.ok(home.includes("Recently viewed"), "the section heading stays rendered while loading");
+});
+
+test("T4 SSR: loading MealsHubPage and ShoppingListPage render skeleton rows", async () => {
+  const { React } = await loadRuntime();
+  const { MealsHubPage, ShoppingListPage } = await loadPages();
+  const noop = () => {};
+
+  const hub = await renderToHtml(
+    React.createElement(MealsHubPage, {
+      activeTab: "meals",
+      onSelectTab: noop,
+      meals: [{ id: "m1", href: "/meals/secret", title: "Secret Meal", subtitle: "Secret meta" }],
+      plans: [],
+      loading: true,
+      createMealHref: "/meals/new",
+      createPlanHref: "/plans/new",
+      onDeleteMeal: noop,
+      onDeletePlan: noop,
+    }),
+  );
+  assert.equal(
+    hiddenBones(hub),
+    9,
+    "3 dummy rows x (title + subtitle bones + the Delete ghost text bone)",
+  );
+  assert.ok(!hub.includes("Secret Meal"), "a loading MealsHubPage shows no real meal titles");
+  assert.ok(hub.includes("New meal"), "the create action stays rendered while loading");
+
+  const list = await renderToHtml(
+    React.createElement(ShoppingListPage, {
+      lines: [{ key: "l1", name: "Secret item", quantityLabel: "2 lb", isChecked: false }],
+      loading: true,
+      onToggleLine: noop,
+    }),
+  );
+  assert.equal(hiddenBones(list), 6, "3 dummy rows x (checkbox box + label) bones");
+  assert.ok(!list.includes("Secret item"), "a loading ShoppingListPage shows no real lines");
+  assert.ok(list.includes("Shopping list"), "the page title stays rendered while loading");
+
+  const listIdle = await renderToHtml(
+    React.createElement(ShoppingListPage, {
+      lines: [{ key: "l1", name: "Secret item", quantityLabel: "2 lb", isChecked: false }],
+      loading: false,
+      onToggleLine: noop,
+    }),
+  );
+  assert.equal(hiddenBones(listIdle), 0, "a non-loading ShoppingListPage renders no bones");
+  assert.ok(listIdle.includes("Secret item"), "a non-loading ShoppingListPage renders its lines");
+});
+
+test("T4 SSR: loading TagsPage renders skeleton rows, the create form stays live", async () => {
+  const { React } = await loadRuntime();
+  const { TagsPage } = await loadPages();
+  const noop = () => {};
+
+  const tags = await renderToHtml(
+    React.createElement(TagsPage, {
+      tags: [{ id: "t1", name: "SecretTag", color: "red" }],
+      loading: true,
+      name: "",
+      color: "red",
+      colorOptions: ["red", "green"],
+      onNameChange: noop,
+      onColorChange: noop,
+      onCreate: noop,
+      onDelete: noop,
+      onStartEdit: noop,
+    }),
+  );
+  assert.equal(
+    hiddenBones(tags),
+    9,
+    "3 dummy rows x (badge pill bone + Edit and Delete ghost text bones)",
+  );
+  assert.ok(!tags.includes("SecretTag"), "a loading TagsPage shows no real tag names");
+  assert.ok(tags.includes("Tag name"), "the create form stays rendered while loading");
+  assert.ok(tags.includes("Tags"), "the page title stays rendered while loading");
+});
+
+test("T4 SSR: the union pages' loading states render their skeleton compositions", async () => {
+  const { React } = await loadRuntime();
+  const { MealPlanDetailPage, PublicRecipePage, RecipeDetailPage } = await loadPages();
+
+  const plan = await renderToHtml(React.createElement(MealPlanDetailPage, { state: "loading" }));
+  assert.equal(
+    hiddenBones(plan),
+    15,
+    "title (1) + meta (3) + goals card (title 1 + 3 lines) + entries card (title 1 + 3 rows x 2)",
+  );
+  assert.match(plan, /aria-busy/, "a loading MealPlanDetailPage marks its regions busy");
+  assert.ok(plan.includes("Shopping list"), "the action row stays, as skeleton Buttons");
+
+  const pub = await renderToHtml(React.createElement(PublicRecipePage, { state: "loading" }));
+  assert.equal(
+    hiddenBones(pub),
+    17,
+    "hero (1) + title (1) + description (3) + stat band (6) + ingredients (4) + instructions (2)",
+  );
+  assert.ok(pub.includes("Ingredients"), "the section headings stay rendered while loading");
+  assert.ok(pub.includes("Instructions"), "the section headings stay rendered while loading");
+
+  const detail = await renderToHtml(React.createElement(RecipeDetailPage, { state: "loading" }));
+  assert.equal(
+    hiddenBones(detail),
+    25,
+    "skeleton toolbar (badge 1 + picker 1) + overview (hero 1 + title 1 + description 3 + stat band 6) + ingredients (4) + instructions (2) + cook history (3) + nutrition (3)",
+  );
+  assert.ok(detail.includes("Cook History"), "the section headings stay rendered while loading");
+  assert.ok(detail.includes("Nutrition"), "the section headings stay rendered while loading");
+});
+
+test("T4: RecipesPage's loading sections and footers render the skeleton rows", () => {
+  // RecipesPage cannot be SSR'd in this harness — it imports
+  // react-native through BoundedList, whose Flow-typed sources
+  // the Node loader cannot parse (the same reason the page's
+  // own contract tests are source scans) — so its wiring is
+  // pinned here at the source level; the skeleton rows it
+  // renders are the T1-verified DiscoveryCard loading state and
+  // the MediaRow-shaped composition below.
+  const code = readCode("src/pages/RecipesPage.tsx");
+  assert.match(code, /case "loadingOwn":\s*return <LoadingOwnRows \/>;/);
+  assert.match(code, /case "loadingOwnMore":\s*return <LoadingOwnRows \/>;/);
+  assert.match(
+    code,
+    /case "loadingDiscovery":\s*return <LoadingDiscoveryRows variant="section" \/>;/,
+  );
+  assert.match(
+    code,
+    /publicLoading \? \(\s*<LoadingDiscoveryRows \/>\s*\)/,
+    "the public web first load",
+  );
+  assert.match(
+    code,
+    /isFetchingNextPage \? <LoadingDiscoveryRows \/> : null/,
+    "the public web footer",
+  );
+  assert.match(
+    code,
+    /isFetchingNextPage && !discoveryLoadMoreErrorMessage \? <LoadingOwnRows \/> : null/,
+    "the signed-in web footer",
+  );
+  assert.match(
+    code,
+    /function LoadingOwnRows\(\) \{[\s\S]*?<BoxSkeleton width=\{64\} height=\{64\} \/>/,
+    "the own skeleton rows mirror MediaRow's 64dp thumbnail geometry",
+  );
+  assert.match(
+    code,
+    /function LoadingDiscoveryRows\([\s\S]*?<DiscoveryCard[\s\S]*?loading/,
+    "the discovery skeleton rows are DiscoveryCards in their loading state",
+  );
+  assert.match(
+    code,
+    /const LOADING_ROW_KEYS = \["loading-1", "loading-2", "loading-3"\] as const;/,
+    "exactly 3 dummy rows per loading section, from the frozen constant",
+  );
+});
+
 // #278 Tranche 3 — views: the data-bearing views take the same
 // explicit `loading` prop, read the internal LoadingScope,
 // render skeletons mirroring their loaded layout (actions kept

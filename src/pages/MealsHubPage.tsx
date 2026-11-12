@@ -1,16 +1,18 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { CardStack } from "../widgets/CardStack.js";
+import { Card } from "../widgets/Card.js";
 import { EmptyState } from "../widgets/EmptyState.js";
-import { Center } from "../widgets/Center.js";
-import { Spinner } from "../widgets/Spinner.js";
+import { LoadingScope } from "../contexts/LoadingScope.js";
 import { PinnedHeaderShell } from "../widgets/PinnedHeaderShell.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Tabs } from "../widgets/Tabs.js";
 import { Text } from "../widgets/Text.js";
 import { TextActionCardRow } from "../widgets/TextActionCardRow.js";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
+import { YStack } from "tamagui";
 
 /**
  * MealsHubPage (#125, B3b): the meals hub — the split view
@@ -41,13 +43,17 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * switch is reported as an intent (`onSelectTab`) — the
  * active tab is the screen's state, as today.
  *
- * States mirror the app view's swaps: while `loading`, the
- * centered Spinner (Center + Spinner) replaces the active
- * tab's list (the app renders its branded loader there; the
- * centered Spinner stands in — the
- * branded loader stays app-side by recorded decision); an
- * empty meals list renders the DS EmptyState with the app's
- * message. The plans tab's states are MealPlansPage's own.
+ * States: while `loading`, the active tab's list region
+ * renders skeleton rows (#278, tranche 4 — the centered-Spinner
+ * pattern is deleted): the hub chrome and the create action
+ * stay rendered, the meals tab renders exactly 3 dummy rows in
+ * the TextActionCardRow shape (title/subtitle bones in an
+ * elevated card, Delete kept as an inert ghost skeleton
+ * Button — a ghost Button skeletonizes as a text bone inside
+ * the loading scope), and an empty meals list renders the DS
+ * EmptyState with the app's message. The plans tab's states
+ * are MealPlansPage's own (its loading state skeletonizes the
+ * same way).
  *
  * Footer ownership (#410, adjusted on PR #413 review): the
  * hub owns the footer on BOTH tabs. On the plans tab the
@@ -101,6 +107,11 @@ export type MealsHubPageProps = {
   onDeleteMeal: (mealId: string) => void;
   onDeletePlan: (planId: string) => void;
 };
+
+// The dummy skeleton rows for the loading meals list (#278):
+// exactly 3, from a frozen module-level constant — never
+// generated per render (the CheckboxSelectList convention).
+const LOADING_MEAL_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
 export function MealsHubPage({
   activeTab,
@@ -175,9 +186,27 @@ export function MealsHubPage({
             New meal
           </Button>
           {loading ? (
-            <Center>
-              <Spinner label="Loading meals" />
-            </Center>
+            <LoadingScope active>
+              <CardStack>
+                {LOADING_MEAL_KEYS.map((key) => (
+                  <Card
+                    key={key}
+                    variant="elevated"
+                    flexDirection="row"
+                    alignItems="center"
+                    gap="$3"
+                  >
+                    <YStack flex={1} minWidth={0} gap="$1">
+                      <TextSkeleton size="md" lines={1} />
+                      <TextSkeleton size="sm" lines={1} />
+                    </YStack>
+                    <Button ghost size="sm" accessibilityLabel="Delete meal" onPress={() => {}}>
+                      Delete
+                    </Button>
+                  </Card>
+                ))}
+              </CardStack>
+            </LoadingScope>
           ) : meals.length === 0 ? (
             <EmptyState title="No meals yet." />
           ) : (

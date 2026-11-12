@@ -1,11 +1,9 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { CardStack } from "../widgets/CardStack.js";
-import { Center } from "../widgets/Center.js";
 import { EmptyState } from "../widgets/EmptyState.js";
 import { CardRow } from "../widgets/CardRow.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
-import { Spinner } from "../widgets/Spinner.js";
 import { Text } from "../widgets/Text.js";
 
 /**
@@ -50,10 +48,12 @@ import { Text } from "../widgets/Text.js";
  *   bounded-list structure to carry — #188's failure shape came
  *   from a virtualized list inside a fixed shell, and this screen
  *   has neither. The shell scrolls, like the app's ScreenScroll.
- * - Loading replaces the content (spinner in place of the list):
- *   the app swaps its content for a loading indicator, and unlike
- *   RecipesPage there are no filter inputs whose focus a tree swap
- *   would drop, so the swap is faithful here.
+ * - Loading skeletonizes the list region (#278, tranche 4):
+ *   the centered-Spinner pattern is deleted — the heading and
+ *   the create action stay rendered (they need no data) and the
+ *   list renders exactly 3 dummy CardRows in their loading
+ *   state, Delete kept as an inert skeleton Button when the
+ *   host wires it, exactly as the loaded rows render it.
  *
  * The app formats each row's `subtitle` (its meta line — entry
  * count with pluralization, the plan's date range, its nutrition
@@ -80,9 +80,8 @@ import { Text } from "../widgets/Text.js";
  * sets no styling props. The plan row is the generic CardRow
  * widget in its link form (its card layout, link area, and action
  * treatment live there; the page supplies the plan content, the
- * plan's href, and the Delete action), the list stacks in a
- * CardStack, and the loading block centers its spinner in a
- * Center.
+ * plan's href, and the Delete action), and the list stacks in a
+ * CardStack.
  */
 
 /** One meal plan row's view-model. The app formats `subtitle` (its
@@ -103,8 +102,8 @@ export type MealPlansPageProps = {
   footer?: BigFooterData;
   /** Meal plans to render, in the app's order. */
   plans: MealPlansPageItem[];
-  /** Load in flight: the spinner renders in place of the list,
-   * mirroring the app's content swap (see the header). */
+  /** Load in flight: the list region renders skeleton rows
+   * (see the header's loading note). */
   loading: boolean;
   /** Optional: the "New meal plan" action renders only when the
    * href is provided (#248: it navigates, so it is a link). */
@@ -125,6 +124,11 @@ export type MealPlansPageProps = {
  * the plan list in a scrolling shell. Controlled — see the file
  * header for the contract and the screen inventory it mirrors.
  */
+// The dummy skeleton rows for the loading list (#278): exactly
+// 3, from a frozen module-level constant — never generated per
+// render (the CheckboxSelectList convention).
+const LOADING_PLAN_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
 export function MealPlansPage({
   plans,
   loading,
@@ -141,9 +145,24 @@ export function MealPlansPage({
         </Text>
         {createHref ? <Button href={createHref}>New meal plan</Button> : null}
         {loading ? (
-          <Center>
-            <Spinner label="Loading" />
-          </Center>
+          <CardStack>
+            {LOADING_PLAN_KEYS.map((key) => (
+              <CardRow
+                key={key}
+                title="Meal plan"
+                subtitle="Meal plan details"
+                onPress={() => {}}
+                loading
+                {...(onPlanDelete
+                  ? {
+                      actionLabel: "Delete",
+                      actionTone: "danger" as const,
+                      onActionPress: () => {},
+                    }
+                  : {})}
+              />
+            ))}
+          </CardStack>
         ) : plans.length === 0 ? (
           <EmptyState title="No meal plans yet." />
         ) : (

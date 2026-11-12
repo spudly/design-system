@@ -145,25 +145,25 @@ test("the three fixed-shell list pages render BoundedList", () => {
 test("the retired loading slot helpers stay retired (#119 dedupe)", () => {
   assert.ok(
     !code.includes("BoundedListLoading"),
-    "BoundedListLoading/BoundedListLoadingMore were this tranche's local helpers — the dedupe retired them for the shared Center + Spinner composition and they must not come back",
+    "BoundedListLoading/BoundedListLoadingMore were this tranche's local helpers — the dedupe retired them and they must not come back (the loading rows are now the page's skeleton compositions, #278)",
   );
 });
 
-test("RecipesPage renders its loading slots through Center + Spinner directly (#119)", () => {
+test("RecipesPage renders its loading slots as skeleton rows (#278 tranche 4)", () => {
   const page = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
   // Since #415 the loading slots are the two sections' own
   // rows in the unified list (each section loads independently)
-  // plus the shared loading-more footer.
+  // plus the shared loading-more footer. Since #278 tranche 4
+  // they render skeleton rows, not a centered Spinner.
+  assert.match(page, /case "loadingOwn":\s*return <LoadingOwnRows \/>;/);
   assert.match(
     page,
-    /case "loadingOwn":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
+    /case "loadingDiscovery":\s*return <LoadingDiscoveryRows variant="section" \/>;/,
   );
-  assert.match(
-    page,
-    /case "loadingDiscovery":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
-  );
-  assert.match(
-    page,
-    /isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\) : undefined/,
+  assert.match(page, /isFetchingNextPage \? <LoadingDiscoveryRows \/> : undefined/);
+  const pageCode = page.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  assert.ok(
+    !pageCode.includes("Spinner"),
+    "the catalog's loading states render skeletons, not a Spinner (#278)",
   );
 });

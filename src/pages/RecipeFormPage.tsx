@@ -18,7 +18,7 @@ import { LabeledField } from "../widgets/LabeledField.js";
 import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { RevertAction } from "../views/RevertAction.js";
 import { ScrollRegion } from "../widgets/ScrollRegion.js";
-import { Spinner } from "../widgets/Spinner.js";
+import { TagList } from "../widgets/TagList.js";
 import { TextAreaField } from "../views/TextAreaField.js";
 import { TextField } from "../views/TextField.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
@@ -48,9 +48,12 @@ import { Badge } from "../widgets/Badge.js";
  *   components are retired), and the tag selector is a row of
  *   selectable Badges (Badge's selectable form — a tag renders as
  *   a Badge, including when it selects). Tag loading
- *   crosses as `loadingTags` — the
- *   view renders the DS Spinner where the app renders its branded
- *   loader (the branded loader stays app-side by recorded decision).
+ *   crosses as `loadingTags` — while it is set, the tag row
+ *   renders TagList's loading state (#278, tranche 4: exactly
+ *   3 dummy pill skeletons at the Badge pill geometry, the
+ *   region marked busy) instead of the selectable Badges; the
+ *   rest of the form — user input, not loaded content — stays
+ *   live.
  * - Version-diff presentation is view-model data: the host computes
  *   which fields changed (`changedFields`), the pre-formatted
  *   revert hint for each (`revertLabels`), and the changed-list
@@ -431,7 +434,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
             }
           >
             {loadingTags ? (
-              <Spinner label="Loading tags" />
+              <TagList tags={[]} loading />
             ) : (
               <ButtonRow>
                 {tagOptions.map((option) => (

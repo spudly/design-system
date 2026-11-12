@@ -68,7 +68,7 @@ const pageStories = readCode(join(pagesDir, "DiscoverPage.stories.tsx"));
 // The page's internals moved into shared components in the #119
 // de-styling tranche, canonized in the #320 dedupe: the filter
 // bar is CatalogFiltersBar, the list header is CatalogHeader,
-// and the list's loading state is a centered Spinner (Center + Spinner); the error
+// and the list's loading state is skeleton cards (#278 tranche 4); the error
 // state renders Alert directly (the ListErrorState middleman was
 // removed in #320 — Stephen's no-middleman ruling). The scans
 // below follow the code — the bar's decisions pin against the
@@ -101,8 +101,8 @@ test("the page contract carries copy in and the error state (decision 3)", () =>
   );
   assert.match(
     unified,
-    /<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>/,
-    "loading renders the centered spinner state",
+    /publicLoading \? \(\s*<LoadingDiscoveryRows \/>\s*\)/,
+    "loading renders skeleton cards (#278 tranche 4)",
   );
   assert.match(
     page,
@@ -255,7 +255,7 @@ test("the title renders as the page heading and pagination rides the shared cata
   );
   assert.match(
     unified,
-    /isFetchingNextPage \? \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\)/,
+    /isFetchingNextPage \? <LoadingDiscoveryRows \/>/,
     "the loading-more footer keys off isFetchingNextPage",
   );
 });

@@ -75,6 +75,7 @@ type FormOverrides = Partial<
     | "instructionsChangedLabel"
     | "isSubmitting"
     | "submitError"
+    | "loadingTags"
   >
 >;
 
@@ -93,7 +94,9 @@ function FormHarness({
   const [status, setStatus] = useState(fixture.status);
   const [tagIds, setTagIds] = useState<string[]>(empty ? [] : fixture.tagIds);
   const [imageUri, setImageUri] = useState<string | null>(empty ? null : storyImageWide);
-  const [ingredients, setIngredients] = useState<RecipeIngredientRow[]>(empty ? [] : ingredientRows);
+  const [ingredients, setIngredients] = useState<RecipeIngredientRow[]>(
+    empty ? [] : ingredientRows,
+  );
   // Monotonic key counters for added rows: deriving a key from the
   // current row count would reuse a removed row's key on a later add.
   const addedIngredientCount = useRef(0);
@@ -148,7 +151,12 @@ function FormHarness({
         onAdd: () => {
           setIngredients((prev) => [
             ...prev,
-            { key: `added-${(addedIngredientCount.current += 1)}`, quantity: "", unit: "", name: "" },
+            {
+              key: `added-${(addedIngredientCount.current += 1)}`,
+              quantity: "",
+              unit: "",
+              name: "",
+            },
           ]);
         },
         renderDragHandle: (_row, index) => dragHandle(`Reorder ingredient ${index + 1}`),
@@ -162,7 +170,10 @@ function FormHarness({
           setInstructions((prev) => prev.filter((r) => r.key !== key));
         },
         onAdd: () => {
-          setInstructions((prev) => [...prev, { key: `added-${(addedInstructionCount.current += 1)}`, body: "" }]);
+          setInstructions((prev) => [
+            ...prev,
+            { key: `added-${(addedInstructionCount.current += 1)}`, body: "" },
+          ]);
         },
         renderDragHandle: (_row, index) => dragHandle(`Reorder step ${index + 1}`),
       }}
@@ -217,5 +228,33 @@ export const VersionDiff: Story = {
         instructionsChangedLabel="Instructions changed from parent version (4 steps)"
       />
     </Viewport>
+  ),
+};
+
+export const LoadingTags: Story = {
+  render: () => (
+    <Viewport>
+      <FormHarness submitLabel="Create Recipe" loadingTags />
+    </Viewport>
+  ),
+};
+
+// The overlay verifies the tag-pill skeletons reproduce the loaded tag row's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <View width={430} maxWidth="100%" height={844} position="relative">
+      <FormHarness submitLabel="Create Recipe" />
+      <View
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <FormHarness submitLabel="Create Recipe" loadingTags />
+      </View>
+    </View>
   ),
 };

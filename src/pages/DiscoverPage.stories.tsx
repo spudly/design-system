@@ -193,3 +193,23 @@ export const WithFiltersAdded: Story = {
   // remaining filters stay collapsed behind the button.
   render: () => <DiscoverPageDemo initialActiveFilters={["ingredient", "sort"]} />,
 };
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <View position="relative">
+      <DiscoverPageDemo />
+      <View
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <DiscoverPageDemo loading recipes={[]} />
+      </View>
+    </View>
+  ),
+};

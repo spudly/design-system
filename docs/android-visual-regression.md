@@ -299,12 +299,12 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-authconfirmationpage         | light_warmHarvest |       2 |         2 |
 | pages-eciperay-consentpreferencespage       | light_warmHarvest |       2 |         2 |
 | pages-eciperay-cookingmodepage              | light_warmHarvest |       3 |         3 |
-| pages-eciperay-discoverpage                 | light_warmHarvest |       8 |         8 |
+| pages-eciperay-discoverpage                 | light_warmHarvest |       9 |         8 |
 | pages-eciperay-editrecipepage               | light_warmHarvest |       1 |         1 |
 | pages-eciperay-editversionpage              | light_warmHarvest |       2 |         2 |
 | pages-eciperay-feedbackpage                 | light_warmHarvest |       2 |         2 |
 | pages-eciperay-forgotpasswordpage           | light_warmHarvest |       3 |         3 |
-| pages-eciperay-homepage                     | light_warmHarvest |       3 |         3 |
+| pages-eciperay-homepage                     | light_warmHarvest |       4 |         3 |
 | pages-eciperay-importimagepage              | light_warmHarvest |       1 |         1 |
 | pages-eciperay-importreviewpage             | light_warmHarvest |       2 |         2 |
 | pages-eciperay-importtextpage               | light_warmHarvest |       2 |         2 |
@@ -315,23 +315,23 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-mealcookingmodepage          | light_warmHarvest |       5 |         5 |
 | pages-eciperay-mealdetailpage               | light_warmHarvest |       3 |         3 |
 | pages-eciperay-mealformpage                 | light_warmHarvest |       4 |         4 |
-| pages-eciperay-mealplandetailpage           | light_warmHarvest |       6 |         6 |
+| pages-eciperay-mealplandetailpage           | light_warmHarvest |       7 |         6 |
 | pages-eciperay-mealplanformpage             | light_warmHarvest |       2 |         2 |
-| pages-eciperay-mealplanspage                | light_warmHarvest |       4 |         4 |
-| pages-eciperay-mealshubpage                 | light_warmHarvest |       4 |         4 |
+| pages-eciperay-mealplanspage                | light_warmHarvest |       5 |         4 |
+| pages-eciperay-mealshubpage                 | light_warmHarvest |       5 |         4 |
 | pages-eciperay-paypage                      | light_warmHarvest |       5 |         5 |
 | pages-eciperay-profilepage                  | light_warmHarvest |       2 |         2 |
-| pages-eciperay-publicrecipepage             | light_warmHarvest |       9 |         8 |
-| pages-eciperay-recipedetailpage             | light_warmHarvest |      11 |        11 |
-| pages-eciperay-recipeformpage               | light_warmHarvest |       4 |         4 |
-| pages-eciperay-recipespage                  | light_warmHarvest |      13 |        13 |
-| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      13 |        13 |
+| pages-eciperay-publicrecipepage             | light_warmHarvest |      10 |         8 |
+| pages-eciperay-recipedetailpage             | light_warmHarvest |      12 |        11 |
+| pages-eciperay-recipeformpage               | light_warmHarvest |       6 |         4 |
+| pages-eciperay-recipespage                  | light_warmHarvest |      14 |        13 |
+| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      14 |        13 |
 | pages-eciperay-resetpasswordpage            | light_warmHarvest |       2 |         2 |
 | pages-eciperay-routeerrorpage               | light_warmHarvest |       2 |         2 |
-| pages-eciperay-shoppinglistpage             | light_warmHarvest |       3 |         3 |
+| pages-eciperay-shoppinglistpage             | light_warmHarvest |       4 |         3 |
 | pages-eciperay-signinpage                   | light_warmHarvest |       4 |         4 |
 | pages-eciperay-signuppage                   | light_warmHarvest |       4 |         4 |
-| pages-eciperay-tagspage                     | light_warmHarvest |       4 |         4 |
+| pages-eciperay-tagspage                     | light_warmHarvest |       5 |         4 |
 | pages-memorize                              | light_quietDawn   |       4 |         4 |
 | pages-memorize-memorizationsessionpage      | light_quietDawn   |       5 |         5 |
 | pages-memorize-memorizereviewpage           | light_quietDawn   |       2 |         2 |
@@ -339,7 +339,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-tabbedshellpage              | light_quietDawn   |       6 |         6 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **181** |   **180** |
+| **Total**                                   |                   | **194** |   **180** |
 
 <!-- VR-COVERAGE-END -->
 

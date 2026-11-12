@@ -11,10 +11,10 @@ import { CatalogFiltersBar, type CatalogFilterDefinition } from "../views/Catalo
 import { CatalogHeader } from "../views/CatalogHeader.js";
 import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
 import { EmptyState } from "../widgets/EmptyState.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { LinkOverlay } from "../widgets/linkOverlay.js";
-import { Center } from "../widgets/Center.js";
-import { Spinner } from "../widgets/Spinner.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import type { SelectOption } from "../widgets/SelectField.js";
 import { Text } from "../widgets/Text.js";
@@ -95,9 +95,15 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  *   list's header so it scrolls with the recipes instead of
  *   pinning above a sliver of list. The list — and therefore
  *   the focused filter input — stays mounted while either
- *   section loads; each section's spinner renders as that
- *   section's row in the list (a centered Spinner), never as a
- *   tree swap.
+ *   section loads; each section's loading state renders as
+ *   that section's rows in the list — skeleton rows, never as
+ *   a tree swap (#278, tranche 4: the centered-Spinner pattern
+ *   is deleted; a loading section renders exactly 3 dummy
+ *   rows in its own row shape — MediaRow-shaped card bones for
+ *   the own section, DiscoveryCards in their loading state
+ *   for discovery and the public catalog — and a section's
+ *   next-page fetch renders the same dummy rows where the
+ *   incoming rows will land).
  * - #162: search uses the DS SearchField as-is. No lineHeight
  *   is set on any glyph or text in this file — the SearchField's
  *   own glyph box is the containment for that failure (see
@@ -179,7 +185,8 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  * data and callbacks only. The layout it used to hand-style
  * lives in the components it renders: BoundedList (the bounded
  * list, its content inset, the 12px row separation),
- * Center + Spinner (the loading states), CatalogFiltersBar
+ * the skeleton loading rows (the loading states, #278),
+ * CatalogFiltersBar
  * (the shared catalog filter bar — the page supplies its
  * filter definitions as data; the bar owns the control design),
  * SectionHeading (the section titles), DiscoveryCard (the
@@ -315,7 +322,7 @@ export type RecipesPageProps = {
    * the app under the page's one search/filter state. */
   ownRecipes?: RecipesPageItem[];
   /** Own section's first load in flight: the section renders
-   * its spinner row; the discovery section is unaffected. */
+   * skeleton rows (#278); the discovery section is unaffected. */
   loadingOwn?: boolean;
   /** The own section's failed-load message, composed by the
    * app; null/absent renders no error state. A failure here
@@ -345,7 +352,7 @@ export type RecipesPageProps = {
    * inert. */
   discoveryRecipes?: RecipesPageDiscoveryItem[];
   /** Discovery section's first load in flight: the section
-   * renders its spinner row; the own section is unaffected.
+   * renders skeleton rows (#278); the own section is unaffected.
    * Defaults to false when the section is supplied. */
   loadingDiscovery?: boolean;
   /** The discovery section's failed-load message, composed by
@@ -361,8 +368,8 @@ export type RecipesPageProps = {
    * `discoveryEmptyTitle`. */
   discoveryEmptyBody?: string;
 
-  /** Discovery next page in flight: a spinner renders as the
-   * list footer, and it is the shared pagination pattern's only
+  /** Discovery next page in flight: skeleton rows render as
+   * the list footer, and it is the shared pagination pattern's only
    * fetch signal (see useCatalogPagination, #285): while it is
    * set the end-reached handler swallows duplicate requests,
    * and when a fetch completes having added no new visible rows
@@ -1067,11 +1074,7 @@ export function RecipesPage(props: RecipesPageProps) {
         );
       }
       case "loadingOwn":
-        return (
-          <Center>
-            <Spinner label="Loading" />
-          </Center>
-        );
+        return <LoadingOwnRows />;
       case "ownError":
         return <Alert severity="error">{row.message}</Alert>;
       case "ownEmpty":
@@ -1079,11 +1082,7 @@ export function RecipesPage(props: RecipesPageProps) {
           <EmptyState title={ownEmptyTitle} {...(ownEmptyBody ? { body: ownEmptyBody } : {})} />
         );
       case "loadingOwnMore":
-        return (
-          <Center>
-            <Spinner label="Loading" />
-          </Center>
-        );
+        return <LoadingOwnRows />;
       case "ownLoadMoreError":
         return (
           <Alert
@@ -1130,11 +1129,7 @@ export function RecipesPage(props: RecipesPageProps) {
           />
         );
       case "loadingDiscovery":
-        return (
-          <Center>
-            <Spinner label="Loading" />
-          </Center>
-        );
+        return <LoadingDiscoveryRows variant="section" />;
       case "discoveryError":
         return <Alert severity="error">{row.message}</Alert>;
       case "discoveryEmpty":
@@ -1160,6 +1155,17 @@ export function RecipesPage(props: RecipesPageProps) {
     />
   );
 
+  // The signed-in catalog renders the bar bare (the public
+  // variant wraps it in CatalogHeader, inside a gapped column):
+  // the bar's wrapper carries the $3 bottom separation every
+  // list row carries under itself (the rows' paddingBlockEnd
+  // rhythm), so the first section heading sits the list's
+  // 12px below the search bar instead of flush against it.
+  // Both signed-in layouts (the web column and the native
+  // list's header) render this one composition, so the
+  // separation holds in the loaded and loading states alike.
+  const filtersHeader = <YStack paddingBlockEnd="$3">{filtersBar}</YStack>;
+
   if (variant === "public") {
     const publicItems: DiscoverPageItem[] = publicLoading ? [] : (publicRecipes ?? []);
     if (isWeb) {
@@ -1172,9 +1178,7 @@ export function RecipesPage(props: RecipesPageProps) {
             <YStack paddingHorizontal="$4" paddingBottom="$8" gap="$3">
               <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
               {publicLoading ? (
-                <Center>
-                  <Spinner label="Loading" />
-                </Center>
+                <LoadingDiscoveryRows />
               ) : publicErrorMessage ? (
                 <Alert severity="error">{publicErrorMessage}</Alert>
               ) : publicItems.length === 0 ? (
@@ -1190,11 +1194,7 @@ export function RecipesPage(props: RecipesPageProps) {
                   />
                 ))
               )}
-              {isFetchingNextPage ? (
-                <Center>
-                  <Spinner label="Loading" />
-                </Center>
-              ) : null}
+              {isFetchingNextPage ? <LoadingDiscoveryRows /> : null}
               <WebScrollSentinel
                 sections={[
                   {
@@ -1234,22 +1234,14 @@ export function RecipesPage(props: RecipesPageProps) {
             )}
             ListEmptyComponent={
               publicLoading ? (
-                <Center>
-                  <Spinner label="Loading" />
-                </Center>
+                <LoadingDiscoveryRows />
               ) : publicErrorMessage ? (
                 <Alert severity="error">{publicErrorMessage}</Alert>
               ) : (
                 <EmptyState title={publicEmptyMessage} />
               )
             }
-            ListFooterComponent={
-              isFetchingNextPage ? (
-                <Center>
-                  <Spinner label="Loading" />
-                </Center>
-              ) : undefined
-            }
+            ListFooterComponent={isFetchingNextPage ? <LoadingDiscoveryRows /> : undefined}
             onEndReached={publicPagination.onEndReached}
             onScroll={publicPagination.onScroll}
             onEndReachedThreshold={publicPagination.onEndReachedThreshold}
@@ -1276,15 +1268,11 @@ export function RecipesPage(props: RecipesPageProps) {
       <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
           <YStack paddingHorizontal="$4" paddingBottom="$8">
-            {filtersBar}
+            {filtersHeader}
             {rows.map((row) => (
               <YStack key={recipesPageRowKey(row)}>{renderRow(row)}</YStack>
             ))}
-            {isFetchingNextPage && !discoveryLoadMoreErrorMessage ? (
-              <Center>
-                <Spinner label="Loading" />
-              </Center>
-            ) : null}
+            {isFetchingNextPage && !discoveryLoadMoreErrorMessage ? <LoadingOwnRows /> : null}
             <WebScrollSentinel
               sections={[
                 {
@@ -1328,7 +1316,7 @@ export function RecipesPage(props: RecipesPageProps) {
           // flips a section's loading flag and a tree swap would
           // unmount the focused filter input mid-typing; the loading
           // indicators render as the sections' own rows instead.
-          ListHeaderComponent={filtersBar}
+          ListHeaderComponent={filtersHeader}
           renderItem={({ item: row }) => renderRow(row)}
           onEndReached={handleListEndReached}
           onScroll={handleListScroll}
@@ -1336,11 +1324,7 @@ export function RecipesPage(props: RecipesPageProps) {
           onLayout={handleListLayout}
           onContentSizeChange={handleListContentSizeChange}
           ListFooterComponent={
-            isFetchingNextPage && !discoveryLoadMoreErrorMessage ? (
-              <Center>
-                <Spinner label="Loading" />
-              </Center>
-            ) : undefined
+            isFetchingNextPage && !discoveryLoadMoreErrorMessage ? <LoadingOwnRows /> : undefined
           }
         />
       </ScreenContainer>
@@ -1373,6 +1357,76 @@ export function RecipesPage(props: RecipesPageProps) {
 // nothing changes — the basis is below the width the block already
 // gets, so it still just expands.
 const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
+
+// The dummy skeleton rows for a loading section (#278,
+// tranche 4): exactly 3 per section, from a frozen module-level
+// constant — never generated per render (the
+// CheckboxSelectList convention).
+const LOADING_ROW_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
+
+/**
+ * A loading own section's rows: 3 dummy rows in the MediaRow
+ * shape — an elevated card holding a 64dp box bone where the
+ * thumbnail sits and title/subtitle bones at the row's text
+ * sizes, the region marked busy, no link and no real content.
+ * MediaRow itself is a page-local composition with no loading
+ * state, so its skeleton is composed here in its shape.
+ */
+function LoadingOwnRows() {
+  return (
+    <>
+      {LOADING_ROW_KEYS.map((key) => (
+        <YStack key={key} paddingBlockEnd="$3">
+          <Card
+            variant="elevated"
+            flexDirection="row"
+            flexWrap="wrap"
+            alignItems="center"
+            gap="$3"
+            {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+          >
+            <BoxSkeleton width={64} height={64} />
+            <YStack style={textBlockStyle} gap="$1">
+              <TextSkeleton size="md" lines={1} />
+              <TextSkeleton size="sm" lines={1} />
+            </YStack>
+          </Card>
+        </YStack>
+      ))}
+    </>
+  );
+}
+
+/**
+ * A loading discovery/public section's rows: 3 DiscoveryCards
+ * in their loading state (the widget's own skeleton — thumbnail
+ * box and text bones in the card's geometry, no link). The
+ * `section` variant is the unified list's form, where each card
+ * sits in the discovery row's padded wrapper; the `standalone`
+ * variant is the public catalog's own layouts, where the cards
+ * render bare in the column's gap rhythm.
+ */
+function LoadingDiscoveryRows({ variant = "standalone" }: { variant?: "section" | "standalone" }) {
+  return (
+    <>
+      {LOADING_ROW_KEYS.map((key) =>
+        variant === "section" ? (
+          <YStack key={key} paddingBlockEnd="$3">
+            <DiscoveryCard title="Recipe" subtitle="Recipe details" href="/loading" loading />
+          </YStack>
+        ) : (
+          <DiscoveryCard
+            key={key}
+            title="Recipe"
+            subtitle="Recipe details"
+            href="/loading"
+            loading
+          />
+        ),
+      )}
+    </>
+  );
+}
 
 type MediaRowProps = {
   /** Row detail href. Both the media and the title/subtitle

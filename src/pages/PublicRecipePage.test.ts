@@ -65,9 +65,10 @@ test("error states live inside the props union, branched before the ready render
   }
   assert.match(
     code,
-    /<Center fill>\s*<Spinner label="Loading recipe" \/>\s*<\/Center>/,
-    "the loading state renders a centered DS Spinner (Center + Spinner)",
+    /<LoadingScope active>[\s\S]*?<StatBand loading>/,
+    "the loading state renders the skeleton composition in a LoadingScope (#278 tranche 4)",
   );
+  assert.ok(!code.includes("Spinner"), "the loading state renders skeletons, not a Spinner (#278)");
   assert.match(code, /<MessageCard title=\{NOT_FOUND_TITLE\} message=\{NOT_FOUND_MESSAGE\} \/>/);
   assert.match(
     code,
@@ -87,15 +88,25 @@ test("the error copy is the web surface's verbatim copy", () => {
 });
 
 test("single scroll, no tabs: the sections render in tab order inside one ScrollShell", () => {
+  // Scoped to the ready render: the loading state is a separate
+  // union branch with its own skeleton composition inside its
+  // own shell (#278 tranche 4, pinned in skeletonLoading.test.ts
+  // T4) — the single-scroll invariant below is the ready
+  // layout's, as it was when only the ready branch rendered
+  // sections.
+  const readyCode = code.replace(
+    /if \(props\.state === "loading"\) \{[\s\S]*?(?=if \(props\.state === "notFound"\))/,
+    "",
+  );
   assert.equal(
     code.split("<ScrollView").length - 1,
     0,
     "the page renders no ScrollView of its own: ScrollShell owns the page's single scroll",
   );
   assert.equal(
-    code.split("<ScrollShell").length - 1,
+    readyCode.split("<ScrollShell").length - 1,
     1,
-    "exactly one ScrollShell: the page's single section scroll",
+    "exactly one ScrollShell: the ready page's single section scroll",
   );
   assert.match(
     scrollShellCode,
@@ -117,12 +128,12 @@ test("single scroll, no tabs: the sections render in tab order inside one Scroll
   ];
   let lastAt = -1;
   for (const marker of sequence) {
-    const at = code.indexOf(marker);
+    const at = readyCode.indexOf(marker);
     assert.ok(at > lastAt, `sections must render in tab order: ${marker} after the previous one`);
     lastAt = at;
   }
-  const scrollAt = code.indexOf("<ScrollShell");
-  assert.ok(code.indexOf("<CtaBar") > scrollAt, "the sections render inside the scroll shell");
+  const scrollAt = readyCode.indexOf("<ScrollShell");
+  assert.ok(readyCode.indexOf("<CtaBar") > scrollAt, "the sections render inside the scroll shell");
 });
 
 test("the CTA bar switches on the auth-state variant with verbatim labels", () => {

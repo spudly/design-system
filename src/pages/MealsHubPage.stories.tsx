@@ -99,3 +99,45 @@ export const Loading: Story = {
     </Viewport>
   ),
 };
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <View width={430} maxWidth="100%" height={844} position="relative">
+      <MealsHubPage
+        footer={eciperayFooterFixture}
+        activeTab="meals"
+        onSelectTab={() => undefined}
+        meals={mealsHubFixture.meals}
+        plans={mealsHubFixture.plans}
+        loading={false}
+        createMealHref="/meals/new"
+        createPlanHref="/meal-plans/new"
+        onDeleteMeal={() => undefined}
+        onDeletePlan={() => undefined}
+      />
+      <View
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <MealsHubPage
+          footer={eciperayFooterFixture}
+          activeTab="meals"
+          onSelectTab={() => undefined}
+          meals={mealsHubFixture.meals}
+          plans={mealsHubFixture.plans}
+          loading
+          createMealHref="/meals/new"
+          createPlanHref="/meal-plans/new"
+          onDeleteMeal={() => undefined}
+          onDeletePlan={() => undefined}
+        />
+      </View>
+    </View>
+  ),
+};

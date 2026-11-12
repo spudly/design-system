@@ -398,3 +398,23 @@ export const OwnLoadMoreWhileDiscoveryError: Story = {
     />
   ),
 };
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <View position="relative">
+      <RecipesPageDemo />
+      <View
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <RecipesPageDemo loadingOwn loadingDiscovery ownRecipes={[]} discoveryRecipes={[]} />
+      </View>
+    </View>
+  ),
+};

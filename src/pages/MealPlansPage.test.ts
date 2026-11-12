@@ -133,7 +133,12 @@ test("loading swaps content before the empty and list branches", () => {
   assert.ok(loadingAt !== -1, "the loading branch must key off loading");
   assert.ok(emptyAt > loadingAt, "the empty branch must follow the loading branch");
   assert.ok(listAt > emptyAt, "the list branch must follow the empty branch");
-  assert.match(code, /<Spinner label="Loading" \/>/, "loading must render the Spinner");
+  assert.match(
+    code,
+    /<CardRow[\s\S]*?loading/,
+    "loading must render skeleton CardRows (#278 tranche 4)",
+  );
+  assert.ok(!code.includes("Spinner"), "loading renders skeletons, not a Spinner (#278)");
   assert.match(
     code,
     /<EmptyState title="No meal plans yet\." \/>/,
@@ -190,13 +195,13 @@ test("the page carries no styling of its own (#119)", () => {
   ]) {
     assert.ok(
       !code.includes(banned),
-      `MealPlansPage must not contain "${banned}" — layout and text treatments live in CardRow / CardStack / Center / Text since the #119 tranche-2 fix`,
+      `MealPlansPage must not contain "${banned}" — layout and text treatments live in CardRow / CardStack / Text since the #119 tranche-2 fix`,
     );
   }
   assert.match(code, /<CardStack>/, "the plan list must stack in a CardStack");
   assert.match(
     code,
-    /<Center>/,
-    "the loading block must render in a Center (the dedicated centering component)",
+    /LOADING_PLAN_KEYS\.map/,
+    "the loading block must render its dummy skeleton rows from the frozen key constant (#278 tranche 4)",
   );
 });

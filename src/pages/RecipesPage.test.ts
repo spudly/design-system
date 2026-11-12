@@ -141,12 +141,13 @@ describe("recipesPageBoundedList", () => {
     );
   });
 
-  test("loading keeps the list mounted and shows the spinner as the section's own row", () => {
+  test("loading keeps the list mounted and shows skeleton rows as the section's own rows", () => {
     // Since #415 the list's data is the unified row sequence: a
     // section's loading flag swaps only that section's rows for
-    // its spinner row — the DATA is never emptied and the list
+    // its skeleton rows — the DATA is never emptied and the list
     // never unmounts, so the focused filter input survives a
     // filter edit mid-typing (the #188 rule, per-section now).
+    // Since #278 tranche 4 the rows are skeletons, not spinners.
     assert.match(
       code,
       /data=\{rows\}/,
@@ -154,13 +155,13 @@ describe("recipesPageBoundedList", () => {
     );
     assert.match(
       code,
-      /case "loadingOwn":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
-      "the own section's spinner renders as that section's row in the list",
+      /case "loadingOwn":\s*return <LoadingOwnRows \/>;/,
+      "the own section's skeleton rows render as that section's rows in the list",
     );
     assert.match(
       code,
-      /case "loadingDiscovery":\s*return \(\s*<Center>\s*<Spinner label="Loading" \/>\s*<\/Center>\s*\);/,
-      "the discovery section's spinner renders as that section's row in the list",
+      /case "loadingDiscovery":\s*return <LoadingDiscoveryRows variant="section" \/>;/,
+      "the discovery section's skeleton rows render as that section's rows in the list",
     );
     assert.match(
       code,
@@ -169,8 +170,13 @@ describe("recipesPageBoundedList", () => {
     );
     assert.match(
       code,
-      /ListHeaderComponent=\{filtersBar\}/,
+      /ListHeaderComponent=\{filtersHeader\}/,
       "the one filter bar renders as the native list's header, so it scrolls with the recipes (web renders it in page flow, #547)",
+    );
+    assert.match(
+      code,
+      /const filtersHeader = <YStack paddingBlockEnd="\$3">\{filtersBar\}<\/YStack>;/,
+      "the bar's wrapper carries the $3 bottom separation, so the first section heading sits the list's 12px below the search bar in both layouts",
     );
   });
 
@@ -809,9 +815,9 @@ describe("recipesPageUnified", () => {
       "the discovery empty row carries the caller's discovery copy",
     );
     assert.equal(
-      count(code, '<Spinner label="Loading" />'),
-      9,
-      "nine spinner renders (#547): the two sections' loading rows, the own load-more row, the native loading-more footer, the web loading-more row, and the public mode's web/native loading + loading-more states",
+      count(code, "<Spinner"),
+      0,
+      "no spinner renders (#278 tranche 4): every loading state — the two sections' loading rows, the own load-more row, the native loading-more footer, the web loading-more row, and the public mode's web/native loading + loading-more states — renders skeleton rows",
     );
   });
 
