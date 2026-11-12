@@ -4,6 +4,14 @@ import { Alert } from "../widgets/Alert.js";
 import { Button } from "../widgets/Button.js";
 import { ChangedListBanner } from "../views/ChangedListBanner.js";
 import { RecipeImageView, type RecipeImageViewProps } from "../views/RecipeImageView.js";
+import {
+  RecipeIngredientListView,
+  type RecipeIngredientListViewProps,
+} from "../views/RecipeIngredientListView.js";
+import {
+  RecipeInstructionListView,
+  type RecipeInstructionListViewProps,
+} from "../views/RecipeInstructionListView.js";
 import { FieldColumns } from "../widgets/FieldColumns.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { LabeledField } from "../widgets/LabeledField.js";
@@ -59,11 +67,21 @@ import { Badge } from "../widgets/Badge.js";
  *   the data prop; it receives the same revert affordance as
  *   its argument — the app field renders that node in its
  *   header row, exactly where the app form puts it today.
- *   The sortable ingredient / instruction lists stay render
- *   slots (the #124 Option A interim: the lists are built
- *   app-side on drag libraries with no cross-platform
- *   equivalent in the DS); the list slots take no argument
- *   (the #49 `renderComments` shape). While `contentLocked`
+ * - The sortable lists render from props the same way: the
+ *   `ingredients` / `instructions` data props carry the list
+ *   views' contracts (the settled #124 row view-models plus
+ *   field-change / add / remove intents), and the page renders
+ *   RecipeIngredientListView / RecipeInstructionListView from
+ *   them. Stephen's 2026-11-09 boundary on #130 governs the
+ *   split: the DS owns the row views and the list chrome; the
+ *   hosts keep their drag containers (dnd-kit on web,
+ *   DraggableFlatList on native) and bind the handle through
+ *   the views' `renderDragHandle` — no drag library enters
+ *   the DS, and a reorder crosses back as a new rows array.
+ *   `renderIngredientsSection` / `renderInstructionsSection`
+ *   remain as fallbacks for hosts that have not adopted the
+ *   data props; the list slots take no argument (the #49
+ *   `renderComments` shape). While `contentLocked`
  *   is set, the list slots are not rendered at all and the
  *   lock notice renders in their place — the app's behavior
  *   on the active version.
@@ -100,6 +118,14 @@ export type RecipeFormPageOption = {
 // precedent). The view's `headerAction` is the page's own
 // revert affordance, so it is not part of the data prop.
 export type RecipeFormPageImage = Omit<RecipeImageViewProps, "headerAction">;
+
+// The sortable lists' view-models live with their views
+// (#130, tranche T4); the page's contract names are aliases,
+// the same precedent as the image section above. The list
+// views carry no page-supplied chrome of their own, so the
+// data props are the views' full contracts.
+export type RecipeFormPageIngredients = RecipeIngredientListViewProps;
+export type RecipeFormPageInstructions = RecipeInstructionListViewProps;
 
 export type RecipeFormPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
@@ -170,9 +196,21 @@ export type RecipeFormPageProps = {
    * revert affordance (or null) for its header row — see the
    * header. */
   renderImageSection?: (revertAction: ReactNode) => ReactNode;
-  /** Slot: the app's sortable ingredient list. */
+  /** The ingredient list's data (the #124 row contracts plus
+   * the list chrome's intents): when provided, the page
+   * renders RecipeIngredientListView from it and this prop
+   * wins over the slot; null / omitted falls back to the
+   * slot. The host's drag handle binds through the view's
+   * `renderDragHandle` (see the header). */
+  ingredients?: RecipeFormPageIngredients | null;
+  /** Slot fallback: the app's sortable ingredient list, for
+   * hosts that have not adopted the `ingredients` data prop. */
   renderIngredientsSection?: () => ReactNode;
-  /** Slot: the app's sortable instruction list. */
+  /** The instruction list's data: the same data-wins rule as
+   * `ingredients`. */
+  instructions?: RecipeFormPageInstructions | null;
+  /** Slot fallback: the app's sortable instruction list, for
+   * hosts that have not adopted the `instructions` data prop. */
   renderInstructionsSection?: () => ReactNode;
 
   /** Submit row: a bare intent out; the label is the host's
@@ -223,7 +261,9 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
     contentLocked = false,
     image,
     renderImageSection,
+    ingredients,
     renderIngredientsSection,
+    instructions,
     renderInstructionsSection,
     submitLabel,
     isSubmitting = false,
@@ -422,7 +462,11 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               {...(onRevertIngredients ? { onRevert: onRevertIngredients } : {})}
             />
           ) : null}
-          {contentLocked ? null : renderIngredientsSection ? renderIngredientsSection() : null}
+          {contentLocked ? null : ingredients ? (
+            <RecipeIngredientListView {...ingredients} />
+          ) : renderIngredientsSection ? (
+            renderIngredientsSection()
+          ) : null}
 
           {instructionsChangedLabel && !contentLocked ? (
             <ChangedListBanner
@@ -430,7 +474,11 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               {...(onRevertInstructions ? { onRevert: onRevertInstructions } : {})}
             />
           ) : null}
-          {contentLocked ? null : renderInstructionsSection ? renderInstructionsSection() : null}
+          {contentLocked ? null : instructions ? (
+            <RecipeInstructionListView {...instructions} />
+          ) : renderInstructionsSection ? (
+            renderInstructionsSection()
+          ) : null}
 
           {submitError ? <Alert severity="error" message={submitError} /> : null}
           <Button disabled={isSubmitting} onPress={onSubmit}>

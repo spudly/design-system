@@ -1,10 +1,9 @@
 import { useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, XStack, YStack } from "tamagui";
-import { TextAreaField } from "../views/TextAreaField.js";
-import { Text } from "../widgets/Text.js";
-import { TextField } from "../views/TextField.js";
-import { tokens } from "../tokens/index.js";
+import { View } from "tamagui";
+import type { RecipeIngredientRow } from "../views/RecipeIngredientListView.js";
+import type { RecipeInstructionRow } from "../views/RecipeInstructionListView.js";
+import { Button } from "../widgets/Button.js";
 import { storyImageWide } from "../storyFixtures.js";
 import { recipeFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
@@ -15,13 +14,13 @@ import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
  * harness (the page is controlled; the harness plays the app
  * host's part). The image section renders the real
  * RecipeImageView through the page's `image` data prop (the
- * #124 view-half contract, landed in #130). The two list
- * sections render stand-ins composed from DS fields: in the
- * app those slots carry the app's own sortable lists, which
- * stay app-side under the #124 Option A interim — the
- * stand-ins mirror their layout (qty/unit/name rows; numbered
- * step rows) so the page's composition and full height are
- * what the screenshots guard.
+ * #124 view-half contract, landed in #130), and the two list
+ * sections render the real RecipeIngredientListView /
+ * RecipeInstructionListView through the `ingredients` /
+ * `instructions` data props (#130, tranche T4), with plain
+ * Drag stand-ins bound as the drag handles — in the apps the
+ * handles are the hosts' drag-container activators, per
+ * Stephen's 2026-11-09 boundary on #130.
  *
  * The frame matches the other page stories: a phone viewport
  * (430×844) pinned so screenshots are deterministic. Theme pinned
@@ -44,73 +43,24 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
-const ingredientRows = [
-  { quantity: "1 1/2", unit: "lb", name: "Chicken breasts" },
-  { quantity: "4", unit: "", name: "Garlic cloves" },
-  { quantity: "1", unit: "cup", name: "Heavy cream" },
+const ingredientRows: RecipeIngredientRow[] = [
+  { key: "chicken", quantity: "1 1/2", unit: "lb", name: "Chicken breasts" },
+  { key: "garlic", quantity: "4", unit: "", name: "Garlic cloves" },
+  { key: "cream", quantity: "1", unit: "cup", name: "Heavy cream" },
 ];
 
-function IngredientsSectionStandIn() {
-  const [rows, setRows] = useState(ingredientRows);
-  return (
-    <YStack gap="$2">
-      <Text
-        fontSize={tokens.typography.fontSize.sm}
-        fontWeight={tokens.typography.fontWeight.medium}
-        color={tokens.colors.gray.gray8}
-      >
-        Ingredients
-      </Text>
-      {rows.map((row, index) => (
-        <XStack key={row.name} gap="$2">
-          <TextField
-            accessibilityLabel={`Quantity ${index + 1}`}
-            value={row.quantity}
-            onChangeText={(value) => {
-              setRows((prev) => prev.map((r, i) => (i === index ? { ...r, quantity: value } : r)));
-            }}
-          />
-          <TextField
-            accessibilityLabel={`Name ${index + 1}`}
-            value={row.name}
-            onChangeText={(value) => {
-              setRows((prev) => prev.map((r, i) => (i === index ? { ...r, name: value } : r)));
-            }}
-          />
-        </XStack>
-      ))}
-    </YStack>
-  );
-}
-
-const instructionRows = [
-  "Season the chicken and sear in a large skillet until golden.",
-  "Pour in the cream and simmer gently until the sauce thickens.",
+const instructionRows: RecipeInstructionRow[] = [
+  { key: "sear", body: "Season the chicken and sear in a large skillet until golden." },
+  { key: "simmer", body: "Pour in the cream and simmer gently until the sauce thickens." },
 ];
 
-function InstructionsSectionStandIn() {
-  const [rows, setRows] = useState(instructionRows);
+/** The drag-handle stand-in the harness binds into each row:
+ * in the apps this node is the drag container's activator. */
+function dragHandle(label: string) {
   return (
-    <YStack gap="$2">
-      <Text
-        fontSize={tokens.typography.fontSize.sm}
-        fontWeight={tokens.typography.fontWeight.medium}
-        color={tokens.colors.gray.gray8}
-      >
-        Instructions
-      </Text>
-      {rows.map((row, index) => (
-        <TextAreaField
-          key={index}
-          accessibilityLabel={`Step ${index + 1}`}
-          numberOfLines={2}
-          value={row}
-          onChangeText={(value) => {
-            setRows((prev) => prev.map((r, i) => (i === index ? value : r)));
-          }}
-        />
-      ))}
-    </YStack>
+    <Button variant="secondary" size="sm" accessibilityLabel={label} onPress={() => undefined}>
+      Drag
+    </Button>
   );
 }
 
@@ -143,6 +93,10 @@ function FormHarness({
   const [status, setStatus] = useState(fixture.status);
   const [tagIds, setTagIds] = useState<string[]>(empty ? [] : fixture.tagIds);
   const [imageUri, setImageUri] = useState<string | null>(empty ? null : storyImageWide);
+  const [ingredients, setIngredients] = useState<RecipeIngredientRow[]>(empty ? [] : ingredientRows);
+  const [instructions, setInstructions] = useState<RecipeInstructionRow[]>(
+    empty ? [] : instructionRows,
+  );
   const noop = () => undefined;
   return (
     <RecipeFormPage
@@ -179,8 +133,35 @@ function FormHarness({
           setImageUri(null);
         },
       }}
-      renderIngredientsSection={() => <IngredientsSectionStandIn />}
-      renderInstructionsSection={() => <InstructionsSectionStandIn />}
+      ingredients={{
+        rows: ingredients,
+        onFieldChange: (key, field, value) => {
+          setIngredients((prev) => prev.map((r) => (r.key === key ? { ...r, [field]: value } : r)));
+        },
+        onRemove: (key) => {
+          setIngredients((prev) => prev.filter((r) => r.key !== key));
+        },
+        onAdd: () => {
+          setIngredients((prev) => [
+            ...prev,
+            { key: `added-${prev.length}`, quantity: "", unit: "", name: "" },
+          ]);
+        },
+        renderDragHandle: (_row, index) => dragHandle(`Reorder ingredient ${index + 1}`),
+      }}
+      instructions={{
+        rows: instructions,
+        onBodyChange: (key, value) => {
+          setInstructions((prev) => prev.map((r) => (r.key === key ? { ...r, body: value } : r)));
+        },
+        onRemove: (key) => {
+          setInstructions((prev) => prev.filter((r) => r.key !== key));
+        },
+        onAdd: () => {
+          setInstructions((prev) => [...prev, { key: `added-${prev.length}`, body: "" }]);
+        },
+        renderDragHandle: (_row, index) => dragHandle(`Reorder step ${index + 1}`),
+      }}
       submitLabel={submitLabel}
       onSubmit={noop}
       {...overrides}
