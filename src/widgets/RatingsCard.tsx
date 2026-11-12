@@ -1,8 +1,12 @@
-import { XStack, YStack } from "tamagui";
+import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Card } from "./Card.js";
+import { Center } from "./Center.js";
 import { StarRatingInput } from "./StarRatingInput.js";
 import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 export type RatingsCardCommunityRating = {
   /** Pre-rendered star string ("★★★★★"), app-formatted from the average. */
@@ -37,6 +41,17 @@ export type RatingsCardProps = {
    * renders non-interactive.
    */
   onViewerRatingChange?: ((stars: number | null) => void) | undefined;
+  /** Loading state (#278): the card renders skeletons mirroring
+   * its layout — eyebrow bones at the label size, a star-line
+   * bone and label bone for the community rating, and five star
+   * bones in the star input's own 44dp cells for the viewer's
+   * rating — with no real ratings and no live star controls.
+   * The card's sections mirror the loaded card: a null community
+   * rating skeletonizes as its single line, a null viewer rating
+   * renders no viewer section, and stale hints skeletonize in
+   * their slots. An enclosing composite's LoadingScope can also
+   * put the card into this state without prop-drilling. */
+  loading?: boolean;
 };
 
 // Stale-rating hint copy, verbatim from the app's client constants.
@@ -45,10 +60,30 @@ const STALE_COMMUNITY_RATING_HINT =
 const STALE_VIEWER_RATING_HINT =
   "Your rating was left on an earlier version of the recipe. Tap a star to update it for the current version.";
 
+// The viewer star row's five cells (#278), mirroring the star
+// input's own five stars.
+const LOADING_STAR_KEYS = [
+  "loading-1",
+  "loading-2",
+  "loading-3",
+  "loading-4",
+  "loading-5",
+] as const;
+
 function EyebrowLabel({ children }: { children: string }) {
   return (
     <YStack paddingBlockEnd="$1">
       <Text variant="label">{children}</Text>
+    </YStack>
+  );
+}
+
+function EyebrowSkeleton() {
+  return (
+    <YStack paddingBlockEnd="$1">
+      <View width="45%">
+        <TextSkeleton size="xs" lines={1} />
+      </View>
     </YStack>
   );
 }
@@ -95,7 +130,65 @@ function ViewerRatingInput({
  * caller-supplied pre-composed values, so the card serves any
  * app's rated content.
  */
-export function RatingsCard({ ratings, onViewerRatingChange }: RatingsCardProps) {
+export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: RatingsCardProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    // Loading (#278): the same muted card and section layout,
+    // skeletonized run by run — each eyebrow a bone at the label
+    // size in its own slot, the community star line and its
+    // label as bones at their sizes in their row, the viewer's
+    // stars as five bones centered in the input's own 44dp
+    // cells, and stale hints as two-line bones in their slots.
+    // No real ratings, no star controls, and the card (through
+    // its own loading scope) marks the region busy.
+    return (
+      <LoadingScope active>
+        <Card variant="muted" loading>
+          <EyebrowSkeleton />
+          {ratings.community ? (
+            <>
+              <XStack paddingBlockEnd="$3" alignItems="center" gap="$2">
+                <View width={110}>
+                  <TextSkeleton size="md" lines={1} />
+                </View>
+                <View width={64}>
+                  <TextSkeleton size="sm" lines={1} />
+                </View>
+              </XStack>
+              {ratings.community.hasStaleRatings ? (
+                <YStack paddingBlockEnd="$3">
+                  <TextSkeleton size="xs" lines={2} />
+                </YStack>
+              ) : null}
+            </>
+          ) : (
+            <YStack paddingBlockEnd="$3">
+              <View width="60%">
+                <TextSkeleton size="sm" lines={1} />
+              </View>
+            </YStack>
+          )}
+          {ratings.viewer ? (
+            <>
+              <EyebrowSkeleton />
+              <XStack>
+                {LOADING_STAR_KEYS.map((key) => (
+                  <Center key={key} width={44} height={44}>
+                    <BoxSkeleton width={24} height={24} />
+                  </Center>
+                ))}
+              </XStack>
+              {ratings.viewer.isStale ? (
+                <YStack paddingBlockStart="$2">
+                  <TextSkeleton size="xs" lines={2} />
+                </YStack>
+              ) : null}
+            </>
+          ) : null}
+        </Card>
+      </LoadingScope>
+    );
+  }
   return (
     <Card variant="muted">
       <EyebrowLabel>Community rating</EyebrowLabel>

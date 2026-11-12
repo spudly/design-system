@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { SecretRevealPanel } from "./SecretRevealPanel.js";
 
 const meta: Meta<typeof SecretRevealPanel> = {
@@ -20,6 +21,44 @@ export const Default: Story = {
     onCopy: (s) => console.log("copied", s),
     onDismiss: () => console.log("dismissed"),
   },
+};
+
+export const Loading: Story = {
+  args: {
+    secret: "storybook-fixture-value",
+    onCopy: (s) => console.log("copied", s),
+    onDismiss: () => console.log("dismissed"),
+    loading: true,
+  },
+};
+
+// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+export const LoadingOverlay: Story = {
+  render: () => (
+    <YStack position="relative">
+      <SecretRevealPanel
+        secret="storybook-fixture-value"
+        onCopy={(s) => console.log("copied", s)}
+        onDismiss={() => console.log("dismissed")}
+      />
+      <YStack
+        position="absolute"
+        top={0}
+        left={0}
+        right={0}
+        bottom={0}
+        opacity={0.45}
+        pointerEvents="none"
+      >
+        <SecretRevealPanel
+          secret="storybook-fixture-value"
+          onCopy={(s) => console.log("copied", s)}
+          onDismiss={() => console.log("dismissed")}
+          loading
+        />
+      </YStack>
+    </YStack>
+  ),
 };
 
 export const WithoutDismiss: Story = {

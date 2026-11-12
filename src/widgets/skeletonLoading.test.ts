@@ -472,6 +472,32 @@ test("T1 SSR: loading StatCard, PreviewCard, and the collections render their du
   assert.equal(hiddenBones(statBand), 6, "a loading StatBand renders 3 dummy stats (2 bones each)");
   assert.ok(!statBand.includes("Servings"), "a loading StatBand shows none of its children");
 
+  const statBandOne = await renderToHtml(
+    React.createElement(
+      StatBand,
+      { loading: true, loadingCount: 1 },
+      React.createElement(StatCard, { value: "4", label: "Servings" }),
+    ),
+  );
+  assert.equal(
+    hiddenBones(statBandOne),
+    2,
+    "a loading StatBand with loadingCount=1 renders 1 dummy stat (2 bones) — composites with a conditional stat count mirror their loaded composition",
+  );
+
+  const statBandSeven = await renderToHtml(
+    React.createElement(
+      StatBand,
+      { loading: true, loadingCount: 7 },
+      React.createElement(StatCard, { value: "4", label: "Servings" }),
+    ),
+  );
+  assert.equal(
+    hiddenBones(statBandSeven),
+    14,
+    "a loading StatBand with loadingCount=7 renders 7 dummy stats — counts above six are honored, not truncated",
+  );
+
   const preview = await renderToHtml(
     React.createElement(
       PreviewCard,
@@ -871,4 +897,356 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
   );
   assert.equal(hiddenBones(idleList), 0, "a non-loading CheckboxSelectList renders no bones");
   assert.ok(idleList.includes("AlphaItem"), "a non-loading CheckboxSelectList renders its items");
+});
+
+// ---------------------------------------------------------------------------
+// #278 Tranche 2 — data panels and the remaining data widgets:
+// NutritionPanel, RatingsCard, RecipeIngredientsPanel,
+// RecipeInstructionsPanel, RecipeOverviewPanel, SecretRevealPanel,
+// StatRow, and TagList take the same explicit `loading` prop,
+// read the internal LoadingScope, render skeletons mirroring
+// their loaded layout (actions kept as inert skeleton Buttons
+// inside the scope, hairlines transparent), show no real content
+// while loading, and render unchanged while not loading.
+
+const T2_SCOPE_WIDGETS = [
+  "NutritionPanel",
+  "RatingsCard",
+  "RecipeIngredientsPanel",
+  "RecipeInstructionsPanel",
+  "RecipeOverviewPanel",
+  "SecretRevealPanel",
+  "StatRow",
+  "TagList",
+] as const;
+
+test("T2: every converted data widget declares `loading` and reads the LoadingScope", () => {
+  for (const name of T2_SCOPE_WIDGETS) {
+    const code = readCode(`src/widgets/${name}.tsx`);
+    assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
+    assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
+    assert.match(
+      code,
+      /TextSkeleton|BoxSkeleton|SkeletonBone|StatCard/,
+      `${name} must render skeletons (directly, or via a skeletonized child)`,
+    );
+    assert.match(
+      code,
+      /from "\.\.\/contexts\/LoadingScope\.js"/,
+      `${name} must import the scope from src/contexts`,
+    );
+  }
+});
+
+test("T2 SSR: loading NutritionPanel renders the ready layout's skeleton, no real values", async () => {
+  const { React, NutritionPanel } = await loadRuntime();
+  const noop = () => {};
+
+  // The view-model's own loading state: header bone + exactly 3
+  // dummy rows x label/value bones + the disclaimer bone.
+  const loading = await renderToHtml(
+    React.createElement(NutritionPanel, { nutrition: { state: "loading" } }),
+  );
+  assert.equal(
+    hiddenBones(loading),
+    8,
+    "a loading NutritionPanel renders header + 3x2 row + disclaimer bones",
+  );
+  assert.ok(!loading.includes("Estimating nutrition"), "the plain loading line is gone");
+  assert.match(loading, /aria-busy/, "a loading NutritionPanel marks its region busy");
+
+  // The explicit prop over ready data mirrors the ready rows'
+  // own count, and its Refresh action stays as a skeleton.
+  const readyLoading = await renderToHtml(
+    React.createElement(NutritionPanel, {
+      nutrition: {
+        state: "ready",
+        rows: [
+          { label: "Calories", valueLabel: "520 kcal" },
+          { label: "Protein", valueLabel: "42 g" },
+        ],
+        disclaimer: "SecretDisclaimer",
+        onRefreshPress: noop,
+      },
+      loading: true,
+    }),
+  );
+  assert.equal(
+    hiddenBones(readyLoading),
+    6,
+    "a ready-but-loading NutritionPanel renders header + 2x2 row + disclaimer bones",
+  );
+  assert.ok(!readyLoading.includes("520 kcal"), "a loading NutritionPanel shows no real values");
+  assert.ok(
+    !readyLoading.includes("SecretDisclaimer"),
+    "a loading NutritionPanel shows no disclaimer",
+  );
+  assert.ok(
+    readyLoading.includes("Refresh"),
+    "a loading NutritionPanel keeps its Refresh action, as an inert rectangle skeleton",
+  );
+
+  const idle = await renderToHtml(
+    React.createElement(NutritionPanel, {
+      nutrition: {
+        state: "ready",
+        rows: [{ label: "Calories", valueLabel: "520 kcal" }],
+        disclaimer: "Estimates vary.",
+      },
+    }),
+  );
+  assert.equal(hiddenBones(idle), 0, "a non-loading NutritionPanel renders no bones");
+  assert.ok(idle.includes("520 kcal"), "a non-loading NutritionPanel renders its rows");
+});
+
+test("T2 SSR: loading RatingsCard, TagList, and StatRow render skeletons, no real content", async () => {
+  const { React, RatingsCard, TagList, StatRow, StatCard } = await loadRuntime();
+  const noop = () => {};
+
+  const ratings = await renderToHtml(
+    React.createElement(RatingsCard, {
+      ratings: {
+        community: { stars: "★★★★☆", label: "4.6 (9)" },
+        viewer: { value: 4 },
+      },
+      onViewerRatingChange: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(
+    hiddenBones(ratings),
+    9,
+    "a loading RatingsCard renders eyebrow + star-line + label + eyebrow + 5 star bones",
+  );
+  assert.ok(!ratings.includes("4.6 (9)"), "a loading RatingsCard shows no community label");
+  assert.ok(!ratings.includes("★"), "a loading RatingsCard shows no real stars");
+  assert.ok(
+    !ratings.includes('aria-label="Rate'),
+    "a loading RatingsCard renders no live star controls",
+  );
+  assert.match(ratings, /aria-busy/, "a loading RatingsCard marks its region busy");
+
+  const idleRatings = await renderToHtml(
+    React.createElement(RatingsCard, {
+      ratings: {
+        community: { stars: "★★★★☆", label: "4.6 (9)" },
+        viewer: { value: 4 },
+      },
+      onViewerRatingChange: noop,
+    }),
+  );
+  assert.equal(hiddenBones(idleRatings), 0, "a non-loading RatingsCard renders no bones");
+  assert.ok(idleRatings.includes("4.6 (9)"), "a non-loading RatingsCard renders its label");
+
+  const tags = await renderToHtml(
+    React.createElement(TagList, {
+      tags: [
+        { id: "t1", name: "SecretTagOne", color: "red" },
+        { id: "t2", name: "SecretTagTwo", color: "blue" },
+      ],
+      loading: true,
+    }),
+  );
+  assert.equal(hiddenBones(tags), 2, "a loading TagList renders one pill bone per tag");
+  assert.ok(!tags.includes("SecretTagOne"), "a loading TagList shows no real tag names");
+  assert.match(tags, /aria-busy/, "a loading TagList marks its region busy");
+
+  const emptyTags = await renderToHtml(React.createElement(TagList, { tags: [], loading: true }));
+  assert.equal(
+    hiddenBones(emptyTags),
+    3,
+    "a tag-less loading TagList renders exactly 3 dummy pills",
+  );
+
+  const idleTags = await renderToHtml(
+    React.createElement(TagList, { tags: [{ id: "t1", name: "VisibleTag", color: "red" }] }),
+  );
+  assert.equal(hiddenBones(idleTags), 0, "a non-loading TagList renders no bones");
+  assert.ok(idleTags.includes("VisibleTag"), "a non-loading TagList renders its tags");
+
+  const row = await renderToHtml(
+    React.createElement(
+      StatRow,
+      { loading: true },
+      React.createElement(StatCard, { value: "4", label: "Servings" }),
+    ),
+  );
+  assert.equal(hiddenBones(row), 6, "a loading StatRow renders 3 dummy stats (2 bones each)");
+  assert.ok(!row.includes("Servings"), "a loading StatRow shows none of its children");
+
+  const idleRow2 = await renderToHtml(
+    React.createElement(
+      StatRow,
+      null,
+      React.createElement(StatCard, { value: "4", label: "Servings" }),
+    ),
+  );
+  assert.equal(hiddenBones(idleRow2), 0, "a non-loading StatRow renders no bones");
+  assert.ok(idleRow2.includes("Servings"), "a non-loading StatRow renders its children");
+});
+
+test("T2 SSR: loading SecretRevealPanel and RecipeInstructionsPanel hide their content", async () => {
+  const { React, SecretRevealPanel, RecipeInstructionsPanel } = await loadRuntime();
+  const noop = () => {};
+
+  const secret = await renderToHtml(
+    React.createElement(SecretRevealPanel, {
+      secret: "fixture-hidden-value",
+      onCopy: noop,
+      onDismiss: noop,
+      loading: true,
+    }),
+  );
+  assert.equal(
+    hiddenBones(secret),
+    3,
+    "a loading SecretRevealPanel renders title + hint + secret-box bones",
+  );
+  assert.ok(
+    !secret.includes("fixture-hidden-value"),
+    "a loading SecretRevealPanel never shows the secret",
+  );
+  assert.ok(secret.includes("Copy"), "its Copy action stays, as an inert rectangle skeleton");
+  assert.ok(secret.includes("Dismiss"), "its Dismiss action stays, as an inert rectangle skeleton");
+  assert.match(secret, /aria-busy/, "a loading SecretRevealPanel marks its region busy");
+
+  const idleSecret = await renderToHtml(
+    React.createElement(SecretRevealPanel, { secret: "fixture-shown-value", onCopy: noop }),
+  );
+  assert.equal(hiddenBones(idleSecret), 0, "a non-loading SecretRevealPanel renders no bones");
+  assert.ok(
+    idleSecret.includes("fixture-shown-value"),
+    "a non-loading SecretRevealPanel shows the secret",
+  );
+
+  const steps = [
+    { id: "s1", stepNumber: 1, body: "Secret first step body" },
+    { id: "s2", stepNumber: 2, body: "Secret second step body" },
+  ];
+  const instructions = await renderToHtml(
+    React.createElement(RecipeInstructionsPanel, { instructions: steps, loading: true }),
+  );
+  assert.equal(
+    hiddenBones(instructions),
+    6,
+    "a loading RecipeInstructionsPanel renders eyebrow + 2 body bones per step card",
+  );
+  assert.ok(
+    !instructions.includes("Secret first step body"),
+    "a loading RecipeInstructionsPanel shows no step text",
+  );
+  assert.match(
+    instructions,
+    /aria-busy/,
+    "a loading RecipeInstructionsPanel marks its region busy",
+  );
+
+  const idleSteps = await renderToHtml(
+    React.createElement(RecipeInstructionsPanel, { instructions: steps }),
+  );
+  assert.equal(hiddenBones(idleSteps), 0, "a non-loading RecipeInstructionsPanel renders no bones");
+  assert.ok(
+    idleSteps.includes("Secret first step body"),
+    "a non-loading RecipeInstructionsPanel renders its steps",
+  );
+});
+
+test("T2 SSR: loading RecipeOverviewPanel mirrors its blocks; no real content", async () => {
+  const { React, RecipeOverviewPanel } = await loadRuntime();
+  const overviewProps = {
+    imageUrl: "https://example.com/hero.jpg",
+    title: "Secret Recipe Title",
+    description: "A secret description.",
+    statusTone: "success",
+    statusLabel: "Perfected",
+    servingsLabel: "4",
+    prepTimeLabel: "15m",
+    cookTimeLabel: "30m",
+    tags: [
+      { id: "dinner", name: "Dinner", color: "orange" },
+      { id: "chicken", name: "Chicken", color: "indigo" },
+      { id: "one-pan", name: "One pan", color: "teal" },
+    ],
+  };
+  const loading = await renderToHtml(
+    React.createElement(RecipeOverviewPanel, { ...overviewProps, loading: true }),
+  );
+  assert.equal(
+    hiddenBones(loading),
+    14,
+    "hero + title + badge + 2 description + 6 stat-band + 3 tag bones",
+  );
+  assert.ok(!loading.includes("Secret Recipe Title"), "a loading overview shows no title");
+  assert.ok(!loading.includes("Dinner"), "a loading overview shows no tag names");
+  assert.match(loading, /aria-busy/, "a loading overview marks its region busy");
+
+  const idle = await renderToHtml(React.createElement(RecipeOverviewPanel, overviewProps));
+  assert.equal(hiddenBones(idle), 0, "a non-loading overview renders no bones");
+  assert.ok(idle.includes("Secret Recipe Title"), "a non-loading overview renders its title");
+});
+
+test("T2 SSR: loading RecipeIngredientsPanel skeletonizes controls and rows", async () => {
+  const { React, RecipeIngredientsPanel } = await loadRuntime();
+  const noop = () => {};
+  const view = {
+    servings: 4,
+    onServingsChange: noop,
+    scaleValue: "1",
+    onScaleChange: noop,
+    ingredients: [
+      { id: "a", label: "Secret chicken" },
+      { id: "b", label: "Secret cream", isOptional: true, isMissing: true },
+    ],
+    onIngredientPress: noop,
+    substitutions: [{ ingredient: "Secret cream", suggestions: "Secret substitute" }],
+  };
+  const loading = await renderToHtml(
+    React.createElement(RecipeIngredientsPanel, { ingredients: view, loading: true }),
+  );
+  assert.equal(
+    hiddenBones(loading),
+    10,
+    "servings label/value + scale label + 2 rows (one with its optional-note bone) + hint + substitutions title/entry bones",
+  );
+  assert.ok(!loading.includes("Secret chicken"), "a loading panel shows no ingredient labels");
+  assert.ok(!loading.includes("Secret substitute"), "a loading panel shows no substitution text");
+  assert.ok(
+    loading.includes("Custom"),
+    "the scale selector's Custom action stays, as an inert rectangle skeleton",
+  );
+  assert.match(loading, /aria-busy/, "a loading RecipeIngredientsPanel marks its region busy");
+
+  const idle = await renderToHtml(
+    React.createElement(RecipeIngredientsPanel, { ingredients: view }),
+  );
+  assert.equal(hiddenBones(idle), 0, "a non-loading RecipeIngredientsPanel renders no bones");
+  assert.ok(idle.includes("Secret chicken"), "a non-loading panel renders its ingredients");
+  assert.ok(idle.includes("Substitutions"), "a non-loading panel renders its substitutions");
+
+  // The substitutions fetch state is a skeleton panel now, not a
+  // plain "Finding substitutions…" line.
+  const fetching = await renderToHtml(
+    React.createElement(RecipeIngredientsPanel, {
+      ingredients: { ...view, substitutions: undefined, loadingSubstitutions: true },
+    }),
+  );
+  assert.equal(
+    hiddenBones(fetching),
+    3,
+    "the substitutions fetch renders the skeleton panel (title + one entry's bones)",
+  );
+  assert.ok(
+    fetching.includes("Finding substitutions"),
+    "the substitutions fetch announces a screen-reader progress status",
+  );
+  assert.match(fetching, /aria-busy/, "the fetching substitutions region is marked busy");
+  assert.match(
+    fetching,
+    /role="status"/,
+    "the substitutions status is a polite live region, not a visible line",
+  );
+  assert.ok(
+    fetching.indexOf('role="status"') < fetching.indexOf("aria-busy"),
+    "the substitutions status renders outside (before) the busy region so it is not deferred by aria-busy",
+  );
 });
