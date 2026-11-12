@@ -23,8 +23,9 @@ export type MessageCardProps = {
  * the copy is the caller's content, and there are no styling
  * props.
  *
- * The detail pages' loading state is the same surface shell
- * with a centered spinner (Center + Spinner). The shell, the
+ * The detail pages' loading state is NOT this card: since
+ * #278 it is the page's own skeleton shell (the frame rendered
+ * with skeleton regions). The shell, the
  * centering, and the fill are one component here because the
  * pieces do not compose to this treatment — a shell plus a
  * centering box plus a card leaves the card at the top of the

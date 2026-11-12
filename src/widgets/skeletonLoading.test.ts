@@ -1734,3 +1734,31 @@ test("T3 SSR: loading CandidateList and NutritionGoalsForm render skeletons", as
   assert.ok(!goals.includes("2000"), "a loading NutritionGoalsForm shows no real goal values");
   assert.match(goals, /aria-busy/, "a loading NutritionGoalsForm marks its region busy");
 });
+
+test("T5 survivor audit: only the approved survivor files render a Spinner", () => {
+  // #278 tranche 5: content loading is skeletons. The only non-story
+  // sources that may render a Spinner are the three survivor waits
+  // Stephen approved in the 2026-11-08 plan — PayPage's external
+  // payment window, and the two inline search-in-flight indicators
+  // (AutocompletePicker, VerseSearchPage). Spinner's own file and
+  // stories are exempt (stories demonstrate the widget itself, and
+  // Center's story uses it as arbitrary example content).
+  const allowed = new Set([
+    "src/pages/PayPage.tsx",
+    "src/pages/VerseSearchPage.tsx",
+    "src/widgets/AutocompletePicker.tsx",
+  ]);
+  const rendering = [];
+  for (const file of sourceFiles(join(root, "src"))) {
+    const rel = file.slice(root.length).replace(/^\//, "");
+    if (rel.endsWith(".stories.tsx") || rel === "src/widgets/Spinner.tsx") continue;
+    if (readCode(rel).includes("<Spinner")) rendering.push(rel);
+  }
+  assert.deepEqual(
+    [...rendering].sort(),
+    [...allowed].sort(),
+    "a Spinner rendered outside the approved survivor files is a #278 regression — " +
+      "give the surface a skeleton loading state instead; a survivor that stops " +
+      "rendering one must leave this list in the same change",
+  );
+});
