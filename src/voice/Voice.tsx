@@ -50,6 +50,22 @@ export type Voice = {
     cancelLabel: string;
     deleteLabel: string;
   };
+  /** RatingsCard widget (tranche 1b). */
+  ratingsCard: {
+    communityRatingLabel: string;
+    noCommunityRatingsLabel: string;
+    yourRatingLabel: string;
+    staleCommunityRatingHint: string;
+    staleViewerRatingHint: string;
+  };
+  /** NutritionPanel widget (tranche 1b). */
+  nutritionPanel: {
+    perServingLabel: string;
+    refreshLabel: string;
+    refreshingLabel: string;
+    estimateLabel: string;
+    unavailableLabel: string;
+  };
 };
 
 const VoiceContext = createContext<Voice | null>(null);

@@ -29,11 +29,18 @@ export function makeRenderToHtml(
   loadRuntime: () => Promise<Record<string, any>>,
 ): (element: any) => Promise<string> {
   return async function renderToHtml(element: any) {
-    const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+    const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider } =
       await loadRuntime();
     const config = createTamaguiConfig(baseTheme);
+    // #539: compositions under test can contain voice-reading widgets;
+    // supply the fixture voice the same way Storybook does.
+    let inner = element;
+    if (VoiceProvider) {
+      const { fixtureVoice } = await import("../dist/voice/fixtures.js");
+      inner = React.createElement(VoiceProvider, { voice: fixtureVoice }, element);
+    }
     return renderToString(
-      React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+      React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, inner),
     );
   };
 }

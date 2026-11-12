@@ -5,6 +5,7 @@ import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 export type CommentItemProps = {
@@ -68,6 +69,7 @@ export function CommentItem({
   onDelete,
   loading = false,
 }: CommentItemProps) {
+  const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   const saveDisabled = isUpdatePending || !editDraft.trim();
   // The actions row is one row in both states: while loading it
@@ -89,7 +91,7 @@ export function CommentItem({
                   onSaveEdit?.();
                 }}
               >
-                Save
+                {voice.commentItem.saveLabel}
               </Button>
               <Button
                 ghost
@@ -99,7 +101,7 @@ export function CommentItem({
                   onCancelEdit?.();
                 }}
               >
-                Cancel
+                {voice.commentItem.cancelLabel}
               </Button>
             </>
           ) : (
@@ -110,7 +112,7 @@ export function CommentItem({
                 onStartEdit?.();
               }}
             >
-              Edit
+              {voice.commentItem.editLabel}
             </Button>
           )
         ) : null}
@@ -124,7 +126,7 @@ export function CommentItem({
               onDelete?.();
             }}
           >
-            Delete
+            {voice.commentItem.deleteLabel}
           </Button>
         ) : null}
       </XStack>
