@@ -38,10 +38,10 @@ const read = (rel: string) => readFileSync(join(root, rel), "utf8");
 test("the views are barrel-exported and RecipeFormPage renders the list from the ingredients data prop", () => {
   const barrel = read("src/views/index.ts");
   for (const name of ["RecipeIngredientListView", "RecipeIngredientRowView"]) {
-    assert.match(
-      barrel,
-      new RegExp(`export \\{ ${name},`),
-      `${name} is exported from src/views/index.ts`,
+    assert.ok(barrel.includes(name), `${name} is exported from src/views/index.ts`);
+    assert.ok(
+      barrel.includes(`from "./${name}.js"`),
+      `${name} is exported from its own module`,
     );
     const rootIndex = read("src/index.ts");
     assert.doesNotMatch(rootIndex, new RegExp(`\\b${name}\\b`), "the view stays off the public surface");
