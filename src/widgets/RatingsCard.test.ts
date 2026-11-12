@@ -25,6 +25,7 @@ const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/
 test("RatingsCard is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
     const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
   assert.equal(
     typeof dist.RatingsCard,
     "function",
@@ -62,7 +63,8 @@ function loadRuntime() {
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
     const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
-    return { React, renderToString, TamaguiProvider, ...dist, ...voiceFixtures };
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
+    return { React, renderToString, TamaguiProvider, ...dist, ...voiceFixtures, ...voiceModule };
   })();
   return runtimePromise;
 }

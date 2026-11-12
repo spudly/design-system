@@ -33,7 +33,7 @@ test("NutritionPanel is exported from the built internal components barrel", asy
 test("the panel branches on its three states", () => {
   assert.match(code, /nutrition\.state === "loading"/);
   assert.match(code, /nutrition\.state === "unavailable"/);
-  assert.match(code, /Nutrition is not available yet\./);
+  assert.match(code, /voice\.nutritionPanel\.unavailableLabel/, "the unavailable copy comes from the voice object (#539)");
 });
 
 test("the loading state renders skeletons mirroring the ready layout (#278)", () => {

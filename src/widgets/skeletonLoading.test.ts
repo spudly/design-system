@@ -43,8 +43,9 @@ function loadRuntime() {
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
     const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
     const loadingScope: Record<string, any> = await import("../../dist/contexts/LoadingScope.js");
-    return { React, renderToString, TamaguiProvider, ...dist, ...loadingScope, ...voiceFixtures };
+    return { React, renderToString, TamaguiProvider, ...dist, ...loadingScope, ...voiceFixtures, ...voiceModule };
   })();
   return runtimePromise;
 }
