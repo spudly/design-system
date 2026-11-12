@@ -83,18 +83,19 @@ export function CandidateList({
                 <TextSkeleton size="sm" lines={1} />
               </YStack>
               {onActivatePress ? (
-                <Button
-                  variant="primary"
-                  size="sm"
-                  alignSelf="flex-start"
-                  accessibilityLabel={`Activate ${candidate.label}`}
-                  disabled={isActivationPending}
-                  onPress={() => {
-                    onActivatePress(candidate.id);
-                  }}
-                >
-                  Activate
-                </Button>
+                <YStack alignItems="flex-start">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    accessibilityLabel={`Activate ${candidate.label}`}
+                    disabled={isActivationPending}
+                    onPress={() => {
+                      onActivatePress(candidate.id);
+                    }}
+                  >
+                    Activate
+                  </Button>
+                </YStack>
               ) : null}
             </YStack>
           ))}

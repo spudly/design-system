@@ -5,6 +5,7 @@ import { tokens } from "../tokens/index.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
+import { Center } from "../widgets/Center.js";
 import { CircleSkeleton } from "../widgets/CircleSkeleton.js";
 import { Text } from "../widgets/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
@@ -131,17 +132,17 @@ export function RecipeSharingView({
           // The radio rows' mirror (#278): RadioOptionGroup's
           // own stack (gap spacing 1) of rows (gap spacing 2,
           // centered) — the item's 44px touch-target slot
-          // centering a circle bone, the label bone at sm, and
+          // centering a circle bone, the label bone at md, and
           // a description bone at sm when the option carries
           // one. No real labels or selection show.
           <YStack gap={tokens.spacing[1]}>
             {options.map((option) => (
               <XStack key={option.value} alignItems="center" gap={tokens.spacing[2]}>
-                <XStack width={44} height={44} alignItems="center" justifyContent="center">
+                <Center width={44} height={44}>
                   <CircleSkeleton size={20} />
-                </XStack>
+                </Center>
                 <YStack flex={1} gap={tokens.spacing[1]}>
-                  <TextSkeleton size="sm" lines={1} />
+                  <TextSkeleton size="md" lines={1} />
                   {option.description ? <TextSkeleton size="sm" lines={1} /> : null}
                 </YStack>
               </XStack>
@@ -170,9 +171,9 @@ export function RecipeSharingView({
             // slot, the label bone at md, and a description bone
             // at sm when a description would render.
             <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
-              <XStack width={44} height={44} alignItems="center" justifyContent="center">
+              <Center width={44} height={44}>
                 <BoxSkeleton width={24} height={24} />
-              </XStack>
+              </Center>
               <YStack flex={1} gap={tokens.spacing[1]}>
                 <TextSkeleton size="md" lines={1} />
                 {consentDescription ? <TextSkeleton size="sm" lines={1} /> : null}

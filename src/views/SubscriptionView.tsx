@@ -20,7 +20,7 @@ export type SubscriptionViewProps = {
   error?: string | null;
   /** Loading state (#278): the section title skeletonizes
    * through the SectionCard, the plan line renders as a text
-   * skeleton at lg size and the status/upsell line at md
+   * skeleton at xl size (the subheading size) and the status/upsell line at md
    * size, and the manage / refresh / portal actions stay
    * rendered inside the card's loading scope so each Button
    * renders as a rectangle skeleton at its normal geometry
@@ -87,11 +87,11 @@ export function SubscriptionView({
       <YStack gap="$2">
         {showSkeleton ? (
           // Loading (#278): text skeletons mirroring the
-          // loaded lines — the plan line at lg size, the
+          // loaded lines — the plan line at xl size, the
           // status/upsell line at md size. No real plan,
           // status, reconciling, or error text renders.
           <>
-            <TextSkeleton size="lg" lines={1} />
+            <TextSkeleton size="xl" lines={1} />
             <TextSkeleton size="md" lines={1} />
           </>
         ) : (

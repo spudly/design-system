@@ -1,9 +1,10 @@
-import { View, XStack, YStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/Button.js";
+import { Center } from "../widgets/Center.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
@@ -111,9 +112,9 @@ export function FeedbackPreferenceView({
       <SectionCard title={title} variant="elevated" loading={showSkeleton}>
         <YStack gap={tokens.spacing[1]}>
           <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
-            <View width={44} height={44} alignItems="center" justifyContent="center">
+            <Center width={44} height={44}>
               <BoxSkeleton width={24} height={24} />
-            </View>
+            </Center>
             <YStack flex={1} gap={tokens.spacing[1]}>
               <TextSkeleton size="md" lines={1} />
               <TextSkeleton size="sm" lines={1} />

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Text as TamaguiText, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
@@ -73,7 +73,15 @@ export function LegalSection({ title, children, loading = false }: LegalSectionP
           {title}
         </StyledTitle>
       )}
-      <LoadingScope active={showSkeleton}>{children}</LoadingScope>
+      {showSkeleton ? (
+        // The host's links are live controls that do not read
+        // the loading scope, so bones stand in for the links
+        // block while loading rather than leaving real,
+        // clickable links under a loading section.
+        <TextSkeleton size="sm" lines={2} />
+      ) : (
+        children
+      )}
     </StyledSection>
   );
 }
