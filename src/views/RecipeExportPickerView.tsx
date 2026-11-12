@@ -48,8 +48,8 @@ export type RecipeExportPickerViewProps = {
  * picker as a view — the BulkSelectToolbar over a bounded
  * CheckboxSelectList with the export action — composed from
  * the shared widgets so hosts no longer import those widgets
- * (and the Spinner the list renders while loading) to build
- * the picker themselves (the eciperay audit's coverage
+ * (and the skeleton rows the list renders while loading) to
+ * build the picker themselves (the eciperay audit's coverage
  * disposition for those specifiers).
  *
  * Filtering and selection state stay with the caller: the

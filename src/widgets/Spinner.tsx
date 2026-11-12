@@ -154,12 +154,29 @@ function ProgressRing({
 
 /**
  * Loading indicator in the brand primary color. Provide `label` (e.g.
- * "Loading recipes") so screen readers announce what is loading.
+ * "Searching") so screen readers announce what is happening.
+ *
+ * DEMOTED (#278, tranche 5 — the survivor audit): content loading is
+ * skeletons, never a spinner. A page, view, widget, list, or section
+ * waiting on its content renders its layout with skeleton bones via
+ * its `loading` prop; do NOT reach for Spinner there. Spinner remains
+ * exported only for the waits a skeleton cannot represent:
+ *
+ * - the determinate progress ring (`value` set): a wait whose
+ *   progress is known (uploads, AI generation), announced as a
+ *   progress bar with the current percentage;
+ * - inline search-in-flight, where the field and the current results
+ *   stay live while a refresh runs (AutocompletePicker's dropdown,
+ *   VerseSearchPage's result region);
+ * - PayPage's external secure-payment window opening — a wait with
+ *   no page content shape to skeletonize.
+ *
+ * The audit is enforced, not just documented: skeletonLoading.test.ts
+ * asserts that no other non-story source file renders a Spinner.
  *
  * Two modes: with no `value` it spins indefinitely (an open-ended
- * wait); with a `value` (0–100) it renders a determinate progress
- * ring instead (a wait with known progress — uploads, AI generation),
- * announced as a progress bar with the current percentage.
+ * wait of one of the kinds above); with a `value` (0–100) it renders
+ * the determinate progress ring instead.
  */
 export function Spinner({ label = "Loading", color = "$primary", value, ...rest }: SpinnerProps) {
   if (value !== undefined) {
