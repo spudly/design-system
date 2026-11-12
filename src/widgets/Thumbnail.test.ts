@@ -3,7 +3,7 @@
  * shared content-image component extracted for the page
  * de-styling program's foundation: three page surfaces hand-styled
  * the raw Image element — the recipe detail/public pages' hero
- * (a 256px recessed frame, image contained), the import review's
+ * (a 256px recessed frame, image cover-cropped to fill it), the import review's
  * banner preview (full-width, 192px, cover, large radius), and
  * RecipesPage's 64px row thumbnail (its in-page `Thumbnail`
  * helper, generalized here).
@@ -46,14 +46,14 @@ test("the contract is a URL, a presentation variant, and an optional accessible 
   assert.match(code, /accessibilityLabel\?: string;/);
 });
 
-test("the hero is the 256px recessed frame with the image contained", () => {
+test("the hero is the 256px recessed frame with the image cover-cropped to fill it (#573)", () => {
   assert.match(code, /backgroundColor: tokens\.colors\.gray\.gray1,/);
   assert.match(code, /borderRadius: tokens\.radii\.lg,/);
   assert.match(code, /height: 256,/);
   assert.match(code, /overflow: "hidden",/);
   assert.match(
     code,
-    /<Image src=\{src\} width="100%" height="100%" objectFit="contain" \{\.\.\.a11yProps\} \/>/,
+    /<Image src=\{src\} width="100%" height="100%" objectFit="cover" \{\.\.\.a11yProps\} \/>/,
   );
 });
 

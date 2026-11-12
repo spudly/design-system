@@ -3,9 +3,11 @@ import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
 /**
- * The hero frame: a recessed gray well the feature image sits in —
+ * The hero frame: a recessed gray well the feature image fills —
  * page-background gray fill, large radius, fixed 256px height,
- * overflow hidden so the image's corners follow the frame.
+ * overflow hidden so the cover-cropped image's corners follow the
+ * frame (a mismatched-aspect image fills the frame instead of
+ * letterboxing against the gray fill, #573).
  */
 const StyledHeroFrame = styled(YStack, {
   name: "ThumbnailHeroFrame",
@@ -41,7 +43,7 @@ export type ThumbnailProps = {
   src: string;
   /**
    * The image's presentation: `hero` (default — the detail page's
-   * feature image, contained in its 256px recessed frame), `banner`
+   * feature image, cover-cropped to fill its 256px recessed frame), `banner`
    * (a full-width 192px cover image with large rounded corners, the
    * import/review preview), or `row` (the 64px square list-row
    * thumbnail, cover-cropped with a gray well behind it).
@@ -110,7 +112,7 @@ export function Thumbnail({ src, variant = "hero", accessibilityLabel }: Thumbna
   }
   return (
     <StyledHeroFrame>
-      <Image src={src} width="100%" height="100%" objectFit="contain" {...a11yProps} />
+      <Image src={src} width="100%" height="100%" objectFit="cover" {...a11yProps} />
     </StyledHeroFrame>
   );
 }
