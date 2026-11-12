@@ -485,6 +485,19 @@ test("T1 SSR: loading StatCard, PreviewCard, and the collections render their du
     "a loading StatBand with loadingCount=1 renders 1 dummy stat (2 bones) — composites with a conditional stat count mirror their loaded composition",
   );
 
+  const statBandSeven = await renderToHtml(
+    React.createElement(
+      StatBand,
+      { loading: true, loadingCount: 7 },
+      React.createElement(StatCard, { value: "4", label: "Servings" }),
+    ),
+  );
+  assert.equal(
+    hiddenBones(statBandSeven),
+    14,
+    "a loading StatBand with loadingCount=7 renders 7 dummy stats — counts above six are honored, not truncated",
+  );
+
   const preview = await renderToHtml(
     React.createElement(
       PreviewCard,
@@ -1222,5 +1235,14 @@ test("T2 SSR: loading RecipeIngredientsPanel skeletonizes controls and rows", as
     3,
     "the substitutions fetch renders the skeleton panel (title + one entry's bones)",
   );
-  assert.ok(!fetching.includes("Finding substitutions"), "the plain substitutions line is gone");
+  assert.ok(
+    fetching.includes("Finding substitutions"),
+    "the substitutions fetch announces a screen-reader progress status",
+  );
+  assert.match(fetching, /aria-busy/, "the fetching substitutions region is marked busy");
+  assert.match(
+    fetching,
+    /role="status"/,
+    "the substitutions status is a polite live region, not a visible line",
+  );
 });

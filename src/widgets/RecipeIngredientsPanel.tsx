@@ -1,9 +1,9 @@
-import { View, XStack, YStack } from "tamagui";
+import { View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { MarkableRow } from "./MarkableRow.js";
 import { NumberStepper } from "../views/NumberStepper.js";
-import { platformAccessibilityProps } from "./accessibility.js";
+import { platformAccessibilityProps, politeLiveRegionProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { PresetValueSelector, type PresetValueOption } from "./PresetValueSelector.js";
 import { SuggestionPanel } from "./SuggestionPanel.js";
@@ -319,7 +319,29 @@ export function RecipeIngredientsPanel({
         </YStack>
       ) : null}
       {view.loadingSubstitutions ? (
-        <YStack paddingBlockStart="$4">
+        <YStack
+          paddingBlockStart="$4"
+          position="relative"
+          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+        >
+          {/* Screen-reader-only progress status (the
+              AutocompletePicker StatusMessage pattern): the
+              skeleton bones are hidden from assistive tech, so
+              without this a screen-reader user cannot tell the
+              substitutions fetch started. The region above is
+              marked busy and this polite live region announces
+              the fetch; nothing renders visibly. */}
+          <YStack
+            collapsable={false}
+            {...politeLiveRegionProps}
+            position="absolute"
+            width={1}
+            height={1}
+            overflow="hidden"
+            {...(isWeb ? { opacity: 0 } : {})}
+          >
+            <Text>Finding substitutions…</Text>
+          </YStack>
           <SubstitutionsSkeleton entries={1} />
         </YStack>
       ) : null}

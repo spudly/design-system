@@ -28,17 +28,11 @@ export type StatBandProps = {
 };
 
 // The loading band's dummy stats (#278): placeholder items
-// from a frozen module-level constant with stable keys —
-// never generated per render. Their content is inert: a loading
+// keyed deterministically from their position (`loading-<n>`),
+// so any `loadingCount` — including counts above six — gets a
+// stable key per tile and the loading band always mirrors the
+// loaded band's tile count. Their content is inert: a loading
 // StatCard renders skeletons only.
-const LOADING_STAT_KEYS = [
-  "loading-1",
-  "loading-2",
-  "loading-3",
-  "loading-4",
-  "loading-5",
-  "loading-6",
-] as const;
 
 /**
  * The stat band on a detail page: a recessed gray band that spreads
@@ -54,7 +48,10 @@ const LOADING_STAT_KEYS = [
 export function StatBand({ children, loading = false, loadingCount = 3 }: StatBandProps) {
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
-    const dummyKeys = LOADING_STAT_KEYS.slice(0, Math.max(1, loadingCount));
+    const dummyKeys = Array.from(
+      { length: Math.max(1, loadingCount) },
+      (_, index) => `loading-${index + 1}`,
+    );
     // Loading (#278): the same recessed band, holding
     // `loadingCount` dummy stats (3 by default) — each
     // skeletonized through the LoadingScope
