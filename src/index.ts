@@ -52,3 +52,4 @@ export {
 } from "./themes/index.js";
 export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
 export { createTamaguiConfig } from "./tamagui.config.js";
+export { VoiceProvider, useVoice, type Voice, type VoiceFormatter, type VoiceProviderProps } from "./voice/index.js";

@@ -8,6 +8,8 @@ import { createStorybookTamaguiConfig, type StorybookThemeName } from "../src/ta
 // module scope (see src/tamagui.config.ts).
 const storybookTamaguiConfig = createStorybookTamaguiConfig();
 import { baseTheme, eciperayTheme, memorizeTheme } from "../src/themes/index.js";
+import { VoiceProvider } from "../src/voice/index.js";
+import { fixtureVoice } from "../src/voice/fixtures.js";
 
 /**
  * The body/UI font stack for a Storybook theme, from the brand theme's
@@ -87,6 +89,8 @@ const preview: Preview = {
           defaultTheme={theme}
         >
           <FontStackSync theme={theme} />
+          {/* #539: stories render under the fixture voice — fixtures only, never defaults. */}
+          <VoiceProvider voice={fixtureVoice}>
           {context.title.startsWith("Pages/") || context.parameters.phoneWidthFrame ? (
             // Page stories (#547) and phone-width frame stories
             // (#564): full-bleed — the page shell
@@ -103,6 +107,7 @@ const preview: Preview = {
               <Story />
             </YStack>
           )}
+          </VoiceProvider>
         </TamaguiProvider>
       );
     },
