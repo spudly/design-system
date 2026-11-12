@@ -1,7 +1,8 @@
 import { Alert } from "../widgets/Alert.js";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { Center } from "../widgets/Center.js";
 import { Button } from "../widgets/Button.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
@@ -101,9 +102,9 @@ const LOADING_GOAL_FIELD_KEYS = ["calories", "protein", "carbs", "fat", "satiety
 function GoalFieldSkeleton() {
   return (
     <YStack gap="$1">
-      <View width="35%" height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+      <Center width="35%" height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
         <TextSkeleton size="sm" lines={1} />
-      </View>
+      </Center>
       <BoxSkeleton height={44} />
     </YStack>
   );

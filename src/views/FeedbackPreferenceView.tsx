@@ -1,4 +1,4 @@
-import { View, XStack, YStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
@@ -124,9 +124,9 @@ export function FeedbackPreferenceView({
                   label column is 27 + gap + two lines, and
                   a shorter column slid everything below the
                   row up (Stephen on #579). */}
-              <View height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+              <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
                 <TextSkeleton size="md" lines={1} />
-              </View>
+              </Center>
               <TextSkeleton size="sm" lines={2} />
             </YStack>
           </XStack>

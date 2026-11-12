@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { View, XStack, YStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { tokens } from "../tokens/index.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
@@ -146,9 +146,9 @@ export function RecipeSharingView({
                   <CircleSkeleton size={20} />
                 </Center>
                 <YStack flex={1} gap={tokens.spacing[1]}>
-                  <View height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+                  <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
                     <TextSkeleton size="md" lines={1} />
-                  </View>
+                  </Center>
                   {option.description ? <TextSkeleton size="sm" lines={1} /> : null}
                 </YStack>
               </XStack>
@@ -183,9 +183,9 @@ export function RecipeSharingView({
                 <BoxSkeleton width={24} height={24} />
               </Center>
               <YStack flex={1} gap={tokens.spacing[1]}>
-                <View height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+                <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
                   <TextSkeleton size="md" lines={1} />
-                </View>
+                </Center>
                 {consentDescription ? <TextSkeleton size="sm" lines={1} /> : null}
               </YStack>
             </XStack>

@@ -1,6 +1,7 @@
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
+import { Center } from "../widgets/Center.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
@@ -128,9 +129,9 @@ export function SubscriptionView({
                 // centered in the link's own line box
                 // (SIZABLE_TEXT_LINE_BOX, 27), not a plain
                 // text line box (Stephen on #579).
-                <View width="100%" height={SIZABLE_TEXT_LINE_BOX} justifyContent="center">
+                <Center width="100%" height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
                   <TextSkeleton size="md" lines={1} />
-                </View>
+                </Center>
               ) : (
                 <TextLink href={portalUrl}>{portalLabel}</TextLink>
               )
