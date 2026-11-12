@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
+import { Center } from "../widgets/Center.js";
 import { FieldRow } from "../widgets/FieldRow.js";
 import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "./TextAreaField.js";
@@ -53,7 +54,10 @@ export type RecipeInstructionRowViewProps = {
  * and reordering never enters the row — the host's drag
  * container owns the gesture and feeds the new order back in
  * as a new rows array on the list view (the step numbers
- * re-derive from position on the next render).
+ * re-derive from position on the next render). With no
+ * body-change intent bound, the field renders non-editable:
+ * a read-only rendering must not invite edits it cannot
+ * report.
  */
 export function RecipeInstructionRowView({
   row,
@@ -66,12 +70,13 @@ export function RecipeInstructionRowView({
   return (
     <FieldRow>
       {dragHandle ?? null}
-      <YStack justifyContent="center">
+      <Center horizontal={false}>
         <Text variant="muted">{`${position}.`}</Text>
-      </YStack>
+      </Center>
       <YStack flex={1}>
         <TextAreaField
           accessibilityLabel={`Step ${position}`}
+          editable={onBodyChange !== undefined}
           numberOfLines={2}
           value={row.body}
           onChangeText={(value) => {

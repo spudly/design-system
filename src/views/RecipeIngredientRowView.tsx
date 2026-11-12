@@ -54,7 +54,10 @@ export type RecipeIngredientRowViewProps = {
  * the #124 view-model, every edit reports the row's key with
  * the field name, and reordering never enters the row — the
  * host's drag container owns the gesture and feeds the new
- * order back in as a new rows array on the list view.
+ * order back in as a new rows array on the list view. With
+ * no field-change intent bound, the fields render
+ * non-editable: a read-only rendering must not invite edits
+ * it cannot report.
  */
 export function RecipeIngredientRowView({
   row,
@@ -70,6 +73,7 @@ export function RecipeIngredientRowView({
       <TextField
         accessibilityLabel={`Ingredient ${position} quantity`}
         placeholder="Qty"
+        editable={onFieldChange !== undefined}
         value={row.quantity}
         onChangeText={(value) => {
           onFieldChange?.(row.key, "quantity", value);
@@ -78,6 +82,7 @@ export function RecipeIngredientRowView({
       <TextField
         accessibilityLabel={`Ingredient ${position} unit`}
         placeholder="Unit"
+        editable={onFieldChange !== undefined}
         value={row.unit}
         onChangeText={(value) => {
           onFieldChange?.(row.key, "unit", value);
@@ -87,6 +92,7 @@ export function RecipeIngredientRowView({
         grow
         accessibilityLabel={`Ingredient ${position} name`}
         placeholder="Name"
+        editable={onFieldChange !== undefined}
         value={row.name}
         onChangeText={(value) => {
           onFieldChange?.(row.key, "name", value);

@@ -13,24 +13,25 @@ release's changed components. The full index lives in
 
 ## RecipeIngredientRowView
 
-Open in `Views/RecipeIngredientRowView`: Default, Empty, WithoutIntents (row views:
-Default, WithoutDragHandle, Empty); and in
-`Pages/Eciperay/RecipeFormPage`: Default and Empty.
+Open in `Views/RecipeIngredientRowView`: Default, WithoutDragHandle, Empty.
+List-level checks (section label, + Add action, empty line, the
+WithoutIntents story) belong to `Views/RecipeIngredientListView` — see
+`RecipeIngredientListView.test.steps.md`.
 
-1. Default: the section label, the rows in order with their
-   fields filled, the host-bound Drag handle on each row, the
-   Remove action on each row, and the + Add action in the
-   label row render.
-2. Typing in a row field updates only that row; Remove drops
-   its row (later rows renumber / keep their values); + Add
-   appends an empty row.
-3. Empty: the empty line renders in place of rows; the + Add
-   action stays.
-4. WithoutIntents / WithoutDragHandle: no add, remove, or
-   handle elements render; the row content still renders.
-5. RecipeFormPage Default: both list sections render through
-   the views inside the form's flow; Empty: both sections show
-   their empty lines.
+1. Default: the row's quantity, unit, and name fields render
+   filled, with the host-bound Drag handle and the Remove
+   action; the fields are named for assistive tech by position
+   ("Ingredient 1 quantity" / "unit" / "name").
+2. Typing in a field reports that row's key and field; Remove
+   reports the row's key.
+3. WithoutDragHandle: no handle renders; the fields and the
+   Remove action still render.
+4. Empty: every field is empty with its placeholder showing.
+5. A row rendered without `onFieldChange` (as in the list
+   view's WithoutIntents story) shows its fields non-editable:
+   attempted edits change nothing.
+6. RecipeFormPage Default: ingredient rows render through the
+   row view inside the form's flow.
 
 **Run when:** `src/views/RecipeIngredientRowView.tsx`, its stories,
 RecipeFormPage, or a changeset naming the view.

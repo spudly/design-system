@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import type { RecipeIngredientRow } from "../views/RecipeIngredientListView.js";
@@ -94,6 +94,10 @@ function FormHarness({
   const [tagIds, setTagIds] = useState<string[]>(empty ? [] : fixture.tagIds);
   const [imageUri, setImageUri] = useState<string | null>(empty ? null : storyImageWide);
   const [ingredients, setIngredients] = useState<RecipeIngredientRow[]>(empty ? [] : ingredientRows);
+  // Monotonic key counters for added rows: deriving a key from the
+  // current row count would reuse a removed row's key on a later add.
+  const addedIngredientCount = useRef(0);
+  const addedInstructionCount = useRef(0);
   const [instructions, setInstructions] = useState<RecipeInstructionRow[]>(
     empty ? [] : instructionRows,
   );
@@ -144,7 +148,7 @@ function FormHarness({
         onAdd: () => {
           setIngredients((prev) => [
             ...prev,
-            { key: `added-${prev.length}`, quantity: "", unit: "", name: "" },
+            { key: `added-${(addedIngredientCount.current += 1)}`, quantity: "", unit: "", name: "" },
           ]);
         },
         renderDragHandle: (_row, index) => dragHandle(`Reorder ingredient ${index + 1}`),
@@ -158,7 +162,7 @@ function FormHarness({
           setInstructions((prev) => prev.filter((r) => r.key !== key));
         },
         onAdd: () => {
-          setInstructions((prev) => [...prev, { key: `added-${prev.length}`, body: "" }]);
+          setInstructions((prev) => [...prev, { key: `added-${(addedInstructionCount.current += 1)}`, body: "" }]);
         },
         renderDragHandle: (_row, index) => dragHandle(`Reorder step ${index + 1}`),
       }}
