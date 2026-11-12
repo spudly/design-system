@@ -1,5 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Fragment, type ReactNode } from "react";
+import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import { ButtonStack } from "../widgets/ButtonStack.js";
 import { Card } from "../widgets/Card.js";
@@ -26,7 +27,13 @@ import { Text } from "../widgets/Text.js";
  * bones at the loaded rows' text sizes, inside a LoadingScope.
  * The host's rows cannot skeletonize themselves (they cross
  * through the render slot), so the dummy rows are the page's
- * own composition in the rows' card shape.
+ * own composition in the rows' card shape. ListStack imposes
+ * no gap of its own and the loaded rows carry the list's
+ * rhythm in themselves (each host row renders with its $3
+ * bottom separation), so each dummy row's wrapper carries the
+ * same $3 bottom padding — without it the skeleton cards
+ * stack flush, borders touching, where the loaded list is
+ * separated.
  *
  * The copy crosses as props: the strings are the app's
  * content constants (shared with the web mirror), so the host
@@ -124,10 +131,12 @@ export function HomePage({
             <LoadingScope active>
               <ListStack>
                 {LOADING_ROW_KEYS.map((key) => (
-                  <Card key={key}>
-                    <TextSkeleton size="md" lines={1} />
-                    <TextSkeleton size="sm" lines={1} />
-                  </Card>
+                  <YStack key={key} paddingBlockEnd="$3">
+                    <Card>
+                      <TextSkeleton size="md" lines={1} />
+                      <TextSkeleton size="sm" lines={1} />
+                    </Card>
+                  </YStack>
                 ))}
               </ListStack>
             </LoadingScope>

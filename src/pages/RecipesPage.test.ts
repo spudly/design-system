@@ -170,8 +170,13 @@ describe("recipesPageBoundedList", () => {
     );
     assert.match(
       code,
-      /ListHeaderComponent=\{filtersBar\}/,
+      /ListHeaderComponent=\{filtersHeader\}/,
       "the one filter bar renders as the native list's header, so it scrolls with the recipes (web renders it in page flow, #547)",
+    );
+    assert.match(
+      code,
+      /const filtersHeader = <YStack paddingBlockEnd="\$3">\{filtersBar\}<\/YStack>;/,
+      "the bar's wrapper carries the $3 bottom separation, so the first section heading sits the list's 12px below the search bar in both layouts",
     );
   });
 

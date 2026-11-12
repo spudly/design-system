@@ -1155,6 +1155,17 @@ export function RecipesPage(props: RecipesPageProps) {
     />
   );
 
+  // The signed-in catalog renders the bar bare (the public
+  // variant wraps it in CatalogHeader, inside a gapped column):
+  // the bar's wrapper carries the $3 bottom separation every
+  // list row carries under itself (the rows' paddingBlockEnd
+  // rhythm), so the first section heading sits the list's
+  // 12px below the search bar instead of flush against it.
+  // Both signed-in layouts (the web column and the native
+  // list's header) render this one composition, so the
+  // separation holds in the loaded and loading states alike.
+  const filtersHeader = <YStack paddingBlockEnd="$3">{filtersBar}</YStack>;
+
   if (variant === "public") {
     const publicItems: DiscoverPageItem[] = publicLoading ? [] : (publicRecipes ?? []);
     if (isWeb) {
@@ -1257,7 +1268,7 @@ export function RecipesPage(props: RecipesPageProps) {
       <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
           <YStack paddingHorizontal="$4" paddingBottom="$8">
-            {filtersBar}
+            {filtersHeader}
             {rows.map((row) => (
               <YStack key={recipesPageRowKey(row)}>{renderRow(row)}</YStack>
             ))}
@@ -1305,7 +1316,7 @@ export function RecipesPage(props: RecipesPageProps) {
           // flips a section's loading flag and a tree swap would
           // unmount the focused filter input mid-typing; the loading
           // indicators render as the sections' own rows instead.
-          ListHeaderComponent={filtersBar}
+          ListHeaderComponent={filtersHeader}
           renderItem={({ item: row }) => renderRow(row)}
           onEndReached={handleListEndReached}
           onScroll={handleListScroll}
