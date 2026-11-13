@@ -5,6 +5,7 @@ import { Button } from "../widgets/Button.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "../widgets/TextLink.js";
+import { useVoice } from "../voice/index.js";
 
 const StyledLinks = styled(YStack, {
   name: "SignInFormLinks",
@@ -70,6 +71,8 @@ export function SignInForm({
   signUpHref,
   forgotPasswordHref,
 }: SignInFormProps) {
+  const voice = useVoice();
+  const submitLabel = loading ? voice.signInForm.submitPendingLabel : voice.signInForm.submitLabel;
   const submitFromField = () => {
     if (!loading) {
       onSubmit();
@@ -78,23 +81,23 @@ export function SignInForm({
   return (
     <FormStack>
       <TextField
-        label="Email"
+        label={voice.signInForm.emailLabel}
         value={email}
         onChangeText={onEmailChange}
         autoComplete="email"
         autoCapitalize="none"
         keyboardType="email-address"
-        accessibilityLabel="Email"
+        accessibilityLabel={voice.signInForm.emailLabel}
         {...(emailError ? { error: emailError } : {})}
         onSubmitEditing={submitFromField}
       />
       <TextField
-        label="Password"
+        label={voice.signInForm.passwordLabel}
         value={password}
         onChangeText={onPasswordChange}
         autoComplete="password"
         secureTextEntry
-        accessibilityLabel="Password"
+        accessibilityLabel={voice.signInForm.passwordLabel}
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
@@ -103,16 +106,18 @@ export function SignInForm({
         variant="primary"
         disabled={loading}
         onPress={onSubmit}
-        accessibilityLabel={loading ? "Signing in…" : "Sign In"}
+        accessibilityLabel={submitLabel}
       >
-        {loading ? "Signing in…" : "Sign In"}
+        {submitLabel}
       </Button>
       {signUpHref || forgotPasswordHref ? (
         <StyledLinks>
-          {signUpHref ? <TextLink href={signUpHref}>Create an account</TextLink> : null}
+          {signUpHref ? (
+            <TextLink href={signUpHref}>{voice.signInForm.createAccountLabel}</TextLink>
+          ) : null}
           {forgotPasswordHref ? (
             <TextLink tone="muted" href={forgotPasswordHref}>
-              Forgot password?
+              {voice.signInForm.forgotPasswordLabel}
             </TextLink>
           ) : null}
         </StyledLinks>

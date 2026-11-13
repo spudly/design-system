@@ -204,6 +204,37 @@ export type Voice = {
     importLabel: string;
     importPendingLabel: string;
   };
+  /** SignInForm view (tranche 2c): the form's field labels, submit action, and footer links — the form has no label props, so its copy reads the voice slots directly. */
+  signInForm: {
+    emailLabel: string;
+    passwordLabel: string;
+    submitLabel: string;
+    submitPendingLabel: string;
+    createAccountLabel: string;
+    forgotPasswordLabel: string;
+  };
+  /** SignUpForm view (tranche 2c): the form's field labels, submit action, and sign-in link — the form has no label props, so its copy reads the voice slots directly. */
+  signUpForm: {
+    nameLabel: string;
+    emailLabel: string;
+    passwordLabel: string;
+    submitLabel: string;
+    submitPendingLabel: string;
+    signInLabel: string;
+  };
+  /** ForgotPasswordForm view (tranche 2c): the form's field label, submit action, and back link — the form has no label props, so its copy reads the voice slots directly. */
+  forgotPasswordForm: {
+    emailLabel: string;
+    submitLabel: string;
+    submitPendingLabel: string;
+    backToSignInLabel: string;
+  };
+  /** ResetPasswordForm view (tranche 2c): the form's field label and submit action — the form has no label props, so its copy reads the voice slots directly. */
+  resetPasswordForm: {
+    passwordLabel: string;
+    submitLabel: string;
+    submitPendingLabel: string;
+  };
   /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
   autocompletePicker: {
     searchPlaceholder: string;

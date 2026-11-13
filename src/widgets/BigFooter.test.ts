@@ -377,6 +377,8 @@ function loadRuntime() {
       });
     const { BigFooter, BigFooterShell }: Record<string, any> =
       await import("../../dist/widgets/BigFooter.js");
+    const { VoiceProvider }: Record<string, any> = await import("../../dist/voice/index.js");
+    const { fixtureVoice }: Record<string, any> = await import("../../dist/voice/fixtures.js");
     return {
       React,
       renderToString,
@@ -385,6 +387,8 @@ function loadRuntime() {
       baseTheme,
       BigFooter,
       BigFooterShell,
+      VoiceProvider,
+      fixtureVoice,
     };
   })();
   return runtimePromise;
@@ -436,24 +440,35 @@ test("SSR: BigFooter renders brand, columns, store and social links as anchors",
 });
 
 test("SSR: an exported page renders its footer from the footer prop", async () => {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
-    await loadRuntime();
+  const {
+    React,
+    renderToString,
+    TamaguiProvider,
+    createTamaguiConfig,
+    baseTheme,
+    VoiceProvider,
+    fixtureVoice,
+  } = await loadRuntime();
   const { SignInPage }: Record<string, any> = await import("../../dist/pages/SignInPage.js");
   const config = createTamaguiConfig(baseTheme);
   const html = renderToString(
     React.createElement(
       TamaguiProvider,
       { config, defaultTheme: "light" },
-      React.createElement(SignInPage, {
-        email: "",
-        password: "",
-        onEmailChange: () => {},
-        onPasswordChange: () => {},
-        onSubmit: () => {},
-        signUpHref: "/signup",
-        forgotPasswordHref: "/forgot-password",
-        footer: footerData,
-      }),
+      React.createElement(
+        VoiceProvider,
+        { voice: fixtureVoice },
+        React.createElement(SignInPage, {
+          email: "",
+          password: "",
+          onEmailChange: () => {},
+          onPasswordChange: () => {},
+          onSubmit: () => {},
+          signUpHref: "/signup",
+          forgotPasswordHref: "/forgot-password",
+          footer: footerData,
+        }),
+      ),
     ),
   );
   assert.ok(

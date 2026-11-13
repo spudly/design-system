@@ -3,6 +3,7 @@ import { Button } from "../widgets/Button.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "../widgets/TextLink.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * ForgotPasswordForm (#119): the reset-request form — the
@@ -49,6 +50,10 @@ export function ForgotPasswordForm({
   onSubmit,
   signInHref,
 }: ForgotPasswordFormProps) {
+  const voice = useVoice();
+  const submitLabel = loading
+    ? voice.forgotPasswordForm.submitPendingLabel
+    : voice.forgotPasswordForm.submitLabel;
   const submitFromField = () => {
     if (!loading) {
       onSubmit();
@@ -57,13 +62,13 @@ export function ForgotPasswordForm({
   return (
     <FormStack>
       <TextField
-        label="Email"
+        label={voice.forgotPasswordForm.emailLabel}
         value={email}
         onChangeText={onEmailChange}
         autoComplete="email"
         autoCapitalize="none"
         keyboardType="email-address"
-        accessibilityLabel="Email"
+        accessibilityLabel={voice.forgotPasswordForm.emailLabel}
         {...(emailError ? { error: emailError } : {})}
         onSubmitEditing={submitFromField}
         returnKeyType="go"
@@ -73,13 +78,13 @@ export function ForgotPasswordForm({
         variant="primary"
         disabled={loading}
         onPress={onSubmit}
-        accessibilityLabel={loading ? "Sending…" : "Send Reset Link"}
+        accessibilityLabel={submitLabel}
       >
-        {loading ? "Sending…" : "Send Reset Link"}
+        {submitLabel}
       </Button>
       {signInHref ? (
         <TextLink tone="muted" href={signInHref}>
-          Back to sign in
+          {voice.forgotPasswordForm.backToSignInLabel}
         </TextLink>
       ) : null}
     </FormStack>

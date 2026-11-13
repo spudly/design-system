@@ -135,6 +135,33 @@ export const fixtureVoice: Voice = {
     importLabel: "Import recipes",
     importPendingLabel: "Importing\u2026",
   },
+  signInForm: {
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    submitLabel: "Sign In",
+    submitPendingLabel: "Signing in\u2026",
+    createAccountLabel: "Create an account",
+    forgotPasswordLabel: "Forgot password?",
+  },
+  signUpForm: {
+    nameLabel: "Your name",
+    emailLabel: "Email",
+    passwordLabel: "Password",
+    submitLabel: "Create Account",
+    submitPendingLabel: "Creating account\u2026",
+    signInLabel: "Already have an account? Sign in",
+  },
+  forgotPasswordForm: {
+    emailLabel: "Email",
+    submitLabel: "Send Reset Link",
+    submitPendingLabel: "Sending\u2026",
+    backToSignInLabel: "Back to sign in",
+  },
+  resetPasswordForm: {
+    passwordLabel: "New password",
+    submitLabel: "Update password",
+    submitPendingLabel: "Updating\u2026",
+  },
   autocompletePicker: {
     searchPlaceholder: "Search\u2026",
     searchLabel: "Search",
