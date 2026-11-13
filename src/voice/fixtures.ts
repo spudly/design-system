@@ -89,6 +89,52 @@ export const fixtureVoice: Voice = {
     removeLabel: "Remove",
     removeStepLabel: (position: number) => `Remove step ${position}`,
   },
+  accessTokensPanel: {
+    title: "API access tokens",
+    infoText:
+      "Personal access tokens let apps and scripts use the Eciperay API — including the MCP server — without signing in each time. Treat them like passwords.",
+    createdSecretTitle: "Copy your new token now — you won't see it again.",
+    createdSecretHint: "Long-press the token to copy it.",
+    doneLabel: "Done",
+    tokenNameLabel: "Token name",
+    tokenNamePlaceholder: "e.g. Claude Desktop",
+    createLabel: "Create token",
+    emptyMessage: "No tokens yet.",
+  },
+  accountDataView: {
+    title: "Your data",
+    description: "Download a copy of your recipes and account data, or delete your account.",
+    exportLabel: "Download my data",
+    exportPendingLabel: "Preparing\u2026",
+    deleteLabel: "Delete account",
+    deletePendingLabel: "Deleting\u2026",
+  },
+  feedbackPreferenceView: {
+    title: "Preferences",
+    shortcutLabel: "Show feedback shortcut",
+    shortcutDescription: "Adds a floating shortcut for sending feedback from anywhere in the app.",
+    consentPromptText:
+      "Share anonymous usage analytics to help improve the app? You can change this any time.",
+    acceptLabel: "Accept",
+    declineLabel: "Decline",
+    withdrawLabel: "Withdraw consent",
+    choicesHintBefore: "Manage your choice at any time on the ",
+    choicesLinkLabel: "privacy choices page",
+  },
+  subscriptionView: {
+    title: "Subscription",
+    manageLabel: "Manage subscription",
+    managePendingLabel: "Opening\u2026",
+    refreshLabel: "Check again",
+    refreshPendingLabel: "Checking\u2026",
+    portalLabel: "Open subscription portal",
+  },
+  transferRecipesView: {
+    title: "Transfer recipes",
+    hint: "Export recipes to a file you can keep, or import recipes from a file.",
+    importLabel: "Import recipes",
+    importPendingLabel: "Importing\u2026",
+  },
   autocompletePicker: {
     searchPlaceholder: "Search\u2026",
     searchLabel: "Search",
@@ -145,8 +191,7 @@ export const fixtureVoice: Voice = {
     customScaleAccessibilityLabel: "Custom scale",
     decreaseServingsLabel: "Decrease Servings",
     increaseServingsLabel: "Increase Servings",
-    missingIngredientsHint:
-      "Tap an ingredient to mark it missing and see substitutions below.",
+    missingIngredientsHint: "Tap an ingredient to mark it missing and see substitutions below.",
     findingSubstitutionsLabel: "Finding substitutions\u2026",
     substitutionsTitle: "Substitutions",
   },
@@ -162,7 +207,18 @@ export const fixtureVoice: Voice = {
 /** Pseudo-localize one string the en-XA way: bracketed, accented, lengthened. */
 function pseudoLocalize(value: string): string {
   const accented = value.replace(/[aeiou]/gi, (ch) => {
-    const map: Record<string, string> = { a: "à", e: "ë", i: "ï", o: "ö", u: "ü", A: "À", E: "Ë", I: "Ï", O: "Ö", U: "Ü" };
+    const map: Record<string, string> = {
+      a: "à",
+      e: "ë",
+      i: "ï",
+      o: "ö",
+      u: "ü",
+      A: "À",
+      E: "Ë",
+      I: "Ï",
+      O: "Ö",
+      U: "Ü",
+    };
     return map[ch] ?? ch;
   });
   return `⟦${accented} ⟧`;

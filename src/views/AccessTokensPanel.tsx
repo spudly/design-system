@@ -7,6 +7,7 @@ import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextField } from "./TextField.js";
 import { TokenRow } from "../widgets/TokenRow.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * AccessTokensPanel (#126, B3c): the API access tokens section
@@ -96,13 +97,11 @@ export function AccessTokensPanel({
   error,
   planNotice,
 }: AccessTokensPanelProps) {
+  const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   return (
-    <SectionCard title="API access tokens">
-      <Alert severity="info">
-        Personal access tokens let apps and scripts use the Eciperay API — including the MCP server
-        — without signing in each time. Treat them like passwords.
-      </Alert>
+    <SectionCard title={voice.accessTokensPanel.title}>
+      <Alert severity="info">{voice.accessTokensPanel.infoText}</Alert>
       {createdSecret ? (
         <YStack paddingTop="$4" paddingBottom="$4">
           <YStack
@@ -118,7 +117,7 @@ export function AccessTokensPanel({
                 fontWeight={tokens.typography.fontWeight.semibold}
                 color={tokens.colors.warning.warning10}
               >
-                Copy your new token now — you won&apos;t see it again.
+                {voice.accessTokensPanel.createdSecretTitle}
               </Text>
             </YStack>
             <YStack paddingBottom="$1">
@@ -137,12 +136,12 @@ export function AccessTokensPanel({
             </YStack>
             <YStack paddingBottom="$3">
               <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
-                Long-press the token to copy it.
+                {voice.accessTokensPanel.createdSecretHint}
               </Text>
             </YStack>
             <XStack gap="$2">
               <Button variant="secondary" onPress={onDismissSecret}>
-                Done
+                {voice.accessTokensPanel.doneLabel}
               </Button>
             </XStack>
           </YStack>
@@ -153,10 +152,10 @@ export function AccessTokensPanel({
       ) : (
         <YStack paddingBottom="$4">
           <TextField
-            label="Token name"
+            label={voice.accessTokensPanel.tokenNameLabel}
             value={tokenName}
             onChangeText={onTokenNameChange}
-            placeholder="e.g. Claude Desktop"
+            placeholder={voice.accessTokensPanel.tokenNamePlaceholder}
           />
           <YStack paddingTop="$3">
             <Button
@@ -164,7 +163,7 @@ export function AccessTokensPanel({
               disabled={!tokenName.trim() || createdSecret !== null || isCreating}
               onPress={onCreate}
             >
-              Create token
+              {voice.accessTokensPanel.createLabel}
             </Button>
           </YStack>
         </YStack>
@@ -201,7 +200,7 @@ export function AccessTokensPanel({
           ))}
         </YStack>
       ) : accessTokens.length === 0 ? (
-        <Text textAlign="center">No tokens yet.</Text>
+        <Text textAlign="center">{voice.accessTokensPanel.emptyMessage}</Text>
       ) : (
         <YStack>
           {accessTokens.map((token) => (

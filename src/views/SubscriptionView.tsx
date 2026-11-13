@@ -6,9 +6,10 @@ import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
+import { useVoice } from "../voice/index.js";
 
 export type SubscriptionViewProps = {
-  /** Section heading ("Subscription"). */
+  /** Section heading. Defaults to the voice object's subscriptionView title (#539). */
   title?: string;
   /** The current plan's display name; absent hides the plan line. */
   planLabel?: string | null;
@@ -64,7 +65,7 @@ export type SubscriptionViewProps = {
  * href (#248).
  */
 export function SubscriptionView({
-  title = "Subscription",
+  title: titleProp,
   planLabel,
   statusText,
   upsellText,
@@ -72,16 +73,23 @@ export function SubscriptionView({
   error,
   loading = false,
   onManage,
-  manageLabel = "Manage subscription",
-  managePendingLabel = "Opening…",
+  manageLabel: manageLabelProp,
+  managePendingLabel: managePendingLabelProp,
   managePending = false,
   onRefresh,
-  refreshLabel = "Check again",
-  refreshPendingLabel = "Checking…",
+  refreshLabel: refreshLabelProp,
+  refreshPendingLabel: refreshPendingLabelProp,
   refreshPending = false,
   portalUrl,
-  portalLabel = "Open subscription portal",
+  portalLabel: portalLabelProp,
 }: SubscriptionViewProps) {
+  const voice = useVoice();
+  const title = titleProp ?? voice.subscriptionView.title;
+  const manageLabel = manageLabelProp ?? voice.subscriptionView.manageLabel;
+  const managePendingLabel = managePendingLabelProp ?? voice.subscriptionView.managePendingLabel;
+  const refreshLabel = refreshLabelProp ?? voice.subscriptionView.refreshLabel;
+  const refreshPendingLabel = refreshPendingLabelProp ?? voice.subscriptionView.refreshPendingLabel;
+  const portalLabel = portalLabelProp ?? voice.subscriptionView.portalLabel;
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
