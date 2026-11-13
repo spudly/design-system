@@ -24,7 +24,13 @@ const read = (name: string) => strip(readFileSync(join(here, `${name}.tsx`), "ut
 test("RecipeCommentsView reads its defaults from the voice object", () => {
   const view = read("RecipeCommentsView");
   assert.match(view, /useVoice\(\)/);
-  for (const slot of ["title", "emptyMessage", "composerLabel", "composerPlaceholder", "postLabel"]) {
+  for (const slot of [
+    "title",
+    "emptyMessage",
+    "composerLabel",
+    "composerPlaceholder",
+    "postLabel",
+  ]) {
     assert.match(view, new RegExp(`voice\\.recipeCommentsView\\.${slot}`), `slot ${slot} is read`);
   }
   assert.doesNotMatch(
@@ -65,6 +71,8 @@ test("NutritionGoalsForm reads its copy from the voice object", () => {
     "carbsLabel",
     "fatLabel",
     "satietyScoreLabel",
+    "minLabel",
+    "maxLabel",
     "optionalPlaceholder",
     "saveLabel",
   ]) {

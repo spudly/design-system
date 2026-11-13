@@ -263,6 +263,8 @@ export type Voice = {
     carbsLabel: string;
     fatLabel: string;
     satietyScoreLabel: string;
+    minLabel: string;
+    maxLabel: string;
     optionalPlaceholder: string;
     saveLabel: string;
   };

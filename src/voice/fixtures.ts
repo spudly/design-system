@@ -187,6 +187,8 @@ export const fixtureVoice: Voice = {
     carbsLabel: "Carbs (g)",
     fatLabel: "Fat (g)",
     satietyScoreLabel: "Satiety score",
+    minLabel: "min",
+    maxLabel: "max",
     optionalPlaceholder: "Optional",
     saveLabel: "Save goals",
   },
