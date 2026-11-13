@@ -168,6 +168,8 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
+    const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
     const { LegalDocumentPage }: Record<string, any> =
       await import("../../dist/pages/LegalDocumentPage.js");
     return {
@@ -175,17 +177,20 @@ function loadRuntime() {
       renderToString,
       TamaguiProvider,
       ...dist,
+      ...voiceFixtures,
+      ...voiceModule,
       LegalDocumentPage,
     };
   })();
   return runtimePromise;
 }
 async function renderToHtml(element: any) {
-  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } = await loadRuntime();
+  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
+    await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   const html = renderToString(
     <TamaguiProvider config={config} defaultTheme="light">
-      {element}
+      <VoiceProvider voice={fixtureVoice}>{element}</VoiceProvider>
     </TamaguiProvider>,
   );
   const styleEnd = html.lastIndexOf("</style>");
