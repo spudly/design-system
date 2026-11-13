@@ -117,7 +117,7 @@ test("the shell manages focus: dialog semantics and a web mount focus move (#332
 test("the Done pill routes its button semantics through the translator (#237)", () => {
   assert.match(
     code,
-    /\{\.\.\.platformAccessibilityProps\(\{\s+accessibilityRole: "button",\s+accessibilityLabel: doneLabel,\s+\}\)\}/,
+    /\{\.\.\.platformAccessibilityProps\(\{\s+accessibilityRole: "button",\s+accessibilityLabel: resolvedDoneLabel,\s+\}\)\}/,
   );
   assert.match(code, /onPress=\{onDone\}/);
   assert.match(code, /tabIndex=\{0\}/);
