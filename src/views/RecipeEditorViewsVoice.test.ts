@@ -100,6 +100,12 @@ test("RecipeInstructionRowView builds its step and remove names through the voic
   assert.doesNotMatch(row, /`Step \$\{position\}`|`Remove step \$\{position\}`|>\s*Remove\s*</);
 });
 
+test("the en-XA fixture voice pseudo-localizes formatter results, not just plain strings", () => {
+  const fixtures = readFileSync(join(here, "../voice/fixtures.ts"), "utf8");
+  assert.match(fixtures, /typeof node === "function"/);
+  assert.match(fixtures, /pseudoLocalize\(result\)/);
+});
+
 test("ScaledIngredientsView reads no voice slots — its heading and lines are caller-composed", () => {
   const view = read("ScaledIngredientsView");
   assert.doesNotMatch(view, /useVoice/);

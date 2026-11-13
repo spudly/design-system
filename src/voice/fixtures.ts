@@ -171,6 +171,15 @@ function pseudoLocalize(value: string): string {
 function pseudoLocalizeVoice(voice: Voice): Voice {
   const walk = (node: unknown): unknown => {
     if (typeof node === "string") return pseudoLocalize(node);
+    if (typeof node === "function") {
+      // Formatter slots: forward the arguments and pseudo-localize
+      // the returned string, so a formatter's output is transformed
+      // the same way a plain string slot is.
+      return (...args: unknown[]) => {
+        const result = (node as (...a: unknown[]) => unknown)(...args);
+        return typeof result === "string" ? pseudoLocalize(result) : result;
+      };
+    }
     if (node !== null && typeof node === "object") {
       return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, walk(v)]));
     }
