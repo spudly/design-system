@@ -91,6 +91,35 @@ jobs:
           # baselines; the release PR's VR run generates them.
           DSVR_ENFORCE_BASELINE_GATE: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'changeset-release/') }}
 
+  knip:
+    # Warn mode (design-system #586, Phase 1): reports dead-code findings
+    # to the job summary and never fails. Deliberately NOT in ci-gate's
+    # needs, so it cannot block a merge; Phase 3 (its own PR) removes the
+    # warn masking once the Phase 2 burn-down lands.
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          registry-url: https://npm.pkg.github.com
+          scope: "@spudly"
+      - name: Enable Corepack (pinned npm)
+        run: corepack enable npm
+      - run: npm ci
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: knip — dead-code baseline (warn mode)
+        run: |
+          {
+            echo "## knip baseline — dead-code detection (warn mode, #586 Phase 1)"
+            echo '```'
+            npm run knip 2>&1 || true
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
   # Always-reporting gate for branch protection: needs every job in
   # this workflow and reports whenever the workflow runs. It fails
   # only when a needed job failed or was cancelled, and passes when
