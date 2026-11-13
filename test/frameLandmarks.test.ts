@@ -155,8 +155,14 @@ async function renderToHtml(element: any) {
   const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
+  // #539: compositions under test can contain voice-reading widgets
+  // (PublicRecipePage's overview panel); supply the fixture voice
+  // the same way the whole-page-flow helper does.
+  const { VoiceProvider }: Record<string, any> = await import("../dist/voice/index.js");
+  const { fixtureVoice }: Record<string, any> = await import("../dist/voice/fixtures.js");
+  const inner = React.createElement(VoiceProvider, { voice: fixtureVoice }, element);
   const html = renderToString(
-    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, inner),
   );
   const styleEnd = html.lastIndexOf("</style>");
   return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
