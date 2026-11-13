@@ -4,6 +4,7 @@ import { Button } from "../widgets/Button.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "../widgets/TextLink.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * SignUpForm (#119): the create-account form — the fields and
@@ -66,6 +67,8 @@ export function SignUpForm({
   signInHref,
   legalNotice,
 }: SignUpFormProps) {
+  const voice = useVoice();
+  const submitLabel = loading ? voice.signUpForm.submitPendingLabel : voice.signUpForm.submitLabel;
   const submitFromField = () => {
     if (!loading) {
       onSubmit();
@@ -74,30 +77,30 @@ export function SignUpForm({
   return (
     <FormStack>
       <TextField
-        label="Your name"
+        label={voice.signUpForm.nameLabel}
         value={displayName}
         onChangeText={onDisplayNameChange}
-        accessibilityLabel="Your name"
+        accessibilityLabel={voice.signUpForm.nameLabel}
         onSubmitEditing={submitFromField}
       />
       <TextField
-        label="Email"
+        label={voice.signUpForm.emailLabel}
         value={email}
         onChangeText={onEmailChange}
         autoComplete="email"
         autoCapitalize="none"
         keyboardType="email-address"
-        accessibilityLabel="Email"
+        accessibilityLabel={voice.signUpForm.emailLabel}
         {...(emailError ? { error: emailError } : {})}
         onSubmitEditing={submitFromField}
       />
       <TextField
-        label="Password"
+        label={voice.signUpForm.passwordLabel}
         value={password}
         onChangeText={onPasswordChange}
         autoComplete="password-new"
         secureTextEntry
-        accessibilityLabel="Password"
+        accessibilityLabel={voice.signUpForm.passwordLabel}
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
@@ -106,14 +109,14 @@ export function SignUpForm({
         variant="primary"
         disabled={loading}
         onPress={onSubmit}
-        accessibilityLabel={loading ? "Creating account…" : "Create Account"}
+        accessibilityLabel={submitLabel}
       >
-        {loading ? "Creating account…" : "Create Account"}
+        {submitLabel}
       </Button>
       {legalNotice}
       {signInHref ? (
         <TextLink textAlign="center" href={signInHref}>
-          Already have an account? Sign in
+          {voice.signUpForm.signInLabel}
         </TextLink>
       ) : null}
     </FormStack>

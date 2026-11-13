@@ -172,37 +172,41 @@ test("each form's submit button is named for the label it renders, in both state
   // The visible label swaps while loading; the accessible name
   // follows it (a static name would contradict the rendered
   // label on web, where the button's label forwards as its
-  // aria-label).
-  const BUTTON_LABELS = {
-    SignInForm: ["Signing in…", "Sign In"],
-    SignUpForm: ["Creating account…", "Create Account"],
-    ForgotPasswordForm: ["Sending…", "Send Reset Link"],
-    ResetPasswordForm: ["Updating…", "Update password"],
+  // aria-label). Since #539 tranche 2c the two labels are the
+  // voice object's submit / submitPending slots, resolved once
+  // into a single submitLabel const so the name and the text
+  // cannot drift apart.
+  const BUTTON_VOICE = {
+    SignInForm: "signInForm",
+    SignUpForm: "signUpForm",
+    ForgotPasswordForm: "forgotPasswordForm",
+    ResetPasswordForm: "resetPasswordForm",
   };
-  for (const [form, [busy, idle]] of Object.entries(BUTTON_LABELS)) {
+  for (const [form, voiceKey] of Object.entries(BUTTON_VOICE)) {
     const source = read(`src/views/${form}.tsx`);
-    assert.ok(
-      source.includes(`accessibilityLabel={loading ? "${busy}" : "${idle}"}`),
-      `${form} names its submit button for the state it renders`,
+    assert.match(
+      source.replace(/\s+/g, " "),
+      new RegExp(
+        `const submitLabel = loading \\? voice\\.${voiceKey}\\.submitPendingLabel : voice\\.${voiceKey}\\.submitLabel;`,
+      ),
+      `${form} resolves its submit label from the voice slots for the state it renders`,
     );
-    // The rendered label itself must be the same ternary, so a
-    // change to either visible label is caught here too (the
-    // name and the text cannot drift apart). The accessible-name
-    // line cannot false-positive this: trimmed, it starts with
-    // "accessibilityLabel=".
-    const rendered = `{loading ? "${busy}" : "${idle}"}`;
     assert.ok(
-      source.split("\n").some((line) => line.trim() === rendered),
-      `${form} renders the same loading ternary it is named by`,
+      source.includes("accessibilityLabel={submitLabel}"),
+      `${form} names its submit button with the resolved label`,
+    );
+    assert.ok(
+      source.split("\n").some((line) => line.trim() === "{submitLabel}"),
+      `${form} renders the same resolved label it is named by`,
     );
   }
 });
 
 test("SignUpForm keeps the legal notice between submit and the sign-in link", () => {
   const source = read("src/views/SignUpForm.tsx");
-  const submitAt = source.indexOf("Create Account");
+  const submitAt = source.indexOf("{submitLabel}");
   const noticeAt = source.indexOf("{legalNotice}");
-  const linkAt = source.indexOf("Already have an account? Sign in");
+  const linkAt = source.indexOf("{voice.signUpForm.signInLabel}");
   assert.ok(submitAt !== -1 && noticeAt !== -1 && linkAt !== -1, "all three footer parts render");
   assert.ok(
     submitAt < noticeAt && noticeAt < linkAt,

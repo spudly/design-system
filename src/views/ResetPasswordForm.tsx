@@ -2,6 +2,7 @@ import { Alert } from "../widgets/Alert.js";
 import { Button } from "../widgets/Button.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { TextField } from "./TextField.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * ResetPasswordForm (#119): the new-password form — the field
@@ -38,6 +39,10 @@ export function ResetPasswordForm({
   error,
   onSubmit,
 }: ResetPasswordFormProps) {
+  const voice = useVoice();
+  const submitLabel = loading
+    ? voice.resetPasswordForm.submitPendingLabel
+    : voice.resetPasswordForm.submitLabel;
   const submitFromField = () => {
     if (!loading) {
       onSubmit();
@@ -46,12 +51,12 @@ export function ResetPasswordForm({
   return (
     <FormStack>
       <TextField
-        label="New password"
+        label={voice.resetPasswordForm.passwordLabel}
         value={password}
         onChangeText={onPasswordChange}
         autoComplete="password-new"
         secureTextEntry
-        accessibilityLabel="New password"
+        accessibilityLabel={voice.resetPasswordForm.passwordLabel}
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
@@ -60,9 +65,9 @@ export function ResetPasswordForm({
         variant="primary"
         disabled={loading}
         onPress={onSubmit}
-        accessibilityLabel={loading ? "Updating…" : "Update password"}
+        accessibilityLabel={submitLabel}
       >
-        {loading ? "Updating…" : "Update password"}
+        {submitLabel}
       </Button>
     </FormStack>
   );

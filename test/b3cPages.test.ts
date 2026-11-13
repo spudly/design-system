@@ -94,7 +94,7 @@ test("SignUpForm footer block is consistently centered (eciperay#294)", () => {
   const source = view("SignUpForm");
   assert.match(
     source,
-    /<TextLink textAlign="center" href={signInHref}>\s*Already have an account\? Sign in/,
+    /<TextLink textAlign="center" href={signInHref}>\s*\{voice\.signUpForm\.signInLabel\}/,
     "the sign-in footer link is center-aligned like the legal notice above it (and a link since #248)",
   );
   assert.doesNotMatch(
@@ -132,7 +132,10 @@ test("auth cross-links render their href destinations (#248)", () => {
   // de-emphasized destinations take TextLink's muted tone (the
   // app link button's muted variant) instead of a hard-coded
   // gray — the pins follow the links into the forms.
-  assert.match(view("SignInForm"), /<TextLink href=\{signUpHref\}>Create an account<\/TextLink>/);
+  assert.match(
+    view("SignInForm"),
+    /<TextLink href=\{signUpHref\}>\{voice\.signInForm\.createAccountLabel\}<\/TextLink>/,
+  );
   assert.match(view("SignInForm"), /<TextLink tone="muted" href=\{forgotPasswordHref\}>/);
   assert.match(view("ForgotPasswordForm"), /<TextLink tone="muted" href=\{signInHref\}>/);
   for (const name of ["SignInPage", "SignUpPage", "ForgotPasswordPage"]) {
