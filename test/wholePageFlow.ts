@@ -32,8 +32,13 @@ export function makeRenderToHtml(
     const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
       await loadRuntime();
     const config = createTamaguiConfig(baseTheme);
+    // #539: compositions under test can contain voice-reading widgets;
+    // supply the fixture voice the same way Storybook does.
+    const { VoiceProvider } = await import("../dist/voice/index.js");
+    const { fixtureVoice } = await import("../dist/voice/fixtures.js");
+    const inner = React.createElement(VoiceProvider, { voice: fixtureVoice }, element);
     return renderToString(
-      React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+      React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, inner),
     );
   };
 }

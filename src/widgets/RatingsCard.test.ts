@@ -24,6 +24,8 @@ const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/
 
 test("RatingsCard is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
+    const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
   assert.equal(
     typeof dist.RatingsCard,
     "function",
@@ -60,17 +62,23 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    return { React, renderToString, TamaguiProvider, ...dist };
+    const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
+    return { React, renderToString, TamaguiProvider, ...dist, ...voiceFixtures, ...voiceModule };
   })();
   return runtimePromise;
 }
 
 async function renderToHtml(element: any) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
-    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+    React.createElement(
+      TamaguiProvider,
+      { config, defaultTheme: "light" },
+      React.createElement(VoiceProvider, { voice: fixtureVoice }, element),
+    ),
   );
 }
 
@@ -124,8 +132,8 @@ test("SSR: a read-only card renders no focusable star controls (#316)", async ()
 });
 
 test("stale ratings and the empty community state render their copy", () => {
-  assert.match(code, /STALE_COMMUNITY_RATING_HINT/);
-  assert.match(code, /STALE_VIEWER_RATING_HINT/);
-  assert.match(code, /No community ratings yet/);
+  assert.match(code, /voice\.ratingsCard\.staleCommunityRatingHint/, "the stale community hint comes from the voice object (#539)");
+  assert.match(code, /voice\.ratingsCard\.staleViewerRatingHint/, "the stale viewer hint comes from the voice object (#539)");
+  assert.match(code, /voice\.ratingsCard\.noCommunityRatingsLabel/, "the empty community copy comes from the voice object (#539)");
   assert.match(code, /<Card variant="muted">/, "the card renders in the muted card treatment");
 });

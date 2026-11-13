@@ -70,17 +70,19 @@ test("no source file renders a TextAction element (#464)", () => {
 test("CommentItem's four actions render as ghost Buttons", () => {
   const uses = commentItem.match(/<Button\s+ghost/g) ?? [];
   assert.ok(uses.length >= 4, `expected at least 4 ghost Buttons, found ${uses.length}`);
-  for (const label of ["Save", "Cancel", "Edit", "Delete"]) {
+  for (const slot of ["saveLabel", "cancelLabel", "editLabel", "deleteLabel"]) {
     assert.ok(
-      new RegExp(String.raw`<Button[\s\S]*?>\s*${label}\s*</Button>`).test(commentItem),
-      `CommentItem's ${label} action must render as a ghost Button`,
+      new RegExp(String.raw`<Button[\s\S]*?>\s*\{voice\.commentItem\.${slot}\}\s*</Button>`).test(
+        commentItem,
+      ),
+      `CommentItem's ${slot} action must render as a ghost Button reading the voice slot (#539)`,
     );
   }
   assert.match(commentItem, /disabled=\{saveDisabled\}/, "Save keeps its disabled state");
   assert.match(commentItem, /disabled=\{isDeletePending\}/, "Delete keeps its disabled state");
   assert.match(
     commentItem,
-    /variant="danger"[\s\S]*?>\s*Delete\s*<\/Button>/,
+    /variant="danger"[\s\S]*?>\s*\{voice\.commentItem\.deleteLabel\}\s*<\/Button>/,
     "Delete keeps its destructive treatment as the danger variant",
   );
 });

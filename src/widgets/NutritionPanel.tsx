@@ -4,6 +4,7 @@ import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 export type NutritionPanelRow = {
@@ -86,6 +87,7 @@ function NutritionRow({ label, valueLabel }: NutritionPanelRow) {
  * any app's nutrition displays.
  */
 export function NutritionPanel({ nutrition, loading = false }: NutritionPanelProps) {
+  const voice = useVoice();
   const showSkeleton = useLoadingScope(loading) || nutrition.state === "loading";
   if (showSkeleton) {
     // Loading (#278): the ready layout's skeleton — the header
@@ -115,7 +117,7 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
                 disabled={(nutrition.isRefreshing ?? false) || (nutrition.isFetching ?? false)}
                 onPress={nutrition.onRefreshPress}
               >
-                {nutrition.isRefreshing ? "Refreshing…" : "Refresh"}
+                {nutrition.isRefreshing ? voice.nutritionPanel.refreshingLabel : voice.nutritionPanel.refreshLabel}
               </Button>
             ) : null}
           </XStack>
@@ -147,7 +149,7 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
     return (
       <YStack>
         <YStack paddingBlockEnd="$3">
-          <Text color="$textMuted">Nutrition is not available yet.</Text>
+          <Text color="$textMuted">{voice.nutritionPanel.unavailableLabel}</Text>
         </YStack>
         {nutrition.onEstimatePress ? (
           <Button
@@ -155,7 +157,7 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
             disabled={nutrition.isRefreshing ?? false}
             onPress={nutrition.onEstimatePress}
           >
-            {nutrition.isRefreshing ? "Refreshing…" : "Estimate nutrition"}
+            {nutrition.isRefreshing ? voice.nutritionPanel.refreshingLabel : voice.nutritionPanel.estimateLabel}
           </Button>
         ) : null}
       </YStack>
@@ -171,7 +173,7 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
           color={tokens.colors.gray.gray6}
           textTransform="uppercase"
         >
-          Per Serving
+          {voice.nutritionPanel.perServingLabel}
         </Text>
         {nutrition.onRefreshPress ? (
           <Button
@@ -180,7 +182,7 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
             disabled={(nutrition.isRefreshing ?? false) || (nutrition.isFetching ?? false)}
             onPress={nutrition.onRefreshPress}
           >
-            {nutrition.isRefreshing ? "Refreshing…" : "Refresh"}
+            {nutrition.isRefreshing ? voice.nutritionPanel.refreshingLabel : voice.nutritionPanel.refreshLabel}
           </Button>
         ) : null}
       </XStack>

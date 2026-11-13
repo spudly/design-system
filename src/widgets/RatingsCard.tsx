@@ -6,6 +6,7 @@ import { Card } from "./Card.js";
 import { Center } from "./Center.js";
 import { StarRatingInput } from "./StarRatingInput.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 export type RatingsCardCommunityRating = {
@@ -54,11 +55,8 @@ export type RatingsCardProps = {
   loading?: boolean;
 };
 
-// Stale-rating hint copy, verbatim from the app's client constants.
-const STALE_COMMUNITY_RATING_HINT =
-  "Some community ratings were left on earlier recipe versions and count at half weight in the average.";
-const STALE_VIEWER_RATING_HINT =
-  "Your rating was left on an earlier version of the recipe. Tap a star to update it for the current version.";
+// Stale-rating hint copy lives in the voice object (#539 tranche 1b):
+// voice.ratingsCard.staleCommunityRatingHint / staleViewerRatingHint.
 
 // The viewer star row's five cells (#278), mirroring the star
 // input's own five stars.
@@ -131,6 +129,7 @@ function ViewerRatingInput({
  * app's rated content.
  */
 export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: RatingsCardProps) {
+  const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same muted card and section layout,
@@ -191,7 +190,7 @@ export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: 
   }
   return (
     <Card variant="muted">
-      <EyebrowLabel>Community rating</EyebrowLabel>
+      <EyebrowLabel>{voice.ratingsCard.communityRatingLabel}</EyebrowLabel>
       {ratings.community ? (
         <>
           <XStack paddingBlockEnd="$3" alignItems="center" gap="$2">
@@ -203,7 +202,7 @@ export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: 
           {ratings.community.hasStaleRatings ? (
             <YStack paddingBlockEnd="$3">
               <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
-                {STALE_COMMUNITY_RATING_HINT}
+                {voice.ratingsCard.staleCommunityRatingHint}
               </Text>
             </YStack>
           ) : null}
@@ -211,13 +210,13 @@ export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: 
       ) : (
         <YStack paddingBlockEnd="$3">
           <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
-            No community ratings yet
+            {voice.ratingsCard.noCommunityRatingsLabel}
           </Text>
         </YStack>
       )}
       {ratings.viewer ? (
         <>
-          <EyebrowLabel>Your rating</EyebrowLabel>
+          <EyebrowLabel>{voice.ratingsCard.yourRatingLabel}</EyebrowLabel>
           <ViewerRatingInput
             value={ratings.viewer.value}
             isPending={ratings.viewer.isPending ?? false}
@@ -226,7 +225,7 @@ export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: 
           {ratings.viewer.isStale ? (
             <YStack paddingBlockStart="$2">
               <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
-                {STALE_VIEWER_RATING_HINT}
+                {voice.ratingsCard.staleViewerRatingHint}
               </Text>
             </YStack>
           ) : null}

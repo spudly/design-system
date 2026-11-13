@@ -28,6 +28,22 @@ export const fixtureVoice: Voice = {
     cancelLabel: "Cancel",
     deleteLabel: "Delete",
   },
+  ratingsCard: {
+    communityRatingLabel: "Community rating",
+    noCommunityRatingsLabel: "No community ratings yet",
+    yourRatingLabel: "Your rating",
+    staleCommunityRatingHint:
+      "Some community ratings were left on earlier recipe versions and count at half weight in the average.",
+    staleViewerRatingHint:
+      "Your rating was left on an earlier version of the recipe. Tap a star to update it for the current version.",
+  },
+  nutritionPanel: {
+    perServingLabel: "Per Serving",
+    refreshLabel: "Refresh",
+    refreshingLabel: "Refreshing\u2026",
+    estimateLabel: "Estimate nutrition",
+    unavailableLabel: "Nutrition is not available yet.",
+  },
 };
 
 /** Pseudo-localize one string the en-XA way: bracketed, accented, lengthened. */
