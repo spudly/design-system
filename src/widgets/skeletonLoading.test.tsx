@@ -1751,11 +1751,16 @@ test("T3 SSR: loading CandidateList and NutritionGoalsForm render skeletons", as
   const goals = await renderToHtml(
     <NutritionGoalsForm
       goals={{
-        calories: 2000,
-        proteinG: 120,
-        carbsG: null,
-        fatG: null,
-        satietyScore: null,
+        caloriesMin: 1800,
+        caloriesMax: 2000,
+        proteinGMin: 110,
+        proteinGMax: 120,
+        carbsGMin: null,
+        carbsGMax: null,
+        fatGMin: null,
+        fatGMax: null,
+        satietyScoreMin: null,
+        satietyScoreMax: null,
       }}
       onChange={noop}
       onSave={noop}

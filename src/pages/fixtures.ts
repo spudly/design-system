@@ -358,11 +358,16 @@ export const accessTokensFixture = {
  * numbers or null, as the host's form state carries them.
  */
 export const nutritionGoalsFixture = {
-  calories: 2100,
-  proteinG: 140,
-  carbsG: 220,
-  fatG: 70,
-  satietyScore: null,
+  caloriesMin: 1900,
+  caloriesMax: 2100,
+  proteinGMin: 130,
+  proteinGMax: 150,
+  carbsGMin: 200,
+  carbsGMax: 240,
+  fatGMin: 60,
+  fatGMax: 80,
+  satietyScoreMin: null,
+  satietyScoreMax: null,
 };
 
 /**

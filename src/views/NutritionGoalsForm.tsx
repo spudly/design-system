@@ -23,14 +23,25 @@ import { useVoice } from "../voice/index.js";
  * lives in the view, exactly as in the app view: an empty or
  * non-numeric field crosses back as null. The section
  * validates nothing — the host owns the save.
+ *
+ * Each goal is a min/max range (#607, mirroring eciperay
+ * #521's flat min/max contract): the form renders a Min and a
+ * Max field per goal, each independently optional (blank =
+ * null), so a goal can carry a floor, a ceiling, both, or
+ * neither.
  */
 
 export type NutritionGoalsValues = {
-  calories: number | null;
-  proteinG: number | null;
-  carbsG: number | null;
-  fatG: number | null;
-  satietyScore: number | null;
+  caloriesMin: number | null;
+  caloriesMax: number | null;
+  proteinGMin: number | null;
+  proteinGMax: number | null;
+  carbsGMin: number | null;
+  carbsGMax: number | null;
+  fatGMin: number | null;
+  fatGMax: number | null;
+  satietyScoreMin: number | null;
+  satietyScoreMax: number | null;
 };
 
 export type NutritionGoalsFormProps = {
@@ -40,7 +51,7 @@ export type NutritionGoalsFormProps = {
   error?: string | null;
   onSave: () => void;
   /** Loading state (#278): the section title skeletonizes
-   * through the SectionCard, each of the five goal fields
+   * through the SectionCard, each of the ten goal fields
    * renders as a label text skeleton at its own (sm) size over
    * a field-height box skeleton in the field's slot instead of
    * the live TextField, the Save action stays rendered inside
@@ -90,16 +101,28 @@ function GoalField({
   );
 }
 
-// The loading form's field keys (#278): the five goal fields in
-// display order, from a frozen module-level constant — never
-// generated per render. Each skeleton field mirrors a
-// TextField's own stack: the label's gap ($1) over the input,
-// whose minimum height is 44. The label bone sits centered in
-// the field Label's own line box (SIZABLE_TEXT_LINE_BOX, 27) —
-// a TextSkeleton sm line box (16) in its place leaves each
-// field 11px short, and the five fields accumulate the drift,
-// so the bones slide off the loaded form (Stephen on #579).
-const LOADING_GOAL_FIELD_KEYS = ["calories", "protein", "carbs", "fat", "satiety"] as const;
+// The loading form's field keys (#278): the ten goal fields in
+// display order (min then max per goal, #607), from a frozen
+// module-level constant — never generated per render. Each
+// skeleton field mirrors a TextField's own stack: the label's
+// gap ($1) over the input, whose minimum height is 44. The
+// label bone sits centered in the field Label's own line box
+// (SIZABLE_TEXT_LINE_BOX, 27) — a TextSkeleton sm line box
+// (16) in its place leaves each field 11px short, and the ten
+// fields accumulate the drift, so the bones slide off the
+// loaded form (Stephen on #579).
+const LOADING_GOAL_FIELD_KEYS = [
+  "caloriesMin",
+  "caloriesMax",
+  "proteinGMin",
+  "proteinGMax",
+  "carbsGMin",
+  "carbsGMax",
+  "fatGMin",
+  "fatGMax",
+  "satietyScoreMin",
+  "satietyScoreMax",
+] as const;
 
 function GoalFieldSkeleton() {
   return (
@@ -133,38 +156,73 @@ export function NutritionGoalsForm({
       ) : (
         <>
           <GoalField
-            label={voice.nutritionGoalsForm.caloriesLabel}
-            value={goals.calories}
-            onChange={(calories) => {
-              patch({ calories });
+            label={`${voice.nutritionGoalsForm.caloriesLabel} ${voice.nutritionGoalsForm.minLabel}`}
+            value={goals.caloriesMin}
+            onChange={(caloriesMin) => {
+              patch({ caloriesMin });
             }}
           />
           <GoalField
-            label={voice.nutritionGoalsForm.proteinLabel}
-            value={goals.proteinG}
-            onChange={(proteinG) => {
-              patch({ proteinG });
+            label={`${voice.nutritionGoalsForm.caloriesLabel} ${voice.nutritionGoalsForm.maxLabel}`}
+            value={goals.caloriesMax}
+            onChange={(caloriesMax) => {
+              patch({ caloriesMax });
             }}
           />
           <GoalField
-            label={voice.nutritionGoalsForm.carbsLabel}
-            value={goals.carbsG}
-            onChange={(carbsG) => {
-              patch({ carbsG });
+            label={`${voice.nutritionGoalsForm.proteinLabel} ${voice.nutritionGoalsForm.minLabel}`}
+            value={goals.proteinGMin}
+            onChange={(proteinGMin) => {
+              patch({ proteinGMin });
             }}
           />
           <GoalField
-            label={voice.nutritionGoalsForm.fatLabel}
-            value={goals.fatG}
-            onChange={(fatG) => {
-              patch({ fatG });
+            label={`${voice.nutritionGoalsForm.proteinLabel} ${voice.nutritionGoalsForm.maxLabel}`}
+            value={goals.proteinGMax}
+            onChange={(proteinGMax) => {
+              patch({ proteinGMax });
             }}
           />
           <GoalField
-            label={voice.nutritionGoalsForm.satietyScoreLabel}
-            value={goals.satietyScore}
-            onChange={(satietyScore) => {
-              patch({ satietyScore });
+            label={`${voice.nutritionGoalsForm.carbsLabel} ${voice.nutritionGoalsForm.minLabel}`}
+            value={goals.carbsGMin}
+            onChange={(carbsGMin) => {
+              patch({ carbsGMin });
+            }}
+          />
+          <GoalField
+            label={`${voice.nutritionGoalsForm.carbsLabel} ${voice.nutritionGoalsForm.maxLabel}`}
+            value={goals.carbsGMax}
+            onChange={(carbsGMax) => {
+              patch({ carbsGMax });
+            }}
+          />
+          <GoalField
+            label={`${voice.nutritionGoalsForm.fatLabel} ${voice.nutritionGoalsForm.minLabel}`}
+            value={goals.fatGMin}
+            onChange={(fatGMin) => {
+              patch({ fatGMin });
+            }}
+          />
+          <GoalField
+            label={`${voice.nutritionGoalsForm.fatLabel} ${voice.nutritionGoalsForm.maxLabel}`}
+            value={goals.fatGMax}
+            onChange={(fatGMax) => {
+              patch({ fatGMax });
+            }}
+          />
+          <GoalField
+            label={`${voice.nutritionGoalsForm.satietyScoreLabel} ${voice.nutritionGoalsForm.minLabel}`}
+            value={goals.satietyScoreMin}
+            onChange={(satietyScoreMin) => {
+              patch({ satietyScoreMin });
+            }}
+          />
+          <GoalField
+            label={`${voice.nutritionGoalsForm.satietyScoreLabel} ${voice.nutritionGoalsForm.maxLabel}`}
+            value={goals.satietyScoreMax}
+            onChange={(satietyScoreMax) => {
+              patch({ satietyScoreMax });
             }}
           />
         </>
