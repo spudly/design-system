@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Button } from "../widgets/Button.js";
 import { FieldRow } from "../widgets/FieldRow.js";
 import { TextField } from "./TextField.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * One ingredient row's view-model: the settled #124 row
@@ -23,7 +24,8 @@ export type RecipeIngredientRowViewProps = {
   /** The row's view-model (the #124 contract above). */
   row: RecipeIngredientRow;
   /** The row's position in its list: names the row's fields
-   * and actions for assistive tech ("Ingredient 2 quantity"). */
+   * and actions for assistive tech, through the voice
+   * object's recipeIngredientRowView formatters (#539). */
   index: number;
   /**
    * The host's drag handle for this row, bound by the host's
@@ -66,6 +68,7 @@ export function RecipeIngredientRowView({
   onFieldChange,
   onRemove,
 }: RecipeIngredientRowViewProps) {
+  const voice = useVoice();
   const position = index + 1;
   return (
     <FieldRow>
@@ -78,8 +81,8 @@ export function RecipeIngredientRowView({
           fit the fields' content ("1 1/2", "tbsp") while the
           name field takes whatever width remains. */}
       <TextField
-        accessibilityLabel={`Ingredient ${position} quantity`}
-        placeholder="Qty"
+        accessibilityLabel={voice.recipeIngredientRowView.quantityLabel(position)}
+        placeholder={voice.recipeIngredientRowView.quantityPlaceholder}
         width={68}
         readOnly={onFieldChange === undefined}
         value={row.quantity}
@@ -88,8 +91,8 @@ export function RecipeIngredientRowView({
         }}
       />
       <TextField
-        accessibilityLabel={`Ingredient ${position} unit`}
-        placeholder="Unit"
+        accessibilityLabel={voice.recipeIngredientRowView.unitLabel(position)}
+        placeholder={voice.recipeIngredientRowView.unitPlaceholder}
         width={84}
         readOnly={onFieldChange === undefined}
         value={row.unit}
@@ -99,8 +102,8 @@ export function RecipeIngredientRowView({
       />
       <TextField
         grow
-        accessibilityLabel={`Ingredient ${position} name`}
-        placeholder="Name"
+        accessibilityLabel={voice.recipeIngredientRowView.nameLabel(position)}
+        placeholder={voice.recipeIngredientRowView.namePlaceholder}
         readOnly={onFieldChange === undefined}
         value={row.name}
         onChangeText={(value) => {
@@ -111,12 +114,12 @@ export function RecipeIngredientRowView({
         <Button
           variant="danger"
           size="sm"
-          accessibilityLabel={`Remove ingredient ${position}`}
+          accessibilityLabel={voice.recipeIngredientRowView.removeIngredientLabel(position)}
           onPress={() => {
             onRemove(row.key);
           }}
         >
-          Remove
+          {voice.recipeIngredientRowView.removeLabel}
         </Button>
       ) : null}
     </FieldRow>

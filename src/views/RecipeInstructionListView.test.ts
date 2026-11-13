@@ -84,9 +84,19 @@ async function renderList(props: Record<string, unknown>): Promise<string> {
   const { TamaguiProvider }: Record<string, any> = await import("tamagui");
   const distRuntime = await loadInternalDist();
   const { createTamaguiConfig, baseTheme, RecipeInstructionListView } = distRuntime;
+  const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+  const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
-    h(TamaguiProvider, { config, defaultTheme: "light" }, h(RecipeInstructionListView, props)),
+    h(
+      TamaguiProvider,
+      { config, defaultTheme: "light" },
+      h(
+        voiceModule.VoiceProvider,
+        { voice: voiceFixtures.fixtureVoice },
+        h(RecipeInstructionListView, props),
+      ),
+    ),
   );
 }
 

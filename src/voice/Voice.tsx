@@ -105,6 +105,56 @@ export type Voice = {
     findingSubstitutionsLabel: string;
     substitutionsTitle: string;
   };
+  /** RecipeImageView (tranche 2a): defaults when label / emptyMessage props are not passed, plus the view's own chrome. */
+  recipeImageView: {
+    label: string;
+    emptyMessage: string;
+    previewLabel: string;
+    browseLabel: string;
+    uploadingLabel: string;
+    takePhotoLabel: string;
+    generateLabel: string;
+    generatingLabel: string;
+    generateAccessibilityLabel: string;
+    removeLabel: string;
+  };
+  /** RecipeIngredientListView (tranche 2a): defaults when label / emptyMessage / addLabel props are not passed, plus the add action's name. */
+  recipeIngredientListView: {
+    label: string;
+    emptyMessage: string;
+    addLabel: string;
+    addIngredientLabel: string;
+  };
+  /** RecipeIngredientRowView (tranche 2a): field placeholders and accessible names built from the row's position. */
+  recipeIngredientRowView: {
+    quantityPlaceholder: string;
+    unitPlaceholder: string;
+    namePlaceholder: string;
+    /** Formatter: builds the quantity field's accessible name from the row's position. */
+    quantityLabel: VoiceFormatter<[position: number]>;
+    /** Formatter: builds the unit field's accessible name from the row's position. */
+    unitLabel: VoiceFormatter<[position: number]>;
+    /** Formatter: builds the name field's accessible name from the row's position. */
+    nameLabel: VoiceFormatter<[position: number]>;
+    removeLabel: string;
+    /** Formatter: builds the remove action's accessible name from the row's position. */
+    removeIngredientLabel: VoiceFormatter<[position: number]>;
+  };
+  /** RecipeInstructionListView (tranche 2a): defaults when label / emptyMessage / addLabel props are not passed, plus the add action's name. */
+  recipeInstructionListView: {
+    label: string;
+    emptyMessage: string;
+    addLabel: string;
+    addInstructionLabel: string;
+  };
+  /** RecipeInstructionRowView (tranche 2a): the step field's accessible name and the remove action, built from the row's position. */
+  recipeInstructionRowView: {
+    /** Formatter: builds the step field's accessible name from the row's position. */
+    stepLabel: VoiceFormatter<[position: number]>;
+    removeLabel: string;
+    /** Formatter: builds the remove action's accessible name from the row's position. */
+    removeStepLabel: VoiceFormatter<[position: number]>;
+  };
   /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
   autocompletePicker: {
     searchPlaceholder: string;
