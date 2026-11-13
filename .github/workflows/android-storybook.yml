@@ -800,8 +800,10 @@ jobs:
       # exactly as the update-mode job refuses a main dispatch.
       - name: Refuse the default branch
         if: github.head_ref == github.event.repository.default_branch
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
-          echo "::error::Refusing to push regenerated baselines to the default branch (${{ github.head_ref }}). Baselines land via PR branches so they are reviewed in the PR diff."
+          echo "::error::Refusing to push regenerated baselines to the default branch ($HEAD_REF). Baselines land via PR branches so they are reviewed in the PR diff."
           exit 1
 
       - uses: actions/checkout@v7
@@ -832,6 +834,8 @@ jobs:
         run: node tools/visualRegression/coverageListing.mjs
 
       - name: Commit and push regenerated baselines
+        env:
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           if [ -z "$(git status --porcelain -- src docs/android-visual-regression.md)" ]; then
             echo "Baselines unchanged; nothing to commit."
@@ -841,7 +845,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A -- src docs/android-visual-regression.md
           git commit -m "chore(vr): update Android Storybook baselines"
-          git push origin "HEAD:${{ github.head_ref }}"
+          git push origin "HEAD:$HEAD_REF"
 
   # The #162 sanity check (issue #43 acceptance): reintroduce the
   # SearchField lineHeight bug via the patch in
