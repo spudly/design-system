@@ -9,6 +9,7 @@ import { ListRow } from "./ListRow.js";
 import { SearchField } from "../views/SearchField.js";
 import { Spinner } from "./Spinner.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 
 export type AutocompletePickerResult = {
   /** Stable id of the result — selection and removal report it. */
@@ -60,14 +61,15 @@ export type AutocompletePickerProps = {
   /** Called with the id of the selected item whose Remove
    * action was pressed. */
   onRemoveSelectedItem: (id: string) => void;
-  /** The search field's placeholder. */
+  /** The search field's placeholder. Defaults to the voice object's autocompletePicker search placeholder (#539). */
   placeholder?: string;
   /** Accessible name for the search field (its visible label,
    * when the caller gives the picker one, is the caller's
-   * LabeledGroup — the field itself carries this name). */
+   * LabeledGroup — the field itself carries this name).
+   * Defaults to the voice object's autocompletePicker search label (#539). */
   searchAccessibilityLabel?: string;
   /** Shown when a non-empty search returns no results.
-   * Defaults to "No results found." */
+   * Defaults to the voice object's autocompletePicker no-results message (#539). */
   noResultsMessage?: string;
   /**
    * The caller's search failed (e.g. "Could not load
@@ -158,12 +160,17 @@ export function AutocompletePicker({
   onSelectResult,
   selectedItems,
   onRemoveSelectedItem,
-  placeholder = "Search…",
-  searchAccessibilityLabel = "Search",
-  noResultsMessage = "No results found.",
+  placeholder: placeholderProp,
+  searchAccessibilityLabel: searchAccessibilityLabelProp,
+  noResultsMessage: noResultsMessageProp,
   searchError,
   disabled = false,
 }: AutocompletePickerProps) {
+  const voice = useVoice();
+  const placeholder = placeholderProp ?? voice.autocompletePicker.searchPlaceholder;
+  const searchAccessibilityLabel =
+    searchAccessibilityLabelProp ?? voice.autocompletePicker.searchLabel;
+  const noResultsMessage = noResultsMessageProp ?? voice.autocompletePicker.noResultsMessage;
   const selectedIds = new Set(selectedItems.map((item) => item.id));
   const visibleResults = searchResults.filter((result) => !selectedIds.has(result.id));
   const hasSearchText = searchText.trim().length > 0;
@@ -178,10 +185,10 @@ export function AutocompletePicker({
   const statusMessage = !hasSearchText
     ? null
     : isSearching
-      ? "Searching"
+      ? voice.autocompletePicker.searchingLabel
       : visibleResults.length === 0
         ? searchError || noResultsMessage
-        : `${visibleResults.length} ${visibleResults.length === 1 ? "result" : "results"} available`;
+        : voice.autocompletePicker.resultsAvailableLabel(visibleResults.length);
 
   // Both the select and remove paths unmount the control the
   // user just activated (the result row is filtered out as
@@ -231,7 +238,7 @@ export function AutocompletePicker({
       {hasSearchText ? (
         isSearching ? (
           <YStack alignItems="center" padding={tokens.spacing[3]}>
-            <Spinner label="Searching" />
+            <Spinner label={voice.autocompletePicker.searchingLabel} />
           </YStack>
         ) : visibleResults.length === 0 ? (
           searchError ? (
@@ -285,13 +292,13 @@ export function AutocompletePicker({
               <Button
                 ghost
                 size="sm"
-                accessibilityLabel={`Remove ${item.label}`}
+                accessibilityLabel={voice.autocompletePicker.removeItemLabel(item.label)}
                 disabled={disabled}
                 onPress={() => {
                   handleRemoveSelectedItem(item.id);
                 }}
               >
-                Remove
+                {voice.autocompletePicker.removeLabel}
               </Button>
             </XStack>
           ))}

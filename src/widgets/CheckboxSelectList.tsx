@@ -6,6 +6,7 @@ import { BoxSkeleton } from "./BoxSkeleton.js";
 import { EmptyState } from "./EmptyState.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "./TextSkeleton.js";
+import { useVoice } from "../voice/index.js";
 
 export type CheckboxSelectItem = {
   id: string;
@@ -58,8 +59,9 @@ export function CheckboxSelectList({
   onToggle,
   disabled = false,
   loading = false,
-  emptyMessage = "No items found.",
+  emptyMessage,
 }: CheckboxSelectListProps) {
+  const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // One row per known item, keyed by the item's id; the
@@ -84,7 +86,7 @@ export function CheckboxSelectList({
     );
   }
   if (items.length === 0) {
-    return <EmptyState title={emptyMessage} />;
+    return <EmptyState title={emptyMessage ?? voice.checkboxSelectList.emptyMessage} />;
   }
   const selected = new Set(selectedIds);
   return (

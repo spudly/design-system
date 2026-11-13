@@ -47,6 +47,43 @@ export const fixtureVoice: Voice = {
   bulkSelectToolbar: {
     selectAllLabel: "Select all",
     clearSelectionLabel: "Clear selection",
+    searchPlaceholder: "Search\u2026",
+    selectedLabel: (count: number) => `${count} selected`,
+  },
+  autocompletePicker: {
+    searchPlaceholder: "Search\u2026",
+    searchLabel: "Search",
+    searchingLabel: "Searching",
+    noResultsMessage: "No results found.",
+    resultsAvailableLabel: (count: number) =>
+      `${count} ${count === 1 ? "result" : "results"} available`,
+    removeLabel: "Remove",
+    removeItemLabel: (itemLabel: string) => `Remove ${itemLabel}`,
+  },
+  alert: {
+    dismissLabel: "Dismiss",
+  },
+  fixedActionBanner: {
+    dismissLabel: "Dismiss",
+  },
+  checkboxSelectList: {
+    emptyMessage: "No items found.",
+  },
+  selectField: {
+    placeholder: "Select\u2026",
+    selectOptionLabel: "Select an option",
+  },
+  colorPickerField: {
+    chooseColorLabel: "Choose a color",
+    selectColorLabel: (color: string) => `Select color ${color}`,
+  },
+  starRatingInput: {
+    label: "Star rating",
+    ratedLabel: (value: number) => `Rated ${value} out of 5 stars`,
+    rateLabel: (star: number) => `Rate ${star} out of 5 stars`,
+  },
+  removableField: {
+    removeLabel: "Remove",
   },
   stepOverlay: {
     doneLabel: "Done",

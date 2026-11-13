@@ -3,6 +3,7 @@ import { XStack, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 
 const StarButton = styled(YStack, {
   name: "StarButton",
@@ -79,6 +80,7 @@ export function StarRatingInput({
   readOnly = false,
   disabled = false,
 }: StarRatingInputProps) {
+  const voice = useVoice();
   const autoId = useId();
   const labelId = `${autoId}-label`;
   const stars = [1, 2, 3, 4, 5];
@@ -107,9 +109,9 @@ export function StarRatingInput({
         <XStack
           {...platformAccessibilityProps({
             accessibilityRole: "image",
-            accessibilityLabel: `Rated ${value} out of 5 stars`,
+            accessibilityLabel: voice.starRatingInput.ratedLabel(value),
           })}
-          aria-label={`Rated ${value} out of 5 stars`}
+          aria-label={voice.starRatingInput.ratedLabel(value)}
         >
           {stars.map((star) => {
             const style = starStyle(star);
@@ -132,7 +134,7 @@ export function StarRatingInput({
         <XStack
           {...platformAccessibilityProps({ accessibilityRole: "radiogroup" })}
           aria-labelledby={label ? labelId : undefined}
-          aria-label={label ? undefined : "Star rating"}
+          aria-label={label ? undefined : voice.starRatingInput.label}
           opacity={disabled ? 0.5 : 1}
         >
           {stars.map((star) => {
@@ -162,7 +164,7 @@ export function StarRatingInput({
                 {...platformAccessibilityProps({
                   accessibilityRole: "radio",
                   accessibilityState: { disabled },
-                  accessibilityLabel: `Rate ${star} out of 5 stars`,
+                  accessibilityLabel: voice.starRatingInput.rateLabel(star),
                 })}
                 aria-checked={selected}
                 disabled={disabled}

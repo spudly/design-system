@@ -6,8 +6,9 @@
  * dialogs; SelectField's touch-adapted Sheet rendered without any
  * accessible name, so a screen reader met an unnamed dialog. The
  * pin holds the fix in the component: the Sheet carries the
- * field's label, with a fixed fallback when the field has no
- * label. Source-contract pattern follows the textFontContext block in src/widgets/Text.test.ts.
+ * field's label, with the voice object's selectOptionLabel as the
+ * fallback when the field has no label (#539). Source-contract
+ * pattern follows the textFontContext block in src/widgets/Text.test.ts.
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -22,6 +23,6 @@ const source = readFileSync(join(here, "../..", "src", "widgets", "SelectField.t
 test("the touch Sheet carries the field label as its accessible name, with a fallback", () => {
   assert.match(
     source,
-    /<Sheet\s+modal\s+dismissOnSnapToBottom\s+aria-label=\{label\?\.trim\(\) \? label : "Select an option"\}/,
+    /<Sheet\s+modal\s+dismissOnSnapToBottom\s+aria-label=\{label\?\.trim\(\) \? label : voice\.selectField\.selectOptionLabel\}/,
   );
 });

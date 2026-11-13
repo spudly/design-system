@@ -55,7 +55,7 @@ test("dismiss renders only when dismissible with a handler, with the banner trea
   assert.match(source, /position="relative"/);
   assert.match(source, /top=\{-tokens\.spacing\[6\]\}/);
   assert.match(source, /right=\{-tokens\.spacing\[5\]\}/);
-  assert.match(source, /accessibilityLabel="Dismiss"/);
+  assert.match(source, /accessibilityLabel=\{voice\.alert\.dismissLabel\}/);
   assert.match(source, /minWidth=\{44\}/);
   assert.match(source, /minHeight=\{44\}/);
 });

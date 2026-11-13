@@ -6,6 +6,7 @@ import { groupRoleProps, platformAccessibilityProps } from "./accessibility.js";
 import { useTagColorResolver } from "./tagColors.js";
 import { Alert } from "./Alert.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 
 const Swatch = styled(YStack, {
   name: "ColorSwatch",
@@ -65,6 +66,7 @@ export function ColorPickerField({
   error,
   id: idProp,
 }: ColorPickerFieldProps) {
+  const voice = useVoice();
   const autoId = useId();
   const id = idProp ?? autoId;
   const labelId = `${id}-label`;
@@ -84,7 +86,7 @@ export function ColorPickerField({
         gap={tokens.spacing[2]}
         {...groupRoleProps}
         aria-labelledby={label ? labelId : undefined}
-        aria-label={label ? undefined : "Choose a color"}
+        aria-label={label ? undefined : voice.colorPickerField.chooseColorLabel}
         aria-describedby={error ? errorId : undefined}
       >
         {colors.map((color) => {
@@ -97,7 +99,7 @@ export function ColorPickerField({
               backgroundColor={resolvedColor}
               {...platformAccessibilityProps({
                 accessibilityRole: "button",
-                accessibilityLabel: `Select color ${color}`,
+                accessibilityLabel: voice.colorPickerField.selectColorLabel(color),
               })}
               aria-pressed={selected}
               onPress={() => onChange?.(color)}
