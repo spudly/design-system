@@ -6,6 +6,7 @@ import { Card } from "../widgets/Card.js";
 import { CommentItem } from "../widgets/CommentItem.js";
 import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "./TextAreaField.js";
+import { useVoice } from "../voice/index.js";
 
 export type RecipeCommentsViewComment = {
   id: string;
@@ -30,9 +31,9 @@ export type RecipeCommentsViewProps = {
   loading?: boolean;
   /** The comments query failed: the card renders this message instead of the empty state. */
   error?: string | null;
-  /** Section heading ("Comments"). */
+  /** Section heading. Defaults to the voice object's recipeCommentsView title (#539). */
   title?: string;
-  /** Shown when the list is empty and not loading ("No comments yet"). */
+  /** Shown when the list is empty and not loading. Defaults to the voice object's recipeCommentsView emptyMessage (#539). */
   emptyMessage?: string;
   /** Accessible name for a stale comment's marker. */
   staleHintLabel?: string;
@@ -54,8 +55,11 @@ export type RecipeCommentsViewProps = {
   onDraftChange?: (value: string) => void;
   onPost?: () => void;
   isPostPending?: boolean;
+  /** Defaults to the voice object's recipeCommentsView composerLabel (#539). */
   composerLabel?: string;
+  /** Defaults to the voice object's recipeCommentsView composerPlaceholder (#539). */
   composerPlaceholder?: string;
+  /** Defaults to the voice object's recipeCommentsView postLabel (#539). */
   postLabel?: string;
 };
 
@@ -89,8 +93,8 @@ export function RecipeCommentsView({
   comments,
   loading = false,
   error,
-  title = "Comments",
-  emptyMessage = "No comments yet",
+  title: titleProp,
+  emptyMessage: emptyMessageProp,
   staleHintLabel,
   editingCommentId,
   editDraft = "",
@@ -105,10 +109,17 @@ export function RecipeCommentsView({
   onDraftChange,
   onPost,
   isPostPending = false,
-  composerLabel = "Add a comment",
-  composerPlaceholder = "Share how it turned out…",
-  postLabel = "Post comment",
+  composerLabel: composerLabelProp,
+  composerPlaceholder: composerPlaceholderProp,
+  postLabel: postLabelProp,
 }: RecipeCommentsViewProps) {
+  const voice = useVoice();
+  const title = titleProp ?? voice.recipeCommentsView.title;
+  const emptyMessage = emptyMessageProp ?? voice.recipeCommentsView.emptyMessage;
+  const composerLabel = composerLabelProp ?? voice.recipeCommentsView.composerLabel;
+  const composerPlaceholder =
+    composerPlaceholderProp ?? voice.recipeCommentsView.composerPlaceholder;
+  const postLabel = postLabelProp ?? voice.recipeCommentsView.postLabel;
   const showSkeleton = useLoadingScope(loading);
   return (
     <Card variant="bordered">

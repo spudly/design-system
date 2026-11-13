@@ -4,6 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { StarRatingInput } from "../widgets/StarRatingInput.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 const NotesArea = styled(TamaguiTextArea, {
   name: "RatingFormNotesArea",
@@ -24,8 +25,11 @@ export type RatingFormProps = {
   onSkip: () => void;
   isPending: boolean;
   variant?: "dark" | "light";
+  /** Defaults to the voice object's ratingForm secondaryLabel (#539). */
   secondaryLabel?: string;
+  /** Defaults to the voice object's ratingForm title (#539). */
   title?: string;
+  /** Defaults to the voice object's ratingForm notesPlaceholder (#539). */
   notesPlaceholder?: string;
 };
 
@@ -34,8 +38,8 @@ export type RatingFormProps = {
  * shipped as CookLogForm under #126, B3c contract proposals,
  * option A): a generic star-rating plus free-text notes form.
  * Nothing about it is specific to any one app or domain: the
- * heading and the notes placeholder are props (with neutral
- * defaults), and the submit view-model carries a plain
+ * heading and the notes placeholder are props (whose defaults
+ * come from the voice object, #539), and the submit view-model carries a plain
  * `rating`, so any "rate this and leave a note" surface can
  * use it — a cook log, a session review, a purchase rating.
  *
@@ -72,10 +76,14 @@ export function RatingForm({
   onSkip,
   isPending,
   variant = "dark",
-  secondaryLabel = "Skip",
-  title = "How did it go?",
-  notesPlaceholder = "Notes (optional)",
+  secondaryLabel: secondaryLabelProp,
+  title: titleProp,
+  notesPlaceholder: notesPlaceholderProp,
 }: RatingFormProps) {
+  const voice = useVoice();
+  const secondaryLabel = secondaryLabelProp ?? voice.ratingForm.secondaryLabel;
+  const title = titleProp ?? voice.ratingForm.title;
+  const notesPlaceholder = notesPlaceholderProp ?? voice.ratingForm.notesPlaceholder;
   const [rating, setRating] = useState<1 | 2 | 3 | 4 | 5 | null>(null);
   const [notes, setNotes] = useState("");
   const isLight = variant === "light";
@@ -191,7 +199,7 @@ export function RatingForm({
             opacity={isPending ? 0.5 : 1}
             {...platformAccessibilityProps({
               accessibilityRole: "button",
-              accessibilityLabel: "Save",
+              accessibilityLabel: voice.ratingForm.saveLabel,
               accessibilityState: { disabled: isPending },
             })}
             onPress={isPending ? undefined : handleSubmit}
@@ -202,7 +210,7 @@ export function RatingForm({
               fontWeight={tokens.typography.fontWeight.semibold}
               color="$onPrimary"
             >
-              Save
+              {voice.ratingForm.saveLabel}
             </Text>
           </YStack>
         </XStack>
