@@ -26,7 +26,8 @@ function* sourceFiles(dir: string): Generator<string> {
     if (entry.isDirectory()) yield* sourceFiles(path);
     else if (
       (entry.name.endsWith(".ts") || entry.name.endsWith(".tsx")) &&
-      !entry.name.endsWith(".test.ts")
+      !entry.name.endsWith(".test.ts") &&
+      !entry.name.endsWith(".test.tsx")
     )
       yield path;
   }

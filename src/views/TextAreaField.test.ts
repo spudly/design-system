@@ -47,6 +47,7 @@ test("no source file still references MultilineField (#180)", () => {
       else if (
         /\.(ts|tsx)$/.test(entry.name) &&
         !entry.name.endsWith(".test.ts") &&
+        !entry.name.endsWith(".test.tsx") &&
         readFileSync(path, "utf8").includes("MultilineField")
       ) {
         offenders.push(path);

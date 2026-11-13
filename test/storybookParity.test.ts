@@ -156,6 +156,7 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
       exceptions.has(entry.name) ||
       entry.name.endsWith(".stories.tsx") ||
       entry.name.endsWith(".test.ts") ||
+      entry.name.endsWith(".test.tsx") ||
       entry.name.endsWith(".test.steps.md")
     )
       continue;
@@ -187,6 +188,7 @@ test("every view component has a story file titled Views/<Name>", () => {
       exceptions.has(entry.name) ||
       entry.name.endsWith(".stories.tsx") ||
       entry.name.endsWith(".test.ts") ||
+      entry.name.endsWith(".test.tsx") ||
       entry.name.endsWith(".test.steps.md")
     )
       continue;
@@ -241,6 +243,7 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
       exceptions.has(entry.name) ||
       entry.name.endsWith(".stories.tsx") ||
       entry.name.endsWith(".test.ts") ||
+      entry.name.endsWith(".test.tsx") ||
       entry.name.endsWith(".test.steps.md")
     )
       continue;

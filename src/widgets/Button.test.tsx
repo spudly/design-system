@@ -112,7 +112,10 @@ describe("buttonGhostProp", () => {
     })
       .map((entry) => String(entry))
       .filter(
-        (entry) => (entry.endsWith(".ts") || entry.endsWith(".tsx")) && !entry.endsWith(".test.ts"),
+        (entry) =>
+          (entry.endsWith(".ts") || entry.endsWith(".tsx")) &&
+          !entry.endsWith(".test.ts") &&
+          !entry.endsWith(".test.tsx"),
       );
     assert.ok(srcFiles.length > 100, "the scan must cover the source tree");
     for (const rel of srcFiles) {
@@ -153,7 +156,7 @@ describe("buttonIcon", () => {
   const button = readCode("src/widgets/Button.tsx");
   const stories = readCode("src/widgets/Button.stories.tsx");
   const index = readCode("src/widgets/index.ts");
-  const pageWebAria = readCode("test/pageWebAria.test.ts");
+  const pageWebAria = readCode("test/pageWebAria.test.tsx");
   test("the standalone IconButton is removed everywhere (#178 decision change)", () => {
     for (const rel of [
       "src/widgets/IconButton.tsx",

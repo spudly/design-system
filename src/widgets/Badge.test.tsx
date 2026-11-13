@@ -217,6 +217,7 @@ describe("badgeTagForm", async () => {
         else if (
           /\.(ts|tsx)$/.test(entry.name) &&
           !entry.name.endsWith(".test.ts") &&
+          !entry.name.endsWith(".test.tsx") &&
           readFileSync(path, "utf8").includes("TagPill.js")
         )
           offenders.push(path);

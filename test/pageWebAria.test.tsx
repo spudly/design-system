@@ -93,7 +93,7 @@ function sourceFiles(dir: string): string[] {
   }).flatMap((entry) => {
     const path = join(dir, entry.name);
     if (entry.isDirectory()) return sourceFiles(path);
-    return /\.tsx$/.test(entry.name) ? [path] : [];
+    return /\.tsx$/.test(entry.name) && !entry.name.endsWith(".test.tsx") ? [path] : [];
   });
 }
 
