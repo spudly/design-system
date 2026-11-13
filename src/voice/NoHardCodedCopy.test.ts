@@ -57,10 +57,10 @@ function isCodeFragment(text: string) {
   if (text === "return" || text === "void") return true;
   if (/^(export|function|const|let|var|type|import|else|if|catch|switch|for|while)\b/.test(text))
     return true;
-  // A lone lowercase word between braces is an identifier or a
-  // control keyword, not copy (copy words are capitalized or
-  // part of a phrase).
-  if (/^[a-z]+$/.test(text)) return true;
+  // (A lone lowercase word is NOT excluded: copy split by
+  // expressions leaves real fragments like the "of" in
+  // `Round {n} of {count}` and the "items" in `{count} items`.
+  // The baseline absorbs the rare identifier-shaped fragment.)
   if (text.includes("===") || text.includes("!==")) return true;
   if (text.includes("&&") || text.includes("||")) return true;
   if (text.includes("=>") || text.includes("?:")) return true;
