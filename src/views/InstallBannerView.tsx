@@ -2,6 +2,7 @@ import { XStack } from "tamagui";
 import { FixedActionBanner } from "../widgets/FixedActionBanner.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
+import { useVoice } from "../voice/index.js";
 
 export type InstallBannerViewLink = {
   label: string;
@@ -14,6 +15,7 @@ export type InstallBannerViewProps = {
   /** The app-store links rendered inline after the message. */
   links: InstallBannerViewLink[];
   onDismiss: () => void;
+  /** Defaults to the voice object's installBannerView dismissLabel (#539). */
   dismissAriaLabel?: string;
 };
 
@@ -34,8 +36,10 @@ export function InstallBannerView({
   message,
   links,
   onDismiss,
-  dismissAriaLabel = "Dismiss install banner",
+  dismissAriaLabel: dismissAriaLabelProp,
 }: InstallBannerViewProps) {
+  const voice = useVoice();
+  const dismissAriaLabel = dismissAriaLabelProp ?? voice.installBannerView.dismissLabel;
   return (
     <FixedActionBanner
       position="top"

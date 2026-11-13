@@ -4,6 +4,7 @@ import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
 import { Text } from "../widgets/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { useVoice } from "../voice/index.js";
 
 export type ChangedListBannerProps = {
   /** The host-formatted summary line (the parent summary is
@@ -35,6 +36,7 @@ export type ChangedListBannerProps = {
  * the same composition RevertAction makes.
  */
 export function ChangedListBanner({ label, onRevert, loading = false }: ChangedListBannerProps) {
+  const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   return (
     <XStack
@@ -62,7 +64,7 @@ export function ChangedListBanner({ label, onRevert, loading = false }: ChangedL
       <LoadingScope active={showSkeleton}>
         {onRevert ? (
           <Button ghost size="sm" onPress={onRevert}>
-            Revert
+            {voice.changedListBanner.revertLabel}
           </Button>
         ) : null}
       </LoadingScope>

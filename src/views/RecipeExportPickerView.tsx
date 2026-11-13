@@ -5,6 +5,7 @@ import { BulkSelectToolbar } from "../widgets/BulkSelectToolbar.js";
 import { Button } from "../widgets/Button.js";
 import { CheckboxSelectList } from "../widgets/CheckboxSelectList.js";
 import { tokens } from "../tokens/index.js";
+import { useVoice } from "../voice/index.js";
 
 export type RecipeExportPickerViewItem = {
   id: string;
@@ -15,6 +16,7 @@ export type RecipeExportPickerViewProps = {
   /** The search text; the host filters `items` by it. */
   search: string;
   onSearchChange: (text: string) => void;
+  /** Defaults to the voice object's recipeExportPickerView searchPlaceholder (#539). */
   searchPlaceholder?: string;
   /** The filtered items to offer for selection. */
   items: RecipeExportPickerViewItem[];
@@ -35,11 +37,13 @@ export type RecipeExportPickerViewProps = {
   loading?: boolean;
   /** The item query failed: renders this message instead of the list and its empty state. */
   error?: string | null;
+  /** Defaults to the voice object's recipeExportPickerView emptyMessage (#539). */
   emptyMessage?: string;
   exporting?: boolean;
   onExport: () => void;
   /** The host composes the label with its count ("Export selected (3)"). */
   exportLabel: string;
+  /** Defaults to the voice object's recipeExportPickerView exportPendingLabel (#539). */
   exportPendingLabel?: string;
 };
 
@@ -61,7 +65,7 @@ export type RecipeExportPickerViewProps = {
 export function RecipeExportPickerView({
   search,
   onSearchChange,
-  searchPlaceholder = "Search recipes…",
+  searchPlaceholder: searchPlaceholderProp,
   items,
   selectedIds,
   onToggle,
@@ -70,12 +74,18 @@ export function RecipeExportPickerView({
   disabled = false,
   loading = false,
   error,
-  emptyMessage = "No recipes to export yet.",
+  emptyMessage: emptyMessageProp,
   exporting = false,
   onExport,
   exportLabel,
-  exportPendingLabel = "Exporting…",
+  exportPendingLabel: exportPendingLabelProp,
 }: RecipeExportPickerViewProps) {
+  const voice = useVoice();
+  const searchPlaceholder =
+    searchPlaceholderProp ?? voice.recipeExportPickerView.searchPlaceholder;
+  const emptyMessage = emptyMessageProp ?? voice.recipeExportPickerView.emptyMessage;
+  const exportPendingLabel =
+    exportPendingLabelProp ?? voice.recipeExportPickerView.exportPendingLabel;
   const showSkeleton = useLoadingScope(loading);
   return (
     <LoadingScope active={showSkeleton}>
