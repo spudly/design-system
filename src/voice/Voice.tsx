@@ -292,6 +292,24 @@ export type Voice = {
     emptyMessage: string;
     exportPendingLabel: string;
   };
+  /** SignInPage (tranche 3a): the page heading — the page has no copy props for its heading, so its copy reads the voice slots directly. */
+  signInPage: {
+    heading: string;
+  };
+  /** SignUpPage (tranche 3a): the page heading — the page has no copy props for its heading, so its copy reads the voice slots directly. */
+  signUpPage: {
+    heading: string;
+  };
+  /** ForgotPasswordPage (tranche 3a): the page heading and intro line — the page has no copy props for them, so its copy reads the voice slots directly. */
+  forgotPasswordPage: {
+    heading: string;
+    description: string;
+  };
+  /** ResetPasswordPage (tranche 3a): the page heading and intro line — the page has no copy props for them, so its copy reads the voice slots directly. */
+  resetPasswordPage: {
+    heading: string;
+    description: string;
+  };
   /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
   autocompletePicker: {
     searchPlaceholder: string;

@@ -3,6 +3,7 @@ import { ForgotPasswordForm } from "../views/ForgotPasswordForm.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * ForgotPasswordPage (#126, B3c): the reset-request view —
@@ -53,12 +54,13 @@ export function ForgotPasswordPage({
   signInHref,
   footer,
 }: ForgotPasswordPageProps) {
+  const voice = useVoice();
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
         <SectionStack>
-          <Text variant="heading">Reset password</Text>
-          <Text variant="muted">We&apos;ll send a reset link to your email.</Text>
+          <Text variant="heading">{voice.forgotPasswordPage.heading}</Text>
+          <Text variant="muted">{voice.forgotPasswordPage.description}</Text>
           <ForgotPasswordForm
             email={email}
             onEmailChange={onEmailChange}

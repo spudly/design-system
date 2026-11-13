@@ -3,6 +3,7 @@ import { ResetPasswordForm } from "../views/ResetPasswordForm.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * ResetPasswordPage (#126, B3c): the new-password view — the
@@ -42,12 +43,13 @@ export function ResetPasswordPage({
   onSubmit,
   footer,
 }: ResetPasswordPageProps) {
+  const voice = useVoice();
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
         <SectionStack>
-          <Text variant="heading">New password</Text>
-          <Text variant="muted">Choose a new password for your account.</Text>
+          <Text variant="heading">{voice.resetPasswordPage.heading}</Text>
+          <Text variant="muted">{voice.resetPasswordPage.description}</Text>
           <ResetPasswordForm
             password={password}
             onPasswordChange={onPasswordChange}
