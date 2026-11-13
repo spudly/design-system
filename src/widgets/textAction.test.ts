@@ -60,7 +60,7 @@ test("no source file renders a TextAction element (#464)", () => {
   const dirs = ["src/widgets", "src/views", "src/pages"];
   for (const dir of dirs) {
     for (const name of readdirSync(join(root, dir))) {
-      if (!name.endsWith(".tsx") || name.endsWith(".test.ts")) continue;
+      if (!name.endsWith(".tsx") || name.endsWith(".test.ts") || name.endsWith(".test.tsx")) continue;
       const code = readCode(join(dir, name));
       assert.ok(!/<TextAction[\s>]/.test(code), `${dir}/${name} must not render <TextAction>`);
     }
