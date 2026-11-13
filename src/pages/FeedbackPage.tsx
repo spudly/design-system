@@ -6,6 +6,7 @@ import { TextAreaField } from "../views/TextAreaField.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Text } from "../widgets/Text.js";
 import { TextField } from "../views/TextField.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * FeedbackPage (#126, B3c): the feedback view — the split
@@ -70,43 +71,45 @@ export function FeedbackPage({
   onSubmit,
   footer,
 }: FeedbackPageProps) {
+  const voice = useVoice();
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="padded">
-        <Text variant="title">Feedback</Text>
-        <Text variant="hint">
-          Share ideas, confusion, or problems. We&apos;ll include session context to help us
-          investigate.
-        </Text>
+        <Text variant="title">{voice.feedbackPage.title}</Text>
+        <Text variant="hint">{voice.feedbackPage.description}</Text>
         {submitted ? (
-          <Text variant="success">Thanks — we got your feedback.</Text>
+          <Text variant="success">{voice.feedbackPage.submittedMessage}</Text>
         ) : (
           <>
             <TextAreaField
-              label="What's on your mind?"
-              accessibilityLabel="What's on your mind?"
+              label={voice.feedbackPage.messageLabel}
+              accessibilityLabel={voice.feedbackPage.messageLabel}
               value={message}
               onChangeText={onMessageChange}
-              placeholder="Tell us what happened or what you'd like to see improved."
+              placeholder={voice.feedbackPage.messagePlaceholder}
             />
             <TextField
-              label="Email me back (optional)"
+              label={voice.feedbackPage.replyEmailLabel}
               value={replyEmail}
               onChangeText={onReplyEmailChange}
               autoCapitalize="none"
               keyboardType="email-address"
-              placeholder="you@example.com"
-              accessibilityLabel="Email me back (optional)"
+              placeholder={voice.feedbackPage.replyEmailPlaceholder}
+              accessibilityLabel={voice.feedbackPage.replyEmailLabel}
             />
-            <CheckboxField label="This is a bug" checked={isBug} onCheckedChange={onIsBugChange} />
+            <CheckboxField
+              label={voice.feedbackPage.bugLabel}
+              checked={isBug}
+              onCheckedChange={onIsBugChange}
+            />
             {error ? <Alert severity="error" message={error} /> : null}
             <Button
               variant="primary"
               disabled={submitDisabled || submitting}
               onPress={onSubmit}
-              accessibilityLabel="Submit feedback"
+              accessibilityLabel={voice.feedbackPage.submitLabel}
             >
-              {submitting ? "Submitting…" : "Submit feedback"}
+              {submitting ? voice.feedbackPage.submitPendingLabel : voice.feedbackPage.submitLabel}
             </Button>
           </>
         )}

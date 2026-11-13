@@ -5,6 +5,7 @@ import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * ConsentPreferencesPage (#438 Part 3): the standalone
@@ -16,11 +17,11 @@ import { Text } from "../widgets/Text.js";
  *
  * The consent record and its side effects stay with the host:
  * the current choice crosses as data and the three intents
- * report the user's action. The explanatory copy is generic
- * (the DS-owned-copy precedent) and overridable, because the
- * precise analytics wording is the host's privacy surface;
- * the choices here and the profile's FeedbackPreferenceView
- * act on the same host-held record.
+ * report the user's action. The copy comes from the voice
+ * object (#539); the explanatory lines stay overridable by
+ * prop, because the precise analytics wording is the host's
+ * privacy surface; the choices here and the profile's
+ * FeedbackPreferenceView act on the same host-held record.
  */
 export type ConsentPreferencesPageChoice = "accepted" | "declined" | null;
 
@@ -35,43 +36,43 @@ export type ConsentPreferencesPageProps = {
   hint?: string;
 };
 
-const CHOICE_LABELS: Record<"accepted" | "declined", string> = {
-  accepted: "Accepted",
-  declined: "Declined",
-};
-
-const DEFAULT_DESCRIPTION =
-  "We use privacy-respecting analytics to understand which features are used and where the app can improve. You can accept or decline at any time, and change your mind whenever you like.";
-const DEFAULT_HINT =
-  "Withdrawing consent removes your previous choice; you will be asked again the next time a feature needs it.";
-
 export function ConsentPreferencesPage({
   currentChoice,
   onAccept,
   onDecline,
   onWithdraw,
-  description = DEFAULT_DESCRIPTION,
-  hint = DEFAULT_HINT,
+  description: descriptionProp,
+  hint: hintProp,
   footer,
 }: ConsentPreferencesPageProps) {
+  const voice = useVoice();
+  const description = descriptionProp ?? voice.consentPreferencesPage.description;
+  const hint = hintProp ?? voice.consentPreferencesPage.hint;
+  const choiceLabel =
+    currentChoice === "accepted"
+      ? voice.consentPreferencesPage.acceptedLabel
+      : currentChoice === "declined"
+        ? voice.consentPreferencesPage.declinedLabel
+        : voice.consentPreferencesPage.notSetLabel;
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="padded">
-        <SectionCard title="Privacy choices" variant="elevated">
+        <SectionCard title={voice.consentPreferencesPage.title} variant="elevated">
           <SectionStack>
             <Text variant="body">{description}</Text>
             <Text variant="body">
-              Your current choice: {currentChoice ? CHOICE_LABELS[currentChoice] : "Not set"}
+              {voice.consentPreferencesPage.currentChoiceLabel}
+              {choiceLabel}
             </Text>
             <ButtonRow>
               <Button variant="primary" onPress={onAccept}>
-                Accept
+                {voice.consentPreferencesPage.acceptLabel}
               </Button>
               <Button variant="secondary" onPress={onDecline}>
-                Decline
+                {voice.consentPreferencesPage.declineLabel}
               </Button>
               <Button variant="secondary" onPress={onWithdraw}>
-                Withdraw
+                {voice.consentPreferencesPage.withdrawLabel}
               </Button>
             </ButtonRow>
             <Text variant="hint">{hint}</Text>

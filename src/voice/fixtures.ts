@@ -225,6 +225,40 @@ export const fixtureVoice: Voice = {
     heading: "New password",
     description: "Choose a new password for your account.",
   },
+  feedbackPage: {
+    title: "Feedback",
+    description:
+      "Share ideas, confusion, or problems. We'll include session context to help us investigate.",
+    submittedMessage: "Thanks — we got your feedback.",
+    messageLabel: "What's on your mind?",
+    messagePlaceholder: "Tell us what happened or what you'd like to see improved.",
+    replyEmailLabel: "Email me back (optional)",
+    replyEmailPlaceholder: "you@example.com",
+    bugLabel: "This is a bug",
+    submitLabel: "Submit feedback",
+    submitPendingLabel: "Submitting\u2026",
+  },
+  consentPreferencesPage: {
+    title: "Privacy choices",
+    description:
+      "We use privacy-respecting analytics to understand which features are used and where the app can improve. You can accept or decline at any time, and change your mind whenever you like.",
+    hint: "Withdrawing consent removes your previous choice; you will be asked again the next time a feature needs it.",
+    currentChoiceLabel: "Your current choice: ",
+    acceptedLabel: "Accepted",
+    declinedLabel: "Declined",
+    notSetLabel: "Not set",
+    acceptLabel: "Accept",
+    declineLabel: "Decline",
+    withdrawLabel: "Withdraw",
+  },
+  routeErrorPage: {
+    notFoundTitle: "Page not found",
+    notFoundMessage:
+      "We couldn't find that page. It may have been moved or the link may be broken.",
+    errorTitle: "Something went wrong",
+    errorMessage: "An unexpected error occurred. Try reloading the page, or head back home.",
+    homeLabel: "Go to the home page",
+  },
   autocompletePicker: {
     searchPlaceholder: "Search\u2026",
     searchLabel: "Search",
