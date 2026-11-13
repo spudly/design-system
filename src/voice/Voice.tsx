@@ -155,6 +155,55 @@ export type Voice = {
     /** Formatter: builds the remove action's accessible name from the row's position. */
     removeStepLabel: VoiceFormatter<[position: number]>;
   };
+  /** AccessTokensPanel view (tranche 2b): the section's own chrome — title, intro, created-secret panel, create form, and empty state. */
+  accessTokensPanel: {
+    title: string;
+    infoText: string;
+    createdSecretTitle: string;
+    createdSecretHint: string;
+    doneLabel: string;
+    tokenNameLabel: string;
+    tokenNamePlaceholder: string;
+    createLabel: string;
+    emptyMessage: string;
+  };
+  /** AccountDataView (tranche 2b): defaults when title / description / export / delete label props are not passed. */
+  accountDataView: {
+    title: string;
+    description: string;
+    exportLabel: string;
+    exportPendingLabel: string;
+    deleteLabel: string;
+    deletePendingLabel: string;
+  };
+  /** FeedbackPreferenceView (tranche 2b): defaults when title / shortcut / consent / choices label props are not passed. */
+  feedbackPreferenceView: {
+    title: string;
+    shortcutLabel: string;
+    shortcutDescription: string;
+    consentPromptText: string;
+    acceptLabel: string;
+    declineLabel: string;
+    withdrawLabel: string;
+    choicesHintBefore: string;
+    choicesLinkLabel: string;
+  };
+  /** SubscriptionView (tranche 2b): defaults when title / manage / refresh / portal label props are not passed. */
+  subscriptionView: {
+    title: string;
+    manageLabel: string;
+    managePendingLabel: string;
+    refreshLabel: string;
+    refreshPendingLabel: string;
+    portalLabel: string;
+  };
+  /** TransferRecipesView (tranche 2b): defaults when title / hint / import label props are not passed. */
+  transferRecipesView: {
+    title: string;
+    hint: string;
+    importLabel: string;
+    importPendingLabel: string;
+  };
   /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
   autocompletePicker: {
     searchPlaceholder: string;

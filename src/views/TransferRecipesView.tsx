@@ -8,9 +8,10 @@ import {
   RecipeExportPickerView,
   type RecipeExportPickerViewProps,
 } from "./RecipeExportPickerView.js";
+import { useVoice } from "../voice/index.js";
 
 export type TransferRecipesViewProps = {
-  /** Section heading ("Transfer recipes"). */
+  /** Section heading. Defaults to the voice object's transferRecipesView title (#539). */
   title?: string;
   /** The section's explanatory line. */
   hint?: string;
@@ -56,17 +57,22 @@ export type TransferRecipesViewProps = {
  * and error lines.
  */
 export function TransferRecipesView({
-  title = "Transfer recipes",
-  hint = "Export recipes to a file you can keep, or import recipes from a file.",
+  title: titleProp,
+  hint: hintProp,
   exportPicker,
   onImportPress,
-  importLabel = "Import recipes",
-  importPendingLabel = "Importing…",
+  importLabel: importLabelProp,
+  importPendingLabel: importPendingLabelProp,
   importPending = false,
   importSummary,
   error,
   loading = false,
 }: TransferRecipesViewProps) {
+  const voice = useVoice();
+  const title = titleProp ?? voice.transferRecipesView.title;
+  const hint = hintProp ?? voice.transferRecipesView.hint;
+  const importLabel = importLabelProp ?? voice.transferRecipesView.importLabel;
+  const importPendingLabel = importPendingLabelProp ?? voice.transferRecipesView.importPendingLabel;
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>

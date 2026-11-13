@@ -4,9 +4,10 @@ import { Button } from "../widgets/Button.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { useVoice } from "../voice/index.js";
 
 export type AccountDataViewProps = {
-  /** Section heading ("Your data"). */
+  /** Section heading. Defaults to the voice object's accountDataView title (#539). */
   title?: string;
   /** The section's explanatory line. */
   description?: string;
@@ -45,19 +46,26 @@ export type AccountDataViewProps = {
  * and switch the labels, as the host section's busy states do.
  */
 export function AccountDataView({
-  title = "Your data",
-  description = "Download a copy of your recipes and account data, or delete your account.",
+  title: titleProp,
+  description: descriptionProp,
   onExportData,
-  exportLabel = "Download my data",
-  exportPendingLabel = "Preparing…",
+  exportLabel: exportLabelProp,
+  exportPendingLabel: exportPendingLabelProp,
   exportPending = false,
   onDeleteAccount,
-  deleteLabel = "Delete account",
-  deletePendingLabel = "Deleting…",
+  deleteLabel: deleteLabelProp,
+  deletePendingLabel: deletePendingLabelProp,
   deletePending = false,
   error,
   loading = false,
 }: AccountDataViewProps) {
+  const voice = useVoice();
+  const title = titleProp ?? voice.accountDataView.title;
+  const description = descriptionProp ?? voice.accountDataView.description;
+  const exportLabel = exportLabelProp ?? voice.accountDataView.exportLabel;
+  const exportPendingLabel = exportPendingLabelProp ?? voice.accountDataView.exportPendingLabel;
+  const deleteLabel = deleteLabelProp ?? voice.accountDataView.deleteLabel;
+  const deletePendingLabel = deletePendingLabelProp ?? voice.accountDataView.deletePendingLabel;
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>

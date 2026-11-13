@@ -10,9 +10,10 @@ import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "./CheckboxField.js";
+import { useVoice } from "../voice/index.js";
 
 export type FeedbackPreferenceViewProps = {
-  /** Section heading ("Preferences"). */
+  /** Section heading. Defaults to the voice object's feedbackPreferenceView title (#539). */
   title?: string;
   shortcutLabel?: string;
   shortcutDescription?: string;
@@ -75,9 +76,9 @@ export type FeedbackPreferenceViewProps = {
  * through the callbacks.
  */
 export function FeedbackPreferenceView({
-  title = "Preferences",
-  shortcutLabel = "Show feedback shortcut",
-  shortcutDescription = "Adds a floating shortcut for sending feedback from anywhere in the app.",
+  title: titleProp,
+  shortcutLabel: shortcutLabelProp,
+  shortcutDescription: shortcutDescriptionProp,
   shortcutEnabled,
   onShortcutEnabledChange,
   shortcutUnavailable = false,
@@ -85,19 +86,30 @@ export function FeedbackPreferenceView({
   consent,
   consentStatusText,
   consentPromptOpen = false,
-  consentPromptText = "Share anonymous usage analytics to help improve the app? You can change this any time.",
+  consentPromptText: consentPromptTextProp,
   onAcceptConsent,
   onDeclineConsent,
   onWithdrawConsent,
-  acceptLabel = "Accept",
-  declineLabel = "Decline",
-  withdrawLabel = "Withdraw consent",
-  choicesHintBefore = "Manage your choice at any time on the ",
-  choicesLinkLabel = "privacy choices page",
+  acceptLabel: acceptLabelProp,
+  declineLabel: declineLabelProp,
+  withdrawLabel: withdrawLabelProp,
+  choicesHintBefore: choicesHintBeforeProp,
+  choicesLinkLabel: choicesLinkLabelProp,
   choicesHref,
   error,
   loading = false,
 }: FeedbackPreferenceViewProps) {
+  const voice = useVoice();
+  const title = titleProp ?? voice.feedbackPreferenceView.title;
+  const shortcutLabel = shortcutLabelProp ?? voice.feedbackPreferenceView.shortcutLabel;
+  const shortcutDescription =
+    shortcutDescriptionProp ?? voice.feedbackPreferenceView.shortcutDescription;
+  const consentPromptText = consentPromptTextProp ?? voice.feedbackPreferenceView.consentPromptText;
+  const acceptLabel = acceptLabelProp ?? voice.feedbackPreferenceView.acceptLabel;
+  const declineLabel = declineLabelProp ?? voice.feedbackPreferenceView.declineLabel;
+  const withdrawLabel = withdrawLabelProp ?? voice.feedbackPreferenceView.withdrawLabel;
+  const choicesHintBefore = choicesHintBeforeProp ?? voice.feedbackPreferenceView.choicesHintBefore;
+  const choicesLinkLabel = choicesLinkLabelProp ?? voice.feedbackPreferenceView.choicesLinkLabel;
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): a skeleton branch mirroring the loaded

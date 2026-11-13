@@ -1,0 +1,5 @@
+---
+"@spudly/ui": major
+---
+
+The account / profile view literals move to the app-supplied voice object, as tranche 2b of the voice-as-theme system (#539): AccessTokensPanel's section title, intro, created-secret panel heading and hint, Done action, token-name label and placeholder, Create token action, and empty state; AccountDataView's title, description, and Download / Preparing / Delete / Deleting labels; FeedbackPreferenceView's title, feedback-shortcut label and description, consent prompt, Accept / Decline / Withdraw consent labels, and privacy-choices hint and link label; SubscriptionView's title and Manage / Opening / Check again / Checking / portal labels; and TransferRecipesView's title, hint, and Import / Importing labels. Apps must supply the new accessTokensPanel, accountDataView, feedbackPreferenceView, subscriptionView, and transferRecipesView voice slots through VoiceProvider; Storybook's fixture voice carries the same strings these views previously hard-coded, so rendered output is unchanged.
