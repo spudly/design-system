@@ -235,6 +235,44 @@ export type Voice = {
     submitLabel: string;
     submitPendingLabel: string;
   };
+  /** RecipeCommentsView (tranche 2d): defaults when title / emptyMessage / composer / post label props are not passed. */
+  recipeCommentsView: {
+    title: string;
+    emptyMessage: string;
+    composerLabel: string;
+    composerPlaceholder: string;
+    postLabel: string;
+  };
+  /** RecipeSharingView (tranche 2d): defaults when title / consent / save / share-link / permalink label props are not passed. */
+  recipeSharingView: {
+    title: string;
+    consentLabel: string;
+    saveLabel: string;
+    savePendingLabel: string;
+    shareLinkLabel: string;
+    rotateShareLinkLabel: string;
+    copyShareLinkLabel: string;
+    permalinkLabel: string;
+    copyPermalinkLabel: string;
+  };
+  /** NutritionGoalsForm (tranche 2d): the section title, field labels, optional placeholder, and save action — the form has no label props, so its copy reads the voice slots directly. */
+  nutritionGoalsForm: {
+    title: string;
+    caloriesLabel: string;
+    proteinLabel: string;
+    carbsLabel: string;
+    fatLabel: string;
+    satietyScoreLabel: string;
+    optionalPlaceholder: string;
+    saveLabel: string;
+  };
+  /** RatingForm (tranche 2d): defaults when title / notesPlaceholder / secondaryLabel props are not passed, plus the save action's text and accessible name. */
+  ratingForm: {
+    title: string;
+    notesPlaceholder: string;
+    secondaryLabel: string;
+    saveLabel: string;
+  };
   /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
   autocompletePicker: {
     searchPlaceholder: string;

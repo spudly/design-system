@@ -7,6 +7,7 @@ import { Button } from "../widgets/Button.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { TextField } from "./TextField.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * NutritionGoalsForm (#126, B3c): the daily nutrition goals
@@ -76,6 +77,7 @@ function GoalField({
   value: number | null;
   onChange: (value: number | null) => void;
 }) {
+  const voice = useVoice();
   return (
     <TextField
       label={label}
@@ -83,7 +85,7 @@ function GoalField({
       onChangeText={(text) => {
         onChange(parseOptionalNumber(text));
       }}
-      placeholder="Optional"
+      placeholder={voice.nutritionGoalsForm.optionalPlaceholder}
     />
   );
 }
@@ -118,47 +120,48 @@ export function NutritionGoalsForm({
   onSave,
   loading = false,
 }: NutritionGoalsFormProps) {
+  const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   const patch = (partial: Partial<NutritionGoalsValues>) => {
     onChange({ ...goals, ...partial });
   };
 
   return (
-    <SectionCard title="Daily nutrition goals" loading={showSkeleton}>
+    <SectionCard title={voice.nutritionGoalsForm.title} loading={showSkeleton}>
       {showSkeleton ? (
         LOADING_GOAL_FIELD_KEYS.map((key) => <GoalFieldSkeleton key={key} />)
       ) : (
         <>
           <GoalField
-            label="Calories"
+            label={voice.nutritionGoalsForm.caloriesLabel}
             value={goals.calories}
             onChange={(calories) => {
               patch({ calories });
             }}
           />
           <GoalField
-            label="Protein (g)"
+            label={voice.nutritionGoalsForm.proteinLabel}
             value={goals.proteinG}
             onChange={(proteinG) => {
               patch({ proteinG });
             }}
           />
           <GoalField
-            label="Carbs (g)"
+            label={voice.nutritionGoalsForm.carbsLabel}
             value={goals.carbsG}
             onChange={(carbsG) => {
               patch({ carbsG });
             }}
           />
           <GoalField
-            label="Fat (g)"
+            label={voice.nutritionGoalsForm.fatLabel}
             value={goals.fatG}
             onChange={(fatG) => {
               patch({ fatG });
             }}
           />
           <GoalField
-            label="Satiety score"
+            label={voice.nutritionGoalsForm.satietyScoreLabel}
             value={goals.satietyScore}
             onChange={(satietyScore) => {
               patch({ satietyScore });
@@ -169,7 +172,7 @@ export function NutritionGoalsForm({
       {error && !showSkeleton ? <Alert severity="error" message={error} /> : null}
       <YStack paddingTop="$3">
         <Button variant="primary" disabled={saving} onPress={onSave}>
-          Save goals
+          {voice.nutritionGoalsForm.saveLabel}
         </Button>
       </YStack>
     </SectionCard>

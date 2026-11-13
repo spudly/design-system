@@ -11,9 +11,10 @@ import { Text } from "../widgets/Text.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "./CheckboxField.js";
 import { RadioOptionGroup, type RadioOption } from "./RadioOptionGroup.js";
+import { useVoice } from "../voice/index.js";
 
 export type RecipeSharingViewProps = {
-  /** Section heading ("Sharing"). */
+  /** Section heading. Defaults to the voice object's recipeSharingView title (#539). */
   title?: string;
   /** The visibility options (value / label / description are caller data). */
   options: RadioOption[];
@@ -33,6 +34,7 @@ export type RecipeSharingViewProps = {
    * `onConsentCheckedChange` is provided. Its description is a
    * ReactNode so the host's policy link stays inline and
    * pressable (the CheckboxField description contract).
+   * Defaults to the voice object's recipeSharingView consentLabel (#539).
    */
   consentLabel?: string;
   consentDescription?: ReactNode;
@@ -41,21 +43,25 @@ export type RecipeSharingViewProps = {
   /** Saving requires consent: Save disables until it is checked. */
   consentRequired?: boolean;
   onSave?: () => void;
+  /** Defaults to the voice object's recipeSharingView saveLabel (#539). */
   saveLabel?: string;
+  /** Defaults to the voice object's recipeSharingView savePendingLabel (#539). */
   savePendingLabel?: string;
-  /** The token share-link block; renders when `onRotateShareLink` is provided. */
+  /** The token share-link block; renders when `onRotateShareLink` is provided. Defaults to the voice object's recipeSharingView shareLinkLabel (#539). */
   shareLinkLabel?: string;
   shareLinkUrl?: string | null;
   onRotateShareLink?: () => void;
-  /** The host composes the label ("Generate share link" / "Rotate share link"). */
+  /** The host composes the label (a generate or rotate wording). Defaults to the voice object's recipeSharingView rotateShareLinkLabel (#539). */
   rotateShareLinkLabel?: string;
   shareLinkPending?: boolean;
   onCopyShareLink?: () => void;
+  /** Defaults to the voice object's recipeSharingView copyShareLinkLabel (#539). */
   copyShareLinkLabel?: string;
-  /** The public permalink block; renders when a URL and copy intent exist. */
+  /** The public permalink block; renders when a URL and copy intent exist. Defaults to the voice object's recipeSharingView permalinkLabel (#539). */
   permalinkLabel?: string;
   permalinkUrl?: string | null;
   onCopyPermalink?: () => void;
+  /** Defaults to the voice object's recipeSharingView copyPermalinkLabel (#539). */
   copyPermalinkLabel?: string;
   /** Loading state (#278): the Card carries the loading scope
    * and the view renders a mirror of its layout — the title as
@@ -92,33 +98,44 @@ export type RecipeSharingViewProps = {
  * (grants, withdrawals, forced re-consent) is the host's.
  */
 export function RecipeSharingView({
-  title = "Sharing",
+  title: titleProp,
   options,
   value,
   onValueChange,
   pending = false,
   publicWarning,
-  consentLabel = "Publishing consent",
+  consentLabel: consentLabelProp,
   consentDescription,
   consentChecked = false,
   onConsentCheckedChange,
   consentRequired = false,
   onSave,
-  saveLabel = "Save visibility",
-  savePendingLabel = "Saving…",
-  shareLinkLabel = "Anyone with this link can view this recipe.",
+  saveLabel: saveLabelProp,
+  savePendingLabel: savePendingLabelProp,
+  shareLinkLabel: shareLinkLabelProp,
   shareLinkUrl,
   onRotateShareLink,
-  rotateShareLinkLabel = "Generate share link",
+  rotateShareLinkLabel: rotateShareLinkLabelProp,
   shareLinkPending = false,
   onCopyShareLink,
-  copyShareLinkLabel = "Copy share link",
-  permalinkLabel = "Public link",
+  copyShareLinkLabel: copyShareLinkLabelProp,
+  permalinkLabel: permalinkLabelProp,
   permalinkUrl,
   onCopyPermalink,
-  copyPermalinkLabel = "Copy public link",
+  copyPermalinkLabel: copyPermalinkLabelProp,
   loading = false,
 }: RecipeSharingViewProps) {
+  const voice = useVoice();
+  const title = titleProp ?? voice.recipeSharingView.title;
+  const consentLabel = consentLabelProp ?? voice.recipeSharingView.consentLabel;
+  const saveLabel = saveLabelProp ?? voice.recipeSharingView.saveLabel;
+  const savePendingLabel = savePendingLabelProp ?? voice.recipeSharingView.savePendingLabel;
+  const shareLinkLabel = shareLinkLabelProp ?? voice.recipeSharingView.shareLinkLabel;
+  const rotateShareLinkLabel =
+    rotateShareLinkLabelProp ?? voice.recipeSharingView.rotateShareLinkLabel;
+  const copyShareLinkLabel = copyShareLinkLabelProp ?? voice.recipeSharingView.copyShareLinkLabel;
+  const permalinkLabel = permalinkLabelProp ?? voice.recipeSharingView.permalinkLabel;
+  const copyPermalinkLabel = copyPermalinkLabelProp ?? voice.recipeSharingView.copyPermalinkLabel;
   const showSkeleton = useLoadingScope(loading);
   return (
     <Card variant="bordered" loading={showSkeleton}>

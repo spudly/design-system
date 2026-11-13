@@ -9,8 +9,9 @@ import test from "node:test";
  * component is specific to cooking or any one app. The
  * load-bearing properties are the generic boundary (the
  * submit view-model carries a plain `rating`, the heading
- * and notes placeholder are props with neutral defaults, no
- * domain vocabulary in the defaults) and the behaviors the
+ * and notes placeholder are props whose defaults come from
+ * the voice object (#539 tranche 2d), no domain vocabulary
+ * in the defaults) and the behaviors the
  * original form established (uncontrolled rating/notes,
  * optional rating, toggle-off, trimmed-or-null notes,
  * pending disables Save only, StarRatingInput reuse).
@@ -42,11 +43,11 @@ test("the submit view-model is generic: rating, not a domain field name", () => 
   assert.match(source, /isPending: boolean/);
 });
 
-test("heading and notes placeholder are props with neutral defaults", () => {
+test("heading and notes placeholder are props whose defaults come from the voice object", () => {
   assert.match(source, /title\?: string/);
   assert.match(source, /notesPlaceholder\?: string/);
-  assert.match(source, /title = "How did it go\?"/);
-  assert.match(source, /notesPlaceholder = "Notes \(optional\)"/);
+  assert.match(source, /titleProp \?\? voice\.ratingForm\.title/);
+  assert.match(source, /notesPlaceholderProp \?\? voice\.ratingForm\.notesPlaceholder/);
   assert.match(source, /\{title\}/);
   assert.match(source, /placeholder=\{notesPlaceholder\}/);
   assert.doesNotMatch(source, /from this cook/);
@@ -67,9 +68,9 @@ test("toggle-off: pressing the current star clears the rating", () => {
   assert.match(source, /value=\{rating \?\? 0\}/);
 });
 
-test("defaults: dark variant, Skip secondary label", () => {
+test("defaults: dark variant, voice secondary label", () => {
   assert.match(source, /variant = "dark"/);
-  assert.match(source, /secondaryLabel = "Skip"/);
+  assert.match(source, /secondaryLabelProp \?\? voice\.ratingForm\.secondaryLabel/);
   assert.match(source, /variant\?: "dark" \| "light"/);
   assert.match(source, /secondaryLabel\?: string/);
 });
