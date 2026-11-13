@@ -28,7 +28,10 @@
  * their hrefs, and the footer present.
  */
 import "../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../test/internalDist.js";
+import {
+  loadLegalDocumentRuntime,
+  renderLegalDocumentToHtml,
+} from "../../test/legalDocumentSsr.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -157,45 +160,14 @@ test("stories render the real page for both documents (#170)", () => {
   assert.ok(stories.includes("legalTermsFixture"), "terms story uses the terms fixture");
 });
 
-// Runtime imports are lazy (inside the SSR tests) so the source-scan
-// tests above still run and report when the build output is missing
-// or broken, instead of the whole file failing at import time.
-let runtimePromise;
-function loadRuntime() {
-  runtimePromise ??= (async () => {
-    const reactModule = await import("react");
-    const React = reactModule.default;
-    const { renderToString } = await import("react-dom/server");
-    const { TamaguiProvider }: Record<string, any> = await import("tamagui");
-    const dist: Record<string, any> = await loadInternalDist();
-    const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
-    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
-    const { LegalDocumentPage }: Record<string, any> =
-      await import("../../dist/pages/LegalDocumentPage.js");
-    return {
-      React,
-      renderToString,
-      TamaguiProvider,
-      ...dist,
-      ...voiceFixtures,
-      ...voiceModule,
-      LegalDocumentPage,
-    };
-  })();
-  return runtimePromise;
-}
-async function renderToHtml(element: any) {
-  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
-    await loadRuntime();
-  const config = createTamaguiConfig(baseTheme);
-  const html = renderToString(
-    <TamaguiProvider config={config} defaultTheme="light">
-      <VoiceProvider voice={fixtureVoice}>{element}</VoiceProvider>
-    </TamaguiProvider>,
-  );
-  const styleEnd = html.lastIndexOf("</style>");
-  return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
-}
+// The lazy runtime loader and SSR render helper are shared with
+// the other LegalDocumentPage contract test — see
+// test/legalDocumentSsr.tsx (#587 phase 2). Runtime imports stay
+// lazy inside that loader so the source-scan tests above still run
+// and report when the build output is missing or broken, instead of
+// the whole file failing at import time.
+const loadRuntime = loadLegalDocumentRuntime;
+const renderToHtml = renderLegalDocumentToHtml;
 
 // [{ level, text }] for every rendered heading, in document order.
 function renderedHeadings(html: string) {
