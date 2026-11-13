@@ -1,6 +1,7 @@
 import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
+import { useVoice } from "../voice/index.js";
 
 export type PrevNextNavProps = {
   onBack?: () => void;
@@ -22,11 +23,14 @@ export type PrevNextNavProps = {
 export function PrevNextNav({
   onBack,
   onNext,
-  backLabel = "Back",
-  nextLabel = "Next",
+  backLabel,
+  nextLabel,
   backDisabled = false,
   nextDisabled = false,
 }: PrevNextNavProps) {
+  const voice = useVoice();
+  const resolvedBackLabel = backLabel ?? voice.prevNextNav.backLabel;
+  const resolvedNextLabel = nextLabel ?? voice.prevNextNav.nextLabel;
   return (
     <XStack
       justifyContent={onBack ? "space-between" : "flex-end"}
@@ -35,12 +39,12 @@ export function PrevNextNav({
     >
       {onBack ? (
         <Button ghost onPress={onBack} disabled={backDisabled}>
-          {backLabel}
+          {resolvedBackLabel}
         </Button>
       ) : null}
       {onNext ? (
         <Button variant="primary" onPress={onNext} disabled={nextDisabled}>
-          {nextLabel}
+          {resolvedNextLabel}
         </Button>
       ) : null}
     </XStack>

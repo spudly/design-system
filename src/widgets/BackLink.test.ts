@@ -102,8 +102,8 @@ test("the row centers the arrow against the label by construction", () => {
   );
 });
 
-test("the label defaults to Back and renders in the link role color", () => {
-  assert.match(code, /label = "Back"/, "the default label is the apps' back-link copy");
+test("the label defaults to the voice backLink slot and renders in the link role color", () => {
+  assert.match(code, /props\.label \?\? voice\.backLink\.label/, "the default label comes from the voice object (#539)");
   assert.match(
     code,
     /color="\$link"/,

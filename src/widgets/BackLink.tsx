@@ -3,6 +3,7 @@ import { BackIcon } from "../icons/BackIcon.js";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * The back arrow must NOT be the "←" text glyph. Its ink is not
@@ -73,7 +74,7 @@ export type BackLinkProps =
       /** Navigate back — the callback form, for hosts whose back navigation is callback-driven (e.g. "wherever the user came from"). */
       onPress: () => void;
       href?: never;
-      /** Link label. Defaults to "Back", the apps' back-link copy. */
+      /** Link label. Defaults to the voice object's backLink label (#539). */
       label?: string;
     }
   | {
@@ -94,7 +95,7 @@ export type BackLinkProps =
        */
       href: string;
       onPress?: never;
-      /** Link label. Defaults to "Back", the apps' back-link copy. */
+      /** Link label. Defaults to the voice object's backLink label (#539). */
       label?: string;
     };
 
@@ -121,7 +122,8 @@ export type BackLinkProps =
  * keyboard-operable).
  */
 export function BackLink(props: BackLinkProps) {
-  const { label = "Back" } = props;
+  const voice = useVoice();
+  const label = props.label ?? voice.backLink.label;
   const arrowInk = useBackArrowInk();
   if (props.href !== undefined) {
     return (

@@ -205,8 +205,13 @@ async function renderToHtml(element: any) {
   const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
+  // #539: BackLink reads its default label from the voice object;
+  // supply the fixture voice the same way Storybook does.
+  const { VoiceProvider } = await import("../dist/voice/index.js");
+  const { fixtureVoice } = await import("../dist/voice/fixtures.js");
+  const inner = React.createElement(VoiceProvider, { voice: fixtureVoice }, element);
   return renderToString(
-    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, inner),
   );
 }
 

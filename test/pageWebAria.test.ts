@@ -327,8 +327,14 @@ async function renderToHtml(element: any) {
   const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
+  // #539: pages/widgets under test can contain voice-reading widgets
+  // (BackLink, StepOverlay); supply the fixture voice the same way
+  // Storybook does.
+  const { VoiceProvider } = await import("../dist/voice/index.js");
+  const { fixtureVoice } = await import("../dist/voice/fixtures.js");
+  const inner = React.createElement(VoiceProvider, { voice: fixtureVoice }, element);
   const html = renderToString(
-    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, inner),
   );
   // Strip the Tamagui CSS block: the leak assertions are about the
   // rendered elements' attributes, not stylesheet text.
