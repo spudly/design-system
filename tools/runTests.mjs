@@ -22,7 +22,13 @@ const root = fileURLToPath(new URL("..", import.meta.url));
 
 const args = ["tsx", "--test"];
 if (process.env.CI !== "true") args.push("--test-concurrency=2");
-args.push("src/**/*.test.ts", "test/**/*.test.ts", "eslintRules/*.test.ts");
+args.push(
+  "src/**/*.test.ts",
+  "src/**/*.test.tsx",
+  "test/**/*.test.ts",
+  "test/**/*.test.tsx",
+  "eslintRules/*.test.ts",
+);
 
 // On Windows, npx is a .cmd shim, which child_process cannot launch
 // by its bare name without a shell; naming the shim explicitly works

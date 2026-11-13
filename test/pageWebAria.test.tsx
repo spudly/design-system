@@ -1,0 +1,437 @@
+/**
+ * Contract test for spudly/design-system#237: the follow-up to #235.
+ * #235 routed Button, Text, and the component-internal stack
+ * pressables through the shared `platformAccessibilityProps`
+ * translator in src/widgets/accessibility.ts, but remaining render
+ * paths still set React Native accessibility props on raw Tamagui
+ * stacks or Tamagui semantic primitives, where Tamagui's web renderer
+ * forwards them verbatim to the DOM as raw attributes — no
+ * `aria-label`, stringified `accessibilityvalue="[object Object]"`,
+ * and no role at all (the role prop itself leaked as
+ * `accessibilityrole="…"`), leaving controls with no accessible name
+ * or semantics on web:
+ *
+ * - Page-level raw-stack pressables in src/pages/**: ShoppingListPage's
+ *   checkbox row (XStack), MealDetailPage member rows (YStack,
+ *   including the disabled-state spread for unavailable rows),
+ *   MealsHubPage rows (YStack), AiSessionPage's
+ *   Cancel action (YStack), MealCookingModePage's Done action (YStack),
+ *   RecipeFormPage's revert actions (YStack). (RecipeDetailPage's
+ *   viewer-rating wrapper and Custom scale chip were in this list
+ *   until the #119 recipes-detail tranche moved the wrapper into
+ *   RatingsCard, its rows/steps into MarkableRow / StepList, and
+ *   the #119 dedupe turned the scale chip into a PresetValueSelector
+ *   Button; the page has no stack pressable left — pinned below.)
+ *   (MealPlansPage's and MealPlanDetailPage's rows were in this
+ *   list until the #119 tranche-2 de-styling moved them into the
+ *   generic CardRow / ListRow components; the routing moved with
+ *   them and the rows test below pins it there. AiSessionPage's
+ *   Cancel action was in this list until the #119 ai-import
+ *   tranche composed it inline as a text action — since #464 it
+ *   is a ghost Button, pinned below the same way. RecipeFormPage's
+ *   revert actions and changed-list banner joined them in the
+ *   #119 forms tranche as the RevertAction / ChangedListBanner
+ *   components; since #464 both compose a ghost Button,
+ *   so their press role is Button's routing — the
+ *   de-styled-pages test below pins that no
+ *   stack pressable remains in RecipeFormPage itself.)
+ * - Tamagui semantic primitives used directly: Checkbox in
+ *   ChecklistRow (its `accessibilityLabel` leaked; Tamagui supplies
+ *   role/aria-checked itself) and Progress in ProgressBar (role,
+ *   value, and caller labels all leaked).
+ * - The same leak through DS field/primitive wrappers that forwarded
+ *   caller RN props in `...rest` to a Tamagui element: TextField,
+ *   TextAreaField, CheckboxField (a Checkbox primitive), TextLink,
+ *   OptionCard (through Card), BackLink, and Alert's alert role.
+ *
+ * The contract now:
+ * 1. Every path above routes its RN accessibility props through
+ *    `platformAccessibilityProps` (or, for the wrappers, destructures
+ *    the caller's RN props OUT of rest and routes them through the
+ *    translator like Button/Text do in #235), so on web they render
+ *    as `aria-label` / `role` / `aria-checked` / `aria-valuenow` etc.
+ *    and on native they pass through unchanged.
+ * 2. A global source scan (below) pins that NO raw
+ *    `accessibilityLabel=` / `accessibilityState=` /
+ *    `accessibilityRole=` / `accessibilityValue=` JSX prop in src/
+ *    lands on anything but a sanctioned translating target: a DS
+ *    primitive that itself translates (Button, Text, TextField,
+ *    TextAreaField, and ProgressBar), or a
+ *    React Native element (TouchableOpacity in RecipesPage /
+ *    SharedWithMePage / RecipeDetailPage; Image in
+ *    ImportReviewPage, whose `accessibilityLabel`
+ *    react-native-web renders as the image's `alt` text), which
+ *    react-native-web translates to ARIA itself on web. Raw
+ *    Tamagui stacks (XStack,
+ *    YStack, View), styled Tamagui primitives (StyledCheckbox,
+ *    StyledTrack, StyledTextLink, Card, …), and Progress/Checkbox
+ *    primitives are NOT sanctioned targets.
+ * 3. Runtime (SSR, against the built output): ChecklistRow,
+ *    ProgressBar, TextField, CheckboxField, TextLink, BackLink,
+ *    OptionCard, and Alert render their ARIA equivalents and NO
+ *    leaked RN attributes and no "[object Object]".
+ *
+ * The source scans strip comments first, like the other contract
+ * tests here, so prose cannot satisfy or trip the patterns.
+ */
+import "./registerSvgStub.js";
+import { loadInternalDist } from "./internalDist.js";
+import assert from "node:assert/strict";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { test } from "node:test";
+import { fileURLToPath } from "node:url";
+const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+function readCode(rel: string) {
+  return readFileSync(join(root, rel), "utf8")
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+}
+function sourceFiles(dir: string): string[] {
+  return readdirSync(dir, {
+    withFileTypes: true,
+  }).flatMap((entry) => {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) return sourceFiles(path);
+    return /\.tsx$/.test(entry.name) ? [path] : [];
+  });
+}
+
+/** DS primitives that translate caller RN props themselves (#235/#237),
+ * plus RN elements react-native-web translates on web. */
+// Compact split form: this file sits at the test max-lines cap
+// (300), so the tag list cannot grow one-per-line. Dropdown and
+// DropdownButton (#178) are sanctioned on the same ground as the
+// primitives: Dropdown routes its panel label through
+// platformAccessibilityProps onto the Popover content, and
+// DropdownButton forwards its label to the DS Button — both
+// translate caller RN props themselves. LinkOverlay is sanctioned
+// on the same ground again: it is the native link layer for
+// view-level link surfaces and spreads platformAccessibilityProps
+// onto its Anchor. Thumbnail is sanctioned on the same ground:
+// it routes its `accessibilityLabel` through
+// platformAccessibilityProps internally. (ActionChip was too,
+// until the #119 dedupe retired it; its consumers are Buttons.)
+// RatingStars (RecipesPage's page-local log-cook control) is
+// sanctioned on the same ground: its pressable form routes
+// the label through platformAccessibilityProps onto its target.
+// Alert is sanctioned on the same ground again (#460): it routes
+// caller RN props through platformAccessibilityProps like Button/Text;
+// ButtonInternal (#480) is Button's own internal form — same routing.
+const SANCTIONED_TAGS = new Set(
+  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert".split(
+    ",",
+  ),
+);
+test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in src/ (#237)", () => {
+  const files = sourceFiles(join(root, "src"));
+  assert.ok(files.length > 0, "scan must find source files");
+  let checked = 0;
+  for (const file of files) {
+    const code = readCode(file.slice(root.length + 1));
+    for (const match of code.matchAll(/accessibility(?:Label|State|Role|Value)\s*=/g)) {
+      // The JSX opening tag this prop belongs to: the last `<Tag`
+      // before the prop with no `>` in between (props live inside the
+      // opening tag). Object-literal forms (`accessibilityRole: "x"`
+      // inside platformAccessibilityProps({…})) use `:` and never
+      // match the `=` pattern above.
+      const before = code.slice(0, match.index);
+      const tagStart = before.lastIndexOf("<");
+      assert.ok(tagStart !== -1, `${file}: accessibility prop with no preceding tag`);
+      // Arrow functions in earlier props of the same opening tag
+      // (`onFocus={() => …}`) contain `>` without closing the tag;
+      // strip `=>` before checking the tag is still open.
+      const tagText = before.slice(tagStart).replaceAll("=>", "");
+      assert.ok(!tagText.includes(">"), `${file}: could not attribute accessibility prop to a tag`);
+      const tag = /^<([A-Z][A-Za-z0-9.]*)/.exec(tagText)?.[1];
+      assert.ok(tag, `${file}: could not read tag name before accessibility prop`);
+      checked += 1;
+      assert.ok(
+        SANCTIONED_TAGS.has(tag),
+        `${file}: raw ${match[0]} on <${tag}> leaks to the DOM on web — route it through platformAccessibilityProps (#237)`,
+      );
+    }
+  }
+  assert.ok(checked > 0, "scan must find at least one sanctioned raw prop");
+});
+
+// Compact split form (the SANCTIONED_TAGS pattern above): this
+// file sits at the max-lines cap. MealPlansPage,
+// Every page that once routed stack pressables through the
+// translator has been de-styled off this list by the #119
+// tranches: ShoppingListPage (its row is CheckRow),
+// MealDetailPage (its rows are ListRow), MealsHubPage
+// (TextActionCardRow), MealCookingModePage (its Done pill is
+// StepOverlay's), AiSessionPage (its Cancel control is a
+// ghost Button), RecipeFormPage and the plan pages
+// (CardRow / ListRow; RevertAction / ChangedListBanner), and
+// RecipeDetailPage (its rows/steps through MarkableRow /
+// StepList). The list is empty; the dedicated test below pins
+// all of them translator-free.
+const PAGE_STACKS: string[] = [];
+
+// Shared by the stack scans below (compact form: this file sits
+// at the max-lines cap). RAW matches a raw RN accessibility JSX
+// prop; TAGS strips the sanctioned targets (DS primitives /
+// TouchableOpacity / LinkOverlay) before RAW is applied.
+const RAW = /accessibility(Label|State|Role|Value)=/;
+const TAGS =
+  /<(Button|Text|TextField|TextAreaField|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g;
+test("page-level stack pressables route through the translator, never raw RN JSX props (#237)", () => {
+  for (const rel of PAGE_STACKS) {
+    const code = readCode(rel);
+    assert.ok(
+      code.includes("platformAccessibilityProps"),
+      `${rel} must route its stack accessibility props through platformAccessibilityProps`,
+    );
+    assert.ok(
+      code.includes("...platformAccessibilityProps("),
+      `${rel} must spread the translator's result onto the pressable — calling the helper without spreading it changes nothing`,
+    );
+    assert.ok(
+      !RAW.test(code.replaceAll(TAGS, "")),
+      `${rel} must not pass raw RN accessibility JSX props to a Tamagui stack (props on DS primitives / TouchableOpacity / LinkOverlay are the sanctioned exceptions)`,
+    );
+  }
+});
+test("CheckRow (ShoppingListPage's row) translates role, checked state, and label together (#237)", () => {
+  const code = readCode("src/widgets/CheckRow.tsx");
+  assert.match(
+    code,
+    /\{\.\.\.platformAccessibilityProps\(\{\s+accessibilityRole: "checkbox"/,
+    "the translated props must be spread onto the row's XStack pressable",
+  );
+  assert.match(code, /accessibilityState: \{ checked \}/);
+  assert.match(code, /accessibilityLabel: accessibleName/);
+});
+test("the de-styled pages have no stack pressable left to translate (#237, #248, #119)", () => {
+  // These pages' rows and revert pressables render through the
+  // generic components the #119 extractions moved them into
+  // (and MealCookingModePage's pressable is StepOverlay's pill)
+  // — no stack pressable remains in any of them, so the
+  // translator must not be imported or used, and no raw RN
+  // accessibility JSX props may appear either (props on DS
+  // primitives / LinkOverlay are the sanctioned exceptions,
+  // stripped via the shared TAGS before RAW is applied).
+  const PAGES =
+    "MealPlansPage,MealPlanDetailPage,AiSessionPage,RecipeFormPage,ShoppingListPage,MealDetailPage,MealsHubPage,MealCookingModePage,RecipeDetailPage".split(
+      ",",
+    );
+  for (const rel of PAGES.map((page) => `src/pages/${page}.tsx`)) {
+    const code = readCode(rel);
+    assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
+    assert.ok(
+      !RAW.test(code.replaceAll(TAGS, "")),
+      `${rel} must not carry raw RN accessibility JSX props`,
+    );
+  }
+});
+test("rows translate the disabled state; the generic rows keep the button role in their press form (#237, #248)", () => {
+  // MealDetailPage's member rows are links since #248 and render
+  // through ListRow since the #119 meals tranche: the disabled
+  // routing lives in the row, not the page. The plan pages' rows
+  // moved into the generic ListRow / CardRow components (#119
+  // tranche 2) and the routing moved with them: their press
+  // forms carry the button role, ListRow also translates its
+  // disabled state, and CardRow has no disabled state.
+  // RecipeFormPage's revert pressables (RevertAction /
+  // ChangedListBanner, #119 forms tranche) carry no row here:
+  // since #464 both compose a ghost Button, whose own
+  // routing carries their role. Compact table form: this file
+  // is at its line cap.
+  const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
+  const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
+  const cases: [string, RegExp, RegExp | null][] = [
+    ["src/widgets/ListRow.tsx", ROLE, DISABLED],
+    ["src/widgets/CardRow.tsx", ROLE, null],
+  ];
+  for (const [rel, role, disabled] of cases) {
+    const code = readCode(rel);
+    if (role)
+      assert.match(
+        code,
+        role,
+        `${rel}: the press form's button role must go through the translator`,
+      );
+    if (disabled)
+      assert.match(code, disabled, `${rel}: the disabled state must go through the translator`);
+  }
+  assert.doesNotMatch(
+    readCode("src/pages/MealDetailPage.tsx"),
+    ROLE,
+    "MealDetailPage's rows are links (#248) — no button role may come back through the translator",
+  );
+});
+test("ChecklistRow's Checkbox and ProgressBar's Progress route through the translator (#237)", () => {
+  const checklist = readCode("src/widgets/ChecklistRow.tsx");
+  assert.match(checklist, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
+  assert.ok(!/accessibility(Label|State|Role|Value)=/.test(checklist));
+  const progress = readCode("src/widgets/ProgressBar.tsx");
+  assert.match(progress, /platformAccessibilityProps\(\{/);
+  assert.match(progress, /accessibilityRole: accessibilityRole \?\? "progressbar"/);
+  assert.match(progress, /accessibilityValue: accessibilityValue \?\? \{ min: 0, max: 100, now:/);
+  assert.match(
+    progress,
+    /accessibilityLabel,/,
+    "caller labels (the stories' form) must be destructured for translation",
+  );
+  assert.ok(!/accessibility(Label|State|Role|Value)=/.test(progress));
+});
+test("field/primitive wrappers destructure caller RN props out of rest and translate them (#237)", () => {
+  // Compact split form: this file sits at the max-lines cap.
+  const wrappers =
+    "src/views/TextField.tsx,src/views/TextAreaField.tsx,src/views/CheckboxField.tsx,src/widgets/TextLink.tsx,src/widgets/OptionCard.tsx,src/widgets/Alert.tsx".split(
+      ",",
+    );
+  for (const rel of wrappers) {
+    const code = readCode(rel);
+    // One needle per routing requirement: build a11yProps via the
+    // translator, spread them onto the element, and destructure
+    // the caller's accessibilityLabel out of rest.
+    const NEEDLES = ["platformAccessibilityProps({", "{...a11yProps}", "accessibilityLabel,"];
+    for (const needle of NEEDLES)
+      assert.ok(code.includes(needle), `${rel} must satisfy the translator routing (${needle})`);
+  }
+  const backLink = readCode("src/widgets/BackLink.tsx");
+  assert.match(backLink, /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/);
+  const alert = readCode("src/widgets/Alert.tsx");
+  assert.match(alert, /platformAccessibilityProps\(\{ accessibilityRole: "alert" \}\)/);
+});
+
+// Runtime imports are lazy (inside the SSR tests) so the source-scan
+// tests above still run and report when the build output is missing
+// or broken, instead of the whole file failing at import time.
+let runtimePromise;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const reactModule = await import("react");
+    const React = reactModule.default;
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider }: Record<string, any> = await import("tamagui");
+    const dist: Record<string, any> = await loadInternalDist();
+    return {
+      React,
+      renderToString,
+      TamaguiProvider,
+      ...dist,
+    };
+  })();
+  return runtimePromise;
+}
+async function renderToHtml(element: any) {
+  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } = await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  // #539: pages/widgets under test can contain voice-reading widgets
+  // (BackLink, StepOverlay); supply the fixture voice the same way
+  // Storybook does.
+  const { VoiceProvider } = await import("../dist/voice/index.js");
+  const { fixtureVoice } = await import("../dist/voice/fixtures.js");
+  const inner = React.createElement(VoiceProvider, { voice: fixtureVoice }, element);
+  const html = renderToString(
+    <TamaguiProvider config={config} defaultTheme="light">
+      {inner}
+    </TamaguiProvider>,
+  );
+  // Strip the Tamagui CSS block: the leak assertions are about the
+  // rendered elements' attributes, not stylesheet text.
+  const styleEnd = html.lastIndexOf("</style>");
+  return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
+}
+function assertNoLeak(html: string) {
+  assert.ok(!/accessibilitylabel/i.test(html), "accessibilitylabel must not leak to the DOM");
+  assert.ok(!/accessibilitystate/i.test(html), "accessibilitystate must not leak to the DOM");
+  assert.ok(!/accessibilityrole/i.test(html), "accessibilityrole must not leak to the DOM");
+  assert.ok(!/accessibilityvalue/i.test(html), "accessibilityvalue must not leak to the DOM");
+  assert.ok(!html.includes("[object Object]"), "no stringified state/value object in the DOM");
+}
+const noop = () => null;
+test("SSR: ChecklistRow's checkbox carries its label as aria-label (#237)", async () => {
+  const { ChecklistRow } = await loadRuntime();
+  const html = await renderToHtml(
+    <ChecklistRow label="Buy milk" checked={true} onCheckedChange={noop} />,
+  );
+  assert.ok(
+    html.includes('aria-label="Buy milk"'),
+    `expected aria-label in: ${html.slice(0, 600)}`,
+  );
+  assert.ok(html.includes('role="checkbox"'));
+  assert.ok(html.includes('aria-checked="true"'));
+  assertNoLeak(html);
+});
+test("SSR: ProgressBar renders aria-label, progressbar role, and value — no [object Object] (#237)", async () => {
+  const { ProgressBar } = await loadRuntime();
+  const html = await renderToHtml(<ProgressBar value={40} accessibilityLabel="Session progress" />);
+  assert.ok(html.includes('aria-label="Session progress"'));
+  assert.ok(html.includes('role="progressbar"'));
+  assert.ok(html.includes('aria-valuenow="40"'));
+  assertNoLeak(html);
+});
+test("SSR: TextField and CheckboxField render caller labels as aria-label (#237)", async () => {
+  const { TextField, CheckboxField } = await loadRuntime();
+  const field = await renderToHtml(
+    <TextField accessibilityLabel="Email" value="" onChangeText={noop} />,
+  );
+  assert.ok(field.includes('aria-label="Email"'));
+  assertNoLeak(field);
+  const box = await renderToHtml(
+    <CheckboxField
+      label="Agree"
+      checked={false}
+      onCheckedChange={noop}
+      accessibilityLabel="Agree checkbox"
+    />,
+  );
+  assert.ok(box.includes('aria-label="Agree checkbox"'));
+  assertNoLeak(box);
+});
+test("SSR: TextLink, BackLink, OptionCard, and Alert render their roles (#237)", async () => {
+  const { TextLink, BackLink, OptionCard, Alert } = await loadRuntime();
+  const link = await renderToHtml(<TextLink onPress={noop}>Forgot</TextLink>);
+  assert.ok(link.includes('role="link"'), `expected role=link in: ${link.slice(0, 400)}`);
+  assertNoLeak(link);
+  const back = await renderToHtml(<BackLink onPress={noop} />);
+  assert.ok(back.includes('role="link"'));
+  assertNoLeak(back);
+  const card = await renderToHtml(<OptionCard title="Manual entry" onPress={noop} />);
+  assert.ok(card.includes('role="button"'));
+  assertNoLeak(card);
+  const alertHtml = await renderToHtml(<Alert severity="error" message="Boom" />);
+  assert.ok(alertHtml.includes('role="alert"'));
+  assertNoLeak(alertHtml);
+  // Caller-supplied RN props on Alert are translated too, not leaked
+  // raw through `...rest` (CodeRabbit finding on PR #243).
+  const labelledAlert = await renderToHtml(
+    <Alert severity="error" message="Boom" accessibilityLabel="Failure notice" />,
+  );
+  assert.ok(labelledAlert.includes('aria-label="Failure notice"'));
+  assert.ok(labelledAlert.includes('role="alert"'));
+  assertNoLeak(labelledAlert);
+  // A caller role override on a polite (non-alert) severity must not
+  // drop the live region: role="status" carries it implicitly, so an
+  // override gets an explicit aria-live="polite" instead.
+  const headingAlert = await renderToHtml(
+    <Alert severity="success" message="Saved" accessibilityRole="header" />,
+  );
+  assert.ok(headingAlert.includes('role="heading"'));
+  assert.ok(headingAlert.includes('aria-live="polite"'));
+  assertNoLeak(headingAlert);
+  // A caller-supplied "alert" role must keep its implicit assertive
+  // announcement: the polite fallback must not downgrade it with an
+  // explicit aria-live="polite" (CodeRabbit finding on PR #241).
+  const callerAlertRole = await renderToHtml(
+    <Alert severity="success" message="Saved" accessibilityRole="alert" />,
+  );
+  assert.ok(callerAlertRole.includes('role="alert"'));
+  assert.ok(!callerAlertRole.includes('aria-live="polite"'));
+  assertNoLeak(callerAlertRole);
+  // Same protection for a direct web role="alert" combined with a
+  // translated accessibilityRole: the direct role goes through the
+  // translator (and wins), so the polite fallback must not fire
+  // (CodeRabbit finding on PR #241, head 6f0bbd1).
+  const directAlertRole = await renderToHtml(
+    <Alert severity="success" message="Saved" accessibilityRole="header" role="alert" />,
+  );
+  assert.ok(directAlertRole.includes('role="alert"'));
+  assert.ok(!directAlertRole.includes('aria-live="polite"'));
+  assertNoLeak(directAlertRole);
+});
