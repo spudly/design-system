@@ -267,6 +267,6 @@ test("FeedbackPage fields carry explicit accessible names", () => {
   // Label elements; the native accessible names cross explicitly,
   // as the email field's always has.
   const source = page("FeedbackPage");
-  assert.match(source, /accessibilityLabel="What's on your mind\?"/);
-  assert.match(source, /accessibilityLabel="Email me back \(optional\)"/);
+  assert.match(source, /accessibilityLabel=\{voice\.feedbackPage\.messageLabel\}/);
+  assert.match(source, /accessibilityLabel=\{voice\.feedbackPage\.replyEmailLabel\}/);
 });
