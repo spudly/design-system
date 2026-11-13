@@ -76,6 +76,13 @@ export type Voice = {
   stepOverlay: {
     doneLabel: string;
   };
+  /** SecretRevealPanel widget (tranche 1d). */
+  secretRevealPanel: {
+    title: string;
+    copyLabel: string;
+    hint: string;
+    dismissLabel: string;
+  };
   /** NutritionPanel widget (tranche 1b). */
   nutritionPanel: {
     perServingLabel: string;

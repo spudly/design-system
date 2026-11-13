@@ -51,6 +51,12 @@ export const fixtureVoice: Voice = {
   stepOverlay: {
     doneLabel: "Done",
   },
+  secretRevealPanel: {
+    title: "Your secret",
+    copyLabel: "Copy",
+    hint: "Copy it now — it won't be shown again.",
+    dismissLabel: "Dismiss",
+  },
   nutritionPanel: {
     perServingLabel: "Per Serving",
     refreshLabel: "Refresh",
