@@ -310,6 +310,40 @@ export type Voice = {
     heading: string;
     description: string;
   };
+  /** FeedbackPage (tranche 3b): the page title, hint, submitted thanks, field labels and placeholders, bug checkbox, and submit action — the page has no copy props, so its copy reads the voice slots directly. */
+  feedbackPage: {
+    title: string;
+    description: string;
+    submittedMessage: string;
+    messageLabel: string;
+    messagePlaceholder: string;
+    replyEmailLabel: string;
+    replyEmailPlaceholder: string;
+    bugLabel: string;
+    submitLabel: string;
+    submitPendingLabel: string;
+  };
+  /** ConsentPreferencesPage (tranche 3b): defaults when the description / hint props are not passed, plus the card title, the current-choice line's prefix and choice labels, and the action labels. */
+  consentPreferencesPage: {
+    title: string;
+    description: string;
+    hint: string;
+    currentChoiceLabel: string;
+    acceptedLabel: string;
+    declinedLabel: string;
+    notSetLabel: string;
+    acceptLabel: string;
+    declineLabel: string;
+    withdrawLabel: string;
+  };
+  /** RouteErrorPage (tranche 3b): defaults when the title / message / homeLabel props are not passed, per variant. */
+  routeErrorPage: {
+    notFoundTitle: string;
+    notFoundMessage: string;
+    errorTitle: string;
+    errorMessage: string;
+    homeLabel: string;
+  };
   /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
   autocompletePicker: {
     searchPlaceholder: string;
