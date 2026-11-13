@@ -4,6 +4,7 @@ import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 const SecretBox = styled(XStack, {
@@ -20,7 +21,9 @@ const SecretBox = styled(XStack, {
 export type SecretRevealPanelProps = {
   /** The secret value to display (shown once). */
   secret: string;
+  /** Panel title. Defaults to the voice object's secretRevealPanel title (#539). */
   title?: string;
+  /** Copy action label. Defaults to the voice object's secretRevealPanel copy label (#539). */
   copyLabel?: string;
   /** Called with the secret when Copy is pressed; the app wires the real clipboard. */
   onCopy: (secret: string) => void;
@@ -47,12 +50,15 @@ export type SecretRevealPanelProps = {
  */
 export function SecretRevealPanel({
   secret,
-  title = "Your secret",
-  copyLabel = "Copy",
+  title,
+  copyLabel,
   onCopy,
   onDismiss,
   loading = false,
 }: SecretRevealPanelProps) {
+  const voice = useVoice();
+  const resolvedTitle = title ?? voice.secretRevealPanel.title;
+  const resolvedCopyLabel = copyLabel ?? voice.secretRevealPanel.copyLabel;
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same stack — a title bone at the
@@ -82,11 +88,11 @@ export function SecretRevealPanel({
           </SecretBox>
           <XStack gap={tokens.spacing[2]}>
             <Button variant="primary" size="sm" onPress={() => onCopy(secret)}>
-              {copyLabel}
+              {resolvedCopyLabel}
             </Button>
             {onDismiss ? (
               <Button variant="secondary" size="sm" onPress={onDismiss}>
-                Dismiss
+                {voice.secretRevealPanel.dismissLabel}
               </Button>
             ) : null}
           </XStack>
@@ -96,8 +102,8 @@ export function SecretRevealPanel({
   }
   return (
     <YStack gap={tokens.spacing[3]} {...politeLiveRegionProps}>
-      <Text variant="subheading">{title}</Text>
-      <Text variant="hint">Copy it now — it won&apos;t be shown again.</Text>
+      <Text variant="subheading">{resolvedTitle}</Text>
+      <Text variant="hint">{voice.secretRevealPanel.hint}</Text>
       <SecretBox>
         <Text
           style={{
@@ -113,12 +119,12 @@ export function SecretRevealPanel({
       </SecretBox>
       <XStack gap={tokens.spacing[2]}>
         <Button variant="primary" size="sm" onPress={() => onCopy(secret)}>
-          {copyLabel}
+          {resolvedCopyLabel}
         </Button>
         {onDismiss ? (
           <Button variant="secondary" size="sm" onPress={onDismiss}>
-            Dismiss
-          </Button>
+                {voice.secretRevealPanel.dismissLabel}
+              </Button>
         ) : null}
       </XStack>
     </YStack>
