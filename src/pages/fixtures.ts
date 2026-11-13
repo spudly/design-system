@@ -519,6 +519,28 @@ export const aiSessionPreviewFixture = {
  * mailto link span mid-sentence in the contact section. Dates are
  * fixed literals per the fixture rules above.
  */
+const legalFooterFixture: LegalDocumentPageProps["footer"] = {
+  brand: { label: "Eciperay", href: "/" },
+  columns: [
+    {
+      title: "Legal",
+      links: [
+        { label: "Privacy Policy", href: "/privacy" },
+        { label: "Terms of Service", href: "/terms" },
+        {
+          label: "Do Not Sell or Share My Personal Information",
+          href: "/do-not-sell-or-share",
+        },
+      ],
+    },
+  ],
+  storeLinks: [
+    { label: "Download on the App Store", href: "/app-store", store: "app-store" },
+    { label: "Get it on Google Play", href: "/google-play", store: "google-play" },
+  ],
+  socialLinks: [],
+};
+
 export const legalPrivacyFixture: LegalDocumentPageProps = {
   title: "Privacy Policy",
   lastUpdated: "July 22, 2026",
@@ -526,27 +548,7 @@ export const legalPrivacyFixture: LegalDocumentPageProps = {
   brandHref: "/",
   signInLabel: "Sign in",
   signInHref: "/login",
-  footer: {
-    brand: { label: "Eciperay", href: "/" },
-    columns: [
-      {
-        title: "Legal",
-        links: [
-          { label: "Privacy Policy", href: "/privacy" },
-          { label: "Terms of Service", href: "/terms" },
-          {
-            label: "Do Not Sell or Share My Personal Information",
-            href: "/do-not-sell-or-share",
-          },
-        ],
-      },
-    ],
-    storeLinks: [
-      { label: "Download on the App Store", href: "/app-store", store: "app-store" },
-      { label: "Get it on Google Play", href: "/google-play", store: "google-play" },
-    ],
-    socialLinks: [],
-  },
+  footer: legalFooterFixture,
   sections: [
     {
       title: "Information we collect",
@@ -614,27 +616,7 @@ export const legalTermsFixture: LegalDocumentPageProps = {
   brandHref: "/",
   signInLabel: "Sign in",
   signInHref: "/login",
-  footer: {
-    brand: { label: "Eciperay", href: "/" },
-    columns: [
-      {
-        title: "Legal",
-        links: [
-          { label: "Privacy Policy", href: "/privacy" },
-          { label: "Terms of Service", href: "/terms" },
-          {
-            label: "Do Not Sell or Share My Personal Information",
-            href: "/do-not-sell-or-share",
-          },
-        ],
-      },
-    ],
-    storeLinks: [
-      { label: "Download on the App Store", href: "/app-store", store: "app-store" },
-      { label: "Get it on Google Play", href: "/google-play", store: "google-play" },
-    ],
-    socialLinks: [],
-  },
+  footer: legalFooterFixture,
   sections: [
     {
       title: "Using Eciperay",
