@@ -273,6 +273,25 @@ export type Voice = {
     secondaryLabel: string;
     saveLabel: string;
   };
+  /** ChangedListBanner (tranche 2e): the Revert action's label — the banner's summary line is host data, so only the action reads the voice. */
+  changedListBanner: {
+    revertLabel: string;
+  };
+  /** ConsentBannerView (tranche 2e): defaults when acceptLabel / declineLabel props are not passed. */
+  consentBannerView: {
+    acceptLabel: string;
+    declineLabel: string;
+  };
+  /** InstallBannerView (tranche 2e): default when the dismissAriaLabel prop is not passed. */
+  installBannerView: {
+    dismissLabel: string;
+  };
+  /** RecipeExportPickerView (tranche 2e): defaults when searchPlaceholder / emptyMessage / exportPendingLabel props are not passed. */
+  recipeExportPickerView: {
+    searchPlaceholder: string;
+    emptyMessage: string;
+    exportPendingLabel: string;
+  };
   /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
   autocompletePicker: {
     searchPlaceholder: string;

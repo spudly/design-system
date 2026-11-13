@@ -196,6 +196,21 @@ export const fixtureVoice: Voice = {
     secondaryLabel: "Skip",
     saveLabel: "Save",
   },
+  changedListBanner: {
+    revertLabel: "Revert",
+  },
+  consentBannerView: {
+    acceptLabel: "Accept",
+    declineLabel: "Decline",
+  },
+  installBannerView: {
+    dismissLabel: "Dismiss install banner",
+  },
+  recipeExportPickerView: {
+    searchPlaceholder: "Search recipes\u2026",
+    emptyMessage: "No recipes to export yet.",
+    exportPendingLabel: "Exporting\u2026",
+  },
   autocompletePicker: {
     searchPlaceholder: "Search\u2026",
     searchLabel: "Search",

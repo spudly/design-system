@@ -1,5 +1,6 @@
 import { FixedActionBanner } from "../widgets/FixedActionBanner.js";
 import { TextLink } from "../widgets/TextLink.js";
+import { useVoice } from "../voice/index.js";
 
 export type ConsentBannerViewProps = {
   /** The message up to the policy link. */
@@ -11,7 +12,9 @@ export type ConsentBannerViewProps = {
   messageAfterLink?: string;
   onAccept: () => void;
   onDecline: () => void;
+  /** Defaults to the voice object's consentBannerView acceptLabel (#539). */
   acceptLabel?: string;
+  /** Defaults to the voice object's consentBannerView declineLabel (#539). */
   declineLabel?: string;
 };
 
@@ -38,9 +41,12 @@ export function ConsentBannerView({
   messageAfterLink = "",
   onAccept,
   onDecline,
-  acceptLabel = "Accept",
-  declineLabel = "Decline",
+  acceptLabel: acceptLabelProp,
+  declineLabel: declineLabelProp,
 }: ConsentBannerViewProps) {
+  const voice = useVoice();
+  const acceptLabel = acceptLabelProp ?? voice.consentBannerView.acceptLabel;
+  const declineLabel = declineLabelProp ?? voice.consentBannerView.declineLabel;
   return (
     <FixedActionBanner
       message={
