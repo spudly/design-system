@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
+import { useVoice } from "../voice/index.js";
 
 export type RemovableFieldProps = {
   /** Fires when the remove control is pressed. Hiding the
@@ -30,11 +31,12 @@ export function RemovableField({
   removeAccessibilityLabel,
   children,
 }: RemovableFieldProps) {
+  const voice = useVoice();
   return (
     <YStack gap={tokens.spacing[1]}>
       <XStack justifyContent="flex-end">
         <Button ghost size="sm" accessibilityLabel={removeAccessibilityLabel} onPress={onRemove}>
-          Remove
+          {voice.removableField.removeLabel}
         </Button>
       </XStack>
       {children}

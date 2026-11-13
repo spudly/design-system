@@ -37,7 +37,7 @@ test("the search contract is controlled: text out, results and searching flag in
 
 test("while searching, a spinner replaces the results", () => {
   assert.match(picker, /isSearching \? \(/);
-  assert.match(picker, /<Spinner label="Searching" \/>/);
+  assert.match(picker, /<Spinner label=\{voice\.autocompletePicker\.searchingLabel\} \/>/);
 });
 
 test("results render only for a non-empty search, and selected results are not offered again", () => {
@@ -89,8 +89,8 @@ test("selecting a result and removing a selected item report their ids", () => {
   assert.match(picker, /onRemoveSelectedItem\(id\)/);
   assert.match(
     picker,
-    /accessibilityLabel=\{`Remove \$\{item\.label\}`\}/,
-    "each Remove action names the item it removes",
+    /accessibilityLabel=\{voice\.autocompletePicker\.removeItemLabel\(item\.label\)\}/,
+    "each Remove action names the item it removes, through the voice formatter (#539)",
   );
 });
 
@@ -118,20 +118,26 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
+    const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
     const { MealFormPage }: Record<string, any> = await import("../../dist/pages/MealFormPage.js");
     const { MealPlanFormPage }: Record<string, any> =
       await import("../../dist/pages/MealPlanFormPage.js");
-    return { React, renderToString, TamaguiProvider, MealFormPage, MealPlanFormPage, ...dist };
+    return { React, renderToString, TamaguiProvider, MealFormPage, MealPlanFormPage, ...dist, ...voiceFixtures, ...voiceModule };
   })();
   return runtimePromise;
 }
 
 async function renderToHtml(element: any) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
-    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+    React.createElement(
+      TamaguiProvider,
+      { config, defaultTheme: "light" },
+      React.createElement(VoiceProvider, { voice: fixtureVoice }, element),
+    ),
   );
 }
 
@@ -423,13 +429,13 @@ describe("autocompletePickerReview", () => {
     assert.match(picker, /politeLiveRegionProps/, "the region uses the shared live-region props");
     assert.match(picker, /collapsable=\{false\}/, "the region's node cannot be flattened away");
     assert.match(picker, /statusMessage/, "the region's text is the search-state message");
-    assert.match(picker, /\? "Searching"/, "the searching state is announced");
+    assert.match(picker, /\? voice\.autocompletePicker\.searchingLabel/, "the searching state is announced");
     assert.match(
       picker,
       /\|\| noResultsMessage/,
       "the no-matches state announces the no-results text (falling back from a search error; an empty-string error counts as no error, #393)",
     );
-    assert.match(picker, /results"} available`/, "the results state announces the result count");
+    assert.match(picker, /voice\.autocompletePicker\.resultsAvailableLabel\(visibleResults\.length\)/, "the results state announces the result count");
     assert.ok(
       !picker.includes("opacity={0}"),
       "the region is not transparent on every platform — iOS VoiceOver drops alpha-0 views",

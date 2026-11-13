@@ -3,6 +3,7 @@ import { XStack, YStack } from "tamagui";
 import { ActionBar } from "./ActionBar.js";
 import { Button } from "./Button.js";
 import { Alert } from "./Alert.js";
+import { useVoice } from "../voice/index.js";
 
 export type FixedActionBannerAction = {
   label: string;
@@ -25,7 +26,8 @@ export type FixedActionBannerProps = {
  * Pinned action banner (consent bars, install prompts): the DS ActionBar
  * pinned to a screen edge, holding an info Alert above a wrapping
  * row of actions — secondary first, then primary, then an optional ghost
- * dismiss button labeled "Dismiss". Content sits in a centered column
+ * dismiss button labeled with the voice object's fixedActionBanner
+ * dismiss label (#539). Content sits in a centered column
  * capped at 1024px so the bar reads the same on wide screens.
  *
  * Pinning is to the viewport (#405): on web the bar is viewport-fixed,
@@ -49,9 +51,11 @@ export function FixedActionBanner({
   primaryAction,
   secondaryAction,
   onDismiss,
-  dismissAriaLabel = "Dismiss",
+  dismissAriaLabel,
   position = "bottom",
 }: FixedActionBannerProps) {
+  const voice = useVoice();
+  const resolvedDismissAriaLabel = dismissAriaLabel ?? voice.fixedActionBanner.dismissLabel;
   return (
     <ActionBar placement={position} pinning="viewport">
       <YStack width="100%" maxWidth={1024} alignSelf="center" gap="$3">
@@ -68,8 +72,8 @@ export function FixedActionBanner({
             </Button>
           ) : null}
           {onDismiss ? (
-            <Button ghost size="sm" accessibilityLabel={dismissAriaLabel} onPress={onDismiss}>
-              Dismiss
+            <Button ghost size="sm" accessibilityLabel={resolvedDismissAriaLabel} onPress={onDismiss}>
+              {voice.fixedActionBanner.dismissLabel}
             </Button>
           ) : null}
         </XStack>

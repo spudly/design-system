@@ -5,6 +5,7 @@ import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "./accessibility.js";
 import { Button, ButtonInternal } from "./Button.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 
 const severityStyles = {
   info: {
@@ -67,7 +68,8 @@ export type AlertProps = StyledAlertProps & {
  * `accessibilityLiveRegion="polite"` on native, via `politeLiveRegionProps`
  * (`status` is not a valid React Native `accessibilityRole` and crashes
  * Android — spudly/eciperay#156). Message meaning is carried by text,
- * never color alone. The optional dismiss button is labeled "Dismiss" and
+ * never color alone. The optional dismiss button is labeled with the
+ * voice object's alert dismiss label (#539) and
  * meets the 44px minimum touch target; its glyph renders at 2xl in the
  * alert's own text color, pulled toward the top-right corner (the
  * treatment carried over from DismissibleBanner, #179/#193).
@@ -92,6 +94,7 @@ export function Alert({
   "aria-live": ariaLive,
   ...rest
 }: AlertProps) {
+  const voice = useVoice();
   const styles = severityStyles[severity];
   const isAlert = severity === "error" || severity === "warning";
   const showDismiss = dismissible && onDismiss !== undefined;
@@ -176,7 +179,7 @@ export function Alert({
             // contrasting foreground for this background in both modes.
             internalInk={styles.text}
             onPress={onDismiss}
-            accessibilityLabel="Dismiss"
+            accessibilityLabel={voice.alert.dismissLabel}
             minWidth={44}
             minHeight={44}
           >

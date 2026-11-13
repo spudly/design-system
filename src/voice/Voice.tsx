@@ -71,6 +71,10 @@ export type Voice = {
   bulkSelectToolbar: {
     selectAllLabel: string;
     clearSelectionLabel: string;
+    /** Search-field placeholder default (tranche 1f). */
+    searchPlaceholder: string;
+    /** Formatter (tranche 1f): builds the selection-count text from the count. */
+    selectedLabel: VoiceFormatter<[count: number]>;
   };
   /** StepOverlay widget (tranche 1c): default when no doneLabel prop is passed. */
   stepOverlay: {
@@ -100,6 +104,53 @@ export type Voice = {
     missingIngredientsHint: string;
     findingSubstitutionsLabel: string;
     substitutionsTitle: string;
+  };
+  /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
+  autocompletePicker: {
+    searchPlaceholder: string;
+    searchLabel: string;
+    searchingLabel: string;
+    noResultsMessage: string;
+    /** Formatter: builds the results-count announcement from the count only the picker knows. */
+    resultsAvailableLabel: VoiceFormatter<[count: number]>;
+    removeLabel: string;
+    /** Formatter: builds a selected item's Remove accessible name from its label. */
+    removeItemLabel: VoiceFormatter<[itemLabel: string]>;
+  };
+  /** Alert widget (tranche 1f): the dismiss button's accessible name. */
+  alert: {
+    dismissLabel: string;
+  };
+  /** FixedActionBanner widget (tranche 1f): the dismiss action's text and accessible name. */
+  fixedActionBanner: {
+    dismissLabel: string;
+  };
+  /** CheckboxSelectList widget (tranche 1f): default empty-state message. */
+  checkboxSelectList: {
+    emptyMessage: string;
+  };
+  /** SelectField widget (tranche 1f): form-field fallbacks. */
+  selectField: {
+    placeholder: string;
+    selectOptionLabel: string;
+  };
+  /** ColorPickerField widget (tranche 1f): form-field fallbacks. */
+  colorPickerField: {
+    chooseColorLabel: string;
+    /** Formatter: builds a swatch's accessible name from its color name. */
+    selectColorLabel: VoiceFormatter<[color: string]>;
+  };
+  /** StarRatingInput widget (tranche 1f): form-field fallbacks. */
+  starRatingInput: {
+    label: string;
+    /** Formatter: builds the read-only display's name from the rating value. */
+    ratedLabel: VoiceFormatter<[value: number]>;
+    /** Formatter: builds one star's accessible name from its star number. */
+    rateLabel: VoiceFormatter<[star: number]>;
+  };
+  /** RemovableField widget (tranche 1f): the remove control's visible text. */
+  removableField: {
+    removeLabel: string;
   };
   /** NutritionPanel widget (tranche 1b). */
   nutritionPanel: {

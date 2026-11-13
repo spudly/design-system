@@ -55,7 +55,7 @@ export type BulkSelectToolbarProps = {
 export function BulkSelectToolbar({
   search,
   onSearchChange,
-  searchPlaceholder = "Search…",
+  searchPlaceholder,
   selectedCount,
   filteredCount,
   disabled = false,
@@ -66,12 +66,13 @@ export function BulkSelectToolbar({
   clearSelectionLabel,
 }: BulkSelectToolbarProps) {
   const voice = useVoice();
+  const resolvedSearchPlaceholder = searchPlaceholder ?? voice.bulkSelectToolbar.searchPlaceholder;
   const resolvedSelectAllLabel = selectAllLabel ?? voice.bulkSelectToolbar.selectAllLabel;
   const resolvedClearSelectionLabel =
     clearSelectionLabel ?? voice.bulkSelectToolbar.clearSelectionLabel;
   const controlsDisabled = disabled || busy;
   const showSkeleton = useLoadingScope();
-  const selectedText = `${selectedCount} selected`;
+  const selectedText = voice.bulkSelectToolbar.selectedLabel(selectedCount);
 
   return (
     <YStack>
@@ -85,7 +86,7 @@ export function BulkSelectToolbar({
         // their places.
         <BoxSkeleton height={46} />
       ) : (
-        <SearchField value={search} onChangeText={onSearchChange} placeholder={searchPlaceholder} />
+        <SearchField value={search} onChangeText={onSearchChange} placeholder={resolvedSearchPlaceholder} />
       )}
       <XStack flexWrap="wrap" alignItems="center" gap="$3" paddingBlockEnd="$3">
         <Button

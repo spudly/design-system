@@ -2,6 +2,7 @@ import { useId } from "react";
 import { Adapt, Label, Select as TamaguiSelect, Sheet, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 
 const StyledTrigger = styled(TamaguiSelect.Trigger, {
   name: "SelectFieldTrigger",
@@ -89,11 +90,13 @@ export function SelectField({
   options,
   value,
   onValueChange,
-  placeholder = "Select…",
+  placeholder,
   error,
   id: idProp,
   grow = false,
 }: SelectFieldProps) {
+  const voice = useVoice();
+  const resolvedPlaceholder = placeholder ?? voice.selectField.placeholder;
   const autoId = useId();
   const id = idProp ?? autoId;
   const errorId = `${id}-error`;
@@ -118,7 +121,7 @@ export function SelectField({
               without it the selected value inherited the page's
               default family while the field's label (a fonted
               Label) rendered in the theme stack. */}
-          <StyledValue placeholder={placeholder} fontFamily="body" />
+          <StyledValue placeholder={resolvedPlaceholder} fontFamily="body" />
           <Text style={{ color: "$textMuted" }}>▾</Text>
         </StyledTrigger>
 
@@ -126,7 +129,7 @@ export function SelectField({
           <Sheet
             modal
             dismissOnSnapToBottom
-            aria-label={label?.trim() ? label : "Select an option"}
+            aria-label={label?.trim() ? label : voice.selectField.selectOptionLabel}
           >
             <Sheet.Overlay />
             <Sheet.ScrollView>
