@@ -245,7 +245,7 @@ test("the shared section shapes are reused from RecipeDetailPage by alias", () =
   }
   assert.match(
     ingredientsCode,
-    /<NumberStepper\s+label="Servings"\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
+    /<NumberStepper\s+label=\{panelVoice\.servingsLabel\}\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
     "the servings stepper mirrors the detail page's (label Servings, floor of 1, inline layout)",
   );
 });
@@ -255,12 +255,12 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(overviewCode, /\{description \? \(/, "the description renders only when present");
   assert.match(
     overviewCode,
-    /\{prepTimeLabel \? <StatCard label="Prep"/,
+    /\{prepTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/,
     "the Prep stat needs a prep time",
   );
   assert.match(
     overviewCode,
-    /\{cookTimeLabel \? <StatCard label="Cook"/,
+    /\{cookTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/,
     "the Cook stat needs a cook time",
   );
   assert.match(overviewCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");

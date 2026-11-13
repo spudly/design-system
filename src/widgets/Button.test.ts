@@ -657,8 +657,8 @@ describe("buttonWebAria", () => {
     // which is the sanctioned caller API — Button translates them.
     const rawLabels = code.match(/accessibilityLabel=\{/g) ?? [];
     assert.equal(rawLabels.length, 2, "only the two DS Button labels may remain as raw JSX props");
-    assert.match(code, /accessibilityLabel=\{label \? `Decrease \$\{label\}` : "Decrease value"\}/);
-    assert.match(code, /accessibilityLabel=\{label \? `Increase \$\{label\}` : "Increase value"\}/);
+    assert.match(code, /accessibilityLabel=\{decreaseAccessibilityLabel \?\? \(label \? `Decrease \$\{label\}` : "Decrease value"\)\}/);
+    assert.match(code, /accessibilityLabel=\{increaseAccessibilityLabel \?\? \(label \? `Increase \$\{label\}` : "Increase value"\)\}/);
   });
 
   test("component-internal stack pressables route through the translator, never raw RN JSX props (#235)", () => {

@@ -57,9 +57,9 @@ test("the panel composes the shared building blocks with its conditional content
   assert.match(panelCode, /<Thumbnail src=\{imageUrl\} \/>/, "the hero is Thumbnail's hero frame");
   assert.match(panelCode, /\{description \? \(/, "the description renders only when present");
   assert.match(panelCode, /<StatBand>/, "the stat band is the shared StatBand");
-  assert.match(panelCode, /<StatCard label="Servings" value=\{servingsLabel\} \/>/);
-  assert.match(panelCode, /\{prepTimeLabel \? <StatCard label="Prep"/);
-  assert.match(panelCode, /\{cookTimeLabel \? <StatCard label="Cook"/);
+  assert.match(panelCode, /<StatCard label=\{voice\.recipeOverviewPanel\.servingsLabel\} value=\{servingsLabel\} \/>/);
+  assert.match(panelCode, /\{prepTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/);
+  assert.match(panelCode, /\{cookTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/);
   assert.match(panelCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
   assert.match(
     panelCode,

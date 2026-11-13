@@ -103,18 +103,23 @@ test("PresetValueSelector renders one non-wrapping row of toggle buttons, preset
 });
 
 test("the ingredients panels use the inline stepper and the PresetValueSelector", () => {
-  for (const [name, source] of [
-    ["RecipeDetailPage", page],
-    ["PublicRecipePage (via RecipeIngredientsPanel)", ingredientsPanel],
+  for (const [name, source, servingsPattern, scalePattern] of [
+    ["RecipeDetailPage", page, /<NumberStepper\s+label="Servings"\s+layout="inline"/, /<PresetValueSelector\s+label="Scale"\s+options=\{SCALE_OPTIONS\}\s+value=\{view\.scaleValue\}\s+onChange=\{view\.onScaleChange\}/],
+    [
+      "PublicRecipePage (via RecipeIngredientsPanel)",
+      ingredientsPanel,
+      /<NumberStepper\s+label=\{panelVoice\.servingsLabel\}\s+layout="inline"/,
+      /<PresetValueSelector\s+label=\{panelVoice\.scaleLabel\}\s+options=\{SCALE_OPTIONS\}\s+value=\{view\.scaleValue\}\s+onChange=\{view\.onScaleChange\}/,
+    ],
   ]) {
     assert.match(
       source,
-      /<NumberStepper\s+label="Servings"\s+layout="inline"/,
+      servingsPattern,
       `${name}: servings renders inline (label beside the stepper)`,
     );
     assert.match(
       source,
-      /<PresetValueSelector\s+label="Scale"\s+options=\{SCALE_OPTIONS\}\s+value=\{view\.scaleValue\}\s+onChange=\{view\.onScaleChange\}/,
+      scalePattern,
       `${name}: scale renders as the preset-or-custom selector on the same handlers`,
     );
     // The contract is unchanged: the same handlers feed both controls.
@@ -145,6 +150,21 @@ test("NumberStepper editable is additive, off by default, and renders a numeric 
     stepper,
     /width=\{tokens\.spacing\[16\]\}/,
     "the editable box is fixed-width (spacing[16]) so buttons never shift",
+  );
+});
+
+test("NumberStepper button names accept accessibility-label overrides, generated names by default", () => {
+  assert.match(stepper, /decreaseAccessibilityLabel\?: string;/, "decrease override prop is declared");
+  assert.match(stepper, /increaseAccessibilityLabel\?: string;/, "increase override prop is declared");
+  assert.match(
+    stepper,
+    /decreaseAccessibilityLabel \?\? \(label \? `Decrease \$\{label\}` : "Decrease value"\)/,
+    "the override wins; the generated Decrease name is the fallback",
+  );
+  assert.match(
+    stepper,
+    /increaseAccessibilityLabel \?\? \(label \? `Increase \$\{label\}` : "Increase value"\)/,
+    "the override wins; the generated Increase name is the fallback",
   );
 });
 
