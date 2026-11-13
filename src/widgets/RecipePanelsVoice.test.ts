@@ -41,6 +41,18 @@ test("RecipeIngredientsPanel reads its labels from the voice object", () => {
   ]) {
     assert.match(ingredients, new RegExp(`panelVoice\\.${slot}`), `slot ${slot} is read`);
   }
+  // The loaded stepper must receive the voice names too — without
+  // the overrides it generates `Decrease ${label}` from the label.
+  assert.match(
+    ingredients,
+    /decreaseAccessibilityLabel=\{panelVoice\.decreaseServingsLabel\}/,
+    "the loaded stepper's decrease button uses the voice name",
+  );
+  assert.match(
+    ingredients,
+    /increaseAccessibilityLabel=\{panelVoice\.increaseServingsLabel\}/,
+    "the loaded stepper's increase button uses the voice name",
+  );
   assert.doesNotMatch(ingredients, /label="Servings"|label="Scale"|title="Substitutions"/);
   assert.doesNotMatch(ingredients, /"Custom scale"|"Decrease Servings"|"Increase Servings"/);
   assert.doesNotMatch(ingredients, /Tap an ingredient to mark it missing/);

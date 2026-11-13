@@ -288,6 +288,8 @@ export function RecipeIngredientsPanel({
           min={1}
           onChange={view.onServingsChange}
           editable
+          decreaseAccessibilityLabel={panelVoice.decreaseServingsLabel}
+          increaseAccessibilityLabel={panelVoice.increaseServingsLabel}
         />
         <PresetValueSelector
           label={panelVoice.scaleLabel}

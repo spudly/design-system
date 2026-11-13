@@ -53,6 +53,15 @@ export type NumberStepperProps = {
    * restores the current value.
    */
   editable?: boolean;
+  /**
+   * Accessible names for the −/+ buttons, overriding the names
+   * generated from `label` (`Decrease ${label}` / `Increase
+   * ${label}`). For callers whose button names come from their
+   * own copy source (e.g. the #539 voice slots) instead of the
+   * generated pattern; unset keeps the generated names.
+   */
+  decreaseAccessibilityLabel?: string;
+  increaseAccessibilityLabel?: string;
 };
 
 /**
@@ -78,6 +87,8 @@ export function NumberStepper({
   label,
   layout = "stacked",
   editable = false,
+  decreaseAccessibilityLabel,
+  increaseAccessibilityLabel,
 }: NumberStepperProps) {
   // The editable field's uncommitted text; null while not editing, so
   // the field shows the (externally owned) value.
@@ -131,7 +142,7 @@ export function NumberStepper({
           setDraft(null);
           onChange(value - step);
         }}
-        accessibilityLabel={label ? `Decrease ${label}` : "Decrease value"}
+        accessibilityLabel={decreaseAccessibilityLabel ?? (label ? `Decrease ${label}` : "Decrease value")}
       >
         −
       </Button>
@@ -165,7 +176,7 @@ export function NumberStepper({
           setDraft(null);
           onChange(value + step);
         }}
-        accessibilityLabel={label ? `Increase ${label}` : "Increase value"}
+        accessibilityLabel={increaseAccessibilityLabel ?? (label ? `Increase ${label}` : "Increase value")}
       >
         +
       </Button>

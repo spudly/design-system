@@ -153,6 +153,21 @@ test("NumberStepper editable is additive, off by default, and renders a numeric 
   );
 });
 
+test("NumberStepper button names accept accessibility-label overrides, generated names by default", () => {
+  assert.match(stepper, /decreaseAccessibilityLabel\?: string;/, "decrease override prop is declared");
+  assert.match(stepper, /increaseAccessibilityLabel\?: string;/, "increase override prop is declared");
+  assert.match(
+    stepper,
+    /decreaseAccessibilityLabel \?\? \(label \? `Decrease \$\{label\}` : "Decrease value"\)/,
+    "the override wins; the generated Decrease name is the fallback",
+  );
+  assert.match(
+    stepper,
+    /increaseAccessibilityLabel \?\? \(label \? `Increase \$\{label\}` : "Increase value"\)/,
+    "the override wins; the generated Increase name is the fallback",
+  );
+});
+
 test("the stepper commits typed entries snapped and clamped, and ignores invalid ones", () => {
   assert.match(stepper, /const parsed = Number\(draft\.trim\(\)\);/, "the entry is parsed");
   assert.match(
