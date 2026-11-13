@@ -13,6 +13,7 @@ import {
 } from "./modalRegistry.js";
 import type { ModalLayer } from "./modalRegistry.js";
 import { Text } from "./Text.js";
+import { useVoice } from "../voice/index.js";
 
 export type StepOverlayProps = {
   /** The top eyebrow line: the context the steps belong to (a
@@ -126,11 +127,13 @@ export function StepOverlay({
   title,
   stepLabel,
   body,
-  doneLabel = "Done",
+  doneLabel,
   onDone,
   accessory,
   children,
 }: StepOverlayProps) {
+  const voice = useVoice();
+  const resolvedDoneLabel = doneLabel ?? voice.stepOverlay.doneLabel;
   const shellRef = useRef<TamaguiElement>(null);
   // This overlay's identity and ancestry in the modal
   // registry (#394, see modalRegistry.ts): the token is stable
@@ -388,7 +391,7 @@ export function StepOverlay({
           backgroundColor={tokens.colors.gray.gray10}
           {...platformAccessibilityProps({
             accessibilityRole: "button",
-            accessibilityLabel: doneLabel,
+            accessibilityLabel: resolvedDoneLabel,
           })}
           onPress={onDone}
           tabIndex={0}
@@ -410,7 +413,7 @@ export function StepOverlay({
             paddingHorizontal="$4"
             paddingVertical="$2"
           >
-            {doneLabel}
+            {resolvedDoneLabel}
           </Text>
         </YStack>
       </YStack>

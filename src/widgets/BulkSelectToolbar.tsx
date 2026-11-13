@@ -7,6 +7,7 @@ import { SkeletonBone } from "./SkeletonClock.js";
 import { Text } from "./Text.js";
 import { LINE_BOXES } from "./TextSkeleton.js";
 import { SearchField } from "../views/SearchField.js";
+import { useVoice } from "../voice/index.js";
 
 export type BulkSelectToolbarProps = {
   search: string;
@@ -61,9 +62,13 @@ export function BulkSelectToolbar({
   busy = false,
   onSelectAll,
   onClearSelection,
-  selectAllLabel = "Select all",
-  clearSelectionLabel = "Clear selection",
+  selectAllLabel,
+  clearSelectionLabel,
 }: BulkSelectToolbarProps) {
+  const voice = useVoice();
+  const resolvedSelectAllLabel = selectAllLabel ?? voice.bulkSelectToolbar.selectAllLabel;
+  const resolvedClearSelectionLabel =
+    clearSelectionLabel ?? voice.bulkSelectToolbar.clearSelectionLabel;
   const controlsDisabled = disabled || busy;
   const showSkeleton = useLoadingScope();
   const selectedText = `${selectedCount} selected`;
@@ -89,7 +94,7 @@ export function BulkSelectToolbar({
           disabled={controlsDisabled || filteredCount === 0}
           onPress={onSelectAll}
         >
-          {selectAllLabel}
+          {resolvedSelectAllLabel}
         </Button>
         <Button
           ghost
@@ -97,7 +102,7 @@ export function BulkSelectToolbar({
           disabled={controlsDisabled || selectedCount === 0}
           onPress={onClearSelection}
         >
-          {clearSelectionLabel}
+          {resolvedClearSelectionLabel}
         </Button>
         {selectedCount > 0 ? (
           showSkeleton ? (

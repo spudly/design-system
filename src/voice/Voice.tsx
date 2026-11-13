@@ -58,6 +58,24 @@ export type Voice = {
     staleCommunityRatingHint: string;
     staleViewerRatingHint: string;
   };
+  /** BackLink widget (tranche 1c): default when no label prop is passed. */
+  backLink: {
+    label: string;
+  };
+  /** PrevNextNav widget (tranche 1c): defaults when label props are not passed. */
+  prevNextNav: {
+    backLabel: string;
+    nextLabel: string;
+  };
+  /** BulkSelectToolbar widget (tranche 1c): defaults when label props are not passed. */
+  bulkSelectToolbar: {
+    selectAllLabel: string;
+    clearSelectionLabel: string;
+  };
+  /** StepOverlay widget (tranche 1c): default when no doneLabel prop is passed. */
+  stepOverlay: {
+    doneLabel: string;
+  };
   /** NutritionPanel widget (tranche 1b). */
   nutritionPanel: {
     perServingLabel: string;

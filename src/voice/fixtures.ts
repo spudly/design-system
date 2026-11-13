@@ -37,6 +37,20 @@ export const fixtureVoice: Voice = {
     staleViewerRatingHint:
       "Your rating was left on an earlier version of the recipe. Tap a star to update it for the current version.",
   },
+  backLink: {
+    label: "Back",
+  },
+  prevNextNav: {
+    backLabel: "Back",
+    nextLabel: "Next",
+  },
+  bulkSelectToolbar: {
+    selectAllLabel: "Select all",
+    clearSelectionLabel: "Clear selection",
+  },
+  stepOverlay: {
+    doneLabel: "Done",
+  },
   nutritionPanel: {
     perServingLabel: "Per Serving",
     refreshLabel: "Refresh",
