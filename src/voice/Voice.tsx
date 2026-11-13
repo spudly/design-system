@@ -344,6 +344,32 @@ export type Voice = {
     errorMessage: string;
     homeLabel: string;
   };
+  /** PayPage (tranche 3c): the per-status card titles and bodies, the opening state's spinner label and message, the retry actions, and the home button's default label — the page's status copy reads the voice slots directly; the home label stays overridable by the host because it names the host's home. */
+  payPage: {
+    title: string;
+    needsTransactionTitle: string;
+    unconfiguredBody: string;
+    needsTransactionBody: string;
+    openingLabel: string;
+    openingMessage: string;
+    closedBody: string;
+    errorBody: string;
+    homeLabel: string;
+    reopenLabel: string;
+    retryLabel: string;
+  };
+  /** AddRecipeMenuPage (tranche 3c): the page title — the options are host data, so only the title reads the voice. */
+  addRecipeMenuPage: {
+    title: string;
+  };
+  /** ManualEntryPage (tranche 3c): the shell heading around the recipe form. */
+  manualEntryPage: {
+    heading: string;
+  };
+  /** LegalDocumentPage (tranche 3c): the last-updated line — a formatter slot because the pre-formatted date is host data only the page combines with the label. */
+  legalDocumentPage: {
+    lastUpdatedLabel: VoiceFormatter<[lastUpdated: string]>;
+  };
   /** AutocompletePicker widget (tranche 1f): search-field defaults and search-state announcements. */
   autocompletePicker: {
     searchPlaceholder: string;

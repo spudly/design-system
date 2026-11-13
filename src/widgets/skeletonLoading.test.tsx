@@ -1336,7 +1336,7 @@ test("T4: every converted page renders skeletons — no Spinner remains in its c
 test("T4: the approved spinner survivors keep their Spinners", () => {
   assert.match(
     readCode("src/pages/PayPage.tsx"),
-    /<Spinner label="Opening the secure payment window" \/>/,
+    /<Spinner label=\{voice\.payPage\.openingLabel\} \/>/,
     "PayPage's wait is an external secure-payment window — no page content shape to skeletonize (approved survivor)",
   );
   assert.match(

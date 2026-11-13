@@ -259,6 +259,29 @@ export const fixtureVoice: Voice = {
     errorMessage: "An unexpected error occurred. Try reloading the page, or head back home.",
     homeLabel: "Go to the home page",
   },
+  payPage: {
+    title: "Complete your purchase",
+    needsTransactionTitle: "Checkout",
+    unconfiguredBody: "Checkout isn't configured yet, so there's nothing to pay for here.",
+    needsTransactionBody:
+      "This page completes a purchase started somewhere else \u2014 it needs the checkout link from that purchase to open a payment window.",
+    openingLabel: "Opening the secure payment window",
+    openingMessage: "Opening the secure payment window\u2026",
+    closedBody: "The payment window was closed before the purchase finished.",
+    errorBody: "The payment window couldn't be opened. Check your connection and try again.",
+    homeLabel: "Go to home",
+    reopenLabel: "Reopen checkout",
+    retryLabel: "Try again",
+  },
+  addRecipeMenuPage: {
+    title: "Add Recipe",
+  },
+  manualEntryPage: {
+    heading: "Manual Entry",
+  },
+  legalDocumentPage: {
+    lastUpdatedLabel: (lastUpdated: string) => `Last updated: ${lastUpdated}`,
+  },
   autocompletePicker: {
     searchPlaceholder: "Search\u2026",
     searchLabel: "Search",

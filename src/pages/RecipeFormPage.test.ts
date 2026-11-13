@@ -236,7 +236,10 @@ test("the shells mirror the app views' chrome", () => {
   assert.ok(edit.includes("{children}"), "EditRecipePage must render its children (the form)");
 
   const manual = pageSource("ManualEntryPage");
-  assert.ok(manual.includes("Manual Entry"), "ManualEntryPage heading missing");
+  assert.ok(
+    manual.includes("voice.manualEntryPage.heading"),
+    "ManualEntryPage heading missing (it reads voice.manualEntryPage.heading, #539)",
+  );
   assert.ok(manual.includes("{children}"), "ManualEntryPage must render its children (the form)");
 
   const version = pageSource("EditVersionPage");
