@@ -59,7 +59,7 @@ test("RecipeIngredientsPanel's types are type-only exports from the built compon
 test("the servings stepper and scale presets mirror the settled model", () => {
   assert.match(
     panelCode,
-    /<NumberStepper\s+label="Servings"\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
+    /<NumberStepper\s+label=\{panelVoice\.servingsLabel\}\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
     "the servings stepper mirrors the detail page's (label Servings, floor of 1, inline layout)",
   );
   for (const [value, label] of [
@@ -78,11 +78,11 @@ test("the servings stepper and scale presets mirror the settled model", () => {
     /<PresetValueSelector/,
     "the scale control is the shared PresetValueSelector",
   );
-  assert.match(panelCode, /label="Scale"/);
+  assert.match(panelCode, /label=\{panelVoice\.scaleLabel\}/);
   assert.match(panelCode, /onChange=\{view\.onScaleChange\}/);
   assert.match(
     panelCode,
-    /customAccessibilityLabel="Custom scale"/,
+    /customAccessibilityLabel=\{panelVoice\.customScaleAccessibilityLabel\}/,
     "the custom slot's accessible name is 'Custom scale'",
   );
   assert.match(
@@ -106,7 +106,7 @@ test("rows and substitutions keep their conditional rendering", () => {
     /<SuggestionPanel/,
     "the substitutions block is the shared SuggestionPanel",
   );
-  assert.match(panelCode, /title="Substitutions"/);
+  assert.match(panelCode, /title=\{panelVoice\.substitutionsTitle\}/);
   assert.match(
     panelCode,
     /view\.substitutions && view\.substitutions\.length > 0/,

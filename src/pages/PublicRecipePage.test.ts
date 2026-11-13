@@ -245,7 +245,7 @@ test("the shared section shapes are reused from RecipeDetailPage by alias", () =
   }
   assert.match(
     ingredientsCode,
-    /<NumberStepper\s+label="Servings"\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
+    /<NumberStepper\s+label=\{panelVoice\.servingsLabel\}\s+layout="inline"\s+value=\{view\.servings\}\s+min=\{1\}/,
     "the servings stepper mirrors the detail page's (label Servings, floor of 1, inline layout)",
   );
 });

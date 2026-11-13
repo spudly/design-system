@@ -83,6 +83,24 @@ export type Voice = {
     hint: string;
     dismissLabel: string;
   };
+  /** RecipeOverviewPanel widget (tranche 1e): stat band labels. */
+  recipeOverviewPanel: {
+    servingsLabel: string;
+    prepLabel: string;
+    cookLabel: string;
+  };
+  /** RecipeIngredientsPanel widget (tranche 1e). */
+  recipeIngredientsPanel: {
+    servingsLabel: string;
+    scaleLabel: string;
+    customScaleLabel: string;
+    customScaleAccessibilityLabel: string;
+    decreaseServingsLabel: string;
+    increaseServingsLabel: string;
+    missingIngredientsHint: string;
+    findingSubstitutionsLabel: string;
+    substitutionsTitle: string;
+  };
   /** NutritionPanel widget (tranche 1b). */
   nutritionPanel: {
     perServingLabel: string;

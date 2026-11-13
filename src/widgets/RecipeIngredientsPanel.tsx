@@ -9,6 +9,7 @@ import { PresetValueSelector, type PresetValueOption } from "./PresetValueSelect
 import { SuggestionPanel } from "./SuggestionPanel.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * A recipe's ingredients panel: the servings stepper, the scale
@@ -89,11 +90,11 @@ const SCALE_OPTIONS: PresetValueOption[] = [
   { value: "3", label: "3×" },
 ];
 
-// The custom scale slot's resting label: beside the presets, one
-// more slot that turns into a number input when pressed, as on
+// The custom scale slot's resting label comes from the voice
+// object (#539 tranche 1e): beside the presets, one more slot
+// that turns into a number input when pressed, as on
 // RecipeDetailPage (#73). Once a custom value applies, the slot
-// shows that value ("4×") selected instead of this label.
-const CUSTOM_SCALE_LABEL = "Custom";
+// shows that value ("4×") selected instead of the voice label.
 
 /** A scale value as the custom slot shows it: the number without
  * trailing zeros ("2.50" → "2.5"); non-numeric values pass through. */
@@ -102,8 +103,6 @@ function formatScaleValue(value: string): string {
   return Number.isFinite(parsed) ? String(parsed) : value;
 }
 
-const MISSING_INGREDIENTS_HINT =
-  "Tap an ingredient to mark it missing and see substitutions below.";
 
 // The loading panel's dummy rows (#278): exactly 3 placeholder
 // ingredients when none are known, from a frozen module-level
@@ -144,6 +143,8 @@ export function RecipeIngredientsPanel({
   ingredients: view,
   loading = false,
 }: RecipeIngredientsPanelProps) {
+  const voice = useVoice();
+  const panelVoice = voice.recipeIngredientsPanel;
   const showSkeleton = useLoadingScope(loading);
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
 
@@ -172,7 +173,7 @@ export function RecipeIngredientsPanel({
                 <Button
                   variant="secondary"
                   size="md"
-                  accessibilityLabel="Decrease Servings"
+                  accessibilityLabel={panelVoice.decreaseServingsLabel}
                   onPress={() => {
                     view.onServingsChange(view.servings - 1);
                   }}
@@ -185,7 +186,7 @@ export function RecipeIngredientsPanel({
                 <Button
                   variant="secondary"
                   size="md"
-                  accessibilityLabel="Increase Servings"
+                  accessibilityLabel={panelVoice.increaseServingsLabel}
                   onPress={() => {
                     view.onServingsChange(view.servings + 1);
                   }}
@@ -227,7 +228,7 @@ export function RecipeIngredientsPanel({
                     view.onScaleChange(view.scaleValue);
                   }}
                 >
-                  {CUSTOM_SCALE_LABEL}
+                  {panelVoice.customScaleLabel}
                 </Button>
               </XStack>
             </XStack>
@@ -281,7 +282,7 @@ export function RecipeIngredientsPanel({
           selected. */}
       <YStack gap="$3" paddingBlockEnd="$4">
         <NumberStepper
-          label="Servings"
+          label={panelVoice.servingsLabel}
           layout="inline"
           value={view.servings}
           min={1}
@@ -289,12 +290,12 @@ export function RecipeIngredientsPanel({
           editable
         />
         <PresetValueSelector
-          label="Scale"
+          label={panelVoice.scaleLabel}
           options={SCALE_OPTIONS}
           value={view.scaleValue}
           onChange={view.onScaleChange}
-          customLabel={CUSTOM_SCALE_LABEL}
-          customAccessibilityLabel="Custom scale"
+          customLabel={panelVoice.customScaleLabel}
+          customAccessibilityLabel={panelVoice.customScaleAccessibilityLabel}
           formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
         />
       </YStack>
@@ -315,7 +316,7 @@ export function RecipeIngredientsPanel({
       ))}
       {hasMissing && view.onIngredientPress ? (
         <YStack paddingBlockStart="$3">
-          <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text>
+          <Text variant="hint">{panelVoice.missingIngredientsHint}</Text>
         </YStack>
       ) : null}
       {view.loadingSubstitutions ? (
@@ -339,7 +340,7 @@ export function RecipeIngredientsPanel({
             overflow="hidden"
             {...(isWeb ? { opacity: 0 } : {})}
           >
-            <Text>Finding substitutions…</Text>
+            <Text>{panelVoice.findingSubstitutionsLabel}</Text>
           </YStack>
           <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
             <SubstitutionsSkeleton entries={1} />
@@ -349,7 +350,7 @@ export function RecipeIngredientsPanel({
       {view.substitutions && view.substitutions.length > 0 ? (
         <YStack paddingBlockStart="$4">
           <SuggestionPanel
-            title="Substitutions"
+            title={panelVoice.substitutionsTitle}
             entries={view.substitutions.map((sub) => ({
               id: sub.ingredient,
               label: sub.ingredient,

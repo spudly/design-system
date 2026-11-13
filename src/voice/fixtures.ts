@@ -57,6 +57,23 @@ export const fixtureVoice: Voice = {
     hint: "Copy it now — it won't be shown again.",
     dismissLabel: "Dismiss",
   },
+  recipeOverviewPanel: {
+    servingsLabel: "Servings",
+    prepLabel: "Prep",
+    cookLabel: "Cook",
+  },
+  recipeIngredientsPanel: {
+    servingsLabel: "Servings",
+    scaleLabel: "Scale",
+    customScaleLabel: "Custom",
+    customScaleAccessibilityLabel: "Custom scale",
+    decreaseServingsLabel: "Decrease Servings",
+    increaseServingsLabel: "Increase Servings",
+    missingIngredientsHint:
+      "Tap an ingredient to mark it missing and see substitutions below.",
+    findingSubstitutionsLabel: "Finding substitutions\u2026",
+    substitutionsTitle: "Substitutions",
+  },
   nutritionPanel: {
     perServingLabel: "Per Serving",
     refreshLabel: "Refresh",

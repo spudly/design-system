@@ -12,6 +12,7 @@ import { TagList } from "./TagList.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 import { Thumbnail } from "./Thumbnail.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * A recipe's overview panel: the header block of the two recipe
@@ -104,6 +105,7 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
     tags,
     loading = false,
   } = props;
+  const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
 
   if (showSkeleton) {
@@ -145,9 +147,9 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
           ) : null}
           <YStack paddingBlockEnd="$4">
             <StatBand loading loadingCount={1 + (prepTimeLabel ? 1 : 0) + (cookTimeLabel ? 1 : 0)}>
-              <StatCard label="Servings" value={servingsLabel} />
-              {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
-              {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
+              <StatCard label={voice.recipeOverviewPanel.servingsLabel} value={servingsLabel} />
+              {prepTimeLabel ? <StatCard label={voice.recipeOverviewPanel.prepLabel} value={prepTimeLabel} /> : null}
+              {cookTimeLabel ? <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} /> : null}
             </StatBand>
           </YStack>
           {tags.length > 0 ? <TagList tags={tags} loading /> : null}
@@ -183,9 +185,9 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
       ) : null}
       <YStack paddingBlockEnd="$4">
         <StatBand>
-          <StatCard label="Servings" value={servingsLabel} />
-          {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
-          {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
+          <StatCard label={voice.recipeOverviewPanel.servingsLabel} value={servingsLabel} />
+          {prepTimeLabel ? <StatCard label={voice.recipeOverviewPanel.prepLabel} value={prepTimeLabel} /> : null}
+          {cookTimeLabel ? <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} /> : null}
         </StatBand>
       </YStack>
       {tags.length > 0 ? <TagList tags={tags} /> : null}
