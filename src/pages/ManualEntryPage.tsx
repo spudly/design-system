@@ -2,11 +2,13 @@ import type { ReactNode } from "react";
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * ManualEntryPage (#124, B3a): the shell half of Eciperay's
  * manual recipe creation screen — the container and
- * the "Manual Entry" heading around the recipe form
+ * the heading around the recipe form (read from the
+ * voice object, #539)
  * (RecipeFormPage, rendered by the app host as this page's
  * children — the shell/body split the app screens have). The app
  * screen keeps the create mutation and the post-create image
@@ -27,10 +29,11 @@ export function ManualEntryPage({
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
 }) {
+  const voice = useVoice();
   return (
     <BigFooterShell footer={footer} scrollMode="content">
       <ScreenContainer>
-        <Text variant="heading">Manual Entry</Text>
+        <Text variant="heading">{voice.manualEntryPage.heading}</Text>
         {children}
       </ScreenContainer>
     </BigFooterShell>

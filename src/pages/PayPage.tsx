@@ -5,6 +5,7 @@ import { SectionCard } from "../widgets/SectionCard.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Spinner } from "../widgets/Spinner.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * PayPage (#438 Part 3): the checkout-completion page — the
@@ -17,10 +18,10 @@ import { Text } from "../widgets/Text.js";
  * The provider session stays with the host: it opens the
  * checkout window from the transaction it was handed and
  * reports the outcome as the `status` union. The page owns
- * the states' presentation and the generic copy (the
- * PublicRecipePage DS-owned-copy precedent — the copy names
- * no brand, so both apps share the page); the way out of the
- * terminal states crosses as intents (`onRetryPress`), and
+ * the states' presentation and the generic copy, read from
+ * the voice object (#539 — the copy names no brand, so both
+ * apps share the page); the way out of the terminal
+ * states crosses as intents (`onRetryPress`), and
  * home is an href (`homeHref`) because it navigates, with
  * the home button's label supplied by the host because it
  * names the host's home.
@@ -35,40 +36,29 @@ export type PayPageProps = {
   onRetryPress?: () => void;
   /** Leave for the host's home (the needs-transaction state): an href, because it navigates. */
   homeHref?: string;
-  /** The home button's label; it names the host's home, so the host supplies it. */
+  /** The home button's label; it names the host's home, so it defaults to the voice slot and the host may override it. */
   homeLabel?: string;
-};
-
-const STATUS_COPY: Record<PayPageStatus, { title: string; body?: string }> = {
-  unconfigured: {
-    title: "Complete your purchase",
-    body: "Checkout isn't configured yet, so there's nothing to pay for here.",
-  },
-  "needs-transaction": {
-    title: "Checkout",
-    body: "This page completes a purchase started somewhere else — it needs the checkout link from that purchase to open a payment window.",
-  },
-  opening: {
-    title: "Complete your purchase",
-  },
-  closed: {
-    title: "Complete your purchase",
-    body: "The payment window was closed before the purchase finished.",
-  },
-  error: {
-    title: "Complete your purchase",
-    body: "The payment window couldn't be opened. Check your connection and try again.",
-  },
 };
 
 export function PayPage({
   status,
   onRetryPress,
   homeHref,
-  homeLabel = "Go to home",
+  homeLabel: homeLabelProp,
   footer,
 }: PayPageProps) {
-  const copy = STATUS_COPY[status];
+  const voice = useVoice();
+  const copy =
+    status === "needs-transaction"
+      ? { title: voice.payPage.needsTransactionTitle, body: voice.payPage.needsTransactionBody }
+      : status === "unconfigured"
+        ? { title: voice.payPage.title, body: voice.payPage.unconfiguredBody }
+        : status === "closed"
+          ? { title: voice.payPage.title, body: voice.payPage.closedBody }
+          : status === "error"
+            ? { title: voice.payPage.title, body: voice.payPage.errorBody }
+            : { title: voice.payPage.title, body: undefined };
+  const homeLabel = homeLabelProp ?? voice.payPage.homeLabel;
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="padded">
@@ -76,8 +66,8 @@ export function PayPage({
           <SectionStack>
             {status === "opening" ? (
               <>
-                <Spinner label="Opening the secure payment window" />
-                <Text variant="body">Opening the secure payment window…</Text>
+                <Spinner label={voice.payPage.openingLabel} />
+                <Text variant="body">{voice.payPage.openingMessage}</Text>
               </>
             ) : (
               <>
@@ -89,7 +79,7 @@ export function PayPage({
                 ) : null}
                 {(status === "closed" || status === "error") && onRetryPress ? (
                   <Button variant="primary" onPress={onRetryPress}>
-                    {status === "closed" ? "Reopen checkout" : "Try again"}
+                    {status === "closed" ? voice.payPage.reopenLabel : voice.payPage.retryLabel}
                   </Button>
                 ) : null}
               </>

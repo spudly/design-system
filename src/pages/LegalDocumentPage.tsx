@@ -12,6 +12,7 @@ import {
   mainRoleProps,
 } from "../widgets/accessibility.js";
 import { tokens } from "../tokens/index.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * LegalDocumentPage (spudly/design-system#170, B7 public surfaces):
@@ -169,7 +170,7 @@ export type LegalDocumentPageProps = {
   title: string;
   /**
    * Pre-formatted by the host, e.g. "July 22, 2026" — the page
-   * renders it as "Last updated: …".
+   * renders it through the voice's last-updated formatter (#539).
    */
   lastUpdated: string;
   sections: LegalDocumentSection[];
@@ -191,6 +192,7 @@ export function LegalDocumentPage({
   signInHref,
   footer,
 }: LegalDocumentPageProps) {
+  const voice = useVoice();
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
@@ -207,7 +209,7 @@ export function LegalDocumentPage({
         >
           <YStack gap="$3">
             <Text variant="heading">{title}</Text>
-            <Text variant="hint">{`Last updated: ${lastUpdated}`}</Text>
+            <Text variant="hint">{voice.legalDocumentPage.lastUpdatedLabel(lastUpdated)}</Text>
           </YStack>
           {sections.map((section) => (
             <YStack key={section.title} gap="$3">

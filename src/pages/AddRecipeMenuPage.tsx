@@ -2,6 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { OptionCard } from "../widgets/OptionCard.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * AddRecipeMenuPage (#126, B3c): the add-recipe menu — the
@@ -40,10 +41,11 @@ export type AddRecipeMenuPageProps = {
 };
 
 export function AddRecipeMenuPage({ options, footer }: AddRecipeMenuPageProps) {
+  const voice = useVoice();
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="padded">
-        <Text variant="title">Add Recipe</Text>
+        <Text variant="title">{voice.addRecipeMenuPage.title}</Text>
         {options.map((option) => (
           <OptionCard
             key={option.href}

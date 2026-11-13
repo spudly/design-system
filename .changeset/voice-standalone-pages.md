@@ -1,0 +1,5 @@
+---
+"@spudly/ui": major
+---
+
+The standalone page literals move to the app-supplied voice object, as tranche 3c of the voice-as-theme system (#539): PayPage's Complete your purchase / Checkout status titles, its unconfigured, needs-transaction, closed, and error bodies, Opening the secure payment window spinner label and message, Reopen checkout / Try again retry labels, and Go to home home-button default; AddRecipeMenuPage's Add Recipe title; ManualEntryPage's Manual Entry heading; and LegalDocumentPage's Last updated: line (a formatter slot combining the label with the host's pre-formatted date). Apps must supply the new payPage, addRecipeMenuPage, manualEntryPage, and legalDocumentPage voice slots through VoiceProvider; Storybook's fixture voice carries the same strings these pages previously hard-coded, so rendered output is unchanged. Test: open the PayPage stories in each status, the AddRecipeMenuPage and ManualEntryPage stories, and a LegalDocumentPage story, and confirm the same titles, bodies, and last-updated line render as before.
