@@ -1,0 +1,1 @@
+{"format":["typescript","tsx"],"ignore":["**/node_modules/**","**/dist/**"],"minLines":5,"minTokens":50,"reporters":["console"],"threshold":100}
