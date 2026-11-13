@@ -47,7 +47,7 @@ describe("textFontContext", () => {
     const source = readSrc("widgets/SelectField.tsx");
     assert.match(
       source,
-      /<StyledValue placeholder=\{placeholder\} fontFamily="body" \/>/,
+      /<StyledValue placeholder=\{resolvedPlaceholder\} fontFamily="body" \/>/,
       'SelectField value must pass fontFamily="body" as an instance prop',
     );
     assert.match(

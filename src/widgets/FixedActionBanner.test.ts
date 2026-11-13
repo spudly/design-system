@@ -123,17 +123,23 @@ function loadRuntime() {
       ...(await import("../../dist/tamagui.config.js")),
       ...(await import("../../dist/widgets/index.js")),
     };
-    return { React, renderToString, TamaguiProvider, ...dist };
+    const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
+    return { React, renderToString, TamaguiProvider, ...dist, ...voiceFixtures, ...voiceModule };
   })();
   return runtimePromise;
 }
 
 async function renderSsr(element) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } =
+  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
     await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
-    React.createElement(TamaguiProvider, { config, defaultTheme: "light" }, element),
+    React.createElement(
+      TamaguiProvider,
+      { config, defaultTheme: "light" },
+      React.createElement(VoiceProvider, { voice: fixtureVoice }, element),
+    ),
   );
 }
 
