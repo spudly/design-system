@@ -4,6 +4,7 @@ import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { SignUpForm } from "../views/SignUpForm.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * SignUpPage (#126, B3c): the create-account view — the split
@@ -65,11 +66,12 @@ export function SignUpPage({
   legalNotice,
   footer,
 }: SignUpPageProps) {
+  const voice = useVoice();
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
         <SectionStack>
-          <Text variant="heading">Create account</Text>
+          <Text variant="heading">{voice.signUpPage.heading}</Text>
           <SignUpForm
             displayName={displayName}
             email={email}

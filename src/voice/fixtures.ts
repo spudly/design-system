@@ -211,6 +211,20 @@ export const fixtureVoice: Voice = {
     emptyMessage: "No recipes to export yet.",
     exportPendingLabel: "Exporting\u2026",
   },
+  signInPage: {
+    heading: "Welcome back",
+  },
+  signUpPage: {
+    heading: "Create account",
+  },
+  forgotPasswordPage: {
+    heading: "Reset password",
+    description: "We'll send a reset link to your email.",
+  },
+  resetPasswordPage: {
+    heading: "New password",
+    description: "Choose a new password for your account.",
+  },
   autocompletePicker: {
     searchPlaceholder: "Search\u2026",
     searchLabel: "Search",

@@ -3,6 +3,7 @@ import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { SignInForm } from "../views/SignInForm.js";
 import { Text } from "../widgets/Text.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * SignInPage (#126, B3c): the sign-in view — the split view half
@@ -64,11 +65,12 @@ export function SignInPage({
   forgotPasswordHref,
   footer,
 }: SignInPageProps) {
+  const voice = useVoice();
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
         <SectionStack>
-          <Text variant="heading">Welcome back</Text>
+          <Text variant="heading">{voice.signInPage.heading}</Text>
           <SignInForm
             email={email}
             password={password}
