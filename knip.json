@@ -5,7 +5,7 @@
       "entry": [
         "src/**/*.stories.tsx",
         "src/**/*.test.{ts,tsx}",
-        "test/**/*.test.ts",
+        "test/**/*.test.{ts,tsx}",
         "eslintRules/*.test.ts",
         ".storybook/main.ts"
       ],
@@ -18,7 +18,10 @@
       "ignore": [
         ".storybook/assetsRegistryStub.ts",
         ".storybook/svgSoundModuleStub.ts",
-        "test/stubs/reactNativeSvg.ts"
+        "test/stubs/reactNativeSvg.ts",
+        "src/icons/index.ts",
+        "src/views/index.ts",
+        "src/widgets/index.ts"
       ],
       "ignoreDependencies": [
         "@storybook/react"
