@@ -77,13 +77,15 @@ test("en-XA: RatingsCard renders its voice labels pseudo-localized, none in plai
   );
   const plain = await renderWithVoice(card, fixtureVoice);
   const pseudo = await renderWithVoice(card, fixtureVoicePseudoLocale);
-  for (const slot of [
-    fixtureVoice.ratingsCard.communityRatingLabel,
-    fixtureVoice.ratingsCard.noCommunityRatingsLabel,
-    fixtureVoice.ratingsCard.yourRatingLabel,
-  ]) {
+  for (const key of ["communityRatingLabel", "noCommunityRatingsLabel", "yourRatingLabel"] as const) {
+    const slot = fixtureVoice.ratingsCard[key];
+    const transformed = fixtureVoicePseudoLocale.ratingsCard[key];
     assert.ok(plain.includes(slot), `plain render carries the voice slot "${slot}"`);
     assert.ok(!pseudo.includes(slot), `en-XA render must not leave "${slot}" untransformed`);
+    assert.ok(
+      pseudo.includes(transformed),
+      `en-XA render carries the transformed slot "${transformed}"`,
+    );
   }
   assert.match(pseudo, /⟦/, "en-XA render carries the pseudo-locale markers");
   assert.ok(
