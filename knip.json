@@ -1,0 +1,42 @@
+{
+  "$schema": "https://unpkg.com/knip@6/schema.json",
+  "workspaces": {
+    ".": {
+      "entry": [
+        "src/**/*.stories.tsx",
+        "src/**/*.test.{ts,tsx}",
+        "test/**/*.test.ts",
+        "eslintRules/*.test.ts",
+        ".storybook/main.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "test/**/*.{ts,tsx}",
+        "eslintRules/**/*.{ts,mjs}",
+        ".storybook/**/*.{ts,tsx}"
+      ],
+      "ignore": [
+        ".storybook/assetsRegistryStub.ts",
+        ".storybook/svgSoundModuleStub.ts",
+        "test/stubs/reactNativeSvg.ts"
+      ],
+      "ignoreDependencies": [
+        "@storybook/react"
+      ]
+    },
+    "apps/storybook": {
+      "entry": [
+        "index.ts",
+        ".rnstorybook/main.ts"
+      ],
+      "project": [
+        "**/*.{ts,tsx}"
+      ],
+      "ignoreDependencies": [
+        "expo-updates",
+        "expo-modules-core",
+        "@storybook/react"
+      ]
+    }
+  }
+}
