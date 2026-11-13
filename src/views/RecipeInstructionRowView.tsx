@@ -5,6 +5,7 @@ import { Center } from "../widgets/Center.js";
 import { FieldRow } from "../widgets/FieldRow.js";
 import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "./TextAreaField.js";
+import { useVoice } from "../voice/index.js";
 
 /**
  * One instruction row's view-model: the settled #124 row
@@ -22,7 +23,8 @@ export type RecipeInstructionRowViewProps = {
   row: RecipeInstructionRow;
   /** The row's position in its list: renders as the step
    * number and names the row's field and actions for
-   * assistive tech ("Step 2"). */
+   * assistive tech, through the voice object's
+   * recipeInstructionRowView formatters (#539). */
   index: number;
   /**
    * The host's drag handle for this row, bound by the host's
@@ -66,6 +68,7 @@ export function RecipeInstructionRowView({
   onBodyChange,
   onRemove,
 }: RecipeInstructionRowViewProps) {
+  const voice = useVoice();
   const position = index + 1;
   return (
     <FieldRow>
@@ -75,7 +78,7 @@ export function RecipeInstructionRowView({
       </Center>
       <YStack flex={1}>
         <TextAreaField
-          accessibilityLabel={`Step ${position}`}
+          accessibilityLabel={voice.recipeInstructionRowView.stepLabel(position)}
           readOnly={onBodyChange === undefined}
           numberOfLines={2}
           value={row.body}
@@ -88,12 +91,12 @@ export function RecipeInstructionRowView({
         <Button
           variant="danger"
           size="sm"
-          accessibilityLabel={`Remove step ${position}`}
+          accessibilityLabel={voice.recipeInstructionRowView.removeStepLabel(position)}
           onPress={() => {
             onRemove(row.key);
           }}
         >
-          Remove
+          {voice.recipeInstructionRowView.removeLabel}
         </Button>
       ) : null}
     </FieldRow>

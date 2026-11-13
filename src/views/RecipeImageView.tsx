@@ -9,6 +9,7 @@ import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { Text } from "../widgets/Text.js";
 import { Thumbnail } from "../widgets/Thumbnail.js";
 import { tokens } from "../tokens/index.js";
+import { useVoice } from "../voice/index.js";
 
 // The preview frame's heights while loading (#278): with an
 // image, the bone fills Thumbnail's hero frame at its fixed
@@ -21,7 +22,7 @@ const EMPTY_PREVIEW_HEIGHT =
   tokens.spacing[6] * 2 + tokens.typography.fontSize.sm * tokens.typography.lineHeight.normal;
 
 export type RecipeImageViewProps = {
-  /** Section label ("Recipe image"). */
+  /** Section label. Defaults to the voice object's recipeImageView label (#539). */
   label?: string;
   /**
    * The current image's preview URI; null (or omitted) renders
@@ -29,11 +30,13 @@ export type RecipeImageViewProps = {
    * crosses — the host's picker flow owns it until it applies.
    */
   imagePreviewUri?: string | null;
-  /** Upload in flight: the pick action reads "Uploading…" and
-   * every action disables. */
+  /** Upload in flight: the pick action reads the voice
+   * object's recipeImageView uploading label and every
+   * action disables. */
   isUploading?: boolean;
-  /** AI generation in flight: the generate action reads
-   * "Generating…" and every action disables. */
+  /** AI generation in flight: the generate action reads the
+   * voice object's recipeImageView generating label and
+   * every action disables. */
   isGenerating?: boolean;
   /** Host-reported failure (upload / generation), rendered as
    * an error alert below the preview. */
@@ -60,7 +63,8 @@ export type RecipeImageViewProps = {
    */
   canGenerateImage?: boolean;
   /** The empty state's line; hosts whose field offers no
-   * generation pass their own copy. */
+   * generation pass their own copy. Defaults to the voice
+   * object's recipeImageView empty message (#539). */
   emptyMessage?: string;
   /** Trailing action for the label row (the form page passes
    * its revert affordance). */
@@ -100,8 +104,8 @@ export type RecipeImageViewProps = {
  * take-photo, optional AI generate, and remove while a
  * preview shows. Busy presentation is the hosts' own: while
  * an upload or generation is in flight the pick / generate
- * actions read "Uploading…" / "Generating…" and every action
- * disables.
+ * actions read the voice object's uploading / generating
+ * labels (#539) and every action disables.
  *
  * Everything else stays with the host, exactly as the #124
  * decision drew it: the picker invocation itself, file
@@ -111,20 +115,23 @@ export type RecipeImageViewProps = {
  * `imagePreviewUri`, a failure as `error`.
  */
 export function RecipeImageView({
-  label = "Recipe image",
+  label: labelProp,
   imagePreviewUri,
   isUploading = false,
   isGenerating = false,
   error,
   loading = false,
   canGenerateImage = true,
-  emptyMessage = "Choose an image from your library or generate one with AI",
+  emptyMessage: emptyMessageProp,
   headerAction,
   onPickImageRequest,
   onTakePhotoRequest,
   onGenerateImageRequest,
   onRemoveImage,
 }: RecipeImageViewProps) {
+  const voice = useVoice();
+  const label = labelProp ?? voice.recipeImageView.label;
+  const emptyMessage = emptyMessageProp ?? voice.recipeImageView.emptyMessage;
   const showSkeleton = useLoadingScope(loading);
   const busy = isUploading || isGenerating;
   return (
@@ -134,7 +141,11 @@ export function RecipeImageView({
           {showSkeleton ? (
             <BoxSkeleton height={imagePreviewUri ? HERO_PREVIEW_HEIGHT : EMPTY_PREVIEW_HEIGHT} />
           ) : imagePreviewUri ? (
-            <Thumbnail src={imagePreviewUri} variant="hero" accessibilityLabel="Recipe preview" />
+            <Thumbnail
+              src={imagePreviewUri}
+              variant="hero"
+              accessibilityLabel={voice.recipeImageView.previewLabel}
+            />
           ) : (
             <YStack
               overflow="hidden"
@@ -151,26 +162,30 @@ export function RecipeImageView({
           )}
           <ButtonRow>
             <Button variant="primary" disabled={busy} onPress={onPickImageRequest}>
-              {isUploading ? "Uploading…" : "Browse images"}
+              {isUploading
+                ? voice.recipeImageView.uploadingLabel
+                : voice.recipeImageView.browseLabel}
             </Button>
             {onTakePhotoRequest ? (
               <Button variant="secondary" disabled={busy} onPress={onTakePhotoRequest}>
-                Take photo
+                {voice.recipeImageView.takePhotoLabel}
               </Button>
             ) : null}
             {onGenerateImageRequest ? (
               <Button
                 variant="secondary"
-                accessibilityLabel="Generate image with AI"
+                accessibilityLabel={voice.recipeImageView.generateAccessibilityLabel}
                 disabled={busy || !canGenerateImage}
                 onPress={onGenerateImageRequest}
               >
-                {isGenerating ? "Generating…" : "Generate with AI"}
+                {isGenerating
+                  ? voice.recipeImageView.generatingLabel
+                  : voice.recipeImageView.generateLabel}
               </Button>
             ) : null}
             {imagePreviewUri ? (
               <Button variant="secondary" disabled={busy} onPress={onRemoveImage}>
-                Remove image
+                {voice.recipeImageView.removeLabel}
               </Button>
             ) : null}
           </ButtonRow>

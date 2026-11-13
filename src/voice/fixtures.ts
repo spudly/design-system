@@ -50,6 +50,45 @@ export const fixtureVoice: Voice = {
     searchPlaceholder: "Search\u2026",
     selectedLabel: (count: number) => `${count} selected`,
   },
+  recipeImageView: {
+    label: "Recipe image",
+    emptyMessage: "Choose an image from your library or generate one with AI",
+    previewLabel: "Recipe preview",
+    browseLabel: "Browse images",
+    uploadingLabel: "Uploading\u2026",
+    takePhotoLabel: "Take photo",
+    generateLabel: "Generate with AI",
+    generatingLabel: "Generating\u2026",
+    generateAccessibilityLabel: "Generate image with AI",
+    removeLabel: "Remove image",
+  },
+  recipeIngredientListView: {
+    label: "Ingredients",
+    emptyMessage: "No ingredients yet",
+    addLabel: "+ Add",
+    addIngredientLabel: "Add ingredient",
+  },
+  recipeIngredientRowView: {
+    quantityPlaceholder: "Qty",
+    unitPlaceholder: "Unit",
+    namePlaceholder: "Name",
+    quantityLabel: (position: number) => `Ingredient ${position} quantity`,
+    unitLabel: (position: number) => `Ingredient ${position} unit`,
+    nameLabel: (position: number) => `Ingredient ${position} name`,
+    removeLabel: "Remove",
+    removeIngredientLabel: (position: number) => `Remove ingredient ${position}`,
+  },
+  recipeInstructionListView: {
+    label: "Instructions",
+    emptyMessage: "No instructions yet",
+    addLabel: "+ Add",
+    addInstructionLabel: "Add instruction",
+  },
+  recipeInstructionRowView: {
+    stepLabel: (position: number) => `Step ${position}`,
+    removeLabel: "Remove",
+    removeStepLabel: (position: number) => `Remove step ${position}`,
+  },
   autocompletePicker: {
     searchPlaceholder: "Search\u2026",
     searchLabel: "Search",
@@ -132,6 +171,15 @@ function pseudoLocalize(value: string): string {
 function pseudoLocalizeVoice(voice: Voice): Voice {
   const walk = (node: unknown): unknown => {
     if (typeof node === "string") return pseudoLocalize(node);
+    if (typeof node === "function") {
+      // Formatter slots: forward the arguments and pseudo-localize
+      // the returned string, so a formatter's output is transformed
+      // the same way a plain string slot is.
+      return (...args: unknown[]) => {
+        const result = (node as (...a: unknown[]) => unknown)(...args);
+        return typeof result === "string" ? pseudoLocalize(result) : result;
+      };
+    }
     if (node !== null && typeof node === "object") {
       return Object.fromEntries(Object.entries(node).map(([k, v]) => [k, walk(v)]));
     }

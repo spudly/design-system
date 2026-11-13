@@ -7,17 +7,18 @@ import {
   RecipeInstructionRowView,
   type RecipeInstructionRow,
 } from "./RecipeInstructionRowView.js";
+import { useVoice } from "../voice/index.js";
 
 export type { RecipeInstructionRow };
 
 export type RecipeInstructionListViewProps = {
-  /** Section label ("Instructions"). */
+  /** Section label. Defaults to the voice object's recipeInstructionListView label (#539). */
   label?: string;
   /** The rows, in display order (the #124 view-models). */
   rows: RecipeInstructionRow[];
-  /** Shown when the list is empty ("No instructions yet"). */
+  /** Shown when the list is empty. Defaults to the voice object's recipeInstructionListView empty message (#539). */
   emptyMessage?: string;
-  /** The add action's label ("+ Add"). */
+  /** The add action's label. Defaults to the voice object's recipeInstructionListView add label (#539). */
   addLabel?: string;
   /** Add intent: the host appends its own empty row (it owns
    * row keys and shape defaults). Renders the add action —
@@ -61,21 +62,30 @@ export type RecipeInstructionListViewProps = {
  * on the next render.
  */
 export function RecipeInstructionListView({
-  label = "Instructions",
+  label: labelProp,
   rows,
-  emptyMessage = "No instructions yet",
-  addLabel = "+ Add",
+  emptyMessage: emptyMessageProp,
+  addLabel: addLabelProp,
   onAdd,
   onBodyChange,
   onRemove,
   renderDragHandle,
 }: RecipeInstructionListViewProps) {
+  const voice = useVoice();
+  const label = labelProp ?? voice.recipeInstructionListView.label;
+  const emptyMessage = emptyMessageProp ?? voice.recipeInstructionListView.emptyMessage;
+  const addLabel = addLabelProp ?? voice.recipeInstructionListView.addLabel;
   return (
     <LabeledGroup
       label={label}
       action={
         onAdd ? (
-          <Button ghost size="sm" accessibilityLabel="Add instruction" onPress={onAdd}>
+          <Button
+            ghost
+            size="sm"
+            accessibilityLabel={voice.recipeInstructionListView.addInstructionLabel}
+            onPress={onAdd}
+          >
             {addLabel}
           </Button>
         ) : null
