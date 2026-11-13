@@ -41,6 +41,32 @@ function stripComments(text: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
+/**
+ * Code fragments caught between a generic's ">" and the next
+ * "<" (type declarations, ternaries, call arguments) are not
+ * copy. They are identified by code context — leading closers,
+ * operators, casts, dotted calls, unbalanced call parens — NOT
+ * by blanket punctuation bans, so real copy carrying parens or
+ * semicolons ("Save (optional)") still counts as a literal.
+ */
+function isCodeFragment(text: string) {
+  if (/^[)\]};:,(`]/.test(text)) return true;
+  if (/^case\s/.test(text)) return true;
+  if (/^\d+\s*\?/.test(text)) return true;
+  if (/^as\s/.test(text) || text.includes(" as ")) return true;
+  if (text === "return" || text === "void") return true;
+  if (/^(export|function|const|let|var|type|import)\b/.test(text)) return true;
+  if (text.includes("===") || text.includes("!==")) return true;
+  if (text.includes("&&") || text.includes("||")) return true;
+  if (text.includes("=>") || text.includes("?:")) return true;
+  if (text.includes(";") || text.includes(");")) return true;
+  if (/\b\w+\.\w+\(/.test(text)) return true;
+  if (text.includes("(") && !text.includes(")")) return true;
+  if (text.includes("(") && text.includes(":")) return true;
+  if (/[={}|]/.test(text)) return true;
+  return false;
+}
+
 function* walk(dir: string): Generator<string> {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const full = join(dir, entry.name);
@@ -58,16 +84,24 @@ function inventory(): string[] {
       if (file.endsWith("fixtures.ts") || file.endsWith("storyFixtures.ts")) continue;
       const rel = relative(srcRoot, file).replaceAll("\\", "/");
       const code = stripComments(readFileSync(file, "utf8"));
-      for (const match of code.matchAll(/>\s*([^<>{}]+?)\s*</g)) {
+      // JSX text nodes, including text sitting beside an
+      // expression (`Hello {name}`, `{count} items`): the three
+      // segment shapes are text before a closing tag, text
+      // before an expression, and text after an expression.
+      const segments = [
+        ...code.matchAll(/>\s*([^<>{}]+?)\s*</g),
+        ...code.matchAll(/>\s*([^<>{}]+?)\s*\{/g),
+        ...code.matchAll(/\}\s*([^<>{}]+?)\s*</g),
+      ];
+      for (const match of segments) {
         const text = match[1].replaceAll(/\s+/g, " ").trim();
-        // Code fragments caught between a generic's ">" and the
-        // next "<" (type declarations, ternaries) are not copy:
-        // they carry code punctuation real copy never does.
-        if (/[;={}|(]/.test(text) || text.includes("=>") || text.includes("?:")) continue;
+        if (isCodeFragment(text)) continue;
         if (text.length >= 2 && /[A-Za-z]/.test(text)) found.add(`${rel}|jsx|${text}`);
       }
+      // Copy attributes in every literal form: attr="…",
+      // attr='…' and attr={"…"} / attr={'…'}.
       const attrPattern = new RegExp(
-        String.raw`(?:${COPY_ATTRIBUTES.join("|")})="([^"]*[A-Za-z][^"]*)"`,
+        String.raw`(?:${COPY_ATTRIBUTES.join("|")})\s*=\s*(?:\{\s*)?["']([^"']*[A-Za-z][^"']*)["']`,
         "g",
       );
       for (const match of code.matchAll(attrPattern)) {

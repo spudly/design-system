@@ -67,8 +67,13 @@ async function renderWithVoice(element: any, voice: any) {
 
 test("en-XA: RatingsCard renders its voice labels pseudo-localized, none in plain en-US", async () => {
   const { RatingsCard, fixtureVoice, fixtureVoicePseudoLocale } = await loadRuntime();
+  // A viewer rating must be present: RatingsCard renders the
+  // yourRatingLabel slot only when ratings.viewer is truthy.
   const card = (
-    <RatingsCard ratings={{ community: null, viewer: null }} onViewerRatingChange={undefined} />
+    <RatingsCard
+      ratings={{ community: null, viewer: { value: 4, isPending: false } }}
+      onViewerRatingChange={undefined}
+    />
   );
   const plain = await renderWithVoice(card, fixtureVoice);
   const pseudo = await renderWithVoice(card, fixtureVoicePseudoLocale);

@@ -48,6 +48,7 @@
   "pages/MealPlanDetailPage.tsx|attr|Nutrition goals",
   "pages/MealPlanDetailPage.tsx|attr|Weekly totals",
   "pages/MealPlanDetailPage.tsx|jsx|Edit",
+  "pages/MealPlanDetailPage.tsx|jsx|Plan total:",
   "pages/MealPlanDetailPage.tsx|jsx|Set daily nutrition goals to compare this plan.",
   "pages/MealPlanDetailPage.tsx|jsx|Set nutrition goals",
   "pages/MealPlanDetailPage.tsx|jsx|Shopping list",
@@ -73,7 +74,9 @@
   "pages/MealsHubPage.tsx|jsx|Meals",
   "pages/MealsHubPage.tsx|jsx|New meal",
   "pages/MemorizationSessionPage.tsx|jsx|Back",
+  "pages/MemorizationSessionPage.tsx|jsx|Round",
   "pages/MemorizationSessionPage.tsx|jsx|Verse not found.",
+  "pages/MemorizationSessionPage.tsx|jsx|— tap a blank to peek at the word.",
   "pages/MemorizeReviewPage.tsx|attr|Nothing due",
   "pages/MemorizeReviewPage.tsx|jsx|I forgot it",
   "pages/MemorizeReviewPage.tsx|jsx|I remembered it",
@@ -112,6 +115,7 @@
   "pages/RecipeDetailPage.tsx|jsx|Start Cooking",
   "pages/RecipeDetailPage.tsx|jsx|Tweak manually",
   "pages/RecipeDetailPage.tsx|jsx|Tweak with AI",
+  "pages/RecipeDetailPage.tsx|jsx|Version",
   "pages/RecipeFormPage.tsx|attr|Cook (min)",
   "pages/RecipeFormPage.tsx|attr|Description",
   "pages/RecipeFormPage.tsx|attr|Generate description with AI",
@@ -149,5 +153,6 @@
   "views/CatalogFiltersBar.tsx|attr|Add a filter",
   "views/CatalogFiltersBar.tsx|jsx|Filters",
   "views/ChunkErrorBoundary.tsx|jsx|This section failed to load.",
-  "widgets/LogEntryCard.tsx|jsx|Delete"
+  "widgets/LogEntryCard.tsx|jsx|Delete",
+  "widgets/Spinner.tsx|attr|Loading"
 ]
