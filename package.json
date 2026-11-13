@@ -2,12 +2,16 @@
   "description": "Shared design system (tokens, themes, universal components) for Spudly apps: Eciperay and Memorize.",
   "devDependencies": {
     "@changesets/cli": "^3.0.3",
+    "@commitlint/cli": "^21.2.4",
+    "@spudly/commitlint-config": "^0.2.0",
     "@spudly/eslint-config": "^0.2.0",
+    "@spudly/tooling": "^0.2.0",
     "@storybook/react-native": "10.6.2",
     "@storybook/react-vite": "^10.6.6",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "eslint": "^10.14.0",
+    "github-actionlint": "^1.7.12",
     "husky": "^9.1.7",
     "jiti": "^2.7.0",
     "jscpd": "^5.4.3",
@@ -42,6 +46,9 @@
     ],
     "*.{ts,tsx}": [
       "bash -c 'npm run typecheck'"
+    ],
+    ".github/workflows/*.{yml,yaml}": [
+      "spudly-tooling actionlint --staged"
     ]
   },
   "main": "./dist/index.js",
@@ -62,6 +69,8 @@
     "changeset": "changeset",
     "clean": "rm -rf dist",
     "lint": "eslint .",
+    "actionlint": "github-actionlint .github/workflows/*.yml",
+    "workflows:lint": "prettier --check .github/workflows && npm run actionlint",
     "lint:fix": "eslint . --fix",
     "jscpd": "npm run jscpd:source && npm run jscpd:stories-tests",
     "jscpd:source": "jscpd src --ignore \"**/*.stories.tsx,**/*.test.ts\"",
@@ -70,6 +79,7 @@
     "manual-tests:index": "node tools/manualTestsIndex.mjs && prettier --write docs/manual-tests.md",
     "prepare": "husky",
     "prepublishOnly": "npm run build",
+    "precommit:affected-tests": "node tools/precommitAffectedTests.mjs",
     "prettier": "prettier --write .",
     "prettier:check": "prettier --check .",
     "storybook": "npm run storybook:react --",
