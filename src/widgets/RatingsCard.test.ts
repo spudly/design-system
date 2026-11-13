@@ -132,8 +132,8 @@ test("SSR: a read-only card renders no focusable star controls (#316)", async ()
 });
 
 test("stale ratings and the empty community state render their copy", () => {
-  assert.match(code, /STALE_COMMUNITY_RATING_HINT/);
-  assert.match(code, /STALE_VIEWER_RATING_HINT/);
-  assert.match(code, /No community ratings yet/);
+  assert.match(code, /voice\.ratingsCard\.staleCommunityRatingHint/, "the stale community hint comes from the voice object (#539)");
+  assert.match(code, /voice\.ratingsCard\.staleViewerRatingHint/, "the stale viewer hint comes from the voice object (#539)");
+  assert.match(code, /voice\.ratingsCard\.noCommunityRatingsLabel/, "the empty community copy comes from the voice object (#539)");
   assert.match(code, /<Card variant="muted">/, "the card renders in the muted card treatment");
 });
