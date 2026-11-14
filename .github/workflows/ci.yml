@@ -112,6 +112,14 @@ jobs:
       - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
+      # apps/storybook is a standalone workspace (own lockfile, not a root
+      # workspace member): knip loads its metro.config.js, which requires
+      # expo/metro-config — without this install knip errors out (exit 2)
+      # even on a zero-finding tree.
+      - name: Install storybook host deps (for knip config loading)
+        run: npm ci --prefix apps/storybook
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
       - name: knip — dead-code detection (enforce mode)
         run: npm run knip
 
