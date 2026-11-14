@@ -10,7 +10,7 @@
  */
 
 /** 10-step neutral gray ramp (light → dark). */
-export const gray = {
+const gray = {
   gray1: "#fafafa",
   gray2: "#f5f5f5",
   gray3: "#e5e5e5",
@@ -24,7 +24,7 @@ export const gray = {
 } as const;
 
 /** 10-step primary accent ramp (light → dark). Indigo placeholder. */
-export const primary = {
+const primary = {
   primary1: "#eef2ff",
   primary2: "#e0e7ff",
   primary3: "#c7d2fe",
@@ -38,7 +38,7 @@ export const primary = {
 } as const;
 
 /** 10-step success ramp (light → dark). */
-export const success = {
+const success = {
   success1: "#f0fdf4",
   success2: "#dcfce7",
   success3: "#bbf7d0",
@@ -52,7 +52,7 @@ export const success = {
 } as const;
 
 /** 10-step warning ramp (light → dark). */
-export const warning = {
+const warning = {
   warning1: "#fffbeb",
   warning2: "#fef3c7",
   warning3: "#fde68a",
@@ -66,7 +66,7 @@ export const warning = {
 } as const;
 
 /** 10-step danger ramp (light → dark). */
-export const danger = {
+const danger = {
   danger1: "#fef2f2",
   danger2: "#fee2e2",
   danger3: "#fecaca",
@@ -80,7 +80,7 @@ export const danger = {
 } as const;
 
 /** 10-step terracotta ramp (light → dark). Eciperay brand hue. */
-export const terracotta = {
+const terracotta = {
   terracotta1: "#fff7ed",
   terracotta2: "#ffedd5",
   terracotta3: "#fed7aa",
@@ -94,7 +94,7 @@ export const terracotta = {
 } as const;
 
 /** 10-step deep teal ramp (light → dark). Memorize brand hue. */
-export const teal = {
+const teal = {
   teal1: "#f0fdfa",
   teal2: "#ccfbf1",
   teal3: "#99f6e4",
