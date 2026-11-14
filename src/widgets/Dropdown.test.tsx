@@ -117,7 +117,7 @@ test("Dropdown resolves controlled vs uncontrolled open state and reports change
   assert.match(dropdown, /onOpenChange\?\.\(next\)/);
 });
 test("anchoring is the semantic side/align subset composed into the Popover placement", () => {
-  assert.match(dropdown, /export type DropdownSide = "top" \| "bottom"/);
+  assert.match(dropdown, /type DropdownSide = "top" \| "bottom"/);
   assert.match(dropdown, /export type DropdownAlign = "start" \| "end"/);
   assert.match(dropdown, /placement=\{`\$\{side\}-\$\{align\}`\}/);
   assert.match(dropdown, /allowFlip/);

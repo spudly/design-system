@@ -3,8 +3,8 @@
  * adopting shuoink/ui's Slider as spec).
  *
  * The contracts pinned here:
- * 1. Slider and the SliderTick type are exported from the package
- *    root (dist).
+ * 1. Slider is exported from the package root (dist); the
+ *    SliderTick type stays internal to the component.
  * 2. The contract is scalar and controlled, like every DS field:
  *    `value: number` + `onValueChange(value)` (the SelectField /
  *    RadioOptionGroup shape). Tamagui's array-valued Slider API is
@@ -158,7 +158,7 @@ test("disabled passes through to the primitive and dims the control", () => {
   assert.match(slider, /opacity=\{disabled \? 0\.5 : 1\}/);
 });
 test("ticks are a { value, label } view-model positioned by clamped percentage", () => {
-  assert.match(slider, /export type SliderTick = \{/);
+  assert.match(slider, /type SliderTick = \{/);
   assert.match(slider, /ticks\?: SliderTick\[\]/);
   assert.match(
     slider,

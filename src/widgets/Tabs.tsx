@@ -92,7 +92,7 @@ const StyledLinkTab = styled(Anchor, {
   } as const,
 });
 
-export type TabItem = {
+type TabItem = {
   value: string;
   label: string;
   /**
@@ -108,7 +108,7 @@ export type TabItem = {
   icon?: IconName;
 };
 
-export type LinkTabItem = {
+type LinkTabItem = {
   value: string;
   label: string;
   /**

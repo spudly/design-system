@@ -49,8 +49,6 @@ test("RecipeIngredientsPanel's types are type-only exports from the built compon
   for (const name of [
     "RecipeIngredientsPanelProps",
     "RecipeIngredientsPanelView",
-    "RecipeIngredientsPanelIngredient",
-    "RecipeIngredientsPanelSubstitution",
   ]) {
     assert.match(types, new RegExp(name), `${name} must be exported from the barrel types`);
   }

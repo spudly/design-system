@@ -37,7 +37,7 @@ import { useVoice } from "../voice/index.js";
  * view-model mapping.
  */
 
-export type RecipeIngredientsPanelIngredient = {
+type RecipeIngredientsPanelIngredient = {
   id: string;
   label: string;
   isOptional?: boolean;
@@ -46,7 +46,7 @@ export type RecipeIngredientsPanelIngredient = {
   isMissing?: boolean;
 };
 
-export type RecipeIngredientsPanelSubstitution = {
+type RecipeIngredientsPanelSubstitution = {
   ingredient: string;
   suggestions: string;
 };

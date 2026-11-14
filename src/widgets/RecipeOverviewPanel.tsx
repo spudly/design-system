@@ -56,7 +56,7 @@ import { useVoice } from "../voice/index.js";
  * passes the pair in.
  */
 
-export type RecipeOverviewPanelTag = {
+type RecipeOverviewPanelTag = {
   id: string;
   name: string;
   /** The tag's color: a DS tag color token name, strictly typed

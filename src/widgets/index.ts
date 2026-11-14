@@ -1,6 +1,6 @@
 export { Accordion, type AccordionItem, type AccordionProps } from "./Accordion.js";
 export { AccordionSection, type AccordionSectionProps } from "./AccordionSection.js";
-export { Alert, type AlertAction, type AlertProps, type AlertSeverity } from "./Alert.js";
+export { Alert, type AlertProps } from "./Alert.js";
 export { ActionBar, type ActionBarProps } from "./ActionBar.js";
 export { Avatar, type AvatarProps } from "./Avatar.js";
 export {
@@ -33,7 +33,6 @@ export {
   useDropdownClose,
   type DropdownAlign,
   type DropdownProps,
-  type DropdownSide,
 } from "./Dropdown.js";
 export { DropdownButton, type DropdownButtonProps } from "./DropdownButton.js";
 export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
@@ -66,7 +65,7 @@ export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./SecretRevealPanel.js";
 export { SectionCard, type SectionCardProps } from "./SectionCard.js";
 export { SelectField, type SelectFieldProps, type SelectOption } from "./SelectField.js";
-export { Slider, type SliderProps, type SliderTick } from "./Slider.js";
+export { Slider, type SliderProps } from "./Slider.js";
 export { BoxSkeleton, type BoxSkeletonProps } from "./BoxSkeleton.js";
 export { CircleSkeleton, type CircleSkeletonProps } from "./CircleSkeleton.js";
 export { SkeletonClock, type SkeletonClockProps } from "./SkeletonClock.js";
@@ -78,7 +77,7 @@ export { StatCard, type StatCardProps } from "./StatCard.js";
 export { StatRow, type StatRowProps } from "./StatRow.js";
 export { StepDots, type StepDotsProps } from "./StepDots.js";
 export { Switch, type SwitchProps } from "./Switch.js";
-export { Tabs, type LinkTabItem, type TabItem, type TabsProps } from "./Tabs.js";
+export { Tabs, type TabsProps } from "./Tabs.js";
 export { useTagColorResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./Text.js";
 export { Thumbnail, type ThumbnailProps } from "./Thumbnail.js";
@@ -143,20 +142,16 @@ export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
 export {
   RecipeIngredientsPanel,
-  type RecipeIngredientsPanelIngredient,
   type RecipeIngredientsPanelProps,
-  type RecipeIngredientsPanelSubstitution,
   type RecipeIngredientsPanelView,
 } from "./RecipeIngredientsPanel.js";
 export {
   RecipeInstructionsPanel,
   type RecipeInstructionsPanelProps,
-  type RecipeInstructionsPanelStep,
 } from "./RecipeInstructionsPanel.js";
 export {
   RecipeOverviewPanel,
   type RecipeOverviewPanelProps,
-  type RecipeOverviewPanelTag,
 } from "./RecipeOverviewPanel.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./Toolbar.js";

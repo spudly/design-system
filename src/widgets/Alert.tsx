@@ -30,7 +30,7 @@ const severityStyles = {
   },
 } as const;
 
-export type AlertSeverity = keyof typeof severityStyles;
+type AlertSeverity = keyof typeof severityStyles;
 
 const StyledAlert = styled(YStack, {
   name: "Alert",
@@ -43,7 +43,7 @@ const StyledAlert = styled(YStack, {
 
 type StyledAlertProps = GetProps<typeof StyledAlert>;
 
-export type AlertAction = {
+type AlertAction = {
   label: string;
   onPress: () => void;
 };

@@ -25,7 +25,6 @@ test("RatingForm is exported from the views barrel; CookLogForm is gone", () => 
   const barrel = readFileSync("src/views/index.ts", "utf8");
   assert.match(barrel, /export \{[^}]*\bRatingForm\b[^}]*\} from "\.\/RatingForm\.js"/);
   assert.match(barrel, /type RatingFormProps/);
-  assert.match(barrel, /type RatingFormValues/);
   assert.doesNotMatch(barrel, /CookLogForm/);
   assert.equal(existsSync("src/widgets/CookLogForm.tsx"), false);
   assert.equal(existsSync("src/widgets/CookLogForm.stories.tsx"), false);
@@ -34,7 +33,7 @@ test("RatingForm is exported from the views barrel; CookLogForm is gone", () => 
 test("the submit view-model is generic: rating, not a domain field name", () => {
   assert.match(
     source,
-    /export type RatingFormValues = \{\n {2}rating: 1 \| 2 \| 3 \| 4 \| 5 \| null;/,
+    /type RatingFormValues = \{\n {2}rating: 1 \| 2 \| 3 \| 4 \| 5 \| null;/,
   );
   assert.match(source, /onSubmit: \(values: RatingFormValues\) => void/);
   assert.match(source, /onSubmit\(\{ rating, notes: notes\.trim\(\) \|\| null \}\)/);

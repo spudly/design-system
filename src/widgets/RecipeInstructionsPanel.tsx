@@ -28,7 +28,7 @@ import { TextSkeleton } from "./TextSkeleton.js";
  * content.
  */
 
-export type RecipeInstructionsPanelStep = {
+type RecipeInstructionsPanelStep = {
   id: string;
   stepNumber: number;
   body: string;

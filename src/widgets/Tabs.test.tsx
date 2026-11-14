@@ -119,7 +119,7 @@ describe("tabsIcon", () => {
   }
   const tabs = codeOf("src/widgets/Tabs.tsx");
   function typeBlock(source: string, name: string): string {
-    const match = new RegExp(`export type ${name} = \\{([\\s\\S]*?)\\n\\};`).exec(source);
+    const match = new RegExp(`type ${name} = \\{([\\s\\S]*?)\\n\\};`).exec(source);
     assert.ok(match, `${name} type block found`);
     return match[1]!;
   }
