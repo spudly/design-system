@@ -114,7 +114,9 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches }:
 // modal-layer registry Dialog/StepOverlay register in (#394),
 // linkOverlay.tsx is the native-only link layer other components
 // compose, labelRow.tsx is the shared label-row implementation
-// LabeledField / LabeledGroup compose, and PageFrame.tsx is
+// LabeledField / LabeledGroup compose, RowTextContent.tsx is the
+// shared row title/subtitle block CardRow / TextActionCardRow
+// compose (#587 phase 2), and PageFrame.tsx is
 // page-story scaffolding (the demo stories' phone-width frame,
 // relocated out of src/pages for #119) — none is a standalone
 // component with a story of its own, and none is exported from
@@ -133,6 +135,7 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "tagColors.ts",
   "linkOverlay.tsx",
   "labelRow.tsx",
+  "RowTextContent.tsx",
   "PageFrame.tsx",
 ]);
 

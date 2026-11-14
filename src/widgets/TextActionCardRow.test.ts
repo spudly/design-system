@@ -24,6 +24,14 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "../..", "src", "widgets", "TextActionCardRow.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+// Since #587 phase 2 the title/subtitle rendering lives in the
+// shared RowTextContent block both card rows compose; the
+// decorative-hiding pin below reads that source, and this row's
+// own pin holds that its native form renders the block decorative.
+const rowTextSource = readFileSync(join(here, "../..", "src", "widgets", "RowTextContent.tsx"), "utf8");
+const rowTextCode = rowTextSource
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("TextActionCardRow is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await import("../../dist/widgets/index.js");
@@ -61,7 +69,13 @@ test("web renders a real anchor carrying the link role and the title as its labe
 test("native renders decorative texts under a LinkOverlay with the composed label", () => {
   assert.match(
     code,
+    /<RowTextContent title=\{title\} subtitle=\{subtitle\} decorative \/>/,
+    "the native form renders its text block decorative",
+  );
+  assert.match(
+    rowTextCode,
     /importantForAccessibility=\{decorative \? "no-hide-descendants" : undefined\}/,
+    "the shared block hides its decorative texts from Android accessibility too",
   );
   assert.match(code, /accessibilityLabel=\{subtitle \? `\$\{title\}, \$\{subtitle\}` : title\}/);
   assert.match(code, /accessibilityRole="link"/);

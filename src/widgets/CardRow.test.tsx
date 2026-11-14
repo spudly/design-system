@@ -39,6 +39,14 @@ const cardRowSource = readFileSync(join(componentsDir, "CardRow.tsx"), "utf8");
 const cardRowCode = cardRowSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+// Since #587 phase 2 the title/subtitle rendering lives in the
+// shared RowTextContent block both card rows compose; the text
+// treatment pins below read that source, and CardRow's own pins
+// hold that it delegates to the block (plain and decorative).
+const rowTextSource = readFileSync(join(componentsDir, "RowTextContent.tsx"), "utf8");
+const rowTextCode = rowTextSource
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("CardRow is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
@@ -96,11 +104,16 @@ test("CardRow's keyboard activation ignores held-key repeats (#313)", () => {
 test("CardRow's title takes the md semibold treatment and the subtitle the hint variant", () => {
   assert.match(
     cardRowCode,
+    /<RowTextContent title=\{title\} subtitle=\{subtitle\} \/>/,
+    "CardRow renders its text block through the shared RowTextContent (#587 phase 2)",
+  );
+  assert.match(
+    rowTextCode,
     /fontSize=\{tokens\.typography\.fontSize\.md\}\s+fontWeight=\{tokens\.typography\.fontWeight\.semibold\}/,
   );
-  assert.match(cardRowCode, /\{subtitle \? \(/, "the subtitle renders only when provided");
+  assert.match(rowTextCode, /\{subtitle \? \(/, "the subtitle renders only when provided");
   assert.match(
-    cardRowCode,
+    rowTextCode,
     /<Text\s+variant="hint"\s+accessible=\{decorative \? false : undefined\}/,
     "the subtitle takes the hint variant and the decorative flag (the native link form hides it behind the overlay's composed label)",
   );
@@ -125,8 +138,13 @@ test("CardRow's link form renders an anchor on web and a LinkOverlay on native (
   );
   assert.match(
     cardRowCode,
+    /<RowTextContent title=\{title\} subtitle=\{subtitle\} decorative \/>/,
+    "the native link form renders its text block decorative",
+  );
+  assert.match(
+    rowTextCode,
     /accessible=\{decorative \? false : undefined\}/,
-    "the native link form marks its visible texts decorative",
+    "the shared block marks its visible texts decorative in that form",
   );
 });
 test("CardRow's action accessible name composes the label with the row title (#359)", () => {

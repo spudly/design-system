@@ -59,12 +59,14 @@ function count(code: string, literal: any) {
 // are ListRow's surface, already counted above). The recipe
 // list's rows are RecipesPage's page-local MediaRow
 // composition (Stephen's tranche rule, 2026-10-29), so its
-// surface is the page file itself.
+// surface is the page file itself. Since #587 phase 2 the two
+// card rows (CardRow, TextActionCardRow) render their texts
+// through the shared RowTextContent block, so their two
+// decorative texts are counted once, on that block's file.
 const FAMILY: [string, string, number][] = [
   ["src/widgets/OptionCard.tsx", "decorative", 3],
-  ["src/widgets/CardRow.tsx", "decorative", 2],
+  ["src/widgets/RowTextContent.tsx", "decorative", 2],
   ["src/widgets/ListRow.tsx", "decorative", 2],
-  ["src/widgets/TextActionCardRow.tsx", "decorative", 2],
   ["src/pages/RecipesPage.tsx", "native", 3],
 ];
 
