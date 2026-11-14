@@ -45,6 +45,9 @@
  *   stories.
  * - src/widgets/tagColors.ts — the shared tag-color resolver hook
  *   (#207); exercised through the Badge/ColorPickerField stories.
+ * - src/widgets/useVariantGlyphInk.ts — the shared variant glyph
+ *   ink hook (#587 phase 2); exercised through the Button/
+ *   DropdownButton stories.
  * - src/widgets/PageFrame.tsx — internal page-story scaffolding
  *   shared by the page stories; NOT exported from either barrel, so
  *   it is not part of the @spudly/ui surface. It is exercised through
@@ -116,7 +119,9 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches }:
 // compose, labelRow.tsx is the shared label-row implementation
 // LabeledField / LabeledGroup compose, RowTextContent.tsx is the
 // shared row title/subtitle block CardRow / TextActionCardRow
-// compose (#587 phase 2), and PageFrame.tsx is
+// compose (#587 phase 2), useVariantGlyphInk.ts is the shared
+// variant glyph ink hook Button / DropdownButton compose
+// (#587 phase 2), and PageFrame.tsx is
 // page-story scaffolding (the demo stories' phone-width frame,
 // relocated out of src/pages for #119) — none is a standalone
 // component with a story of its own, and none is exported from
@@ -136,6 +141,7 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "linkOverlay.tsx",
   "labelRow.tsx",
   "RowTextContent.tsx",
+  "useVariantGlyphInk.ts",
   "PageFrame.tsx",
 ]);
 

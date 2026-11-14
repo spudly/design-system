@@ -9,6 +9,7 @@ import { platformAccessibilityProps } from "./accessibility.js";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { SkeletonBone } from "./SkeletonClock.js";
 import { LINE_BOXES } from "./TextSkeleton.js";
+import { useVariantGlyphInk } from "./useVariantGlyphInk.js";
 
 /**
  * The button frame's styling: ONE config shared by the two frames
@@ -449,48 +450,6 @@ const ghostLabelFontSizes = {
 } as const;
 
 /**
- * The icon glyph's ink for a variant: the same colors
- * `variantLabelColors` gives the text label, resolved to concrete
- * values because react-native-svg cannot resolve Tamagui theme
- * variables — the theme roles (onPrimary, link) are read from the
- * active theme, following the tag-color resolver's pattern
- * (widgets/tagColors). The fallbacks are the base theme's values
- * for those roles.
- */
-function useGlyphInk(variant: string | undefined, ghost = false, dangerTone = false): string {
-  const theme = useTheme();
-  if (dangerTone) return tokens.colors.danger.danger8;
-  const roleValue = (key: string): string | undefined => {
-    const variable = theme[key];
-    return typeof variable?.val === "string" ? variable.val : undefined;
-  };
-  // The ghost prop's glyph ink follows `ghostLabelColors`: the
-  // variant's own ink, resolved like the label colors above.
-  if (ghost) {
-    switch (variant) {
-      case "secondary":
-        return tokens.colors.gray.gray10;
-      case "danger":
-        return tokens.colors.danger.danger7;
-      case "primary":
-      default:
-        return roleValue("primary") ?? tokens.colors.primary.primary7;
-    }
-  }
-  switch (variant) {
-    case "secondary":
-      return tokens.colors.gray.gray10;
-    case "ghost":
-      return roleValue("link") ?? tokens.colors.primary.primary8;
-    case "danger":
-      return "#ffffff";
-    case "primary":
-    default:
-      return roleValue("onPrimary") ?? "#ffffff";
-  }
-}
-
-/**
  * Universal cross-platform button (web + React Native via Tamagui).
  *
  * Props: `variant` ("primary" | "secondary" | "danger" — the
@@ -667,7 +626,7 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
           : ghostInkApplies
             ? ghostLabelColors[variant as keyof typeof ghostLabelColors]
             : variantLabelColors[variant as keyof typeof variantLabelColors]));
-  const variantGlyphInk = useGlyphInk(
+  const variantGlyphInk = useVariantGlyphInk(
     selected ? "primary" : typeof variant === "string" ? variant : undefined,
     ghostInkApplies,
     dangerToneApplies,

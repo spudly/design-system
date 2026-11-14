@@ -1,10 +1,11 @@
 import { forwardRef } from "react";
 import type { ComponentProps, ReactElement } from "react";
-import { useTheme, type TamaguiElement } from "tamagui";
+import type { TamaguiElement } from "tamagui";
 import { CollapsibleIcon } from "../icons/CollapsibleIcon.js";
 import type { IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
 import { Button } from "./Button.js";
+import { useVariantGlyphInk } from "./useVariantGlyphInk.js";
 import { farCornerTouches, touchingCornerRadii, useDropdownContext } from "./Dropdown.js";
 
 type DropdownButtonCommonProps = {
@@ -70,45 +71,6 @@ const glyphSizes = {
 } as const;
 
 /**
- * The chevron's ink per variant: the color Button gives the variant's
- * label, resolved the same way Button resolves its icon slot's ink
- * (theme roles read from the active theme, the fixed ramps read
- * directly), because react-native-svg cannot resolve Tamagui theme
- * variables.
- */
-function useChevronInk(variant: string, ghost = false): string {
-  const theme = useTheme();
-  const roleValue = (key: string): string | undefined => {
-    const variable = theme[key];
-    return typeof variable?.val === "string" ? variable.val : undefined;
-  };
-  // The ghost prop's chevron ink follows Button's ghost ink map
-  // (#463): the variant's own ink.
-  if (ghost) {
-    switch (variant) {
-      case "secondary":
-        return tokens.colors.gray.gray10;
-      case "danger":
-        return tokens.colors.danger.danger7;
-      case "primary":
-      default:
-        return roleValue("primary") ?? tokens.colors.primary.primary7;
-    }
-  }
-  switch (variant) {
-    case "secondary":
-      return tokens.colors.gray.gray10;
-    case "ghost":
-      return roleValue("link") ?? tokens.colors.primary.primary8;
-    case "danger":
-      return "#ffffff";
-    case "primary":
-    default:
-      return roleValue("onPrimary") ?? "#ffffff";
-  }
-}
-
-/**
  * The props-described dropdown trigger (spudly/design-system#178,
  * decisions 1–2): the DS renders it — a Button with an optional
  * leading icon, the label, and the disclosure chevron
@@ -146,7 +108,7 @@ export const DropdownButton = forwardRef<
 ) {
   const context = useDropdownContext();
   const open = context?.open ?? false;
-  const chevronInk = useChevronInk(variant, ghost);
+  const chevronInk = useVariantGlyphInk(variant, ghost);
   const glyphSize = glyphSizes[size];
 
   // The connected surface (#474): while open, the trigger squares
