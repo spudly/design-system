@@ -61,7 +61,7 @@ test("store and social entries are real links with accessible names", () => {
   assert.match(bigFooter, /icon: BigFooterSocialIcon/);
 });
 test("the mobile stack breakpoint is named and the shell is sticky in flow", () => {
-  assert.match(bigFooter, /export const BIG_FOOTER_STACK_BREAKPOINT = 640;/);
+  assert.match(bigFooter, /const BIG_FOOTER_STACK_BREAKPOINT = 640;/);
   assert.match(bigFooter, /flexBasis=\{BIG_FOOTER_COLUMN_BASIS\}/);
   assert.match(bigFooter, /flexWrap="wrap"/);
   // Page-scroll model (#547): the web shell is a flex column with

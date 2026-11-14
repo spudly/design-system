@@ -206,7 +206,7 @@ export function SkeletonClock({ children, frozen = false }: SkeletonClockProps) 
  * shared default clock). Internal: the primitives consume it; it
  * is not part of the package's public surface.
  */
-export function useSkeletonOpacity(): number {
+function useSkeletonOpacity(): number {
   const store = useContext(SkeletonClockContext) ?? getDefaultStore();
   return useSyncExternalStore(store.subscribe, store.getOpacity, store.getServerOpacity);
 }
