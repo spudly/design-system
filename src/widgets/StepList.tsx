@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
 
-export type StepListStep = {
+type StepListStep = {
   /** Stable key for the step. */
   id: string;
   /** The step's eyebrow label, pre-composed by the caller (e.g. "Step 3"). */

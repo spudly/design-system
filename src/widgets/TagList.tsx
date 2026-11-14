@@ -14,7 +14,7 @@ const StyledTagRow = styled(XStack, {
   alignItems: "flex-start",
 });
 
-export type TagListTag = {
+type TagListTag = {
   /** Stable key for the tag. */
   id: string;
   /** The tag's label. */

@@ -8,7 +8,7 @@ import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 import { useVoice } from "../voice/index.js";
 
-export type CheckboxSelectItem = {
+type CheckboxSelectItem = {
   id: string;
   label: string;
 };

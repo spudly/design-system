@@ -5,7 +5,7 @@ import { Button } from "./Button.js";
 import { Alert } from "./Alert.js";
 import { useVoice } from "../voice/index.js";
 
-export type FixedActionBannerAction = {
+type FixedActionBannerAction = {
   label: string;
   onPress: () => void;
 };
