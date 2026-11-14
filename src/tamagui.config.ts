@@ -183,13 +183,13 @@ type BrandFontFamily = {
 };
 
 /** Platforms whose font resolution differs. */
-export type FontPlatform = "web" | "ios" | "android";
+type FontPlatform = "web" | "ios" | "android";
 
 /** The platform this build targets, for font resolution. Any native target other than Android takes the iOS (named-family) path, as all native did before the Android split. */
 const fontPlatform: FontPlatform = isWeb ? "web" : isAndroid ? "android" : "ios";
 
 /** A resolved font registration: the family plus optional per-weight faces. */
-export type ResolvedFont = {
+type ResolvedFont = {
   family: string;
   face?: Record<string, { normal: string }> | undefined;
 };

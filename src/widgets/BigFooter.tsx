@@ -385,7 +385,7 @@ export function BigFooter({ footer }: BigFooterProps) {
  * changes the web layout. It is a semantic scroll-ownership
  * prop, not a styling prop.
  */
-export type BigFooterShellScrollMode = "shell" | "content" | "nested";
+type BigFooterShellScrollMode = "shell" | "content" | "nested";
 
 export type BigFooterShellProps = {
   /** The page's footer data, when its host supplied any. */
