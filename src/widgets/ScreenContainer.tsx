@@ -1,4 +1,4 @@
-import { YStack, styled } from "tamagui";
+import { YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
@@ -20,7 +20,9 @@ const StyledContent = styled(YStack, {
         paddingTop: tokens.spacing[8],
       },
       // Flush: no container padding — callers manage their own, e.g. a
-      // FlatList with its own content padding.
+      // FlatList with its own content padding. On native the variant
+      // also flexes within the shell frame — see listFlexProps in the
+      // component below (eciperay #526).
       list: {
         paddingHorizontal: 0,
         paddingVertical: 0,
@@ -92,6 +94,25 @@ export type ScreenContainerProps = StyledContentProps & {
  * inside the shell's bounded region — is removed, along with
  * every call site that passed it.
  */
+/**
+ * The list variant's bounded-region flex on native (eciperay #526):
+ * the variant exists to host a self-bounding list (BoundedList's
+ * `flex: 1` FlatList) inside BigFooterShell's frame, and the frame
+ * bounds this container only if the container itself flexes. Without
+ * it the container sizes to content, and a `flex: 1` list inside an
+ * auto-height column computes to height 0 in Yoga — the page renders
+ * its chrome with a completely empty body (no filter bar, no rows,
+ * no loading state). That is the regression @spudly/ui 9.2.0 shipped
+ * when #547 dropped this component's pre-#547 base `flex: 1` /
+ * `minHeight: "100%"`. The flex is native-only, applied as a prop
+ * rather than in the styled variant, for the reason ScreenShell's
+ * platform split documents: on web `flex: 1`'s zero basis collapses
+ * a column inside BigFooterShell's unbounded space-between shell,
+ * and the list variant's web content must keep flowing in the
+ * document. Web therefore gets no flex prop at all.
+ */
+const listFlexProps = { flex: 1 } as const;
+
 export function ScreenContainer({ children, gap, ...rest }: ScreenContainerProps) {
   return (
     // The gap override is spread only when the caller actually passed
@@ -102,7 +123,11 @@ export function ScreenContainer({ children, gap, ...rest }: ScreenContainerProps
     // Native ignored the undefined and kept the static gap, which is
     // why only web lost the shell's section separation. The
     // conditional spread is the PageFrame idiom for the same hazard.
-    <StyledContent {...(gap !== undefined ? { gap } : null)} {...rest}>
+    <StyledContent
+      {...(gap !== undefined ? { gap } : null)}
+      {...(rest.variant === "list" && !isWeb ? listFlexProps : null)}
+      {...rest}
+    >
       {rest.variant === "auth" ? (
         <StyledAuthContent gap={gap ?? tokens.spacing[4]}>{children}</StyledAuthContent>
       ) : (
