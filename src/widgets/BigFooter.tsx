@@ -172,7 +172,7 @@ export type BigFooterProps = {
  * precedent): the geometry holds on both targets as written.
  */
 export const BIG_FOOTER_STACK_BREAKPOINT = 640;
-export const BIG_FOOTER_COLUMN_BASIS = 300;
+const BIG_FOOTER_COLUMN_BASIS = 300;
 
 /**
  * The DS-owned height of the brand logo box (#468): a supplied

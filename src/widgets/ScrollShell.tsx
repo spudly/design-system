@@ -42,7 +42,7 @@ export type ScrollShellProps = {
  * not the shell's: BigFooterShell renders it outside this
  * column, uncapped.
  */
-export const SCROLL_SHELL_COLUMN_MAX_WIDTH = 768;
+const SCROLL_SHELL_COLUMN_MAX_WIDTH = 768;
 
 export function ScrollShell({ children }: ScrollShellProps) {
   return (

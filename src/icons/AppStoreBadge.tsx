@@ -26,8 +26,8 @@ import { Path, Rect, Svg, Text } from "react-native-svg";
  */
 
 /** The badge's fixed size: Apple's required minimum, 120x40. */
-export const APP_STORE_BADGE_WIDTH = 120;
-export const APP_STORE_BADGE_HEIGHT = 40;
+const APP_STORE_BADGE_WIDTH = 120;
+const APP_STORE_BADGE_HEIGHT = 40;
 
 /**
  * The Apple logo glyph path (the widely published Apple logo
