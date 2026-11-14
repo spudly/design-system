@@ -228,6 +228,7 @@ function toFaces(
  * declares no native names gets the generic "sans-serif" on either
  * native platform. Pure and platform-parameterized so the choice is
  * testable without a native runtime.
+  * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export function resolveFontFamily(
   fontFamily: BrandFontFamily,

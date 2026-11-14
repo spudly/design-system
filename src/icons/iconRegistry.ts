@@ -38,6 +38,7 @@ import { WarningIcon } from "./WarningIcon.js";
  * subpath (add, feedback, home, meals, profile, recipes, shared,
  * tags, warning), plus "print" and "share" for RecipeDetailPage's
  * Print / Share actions, the icon slot's original call sites (#187).
+  * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export const iconNames = [
   "add",

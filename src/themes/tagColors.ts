@@ -53,6 +53,7 @@ export type TagColorName = (typeof tagColorNames)[number];
  * The fallback tag color: a stored value that is not one of the
  * twelve palette hexes converts to this name at the
  * `tagColorNameForHex` boundary instead of passing through.
+  * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export const defaultTagColorName: TagColorName = "gray";
 

@@ -150,6 +150,9 @@ function presentationPath(layer: ModalLayer): number[] {
 // active and every containment stands down. The path order
 // is a total order, so exactly one layer is active whenever
 // any layer is registered.
+/**
+ * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
+ */
 export function isAboveModalLayer(a: ModalLayer, b: ModalLayer): boolean {
   if (a === b) {
     return false;
