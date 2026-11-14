@@ -178,7 +178,10 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
 test("every view component has a story file titled Views/<Name>", () => {
   const dir = join(root, "src", "views");
   const index = read("src/views/index.ts");
-  const exceptions = new Set(["index.ts"]);
+  // useImeCompositionGuard.ts is an internal hook (the shared IME
+  // composition guard TextField/SearchField compose, #587 phase 2),
+  // not a view component — no story of its own.
+  const exceptions = new Set(["index.ts", "useImeCompositionGuard.ts"]);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),

@@ -69,27 +69,30 @@ for (const { name, fields } of AUTH_FORMS) {
 
 test("TextField: submit-editing is held while an IME composition is active (web)", () => {
   const source = readFileSync("src/views/TextField.tsx", "utf8");
+  // The guard internals live in the shared hook since the #587
+  // phase-2 dedupe; TextField.tsx only wires its handlers in.
+  const guard = readFileSync("src/views/useImeCompositionGuard.ts", "utf8");
   // Composition is tracked on the field itself (web only —
   // Tamagui's Enter handler fires onSubmitEditing without a
   // composition check, so the guard must live in the shared
   // field every auth form renders).
   assert.match(
-    source,
+    guard,
     /const composingRef = useRef\(false\);/,
     "TextField tracks composition state",
   );
   assert.match(
-    source,
+    guard,
     /composingRef\.current = true;[\s\S]*?onCompositionStart\?\.\(event\);/,
     "composition start sets the flag and chains the caller's handler",
   );
   assert.match(
-    source,
+    guard,
     /composingRef\.current = false;\s*compositionEndedAtRef\.current = performance\.now\(\);[\s\S]*?onCompositionEnd\?\.\(event\);/,
     "composition end clears the flag, stamps the end time, and chains the caller's handler",
   );
   assert.match(
-    source,
+    guard,
     /if \(\s*isWeb &&\s*\(composingRef\.current \|\|\s*performance\.now\(\) - compositionEndedAtRef\.current < 100\)\s*\) \{\s*return;\s*\}\s*onSubmitEditing\?\.\(event\);/,
     "submit-editing is held while composing on web — and for the grace window after composition ends (Safari fires compositionend before the confirming Enter keydown) — and otherwise fires",
   );
