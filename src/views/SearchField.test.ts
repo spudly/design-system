@@ -41,6 +41,9 @@ function readCode(rel: string) {
 }
 
 const searchField = readCode("src/views/SearchField.tsx");
+// The guard itself lives in the shared hook since the #587
+// phase-2 dedupe; the field files only wire its handlers in.
+const guard = readCode("src/views/useImeCompositionGuard.ts");
 
 test("SearchField destructures the submit/composition handlers out of rest (#562)", () => {
   assert.match(searchField, /\n {4}onSubmitEditing,/);
@@ -51,14 +54,14 @@ test("SearchField destructures the submit/composition handlers out of rest (#562
 });
 
 test("SearchField tracks composition state with a monotonic grace window (#562)", () => {
-  assert.match(searchField, /composingRef = useRef\(false\)/);
+  assert.match(guard, /composingRef = useRef\(false\)/);
   assert.match(
-    searchField,
+    guard,
     /compositionEndedAtRef = useRef\(Number\.NEGATIVE_INFINITY\)/,
     "the grace clock must start at -Infinity so early submits are not held",
   );
   assert.match(
-    searchField,
+    guard,
     /compositionEndedAtRef\.current = performance\.now\(\)/,
     "composition end stamps the monotonic clock",
   );
@@ -66,20 +69,20 @@ test("SearchField tracks composition state with a monotonic grace window (#562)"
 
 test("the submit wrapper suppresses only while composing or inside the grace window (#562)", () => {
   assert.match(
-    searchField,
+    guard,
     /isWeb &&\s*\(composingRef\.current \|\| performance\.now\(\) - compositionEndedAtRef\.current < 100\)/,
     "web-only suppression: composing flag OR <100 ms since compositionend",
   );
   assert.match(
-    searchField,
+    guard,
     /onSubmitEditing\?\.\(event\)/,
     "an ordinary Enter (no composition, outside the window) still reaches the caller",
   );
 });
 
 test("the caller's composition handlers are always invoked (#562)", () => {
-  assert.match(searchField, /onCompositionStart\?\.\(event\)/);
-  assert.match(searchField, /onCompositionEnd\?\.\(event\)/);
+  assert.match(guard, /onCompositionStart\?\.\(event\)/);
+  assert.match(guard, /onCompositionEnd\?\.\(event\)/);
 });
 
 test("the guarded handlers are wired onto the inner input (#562)", () => {
@@ -102,5 +105,13 @@ test("the guarded handlers are wired onto the inner input (#562)", () => {
     searchField,
     /\.\.\.\(onCompositionEnd \? \{ onCompositionEnd \} : \{\}\)/,
     "on native the caller's composition handlers forward unchanged",
+  );
+});
+
+test("SearchField passes its callbacks to the shared guard hook and binds the returned handlers (#587)", () => {
+  assert.match(
+    searchField,
+    /const \{ handleCompositionStart, handleCompositionEnd, handleSubmitEditing \} =\s*useImeCompositionGuard\(\{ onCompositionStart, onCompositionEnd, onSubmitEditing \}\);/,
+    "the field's own callbacks go into the hook and the guarded handlers come back out",
   );
 });
