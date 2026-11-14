@@ -113,9 +113,13 @@ test("dark decorative overlays never intercept presses (#450)", () => {
   // form-wide layer sits over the star row and swallows mouse/touch
   // presses (keyboard worked, mouse did not). Every such layer must be
   // press-transparent.
+  // The tint layer lives once in the shared DarkTintOverlay (#587 phase 2)
+  // and is rendered at the form, notes-field and skip-action sites.
   const overlays = source.match(/position="absolute"[\s\S]*?\/>/g) ?? [];
-  assert.equal(overlays.length, 3, "form, notes-field and skip-action tint layers");
+  assert.equal(overlays.length, 1, "the one shared DarkTintOverlay definition");
   for (const overlay of overlays) {
     assert.match(overlay, /pointerEvents="none"/);
   }
+  const sites = source.match(/<DarkTintOverlay \/>/g) ?? [];
+  assert.equal(sites.length, 3, "form, notes-field and skip-action tint layers");
 });
