@@ -93,10 +93,10 @@ jobs:
           DSVR_ENFORCE_BASELINE_GATE: ${{ github.event_name == 'pull_request' && startsWith(github.head_ref, 'changeset-release/') }}
 
   knip:
-    # Warn mode (design-system #586, Phase 1): reports dead-code findings
-    # to the job summary and never fails. Deliberately NOT in ci-gate's
-    # needs, so it cannot block a merge; Phase 3 (its own PR) removes the
-    # warn masking once the Phase 2 burn-down lands.
+    # Enforce mode (design-system #586, Phase 3): the Phase 2 burn-down
+    # reached a verified-zero baseline (tranche 16), so knip now runs
+    # unmasked and is wired into ci-gate's needs — a dead-code finding
+    # fails the gate and blocks merge.
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -112,14 +112,16 @@ jobs:
       - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
-      - name: knip — dead-code baseline (warn mode)
-        run: |
-          {
-            echo "## knip baseline — dead-code detection (warn mode, #586 Phase 1)"
-            echo '```'
-            npm run knip 2>&1 || true
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+      # apps/storybook is a standalone workspace (own lockfile, not a root
+      # workspace member): knip loads its metro.config.js, which requires
+      # expo/metro-config — without this install knip errors out (exit 2)
+      # even on a zero-finding tree.
+      - name: Install storybook host deps (for knip config loading)
+        run: npm ci --prefix apps/storybook
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
+      - name: knip — dead-code detection (enforce mode)
+        run: npm run knip
 
   # Copy-paste detection (#587, Phase 1 — warn mode only): reports
   # duplication in the job summary but can never block a PR. The
@@ -169,7 +171,7 @@ jobs:
   # all (see the PR description).
   ci-gate:
     name: ci-gate
-    needs: [ci]
+    needs: [ci, knip]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
