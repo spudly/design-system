@@ -184,7 +184,10 @@ test("every view component has a story file titled Views/<Name>", () => {
   // useImeCompositionGuard.ts is an internal hook (the shared IME
   // composition guard TextField/SearchField compose, #587 phase 2),
   // not a view component — no story of its own.
-  const exceptions = new Set(["index.ts", "useImeCompositionGuard.ts"]);
+  // LabeledListSection.tsx is likewise an internal helper (the
+  // labeled-list chrome the two recipe list views compose, #587
+  // phase 2), not a view component — no story of its own.
+  const exceptions = new Set(["index.ts", "useImeCompositionGuard.ts", "LabeledListSection.tsx"]);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),

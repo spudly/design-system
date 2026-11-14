@@ -1,12 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
-import { Button } from "../widgets/Button.js";
-import { LabeledGroup } from "../widgets/LabeledGroup.js";
-import { Text } from "../widgets/Text.js";
-import {
-  RecipeInstructionRowView,
-  type RecipeInstructionRow,
-} from "./RecipeInstructionRowView.js";
+import { LabeledListSection } from "./LabeledListSection.js";
+import { RecipeInstructionRowView, type RecipeInstructionRow } from "./RecipeInstructionRowView.js";
 import { useVoice } from "../voice/index.js";
 
 export type { RecipeInstructionRow };
@@ -76,37 +70,24 @@ export function RecipeInstructionListView({
   const emptyMessage = emptyMessageProp ?? voice.recipeInstructionListView.emptyMessage;
   const addLabel = addLabelProp ?? voice.recipeInstructionListView.addLabel;
   return (
-    <LabeledGroup
+    <LabeledListSection
       label={label}
-      action={
-        onAdd ? (
-          <Button
-            ghost
-            size="sm"
-            accessibilityLabel={voice.recipeInstructionListView.addInstructionLabel}
-            onPress={onAdd}
-          >
-            {addLabel}
-          </Button>
-        ) : null
-      }
+      addLabel={addLabel}
+      addAccessibilityLabel={voice.recipeInstructionListView.addInstructionLabel}
+      emptyMessage={emptyMessage}
+      isEmpty={rows.length === 0}
+      {...(onAdd ? { onAdd } : {})}
     >
-      {rows.length === 0 ? (
-        <Text variant="muted">{emptyMessage}</Text>
-      ) : (
-        <YStack gap="$2">
-          {rows.map((row, index) => (
-            <RecipeInstructionRowView
-              key={row.key}
-              row={row}
-              index={index}
-              {...(renderDragHandle ? { dragHandle: renderDragHandle(row, index) } : {})}
-              {...(onBodyChange ? { onBodyChange } : {})}
-              {...(onRemove ? { onRemove } : {})}
-            />
-          ))}
-        </YStack>
-      )}
-    </LabeledGroup>
+      {rows.map((row, index) => (
+        <RecipeInstructionRowView
+          key={row.key}
+          row={row}
+          index={index}
+          {...(renderDragHandle ? { dragHandle: renderDragHandle(row, index) } : {})}
+          {...(onBodyChange ? { onBodyChange } : {})}
+          {...(onRemove ? { onRemove } : {})}
+        />
+      ))}
+    </LabeledListSection>
   );
 }

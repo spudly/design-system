@@ -1,8 +1,5 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
-import { Button } from "../widgets/Button.js";
-import { LabeledGroup } from "../widgets/LabeledGroup.js";
-import { Text } from "../widgets/Text.js";
+import { LabeledListSection } from "./LabeledListSection.js";
 import {
   RecipeIngredientRowView,
   type RecipeIngredientField,
@@ -76,37 +73,24 @@ export function RecipeIngredientListView({
   const emptyMessage = emptyMessageProp ?? voice.recipeIngredientListView.emptyMessage;
   const addLabel = addLabelProp ?? voice.recipeIngredientListView.addLabel;
   return (
-    <LabeledGroup
+    <LabeledListSection
       label={label}
-      action={
-        onAdd ? (
-          <Button
-            ghost
-            size="sm"
-            accessibilityLabel={voice.recipeIngredientListView.addIngredientLabel}
-            onPress={onAdd}
-          >
-            {addLabel}
-          </Button>
-        ) : null
-      }
+      addLabel={addLabel}
+      addAccessibilityLabel={voice.recipeIngredientListView.addIngredientLabel}
+      emptyMessage={emptyMessage}
+      isEmpty={rows.length === 0}
+      {...(onAdd ? { onAdd } : {})}
     >
-      {rows.length === 0 ? (
-        <Text variant="muted">{emptyMessage}</Text>
-      ) : (
-        <YStack gap="$2">
-          {rows.map((row, index) => (
-            <RecipeIngredientRowView
-              key={row.key}
-              row={row}
-              index={index}
-              {...(renderDragHandle ? { dragHandle: renderDragHandle(row, index) } : {})}
-              {...(onFieldChange ? { onFieldChange } : {})}
-              {...(onRemove ? { onRemove } : {})}
-            />
-          ))}
-        </YStack>
-      )}
-    </LabeledGroup>
+      {rows.map((row, index) => (
+        <RecipeIngredientRowView
+          key={row.key}
+          row={row}
+          index={index}
+          {...(renderDragHandle ? { dragHandle: renderDragHandle(row, index) } : {})}
+          {...(onFieldChange ? { onFieldChange } : {})}
+          {...(onRemove ? { onRemove } : {})}
+        />
+      ))}
+    </LabeledListSection>
   );
 }
