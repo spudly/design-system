@@ -1,1 +1,1 @@
-{ "*.{ts,tsx}": ["node tools/precommitAffectedTests.mjs"] }
+{ "*.{ts,tsx}": ["npm run precommit:affected-tests"] }

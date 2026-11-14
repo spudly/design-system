@@ -80,6 +80,7 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_READ_TOKEN }}
       - run: npm run typecheck
       - run: npm run lint
+      - run: npm run workflows:lint
       - run: npm run build
       - run: npm test
         env:
