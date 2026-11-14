@@ -52,6 +52,20 @@ function readCode(rel: string) {
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
+test("the list variant flexes on native so it bounds its list within the shell frame (eciperay #526)", () => {
+  const code = readCode("src/widgets/ScreenContainer.tsx");
+  assert.match(
+    code,
+    /const listFlexProps = \{ flex: 1 \} as const;/,
+    "the list variant's bounded-region flex must be flex: 1 — without it the container sizes to content and a flex: 1 FlatList inside it computes to height 0 in Yoga, rendering the native page body empty (the @spudly/ui 9.2.0 regression)",
+  );
+  assert.match(
+    code,
+    /\{\.\.\.\(rest\.variant === "list" && !isWeb \? listFlexProps : null\)\}/,
+    "the flex must be applied only for the list variant and only on native: on web flex: 1's zero basis collapses a column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry)",
+  );
+});
+
 test("the caller's gap is spread into StyledContent only when actually passed (#299)", () => {
   const code = readCode("src/widgets/ScreenContainer.tsx");
   assert.ok(
@@ -122,6 +136,32 @@ async function renderShell(props: any) {
     </ScreenContainer>,
   );
 }
+/** The flex declaration (e.g. "1 0px") the named element's classes generate, or null. */
+function renderedFlex(html: string, elementName: any) {
+  const element = html.match(new RegExp(`<div name="${elementName}" class="([^"]*)"`));
+  assert.ok(element, `expected a rendered element named ${elementName} in: ${html.slice(-600)}`);
+  for (const className of element[1].split(/\s+/)) {
+    // Tamagui emits one rule block per declaration group under the
+    // same class, so scan every block for this class, not just the
+    // first (declarationsFor returns the first block only).
+    const blocks = html.match(new RegExp(String.raw`\.${className}\{[^}]*\}`, "g")) ?? [];
+    for (const block of blocks) {
+      const flex = block.match(/\{flex:([^;}]+)/);
+      if (flex) return flex[1];
+    }
+  }
+  return null;
+}
+test("SSR: the list variant's column carries NO flex on web (eciperay #526)", async () => {
+  const html = await renderShell({
+    variant: "list",
+  });
+  assert.equal(
+    renderedFlex(html, "ScreenContainer"),
+    null,
+    "on web the list variant must not generate a flex rule — flex: 1's zero basis collapses the column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry); the bounding flex is native-only",
+  );
+});
 test("SSR: the shell's column carries the 16px gap with no caller gap (#299, #547)", async () => {
   const html = await renderShell(null);
   assert.equal(renderedGap(html, "ScreenContainer"), "16px");
