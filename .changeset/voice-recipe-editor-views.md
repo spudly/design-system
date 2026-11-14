@@ -1,5 +1,0 @@
----
-"@spudly/ui": major
----
-
-The recipe-editor view literals move to the app-supplied voice object, as tranche 2a of the voice-as-theme system (#539): RecipeImageView's section-label and empty-message defaults, preview name, and Browse / Uploading / Take photo / Generate / Generating / Remove action text; RecipeIngredientListView's and RecipeInstructionListView's section-label, empty-message, and add-action defaults and names; and the rows' position-built names — RecipeIngredientRowView's quantity / unit / name field names, field placeholders, and Remove name, and RecipeInstructionRowView's step name and Remove-step name. Apps must supply the new recipeImageView, recipeIngredientListView, recipeIngredientRowView, recipeInstructionListView, and recipeInstructionRowView voice slots through VoiceProvider; Storybook's fixture voice carries the same strings these views previously hard-coded, so rendered output is unchanged. ScaledIngredientsView is unchanged: its heading and lines were already caller-composed.
