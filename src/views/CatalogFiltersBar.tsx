@@ -38,7 +38,7 @@ import { TextField } from "./TextField.js";
  * options. Removal (and the uncontrolled seed) keys off
  * `defaultValue`: the filter starts added iff its value differs
  * from the default, and removal resets it to the default. */
-export type CatalogSelectFilter<FilterId extends string = string> = {
+type CatalogSelectFilter<FilterId extends string = string> = {
   kind: "select";
   id: FilterId;
   label: string;
@@ -50,7 +50,7 @@ export type CatalogSelectFilter<FilterId extends string = string> = {
 
 /** A free-text filter: a TextField. Defaults work like the
  * select's. */
-export type CatalogTextFilter<FilterId extends string = string> = {
+type CatalogTextFilter<FilterId extends string = string> = {
   kind: "text";
   id: FilterId;
   label: string;
@@ -64,7 +64,7 @@ export type CatalogTextFilter<FilterId extends string = string> = {
  * remove together (one filter, #96). The range's default is
  * empty on both ends: it starts added iff either end is set,
  * and removal clears both. */
-export type CatalogRangeFilter<FilterId extends string = string> = {
+type CatalogRangeFilter<FilterId extends string = string> = {
   kind: "range";
   id: FilterId;
   label: string;
@@ -79,7 +79,7 @@ export type CatalogRangeFilter<FilterId extends string = string> = {
 /** The sort filter: the Sort-by and Order SelectFields as one
  * filter (#96). Starts added iff either value differs from its
  * default; removal resets both. */
-export type CatalogSortFilter<FilterId extends string = string> = {
+type CatalogSortFilter<FilterId extends string = string> = {
   kind: "sort";
   id: FilterId;
   label: string;

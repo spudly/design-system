@@ -4,7 +4,7 @@ import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { useVoice } from "../voice/index.js";
 
-export type InstallBannerViewLink = {
+type InstallBannerViewLink = {
   label: string;
   /** The store destination (#248: an href, not a callback). */
   href: string;

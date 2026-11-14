@@ -34,7 +34,7 @@ import { useVoice } from "../voice/index.js";
  * made here.
  */
 
-export type AccessTokensPanelToken = {
+type AccessTokensPanelToken = {
   id: string;
   name: string;
   /** The token's non-secret prefix (rendered mono, with an ellipsis). */
