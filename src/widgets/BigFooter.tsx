@@ -171,7 +171,7 @@ export type BigFooterProps = {
  * config defines no width breakpoints (the LandingPage
  * precedent): the geometry holds on both targets as written.
  */
-export const BIG_FOOTER_STACK_BREAKPOINT = 640;
+const BIG_FOOTER_STACK_BREAKPOINT = 640;
 const BIG_FOOTER_COLUMN_BASIS = 300;
 
 /**
