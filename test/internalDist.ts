@@ -22,12 +22,13 @@
  * the build output is missing.
  */
 export async function loadInternalDist(): Promise<Record<string, any>> {
-  const [components, views, themes, tokens, config] = await Promise.all([
+  const [components, views, themes, tagColors, tokens, config] = await Promise.all([
     import("../dist/widgets/index.js"),
     import("../dist/views/index.js"),
     import("../dist/themes/index.js"),
+    import("../dist/themes/tagColors.js"),
     import("../dist/tokens/index.js"),
     import("../dist/tamagui.config.js"),
   ]);
-  return { ...tokens, ...themes, ...config, ...views, ...components };
+  return { ...tokens, ...themes, ...tagColors, ...config, ...views, ...components };
 }

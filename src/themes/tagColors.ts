@@ -100,11 +100,6 @@ export const quietDawnTagColors: TagColorValues = {
   gray: "#6e7a80",
 };
 
-/** Whether a value is one of the twelve tag color names. */
-export function isTagColorName(value: string): value is TagColorName {
-  return (tagColorNames as readonly string[]).includes(value);
-}
-
 /**
  * The token name for a stored legacy palette hex — the single
  * conversion boundary between stored tag data and the typed
