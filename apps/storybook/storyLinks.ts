@@ -54,6 +54,7 @@ const SCHEME_PATTERN = /^[a-zA-Z][a-zA-Z0-9+.-]*:/;
  * should actually open: scheme-bearing URLs unchanged, app-style
  * paths routed to the host's browse URL with the original path
  * preserved as a query parameter.
+  * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export function resolveStoryLink(url: string, browseUrl: string): string {
   if (SCHEME_PATTERN.test(url)) return url;

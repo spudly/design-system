@@ -49,6 +49,7 @@ export type MasonryColumnCountOptions = {
  * This is the dynamic column detection the shuoink/ui original never
  * finished (it hard-coded 3 columns behind a TODO); it is exported
  * so hosts and tests can reason about the layout without rendering.
+  * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export function masonryColumnCount(
   containerWidth: number,
@@ -73,6 +74,7 @@ export function masonryColumnCount(
  * staggered heights — the masonry look. The result never contains an
  * empty column: fewer items than columns yields one column per item,
  * and no items yields no columns.
+  * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export function distributeMasonryItems<Item>(
   items: readonly Item[],
