@@ -2,7 +2,7 @@ import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
-export type SuggestionPanelEntry = {
+type SuggestionPanelEntry = {
   /** Stable key for the entry. */
   id: string;
   /** The entry's name (e.g. the item a suggestion replaces). */

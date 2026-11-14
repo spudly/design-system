@@ -17,7 +17,6 @@ export { Button, type ButtonProps } from "./Button.js";
 export { Card, type CardProps } from "./Card.js";
 export {
   CheckboxSelectList,
-  type CheckboxSelectItem,
   type CheckboxSelectListProps,
 } from "./CheckboxSelectList.js";
 export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
@@ -40,7 +39,6 @@ export { DropdownButton, type DropdownButtonProps } from "./DropdownButton.js";
 export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export {
   FixedActionBanner,
-  type FixedActionBannerAction,
   type FixedActionBannerProps,
 } from "./FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
@@ -118,20 +116,19 @@ export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
 export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./SessionShell.js";
 export { StatusMessage, type StatusMessageProps } from "./StatusMessage.js";
-export { StepList, type StepListProps, type StepListStep } from "./StepList.js";
+export { StepList, type StepListProps } from "./StepList.js";
 export {
   SuggestionPanel,
-  type SuggestionPanelEntry,
   type SuggestionPanelProps,
 } from "./SuggestionPanel.js";
-export { TagList, type TagListProps, type TagListTag } from "./TagList.js";
+export { TagList, type TagListProps } from "./TagList.js";
 export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCardRow.js";
 
 // The #119 extraction set: the components the tranche PRs
 // inventoried as extraction-required during their adoption
 // rounds, shipped once here (the tranche PRs adopt these in
 // their post-extraction rounds).
-export { BadgeCardRow, type BadgeCardRowAction, type BadgeCardRowProps } from "./BadgeCardRow.js";
+export { BadgeCardRow, type BadgeCardRowProps } from "./BadgeCardRow.js";
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
 export { CheckRow, type CheckRowProps } from "./CheckRow.js";
 export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";

@@ -4,7 +4,7 @@ import { Button } from "./Button.js";
 import { Card } from "./Card.js";
 import { TrailingActionsRow } from "./TrailingActionsRow.js";
 
-export type BadgeCardRowAction = {
+type BadgeCardRowAction = {
   /** The action's visible text ("Edit", "Delete"). */
   label: string;
   /** The action's accessible name, composed by the caller from

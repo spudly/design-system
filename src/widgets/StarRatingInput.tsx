@@ -24,7 +24,7 @@ const StarCell = styled(YStack, {
   justifyContent: "center",
 });
 
-export type StarRatingTone = "default" | "dark";
+type StarRatingTone = "default" | "dark";
 
 export type StarRatingInputProps = {
   /** Current rating, 0–5. */
