@@ -36,6 +36,19 @@
         "react-native-web",
         "storybook",
         "tsx"
+      ],
+      "ignoreBinaries": [
+        "changeset",
+        "commitlint",
+        "eslint",
+        "github-actionlint",
+        "husky",
+        "jscpd",
+        "knip",
+        "prettier",
+        "spudly-tooling",
+        "storybook",
+        "tsc"
       ]
     },
     "apps/storybook": {
@@ -60,6 +73,11 @@
         "expo-updates",
         "react-native-reanimated",
         "react-native-svg"
+      ],
+      "ignoreBinaries": [
+        "expo",
+        "sb-rn-get-stories",
+        "tsc"
       ]
     }
   }
