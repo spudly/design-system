@@ -313,8 +313,8 @@ test("T1: every converted list/card widget declares `loading` and reads the Load
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
       code,
-      /TextSkeleton|BoxSkeleton|StatCard/,
-      `${name} must render skeletons (directly, or via a skeletonized child like StatBand's StatCards)`,
+      /TextSkeleton|BoxSkeleton|StatCard|LoadingStatTiles/,
+      `${name} must render skeletons (directly, or via a skeletonized child like StatBand's StatCards — now the shared LoadingStatTiles, #587 phase 2)`,
     );
   }
   // The shells: Card provides the scope (it has no scope to read);
@@ -898,8 +898,8 @@ test("T2: every converted data widget declares `loading` and reads the LoadingSc
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
       code,
-      /TextSkeleton|BoxSkeleton|SkeletonBone|StatCard/,
-      `${name} must render skeletons (directly, or via a skeletonized child)`,
+      /TextSkeleton|BoxSkeleton|SkeletonBone|StatCard|LoadingStatTiles/,
+      `${name} must render skeletons (directly, or via a skeletonized child — StatRow's is the shared LoadingStatTiles, #587 phase 2)`,
     );
     assert.match(
       code,
