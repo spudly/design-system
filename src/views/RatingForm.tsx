@@ -15,7 +15,7 @@ const NotesArea = styled(TamaguiTextArea, {
   fontSize: tokens.typography.fontSize.md,
 });
 
-export type RatingFormValues = {
+type RatingFormValues = {
   rating: 1 | 2 | 3 | 4 | 5 | null;
   notes: string | null;
 };

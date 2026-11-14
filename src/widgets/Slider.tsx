@@ -69,7 +69,7 @@ const ThumbKnob = styled(View, {
   borderColor: "$textMuted",
 });
 
-export type SliderTick = {
+type SliderTick = {
   /** The value this label sits under; clamped into the min–max range. */
   value: number;
   label: string;

@@ -56,7 +56,7 @@ export {
   type RadioOption,
   type RadioOptionGroupProps,
 } from "./RadioOptionGroup.js";
-export { RatingForm, type RatingFormProps, type RatingFormValues } from "./RatingForm.js";
+export { RatingForm, type RatingFormProps } from "./RatingForm.js";
 export {
   RecipeCommentsView,
   type RecipeCommentsViewProps,

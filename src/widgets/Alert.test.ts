@@ -25,7 +25,7 @@ const stories = readFileSync("src/widgets/Alert.stories.tsx", "utf8");
 
 test("Alert is exported from the components barrel and the old components are removed", () => {
   const barrel = readFileSync("src/widgets/index.ts", "utf8");
-  assert.match(barrel, /export \{ Alert, type AlertAction, type AlertProps, type AlertSeverity \}/);
+  assert.match(barrel, /export \{ Alert, type AlertProps \}/);
   assert.doesNotMatch(barrel, /\bInlineAlert\b|\bDismissibleBanner\b|\bBannerAction\b/);
   assert.equal(existsSync("src/widgets/InlineAlert.tsx"), false);
   assert.equal(existsSync("src/widgets/DismissibleBanner.tsx"), false);

@@ -3,7 +3,7 @@ import { Popover, View, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
-export type DropdownSide = "top" | "bottom";
+type DropdownSide = "top" | "bottom";
 export type DropdownAlign = "start" | "end";
 
 type DropdownContextValue = {

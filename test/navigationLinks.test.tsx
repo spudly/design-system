@@ -161,14 +161,13 @@ test("BackLink: href is optional and renders the row inside a styled Anchor (#24
   // its translator call survive (see also src/widgets/BackLink.test.ts).
   assert.match(backLink, /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/);
 });
-test("Tabs: link variant items carry hrefs, the variant takes no change callback, LinkTabItem is exported (#248)", () => {
-  assert.match(tabs, /export type LinkTabItem = \{/);
+test("Tabs: link variant items carry hrefs, the variant takes no change callback (#248)", () => {
+  assert.match(tabs, /type LinkTabItem = \{/);
   assert.match(tabs, /href: string;/);
   assert.match(tabs, /variant: "link";/);
   assert.match(tabs, /onValueChange\?: never;/);
   assert.match(tabs, /styled\(Anchor, \{\s*name: "TabsLinkTab",/);
   assert.match(tabs, /aria-current/);
-  assert.match(index, /type LinkTabItem/);
   assert.match(index, /from "\.\/Tabs\.js"/);
 });
 

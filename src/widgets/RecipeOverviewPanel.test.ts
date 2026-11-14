@@ -49,7 +49,6 @@ test("RecipeOverviewPanel is exported from the built internal components barrel"
 test("RecipeOverviewPanel's types are type-only exports from the built components barrel", () => {
   const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(types, /RecipeOverviewPanelProps/);
-  assert.match(types, /RecipeOverviewPanelTag/);
 });
 
 test("the panel composes the shared building blocks with its conditional content", () => {
