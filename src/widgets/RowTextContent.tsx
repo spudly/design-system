@@ -5,7 +5,7 @@ export type RowTextContentProps = {
   /** The row's main line. */
   title: string;
   /** Optional second line under the title. */
-  subtitle?: string | null;
+  subtitle?: string | null | undefined;
   /** Marks the visible texts non-accessible for a native link
    * rendering whose LinkOverlay carries the label as the row's
    * one accessibility stop (see LinkOverlay). */
