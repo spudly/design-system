@@ -70,7 +70,7 @@ export type MealDetailPageMember = {
   isUnavailable?: boolean;
 };
 
-export type MealDetailPageIngredient = {
+type MealDetailPageIngredient = {
   id: string;
   /** The ingredient's name, as the host stores it. */
   name: string;

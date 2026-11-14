@@ -25,8 +25,8 @@ export type ProfilePageSubscription = SubscriptionViewProps;
 export type ProfilePageAccountData = AccountDataViewProps;
 export type ProfilePageTransfer = TransferRecipesViewProps;
 export type ProfilePageFeedbackPreference = FeedbackPreferenceViewProps;
-export type ProfilePageNutritionGoals = NutritionGoalsFormProps;
-export type ProfilePageAccessTokens = AccessTokensPanelProps;
+type ProfilePageNutritionGoals = NutritionGoalsFormProps;
+type ProfilePageAccessTokens = AccessTokensPanelProps;
 
 /**
  * ProfilePage (#126, B3c): the profile view — the split view
