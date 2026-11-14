@@ -1,8 +1,9 @@
-import { forwardRef, useId, useRef } from "react";
+import { forwardRef, useId } from "react";
 import { Input as TamaguiInput, Label, View, XStack, YStack, isWeb, styled } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
+import { useImeCompositionGuard } from "./useImeCompositionGuard.js";
 import { Text } from "../widgets/Text.js";
 
 /**
@@ -196,52 +197,9 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
   const autoId = useId();
   const id = idProp ?? autoId;
 
-  // IME composition guard (web), mirroring TextField's shipped
-  // guard (#562): Tamagui's Input fires `onSubmitEditing` from
-  // its Enter keydown handler without checking composition, so
-  // a CJK user confirming a candidate with Enter would submit
-  // the search mid-typing (the AppShellPage header search, via
-  // AppTopBar, and VerseSearchPage both pass a submit handler
-  // to this field). Track
-  // composition on the field itself and hold submit-editing
-  // while it is active; composition events do not exist on
-  // native, where the return key never fires during composition.
-  //
-  // The flag alone is not enough: Safari fires
-  // `compositionend` BEFORE the confirming Enter keydown, so
-  // the flag is already cleared when Tamagui's handler runs —
-  // and the event Tamagui passes to `onSubmitEditing` carries
-  // only the field text (no isComposing/keyCode to check
-  // here). The guard therefore also holds submit-editing for
-  // a short grace window after composition ends: the
-  // confirming keydown follows `compositionend` within the
-  // same task sequence, while a deliberate Enter press lands
-  // well after the window.
-  const composingRef = useRef(false);
-  // Monotonic clock (performance.now): a wall-clock step must
-  // not stretch or shrink the grace window. -Infinity means
-  // "no composition has ended yet" (performance.now() starts
-  // near 0, so 0 would falsely hold submits in the first
-  // 100 ms after mount).
-  const compositionEndedAtRef = useRef(Number.NEGATIVE_INFINITY);
-  const handleCompositionStart: typeof onCompositionStart = (event) => {
-    composingRef.current = true;
-    onCompositionStart?.(event);
-  };
-  const handleCompositionEnd: typeof onCompositionEnd = (event) => {
-    composingRef.current = false;
-    compositionEndedAtRef.current = performance.now();
-    onCompositionEnd?.(event);
-  };
-  const handleSubmitEditing: typeof onSubmitEditing = (event) => {
-    if (
-      isWeb &&
-      (composingRef.current || performance.now() - compositionEndedAtRef.current < 100)
-    ) {
-      return;
-    }
-    onSubmitEditing?.(event);
-  };
+  // IME composition guard (web) — see useImeCompositionGuard.
+  const { handleCompositionStart, handleCompositionEnd, handleSubmitEditing } =
+    useImeCompositionGuard({ onCompositionStart, onCompositionEnd, onSubmitEditing });
 
   return (
     <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1 } : {})}>
