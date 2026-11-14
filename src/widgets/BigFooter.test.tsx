@@ -165,7 +165,7 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
   // shell (nested pages opt out of scrolling entirely).
   assert.match(
     bigFooter,
-    /export type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/,
+    /type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/,
   );
   assert.match(bigFooter, /scrollMode\?: BigFooterShellScrollMode;/);
   assert.match(bigFooter, /scrollMode = "shell"/, "the shell scroller is the default mode");
