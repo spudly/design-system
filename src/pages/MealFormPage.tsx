@@ -90,7 +90,7 @@ export type MealFormPageIngredient = {
 
 /** A partial edit to one ingredient entry, reported through
  * `onIngredientChange` — the fields the user changed. */
-export type MealFormPageIngredientPatch = Partial<Omit<MealFormPageIngredient, "id">>;
+type MealFormPageIngredientPatch = Partial<Omit<MealFormPageIngredient, "id">>;
 
 export type MealFormPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */

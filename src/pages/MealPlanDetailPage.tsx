@@ -168,7 +168,7 @@ export type MealPlanDetailPageEntry = {
 /** One nutrition-goal progress row. The app composes
  * `valueLabel` from the field's numbers and band ("850 / 2,000 ·
  * On track") — the rounding and band wording stay app-side. */
-export type MealPlanDetailPageGoalRow = {
+type MealPlanDetailPageGoalRow = {
   label: string;
   valueLabel: string;
 };
@@ -202,7 +202,7 @@ export type MealPlanDetailPageWeeklyTotals = {
   averages: MealPlanDetailPageWeeklyTotalsRow[];
 };
 
-export type MealPlanDetailPageReadyProps = {
+type MealPlanDetailPageReadyProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
   state: "ready";

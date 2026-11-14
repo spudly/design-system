@@ -120,15 +120,15 @@ export type RecipeFormPageOption = {
 // page's types are untouched (the RecipeDetailPage ratings
 // precedent). The view's `headerAction` is the page's own
 // revert affordance, so it is not part of the data prop.
-export type RecipeFormPageImage = Omit<RecipeImageViewProps, "headerAction">;
+type RecipeFormPageImage = Omit<RecipeImageViewProps, "headerAction">;
 
 // The sortable lists' view-models live with their views
 // (#130, tranche T4); the page's contract names are aliases,
 // the same precedent as the image section above. The list
 // views carry no page-supplied chrome of their own, so the
 // data props are the views' full contracts.
-export type RecipeFormPageIngredients = RecipeIngredientListViewProps;
-export type RecipeFormPageInstructions = RecipeInstructionListViewProps;
+type RecipeFormPageIngredients = RecipeIngredientListViewProps;
+type RecipeFormPageInstructions = RecipeInstructionListViewProps;
 
 export type RecipeFormPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
