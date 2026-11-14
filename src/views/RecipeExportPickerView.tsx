@@ -7,7 +7,7 @@ import { CheckboxSelectList } from "../widgets/CheckboxSelectList.js";
 import { tokens } from "../tokens/index.js";
 import { useVoice } from "../voice/index.js";
 
-export type RecipeExportPickerViewItem = {
+type RecipeExportPickerViewItem = {
   id: string;
   label: string;
 };

@@ -8,7 +8,7 @@ import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "./TextAreaField.js";
 import { useVoice } from "../voice/index.js";
 
-export type RecipeCommentsViewComment = {
+type RecipeCommentsViewComment = {
   id: string;
   authorName: string;
   body: string;

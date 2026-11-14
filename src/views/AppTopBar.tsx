@@ -59,7 +59,7 @@ import { SearchField } from "./SearchField.js";
  * exemption — the destination is built from the typed term.
  */
 
-export type AppTopBarBrand = {
+type AppTopBarBrand = {
   /** The brand's wordmark text — the caller's app/site name, as content. */
   label: string;
   /**

@@ -6,7 +6,7 @@ import { Button } from "../widgets/Button.js";
 import { Text } from "../widgets/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
-export type CandidateListItem = {
+type CandidateListItem = {
   /** Stable key for the candidate. */
   id: string;
   /** The candidate's label (e.g. a version's name). */
