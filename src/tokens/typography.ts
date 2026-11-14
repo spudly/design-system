@@ -6,7 +6,7 @@
  *
  * Every value is a plain serializable string or number; no functions.
  */
-export const fontFamily = {
+const fontFamily = {
   /**
    * Default UI font stack: Raleway first, platform system fonts as
    * fallbacks for surfaces that have not loaded/bundled Raleway yet.
@@ -108,7 +108,7 @@ export const fontFamily = {
 } as const;
 
 /** Type scale in px. */
-export const fontSize = {
+const fontSize = {
   xs: 12,
   sm: 14,
   md: 16,
@@ -120,7 +120,7 @@ export const fontSize = {
 } as const;
 
 /** Font weights. */
-export const fontWeight = {
+const fontWeight = {
   regular: 400,
   medium: 500,
   semibold: 600,
@@ -128,7 +128,7 @@ export const fontWeight = {
 } as const;
 
 /** Line heights (unitless multipliers). */
-export const lineHeight = {
+const lineHeight = {
   tight: 1.25,
   normal: 1.5,
   relaxed: 1.75,
