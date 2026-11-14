@@ -36,9 +36,18 @@
         "**/*.{ts,tsx}"
       ],
       "ignoreDependencies": [
-        "expo-updates",
+        "@gorhom/bottom-sheet",
+        "@react-native-community/datetimepicker",
+        "@react-native-picker/picker",
+        "@storybook/react",
+        "@tamagui/animations-css",
+        "@tamagui/constants",
+        "expo-constants",
         "expo-modules-core",
-        "@storybook/react"
+        "expo-status-bar",
+        "expo-updates",
+        "react-native-reanimated",
+        "react-native-svg"
       ]
     }
   }
