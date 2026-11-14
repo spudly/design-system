@@ -27,8 +27,8 @@ import { Path, Rect, Svg, Text } from "react-native-svg";
  */
 
 /** The badge's fixed size: the official generic badge's 155x46. */
-export const GOOGLE_PLAY_BADGE_WIDTH = 155;
-export const GOOGLE_PLAY_BADGE_HEIGHT = 46;
+const GOOGLE_PLAY_BADGE_WIDTH = 155;
+const GOOGLE_PLAY_BADGE_HEIGHT = 46;
 
 /** Google's official "Get it on Google Play" badge: black field, white border, multicolor Play triangle. */
 export function GooglePlayBadge() {

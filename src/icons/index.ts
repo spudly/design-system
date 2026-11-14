@@ -21,9 +21,5 @@ export { SocialTwitterIcon } from "./SocialTwitterIcon.js";
 export { SocialYoutubeIcon } from "./SocialYoutubeIcon.js";
 export { SocialGithubIcon } from "./SocialGithubIcon.js";
 export { SocialLinkedinIcon } from "./SocialLinkedinIcon.js";
-export { AppStoreBadge, APP_STORE_BADGE_HEIGHT, APP_STORE_BADGE_WIDTH } from "./AppStoreBadge.js";
-export {
-  GooglePlayBadge,
-  GOOGLE_PLAY_BADGE_HEIGHT,
-  GOOGLE_PLAY_BADGE_WIDTH,
-} from "./GooglePlayBadge.js";
+export { AppStoreBadge } from "./AppStoreBadge.js";
+export { GooglePlayBadge } from "./GooglePlayBadge.js";
