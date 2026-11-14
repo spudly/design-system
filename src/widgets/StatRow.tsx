@@ -1,10 +1,10 @@
 import type { ReactNode } from "react";
-import { XStack, YStack, styled } from "tamagui";
+import { XStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { StatCard } from "./StatCard.js";
+import { LoadingStatTiles } from "./LoadingStatTiles.js";
 
 const StyledStatRow = styled(XStack, {
   name: "StatRow",
@@ -53,13 +53,7 @@ export function StatRow({ children, loading = false, ...rest }: StatRowProps) {
         {...rest}
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
-        <LoadingScope active>
-          {LOADING_STAT_KEYS.map((key) => (
-            <YStack key={key} flex={1} paddingHorizontal={tokens.spacing[2]}>
-              <StatCard value="" label="" />
-            </YStack>
-          ))}
-        </LoadingScope>
+        <LoadingStatTiles keys={LOADING_STAT_KEYS} />
       </StyledStatRow>
     );
   }
