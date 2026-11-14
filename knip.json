@@ -24,7 +24,18 @@
         "src/widgets/index.ts"
       ],
       "ignoreDependencies": [
-        "@storybook/react"
+        "@commitlint/cli",
+        "@spudly/tooling",
+        "@storybook/react",
+        "@storybook/react-native",
+        "github-actionlint",
+        "husky",
+        "jscpd",
+        "lint-staged",
+        "prettier",
+        "react-native-web",
+        "storybook",
+        "tsx"
       ]
     },
     "apps/storybook": {
@@ -36,6 +47,7 @@
         "**/*.{ts,tsx}"
       ],
       "ignoreDependencies": [
+        "@babel/core",
         "@gorhom/bottom-sheet",
         "@react-native-community/datetimepicker",
         "@react-native-picker/picker",
