@@ -1,5 +1,0 @@
----
-"@spudly/ui": major
----
-
-The remaining recipe and form view literals move to the app-supplied voice object, as tranche 2d of the voice-as-theme system (#539): RecipeCommentsView's Comments title, No comments yet empty message, and Add a comment / Share how it turned out… / Post comment composer copy; RecipeSharingView's Sharing title, Publishing consent label, Save visibility / Saving… save labels, Anyone with this link can view this recipe. share-link line, Generate share link / Copy share link labels, and Public link / Copy public link labels; NutritionGoalsForm's Daily nutrition goals title, Calories / Protein (g) / Carbs (g) / Fat (g) / Satiety score field labels, Optional placeholder, and Save goals action; and RatingForm's How did it go? title, Notes (optional) placeholder, Skip secondary label, and Save action. Apps must supply the new recipeCommentsView, recipeSharingView, nutritionGoalsForm, and ratingForm voice slots through VoiceProvider; Storybook's fixture voice carries the same strings these views previously hard-coded, so rendered output is unchanged.
