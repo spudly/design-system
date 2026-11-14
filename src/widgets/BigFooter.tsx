@@ -10,6 +10,7 @@ import { SocialYoutubeIcon } from "../icons/SocialYoutubeIcon.js";
 import type { IconComponentProps } from "../icons/Icon.js";
 import { AppStoreBadge } from "../icons/AppStoreBadge.js";
 import { GooglePlayBadge } from "../icons/GooglePlayBadge.js";
+import { PageContentColumn } from "./PageContentColumn.js";
 import { Text } from "./Text.js";
 import { TextLink } from "./TextLink.js";
 import { contentInfoRoleProps, platformAccessibilityProps } from "./accessibility.js";
@@ -424,6 +425,17 @@ export type BigFooterShellProps = {
  * scroller lived only in the footer branch). ScreenContainer
  * renders no scroller of its own on either platform (#547).
  *
+ * Desktop content column (#628): on web the content child
+ * renders inside PageContentColumn — a centered column at
+ * most 1200px wide — in BOTH web branches (with and without
+ * footer data). The BigFooter stays a direct child of the
+ * shell, full-width: it is never inside the column. The
+ * two-children model above is preserved — the shell's two
+ * children are now the column (holding the page content) and
+ * the footer. The column is positioned, so the content-area
+ * anchoring described above holds through it. Native is
+ * unchanged: no column, no footer.
+ *
  * On web, a page whose host supplied no footer data renders
  * NO footer band and reserves NO viewport height — just a
  * growing column around its content — so a page can compose
@@ -476,9 +488,12 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
     );
   }
   if (!footer) {
+    // Web, no footer data (#628): no footer band, but the
+    // content still gets the centered desktop column — a page
+    // without footer data is not exempt from the measure.
     return (
       <YStack flexGrow={1} flexDirection="column" position="relative">
-        {children}
+        <PageContentColumn>{children}</PageContentColumn>
       </YStack>
     );
   }
@@ -495,7 +510,7 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
       flexDirection="column"
       justifyContent="space-between"
     >
-      <YStack position="relative">{children}</YStack>
+      <PageContentColumn>{children}</PageContentColumn>
       <BigFooter footer={footer} />
     </YStack>
   );
