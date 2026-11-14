@@ -34,6 +34,27 @@ export type RatingFormProps = {
 };
 
 /**
+ * The dark variant's 10%-surface tint layer, shared by the form
+ * shell, the notes field, and the secondary action (#587 phase 2:
+ * the overlay was copy-pasted at all three sites).
+ */
+function DarkTintOverlay() {
+  return (
+    <YStack
+      position="absolute"
+      pointerEvents="none"
+      top={0}
+      left={0}
+      right={0}
+      bottom={0}
+      borderRadius={tokens.radii.xl}
+      backgroundColor="$surface"
+      opacity={0.1}
+    />
+  );
+}
+
+/**
  * RatingForm (#176 — generalized from the cook-log form that
  * shipped as CookLogForm under #126, B3c contract proposals,
  * option A): a generic star-rating plus free-text notes form.
@@ -105,17 +126,7 @@ export function RatingForm({
       borderColor={isLight ? tokens.colors.gray.gray3 : undefined}
     >
       {isLight ? null : (
-        <YStack
-          position="absolute"
-          pointerEvents="none"
-          top={0}
-          left={0}
-          right={0}
-          bottom={0}
-          borderRadius={tokens.radii.xl}
-          backgroundColor="$surface"
-          opacity={0.1}
-        />
+        <DarkTintOverlay />
       )}
       <YStack padding="$6" gap="$4">
         <Text
@@ -130,17 +141,7 @@ export function RatingForm({
         </YStack>
         <YStack>
           {isLight ? null : (
-            <YStack
-              position="absolute"
-              pointerEvents="none"
-              top={0}
-              left={0}
-              right={0}
-              bottom={0}
-              borderRadius={tokens.radii.xl}
-              backgroundColor="$surface"
-              opacity={0.1}
-            />
+            <DarkTintOverlay />
           )}
           <NotesArea
             multiline
@@ -171,17 +172,7 @@ export function RatingForm({
             cursor="pointer"
           >
             {isLight ? null : (
-              <YStack
-                position="absolute"
-                pointerEvents="none"
-                top={0}
-                left={0}
-                right={0}
-                bottom={0}
-                borderRadius={tokens.radii.xl}
-                backgroundColor="$surface"
-                opacity={0.1}
-              />
+              <DarkTintOverlay />
             )}
             <Text
               fontSize={tokens.typography.fontSize.md}
