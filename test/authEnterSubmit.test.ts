@@ -101,4 +101,9 @@ test("TextField: submit-editing is held while an IME composition is active (web)
     /onCompositionStart: handleCompositionStart,[\s\S]*?onCompositionEnd: handleCompositionEnd,/,
     "the composition handlers are wired on the web target",
   );
+  assert.match(
+    source,
+    /const \{ handleCompositionStart, handleCompositionEnd, handleSubmitEditing \} =\s*useImeCompositionGuard\(\{ onCompositionStart, onCompositionEnd, onSubmitEditing \}\);/,
+    "the field's own callbacks go into the shared hook and the guarded handlers come back out",
+  );
 });

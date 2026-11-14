@@ -107,3 +107,11 @@ test("the guarded handlers are wired onto the inner input (#562)", () => {
     "on native the caller's composition handlers forward unchanged",
   );
 });
+
+test("SearchField passes its callbacks to the shared guard hook and binds the returned handlers (#587)", () => {
+  assert.match(
+    searchField,
+    /const \{ handleCompositionStart, handleCompositionEnd, handleSubmitEditing \} =\s*useImeCompositionGuard\(\{ onCompositionStart, onCompositionEnd, onSubmitEditing \}\);/,
+    "the field's own callbacks go into the hook and the guarded handlers come back out",
+  );
+});
