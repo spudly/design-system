@@ -155,6 +155,7 @@ describe("buttonIcon", () => {
   }
   const button = readCode("src/widgets/Button.tsx");
   const stories = readCode("src/widgets/Button.stories.tsx");
+  const glyphInk = readCode("src/widgets/useVariantGlyphInk.ts");
   const index = readCode("src/widgets/index.ts");
   const pageWebAria = readCode("test/pageWebAria.test.tsx");
   test("the standalone IconButton is removed everywhere (#178 decision change)", () => {
@@ -232,10 +233,13 @@ describe("buttonIcon", () => {
     assert.match(button, /glyphSizes\[size as keyof typeof glyphSizes\] \?\? glyphSizes\.md/);
   });
   test("glyph ink mirrors Button's variant label colors (#178)", () => {
-    assert.match(button, /roleValue\("onPrimary"\)/);
-    assert.match(button, /roleValue\("link"\)/);
-    assert.match(button, /case "danger":\s*return "#ffffff";/);
-    assert.match(button, /case "secondary":\s*return tokens\.colors\.gray\.gray10;/);
+    // The ink resolution lives in the shared glyph-ink hook (#587
+    // phase 2); Button's icon slot resolves its ink through it.
+    assert.match(button, /useVariantGlyphInk\(/);
+    assert.match(glyphInk, /roleValue\("onPrimary"\)/);
+    assert.match(glyphInk, /roleValue\("link"\)/);
+    assert.match(glyphInk, /case "danger":\s*return "#ffffff";/);
+    assert.match(glyphInk, /case "secondary":\s*return tokens\.colors\.gray\.gray10;/);
   });
   test("icon-only pins the square standard box (44/48/56) with text padding zeroed (#178)", () => {
     assert.match(button, /sm: 44,\s*md: 48,\s*lg: 56/);
@@ -601,8 +605,14 @@ describe("buttonWebAria", () => {
     // which is the sanctioned caller API — Button translates them.
     const rawLabels = code.match(/accessibilityLabel=\{/g) ?? [];
     assert.equal(rawLabels.length, 2, "only the two DS Button labels may remain as raw JSX props");
-    assert.match(code, /accessibilityLabel=\{decreaseAccessibilityLabel \?\? \(label \? `Decrease \$\{label\}` : "Decrease value"\)\}/);
-    assert.match(code, /accessibilityLabel=\{increaseAccessibilityLabel \?\? \(label \? `Increase \$\{label\}` : "Increase value"\)\}/);
+    assert.match(
+      code,
+      /accessibilityLabel=\{decreaseAccessibilityLabel \?\? \(label \? `Decrease \$\{label\}` : "Decrease value"\)\}/,
+    );
+    assert.match(
+      code,
+      /accessibilityLabel=\{increaseAccessibilityLabel \?\? \(label \? `Increase \$\{label\}` : "Increase value"\)\}/,
+    );
   });
   test("component-internal stack pressables route through the translator, never raw RN JSX props (#235)", () => {
     for (const rel of STACK_PRESSABLES) {
