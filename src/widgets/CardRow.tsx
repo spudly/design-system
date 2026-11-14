@@ -1,11 +1,10 @@
 import { Anchor, XStack, YStack, isWeb } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Card } from "./Card.js";
 import { LinkOverlay } from "./linkOverlay.js";
+import { RowTextContent } from "./RowTextContent.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 type CardRowOwnProps = {
@@ -149,31 +148,7 @@ export function CardRow({
       }
     }
   };
-  // `decorative` marks the visible texts non-accessible for the
-  // native link rendering, whose LinkOverlay carries the composed
-  // label as the row's one accessibility stop (see LinkOverlay).
-  const renderTextContent = (decorative: boolean) => (
-    <>
-      <Text
-        accessible={decorative ? false : undefined}
-        importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        fontSize={tokens.typography.fontSize.md}
-        fontWeight={tokens.typography.fontWeight.semibold}
-      >
-        {title}
-      </Text>
-      {subtitle ? (
-        <Text
-          variant="hint"
-          accessible={decorative ? false : undefined}
-          importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        >
-          {subtitle}
-        </Text>
-      ) : null}
-    </>
-  );
-  const textContent = renderTextContent(false);
+  const textContent = <RowTextContent title={title} subtitle={subtitle} />;
   return (
     <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
       {href !== undefined ? (
@@ -191,7 +166,7 @@ export function CardRow({
           </Anchor>
         ) : (
           <YStack flex={1} minWidth={0} gap="$1" position="relative">
-            {renderTextContent(true)}
+            <RowTextContent title={title} subtitle={subtitle} decorative />
             <LinkOverlay
               href={href}
               accessibilityRole="link"
