@@ -41,6 +41,19 @@ test("the nav list can shrink below its intrinsic width so its wrap engages (#56
   assert.match(navList, /minWidth: 0/);
 });
 
+test("the web nav item centers its glyph over its label in a column stack (#627)", () => {
+  const stack = styledBlock(topBar, "StyledNavItemStack");
+  assert.match(stack, /alignItems: "center"/);
+  assert.match(stack, /justifyContent: "center"/);
+  // The glyph and label render inside the stack, not as direct
+  // children of the anchor (a raw text child lays out inline and
+  // the glyph lands left of the label's center).
+  assert.match(
+    topBar,
+    /<StyledNavItemStack>\s*\{glyph\}\s*<Text[\s\S]*?\{item\.label\}[\s\S]*?<\/StyledNavItemStack>/,
+  );
+});
+
 test("a story demonstrates the 6-item nav at phone width (#564)", () => {
   assert.match(stories, /export const PhoneWidthNav/);
   assert.match(stories, /width=\{390\}/);

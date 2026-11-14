@@ -39,6 +39,10 @@ LinkActions, NoFooter, ChunkFailedContent;
    every link including Profile is fully visible, and the
    page does not scroll sideways. Repeat with PhoneWidthNav430
    (430px frame).
+6. Nav centering (#627): in the same phone-width stories, each
+   nav item's glyph is centered over its label — glyph and
+   label share one vertical axis for every item, active and
+   inactive, including Profile on the wrapped second row.
 
 **Run when:** `src/pages/AppShellPage.tsx`,
 `src/pages/TabbedShellPage.tsx`, `src/views/AppTopBar.tsx`,
