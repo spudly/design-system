@@ -136,6 +136,11 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   // pages barrel's contract). It has its own stories
   // (Widgets/BigFooter) and is exercised through every page story.
   "BigFooter.tsx",
+  // PageContentColumn (#628): internal page chrome — NOT exported
+  // from the components barrel (shells/views compose it by direct
+  // import; #298 pages-only surface). It has its own stories
+  // (Widgets/PageContentColumn), like BigFooter.
+  "PageContentColumn.tsx",
   "accessibility.ts",
   "index.ts",
   "modalRegistry.ts",

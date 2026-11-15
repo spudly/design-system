@@ -80,7 +80,10 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   // absolute-fill child (StepOverlay) cannot cover the footer;
   // there is no bounded flex region allocating it a height
   // (#547 removed the bounded region and its nested scroller).
-  assert.match(bigFooter, /<YStack position="relative">\{children\}<\/YStack>/);
+  // #628: the positioned content child is now the
+  // PageContentColumn (positioned itself, capped at 1200px and
+  // centered); the footer stays its full-width sibling.
+  assert.match(bigFooter, /<PageContentColumn>\{children\}<\/PageContentColumn>/);
   assert.ok(!/flexBasis="auto"/.test(bigFooter), "the bounded content region is gone (#547)");
   assert.ok(!/position="(fixed|absolute)"/.test(bigFooter), "the footer is in flow, never pinned");
 });
@@ -163,10 +166,7 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
   // the three owners: the shell's ScrollView (default), the
   // page content's own list/scroll region, or an enclosing
   // shell (nested pages opt out of scrolling entirely).
-  assert.match(
-    bigFooter,
-    /type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/,
-  );
+  assert.match(bigFooter, /type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/);
   assert.match(bigFooter, /scrollMode\?: BigFooterShellScrollMode;/);
   assert.match(bigFooter, /scrollMode = "shell"/, "the shell scroller is the default mode");
   // Native handling comes FIRST and never consults footer

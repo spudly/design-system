@@ -3,6 +3,7 @@ import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
 import { navigationRoleProps, platformAccessibilityProps } from "../widgets/accessibility.js";
 import { BrandLink } from "../widgets/BrandLink.js";
+import { PageContentColumn } from "../widgets/PageContentColumn.js";
 import { Button } from "../widgets/Button.js";
 import { LinkOverlay } from "../widgets/linkOverlay.js";
 import { Text } from "../widgets/Text.js";
@@ -327,55 +328,63 @@ export function AppTopBar({
   actions,
 }: AppTopBarProps) {
   const glyphInks = useNavGlyphInks();
+  // Desktop content column (#628): the bar's content — brand,
+  // nav, search, actions — constrains to the same centered
+  // 1200px column as the page body (PageContentColumn), so the
+  // header aligns with the content below it. The bar has no
+  // background/frame of its own, so wrapping its row is the
+  // whole constraint; on native the column is a pass-through.
   return (
-    <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[3]}>
-      {brand.href !== undefined ? (
-        <BrandLink label={brand.label} href={brand.href} />
-      ) : (
-        <Text variant="heading">{brand.label}</Text>
-      )}
-      {navItems !== undefined && navItems.length > 0 ? (
-        <StyledNavList
-          {...navigationRoleProps}
-          {...platformAccessibilityProps({ accessibilityLabel: navLabel })}
-        >
-          {navItems.map((item) => (
-            <NavItem
-              key={item.id}
-              item={item}
-              active={item.id === activeItemId}
-              glyphInks={glyphInks}
+    <PageContentColumn>
+      <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[3]}>
+        {brand.href !== undefined ? (
+          <BrandLink label={brand.label} href={brand.href} />
+        ) : (
+          <Text variant="heading">{brand.label}</Text>
+        )}
+        {navItems !== undefined && navItems.length > 0 ? (
+          <StyledNavList
+            {...navigationRoleProps}
+            {...platformAccessibilityProps({ accessibilityLabel: navLabel })}
+          >
+            {navItems.map((item) => (
+              <NavItem
+                key={item.id}
+                item={item}
+                active={item.id === activeItemId}
+                glyphInks={glyphInks}
+              />
+            ))}
+          </StyledNavList>
+        ) : null}
+        {search !== undefined && search !== null ? (
+          <XStack flex={1} {...platformAccessibilityProps({ accessibilityRole: "search" })}>
+            <SearchField
+              grow
+              value={search.value}
+              onChangeText={search.onValueChange}
+              onSubmitEditing={search.onSubmit}
+              {...(search.placeholder !== undefined ? { placeholder: search.placeholder } : null)}
+              {...platformAccessibilityProps({ accessibilityLabel: search.label })}
             />
-          ))}
-        </StyledNavList>
-      ) : null}
-      {search !== undefined && search !== null ? (
-        <XStack flex={1} {...platformAccessibilityProps({ accessibilityRole: "search" })}>
-          <SearchField
-            grow
-            value={search.value}
-            onChangeText={search.onValueChange}
-            onSubmitEditing={search.onSubmit}
-            {...(search.placeholder !== undefined ? { placeholder: search.placeholder } : null)}
-            {...platformAccessibilityProps({ accessibilityLabel: search.label })}
-          />
-        </XStack>
-      ) : null}
-      {actions !== undefined && actions.length > 0 ? (
-        <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[2]} marginLeft="auto">
-          {actions.map((action) =>
-            action.href !== undefined ? (
-              <Button key={action.id} ghost href={action.href}>
-                {action.label}
-              </Button>
-            ) : (
-              <Button key={action.id} ghost onPress={action.onPress}>
-                {action.label}
-              </Button>
-            ),
-          )}
-        </XStack>
-      ) : null}
-    </XStack>
+          </XStack>
+        ) : null}
+        {actions !== undefined && actions.length > 0 ? (
+          <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[2]} marginLeft="auto">
+            {actions.map((action) =>
+              action.href !== undefined ? (
+                <Button key={action.id} ghost href={action.href}>
+                  {action.label}
+                </Button>
+              ) : (
+                <Button key={action.id} ghost onPress={action.onPress}>
+                  {action.label}
+                </Button>
+              ),
+            )}
+          </XStack>
+        ) : null}
+      </XStack>
+    </PageContentColumn>
   );
 }
