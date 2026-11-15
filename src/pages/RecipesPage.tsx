@@ -456,6 +456,7 @@ export type RecipesPageProps = CatalogPageFilterProps<RecipesPageFilterId> & {
   onDiscoveryLoadMoreRetry?: () => void;
   /** The discovery retry action's label ("Try again"). */
   discoveryLoadMoreRetryLabel?: string;
+};
 
 /**
  * The unified list's row model: the one list renders both

@@ -77,6 +77,7 @@ export type DiscoverPageProps = CatalogPageFilterProps<DiscoverPageFilterId> & {
    * (useCatalogPagination, #285 — the same pattern RecipesPage
    * uses, so the two catalogs share one pagination contract). */
   onLoadMore?: () => void;
+};
 
 /**
  * The public catalog, delegated to the unified RecipesPage
