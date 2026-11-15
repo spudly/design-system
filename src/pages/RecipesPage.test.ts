@@ -216,10 +216,12 @@ describe("recipesPageCollapsedFilters", () => {
       /export type RecipesPageFilterId = "status" \| "ingredient" \| "calories" \| "satiety" \| "sort";/,
       "RecipesPageFilterId must enumerate the five addable filters",
     );
-    assert.match(code, /activeFilters\?: RecipesPageFilterId\[\];/);
-    assert.match(code, /onActiveFiltersChange\?: \(filters: RecipesPageFilterId\[\]\) => void;/);
-    assert.match(code, /filterChooserOpen\?: boolean;/);
-    assert.match(code, /onFilterChooserOpenChange\?: \(open: boolean\) => void;/);
+    assert.match(code, /CatalogPageFilterProps<RecipesPageFilterId>/);
+    const barSource = readFileSync(join(here, "../../src/views/CatalogFiltersBar.tsx"), "utf8");
+    assert.match(barSource, /activeFilters\?: FilterId\[\];/);
+    assert.match(barSource, /onActiveFiltersChange\?: \(filters: FilterId\[\]\) => void;/);
+    assert.match(barSource, /filterChooserOpen\?: boolean;/);
+    assert.match(barSource, /onFilterChooserOpenChange\?: \(open: boolean\) => void;/);
   });
 
   test("the page renders the shared CatalogFiltersBar with its search copy", () => {
