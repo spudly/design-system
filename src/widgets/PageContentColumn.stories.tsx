@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { FullBleed, PageContentColumn } from "./PageContentColumn.js";
+import { FullBleed, PAGE_CONTENT_MAX_WIDTH, PageContentColumn } from "./PageContentColumn.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof PageContentColumn> = {
@@ -24,8 +24,9 @@ export const CenteredColumn: Story = {
         <YStack backgroundColor="$surface" padding="$4" gap="$2">
           <Text variant="heading">Page content</Text>
           <Text>
-            This block sits inside the centered 1200px column: on a desktop-width canvas it stops at
-            1200px and centers; the frame around it shows the space the column leaves on each side.
+            This block sits inside the centered {PAGE_CONTENT_MAX_WIDTH}px column: on a
+            desktop-width canvas it stops at {PAGE_CONTENT_MAX_WIDTH}px and centers; the frame
+            around it shows the space the column leaves on each side.
           </Text>
         </YStack>
       </PageContentColumn>
