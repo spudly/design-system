@@ -533,7 +533,31 @@ describe("dialogModalRegistry", () => {
     assert.match(overlay, /registerModalLayer\(layerToken, parentLayerToken\)/);
     assert.match(overlay, /unregisterModalLayer\(layer\)/);
     assert.match(overlay, /<ModalLayerContext\.Provider value=\{layerToken\}>/);
-    assert.match(overlay, /if \(ownLayer && !isActiveModalLayer\(ownLayer\)\) \{\s+return;\s+\}/);
+    // Since #587 phase 3 the stand-down guard lives in the
+    // shared activeShellNode helper both Tab handlers call:
+    // while a layer above this overlay is active it returns no
+    // node, and both handlers stand down on that null.
+    assert.match(
+      overlay,
+      /function activeShellNode\(\s+shellRef: \{ current: TamaguiElement \| null \},\s+layerRef: \{ current: ModalLayer \| null \},/,
+      "the shell-node guard is the shared activeShellNode helper (#587 phase 3)",
+    );
+    assert.match(
+      overlay,
+      /const ownLayer = layerRef\.current;\s+if \(ownLayer && !isActiveModalLayer\(ownLayer\)\) \{\s+return null;\s+\}/,
+      "activeShellNode stands down while a layer above this overlay is the active modal layer",
+    );
+    assert.match(
+      overlay,
+      /if \(!node \|\| typeof node\.querySelectorAll !== "function"\) \{\s+return null;\s+\}/,
+      "activeShellNode also yields no node when the shell node cannot be queried",
+    );
+    assert.equal(
+      (overlay.match(/const node = activeShellNode\(shellRef, layerRef\);/g) ?? []).length,
+      2,
+      "both the shell Tab wrap and the outside-Tab containment go through activeShellNode",
+    );
+    assert.match(overlay, /const node = activeShellNode\(shellRef, layerRef\);\s+if \(!node\) \{\s+return;\s+\}/);
     // …and the active overlay also contains Tab pressed from
     // OUTSIDE its shell (focus on the body) — the shell wrap
     // alone never sees that key (CodeRabbit review on PR #398).

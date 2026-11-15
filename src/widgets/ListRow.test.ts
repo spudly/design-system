@@ -38,6 +38,16 @@ const listRowCode = listRowSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
+// Since #587 phase 3 the subtitle line lives in the shared
+// RowSubtitleText in RowTextContent.tsx (also composed by
+// RowTextContent for the card rows); the subtitle pins below
+// read that source, and ListRow's own pins hold that it
+// delegates to the shared component.
+const rowTextSource = readFileSync(join(componentsDir, "RowTextContent.tsx"), "utf8");
+const rowTextCode = rowTextSource
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
 test("ListRow is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
@@ -72,11 +82,30 @@ test("ListRow keeps the hairline row and composes the title line from its parts"
     /fontSize=\{tokens\.typography\.fontSize\.md\}\s+fontWeight=\{tokens\.typography\.fontWeight\.medium\}/,
   );
   assert.match(listRowCode, /\{prefix\}\s+\{title\}\s+\{titleSuffix\}/);
-  assert.match(listRowCode, /\{subtitle \? \(/, "the subtitle renders only when provided");
   assert.match(
     listRowCode,
-    /<Text\s+variant="hint"\s+accessible=\{decorative \? false : undefined\}/,
+    /import \{ RowSubtitleText \} from "\.\/RowTextContent\.js";/,
+    "ListRow imports the shared RowSubtitleText (#587 phase 3)",
+  );
+  assert.match(
+    listRowCode,
+    /\{subtitle \? <RowSubtitleText subtitle=\{subtitle\} decorative=\{decorative\} \/> : null\}/,
+    "the subtitle renders only when provided, through the shared RowSubtitleText",
+  );
+  assert.match(
+    rowTextCode,
+    /export function RowSubtitleText\(\{\s+subtitle,\s+decorative = false,/,
+    "the shared RowSubtitleText carries the subtitle line (#587 phase 3)",
+  );
+  assert.match(
+    rowTextCode,
+    /<Text\s+variant="hint"\s+accessible=\{decorative \? false : undefined\}\s+importantForAccessibility=\{decorative \? "no-hide-descendants" : undefined\}/,
     "the subtitle takes the hint variant and the decorative flag (the native link form hides it behind the overlay's composed label)",
+  );
+  assert.match(
+    rowTextCode,
+    /variant="hint"[\s\S]*?>\s+\{subtitle\}\s+<\/Text>/,
+    "RowSubtitleText renders the subtitle text itself",
   );
 });
 
