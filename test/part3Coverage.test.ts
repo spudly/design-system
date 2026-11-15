@@ -130,8 +130,13 @@ test("CookingModePage composes StepOverlay with the ingredients accessory; StepO
   assert.match(page, /<StepOverlay/);
   assert.match(page, /accessory=\{/);
   assert.match(page, /<ScaledIngredientsView/);
-  assert.match(page, /<StepDots/);
-  assert.match(page, /<PrevNextNav/);
+  // The StepDots + PrevNextNav block is shared with
+  // MealCookingModePage in StepNavControls (#587 phase 3
+  // tranche 5) — the pins follow it there.
+  assert.match(page, /<StepNavControls/);
+  const nav = read("src/pages/StepNavControls.tsx");
+  assert.match(nav, /<StepDots/);
+  assert.match(nav, /<PrevNextNav/);
   const overlay = read("src/widgets/StepOverlay.tsx");
   assert.match(overlay, /accessory\?: ReactNode/);
   const accessoryAt = overlay.indexOf("{accessory ?");

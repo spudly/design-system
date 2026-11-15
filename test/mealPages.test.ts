@@ -190,11 +190,19 @@ test("MealCookingModePage progression is controlled and bounded by the PrevNextN
   for (const prop of ["stepIndex", "onPrev", "onNext", "onDone"]) {
     assert.ok(page.includes(prop), `MealCookingModePage must take ${prop}`);
   }
+  // The nav composition itself is shared with CookingModePage in
+  // StepNavControls (#587 phase 3 tranche 5) — the convention pins
+  // follow it there; the page pins the wiring.
+  const nav = pageSource("StepNavControls");
   assert.ok(
-    page.includes("stepIndex === 0 ? {} : { onBack: onPrev }"),
+    page.includes("<StepNavControls"),
+    "the page renders the shared StepNavControls inside its StepOverlay",
+  );
+  assert.ok(
+    nav.includes("activeIndex === 0 ? {} : { onBack: props.onPrev }"),
     "the back button is omitted on the first step (the DS PrevNextNav convention)",
   );
-  assert.ok(page.includes("StepDots"), "progress renders through the DS StepDots");
+  assert.ok(nav.includes("StepDots"), "progress renders through the DS StepDots");
   assert.ok(
     !page.includes("lineHeight"),
     "no lineHeight — a font-size-derived one is the #162 ban",
@@ -220,8 +228,14 @@ test("MealCookingModePage header numbers steps by their combined position, not t
   );
   /* eslint-enable no-template-curly-in-string -- end of the expected source-text literal block */
   assert.ok(
-    page.includes("StepDots count={steps.length} activeIndex={stepIndex}"),
+    page.includes("count={steps.length}") && page.includes("activeIndex={stepIndex}"),
     "progress must keep reporting the same combined stepIndex the header uses",
+  );
+  assert.ok(
+    pageSource("StepNavControls").includes(
+      "StepDots count={props.count} activeIndex={props.activeIndex}",
+    ),
+    "the shared nav feeds that combined position to StepDots",
   );
   // A step's stepNumber is per-recipe: in the fixture's combined
   // sequence (3 steps from the first recipe, then the second

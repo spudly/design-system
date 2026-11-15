@@ -106,6 +106,8 @@ test("every page component renders BigFooter through the shell from a footer pro
   const pagesDir = join(root, "src", "pages");
   const exceptions = new Set([
     "BoundedList.tsx",
+    "StepNavControls.tsx",
+    "recipeStatusBadges.ts",
     "fixtures.ts",
     "useCatalogPagination.ts",
     "index.ts",
@@ -163,10 +165,7 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
   // the three owners: the shell's ScrollView (default), the
   // page content's own list/scroll region, or an enclosing
   // shell (nested pages opt out of scrolling entirely).
-  assert.match(
-    bigFooter,
-    /type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/,
-  );
+  assert.match(bigFooter, /type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/);
   assert.match(bigFooter, /scrollMode\?: BigFooterShellScrollMode;/);
   assert.match(bigFooter, /scrollMode = "shell"/, "the shell scroller is the default mode");
   // Native handling comes FIRST and never consults footer
