@@ -21,6 +21,7 @@ const code = strip(source);
 // header), so the section scans read the panel sources; the
 // page source hosts the wiring pins (render order, status map).
 const overviewCode = strip(readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8"));
+const statusBadgesCode = strip(readFileSync(join(pagesDir, "recipeStatusBadges.ts"), "utf8"));
 const ingredientsCode = strip(
   readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8"),
 );
@@ -298,7 +299,7 @@ test("the status badge map is page-owned with the idea fallback", () => {
     ["abandoned", "Abandoned"],
   ]) {
     assert.ok(
-      code.includes(`${status}: { label: "${label}"`),
+      statusBadgesCode.includes(`${status}: { label: "${label}"`),
       `STATUS_BADGES must map ${status} to ${label}`,
     );
   }

@@ -31,7 +31,7 @@ import { SectionHeading } from "../widgets/SectionHeading.js";
 import { SelectField } from "../widgets/SelectField.js";
 import { StatBand } from "../widgets/StatBand.js";
 import { StatCard } from "../widgets/StatCard.js";
-import { Badge, type BadgeProps } from "../widgets/Badge.js";
+import { Badge } from "../widgets/Badge.js";
 import { StatusMessage } from "../widgets/StatusMessage.js";
 import { StepList } from "../widgets/StepList.js";
 import { SuggestionPanel } from "../widgets/SuggestionPanel.js";
@@ -42,6 +42,7 @@ import { Toolbar } from "../widgets/Toolbar.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../views/ConfirmActionView.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
 import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeSharingView.js";
+import { STATUS_BADGES } from "./recipeStatusBadges.js";
 
 /**
  * RecipeDetailPage (#49): Eciperay's recipe detail screen as a
@@ -455,19 +456,11 @@ export type RecipeDetailPageProps =
 // and section copy).
 // ---------------------------------------------------------------------------
 
-// Status badge map: labels and tones for the app's four statuses
-// (idea → neutral gray, evolving → info blue, perfected → success
-// green, abandoned → danger red, matching the app's badge tints).
-// The vocabulary is this page's caller data — the shared
-// Badge takes the tone and the label as its child and owns
-// only the rendering (Stephen's #119 dedupe ruling: no
-// DS-owned status vocabulary).
-const STATUS_BADGES: Record<string, { label: string; tone: NonNullable<BadgeProps["tone"]> }> = {
-  idea: { label: "Idea", tone: "neutral" },
-  evolving: { label: "Evolving", tone: "info" },
-  perfected: { label: "Perfected", tone: "success" },
-  abandoned: { label: "Abandoned", tone: "danger" },
-};
+// The status badge map (labels and tones for the app's four
+// statuses) is shared with PublicRecipePage in
+// ./recipeStatusBadges.ts (#587 phase 3 tranche 5) — the vocabulary
+// is the pages' caller data, not something the shared Badge owns
+// (Stephen's #119 dedupe ruling).
 
 // Scale multipliers from the app's scaling constants; labels are
 // presentation, the servings math stays app-side.

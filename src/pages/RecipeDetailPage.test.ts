@@ -75,6 +75,9 @@ const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+const statusBadgesCode = readFileSync(join(pagesDir, "recipeStatusBadges.ts"), "utf8")
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const storiesCode = stories
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -226,7 +229,8 @@ test("the status badge map covers the four statuses with a fallback", () => {
     ["abandoned", "danger"],
   ]) {
     assert.ok(
-      code.includes(`${status}: { label:`) && code.includes(`tone: "${tone}"`),
+      statusBadgesCode.includes(`${status}: { label:`) &&
+        statusBadgesCode.includes(`tone: "${tone}"`),
       `STATUS_BADGES must map ${status} to the ${tone} tone`,
     );
   }

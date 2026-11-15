@@ -17,6 +17,7 @@ import { RecipeOverviewPanel } from "../widgets/RecipeOverviewPanel.js";
 import { ScrollShell } from "../widgets/ScrollShell.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
+import { STATUS_BADGES } from "./recipeStatusBadges.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,
@@ -248,21 +249,11 @@ const NOT_FOUND_MESSAGE = "This recipe may be private or no longer available.";
 const UNAVAILABLE_TITLE = "Recipe unavailable";
 const UNAVAILABLE_MESSAGE = "This recipe link is invalid or has expired.";
 
-// Status badge map: labels and tones for the app's four statuses
-// (idea → neutral gray, evolving → info blue, perfected → success
-// green, abandoned → danger red, matching the app's badge tints) —
-// the same map RecipeDetailPage carries. The page owns the map:
-// status words are the surface's data, not a vocabulary the
-// shared components own (#119 dedupe).
-const STATUS_BADGES: Record<
-  string,
-  { label: string; tone: "neutral" | "info" | "success" | "danger" }
-> = {
-  idea: { label: "Idea", tone: "neutral" },
-  evolving: { label: "Evolving", tone: "info" },
-  perfected: { label: "Perfected", tone: "success" },
-  abandoned: { label: "Abandoned", tone: "danger" },
-};
+// The status badge map (labels and tones for the app's four
+// statuses) is shared with RecipeDetailPage in
+// ./recipeStatusBadges.ts (#587 phase 3 tranche 5) — status words
+// are the surfaces' data, not a vocabulary the shared components
+// own (#119 dedupe).
 
 // The scale option set, the custom-scale label and the missing-
 // ingredients hint moved with the ingredients section into

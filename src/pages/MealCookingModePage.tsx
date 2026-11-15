@@ -1,12 +1,11 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Alert } from "../widgets/Alert.js";
 import { Button } from "../widgets/Button.js";
-import { PrevNextNav } from "../widgets/PrevNextNav.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
-import { StepDots } from "../widgets/StepDots.js";
 import { StepOverlay } from "../widgets/StepOverlay.js";
 import { Text } from "../widgets/Text.js";
+import { StepNavControls } from "./StepNavControls.js";
 
 /**
  * MealCookingModePage (#125, B3b): the meal cooking mode's
@@ -177,13 +176,11 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
         body={current.body}
         onDone={onDone}
       >
-        <StepDots count={steps.length} activeIndex={stepIndex} />
-        <PrevNextNav
-          {...(stepIndex === 0 ? {} : { onBack: onPrev })}
+        <StepNavControls
+          count={steps.length}
+          activeIndex={stepIndex}
+          onPrev={onPrev}
           onNext={onNext}
-          backLabel="← Back"
-          nextLabel="Next →"
-          nextDisabled={stepIndex >= steps.length - 1}
         />
       </StepOverlay>
     </BigFooterShell>
