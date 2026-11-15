@@ -1,6 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
+import { keyboardActivationHandler } from "./keyboardActivation.js";
 import { Text } from "./Text.js";
 
 export type MarkableRowProps = {
@@ -48,17 +49,7 @@ export function MarkableRow({
   isMarked = false,
   onPress,
 }: MarkableRowProps) {
-  const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      // A held key repeats keydown events; a native button does
-      // not re-activate on repeats (the native-button guard), and a
-      // repeat here would flip the mark back and forth.
-      if (!event.repeat) {
-        onPress?.();
-      }
-    }
-  };
+  const handleKeyDown = keyboardActivationHandler(() => onPress?.());
   return (
     <XStack
       alignItems="center"

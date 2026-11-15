@@ -1,6 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
+import { keyboardActivationHandler } from "./keyboardActivation.js";
 import { Text } from "./Text.js";
 
 export type CheckRowProps = {
@@ -46,14 +47,7 @@ export function CheckRow({ label, detail, checked, onToggle }: CheckRowProps) {
   // press. A held key's repeats still prevent the default (a
   // held Space must not scroll) but do not re-toggle: one press
   // is one toggle. Web-only props, ignored on native.
-  const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      if (!event.repeat) {
-        onToggle();
-      }
-    }
-  };
+  const handleKeyDown = keyboardActivationHandler(onToggle);
   // The row's accessible name composes the detail after the
   // label (the row family's standing rule — ListRow's composed
   // label): with the row as the one accessibility stop, a

@@ -2,6 +2,7 @@ import { Anchor, XStack, YStack, isWeb } from "tamagui";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { Card } from "./Card.js";
+import { keyboardActivationHandler } from "./keyboardActivation.js";
 import { LinkOverlay } from "./linkOverlay.js";
 import { RowTextContent } from "./RowTextContent.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
@@ -138,16 +139,7 @@ export function CardRow({
   // web-only props in Tamagui and are ignored on native, where
   // onPress is the activation path. The link form needs none of
   // this: a real anchor is keyboard-operable by default.
-  const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      // A held key repeats keydown events; a native button does not
-      // re-activate on repeats, so only the first event presses.
-      if (!event.repeat) {
-        onPress?.();
-      }
-    }
-  };
+  const handleKeyDown = keyboardActivationHandler(() => onPress?.());
   const textContent = <RowTextContent title={title} subtitle={subtitle} />;
   return (
     <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
