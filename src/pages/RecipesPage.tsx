@@ -7,7 +7,7 @@ import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { Alert } from "../widgets/Alert.js";
 import { Badge } from "../widgets/Badge.js";
 import { Card } from "../widgets/Card.js";
-import { CatalogFiltersBar, type CatalogFilterDefinition } from "../views/CatalogFiltersBar.js";
+import { CatalogFiltersBar, type CatalogFilterDefinition, type CatalogPageFilterProps } from "../views/CatalogFiltersBar.js";
 import { CatalogHeader } from "../views/CatalogHeader.js";
 import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
 import { EmptyState } from "../widgets/EmptyState.js";
@@ -284,7 +284,7 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
  * Order selects. */
 export type RecipesPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
 
-export type RecipesPageProps = {
+export type RecipesPageProps = CatalogPageFilterProps<RecipesPageFilterId> & {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
 
@@ -456,42 +456,6 @@ export type RecipesPageProps = {
   onDiscoveryLoadMoreRetry?: () => void;
   /** The discovery retry action's label ("Try again"). */
   discoveryLoadMoreRetryLabel?: string;
-
-  search: string;
-  onSearchChange: (value: string) => void;
-  /** Status filter. The control renders only when both the value and
-   * its callback are provided and `showStatusFilter` is not false —
-   * the same condition as the app's filter bar. */
-  statusFilter?: string;
-  onStatusFilterChange?: (value: string) => void;
-  showStatusFilter?: boolean;
-  ingredient: string;
-  onIngredientChange: (value: string) => void;
-  minCalories: string;
-  onMinCaloriesChange: (value: string) => void;
-  maxCalories: string;
-  onMaxCaloriesChange: (value: string) => void;
-  minSatiety: string;
-  onMinSatietyChange: (value: string) => void;
-  maxSatiety: string;
-  onMaxSatietyChange: (value: string) => void;
-  sort: string;
-  onSortChange: (value: string) => void;
-  sortDir: string;
-  onSortDirChange: (value: string) => void;
-  /** Filters currently added to the bar (#96). Controlled: when
-   * provided, the view renders exactly these filters' controls;
-   * when omitted, the view tracks the added set internally,
-   * seeded from the filters carrying non-default values. */
-  activeFilters?: RecipesPageFilterId[];
-  /** Fires with the next added set whenever the user adds or
-   * removes a filter, in controlled and uncontrolled use alike. */
-  onActiveFiltersChange?: (filters: RecipesPageFilterId[]) => void;
-  /** Whether the add-filter chooser is open (#96). Controlled
-   * like `activeFilters`; uncontrolled when omitted. */
-  filterChooserOpen?: boolean;
-  onFilterChooserOpenChange?: (open: boolean) => void;
-};
 
 /**
  * The unified list's row model: the one list renders both

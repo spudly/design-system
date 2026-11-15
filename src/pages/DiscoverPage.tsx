@@ -1,3 +1,4 @@
+import type { CatalogPageFilterProps } from "../views/CatalogFiltersBar.js";
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { RecipesPage } from "./RecipesPage.js";
 
@@ -37,7 +38,7 @@ export type DiscoverPageItem = {
  * Order selects. */
 export type DiscoverPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
 
-export type DiscoverPageProps = {
+export type DiscoverPageProps = CatalogPageFilterProps<DiscoverPageFilterId> & {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
   /** Page title copy — app-owned, like all copy on this page. */
@@ -76,44 +77,6 @@ export type DiscoverPageProps = {
    * (useCatalogPagination, #285 — the same pattern RecipesPage
    * uses, so the two catalogs share one pagination contract). */
   onLoadMore?: () => void;
-
-  search: string;
-  onSearchChange: (value: string) => void;
-  /** Status filter. The control renders only when both the value
-   * and its callback are provided and `showStatusFilter` is not
-   * false — the same condition as RecipesPage's bar. (The public
-   * host passes no status filter today; the contract mirrors
-   * RecipesPage 1:1 so the two catalogs share one bar.) */
-  statusFilter?: string;
-  onStatusFilterChange?: (value: string) => void;
-  showStatusFilter?: boolean;
-  ingredient: string;
-  onIngredientChange: (value: string) => void;
-  minCalories: string;
-  onMinCaloriesChange: (value: string) => void;
-  maxCalories: string;
-  onMaxCaloriesChange: (value: string) => void;
-  minSatiety: string;
-  onMinSatietyChange: (value: string) => void;
-  maxSatiety: string;
-  onMaxSatietyChange: (value: string) => void;
-  sort: string;
-  onSortChange: (value: string) => void;
-  sortDir: string;
-  onSortDirChange: (value: string) => void;
-  /** Filters currently added to the bar (#96). Controlled: when
-   * provided, the view renders exactly these filters' controls;
-   * when omitted, the view tracks the added set internally,
-   * seeded from the filters carrying non-default values. */
-  activeFilters?: DiscoverPageFilterId[];
-  /** Fires with the next added set whenever the user adds or
-   * removes a filter, in controlled and uncontrolled use alike. */
-  onActiveFiltersChange?: (filters: DiscoverPageFilterId[]) => void;
-  /** Whether the add-filter chooser is open (#96). Controlled
-   * like `activeFilters`; uncontrolled when omitted. */
-  filterChooserOpen?: boolean;
-  onFilterChooserOpenChange?: (open: boolean) => void;
-};
 
 /**
  * The public catalog, delegated to the unified RecipesPage

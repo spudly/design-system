@@ -128,6 +128,48 @@ export type CatalogFiltersBarProps<FilterId extends string = string> = {
   onFilterChooserOpenChange?: (open: boolean) => void;
 };
 
+/** The filter-bar prop block the catalog pages share (#587,
+ * phase 3): every catalog page — RecipesPage and its public
+ * DiscoverPage form — carries the same search and filter
+ * value/callback pairs feeding the shared CatalogFiltersBar.
+ * Declared once here so the two pages' contracts cannot drift. */
+export type CatalogPageFilterProps<FilterId extends string = string> = {
+  search: string;
+  onSearchChange: (value: string) => void;
+  /** Status filter. The control renders only when both the value
+   * and its callback are provided and `showStatusFilter` is not
+   * false. */
+  statusFilter?: string;
+  onStatusFilterChange?: (value: string) => void;
+  showStatusFilter?: boolean;
+  ingredient: string;
+  onIngredientChange: (value: string) => void;
+  minCalories: string;
+  onMinCaloriesChange: (value: string) => void;
+  maxCalories: string;
+  onMaxCaloriesChange: (value: string) => void;
+  minSatiety: string;
+  onMinSatietyChange: (value: string) => void;
+  maxSatiety: string;
+  onMaxSatietyChange: (value: string) => void;
+  sort: string;
+  onSortChange: (value: string) => void;
+  sortDir: string;
+  onSortDirChange: (value: string) => void;
+  /** Filters currently added to the bar (#96). Controlled: when
+   * provided, the page renders exactly these filters' controls;
+   * when omitted, the page tracks the added set internally,
+   * seeded from the filters carrying non-default values. */
+  activeFilters?: FilterId[];
+  /** Fires with the next added set whenever the user adds or
+   * removes a filter, in controlled and uncontrolled use alike. */
+  onActiveFiltersChange?: (filters: FilterId[]) => void;
+  /** Whether the add-filter chooser is open (#96). Controlled
+   * like `activeFilters`; uncontrolled when omitted. */
+  filterChooserOpen?: boolean;
+  onFilterChooserOpenChange?: (open: boolean) => void;
+};
+
 function NumberFilter({
   label,
   value,
