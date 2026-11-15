@@ -66,7 +66,10 @@ function count(code: string, literal: any) {
 const FAMILY: [string, string, number][] = [
   ["src/widgets/OptionCard.tsx", "decorative", 3],
   ["src/widgets/RowTextContent.tsx", "decorative", 2],
-  ["src/widgets/ListRow.tsx", "decorative", 2],
+  // ListRow's subtitle renders through RowTextContent's shared
+  // subtitle line since #587 phase 3, so only its title line
+  // counts here; the subtitle is counted on RowTextContent.
+  ["src/widgets/ListRow.tsx", "decorative", 1],
   ["src/pages/RecipesPage.tsx", "native", 3],
 ];
 

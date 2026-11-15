@@ -3,6 +3,7 @@ import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { LinkOverlay } from "./linkOverlay.js";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
+import { RowSubtitleText } from "./RowTextContent.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
@@ -118,15 +119,7 @@ export function ListRow({
         {title}
         {titleSuffix}
       </Text>
-      {subtitle ? (
-        <Text
-          variant="hint"
-          accessible={decorative ? false : undefined}
-          importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        >
-          {subtitle}
-        </Text>
-      ) : null}
+      {subtitle ? <RowSubtitleText subtitle={subtitle} decorative={decorative} /> : null}
     </>
   );
   const rowContent = renderRowContent(false);

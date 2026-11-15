@@ -111,6 +111,28 @@ const scrollContentContainerStyle = { flexGrow: 1, justifyContent: "center" } as
 // matches elements that carry a negative tabIndex (a link
 // with tabIndex={-1}), which Tab always skips — counting one
 // as the first or last stop would break the wrap.
+// The shell's DOM node, when this overlay's Tab containment
+// may act on it (#587 phase 3 — shared by the shell wrap and
+// the outside-Tab containment, which each carried this guard
+// pair): while a DS layer above this overlay is the active
+// layer, the key belongs to that layer, and a shell node that
+// cannot be queried cannot be wrapped into — both cases read
+// as no node.
+function activeShellNode(
+  shellRef: { current: TamaguiElement | null },
+  layerRef: { current: ModalLayer | null },
+): HTMLElement | null {
+  const ownLayer = layerRef.current;
+  if (ownLayer && !isActiveModalLayer(ownLayer)) {
+    return null;
+  }
+  const node = shellRef.current as unknown as HTMLElement | null;
+  if (!node || typeof node.querySelectorAll !== "function") {
+    return null;
+  }
+  return node;
+}
+
 function shellTabbables(node: HTMLElement): HTMLElement[] {
   return Array.from(
     node.querySelectorAll<HTMLElement>(
@@ -210,13 +232,9 @@ export function StepOverlay({
     // composed inside the overlay, say), the key belongs to
     // that layer — wrapping here would cycle focus inside the
     // covered overlay instead of letting the active layer's
-    // containment govern.
-    const ownLayer = layerRef.current;
-    if (ownLayer && !isActiveModalLayer(ownLayer)) {
-      return;
-    }
-    const node = shellRef.current as unknown as HTMLElement | null;
-    if (!node || typeof node.querySelectorAll !== "function") {
+    // containment govern (see activeShellNode).
+    const node = activeShellNode(shellRef, layerRef);
+    if (!node) {
       return;
     }
     const focusables = shellTabbables(node);
@@ -260,12 +278,8 @@ export function StepOverlay({
       if (event.key !== "Tab") {
         return;
       }
-      const ownLayer = layerRef.current;
-      if (ownLayer && !isActiveModalLayer(ownLayer)) {
-        return;
-      }
-      const node = shellRef.current as unknown as HTMLElement | null;
-      if (!node || typeof node.querySelectorAll !== "function") {
+      const node = activeShellNode(shellRef, layerRef);
+      if (!node) {
         return;
       }
       const active = document.activeElement as HTMLElement | null;
