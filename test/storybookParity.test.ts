@@ -121,7 +121,9 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches }:
 // shared row title/subtitle block CardRow / TextActionCardRow
 // compose (#587 phase 2), useVariantGlyphInk.ts is the shared
 // variant glyph ink hook Button / DropdownButton compose
-// (#587 phase 2), and PageFrame.tsx is
+// (#587 phase 2), LoadingStatTiles.tsx is the shared loading
+// dummy-stat tiles StatBand / StatRow compose (#587 phase 2),
+// and PageFrame.tsx is
 // page-story scaffolding (the demo stories' phone-width frame,
 // relocated out of src/pages for #119) — none is a standalone
 // component with a story of its own, and none is exported from
@@ -141,6 +143,7 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "linkOverlay.tsx",
   "labelRow.tsx",
   "RowTextContent.tsx",
+  "LoadingStatTiles.tsx",
   "useVariantGlyphInk.ts",
   "PageFrame.tsx",
 ]);

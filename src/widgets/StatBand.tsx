@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
-import { XStack, YStack } from "tamagui";
+import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { StatCard } from "./StatCard.js";
+import { useLoadingScope } from "../contexts/LoadingScope.js";
+import { LoadingStatTiles } from "./LoadingStatTiles.js";
 
 export type StatBandProps = {
   /** The band's stats — StatCards, composed by the caller. */
@@ -65,13 +65,7 @@ export function StatBand({ children, loading = false, loadingCount = 3 }: StatBa
         justifyContent="space-around"
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
-        <LoadingScope active>
-          {dummyKeys.map((key) => (
-            <YStack key={key} flex={1} paddingHorizontal={tokens.spacing[2]}>
-              <StatCard value="" label="" />
-            </YStack>
-          ))}
-        </LoadingScope>
+        <LoadingStatTiles keys={dummyKeys} />
       </XStack>
     );
   }
