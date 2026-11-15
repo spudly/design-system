@@ -3,8 +3,6 @@ import { Label, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { useImeCompositionGuard, type ImeCompositionGuard } from "./useImeCompositionGuard.js";
 
-export type FieldShellGuard = ReturnType<typeof useImeCompositionGuard>;
-
 export type FieldShellProps = ImeCompositionGuard & {
   /** The visible label, associated with the field via `htmlFor`. */
   label?: string | undefined;
@@ -16,7 +14,7 @@ export type FieldShellProps = ImeCompositionGuard & {
   /** The field itself (plus any error line), rendered inside the
    * shell with the IME composition guard's prop spreads for its
    * inner input. */
-  children: (guard: FieldShellGuard) => ReactNode;
+  children: (guard: ReturnType<typeof useImeCompositionGuard>) => ReactNode;
 };
 
 /**

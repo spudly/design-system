@@ -73,6 +73,7 @@ const formStackCode = code("FormStack.tsx");
 const viewsDir = join(here, "../..", "src", "views");
 const textFieldSource = readFileSync(join(viewsDir, "TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(viewsDir, "SearchField.tsx"), "utf8");
+const fieldShellSource = readFileSync(join(viewsDir, "FieldShell.tsx"), "utf8");
 const buttonCode = code("Button.tsx");
 
 test("the layout components are exported from the built internal components barrel", async () => {
@@ -303,8 +304,16 @@ test("SearchField's grow prop flexes the field's root, and only when set", () =>
     /grow\?: boolean;/,
     "SearchFieldProps must carry the optional grow flag (#119)",
   );
+  // The root spread lives in the shared FieldShell since the
+  // #587 phase-3 dedupe; SearchField hands its grow flag to the
+  // shell, and the shell's root carries the conditional spread.
   assert.match(
     searchFieldSource,
+    /<FieldShell[\s\S]*?grow=\{grow\}/,
+    "SearchField must hand its grow flag to the shared field shell",
+  );
+  assert.match(
+    fieldShellSource,
     /\{\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)\}/,
     "the field's root must take flex: 1 only when grow is set, so standalone fields are unchanged",
   );

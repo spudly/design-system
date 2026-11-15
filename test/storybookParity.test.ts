@@ -202,11 +202,19 @@ test("every view component has a story file titled Views/<Name>", () => {
   // AuthFormSubmit.tsx is likewise an internal helper (the
   // error-alert + submit tail the four auth forms compose, #587
   // phase 2), not a view component — no story of its own.
+  // FieldShell.tsx and SectionMutedText.tsx joined in #587
+  // phase 3 (the labeled-field shell TextField/SearchField
+  // compose; the section intro line AccountDataView/
+  // TransferRecipesView compose), and useFieldA11y.ts is an
+  // internal hook — same terms.
   const exceptions = new Set([
     "index.ts",
     "useImeCompositionGuard.ts",
+    "useFieldA11y.ts",
     "LabeledListSection.tsx",
     "AuthFormSubmit.tsx",
+    "FieldShell.tsx",
+    "SectionMutedText.tsx",
   ]);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(

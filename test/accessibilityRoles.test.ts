@@ -141,6 +141,9 @@ const TRANSLATOR_FILES = new Set([
   join(srcDir, "widgets", "OptionCard.tsx"),
   join(srcDir, "views", "TextField.tsx"),
   join(srcDir, "views", "TextAreaField.tsx"),
+  // The shared hook the two fields' a11y wiring moved into in
+  // #587 phase 3 — it is the file that now calls the translator.
+  join(srcDir, "views", "useFieldA11y.ts"),
   join(srcDir, "views", "CheckboxField.tsx"),
   join(srcDir, "widgets", "Alert.tsx"),
   // Spinner joined with its determinate ring (#178): the ring
@@ -182,8 +185,13 @@ test("no component passes an accessibilityRole outside React Native's supported 
 test("the excluded translator/forwarder files route through platformAccessibilityProps (#235)", () => {
   for (const file of TRANSLATOR_FILES) {
     const source = stripComments(readFileSync(file, "utf8"));
+    // TextField/TextAreaField route through the shared
+    // useFieldA11y hook since #587 phase 3 — the hook is the
+    // file that calls the translator on their behalf.
+    const routesThroughTranslator =
+      source.includes("platformAccessibilityProps") || source.includes("useFieldA11y(");
     assert.ok(
-      source.includes("platformAccessibilityProps"),
+      routesThroughTranslator,
       `${file}: excluded from the literal scan only because it routes accessibility props through platformAccessibilityProps`,
     );
   }

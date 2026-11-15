@@ -284,14 +284,28 @@ test("field/primitive wrappers destructure caller RN props out of rest and trans
       ",",
     );
   for (const rel of wrappers) {
-    const code = readCode(rel);
+    // TextField/TextAreaField route through the shared
+    // useFieldA11y hook since #587 phase 3 — the translator call
+    // lives there, so scan the field and the hook together.
+    const isField = rel === "src/views/TextField.tsx" || rel === "src/views/TextAreaField.tsx";
+    const code = isField ? readCode(rel) + readCode("src/views/useFieldA11y.ts") : readCode(rel);
     // One needle per routing requirement: build a11yProps via the
     // translator, spread them onto the element, and destructure
-    // the caller's accessibilityLabel out of rest.
-    const NEEDLES = ["platformAccessibilityProps({", "{...a11yProps}", "accessibilityLabel,"];
+    // the caller's accessibilityLabel out of rest. For the two
+    // fields the translator call lives in the hook (it takes the
+    // assembled props object), so their first needle is the hook
+    // call itself, and the hook's translator call is pinned after
+    // the loop.
+    const NEEDLES = isField
+      ? ["useFieldA11y(", "{...a11yProps}", "accessibilityLabel,"]
+      : ["platformAccessibilityProps({", "{...a11yProps}", "accessibilityLabel,"];
     for (const needle of NEEDLES)
       assert.ok(code.includes(needle), `${rel} must satisfy the translator routing (${needle})`);
   }
+  assert.ok(
+    readCode("src/views/useFieldA11y.ts").includes("platformAccessibilityProps("),
+    "useFieldA11y must build the fields' a11yProps via the translator",
+  );
   const backLink = readCode("src/widgets/BackLink.tsx");
   assert.match(backLink, /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/);
   const alert = readCode("src/widgets/Alert.tsx");

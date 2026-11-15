@@ -115,9 +115,12 @@ test("TextField: submit-editing is held while an IME composition is active (web)
   );
   assert.match(source, /\{\.\.\.submitEditingProps\}/);
   assert.match(source, /\{\.\.\.compositionProps\}/);
+  // The guard call itself lives in FieldShell since the #587
+  // phase-3 dedupe; TextField hands its handlers to the shell.
+  const shell = readFileSync("src/views/FieldShell.tsx", "utf8");
   assert.match(
-    source,
-    /const \{ submitEditingProps, compositionProps \} = useImeCompositionGuard\(\{\s*onCompositionStart,\s*onCompositionEnd,\s*onSubmitEditing,\s*\}\);/,
+    shell,
+    /const guard = useImeCompositionGuard\(\{\s*onCompositionStart,\s*onCompositionEnd,\s*onSubmitEditing,\s*\}\);/,
     "the field's own callbacks go into the shared hook and the guarded prop spreads come back out",
   );
 });
