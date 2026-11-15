@@ -503,7 +503,7 @@ describe("buttonSecondaryBorder", () => {
     // (#587 phase 3: the treatment lives in buttonFrameTreatment,
     // applied once there instead of once per form).
     const applications = button.match(
-      /\{\.\.\.\(variant === "secondary" \? \{ borderColor: labelColor \} : null\)\}/g,
+      /\.\.\.\(variant === "secondary" \? \{ borderColor: labelColor \} : null\),/g,
     );
     assert.equal(
       applications?.length,
