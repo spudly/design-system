@@ -191,12 +191,21 @@ test("each form's submit button is named for the label it renders, in both state
       ),
       `${form} resolves its submit label from the voice slots for the state it renders`,
     );
+    // The button itself lives in the shared AuthFormSubmit tail
+    // since the #587 phase-2 dedupe; the form passes its resolved
+    // label in, and the shared tail names and renders the button
+    // with that same label.
     assert.ok(
-      source.includes("accessibilityLabel={submitLabel}"),
+      source.includes("submitLabel={submitLabel}"),
+      `${form} passes its resolved label to the shared AuthFormSubmit tail`,
+    );
+    const tail = read(`src/views/AuthFormSubmit.tsx`);
+    assert.ok(
+      tail.includes("accessibilityLabel={submitLabel}"),
       `${form} names its submit button with the resolved label`,
     );
     assert.ok(
-      source.split("\n").some((line) => line.trim() === "{submitLabel}"),
+      tail.split("\n").some((line) => line.trim() === "{submitLabel}"),
       `${form} renders the same resolved label it is named by`,
     );
   }

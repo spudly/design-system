@@ -196,7 +196,15 @@ test("every view component has a story file titled Views/<Name>", () => {
   // LabeledListSection.tsx is likewise an internal helper (the
   // labeled-list chrome the two recipe list views compose, #587
   // phase 2), not a view component — no story of its own.
-  const exceptions = new Set(["index.ts", "useImeCompositionGuard.ts", "LabeledListSection.tsx"]);
+  // AuthFormSubmit.tsx is likewise an internal helper (the
+  // error-alert + submit tail the four auth forms compose, #587
+  // phase 2), not a view component — no story of its own.
+  const exceptions = new Set([
+    "index.ts",
+    "useImeCompositionGuard.ts",
+    "LabeledListSection.tsx",
+    "AuthFormSubmit.tsx",
+  ]);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     assert.ok(
       entry.isFile(),
