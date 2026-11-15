@@ -1,4 +1,4 @@
-import { Anchor, XStack, isWeb, styled, useTheme } from "tamagui";
+import { Anchor, XStack, YStack, isWeb, styled, useTheme } from "tamagui";
 import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
 import { navigationRoleProps, platformAccessibilityProps } from "../widgets/accessibility.js";
@@ -28,9 +28,10 @@ import { SearchField } from "./SearchField.js";
  * Nav items navigate to other pages, so every item is a LINK
  * with an href (#248's navigation rule) — there is no callback
  * form. An item may carry an icon NAME (#438 Part 4's registry —
- * data, never a component), resolved here and rendered left of
- * the label, decorative (the label is the item's accessible
- * name). The active item — the host derives it from its route
+ * data, never a component), resolved here and rendered with
+ * the label (left of it on native's row frame, centered over
+ * it in the web column stack, #627), decorative (the label is
+ * the item's accessible name). The active item — the host derives it from its route
  * and passes `activeItemId` — carries the primary-filled
  * treatment Eciperay's host shell uses today (a primary fill
  * with on-primary ink) and is marked current: `aria-current`
@@ -197,6 +198,22 @@ const StyledNavLink = styled(Anchor, {
   } as const,
 });
 
+/**
+ * The web nav item's inner layout (#627): a centered column
+ * stack — glyph over label — inside the anchor. The glyph and
+ * the raw label string must NOT be direct children of the
+ * anchor: a raw text child is laid out inline, not as a flex
+ * item, so the glyph landed left of the label's center by an
+ * amount that varied with label width. Inside this stack both
+ * are real flex items sharing one centered axis.
+ */
+const StyledNavItemStack = styled(YStack, {
+  name: "AppTopBarNavItemStack",
+  alignItems: "center",
+  justifyContent: "center",
+  gap: tokens.spacing[1],
+});
+
 const StyledNavFrame = styled(XStack, {
   name: "AppTopBarNavFrame",
   ...navItemFrameStyles,
@@ -259,8 +276,19 @@ function NavItem({
         })}
         {...{ "aria-current": active ? ("page" as const) : undefined }}
       >
-        {glyph}
-        {item.label}
+        <StyledNavItemStack>
+          {glyph}
+          <Text
+            style={{
+              color: active ? "$onPrimary" : "$textMuted",
+              fontWeight: active
+                ? tokens.typography.fontWeight.semibold
+                : tokens.typography.fontWeight.regular,
+            }}
+          >
+            {item.label}
+          </Text>
+        </StyledNavItemStack>
       </StyledNavLink>
     );
   }
