@@ -70,9 +70,21 @@ const ERROR_PAGES = [
 ];
 
 test("form components render their form-level error through Alert (assertive)", () => {
+  // The four auth forms render their error through the shared
+  // AuthFormSubmit tail since the #587 phase-2 dedupe — the tail
+  // carries the Alert rendering for them.
+  const authFormSubmit = read("src/views/AuthFormSubmit.tsx");
+  assert.ok(
+    authFormSubmit.includes(ERROR_ALERT),
+    `AuthFormSubmit renders its error via Alert severity="error"`,
+  );
   for (const name of FORM_COMPONENTS) {
     const source = formSource(name);
-    assert.ok(source.includes(ERROR_ALERT), `${name} renders its error via Alert severity="error"`);
+    assert.ok(
+      source.includes(ERROR_ALERT) ||
+        (source.includes("<AuthFormSubmit") && source.includes("error={error}")),
+      `${name} renders its error via Alert severity="error"`,
+    );
     assert.doesNotMatch(
       source,
       /<Text variant="error">\{error\}<\/Text>/,

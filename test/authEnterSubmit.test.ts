@@ -62,8 +62,18 @@ for (const { name, fields } of AUTH_FORMS) {
 
   test(`${name}: button activation still submits via onPress`, () => {
     const source = form(name);
-    assert.match(source, /disabled=\{loading\}/, `${name} button disables while loading`);
-    assert.match(source, /onPress=\{onSubmit\}/, `${name} button onPress is the submit intent`);
+    // The button itself lives in the shared AuthFormSubmit tail
+    // since the #587 phase-2 dedupe; the form wires its intent
+    // and loading state into it, and the shared tail's button
+    // carries the wiring.
+    assert.match(
+      source.replace(/\s+/g, " "),
+      /<AuthFormSubmit error=\{error\} loading=\{loading\} onSubmit=\{onSubmit\} submitLabel=\{submitLabel\} \/>/,
+      `${name} renders the shared AuthFormSubmit tail with its error, loading, submit intent, and label`,
+    );
+    const tail = form("AuthFormSubmit");
+    assert.match(tail, /disabled=\{loading\}/, `${name} button disables while loading`);
+    assert.match(tail, /onPress=\{onSubmit\}/, `${name} button onPress is the submit intent`);
   });
 }
 
