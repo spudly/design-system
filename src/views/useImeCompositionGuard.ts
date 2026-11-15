@@ -62,5 +62,41 @@ export function useImeCompositionGuard({
     }
     onSubmitEditing?.(event);
   };
-  return { handleCompositionStart, handleCompositionEnd, handleSubmitEditing };
+  // The prop spreads every guarded field applies to its inner
+  // input (#587 phase 2): the guarded submit wrapper replaces a
+  // caller-supplied submit handler, and the composition handlers
+  // are the tracking wrappers on web — on native, where
+  // composition events do not exist, the caller's own handlers
+  // forward unchanged. SearchField and TextField each carried
+  // this exact spread pair inline before it moved here.
+  // (The prop types strip `undefined` via NonNullable:
+  // exactOptionalPropertyTypes rejects a spread whose handler
+  // may be undefined into the Tamagui input's props.)
+  const submitEditingProps:
+    | { onSubmitEditing: NonNullable<ImeCompositionGuard["onSubmitEditing"]> }
+    | Record<string, never> = onSubmitEditing ? { onSubmitEditing: handleSubmitEditing } : {};
+  const compositionProps:
+    | {
+        onCompositionStart: NonNullable<ImeCompositionGuard["onCompositionStart"]>;
+        onCompositionEnd: NonNullable<ImeCompositionGuard["onCompositionEnd"]>;
+      }
+    | {
+        onCompositionStart?: NonNullable<ImeCompositionGuard["onCompositionStart"]>;
+        onCompositionEnd?: NonNullable<ImeCompositionGuard["onCompositionEnd"]>;
+      } = isWeb
+    ? {
+        onCompositionStart: handleCompositionStart,
+        onCompositionEnd: handleCompositionEnd,
+      }
+    : {
+        ...(onCompositionStart ? { onCompositionStart } : {}),
+        ...(onCompositionEnd ? { onCompositionEnd } : {}),
+      };
+  return {
+    handleCompositionStart,
+    handleCompositionEnd,
+    handleSubmitEditing,
+    submitEditingProps,
+    compositionProps,
+  };
 }

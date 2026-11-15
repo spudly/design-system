@@ -50,7 +50,7 @@ test("SearchField destructures the submit/composition handlers out of rest (#562
   assert.match(searchField, /\n {4}onCompositionStart,/);
   assert.match(searchField, /\n {4}onCompositionEnd,/);
   assert.match(searchField, /from "tamagui"/);
-  assert.match(searchField, /\bisWeb\b/, "the guard is gated on the web platform flag");
+  assert.match(guard, /\bisWeb\b/, "the guard is gated on the web platform flag");
 });
 
 test("SearchField tracks composition state with a monotonic grace window (#562)", () => {
@@ -86,32 +86,36 @@ test("the caller's composition handlers are always invoked (#562)", () => {
 });
 
 test("the guarded handlers are wired onto the inner input (#562)", () => {
+  // The spread pair is built once in the shared guard hook
+  // (#587 phase 2, tranche 10); the field only spreads it in.
   assert.match(
-    searchField,
-    /onSubmitEditing \? \{ onSubmitEditing: handleSubmitEditing \}/,
+    guard,
+    /onSubmitEditing \? \{ onSubmitEditing: handleSubmitEditing \} : \{\}/,
     "a caller-supplied submit handler is replaced by the guarded wrapper",
   );
   assert.match(
-    searchField,
+    guard,
     /isWeb[\s\S]*?onCompositionStart: handleCompositionStart[\s\S]*?onCompositionEnd: handleCompositionEnd/,
     "on web the input gets the tracking composition handlers",
   );
   assert.match(
-    searchField,
+    guard,
     /\.\.\.\(onCompositionStart \? \{ onCompositionStart \} : \{\}\)/,
     "on native the caller's composition handlers forward unchanged",
   );
   assert.match(
-    searchField,
+    guard,
     /\.\.\.\(onCompositionEnd \? \{ onCompositionEnd \} : \{\}\)/,
     "on native the caller's composition handlers forward unchanged",
   );
+  assert.match(searchField, /\{\.\.\.submitEditingProps\}/);
+  assert.match(searchField, /\{\.\.\.compositionProps\}/);
 });
 
 test("SearchField passes its callbacks to the shared guard hook and binds the returned handlers (#587)", () => {
   assert.match(
     searchField,
-    /const \{ handleCompositionStart, handleCompositionEnd, handleSubmitEditing \} =\s*useImeCompositionGuard\(\{ onCompositionStart, onCompositionEnd, onSubmitEditing \}\);/,
-    "the field's own callbacks go into the hook and the guarded handlers come back out",
+    /const \{ submitEditingProps, compositionProps \} = useImeCompositionGuard\(\{\s*onCompositionStart,\s*onCompositionEnd,\s*onSubmitEditing,\s*\}\);/,
+    "the field's own callbacks go into the hook and the guarded prop spreads come back out",
   );
 });

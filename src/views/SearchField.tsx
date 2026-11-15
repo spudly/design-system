@@ -1,5 +1,5 @@
 import { forwardRef, useId } from "react";
-import { Input as TamaguiInput, Label, View, XStack, YStack, isWeb, styled } from "tamagui";
+import { Input as TamaguiInput, Label, View, XStack, YStack, styled } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
@@ -198,8 +198,11 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
   const id = idProp ?? autoId;
 
   // IME composition guard (web) — see useImeCompositionGuard.
-  const { handleCompositionStart, handleCompositionEnd, handleSubmitEditing } =
-    useImeCompositionGuard({ onCompositionStart, onCompositionEnd, onSubmitEditing });
+  const { submitEditingProps, compositionProps } = useImeCompositionGuard({
+    onCompositionStart,
+    onCompositionEnd,
+    onSubmitEditing,
+  });
 
   return (
     <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1 } : {})}>
@@ -220,16 +223,8 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
           placeholder={placeholder}
           disabled={disabled}
           {...rest}
-          {...(onSubmitEditing ? { onSubmitEditing: handleSubmitEditing } : {})}
-          {...(isWeb
-            ? {
-                onCompositionStart: handleCompositionStart,
-                onCompositionEnd: handleCompositionEnd,
-              }
-            : {
-                ...(onCompositionStart ? { onCompositionStart } : {}),
-                ...(onCompositionEnd ? { onCompositionEnd } : {}),
-              })}
+          {...submitEditingProps}
+          {...compositionProps}
         />
         {value ? (
           <XStack
