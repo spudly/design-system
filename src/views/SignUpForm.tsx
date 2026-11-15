@@ -1,7 +1,6 @@
-import { Alert } from "../widgets/Alert.js";
 import type { ReactNode } from "react";
-import { Button } from "../widgets/Button.js";
 import { FormStack } from "../widgets/FormStack.js";
+import { AuthFormSubmit } from "./AuthFormSubmit.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { useVoice } from "../voice/index.js";
@@ -104,15 +103,12 @@ export function SignUpForm({
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
-      {error ? <Alert severity="error" message={error} /> : null}
-      <Button
-        variant="primary"
-        disabled={loading}
-        onPress={onSubmit}
-        accessibilityLabel={submitLabel}
-      >
-        {submitLabel}
-      </Button>
+      <AuthFormSubmit
+        error={error}
+        loading={loading}
+        onSubmit={onSubmit}
+        submitLabel={submitLabel}
+      />
       {legalNotice}
       {signInHref ? (
         <TextLink textAlign="center" href={signInHref}>

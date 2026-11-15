@@ -1,8 +1,7 @@
-import { Alert } from "../widgets/Alert.js";
 import { YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "../widgets/Button.js";
 import { FormStack } from "../widgets/FormStack.js";
+import { AuthFormSubmit } from "./AuthFormSubmit.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { useVoice } from "../voice/index.js";
@@ -101,15 +100,12 @@ export function SignInForm({
         onSubmitEditing={submitFromField}
         returnKeyType="go"
       />
-      {error ? <Alert severity="error" message={error} /> : null}
-      <Button
-        variant="primary"
-        disabled={loading}
-        onPress={onSubmit}
-        accessibilityLabel={submitLabel}
-      >
-        {submitLabel}
-      </Button>
+      <AuthFormSubmit
+        error={error}
+        loading={loading}
+        onSubmit={onSubmit}
+        submitLabel={submitLabel}
+      />
       {signUpHref || forgotPasswordHref ? (
         <StyledLinks>
           {signUpHref ? (
