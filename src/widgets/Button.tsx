@@ -450,6 +450,45 @@ const ghostLabelFontSizes = {
 } as const;
 
 /**
+ * The frame treatment BOTH activation forms share (#587 phase 3):
+ * the label color, the loading inertness, the danger fill, the
+ * #459 rule (a secondary frame's border always takes the label
+ * color — gray10 by default, the danger8 ink under the danger
+ * tone, the on-primary ink on a selected toggle), and the
+ * skeleton treatment, which wins over every variant fill: a
+ * filled variant's frame and border take the bone fill, so its
+ * rectangle is one solid bone, while a ghost button keeps its
+ * transparent, borderless frame and skeletonizes as text instead
+ * (Stephen on #551). One builder, so the link and button forms
+ * can never drift apart on any of these.
+ */
+function buttonFrameTreatment({
+  labelColor,
+  scopedLoading,
+  dangerFillApplies,
+  variant,
+  ghostSkeleton,
+}: {
+  labelColor: string;
+  scopedLoading: boolean;
+  dangerFillApplies: boolean;
+  variant: ButtonRenderProps["variant"];
+  ghostSkeleton: boolean;
+}) {
+  return {
+    color: labelColor,
+    ...(scopedLoading ? { pointerEvents: "none" as const } : null),
+    ...(dangerFillApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null),
+    ...(variant === "secondary" ? { borderColor: labelColor } : null),
+    ...(scopedLoading
+      ? ghostSkeleton
+        ? { backgroundColor: "transparent", borderColor: "transparent", borderWidth: 0 }
+        : { backgroundColor: "$borderColor", borderColor: "$borderColor" }
+      : null),
+  };
+}
+
+/**
  * Universal cross-platform button (web + React Native via Tamagui).
  *
  * Props: `variant` ("primary" | "secondary" | "danger" — the
@@ -701,26 +740,17 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
         variant={variant}
         {...(ghost ? { ghost: true } : null)}
         size={size}
-        color={labelColor}
-        {...(scopedLoading ? { pointerEvents: "none" as const } : null)}
-        {...(dangerFillApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null)}
-        // Same #459 rule as the button form: the secondary
-        // variant's border always takes the label color (gray10 by
-        // default, the danger8 ink under the danger tone). The
-        // link form has no selected state, so this is the only
-        // departure it needs to cover.
-        {...(variant === "secondary" ? { borderColor: labelColor } : null)}
-        // The skeleton treatment wins over every variant fill:
-        // a filled variant's frame and border take the bone
-        // fill, so its rectangle is one solid bone. A ghost
-        // button is the exception — it keeps its transparent,
-        // borderless frame and its label becomes a text bone
-        // (Stephen on #551).
-        {...(scopedLoading
-          ? ghostSkeleton
-            ? { backgroundColor: "transparent", borderColor: "transparent", borderWidth: 0 }
-            : { backgroundColor: "$borderColor", borderColor: "$borderColor" }
-          : null)}
+        // The shared frame treatment (label color, #459 border,
+        // danger fill, skeleton fill) — see buttonFrameTreatment.
+        // The link form has no selected state, so it needs no
+        // departure beyond what the builder already covers.
+        {...buttonFrameTreatment({
+          labelColor,
+          scopedLoading,
+          dangerFillApplies,
+          variant,
+          ghostSkeleton,
+        })}
         // Same instance-prop rule as the button form's `color`: the
         // BARE font name ("body", no "$") is the form that makes
         // Tamagui emit the font-context class defining `--f-family`
@@ -808,28 +838,15 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
       {...(ghost ? { ghost: true } : null)}
       size={size}
       {...(selected !== undefined ? { selected } : null)}
-      color={labelColor}
-      {...(scopedLoading ? { pointerEvents: "none" as const } : null)}
-      {...(dangerFillApplies ? { backgroundColor: tokens.colors.danger.danger1 } : null)}
-      // #459's border-matches-text rule, applied wherever the
-      // label color can depart from the variant's gray10: a
-      // SELECTED secondary button takes the primary fill and the
-      // on-primary label, and the danger tone takes danger8.
-      // Both are exactly `labelColor` (gray10 in the default
-      // case), so the secondary border simply always takes the
-      // label color. Other variants keep the frame's transparent border.
-      {...(variant === "secondary" ? { borderColor: labelColor } : null)}
-      // The skeleton treatment wins over every variant fill:
-      // a filled variant's frame and border take the bone
-      // fill, so its rectangle is one solid bone. A ghost
-      // button is the exception — it keeps its transparent,
-      // borderless frame and its label becomes a text bone
-      // (Stephen on #551).
-      {...(scopedLoading
-        ? ghostSkeleton
-          ? { backgroundColor: "transparent", borderColor: "transparent", borderWidth: 0 }
-          : { backgroundColor: "$borderColor", borderColor: "$borderColor" }
-        : null)}
+      // The shared frame treatment (label color, #459 border,
+      // danger fill, skeleton fill) — see buttonFrameTreatment.
+      {...buttonFrameTreatment({
+        labelColor,
+        scopedLoading,
+        dangerFillApplies,
+        variant,
+        ghostSkeleton,
+      })}
       // Same instance-prop rule as `color` above, for the family:
       // Tamagui Button forwards an instance `fontFamily` to its
       // internal text element, and the BARE font name ("body", no

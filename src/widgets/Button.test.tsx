@@ -498,14 +498,23 @@ describe("buttonSecondaryBorder", () => {
     // caller-passed `color` overrides the label on any secondary
     // button — a gray10 border would match the text in neither case.
     // Both departures are exactly `labelColor` (gray10 by default),
-    // so BOTH render forms pass it as the secondary border color.
+    // so the shared frame treatment passes it as the secondary
+    // border color, and BOTH render forms spread that treatment in
+    // (#587 phase 3: the treatment lives in buttonFrameTreatment,
+    // applied once there instead of once per form).
     const applications = button.match(
       /\{\.\.\.\(variant === "secondary" \? \{ borderColor: labelColor \} : null\)\}/g,
     );
     assert.equal(
       applications?.length,
+      1,
+      "the shared buttonFrameTreatment must apply the label color as the secondary border",
+    );
+    const spreads = button.match(/\{\.\.\.buttonFrameTreatment\(\{/g);
+    assert.equal(
+      spreads?.length,
       2,
-      "the button form and the href form must both apply the label color as the secondary border",
+      "the button form and the href form must both spread buttonFrameTreatment",
     );
   });
 });
