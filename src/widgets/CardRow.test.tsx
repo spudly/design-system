@@ -47,6 +47,17 @@ const rowTextSource = readFileSync(join(componentsDir, "RowTextContent.tsx"), "u
 const rowTextCode = rowTextSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+// Since #587 phase 3 the keyboard-activation handler lives in the
+// shared keyboardActivation block the pressable rows compose; the
+// keyboard pins below read that source, and CardRow's own pins hold
+// that it delegates to the block.
+const keyboardActivationSource = readFileSync(
+  join(componentsDir, "keyboardActivation.ts"),
+  "utf8",
+);
+const keyboardActivationCode = keyboardActivationSource
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("CardRow is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
@@ -79,22 +90,38 @@ test("CardRow keeps the elevated card and the div-button pressable pattern", () 
   assert.match(cardRowCode, /onPress=\{onPress\}/);
   assert.match(cardRowCode, /tabIndex=\{0\}/);
   assert.match(cardRowCode, /cursor="web:pointer"/);
-  assert.match(cardRowCode, /event\.key === "Enter" \|\| event\.key === " "/);
+  assert.match(cardRowCode, /onKeyDown=\{handleKeyDown\}/);
+  assert.match(
+    cardRowCode,
+    /const handleKeyDown = keyboardActivationHandler\(\(\) => onPress\?\.\(\)\);/,
+    "CardRow delegates keyboard activation to the shared handler (#587 phase 3)",
+  );
+  assert.match(
+    keyboardActivationCode,
+    /event\.key === "Enter" \|\| event\.key === " "/,
+    "the shared handler activates on Enter and Space",
+  );
   // The row carries no spacing outside its card: separation between
   // rows is the composing stack's gap (CardStack's 8px rhythm),
   // never the row's own padding.
   assert.doesNotMatch(cardRowCode, /paddingBlockEnd/);
 });
 test("CardRow's keyboard activation ignores held-key repeats (#313)", () => {
-  assert.match(cardRowCode, /repeat\?: boolean/, "the key handler types the repeat flag");
   assert.match(
-    cardRowCode,
-    /if \(!event\.repeat\) \{\s+onPress\?\.\(\);\s+\}/,
+    keyboardActivationCode,
+    /repeat\?: boolean/,
+    "the shared handler types the repeat flag",
+  );
+  assert.match(
+    keyboardActivationCode,
+    /if \(!event\.repeat\) \{\s+onActivate\(\);\s+\}/,
     "only the first keydown of a held key presses",
   );
   // preventDefault still runs for repeat events, before the guard,
   // so a held Space key does not scroll the page.
-  const handler = cardRowCode.slice(cardRowCode.indexOf("handleKeyDown"));
+  const handler = keyboardActivationCode.slice(
+    keyboardActivationCode.indexOf("keyboardActivationHandler"),
+  );
   assert.ok(handler.includes("event.preventDefault()"), "the key handler calls preventDefault");
   assert.ok(
     handler.indexOf("event.preventDefault()") < handler.indexOf("!event.repeat"),

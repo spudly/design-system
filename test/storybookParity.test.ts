@@ -113,7 +113,9 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches }:
 }
 
 // Internal helpers, not widgets: accessibility.ts / tagColors.ts
-// are prop/style translators, modalRegistry.ts is the internal
+// are prop/style translators, keyboardActivation.ts is the shared
+// web keyboard-activation handler the pressable rows compose
+// (#587 phase 3), modalRegistry.ts is the internal
 // modal-layer registry Dialog/StepOverlay register in (#394),
 // linkOverlay.tsx is the native-only link layer other components
 // compose, labelRow.tsx is the shared label-row implementation
@@ -137,6 +139,7 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   // (Widgets/BigFooter) and is exercised through every page story.
   "BigFooter.tsx",
   "accessibility.ts",
+  "keyboardActivation.ts",
   "index.ts",
   "modalRegistry.ts",
   "tagColors.ts",

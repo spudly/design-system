@@ -21,6 +21,18 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "../..", "src", "widgets", "MarkableRow.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
+// Since #587 phase 3 the keyboard-activation handler lives in the
+// shared keyboardActivation block the pressable rows compose; the
+// keyboard pins below read that source, and MarkableRow's own pins
+// hold that it delegates to the block.
+const keyboardActivationSource = readFileSync(
+  join(here, "../..", "src", "widgets", "keyboardActivation.ts"),
+  "utf8",
+);
+const keyboardActivationCode = keyboardActivationSource
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
 test("MarkableRow is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await import("../../dist/widgets/index.js");
   assert.equal(
@@ -42,12 +54,22 @@ test("a marked row dims but keeps its press — the mark is a toggle, not a disa
 
 test("the press form is keyboard-operable on web (the ListRow pattern)", () => {
   assert.match(code, /tabIndex: 0,/);
-  assert.match(code, /event\.key === "Enter" \|\| event\.key === " "/);
+  assert.match(
+    code,
+    /const handleKeyDown = keyboardActivationHandler\(\(\) => onPress\?\.\(\)\);/,
+    "MarkableRow delegates keyboard activation to the shared handler (#587 phase 3)",
+  );
+  assert.match(code, /onKeyDown: handleKeyDown,/);
+  assert.match(
+    keyboardActivationCode,
+    /event\.key === "Enter" \|\| event\.key === " "/,
+    "the shared handler activates on Enter and Space",
+  );
   assert.match(code, /onPress\?\.\(\)/, "the button keys invoke the same callback as a press");
   // A held key must not re-activate (the native-button guard): a
   // repeat would flip the mark back and forth until release.
-  assert.match(code, /repeat\?: boolean;/);
-  assert.match(code, /if \(!event\.repeat\) \{\s*onPress\?\.\(\);/);
+  assert.match(keyboardActivationCode, /repeat\?: boolean;/);
+  assert.match(keyboardActivationCode, /if \(!event\.repeat\) \{\s*onActivate\(\);/);
 });
 
 test("the trailing note renders only when provided", () => {

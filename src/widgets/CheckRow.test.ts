@@ -25,6 +25,18 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "../..", "src", "widgets", "CheckRow.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
+// Since #587 phase 3 the keyboard-activation handler lives in the
+// shared keyboardActivation block the pressable rows compose; the
+// keyboard pins below read that source, and CheckRow's own pins
+// hold that it delegates to the block.
+const keyboardActivationSource = readFileSync(
+  join(here, "../..", "src", "widgets", "keyboardActivation.ts"),
+  "utf8",
+);
+const keyboardActivationCode = keyboardActivationSource
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
 test("CheckRow is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
@@ -50,7 +62,12 @@ test("the accessible name composes the detail after the label (the row family's 
 });
 
 test("a held activation key does not re-toggle: repeats are ignored", () => {
-  assert.match(code, /if \(!event\.repeat\) \{\s+onToggle\(\);\s+\}/);
+  assert.match(
+    code,
+    /const handleKeyDown = keyboardActivationHandler\(onToggle\);/,
+    "CheckRow delegates keyboard activation to the shared handler (#587 phase 3)",
+  );
+  assert.match(keyboardActivationCode, /if \(!event\.repeat\) \{\s+onActivate\(\);\s+\}/);
 });
 
 test("checked rows render struck through and muted; the box fills with the check glyph", () => {
@@ -78,7 +95,12 @@ test("the detail renders as one muted segment after the middle-dot separator", (
 test("the row is the press target with web keyboard activation", () => {
   assert.match(code, /onPress=\{onToggle\}/);
   assert.match(code, /tabIndex=\{0\}/);
-  assert.match(code, /event\.key === "Enter" \|\| event\.key === " "/);
+  assert.match(code, /onKeyDown=\{handleKeyDown\}/);
+  assert.match(
+    keyboardActivationCode,
+    /event\.key === "Enter" \|\| event\.key === " "/,
+    "the shared handler activates on Enter and Space",
+  );
 });
 
 test("the row owns its hairline and padding; no separation of its own beyond the list's", () => {
