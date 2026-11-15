@@ -1,9 +1,8 @@
-import { useId } from "react";
-import { Input as TamaguiInput, Label, YStack, isWeb, styled } from "tamagui";
+import { Input as TamaguiInput, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../widgets/accessibility.js";
-import { useImeCompositionGuard } from "./useImeCompositionGuard.js";
+import { FieldShell } from "./FieldShell.js";
+import { useFieldA11y } from "./useFieldA11y.js";
 import { Text } from "../widgets/Text.js";
 
 const StyledInput = styled(TamaguiInput, {
@@ -116,20 +115,20 @@ export function TextField({
   accessibilityValue,
   ...rest
 }: TextFieldProps) {
-  const a11yProps = platformAccessibilityProps({
-    accessible,
-    accessibilityElementsHidden,
-    accessibilityHint,
-    accessibilityLabel,
-    accessibilityLabelledBy,
-    accessibilityLiveRegion,
-    accessibilityRole,
-    accessibilityState,
-    accessibilityValue,
-  });
-  const autoId = useId();
-  const id = idProp ?? autoId;
-  const errorId = `${id}-error`;
+  const { a11yProps, id, errorId } = useFieldA11y(
+    {
+      accessible,
+      accessibilityElementsHidden,
+      accessibilityHint,
+      accessibilityLabel,
+      accessibilityLabelledBy,
+      accessibilityLiveRegion,
+      accessibilityRole,
+      accessibilityState,
+      accessibilityValue,
+    },
+    idProp,
+  );
   // `secureTextEntry` is a React Native prop; Tamagui's web Input
   // destructures it out and discards it, so a password field rendered
   // as a plain text input and showed the password as typed (#262,
@@ -162,42 +161,41 @@ export function TextField({
     }).filter(([, value]) => value !== undefined),
   ) as Pick<StyledInputProps, "autoComplete">;
 
-  // IME composition guard (web) — see useImeCompositionGuard.
-  const { submitEditingProps, compositionProps } = useImeCompositionGuard({
-    onCompositionStart,
-    onCompositionEnd,
-    onSubmitEditing,
-  });
-
   return (
-    <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1 } : {})}>
-      {label ? (
-        <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
-          {label}
-        </Label>
-      ) : null}
-      <StyledInput
-        id={id}
-        error={!!error}
-        changed={changed ?? false}
-        placeholderTextColor={
-          placeholderTextColor ?? (changed ? tokens.colors.warning.warning10 : "$textMuted")
-        }
-        aria-invalid={error ? true : undefined}
-        aria-describedby={error ? errorId : undefined}
-        {...a11yProps}
-        {...rest}
-        {...(grow ? { flex: 1 } : {})}
-        {...secureProps}
-        {...autoCompleteProps}
-        {...submitEditingProps}
-        {...compositionProps}
-      />
-      {error ? (
-        <Text variant="error" id={errorId}>
-          {error}
-        </Text>
-      ) : null}
-    </YStack>
+    <FieldShell
+      label={label}
+      id={id}
+      grow={grow}
+      onCompositionStart={onCompositionStart}
+      onCompositionEnd={onCompositionEnd}
+      onSubmitEditing={onSubmitEditing}
+    >
+      {({ submitEditingProps, compositionProps }) => (
+        <>
+          <StyledInput
+            id={id}
+            error={!!error}
+            changed={changed ?? false}
+            placeholderTextColor={
+              placeholderTextColor ?? (changed ? tokens.colors.warning.warning10 : "$textMuted")
+            }
+            aria-invalid={error ? true : undefined}
+            aria-describedby={error ? errorId : undefined}
+            {...a11yProps}
+            {...rest}
+            {...(grow ? { flex: 1 } : {})}
+            {...secureProps}
+            {...autoCompleteProps}
+            {...submitEditingProps}
+            {...compositionProps}
+          />
+          {error ? (
+            <Text variant="error" id={errorId}>
+              {error}
+            </Text>
+          ) : null}
+        </>
+      )}
+    </FieldShell>
   );
 }

@@ -44,6 +44,7 @@ const searchField = readCode("src/views/SearchField.tsx");
 // The guard itself lives in the shared hook since the #587
 // phase-2 dedupe; the field files only wire its handlers in.
 const guard = readCode("src/views/useImeCompositionGuard.ts");
+const fieldShell = readCode("src/views/FieldShell.tsx");
 
 test("SearchField destructures the submit/composition handlers out of rest (#562)", () => {
   assert.match(searchField, /\n {4}onSubmitEditing,/);
@@ -113,9 +114,17 @@ test("the guarded handlers are wired onto the inner input (#562)", () => {
 });
 
 test("SearchField passes its callbacks to the shared guard hook and binds the returned handlers (#587)", () => {
+  // The guard call itself lives in FieldShell (#587 phase 3):
+  // SearchField hands its callbacks to the shell, and the shell
+  // passes them to the hook and binds the returned handlers.
   assert.match(
     searchField,
-    /const \{ submitEditingProps, compositionProps \} = useImeCompositionGuard\(\{\s*onCompositionStart,\s*onCompositionEnd,\s*onSubmitEditing,\s*\}\);/,
-    "the field's own callbacks go into the hook and the guarded prop spreads come back out",
+    /<FieldShell[\s\S]*?onCompositionStart=\{onCompositionStart\}[\s\S]*?onCompositionEnd=\{onCompositionEnd\}[\s\S]*?onSubmitEditing=\{onSubmitEditing\}/,
+    "the field's own callbacks go into the shell",
+  );
+  assert.match(
+    fieldShell,
+    /const guard = useImeCompositionGuard\(\{\s*onCompositionStart,\s*onCompositionEnd,\s*onSubmitEditing,\s*\}\);/,
+    "the shell passes the callbacks to the hook and the guarded prop spreads come back out",
   );
 });
