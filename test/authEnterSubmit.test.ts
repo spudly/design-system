@@ -106,14 +106,18 @@ test("TextField: submit-editing is held while an IME composition is active (web)
     /if \(\s*isWeb &&\s*\(composingRef\.current \|\|\s*performance\.now\(\) - compositionEndedAtRef\.current < 100\)\s*\) \{\s*return;\s*\}\s*onSubmitEditing\?\.\(event\);/,
     "submit-editing is held while composing on web — and for the grace window after composition ends (Safari fires compositionend before the confirming Enter keydown) — and otherwise fires",
   );
+  // The spread pair is built once in the shared guard hook
+  // (#587 phase 2, tranche 10); the field only spreads it in.
   assert.match(
-    source,
-    /onCompositionStart: handleCompositionStart,[\s\S]*?onCompositionEnd: handleCompositionEnd,/,
+    guard,
+    /isWeb[\s\S]*?onCompositionStart: handleCompositionStart[\s\S]*?onCompositionEnd: handleCompositionEnd/,
     "the composition handlers are wired on the web target",
   );
+  assert.match(source, /\{\.\.\.submitEditingProps\}/);
+  assert.match(source, /\{\.\.\.compositionProps\}/);
   assert.match(
     source,
-    /const \{ handleCompositionStart, handleCompositionEnd, handleSubmitEditing \} =\s*useImeCompositionGuard\(\{ onCompositionStart, onCompositionEnd, onSubmitEditing \}\);/,
-    "the field's own callbacks go into the shared hook and the guarded handlers come back out",
+    /const \{ submitEditingProps, compositionProps \} = useImeCompositionGuard\(\{\s*onCompositionStart,\s*onCompositionEnd,\s*onSubmitEditing,\s*\}\);/,
+    "the field's own callbacks go into the shared hook and the guarded prop spreads come back out",
   );
 });

@@ -163,8 +163,11 @@ export function TextField({
   ) as Pick<StyledInputProps, "autoComplete">;
 
   // IME composition guard (web) — see useImeCompositionGuard.
-  const { handleCompositionStart, handleCompositionEnd, handleSubmitEditing } =
-    useImeCompositionGuard({ onCompositionStart, onCompositionEnd, onSubmitEditing });
+  const { submitEditingProps, compositionProps } = useImeCompositionGuard({
+    onCompositionStart,
+    onCompositionEnd,
+    onSubmitEditing,
+  });
 
   return (
     <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1 } : {})}>
@@ -187,16 +190,8 @@ export function TextField({
         {...(grow ? { flex: 1 } : {})}
         {...secureProps}
         {...autoCompleteProps}
-        {...(onSubmitEditing ? { onSubmitEditing: handleSubmitEditing } : {})}
-        {...(isWeb
-          ? {
-              onCompositionStart: handleCompositionStart,
-              onCompositionEnd: handleCompositionEnd,
-            }
-          : {
-              ...(onCompositionStart ? { onCompositionStart } : {}),
-              ...(onCompositionEnd ? { onCompositionEnd } : {}),
-            })}
+        {...submitEditingProps}
+        {...compositionProps}
       />
       {error ? (
         <Text variant="error" id={errorId}>
