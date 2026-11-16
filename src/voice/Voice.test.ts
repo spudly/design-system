@@ -40,6 +40,26 @@ test("fixtures are typed as Voice and the pseudo-locale fixture transforms every
   }
 });
 
+test("both Storybook previews install the VoiceProvider with the fixture voice (#649)", () => {
+  // Regression guard: the web preview got the #539 wrap, the on-device
+  // (RN) preview did not — every native story whose tree calls
+  // useVoice() threw and rendered the Storybook error frame. Both
+  // previews must keep the provider so a preview rewrite cannot
+  // silently drop it again.
+  for (const path of [".storybook/preview.tsx", "apps/storybook/.rnstorybook/preview.tsx"]) {
+    const preview = read(path);
+    // The provider must ENCLOSE the story, not merely appear beside
+    // it: a sibling <VoiceProvider /> would leave the story tree
+    // without voice context and the error frames would return.
+    const open = preview.indexOf("<VoiceProvider voice={fixtureVoice}>");
+    const story = preview.indexOf("<Story />", open);
+    const close = preview.indexOf("</VoiceProvider>", story);
+    assert.ok(open !== -1, `${path} must render VoiceProvider with the fixture voice`);
+    assert.ok(story > open, `${path} must render the story inside the VoiceProvider`);
+    assert.ok(close > story, `${path} must close the VoiceProvider after the story`);
+  }
+});
+
 test("Voice uses type aliases, not interfaces (DS code style)", () => {
   const voice = read("src/voice/Voice.tsx");
   assert.doesNotMatch(voice, /\binterface\s+(Voice|VoiceProviderProps)\b/);

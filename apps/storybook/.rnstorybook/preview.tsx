@@ -1,6 +1,8 @@
 import type { Preview } from "@storybook/react";
 import { TamaguiProvider, YStack } from "tamagui";
 import { createOnDeviceStorybookTamaguiConfig } from "../../../src/tamagui.config.js";
+import { fixtureVoice } from "../../../src/voice/fixtures.js";
+import { VoiceProvider } from "../../../src/voice/index.js";
 import { getCaptureThemeOverride } from "../captureTheme";
 
 // On-device mirror of the web .storybook/preview.tsx: same decorator
@@ -29,9 +31,11 @@ const preview: Preview = {
       const themeName = getCaptureThemeOverride() ?? (context.globals.theme as string) ?? "light";
       return (
         <TamaguiProvider key={themeName} config={config} defaultTheme={themeName}>
-          <YStack flex={1} backgroundColor="$background" padding={24}>
-            <Story />
-          </YStack>
+          <VoiceProvider voice={fixtureVoice}>
+            <YStack flex={1} backgroundColor="$background" padding={24}>
+              <Story />
+            </YStack>
+          </VoiceProvider>
         </TamaguiProvider>
       );
     },
