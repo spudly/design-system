@@ -44,20 +44,19 @@ const preview: Preview = {
       // and this frozen provider covers any provider-scoped
       // subtree. Browse mode never freezes.
       const captureMode = isCaptureModeActive();
+      const toolbarViewport = context.globals.dsViewport as string | undefined;
       const viewport =
-        (context.globals.dsViewport as string | undefined) ??
+        toolbarViewport ??
         (context.parameters.dsViewport as string | undefined) ??
         "phone";
-      const frameHeight =
-        (context.parameters.dsViewportHeight as number | undefined) ??
-        (viewport === "shortPhone" ? 430 : 844);
-      const story = captureMode ? (
-        <SkeletonClock frozen>
-          <Story />
-        </SkeletonClock>
-      ) : (
-        <Story />
-      );
+      // Same toolbar-owns-the-frame rule as the web preview: a
+      // dsViewportHeight pin applies only to the no-toolbar default.
+      const frameHeight = toolbarViewport
+        ? toolbarViewport === "shortPhone"
+          ? 430
+          : 844
+        : ((context.parameters.dsViewportHeight as number | undefined) ??
+          (viewport === "shortPhone" ? 430 : 844));
       return (
         <TamaguiProvider key={themeName} config={config} defaultTheme={themeName}>
           <VoiceProvider voice={fixtureVoice}>
@@ -81,12 +80,24 @@ const preview: Preview = {
                   height={frameHeight}
                   position="relative"
                 >
-                  {story}
+                  {captureMode ? (
+                    <SkeletonClock frozen>
+                      <Story />
+                    </SkeletonClock>
+                  ) : (
+                    <Story />
+                  )}
                 </View>
               </YStack>
             ) : (
               <YStack flex={1} backgroundColor="$background" padding={24}>
-                {story}
+                {captureMode ? (
+                  <SkeletonClock frozen>
+                    <Story />
+                  </SkeletonClock>
+                ) : (
+                  <Story />
+                )}
               </YStack>
             )}
           </VoiceProvider>

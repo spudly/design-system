@@ -100,13 +100,21 @@ const preview: Preview = {
       // captures keep rendering page stories at exactly their previous
       // frames (430×844 phone; AppShellPage 1024×844 and
       // PublicRecipePage 1024×900 via their parameters).
+      const toolbarViewport = context.globals.dsViewport as string | undefined;
       const viewport =
-        (context.globals.dsViewport as string | undefined) ??
+        toolbarViewport ??
         (context.parameters.dsViewport as string | undefined) ??
         "phone";
-      const frameHeight =
-        (context.parameters.dsViewportHeight as number | undefined) ??
-        (viewport === "shortPhone" ? 430 : 844);
+      // A toolbar selection owns the frame entirely: the story's
+      // dsViewportHeight pin (e.g. PublicRecipePage's 900) applies
+      // only to the no-toolbar capture default, never over a
+      // Phone/Short phone switch.
+      const frameHeight = toolbarViewport
+        ? toolbarViewport === "shortPhone"
+          ? 430
+          : 844
+        : ((context.parameters.dsViewportHeight as number | undefined) ??
+          (viewport === "shortPhone" ? 430 : 844));
       const themeValue = context.globals.theme as string;
       const theme: StorybookThemeName = isStorybookThemeName(themeValue) ? themeValue : "light";
       return (
