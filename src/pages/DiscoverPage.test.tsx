@@ -145,10 +145,11 @@ test("the collapsed-filter contract props are declared (decision 2)", () => {
     /export type DiscoverPageFilterId = "status" \| "ingredient" \| "calories" \| "satiety" \| "sort";/,
     "DiscoverPageFilterId must enumerate the five addable filters",
   );
-  assert.match(page, /activeFilters\?: DiscoverPageFilterId\[\];/);
-  assert.match(page, /onActiveFiltersChange\?: \(filters: DiscoverPageFilterId\[\]\) => void;/);
-  assert.match(page, /filterChooserOpen\?: boolean;/);
-  assert.match(page, /onFilterChooserOpenChange\?: \(open: boolean\) => void;/);
+  assert.match(page, /CatalogPageFilterProps<DiscoverPageFilterId>/);
+  assert.match(bar, /activeFilters\?: FilterId\[\];/);
+  assert.match(bar, /onActiveFiltersChange\?: \(filters: FilterId\[\]\) => void;/);
+  assert.match(bar, /filterChooserOpen\?: boolean;/);
+  assert.match(bar, /onFilterChooserOpenChange\?: \(open: boolean\) => void;/);
 });
 test("search (with the page's own placeholder) and the Filters button are the initial render", () => {
   assert.match(
