@@ -396,3 +396,29 @@ test("the page composes through the purpose-named layout components (#119)", () 
     "the entry rows must compose as one ListStack inside the Entries card (SectionCard spaces its own children; the rows own theirs)",
   );
 });
+
+test("the week view is an optional view-model prop (#660)", () => {
+  assert.match(
+    code,
+    /weekView\?: MealPlanDetailPageWeekView \| null;/,
+    "the week view's data must cross as one optional prop on the ready props, null included",
+  );
+  assert.match(code, /export type MealPlanDetailPageDay = \{/);
+  assert.match(code, /dailyTotals: MealPlanDetailPageWeeklyTotalsRow\[\];/);
+  assert.match(code, /satietyLabel\?: string;/);
+  assert.match(index, /type MealPlanDetailPageDay,/);
+  assert.match(index, /type MealPlanDetailPageWeekView,/);
+});
+
+test("the week view renders one column per supplied day, with totals below (#660)", () => {
+  assert.match(code, /weekView && weekView\.days\.length > 0 \? weekView\.days : null/);
+  assert.match(code, /<WeekDayColumns>/);
+  assert.match(code, /<WeekDayColumn/);
+  assert.match(code, /day\.dailyTotals\.map\(\(row\) => \(/);
+  assert.match(code, /<DetailRow label="Satiety" value=\{day\.satietyLabel\} \/>/);
+  assert.match(code, /No entries/, "a supplied empty day renders its empty-state line");
+  assert.match(stories, /export const WeekView/);
+  assert.match(stories, /export const NonSevenDay/);
+  assert.match(stories, /export const EmptyDay/);
+  assert.match(stories, /weekView=\{\{ days: weekDays \}\}/);
+});

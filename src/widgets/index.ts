@@ -161,3 +161,9 @@ export {
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./Toolbar.js";
 export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";
+export {
+  WeekDayColumn,
+  WeekDayColumns,
+  type WeekDayColumnProps,
+  type WeekDayColumnsProps,
+} from "./WeekDayColumn.js";

@@ -49,9 +49,11 @@ export {
 } from "./RecipeDetailPage.js";
 export {
   MealPlanDetailPage,
+  type MealPlanDetailPageDay,
   type MealPlanDetailPageEntry,
   type MealPlanDetailPageNutritionGoals,
   type MealPlanDetailPageProps,
+  type MealPlanDetailPageWeekView,
   type MealPlanDetailPageWeeklyTotals,
   type MealPlanDetailPageWeeklyTotalsRow,
 } from "./MealPlanDetailPage.js";
