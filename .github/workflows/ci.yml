@@ -123,11 +123,15 @@ jobs:
       - name: knip — dead-code detection (enforce mode)
         run: npm run knip
 
-  # Copy-paste detection (#587, Phase 1 — warn mode only): reports
-  # duplication in the job summary but can never block a PR. The
-  # threshold in .jscpd.json is 100 (informational), this job is NOT
-  # in ci-gate's needs, and it gets no required-status wiring until
-  # the Phase 3 enforce PR.
+  # Copy-paste detection (#587, Phase 3 — enforce mode): the Phase 2/3
+  # burn-down tranches brought shipped source (src, excluding stories
+  # and tests) to 6 clones / 0.42% duplicated lines on the tranche-6
+  # head, so the shipped-source run is unmasked against the
+  # .jscpd.json threshold of 1% and this job is wired into ci-gate's
+  # needs — new copy-paste code above the threshold blocks merge.
+  # Stories and tests keep warn-mode reporting only: fixture/setup
+  # duplication there is intentional (measured 8.30% on the same head)
+  # and is reported in the job summary, never gated.
   jscpd:
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -144,14 +148,8 @@ jobs:
       - run: npm ci
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: jscpd — shipped source (warn mode)
-        run: |
-          {
-            echo "## jscpd baseline — shipped source (src, excluding stories/tests)"
-            echo '```'
-            npm run jscpd:source 2>&1 || true
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
+      - name: jscpd — shipped source (enforce mode)
+        run: npm run jscpd:source
       - name: jscpd — stories and tests (warn mode, reported separately)
         run: |
           {
@@ -171,7 +169,7 @@ jobs:
   # all (see the PR description).
   ci-gate:
     name: ci-gate
-    needs: [ci, knip]
+    needs: [ci, knip, jscpd]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5
