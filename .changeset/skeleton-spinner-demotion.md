@@ -1,5 +1,0 @@
----
-"@spudly/ui": patch
----
-
-Spinner is demoted to its approved survivor uses (#278, tranche 5 of 5 — the survivor audit that completes the universal-skeleton program). The audit is grep-verified and now test-enforced: no page, view, widget, list, or section renders a Spinner for content loading — every content wait renders layout-matched skeletons through its `loading` prop. Spinner stays exported only for the waits a skeleton cannot represent: its determinate progress ring for waits with known progress (uploads, AI generation), inline search-in-flight where the field and current results stay live (AutocompletePicker, VerseSearchPage), and PayPage's external secure-payment window opening. Spinner's documentation is narrowed to those uses, and two stale comments that still described spinner-based loading (MessageCard, RecipeExportPickerView) are corrected to the skeleton treatment. Test: render any page, view, or list in its loading state and confirm skeletons appear with no spinner; open the Spinner stories and confirm the indeterminate and determinate (progress-ring) modes still render.
