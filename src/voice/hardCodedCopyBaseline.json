@@ -37,6 +37,7 @@
   "pages/MealFormPage.tsx|attr|Save meal",
   "pages/MealFormPage.tsx|attr|Search recipes…",
   "pages/MealFormPage.tsx|attr|Servings this entry covers",
+  "pages/MealFormPage.tsx|attr|Servings to eat this entry covers",
   "pages/MealFormPage.tsx|attr|Title",
   "pages/MealFormPage.tsx|attr|Unit (e.g. cups)",
   "pages/MealFormPage.tsx|jsx|Add ingredient",
