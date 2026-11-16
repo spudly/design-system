@@ -1,7 +1,5 @@
 import { memorizeFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import {
   MemorizationSessionPage,
   type MemorizationSessionPageWord,
@@ -39,14 +37,6 @@ const meta: Meta<typeof MemorizationSessionPage> = {
 export default meta;
 type Story = StoryObj<typeof MemorizationSessionPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 const passageText =
   "The old lighthouse keeper climbed the spiral stairs each evening, carrying a lantern and a worn notebook, and wrote down the weather before lighting the lamp.";
 const passageWords = passageText.split(" ");
@@ -69,7 +59,7 @@ export const FirstRound: Story = {
   // shows the full passage so the user reads it before the
   // cloze begins.
   render: () => (
-    <Viewport>
+    <>
       <MemorizationSessionPage
         footer={memorizeFooterFixture}
         state="ready"
@@ -82,7 +72,7 @@ export const FirstRound: Story = {
         onBlankReveal={noop}
         onAdvance={noop}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -91,7 +81,7 @@ export const MidSession: Story = {
   // the user has peeked at two of them — they render as plain
   // text among the remaining blanks.
   render: () => (
-    <Viewport>
+    <>
       <MemorizationSessionPage
         footer={memorizeFooterFixture}
         state="ready"
@@ -104,7 +94,7 @@ export const MidSession: Story = {
         onBlankReveal={noop}
         onAdvance={noop}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -115,7 +105,7 @@ export const RetryFeedback: Story = {
   // peeked blanks stay revealed — a retry keeps the round's
   // state, as the app keeps it.
   render: () => (
-    <Viewport>
+    <>
       <MemorizationSessionPage
         footer={memorizeFooterFixture}
         state="ready"
@@ -129,7 +119,7 @@ export const RetryFeedback: Story = {
         onBlankReveal={noop}
         onAdvance={noop}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -137,7 +127,7 @@ export const FinalRound: Story = {
   // Round 7 of 7: nearly every word is blanked (24 of 26)
   // and the advance button becomes the finish action.
   render: () => (
-    <Viewport>
+    <>
       <MemorizationSessionPage
         footer={memorizeFooterFixture}
         state="ready"
@@ -152,7 +142,7 @@ export const FinalRound: Story = {
         onBlankReveal={noop}
         onAdvance={noop}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -160,8 +150,8 @@ export const NotFound: Story = {
   // The app screen's missing-verse branch: a plain line and
   // the primary Back button (not the drill's ghost one).
   render: () => (
-    <Viewport>
+    <>
       <MemorizationSessionPage footer={memorizeFooterFixture} state="not-found" onBack={noop} />
-    </Viewport>
+    </>
   ),
 };

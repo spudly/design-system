@@ -1,6 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { recipeFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import { EditVersionPage } from "./EditVersionPage.js";
 import { RecipeFormPage, type RecipeFormPageProps } from "./RecipeFormPage.js";
@@ -21,14 +20,6 @@ const meta: Meta<typeof EditVersionPage> = {
 
 export default meta;
 type Story = StoryObj<typeof EditVersionPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 function useFormProps(): RecipeFormPageProps {
   const fixture = recipeFormFixture;
@@ -90,21 +81,21 @@ function Shell() {
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Shell />
-    </Viewport>
+    </>
   ),
 };
 
 export const NotEditable: Story = {
   render: () => (
-    <Viewport>
+    <>
       <EditVersionPage
         footer={eciperayFooterFixture}
         versionNumber={1}
         notEditable
         backHref="/recipes/1"
       />
-    </Viewport>
+    </>
   ),
 };

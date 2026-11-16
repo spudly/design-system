@@ -1,4 +1,4 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import type { RecipeIngredientRow } from "../views/RecipeIngredientListView.js";
@@ -34,14 +34,6 @@ const meta: Meta<typeof RecipeFormPage> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeFormPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 const ingredientRows: RecipeIngredientRow[] = [
   { key: "chicken", quantity: "1 1/2", unit: "lb", name: "Chicken breasts" },
@@ -186,17 +178,17 @@ function FormHarness({
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <FormHarness submitLabel="Create Recipe" />
-    </Viewport>
+    </>
   ),
 };
 
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <>
       <FormHarness submitLabel="Create Recipe" empty />
-    </Viewport>
+    </>
   ),
 };
 
@@ -204,9 +196,9 @@ export const Empty: Story = {
  * notice; scalars and tags stay editable. */
 export const ContentLocked: Story = {
   render: () => (
-    <Viewport>
+    <>
       <FormHarness submitLabel="Save Changes" contentLocked />
-    </Viewport>
+    </>
   ),
 };
 
@@ -214,7 +206,7 @@ export const ContentLocked: Story = {
  * wash and a revert affordance; changed lists get their banners. */
 export const VersionDiff: Story = {
   render: () => (
-    <Viewport>
+    <>
       <FormHarness
         submitLabel="Save Draft"
         changedFields={["title", "servings", "image"]}
@@ -227,15 +219,15 @@ export const VersionDiff: Story = {
         ingredientsChangedLabel="Ingredients changed from parent version (6 ingredients)"
         instructionsChangedLabel="Instructions changed from parent version (4 steps)"
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const LoadingTags: Story = {
   render: () => (
-    <Viewport>
+    <>
       <FormHarness submitLabel="Create Recipe" loadingTags />
-    </Viewport>
+    </>
   ),
 };
 

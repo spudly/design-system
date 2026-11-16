@@ -1,7 +1,5 @@
 import { memorizeFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { VerseSearchPage, type VerseSearchPageItem } from "./VerseSearchPage.js";
 
 /**
@@ -28,14 +26,6 @@ const meta: Meta<typeof VerseSearchPage> = {
 
 export default meta;
 type Story = StoryObj<typeof VerseSearchPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 // Search results as the app's data source returns them: reference
 // and full text per verse. The set answers the fixture query
@@ -68,7 +58,7 @@ const etherResult: VerseSearchPageItem[] = [
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
@@ -80,7 +70,7 @@ export const Default: Story = {
         results={charityResults}
         onAddVerse={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -89,7 +79,7 @@ export const WithAddedResult: Story = {
   // disabled "Added" confirmation instead of the Add button;
   // the other results keep the active button.
   render: () => (
-    <Viewport>
+    <>
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
@@ -103,7 +93,7 @@ export const WithAddedResult: Story = {
         )}
         onAddVerse={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -111,7 +101,7 @@ export const DemoMode: Story = {
   // No API key in the app: the demo-set notice renders above the
   // search row, and the screen waits for a first search.
   render: () => (
-    <Viewport>
+    <>
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query=""
@@ -123,7 +113,7 @@ export const DemoMode: Story = {
         results={[]}
         onAddVerse={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -131,7 +121,7 @@ export const Searching: Story = {
   // A re-search in flight: the spinner renders above the list and
   // the previous search's results stay mounted under it.
   render: () => (
-    <Viewport>
+    <>
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="Ether 12:27"
@@ -143,7 +133,7 @@ export const Searching: Story = {
         results={etherResult}
         onAddVerse={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -151,7 +141,7 @@ export const Error: Story = {
   // The app's fallback message for a failed search (a caught
   // error's own message crosses the same prop in production).
   render: () => (
-    <Viewport>
+    <>
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="charity"
@@ -163,7 +153,7 @@ export const Error: Story = {
         results={[]}
         onAddVerse={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -172,7 +162,7 @@ export const NoResults: Story = {
   // the no-results empty state so the user gets feedback; the
   // pre-search state (DemoMode) still renders no message.
   render: () => (
-    <Viewport>
+    <>
       <VerseSearchPage
         footer={memorizeFooterFixture}
         query="xyz"
@@ -185,6 +175,6 @@ export const NoResults: Story = {
         hasSearched
         onAddVerse={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };

@@ -1,8 +1,7 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import { RecipeIngredientRowView } from "./RecipeIngredientRowView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof RecipeIngredientRowView> = {
   title: "Views/RecipeIngredientRowView",
@@ -12,14 +11,6 @@ const meta: Meta<typeof RecipeIngredientRowView> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeIngredientRowView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
 
 const noop = () => undefined;
 
@@ -36,7 +27,7 @@ function DragHandle() {
 /** A filled row with its drag handle and remove action. */
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeIngredientRowView
         row={{ key: "flour", quantity: "2", unit: "cups", name: "All-purpose flour" }}
         index={0}
@@ -44,28 +35,28 @@ export const Default: Story = {
         onFieldChange={noop}
         onRemove={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 /** No drag handle bound: the fields and remove action only. */
 export const WithoutDragHandle: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeIngredientRowView
         row={{ key: "eggs", quantity: "3", unit: "", name: "Eggs" }}
         index={1}
         onFieldChange={noop}
         onRemove={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 /** A fresh row: every field empty, placeholders showing. */
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeIngredientRowView
         row={{ key: "new", quantity: "", unit: "", name: "" }}
         index={2}
@@ -73,6 +64,6 @@ export const Empty: Story = {
         onFieldChange={noop}
         onRemove={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };

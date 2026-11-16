@@ -1,6 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { mealPlanFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import {
   MealPlanFormPage,
@@ -30,14 +29,6 @@ const meta: Meta<typeof MealPlanFormPage> = {
 
 export default meta;
 type Story = StoryObj<typeof MealPlanFormPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormPageProps {
   const fixture = mealPlanFormFixture;
@@ -131,15 +122,15 @@ function Form(props: Partial<MealPlanFormPageProps>) {
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Form />
-    </Viewport>
+    </>
   ),
 };
 
 export const NoSelection: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Form
         selectedEntries={[]}
         quantityByKey={{}}
@@ -148,6 +139,6 @@ export const NoSelection: Story = {
         searchText=""
         searchResults={[]}
       />
-    </Viewport>
+    </>
   ),
 };

@@ -1,7 +1,5 @@
 import { memorizeFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { MyVersesPage, type MyVersesPageItem } from "./MyVersesPage.js";
 
 /**
@@ -28,14 +26,6 @@ const meta: Meta<typeof MyVersesPage> = {
 
 export default meta;
 type Story = StoryObj<typeof MyVersesPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 // The app's memorize list, as the store holds it: the
 // next-review line is pre-composed by the app (its locale date
@@ -71,20 +61,20 @@ const verseItems: MyVersesPageItem[] = [
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MyVersesPage
         footer={memorizeFooterFixture}
         verses={verseItems}
         onRemoveVerse={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MyVersesPage footer={memorizeFooterFixture} verses={[]} onRemoveVerse={() => undefined} />
-    </Viewport>
+    </>
   ),
 };

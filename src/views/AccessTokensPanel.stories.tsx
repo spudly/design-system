@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { AccessTokensPanel } from "./AccessTokensPanel.js";
 import { accessTokensFixture } from "../pages/fixtures.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof AccessTokensPanel> = {
   title: "Views/AccessTokensPanel",
@@ -13,17 +13,9 @@ const meta: Meta<typeof AccessTokensPanel> = {
 export default meta;
 type Story = StoryObj<typeof AccessTokensPanel>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 export const WithTokens: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={844}>
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         tokenName="Kitchen tablet"
@@ -33,13 +25,13 @@ export const WithTokens: Story = {
         onDismissSecret={() => undefined}
         onRevoke={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={844}>
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         loading
@@ -50,14 +42,14 @@ export const Loading: Story = {
         onDismissSecret={() => undefined}
         onRevoke={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={844}>
       <YStack position="relative">
         <AccessTokensPanel
           tokens={accessTokensFixture.tokens}
@@ -89,13 +81,13 @@ export const LoadingOverlay: Story = {
           />
         </YStack>
       </YStack>
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const SecretJustCreated: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={844}>
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         tokenName=""
@@ -105,13 +97,13 @@ export const SecretJustCreated: Story = {
         onDismissSecret={() => undefined}
         onRevoke={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const PlanNotice: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={844}>
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens.slice(0, 1)}
         tokenName=""
@@ -122,6 +114,6 @@ export const PlanNotice: Story = {
         onRevoke={() => undefined}
         planNotice="API access tokens are a Power plan feature. Upgrade to create tokens."
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };

@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { homeFixture, eciperayFooterFixture } from "./fixtures.js";
@@ -13,14 +12,6 @@ const meta: Meta<typeof HomePage> = {
 export default meta;
 type Story = StoryObj<typeof HomePage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 const noop = () => {};
 
 /**
@@ -32,7 +23,7 @@ const noop = () => {};
  */
 export const WithRecipes: Story = {
   render: () => (
-    <Viewport>
+    <>
       <HomePage
         footer={eciperayFooterFixture}
         {...homeFixture}
@@ -64,13 +55,13 @@ export const WithRecipes: Story = {
         addHref="/recipes/new"
         sharedWithMeHref="/shared-with-me"
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <>
       <HomePage
         footer={eciperayFooterFixture}
         {...homeFixture}
@@ -79,13 +70,13 @@ export const Empty: Story = {
         addHref="/recipes/new"
         sharedWithMeHref="/shared-with-me"
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <>
       <HomePage
         footer={eciperayFooterFixture}
         {...homeFixture}
@@ -95,7 +86,7 @@ export const Loading: Story = {
         addHref="/recipes/new"
         sharedWithMeHref="/shared-with-me"
       />
-    </Viewport>
+    </>
   ),
 };
 

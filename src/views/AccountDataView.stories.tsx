@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { AccountDataView } from "./AccountDataView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof AccountDataView> = {
   title: "Views/AccountDataView",
@@ -12,46 +12,38 @@ const meta: Meta<typeof AccountDataView> = {
 export default meta;
 type Story = StoryObj<typeof AccountDataView>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
-
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const WithError: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <AccountDataView
         onExportData={() => undefined}
         onDeleteAccount={() => undefined}
         error="We couldn't prepare your download. Try again."
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} loading />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <View position="relative">
         <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} />
         <View
@@ -70,6 +62,6 @@ export const LoadingOverlay: Story = {
           />
         </View>
       </View>
-    </Viewport>
+    </StoryFrame>
   ),
 };

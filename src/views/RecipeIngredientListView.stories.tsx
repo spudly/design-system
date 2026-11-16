@@ -1,8 +1,8 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import {
+import { StoryFrame } from "./storyFrame.js";
   RecipeIngredientListView,
   type RecipeIngredientField,
   type RecipeIngredientRow,
@@ -16,14 +16,6 @@ const meta: Meta<typeof RecipeIngredientListView> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeIngredientListView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
 
 const seedRows: RecipeIngredientRow[] = [
   { key: "chicken", quantity: "1 1/2", unit: "lb", name: "Chicken breasts" },
@@ -69,18 +61,18 @@ function Harness({ initial }: { initial: RecipeIngredientRow[] }) {
  * add action in the label row. */
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <Harness initial={seedRows} />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 /** No rows: the empty line renders; the add action stays. */
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <Harness initial={[]} />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
@@ -88,8 +80,8 @@ export const Empty: Story = {
  * read-only-order rendering of the same rows. */
 export const WithoutIntents: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeIngredientListView rows={seedRows} />
-    </Viewport>
+    </StoryFrame>
   ),
 };

@@ -1,6 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { mealCookingFixture, eciperayFooterFixture } from "./fixtures.js";
 import { MealCookingModePage } from "./MealCookingModePage.js";
 
@@ -21,14 +20,6 @@ const meta: Meta<typeof MealCookingModePage> = {
 
 export default meta;
 type Story = StoryObj<typeof MealCookingModePage>;
-
-function Viewport({ children, height = 844 }: { children: ReactNode; height?: number }) {
-  return (
-    <View width={430} maxWidth="100%" height={height} position="relative">
-      {children}
-    </View>
-  );
-}
 
 function Cooking({ initialStep }: { initialStep: number }) {
   const [stepIndex, setStepIndex] = useState(initialStep);
@@ -52,25 +43,25 @@ function Cooking({ initialStep }: { initialStep: number }) {
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Cooking initialStep={1} />
-    </Viewport>
+    </>
   ),
 };
 
 export const FirstStep: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Cooking initialStep={0} />
-    </Viewport>
+    </>
   ),
 };
 
 export const LastStep: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Cooking initialStep={mealCookingFixture.steps.length - 1} />
-    </Viewport>
+    </>
   ),
 };
 
@@ -85,14 +76,14 @@ export const LastStep: Story = {
  */
 export const LoadError: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealCookingModePage
         footer={eciperayFooterFixture}
         state="error"
         mealTitle={mealCookingFixture.mealTitle}
         onDone={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -118,8 +109,9 @@ const LONG_BODY_STEPS = [
 ];
 
 export const LongBody: Story = {
+  globals: { dsViewport: "shortPhone" },
   render: () => (
-    <Viewport height={430}>
+    <>
       <MealCookingModePage
         footer={eciperayFooterFixture}
         mealTitle={mealCookingFixture.mealTitle}
@@ -129,6 +121,6 @@ export const LongBody: Story = {
         onNext={() => undefined}
         onDone={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };

@@ -1,8 +1,7 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
+import { YStack } from "tamagui";
 import { ScaledIngredientsView } from "./ScaledIngredientsView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof ScaledIngredientsView> = {
   title: "Views/ScaledIngredientsView",
@@ -12,14 +11,6 @@ const meta: Meta<typeof ScaledIngredientsView> = {
 
 export default meta;
 type Story = StoryObj<typeof ScaledIngredientsView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4" backgroundColor={tokens.colors.gray.gray10}>
-      {children}
-    </View>
-  );
-}
 
 const HEADING = "Ingredients · 4 servings (scaled ×2)";
 const LINES = [
@@ -32,24 +23,24 @@ const LINES = [
 
 export const OnOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded onOverlay>
       <ScaledIngredientsView heading={HEADING} lines={LINES} />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded onOverlay>
       <ScaledIngredientsView heading={HEADING} lines={LINES} loading />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded onOverlay>
       <YStack position="relative">
         <ScaledIngredientsView heading={HEADING} lines={LINES} />
         <YStack
@@ -64,6 +55,6 @@ export const LoadingOverlay: Story = {
           <ScaledIngredientsView heading={HEADING} lines={LINES} loading />
         </YStack>
       </YStack>
-    </Viewport>
+    </StoryFrame>
   ),
 };

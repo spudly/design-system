@@ -1,5 +1,5 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { DiscoverPage, type DiscoverPageFilterId, type DiscoverPageItem } from "./DiscoverPage.js";
@@ -31,14 +31,6 @@ const meta: Meta<typeof DiscoverPage> = {
 
 export default meta;
 type Story = StoryObj<typeof DiscoverPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 const discoverItems: DiscoverPageItem[] = [
   {
@@ -114,7 +106,7 @@ function DiscoverPageDemo({
   );
 
   return (
-    <Viewport>
+    <>
       <DiscoverPage
         footer={eciperayFooterFixture}
         title="Discover recipes"
@@ -145,7 +137,7 @@ function DiscoverPageDemo({
         filterChooserOpen={filterChooserOpen}
         onFilterChooserOpenChange={setFilterChooserOpen}
       />
-    </Viewport>
+    </>
   );
 }
 

@@ -1,8 +1,9 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { TextLink } from "../widgets/TextLink.js";
 import { RecipeSharingView } from "./RecipeSharingView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof RecipeSharingView> = {
   title: "Views/RecipeSharingView",
@@ -12,14 +13,6 @@ const meta: Meta<typeof RecipeSharingView> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeSharingView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
 
 const options = [
   { value: "private", label: "Private", description: "Only you can see this recipe." },
@@ -32,7 +25,7 @@ function PublicWithConsentDemo() {
   // consent gate: Save stays disabled until the box is checked.
   const [consentChecked, setConsentChecked] = useState(false);
   return (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeSharingView
         options={options}
         value="public"
@@ -55,7 +48,7 @@ function PublicWithConsentDemo() {
         permalinkUrl="https://example.com/recipes/skillet-chicken"
         onCopyPermalink={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   );
 }
 
@@ -65,7 +58,7 @@ export const PublicWithConsent: Story = {
 
 export const Private: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeSharingView
         options={options}
         value="private"
@@ -73,13 +66,13 @@ export const Private: Story = {
         onSave={() => undefined}
         onRotateShareLink={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeSharingView
         options={options}
         value="private"
@@ -88,14 +81,14 @@ export const Loading: Story = {
         onRotateShareLink={() => undefined}
         loading
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <YStack position="relative">
         <RecipeSharingView
           options={options}
@@ -123,6 +116,6 @@ export const LoadingOverlay: Story = {
           />
         </YStack>
       </YStack>
-    </Viewport>
+    </StoryFrame>
   ),
 };

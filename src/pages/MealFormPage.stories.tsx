@@ -1,6 +1,5 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { mealFormFixture, eciperayFooterFixture } from "./fixtures.js";
 import {
   MealFormPage,
@@ -31,14 +30,6 @@ const meta: Meta<typeof MealFormPage> = {
 
 export default meta;
 type Story = StoryObj<typeof MealFormPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps {
   const fixture = mealFormFixture;
@@ -154,23 +145,23 @@ function Form(props: Partial<MealFormPageProps>) {
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Form />
-    </Viewport>
+    </>
   ),
 };
 
 export const NoSelection: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Form selectedRecipes={[]} servingsByRecipeId={{}} servingsToEatByRecipeId={{}} searchText="" searchResults={[]} />
-    </Viewport>
+    </>
   ),
 };
 
 export const WithDirectIngredients: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Form
         selectedRecipes={[]}
         servingsByRecipeId={{}}
@@ -179,14 +170,14 @@ export const WithDirectIngredients: Story = {
         searchResults={[]}
         ingredients={mealFormFixture.ingredients}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const SaveError: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Form error="Could not save the meal. Try again." />
-    </Viewport>
+    </>
   ),
 };

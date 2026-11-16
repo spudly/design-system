@@ -1,11 +1,10 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../widgets/Text.js";
 import { View } from "tamagui";
 import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
 import { tagColorNameForHex } from "../themes/tagColors.js";
 import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
-import { tokens } from "../tokens/index.js";
 
 /**
  * Stories for the real RecipeDetailPage component (#49) — not a
@@ -30,14 +29,6 @@ const meta: Meta<typeof RecipeDetailPage> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeDetailPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 /** Fixture stand-in for app-side slot content (forms and panels
  * whose state and mutations stay in the app) — a plain dashed
@@ -377,9 +368,9 @@ function RecipeDetailPageDemo({
   };
 
   return (
-    <Viewport>
+    <>
       <RecipeDetailPage footer={eciperayFooterFixture} {...readyProps} />
-    </Viewport>
+    </>
   );
 }
 
@@ -402,9 +393,9 @@ export const CreateDraft: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <>
       <RecipeDetailPage footer={eciperayFooterFixture} state="loading" />
-    </Viewport>
+    </>
   ),
 };
 

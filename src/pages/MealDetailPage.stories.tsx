@@ -1,6 +1,4 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { mealDetailFixture, eciperayFooterFixture } from "./fixtures.js";
 import { MealDetailPage } from "./MealDetailPage.js";
 
@@ -20,19 +18,11 @@ const meta: Meta<typeof MealDetailPage> = {
 export default meta;
 type Story = StoryObj<typeof MealDetailPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 const fixture = mealDetailFixture;
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealDetailPage
         footer={eciperayFooterFixture}
         title={fixture.title}
@@ -42,13 +32,13 @@ export const Default: Story = {
         cookHref="/meals/sunday-chicken-dinner/cook"
         editHref="/meals/sunday-chicken-dinner/edit"
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const WithDirectIngredients: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealDetailPage
         footer={eciperayFooterFixture}
         title={fixture.title}
@@ -59,13 +49,13 @@ export const WithDirectIngredients: Story = {
         cookHref="/meals/sunday-chicken-dinner/cook"
         editHref="/meals/sunday-chicken-dinner/edit"
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const NoNotesOrNutrition: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealDetailPage
         footer={eciperayFooterFixture}
         title={fixture.title}
@@ -73,6 +63,6 @@ export const NoNotesOrNutrition: Story = {
         cookHref="/meals/sunday-chicken-dinner/cook"
         editHref="/meals/sunday-chicken-dinner/edit"
       />
-    </Viewport>
+    </>
   ),
 };

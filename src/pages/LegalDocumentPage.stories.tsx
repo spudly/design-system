@@ -1,6 +1,4 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { legalPrivacyFixture, legalTermsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { LegalDocumentPage } from "./LegalDocumentPage.js";
 
@@ -32,27 +30,19 @@ const meta: Meta<typeof LegalDocumentPage> = {
 export default meta;
 type Story = StoryObj<typeof LegalDocumentPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 export const PrivacyPolicy: Story = {
   render: () => (
-    <Viewport>
+    <>
       <LegalDocumentPage {...legalPrivacyFixture} footer={eciperayFooterFixture} />
-    </Viewport>
+    </>
   ),
 };
 
 export const TermsOfService: Story = {
   render: () => (
-    <Viewport>
+    <>
       <LegalDocumentPage {...legalTermsFixture} footer={eciperayFooterFixture} />
-    </Viewport>
+    </>
   ),
 };
 

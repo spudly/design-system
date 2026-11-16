@@ -1,8 +1,7 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import { RecipeInstructionRowView } from "./RecipeInstructionRowView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof RecipeInstructionRowView> = {
   title: "Views/RecipeInstructionRowView",
@@ -12,14 +11,6 @@ const meta: Meta<typeof RecipeInstructionRowView> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeInstructionRowView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
 
 const noop = () => undefined;
 
@@ -36,7 +27,7 @@ function DragHandle() {
 /** A filled step with its drag handle and remove action. */
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeInstructionRowView
         row={{ key: "mix", body: "Whisk the flour and salt together in a large bowl." }}
         index={0}
@@ -44,7 +35,7 @@ export const Default: Story = {
         onBodyChange={noop}
         onRemove={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
@@ -52,21 +43,21 @@ export const Default: Story = {
  * action only. */
 export const WithoutDragHandle: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeInstructionRowView
         row={{ key: "bake", body: "Bake at 375°F for 25 minutes, until golden." }}
         index={1}
         onBodyChange={noop}
         onRemove={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 /** A fresh step: the body field empty. */
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeInstructionRowView
         row={{ key: "new", body: "" }}
         index={2}
@@ -74,6 +65,6 @@ export const Empty: Story = {
         onBodyChange={noop}
         onRemove={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };

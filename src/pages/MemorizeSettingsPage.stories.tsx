@@ -1,7 +1,5 @@
 import { memorizeFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { MemorizeSettingsPage } from "./MemorizeSettingsPage.js";
 
 /**
@@ -29,20 +27,12 @@ const meta: Meta<typeof MemorizeSettingsPage> = {
 export default meta;
 type Story = StoryObj<typeof MemorizeSettingsPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 // The page's only state: the heading in the shared shell,
 // with the host-supplied footer.
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MemorizeSettingsPage footer={memorizeFooterFixture} />
-    </Viewport>
+    </>
   ),
 };

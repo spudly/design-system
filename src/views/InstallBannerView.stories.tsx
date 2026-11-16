@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { InstallBannerView } from "./InstallBannerView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof InstallBannerView> = {
   title: "Views/InstallBannerView",
@@ -12,17 +11,9 @@ const meta: Meta<typeof InstallBannerView> = {
 export default meta;
 type Story = StoryObj<typeof InstallBannerView>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={300}>
-      {children}
-    </View>
-  );
-}
-
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={300}>
       <InstallBannerView
         message="Get the app for cooking mode and offline access:"
         links={[
@@ -31,6 +22,6 @@ export const Default: Story = {
         ]}
         onDismiss={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };

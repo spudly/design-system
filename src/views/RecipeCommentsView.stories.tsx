@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { RecipeCommentsView } from "./RecipeCommentsView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof RecipeCommentsView> = {
   title: "Views/RecipeCommentsView",
@@ -11,14 +11,6 @@ const meta: Meta<typeof RecipeCommentsView> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeCommentsView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
 
 const comments = [
   {
@@ -33,7 +25,7 @@ const comments = [
 
 export const WithComposer: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeCommentsView
         comments={comments}
         staleHintLabel="Based on an older version"
@@ -43,13 +35,13 @@ export const WithComposer: Story = {
         onStartEdit={() => undefined}
         onDeleteComment={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Editing: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeCommentsView
         comments={comments}
         editingCommentId="c1"
@@ -58,35 +50,35 @@ export const Editing: Story = {
         onCancelEdit={() => undefined}
         onSaveEdit={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeCommentsView
         comments={[]}
         draft=""
         onDraftChange={() => undefined}
         onPost={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeCommentsView comments={[]} loading />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <YStack position="relative">
         <RecipeCommentsView
           comments={comments}
@@ -118,14 +110,14 @@ export const LoadingOverlay: Story = {
           />
         </YStack>
       </YStack>
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const SignedOut: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeCommentsView comments={comments} />
-    </Viewport>
+    </StoryFrame>
   ),
 };

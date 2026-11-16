@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { mealsHubFixture, eciperayFooterFixture } from "./fixtures.js";
@@ -20,14 +20,6 @@ const meta: Meta<typeof MealsHubPage> = {
 export default meta;
 type Story = StoryObj<typeof MealsHubPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 function Hub({ initialTab }: { initialTab: MealsHubPageTab }) {
   const [activeTab, setActiveTab] = useState<MealsHubPageTab>(initialTab);
   return (
@@ -48,23 +40,23 @@ function Hub({ initialTab }: { initialTab: MealsHubPageTab }) {
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Hub initialTab="meals" />
-    </Viewport>
+    </>
   ),
 };
 
 export const PlansTab: Story = {
   render: () => (
-    <Viewport>
+    <>
       <Hub initialTab="plans" />
-    </Viewport>
+    </>
   ),
 };
 
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealsHubPage
         footer={eciperayFooterFixture}
         activeTab="meals"
@@ -77,13 +69,13 @@ export const Empty: Story = {
         onDeleteMeal={() => undefined}
         onDeletePlan={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealsHubPage
         footer={eciperayFooterFixture}
         activeTab="meals"
@@ -96,7 +88,7 @@ export const Loading: Story = {
         onDeleteMeal={() => undefined}
         onDeletePlan={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 

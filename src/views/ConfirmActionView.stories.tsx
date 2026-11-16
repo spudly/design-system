@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { ConfirmActionView } from "./ConfirmActionView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof ConfirmActionView> = {
   title: "Views/ConfirmActionView",
@@ -12,17 +11,9 @@ const meta: Meta<typeof ConfirmActionView> = {
 export default meta;
 type Story = StoryObj<typeof ConfirmActionView>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={500}>
-      {children}
-    </View>
-  );
-}
-
 export const DeleteConfirmation: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={500}>
       <ConfirmActionView
         open
         onOpenChange={() => undefined}
@@ -33,13 +24,13 @@ export const DeleteConfirmation: Story = {
         onConfirm={() => undefined}
         cancelLabel="Cancel"
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const WithError: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={500}>
       <ConfirmActionView
         open
         onOpenChange={() => undefined}
@@ -50,13 +41,13 @@ export const WithError: Story = {
         onConfirm={() => undefined}
         cancelLabel="Cancel"
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Notice: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame height={500}>
       <ConfirmActionView
         open
         onOpenChange={() => undefined}
@@ -66,6 +57,6 @@ export const Notice: Story = {
         confirmTone="primary"
         onConfirm={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };

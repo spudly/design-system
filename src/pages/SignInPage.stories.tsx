@@ -1,7 +1,6 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { Text } from "../widgets/Text.js";
 import { SignInPage } from "./SignInPage.js";
 
@@ -15,14 +14,6 @@ export default meta;
 type Story = StoryObj<typeof SignInPage>;
 
 const filledValue = "correct horse battery";
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 /**
  * Interactive wrapper: the fields are stateful so the story
@@ -47,7 +38,7 @@ function Interactive({
   const [submissions, setSubmissions] = useState(0);
   return (
     <>
-      <Viewport>
+      <>
         <SignInPage
           footer={eciperayFooterFixture}
           email={email}
@@ -64,7 +55,7 @@ function Interactive({
           signUpHref="/signup"
           forgotPasswordHref="/forgot-password"
         />
-      </Viewport>
+      </>
       <Text>Submissions: {submissions}</Text>
     </>
   );

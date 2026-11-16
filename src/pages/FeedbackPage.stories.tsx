@@ -1,7 +1,5 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { FeedbackPage } from "./FeedbackPage.js";
 
 const meta: Meta<typeof FeedbackPage> = {
@@ -13,17 +11,9 @@ const meta: Meta<typeof FeedbackPage> = {
 export default meta;
 type Story = StoryObj<typeof FeedbackPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 export const Form: Story = {
   render: () => (
-    <Viewport>
+    <>
       <FeedbackPage
         footer={eciperayFooterFixture}
         message="The shopping list didn't keep my checks after I closed the app."
@@ -34,13 +24,13 @@ export const Form: Story = {
         onIsBugChange={() => undefined}
         onSubmit={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Submitted: Story = {
   render: () => (
-    <Viewport>
+    <>
       <FeedbackPage
         footer={eciperayFooterFixture}
         message=""
@@ -52,6 +42,6 @@ export const Submitted: Story = {
         submitted
         onSubmit={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };

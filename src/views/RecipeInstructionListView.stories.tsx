@@ -1,8 +1,8 @@
-import { useRef, useState, type ReactNode } from "react";
+import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import {
+import { StoryFrame } from "./storyFrame.js";
   RecipeInstructionListView,
   type RecipeInstructionRow,
 } from "./RecipeInstructionListView.js";
@@ -15,14 +15,6 @@ const meta: Meta<typeof RecipeInstructionListView> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeInstructionListView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
 
 const seedRows: RecipeInstructionRow[] = [
   { key: "sear", body: "Season the chicken and sear in a large skillet until golden." },
@@ -66,18 +58,18 @@ function Harness({ initial }: { initial: RecipeInstructionRow[] }) {
  * handles, the add action in the label row. */
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <Harness initial={seedRows} />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 /** No rows: the empty line renders; the add action stays. */
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <Harness initial={[]} />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
@@ -85,8 +77,8 @@ export const Empty: Story = {
  * read-only-order rendering of the same steps. */
 export const WithoutIntents: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame padded>
       <RecipeInstructionListView rows={seedRows} />
-    </Viewport>
+    </StoryFrame>
   ),
 };
