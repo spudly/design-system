@@ -59,6 +59,7 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     selectedEntries: initialSelectedEntries,
     quantityByKey: initialQuantityByKey,
     servingsByRecipeId: initialServingsByRecipeId,
+    servingsToEatByRecipeId: initialServingsToEatByRecipeId,
     ...restOverrides
   } = overrides ?? {};
   const [title, setTitle] = useState(initialTitle ?? fixture.title);
@@ -74,6 +75,9 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
   );
   const [servingsByRecipeId, setServingsByRecipeId] = useState<Record<string, number>>(
     initialServingsByRecipeId ?? fixture.servingsByRecipeId,
+  );
+  const [servingsToEatByRecipeId, setServingsToEatByRecipeId] = useState<Record<string, number>>(
+    initialServingsToEatByRecipeId ?? fixture.servingsToEatByRecipeId,
   );
   const query = searchText.trim().toLowerCase();
   const searchResults = query
@@ -95,6 +99,7 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     selectedEntries,
     quantityByKey,
     servingsByRecipeId,
+    servingsToEatByRecipeId,
     onSelectEntry: (key) => {
       const entry = fixture.entryOptions.find((option) => option.key === key);
       if (entry) {
@@ -111,6 +116,9 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     },
     onRecipeServingsChange: (recipeId, servings) => {
       setServingsByRecipeId((current) => ({ ...current, [recipeId]: servings }));
+    },
+    onRecipeServingsToEatChange: (recipeId, servings) => {
+      setServingsToEatByRecipeId((current) => ({ ...current, [recipeId]: servings }));
     },
     onSubmit: restOverrides.onSubmit ?? (() => undefined),
   };
@@ -136,6 +144,7 @@ export const NoSelection: Story = {
         selectedEntries={[]}
         quantityByKey={{}}
         servingsByRecipeId={{}}
+        servingsToEatByRecipeId={{}}
         searchText=""
         searchResults={[]}
       />

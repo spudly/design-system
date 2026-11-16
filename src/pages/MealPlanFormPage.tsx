@@ -117,12 +117,21 @@ export type MealPlanFormPageProps = {
   quantityByKey: Record<string, number>;
   /** Servings overrides by recipe id. */
   servingsByRecipeId: Record<string, number>;
+  /** Servings-to-eat overrides by recipe id (#659). Optional:
+   * hosts that have not adopted the eat control omit it and
+   * the eat stepper falls back only to the recipe's own
+   * servings — the host's blank/divergent follow-cook logic
+   * is NOT baked in here. */
+  servingsToEatByRecipeId?: Record<string, number>;
   /** Add the search result with this key to the selection. */
   onSelectEntry: (key: string) => void;
   /** Remove the selected entry with this key. */
   onRemoveEntry: (key: string) => void;
   onQuantityChange: (key: string, quantity: number) => void;
   onRecipeServingsChange: (recipeId: string, servings: number) => void;
+  /** Report a servings-to-eat edit for one plan recipe entry,
+   * independently of `onRecipeServingsChange` (#659). */
+  onRecipeServingsToEatChange?: (recipeId: string, servings: number) => void;
   /** Save in flight: the submit button disables. */
   isSaving?: boolean;
   /** Host-reported save failure, rendered above the submit row. */
@@ -153,10 +162,12 @@ export function MealPlanFormPage({
   selectedEntries,
   quantityByKey,
   servingsByRecipeId,
+  servingsToEatByRecipeId,
   onSelectEntry,
   onRemoveEntry,
   onQuantityChange,
   onRecipeServingsChange,
+  onRecipeServingsToEatChange,
   isSaving = false,
   error,
   onSubmit,
@@ -236,11 +247,19 @@ export function MealPlanFormPage({
             <FormStack key={key}>
               {quantityStepper}
               <NumberStepper
-                label={`Servings · ${option.title}`}
+                label={`Servings to cook · ${option.title}`}
                 value={servingsByRecipeId[recipeId] ?? option.servings ?? 1}
                 min={1}
                 onChange={(value) => {
                   onRecipeServingsChange(recipeId, value);
+                }}
+              />
+              <NumberStepper
+                label={`Servings to eat · ${option.title}`}
+                value={servingsToEatByRecipeId?.[recipeId] ?? option.servings ?? 1}
+                min={1}
+                onChange={(value) => {
+                  onRecipeServingsToEatChange?.(recipeId, value);
                 }}
               />
             </FormStack>

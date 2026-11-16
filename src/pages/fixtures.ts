@@ -144,11 +144,31 @@ export const mealFormFixture = {
     { id: "fudgy-brownies", label: "Fudgy Brownies", servings: 12 },
   ],
   servingsByRecipeId: { "tuscan-chicken": 6, "fudgy-brownies": 12 },
+  // Servings to eat (#659): the Tuscan chicken's eat equals its
+  // cook (6 = 6, the equal case) and the brownies' eat diverges
+  // from their cook (4 to eat of 12 to cook, the divergent case).
+  servingsToEatByRecipeId: { "tuscan-chicken": 6, "fudgy-brownies": 4 },
   // Direct ingredients (#440): entered on the meal itself, in
-  // the form's free-text field shape.
+  // the form's free-text field shape. Servings to eat (#659):
+  // the olive oil's eat is set ("6") and the Parmesan's eat is
+  // blank ("") — the blank case the host interprets.
   ingredients: [
-    { id: "ing-olive-oil", name: "Olive oil", quantity: "2", unit: "tbsp", servings: "6" },
-    { id: "ing-parmesan", name: "Parmesan", quantity: "1/2", unit: "cup", servings: "6" },
+    {
+      id: "ing-olive-oil",
+      name: "Olive oil",
+      quantity: "2",
+      unit: "tbsp",
+      servings: "6",
+      servingsToEat: "6",
+    },
+    {
+      id: "ing-parmesan",
+      name: "Parmesan",
+      quantity: "1/2",
+      unit: "cup",
+      servings: "6",
+      servingsToEat: "",
+    },
   ],
 };
 
@@ -189,9 +209,21 @@ export const mealPlanFormFixture = {
       recipeId: "tuscan-chicken",
       servings: 4,
     },
+    {
+      key: "recipe:stuffed-peppers",
+      kind: "recipe" as const,
+      title: "Classic Stuffed Peppers",
+      recipeId: "stuffed-peppers",
+      servings: 6,
+    },
   ],
-  quantityByKey: { "meal:sunday-dinner": 1, "recipe:tuscan-chicken": 2 },
-  servingsByRecipeId: { "tuscan-chicken": 6 },
+  quantityByKey: { "meal:sunday-dinner": 1, "recipe:tuscan-chicken": 2, "recipe:stuffed-peppers": 1 },
+  servingsByRecipeId: { "tuscan-chicken": 6, "stuffed-peppers": 6 },
+  // Servings to eat (#659): the Tuscan chicken's eat equals its
+  // cook (6 = 6, the equal case) and the stuffed peppers' eat
+  // diverges from their cook (3 to eat of 6 to cook, the
+  // divergent case).
+  servingsToEatByRecipeId: { "tuscan-chicken": 6, "stuffed-peppers": 3 },
 };
 
 /**

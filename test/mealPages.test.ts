@@ -149,6 +149,99 @@ test("MealPlanFormPage is controlled per field and submits as a bare intent", ()
   );
 });
 
+test("MealFormPage servings-to-eat controls render alongside servings-to-cook (#659)", () => {
+  const page = pageSource("MealFormPage");
+  for (const prop of ["servingsToEatByRecipeId", "onServingsToEatChange"]) {
+    assert.ok(page.includes(prop), `MealFormPage must take ${prop}`);
+  }
+  assert.ok(
+    page.includes("label={`Servings to cook · ${recipe.label}`}"),
+    "the existing stepper is renamed to the #363 servings-to-cook label",
+  );
+  assert.ok(
+    page.includes("label={`Servings to eat · ${recipe.label}`}"),
+    "a second stepper carries the #363 servings-to-eat label",
+  );
+  assert.ok(
+    page.includes("value={servingsToEatByRecipeId?.[recipe.id] ?? recipe.servings}"),
+    "the eat stepper falls back only to the recipe's own servings",
+  );
+  assert.ok(
+    !page.includes("servingsToEatByRecipeId?.[recipe.id] ?? servingsByRecipeId"),
+    "the eat stepper must not bake in the host's follow-cook fallback",
+  );
+  assert.ok(
+    page.includes("onServingsToEatChange?.(recipe.id, value)"),
+    "eat edits report through the eat callback",
+  );
+  assert.ok(
+    page.includes("onServingsChange(recipe.id, value)"),
+    "cook edits still report through the cook callback, independently of the eat callback",
+  );
+});
+
+test("MealPlanFormPage servings-to-eat controls render alongside servings-to-cook (#659)", () => {
+  const page = pageSource("MealPlanFormPage");
+  for (const prop of ["servingsToEatByRecipeId", "onRecipeServingsToEatChange"]) {
+    assert.ok(page.includes(prop), `MealPlanFormPage must take ${prop}`);
+  }
+  assert.ok(
+    page.includes("label={`Servings to cook · ${option.title}`}"),
+    "the existing stepper is renamed to the #363 servings-to-cook label",
+  );
+  assert.ok(
+    page.includes("label={`Servings to eat · ${option.title}`}"),
+    "a second stepper carries the #363 servings-to-eat label",
+  );
+  assert.ok(
+    page.includes("value={servingsToEatByRecipeId?.[recipeId] ?? option.servings ?? 1}"),
+    "the eat stepper falls back only to the recipe's own servings",
+  );
+  assert.ok(
+    !page.includes("servingsToEatByRecipeId?.[recipeId] ?? servingsByRecipeId"),
+    "the eat stepper must not bake in the host's follow-cook fallback",
+  );
+  assert.ok(
+    page.includes("onRecipeServingsToEatChange?.(recipeId, value)"),
+    "eat edits report through the eat callback",
+  );
+  assert.ok(
+    page.includes("onRecipeServingsChange(recipeId, value)"),
+    "cook edits still report through the cook callback, independently of the eat callback",
+  );
+});
+
+test("MealFormPage ingredient servings-to-eat round-trips blank and divergent values (#659)", () => {
+  const page = pageSource("MealFormPage");
+  assert.ok(page.includes("servingsToEat: string"), "the ingredient type carries servingsToEat");
+  assert.ok(
+    page.includes("label={`${entryLabel} — Servings to eat`}"),
+    "each entry renders a servings-to-eat field beside its servings field",
+  );
+  assert.ok(
+    page.includes('placeholder="Servings to eat this entry covers"'),
+    "the eat field carries its placeholder",
+  );
+  assert.ok(
+    page.includes("onIngredientChange?.(ingredient.id, { servingsToEat: value })"),
+    "eat edits report through onIngredientChange with a servingsToEat patch",
+  );
+  const fixture = readFileSync(join(root, "src", "pages", "fixtures.ts"), "utf8");
+  assert.ok(fixture.includes('servingsToEat: ""'), "a fixture entry covers the blank eat case");
+  assert.ok(
+    fixture.includes('servingsToEat: "6"'),
+    "a fixture entry covers a set eat value alongside its servings",
+  );
+  assert.ok(
+    fixture.includes('servingsToEatByRecipeId: { "tuscan-chicken": 6, "fudgy-brownies": 4 }'),
+    "the meal fixture covers eat equal to cook (6 = 6) and eat divergent from cook (4 of 12)",
+  );
+  assert.ok(
+    fixture.includes('servingsToEatByRecipeId: { "tuscan-chicken": 6, "stuffed-peppers": 3 }'),
+    "the plan fixture covers eat equal to cook (6 = 6) and eat divergent from cook (3 of 6)",
+  );
+});
+
 test("meal form steppers floor servings and quantity at 1 (#362)", () => {
   for (const name of ["MealFormPage", "MealPlanFormPage"]) {
     const source = pageSource(name);

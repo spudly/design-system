@@ -37,7 +37,7 @@ Default, NoSelection, SaveError. Open in
    recipe search autocomplete (#383) — the search field (opened
    mid-search, "peppers") with the matching recipe as a result
    row carrying its servings, the selected recipes as a
-   removable list, and a servings stepper per selected recipe;
+   removable list, and Servings to cook and Servings to eat steppers per selected recipe (#659);
    selecting the result adds it and the picker stays available
    to add more, Remove drops a selected recipe, and a search
    with no matches shows "No recipes found." NoSelection
@@ -46,7 +46,7 @@ Default, NoSelection, SaveError. Open in
 5. MealPlanFormPage Default: the plan-title heading, the Starts
    on / Ends on fields, the entry search autocomplete with kind
    prefixes on its results and selected entries, and quantity
-   (plus servings for recipes) steppers grouped per selected
+   (plus Servings to cook and Servings to eat for recipes, #659) steppers grouped per selected
    entry in their own field stacks; NoSelection disables Save
    plan.
 

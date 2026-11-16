@@ -57,6 +57,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
     searchText: initialSearchText,
     selectedRecipes: initialSelectedRecipes,
     servingsByRecipeId: initialServingsByRecipeId,
+    servingsToEatByRecipeId: initialServingsToEatByRecipeId,
     ingredients: initialIngredients,
     ...restOverrides
   } = overrides ?? {};
@@ -68,6 +69,9 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
   );
   const [servingsByRecipeId, setServingsByRecipeId] = useState<Record<string, number>>(
     initialServingsByRecipeId ?? fixture.servingsByRecipeId,
+  );
+  const [servingsToEatByRecipeId, setServingsToEatByRecipeId] = useState<Record<string, number>>(
+    initialServingsToEatByRecipeId ?? fixture.servingsToEatByRecipeId,
   );
   const [ingredients, setIngredients] = useState<MealFormPageIngredient[]>(
     initialIngredients ?? [],
@@ -91,6 +95,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
     searchResults,
     selectedRecipes,
     servingsByRecipeId,
+    servingsToEatByRecipeId,
     onSelectRecipe: (recipeId) => {
       const recipe = fixture.recipeOptions.find((option) => option.id === recipeId);
       if (recipe) {
@@ -104,6 +109,9 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
     },
     onServingsChange: (recipeId, servings) => {
       setServingsByRecipeId((current) => ({ ...current, [recipeId]: servings }));
+    },
+    onServingsToEatChange: (recipeId, servings) => {
+      setServingsToEatByRecipeId((current) => ({ ...current, [recipeId]: servings }));
     },
     // Direct ingredients (#440): the section renders only for
     // stories that opt in by passing initial ingredients — the
@@ -121,6 +129,7 @@ function useFormProps(overrides?: Partial<MealFormPageProps>): MealFormPageProps
                 quantity: "",
                 unit: "",
                 servings: "",
+                servingsToEat: "",
               },
             ]);
           },
@@ -154,7 +163,7 @@ export const Default: Story = {
 export const NoSelection: Story = {
   render: () => (
     <Viewport>
-      <Form selectedRecipes={[]} servingsByRecipeId={{}} searchText="" searchResults={[]} />
+      <Form selectedRecipes={[]} servingsByRecipeId={{}} servingsToEatByRecipeId={{}} searchText="" searchResults={[]} />
     </Viewport>
   ),
 };
@@ -165,6 +174,7 @@ export const WithDirectIngredients: Story = {
       <Form
         selectedRecipes={[]}
         servingsByRecipeId={{}}
+        servingsToEatByRecipeId={{}}
         searchText=""
         searchResults={[]}
         ingredients={mealFormFixture.ingredients}
