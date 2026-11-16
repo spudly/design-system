@@ -147,24 +147,44 @@ function useWebPrefersReducedMotion(): boolean {
 }
 
 let defaultStore: SkeletonClockStore | null = null;
+let defaultCaptureFrozen = false;
+let defaultReducedMotion = false;
+
+function applyDefaultFrozen(): void {
+  defaultStore?.setFrozen(defaultCaptureFrozen || defaultReducedMotion);
+}
 
 function getDefaultStore(): SkeletonClockStore {
   if (defaultStore === null) {
-    const store = createSkeletonClockStore(webPrefersReducedMotion());
+    defaultReducedMotion = webPrefersReducedMotion();
+    const store = createSkeletonClockStore(defaultCaptureFrozen || defaultReducedMotion);
     defaultStore = store;
     // The provider path live-tracks the web reduced-motion
     // preference; the shared default store must too, or
     // provider-less bones would keep pulsing after the user
-    // enables reduced motion mid-session. setFrozen is
-    // idempotent, and a provider-less tree has no explicit
-    // freeze for the preference to override.
+    // enables reduced motion mid-session. The preference and the
+    // capture override are separate flags: clearing one must
+    // never clear the other (CodeRabbit on PR #662).
     if (isWeb && typeof window !== "undefined" && typeof window.matchMedia === "function") {
       window
         .matchMedia("(prefers-reduced-motion: reduce)")
-        .addEventListener("change", (event) => store.setFrozen(event.matches));
+        .addEventListener("change", (event) => {
+          defaultReducedMotion = event.matches;
+          applyDefaultFrozen();
+        });
     }
   }
   return defaultStore;
+}
+
+/** Whether the shared default clock is currently frozen. */
+export function isDefaultSkeletonClockFrozen(): boolean {
+  return defaultCaptureFrozen || defaultReducedMotion;
+}
+
+/** The live (client) opacity of the shared default clock — test probe. */
+export function getDefaultSkeletonClockOpacity(): number {
+  return getDefaultStore().getOpacity();
 }
 
 /**
@@ -178,7 +198,9 @@ function getDefaultStore(): SkeletonClockStore {
  * package's public surface.
  */
 export function setDefaultSkeletonClockFrozen(frozen: boolean): void {
-  getDefaultStore().setFrozen(frozen);
+  defaultCaptureFrozen = frozen;
+  getDefaultStore();
+  applyDefaultFrozen();
 }
 
 export type SkeletonClockProps = {
@@ -201,13 +223,26 @@ export type SkeletonClockProps = {
  */
 export function SkeletonClock({ children, frozen = false }: SkeletonClockProps) {
   const webReducedMotion = useWebPrefersReducedMotion();
+  // A nested provider must not defeat a capture freeze applied to
+  // the shared default clock (#648, CodeRabbit on PR #662): while
+  // the default clock is frozen for capture, every provider clock
+  // freezes too. Subscribed live so a freeze applied after mount
+  // still lands.
+  const defaultStore = getDefaultStore();
+  const defaultFrozen = useSyncExternalStore(
+    defaultStore.subscribe,
+    () => isDefaultSkeletonClockFrozen(),
+    () => false,
+  );
   const storeRef = useRef<SkeletonClockStore | null>(null);
   if (storeRef.current === null) {
-    storeRef.current = createSkeletonClockStore(frozen || webPrefersReducedMotion());
+    storeRef.current = createSkeletonClockStore(
+      frozen || webPrefersReducedMotion() || isDefaultSkeletonClockFrozen(),
+    );
   }
   useEffect(() => {
-    storeRef.current?.setFrozen(frozen || webReducedMotion);
-  }, [frozen, webReducedMotion]);
+    storeRef.current?.setFrozen(frozen || webReducedMotion || defaultFrozen);
+  }, [frozen, webReducedMotion, defaultFrozen]);
   return (
     <SkeletonClockContext.Provider value={storeRef.current}>
       {children}

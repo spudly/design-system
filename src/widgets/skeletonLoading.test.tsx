@@ -135,7 +135,7 @@ test("every bone pulses on the one shared clock — primitives own no loop", () 
   );
   assert.match(
     clock,
-    /addEventListener\("change", \(event\) => store\.setFrozen\(event\.matches\)\)/,
+    /addEventListener\("change", \(event\) => \{\s+defaultReducedMotion = event\.matches;/,
     "the provider-less default store live-tracks the reduced-motion preference",
   );
 });
@@ -176,7 +176,8 @@ test("a frozen clock renders static, deterministic output", async () => {
   assert.match(first, /opacity:\s*0\.72/, "the frozen pulse sits at the static mid-opacity");
 });
 test("freezing the shared default clock pins provider-less bones at 0.72 (#648)", async () => {
-  const { BoxSkeleton, setDefaultSkeletonClockFrozen } = await loadRuntime();
+  const { BoxSkeleton, setDefaultSkeletonClockFrozen, getDefaultSkeletonClockOpacity } =
+    await loadRuntime();
   assert.equal(
     typeof setDefaultSkeletonClockFrozen,
     "function",
@@ -184,18 +185,31 @@ test("freezing the shared default clock pins provider-less bones at 0.72 (#648)"
   );
   setDefaultSkeletonClockFrozen(true);
   try {
+    // Server rendering always reads the pinned server snapshot
+    // (getServerOpacity), so SSR can only prove the snapshot is
+    // deterministic — the live freeze is probed through the
+    // store's client opacity below (CodeRabbit on PR #662).
     const first = await renderToHtml(<BoxSkeleton width={120} height={80} />);
     const second = await renderToHtml(<BoxSkeleton width={120} height={80} />);
     assert.equal(first, second, "default-clock frozen renders must be byte-identical");
     assert.match(first, /opacity:\s*0\.72/, "provider-less bones sit at the frozen opacity");
+    assert.equal(
+      getDefaultSkeletonClockOpacity(),
+      0.72,
+      "the live default clock is pinned at the frozen opacity while frozen",
+    );
   } finally {
+    // Unfreeze at a phase whose pulse opacity is far from 0.72 so
+    // the resumed assertion is deterministic (cycle start = min).
+    while (Date.now() % 1200 > 100) {
+      await new Promise((resolve) => setTimeout(resolve, 5));
+    }
     setDefaultSkeletonClockFrozen(false);
   }
-  const resumed = await renderToHtml(<BoxSkeleton width={120} height={80} />);
-  assert.doesNotMatch(
-    resumed,
-    /opacity:\s*0\.72/,
-    "unfreezing resumes the pulse instead of leaving bones pinned",
+  const resumedOpacity = getDefaultSkeletonClockOpacity();
+  assert.ok(
+    resumedOpacity < 0.6,
+    `unfreezing resumes the pulse instead of leaving bones pinned (got ${resumedOpacity})`,
   );
 });
 test("LoadingScope carries the loading flag to internal consumers only", async () => {
