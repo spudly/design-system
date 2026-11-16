@@ -1,5 +1,16 @@
 # @spudly/ui
 
+## 11.0.0
+
+### Major Changes
+
+- 25ffe47: HomePage now renders the same recipe rows as RecipesPage: `renderRecipeRow` is removed, `HomePageRecipe` carries the full recipe-row item model (title, href, subtitle, rating, image), and the new `onLogCookPress` callback fires when a row's stars are pressed. Home's recently-viewed cards are identical to the browse cards — Delete and the "Log cook" text button are gone from Home rows, and tapping the stars logs a cook.
+
+### Minor Changes
+
+- 8cbe496: MealPlanDetailPage can now show a plan as a week — one column per day with that day's entries and its calorie, protein, carb, fat, and satiety totals below the day — when the host supplies the new optional `weekView` prop (`{ days: [{ id, label, dateLabel?, entries, dailyTotals, satietyLabel? }] }`, days pre-grouped and totals pre-computed from servings eaten by the host). Without `weekView` (or with an empty day list) the page renders its flat entry list exactly as before, and the weekly-totals band is unchanged.
+- 09fabf8: Meal and meal-plan editors now expose separate Servings to cook and Servings to eat controls: MealFormPage and MealPlanFormPage render a "Servings to eat" stepper beside the renamed "Servings to cook" stepper for each selected recipe (reported through the new optional `servingsToEatByRecipeId` / `onServingsToEatChange` and `onRecipeServingsToEatChange` props, falling back only to the recipe's own servings), and each direct ingredient on MealFormPage gains a "Servings to eat" field (`MealFormPageIngredient.servingsToEat`) beside its servings field, so servings to eat can be set independently of servings to cook — including leaving an ingredient's servings to eat blank.
+
 ## 10.0.0
 
 ### Major Changes
