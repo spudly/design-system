@@ -111,6 +111,10 @@ test("every page component renders BigFooter through the shell from a footer pro
     "BoundedList.tsx",
     "StepNavControls.tsx",
     "recipeStatusBadges.ts",
+    // recipeRow.tsx is the shared recipe-row composition (#657)
+    // RecipesPage and HomePage render — page-local scaffolding,
+    // not a page; it renders no footer of its own.
+    "recipeRow.tsx",
     "fixtures.ts",
     "useCatalogPagination.ts",
     "index.ts",

@@ -383,7 +383,21 @@ export const homeFixture = {
   sharedWithMeLabel: "Shared with me",
   recipesTitle: "Recently viewed",
   emptyMessage: "No recipes yet. Add your first recipe to get started.",
-  recipes: [{ id: "tuscan-chicken" }, { id: "fudgy-brownies" }],
+  recipes: [
+    {
+      id: "tuscan-chicken",
+      href: "/recipes/tuscan-chicken",
+      title: "Tuscan Chicken",
+      subtitle: "4 servings · 45 min",
+      rating: 4,
+    },
+    {
+      id: "fudgy-brownies",
+      href: "/recipes/fudgy-brownies",
+      title: "Fudgy Brownies",
+      subtitle: "12 servings · 35 min",
+    },
+  ],
 };
 
 /**

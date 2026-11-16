@@ -1,5 +1,4 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { Fragment, type ReactNode } from "react";
 import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import { ButtonStack } from "../widgets/ButtonStack.js";
@@ -11,6 +10,7 @@ import { ListStack } from "../widgets/ListStack.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
+import { RecipeRow, type RecipeRowItem } from "./recipeRow.js";
 
 /**
  * HomePage (#126, B3c): the home view — the split view half
@@ -25,29 +25,29 @@ import { Text } from "../widgets/Text.js";
  * need no data) and the list region renders skeleton rows:
  * exactly 3 dummy rows, each a card holding title and subtitle
  * bones at the loaded rows' text sizes, inside a LoadingScope.
- * The host's rows cannot skeletonize themselves (they cross
- * through the render slot), so the dummy rows are the page's
- * own composition in the rows' card shape. ListStack imposes
- * no gap of its own and the loaded rows carry the list's
- * rhythm in themselves (each host row renders with its $3
- * bottom separation), so each dummy row's wrapper carries the
- * same $3 bottom padding — without it the skeleton cards
- * stack flush, borders touching, where the loaded list is
- * separated.
+ * The dummy rows are the page's own composition in the shared
+ * row's card shape. ListStack imposes no gap of its own and
+ * the loaded rows carry the list's rhythm in themselves (each
+ * row renders with its $3 bottom separation), so each dummy
+ * row's wrapper carries the same $3 bottom padding — without
+ * it the skeleton cards stack flush, borders touching, where
+ * the loaded list is separated.
  *
  * The copy crosses as props: the strings are the app's
  * content constants (shared with the web mirror), so the host
  * passes them in rather than the DS baking in app copy.
  *
- * Rows cross through the `renderRecipeRow` slot (proposals on
- * #126): the row component (`RecipeListCard`) is mixed — its
- * cook-log mutation and form-open state stay app-side — and
- * the audit records its deletion for B6, once the Home list
- * renders DS rows directly. Until then the host renders each
- * row; this page keys the rows by the view-model's `id` and
- * owns the surrounding states: while `loading` the list region
- * renders its skeleton rows (see the loading note above), and
- * an empty list renders the host's empty message.
+ * Rows (#657): the page renders the shared recipe row itself
+ * (recipeRow.tsx — the same row RecipesPage's own section
+ * renders), so Home's recently-viewed cards are identical to
+ * the browse cards: a link row with the RatingStars log-cook
+ * control, no Delete control and no "Log cook" text button.
+ * The host supplies only the item data, the hrefs, and the
+ * `onLogCookPress` callback (the cook-log mutation itself
+ * stays app-side). The page keys the rows by the view-model's
+ * `id` and owns the surrounding states: while `loading` the
+ * list region renders its skeleton rows (see the loading note
+ * above), and an empty list renders the host's empty message.
  *
  * De-styled for #119: the page composes DS components only —
  * the whole screen stacks in SectionStack at its uniform
@@ -64,9 +64,10 @@ import { Text } from "../widgets/Text.js";
  * a hero heading, not a screen title).
  */
 
-export type HomePageRecipe = {
-  id: string;
-};
+/** One recently-viewed recipe row's view-model: the shared
+ * recipe-row item (see recipeRow.tsx, #657) — aliased here so
+ * HomePage's rows and RecipesPage's rows cannot drift. */
+export type HomePageRecipe = RecipeRowItem;
 
 export type HomePageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
@@ -79,7 +80,10 @@ export type HomePageProps = {
   recipesTitle: string;
   emptyMessage: string;
   recipes: HomePageRecipe[];
-  renderRecipeRow: (recipe: HomePageRecipe) => ReactNode;
+  /** Log-cook callback, with the RecipesPage semantics: pressing
+   * a row's stars fires it with the recipe's id; absent, no
+   * log-cook control renders. The mutation stays app-side. */
+  onLogCookPress?: (recipeId: string) => void;
   loading?: boolean;
   /** Navigation destinations (#248: navigation crosses as hrefs,
    * not press callbacks); the host composes them from its routes. */
@@ -102,7 +106,7 @@ export function HomePage({
   recipesTitle,
   emptyMessage,
   recipes,
-  renderRecipeRow,
+  onLogCookPress,
   loading = false,
   browseHref,
   addHref,
@@ -145,7 +149,7 @@ export function HomePage({
           ) : (
             <ListStack>
               {recipes.map((recipe) => (
-                <Fragment key={recipe.id}>{renderRecipeRow(recipe)}</Fragment>
+                <RecipeRow key={recipe.id} item={recipe} onLogCookPress={onLogCookPress} />
               ))}
             </ListStack>
           )}

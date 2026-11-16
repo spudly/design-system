@@ -1465,9 +1465,10 @@ test("T4 SSR: loading MealPlansPage and HomePage render skeleton rows, frames in
       recipes={[
         {
           id: "r1",
+          href: "/recipes/r1",
+          title: "Recipe One",
         },
       ]}
-      renderRecipeRow={() => null}
       loading={true}
       browseHref="/recipes"
       addHref="/recipes/new"

@@ -70,6 +70,10 @@
  * - src/pages/recipeStatusBadges.ts — the shared status-badge map
  *   both recipe pages read (#587 phase 3 tranche 5); data, not a
  *   component.
+ * - src/pages/recipeRow.tsx — the shared recipe-row composition
+ *   (#657) RecipesPage and HomePage render; page-local scaffolding,
+ *   NOT exported from src/pages/index.ts, exercised through both
+ *   pages' stories. Same rule as BoundedList.
  * - src/pages/fixtures.ts — static story fixtures, not a component.
  *
  * Source scan, like the other story contract tests
@@ -272,6 +276,7 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
     "BoundedList.tsx",
     "StepNavControls.tsx",
     "recipeStatusBadges.ts",
+    "recipeRow.tsx",
     "fixtures.ts",
     "useCatalogPagination.ts",
     "index.ts",
