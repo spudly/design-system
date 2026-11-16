@@ -184,6 +184,8 @@ test("freezing the shared default clock pins provider-less bones at 0.72 (#648)"
     "the capture harness freezes provider-less bones through the shared default clock",
   );
   setDefaultSkeletonClockFrozen(true);
+  const realDateNow = Date.now;
+  let resumedOpacity: number | undefined;
   try {
     // Server rendering always reads the pinned server snapshot
     // (getServerOpacity), so SSR can only prove the snapshot is
@@ -199,16 +201,21 @@ test("freezing the shared default clock pins provider-less bones at 0.72 (#648)"
       "the live default clock is pinned at the frozen opacity while frozen",
     );
   } finally {
-    // Unfreeze at a phase whose pulse opacity is far from 0.72 so
-    // the resumed assertion is deterministic (cycle start = min).
-    while (Date.now() % 1200 > 100) {
-      await new Promise((resolve) => setTimeout(resolve, 5));
+    // Control the clock instead of waiting for a real-time phase
+    // (CodeRabbit on PR #662): pin Date.now at an exact cycle
+    // boundary so unfreezing samples phase 0 — the pulse minimum,
+    // far from the frozen 0.72 — deterministically, even if the
+    // worker pauses between unfreezing and the assertion.
+    Date.now = () => 1_200_000;
+    try {
+      setDefaultSkeletonClockFrozen(false);
+      resumedOpacity = getDefaultSkeletonClockOpacity();
+    } finally {
+      Date.now = realDateNow;
     }
-    setDefaultSkeletonClockFrozen(false);
   }
-  const resumedOpacity = getDefaultSkeletonClockOpacity();
   assert.ok(
-    resumedOpacity < 0.6,
+    resumedOpacity !== undefined && resumedOpacity < 0.6,
     `unfreezing resumes the pulse instead of leaving bones pinned (got ${resumedOpacity})`,
   );
 });
