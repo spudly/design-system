@@ -4,6 +4,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import {
   MealPlanDetailPage,
+  type MealPlanDetailPageDay,
   type MealPlanDetailPageEntry,
   type MealPlanDetailPageNutritionGoals,
   type MealPlanDetailPageWeeklyTotals,
@@ -142,6 +143,115 @@ export const WeeklyTotals: Story = {
         shoppingListHref="/meal-plans/this-week/shopping-list"
         editHref="/meal-plans/this-week/edit"
         entries={detailEntries}
+      />
+    </Viewport>
+  ),
+};
+
+// The #660 week view's fixture: the host groups the plan's
+// entries by day and computes each day's totals from servings
+// eaten, as pre-labelled rows plus the day's satiety label.
+const weekDays: MealPlanDetailPageDay[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+].map((label, index) => ({
+  id: `day-${label.toLowerCase()}`,
+  label,
+  dateLabel: `2026-10-${19 + index}`,
+  entries: detailEntries.slice(0, (index % 3) + 1),
+  dailyTotals: [
+    { label: "Calories", valueLabel: "1,850 cal" },
+    { label: "Protein", valueLabel: "118 g" },
+    { label: "Carbs", valueLabel: "190 g" },
+    { label: "Fat", valueLabel: "62 g" },
+  ],
+  satietyLabel: "62",
+}));
+
+export const WeekView: Story = {
+  // The week view populated: the Entries section renders one
+  // column per supplied day, each with its entries and its
+  // per-day totals + satiety below them, instead of the flat
+  // list. The weekly-totals band still renders above it.
+  render: () => (
+    <Viewport>
+      <MealPlanDetailPage
+        state="ready"
+        title="This week"
+        notes="Family dinners — keep weeknights simple."
+        dateRangeLabel="2026-10-19 – 2026-10-25"
+        nutritionLabel="2,140 cal · Protein 118 g"
+        nutritionGoals={detailGoals}
+        weeklyTotals={detailWeeklyTotals}
+        goalsHref="/meal-plans/this-week/goals"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
+        entries={detailEntries}
+        weekView={{ days: weekDays }}
+      />
+    </Viewport>
+  ),
+};
+
+export const NonSevenDay: Story = {
+  // A 3-day plan: the week view renders exactly the days the
+  // host supplies — no columns are invented to fill a week.
+  render: () => (
+    <Viewport>
+      <MealPlanDetailPage
+        state="ready"
+        title="Long weekend"
+        dateRangeLabel="2026-10-23 – 2026-10-25"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
+        entries={detailEntries}
+        weekView={{ days: weekDays.slice(4) }}
+      />
+    </Viewport>
+  ),
+};
+
+export const EmptyDay: Story = {
+  // A supplied day with no entries still gets its column, with
+  // its empty-state line and the totals rows the host passed.
+  render: () => (
+    <Viewport>
+      <MealPlanDetailPage
+        state="ready"
+        title="This week"
+        shoppingListHref="/meal-plans/this-week/shopping-list"
+        editHref="/meal-plans/this-week/edit"
+        entries={detailEntries}
+        weekView={{
+          days: [
+            {
+              id: "day-monday",
+              label: "Monday",
+              dateLabel: "2026-10-19",
+              entries: detailEntries.slice(0, 1),
+              dailyTotals: [
+                { label: "Calories", valueLabel: "1,850 cal" },
+                { label: "Protein", valueLabel: "118 g" },
+              ],
+              satietyLabel: "62",
+            },
+            {
+              id: "day-empty",
+              label: "Tuesday",
+              dateLabel: "2026-10-20",
+              entries: [],
+              dailyTotals: [
+                { label: "Calories", valueLabel: "0 cal" },
+                { label: "Protein", valueLabel: "0 g" },
+              ],
+            },
+          ],
+        }}
       />
     </Viewport>
   ),

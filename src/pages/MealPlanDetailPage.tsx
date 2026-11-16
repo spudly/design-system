@@ -11,6 +11,7 @@ import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
+import { WeekDayColumn, WeekDayColumns } from "../widgets/WeekDayColumn.js";
 
 /**
  * MealPlanDetailPage (#49): Eciperay's meal plan detail screen as
@@ -202,6 +203,39 @@ export type MealPlanDetailPageWeeklyTotals = {
   averages: MealPlanDetailPageWeeklyTotalsRow[];
 };
 
+/** One day of the week view (#660): the host groups the plan's
+ * entries by day and computes the day's totals from servings
+ * eaten (the #363/#414 model), passing them as the same
+ * pre-labelled `{ label, valueLabel }` rows as the weekly band,
+ * plus the day's satiety as its own pre-composed label. The page
+ * renders exactly the days supplied — it invents no days and
+ * computes no nutrition. */
+export type MealPlanDetailPageDay = {
+  /** The day's own id (the column key). */
+  id: string;
+  /** The day's heading, pre-composed by the host (e.g. "Monday"). */
+  label: string;
+  /** The day's date line, pre-composed; omit to hide it. */
+  dateLabel?: string;
+  /** The day's entries, in plan order. An empty list renders the
+   * column with an empty-state line — a supplied day always gets
+   * its column. */
+  entries: MealPlanDetailPageEntry[];
+  /** The day's totals rows (calories, protein, carbs, fat, …),
+   * rendered below the day's entries. */
+  dailyTotals: MealPlanDetailPageWeeklyTotalsRow[];
+  /** The day's satiety score, pre-composed by the host (how it
+   * aggregates the day's entries is the host's decision); omit
+   * to hide the satiety line. */
+  satietyLabel?: string;
+};
+
+/** The week view's view-model (#660): the plan's days,
+ * pre-grouped by the host. */
+export type MealPlanDetailPageWeekView = {
+  days: MealPlanDetailPageDay[];
+};
+
 type MealPlanDetailPageReadyProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
@@ -255,6 +289,13 @@ type MealPlanDetailPageReadyProps = {
   editHref: string;
   /** The plan's entries, in the app's order. */
   entries: MealPlanDetailPageEntry[];
+  /** Optional week view (#660): when present with at least one
+   * day, the Entries section renders one column per day (with
+   * each day's totals below it) instead of the flat entry list.
+   * Omit, pass null, or pass an empty day list to render the
+   * flat list exactly as before — the host opts in when it can
+   * supply grouped days. The weekly-totals band is unaffected. */
+  weekView?: MealPlanDetailPageWeekView | null;
 };
 
 export type MealPlanDetailPageProps =
@@ -329,7 +370,28 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     shoppingListHref,
     editHref,
     entries,
+    weekView,
   } = props;
+
+  // One entry row's rendering, shared verbatim by the flat list
+  // and the week view's day columns (#660) so navigation and
+  // accessibility behaviour are identical in both.
+  const renderEntry = (entry: MealPlanDetailPageEntry) => (
+    <ListRow
+      key={entry.id}
+      prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
+      title={entry.title}
+      {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
+      {...(entry.kind === "recipe" && entry.isUnavailable
+        ? { isDisabled: true, titleSuffix: " (unavailable)" }
+        : {})}
+      href={entry.href}
+    />
+  );
+
+  // The week view (#660) renders only when the host supplies at
+  // least one day; omitted/null/empty renders the flat list.
+  const weekDays = weekView && weekView.days.length > 0 ? weekView.days : null;
 
   // The app's goals view renders nothing when the plan has
   // neither goal progress nor a nutrition summary — that is the
@@ -414,20 +476,31 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
             </Button>
           </ButtonRow>
           <SectionCard title="Entries">
-            <ListStack>
-              {entries.map((entry) => (
-                <ListRow
-                  key={entry.id}
-                  prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
-                  title={entry.title}
-                  {...(entry.subtitle ? { subtitle: entry.subtitle } : {})}
-                  {...(entry.kind === "recipe" && entry.isUnavailable
-                    ? { isDisabled: true, titleSuffix: " (unavailable)" }
-                    : {})}
-                  href={entry.href}
-                />
-              ))}
-            </ListStack>
+            {weekDays ? (
+              <WeekDayColumns>
+                {weekDays.map((day) => (
+                  <WeekDayColumn
+                    key={day.id}
+                    label={day.label}
+                    {...(day.dateLabel ? { dateLabel: day.dateLabel } : {})}
+                  >
+                    {day.entries.length > 0 ? (
+                      <ListStack>{day.entries.map(renderEntry)}</ListStack>
+                    ) : (
+                      <Text variant="hint">No entries</Text>
+                    )}
+                    {day.dailyTotals.map((row) => (
+                      <DetailRow key={row.label} label={row.label} value={row.valueLabel} />
+                    ))}
+                    {day.satietyLabel ? (
+                      <DetailRow label="Satiety" value={day.satietyLabel} />
+                    ) : null}
+                  </WeekDayColumn>
+                ))}
+              </WeekDayColumns>
+            ) : (
+              <ListStack>{entries.map(renderEntry)}</ListStack>
+            )}
           </SectionCard>
         </SectionStack>
       </ScreenContainer>
