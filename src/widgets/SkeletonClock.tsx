@@ -178,11 +178,17 @@ function getDefaultStore(): SkeletonClockStore {
 }
 
 /** Whether the shared default clock is currently frozen. */
-export function isDefaultSkeletonClockFrozen(): boolean {
+function isDefaultSkeletonClockFrozen(): boolean {
   return defaultCaptureFrozen || defaultReducedMotion;
 }
 
-/** The live (client) opacity of the shared default clock — test probe. */
+/**
+ * The live (client) opacity of the shared default clock — test probe.
+ * Consumed by skeletonLoading.test.tsx through the built dist export
+ * surface (a spread the static graph cannot trace).
+ *
+ * @knip-ignore
+ */
 export function getDefaultSkeletonClockOpacity(): number {
   return getDefaultStore().getOpacity();
 }
