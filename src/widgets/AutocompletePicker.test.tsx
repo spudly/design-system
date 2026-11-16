@@ -358,15 +358,23 @@ test("SSR: MealFormPage steppers read the selected view-models, not the results 
   const html = await renderToHtml(<MealFormPage {...mealFormSsrProps()} />);
   assert.ok(html.includes("Solo Recipe"), "the selected recipe renders without any results");
   assert.ok(
-    html.includes("Servings · Solo Recipe"),
-    "its servings stepper renders from the selection",
+    html.includes("Servings to cook · Solo Recipe"),
+    "its servings-to-cook stepper renders from the selection",
+  );
+  assert.ok(
+    html.includes("Servings to eat · Solo Recipe"),
+    "its servings-to-eat stepper renders from the selection (#659)",
   );
 });
 test("SSR: MealPlanFormPage steppers read the selected entries, not the results (#383)", async () => {
   const { MealPlanFormPage } = await loadRuntime();
   const html = await renderToHtml(<MealPlanFormPage {...mealPlanFormSsrProps()} />);
   assert.ok(html.includes("Quantity · Solo Recipe"), "the quantity stepper renders");
-  assert.ok(html.includes("Servings · Solo Recipe"), "the servings stepper renders");
+  assert.ok(html.includes("Servings to cook · Solo Recipe"), "the servings-to-cook stepper renders");
+  assert.ok(
+    html.includes("Servings to eat · Solo Recipe"),
+    "the servings-to-eat stepper renders (#659)",
+  );
 });
 describe("autocompletePickerReview", () => {
   const here = dirname(fileURLToPath(import.meta.url));

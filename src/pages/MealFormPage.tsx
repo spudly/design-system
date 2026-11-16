@@ -86,6 +86,11 @@ export type MealFormPageIngredient = {
    * entry's quantity covers (the eciperay #363 entry-level
    * servings correction). */
   servings: string;
+  /** Free-text entry servings to eat, as entered — the
+   * servings to eat this entry's quantity covers (#659, the
+   * #363 cook/eat split at the ingredient level). Blank is a
+   * real value the host interprets; it crosses as "". */
+  servingsToEat: string;
 };
 
 /** A partial edit to one ingredient entry, reported through
@@ -121,11 +126,20 @@ export type MealFormPageProps = {
   selectedRecipes: MealFormPageRecipeOption[];
   /** Servings overrides by recipe id. */
   servingsByRecipeId: Record<string, number>;
+  /** Servings-to-eat overrides by recipe id (#659). Optional:
+   * hosts that have not adopted the eat control omit it and
+   * the eat stepper falls back only to the recipe's own
+   * servings — the host's blank/divergent follow-cook logic
+   * is NOT baked in here. */
+  servingsToEatByRecipeId?: Record<string, number>;
   /** Add the search result with this id to the selection. */
   onSelectRecipe: (recipeId: string) => void;
   /** Remove the selected recipe with this id. */
   onRemoveRecipe: (recipeId: string) => void;
   onServingsChange: (recipeId: string, servings: number) => void;
+  /** Report a servings-to-eat edit for one selected recipe,
+   * independently of `onServingsChange` (#659). */
+  onServingsToEatChange?: (recipeId: string, servings: number) => void;
   /** The meal's direct ingredients (#440), in entry order —
    * ingredients entered on the meal itself, not through a
    * selected recipe. The section renders only when the host
@@ -162,9 +176,11 @@ export function MealFormPage({
   searchError,
   selectedRecipes,
   servingsByRecipeId,
+  servingsToEatByRecipeId,
   onSelectRecipe,
   onRemoveRecipe,
   onServingsChange,
+  onServingsToEatChange,
   ingredients = [],
   onAddIngredient,
   onRemoveIngredient,
@@ -213,15 +229,24 @@ export function MealFormPage({
           />
         </LabeledGroup>
         {selectedRecipes.map((recipe) => (
-          <NumberStepper
-            key={recipe.id}
-            label={`Servings · ${recipe.label}`}
-            value={servingsByRecipeId[recipe.id] ?? recipe.servings}
-            min={1}
-            onChange={(value) => {
-              onServingsChange(recipe.id, value);
-            }}
-          />
+          <FormStack key={recipe.id}>
+            <NumberStepper
+              label={`Servings to cook · ${recipe.label}`}
+              value={servingsByRecipeId[recipe.id] ?? recipe.servings}
+              min={1}
+              onChange={(value) => {
+                onServingsChange(recipe.id, value);
+              }}
+            />
+            <NumberStepper
+              label={`Servings to eat · ${recipe.label}`}
+              value={servingsToEatByRecipeId?.[recipe.id] ?? recipe.servings}
+              min={1}
+              onChange={(value) => {
+                onServingsToEatChange?.(recipe.id, value);
+              }}
+            />
+          </FormStack>
         ))}
         {onAddIngredient && onIngredientChange ? (
           <LabeledGroup label="Ingredients">
@@ -262,6 +287,14 @@ export function MealFormPage({
                         onIngredientChange?.(ingredient.id, { servings: value });
                       }}
                       placeholder="Servings this entry covers"
+                    />
+                    <TextField
+                      label={`${entryLabel} — Servings to eat`}
+                      value={ingredient.servingsToEat}
+                      onChangeText={(value) => {
+                        onIngredientChange?.(ingredient.id, { servingsToEat: value });
+                      }}
+                      placeholder="Servings to eat this entry covers"
                     />
                     {onRemoveIngredient ? (
                       <Button
