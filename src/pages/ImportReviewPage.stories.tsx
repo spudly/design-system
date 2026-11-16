@@ -1,7 +1,6 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { Text } from "../widgets/Text.js";
 import { storyImageWide } from "../storyFixtures.js";
 import { ImportReviewPage } from "./ImportReviewPage.js";
@@ -14,14 +13,6 @@ const meta: Meta<typeof ImportReviewPage> = {
 
 export default meta;
 type Story = StoryObj<typeof ImportReviewPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 /**
  * The preview is a slot: hosts render their parsed-recipe
@@ -40,7 +31,7 @@ function PreviewStandIn() {
 
 export const Ready: Story = {
   render: () => (
-    <Viewport>
+    <>
       <ImportReviewPage
         footer={eciperayFooterFixture}
         versionLabel="v1"
@@ -51,7 +42,7 @@ export const Ready: Story = {
         onAccept={() => undefined}
         onStartEdits={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -67,7 +58,7 @@ export const Ready: Story = {
  */
 export const WithImage: Story = {
   render: () => (
-    <Viewport>
+    <>
       <ImportReviewPage
         footer={eciperayFooterFixture}
         versionLabel="v1"
@@ -80,6 +71,6 @@ export const WithImage: Story = {
         onAccept={() => undefined}
         onStartEdits={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };

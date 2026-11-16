@@ -1,6 +1,4 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { Card } from "../widgets/Card.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
@@ -24,18 +22,11 @@ const meta: Meta<typeof AppShellPage> = {
   title: "Pages/Eciperay/AppShellPage",
   component: AppShellPage,
   globals: { theme: "light_warmHarvest" },
+  parameters: { dsViewport: "wide" },
 };
 
 export default meta;
 type Story = StoryObj<typeof AppShellPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={1024} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 function RecipesContent() {
   return (
@@ -67,7 +58,7 @@ const labelOnlyNav: AppShellPageNavItem[] = eciperayNav.map(({ icon: _icon, ...i
 /** The Eciperay shell as the app renders it: icon nav, Recipes current, account action, footer. */
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AppShellPage
         brand={{ label: "Eciperay", href: "/" }}
         navItems={eciperayNav}
@@ -78,14 +69,14 @@ export const Default: Story = {
       >
         <RecipesContent />
       </AppShellPage>
-    </Viewport>
+    </>
   ),
 };
 
 /** Header search supplied (#542): the shell keeps the host's header search as DS chrome. */
 export const WithSearch: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AppShellPage
         brand={{ label: "Eciperay", href: "/" }}
         navItems={eciperayNav}
@@ -103,14 +94,14 @@ export const WithSearch: Story = {
       >
         <RecipesContent />
       </AppShellPage>
-    </Viewport>
+    </>
   ),
 };
 
 /** Nav items may omit the icon name — the label alone renders. */
 export const NoIcons: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AppShellPage
         brand={{ label: "Eciperay", href: "/" }}
         navItems={labelOnlyNav}
@@ -120,14 +111,14 @@ export const NoIcons: Story = {
       >
         <RecipesContent />
       </AppShellPage>
-    </Viewport>
+    </>
   ),
 };
 
 /** The signed-out shell: header actions are links (Sign in / Create account navigate). */
 export const LinkActions: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AppShellPage
         brand={{ label: "Eciperay", href: "/" }}
         navItems={eciperayNav}
@@ -141,14 +132,14 @@ export const LinkActions: Story = {
       >
         <RecipesContent />
       </AppShellPage>
-    </Viewport>
+    </>
   ),
 };
 
 /** No footer data supplied: no footer band renders and none is reserved. */
 export const NoFooter: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AppShellPage
         brand={{ label: "Eciperay", href: "/" }}
         navItems={eciperayNav}
@@ -158,7 +149,7 @@ export const NoFooter: Story = {
       >
         <RecipesContent />
       </AppShellPage>
-    </Viewport>
+    </>
   ),
 };
 
@@ -174,7 +165,7 @@ function FailingContent(): never {
  */
 export const ChunkFailedContent: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AppShellPage
         brand={{ label: "Eciperay", href: "/" }}
         navItems={eciperayNav}
@@ -187,6 +178,6 @@ export const ChunkFailedContent: Story = {
       >
         <FailingContent />
       </AppShellPage>
-    </Viewport>
+    </>
   ),
 };

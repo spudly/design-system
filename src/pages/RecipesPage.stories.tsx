@@ -1,5 +1,5 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../widgets/Text.js";
 import { View } from "tamagui";
@@ -9,7 +9,6 @@ import {
   type RecipesPageFilterId,
   type RecipesPageItem,
 } from "./RecipesPage.js";
-import { tokens } from "../tokens/index.js";
 
 /**
  * Stories for the real unified RecipesPage component (#415) —
@@ -45,14 +44,6 @@ const meta: Meta<typeof RecipesPage> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipesPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 // Ratings ride the view model separately (`rating`), the way the
 // app passes its display rating; the subtitle stays rating-free.
@@ -224,7 +215,7 @@ function RecipesPageDemo({
   };
 
   return (
-    <Viewport>
+    <>
       <RecipesPage
         footer={eciperayFooterFixture}
         ownTitle="Your recipes"
@@ -290,7 +281,7 @@ function RecipesPageDemo({
         filterChooserOpen={filterChooserOpen}
         onFilterChooserOpenChange={setFilterChooserOpen}
       />
-    </Viewport>
+    </>
   );
 }
 

@@ -1,7 +1,6 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { Text } from "../widgets/Text.js";
 import { ResetPasswordPage } from "./ResetPasswordPage.js";
 
@@ -15,14 +14,6 @@ export default meta;
 type Story = StoryObj<typeof ResetPasswordPage>;
 
 const filledValue = "a brand new password";
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 /**
  * Interactive wrapper: the field is stateful so the story
@@ -38,7 +29,7 @@ function Interactive({ initialLoading = false }: { initialLoading?: boolean }) {
   const [submissions, setSubmissions] = useState(0);
   return (
     <>
-      <Viewport>
+      <>
         <ResetPasswordPage
           footer={eciperayFooterFixture}
           password={password}
@@ -49,7 +40,7 @@ function Interactive({ initialLoading = false }: { initialLoading?: boolean }) {
             setLoading(true);
           }}
         />
-      </Viewport>
+      </>
       <Text>Submissions: {submissions}</Text>
     </>
   );

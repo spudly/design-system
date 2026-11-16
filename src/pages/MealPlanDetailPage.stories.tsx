@@ -1,5 +1,4 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import {
@@ -39,14 +38,6 @@ const meta: Meta<typeof MealPlanDetailPage> = {
 
 export default meta;
 type Story = StoryObj<typeof MealPlanDetailPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 // Mirrors the app's screen fixture shape: one meal entry, one
 // recipe entry with nutrition, and one shared recipe whose
@@ -89,7 +80,7 @@ const detailGoals: MealPlanDetailPageNutritionGoals = {
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage
         footer={eciperayFooterFixture}
         state="ready"
@@ -103,7 +94,7 @@ export const Default: Story = {
         editHref="/meal-plans/this-week/edit"
         entries={detailEntries}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -130,7 +121,7 @@ export const WeeklyTotals: Story = {
   // other story omits the prop — the band renders only when
   // the caller supplies it.
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage
         state="ready"
         title="This week"
@@ -144,7 +135,7 @@ export const WeeklyTotals: Story = {
         editHref="/meal-plans/this-week/edit"
         entries={detailEntries}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -179,7 +170,7 @@ export const WeekView: Story = {
   // per-day totals + satiety below them, instead of the flat
   // list. The weekly-totals band still renders above it.
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage
         state="ready"
         title="This week"
@@ -194,7 +185,7 @@ export const WeekView: Story = {
         entries={detailEntries}
         weekView={{ days: weekDays }}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -202,7 +193,7 @@ export const NonSevenDay: Story = {
   // A 3-day plan: the week view renders exactly the days the
   // host supplies — no columns are invented to fill a week.
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage
         state="ready"
         title="Long weekend"
@@ -212,7 +203,7 @@ export const NonSevenDay: Story = {
         entries={detailEntries}
         weekView={{ days: weekDays.slice(4) }}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -220,7 +211,7 @@ export const EmptyDay: Story = {
   // A supplied day with no entries still gets its column, with
   // its empty-state line and the totals rows the host passed.
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage
         state="ready"
         title="This week"
@@ -253,7 +244,7 @@ export const EmptyDay: Story = {
           ],
         }}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -262,7 +253,7 @@ export const Empty: Story = {
   // "Entries" section renders bare, as the app renders it — this
   // screen has no empty message.
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage
         footer={eciperayFooterFixture}
         state="ready"
@@ -271,15 +262,15 @@ export const Empty: Story = {
         editHref="/meal-plans/this-week/edit"
         entries={[]}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage footer={eciperayFooterFixture} state="loading" />
-    </Viewport>
+    </>
   ),
 };
 
@@ -290,7 +281,7 @@ export const NutritionUnavailable: Story = {
   // explicit visibility control forces the section so the
   // set-goals hint card renders, as the old app view did.
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage
         footer={eciperayFooterFixture}
         state="ready"
@@ -302,7 +293,7 @@ export const NutritionUnavailable: Story = {
         editHref="/meal-plans/this-week/edit"
         entries={detailEntries.slice(0, 1)}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -311,7 +302,7 @@ export const NoGoals: Story = {
   // section shows the plan total, its set-goals hint, and the
   // "Set nutrition goals" link.
   render: () => (
-    <Viewport>
+    <>
       <MealPlanDetailPage
         footer={eciperayFooterFixture}
         state="ready"
@@ -323,7 +314,7 @@ export const NoGoals: Story = {
         editHref="/meal-plans/this-week/edit"
         entries={detailEntries.slice(0, 1)}
       />
-    </Viewport>
+    </>
   ),
 };
 

@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { Text } from "../widgets/Text.js";
 import {
   aiSessionGenerateConfigFixture,
@@ -19,14 +18,6 @@ const meta: Meta<typeof AiSessionPage> = {
 export default meta;
 type Story = StoryObj<typeof AiSessionPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 const noopHandlers = {
   onPromptChange: () => undefined,
   onFollowUpChange: () => undefined,
@@ -40,7 +31,7 @@ const noopHandlers = {
 
 export const Start: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AiSessionPage
         footer={eciperayFooterFixture}
         config={aiSessionGenerateConfigFixture}
@@ -50,13 +41,13 @@ export const Start: Story = {
         busy={false}
         {...noopHandlers}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Planning: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AiSessionPage
         footer={eciperayFooterFixture}
         config={aiSessionGenerateConfigFixture}
@@ -66,7 +57,7 @@ export const Planning: Story = {
         busy={false}
         {...noopHandlers}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -77,7 +68,7 @@ export const Planning: Story = {
  */
 export const PreviewReady: Story = {
   render: () => (
-    <Viewport>
+    <>
       <AiSessionPage
         footer={eciperayFooterFixture}
         config={aiSessionGenerateConfigFixture}
@@ -94,6 +85,6 @@ export const PreviewReady: Story = {
         busy={false}
         {...noopHandlers}
       />
-    </Viewport>
+    </>
   ),
 };

@@ -1,7 +1,6 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { ConsentBannerView } from "./ConsentBannerView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof ConsentBannerView> = {
   title: "Views/ConsentBannerView",
@@ -12,17 +11,9 @@ const meta: Meta<typeof ConsentBannerView> = {
 export default meta;
 type Story = StoryObj<typeof ConsentBannerView>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={300}>
-      {children}
-    </View>
-  );
-}
-
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="banner">
       <ConsentBannerView
         messageBeforeLink="We use analytics to improve the app. See our"
         linkLabel="Privacy Policy"
@@ -31,6 +22,6 @@ export const Default: Story = {
         onAccept={() => undefined}
         onDecline={() => undefined}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };

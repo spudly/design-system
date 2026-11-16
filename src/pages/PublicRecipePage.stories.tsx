@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../widgets/Text.js";
 import { View } from "tamagui";
@@ -14,7 +14,8 @@ import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
  * RecipeDetailPage stories).
  *
  * The public surface is wide (the public column is
- * max-w-3xl), so the frame pins a desktop viewport (1024×900)
+ * max-w-3xl), so the frame pins a desktop viewport (1024×900, via the wide dsViewport preset
+ * plus the dsViewportHeight parameter — a parameter, not a global, so the viewport toolbar stays usable)
  * instead of the phone frame the app pages use: the page is a
  * flex column over a single scroll view, so a bounded viewport is
  * what it composes against, and fixed dimensions keep Chromatic
@@ -28,18 +29,11 @@ const meta: Meta<typeof PublicRecipePage> = {
   title: "Pages/Eciperay/PublicRecipePage",
   component: PublicRecipePage,
   globals: { theme: "light_warmHarvest" },
+  parameters: { dsViewport: "wide", dsViewportHeight: 900 },
 };
 
 export default meta;
 type Story = StoryObj<typeof PublicRecipePage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={1024} maxWidth="100%" height={900}>
-      {children}
-    </View>
-  );
-}
 
 /** Fixture stand-in for app-side slot content (the comments
  * section, whose query and mutations stay in the app) — a plain
@@ -278,9 +272,9 @@ function PublicRecipePageDemo({
   };
 
   return (
-    <Viewport>
+    <>
       <PublicRecipePage footer={eciperayFooterFixture} {...readyProps} />
-    </Viewport>
+    </>
   );
 }
 
@@ -311,25 +305,25 @@ export const Minimal: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <>
       <PublicRecipePage footer={eciperayFooterFixture} state="loading" />
-    </Viewport>
+    </>
   ),
 };
 
 export const NotFound: Story = {
   render: () => (
-    <Viewport>
+    <>
       <PublicRecipePage footer={eciperayFooterFixture} state="notFound" />
-    </Viewport>
+    </>
   ),
 };
 
 export const Unavailable: Story = {
   render: () => (
-    <Viewport>
+    <>
       <PublicRecipePage footer={eciperayFooterFixture} state="unavailable" />
-    </Viewport>
+    </>
   ),
 };
 

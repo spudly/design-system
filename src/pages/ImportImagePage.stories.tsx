@@ -1,7 +1,5 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { ImportImagePage } from "./ImportImagePage.js";
 
 const meta: Meta<typeof ImportImagePage> = {
@@ -13,22 +11,14 @@ const meta: Meta<typeof ImportImagePage> = {
 export default meta;
 type Story = StoryObj<typeof ImportImagePage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 export const Idle: Story = {
   render: () => (
-    <Viewport>
+    <>
       <ImportImagePage
         footer={eciperayFooterFixture}
         onPickCamera={() => undefined}
         onPickLibrary={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };

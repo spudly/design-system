@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { TransferRecipesView } from "./TransferRecipesView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof TransferRecipesView> = {
   title: "Views/TransferRecipesView",
@@ -11,14 +11,6 @@ const meta: Meta<typeof TransferRecipesView> = {
 
 export default meta;
 type Story = StoryObj<typeof TransferRecipesView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
 
 const exportPicker = {
   search: "",
@@ -37,28 +29,28 @@ const exportPicker = {
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <TransferRecipesView
         exportPicker={exportPicker}
         onImportPress={() => undefined}
         importSummary="Imported 3 recipes."
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <TransferRecipesView exportPicker={exportPicker} onImportPress={() => undefined} loading />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <YStack position="relative">
         <TransferRecipesView
           exportPicker={exportPicker}
@@ -81,6 +73,6 @@ export const LoadingOverlay: Story = {
           />
         </YStack>
       </YStack>
-    </Viewport>
+    </StoryFrame>
   ),
 };

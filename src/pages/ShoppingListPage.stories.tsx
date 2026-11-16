@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { shoppingListFixture, eciperayFooterFixture } from "./fixtures.js";
@@ -20,14 +20,6 @@ const meta: Meta<typeof ShoppingListPage> = {
 export default meta;
 type Story = StoryObj<typeof ShoppingListPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 function List() {
   const [lines, setLines] = useState<ShoppingListPageLine[]>(shoppingListFixture.lines);
   return (
@@ -47,30 +39,30 @@ function List() {
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <List />
-    </Viewport>
+    </>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <>
       <ShoppingListPage
         footer={eciperayFooterFixture}
         lines={[]}
         loading
         onToggleLine={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <>
       <ShoppingListPage footer={eciperayFooterFixture} lines={[]} onToggleLine={() => undefined} />
-    </Viewport>
+    </>
   ),
 };
 

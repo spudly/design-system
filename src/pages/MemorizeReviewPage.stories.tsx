@@ -1,7 +1,5 @@
 import { memorizeFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { MemorizeReviewPage, type MemorizeReviewPageVerse } from "./MemorizeReviewPage.js";
 
 /**
@@ -30,14 +28,6 @@ const meta: Meta<typeof MemorizeReviewPage> = {
 export default meta;
 type Story = StoryObj<typeof MemorizeReviewPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 // The app's due order is oldest-due first; the set is three
 // verses from the app's built-in demo set so the heading's
 // count, the card stack, and the button rows all render as
@@ -62,26 +52,26 @@ const dueVerses: MemorizeReviewPageVerse[] = [
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MemorizeReviewPage
         footer={memorizeFooterFixture}
         verses={dueVerses}
         onRememberedPress={() => undefined}
         onForgotPress={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MemorizeReviewPage
         footer={memorizeFooterFixture}
         verses={[]}
         onRememberedPress={() => undefined}
         onForgotPress={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };

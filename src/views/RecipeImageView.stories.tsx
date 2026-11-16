@@ -1,8 +1,8 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { storyImageWide } from "../storyFixtures.js";
 import { RecipeImageView } from "./RecipeImageView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof RecipeImageView> = {
   title: "Views/RecipeImageView",
@@ -13,28 +13,20 @@ const meta: Meta<typeof RecipeImageView> = {
 export default meta;
 type Story = StoryObj<typeof RecipeImageView>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
-
 const noop = () => undefined;
 
 /** No image yet: the dashed empty frame, pick / take-photo /
  * generate actions, and no remove action. */
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <RecipeImageView
         onPickImageRequest={noop}
         onTakePhotoRequest={noop}
         onGenerateImageRequest={noop}
         onRemoveImage={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
@@ -42,7 +34,7 @@ export const Empty: Story = {
  * join the row. */
 export const WithImage: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <RecipeImageView
         imagePreviewUri={storyImageWide}
         onPickImageRequest={noop}
@@ -50,7 +42,7 @@ export const WithImage: Story = {
         onGenerateImageRequest={noop}
         onRemoveImage={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
@@ -58,7 +50,7 @@ export const WithImage: Story = {
  * every action disables. */
 export const Uploading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <RecipeImageView
         isUploading
         onPickImageRequest={noop}
@@ -66,7 +58,7 @@ export const Uploading: Story = {
         onGenerateImageRequest={noop}
         onRemoveImage={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
@@ -74,7 +66,7 @@ export const Uploading: Story = {
  * "Generating…" and every action disables. */
 export const Generating: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <RecipeImageView
         imagePreviewUri={storyImageWide}
         isGenerating
@@ -83,7 +75,7 @@ export const Generating: Story = {
         onGenerateImageRequest={noop}
         onRemoveImage={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
@@ -91,7 +83,7 @@ export const Generating: Story = {
  * the actions; the current image and its actions stay. */
 export const ErrorState: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <RecipeImageView
         imagePreviewUri={storyImageWide}
         error="That image could not be uploaded. Try a different file."
@@ -100,7 +92,7 @@ export const ErrorState: Story = {
         onGenerateImageRequest={noop}
         onRemoveImage={noop}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
@@ -108,7 +100,7 @@ export const ErrorState: Story = {
  * frame's height and the actions skeletonize in place. */
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <RecipeImageView
         imagePreviewUri={storyImageWide}
         onPickImageRequest={noop}
@@ -117,14 +109,14 @@ export const Loading: Story = {
         onRemoveImage={noop}
         loading
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <YStack position="relative">
         <RecipeImageView
           imagePreviewUri={storyImageWide}
@@ -152,6 +144,6 @@ export const LoadingOverlay: Story = {
           />
         </YStack>
       </YStack>
-    </Viewport>
+    </StoryFrame>
   ),
 };

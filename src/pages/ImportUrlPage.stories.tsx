@@ -1,7 +1,7 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { Text } from "../widgets/Text.js";
 import { ImportUrlPage } from "./ImportUrlPage.js";
 
@@ -14,24 +14,16 @@ const meta: Meta<typeof ImportUrlPage> = {
 export default meta;
 type Story = StoryObj<typeof ImportUrlPage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 export const Filled: Story = {
   render: () => (
-    <Viewport>
+    <>
       <ImportUrlPage
         footer={eciperayFooterFixture}
         url="https://example.com/recipes/mushroom-stroganoff"
         onUrlChange={() => undefined}
         onSubmit={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -61,8 +53,8 @@ function InteractiveDemo() {
 
 export const Interactive: Story = {
   render: () => (
-    <Viewport>
+    <>
       <InteractiveDemo />
-    </Viewport>
+    </>
   ),
 };

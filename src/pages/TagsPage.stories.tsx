@@ -1,4 +1,4 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import type { TagColorName } from "../themes/tagColors.js";
@@ -13,14 +13,6 @@ const meta: Meta<typeof TagsPage> = {
 
 export default meta;
 type Story = StoryObj<typeof TagsPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 /**
  * The page's primary story wires the full inline-edit contract
@@ -46,7 +38,7 @@ export const WithTags: Story = {
       tagsFixture.tags[0]?.color ?? "indigo",
     );
     return (
-      <Viewport>
+      <>
         <TagsPage
           footer={eciperayFooterFixture}
           tags={tags}
@@ -79,7 +71,7 @@ export const WithTags: Story = {
             setEditingTagId(null);
           }}
         />
-      </Viewport>
+      </>
     );
   },
 };
@@ -100,7 +92,7 @@ export const Editing: Story = {
       tagsFixture.tags[0]?.color ?? "indigo",
     );
     return (
-      <Viewport>
+      <>
         <TagsPage
           footer={eciperayFooterFixture}
           tags={tags}
@@ -133,7 +125,7 @@ export const Editing: Story = {
             setEditingTagId(null);
           }}
         />
-      </Viewport>
+      </>
     );
   },
 };
@@ -160,7 +152,7 @@ export const FailingSaves: Story = {
       tagsFixture.tags[0]?.color ?? "indigo",
     );
     return (
-      <Viewport>
+      <>
         <TagsPage
           footer={eciperayFooterFixture}
           tags={tagsFixture.tags}
@@ -187,14 +179,14 @@ export const FailingSaves: Story = {
             setEditingTagId(null);
           }}
         />
-      </Viewport>
+      </>
     );
   },
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <>
       <TagsPage
         footer={eciperayFooterFixture}
         tags={[]}
@@ -207,7 +199,7 @@ export const Loading: Story = {
         onCreate={() => undefined}
         onDelete={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 

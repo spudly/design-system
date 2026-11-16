@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { FeedbackPreferenceView } from "./FeedbackPreferenceView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof FeedbackPreferenceView> = {
   title: "Views/FeedbackPreferenceView",
@@ -11,14 +11,6 @@ const meta: Meta<typeof FeedbackPreferenceView> = {
 
 export default meta;
 type Story = StoryObj<typeof FeedbackPreferenceView>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" padding="$4">
-      {children}
-    </View>
-  );
-}
 
 const actions = {
   onShortcutEnabledChange: () => undefined,
@@ -30,20 +22,20 @@ const actions = {
 
 export const ConsentAccepted: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled
         consent={true}
         consentStatusText="Analytics consent: Accepted"
         {...actions}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const PromptOpen: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled={false}
         consent={null}
@@ -51,13 +43,13 @@ export const PromptOpen: Story = {
         consentPromptOpen
         {...actions}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const ShortcutUnavailable: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled={false}
         shortcutUnavailable
@@ -66,13 +58,13 @@ export const ShortcutUnavailable: Story = {
         consentStatusText="Analytics consent: Declined"
         {...actions}
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled
         consent={true}
@@ -80,14 +72,14 @@ export const Loading: Story = {
         {...actions}
         loading
       />
-    </Viewport>
+    </StoryFrame>
   ),
 };
 
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <Viewport>
+    <StoryFrame variant="panel">
       <View position="relative">
         <FeedbackPreferenceView
           shortcutEnabled
@@ -113,6 +105,6 @@ export const LoadingOverlay: Story = {
           />
         </View>
       </View>
-    </Viewport>
+    </StoryFrame>
   ),
 };

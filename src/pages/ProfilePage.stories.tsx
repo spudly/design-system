@@ -1,6 +1,5 @@
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
+import { YStack } from "tamagui";
 import { AccessTokensPanel } from "../views/AccessTokensPanel.js";
 import { CheckboxField } from "../views/CheckboxField.js";
 import { NutritionGoalsForm } from "../views/NutritionGoalsForm.js";
@@ -17,14 +16,6 @@ const meta: Meta<typeof ProfilePage> = {
 export default meta;
 type Story = StoryObj<typeof ProfilePage>;
 
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
-
 /**
  * The slots are host-rendered: the nutrition goals and access
  * tokens sections are the DS section components fed fixture
@@ -35,7 +26,7 @@ function Viewport({ children }: { children: ReactNode }) {
  */
 export const WithSections: Story = {
   render: () => (
-    <Viewport>
+    <>
       <ProfilePage
         footer={eciperayFooterFixture}
         email="cook@example.com"
@@ -73,7 +64,7 @@ export const WithSections: Story = {
           </YStack>
         }
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -86,7 +77,7 @@ export const WithCoverageSections: Story = {
   // props here too, in the same before-feedback position
   // WithSections composes them in the slot.
   render: () => (
-    <Viewport>
+    <>
       <ProfilePage
         footer={eciperayFooterFixture}
         email="cook@example.com"
@@ -148,6 +139,6 @@ export const WithCoverageSections: Story = {
           </YStack>
         }
       />
-    </Viewport>
+    </>
   ),
 };

@@ -1,6 +1,5 @@
-import { useState, type ReactNode } from "react";
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View } from "tamagui";
 import { Card } from "../widgets/Card.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
@@ -25,14 +24,6 @@ const meta: Meta<typeof TabbedShellPage> = {
 
 export default meta;
 type Story = StoryObj<typeof TabbedShellPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 function VersesContent() {
   return (
@@ -102,9 +93,9 @@ function TabbedShellDemo() {
 
 export const TabbedShell: Story = {
   render: () => (
-    <Viewport>
+    <>
       <TabbedShellDemo />
-    </Viewport>
+    </>
   ),
 };
 
@@ -129,9 +120,9 @@ function IconTabsDemo() {
 
 export const IconTabs: Story = {
   render: () => (
-    <Viewport>
+    <>
       <IconTabsDemo />
-    </Viewport>
+    </>
   ),
 };
 
@@ -143,7 +134,7 @@ function PendingContent(): never {
 /** The active tab's chunk is still loading: the slot shows the DS loading state. */
 export const LoadingTabContent: Story = {
   render: () => (
-    <Viewport>
+    <>
       <TabbedShellPage
         title="Memorize"
         tabsLabel="Memorize sections"
@@ -156,7 +147,7 @@ export const LoadingTabContent: Story = {
         activeTabId="search"
         onTabSelect={() => {}}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -172,7 +163,7 @@ function FailingContent(): never {
  */
 export const ChunkFailedTabContent: Story = {
   render: () => (
-    <Viewport>
+    <>
       <TabbedShellPage
         title="Memorize"
         tabsLabel="Memorize sections"
@@ -188,7 +179,7 @@ export const ChunkFailedTabContent: Story = {
         // screen for inspection instead of reloading the page.
         onReload={() => {}}
       />
-    </Viewport>
+    </>
   ),
 };
 
@@ -198,7 +189,7 @@ export const ChunkFailedTabContent: Story = {
  */
 export const DrillOpen: Story = {
   render: () => (
-    <Viewport>
+    <>
       <TabbedShellPage
         title="Memorize"
         tabsLabel="Memorize sections"
@@ -212,14 +203,14 @@ export const DrillOpen: Story = {
           </Text>
         </SectionCard>
       </TabbedShellPage>
-    </Viewport>
+    </>
   ),
 };
 
 /** The link form: tabs navigate (real hrefs); the host renders the current page as children. */
 export const LinkTabs: Story = {
   render: () => (
-    <Viewport>
+    <>
       <TabbedShellPage
         variant="link"
         title="Memorize"
@@ -234,6 +225,6 @@ export const LinkTabs: Story = {
       >
         <VersesContent />
       </TabbedShellPage>
-    </Viewport>
+    </>
   ),
 };

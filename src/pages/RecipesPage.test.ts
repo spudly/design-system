@@ -197,10 +197,30 @@ describe("recipesPageBoundedList", () => {
   });
 
   test("the list stories pin the bounded geometry (#188)", () => {
+    // #668: page stories no longer carry a local Viewport frame — the
+    // Storybook preview decorator frames them from the dsViewport
+    // resolution (toolbar global, then the story's dsViewport
+    // parameter, then the "phone" preset), which pins captures at
+    // 430×844 for stories without their own default frame.
+    const preview = readFileSync(join(pagesDir, "../../.storybook/preview.tsx"), "utf8");
     assert.match(
-      stories,
-      /<View width=\{430\} maxWidth="100%" height=\{844\}>/,
-      "the stories' Viewport bounds the list to a phone-height frame",
+      preview,
+      /context\.parameters\.dsViewport as string \| undefined\) \?\?\s+"phone"/,
+      "the preview falls back through the story's dsViewport parameter to the phone preset, pinning captures to the phone frame",
+    );
+    assert.match(
+      preview,
+      /: 430\n/,
+      "the preview's phone frame is 430 wide, bounding the list to a phone frame",
+    );
+    assert.match(
+      preview,
+      /viewport === "shortPhone" \? 430 : 844/,
+      "the preview's phone frame is 844 high, bounding the list to a phone-height frame",
+    );
+    assert.ok(
+      !stories.includes("width={430}"),
+      "the stories carry no local frame — the preview decorator owns the geometry (#668)",
     );
     assert.match(stories, /export const Default/);
     assert.match(stories, /export const Empty/);

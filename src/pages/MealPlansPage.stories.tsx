@@ -1,5 +1,4 @@
 import { eciperayFooterFixture } from "./fixtures.js";
-import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
@@ -27,14 +26,6 @@ const meta: Meta<typeof MealPlansPage> = {
 
 export default meta;
 type Story = StoryObj<typeof MealPlansPage>;
-
-function Viewport({ children }: { children: ReactNode }) {
-  return (
-    <View width={430} maxWidth="100%" height={844}>
-      {children}
-    </View>
-  );
-}
 
 // Subtitles are the app's meta line, pre-composed: entry count,
 // then the date range and nutrition summary when the plan has
@@ -69,7 +60,7 @@ const planItems: MealPlansPageItem[] = [
 
 export const Default: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealPlansPage
         footer={eciperayFooterFixture}
         plans={planItems}
@@ -77,13 +68,13 @@ export const Default: Story = {
         createHref="/meal-plans/new"
         onPlanDelete={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Empty: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealPlansPage
         footer={eciperayFooterFixture}
         plans={[]}
@@ -91,15 +82,15 @@ export const Empty: Story = {
         createHref="/meal-plans/new"
         onPlanDelete={() => undefined}
       />
-    </Viewport>
+    </>
   ),
 };
 
 export const Loading: Story = {
   render: () => (
-    <Viewport>
+    <>
       <MealPlansPage footer={eciperayFooterFixture} plans={[]} loading />
-    </Viewport>
+    </>
   ),
 };
 
@@ -107,9 +98,9 @@ export const NoActions: Story = {
   // No createHref / onPlanDelete: the create button and the
   // per-row Delete buttons omit cleanly, leaving a read-only list.
   render: () => (
-    <Viewport>
+    <>
       <MealPlansPage footer={eciperayFooterFixture} plans={planItems} loading={false} />
-    </Viewport>
+    </>
   ),
 };
 
