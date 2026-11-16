@@ -6,8 +6,8 @@
     "@spudly/commitlint-config": "^0.2.0",
     "@spudly/eslint-config": "^0.2.0",
     "@spudly/tooling": "^0.2.0",
-    "@storybook/react-native": "10.6.2",
-    "@storybook/react-vite": "^10.6.6",
+    "@storybook/react-native": "10.7.1",
+    "@storybook/react-vite": "^10.6.7",
     "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "eslint": "^10.14.0",
@@ -17,7 +17,7 @@
     "jscpd": "^5.4.3",
     "knip": "^6.45.1",
     "lint-staged": "^17.6.0",
-    "prettier": "^3.9.10",
+    "prettier": "^3.10.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-native": "^0.88.1",
@@ -93,9 +93,9 @@
   "types": "./dist/index.d.ts",
   "version": "10.0.0",
   "dependencies": {
-    "@tamagui/animations-css": "^3.2.3",
-    "@tamagui/constants": "3.2.3",
+    "@tamagui/animations-css": "^3.3.3",
+    "@tamagui/constants": "3.3.3",
     "react-native-svg": "^15.16.1",
-    "tamagui": "^3.2.3"
+    "tamagui": "^3.3.3"
   }
 }
