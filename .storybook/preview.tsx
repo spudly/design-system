@@ -89,14 +89,24 @@ const preview: Preview = {
   },
   initialGlobals: {
     theme: "light",
-    // #668: captures (Chromatic / built-Storybook baselines) load stories
-    // with the initial globals, so the phone preset IS the capture pin —
-    // captures keep rendering page stories at exactly 430×844, and only
-    // an interactive toolbar switch changes the frame.
-    dsViewport: "phone",
   },
   decorators: [
     (Story, context) => {
+      // #668: the frame viewport resolves toolbar-first, then the
+      // story's own default frame (a `dsViewport` PARAMETER — a global
+      // here would lock the toolbar control and disable switching),
+      // then the phone preset. Captures load stories without touching
+      // the toolbar, so a story's parameter IS its capture pin:
+      // captures keep rendering page stories at exactly their previous
+      // frames (430×844 phone; AppShellPage 1024×844 and
+      // PublicRecipePage 1024×900 via their parameters).
+      const viewport =
+        (context.globals.dsViewport as string | undefined) ??
+        (context.parameters.dsViewport as string | undefined) ??
+        "phone";
+      const frameHeight =
+        (context.parameters.dsViewportHeight as number | undefined) ??
+        (viewport === "shortPhone" ? 430 : 844);
       const themeValue = context.globals.theme as string;
       const theme: StorybookThemeName = isStorybookThemeName(themeValue) ? themeValue : "light";
       return (
@@ -126,25 +136,26 @@ const preview: Preview = {
             // half of the #547 Storybook overlap: a 100dvh page
             // shell nested inside a padded viewport-height
             // decorator mis-measured its height distribution).
-            // The frame size comes from the dsViewport global: the
-            // toolbar switches a page story between phone, wide,
+            // The frame size comes from the resolved viewport above:
+            // the toolbar switches a page story between phone, wide,
             // desktop and full fluid widths so desktop layouts
             // (e.g. #628's centered 1200px column and full-width
-            // Big Footer) can be evaluated interactively; the
-            // initial "phone" value pins captures at 430×844.
+            // Big Footer) can be evaluated interactively; with no
+            // toolbar selection the story's parameter (or the phone
+            // preset) pins captures at their previous dimensions.
             <YStack backgroundColor="$background">
               <View
                 width={
-                  context.globals.dsViewport === "desktop"
+                  viewport === "desktop"
                     ? 1280
-                    : context.globals.dsViewport === "wide"
+                    : viewport === "wide"
                       ? 1024
-                      : context.globals.dsViewport === "full"
+                      : viewport === "full"
                         ? "100%"
                         : 430
                 }
                 maxWidth="100%"
-                height={context.globals.dsViewport === "shortPhone" ? 430 : 844}
+                height={frameHeight}
                 position="relative"
               >
                 <Story />

@@ -27,7 +27,7 @@ function DragHandle() {
 /** A filled step with its drag handle and remove action. */
 export const Default: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeInstructionRowView
         row={{ key: "mix", body: "Whisk the flour and salt together in a large bowl." }}
         index={0}
@@ -43,7 +43,7 @@ export const Default: Story = {
  * action only. */
 export const WithoutDragHandle: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeInstructionRowView
         row={{ key: "bake", body: "Bake at 375°F for 25 minutes, until golden." }}
         index={1}
@@ -57,7 +57,7 @@ export const WithoutDragHandle: Story = {
 /** A fresh step: the body field empty. */
 export const Empty: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeInstructionRowView
         row={{ key: "new", body: "" }}
         index={2}

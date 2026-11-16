@@ -13,7 +13,7 @@ type Story = StoryObj<typeof RatingForm>;
 
 export const Dark: Story = {
   render: () => (
-    <StoryFrame padded onOverlay>
+    <StoryFrame variant="overlayPanel">
       <RatingForm onSubmit={() => undefined} onSkip={() => undefined} isPending={false} />
     </StoryFrame>
   ),
@@ -21,7 +21,7 @@ export const Dark: Story = {
 
 export const Light: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RatingForm
         variant="light"
         onSubmit={() => undefined}
@@ -34,7 +34,7 @@ export const Light: Story = {
 
 export const Pending: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RatingForm variant="light" onSubmit={() => undefined} onSkip={() => undefined} isPending />
     </StoryFrame>
   ),
@@ -42,7 +42,7 @@ export const Pending: Story = {
 
 export const CustomLabels: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RatingForm
         variant="light"
         title="Rate this recipe"

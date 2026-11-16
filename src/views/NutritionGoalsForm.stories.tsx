@@ -15,7 +15,7 @@ type Story = StoryObj<typeof NutritionGoalsForm>;
 
 export const Filled: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
         onChange={() => undefined}
@@ -27,7 +27,7 @@ export const Filled: Story = {
 
 export const WithError: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
         onChange={() => undefined}
@@ -40,7 +40,7 @@ export const WithError: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <NutritionGoalsForm
         goals={nutritionGoalsFixture}
         onChange={() => undefined}
@@ -54,7 +54,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <YStack position="relative">
         <NutritionGoalsForm
           goals={nutritionGoalsFixture}

@@ -29,7 +29,7 @@ const exportPicker = {
 
 export const Default: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <TransferRecipesView
         exportPicker={exportPicker}
         onImportPress={() => undefined}
@@ -41,7 +41,7 @@ export const Default: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <TransferRecipesView exportPicker={exportPicker} onImportPress={() => undefined} loading />
     </StoryFrame>
   ),
@@ -50,7 +50,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <YStack position="relative">
         <TransferRecipesView
           exportPicker={exportPicker}

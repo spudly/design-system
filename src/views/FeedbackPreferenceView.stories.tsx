@@ -22,7 +22,7 @@ const actions = {
 
 export const ConsentAccepted: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled
         consent={true}
@@ -35,7 +35,7 @@ export const ConsentAccepted: Story = {
 
 export const PromptOpen: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled={false}
         consent={null}
@@ -49,7 +49,7 @@ export const PromptOpen: Story = {
 
 export const ShortcutUnavailable: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled={false}
         shortcutUnavailable
@@ -64,7 +64,7 @@ export const ShortcutUnavailable: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <FeedbackPreferenceView
         shortcutEnabled
         consent={true}
@@ -79,7 +79,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <View position="relative">
         <FeedbackPreferenceView
           shortcutEnabled

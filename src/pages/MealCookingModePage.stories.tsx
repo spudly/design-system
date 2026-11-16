@@ -109,7 +109,7 @@ const LONG_BODY_STEPS = [
 ];
 
 export const LongBody: Story = {
-  globals: { dsViewport: "shortPhone" },
+  parameters: { dsViewport: "shortPhone" },
   render: () => (
     <>
       <MealCookingModePage

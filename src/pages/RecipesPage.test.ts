@@ -199,12 +199,14 @@ describe("recipesPageBoundedList", () => {
   test("the list stories pin the bounded geometry (#188)", () => {
     // #668: page stories no longer carry a local Viewport frame — the
     // Storybook preview decorator frames them from the dsViewport
-    // global, whose initial "phone" value pins captures at 430×844.
+    // resolution (toolbar global, then the story's dsViewport
+    // parameter, then the "phone" preset), which pins captures at
+    // 430×844 for stories without their own default frame.
     const preview = readFileSync(join(pagesDir, "../../.storybook/preview.tsx"), "utf8");
     assert.match(
       preview,
-      /dsViewport: "phone"/,
-      "the preview's initial dsViewport pins page-story captures to the phone frame",
+      /context\.parameters\.dsViewport as string \| undefined\) \?\?\s+"phone"/,
+      "the preview falls back through the story's dsViewport parameter to the phone preset, pinning captures to the phone frame",
     );
     assert.match(
       preview,
@@ -213,7 +215,7 @@ describe("recipesPageBoundedList", () => {
     );
     assert.match(
       preview,
-      /dsViewport === "shortPhone" \? 430 : 844/,
+      /viewport === "shortPhone" \? 430 : 844/,
       "the preview's phone frame is 844 high, bounding the list to a phone-height frame",
     );
     assert.ok(

@@ -25,7 +25,7 @@ function PublicWithConsentDemo() {
   // consent gate: Save stays disabled until the box is checked.
   const [consentChecked, setConsentChecked] = useState(false);
   return (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeSharingView
         options={options}
         value="public"
@@ -58,7 +58,7 @@ export const PublicWithConsent: Story = {
 
 export const Private: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeSharingView
         options={options}
         value="private"
@@ -72,7 +72,7 @@ export const Private: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeSharingView
         options={options}
         value="private"
@@ -88,7 +88,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <YStack position="relative">
         <RecipeSharingView
           options={options}

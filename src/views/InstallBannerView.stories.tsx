@@ -13,7 +13,7 @@ type Story = StoryObj<typeof InstallBannerView>;
 
 export const Default: Story = {
   render: () => (
-    <StoryFrame height={300}>
+    <StoryFrame variant="banner">
       <InstallBannerView
         message="Get the app for cooking mode and offline access:"
         links={[

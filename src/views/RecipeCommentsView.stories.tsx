@@ -25,7 +25,7 @@ const comments = [
 
 export const WithComposer: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeCommentsView
         comments={comments}
         staleHintLabel="Based on an older version"
@@ -41,7 +41,7 @@ export const WithComposer: Story = {
 
 export const Editing: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeCommentsView
         comments={comments}
         editingCommentId="c1"
@@ -56,7 +56,7 @@ export const Editing: Story = {
 
 export const Empty: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeCommentsView
         comments={[]}
         draft=""
@@ -69,7 +69,7 @@ export const Empty: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeCommentsView comments={[]} loading />
     </StoryFrame>
   ),
@@ -78,7 +78,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <YStack position="relative">
         <RecipeCommentsView
           comments={comments}
@@ -116,7 +116,7 @@ export const LoadingOverlay: Story = {
 
 export const SignedOut: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeCommentsView comments={comments} />
     </StoryFrame>
   ),

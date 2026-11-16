@@ -61,7 +61,7 @@ function Harness({ initial }: { initial: RecipeIngredientRow[] }) {
  * add action in the label row. */
 export const Default: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <Harness initial={seedRows} />
     </StoryFrame>
   ),
@@ -70,7 +70,7 @@ export const Default: Story = {
 /** No rows: the empty line renders; the add action stays. */
 export const Empty: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <Harness initial={[]} />
     </StoryFrame>
   ),
@@ -80,7 +80,7 @@ export const Empty: Story = {
  * read-only-order rendering of the same rows. */
 export const WithoutIntents: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeIngredientListView rows={seedRows} />
     </StoryFrame>
   ),

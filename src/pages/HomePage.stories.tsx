@@ -93,7 +93,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <View width={430} maxWidth="100%" height={844} position="relative">
+    <View width="100%" height="100%" position="relative">
       <HomePage
         footer={eciperayFooterFixture}
         {...homeFixture}

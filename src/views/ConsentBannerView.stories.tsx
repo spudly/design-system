@@ -13,7 +13,7 @@ type Story = StoryObj<typeof ConsentBannerView>;
 
 export const Default: Story = {
   render: () => (
-    <StoryFrame height={300}>
+    <StoryFrame variant="banner">
       <ConsentBannerView
         messageBeforeLink="We use analytics to improve the app. See our"
         linkLabel="Privacy Policy"

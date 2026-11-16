@@ -14,7 +14,7 @@ type Story = StoryObj<typeof AccountDataView>;
 
 export const Default: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} />
     </StoryFrame>
   ),
@@ -22,7 +22,7 @@ export const Default: Story = {
 
 export const WithError: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <AccountDataView
         onExportData={() => undefined}
         onDeleteAccount={() => undefined}
@@ -34,7 +34,7 @@ export const WithError: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} loading />
     </StoryFrame>
   ),
@@ -43,7 +43,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <View position="relative">
         <AccountDataView onExportData={() => undefined} onDeleteAccount={() => undefined} />
         <View

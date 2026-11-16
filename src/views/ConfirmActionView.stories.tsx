@@ -13,7 +13,7 @@ type Story = StoryObj<typeof ConfirmActionView>;
 
 export const DeleteConfirmation: Story = {
   render: () => (
-    <StoryFrame height={500}>
+    <StoryFrame variant="dialog">
       <ConfirmActionView
         open
         onOpenChange={() => undefined}
@@ -30,7 +30,7 @@ export const DeleteConfirmation: Story = {
 
 export const WithError: Story = {
   render: () => (
-    <StoryFrame height={500}>
+    <StoryFrame variant="dialog">
       <ConfirmActionView
         open
         onOpenChange={() => undefined}
@@ -47,7 +47,7 @@ export const WithError: Story = {
 
 export const Notice: Story = {
   render: () => (
-    <StoryFrame height={500}>
+    <StoryFrame variant="dialog">
       <ConfirmActionView
         open
         onOpenChange={() => undefined}

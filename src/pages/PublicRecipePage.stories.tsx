@@ -14,7 +14,8 @@ import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
  * RecipeDetailPage stories).
  *
  * The public surface is wide (the public column is
- * max-w-3xl), so the frame pins a desktop viewport (1024×844, via the wide dsViewport preset)
+ * max-w-3xl), so the frame pins a desktop viewport (1024×900, via the wide dsViewport preset
+ * plus the dsViewportHeight parameter — a parameter, not a global, so the viewport toolbar stays usable)
  * instead of the phone frame the app pages use: the page is a
  * flex column over a single scroll view, so a bounded viewport is
  * what it composes against, and fixed dimensions keep Chromatic
@@ -27,7 +28,8 @@ import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
 const meta: Meta<typeof PublicRecipePage> = {
   title: "Pages/Eciperay/PublicRecipePage",
   component: PublicRecipePage,
-  globals: { theme: "light_warmHarvest", dsViewport: "wide" },
+  globals: { theme: "light_warmHarvest" },
+  parameters: { dsViewport: "wide", dsViewportHeight: 900 },
 };
 
 export default meta;

@@ -21,7 +21,8 @@ import { eciperayFooterFixture } from "./fixtures.js";
 const meta: Meta<typeof AppShellPage> = {
   title: "Pages/Eciperay/AppShellPage",
   component: AppShellPage,
-  globals: { theme: "light_warmHarvest", dsViewport: "wide" },
+  globals: { theme: "light_warmHarvest" },
+  parameters: { dsViewport: "wide" },
 };
 
 export default meta;

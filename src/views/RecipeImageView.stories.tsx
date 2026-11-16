@@ -19,7 +19,7 @@ const noop = () => undefined;
  * generate actions, and no remove action. */
 export const Empty: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeImageView
         onPickImageRequest={noop}
         onTakePhotoRequest={noop}
@@ -34,7 +34,7 @@ export const Empty: Story = {
  * join the row. */
 export const WithImage: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeImageView
         imagePreviewUri={storyImageWide}
         onPickImageRequest={noop}
@@ -50,7 +50,7 @@ export const WithImage: Story = {
  * every action disables. */
 export const Uploading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeImageView
         isUploading
         onPickImageRequest={noop}
@@ -66,7 +66,7 @@ export const Uploading: Story = {
  * "Generating…" and every action disables. */
 export const Generating: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeImageView
         imagePreviewUri={storyImageWide}
         isGenerating
@@ -83,7 +83,7 @@ export const Generating: Story = {
  * the actions; the current image and its actions stay. */
 export const ErrorState: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeImageView
         imagePreviewUri={storyImageWide}
         error="That image could not be uploaded. Try a different file."
@@ -100,7 +100,7 @@ export const ErrorState: Story = {
  * frame's height and the actions skeletonize in place. */
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeImageView
         imagePreviewUri={storyImageWide}
         onPickImageRequest={noop}
@@ -116,7 +116,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <YStack position="relative">
         <RecipeImageView
           imagePreviewUri={storyImageWide}

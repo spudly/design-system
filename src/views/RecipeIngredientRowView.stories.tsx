@@ -27,7 +27,7 @@ function DragHandle() {
 /** A filled row with its drag handle and remove action. */
 export const Default: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeIngredientRowView
         row={{ key: "flour", quantity: "2", unit: "cups", name: "All-purpose flour" }}
         index={0}
@@ -42,7 +42,7 @@ export const Default: Story = {
 /** No drag handle bound: the fields and remove action only. */
 export const WithoutDragHandle: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeIngredientRowView
         row={{ key: "eggs", quantity: "3", unit: "", name: "Eggs" }}
         index={1}
@@ -56,7 +56,7 @@ export const WithoutDragHandle: Story = {
 /** A fresh row: every field empty, placeholders showing. */
 export const Empty: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeIngredientRowView
         row={{ key: "new", quantity: "", unit: "", name: "" }}
         index={2}

@@ -23,7 +23,7 @@ const LINES = [
 
 export const OnOverlay: Story = {
   render: () => (
-    <StoryFrame padded onOverlay>
+    <StoryFrame variant="overlayPanel">
       <ScaledIngredientsView heading={HEADING} lines={LINES} />
     </StoryFrame>
   ),
@@ -31,7 +31,7 @@ export const OnOverlay: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded onOverlay>
+    <StoryFrame variant="overlayPanel">
       <ScaledIngredientsView heading={HEADING} lines={LINES} loading />
     </StoryFrame>
   ),
@@ -40,7 +40,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded onOverlay>
+    <StoryFrame variant="overlayPanel">
       <YStack position="relative">
         <ScaledIngredientsView heading={HEADING} lines={LINES} />
         <YStack

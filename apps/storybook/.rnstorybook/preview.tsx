@@ -1,5 +1,5 @@
 import type { Preview } from "@storybook/react";
-import { TamaguiProvider, YStack } from "tamagui";
+import { TamaguiProvider, View, YStack } from "tamagui";
 import { createOnDeviceStorybookTamaguiConfig } from "../../../src/tamagui.config.js";
 import { fixtureVoice } from "../../../src/voice/fixtures.js";
 import { VoiceProvider } from "../../../src/voice/index.js";
@@ -20,6 +20,13 @@ const preview: Preview = {
       description: "Design-system theme (brand + color scheme)",
       defaultValue: "light",
     },
+    // #668: same viewport resolution as the web preview — toolbar
+    // global first, then the story's dsViewport parameter, then the
+    // phone preset — so native page-story captures keep the bounded
+    // frames the stories' removed local Viewport helpers set.
+    dsViewport: {
+      description: "Story viewport (frame width for page stories)",
+    },
   },
   decorators: [
     (Story, context) => {
@@ -37,18 +44,51 @@ const preview: Preview = {
       // and this frozen provider covers any provider-scoped
       // subtree. Browse mode never freezes.
       const captureMode = isCaptureModeActive();
+      const viewport =
+        (context.globals.dsViewport as string | undefined) ??
+        (context.parameters.dsViewport as string | undefined) ??
+        "phone";
+      const frameHeight =
+        (context.parameters.dsViewportHeight as number | undefined) ??
+        (viewport === "shortPhone" ? 430 : 844);
+      const story = captureMode ? (
+        <SkeletonClock frozen>
+          <Story />
+        </SkeletonClock>
+      ) : (
+        <Story />
+      );
       return (
         <TamaguiProvider key={themeName} config={config} defaultTheme={themeName}>
           <VoiceProvider voice={fixtureVoice}>
-            <YStack flex={1} backgroundColor="$background" padding={24}>
-              {captureMode ? (
-                <SkeletonClock frozen>
-                  <Story />
-                </SkeletonClock>
-              ) : (
-                <Story />
-              )}
-            </YStack>
+            {context.title.startsWith("Pages/") ? (
+              // Page stories (#668): the same bounded frame as the web
+              // preview, no padded wrapper — native captures keep
+              // their previous dimensions (430×844 phone, 1024×844
+              // AppShellPage, 1024×900 PublicRecipePage).
+              <YStack flex={1} backgroundColor="$background">
+                <View
+                  width={
+                    viewport === "desktop"
+                      ? 1280
+                      : viewport === "wide"
+                        ? 1024
+                        : viewport === "full"
+                          ? "100%"
+                          : 430
+                  }
+                  maxWidth="100%"
+                  height={frameHeight}
+                  position="relative"
+                >
+                  {story}
+                </View>
+              </YStack>
+            ) : (
+              <YStack flex={1} backgroundColor="$background" padding={24}>
+                {story}
+              </YStack>
+            )}
           </VoiceProvider>
         </TamaguiProvider>
       );

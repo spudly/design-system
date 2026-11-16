@@ -20,7 +20,7 @@ const items = [
 
 export const WithSelection: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeExportPickerView
         search=""
         onSearchChange={() => undefined}
@@ -38,7 +38,7 @@ export const WithSelection: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <RecipeExportPickerView
         search=""
         onSearchChange={() => undefined}
@@ -58,7 +58,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <YStack position="relative">
         <RecipeExportPickerView
           search=""

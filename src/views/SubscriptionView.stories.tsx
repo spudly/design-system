@@ -14,7 +14,7 @@ type Story = StoryObj<typeof SubscriptionView>;
 
 export const Active: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <SubscriptionView
         planLabel="Plus plan"
         statusText="Your Plus plan is active and renews on Dec 1, 2026."
@@ -28,7 +28,7 @@ export const Active: Story = {
 
 export const FreeUpsell: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <SubscriptionView
         upsellText="You're on the free plan. Upgrade to Plus for meal planning and nutrition goals."
         onManage={() => undefined}
@@ -40,7 +40,7 @@ export const FreeUpsell: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <SubscriptionView loading />
     </StoryFrame>
   ),
@@ -49,7 +49,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame padded>
+    <StoryFrame variant="panel">
       <YStack position="relative">
         <SubscriptionView
           planLabel="Plus plan"

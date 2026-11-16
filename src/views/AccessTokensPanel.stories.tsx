@@ -15,7 +15,7 @@ type Story = StoryObj<typeof AccessTokensPanel>;
 
 export const WithTokens: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         tokenName="Kitchen tablet"
@@ -31,7 +31,7 @@ export const WithTokens: Story = {
 
 export const Loading: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         loading
@@ -49,7 +49,7 @@ export const Loading: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <YStack position="relative">
         <AccessTokensPanel
           tokens={accessTokensFixture.tokens}
@@ -87,7 +87,7 @@ export const LoadingOverlay: Story = {
 
 export const SecretJustCreated: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens}
         tokenName=""
@@ -103,7 +103,7 @@ export const SecretJustCreated: Story = {
 
 export const PlanNotice: Story = {
   render: () => (
-    <StoryFrame height={844}>
+    <StoryFrame variant="phone">
       <AccessTokensPanel
         tokens={accessTokensFixture.tokens.slice(0, 1)}
         tokenName=""

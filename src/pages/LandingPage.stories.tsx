@@ -31,5 +31,6 @@ export const Default: Story = {
 };
 
 export const Wide: Story = {
+  parameters: { dsViewport: "full" },
   render: () => <LandingPage footer={eciperayFooterFixture} {...landingFixture} />,
 };
