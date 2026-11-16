@@ -43,6 +43,9 @@ const cardRowCode = cardRowSource
 // shared RowTextContent block both card rows compose; the text
 // treatment pins below read that source, and CardRow's own pins
 // hold that it delegates to the block (plain and decorative).
+// Since #587 phase 3 the subtitle line itself lives in the
+// shared RowSubtitleText inside that same file (also composed
+// by ListRow), so the subtitle pins read RowSubtitleText there.
 const rowTextSource = readFileSync(join(componentsDir, "RowTextContent.tsx"), "utf8");
 const rowTextCode = rowTextSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -138,11 +141,25 @@ test("CardRow's title takes the md semibold treatment and the subtitle the hint 
     rowTextCode,
     /fontSize=\{tokens\.typography\.fontSize\.md\}\s+fontWeight=\{tokens\.typography\.fontWeight\.semibold\}/,
   );
-  assert.match(rowTextCode, /\{subtitle \? \(/, "the subtitle renders only when provided");
   assert.match(
     rowTextCode,
-    /<Text\s+variant="hint"\s+accessible=\{decorative \? false : undefined\}/,
+    /\{subtitle \? <RowSubtitleText subtitle=\{subtitle\} decorative=\{decorative\} \/> : null\}/,
+    "the subtitle renders only when provided, through the shared RowSubtitleText (#587 phase 3)",
+  );
+  assert.match(
+    rowTextCode,
+    /export function RowSubtitleText\(\{\s+subtitle,\s+decorative = false,/,
+    "the shared RowSubtitleText carries the subtitle line (#587 phase 3)",
+  );
+  assert.match(
+    rowTextCode,
+    /<Text\s+variant="hint"\s+accessible=\{decorative \? false : undefined\}\s+importantForAccessibility=\{decorative \? "no-hide-descendants" : undefined\}/,
     "the subtitle takes the hint variant and the decorative flag (the native link form hides it behind the overlay's composed label)",
+  );
+  assert.match(
+    rowTextCode,
+    /variant="hint"[\s\S]*?>\s+\{subtitle\}\s+<\/Text>/,
+    "RowSubtitleText renders the subtitle text itself",
   );
 });
 test("CardRow's link form renders an anchor on web and a LinkOverlay on native (#248)", () => {

@@ -18,6 +18,30 @@ export type RowTextContentProps = {
  * optional hint subtitle under it. Extracted for #587 phase 2 —
  * both rows carried an identical copy of this rendering.
  */
+/**
+ * The hint subtitle line under a row's title, shared by
+ * RowTextContent and ListRow (#587 phase 3): both row families
+ * render the identical hint text with the same decorative
+ * treatment, so it lives in exactly one place.
+ */
+export function RowSubtitleText({
+  subtitle,
+  decorative = false,
+}: {
+  subtitle: string;
+  decorative?: boolean;
+}) {
+  return (
+    <Text
+      variant="hint"
+      accessible={decorative ? false : undefined}
+      importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
+    >
+      {subtitle}
+    </Text>
+  );
+}
+
 export function RowTextContent({ title, subtitle, decorative = false }: RowTextContentProps) {
   return (
     <>
@@ -29,15 +53,7 @@ export function RowTextContent({ title, subtitle, decorative = false }: RowTextC
       >
         {title}
       </Text>
-      {subtitle ? (
-        <Text
-          variant="hint"
-          accessible={decorative ? false : undefined}
-          importantForAccessibility={decorative ? "no-hide-descendants" : undefined}
-        >
-          {subtitle}
-        </Text>
-      ) : null}
+      {subtitle ? <RowSubtitleText subtitle={subtitle} decorative={decorative} /> : null}
     </>
   );
 }
