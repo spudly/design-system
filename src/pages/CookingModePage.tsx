@@ -1,8 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { PrevNextNav } from "../widgets/PrevNextNav.js";
-import { StepDots } from "../widgets/StepDots.js";
 import { StepOverlay } from "../widgets/StepOverlay.js";
 import { ScaledIngredientsView } from "../views/ScaledIngredientsView.js";
+import { StepNavControls } from "./StepNavControls.js";
 
 /**
  * CookingModePage (#438 Part 3): the single-recipe cooking
@@ -90,13 +89,11 @@ export function CookingModePage(props: CookingModePageProps) {
           ) : undefined
         }
       >
-        <StepDots count={steps.length} activeIndex={stepIndex} />
-        <PrevNextNav
-          {...(stepIndex === 0 ? {} : { onBack: onPrev })}
+        <StepNavControls
+          count={steps.length}
+          activeIndex={stepIndex}
+          onPrev={onPrev}
           onNext={onNext}
-          backLabel="← Back"
-          nextLabel="Next →"
-          nextDisabled={stepIndex >= steps.length - 1}
         />
       </StepOverlay>
     </BigFooterShell>

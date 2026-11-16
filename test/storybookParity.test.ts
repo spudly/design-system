@@ -61,6 +61,15 @@
  *   pages that use it (VerseSearchPage, MemorizeReviewPage,
  *   MyVersesPage). Same rule as PageFrame: export means a story
  *   decision is required.
+ * - src/pages/StepNavControls.tsx — internal page scaffolding
+ *   (#587 phase 3 tranche 5): the step-navigation composition both
+ *   cooking-mode pages render inside their StepOverlay; NOT exported
+ *   from src/pages/index.ts, exercised through the cooking pages'
+ *   stories. Same rule as BoundedList: export means a story
+ *   decision is required.
+ * - src/pages/recipeStatusBadges.ts — the shared status-badge map
+ *   both recipe pages read (#587 phase 3 tranche 5); data, not a
+ *   component.
  * - src/pages/fixtures.ts — static story fixtures, not a component.
  *
  * Source scan, like the other story contract tests
@@ -261,6 +270,8 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
   // components scan's exceptions.)
   const exceptions = new Set([
     "BoundedList.tsx",
+    "StepNavControls.tsx",
+    "recipeStatusBadges.ts",
     "fixtures.ts",
     "useCatalogPagination.ts",
     "index.ts",

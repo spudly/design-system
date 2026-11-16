@@ -109,6 +109,8 @@ test("every page component renders BigFooter through the shell from a footer pro
   const pagesDir = join(root, "src", "pages");
   const exceptions = new Set([
     "BoundedList.tsx",
+    "StepNavControls.tsx",
+    "recipeStatusBadges.ts",
     "fixtures.ts",
     "useCatalogPagination.ts",
     "index.ts",
