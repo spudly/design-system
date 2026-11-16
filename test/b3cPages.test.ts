@@ -216,9 +216,11 @@ test("AiSessionPage splits view from session logic", () => {
   assert.match(source, /onFinalize: \(\) => void/);
 });
 
-test("HomePage renders rows through the host slot and copy through props", () => {
+test("HomePage renders the shared recipe rows itself and copy through props (#657)", () => {
   const source = page("HomePage");
-  assert.match(source, /renderRecipeRow: \(recipe: HomePageRecipe\) => ReactNode/);
+  assert.match(source, /RecipeRow/, "the page renders the shared row");
+  assert.match(source, /onLogCookPress\?: \(recipeId: string\) => void/);
+  assert.doesNotMatch(source, /renderRecipeRow/, "the render slot is removed");
   assert.match(source, /emptyMessage: string/, "copy crosses as props");
   assert.doesNotMatch(source, /RecipeListCard\.js|CookLogForm\.js/);
 });

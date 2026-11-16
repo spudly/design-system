@@ -8,17 +8,23 @@ describe("recipesPageAccessory", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const pagesDir = join(here, "../..", "src", "pages");
   const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  // The MediaRow composition is page-local (bottom of the page
-  // file); slice it out so the placement pins run against it.
-  const mediaRow = source.slice(
-    source.indexOf("const textBlockStyle"),
-    source.indexOf("const STAR_STEPS"),
+  // The MediaRow composition lives in the shared recipeRow.tsx
+  // (#657); slice it out so the placement pins run against it.
+  const rowSource = readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8");
+  const mediaRow = rowSource.slice(
+    rowSource.indexOf("const textBlockStyle"),
+    rowSource.indexOf("const STAR_STEPS"),
   );
   const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
 
   // Strip block and line comments so documented patterns in prose
   // cannot pass the scan.
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  // The row wiring (hasAccessory gate, accessory pass-through)
+  // lives in the shared recipeRow.tsx (#657).
+  const rowCode = readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8")
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
   test("the accessory slot prop is declared with the id-based signature", () => {
     assert.match(
@@ -43,17 +49,17 @@ describe("recipesPageAccessory", () => {
 
   test("a row with accessory content hides its Log cook button; other rows keep it", () => {
     assert.match(
-      code,
+      rowCode,
       /const hasAccessory = accessory !== null && accessory !== undefined;/,
       "hasAccessory must be exactly the non-null/non-undefined check on the slot's return",
     );
     assert.match(
-      code,
+      rowCode,
       /onLogCookPress && !hasAccessory/,
       "the row's onLogCookPress wiring must be withheld while its accessory renders",
     );
     assert.match(
-      code,
+      rowCode,
       /onLogCookPress\(item\.id\)/,
       "when wired, the callback still fires with the row id, unchanged",
     );
@@ -65,7 +71,7 @@ describe("recipesPageAccessory", () => {
     // accessory over only when it has content, and the under-card
     // placement is the composition's own.
     assert.match(
-      code,
+      rowCode,
       /accessory=\{hasAccessory \? accessory : undefined\}/,
       "the page must pass the accessory to MediaRow only when it renders content",
     );
@@ -183,7 +189,7 @@ describe("recipesPageBoundedList", () => {
   test("rows render through MediaRow, standalone (no list-item wrapper)", () => {
     assert.match(code, /renderItem=\{\(\{ item: row \}\) => renderRow\(row\)\}/);
     assert.match(code, /const renderRow = \(row: RecipesPageRow\) => \{/);
-    assert.match(code, /<MediaRow/);
+    assert.match(code, /<RecipeRow/);
     assert.ok(
       !code.includes('role="listitem"'),
       "rows must not be wrapped in a listitem element — each row is a standalone article",
@@ -299,11 +305,14 @@ describe("recipesPageRowA11y", () => {
   const page = readFileSync(join(here, "../..", "src", "pages", "RecipesPage.tsx"), "utf8")
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-  // The MediaRow composition is page-local (bottom of the page
-  // file); slice it out so the row pins run against it alone.
-  const mediaRow = page.slice(
-    page.indexOf("const textBlockStyle"),
-    page.indexOf("const STAR_STEPS"),
+  // The MediaRow composition lives in the shared recipeRow.tsx
+  // (#657); slice it out so the row pins run against it alone.
+  const rowPage = readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8")
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const mediaRow = rowPage.slice(
+    rowPage.indexOf("const textBlockStyle"),
+    rowPage.indexOf("const STAR_STEPS"),
   );
 
   function count(code: string, literal: any) {
@@ -370,9 +379,9 @@ describe("recipesPageRowA11y", () => {
   });
 
   test("the page wires the row href and fields through unchanged", () => {
-    assert.match(page, /<MediaRow\s+href=\{item\.href\}\s+title=\{item\.title\}/);
-    assert.match(page, /subtitle=\{item\.subtitle\}/);
-    assert.match(page, /imageUrl=\{item\.imageUrl\}/);
+    assert.match(rowPage, /<MediaRow\s+href=\{item\.href\}\s+title=\{item\.title\}/);
+    assert.match(rowPage, /subtitle=\{item\.subtitle\}/);
+    assert.match(rowPage, /imageUrl=\{item\.imageUrl\}/);
   });
 });
 
@@ -381,14 +390,17 @@ describe("recipesPageRowActions", () => {
   const code = readFileSync(join(here, "../..", "src", "pages", "RecipesPage.tsx"), "utf8")
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-  // The page-local compositions live at the bottom of the page
-  // file; slice them out so page-level code cannot satisfy the
+  // The compositions live in the shared recipeRow.tsx (#657);
+  // slice them out so page-level code cannot satisfy the
   // composition pins.
-  const mediaRow = code.slice(
-    code.indexOf("const textBlockStyle"),
-    code.indexOf("const STAR_STEPS"),
+  const rowCode = readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8")
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const mediaRow = rowCode.slice(
+    rowCode.indexOf("const textBlockStyle"),
+    rowCode.indexOf("const STAR_STEPS"),
   );
-  const ratingStars = code.slice(code.indexOf("const STAR_STEPS"));
+  const ratingStars = rowCode.slice(rowCode.indexOf("const STAR_STEPS"));
   const stories = readFileSync(
     join(here, "../..", "src", "pages", "RecipesPage.stories.tsx"),
     "utf8",
@@ -396,7 +408,7 @@ describe("recipesPageRowActions", () => {
 
   test("the log-cook callback is optional and keyed by recipe id", () => {
     assert.match(code, /onLogCookPress\?: \(recipeId: string\) => void;/);
-    assert.match(code, /onLogCookPress\(item\.id\)/);
+    assert.match(rowCode, /onLogCookPress\(item\.id\)/);
   });
 
   test("there is no delete affordance on the list", () => {
@@ -406,21 +418,21 @@ describe("recipesPageRowActions", () => {
 
   test("rows place the RatingStars control in the subtitle flow, rated names carrying the rating", () => {
     const dollar = String.raw`\$`;
-    assert.match(code, /<RatingStars/);
+    assert.match(rowCode, /<RatingStars/);
     assert.match(
-      code,
+      rowCode,
       new RegExp(
         `\`Log a cook of ${dollar}{item\\.title}, rated ${dollar}{item\\.rating} out of 5 stars\``,
       ),
       "the rated control's name must carry the rating — the stars alone would mislead a screen reader",
     );
     assert.match(
-      code,
+      rowCode,
       new RegExp(`\`Log a cook of ${dollar}{item\\.title}\``),
       "the unrated control's name is just the action and the title",
     );
     assert.match(
-      code,
+      rowCode,
       /subtitleAction=\{/,
       "the control renders through MediaRow's subtitleAction slot",
     );
@@ -459,16 +471,16 @@ describe("recipesPageRowActions", () => {
 
   test("a per-item canLogCook opt-out suppresses the control (#518)", () => {
     assert.match(
-      code,
+      rowCode,
       /canLogCook\?: boolean;/,
       "RecipesPageItem carries the optional canLogCook capability field",
     );
     assert.match(
-      code,
+      rowCode,
       /onLogCookPress && !hasAccessory && item\.canLogCook !== false \? \(/,
       "the subtitleAction gate omits the control when canLogCook is false, in both rated and unrated states (the one render site)",
     );
-    const gate = code.slice(code.indexOf("subtitleAction={"), code.indexOf("accessory={"));
+    const gate = rowCode.slice(rowCode.indexOf("subtitleAction={"), rowCode.indexOf("accessory={"));
     assert.ok(
       !gate.includes("badgeLabel"),
       "suppression is decoupled from badgeLabel — the badge is a display marker, not a capability",
@@ -506,6 +518,10 @@ describe("recipesPageSharedConfig", () => {
   // Strip block and line comments so documented patterns in prose
   // cannot pass the scan.
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  // The shared row item and row live in recipeRow.tsx (#657).
+  const rowCode = readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8")
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
   test("SharedWithMePage is retired: no file, no stories, no export (#185)", () => {
     assert.ok(
@@ -541,12 +557,12 @@ describe("recipesPageSharedConfig", () => {
 
   test("shared items are own-section items carrying the caller-supplied badge", () => {
     assert.match(
-      code,
+      rowCode,
       /badgeLabel\?: string;/,
       "RecipesPageItem must declare the caller-supplied badgeLabel shared items carry",
     );
     assert.match(
-      code,
+      rowCode,
       /badgeLabel=\{item\.badgeLabel\}/,
       "own rows must pass the item's badge through to the row",
     );
@@ -597,11 +613,14 @@ describe("recipesPageUnified", () => {
   // Strip block and line comments so documented patterns in prose
   // cannot pass the scan.
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-  // The MediaRow composition is page-local (bottom of the page
-  // file); slice it out so the badge pins run against it.
-  const mediaRow = code.slice(
-    code.indexOf("const textBlockStyle"),
-    code.indexOf("const STAR_STEPS"),
+  // The MediaRow composition lives in the shared recipeRow.tsx
+  // (#657); slice it out so the badge pins run against it.
+  const rowCode = readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8")
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const mediaRow = rowCode.slice(
+    rowCode.indexOf("const textBlockStyle"),
+    rowCode.indexOf("const STAR_STEPS"),
   );
 
   function count(haystack: string, literal: string) {
@@ -751,12 +770,12 @@ describe("recipesPageUnified", () => {
 
   test("shared items carry their caller-supplied badge inside the own section", () => {
     assert.match(
-      code,
+      rowCode,
       /badgeLabel\?: string;/,
       "RecipesPageItem must declare the caller-supplied badgeLabel",
     );
     assert.match(
-      code,
+      rowCode,
       /badgeLabel=\{item\.badgeLabel\}/,
       "own rows pass the item's badge to MediaRow",
     );

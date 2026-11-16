@@ -1,7 +1,6 @@
 import type { ReactNode } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { View, YStack } from "tamagui";
-import { Text } from "../widgets/Text.js";
+import { View } from "tamagui";
 import { homeFixture, eciperayFooterFixture } from "./fixtures.js";
 import { HomePage } from "./HomePage.js";
 
@@ -22,10 +21,14 @@ function Viewport({ children }: { children: ReactNode }) {
   );
 }
 
+const noop = () => {};
+
 /**
- * Rows cross through the renderRecipeRow slot — hosts render
- * their row component per recipe. The story's stand-in is a
- * simple title row in the row's shape.
+ * Rows are the shared recipe rows (#657): the page renders them
+ * itself from the item data — a rated recipe (pressable stars),
+ * an unrated one (icon-only star), one with a thumbnail, and one
+ * long title + long meta line (the cramped-layout regression
+ * case from the old app-side card).
  */
 export const WithRecipes: Story = {
   render: () => (
@@ -33,11 +36,30 @@ export const WithRecipes: Story = {
       <HomePage
         footer={eciperayFooterFixture}
         {...homeFixture}
-        renderRecipeRow={(recipe) => (
-          <YStack marginBottom="$3" borderRadius="$3" backgroundColor="$surface" padding="$3">
-            <Text>{recipe.id === "tuscan-chicken" ? "Tuscan Chicken" : "Fudgy Brownies"}</Text>
-          </YStack>
-        )}
+        recipes={[
+          {
+            id: "tuscan-chicken",
+            href: "/recipes/tuscan-chicken",
+            title: "Tuscan Chicken",
+            subtitle: "4 servings · 45 min",
+            rating: 4,
+          },
+          {
+            id: "fudgy-brownies",
+            href: "/recipes/fudgy-brownies",
+            title: "Fudgy Brownies",
+            subtitle: "12 servings · 35 min",
+          },
+          {
+            id: "long-title",
+            href: "/recipes/long-title",
+            title: "Slow-Braised Tuscan White Bean and Tuscan Chicken Skillet with Crispy Sage",
+            subtitle:
+              "6 servings · 1 hr 20 min · braised · weeknight favorite with a very long meta line",
+            rating: 5,
+          },
+        ]}
+        onLogCookPress={noop}
         browseHref="/recipes"
         addHref="/recipes/new"
         sharedWithMeHref="/shared-with-me"
@@ -53,7 +75,6 @@ export const Empty: Story = {
         footer={eciperayFooterFixture}
         {...homeFixture}
         recipes={[]}
-        renderRecipeRow={() => null}
         browseHref="/recipes"
         addHref="/recipes/new"
         sharedWithMeHref="/shared-with-me"
@@ -70,7 +91,6 @@ export const Loading: Story = {
         {...homeFixture}
         recipes={[]}
         loading
-        renderRecipeRow={() => null}
         browseHref="/recipes"
         addHref="/recipes/new"
         sharedWithMeHref="/shared-with-me"
@@ -86,11 +106,7 @@ export const LoadingOverlay: Story = {
       <HomePage
         footer={eciperayFooterFixture}
         {...homeFixture}
-        renderRecipeRow={(recipe) => (
-          <YStack marginBottom="$3" borderRadius="$3" backgroundColor="$surface" padding="$3">
-            <Text>{recipe.id === "tuscan-chicken" ? "Tuscan Chicken" : "Fudgy Brownies"}</Text>
-          </YStack>
-        )}
+        onLogCookPress={noop}
         browseHref="/recipes"
         addHref="/recipes/new"
         sharedWithMeHref="/shared-with-me"
@@ -109,7 +125,6 @@ export const LoadingOverlay: Story = {
           {...homeFixture}
           recipes={[]}
           loading
-          renderRecipeRow={() => null}
           browseHref="/recipes"
           addHref="/recipes/new"
           sharedWithMeHref="/shared-with-me"
