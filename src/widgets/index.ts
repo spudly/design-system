@@ -68,7 +68,12 @@ export { SelectField, type SelectFieldProps, type SelectOption } from "./SelectF
 export { Slider, type SliderProps } from "./Slider.js";
 export { BoxSkeleton, type BoxSkeletonProps } from "./BoxSkeleton.js";
 export { CircleSkeleton, type CircleSkeletonProps } from "./CircleSkeleton.js";
-export { SkeletonClock, type SkeletonClockProps } from "./SkeletonClock.js";
+export {
+  SkeletonClock,
+  setDefaultSkeletonClockFrozen,
+  getDefaultSkeletonClockOpacity,
+  type SkeletonClockProps,
+} from "./SkeletonClock.js";
 export { TextSkeleton, type TextSkeletonProps } from "./TextSkeleton.js";
 export { Spinner, type SpinnerProps } from "./Spinner.js";
 export { StarRatingInput, type StarRatingInputProps } from "./StarRatingInput.js";

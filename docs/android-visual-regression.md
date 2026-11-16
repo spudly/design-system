@@ -265,6 +265,19 @@ deep link's theme to the preview decorator directly:
 it from the capture link, and `.rnstorybook/preview.tsx` prefers it
 over the theme global whenever it is set. Browse mode never sets it.
 
+Loading-state captures are taken with the skeleton pulse frozen
+(#648): the pulse behind every skeleton bone is JS-driven
+(`requestAnimationFrame` in `src/widgets/SkeletonClock.tsx`), so
+the emulator-level animation disabling cannot pin its phase, and
+shard captures and the merge-verify re-capture minutes later
+landed on different opacities — regenerated baselines for loading
+stories could never verify. In capture mode `App.tsx` therefore
+freezes the shared default clock (and flags capture mode in
+`captureTheme.ts`), and the preview decorator wraps the story in
+a frozen `SkeletonClock` provider, so every bone renders at the
+static 0.72 opacity and captures are reproducible. Browse mode
+never freezes.
+
 ### Capture scope: pages only, own brand
 
 Stephen's decision, 2026-10-23: the committed baseline set is **page

@@ -26,3 +26,19 @@ export function setCaptureThemeOverride(theme: string | null): void {
 export function getCaptureThemeOverride(): string | null {
   return captureThemeOverride;
 }
+
+// Capture-mode flag, set alongside the theme override by App.tsx
+// whenever a capture deep link is active. The preview decorator
+// reads it to freeze the skeleton pulse for the capture (#648):
+// the theme override alone cannot signal capture mode, because a
+// capture link may legitimately carry no theme.
+
+let captureModeActive = false;
+
+export function setCaptureModeActive(active: boolean): void {
+  captureModeActive = active;
+}
+
+export function isCaptureModeActive(): boolean {
+  return captureModeActive;
+}

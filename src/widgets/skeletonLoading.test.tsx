@@ -135,7 +135,7 @@ test("every bone pulses on the one shared clock — primitives own no loop", () 
   );
   assert.match(
     clock,
-    /addEventListener\("change", \(event\) => store\.setFrozen\(event\.matches\)\)/,
+    /addEventListener\("change", \(event\) => \{\s+defaultReducedMotion = event\.matches;/,
     "the provider-less default store live-tracks the reduced-motion preference",
   );
 });
@@ -174,6 +174,50 @@ test("a frozen clock renders static, deterministic output", async () => {
   const second = await renderToHtml(composition());
   assert.equal(first, second, "frozen renders must be byte-identical across renders");
   assert.match(first, /opacity:\s*0\.72/, "the frozen pulse sits at the static mid-opacity");
+});
+test("freezing the shared default clock pins provider-less bones at 0.72 (#648)", async () => {
+  const { BoxSkeleton, setDefaultSkeletonClockFrozen, getDefaultSkeletonClockOpacity } =
+    await loadRuntime();
+  assert.equal(
+    typeof setDefaultSkeletonClockFrozen,
+    "function",
+    "the capture harness freezes provider-less bones through the shared default clock",
+  );
+  setDefaultSkeletonClockFrozen(true);
+  const realDateNow = Date.now;
+  let resumedOpacity: number | undefined;
+  try {
+    // Server rendering always reads the pinned server snapshot
+    // (getServerOpacity), so SSR can only prove the snapshot is
+    // deterministic — the live freeze is probed through the
+    // store's client opacity below (CodeRabbit on PR #662).
+    const first = await renderToHtml(<BoxSkeleton width={120} height={80} />);
+    const second = await renderToHtml(<BoxSkeleton width={120} height={80} />);
+    assert.equal(first, second, "default-clock frozen renders must be byte-identical");
+    assert.match(first, /opacity:\s*0\.72/, "provider-less bones sit at the frozen opacity");
+    assert.equal(
+      getDefaultSkeletonClockOpacity(),
+      0.72,
+      "the live default clock is pinned at the frozen opacity while frozen",
+    );
+  } finally {
+    // Control the clock instead of waiting for a real-time phase
+    // (CodeRabbit on PR #662): pin Date.now at an exact cycle
+    // boundary so unfreezing samples phase 0 — the pulse minimum,
+    // far from the frozen 0.72 — deterministically, even if the
+    // worker pauses between unfreezing and the assertion.
+    Date.now = () => 1_200_000;
+    try {
+      setDefaultSkeletonClockFrozen(false);
+      resumedOpacity = getDefaultSkeletonClockOpacity();
+    } finally {
+      Date.now = realDateNow;
+    }
+  }
+  assert.ok(
+    resumedOpacity !== undefined && resumedOpacity < 0.6,
+    `unfreezing resumes the pulse instead of leaving bones pinned (got ${resumedOpacity})`,
+  );
 });
 test("LoadingScope carries the loading flag to internal consumers only", async () => {
   const { LoadingScope, useLoadingScope } = await loadRuntime();
