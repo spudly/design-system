@@ -185,9 +185,8 @@ function isDefaultSkeletonClockFrozen(): boolean {
 /**
  * The live (client) opacity of the shared default clock — test probe.
  * Consumed by skeletonLoading.test.tsx through the built dist export
- * surface (a spread the static graph cannot trace).
- *
- * @knip-ignore
+ * surface (a spread the static graph cannot trace); SkeletonClock.tsx
+ * is a knip entry for this reason (see knip.json).
  */
 export function getDefaultSkeletonClockOpacity(): number {
   return getDefaultStore().getOpacity();

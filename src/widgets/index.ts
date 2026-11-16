@@ -71,6 +71,7 @@ export { CircleSkeleton, type CircleSkeletonProps } from "./CircleSkeleton.js";
 export {
   SkeletonClock,
   setDefaultSkeletonClockFrozen,
+  getDefaultSkeletonClockOpacity,
   type SkeletonClockProps,
 } from "./SkeletonClock.js";
 export { TextSkeleton, type TextSkeletonProps } from "./TextSkeleton.js";
