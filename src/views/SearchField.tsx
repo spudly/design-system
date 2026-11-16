@@ -1,9 +1,9 @@
 import { forwardRef, useId } from "react";
-import { Input as TamaguiInput, Label, View, XStack, YStack, styled } from "tamagui";
+import { Input as TamaguiInput, View, XStack, styled } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
-import { useImeCompositionGuard } from "./useImeCompositionGuard.js";
+import { FieldShell } from "./FieldShell.js";
 import { Text } from "../widgets/Text.js";
 
 /**
@@ -197,60 +197,57 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
   const autoId = useId();
   const id = idProp ?? autoId;
 
-  // IME composition guard (web) — see useImeCompositionGuard.
-  const { submitEditingProps, compositionProps } = useImeCompositionGuard({
-    onCompositionStart,
-    onCompositionEnd,
-    onSubmitEditing,
-  });
-
   return (
-    <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1 } : {})}>
-      {label ? (
-        <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
-          {label}
-        </Label>
-      ) : null}
-      <StyledContainer {...(grow && !label ? { flex: 1 } : {})}>
-        <StyledGlyphBox>
-          <SearchGlyph />
-        </StyledGlyphBox>
-        <StyledInput
-          ref={ref}
-          id={id}
-          value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          disabled={disabled}
-          {...rest}
-          {...submitEditingProps}
-          {...compositionProps}
-        />
-        {value ? (
-          <XStack
-            onPress={disabled ? undefined : () => onChangeText("")}
-            {...platformAccessibilityProps({
-              accessibilityRole: "button",
-              accessibilityLabel: "Clear search",
-              accessibilityState: { disabled },
-            })}
-            alignItems="center"
-            justifyContent="center"
-            minWidth={44}
-            minHeight={44}
-          >
-            <Text
-              aria-hidden
-              style={{
-                fontSize: tokens.typography.fontSize.lg,
-                color: "$textMuted",
-              }}
+    <FieldShell
+      label={label}
+      id={id}
+      grow={grow}
+      onCompositionStart={onCompositionStart}
+      onCompositionEnd={onCompositionEnd}
+      onSubmitEditing={onSubmitEditing}
+    >
+      {({ submitEditingProps, compositionProps }) => (
+        <StyledContainer {...(grow && !label ? { flex: 1 } : {})}>
+          <StyledGlyphBox>
+            <SearchGlyph />
+          </StyledGlyphBox>
+          <StyledInput
+            ref={ref}
+            id={id}
+            value={value}
+            onChangeText={onChangeText}
+            placeholder={placeholder}
+            disabled={disabled}
+            {...rest}
+            {...submitEditingProps}
+            {...compositionProps}
+          />
+          {value ? (
+            <XStack
+              onPress={disabled ? undefined : () => onChangeText("")}
+              {...platformAccessibilityProps({
+                accessibilityRole: "button",
+                accessibilityLabel: "Clear search",
+                accessibilityState: { disabled },
+              })}
+              alignItems="center"
+              justifyContent="center"
+              minWidth={44}
+              minHeight={44}
             >
-              ×
-            </Text>
-          </XStack>
-        ) : null}
-      </StyledContainer>
-    </YStack>
+              <Text
+                aria-hidden
+                style={{
+                  fontSize: tokens.typography.fontSize.lg,
+                  color: "$textMuted",
+                }}
+              >
+                ×
+              </Text>
+            </XStack>
+          ) : null}
+        </StyledContainer>
+      )}
+    </FieldShell>
   );
 });

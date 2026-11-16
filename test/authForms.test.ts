@@ -79,7 +79,12 @@ test("each form composes the shared FormStack and owns its submit handling", () 
       /const StyledForm\b/,
       `${form} defines no local form stack (FormStack owns the 16px field rhythm)`,
     );
-    assert.match(source, /onSubmit: \(\) => void/, `${form} submits a bare intent`);
+    // SignInForm/SignUpForm declare the bare submit intent in
+    // the shared EmailPasswordFormProps (#587 phase 3); the
+    // other forms declare it in their own props.
+    const intentSource =
+      form === "SignInForm" || form === "SignUpForm" ? read("src/views/AuthFormSubmit.tsx") : source;
+    assert.match(intentSource, /onSubmit: \(\) => void/, `${form} submits a bare intent`);
     assert.doesNotMatch(
       source,
       /useMutation|useQuery|fetch\(|AsyncStorage/,
@@ -147,8 +152,13 @@ test("auth pages forward their props to their forms", () => {
 test("the email-bearing forms thread emailError to the email field only (#535)", () => {
   for (const form of ["SignInForm", "SignUpForm", "ForgotPasswordForm"]) {
     const source = read(`src/views/${form}.tsx`);
+    // SignInForm/SignUpForm declare emailError in the shared
+    // EmailPasswordFormProps (#587 phase 3); ForgotPasswordForm
+    // declares it in its own props.
+    const declarationSource =
+      form === "SignInForm" || form === "SignUpForm" ? read("src/views/AuthFormSubmit.tsx") : source;
     assert.ok(
-      source.includes("emailError?: string | null | undefined;"),
+      declarationSource.includes("emailError?: string | null | undefined;"),
       `${form} declares emailError`,
     );
     assert.ok(

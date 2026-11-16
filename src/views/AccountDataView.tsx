@@ -3,7 +3,7 @@ import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { SectionMutedText } from "./SectionMutedText.js";
 import { useVoice } from "../voice/index.js";
 
 export type AccountDataViewProps = {
@@ -70,15 +70,7 @@ export function AccountDataView({
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
       <YStack gap="$3">
-        {showSkeleton ? (
-          // The description bone takes the two lines the
-          // description copy wraps to at the section's width —
-          // a single line left the actions shifted up by a
-          // line (Stephen on #579).
-          <TextSkeleton size="md" lines={2} />
-        ) : (
-          <Text variant="muted">{description}</Text>
-        )}
+        <SectionMutedText loading={showSkeleton} text={description} />
         <XStack gap="$2" flexWrap="wrap">
           {onExportData ? (
             <Button variant="secondary" disabled={exportPending} onPress={onExportData}>

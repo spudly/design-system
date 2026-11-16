@@ -1,8 +1,7 @@
-import { useId } from "react";
 import { TextArea as TamaguiTextArea, Label, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../widgets/accessibility.js";
+import { useFieldA11y } from "./useFieldA11y.js";
 import { Text } from "../widgets/Text.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {
@@ -84,20 +83,20 @@ export function TextAreaField({
   accessibilityValue,
   ...rest
 }: TextAreaFieldProps) {
-  const a11yProps = platformAccessibilityProps({
-    accessible,
-    accessibilityElementsHidden,
-    accessibilityHint,
-    accessibilityLabel,
-    accessibilityLabelledBy,
-    accessibilityLiveRegion,
-    accessibilityRole,
-    accessibilityState,
-    accessibilityValue,
-  });
-  const autoId = useId();
-  const id = idProp ?? autoId;
-  const errorId = `${id}-error`;
+  const { a11yProps, id, errorId } = useFieldA11y(
+    {
+      accessible,
+      accessibilityElementsHidden,
+      accessibilityHint,
+      accessibilityLabel,
+      accessibilityLabelledBy,
+      accessibilityLiveRegion,
+      accessibilityRole,
+      accessibilityState,
+      accessibilityValue,
+    },
+    idProp,
+  );
 
   return (
     <YStack gap={tokens.spacing[1]}>

@@ -1,7 +1,7 @@
 import { YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { FormStack } from "../widgets/FormStack.js";
-import { AuthFormSubmit } from "./AuthFormSubmit.js";
+import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
 import { TextField } from "./TextField.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { useVoice } from "../voice/index.js";
@@ -37,18 +37,7 @@ const StyledLinks = styled(YStack, {
  * tighter than the form's field rhythm, as in the app view.
  */
 
-export type SignInFormProps = {
-  email: string;
-  password: string;
-  onEmailChange: (value: string) => void;
-  onPasswordChange: (value: string) => void;
-  loading?: boolean | undefined;
-  error?: string | null | undefined;
-  /** The host's field-level email validation error (#535):
-   * renders under the email field with the field's error
-   * styling, distinct from the form-level `error` alert. */
-  emailError?: string | null | undefined;
-  onSubmit: () => void;
+export type SignInFormProps = EmailPasswordFormProps & {
   /** The create-account destination (#248: navigation crosses as
    * an href, not a press callback); the link renders only when
    * the href is provided. */

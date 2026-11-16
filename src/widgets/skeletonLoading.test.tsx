@@ -1645,7 +1645,7 @@ test("T3: every converted view declares `loading` and reads the LoadingScope", (
     );
     assert.match(
       code,
-      /TextSkeleton|BoxSkeleton|CircleSkeleton|TokenRow|CommentItem|CheckboxSelectList/,
+      /TextSkeleton|BoxSkeleton|CircleSkeleton|TokenRow|CommentItem|CheckboxSelectList|SectionMutedText/,
       `${name} must render skeletons (directly, or via a skeletonized child)`,
     );
   }
