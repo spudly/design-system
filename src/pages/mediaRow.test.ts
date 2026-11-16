@@ -30,7 +30,8 @@
  * the recipesPageRowActions block in src/pages/RecipesPage.test.ts.
  *
  * Source scan plus dist export checks, like the other contract
- * tests. The scans slice RecipesPage.tsx at the compositions'
+ * tests. The scans slice recipeRow.tsx (the shared row module
+ * RecipesPage and HomePage compose since #657) at the compositions'
  * markers so page-level code cannot satisfy them. Comments are
  * stripped before scanning.
  */
@@ -53,7 +54,7 @@ function code(file: string) {
   return strip(readFileSync(join(componentsDir, file), "utf8"));
 }
 
-const page = strip(readFileSync(join(here, "../..", "src", "pages", "RecipesPage.tsx"), "utf8"));
+const page = strip(readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8"));
 const mediaRow = page.slice(page.indexOf("const textBlockStyle"), page.indexOf("const STAR_STEPS"));
 const ratingStars = page.slice(page.indexOf("const STAR_STEPS"));
 const removableField = code("RemovableField.tsx");
