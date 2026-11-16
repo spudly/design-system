@@ -3,7 +3,8 @@ import { TamaguiProvider, YStack } from "tamagui";
 import { createOnDeviceStorybookTamaguiConfig } from "../../../src/tamagui.config.js";
 import { fixtureVoice } from "../../../src/voice/fixtures.js";
 import { VoiceProvider } from "../../../src/voice/index.js";
-import { getCaptureThemeOverride } from "../captureTheme";
+import { SkeletonClock } from "../../../src/widgets/SkeletonClock.js";
+import { getCaptureThemeOverride, isCaptureModeActive } from "../captureTheme";
 
 // On-device mirror of the web .storybook/preview.tsx: same decorator
 // shape and the same theme global, but the config comes from the
@@ -29,11 +30,24 @@ const preview: Preview = {
       // deep link's theme arrives via captureTheme.ts instead (see
       // that module). Null outside capture mode.
       const themeName = getCaptureThemeOverride() ?? (context.globals.theme as string) ?? "light";
+      // Capture mode freezes the skeleton pulse (#648) so
+      // loading-state captures are reproducible between the shard
+      // capture and the merge-verify re-capture: provider-less
+      // bones are frozen via the shared default clock (App.tsx),
+      // and this frozen provider covers any provider-scoped
+      // subtree. Browse mode never freezes.
+      const captureMode = isCaptureModeActive();
       return (
         <TamaguiProvider key={themeName} config={config} defaultTheme={themeName}>
           <VoiceProvider voice={fixtureVoice}>
             <YStack flex={1} backgroundColor="$background" padding={24}>
-              <Story />
+              {captureMode ? (
+                <SkeletonClock frozen>
+                  <Story />
+                </SkeletonClock>
+              ) : (
+                <Story />
+              )}
             </YStack>
           </VoiceProvider>
         </TamaguiProvider>

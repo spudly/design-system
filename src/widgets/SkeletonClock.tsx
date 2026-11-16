@@ -167,6 +167,20 @@ function getDefaultStore(): SkeletonClockStore {
   return defaultStore;
 }
 
+/**
+ * Freeze (or unfreeze) the shared default clock behind every
+ * provider-less bone. Capture harnesses (Android VR, Chromatic)
+ * call this before stories mount so loading-state captures are
+ * reproducible: the pulse is JS-driven, so emulator-level
+ * animation disabling cannot pin its phase, and two captures
+ * minutes apart otherwise land on different opacities (#648).
+ * Internal: hosts inside this repo use it; it is not part of the
+ * package's public surface.
+ */
+export function setDefaultSkeletonClockFrozen(frozen: boolean): void {
+  getDefaultStore().setFrozen(frozen);
+}
+
 export type SkeletonClockProps = {
   children?: ReactNode;
   /**

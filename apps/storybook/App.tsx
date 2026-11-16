@@ -6,7 +6,8 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SET_CURRENT_STORY, STORY_RENDERED, UPDATE_GLOBALS } from "storybook/internal/core-events";
 import StorybookUIRoot, { view } from "./Storybook";
-import { setCaptureThemeOverride } from "./captureTheme";
+import { setCaptureModeActive, setCaptureThemeOverride } from "./captureTheme";
+import { setDefaultSkeletonClockFrozen } from "../../src/widgets/SkeletonClock.js";
 import { createStoryLinkOpenURL } from "./storyLinks";
 
 // App-side full-content capture module (design-system #137).
@@ -163,8 +164,23 @@ function CaptureRoot({ storyId, theme, nonce, appCapture }: Required<CaptureTarg
   // the driver screenshots — and cleared on unmount so browse mode
   // is unaffected. The value is idempotent per capture target.
   setCaptureThemeOverride(theme || null);
+  // Capture mode also freezes the skeleton pulse (#648): the pulse
+  // is JS-driven (requestAnimationFrame), so the emulator-level
+  // animation disabling the harness relies on cannot pin it, and
+  // loading-state captures minutes apart landed on different
+  // phases — the merge-verify re-capture could never match the
+  // shard capture. Freezing the shared default clock here, before
+  // stories mount, pins every provider-less bone at the static
+  // 0.72 opacity; the preview decorator additionally wraps the
+  // story in a frozen provider for provider-scoped subtrees.
+  setCaptureModeActive(true);
+  setDefaultSkeletonClockFrozen(true);
   useEffect(() => {
-    return () => setCaptureThemeOverride(null);
+    return () => {
+      setCaptureThemeOverride(null);
+      setCaptureModeActive(false);
+      setDefaultSkeletonClockFrozen(false);
+    };
   }, []);
 
   const Root = useMemo(

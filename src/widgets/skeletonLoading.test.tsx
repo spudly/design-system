@@ -175,6 +175,29 @@ test("a frozen clock renders static, deterministic output", async () => {
   assert.equal(first, second, "frozen renders must be byte-identical across renders");
   assert.match(first, /opacity:\s*0\.72/, "the frozen pulse sits at the static mid-opacity");
 });
+test("freezing the shared default clock pins provider-less bones at 0.72 (#648)", async () => {
+  const { BoxSkeleton, setDefaultSkeletonClockFrozen } = await loadRuntime();
+  assert.equal(
+    typeof setDefaultSkeletonClockFrozen,
+    "function",
+    "the capture harness freezes provider-less bones through the shared default clock",
+  );
+  setDefaultSkeletonClockFrozen(true);
+  try {
+    const first = await renderToHtml(<BoxSkeleton width={120} height={80} />);
+    const second = await renderToHtml(<BoxSkeleton width={120} height={80} />);
+    assert.equal(first, second, "default-clock frozen renders must be byte-identical");
+    assert.match(first, /opacity:\s*0\.72/, "provider-less bones sit at the frozen opacity");
+  } finally {
+    setDefaultSkeletonClockFrozen(false);
+  }
+  const resumed = await renderToHtml(<BoxSkeleton width={120} height={80} />);
+  assert.doesNotMatch(
+    resumed,
+    /opacity:\s*0\.72/,
+    "unfreezing resumes the pulse instead of leaving bones pinned",
+  );
+});
 test("LoadingScope carries the loading flag to internal consumers only", async () => {
   const { LoadingScope, useLoadingScope } = await loadRuntime();
   const Probe = () => <span>{useLoadingScope() ? "loading" : "idle"}</span>;
