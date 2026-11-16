@@ -48,8 +48,15 @@ test("both Storybook previews install the VoiceProvider with the fixture voice (
   // silently drop it again.
   for (const path of [".storybook/preview.tsx", "apps/storybook/.rnstorybook/preview.tsx"]) {
     const preview = read(path);
-    assert.match(preview, /VoiceProvider/, `${path} must import/render VoiceProvider`);
-    assert.match(preview, /voice=\{fixtureVoice\}/, `${path} must pass the fixture voice`);
+    // The provider must ENCLOSE the story, not merely appear beside
+    // it: a sibling <VoiceProvider /> would leave the story tree
+    // without voice context and the error frames would return.
+    const open = preview.indexOf("<VoiceProvider voice={fixtureVoice}>");
+    const story = preview.indexOf("<Story />", open);
+    const close = preview.indexOf("</VoiceProvider>", story);
+    assert.ok(open !== -1, `${path} must render VoiceProvider with the fixture voice`);
+    assert.ok(story > open, `${path} must render the story inside the VoiceProvider`);
+    assert.ok(close > story, `${path} must close the VoiceProvider after the story`);
   }
 });
 
