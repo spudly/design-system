@@ -69,7 +69,7 @@ test("premise: page stories pin a light theme global", () => {
     const source = readFileSync(join(pagesDir, file), "utf8");
     assert.match(
       source,
-      /globals:\s*\{\s*theme:\s*"light_(warmHarvest|quietDawn)"\s*\}/,
+      /globals:\s*\{\s*theme:\s*"light_(warmHarvest|quietDawn)"\s*[,}]/,
       `${file} pins a light_<brand> theme global`,
     );
   }

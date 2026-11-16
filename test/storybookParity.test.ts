@@ -225,8 +225,12 @@ test("every view component has a story file titled Views/<Name>", () => {
   // compose; the section intro line AccountDataView/
   // TransferRecipesView compose), and useFieldA11y.ts is an
   // internal hook — same terms.
+  // storyFrame.tsx is likewise an internal helper (the shared
+  // StoryFrame the view stories compose, #668), not a view
+  // component — no story of its own.
   const exceptions = new Set([
     "index.ts",
+    "storyFrame.tsx",
     "useImeCompositionGuard.ts",
     "useFieldA11y.ts",
     "LabeledListSection.tsx",
