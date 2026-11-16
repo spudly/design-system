@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 import { XStack, YStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
@@ -12,12 +11,10 @@ const StyledWeekDayColumns = styled(XStack, {
   alignItems: "flex-start",
 });
 
-type StyledWeekDayColumnsProps = GetProps<typeof StyledWeekDayColumns>;
-
-export type WeekDayColumnsProps = Omit<
-  StyledWeekDayColumnsProps,
-  "gap" | "alignItems" | "flexWrap"
->;
+export type WeekDayColumnsProps = {
+  /** The row's day columns (WeekDayColumn children). */
+  children: ReactNode;
+};
 
 /**
  * The wrapping row of a week view's day columns (#660): the
@@ -25,11 +22,12 @@ export type WeekDayColumnsProps = Omit<
  * full-width days on narrow (phone/native) surfaces. There is
  * deliberately no horizontal scrolling — the page-scroll model
  * (#547) bans nested scrollers, so wrapping is the only compliant
- * overflow treatment. Call sites pass only the WeekDayColumns'
- * WeekDayColumn children: the gap and wrapping live here.
+ * overflow treatment. Call sites pass only the columns: the gap
+ * and wrapping live here, and the component accepts no styling
+ * props — it owns its treatment completely (#119).
  */
-export function WeekDayColumns({ ...rest }: WeekDayColumnsProps) {
-  return <StyledWeekDayColumns {...rest} />;
+export function WeekDayColumns({ children }: WeekDayColumnsProps) {
+  return <StyledWeekDayColumns>{children}</StyledWeekDayColumns>;
 }
 
 const StyledWeekDayColumn = styled(YStack, {
@@ -40,9 +38,7 @@ const StyledWeekDayColumn = styled(YStack, {
   minWidth: 180,
 });
 
-type StyledWeekDayColumnProps = GetProps<typeof StyledWeekDayColumn>;
-
-export type WeekDayColumnProps = Omit<StyledWeekDayColumnProps, "gap" | "flex" | "minWidth"> & {
+export type WeekDayColumnProps = {
   /** The day's heading (the host composes it, e.g. "Monday"). */
   label: string;
   /** The day's date line, pre-composed by the host; omit to hide it. */
@@ -60,9 +56,9 @@ export type WeekDayColumnProps = Omit<StyledWeekDayColumnProps, "gap" | "flex" |
  * wraps it to its own line); call sites pass only content — no
  * styling props, by design (#119).
  */
-export function WeekDayColumn({ label, dateLabel, children, ...rest }: WeekDayColumnProps) {
+export function WeekDayColumn({ label, dateLabel, children }: WeekDayColumnProps) {
   return (
-    <StyledWeekDayColumn {...rest}>
+    <StyledWeekDayColumn>
       <Text variant="subheading">{label}</Text>
       {dateLabel ? <Text variant="hint">{dateLabel}</Text> : null}
       {children}
