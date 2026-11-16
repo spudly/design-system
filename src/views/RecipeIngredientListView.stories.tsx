@@ -2,11 +2,11 @@ import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Button } from "../widgets/Button.js";
 import {
-import { StoryFrame } from "./storyFrame.js";
   RecipeIngredientListView,
   type RecipeIngredientField,
   type RecipeIngredientRow,
 } from "./RecipeIngredientListView.js";
+import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof RecipeIngredientListView> = {
   title: "Views/RecipeIngredientListView",

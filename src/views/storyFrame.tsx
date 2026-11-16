@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { View } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
-export type StoryFrameProps = {
+type StoryFrameProps = {
   children: ReactNode;
   /** Fixed frame height for views whose stories pin one (banners, dialogs). */
   height?: number;
