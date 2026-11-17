@@ -1,5 +1,15 @@
 # @spudly/ui
 
+## 11.1.0
+
+### Minor Changes
+
+- e6bc372: Export `RecipeIngredientRowView` and `RecipeInstructionRowView` (plus their prop types) from the package root: native hosts can now compose sortable ingredient and instruction rows directly from @spudly/ui, the same row views the web recipe editor uses. No other views or widgets are exported.
+
+### Patch Changes
+
+- 549e04f: Storybook story harness: page stories now render in a viewport-driven frame (phone/wide/desktop/full, selectable in the toolbar, with a per-story default frame parameter) instead of a fixed 430px phone frame — on both the web and on-device previews — and view stories share one StoryFrame component with named frame variants — no library component behavior changes.
+
 ## 11.0.0
 
 ### Major Changes
