@@ -56,6 +56,20 @@ import { TextField } from "../views/TextField.js";
  *   quantity stepper; a selected recipe gets quantity and
  *   servings steppers, the servings value falling back to
  *   the recipe's own servings when the host has no override.
+ * - Each selected entry can also carry a day (#673): the
+ *   day crosses as the raw date string the screen edits
+ *   (`dayByKey`, "YYYY-MM-DD" values, or "" for no day),
+ *   keyed by the entry's selection key. The per-entry day
+ *   field renders only when the host supplies
+ *   `onDayChange` — hosts that omit the day props render
+ *   exactly as before. The field gets the same treatment
+ *   as `startsOn` / `endsOn` above (`type="date"`, so web
+ *   gets a real date input with the same YYYY-MM-DD value
+ *   contract; on native it stays text entry with
+ *   `keyboardType="numbers-and-punctuation"`). No defaulting
+ *   a missing day to `startsOn`, no validation, and no
+ *   clamping to the plan range is baked in here — the host
+ *   owns the value and its semantics.
  *
  * Submission is a bare intent (`onSubmit`); the disabled rule
  * is the app view's one presentation rule (a title and at
@@ -132,6 +146,14 @@ export type MealPlanFormPageProps = {
   /** Report a servings-to-eat edit for one plan recipe entry,
    * independently of `onRecipeServingsChange` (#659). */
   onRecipeServingsToEatChange?: (recipeId: string, servings: number) => void;
+  /** Day overrides by entry key (#673): "YYYY-MM-DD" values,
+   * or "" for no day. Optional: hosts that have not adopted
+   * the day control omit it (and `onDayChange`) and no day
+   * fields render. */
+  dayByKey?: Record<string, string>;
+  /** Report a day edit for one selected entry (#673). Its
+   * presence is what makes the per-entry day fields render. */
+  onDayChange?: (key: string, day: string) => void;
   /** Save in flight: the submit button disables. */
   isSaving?: boolean;
   /** Host-reported save failure, rendered above the submit row. */
@@ -168,6 +190,8 @@ export function MealPlanFormPage({
   onQuantityChange,
   onRecipeServingsChange,
   onRecipeServingsToEatChange,
+  dayByKey,
+  onDayChange,
   isSaving = false,
   error,
   onSubmit,
@@ -239,8 +263,25 @@ export function MealPlanFormPage({
               }}
             />
           );
+          const dayField = onDayChange ? (
+            <TextField
+              label={`Day · ${option.title}`}
+              type="date"
+              keyboardType="numbers-and-punctuation"
+              value={dayByKey?.[key] ?? ""}
+              onChangeText={(value) => {
+                onDayChange(key, value);
+              }}
+              placeholder="YYYY-MM-DD"
+            />
+          ) : null;
           if (option.kind === "meal" || !option.recipeId) {
-            return <FormStack key={key}>{quantityStepper}</FormStack>;
+            return (
+              <FormStack key={key}>
+                {quantityStepper}
+                {dayField}
+              </FormStack>
+            );
           }
           const recipeId = option.recipeId;
           return (
@@ -262,6 +303,7 @@ export function MealPlanFormPage({
                   onRecipeServingsToEatChange?.(recipeId, value);
                 }}
               />
+              {dayField}
             </FormStack>
           );
         })}

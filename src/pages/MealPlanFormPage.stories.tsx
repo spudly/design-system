@@ -51,6 +51,7 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     quantityByKey: initialQuantityByKey,
     servingsByRecipeId: initialServingsByRecipeId,
     servingsToEatByRecipeId: initialServingsToEatByRecipeId,
+    dayByKey: initialDayByKey,
     ...restOverrides
   } = overrides ?? {};
   const [title, setTitle] = useState(initialTitle ?? fixture.title);
@@ -69,6 +70,9 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
   );
   const [servingsToEatByRecipeId, setServingsToEatByRecipeId] = useState<Record<string, number>>(
     initialServingsToEatByRecipeId ?? fixture.servingsToEatByRecipeId,
+  );
+  const [dayByKey, setDayByKey] = useState<Record<string, string>>(
+    initialDayByKey ?? fixture.dayByKey,
   );
   const query = searchText.trim().toLowerCase();
   const searchResults = query
@@ -91,6 +95,7 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     quantityByKey,
     servingsByRecipeId,
     servingsToEatByRecipeId,
+    dayByKey,
     onSelectEntry: (key) => {
       const entry = fixture.entryOptions.find((option) => option.key === key);
       if (entry) {
@@ -110,6 +115,9 @@ function useFormProps(overrides?: Partial<MealPlanFormPageProps>): MealPlanFormP
     },
     onRecipeServingsToEatChange: (recipeId, servings) => {
       setServingsToEatByRecipeId((current) => ({ ...current, [recipeId]: servings }));
+    },
+    onDayChange: (key, day) => {
+      setDayByKey((current) => ({ ...current, [key]: day }));
     },
     onSubmit: restOverrides.onSubmit ?? (() => undefined),
   };
@@ -136,6 +144,7 @@ export const NoSelection: Story = {
         quantityByKey={{}}
         servingsByRecipeId={{}}
         servingsToEatByRecipeId={{}}
+        dayByKey={{}}
         searchText=""
         searchResults={[]}
       />

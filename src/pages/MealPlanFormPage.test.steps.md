@@ -47,7 +47,11 @@ Default, NoSelection, SaveError. Open in
    on / Ends on fields, the entry search autocomplete with kind
    prefixes on its results and selected entries, and quantity
    (plus Servings to cook and Servings to eat for recipes, #659) steppers grouped per selected
-   entry in their own field stacks; NoSelection disables Save
+   entry in their own field stacks, plus a Day field per
+   selected entry (#673) — a date field showing the entry's
+   set day where one is set and blank where none is, with
+   editing a Day field reporting the new YYYY-MM-DD value for
+   that entry only; NoSelection disables Save
    plan.
 
 **Run when:** `src/pages/RecipeFormPage.tsx`,
