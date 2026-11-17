@@ -36,6 +36,13 @@
  * src/voice/ — the DS owns the text system the way it owns themes,
  * so the provider and slot types are part of the published surface.
  *
+ * #671 (2026-11-16, Stephen's Option A decision on eciperay #555)
+ * adds a minimal, named exception to the #298 pages-only rule:
+ * `RecipeIngredientRowView` and `RecipeInstructionRowView` (plus
+ * their prop types) are exported from the package root so a native
+ * host can compose sortable ingredient/instruction rows the way
+ * the web host does. No other view or widget is exported.
+ *
  * Widgets, icons, and the Storybook factories remain in the repo
  * as internal building blocks (src/widgets, src/icons,
  * src/tamagui.config.ts) that the pages are composed from and that
@@ -59,3 +66,11 @@ export {
 export type { Theme, SemanticColors, EciperayTheme, MemorizeTheme } from "./themes/index.js";
 export { createTamaguiConfig } from "./tamagui.config.js";
 export { VoiceProvider, useVoice, type Voice, type VoiceFormatter, type VoiceProviderProps } from "./voice/index.js";
+export {
+  RecipeIngredientRowView,
+  type RecipeIngredientRowViewProps,
+} from "./views/RecipeIngredientRowView.js";
+export {
+  RecipeInstructionRowView,
+  type RecipeInstructionRowViewProps,
+} from "./views/RecipeInstructionRowView.js";

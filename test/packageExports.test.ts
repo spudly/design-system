@@ -15,6 +15,9 @@
  *    `createTamaguiConfig` from src/tamagui.config.ts.
  *    (#438's final major removed the former `ChunkErrorBoundary`
  *    root export; the boundary is an internal view now.)
+ *    (#671, 2026-11-16, adds Stephen's minimal named exception:
+ *    `RecipeIngredientRowView` and `RecipeInstructionRowView`
+ *    plus their prop types, for native sortable lists.)
  * 3. Nothing else is on the public surface: no other widget
  *    components, no icons, no composite (form) components, and
  *    no Storybook config factories or other
@@ -105,6 +108,11 @@ const restoredByModule: [string, string[]][] = [
     "./voice/index.js",
     ["VoiceProvider", "useVoice", "Voice", "VoiceFormatter", "VoiceProviderProps"],
   ],
+  // #671 (2026-11-16): Stephen's minimal named exception to the
+  // #298 pages-only rule — exactly these two sortable row views
+  // and their prop types, so native hosts can compose them.
+  ["./views/RecipeIngredientRowView.js", ["RecipeIngredientRowView", "RecipeIngredientRowViewProps"]],
+  ["./views/RecipeInstructionRowView.js", ["RecipeInstructionRowView", "RecipeInstructionRowViewProps"]],
 ];
 
 const restoredNames = new Set(restoredByModule.flatMap(([, names]) => names));
@@ -144,8 +152,10 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions 
         "./themes/index.js",
         "./tamagui.config.js",
         "./voice/index.js",
+        "./views/RecipeIngredientRowView.js",
+        "./views/RecipeInstructionRowView.js",
       ]),
-      `${rel} must re-export from exactly the pages barrel, the #411 source modules, and the #539 voice module`,
+      `${rel} must re-export from exactly the pages barrel, the #411 source modules, the #539 voice module, and the #671 row-view modules`,
     );
     // The built JS drops the type-only names (they are erased at
     // compile time); the source and the built declarations carry
@@ -163,6 +173,8 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions 
             "createTamaguiConfig",
             "VoiceProvider",
             "useVoice",
+            "RecipeIngredientRowView",
+            "RecipeInstructionRowView",
           ])
         : restoredNames;
     assert.deepEqual(
