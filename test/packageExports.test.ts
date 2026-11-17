@@ -34,7 +34,7 @@
  * scanning so prose cannot satisfy or trip the patterns.
  */
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -214,7 +214,11 @@ test("the public surface is exactly the pages barrel's names plus the #411 addit
   // internal modules do not have.
   for (const [specifier, names] of restoredByModule) {
     const sourceRel = `src/${specifier.replace(/^\.\//, "").replace(/\.js$/, "")}`;
-    const sourceNames = exportNames(readCode(`${sourceRel}.ts`));
+    // Source modules are .ts, except component modules (.tsx, e.g.
+    // the #671 row views).
+    const sourceNames = exportNames(
+      readCode(existsSync(join(root, `${sourceRel}.tsx`)) ? `${sourceRel}.tsx` : `${sourceRel}.ts`),
+    );
     for (const name of names) {
       assert.ok(sourceNames.has(name), `${name} must be exported by ${specifier}'s source module`);
     }

@@ -9,8 +9,9 @@
  * drag library enters the DS.
  *
  * The contracts pinned here:
- * 1. The views are exported from the views barrel (internal
- *    surface only); RecipeFormPage renders the list from the
+ * 1. The views are exported from the views barrel (the list
+ *    view stays internal; the row view is also exported from
+ *    the package root under the #671 exception); RecipeFormPage renders the list from the
  *    `instructions` data prop, ahead of the
  *    `renderInstructionsSection` slot, which remains the
  *    fallback.
@@ -38,13 +39,20 @@ test("the views are barrel-exported and RecipeFormPage renders the list from the
   for (const name of ["RecipeInstructionListView", "RecipeInstructionRowView"]) {
     assert.ok(barrel.includes(name), `${name} is exported from src/views/index.ts`);
     assert.ok(barrel.includes(`from "./${name}.js"`), `${name} is exported from its own module`);
-    const rootIndex = read("src/index.ts");
-    assert.doesNotMatch(
-      rootIndex,
-      new RegExp(`\\b${name}\\b`),
-      "the view stays off the public surface",
-    );
   }
+  const rootIndex = read("src/index.ts");
+  assert.doesNotMatch(
+    rootIndex,
+    /\bRecipeInstructionListView\b/,
+    "the list view stays off the public surface",
+  );
+  // #671 (2026-11-16): the row view is the named exception to the
+  // #298 pages-only rule — it IS exported from the package root.
+  assert.match(
+    rootIndex,
+    /\bRecipeInstructionRowView\b/,
+    "the row view is exported from the package root (#671)",
+  );
   const form = read("src/pages/RecipeFormPage.tsx");
   assert.ok(
     form.includes("instructions?: RecipeFormPageInstructions | null"),
