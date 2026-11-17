@@ -15,6 +15,9 @@
  *    `createTamaguiConfig` from src/tamagui.config.ts.
  *    (#438's final major removed the former `ChunkErrorBoundary`
  *    root export; the boundary is an internal view now.)
+ *    (#671, 2026-11-16, adds Stephen's minimal named exception:
+ *    `RecipeIngredientRowView` and `RecipeInstructionRowView`
+ *    plus their prop types, for native sortable lists.)
  * 3. Nothing else is on the public surface: no other widget
  *    components, no icons, no composite (form) components, and
  *    no Storybook config factories or other
@@ -31,7 +34,7 @@
  * scanning so prose cannot satisfy or trip the patterns.
  */
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -105,6 +108,11 @@ const restoredByModule: [string, string[]][] = [
     "./voice/index.js",
     ["VoiceProvider", "useVoice", "Voice", "VoiceFormatter", "VoiceProviderProps"],
   ],
+  // #671 (2026-11-16): Stephen's minimal named exception to the
+  // #298 pages-only rule — exactly these two sortable row views
+  // and their prop types, so native hosts can compose them.
+  ["./views/RecipeIngredientRowView.js", ["RecipeIngredientRowView", "RecipeIngredientRowViewProps"]],
+  ["./views/RecipeInstructionRowView.js", ["RecipeInstructionRowView", "RecipeInstructionRowViewProps"]],
 ];
 
 const restoredNames = new Set(restoredByModule.flatMap(([, names]) => names));
@@ -144,8 +152,10 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions 
         "./themes/index.js",
         "./tamagui.config.js",
         "./voice/index.js",
+        "./views/RecipeIngredientRowView.js",
+        "./views/RecipeInstructionRowView.js",
       ]),
-      `${rel} must re-export from exactly the pages barrel, the #411 source modules, and the #539 voice module`,
+      `${rel} must re-export from exactly the pages barrel, the #411 source modules, the #539 voice module, and the #671 row-view modules`,
     );
     // The built JS drops the type-only names (they are erased at
     // compile time); the source and the built declarations carry
@@ -163,6 +173,8 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions 
             "createTamaguiConfig",
             "VoiceProvider",
             "useVoice",
+            "RecipeIngredientRowView",
+            "RecipeInstructionRowView",
           ])
         : restoredNames;
     assert.deepEqual(
@@ -202,7 +214,11 @@ test("the public surface is exactly the pages barrel's names plus the #411 addit
   // internal modules do not have.
   for (const [specifier, names] of restoredByModule) {
     const sourceRel = `src/${specifier.replace(/^\.\//, "").replace(/\.js$/, "")}`;
-    const sourceNames = exportNames(readCode(`${sourceRel}.ts`));
+    // Source modules are .ts, except component modules (.tsx, e.g.
+    // the #671 row views).
+    const sourceNames = exportNames(
+      readCode(existsSync(join(root, `${sourceRel}.tsx`)) ? `${sourceRel}.tsx` : `${sourceRel}.ts`),
+    );
     for (const name of names) {
       assert.ok(sourceNames.has(name), `${name} must be exported by ${specifier}'s source module`);
     }
