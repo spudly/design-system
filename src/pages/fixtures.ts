@@ -217,13 +217,21 @@ export const mealPlanFormFixture = {
       servings: 6,
     },
   ],
-  quantityByKey: { "meal:sunday-dinner": 1, "recipe:tuscan-chicken": 2, "recipe:stuffed-peppers": 1 },
+  quantityByKey: {
+    "meal:sunday-dinner": 1,
+    "recipe:tuscan-chicken": 2,
+    "recipe:stuffed-peppers": 1,
+  },
   servingsByRecipeId: { "tuscan-chicken": 6, "stuffed-peppers": 6 },
   // Servings to eat (#659): the Tuscan chicken's eat equals its
   // cook (6 = 6, the equal case) and the stuffed peppers' eat
   // diverges from their cook (3 to eat of 6 to cook, the
   // divergent case).
   servingsToEatByRecipeId: { "tuscan-chicken": 6, "stuffed-peppers": 3 },
+  // Per-entry day (#673): the Sunday dinner and the Tuscan
+  // chicken carry a set day, and the stuffed peppers are
+  // deliberately left unset — the set and no-day cases.
+  dayByKey: { "meal:sunday-dinner": "2026-10-19", "recipe:tuscan-chicken": "2026-10-20" },
 };
 
 /**

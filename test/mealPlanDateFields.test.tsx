@@ -83,7 +83,7 @@ test("TextField defaults placeholderTextColor to $textMuted, caller wins (eciper
     'the input must receive placeholderTextColor ?? (changed ? warning10 : "$textMuted") explicitly',
   );
 });
-test("MealPlanFormPage passes type=date to both date fields (eciperay#334)", () => {
+test("MealPlanFormPage passes type=date to its date fields (eciperay#334, #673)", () => {
   assert.match(
     mealPlanFormPage,
     /label="Starts on"\s+type="date"\s+keyboardType="numbers-and-punctuation"/,
@@ -92,10 +92,14 @@ test("MealPlanFormPage passes type=date to both date fields (eciperay#334)", () 
     mealPlanFormPage,
     /label="Ends on"\s+type="date"\s+keyboardType="numbers-and-punctuation"/,
   );
+  assert.match(
+    mealPlanFormPage,
+    /label=\{`Day · \$\{option\.title\}`\}\s+type="date"\s+keyboardType="numbers-and-punctuation"/,
+  );
   assert.equal(
     (mealPlanFormPage.match(/type="date"/g) ?? []).length,
-    2,
-    "exactly the two date fields carry type=date",
+    3,
+    "exactly the three date fields (starts on, ends on, per-entry day) carry type=date",
   );
 });
 
@@ -127,8 +131,15 @@ function loadRuntime() {
   return runtimePromise;
 }
 async function renderToHtml(element: any) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
-    await loadRuntime();
+  const {
+    React,
+    renderToString,
+    TamaguiProvider,
+    createTamaguiConfig,
+    baseTheme,
+    VoiceProvider,
+    fixtureVoice,
+  } = await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
     <TamaguiProvider config={config} defaultTheme="light">
