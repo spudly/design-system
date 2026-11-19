@@ -118,8 +118,11 @@ function sourceFiles(dir: string): string[] {
 // Alert is sanctioned on the same ground again (#460): it routes
 // caller RN props through platformAccessibilityProps like Button/Text;
 // ButtonInternal (#480) is Button's own internal form — same routing.
+// LoadingActionCardRow (#119 tranche 2) is sanctioned on the
+// DropdownButton ground: it forwards its `accessibilityLabel` to the
+// DS Button it renders, which translates it.
 const SANCTIONED_TAGS = new Set(
-  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert".split(
+  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert,LoadingActionCardRow".split(
     ",",
   ),
 );
@@ -176,7 +179,7 @@ const PAGE_STACKS: string[] = [];
 // TouchableOpacity / LinkOverlay) before RAW is applied.
 const RAW = /accessibility(Label|State|Role|Value)=/;
 const TAGS =
-  /<(Button|Text|TextField|TextAreaField|ProgressBar|TouchableOpacity|LinkOverlay)\b[^>]*>/g;
+  /<(Button|Text|TextField|TextAreaField|ProgressBar|TouchableOpacity|LinkOverlay|LoadingActionCardRow)\b[^>]*>/g;
 test("page-level stack pressables route through the translator, never raw RN JSX props (#237)", () => {
   for (const rel of PAGE_STACKS) {
     const code = readCode(rel);
