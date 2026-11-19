@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
+import { LinkStack } from "../widgets/LinkStack.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { LegalSection } from "../views/LegalSection.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
@@ -146,13 +146,13 @@ export function ProfilePage({
         {transfer ? <TransferRecipesView {...transfer} /> : null}
         {accountData ? <AccountDataView {...accountData} /> : null}
         <LegalSection title="Legal">
-          <YStack gap="$2">
+          <LinkStack>
             {(legalLinks ?? []).map((link) => (
               <TextLink key={link.href} href={link.href}>
                 {link.label}
               </TextLink>
             ))}
-          </YStack>
+          </LinkStack>
         </LegalSection>
         <Button variant="danger" onPress={onSignOut}>
           Sign Out
