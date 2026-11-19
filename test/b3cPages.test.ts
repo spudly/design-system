@@ -201,10 +201,11 @@ test("ImportTextPage holds the batch's one documented local-state exception", ()
   assert.match(source, /onSubmit: \(text: string\) => void/, "text crosses only at submit");
 });
 
-test("ImportReviewPage takes the preview as a slot, not a renderer import", () => {
+test("ImportReviewPage renders the preview from data, not a slot (#684)", () => {
   const source = page("ImportReviewPage");
-  assert.match(source, /preview: ReactNode/);
-  assert.doesNotMatch(source, /RecipeInputPreview\.js/);
+  assert.match(source, /preview: RecipePreviewViewProps/);
+  assert.match(source, /<RecipePreviewView \{\.\.\.preview\} \/>/);
+  assert.doesNotMatch(source, /preview: ReactNode/);
 });
 
 test("AiSessionPage splits view from session logic", () => {
@@ -215,8 +216,9 @@ test("AiSessionPage splits view from session logic", () => {
   assert.match(source, /canRefine: boolean/);
   assert.match(source, /canCancel: boolean/);
   assert.match(source, /phaseLabel: string/);
-  // The preview is a slot; the intents are bare.
-  assert.match(source, /preview\?: ReactNode/);
+  // The preview is data (#684); the intents are bare.
+  assert.match(source, /preview\?: RecipePreviewViewProps/);
+  assert.match(source, /<RecipePreviewView \{\.\.\.preview\} \/>/);
   assert.match(source, /onStart: \(prompt: string\) => void/);
   assert.match(source, /onApprovePlan: \(\) => void/);
   assert.match(source, /onFinalize: \(\) => void/);

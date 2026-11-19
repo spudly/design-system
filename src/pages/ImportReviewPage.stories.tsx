@@ -1,7 +1,5 @@
 import { eciperayFooterFixture } from "./fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
-import { YStack } from "tamagui";
-import { Text } from "../widgets/Text.js";
 import { storyImageWide } from "../storyFixtures.js";
 import { ImportReviewPage } from "./ImportReviewPage.js";
 
@@ -15,19 +13,15 @@ export default meta;
 type Story = StoryObj<typeof ImportReviewPage>;
 
 /**
- * The preview is a slot: hosts render their parsed-recipe
- * preview into it (the app's RecipeInputPreview). The story's
- * stand-in is plain text lines in the preview's shape.
+ * The preview is data (#684): hosts pass their parsed recipe's
+ * preview content and the page renders RecipePreviewView in
+ * the card. The fixture is the parsed stroganoff.
  */
-function PreviewStandIn() {
-  return (
-    <YStack gap="$2">
-      <Text fontWeight="bold">Creamy Mushroom Stroganoff</Text>
-      <Text>Serves 4 · 35 minutes</Text>
-      <Text>12 oz egg noodles · 1 lb mushrooms · 1 cup sour cream</Text>
-    </YStack>
-  );
-}
+const previewFixture = {
+  title: "Creamy Mushroom Stroganoff",
+  metaLabel: "Serves 4 · 35 minutes",
+  ingredients: ["12 oz egg noodles", "1 lb mushrooms", "1 cup sour cream"],
+};
 
 export const Ready: Story = {
   render: () => (
@@ -35,7 +29,7 @@ export const Ready: Story = {
       <ImportReviewPage
         footer={eciperayFooterFixture}
         versionLabel="v1"
-        preview={<PreviewStandIn />}
+        preview={previewFixture}
         busy={false}
         acceptPending={false}
         editsPending={false}
@@ -64,7 +58,7 @@ export const WithImage: Story = {
         versionLabel="v1"
         imageUrl={storyImageWide}
         imageAlt="Creamy Mushroom Stroganoff"
-        preview={<PreviewStandIn />}
+        preview={previewFixture}
         busy={false}
         acceptPending={false}
         editsPending={false}
