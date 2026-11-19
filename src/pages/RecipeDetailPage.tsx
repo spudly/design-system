@@ -860,7 +860,13 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
 // generated per render (the CheckboxSelectList convention).
 const LOADING_COOK_LOG_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
-function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
+function HistoryPanel({
+  history,
+  selectedVersionId,
+}: {
+  history: RecipeDetailPageHistoryProps;
+  selectedVersionId: string;
+}) {
   if (history.loading) {
     // Loading (#278, tranche 4): the heading stays and the
     // entries render as exactly 3 dummy LogEntryCards in their
@@ -890,9 +896,14 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
   }
 
   // The form renders from data while the host has it open;
-  // its presence replaces the button (#687).
+  // its presence replaces the button (#687). The form is keyed
+  // to the selected version: RatingForm keeps its draft in
+  // local state, so a version change remounts it — a draft
+  // entered for one version can never be submitted through
+  // another version's onSubmit (CodeRabbit review on #691).
   const form = history.cookLogForm ? (
     <RatingForm
+      key={selectedVersionId}
       variant="light"
       onSubmit={history.cookLogForm.onSubmit}
       onSkip={history.cookLogForm.onSkip}
@@ -1014,7 +1025,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
           <OverviewPanel overview={props.overview} />
           <IngredientsPanel ingredients={props.ingredients} />
           <InstructionsPanel instructions={props.instructions.instructions} />
-          <HistoryPanel history={props.history} />
+          <HistoryPanel history={props.history} selectedVersionId={selectedVersionId} />
           {/* The section headings render inside their panels as the
             PanelStack's first block (the canonical SectionHeading
             carries no padding of its own — the panel's inset is

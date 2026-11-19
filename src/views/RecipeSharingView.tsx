@@ -7,10 +7,21 @@ import { Card } from "../widgets/Card.js";
 import { Center } from "../widgets/Center.js";
 import { CircleSkeleton } from "../widgets/CircleSkeleton.js";
 import { Text } from "../widgets/Text.js";
+import { TextLink } from "../widgets/TextLink.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "./CheckboxField.js";
 import { RadioOptionGroup, type RadioOption } from "./RadioOptionGroup.js";
 import { useVoice } from "../voice/index.js";
+
+/** One span of the publishing-consent description (#689): plain
+ * text, or a link whose label and href are host-supplied data
+ * (the SignUpForm legalNotice span precedent, #686). The
+ * consent text is never re-authored by the DS — spans cross
+ * verbatim, so a consent line can keep its Privacy Policy link
+ * as data instead of losing it to a plain string. */
+export type RecipeSharingConsentSpan =
+  | { type: "text"; text: string }
+  | { type: "link"; label: string; href: string };
 
 export type RecipeSharingViewProps = {
   /** Section heading. Defaults to the voice object's recipeSharingView title (#539). */
@@ -32,12 +43,13 @@ export type RecipeSharingViewProps = {
    * Publishing consent: the checkbox renders when
    * `onConsentCheckedChange` is provided. Its description is
    * copy data (#689): the host supplies the consent copy as a
-   * plain string and the view renders it itself as the
-   * checkbox's description — no rendered UI crosses the
-   * boundary. Defaults to the voice object's recipeSharingView consentLabel (#539).
+   * plain string, or as an ordered run of text/link spans when
+   * the copy carries a link (e.g. the Privacy Policy), and the
+   * view renders it itself as the checkbox's description — no
+   * rendered UI crosses the boundary. Defaults to the voice object's recipeSharingView consentLabel (#539).
    */
   consentLabel?: string;
-  consentDescription?: string;
+  consentDescription?: string | RecipeSharingConsentSpan[];
   consentChecked?: boolean;
   onConsentCheckedChange?: (checked: boolean) => void;
   /** Saving requires consent: Save disables until it is checked. */
@@ -209,7 +221,19 @@ export function RecipeSharingView({
           ) : (
             <CheckboxField
               label={consentLabel}
-              description={consentDescription}
+              description={
+                Array.isArray(consentDescription)
+                  ? consentDescription.map((span, index) =>
+                      span.type === "link" ? (
+                        <TextLink key={index} href={span.href}>
+                          {span.label}
+                        </TextLink>
+                      ) : (
+                        span.text
+                      ),
+                    )
+                  : consentDescription
+              }
               checked={consentChecked}
               onCheckedChange={onConsentCheckedChange}
               disabled={pending}

@@ -261,6 +261,10 @@ test("the cook-log form data replaces the Log a cook button while the form is op
     "the form renders from the history data and its presence decides the button swap",
   );
   assert.match(code, /<RatingForm/, "the page renders the DS RatingForm itself");
+  // The form is keyed to the selected version so its local draft
+  // remounts (resets) on a version change instead of leaking into
+  // another version's onSubmit (CodeRabbit review on #691).
+  assert.match(code, /<RatingForm\s+key=\{selectedVersionId\}/);
   assert.match(code, /form !== null && form !== undefined \?/);
   const formBranchAt = code.indexOf("form !== null && form !== undefined");
   const buttonAt = code.indexOf("Log a cook", formBranchAt);

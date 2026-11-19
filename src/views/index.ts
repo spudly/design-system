@@ -86,7 +86,11 @@ export {
   type RecipeInstructionRowViewProps,
 } from "./RecipeInstructionRowView.js";
 export { RecipePreviewView, type RecipePreviewViewProps } from "./RecipePreviewView.js";
-export { RecipeSharingView, type RecipeSharingViewProps } from "./RecipeSharingView.js";
+export {
+  RecipeSharingView,
+  type RecipeSharingViewProps,
+  type RecipeSharingConsentSpan,
+} from "./RecipeSharingView.js";
 export { ResetPasswordForm, type ResetPasswordFormProps } from "./ResetPasswordForm.js";
 export { RevertAction, type RevertActionProps } from "./RevertAction.js";
 export { ScaledIngredientsView, type ScaledIngredientsViewProps } from "./ScaledIngredientsView.js";

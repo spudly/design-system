@@ -30,7 +30,11 @@ function PublicWithConsentDemo() {
         value="public"
         onValueChange={() => undefined}
         publicWarning="Public recipes can be discovered by anyone. Make sure you're happy to share this recipe before saving."
-        consentDescription="I agree to publish this recipe under the Privacy Policy."
+        consentDescription={[
+          { type: "text", text: "I agree to publish this recipe under the " },
+          { type: "link", label: "Privacy Policy", href: "/privacy" },
+          { type: "text", text: "." },
+        ]}
         consentChecked={consentChecked}
         onConsentCheckedChange={setConsentChecked}
         consentRequired
