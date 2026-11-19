@@ -94,9 +94,8 @@ export type RecipeImageViewProps = {
  * image field as a view — the view half of the hosts'
  * RecipeImageField, landing the contract Stephen approved on
  * #124 ("Props in, callbacks out; the DS does not call the
- * picker library") and retiring RecipeFormPage's interim
- * `renderImageSection` slot for hosts that adopt the data
- * prop.
+ * picker library"); RecipeFormPage's interim image render
+ * slot was removed in #683.
  *
  * The view owns the field's chrome: the labeled preview frame
  * (the current image through Thumbnail's hero treatment, or

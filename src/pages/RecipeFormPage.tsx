@@ -65,11 +65,9 @@ import { Badge } from "../widgets/Badge.js";
  *   prop carries the view-half contract approved on #124
  *   (preview URI, busy flags, error, generate gate), and the
  *   page renders RecipeImageView with the image revert
- *   affordance as its header action. `renderImageSection`
- *   remains as the fallback for hosts that have not adopted
- *   the data prop; it receives the same revert affordance as
- *   its argument — the app field renders that node in its
- *   header row, exactly where the app form puts it today.
+ *   affordance as its header action. (The section's former
+ *   render slot was removed in #683 — the data prop is the
+ *   only path.)
  * - The sortable lists render from props the same way: the
  *   `ingredients` / `instructions` data props carry the list
  *   views' contracts (the settled #124 row view-models plus
@@ -81,11 +79,9 @@ import { Badge } from "../widgets/Badge.js";
  *   DraggableFlatList on native) and bind the handle through
  *   the views' `renderDragHandle` — no drag library enters
  *   the DS, and a reorder crosses back as a new rows array.
- *   `renderIngredientsSection` / `renderInstructionsSection`
- *   remain as fallbacks for hosts that have not adopted the
- *   data props; the list slots take no argument (the #49
- *   `renderComments` shape). While `contentLocked`
- *   is set, the list slots are not rendered at all and the
+ *   (The lists' former render slots were removed in #683 —
+ *   the data props are the only paths.) While `contentLocked`
+ *   is set, the lists are not rendered at all and the
  *   lock notice renders in their place — the app's behavior
  *   on the active version.
  *
@@ -189,32 +185,19 @@ export type RecipeFormPageProps = {
   contentLocked?: boolean;
 
   /** The image section's data (the #124 view-half contract):
-   * when provided, the page renders RecipeImageView from it
-   * and this prop wins over the slot; null / omitted falls
-   * back to the slot. The page supplies the view's
-   * `headerAction` itself (the image revert affordance). */
+   * the page renders RecipeImageView from it. The page
+   * supplies the view's `headerAction` itself (the image
+   * revert affordance). */
   image?: RecipeFormPageImage | null;
-  /** Slot fallback: the app's image field, for hosts that
-   * have not adopted the `image` data prop. Receives the image
-   * revert affordance (or null) for its header row — see the
-   * header. */
-  renderImageSection?: (revertAction: ReactNode) => ReactNode;
   /** The ingredient list's data (the #124 row contracts plus
-   * the list chrome's intents): when provided, the page
-   * renders RecipeIngredientListView from it and this prop
-   * wins over the slot; null / omitted falls back to the
-   * slot. The host's drag handle binds through the view's
-   * `renderDragHandle` (see the header). */
+   * the list chrome's intents): the page renders
+   * RecipeIngredientListView from it. The host's drag handle
+   * binds through the view's `renderDragHandle` (see the
+   * header). */
   ingredients?: RecipeFormPageIngredients | null;
-  /** Slot fallback: the app's sortable ingredient list, for
-   * hosts that have not adopted the `ingredients` data prop. */
-  renderIngredientsSection?: () => ReactNode;
-  /** The instruction list's data: the same data-wins rule as
-   * `ingredients`. */
+  /** The instruction list's data: the page renders
+   * RecipeInstructionListView from it. */
   instructions?: RecipeFormPageInstructions | null;
-  /** Slot fallback: the app's sortable instruction list, for
-   * hosts that have not adopted the `instructions` data prop. */
-  renderInstructionsSection?: () => ReactNode;
 
   /** Submit row: a bare intent out; the label is the host's
    * ("Create Recipe" / "Save Changes" / "Save Draft"). */
@@ -263,11 +246,8 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
     descriptionError,
     contentLocked = false,
     image,
-    renderImageSection,
     ingredients,
-    renderIngredientsSection,
     instructions,
-    renderInstructionsSection,
     submitLabel,
     isSubmitting = false,
     submittingLabel = "Saving…",
@@ -407,8 +387,6 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
 
           {image ? (
             <RecipeImageView {...image} headerAction={revertAction("image")} />
-          ) : renderImageSection ? (
-            renderImageSection(revertAction("image"))
           ) : null}
 
           <LabeledField
@@ -467,8 +445,6 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
           ) : null}
           {contentLocked ? null : ingredients ? (
             <RecipeIngredientListView {...ingredients} />
-          ) : renderIngredientsSection ? (
-            renderIngredientsSection()
           ) : null}
 
           {instructionsChangedLabel && !contentLocked ? (
@@ -479,8 +455,6 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
           ) : null}
           {contentLocked ? null : instructions ? (
             <RecipeInstructionListView {...instructions} />
-          ) : renderInstructionsSection ? (
-            renderInstructionsSection()
           ) : null}
 
           {submitError ? <Alert severity="error" message={submitError} /> : null}

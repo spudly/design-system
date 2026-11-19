@@ -1,8 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import type { ReactNode } from "react";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
-import { SignUpForm } from "../views/SignUpForm.js";
+import { SignUpForm, type SignUpLegalNoticeSpan } from "../views/SignUpForm.js";
 import { Text } from "../widgets/Text.js";
 import { useVoice } from "../voice/index.js";
 
@@ -18,12 +17,12 @@ import { useVoice } from "../voice/index.js";
  * callbacks, submission is a bare intent, and no credentials
  * logic lives in the DS.
  *
- * The legal notice under the submit button is a slot: the
- * legal copy's links are app content (the URLs are app
- * constants — the B2 audit keeps `LegalLinks` app-side), so
- * the host renders its LegalLinks into `legalNotice`, at the
- * position the app view renders it — inside the form's footer
- * block, which SignUpForm (#119) owns; the page composes the
+ * The legal notice under the submit button is copy data
+ * (#686): the legal text and its link destinations stay
+ * app-owned, supplied as text/link spans through
+ * `legalNotice`, and SignUpForm renders it at the position
+ * the app view renders it — inside the form's footer block,
+ * which SignUpForm (#119) owns; the page composes the
  * heading and the form as the screen's two sections.
  */
 
@@ -47,8 +46,9 @@ export type SignUpPageProps = {
    * href, not a press callback); the link renders only when the
    * href is provided. */
   signInHref?: string;
-  /** The app's inline legal notice (app LegalLinks). */
-  legalNotice?: ReactNode;
+  /** The inline legal notice as copy data (#686): text/link
+   * spans, rendered by the form under the submit button. */
+  legalNotice?: SignUpLegalNoticeSpan[];
 };
 
 export function SignUpPage({

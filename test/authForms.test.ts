@@ -18,7 +18,7 @@
  *   no fields directly;
  * - each form's submit button is named for the label it
  *   renders in both its idle and loading states;
- * - SignUpForm keeps the legalNotice slot between the submit
+ * - SignUpForm keeps the legalNotice copy data between the submit
  *   button and the sign-in link (the app view's order);
  * - LegalSection renders its title in the app profile screen's
  *   section-title treatment and frames the host's links as
@@ -224,7 +224,7 @@ test("each form's submit button is named for the label it renders, in both state
 test("SignUpForm keeps the legal notice between submit and the sign-in link", () => {
   const source = read("src/views/SignUpForm.tsx");
   const submitAt = source.indexOf("{submitLabel}");
-  const noticeAt = source.indexOf("{legalNotice}");
+  const noticeAt = source.indexOf("{legalNotice ? (");
   const linkAt = source.indexOf("{voice.signUpForm.signInLabel}");
   assert.ok(submitAt !== -1 && noticeAt !== -1 && linkAt !== -1, "all three footer parts render");
   assert.ok(

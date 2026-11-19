@@ -85,13 +85,18 @@ export {
   RecipeInstructionRowView,
   type RecipeInstructionRowViewProps,
 } from "./RecipeInstructionRowView.js";
-export { RecipeSharingView, type RecipeSharingViewProps } from "./RecipeSharingView.js";
+export { RecipePreviewView, type RecipePreviewViewProps } from "./RecipePreviewView.js";
+export {
+  RecipeSharingView,
+  type RecipeSharingViewProps,
+  type RecipeSharingConsentSpan,
+} from "./RecipeSharingView.js";
 export { ResetPasswordForm, type ResetPasswordFormProps } from "./ResetPasswordForm.js";
 export { RevertAction, type RevertActionProps } from "./RevertAction.js";
 export { ScaledIngredientsView, type ScaledIngredientsViewProps } from "./ScaledIngredientsView.js";
 export { SearchField, type SearchFieldProps } from "./SearchField.js";
 export { SignInForm, type SignInFormProps } from "./SignInForm.js";
-export { SignUpForm, type SignUpFormProps } from "./SignUpForm.js";
+export { SignUpForm, type SignUpFormProps, type SignUpLegalNoticeSpan } from "./SignUpForm.js";
 export { SubscriptionView, type SubscriptionViewProps } from "./SubscriptionView.js";
 export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
 export { TextField, type TextFieldProps } from "./TextField.js";

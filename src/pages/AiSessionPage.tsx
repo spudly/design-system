@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Alert } from "../widgets/Alert.js";
-import type { ReactNode } from "react";
 import { YStack } from "tamagui";
+import { RecipePreviewView, type RecipePreviewViewProps } from "../views/RecipePreviewView.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { FormHeading } from "../widgets/FormHeading.js";
@@ -31,10 +31,10 @@ import { tokens } from "../tokens/index.js";
  * token-stream contract is needed; a future streaming API
  * would extend the view-model, not this page's shape.
  *
- * The recipe preview crosses as a ReactNode slot: the host
- * parses the proposed recipe and renders its preview
- * component into the card this page frames (the preview
- * renderer stays app-side — see ImportReviewPage).
+ * The recipe preview crosses as data (#684): the host parses
+ * the proposed recipe and supplies its preview content, and
+ * this page renders the shared RecipePreviewView inside the
+ * card it frames (see ImportReviewPage, the same pattern).
  *
  * The config strings are app content: both AI flows (generate
  * and tweak) render this page with their own titles, labels,
@@ -106,8 +106,9 @@ export type AiSessionPageProps = {
   footer?: BigFooterData;
   config: AiSessionPageConfig;
   session: AiSessionPageSession | null;
-  /** The host-rendered recipe preview for the preview stage. */
-  preview?: ReactNode;
+  /** The parsed recipe's preview data for the preview stage
+   * (#684): rendered by the page as RecipePreviewView. */
+  preview?: RecipePreviewViewProps;
   prompt: string;
   onPromptChange: (value: string) => void;
   followUp: string;
@@ -243,7 +244,7 @@ export function AiSessionPage({
               </Button>
             }
           >
-            {preview}
+            <RecipePreviewView {...preview} />
           </PreviewCard>
         ) : null}
         {error ? <Alert severity="error" message={error} /> : null}

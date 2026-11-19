@@ -252,13 +252,19 @@ test("the status badge map covers the four statuses with a fallback", () => {
   assert.ok(!code.includes("StatusBadge.tsx"), "no StatusBadge import remains");
 });
 
-test("the cook-log form slot replaces the Log a cook button while it renders content", () => {
-  assert.match(code, /renderCookLogForm\?: \(\) => ReactNode;/);
+test("the cook-log form data replaces the Log a cook button while the form is open (#687)", () => {
+  assert.match(code, /cookLogForm\?: RecipeDetailPageCookLogForm \| null;/);
+  assert.doesNotMatch(code, /renderCookLogForm/, "the renderCookLogForm slot is removed (#687)");
   assert.match(
     code,
-    /const form = history\.renderCookLogForm \? history\.renderCookLogForm\(\) : null;/,
-    "the slot is called once per render and its result decides the button swap",
+    /const form = history\.cookLogForm \? \(/,
+    "the form renders from the history data and its presence decides the button swap",
   );
+  assert.match(code, /<RatingForm/, "the page renders the DS RatingForm itself");
+  // The form is keyed to the selected version so its local draft
+  // remounts (resets) on a version change instead of leaking into
+  // another version's onSubmit (CodeRabbit review on #691).
+  assert.match(code, /<RatingForm\s+key=\{selectedVersionId\}/);
   assert.match(code, /form !== null && form !== undefined \?/);
   const formBranchAt = code.indexOf("form !== null && form !== undefined");
   const buttonAt = code.indexOf("Log a cook", formBranchAt);
@@ -281,24 +287,24 @@ test("the cook-log form slot replaces the Log a cook button while it renders con
   );
 });
 
-test("the sharing slot renders after the lifecycle section and before the tags", () => {
+test("the sharing section renders after the lifecycle section and before the tags", () => {
   const lifecycleAt = code.indexOf("<LifecycleSection");
   const sharingAt = code.indexOf("{sharingControls}");
   const tagsAt = code.indexOf("<TagList");
   assert.ok(lifecycleAt !== -1, "the lifecycle section renders in the overview");
   assert.ok(sharingAt > lifecycleAt, "sharing renders after the lifecycle section");
   assert.ok(tagsAt > sharingAt, "the tags render after the sharing slot");
-  assert.match(
+  assert.doesNotMatch(
     code,
-    /const sharingSlot = renderSharingControls \? renderSharingControls\(\) : null;/,
-    "the sharing slot is called once per render, only when provided",
+    /renderSharingControls/,
+    "the sharing render slot is removed (#682) — the data prop is the only path",
   );
   // #438 Part 3: the `sharing` data prop renders RecipeSharingView
-  // at the same position and takes precedence over the slot.
+  // at the same position.
   assert.match(
     code,
-    /const sharingControls = sharing \? <RecipeSharingView \{\.\.\.sharing\} \/> : sharingSlot;/,
-    "the sharing data prop renders the view at the slot's position",
+    /const sharingControls = sharing \? <RecipeSharingView \{\.\.\.sharing\} \/> : null;/,
+    "the sharing data prop renders the view at the section's position",
   );
 });
 
@@ -309,10 +315,15 @@ test("the comments slot renders in the overview panel after the ratings card", (
   assert.ok(commentsAt > ratingsAt, "comments render after the ratings card");
   // #438 Part 3: the `comments` data prop renders RecipeCommentsView
   // at the same position and takes precedence over the slot.
+  assert.doesNotMatch(
+    code,
+    /renderComments/,
+    "the comments render slot is removed (#682) — the data prop is the only path",
+  );
   assert.match(
     code,
-    /const comments = commentsData \? <RecipeCommentsView \{\.\.\.commentsData\} \/> : commentsSlot;/,
-    "the comments data prop renders the view at the slot's position",
+    /const comments = commentsData \? <RecipeCommentsView \{\.\.\.commentsData\} \/> : null;/,
+    "the comments data prop renders the view at the section's position",
   );
 });
 
@@ -426,13 +437,13 @@ test("stories exercise the states and the cook-log form slot", () => {
   }
   assert.match(
     storiesCode,
-    /renderCookLogForm: \(\) =>/,
-    "a story must pass the cook-log form slot with stand-in content",
+    /cookLogForm: \{/,
+    "a story must pass the cook-log form data for the open form",
   );
-  assert.match(
+  assert.doesNotMatch(
     storiesCode,
-    /renderSharingControls: \(\) =>/,
-    "a story must pass the sharing slot with stand-in content",
+    /renderSharingControls/,
+    "no story passes the removed sharing slot (#682)",
   );
   assert.match(
     storiesCode,

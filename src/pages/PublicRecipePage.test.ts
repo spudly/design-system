@@ -179,7 +179,7 @@ test("the CTA bar switches on the auth-state variant with verbatim labels", () =
   }
 });
 
-test("engagement is in v1: ratings reuse the detail page's view-model, comments take the slot or data prop", () => {
+test("engagement is in v1: ratings reuse the detail page's view-model, comments take the data prop", () => {
   assert.match(
     code,
     /export type PublicRecipePageRatings = RecipeDetailPageRatings;/,
@@ -190,10 +190,10 @@ test("engagement is in v1: ratings reuse the detail page's view-model, comments 
     /ratings\?: PublicRecipePageRatings \| null;/,
     "ratings are optional on ready",
   );
-  assert.match(
+  assert.doesNotMatch(
     code,
-    /renderComments\?: \(\) => ReactNode;/,
-    "comments enter through the render slot, as on RecipeDetailPage",
+    /renderComments/,
+    "the comments render slot is removed (#681) — the data prop is the only path",
   );
   assert.match(
     code,
@@ -207,13 +207,8 @@ test("engagement is in v1: ratings reuse the detail page's view-model, comments 
   );
   assert.match(
     code,
-    /const commentsSlot = renderComments \? renderComments\(\) : null;/,
-    "the slot is called once per render, only when provided",
-  );
-  assert.match(
-    code,
-    /const comments = commentsData \? <RecipeCommentsView \{\.\.\.commentsData\} \/> : commentsSlot;/,
-    "the data prop renders RecipeCommentsView and wins over the slot (#130 T7)",
+    /const comments = commentsData \? <RecipeCommentsView \{\.\.\.commentsData\} \/> : null;/,
+    "the data prop renders RecipeCommentsView (#130 T7)",
   );
   assert.match(
     ratingsCode,
@@ -403,10 +398,10 @@ describe("publicRecipePageAdoption", () => {
       /isClonePending: clonePending/,
       "a story must exercise the pending clone",
     );
-    assert.match(
+    assert.doesNotMatch(
       storiesCode,
-      /renderComments: \(\) =>/,
-      "a story must pass the comments slot with stand-in content",
+      /renderComments/,
+      "no story passes the removed comments slot (#681)",
     );
     assert.match(
       storiesCode,

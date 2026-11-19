@@ -1,5 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { useEffect, useRef, type ReactNode } from "react";
+import { useEffect, useRef } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { View, YStack, isWeb } from "tamagui";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
@@ -19,6 +19,7 @@ import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import type { SelectOption } from "../widgets/SelectField.js";
 import { Text } from "../widgets/Text.js";
+import { RatingForm } from "../views/RatingForm.js";
 import { BoundedList } from "./BoundedList.js";
 import { RecipeRow, textBlockStyle, type RecipeRowItem } from "./recipeRow.js";
 import type { DiscoverPageItem } from "./DiscoverPage.js";
@@ -110,25 +111,23 @@ import { useCatalogPagination } from "./useCatalogPagination.js";
  *   own glyph box is the containment for that failure (see
  *   SearchField.tsx).
  *
- * Per-row accessory slot (`renderRecipeAccessory`): the one
- * place app-rendered content enters the list. The app's
- * cook-log form expands inline under the tapped own-section
- * card (its state and mutation live in the app's
- * RecipeListCard), so a bare `onLogCookPress(id)` callback with
- * rows rendered end to end here would leave it nowhere to
- * render. The slot keeps the boundary intact: the view calls
- * the render prop once per own-section row with the row's id
- * and hands the result to the row (MediaRow's `accessory`),
- * which renders it directly under that row's card; returning
- * null/undefined renders nothing. When a row's accessory is
- * non-null, that row's log-cook control is hidden — the app
- * reproduces its card's control-hides-while-the-form-is-open
- * behavior purely by what it returns (the form for the open
- * row, null everywhere else). The form itself, its state, and
- * its mutation stay in the app; other rows' controls and the
- * `onLogCookPress` firing semantics are unchanged. Discovery
- * rows are public content: they carry no accessory and no
- * log-cook control.
+ * Per-row cook-log form (`cookLogForm`, #687): the one
+ * expanded panel in the list, rendered by the page itself.
+ * The cook-log form expands inline under the tapped
+ * own-section card, so a bare `onLogCookPress(id)` callback
+ * with rows rendered end to end here would leave it nowhere
+ * to render. The host instead names the open row and the
+ * form's intents as data (`cookLogForm`), and the page
+ * renders the DS RatingForm (the generalized cook-log form,
+ * #176) as that row's accessory (MediaRow's `accessory`),
+ * directly under the row's card. While a row's form is open,
+ * that row's log-cook control is hidden — the
+ * control-hides-while-the-form-is-open behavior the app card
+ * had. The form's rating/notes state stays inside the form
+ * and its mutation stays in the app; other rows' controls
+ * and the `onLogCookPress` firing semantics are unchanged.
+ * Discovery rows are public content: they carry no accessory
+ * and no log-cook control.
  *
  * Row actions: an own row's only action is logging a cook, and
  * the control is the recipe's rating. A rated recipe renders
@@ -243,6 +242,28 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
  * min/max fields add and remove together), as do the Sort by /
  * Order selects. */
 export type RecipesPageFilterId = "status" | "ingredient" | "calories" | "satiety" | "sort";
+
+/** The cook-log form's submit view-model (#687). */
+export type RecipesPageCookLogFormValues = {
+  rating: 1 | 2 | 3 | 4 | 5 | null;
+  notes: string | null;
+};
+
+/** The open row's cook-log form (#687): the row it belongs to
+ * plus the form's intents, as data. */
+export type RecipesPageCookLogForm = {
+  /** The own-section row the form is expanded under. */
+  recipeId: string;
+  onSubmit: (values: RecipesPageCookLogFormValues) => void;
+  onSkip: () => void;
+  isPending: boolean;
+  /** Defaults to the voice object's ratingForm title (#539). */
+  title?: string;
+  /** Defaults to the voice object's ratingForm notesPlaceholder (#539). */
+  notesPlaceholder?: string;
+  /** Defaults to the voice object's ratingForm secondaryLabel (#539). */
+  secondaryLabel?: string;
+};
 
 export type RecipesPageProps = CatalogPageFilterProps<RecipesPageFilterId> & {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
@@ -376,24 +397,23 @@ export type RecipesPageProps = CatalogPageFilterProps<RecipesPageFilterId> & {
    */
   onOwnLoadMore?: () => void;
   /** Optional own-row action, mirroring the app card's log-cook
-   * affordance. "Log cook" is a callback only — the cook-log
-   * form and its mutation stay in the app, which renders them
-   * (see `renderRecipeAccessory`); the view owns the control:
-   * the recipe's stars when it has a rating, a single icon-only
-   * button when it does not. There is no delete callback —
-   * deleting a recipe is a RecipeDetailPage action, not a list
-   * action. Own-section rows only: discovery rows are links. */
+   * affordance. "Log cook" is a callback only — pressing it
+   * opens the row's cook-log form, which the page renders from
+   * the `cookLogForm` data prop (see below); the view owns the
+   * control: the recipe's stars when it has a rating, a single
+   * icon-only button when it does not. There is no delete
+   * callback — deleting a recipe is a RecipeDetailPage action,
+   * not a list action. Own-section rows only: discovery rows
+   * are links. */
   onLogCookPress?: (recipeId: string) => void;
-  /** Optional per-row accessory slot for own-section rows:
-   * called once per own row with the row's id; the returned
-   * node renders directly under that row's card, inside the
-   * list item. Return null/undefined to render nothing. When a
-   * row's accessory renders non-null content, that row's
-   * log-cook control is hidden — the app returns its inline
-   * cook-log form for the row whose form is open and null
-   * elsewhere, which reproduces the app card's
-   * control-hides-while-open behavior. */
-  renderRecipeAccessory?: (recipeId: string) => ReactNode;
+  /** The open row's cook-log form as data (#687): names the
+   * own-section row whose form is expanded; the page renders
+   * the DS RatingForm under that row's card, inside the list
+   * item, and hides that row's log-cook control while it is
+   * open. Omit it (or pass null) when no form is open. Only
+   * the submit view-model, the skip intent, and the pending
+   * flag cross the boundary — the mutation stays app-side. */
+  cookLogForm?: RecipesPageCookLogForm | null;
   /** The discovery section's pagination hook, wired to the
    * list's end-reached signal through the shared catalog
    * pagination pattern (useCatalogPagination, #285 — the same
@@ -733,7 +753,7 @@ export function RecipesPage(props: RecipesPageProps) {
     discoveryLoadMoreErrorMessage = null,
     onDiscoveryLoadMoreRetry,
     discoveryLoadMoreRetryLabel = "Try again",
-    renderRecipeAccessory,
+    cookLogForm,
     search,
     onSearchChange,
     statusFilter,
@@ -970,7 +990,18 @@ export function RecipesPage(props: RecipesPageProps) {
         );
       case "ownRecipe": {
         const item = row.item;
-        const accessory = renderRecipeAccessory ? renderRecipeAccessory(item.id) : null;
+        const accessory =
+          cookLogForm && cookLogForm.recipeId === item.id ? (
+            <RatingForm
+              variant="light"
+              onSubmit={cookLogForm.onSubmit}
+              onSkip={cookLogForm.onSkip}
+              isPending={cookLogForm.isPending}
+              title={cookLogForm.title}
+              notesPlaceholder={cookLogForm.notesPlaceholder}
+              secondaryLabel={cookLogForm.secondaryLabel}
+            />
+          ) : null;
         return <RecipeRow item={item} onLogCookPress={onLogCookPress} accessory={accessory} />;
       }
       case "loadingOwn":

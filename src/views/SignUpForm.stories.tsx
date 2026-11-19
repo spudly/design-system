@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { SignUpForm } from "./SignUpForm.js";
 import { Text } from "../widgets/Text.js";
-import { TextLink } from "../widgets/TextLink.js";
+
 
 const meta: Meta<typeof SignUpForm> = {
   title: "Views/SignUpForm",
@@ -48,12 +48,13 @@ function Controlled({
           setLoading(true);
         }}
         signInHref="#/sign-in"
-        legalNotice={
-          <Text textAlign="center" variant="hint">
-            By continuing you accept the <TextLink href="#/terms">Terms</TextLink> and{" "}
-            <TextLink href="#/privacy">Privacy Policy</TextLink>.
-          </Text>
-        }
+        legalNotice={[
+          { type: "text", text: "By continuing you accept the " },
+          { type: "link", label: "Terms", href: "#/terms" },
+          { type: "text", text: " and " },
+          { type: "link", label: "Privacy Policy", href: "#/privacy" },
+          { type: "text", text: "." },
+        ]}
       />
       <Text>Submissions: {submissions}</Text>
     </YStack>

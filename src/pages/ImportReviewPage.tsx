@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Alert } from "../widgets/Alert.js";
-import type { ReactNode } from "react";
+import { RecipePreviewView, type RecipePreviewViewProps } from "../views/RecipePreviewView.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
@@ -15,12 +15,11 @@ import { Thumbnail } from "../widgets/Thumbnail.js";
  * parsed recipe, the accept/edit mutations, and navigation;
  * this view renders the review and reports the two intents.
  *
- * The parsed recipe's preview crosses as a ReactNode slot —
- * the same shape the app view has today. The preview renderer
- * (`RecipeInputPreview`) stays app-side (proposals on #126):
- * it renders on RN primitives without a TamaguiProvider by
- * design, and both of its consumers already pass it as a node.
- * The description's version label is host data and crosses as
+ * The parsed recipe's preview crosses as data (#684): the
+ * host supplies the parsed recipe's preview content and this
+ * page renders the shared RecipePreviewView — the DS-side
+ * counterpart of the app's `RecipeInputPreview`, fed by the
+ * same parsed data. The description's version label is host data and crosses as
  * a string; the accept/edit pending labels are presentation
  * of the host's mutation states, mirrored from the app view.
  *
@@ -29,7 +28,7 @@ import { Thumbnail } from "../widgets/Thumbnail.js";
  * full-width 192px cover shape it was extracted from), the
  * title is Text's `formTitle` variant, the actions sit in a
  * ButtonRow, and the section rhythm is FormScreenLayout's
- * own. The preview slot sits in the library's PreviewCard —
+ * own. The preview view sits in the library's PreviewCard —
  * the bordered surface frame extracted in #331 from this
  * page's and AiSessionPage's identical hand-styled frames
  * (AiSessionPage frames its preview stage with the same
@@ -50,8 +49,9 @@ export type ImportReviewPageProps = {
    * purely decorative image.
    */
   imageAlt?: string;
-  /** The host-rendered recipe preview (app RecipeInputPreview). */
-  preview: ReactNode;
+  /** The parsed recipe's preview data (#684): rendered by the
+   * page as RecipePreviewView inside the PreviewCard. */
+  preview: RecipePreviewViewProps;
   error?: string | null;
   busy: boolean;
   acceptPending: boolean;
@@ -88,7 +88,9 @@ export function ImportReviewPage({
             {...(imageAlt ? { accessibilityLabel: imageAlt } : {})}
           />
         ) : null}
-        <PreviewCard>{preview}</PreviewCard>
+        <PreviewCard>
+          <RecipePreviewView {...preview} />
+        </PreviewCard>
         {error ? <Alert severity="error" message={error} /> : null}
         <ButtonRow>
           <Button variant="primary" disabled={busy} onPress={onAccept}>

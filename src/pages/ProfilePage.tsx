@@ -1,6 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import type { ReactNode } from "react";
+import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
+import { TextLink } from "../widgets/TextLink.js";
 import { LegalSection } from "../views/LegalSection.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Text } from "../widgets/Text.js";
@@ -28,6 +29,13 @@ export type ProfilePageFeedbackPreference = FeedbackPreferenceViewProps;
 type ProfilePageNutritionGoals = NutritionGoalsFormProps;
 type ProfilePageAccessTokens = AccessTokensPanelProps;
 
+/** One Legal-section link (#686): the label renders as the
+ * link's text, the href is its destination (#248). */
+export type ProfilePageLegalLink = {
+  label: string;
+  href: string;
+};
+
 /**
  * ProfilePage (#126, B3c): the profile view — the split view
  * half of Eciperay's `ProfileView` (the B2 audit's page-view
@@ -36,17 +44,17 @@ type ProfilePageAccessTokens = AccessTokensPanelProps;
  * renders the chrome and the slot regions in the app view's
  * order. The nutrition-goals and access-tokens sections are
  * covered by the `nutritionGoals` / `accessTokens` data props
- * (#511); the slots remain for sections the DS does not cover.
+ * (#511), and every section is composed by the page itself
+ * from data props (#685).
  *
- * The slots, in render order:
- * - `sectionsBeforeFeedback` — any remaining app section
- *   hosts, rendered after the covered before-feedback
- *   sections.
- * - `sectionsAfterFeedback` — any remaining app sections.
+ * No render slots remain: the feedback position is served by
+ * the `feedbackPreferenceSection` data prop (#680), the generic
+ * before/after-feedback section slots are removed (#685), and
+ * the Legal section's links cross as data (#686, below).
  * - `legalLinks` — the Legal section's links are app content
- *   (the URLs are app constants; the B2 audit keeps
- *   `LegalLinks` app-side), so the host renders its LegalLinks
- *   into the section this page frames (LegalSection, #119).
+ *   (the labels and URLs are app data), so they cross as
+ *   label + href data and the page renders them itself inside
+ *   the Legal section it frames (LegalSection, #119; #686).
  *
  * Sign out is a bare intent: the session teardown is app-side
  * business logic and never enters the DS.
@@ -72,24 +80,25 @@ export type ProfilePageProps = {
   /** The component-showcase destination (#248); the button
    * renders only when the href is provided. */
   showcaseHref?: string;
-  sectionsBeforeFeedback?: ReactNode;
-  sectionsAfterFeedback?: ReactNode;
-  /** The app's LegalLinks, rendered inside the Legal section. */
-  legalLinks?: ReactNode;
+  /** The Legal section's links as data (#686): each entry's
+   * label and href; the page renders them as links inside the
+   * Legal section. The legal text itself stays app-owned —
+   * only the rendering moved into the DS. */
+  legalLinks?: ProfilePageLegalLink[];
   /**
    * Typed section data (#438 Part 3): the profile sections the
-   * design system now covers as views. Each renders at its
-   * slot position — `subscription` with the before-feedback
-   * sections, `feedbackPreferenceSection` at the feedback
-   * position, `transfer` and `accountData` with the
-   * after-feedback sections — and the ReactNode slots stay as
-   * the fallback for sections the DS does not cover.
+   * design system covers as views — the page composes every
+   * section itself from these props (#685: the generic
+   * before/after-feedback ReactNode slots are removed; #680:
+   * the feedbackPreference ReactNode slot is removed — no
+   * rendered UI crosses the page boundary for sections).
+   * Each renders at its position — `subscription`,
+   * `nutritionGoals`, and `accessTokens` before the feedback
+   * position, `feedbackPreferenceSection` at the feedback
+   * position, and `transfer` and `accountData` after it.
    *
    * `nutritionGoals` and `accessTokens` (#511) render at the
-   * before-feedback position, in that order, immediately
-   * before the `sectionsBeforeFeedback` slot content; the
-   * data props and the slot are alternatives for these two
-   * sections (a host uses one or the other).
+   * before-feedback position, in that order.
    */
   subscription?: ProfilePageSubscription;
   feedbackPreferenceSection?: ProfilePageFeedbackPreference;
@@ -104,8 +113,6 @@ export function ProfilePage({
   onSignOut,
   tagsHref,
   showcaseHref,
-  sectionsBeforeFeedback,
-  sectionsAfterFeedback,
   legalLinks,
   subscription,
   feedbackPreferenceSection,
@@ -128,7 +135,6 @@ export function ProfilePage({
         {subscription ? <SubscriptionView {...subscription} /> : null}
         {nutritionGoals ? <NutritionGoalsForm {...nutritionGoals} /> : null}
         {accessTokens ? <AccessTokensPanel {...accessTokens} /> : null}
-        {sectionsBeforeFeedback}
         {tagsHref ? (
           <Button variant="secondary" href={tagsHref}>
             Manage Tags
@@ -139,8 +145,15 @@ export function ProfilePage({
         ) : null}
         {transfer ? <TransferRecipesView {...transfer} /> : null}
         {accountData ? <AccountDataView {...accountData} /> : null}
-        {sectionsAfterFeedback}
-        <LegalSection title="Legal">{legalLinks}</LegalSection>
+        <LegalSection title="Legal">
+          <YStack gap="$2">
+            {(legalLinks ?? []).map((link) => (
+              <TextLink key={link.href} href={link.href}>
+                {link.label}
+              </TextLink>
+            ))}
+          </YStack>
+        </LegalSection>
         <Button variant="danger" onPress={onSignOut}>
           Sign Out
         </Button>

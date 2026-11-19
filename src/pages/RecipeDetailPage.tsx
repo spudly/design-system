@@ -1,5 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { useMemo, type ReactNode } from "react";
+import { useMemo } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
@@ -41,7 +41,12 @@ import { Thumbnail } from "../widgets/Thumbnail.js";
 import { Toolbar } from "../widgets/Toolbar.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../views/ConfirmActionView.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
-import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeSharingView.js";
+import { RatingForm } from "../views/RatingForm.js";
+import {
+  RecipeSharingView,
+  type RecipeSharingConsentSpan,
+  type RecipeSharingViewProps,
+} from "../views/RecipeSharingView.js";
 import { STATUS_BADGES } from "./recipeStatusBadges.js";
 
 /**
@@ -81,34 +86,23 @@ import { STATUS_BADGES } from "./recipeStatusBadges.js";
  * the chrome and panels. If the app grows a not-found state, the
  * union grows a member.
  *
- * Slots — app-rendered content inside the view (the
- * renderRecipeAccessory precedent from RecipesPage): three parts of
- * this screen are self-contained app panels whose state and
- * mutations cannot be view-modeled without leaking business logic
- * into props, so each enters through a documented render slot and
- * the app renders its existing component at the same position it
- * occupies today:
- * - `renderCookLogForm` (history section): the cook-log form. When it
- *   returns non-null content, the content replaces the view's
- *   "Log a cook" button — the same button-hides-while-open
- *   semantics as the accessory slot. The cook-log ENTRIES are
- *   display data and are view-modeled as props; only the form is
- *   slotted.
- * - `renderSharingControls` (overview): the sharing/visibility
- *   panel — it carries its own pending-selection state, a
- *   publishing-consent flow, share-token state, and two mutations.
- * - `renderComments` (overview, engagement stack): the comments
- *   section — its own query, compose/edit draft state, and three
- *   mutations, auth-gated.
- * #438 Part 3 view-modeled both sections after all, on the
- * ratings pattern below: RecipeSharingView and
+ * The cook-log form (#687): the history section's form is
+ * rendered by the page itself — the DS RatingForm (the
+ * generalized cook-log form, #176) driven by the history
+ * data + submit callbacks (`history.cookLogForm`). While the
+ * form data is present, the form replaces the view's
+ * "Log a cook" button — the same button-hides-while-open
+ * semantics the old render slot had. The cook-log ENTRIES
+ * are display data and are view-modeled as props.
+ * #438 Part 3 view-modeled the sharing and comments sections
+ * on the ratings pattern below: RecipeSharingView and
  * RecipeCommentsView compose the sections from the shared
- * widgets, with every piece of state the old rationale listed
- * (pending selection, consent flag, drafts, pending flags)
- * crossing as controlled props and every mutation staying
- * behind a callback. The overview's `sharing` and `comments`
- * data props render the views; the two render slots remain as
- * the fallback for hosts that have not migrated. The host's
+ * widgets, with every piece of state (pending selection,
+ * consent flag, drafts, pending flags) crossing as controlled
+ * props and every mutation staying behind a callback. The
+ * overview's `sharing` and `comments` data props render the
+ * views; their former render slots were removed in #682 — the
+ * data props are the only paths. The host's
  * four confirmation dialogs (recipe delete, cook-log delete,
  * version activation, nutrition notice) are view-modeled the
  * same way through ConfirmActionView, carried on the ready
@@ -237,6 +231,7 @@ export type RecipeDetailPageRatings = RatingsCardRatings;
 // (#438 Part 3); the page's contract names are aliases, as
 // with the ratings types above.
 export type RecipeDetailPageSharing = RecipeSharingViewProps;
+export type RecipeDetailPageSharingConsentSpan = RecipeSharingConsentSpan;
 export type RecipeDetailPageComments = RecipeCommentsViewProps;
 /** A confirmation-dialog view-model (ConfirmActionView's props). */
 export type RecipeDetailPageConfirmation = ConfirmActionViewProps;
@@ -298,23 +293,16 @@ export type RecipeDetailPageOverviewProps = {
   /** Engagement ratings card; omit to hide it. */
   ratings?: RecipeDetailPageRatings | null;
   onViewerRatingChange?: (stars: number | null) => void;
-  /** Slot: the app's sharing/visibility panel, rendered after the
-   * lifecycle section and before the tags — its position today. */
-  renderSharingControls?: () => ReactNode;
-  /** Slot: the app's comments section, rendered in the engagement
-   * stack under the ratings card. */
-  renderComments?: () => ReactNode;
   /**
    * The sharing section as data (#438 Part 3): renders
-   * RecipeSharingView at the slot's position. The data prop
-   * and the render slot are alternatives — when both are
-   * supplied, the data prop wins (it is the migrated form).
+   * RecipeSharingView after the lifecycle section and before
+   * the tags.
    */
   sharing?: RecipeDetailPageSharing | null;
   /**
    * The comments section as data (#438 Part 3): renders
-   * RecipeCommentsView at the slot's position, under the
-   * ratings card. Same alternative rule as `sharing`.
+   * RecipeCommentsView in the engagement stack, under the
+   * ratings card.
    */
   comments?: RecipeDetailPageComments | null;
 };
@@ -389,10 +377,31 @@ export type RecipeDetailPageHistoryProps = {
    * MealPlansPage's `onPlanDelete` — the view only reports the
    * intent. Omit it for a read-only history. */
   onDeleteCookLogPress?: (cookLogId: string) => void;
-  /** Slot: the app's cook-log form. Called once per render; when
-   * it returns non-null, the form replaces the "Log a cook"
-   * button. Form, state, and mutation stay app-side. */
-  renderCookLogForm?: () => ReactNode;
+  /** The cook-log form as data (#687): when present, the page
+   * renders the DS RatingForm (light variant) in place of the
+   * "Log a cook" button. The form's rating/notes state stays
+   * inside the form; only the submit view-model, the skip
+   * intent, and the pending flag cross the boundary — the
+   * mutation itself stays app-side. */
+  cookLogForm?: RecipeDetailPageCookLogForm | null;
+};
+
+/** The cook-log form's submit view-model (#687). */
+export type RecipeDetailPageCookLogFormValues = {
+  rating: 1 | 2 | 3 | 4 | 5 | null;
+  notes: string | null;
+};
+
+export type RecipeDetailPageCookLogForm = {
+  onSubmit: (values: RecipeDetailPageCookLogFormValues) => void;
+  onSkip: () => void;
+  isPending: boolean;
+  /** Defaults to the voice object's ratingForm title (#539). */
+  title?: string;
+  /** Defaults to the voice object's ratingForm notesPlaceholder (#539). */
+  notesPlaceholder?: string;
+  /** Defaults to the voice object's ratingForm secondaryLabel (#539). */
+  secondaryLabel?: string;
 };
 
 // The nutrition view-model lives with NutritionPanel (the widget
@@ -647,8 +656,6 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
     tags,
     ratings,
     onViewerRatingChange,
-    renderSharingControls,
-    renderComments,
     sharing,
     comments: commentsData,
   } = overview;
@@ -666,14 +673,9 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
     lifecycle !== undefined &&
     lifecycle !== null &&
     (lifecycle.isEditable || lifecycle.candidates.length > 0);
-  // The sections have two sources (#438 Part 3): the data
-  // props render the DS views; the render slots are the
-  // fallback for hosts that have not migrated. A slot is
-  // called once per render, only when provided.
-  const sharingSlot = renderSharingControls ? renderSharingControls() : null;
-  const commentsSlot = renderComments ? renderComments() : null;
-  const sharingControls = sharing ? <RecipeSharingView {...sharing} /> : sharingSlot;
-  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : commentsSlot;
+  // The sections render from their data props (#438 Part 3).
+  const sharingControls = sharing ? <RecipeSharingView {...sharing} /> : null;
+  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : null;
 
   return (
     <PanelStack>
@@ -863,7 +865,13 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
 // generated per render (the CheckboxSelectList convention).
 const LOADING_COOK_LOG_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
-function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
+function HistoryPanel({
+  history,
+  selectedVersionId,
+}: {
+  history: RecipeDetailPageHistoryProps;
+  selectedVersionId: string;
+}) {
   if (history.loading) {
     // Loading (#278, tranche 4): the heading stays and the
     // entries render as exactly 3 dummy LogEntryCards in their
@@ -892,8 +900,24 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
     );
   }
 
-  // Called once per render; non-null content replaces the button.
-  const form = history.renderCookLogForm ? history.renderCookLogForm() : null;
+  // The form renders from data while the host has it open;
+  // its presence replaces the button (#687). The form is keyed
+  // to the selected version: RatingForm keeps its draft in
+  // local state, so a version change remounts it — a draft
+  // entered for one version can never be submitted through
+  // another version's onSubmit (CodeRabbit review on #691).
+  const form = history.cookLogForm ? (
+    <RatingForm
+      key={selectedVersionId}
+      variant="light"
+      onSubmit={history.cookLogForm.onSubmit}
+      onSkip={history.cookLogForm.onSkip}
+      isPending={history.cookLogForm.isPending}
+      title={history.cookLogForm.title}
+      notesPlaceholder={history.cookLogForm.notesPlaceholder}
+      secondaryLabel={history.cookLogForm.secondaryLabel}
+    />
+  ) : null;
 
   return (
     <PanelStack>
@@ -1006,7 +1030,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
           <OverviewPanel overview={props.overview} />
           <IngredientsPanel ingredients={props.ingredients} />
           <InstructionsPanel instructions={props.instructions.instructions} />
-          <HistoryPanel history={props.history} />
+          <HistoryPanel history={props.history} selectedVersionId={selectedVersionId} />
           {/* The section headings render inside their panels as the
             PanelStack's first block (the canonical SectionHeading
             carries no padding of its own — the panel's inset is

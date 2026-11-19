@@ -1,6 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { YStack } from "tamagui";
-import { Text } from "../widgets/Text.js";
 import {
   aiSessionGenerateConfigFixture,
   aiSessionPlanningFixture,
@@ -62,9 +60,9 @@ export const Planning: Story = {
 };
 
 /**
- * The preview is a slot: hosts render their parsed-recipe
- * preview into the card (the app's RecipeInputPreview). The
- * story's stand-in is plain text lines in the preview's shape.
+ * The preview is data (#684): hosts pass their parsed recipe's
+ * preview content and the page renders RecipePreviewView in
+ * the card. The story's fixture is the parsed stroganoff.
  */
 export const PreviewReady: Story = {
   render: () => (
@@ -73,13 +71,11 @@ export const PreviewReady: Story = {
         footer={eciperayFooterFixture}
         config={aiSessionGenerateConfigFixture}
         session={aiSessionPreviewFixture}
-        preview={
-          <YStack gap="$2">
-            <Text fontWeight="bold">Creamy Mushroom Stroganoff</Text>
-            <Text>Serves 4 · 35 minutes</Text>
-            <Text>12 oz egg noodles · 1 lb mushrooms · 1 cup sour cream</Text>
-          </YStack>
-        }
+        preview={{
+          title: "Creamy Mushroom Stroganoff",
+          metaLabel: "Serves 4 · 35 minutes",
+          ingredients: ["12 oz egg noodles", "1 lb mushrooms", "1 cup sour cream"],
+        }}
         prompt=""
         followUp=""
         busy={false}

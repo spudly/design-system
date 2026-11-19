@@ -15,6 +15,8 @@ export {
   type RecipesPageDiscoveryItem,
   type RecipesPageItem,
   type RecipesPageProps,
+  type RecipesPageCookLogForm,
+  type RecipesPageCookLogFormValues,
 } from "./RecipesPage.js";
 export {
   DiscoverPage,
@@ -44,8 +46,11 @@ export {
   type RecipeDetailPageNutritionProps,
   type RecipeDetailPageNutritionRow,
   type RecipeDetailPageSharing,
+  type RecipeDetailPageSharingConsentSpan,
   type RecipeDetailPageComments,
   type RecipeDetailPageConfirmation,
+  type RecipeDetailPageCookLogForm,
+  type RecipeDetailPageCookLogFormValues,
 } from "./RecipeDetailPage.js";
 export {
   MealPlanDetailPage,
@@ -130,6 +135,7 @@ export {
   type ProfilePageAccountData,
   type ProfilePageTransfer,
   type ProfilePageFeedbackPreference,
+  type ProfilePageLegalLink,
 } from "./ProfilePage.js";
 export { ImportTextPage, type ImportTextPageProps } from "./ImportTextPage.js";
 export { ImportUrlPage, type ImportUrlPageProps } from "./ImportUrlPage.js";

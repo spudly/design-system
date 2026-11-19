@@ -1,8 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { YStack } from "tamagui";
-import { AccessTokensPanel } from "../views/AccessTokensPanel.js";
-import { NutritionGoalsForm } from "../views/NutritionGoalsForm.js";
-import { TextLink } from "../widgets/TextLink.js";
 import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ProfilePage } from "./ProfilePage.js";
 
@@ -16,10 +12,10 @@ export default meta;
 type Story = StoryObj<typeof ProfilePage>;
 
 /**
- * The slots are host-rendered: the nutrition goals and access
- * tokens sections are the DS section components fed fixture
- * data here (their app containers feed them live data), and
- * the legal links are the app's LegalLinks.
+ * The sections are data-driven: the nutrition goals, access
+ * tokens, and feedback preference sections render from their
+ * data props (their app containers feed them live data), and
+ * the legal links cross as label + href data.
  */
 export const WithSections: Story = {
   render: () => (
@@ -29,24 +25,20 @@ export const WithSections: Story = {
         email="cook@example.com"
         onSignOut={() => undefined}
         tagsHref="/profile/tags"
-        sectionsBeforeFeedback={
-          <YStack gap="$4">
-            <NutritionGoalsForm
-              goals={nutritionGoalsFixture}
-              onChange={() => undefined}
-              onSave={() => undefined}
-            />
-            <AccessTokensPanel
-              tokens={accessTokensFixture.tokens}
-              tokenName=""
-              onTokenNameChange={() => undefined}
-              onCreate={() => undefined}
-              createdSecret={null}
-              onDismissSecret={() => undefined}
-              onRevoke={() => undefined}
-            />
-          </YStack>
-        }
+        nutritionGoals={{
+          goals: nutritionGoalsFixture,
+          onChange: () => undefined,
+          onSave: () => undefined,
+        }}
+        accessTokens={{
+          tokens: accessTokensFixture.tokens,
+          tokenName: "",
+          onTokenNameChange: () => undefined,
+          onCreate: () => undefined,
+          createdSecret: null,
+          onDismissSecret: () => undefined,
+          onRevoke: () => undefined,
+        }}
         feedbackPreferenceSection={{
           shortcutEnabled: true,
           onShortcutEnabledChange: () => undefined,
@@ -57,12 +49,10 @@ export const WithSections: Story = {
           onWithdrawConsent: () => undefined,
           choicesHref: "/privacy/consent",
         }}
-        legalLinks={
-          <YStack gap="$2">
-            <TextLink onPress={() => undefined}>Terms of Service</TextLink>
-            <TextLink onPress={() => undefined}>Privacy Policy</TextLink>
-          </YStack>
-        }
+        legalLinks={[
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Privacy Policy", href: "/privacy" },
+        ]}
       />
     </>
   ),
@@ -132,12 +122,10 @@ export const WithCoverageSections: Story = {
           onDismissSecret: () => undefined,
           onRevoke: () => undefined,
         }}
-        legalLinks={
-          <YStack gap="$2">
-            <TextLink onPress={() => undefined}>Terms of Service</TextLink>
-            <TextLink onPress={() => undefined}>Privacy Policy</TextLink>
-          </YStack>
-        }
+        legalLinks={[
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Privacy Policy", href: "/privacy" },
+        ]}
       />
     </>
   ),

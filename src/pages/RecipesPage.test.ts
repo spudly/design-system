@@ -26,24 +26,34 @@ describe("recipesPageAccessory", () => {
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-  test("the accessory slot prop is declared with the id-based signature", () => {
+  test("the cook-log form prop is declared as data, not a render slot (#687)", () => {
     assert.match(
       code,
-      /renderRecipeAccessory\?: \(recipeId: string\) => ReactNode;/,
-      "RecipesPageProps must declare renderRecipeAccessory?: (recipeId: string) => ReactNode",
+      /cookLogForm\?: RecipesPageCookLogForm \| null;/,
+      "RecipesPageProps must declare cookLogForm?: RecipesPageCookLogForm | null",
+    );
+    assert.doesNotMatch(
+      code,
+      /renderRecipeAccessory/,
+      "the renderRecipeAccessory slot is removed (#687)",
     );
   });
 
-  test("the slot is called once per row with the row id, only when provided", () => {
+  test("the form renders once, under the row its recipeId names", () => {
     assert.match(
       code,
-      /const accessory = renderRecipeAccessory \? renderRecipeAccessory\(item\.id\) : null;/,
-      "renderItem must resolve the row's accessory via renderRecipeAccessory(item.id), defaulting to null",
+      /cookLogForm && cookLogForm\.recipeId === item\.id/,
+      "renderItem must resolve the row's accessory from the cookLogForm data, defaulting to null",
     );
     assert.equal(
-      code.split("renderRecipeAccessory(item.id)").length - 1,
+      code.split("cookLogForm.recipeId === item.id").length - 1,
       1,
-      "the slot must be called exactly once per row (a second call site could double-render app content)",
+      "the form must render at exactly one row (a second call site could double-render the form)",
+    );
+    assert.match(
+      code,
+      /<RatingForm/,
+      "the accessory is the DS RatingForm, rendered by the page itself",
     );
   });
 
@@ -86,7 +96,7 @@ describe("recipesPageAccessory", () => {
     );
   });
 
-  test("a story exercises the slot so Chromatic captures the expanded layout", () => {
+  test("a story exercises the form so Chromatic captures the expanded layout", () => {
     assert.match(
       stories,
       /export const ExpandedAccessory/,
@@ -94,8 +104,8 @@ describe("recipesPageAccessory", () => {
     );
     assert.match(
       stories,
-      /renderRecipeAccessory: \(recipeId: string\) =>/,
-      "the story must pass renderRecipeAccessory with per-row content",
+      /cookLogForm: \{/,
+      "the story must pass the cookLogForm data for the expanded row",
     );
   });
 });

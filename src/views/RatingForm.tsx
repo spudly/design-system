@@ -26,11 +26,11 @@ export type RatingFormProps = {
   isPending: boolean;
   variant?: "dark" | "light";
   /** Defaults to the voice object's ratingForm secondaryLabel (#539). */
-  secondaryLabel?: string;
+  secondaryLabel?: string | undefined;
   /** Defaults to the voice object's ratingForm title (#539). */
-  title?: string;
+  title?: string | undefined;
   /** Defaults to the voice object's ratingForm notesPlaceholder (#539). */
-  notesPlaceholder?: string;
+  notesPlaceholder?: string | undefined;
 };
 
 /**

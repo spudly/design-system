@@ -84,8 +84,8 @@ test("auth pages use the DS auth shell and secure password entry", () => {
 });
 
 test("SignUpForm footer block is consistently centered (eciperay#294)", () => {
-  // The host renders its legal notice centered in the legalNotice
-  // slot; the sign-in link that follows it in the same footer
+  // The form renders the legal notice centered from the legalNotice
+  // copy data (#686); the sign-in link that follows it in the same footer
   // block must carry the same alignment or the block reads as
   // two mismatched columns. Since #119 the block lives in the
   // SignUpForm unit the page composes, and the separation is
@@ -147,18 +147,29 @@ test("auth cross-links render their href destinations (#248)", () => {
   }
 });
 
-test("ProfilePage exposes the section and legal slots in the app view's order", () => {
+test("ProfilePage composes its sections from data props in the app view's order (#685)", () => {
   const source = page("ProfilePage");
-  for (const slot of ["sectionsBeforeFeedback", "sectionsAfterFeedback", "legalLinks"]) {
-    assert.match(source, new RegExp(String.raw`${slot}\?:`), `${slot} is a prop`);
-  }
+  // The generic section slots are removed: sections cross as
+  // data props only, never as rendered UI.
+  assert.doesNotMatch(source, /sectionsBeforeFeedback|sectionsAfterFeedback/);
   // #680: the feedbackPreference ReactNode slot is removed — the
   // feedbackPreferenceSection data prop is the only path.
   assert.doesNotMatch(source, /feedbackPreference\?: ReactNode/);
+  for (const prop of [
+    "subscription",
+    "nutritionGoals",
+    "accessTokens",
+    "feedbackPreferenceSection",
+    "transfer",
+    "accountData",
+    "legalLinks",
+  ]) {
+    assert.match(source, new RegExp(String.raw`${prop}\?:`), `${prop} is a prop`);
+  }
+  const beforeAt = source.indexOf("<SubscriptionView");
   const feedbackAt = source.indexOf("{feedbackPreferenceSection ? (");
-  const beforeAt = source.indexOf("{sectionsBeforeFeedback}");
-  const afterAt = source.indexOf("{sectionsAfterFeedback}");
-  assert.ok(beforeAt !== -1 && beforeAt < feedbackAt && feedbackAt < afterAt, "slot order");
+  const afterAt = source.indexOf("<TransferRecipesView");
+  assert.ok(beforeAt !== -1 && beforeAt < feedbackAt && feedbackAt < afterAt, "section order");
   // Sign out is a bare intent; the session teardown is app-side.
   assert.match(source, /onSignOut: \(\) => void/);
 });
@@ -193,10 +204,11 @@ test("ImportTextPage holds the batch's one documented local-state exception", ()
   assert.match(source, /onSubmit: \(text: string\) => void/, "text crosses only at submit");
 });
 
-test("ImportReviewPage takes the preview as a slot, not a renderer import", () => {
+test("ImportReviewPage renders the preview from data, not a slot (#684)", () => {
   const source = page("ImportReviewPage");
-  assert.match(source, /preview: ReactNode/);
-  assert.doesNotMatch(source, /RecipeInputPreview\.js/);
+  assert.match(source, /preview: RecipePreviewViewProps/);
+  assert.match(source, /<RecipePreviewView \{\.\.\.preview\} \/>/);
+  assert.doesNotMatch(source, /preview: ReactNode/);
 });
 
 test("AiSessionPage splits view from session logic", () => {
@@ -207,8 +219,9 @@ test("AiSessionPage splits view from session logic", () => {
   assert.match(source, /canRefine: boolean/);
   assert.match(source, /canCancel: boolean/);
   assert.match(source, /phaseLabel: string/);
-  // The preview is a slot; the intents are bare.
-  assert.match(source, /preview\?: ReactNode/);
+  // The preview is data (#684); the intents are bare.
+  assert.match(source, /preview\?: RecipePreviewViewProps/);
+  assert.match(source, /<RecipePreviewView \{\.\.\.preview\} \/>/);
   assert.match(source, /onStart: \(prompt: string\) => void/);
   assert.match(source, /onApprovePlan: \(\) => void/);
   assert.match(source, /onFinalize: \(\) => void/);

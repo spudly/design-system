@@ -30,24 +30,7 @@ const meta: Meta<typeof RecipeDetailPage> = {
 export default meta;
 type Story = StoryObj<typeof RecipeDetailPage>;
 
-/** Fixture stand-in for app-side slot content (forms and panels
- * whose state and mutations stay in the app) — a plain dashed
- * panel, not a form, per the RecipesPage ExpandedAccessory
- * precedent. */
-function SlotStandIn({ label }: { label: string }) {
-  return (
-    <View
-      borderWidth={1}
-      borderColor="#b08968"
-      borderStyle="dashed"
-      borderRadius={8}
-      paddingVertical={12}
-      paddingHorizontal={16}
-    >
-      <Text variant="body">{label}</Text>
-    </View>
-  );
-}
+
 
 const SCALE_MULTIPLIERS = [0.5, 1, 2, 3];
 
@@ -117,7 +100,6 @@ function RecipeDetailPageDemo({
   variant = "full",
   initialMissing = [],
   cookLogFormOpen = false,
-  showPanelSlots = false,
   createDraft = false,
   withCoverageSections = false,
   activationConfirmationOpen = false,
@@ -125,7 +107,6 @@ function RecipeDetailPageDemo({
   variant?: "full" | "minimal";
   initialMissing?: string[];
   cookLogFormOpen?: boolean;
-  showPanelSlots?: boolean;
   createDraft?: boolean;
   withCoverageSections?: boolean;
   activationConfirmationOpen?: boolean;
@@ -224,16 +205,6 @@ function RecipeDetailPageDemo({
         viewer: isFull ? { value: viewerRating } : null,
       },
       onViewerRatingChange: setViewerRating,
-      ...(showPanelSlots
-        ? {
-            renderSharingControls: () => (
-              <SlotStandIn label="Sharing controls render here (app-side fixture stand-in)" />
-            ),
-            renderComments: () => (
-              <SlotStandIn label="Comments render here (app-side fixture stand-in)" />
-            ),
-          }
-        : {}),
       ...(withCoverageSections
         ? {
             sharing: {
@@ -344,9 +315,18 @@ function RecipeDetailPageDemo({
       onDeleteCookLogPress: () => undefined,
       ...(formOpen
         ? {
-            renderCookLogForm: () => (
-              <SlotStandIn label="Cook log form renders here (app-side fixture stand-in)" />
-            ),
+            // The cook-log form renders from data (#687): the
+            // page composes the DS RatingForm itself; submit and
+            // skip close the story's form like the app's intents.
+            cookLogForm: {
+              onSubmit: () => {
+                setFormOpen(false);
+              },
+              onSkip: () => {
+                setFormOpen(false);
+              },
+              isPending: false,
+            },
           }
         : {}),
     },
@@ -375,7 +355,7 @@ function RecipeDetailPageDemo({
 }
 
 export const Default: Story = {
-  render: () => <RecipeDetailPageDemo showPanelSlots />,
+  render: () => <RecipeDetailPageDemo withCoverageSections />,
 };
 
 export const Minimal: Story = {
@@ -445,7 +425,7 @@ export const SharingAndComments: Story = {
 export const LoadingOverlay: Story = {
   render: () => (
     <View width={430} maxWidth="100%" height={844} position="relative">
-      <RecipeDetailPageDemo showPanelSlots />
+      <RecipeDetailPageDemo withCoverageSections />
       <View
         position="absolute"
         top={0}
