@@ -1,16 +1,14 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
-import { Anchor, XStack, YStack } from "tamagui";
+import { BannerRow } from "../widgets/BannerRow.js";
 import { BrandLink } from "../widgets/BrandLink.js";
+import { BulletList } from "../widgets/BulletList.js";
+import { ProseColumn } from "../widgets/ProseColumn.js";
+import { ProseStack } from "../widgets/ProseStack.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
-import {
-  bannerRoleProps,
-  listItemRoleProps,
-  listRoleProps,
-  mainRoleProps,
-} from "../widgets/accessibility.js";
+import { bannerRoleProps, mainRoleProps } from "../widgets/accessibility.js";
 import { tokens } from "../tokens/index.js";
 import { useVoice } from "../voice/index.js";
 
@@ -57,12 +55,16 @@ import { useVoice } from "../voice/index.js";
  * retired with it; hosts pass legal links as BigFooter column
  * data through the page's `footer` prop), and the document
  * itself renders through the
- * page-local prose renderer below (Stephen's no-new-components
- * rule for tranche PRs, 2026-10-29). An earlier tranche cut
+ * page-local prose renderer below. An earlier tranche cut
  * extracted the renderer as a ProseDocument library component;
  * it had no second consumer, so it was folded back into the
  * page — the model types live here under the page's public
- * names, so the contract below is unchanged.
+ * names, so the contract below is unchanged. The renderer's
+ * layout primitives are no longer page-local (#119 tranche 2):
+ * the banner row is BannerRow, the prose column is
+ * ProseColumn, the title block and each section are
+ * ProseStack, and list blocks are BulletList — only the span
+ * and block rendering stays in this page.
  *
  * Stays app-side: the legal text itself, routing, document
  * head/SEO, and the analytics consent banner.
@@ -102,16 +104,6 @@ export type LegalDocumentLink = {
   href: string;
 };
 
-/**
- * The document's prose column width: the same 768px (the web
- * layout's max-w-3xl) centered column the other public surfaces
- * render into, so the
- * prose stays readable on wide viewports. The frame header and
- * footer stay outside the column, spanning the container as
- * before; on phone-width viewports the cap does not bind.
- */
-const PROSE_MAX_WIDTH = 768;
-
 function renderSpan(span: LegalDocumentSpan, key: number): ReactNode {
   switch (span.type) {
     case "text":
@@ -130,15 +122,9 @@ function renderSpan(span: LegalDocumentSpan, key: number): ReactNode {
       );
     case "link":
       return (
-        <Anchor
-          key={key}
-          href={span.href}
-          color="$link"
-          fontWeight={tokens.typography.fontWeight.medium}
-          textDecorationLine="underline"
-        >
+        <TextLink key={key} href={span.href}>
           {span.label}
-        </Anchor>
+        </TextLink>
       );
   }
 }
@@ -151,16 +137,7 @@ function renderBlock(block: LegalDocumentBlock, key: number): ReactNode {
   if (block.type === "paragraph") {
     return <Text key={key}>{renderSpans(block.spans)}</Text>;
   }
-  return (
-    <YStack key={key} gap="$2" {...listRoleProps}>
-      {block.items.map((item, index) => (
-        <XStack key={index} gap="$2" {...listItemRoleProps}>
-          <Text>{"•"}</Text>
-          <Text flex={1}>{renderSpans(item)}</Text>
-        </XStack>
-      ))}
-    </YStack>
-  );
+  return <BulletList key={key} items={block.items.map((item) => renderSpans(item))} />;
 }
 
 export type LegalDocumentPageProps = {
@@ -196,28 +173,22 @@ export function LegalDocumentPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <XStack alignItems="center" justifyContent="space-between" gap="$4" {...bannerRoleProps}>
+        <BannerRow {...bannerRoleProps}>
           <BrandLink label={brandLabel} href={brandHref} />
           <TextLink href={signInHref}>{signInLabel}</TextLink>
-        </XStack>
-        <YStack
-          width="100%"
-          maxWidth={PROSE_MAX_WIDTH}
-          alignSelf="center"
-          gap="$4"
-          {...mainRoleProps}
-        >
-          <YStack gap="$3">
+        </BannerRow>
+        <ProseColumn {...mainRoleProps}>
+          <ProseStack>
             <Text variant="heading">{title}</Text>
             <Text variant="hint">{voice.legalDocumentPage.lastUpdatedLabel(lastUpdated)}</Text>
-          </YStack>
+          </ProseStack>
           {sections.map((section) => (
-            <YStack key={section.title} gap="$3">
+            <ProseStack key={section.title}>
               <Text variant="subheading">{section.title}</Text>
               {section.blocks.map((block, index) => renderBlock(block, index))}
-            </YStack>
+            </ProseStack>
           ))}
-        </YStack>
+        </ProseColumn>
       </ScreenContainer>
     </BigFooterShell>
   );

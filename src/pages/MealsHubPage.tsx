@@ -1,18 +1,16 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { CardStack } from "../widgets/CardStack.js";
-import { Card } from "../widgets/Card.js";
 import { EmptyState } from "../widgets/EmptyState.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
 import { PinnedHeaderShell } from "../widgets/PinnedHeaderShell.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { LoadingActionCardRow } from "../widgets/LoadingActionCardRow.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Tabs } from "../widgets/Tabs.js";
 import { Text } from "../widgets/Text.js";
 import { TextActionCardRow } from "../widgets/TextActionCardRow.js";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
-import { YStack } from "tamagui";
 
 /**
  * MealsHubPage (#125, B3b): the meals hub — the split view
@@ -189,21 +187,9 @@ export function MealsHubPage({
             <LoadingScope active>
               <CardStack>
                 {LOADING_MEAL_KEYS.map((key) => (
-                  <Card
-                    key={key}
-                    variant="elevated"
-                    flexDirection="row"
-                    alignItems="center"
-                    gap="$3"
-                  >
-                    <YStack flex={1} minWidth={0} gap="$1">
-                      <TextSkeleton size="md" lines={1} />
-                      <TextSkeleton size="sm" lines={1} />
-                    </YStack>
-                    <Button ghost size="sm" accessibilityLabel="Delete meal" onPress={() => {}}>
-                      Delete
-                    </Button>
-                  </Card>
+                  <LoadingActionCardRow key={key} accessibilityLabel="Delete meal">
+                    Delete
+                  </LoadingActionCardRow>
                 ))}
               </CardStack>
             </LoadingScope>

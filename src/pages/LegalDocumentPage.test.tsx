@@ -51,10 +51,15 @@ const code = readCode("src/pages/LegalDocumentPage.tsx");
 // them back — the page was the only consumer, and its public
 // Legal* type names now define the model directly. The header
 // row likewise renders directly in the page since #473 retired
-// the DocumentHeader / DocumentFooter components. The model,
-// rendering, and frame pins below all scan the page (`prose`
-// is the page source).
+// the DocumentHeader / DocumentFooter components. #119
+// tranche 2 moved the renderer's layout primitives into
+// widgets (BannerRow, ProseColumn, ProseStack, BulletList):
+// the model, rendering, and frame pins below scan the page
+// (`prose` is the page source), and the geometry pins scan
+// the widget sources the primitives now live in.
 const prose = code;
+const proseColumn = readCode("src/widgets/ProseColumn.tsx");
+const bulletList = readCode("src/widgets/BulletList.tsx");
 test("content crosses as structured section/block/span data (#170)", () => {
   for (const spanType of ['"text"', '"strong"', '"code"', '"link"']) {
     assert.ok(
@@ -88,7 +93,11 @@ test("link spans render as real anchors with the data's href — no press callba
     !prose.includes("onPress"),
     "the renderer has no press intents either — links carry hrefs",
   );
-  assert.match(prose, /<Anchor\s+key=\{key\}\s+href=\{span\.href\}/, "link span renders an Anchor");
+  assert.match(
+    prose,
+    /<TextLink\s+key=\{key\}\s+href=\{span\.href\}>/,
+    "link span renders a TextLink in its href form (a real anchor with the href)",
+  );
 });
 test("the full public frame renders: brand, sign-in, and footer links as hrefs (#170)", () => {
   // #473: the header row renders directly in the page — the
@@ -118,25 +127,35 @@ test("the document renders in a prose column; list blocks carry list semantics (
   // Prose column: title + sections sit in the centered 768px
   // column (the public surfaces' max-w-3xl), not stretched across
   // a wide viewport; ScreenContainer itself has no cap.
-  assert.match(prose, /const PROSE_MAX_WIDTH = 768;/, "prose column width is the public 768px");
+  assert.match(
+    proseColumn,
+    /const PROSE_MAX_WIDTH = 768;/,
+    "prose column width is the public 768px",
+  );
+  assert.match(
+    proseColumn,
+    /width: "100%",\s+maxWidth: PROSE_MAX_WIDTH,\s+alignSelf: "center",\s+gap: tokens\.spacing\[4\],/,
+    "the ProseColumn widget owns the centered 768px column geometry (#119 tranche 2)",
+  );
   assert.match(
     prose,
-    /<YStack\s+width="100%"\s+maxWidth=\{PROSE_MAX_WIDTH\}\s+alignSelf="center"\s+gap="\$4"\s+\{\.\.\.mainRoleProps\}\s*>/,
+    /<ProseColumn \{\.\.\.mainRoleProps\}>/,
     "title and sections render inside the centered prose column, which is the main landmark (#366)",
   );
-  // List semantics: the block's stack carries the web list role and
+  // List semantics: the BulletList's stack carries the web list role and
   // each item row the listitem role (platform-split props from
   // widgets/accessibility — native has no listitem role).
   assert.match(
-    prose,
-    /<YStack key=\{key\} gap="\$2" \{\.\.\.listRoleProps\}>/,
+    bulletList,
+    /<YStack gap=\{tokens\.spacing\[2\]\} \{\.\.\.listRoleProps\}>/,
     "list block carries the list role",
   );
   assert.match(
-    prose,
-    /<XStack key=\{index\} gap="\$2" \{\.\.\.listItemRoleProps\}>/,
+    bulletList,
+    /<XStack key=\{index\} gap=\{tokens\.spacing\[2\]\} \{\.\.\.listItemRoleProps\}>/,
     "list items carry the listitem role",
   );
+  assert.match(prose, /<BulletList key=\{key\} items=/, "list blocks render through BulletList");
 });
 test("LegalDocumentPage is exported from the pages barrel with its view-model types (#170)", () => {
   const index = readCode("src/pages/index.ts");
