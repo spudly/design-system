@@ -1,5 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { useMemo, type ReactNode } from "react";
+import { useMemo } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
@@ -41,6 +41,7 @@ import { Thumbnail } from "../widgets/Thumbnail.js";
 import { Toolbar } from "../widgets/Toolbar.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../views/ConfirmActionView.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
+import { RatingForm } from "../views/RatingForm.js";
 import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeSharingView.js";
 import { STATUS_BADGES } from "./recipeStatusBadges.js";
 
@@ -81,19 +82,14 @@ import { STATUS_BADGES } from "./recipeStatusBadges.js";
  * the chrome and panels. If the app grows a not-found state, the
  * union grows a member.
  *
- * Slots — app-rendered content inside the view (the
- * renderRecipeAccessory precedent from RecipesPage): three parts of
- * this screen are self-contained app panels whose state and
- * mutations cannot be view-modeled without leaking business logic
- * into props, so each enters through a documented render slot and
- * the app renders its existing component at the same position it
- * occupies today:
- * - `renderCookLogForm` (history section): the cook-log form. When it
- *   returns non-null content, the content replaces the view's
- *   "Log a cook" button — the same button-hides-while-open
- *   semantics as the accessory slot. The cook-log ENTRIES are
- *   display data and are view-modeled as props; only the form is
- *   slotted.
+ * The cook-log form (#687): the history section's form is
+ * rendered by the page itself — the DS RatingForm (the
+ * generalized cook-log form, #176) driven by the history
+ * data + submit callbacks (`history.cookLogForm`). While the
+ * form data is present, the form replaces the view's
+ * "Log a cook" button — the same button-hides-while-open
+ * semantics the old render slot had. The cook-log ENTRIES
+ * are display data and are view-modeled as props.
  * #438 Part 3 view-modeled the sharing and comments sections
  * on the ratings pattern below: RecipeSharingView and
  * RecipeCommentsView compose the sections from the shared
@@ -376,10 +372,31 @@ export type RecipeDetailPageHistoryProps = {
    * MealPlansPage's `onPlanDelete` — the view only reports the
    * intent. Omit it for a read-only history. */
   onDeleteCookLogPress?: (cookLogId: string) => void;
-  /** Slot: the app's cook-log form. Called once per render; when
-   * it returns non-null, the form replaces the "Log a cook"
-   * button. Form, state, and mutation stay app-side. */
-  renderCookLogForm?: () => ReactNode;
+  /** The cook-log form as data (#687): when present, the page
+   * renders the DS RatingForm (light variant) in place of the
+   * "Log a cook" button. The form's rating/notes state stays
+   * inside the form; only the submit view-model, the skip
+   * intent, and the pending flag cross the boundary — the
+   * mutation itself stays app-side. */
+  cookLogForm?: RecipeDetailPageCookLogForm | null;
+};
+
+/** The cook-log form's submit view-model (#687). */
+export type RecipeDetailPageCookLogFormValues = {
+  rating: 1 | 2 | 3 | 4 | 5 | null;
+  notes: string | null;
+};
+
+export type RecipeDetailPageCookLogForm = {
+  onSubmit: (values: RecipeDetailPageCookLogFormValues) => void;
+  onSkip: () => void;
+  isPending: boolean;
+  /** Defaults to the voice object's ratingForm title (#539). */
+  title?: string;
+  /** Defaults to the voice object's ratingForm notesPlaceholder (#539). */
+  notesPlaceholder?: string;
+  /** Defaults to the voice object's ratingForm secondaryLabel (#539). */
+  secondaryLabel?: string;
 };
 
 // The nutrition view-model lives with NutritionPanel (the widget
@@ -872,8 +889,19 @@ function HistoryPanel({ history }: { history: RecipeDetailPageHistoryProps }) {
     );
   }
 
-  // Called once per render; non-null content replaces the button.
-  const form = history.renderCookLogForm ? history.renderCookLogForm() : null;
+  // The form renders from data while the host has it open;
+  // its presence replaces the button (#687).
+  const form = history.cookLogForm ? (
+    <RatingForm
+      variant="light"
+      onSubmit={history.cookLogForm.onSubmit}
+      onSkip={history.cookLogForm.onSkip}
+      isPending={history.cookLogForm.isPending}
+      title={history.cookLogForm.title}
+      notesPlaceholder={history.cookLogForm.notesPlaceholder}
+      secondaryLabel={history.cookLogForm.secondaryLabel}
+    />
+  ) : null;
 
   return (
     <PanelStack>

@@ -237,25 +237,15 @@ function RecipesPageDemo({
         onLogCookPress={() => undefined}
         {...(expandedRecipeId
           ? {
-              // Fixture stand-in for the app's inline cook-log form:
-              // a plain expanded panel, not a form — the form is
-              // business logic and stays app-side. Returning content
-              // for one row also hides that row's log-cook control.
-              renderRecipeAccessory: (recipeId: string) =>
-                recipeId === expandedRecipeId ? (
-                  <View
-                    borderWidth={1}
-                    borderColor="#b08968"
-                    borderStyle="dashed"
-                    borderRadius={8}
-                    paddingVertical={12}
-                    paddingHorizontal={16}
-                  >
-                    <Text variant="body">
-                      Cook log form renders here (app-side fixture stand-in)
-                    </Text>
-                  </View>
-                ) : null,
+              // The expanded row's cook-log form as data (#687):
+              // the page renders the DS RatingForm under that
+              // row, which also hides that row's log-cook control.
+              cookLogForm: {
+                recipeId: expandedRecipeId,
+                onSubmit: () => undefined,
+                onSkip: () => undefined,
+                isPending: false,
+              },
             }
           : {})}
         search={search}
