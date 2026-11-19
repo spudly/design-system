@@ -1,4 +1,3 @@
-import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { tokens } from "../tokens/index.js";
@@ -31,13 +30,14 @@ export type RecipeSharingViewProps = {
   publicWarning?: string | null;
   /**
    * Publishing consent: the checkbox renders when
-   * `onConsentCheckedChange` is provided. Its description is a
-   * ReactNode so the host's policy link stays inline and
-   * pressable (the CheckboxField description contract).
-   * Defaults to the voice object's recipeSharingView consentLabel (#539).
+   * `onConsentCheckedChange` is provided. Its description is
+   * copy data (#689): the host supplies the consent copy as a
+   * plain string and the view renders it itself as the
+   * checkbox's description — no rendered UI crosses the
+   * boundary. Defaults to the voice object's recipeSharingView consentLabel (#539).
    */
   consentLabel?: string;
-  consentDescription?: ReactNode;
+  consentDescription?: string;
   consentChecked?: boolean;
   onConsentCheckedChange?: (checked: boolean) => void;
   /** Saving requires consent: Save disables until it is checked. */

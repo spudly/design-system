@@ -1,7 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { TextLink } from "../widgets/TextLink.js";
 import { RecipeSharingView } from "./RecipeSharingView.js";
 import { StoryFrame } from "./storyFrame.js";
 
@@ -31,12 +30,7 @@ function PublicWithConsentDemo() {
         value="public"
         onValueChange={() => undefined}
         publicWarning="Public recipes can be discovered by anyone. Make sure you're happy to share this recipe before saving."
-        consentDescription={
-          <>
-            I agree to publish this recipe under the{" "}
-            <TextLink href="/privacy">Privacy Policy</TextLink>.
-          </>
-        }
+        consentDescription="I agree to publish this recipe under the Privacy Policy."
         consentChecked={consentChecked}
         onConsentCheckedChange={setConsentChecked}
         consentRequired
