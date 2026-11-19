@@ -84,8 +84,8 @@ test("auth pages use the DS auth shell and secure password entry", () => {
 });
 
 test("SignUpForm footer block is consistently centered (eciperay#294)", () => {
-  // The host renders its legal notice centered in the legalNotice
-  // slot; the sign-in link that follows it in the same footer
+  // The form renders the legal notice centered from the legalNotice
+  // copy data (#686); the sign-in link that follows it in the same footer
   // block must carry the same alignment or the block reads as
   // two mismatched columns. Since #119 the block lives in the
   // SignUpForm unit the page composes, and the separation is

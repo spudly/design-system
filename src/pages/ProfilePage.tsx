@@ -1,6 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import type { ReactNode } from "react";
+import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
+import { TextLink } from "../widgets/TextLink.js";
 import { LegalSection } from "../views/LegalSection.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Text } from "../widgets/Text.js";
@@ -28,6 +30,13 @@ export type ProfilePageFeedbackPreference = FeedbackPreferenceViewProps;
 type ProfilePageNutritionGoals = NutritionGoalsFormProps;
 type ProfilePageAccessTokens = AccessTokensPanelProps;
 
+/** One Legal-section link (#686): the label renders as the
+ * link's text, the href is its destination (#248). */
+export type ProfilePageLegalLink = {
+  label: string;
+  href: string;
+};
+
 /**
  * ProfilePage (#126, B3c): the profile view — the split view
  * half of Eciperay's `ProfileView` (the B2 audit's page-view
@@ -46,9 +55,9 @@ type ProfilePageAccessTokens = AccessTokensPanelProps;
  *   position the app view renders it, between the covered
  *   before-feedback and after-feedback sections.
  * - `legalLinks` — the Legal section's links are app content
- *   (the URLs are app constants; the B2 audit keeps
- *   `LegalLinks` app-side), so the host renders its LegalLinks
- *   into the section this page frames (LegalSection, #119).
+ *   (the labels and URLs are app data), so they cross as
+ *   label + href data and the page renders them itself inside
+ *   the Legal section it frames (LegalSection, #119; #686).
  *
  * Sign out is a bare intent: the session teardown is app-side
  * business logic and never enters the DS.
@@ -75,8 +84,11 @@ export type ProfilePageProps = {
    * renders only when the href is provided. */
   showcaseHref?: string;
   feedbackPreference?: ReactNode;
-  /** The app's LegalLinks, rendered inside the Legal section. */
-  legalLinks?: ReactNode;
+  /** The Legal section's links as data (#686): each entry's
+   * label and href; the page renders them as links inside the
+   * Legal section. The legal text itself stays app-owned —
+   * only the rendering moved into the DS. */
+  legalLinks?: ProfilePageLegalLink[];
   /**
    * Typed section data (#438 Part 3): the profile sections the
    * design system covers as views — the page composes every
@@ -142,7 +154,15 @@ export function ProfilePage({
         ) : null}
         {transfer ? <TransferRecipesView {...transfer} /> : null}
         {accountData ? <AccountDataView {...accountData} /> : null}
-        <LegalSection title="Legal">{legalLinks}</LegalSection>
+        <LegalSection title="Legal">
+          <YStack gap="$2">
+            {(legalLinks ?? []).map((link) => (
+              <TextLink key={link.href} href={link.href}>
+                {link.label}
+              </TextLink>
+            ))}
+          </YStack>
+        </LegalSection>
         <Button variant="danger" onPress={onSignOut}>
           Sign Out
         </Button>

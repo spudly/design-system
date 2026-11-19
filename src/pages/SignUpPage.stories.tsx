@@ -2,7 +2,6 @@ import { eciperayFooterFixture } from "./fixtures.js";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../widgets/Text.js";
-import { TextLink } from "../widgets/TextLink.js";
 import { SignUpPage } from "./SignUpPage.js";
 
 const meta: Meta<typeof SignUpPage> = {
@@ -17,20 +16,18 @@ type Story = StoryObj<typeof SignUpPage>;
 const filledValue = "correct horse battery";
 
 /**
- * The legal notice is a slot: hosts render their LegalLinks
- * into it. The story's stand-in mirrors the app's inline
- * variant ("By creating an account you agree to our Terms of
- * Service and Privacy Policy.").
+ * The legal notice is copy data (#686): hosts pass their
+ * legal text as text/link spans. The story's fixture mirrors
+ * the app's inline variant ("By creating an account you agree
+ * to our Terms of Service and Privacy Policy.").
  */
-function LegalNotice() {
-  return (
-    <Text variant="hint">
-      By creating an account you agree to our{" "}
-      <TextLink onPress={() => undefined}>Terms of Service</TextLink> and{" "}
-      <TextLink onPress={() => undefined}>Privacy Policy</TextLink>.
-    </Text>
-  );
-}
+const legalNoticeFixture = [
+  { type: "text", text: "By creating an account you agree to our " },
+  { type: "link", label: "Terms of Service", href: "/terms" },
+  { type: "text", text: " and " },
+  { type: "link", label: "Privacy Policy", href: "/privacy" },
+  { type: "text", text: "." },
+] as const;
 
 /**
  * Interactive wrapper: the fields are stateful so the story
@@ -75,7 +72,7 @@ function Interactive({
             setLoading(true);
           }}
           signInHref="/signin"
-          legalNotice={<LegalNotice />}
+          legalNotice={[...legalNoticeFixture]}
         />
       </>
       <Text>Submissions: {submissions}</Text>

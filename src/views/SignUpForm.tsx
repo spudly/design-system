@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
 import { FormStack } from "../widgets/FormStack.js";
 import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
 import { TextField } from "./TextField.js";
+import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { useVoice } from "../voice/index.js";
 
@@ -23,12 +23,21 @@ import { useVoice } from "../voice/index.js";
  * is held the same way.
  *
  * The footer block under the submit button is consistently
- * centered (eciperay#294): the host renders its legal notice
- * centered into the `legalNotice` slot (the legal copy's
- * links are app content — the URLs are app constants), and
- * the sign-in link that follows it carries the same centered
- * alignment, so the block reads as one column.
+ * centered (eciperay#294): the legal notice renders centered
+ * from the `legalNotice` copy data (#686 — the legal text and
+ * its link destinations stay app-owned as data; only the
+ * rendering lives here), and the sign-in link that follows it
+ * carries the same centered alignment, so the block reads as
+ * one column.
  */
+
+/** One span of the sign-up legal notice (#686): plain text, or
+ * a link whose label and href are app-supplied data (the
+ * LegalDocumentPage span precedent). The notice's text is
+ * never re-authored by the DS — spans cross verbatim. */
+export type SignUpLegalNoticeSpan =
+  | { type: "text"; text: string }
+  | { type: "link"; label: string; href: string };
 
 export type SignUpFormProps = EmailPasswordFormProps & {
   displayName: string;
@@ -37,8 +46,10 @@ export type SignUpFormProps = EmailPasswordFormProps & {
    * href, not a press callback); the link renders only when
    * the href is provided. */
   signInHref?: string | undefined;
-  /** The app's inline legal notice (app LegalLinks). */
-  legalNotice?: ReactNode;
+  /** The inline legal notice as copy data (#686): an ordered
+   * run of text/link spans the form renders itself, centered,
+   * under the submit button. */
+  legalNotice?: SignUpLegalNoticeSpan[];
 };
 
 export function SignUpForm({
@@ -98,7 +109,19 @@ export function SignUpForm({
         onSubmit={onSubmit}
         submitLabel={submitLabel}
       />
-      {legalNotice}
+      {legalNotice ? (
+        <Text textAlign="center" variant="hint">
+          {legalNotice.map((span, index) =>
+            span.type === "link" ? (
+              <TextLink key={index} href={span.href}>
+                {span.label}
+              </TextLink>
+            ) : (
+              span.text
+            ),
+          )}
+        </Text>
+      ) : null}
       {signInHref ? (
         <TextLink textAlign="center" href={signInHref}>
           {voice.signUpForm.signInLabel}

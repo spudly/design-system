@@ -1,7 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { YStack } from "tamagui";
 import { CheckboxField } from "../views/CheckboxField.js";
-import { TextLink } from "../widgets/TextLink.js";
 import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ProfilePage } from "./ProfilePage.js";
 
@@ -50,12 +48,10 @@ export const WithSections: Story = {
             onCheckedChange={() => undefined}
           />
         }
-        legalLinks={
-          <YStack gap="$2">
-            <TextLink onPress={() => undefined}>Terms of Service</TextLink>
-            <TextLink onPress={() => undefined}>Privacy Policy</TextLink>
-          </YStack>
-        }
+        legalLinks={[
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Privacy Policy", href: "/privacy" },
+        ]}
       />
     </>
   ),
@@ -125,12 +121,10 @@ export const WithCoverageSections: Story = {
           onDismissSecret: () => undefined,
           onRevoke: () => undefined,
         }}
-        legalLinks={
-          <YStack gap="$2">
-            <TextLink onPress={() => undefined}>Terms of Service</TextLink>
-            <TextLink onPress={() => undefined}>Privacy Policy</TextLink>
-          </YStack>
-        }
+        legalLinks={[
+          { label: "Terms of Service", href: "/terms" },
+          { label: "Privacy Policy", href: "/privacy" },
+        ]}
       />
     </>
   ),
