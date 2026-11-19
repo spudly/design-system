@@ -156,6 +156,9 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   // import; #298 pages-only surface). It has its own stories
   // (Widgets/PageContentColumn), like BigFooter.
   "PageContentColumn.tsx",
+  // platform.ts (#119): styling-free re-export of Tamagui's isWeb
+  // flag for pages' web/native layout choice. Not a component.
+  "platform.ts",
   "accessibility.ts",
   "keyboardActivation.ts",
   "index.ts",

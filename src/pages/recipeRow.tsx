@@ -125,7 +125,7 @@ export function RecipeRow({ item, onLogCookPress, accessory }: RecipeRowProps) {
 // inline inside this block; see subtitleAction.) At ordinary widths
 // nothing changes — the basis is below the width the block already
 // gets, so it still just expands.
-export const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
+const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 } as const;
 
 type MediaRowProps = {
   /** Row detail href. Both the media and the title/subtitle

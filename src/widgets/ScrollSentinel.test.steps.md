@@ -21,7 +21,9 @@ web list; an observer reads its position to request more rows.
 1. Nothing visible renders below the story's text (the marker
    is 1px tall), and scrolling a live paginated catalog
    (RecipesPage on web) to the marker's margin requests the
-   next page exactly once per visibility episode.
+   next page — with no duplicate request while a fetch is in
+   flight, and a further request allowed once that fetch
+   completes even if the marker never left the margin.
 
 **Run when:** `src/widgets/ScrollSentinel.tsx`, its stories,
 the pages that compose ScrollSentinel (RecipesPage), or a
