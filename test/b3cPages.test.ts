@@ -147,20 +147,26 @@ test("auth cross-links render their href destinations (#248)", () => {
   }
 });
 
-test("ProfilePage exposes the section and legal slots in the app view's order", () => {
+test("ProfilePage composes its sections from data props in the app view's order (#685)", () => {
   const source = page("ProfilePage");
-  for (const slot of [
-    "sectionsBeforeFeedback",
+  // The generic section slots are removed: sections cross as
+  // data props only, never as rendered UI.
+  assert.doesNotMatch(source, /sectionsBeforeFeedback|sectionsAfterFeedback/);
+  for (const prop of [
+    "subscription",
+    "nutritionGoals",
+    "accessTokens",
     "feedbackPreference",
-    "sectionsAfterFeedback",
+    "transfer",
+    "accountData",
     "legalLinks",
   ]) {
-    assert.match(source, new RegExp(String.raw`${slot}\?:`), `${slot} is a prop`);
+    assert.match(source, new RegExp(String.raw`${prop}\?:`), `${prop} is a prop`);
   }
+  const beforeAt = source.indexOf("<SubscriptionView");
   const feedbackAt = source.indexOf("{feedbackPreference}");
-  const beforeAt = source.indexOf("{sectionsBeforeFeedback}");
-  const afterAt = source.indexOf("{sectionsAfterFeedback}");
-  assert.ok(beforeAt !== -1 && beforeAt < feedbackAt && feedbackAt < afterAt, "slot order");
+  const afterAt = source.indexOf("<TransferRecipesView");
+  assert.ok(beforeAt !== -1 && beforeAt < feedbackAt && feedbackAt < afterAt, "section order");
   // Sign out is a bare intent; the session teardown is app-side.
   assert.match(source, /onSignOut: \(\) => void/);
 });

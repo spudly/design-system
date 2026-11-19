@@ -36,18 +36,15 @@ type ProfilePageAccessTokens = AccessTokensPanelProps;
  * renders the chrome and the slot regions in the app view's
  * order. The nutrition-goals and access-tokens sections are
  * covered by the `nutritionGoals` / `accessTokens` data props
- * (#511); the slots remain for sections the DS does not cover.
+ * (#511), and every section is composed by the page itself
+ * from data props (#685).
  *
- * The slots, in render order:
- * - `sectionsBeforeFeedback` — any remaining app section
- *   hosts, rendered after the covered before-feedback
- *   sections.
+ * The remaining slots, in render order:
  * - `feedbackPreference` — the app's feedback-preference
  *   container (a hook + analytics-config flag — business logic
  *   that stays app-side per the audit) rendered at the exact
- *   position the app view renders it, between the two section
- *   slots.
- * - `sectionsAfterFeedback` — any remaining app sections.
+ *   position the app view renders it, between the covered
+ *   before-feedback and after-feedback sections.
  * - `legalLinks` — the Legal section's links are app content
  *   (the URLs are app constants; the B2 audit keeps
  *   `LegalLinks` app-side), so the host renders its LegalLinks
@@ -77,28 +74,26 @@ export type ProfilePageProps = {
   /** The component-showcase destination (#248); the button
    * renders only when the href is provided. */
   showcaseHref?: string;
-  sectionsBeforeFeedback?: ReactNode;
   feedbackPreference?: ReactNode;
-  sectionsAfterFeedback?: ReactNode;
   /** The app's LegalLinks, rendered inside the Legal section. */
   legalLinks?: ReactNode;
   /**
    * Typed section data (#438 Part 3): the profile sections the
-   * design system now covers as views. Each renders at its
-   * slot position — `subscription` with the before-feedback
-   * sections, `feedbackPreferenceSection` at the feedback
-   * position, `transfer` and `accountData` with the
-   * after-feedback sections — and the ReactNode slots stay as
-   * the fallback for sections the DS does not cover. A data
-   * prop and its slot position's ReactNode are alternatives:
-   * when both are supplied for the feedback position, the slot
-   * wins (it is the more specific composition).
+   * design system covers as views — the page composes every
+   * section itself from these props (#685: the generic
+   * before/after-feedback ReactNode slots are removed; no
+   * rendered UI crosses the page boundary for sections).
+   * Each renders at its position — `subscription`,
+   * `nutritionGoals`, and `accessTokens` before the feedback
+   * position, `feedbackPreferenceSection` at the feedback
+   * position, and `transfer` and `accountData` after it. For
+   * the feedback position, a data prop and the
+   * `feedbackPreference` slot are alternatives: when both are
+   * supplied, the slot wins (it is the more specific
+   * composition).
    *
    * `nutritionGoals` and `accessTokens` (#511) render at the
-   * before-feedback position, in that order, immediately
-   * before the `sectionsBeforeFeedback` slot content; the
-   * data props and the slot are alternatives for these two
-   * sections (a host uses one or the other).
+   * before-feedback position, in that order.
    */
   subscription?: ProfilePageSubscription;
   feedbackPreferenceSection?: ProfilePageFeedbackPreference;
@@ -113,9 +108,7 @@ export function ProfilePage({
   onSignOut,
   tagsHref,
   showcaseHref,
-  sectionsBeforeFeedback,
   feedbackPreference,
-  sectionsAfterFeedback,
   legalLinks,
   subscription,
   feedbackPreferenceSection,
@@ -138,7 +131,6 @@ export function ProfilePage({
         {subscription ? <SubscriptionView {...subscription} /> : null}
         {nutritionGoals ? <NutritionGoalsForm {...nutritionGoals} /> : null}
         {accessTokens ? <AccessTokensPanel {...accessTokens} /> : null}
-        {sectionsBeforeFeedback}
         {tagsHref ? (
           <Button variant="secondary" href={tagsHref}>
             Manage Tags
@@ -150,7 +142,6 @@ export function ProfilePage({
         ) : null}
         {transfer ? <TransferRecipesView {...transfer} /> : null}
         {accountData ? <AccountDataView {...accountData} /> : null}
-        {sectionsAfterFeedback}
         <LegalSection title="Legal">{legalLinks}</LegalSection>
         <Button variant="danger" onPress={onSignOut}>
           Sign Out

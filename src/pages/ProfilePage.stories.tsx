@@ -1,8 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { AccessTokensPanel } from "../views/AccessTokensPanel.js";
 import { CheckboxField } from "../views/CheckboxField.js";
-import { NutritionGoalsForm } from "../views/NutritionGoalsForm.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ProfilePage } from "./ProfilePage.js";
@@ -17,12 +15,11 @@ export default meta;
 type Story = StoryObj<typeof ProfilePage>;
 
 /**
- * The slots are host-rendered: the nutrition goals and access
- * tokens sections are the DS section components fed fixture
- * data here (their app containers feed them live data), the
- * feedback preference is the app's container (a DS
- * CheckboxField stands in for its shape), and the legal links
- * are the app's LegalLinks.
+ * The sections are data-driven (#685): the nutrition goals and
+ * access tokens sections render from their data props (their
+ * app containers feed them live data), the feedback preference
+ * is the app's container (a DS CheckboxField stands in for its
+ * shape), and the legal links are the app's LegalLinks.
  */
 export const WithSections: Story = {
   render: () => (
@@ -32,24 +29,20 @@ export const WithSections: Story = {
         email="cook@example.com"
         onSignOut={() => undefined}
         tagsHref="/profile/tags"
-        sectionsBeforeFeedback={
-          <YStack gap="$4">
-            <NutritionGoalsForm
-              goals={nutritionGoalsFixture}
-              onChange={() => undefined}
-              onSave={() => undefined}
-            />
-            <AccessTokensPanel
-              tokens={accessTokensFixture.tokens}
-              tokenName=""
-              onTokenNameChange={() => undefined}
-              onCreate={() => undefined}
-              createdSecret={null}
-              onDismissSecret={() => undefined}
-              onRevoke={() => undefined}
-            />
-          </YStack>
-        }
+        nutritionGoals={{
+          goals: nutritionGoalsFixture,
+          onChange: () => undefined,
+          onSave: () => undefined,
+        }}
+        accessTokens={{
+          tokens: accessTokensFixture.tokens,
+          tokenName: "",
+          onTokenNameChange: () => undefined,
+          onCreate: () => undefined,
+          createdSecret: null,
+          onDismissSecret: () => undefined,
+          onRevoke: () => undefined,
+        }}
         feedbackPreference={
           <CheckboxField
             label="Send product feedback prompts"
