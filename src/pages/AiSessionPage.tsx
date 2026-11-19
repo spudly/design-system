@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Alert } from "../widgets/Alert.js";
-import { YStack } from "tamagui";
+import { ChatTranscript } from "../widgets/ChatTranscript.js";
 import { RecipePreviewView, type RecipePreviewViewProps } from "../views/RecipePreviewView.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
@@ -8,8 +8,6 @@ import { FormHeading } from "../widgets/FormHeading.js";
 import { PreviewCard } from "../widgets/PreviewCard.js";
 import { SessionShell } from "../widgets/SessionShell.js";
 import { TextAreaField } from "../views/TextAreaField.js";
-import { Text } from "../widgets/Text.js";
-import { tokens } from "../tokens/index.js";
 
 /**
  * AiSessionPage (#126, B3c): the AI session view — the split
@@ -66,8 +64,8 @@ import { tokens } from "../tokens/index.js";
  * actions row. The pieces only this page needs — the
  * transcript bubbles and the cancel control — are composed
  * inline below from library primitives rather than added as
- * new library components: the bubbles are Text in token-inked
- * stacks, and the cancel control is a ghost Button (#464,
+ * new library components: the bubbles are the ChatTranscript
+ * widget (#119 tranche 1), and the cancel control is a ghost Button (#464,
  * retiring TextAction): a real button's keyboard and disabled
  * semantics — disabled while a request is in flight, which
  * dims it and refuses activation, held-key repeats included —
@@ -185,31 +183,12 @@ export function AiSessionPage({
     <BigFooterShell footer={footer}>
       <SessionShell scrollable>
         <FormHeading subtitle={session.phaseLabel}>{config.title}</FormHeading>
-        <YStack gap="$3">
-          {session.messages.map((message, index) => {
+        <ChatTranscript
+          messages={session.messages.map((message) => {
             const own = message.role === "user";
-            return (
-              <YStack
-                key={index}
-                paddingStart={own ? "$8" : undefined}
-                paddingEnd={own ? undefined : "$8"}
-              >
-                <YStack
-                  borderRadius={tokens.radii.md}
-                  backgroundColor={own ? tokens.colors.gray.gray2 : "$primarySubtle"}
-                  padding="$3"
-                >
-                  <YStack paddingBottom="$1">
-                    <Text variant="label">{own ? "You" : "Plan"}</Text>
-                  </YStack>
-                  <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
-                    {message.content}
-                  </Text>
-                </YStack>
-              </YStack>
-            );
+            return { own, author: own ? "You" : "Plan", content: message.content };
           })}
-        </YStack>
+        />
         {session.canRefine ? (
           <>
             <TextAreaField

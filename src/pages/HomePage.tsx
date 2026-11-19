@@ -1,11 +1,9 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import { ButtonStack } from "../widgets/ButtonStack.js";
-import { Card } from "../widgets/Card.js";
 import { CenteredText } from "../widgets/CenteredText.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { LoadingCardRow } from "../widgets/LoadingCardRow.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
@@ -135,12 +133,7 @@ export function HomePage({
             <LoadingScope active>
               <ListStack>
                 {LOADING_ROW_KEYS.map((key) => (
-                  <YStack key={key} paddingBlockEnd="$3">
-                    <Card>
-                      <TextSkeleton size="md" lines={1} />
-                      <TextSkeleton size="sm" lines={1} />
-                    </Card>
-                  </YStack>
+                  <LoadingCardRow key={key} />
                 ))}
               </ListStack>
             </LoadingScope>
