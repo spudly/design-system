@@ -66,7 +66,7 @@ test("the list variant flexes on native so it bounds its list within the shell f
   );
   assert.match(
     code,
-    /!isWeb \? boundedFlexProps : null/,
+    /!isWeb\s*\?\s*boundedFlexProps\s*:\s*null/,
     "the flex must be applied only on native: on web flex: 1's zero basis collapses a column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry)",
   );
 });
@@ -75,8 +75,18 @@ test("the default variant flexes on native so form shell pages bound their scrol
   const code = readCode("src/widgets/ScreenContainer.tsx");
   assert.match(
     code,
+    /const defaultFlexProps = \{ flexGrow: 1 \} as const;/,
+    "the default variant's native flex must be flexGrow: 1 with an automatic basis — flex: 1's zero basis would contribute no content height inside BigFooterShell's shell-mode ScrollView column, clipping pages taller than the viewport (#676 review)",
+  );
+  assert.match(
+    code,
     /rest\.variant === undefined \|\| rest\.variant === "default"/,
     "the default variant (explicit or via defaultVariants when no variant is passed) must receive the native bounded-region flex — without it a default-variant container sizes to content and a flex: 1 scroll region inside it computes to height 0 in Yoga, so Edit Recipe / Edit Version / Manual Entry rendered only their heading on Android (#676)",
+  );
+  assert.match(
+    code,
+    /!isWeb\s*\?\s*defaultFlexProps\s*:\s*null/,
+    "the default variant's flex must be native-only: on web the document scrolls and no flex prop is applied (#676)",
   );
   // The composition that needs the bounded height: the three form
   // shell pages render a default-variant ScreenContainer, and their

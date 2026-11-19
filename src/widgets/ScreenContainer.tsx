@@ -125,6 +125,24 @@ export type ScreenContainerProps = StyledContentProps & {
  */
 const boundedFlexProps = { flex: 1 } as const;
 
+/**
+ * The default variant's form of the bounded-region flex (#676):
+ * `flexGrow: 1` with an automatic basis, NOT `flex: 1`. The default
+ * variant also renders inside BigFooterShell's default "shell"
+ * mode, whose native ScrollView content column is `flexGrow: 1` /
+ * `minHeight: "100%"` with no definite height: there, a `flex: 1`
+ * (zero-basis) container would contribute none of its content
+ * height to the scroller's extent, so a page taller than the
+ * viewport would overflow the container and its tail would be
+ * unreachable. With an automatic basis the container contributes
+ * its full content height in shell mode and merely grows to fill
+ * the column when the page is short — while in the content-mode
+ * frame (definite height) flexGrow still stretches it to the
+ * frame, which is exactly the bounded height the form pages'
+ * inner scroll region needs.
+ */
+const defaultFlexProps = { flexGrow: 1 } as const;
+
 export function ScreenContainer({ children, gap, ...rest }: ScreenContainerProps) {
   return (
     // The gap override is spread only when the caller actually passed
@@ -137,9 +155,8 @@ export function ScreenContainer({ children, gap, ...rest }: ScreenContainerProps
     // conditional spread is the PageFrame idiom for the same hazard.
     <StyledContent
       {...(gap !== undefined ? { gap } : null)}
-      {...((rest.variant === "list" || rest.variant === undefined || rest.variant === "default") && !isWeb
-        ? boundedFlexProps
-        : null)}
+      {...(rest.variant === "list" && !isWeb ? boundedFlexProps : null)}
+      {...((rest.variant === undefined || rest.variant === "default") && !isWeb ? defaultFlexProps : null)}
       {...rest}
     >
       {rest.variant === "auth" ? (
