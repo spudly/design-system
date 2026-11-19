@@ -488,7 +488,7 @@ test("SSR: an exported page renders its footer from the footer prop", async () =
     "the page footer's legal link is an anchor",
   );
 });
-describe("bigFooterBrandLogo", () => {
+describe("bigFooterBrandWordmark", () => {
   const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
   function readCode(rel: string) {
     return readFileSync(join(root, rel), "utf8")
@@ -496,18 +496,19 @@ describe("bigFooterBrandLogo", () => {
       .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   }
   const footer = readCode("src/widgets/BigFooter.tsx");
-  test("BigFooterBrand carries the optional logo slot (#468)", () => {
+  test("BigFooterBrand carries no logo slot — brand identity is data only (#688)", () => {
     assert.match(footer, /export type BigFooterBrand = \{/);
-    assert.match(footer, /logo\?: ReactNode;/);
-    assert.match(footer, /export const BIG_FOOTER_BRAND_LOGO_HEIGHT = 40;/);
-  });
-  test("a supplied logo renders in the DS-owned box instead of the wordmark (#468)", () => {
-    assert.match(
-      footer,
-      /brand\.logo \? \(\s*<XStack height=\{BIG_FOOTER_BRAND_LOGO_HEIGHT\} alignItems="center">\s*\{brand\.logo\}\s*<\/XStack>\s*\) : \(\s*brand\.label\s*\)/,
+    assert.ok(!/logo\?:/.test(footer), "the brand type must not carry a logo slot (#688)");
+    assert.ok(!/brand\.logo/.test(footer), "the footer must not render a host-supplied logo (#688)");
+    assert.ok(
+      !/BIG_FOOTER_BRAND_LOGO_HEIGHT/.test(footer),
+      "the DS-owned logo box height is gone with the slot (#688)",
     );
-    // The brand anchor keeps the label as its accessible name in
-    // both forms and stays a real link to the brand href.
+  });
+  test("the brand anchor renders the DS-owned text wordmark (#688)", () => {
+    assert.match(footer, /\{brand\.label\}/);
+    // The brand anchor keeps the label as its accessible name and
+    // stays a real link to the brand href.
     assert.match(footer, /accessibilityLabel: brand\.label/);
     assert.match(footer, /href=\{brand\.href\}/);
   });
@@ -547,33 +548,7 @@ describe("bigFooterBrandLogo", () => {
     storeLinks: [],
     socialLinks: [],
   };
-  test("SSR: a supplied logo renders inside the brand link, named by the brand label (#468)", async () => {
-    const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, BigFooter } =
-      await loadRuntime();
-    const config = createTamaguiConfig(baseTheme);
-    const html = renderToString(
-      <TamaguiProvider config={config} defaultTheme="light">
-        <BigFooter
-          footer={{
-            ...baseFooter,
-            brand: {
-              ...baseFooter.brand,
-              logo: <span data-logo-marker="fixture-logo">LOGO</span>,
-            },
-          }}
-        />
-      </TamaguiProvider>,
-    );
-    const anchor = /<a [^>]*href="\/"[^>]*>/.exec(html)?.[0];
-    assert.ok(anchor, "the brand renders as an anchor to the brand href");
-    assert.ok(
-      anchor.includes('aria-label="Eciperay"'),
-      "the brand anchor carries the brand label as its accessible name",
-    );
-    assert.ok(html.includes('data-logo-marker="fixture-logo"'), "the supplied logo node renders");
-    assert.ok(!html.includes(">Eciperay<"), "the text wordmark does not render alongside the logo");
-  });
-  test("SSR: without a logo the text wordmark renders as before (#468)", async () => {
+  test("SSR: the text wordmark renders inside the brand link, named by the brand label (#688)", async () => {
     const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, BigFooter } =
       await loadRuntime();
     const config = createTamaguiConfig(baseTheme);
