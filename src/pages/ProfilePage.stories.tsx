@@ -1,5 +1,4 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { CheckboxField } from "../views/CheckboxField.js";
 import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "./fixtures.js";
 import { ProfilePage } from "./ProfilePage.js";
 
@@ -13,11 +12,10 @@ export default meta;
 type Story = StoryObj<typeof ProfilePage>;
 
 /**
- * The sections are data-driven (#685): the nutrition goals and
- * access tokens sections render from their data props (their
- * app containers feed them live data), the feedback preference
- * is the app's container (a DS CheckboxField stands in for its
- * shape), and the legal links are the app's LegalLinks.
+ * The sections are data-driven: the nutrition goals, access
+ * tokens, and feedback preference sections render from their
+ * data props (their app containers feed them live data), and
+ * the legal links cross as label + href data.
  */
 export const WithSections: Story = {
   render: () => (
@@ -41,13 +39,16 @@ export const WithSections: Story = {
           onDismissSecret: () => undefined,
           onRevoke: () => undefined,
         }}
-        feedbackPreference={
-          <CheckboxField
-            label="Send product feedback prompts"
-            checked
-            onCheckedChange={() => undefined}
-          />
-        }
+        feedbackPreferenceSection={{
+          shortcutEnabled: true,
+          onShortcutEnabledChange: () => undefined,
+          consent: true,
+          consentStatusText: "Analytics consent: Accepted",
+          onAcceptConsent: () => undefined,
+          onDeclineConsent: () => undefined,
+          onWithdrawConsent: () => undefined,
+          choicesHref: "/privacy/consent",
+        }}
         legalLinks={[
           { label: "Terms of Service", href: "/terms" },
           { label: "Privacy Policy", href: "/privacy" },

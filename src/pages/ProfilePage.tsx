@@ -1,5 +1,4 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import { TextLink } from "../widgets/TextLink.js";
@@ -48,12 +47,10 @@ export type ProfilePageLegalLink = {
  * (#511), and every section is composed by the page itself
  * from data props (#685).
  *
- * The remaining slots, in render order:
- * - `feedbackPreference` — the app's feedback-preference
- *   container (a hook + analytics-config flag — business logic
- *   that stays app-side per the audit) rendered at the exact
- *   position the app view renders it, between the covered
- *   before-feedback and after-feedback sections.
+ * No render slots remain: the feedback position is served by
+ * the `feedbackPreferenceSection` data prop (#680), the generic
+ * before/after-feedback section slots are removed (#685), and
+ * the Legal section's links cross as data (#686, below).
  * - `legalLinks` — the Legal section's links are app content
  *   (the labels and URLs are app data), so they cross as
  *   label + href data and the page renders them itself inside
@@ -83,7 +80,6 @@ export type ProfilePageProps = {
   /** The component-showcase destination (#248); the button
    * renders only when the href is provided. */
   showcaseHref?: string;
-  feedbackPreference?: ReactNode;
   /** The Legal section's links as data (#686): each entry's
    * label and href; the page renders them as links inside the
    * Legal section. The legal text itself stays app-owned —
@@ -93,16 +89,13 @@ export type ProfilePageProps = {
    * Typed section data (#438 Part 3): the profile sections the
    * design system covers as views — the page composes every
    * section itself from these props (#685: the generic
-   * before/after-feedback ReactNode slots are removed; no
+   * before/after-feedback ReactNode slots are removed; #680:
+   * the feedbackPreference ReactNode slot is removed — no
    * rendered UI crosses the page boundary for sections).
    * Each renders at its position — `subscription`,
    * `nutritionGoals`, and `accessTokens` before the feedback
    * position, `feedbackPreferenceSection` at the feedback
-   * position, and `transfer` and `accountData` after it. For
-   * the feedback position, a data prop and the
-   * `feedbackPreference` slot are alternatives: when both are
-   * supplied, the slot wins (it is the more specific
-   * composition).
+   * position, and `transfer` and `accountData` after it.
    *
    * `nutritionGoals` and `accessTokens` (#511) render at the
    * before-feedback position, in that order.
@@ -120,7 +113,6 @@ export function ProfilePage({
   onSignOut,
   tagsHref,
   showcaseHref,
-  feedbackPreference,
   legalLinks,
   subscription,
   feedbackPreferenceSection,
@@ -148,8 +140,7 @@ export function ProfilePage({
             Manage Tags
           </Button>
         ) : null}
-        {feedbackPreference}
-        {!feedbackPreference && feedbackPreferenceSection ? (
+        {feedbackPreferenceSection ? (
           <FeedbackPreferenceView {...feedbackPreferenceSection} />
         ) : null}
         {transfer ? <TransferRecipesView {...transfer} /> : null}

@@ -152,11 +152,14 @@ test("ProfilePage composes its sections from data props in the app view's order 
   // The generic section slots are removed: sections cross as
   // data props only, never as rendered UI.
   assert.doesNotMatch(source, /sectionsBeforeFeedback|sectionsAfterFeedback/);
+  // #680: the feedbackPreference ReactNode slot is removed — the
+  // feedbackPreferenceSection data prop is the only path.
+  assert.doesNotMatch(source, /feedbackPreference\?: ReactNode/);
   for (const prop of [
     "subscription",
     "nutritionGoals",
     "accessTokens",
-    "feedbackPreference",
+    "feedbackPreferenceSection",
     "transfer",
     "accountData",
     "legalLinks",
@@ -164,7 +167,7 @@ test("ProfilePage composes its sections from data props in the app view's order 
     assert.match(source, new RegExp(String.raw`${prop}\?:`), `${prop} is a prop`);
   }
   const beforeAt = source.indexOf("<SubscriptionView");
-  const feedbackAt = source.indexOf("{feedbackPreference}");
+  const feedbackAt = source.indexOf("{feedbackPreferenceSection ? (");
   const afterAt = source.indexOf("<TransferRecipesView");
   assert.ok(beforeAt !== -1 && beforeAt < feedbackAt && feedbackAt < afterAt, "section order");
   // Sign out is a bare intent; the session teardown is app-side.
