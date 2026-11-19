@@ -47,6 +47,16 @@ export const WithSections: Story = {
             />
           </YStack>
         }
+        feedbackPreferenceSection={{
+          shortcutEnabled: true,
+          onShortcutEnabledChange: () => undefined,
+          consent: true,
+          consentStatusText: "Analytics consent: Accepted",
+          onAcceptConsent: () => undefined,
+          onDeclineConsent: () => undefined,
+          onWithdrawConsent: () => undefined,
+          choicesHref: "/privacy/consent",
+        }}
         legalLinks={
           <YStack gap="$2">
             <TextLink onPress={() => undefined}>Terms of Service</TextLink>
