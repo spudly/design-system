@@ -12,9 +12,8 @@
  * 1. The views are exported from the views barrel (the list
  *    view stays internal; the row view is also exported from
  *    the package root under the #671 exception); RecipeFormPage renders the list from the
- *    `ingredients` data prop, ahead of the
- *    `renderIngredientsSection` slot, which remains the
- *    fallback.
+ *    `ingredients` data prop — its former render slot was
+ *    removed in #683, so the data prop is the only path.
  * 2. The views are controlled and drag-free: no state of their
  *    own, no drag library, no app imports — values cross as
  *    view-models and every intent reports the row's key.
@@ -64,8 +63,8 @@ test("the views are barrel-exported and RecipeFormPage renders the list from the
     "the page renders the list view from the data prop",
   );
   assert.ok(
-    form.includes("renderIngredientsSection()"),
-    "the slot fallback still renders for unmigrated hosts",
+    !form.includes("renderIngredientsSection"),
+    "the ingredients render slot is removed (#683) — the data prop is the only path",
   );
 });
 test("the views are controlled and drag-free", () => {

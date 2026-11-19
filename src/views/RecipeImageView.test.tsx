@@ -9,9 +9,8 @@
  * The contracts pinned here:
  * 1. The view is exported from the views barrel (internal
  *    surface only); RecipeFormPage renders it from the `image`
- *    data prop, ahead of the `renderImageSection` slot, which
- *    remains the fallback and still receives the revert
- *    affordance.
+ *    data prop — its former render slot was removed in #683,
+ *    so the data prop is the only path.
  * 2. The view is controlled and picker-free: no state of its
  *    own, no picker library, no file input — picking, capture,
  *    cropping, upload, and generation stay with the host.
@@ -58,8 +57,8 @@ test("the view is barrel-exported and RecipeFormPage renders it from the image d
     "the page renders the view from the data prop with its revert affordance as the header action",
   );
   assert.ok(
-    form.includes('renderImageSection(revertAction("image"))'),
-    "the slot fallback still receives the revert affordance",
+    !form.includes("renderImageSection"),
+    "the image render slot is removed (#683) — the data prop is the only path",
   );
 });
 test("the view is controlled and picker-free", () => {
