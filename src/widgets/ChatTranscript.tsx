@@ -2,7 +2,7 @@ import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { Text } from "./Text.js";
 
-export type ChatTranscriptMessage = {
+type ChatTranscriptMessage = {
   /** True for the user's own messages: the bubble aligns to the
    * opposite side and takes the neutral surface; the other
    * party's messages take the primary-subtle surface. */

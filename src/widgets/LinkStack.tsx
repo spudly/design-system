@@ -6,12 +6,11 @@ const StyledLinkStack = styled(YStack, {
   name: "LinkStack",
 
   gap: tokens.spacing[2],
-  alignItems: "flex-start",
 });
 
 type StyledLinkStackProps = GetProps<typeof StyledLinkStack>;
 
-export type LinkStackProps = Omit<StyledLinkStackProps, "gap" | "alignItems">;
+export type LinkStackProps = Omit<StyledLinkStackProps, "gap">;
 
 /**
  * A stack of links (#119): text links listed one per line (a
