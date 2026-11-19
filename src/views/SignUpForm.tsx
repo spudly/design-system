@@ -49,7 +49,7 @@ export type SignUpFormProps = EmailPasswordFormProps & {
   /** The inline legal notice as copy data (#686): an ordered
    * run of text/link spans the form renders itself, centered,
    * under the submit button. */
-  legalNotice?: SignUpLegalNoticeSpan[];
+  legalNotice?: SignUpLegalNoticeSpan[] | undefined;
 };
 
 export function SignUpForm({
