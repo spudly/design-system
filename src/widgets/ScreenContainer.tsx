@@ -21,8 +21,8 @@ const StyledContent = styled(YStack, {
       },
       // Flush: no container padding — callers manage their own, e.g. a
       // FlatList with its own content padding. On native the variant
-      // also flexes within the shell frame — see listFlexProps in the
-      // component below (eciperay #526).
+      // also flexes within the shell frame — see boundedFlexProps in
+      // the component below (eciperay #526).
       list: {
         paddingHorizontal: 0,
         paddingVertical: 0,
@@ -95,8 +95,9 @@ export type ScreenContainerProps = StyledContentProps & {
  * every call site that passed it.
  */
 /**
- * The list variant's bounded-region flex on native (eciperay #526):
- * the variant exists to host a self-bounding list (BoundedList's
+ * The bounded-region flex on native for the `list` and `default`
+ * variants (eciperay #526; design-system #676):
+ * the list variant exists to host a self-bounding list (BoundedList's
  * `flex: 1` FlatList) inside BigFooterShell's frame, and the frame
  * bounds this container only if the container itself flexes. Without
  * it the container sizes to content, and a `flex: 1` list inside an
@@ -104,14 +105,25 @@ export type ScreenContainerProps = StyledContentProps & {
  * its chrome with a completely empty body (no filter bar, no rows,
  * no loading state). That is the regression @spudly/ui 9.2.0 shipped
  * when #547 dropped this component's pre-#547 base `flex: 1` /
- * `minHeight: "100%"`. The flex is native-only, applied as a prop
- * rather than in the styled variant, for the reason ScreenShell's
- * platform split documents: on web `flex: 1`'s zero basis collapses
- * a column inside BigFooterShell's unbounded space-between shell,
- * and the list variant's web content must keep flowing in the
- * document. Web therefore gets no flex prop at all.
+ * `minHeight: "100%"`. PR #619 restored the flex for `list` only.
+ * The `default` variant has the same composition on the form shell
+ * pages (EditRecipePage, EditVersionPage, ManualEntryPage): each
+ * renders this container inside BigFooterShell's content mode, and
+ * its content (RecipeFormPage) renders its own content-mode shell
+ * whose ScrollRegion is a native `ScrollView flex={1}` inside a
+ * `flex: 1` frame — so without the flex here the form body likewise
+ * computed to height 0 on Android and the pages rendered only their
+ * heading (#676). Before #547 every variant carried the base flex
+ * and these pages rendered correctly, so the default variant gets
+ * the same treatment; `padded` / `auth` host no self-scrolling
+ * region and are untouched. The flex is native-only, applied as a
+ * prop rather than in the styled variant, for the reason
+ * ScreenShell's platform split documents: on web `flex: 1`'s zero
+ * basis collapses a column inside BigFooterShell's unbounded
+ * space-between shell, and these variants' web content must keep
+ * flowing in the document. Web therefore gets no flex prop at all.
  */
-const listFlexProps = { flex: 1 } as const;
+const boundedFlexProps = { flex: 1 } as const;
 
 export function ScreenContainer({ children, gap, ...rest }: ScreenContainerProps) {
   return (
@@ -125,7 +137,9 @@ export function ScreenContainer({ children, gap, ...rest }: ScreenContainerProps
     // conditional spread is the PageFrame idiom for the same hazard.
     <StyledContent
       {...(gap !== undefined ? { gap } : null)}
-      {...(rest.variant === "list" && !isWeb ? listFlexProps : null)}
+      {...((rest.variant === "list" || rest.variant === undefined || rest.variant === "default") && !isWeb
+        ? boundedFlexProps
+        : null)}
       {...rest}
     >
       {rest.variant === "auth" ? (
