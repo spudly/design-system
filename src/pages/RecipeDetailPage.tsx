@@ -42,7 +42,11 @@ import { Toolbar } from "../widgets/Toolbar.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../views/ConfirmActionView.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
 import { RatingForm } from "../views/RatingForm.js";
-import { RecipeSharingView, type RecipeSharingViewProps } from "../views/RecipeSharingView.js";
+import {
+  RecipeSharingView,
+  type RecipeSharingConsentSpan,
+  type RecipeSharingViewProps,
+} from "../views/RecipeSharingView.js";
 import { STATUS_BADGES } from "./recipeStatusBadges.js";
 
 /**
@@ -227,6 +231,7 @@ export type RecipeDetailPageRatings = RatingsCardRatings;
 // (#438 Part 3); the page's contract names are aliases, as
 // with the ratings types above.
 export type RecipeDetailPageSharing = RecipeSharingViewProps;
+export type RecipeDetailPageSharingConsentSpan = RecipeSharingConsentSpan;
 export type RecipeDetailPageComments = RecipeCommentsViewProps;
 /** A confirmation-dialog view-model (ConfirmActionView's props). */
 export type RecipeDetailPageConfirmation = ConfirmActionViewProps;
