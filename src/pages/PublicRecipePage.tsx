@@ -1,5 +1,4 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import type { ReactNode } from "react";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
@@ -56,20 +55,15 @@ import type {
  *   order — overview, ingredients, instructions, engagement — so
  *   every section stays in the document on this SEO-first surface.
  * - Engagement is in v1: the ratings view-model is reused from
- *   RecipeDetailPage verbatim, and comments enter through the
- *   renderComments slot, exactly as on the detail page — the
- *   comments section carries its own query, draft/edit state, and
- *   three mutations, so it cannot be view-modeled without leaking
- *   business logic into props. (#130 T7, Stephen's 2026-11-11
- *   Q1 decision, option (a)): comments now also enter as a
- *   `comments` data prop rendering RecipeCommentsView at the
- *   slot's position — the view-model is the view's own props, so
- *   the query, draft/edit state, and mutations still stay
- *   host-side behind its callbacks; the view supports the
- *   signed-out case (its composer renders only when the host
- *   passes `onPost`). The data prop and the render slot are
- *   alternatives — when both are supplied, the data prop wins
- *   (it is the migrated form), as on RecipeDetailPage.
+ *   RecipeDetailPage verbatim, and comments enter as a
+ *   `comments` data prop rendering RecipeCommentsView in the
+ *   engagement stack (#130 T7, Stephen's 2026-11-11 Q1 decision,
+ *   option (a)) — the view-model is the view's own props, so the
+ *   query, draft/edit state, and mutations stay host-side behind
+ *   its callbacks; the view supports the signed-out case (its
+ *   composer renders only when the host passes `onPost`). The
+ *   former comments render slot was removed in #681 — the data
+ *   prop is the only path.
  * - Error states live inside the props union: `notFound` and
  *   `unavailable` are union members with DS-owned copy (the web
  *   messages verbatim), so the whole route is one component and
@@ -209,16 +203,10 @@ export type PublicRecipePageReadyProps = {
   /** Engagement block; omit (or pass null) to hide it. */
   ratings?: PublicRecipePageRatings | null;
   onViewerRatingChange?: (stars: number | null) => void;
-  /** Slot: the app's comments section, rendered in the engagement
-   * stack under the ratings card — its position on the web
-   * surface today. */
-  renderComments?: () => ReactNode;
   /**
    * The comments section as data (#130 T7): renders
-   * RecipeCommentsView at the slot's position, under the
-   * ratings card. The data prop and the render slot are
-   * alternatives — when both are supplied, the data prop wins
-   * (it is the migrated form).
+   * RecipeCommentsView in the engagement stack, under the
+   * ratings card.
    */
   comments?: PublicRecipePageComments | null;
 };
@@ -449,12 +437,8 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
     );
   }
 
-  const { ratings, onViewerRatingChange, renderComments, comments: commentsData } = props;
-  // The slot is called once per render; its content renders in
-  // the engagement stack under the ratings card. The `comments`
-  // data prop wins when both forms are supplied (#130 T7).
-  const commentsSlot = renderComments ? renderComments() : null;
-  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : commentsSlot;
+  const { ratings, onViewerRatingChange, comments: commentsData } = props;
+  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : null;
 
   return (
     <BigFooterShell footer={props.footer} scrollMode="content">

@@ -35,25 +35,6 @@ const meta: Meta<typeof PublicRecipePage> = {
 export default meta;
 type Story = StoryObj<typeof PublicRecipePage>;
 
-/** Fixture stand-in for app-side slot content (the comments
- * section, whose query and mutations stay in the app) — a plain
- * dashed panel, not a form, per the RecipesPage ExpandedAccessory
- * precedent. */
-function SlotStandIn({ label }: { label: string }) {
-  return (
-    <View
-      borderWidth={1}
-      borderColor="#b08968"
-      borderStyle="dashed"
-      borderRadius={8}
-      paddingVertical={12}
-      paddingHorizontal={16}
-    >
-      <Text variant="body">{label}</Text>
-    </View>
-  );
-}
-
 const SCALE_MULTIPLIERS = [0.5, 1, 2, 3];
 
 function scaleValueFor(baseServings: number, servings: number): string {
@@ -123,14 +104,12 @@ function PublicRecipePageDemo({
   signedIn = false,
   clonePending = false,
   initialMissing = [],
-  showCommentsSlot = false,
   showCommentsData = false,
 }: {
   variant?: "full" | "minimal";
   signedIn?: boolean;
   clonePending?: boolean;
   initialMissing?: string[];
-  showCommentsSlot?: boolean;
   showCommentsData?: boolean;
 }) {
   const isFull = variant === "full";
@@ -241,13 +220,6 @@ function PublicRecipePageDemo({
           onViewerRatingChange: setViewerRating,
         }
       : {}),
-    ...(showCommentsSlot
-      ? {
-          renderComments: () => (
-            <SlotStandIn label="Comments render here (app-side fixture stand-in)" />
-          ),
-        }
-      : {}),
     ...(showCommentsData
       ? {
           // The comments section as data (#130 T7): the page renders
@@ -279,11 +251,11 @@ function PublicRecipePageDemo({
 }
 
 export const Default: Story = {
-  render: () => <PublicRecipePageDemo showCommentsSlot />,
+  render: () => <PublicRecipePageDemo showCommentsData />,
 };
 
 export const SignedIn: Story = {
-  render: () => <PublicRecipePageDemo signedIn showCommentsSlot />,
+  render: () => <PublicRecipePageDemo signedIn showCommentsData />,
 };
 
 export const CommentsAsData: Story = {
@@ -339,7 +311,7 @@ export const Ingredients: Story = {
 export const LoadingOverlay: Story = {
   render: () => (
     <View width={430} maxWidth="100%" height={844} position="relative">
-      <PublicRecipePageDemo showCommentsSlot />
+      <PublicRecipePageDemo showCommentsData />
       <View
         position="absolute"
         top={0}
