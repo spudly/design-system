@@ -56,13 +56,58 @@ test("the list variant flexes on native so it bounds its list within the shell f
   const code = readCode("src/widgets/ScreenContainer.tsx");
   assert.match(
     code,
-    /const listFlexProps = \{ flex: 1 \} as const;/,
-    "the list variant's bounded-region flex must be flex: 1 — without it the container sizes to content and a flex: 1 FlatList inside it computes to height 0 in Yoga, rendering the native page body empty (the @spudly/ui 9.2.0 regression)",
+    /const boundedFlexProps = \{ flex: 1 \} as const;/,
+    "the bounded-region flex must be flex: 1 — without it the container sizes to content and a flex: 1 FlatList inside it computes to height 0 in Yoga, rendering the native page body empty (the @spudly/ui 9.2.0 regression)",
   );
   assert.match(
     code,
-    /\{\.\.\.\(rest\.variant === "list" && !isWeb \? listFlexProps : null\)\}/,
-    "the flex must be applied only for the list variant and only on native: on web flex: 1's zero basis collapses a column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry)",
+    /rest\.variant === "list"/,
+    "the list variant must be one of the variants that receive the native bounded-region flex (eciperay #526)",
+  );
+  assert.match(
+    code,
+    /!isWeb\s*\?\s*boundedFlexProps\s*:\s*null/,
+    "the flex must be applied only on native: on web flex: 1's zero basis collapses a column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry)",
+  );
+});
+
+test("the default variant flexes on native so form shell pages bound their scroll region (#676)", () => {
+  const code = readCode("src/widgets/ScreenContainer.tsx");
+  assert.match(
+    code,
+    /const defaultFlexProps = \{ flexGrow: 1 \} as const;/,
+    "the default variant's native flex must be flexGrow: 1 with an automatic basis — flex: 1's zero basis would contribute no content height inside BigFooterShell's shell-mode ScrollView column, clipping pages taller than the viewport (#676 review)",
+  );
+  assert.match(
+    code,
+    /rest\.variant === undefined \|\| rest\.variant === "default"/,
+    "the default variant (explicit or via defaultVariants when no variant is passed) must receive the native bounded-region flex — without it a default-variant container sizes to content and a flex: 1 scroll region inside it computes to height 0 in Yoga, so Edit Recipe / Edit Version / Manual Entry rendered only their heading on Android (#676)",
+  );
+  assert.match(
+    code,
+    /!isWeb\s*\?\s*defaultFlexProps\s*:\s*null/,
+    "the default variant's flex must be native-only: on web the document scrolls and no flex prop is applied (#676)",
+  );
+  // The composition that needs the bounded height: the three form
+  // shell pages render a default-variant ScreenContainer, and their
+  // content's shell hosts a flex: 1 scroll region. Pinning the
+  // composition (not just the flex prop's presence) is the
+  // layout-aware half of this regression coverage — if a page stops
+  // composing this way, or the scroll region stops flexing, this
+  // test forces a re-check of the #676 mechanism.
+  for (const page of ["EditRecipePage", "EditVersionPage", "ManualEntryPage"]) {
+    const pageCode = readCode(`src/pages/${page}.tsx`);
+    assert.match(
+      pageCode,
+      /<ScreenContainer>/,
+      `${page} must render the default-variant ScreenContainer whose native flex bounds its form body (#676)`,
+    );
+  }
+  const recipeFormCode = readCode("src/pages/RecipeFormPage.tsx");
+  assert.match(
+    recipeFormCode,
+    /scrollMode="content"/,
+    "RecipeFormPage must keep rendering its content-mode shell, whose native ScrollRegion flexes inside the default-variant ScreenContainer's bounded height (#676)",
   );
 });
 
@@ -160,6 +205,14 @@ test("SSR: the list variant's column carries NO flex on web (eciperay #526)", as
     renderedFlex(html, "ScreenContainer"),
     null,
     "on web the list variant must not generate a flex rule — flex: 1's zero basis collapses the column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry); the bounding flex is native-only",
+  );
+});
+test("SSR: the default variant's column carries NO flex on web (#676)", async () => {
+  const html = await renderShell({});
+  assert.equal(
+    renderedFlex(html, "ScreenContainer"),
+    null,
+    "on web the default variant must not generate a flex rule — flex: 1's zero basis collapses the column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry); the bounding flex is native-only (#676)",
   );
 });
 test("SSR: the shell's column carries the 16px gap with no caller gap (#299, #547)", async () => {
