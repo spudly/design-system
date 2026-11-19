@@ -281,24 +281,24 @@ test("the cook-log form slot replaces the Log a cook button while it renders con
   );
 });
 
-test("the sharing slot renders after the lifecycle section and before the tags", () => {
+test("the sharing section renders after the lifecycle section and before the tags", () => {
   const lifecycleAt = code.indexOf("<LifecycleSection");
   const sharingAt = code.indexOf("{sharingControls}");
   const tagsAt = code.indexOf("<TagList");
   assert.ok(lifecycleAt !== -1, "the lifecycle section renders in the overview");
   assert.ok(sharingAt > lifecycleAt, "sharing renders after the lifecycle section");
   assert.ok(tagsAt > sharingAt, "the tags render after the sharing slot");
-  assert.match(
+  assert.doesNotMatch(
     code,
-    /const sharingSlot = renderSharingControls \? renderSharingControls\(\) : null;/,
-    "the sharing slot is called once per render, only when provided",
+    /renderSharingControls/,
+    "the sharing render slot is removed (#682) — the data prop is the only path",
   );
   // #438 Part 3: the `sharing` data prop renders RecipeSharingView
-  // at the same position and takes precedence over the slot.
+  // at the same position.
   assert.match(
     code,
-    /const sharingControls = sharing \? <RecipeSharingView \{\.\.\.sharing\} \/> : sharingSlot;/,
-    "the sharing data prop renders the view at the slot's position",
+    /const sharingControls = sharing \? <RecipeSharingView \{\.\.\.sharing\} \/> : null;/,
+    "the sharing data prop renders the view at the section's position",
   );
 });
 
@@ -309,10 +309,15 @@ test("the comments slot renders in the overview panel after the ratings card", (
   assert.ok(commentsAt > ratingsAt, "comments render after the ratings card");
   // #438 Part 3: the `comments` data prop renders RecipeCommentsView
   // at the same position and takes precedence over the slot.
+  assert.doesNotMatch(
+    code,
+    /renderComments/,
+    "the comments render slot is removed (#682) — the data prop is the only path",
+  );
   assert.match(
     code,
-    /const comments = commentsData \? <RecipeCommentsView \{\.\.\.commentsData\} \/> : commentsSlot;/,
-    "the comments data prop renders the view at the slot's position",
+    /const comments = commentsData \? <RecipeCommentsView \{\.\.\.commentsData\} \/> : null;/,
+    "the comments data prop renders the view at the section's position",
   );
 });
 
@@ -429,10 +434,10 @@ test("stories exercise the states and the cook-log form slot", () => {
     /renderCookLogForm: \(\) =>/,
     "a story must pass the cook-log form slot with stand-in content",
   );
-  assert.match(
+  assert.doesNotMatch(
     storiesCode,
-    /renderSharingControls: \(\) =>/,
-    "a story must pass the sharing slot with stand-in content",
+    /renderSharingControls/,
+    "no story passes the removed sharing slot (#682)",
   );
   assert.match(
     storiesCode,

@@ -87,9 +87,10 @@ test("RecipeDetailPage renders the sharing / comments views and the confirmation
   assert.match(source, /comments\?: RecipeDetailPageComments \| null/);
   assert.match(source, /<RecipeSharingView \{\.\.\.sharing\} \/>/);
   assert.match(source, /<RecipeCommentsView \{\.\.\.commentsData\} \/>/);
-  // The render slots remain as the fallback for unmigrated hosts.
-  assert.match(source, /renderSharingControls\?: \(\) => ReactNode/);
-  assert.match(source, /renderComments\?: \(\) => ReactNode/);
+  // The sharing/comments render slots were removed in #682 — the
+  // data props above are the only paths.
+  assert.doesNotMatch(source, /renderSharingControls/);
+  assert.doesNotMatch(source, /renderComments/);
   assert.match(source, /recipeDeleteConfirmation\?: RecipeDetailPageConfirmation \| null/);
   assert.match(source, /cookLogDeleteConfirmation\?: RecipeDetailPageConfirmation \| null/);
   assert.match(source, /nutritionNotice\?: RecipeDetailPageConfirmation \| null/);

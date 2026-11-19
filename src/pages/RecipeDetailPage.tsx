@@ -94,21 +94,15 @@ import { STATUS_BADGES } from "./recipeStatusBadges.js";
  *   semantics as the accessory slot. The cook-log ENTRIES are
  *   display data and are view-modeled as props; only the form is
  *   slotted.
- * - `renderSharingControls` (overview): the sharing/visibility
- *   panel — it carries its own pending-selection state, a
- *   publishing-consent flow, share-token state, and two mutations.
- * - `renderComments` (overview, engagement stack): the comments
- *   section — its own query, compose/edit draft state, and three
- *   mutations, auth-gated.
- * #438 Part 3 view-modeled both sections after all, on the
- * ratings pattern below: RecipeSharingView and
+ * #438 Part 3 view-modeled the sharing and comments sections
+ * on the ratings pattern below: RecipeSharingView and
  * RecipeCommentsView compose the sections from the shared
- * widgets, with every piece of state the old rationale listed
- * (pending selection, consent flag, drafts, pending flags)
- * crossing as controlled props and every mutation staying
- * behind a callback. The overview's `sharing` and `comments`
- * data props render the views; the two render slots remain as
- * the fallback for hosts that have not migrated. The host's
+ * widgets, with every piece of state (pending selection,
+ * consent flag, drafts, pending flags) crossing as controlled
+ * props and every mutation staying behind a callback. The
+ * overview's `sharing` and `comments` data props render the
+ * views; their former render slots were removed in #682 — the
+ * data props are the only paths. The host's
  * four confirmation dialogs (recipe delete, cook-log delete,
  * version activation, nutrition notice) are view-modeled the
  * same way through ConfirmActionView, carried on the ready
@@ -298,23 +292,16 @@ export type RecipeDetailPageOverviewProps = {
   /** Engagement ratings card; omit to hide it. */
   ratings?: RecipeDetailPageRatings | null;
   onViewerRatingChange?: (stars: number | null) => void;
-  /** Slot: the app's sharing/visibility panel, rendered after the
-   * lifecycle section and before the tags — its position today. */
-  renderSharingControls?: () => ReactNode;
-  /** Slot: the app's comments section, rendered in the engagement
-   * stack under the ratings card. */
-  renderComments?: () => ReactNode;
   /**
    * The sharing section as data (#438 Part 3): renders
-   * RecipeSharingView at the slot's position. The data prop
-   * and the render slot are alternatives — when both are
-   * supplied, the data prop wins (it is the migrated form).
+   * RecipeSharingView after the lifecycle section and before
+   * the tags.
    */
   sharing?: RecipeDetailPageSharing | null;
   /**
    * The comments section as data (#438 Part 3): renders
-   * RecipeCommentsView at the slot's position, under the
-   * ratings card. Same alternative rule as `sharing`.
+   * RecipeCommentsView in the engagement stack, under the
+   * ratings card.
    */
   comments?: RecipeDetailPageComments | null;
 };
@@ -647,8 +634,6 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
     tags,
     ratings,
     onViewerRatingChange,
-    renderSharingControls,
-    renderComments,
     sharing,
     comments: commentsData,
   } = overview;
@@ -666,14 +651,9 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
     lifecycle !== undefined &&
     lifecycle !== null &&
     (lifecycle.isEditable || lifecycle.candidates.length > 0);
-  // The sections have two sources (#438 Part 3): the data
-  // props render the DS views; the render slots are the
-  // fallback for hosts that have not migrated. A slot is
-  // called once per render, only when provided.
-  const sharingSlot = renderSharingControls ? renderSharingControls() : null;
-  const commentsSlot = renderComments ? renderComments() : null;
-  const sharingControls = sharing ? <RecipeSharingView {...sharing} /> : sharingSlot;
-  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : commentsSlot;
+  // The sections render from their data props (#438 Part 3).
+  const sharingControls = sharing ? <RecipeSharingView {...sharing} /> : null;
+  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : null;
 
   return (
     <PanelStack>

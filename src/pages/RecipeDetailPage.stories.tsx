@@ -117,7 +117,6 @@ function RecipeDetailPageDemo({
   variant = "full",
   initialMissing = [],
   cookLogFormOpen = false,
-  showPanelSlots = false,
   createDraft = false,
   withCoverageSections = false,
   activationConfirmationOpen = false,
@@ -125,7 +124,6 @@ function RecipeDetailPageDemo({
   variant?: "full" | "minimal";
   initialMissing?: string[];
   cookLogFormOpen?: boolean;
-  showPanelSlots?: boolean;
   createDraft?: boolean;
   withCoverageSections?: boolean;
   activationConfirmationOpen?: boolean;
@@ -224,16 +222,6 @@ function RecipeDetailPageDemo({
         viewer: isFull ? { value: viewerRating } : null,
       },
       onViewerRatingChange: setViewerRating,
-      ...(showPanelSlots
-        ? {
-            renderSharingControls: () => (
-              <SlotStandIn label="Sharing controls render here (app-side fixture stand-in)" />
-            ),
-            renderComments: () => (
-              <SlotStandIn label="Comments render here (app-side fixture stand-in)" />
-            ),
-          }
-        : {}),
       ...(withCoverageSections
         ? {
             sharing: {
@@ -375,7 +363,7 @@ function RecipeDetailPageDemo({
 }
 
 export const Default: Story = {
-  render: () => <RecipeDetailPageDemo showPanelSlots />,
+  render: () => <RecipeDetailPageDemo withCoverageSections />,
 };
 
 export const Minimal: Story = {
@@ -445,7 +433,7 @@ export const SharingAndComments: Story = {
 export const LoadingOverlay: Story = {
   render: () => (
     <View width={430} maxWidth="100%" height={844} position="relative">
-      <RecipeDetailPageDemo showPanelSlots />
+      <RecipeDetailPageDemo withCoverageSections />
       <View
         position="absolute"
         top={0}
