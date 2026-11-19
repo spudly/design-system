@@ -1,14 +1,12 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { CheckRow } from "../widgets/CheckRow.js";
 import { EmptyState } from "../widgets/EmptyState.js";
 import { ListStack } from "../widgets/ListStack.js";
+import { LoadingListRow } from "../widgets/LoadingListRow.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
-import { XStack, YStack } from "tamagui";
 
 /**
  * ShoppingListPage (#125, B3b): a meal plan's shopping list —
@@ -98,19 +96,7 @@ export function ShoppingListPage({
             <LoadingScope active>
               <ListStack>
                 {LOADING_LINE_KEYS.map((key) => (
-                  <XStack
-                    key={key}
-                    alignItems="flex-start"
-                    gap="$3"
-                    paddingVertical="$3"
-                    borderBottomWidth={1}
-                    borderBottomColor="transparent"
-                  >
-                    <BoxSkeleton width={24} height={24} />
-                    <YStack flex={1}>
-                      <TextSkeleton size="md" lines={1} />
-                    </YStack>
-                  </XStack>
+                  <LoadingListRow key={key} />
                 ))}
               </ListStack>
             </LoadingScope>

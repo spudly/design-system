@@ -53,14 +53,18 @@ const page = readCode("src/pages/LandingPage.tsx");
 const stories = readCode("src/pages/LandingPage.stories.tsx");
 const pagesIndex = readCode("src/pages/index.ts");
 const fixtures = readCode("src/pages/fixtures.ts");
-// The page's sections are composed inline in the page itself:
-// an earlier #119 tranche cut extracted them as Hero / CtaRow /
-// FeatureCard / CardGrid library components, but Stephen's
-// no-new-components rule for tranche PRs (2026-10-29) folded
-// them back — they had no second consumer. Every scan below
-// pins against the page source, which is where the treatments
-// now live.
-const landingUnit = page;
+// The page's sections are composed from DS widgets: an earlier
+// #119 tranche cut extracted them as Hero / CtaRow / FeatureCard
+// library components and folded them back (they had no second
+// consumer), and #119 tranche 2 re-extracted the sections'
+// geometry into the HeroStack / StackedButtonRow / CardGrid
+// widgets. Scans pin against the page plus those widgets'
+// sources, which is where the treatments now live.
+const landingUnit =
+  page +
+  readCode("src/widgets/HeroStack.tsx") +
+  readCode("src/widgets/StackedButtonRow.tsx") +
+  readCode("src/widgets/CardGrid.tsx");
 test("LandingPage source is readable and exports the page and its view-model types", () => {
   assert.ok(page.length > 1000, "expected the full LandingPage source");
   assert.match(page, /export function LandingPage/);
@@ -127,9 +131,10 @@ test("the CTAs render through Button's href form fed by the CTA data", () => {
   assert.ok(!page.includes("CtaLink"), "the page must not render the deleted CtaLink");
 });
 test("the CTA container stacks narrow and rows on web — no wrapping CTA row", () => {
+  assert.match(page, /<StackedButtonRow>/, "the CTAs render in the StackedButtonRow widget");
   assert.match(
-    page,
-    /<YStack flexDirection="web:row" gap="\$3" alignItems="center" justifyContent="center">/,
+    landingUnit,
+    /<YStack\s+flexDirection="web:row"\s+gap=\{tokens\.spacing\[3\]\}\s+alignItems="center"\s+justifyContent="center"\s*>/,
     "the CTA row must become a row only on web — the #171 contract is stacked narrow / row on wide, and its narrow rendering is the native one while wide is web (the DS config defines no width breakpoints)",
   );
   assert.equal(
@@ -137,7 +142,7 @@ test("the CTA container stacks narrow and rows on web — no wrapping CTA row", 
     1,
     "only the feature grid may flexWrap — a wrapping CTA row could seat two CTAs side by side at the 430px story viewport instead of the contracted stack",
   );
-  assert.match(page, /flexWrap="wrap"/, "the one flexWrap is the feature grid's");
+  assert.match(landingUnit, /flexWrap="wrap"/, "the one flexWrap is the feature grid's");
 });
 test("frame structure: ScreenContainer shell, sections in hero → CTAs → features order", () => {
   assert.match(

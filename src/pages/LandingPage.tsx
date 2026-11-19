@@ -1,8 +1,10 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { XStack, YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
+import { CardGrid } from "../widgets/CardGrid.js";
+import { HeroStack } from "../widgets/HeroStack.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import { StackedButtonRow } from "../widgets/StackedButtonRow.js";
 import { Text } from "../widgets/Text.js";
 
 /**
@@ -35,17 +37,17 @@ import { Text } from "../widgets/Text.js";
  * and adding a fourth feature later is a deliberate contract
  * change, not a longer array from the host.
  *
- * The page composes its sections directly (#119; Stephen's
- * no-new-components rule for tranche PRs, 2026-10-29): the hero,
- * the CTA row, and the feature grid are page-local composition,
- * not library components — the hero's centering and top
- * breathing room, the CTA row's geometry, the cards' flex and
- * 260px wrap basis, and the grid's wrap are this page's design,
- * rendered here from the shared primitives (Text, Button, Card,
- * and the Tamagui stacks). An earlier tranche cut extracted
- * them as Hero / CtaRow / FeatureCard / CardGrid library
- * components; they had no second consumer, so they were folded
- * back into the page.
+ * The page composes DS components only (#119): the sections'
+ * geometry now lives in the named widgets (tranche 2) — the
+ * hero's centering and top breathing room in HeroStack, the
+ * CTA row's geometry in StackedButtonRow, and the cards' flex,
+ * 260px wrap basis, and the grid's wrap in CardGrid — so the
+ * page passes only content (Text, Button, Card) and applies no
+ * styling of its own. An earlier tranche cut extracted them as
+ * Hero / CtaRow / FeatureCard library components; they had no
+ * second consumer, so they were folded back into the page, and
+ * tranche 2 re-extracted the geometry under the widget names
+ * above.
  *
  * CTA row geometry (#171): the CTAs under the hero stack
  * narrow and row on wide. The DS Tamagui config defines no
@@ -100,15 +102,15 @@ export function LandingPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <YStack alignItems="center" gap="$3" paddingTop="$6">
+        <HeroStack>
           <Text variant="heading" textAlign="center">
             {heroTitle}
           </Text>
           <Text color="$textMuted" textAlign="center">
             {heroSubtitle}
           </Text>
-        </YStack>
-        <YStack flexDirection="web:row" gap="$3" alignItems="center" justifyContent="center">
+        </HeroStack>
+        <StackedButtonRow>
           <Button href={discoverCta.href} variant="primary">
             {discoverCta.label}
           </Button>
@@ -118,15 +120,15 @@ export function LandingPage({
           <Button href={getAppCta.href} variant="secondary">
             {getAppCta.label}
           </Button>
-        </YStack>
-        <XStack flexWrap="wrap" gap="$3">
+        </StackedButtonRow>
+        <CardGrid>
           {[featureOne, featureTwo, featureThree].map((feature) => (
-            <Card key={feature.title} flex={1} flexBasis={260} gap="$2">
+            <Card key={feature.title}>
               <Text variant="subheading">{feature.title}</Text>
               <Text color="$textMuted">{feature.description}</Text>
             </Card>
           ))}
-        </XStack>
+        </CardGrid>
       </ScreenContainer>
     </BigFooterShell>
   );
