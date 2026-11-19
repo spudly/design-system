@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { AccessTokensPanel } from "../views/AccessTokensPanel.js";
-import { CheckboxField } from "../views/CheckboxField.js";
 import { NutritionGoalsForm } from "../views/NutritionGoalsForm.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { accessTokensFixture, nutritionGoalsFixture, eciperayFooterFixture } from "./fixtures.js";
@@ -19,10 +18,8 @@ type Story = StoryObj<typeof ProfilePage>;
 /**
  * The slots are host-rendered: the nutrition goals and access
  * tokens sections are the DS section components fed fixture
- * data here (their app containers feed them live data), the
- * feedback preference is the app's container (a DS
- * CheckboxField stands in for its shape), and the legal links
- * are the app's LegalLinks.
+ * data here (their app containers feed them live data), and
+ * the legal links are the app's LegalLinks.
  */
 export const WithSections: Story = {
   render: () => (
@@ -50,13 +47,16 @@ export const WithSections: Story = {
             />
           </YStack>
         }
-        feedbackPreference={
-          <CheckboxField
-            label="Send product feedback prompts"
-            checked
-            onCheckedChange={() => undefined}
-          />
-        }
+        feedbackPreferenceSection={{
+          shortcutEnabled: true,
+          onShortcutEnabledChange: () => undefined,
+          consent: true,
+          consentStatusText: "Analytics consent: Accepted",
+          onAcceptConsent: () => undefined,
+          onDeclineConsent: () => undefined,
+          onWithdrawConsent: () => undefined,
+          choicesHref: "/privacy/consent",
+        }}
         legalLinks={
           <YStack gap="$2">
             <TextLink onPress={() => undefined}>Terms of Service</TextLink>

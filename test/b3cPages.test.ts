@@ -149,15 +149,13 @@ test("auth cross-links render their href destinations (#248)", () => {
 
 test("ProfilePage exposes the section and legal slots in the app view's order", () => {
   const source = page("ProfilePage");
-  for (const slot of [
-    "sectionsBeforeFeedback",
-    "feedbackPreference",
-    "sectionsAfterFeedback",
-    "legalLinks",
-  ]) {
+  for (const slot of ["sectionsBeforeFeedback", "sectionsAfterFeedback", "legalLinks"]) {
     assert.match(source, new RegExp(String.raw`${slot}\?:`), `${slot} is a prop`);
   }
-  const feedbackAt = source.indexOf("{feedbackPreference}");
+  // #680: the feedbackPreference ReactNode slot is removed — the
+  // feedbackPreferenceSection data prop is the only path.
+  assert.doesNotMatch(source, /feedbackPreference\?: ReactNode/);
+  const feedbackAt = source.indexOf("{feedbackPreferenceSection ? (");
   const beforeAt = source.indexOf("{sectionsBeforeFeedback}");
   const afterAt = source.indexOf("{sectionsAfterFeedback}");
   assert.ok(beforeAt !== -1 && beforeAt < feedbackAt && feedbackAt < afterAt, "slot order");
