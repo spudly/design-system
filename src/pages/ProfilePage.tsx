@@ -42,11 +42,6 @@ type ProfilePageAccessTokens = AccessTokensPanelProps;
  * - `sectionsBeforeFeedback` — any remaining app section
  *   hosts, rendered after the covered before-feedback
  *   sections.
- * - `feedbackPreference` — the app's feedback-preference
- *   container (a hook + analytics-config flag — business logic
- *   that stays app-side per the audit) rendered at the exact
- *   position the app view renders it, between the two section
- *   slots.
  * - `sectionsAfterFeedback` — any remaining app sections.
  * - `legalLinks` — the Legal section's links are app content
  *   (the URLs are app constants; the B2 audit keeps
@@ -78,7 +73,6 @@ export type ProfilePageProps = {
    * renders only when the href is provided. */
   showcaseHref?: string;
   sectionsBeforeFeedback?: ReactNode;
-  feedbackPreference?: ReactNode;
   sectionsAfterFeedback?: ReactNode;
   /** The app's LegalLinks, rendered inside the Legal section. */
   legalLinks?: ReactNode;
@@ -89,10 +83,7 @@ export type ProfilePageProps = {
    * sections, `feedbackPreferenceSection` at the feedback
    * position, `transfer` and `accountData` with the
    * after-feedback sections — and the ReactNode slots stay as
-   * the fallback for sections the DS does not cover. A data
-   * prop and its slot position's ReactNode are alternatives:
-   * when both are supplied for the feedback position, the slot
-   * wins (it is the more specific composition).
+   * the fallback for sections the DS does not cover.
    *
    * `nutritionGoals` and `accessTokens` (#511) render at the
    * before-feedback position, in that order, immediately
@@ -114,7 +105,6 @@ export function ProfilePage({
   tagsHref,
   showcaseHref,
   sectionsBeforeFeedback,
-  feedbackPreference,
   sectionsAfterFeedback,
   legalLinks,
   subscription,
@@ -144,8 +134,7 @@ export function ProfilePage({
             Manage Tags
           </Button>
         ) : null}
-        {feedbackPreference}
-        {!feedbackPreference && feedbackPreferenceSection ? (
+        {feedbackPreferenceSection ? (
           <FeedbackPreferenceView {...feedbackPreferenceSection} />
         ) : null}
         {transfer ? <TransferRecipesView {...transfer} /> : null}
