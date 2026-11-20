@@ -1,10 +1,11 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { useEffect, useRef } from "react";
+import { Fragment, useEffect, useRef } from "react";
 import type { LayoutChangeEvent } from "react-native";
-import { View, YStack, isWeb } from "tamagui";
-import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { Alert } from "../widgets/Alert.js";
-import { Card } from "../widgets/Card.js";
+import { CatalogCardColumn } from "../widgets/CatalogCardColumn.js";
+import { CatalogListColumn } from "../widgets/CatalogListColumn.js";
+import { CatalogRow } from "../widgets/CatalogRow.js";
+import { isWeb } from "../widgets/platform.js";
 import {
   CatalogFiltersBar,
   type CatalogFilterDefinition,
@@ -13,15 +14,15 @@ import {
 import { CatalogHeader } from "../views/CatalogHeader.js";
 import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
 import { EmptyState } from "../widgets/EmptyState.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import type { SelectOption } from "../widgets/SelectField.js";
+import { LoadingMediaRow } from "../widgets/LoadingMediaRow.js";
+import { ScrollSentinel } from "../widgets/ScrollSentinel.js";
 import { Text } from "../widgets/Text.js";
 import { RatingForm } from "../views/RatingForm.js";
 import { BoundedList } from "./BoundedList.js";
-import { RecipeRow, textBlockStyle, type RecipeRowItem } from "./recipeRow.js";
+import { RecipeRow, type RecipeRowItem } from "./recipeRow.js";
 import type { DiscoverPageItem } from "./DiscoverPage.js";
 import { useCatalogPagination } from "./useCatalogPagination.js";
 
@@ -710,7 +711,7 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
     });
   });
   if (!isWeb) return null;
-  return <View ref={ref as never} style={{ height: 1 }} testID="catalog-scroll-sentinel" />;
+  return <ScrollSentinel sentinelRef={ref} />;
 }
 
 /**
@@ -984,9 +985,9 @@ export function RecipesPage(props: RecipesPageProps) {
     switch (row.kind) {
       case "ownHeading":
         return (
-          <YStack paddingBlockEnd="$3">
+          <CatalogRow>
             <SectionHeading>{ownTitle}</SectionHeading>
-          </YStack>
+          </CatalogRow>
         );
       case "ownRecipe": {
         const item = row.item;
@@ -1028,21 +1029,21 @@ export function RecipesPage(props: RecipesPageProps) {
         );
       case "discoveryHeading":
         return (
-          <YStack paddingBlockEnd="$3">
+          <CatalogRow>
             <SectionHeading>{row.title}</SectionHeading>
-          </YStack>
+          </CatalogRow>
         );
       case "discoveryRecipe": {
         const item = row.item;
         return (
-          <YStack paddingBlockEnd="$3">
+          <CatalogRow>
             <DiscoveryCard
               title={item.title}
               {...(item.subtitle ? { subtitle: item.subtitle } : {})}
               imageUrl={item.imageUrl}
               href={item.href}
             />
-          </YStack>
+          </CatalogRow>
         );
       }
       case "discoveryLoadMoreError":
@@ -1095,7 +1096,7 @@ export function RecipesPage(props: RecipesPageProps) {
   // Both signed-in layouts (the web column and the native
   // list's header) render this one composition, so the
   // separation holds in the loaded and loading states alike.
-  const filtersHeader = <YStack paddingBlockEnd="$3">{filtersBar}</YStack>;
+  const filtersHeader = <CatalogRow>{filtersBar}</CatalogRow>;
 
   if (variant === "public") {
     const publicItems: DiscoverPageItem[] = publicLoading ? [] : (publicRecipes ?? []);
@@ -1106,7 +1107,7 @@ export function RecipesPage(props: RecipesPageProps) {
       return (
         <BigFooterShell footer={props.footer} scrollMode="content">
           <ScreenContainer variant="list">
-            <YStack paddingHorizontal="$4" paddingBottom="$8" gap="$3">
+            <CatalogCardColumn>
               <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
               {publicLoading ? (
                 <LoadingDiscoveryRows />
@@ -1135,7 +1136,7 @@ export function RecipesPage(props: RecipesPageProps) {
                   },
                 ]}
               />
-            </YStack>
+            </CatalogCardColumn>
           </ScreenContainer>
         </BigFooterShell>
       );
@@ -1198,10 +1199,10 @@ export function RecipesPage(props: RecipesPageProps) {
     return (
       <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
-          <YStack paddingHorizontal="$4" paddingBottom="$8">
+          <CatalogListColumn>
             {filtersHeader}
             {rows.map((row) => (
-              <YStack key={recipesPageRowKey(row)}>{renderRow(row)}</YStack>
+              <Fragment key={recipesPageRowKey(row)}>{renderRow(row)}</Fragment>
             ))}
             {isFetchingNextPage && !discoveryLoadMoreErrorMessage ? <LoadingOwnRows /> : null}
             <WebScrollSentinel
@@ -1218,7 +1219,7 @@ export function RecipesPage(props: RecipesPageProps) {
                 },
               ]}
             />
-          </YStack>
+          </CatalogListColumn>
         </ScreenContainer>
       </BigFooterShell>
     );
@@ -1278,32 +1279,17 @@ const LOADING_ROW_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
 /**
  * A loading own section's rows: 3 dummy rows in the MediaRow
- * shape — an elevated card holding a 64dp box bone where the
- * thumbnail sits and title/subtitle bones at the row's text
- * sizes, the region marked busy, no link and no real content.
- * MediaRow itself is a page-local composition with no loading
- * state, so its skeleton is composed here in its shape.
+ * shape, rendered as LoadingMediaRows — the widget owns the
+ * skeleton's shape (an elevated card holding a 64dp box bone
+ * where the thumbnail sits and title/subtitle bones at the
+ * row's text sizes, the region marked busy), no link and no
+ * real content.
  */
 function LoadingOwnRows() {
   return (
     <>
       {LOADING_ROW_KEYS.map((key) => (
-        <YStack key={key} paddingBlockEnd="$3">
-          <Card
-            variant="elevated"
-            flexDirection="row"
-            flexWrap="wrap"
-            alignItems="center"
-            gap="$3"
-            {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
-          >
-            <BoxSkeleton width={64} height={64} />
-            <YStack style={textBlockStyle} gap="$1">
-              <TextSkeleton size="md" lines={1} />
-              <TextSkeleton size="sm" lines={1} />
-            </YStack>
-          </Card>
-        </YStack>
+        <LoadingMediaRow key={key} />
       ))}
     </>
   );
@@ -1323,9 +1309,9 @@ function LoadingDiscoveryRows({ variant = "standalone" }: { variant?: "section" 
     <>
       {LOADING_ROW_KEYS.map((key) =>
         variant === "section" ? (
-          <YStack key={key} paddingBlockEnd="$3">
+          <CatalogRow key={key}>
             <DiscoveryCard title="Recipe" subtitle="Recipe details" href="/loading" loading />
-          </YStack>
+          </CatalogRow>
         ) : (
           <DiscoveryCard
             key={key}

@@ -1637,7 +1637,13 @@ test("T4: RecipesPage's loading sections and footers render the skeleton rows", 
   );
   assert.match(
     code,
-    /function LoadingOwnRows\(\) \{[\s\S]*?<BoxSkeleton width=\{64\} height=\{64\} \/>/,
+    /function LoadingOwnRows\(\) \{[\s\S]*?<LoadingMediaRow key=\{key\} \/>/,
+    "the own skeleton rows render as LoadingMediaRows",
+  );
+  const mediaRow = readCode("src/widgets/LoadingMediaRow.tsx");
+  assert.match(
+    mediaRow,
+    /<BoxSkeleton width=\{64\} height=\{64\} \/>/,
     "the own skeleton rows mirror MediaRow's 64dp thumbnail geometry",
   );
   assert.match(

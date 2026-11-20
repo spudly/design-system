@@ -191,7 +191,7 @@ describe("recipesPageBoundedList", () => {
     );
     assert.match(
       code,
-      /const filtersHeader = <YStack paddingBlockEnd="\$3">\{filtersBar\}<\/YStack>;/,
+      /const filtersHeader = <CatalogRow>\{filtersBar\}<\/CatalogRow>;/,
       "the bar's wrapper carries the $3 bottom separation, so the first section heading sits the list's 12px below the search bar in both layouts",
     );
   });
