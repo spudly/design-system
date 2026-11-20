@@ -54,6 +54,53 @@ export const PlansTab: Story = {
   ),
 };
 
+// #705 regression coverage: a long plan list at narrow width —
+// the footer must land below the last plan card, never mid-list.
+const LONG_PLANS = Array.from({ length: 12 }, (_, i) => ({
+  id: `long-plan-${i + 1}`,
+  href: `/meal-plans/long-plan-${i + 1}`,
+  title: `Meal plan ${i + 1}`,
+  subtitle: "7 entries · 2026-11-02 – 2026-11-08",
+}));
+
+export const PlansTabLongListNarrow: Story = {
+  render: () => (
+    <View width={864}>
+      <MealsHubPage
+        footer={eciperayFooterFixture}
+        activeTab="plans"
+        onSelectTab={() => undefined}
+        meals={mealsHubFixture.meals}
+        plans={LONG_PLANS}
+        loading={false}
+        createMealHref="/meals/new"
+        createPlanHref="/meal-plans/new"
+        onDeleteMeal={() => undefined}
+        onDeletePlan={() => undefined}
+      />
+    </View>
+  ),
+};
+
+export const PlansTabLongListNarrowLoading: Story = {
+  render: () => (
+    <View width={864}>
+      <MealsHubPage
+        footer={eciperayFooterFixture}
+        activeTab="plans"
+        onSelectTab={() => undefined}
+        meals={mealsHubFixture.meals}
+        plans={LONG_PLANS}
+        loading
+        createMealHref="/meals/new"
+        createPlanHref="/meal-plans/new"
+        onDeleteMeal={() => undefined}
+        onDeletePlan={() => undefined}
+      />
+    </View>
+  ),
+};
+
 export const Empty: Story = {
   render: () => (
     <>

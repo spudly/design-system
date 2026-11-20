@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 
 export type PinnedHeaderShellProps = {
@@ -7,9 +7,10 @@ export type PinnedHeaderShellProps = {
    * rendered in the shell's padded header block and held above
    * the content region while the content scrolls itself. */
   header: ReactNode;
-  /** The shell's content region: it fills the height the header
-   * leaves and manages its own scrolling (a page composed under
-   * the chrome, a list). */
+  /** The shell's content region: on native it fills the height
+   * the header leaves and manages its own scrolling (a page
+   * composed under the chrome, a list); on web it grows in
+   * normal document flow (#705 — see the component note). */
   children: ReactNode;
 };
 
@@ -26,10 +27,22 @@ export type PinnedHeaderShellProps = {
  * nested-shell failure). The header's own internal rhythm
  * belongs to the header content (a SectionStack, say); the
  * shell adds none.
+ *
+ * Platform split (#705, the #547 page-scroll contract): on
+ * native the root is the bounded `flex: 1` frame, which gives
+ * the content region's own scroller its height. On web there
+ * is no content scroller inside a footer shell — the document
+ * scrolls — so the root only grows (`flexGrow: 1`, no bounded
+ * basis): its height is content-driven, and a footer shell
+ * composed around it places its footer below the last content
+ * item instead of mid-list over it.
  */
 export function PinnedHeaderShell({ header, children }: PinnedHeaderShellProps) {
   return (
-    <YStack flex={1} backgroundColor={tokens.colors.gray.gray1}>
+    <YStack
+      {...(isWeb ? { flexGrow: 1 } : { flex: 1 })}
+      backgroundColor={tokens.colors.gray.gray1}
+    >
       <YStack paddingHorizontal="$4" paddingTop="$4">
         {header}
       </YStack>
