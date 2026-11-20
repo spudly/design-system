@@ -158,9 +158,11 @@ export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";
 export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
   NutritionPanel,
+  type NutritionFact,
+  type NutritionFactKind,
+  type NutritionFacts,
   type NutritionPanelData,
   type NutritionPanelProps,
-  type NutritionPanelRow,
 } from "./NutritionPanel.js";
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
