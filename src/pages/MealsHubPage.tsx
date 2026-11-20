@@ -58,8 +58,9 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * BigFooterShell encloses the PinnedHeaderShell (header plus
  * MealPlansPage) so the shell's viewport minimum spans the
  * full pinned layout, and MealPlansPage is rendered without a
- * footer prop — its list keeps its bounded scroll region
- * inside the hub's shell.
+ * footer prop. On web its list grows in document flow inside
+ * the hub's shell (#705); on native it keeps its bounded
+ * scroll region inside the hub's shell.
  *
  * De-styled for #119: the page composes DS components only.
  * The chrome is a SectionStack (the "Meals" title in Text's
@@ -150,9 +151,12 @@ export function MealsHubPage({
     // edge about one header height below the viewport bottom
     // on a short plan list. MealPlansPage therefore receives
     // NO footer here: with no footer data its own shell is just
-    // the growing column, and its ScreenContainer keeps the
-    // bounded scroll region under the header inside the hub's
-    // shell — exactly one footer renders on this tab. Native
+    // the growing column — on web its content grows in document
+    // flow under the header inside the hub's shell (#705: the
+    // PinnedHeaderShell root is a growing column on web, so the
+    // hub footer lands below the last plan card); on native its
+    // ScreenContainer keeps the bounded scroll region under the
+    // header — exactly one footer renders on this tab. Native
     // scroll ownership (PR #556 review): the hub shell is in
     // "content" mode — a bounded frame with NO ScrollView — so
     // MealPlansPage's own shell ScrollView is the plans tab's

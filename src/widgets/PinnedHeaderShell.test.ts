@@ -10,7 +10,11 @@
  * the content region owns its own top spacing), and the shell
  * renders no scroller of its own (the #188 constraint: the
  * content scrolls itself, never nested inside the shell's
- * scroll view).
+ * scroll view). The root frame is platform-split (#705): the
+ * bounded `flex: 1` frame is native-only — on web the root
+ * only grows (`flexGrow: 1`), so content height is
+ * content-driven inside a footer shell and the footer lands
+ * below the last content item (#547).
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -34,8 +38,16 @@ test("PinnedHeaderShell is exported from the built internal components barrel", 
 });
 
 test("the shell paints the page background and insets the header block", () => {
-  assert.match(code, /<YStack flex=\{1\} backgroundColor=\{tokens\.colors\.gray\.gray1\}>/);
+  assert.match(code, /backgroundColor=\{tokens\.colors\.gray\.gray1\}/);
   assert.match(code, /<YStack paddingHorizontal="\$4" paddingTop="\$4">/);
+});
+
+test("the bounded root frame is native-only — web grows in document flow (#705)", () => {
+  assert.match(code, /isWeb \? \{ flexGrow: 1 \} : \{ flex: 1 \}/);
+  assert.ok(
+    !/<YStack\b[^>]*\bflex=\{1\}/.test(code),
+    "the root must not carry an unconditional bounded flex: 1 frame",
+  );
 });
 
 test("the shell renders no scroller — the content region scrolls itself (#188)", () => {
