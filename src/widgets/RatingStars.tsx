@@ -5,7 +5,7 @@ import { Text } from "./Text.js";
 
 const STAR_STEPS = [1, 2, 3, 4, 5] as const;
 
-export type RatingStarsBase = {
+type RatingStarsBase = {
   /** Display rating, 0–5, or null/absent when unrated. The app
    * computes it by its display-rating rule; the composition
    * renders it and never formats it into text. */
