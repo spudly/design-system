@@ -56,3 +56,31 @@ test("the shell renders no scroller — the content region scrolls itself (#188)
   assert.match(code, /header: ReactNode;/);
   assert.match(code, /children: ReactNode;/);
 });
+
+const storySource = readFileSync(join(here, "PinnedHeaderShell.stories.tsx"), "utf8");
+const storyCode = storySource
+  .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+  .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
+test("the story demonstrates the pinning: bound frame, overflowing content, header outside the scroller (#723)", () => {
+  // The frame's height binds, so the content region has a
+  // definite height to overflow.
+  assert.match(storyCode, /height=\{480\}/);
+  // The content decisively overflows the frame — with too few
+  // lines nothing scrolls and the pinning is unobservable.
+  const count = storyCode.match(/length: (\d+)/);
+  assert.ok(count, "the story must generate its content lines from a length");
+  assert.ok(
+    Number(count[1]) >= 25,
+    `the story's content must overflow the 480px frame (got ${count?.[1]} lines)`,
+  );
+  // The story composes a bounded scroller as the shell's
+  // children — the self-scrolling page a real consumer
+  // composes — while the header is passed as the shell's
+  // header prop, outside that scroller.
+  assert.match(storyCode, /<ScrollView flex=\{1\}>/);
+  assert.ok(
+    storyCode.indexOf("header={") < storyCode.indexOf("<ScrollView"),
+    "the header must be composed outside the story's scroller",
+  );
+});
