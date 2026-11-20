@@ -21,7 +21,7 @@ beside a medium text bone.
 1. The three rows render as a 24px box bone beside a medium text
    bone, top-aligned with 12px gaps and 12px vertical padding
    (ShoppingListPage's loading list is the live case), and the
-   bones mirror the loaded CheckRow's checkbox and label sizes.
+   bones mirror the loaded CheckboxField list row's checkbox and label sizes.
 
 **Run when:** `src/widgets/LoadingListRow.tsx`, its stories,
 the pages that compose LoadingListRow (ShoppingListPage), or a

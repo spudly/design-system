@@ -3,7 +3,7 @@ component: ShoppingListPage
 run_when:
   - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
-  - "src/widgets/CheckRow.tsx, its stories, ShoppingListPage's list, or a changeset naming CheckRow."
+  - "src/widgets/CheckboxField.tsx, its stories, ShoppingListPage's list, or a changeset naming CheckboxField."
 ---
 
 # ShoppingListPage — manual test steps
@@ -60,7 +60,8 @@ FirstStep, LastStep, LoadError.
 3. ShoppingListPage Default: each line's box, medium-weight
    (500) name, and muted quantity / "optional" segments
    render on one line;
-   checking a line fills its box and strikes the line through.
+   checking a line shows a primary-colored check in its
+   still-unfilled box and strikes the line through.
    Loading shows the spinner under the title; Empty shows the
    empty state.
 4. HomePage WithRecipes: hero title, centered muted subtitle,
@@ -85,19 +86,22 @@ FirstStep, LastStep, LoadError.
 changeset naming any of them. Run only the numbered cases for
 the page(s) that changed.
 
-## CheckRow
+## CheckboxField list shape (ShoppingListPage's row)
 
-Open in `Widgets/CheckRow`: Default, Checked, LabelOnly.
+Open in `Widgets/CheckboxField`: ListShape, ListShapeChecked,
+ListShapeWrappedLabel.
 
-1. Default: an outlined box sits left of a medium-weight
-   (500) label with its muted detail ("2 tbsp · optional")
-   on the same line, over a hairline; the whole row is the
-   press target (pointer cursor on web, Enter/Space toggle
-   it, the story's row checks and unchecks).
-2. Checked: the box fills with the primary color and a check
-   glyph, and the label renders muted and struck through.
-3. LabelOnly: no detail segment renders — the label stands
-   alone with no trailing separator.
+1. ListShape: an unfilled outlined box sits left of a
+   medium-weight (500) label with its muted detail
+   ("2 tbsp · optional") on the same line, over a hairline;
+   the whole row is the press target (pointer cursor on web,
+   Enter/Space toggle it via the row's checkbox, the story's
+   row checks and unchecks).
+2. ListShapeChecked: the box stays unfilled with a
+   primary-colored check glyph, and the label renders muted
+   and struck through.
+3. ListShapeWrappedLabel: the label wraps and the box stays
+   aligned to the label's first line.
 
-**Run when:** `src/widgets/CheckRow.tsx`, its stories,
-ShoppingListPage's list, or a changeset naming CheckRow.
+**Run when:** `src/widgets/CheckboxField.tsx`, its stories,
+ShoppingListPage's list, or a changeset naming CheckboxField.

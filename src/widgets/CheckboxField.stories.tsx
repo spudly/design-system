@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
 import { CheckboxField } from "./CheckboxField.js";
 import { Text } from "./Text.js";
 import { TextLink } from "./TextLink.js";
@@ -96,6 +97,57 @@ export const WithError: Story = {
         checked={checked}
         onCheckedChange={setChecked}
       />
+    );
+  },
+};
+
+export const ListShape: Story = {
+  render: () => {
+    const [checked, setChecked] = useState(false);
+    return (
+      <YStack maxWidth={430}>
+        <CheckboxField
+          label="Olive oil"
+          detail="2 tbsp · optional"
+          separator
+          strikeWhenChecked
+          checked={checked}
+          onCheckedChange={setChecked}
+        />
+      </YStack>
+    );
+  },
+};
+
+export const ListShapeChecked: Story = {
+  render: () => (
+    <YStack maxWidth={430}>
+      <CheckboxField
+        label="Eggs"
+        detail="1 dozen"
+        separator
+        strikeWhenChecked
+        checked
+        onCheckedChange={() => {}}
+      />
+    </YStack>
+  ),
+};
+
+export const ListShapeWrappedLabel: Story = {
+  render: () => {
+    const [checked, setChecked] = useState(false);
+    return (
+      <YStack maxWidth={260}>
+        <CheckboxField
+          label="Extra virgin olive oil, cold pressed, for the dressing and the pan"
+          detail="2 tbsp · optional"
+          separator
+          strikeWhenChecked
+          checked={checked}
+          onCheckedChange={setChecked}
+        />
+      </YStack>
     );
   },
 };

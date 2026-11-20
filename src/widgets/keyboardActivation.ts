@@ -1,6 +1,6 @@
 /**
  * The shared web keyboard-activation handler for view-based
- * press targets (the row family: CardRow, CheckRow, MarkableRow).
+ * press targets (the row family: CardRow, MarkableRow).
  *
  * A Tamagui view carrying an accessibility role is not
  * keyboard-operable on its own, so the pressable rows make it
