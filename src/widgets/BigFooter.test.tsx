@@ -164,8 +164,9 @@ test("the shell reserves viewport height only when a footer is supplied", () => 
   const noFooterBranch = bigFooter.indexOf("if (!footer)");
   assert.ok(noFooterBranch >= 0, "BigFooterShell handles the no-footer case explicitly");
   assert.ok(
-    noFooterBranch < bigFooter.indexOf('minHeight={{ default: "100%", web: "100dvh" }}'),
-    "the no-footer branch precedes the viewport-height shell",
+    noFooterBranch <
+      bigFooter.indexOf('minHeight={{ default: "100%", web: "100dvh" }}', noFooterBranch),
+    "the no-footer branch precedes the with-footer viewport-height shell",
   );
   assert.match(bigFooter, /padding: tokens\.spacing\[3\]/, "social links keep a ≥44px target");
 });
@@ -209,22 +210,24 @@ test("overlay pages get a viewport-bounded region with or without footer data (#
   // inset 0, no intrinsic height — so the shell must bound its
   // region to the viewport even when the host supplies no
   // footer data (the eciperay host's composition, where the
-  // step view rendered invisible). The web no-footer overlay
-  // branch is the with-footer shell's shape minus the footer,
-  // and the column fills the bounded height.
+  // step view rendered invisible). The overlay branch is its
+  // own web branch, ahead of the footer branches: a bounded
+  // full-width positioned region (StepOverlay is a full-screen
+  // shell — the #628 column cap would leave the page showing
+  // through at the sides), with the footer in flow below it
+  // when one is supplied.
   assert.match(
     bigFooter,
     /if \(scrollMode === "overlay"\) \{\s*return \(\s*<YStack\s+minHeight=\{\{ default: "100%", web: "100dvh" \}\}/,
   );
-  assert.match(bigFooter, /<PageContentColumn fillHeight>\{children\}<\/PageContentColumn>/);
   assert.match(
     bigFooter,
-    /<PageContentColumn fillHeight=\{scrollMode === "overlay"\}>\{children\}<\/PageContentColumn>/,
+    /<YStack flex=\{1\} position="relative">\s*\{children\}\s*<\/YStack>\s*\{footer \? <BigFooter footer=\{footer\} \/> : null\}/,
   );
-  // PageContentColumn's fill is what stretches the positioned
-  // column (the overlay's anchoring ancestor) to the region.
-  const column = readCode("src/widgets/PageContentColumn.tsx");
-  assert.match(column, /flex=\{fillHeight \? 1 : undefined\}/);
+  assert.ok(
+    bigFooter.indexOf('if (scrollMode === "overlay")') < bigFooter.indexOf("if (!footer)"),
+    "the web overlay branch precedes the web footer branches",
+  );
   // Both cooking-mode pages opt in; their error/plain branches
   // and every other page keep their existing modes.
   for (const entry of ["CookingModePage.tsx", "MealCookingModePage.tsx"]) {
