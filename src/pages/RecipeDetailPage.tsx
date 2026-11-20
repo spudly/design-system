@@ -14,6 +14,7 @@ import { MarkableRow } from "../widgets/MarkableRow.js";
 import {
   NutritionPanel,
   type NutritionFact,
+  type NutritionFactKind,
   type NutritionPanelData,
 } from "../widgets/NutritionPanel.js";
 import { NumberStepper } from "../widgets/NumberStepper.js";
@@ -409,6 +410,7 @@ export type RecipeDetailPageCookLogForm = {
 // the page's contract names are aliases, as with the ratings
 // types above.
 export type RecipeDetailPageNutritionFact = NutritionFact;
+export type RecipeDetailPageNutritionFactKind = NutritionFactKind;
 export type RecipeDetailPageNutritionProps = NutritionPanelData;
 
 export type RecipeDetailPageReadyProps = {

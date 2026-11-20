@@ -159,7 +159,7 @@ function NutritionFactRow({
       alignItems="baseline"
       gap="$3"
       paddingVertical="$2"
-      paddingInlineStart={isSubNutrient ? "$5" : undefined}
+      {...(isSubNutrient ? { paddingInlineStart: "$5" as const } : {})}
       borderBottomWidth={isLast ? 0 : 1}
       borderBottomColor={LABEL_HAIRLINE}
     >

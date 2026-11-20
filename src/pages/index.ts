@@ -45,6 +45,7 @@ export {
   type RecipeDetailPageCookLog,
   type RecipeDetailPageNutritionProps,
   type RecipeDetailPageNutritionFact,
+  type RecipeDetailPageNutritionFactKind,
   type RecipeDetailPageSharing,
   type RecipeDetailPageSharingConsentSpan,
   type RecipeDetailPageComments,
