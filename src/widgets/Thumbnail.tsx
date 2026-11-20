@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Image, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
@@ -110,15 +110,44 @@ export function Thumbnail({ src, variant = "hero", accessibilityLabel }: Thumbna
   // and native), so no prop or app change is needed. Only the
   // hero variant measures; banner and row keep fixed geometry.
   const [heroAspect, setHeroAspect] = useState(HERO_FALLBACK_ASPECT);
+  const applyMeasuredAspect = (width: number, height: number) => {
+    if (width > 0 && height > 0) {
+      setHeroAspect(Math.min(HERO_MAX_ASPECT, Math.max(HERO_MIN_ASPECT, width / height)));
+    }
+  };
   const handleHeroLoad = (event: {
     nativeEvent?: { source?: { width?: number; height?: number } };
   }) => {
     const width = event.nativeEvent?.source?.width;
     const height = event.nativeEvent?.source?.height;
-    if (typeof width === "number" && typeof height === "number" && width > 0 && height > 0) {
-      setHeroAspect(Math.min(HERO_MAX_ASPECT, Math.max(HERO_MIN_ASPECT, width / height)));
+    if (typeof width === "number" && typeof height === "number") {
+      applyMeasuredAspect(width, height);
     }
   };
+  // Web measurement: react-native-web's Image load event does
+  // not reliably carry the source dimensions (and a cached or
+  // data-URI image can finish loading before the handler is
+  // attached), so on web the widget measures with a probe image
+  // whose handler is assigned before its src — the load always
+  // reports. Native measures through the Image onLoad above,
+  // whose event carries the source dimensions.
+  useEffect(() => {
+    if (variant !== "hero") {
+      return;
+    }
+    setHeroAspect(HERO_FALLBACK_ASPECT);
+    if (!isWeb || typeof window === "undefined") {
+      return;
+    }
+    const probe = new window.Image();
+    probe.onload = () => {
+      applyMeasuredAspect(probe.naturalWidth, probe.naturalHeight);
+    };
+    probe.src = src;
+    return () => {
+      probe.onload = null;
+    };
+  }, [src, variant]);
   // A named image is exposed as an image with that name, routed
   // through the accessibility translator (Avatar's pattern, #235):
   // the RN `image` role and label become `role="img"` and

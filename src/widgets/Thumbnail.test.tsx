@@ -59,6 +59,11 @@ test("the hero frame is aspect-preserving: the measured image ratio, clamped, wi
   assert.match(code, /<StyledHeroFrame aspectRatio=\{heroAspect\}>/);
   assert.match(
     code,
+    /const probe = new window\.Image\(\);\s+probe\.onload = \(\) => \{\s+applyMeasuredAspect\(probe\.naturalWidth, probe\.naturalHeight\);\s+\};\s+probe\.src = src;/,
+    "on web the widget measures with a probe image (handler assigned before src, so cached/data-URI loads still report); native measures through the Image onLoad event",
+  );
+  assert.match(
+    code,
     /<Image\s+src=\{src\}\s+width="100%"\s+height="100%"\s+objectFit="cover"\s+onLoad=\{handleHeroLoad\}\s+\{\.\.\.a11yProps\}\s+\/>/,
     "the image still cover-fills the frame (#573) and reports its natural dimensions on load",
   );
