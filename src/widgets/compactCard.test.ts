@@ -10,8 +10,8 @@
  * adds components. The pins hold the treatment (the app view's
  * row-card values, unchanged), that CompactCard no longer
  * exists in the package, and that the treatment's consumers
- * (TagsPage's editor card, BadgeCardRow) compose Card's compact
- * variant.
+ * (TagsPage's editor and display-row cards) compose Card's
+ * compact variant.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -55,7 +55,5 @@ test("the compact variant: surface, medium radius, 12px padding, small shadow, n
 
 test("the treatment's consumers compose Card's compact variant", () => {
   const tagsPage = readFileSync(join(root, "src", "pages", "TagsPage.tsx"), "utf8");
-  const badgeCardRow = readFileSync(join(root, "src", "widgets", "BadgeCardRow.tsx"), "utf8");
   assert.match(tagsPage, /<Card key=\{tag\.id\} variant="compact">/);
-  assert.match(badgeCardRow, /<Card variant="compact">/);
 });

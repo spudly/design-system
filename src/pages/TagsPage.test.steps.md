@@ -4,7 +4,6 @@ run_when:
   - "src/widgets/FormStack.tsx, src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
   - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "src/pages/TagsPage.tsx, its stories, or a changeset naming TagsPage."
-  - "src/widgets/BadgeCardRow.tsx, its stories, TagsPage's rows, or a changeset naming BadgeCardRow."
   - "src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: TrailingActionsRow, Card, TagsPage)"
 ---
 
@@ -88,19 +87,19 @@ Open in `Pages/Eciperay/TagsPage`: WithTags, Loading, FailingSaves.
 **Run when:** `src/pages/TagsPage.tsx`, its stories, or a changeset
 naming TagsPage.
 
-## BadgeCardRow
+## Tag rows
 
-Open in `Widgets/BadgeCardRow`: Default, DeleteOnly.
+Open in `Pages/Eciperay/TagsPage`: WithTags.
 
-1. Default: a compact card (small padding and shadow) with
-   the colored badge at the left and Edit / Delete as bare
-   text actions at the right, Delete in the error treatment.
-2. DeleteOnly: only the Delete action shows; the badge
-   keeps its color and the row height is unchanged.
+1. Each row: a compact card (small padding and shadow) with
+   the colored badge at the left and Edit / Delete as ghost
+   buttons at the right, Delete in the danger treatment.
+2. A tag the host marks read-only shows only the actions it
+   is eligible for; the badge keeps its color and the row
+   height is unchanged.
 
-**Run when:** `src/widgets/BadgeCardRow.tsx`, its
-stories, TagsPage's rows, or a changeset naming
-BadgeCardRow.
+**Run when:** `src/pages/TagsPage.tsx`, its stories, or a
+changeset naming TagsPage.
 
 ## TrailingActionsRow; Card's compact variant
 
