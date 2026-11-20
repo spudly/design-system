@@ -953,7 +953,7 @@ test("T2: every converted data widget declares `loading` and reads the LoadingSc
     );
     assert.match(
       code,
-      /from "\.\.\/contexts\/LoadingScope\.js"/,
+      /from "(?:\.\.\/)+contexts\/LoadingScope\.js"/,
       `${name} must import the scope from src/contexts`,
     );
   }
