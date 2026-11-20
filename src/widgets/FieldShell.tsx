@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Label, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { useImeCompositionGuard, type ImeCompositionGuard } from "./useImeCompositionGuard.js";
+import { useImeCompositionGuard, type ImeCompositionGuard } from "../views/useImeCompositionGuard.js";
 
 export type FieldShellProps = ImeCompositionGuard & {
   /** The visible label, associated with the field via `htmlFor`. */
@@ -23,7 +23,7 @@ export type FieldShellProps = ImeCompositionGuard & {
  * and the IME composition guard call were identical in both
  * fields — only the inner control differs (a plain input vs the
  * search container). Internal helper, not a view component of
- * its own: NOT exported from the views barrel, exercised through
+ * its own: NOT exported from the widgets barrel, exercised through
  * the two fields' stories.
  */
 export function FieldShell({

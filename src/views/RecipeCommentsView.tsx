@@ -5,7 +5,7 @@ import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { CommentItem } from "../widgets/CommentItem.js";
 import { Text } from "../widgets/Text.js";
-import { TextAreaField } from "./TextAreaField.js";
+import { TextAreaField } from "../widgets/TextAreaField.js";
 import { useVoice } from "../voice/index.js";
 
 type RecipeCommentsViewComment = {

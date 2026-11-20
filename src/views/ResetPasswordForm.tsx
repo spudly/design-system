@@ -1,6 +1,6 @@
 import { FormStack } from "../widgets/FormStack.js";
 import { AuthFormSubmit } from "./AuthFormSubmit.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../widgets/TextField.js";
 import { useVoice } from "../voice/index.js";
 
 /**

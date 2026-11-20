@@ -601,13 +601,13 @@ describe("buttonWebAria", () => {
   const STACK_PRESSABLES = [
     "src/views/RatingForm.tsx",
     "src/widgets/ColorPickerField.tsx",
-    "src/views/SearchField.tsx",
+    "src/widgets/SearchField.tsx",
     "src/widgets/StarRatingInput.tsx",
     "src/widgets/StepDots.tsx",
     "src/widgets/Avatar.tsx",
   ];
   test("NumberStepper: group container and value input route through the translator; its buttons are DS Buttons (#235)", () => {
-    const code = readCode("src/views/NumberStepper.tsx");
+    const code = readCode("src/widgets/NumberStepper.tsx");
     assert.ok(code.includes("platformAccessibilityProps"));
     // The only raw accessibilityLabel props left in the file are the
     // ones passed TO the DS Button primitive (Decrease / Increase),

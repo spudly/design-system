@@ -3,7 +3,7 @@ import { Alert } from "../widgets/Alert.js";
 import { useState } from "react";
 import { Button } from "../widgets/Button.js";
 import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
-import { TextAreaField } from "../views/TextAreaField.js";
+import { TextAreaField } from "../widgets/TextAreaField.js";
 import { Text } from "../widgets/Text.js";
 
 /**

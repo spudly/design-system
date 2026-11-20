@@ -9,8 +9,8 @@ import { CircleSkeleton } from "../widgets/CircleSkeleton.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
-import { CheckboxField } from "./CheckboxField.js";
-import { RadioOptionGroup, type RadioOption } from "./RadioOptionGroup.js";
+import { CheckboxField } from "../widgets/CheckboxField.js";
+import { RadioOptionGroup, type RadioOption } from "../widgets/RadioOptionGroup.js";
 import { useVoice } from "../voice/index.js";
 
 /** One span of the publishing-consent description (#689): plain

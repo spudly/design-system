@@ -1,6 +1,6 @@
 import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { CheckboxField } from "../views/CheckboxField.js";
+import { CheckboxField } from "../widgets/CheckboxField.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { EmptyState } from "./EmptyState.js";

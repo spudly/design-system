@@ -5,7 +5,7 @@ import { Button } from "../widgets/Button.js";
 import { Alert } from "../widgets/Alert.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../widgets/TextField.js";
 import { TokenRow } from "../widgets/TokenRow.js";
 import { useVoice } from "../voice/index.js";
 

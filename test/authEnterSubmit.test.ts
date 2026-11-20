@@ -78,7 +78,7 @@ for (const { name, fields } of AUTH_FORMS) {
 }
 
 test("TextField: submit-editing is held while an IME composition is active (web)", () => {
-  const source = readFileSync("src/views/TextField.tsx", "utf8");
+  const source = readFileSync("src/widgets/TextField.tsx", "utf8");
   // The guard internals live in the shared hook since the #587
   // phase-2 dedupe; TextField.tsx only wires its handlers in.
   const guard = readFileSync("src/views/useImeCompositionGuard.ts", "utf8");
@@ -117,7 +117,7 @@ test("TextField: submit-editing is held while an IME composition is active (web)
   assert.match(source, /\{\.\.\.compositionProps\}/);
   // The guard call itself lives in FieldShell since the #587
   // phase-3 dedupe; TextField hands its handlers to the shell.
-  const shell = readFileSync("src/views/FieldShell.tsx", "utf8");
+  const shell = readFileSync("src/widgets/FieldShell.tsx", "utf8");
   assert.match(
     shell,
     /const guard = useImeCompositionGuard\(\{\s*onCompositionStart,\s*onCompositionEnd,\s*onSubmitEditing,\s*\}\);/,

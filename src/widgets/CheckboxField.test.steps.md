@@ -1,12 +1,12 @@
 ---
 component: CheckboxField
 run_when:
-  - "src/views/CheckboxField.tsx, its stories, or a changeset naming CheckboxField."
+  - "src/widgets/CheckboxField.tsx, its stories, or a changeset naming CheckboxField."
 ---
 
 # CheckboxField — manual test steps
 
-Colocated manual test steps for `src/views/CheckboxField.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/CheckboxField.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -26,5 +26,5 @@ WithRichDescription, WithChildren, WithError.
    and the checkbox remains toggleable in the story.
 4. Toggling in Default/Checked flips the check with no layout shift.
 
-**Run when:** `src/views/CheckboxField.tsx`, its stories, or a
+**Run when:** `src/widgets/CheckboxField.tsx`, its stories, or a
 changeset naming CheckboxField.

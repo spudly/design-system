@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { LabeledField } from "./LabeledField.js";
 import { RevertAction } from "../views/RevertAction.js";
-import { TextAreaField } from "../views/TextAreaField.js";
-import { TextField } from "../views/TextField.js";
+import { TextAreaField } from "../widgets/TextAreaField.js";
+import { TextField } from "../widgets/TextField.js";
 
 const meta: Meta<typeof LabeledField> = {
   title: "Widgets/LabeledField",

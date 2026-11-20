@@ -47,7 +47,7 @@ function readCode(rel: string) {
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
-const textField = readCode("src/views/TextField.tsx");
+const textField = readCode("src/widgets/TextField.tsx");
 const mealPlanFormPage = readCode("src/pages/MealPlanFormPage.tsx");
 const noop = () => null;
 function mealPlanFormProps() {

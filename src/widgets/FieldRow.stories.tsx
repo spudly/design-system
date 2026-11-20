@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { Button } from "./Button.js";
 import { FieldRow } from "./FieldRow.js";
-import { SearchField } from "../views/SearchField.js";
+import { SearchField } from "../widgets/SearchField.js";
 
 const meta: Meta<typeof FieldRow> = {
   title: "Widgets/FieldRow",

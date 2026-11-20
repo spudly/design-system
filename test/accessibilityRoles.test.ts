@@ -139,12 +139,12 @@ const TRANSLATOR_FILES = new Set([
   join(srcDir, "widgets", "ProgressBar.tsx"),
   join(srcDir, "widgets", "TextLink.tsx"),
   join(srcDir, "widgets", "OptionCard.tsx"),
-  join(srcDir, "views", "TextField.tsx"),
-  join(srcDir, "views", "TextAreaField.tsx"),
+  join(srcDir, "widgets", "TextField.tsx"),
+  join(srcDir, "widgets", "TextAreaField.tsx"),
   // The shared hook the two fields' a11y wiring moved into in
   // #587 phase 3 — it is the file that now calls the translator.
   join(srcDir, "views", "useFieldA11y.ts"),
-  join(srcDir, "views", "CheckboxField.tsx"),
+  join(srcDir, "widgets", "CheckboxField.tsx"),
   join(srcDir, "widgets", "Alert.tsx"),
   // Spinner joined with its determinate ring (#178): the ring
   // destructures a caller's role and forwards it through the same

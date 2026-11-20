@@ -1,12 +1,12 @@
 ---
 component: NumberStepper
 run_when:
-  - "src/views/NumberStepper.tsx, its stories, or a changeset naming NumberStepper."
+  - "src/widgets/NumberStepper.tsx, its stories, or a changeset naming NumberStepper."
 ---
 
 # NumberStepper — manual test steps
 
-Colocated manual test steps for `src/views/NumberStepper.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/NumberStepper.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -27,5 +27,5 @@ CustomStep, Inline, Editable.
    value returns to / stays at the last committed value) — an empty
    entry never commits 0 or NaN.
 
-**Run when:** `src/views/NumberStepper.tsx`, its stories, or a
+**Run when:** `src/widgets/NumberStepper.tsx`, its stories, or a
 changeset naming NumberStepper.

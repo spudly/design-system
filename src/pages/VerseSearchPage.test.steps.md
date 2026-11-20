@@ -1,7 +1,7 @@
 ---
 component: VerseSearchPage
 run_when:
-  - "src/widgets/FieldRow.tsx, its stories, src/views/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
+  - "src/widgets/FieldRow.tsx, its stories, src/widgets/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
 ---
 
 # VerseSearchPage — manual test steps
@@ -35,6 +35,6 @@ here a search field with its submit button.
    stories pass.
 
 **Run when:** `src/widgets/FieldRow.tsx`, its stories,
-`src/views/SearchField.tsx` (the `grow` prop), the pages
+`src/widgets/SearchField.tsx` (the `grow` prop), the pages
 that compose FieldRow (VerseSearchPage), or a changeset
 naming FieldRow.
