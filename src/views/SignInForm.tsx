@@ -1,16 +1,9 @@
-import { YStack, styled } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { FormStack } from "../widgets/FormStack.js";
+import { LinkStack } from "../widgets/LinkStack.js";
 import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
 import { TextField } from "../widgets/TextField.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { useVoice } from "../voice/index.js";
-
-const StyledLinks = styled(YStack, {
-  name: "SignInFormLinks",
-
-  gap: tokens.spacing[2],
-});
 
 /**
  * SignInForm (#119): the sign-in form — the fields and their
@@ -96,7 +89,7 @@ export function SignInForm({
         submitLabel={submitLabel}
       />
       {signUpHref || forgotPasswordHref ? (
-        <StyledLinks>
+        <LinkStack>
           {signUpHref ? (
             <TextLink href={signUpHref}>{voice.signInForm.createAccountLabel}</TextLink>
           ) : null}
@@ -105,7 +98,7 @@ export function SignInForm({
               {voice.signInForm.forgotPasswordLabel}
             </TextLink>
           ) : null}
-        </StyledLinks>
+        </LinkStack>
       ) : null}
     </FormStack>
   );

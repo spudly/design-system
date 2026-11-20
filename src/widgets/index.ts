@@ -196,3 +196,27 @@ export { DashedPlaceholder, type DashedPlaceholderProps } from "./DashedPlacehol
 export { OverlayTextPanel, type OverlayTextPanelProps } from "./OverlayTextPanel.js";
 export { RadioSkeletonRow, type RadioSkeletonRowProps } from "./RadioSkeletonRow.js";
 export { CheckboxSkeletonRow, type CheckboxSkeletonRowProps } from "./CheckboxSkeletonRow.js";
+
+// The #698 tranche-4 move set: the remaining styled leaf and
+// chrome components the views' de-styling moved from
+// src/views to src/widgets (they own their styling, so they
+// are widgets, not views). Names, props, and rendering are
+// unchanged.
+export {
+  AppTopBar,
+  type AppTopBarAction,
+  type AppTopBarNavItem,
+  type AppTopBarProps,
+} from "./AppTopBar.js";
+export { CandidateList, type CandidateListProps } from "./CandidateList.js";
+export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
+export { LegalSection, type LegalSectionProps } from "./LegalSection.js";
+export { RatingForm, type RatingFormProps } from "./RatingForm.js";
+// The #698 tranche-4 extraction set: the layout and panel
+// components the remaining views' de-styling extracted.
+export { CenteredRow, type CenteredRowProps } from "./CenteredRow.js";
+export { StartStack, type StartStackProps } from "./StartStack.js";
+export { ListHeaderStack, type ListHeaderStackProps } from "./ListHeaderStack.js";
+export { SkeletonPanel, type SkeletonPanelProps } from "./SkeletonPanel.js";
+export { SpacedTopStack, type SpacedTopStackProps } from "./SpacedTopStack.js";
+export { CreatedSecretPanel, type CreatedSecretPanelProps } from "./CreatedSecretPanel.js";

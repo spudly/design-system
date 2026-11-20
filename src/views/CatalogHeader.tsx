@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { ListHeaderStack } from "../widgets/ListHeaderStack.js";
 import { Text } from "../widgets/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
@@ -31,13 +31,13 @@ export type CatalogHeaderProps = {
 export function CatalogHeader({ children, title, loading = false }: CatalogHeaderProps) {
   const showSkeleton = useLoadingScope(loading);
   return (
-    <YStack paddingBlockStart="$4" paddingBlockEnd="$2" gap="$4">
+    <ListHeaderStack>
       {showSkeleton ? (
         <TextSkeleton size="3xl" lines={1} />
       ) : (
         <Text variant="heading">{title}</Text>
       )}
       <LoadingScope active={showSkeleton}>{children}</LoadingScope>
-    </YStack>
+    </ListHeaderStack>
   );
 }

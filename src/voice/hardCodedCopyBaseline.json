@@ -155,7 +155,7 @@
   "pages/VerseSearchPage.tsx|jsx|Search verses",
   "pages/VerseSearchPage.tsx|jsx|Searching the built-in demo set. Add a gospel-engine API key in Settings for full-library search.",
   "views/AccessTokensPanel.tsx|jsx|loading",
-  "views/CandidateList.tsx|jsx|Activate",
+  "widgets/CandidateList.tsx|jsx|Activate",
   "views/CatalogFiltersBar.tsx|attr|Add a filter",
   "views/CatalogFiltersBar.tsx|jsx|Filters",
   "views/ChunkErrorBoundary.tsx|jsx|This section failed to load.",

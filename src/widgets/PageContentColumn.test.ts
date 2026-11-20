@@ -34,7 +34,7 @@ function readCode(rel: string): string {
 
 const column = readCode("src/widgets/PageContentColumn.tsx");
 const bigFooter = readCode("src/widgets/BigFooter.tsx");
-const appTopBar = readCode("src/views/AppTopBar.tsx");
+const appTopBar = readCode("src/widgets/AppTopBar.tsx");
 
 test("the column width is the named 1200 constant (#628, Stephen's amendment)", () => {
   assert.match(column, /export const PAGE_CONTENT_MAX_WIDTH = 1200;/);

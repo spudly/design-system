@@ -1,7 +1,8 @@
-import { YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
 import { Center } from "../widgets/Center.js";
+import { CompactStack } from "../widgets/CompactStack.js";
+import { StartStack } from "../widgets/StartStack.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
@@ -93,7 +94,7 @@ export function SubscriptionView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
-      <YStack gap="$2">
+      <CompactStack>
         {showSkeleton ? (
           // Loading (#278): text skeletons mirroring the
           // loaded lines — the plan line at xl size, the
@@ -119,7 +120,7 @@ export function SubscriptionView({
           </>
         )}
         {onManage || onRefresh || portalUrl ? (
-          <YStack gap="$2" alignItems="flex-start">
+          <StartStack>
             {onManage ? (
               <Button variant="primary" disabled={managePending} onPress={onManage}>
                 {managePending ? managePendingLabel : manageLabel}
@@ -144,9 +145,9 @@ export function SubscriptionView({
                 <TextLink href={portalUrl}>{portalLabel}</TextLink>
               )
             ) : null}
-          </YStack>
+          </StartStack>
         ) : null}
-      </YStack>
+      </CompactStack>
     </SectionCard>
   );
 }

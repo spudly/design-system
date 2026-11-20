@@ -45,9 +45,10 @@ const COMPONENTS = [
   "FormHeading",
 ];
 
-// RevertAction and ChangedListBanner are views since #470; the
-// rest of the set remains in src/widgets.
-const VIEWS = new Set(["RevertAction", "ChangedListBanner"]);
+// RevertAction is a view since #470; ChangedListBanner was a
+// view from #470 until #698 tranche 4 moved it to src/widgets
+// (it owns its styling); the rest of the set is in src/widgets.
+const VIEWS = new Set(["RevertAction"]);
 const homeOf = (name: string) => (VIEWS.has(name) ? "views" : "widgets");
 for (const name of COMPONENTS) {
   test(`${name} is exported from the built internal dist surface`, () => {
@@ -144,7 +145,7 @@ test("RevertAction is the revert affordance composed on a ghost Button (#464)", 
   assert.ok(!source.includes("platformAccessibilityProps"), "no hand-rolled a11y translation");
 });
 test("ChangedListBanner keeps the warning wash and offers its revert only when given one", () => {
-  const source = readRepoFile("src/views/ChangedListBanner.tsx");
+  const source = readRepoFile("src/widgets/ChangedListBanner.tsx");
   assert.match(source, /backgroundColor=\{tokens\.colors\.warning\.warning1\}/);
   assert.match(source, /\{onRevert \? \(/);
   assert.match(

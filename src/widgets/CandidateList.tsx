@@ -1,10 +1,10 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { platformAccessibilityProps } from "../widgets/accessibility.js";
-import { Button } from "../widgets/Button.js";
-import { Text } from "../widgets/Text.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { Button } from "./Button.js";
+import { Text } from "./Text.js";
+import { TextSkeleton } from "./TextSkeleton.js";
 
 type CandidateListItem = {
   /** Stable key for the candidate. */

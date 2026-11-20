@@ -21,7 +21,16 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const strip = (text: string) =>
   text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const read = (name: string) => strip(readFileSync(join(here, `${name}.tsx`), "utf8"));
+// #698 tranche 4 moved ChangedListBanner, LegalSection, and
+// AppTopBar to src/widgets; the rest still live beside this test.
+const WIDGET_COMPONENTS = new Set(["AppTopBar", "ChangedListBanner", "LegalSection"]);
+const read = (name: string) =>
+  strip(
+    readFileSync(
+      join(here, ...(WIDGET_COMPONENTS.has(name) ? ["..", "widgets"] : []), `${name}.tsx`),
+      "utf8",
+    ),
+  );
 
 test("ChangedListBanner reads its Revert action from the voice object", () => {
   const view = read("ChangedListBanner");

@@ -1,6 +1,7 @@
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
+import { ContentStack } from "../widgets/ContentStack.js";
+import { CreatedSecretPanel } from "../widgets/CreatedSecretPanel.js";
+import { ListStack } from "../widgets/ListStack.js";
 import { Button } from "../widgets/Button.js";
 import { Alert } from "../widgets/Alert.js";
 import { SectionCard } from "../widgets/SectionCard.js";
@@ -103,70 +104,32 @@ export function AccessTokensPanel({
     <SectionCard title={voice.accessTokensPanel.title}>
       <Alert severity="info">{voice.accessTokensPanel.infoText}</Alert>
       {createdSecret ? (
-        <YStack paddingTop="$4" paddingBottom="$4">
-          <YStack
-            borderRadius={tokens.radii.md}
-            borderWidth={1}
-            borderColor={tokens.colors.warning.warning4}
-            backgroundColor={tokens.colors.warning.warning1}
-            padding="$4"
-          >
-            <YStack paddingBottom="$2">
-              <Text
-                fontSize={tokens.typography.fontSize.sm}
-                fontWeight={tokens.typography.fontWeight.semibold}
-                color={tokens.colors.warning.warning10}
-              >
-                {voice.accessTokensPanel.createdSecretTitle}
-              </Text>
-            </YStack>
-            <YStack paddingBottom="$1">
-              <YStack borderRadius={tokens.radii.sm} backgroundColor="$surface" padding="$3">
-                <Text
-                  userSelect="text"
-                  color={tokens.colors.gray.gray10}
-                  style={{
-                    fontFamily: tokens.typography.fontFamily.mono,
-                    fontSize: tokens.typography.fontSize.sm,
-                  }}
-                >
-                  {createdSecret}
-                </Text>
-              </YStack>
-            </YStack>
-            <YStack paddingBottom="$3">
-              <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
-                {voice.accessTokensPanel.createdSecretHint}
-              </Text>
-            </YStack>
-            <XStack gap="$2">
-              <Button variant="secondary" onPress={onDismissSecret}>
-                {voice.accessTokensPanel.doneLabel}
-              </Button>
-            </XStack>
-          </YStack>
-        </YStack>
+        <CreatedSecretPanel
+          title={voice.accessTokensPanel.createdSecretTitle}
+          secret={createdSecret}
+          hint={voice.accessTokensPanel.createdSecretHint}
+          doneLabel={voice.accessTokensPanel.doneLabel}
+          onDismiss={onDismissSecret}
+        />
       ) : null}
       {planNotice ? (
         <Alert severity="info">{planNotice}</Alert>
       ) : (
-        <YStack paddingBottom="$4">
+        <ContentStack>
           <TextField
             label={voice.accessTokensPanel.tokenNameLabel}
             value={tokenName}
             onChangeText={onTokenNameChange}
             placeholder={voice.accessTokensPanel.tokenNamePlaceholder}
           />
-          <YStack paddingTop="$3">
-            <Button
-              variant="primary"
-              disabled={!tokenName.trim() || createdSecret !== null || isCreating}
-              onPress={onCreate}
-            >
-              {voice.accessTokensPanel.createLabel}
-            </Button>
-          </YStack>
-        </YStack>
+          <Button
+            variant="primary"
+            disabled={!tokenName.trim() || createdSecret !== null || isCreating}
+            onPress={onCreate}
+          >
+            {voice.accessTokensPanel.createLabel}
+          </Button>
+        </ContentStack>
       )}
       {error ? <Alert severity="error" message={error} /> : null}
       {showSkeleton ? (
@@ -177,7 +140,7 @@ export function AccessTokensPanel({
         // known yet. Each non-revoked row keeps its Revoke
         // action (a noop for the dummies) so the Button
         // skeletonizes in its slot instead of dropping out.
-        <YStack>
+        <ListStack>
           {(accessTokens.length > 0 ? accessTokens : LOADING_TOKENS).map((token) => (
             <TokenRow
               key={token.id}
@@ -198,11 +161,11 @@ export function AccessTokensPanel({
                   })}
             />
           ))}
-        </YStack>
+        </ListStack>
       ) : accessTokens.length === 0 ? (
         <Text textAlign="center">{voice.accessTokensPanel.emptyMessage}</Text>
       ) : (
-        <YStack>
+        <ListStack>
           {accessTokens.map((token) => (
             <TokenRow
               key={token.id}
@@ -220,7 +183,7 @@ export function AccessTokensPanel({
                   })}
             />
           ))}
-        </YStack>
+        </ListStack>
       )}
     </SectionCard>
   );

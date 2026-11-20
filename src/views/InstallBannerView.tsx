@@ -1,4 +1,4 @@
-import { XStack } from "tamagui";
+import { CompactRow } from "../widgets/CompactRow.js";
 import { FixedActionBanner } from "../widgets/FixedActionBanner.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
@@ -44,14 +44,14 @@ export function InstallBannerView({
     <FixedActionBanner
       position="top"
       message={
-        <XStack flexWrap="wrap" gap="$2" alignItems="center">
+        <CompactRow>
           <Text>{message}</Text>
           {links.map((link) => (
             <TextLink key={link.href} href={link.href}>
               {link.label}
             </TextLink>
           ))}
-        </XStack>
+        </CompactRow>
       }
       onDismiss={onDismiss}
       dismissAriaLabel={dismissAriaLabel}

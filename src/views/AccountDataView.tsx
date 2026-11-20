@@ -1,6 +1,7 @@
-import { XStack, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
+import { CompactRow } from "../widgets/CompactRow.js";
+import { ContentStack } from "../widgets/ContentStack.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { SectionMutedText } from "./SectionMutedText.js";
@@ -69,9 +70,9 @@ export function AccountDataView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
-      <YStack gap="$3">
+      <ContentStack>
         <SectionMutedText loading={showSkeleton} text={description} />
-        <XStack gap="$2" flexWrap="wrap">
+        <CompactRow>
           {onExportData ? (
             <Button variant="secondary" disabled={exportPending} onPress={onExportData}>
               {exportPending ? exportPendingLabel : exportLabel}
@@ -82,9 +83,9 @@ export function AccountDataView({
               {deletePending ? deletePendingLabel : deleteLabel}
             </Button>
           ) : null}
-        </XStack>
+        </CompactRow>
         {error && !showSkeleton ? <Text variant="error">{error}</Text> : null}
-      </YStack>
+      </ContentStack>
     </SectionCard>
   );
 }

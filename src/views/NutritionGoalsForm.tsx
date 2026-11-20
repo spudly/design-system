@@ -1,9 +1,10 @@
 import { Alert } from "../widgets/Alert.js";
-import { YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Center } from "../widgets/Center.js";
 import { Button } from "../widgets/Button.js";
+import { SpacedTopStack } from "../widgets/SpacedTopStack.js";
+import { TightStack } from "../widgets/TightStack.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { TextField } from "../widgets/TextField.js";
@@ -126,12 +127,12 @@ const LOADING_GOAL_FIELD_KEYS = [
 
 function GoalFieldSkeleton() {
   return (
-    <YStack gap="$1">
+    <TightStack>
       <Center width="35%" height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
         <TextSkeleton size="sm" lines={1} />
       </Center>
       <BoxSkeleton height={44} />
-    </YStack>
+    </TightStack>
   );
 }
 
@@ -228,11 +229,11 @@ export function NutritionGoalsForm({
         </>
       )}
       {error && !showSkeleton ? <Alert severity="error" message={error} /> : null}
-      <YStack paddingTop="$3">
+      <SpacedTopStack>
         <Button variant="primary" disabled={saving} onPress={onSave}>
           {voice.nutritionGoalsForm.saveLabel}
         </Button>
-      </YStack>
+      </SpacedTopStack>
     </SectionCard>
   );
 }

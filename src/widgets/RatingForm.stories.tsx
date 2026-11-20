@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { RatingForm } from "./RatingForm.js";
-import { StoryFrame } from "./storyFrame.js";
+import { StoryFrame } from "../views/storyFrame.js";
 
 const meta: Meta<typeof RatingForm> = {
-  title: "Views/RatingForm",
+  title: "Widgets/RatingForm",
   component: RatingForm,
   globals: { theme: "light_warmHarvest" },
 };

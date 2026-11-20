@@ -1,12 +1,12 @@
 ---
 component: AppTopBar
 run_when:
-  - "src/pages/AppShellPage.tsx, src/pages/TabbedShellPage.tsx, src/views/AppTopBar.tsx, their stories, or a changeset naming any of them. (namely: AppShellPage, TabbedShellPage, AppTopBar)"
+  - "src/pages/AppShellPage.tsx, src/pages/TabbedShellPage.tsx, src/widgets/AppTopBar.tsx, their stories, or a changeset naming any of them. (namely: AppShellPage, TabbedShellPage, AppTopBar)"
 ---
 
 # AppTopBar — manual test steps
 
-Colocated manual test steps for `src/views/AppTopBar.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/AppTopBar.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -34,7 +34,7 @@ LinkActions, NoFooter, ChunkFailedContent;
 4. TabbedShellPage TabbedShell: the header is the same top
    bar — the app title in the brand treatment, no nav, no
    actions — above the tab bar; the shells are one chrome.
-5. Phone width (#564): open `Views/AppTopBar` PhoneWidthNav
+5. Phone width (#564): open `Widgets/AppTopBar` PhoneWidthNav
    (390px frame, 6-item nav) — the nav wraps within the bar,
    every link including Profile is fully visible, and the
    page does not scroll sideways. Repeat with PhoneWidthNav430
@@ -45,5 +45,5 @@ LinkActions, NoFooter, ChunkFailedContent;
    inactive, including Profile on the wrapped second row.
 
 **Run when:** `src/pages/AppShellPage.tsx`,
-`src/pages/TabbedShellPage.tsx`, `src/views/AppTopBar.tsx`,
+`src/pages/TabbedShellPage.tsx`, `src/widgets/AppTopBar.tsx`,
 their stories, or a changeset naming any of them.

@@ -1,12 +1,12 @@
 ---
 component: LegalSection
 run_when:
-  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/views/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
+  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/widgets/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
 ---
 
 # LegalSection — manual test steps
 
-Colocated manual test steps for `src/views/LegalSection.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/LegalSection.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -15,7 +15,7 @@ release's changed components. The full index lives in
 
 Open in `Views/SignInForm`, `Views/SignUpForm`,
 `Views/ForgotPasswordForm`, `Views/ResetPasswordForm`,
-`Views/LegalSection` (each form's Default story — the
+`Widgets/LegalSection` (each form's Default story — the
 stories are interactive: fields can be typed in).
 
 The auth pages' forms as standalone components: each form
@@ -49,6 +49,6 @@ forms.
 `src/views/SignUpForm.tsx`,
 `src/views/ForgotPasswordForm.tsx`,
 `src/views/ResetPasswordForm.tsx`,
-`src/views/LegalSection.tsx`, their stories, the auth or
+`src/widgets/LegalSection.tsx`, their stories, the auth or
 Profile pages that compose them, or a changeset naming the
 auth forms or LegalSection.

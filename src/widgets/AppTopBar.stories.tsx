@@ -11,7 +11,7 @@ import { AppTopBar } from "./AppTopBar.js";
  * these pin the bar's own compositions.
  */
 const meta: Meta<typeof AppTopBar> = {
-  title: "Views/AppTopBar",
+  title: "Widgets/AppTopBar",
   component: AppTopBar,
   globals: { theme: "light_warmHarvest" },
 };

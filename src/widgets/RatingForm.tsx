@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { TextArea as TamaguiTextArea, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../widgets/accessibility.js";
-import { StarRatingInput } from "../widgets/StarRatingInput.js";
-import { Text } from "../widgets/Text.js";
+import { platformAccessibilityProps } from "./accessibility.js";
+import { StarRatingInput } from "./StarRatingInput.js";
+import { Text } from "./Text.js";
 import { useVoice } from "../voice/index.js";
 
 const NotesArea = styled(TamaguiTextArea, {
@@ -125,9 +125,7 @@ export function RatingForm({
       borderWidth={isLight ? 1 : undefined}
       borderColor={isLight ? tokens.colors.gray.gray3 : undefined}
     >
-      {isLight ? null : (
-        <DarkTintOverlay />
-      )}
+      {isLight ? null : <DarkTintOverlay />}
       <YStack padding="$6" gap="$4">
         <Text
           fontSize={tokens.typography.fontSize.xl}
@@ -140,9 +138,7 @@ export function RatingForm({
           <StarRatingInput value={rating ?? 0} onChange={handleRatingChange} />
         </YStack>
         <YStack>
-          {isLight ? null : (
-            <DarkTintOverlay />
-          )}
+          {isLight ? null : <DarkTintOverlay />}
           <NotesArea
             multiline
             value={notes}
@@ -171,9 +167,7 @@ export function RatingForm({
             onPress={onSkip}
             cursor="pointer"
           >
-            {isLight ? null : (
-              <DarkTintOverlay />
-            )}
+            {isLight ? null : <DarkTintOverlay />}
             <Text
               fontSize={tokens.typography.fontSize.md}
               color={isLight ? tokens.colors.gray.gray8 : "$surface"}

@@ -45,11 +45,15 @@ const FORM_PAGES = {
   ResetPasswordForm: "ResetPasswordPage",
 };
 
-test("the auth forms and LegalSection are exported from the views barrel", () => {
+test("the auth forms and LegalSection are exported from their barrels", () => {
   const barrel = read("src/views/index.ts");
-  for (const name of [...FORMS, "LegalSection"]) {
+  for (const name of FORMS) {
     assert.match(barrel, new RegExp(String.raw`export \{ ${name},`), name);
   }
+  // #698 tranche 4: LegalSection moved to src/widgets (it owns
+  // its styling), so its barrel is the widgets barrel now.
+  const widgetsBarrel = read("src/widgets/index.ts");
+  assert.match(widgetsBarrel, /export \{ LegalSection,/, "LegalSection");
 });
 
 test("the auth pages compose their form units and render no fields directly", () => {
@@ -83,7 +87,9 @@ test("each form composes the shared FormStack and owns its submit handling", () 
     // the shared EmailPasswordFormProps (#587 phase 3); the
     // other forms declare it in their own props.
     const intentSource =
-      form === "SignInForm" || form === "SignUpForm" ? read("src/views/AuthFormSubmit.tsx") : source;
+      form === "SignInForm" || form === "SignUpForm"
+        ? read("src/views/AuthFormSubmit.tsx")
+        : source;
     assert.match(intentSource, /onSubmit: \(\) => void/, `${form} submits a bare intent`);
     assert.doesNotMatch(
       source,
@@ -156,7 +162,9 @@ test("the email-bearing forms thread emailError to the email field only (#535)",
     // EmailPasswordFormProps (#587 phase 3); ForgotPasswordForm
     // declares it in its own props.
     const declarationSource =
-      form === "SignInForm" || form === "SignUpForm" ? read("src/views/AuthFormSubmit.tsx") : source;
+      form === "SignInForm" || form === "SignUpForm"
+        ? read("src/views/AuthFormSubmit.tsx")
+        : source;
     assert.ok(
       declarationSource.includes("emailError?: string | null | undefined;"),
       `${form} declares emailError`,
@@ -234,7 +242,7 @@ test("SignUpForm keeps the legal notice between submit and the sign-in link", ()
 });
 
 test("LegalSection frames the host's links under its title in the app treatment", () => {
-  const source = read("src/views/LegalSection.tsx");
+  const source = read("src/widgets/LegalSection.tsx");
   assert.match(source, /title: string/, "the title crosses as the host's copy");
   assert.match(source, /children: ReactNode/, "the links cross as children");
   assert.match(

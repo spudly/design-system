@@ -599,7 +599,7 @@ describe("buttonWebAria", () => {
     assert.match(blankWord, /from "\.\/Button\.js"/);
   });
   const STACK_PRESSABLES = [
-    "src/views/RatingForm.tsx",
+    "src/widgets/RatingForm.tsx",
     "src/widgets/ColorPickerField.tsx",
     "src/widgets/SearchField.tsx",
     "src/widgets/StarRatingInput.tsx",
