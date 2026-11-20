@@ -419,13 +419,42 @@ export type Voice = {
   removableField: {
     removeLabel: string;
   };
-  /** NutritionPanel widget (tranche 1b). */
+  /** NutritionPanel widget (tranche 1b; label copy #722). */
   nutritionPanel: {
     perServingLabel: string;
     refreshLabel: string;
     refreshingLabel: string;
     estimateLabel: string;
     unavailableLabel: string;
+    /** The label's title, in large heavy type ("Nutrition Facts"). */
+    titleLabel: string;
+    /** The calories row's caption ("Calories"). */
+    caloriesLabel: string;
+    /** The serving-size line's caption ("Serving size"). */
+    servingSizeLabel: string;
+    /** The right-aligned column header over the %DV values ("% Daily Value*"). */
+    dailyValueHeaderLabel: string;
+    /** The standard %DV footnote printed inside the label. */
+    dailyValueFootnote: string;
+    /** Display name per nutrient kind (#722): the widget maps
+     * each NutritionFactKind to its voice-owned name. */
+    factLabels: {
+      totalFat: string;
+      saturatedFat: string;
+      transFat: string;
+      cholesterol: string;
+      sodium: string;
+      totalCarbohydrate: string;
+      dietaryFiber: string;
+      totalSugars: string;
+      addedSugars: string;
+      protein: string;
+      netCarbs: string;
+      vitaminD: string;
+      calcium: string;
+      iron: string;
+      potassium: string;
+    };
   };
 };
 

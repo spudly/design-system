@@ -13,8 +13,8 @@ import { LogEntryCard } from "../widgets/LogEntryCard.js";
 import { MarkableRow } from "../widgets/MarkableRow.js";
 import {
   NutritionPanel,
+  type NutritionFact,
   type NutritionPanelData,
-  type NutritionPanelRow,
 } from "../widgets/NutritionPanel.js";
 import { NumberStepper } from "../widgets/NumberStepper.js";
 import { PanelStack } from "../widgets/PanelStack.js";
@@ -408,7 +408,7 @@ export type RecipeDetailPageCookLogForm = {
 // the #119 pass extracted from this page's nutrition section);
 // the page's contract names are aliases, as with the ratings
 // types above.
-export type RecipeDetailPageNutritionRow = NutritionPanelRow;
+export type RecipeDetailPageNutritionFact = NutritionFact;
 export type RecipeDetailPageNutritionProps = NutritionPanelData;
 
 export type RecipeDetailPageReadyProps = {

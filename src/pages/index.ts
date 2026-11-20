@@ -44,7 +44,7 @@ export {
   type RecipeDetailPageHistoryProps,
   type RecipeDetailPageCookLog,
   type RecipeDetailPageNutritionProps,
-  type RecipeDetailPageNutritionRow,
+  type RecipeDetailPageNutritionFact,
   type RecipeDetailPageSharing,
   type RecipeDetailPageSharingConsentSpan,
   type RecipeDetailPageComments,
