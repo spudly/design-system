@@ -3,7 +3,7 @@ import { YStack } from "tamagui";
 import { Button } from "./Button.js";
 import { ButtonRow } from "./ButtonRow.js";
 import { FormStack } from "./FormStack.js";
-import { LabeledField } from "./LabeledField.js";
+import { LabeledField } from "./form/LabeledField.js";
 import { TextField } from "../widgets/TextField.js";
 
 const meta: Meta<typeof FormStack> = {

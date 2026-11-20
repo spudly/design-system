@@ -600,9 +600,9 @@ describe("buttonWebAria", () => {
   });
   const STACK_PRESSABLES = [
     "src/widgets/RatingForm.tsx",
-    "src/widgets/ColorPickerField.tsx",
+    "src/widgets/form/ColorPickerField.tsx",
     "src/widgets/SearchField.tsx",
-    "src/widgets/StarRatingInput.tsx",
+    "src/widgets/form/StarRatingInput.tsx",
     "src/widgets/StepDots.tsx",
     "src/widgets/Avatar.tsx",
   ];

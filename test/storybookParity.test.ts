@@ -106,9 +106,9 @@ function declaredTitle(source: string) {
 /** One module's parity obligations: exported from its area index, a
  * sibling story file exists, the story's title satisfies the area's
  * organization rule, and it exports at least one story. */
-function assertModuleStory({ dir, index, base, titleDescription, titleMatches }: any) {
+function assertModuleStory({ dir, index, base, titleDescription, titleMatches, specifier }: any) {
   assert.ok(
-    index.includes(`from "./${base}.js"`),
+    index.includes(`from "${specifier ?? `./${base}.js`}"`),
     `${base} is not exported from its area index.ts`,
   );
   const storyPath = join(dir, `${base}.stories.tsx`);
@@ -196,10 +196,43 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
     "PageFrame must stay unexported from src/widgets/index.ts (internal scaffolding)",
   );
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    assert.ok(
-      entry.isFile(),
-      `src/widgets/${entry.name}: unexpected directory — the parity scan is flat`,
-    );
+    // Category subdirectories (#710): a category directory holds
+    // its widgets one level down, with titles
+    // Widgets/<Category>/<Name> and barrel specifiers
+    // ./<category>/<Name>.js. The directory name is the lowercase
+    // category; the title segment capitalizes it.
+    if (entry.isDirectory()) {
+      const category = entry.name.charAt(0).toUpperCase() + entry.name.slice(1);
+      const subdir = join(dir, entry.name);
+      for (const sub of readdirSync(subdir, { withFileTypes: true })) {
+        assert.ok(
+          sub.isFile(),
+          `src/widgets/${entry.name}/${sub.name}: unexpected directory — category scans are one level deep`,
+        );
+        if (
+          exceptions.has(sub.name) ||
+          sub.name.endsWith(".stories.tsx") ||
+          sub.name.endsWith(".test.ts") ||
+          sub.name.endsWith(".test.tsx") ||
+          sub.name.endsWith(".test.steps.md")
+        )
+          continue;
+        assert.ok(
+          sub.name.endsWith(".tsx"),
+          `src/widgets/${entry.name}/${sub.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
+        );
+        const subBase = sub.name.replace(/\.tsx$/, "");
+        assertModuleStory({
+          dir: subdir,
+          index,
+          base: subBase,
+          specifier: `./${entry.name}/${subBase}.js`,
+          titleDescription: `title "Widgets/${category}/${subBase}"`,
+          titleMatches: (t: any) => t === `Widgets/${category}/${subBase}`,
+        });
+      }
+      continue;
+    }
     if (
       exceptions.has(entry.name) ||
       entry.name.endsWith(".stories.tsx") ||

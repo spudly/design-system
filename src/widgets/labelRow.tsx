@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { FieldLabel } from "./FieldLabel.js";
+import { FieldLabel } from "./form/FieldLabel.js";
 
 /**
  * The one label row the labeled form compositions share

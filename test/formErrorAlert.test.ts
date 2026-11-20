@@ -43,8 +43,12 @@ const VIEW_FORM_COMPONENTS = new Set([
   "ForgotPasswordForm",
   "ResetPasswordForm",
 ]);
+// Form-category widgets live in src/widgets/form since #710.
+const FORM_CATEGORY_COMPONENTS = new Set(["SelectField", "ColorPickerField"]);
 const formSource = (name: string) =>
-  read(`src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : "widgets"}/${name}.tsx`);
+  read(
+    `src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : FORM_CATEGORY_COMPONENTS.has(name) ? "widgets/form" : "widgets"}/${name}.tsx`,
+  );
 
 const FORM_COMPONENTS = [
   "NutritionGoalsForm",

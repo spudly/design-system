@@ -1,7 +1,7 @@
 ---
 component: SearchField
 run_when:
-  - "src/widgets/FieldRow.tsx, its stories, src/widgets/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
+  - "src/widgets/form/FieldRow.tsx, its stories, src/widgets/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
 ---
 
 # SearchField — manual test steps
@@ -13,7 +13,7 @@ release's changed components. The full index lives in
 
 ## FieldRow
 
-Open in `Widgets/FieldRow`: Default, SmallAction.
+Open in `Widgets/Form/FieldRow`: Default, SmallAction.
 
 A FieldRow composes form fields and their action on one line —
 here a search field with its submit button.
@@ -26,7 +26,7 @@ here a search field with its submit button.
    Filters button), which stretches to the search field's
    height instead of sitting shorter.
 
-**Run when:** `src/widgets/FieldRow.tsx`, its stories,
+**Run when:** `src/widgets/form/FieldRow.tsx`, its stories,
 `src/widgets/SearchField.tsx` (the `grow` prop), the pages
 that compose FieldRow (VerseSearchPage), or a changeset
 naming FieldRow.

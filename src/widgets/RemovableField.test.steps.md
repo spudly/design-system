@@ -16,10 +16,10 @@ release's changed components. The full index lives in
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
-`Widgets/SuggestionPanel`: Default;
+`Widgets/Form/SuggestionPanel`: Default;
 `Widgets/TagList`: Default;
 `Widgets/StatusMessage`: Default, Empty, Transient;
-`Widgets/FieldRow`: (its stories);
+`Widgets/Form/FieldRow`: (its stories);
 `Widgets/RemovableField`: (its stories).
 
 1. StepList: steps render numbered in order; a step with a

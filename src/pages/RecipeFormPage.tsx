@@ -12,10 +12,10 @@ import {
   RecipeInstructionListView,
   type RecipeInstructionListViewProps,
 } from "../views/RecipeInstructionListView.js";
-import { FieldColumns } from "../widgets/FieldColumns.js";
+import { FieldColumns } from "../widgets/form/FieldColumns.js";
 import { FormStack } from "../widgets/FormStack.js";
-import { LabeledField } from "../widgets/LabeledField.js";
-import { LabeledGroup } from "../widgets/LabeledGroup.js";
+import { LabeledField } from "../widgets/form/LabeledField.js";
+import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
 import { RevertAction } from "../views/RevertAction.js";
 import { ScrollRegion } from "../widgets/ScrollRegion.js";
 import { TagList } from "../widgets/TagList.js";

@@ -49,6 +49,8 @@ const COMPONENTS = [
 // view from #470 until #698 tranche 4 moved it to src/widgets
 // (it owns its styling); the rest of the set is in src/widgets.
 const VIEWS = new Set(["RevertAction"]);
+// Form-category widgets live in src/widgets/form since #710.
+const FORM_CATEGORY = new Set(["FieldLabel", "LabeledField", "LabeledGroup", "FieldColumns"]);
 const homeOf = (name: string) => (VIEWS.has(name) ? "views" : "widgets");
 for (const name of COMPONENTS) {
   test(`${name} is exported from the built internal dist surface`, () => {
@@ -59,7 +61,9 @@ for (const name of COMPONENTS) {
     assert.match(barrel, new RegExp(String.raw`export \{[^}]*type ${name}Props[^}]*\}`));
   });
   test(`${name} offers no styling or spacing props and uses type aliases only`, () => {
-    const source = readRepoFile(`src/${homeOf(name)}/${name}.tsx`);
+    const source = readRepoFile(
+      FORM_CATEGORY.has(name) ? `src/widgets/form/${name}.tsx` : `src/${homeOf(name)}/${name}.tsx`,
+    );
     assert.doesNotMatch(source, /spaceBefore|spaceAfter|className|style\??:/);
     assert.doesNotMatch(source, /\binterface\s/);
   });
@@ -68,19 +72,19 @@ test("the label row is one shared implementation behind both labeled wrappers", 
   const row = readRepoFile("src/widgets/labelRow.tsx");
   assert.match(row, /paddingBlockEnd=\{tokens\.spacing\[separation\]\}/);
   assert.match(row, /<FieldLabel htmlFor=\{htmlFor\}>\{label\}<\/FieldLabel>/);
-  const field = readRepoFile("src/widgets/LabeledField.tsx");
+  const field = readRepoFile("src/widgets/form/LabeledField.tsx");
   assert.match(
     field,
     /<LabelRow label=\{label\} action=\{action\} separation=\{1\} htmlFor=\{fieldId\} \/>/,
   );
-  const group = readRepoFile("src/widgets/LabeledGroup.tsx");
+  const group = readRepoFile("src/widgets/form/LabeledGroup.tsx");
   assert.match(
     group,
     /<LabelRow label=\{label\} action=\{action\} separation=\{2\} htmlFor=\{fieldId\} \/>/,
   );
 });
 test("FieldLabel renders a real label element on web and keeps the text treatment on native", () => {
-  const source = readRepoFile("src/widgets/FieldLabel.tsx");
+  const source = readRepoFile("src/widgets/form/FieldLabel.tsx");
   // Stephen's ruling on PR #320: web uses an HTML label element
   // with a proper `for`; native keeps the plain Text treatment.
   assert.match(source, /if \(isWeb\) \{/);
@@ -89,7 +93,7 @@ test("FieldLabel renders a real label element on web and keeps the text treatmen
   assert.match(source, /<Text\s+fontSize=\{tokens\.typography\.fontSize\.sm\}/);
 });
 test("LabeledField owns the 4px label separation and renders the error below the field", () => {
-  const source = readRepoFile("src/widgets/LabeledField.tsx");
+  const source = readRepoFile("src/widgets/form/LabeledField.tsx");
   assert.match(source, /label: string;/);
   assert.match(source, /fieldId\?: string | undefined;/);
   assert.match(source, /error\?: string \| null \| undefined;/);
@@ -100,7 +104,7 @@ test("LabeledField owns the 4px label separation and renders the error below the
   assert.match(source, /\{\.\.\.\(fieldId \? \{ id: `\$\{fieldId\}-error` \} : \{\}\)\}/);
 });
 test("LabeledGroup owns the wider 8px label separation for non-field controls", () => {
-  const source = readRepoFile("src/widgets/LabeledGroup.tsx");
+  const source = readRepoFile("src/widgets/form/LabeledGroup.tsx");
   assert.match(source, /separation=\{2\}/);
   assert.match(source, /fieldId\?: string | undefined;/);
   // The group is programmatically named by its label (the
@@ -121,7 +125,7 @@ test("FieldStack does not survive the #477 consolidation", () => {
   assert.doesNotMatch(barrel, /FieldStack/);
 });
 test("FieldColumns gives every child an equal flex column with an owned 12px gutter", () => {
-  const source = readRepoFile("src/widgets/FieldColumns.tsx");
+  const source = readRepoFile("src/widgets/form/FieldColumns.tsx");
   assert.match(source, /gap=\{tokens\.spacing\[3\]\}/);
   assert.match(source, /<YStack flex=\{1\}>/);
   assert.match(source, /typeof child === "boolean"/);

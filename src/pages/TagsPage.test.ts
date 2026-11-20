@@ -11,7 +11,7 @@ describe("tagsPageCreateForm", () => {
   const tagsPage = readFileSync(join(root, "src", "pages", "TagsPage.tsx"), "utf8");
   const createFormEnd = tagsPage.indexOf("{loading ?");
   const row = readFileSync(join(root, "src", "widgets", "TrailingActionsRow.tsx"), "utf8");
-  const picker = readFileSync(join(root, "src", "widgets", "ColorPickerField.tsx"), "utf8");
+  const picker = readFileSync(join(root, "src", "widgets", "form", "ColorPickerField.tsx"), "utf8");
 
   test("TagsPage create-form row wraps so Add stays visible (#219)", () => {
     assert.match(

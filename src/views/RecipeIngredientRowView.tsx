@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { Button } from "../widgets/Button.js";
-import { FieldRow } from "../widgets/FieldRow.js";
+import { FieldRow } from "../widgets/form/FieldRow.js";
 import { TextField } from "../widgets/TextField.js";
 import { useVoice } from "../voice/index.js";
 

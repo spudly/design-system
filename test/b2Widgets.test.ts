@@ -36,7 +36,7 @@
 import "./registerSvgStub.js";
 import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -45,7 +45,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist: Record<string, any> = await loadInternalDist();
 
 function source(name: string) {
-  return readFileSync(join(root, "src", "widgets", `${name}.tsx`), "utf8");
+  // Form-category widgets live in src/widgets/form since #710.
+  const formPath = join(root, "src", "widgets", "form", `${name}.tsx`);
+  return readFileSync(existsSync(formPath) ? formPath : join(root, "src", "widgets", `${name}.tsx`), "utf8");
 }
 
 const MOVED = [

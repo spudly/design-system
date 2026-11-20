@@ -64,7 +64,7 @@ function code(file: string) {
 const buttonRowCode = code("ButtonRow.tsx");
 const cardStackCode = code("CardStack.tsx");
 const sectionStackCode = code("SectionStack.tsx");
-const fieldRowCode = code("FieldRow.tsx");
+const fieldRowCode = code("form/FieldRow.tsx");
 const listStackCode = code("ListStack.tsx");
 const panelStackCode = code("PanelStack.tsx");
 const buttonStackCode = code("ButtonStack.tsx");
@@ -146,7 +146,7 @@ test("FieldRow owns the search row's gap and stretch — the equal-height contra
 test("FieldRow's field types fill the row height on their grow path (#476)", () => {
   const searchFieldCode = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
   const textFieldCode = readFileSync(join(componentsDir, "TextField.tsx"), "utf8");
-  const selectFieldCode = code("SelectField.tsx");
+  const selectFieldCode = code("form/SelectField.tsx");
   // SearchField: the bordered container fills its root when growing (no label).
   assert.match(
     searchFieldCode,
