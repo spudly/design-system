@@ -337,6 +337,12 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 // masonry grid (Stephen on #551). CheckboxSelectList's centered
 // spinner is gone.
 
+// Form-category widgets live in src/widgets/form since #710.
+const widgetPath = (name: string) =>
+  existsSync(join(root, "src", "widgets", "form", `${name}.tsx`))
+    ? `src/widgets/form/${name}.tsx`
+    : `src/widgets/${name}.tsx`;
+
 const T1_SCOPE_WIDGETS = [
   "CardRow",
   "ListRow",
@@ -352,7 +358,7 @@ const T1_SCOPE_WIDGETS = [
 ] as const;
 test("T1: every converted list/card widget declares `loading` and reads the LoadingScope", () => {
   for (const name of T1_SCOPE_WIDGETS) {
-    const code = readCode(`src/widgets/${name}.tsx`);
+    const code = readCode(widgetPath(name));
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
@@ -937,7 +943,7 @@ const T2_SCOPE_WIDGETS = [
 ] as const;
 test("T2: every converted data widget declares `loading` and reads the LoadingScope", () => {
   for (const name of T2_SCOPE_WIDGETS) {
-    const code = readCode(`src/widgets/${name}.tsx`);
+    const code = readCode(widgetPath(name));
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(

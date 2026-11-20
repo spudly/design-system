@@ -331,7 +331,7 @@ test("DropdownButton is props-described: label/icon in, DS Button + CollapsibleI
   assert.match(dropdownButton, /from "\.\.\/Button\.js"/);
   assert.match(
     dropdownButton,
-    /import \{ CollapsibleIcon \} from "\.\.\.\.\/icons\/CollapsibleIcon\.js"/,
+    /import \{ CollapsibleIcon \} from "\.\.\/\.\.\/icons\/CollapsibleIcon\.js"/,
   );
   assert.match(dropdownButton, /<CollapsibleIcon key="chevron" isOpen=\{open\}/);
   assert.match(dropdownButton, /label: string/);

@@ -49,6 +49,8 @@ const COMPONENTS = [
 // view from #470 until #698 tranche 4 moved it to src/widgets
 // (it owns its styling); the rest of the set is in src/widgets.
 const VIEWS = new Set(["RevertAction"]);
+// Form-category widgets live in src/widgets/form since #710.
+const FORM_CATEGORY = new Set(["FieldLabel", "LabeledField", "LabeledGroup", "FieldColumns"]);
 const homeOf = (name: string) => (VIEWS.has(name) ? "views" : "widgets");
 for (const name of COMPONENTS) {
   test(`${name} is exported from the built internal dist surface`, () => {
@@ -59,7 +61,9 @@ for (const name of COMPONENTS) {
     assert.match(barrel, new RegExp(String.raw`export \{[^}]*type ${name}Props[^}]*\}`));
   });
   test(`${name} offers no styling or spacing props and uses type aliases only`, () => {
-    const source = readRepoFile(`src/${homeOf(name)}/${name}.tsx`);
+    const source = readRepoFile(
+      FORM_CATEGORY.has(name) ? `src/widgets/form/${name}.tsx` : `src/${homeOf(name)}/${name}.tsx`,
+    );
     assert.doesNotMatch(source, /spaceBefore|spaceAfter|className|style\??:/);
     assert.doesNotMatch(source, /\binterface\s/);
   });
