@@ -1,0 +1,5 @@
+---
+"@spudly/ui": major
+---
+
+CheckboxField: unified the checkbox widgets (#713) — `CheckRow` is removed and its shopping-list shape is folded into `CheckboxField` as opt-in props: `detail` (inline muted segment after the label, composed into the accessible name), `separator` (hairline under list rows), and `strikeWhenChecked` (opt-in strikethrough + muted when checked; `ShoppingListPage` passes it, form/ingredient usage does not strike). In the list shape the whole row is the press target and the real Tamagui Checkbox remains the single accessibility stop. The shared checkbox box is restyled to the visual direction in `CheckboxField` and `ChecklistRow`: unfilled in both states, `$primary` outline in both states, `$primary` check glyph — no fill. The box now aligns to the label's first line via a container sized to the label's first-line height, replacing CheckRow's hand-tuned `paddingTop={2}` offset. Hosts that rendered `CheckRow` should render `CheckboxField` with `detail` / `separator` / `strikeWhenChecked` and `onCheckedChange` instead of `onToggle`.

@@ -153,7 +153,6 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // their post-extraction rounds).
 export { BadgeCardRow, type BadgeCardRowProps } from "./BadgeCardRow.js";
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
-export { CheckRow, type CheckRowProps } from "./CheckRow.js";
 export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";
 export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
