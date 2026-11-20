@@ -176,6 +176,9 @@ test("review round: explicit error states, href home control, negative step guar
   assert.match(pay, /<Button variant="primary" href=\{homeHref\}>/);
   const cooking = read("src/pages/CookingModePage.tsx");
   assert.match(cooking, /stepIndex >= 0 \? steps\.at\(stepIndex\) : undefined/);
-  const scaled = read("src/views/ScaledIngredientsView.tsx");
+  // The scaled panel's scroll treatment moved into the
+  // OverlayTextPanel widget in #698 tranche 3 — the pin
+  // follows it there.
+  const scaled = read("src/widgets/OverlayTextPanel.tsx");
   assert.match(scaled, /nestedScrollEnabled/);
 });

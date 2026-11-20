@@ -1,4 +1,4 @@
-import { YStack } from "tamagui";
+import { CompactStack } from "../widgets/CompactStack.js";
 import { Text } from "../widgets/Text.js";
 
 /**
@@ -34,8 +34,8 @@ export function RecipePreviewView({
   instructions,
 }: RecipePreviewViewProps) {
   return (
-    <YStack gap="$2">
-      <Text fontWeight="bold">{title}</Text>
+    <CompactStack>
+      <Text variant="strong">{title}</Text>
       {metaLabel ? <Text>{metaLabel}</Text> : null}
       {(ingredients ?? []).map((line, index) => (
         <Text key={index}>{line}</Text>
@@ -43,6 +43,6 @@ export function RecipePreviewView({
       {(instructions ?? []).map((line, index) => (
         <Text key={index}>{`${index + 1}. ${line}`}</Text>
       ))}
-    </YStack>
+    </CompactStack>
   );
 }

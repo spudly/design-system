@@ -1,14 +1,17 @@
-import { XStack, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
-import { tokens } from "../tokens/index.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { ButtonRow } from "../widgets/ButtonRow.js";
+import { CheckboxSkeletonRow } from "../widgets/CheckboxSkeletonRow.js";
+import { CompactRow } from "../widgets/CompactRow.js";
+import { CompactStack } from "../widgets/CompactStack.js";
+import { ContentStack } from "../widgets/ContentStack.js";
+import { Grow } from "../widgets/Grow.js";
+import { RadioSkeletonRow } from "../widgets/RadioSkeletonRow.js";
+import { TightStack } from "../widgets/TightStack.js";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
-import { Center } from "../widgets/Center.js";
-import { CircleSkeleton } from "../widgets/CircleSkeleton.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
-import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "../widgets/CheckboxField.js";
 import { RadioOptionGroup, type RadioOption } from "../widgets/RadioOptionGroup.js";
 import { useVoice } from "../voice/index.js";
@@ -20,8 +23,7 @@ import { useVoice } from "../voice/index.js";
  * verbatim, so a consent line can keep its Privacy Policy link
  * as data instead of losing it to a plain string. */
 export type RecipeSharingConsentSpan =
-  | { type: "text"; text: string }
-  | { type: "link"; label: string; href: string };
+  { type: "text"; text: string } | { type: "link"; label: string; href: string };
 
 export type RecipeSharingViewProps = {
   /** Section heading. Defaults to the voice object's recipeSharingView title (#539). */
@@ -151,7 +153,7 @@ export function RecipeSharingView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <Card variant="bordered" loading={showSkeleton}>
-      <YStack gap="$3">
+      <ContentStack>
         {showSkeleton ? (
           <TextSkeleton size="xl" lines={1} />
         ) : (
@@ -168,21 +170,11 @@ export function RecipeSharingView({
           // down the group, Stephen on #579), and a
           // description bone at sm when the option carries
           // one. No real labels or selection show.
-          <YStack gap={tokens.spacing[1]}>
+          <TightStack>
             {options.map((option) => (
-              <XStack key={option.value} alignItems="center" gap={tokens.spacing[2]}>
-                <Center width={44} height={44}>
-                  <CircleSkeleton size={20} />
-                </Center>
-                <YStack flex={1} gap={tokens.spacing[1]}>
-                  <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
-                    <TextSkeleton size="md" lines={1} />
-                  </Center>
-                  {option.description ? <TextSkeleton size="sm" lines={1} /> : null}
-                </YStack>
-              </XStack>
+              <RadioSkeletonRow key={option.value} description={!!option.description} />
             ))}
-          </YStack>
+          </TightStack>
         ) : (
           <RadioOptionGroup
             options={options}
@@ -207,17 +199,7 @@ export function RecipeSharingView({
             // Label's own line box (SIZABLE_TEXT_LINE_BOX, 27),
             // and a description bone at sm when a description
             // would render.
-            <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
-              <Center width={44} height={44}>
-                <BoxSkeleton width={24} height={24} />
-              </Center>
-              <YStack flex={1} gap={tokens.spacing[1]}>
-                <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
-                  <TextSkeleton size="md" lines={1} />
-                </Center>
-                {consentDescription ? <TextSkeleton size="sm" lines={1} /> : null}
-              </YStack>
-            </XStack>
+            <CheckboxSkeletonRow description={!!consentDescription} />
           ) : (
             <CheckboxField
               label={consentLabel}
@@ -241,7 +223,7 @@ export function RecipeSharingView({
           )
         ) : null}
         {onSave ? (
-          <XStack>
+          <ButtonRow>
             <Button
               variant="primary"
               disabled={pending || (consentRequired && !consentChecked)}
@@ -249,16 +231,16 @@ export function RecipeSharingView({
             >
               {pending ? savePendingLabel : saveLabel}
             </Button>
-          </XStack>
+          </ButtonRow>
         ) : null}
         {onRotateShareLink ? (
-          <YStack gap="$2">
+          <CompactStack>
             {showSkeleton ? (
               <TextSkeleton size="sm" lines={1} />
             ) : (
               <Text variant="hint">{shareLinkLabel}</Text>
             )}
-            <XStack gap="$2" flexWrap="wrap">
+            <CompactRow>
               <Button
                 variant="secondary"
                 size="sm"
@@ -272,31 +254,31 @@ export function RecipeSharingView({
                   {copyShareLinkLabel}
                 </Button>
               ) : null}
-            </XStack>
-          </YStack>
+            </CompactRow>
+          </CompactStack>
         ) : null}
         {permalinkUrl && onCopyPermalink ? (
-          <YStack gap="$2">
+          <CompactStack>
             {showSkeleton ? (
               <TextSkeleton size="sm" lines={1} />
             ) : (
               <Text variant="hint">{permalinkLabel}</Text>
             )}
-            <XStack gap="$2" alignItems="center" flexWrap="wrap">
+            <CompactRow>
               {showSkeleton ? (
-                <YStack flex={1}>
+                <Grow>
                   <TextSkeleton size="md" lines={1} />
-                </YStack>
+                </Grow>
               ) : (
                 <Text variant="muted">{permalinkUrl}</Text>
               )}
               <Button ghost size="sm" onPress={onCopyPermalink}>
                 {copyPermalinkLabel}
               </Button>
-            </XStack>
-          </YStack>
+            </CompactRow>
+          </CompactStack>
         ) : null}
-      </YStack>
+      </ContentStack>
     </Card>
   );
 }

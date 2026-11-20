@@ -1,9 +1,5 @@
-import { ScrollView, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
-import { platformAccessibilityProps } from "../widgets/accessibility.js";
-import { Text } from "../widgets/Text.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
-import { tokens } from "../tokens/index.js";
+import { OverlayTextPanel } from "../widgets/OverlayTextPanel.js";
 
 export type ScaledIngredientsViewProps = {
   /** The panel's heading line, pre-composed by the caller ("Ingredients · 4 servings (scaled ×2)"). */
@@ -19,12 +15,6 @@ export type ScaledIngredientsViewProps = {
    * into this state without prop-drilling. */
   loading?: boolean;
 };
-
-// The loading panel's dummy lines (#278): exactly 3 placeholder
-// lines when none are known, from a frozen module-level
-// constant — never generated per render. A loading panel over
-// known lines mirrors its own lines instead (one bone per line).
-const LOADING_LINE_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
 /**
  * ScaledIngredientsView (#438 Part 3): the cooking mode's
@@ -49,49 +39,5 @@ export function ScaledIngredientsView({
   loading = false,
 }: ScaledIngredientsViewProps) {
   const showSkeleton = useLoadingScope(loading);
-  return (
-    <YStack borderRadius={tokens.radii.xl} overflow="hidden">
-      <YStack
-        position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        bottom={0}
-        backgroundColor="$surface"
-        opacity={0.05}
-      />
-      <YStack
-        padding="$3"
-        gap="$2"
-        {...(showSkeleton
-          ? platformAccessibilityProps({ accessibilityState: { busy: true } })
-          : {})}
-      >
-        {showSkeleton ? (
-          <TextSkeleton size="sm" lines={1} />
-        ) : (
-          <Text
-            fontSize={tokens.typography.fontSize.sm}
-            fontWeight={tokens.typography.fontWeight.semibold}
-            color="$surface"
-          >
-            {heading}
-          </Text>
-        )}
-        <ScrollView maxHeight={160} nestedScrollEnabled>
-          <YStack gap="$1">
-            {showSkeleton
-              ? lines.length > 0
-                ? lines.map((_, index) => <TextSkeleton key={index} size="sm" lines={1} />)
-                : LOADING_LINE_KEYS.map((key) => <TextSkeleton key={key} size="sm" lines={1} />)
-              : lines.map((line, index) => (
-                  <Text key={index} fontSize={tokens.typography.fontSize.sm} color="$surface">
-                    {line}
-                  </Text>
-                ))}
-          </YStack>
-        </ScrollView>
-      </YStack>
-    </YStack>
-  );
+  return <OverlayTextPanel heading={heading} lines={lines} loading={showSkeleton} />;
 }

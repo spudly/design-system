@@ -1,10 +1,10 @@
-import { ScrollView, YStack } from "tamagui";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
 import { BulkSelectToolbar } from "../widgets/BulkSelectToolbar.js";
 import { Button } from "../widgets/Button.js";
 import { CheckboxSelectList } from "../widgets/CheckboxSelectList.js";
-import { tokens } from "../tokens/index.js";
+import { ContentStack } from "../widgets/ContentStack.js";
+import { FramedScrollRegion } from "../widgets/FramedScrollRegion.js";
 import { useVoice } from "../voice/index.js";
 
 type RecipeExportPickerViewItem = {
@@ -81,15 +81,14 @@ export function RecipeExportPickerView({
   exportPendingLabel: exportPendingLabelProp,
 }: RecipeExportPickerViewProps) {
   const voice = useVoice();
-  const searchPlaceholder =
-    searchPlaceholderProp ?? voice.recipeExportPickerView.searchPlaceholder;
+  const searchPlaceholder = searchPlaceholderProp ?? voice.recipeExportPickerView.searchPlaceholder;
   const emptyMessage = emptyMessageProp ?? voice.recipeExportPickerView.emptyMessage;
   const exportPendingLabel =
     exportPendingLabelProp ?? voice.recipeExportPickerView.exportPendingLabel;
   const showSkeleton = useLoadingScope(loading);
   return (
     <LoadingScope active={showSkeleton}>
-      <YStack gap="$3">
+      <ContentStack>
         {/* The toolbar stays rendered inside the scope while
             loading (#278): it reads the scope itself — its
             ghost Buttons as text bones, its SearchField as a
@@ -111,28 +110,20 @@ export function RecipeExportPickerView({
           onSelectAll={onSelectAll}
           onClearSelection={onClearSelection}
         />
-        <YStack
-          borderWidth={1}
-          borderColor={showSkeleton ? "transparent" : tokens.colors.gray.gray3}
-          borderRadius={tokens.radii.xl}
-          maxHeight={256}
-          overflow="hidden"
-        >
-          <ScrollView>
-            {error && !showSkeleton ? (
-              <Alert severity="error" message={error} />
-            ) : (
-              <CheckboxSelectList
-                items={items}
-                selectedIds={selectedIds}
-                onToggle={onToggle}
-                disabled={disabled || exporting}
-                loading={showSkeleton}
-                emptyMessage={emptyMessage}
-              />
-            )}
-          </ScrollView>
-        </YStack>
+        <FramedScrollRegion loading={showSkeleton}>
+          {error && !showSkeleton ? (
+            <Alert severity="error" message={error} />
+          ) : (
+            <CheckboxSelectList
+              items={items}
+              selectedIds={selectedIds}
+              onToggle={onToggle}
+              disabled={disabled || exporting}
+              loading={showSkeleton}
+              emptyMessage={emptyMessage}
+            />
+          )}
+        </FramedScrollRegion>
         <Button
           variant="primary"
           disabled={disabled || exporting || selectedIds.length === 0}
@@ -140,7 +131,7 @@ export function RecipeExportPickerView({
         >
           {exporting ? exportPendingLabel : exportLabel}
         </Button>
-      </YStack>
+      </ContentStack>
     </LoadingScope>
   );
 }

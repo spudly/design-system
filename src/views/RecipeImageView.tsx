@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
+import { ContentStack } from "../widgets/ContentStack.js";
+import { DashedPlaceholder } from "../widgets/DashedPlaceholder.js";
 import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { Text } from "../widgets/Text.js";
 import { Thumbnail } from "../widgets/Thumbnail.js";
@@ -136,7 +137,7 @@ export function RecipeImageView({
   return (
     <LoadingScope active={showSkeleton}>
       <LabeledGroup label={label} action={headerAction}>
-        <YStack gap="$3">
+        <ContentStack>
           {showSkeleton ? (
             <BoxSkeleton height={imagePreviewUri ? HERO_PREVIEW_HEIGHT : EMPTY_PREVIEW_HEIGHT} />
           ) : imagePreviewUri ? (
@@ -146,18 +147,9 @@ export function RecipeImageView({
               accessibilityLabel={voice.recipeImageView.previewLabel}
             />
           ) : (
-            <YStack
-              overflow="hidden"
-              borderRadius={tokens.radii.md}
-              borderWidth={2}
-              borderStyle="dashed"
-              borderColor={tokens.colors.gray.gray4}
-              backgroundColor={tokens.colors.gray.gray1}
-              paddingVertical="$6"
-              alignItems="center"
-            >
+            <DashedPlaceholder>
               <Text variant="hint">{emptyMessage}</Text>
-            </YStack>
+            </DashedPlaceholder>
           )}
           <ButtonRow>
             <Button variant="primary" disabled={busy} onPress={onPickImageRequest}>
@@ -189,7 +181,7 @@ export function RecipeImageView({
             ) : null}
           </ButtonRow>
           {error && !showSkeleton ? <Alert severity="error" message={error} /> : null}
-        </YStack>
+        </ContentStack>
       </LabeledGroup>
     </LoadingScope>
   );

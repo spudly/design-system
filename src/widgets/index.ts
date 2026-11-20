@@ -183,3 +183,16 @@ export {
   type WeekDayColumnProps,
   type WeekDayColumnsProps,
 } from "./WeekDayColumn.js";
+// The #698 tranche-3 extraction set: the layout and loading
+// components the recipe views' de-styling extracted.
+export { ContentStack, type ContentStackProps } from "./ContentStack.js";
+export { CompactStack, type CompactStackProps } from "./CompactStack.js";
+export { TightStack, type TightStackProps } from "./TightStack.js";
+export { EndRow, type EndRowProps } from "./EndRow.js";
+export { CompactRow, type CompactRowProps } from "./CompactRow.js";
+export { Grow, type GrowProps } from "./Grow.js";
+export { FramedScrollRegion, type FramedScrollRegionProps } from "./FramedScrollRegion.js";
+export { DashedPlaceholder, type DashedPlaceholderProps } from "./DashedPlaceholder.js";
+export { OverlayTextPanel, type OverlayTextPanelProps } from "./OverlayTextPanel.js";
+export { RadioSkeletonRow, type RadioSkeletonRowProps } from "./RadioSkeletonRow.js";
+export { CheckboxSkeletonRow, type CheckboxSkeletonRowProps } from "./CheckboxSkeletonRow.js";
