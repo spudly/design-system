@@ -86,7 +86,7 @@ test("header search crosses as data: a controlled field with change/submit callb
   assert.match(page, /search\?: AppShellPageSearch \| null;/);
   assert.match(
     topBar,
-    /import \{ SearchField \} from "\.\.\/widgets\/SearchField\.js";/,
+    /import \{ SearchField \} from "\.\/SearchField\.js";/,
     "the bar renders the DS SearchField — no new input widget",
   );
   assert.match(
@@ -127,7 +127,7 @@ test("the page composes DS components only and never touches the boundary itself
   assert.match(page, /<BigFooterShell footer=\{footer\} scrollMode="content">/);
 });
 test("the top bar is one shared chrome: TabbedShellPage renders it too", () => {
-  assert.match(topBar, /import \{ BrandLink \} from "\.\.\/widgets\/BrandLink\.js";/);
+  assert.match(topBar, /import \{ BrandLink \} from "\.\/BrandLink\.js";/);
   assert.match(topBar, /iconsByName/);
   assert.match(topBar, /navigationRoleProps/);
   assert.match(

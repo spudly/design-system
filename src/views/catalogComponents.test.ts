@@ -149,7 +149,14 @@ test("the bar's chooser adds filters and each added filter removes through Remov
 });
 
 test("CatalogHeader renders the title as the heading over its controls", () => {
-  assert.match(header, /<YStack paddingBlockStart="\$4" paddingBlockEnd="\$2" gap="\$4">/);
+  // #698 tranche 4: the header's stack geometry moved into the
+  // ListHeaderStack widget (views apply no styling directly);
+  // the header composes it and the widget owns the rhythm.
+  assert.match(header, /<ListHeaderStack>/);
+  const listHeaderStack = readCode("ListHeaderStack.tsx");
+  assert.match(listHeaderStack, /paddingBlockStart: tokens\.spacing\[4\]/);
+  assert.match(listHeaderStack, /paddingBlockEnd: tokens\.spacing\[2\]/);
+  assert.match(listHeaderStack, /gap: tokens\.spacing\[4\]/);
   assert.match(header, /<Text variant="heading">\{title\}<\/Text>/);
   assert.match(header, /title: string;/);
   assert.match(header, /children: ReactNode;/, "the bar composes in as the child");

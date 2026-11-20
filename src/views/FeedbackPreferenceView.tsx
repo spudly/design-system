@@ -1,5 +1,6 @@
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { CenteredRow } from "../widgets/CenteredRow.js";
+import { Grow } from "../widgets/Grow.js";
 import { CompactRow } from "../widgets/CompactRow.js";
 import { CompactStack } from "../widgets/CompactStack.js";
 import { TightStack } from "../widgets/TightStack.js";
@@ -125,12 +126,13 @@ export function FeedbackPreferenceView({
     return (
       <SectionCard title={title} variant="elevated" loading={showSkeleton}>
         <TightStack>
-          <CenteredRow minHeight={44}>
+          <CenteredRow>
             <Center width={44} height={44}>
               <BoxSkeleton width={24} height={24} />
             </Center>
-            <TightStack flex={1}>
-              {/* The label bone sits centered in the
+            <Grow>
+              <TightStack>
+                {/* The label bone sits centered in the
                   CheckboxField Label's own line box
                   (SIZABLE_TEXT_LINE_BOX, 27), and the
                   description bone takes the two lines the
@@ -138,11 +140,12 @@ export function FeedbackPreferenceView({
                   label column is 27 + gap + two lines, and
                   a shorter column slid everything below the
                   row up (Stephen on #579). */}
-              <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
-                <TextSkeleton size="md" lines={1} />
-              </Center>
-              <TextSkeleton size="sm" lines={2} />
-            </TightStack>
+                <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
+                  <TextSkeleton size="md" lines={1} />
+                </Center>
+                <TextSkeleton size="sm" lines={2} />
+              </TightStack>
+            </Grow>
           </CenteredRow>
           <CompactStack>
             <TextSkeleton size="md" lines={1} />

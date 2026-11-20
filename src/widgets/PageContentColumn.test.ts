@@ -101,10 +101,7 @@ test("BigFooterShell wraps web content in the column; the footer is NOT inside i
 });
 
 test("AppTopBar constrains its content through the same column", () => {
-  assert.match(
-    appTopBar,
-    /import \{ PageContentColumn \} from "\.\.\/widgets\/PageContentColumn\.js";/,
-  );
+  assert.match(appTopBar, /import \{ PageContentColumn \} from "\.\/PageContentColumn\.js";/);
   assert.match(appTopBar, /<PageContentColumn>\s*<XStack/);
   assert.match(appTopBar, /<\/XStack>\s*<\/PageContentColumn>/);
 });
