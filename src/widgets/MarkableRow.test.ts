@@ -59,10 +59,14 @@ test("a marked row dims but keeps its press — the mark is a toggle, not a disa
   assert.match(code, /opacity=\{isMarked \? 0\.4 : 1\}/, "the marked treatment is the dim");
   assert.match(
     code,
-    /accessibilityRole: "button"/,
-    "the press form carries the button role regardless of the mark",
+    /accessibilityRole: "checkbox"/,
+    "the press form carries the checkbox role — the box it draws (#721)",
   );
-  assert.ok(!code.includes("accessibilityState"), "a marked row is never announced disabled");
+  assert.match(
+    code,
+    /accessibilityState: \{ checked: isMarked \}/,
+    "the marked state is announced through the checked state, never as disabled",
+  );
 });
 
 test("the press form is keyboard-operable on web (the ListRow pattern)", () => {

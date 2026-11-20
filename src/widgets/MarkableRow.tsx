@@ -51,9 +51,11 @@ export type MarkableRowProps = {
  * layout or this row's data contract. A row with no press
  * handler is a plain row and renders no box.
  *
- * Activation follows the ListRow press pattern: the row carries
- * the button role, is focusable on web, and the button keys
- * (Enter and Space) invoke the same callback as a press.
+ * Activation follows the ListRow press pattern: the row is
+ * focusable on web, and the button keys (Enter and Space) invoke
+ * the same callback as a press. The press form announces itself
+ * as a checkbox whose checked state is the mark, matching the
+ * box it draws.
  */
 export function MarkableRow({
   label,
@@ -73,7 +75,10 @@ export function MarkableRow({
       opacity={isMarked ? 0.4 : 1}
       {...(onPress
         ? {
-            ...platformAccessibilityProps({ accessibilityRole: "button" }),
+            ...platformAccessibilityProps({
+              accessibilityRole: "checkbox",
+              accessibilityState: { checked: isMarked },
+            }),
             onPress,
             tabIndex: 0,
             onKeyDown: handleKeyDown,
