@@ -13,7 +13,7 @@ release's changed components. The full index lives in
 
 ## CheckboxField
 
-Open in `Views/CheckboxField`: Default, WithDescription, Checked,
+Open in `Widgets/CheckboxField`: Default, WithDescription, Checked,
 WithRichDescription, WithChildren, WithError.
 
 1. WithRichDescription: rich (multi-element) description content

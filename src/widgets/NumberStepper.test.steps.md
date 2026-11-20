@@ -13,7 +13,7 @@ release's changed components. The full index lives in
 
 ## NumberStepper
 
-Open in `Views/NumberStepper`: Default, AtMinBound, AtMaxBound,
+Open in `Widgets/NumberStepper`: Default, AtMinBound, AtMaxBound,
 CustomStep, Inline, Editable.
 
 1. Exactly **one pair** of step buttons renders — the browser's native
