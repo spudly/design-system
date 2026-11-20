@@ -5,8 +5,6 @@ import { platformAccessibilityProps } from "./accessibility.js";
 import { LinkOverlay } from "./linkOverlay.js";
 import { Text } from "./Text.js";
 
-export type { BrandMarkName };
-
 /**
  * The wordmark's brand treatment, carried by the anchor's styled
  * frame: primary ink, semibold, at the large text size, with no

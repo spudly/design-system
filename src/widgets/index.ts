@@ -115,7 +115,7 @@ export { VerseText, type VerseTextProps } from "./VerseText.js";
 // The #119 dedupe set: the canonical components the tranche
 // branches coined independently, shipped once here (the
 // tranche PRs adopt these in their update rounds).
-export { BrandLink, type BrandLinkProps, type BrandMarkName } from "./BrandLink.js";
+export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
 export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
 export { FieldLabel, type FieldLabelProps } from "./FieldLabel.js";
 export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
