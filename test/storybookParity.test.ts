@@ -169,6 +169,13 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "RowTextContent.tsx",
   "LoadingStatTiles.tsx",
   "useVariantGlyphInk.ts",
+  // MediaRow / RatingStars (#119 tranche 4): internal widgets
+  // composed by recipeRow (the shared recipe-row adapter) — NOT
+  // exported from the components barrel (#298 pages-only surface).
+  // Each has its own stories (Widgets/MediaRow,
+  // Widgets/RatingStars), like BigFooter.
+  "MediaRow.tsx",
+  "RatingStars.tsx",
   "PageFrame.tsx",
 ]);
 

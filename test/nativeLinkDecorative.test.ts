@@ -59,7 +59,9 @@ function count(code: string, literal: any) {
 // are ListRow's surface, already counted above). The recipe
 // list's rows are RecipesPage's page-local MediaRow
 // composition (Stephen's tranche rule, 2026-10-29), so its
-// surface is recipeRow.tsx, the shared row module (#657). Since #587 phase 2 the two
+// surface was recipeRow.tsx, the shared row module (#657); since
+// the #119 tranche-4 extraction it is the internal MediaRow widget
+// recipeRow composes. Since #587 phase 2 the two
 // card rows (CardRow, TextActionCardRow) render their texts
 // through the shared RowTextContent block, so their two
 // decorative texts are counted once, on that block's file.
@@ -70,7 +72,7 @@ const FAMILY: [string, string, number][] = [
   // subtitle line since #587 phase 3, so only its title line
   // counts here; the subtitle is counted on RowTextContent.
   ["src/widgets/ListRow.tsx", "decorative", 1],
-  ["src/pages/recipeRow.tsx", "native", 3],
+  ["src/widgets/MediaRow.tsx", "native", 3],
 ];
 
 for (const [rel, flag, expectedCount] of FAMILY) {
