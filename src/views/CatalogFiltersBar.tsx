@@ -111,10 +111,6 @@ export type CatalogFilterDefinition<FilterId extends string = string> =
   | CatalogRangeFilter<FilterId>
   | CatalogSortFilter<FilterId>;
 
-/** Re-exported so catalog pages and hosts name the search-help
- * content shape from the bar's own module (#699). */
-export type { SearchHelpContent, SearchHelpEntry } from "../widgets/SearchHelpPopover.js";
-
 export type CatalogFiltersBarProps<FilterId extends string = string> = {
   /** Search field placeholder copy, passed through to the search field. */
   searchPlaceholder: string;

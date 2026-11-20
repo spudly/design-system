@@ -108,11 +108,9 @@ export function SearchHelpPopover({
       <Adapt platform="touch">
         <Sheet modal dismissOnSnapToBottom aria-label={title}>
           <Sheet.Overlay />
-          <Sheet.Frame>
-            <Sheet.ScrollView>
-              <Adapt.Contents />
-            </Sheet.ScrollView>
-          </Sheet.Frame>
+          <Sheet.ScrollView>
+            <Adapt.Contents />
+          </Sheet.ScrollView>
         </Sheet>
       </Adapt>
       <StyledContent onCloseAutoFocus={false} {...platformAccessibilityProps({ accessibilityLabel: title })}>
