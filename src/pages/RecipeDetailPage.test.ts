@@ -163,7 +163,7 @@ test("there are no tabs: every section renders in one scroll, in tab order, unde
   // definitions precede the page body, and Nutrition's section
   // stack is composed in the body, its heading before the panel).
   const sequence = [
-    "<SectionHeading>Ingredients</SectionHeading>",
+    '<SectionHeading icon="list">Ingredients</SectionHeading>',
     "<SectionHeading>Instructions</SectionHeading>",
     "<SectionHeading>Cook History</SectionHeading>",
     "<OverviewPanel",
@@ -488,6 +488,38 @@ test("the activation confirmation mirrors the other confirmations' contract (#53
     /confirmTone: "primary" as const,/,
     "the story's activation confirmation uses the primary tone (reversible action)",
   );
+});
+
+test("the overview follows the recipe-detail visual direction (#721)", () => {
+  // The new optional overview props: category + total time for
+  // the pill, the cooking tip line — all app-supplied strings.
+  assert.match(code, /categoryLabel\?: string;/);
+  assert.match(code, /totalTimeLabel\?: string;/);
+  assert.match(code, /cookingTipLabel\?: string;/);
+  // The metadata pill under the hero: Badge's success (sage)
+  // tone, parts joined in the direction's order.
+  assert.match(code, /<Badge tone="success">\{parts\.join\(" • "\)\}<\/Badge>/);
+  assert.match(code, /servingsLabel \? `Serves \$\{servingsLabel\}` : undefined/);
+  // The title is the serif display variant, bare (no CardStack).
+  assert.match(code, /<Text variant="display">\{title\}<\/Text>/);
+  assert.ok(!code.includes("CardStack"), "the title's CardStack wrapper is dropped (#721)");
+  assert.ok(!code.includes('variant="formTitle"'), "the title no longer uses formTitle (#721)");
+  // Start Cooking: its own row, full-width on mobile (grow),
+  // capped on web (Stephen's amendment — not full-width on
+  // desktop).
+  assert.match(
+    code,
+    /<Button variant="primary" grow maxWidth=\{\{ web: 360 \}\} href=\{cookingHref\}>/,
+  );
+  // The tip line under the action, italic, only when supplied.
+  assert.match(
+    code,
+    /\{cookingTipLabel \? \(\s+<Text variant="hint" fontStyle="italic">\s+\{cookingTipLabel\}\s+<\/Text>\s+\) : null\}/,
+  );
+  // Ingredients heading carries the list icon; instructions use
+  // StepList's numeral presentation.
+  assert.match(code, /<SectionHeading icon="list">Ingredients<\/SectionHeading>/);
+  assert.match(code, /<StepList\s+presentation="numeral"/);
 });
 
 test("print/share name the icons module's Feather icons, not text glyphs (#187, #438 Part 4)", () => {

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { YStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Text } from "./Text.js";
@@ -16,6 +16,16 @@ type StepListStep = {
 export type StepListProps = {
   /** The steps, in display order. */
   steps: StepListStep[];
+  /**
+   * How each step is headed: `eyebrow` (default — the caller's
+   * pre-composed label over the body, the treatment every
+   * existing consumer renders) or `numeral` (#721 — the step's
+   * number as a large accent numeral beside the body, the
+   * recipe-detail visual direction's instructions treatment;
+   * the caller's label is not rendered in this presentation,
+   * the numeral is the step's position in the list).
+   */
+  presentation?: "eyebrow" | "numeral";
 };
 
 /**
@@ -33,8 +43,14 @@ export type StepListProps = {
  * Activation follows the ListRow press pattern: each card
  * carries the button role, is focusable on web, and the button
  * keys (Enter and Space) activate it like a press.
+ *
+ * The numeral presentation (#721) is opt-in per consumer: the
+ * card's eyebrow is replaced by the step's number as a large
+ * accent numeral beside the body (the recipe-detail visual
+ * direction). The card, its active treatment, and activation
+ * are unchanged — only the heading treatment differs.
  */
-export function StepList({ steps }: StepListProps) {
+export function StepList({ steps, presentation = "eyebrow" }: StepListProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   return (
     <>
@@ -68,21 +84,42 @@ export function StepList({ steps }: StepListProps) {
                 borderColor={isActive ? "$primary" : tokens.colors.gray.gray2}
                 backgroundColor={isActive ? "$primarySubtle" : "$surface"}
               >
-                <YStack paddingBlockEnd="$1">
-                  <Text
-                    fontSize={tokens.typography.fontSize.xs}
-                    fontWeight={tokens.typography.fontWeight.semibold}
-                    color={isActive ? "$primary" : "$textMuted"}
-                  >
-                    {step.label}
-                  </Text>
-                </YStack>
-                <Text
-                  fontSize={tokens.typography.fontSize.md}
-                  {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
-                >
-                  {step.body}
-                </Text>
+                {presentation === "numeral" ? (
+                  <XStack gap="$3" alignItems="flex-start">
+                    <Text
+                      fontSize={tokens.typography.fontSize["2xl"]}
+                      fontWeight={tokens.typography.fontWeight.bold}
+                      color="$primary"
+                    >
+                      {i + 1}
+                    </Text>
+                    <Text
+                      flex={1}
+                      fontSize={tokens.typography.fontSize.md}
+                      {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
+                    >
+                      {step.body}
+                    </Text>
+                  </XStack>
+                ) : (
+                  <>
+                    <YStack paddingBlockEnd="$1">
+                      <Text
+                        fontSize={tokens.typography.fontSize.xs}
+                        fontWeight={tokens.typography.fontWeight.semibold}
+                        color={isActive ? "$primary" : "$textMuted"}
+                      >
+                        {step.label}
+                      </Text>
+                    </YStack>
+                    <Text
+                      fontSize={tokens.typography.fontSize.md}
+                      {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
+                    >
+                      {step.body}
+                    </Text>
+                  </>
+                )}
               </YStack>
             </YStack>
           </YStack>

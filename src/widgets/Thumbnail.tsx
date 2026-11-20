@@ -1,20 +1,36 @@
+import { useState } from "react";
 import { Image, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 
 /**
  * The hero frame: a recessed gray well the feature image fills —
- * page-background gray fill, large radius, fixed 256px height,
- * overflow hidden so the cover-cropped image's corners follow the
- * frame (a mismatched-aspect image fills the frame instead of
+ * page-background gray fill, large radius, overflow hidden so
+ * the cover-cropped image's corners follow the frame (a
+ * mismatched-aspect image fills the frame instead of
  * letterboxing against the gray fill, #573).
+ *
+ * The frame's shape is the image's own aspect ratio (#721, the
+ * recipe-detail visual direction): the widget measures the
+ * image's natural dimensions when it loads and sets the frame's
+ * aspectRatio to the measured ratio, clamped to
+ * [HERO_MIN_ASPECT, HERO_MAX_ASPECT] so an extreme panorama or
+ * a tall screenshot cannot stretch the page; before the image
+ * loads (and if it never reports dimensions) the frame holds
+ * the HERO_FALLBACK_ASPECT shape. The image still cover-fills
+ * the frame, so an image whose ratio clamps crops inside its
+ * clamped frame exactly as it cropped inside the old fixed
+ * 256px frame (#573's treatment, kept).
  */
+const HERO_FALLBACK_ASPECT = 4 / 3;
+const HERO_MIN_ASPECT = 0.75;
+const HERO_MAX_ASPECT = 2.25;
+
 const StyledHeroFrame = styled(YStack, {
   name: "ThumbnailHeroFrame",
 
   backgroundColor: tokens.colors.gray.gray1,
   borderRadius: tokens.radii.lg,
-  height: 256,
   overflow: "hidden",
   width: "100%",
 });
@@ -43,7 +59,8 @@ export type ThumbnailProps = {
   src: string;
   /**
    * The image's presentation: `hero` (default — the detail page's
-   * feature image, cover-cropped to fill its 256px recessed frame), `banner`
+   * feature image, cover-cropped to fill its aspect-preserving
+   * recessed frame, #721), `banner`
    * (a full-width 192px cover image with large rounded corners, the
    * import/review preview), or `row` (the 64px square list-row
    * thumbnail, cover-cropped with a gray well behind it).
@@ -86,6 +103,22 @@ export type ThumbnailProps = {
 const decorativeImageProps = isWeb ? ({ alt: "" } as const) : ({} as const);
 
 export function Thumbnail({ src, variant = "hero", accessibilityLabel }: ThumbnailProps) {
+  // The hero frame's aspect ratio (#721): the image's measured
+  // natural ratio once it loads, clamped to the hero bounds;
+  // the 4:3 fallback until then. Measurement is widget-internal
+  // (the load event's source dimensions — the same shape on web
+  // and native), so no prop or app change is needed. Only the
+  // hero variant measures; banner and row keep fixed geometry.
+  const [heroAspect, setHeroAspect] = useState(HERO_FALLBACK_ASPECT);
+  const handleHeroLoad = (event: {
+    nativeEvent?: { source?: { width?: number; height?: number } };
+  }) => {
+    const width = event.nativeEvent?.source?.width;
+    const height = event.nativeEvent?.source?.height;
+    if (typeof width === "number" && typeof height === "number" && width > 0 && height > 0) {
+      setHeroAspect(Math.min(HERO_MAX_ASPECT, Math.max(HERO_MIN_ASPECT, width / height)));
+    }
+  };
   // A named image is exposed as an image with that name, routed
   // through the accessibility translator (Avatar's pattern, #235):
   // the RN `image` role and label become `role="img"` and
@@ -111,8 +144,15 @@ export function Thumbnail({ src, variant = "hero", accessibilityLabel }: Thumbna
     return <StyledRowImage src={src} {...a11yProps} />;
   }
   return (
-    <StyledHeroFrame>
-      <Image src={src} width="100%" height="100%" objectFit="cover" {...a11yProps} />
+    <StyledHeroFrame aspectRatio={heroAspect}>
+      <Image
+        src={src}
+        width="100%"
+        height="100%"
+        objectFit="cover"
+        onLoad={handleHeroLoad}
+        {...a11yProps}
+      />
     </StyledHeroFrame>
   );
 }

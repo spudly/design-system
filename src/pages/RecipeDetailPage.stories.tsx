@@ -5,6 +5,7 @@ import { View } from "tamagui";
 import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
 import { tagColorNameForHex } from "../themes/tagColors.js";
 import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
+import { storyImagePanorama, storyImagePortrait, storyImageWide } from "../storyFixtures.js";
 
 /**
  * Stories for the real RecipeDetailPage component (#49) — not a
@@ -29,8 +30,6 @@ const meta: Meta<typeof RecipeDetailPage> = {
 
 export default meta;
 type Story = StoryObj<typeof RecipeDetailPage>;
-
-
 
 const SCALE_MULTIPLIERS = [0.5, 1, 2, 3];
 
@@ -103,6 +102,7 @@ function RecipeDetailPageDemo({
   createDraft = false,
   withCoverageSections = false,
   activationConfirmationOpen = false,
+  heroImage = "wide",
 }: {
   variant?: "full" | "minimal";
   initialMissing?: string[];
@@ -110,6 +110,11 @@ function RecipeDetailPageDemo({
   createDraft?: boolean;
   withCoverageSections?: boolean;
   activationConfirmationOpen?: boolean;
+  /** Which fixture image the hero renders (#721): the wide
+   * placeholder (2.0 natural ratio), the portrait placeholder
+   * (0.5 — clamps to the hero's 0.75 floor), or the panorama
+   * placeholder (4.0 — clamps to the 2.25 ceiling). */
+  heroImage?: "wide" | "portrait" | "panorama";
 }) {
   const isFull = variant === "full";
   const baseServings = isFull ? 4 : 2;
@@ -164,10 +169,19 @@ function RecipeDetailPageDemo({
       title: isFull ? recipeDetailFixture.title : "Weeknight Tomato Pasta",
       ...(isFull
         ? {
+            imageUrl:
+              heroImage === "portrait"
+                ? storyImagePortrait
+                : heroImage === "panorama"
+                  ? storyImagePanorama
+                  : storyImageWide,
             description:
               "A one-pan weeknight chicken in a garlicky cream sauce with sun-dried tomatoes and spinach.",
             prepTimeLabel: "15m",
             cookTimeLabel: "30m",
+            categoryLabel: "Chicken",
+            totalTimeLabel: "45 min",
+            cookingTipLabel: "Tip: Spoon the pan sauce over just before serving.",
           }
         : {}),
       servingsLabel: String(servings),
@@ -360,6 +374,21 @@ export const Default: Story = {
 
 export const Minimal: Story = {
   render: () => <RecipeDetailPageDemo variant="minimal" />,
+};
+
+export const PortraitHero: Story = {
+  // #721: a portrait image (0.5 natural ratio) — the hero frame
+  // preserves the image's aspect, clamped at the 0.75 floor, so
+  // the frame renders taller than the wide fixture's frame
+  // without stretching to the image's full portrait height.
+  render: () => <RecipeDetailPageDemo heroImage="portrait" />,
+};
+
+export const PanoramaHero: Story = {
+  // #721: an extreme-wide image (4.0 natural ratio) — the hero
+  // frame clamps at the 2.25 ceiling instead of rendering a
+  // letterbox-thin strip.
+  render: () => <RecipeDetailPageDemo heroImage="panorama" />,
 };
 
 export const CreateDraft: Story = {

@@ -14,7 +14,8 @@
  *    the retired `@spudly/ui/icons` subpath (add, feedback, home,
  *    meals, profile, recipes, shared, tags, warning), plus "print"
  *    and "share" for RecipeDetailPage's Print / Share actions
- *    (#187), plus "help" for SearchHelpPopover's trigger (#699)
+ *    (#187), plus "help" for SearchHelpPopover's trigger (#699),
+ *    plus "list" for SectionHeading's icon form (#721)
  *    — no more, no fewer.
  * 2. Every name resolves, at runtime, to the per-icon component of
  *    the same semantic name (add -> AddIcon, …): resolution is
@@ -51,6 +52,7 @@ const NAMES: [string, string][] = [
   ["feedback", "FeedbackIcon"],
   ["help", "HelpIcon"],
   ["home", "HomeIcon"],
+  ["list", "ListIcon"],
   ["meals", "MealsIcon"],
   ["print", "PrintIcon"],
   ["profile", "ProfileIcon"],
@@ -89,7 +91,7 @@ test("the registry's name set is exactly the audited names plus print/share (#43
   assert.deepEqual(
     listed,
     NAMES.map(([name]) => name),
-    "the name set is exactly the dispositioned twelve, in order",
+    "the name set is exactly the dispositioned thirteen, in order",
   );
 });
 

@@ -18,7 +18,9 @@ export type MarkableRowProps = {
    * The row's marked state: the row renders dimmed but stays
    * pressable, so a marked row can be un-marked by pressing it
    * again. This is not a disabled state — activation is the
-   * point of the mark.
+   * point of the mark. A pressable row's leading checkbox box
+   * shows the same state: checked (accent fill, accent check)
+   * while marked.
    */
   isMarked?: boolean;
   /**
@@ -38,6 +40,17 @@ export type MarkableRowProps = {
  * lists without hand-rolling pressable row styles; all content
  * is caller-supplied, so the row serves any app's lists.
  *
+ * The checkbox box (#721, the recipe-detail visual direction):
+ * a pressable row leads with the visual-direction checkbox —
+ * CheckRow's box shape (a 24px rounded box, accent fill with
+ * the accent check while marked, an outline while unmarked) —
+ * so the mark reads as a checked box, not only as dimming.
+ * This is the interim row treatment the #721 plan settled
+ * against #713: when #713's unified CheckboxField lands, its
+ * migration swaps the row widget without changing the pages'
+ * layout or this row's data contract. A row with no press
+ * handler is a plain row and renders no box.
+ *
  * Activation follows the ListRow press pattern: the row carries
  * the button role, is focusable on web, and the button keys
  * (Enter and Space) invoke the same callback as a press.
@@ -53,6 +66,7 @@ export function MarkableRow({
   return (
     <XStack
       alignItems="center"
+      gap={onPress ? "$3" : undefined}
       borderBottomWidth={1}
       borderBottomColor={tokens.colors.gray.gray2}
       paddingVertical="$3"
@@ -67,6 +81,24 @@ export function MarkableRow({
           }
         : null)}
     >
+      {onPress ? (
+        <YStack
+          width={tokens.spacing[6]}
+          height={tokens.spacing[6]}
+          borderRadius={tokens.radii.sm}
+          borderWidth={2}
+          borderColor={isMarked ? "$primary" : "$textMuted"}
+          backgroundColor={isMarked ? "$primary" : "$surface"}
+          alignItems="center"
+          justifyContent="center"
+        >
+          {isMarked ? (
+            <Text fontSize={tokens.typography.fontSize.sm} color="$onPrimary">
+              ✓
+            </Text>
+          ) : null}
+        </YStack>
+      ) : null}
       {subtitle ? (
         <YStack flex={1}>
           <Text>{label}</Text>

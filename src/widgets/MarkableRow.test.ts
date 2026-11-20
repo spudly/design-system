@@ -42,6 +42,19 @@ test("MarkableRow is exported from the built internal components barrel", async 
   );
 });
 
+test("a pressable row leads with the visual-direction checkbox box (#721)", () => {
+  assert.match(
+    code,
+    /borderColor=\{isMarked \? "\$primary" : "\$textMuted"\}/,
+    "the box takes CheckRow's shape: accent while marked, muted outline while unmarked",
+  );
+  assert.match(code, /backgroundColor=\{isMarked \? "\$primary" : "\$surface"\}/);
+  assert.match(
+    code,
+    /\{isMarked \? \(\s+<Text fontSize=\{tokens\.typography\.fontSize\.sm\} color="\$onPrimary">\s+✓\s+<\/Text>\s+\) : null\}/,
+  );
+});
+
 test("a marked row dims but keeps its press — the mark is a toggle, not a disable", () => {
   assert.match(code, /opacity=\{isMarked \? 0\.4 : 1\}/, "the marked treatment is the dim");
   assert.match(

@@ -23,6 +23,10 @@ const StyledText = styled(TamaguiText, {
         fontSize: tokens.typography.fontSize["2xl"],
         fontWeight: tokens.typography.fontWeight.bold,
       },
+      display: {
+        fontSize: tokens.typography.fontSize["3xl"],
+        fontWeight: tokens.typography.fontWeight.bold,
+      },
       label: {
         fontSize: tokens.typography.fontSize.xs,
         fontWeight: tokens.typography.fontWeight.semibold,
@@ -76,6 +80,7 @@ export type TextProps = StyledTextProps & {
     | "heading"
     | "title"
     | "formTitle"
+    | "display"
     | "subheading"
     | "body"
     | "strong"
@@ -96,7 +101,10 @@ export type TextProps = StyledTextProps & {
  * page title — xl bold, for detail screens whose title sits above a
  * meta block rather than opening a list), `formTitle` (the form-flow
  * page title — 2xl bold, for the import/form screens whose titles sit
- * inside the form layout rather than opening a page), `subheading`,
+ * inside the form layout rather than opening a page), `display`
+ * (the serif display title — 3xl bold in the `verse` serif family,
+ * for a detail page's hero title in the visual-direction treatment,
+ * #721), `subheading`,
  * `body` (default), `hint` (muted caption), `muted` (body-size text in
  * the muted treatment — the intro line under a page title, a
  * de-emphasized account line), `strong` (body-size text in bold — a
@@ -129,10 +137,10 @@ export function Text({
   ...rest
 }: TextProps) {
   // Heading semantics (#256): the `heading`, `title`, `formTitle`,
-  // and `subheading` variants are page/section titles, so they carry
+  // `display`, and `subheading` variants are page/section titles, so they carry
   // the RN `header` role by default — on web the translator renders
   // it as `role="heading"` with `aria-level` 1
-  // (heading/title/formTitle) / 2 (subheading),
+  // (heading/title/formTitle/display) / 2 (subheading),
   // and on native the `header` role alone gives VoiceOver/TalkBack
   // heading navigation, with visuals unchanged. A caller-supplied
   // role (RN `accessibilityRole` or web `role` in rest) always wins;
@@ -144,7 +152,7 @@ export function Text({
   // web and a defined level would bypass the translator's native
   // filter (RN has no heading-level prop; it is dropped there).
   const headingLevel =
-    variant === "heading" || variant === "title" || variant === "formTitle"
+    variant === "heading" || variant === "title" || variant === "formTitle" || variant === "display"
       ? 1
       : variant === "subheading"
         ? 2
@@ -189,7 +197,7 @@ export function Text({
   return (
     <StyledText
       variant={variant}
-      fontFamily={variant === "verse" ? "verse" : "body"}
+      fontFamily={variant === "verse" || variant === "display" ? "verse" : "body"}
       {...a11yProps}
       {...rest}
     />

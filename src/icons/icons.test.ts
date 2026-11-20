@@ -64,6 +64,9 @@ const ICONS: [string, string | null][] = [
   ["FeedbackIcon", "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7"],
   ["HelpIcon", "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"],
   ["HomeIcon", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"],
+  // ListIcon is six bare lines with no path literal; its data is
+  // pinned by a dedicated assertion below.
+  ["ListIcon", null],
   ["MealsIcon", "M2.62 13.5 A9.5 9.5 0 0 0 21.38 13.5 Z"],
   ["PrintIcon", "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"],
   ["ProfileIcon", "M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"],
@@ -101,6 +104,14 @@ test("each icon module carries its glyph's data (official Feather, except the cu
   const add = codeByIcon.get("AddIcon")!;
   assert.match(add, /x1: "12", y1: "5", x2: "12", y2: "19"/);
   assert.match(add, /x1: "5", y1: "12", x2: "19", y2: "12"/);
+  // list is six bare lines with no path data: pin its line endpoints.
+  const list = codeByIcon.get("ListIcon")!;
+  assert.match(list, /x1: "8", y1: "6", x2: "21", y2: "6"/);
+  assert.match(list, /x1: "8", y1: "12", x2: "21", y2: "12"/);
+  assert.match(list, /x1: "8", y1: "18", x2: "21", y2: "18"/);
+  assert.match(list, /x1: "3", y1: "6", x2: "3.01", y2: "6"/);
+  assert.match(list, /x1: "3", y1: "12", x2: "3.01", y2: "12"/);
+  assert.match(list, /x1: "3", y1: "18", x2: "3.01", y2: "18"/);
 });
 
 test("no icon module carries another icon's glyph (#246)", () => {

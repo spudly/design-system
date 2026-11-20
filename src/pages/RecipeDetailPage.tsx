@@ -5,7 +5,6 @@ import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { CandidateList } from "../widgets/CandidateList.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
-import { CardStack } from "../widgets/CardStack.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
@@ -176,9 +175,10 @@ import { STATUS_BADGES } from "./recipeStatusBadges.js";
  *   accessibility label is the hint; the view renders the hint as
  *   visible hint text. The copy moved verbatim from the app's
  *   client constants (STALE_*_RATING_HINT, now in RatingsCard).
- * - The hero image frame height (256) is layout geometry with no
- *   step on the DS spacing scale, as in the app — it lives in
- *   Thumbnail's hero variant.
+ * - The hero image frame's shape is the image's own aspect
+ *   ratio (#721), measured and clamped inside Thumbnail's hero
+ *   variant; the loading skeleton's hero bone holds the same
+ *   fallback 4:3 shape.
  * No lineHeight is set anywhere in this file (the #162 rule).
  */
 
@@ -244,6 +244,18 @@ export type RecipeDetailPageOverviewProps = {
   servingsLabel: string;
   prepTimeLabel?: string;
   cookTimeLabel?: string;
+  /** The recipe's category, app-formatted ("Herb & Garlic"):
+   * the first part of the metadata pill under the hero (#721).
+   * Optional — the pill joins whichever parts are present. */
+  categoryLabel?: string;
+  /** Total time, app-formatted ("45 min"): the metadata pill's
+   * second part (#721). The app formats it from its own data —
+   * the DS never sums the prep/cook label strings. */
+  totalTimeLabel?: string;
+  /** A short cooking hint, app-supplied ("Tip: Let it rest for
+   * juicier meat"): rendered as the italic line under the Start
+   * Cooking action (#721). Omit for no line. */
+  cookingTipLabel?: string;
   /** Transient feedback line ("Version activated"), app-held. */
   actionMessage?: string | null;
   /** The cooking-mode destination (#248: navigation crosses as
@@ -636,6 +648,35 @@ function LifecycleSection({
   );
 }
 
+/**
+ * The metadata pill (#721): the visual direction's sage summary
+ * line under the hero — category • total time • serves — composed
+ * from the overview's app-supplied labels in that order, joining
+ * whichever parts are present. Rendered through Badge's success
+ * tone (the sage treatment already in the system); the pill is a
+ * summary line, not a replacement for the StatBand's prep/cook
+ * breakdown below. Renders nothing when no part exists.
+ */
+function MetaPill({
+  categoryLabel,
+  totalTimeLabel,
+  servingsLabel,
+}: {
+  categoryLabel?: string | undefined;
+  totalTimeLabel?: string | undefined;
+  servingsLabel: string;
+}) {
+  const parts = [
+    categoryLabel,
+    totalTimeLabel,
+    servingsLabel ? `Serves ${servingsLabel}` : undefined,
+  ].filter((part): part is string => part !== undefined && part !== "");
+  if (parts.length === 0) {
+    return null;
+  }
+  return <Badge tone="success">{parts.join(" • ")}</Badge>;
+}
+
 function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }) {
   const {
     imageUrl,
@@ -644,6 +685,9 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
     servingsLabel,
     prepTimeLabel,
     cookTimeLabel,
+    categoryLabel,
+    totalTimeLabel,
+    cookingTipLabel,
     actionMessage,
     cookingHref,
     onPrintPress,
@@ -676,61 +720,93 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
   // The sections render from their data props (#438 Part 3).
   const sharingControls = sharing ? <RecipeSharingView {...sharing} /> : null;
   const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : null;
+  // The secondary action row renders only when at least one of
+  // its actions applies — Start Cooking has its own row now
+  // (#721), so this row can legitimately be empty.
+  const hasSecondaryActions =
+    onPrintPress !== undefined ||
+    onSharePress !== undefined ||
+    editHref !== undefined ||
+    editDraftHref !== undefined ||
+    onCreateDraftPress !== undefined ||
+    onDeletePress !== undefined;
 
   return (
     <PanelStack>
       {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
-      <CardStack>
-        <Text variant="formTitle">{title}</Text>
-      </CardStack>
+      <MetaPill
+        categoryLabel={categoryLabel}
+        totalTimeLabel={totalTimeLabel}
+        servingsLabel={servingsLabel}
+      />
+      <Text variant="display">{title}</Text>
       {description ? <Text variant="body">{description}</Text> : null}
       <StatBand>
         <StatCard label="Servings" value={servingsLabel} />
         {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
         {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
       </StatBand>
+      {/* Start Cooking on its own row (#721, as amended by
+          Stephen): full-width on mobile, capped on web — a
+          full-width primary would stretch too wide across a
+          desktop column. The DS config defines no width
+          breakpoints and treats native as the narrow rendering
+          and web as the wide one (the #171 contract), so the
+          button grows to the row on native and takes a web-only
+          max-width cap through Tamagui's conditional-object
+          syntax. The remaining actions keep their shared row
+          beneath it. */}
       <ButtonRow>
-        <Button variant="primary" grow href={cookingHref}>
+        <Button variant="primary" grow maxWidth={{ web: 360 }} href={cookingHref}>
           Start Cooking
         </Button>
-        {onPrintPress ? (
-          <Button
-            variant="secondary"
-            size="md"
-            icon="print"
-            accessibilityLabel="Print recipe"
-            onPress={onPrintPress}
-          />
-        ) : null}
-        {onSharePress ? (
-          <Button
-            variant="secondary"
-            size="md"
-            icon="share"
-            accessibilityLabel="Share recipe"
-            onPress={onSharePress}
-          />
-        ) : null}
-        {editHref ? (
-          <Button variant="secondary" size="sm" href={editHref}>
-            Edit
-          </Button>
-        ) : null}
-        {editDraftHref ? (
-          <Button variant="secondary" size="sm" href={editDraftHref}>
-            Edit draft
-          </Button>
-        ) : onCreateDraftPress ? (
-          <Button variant="secondary" size="sm" onPress={onCreateDraftPress}>
-            Edit draft
-          </Button>
-        ) : null}
-        {onDeletePress ? (
-          <Button variant="danger" size="sm" onPress={onDeletePress}>
-            Delete
-          </Button>
-        ) : null}
       </ButtonRow>
+      {cookingTipLabel ? (
+        <Text variant="hint" fontStyle="italic">
+          {cookingTipLabel}
+        </Text>
+      ) : null}
+      {hasSecondaryActions ? (
+        <ButtonRow>
+          {onPrintPress ? (
+            <Button
+              variant="secondary"
+              size="md"
+              icon="print"
+              accessibilityLabel="Print recipe"
+              onPress={onPrintPress}
+            />
+          ) : null}
+          {onSharePress ? (
+            <Button
+              variant="secondary"
+              size="md"
+              icon="share"
+              accessibilityLabel="Share recipe"
+              onPress={onSharePress}
+            />
+          ) : null}
+          {editHref ? (
+            <Button variant="secondary" size="sm" href={editHref}>
+              Edit
+            </Button>
+          ) : null}
+          {editDraftHref ? (
+            <Button variant="secondary" size="sm" href={editDraftHref}>
+              Edit draft
+            </Button>
+          ) : onCreateDraftPress ? (
+            <Button variant="secondary" size="sm" onPress={onCreateDraftPress}>
+              Edit draft
+            </Button>
+          ) : null}
+          {onDeletePress ? (
+            <Button variant="danger" size="sm" onPress={onDeletePress}>
+              Delete
+            </Button>
+          ) : null}
+        </ButtonRow>
+      ) : null}
       {/* StatusMessage renders unconditionally (#318): its polite
           live region must be mounted before the message changes
           for the change to announce, so there is no conditional
@@ -769,7 +845,7 @@ function IngredientsPanel({
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
   return (
     <PanelStack>
-      <SectionHeading>Ingredients</SectionHeading>
+      <SectionHeading icon="list">Ingredients</SectionHeading>
       {/* Servings + scale controls (#73): one compact block, two
           fixed rows, and every value directly enterable — stepping
           is no longer the only way to reach a large batch. Servings
@@ -846,6 +922,7 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
     <PanelStack>
       <SectionHeading>Instructions</SectionHeading>
       <StepList
+        presentation="numeral"
         steps={sorted.map((step) => ({
           id: step.id,
           label: `Step ${step.stepNumber}`,
@@ -982,7 +1059,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
             </Toolbar>
             <ScrollRegion>
               <PanelStack>
-                <BoxSkeleton height={256} />
+                <BoxSkeleton aspectRatio={4 / 3} />
                 <TextSkeleton size="2xl" lines={1} />
                 <TextSkeleton size="md" lines={3} />
                 <StatBand loading>
