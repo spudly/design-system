@@ -56,6 +56,12 @@ export { CatalogCardColumn, type CatalogCardColumnProps } from "./CatalogCardCol
 export { CatalogListColumn, type CatalogListColumnProps } from "./CatalogListColumn.js";
 export { LoadingMediaRow } from "./LoadingMediaRow.js";
 export { ScrollSentinel, type ScrollSentinelProps } from "./ScrollSentinel.js";
+export {
+  SearchHelpPopover,
+  type SearchHelpContent,
+  type SearchHelpEntry,
+  type SearchHelpPopoverProps,
+} from "./SearchHelpPopover.js";
 export { HeroStack, type HeroStackProps } from "./HeroStack.js";
 export { StackedButtonRow, type StackedButtonRowProps } from "./StackedButtonRow.js";
 export { CardGrid, type CardGridProps } from "./CardGrid.js";

@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 import { AddIcon } from "./AddIcon.js";
 import { FeedbackIcon } from "./FeedbackIcon.js";
+import { HelpIcon } from "./HelpIcon.js";
 import { HomeIcon } from "./HomeIcon.js";
 import type { IconComponentProps } from "./Icon.js";
 import { MealsIcon } from "./MealsIcon.js";
@@ -37,12 +38,14 @@ import { WarningIcon } from "./WarningIcon.js";
  * importing as components from the retired `@spudly/ui/icons`
  * subpath (add, feedback, home, meals, profile, recipes, shared,
  * tags, warning), plus "print" and "share" for RecipeDetailPage's
- * Print / Share actions, the icon slot's original call sites (#187).
+ * Print / Share actions, the icon slot's original call sites (#187),
+ * plus "help" for SearchHelpPopover's trigger (#699).
   * @public — intentional exception (#586 phase 2): exercised directly by tests through internal module/dist imports that knip cannot trace; not part of the package's public entry.
  */
 export const iconNames = [
   "add",
   "feedback",
+  "help",
   "home",
   "meals",
   "print",
@@ -61,6 +64,7 @@ export type IconName = (typeof iconNames)[number];
 export const iconsByName: Record<IconName, ComponentType<IconComponentProps>> = {
   add: AddIcon,
   feedback: FeedbackIcon,
+  help: HelpIcon,
   home: HomeIcon,
   meals: MealsIcon,
   print: PrintIcon,

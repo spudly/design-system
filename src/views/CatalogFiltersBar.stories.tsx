@@ -29,12 +29,32 @@ const SORT_DIR_OPTIONS: SelectOption[] = [
 /** The bar is controlled: the story holds the filter state the
  * way a catalog page's host does, and passes the catalog's
  * filter definitions in. */
+const SEARCH_HELP = {
+  label: "Search syntax",
+  title: "Search syntax",
+  intro: "Combine these in the search field to narrow results.",
+  entries: [
+    { syntax: "title:", description: "Match words in the title, e.g. title:soup." },
+    { syntax: "desc:", description: "Match words in the description." },
+    { syntax: "ingredient:", description: "Match recipes using an ingredient." },
+    { syntax: "tag:", description: "Match a tag." },
+    { syntax: '"quoted phrase"', description: "Match the exact phrase." },
+    { syntax: "-ingredient:", description: "Exclude recipes using an ingredient." },
+    { syntax: "status: / is:", description: "Filter by status, e.g. is:favorite." },
+    { syntax: "calories:<600", description: "Match under a calorie limit." },
+  ],
+};
+
+const SEARCH_HINT = "Tip: try title:soup or calories:<600 — open Search syntax for all qualifiers.";
+
 function BarDemo({
   initialActive,
   initialChooserOpen = false,
+  withSearchHelp = false,
 }: {
   initialActive?: string[];
   initialChooserOpen?: boolean;
+  withSearchHelp?: boolean;
 }) {
   const [search, setSearch] = useState("");
   const [ingredient, setIngredient] = useState("");
@@ -99,6 +119,7 @@ function BarDemo({
       searchPlaceholder="Search public recipes…"
       search={search}
       onSearchChange={setSearch}
+      {...(withSearchHelp ? { searchHelp: SEARCH_HELP, searchHint: SEARCH_HINT } : {})}
       filters={filters}
       activeFilters={activeFilters}
       onActiveFiltersChange={setActiveFilters}
@@ -118,4 +139,8 @@ export const ChooserOpen: Story = {
 
 export const WithFiltersAdded: Story = {
   render: () => <BarDemo initialActive={["ingredient", "calories", "sort"]} />,
+};
+
+export const WithSearchHelp: Story = {
+  render: () => <BarDemo withSearchHelp />,
 };

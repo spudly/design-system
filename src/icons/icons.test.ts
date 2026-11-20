@@ -62,6 +62,7 @@ const ICONS: [string, string | null][] = [
   ["CollapsedIcon", "6 9 12 15 18 9"],
   ["ExpandedIcon", "18 15 12 9 6 15"],
   ["FeedbackIcon", "M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7"],
+  ["HelpIcon", "M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"],
   ["HomeIcon", "M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"],
   ["MealsIcon", "M2.62 13.5 A9.5 9.5 0 0 0 21.38 13.5 Z"],
   ["PrintIcon", "M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"],
