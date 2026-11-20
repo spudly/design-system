@@ -2,7 +2,7 @@
 component: ForgotPasswordForm
 run_when:
   - "src/pages/SignInPage.tsx, src/pages/SignUpPage.tsx, src/pages/ForgotPasswordPage.tsx, src/pages/ResetPasswordPage.tsx, the form components they compose (src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx), their stories, or a changeset naming the auth pages or Enter-to-submit."
-  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/views/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
+  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/widgets/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
 ---
 
 # ForgotPasswordForm — manual test steps
@@ -67,7 +67,7 @@ changeset naming the auth pages or Enter-to-submit.
 
 Open in `Views/SignInForm`, `Views/SignUpForm`,
 `Views/ForgotPasswordForm`, `Views/ResetPasswordForm`,
-`Views/LegalSection` (each form's Default story — the
+`Widgets/LegalSection` (each form's Default story — the
 stories are interactive: fields can be typed in).
 
 The auth pages' forms as standalone components: each form
@@ -101,6 +101,6 @@ forms.
 `src/views/SignUpForm.tsx`,
 `src/views/ForgotPasswordForm.tsx`,
 `src/views/ResetPasswordForm.tsx`,
-`src/views/LegalSection.tsx`, their stories, the auth or
+`src/widgets/LegalSection.tsx`, their stories, the auth or
 Profile pages that compose them, or a changeset naming the
 auth forms or LegalSection.

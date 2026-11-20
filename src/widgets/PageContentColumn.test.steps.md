@@ -1,7 +1,7 @@
 ---
 component: PageContentColumn
 run_when:
-  - "src/widgets/PageContentColumn.tsx, its stories, BigFooterShell (src/widgets/BigFooter.tsx), AppTopBar (src/views/AppTopBar.tsx), or a changeset naming PageContentColumn."
+  - "src/widgets/PageContentColumn.tsx, its stories, BigFooterShell (src/widgets/BigFooter.tsx), AppTopBar (src/widgets/AppTopBar.tsx), or a changeset naming PageContentColumn."
 ---
 
 # PageContentColumn — manual test steps
@@ -32,5 +32,5 @@ the column is a pass-through (device-width screens).
 
 **Run when:** `src/widgets/PageContentColumn.tsx`, its
 stories, BigFooterShell (`src/widgets/BigFooter.tsx`),
-AppTopBar (`src/views/AppTopBar.tsx`), or a changeset naming
+AppTopBar (`src/widgets/AppTopBar.tsx`), or a changeset naming
 PageContentColumn.

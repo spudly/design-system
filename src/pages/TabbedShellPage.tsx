@@ -3,7 +3,7 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Tabs } from "../widgets/Tabs.js";
 import type { IconName } from "../icons/iconRegistry.js";
-import { AppTopBar } from "../views/AppTopBar.js";
+import { AppTopBar } from "../widgets/AppTopBar.js";
 import { LazySlot } from "../views/LazySlot.js";
 
 /**

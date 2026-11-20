@@ -3,7 +3,7 @@ import { useMemo } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
-import { CandidateList } from "../views/CandidateList.js";
+import { CandidateList } from "../widgets/CandidateList.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { CardStack } from "../widgets/CardStack.js";
 import { ListStack } from "../widgets/ListStack.js";
@@ -41,7 +41,7 @@ import { Thumbnail } from "../widgets/Thumbnail.js";
 import { Toolbar } from "../widgets/Toolbar.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../views/ConfirmActionView.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
-import { RatingForm } from "../views/RatingForm.js";
+import { RatingForm } from "../widgets/RatingForm.js";
 import {
   RecipeSharingView,
   type RecipeSharingConsentSpan,

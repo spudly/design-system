@@ -1,6 +1,9 @@
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
+import { CenteredRow } from "../widgets/CenteredRow.js";
+import { Grow } from "../widgets/Grow.js";
+import { CompactRow } from "../widgets/CompactRow.js";
+import { CompactStack } from "../widgets/CompactStack.js";
+import { TightStack } from "../widgets/TightStack.js";
 import { Alert } from "../widgets/Alert.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/Button.js";
@@ -122,13 +125,14 @@ export function FeedbackPreferenceView({
     // text, or error shows.
     return (
       <SectionCard title={title} variant="elevated" loading={showSkeleton}>
-        <YStack gap={tokens.spacing[1]}>
-          <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
+        <TightStack>
+          <CenteredRow>
             <Center width={44} height={44}>
               <BoxSkeleton width={24} height={24} />
             </Center>
-            <YStack flex={1} gap={tokens.spacing[1]}>
-              {/* The label bone sits centered in the
+            <Grow>
+              <TightStack>
+                {/* The label bone sits centered in the
                   CheckboxField Label's own line box
                   (SIZABLE_TEXT_LINE_BOX, 27), and the
                   description bone takes the two lines the
@@ -136,26 +140,27 @@ export function FeedbackPreferenceView({
                   label column is 27 + gap + two lines, and
                   a shorter column slid everything below the
                   row up (Stephen on #579). */}
-              <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
-                <TextSkeleton size="md" lines={1} />
-              </Center>
-              <TextSkeleton size="sm" lines={2} />
-            </YStack>
-          </XStack>
-          <YStack gap="$2">
+                <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
+                  <TextSkeleton size="md" lines={1} />
+                </Center>
+                <TextSkeleton size="sm" lines={2} />
+              </TightStack>
+            </Grow>
+          </CenteredRow>
+          <CompactStack>
             <TextSkeleton size="md" lines={1} />
             <LoadingScope active>
-              <XStack gap="$2" flexWrap="wrap">
+              <CompactRow>
                 <Button ghost size="sm" onPress={onAcceptConsent}>
                   {acceptLabel}
                 </Button>
                 <Button ghost size="sm" onPress={onDeclineConsent}>
                   {declineLabel}
                 </Button>
-              </XStack>
+              </CompactRow>
             </LoadingScope>
-          </YStack>
-        </YStack>
+          </CompactStack>
+        </TightStack>
       </SectionCard>
     );
   }
@@ -168,25 +173,25 @@ export function FeedbackPreferenceView({
         onCheckedChange={onShortcutEnabledChange}
         disabled={shortcutUnavailable}
       >
-        <YStack gap="$2">
+        <CompactStack>
           {shortcutUnavailable && unavailableHint ? (
             <Text variant="hint">{unavailableHint}</Text>
           ) : null}
           {consentStatusText ? <Text variant="body">{consentStatusText}</Text> : null}
           {consentPromptOpen ? (
-            <YStack gap="$2">
+            <CompactStack>
               <Text variant="body">{consentPromptText}</Text>
-              <XStack gap="$2">
+              <CompactRow>
                 <Button variant="secondary" size="sm" onPress={onDeclineConsent}>
                   {declineLabel}
                 </Button>
                 <Button variant="primary" size="sm" onPress={onAcceptConsent}>
                   {acceptLabel}
                 </Button>
-              </XStack>
-            </YStack>
+              </CompactRow>
+            </CompactStack>
           ) : (
-            <XStack gap="$2" flexWrap="wrap">
+            <CompactRow>
               {consent !== true ? (
                 <Button ghost size="sm" onPress={onAcceptConsent}>
                   {acceptLabel}
@@ -202,7 +207,7 @@ export function FeedbackPreferenceView({
                   {withdrawLabel}
                 </Button>
               ) : null}
-            </XStack>
+            </CompactRow>
           )}
           {choicesHref ? (
             <Text variant="hint">
@@ -211,7 +216,7 @@ export function FeedbackPreferenceView({
             </Text>
           ) : null}
           {error ? <Alert severity="error" message={error} /> : null}
-        </YStack>
+        </CompactStack>
       </CheckboxField>
     </SectionCard>
   );

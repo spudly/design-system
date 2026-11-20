@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
+import { CompactStack } from "../widgets/CompactStack.js";
 import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { Text } from "../widgets/Text.js";
 
@@ -52,7 +52,11 @@ export function LabeledListSection({
         ) : null
       }
     >
-      {isEmpty ? <Text variant="muted">{emptyMessage}</Text> : <YStack gap="$2">{children}</YStack>}
+      {isEmpty ? (
+        <Text variant="muted">{emptyMessage}</Text>
+      ) : (
+        <CompactStack>{children}</CompactStack>
+      )}
     </LabeledGroup>
   );
 }

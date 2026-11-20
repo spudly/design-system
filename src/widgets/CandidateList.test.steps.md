@@ -1,19 +1,19 @@
 ---
 component: CandidateList
 run_when:
-  - "src/views/CandidateList.tsx, its stories, or a changeset naming CandidateList."
+  - "src/widgets/CandidateList.tsx, its stories, or a changeset naming CandidateList."
 ---
 
 # CandidateList — manual test steps
 
-Colocated manual test steps for `src/views/CandidateList.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/CandidateList.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
 ## CandidateList
 
-Open in `Views/CandidateList`: Default, Pending,
+Open in `Widgets/CandidateList`: Default, Pending,
 ReadOnly.
 
 1. Default: the heading sits over one tinted card per
@@ -26,5 +26,5 @@ ReadOnly.
 3. ReadOnly: the cards render their labels with no Activate
    button — candidate data alone exposes no dead action.
 
-**Run when:** `src/views/CandidateList.tsx`, its
+**Run when:** `src/widgets/CandidateList.tsx`, its
 stories, or a changeset naming CandidateList.

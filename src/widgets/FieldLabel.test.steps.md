@@ -18,7 +18,7 @@ Open in `Widgets/FormStack`: Default, FieldsWithActions;
 `Widgets/LabeledField`: Default, WithAction, WithError;
 `Widgets/LabeledGroup`: Default, WithAction;
 `Widgets/FieldLabel`: Default, Associated;
-`Views/RevertAction` and `Views/ChangedListBanner`
+`Views/RevertAction` and `Widgets/ChangedListBanner`
 (their stories).
 
 1. FormStack: fields render in order with the form rhythm —

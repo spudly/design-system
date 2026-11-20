@@ -1,13 +1,13 @@
 import { Anchor, XStack, YStack, isWeb, styled, useTheme } from "tamagui";
 import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
-import { navigationRoleProps, platformAccessibilityProps } from "../widgets/accessibility.js";
-import { BrandLink } from "../widgets/BrandLink.js";
-import { PageContentColumn } from "../widgets/PageContentColumn.js";
-import { Button } from "../widgets/Button.js";
-import { LinkOverlay } from "../widgets/linkOverlay.js";
-import { Text } from "../widgets/Text.js";
-import { SearchField } from "../widgets/SearchField.js";
+import { navigationRoleProps, platformAccessibilityProps } from "./accessibility.js";
+import { BrandLink } from "./BrandLink.js";
+import { PageContentColumn } from "./PageContentColumn.js";
+import { Button } from "./Button.js";
+import { LinkOverlay } from "./linkOverlay.js";
+import { Text } from "./Text.js";
+import { SearchField } from "./SearchField.js";
 
 /**
  * AppTopBar (#437): the shared top-bar composition both DS frame

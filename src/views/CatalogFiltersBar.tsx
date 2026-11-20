@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
 import { politeLiveRegionProps } from "../widgets/accessibility.js";
 import { Button } from "../widgets/Button.js";
+import { CompactRow } from "../widgets/CompactRow.js";
+import { ContentStack } from "../widgets/ContentStack.js";
 import { RemovableField } from "../widgets/RemovableField.js";
 import { SearchField } from "../widgets/SearchField.js";
 import {
@@ -278,7 +278,7 @@ function FilterControl<FilterId extends string>({
       );
     case "range":
       return (
-        <XStack gap={tokens.spacing[2]}>
+        <FieldRow>
           <NumberFilter
             label={definition.minLabel}
             value={definition.minValue}
@@ -289,11 +289,11 @@ function FilterControl<FilterId extends string>({
             value={definition.maxValue}
             onChange={definition.onMaxChange}
           />
-        </XStack>
+        </FieldRow>
       );
     case "sort":
       return (
-        <YStack gap={tokens.spacing[3]}>
+        <ContentStack>
           <SelectField
             label={definition.sortLabel}
             value={definition.sortValue}
@@ -306,7 +306,7 @@ function FilterControl<FilterId extends string>({
             options={definition.dirOptions}
             onValueChange={definition.onDirChange}
           />
-        </YStack>
+        </ContentStack>
       );
   }
 }
@@ -364,7 +364,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
   };
 
   return (
-    <YStack gap={tokens.spacing[3]}>
+    <ContentStack>
       {/* FieldRow stretches its children (#188): the small
           Filters button's natural height is shorter than the
           SearchField, so the button stretches to the search
@@ -394,12 +394,12 @@ export function CatalogFiltersBar<FilterId extends string = string>({
         ) : null}
       </FieldRow>
       {searchHint ? (
-        <YStack collapsable={false} {...politeLiveRegionProps}>
-          <Text variant="hint">{searchHint}</Text>
-        </YStack>
+        <Text variant="hint" {...politeLiveRegionProps}>
+          {searchHint}
+        </Text>
       ) : null}
       {chooserOpen && addable.length > 0 ? (
-        <XStack gap={tokens.spacing[2]} flexWrap="wrap">
+        <CompactRow>
           {addable.map((definition) => (
             <Button
               key={definition.id}
@@ -413,7 +413,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
               {definition.label}
             </Button>
           ))}
-        </XStack>
+        </CompactRow>
       ) : null}
       {added.map((definition) => (
         <RemovableField
@@ -426,6 +426,6 @@ export function CatalogFiltersBar<FilterId extends string = string>({
           <FilterControl definition={definition} />
         </RemovableField>
       ))}
-    </YStack>
+    </ContentStack>
   );
 }

@@ -34,7 +34,7 @@ function readCode(rel: string): string {
 
 const column = readCode("src/widgets/PageContentColumn.tsx");
 const bigFooter = readCode("src/widgets/BigFooter.tsx");
-const appTopBar = readCode("src/views/AppTopBar.tsx");
+const appTopBar = readCode("src/widgets/AppTopBar.tsx");
 
 test("the column width is the named 1200 constant (#628, Stephen's amendment)", () => {
   assert.match(column, /export const PAGE_CONTENT_MAX_WIDTH = 1200;/);
@@ -101,10 +101,7 @@ test("BigFooterShell wraps web content in the column; the footer is NOT inside i
 });
 
 test("AppTopBar constrains its content through the same column", () => {
-  assert.match(
-    appTopBar,
-    /import \{ PageContentColumn \} from "\.\.\/widgets\/PageContentColumn\.js";/,
-  );
+  assert.match(appTopBar, /import \{ PageContentColumn \} from "\.\/PageContentColumn\.js";/);
   assert.match(appTopBar, /<PageContentColumn>\s*<XStack/);
   assert.match(appTopBar, /<\/XStack>\s*<\/PageContentColumn>/);
 });

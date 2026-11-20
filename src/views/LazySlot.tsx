@@ -1,7 +1,7 @@
 import { Suspense, type ReactNode } from "react";
-import { YStack } from "tamagui";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { SkeletonPanel } from "../widgets/SkeletonPanel.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { ChunkErrorBoundary } from "./ChunkErrorBoundary.js";
 
@@ -55,16 +55,11 @@ export function LazySlot({ children, onReload }: LazySlotProps) {
     <ChunkErrorBoundary {...(onReload !== undefined ? { onReload } : null)}>
       <Suspense
         fallback={
-          <YStack
-            width="100%"
-            gap="$3"
-            padding="$4"
-            {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
-          >
+          <SkeletonPanel {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
             <BoxSkeleton height={120} />
             <TextSkeleton lines={3} />
             <BoxSkeleton height={80} />
-          </YStack>
+          </SkeletonPanel>
         }
       >
         {children}

@@ -19,7 +19,15 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const strip = (text: string) =>
   text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const read = (name: string) => strip(readFileSync(join(here, `${name}.tsx`), "utf8"));
+// #698 tranche 4 moved RatingForm to src/widgets; the rest
+// still live beside this test.
+const read = (name: string) =>
+  strip(
+    readFileSync(
+      join(here, ...(name === "RatingForm" ? ["..", "widgets"] : []), `${name}.tsx`),
+      "utf8",
+    ),
+  );
 
 test("RecipeCommentsView reads its defaults from the voice object", () => {
   const view = read("RecipeCommentsView");

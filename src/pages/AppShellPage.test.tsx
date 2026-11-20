@@ -41,7 +41,7 @@ function codeOf(rel: string): string {
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 const page = codeOf("src/pages/AppShellPage.tsx");
-const topBar = codeOf("src/views/AppTopBar.tsx");
+const topBar = codeOf("src/widgets/AppTopBar.tsx");
 const tabbedShell = codeOf("src/pages/TabbedShellPage.tsx");
 const barrel = readFileSync(join(root, "src/pages/index.ts"), "utf8");
 const stories = readFileSync(join(root, "src/pages/AppShellPage.stories.tsx"), "utf8");
@@ -86,7 +86,7 @@ test("header search crosses as data: a controlled field with change/submit callb
   assert.match(page, /search\?: AppShellPageSearch \| null;/);
   assert.match(
     topBar,
-    /import \{ SearchField \} from "\.\.\/widgets\/SearchField\.js";/,
+    /import \{ SearchField \} from "\.\/SearchField\.js";/,
     "the bar renders the DS SearchField — no new input widget",
   );
   assert.match(
@@ -127,7 +127,7 @@ test("the page composes DS components only and never touches the boundary itself
   assert.match(page, /<BigFooterShell footer=\{footer\} scrollMode="content">/);
 });
 test("the top bar is one shared chrome: TabbedShellPage renders it too", () => {
-  assert.match(topBar, /import \{ BrandLink \} from "\.\.\/widgets\/BrandLink\.js";/);
+  assert.match(topBar, /import \{ BrandLink \} from "\.\/BrandLink\.js";/);
   assert.match(topBar, /iconsByName/);
   assert.match(topBar, /navigationRoleProps/);
   assert.match(
@@ -162,6 +162,7 @@ function loadRuntime() {
     const dist: Record<string, any> = await loadInternalDist();
     const { AppShellPage }: Record<string, any> = await import("../../dist/pages/AppShellPage.js");
     const distViews: Record<string, any> = await import("../../dist/views/index.js");
+    const distWidgets: Record<string, any> = await import("../../dist/widgets/index.js");
     return {
       React,
       renderToString,
@@ -169,6 +170,7 @@ function loadRuntime() {
       ...dist,
       AppShellPage,
       distViews,
+      distWidgets,
     };
   })();
   return runtimePromise;
@@ -204,7 +206,7 @@ const sentinelNav = [
   },
 ];
 test("the slot renders the page content, keyed by the active nav item; contentKey wins", async () => {
-  const { AppShellPage, distViews } = await loadRuntime();
+  const { AppShellPage, distViews, distWidgets } = await loadRuntime();
   const surface = <span>PAGE SURFACE</span>;
   const tree = AppShellPage({
     brand: {
@@ -218,7 +220,7 @@ test("the slot renders the page content, keyed by the active nav item; contentKe
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
   const [topBarEl, slot] = tree.props.children.props.children;
-  assert.equal(topBarEl.type, distViews.AppTopBar, "the header is the shared top-bar view");
+  assert.equal(topBarEl.type, distWidgets.AppTopBar, "the header is the shared top-bar widget");
   assert.deepEqual(topBarEl.props.brand, {
     label: "Eciperay",
     href: "/",

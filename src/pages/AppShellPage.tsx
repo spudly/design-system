@@ -6,7 +6,7 @@ import {
   type AppTopBarAction,
   type AppTopBarNavItem,
   type AppTopBarSearch,
-} from "../views/AppTopBar.js";
+} from "../widgets/AppTopBar.js";
 import { LazySlot } from "../views/LazySlot.js";
 
 /**

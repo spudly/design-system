@@ -43,7 +43,7 @@ function readCode(rel: string) {
 const commentItem = readCode("src/widgets/CommentItem.tsx");
 const badgeCardRow = readCode("src/widgets/BadgeCardRow.tsx");
 const textActionCardRow = readCode("src/widgets/TextActionCardRow.tsx");
-const changedListBanner = readCode("src/views/ChangedListBanner.tsx");
+const changedListBanner = readCode("src/widgets/ChangedListBanner.tsx");
 const revertAction = readCode("src/views/RevertAction.tsx");
 const aiSessionPage = readCode("src/pages/AiSessionPage.tsx");
 const tagsPage = readCode("src/pages/TagsPage.tsx");
@@ -60,7 +60,8 @@ test("no source file renders a TextAction element (#464)", () => {
   const dirs = ["src/widgets", "src/views", "src/pages"];
   for (const dir of dirs) {
     for (const name of readdirSync(join(root, dir))) {
-      if (!name.endsWith(".tsx") || name.endsWith(".test.ts") || name.endsWith(".test.tsx")) continue;
+      if (!name.endsWith(".tsx") || name.endsWith(".test.ts") || name.endsWith(".test.tsx"))
+        continue;
       const code = readCode(join(dir, name));
       assert.ok(!/<TextAction[\s>]/.test(code), `${dir}/${name} must not render <TextAction>`);
     }

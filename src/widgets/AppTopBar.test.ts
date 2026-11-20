@@ -25,8 +25,8 @@ function codeOf(rel: string): string {
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const topBar = codeOf("src/views/AppTopBar.tsx");
-const stories = readFileSync(join(root, "src/views/AppTopBar.stories.tsx"), "utf8");
+const topBar = codeOf("src/widgets/AppTopBar.tsx");
+const stories = readFileSync(join(root, "src/widgets/AppTopBar.stories.tsx"), "utf8");
 
 function styledBlock(source: string, name: string): string {
   const match = new RegExp(`const ${name} = styled\\([\\s\\S]*?\\}\\);`).exec(source);

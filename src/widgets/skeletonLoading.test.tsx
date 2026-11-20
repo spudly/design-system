@@ -1684,9 +1684,14 @@ const T3_PROP_VIEWS = [
   "SubscriptionView",
   "TransferRecipesView",
 ] as const;
+// #698 tranche 4: CandidateList, ChangedListBanner, and
+// LegalSection moved to src/widgets (they own their styling).
+const T3_WIDGET_COMPONENTS = new Set(["CandidateList", "ChangedListBanner", "LegalSection"]);
 test("T3: every converted view declares `loading` and reads the LoadingScope", () => {
   for (const name of T3_PROP_VIEWS) {
-    const code = readCode(`src/views/${name}.tsx`);
+    const code = readCode(
+      `src/${T3_WIDGET_COMPONENTS.has(name) ? "widgets" : "views"}/${name}.tsx`,
+    );
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(

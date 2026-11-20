@@ -7,25 +7,14 @@
  * surface stands); pages reach them by relative path, exactly
  * as they reach widgets.
  */
-export {
-  AccessTokensPanel,
-  type AccessTokensPanelProps,
-} from "./AccessTokensPanel.js";
+export { AccessTokensPanel, type AccessTokensPanelProps } from "./AccessTokensPanel.js";
 export { AccountDataView, type AccountDataViewProps } from "./AccountDataView.js";
-export {
-  AppTopBar,
-  type AppTopBarAction,
-  type AppTopBarNavItem,
-  type AppTopBarProps,
-} from "./AppTopBar.js";
-export { CandidateList, type CandidateListProps } from "./CandidateList.js";
 export {
   CatalogFiltersBar,
   type CatalogFilterDefinition,
   type CatalogFiltersBarProps,
 } from "./CatalogFiltersBar.js";
 export { CatalogHeader, type CatalogHeaderProps } from "./CatalogHeader.js";
-export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
 export {
   ChunkErrorBoundary,
   type ChunkErrorBoundaryProps,
@@ -38,22 +27,14 @@ export {
   type FeedbackPreferenceViewProps,
 } from "./FeedbackPreferenceView.js";
 export { ForgotPasswordForm, type ForgotPasswordFormProps } from "./ForgotPasswordForm.js";
-export {
-  InstallBannerView,
-  type InstallBannerViewProps,
-} from "./InstallBannerView.js";
+export { InstallBannerView, type InstallBannerViewProps } from "./InstallBannerView.js";
 export { LazySlot, type LazySlotProps } from "./LazySlot.js";
-export { LegalSection, type LegalSectionProps } from "./LegalSection.js";
 export {
   NutritionGoalsForm,
   type NutritionGoalsFormProps,
   type NutritionGoalsValues,
 } from "./NutritionGoalsForm.js";
-export { RatingForm, type RatingFormProps } from "./RatingForm.js";
-export {
-  RecipeCommentsView,
-  type RecipeCommentsViewProps,
-} from "./RecipeCommentsView.js";
+export { RecipeCommentsView, type RecipeCommentsViewProps } from "./RecipeCommentsView.js";
 export {
   RecipeExportPickerView,
   type RecipeExportPickerViewProps,

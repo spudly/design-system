@@ -18,11 +18,11 @@ import test from "node:test";
  * Source-scan style, like the other batch tests.
  */
 
-const source = readFileSync("src/views/RatingForm.tsx", "utf8");
-const stories = readFileSync("src/views/RatingForm.stories.tsx", "utf8");
+const source = readFileSync("src/widgets/RatingForm.tsx", "utf8");
+const stories = readFileSync("src/widgets/RatingForm.stories.tsx", "utf8");
 
-test("RatingForm is exported from the views barrel; CookLogForm is gone", () => {
-  const barrel = readFileSync("src/views/index.ts", "utf8");
+test("RatingForm is exported from the widgets barrel; CookLogForm is gone", () => {
+  const barrel = readFileSync("src/widgets/index.ts", "utf8");
   assert.match(barrel, /export \{[^}]*\bRatingForm\b[^}]*\} from "\.\/RatingForm\.js"/);
   assert.match(barrel, /type RatingFormProps/);
   assert.doesNotMatch(barrel, /CookLogForm/);
@@ -31,10 +31,7 @@ test("RatingForm is exported from the views barrel; CookLogForm is gone", () => 
 });
 
 test("the submit view-model is generic: rating, not a domain field name", () => {
-  assert.match(
-    source,
-    /type RatingFormValues = \{\n {2}rating: 1 \| 2 \| 3 \| 4 \| 5 \| null;/,
-  );
+  assert.match(source, /type RatingFormValues = \{\n {2}rating: 1 \| 2 \| 3 \| 4 \| 5 \| null;/);
   assert.match(source, /onSubmit: \(values: RatingFormValues\) => void/);
   assert.match(source, /onSubmit\(\{ rating, notes: notes\.trim\(\) \|\| null \}\)/);
   assert.doesNotMatch(source, /authorStarRating/);
@@ -86,7 +83,7 @@ test("isPending disables Save (half opacity); the secondary action stays live", 
 });
 
 test("reuses the DS StarRatingInput as-is; no forked star rendering", () => {
-  assert.match(source, /import \{ StarRatingInput \} from "\.\.\/widgets\/StarRatingInput\.js"/);
+  assert.match(source, /import \{ StarRatingInput \} from "\.\/StarRatingInput\.js"/);
   assert.doesNotMatch(source, /★/, "stars come from StarRatingInput, not a local copy");
 });
 
@@ -98,7 +95,7 @@ test("no app imports, no data layer, no lineHeight (#162)", () => {
 });
 
 test("stories cover both variants and the custom labels in the shared CSF tree", () => {
-  assert.match(stories, /title: "Views\/RatingForm"/);
+  assert.match(stories, /title: "Widgets\/RatingForm"/);
   assert.match(stories, /export const Dark: Story/);
   assert.match(stories, /export const Light: Story/);
   assert.match(stories, /export const Pending: Story/);
