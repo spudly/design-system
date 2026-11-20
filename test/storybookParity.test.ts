@@ -177,6 +177,11 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "MediaRow.tsx",
   "RatingStars.tsx",
   "PageFrame.tsx",
+  // FieldShell.tsx (#698 tranche 2): the shared labeled-field shell
+  // TextField/SearchField compose — internal, not exported from
+  // the components barrel, no story of its own (joined widgets
+  // from views in #698; it was a views parity exception before).
+  "FieldShell.tsx",
 ]);
 
 test("every widget component has a story file titled Widgets/<Name>", () => {
@@ -245,7 +250,6 @@ test("every view component has a story file titled Views/<Name>", () => {
     "useFieldA11y.ts",
     "LabeledListSection.tsx",
     "AuthFormSubmit.tsx",
-    "FieldShell.tsx",
     "SectionMutedText.tsx",
   ]);
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
