@@ -1,10 +1,11 @@
 /**
- * design-system/no-page-styling — page components must not apply
- * styling directly (#119, simplified shape per #297).
+ * design-system/no-page-styling — page and view components must
+ * not apply styling directly (#119, simplified shape per #297;
+ * extended to views by #698 — only widgets add styling).
  *
  * Stephen's decision (2026-11-03, on #297): the rule enforces
- * exactly three things for a page (any file the config scopes this
- * rule to — src/pages/**):
+ * exactly three things for a page or view (any file the config
+ * scopes this rule to — src/pages/** and src/views/**):
  *
  * 1. No direct Tamagui imports: a page must not import from
  *    `tamagui` or any `@tamagui/*` package. Tamagui elements and
@@ -30,8 +31,8 @@
  * set from it.)
  *
  * Dormancy: this repo's eslint.config.ts wires the rule at "error"
- * for src/pages/**, but typescript-eslint has no TypeScript 7 parser
- * yet, so the shared `typescriptPendingIgnores` block ignores every
+ * for src/pages/** and src/views/**, but typescript-eslint has
+ * no TypeScript 7 parser yet, so the shared `typescriptPendingIgnores` block ignores every
  * .ts/.tsx file and the rule cannot fire in CI today. It activates
  * with no further change the moment the TS lint restoration removes
  * that ignores block (eslint-config issue #8 tracks the restoration).
@@ -75,15 +76,15 @@ const noPageStyling = {
     type: "problem",
     docs: {
       description:
-        "Page components must not apply styling directly: no direct Tamagui imports, no className, no inline style prop; styling belongs in reusable components behind semantic props.",
+        "Page and view components must not apply styling directly: no direct Tamagui imports, no className, no inline style prop; styling belongs in reusable components behind semantic props.",
     },
     messages: {
       tamaguiImport:
-        "Pages must not import from '{{source}}' directly. Tamagui belongs inside reusable components in src/widgets; pages compose those components with semantic props instead.",
+        "Pages and views must not import from '{{source}}' directly. Tamagui belongs inside reusable components in src/widgets; pages and views compose those components with semantic props instead.",
       className:
-        "Pages must not set className. Move the styling into a reusable component in src/widgets and pass semantic props instead.",
+        "Pages and views must not set className. Move the styling into a reusable component in src/widgets and pass semantic props instead.",
       styleProp:
-        "Pages must not set the inline style prop. Move the styling into a reusable component in src/widgets and pass semantic props instead.",
+        "Pages and views must not set the inline style prop. Move the styling into a reusable component in src/widgets and pass semantic props instead.",
     },
     schema: [],
   },

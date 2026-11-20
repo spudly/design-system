@@ -80,7 +80,12 @@ export default [
     // that block — at which point it activates with no further change.
     // The pages are being fixed proactively from the audit on #119 so
     // activation is a non-event. Rule: eslintRules/noPageStyling.mjs.
-    files: ["src/pages/**/*.tsx"],
+    // #698 extends the same rule to views: only widgets add styling,
+    // so views compose data and callbacks exactly like pages. The
+    // violating views are being fixed proactively from the #698
+    // audit (leaf form controls move to src/widgets under its
+    // Option B), so activation is a non-event for views too.
+    files: ["src/pages/**/*.tsx", "src/views/**/*.tsx"],
     plugins: { "design-system": designSystem },
     rules: {
       "design-system/no-page-styling": "error",
@@ -108,7 +113,7 @@ export default [
     // onto them, which the page rule forbids for pages themselves.
     // The margin rule is off for the same reason: stories lay out
     // demo content, they are not shipped components or pages.
-    files: ["src/pages/**/*.stories.tsx"],
+    files: ["src/pages/**/*.stories.tsx", "src/views/**/*.stories.tsx"],
     rules: {
       "design-system/no-page-styling": "off",
       "design-system/no-margin-spacing": "off",

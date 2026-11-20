@@ -9,8 +9,9 @@
  * - Rule behaviour, driven through ESLint's Linter with espree (the
  *   default parser) on plain-JSX snippets: espree cannot parse
  *   TypeScript syntax, but the rule operates purely on JSX nodes, so
- *   JSX snippets exercise it fully. The config below mirrors the
- *   src/pages/** block in eslint.config.ts.
+ *   JSX snippets exercise it fully. The configs below mirror the
+ *   src/pages/** + src/views/** block in eslint.config.ts (#698
+ *   extended the rule's scope from pages to views).
  * - Dormancy, driven through the repo's REAL eslint.config.ts (loaded
  *   with jiti): typescriptPendingIgnores currently ignores every
  *   .ts/.tsx file (typescript-eslint has no TypeScript 7 parser), so
@@ -41,8 +42,27 @@ const pagesConfig: Linter.Config[] = [
   },
 ];
 
+const viewsConfig: Linter.Config[] = [
+  {
+    files: ["src/views/**/*.tsx"],
+    plugins: { "design-system": plugin },
+    languageOptions: {
+      parserOptions: { ecmaVersion: 2022, ecmaFeatures: { jsx: true } },
+    },
+    rules: { "design-system/no-page-styling": "error" as const },
+  },
+];
+
 function lintPage(code: string, filename = "src/pages/ExamplePage.tsx") {
   return linter.verify(code, pagesConfig, { filename });
+}
+
+function lintView(code: string, filename = "src/views/ExampleView.tsx") {
+  return linter.verify(code, viewsConfig, { filename });
+}
+
+function viewMessageIds(code: string, filename?: string): (string | undefined)[] {
+  return lintView(code, filename).map((message) => message.messageId);
 }
 
 function messageIds(code: string, filename?: string): (string | undefined)[] {
@@ -102,6 +122,19 @@ test("the rule only applies where the config scopes it (src/pages/**)", () => {
   assert.deepEqual(ruleReports, []);
 });
 
+test("direct Tamagui imports are banned in views (#698)", () => {
+  assert.deepEqual(viewMessageIds(`import { YStack } from "tamagui";`), ["tamaguiImport"]);
+  assert.deepEqual(viewMessageIds(`import { View } from "@tamagui/core";`), ["tamaguiImport"]);
+  assert.deepEqual(viewMessageIds(`const m = import("tamagui");`), ["tamaguiImport"]);
+  assert.deepEqual(viewMessageIds(`import { Alert } from "../../components";`), []);
+});
+
+test("className and the inline style prop are banned in views (#698)", () => {
+  assert.deepEqual(viewMessageIds(`<div className="x" />`), ["className"]);
+  assert.deepEqual(viewMessageIds(`<Text style={{ color: "red" }} />`), ["styleProp"]);
+  assert.deepEqual(viewMessageIds(`<Alert intent="error" />`), []);
+});
+
 test("eslint.config.ts wires the rule at error for pages, off for stories", async () => {
   const jiti = createJiti(import.meta.url);
   const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
@@ -116,6 +149,33 @@ test("eslint.config.ts wires the rule at error for pages, off for stories", asyn
   );
   assert.ok(storiesBlock, "a config block must target src/pages/**/*.stories.tsx");
   assert.equal(storiesBlock.rules!["design-system/no-page-styling"], "off");
+});
+
+test("eslint.config.ts wires the rule at error for views, off for view stories (#698)", async () => {
+  const jiti = createJiti(import.meta.url);
+  const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
+  const viewsBlock = config.find(
+    (block) => block.files?.includes("src/views/**/*.tsx") && block.rules?.["design-system/no-page-styling"],
+  );
+  assert.ok(viewsBlock, "a config block must target src/views/**/*.tsx with the rule");
+  assert.equal(viewsBlock.rules!["design-system/no-page-styling"], "error");
+  const storiesBlock = config.find(
+    (block) => block.files?.includes("src/views/**/*.stories.tsx") && block.rules?.["design-system/no-page-styling"],
+  );
+  assert.ok(storiesBlock, "a config block must target src/views/**/*.stories.tsx");
+  assert.equal(storiesBlock.rules!["design-system/no-page-styling"], "off");
+});
+
+test("dormant today: the real config reports nothing for a violating view (#698)", async () => {
+  const jiti = createJiti(import.meta.url);
+  const config = (await jiti.import(join(repoRoot, "eslint.config.ts"))) as Linter.Config[];
+  const messages = linter.verify(`<div className="x" />`, config, {
+    filename: "src/views/ExampleView.tsx",
+  });
+  const ruleReports = messages.filter(
+    (message) => message.ruleId === "design-system/no-page-styling",
+  );
+  assert.deepEqual(ruleReports, []);
 });
 
 test("dormant today: the real config reports nothing for a violating page", async () => {
