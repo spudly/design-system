@@ -146,30 +146,29 @@ export function Badge({
           : { accessibilityState: { selected: selected ?? false, disabled } }),
       }
     : null;
+  // The colored-tag form (`color`) and the status-pill form
+  // (`tone`) differ only in these three unselected values; the
+  // selected treatment and the render itself are shared (#707).
+  let unselected: { background: string; border: string; label: string };
   if (color) {
     const resolvedColor = resolveTagColor(color);
-    return (
-      <StyledBadge
-        backgroundColor={isSelected ? "$primary" : `${resolvedColor}22`}
-        borderColor={isSelected ? "$primary" : resolvedColor}
-        {...rest}
-        {...selectableProps}
-      >
-        <Text style={{ ...labelType, color: isSelected ? "$onPrimary" : resolvedColor }}>
-          {children}
-        </Text>
-      </StyledBadge>
-    );
+    unselected = {
+      background: `${resolvedColor}22`,
+      border: resolvedColor,
+      label: resolvedColor,
+    };
+  } else {
+    const styles = toneStyles[tone];
+    unselected = { background: styles.background, border: styles.text, label: styles.text };
   }
-  const styles = toneStyles[tone];
   return (
     <StyledBadge
-      backgroundColor={isSelected ? "$primary" : styles.background}
-      borderColor={isSelected ? "$primary" : styles.text}
+      backgroundColor={isSelected ? "$primary" : unselected.background}
+      borderColor={isSelected ? "$primary" : unselected.border}
       {...rest}
       {...selectableProps}
     >
-      <Text style={{ ...labelType, color: isSelected ? "$onPrimary" : styles.text }}>
+      <Text style={{ ...labelType, color: isSelected ? "$onPrimary" : unselected.label }}>
         {children}
       </Text>
     </StyledBadge>
