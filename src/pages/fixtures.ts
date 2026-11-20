@@ -579,7 +579,7 @@ export const aiSessionPreviewFixture = {
  * fixed literals per the fixture rules above.
  */
 const legalFooterFixture: LegalDocumentPageProps["footer"] = {
-  brand: { label: "Eciperay", href: "/" },
+  brand: { label: "Eciperay", href: "/", mark: "eciperay" },
   columns: [
     {
       title: "Legal",
@@ -732,7 +732,7 @@ export const legalTermsFixture: LegalDocumentPageProps = {
  * destinations (the fixtures ban external URLs outright).
  */
 export const eciperayFooterFixture: BigFooterData = {
-  brand: { label: "Eciperay", href: "/" },
+  brand: { label: "Eciperay", href: "/", mark: "eciperay" },
   columns: [
     {
       title: "Product",
