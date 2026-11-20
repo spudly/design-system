@@ -13,7 +13,7 @@ import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "../widgets/CheckboxField.js";
-import { RadioOptionGroup, type RadioOption } from "../widgets/RadioOptionGroup.js";
+import { RadioOptionGroup, type RadioOption } from "../widgets/form/RadioOptionGroup.js";
 import { useVoice } from "../voice/index.js";
 
 /** One span of the publishing-consent description (#689): plain

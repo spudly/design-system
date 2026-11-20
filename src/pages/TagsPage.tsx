@@ -6,7 +6,7 @@ import { BadgeCardRow } from "../widgets/BadgeCardRow.js";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { CardStack } from "../widgets/CardStack.js";
-import { ColorPickerField } from "../widgets/ColorPickerField.js";
+import { ColorPickerField } from "../widgets/form/ColorPickerField.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";

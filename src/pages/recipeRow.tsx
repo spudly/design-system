@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { MediaRow } from "../widgets/MediaRow.js";
-import { RatingStars } from "../widgets/RatingStars.js";
+import { RatingStars } from "../widgets/form/RatingStars.js";
 
 /**
  * The shared recipe row (#657): the row composition RecipesPage's

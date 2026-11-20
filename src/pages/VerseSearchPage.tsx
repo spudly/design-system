@@ -3,7 +3,7 @@ import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { Alert } from "../widgets/Alert.js";
 import { EmptyState } from "../widgets/EmptyState.js";
-import { FieldRow } from "../widgets/FieldRow.js";
+import { FieldRow } from "../widgets/form/FieldRow.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SearchField } from "../widgets/SearchField.js";
 import { Spinner } from "../widgets/Spinner.js";

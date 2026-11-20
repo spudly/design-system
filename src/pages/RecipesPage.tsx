@@ -16,7 +16,7 @@ import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
 import { EmptyState } from "../widgets/EmptyState.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
-import type { SelectOption } from "../widgets/SelectField.js";
+import type { SelectOption } from "../widgets/form/SelectField.js";
 import { LoadingMediaRow } from "../widgets/LoadingMediaRow.js";
 import { ScrollSentinel } from "../widgets/ScrollSentinel.js";
 import { Text } from "../widgets/Text.js";

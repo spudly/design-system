@@ -18,7 +18,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "SelectField.tsx"), "utf8");
+const source = readFileSync(join(here, "../..", "src", "widgets", "form", "SelectField.tsx"), "utf8");
 
 test("the touch Sheet carries the field label as its accessible name, with a fallback", () => {
   assert.match(

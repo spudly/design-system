@@ -44,7 +44,7 @@ describe("textFontContext", () => {
     // value ("All statuses", "Newest") was the one remaining
     // non-theme family on the page. SelectField's label is a fonted
     // Tamagui Label, so it already rendered in the theme stack.
-    const source = readSrc("widgets/SelectField.tsx");
+    const source = readSrc("widgets/form/SelectField.tsx");
     assert.match(
       source,
       /<StyledValue placeholder=\{resolvedPlaceholder\} fontFamily="body" \/>/,

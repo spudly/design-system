@@ -13,7 +13,7 @@ describe("recipesPageAccessory", () => {
   const rowSource =
     readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
-    readFileSync(join(pagesDir, "..", "widgets", "RatingStars.tsx"), "utf8");
+    readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8");
   const mediaRow = rowSource.slice(
     rowSource.indexOf("const textBlockStyle"),
     rowSource.indexOf("const STAR_STEPS"),
@@ -28,7 +28,7 @@ describe("recipesPageAccessory", () => {
   const rowCode = (
     readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
-    readFileSync(join(pagesDir, "..", "widgets", "RatingStars.tsx"), "utf8")
+    readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -347,7 +347,7 @@ describe("recipesPageRowA11y", () => {
   const rowPage = (
     readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8") +
     readFileSync(join(here, "../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
-    readFileSync(join(here, "../..", "src", "widgets", "RatingStars.tsx"), "utf8")
+    readFileSync(join(here, "../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -437,7 +437,7 @@ describe("recipesPageRowActions", () => {
   const rowCode = (
     readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8") +
     readFileSync(join(here, "../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
-    readFileSync(join(here, "../..", "src", "widgets", "RatingStars.tsx"), "utf8")
+    readFileSync(join(here, "../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -567,7 +567,7 @@ describe("recipesPageSharedConfig", () => {
   const rowCode = (
     readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
-    readFileSync(join(pagesDir, "..", "widgets", "RatingStars.tsx"), "utf8")
+    readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -667,7 +667,7 @@ describe("recipesPageUnified", () => {
   const rowCode = (
     readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
-    readFileSync(join(pagesDir, "..", "widgets", "RatingStars.tsx"), "utf8")
+    readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");

@@ -307,7 +307,7 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
     );
   }
   // Spot-pin the renamed surfaces, plain and qualified.
-  assert.match(read("src/widgets/CheckboxSelectList.tsx"), /\bloading\?: boolean/);
+  assert.match(read("src/widgets/form/CheckboxSelectList.tsx"), /\bloading\?: boolean/);
   assert.match(read("src/views/AccessTokensPanel.tsx"), /\bloading\?: boolean/);
   // RecipesPage's loading props are the qualified forms since
   // #415 (one per section of the unified page): loading +
@@ -371,7 +371,7 @@ test("T1: every converted list/card widget declares `loading` and reads the Load
   assert.match(sectionCard, /TextSkeleton/, "SectionCard must skeletonize its title");
 });
 test("T1: CheckboxSelectList's centered spinner is gone", () => {
-  const code = readCode("src/widgets/CheckboxSelectList.tsx");
+  const code = readCode("src/widgets/form/CheckboxSelectList.tsx");
   assert.doesNotMatch(code, /Spinner/, "the loading list renders skeleton rows, not a spinner");
   assert.match(code, /LOADING_ROW_KEYS/, "the dummy rows come from a frozen constant");
 });
@@ -704,7 +704,7 @@ test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelec
   // 44x44 touch-target slot, centered — the loaded field's visual
   // box is centered in its 44px target, so the skeleton's bone
   // starts after the slot, not at the row's left edge.
-  const list = readCode("src/widgets/CheckboxSelectList.tsx");
+  const list = readCode("src/widgets/form/CheckboxSelectList.tsx");
   assert.match(
     list,
     /<View width=\{44\} height=\{44\} alignItems="center" justifyContent="center">/,
@@ -1853,7 +1853,7 @@ test("T5 survivor audit: only the approved survivor files render a Spinner", () 
   const allowed = new Set([
     "src/pages/PayPage.tsx",
     "src/pages/VerseSearchPage.tsx",
-    "src/widgets/AutocompletePicker.tsx",
+    "src/widgets/form/AutocompletePicker.tsx",
   ]);
   const rendering = [];
   for (const file of sourceFiles(join(root, "src"))) {

@@ -41,10 +41,10 @@ forms or rows, or a changeset naming any of them.
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
-`Widgets/SuggestionPanel`: Default;
+`Widgets/Form/SuggestionPanel`: Default;
 `Widgets/TagList`: Default;
 `Widgets/StatusMessage`: Default, Empty, Transient;
-`Widgets/FieldRow`: (its stories);
+`Widgets/Form/FieldRow`: (its stories);
 `Widgets/RemovableField`: (its stories).
 
 1. StepList: steps render numbered in order; a step with a
@@ -78,9 +78,9 @@ component(s) that changed.
 
 Open in `Widgets/FormStack`: Default, FieldsWithActions;
 `Widgets/FormHeading`: Default, WithSubtitle;
-`Widgets/LabeledField`: Default, WithAction, WithError;
-`Widgets/LabeledGroup`: Default, WithAction;
-`Widgets/FieldLabel`: Default, Associated;
+`Widgets/Form/LabeledField`: Default, WithAction, WithError;
+`Widgets/Form/LabeledGroup`: Default, WithAction;
+`Widgets/Form/FieldLabel`: Default, Associated;
 `Views/RevertAction` and `Widgets/ChangedListBanner`
 (their stories).
 
