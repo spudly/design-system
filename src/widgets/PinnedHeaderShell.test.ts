@@ -45,7 +45,7 @@ test("the shell paints the page background and insets the header block", () => {
 test("the bounded root frame is native-only — web grows in document flow (#705)", () => {
   assert.match(code, /isWeb \? \{ flexGrow: 1 \} : \{ flex: 1 \}/);
   assert.ok(
-    !/<YStack flex=\{1\}/.test(code),
+    !/<YStack\b[^>]*\bflex=\{1\}/.test(code),
     "the root must not carry an unconditional bounded flex: 1 frame",
   );
 });
