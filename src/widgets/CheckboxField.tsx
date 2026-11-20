@@ -42,12 +42,20 @@ const StyledBox = styled(XStack, {
 
 // The list shape's first-line height: the label renders at the md
 // size with the normal line height, so its first line box is
-// fontSize.md × lineHeight.normal tall. The box container is sized
-// to exactly that height with the box centered in it, so the box
-// aligns to the label's first line — including when the label
-// wraps — with no hand-tuned padding offset (#713; this replaces
-// CheckRow's paddingTop={2} nudge).
+// fontSize.md × lineHeight.normal tall. The box aligns to the
+// label's first line — including when the label wraps — with no
+// hand-tuned padding offset (#713; this replaces CheckRow's
+// paddingTop={2} nudge).
 const FIRST_LINE_HEIGHT = tokens.typography.fontSize.md * tokens.typography.lineHeight.normal;
+
+// Centering the box on the line BOX still leaves it visibly low:
+// the glyph run's ink center sits ~4px above the line box's center
+// (measured on the rendered ListShape stories, #713 fix round —
+// box center +4px vs first-line ink center). The box container is
+// therefore shortened by twice that offset: the 24px checkbox
+// overflows the container symmetrically, so its center lands on
+// the first line's ink center instead of the line box's center.
+const FIRST_LINE_BOX_CONTAINER_HEIGHT = FIRST_LINE_HEIGHT - 8;
 
 type StyledCheckboxProps = GetProps<typeof StyledCheckbox>;
 
@@ -123,9 +131,9 @@ export type CheckboxFieldProps = Omit<StyledCheckboxProps, "checked" | "onChecke
  * when checked. The real Tamagui Checkbox remains the single
  * accessibility stop (one checkbox role, one name — the name
  * composes the detail after the label, per the row family's
- * standing rule), and its box sits in a container sized to the
- * label's first-line height so it stays aligned to the first line
- * when the label wraps.
+ * standing rule), and its box sits in a container sized to center
+ * it on the first line's glyph run so it stays aligned to the
+ * first line when the label wraps.
  */
 export function CheckboxField({
   label,
@@ -225,7 +233,11 @@ export function CheckboxField({
           onPress={disabled ? undefined : toggle}
           cursor={disabled ? undefined : "pointer"}
         >
-          <XStack height={FIRST_LINE_HEIGHT} alignItems="center" justifyContent="center">
+          <XStack
+            height={FIRST_LINE_BOX_CONTAINER_HEIGHT}
+            alignItems="center"
+            justifyContent="center"
+          >
             {checkbox}
           </XStack>
           <Text

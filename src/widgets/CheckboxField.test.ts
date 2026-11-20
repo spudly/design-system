@@ -87,9 +87,14 @@ test("the box aligns to the label's first line via a first-line-height container
     code,
     /const FIRST_LINE_HEIGHT = tokens\.typography\.fontSize\.md \* tokens\.typography\.lineHeight\.normal;/,
   );
+  // The container is shortened by twice the measured ~4px
+  // line-box/ink-center offset so the centered box lands on the
+  // first line's glyph center, not the line box's center (#713
+  // fix round).
+  assert.match(code, /const FIRST_LINE_BOX_CONTAINER_HEIGHT = FIRST_LINE_HEIGHT - 8;/);
   assert.match(
     code,
-    /<XStack height=\{FIRST_LINE_HEIGHT\} alignItems="center" justifyContent="center">/,
+    /<XStack\s+height=\{FIRST_LINE_BOX_CONTAINER_HEIGHT\}\s+alignItems="center"\s+justifyContent="center"\s+>/,
   );
   assert.ok(!/paddingTop/.test(code), "no hand-tuned paddingTop offset (#713)");
   assert.ok(!/margin/.test(code), "CheckboxField must not carry margins (#119)");

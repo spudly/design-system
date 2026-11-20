@@ -20,6 +20,16 @@ const StyledCheckbox = styled(TamaguiCheckbox, {
   justifyContent: "center",
 });
 
+// The box aligns to the label's first line, not to the row's full
+// height: with a metadata line under the label, row-centering left
+// the box ~9px below the first line's glyph center (measured on
+// the rendered Checked story, #713 fix round). The box sits in a
+// container shortened by twice the ~4px line-box/ink-center offset
+// (see CheckboxField's list shape), so the centered box lands on
+// the first line's ink center.
+const FIRST_LINE_HEIGHT = tokens.typography.fontSize.md * tokens.typography.lineHeight.normal;
+const FIRST_LINE_BOX_CONTAINER_HEIGHT = FIRST_LINE_HEIGHT - 8;
+
 export type ChecklistRowProps = {
   label: string;
   metadata?: string;
@@ -40,20 +50,22 @@ export function ChecklistRow({ label, metadata, checked, onCheckedChange }: Chec
 
   return (
     <XStack
-      alignItems="center"
+      alignItems="flex-start"
       gap={tokens.spacing[3]}
       minHeight={44}
       paddingVertical={tokens.spacing[1]}
     >
-      <StyledCheckbox
-        checked={checked}
-        onCheckedChange={onCheckedChange}
-        {...platformAccessibilityProps({ accessibilityLabel: label })}
-      >
-        <TamaguiCheckbox.Indicator>
-          <Text style={{ fontSize: tokens.typography.fontSize.sm, color: "$primary" }}>✓</Text>
-        </TamaguiCheckbox.Indicator>
-      </StyledCheckbox>
+      <XStack height={FIRST_LINE_BOX_CONTAINER_HEIGHT} alignItems="center" justifyContent="center">
+        <StyledCheckbox
+          checked={checked}
+          onCheckedChange={onCheckedChange}
+          {...platformAccessibilityProps({ accessibilityLabel: label })}
+        >
+          <TamaguiCheckbox.Indicator>
+            <Text style={{ fontSize: tokens.typography.fontSize.sm, color: "$primary" }}>✓</Text>
+          </TamaguiCheckbox.Indicator>
+        </StyledCheckbox>
+      </XStack>
       <YStack flex={1} onPress={toggle} cursor="pointer">
         <Text
           style={
