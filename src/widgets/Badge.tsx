@@ -147,30 +147,51 @@ export function Badge({
       }
     : null;
   // The colored-tag form (`color`) and the status-pill form
-  // (`tone`) differ only in these three unselected values; the
-  // selected treatment and the render itself are shared (#707).
-  let unselected: { background: string; border: string; label: string };
+  // (`tone`) differ only in the three color values each passes to
+  // the shared render below (#707): the selected treatment, the
+  // selectable props, and the render itself live in one place, so
+  // a Badge change can't land in one form and miss the other.
   if (color) {
     const resolvedColor = resolveTagColor(color);
-    unselected = {
-      background: `${resolvedColor}22`,
-      border: resolvedColor,
-      label: resolvedColor,
-    };
-  } else {
-    const styles = toneStyles[tone];
-    unselected = { background: styles.background, border: styles.text, label: styles.text };
+    return (
+      <BadgeShell
+        backgroundColor={isSelected ? "$primary" : `${resolvedColor}22`}
+        borderColor={isSelected ? "$primary" : resolvedColor}
+        labelStyle={{ ...labelType, color: isSelected ? "$onPrimary" : resolvedColor }}
+        {...rest}
+        {...selectableProps}
+      >
+        {children}
+      </BadgeShell>
+    );
   }
+  const styles = toneStyles[tone];
   return (
-    <StyledBadge
-      backgroundColor={isSelected ? "$primary" : unselected.background}
-      borderColor={isSelected ? "$primary" : unselected.border}
+    <BadgeShell
+      backgroundColor={isSelected ? "$primary" : styles.background}
+      borderColor={isSelected ? "$primary" : styles.text}
+      labelStyle={{ ...labelType, color: isSelected ? "$onPrimary" : styles.text }}
       {...rest}
       {...selectableProps}
     >
-      <Text style={{ ...labelType, color: isSelected ? "$onPrimary" : unselected.label }}>
-        {children}
-      </Text>
+      {children}
+    </BadgeShell>
+  );
+}
+
+type BadgeShellProps = StyledBadgeProps & {
+  labelStyle: GetProps<typeof Text>["style"];
+};
+
+/**
+ * The one Badge render (#707): both forms delegate here with
+ * their own background / border / label colors, so the pill's
+ * structure and label typography exist exactly once.
+ */
+function BadgeShell({ labelStyle, children, ...badgeProps }: BadgeShellProps) {
+  return (
+    <StyledBadge {...badgeProps}>
+      <Text style={labelStyle}>{children}</Text>
     </StyledBadge>
   );
 }
