@@ -968,8 +968,8 @@ test("T2 SSR: loading NutritionPanel renders the ready layout's skeleton, no rea
   );
   assert.equal(
     hiddenBones(loading),
-    12,
-    "a loading NutritionPanel renders header + label (title/serving/calories + 3x2 rows + footnote) + disclaimer bones",
+    13,
+    "a loading NutritionPanel renders header + label (title/serving/calories + %DV header + 3x2 rows + footnote) + disclaimer bones",
   );
   assert.ok(!loading.includes("Estimating nutrition"), "the plain loading line is gone");
   assert.match(loading, /aria-busy/, "a loading NutritionPanel marks its region busy");
@@ -1004,8 +1004,8 @@ test("T2 SSR: loading NutritionPanel renders the ready layout's skeleton, no rea
   );
   assert.equal(
     hiddenBones(readyLoading),
-    10,
-    "a ready-but-loading NutritionPanel renders header + label (title/serving/calories + 2x2 rows + footnote) + disclaimer bones",
+    11,
+    "a ready-but-loading NutritionPanel renders header + label (title/serving/calories + %DV header + 2x2 rows + footnote) + disclaimer bones",
   );
   assert.ok(!readyLoading.includes("520"), "a loading NutritionPanel shows no real values");
   assert.ok(

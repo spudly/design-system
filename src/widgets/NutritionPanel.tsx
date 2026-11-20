@@ -131,6 +131,29 @@ const MICRO_NUTRIENT_KINDS: ReadonlySet<NutritionFactKind> = new Set([
   "potassium",
 ]);
 
+// The FDA label order, by kind: the widget owns the hierarchy
+// and placement, so the label renders nutrients in this order
+// whatever order the app supplies them in — netCarbs lands
+// directly after the carbohydrate group (its parent), never
+// under an unrelated nutrient.
+const FACT_ORDER: readonly NutritionFactKind[] = [
+  "totalFat",
+  "saturatedFat",
+  "transFat",
+  "cholesterol",
+  "sodium",
+  "totalCarbohydrate",
+  "dietaryFiber",
+  "totalSugars",
+  "addedSugars",
+  "netCarbs",
+  "protein",
+  "vitaminD",
+  "calcium",
+  "iron",
+  "potassium",
+];
+
 // The loading panel's dummy rows (#278): exactly 3 placeholder
 // rows when the ready nutrients are not known (the view-model's
 // loading / unavailable states), from a frozen module-level
@@ -204,8 +227,11 @@ function NutritionFactRow({
 function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
   const voice = useVoice();
   const labels = voice.nutritionPanel.factLabels;
-  const macroNutrients = facts.nutrients.filter((fact) => !MICRO_NUTRIENT_KINDS.has(fact.kind));
-  const microNutrients = facts.nutrients.filter((fact) => MICRO_NUTRIENT_KINDS.has(fact.kind));
+  const ordered = [...facts.nutrients].sort(
+    (a, b) => FACT_ORDER.indexOf(a.kind) - FACT_ORDER.indexOf(b.kind),
+  );
+  const macroNutrients = ordered.filter((fact) => !MICRO_NUTRIENT_KINDS.has(fact.kind));
+  const microNutrients = ordered.filter((fact) => MICRO_NUTRIENT_KINDS.has(fact.kind));
   return (
     <YStack
       backgroundColor={LABEL_SURFACE}
@@ -309,7 +335,25 @@ function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
  * so the overlay story can prove shape/size fidelity. No real
  * values show.
  */
-function NutritionFactsSkeleton({ rowKeys }: { rowKeys: readonly string[] }) {
+function NutritionFactsSkeleton({
+  rowKeys,
+  microRowKeys,
+  hasServingsPerContainer,
+}: {
+  rowKeys: readonly string[];
+  microRowKeys: readonly string[];
+  hasServingsPerContainer: boolean;
+}) {
+  const renderRow = (key: string) => (
+    <XStack key={key} justifyContent="space-between" gap="$3" paddingVertical="$2">
+      <YStack flex={1}>
+        <TextSkeleton size="sm" lines={1} />
+      </YStack>
+      <View width={48}>
+        <TextSkeleton size="sm" lines={1} />
+      </View>
+    </XStack>
+  );
   return (
     <YStack
       backgroundColor={LABEL_SURFACE}
@@ -321,19 +365,22 @@ function NutritionFactsSkeleton({ rowKeys }: { rowKeys: readonly string[] }) {
     >
       <TextSkeleton size="4xl" lines={1} />
       <TextSkeleton size="sm" lines={1} />
+      {hasServingsPerContainer ? <TextSkeleton size="sm" lines={1} /> : null}
       <View height={THICK_BAR_HEIGHT} backgroundColor={LABEL_HAIRLINE} />
       <TextSkeleton size="4xl" lines={1} />
       <View height={MEDIUM_BAR_HEIGHT} backgroundColor={LABEL_HAIRLINE} />
-      {rowKeys.map((key) => (
-        <XStack key={key} justifyContent="space-between" gap="$3" paddingVertical="$2">
-          <YStack flex={1}>
-            <TextSkeleton size="sm" lines={1} />
-          </YStack>
-          <View width={48}>
-            <TextSkeleton size="sm" lines={1} />
-          </View>
-        </XStack>
-      ))}
+      <XStack justifyContent="flex-end">
+        <View width={96}>
+          <TextSkeleton size="sm" lines={1} />
+        </View>
+      </XStack>
+      {rowKeys.map(renderRow)}
+      {microRowKeys.length > 0 ? (
+        <>
+          <View height={MEDIUM_BAR_HEIGHT} backgroundColor={LABEL_HAIRLINE} />
+          {microRowKeys.map(renderRow)}
+        </>
+      ) : null}
       <View height={MEDIUM_BAR_HEIGHT} backgroundColor={LABEL_HAIRLINE} />
       <TextSkeleton size="xs" lines={1} />
     </YStack>
@@ -371,8 +418,16 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
     // busy. No real values show.
     const rowKeys =
       nutrition.state === "ready" && nutrition.facts.nutrients.length > 0
-        ? nutrition.facts.nutrients.map((fact) => fact.kind)
+        ? nutrition.facts.nutrients
+            .filter((fact) => !MICRO_NUTRIENT_KINDS.has(fact.kind))
+            .map((fact) => fact.kind)
         : LOADING_ROW_KEYS;
+    const microRowKeys =
+      nutrition.state === "ready"
+        ? nutrition.facts.nutrients
+            .filter((fact) => MICRO_NUTRIENT_KINDS.has(fact.kind))
+            .map((fact) => fact.kind)
+        : [];
     return (
       <LoadingScope active>
         <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
@@ -391,7 +446,13 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
               </Button>
             ) : null}
           </XStack>
-          <NutritionFactsSkeleton rowKeys={rowKeys} />
+          <NutritionFactsSkeleton
+            rowKeys={rowKeys}
+            microRowKeys={microRowKeys}
+            hasServingsPerContainer={
+              nutrition.state === "ready" && nutrition.facts.servingsPerContainerLabel !== undefined
+            }
+          />
           <YStack paddingBlockStart="$4">
             <TextSkeleton size="xs" lines={1} />
           </YStack>

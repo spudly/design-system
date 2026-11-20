@@ -90,8 +90,14 @@ test("the kind hierarchy drives indent, bold, and block placement (#722)", () =>
   }
   assert.match(
     code,
-    /facts\.nutrients\.filter\(\(fact\) => !MICRO_NUTRIENT_KINDS\.has\(fact\.kind\)\)/,
+    /ordered\.filter\(\(fact\) => !MICRO_NUTRIENT_KINDS\.has\(fact\.kind\)\)/,
     "the macronutrient block excludes the vitamin/mineral kinds",
+  );
+  assert.match(code, /const FACT_ORDER/, "the widget owns the FDA nutrient order");
+  assert.match(
+    code,
+    /FACT_ORDER\.indexOf\(a\.kind\) - FACT_ORDER\.indexOf\(b\.kind\)/,
+    "nutrients render in FDA order whatever order the app supplies, so net carbs lands under Total Carbohydrate",
   );
   assert.match(
     code,
@@ -110,10 +116,15 @@ test("the loading state renders skeletons mirroring the new label shape (#278, #
   assert.match(code, /\bloading\?: boolean/);
   assert.match(code, /useLoadingScope\(loading\)/);
   assert.match(code, /LOADING_ROW_KEYS/);
-  assert.match(code, /<NutritionFactsSkeleton rowKeys=\{rowKeys\} \/>/);
+  assert.match(code, /<NutritionFactsSkeleton/);
   assert.match(
     code,
-    /nutrition\.facts\.nutrients\.map\(\(fact\) => fact\.kind\)/,
+    /microRowKeys=\{microRowKeys\}/,
+    "the skeleton mirrors the ready label's vitamin/mineral section",
+  );
+  assert.match(
+    code,
+    /nutrition\.facts\.nutrients/,
     "a loading panel over ready data mirrors its own nutrient count",
   );
   assert.match(code, /<TextSkeleton size="4xl" lines=\{1\} \/>/, "the title and calories blocks are 4xl bones");
