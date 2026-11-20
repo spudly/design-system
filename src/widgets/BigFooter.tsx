@@ -383,14 +383,27 @@ export function BigFooter({ footer }: BigFooterProps) {
  *   shell adds neither a scroller nor a bounded frame — just
  *   the growing column — so the outer shell stays the sole
  *   scroll owner.
+ * - "overlay": the page's content IS a full-region overlay
+ *   (StepOverlay in the cooking-mode pages, #729). The overlay
+ *   anchors to the content region with absolute positioning
+ *   and contributes no intrinsic height, so the region must
+ *   be bounded to the viewport: on native the shell is the
+ *   bounded frame (like "content", no ScrollView of its own);
+ *   on web the shell bounds the content region to the
+ *   viewport (minHeight 100dvh, the column filling it)
+ *   WHETHER OR NOT the host supplied footer data — the
+ *   no-footer branch's unbounded growing column would leave
+ *   the overlay's region collapsed and covered.
  *
- * The mode is a native-only concern: on web the document
- * scrolls the whole page in every mode (no windowing, the
- * catalogs paginate by scroll sentinel), and the mode never
- * changes the web layout. It is a semantic scroll-ownership
+ * Except for "overlay", the mode is a native-only concern:
+ * on web the document scrolls the whole page in every other
+ * mode (no windowing, the catalogs paginate by scroll
+ * sentinel), and the mode never changes the web layout.
+ * "overlay" changes only the web no-footer branch, bounding
+ * it as described above. It is a semantic scroll-ownership
  * prop, not a styling prop.
  */
-type BigFooterShellScrollMode = "shell" | "content" | "nested";
+type BigFooterShellScrollMode = "shell" | "content" | "nested" | "overlay";
 
 export type BigFooterShellProps = {
   /** The page's footer data, when its host supplied any. */
@@ -449,13 +462,18 @@ export type BigFooterShellProps = {
  * footer nor a full-viewport inner shell. A page composed
  * inside another shell's scroller on native says so with
  * scrollMode "nested" — the same opt-out, for the platform
- * whose scroller is explicit.
+ * whose scroller is explicit. The one exception is a page
+ * whose content is a full-region overlay (the cooking-mode
+ * pages): it says scrollMode "overlay" (#729) and its
+ * no-footer branch bounds the content region to the
+ * viewport, because the overlay contributes no intrinsic
+ * height and the unbounded column would collapse its region.
  */
 export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFooterShellProps) {
   if (!isWeb) {
     // Native (#547 addendum): no BigFooter in any mode — native
     // uses bottom navigation (the tab shells' Tabs) instead.
-    if (scrollMode === "content") {
+    if (scrollMode === "content" || scrollMode === "overlay") {
       // The content owns scrolling (a windowed list or a
       // page-owned scroll region): the shell is only the
       // bounded frame that gives that scroller its height —
@@ -492,6 +510,25 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
     );
   }
   if (!footer) {
+    if (scrollMode === "overlay") {
+      // Web, no footer data, overlay page (#729): the content
+      // is a full-region overlay (StepOverlay) that anchors to
+      // the content region and contributes no intrinsic
+      // height, so the unbounded growing column below would
+      // leave its region collapsed and covered by the host
+      // shell's background. Bound the region to the viewport
+      // instead — the with-footer shell's shape minus the
+      // footer — with the column filling the bounded height.
+      return (
+        <YStack
+          minHeight={{ default: "100%", web: "100dvh" }}
+          flexDirection="column"
+          position="relative"
+        >
+          <PageContentColumn fillHeight>{children}</PageContentColumn>
+        </YStack>
+      );
+    }
     // Web, no footer data (#628): no footer band, but the
     // content still gets the centered desktop column — a page
     // without footer data is not exempt from the measure.
@@ -514,7 +551,7 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
       flexDirection="column"
       justifyContent="space-between"
     >
-      <PageContentColumn>{children}</PageContentColumn>
+      <PageContentColumn fillHeight={scrollMode === "overlay"}>{children}</PageContentColumn>
       <BigFooter footer={footer} />
     </YStack>
   );

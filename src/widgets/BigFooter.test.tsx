@@ -154,11 +154,13 @@ test("every page component renders BigFooter through the shell from a footer pro
   }
 });
 test("the shell reserves viewport height only when a footer is supplied", () => {
-  // No footer data: no footer band and no full-viewport inner
-  // shell, so a page composed inside a frame that owns the layout
-  // (a hub page composing a nested page) adds neither a second footer nor a 100dvh
-  // reservation. The no-footer branch must come before (and stay
-  // clear of) the sticky viewport shell.
+  // No footer data (default modes): no footer band and no
+  // full-viewport inner shell, so a page composed inside a
+  // frame that owns the layout (a hub page composing a nested
+  // page) adds neither a second footer nor a 100dvh
+  // reservation. (Overlay mode is the #729 exception, pinned
+  // by its own test below.) The no-footer branch must come
+  // before (and stay clear of) the sticky viewport shell.
   const noFooterBranch = bigFooter.indexOf("if (!footer)");
   assert.ok(noFooterBranch >= 0, "BigFooterShell handles the no-footer case explicitly");
   assert.ok(
@@ -172,7 +174,10 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
   // the three owners: the shell's ScrollView (default), the
   // page content's own list/scroll region, or an enclosing
   // shell (nested pages opt out of scrolling entirely).
-  assert.match(bigFooter, /type BigFooterShellScrollMode = "shell" \| "content" \| "nested";/);
+  assert.match(
+    bigFooter,
+    /type BigFooterShellScrollMode = "shell" \| "content" \| "nested" \| "overlay";/,
+  );
   assert.match(bigFooter, /scrollMode\?: BigFooterShellScrollMode;/);
   assert.match(bigFooter, /scrollMode = "shell"/, "the shell scroller is the default mode");
   // Native handling comes FIRST and never consults footer
@@ -190,7 +195,7 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
   // shell's plain ScrollView (the RecipesPage windowing bug).
   assert.match(
     bigFooter,
-    /if \(scrollMode === "content"\) \{\s*return \(\s*<YStack flex=\{1\} position="relative">\s*\{children\}/,
+    /if \(scrollMode === "content" \|\| scrollMode === "overlay"\) \{\s*return \(\s*<YStack flex=\{1\} position="relative">\s*\{children\}/,
   );
   // "nested" mode: the growing column only — no scroller, no
   // bounded frame; the enclosing shell stays the scroll owner.
@@ -198,6 +203,43 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
     bigFooter,
     /if \(scrollMode === "nested"\) \{\s*return \(\s*<YStack flexGrow=\{1\} flexDirection="column" position="relative">\s*\{children\}/,
   );
+});
+test("overlay pages get a viewport-bounded region with or without footer data (#729)", () => {
+  // The cooking-mode pages' content is StepOverlay — absolute
+  // inset 0, no intrinsic height — so the shell must bound its
+  // region to the viewport even when the host supplies no
+  // footer data (the eciperay host's composition, where the
+  // step view rendered invisible). The web no-footer overlay
+  // branch is the with-footer shell's shape minus the footer,
+  // and the column fills the bounded height.
+  assert.match(
+    bigFooter,
+    /if \(scrollMode === "overlay"\) \{\s*return \(\s*<YStack\s+minHeight=\{\{ default: "100%", web: "100dvh" \}\}/,
+  );
+  assert.match(bigFooter, /<PageContentColumn fillHeight>\{children\}<\/PageContentColumn>/);
+  assert.match(
+    bigFooter,
+    /<PageContentColumn fillHeight=\{scrollMode === "overlay"\}>\{children\}<\/PageContentColumn>/,
+  );
+  // PageContentColumn's fill is what stretches the positioned
+  // column (the overlay's anchoring ancestor) to the region.
+  const column = readCode("src/widgets/PageContentColumn.tsx");
+  assert.match(column, /flex=\{fillHeight \? 1 : undefined\}/);
+  // Both cooking-mode pages opt in; their error/plain branches
+  // and every other page keep their existing modes.
+  for (const entry of ["CookingModePage.tsx", "MealCookingModePage.tsx"]) {
+    const code = readCode(join("src", "pages", entry));
+    assert.ok(
+      code.includes('<BigFooterShell footer={props.footer} scrollMode="overlay">'),
+      `${entry} must render its StepOverlay shell in overlay mode`,
+    );
+  }
+  // The regression stories render the exact no-footer host
+  // composition for both pages.
+  for (const entry of ["CookingModePage.stories.tsx", "MealCookingModePage.stories.tsx"]) {
+    const code = readCode(join("src", "pages", entry));
+    assert.ok(code.includes("export const NoFooter"), `${entry} must carry a NoFooter story`);
+  }
 });
 test("list and self-scrolling pages put the shell in content mode (PR #556)", () => {
   // Every page whose content owns native scrolling — the

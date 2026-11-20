@@ -48,6 +48,11 @@ FirstStep, LastStep, LoadError.
    over the step body, Done pill at the top right, dots and
    Back / Next below. FirstStep has no Back; LastStep disables
    Next.
+7. MealCookingModePage NoFooter (#729): with NO footer data
+   supplied (the eciperay host's composition), the dark
+   overlay still covers the full viewport — step body,
+   eyebrows, Done pill, and Back / Next all visible and
+   reachable, nothing covered by a cream layer.
 6. MealCookingModePage LoadError: no overlay and no step UI —
    the meal title over an error alert reading "Couldn't load
    the cook plan for this meal. Please try again.", with a

@@ -169,7 +169,7 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
   }
 
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} scrollMode="overlay">
       <StepOverlay
         title={mealTitle}
         stepLabel={`Step ${stepIndex + 1} of ${steps.length} · ${current.recipeTitle}`}

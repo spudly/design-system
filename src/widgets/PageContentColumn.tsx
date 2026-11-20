@@ -40,6 +40,14 @@ export const PAGE_CONTENT_MAX_WIDTH = 1200;
 export type PageContentColumnProps = {
   /** The page (or bar) content constrained to the column. */
   children: ReactNode;
+  /**
+   * Fill the shell's bounded height instead of sizing to the
+   * content (#729): a page whose content is an absolutely-
+   * positioned full-region overlay (StepOverlay) contributes
+   * no intrinsic height, so the column must stretch to the
+   * shell's height for the overlay to cover the region.
+   */
+  fillHeight?: boolean;
 };
 
 /**
@@ -51,12 +59,18 @@ export type PageContentColumnProps = {
  * (the #547 StepOverlay case) anchors to the column, which
  * is the page's content area.
  */
-export function PageContentColumn({ children }: PageContentColumnProps) {
+export function PageContentColumn({ children, fillHeight }: PageContentColumnProps) {
   if (!isWeb) {
     return <YStack width="100%">{children}</YStack>;
   }
   return (
-    <YStack width="100%" maxWidth={PAGE_CONTENT_MAX_WIDTH} alignSelf="center" position="relative">
+    <YStack
+      width="100%"
+      maxWidth={PAGE_CONTENT_MAX_WIDTH}
+      alignSelf="center"
+      position="relative"
+      flex={fillHeight ? 1 : undefined}
+    >
       {children}
     </YStack>
   );
