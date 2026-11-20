@@ -42,6 +42,35 @@ export const WithIngredientsPanel: Story = {
   ),
 };
 
+/**
+ * The host composition that broke in #729: the eciperay host
+ * supplies NO footer data, so the shell's web no-footer branch
+ * renders — the overlay must still cover the full viewport.
+ */
+export const NoFooter: Story = {
+  render: () => (
+    <>
+      <CookingModePage
+        recipeTitle="Skillet Chicken"
+        steps={steps}
+        stepIndex={1}
+        ingredients={{
+          heading: "Ingredients · 4 servings (scaled ×2)",
+          lines: [
+            "2 lb chicken thighs",
+            "2 tbsp olive oil",
+            "1 cup tomato sauce",
+            "1 tsp smoked paprika",
+          ],
+        }}
+        onPrev={() => undefined}
+        onNext={() => undefined}
+        onDone={() => undefined}
+      />
+    </>
+  ),
+};
+
 export const FirstStep: Story = {
   render: () => (
     <>

@@ -15,12 +15,17 @@ release's changed components. The full index lives in
 ## CookingModePage
 
 Open in `Pages/Eciperay/CookingModePage`: WithIngredientsPanel,
-FirstStep, LastStep.
+FirstStep, LastStep, NoFooter.
 
 1. WithIngredientsPanel: the scaled-ingredients panel renders
    between the "Step 2 of 3" label and the step body — heading
    line plus the four ingredient lines on the translucent
    panel, readable against the dark overlay.
+4. NoFooter (#729): with NO footer data supplied (the
+   eciperay host's composition), the dark overlay still
+   covers the full viewport — step body, ingredients panel,
+   Done pill, and nav controls all visible and reachable,
+   nothing covered by a cream layer.
 2. FirstStep: no Back control renders (the nav shows only
    Next); LastStep: the Next control renders disabled and Back
    is present.
