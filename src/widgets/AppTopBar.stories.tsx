@@ -32,7 +32,7 @@ const eciperayNav = [
 /** Brand link, icon nav with Recipes current, and a callback header action. */
 export const Default: Story = {
   args: {
-    brand: { label: "Eciperay", href: "/" },
+    brand: { label: "Eciperay", href: "/", mark: "eciperay" },
     navItems: eciperayNav,
     navLabel: "Eciperay sections",
     activeItemId: "recipes",
@@ -43,7 +43,7 @@ export const Default: Story = {
 /** Header search supplied (#542): the labeled SearchField renders between nav and actions. */
 export const WithSearch: Story = {
   args: {
-    brand: { label: "Eciperay", href: "/" },
+    brand: { label: "Eciperay", href: "/", mark: "eciperay" },
     navItems: eciperayNav,
     navLabel: "Eciperay sections",
     activeItemId: "recipes",
@@ -65,10 +65,22 @@ export const BrandOnly: Story = {
   },
 };
 
+/**
+ * A brand with no graphic mark as a link (#726): Memorize names
+ * no mark, so its BrandLink renders the wordmark alone — no
+ * placeholder, no empty slot. (The Default story above is the
+ * marked case: Eciperay's DS-owned mark before its wordmark.)
+ */
+export const WordmarkOnlyBrand: Story = {
+  args: {
+    brand: { label: "Memorize", href: "/" },
+  },
+};
+
 /** Label-only nav (no icon names) with link-form header actions. */
 export const LabelOnlyNav: Story = {
   args: {
-    brand: { label: "Eciperay", href: "/" },
+    brand: { label: "Eciperay", href: "/", mark: "eciperay" },
     navItems: eciperayNav.map(({ icon: _icon, ...item }) => item),
     navLabel: "Eciperay sections",
     activeItemId: "home",
@@ -89,7 +101,7 @@ const phoneNav = [
 ];
 
 const phoneWidthArgs = {
-  brand: { label: "Eciperay", href: "/" },
+  brand: { label: "Eciperay", href: "/", mark: "eciperay" as const },
   navItems: phoneNav,
   navLabel: "Eciperay sections",
   activeItemId: "recipes",

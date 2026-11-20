@@ -1,4 +1,5 @@
 import { Anchor, XStack, YStack, isWeb, styled, useTheme } from "tamagui";
+import { BrandMark, type BrandMarkName } from "../icons/BrandMark.js";
 import { iconsByName, type IconName } from "../icons/iconRegistry.js";
 import { tokens } from "../tokens/index.js";
 import { navigationRoleProps, platformAccessibilityProps } from "./accessibility.js";
@@ -71,6 +72,18 @@ type AppTopBarBrand = {
    * TabbedShellPage's app title, which navigates nowhere).
    */
   href?: string;
+  /**
+   * The brand's graphic mark, named as data (#726): when the
+   * brand has a DS-owned mark, the host names it here and the
+   * DS renders its own artwork before the wordmark (inside the
+   * BrandLink when the brand carries an href; beside the plain
+   * brand treatment when it does not). Brand identity is data
+   * only — never a caller-supplied element (Stephen's
+   * 2026-11-19 logos ruling). Omit it for a brand with no mark
+   * (Memorize, today): the brand renders exactly as before,
+   * with no placeholder or empty slot.
+   */
+  mark?: BrandMarkName;
 };
 
 export type AppTopBarNavItem = {
@@ -338,7 +351,16 @@ export function AppTopBar({
     <PageContentColumn>
       <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[3]}>
         {brand.href !== undefined ? (
-          <BrandLink label={brand.label} href={brand.href} />
+          <BrandLink
+            label={brand.label}
+            href={brand.href}
+            {...(brand.mark !== undefined ? { mark: brand.mark } : null)}
+          />
+        ) : brand.mark !== undefined ? (
+          <XStack alignItems="center" gap={tokens.spacing[2]}>
+            <BrandMark mark={brand.mark} size={28} />
+            <Text variant="heading">{brand.label}</Text>
+          </XStack>
         ) : (
           <Text variant="heading">{brand.label}</Text>
         )}

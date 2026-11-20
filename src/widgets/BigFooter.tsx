@@ -9,6 +9,7 @@ import { SocialTwitterIcon } from "../icons/SocialTwitterIcon.js";
 import { SocialYoutubeIcon } from "../icons/SocialYoutubeIcon.js";
 import type { IconComponentProps } from "../icons/Icon.js";
 import { AppStoreBadge } from "../icons/AppStoreBadge.js";
+import { BrandMark, type BrandMarkName } from "../icons/BrandMark.js";
 import { GooglePlayBadge } from "../icons/GooglePlayBadge.js";
 import { PageContentColumn } from "./PageContentColumn.js";
 import { Text } from "./Text.js";
@@ -40,7 +41,10 @@ import { contentInfoRoleProps, platformAccessibilityProps } from "./accessibilit
  * the design system — BigFooter renders the brand wordmark itself
  * (the brand label as text, inside the brand anchor). The host
  * never supplies rendered logo UI; brand identity reaches the
- * footer as data only (label + href).
+ * footer as data only (label + href). Since #726 the identity
+ * may also name the brand's DS-owned graphic mark (`mark`), which
+ * the footer renders from its own artwork beside the wordmark —
+ * still data only, never a host-supplied element.
  *
  * Store links (#466, Option A): each entry names its store and
  * renders that store's OFFICIAL badge artwork — Apple's
@@ -129,10 +133,19 @@ export type BigFooterSocialLink = {
  * The wordmark is rendered by the DS itself (#688): there is no
  * logo slot — brand identity is data only (`label` + `href`), and
  * the anchor's accessible name is the brand `label`.
+ *
+ * Graphic brand mark (#726): `mark` names the brand's DS-owned
+ * graphic mark as data, the same identity the header brand path
+ * (BrandLink / AppTopBar) takes — when named, the DS renders
+ * its own mark artwork beside the wordmark, decorative (the
+ * anchor's accessible name stays the brand `label`). Omit it
+ * for a brand with no mark (Memorize, today): the wordmark
+ * renders alone, exactly as before.
  */
 export type BigFooterBrand = {
   label: string;
   href: string;
+  mark?: BrandMarkName;
 };
 
 /**
@@ -224,6 +237,23 @@ export function BigFooter({ footer }: BigFooterProps) {
   // active theme and passed to the glyph explicitly.
   const theme = useTheme();
   const socialInk = typeof theme.onPrimary?.val === "string" ? theme.onPrimary.val : "#ffffff";
+  // The brand wordmark anchor (#688): the DS renders the
+  // wordmark itself, its accessible name the brand label. When
+  // the brand names a graphic mark (#726), the DS-owned mark
+  // renders beside it in the row below — the anchor itself is
+  // the same either way.
+  const brandAnchor = (
+    <StyledBigFooterBrandAnchor
+      {...platformAccessibilityProps({
+        accessibilityRole: "link",
+        accessibilityLabel: brand.label,
+      })}
+      href={brand.href}
+      cursor="web:pointer"
+    >
+      {brand.label}
+    </StyledBigFooterBrandAnchor>
+  );
   return (
     <YStack
       backgroundColor="$primary"
@@ -232,16 +262,14 @@ export function BigFooter({ footer }: BigFooterProps) {
       gap="$5"
       {...contentInfoRoleProps}
     >
-      <StyledBigFooterBrandAnchor
-        {...platformAccessibilityProps({
-          accessibilityRole: "link",
-          accessibilityLabel: brand.label,
-        })}
-        href={brand.href}
-        cursor="web:pointer"
-      >
-        {brand.label}
-      </StyledBigFooterBrandAnchor>
+      {brand.mark !== undefined ? (
+        <XStack alignItems="center" gap="$3">
+          <BrandMark mark={brand.mark} size={40} />
+          {brandAnchor}
+        </XStack>
+      ) : (
+        brandAnchor
+      )}
       <XStack flexWrap="wrap" gap="$5" alignItems="stretch">
         {columns.length > 0 ? (
           <XStack
