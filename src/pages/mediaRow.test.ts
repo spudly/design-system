@@ -54,7 +54,11 @@ function code(file: string) {
   return strip(readFileSync(join(componentsDir, file), "utf8"));
 }
 
-const page = strip(readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8"));
+const page = strip(
+  readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(here, "../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(here, "../..", "src", "widgets", "RatingStars.tsx"), "utf8"),
+);
 const mediaRow = page.slice(page.indexOf("const textBlockStyle"), page.indexOf("const STAR_STEPS"));
 const ratingStars = page.slice(page.indexOf("const STAR_STEPS"));
 const removableField = code("RemovableField.tsx");

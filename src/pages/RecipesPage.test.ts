@@ -10,7 +10,10 @@ describe("recipesPageAccessory", () => {
   const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
   // The MediaRow composition lives in the shared recipeRow.tsx
   // (#657); slice it out so the placement pins run against it.
-  const rowSource = readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8");
+  const rowSource =
+    readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "RatingStars.tsx"), "utf8");
   const mediaRow = rowSource.slice(
     rowSource.indexOf("const textBlockStyle"),
     rowSource.indexOf("const STAR_STEPS"),
@@ -22,7 +25,11 @@ describe("recipesPageAccessory", () => {
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   // The row wiring (hasAccessory gate, accessory pass-through)
   // lives in the shared recipeRow.tsx (#657).
-  const rowCode = readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8")
+  const rowCode = (
+    readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "RatingStars.tsx"), "utf8")
+  )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
@@ -337,7 +344,11 @@ describe("recipesPageRowA11y", () => {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   // The MediaRow composition lives in the shared recipeRow.tsx
   // (#657); slice it out so the row pins run against it alone.
-  const rowPage = readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8")
+  const rowPage = (
+    readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(here, "../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(here, "../..", "src", "widgets", "RatingStars.tsx"), "utf8")
+  )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   const mediaRow = rowPage.slice(
@@ -423,7 +434,11 @@ describe("recipesPageRowActions", () => {
   // The compositions live in the shared recipeRow.tsx (#657);
   // slice them out so page-level code cannot satisfy the
   // composition pins.
-  const rowCode = readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8")
+  const rowCode = (
+    readFileSync(join(here, "../..", "src", "pages", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(here, "../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(here, "../..", "src", "widgets", "RatingStars.tsx"), "utf8")
+  )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   const mediaRow = rowCode.slice(
@@ -549,7 +564,11 @@ describe("recipesPageSharedConfig", () => {
   // cannot pass the scan.
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   // The shared row item and row live in recipeRow.tsx (#657).
-  const rowCode = readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8")
+  const rowCode = (
+    readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "RatingStars.tsx"), "utf8")
+  )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
@@ -645,7 +664,11 @@ describe("recipesPageUnified", () => {
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   // The MediaRow composition lives in the shared recipeRow.tsx
   // (#657); slice it out so the badge pins run against it.
-  const rowCode = readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8")
+  const rowCode = (
+    readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "RatingStars.tsx"), "utf8")
+  )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   const mediaRow = rowCode.slice(
