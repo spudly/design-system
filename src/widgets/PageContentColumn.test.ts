@@ -95,8 +95,8 @@ test("BigFooterShell wraps web content in the column; the footer is NOT inside i
   );
   assert.equal(
     (bigFooter.match(/<BigFooter footer=\{footer\} \/>/g) ?? []).length,
-    1,
-    "the shell renders BigFooter once, outside the column",
+    2,
+    "the shell renders BigFooter once per web branch (default + #729 overlay), outside the column",
   );
 });
 

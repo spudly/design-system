@@ -63,6 +63,16 @@ test("the body and navigation scroll in a bounded region; short bodies stay cent
   );
   assert.match(code, /<YStack paddingHorizontal="\$6" paddingVertical="\$12">/);
   assert.match(code, /paddingHorizontal="\$6"/);
+  // The reading measure lives inside the shell (#729): the
+  // scroll content is wrapped in PageContentColumn, so the
+  // step text keeps the #628 desktop measure even when the
+  // shell's backdrop fills a full-width region (the cooking
+  // pages' overlay mode).
+  assert.match(code, /import \{ PageContentColumn \} from "\.\/PageContentColumn\.js";/);
+  assert.match(
+    code,
+    /<PageContentColumn>\s*<YStack paddingHorizontal="\$6" paddingVertical="\$12">/,
+  );
   // The Done pill is NOT inside the scroll region: it renders
   // after the region closes, a fixed sibling of it, so it stays
   // pinned and reachable at any scroll position.

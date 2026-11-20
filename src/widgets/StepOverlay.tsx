@@ -13,6 +13,7 @@ import {
 } from "./modalRegistry.js";
 import type { ModalLayer } from "./modalRegistry.js";
 import { Text } from "./Text.js";
+import { PageContentColumn } from "./PageContentColumn.js";
 import { useVoice } from "../voice/index.js";
 
 export type StepOverlayProps = {
@@ -364,37 +365,47 @@ export function StepOverlay({
           keyboardShouldPersistTaps="handled"
           contentContainerStyle={scrollContentContainerStyle}
         >
-          <YStack paddingHorizontal="$6" paddingVertical="$12">
-            <YStack paddingBlockEnd="$2">
-              <Text
-                fontSize={tokens.typography.fontSize.sm}
-                letterSpacing={1.4}
-                color="$surface"
-                opacity={0.6}
-                textTransform="uppercase"
-              >
-                {title}
-              </Text>
+          {/* The reading measure lives inside the shell (#729):
+              the shell's backdrop fills its full region (in the
+              cooking pages' overlay mode that region is the
+              full viewport width), while the step content keeps
+              the #628 desktop measure — the column caps and
+              centers the text inside the full-width backdrop.
+              On native the column is a plain full-width stack,
+              so the measure is a web-only effect. */}
+          <PageContentColumn>
+            <YStack paddingHorizontal="$6" paddingVertical="$12">
+              <YStack paddingBlockEnd="$2">
+                <Text
+                  fontSize={tokens.typography.fontSize.sm}
+                  letterSpacing={1.4}
+                  color="$surface"
+                  opacity={0.6}
+                  textTransform="uppercase"
+                >
+                  {title}
+                </Text>
+              </YStack>
+              <YStack paddingBlockEnd="$4">
+                <Text
+                  fontSize={tokens.typography.fontSize.sm}
+                  letterSpacing={1.4}
+                  color="$surface"
+                  opacity={0.6}
+                  textTransform="uppercase"
+                >
+                  {stepLabel}
+                </Text>
+              </YStack>
+              {accessory ? <YStack paddingBlockEnd="$4">{accessory}</YStack> : null}
+              <YStack paddingBlockEnd="$8">
+                <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
+                  {body}
+                </Text>
+              </YStack>
+              {children}
             </YStack>
-            <YStack paddingBlockEnd="$4">
-              <Text
-                fontSize={tokens.typography.fontSize.sm}
-                letterSpacing={1.4}
-                color="$surface"
-                opacity={0.6}
-                textTransform="uppercase"
-              >
-                {stepLabel}
-              </Text>
-            </YStack>
-            {accessory ? <YStack paddingBlockEnd="$4">{accessory}</YStack> : null}
-            <YStack paddingBlockEnd="$8">
-              <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
-                {body}
-              </Text>
-            </YStack>
-            {children}
-          </YStack>
+          </PageContentColumn>
         </ScrollView>
         <YStack
           position="absolute"

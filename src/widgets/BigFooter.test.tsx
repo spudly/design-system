@@ -334,11 +334,15 @@ test("on native the shell renders one ScrollView and no BigFooter (#547)", () =>
     1,
     "BigFooterShell's only ScrollView is the native shell scroller",
   );
-  // Exactly one BigFooter renders, in the web branch only.
+  // Exactly one BigFooter renders per web branch, and the
+  // branches are mutually exclusive: the default with-footer
+  // branch and the #729 overlay branch (which renders it only
+  // when footer data exists) — two textual occurrences, never
+  // two renders. Native renders none (#547).
   assert.equal(
     (bigFooter.match(/<BigFooter footer=\{footer\} \/>/g) ?? []).length,
-    1,
-    "the shell renders BigFooter once, on web only (#547)",
+    2,
+    "the shell renders BigFooter once per web branch, on web only (#547, #729)",
   );
 });
 test("composed pages and stories render exactly one footer", () => {
@@ -544,7 +548,10 @@ describe("bigFooterBrandWordmark", () => {
   test("BigFooterBrand carries no logo slot — brand identity is data only (#688)", () => {
     assert.match(footer, /export type BigFooterBrand = \{/);
     assert.ok(!/logo\?:/.test(footer), "the brand type must not carry a logo slot (#688)");
-    assert.ok(!/brand\.logo/.test(footer), "the footer must not render a host-supplied logo (#688)");
+    assert.ok(
+      !/brand\.logo/.test(footer),
+      "the footer must not render a host-supplied logo (#688)",
+    );
     assert.ok(
       !/BIG_FOOTER_BRAND_LOGO_HEIGHT/.test(footer),
       "the DS-owned logo box height is gone with the slot (#688)",
