@@ -38,9 +38,6 @@ const ERROR_ALERT = '<Alert severity="error" message={error} />';
 const VIEW_FORM_COMPONENTS = new Set([
   "NutritionGoalsForm",
   "AccessTokensPanel",
-  "TextField",
-  "TextAreaField",
-  "CheckboxField",
   "SignInForm",
   "SignUpForm",
   "ForgotPasswordForm",

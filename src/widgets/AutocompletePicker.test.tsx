@@ -384,7 +384,7 @@ describe("autocompletePickerReview", () => {
     return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   }
   const picker = codeOf("src/widgets/AutocompletePicker.tsx");
-  const searchField = codeOf("src/views/SearchField.tsx");
+  const searchField = codeOf("src/widgets/SearchField.tsx");
   test("SearchField's clear button honors disabled: no press handler, disabled state reported", () => {
     assert.match(
       searchField,

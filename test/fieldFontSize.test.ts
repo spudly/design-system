@@ -39,9 +39,9 @@ function styledBlock(code: string, constName: any) {
 }
 
 const FIELD_VALUE_BLOCKS = [
-  ["src/views/TextField.tsx", "StyledInput"],
-  ["src/views/SearchField.tsx", "StyledInput"],
-  ["src/views/TextAreaField.tsx", "StyledTextArea"],
+  ["src/widgets/TextField.tsx", "StyledInput"],
+  ["src/widgets/SearchField.tsx", "StyledInput"],
+  ["src/widgets/TextAreaField.tsx", "StyledTextArea"],
   ["src/widgets/SelectField.tsx", "StyledValue"],
   ["src/widgets/SelectField.tsx", "StyledItemText"],
 ];

@@ -86,7 +86,7 @@ test("header search crosses as data: a controlled field with change/submit callb
   assert.match(page, /search\?: AppShellPageSearch \| null;/);
   assert.match(
     topBar,
-    /import \{ SearchField \} from "\.\/SearchField\.js";/,
+    /import \{ SearchField \} from "\.\.\/widgets\/SearchField\.js";/,
     "the bar renders the DS SearchField — no new input widget",
   );
   assert.match(

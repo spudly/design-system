@@ -1,7 +1,7 @@
 ---
 component: FieldRow
 run_when:
-  - "src/widgets/FieldRow.tsx, its stories, src/views/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
+  - "src/widgets/FieldRow.tsx, its stories, src/widgets/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
   - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)"
 ---
 
@@ -28,7 +28,7 @@ here a search field with its submit button.
    height instead of sitting shorter.
 
 **Run when:** `src/widgets/FieldRow.tsx`, its stories,
-`src/views/SearchField.tsx` (the `grow` prop), the pages
+`src/widgets/SearchField.tsx` (the `grow` prop), the pages
 that compose FieldRow (VerseSearchPage), or a changeset
 naming FieldRow.
 

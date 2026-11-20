@@ -2,9 +2,9 @@ import { forwardRef, useId } from "react";
 import { Input as TamaguiInput, View, XStack, styled } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { platformAccessibilityProps } from "../widgets/accessibility.js";
+import { platformAccessibilityProps } from "./accessibility.js";
 import { FieldShell } from "./FieldShell.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "./Text.js";
 
 /**
  * The ⌕ glyph must NOT get an explicit lineHeight. It previously received

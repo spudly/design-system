@@ -4,7 +4,7 @@ import { YStack } from "tamagui";
 import { SearchField } from "./SearchField.js";
 
 const meta: Meta<typeof SearchField> = {
-  title: "Views/SearchField",
+  title: "Widgets/SearchField",
   component: SearchField,
   argTypes: {
     label: { control: "text" },

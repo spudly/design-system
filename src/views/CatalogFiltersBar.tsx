@@ -4,15 +4,15 @@ import { tokens } from "../tokens/index.js";
 import { politeLiveRegionProps } from "../widgets/accessibility.js";
 import { Button } from "../widgets/Button.js";
 import { RemovableField } from "../widgets/RemovableField.js";
+import { SearchField } from "../widgets/SearchField.js";
 import {
   SearchHelpPopover,
   type SearchHelpContent,
 } from "../widgets/SearchHelpPopover.js";
 import { Text } from "../widgets/Text.js";
-import { SearchField } from "./SearchField.js";
 import { FieldRow } from "../widgets/FieldRow.js";
 import { SelectField, type SelectOption } from "../widgets/SelectField.js";
-import { TextField } from "./TextField.js";
+import { TextField } from "../widgets/TextField.js";
 
 /**
  * The catalog filter bar (#96, #168): the collapsed filter

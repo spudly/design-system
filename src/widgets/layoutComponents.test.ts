@@ -70,10 +70,9 @@ const panelStackCode = code("PanelStack.tsx");
 const buttonStackCode = code("ButtonStack.tsx");
 const centerCode = code("Center.tsx");
 const formStackCode = code("FormStack.tsx");
-const viewsDir = join(here, "../..", "src", "views");
-const textFieldSource = readFileSync(join(viewsDir, "TextField.tsx"), "utf8");
-const searchFieldSource = readFileSync(join(viewsDir, "SearchField.tsx"), "utf8");
-const fieldShellSource = readFileSync(join(viewsDir, "FieldShell.tsx"), "utf8");
+const textFieldSource = readFileSync(join(componentsDir, "TextField.tsx"), "utf8");
+const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
+const fieldShellSource = readFileSync(join(componentsDir, "FieldShell.tsx"), "utf8");
 const buttonCode = code("Button.tsx");
 
 test("the layout components are exported from the built internal components barrel", async () => {
@@ -145,8 +144,8 @@ test("FieldRow owns the search row's gap and stretch — the equal-height contra
 });
 
 test("FieldRow's field types fill the row height on their grow path (#476)", () => {
-  const searchFieldCode = readFileSync(join(viewsDir, "SearchField.tsx"), "utf8");
-  const textFieldCode = readFileSync(join(viewsDir, "TextField.tsx"), "utf8");
+  const searchFieldCode = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
+  const textFieldCode = readFileSync(join(componentsDir, "TextField.tsx"), "utf8");
   const selectFieldCode = code("SelectField.tsx");
   // SearchField: the bordered container fills its root when growing (no label).
   assert.match(

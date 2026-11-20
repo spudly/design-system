@@ -1,6 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { TextAreaField } from "../views/TextAreaField.js";
+import { TextAreaField } from "../widgets/TextAreaField.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./Button.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";

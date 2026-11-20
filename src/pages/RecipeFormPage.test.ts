@@ -148,7 +148,7 @@ test("the image and list sections render from their data props, and the lock rep
   );
 });
 
-test("the diff wash is the fields' semantic `changed` variant, defined in the field views", () => {
+test("the diff wash is the fields' semantic `changed` variant, defined in the field widgets", () => {
   const form = pageSource("RecipeFormPage");
   assert.ok(form.includes('changed={isChanged("title")}'), "title field must pass `changed`");
   assert.ok(
@@ -156,7 +156,7 @@ test("the diff wash is the fields' semantic `changed` variant, defined in the fi
     "description field must pass `changed`",
   );
   for (const component of ["TextField", "TextAreaField"]) {
-    const src = source("views", component);
+    const src = source("widgets", component);
     assert.ok(src.includes("changed: {"), `${component} must define the changed variant`);
     assert.ok(
       src.includes("tokens.colors.warning.warning5"),

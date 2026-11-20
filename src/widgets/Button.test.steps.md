@@ -60,7 +60,7 @@ button. The icon-slot stories:
    (sm → lg); the icon-only row's squares grow sm → lg with the
    glyph centered in each, and the smallest is still a full 44px
    touch target (compare it with the 44px SearchField clear target
-   in `Views/SearchField` — it is no smaller).
+   in `Widgets/SearchField` — it is no smaller).
 4. IconDisabled: both the labeled and the icon-only button render
    dimmed and pressing them does nothing.
 5. IconPressCounter: pressing the icon-only button increments the

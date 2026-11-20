@@ -19,8 +19,8 @@ import { LabeledGroup } from "../widgets/LabeledGroup.js";
 import { RevertAction } from "../views/RevertAction.js";
 import { ScrollRegion } from "../widgets/ScrollRegion.js";
 import { TagList } from "../widgets/TagList.js";
-import { TextAreaField } from "../views/TextAreaField.js";
-import { TextField } from "../views/TextField.js";
+import { TextAreaField } from "../widgets/TextAreaField.js";
+import { TextField } from "../widgets/TextField.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { Badge } from "../widgets/Badge.js";
 

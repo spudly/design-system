@@ -6,7 +6,7 @@ import { Button } from "./Button.js";
 import { SkeletonBone } from "./SkeletonClock.js";
 import { Text } from "./Text.js";
 import { LINE_BOXES } from "./TextSkeleton.js";
-import { SearchField } from "../views/SearchField.js";
+import { SearchField } from "../widgets/SearchField.js";
 import { useVoice } from "../voice/index.js";
 
 export type BulkSelectToolbarProps = {

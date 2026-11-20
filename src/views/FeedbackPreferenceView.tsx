@@ -9,7 +9,7 @@ import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
-import { CheckboxField } from "./CheckboxField.js";
+import { CheckboxField } from "../widgets/CheckboxField.js";
 import { useVoice } from "../voice/index.js";
 
 export type FeedbackPreferenceViewProps = {
