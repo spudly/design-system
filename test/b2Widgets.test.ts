@@ -78,7 +78,7 @@ test("Badge's colored-tag form tints its surface and label from the resolved tok
     "surface must be the resolved color at 22 hex alpha",
   );
   assert.ok(
-    badge.includes('color: isSelected ? "$onPrimary" : resolvedColor'),
+    badge.includes('const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text)'),
     "label must render in the resolved color itself while unselected (the selectable form's selected state takes the on-primary ink)",
   );
   assert.ok(badge.includes("radii.full"), "pill must use the full radius token");
