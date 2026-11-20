@@ -1,9 +1,11 @@
-import { XStack, YStack } from "tamagui";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { CommentItem } from "../widgets/CommentItem.js";
+import { CompactStack } from "../widgets/CompactStack.js";
+import { ContentStack } from "../widgets/ContentStack.js";
+import { EndRow } from "../widgets/EndRow.js";
 import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "../widgets/TextAreaField.js";
 import { useVoice } from "../voice/index.js";
@@ -123,7 +125,7 @@ export function RecipeCommentsView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <Card variant="bordered">
-      <YStack gap="$3">
+      <ContentStack>
         <Text variant="subheading">{title}</Text>
         {showSkeleton ? (
           // Loading (#278): skeleton CommentItems mirroring
@@ -172,7 +174,7 @@ export function RecipeCommentsView({
           ))
         )}
         {onPost ? (
-          <YStack gap="$2">
+          <CompactStack>
             <TextAreaField
               label={composerLabel}
               value={draft}
@@ -180,7 +182,7 @@ export function RecipeCommentsView({
               placeholder={composerPlaceholder}
               numberOfLines={3}
             />
-            <XStack justifyContent="flex-end">
+            <EndRow>
               <Button
                 variant="primary"
                 size="sm"
@@ -189,10 +191,10 @@ export function RecipeCommentsView({
               >
                 {postLabel}
               </Button>
-            </XStack>
-          </YStack>
+            </EndRow>
+          </CompactStack>
         ) : null}
-      </YStack>
+      </ContentStack>
     </Card>
   );
 }

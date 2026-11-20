@@ -37,6 +37,9 @@ const StyledText = styled(TamaguiText, {
       body: {
         // Base styles above; no overrides.
       },
+      strong: {
+        fontWeight: tokens.typography.fontWeight.bold,
+      },
       hint: {
         fontSize: tokens.typography.fontSize.sm,
         color: "$textMuted",
@@ -75,6 +78,7 @@ export type TextProps = StyledTextProps & {
     | "formTitle"
     | "subheading"
     | "body"
+    | "strong"
     | "hint"
     | "muted"
     | "error"
@@ -95,7 +99,8 @@ export type TextProps = StyledTextProps & {
  * inside the form layout rather than opening a page), `subheading`,
  * `body` (default), `hint` (muted caption), `muted` (body-size text in
  * the muted treatment — the intro line under a page title, a
- * de-emphasized account line), `error`, `success` (small confirmation
+ * de-emphasized account line), `strong` (body-size text in bold — a
+ * data-rendered title line that is not a heading), `error`, `success` (small confirmation
  * text in the success treatment — a form's submitted message), `label`
  * (the section eyebrow — xs semibold, uppercase, letter-spaced, muted
  * gray), and `verse` (serif reading text for scripture/long-form

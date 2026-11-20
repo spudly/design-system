@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
 import { Button } from "../widgets/Button.js";
 import { Center } from "../widgets/Center.js";
 import { FieldRow } from "../widgets/FieldRow.js";
+import { Grow } from "../widgets/Grow.js";
 import { Text } from "../widgets/Text.js";
 import { TextAreaField } from "../widgets/TextAreaField.js";
 import { useVoice } from "../voice/index.js";
@@ -76,7 +76,7 @@ export function RecipeInstructionRowView({
       <Center horizontal={false}>
         <Text variant="muted">{`${position}.`}</Text>
       </Center>
-      <YStack flex={1}>
+      <Grow>
         <TextAreaField
           accessibilityLabel={voice.recipeInstructionRowView.stepLabel(position)}
           readOnly={onBodyChange === undefined}
@@ -86,7 +86,7 @@ export function RecipeInstructionRowView({
             onBodyChange?.(row.key, value);
           }}
         />
-      </YStack>
+      </Grow>
       {onRemove ? (
         <Button
           variant="danger"

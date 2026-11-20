@@ -1,6 +1,6 @@
-import { YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/Button.js";
+import { ContentStack } from "../widgets/ContentStack.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { SectionMutedText } from "./SectionMutedText.js";
@@ -76,7 +76,7 @@ export function TransferRecipesView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
-      <YStack gap="$3">
+      <ContentStack>
         <SectionMutedText loading={showSkeleton} text={hint} />
         <RecipeExportPickerView
           {...exportPicker}
@@ -87,7 +87,7 @@ export function TransferRecipesView({
         </Button>
         {importSummary && !showSkeleton ? <Text variant="success">{importSummary}</Text> : null}
         {error && !showSkeleton ? <Text variant="error">{error}</Text> : null}
-      </YStack>
+      </ContentStack>
     </SectionCard>
   );
 }
