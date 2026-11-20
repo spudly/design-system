@@ -1007,7 +1007,10 @@ test("T2 SSR: loading NutritionPanel renders the ready layout's skeleton, no rea
     11,
     "a ready-but-loading NutritionPanel renders header + label (title/serving/calories + %DV header + 2x2 rows + footnote) + disclaimer bones",
   );
-  assert.ok(!readyLoading.includes("520"), "a loading NutritionPanel shows no real values");
+  assert.ok(
+    !readyLoading.includes("16g") && !readyLoading.includes("42g"),
+    "a loading NutritionPanel shows no real values",
+  );
   assert.ok(
     !readyLoading.includes("SecretDisclaimer"),
     "a loading NutritionPanel shows no disclaimer",
