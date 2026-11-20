@@ -757,6 +757,8 @@ export function RecipesPage(props: RecipesPageProps) {
     cookLogForm,
     search,
     onSearchChange,
+    searchHelp,
+    searchHint,
     statusFilter,
     onStatusFilterChange,
     showStatusFilter,
@@ -1079,6 +1081,8 @@ export function RecipesPage(props: RecipesPageProps) {
       searchPlaceholder={variant === "public" ? publicSearchPlaceholder : "Search recipes\u2026"}
       search={search}
       onSearchChange={onSearchChange}
+      {...(searchHelp ? { searchHelp } : {})}
+      {...(searchHint ? { searchHint } : {})}
       filters={catalogFilters}
       {...(activeFilters ? { activeFilters } : {})}
       {...(onActiveFiltersChange ? { onActiveFiltersChange } : {})}

@@ -1,8 +1,14 @@
 import { useState } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
+import { politeLiveRegionProps } from "../widgets/accessibility.js";
 import { Button } from "../widgets/Button.js";
 import { RemovableField } from "../widgets/RemovableField.js";
+import {
+  SearchHelpPopover,
+  type SearchHelpContent,
+} from "../widgets/SearchHelpPopover.js";
+import { Text } from "../widgets/Text.js";
 import { SearchField } from "./SearchField.js";
 import { FieldRow } from "../widgets/FieldRow.js";
 import { SelectField, type SelectOption } from "../widgets/SelectField.js";
@@ -105,11 +111,25 @@ export type CatalogFilterDefinition<FilterId extends string = string> =
   | CatalogRangeFilter<FilterId>
   | CatalogSortFilter<FilterId>;
 
+/** Re-exported so catalog pages and hosts name the search-help
+ * content shape from the bar's own module (#699). */
+export type { SearchHelpContent, SearchHelpEntry } from "../widgets/SearchHelpPopover.js";
+
 export type CatalogFiltersBarProps<FilterId extends string = string> = {
   /** Search field placeholder copy, passed through to the search field. */
   searchPlaceholder: string;
   search: string;
   onSearchChange: (value: string) => void;
+  /** Optional search help (#699): when present, the search row
+   * renders the SearchHelpPopover trigger beside the search
+   * field; when absent, the row renders exactly as before. The
+   * content is host-supplied data — the bar bakes in no search
+   * language. */
+  searchHelp?: SearchHelpContent;
+  /** Optional inline hint line (#699) under the search field,
+   * exposed as a polite live region (status role on web); when
+   * absent, no line renders. */
+  searchHint?: string;
   /** The addable filters, in chooser order — the caller's data
    * (see the file header): the bar renders a control for a
    * definition only once its filter has been added. */
@@ -136,6 +156,12 @@ export type CatalogFiltersBarProps<FilterId extends string = string> = {
 export type CatalogPageFilterProps<FilterId extends string = string> = {
   search: string;
   onSearchChange: (value: string) => void;
+  /** Optional search help (#699), passed through to the bar:
+   * see CatalogFiltersBarProps. */
+  searchHelp?: SearchHelpContent;
+  /** Optional inline search hint (#699), passed through to the
+   * bar: see CatalogFiltersBarProps. */
+  searchHint?: string;
   /** Status filter. The control renders only when both the value
    * and its callback are provided and `showStatusFilter` is not
    * false. */
@@ -304,6 +330,8 @@ export function CatalogFiltersBar<FilterId extends string = string>({
   searchPlaceholder,
   search,
   onSearchChange,
+  searchHelp,
+  searchHint,
   filters,
   activeFilters,
   onActiveFiltersChange,
@@ -354,6 +382,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
           onChangeText={onSearchChange}
           placeholder={searchPlaceholder}
         />
+        {searchHelp ? <SearchHelpPopover {...searchHelp} /> : null}
         {addable.length > 0 ? (
           <Button
             variant="secondary"
@@ -368,6 +397,11 @@ export function CatalogFiltersBar<FilterId extends string = string>({
           </Button>
         ) : null}
       </FieldRow>
+      {searchHint ? (
+        <YStack collapsable={false} {...politeLiveRegionProps}>
+          <Text variant="hint">{searchHint}</Text>
+        </YStack>
+      ) : null}
       {chooserOpen && addable.length > 0 ? (
         <XStack gap={tokens.spacing[2]} flexWrap="wrap">
           {addable.map((definition) => (
