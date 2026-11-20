@@ -78,9 +78,11 @@ test("the story demonstrates the pinning: bound frame, overflowing content, head
   // children — the self-scrolling page a real consumer
   // composes — while the header is passed as the shell's
   // header prop, outside that scroller.
-  assert.match(storyCode, /<ScrollView flex=\{1\}>/);
+  assert.match(storyCode, /<ScrollView flex=\{1\} minHeight=\{0\}>/);
+  const headerIndex = storyCode.indexOf("header={");
+  assert.ok(headerIndex >= 0, "the story must compose the shell's header prop");
   assert.ok(
-    storyCode.indexOf("header={") < storyCode.indexOf("<ScrollView"),
+    headerIndex < storyCode.indexOf("<ScrollView"),
     "the header must be composed outside the story's scroller",
   );
 });

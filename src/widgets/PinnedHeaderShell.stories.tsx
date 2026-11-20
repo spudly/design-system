@@ -52,9 +52,12 @@ export const Default: Story = {
           MealPlansPage role inside MealsHubPage's plans tab —
           which is exactly the composition the shell's contract
           describes: the header sits outside the scroller, the
-          content scrolls itself.
+          content scrolls itself. `minHeight: 0` lets the flex
+          scroller shrink below its content height inside the
+          bound frame — without it the scroller grows to fit its
+          content and the document scrolls instead.
         */}
-        <ScrollView flex={1}>
+        <ScrollView flex={1} minHeight={0}>
           <YStack padding={tokens.spacing[4]} gap={tokens.spacing[3]}>
             {lines}
           </YStack>
