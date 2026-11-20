@@ -147,51 +147,26 @@ export function Badge({
       }
     : null;
   // The colored-tag form (`color`) and the status-pill form
-  // (`tone`) differ only in the three color values each passes to
-  // the shared render below (#707): the selected treatment, the
-  // selectable props, and the render itself live in one place, so
-  // a Badge change can't land in one form and miss the other.
-  if (color) {
-    const resolvedColor = resolveTagColor(color);
-    return (
-      <BadgeShell
-        backgroundColor={isSelected ? "$primary" : `${resolvedColor}22`}
-        borderColor={isSelected ? "$primary" : resolvedColor}
-        labelStyle={{ ...labelType, color: isSelected ? "$onPrimary" : resolvedColor }}
-        {...rest}
-        {...selectableProps}
-      >
-        {children}
-      </BadgeShell>
-    );
-  }
+  // (`tone`) differ only in three color values (#707): compute
+  // those once, then render a single StyledBadge, so a Badge
+  // change can't land in one form and miss the other.
   const styles = toneStyles[tone];
+  const resolvedColor = color ? resolveTagColor(color) : undefined;
+  const backgroundColor = isSelected
+    ? "$primary"
+    : resolvedColor
+      ? `${resolvedColor}22`
+      : styles.background;
+  const borderColor = isSelected ? "$primary" : (resolvedColor ?? styles.text);
+  const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text);
   return (
-    <BadgeShell
-      backgroundColor={isSelected ? "$primary" : styles.background}
-      borderColor={isSelected ? "$primary" : styles.text}
-      labelStyle={{ ...labelType, color: isSelected ? "$onPrimary" : styles.text }}
+    <StyledBadge
+      backgroundColor={backgroundColor}
+      borderColor={borderColor}
       {...rest}
       {...selectableProps}
     >
-      {children}
-    </BadgeShell>
-  );
-}
-
-type BadgeShellProps = StyledBadgeProps & {
-  labelStyle: GetProps<typeof Text>["style"];
-};
-
-/**
- * The one Badge render (#707): both forms delegate here with
- * their own background / border / label colors, so the pill's
- * structure and label typography exist exactly once.
- */
-function BadgeShell({ labelStyle, children, ...badgeProps }: BadgeShellProps) {
-  return (
-    <StyledBadge {...badgeProps}>
-      <Text style={labelStyle}>{children}</Text>
+      <Text style={{ ...labelType, color: textColor }}>{children}</Text>
     </StyledBadge>
   );
 }
