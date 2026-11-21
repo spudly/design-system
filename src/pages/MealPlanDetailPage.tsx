@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
-import { DetailRow } from "../widgets/DetailRow.js";
+import { DetailRow } from "../views/DetailRow.js";
 import { ListRow } from "../widgets/ListRow.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
@@ -135,7 +135,7 @@ import { WeekDayColumn, WeekDayColumns } from "../widgets/WeekDayColumn.js";
  * composition described above, the entry rows are the generic
  * ListRow widget in its link form (the page supplies the kind prefix, the entry's
  * href, the unavailable suffix, and the disabled flag as
- * content), the goal rows are DetailRow widgets, the plan title
+ * content), the goal rows are DetailRow views, the plan title
  * takes Text's `title` variant, the meta lines take its `hint`
  * variant, and the page's blocks stack in a SectionStack, which
  * owns every section separation.

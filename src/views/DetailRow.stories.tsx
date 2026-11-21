@@ -3,7 +3,7 @@ import { YStack } from "tamagui";
 import { DetailRow } from "./DetailRow.js";
 
 const meta: Meta<typeof DetailRow> = {
-  title: "Widgets/DetailRow",
+  title: "Views/DetailRow",
   component: DetailRow,
 };
 
