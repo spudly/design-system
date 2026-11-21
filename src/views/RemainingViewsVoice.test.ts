@@ -76,7 +76,7 @@ test("NutritionGoalsForm reads its copy from the voice object", () => {
     "title",
     "caloriesLabel",
     "proteinLabel",
-    "carbsLabel",
+    "netCarbsLabel",
     "fatLabel",
     "satietyScoreLabel",
     "minLabel",
