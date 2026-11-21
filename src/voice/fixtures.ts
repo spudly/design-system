@@ -184,7 +184,7 @@ export const fixtureVoice: Voice = {
     title: "Daily nutrition goals",
     caloriesLabel: "Calories",
     proteinLabel: "Protein (g)",
-    carbsLabel: "Carbs (g)",
+    netCarbsLabel: "Net carbs (g)",
     fatLabel: "Fat (g)",
     satietyScoreLabel: "Satiety score",
     minLabel: "min",
