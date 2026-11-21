@@ -117,18 +117,11 @@ const preview: Preview = {
           (viewport === "shortPhone" ? 430 : 844));
       // Same capture-default rule for width (#754): a story's
       // dsViewportWidth pin (e.g. MealsHubPage's 864px regression
-      // stories) applies only when the toolbar has no selection.
-      const presetWidth =
-        viewport === "desktop"
-          ? 1280
-          : viewport === "wide"
-            ? 1024
-            : viewport === "full"
-              ? "100%"
-              : 430;
-      const frameWidth = toolbarViewport
-        ? presetWidth
-        : ((context.parameters.dsViewportWidth as number | undefined) ?? presetWidth);
+      // stories) overrides the preset width only when the toolbar
+      // has no selection — a toolbar selection owns the frame.
+      const widthOverride = toolbarViewport
+        ? undefined
+        : (context.parameters.dsViewportWidth as number | undefined);
       const themeValue = context.globals.theme as string;
       const theme: StorybookThemeName = isStorybookThemeName(themeValue) ? themeValue : "light";
       return (
@@ -167,7 +160,17 @@ const preview: Preview = {
             // preset) pins captures at their previous dimensions.
             <YStack backgroundColor="$background">
               <View
-                width={frameWidth}
+                width={
+                  widthOverride ??
+                  (viewport === "desktop"
+                    ? 1280
+                    : viewport === "wide"
+                      ? 1024
+                      : viewport === "full"
+                        ? "100%"
+                        : 430
+                  )
+                }
                 maxWidth="100%"
                 height={frameHeight}
                 position="relative"

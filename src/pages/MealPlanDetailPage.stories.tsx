@@ -321,7 +321,7 @@ export const NoGoals: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <View position="relative">
+    <View position="relative" height="100%">
       <MealPlanDetailPage
         footer={eciperayFooterFixture}
         state="ready"

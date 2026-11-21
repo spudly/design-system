@@ -230,7 +230,7 @@ export const LoadingTags: Story = {
 // The overlay verifies the tag-pill skeletons reproduce the loaded tag row's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <View position="relative">
+    <View position="relative" height="100%">
       <FormHarness submitLabel="Create Recipe" />
       <View
         position="absolute"
