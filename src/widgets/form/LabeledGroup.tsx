@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
-import { LabelRow } from "../labelRow.js";
+import { LabelRow } from "../LabelRow.js";
 
 export type LabeledGroupProps = {
   /** The group's label, rendered in the FieldLabel treatment. */
@@ -29,7 +29,7 @@ export type LabeledGroupProps = {
  * lists, owned here so no page sets it. LabeledField is the
  * sibling for a single field, whose label sits 4px above the
  * field. The label row itself is the one implementation both
- * wrappers share (labelRow).
+ * wrappers share (LabelRow).
  *
  * The group carries its label as its programmatic name (the
  * NumberStepper pattern): a group role on web, the accessible

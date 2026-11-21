@@ -69,7 +69,7 @@ for (const name of COMPONENTS) {
   });
 }
 test("the label row is one shared implementation behind both labeled wrappers", () => {
-  const row = readRepoFile("src/widgets/labelRow.tsx");
+  const row = readRepoFile("src/widgets/LabelRow.tsx");
   assert.match(row, /paddingBlockEnd=\{tokens\.spacing\[separation\]\}/);
   assert.match(row, /<FieldLabel htmlFor=\{htmlFor\}>\{label\}<\/FieldLabel>/);
   const field = readRepoFile("src/widgets/form/LabeledField.tsx");

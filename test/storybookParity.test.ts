@@ -131,7 +131,7 @@ function assertModuleStory({ dir, index, base, titleDescription, titleMatches, s
 // (#587 phase 3), modalRegistry.ts is the internal
 // modal-layer registry Dialog/StepOverlay register in (#394),
 // linkOverlay.tsx is the native-only link layer other components
-// compose, labelRow.tsx is the shared label-row implementation
+// compose, LabelRow.tsx is the shared label-row implementation
 // LabeledField / LabeledGroup compose, RowTextContent.tsx is the
 // shared row title/subtitle block CardRow / TextActionCardRow
 // compose (#587 phase 2), useVariantGlyphInk.ts is the shared
@@ -165,7 +165,7 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   "modalRegistry.ts",
   "tagColors.ts",
   "linkOverlay.tsx",
-  "labelRow.tsx",
+  "LabelRow.tsx",
   "RowTextContent.tsx",
   "LoadingStatTiles.tsx",
   "useVariantGlyphInk.ts",
