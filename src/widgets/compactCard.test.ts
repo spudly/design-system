@@ -55,5 +55,12 @@ test("the compact variant: surface, medium radius, 12px padding, small shadow, n
 
 test("the treatment's consumers compose Card's compact variant", () => {
   const tagsPage = readFileSync(join(root, "src", "pages", "TagsPage.tsx"), "utf8");
-  assert.match(tagsPage, /<Card key=\{tag\.id\} variant="compact">/);
+  // Editor and display rows both render a compact Card keyed by
+  // the tag; scope this pin to the display branch (the compact
+  // Card whose TrailingActionsRow leads with the tag's Badge) so
+  // it fails if the display row alone loses the variant.
+  assert.match(
+    tagsPage,
+    /<Card key=\{tag\.id\} variant="compact">\s*<TrailingActionsRow leading=\{<Badge color=\{tag\.color\}>\{tag\.name\}<\/Badge>\}>/,
+  );
 });
