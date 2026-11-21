@@ -8,7 +8,7 @@ import { PageContentColumn } from "./PageContentColumn.js";
 import { Button } from "./Button.js";
 import { LinkOverlay } from "./linkOverlay.js";
 import { Text } from "./Text.js";
-import { SearchField } from "./SearchField.js";
+import { SearchField } from "./form/SearchField.js";
 
 /**
  * AppTopBar (#437): the shared top-bar composition both DS frame

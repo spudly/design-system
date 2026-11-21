@@ -6,7 +6,7 @@ import { Button } from "./Button.js";
 import { SkeletonBone } from "./SkeletonClock.js";
 import { Text } from "./Text.js";
 import { LINE_BOXES } from "./TextSkeleton.js";
-import { SearchField } from "../widgets/SearchField.js";
+import { SearchField } from "../widgets/form/SearchField.js";
 import { useVoice } from "../voice/index.js";
 
 export type BulkSelectToolbarProps = {
@@ -86,7 +86,11 @@ export function BulkSelectToolbar({
         // their places.
         <BoxSkeleton height={46} />
       ) : (
-        <SearchField value={search} onChangeText={onSearchChange} placeholder={resolvedSearchPlaceholder} />
+        <SearchField
+          value={search}
+          onChangeText={onSearchChange}
+          placeholder={resolvedSearchPlaceholder}
+        />
       )}
       <XStack flexWrap="wrap" alignItems="center" gap="$3" paddingBlockEnd="$3">
         <Button

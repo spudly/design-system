@@ -4,11 +4,8 @@ import { Button } from "../widgets/Button.js";
 import { CompactRow } from "../widgets/CompactRow.js";
 import { ContentStack } from "../widgets/ContentStack.js";
 import { RemovableField } from "../widgets/RemovableField.js";
-import { SearchField } from "../widgets/SearchField.js";
-import {
-  SearchHelpPopover,
-  type SearchHelpContent,
-} from "../widgets/SearchHelpPopover.js";
+import { SearchField } from "../widgets/form/SearchField.js";
+import { SearchHelpPopover, type SearchHelpContent } from "../widgets/SearchHelpPopover.js";
 import { Text } from "../widgets/Text.js";
 import { FieldRow } from "../widgets/form/FieldRow.js";
 import { SelectField, type SelectOption } from "../widgets/form/SelectField.js";

@@ -40,7 +40,7 @@ function styledBlock(code: string, constName: any) {
 
 const FIELD_VALUE_BLOCKS = [
   ["src/widgets/TextField.tsx", "StyledInput"],
-  ["src/widgets/SearchField.tsx", "StyledInput"],
+  ["src/widgets/form/SearchField.tsx", "StyledInput"],
   ["src/widgets/TextAreaField.tsx", "StyledTextArea"],
   ["src/widgets/form/SelectField.tsx", "StyledValue"],
   ["src/widgets/form/SelectField.tsx", "StyledItemText"],

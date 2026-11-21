@@ -1,7 +1,7 @@
-diff --git a/src/widgets/SearchField.tsx b/src/widgets/SearchField.tsx
+diff --git a/src/widgets/form/SearchField.tsx b/src/widgets/form/SearchField.tsx
 index 7b0f1eb..9d94a40 100644
---- a/src/widgets/SearchField.tsx
-+++ b/src/widgets/SearchField.tsx
+--- a/src/widgets/form/SearchField.tsx
++++ b/src/widgets/form/SearchField.tsx
 @@ -71,13 +71,8 @@ const StyledContainer = styled(XStack, {
  const StyledGlyphBox = styled(XStack, {
    name: "SearchFieldGlyphBox",
