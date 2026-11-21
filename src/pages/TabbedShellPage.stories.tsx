@@ -12,7 +12,7 @@ import { TabbedShellPage, type TabbedShellPageTab } from "./TabbedShellPage.js";
  * values (packages/web/src/App.tsx); the tab surfaces are static
  * stand-ins composed from DS components, the way the app's tab
  * hosts slot DS pages into the frame. The frame matches the
- * other page stories: a phone viewport (430×844) pinned so
+ * other page stories: a phone viewport (430×844) by default, so
  * Chromatic screenshots are deterministic, theme pinned to
  * Quiet Dawn, Memorize's brand.
  */

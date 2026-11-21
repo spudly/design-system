@@ -12,7 +12,7 @@ import { LegalDocumentPage } from "./LegalDocumentPage.js";
  * same frame. The fixture copy is story prose in the real
  * documents' shape — the real legal text is app content.
  *
- * Like the other page stories, the frame pins a phone viewport
+ * Like the other page stories, the preview frame defaults to a phone viewport
  * (430×844) so Chromatic screenshots stay deterministic; the
  * document scrolls inside it. The Wide story is the exception:
  * it renders the privacy document unconstrained so the prose
