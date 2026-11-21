@@ -32,7 +32,7 @@ import {
  * leaves height unbounded so the story canvas owns it, but a real
  * FlatList needs a bounded viewport to virtualize against — an
  * unbounded one is also exactly the #188 failure shape. So the
- * frame pins a phone viewport (430×844) and the list bounds inside
+ * preview frame defaults to a phone viewport (430×844) and the list bounds inside
  * it. Fixed dimensions keep Chromatic screenshots deterministic.
  * Theme pinned to Warm Harvest, Eciperay's brand, like Pages/Eciperay.
  */

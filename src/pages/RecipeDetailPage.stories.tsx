@@ -15,7 +15,7 @@ import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
  * ingredients, and steps below; the demo stays as the spec until
  * the app rewires onto this component.
  *
- * Like RecipesPage, the frame pins a phone viewport (430×844): the
+ * Like RecipesPage, the preview frame defaults to a phone viewport (430×844): the
  * page is a flex column (pinned chrome over a scroll view), so a
  * bounded viewport is what it composes against, and fixed
  * dimensions keep Chromatic screenshots deterministic. Theme
@@ -439,7 +439,7 @@ export const SharingAndComments: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <View width={430} maxWidth="100%" height={844} position="relative">
+    <View position="relative" height="100%">
       <RecipeDetailPageDemo withCoverageSections />
       <View
         position="absolute"

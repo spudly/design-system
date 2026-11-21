@@ -14,7 +14,7 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * in production and written out here.
  *
  * The frame matches RecipesPage's stories: a phone viewport
- * (430×844) pinned so Chromatic screenshots are deterministic and
+ * (430×844) by default, so Chromatic screenshots are deterministic and
  * the scrolling shell bounds the way it does on device. Theme
  * pinned to Warm Harvest, Eciperay's brand, like Pages/Eciperay.
  */
@@ -107,7 +107,7 @@ export const NoActions: Story = {
 // The overlay verifies the skeleton reproduces the original's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
-    <View width={430} maxWidth="100%" height={844} position="relative">
+    <View position="relative" height="100%">
       <MealPlansPage
         footer={eciperayFooterFixture}
         plans={planItems}
