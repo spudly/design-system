@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { DetailRow } from "./DetailRow.js";
+import { DetailRow } from "../views/DetailRow.js";
 import { ListRow } from "./ListRow.js";
 import { ListStack } from "./ListStack.js";
 import { Text } from "./Text.js";
