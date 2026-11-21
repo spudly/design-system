@@ -343,8 +343,8 @@ test("no lineHeight value is derived from a font size", () => {
 });
 
 test("SearchField glyph is capped in its own fixed box; the row keeps minHeight", () => {
-  const file = sources.find(({ posixPath }) => posixPath.endsWith("widgets/SearchField.tsx"));
-  assert.ok(file, "src/widgets/SearchField.tsx not found");
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("widgets/form/SearchField.tsx"));
+  assert.ok(file, "src/widgets/form/SearchField.tsx not found");
   // Declarations are checked on comment-stripped text so prose in the
   // block's comments can neither satisfy nor trip them.
   const stripped = stripComments(file.text);
@@ -363,8 +363,8 @@ test("SearchField glyph is capped in its own fixed box; the row keeps minHeight"
 });
 
 test("SearchField search icon is drawn shapes, not a text glyph, so it centers by construction (#45)", () => {
-  const file = sources.find(({ posixPath }) => posixPath.endsWith("widgets/SearchField.tsx"));
-  assert.ok(file, "src/widgets/SearchField.tsx not found");
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("widgets/form/SearchField.tsx"));
+  assert.ok(file, "src/widgets/form/SearchField.tsx not found");
   const stripped = stripComments(file.text);
   // The ⌕ character (U+2315) must not survive as rendered content:
   // its ink is asymmetric inside its em box, so no font size centers

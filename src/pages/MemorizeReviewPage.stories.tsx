@@ -15,7 +15,7 @@ import { MemorizeReviewPage, type MemorizeReviewPageVerse } from "./MemorizeRevi
  * review cards render them).
  *
  * The frame matches the other page stories: a phone viewport
- * (430×844) pinned so Chromatic screenshots are deterministic
+ * (430×844) by default, so Chromatic screenshots are deterministic
  * and the fixed shell bounds the way it does on device. Theme
  * pinned to Quiet Dawn, Memorize's brand, like Pages/Memorize.
  */

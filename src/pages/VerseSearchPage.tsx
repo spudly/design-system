@@ -5,7 +5,7 @@ import { Alert } from "../widgets/Alert.js";
 import { EmptyState } from "../widgets/EmptyState.js";
 import { FieldRow } from "../widgets/form/FieldRow.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
-import { SearchField } from "../widgets/SearchField.js";
+import { SearchField } from "../widgets/form/SearchField.js";
 import { Spinner } from "../widgets/Spinner.js";
 import { Text } from "../widgets/Text.js";
 import { BoundedList } from "./BoundedList.js";

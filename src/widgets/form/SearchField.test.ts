@@ -32,7 +32,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 function readCode(rel: string) {
   return readFileSync(join(root, rel), "utf8")
@@ -40,7 +40,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const searchField = readCode("src/widgets/SearchField.tsx");
+const searchField = readCode("src/widgets/form/SearchField.tsx");
 // The guard itself lives in the shared hook since the #587
 // phase-2 dedupe; the field files only wire its handlers in.
 const guard = readCode("src/views/useImeCompositionGuard.ts");

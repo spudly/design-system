@@ -17,7 +17,7 @@ import { DiscoverPage, type DiscoverPageFilterId, type DiscoverPageItem } from "
  * it. No image URLs: story fixtures never load external images,
  * so every thumbnail renders the placeholder block.
  *
- * The frame pins a phone viewport (430×844) like RecipesPage's
+ * The preview frame defaults to a phone viewport (430×844) like RecipesPage's
  * stories: a real FlatList needs a bounded viewport to
  * virtualize against, and fixed dimensions keep Chromatic
  * screenshots deterministic. Theme pinned to Warm Harvest,

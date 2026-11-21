@@ -1,12 +1,12 @@
 ---
 component: SearchField
 run_when:
-  - "src/widgets/form/FieldRow.tsx, its stories, src/widgets/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
+  - "src/widgets/form/FieldRow.tsx, its stories, src/widgets/form/SearchField.tsx (the grow prop), the pages that compose FieldRow (VerseSearchPage), or a changeset naming FieldRow."
 ---
 
 # SearchField — manual test steps
 
-Colocated manual test steps for `src/widgets/SearchField.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/form/SearchField.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -27,6 +27,6 @@ here a search field with its submit button.
    height instead of sitting shorter.
 
 **Run when:** `src/widgets/form/FieldRow.tsx`, its stories,
-`src/widgets/SearchField.tsx` (the `grow` prop), the pages
+`src/widgets/form/SearchField.tsx` (the `grow` prop), the pages
 that compose FieldRow (VerseSearchPage), or a changeset
 naming FieldRow.
