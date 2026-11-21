@@ -77,7 +77,7 @@ export function CookingModePage(props: CookingModePageProps) {
   }
 
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} scrollMode="overlay">
       <StepOverlay
         title={recipeTitle}
         stepLabel={`Step ${current.stepNumber} of ${steps.length}`}

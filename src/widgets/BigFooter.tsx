@@ -9,6 +9,7 @@ import { SocialTwitterIcon } from "../icons/SocialTwitterIcon.js";
 import { SocialYoutubeIcon } from "../icons/SocialYoutubeIcon.js";
 import type { IconComponentProps } from "../icons/Icon.js";
 import { AppStoreBadge } from "../icons/AppStoreBadge.js";
+import { BrandMark, type BrandMarkName } from "../icons/BrandMark.js";
 import { GooglePlayBadge } from "../icons/GooglePlayBadge.js";
 import { PageContentColumn } from "./PageContentColumn.js";
 import { Text } from "./Text.js";
@@ -40,7 +41,10 @@ import { contentInfoRoleProps, platformAccessibilityProps } from "./accessibilit
  * the design system — BigFooter renders the brand wordmark itself
  * (the brand label as text, inside the brand anchor). The host
  * never supplies rendered logo UI; brand identity reaches the
- * footer as data only (label + href).
+ * footer as data only (label + href). Since #726 the identity
+ * may also name the brand's DS-owned graphic mark (`mark`), which
+ * the footer renders from its own artwork beside the wordmark —
+ * still data only, never a host-supplied element.
  *
  * Store links (#466, Option A): each entry names its store and
  * renders that store's OFFICIAL badge artwork — Apple's
@@ -129,10 +133,19 @@ export type BigFooterSocialLink = {
  * The wordmark is rendered by the DS itself (#688): there is no
  * logo slot — brand identity is data only (`label` + `href`), and
  * the anchor's accessible name is the brand `label`.
+ *
+ * Graphic brand mark (#726): `mark` names the brand's DS-owned
+ * graphic mark as data, the same identity the header brand path
+ * (BrandLink / AppTopBar) takes — when named, the DS renders
+ * its own mark artwork beside the wordmark, decorative (the
+ * anchor's accessible name stays the brand `label`). Omit it
+ * for a brand with no mark (Memorize, today): the wordmark
+ * renders alone, exactly as before.
  */
 export type BigFooterBrand = {
   label: string;
   href: string;
+  mark?: BrandMarkName;
 };
 
 /**
@@ -224,6 +237,23 @@ export function BigFooter({ footer }: BigFooterProps) {
   // active theme and passed to the glyph explicitly.
   const theme = useTheme();
   const socialInk = typeof theme.onPrimary?.val === "string" ? theme.onPrimary.val : "#ffffff";
+  // The brand wordmark anchor (#688): the DS renders the
+  // wordmark itself, its accessible name the brand label. When
+  // the brand names a graphic mark (#726), the DS-owned mark
+  // renders beside it in the row below — the anchor itself is
+  // the same either way.
+  const brandAnchor = (
+    <StyledBigFooterBrandAnchor
+      {...platformAccessibilityProps({
+        accessibilityRole: "link",
+        accessibilityLabel: brand.label,
+      })}
+      href={brand.href}
+      cursor="web:pointer"
+    >
+      {brand.label}
+    </StyledBigFooterBrandAnchor>
+  );
   return (
     <YStack
       backgroundColor="$primary"
@@ -232,16 +262,14 @@ export function BigFooter({ footer }: BigFooterProps) {
       gap="$5"
       {...contentInfoRoleProps}
     >
-      <StyledBigFooterBrandAnchor
-        {...platformAccessibilityProps({
-          accessibilityRole: "link",
-          accessibilityLabel: brand.label,
-        })}
-        href={brand.href}
-        cursor="web:pointer"
-      >
-        {brand.label}
-      </StyledBigFooterBrandAnchor>
+      {brand.mark !== undefined ? (
+        <XStack alignItems="center" gap="$3">
+          <BrandMark mark={brand.mark} size={40} />
+          {brandAnchor}
+        </XStack>
+      ) : (
+        brandAnchor
+      )}
       <XStack flexWrap="wrap" gap="$5" alignItems="stretch">
         {columns.length > 0 ? (
           <XStack
@@ -355,14 +383,29 @@ export function BigFooter({ footer }: BigFooterProps) {
  *   shell adds neither a scroller nor a bounded frame — just
  *   the growing column — so the outer shell stays the sole
  *   scroll owner.
+ * - "overlay": the page's content IS a full-region overlay
+ *   (StepOverlay in the cooking-mode pages, #729). The overlay
+ *   anchors to the content region with absolute positioning
+ *   and contributes no intrinsic height, so the region must
+ *   be bounded to the viewport: on native the shell is the
+ *   bounded frame (like "content", no ScrollView of its own);
+ *   on web the shell bounds the content region to the full
+ *   viewport (minHeight 100dvh, full-width positioned region)
+ *   WHETHER OR NOT the host supplied footer data — the
+ *   no-footer branch's unbounded growing column would leave
+ *   the overlay's region collapsed and covered, and the
+ *   #628 column's width cap would leave the page showing
+ *   through at the sides of a full-screen shell.
  *
- * The mode is a native-only concern: on web the document
- * scrolls the whole page in every mode (no windowing, the
- * catalogs paginate by scroll sentinel), and the mode never
- * changes the web layout. It is a semantic scroll-ownership
- * prop, not a styling prop.
+ * Except for "overlay", the mode is a native-only concern:
+ * on web the document scrolls the whole page in every other
+ * mode (no windowing, the catalogs paginate by scroll
+ * sentinel), and the mode never changes the web layout.
+ * "overlay" is the one mode that also changes the web
+ * layout, as described above. It is a semantic
+ * scroll-ownership prop, not a styling prop.
  */
-type BigFooterShellScrollMode = "shell" | "content" | "nested";
+type BigFooterShellScrollMode = "shell" | "content" | "nested" | "overlay";
 
 export type BigFooterShellProps = {
   /** The page's footer data, when its host supplied any. */
@@ -421,13 +464,20 @@ export type BigFooterShellProps = {
  * footer nor a full-viewport inner shell. A page composed
  * inside another shell's scroller on native says so with
  * scrollMode "nested" — the same opt-out, for the platform
- * whose scroller is explicit.
+ * whose scroller is explicit. The one exception is a page
+ * whose content is a full-region overlay (the cooking-mode
+ * pages): it says scrollMode "overlay" (#729) and the shell
+ * bounds its content region to the full viewport with or
+ * without footer data, because the overlay contributes no
+ * intrinsic height and the unbounded column would collapse
+ * its region (and the #628 column cap would leave the page
+ * showing through at the sides of a full-screen shell).
  */
 export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFooterShellProps) {
   if (!isWeb) {
     // Native (#547 addendum): no BigFooter in any mode — native
     // uses bottom navigation (the tab shells' Tabs) instead.
-    if (scrollMode === "content") {
+    if (scrollMode === "content" || scrollMode === "overlay") {
       // The content owns scrolling (a windowed list or a
       // page-owned scroll region): the shell is only the
       // bounded frame that gives that scroller its height —
@@ -461,6 +511,32 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
           {children}
         </YStack>
       </ScrollView>
+    );
+  }
+  if (scrollMode === "overlay") {
+    // Web, overlay page (#729): the content is a full-region
+    // overlay (StepOverlay) — a dark, opaque, full-screen
+    // shell that fills its nearest positioned ancestor so the
+    // page beneath does not show through. It anchors to this
+    // branch's content region and contributes no intrinsic
+    // height, so the region is bounded to the viewport and
+    // FULL-WIDTH: the #628 column's 1200px cap would leave
+    // the page showing through at the sides on wide
+    // viewports, and the no-footer branch's unbounded
+    // growing column would leave the region collapsed and
+    // covered. The footer, when supplied, stays in flow
+    // below the region exactly as in the default shell.
+    return (
+      <YStack
+        minHeight={{ default: "100%", web: "100dvh" }}
+        flexDirection="column"
+        justifyContent="space-between"
+      >
+        <YStack flex={1} position="relative">
+          {children}
+        </YStack>
+        {footer ? <BigFooter footer={footer} /> : null}
+      </YStack>
     );
   }
   if (!footer) {

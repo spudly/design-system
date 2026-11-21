@@ -15,9 +15,9 @@ release's changed components. The full index lives in
 
 Open in `Widgets/FormStack`: Default, FieldsWithActions;
 `Widgets/FormHeading`: Default, WithSubtitle;
-`Widgets/LabeledField`: Default, WithAction, WithError;
-`Widgets/LabeledGroup`: Default, WithAction;
-`Widgets/FieldLabel`: Default, Associated;
+`Widgets/Form/LabeledField`: Default, WithAction, WithError;
+`Widgets/Form/LabeledGroup`: Default, WithAction;
+`Widgets/Form/FieldLabel`: Default, Associated;
 `Views/RevertAction` and `Widgets/ChangedListBanner`
 (their stories).
 

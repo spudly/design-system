@@ -6,7 +6,7 @@ import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { ContentStack } from "../widgets/ContentStack.js";
 import { DashedPlaceholder } from "../widgets/DashedPlaceholder.js";
-import { LabeledGroup } from "../widgets/LabeledGroup.js";
+import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
 import { Text } from "../widgets/Text.js";
 import { Thumbnail } from "../widgets/Thumbnail.js";
 import { tokens } from "../tokens/index.js";

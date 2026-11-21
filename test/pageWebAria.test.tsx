@@ -162,7 +162,7 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 // file sits at the max-lines cap. MealPlansPage,
 // Every page that once routed stack pressables through the
 // translator has been de-styled off this list by the #119
-// tranches: ShoppingListPage (its row is CheckRow),
+// tranches: ShoppingListPage (its row is CheckboxField's list shape),
 // MealDetailPage (its rows are ListRow), MealsHubPage
 // (TextActionCardRow), MealCookingModePage (its Done pill is
 // StepOverlay's), AiSessionPage (its Cancel control is a
@@ -197,15 +197,14 @@ test("page-level stack pressables route through the translator, never raw RN JSX
     );
   }
 });
-test("CheckRow (ShoppingListPage's row) translates role, checked state, and label together (#237)", () => {
-  const code = readCode("src/widgets/CheckRow.tsx");
+test("CheckboxField list shape (ShoppingListPage's row) composes its accessible name from label + detail (#713)", () => {
+  const code = readCode("src/widgets/CheckboxField.tsx");
   assert.match(
     code,
-    /\{\.\.\.platformAccessibilityProps\(\{\s+accessibilityRole: "checkbox"/,
-    "the translated props must be spread onto the row's XStack pressable",
+    /const accessibleName = detail \? `\$\{label\}, \$\{detail\}` : label;/,
+    "the list shape's accessible name must compose the detail after the label",
   );
-  assert.match(code, /accessibilityState: \{ checked \}/);
-  assert.match(code, /accessibilityLabel: accessibleName/);
+  assert.match(code, /"aria-label": accessibilityLabel \?\? accessibleName/);
 });
 test("the de-styled pages have no stack pressable left to translate (#237, #248, #119)", () => {
   // These pages' rows and revert pressables render through the

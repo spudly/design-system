@@ -1,0 +1,5 @@
+---
+"@spudly/ui": major
+---
+
+NutritionPanel: restyled the ready state as a real FDA-style Nutrition Facts label — a fixed black-on-white bordered panel (a deliberate exception to theme tokens, so it renders identically in light and dark mode) with graded rules, very large Calories, a right-aligned % Daily Value column, bold primary nutrients with indented sub-nutrients, the vitamin/mineral block, and the standard %DV footnote. BREAKING: the ready state's free-form `rows: NutritionPanelRow[]` contract is removed in favor of the structured `NutritionFacts` view-model (`servingSizeLabel`, optional `servingsPerContainerLabel`, `caloriesLabel`, and `nutrients: NutritionFact[]` of `{ kind, amountLabel, dailyValueLabel? }`, with app-supplied precomputed %DV). `RecipeDetailPageNutritionRow` is replaced by `RecipeDetailPageNutritionFact`. The voice object's `nutritionPanel` section gains the label copy: `titleLabel`, `caloriesLabel`, `servingSizeLabel`, `dailyValueHeaderLabel`, `dailyValueFootnote`, and per-kind `factLabels`. Loading skeletons now mirror the new label shape; the unavailable/Estimate state, Refresh, and the app disclaimer are unchanged.

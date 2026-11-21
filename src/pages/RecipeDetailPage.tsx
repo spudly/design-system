@@ -12,12 +12,16 @@ import { LogEntryCard } from "../widgets/LogEntryCard.js";
 import { MarkableRow } from "../widgets/MarkableRow.js";
 import {
   NutritionPanel,
+  type NutritionFact,
+  type NutritionFactKind,
   type NutritionPanelData,
-  type NutritionPanelRow,
 } from "../widgets/NutritionPanel.js";
 import { NumberStepper } from "../widgets/NumberStepper.js";
 import { PanelStack } from "../widgets/PanelStack.js";
-import { PresetValueSelector, type PresetValueOption } from "../widgets/PresetValueSelector.js";
+import {
+  PresetValueSelector,
+  type PresetValueOption,
+} from "../widgets/form/PresetValueSelector.js";
 import {
   RatingsCard,
   type RatingsCardCommunityRating,
@@ -27,13 +31,13 @@ import {
 import { ScreenShell } from "../widgets/ScreenShell.js";
 import { ScrollRegion } from "../widgets/ScrollRegion.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
-import { SelectField } from "../widgets/SelectField.js";
+import { SelectField } from "../widgets/form/SelectField.js";
 import { StatBand } from "../widgets/StatBand.js";
 import { StatCard } from "../widgets/StatCard.js";
 import { Badge } from "../widgets/Badge.js";
 import { StatusMessage } from "../widgets/StatusMessage.js";
 import { StepList } from "../widgets/StepList.js";
-import { SuggestionPanel } from "../widgets/SuggestionPanel.js";
+import { SuggestionPanel } from "../widgets/form/SuggestionPanel.js";
 import { TagList } from "../widgets/TagList.js";
 import { Text } from "../widgets/Text.js";
 import { Thumbnail } from "../widgets/Thumbnail.js";
@@ -420,7 +424,8 @@ export type RecipeDetailPageCookLogForm = {
 // the #119 pass extracted from this page's nutrition section);
 // the page's contract names are aliases, as with the ratings
 // types above.
-export type RecipeDetailPageNutritionRow = NutritionPanelRow;
+export type RecipeDetailPageNutritionFact = NutritionFact;
+export type RecipeDetailPageNutritionFactKind = NutritionFactKind;
 export type RecipeDetailPageNutritionProps = NutritionPanelData;
 
 export type RecipeDetailPageReadyProps = {

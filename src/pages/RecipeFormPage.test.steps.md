@@ -1,8 +1,8 @@
 ---
 component: RecipeFormPage
 run_when:
-  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
-  - "src/widgets/FieldColumns.tsx, its stories, RecipeFormPage, or a changeset naming FieldColumns."
+  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/form/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
+  - "src/widgets/form/FieldColumns.tsx, its stories, RecipeFormPage, or a changeset naming FieldColumns."
 ---
 
 # RecipeFormPage — manual test steps
@@ -53,7 +53,7 @@ Default, NoSelection, SaveError. Open in
 
 **Run when:** `src/pages/RecipeFormPage.tsx`,
 `src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
-`src/widgets/AutocompletePicker.tsx`, their stories, or a
+`src/widgets/form/AutocompletePicker.tsx`, their stories, or a
 changeset naming any of the three pages or
 AutocompletePicker. Run only the numbered cases for the
 page(s) that changed; an AutocompletePicker-only change
@@ -61,11 +61,11 @@ runs only the autocomplete portions of cases 4 and 5.
 
 ## FieldColumns
 
-Open in `Widgets/FieldColumns`: Default.
+Open in `Widgets/Form/FieldColumns`: Default.
 
 1. Servings, Prep (min), and Cook (min) fields sit in three
    equal-width columns with an even gutter between them;
    each label sits over its own field.
 
-**Run when:** `src/widgets/FieldColumns.tsx`, its
+**Run when:** `src/widgets/form/FieldColumns.tsx`, its
 stories, RecipeFormPage, or a changeset naming FieldColumns.

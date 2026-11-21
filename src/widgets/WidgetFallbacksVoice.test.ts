@@ -8,7 +8,7 @@
  * ships no default strings.
  */
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -16,7 +16,9 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const strip = (text: string) =>
   text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const read = (name: string) => strip(readFileSync(join(here, `${name}.tsx`), "utf8"));
+// Form-category widgets live in src/widgets/form since #710.
+const read = (name: string) =>
+  strip(readFileSync(existsSync(join(here, "form", `${name}.tsx`)) ? join(here, "form", `${name}.tsx`) : join(here, `${name}.tsx`), "utf8"));
 
 test("AutocompletePicker reads its search defaults and announcements from the voice object", () => {
   const picker = read("AutocompletePicker");

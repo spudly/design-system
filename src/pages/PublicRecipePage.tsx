@@ -16,7 +16,6 @@ import { RecipeOverviewPanel } from "../widgets/RecipeOverviewPanel.js";
 import { ScrollShell } from "../widgets/ScrollShell.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
-import { STATUS_BADGES } from "./recipeStatusBadges.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,
@@ -116,9 +115,7 @@ import type {
  * adds no library components; the same panels serve
  * RecipeDetailPage's sections, so the two surfaces render one
  * interaction model. What stays page-side is only the wiring:
- * the status badge's tone/label pair resolved from the page's
- * own STATUS_BADGES map, and the section view-models passed
- * through. Section separation is the shell column's 16px gap
+ * the section view-models passed through. Section separation is the shell column's 16px gap
  * throughout, where the hand-styled page mixed 16px section
  * padding with 8px heading margins — the headings now sit 16px
  * from the sections on both sides — and the section headings
@@ -163,14 +160,6 @@ export type PublicRecipePageOverviewProps = {
   imageUrl?: string | null;
   title: string;
   description?: string | null;
-  /** Recipe status as a plain string; the page resolves it to
-   * the badge's tone and label through its STATUS_BADGES map
-   * (the same map RecipeDetailPage carries) and passes the pair
-   * into RecipeOverviewPanel — status words are the surface's
-   * data, not a design-system vocabulary (#119 dedupe). Unknown
-   * values fall back to "idea", as the app's status normalizer
-   * does. */
-  status: string;
   /** Overview stat band values, app-formatted ("4", "15m", "30m"). */
   servingsLabel: string;
   prepTimeLabel?: string;
@@ -236,12 +225,6 @@ const NOT_FOUND_TITLE = "Recipe not found";
 const NOT_FOUND_MESSAGE = "This recipe may be private or no longer available.";
 const UNAVAILABLE_TITLE = "Recipe unavailable";
 const UNAVAILABLE_MESSAGE = "This recipe link is invalid or has expired.";
-
-// The status badge map (labels and tones for the app's four
-// statuses) is shared with RecipeDetailPage in
-// ./recipeStatusBadges.ts (#587 phase 3 tranche 5) — status words
-// are the surfaces' data, not a vocabulary the shared components
-// own (#119 dedupe).
 
 // The scale option set, the custom-scale label and the missing-
 // ingredients hint moved with the ingredients section into
@@ -310,25 +293,18 @@ function CtaBar({
 // the header's composition note): RecipeOverviewPanel,
 // RecipeIngredientsPanel and RecipeInstructionsPanel carry the
 // sections' rendering; this file only wires the page's
-// view-models into them. The overview's one piece of page-side
-// wiring is the status resolution below — the panel takes the
-// badge's tone/label pair, and the map that produces it is the
-// page's own.
+// view-models into them.
 // ---------------------------------------------------------------------------
 
 /** The overview header block: the shared RecipeOverviewPanel,
- * fed the page's overview view-model with its status resolved
- * to the badge's tone/label pair through STATUS_BADGES. */
+ * fed the page's overview view-model. The page renders no status
+ * badge (#735: recipe status is removed entirely). */
 function OverviewSection({ overview }: { overview: PublicRecipePageOverviewProps }) {
-  const statusBadge = STATUS_BADGES[overview.status] ?? STATUS_BADGES.idea;
-
   return (
     <RecipeOverviewPanel
       {...(overview.imageUrl !== undefined ? { imageUrl: overview.imageUrl } : {})}
       title={overview.title}
       {...(overview.description !== undefined ? { description: overview.description } : {})}
-      statusTone={statusBadge?.tone ?? "neutral"}
-      statusLabel={statusBadge?.label ?? "Idea"}
       servingsLabel={overview.servingsLabel}
       {...(overview.prepTimeLabel !== undefined ? { prepTimeLabel: overview.prepTimeLabel } : {})}
       {...(overview.cookTimeLabel !== undefined ? { cookTimeLabel: overview.cookTimeLabel } : {})}

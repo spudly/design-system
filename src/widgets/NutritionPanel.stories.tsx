@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { NutritionPanel } from "./NutritionPanel.js";
+import { NutritionPanel, type NutritionFacts } from "./NutritionPanel.js";
 
 const meta: Meta<typeof NutritionPanel> = {
   title: "Widgets/NutritionPanel",
@@ -10,19 +10,41 @@ const meta: Meta<typeof NutritionPanel> = {
 export default meta;
 type Story = StoryObj<typeof NutritionPanel>;
 
+// A full FDA-ordered nutrient set (#722), net carbs included as
+// the indented sub-row under the carbohydrate group.
+const FULL_FACTS: NutritionFacts = {
+  servingSizeLabel: "1 cup (240g)",
+  servingsPerContainerLabel: "about 2 servings per container",
+  caloriesLabel: "520",
+  nutrients: [
+    { kind: "totalFat", amountLabel: "16g", dailyValueLabel: "21%" },
+    { kind: "saturatedFat", amountLabel: "3g", dailyValueLabel: "15%" },
+    { kind: "transFat", amountLabel: "0g" },
+    { kind: "cholesterol", amountLabel: "65mg", dailyValueLabel: "22%" },
+    { kind: "sodium", amountLabel: "640mg", dailyValueLabel: "28%" },
+    { kind: "totalCarbohydrate", amountLabel: "48g", dailyValueLabel: "17%" },
+    { kind: "dietaryFiber", amountLabel: "6g", dailyValueLabel: "21%" },
+    { kind: "totalSugars", amountLabel: "9g" },
+    { kind: "addedSugars", amountLabel: "4g", dailyValueLabel: "8%" },
+    { kind: "netCarbs", amountLabel: "42g" },
+    { kind: "protein", amountLabel: "42g", dailyValueLabel: "84%" },
+    { kind: "vitaminD", amountLabel: "2mcg", dailyValueLabel: "10%" },
+    { kind: "calcium", amountLabel: "180mg", dailyValueLabel: "15%" },
+    { kind: "iron", amountLabel: "3.6mg", dailyValueLabel: "20%" },
+    { kind: "potassium", amountLabel: "705mg", dailyValueLabel: "15%" },
+  ],
+};
+
+const DISCLAIMER = "Estimates are per serving and may vary with substitutions.";
+
 export const Ready: Story = {
   render: () => (
     <YStack maxWidth={430}>
       <NutritionPanel
         nutrition={{
           state: "ready",
-          rows: [
-            { label: "Calories", valueLabel: "520 kcal" },
-            { label: "Protein", valueLabel: "42 g" },
-            { label: "Carbohydrates", valueLabel: "48 g" },
-            { label: "Fat", valueLabel: "16 g" },
-          ],
-          disclaimer: "Estimates are per serving and may vary with substitutions.",
+          facts: FULL_FACTS,
+          disclaimer: DISCLAIMER,
           onRefreshPress: () => {},
         }}
       />
@@ -38,20 +60,15 @@ export const Loading: Story = {
   ),
 };
 
-// The overlay verifies the skeleton reproduces the original's shape/size (#278).
+// The overlay verifies the skeleton reproduces the label's shape/size (#278).
 export const LoadingOverlay: Story = {
   render: () => (
     <YStack position="relative" maxWidth={430}>
       <NutritionPanel
         nutrition={{
           state: "ready",
-          rows: [
-            { label: "Calories", valueLabel: "520 kcal" },
-            { label: "Protein", valueLabel: "42 g" },
-            { label: "Carbohydrates", valueLabel: "48 g" },
-            { label: "Fat", valueLabel: "16 g" },
-          ],
-          disclaimer: "Estimates are per serving and may vary with substitutions.",
+          facts: FULL_FACTS,
+          disclaimer: DISCLAIMER,
           onRefreshPress: () => {},
         }}
       />
@@ -67,13 +84,8 @@ export const LoadingOverlay: Story = {
         <NutritionPanel
           nutrition={{
             state: "ready",
-            rows: [
-              { label: "Calories", valueLabel: "520 kcal" },
-              { label: "Protein", valueLabel: "42 g" },
-              { label: "Carbohydrates", valueLabel: "48 g" },
-              { label: "Fat", valueLabel: "16 g" },
-            ],
-            disclaimer: "Estimates are per serving and may vary with substitutions.",
+            facts: FULL_FACTS,
+            disclaimer: DISCLAIMER,
             onRefreshPress: () => {},
           }}
           loading

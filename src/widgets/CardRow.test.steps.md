@@ -2,7 +2,7 @@
 component: CardRow
 run_when:
   - "src/widgets/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow."
-  - "src/widgets/PresetValueSelector.tsx, its stories, the recipe pages' scale rows, or a changeset naming PresetValueSelector."
+  - "src/widgets/form/PresetValueSelector.tsx, its stories, the recipe pages' scale rows, or a changeset naming PresetValueSelector."
 ---
 
 # CardRow — manual test steps
@@ -36,7 +36,7 @@ MealPlansPage's list, or a changeset naming CardRow.
 
 ## PresetValueSelector
 
-Open in `Widgets/PresetValueSelector`: Default,
+Open in `Widgets/Form/PresetValueSelector`: Default,
 CustomSelected.
 
 1. Default: the Scale row shows ½× / 1× / 2× / 3× preset buttons
@@ -55,6 +55,6 @@ CustomSelected.
    nothing and restores the previous value. On web the Custom
    button carries `aria-pressed` matching its selected state.
 
-**Run when:** `src/widgets/PresetValueSelector.tsx`, its
+**Run when:** `src/widgets/form/PresetValueSelector.tsx`, its
 stories, the recipe pages' scale rows, or a changeset naming
 PresetValueSelector.

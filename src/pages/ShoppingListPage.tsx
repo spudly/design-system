@@ -1,5 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
-import { CheckRow } from "../widgets/CheckRow.js";
+import { CheckboxField } from "../widgets/CheckboxField.js";
 import { EmptyState } from "../widgets/EmptyState.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { LoadingListRow } from "../widgets/LoadingListRow.js";
@@ -30,28 +30,31 @@ import { Text } from "../widgets/Text.js";
  * - The row keeps the app view's inline layout — bold name,
  *   muted quantity / optional suffixes on the same line,
  *   strike-through and muted when checked — but the app's
- *   checkbox text glyph becomes a real checkbox: the row carries
- *   checkbox semantics (`accessibilityRole="checkbox"` with
- *   its checked state, the whole row the press target, web
- *   keyboard activation — the ChecklistRow pattern with the
- *   MealPlansPage row's keyboard handling).
+ *   checkbox text glyph becomes a real checkbox: the unified
+ *   CheckboxField's list shape (#713) — the real Tamagui
+ *   Checkbox is the single accessibility stop (its name
+ *   composes the detail after the name), the whole row is the
+ *   press target, and the field's `strikeWhenChecked` opt-in
+ *   keeps this page's struck-through checked treatment.
  *
  * States: while `loading`, the list region renders skeleton
  * rows (#278, tranche 4 — the centered-Spinner pattern is
  * deleted): the title stays rendered and the list holds
- * exactly 3 dummy rows mirroring the CheckRow composition —
- * a box bone at the row's checkbox geometry beside a text
- * bone at the label's size, the row's hairline rendered
- * transparent in the skeleton state. CheckRow itself has no
- * loading state (a checkbox row's checked state is caller
- * data), so the dummy rows are the page's own composition.
+ * exactly 3 dummy rows mirroring the CheckboxField list
+ * composition — a box bone at the row's checkbox geometry
+ * beside a text bone at the label's size, the row's hairline
+ * rendered transparent in the skeleton state. CheckboxField
+ * itself has no loading state (a checkbox row's checked state
+ * is caller data), so the dummy rows are the page's own
+ * composition.
  * An empty list renders the DS EmptyState with the app's
  * message.
  *
  * De-styled for #119: the page composes DS components only —
  * the title is Text's `title` variant, the sections stack in
  * SectionStack, the lines stack in ListStack, and each line
- * renders through the generic CheckRow, its `detail` composed
+ * renders through the unified CheckboxField's list shape,
+ * its `detail` composed
  * here from the line's quantity and optional flag (the row
  * joins it to the name with the middle-dot separator, so the
  * rendered line is unchanged). The page sets no styling props
@@ -105,7 +108,7 @@ export function ShoppingListPage({
           ) : (
             <ListStack>
               {lines.map((line) => (
-                <CheckRow
+                <CheckboxField
                   key={line.key}
                   label={line.name}
                   detail={
@@ -113,8 +116,10 @@ export function ShoppingListPage({
                       .filter(Boolean)
                       .join(" · ") || null
                   }
+                  separator
+                  strikeWhenChecked
                   checked={line.isChecked}
-                  onToggle={() => {
+                  onCheckedChange={() => {
                     onToggleLine(line.key);
                   }}
                 />

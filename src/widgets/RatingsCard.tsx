@@ -4,7 +4,7 @@ import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Card } from "./Card.js";
 import { Center } from "./Center.js";
-import { StarRatingInput } from "./StarRatingInput.js";
+import { StarRatingInput } from "./form/StarRatingInput.js";
 import { Text } from "./Text.js";
 import { useVoice } from "../voice/index.js";
 import { TextSkeleton } from "./TextSkeleton.js";

@@ -8,26 +8,26 @@ export {
   type AutocompletePickerProps,
   type AutocompletePickerResult,
   type AutocompletePickerSelectedItem,
-} from "./AutocompletePicker.js";
+} from "./form/AutocompletePicker.js";
 export { BackLink, type BackLinkProps } from "./BackLink.js";
 export { Badge, type BadgeProps } from "./Badge.js";
 export { BlankWord, type BlankWordProps } from "./BlankWord.js";
 export { BulkSelectToolbar, type BulkSelectToolbarProps } from "./BulkSelectToolbar.js";
 export { Button, type ButtonProps } from "./Button.js";
 export { Card, type CardProps } from "./Card.js";
-export { CheckboxSelectList, type CheckboxSelectListProps } from "./CheckboxSelectList.js";
+export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";
 export { CheckboxField, type CheckboxFieldProps } from "./CheckboxField.js";
 export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
-export { ColorPickerField, type ColorPickerFieldProps } from "./ColorPickerField.js";
+export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPickerField.js";
 export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
 export { DetailRow, type DetailRowProps } from "./DetailRow.js";
 export { Divider, type DividerProps } from "./Divider.js";
-export { Dropdown, useDropdownClose, type DropdownAlign, type DropdownProps } from "./Dropdown.js";
-export { DropdownButton, type DropdownButtonProps } from "./DropdownButton.js";
+export { Dropdown, useDropdownClose, type DropdownAlign, type DropdownProps } from "./form/Dropdown.js";
+export { DropdownButton, type DropdownButtonProps } from "./form/DropdownButton.js";
 export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export { FixedActionBanner, type FixedActionBannerProps } from "./FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
@@ -71,23 +71,23 @@ export { ProseColumn, type ProseColumnProps } from "./ProseColumn.js";
 export { ProseStack, type ProseStackProps } from "./ProseStack.js";
 export { BulletList, type BulletListProps } from "./BulletList.js";
 export { ChatTranscript, type ChatTranscriptProps } from "./ChatTranscript.js";
-export { FieldRow, type FieldRowProps } from "./FieldRow.js";
+export { FieldRow, type FieldRowProps } from "./form/FieldRow.js";
 export { SectionStack, type SectionStackProps } from "./SectionStack.js";
 export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
 export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";
-export { SecretRevealPanel, type SecretRevealPanelProps } from "./SecretRevealPanel.js";
+export { SecretRevealPanel, type SecretRevealPanelProps } from "./form/SecretRevealPanel.js";
 export { SectionCard, type SectionCardProps } from "./SectionCard.js";
-export { SelectField, type SelectFieldProps, type SelectOption } from "./SelectField.js";
+export { SelectField, type SelectFieldProps, type SelectOption } from "./form/SelectField.js";
 export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
 export {
   RadioOptionGroup,
   type RadioOption,
   type RadioOptionGroupProps,
-} from "./RadioOptionGroup.js";
+} from "./form/RadioOptionGroup.js";
 export { SearchField, type SearchFieldProps } from "./SearchField.js";
 export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
 export { TextField, type TextFieldProps } from "./TextField.js";
-export { Slider, type SliderProps } from "./Slider.js";
+export { Slider, type SliderProps } from "./form/Slider.js";
 export { BoxSkeleton, type BoxSkeletonProps } from "./BoxSkeleton.js";
 export { CircleSkeleton, type CircleSkeletonProps } from "./CircleSkeleton.js";
 export {
@@ -98,12 +98,12 @@ export {
 } from "./SkeletonClock.js";
 export { TextSkeleton, type TextSkeletonProps } from "./TextSkeleton.js";
 export { Spinner, type SpinnerProps } from "./Spinner.js";
-export { StarRatingInput, type StarRatingInputProps } from "./StarRatingInput.js";
+export { StarRatingInput, type StarRatingInputProps } from "./form/StarRatingInput.js";
 export { StatBand, type StatBandProps } from "./StatBand.js";
 export { StatCard, type StatCardProps } from "./StatCard.js";
 export { StatRow, type StatRowProps } from "./StatRow.js";
 export { StepDots, type StepDotsProps } from "./StepDots.js";
-export { Switch, type SwitchProps } from "./Switch.js";
+export { Switch, type SwitchProps } from "./form/Switch.js";
 export { Tabs, type TabsProps } from "./Tabs.js";
 export { useTagColorResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./Text.js";
@@ -117,18 +117,18 @@ export { VerseText, type VerseTextProps } from "./VerseText.js";
 // tranche PRs adopt these in their update rounds).
 export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
 export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
-export { FieldLabel, type FieldLabelProps } from "./FieldLabel.js";
+export { FieldLabel, type FieldLabelProps } from "./form/FieldLabel.js";
 export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
 export { FormStack, type FormStackProps } from "./FormStack.js";
-export { LabeledField, type LabeledFieldProps } from "./LabeledField.js";
-export { LabeledGroup, type LabeledGroupProps } from "./LabeledGroup.js";
+export { LabeledField, type LabeledFieldProps } from "./form/LabeledField.js";
+export { LabeledGroup, type LabeledGroupProps } from "./form/LabeledGroup.js";
 export { MarkableRow, type MarkableRowProps } from "./MarkableRow.js";
 export { PinnedHeaderShell, type PinnedHeaderShellProps } from "./PinnedHeaderShell.js";
 export {
   PresetValueSelector,
   type PresetValueOption,
   type PresetValueSelectorProps,
-} from "./PresetValueSelector.js";
+} from "./form/PresetValueSelector.js";
 export {
   RatingsCard,
   type RatingsCardCommunityRating,
@@ -143,7 +143,7 @@ export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./SessionShell.js";
 export { StatusMessage, type StatusMessageProps } from "./StatusMessage.js";
 export { StepList, type StepListProps } from "./StepList.js";
-export { SuggestionPanel, type SuggestionPanelProps } from "./SuggestionPanel.js";
+export { SuggestionPanel, type SuggestionPanelProps } from "./form/SuggestionPanel.js";
 export { TagList, type TagListProps } from "./TagList.js";
 export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCardRow.js";
 
@@ -151,16 +151,16 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // inventoried as extraction-required during their adoption
 // rounds, shipped once here (the tranche PRs adopt these in
 // their post-extraction rounds).
-export { BadgeCardRow, type BadgeCardRowProps } from "./BadgeCardRow.js";
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
-export { CheckRow, type CheckRowProps } from "./CheckRow.js";
-export { FieldColumns, type FieldColumnsProps } from "./FieldColumns.js";
+export { FieldColumns, type FieldColumnsProps } from "./form/FieldColumns.js";
 export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
   NutritionPanel,
+  type NutritionFact,
+  type NutritionFactKind,
+  type NutritionFacts,
   type NutritionPanelData,
   type NutritionPanelProps,
-  type NutritionPanelRow,
 } from "./NutritionPanel.js";
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";

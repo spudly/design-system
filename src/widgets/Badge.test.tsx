@@ -22,8 +22,8 @@ describe("badgeBorder", () => {
   });
   test("the badge border uses the tone's text color (#174)", () => {
     assert.ok(
-      /borderColor=\{isSelected \? "\$primary" : styles\.text\}/.test(text),
-      "Badge must pass borderColor={styles.text} while unselected so the border is the same color as the badge text for every tone (#174); the selectable form's selected state takes the primary fill instead (the badgeSelectable block in this file)",
+      /borderColor = isSelected \? "\$primary" : \(resolvedColor \?\? styles\.text\)/.test(text),
+      "Badge must compute borderColor from styles.text while unselected (the tone fallback when no tag color resolves) so the border is the same color as the badge text for every tone (#174); the selectable form's selected state takes the primary fill instead (the badgeSelectable block in this file)",
     );
   });
 });
@@ -198,12 +198,12 @@ describe("badgeTagForm", async () => {
     );
     assert.ok(source.includes("borderWidth: 1"), "Badge must carry the 1px border (#174)");
     assert.ok(
-      source.includes('borderColor={isSelected ? "$primary" : resolvedColor}'),
-      "the color form's border must be the resolved tag color itself while unselected (#211)",
+      source.includes('const borderColor = isSelected ? "$primary" : (resolvedColor ?? styles.text)'),
+      "the border must be the resolved tag color itself in the color form and match the text color in the tone form while unselected (#211, #174)",
     );
     assert.ok(
-      source.includes('borderColor={isSelected ? "$primary" : styles.text}'),
-      "the tone form's border must match its text color while unselected (#174)",
+      source.includes('const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text)'),
+      "the label must be the resolved tag color in the color form and the tone text color in the tone form while unselected",
     );
   });
   test("no source file still imports TagPill (#183)", () => {

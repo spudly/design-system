@@ -90,7 +90,7 @@ export const progressFixtures = {
 
 /**
  * Recipe form fixtures (#124): the option sets are app data in
- * production (the status set and the tags query are the app's);
+ * production (the tags query is the app's);
  * here they are written out literally, mirroring the app form's
  * content for the same recipe as recipeDetailFixture.
  */
@@ -104,13 +104,6 @@ export const recipeFormFixture = {
   // No scheme: the fixtures file bans external URLs outright
   // (pageStories.test) — the value is inert field text here.
   sourceUrl: "example.com/recipes/tuscan-garlic-chicken",
-  statusOptions: [
-    { value: "idea", label: "Idea" },
-    { value: "evolving", label: "Evolving" },
-    { value: "perfected", label: "Perfected" },
-    { value: "abandoned", label: "Abandoned" },
-  ],
-  status: "evolving",
   tagOptions: [
     { value: "dinner", label: "Dinner" },
     { value: "chicken", label: "Chicken" },
@@ -579,7 +572,7 @@ export const aiSessionPreviewFixture = {
  * fixed literals per the fixture rules above.
  */
 const legalFooterFixture: LegalDocumentPageProps["footer"] = {
-  brand: { label: "Eciperay", href: "/" },
+  brand: { label: "Eciperay", href: "/", mark: "eciperay" },
   columns: [
     {
       title: "Legal",
@@ -732,7 +725,7 @@ export const legalTermsFixture: LegalDocumentPageProps = {
  * destinations (the fixtures ban external URLs outright).
  */
 export const eciperayFooterFixture: BigFooterData = {
-  brand: { label: "Eciperay", href: "/" },
+  brand: { label: "Eciperay", href: "/", mark: "eciperay" },
   columns: [
     {
       title: "Product",

@@ -13,7 +13,7 @@
  *    stories, no export from the widgets index, and no source
  *    file renders a <TextAction element.
  * 2. Every former call site renders a ghost Button instead:
- *    CommentItem's Edit / Save / Cancel / Delete, BadgeCardRow's
+ *    CommentItem's Edit / Save / Cancel / Delete, TagsPage's row
  *    row actions (TagsPage's Edit / Delete, composed as data),
  *    TextActionCardRow's trailing action, ChangedListBanner's
  *    and RevertAction's Revert, and AiSessionPage's Cancel —
@@ -41,7 +41,6 @@ function readCode(rel: string) {
 }
 
 const commentItem = readCode("src/widgets/CommentItem.tsx");
-const badgeCardRow = readCode("src/widgets/BadgeCardRow.tsx");
 const textActionCardRow = readCode("src/widgets/TextActionCardRow.tsx");
 const changedListBanner = readCode("src/widgets/ChangedListBanner.tsx");
 const revertAction = readCode("src/views/RevertAction.tsx");
@@ -88,35 +87,24 @@ test("CommentItem's four actions render as ghost Buttons", () => {
   );
 });
 
-test("BadgeCardRow's actions render as ghost Buttons with their composed labels", () => {
-  assert.match(badgeCardRow, /<Button/);
-  assert.match(badgeCardRow, /ghost/);
-  assert.match(badgeCardRow, /accessibilityLabel=\{action\.accessibilityLabel\}/);
-  assert.match(badgeCardRow, /onPress=\{action\.onPress\}/);
-  assert.match(
-    badgeCardRow,
-    /variant=\{action\.variant === "error" \? "danger" : "primary"\}/,
-    "an error action maps to the danger variant; the default maps to primary",
-  );
+test("TagsPage's row actions render as ghost Buttons with their composed labels (#709)", () => {
+  // Since #709 the display row is inlined into TagsPage: its Edit
+  // and Delete actions render directly as ghost Buttons, Delete
+  // with the danger variant.
+  assert.match(tagsPage, /<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/);
+  assert.match(tagsPage, /<Button\s+ghost\s+size="sm"\s+variant="danger"\s+accessibilityLabel=\{`Delete tag \$\{tag\.name\}`\}/);
 });
 
-test("TagsPage's Edit and Delete row actions keep their labels as BadgeCardRow data", () => {
-  assert.match(tagsPage, /<BadgeCardRow/);
+test("TagsPage's Edit and Delete row actions keep their composed labels (#709)", () => {
   const dollar = "$";
   assert.ok(
-    tagsPage.includes(`accessibilityLabel: \`Delete tag ${dollar}{tag.name}\``),
+    tagsPage.includes(`accessibilityLabel={\`Delete tag ${dollar}{tag.name}\`}`),
     "the Delete row action must keep its accessible label",
   );
   assert.ok(
-    tagsPage.includes(`accessibilityLabel: \`Edit tag ${dollar}{tag.name}\``),
+    tagsPage.includes(`accessibilityLabel={\`Edit tag ${dollar}{tag.name}\`}`),
     "the Edit row action must keep its accessible label",
   );
-  for (const label of ["Edit", "Delete"]) {
-    assert.ok(
-      tagsPage.includes(`label: "${label}"`),
-      `TagsPage must compose its ${label} row action for BadgeCardRow`,
-    );
-  }
 });
 
 test("TextActionCardRow's trailing action renders as a ghost Button, never a link (#248)", () => {

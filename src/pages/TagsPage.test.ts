@@ -11,7 +11,7 @@ describe("tagsPageCreateForm", () => {
   const tagsPage = readFileSync(join(root, "src", "pages", "TagsPage.tsx"), "utf8");
   const createFormEnd = tagsPage.indexOf("{loading ?");
   const row = readFileSync(join(root, "src", "widgets", "TrailingActionsRow.tsx"), "utf8");
-  const picker = readFileSync(join(root, "src", "widgets", "ColorPickerField.tsx"), "utf8");
+  const picker = readFileSync(join(root, "src", "widgets", "form", "ColorPickerField.tsx"), "utf8");
 
   test("TagsPage create-form row wraps so Add stays visible (#219)", () => {
     assert.match(
@@ -116,7 +116,7 @@ describe("tagsPageErrorSurface", () => {
     );
     assert.match(
       page,
-      /onPress: \(\) => \{\s*handleDelete\(tag\.id\);/,
+      /onPress=\{\(\) => \{\s*handleDelete\(tag\.id\);/,
       "the Delete row action must run the delete operation",
     );
   });
@@ -246,7 +246,7 @@ describe("tagsPageRowEligibility", () => {
   test("Edit renders only for edit-eligible rows when the host supplies onStartEdit (#375)", () => {
     assert.match(
       page,
-      /\.\.\.\(onStartEdit && tag\.canEdit !== false\s*\? \[\s*\{\s*label: "Edit",/,
+      /\{onStartEdit && tag\.canEdit !== false \? \(\s*<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/,
       "the Edit action is gated on both onStartEdit and tag.canEdit !== false (absent = eligible)",
     );
   });
@@ -254,13 +254,13 @@ describe("tagsPageRowEligibility", () => {
   test("Delete renders only for delete-eligible rows (#375)", () => {
     assert.match(
       page,
-      /\.\.\.\(tag\.canDelete !== false\s*\? \[\s*\{\s*label: "Delete",/,
+      /\{tag\.canDelete !== false \? \(\s*<Button\s+ghost\s+size="sm"\s+variant="danger"\s+accessibilityLabel=\{`Delete tag \$\{tag\.name\}`\}/,
       "the Delete action is gated on tag.canDelete !== false (absent = eligible)",
     );
     // Delete must not be gated on the edit flag (or vice versa):
     // the two eligibilities are independent per-row data.
-    assert.doesNotMatch(page, /tag\.canEdit !== false\s*\? \[\s*\{\s*label: "Delete",/);
-    assert.doesNotMatch(page, /tag\.canDelete !== false\s*\? \[\s*\{\s*label: "Edit",/);
+    assert.doesNotMatch(page, /tag\.canEdit !== false \? \(\s*<Button\s+ghost\s+size="sm"\s+variant="danger"/);
+    assert.doesNotMatch(page, /tag\.canDelete !== false \? \(\s*<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag/);
   });
 
   test("an edit-ineligible row never swaps to the edit form (#375)", () => {

@@ -23,5 +23,6 @@ export { SocialTwitterIcon } from "./SocialTwitterIcon.js";
 export { SocialYoutubeIcon } from "./SocialYoutubeIcon.js";
 export { SocialGithubIcon } from "./SocialGithubIcon.js";
 export { SocialLinkedinIcon } from "./SocialLinkedinIcon.js";
+export { BrandMark, type BrandMarkName } from "./BrandMark.js";
 export { AppStoreBadge } from "./AppStoreBadge.js";
 export { GooglePlayBadge } from "./GooglePlayBadge.js";

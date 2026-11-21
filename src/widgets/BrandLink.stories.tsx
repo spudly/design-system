@@ -18,3 +18,28 @@ export const Default: Story = {
     href: "/",
   },
 };
+
+/**
+ * With the brand's graphic mark (#726): the DS-owned Eciperay
+ * mark renders before the wordmark, inside the same real link —
+ * the anchor's accessible name stays the brand label.
+ */
+export const WithMark: Story = {
+  args: {
+    label: "Eciperay",
+    href: "/",
+    mark: "eciperay",
+  },
+};
+
+/**
+ * A brand with no graphic mark (Memorize, #726): no mark is
+ * named, so the wordmark renders alone — no placeholder, no
+ * empty slot.
+ */
+export const WordmarkOnly: Story = {
+  args: {
+    label: "Memorize",
+    href: "/",
+  },
+};

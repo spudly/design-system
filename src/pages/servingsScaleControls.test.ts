@@ -59,7 +59,7 @@ import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
 const stepper = readFileSync(join(root, "src/widgets/NumberStepper.tsx"), "utf8");
-const selector = readFileSync(join(root, "src/widgets/PresetValueSelector.tsx"), "utf8");
+const selector = readFileSync(join(root, "src/widgets/form/PresetValueSelector.tsx"), "utf8");
 const page = readFileSync(join(root, "src/pages/RecipeDetailPage.tsx"), "utf8");
 // PublicRecipePage's ingredients section is the shared library
 // panel since the #331 extraction, so its control pins scan the

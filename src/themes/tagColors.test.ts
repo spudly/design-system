@@ -144,7 +144,7 @@ test("components resolve tag colors through the one shared resolver", () => {
   assert.match(badge, /resolveTagColor\(color\)/);
   assert.doesNotMatch(badge, /backgroundColor=\{`\$\{color\}22`\}/);
 
-  const picker = read("src/widgets/ColorPickerField.tsx");
+  const picker = read("src/widgets/form/ColorPickerField.tsx");
   assert.match(picker, /colors: TagColorName\[\]/);
   assert.match(picker, /useTagColorResolver\(\)/);
 
@@ -173,7 +173,7 @@ test("the tag color API is strictly typed: names only, no hex pass-through", () 
   const badge = read("src/widgets/Badge.tsx");
   assert.match(badge, /color\?: TagColorName;/);
 
-  const picker = read("src/widgets/ColorPickerField.tsx");
+  const picker = read("src/widgets/form/ColorPickerField.tsx");
   assert.match(picker, /value\?: TagColorName;/);
 
   const tagsPage = read("src/pages/TagsPage.tsx");

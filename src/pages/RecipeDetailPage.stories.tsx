@@ -347,13 +347,28 @@ function RecipeDetailPageDemo({
     nutrition: isFull
       ? {
           state: "ready",
-          rows: [
-            { label: "Calories", valueLabel: "520 kcal" },
-            { label: "Protein", valueLabel: "42 g" },
-            { label: "Carbohydrates", valueLabel: "18 g" },
-            { label: "Fat", valueLabel: "31 g" },
-            { label: "Sodium", valueLabel: "640 mg" },
-          ],
+          facts: {
+            servingSizeLabel: "1 serving (310g)",
+            servingsPerContainerLabel: "about 4 servings per container",
+            caloriesLabel: "520",
+            nutrients: [
+              { kind: "totalFat", amountLabel: "31g", dailyValueLabel: "40%" },
+              { kind: "saturatedFat", amountLabel: "9g", dailyValueLabel: "45%" },
+              { kind: "transFat", amountLabel: "0g" },
+              { kind: "cholesterol", amountLabel: "95mg", dailyValueLabel: "32%" },
+              { kind: "sodium", amountLabel: "640mg", dailyValueLabel: "28%" },
+              { kind: "totalCarbohydrate", amountLabel: "18g", dailyValueLabel: "7%" },
+              { kind: "dietaryFiber", amountLabel: "3g", dailyValueLabel: "11%" },
+              { kind: "totalSugars", amountLabel: "4g" },
+              { kind: "addedSugars", amountLabel: "0g", dailyValueLabel: "0%" },
+              { kind: "netCarbs", amountLabel: "15g" },
+              { kind: "protein", amountLabel: "42g", dailyValueLabel: "84%" },
+              { kind: "vitaminD", amountLabel: "1mcg", dailyValueLabel: "6%" },
+              { kind: "calcium", amountLabel: "120mg", dailyValueLabel: "10%" },
+              { kind: "iron", amountLabel: "2.7mg", dailyValueLabel: "15%" },
+              { kind: "potassium", amountLabel: "620mg", dailyValueLabel: "15%" },
+            ],
+          },
           disclaimer:
             "Estimated from the ingredient list with AI; values are approximate and not a substitute for professional nutrition advice.",
           onRefreshPress: () => undefined,

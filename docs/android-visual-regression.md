@@ -324,7 +324,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-appshellpage                 | light_warmHarvest |       6 |         6 |
 | pages-eciperay-authconfirmationpage         | light_warmHarvest |       2 |         2 |
 | pages-eciperay-consentpreferencespage       | light_warmHarvest |       2 |         2 |
-| pages-eciperay-cookingmodepage              | light_warmHarvest |       3 |         3 |
+| pages-eciperay-cookingmodepage              | light_warmHarvest |       4 |         3 |
 | pages-eciperay-discoverpage                 | light_warmHarvest |       9 |         9 |
 | pages-eciperay-editrecipepage               | light_warmHarvest |       1 |         1 |
 | pages-eciperay-editversionpage              | light_warmHarvest |       2 |         2 |
@@ -338,7 +338,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-landingpage                  | light_warmHarvest |       2 |         2 |
 | pages-eciperay-legaldocumentpage            | light_warmHarvest |       3 |         3 |
 | pages-eciperay-manualentrypage              | light_warmHarvest |       1 |         1 |
-| pages-eciperay-mealcookingmodepage          | light_warmHarvest |       5 |         5 |
+| pages-eciperay-mealcookingmodepage          | light_warmHarvest |       6 |         5 |
 | pages-eciperay-mealdetailpage               | light_warmHarvest |       3 |         3 |
 | pages-eciperay-mealformpage                 | light_warmHarvest |       4 |         4 |
 | pages-eciperay-mealplandetailpage           | light_warmHarvest |      10 |        10 |
@@ -365,7 +365,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-tabbedshellpage              | light_quietDawn   |       6 |         6 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **201** |   **197** |
+| **Total**                                   |                   | **203** |   **197** |
 
 <!-- VR-COVERAGE-END -->
 

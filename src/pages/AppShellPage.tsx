@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
+import type { BrandMarkName } from "../icons/BrandMark.js";
 import {
   AppTopBar,
   type AppTopBarAction,
@@ -84,8 +85,14 @@ export type AppShellPageAction = AppTopBarAction;
 export type AppShellPageSearch = AppTopBarSearch;
 
 export type AppShellPageProps = {
-  /** The brand wordmark: its label and its home destination. */
-  brand: { label: string; href: string };
+  /**
+   * The brand wordmark: its label and its home destination.
+   * `mark` (#726) names the brand's DS-owned graphic mark as
+   * data — the top bar renders the DS's own artwork before the
+   * wordmark; omit it for a brand with no mark (Memorize,
+   * today), which renders the wordmark alone exactly as before.
+   */
+  brand: { label: string; href: string; mark?: BrandMarkName };
   /** The routed nav items as data, in display order. */
   navItems: AppShellPageNavItem[];
   /** The nav list's accessible name (e.g. "Eciperay sections"). */

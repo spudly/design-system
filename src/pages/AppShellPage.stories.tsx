@@ -60,7 +60,7 @@ export const Default: Story = {
   render: () => (
     <>
       <AppShellPage
-        brand={{ label: "Eciperay", href: "/" }}
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"
@@ -78,7 +78,7 @@ export const WithSearch: Story = {
   render: () => (
     <>
       <AppShellPage
-        brand={{ label: "Eciperay", href: "/" }}
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"
@@ -103,7 +103,7 @@ export const NoIcons: Story = {
   render: () => (
     <>
       <AppShellPage
-        brand={{ label: "Eciperay", href: "/" }}
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
         navItems={labelOnlyNav}
         navLabel="Eciperay sections"
         activeItemId="home"
@@ -120,7 +120,7 @@ export const LinkActions: Story = {
   render: () => (
     <>
       <AppShellPage
-        brand={{ label: "Eciperay", href: "/" }}
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="home"
@@ -141,7 +141,7 @@ export const NoFooter: Story = {
   render: () => (
     <>
       <AppShellPage
-        brand={{ label: "Eciperay", href: "/" }}
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="meals"
@@ -167,7 +167,7 @@ export const ChunkFailedContent: Story = {
   render: () => (
     <>
       <AppShellPage
-        brand={{ label: "Eciperay", href: "/" }}
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
         navItems={eciperayNav}
         navLabel="Eciperay sections"
         activeItemId="recipes"

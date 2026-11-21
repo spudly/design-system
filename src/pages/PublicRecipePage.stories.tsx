@@ -144,7 +144,6 @@ function PublicRecipePageDemo({
             cookTimeLabel: "30m",
           }
         : {}),
-      status: isFull ? "perfected" : "idea",
       servingsLabel: String(servings),
       // Tag colors are names at the prop boundary (#207): stored
       // hexes convert through `tagColorNameForHex`, as the host's

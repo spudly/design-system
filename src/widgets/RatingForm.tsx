@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TextArea as TamaguiTextArea, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { StarRatingInput } from "./StarRatingInput.js";
+import { StarRatingInput } from "./form/StarRatingInput.js";
 import { Text } from "./Text.js";
 import { useVoice } from "../voice/index.js";
 

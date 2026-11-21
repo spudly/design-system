@@ -49,6 +49,24 @@ export const Default: Story = {
   ),
 };
 
+/**
+ * The host composition that broke in #729: the eciperay host
+ * supplies NO footer data, so the shell's web no-footer branch
+ * renders — the overlay must still cover the full viewport.
+ */
+export const NoFooter: Story = {
+  render: () => (
+    <MealCookingModePage
+      mealTitle={mealCookingFixture.mealTitle}
+      steps={mealCookingFixture.steps}
+      stepIndex={1}
+      onPrev={() => undefined}
+      onNext={() => undefined}
+      onDone={() => undefined}
+    />
+  ),
+};
+
 export const FirstStep: Story = {
   render: () => (
     <>

@@ -36,7 +36,7 @@
 import "./registerSvgStub.js";
 import { loadInternalDist } from "./internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -45,7 +45,9 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist: Record<string, any> = await loadInternalDist();
 
 function source(name: string) {
-  return readFileSync(join(root, "src", "widgets", `${name}.tsx`), "utf8");
+  // Form-category widgets live in src/widgets/form since #710.
+  const formPath = join(root, "src", "widgets", "form", `${name}.tsx`);
+  return readFileSync(existsSync(formPath) ? formPath : join(root, "src", "widgets", `${name}.tsx`), "utf8");
 }
 
 const MOVED = [
@@ -78,7 +80,7 @@ test("Badge's colored-tag form tints its surface and label from the resolved tok
     "surface must be the resolved color at 22 hex alpha",
   );
   assert.ok(
-    badge.includes('color: isSelected ? "$onPrimary" : resolvedColor'),
+    badge.includes('const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text)'),
     "label must render in the resolved color itself while unselected (the selectable form's selected state takes the on-primary ink)",
   );
   assert.ok(badge.includes("radii.full"), "pill must use the full radius token");

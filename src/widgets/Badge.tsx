@@ -146,32 +146,27 @@ export function Badge({
           : { accessibilityState: { selected: selected ?? false, disabled } }),
       }
     : null;
-  if (color) {
-    const resolvedColor = resolveTagColor(color);
-    return (
-      <StyledBadge
-        backgroundColor={isSelected ? "$primary" : `${resolvedColor}22`}
-        borderColor={isSelected ? "$primary" : resolvedColor}
-        {...rest}
-        {...selectableProps}
-      >
-        <Text style={{ ...labelType, color: isSelected ? "$onPrimary" : resolvedColor }}>
-          {children}
-        </Text>
-      </StyledBadge>
-    );
-  }
+  // The colored-tag form (`color`) and the status-pill form
+  // (`tone`) differ only in three color values (#707): compute
+  // those once, then render a single StyledBadge, so a Badge
+  // change can't land in one form and miss the other.
   const styles = toneStyles[tone];
+  const resolvedColor = color ? resolveTagColor(color) : undefined;
+  const backgroundColor = isSelected
+    ? "$primary"
+    : resolvedColor
+      ? `${resolvedColor}22`
+      : styles.background;
+  const borderColor = isSelected ? "$primary" : (resolvedColor ?? styles.text);
+  const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text);
   return (
     <StyledBadge
-      backgroundColor={isSelected ? "$primary" : styles.background}
-      borderColor={isSelected ? "$primary" : styles.text}
+      backgroundColor={backgroundColor}
+      borderColor={borderColor}
       {...rest}
       {...selectableProps}
     >
-      <Text style={{ ...labelType, color: isSelected ? "$onPrimary" : styles.text }}>
-        {children}
-      </Text>
+      <Text style={{ ...labelType, color: textColor }}>{children}</Text>
     </StyledBadge>
   );
 }

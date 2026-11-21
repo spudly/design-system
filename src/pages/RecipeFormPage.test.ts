@@ -24,11 +24,10 @@
  * 4. The version-diff wash is the DS fields' semantic `changed`
  *    variant (warning step 5 border / step 1 fill on TextField and
  *    TextAreaField), never page-level color props on the fields.
- * 5. Option data crosses as view-models: status and tag options
- *    are props — the status picker renders as a row of DS toggle
- *    Buttons (Button's `selected` form), the tag picker as
- *    selectable Badges (Badge's selectable form); the chip
- *    groups are retired.
+ * 5. Option data crosses as view-models: tag options are props —
+ *    the tag picker renders as selectable Badges (Badge's
+ *    selectable form); the chip groups are retired. Recipe status
+ *    is removed entirely (#735): no status props, no picker.
  * 6. The shells mirror the app views: EditRecipePage /
  *    ManualEntryPage render their headings around the form;
  *    EditVersionPage renders the draft heading, the import banner,
@@ -86,7 +85,6 @@ test("RecipeFormPage is controlled: no own state, no app or react-native imports
     "onTitleChange",
     "onDescriptionChange",
     "onServingsChange",
-    "onStatusChange",
     "onTagIdsChange",
     "onSubmit",
   ]) {
@@ -169,27 +167,21 @@ test("the diff wash is the fields' semantic `changed` variant, defined in the fi
   }
 });
 
-test("status and tag options cross as view-models; status picks by Button, tags by Badge", () => {
+test("tag options cross as view-models and pick by Badge; no status picker remains (#735)", () => {
   const form = pageSource("RecipeFormPage");
   // The chip retirement, as ruled on PR #320: the status picker
   // is a ButtonRow of Button's toggle form; the tag picker is a
   // row of selectable Badges (a tag renders as a Badge, including
   // when it selects). The selection state derives from the same
   // view-model props as before.
-  assert.ok(form.includes("statusOptions"), "status options must cross as props");
+  assert.ok(!form.includes("statusOptions"), "status options must not cross as props (#735)");
+  assert.ok(!form.includes("onStatusChange"), "status changes must not cross as props (#735)");
   assert.ok(form.includes("tagOptions"), "tag options must cross as props");
   assert.ok(form.includes("loadingTags"), "tag loading must cross as a prop");
-  assert.ok(
-    form.includes("selected={status === option.value}"),
-    "the status picker marks the current status selected",
-  );
   assert.ok(
     form.includes("selected={tagIds.includes(option.value)}"),
     "the tag picker marks each chosen tag selected",
   );
-  const statusMapAt = form.indexOf("statusOptions.map");
-  const statusMap = form.slice(statusMapAt, statusMapAt + 500);
-  assert.ok(statusMap.includes("<Button"), "the status picker renders toggle Buttons");
   const tagMapAt = form.indexOf("tagOptions.map");
   const tagMap = form.slice(tagMapAt, tagMapAt + 500);
   assert.ok(tagMap.includes("<Badge"), "the tag picker renders selectable Badges");
