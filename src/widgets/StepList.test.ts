@@ -52,7 +52,11 @@ test("the numeral presentation is opt-in: a flat row with an orange numeral and 
   );
   assert.match(code, /fontSize=\{tokens\.typography\.fontSize\["2xl"\]\}/);
   assert.match(code, /color="\$primary"/);
-  assert.match(code, /\{i \+ 1\}\./, "the numeral is the step's position, followed by a period");
+  assert.match(
+    code,
+    /\{step\.number \?\? i \+ 1\}\./,
+    "the numeral is the step's own number when supplied, else its position, followed by a period",
+  );
 });
 
 test("step activation is keyboard-operable on web (the ListRow pattern)", () => {

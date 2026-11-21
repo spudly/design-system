@@ -976,6 +976,7 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
           id: step.id,
           label: `Step ${step.stepNumber}`,
           body: step.body,
+          number: step.stepNumber,
         }))}
       />
     </PanelStack>

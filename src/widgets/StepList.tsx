@@ -11,6 +11,13 @@ type StepListStep = {
   label: string;
   /** The step's body text. */
   body: string;
+  /**
+   * The step's own number, when the caller's numbering is not
+   * simply its position in the list (e.g. non-contiguous recipe
+   * step numbers). The numeral presentation renders this when
+   * supplied, falling back to the step's 1-based position.
+   */
+  number?: number;
 };
 
 export type StepListProps = {
@@ -22,8 +29,8 @@ export type StepListProps = {
    * every existing consumer renders) or `numeral` (#721 — a flat
    * text row: the step's number as an orange numeral and period
    * beside the body, no card; the caller's label is not rendered
-   * in this presentation, the numeral is the step's position in
-   * the list).
+   * in this presentation, the numeral is the step's own number
+   * when the caller supplies one, else its position in the list).
    */
   presentation?: "eyebrow" | "numeral";
 };
@@ -86,7 +93,7 @@ export function StepList({ steps, presentation = "eyebrow" }: StepListProps) {
                   fontWeight={tokens.typography.fontWeight.bold}
                   color="$primary"
                 >
-                  {i + 1}.
+                  {step.number ?? i + 1}.
                 </Text>
                 <Text flex={1} fontSize={tokens.typography.fontSize.md}>
                   {step.body}
