@@ -14,15 +14,15 @@
  * Run against the built output: `npm run build` first (the `test`
  * script does both).
  */
-import "../../test/registerSvgStub.js";
+import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
 import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
-const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
+const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
 
 test("TextAreaField is exported and MultilineField is gone (#180)", () => {
   assert.equal(typeof dist.TextAreaField, "function", "TextAreaField must be exported");
@@ -30,7 +30,7 @@ test("TextAreaField is exported and MultilineField is gone (#180)", () => {
 });
 
 test("TextAreaField keeps the labeled, error-aware field contract", () => {
-  const source = readFileSync(join(root, "src", "widgets", "TextAreaField.tsx"), "utf8");
+  const source = readFileSync(join(root, "src", "widgets", "form", "TextAreaField.tsx"), "utf8");
   assert.ok(source.includes('name: "TextAreaField"'), "styled name must be TextAreaField");
   assert.ok(source.includes("htmlFor={id}"), "label must be associated via htmlFor");
   assert.ok(source.includes("aria-describedby"), "error must be wired via aria-describedby");
