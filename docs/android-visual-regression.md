@@ -321,7 +321,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay                              | light_warmHarvest |       2 |         2 |
 | pages-eciperay-addrecipemenupage            | light_warmHarvest |       1 |         1 |
 | pages-eciperay-aisessionpage                | light_warmHarvest |       3 |         3 |
-| pages-eciperay-appshellpage                 | light_warmHarvest |       6 |         6 |
+| pages-eciperay-appshellpage                 | light_warmHarvest |       8 |         6 |
 | pages-eciperay-authconfirmationpage         | light_warmHarvest |       2 |         2 |
 | pages-eciperay-consentpreferencespage       | light_warmHarvest |       2 |         2 |
 | pages-eciperay-cookingmodepage              | light_warmHarvest |       4 |         3 |
@@ -353,7 +353,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-recipespage                  | light_warmHarvest |      14 |        14 |
 | pages-eciperay-recipespage — narrow variant | light_warmHarvest |      14 |        14 |
 | pages-eciperay-resetpasswordpage            | light_warmHarvest |       2 |         2 |
-| pages-eciperay-routeerrorpage               | light_warmHarvest |       2 |         2 |
+| pages-eciperay-routeerrorpage               | light_warmHarvest |       3 |         2 |
 | pages-eciperay-shoppinglistpage             | light_warmHarvest |       4 |         4 |
 | pages-eciperay-signinpage                   | light_warmHarvest |       4 |         4 |
 | pages-eciperay-signuppage                   | light_warmHarvest |       4 |         4 |
@@ -363,9 +363,9 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-memorizereviewpage           | light_quietDawn   |       2 |         2 |
 | pages-memorize-memorizesettingspage         | light_quietDawn   |       1 |         1 |
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
-| pages-memorize-tabbedshellpage              | light_quietDawn   |       6 |         6 |
+| pages-memorize-tabbedshellpage              | light_quietDawn   |       8 |         6 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **201** |   **197** |
+| **Total**                                   |                   | **206** |   **197** |
 
 <!-- VR-COVERAGE-END -->
 
