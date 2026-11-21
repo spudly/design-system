@@ -1,4 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { Button } from "../widgets/Button.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
@@ -28,6 +29,15 @@ export type RouteErrorPageProps = {
   /** The home destination (#248: navigation crosses as an href). */
   homeHref?: string;
   homeLabel?: string;
+  /**
+   * An optional recovery action (#765), as data: the host
+   * supplies the label (its own retry wording) and a press
+   * callback — a retry acts in place, so it takes the callback
+   * form (#248), never an href. When present, a DS Button
+   * renders alongside the home link; when absent, rendering is
+   * unchanged.
+   */
+  action?: { label: string; onPress: () => void };
 };
 
 export function RouteErrorPage({
@@ -37,6 +47,7 @@ export function RouteErrorPage({
   homeHref = "/",
   homeLabel: homeLabelProp,
   footer,
+  action,
 }: RouteErrorPageProps) {
   const voice = useVoice();
   const defaultTitle =
@@ -54,6 +65,7 @@ export function RouteErrorPage({
         <SectionStack>
           <Text variant="heading">{title}</Text>
           <Text variant="body">{message}</Text>
+          {action ? <Button onPress={action.onPress}>{action.label}</Button> : null}
           <TextLink href={homeHref}>{homeLabel}</TextLink>
         </SectionStack>
       </ScreenContainer>
