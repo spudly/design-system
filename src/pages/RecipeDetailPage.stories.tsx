@@ -5,7 +5,7 @@ import { View } from "tamagui";
 import { RecipeDetailPage, type RecipeDetailPageProps } from "./RecipeDetailPage.js";
 import { tagColorNameForHex } from "../themes/tagColors.js";
 import { recipeDetailFixture, eciperayFooterFixture } from "./fixtures.js";
-import { storyImagePanorama, storyImagePortrait, storyImageWide } from "../storyFixtures.js";
+import { storyImagePanorama, storyImagePortrait, storyImageRecipeHero } from "../storyFixtures.js";
 
 /**
  * Stories for the real RecipeDetailPage component (#49) — not a
@@ -110,8 +110,9 @@ function RecipeDetailPageDemo({
   createDraft?: boolean;
   withCoverageSections?: boolean;
   activationConfirmationOpen?: boolean;
-  /** Which fixture image the hero renders (#721): the wide
-   * placeholder (2.0 natural ratio), the portrait placeholder
+  /** Which fixture image the hero renders (#721): the turkey
+   * hero photo (860×472, cropped from the visual direction —
+   * the fidelity round's fixture), the portrait placeholder
    * (0.5 — clamps to the hero's 0.75 floor), or the panorama
    * placeholder (4.0 — clamps to the 2.25 ceiling). */
   heroImage?: "wide" | "portrait" | "panorama";
@@ -174,7 +175,7 @@ function RecipeDetailPageDemo({
                 ? storyImagePortrait
                 : heroImage === "panorama"
                   ? storyImagePanorama
-                  : storyImageWide,
+                  : storyImageRecipeHero,
             description:
               "A one-pan weeknight chicken in a garlicky cream sauce with sun-dried tomatoes and spinach.",
             prepTimeLabel: "15m",

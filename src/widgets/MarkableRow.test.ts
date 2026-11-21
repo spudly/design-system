@@ -42,21 +42,22 @@ test("MarkableRow is exported from the built internal components barrel", async 
   );
 });
 
-test("a pressable row leads with the visual-direction checkbox box (#721)", () => {
+test("a pressable row leads with the visual-direction checkbox box (#721, #713 design)", () => {
   assert.match(
     code,
-    /borderColor=\{isMarked \? "\$primary" : "\$textMuted"\}/,
-    "the box takes CheckRow's shape: accent while marked, muted outline while unmarked",
+    /borderColor="\$primary"/,
+    "the box takes the #713 CheckboxField shape: a $primary (terracotta) outline in both states",
   );
-  assert.match(code, /backgroundColor=\{isMarked \? "\$primary" : "\$surface"\}/);
+  assert.match(code, /backgroundColor="\$surface"/, "the box is unfilled in both states");
   assert.match(
     code,
-    /\{isMarked \? \(\s+<Text fontSize=\{tokens\.typography\.fontSize\.sm\} color="\$onPrimary">\s+✓\s+<\/Text>\s+\) : null\}/,
+    /\{isMarked \? \(\s+<Text fontSize=\{tokens\.typography\.fontSize\.sm\} color="\$primary">\s+✓\s+<\/Text>\s+\) : null\}/,
+    "the check glyph renders in the same terracotta while marked",
   );
 });
 
-test("a marked row dims but keeps its press — the mark is a toggle, not a disable", () => {
-  assert.match(code, /opacity=\{isMarked \? 0\.4 : 1\}/, "the marked treatment is the dim");
+test("a marked row never dims but keeps its press — the mark is a toggle, not a disable", () => {
+  assert.ok(!code.includes("opacity={isMarked"), "the row text never dims (#721 fidelity round)");
   assert.match(
     code,
     /accessibilityRole: "checkbox"/,

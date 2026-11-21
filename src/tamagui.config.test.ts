@@ -67,7 +67,7 @@ test("createTamaguiConfig installs the caller's brand as the global config", asy
 
   const config = createTamaguiConfig(eciperayTheme);
   assert.equal(getConfigMaybe(), config);
-  assert.equal(config.themes.light.primary.val, "#c2410c");
+  assert.equal(config.themes.light.primary.val, "#b13f13");
   assert.equal(config.themes.light.background.val, "#faf6f0");
 
   // A different app creating its own config gets its own brand —

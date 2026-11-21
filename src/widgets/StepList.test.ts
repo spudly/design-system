@@ -42,16 +42,17 @@ test("the list owns the active step, first step active by default", () => {
   assert.match(code, /accessibilityState: \{ selected: isActive \}/);
 });
 
-test("the numeral presentation is opt-in: a large accent numeral beside the body (#721)", () => {
+test("the numeral presentation is opt-in: a flat row with an orange numeral and period (#721)", () => {
   assert.match(code, /presentation\?: "eyebrow" \| "numeral";/);
   assert.match(code, /presentation = "eyebrow"/, "the eyebrow presentation stays the default");
   assert.match(
     code,
-    /presentation === "numeral" \? \(\s+<XStack gap="\$3" alignItems="flex-start">/,
+    /if \(presentation === "numeral"\) \{\s+return \(\s+<YStack/,
+    "the numeral presentation renders its own flat row, not the eyebrow card",
   );
   assert.match(code, /fontSize=\{tokens\.typography\.fontSize\["2xl"\]\}/);
   assert.match(code, /color="\$primary"/);
-  assert.match(code, /\{i \+ 1\}/, "the numeral is the step's position in the list");
+  assert.match(code, /\{i \+ 1\}\./, "the numeral is the step's position, followed by a period");
 });
 
 test("step activation is keyboard-operable on web (the ListRow pattern)", () => {

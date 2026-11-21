@@ -17,13 +17,13 @@ export type StepListProps = {
   /** The steps, in display order. */
   steps: StepListStep[];
   /**
-   * How each step is headed: `eyebrow` (default — the caller's
-   * pre-composed label over the body, the treatment every
-   * existing consumer renders) or `numeral` (#721 — the step's
-   * number as a large accent numeral beside the body, the
-   * recipe-detail visual direction's instructions treatment;
-   * the caller's label is not rendered in this presentation,
-   * the numeral is the step's position in the list).
+   * How each step renders: `eyebrow` (default — a card with the
+   * caller's pre-composed label over the body, the treatment
+   * every existing consumer renders) or `numeral` (#721 — a flat
+   * text row: the step's number as an orange numeral and period
+   * beside the body, no card; the caller's label is not rendered
+   * in this presentation, the numeral is the step's position in
+   * the list).
    */
   presentation?: "eyebrow" | "numeral";
 };
@@ -45,10 +45,12 @@ export type StepListProps = {
  * keys (Enter and Space) activate it like a press.
  *
  * The numeral presentation (#721) is opt-in per consumer: the
- * card's eyebrow is replaced by the step's number as a large
- * accent numeral beside the body (the recipe-detail visual
- * direction). The card, its active treatment, and activation
- * are unchanged — only the heading treatment differs.
+ * step renders as a FLAT text row — an orange numeral and period
+ * beside the body, no card, no border, no filled highlight (the
+ * recipe-detail visual direction, fidelity round) — instead of
+ * the eyebrow card. Activation (press to make a step active) is
+ * unchanged; the active state carries no filled treatment in
+ * this presentation.
  */
 export function StepList({ steps, presentation = "eyebrow" }: StepListProps) {
   const [activeIndex, setActiveIndex] = useState(0);
@@ -62,6 +64,37 @@ export function StepList({ steps, presentation = "eyebrow" }: StepListProps) {
             setActiveIndex(i);
           }
         };
+        if (presentation === "numeral") {
+          return (
+            <YStack
+              key={step.id}
+              {...platformAccessibilityProps({
+                accessibilityRole: "button",
+                accessibilityState: { selected: isActive },
+              })}
+              onPress={() => {
+                setActiveIndex(i);
+              }}
+              tabIndex={0}
+              onKeyDown={handleKeyDown}
+              cursor="web:pointer"
+              paddingBlockEnd="$3"
+            >
+              <XStack gap="$3" alignItems="flex-start">
+                <Text
+                  fontSize={tokens.typography.fontSize["2xl"]}
+                  fontWeight={tokens.typography.fontWeight.bold}
+                  color="$primary"
+                >
+                  {i + 1}.
+                </Text>
+                <Text flex={1} fontSize={tokens.typography.fontSize.md}>
+                  {step.body}
+                </Text>
+              </XStack>
+            </YStack>
+          );
+        }
         return (
           <YStack
             key={step.id}
@@ -84,24 +117,7 @@ export function StepList({ steps, presentation = "eyebrow" }: StepListProps) {
                 borderColor={isActive ? "$primary" : tokens.colors.gray.gray2}
                 backgroundColor={isActive ? "$primarySubtle" : "$surface"}
               >
-                {presentation === "numeral" ? (
-                  <XStack gap="$3" alignItems="flex-start">
-                    <Text
-                      fontSize={tokens.typography.fontSize["2xl"]}
-                      fontWeight={tokens.typography.fontWeight.bold}
-                      color="$primary"
-                    >
-                      {i + 1}
-                    </Text>
-                    <Text
-                      flex={1}
-                      fontSize={tokens.typography.fontSize.md}
-                      {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
-                    >
-                      {step.body}
-                    </Text>
-                  </XStack>
-                ) : (
+                {
                   <>
                     <YStack paddingBlockEnd="$1">
                       <Text
@@ -119,7 +135,7 @@ export function StepList({ steps, presentation = "eyebrow" }: StepListProps) {
                       {step.body}
                     </Text>
                   </>
-                )}
+                }
               </YStack>
             </YStack>
           </YStack>

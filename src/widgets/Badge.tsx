@@ -16,8 +16,12 @@ const toneStyles = {
     text: "$primaryEmphasis",
   },
   success: {
-    background: tokens.colors.success.success2,
-    text: tokens.colors.success.success8,
+    // Filled sage with white text (#721 fidelity round, Stephen
+    // 2026-11-20): the recipe-detail visual direction's metadata
+    // pill is a filled sage band sampled at #5C614F — not the pale
+    // tinted pill the success tone rendered before.
+    background: "#5c614f",
+    text: "#ffffff",
   },
   warning: {
     background: tokens.colors.warning.warning2,

@@ -15,12 +15,13 @@ export type MarkableRowProps = {
   /** Optional note at the row's trailing edge (e.g. "optional"). */
   trailingNote?: string;
   /**
-   * The row's marked state: the row renders dimmed but stays
-   * pressable, so a marked row can be un-marked by pressing it
-   * again. This is not a disabled state — activation is the
-   * point of the mark. A pressable row's leading checkbox box
-   * shows the same state: checked (accent fill, accent check)
-   * while marked.
+   * The row's marked state: the row stays pressable, so a marked
+   * row can be un-marked by pressing it again. This is not a
+   * disabled state — activation is the point of the mark. The
+   * row's text is never dimmed (#721 fidelity round): a pressable
+   * row's leading checkbox box shows the state — the #713
+   * CheckboxField box (unfilled terracotta outline in both
+   * states, a terracotta check while marked).
    */
   isMarked?: boolean;
   /**
@@ -32,7 +33,7 @@ export type MarkableRowProps = {
 
 /**
  * A pressable hairline row a tap marks and un-marks (#119): a
- * label with an optional trailing note, dimmed while marked —
+ * label with an optional trailing note, its text never dimmed —
  * the checklist row of shopping lists, packing lists, and
  * ingredient lists (RecipeDetailPage's ingredients render
  * through it; PublicRecipePage's identical rows adopt it with
@@ -40,16 +41,14 @@ export type MarkableRowProps = {
  * lists without hand-rolling pressable row styles; all content
  * is caller-supplied, so the row serves any app's lists.
  *
- * The checkbox box (#721, the recipe-detail visual direction):
- * a pressable row leads with the visual-direction checkbox —
- * CheckRow's box shape (a 24px rounded box, accent fill with
- * the accent check while marked, an outline while unmarked) —
- * so the mark reads as a checked box, not only as dimming.
- * This is the interim row treatment the #721 plan settled
- * against #713: when #713's unified CheckboxField lands, its
- * migration swaps the row widget without changing the pages'
- * layout or this row's data contract. A row with no press
- * handler is a plain row and renders no box.
+ * The checkbox box (#721, the recipe-detail visual direction,
+ * converged on the #713 CheckboxField design in the fidelity
+ * round): a pressable row leads with an unfilled 24px rounded
+ * box — a terracotta ($primary) outline in BOTH states and a
+ * terracotta check while marked, no fill in either state — and
+ * the row's text never dims. (The first #721 round's filled-box
+ * stopgap and the old missing-mark dim are both gone.) A row
+ * with no press handler is a plain row and renders no box.
  *
  * Activation follows the ListRow press pattern: the row is
  * focusable on web, and the button keys (Enter and Space) invoke
@@ -72,7 +71,6 @@ export function MarkableRow({
       borderBottomWidth={1}
       borderBottomColor={tokens.colors.gray.gray2}
       paddingVertical="$3"
-      opacity={isMarked ? 0.4 : 1}
       {...(onPress
         ? {
             ...platformAccessibilityProps({
@@ -92,13 +90,13 @@ export function MarkableRow({
           height={tokens.spacing[6]}
           borderRadius={tokens.radii.sm}
           borderWidth={2}
-          borderColor={isMarked ? "$primary" : "$textMuted"}
-          backgroundColor={isMarked ? "$primary" : "$surface"}
+          borderColor="$primary"
+          backgroundColor="$surface"
           alignItems="center"
           justifyContent="center"
         >
           {isMarked ? (
-            <Text fontSize={tokens.typography.fontSize.sm} color="$onPrimary">
+            <Text fontSize={tokens.typography.fontSize.sm} color="$primary">
               ✓
             </Text>
           ) : null}

@@ -2,6 +2,8 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { useMemo } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../widgets/Button.js";
+import { CenteredText } from "../widgets/CenteredText.js";
+import { tokens } from "../tokens/index.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { CandidateList } from "../widgets/CandidateList.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
@@ -67,11 +69,15 @@ import { STATUS_BADGES } from "./recipeStatusBadges.js";
  * exports.
  *
  * Composition mirrors the app's RecipeDetailScreen +
- * RecipeDetailChrome (spudly/eciperay packages/app): a pinned
- * chrome — toolbar (status badge + version picker) — above a
- * single ScrollRegion holding every section in order (overview,
- * ingredients, instructions, cook history, nutrition), each under
- * its own heading. The page originally split the sections across
+ * RecipeDetailChrome (spudly/eciperay packages/app): a single
+ * ScrollRegion holding every section in order. The #721 fidelity
+ * round (Stephen, 2026-11-20) fixed the order to the visual
+ * direction's in-image flow — hero, metadata pill, serif title,
+ * description, Ingredients, Instructions, Start Cooking, tip
+ * line — with everything else (stat band, status badge + version
+ * picker, servings/scale controls, action rows, substitutions,
+ * cook history, nutrition) below Start Cooking, each section
+ * under its own heading. The page originally split the sections across
  * a tab layout; #71 replaced the tabs with this single scrollable
  * page, so the per-tab view-models became section view-models and
  * the tab state (activeTab / onTabChange) left the contract.
@@ -169,12 +175,9 @@ import { STATUS_BADGES } from "./recipeStatusBadges.js";
  *
  * Documented deviations from the app's current rendering, all
  * presentation-only:
- * - The instructions section's active card wash: the app composes
- *   the semantic primary at 5% alpha over RN primitives (its tab
- *   renders without a Tamagui provider in tests); the view uses
- *   `$primarySubtle` — the same treatment the app itself uses for
- *   its other primary-tinted panels (activation candidates,
- *   substitutions).
+ * - The instructions section's steps render flat in the numeral
+ *   presentation (#721 fidelity round): no active card wash at
+ *   all — an orange numeral and period beside the body text.
  * - Stale-rating hints: the app renders an alert icon whose
  *   accessibility label is the hint; the view renders the hint as
  *   visible hint text. The copy moved verbatim from the app's
@@ -328,7 +331,8 @@ export type RecipeDetailPageIngredient = {
   /** The full scaled line, app-formatted ("1 1/2 lb chicken"). */
   label: string;
   isOptional?: boolean;
-  /** Marked missing by the viewer: the row dims and the
+  /** Marked missing by the viewer: the row's checkbox checks
+   * (its text never dims, #721 fidelity round) and the
    * substitutions flow keys off it. */
   isMissing?: boolean;
 };
@@ -683,18 +687,78 @@ function MetaPill({
 }
 
 function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }) {
+  const { imageUrl, title, description, servingsLabel, categoryLabel, totalTimeLabel } = overview;
+
+  return (
+    <PanelStack>
+      {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
+      <MetaPill
+        categoryLabel={categoryLabel}
+        totalTimeLabel={totalTimeLabel}
+        servingsLabel={servingsLabel}
+      />
+      <Text variant="display">{title}</Text>
+      {description ? <Text variant="body">{description}</Text> : null}
+    </PanelStack>
+  );
+}
+
+/**
+ * The Start Cooking block (#721 fidelity round, Stephen's
+ * ruling): the in-image flow ends with the Start Cooking pill —
+ * fully rounded, burnt orange (the theme primary sampled at
+ * #B13F13), full width — and the tip line centered underneath
+ * it, italic in the muted-green accent ink. Everything that is
+ * not in the visual direction image renders below this block
+ * (see DetailsPanel).
+ */
+function StartCookingPanel({ overview }: { overview: RecipeDetailPageOverviewProps }) {
+  const { cookingHref, cookingTipLabel } = overview;
+  return (
+    <PanelStack>
+      <ButtonRow>
+        <Button variant="primary" grow borderRadius={tokens.radii.full} href={cookingHref}>
+          Start Cooking
+        </Button>
+      </ButtonRow>
+      {cookingTipLabel ? (
+        <CenteredText variant="hint" fontStyle="italic" color="$accent">
+          {cookingTipLabel}
+        </CenteredText>
+      ) : null}
+    </PanelStack>
+  );
+}
+
+/**
+ * Everything below Start Cooking (#721 fidelity round, Stephen's
+ * ruling: anything not in the visual direction image moves below
+ * the Start Cooking button): the stat band, the status badge +
+ * version selector, the servings stepper and scale pills, the
+ * print/share/edit/delete and tweak action rows, the
+ * substitutions panel, and the overview's remaining sections
+ * (sharing, tags, ratings, comments) in their established order.
+ */
+function DetailsPanel({
+  overview,
+  ingredients: view,
+  status,
+  versions,
+  selectedVersionId,
+  onSelectVersion,
+}: {
+  overview: RecipeDetailPageOverviewProps;
+  ingredients: RecipeDetailPageIngredientsProps;
+  status: string;
+  versions: RecipeDetailPageVersion[];
+  selectedVersionId: string;
+  onSelectVersion: (versionId: string) => void;
+}) {
   const {
-    imageUrl,
-    title,
-    description,
     servingsLabel,
     prepTimeLabel,
     cookTimeLabel,
-    categoryLabel,
-    totalTimeLabel,
-    cookingTipLabel,
     actionMessage,
-    cookingHref,
     onPrintPress,
     onSharePress,
     editHref,
@@ -726,7 +790,7 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
   const sharingControls = sharing ? <RecipeSharingView {...sharing} /> : null;
   const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : null;
   // The secondary action row renders only when at least one of
-  // its actions applies — Start Cooking has its own row now
+  // its actions applies — Start Cooking has its own panel now
   // (#721), so this row can legitimately be empty.
   const hasSecondaryActions =
     onPrintPress !== undefined ||
@@ -738,39 +802,47 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
 
   return (
     <PanelStack>
-      {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
-      <MetaPill
-        categoryLabel={categoryLabel}
-        totalTimeLabel={totalTimeLabel}
-        servingsLabel={servingsLabel}
-      />
-      <Text variant="display">{title}</Text>
-      {description ? <Text variant="body">{description}</Text> : null}
       <StatBand>
         <StatCard label="Servings" value={servingsLabel} />
         {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
         {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
       </StatBand>
-      {/* Start Cooking on its own row (#721, as amended by
-          Stephen): full-width on mobile, capped on web — a
-          full-width primary would stretch too wide across a
-          desktop column. The DS config defines no width
-          breakpoints and treats native as the narrow rendering
-          and web as the wide one (the #171 contract), so the
-          button grows to the row on native and takes a web-only
-          max-width cap through Tamagui's conditional-object
-          syntax. The remaining actions keep their shared row
-          beneath it. */}
-      <ButtonRow>
-        <Button variant="primary" grow maxWidth={{ web: 360 }} href={cookingHref}>
-          Start Cooking
-        </Button>
-      </ButtonRow>
-      {cookingTipLabel ? (
-        <Text variant="hint" fontStyle="italic">
-          {cookingTipLabel}
-        </Text>
-      ) : null}
+      <Toolbar>
+        <RecipeStatusBadge status={status} />
+        <VersionPicker
+          versions={versions}
+          selectedVersionId={selectedVersionId}
+          onSelectVersion={onSelectVersion}
+        />
+      </Toolbar>
+      {/* Servings + scale controls (#73): one compact block, two
+          fixed rows, and every value directly enterable — stepping
+          is no longer the only way to reach a large batch. Servings
+          is an inline editable stepper (label beside the stepper,
+          the value a number input in a fixed-width box); Scale is
+          the PresetValueSelector — a single non-wrapping row of
+          equal-width preset buttons plus a Custom option that
+          turns into a number input when pressed and afterwards
+          shows the applied custom value selected (the selector
+          owns that editing state). Same props contract as before —
+          the app wiring is untouched. */}
+      <NumberStepper
+        label="Servings"
+        layout="inline"
+        value={view.servings}
+        min={1}
+        onChange={view.onServingsChange}
+        editable
+      />
+      <PresetValueSelector
+        label="Scale"
+        options={SCALE_OPTIONS}
+        value={view.scaleValue}
+        onChange={view.onScaleChange}
+        customLabel={CUSTOM_SCALE_LABEL}
+        customAccessibilityLabel="Custom scale"
+        formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
+      />
       {hasSecondaryActions ? (
         <ButtonRow>
           {onPrintPress ? (
@@ -828,6 +900,17 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
           onActivateCandidatePress={overview.onActivateCandidatePress}
         />
       ) : null}
+      {view.loadingSubstitutions ? <Text variant="hint">Finding substitutions…</Text> : null}
+      {view.substitutions && view.substitutions.length > 0 ? (
+        <SuggestionPanel
+          title="Substitutions"
+          entries={view.substitutions.map((sub) => ({
+            id: sub.ingredient,
+            label: sub.ingredient,
+            detail: sub.suggestions,
+          }))}
+        />
+      ) : null}
       {sharingControls}
       {tags.length > 0 ? <TagList tags={tags} /> : null}
       {ratings ? (
@@ -851,34 +934,6 @@ function IngredientsPanel({
   return (
     <PanelStack>
       <SectionHeading icon="list">Ingredients</SectionHeading>
-      {/* Servings + scale controls (#73): one compact block, two
-          fixed rows, and every value directly enterable — stepping
-          is no longer the only way to reach a large batch. Servings
-          is an inline editable stepper (label beside the stepper,
-          the value a number input in a fixed-width box); Scale is
-          the PresetValueSelector — a single non-wrapping row of
-          equal-width preset buttons plus a Custom option that
-          turns into a number input when pressed and afterwards
-          shows the applied custom value selected (the selector
-          owns that editing state). Same props contract as before —
-          the app wiring is untouched. */}
-      <NumberStepper
-        label="Servings"
-        layout="inline"
-        value={view.servings}
-        min={1}
-        onChange={view.onServingsChange}
-        editable
-      />
-      <PresetValueSelector
-        label="Scale"
-        options={SCALE_OPTIONS}
-        value={view.scaleValue}
-        onChange={view.onScaleChange}
-        customLabel={CUSTOM_SCALE_LABEL}
-        customAccessibilityLabel="Custom scale"
-        formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
-      />
       <ListStack>
         {view.ingredients.map((ingredient) => (
           <MarkableRow
@@ -897,17 +952,6 @@ function IngredientsPanel({
         ))}
       </ListStack>
       {hasMissing ? <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text> : null}
-      {view.loadingSubstitutions ? <Text variant="hint">Finding substitutions…</Text> : null}
-      {view.substitutions && view.substitutions.length > 0 ? (
-        <SuggestionPanel
-          title="Substitutions"
-          entries={view.substitutions.map((sub) => ({
-            id: sub.ingredient,
-            label: sub.ingredient,
-            detail: sub.suggestions,
-          }))}
-        />
-      ) : null}
     </PanelStack>
   );
 }
@@ -1042,9 +1086,10 @@ function HistoryPanel({
 // ---------------------------------------------------------------------------
 
 /**
- * Full-page recipe detail view: pinned chrome (status + version
- * toolbar) over all five sections in a single scroll region (#71 —
- * no tabs; the sections render in the order the tabs had).
+ * Full-page recipe detail view: all sections in a single scroll
+ * region (#71 — no tabs), in the #721 fidelity round's order
+ * (the visual direction's in-image flow first, everything else
+ * below Start Cooking).
  * Controlled — see the file header for the contract, the slot
  * design, and the layout decisions.
  */
@@ -1100,18 +1145,19 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
   return (
     <BigFooterShell footer={props.footer} scrollMode="content">
       <ScreenShell>
-        <Toolbar>
-          <RecipeStatusBadge status={status} />
-          <VersionPicker
-            versions={versions}
-            selectedVersionId={selectedVersionId}
-            onSelectVersion={onSelectVersion}
-          />
-        </Toolbar>
         <ScrollRegion>
           <OverviewPanel overview={props.overview} />
           <IngredientsPanel ingredients={props.ingredients} />
           <InstructionsPanel instructions={props.instructions.instructions} />
+          <StartCookingPanel overview={props.overview} />
+          <DetailsPanel
+            overview={props.overview}
+            ingredients={props.ingredients}
+            status={status}
+            versions={versions}
+            selectedVersionId={selectedVersionId}
+            onSelectVersion={onSelectVersion}
+          />
           <HistoryPanel history={props.history} selectedVersionId={selectedVersionId} />
           {/* The section headings render inside their panels as the
             PanelStack's first block (the canonical SectionHeading
