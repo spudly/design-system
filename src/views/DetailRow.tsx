@@ -1,6 +1,6 @@
 import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Text } from "./Text.js";
+import { Text } from "../widgets/Text.js";
 
 export type DetailRowProps = {
   /** The row's label, rendered muted on the leading edge. */
@@ -13,7 +13,9 @@ export type DetailRowProps = {
  * Label/value detail row: a muted label on the leading edge and its
  * value on the trailing edge, over a hairline — the row shape of a
  * detail screen's facts (MealPlanDetailPage's nutrition-goal
- * progress rows render through it). The label takes Text's `hint`
+ * progress rows render through it). It is a view, not a widget
+ * (#715): a single-consumer detail-screen composition whose
+ * layout travels with it as view-level composition. The label takes Text's `hint`
  * treatment and the value the same small size at the default tone;
  * the hairline and the row's vertical padding live here so pages
  * compose rows without styling them (#119).
