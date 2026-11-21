@@ -71,7 +71,7 @@ const buttonStackCode = code("ButtonStack.tsx");
 const centerCode = code("Center.tsx");
 const formStackCode = code("FormStack.tsx");
 const textFieldSource = readFileSync(join(componentsDir, "TextField.tsx"), "utf8");
-const searchFieldSource = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
+const searchFieldSource = readFileSync(join(componentsDir, "form/SearchField.tsx"), "utf8");
 const fieldShellSource = readFileSync(join(componentsDir, "FieldShell.tsx"), "utf8");
 const buttonCode = code("Button.tsx");
 
@@ -144,7 +144,7 @@ test("FieldRow owns the search row's gap and stretch — the equal-height contra
 });
 
 test("FieldRow's field types fill the row height on their grow path (#476)", () => {
-  const searchFieldCode = readFileSync(join(componentsDir, "SearchField.tsx"), "utf8");
+  const searchFieldCode = readFileSync(join(componentsDir, "form/SearchField.tsx"), "utf8");
   const textFieldCode = readFileSync(join(componentsDir, "TextField.tsx"), "utf8");
   const selectFieldCode = code("form/SelectField.tsx");
   // SearchField: the bordered container fills its root when growing (no label).

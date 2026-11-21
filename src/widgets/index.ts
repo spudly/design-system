@@ -26,7 +26,12 @@ export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
 export { DetailRow, type DetailRowProps } from "./DetailRow.js";
 export { Divider, type DividerProps } from "./Divider.js";
-export { Dropdown, useDropdownClose, type DropdownAlign, type DropdownProps } from "./form/Dropdown.js";
+export {
+  Dropdown,
+  useDropdownClose,
+  type DropdownAlign,
+  type DropdownProps,
+} from "./form/Dropdown.js";
 export { DropdownButton, type DropdownButtonProps } from "./form/DropdownButton.js";
 export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export { FixedActionBanner, type FixedActionBannerProps } from "./FixedActionBanner.js";
@@ -84,7 +89,7 @@ export {
   type RadioOption,
   type RadioOptionGroupProps,
 } from "./form/RadioOptionGroup.js";
-export { SearchField, type SearchFieldProps } from "./SearchField.js";
+export { SearchField, type SearchFieldProps } from "./form/SearchField.js";
 export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
 export { TextField, type TextFieldProps } from "./TextField.js";
 export { Slider, type SliderProps } from "./form/Slider.js";

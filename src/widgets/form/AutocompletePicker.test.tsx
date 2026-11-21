@@ -108,7 +108,8 @@ function loadRuntime() {
     const dist: Record<string, any> = await loadInternalDist();
     const voiceFixtures: Record<string, any> = await import("../../../dist/voice/fixtures.js");
     const voiceModule: Record<string, any> = await import("../../../dist/voice/index.js");
-    const { MealFormPage }: Record<string, any> = await import("../../../dist/pages/MealFormPage.js");
+    const { MealFormPage }: Record<string, any> =
+      await import("../../../dist/pages/MealFormPage.js");
     const { MealPlanFormPage }: Record<string, any> =
       await import("../../../dist/pages/MealPlanFormPage.js");
     return {
@@ -125,8 +126,15 @@ function loadRuntime() {
   return runtimePromise;
 }
 async function renderToHtml(element: any) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
-    await loadRuntime();
+  const {
+    React,
+    renderToString,
+    TamaguiProvider,
+    createTamaguiConfig,
+    baseTheme,
+    VoiceProvider,
+    fixtureVoice,
+  } = await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
     <TamaguiProvider config={config} defaultTheme="light">
@@ -370,7 +378,10 @@ test("SSR: MealPlanFormPage steppers read the selected entries, not the results 
   const { MealPlanFormPage } = await loadRuntime();
   const html = await renderToHtml(<MealPlanFormPage {...mealPlanFormSsrProps()} />);
   assert.ok(html.includes("Quantity · Solo Recipe"), "the quantity stepper renders");
-  assert.ok(html.includes("Servings to cook · Solo Recipe"), "the servings-to-cook stepper renders");
+  assert.ok(
+    html.includes("Servings to cook · Solo Recipe"),
+    "the servings-to-cook stepper renders",
+  );
   assert.ok(
     html.includes("Servings to eat · Solo Recipe"),
     "the servings-to-eat stepper renders (#659)",
@@ -384,7 +395,7 @@ describe("autocompletePickerReview", () => {
     return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   }
   const picker = codeOf("src/widgets/form/AutocompletePicker.tsx");
-  const searchField = codeOf("src/widgets/SearchField.tsx");
+  const searchField = codeOf("src/widgets/form/SearchField.tsx");
   test("SearchField's clear button honors disabled: no press handler, disabled state reported", () => {
     assert.match(
       searchField,
@@ -446,13 +457,21 @@ describe("autocompletePickerReview", () => {
     assert.match(picker, /politeLiveRegionProps/, "the region uses the shared live-region props");
     assert.match(picker, /collapsable=\{false\}/, "the region's node cannot be flattened away");
     assert.match(picker, /statusMessage/, "the region's text is the search-state message");
-    assert.match(picker, /\? voice\.autocompletePicker\.searchingLabel/, "the searching state is announced");
+    assert.match(
+      picker,
+      /\? voice\.autocompletePicker\.searchingLabel/,
+      "the searching state is announced",
+    );
     assert.match(
       picker,
       /\|\| noResultsMessage/,
       "the no-matches state announces the no-results text (falling back from a search error; an empty-string error counts as no error, #393)",
     );
-    assert.match(picker, /voice\.autocompletePicker\.resultsAvailableLabel\(visibleResults\.length\)/, "the results state announces the result count");
+    assert.match(
+      picker,
+      /voice\.autocompletePicker\.resultsAvailableLabel\(visibleResults\.length\)/,
+      "the results state announces the result count",
+    );
     assert.ok(
       !picker.includes("opacity={0}"),
       "the region is not transparent on every platform — iOS VoiceOver drops alpha-0 views",
@@ -515,8 +534,15 @@ describe("autocompletePickerReview", () => {
     return runtimePromise;
   }
   async function renderToHtml(element: any) {
-    const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
-      await loadRuntime();
+    const {
+      React,
+      renderToString,
+      TamaguiProvider,
+      createTamaguiConfig,
+      baseTheme,
+      VoiceProvider,
+      fixtureVoice,
+    } = await loadRuntime();
     const config = createTamaguiConfig(baseTheme);
     return renderToString(
       <TamaguiProvider config={config} defaultTheme="light">
