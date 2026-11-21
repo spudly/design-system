@@ -2,10 +2,11 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { useMemo } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Button } from "../widgets/Button.js";
+import { CenteredText } from "../widgets/CenteredText.js";
+import { tokens } from "../tokens/index.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { CandidateList } from "../widgets/CandidateList.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
-import { CardStack } from "../widgets/CardStack.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
@@ -19,7 +20,10 @@ import {
 } from "../widgets/NutritionPanel.js";
 import { NumberStepper } from "../widgets/NumberStepper.js";
 import { PanelStack } from "../widgets/PanelStack.js";
-import { PresetValueSelector, type PresetValueOption } from "../widgets/form/PresetValueSelector.js";
+import {
+  PresetValueSelector,
+  type PresetValueOption,
+} from "../widgets/form/PresetValueSelector.js";
 import {
   RatingsCard,
   type RatingsCardCommunityRating,
@@ -65,11 +69,15 @@ import { STATUS_BADGES } from "./recipeStatusBadges.js";
  * exports.
  *
  * Composition mirrors the app's RecipeDetailScreen +
- * RecipeDetailChrome (spudly/eciperay packages/app): a pinned
- * chrome — toolbar (status badge + version picker) — above a
- * single ScrollRegion holding every section in order (overview,
- * ingredients, instructions, cook history, nutrition), each under
- * its own heading. The page originally split the sections across
+ * RecipeDetailChrome (spudly/eciperay packages/app): a single
+ * ScrollRegion holding every section in order. The #721 fidelity
+ * round (Stephen, 2026-11-20) fixed the order to the visual
+ * direction's in-image flow — hero, metadata pill, serif title,
+ * description, Ingredients, Instructions, Start Cooking, tip
+ * line — with everything else (stat band, status badge + version
+ * picker, servings/scale controls, action rows, substitutions,
+ * cook history, nutrition) below Start Cooking, each section
+ * under its own heading. The page originally split the sections across
  * a tab layout; #71 replaced the tabs with this single scrollable
  * page, so the per-tab view-models became section view-models and
  * the tab state (activeTab / onTabChange) left the contract.
@@ -167,19 +175,17 @@ import { STATUS_BADGES } from "./recipeStatusBadges.js";
  *
  * Documented deviations from the app's current rendering, all
  * presentation-only:
- * - The instructions section's active card wash: the app composes
- *   the semantic primary at 5% alpha over RN primitives (its tab
- *   renders without a Tamagui provider in tests); the view uses
- *   `$primarySubtle` — the same treatment the app itself uses for
- *   its other primary-tinted panels (activation candidates,
- *   substitutions).
+ * - The instructions section's steps render flat in the numeral
+ *   presentation (#721 fidelity round): no active card wash at
+ *   all — an orange numeral and period beside the body text.
  * - Stale-rating hints: the app renders an alert icon whose
  *   accessibility label is the hint; the view renders the hint as
  *   visible hint text. The copy moved verbatim from the app's
  *   client constants (STALE_*_RATING_HINT, now in RatingsCard).
- * - The hero image frame height (256) is layout geometry with no
- *   step on the DS spacing scale, as in the app — it lives in
- *   Thumbnail's hero variant.
+ * - The hero image frame's shape is the image's own aspect
+ *   ratio (#721), measured and clamped inside Thumbnail's hero
+ *   variant; the loading skeleton's hero bone holds the same
+ *   fallback 4:3 shape.
  * No lineHeight is set anywhere in this file (the #162 rule).
  */
 
@@ -245,6 +251,18 @@ export type RecipeDetailPageOverviewProps = {
   servingsLabel: string;
   prepTimeLabel?: string;
   cookTimeLabel?: string;
+  /** The recipe's category, app-formatted ("Herb & Garlic"):
+   * the first part of the metadata pill under the hero (#721).
+   * Optional — the pill joins whichever parts are present. */
+  categoryLabel?: string;
+  /** Total time, app-formatted ("45 min"): the metadata pill's
+   * second part (#721). The app formats it from its own data —
+   * the DS never sums the prep/cook label strings. */
+  totalTimeLabel?: string;
+  /** A short cooking hint, app-supplied ("Tip: Let it rest for
+   * juicier meat"): rendered as the italic line under the Start
+   * Cooking action (#721). Omit for no line. */
+  cookingTipLabel?: string;
   /** Transient feedback line ("Version activated"), app-held. */
   actionMessage?: string | null;
   /** The cooking-mode destination (#248: navigation crosses as
@@ -313,7 +331,8 @@ export type RecipeDetailPageIngredient = {
   /** The full scaled line, app-formatted ("1 1/2 lb chicken"). */
   label: string;
   isOptional?: boolean;
-  /** Marked missing by the viewer: the row dims and the
+  /** Marked missing by the viewer: the row's checkbox checks
+   * (its text never dims, #721 fidelity round) and the
    * substitutions flow keys off it. */
   isMissing?: boolean;
 };
@@ -638,16 +657,108 @@ function LifecycleSection({
   );
 }
 
+/**
+ * The metadata pill (#721): the visual direction's sage summary
+ * line under the hero — category • total time • serves — composed
+ * from the overview's app-supplied labels in that order, joining
+ * whichever parts are present. Rendered through Badge's success
+ * tone (the sage treatment already in the system); the pill is a
+ * summary line, not a replacement for the StatBand's prep/cook
+ * breakdown below. Renders nothing when no part exists.
+ */
+function MetaPill({
+  categoryLabel,
+  totalTimeLabel,
+  servingsLabel,
+}: {
+  categoryLabel?: string | undefined;
+  totalTimeLabel?: string | undefined;
+  servingsLabel: string;
+}) {
+  const parts = [
+    categoryLabel,
+    totalTimeLabel,
+    servingsLabel ? `Serves ${servingsLabel}` : undefined,
+  ].filter((part): part is string => part !== undefined && part !== "");
+  if (parts.length === 0) {
+    return null;
+  }
+  return <Badge tone="success">{parts.join(" • ")}</Badge>;
+}
+
 function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }) {
+  const { imageUrl, title, description, servingsLabel, categoryLabel, totalTimeLabel } = overview;
+
+  return (
+    <PanelStack>
+      {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
+      <MetaPill
+        categoryLabel={categoryLabel}
+        totalTimeLabel={totalTimeLabel}
+        servingsLabel={servingsLabel}
+      />
+      <Text variant="display">{title}</Text>
+      {description ? <Text variant="body">{description}</Text> : null}
+    </PanelStack>
+  );
+}
+
+/**
+ * The Start Cooking block (#721 fidelity round, Stephen's
+ * ruling): the in-image flow ends with the Start Cooking pill —
+ * fully rounded, burnt orange (the theme primary sampled at
+ * #B13F13), full width — and the tip line centered underneath
+ * it, italic in the muted-green accent ink. Everything that is
+ * not in the visual direction image renders below this block
+ * (see DetailsPanel).
+ */
+function StartCookingPanel({ overview }: { overview: RecipeDetailPageOverviewProps }) {
+  const { cookingHref, cookingTipLabel } = overview;
+  return (
+    <PanelStack>
+      <ButtonRow>
+        <Button variant="primary" grow borderRadius={tokens.radii.full} href={cookingHref}>
+          Start Cooking
+        </Button>
+      </ButtonRow>
+      {cookingTipLabel ? (
+        <CenteredText variant="hint" fontStyle="italic" color="$accent">
+          {cookingTipLabel}
+        </CenteredText>
+      ) : null}
+    </PanelStack>
+  );
+}
+
+/**
+ * Everything below Start Cooking (#721 fidelity round, Stephen's
+ * ruling: anything not in the visual direction image moves below
+ * the Start Cooking button): the stat band, the status badge +
+ * version selector, the servings stepper and scale pills, the
+ * print/share/edit/delete and tweak action rows, the
+ * substitutions panel, and the overview's remaining sections
+ * (sharing, tags, ratings, comments) in their established order.
+ */
+function DetailsPanel({
+  overview,
+  ingredients: view,
+  status,
+  versions,
+  selectedVersionId,
+  onSelectVersion,
+}: {
+  overview: RecipeDetailPageOverviewProps;
+  ingredients: RecipeDetailPageIngredientsProps;
+  status: string;
+  versions: RecipeDetailPageVersion[];
+  selectedVersionId: string;
+  onSelectVersion: (versionId: string) => void;
+}) {
   const {
-    imageUrl,
-    title,
-    description,
     servingsLabel,
     prepTimeLabel,
     cookTimeLabel,
     actionMessage,
-    cookingHref,
     onPrintPress,
     onSharePress,
     editHref,
@@ -678,100 +789,32 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
   // The sections render from their data props (#438 Part 3).
   const sharingControls = sharing ? <RecipeSharingView {...sharing} /> : null;
   const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : null;
+  // The secondary action row renders only when at least one of
+  // its actions applies — Start Cooking has its own panel now
+  // (#721), so this row can legitimately be empty.
+  const hasSecondaryActions =
+    onPrintPress !== undefined ||
+    onSharePress !== undefined ||
+    editHref !== undefined ||
+    editDraftHref !== undefined ||
+    onCreateDraftPress !== undefined ||
+    onDeletePress !== undefined;
 
   return (
     <PanelStack>
-      {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
-      <CardStack>
-        <Text variant="formTitle">{title}</Text>
-      </CardStack>
-      {description ? <Text variant="body">{description}</Text> : null}
       <StatBand>
         <StatCard label="Servings" value={servingsLabel} />
         {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
         {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
       </StatBand>
-      <ButtonRow>
-        <Button variant="primary" grow href={cookingHref}>
-          Start Cooking
-        </Button>
-        {onPrintPress ? (
-          <Button
-            variant="secondary"
-            size="md"
-            icon="print"
-            accessibilityLabel="Print recipe"
-            onPress={onPrintPress}
-          />
-        ) : null}
-        {onSharePress ? (
-          <Button
-            variant="secondary"
-            size="md"
-            icon="share"
-            accessibilityLabel="Share recipe"
-            onPress={onSharePress}
-          />
-        ) : null}
-        {editHref ? (
-          <Button variant="secondary" size="sm" href={editHref}>
-            Edit
-          </Button>
-        ) : null}
-        {editDraftHref ? (
-          <Button variant="secondary" size="sm" href={editDraftHref}>
-            Edit draft
-          </Button>
-        ) : onCreateDraftPress ? (
-          <Button variant="secondary" size="sm" onPress={onCreateDraftPress}>
-            Edit draft
-          </Button>
-        ) : null}
-        {onDeletePress ? (
-          <Button variant="danger" size="sm" onPress={onDeletePress}>
-            Delete
-          </Button>
-        ) : null}
-      </ButtonRow>
-      {/* StatusMessage renders unconditionally (#318): its polite
-          live region must be mounted before the message changes
-          for the change to announce, so there is no conditional
-          block here — the component renders its empty region when
-          there is no message. */}
-      <StatusMessage message={actionMessage} />
-      {showLifecycle && lifecycle ? (
-        <LifecycleSection
-          lifecycle={lifecycle}
-          onTweakManuallyPress={overview.onTweakManuallyPress}
-          tweakAiHref={overview.tweakAiHref}
-          onMarkPerfectedPress={overview.onMarkPerfectedPress}
-          onAbandonPress={overview.onAbandonPress}
-          onActivateCandidatePress={overview.onActivateCandidatePress}
+      <Toolbar>
+        <RecipeStatusBadge status={status} />
+        <VersionPicker
+          versions={versions}
+          selectedVersionId={selectedVersionId}
+          onSelectVersion={onSelectVersion}
         />
-      ) : null}
-      {sharingControls}
-      {tags.length > 0 ? <TagList tags={tags} /> : null}
-      {ratings ? (
-        <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
-      ) : null}
-      {comments}
-    </PanelStack>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Ingredients section.
-// ---------------------------------------------------------------------------
-
-function IngredientsPanel({
-  ingredients: view,
-}: {
-  ingredients: RecipeDetailPageIngredientsProps;
-}) {
-  const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
-  return (
-    <PanelStack>
-      <SectionHeading>Ingredients</SectionHeading>
+      </Toolbar>
       {/* Servings + scale controls (#73): one compact block, two
           fixed rows, and every value directly enterable — stepping
           is no longer the only way to reach a large batch. Servings
@@ -800,6 +843,97 @@ function IngredientsPanel({
         customAccessibilityLabel="Custom scale"
         formatCustomValue={(custom) => `${formatScaleValue(custom)}×`}
       />
+      {hasSecondaryActions ? (
+        <ButtonRow>
+          {onPrintPress ? (
+            <Button
+              variant="secondary"
+              size="md"
+              icon="print"
+              accessibilityLabel="Print recipe"
+              onPress={onPrintPress}
+            />
+          ) : null}
+          {onSharePress ? (
+            <Button
+              variant="secondary"
+              size="md"
+              icon="share"
+              accessibilityLabel="Share recipe"
+              onPress={onSharePress}
+            />
+          ) : null}
+          {editHref ? (
+            <Button variant="secondary" size="sm" href={editHref}>
+              Edit
+            </Button>
+          ) : null}
+          {editDraftHref ? (
+            <Button variant="secondary" size="sm" href={editDraftHref}>
+              Edit draft
+            </Button>
+          ) : onCreateDraftPress ? (
+            <Button variant="secondary" size="sm" onPress={onCreateDraftPress}>
+              Edit draft
+            </Button>
+          ) : null}
+          {onDeletePress ? (
+            <Button variant="danger" size="sm" onPress={onDeletePress}>
+              Delete
+            </Button>
+          ) : null}
+        </ButtonRow>
+      ) : null}
+      {/* StatusMessage renders unconditionally (#318): its polite
+          live region must be mounted before the message changes
+          for the change to announce, so there is no conditional
+          block here — the component renders its empty region when
+          there is no message. */}
+      <StatusMessage message={actionMessage} />
+      {showLifecycle && lifecycle ? (
+        <LifecycleSection
+          lifecycle={lifecycle}
+          onTweakManuallyPress={overview.onTweakManuallyPress}
+          tweakAiHref={overview.tweakAiHref}
+          onMarkPerfectedPress={overview.onMarkPerfectedPress}
+          onAbandonPress={overview.onAbandonPress}
+          onActivateCandidatePress={overview.onActivateCandidatePress}
+        />
+      ) : null}
+      {view.loadingSubstitutions ? <Text variant="hint">Finding substitutions…</Text> : null}
+      {view.substitutions && view.substitutions.length > 0 ? (
+        <SuggestionPanel
+          title="Substitutions"
+          entries={view.substitutions.map((sub) => ({
+            id: sub.ingredient,
+            label: sub.ingredient,
+            detail: sub.suggestions,
+          }))}
+        />
+      ) : null}
+      {sharingControls}
+      {tags.length > 0 ? <TagList tags={tags} /> : null}
+      {ratings ? (
+        <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
+      ) : null}
+      {comments}
+    </PanelStack>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Ingredients section.
+// ---------------------------------------------------------------------------
+
+function IngredientsPanel({
+  ingredients: view,
+}: {
+  ingredients: RecipeDetailPageIngredientsProps;
+}) {
+  const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
+  return (
+    <PanelStack>
+      <SectionHeading icon="list">Ingredients</SectionHeading>
       <ListStack>
         {view.ingredients.map((ingredient) => (
           <MarkableRow
@@ -818,17 +952,6 @@ function IngredientsPanel({
         ))}
       </ListStack>
       {hasMissing ? <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text> : null}
-      {view.loadingSubstitutions ? <Text variant="hint">Finding substitutions…</Text> : null}
-      {view.substitutions && view.substitutions.length > 0 ? (
-        <SuggestionPanel
-          title="Substitutions"
-          entries={view.substitutions.map((sub) => ({
-            id: sub.ingredient,
-            label: sub.ingredient,
-            detail: sub.suggestions,
-          }))}
-        />
-      ) : null}
     </PanelStack>
   );
 }
@@ -848,10 +971,12 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
     <PanelStack>
       <SectionHeading>Instructions</SectionHeading>
       <StepList
+        presentation="numeral"
         steps={sorted.map((step) => ({
           id: step.id,
           label: `Step ${step.stepNumber}`,
           body: step.body,
+          number: step.stepNumber,
         }))}
       />
     </PanelStack>
@@ -962,9 +1087,10 @@ function HistoryPanel({
 // ---------------------------------------------------------------------------
 
 /**
- * Full-page recipe detail view: pinned chrome (status + version
- * toolbar) over all five sections in a single scroll region (#71 —
- * no tabs; the sections render in the order the tabs had).
+ * Full-page recipe detail view: all sections in a single scroll
+ * region (#71 — no tabs), in the #721 fidelity round's order
+ * (the visual direction's in-image flow first, everything else
+ * below Start Cooking).
  * Controlled — see the file header for the contract, the slot
  * design, and the layout decisions.
  */
@@ -984,7 +1110,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
             </Toolbar>
             <ScrollRegion>
               <PanelStack>
-                <BoxSkeleton height={256} />
+                <BoxSkeleton aspectRatio={4 / 3} />
                 <TextSkeleton size="2xl" lines={1} />
                 <TextSkeleton size="md" lines={3} />
                 <StatBand loading>
@@ -1020,18 +1146,19 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
   return (
     <BigFooterShell footer={props.footer} scrollMode="content">
       <ScreenShell>
-        <Toolbar>
-          <RecipeStatusBadge status={status} />
-          <VersionPicker
-            versions={versions}
-            selectedVersionId={selectedVersionId}
-            onSelectVersion={onSelectVersion}
-          />
-        </Toolbar>
         <ScrollRegion>
           <OverviewPanel overview={props.overview} />
           <IngredientsPanel ingredients={props.ingredients} />
           <InstructionsPanel instructions={props.instructions.instructions} />
+          <StartCookingPanel overview={props.overview} />
+          <DetailsPanel
+            overview={props.overview}
+            ingredients={props.ingredients}
+            status={status}
+            versions={versions}
+            selectedVersionId={selectedVersionId}
+            onSelectVersion={onSelectVersion}
+          />
           <HistoryPanel history={props.history} selectedVersionId={selectedVersionId} />
           {/* The section headings render inside their panels as the
             PanelStack's first block (the canonical SectionHeading

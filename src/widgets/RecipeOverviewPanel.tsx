@@ -113,7 +113,7 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
   if (showSkeleton) {
     // Loading (#278): the same block stack, skeletonized block
     // by block in its own padding wrappers — the hero a box at
-    // Thumbnail's hero-frame height (256), the title a bone at
+    // Thumbnail's hero fallback aspect (4:3, #721), the title a bone at
     // the 2xl size, the status badge a pill bone at the badge's
     // geometry (width estimated from its label, the TagList
     // estimate), the description two bones at the body size,
@@ -125,7 +125,7 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
         <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
           {imageUrl ? (
             <YStack paddingBlockEnd="$4">
-              <BoxSkeleton height={256} />
+              <BoxSkeleton aspectRatio={4 / 3} />
             </YStack>
           ) : null}
           <YStack paddingBlockEnd="$2">
@@ -152,8 +152,12 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
           <YStack paddingBlockEnd="$4">
             <StatBand loading loadingCount={1 + (prepTimeLabel ? 1 : 0) + (cookTimeLabel ? 1 : 0)}>
               <StatCard label={voice.recipeOverviewPanel.servingsLabel} value={servingsLabel} />
-              {prepTimeLabel ? <StatCard label={voice.recipeOverviewPanel.prepLabel} value={prepTimeLabel} /> : null}
-              {cookTimeLabel ? <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} /> : null}
+              {prepTimeLabel ? (
+                <StatCard label={voice.recipeOverviewPanel.prepLabel} value={prepTimeLabel} />
+              ) : null}
+              {cookTimeLabel ? (
+                <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} />
+              ) : null}
             </StatBand>
           </YStack>
           {tags.length > 0 ? <TagList tags={tags} loading /> : null}
@@ -192,8 +196,12 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
       <YStack paddingBlockEnd="$4">
         <StatBand>
           <StatCard label={voice.recipeOverviewPanel.servingsLabel} value={servingsLabel} />
-          {prepTimeLabel ? <StatCard label={voice.recipeOverviewPanel.prepLabel} value={prepTimeLabel} /> : null}
-          {cookTimeLabel ? <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} /> : null}
+          {prepTimeLabel ? (
+            <StatCard label={voice.recipeOverviewPanel.prepLabel} value={prepTimeLabel} />
+          ) : null}
+          {cookTimeLabel ? (
+            <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} />
+          ) : null}
         </StatBand>
       </YStack>
       {tags.length > 0 ? <TagList tags={tags} /> : null}
