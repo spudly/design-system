@@ -35,7 +35,7 @@ export type SessionShellProps = {
 export function SessionShell({ scrollable = false, children }: SessionShellProps) {
   if (scrollable) {
     return (
-      <YStack flex={1} backgroundColor={tokens.colors.gray.gray1}>
+      <YStack flex={1} minHeight={0} backgroundColor={tokens.colors.gray.gray1}>
         <ScrollRegion>
           <YStack paddingHorizontal="$4" paddingTop="$4" gap="$4" paddingBottom={tokens.spacing[8]}>
             {children}
@@ -47,6 +47,8 @@ export function SessionShell({ scrollable = false, children }: SessionShellProps
   return (
     <YStack
       flex={1}
+      minHeight={0}
+      overflow="hidden"
       backgroundColor={tokens.colors.gray.gray1}
       paddingHorizontal="$4"
       paddingTop="$4"
