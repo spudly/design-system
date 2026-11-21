@@ -13,11 +13,15 @@ release's changed components. The full index lives in
 
 ## RouteErrorPage
 
-Open in `Pages/Eciperay/RouteErrorPage`: NotFound, ErrorState.
+Open in `Pages/Eciperay/RouteErrorPage`: NotFound, ErrorState, WithAction.
 
 1. NotFound reads "Page not found" and ErrorState reads
    "Something went wrong", each with its own message and the
    "Go to the home page" link as a real anchor.
+2. WithAction (#765): a "Try again" button renders beside the
+   home link; activating it fires the host's retry callback.
+   NotFound and ErrorState (no action supplied) render no
+   button.
 
 **Run when:** `src/pages/RouteErrorPage.tsx`, its stories, or
 a changeset naming RouteErrorPage.

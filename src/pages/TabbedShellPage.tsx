@@ -5,6 +5,9 @@ import { Tabs } from "../widgets/Tabs.js";
 import type { IconName } from "../icons/iconRegistry.js";
 import { AppTopBar } from "../widgets/AppTopBar.js";
 import { LazySlot } from "../views/LazySlot.js";
+import { BannerRow } from "../widgets/BannerRow.js";
+import { Button } from "../widgets/Button.js";
+import { StatusMessage } from "../widgets/StatusMessage.js";
 
 /**
  * TabbedShellPage (#438 Part 5): the tabbed app shell as a
@@ -117,6 +120,16 @@ export type TabbedShellPageLinkTab = {
 type TabbedShellPageBaseProps = {
   /** The app title at the shell's head — the host's app name (e.g. "Memorize"). */
   title: string;
+  /**
+   * An optional non-blocking notice (#765), as data: a message
+   * plus an optional recovery action ({ label, onPress } — a
+   * callback, never an href, per #248). When present it renders
+   * between the top bar / tab bar and the content slot via
+   * BannerRow / StatusMessage (the polite live region announces
+   * it); the tab content stays mounted underneath. When absent,
+   * no notice renders and the shell is unchanged.
+   */
+  notice?: { message: string; action?: { label: string; onPress: () => void } };
   /** The tab list's accessible name (Memorize's shell: "Memorize sections"). */
   tabsLabel?: string;
   /**
@@ -184,7 +197,7 @@ export type TabbedShellPageProps = TabbedShellPageBaseProps &
  * see the file header for the contract and the ownership split.
  */
 export function TabbedShellPage(props: TabbedShellPageProps) {
-  const { title, tabsLabel, footer, activeTabId, onReload, contentKey } = props;
+  const { title, tabsLabel, footer, activeTabId, onReload, contentKey, notice } = props;
 
   let tabBar: ReactNode;
   let content: ReactNode;
@@ -224,6 +237,14 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
       <ScreenContainer>
         <AppTopBar brand={{ label: title }} />
         {tabBar}
+        {notice ? (
+          <BannerRow>
+            <StatusMessage message={notice.message} />
+            {notice.action ? (
+              <Button onPress={notice.action.onPress}>{notice.action.label}</Button>
+            ) : null}
+          </BannerRow>
+        ) : null}
         {content !== undefined ? (
           <LazySlot
             key={contentKey ?? surfaceKey}

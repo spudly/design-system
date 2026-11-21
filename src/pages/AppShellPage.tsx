@@ -9,6 +9,9 @@ import {
   type AppTopBarSearch,
 } from "../widgets/AppTopBar.js";
 import { LazySlot } from "../views/LazySlot.js";
+import { BannerRow } from "../widgets/BannerRow.js";
+import { Button } from "../widgets/Button.js";
+import { StatusMessage } from "../widgets/StatusMessage.js";
 
 /**
  * AppShellPage (#437): the routed app shell as a design-system
@@ -114,6 +117,16 @@ export type AppShellPageProps = {
   /** The top-bar's right-side actions (e.g. Sign in / account). */
   actions?: AppShellPageAction[];
   /**
+   * An optional non-blocking notice (#765), as data: a message
+   * plus an optional recovery action ({ label, onPress } — a
+   * callback, never an href, per #248). When present it renders
+   * between the top bar and the content slot via BannerRow /
+   * StatusMessage (the polite live region announces it); the
+   * page content stays mounted underneath. When absent, no
+   * notice renders and the shell is unchanged.
+   */
+  notice?: { message: string; action?: { label: string; onPress: () => void } };
+  /**
    * The page footer (#410): caller-supplied BigFooter data, in
    * the standard shape every page takes. Omitted, no footer
    * band renders.
@@ -147,6 +160,7 @@ export function AppShellPage({
   activeItemId,
   search,
   actions,
+  notice,
   footer,
   onReload,
   contentKey,
@@ -163,6 +177,14 @@ export function AppShellPage({
           {...(search !== undefined ? { search } : null)}
           {...(actions !== undefined ? { actions } : null)}
         />
+        {notice ? (
+          <BannerRow>
+            <StatusMessage message={notice.message} />
+            {notice.action ? (
+              <Button onPress={notice.action.onPress}>{notice.action.label}</Button>
+            ) : null}
+          </BannerRow>
+        ) : null}
         <LazySlot
           key={contentKey ?? activeItemId ?? "page"}
           {...(onReload !== undefined ? { onReload } : null)}

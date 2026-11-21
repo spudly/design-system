@@ -153,6 +153,47 @@ export const NoFooter: Story = {
   ),
 };
 
+/** With a non-blocking notice (#765): message only, above the content. */
+export const WithNotice: Story = {
+  render: () => (
+    <>
+      <AppShellPage
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
+        navItems={eciperayNav}
+        navLabel="Eciperay sections"
+        activeItemId="recipes"
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        footer={eciperayFooterFixture}
+        notice={{ message: "Your profile could not be loaded." }}
+      >
+        <RecipesContent />
+      </AppShellPage>
+    </>
+  ),
+};
+
+/** With a notice carrying a recovery action (#765): message plus a retry Button. */
+export const WithNoticeAction: Story = {
+  render: () => (
+    <>
+      <AppShellPage
+        brand={{ label: "Eciperay", href: "/", mark: "eciperay" }}
+        navItems={eciperayNav}
+        navLabel="Eciperay sections"
+        activeItemId="recipes"
+        actions={[{ id: "sign-out", label: "Sign out", onPress: () => {} }]}
+        footer={eciperayFooterFixture}
+        notice={{
+          message: "Your profile could not be loaded.",
+          action: { label: "Try again", onPress: () => {} },
+        }}
+      >
+        <RecipesContent />
+      </AppShellPage>
+    </>
+  ),
+};
+
 /** A child that fails the way a rejected lazy chunk import does. */
 function FailingContent(): never {
   throw new Error("Failed to fetch dynamically imported module");

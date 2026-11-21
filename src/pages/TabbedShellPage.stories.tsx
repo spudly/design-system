@@ -207,6 +207,41 @@ export const DrillOpen: Story = {
   ),
 };
 
+/** With a non-blocking notice (#765): message only, above the tab content. */
+export const WithNotice: Story = {
+  render: () => (
+    <>
+      <TabbedShellPage
+        title="Memorize"
+        tabsLabel="Memorize sections"
+        tabs={memorizeTabs}
+        activeTabId="verses"
+        onTabSelect={() => {}}
+        notice={{ message: "Your verses could not be refreshed." }}
+      />
+    </>
+  ),
+};
+
+/** With a notice carrying a recovery action (#765): message plus a retry Button. */
+export const WithNoticeAction: Story = {
+  render: () => (
+    <>
+      <TabbedShellPage
+        title="Memorize"
+        tabsLabel="Memorize sections"
+        tabs={memorizeTabs}
+        activeTabId="verses"
+        onTabSelect={() => {}}
+        notice={{
+          message: "Your verses could not be refreshed.",
+          action: { label: "Try again", onPress: () => {} },
+        }}
+      />
+    </>
+  ),
+};
+
 /** The link form: tabs navigate (real hrefs); the host renders the current page as children. */
 export const LinkTabs: Story = {
   render: () => (
