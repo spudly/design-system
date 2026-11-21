@@ -8,7 +8,7 @@ import { FormStack } from "../widgets/FormStack.js";
 import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
 import { NumberStepper } from "../widgets/NumberStepper.js";
 import { TextAreaField } from "../widgets/TextAreaField.js";
-import { TextField } from "../widgets/TextField.js";
+import { TextField } from "../widgets/form/TextField.js";
 
 /**
  * MealPlanFormPage (#125, B3b): the meal plan form's view

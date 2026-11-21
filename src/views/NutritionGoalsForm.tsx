@@ -7,7 +7,7 @@ import { SpacedTopStack } from "../widgets/SpacedTopStack.js";
 import { TightStack } from "../widgets/TightStack.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
-import { TextField } from "../widgets/TextField.js";
+import { TextField } from "../widgets/form/TextField.js";
 import { useVoice } from "../voice/index.js";
 
 /**
