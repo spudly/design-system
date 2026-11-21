@@ -1,9 +1,9 @@
 import { Input as TamaguiInput, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { FieldShell } from "./FieldShell.js";
-import { useFieldA11y } from "../views/useFieldA11y.js";
-import { Text } from "./Text.js";
+import { tokens } from "../../tokens/index.js";
+import { FieldShell } from "../FieldShell.js";
+import { useFieldA11y } from "../../views/useFieldA11y.js";
+import { Text } from "../Text.js";
 
 const StyledInput = styled(TamaguiInput, {
   name: "TextField",

@@ -13,7 +13,7 @@ import { LoadingScope } from "../contexts/LoadingScope.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
 import { Text } from "../widgets/Text.js";
-import { TextField } from "../widgets/TextField.js";
+import { TextField } from "../widgets/form/TextField.js";
 import { TrailingActionsRow } from "../widgets/TrailingActionsRow.js";
 
 /**

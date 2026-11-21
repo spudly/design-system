@@ -12,7 +12,7 @@ import {
 import { Text } from "../widgets/Text.js";
 import { FieldRow } from "../widgets/form/FieldRow.js";
 import { SelectField, type SelectOption } from "../widgets/form/SelectField.js";
-import { TextField } from "../widgets/TextField.js";
+import { TextField } from "../widgets/form/TextField.js";
 
 /**
  * The catalog filter bar (#96, #168): the collapsed filter
