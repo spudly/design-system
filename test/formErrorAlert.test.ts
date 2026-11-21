@@ -43,8 +43,9 @@ const VIEW_FORM_COMPONENTS = new Set([
   "ForgotPasswordForm",
   "ResetPasswordForm",
 ]);
-// Form-category widgets live in src/widgets/form since #710.
-const FORM_CATEGORY_COMPONENTS = new Set(["SelectField", "ColorPickerField", "TextField"]);
+// Form-category widgets live in src/widgets/form since #710;
+// TextAreaField joined them in #748.
+const FORM_CATEGORY_COMPONENTS = new Set(["SelectField", "ColorPickerField", "TextField", "TextAreaField"]);
 const formSource = (name: string) =>
   read(
     `src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : FORM_CATEGORY_COMPONENTS.has(name) ? "widgets/form" : "widgets"}/${name}.tsx`,

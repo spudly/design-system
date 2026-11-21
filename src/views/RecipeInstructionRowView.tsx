@@ -4,7 +4,7 @@ import { Center } from "../widgets/Center.js";
 import { FieldRow } from "../widgets/form/FieldRow.js";
 import { Grow } from "../widgets/Grow.js";
 import { Text } from "../widgets/Text.js";
-import { TextAreaField } from "../widgets/TextAreaField.js";
+import { TextAreaField } from "../widgets/form/TextAreaField.js";
 import { useVoice } from "../voice/index.js";
 
 /**

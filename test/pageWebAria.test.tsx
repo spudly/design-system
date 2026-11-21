@@ -282,14 +282,14 @@ test("ChecklistRow's Checkbox and ProgressBar's Progress route through the trans
 test("field/primitive wrappers destructure caller RN props out of rest and translate them (#237)", () => {
   // Compact split form: this file sits at the max-lines cap.
   const wrappers =
-    "src/widgets/form/TextField.tsx,src/widgets/TextAreaField.tsx,src/widgets/CheckboxField.tsx,src/widgets/TextLink.tsx,src/widgets/OptionCard.tsx,src/widgets/Alert.tsx".split(
+    "src/widgets/form/TextField.tsx,src/widgets/form/TextAreaField.tsx,src/widgets/CheckboxField.tsx,src/widgets/TextLink.tsx,src/widgets/OptionCard.tsx,src/widgets/Alert.tsx".split(
       ",",
     );
   for (const rel of wrappers) {
     // TextField/TextAreaField route through the shared
     // useFieldA11y hook since #587 phase 3 — the translator call
     // lives there, so scan the field and the hook together.
-    const isField = rel === "src/widgets/form/TextField.tsx" || rel === "src/widgets/TextAreaField.tsx";
+    const isField = rel === "src/widgets/form/TextField.tsx" || rel === "src/widgets/form/TextAreaField.tsx";
     const code = isField ? readCode(rel) + readCode("src/views/useFieldA11y.ts") : readCode(rel);
     // One needle per routing requirement: build a11yProps via the
     // translator, spread them onto the element, and destructure

@@ -155,7 +155,7 @@ test("the diff wash is the fields' semantic `changed` variant, defined in the fi
   );
   for (const [component, src] of [
     ["TextField", source("widgets/form", "TextField")],
-    ["TextAreaField", source("widgets", "TextAreaField")],
+    ["TextAreaField", source("widgets/form", "TextAreaField")],
   ] as const) {
     assert.ok(src.includes("changed: {"), `${component} must define the changed variant`);
     assert.ok(

@@ -7,7 +7,7 @@ import { CompactStack } from "../widgets/CompactStack.js";
 import { ContentStack } from "../widgets/ContentStack.js";
 import { EndRow } from "../widgets/EndRow.js";
 import { Text } from "../widgets/Text.js";
-import { TextAreaField } from "../widgets/TextAreaField.js";
+import { TextAreaField } from "../widgets/form/TextAreaField.js";
 import { useVoice } from "../voice/index.js";
 
 type RecipeCommentsViewComment = {
