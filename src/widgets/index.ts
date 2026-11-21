@@ -26,7 +26,12 @@ export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
 export { DetailRow, type DetailRowProps } from "./DetailRow.js";
 export { Divider, type DividerProps } from "./Divider.js";
-export { Dropdown, useDropdownClose, type DropdownAlign, type DropdownProps } from "./form/Dropdown.js";
+export {
+  Dropdown,
+  useDropdownClose,
+  type DropdownAlign,
+  type DropdownProps,
+} from "./form/Dropdown.js";
 export { DropdownButton, type DropdownButtonProps } from "./form/DropdownButton.js";
 export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export { FixedActionBanner, type FixedActionBannerProps } from "./FixedActionBanner.js";
@@ -42,6 +47,7 @@ export { CardRow, type CardRowProps } from "./CardRow.js";
 export { ListRow, type ListRowProps } from "./ListRow.js";
 export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./MessageCard.js";
+export { MetadataBadge, type MetadataBadgeProps } from "./MetadataBadge.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";
 export { ProgressBar, type ProgressBarProps } from "./ProgressBar.js";
