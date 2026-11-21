@@ -86,8 +86,14 @@ export function Switch({ label, description, checked, onCheckedChange }: SwitchP
             part of the styled component's own styles — always loses to
             the HOC's direct prop, which is why the thumb stayed left
             when on. Travel is deterministic from this file's geometry:
-            48px track − 24px thumb − 2×2px frame padding = 20px. */}
-        <StyledThumb x={checked ? 20 : 0} transition="fast" />
+            48px track − 24px thumb − 2×2px frame padding = 20px.
+            `alignSelf` is likewise pinned to flex-start: the HOC sets
+            the thumb's alignment from the INITIAL checked state
+            (flex-end when mounted checked, paired with its own
+            compensating x), so the offset's origin must be fixed here
+            for the direct `x` to mean the same thing however the
+            switch was mounted. */}
+        <StyledThumb alignSelf="flex-start" x={checked ? 20 : 0} transition="fast" />
       </StyledSwitch>
     </XStack>
   );
