@@ -11,7 +11,7 @@ const StyledSwitch = styled(TamaguiSwitch, {
   // design system's size tokens are the numeric spacing scale, so the
   // lookup resolved to nothing and the switch rendered with no width or
   // height at all. 48x32 track; the thumb travel is driven from the
-  // switch state by StyledThumb's `on` variant (see there).
+  // switch state by a direct `x` prop on the thumb (see there).
   width: tokens.spacing[12],
   height: tokens.spacing[8],
   borderRadius: tokens.radii.full,
@@ -43,24 +43,6 @@ const StyledThumb = styled(TamaguiSwitch.Thumb, {
   // spacing token exists — the scale is 4px-based — so the literal is
   // intentional.)
   marginTop: 2,
-
-  variants: {
-    on: {
-      true: {
-        // Horizontal travel is driven from the switch state here, not
-        // measured by Tamagui at runtime: the frame's dynamic size
-        // machinery resolves to nothing against this repo's numeric
-        // spacing-token scale (see StyledSwitch), so the runtime travel
-        // was never reliably applied and the knob stayed left when on.
-        // Travel is deterministic from this file's geometry: 48px track
-        // − 24px thumb − 2×2px frame padding = 20px.
-        x: 20,
-      },
-      false: {
-        x: 0,
-      },
-    },
-  } as const,
 });
 
 export type SwitchProps = {
@@ -95,8 +77,23 @@ export function Switch({ label, description, checked, onCheckedChange }: SwitchP
             the mechanism the CSS animation driver turns into a real
             transition (the `animation` prop compiles to a 0s keyframe
             reference in this repo and never visibly animates; see
-            Collapsible). It transitions the thumb's `x` offset on toggle. */}
-        <StyledThumb on={checked} transition="fast" />
+            Collapsible). It transitions the thumb's `x` offset on toggle.
+            The travel is a DIRECT prop, not a styled variant (#750):
+            Tamagui's createSwitch Thumb HOC computes the thumb's `x`
+            itself from runtime layout measurement and renders it before
+            spreading the thumb's props, so a direct `x` here overrides
+            the HOC's value deterministically, while a variant `x` —
+            part of the styled component's own styles — always loses to
+            the HOC's direct prop, which is why the thumb stayed left
+            when on. Travel is deterministic from this file's geometry:
+            48px track − 24px thumb − 2×2px frame padding = 20px.
+            `alignSelf` is likewise pinned to flex-start: the HOC sets
+            the thumb's alignment from the INITIAL checked state
+            (flex-end when mounted checked, paired with its own
+            compensating x), so the offset's origin must be fixed here
+            for the direct `x` to mean the same thing however the
+            switch was mounted. */}
+        <StyledThumb alignSelf="flex-start" x={checked ? 20 : 0} transition="fast" />
       </StyledSwitch>
     </XStack>
   );

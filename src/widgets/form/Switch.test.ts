@@ -1,3 +1,5 @@
+import "../../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -64,28 +66,84 @@ describe("switchStories", () => {
 });
 
 describe("switchThumb", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
-  const source = readFileSync(join(root, "src", "widgets", "form", "Switch.tsx"), "utf8");
-  const thumb = source.slice(
-    source.indexOf("const StyledThumb"),
-    source.indexOf("export type SwitchProps"),
-  );
+  // Behavioral (#750, superseding the #484 source pins): SSR-render the
+  // built Switch in both states and read the thumb's resolved horizontal
+  // offset out of the rendered output. Tamagui compiles `x` to a `--t-x`
+  // CSS variable delivered by a generated class on the thumb element;
+  // when two rules target that class the later one wins (the cascade),
+  // so the resolved offset is the LAST `--t-x` rule for the thumb's
+  // class in the rendered stylesheet.
+  function thumbClass(html: string, prefix: string): string {
+    const thumb = /name="SwitchThumb"[^>]*class="([^"]*)"/.exec(html);
+    assert.ok(thumb, "rendered output must contain the SwitchThumb element");
+    const found = thumb[1].split(" ").find((name) => name.startsWith(prefix));
+    assert.ok(found, `the thumb element must carry a ${prefix} class`);
+    return found;
+  }
 
-  test("StyledThumb carries an on variant with the 20px travel offset (#484)", () => {
-    assert.match(thumb, /on:\s*\{\s*true:\s*\{[^}]*x: 20/s, "on:true must offset the thumb 20px");
-    assert.match(thumb, /false:\s*\{\s*x: 0,?\s*\}/s, "on:false must leave the thumb at offset 0");
+  function resolvedThumbOffset(html: string): number {
+    const txClass = thumbClass(html, "_tx-");
+    const rules = [
+      ...html.matchAll(new RegExp(`\\.${txClass.replace("-", "\\-")}\\{--t-x:(-?\\d+)px\\}`, "g")),
+    ];
+    assert.ok(rules.length > 0, `rendered CSS must define --t-x for ${txClass}`);
+    return Number(rules[rules.length - 1][1]);
+  }
+
+  function resolvedThumbAlignSelf(html: string): string {
+    const asClass = thumbClass(html, "_as-");
+    const rules = [
+      ...html.matchAll(
+        new RegExp(`\\.${asClass.replace("-", "\\-")}\\{align-self:([a-z-]+)\\}`, "g"),
+      ),
+    ];
+    assert.ok(rules.length > 0, `rendered CSS must define align-self for ${asClass}`);
+    return rules[rules.length - 1][1];
+  }
+
+  async function renderSwitch(checked: boolean): Promise<string> {
+    const React = (await import("react")).default;
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider }: Record<string, any> = await import("tamagui");
+    const dist: Record<string, any> = await loadInternalDist();
+    const config = dist.createTamaguiConfig(dist.baseTheme);
+    return renderToString(
+      React.createElement(
+        TamaguiProvider,
+        { config },
+        React.createElement(dist.Switch, {
+          label: "Email notifications",
+          checked,
+          onCheckedChange: () => {},
+        }),
+      ),
+    );
+  }
+
+  test("the rendered thumb sits at offset 0 when off and travels 20px when on (#750)", async () => {
+    const off = resolvedThumbOffset(await renderSwitch(false));
+    const on = resolvedThumbOffset(await renderSwitch(true));
+    assert.equal(off, 0, "off: the thumb's resolved --t-x must be 0px");
+    assert.equal(on, 20, "on: the thumb's resolved --t-x must be the full 20px travel");
+    assert.equal(on - off, 20, "toggling must move the thumb by the 20px travel");
   });
 
-  test("Switch passes its checked state to the thumb and transitions the travel (#484)", () => {
-    assert.match(
-      source,
-      /<StyledThumb on=\{checked\} transition="fast" \/>/,
-      'the thumb\'s on variant must be keyed off checked and animated with transition="fast"',
+  test("the rendered thumb's alignment origin is flex-start in both states (#750)", async () => {
+    // Tamagui's Thumb HOC sets alignSelf from the INITIAL checked state
+    // (flex-end when mounted checked, paired with its own compensating
+    // x). The Switch pins flex-start so the direct x offset has the
+    // same origin however the switch was mounted — an initially checked
+    // render (this test's `on` render) must report the same origin as
+    // an initially unchecked one.
+    assert.equal(
+      resolvedThumbAlignSelf(await renderSwitch(false)),
+      "flex-start",
+      "off: the thumb's resolved align-self must be flex-start",
     );
-    assert.doesNotMatch(
-      source,
-      /animation=/,
-      "the animation prop never visibly animates in this repo (#457)",
+    assert.equal(
+      resolvedThumbAlignSelf(await renderSwitch(true)),
+      "flex-start",
+      "on (mounted checked): the thumb's resolved align-self must be flex-start",
     );
   });
 });
