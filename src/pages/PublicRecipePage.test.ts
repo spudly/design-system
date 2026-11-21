@@ -19,9 +19,8 @@ const strip = (text: string) =>
 const code = strip(source);
 // The recipe sections are the shared library panels (see the
 // header), so the section scans read the panel sources; the
-// page source hosts the wiring pins (render order, status map).
+// page source hosts the wiring pins (render order).
 const overviewCode = strip(readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8"));
-const statusBadgesCode = strip(readFileSync(join(pagesDir, "recipeStatusBadges.ts"), "utf8"));
 const ingredientsCode = strip(
   readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8"),
 );
@@ -286,21 +285,11 @@ test("tags render through Badge's color form, not an inline pill (#211)", () => 
   );
 });
 
-test("the status badge map is page-owned with the idea fallback", () => {
-  for (const [status, label] of [
-    ["idea", "Idea"],
-    ["evolving", "Evolving"],
-    ["perfected", "Perfected"],
-    ["abandoned", "Abandoned"],
-  ]) {
-    assert.ok(
-      statusBadgesCode.includes(`${status}: { label: "${label}"`),
-      `STATUS_BADGES must map ${status} to ${label}`,
-    );
-  }
-  assert.match(code, /STATUS_BADGES\[overview\.status\] \?\? STATUS_BADGES\.idea/);
-  assert.match(code, /statusTone=\{statusBadge\?\.tone \?\? "neutral"\}/);
-  assert.match(code, /statusLabel=\{statusBadge\?\.label \?\? "Idea"\}/);
+test("no status badge on the public overview (#735: recipe status removed)", () => {
+  assert.ok(!code.includes("STATUS_BADGES"), "the page must not resolve a status badge");
+  assert.ok(!code.includes("overview.status"), "the overview carries no status");
+  assert.ok(!code.includes("statusTone"), "the page must not feed a status tone to the panel");
+  assert.ok(!code.includes("statusLabel"), "the page must not feed a status label to the panel");
 });
 
 test("no explicit lineHeight anywhere in the new files (#162)", () => {

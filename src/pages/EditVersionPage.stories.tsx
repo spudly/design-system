@@ -29,7 +29,6 @@ function useFormProps(): RecipeFormPageProps {
   const [prepTimeMin, setPrepTimeMin] = useState(fixture.prepTimeMin);
   const [cookTimeMin, setCookTimeMin] = useState(fixture.cookTimeMin);
   const [sourceUrl, setSourceUrl] = useState(fixture.sourceUrl);
-  const [status, setStatus] = useState(fixture.status);
   const [tagIds, setTagIds] = useState<string[]>(fixture.tagIds);
   const noop = () => undefined;
   return {
@@ -45,9 +44,6 @@ function useFormProps(): RecipeFormPageProps {
     onCookTimeMinChange: setCookTimeMin,
     sourceUrl,
     onSourceUrlChange: setSourceUrl,
-    statusOptions: fixture.statusOptions,
-    status,
-    onStatusChange: setStatus,
     tagOptions: fixture.tagOptions,
     tagIds,
     onTagIdsChange: setTagIds,

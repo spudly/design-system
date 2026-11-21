@@ -83,7 +83,6 @@ function FormHarness({
   const [prepTimeMin, setPrepTimeMin] = useState(empty ? "" : fixture.prepTimeMin);
   const [cookTimeMin, setCookTimeMin] = useState(empty ? "" : fixture.cookTimeMin);
   const [sourceUrl, setSourceUrl] = useState(empty ? "" : fixture.sourceUrl);
-  const [status, setStatus] = useState(fixture.status);
   const [tagIds, setTagIds] = useState<string[]>(empty ? [] : fixture.tagIds);
   const [imageUri, setImageUri] = useState<string | null>(empty ? null : storyImageWide);
   const [ingredients, setIngredients] = useState<RecipeIngredientRow[]>(
@@ -112,9 +111,6 @@ function FormHarness({
       onCookTimeMinChange={setCookTimeMin}
       sourceUrl={sourceUrl}
       onSourceUrlChange={setSourceUrl}
-      statusOptions={fixture.statusOptions}
-      status={status}
-      onStatusChange={setStatus}
       tagOptions={fixture.tagOptions}
       tagIds={tagIds}
       onTagIdsChange={setTagIds}

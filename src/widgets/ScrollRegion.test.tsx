@@ -141,7 +141,6 @@ const publicRecipeReadyFixture = {
   state: "ready",
   overview: {
     title: "Landmark Soup",
-    status: "idea",
     servingsLabel: "4",
     tags: [],
   },
