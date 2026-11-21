@@ -90,7 +90,7 @@ export {
 } from "./form/RadioOptionGroup.js";
 export { SearchField, type SearchFieldProps } from "./form/SearchField.js";
 export { TextAreaField, type TextAreaFieldProps } from "./form/TextAreaField.js";
-export { TextField, type TextFieldProps } from "./TextField.js";
+export { TextField, type TextFieldProps } from "./form/TextField.js";
 export { Slider, type SliderProps } from "./form/Slider.js";
 export { BoxSkeleton, type BoxSkeletonProps } from "./BoxSkeleton.js";
 export { CircleSkeleton, type CircleSkeletonProps } from "./CircleSkeleton.js";
