@@ -504,9 +504,10 @@ test("the overview follows the recipe-detail visual direction (#721)", () => {
   assert.match(code, /categoryLabel\?: string;/);
   assert.match(code, /totalTimeLabel\?: string;/);
   assert.match(code, /cookingTipLabel\?: string;/);
-  // The metadata pill under the hero: Badge's success (sage)
-  // tone, parts joined in the direction's order.
-  assert.match(code, /<Badge tone="success">\{parts\.join\(" • "\)\}<\/Badge>/);
+  // The metadata pill under the hero: the reusable MetadataBadge
+  // widget (extracted from this page file at Stephen's PR #730
+  // review), parts composed in the direction's order.
+  assert.match(code, /<MetadataBadge/);
   assert.match(code, /servingsLabel \? `Serves \$\{servingsLabel\}` : undefined/);
   // The title is the serif display variant, bare (no CardStack).
   assert.match(code, /<Text variant="display">\{title\}<\/Text>/);

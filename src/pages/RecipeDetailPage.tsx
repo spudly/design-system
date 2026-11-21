@@ -37,6 +37,7 @@ import { SelectField } from "../widgets/form/SelectField.js";
 import { StatBand } from "../widgets/StatBand.js";
 import { StatCard } from "../widgets/StatCard.js";
 import { Badge } from "../widgets/Badge.js";
+import { MetadataBadge } from "../widgets/MetadataBadge.js";
 import { StatusMessage } from "../widgets/StatusMessage.js";
 import { StepList } from "../widgets/StepList.js";
 import { SuggestionPanel } from "../widgets/form/SuggestionPanel.js";
@@ -657,45 +658,18 @@ function LifecycleSection({
   );
 }
 
-/**
- * The metadata pill (#721): the visual direction's sage summary
- * line under the hero — category • total time • serves — composed
- * from the overview's app-supplied labels in that order, joining
- * whichever parts are present. Rendered through Badge's success
- * tone (the sage treatment already in the system); the pill is a
- * summary line, not a replacement for the StatBand's prep/cook
- * breakdown below. Renders nothing when no part exists.
- */
-function MetaPill({
-  categoryLabel,
-  totalTimeLabel,
-  servingsLabel,
-}: {
-  categoryLabel?: string | undefined;
-  totalTimeLabel?: string | undefined;
-  servingsLabel: string;
-}) {
-  const parts = [
-    categoryLabel,
-    totalTimeLabel,
-    servingsLabel ? `Serves ${servingsLabel}` : undefined,
-  ].filter((part): part is string => part !== undefined && part !== "");
-  if (parts.length === 0) {
-    return null;
-  }
-  return <Badge tone="success">{parts.join(" • ")}</Badge>;
-}
-
 function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }) {
   const { imageUrl, title, description, servingsLabel, categoryLabel, totalTimeLabel } = overview;
 
   return (
     <PanelStack>
       {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
-      <MetaPill
-        categoryLabel={categoryLabel}
-        totalTimeLabel={totalTimeLabel}
-        servingsLabel={servingsLabel}
+      <MetadataBadge
+        parts={[
+          categoryLabel,
+          totalTimeLabel,
+          servingsLabel ? `Serves ${servingsLabel}` : undefined,
+        ]}
       />
       <Text variant="display">{title}</Text>
       {description ? <Text variant="body">{description}</Text> : null}

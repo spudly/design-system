@@ -16,12 +16,13 @@ const toneStyles = {
     text: "$primaryEmphasis",
   },
   success: {
-    // Filled sage with white text (#721 fidelity round, Stephen
-    // 2026-11-20): the recipe-detail visual direction's metadata
-    // pill is a filled sage band sampled at #5C614F — not the pale
-    // tinted pill the success tone rendered before.
-    background: "#5c614f",
-    text: "#ffffff",
+    // Sage from the success token ramp (rebalanced to the visual
+    // direction's sage at the token level, PR #730 review): the
+    // same step pattern as every other tone — step-2 background,
+    // step-8 text — so all badge tones stay consistent and every
+    // theme keeps its own rendering through the shared tokens.
+    background: tokens.colors.success.success2,
+    text: tokens.colors.success.success8,
   },
   warning: {
     background: tokens.colors.warning.warning2,
