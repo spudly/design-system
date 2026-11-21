@@ -51,13 +51,17 @@ function declarationBlocks(html: string, className: string) {
   return html.match(new RegExp(String.raw`\.${className}\{[^}]*\}`, "g")) ?? [];
 }
 
-/** The padding-bottom value the outermost rendered element's classes generate, or null. */
+/**
+ * The below-the-row padding value the outermost rendered element's
+ * classes generate, or null. Tamagui emits the logical
+ * `padding-block-end` property for `paddingBlockEnd` on web.
+ */
 function renderedPaddingBottom(html: string) {
   const element = html.match(/<div class="([^"]*)"/);
   assert.ok(element, `expected a rendered row element in: ${html.slice(-600)}`);
   for (const className of element[1].split(/\s+/)) {
     for (const block of declarationBlocks(html, className)) {
-      const padding = block.match(/padding-bottom:([\d.]+px)/);
+      const padding = block.match(/(?:padding-bottom|padding-block-end):([\d.]+px)/);
       if (padding) return padding[1];
     }
   }
