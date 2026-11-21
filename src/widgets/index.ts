@@ -151,7 +151,6 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // inventoried as extraction-required during their adoption
 // rounds, shipped once here (the tranche PRs adopt these in
 // their post-extraction rounds).
-export { BadgeCardRow, type BadgeCardRowProps } from "./BadgeCardRow.js";
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
 export { FieldColumns, type FieldColumnsProps } from "./form/FieldColumns.js";
 export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";

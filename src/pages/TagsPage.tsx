@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { useState } from "react";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Alert } from "../widgets/Alert.js";
-import { BadgeCardRow } from "../widgets/BadgeCardRow.js";
+import { Badge } from "../widgets/Badge.js";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
 import { CardStack } from "../widgets/CardStack.js";
@@ -32,15 +32,15 @@ import { TrailingActionsRow } from "../widgets/TrailingActionsRow.js";
  *
  * Rows render the DS Badge in its colored-tag form (the
  * former TagPill, merged into Badge in #183) with Edit /
- * Delete actions rendered as ghost Buttons through
- * BadgeCardRow (#464, retiring TextAction), so they are real
+ * Delete actions rendered as ghost Buttons in the row's own
+ * inline composition (#464, retiring TextAction), so they are real
  * buttons — keyboard-focusable and Enter/Space-operable on
  * web; the row card treatment is the app view's, on DS
  * tokens. While `loading`, the list region renders skeleton
  * rows (#278, tranche 4 — the centered-Spinner pattern is
  * deleted): the title and the create form stay rendered (the
  * form is user input, not loaded content) and the list holds
- * exactly 3 dummy rows mirroring the BadgeCardRow composition
+ * exactly 3 dummy rows mirroring the display-row composition
  * — a pill bone at the badge's geometry in a compact card,
  * with the row's ghost actions kept as inert text-bone
  * Buttons inside the loading scope (Edit only when the host
@@ -86,9 +86,11 @@ import { TrailingActionsRow } from "../widgets/TrailingActionsRow.js";
  * `title` variant, each form's fields stack in FormStack,
  * the picker-and-actions rows are TrailingActionsRow (which
  * carries the #219 wrap), the editor card is Card's `compact`
- * variant, each display row renders through BadgeCardRow (the badge
- * and its actions cross as data — the badge's color among
- * them), and the rows stack in CardStack at its 8px rhythm
+ * variant, each display row composes its badge and ghost
+ * action Buttons inline in a compact Card (#709 — the row
+ * was a single-use widget until it was inlined into this,
+ * its only caller), and the rows stack in CardStack at
+ * its 8px rhythm
  * (the per-row bottom padding they carried before). The
  * display row composes through the same TrailingActionsRow
  * as the form rows, so it gains the same wrap at narrow
@@ -369,36 +371,35 @@ export function TagsPage({
                     </FormStack>
                   </Card>
                 ) : (
-                  <BadgeCardRow
-                    key={tag.id}
-                    badgeLabel={tag.name}
-                    badgeColor={tag.color}
-                    actions={[
-                      ...(onStartEdit && tag.canEdit !== false
-                        ? [
-                            {
-                              label: "Edit",
-                              accessibilityLabel: `Edit tag ${tag.name}`,
-                              onPress: () => {
-                                onStartEdit(tag);
-                              },
-                            },
-                          ]
-                        : []),
-                      ...(tag.canDelete !== false
-                        ? [
-                            {
-                              label: "Delete",
-                              accessibilityLabel: `Delete tag ${tag.name}`,
-                              variant: "error" as const,
-                              onPress: () => {
-                                handleDelete(tag.id);
-                              },
-                            },
-                          ]
-                        : []),
-                    ]}
-                  />
+                  <Card key={tag.id} variant="compact">
+                    <TrailingActionsRow leading={<Badge color={tag.color}>{tag.name}</Badge>}>
+                      {onStartEdit && tag.canEdit !== false ? (
+                        <Button
+                          ghost
+                          size="sm"
+                          accessibilityLabel={`Edit tag ${tag.name}`}
+                          onPress={() => {
+                            onStartEdit(tag);
+                          }}
+                        >
+                          Edit
+                        </Button>
+                      ) : null}
+                      {tag.canDelete !== false ? (
+                        <Button
+                          ghost
+                          size="sm"
+                          variant="danger"
+                          accessibilityLabel={`Delete tag ${tag.name}`}
+                          onPress={() => {
+                            handleDelete(tag.id);
+                          }}
+                        >
+                          Delete
+                        </Button>
+                      ) : null}
+                    </TrailingActionsRow>
+                  </Card>
                 ),
               )}
             </CardStack>

@@ -240,13 +240,9 @@ test("TagsPage takes its palette as a prop and renders DS Badges as colored tags
   const source = page("TagsPage");
   // #207: the palette crosses as tag color token names, not raw hexes.
   assert.match(source, /colorOptions: TagColorName\[\]/);
-  // Since the #119 de-styling the rows render through
-  // BadgeCardRow: the page passes the tag's name and color name
-  // as the badge's data (Badge's `color` is a style-named prop,
-  // which pages may not set), and the row renders the Badge.
-  assert.match(source, /badgeLabel=\{tag\.name\}/);
-  assert.match(source, /badgeColor=\{tag\.color\}/);
-  assert.match(component("BadgeCardRow"), /<Badge color=\{badgeColor\}>\{badgeLabel\}<\/Badge>/);
+  // Since #709 the display row is inlined into the page: it
+  // renders the Badge directly from the tag's name and color.
+  assert.match(source, /<Badge color=\{tag\.color\}>\{tag\.name\}<\/Badge>/);
   assert.match(source, /ColorPickerField/);
 });
 
@@ -263,9 +259,9 @@ test("TagsPage supports inline rename through a controlled edit draft (eciperay#
   assert.match(source, /onSaveEdit\?: \(\) => TagsPageOperationResult/);
   assert.match(source, /onCancelEdit\?: \(\) => void/);
   // The row offers an accessible Edit action and the editor a Save action.
-  // Since #119 the Edit action crosses as BadgeCardRow action
-  // data, so its label is composed in an object property.
-  assert.match(source, /accessibilityLabel: `Edit tag \$\{tag\.name\}`/);
+  // Since #709 the Edit action is an inline ghost Button, so its
+  // label is composed in the Button's accessibilityLabel prop.
+  assert.match(source, /accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/);
   assert.match(source, /accessibilityLabel="Save"/);
 });
 
