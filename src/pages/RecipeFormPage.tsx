@@ -41,11 +41,9 @@ import { Badge } from "../widgets/Badge.js";
  *   upload, field validation, and submission. This view validates
  *   nothing and submits nothing: `onSubmit` is a bare intent, and
  *   the host builds the recipe input from its own state.
- * - Option data is app data: status options and tag options cross
- *   as { value, label } view-models (the app owns the status set
- *   and the tags query); the status selector is a row of DS toggle
- *   Buttons (Button's `selected` form in a ButtonRow — the chip
- *   components are retired), and the tag selector is a row of
+ * - Option data is app data: tag options cross
+ *   as { value, label } view-models (the app owns the tags query);
+ *   the tag selector is a row of
  *   selectable Badges (Badge's selectable form — a tag renders as
  *   a Badge, including when it selects). Tag loading
  *   crosses as `loadingTags` — while it is set, the tag row
@@ -143,11 +141,6 @@ export type RecipeFormPageProps = {
   sourceUrl: string;
   onSourceUrlChange: (value: string) => void;
 
-  /** Status picker: the option set is app data (statuses + labels). */
-  statusOptions: RecipeFormPageOption[];
-  status: string;
-  onStatusChange: (value: string) => void;
-
   /** Tag picker: options come from the host's tags query. */
   tagOptions: RecipeFormPageOption[];
   tagIds: string[];
@@ -225,9 +218,6 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
     onCookTimeMinChange,
     sourceUrl,
     onSourceUrlChange,
-    statusOptions,
-    status,
-    onStatusChange,
     tagOptions,
     tagIds,
     onTagIdsChange,
@@ -289,24 +279,6 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
               value={title}
               onChangeText={onTitleChange}
             />
-          </LabeledField>
-
-          <LabeledField label="Status">
-            <ButtonRow>
-              {statusOptions.map((option) => (
-                <Button
-                  key={option.value}
-                  variant="secondary"
-                  size="sm"
-                  selected={status === option.value}
-                  onPress={() => {
-                    onStatusChange(option.value);
-                  }}
-                >
-                  {option.label}
-                </Button>
-              ))}
-            </ButtonRow>
           </LabeledField>
 
           <LabeledField

@@ -124,8 +124,12 @@ test("no recipe surface gains a second level-1 heading from the panel (#364)", (
 test("the status badge is the shared Badge fed caller-resolved tone and label", () => {
   assert.match(
     panelCode,
-    /<Badge tone=\{statusTone\}>\{statusLabel\}<\/Badge>/,
+    /<Badge tone=\{statusTone \?\? "neutral"\}>\{statusLabel\}<\/Badge>/,
     "the badge is the shared Badge with the caller's tone and label",
+  );
+  assert.ok(
+    panelCode.includes("statusLabel ? ("),
+    "the badge renders only when the caller supplies a status label (#735)",
   );
   assert.ok(
     !panelCode.includes("STATUS_BADGES"),

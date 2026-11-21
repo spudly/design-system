@@ -70,10 +70,12 @@ export type RecipeOverviewPanelProps = {
   title: string;
   description?: string | null;
   /** The status badge's tone, resolved by the caller from its
-   * status vocabulary. */
-  statusTone: NonNullable<BadgeProps["tone"]>;
-  /** The status badge's label, resolved by the caller. */
-  statusLabel: string;
+   * status vocabulary. Optional (#735): callers with no status
+   * vocabulary omit the pair and no badge renders. */
+  statusTone?: NonNullable<BadgeProps["tone"]>;
+  /** The status badge's label, resolved by the caller. The badge
+   * renders only when a label is supplied. */
+  statusLabel?: string;
   /** Stat band values, app-formatted ("4", "15m", "30m"). */
   servingsLabel: string;
   prepTimeLabel?: string;
@@ -129,17 +131,19 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
           <YStack paddingBlockEnd="$2">
             <TextSkeleton size="2xl" lines={1} />
           </YStack>
-          <YStack paddingBlockEnd="$4" alignSelf="flex-start">
-            <SkeletonBone
-              width={
-                Math.round(statusLabel.length * tokens.typography.fontSize.xs * 0.62) +
-                tokens.spacing[2] * 2 +
-                2
-              }
-              height={14 + tokens.spacing[1] * 2 + 2}
-              borderRadius={tokens.radii.full}
-            />
-          </YStack>
+          {statusLabel ? (
+            <YStack paddingBlockEnd="$4" alignSelf="flex-start">
+              <SkeletonBone
+                width={
+                  Math.round(statusLabel.length * tokens.typography.fontSize.xs * 0.62) +
+                  tokens.spacing[2] * 2 +
+                  2
+                }
+                height={14 + tokens.spacing[1] * 2 + 2}
+                borderRadius={tokens.radii.full}
+              />
+            </YStack>
+          ) : null}
           {description ? (
             <YStack paddingBlockEnd="$4">
               <TextSkeleton size="md" lines={2} />
@@ -175,9 +179,11 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
           {title}
         </Text>
       </YStack>
-      <YStack paddingBlockEnd="$4" alignSelf="flex-start">
-        <Badge tone={statusTone}>{statusLabel}</Badge>
-      </YStack>
+      {statusLabel ? (
+        <YStack paddingBlockEnd="$4" alignSelf="flex-start">
+          <Badge tone={statusTone ?? "neutral"}>{statusLabel}</Badge>
+        </YStack>
+      ) : null}
       {description ? (
         <YStack paddingBlockEnd="$4">
           <Text color={tokens.colors.gray.gray7}>{description}</Text>
