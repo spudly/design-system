@@ -235,13 +235,16 @@ test("overlay pages get a viewport-bounded region with or without footer data (#
     bigFooter.indexOf('if (scrollMode === "overlay")') < bigFooter.indexOf("if (!footer)"),
     "the web overlay branch precedes the web footer branches",
   );
-  // Both cooking-mode pages opt in; their error/plain branches
-  // and every other page keep their existing modes.
+  // The cooking-mode pages were the overlay mode's consumers;
+  // since #752/#753 they render NO footer at all and frame
+  // their StepOverlay in FullScreenShell instead — the overlay
+  // branch above remains the shell's footer-bearing form of
+  // the same viewport-bounded region.
   for (const entry of ["CookingModePage.tsx", "MealCookingModePage.tsx"]) {
     const code = readCode(join("src", "pages", entry));
     assert.ok(
-      code.includes('<BigFooterShell footer={props.footer} scrollMode="overlay">'),
-      `${entry} must render its StepOverlay shell in overlay mode`,
+      code.includes("<FullScreenShell>"),
+      `${entry} must frame its StepOverlay shell in FullScreenShell`,
     );
   }
   // The regression stories render the exact no-footer host
