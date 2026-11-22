@@ -115,6 +115,13 @@ test("every page component renders BigFooter through the shell from a footer pro
     // RecipesPage and HomePage render — page-local scaffolding,
     // not a page; it renders no footer of its own.
     "recipeRow.tsx",
+    // The cooking-mode pages are full-screen views (#752/#753,
+    // Stephen's Storybook-review direction 2026-11-20): they
+    // render NO Big Footer and take no footer prop — they frame
+    // themselves in FullScreenShell instead. They are the
+    // standing exception to the #410 every-page-footer rule.
+    "CookingModePage.tsx",
+    "MealCookingModePage.tsx",
     "fixtures.ts",
     "useCatalogPagination.ts",
     "index.ts",
