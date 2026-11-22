@@ -261,7 +261,7 @@ test("rows translate the disabled state; the generic rows keep the button role i
       assert.match(code, disabled, `${rel}: the disabled state must go through the translator`);
   }
   assert.doesNotMatch(
-    readCode("src/pages/MealDetailPage.tsx"),
+    readCode("src/pages/eciperay/MealDetailPage.tsx"),
     ROLE,
     "MealDetailPage's rows are links (#248) — no button role may come back through the translator",
   );

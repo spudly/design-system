@@ -30,7 +30,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pagesDir = join(here, "..", "src", "pages");
+const pagesDir = join(here, "..", "src", "pages", "eciperay");
 
 function pageCode(name: string) {
   const source = readFileSync(join(pagesDir, `${name}.tsx`), "utf8");

@@ -5,7 +5,7 @@ import type { Voice } from "./Voice.js";
  *
  * The DS ships no default strings; this complete fixture object
  * exists so stories can render, under the same determinism rules as
- * src/pages/fixtures.ts. Its type is Voice, so a missing slot is a
+ * src/pages/shared/fixtures.ts. Its type is Voice, so a missing slot is a
  * compile error — that is the parity gate for the fixture.
  *
  * The strings here are neutral placeholder copy for Storybook, not

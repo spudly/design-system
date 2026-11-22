@@ -1,7 +1,7 @@
 ---
 component: AutocompletePicker
 run_when:
-  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/form/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
+  - "src/pages/eciperay/RecipeFormPage.tsx, src/pages/eciperay/MealFormPage.tsx, src/pages/eciperay/MealPlanFormPage.tsx, src/widgets/form/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
   - "src/widgets/form/AutocompletePicker.tsx, its stories, or a changeset naming AutocompletePicker."
 ---
 
@@ -51,8 +51,8 @@ Default, NoSelection, SaveError. Open in
    entry in their own field stacks; NoSelection disables Save
    plan.
 
-**Run when:** `src/pages/RecipeFormPage.tsx`,
-`src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
+**Run when:** `src/pages/eciperay/RecipeFormPage.tsx`,
+`src/pages/eciperay/MealFormPage.tsx`, `src/pages/eciperay/MealPlanFormPage.tsx`,
 `src/widgets/form/AutocompletePicker.tsx`, their stories, or a
 changeset naming any of the three pages or
 AutocompletePicker. Run only the numbered cases for the

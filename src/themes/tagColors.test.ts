@@ -148,10 +148,10 @@ test("components resolve tag colors through the one shared resolver", () => {
   assert.match(picker, /colors: TagColorName\[\]/);
   assert.match(picker, /useTagColorResolver\(\)/);
 
-  const tagsPage = read("src/pages/TagsPage.tsx");
+  const tagsPage = read("src/pages/eciperay/TagsPage.tsx");
   assert.match(tagsPage, /colorOptions: TagColorName\[\]/);
 
-  const recipeDetail = read("src/pages/RecipeDetailPage.tsx");
+  const recipeDetail = read("src/pages/eciperay/RecipeDetailPage.tsx");
   assert.doesNotMatch(recipeDetail, /useTagColorResolver\(\)/);
 
   // RecipeDetailPage's tags render through TagList since the #119
@@ -176,9 +176,9 @@ test("the tag color API is strictly typed: names only, no hex pass-through", () 
   const picker = read("src/widgets/form/ColorPickerField.tsx");
   assert.match(picker, /value\?: TagColorName;/);
 
-  const tagsPage = read("src/pages/TagsPage.tsx");
+  const tagsPage = read("src/pages/eciperay/TagsPage.tsx");
   assert.match(tagsPage, /color: TagColorName;/);
 
-  const recipeDetail = read("src/pages/RecipeDetailPage.tsx");
+  const recipeDetail = read("src/pages/eciperay/RecipeDetailPage.tsx");
   assert.match(recipeDetail, /color: TagColorName;/);
 });

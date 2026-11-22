@@ -312,12 +312,12 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   // RecipesPage's loading props are the qualified forms since
   // #415 (one per section of the unified page): loading +
   // qualifier, never isLoading.
-  assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
-  assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
-  assert.match(read("src/pages/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
+  assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
+  assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
+  assert.match(read("src/pages/eciperay/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
   assert.match(read("src/widgets/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
-  assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloadingSubstitutions\?: boolean/);
-  assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloading\?: boolean/);
+  assert.match(read("src/pages/eciperay/RecipeDetailPage.tsx"), /\bloadingSubstitutions\?: boolean/);
+  assert.match(read("src/pages/eciperay/RecipeDetailPage.tsx"), /\bloading\?: boolean/);
 });
 
 // ---------------------------------------------------------------------------
@@ -1372,21 +1372,21 @@ test("T4: every converted page renders skeletons — no Spinner remains in its c
   }
   // The per-page skeleton compositions, pinned:
   assert.match(
-    readCode("src/pages/RecipeFormPage.tsx"),
+    readCode("src/pages/eciperay/RecipeFormPage.tsx"),
     /<TagList tags=\{\[\]\} loading \/>/,
     "RecipeFormPage's tags fetch renders TagList's loading pills, not a spinner",
   );
   assert.match(
-    readCode("src/pages/RecipesPage.tsx"),
+    readCode("src/pages/eciperay/RecipesPage.tsx"),
     /function LoadingOwnRows\(\)/,
     "RecipesPage's own section loads as MediaRow-shaped skeleton rows",
   );
   assert.match(
-    readCode("src/pages/RecipesPage.tsx"),
+    readCode("src/pages/eciperay/RecipesPage.tsx"),
     /function LoadingDiscoveryRows\(/,
     "RecipesPage's discovery/public sections load as skeleton DiscoveryCards",
   );
-  const detail = readCode("src/pages/RecipeDetailPage.tsx");
+  const detail = readCode("src/pages/eciperay/RecipeDetailPage.tsx");
   assert.match(
     detail,
     /LOADING_COOK_LOG_KEYS\.map/,
@@ -1400,12 +1400,12 @@ test("T4: every converted page renders skeletons — no Spinner remains in its c
 });
 test("T4: the approved spinner survivors keep their Spinners", () => {
   assert.match(
-    readCode("src/pages/PayPage.tsx"),
+    readCode("src/pages/eciperay/PayPage.tsx"),
     /<Spinner label=\{voice\.payPage\.openingLabel\} \/>/,
     "PayPage's wait is an external secure-payment window — no page content shape to skeletonize (approved survivor)",
   );
   assert.match(
-    readCode("src/pages/VerseSearchPage.tsx"),
+    readCode("src/pages/memorize/VerseSearchPage.tsx"),
     /\{isSearching \? <Spinner label="Loading" \/> : null\}/,
     "VerseSearchPage's inline search keeps its spinner — the field and existing results stay live (approved survivor)",
   );
@@ -1420,14 +1420,14 @@ let pagesPromise: Promise<Record<string, any>> | undefined;
 function loadPages() {
   pagesPromise ??= (async () => {
     const modules = await Promise.all([
-      import("../../dist/pages/HomePage.js"),
-      import("../../dist/pages/MealPlansPage.js"),
-      import("../../dist/pages/MealsHubPage.js"),
-      import("../../dist/pages/MealPlanDetailPage.js"),
-      import("../../dist/pages/ShoppingListPage.js"),
-      import("../../dist/pages/TagsPage.js"),
-      import("../../dist/pages/PublicRecipePage.js"),
-      import("../../dist/pages/RecipeDetailPage.js"),
+      import("../../dist/pages/eciperay/HomePage.js"),
+      import("../../dist/pages/eciperay/MealPlansPage.js"),
+      import("../../dist/pages/eciperay/MealsHubPage.js"),
+      import("../../dist/pages/eciperay/MealPlanDetailPage.js"),
+      import("../../dist/pages/eciperay/ShoppingListPage.js"),
+      import("../../dist/pages/eciperay/TagsPage.js"),
+      import("../../dist/pages/eciperay/PublicRecipePage.js"),
+      import("../../dist/pages/eciperay/RecipeDetailPage.js"),
     ]);
     return Object.assign({}, ...modules) as Record<string, any>;
   })();
@@ -1634,7 +1634,7 @@ test("T4: RecipesPage's loading sections and footers render the skeleton rows", 
   // pinned here at the source level; the skeleton rows it
   // renders are the T1-verified DiscoveryCard loading state and
   // the MediaRow-shaped composition below.
-  const code = readCode("src/pages/RecipesPage.tsx");
+  const code = readCode("src/pages/eciperay/RecipesPage.tsx");
   assert.match(code, /case "loadingOwn":\s*return <LoadingOwnRows \/>;/);
   assert.match(code, /case "loadingOwnMore":\s*return <LoadingOwnRows \/>;/);
   assert.match(
@@ -1857,8 +1857,8 @@ test("T5 survivor audit: only the approved survivor files render a Spinner", () 
   // stories are exempt (stories demonstrate the widget itself, and
   // Center's story uses it as arbitrary example content).
   const allowed = new Set([
-    "src/pages/PayPage.tsx",
-    "src/pages/VerseSearchPage.tsx",
+    "src/pages/eciperay/PayPage.tsx",
+    "src/pages/memorize/VerseSearchPage.tsx",
     "src/widgets/form/AutocompletePicker.tsx",
   ]);
   const rendering = [];

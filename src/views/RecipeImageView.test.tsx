@@ -40,7 +40,7 @@ test("the view is barrel-exported and RecipeFormPage renders it from the image d
   );
   const rootIndex = read("src/index.ts");
   assert.doesNotMatch(rootIndex, /\bRecipeImageView\b/, "the view stays off the public surface");
-  const form = read("src/pages/RecipeFormPage.tsx");
+  const form = read("src/pages/eciperay/RecipeFormPage.tsx");
   assert.ok(
     form.includes(
       'import { RecipeImageView, type RecipeImageViewProps } from "../views/RecipeImageView.js"',

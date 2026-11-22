@@ -50,7 +50,7 @@ function readCode(rel: string) {
 }
 const a11y = readCode("src/widgets/accessibility.ts");
 const publicFooter = readCode("src/widgets/BigFooter.tsx");
-const legalPage = readCode("src/pages/LegalDocumentPage.tsx");
+const legalPage = readCode("src/pages/eciperay/LegalDocumentPage.tsx");
 test("the shared translation exports web-only landmark props (#366)", () => {
   assert.match(
     a11y,
@@ -127,11 +127,11 @@ function loadRuntime() {
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
     const { LegalDocumentPage }: Record<string, any> =
-      await import("../dist/pages/LegalDocumentPage.js");
+      await import("../dist/pages/eciperay/LegalDocumentPage.js");
     const { PublicRecipePage }: Record<string, any> =
-      await import("../dist/pages/PublicRecipePage.js");
+      await import("../dist/pages/eciperay/PublicRecipePage.js");
     const { eciperayFooterFixture }: Record<string, any> =
-      await import("../dist/pages/fixtures.js");
+      await import("../dist/pages/shared/fixtures.js");
     // BigFooter is internal (not in the components barrel, #410/#298):
     // load its dist module directly, like the icons module's tests do.
     const { BigFooter }: Record<string, any> = await import("../dist/widgets/BigFooter.js");
@@ -264,7 +264,7 @@ const legalFixture = {
     },
   ],
 };
-const publicRecipePage = readCode("src/pages/PublicRecipePage.tsx");
+const publicRecipePage = readCode("src/pages/eciperay/PublicRecipePage.tsx");
 test("PublicRecipePage carries its main landmark on every state (#473)", () => {
   // One MainLandmark per state branch: loading, notFound,
   // unavailable, and the ready ScrollShell branch. The role

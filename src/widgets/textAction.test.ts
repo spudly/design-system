@@ -44,8 +44,8 @@ const commentItem = readCode("src/widgets/CommentItem.tsx");
 const textActionCardRow = readCode("src/widgets/TextActionCardRow.tsx");
 const changedListBanner = readCode("src/widgets/ChangedListBanner.tsx");
 const revertAction = readCode("src/views/RevertAction.tsx");
-const aiSessionPage = readCode("src/pages/AiSessionPage.tsx");
-const tagsPage = readCode("src/pages/TagsPage.tsx");
+const aiSessionPage = readCode("src/pages/eciperay/AiSessionPage.tsx");
+const tagsPage = readCode("src/pages/eciperay/TagsPage.tsx");
 const index = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
 
 test("TextAction is deleted: no file, no stories, no export (#464)", () => {

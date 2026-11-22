@@ -103,7 +103,7 @@ test("the default variant flexes on native so form shell pages bound their scrol
       `${page} must render the default-variant ScreenContainer whose native flex bounds its form body (#676)`,
     );
   }
-  const recipeFormCode = readCode("src/pages/RecipeFormPage.tsx");
+  const recipeFormCode = readCode("src/pages/eciperay/RecipeFormPage.tsx");
   assert.match(
     recipeFormCode,
     /scrollMode="content"/,

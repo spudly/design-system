@@ -64,10 +64,10 @@ describe("textFontContext", () => {
     // blanket pages/ ban would be wrong. The Memorize pages and their
     // stories must rely on the primitives entirely.
     for (const file of [
-      "pages/MyVersesPage.tsx",
-      "pages/MyVersesPage.stories.tsx",
-      "pages/VerseSearchPage.tsx",
-      "pages/VerseSearchPage.stories.tsx",
+      "pages/memorize/MyVersesPage.tsx",
+      "pages/memorize/MyVersesPage.stories.tsx",
+      "pages/memorize/VerseSearchPage.tsx",
+      "pages/memorize/VerseSearchPage.stories.tsx",
     ]) {
       const source = readSrc(file);
       assert.ok(

@@ -1,6 +1,6 @@
 /**
  * Shared SSR harness for the LegalDocumentPage contract tests
- * (src/pages/LegalDocumentPage.test.tsx and
+ * (src/pages/eciperay/LegalDocumentPage.test.tsx and
  * src/widgets/proseDocument.test.tsx).
  *
  * Both files render the same built page, so they share one lazy
@@ -23,7 +23,7 @@ export function loadLegalDocumentRuntime(): Promise<Record<string, any>> {
     const voiceFixtures: Record<string, any> = await import("../dist/voice/fixtures.js");
     const voiceModule: Record<string, any> = await import("../dist/voice/index.js");
     const { LegalDocumentPage }: Record<string, any> =
-      await import("../dist/pages/LegalDocumentPage.js");
+      await import("../dist/pages/eciperay/LegalDocumentPage.js");
     return {
       React,
       renderToString,

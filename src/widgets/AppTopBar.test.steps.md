@@ -1,7 +1,7 @@
 ---
 component: AppTopBar
 run_when:
-  - "src/pages/AppShellPage.tsx, src/pages/TabbedShellPage.tsx, src/widgets/AppTopBar.tsx, their stories, or a changeset naming any of them. (namely: AppShellPage, TabbedShellPage, AppTopBar)"
+  - "src/pages/eciperay/AppShellPage.tsx, src/pages/memorize/TabbedShellPage.tsx, src/widgets/AppTopBar.tsx, their stories, or a changeset naming any of them. (namely: AppShellPage, TabbedShellPage, AppTopBar)"
 ---
 
 # AppTopBar — manual test steps
@@ -44,6 +44,6 @@ LinkActions, NoFooter, ChunkFailedContent;
    label share one vertical axis for every item, active and
    inactive, including Profile on the wrapped second row.
 
-**Run when:** `src/pages/AppShellPage.tsx`,
-`src/pages/TabbedShellPage.tsx`, `src/widgets/AppTopBar.tsx`,
+**Run when:** `src/pages/eciperay/AppShellPage.tsx`,
+`src/pages/memorize/TabbedShellPage.tsx`, `src/widgets/AppTopBar.tsx`,
 their stories, or a changeset naming any of them.

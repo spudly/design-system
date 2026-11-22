@@ -52,7 +52,7 @@ test("the views are barrel-exported and RecipeFormPage renders the list from the
     /\bRecipeIngredientRowView\b/,
     "the row view is exported from the package root (#671)",
   );
-  const form = read("src/pages/RecipeFormPage.tsx");
+  const form = read("src/pages/eciperay/RecipeFormPage.tsx");
   assert.ok(
     form.includes("ingredients?: RecipeFormPageIngredients | null"),
     "the ingredients data prop is on the form's contract",

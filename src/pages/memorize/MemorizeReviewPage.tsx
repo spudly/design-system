@@ -1,0 +1,168 @@
+import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { Button } from "../../widgets/Button.js";
+import { Card } from "../../widgets/Card.js";
+import { EmptyState } from "../../widgets/EmptyState.js";
+import { ButtonRow } from "../../widgets/ButtonRow.js";
+import { ScreenContainer } from "../../widgets/ScreenContainer.js";
+import { Text } from "../../widgets/Text.js";
+import { BoundedList } from "../shared/BoundedList.js";
+
+/**
+ * MemorizeReviewPage (#49): Memorize's Review screen as a
+ * controlled @spudly/ui page component. The app keeps all
+ * business logic — computing which verses are due from the
+ * spaced-repetition store, recording review outcomes, advancing
+ * or resetting each verse's schedule — and drives this view
+ * entirely through props: the due-verse view-models in, outcome
+ * callbacks out. Nothing here imports an app package or reads
+ * a clock.
+ *
+ * Naming — read this first: the #49 inventory calls this item
+ * "Progress", but Memorize has NO progress screen. That name
+ * came from the #44 demo stories, whose "Progress" demo invented
+ * a dashboard the app never had: StatCards ("12 verses
+ * mastered", "85% drill accuracy"), per-passage percent bars, a
+ * "Passages in progress" section. None of it exists — the app
+ * shows no aggregate stats anywhere, and its data model has no
+ * streak, accuracy, or percent to show. #49 builds the real
+ * screens, so this component ports the real screen that the
+ * "progress" item corresponds to: the Review screen
+ * (ReviewScreen in spudly/memorize packages/app), the surface
+ * where memorization progress is actually exercised — the
+ * due-for-review queue whose remembered/forgot outcomes drive
+ * every verse's spaced-repetition schedule. It is named for
+ * that real screen, not the demo. (Per-verse status badges —
+ * "learning" / "memorized", with next-review dates — live on
+ * the Verses screen, the home surface, not here; this screen's
+ * cards carry no badge, and the contract does not invent one.)
+ *
+ * The composition mirrors ReviewScreen exactly: the heading
+ * carries the due count ("Review (N due)"), one card per due
+ * verse (reference, text, the two outcome buttons), and —
+ * when nothing is due — the bare "Review" heading over the
+ * app's empty state ("Nothing due" / "Nice work."). The due
+ * list itself is the app's computation (`dueVerses`: verses
+ * whose next review has arrived, oldest first); the app hands
+ * the finished list across, and the count in the heading is
+ * the list's own length, as in the app.
+ *
+ * Deliberate contract shapes, all dictated by the app screen:
+ * - Two outcome callbacks, not one outcome-union callback:
+ *   the app wires its two buttons to the two review outcomes
+ *   ("remembered" / "forgot"), and the pair of callbacks keeps
+ *   each button's intent named at the boundary — the same
+ *   shape as MealPlanDetailPage's kind-routed entry presses.
+ * - No loading member. The app gates store readiness one
+ *   level up (App renders a full-screen spinner until the
+ *   store is ready, above the tab shell), so this screen
+ *   never renders a loading state of its own; an empty due
+ *   list is the screen's real empty state, not a placeholder
+ *   for one.
+ * - The list is the shared BoundedList bounded with `flex: 1`
+ *   inside the fixed shell — the app's own structure (its App
+ *   renders a non-scrolling ScreenContainer; the screen's list
+ *   is `flex: 1` inside it), which is the #188 geometry: a list
+ *   that sizes to its content inside a non-scrolling shell
+ *   overflows and never scrolls. BoundedList owns that bounding
+ *   (#119); this page renders no list styling of its own.
+ *
+ * No render slot, by audit: the app's rows render only DS
+ * primitives (text, two buttons) over per-verse data — no
+ * app-owned rendered content lives inside this view, no chart
+ * (the app has none anywhere) — so the contract is
+ * callbacks-only, and the contract test pins the absence. If
+ * a future app change puts app-rendered content in a row,
+ * that change adds a slot then (the `renderRecipeAccessory`
+ * precedent) rather than the slot existing speculatively now.
+ */
+
+/** One due verse row's view-model: the verse only — due rows
+ * carry no status badge or schedule detail in the app. */
+export type MemorizeReviewPageVerse = {
+  id: string;
+  reference: string;
+  text: string;
+};
+
+export type MemorizeReviewPageProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
+  /** Verses due for review, in the app's order (oldest due
+   * first). The app computes dueness from its
+   * spaced-repetition schedule; the view only renders. */
+  verses: MemorizeReviewPageVerse[];
+  /** "I remembered it" action: in the app this records a
+   * remembered review, advancing the verse's schedule. */
+  onRememberedPress: (verseId: string) => void;
+  /** "I forgot it" action: in the app this records a forgot
+   * review, resetting the verse's schedule. */
+  onForgotPress: (verseId: string) => void;
+};
+
+function ReviewVerseRow({
+  verse,
+  onRememberedPress,
+  onForgotPress,
+}: {
+  verse: MemorizeReviewPageVerse;
+  onRememberedPress: () => void;
+  onForgotPress: () => void;
+}) {
+  return (
+    <Card>
+      <Text variant="subheading">{verse.reference}</Text>
+      <Text variant="verse">{verse.text}</Text>
+      <ButtonRow>
+        <Button size="sm" onPress={onRememberedPress}>
+          I remembered it
+        </Button>
+        <Button size="sm" variant="secondary" onPress={onForgotPress}>
+          I forgot it
+        </Button>
+      </ButtonRow>
+    </Card>
+  );
+}
+
+/**
+ * Full-page Memorize review view: the "Review (N due)"
+ * heading and the due-verse list (or the app's nothing-due
+ * empty state) in the fixed shell the app's tab screens
+ * share. Controlled — see the file header for the naming
+ * audit and the contract it produced.
+ */
+export function MemorizeReviewPage({
+  verses,
+  onRememberedPress,
+  onForgotPress,
+  footer,
+}: MemorizeReviewPageProps) {
+  return (
+    <BigFooterShell footer={footer} scrollMode="content">
+      <ScreenContainer>
+        <Text variant="heading">
+          {verses.length === 0 ? "Review" : `Review (${verses.length} due)`}
+        </Text>
+        {verses.length === 0 ? (
+          <EmptyState title="Nothing due" body="Nice work." />
+        ) : (
+          <BoundedList
+            data={verses}
+            keyExtractor={(verse) => verse.id}
+            renderItem={({ item }) => (
+              <ReviewVerseRow
+                verse={item}
+                onRememberedPress={() => {
+                  onRememberedPress(item.id);
+                }}
+                onForgotPress={() => {
+                  onForgotPress(item.id);
+                }}
+              />
+            )}
+          />
+        )}
+      </ScreenContainer>
+    </BigFooterShell>
+  );
+}

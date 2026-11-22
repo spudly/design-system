@@ -277,7 +277,7 @@ test("list and self-scrolling pages put the shell in content mode (PR #556)", ()
   // A plain content page keeps the default: SignUpPage renders
   // the shell with no scrollMode, so the shell's ScrollView
   // owns its native scrolling with or without footer data.
-  const signUp = readCode("src/pages/SignUpPage.tsx");
+  const signUp = readCode("src/pages/eciperay/SignUpPage.tsx");
   assert.match(signUp, /<BigFooterShell footer=\{footer\}>/);
   assert.ok(!signUp.includes("scrollMode"), "SignUpPage stays in the default shell mode");
 });
@@ -288,7 +288,7 @@ test("composed pages keep exactly one native scroll owner (PR #556 round 2)", ()
   // stays outside it. (The meals tab keeps the default shell:
   // its plain ScreenContainer content has no scroller of its
   // own.)
-  const mealsHub = readCode("src/pages/MealsHubPage.tsx");
+  const mealsHub = readCode("src/pages/eciperay/MealsHubPage.tsx");
   assert.match(
     mealsHub,
     /<BigFooterShell footer=\{footer\} scrollMode="content">\s*<PinnedHeaderShell/,
@@ -306,7 +306,7 @@ test("composed pages keep exactly one native scroll owner (PR #556 round 2)", ()
       `${entry} must render its shell in content mode`,
     );
   }
-  const editVersion = readCode("src/pages/EditVersionPage.tsx");
+  const editVersion = readCode("src/pages/eciperay/EditVersionPage.tsx");
   assert.ok(
     editVersion.includes('<BigFooterShell footer={props.footer} scrollMode="content">'),
     "EditVersionPage's editable branch must render its shell in content mode",
@@ -349,7 +349,7 @@ test("composed pages and stories render exactly one footer", () => {
   // AiSessionPage: BOTH states (start and in-session) render
   // through the shell — the start state used to return early
   // without it.
-  const aiSession = readCode("src/pages/AiSessionPage.tsx");
+  const aiSession = readCode("src/pages/eciperay/AiSessionPage.tsx");
   assert.equal(
     (aiSession.match(/<BigFooterShell footer=\{footer\}>/g) ?? []).length,
     2,
@@ -361,7 +361,7 @@ test("composed pages and stories render exactly one footer", () => {
   // the full pinned layout; MealPlansPage gets NO footer there (an
   // inner shell below the header pushed the footer one header
   // height past the viewport bottom on short lists).
-  const mealsHub = readCode("src/pages/MealsHubPage.tsx");
+  const mealsHub = readCode("src/pages/eciperay/MealsHubPage.tsx");
   assert.match(
     mealsHub,
     /<BigFooterShell footer=\{footer\} scrollMode="content">\s*<PinnedHeaderShell[\s\S]*?<MealPlansPage/,
@@ -375,9 +375,9 @@ test("composed pages and stories render exactly one footer", () => {
   // Nested compositions: the outer page owns the footer; the
   // nested form/page gets no footer prop.
   for (const story of [
-    "src/pages/EditRecipePage.stories.tsx",
-    "src/pages/ManualEntryPage.stories.tsx",
-    "src/pages/EditVersionPage.stories.tsx",
+    "src/pages/eciperay/EditRecipePage.stories.tsx",
+    "src/pages/eciperay/ManualEntryPage.stories.tsx",
+    "src/pages/eciperay/EditVersionPage.stories.tsx",
   ]) {
     assert.doesNotMatch(
       readCode(story),
@@ -388,13 +388,13 @@ test("composed pages and stories render exactly one footer", () => {
   // #473: PublicPageFrame is retired — PublicRecipePage owns its
   // footer itself, so its stories supply the footer to the page.
   assert.match(
-    readCode("src/pages/PublicRecipePage.stories.tsx"),
+    readCode("src/pages/eciperay/PublicRecipePage.stories.tsx"),
     /<PublicRecipePage footer=\{eciperayFooterFixture\}/,
     "the PublicRecipePage stories supply the footer to the page itself — the page owns it (#473)",
   );
 });
 test("the eciperay story fixture carries the Legal column convention as data", () => {
-  const fixtures = readCode("src/pages/fixtures.ts");
+  const fixtures = readCode("src/pages/shared/fixtures.ts");
   assert.ok(fixtures.includes("eciperayFooterFixture"), "eciperay footer fixture exists");
   assert.ok(
     fixtures.includes('"Do Not Sell or Share My Personal Information"') ||
@@ -510,7 +510,7 @@ test("SSR: an exported page renders its footer from the footer prop", async () =
     VoiceProvider,
     fixtureVoice,
   } = await loadRuntime();
-  const { SignInPage }: Record<string, any> = await import("../../dist/pages/SignInPage.js");
+  const { SignInPage }: Record<string, any> = await import("../../dist/pages/eciperay/SignInPage.js");
   const config = createTamaguiConfig(baseTheme);
   const html = renderToString(
     <TamaguiProvider config={config} defaultTheme="light">
@@ -714,7 +714,7 @@ describe("bigFooterStoreBadges", () => {
   test("BigFooterStoreLink requires the store discriminator (#466)", () => {
     assert.match(footer, /export type BigFooterStore = "app-store" \| "google-play";/);
     assert.match(footer, /store: BigFooterStore;/);
-    const fixtures = readCode("src/pages/fixtures.ts");
+    const fixtures = readCode("src/pages/shared/fixtures.ts");
     assert.match(fixtures, /store: "app-store"/);
     assert.match(fixtures, /store: "google-play"/);
   });

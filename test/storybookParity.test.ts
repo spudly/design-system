@@ -54,27 +54,27 @@
  *   every page story. If it is ever exported, this test fails and a
  *   story decision is required. (It lived in src/pages until #119's
  *   auth tranche moved it out of the no-page-styling rule's scope.)
- * - src/pages/BoundedList.tsx — internal page scaffolding (#119): the
+ * - src/pages/shared/BoundedList.tsx — internal page scaffolding (#119): the
  *   shared bounded FlatList the fixed-shell list pages render. It
  *   imports react-native, so it cannot be a root-exported component;
  *   NOT exported from src/pages/index.ts, exercised through the
  *   pages that use it (VerseSearchPage, MemorizeReviewPage,
  *   MyVersesPage). Same rule as PageFrame: export means a story
  *   decision is required.
- * - src/pages/StepNavControls.tsx — internal page scaffolding
+ * - src/pages/shared/StepNavControls.tsx — internal page scaffolding
  *   (#587 phase 3 tranche 5): the step-navigation composition both
  *   cooking-mode pages render inside their StepOverlay; NOT exported
  *   from src/pages/index.ts, exercised through the cooking pages'
  *   stories. Same rule as BoundedList: export means a story
  *   decision is required.
- * - src/pages/recipeStatusBadges.ts — the shared status-badge map
+ * - src/pages/shared/recipeStatusBadges.ts — the shared status-badge map
  *   both recipe pages read (#587 phase 3 tranche 5); data, not a
  *   component.
- * - src/pages/recipeRow.tsx — the shared recipe-row composition
+ * - src/pages/shared/recipeRow.tsx — the shared recipe-row composition
  *   (#657) RecipesPage and HomePage render; page-local scaffolding,
  *   NOT exported from src/pages/index.ts, exercised through both
  *   pages' stories. Same rule as BoundedList.
- * - src/pages/fixtures.ts — static story fixtures, not a component.
+ * - src/pages/shared/fixtures.ts — static story fixtures, not a component.
  *
  * Source scan, like the other story contract tests
  * (pagesStoryCategories.test.ts, pageStories.test.ts): the
@@ -340,41 +340,55 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
     !index.includes('from "./BoundedList.js"'),
     "BoundedList is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
   );
-  for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    // The one expected directory: the colocated Android VR baselines
-    // (#530), pinned by test/visualRegressionScope.test.ts.
-    if (entry.name === "__snapshots__") continue;
-    assert.ok(
-      entry.isFile(),
-      `src/pages/${entry.name}: unexpected directory — the parity scan is flat`,
-    );
-    if (
-      exceptions.has(entry.name) ||
-      entry.name.endsWith(".stories.tsx") ||
-      entry.name.endsWith(".test.ts") ||
-      entry.name.endsWith(".test.tsx") ||
-      entry.name.endsWith(".test.steps.md")
-    )
-      continue;
-    assert.ok(
-      entry.name.endsWith(".tsx"),
-      `src/pages/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
-    );
-    const base = entry.name.replace(/\.tsx$/, "");
-    assertModuleStory({
-      dir,
-      index,
-      base,
-      titleDescription: `a Pages/<App>/${base} title (#70)`,
-      titleMatches: (t: any) => t === `Pages/Eciperay/${base}` || t === `Pages/Memorize/${base}`,
-    });
+  // #710: pages live in per-host-app subdirectories
+  // (src/pages/<eciperay|memorize|shared>/); the parity scan
+  // walks each host directory in turn.
+  for (const host of ["eciperay", "memorize", "shared"]) {
+    const hostDir = join(dir, host);
+    for (const entry of readdirSync(hostDir, { withFileTypes: true })) {
+      // The colocated Android VR baselines (#530), pinned by
+      // test/visualRegressionScope.test.ts.
+      if (entry.name === "__snapshots__") continue;
+      assert.ok(
+        entry.isFile(),
+        `src/pages/${host}/${entry.name}: unexpected directory`,
+      );
+      if (
+        exceptions.has(entry.name) ||
+        entry.name.endsWith(".stories.tsx") ||
+        entry.name.endsWith(".test.ts") ||
+        entry.name.endsWith(".test.tsx") ||
+        entry.name.endsWith(".test.steps.md")
+      )
+        continue;
+      assert.ok(
+        entry.name.endsWith(".tsx"),
+        `src/pages/${host}/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
+      );
+      const base = entry.name.replace(/\.tsx$/, "");
+      assertModuleStory({
+        dir: hostDir,
+        index,
+        base,
+        specifier: `./${host}/${base}.js`,
+        titleDescription: `a Pages/<App>/${base} title (#70)`,
+        titleMatches: (t: any) => t === `Pages/Eciperay/${base}` || t === `Pages/Memorize/${base}`,
+      });
+    }
   }
 });
 
 test("every story file is organized under Widgets/, Views/, or Pages/<App>/ and exports stories", () => {
   for (const area of ["widgets", "views", "pages"]) {
     const dir = join(root, "src", area);
-    for (const name of readdirSync(dir)) {
+    // #710: page stories live one level down, in the host-app dirs.
+    const names =
+      area === "pages"
+        ? ["eciperay", "memorize", "shared"].flatMap((host) =>
+            readdirSync(join(dir, host)).map((name) => join(host, name)),
+          )
+        : readdirSync(dir);
+    for (const name of names) {
       if (!name.endsWith(".stories.tsx")) continue;
       const story = readFileSync(join(dir, name), "utf8");
       const title = declaredTitle(story);

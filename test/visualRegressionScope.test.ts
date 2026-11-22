@@ -93,7 +93,7 @@ function syntheticRepo() {
     'import { Shared } from "../widgets/Shared.js";\nexport const PageB = () => null;\n',
   );
   put(
-    "src/pages/RecipesPage.stories.tsx",
+    "src/pages/eciperay/RecipesPage.stories.tsx",
     'import { PageA } from "./PageA.js";\nconst meta = { title: "Pages/Eciperay/RecipesPage" };\nexport default meta;\nexport const Default = {};\nexport const Empty = {};\n',
   );
   put(
@@ -227,7 +227,7 @@ test("colocated baselines resolve through the story index (#530)", () => {
   }
   assert.equal(
     baselineRelPath(index, "pages-eciperay-recipespage--default", "light_warmHarvest", true),
-    "src/pages/__snapshots__/RecipesPage--default--narrow--light_warmHarvest.png",
+    "src/pages/eciperay/__snapshots__/RecipesPage--default--narrow--light_warmHarvest.png",
   );
   assert.equal(baselineRelPath(index, "pages-eciperay-nope--default", "light_warmHarvest"), null);
 });

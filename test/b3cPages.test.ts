@@ -19,7 +19,7 @@ import test from "node:test";
  * option A shipped; the created-secret panel is its own).
  */
 
-const page = (name: string) => readFileSync(`src/pages/${name}.tsx`, "utf8");
+const page = (name: string) => readFileSync(`src/pages/eciperay/${name}.tsx`, "utf8");
 const component = (name: string) => readFileSync(`src/widgets/${name}.tsx`, "utf8");
 const view = (name: string) => readFileSync(`src/views/${name}.tsx`, "utf8");
 

@@ -43,13 +43,13 @@ function readPageFile(name: string) {
 
 const expected = [
   {
-    file: "EciperayPages.stories.tsx",
+    file: "eciperay/EciperayPages.stories.tsx",
     title: "Pages/Eciperay",
     theme: "light_warmHarvest",
     stories: ["RecipeDetail", "MealPlans"],
   },
   {
-    file: "MemorizePages.stories.tsx",
+    file: "memorize/MemorizePages.stories.tsx",
     title: "Pages/Memorize",
     theme: "light_quietDawn",
     stories: ["HomeVerseSearch", "PassageView", "MemorizationSession", "Progress"],
@@ -79,7 +79,7 @@ test("all six full-page demo stories exist, in the correct theme per app", () =>
 
 test("the retired RecipesBrowse and SharedWithMe demos stay retired (#185)", () => {
   const text = readPageFile("EciperayPages.stories.tsx");
-  assert.ok(text, "src/pages/EciperayPages.stories.tsx not found");
+  assert.ok(text, "src/pages/eciperay/EciperayPages.stories.tsx not found");
   for (const retired of ["RecipesBrowse", "SharedWithMe"]) {
     assert.ok(
       !new RegExp(String.raw`export const ${retired}\b`).test(text),
@@ -90,7 +90,7 @@ test("the retired RecipesBrowse and SharedWithMe demos stay retired (#185)", () 
 
 test("page fixtures are static: no network, no clocks, no external images", () => {
   const text = readPageFile("fixtures.ts");
-  assert.ok(text, "src/pages/fixtures.ts not found");
+  assert.ok(text, "src/pages/shared/fixtures.ts not found");
   for (const banned of ["fetch(", "http://", "https://", "Date.now", "new Date("]) {
     assert.ok(
       !text.includes(banned),
