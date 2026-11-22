@@ -58,8 +58,11 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "MemorizationSessionPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "MemorizationSessionPage.stories.tsx"), "utf8");
+const source = readFileSync(join(pagesDir, "memorize", "MemorizationSessionPage.tsx"), "utf8");
+const stories = readFileSync(
+  join(pagesDir, "memorize", "MemorizationSessionPage.stories.tsx"),
+  "utf8",
+);
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in
@@ -247,7 +250,7 @@ test("there is deliberately no app-content render slot", () => {
 test("the component is exported from the pages barrel index", () => {
   assert.match(index, /MemorizationSessionPage/);
   assert.match(index, /type MemorizationSessionPageProps/);
-  assert.match(index, /from "\.\/MemorizationSessionPage\.js"/);
+  assert.match(index, /from "\.\/memorize\/MemorizationSessionPage\.js"/);
 });
 
 test("stories exercise the session's main states", () => {

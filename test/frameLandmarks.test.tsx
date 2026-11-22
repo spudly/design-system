@@ -88,7 +88,7 @@ test("no other source file adds a landmark role — no duplicates inside the fra
   const owners = new Set([
     join(srcDir, "widgets", "accessibility.ts"),
     join(srcDir, "widgets", "BigFooter.tsx"),
-    join(srcDir, "pages", "LegalDocumentPage.tsx"),
+    join(srcDir, "pages", "eciperay", "LegalDocumentPage.tsx"),
     // #473: MainLandmark owns the `main` role for the public
     // recipe surface now the frame page is retired.
     join(srcDir, "widgets", "MainLandmark.tsx"),
@@ -99,7 +99,9 @@ test("no other source file adds a landmark role — no duplicates inside the fra
     }).flatMap((entry) => {
       const path = join(dir, entry.name);
       if (entry.isDirectory()) return files(path);
-      return /\.tsx?$/.test(entry.name) && !entry.name.endsWith(".test.ts") && !entry.name.endsWith(".test.tsx")
+      return /\.tsx?$/.test(entry.name) &&
+        !entry.name.endsWith(".test.ts") &&
+        !entry.name.endsWith(".test.tsx")
         ? [path]
         : [];
     });

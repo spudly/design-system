@@ -68,14 +68,14 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "RecipeDetailPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "RecipeDetailPage.stories.tsx"), "utf8");
+const source = readFileSync(join(pagesDir, "eciperay", "RecipeDetailPage.tsx"), "utf8");
+const stories = readFileSync(join(pagesDir, "eciperay", "RecipeDetailPage.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const statusBadgesCode = readFileSync(join(pagesDir, "recipeStatusBadges.ts"), "utf8")
+const statusBadgesCode = readFileSync(join(pagesDir, "shared", "recipeStatusBadges.ts"), "utf8")
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const storiesCode = stories
@@ -86,7 +86,7 @@ test("RecipeDetailPage is exported from the pages barrel", () => {
   assert.match(index, /RecipeDetailPage,/, "index.ts must export RecipeDetailPage");
   assert.match(
     index,
-    /from "\.\/RecipeDetailPage\.js"/,
+    /from "\.\/eciperay\/RecipeDetailPage\.js"/,
     "the export must come from ./RecipeDetailPage.js",
   );
   assert.match(code, /export function RecipeDetailPage/);

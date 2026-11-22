@@ -50,10 +50,10 @@ function readCode(path: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const hook = readCode(join(pagesDir, "useCatalogPagination.ts"));
-const recipesPage = readCode(join(pagesDir, "RecipesPage.tsx"));
-const discoverPage = readCode(join(pagesDir, "DiscoverPage.tsx"));
-const boundedList = readCode(join(pagesDir, "BoundedList.tsx"));
+const hook = readCode(join(pagesDir, "shared", "useCatalogPagination.ts"));
+const recipesPage = readCode(join(pagesDir, "eciperay", "RecipesPage.tsx"));
+const discoverPage = readCode(join(pagesDir, "eciperay", "DiscoverPage.tsx"));
+const boundedList = readCode(join(pagesDir, "shared", "BoundedList.tsx"));
 
 test("the shared hook declares the catalog pagination contract", () => {
   assert.match(hook, /export type CatalogPaginationOptions = \{/);
@@ -151,7 +151,7 @@ test("the end latch is live: scroll metrics set and clear it with the shared thr
 test("the unified catalog page calls the shared hook for both modes (#547)", () => {
   assert.match(
     recipesPage,
-    /import \{ useCatalogPagination \} from "\.\/useCatalogPagination\.js";/,
+    /import \{ useCatalogPagination \} from "\.\.\/shared\/useCatalogPagination\.js";/,
     "RecipesPage must import the shared hook",
   );
   assert.match(

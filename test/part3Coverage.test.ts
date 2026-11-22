@@ -73,7 +73,7 @@ test("Part 3 pages are exported from the pages barrel, with stories", () => {
   for (const name of NEW_PAGES) {
     assert.match(
       pagesBarrel,
-      new RegExp(`export \\{[^}]*\\b${name}\\b[^}]*\\} from "\\./${name}\\.js"`),
+      new RegExp(`export \\{[^}]*\\b${name}\\b[^}]*\\} from "\\./eciperay/${name}\\.js"`),
       `${name} is exported from src/pages/index.ts`,
     );
     assert.equal(existsSync(`src/pages/eciperay/${name}.tsx`), true, `${name}.tsx exists`);

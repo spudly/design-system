@@ -43,7 +43,7 @@ test("the view is barrel-exported and RecipeFormPage renders it from the image d
   const form = read("src/pages/eciperay/RecipeFormPage.tsx");
   assert.ok(
     form.includes(
-      'import { RecipeImageView, type RecipeImageViewProps } from "../views/RecipeImageView.js"',
+      'import { RecipeImageView, type RecipeImageViewProps } from "../../views/RecipeImageView.js"',
     ),
     "RecipeFormPage imports the view",
   );
@@ -85,7 +85,11 @@ async function renderView(props: Record<string, unknown>): Promise<string> {
         config,
         defaultTheme: "light",
       },
-      h(voiceModule.VoiceProvider, { voice: voiceFixtures.fixtureVoice }, h(RecipeImageView, props)),
+      h(
+        voiceModule.VoiceProvider,
+        { voice: voiceFixtures.fixtureVoice },
+        h(RecipeImageView, props),
+      ),
     ),
   );
 }

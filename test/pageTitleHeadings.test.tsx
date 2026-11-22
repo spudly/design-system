@@ -98,7 +98,7 @@ test("AddRecipeMenuPage's title takes the title variant — xl bold at level 1 (
 });
 test("the #119 meals tranche's page titles take the title variant — xl bold at level 1 (#263, #119)", () => {
   for (const page of TITLE_VARIANT_PAGES) {
-    const code = readCode(`src/pages/${page}.tsx`);
+    const code = readCode(`src/pages/eciperay/${page}.tsx`);
     assert.equal(
       countOccurrences(code, 'variant="title"'),
       1,
@@ -142,7 +142,7 @@ test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 
 });
 test("FeedbackPage and ProfilePage titles take the title variant — xl bold at level 1 (#263, #119)", () => {
   for (const page of ["FeedbackPage", "ProfilePage"]) {
-    const code = readCode(`src/pages/${page}.tsx`);
+    const code = readCode(`src/pages/eciperay/${page}.tsx`);
     assert.equal(
       countOccurrences(code, 'variant="title"'),
       1,
@@ -219,8 +219,10 @@ function loadRuntime() {
     // The pages barrel is not Node-importable (some pages import
     // react-native), so the two pages under test are loaded from
     // their own modules — both are plain component compositions.
-    const { MealPlansPage }: Record<string, any> = await import("../dist/pages/eciperay/MealPlansPage.js");
-    const { MealsHubPage }: Record<string, any> = await import("../dist/pages/eciperay/MealsHubPage.js");
+    const { MealPlansPage }: Record<string, any> =
+      await import("../dist/pages/eciperay/MealPlansPage.js");
+    const { MealsHubPage }: Record<string, any> =
+      await import("../dist/pages/eciperay/MealsHubPage.js");
     return {
       React,
       renderToString,

@@ -8,7 +8,7 @@ import process from "node:process";
 
 describe("tagsPageCreateForm", () => {
   const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
-  const tagsPage = readFileSync(join(root, "src", "pages", "TagsPage.tsx"), "utf8");
+  const tagsPage = readFileSync(join(root, "src", "pages", "eciperay", "TagsPage.tsx"), "utf8");
   const createFormEnd = tagsPage.indexOf("{loading ?");
   const row = readFileSync(join(root, "src", "widgets", "TrailingActionsRow.tsx"), "utf8");
   const picker = readFileSync(join(root, "src", "widgets", "form", "ColorPickerField.tsx"), "utf8");
@@ -122,7 +122,7 @@ describe("tagsPageErrorSurface", () => {
   });
 
   test("the error renders as a dismissible error Alert and success/dismiss clear it (#374)", () => {
-    assert.match(page, /import \{ Alert \} from "\.\.\/widgets\/Alert\.js";/);
+    assert.match(page, /import \{ Alert \} from "\.\.\/\.\.\/widgets\/Alert\.js";/);
     assert.match(
       page,
       /\{failedOperation \? \(\s*<Alert\s+severity="error"\s+dismissible\s+onDismiss=\{\(\) => \{\s*setFailedOperation\(null\);\s*\}\}\s*>\s*\{tagsPageFailureMessages\[failedOperation\]\}\s*<\/Alert>\s*\) : null\}/,
@@ -160,7 +160,7 @@ describe("tagsPageErrorSurface", () => {
   // type rejects all three. The snippet must compile cleanly
   // against the page source — a real compiler check, not a scan.
   const handlerCompatSnippet = [
-    'import type { TagsPageProps, TagsPageTag } from "./TagsPage.js";',
+    'import type { TagsPageProps, TagsPageTag } from "../../src/pages/eciperay/TagsPage.js";',
     "",
     'const tag: TagsPageTag = { id: "1", name: "Baking", color: "indigo" };',
     "",
@@ -259,8 +259,14 @@ describe("tagsPageRowEligibility", () => {
     );
     // Delete must not be gated on the edit flag (or vice versa):
     // the two eligibilities are independent per-row data.
-    assert.doesNotMatch(page, /tag\.canEdit !== false \? \(\s*<Button\s+ghost\s+size="sm"\s+variant="danger"/);
-    assert.doesNotMatch(page, /tag\.canDelete !== false \? \(\s*<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag/);
+    assert.doesNotMatch(
+      page,
+      /tag\.canEdit !== false \? \(\s*<Button\s+ghost\s+size="sm"\s+variant="danger"/,
+    );
+    assert.doesNotMatch(
+      page,
+      /tag\.canDelete !== false \? \(\s*<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag/,
+    );
   });
 
   test("an edit-ineligible row never swaps to the edit form (#375)", () => {
@@ -286,7 +292,7 @@ describe("tagsPageRowEligibility", () => {
   // patch upgrade; this pins assignability with a real compiler
   // check, not just a text scan.
   const eligibilitySnippet = [
-    'import type { TagsPageTag } from "./TagsPage.js";',
+    'import type { TagsPageTag } from "../../src/pages/eciperay/TagsPage.js";',
     "",
     'export const legacyTag: TagsPageTag = { id: "1", name: "Baking", color: "indigo" };',
     "",

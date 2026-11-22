@@ -43,8 +43,8 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "MyVersesPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "MyVersesPage.stories.tsx"), "utf8");
+const source = readFileSync(join(pagesDir, "memorize", "MyVersesPage.tsx"), "utf8");
+const stories = readFileSync(join(pagesDir, "memorize", "MyVersesPage.stories.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // (this file's subject is heavily commented) cannot pass the scan.

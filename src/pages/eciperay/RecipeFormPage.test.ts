@@ -69,7 +69,7 @@ test("all four B3a pages are exported from the pages barrel", () => {
   for (const name of ["RecipeFormPage", "EditRecipePage", "EditVersionPage", "ManualEntryPage"]) {
     assert.ok(index.includes(name), `${name} must be exported from src/pages/index.ts`);
     assert.ok(
-      index.includes(`from "../${name}.js"`),
+      index.includes(`from "./eciperay/${name}.js"`),
       `${name} must be exported from its own module`,
     );
   }

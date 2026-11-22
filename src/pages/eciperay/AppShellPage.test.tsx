@@ -53,7 +53,7 @@ function typeBlock(source: string, name: string): string {
 test("AppShellPage is exported from the pages barrel with alias types", () => {
   assert.match(
     barrel,
-    /AppShellPage,\s*type AppShellPageAction,\s*type AppShellPageNavItem,\s*type AppShellPageProps,\s*type AppShellPageSearch,\s*\} from "\.\/AppShellPage\.js";/,
+    /AppShellPage,\s*type AppShellPageAction,\s*type AppShellPageNavItem,\s*type AppShellPageProps,\s*type AppShellPageSearch,\s*\} from "\.\/eciperay\/AppShellPage\.js";/,
   );
   assert.match(page, /export type AppShellPageProps = \{/);
   assert.match(page, /export type AppShellPageNavItem = AppTopBarNavItem;/);
@@ -117,7 +117,7 @@ test("the page composes DS components only and never touches the boundary itself
     /ChunkErrorBoundary/,
     "lazy content goes through the internal LazySlot — the page never names the boundary",
   );
-  assert.match(page, /import \{ LazySlot \} from "\.\.\/views\/LazySlot\.js";/);
+  assert.match(page, /import \{ LazySlot \} from "\.\.\/\.\.\/views\/LazySlot\.js";/);
   assert.match(page, /import \{\s*AppTopBar,/);
   assert.match(page, /<ScreenContainer>/);
   // The standard page footer contract (#410, pinned for every
@@ -162,7 +162,8 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    const { AppShellPage }: Record<string, any> = await import("../../../dist/pages/eciperay/AppShellPage.js");
+    const { AppShellPage }: Record<string, any> =
+      await import("../../../dist/pages/eciperay/AppShellPage.js");
     const distViews: Record<string, any> = await import("../../../dist/views/index.js");
     const distWidgets: Record<string, any> = await import("../../../dist/widgets/index.js");
     return {

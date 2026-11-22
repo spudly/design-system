@@ -221,7 +221,7 @@ test("the de-styled pages have no stack pressable left to translate (#237, #248,
     "MealPlansPage,MealPlanDetailPage,AiSessionPage,RecipeFormPage,ShoppingListPage,MealDetailPage,MealsHubPage,MealCookingModePage,RecipeDetailPage".split(
       ",",
     );
-  for (const rel of PAGES.map((page) => `src/pages/${page}.tsx`)) {
+  for (const rel of PAGES.map((page) => `src/pages/eciperay/${page}.tsx`)) {
     const code = readCode(rel);
     assert.ok(!code.includes("platformAccessibilityProps"), `${rel} must not use the translator`);
     assert.ok(
@@ -291,7 +291,8 @@ test("field/primitive wrappers destructure caller RN props out of rest and trans
     // TextField/TextAreaField route through the shared
     // useFieldA11y hook since #587 phase 3 — the translator call
     // lives there, so scan the field and the hook together.
-    const isField = rel === "src/widgets/form/TextField.tsx" || rel === "src/widgets/form/TextAreaField.tsx";
+    const isField =
+      rel === "src/widgets/form/TextField.tsx" || rel === "src/widgets/form/TextAreaField.tsx";
     const code = isField ? readCode(rel) + readCode("src/views/useFieldA11y.ts") : readCode(rel);
     // One needle per routing requirement: build a11yProps via the
     // translator, spread them onto the element, and destructure

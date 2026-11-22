@@ -57,7 +57,10 @@ const header = readCodeFrom(viewsDir, "CatalogHeader.tsx");
 // #547: the public catalog's implementation lives in RecipesPage
 // (DiscoverPage is its compatibility wrapper), so the loading-state
 // contract pins RecipesPage's public mode.
-const discoverPage = readCodeFrom(join(here, "../..", "src", "pages"), "RecipesPage.tsx");
+const discoverPage = readCodeFrom(
+  join(here, "../..", "src", "pages", "eciperay"),
+  "RecipesPage.tsx",
+);
 
 test("the catalog views are exported from their built internal barrels", async () => {
   const distViews: Record<string, any> = await import("../../dist/views/index.js");

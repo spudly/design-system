@@ -224,7 +224,7 @@ test("SSR: FieldLabel with htmlFor renders a label element; a LabeledGroup is a 
 });
 test("the three form pages compose DS components only — no tamagui, no tokens, no styled (#119)", () => {
   for (const page of ["RecipeFormPage", "MealFormPage", "MealPlanFormPage"]) {
-    const source = readRepoFile(`src/pages/${page}.tsx`);
+    const source = readRepoFile(`src/pages/eciperay/${page}.tsx`);
     assert.doesNotMatch(source, /from "tamagui"/, `${page} must not import layout primitives`);
     assert.doesNotMatch(source, /tokens/, `${page} must not reach for design tokens`);
     assert.doesNotMatch(source, /styled\(/, `${page} must not define styled components`);

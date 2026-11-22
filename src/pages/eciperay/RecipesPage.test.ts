@@ -7,18 +7,18 @@ import { fileURLToPath } from "node:url";
 describe("recipesPageAccessory", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const pagesDir = join(here, "../../..", "src", "pages");
-  const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
   // The MediaRow composition lives in the shared recipeRow.tsx
   // (#657); slice it out so the placement pins run against it.
   const rowSource =
-    readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8");
   const mediaRow = rowSource.slice(
     rowSource.indexOf("const textBlockStyle"),
     rowSource.indexOf("const STAR_STEPS"),
   );
-  const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
 
   // Strip block and line comments so documented patterns in prose
   // cannot pass the scan.
@@ -26,7 +26,7 @@ describe("recipesPageAccessory", () => {
   // The row wiring (hasAccessory gate, accessory pass-through)
   // lives in the shared recipeRow.tsx (#657).
   const rowCode = (
-    readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
@@ -120,10 +120,10 @@ describe("recipesPageAccessory", () => {
 describe("recipesPageBoundedList", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const pagesDir = join(here, "../../..", "src", "pages");
-  const code = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8")
+  const code = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8")
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-  const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
 
   test("RecipesPage renders the fixed list shell, non-scrolling", () => {
     assert.match(
@@ -134,7 +134,10 @@ describe("recipesPageBoundedList", () => {
   });
 
   test("RecipesPage adopts BoundedList with its separator and inset (#119)", () => {
-    assert.match(code, /import \{[\s\S]*?BoundedList[\s\S]*?\} from "\.\/BoundedList\.js";/);
+    assert.match(
+      code,
+      /import \{[\s\S]*?BoundedList[\s\S]*?\} from "\.\.\/shared\/BoundedList\.js";/,
+    );
     assert.match(code, /<BoundedList/);
     assert.match(
       code,
@@ -219,7 +222,10 @@ describe("recipesPageBoundedList", () => {
     // resolution (toolbar global, then the story's dsViewport
     // parameter, then the "phone" preset), which pins captures at
     // 430×844 for stories without their own default frame.
-    const preview = readFileSync(join(pagesDir, "../../../.storybook/preview.tsx"), "utf8");
+    const preview = readFileSync(
+      join(pagesDir, "eciperay", "../../../.storybook/preview.tsx"),
+      "utf8",
+    );
     assert.match(
       preview,
       /context\.parameters\.dsViewport as string \| undefined\) \?\?\s+"phone"/,
@@ -248,8 +254,8 @@ describe("recipesPageBoundedList", () => {
 describe("recipesPageCollapsedFilters", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const pagesDir = join(here, "../../..", "src", "pages");
-  const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
 
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
@@ -339,13 +345,16 @@ describe("recipesPageCollapsedFilters", () => {
 
 describe("recipesPageRowA11y", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const page = readFileSync(join(here, "../../..", "src", "pages", "RecipesPage.tsx"), "utf8")
+  const page = readFileSync(
+    join(here, "../../..", "src", "pages", "eciperay", "RecipesPage.tsx"),
+    "utf8",
+  )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   // The MediaRow composition lives in the shared recipeRow.tsx
   // (#657); slice it out so the row pins run against it alone.
   const rowPage = (
-    readFileSync(join(here, "../../..", "src", "pages", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "pages", "shared", "recipeRow.tsx"), "utf8") +
     readFileSync(join(here, "../../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
     readFileSync(join(here, "../../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
@@ -428,14 +437,17 @@ describe("recipesPageRowA11y", () => {
 
 describe("recipesPageRowActions", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const code = readFileSync(join(here, "../../..", "src", "pages", "RecipesPage.tsx"), "utf8")
+  const code = readFileSync(
+    join(here, "../../..", "src", "pages", "eciperay", "RecipesPage.tsx"),
+    "utf8",
+  )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   // The compositions live in the shared recipeRow.tsx (#657);
   // slice them out so page-level code cannot satisfy the
   // composition pins.
   const rowCode = (
-    readFileSync(join(here, "../../..", "src", "pages", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "pages", "shared", "recipeRow.tsx"), "utf8") +
     readFileSync(join(here, "../../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
     readFileSync(join(here, "../../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
@@ -447,7 +459,7 @@ describe("recipesPageRowActions", () => {
   );
   const ratingStars = rowCode.slice(rowCode.indexOf("const STAR_STEPS"));
   const stories = readFileSync(
-    join(here, "../../..", "src", "pages", "RecipesPage.stories.tsx"),
+    join(here, "../../..", "src", "pages", "eciperay", "RecipesPage.stories.tsx"),
     "utf8",
   );
 
@@ -556,8 +568,8 @@ describe("recipesPageRowActions", () => {
 describe("recipesPageSharedConfig", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const pagesDir = join(here, "../../..", "src", "pages");
-  const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
   const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
   // Strip block and line comments so documented patterns in prose
@@ -565,7 +577,7 @@ describe("recipesPageSharedConfig", () => {
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   // The shared row item and row live in recipeRow.tsx (#657).
   const rowCode = (
-    readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
@@ -574,11 +586,11 @@ describe("recipesPageSharedConfig", () => {
 
   test("SharedWithMePage is retired: no file, no stories, no export (#185)", () => {
     assert.ok(
-      !existsSync(join(pagesDir, "SharedWithMePage.tsx")),
+      !existsSync(join(pagesDir, "eciperay", "SharedWithMePage.tsx")),
       "SharedWithMePage.tsx must not exist — RecipesPage is the single recipes browse page",
     );
     assert.ok(
-      !existsSync(join(pagesDir, "SharedWithMePage.stories.tsx")),
+      !existsSync(join(pagesDir, "eciperay", "SharedWithMePage.stories.tsx")),
       "SharedWithMePage.stories.tsx must not exist — shared-with-me lives in RecipesPage.stories.tsx",
     );
     assert.ok(
@@ -655,8 +667,8 @@ describe("recipesPageSharedConfig", () => {
 describe("recipesPageUnified", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const pagesDir = join(here, "../../..", "src", "pages");
-  const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
   const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
   // Strip block and line comments so documented patterns in prose
@@ -665,7 +677,7 @@ describe("recipesPageUnified", () => {
   // The MediaRow composition lives in the shared recipeRow.tsx
   // (#657); slice it out so the badge pins run against it.
   const rowCode = (
-    readFileSync(join(pagesDir, "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
@@ -951,8 +963,8 @@ describe("recipesPageUnified", () => {
 describe("recipesPageDecoupledPagination", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const pagesDir = join(here, "../../..", "src", "pages");
-  const source = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  const stories = readFileSync(join(pagesDir, "RecipesPage.stories.tsx"), "utf8");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
 
   // Strip block and line comments so documented patterns in prose
   // cannot pass the scan.

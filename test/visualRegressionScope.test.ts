@@ -85,19 +85,19 @@ function syntheticRepo() {
   put("src/widgets/Leaf.tsx", "export const Leaf = () => null;\n");
   put("src/widgets/Shared.tsx", "export const Shared = () => null;\n");
   put(
-    "src/pages/PageA.tsx",
-    'import { Leaf } from "../widgets/Leaf.js";\nimport { Shared } from "../widgets/Shared.js";\nexport const PageA = () => null;\n',
+    "src/pages/eciperay/PageA.tsx",
+    'import { Leaf } from "../../widgets/Leaf.js";\nimport { Shared } from "../../widgets/Shared.js";\nexport const PageA = () => null;\n',
   );
   put(
-    "src/pages/PageB.tsx",
-    'import { Shared } from "../widgets/Shared.js";\nexport const PageB = () => null;\n',
+    "src/pages/eciperay/PageB.tsx",
+    'import { Shared } from "../../widgets/Shared.js";\nexport const PageB = () => null;\n',
   );
   put(
     "src/pages/eciperay/RecipesPage.stories.tsx",
     'import { PageA } from "./PageA.js";\nconst meta = { title: "Pages/Eciperay/RecipesPage" };\nexport default meta;\nexport const Default = {};\nexport const Empty = {};\n',
   );
   put(
-    "src/pages/PageB.stories.tsx",
+    "src/pages/eciperay/PageB.stories.tsx",
     'import { PageB } from "./PageB.js";\nconst meta = { title: "Pages/Eciperay/PageB" };\nexport default meta;\nexport const Default = {};\n',
   );
   return root;
@@ -125,10 +125,13 @@ test("mapper: changed files map to story ids through the import graph", () => {
   assert.deepEqual(shared.narrow, leaf.narrow);
   const storyFile = computeScope({
     repoRoot: root,
-    changedFiles: ["src/pages/PageB.stories.tsx"],
+    changedFiles: ["src/pages/eciperay/PageB.stories.tsx"],
   });
   assert.deepEqual(storyFile.standard, ["pages-eciperay-pageb--default"]);
-  const pageItself = computeScope({ repoRoot: root, changedFiles: ["src/pages/PageA.tsx"] });
+  const pageItself = computeScope({
+    repoRoot: root,
+    changedFiles: ["src/pages/eciperay/PageA.tsx"],
+  });
   assert.deepEqual(pageItself.standard, leaf.standard);
   const docsOnly = computeScope({ repoRoot: root, changedFiles: ["docs/guide.md"] });
   assert.equal(docsOnly.mode, "scoped");

@@ -33,7 +33,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(join(here, "../..", "src", "widgets", "StatusMessage.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const pageSource = readFileSync(
-  join(here, "../..", "src", "pages", "RecipeDetailPage.tsx"),
+  join(here, "../..", "src", "pages", "eciperay", "RecipeDetailPage.tsx"),
   "utf8",
 );
 const pageCode = pageSource
@@ -118,7 +118,10 @@ test("the old gray7 ink fails on the dark surface — the gap $textMuted closes"
 });
 
 test("RecipeDetailPage renders StatusMessage unconditionally for its action message", () => {
-  assert.match(pageCode, /import \{ StatusMessage \} from "\.\.\/widgets\/StatusMessage\.js"/);
+  assert.match(
+    pageCode,
+    /import \{ StatusMessage \} from "\.\.\/\.\.\/widgets\/StatusMessage\.js"/,
+  );
   assert.match(pageCode, /<StatusMessage message=\{actionMessage\} \/>/);
   assert.doesNotMatch(pageCode, /\{actionMessage \? \(/);
   assert.doesNotMatch(pageCode, /accessibilityRole="text"/);

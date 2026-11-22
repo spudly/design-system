@@ -316,7 +316,10 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
   assert.match(read("src/pages/eciperay/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
   assert.match(read("src/widgets/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
-  assert.match(read("src/pages/eciperay/RecipeDetailPage.tsx"), /\bloadingSubstitutions\?: boolean/);
+  assert.match(
+    read("src/pages/eciperay/RecipeDetailPage.tsx"),
+    /\bloadingSubstitutions\?: boolean/,
+  );
   assert.match(read("src/pages/eciperay/RecipeDetailPage.tsx"), /\bloading\?: boolean/);
 });
 
@@ -1362,7 +1365,7 @@ const T4_CONVERTED_PAGES = [
 ] as const;
 test("T4: every converted page renders skeletons — no Spinner remains in its code", () => {
   for (const name of T4_CONVERTED_PAGES) {
-    const code = readCode(`src/pages/${name}.tsx`);
+    const code = readCode(`src/pages/eciperay/${name}.tsx`);
     assert.doesNotMatch(code, /Spinner/, `${name} must not render a Spinner (#278 tranche 4)`);
     assert.match(
       code,

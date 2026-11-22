@@ -52,8 +52,8 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "MemorizeReviewPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "MemorizeReviewPage.stories.tsx"), "utf8");
+const source = readFileSync(join(pagesDir, "memorize", "MemorizeReviewPage.tsx"), "utf8");
+const stories = readFileSync(join(pagesDir, "memorize", "MemorizeReviewPage.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -172,7 +172,7 @@ test("there is deliberately no app-content render slot", () => {
 test("the component is exported from the pages barrel index", () => {
   assert.match(index, /MemorizeReviewPage/);
   assert.match(index, /type MemorizeReviewPageProps/);
-  assert.match(index, /from "\.\/MemorizeReviewPage\.js"/);
+  assert.match(index, /from "\.\/memorize\/MemorizeReviewPage\.js"/);
 });
 
 test("stories exercise the default and empty states in the Quiet Dawn theme", () => {

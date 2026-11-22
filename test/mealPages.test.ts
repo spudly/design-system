@@ -51,7 +51,9 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 function pageSource(name: string) {
-  return readFileSync(join(root, "src", "pages", "eciperay", `${name}.tsx`), "utf8");
+  // StepNavControls is shared page scaffolding (#710: src/pages/shared/).
+  const dir = name === "StepNavControls" ? "shared" : "eciperay";
+  return readFileSync(join(root, "src", "pages", dir, `${name}.tsx`), "utf8");
 }
 
 function storySource(name: string) {

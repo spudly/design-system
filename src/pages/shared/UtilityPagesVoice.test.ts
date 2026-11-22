@@ -22,7 +22,8 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const strip = (text: string) =>
   text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const read = (name: string) => strip(readFileSync(join(here, `${name}.tsx`), "utf8"));
+const read = (name: string) =>
+  strip(readFileSync(join(here, "..", "eciperay", `${name}.tsx`), "utf8"));
 
 test("FeedbackPage reads its copy from the voice object", () => {
   const page = read("FeedbackPage");

@@ -49,7 +49,7 @@ function typeBlock(source: string, name: string): string {
 test("TabbedShellPage is exported from the pages barrel with alias types", () => {
   assert.match(
     barrel,
-    /TabbedShellPage,\s*type TabbedShellPageLinkTab,\s*type TabbedShellPageProps,\s*type TabbedShellPageTab,\s*\} from "\.\/TabbedShellPage\.js";/,
+    /TabbedShellPage,\s*type TabbedShellPageLinkTab,\s*type TabbedShellPageProps,\s*type TabbedShellPageTab,\s*\} from "\.\/memorize\/TabbedShellPage\.js";/,
   );
   assert.match(page, /export type TabbedShellPageProps = TabbedShellPageBaseProps &/);
   assert.match(page, /export type TabbedShellPageTab = \{/);
@@ -74,11 +74,15 @@ test("the page composes DS components only and never touches the boundary itself
     /ChunkErrorBoundary/,
     "lazy content goes through the internal LazySlot — the page never names the boundary",
   );
-  assert.match(page, /import \{ LazySlot \} from "\.\.\/views\/LazySlot\.js";/);
-  assert.match(page, /import \{ Tabs \} from "\.\.\/widgets\/Tabs\.js";/);
+  assert.match(page, /import \{ LazySlot \} from "\.\.\/\.\.\/views\/LazySlot\.js";/);
+  assert.match(page, /import \{ Tabs \} from "\.\.\/\.\.\/widgets\/Tabs\.js";/);
   assert.match(page, /<ScreenContainer>/);
-  assert.match(page, /import type \{ IconName \} from "\.\.\/icons\/iconRegistry\.js";/);
-  assert.doesNotMatch(page, /from "\.\.\/icons\/[A-Z]/, "no icon component crosses into the page");
+  assert.match(page, /import type \{ IconName \} from "\.\.\/\.\.\/icons\/iconRegistry\.js";/);
+  assert.doesNotMatch(
+    page,
+    /from "\.\.\/\.\.\/icons\/[A-Z]/,
+    "no icon component crosses into the page",
+  );
   // The standard page footer contract (#410, pinned for every
   // page by src/widgets/BigFooter.test.ts): an optional footer prop
   // rendered through the shell — no data, no footer band.

@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../../..", "src", "pages");
 const componentsDir = join(here, "../../..", "src", "widgets");
-const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
+const source = readFileSync(join(pagesDir, "eciperay", "PublicRecipePage.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
 const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
@@ -31,7 +31,7 @@ test("PublicRecipePage is exported from the pages barrel; PublicPageFrame is ret
   assert.match(index, /PublicRecipePage,/, "index.ts must export PublicRecipePage");
   assert.match(
     index,
-    /from "\.\/PublicRecipePage\.js"/,
+    /from "\.\/eciperay\/PublicRecipePage\.js"/,
     "the export must come from ./PublicRecipePage.js",
   );
   assert.ok(
@@ -307,8 +307,8 @@ test("no explicit lineHeight anywhere in the new files (#162)", () => {
 describe("publicRecipePageAdoption", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const pagesDir = join(here, "../../..", "src", "pages");
-  const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
-  const stories = readFileSync(join(pagesDir, "PublicRecipePage.stories.tsx"), "utf8");
+  const source = readFileSync(join(pagesDir, "eciperay", "PublicRecipePage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "PublicRecipePage.stories.tsx"), "utf8");
 
   // Strip block and line comments so documented patterns in prose
   // cannot pass the scan.

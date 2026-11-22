@@ -56,8 +56,8 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "MealPlansPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "MealPlansPage.stories.tsx"), "utf8");
+const source = readFileSync(join(pagesDir, "eciperay", "MealPlansPage.tsx"), "utf8");
+const stories = readFileSync(join(pagesDir, "eciperay", "MealPlansPage.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -162,7 +162,7 @@ test("there is deliberately no app-content render slot", () => {
 test("the component is exported from the pages barrel index", () => {
   assert.match(index, /MealPlansPage/);
   assert.match(index, /type MealPlansPageProps/);
-  assert.match(index, /from "\.\/MealPlansPage\.js"/);
+  assert.match(index, /from "\.\/eciperay\/MealPlansPage\.js"/);
 });
 
 test("stories exercise the default, empty, loading, and no-actions states", () => {

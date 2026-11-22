@@ -263,6 +263,10 @@ test("no app imports in the page or the card", () => {
           specifier.startsWith("../../tokens") ||
           specifier.startsWith("../../widgets") ||
           specifier.startsWith("../../views") ||
+          specifier.startsWith("../tokens") ||
+          specifier.startsWith("../widgets") ||
+          specifier.startsWith("../views") ||
+          specifier.startsWith("../contexts") ||
           specifier.startsWith("../../contexts") ||
           specifier.startsWith("./"),
         `${name} must not import "${specifier}" — app logic stays app-side`,

@@ -337,7 +337,7 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
     "PageFrame is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
   );
   assert.ok(
-    !index.includes('from "./BoundedList.js"'),
+    !index.includes('from "./shared/BoundedList.js"'),
     "BoundedList is exported from src/pages/index.ts — it is now public surface and needs its own story decision (see storybookParity header)",
   );
   // #710: pages live in per-host-app subdirectories
@@ -349,10 +349,7 @@ test("every page component has a story file titled Pages/<App>/<Name>", () => {
       // The colocated Android VR baselines (#530), pinned by
       // test/visualRegressionScope.test.ts.
       if (entry.name === "__snapshots__") continue;
-      assert.ok(
-        entry.isFile(),
-        `src/pages/${host}/${entry.name}: unexpected directory`,
-      );
+      assert.ok(entry.isFile(), `src/pages/${host}/${entry.name}: unexpected directory`);
       if (
         exceptions.has(entry.name) ||
         entry.name.endsWith(".stories.tsx") ||

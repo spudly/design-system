@@ -56,9 +56,18 @@ test("the panel composes the shared building blocks with its conditional content
   assert.match(panelCode, /<Thumbnail src=\{imageUrl\} \/>/, "the hero is Thumbnail's hero frame");
   assert.match(panelCode, /\{description \? \(/, "the description renders only when present");
   assert.match(panelCode, /<StatBand>/, "the stat band is the shared StatBand");
-  assert.match(panelCode, /<StatCard label=\{voice\.recipeOverviewPanel\.servingsLabel\} value=\{servingsLabel\} \/>/);
-  assert.match(panelCode, /\{prepTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/);
-  assert.match(panelCode, /\{cookTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/);
+  assert.match(
+    panelCode,
+    /<StatCard label=\{voice\.recipeOverviewPanel\.servingsLabel\} value=\{servingsLabel\} \/>/,
+  );
+  assert.match(
+    panelCode,
+    /\{prepTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/,
+  );
+  assert.match(
+    panelCode,
+    /\{cookTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/,
+  );
   assert.match(panelCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
   assert.match(
     panelCode,
@@ -104,7 +113,7 @@ test("no recipe surface gains a second level-1 heading from the panel (#364)", (
   // level-1 heading variant of its own — the panel's title is
   // its page's sole level-1 heading (its section headings are
   // SectionHeading, level 2).
-  const publicCode = readCode("PublicRecipePage.tsx");
+  const publicCode = readCode("eciperay/PublicRecipePage.tsx");
   assert.match(publicCode, /<RecipeOverviewPanel/);
   assert.ok(
     !/variant="(heading|title|formTitle)"/.test(publicCode),
@@ -113,7 +122,7 @@ test("no recipe surface gains a second level-1 heading from the panel (#364)", (
   // RecipeDetailPage does not compose the panel; its inline
   // overview title already carries level-1 semantics through
   // the `formTitle` variant, so it is untouched by this change.
-  const detailCode = readCode("RecipeDetailPage.tsx");
+  const detailCode = readCode("eciperay/RecipeDetailPage.tsx");
   assert.ok(
     !detailCode.includes("RecipeOverviewPanel"),
     "RecipeDetailPage does not compose the panel",

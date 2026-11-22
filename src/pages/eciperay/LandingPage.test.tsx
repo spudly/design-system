@@ -197,7 +197,7 @@ test("the page is exported from the package root (@spudly/ui) and storied under 
   const normalizedIndex = pagesIndex.replaceAll(/\s+/g, " ");
   assert.ok(
     normalizedIndex.includes(
-      'export { LandingPage, type LandingPageProps, type LandingPageCta, type LandingPageFeature, } from "./LandingPage.js";',
+      'export { LandingPage, type LandingPageProps, type LandingPageCta, type LandingPageFeature, } from "./eciperay/LandingPage.js";',
     ),
     "src/pages/index.ts must export LandingPage and its view-model types",
   );
@@ -224,7 +224,8 @@ function loadRuntime() {
     // The pages barrel is not Node-importable (some pages import
     // react-native), so the page under test is loaded from its
     // own module — it is a plain component composition.
-    const { LandingPage }: Record<string, any> = await import("../../../dist/pages/eciperay/LandingPage.js");
+    const { LandingPage }: Record<string, any> =
+      await import("../../../dist/pages/eciperay/LandingPage.js");
     return {
       React,
       renderToString,

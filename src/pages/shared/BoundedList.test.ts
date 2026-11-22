@@ -35,7 +35,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "BoundedList.tsx"), "utf8");
+const source = readFileSync(join(pagesDir, "shared", "BoundedList.tsx"), "utf8");
 const pagesIndex = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -132,10 +132,10 @@ test("BoundedList is internal: not exported from the pages index", () => {
 
 test("the three fixed-shell list pages render BoundedList", () => {
   for (const page of ["VerseSearchPage", "MemorizeReviewPage", "MyVersesPage"]) {
-    const pageSource = readFileSync(join(pagesDir, `${page}.tsx`), "utf8");
+    const pageSource = readFileSync(join(pagesDir, "memorize", `${page}.tsx`), "utf8");
     assert.match(
       pageSource,
-      /import \{ BoundedList \} from "\.\/BoundedList\.js";/,
+      /import \{ BoundedList \} from "\.\.\/shared\/BoundedList\.js";/,
       `${page} must import BoundedList from the internal module`,
     );
     assert.match(pageSource, /<BoundedList/, `${page} must render BoundedList`);
@@ -150,7 +150,7 @@ test("the retired loading slot helpers stay retired (#119 dedupe)", () => {
 });
 
 test("RecipesPage renders its loading slots as skeleton rows (#278 tranche 4)", () => {
-  const page = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
+  const page = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
   // Since #415 the loading slots are the two sections' own
   // rows in the unified list (each section loads independently)
   // plus the shared loading-more footer. Since #278 tranche 4

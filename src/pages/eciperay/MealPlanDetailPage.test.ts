@@ -79,8 +79,8 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "MealPlanDetailPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "MealPlanDetailPage.stories.tsx"), "utf8");
+const source = readFileSync(join(pagesDir, "eciperay", "MealPlanDetailPage.tsx"), "utf8");
+const stories = readFileSync(join(pagesDir, "eciperay", "MealPlanDetailPage.stories.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -242,7 +242,7 @@ test("there is deliberately no app-content render slot", () => {
 test("the component is exported from the pages barrel index", () => {
   assert.match(index, /MealPlanDetailPage/);
   assert.match(index, /type MealPlanDetailPageProps/);
-  assert.match(index, /from "\.\/MealPlanDetailPage\.js"/);
+  assert.match(index, /from "\.\/eciperay\/MealPlanDetailPage\.js"/);
 });
 
 test("the goals section has an explicit visibility control (#78)", () => {
