@@ -1,4 +1,5 @@
-import { Input as TamaguiInput, isWeb, styled } from "tamagui";
+import type { ReactNode } from "react";
+import { Input as TamaguiInput, View, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { FieldShell } from "../FieldShell.js";
@@ -59,6 +60,16 @@ export type TextFieldProps = StyledInputProps & {
    * height) the field's box matches its button exactly (#476).
    */
   grow?: boolean;
+  /**
+   * Optional node rendered inside a relatively-positioned wrapper
+   * around the input ALONE (not the label or error line), so an
+   * absolutely-positioned trailing control anchors to the input row
+   * itself and stays centered on it in every state — with or without
+   * a label, with or without an error (PasswordField's eye toggle,
+   * #758). The wrapper carries the grow flex instead of the input
+   * when both are set.
+   */
+  trailing?: ReactNode;
 };
 
 /**
@@ -95,6 +106,7 @@ export function TextField({
   label,
   error,
   grow = false,
+  trailing,
   id: idProp,
   secureTextEntry,
   type,
@@ -172,23 +184,26 @@ export function TextField({
     >
       {({ submitEditingProps, compositionProps }) => (
         <>
-          <StyledInput
-            id={id}
-            error={!!error}
-            changed={changed ?? false}
-            placeholderTextColor={
-              placeholderTextColor ?? (changed ? tokens.colors.warning.warning10 : "$textMuted")
-            }
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? errorId : undefined}
-            {...a11yProps}
-            {...rest}
-            {...(grow ? { flex: 1 } : {})}
-            {...secureProps}
-            {...autoCompleteProps}
-            {...submitEditingProps}
-            {...compositionProps}
-          />
+          <View position="relative" {...(grow ? { flex: 1 } : {})}>
+            <StyledInput
+              id={id}
+              error={!!error}
+              changed={changed ?? false}
+              placeholderTextColor={
+                placeholderTextColor ?? (changed ? tokens.colors.warning.warning10 : "$textMuted")
+              }
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? errorId : undefined}
+              {...a11yProps}
+              {...rest}
+              {...(grow ? { flex: 1 } : {})}
+              {...secureProps}
+              {...autoCompleteProps}
+              {...submitEditingProps}
+              {...compositionProps}
+            />
+            {trailing ?? null}
+          </View>
           {error ? (
             <Text variant="error" id={errorId}>
               {error}

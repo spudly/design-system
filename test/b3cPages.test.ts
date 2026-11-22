@@ -72,10 +72,17 @@ test("auth pages use the DS auth shell and secure password entry", () => {
   }
   // Since #119 the password fields live in the pages' form units
   // (the extracted form components) — the masking pin follows
-  // the fields there.
+  // the fields there. Since #758 the password field is the
+  // PasswordField widget, which composes TextField with
+  // secureTextEntry — the pin follows the field into the widget.
   for (const name of ["SignInForm", "SignUpForm", "ResetPasswordForm"]) {
-    assert.match(view(name), /secureTextEntry/, `${name} masks the password`);
+    assert.match(view(name), /<PasswordField/, `${name} renders its password through PasswordField`);
   }
+  assert.match(
+    readFileSync("src/widgets/form/PasswordField.tsx", "utf8"),
+    /secureTextEntry/,
+    "PasswordField masks the password through TextField's secureTextEntry",
+  );
   // The reset token is app-side business logic: it never
   // crosses the DS boundary, not even as a prop — neither on
   // the page nor on its form unit.

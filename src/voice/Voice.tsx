@@ -208,6 +208,8 @@ export type Voice = {
   signInForm: {
     emailLabel: string;
     passwordLabel: string;
+    showPasswordLabel: string;
+    hidePasswordLabel: string;
     submitLabel: string;
     submitPendingLabel: string;
     createAccountLabel: string;
@@ -218,6 +220,8 @@ export type Voice = {
     nameLabel: string;
     emailLabel: string;
     passwordLabel: string;
+    showPasswordLabel: string;
+    hidePasswordLabel: string;
     submitLabel: string;
     submitPendingLabel: string;
     signInLabel: string;
@@ -232,6 +236,8 @@ export type Voice = {
   /** ResetPasswordForm view (tranche 2c): the form's field label and submit action — the form has no label props, so its copy reads the voice slots directly. */
   resetPasswordForm: {
     passwordLabel: string;
+    showPasswordLabel: string;
+    hidePasswordLabel: string;
     submitLabel: string;
     submitPendingLabel: string;
   };

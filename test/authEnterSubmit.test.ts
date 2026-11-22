@@ -27,9 +27,11 @@ const AUTH_FORMS = [
   { name: "ResetPasswordForm", fields: 1 },
 ];
 
+// Since #758 a form's password field is a PasswordField (which
+// composes TextField); both tags count as fields here.
 const textFieldBlocks = (source: string) =>
   source
-    .split("<TextField")
+    .split(/<(?:TextField|PasswordField)/)
     .slice(1)
     .map((chunk: any) => chunk.split("/>")[0]);
 

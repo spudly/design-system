@@ -138,6 +138,8 @@ export const fixtureVoice: Voice = {
   signInForm: {
     emailLabel: "Email",
     passwordLabel: "Password",
+    showPasswordLabel: "Show password",
+    hidePasswordLabel: "Hide password",
     submitLabel: "Sign In",
     submitPendingLabel: "Signing in\u2026",
     createAccountLabel: "Create an account",
@@ -147,6 +149,8 @@ export const fixtureVoice: Voice = {
     nameLabel: "Your name",
     emailLabel: "Email",
     passwordLabel: "Password",
+    showPasswordLabel: "Show password",
+    hidePasswordLabel: "Hide password",
     submitLabel: "Create Account",
     submitPendingLabel: "Creating account\u2026",
     signInLabel: "Already have an account? Sign in",
@@ -159,6 +163,8 @@ export const fixtureVoice: Voice = {
   },
   resetPasswordForm: {
     passwordLabel: "New password",
+    showPasswordLabel: "Show password",
+    hidePasswordLabel: "Hide password",
     submitLabel: "Update password",
     submitPendingLabel: "Updating\u2026",
   },

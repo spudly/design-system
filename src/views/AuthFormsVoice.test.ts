@@ -23,6 +23,8 @@ test("SignInForm reads its copy from the voice object", () => {
   for (const slot of [
     "emailLabel",
     "passwordLabel",
+    "showPasswordLabel",
+    "hidePasswordLabel",
     "submitLabel",
     "submitPendingLabel",
     "createAccountLabel",
@@ -43,6 +45,8 @@ test("SignUpForm reads its copy from the voice object", () => {
     "nameLabel",
     "emailLabel",
     "passwordLabel",
+    "showPasswordLabel",
+    "hidePasswordLabel",
     "submitLabel",
     "submitPendingLabel",
     "signInLabel",
@@ -67,7 +71,13 @@ test("ForgotPasswordForm reads its copy from the voice object", () => {
 test("ResetPasswordForm reads its copy from the voice object", () => {
   const view = read("ResetPasswordForm");
   assert.match(view, /useVoice\(\)/);
-  for (const slot of ["passwordLabel", "submitLabel", "submitPendingLabel"]) {
+  for (const slot of [
+    "passwordLabel",
+    "showPasswordLabel",
+    "hidePasswordLabel",
+    "submitLabel",
+    "submitPendingLabel",
+  ]) {
     assert.match(view, new RegExp(`voice\\.resetPasswordForm\\.${slot}`), `slot ${slot} is read`);
   }
   assert.doesNotMatch(view, /"New password"|"Update password"|"Updating…"/);

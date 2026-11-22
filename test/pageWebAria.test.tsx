@@ -120,9 +120,11 @@ function sourceFiles(dir: string): string[] {
 // ButtonInternal (#480) is Button's own internal form — same routing.
 // LoadingActionCardRow (#119 tranche 2) is sanctioned on the
 // DropdownButton ground: it forwards its `accessibilityLabel` to the
-// DS Button it renders, which translates it.
+// DS Button it renders, which translates it. PasswordField (#758) is
+// sanctioned on the same ground: it forwards its `accessibilityLabel`
+// to the TextField it renders, which translates it.
 const SANCTIONED_TAGS = new Set(
-  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert,LoadingActionCardRow".split(
+  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert,LoadingActionCardRow,PasswordField".split(
     ",",
   ),
 );

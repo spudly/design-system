@@ -6,6 +6,8 @@ import { BackIcon } from "./BackIcon.js";
 import { CollapsedIcon } from "./CollapsedIcon.js";
 import { CollapsibleIcon } from "./CollapsibleIcon.js";
 import { ExpandedIcon } from "./ExpandedIcon.js";
+import { EyeIcon } from "./EyeIcon.js";
+import { EyeOffIcon } from "./EyeOffIcon.js";
 import { FeedbackIcon } from "./FeedbackIcon.js";
 import { HomeIcon } from "./HomeIcon.js";
 import { Icon, type IconElement } from "./Icon.js";
@@ -52,6 +54,8 @@ const galleryIcons = [
   { name: "BackIcon", Icon: BackIcon },
   { name: "CollapsedIcon", Icon: CollapsedIcon },
   { name: "ExpandedIcon", Icon: ExpandedIcon },
+  { name: "EyeIcon", Icon: EyeIcon },
+  { name: "EyeOffIcon", Icon: EyeOffIcon },
   { name: "FeedbackIcon", Icon: FeedbackIcon },
   { name: "HomeIcon", Icon: HomeIcon },
   { name: "MealsIcon", Icon: MealsIcon },
