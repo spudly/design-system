@@ -24,7 +24,6 @@ export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPicker
 export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
-export { DetailRow, type DetailRowProps } from "./DetailRow.js";
 export { Divider, type DividerProps } from "./Divider.js";
 export {
   Dropdown,
@@ -90,9 +89,9 @@ export {
   type RadioOption,
   type RadioOptionGroupProps,
 } from "./form/RadioOptionGroup.js";
-export { SearchField, type SearchFieldProps } from "./SearchField.js";
-export { TextAreaField, type TextAreaFieldProps } from "./TextAreaField.js";
-export { TextField, type TextFieldProps } from "./TextField.js";
+export { SearchField, type SearchFieldProps } from "./form/SearchField.js";
+export { TextAreaField, type TextAreaFieldProps } from "./form/TextAreaField.js";
+export { TextField, type TextFieldProps } from "./form/TextField.js";
 export { Slider, type SliderProps } from "./form/Slider.js";
 export { BoxSkeleton, type BoxSkeletonProps } from "./BoxSkeleton.js";
 export { CircleSkeleton, type CircleSkeletonProps } from "./CircleSkeleton.js";

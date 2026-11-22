@@ -8,8 +8,8 @@ import { FormScreenLayout } from "../widgets/FormScreenLayout.js";
 import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
 import { NumberStepper } from "../widgets/NumberStepper.js";
 import { Text } from "../widgets/Text.js";
-import { TextAreaField } from "../widgets/TextAreaField.js";
-import { TextField } from "../widgets/TextField.js";
+import { TextAreaField } from "../widgets/form/TextAreaField.js";
+import { TextField } from "../widgets/form/TextField.js";
 
 /**
  * MealFormPage (#125, B3b): the meal form's view layer — the

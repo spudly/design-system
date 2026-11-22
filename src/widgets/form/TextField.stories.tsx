@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { TextField } from "./TextField.js";
 
 const meta: Meta<typeof TextField> = {
-  title: "Widgets/TextField",
+  title: "Widgets/Form/TextField",
   component: TextField,
   argTypes: {
     label: { control: "text" },

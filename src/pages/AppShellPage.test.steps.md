@@ -14,8 +14,10 @@ release's changed components. The full index lives in
 ## App shells (AppShellPage, TabbedShellPage, AppTopBar)
 
 Open in `Pages/Eciperay/AppShellPage`: Default, NoIcons,
-LinkActions, NoFooter, ChunkFailedContent;
-`Pages/Memorize/TabbedShellPage`: TabbedShell.
+LinkActions, NoFooter, ChunkFailedContent, WithNotice,
+WithNoticeAction;
+`Pages/Memorize/TabbedShellPage`: TabbedShell, WithNotice,
+WithNoticeAction.
 
 1. AppShellPage Default: the top bar shows the Eciperay
    wordmark (a real link home), the seven nav items with their
@@ -34,6 +36,12 @@ LinkActions, NoFooter, ChunkFailedContent;
 4. TabbedShellPage TabbedShell: the header is the same top
    bar — the app title in the brand treatment, no nav, no
    actions — above the tab bar; the shells are one chrome.
+5. WithNotice (#765, both shells): the notice message renders
+   between the top bar and the page content and is announced
+   (polite live region); the content stays visible and usable
+   underneath. WithNoticeAction: a "Try again" button renders
+   with the message and activating it fires the host's
+   callback. Without a notice supplied, no notice row renders.
 
 **Run when:** `src/pages/AppShellPage.tsx`,
 `src/pages/TabbedShellPage.tsx`, `src/widgets/AppTopBar.tsx`,

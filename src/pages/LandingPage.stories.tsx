@@ -15,7 +15,7 @@ type Story = StoryObj<typeof LandingPage>;
  * The landing is a static view — one state, all content from
  * props — so a single story renders the whole page: hero, the
  * three link CTAs, and the three fixed feature cards. Default
- * pins the phone viewport (430×844) like the other page
+ * defaults to the phone viewport (430×844) like the other page
  * stories; Wide renders the same page unconstrained so the
  * wide-web layout can be checked (the CTA row in one row, the
  * three feature cards sharing a row at their 260px basis) —

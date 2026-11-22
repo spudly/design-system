@@ -7,7 +7,7 @@ import { SpacedTopStack } from "../widgets/SpacedTopStack.js";
 import { TightStack } from "../widgets/TightStack.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
-import { TextField } from "../widgets/TextField.js";
+import { TextField } from "../widgets/form/TextField.js";
 import { useVoice } from "../voice/index.js";
 
 /**
@@ -185,14 +185,14 @@ export function NutritionGoalsForm({
             }}
           />
           <GoalField
-            label={`${voice.nutritionGoalsForm.carbsLabel} ${voice.nutritionGoalsForm.minLabel}`}
+            label={`${voice.nutritionGoalsForm.netCarbsLabel} ${voice.nutritionGoalsForm.minLabel}`}
             value={goals.carbsGMin}
             onChange={(carbsGMin) => {
               patch({ carbsGMin });
             }}
           />
           <GoalField
-            label={`${voice.nutritionGoalsForm.carbsLabel} ${voice.nutritionGoalsForm.maxLabel}`}
+            label={`${voice.nutritionGoalsForm.netCarbsLabel} ${voice.nutritionGoalsForm.maxLabel}`}
             value={goals.carbsGMax}
             onChange={(carbsGMax) => {
               patch({ carbsGMax });

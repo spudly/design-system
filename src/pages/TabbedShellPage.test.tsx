@@ -100,6 +100,7 @@ function loadRuntime() {
     const { TabbedShellPage }: Record<string, any> =
       await import("../../dist/pages/TabbedShellPage.js");
     const distViews: Record<string, any> = await import("../../dist/views/index.js");
+    const distWidgets: Record<string, any> = await import("../../dist/widgets/index.js");
     return {
       React,
       renderToString,
@@ -107,6 +108,7 @@ function loadRuntime() {
       ...dist,
       TabbedShellPage,
       distViews,
+      distWidgets,
     };
   })();
   return runtimePromise;
@@ -146,7 +148,7 @@ test("the slot renders only the active tab's content, keyed by the active surfac
     onTabSelect,
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
-  const [title, tabBar, slot] = tree.props.children.props.children;
+  const [title, tabBar, , slot] = tree.props.children.props.children;
   // #437: the header is the shared AppTopBar view, with the
   // shell's title as its brand (no href — the title navigates
   // nowhere).
@@ -186,7 +188,7 @@ test("an override surface replaces tab content with no tab selected; contentKey 
     onTabSelect: () => {},
     children: override,
   });
-  const [, tabBar, slot] = tree.props.children.props.children;
+  const [, tabBar, , slot] = tree.props.children.props.children;
   assert.equal(tabBar.props.value, "", "no tab is selected while the override shows");
   assert.equal(slot.key, "override");
   assert.equal(slot.props.children, override);
@@ -198,7 +200,7 @@ test("an override surface replaces tab content with no tab selected; contentKey 
     contentKey: "verse-42",
   });
   assert.equal(
-    keyed.props.children.props.children[2].key,
+    keyed.props.children.props.children[3].key,
     "verse-42",
     "the host's contentKey wins",
   );
@@ -313,7 +315,70 @@ test("stories cover the shell, icon tabs, loading, failure, override, and link f
     "ChunkFailedTabContent",
     "DrillOpen",
     "LinkTabs",
+    "WithNotice",
+    "WithNoticeAction",
   ]) {
     assert.match(stories, new RegExp(`export const ${story}: Story`), `missing story ${story}`);
   }
+});
+test("notice (#765): absent by default; when present it forwards message + action and the callback fires", async () => {
+  const { React, TabbedShellPage, distWidgets } = await loadRuntime();
+  const bare = TabbedShellPage({
+    title: "Memorize",
+    tabs: sentinelTabs(React),
+    activeTabId: "verses",
+    onTabSelect: () => {},
+  });
+  assert.equal(
+    bare.props.children.props.children[2],
+    null,
+    "no notice data — no notice renders between the tab bar and the content",
+  );
+  let presses = 0;
+  const onPress = () => {
+    presses += 1;
+  };
+  const withNotice = TabbedShellPage({
+    title: "Memorize",
+    tabs: sentinelTabs(React),
+    activeTabId: "verses",
+    onTabSelect: () => {},
+    notice: {
+      message: "Your verses could not be refreshed.",
+      action: { label: "Try again", onPress },
+    },
+  });
+  const noticeEl = withNotice.props.children.props.children[2];
+  assert.equal(noticeEl.type, distWidgets.BannerRow, "the notice renders through BannerRow");
+  const [messageEl, actionEl] = noticeEl.props.children;
+  assert.equal(
+    messageEl.type,
+    distWidgets.StatusMessage,
+    "the message renders through StatusMessage",
+  );
+  assert.equal(messageEl.props.message, "Your verses could not be refreshed.");
+  assert.equal(actionEl.type, distWidgets.Button, "the notice action renders as a DS Button");
+  assert.equal(actionEl.props.children, "Try again");
+  assert.equal(actionEl.props.onPress, onPress, "the host callback is forwarded to the Button");
+  actionEl.props.onPress();
+  assert.equal(presses, 1, "the notice action callback fires");
+});
+test("SSR: a notice renders its message and action above the content; content stays mounted", async () => {
+  const { React, TabbedShellPage } = await loadRuntime();
+  const html = await renderToHtml(
+    <TabbedShellPage
+      title="Memorize"
+      tabs={sentinelTabs(React)}
+      activeTabId="verses"
+      onTabSelect={() => {}}
+      notice={{
+        message: "Your verses could not be refreshed.",
+        action: { label: "Try again", onPress: () => {} },
+      }}
+    />,
+  );
+  assert.match(html, /Your verses could not be refreshed\./, "the notice message renders");
+  assert.match(html, /Try again/, "the notice action label renders");
+  assert.match(html, /role="status"/, "the notice keeps the polite live-region semantics");
+  assert.match(html, /VERSES SURFACE/, "the tab content stays mounted under the notice");
 });

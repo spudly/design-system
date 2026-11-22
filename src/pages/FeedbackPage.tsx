@@ -2,10 +2,10 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Alert } from "../widgets/Alert.js";
 import { Button } from "../widgets/Button.js";
 import { CheckboxField } from "../widgets/CheckboxField.js";
-import { TextAreaField } from "../widgets/TextAreaField.js";
+import { TextAreaField } from "../widgets/form/TextAreaField.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { Text } from "../widgets/Text.js";
-import { TextField } from "../widgets/TextField.js";
+import { TextField } from "../widgets/form/TextField.js";
 import { useVoice } from "../voice/index.js";
 
 /**

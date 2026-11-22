@@ -12,7 +12,7 @@ import { TabbedShellPage, type TabbedShellPageTab } from "./TabbedShellPage.js";
  * values (packages/web/src/App.tsx); the tab surfaces are static
  * stand-ins composed from DS components, the way the app's tab
  * hosts slot DS pages into the frame. The frame matches the
- * other page stories: a phone viewport (430×844) pinned so
+ * other page stories: a phone viewport (430×844) by default, so
  * Chromatic screenshots are deterministic, theme pinned to
  * Quiet Dawn, Memorize's brand.
  */
@@ -203,6 +203,41 @@ export const DrillOpen: Story = {
           </Text>
         </SectionCard>
       </TabbedShellPage>
+    </>
+  ),
+};
+
+/** With a non-blocking notice (#765): message only, above the tab content. */
+export const WithNotice: Story = {
+  render: () => (
+    <>
+      <TabbedShellPage
+        title="Memorize"
+        tabsLabel="Memorize sections"
+        tabs={memorizeTabs}
+        activeTabId="verses"
+        onTabSelect={() => {}}
+        notice={{ message: "Your verses could not be refreshed." }}
+      />
+    </>
+  ),
+};
+
+/** With a notice carrying a recovery action (#765): message plus a retry Button. */
+export const WithNoticeAction: Story = {
+  render: () => (
+    <>
+      <TabbedShellPage
+        title="Memorize"
+        tabsLabel="Memorize sections"
+        tabs={memorizeTabs}
+        activeTabId="verses"
+        onTabSelect={() => {}}
+        notice={{
+          message: "Your verses could not be refreshed.",
+          action: { label: "Try again", onPress: () => {} },
+        }}
+      />
     </>
   ),
 };

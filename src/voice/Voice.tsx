@@ -260,7 +260,7 @@ export type Voice = {
     title: string;
     caloriesLabel: string;
     proteinLabel: string;
-    carbsLabel: string;
+    netCarbsLabel: string;
     fatLabel: string;
     satietyScoreLabel: string;
     minLabel: string;

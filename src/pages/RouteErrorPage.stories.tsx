@@ -26,3 +26,16 @@ export const ErrorState: Story = {
     </>
   ),
 };
+
+/** With a host-supplied recovery action (#765): a retry Button beside the home link. */
+export const WithAction: Story = {
+  render: () => (
+    <>
+      <RouteErrorPage
+        footer={eciperayFooterFixture}
+        variant="error"
+        action={{ label: "Try again", onPress: () => {} }}
+      />
+    </>
+  ),
+};

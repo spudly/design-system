@@ -24,7 +24,7 @@ import {
  * and round), so every screenshot is deterministic.
  *
  * The frame matches MealPlanDetailPage's stories: a phone
- * viewport (430×844) pinned so Chromatic screenshots are
+ * viewport (430×844) by default, so Chromatic screenshots are
  * deterministic. Theme pinned to Quiet Dawn, Memorize's
  * brand.
  */

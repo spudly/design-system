@@ -7,7 +7,7 @@ import { ButtonRow } from "../widgets/ButtonRow.js";
 import { FormHeading } from "../widgets/FormHeading.js";
 import { PreviewCard } from "../widgets/PreviewCard.js";
 import { SessionShell } from "../widgets/SessionShell.js";
-import { TextAreaField } from "../widgets/TextAreaField.js";
+import { TextAreaField } from "../widgets/form/TextAreaField.js";
 
 /**
  * AiSessionPage (#126, B3c): the AI session view — the split

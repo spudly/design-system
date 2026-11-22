@@ -86,7 +86,7 @@ test("header search crosses as data: a controlled field with change/submit callb
   assert.match(page, /search\?: AppShellPageSearch \| null;/);
   assert.match(
     topBar,
-    /import \{ SearchField \} from "\.\/SearchField\.js";/,
+    /import \{ SearchField \} from "\.\/form\/SearchField\.js";/,
     "the bar renders the DS SearchField — no new input widget",
   );
   assert.match(
@@ -140,6 +140,8 @@ test("the stories cover the shell's contracted cases", () => {
   for (const name of [
     "Default",
     "WithSearch",
+    "WithNotice",
+    "WithNoticeAction",
     "NoIcons",
     "LinkActions",
     "NoFooter",
@@ -219,7 +221,7 @@ test("the slot renders the page content, keyed by the active nav item; contentKe
     children: surface,
   });
   assert.equal(tree.props.footer, undefined, "no footer data — no footer band (#410)");
-  const [topBarEl, slot] = tree.props.children.props.children;
+  const [topBarEl, , slot] = tree.props.children.props.children;
   assert.equal(topBarEl.type, distWidgets.AppTopBar, "the header is the shared top-bar widget");
   assert.deepEqual(topBarEl.props.brand, {
     label: "Eciperay",
@@ -242,7 +244,7 @@ test("the slot renders the page content, keyed by the active nav item; contentKe
     children: surface,
   });
   assert.equal(
-    keyed.props.children.props.children[1].key,
+    keyed.props.children.props.children[2].key,
     "recipe-42",
     "the host's contentKey wins",
   );
@@ -431,4 +433,78 @@ test("SSR: a pending surface shows the loading state; a failed one stays in the 
   assert.match(failedHtml, /Switched to client rendering because the server rendering errored/);
   assert.match(failedHtml, /Eciperay/, "the shell brand renders around the failure");
   assert.match(failedHtml, /href="\/recipes"/, "the nav renders around the failure");
+});
+test("notice (#765): absent by default; when present it forwards message + action and the callback fires", async () => {
+  const { AppShellPage, distWidgets } = await loadRuntime();
+  const bare = AppShellPage({
+    brand: { label: "Eciperay", href: "/" },
+    navItems: sentinelNav,
+    activeItemId: "recipes",
+    children: <span>PAGE SURFACE</span>,
+  });
+  assert.equal(
+    bare.props.children.props.children[1],
+    null,
+    "no notice data — no notice renders between the top bar and the content",
+  );
+  let presses = 0;
+  const onPress = () => {
+    presses += 1;
+  };
+  const withNotice = AppShellPage({
+    brand: { label: "Eciperay", href: "/" },
+    navItems: sentinelNav,
+    activeItemId: "recipes",
+    notice: {
+      message: "Your profile could not be loaded.",
+      action: { label: "Try again", onPress },
+    },
+    children: <span>PAGE SURFACE</span>,
+  });
+  const noticeEl = withNotice.props.children.props.children[1];
+  assert.equal(noticeEl.type, distWidgets.BannerRow, "the notice renders through BannerRow");
+  const [messageEl, actionEl] = noticeEl.props.children;
+  assert.equal(
+    messageEl.type,
+    distWidgets.StatusMessage,
+    "the message renders through StatusMessage",
+  );
+  assert.equal(messageEl.props.message, "Your profile could not be loaded.");
+  assert.equal(actionEl.type, distWidgets.Button, "the notice action renders as a DS Button");
+  assert.equal(actionEl.props.children, "Try again");
+  assert.equal(actionEl.props.onPress, onPress, "the host callback is forwarded to the Button");
+  actionEl.props.onPress();
+  assert.equal(presses, 1, "the notice action callback fires");
+  const messageOnly = AppShellPage({
+    brand: { label: "Eciperay", href: "/" },
+    navItems: sentinelNav,
+    activeItemId: "recipes",
+    notice: { message: "Your profile could not be loaded." },
+    children: <span>PAGE SURFACE</span>,
+  });
+  assert.equal(
+    messageOnly.props.children.props.children[1].props.children[1],
+    null,
+    "a notice without an action renders no Button",
+  );
+});
+test("SSR: a notice renders its message and action above the content; content stays mounted", async () => {
+  const { AppShellPage } = await loadRuntime();
+  const html = await renderToHtml(
+    <AppShellPage
+      brand={{ label: "Eciperay", href: "/" }}
+      navItems={sentinelNav}
+      activeItemId="recipes"
+      notice={{
+        message: "Your profile could not be loaded.",
+        action: { label: "Try again", onPress: () => {} },
+      }}
+    >
+      <span>PAGE SURFACE</span>
+    </AppShellPage>,
+  );
+  assert.match(html, /Your profile could not be loaded\./, "the notice message renders");
+  assert.match(html, /Try again/, "the notice action label renders");
+  assert.match(html, /role="status"/, "the notice keeps the polite live-region semantics");
+  assert.match(html, /PAGE SURFACE/, "the page content stays mounted under the notice");
 });

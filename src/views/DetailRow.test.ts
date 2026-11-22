@@ -7,8 +7,9 @@
  * The row lived inside MealPlanDetailPage as its private GoalRow
  * helper with the hairline, padding, and text treatments applied
  * by the page — styling a page may not apply itself under #119 —
- * so it is a widget here and the page composes rows. The label
- * takes Text's `hint` treatment (the muted-sm treatment the page
+ * so it was a widget there; #715 reclassified it as a view —
+ * a single-consumer detail-screen composition — and the page
+ * composes rows from src/views. The label takes Text's `hint` treatment (the muted-sm treatment the page
  * applied by hand) and the value the same small size at the
  * default tone.
  *
@@ -26,24 +27,24 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "widgets");
+const componentsDir = join(here, "../..", "src", "views");
 const detailRowSource = readFileSync(join(componentsDir, "DetailRow.tsx"), "utf8");
 
 const detailRowCode = detailRowSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("DetailRow is exported from the built internal components barrel", async () => {
+test("DetailRow is exported from the built internal views barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
     typeof dist.DetailRow,
     "function",
-    "DetailRow must be exported from the internal components barrel",
+    "DetailRow must be exported from the internal views barrel",
   );
 });
 
-test("DetailRowProps is a type-only export from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+test("DetailRowProps is a type-only export from the built views barrel", () => {
+  const types = readFileSync(join(here, "../..", "dist", "views", "index.d.ts"), "utf8");
   assert.match(types, /DetailRowProps/);
 });
 
