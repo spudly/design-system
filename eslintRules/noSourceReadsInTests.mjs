@@ -39,100 +39,19 @@
  * it against the repository's test files directly.
  */
 
-const READ_FUNCTIONS = new Set([
-  "readFileSync",
-  "readFile",
-  "existsSync",
-  "createReadStream",
-  "readdirSync",
-]);
-
-const SOURCE_EXTENSION = /\.(?:ts|tsx|js|jsx|mts|cts|mjs|cjs)$/;
-const SOURCE_TEMPLATE_TAIL = /\.(?:ts|tsx|js|jsx|mts|cts|mjs|cjs)$/;
-
-function calleeName(callee) {
-  if (callee.type === "Identifier") return callee.name;
-  if (callee.type === "MemberExpression" && callee.property.type === "Identifier") {
-    return callee.property.name;
-  }
-  return undefined;
-}
-
-/** All statically known string fragments inside an expression. */
-function stringFragments(node, variables, depth = 0) {
-  if (!node || depth > 6) return [];
-  switch (node.type) {
-    case "Literal":
-      return typeof node.value === "string" ? [node.value] : [];
-    case "TemplateLiteral":
-      return node.quasis.map((quasi) => quasi.value.cooked ?? "").filter(Boolean);
-    case "BinaryExpression":
-      return [
-        ...stringFragments(node.left, variables, depth + 1),
-        ...stringFragments(node.right, variables, depth + 1),
-      ];
-    case "CallExpression":
-      return node.arguments.flatMap((arg) => stringFragments(arg, variables, depth + 1));
-    case "Identifier": {
-      const init = variables.get(node.name);
-      return init ? stringFragments(init, variables, depth + 1) : [];
-    }
-    case "MemberExpression":
-      return stringFragments(node.object, variables, depth + 1);
-    case "ArrayExpression":
-      return node.elements.flatMap((el) => stringFragments(el, variables, depth + 1));
-    case "ObjectExpression":
-      return node.properties.flatMap((prop) =>
-        stringFragments(prop.type === "Property" ? prop.value : prop, variables, depth + 1),
-      );
-    case "SpreadElement":
-      return stringFragments(node.argument, variables, depth + 1);
-    default:
-      return [];
-  }
-}
+import {
+  READ_FUNCTIONS,
+  calleeName,
+  derivesFromReaddir,
+  identifiersIn,
+  isLegitTarget,
+  isSourceDirectory,
+  isSourceTarget,
+  sourceFragmentOf,
+  stringFragments,
+} from "./noSourceReadsInTestsHelpers.mjs";
 
 const enumeratorHelpers = new Set();
-
-/** Whether an expression is (or is built from) a readdirSync result. */
-function derivesFromReaddir(node, variables, depth = 0) {
-  if (!node || depth > 6) return false;
-  if (node.type === "CallExpression") {
-    if (calleeName(node.callee) === "readdirSync") return true;
-    if (node.callee.type === "Identifier" && enumeratorHelpers.has(node.callee.name)) return true;
-    return node.arguments.some((arg) => derivesFromReaddir(arg, variables, depth + 1));
-  }
-  if (node.type === "Identifier") {
-    const init = variables.get(node.name);
-    return init ? derivesFromReaddir(init, variables, depth + 1) : false;
-  }
-  if (node.type === "MemberExpression") {
-    return derivesFromReaddir(node.object, variables, depth + 1);
-  }
-  return false;
-}
-
-function isLegitTarget(fragments) {
-  return fragments.some(
-    (fragment) =>
-      fragment.endsWith(".d.ts") ||
-      fragment === "dist" ||
-      fragment.includes("/dist/") ||
-      fragment.startsWith("dist/"),
-  );
-}
-
-function isSourceTarget(fragments) {
-  return fragments.some(
-    (fragment) => SOURCE_EXTENSION.test(fragment) || SOURCE_TEMPLATE_TAIL.test(fragment.trim()),
-  );
-}
-
-function isSourceDirectory(fragments) {
-  return fragments.some(
-    (fragment) => fragment === "src" || fragment.endsWith("/src") || fragment.startsWith("src/"),
-  );
-}
 
 const noSourceReadsInTests = {
   meta: {
@@ -160,39 +79,26 @@ const noSourceReadsInTests = {
     const helpers = new Map(); // name -> parameter index
     const functionStack = [];
     function registerHelper(paramName) {
-      const fn = functionStack[functionStack.length - 1];
+      const fn = functionStack.at(-1);
       if (!fn || !fn.name) return;
       const index = fn.params.indexOf(paramName);
-      if (index >= 0) helpers.set(fn.name, index);
+      if (index !== -1) helpers.set(fn.name, index);
     }
-    function identifiersIn(node, out = new Set(), depth = 0) {
-      if (!node || typeof node !== "object" || depth > 8) return out;
-      if (node.type === "Identifier") out.add(node.name);
-      for (const key of Object.keys(node)) {
-        if (key === "parent") continue;
-        const value = node[key];
-        if (Array.isArray(value)) value.forEach((child) => identifiersIn(child, out, depth + 1));
-        else if (value && typeof value === "object" && value.type) {
-          identifiersIn(value, out, depth + 1);
-        }
-      }
-      return out;
+    function pushFunction(node, name) {
+      functionStack.push({
+        name: name ?? node.id?.name,
+        params: node.params.filter((p) => p.type === "Identifier").map((p) => p.name),
+      });
     }
     return {
       FunctionDeclaration(node) {
-        functionStack.push({
-          name: node.id?.name,
-          params: node.params.filter((p) => p.type === "Identifier").map((p) => p.name),
-        });
+        pushFunction(node);
       },
       "FunctionDeclaration:exit"() {
         functionStack.pop();
       },
       FunctionExpression(node) {
-        functionStack.push({
-          name: node.id?.name,
-          params: node.params.filter((p) => p.type === "Identifier").map((p) => p.name),
-        });
+        pushFunction(node);
       },
       "FunctionExpression:exit"() {
         functionStack.pop();
@@ -203,10 +109,7 @@ const noSourceReadsInTests = {
           parent?.type === "VariableDeclarator" && parent.id.type === "Identifier"
             ? parent.id.name
             : undefined;
-        functionStack.push({
-          name,
-          params: node.params.filter((p) => p.type === "Identifier").map((p) => p.name),
-        });
+        pushFunction(node, name);
       },
       "ArrowFunctionExpression:exit"() {
         functionStack.pop();
@@ -262,7 +165,7 @@ const noSourceReadsInTests = {
         // A read through one of the enclosing function's parameters
         // makes that function a source-read helper (flagged at its
         // call sites, where the path is statically known).
-        const fn = functionStack[functionStack.length - 1];
+        const fn = functionStack.at(-1);
         if (fn) {
           for (const id of identifiersIn(target)) {
             if (fn.params.includes(id)) registerHelper(id);
@@ -271,7 +174,7 @@ const noSourceReadsInTests = {
         const fragments = stringFragments(target, variables);
         if (isLegitTarget(fragments)) return;
         if (isSourceTarget(fragments)) {
-          const sourceFragment = fragments.find((fragment) => SOURCE_EXTENSION.test(fragment));
+          const sourceFragment = sourceFragmentOf(fragments);
           context.report({
             node,
             messageId: "sourceRead",
@@ -286,11 +189,12 @@ const noSourceReadsInTests = {
           // A readdir over a parameter makes the enclosing function an
           // enumerator helper: files it yields are source reads at the
           // eventual readFileSync call.
-          const fn = functionStack[functionStack.length - 1];
+          const fn = functionStack.at(-1);
           if (fn?.name) enumeratorHelpers.add(fn.name);
           return;
         }
-        if (derivesFromReaddir(target, variables) || derivesFromReaddir(node, variables)) {
+        if (derivesFromReaddir(target, variables, enumeratorHelpers) ||
+          derivesFromReaddir(node, variables, enumeratorHelpers)) {
           context.report({ node, messageId: "dynamicSourceRead" });
         }
       },
