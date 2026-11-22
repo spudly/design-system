@@ -16,23 +16,19 @@
  * 4. The registered Tamagui `verse` font follows the brand config:
  *    a config built from memorizeTheme carries Alegreya, one built
  *    from eciperayTheme carries the base serif family.
- * 5. VerseText and the Text `verse` variant reference the registered
- *    font (`$verse`); neither names the serif token (or any family)
- *    directly anymore.
+ * Converted in #733 tranche 3: the former source scan asserting
+ * VerseText/Text reference `$verse` was deleted — which font token a
+ * styled component references is not runtime-observable, and the
+ * registered-font contract itself is pinned by test 4 above against
+ * the built config.
  *
  * Run against the built output: `npm run build` first (the `test`
- * script does both). The source scan reads source.
+ * script does both).
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
-
-const here = dirname(fileURLToPath(import.meta.url));
-const srcDir = join(here, "../..", "src");
 
 const { tokens, baseTheme, eciperayTheme, memorizeTheme, createTamaguiConfig } =
   await loadInternalDist();
@@ -83,15 +79,4 @@ test("the registered verse font follows the brand config", () => {
     eciperayConfig.fonts.verse.family.startsWith("Georgia"),
     `Eciperay config verse font must lead with Georgia, got: ${eciperayConfig.fonts.verse.family}`,
   );
-});
-
-test("verse components reference the registered $verse font", () => {
-  for (const rel of ["widgets/VerseText.tsx", "widgets/Text.tsx"]) {
-    const text = readFileSync(join(srcDir, rel), "utf8");
-    assert.ok(text.includes('fontFamily: "$verse"'), `${rel} must use the $verse font`);
-    assert.ok(
-      !text.includes("fontFamily.serif"),
-      `${rel} must not pin the serif token for verse text`,
-    );
-  }
 });
