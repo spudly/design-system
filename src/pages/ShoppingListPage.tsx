@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { CheckboxField } from "../widgets/CheckboxField.js";
-import { EmptyState } from "../widgets/EmptyState.js";
+import { EmptyState } from "../views/EmptyState.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { LoadingListRow } from "../widgets/LoadingListRow.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";

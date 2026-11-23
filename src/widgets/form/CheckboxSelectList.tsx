@@ -3,7 +3,7 @@ import { tokens } from "../../tokens/index.js";
 import { CheckboxField } from "../CheckboxField.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "../BoxSkeleton.js";
-import { EmptyState } from "../EmptyState.js";
+import { EmptyState } from "../../views/EmptyState.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../TextSkeleton.js";
 import { useVoice } from "../../voice/index.js";

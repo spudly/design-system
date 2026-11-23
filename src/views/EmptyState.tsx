@@ -1,8 +1,8 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { politeLiveRegionProps } from "./accessibility.js";
-import { Button } from "./Button.js";
-import { Text } from "./Text.js";
+import { politeLiveRegionProps } from "../widgets/accessibility.js";
+import { Button } from "../widgets/Button.js";
+import { Text } from "../widgets/Text.js";
 
 export type EmptyStateProps = {
   title: string;

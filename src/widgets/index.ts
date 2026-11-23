@@ -32,7 +32,6 @@ export {
   type DropdownProps,
 } from "./form/Dropdown.js";
 export { DropdownButton, type DropdownButtonProps } from "./form/DropdownButton.js";
-export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export { FixedActionBanner, type FixedActionBannerProps } from "./FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
 export { FullScreenShell, type FullScreenShellProps } from "./FullScreenShell.js";
