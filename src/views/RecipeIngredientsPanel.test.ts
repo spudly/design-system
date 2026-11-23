@@ -45,7 +45,7 @@ test("RecipeIngredientsPanel is exported from the built internal components barr
 });
 
 test("RecipeIngredientsPanel's types are type-only exports from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../..", "dist", "views", "index.d.ts"), "utf8");
   for (const name of [
     "RecipeIngredientsPanelProps",
     "RecipeIngredientsPanelView",
