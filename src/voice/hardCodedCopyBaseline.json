@@ -159,6 +159,6 @@
   "views/CatalogFiltersBar.tsx|jsx|Filters",
   "views/ChunkErrorBoundary.tsx|jsx|This section failed to load.",
   "widgets/CandidateList.tsx|jsx|Activate",
-  "widgets/LogEntryCard.tsx|jsx|Delete",
+  "views/LogEntryCard.tsx|jsx|Delete",
   "widgets/Spinner.tsx|attr|Loading"
 ]

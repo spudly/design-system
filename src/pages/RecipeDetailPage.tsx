@@ -9,7 +9,7 @@ import { CardStack } from "../widgets/CardStack.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
-import { LogEntryCard } from "../widgets/LogEntryCard.js";
+import { LogEntryCard } from "../views/LogEntryCard.js";
 import { MarkableRow } from "../widgets/MarkableRow.js";
 import {
   NutritionPanel,

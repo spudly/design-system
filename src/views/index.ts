@@ -33,6 +33,7 @@ export {
 export { ForgotPasswordForm, type ForgotPasswordFormProps } from "./ForgotPasswordForm.js";
 export { InstallBannerView, type InstallBannerViewProps } from "./InstallBannerView.js";
 export { LazySlot, type LazySlotProps } from "./LazySlot.js";
+export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
   NutritionGoalsForm,
   type NutritionGoalsFormProps,

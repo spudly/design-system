@@ -155,7 +155,6 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // their post-extraction rounds).
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
 export { EqualColumns, type EqualColumnsProps } from "./form/EqualColumns.js";
-export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
   NutritionPanel,
   type NutritionFact,
