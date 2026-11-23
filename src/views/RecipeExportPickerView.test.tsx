@@ -25,7 +25,7 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
 const viewSource = readFileSync(join(root, "src/views/RecipeExportPickerView.tsx"), "utf8");
-const toolbarSource = readFileSync(join(root, "src/widgets/BulkSelectToolbar.tsx"), "utf8");
+const toolbarSource = readFileSync(join(root, "src/views/BulkSelectToolbar.tsx"), "utf8");
 test("the view reports an empty visible set to the toolbar while the error hides the items", () => {
   assert.ok(
     viewSource.includes("filteredCount={error ? 0 : items.length}"),

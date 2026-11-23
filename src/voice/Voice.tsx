@@ -67,7 +67,7 @@ export type Voice = {
     backLabel: string;
     nextLabel: string;
   };
-  /** BulkSelectToolbar widget (tranche 1c): defaults when label props are not passed. */
+  /** BulkSelectToolbar view (tranche 1c): defaults when label props are not passed. */
   bulkSelectToolbar: {
     selectAllLabel: string;
     clearSelectionLabel: string;
