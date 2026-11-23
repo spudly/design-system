@@ -139,7 +139,6 @@ export {
   type RatingsCardRatings,
   type RatingsCardViewerRating,
 } from "./RatingsCard.js";
-export { RemovableField, type RemovableFieldProps } from "./RemovableField.js";
 export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
 export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
 export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
