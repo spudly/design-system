@@ -86,7 +86,7 @@ FirstStep, LastStep, LoadError.
    Delete, no "Log cook" text button) at the rows' own rhythm.
    Loading centers the spinner under the section title; Empty
    centers the empty message there.
-5. MealCookingModePage: the dark overlay covers only the content region above the footer (the footer remains reachable and is not covered) —
+5. MealCookingModePage: the dark overlay covers the full viewport — cooking mode is a full-screen view and no footer renders (#752/#753) —
    uppercase meal title and "Step N of M · recipe" eyebrows
    over the step body, Done pill at the top right, dots and
    Back / Next below. FirstStep has no Back; LastStep disables
