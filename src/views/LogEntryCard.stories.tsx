@@ -3,7 +3,7 @@ import { YStack } from "tamagui";
 import { LogEntryCard } from "./LogEntryCard.js";
 
 const meta: Meta<typeof LogEntryCard> = {
-  title: "Widgets/LogEntryCard",
+  title: "Views/LogEntryCard",
   component: LogEntryCard,
 };
 

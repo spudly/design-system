@@ -728,7 +728,7 @@ test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelec
   // LogEntryCard: the skeleton header mirrors the loaded header
   // row — a date bone (sm) in a 104-wide slot, and a 72x12 box
   // bone where the star rating sits.
-  const entry = readCode("src/widgets/LogEntryCard.tsx");
+  const entry = readCode("src/views/LogEntryCard.tsx");
   assert.match(entry, /<YStack width=\{104\}>/, "the date bone sits in a 104-wide slot");
   assert.match(
     entry,

@@ -1,19 +1,19 @@
 ---
 component: LogEntryCard
 run_when:
-  - "src/widgets/LogEntryCard.tsx, its stories, or a changeset naming LogEntryCard."
+  - "src/views/LogEntryCard.tsx, its stories, or a changeset naming LogEntryCard."
 ---
 
 # LogEntryCard — manual test steps
 
-Colocated manual test steps for `src/widgets/LogEntryCard.tsx` (design-system #530).
+Colocated manual test steps for `src/views/LogEntryCard.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
 ## LogEntryCard
 
-Open in `Widgets/LogEntryCard`: Default, WithoutAction.
+Open in `Views/LogEntryCard`: Default, WithoutAction.
 
 1. Default: the date and the star rating head the card, the
    notes body follows, and the Delete action sits below,
@@ -22,5 +22,5 @@ Open in `Widgets/LogEntryCard`: Default, WithoutAction.
 2. WithoutAction: the card renders its date and rating with
    no Delete action.
 
-**Run when:** `src/widgets/LogEntryCard.tsx`, its
+**Run when:** `src/views/LogEntryCard.tsx`, its
 stories, or a changeset naming LogEntryCard.
