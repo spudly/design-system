@@ -21,7 +21,6 @@ export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPickerField.js";
-export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
 export { Divider, type DividerProps } from "./Divider.js";

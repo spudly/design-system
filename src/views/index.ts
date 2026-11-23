@@ -20,6 +20,7 @@ export {
   type ChunkErrorBoundaryProps,
   type ChunkErrorBoundaryState,
 } from "./ChunkErrorBoundary.js";
+export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { ConfirmActionView, type ConfirmActionViewProps } from "./ConfirmActionView.js";
 export { ConsentBannerView, type ConsentBannerViewProps } from "./ConsentBannerView.js";
 export { DetailRow, type DetailRowProps } from "./DetailRow.js";

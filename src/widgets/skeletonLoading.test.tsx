@@ -341,7 +341,9 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 const widgetPath = (name: string) =>
   existsSync(join(root, "src", "widgets", "form", `${name}.tsx`))
     ? `src/widgets/form/${name}.tsx`
-    : `src/widgets/${name}.tsx`;
+    : existsSync(join(root, "src", "views", `${name}.tsx`))
+      ? `src/views/${name}.tsx`
+      : `src/widgets/${name}.tsx`;
 
 const T1_SCOPE_WIDGETS = [
   "CardRow",
