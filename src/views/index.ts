@@ -24,6 +24,7 @@ export {
 export { ConfirmActionView, type ConfirmActionViewProps } from "./ConfirmActionView.js";
 export { ConsentBannerView, type ConsentBannerViewProps } from "./ConsentBannerView.js";
 export { DetailRow, type DetailRowProps } from "./DetailRow.js";
+export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export {
   FeedbackPreferenceView,
   type FeedbackPreferenceViewProps,

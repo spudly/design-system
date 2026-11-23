@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { EmptyState } from "./EmptyState.js";
 
 const meta: Meta<typeof EmptyState> = {
-  title: "Widgets/EmptyState",
+  title: "Views/EmptyState",
   component: EmptyState,
   argTypes: {
     title: { control: "text" },
