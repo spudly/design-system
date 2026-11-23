@@ -4,7 +4,7 @@ import { YStack } from "tamagui";
 import { CommentItem } from "./CommentItem.js";
 
 const meta: Meta<typeof CommentItem> = {
-  title: "Widgets/CommentItem",
+  title: "Views/CommentItem",
   component: CommentItem,
 };
 

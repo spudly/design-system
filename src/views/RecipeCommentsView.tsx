@@ -2,7 +2,7 @@ import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
 import { Button } from "../widgets/Button.js";
 import { Card } from "../widgets/Card.js";
-import { CommentItem } from "../widgets/CommentItem.js";
+import { CommentItem } from "./CommentItem.js";
 import { CompactStack } from "../widgets/CompactStack.js";
 import { ContentStack } from "../widgets/ContentStack.js";
 import { EndRow } from "../widgets/EndRow.js";

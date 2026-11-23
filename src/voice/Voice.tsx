@@ -43,7 +43,7 @@ export type Voice = {
     retryLabel: string;
     loadingLabel: string;
   };
-  /** CommentItem widget (tranche 1). */
+  /** CommentItem view (tranche 1). */
   commentItem: {
     editLabel: string;
     saveLabel: string;
