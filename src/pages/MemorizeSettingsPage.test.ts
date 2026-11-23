@@ -33,10 +33,10 @@ async function loadPage() {
   return { ...dist, BigFooterShell: shell.BigFooterShell, ...page };
 }
 
-test("MemorizeSettingsPage is exported from the built package root", async () => {
+test("MemorizeSettingsPage is exported from the built pages barrel", async () => {
   const { MemorizeSettingsPage } = await loadPage();
   assert.equal(typeof MemorizeSettingsPage, "function");
-  const types = readFileSync(join(here, "../..", "dist", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../..", "dist", "pages", "index.d.ts"), "utf8");
   assert.match(types, /MemorizeSettingsPage/);
   assert.match(types, /type MemorizeSettingsPageProps/);
 });

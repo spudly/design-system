@@ -74,10 +74,10 @@ function readyProps(overrides: Record<string, any> = {}) {
   };
 }
 
-test("MemorizationSessionPage is exported from the built package root", async () => {
+test("MemorizationSessionPage is exported from the built pages barrel", async () => {
   const { MemorizationSessionPage } = await loadPage();
   assert.equal(typeof MemorizationSessionPage, "function");
-  const types = readFileSync(join(here, "../..", "dist", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../..", "dist", "pages", "index.d.ts"), "utf8");
   assert.match(types, /MemorizationSessionPage/);
   assert.match(types, /type MemorizationSessionPageProps/);
 });

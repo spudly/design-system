@@ -22,12 +22,30 @@
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
+import { register } from "node:module";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
+
+// BoundedList imports react-native, whose Flow-typed source
+// plain Node cannot parse; redirect the bare specifier to an
+// inert stub before the page module is imported. The tests
+// inspect the BoundedList element's props and call its
+// renderItem — they never render the FlatList itself.
+const reactNativeStubUrl =
+  "data:text/javascript,export%20function%20FlatList()%7Breturn%20null%3B%7D%0Aexport%20function%20View()%7Breturn%20null%3B%7D%0A";
+register(
+  "data:text/javascript," +
+    encodeURIComponent(
+      `export async function resolve(specifier, context, nextResolve) {\n` +
+        `  if (specifier === "react-native") return { shortCircuit: true, url: ${JSON.stringify(reactNativeStubUrl)} };\n` +
+        `  return nextResolve(specifier, context);\n` +
+        `}`,
+    ),
+);
 
 async function loadPage() {
   const dist: Record<string, any> = await loadInternalDist();
@@ -64,10 +82,10 @@ function baseProps(overrides: Record<string, any> = {}) {
   };
 }
 
-test("MemorizeReviewPage is exported from the built package root", async () => {
+test("MemorizeReviewPage is exported from the built pages barrel", async () => {
   const { MemorizeReviewPage } = await loadPage();
   assert.equal(typeof MemorizeReviewPage, "function");
-  const types = readFileSync(join(here, "../..", "dist", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../..", "dist", "pages", "index.d.ts"), "utf8");
   assert.match(types, /MemorizeReviewPage/);
   assert.match(types, /type MemorizeReviewPageProps/);
 });
