@@ -157,7 +157,7 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // rounds, shipped once here (the tranche PRs adopt these in
 // their post-extraction rounds).
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
-export { FieldColumns, type FieldColumnsProps } from "./form/FieldColumns.js";
+export { EqualColumns, type EqualColumnsProps } from "./form/EqualColumns.js";
 export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
   NutritionPanel,
