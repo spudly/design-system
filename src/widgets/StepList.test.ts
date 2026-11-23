@@ -8,7 +8,7 @@
  * ephemeral state the list owns (first step active by default,
  * as the app's instructions tab held it), exactly one step
  * renders in the active treatment, and activation follows the
- * ListRow keyboard pattern.
+ * ListItem keyboard pattern.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -42,7 +42,7 @@ test("the list owns the active step, first step active by default", () => {
   assert.match(code, /accessibilityState: \{ selected: isActive \}/);
 });
 
-test("step activation is keyboard-operable on web (the ListRow pattern)", () => {
+test("step activation is keyboard-operable on web (the ListItem pattern)", () => {
   assert.match(code, /tabIndex=\{0\}/);
   assert.match(code, /event\.key === "Enter" \|\| event\.key === " "/);
   assert.match(code, /setActiveIndex\(i\)/, "keys and presses activate the same step");

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { Badge } from "./Badge.js";
 import { Card } from "./Card.js";
-import { ListRow } from "./ListRow.js";
+import { ListItem } from "./ListItem.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof Card> = {
@@ -75,13 +75,13 @@ export const Compact: Story = {
 };
 
 // Loading propagates through the card's LoadingScope to its
-// contents: the ListRow inside skeletonizes. The contents are a
+// contents: the ListItem inside skeletonizes. The contents are a
 // frameless row on purpose — a framed card inside the card read
 // as a card nested in a card (Stephen on #551).
 export const Loading: Story = {
   render: () => (
     <Card loading style={{ maxWidth: 430 }}>
-      <ListRow title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
+      <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
     </Card>
   ),
 };
@@ -91,7 +91,7 @@ export const LoadingOverlay: Story = {
   render: () => (
     <YStack position="relative" maxWidth={430}>
       <Card style={{ maxWidth: 430 }}>
-        <ListRow title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
+        <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
       </Card>
       <YStack
         position="absolute"
@@ -103,7 +103,7 @@ export const LoadingOverlay: Story = {
         pointerEvents="none"
       >
         <Card loading style={{ maxWidth: 430 }}>
-          <ListRow title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
+          <ListItem title="Weeknight favorites" subtitle="4 entries" onPress={() => {}} />
         </Card>
       </YStack>
     </YStack>

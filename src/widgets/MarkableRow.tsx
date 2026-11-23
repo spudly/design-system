@@ -8,7 +8,7 @@ export type MarkableRowProps = {
   /** The row's label. */
   label: string;
   /** Optional meta line under the label, pre-composed by the
-   * caller (e.g. a quantity/nutrition line) — the ListRow
+   * caller (e.g. a quantity/nutrition line) — the ListItem
    * title/subtitle composition, for plain rows that carry
    * more than a name (#440). */
   subtitle?: string;
@@ -38,7 +38,7 @@ export type MarkableRowProps = {
  * lists without hand-rolling pressable row styles; all content
  * is caller-supplied, so the row serves any app's lists.
  *
- * Activation follows the ListRow press pattern: the row carries
+ * Activation follows the ListItem press pattern: the row carries
  * the button role, is focusable on web, and the button keys
  * (Enter and Space) invoke the same callback as a press.
  */

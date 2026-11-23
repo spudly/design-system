@@ -41,7 +41,7 @@ export {
   type MasonryGridProps,
 } from "./MasonryGrid.js";
 export { CardRow, type CardRowProps } from "./CardRow.js";
-export { ListRow, type ListRowProps } from "./ListRow.js";
+export { ListItem, type ListItemProps } from "./ListItem.js";
 export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./MessageCard.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
@@ -52,7 +52,7 @@ export { CardStack, type CardStackProps } from "./CardStack.js";
 export { ListStack, type ListStackProps } from "./ListStack.js";
 export { LinkStack, type LinkStackProps } from "./LinkStack.js";
 export { LoadingCardRow } from "./LoadingCardRow.js";
-export { LoadingListRow } from "./LoadingListRow.js";
+export { LoadingListItem } from "./LoadingListItem.js";
 export { LoadingActionCardRow, type LoadingActionCardRowProps } from "./LoadingActionCardRow.js";
 export { CatalogRow, type CatalogRowProps } from "./CatalogRow.js";
 export { CatalogCardColumn, type CatalogCardColumnProps } from "./CatalogCardColumn.js";

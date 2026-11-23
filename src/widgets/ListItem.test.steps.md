@@ -1,19 +1,19 @@
 ---
-component: ListRow
+component: ListItem
 run_when:
-  - "src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow."
+  - "src/widgets/ListItem.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListItem."
 ---
 
-# ListRow — manual test steps
+# ListItem — manual test steps
 
-Colocated manual test steps for `src/widgets/ListRow.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/ListItem.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
-## ListRow
+## ListItem
 
-Open in `Widgets/ListRow`: Prefixed, Plain, Disabled.
+Open in `Widgets/ListItem`: Prefixed, Plain, Disabled.
 
 1. Prefixed: the title line reads "Meal · Taco Tuesday" (the
    prefix is caller-supplied content) in medium weight over the
@@ -28,5 +28,5 @@ Open in `Widgets/ListRow`: Prefixed, Plain, Disabled.
    suffix; the row does not press, is not focusable, and is
    exposed as disabled.
 
-**Run when:** `src/widgets/ListRow.tsx`, its stories,
-MealPlanDetailPage's entries, or a changeset naming ListRow.
+**Run when:** `src/widgets/ListItem.tsx`, its stories,
+MealPlanDetailPage's entries, or a changeset naming ListItem.

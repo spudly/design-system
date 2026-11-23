@@ -10,7 +10,7 @@ type StyledListStackProps = GetProps<typeof StyledListStack>;
 export type ListStackProps = Omit<StyledListStackProps, "gap" | "alignItems">;
 
 /**
- * A stack of list rows (#119): hairline rows (ListRow and its
+ * A stack of list rows (#119): hairline rows (ListItem and its
  * kin) composed as one list. The stack adds no gap of its own —
  * the rows own their separation through their hairlines and
  * internal padding, so the list reads as one continuous ruled

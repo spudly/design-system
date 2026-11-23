@@ -1,5 +1,5 @@
 /**
- * Contract test for ListRow (spudly/design-system#119), the
+ * Contract test for ListItem (spudly/design-system#119), the
  * generic hairline list row: a title line — an optional
  * caller-supplied prefix, the title, an optional caller-supplied
  * suffix — over an optional meta line, with a hairline below.
@@ -32,7 +32,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const componentsDir = join(here, "../..", "src", "widgets");
-const listRowSource = readFileSync(join(componentsDir, "ListRow.tsx"), "utf8");
+const listRowSource = readFileSync(join(componentsDir, "ListItem.tsx"), "utf8");
 
 const listRowCode = listRowSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -41,28 +41,28 @@ const listRowCode = listRowSource
 // Since #587 phase 3 the subtitle line lives in the shared
 // RowSubtitleText in RowTextContent.tsx (also composed by
 // RowTextContent for the card rows); the subtitle pins below
-// read that source, and ListRow's own pins hold that it
+// read that source, and ListItem's own pins hold that it
 // delegates to the shared component.
 const rowTextSource = readFileSync(join(componentsDir, "RowTextContent.tsx"), "utf8");
 const rowTextCode = rowTextSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
-test("ListRow is exported from the built internal components barrel", async () => {
+test("ListItem is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   assert.equal(
-    typeof dist.ListRow,
+    typeof dist.ListItem,
     "function",
-    "ListRow must be exported from the internal components barrel",
+    "ListItem must be exported from the internal components barrel",
   );
 });
 
-test("ListRowProps is a type-only export from the built components barrel", () => {
+test("ListItemProps is a type-only export from the built components barrel", () => {
   const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
-  assert.match(types, /ListRowProps/);
+  assert.match(types, /ListItemProps/);
 });
 
-test("ListRow's contract is caller-supplied content plus a disabled flag and a press", () => {
+test("ListItem's contract is caller-supplied content plus a disabled flag and a press", () => {
   assert.match(listRowCode, /prefix\?: string;/);
   assert.match(listRowCode, /title: string;/);
   assert.match(listRowCode, /titleSuffix\?: string;/);
@@ -71,7 +71,7 @@ test("ListRow's contract is caller-supplied content plus a disabled flag and a p
   assert.match(listRowCode, /onPress: \(\) => void;/);
 });
 
-test("ListRow keeps the hairline row and composes the title line from its parts", () => {
+test("ListItem keeps the hairline row and composes the title line from its parts", () => {
   assert.match(
     listRowCode,
     /<YStack borderBottomWidth=\{1\} borderBottomColor=\{tokens\.colors\.gray\.gray2\}>/,
@@ -85,7 +85,7 @@ test("ListRow keeps the hairline row and composes the title line from its parts"
   assert.match(
     listRowCode,
     /import \{ RowSubtitleText \} from "\.\/RowTextContent\.js";/,
-    "ListRow imports the shared RowSubtitleText (#587 phase 3)",
+    "ListItem imports the shared RowSubtitleText (#587 phase 3)",
   );
   assert.match(
     listRowCode,
@@ -109,7 +109,7 @@ test("ListRow keeps the hairline row and composes the title line from its parts"
   );
 });
 
-test("ListRow's link form renders an anchor on web and a LinkOverlay on native; a disabled row renders no link (#248)", () => {
+test("ListItem's link form renders an anchor on web and a LinkOverlay on native; a disabled row renders no link (#248)", () => {
   assert.match(listRowCode, /href: string;/, "the link form's discriminant is the href");
   assert.match(listRowCode, /onPress\?: never/, "the two forms are mutually exclusive");
   assert.match(
@@ -134,7 +134,7 @@ test("ListRow's link form renders an anchor on web and a LinkOverlay on native; 
   );
 });
 
-test("ListRow's enabled row is a keyboard-operable button; the disabled row is marked disabled", () => {
+test("ListItem's enabled row is a keyboard-operable button; the disabled row is marked disabled", () => {
   assert.match(
     listRowCode,
     /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/,

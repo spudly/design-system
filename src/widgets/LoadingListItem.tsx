@@ -17,7 +17,7 @@ import { TextSkeleton } from "./TextSkeleton.js";
  * rhythm; call sites render one per loading row inside a
  * LoadingScope and pass nothing.
  */
-export function LoadingListRow() {
+export function LoadingListItem() {
   return (
     <XStack
       alignItems="flex-start"

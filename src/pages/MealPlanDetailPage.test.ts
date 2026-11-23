@@ -21,7 +21,7 @@
  *    removing entries happens on the plan form screen. Since
  *    #248's navigation rule, every one of those controls
  *    navigates, so they cross as hrefs (the buttons' href
- *    forms, the rows through ListRow's link form, the set-goals
+ *    forms, the rows through ListItem's link form, the set-goals
  *    TextLink's href form), not press callbacks.
  * 4. Entries carry two id spaces: the entry's own `id` (the row
  *    key) and the `targetId` the host composes the entry's
@@ -54,9 +54,9 @@
  *    empty — the page then renders exactly as before.
  * 8. The page carries no styling of its own (#119, tranche 2):
  *    the loading state is a skeleton composition (#278 tranche 4), the entry
- *    rows are the generic ListRow widget (its pressable area,
+ *    rows are the generic ListItem widget (its pressable area,
  *    hairline, and disabled treatment live there — pinned in
- *    src/widgets/ListRow.test.ts; the page supplies the kind prefix,
+ *    src/widgets/ListItem.test.ts; the page supplies the kind prefix,
  *    the unavailable suffix, and the disabled flag as content),
  *    the goal rows are DetailRow
  *    widgets, the plan title takes Text's `title` variant, the
@@ -156,8 +156,8 @@ test("the actions are exactly the app screen's — no delete, no entry editing",
 test("entry rows are links carrying the entry href, by kind", () => {
   assert.match(
     code,
-    /<ListRow[\s\S]*?href=\{entry\.href\}/,
-    "entry rows must render through ListRow in its link form, carrying the entry's href (the link rendering itself is pinned in src/widgets/ListRow.test.ts)",
+    /<ListItem[\s\S]*?href=\{entry\.href\}/,
+    "entry rows must render through ListItem in its link form, carrying the entry's href (the link rendering itself is pinned in src/widgets/ListItem.test.ts)",
   );
   assert.match(code, /kind: "meal" \| "recipe";/, "entries must carry their kind");
   assert.match(
@@ -168,11 +168,11 @@ test("entry rows are links carrying the entry href, by kind", () => {
   assert.match(code, /href: string;/, "entries must carry their pre-composed href");
 });
 
-test("entries render through ListRow, with the kind prefix and availability as content", () => {
+test("entries render through ListItem, with the kind prefix and availability as content", () => {
   assert.match(
     code,
-    /<ListRow/,
-    "entry rows must render through the ListRow widget — its disabled state and link wiring are pinned in src/widgets/ListRow.test.ts",
+    /<ListItem/,
+    "entry rows must render through the ListItem widget — its disabled state and link wiring are pinned in src/widgets/ListItem.test.ts",
   );
   assert.match(
     code,
@@ -183,7 +183,7 @@ test("entries render through ListRow, with the kind prefix and availability as c
   assert.match(
     code,
     /entry\.kind === "recipe" && entry\.isUnavailable\s+\? \{ isDisabled: true, titleSuffix: " \(unavailable\)" \}/,
-    "only a recipe entry can be unavailable — it passes the generic disabled flag and the suffix as content (a disabled ListRow renders no link, so the unavailable row is not a link)",
+    "only a recipe entry can be unavailable — it passes the generic disabled flag and the suffix as content (a disabled ListItem renders no link, so the unavailable row is not a link)",
   );
   assert.match(code, /title=\{entry\.title\}/, "the row must receive the entry's title");
 });
@@ -298,7 +298,7 @@ test("the page carries no styling of its own (#119)", () => {
   for (const item of banned) {
     assert.ok(
       !code.includes(item),
-      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in SectionStack / ButtonRow / ListRow / ListStack / DetailRow since the #119 tranche-2 fix`,
+      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in SectionStack / ButtonRow / ListItem / ListStack / DetailRow since the #119 tranche-2 fix`,
     );
   }
   assert.match(
