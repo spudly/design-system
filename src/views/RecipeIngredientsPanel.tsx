@@ -1,14 +1,14 @@
 import { View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { MarkableRow } from "./MarkableRow.js";
+import { MarkableRow } from "../widgets/MarkableRow.js";
 import { NumberStepper } from "../widgets/NumberStepper.js";
-import { platformAccessibilityProps, politeLiveRegionProps } from "./accessibility.js";
-import { Button } from "./Button.js";
-import { PresetValueSelector, type PresetValueOption } from "./form/PresetValueSelector.js";
-import { SuggestionPanel } from "./form/SuggestionPanel.js";
-import { Text } from "./Text.js";
-import { TextSkeleton } from "./TextSkeleton.js";
+import { platformAccessibilityProps, politeLiveRegionProps } from "../widgets/accessibility.js";
+import { Button } from "../widgets/Button.js";
+import { PresetValueSelector, type PresetValueOption } from "../widgets/form/PresetValueSelector.js";
+import { SuggestionPanel } from "../widgets/form/SuggestionPanel.js";
+import { Text } from "../widgets/Text.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { useVoice } from "../voice/index.js";
 
 /**

@@ -10,7 +10,7 @@ import { StatCard } from "../widgets/StatCard.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { MessageCard } from "../widgets/MessageCard.js";
 import { RatingsCard } from "../widgets/RatingsCard.js";
-import { RecipeIngredientsPanel } from "../widgets/RecipeIngredientsPanel.js";
+import { RecipeIngredientsPanel } from "../views/RecipeIngredientsPanel.js";
 import { RecipeInstructionsPanel } from "../widgets/RecipeInstructionsPanel.js";
 import { RecipeOverviewPanel } from "../widgets/RecipeOverviewPanel.js";
 import { ScrollShell } from "../widgets/ScrollShell.js";

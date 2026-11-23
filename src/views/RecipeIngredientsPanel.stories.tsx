@@ -7,7 +7,7 @@ import {
 } from "./RecipeIngredientsPanel.js";
 
 const meta: Meta<typeof RecipeIngredientsPanel> = {
-  title: "Widgets/RecipeIngredientsPanel",
+  title: "Views/RecipeIngredientsPanel",
   component: RecipeIngredientsPanel,
 };
 
