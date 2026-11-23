@@ -2,54 +2,30 @@
  * Contract test for MemorizationSessionPage
  * (spudly/design-system#49).
  *
- * MemorizationSessionPage is the design-system port of the
- * Memorize app's drill screen (DrillScreen in spudly/memorize
- * packages/app), and its structure is the contract this test
- * guards in source:
- * 1. The props are a state union of exactly the states the
- *    app screen renders: `{ state: "not-found" }` (its
- *    missing-verse branch) and the ready props. The absence
- *    of "loading" and "complete" members is pinned — the app
- *    gates on its store above the screen, and finishing the
- *    final round navigates away, so the screen renders
- *    neither state.
- * 2. The component is fully controlled: it holds no state,
- *    imports no session engine, and derives nothing but
- *    blank ordinals from its props. Tokenizing, blank
- *    selection, grading, peek counting, and persistence stay
- *    app-side in @memorize/core.
- * 3. The drill surface matches the real screen, not the #44
- *    demo: the shared BackLink (#95 — it replaced the inline
- *    ghost "← Back" Button, whose arrow glyph sat at the
- *    bottom of the line on Android), reference heading, the
- *    round hint above a StepDots indicator, the passage as
- *    VerseText in
- *    a Card with BlankWord blanks, the warning feedback
- *    alert, and the advance button. The demo's ProgressBar
- *    and "End session" button do not exist on the real
- *    screen and must not appear.
- * 4. There is no text entry: the drill's only in-verse
- *    interaction is revealing a blank. A blank press reports
- *    the word's index in the words array (onBlankReveal),
- *    and the feedback string is pre-composed by the app (its
- *    peek/blank counts are engine numbers).
- * 5. There is deliberately no app-content render slot: every
- *    element is a DS primitive over view-model data, and the
- *    drill's one interactive primitive (BlankWord) is
- *    already a DS component.
- * 6. The component is exported from the pages barrel
- *    index, and stories exercise the FirstRound, MidSession,
- *    RetryFeedback, FinalRound, and NotFound states so
- *    Chromatic captures them.
- *
- * This is a source scan, not a render test: the repo has no
- * JS renderer for these components (Chromatic screenshots in
- * CI), and the invariant is a per-literal property of the
- * source (same rationale as
- * src/pages/MealPlanDetailPage.test.ts). Comments are
- * stripped before scanning so prose cannot satisfy — or,
- * for the pinned absences, accidentally trip — the patterns.
+ * Converted from source scans to runtime checks in #733
+ * tranche 6a: the page is called directly and the element
+ * tree it returns is inspected — the shell, the BackLink
+ * wired to onBack, the reference heading, the round hint
+ * composed from the round view-model, the StepDots driven
+ * by the same numbers, the passage as VerseText in a Card
+ * with BlankWord blanks reporting their word index, the
+ * warning feedback alert, and the advance button whose
+ * label switches on the final round ARE the rendered
+ * contract, observable without reading source. Absences
+ * that are rendered behavior (no loading/complete state, no
+ * ProgressBar, no End session, no text entry) are asserted
+ * on the returned tree. The former prop-type pins, the
+ * blank-ordinal implementation scan (#135's precompute
+ * shape — its observable effect, each blank's ordinal and
+ * total, is asserted on the BlankWord props instead),
+ * barrel-as-source-text, and story pins were deleted:
+ * type shape is enforced by the TypeScript build and story
+ * coverage by the story-parity tests (Stephen, 2026-11-20).
+ * The dist `.d.ts` read below is a built-artifact read, not
+ * a source read, and stays.
  */
+import "../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -57,210 +33,190 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pagesDir = join(here, "../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "MemorizationSessionPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "MemorizationSessionPage.stories.tsx"), "utf8");
-const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
-// Strip block and line comments so documented patterns in
-// prose cannot pass the scan.
-const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+async function loadPage() {
+  const dist: Record<string, any> = await loadInternalDist();
+  const shell: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
+  const page: Record<string, any> = await import("../../dist/pages/MemorizationSessionPage.js");
+  return { ...dist, BigFooterShell: shell.BigFooterShell, ...page };
+}
 
-test("MemorizationSessionPage source is readable and non-trivial", () => {
-  assert.ok(code.length > 1000, "expected the full MemorizationSessionPage source");
-  assert.match(code, /export function MemorizationSessionPage/);
+function screenChildren(tree: any): any[] {
+  const screen = tree.props.children;
+  const children = screen.props.children;
+  return Array.isArray(children) ? children : [children];
+}
+
+function textOf(element: any): string {
+  const children = element.props.children;
+  return (Array.isArray(children) ? children : [children]).map((c) => String(c)).join("");
+}
+
+const WORDS = [
+  { text: "For" },
+  { text: "God", blank: { revealed: false } },
+  { text: "so" },
+  { text: "loved", blank: { revealed: true } },
+];
+
+function readyProps(overrides: Record<string, any> = {}) {
+  return {
+    state: "ready",
+    reference: "John 3:16",
+    roundIndex: 1,
+    roundCount: 3,
+    words: WORDS,
+    isFinalRound: false,
+    onBack: () => {},
+    onBlankReveal: (_i: number) => {},
+    onAdvance: () => {},
+    ...overrides,
+  };
+}
+
+test("MemorizationSessionPage is exported from the built package root", async () => {
+  const { MemorizationSessionPage } = await loadPage();
+  assert.equal(typeof MemorizationSessionPage, "function");
+  const types = readFileSync(join(here, "../..", "dist", "index.d.ts"), "utf8");
+  assert.match(types, /MemorizationSessionPage/);
+  assert.match(types, /type MemorizationSessionPageProps/);
 });
 
-test("the props are a not-found | ready union, with no loading or complete member", () => {
-  assert.match(code, /export type MemorizationSessionPageProps =/);
-  assert.match(
-    code,
-    /\{ state: "not-found"; onBack: \(\) => void; footer\?: BigFooterData \}/,
-    "the not-found member carries its own Back intent (its branch renders a Back button)",
-  );
-  assert.match(
-    code,
-    /\| MemorizationSessionPageReadyProps;/,
-    "the ready member is the drill props",
-  );
-  assert.match(
-    code,
-    /props\.state === "not-found"/,
-    "the not-found branch must key off the state union",
-  );
-  assert.match(
-    code,
-    /<Text>Verse not found\.<\/Text>/,
-    "the missing-verse line must match the app's",
-  );
-  assert.doesNotMatch(
-    code,
-    /state: "loading"|Spinner/,
-    "the app screen renders no loading state — the union must not invent one",
-  );
-  assert.doesNotMatch(
-    code,
-    /state: "complete"|state: "completed"/,
-    "finishing navigates away — there is no rendered complete state",
-  );
+test("the not-found branch renders the missing-verse line and a Back button", async () => {
+  const { MemorizationSessionPage, BigFooterShell, ScreenContainer, Text, Button } =
+    await loadPage();
+  let backs = 0;
+  const tree = MemorizationSessionPage({
+    state: "not-found",
+    onBack: () => {
+      backs += 1;
+    },
+  });
+  assert.equal(tree.type, BigFooterShell);
+  assert.equal(tree.props.children.type, ScreenContainer);
+  const [line, back] = screenChildren(tree);
+  assert.equal(line.type, Text);
+  assert.equal(line.props.children, "Verse not found.", "the missing-verse line matches the app's");
+  assert.equal(back.type, Button);
+  assert.equal(back.props.children, "Back");
+  back.props.onPress();
+  assert.equal(backs, 1, "the not-found Back button fires onBack");
 });
 
-test("the component is fully controlled — no state, no engine", () => {
-  assert.doesNotMatch(
-    code,
-    /useState|useReducer|useRef/,
-    "round, revealed blanks, and feedback live app-side and cross as props",
+test("the drill chrome renders in order: BackLink, heading, hint, dots, card", async () => {
+  const { MemorizationSessionPage, BackLink, Text, StepDots, Card } = await loadPage();
+  let backs = 0;
+  const onBack = () => {
+    backs += 1;
+  };
+  const tree = MemorizationSessionPage(readyProps({ onBack }));
+  const children = screenChildren(tree);
+  const [backLink, heading, hint, dots, card] = children;
+  assert.equal(backLink.type, BackLink, "Back is the shared BackLink (#95)");
+  assert.equal(backLink.props.onPress, onBack, "BackLink reports through onBack, not an href");
+  assert.equal(backLink.props.href, undefined);
+  backLink.props.onPress();
+  assert.equal(backs, 1);
+  assert.equal(heading.type, Text);
+  assert.equal(heading.props.variant, "heading");
+  assert.equal(heading.props.children, "John 3:16", "the reference is the heading");
+  assert.equal(hint.type, Text);
+  assert.equal(hint.props.variant, "hint");
+  assert.equal(
+    textOf(hint),
+    "Round 2 of 3 — tap a blank to peek at the word.",
+    "the round hint is composed from the round view-model, as the app's",
   );
-  assert.doesNotMatch(
-    code,
-    /@memorize\/core|BLANK_FRACTIONS|blankedIndices|gradeRound|tokenize/,
-    "the session engine (blanking, grading, tokenizing) stays app-side",
-  );
+  assert.equal(dots.type, StepDots, "the dots are the round indicator");
+  assert.equal(dots.props.count, 3);
+  assert.equal(dots.props.activeIndex, 1);
+  assert.equal(card.type, Card, "the passage renders in a Card, after the indicator");
 });
 
-test("the shell is the scrolling ScreenContainer, with no FlatList", () => {
-  assert.match(code, /<ScreenContainer>/, "the page must render in the page shell");
-  assert.doesNotMatch(code, /<FlatList/, "the passage is a single text block — no virtualization");
+test("the passage renders as VerseText, blanks as BlankWord reporting their word index", async () => {
+  const { MemorizationSessionPage, VerseText, Text, BlankWord } = await loadPage();
+  const revealed: number[] = [];
+  const tree = MemorizationSessionPage(
+    readyProps({
+      onBlankReveal: (i: number) => {
+        revealed.push(i);
+      },
+    }),
+  );
+  const card = screenChildren(tree)[4];
+  const verseText = card.props.children;
+  assert.equal(verseText.type, VerseText, "the passage renders in VerseText");
+  const wordEls = verseText.props.children;
+  assert.equal(wordEls.length, WORDS.length);
+  for (const el of wordEls) assert.equal(el.type, Text, "each word renders as verse text");
+  assert.equal(textOf(wordEls[0]), "For ", "a plain word renders its text");
+  const firstBlank = wordEls[1].props.children[0];
+  assert.equal(firstBlank.type, BlankWord, "a blanked word renders via BlankWord");
+  assert.equal(firstBlank.props.word, "God", "a blank carries its word");
+  assert.equal(firstBlank.props.revealed, false, "the revealed flag crosses from props");
+  assert.equal(firstBlank.props.index, 0, "the first blank's ordinal among the round's blanks");
+  assert.equal(firstBlank.props.total, 2, "BlankWord numbers blanks against the round's total");
+  firstBlank.props.onReveal();
+  assert.deepEqual(revealed, [1], "a blank press reports the word's index in the words array");
+  const secondBlank = wordEls[3].props.children[0];
+  assert.equal(secondBlank.type, BlankWord);
+  assert.equal(secondBlank.props.revealed, true);
+  assert.equal(secondBlank.props.index, 1, "the second blank's ordinal");
+  secondBlank.props.onReveal();
+  assert.deepEqual(revealed, [1, 3]);
 });
 
-test("the view-model and callback contract matches the declared props", () => {
-  assert.match(code, /reference: string;/);
-  assert.match(code, /roundIndex: number;/);
-  assert.match(code, /roundCount: number;/);
-  assert.match(code, /words: MemorizationSessionPageWord\[\];/);
-  assert.match(code, /feedback\?: string \| null;/);
-  assert.match(code, /isFinalRound: boolean;/);
-  assert.match(code, /onBack: \(\) => void;/);
-  assert.match(code, /onBlankReveal: \(wordIndex: number\) => void;/);
-  assert.match(code, /onAdvance: \(\) => void;/);
-  assert.match(code, /text: string;/);
-  assert.match(code, /revealed: boolean;/);
-});
+test("feedback renders as the warning alert only when present; advance label switches on the final round", async () => {
+  const { MemorizationSessionPage, Alert, Button } = await loadPage();
+  let advances = 0;
+  const onAdvance = () => {
+    advances += 1;
+  };
+  const withFeedback = screenChildren(
+    MemorizationSessionPage(readyProps({ feedback: "Not quite — try again.", onAdvance })),
+  );
+  const alert = withFeedback[5];
+  assert.equal(alert.type, Alert);
+  assert.equal(alert.props.severity, "warning");
+  assert.equal(alert.props.children, "Not quite — try again.");
+  const advance = withFeedback[6];
+  assert.equal(advance.type, Button);
+  assert.equal(advance.props.children, "Next round");
+  advance.props.onPress();
+  assert.equal(advances, 1, "advance fires onAdvance");
 
-test("the drill chrome matches the app screen, in render order", () => {
-  assert.match(code, /<BackLink onPress=\{onBack\} \/>/, "Back is the shared BackLink (#95)");
-  // Stephen's #248 ruling (2026-10-29): a genuinely dynamic back
-  // destination is EXEMPT from the href rule — it keeps its callback.
-  assert.doesNotMatch(code, /backHref|href=\{onBack\}/, "the session back must not take an href");
-  assert.doesNotMatch(
-    code,
-    /←/,
-    "the arrow is BackLink's drawn icon — the ← text glyph sat at the bottom of the line on Android (#95)",
+  const withoutFeedback = screenChildren(MemorizationSessionPage(readyProps({})));
+  assert.equal(withoutFeedback[5], null, "no feedback renders no alert");
+  const final = screenChildren(
+    MemorizationSessionPage(readyProps({ isFinalRound: true })),
   );
-  assert.match(
-    code,
-    /<Text variant="heading">\{reference\}<\/Text>/,
-    "the reference is the heading",
-  );
-  assert.match(
-    code,
-    /Round \{roundIndex \+ 1\} of \{roundCount\} — tap a blank to peek at the word\./,
-    "the round hint copy must match the app's, composed from the round view-model",
-  );
-  assert.match(
-    code,
-    /<StepDots count=\{roundCount\} activeIndex=\{roundIndex\} \/>/,
-    "the dots are the round indicator, driven by the same numbers",
-  );
-  const backAt = code.indexOf("<BackLink");
-  const dotsAt = code.indexOf("<StepDots");
-  const cardAt = code.indexOf("<Card>");
-  assert.ok(backAt !== -1 && dotsAt !== -1 && cardAt !== -1, "chrome elements must be present");
-  assert.ok(backAt < dotsAt && dotsAt < cardAt, "order: Back, then round indicator, then the card");
-});
-
-test("the passage renders as VerseText in a Card, blanks as BlankWord", () => {
-  assert.match(code, /<VerseText>/, "the passage renders in VerseText");
-  assert.match(code, /<BlankWord/, "blanked words render via BlankWord");
-  assert.match(code, /word=\{word\.text\}/, "a blank carries its word (sizing + revealed text)");
-  assert.match(code, /revealed=\{word\.blank\.revealed\}/, "the revealed flag crosses from props");
-  assert.match(
-    code,
-    /onReveal=\{\(\) => onBlankReveal\(i\)\}/,
-    "a blank press must report the word's index in the words array",
-  );
-  assert.match(code, /total=\{blankCount\}/, "BlankWord numbers blanks against the round's total");
-});
-
-test("blank ordinals are precomputed before the render map, never mutated during render (#135)", () => {
-  assert.match(
-    code,
-    /const blankOrdinals = words\.map\(/,
-    "ordinals come from a first pass over the words, before rendering",
-  );
-  assert.match(
-    code,
-    /const ordinal = blankOrdinals\[i\]/,
-    "each BlankWord reads its precomputed ordinal",
-  );
-  assert.doesNotMatch(
-    code,
-    /blankOrdinal \+=|blankOrdinal\+\+/,
-    "no counter may be mutated inside the render map (the immutability diagnostic's target pattern)",
-  );
-});
-
-test("the feedback alert and advance action match the app screen", () => {
-  assert.match(
-    code,
-    /\{feedback \? <Alert severity="warning">\{feedback\}<\/Alert> : null\}/,
-    "feedback renders as the warning alert, only when present",
-  );
-  assert.match(
-    code,
-    /isFinalRound \? "Finish — mark memorized" : "Next round"/,
-    "the advance label must switch on the final round, as the app's does",
-  );
-  assert.match(code, /<Button onPress=\{onAdvance\}>/, "advance is the primary button");
-});
-
-test("the #44 demo's inventions are absent — no ProgressBar, no End session", () => {
-  assert.doesNotMatch(code, /ProgressBar/, "the real screen's only progress indicator is StepDots");
-  assert.doesNotMatch(
-    code,
-    /End session/,
-    "the session ends by finishing or by Back — there is no end-session action",
-  );
-});
-
-test("there is no text entry — revealing a blank is the only in-verse interaction", () => {
-  assert.doesNotMatch(
-    code,
-    /TextField|TextInput|onChangeText/,
-    "the drill has no typed input; peeking is the interaction",
+  assert.equal(
+    final[6].props.children,
+    "Finish — mark memorized",
+    "the advance label switches on the final round, as the app's does",
   );
 });
 
-test("there is deliberately no app-content render slot", () => {
-  assert.doesNotMatch(
-    code,
-    /render\w+\?:/,
-    "a render slot must be a conscious contract change (see the header audit), not drift",
-  );
-  assert.doesNotMatch(
-    code,
-    /ReactNode/,
-    "MemorizationSessionPage takes no ReactNode props — every element is a DS primitive",
-  );
-});
-
-test("the component is exported from the pages barrel index", () => {
-  assert.match(index, /MemorizationSessionPage/);
-  assert.match(index, /type MemorizationSessionPageProps/);
-  assert.match(index, /from "\.\/MemorizationSessionPage\.js"/);
-});
-
-test("stories exercise the session's main states", () => {
-  for (const name of ["FirstRound", "MidSession", "RetryFeedback", "FinalRound", "NotFound"]) {
-    assert.match(
-      stories,
-      new RegExp(`export const ${name}`),
-      `MemorizationSessionPage.stories.tsx must export a ${name} story`,
-    );
+test("the rendered tree has no demo inventions, loading state, or text entry", async () => {
+  const { MemorizationSessionPage } = await loadPage();
+  const tree = MemorizationSessionPage(readyProps({ feedback: "retry" }));
+  const types: string[] = [];
+  const labels: string[] = [];
+  const walk = (node: any): void => {
+    if (node == null || typeof node !== "object") {
+      if (typeof node === "string") labels.push(node);
+      return;
+    }
+    if (Array.isArray(node)) {
+      node.forEach(walk);
+      return;
+    }
+    if (typeof node.type === "function") types.push(node.type.name);
+    walk(node.props?.children);
+  };
+  walk(tree);
+  for (const banned of ["ProgressBar", "Spinner", "TextField", "TextInput", "FlatList"]) {
+    assert.ok(!types.includes(banned), `the drill must not render a ${banned}`);
   }
-  assert.match(
-    stories,
-    /light_quietDawn/,
-    "stories must pin the Quiet Dawn theme (Memorize's brand)",
-  );
+  assert.ok(!labels.includes("End session"), "there is no end-session action");
 });

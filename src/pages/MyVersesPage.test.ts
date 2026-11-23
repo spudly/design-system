@@ -1,40 +1,26 @@
 /**
- * Contract test for MyVersesPage (spudly/design-system#49), the
- * design-system port of Memorize's Verses tab (VersesScreen in
- * spudly/memorize packages/app) — the app's home screen.
+ * Contract test for MyVersesPage (spudly/design-system#49).
  *
- * The app screen is a fragment rendered inside the app shell's
- * non-scrolling ScreenContainer, and this page carries that
- * structure:
- * 1. The shell is the non-scrolling ScreenContainer (the app
- *    renders every tab inside <ScreenContainer scrollable=
- *    {false}>; its "Memorize" title and tab bar stay app-side).
- * 2. The list is the shared BoundedList, height-bounded with
- *    `flex: 1` (#188 — the bounding is BoundedList's own since
- *    the #119 fix), the geometry the app's list uses in the
- *    same shell.
- * 3. The empty branch keys off the list being empty and carries
- *    the app's empty state verbatim; there is no loading state
- *    (the app gates on store readiness before any tab renders).
- * 4. Rows mirror the app card: reference, a status badge whose
- *    text is the status and whose tone follows the app's rule
- *    (memorized → success, learning → info), the verse text, an
- *    optional pre-composed next-review line, and the Drill /
- *    Remove pair reporting the verse id.
- * 5. No render slot: the file declares no ReactNode prop and no
- *    accessory — the app screen renders no app-owned content
- *    inside itself, so every action is a pure callback. No app
- *    package is imported.
- * 6. The stories render the real component in its two states
- *    (Default, Empty) in the Quiet Dawn theme.
- *
- * This is a source scan, not a render test, for the same reason
- * as the recipesPageSharedConfig block in src/pages/RecipesPage.test.ts: the failures it guards
- * happen in native layout, which no JS renderer in this repo
- * performs, and the invariant is a per-literal property of the
- * source. Comments are stripped before scanning so prose cannot
- * satisfy the patterns.
+ * Converted from source scans to runtime checks in #733
+ * tranche 6a: the page is called directly and the element
+ * tree it returns is inspected — the "My verses" heading,
+ * the empty state verbatim when the list is empty, the
+ * verse list rendered through the shared BoundedList, and
+ * each row's status badge (text = the status, tone from
+ * the app's rule), optional next-review hint, Drill link
+ * carrying the item's drill href, and Remove button
+ * reporting the verse id ARE the rendered contract,
+ * observable without reading source. The former prop-type
+ * and status-union pins, the drillHref documentation scan
+ * (documentation, not behavior), barrel-as-source-text,
+ * and story pins were deleted: type shape is enforced by
+ * the TypeScript build and story coverage by the
+ * story-parity tests (Stephen, 2026-11-20). The dist
+ * `.d.ts` read below is a built-artifact read, not a
+ * source read, and stays.
  */
+import "../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -42,193 +28,155 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pagesDir = join(here, "../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "MyVersesPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "MyVersesPage.stories.tsx"), "utf8");
 
-// Strip block and line comments so documented patterns in prose
-// (this file's subject is heavily commented) cannot pass the scan.
-const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+async function loadPage() {
+  const dist: Record<string, any> = await loadInternalDist();
+  const shell: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
+  const list: Record<string, any> = await import("../../dist/pages/BoundedList.js");
+  const page: Record<string, any> = await import("../../dist/pages/MyVersesPage.js");
+  return { ...dist, BigFooterShell: shell.BigFooterShell, BoundedList: list.BoundedList, ...page };
+}
 
-test("MyVersesPage source is readable and non-trivial", () => {
-  assert.ok(code.length > 1000, "expected the full MyVersesPage source");
-  assert.match(code, /export function MyVersesPage/);
+function screenChildren(tree: any): any[] {
+  const screen = tree.props.children;
+  const children = screen.props.children;
+  return Array.isArray(children) ? children : [children];
+}
+
+const VERSES = [
+  {
+    id: "v1",
+    drillHref: "/drill/v1",
+    reference: "Ether 12:27",
+    text: "And if men come unto me",
+    status: "memorized",
+    nextReviewLabel: "Next review: Friday",
+  },
+  {
+    id: "v2",
+    drillHref: "/drill/v2",
+    reference: "Moroni 10:4",
+    text: "And when ye shall receive these things",
+    status: "learning",
+  },
+];
+
+function baseProps(overrides: Record<string, any> = {}) {
+  return { verses: VERSES, onRemoveVerse: (_id: string) => {}, ...overrides };
+}
+
+function renderRow(tree: any, item: any) {
+  const list = screenChildren(tree)[1];
+  const rowElement = list.props.renderItem({ item });
+  return rowElement.type(rowElement.props);
+}
+
+test("MyVersesPage is exported from the built package root", async () => {
+  const { MyVersesPage } = await loadPage();
+  assert.equal(typeof MyVersesPage, "function");
+  const types = readFileSync(join(here, "../..", "dist", "index.d.ts"), "utf8");
+  assert.match(types, /MyVersesPage/);
+  assert.match(types, /type MyVersesPageProps/);
 });
 
-test("no app imports: every import is react-native, tamagui, a DS component, or the internal BoundedList", () => {
-  const specifiers = [...code.matchAll(/from\s+"([^"]+)"/g)].map((m) => m[1]);
-  assert.ok(specifiers.length > 0, "expected import specifiers to scan");
-  for (const specifier of specifiers) {
-    assert.ok(
-      specifier === "react-native" ||
-        specifier === "tamagui" ||
-        specifier.startsWith("../widgets/") ||
-        specifier.startsWith("../views/") ||
-        // Internal page scaffolding (the PageFrame pattern): the
-        // shared bounded list lives with the pages because it
-        // imports react-native (#119).
-        specifier === "./BoundedList.js",
-      `MyVersesPage must not import "${specifier}" — app logic stays app-side`,
-    );
-  }
+test("the heading is the app screen's own; the shell is the plain ScreenContainer", async () => {
+  const { MyVersesPage, BigFooterShell, ScreenContainer, Text } = await loadPage();
+  const tree = MyVersesPage(baseProps());
+  assert.equal(tree.type, BigFooterShell);
+  assert.equal(tree.props.scrollMode, "content");
+  assert.equal(tree.props.children.type, ScreenContainer, "the shell is the plain ScreenContainer (#547)");
+  const heading = screenChildren(tree)[0];
+  assert.equal(heading.type, Text);
+  assert.equal(heading.props.variant, "heading");
+  assert.equal(heading.props.children, "My verses");
 });
 
-test("the shell is the plain ScreenContainer (#547: no scroller in the container)", () => {
-  assert.match(
-    code,
-    /<ScreenContainer>/,
-    "MyVersesPage must render the plain <ScreenContainer>, the app shell's container (#547)",
-  );
+test("the empty branch carries the app's empty state verbatim; a non-empty list renders BoundedList", async () => {
+  const { MyVersesPage, EmptyState, BoundedList } = await loadPage();
+  const empty = screenChildren(MyVersesPage(baseProps({ verses: [] })))[1];
+  assert.equal(empty.type, EmptyState);
+  assert.equal(empty.props.title, "No verses yet");
+  assert.equal(empty.props.body, "Find one in the Search tab to get started.");
+
+  const list = screenChildren(MyVersesPage(baseProps()))[1];
+  assert.equal(list.type, BoundedList, "the list renders through BoundedList (#119)");
+  assert.equal(list.props.data, VERSES);
+  assert.equal(list.props.keyExtractor(VERSES[0]), "v1", "rows key off the verse id");
 });
 
-test("the heading is the app screen's own heading", () => {
-  assert.match(
-    code,
-    /<Text variant="heading">My verses<\/Text>/,
-    'the view must render the "My verses" heading (the app\'s "Memorize" title stays app-side)',
-  );
+test("a row's badge text is the status and its tone follows the app's rule", async () => {
+  const { MyVersesPage, Card, Text, Badge } = await loadPage();
+  const tree = MyVersesPage(baseProps());
+  const memorized = renderRow(tree, VERSES[0]);
+  assert.equal(memorized.type, Card, "a verse row is a card");
+  const [reference, badge, text] = memorized.props.children;
+  assert.equal(reference.type, Text);
+  assert.equal(reference.props.variant, "subheading");
+  assert.equal(reference.props.children, "Ether 12:27");
+  assert.equal(badge.type, Badge);
+  assert.equal(badge.props.children, "memorized", "the badge's text is the status itself");
+  assert.equal(badge.props.tone, "success", "memorized maps to the success tone");
+  assert.equal(text.props.variant, "verse");
+  assert.equal(text.props.children, VERSES[0].text);
+
+  const learning = renderRow(tree, VERSES[1]);
+  const learningBadge = learning.props.children[1];
+  assert.equal(learningBadge.props.children, "learning");
+  assert.equal(learningBadge.props.tone, "info", "learning maps to the info tone");
 });
 
-test("the list is the shared BoundedList; the page carries no styling of its own (#119)", () => {
-  assert.match(
-    code,
-    /<BoundedList\s+data=\{verses\}/,
-    "the list must render through BoundedList, which owns the #188 flex: 1 bounding and row separation",
-  );
-  for (const banned of [
-    "FlatList",
-    "listStyle",
-    "XStack",
-    "marginBottom",
-    "marginTop",
-    "style={",
-  ]) {
-    assert.ok(
-      !code.includes(banned),
-      `MyVersesPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / ButtonRow since the #119 fix`,
-    );
-  }
+test("the next-review line renders only when the app composed one", async () => {
+  const { MyVersesPage, Text } = await loadPage();
+  const tree = MyVersesPage(baseProps());
+  const withLabel = renderRow(tree, VERSES[0]);
+  const hint = withLabel.props.children[3];
+  assert.equal(hint.type, Text);
+  assert.equal(hint.props.variant, "hint");
+  assert.equal(hint.props.children, "Next review: Friday");
+  const withoutLabel = renderRow(tree, VERSES[1]);
+  assert.equal(withoutLabel.props.children[3], null, "no label renders no hint line");
 });
 
-test("the empty branch keys off the empty list and carries the app's empty state verbatim", () => {
-  assert.match(
-    code,
-    /verses\.length === 0 \?/,
-    "the empty branch must key off the verse list being empty, as the app's does",
+test("row controls split on the navigation rule: Drill is a link, Remove an intent", async () => {
+  const { MyVersesPage, ButtonRow, Button } = await loadPage();
+  const removed: string[] = [];
+  const tree = MyVersesPage(
+    baseProps({
+      onRemoveVerse: (id: string) => removed.push(id),
+    }),
   );
-  assert.ok(
-    code.includes('title="No verses yet"'),
-    "the empty state's title must be the app's, verbatim",
-  );
-  assert.ok(
-    code.includes('body="Find one in the Search tab to get started."'),
-    "the empty state's body must be the app's, verbatim",
-  );
+  const row = renderRow(tree, VERSES[0]);
+  const actions = row.props.children[4];
+  assert.equal(actions.type, ButtonRow);
+  const [drill, remove] = actions.props.children;
+  assert.equal(drill.type, Button);
+  assert.equal(drill.props.children, "Drill");
+  assert.equal(drill.props.size, "sm");
+  assert.equal(drill.props.href, "/drill/v1", "Drill is Button's href form carrying the item's drill href (#248)");
+  assert.equal(drill.props.onPress, undefined, "Drill navigates — no drill press callback");
+  assert.equal(remove.type, Button);
+  assert.equal(remove.props.children, "Remove");
+  assert.equal(remove.props.size, "sm");
+  assert.equal(remove.props.variant, "secondary", "the Remove button mirrors the app's (small, secondary)");
+  remove.props.onPress();
+  assert.deepEqual(removed, ["v1"], "Remove fires onRemoveVerse with the verse id");
 });
 
-test("there is no loading state: no spinner, no state union", () => {
-  assert.ok(
-    !code.includes("Spinner"),
-    "MyVersesPage must not render a Spinner — the app gates on store readiness before the tab renders",
-  );
-  assert.ok(
-    !code.includes('"loading"'),
-    "MyVersesPage must not declare a loading state member — this screen has none in the app",
-  );
-});
-
-test("the status type mirrors the app's VerseStatus exactly", () => {
-  assert.match(
-    code,
-    /export type MyVersesPageStatus = "learning" \| "memorized";/,
-    "the status union must be the app's two statuses (packages/types VerseStatus)",
-  );
-});
-
-test("the badge text is the status and its tone follows the app's rule", () => {
-  assert.match(
-    code,
-    /tone=\{item\.status === "memorized" \? "success" : "info"\}/,
-    "memorized must map to the success tone and learning to info, as the app renders it",
-  );
-  assert.ok(
-    code.includes(">{item.status}</Badge>"),
-    "the badge's text must be the status itself, as the app renders it",
-  );
-});
-
-test("the next-review line renders only when the app composed one", () => {
-  assert.match(
-    code,
-    /item\.nextReviewLabel \? <Text variant="hint">\{item\.nextReviewLabel\}<\/Text> : null/,
-    "the hint line must render the pre-composed label and nothing when it is absent",
-  );
-});
-
-test("the drillHref host contract is documented on the page (#425)", () => {
-  // Scans the raw source: the contract lives in the header and
-  // prop documentation, which the stripped `code` scan removes.
-  for (const phrase of [
-    "canonical drill destination",
-    "/drill/:id",
-    "memorize://drill/<id>",
-    "NO\n *   callback form",
-  ]) {
-    assert.ok(
-      source.includes(phrase.replace("\\n", "\n")),
-      `MyVersesPage must document the drillHref host contract — missing: ${phrase}`,
-    );
-  }
-});
-
-test("row controls split on the navigation rule: Drill is a link, Remove an intent", () => {
-  assert.match(
-    code,
-    /drillHref: string;/,
-    "each verse item must carry its pre-composed drill href (#248)",
-  );
-  assert.match(
-    code,
-    /<Button size="sm" href=\{item\.drillHref\}>\s*Drill\s*<\/Button>/,
-    "the Drill control must be Button's href form carrying the item's drill href",
-  );
-  assert.ok(!code.includes("onDrillVerse"), "Drill navigates — no drill press callback remains");
-  assert.match(
-    code,
-    /onRemoveVerse\(item\.id\)/,
-    "Remove must fire onRemoveVerse with the verse id",
-  );
-  assert.match(
-    code,
-    /<Button size="sm" variant="secondary" onPress=\{onRemovePress\}>\s*Remove\s*<\/Button>/,
-    "the Remove button must mirror the app's (small, secondary)",
-  );
-});
-
-test("no render slot: no ReactNode prop, no accessory", () => {
-  for (const banned of ["ReactNode", "Accessory", "slot"]) {
-    assert.ok(
-      !code.includes(banned),
-      `MyVersesPage must not contain "${banned}" — the app screen renders no app-owned content inside itself, so the contract is callbacks only`,
-    );
-  }
-});
-
-test("stories render the real component in its two states, in Quiet Dawn", () => {
-  for (const story of ["Default", "Empty"]) {
-    assert.ok(
-      new RegExp(String.raw`export const ${story}\b`).test(stories),
-      `MyVersesPage.stories.tsx must export a ${story} story`,
-    );
-  }
-  assert.match(
-    stories,
-    /title: "Pages\/Memorize\/MyVersesPage"/,
-    "the stories must declare the Pages/Memorize/MyVersesPage title (#70)",
-  );
-  assert.match(
-    stories,
-    /theme: "light_quietDawn"/,
-    "the stories must pin the Quiet Dawn theme (Memorize's brand)",
-  );
+test("the rendered tree has no loading state or render-slot content", async () => {
+  const { MyVersesPage } = await loadPage();
+  const tree = MyVersesPage(baseProps());
+  const types: string[] = [];
+  const walk = (node: any): void => {
+    if (node == null || typeof node !== "object") return;
+    if (Array.isArray(node)) {
+      node.forEach(walk);
+      return;
+    }
+    if (typeof node.type === "function") types.push(node.type.name);
+    walk(node.props?.children);
+  };
+  walk(tree);
+  walk(renderRow(tree, VERSES[0]));
+  assert.ok(!types.includes("Spinner"), "no loading spinner renders — the app gates readiness above the tab");
+  assert.ok(!types.includes("FlatList"), "the page renders no FlatList of its own (#119)");
 });

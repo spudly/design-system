@@ -1,49 +1,26 @@
 /**
  * Contract test for MemorizeReviewPage (spudly/design-system#49).
  *
- * MemorizeReviewPage is the design-system port of the Memorize
- * app's Review screen (ReviewScreen in spudly/memorize
- * packages/app), and its structure is the contract this test
- * guards in source:
- * 1. The naming audit: the #49 inventory calls this item
- *    "Progress", after the #44 demo of that name — but the app
- *    has no progress screen and no aggregate stats anywhere
- *    (no mastered counts, no streaks, no drill accuracy, no
- *    per-passage percents; its data model carries none of
- *    those). The component ports the real Review screen and
- *    is named for it; the demo's invented dashboard UI
- *    (StatCard, ProgressBar) is pinned absent.
- * 2. The heading carries the due count from the list itself
- *    ("Review (N due)"), and the empty list renders the bare
- *    "Review" heading over the app's nothing-due empty state,
- *    copy verbatim.
- * 3. The shell is the fixed ScreenContainer (the app's tab
- *    screens share App's non-scrolling shell) with the list
- *    bounded by `flex: 1` — the #188 geometry, owned by the
- *    shared BoundedList since the #119 fix.
- * 4. The actions are exactly the app screen's two review
- *    outcomes, as two named callbacks reporting the verse id.
- *    There is deliberately no Drill or Remove callback —
- *    those are the Verses screen's row actions — and no
- *    status badge on the rows: review cards carry none.
- * 5. No loading member: the app gates store readiness above
- *    the tab shell, so the screen has no loading state and
- *    the component renders no Spinner.
- * 6. There is no render slot: the app's rows render only DS
- *    primitives over per-verse data, so the contract is
- *    callbacks-only and the absence is pinned.
- * 7. The component is exported from the pages barrel index,
- *    and stories exercise the Default and Empty states in
- *    the Quiet Dawn theme so Chromatic captures them.
- *
- * This is a source scan, not a render test: the repo has no JS
- * renderer for these components (Chromatic screenshots in
- * CI), and the invariant is a per-literal property of the
- * source (same rationale as src/pages/MealPlanDetailPage.test.ts).
- * Comments are stripped before scanning so prose cannot
- * satisfy — or, for the pinned absences, accidentally trip —
- * the patterns.
+ * Converted from source scans to runtime checks in #733
+ * tranche 6a: the page is called directly and the element
+ * tree it returns is inspected — the heading composing the
+ * due count from the list itself, the nothing-due empty
+ * state verbatim, the due list rendered through the shared
+ * BoundedList with the rows' two outcome buttons reporting
+ * the verse id ARE the rendered contract, observable
+ * without reading source. Absences that are rendered
+ * behavior (no invented dashboard stats, no Drill/Remove
+ * actions, no status badge, no loading spinner) are
+ * asserted on the returned tree and on the rows the list
+ * renders. The former prop-type pins, barrel-as-source-
+ * text, and story pins were deleted: type shape is enforced
+ * by the TypeScript build and story coverage by the
+ * story-parity tests (Stephen, 2026-11-20). The dist `.d.ts`
+ * read below is a built-artifact read, not a source read,
+ * and stays.
  */
+import "../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -51,141 +28,136 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pagesDir = join(here, "../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "MemorizeReviewPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "MemorizeReviewPage.stories.tsx"), "utf8");
-const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
-// Strip block and line comments so documented patterns in prose
-// cannot pass the scan.
-const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+async function loadPage() {
+  const dist: Record<string, any> = await loadInternalDist();
+  const shell: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
+  const list: Record<string, any> = await import("../../dist/pages/BoundedList.js");
+  const page: Record<string, any> = await import("../../dist/pages/MemorizeReviewPage.js");
+  return { ...dist, BigFooterShell: shell.BigFooterShell, BoundedList: list.BoundedList, ...page };
+}
 
-test("MemorizeReviewPage source is readable and non-trivial", () => {
-  assert.ok(code.length > 1000, "expected the full MemorizeReviewPage source");
-  assert.match(code, /export function MemorizeReviewPage/);
+function screenChildren(tree: any): any[] {
+  const screen = tree.props.children;
+  const children = screen.props.children;
+  return Array.isArray(children) ? children : [children];
+}
+
+function textOf(element: any): string {
+  const children = element?.props?.children;
+  return (Array.isArray(children) ? children : [children])
+    .map((c) => (typeof c === "string" ? c : ""))
+    .join("");
+}
+
+const VERSES = [
+  { id: "v1", reference: "Ether 12:27", text: "And if men come unto me" },
+  { id: "v2", reference: "Moroni 10:4", text: "And when ye shall receive these things" },
+];
+
+function baseProps(overrides: Record<string, any> = {}) {
+  return {
+    verses: VERSES,
+    onRememberedPress: (_id: string) => {},
+    onForgotPress: (_id: string) => {},
+    ...overrides,
+  };
+}
+
+test("MemorizeReviewPage is exported from the built package root", async () => {
+  const { MemorizeReviewPage } = await loadPage();
+  assert.equal(typeof MemorizeReviewPage, "function");
+  const types = readFileSync(join(here, "../..", "dist", "index.d.ts"), "utf8");
+  assert.match(types, /MemorizeReviewPage/);
+  assert.match(types, /type MemorizeReviewPageProps/);
 });
 
-test("the invented demo dashboard is absent — no stats, no percent bars", () => {
-  assert.doesNotMatch(
-    code,
-    /StatCard|ProgressBar/,
-    "the #44 Progress demo's StatCards and percent bars are invented UI — the app has neither",
-  );
-  assert.doesNotMatch(
-    code,
-    /streak|accuracy|percent/i,
-    "the app's data model carries no streak, accuracy, or percent — the contract must not invent them",
-  );
-  assert.doesNotMatch(
-    code,
-    /totalMemorized|memorizedCount|dueCount/,
-    "no aggregate-count props: the only count is the due list's own length, as in the app",
-  );
+test("the heading carries the due count from the list; the empty state matches the app verbatim", async () => {
+  const { MemorizeReviewPage, Text, EmptyState } = await loadPage();
+  const [heading, list] = screenChildren(MemorizeReviewPage(baseProps()));
+  assert.equal(heading.type, Text);
+  assert.equal(heading.props.variant, "heading");
+  assert.equal(textOf(heading), "Review (2 due)", "the heading composes the due count");
+  assert.equal(typeof list.props.renderItem, "function", "a non-empty list renders rows");
+
+  const [emptyHeading, emptyState] = screenChildren(MemorizeReviewPage(baseProps({ verses: [] })));
+  assert.equal(textOf(emptyHeading), "Review", "the empty branch renders the bare heading");
+  assert.equal(emptyState.type, EmptyState);
+  assert.equal(emptyState.props.title, "Nothing due");
+  assert.equal(emptyState.props.body, "Nice work.", "the nothing-due copy matches the app verbatim");
 });
 
-test("the heading carries the due count; the empty state matches the app verbatim", () => {
-  assert.match(
-    code,
-    /`Review \(\$\{verses\.length\} due\)`/,
-    "the heading must compose the due count from the list length, as the app does",
-  );
-  assert.match(code, /"Review"/, "the empty branch must render the bare Review heading");
-  assert.match(
-    code,
-    /<EmptyState title="Nothing due" body="Nice work\." \/>/,
-    "the nothing-due empty state copy must match the app's verbatim",
-  );
+test("the due list renders through the shared BoundedList in the plain shell", async () => {
+  const { MemorizeReviewPage, BigFooterShell, ScreenContainer, BoundedList } = await loadPage();
+  const tree = MemorizeReviewPage(baseProps());
+  assert.equal(tree.type, BigFooterShell);
+  assert.equal(tree.props.scrollMode, "content");
+  assert.equal(tree.props.children.type, ScreenContainer, "the tab screens share the app's shell");
+  const list = screenChildren(tree)[1];
+  assert.equal(list.type, BoundedList, "the due list renders through BoundedList (#119, #547)");
+  assert.equal(list.props.data, VERSES, "the list data is the verses as-is");
+  assert.equal(list.props.keyExtractor(VERSES[0]), "v1", "rows key off the verse id");
 });
 
-test("the shell is the plain ScreenContainer; the list is the shared BoundedList (#119, #547)", () => {
-  assert.match(code, /<ScreenContainer>/, "the tab screens share the app's non-scrolling shell");
-  assert.match(
-    code,
-    /<BoundedList\s+data=\{verses\}/,
-    "the due list must render through BoundedList, which owns the #188 flex: 1 bounding and row separation",
+test("row actions are exactly the two review outcomes, reporting the verse id", async () => {
+  const { MemorizeReviewPage, Card, Text, ButtonRow, Button } = await loadPage();
+  const remembered: string[] = [];
+  const forgot: string[] = [];
+  const tree = MemorizeReviewPage(
+    baseProps({
+      onRememberedPress: (id: string) => remembered.push(id),
+      onForgotPress: (id: string) => forgot.push(id),
+    }),
   );
-  for (const banned of [
-    "FlatList",
-    "listStyle",
-    "XStack",
-    "marginBottom",
-    "marginTop",
-    "style={",
-  ]) {
-    assert.ok(
-      !code.includes(banned),
-      `MemorizeReviewPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / ButtonRow since the #119 fix`,
-    );
+  const list = screenChildren(tree)[1];
+  const rowElement = list.props.renderItem({ item: VERSES[1] });
+  const row = rowElement.type(rowElement.props);
+  assert.equal(row.type, Card, "a due row is a card");
+  const [reference, text, actions] = row.props.children;
+  assert.equal(reference.type, Text);
+  assert.equal(reference.props.variant, "subheading");
+  assert.equal(reference.props.children, "Moroni 10:4");
+  assert.equal(text.props.variant, "verse");
+  assert.equal(text.props.children, VERSES[1].text);
+  assert.equal(actions.type, ButtonRow);
+  const [rememberedBtn, forgotBtn] = actions.props.children;
+  assert.equal(rememberedBtn.type, Button);
+  assert.equal(rememberedBtn.props.children, "I remembered it", "the primary outcome matches the app's");
+  assert.equal(rememberedBtn.props.size, "sm");
+  rememberedBtn.props.onPress();
+  assert.deepEqual(remembered, ["v2"], "remembered reports the row's verse id");
+  assert.equal(forgotBtn.type, Button);
+  assert.equal(forgotBtn.props.children, "I forgot it", "the secondary outcome matches the app's");
+  assert.equal(forgotBtn.props.variant, "secondary");
+  forgotBtn.props.onPress();
+  assert.deepEqual(forgot, ["v2"], "forgot reports the row's verse id");
+});
+
+test("the rendered tree has no invented dashboard, extra actions, badge, or loading state", async () => {
+  const { MemorizeReviewPage } = await loadPage();
+  const tree = MemorizeReviewPage(baseProps());
+  const list = screenChildren(tree)[1];
+  const rowElement = list.props.renderItem({ item: VERSES[0] });
+  const types: string[] = [];
+  const labels: string[] = [];
+  const walk = (node: any): void => {
+    if (node == null || typeof node !== "object") {
+      if (typeof node === "string") labels.push(node);
+      return;
+    }
+    if (Array.isArray(node)) {
+      node.forEach(walk);
+      return;
+    }
+    if (typeof node.type === "function") types.push(node.type.name);
+    walk(node.props?.children);
+  };
+  walk(tree);
+  walk(rowElement.type(rowElement.props));
+  for (const banned of ["StatCard", "ProgressBar", "Badge", "Spinner", "FlatList"]) {
+    assert.ok(!types.includes(banned), `the review page must not render a ${banned}`);
   }
-});
-
-test("the view-model and callback contract matches the declared props", () => {
-  assert.match(code, /verses: MemorizeReviewPageVerse\[\];/);
-  assert.match(code, /reference: string;/);
-  assert.match(code, /text: string;/);
-  assert.match(code, /onRememberedPress: \(verseId: string\) => void;/);
-  assert.match(code, /onForgotPress: \(verseId: string\) => void;/);
-});
-
-test("the actions are exactly the app screen's two review outcomes", () => {
-  assert.match(
-    code,
-    />\s*I remembered it\s*<\/Button>/,
-    "the primary outcome must match the app's",
-  );
-  assert.match(code, />\s*I forgot it\s*<\/Button>/, "the secondary outcome must match the app's");
-  assert.match(code, /onRememberedPress\(item\.id\)/, "remembered must report the row's verse id");
-  assert.match(code, /onForgotPress\(item\.id\)/, "forgot must report the row's verse id");
-  assert.doesNotMatch(
-    code,
-    /onDrill|onRemove|onDelete/,
-    "Drill and Remove are the Verses screen's row actions — not this screen's",
-  );
-  assert.doesNotMatch(
-    code,
-    /Badge/,
-    "review cards carry no status badge in the app — the badges live on the Verses screen",
-  );
-});
-
-test("there is no loading state — the app gates readiness above the tab shell", () => {
-  assert.doesNotMatch(
-    code,
-    /Spinner|loading/,
-    "the app screen has no loading state of its own — the union must not invent one",
-  );
-});
-
-test("there is deliberately no app-content render slot", () => {
-  assert.doesNotMatch(
-    code,
-    /render\w+\?:/,
-    "a render slot must be a conscious contract change (see the header audit), not drift",
-  );
-  assert.doesNotMatch(
-    code,
-    /ReactNode/,
-    "MemorizeReviewPage takes no ReactNode props — its rows are view-modeled data only",
-  );
-});
-
-test("the component is exported from the pages barrel index", () => {
-  assert.match(index, /MemorizeReviewPage/);
-  assert.match(index, /type MemorizeReviewPageProps/);
-  assert.match(index, /from "\.\/MemorizeReviewPage\.js"/);
-});
-
-test("stories exercise the default and empty states in the Quiet Dawn theme", () => {
-  for (const name of ["Default", "Empty"]) {
-    assert.match(
-      stories,
-      new RegExp(`export const ${name}`),
-      `MemorizeReviewPage.stories.tsx must export a ${name} story`,
-    );
+  for (const bannedLabel of ["Drill", "Remove"]) {
+    assert.ok(!labels.includes(bannedLabel), `"${bannedLabel}" is the Verses screen's action, not this screen's`);
   }
-  assert.match(
-    stories,
-    /theme: "light_quietDawn"/,
-    "stories must pin the Quiet Dawn theme (Memorize's brand)",
-  );
 });
