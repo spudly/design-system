@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { ListRow } from "./ListRow.js";
+import { ListItem } from "./ListItem.js";
 import { ListStack } from "./ListStack.js";
 
 const meta: Meta<typeof ListStack> = {
@@ -15,19 +15,19 @@ export const Default: Story = {
   render: () => (
     <YStack maxWidth={430}>
       <ListStack>
-        <ListRow
+        <ListItem
           prefix="Meal · "
           title="Tacos al pastor"
           subtitle="Serves 4 · 640 kcal"
           onPress={() => {}}
         />
-        <ListRow
+        <ListItem
           prefix="Recipe · "
           title="Garlic cream chicken"
           subtitle="2 servings · 520 kcal"
           onPress={() => {}}
         />
-        <ListRow
+        <ListItem
           prefix="Recipe · "
           title="Old family lasagna"
           titleSuffix=" (unavailable)"

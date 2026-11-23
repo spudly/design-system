@@ -7,7 +7,7 @@ import { RowSubtitleText } from "./RowTextContent.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
-type ListRowOwnProps = {
+type ListItemOwnProps = {
   /** Optional caller-supplied lead-in rendered in the title line
    * before the title (e.g. a kind label, "Meal · "). */
   prefix?: string;
@@ -40,7 +40,7 @@ type ListRowOwnProps = {
  *   and on native a view frame with a LinkOverlay carrying the
  *   href (see LinkOverlay for why).
  */
-export type ListRowProps = ListRowOwnProps &
+export type ListItemProps = ListItemOwnProps &
   ({ onPress: () => void; href?: undefined } | { href: string; onPress?: never });
 
 /**
@@ -58,7 +58,7 @@ export type ListRowProps = ListRowOwnProps &
  * one accessibility stop (see LinkOverlay). A disabled row
  * renders as neither form: no activation, no link.
  */
-export function ListRow({
+export function ListItem({
   prefix,
   title,
   titleSuffix,
@@ -67,7 +67,7 @@ export function ListRow({
   loading = false,
   onPress,
   href,
-}: ListRowProps) {
+}: ListItemProps) {
   const showSkeleton = useLoadingScope(loading);
   if (showSkeleton) {
     // Loading (#278): the same hairline row geometry, with the

@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
-import { ListRow } from "../widgets/ListRow.js";
+import { ListItem } from "../widgets/ListItem.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { MarkableRow } from "../widgets/MarkableRow.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
@@ -44,8 +44,8 @@ import { Text } from "../widgets/Text.js";
  * at its uniform rhythm), the title is Text's `title`
  * variant, the notes and nutrition lines are `hint` text,
  * the actions sit in ButtonRow, and each member renders
- * through ListRow's link form: the row passes its href
- * always and adds ListRow's disabled state plus the
+ * through ListItem's link form: the row passes its href
+ * always and adds ListItem's disabled state plus the
  * "(unavailable)" title suffix only for a member whose
  * access was lost (the MealPlanDetailPage pattern), so the
  * row's link semantics — a real anchor on web, a LinkOverlay
@@ -130,7 +130,7 @@ export function MealDetailPage({
           <SectionCard title="Recipes">
             <ListStack>
               {members.map((member) => (
-                <ListRow
+                <ListItem
                   key={member.recipeId}
                   title={member.title}
                   subtitle={member.subtitle}

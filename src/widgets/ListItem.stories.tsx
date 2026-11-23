@@ -1,16 +1,16 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { ListRow } from "./ListRow.js";
+import { ListItem } from "./ListItem.js";
 import { Text } from "./Text.js";
 
-const meta: Meta<typeof ListRow> = {
-  title: "Widgets/ListRow",
-  component: ListRow,
+const meta: Meta<typeof ListItem> = {
+  title: "Widgets/ListItem",
+  component: ListItem,
 };
 
 export default meta;
-type Story = StoryObj<typeof ListRow>;
+type Story = StoryObj<typeof ListItem>;
 
 /**
  * Press readout: the "Row presses: N" line under the row
@@ -21,7 +21,7 @@ function PrefixedDemo() {
   const [presses, setPresses] = useState(0);
   return (
     <YStack maxWidth={430} gap="$2">
-      <ListRow
+      <ListItem
         prefix="Meal · "
         title="Taco Tuesday"
         subtitle="Serves 4 · 2,150 cal"
@@ -39,7 +39,7 @@ export const Prefixed: Story = {
 export const Plain: Story = {
   render: (args) => (
     <YStack maxWidth={430}>
-      <ListRow {...args} />
+      <ListItem {...args} />
     </YStack>
   ),
   args: {
@@ -51,7 +51,7 @@ export const Plain: Story = {
 export const Disabled: Story = {
   render: (args) => (
     <YStack maxWidth={430}>
-      <ListRow {...args} />
+      <ListItem {...args} />
     </YStack>
   ),
   args: {
@@ -67,7 +67,7 @@ export const Disabled: Story = {
 export const Loading: Story = {
   render: (args) => (
     <YStack maxWidth={430}>
-      <ListRow {...args} />
+      <ListItem {...args} />
     </YStack>
   ),
   args: {
@@ -83,7 +83,7 @@ export const Loading: Story = {
 export const LoadingOverlay: Story = {
   render: () => (
     <YStack position="relative" maxWidth={430}>
-      <ListRow
+      <ListItem
         prefix="Meal · "
         title="Taco Tuesday"
         subtitle="Serves 4 · 2,150 cal"
@@ -98,7 +98,7 @@ export const LoadingOverlay: Story = {
         opacity={0.45}
         pointerEvents="none"
       >
-        <ListRow
+        <ListItem
           prefix="Meal · "
           title="Taco Tuesday"
           subtitle="Serves 4 · 2,150 cal"
