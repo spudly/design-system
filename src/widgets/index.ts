@@ -174,7 +174,6 @@ export {
   RecipeInstructionsPanel,
   type RecipeInstructionsPanelProps,
 } from "./RecipeInstructionsPanel.js";
-export { RecipeOverviewPanel, type RecipeOverviewPanelProps } from "./RecipeOverviewPanel.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./Toolbar.js";
 export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";

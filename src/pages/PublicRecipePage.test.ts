@@ -7,6 +7,7 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const pagesDir = join(here, "../..", "src", "pages");
 const componentsDir = join(here, "../..", "src", "widgets");
+const viewsDir = join(here, "../..", "src", "views");
 const source = readFileSync(join(pagesDir, "PublicRecipePage.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
@@ -20,7 +21,7 @@ const code = strip(source);
 // The recipe sections are the shared library panels (see the
 // header), so the section scans read the panel sources; the
 // page source hosts the wiring pins (render order).
-const overviewCode = strip(readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8"));
+const overviewCode = strip(readFileSync(join(viewsDir, "RecipeOverviewPanel.tsx"), "utf8"));
 const ingredientsCode = strip(
   readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8"),
 );

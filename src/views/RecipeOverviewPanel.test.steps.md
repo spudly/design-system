@@ -2,12 +2,12 @@
 component: RecipeOverviewPanel
 run_when:
   - "src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, RecipeInstructionsPanel), or a changeset naming PublicRecipePage."
-  - "src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
+  - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
 ---
 
 # RecipeOverviewPanel — manual test steps
 
-Colocated manual test steps for `src/widgets/RecipeOverviewPanel.tsx` (design-system #530).
+Colocated manual test steps for `src/views/RecipeOverviewPanel.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -70,6 +70,6 @@ Open in `Widgets/RecipeOverviewPanel`: Default, Minimal.
    the "Idea" pill, and the Servings stat only — no
    description, Prep/Cook stats, or tag row.
 
-**Run when:** `src/widgets/RecipeOverviewPanel.tsx`, its
+**Run when:** `src/views/RecipeOverviewPanel.tsx`, its
 stories, PublicRecipePage, RecipeDetailPage, or a changeset
 naming RecipeOverviewPanel.

@@ -30,7 +30,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "widgets");
+const componentsDir = join(here, "../..", "src", "views");
 const panelSource = readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8");
 
 const panelCode = panelSource
@@ -47,7 +47,7 @@ test("RecipeOverviewPanel is exported from the built internal components barrel"
 });
 
 test("RecipeOverviewPanel's types are type-only exports from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../..", "dist", "views", "index.d.ts"), "utf8");
   assert.match(types, /RecipeOverviewPanelProps/);
 });
 

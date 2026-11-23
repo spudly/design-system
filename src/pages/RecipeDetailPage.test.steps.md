@@ -2,7 +2,7 @@
 component: RecipeDetailPage
 run_when:
   - "src/pages/RecipeDetailPage.tsx, its stories, or a changeset naming RecipeDetailPage."
-  - "src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
+  - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
   - "src/widgets/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
   - "src/widgets/RecipeInstructionsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeInstructionsPanel."
   - "src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
@@ -60,7 +60,7 @@ Open in `Widgets/RecipeOverviewPanel`: Default, Minimal.
    the "Idea" pill, and the Servings stat only — no
    description, Prep/Cook stats, or tag row.
 
-**Run when:** `src/widgets/RecipeOverviewPanel.tsx`, its
+**Run when:** `src/views/RecipeOverviewPanel.tsx`, its
 stories, PublicRecipePage, RecipeDetailPage, or a changeset
 naming RecipeOverviewPanel.
 
