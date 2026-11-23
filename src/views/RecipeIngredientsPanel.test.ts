@@ -28,7 +28,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "widgets");
+const componentsDir = join(here, "../..", "src", "views");
 const panelSource = readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8");
 
 const panelCode = panelSource
@@ -36,7 +36,7 @@ const panelCode = panelSource
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("RecipeIngredientsPanel is exported from the built internal components barrel", async () => {
-  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+  const dist: Record<string, any> = await import("../../dist/views/index.js");
   assert.equal(
     typeof dist.RecipeIngredientsPanel,
     "function",

@@ -315,7 +315,7 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
   assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
   assert.match(read("src/pages/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
-  assert.match(read("src/widgets/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
+  assert.match(read("src/views/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
   assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloadingSubstitutions\?: boolean/);
   assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloading\?: boolean/);
 });

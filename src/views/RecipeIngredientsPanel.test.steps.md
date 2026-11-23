@@ -2,12 +2,12 @@
 component: RecipeIngredientsPanel
 run_when:
   - "src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, RecipeInstructionsPanel), or a changeset naming PublicRecipePage."
-  - "src/widgets/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
+  - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
 ---
 
 # RecipeIngredientsPanel — manual test steps
 
-Colocated manual test steps for `src/widgets/RecipeIngredientsPanel.tsx` (design-system #530).
+Colocated manual test steps for `src/views/RecipeIngredientsPanel.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -62,7 +62,7 @@ changeset naming PublicRecipePage.
 
 ## RecipeIngredientsPanel
 
-Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
+Open in `Views/RecipeIngredientsPanel`: Default, Plain.
 
 1. Default: the servings stepper and the Scale preset row
    fit the width without the Scale row wrapping; the Custom
@@ -76,6 +76,6 @@ Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
 2. Plain: two unadorned rows with hairline separators and no
    substitutions panel.
 
-**Run when:** `src/widgets/RecipeIngredientsPanel.tsx`,
+**Run when:** `src/views/RecipeIngredientsPanel.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeIngredientsPanel.
