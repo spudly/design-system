@@ -2,7 +2,7 @@
 component: TextActionCardRow
 run_when:
   - "src/widgets/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow."
-  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)"
+  - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow)"
 ---
 
 # TextActionCardRow — manual test steps
@@ -27,7 +27,7 @@ Open in `Widgets/TextActionCardRow`: Default, TitleOnly.
 stories, MealsHubPage's meal list, or a changeset naming
 TextActionCardRow.
 
-## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow, RemovableField)
+## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow)
 
 Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
@@ -35,7 +35,6 @@ Open in `Widgets/StepList`: Default;
 `Widgets/TagList`: Default;
 `Widgets/StatusMessage`: Default, Empty, Transient;
 `Widgets/Form/FieldRow`: (its stories);
-`Widgets/RemovableField`: (its stories).
 
 1. StepList: steps render numbered in order; a step with a
    heading shows it above its body.
@@ -50,10 +49,7 @@ Open in `Widgets/StepList`: Default;
    only, nothing presses.
 5. FieldRow: the search field claims the row's width and its
    trailing action stretches to the field's height and sits at
-   the end; RemovableField's remove
-   button's accessible name names the filter it
-   removes (e.g. "Remove Ingredient filter"), not the
-   field's value.
+   the end.
 6. StatusMessage: the message line is centered, small, and in
    muted ink that stays readable in the dark theme; Empty shows
    nothing (the live region is mounted but empty); Transient's

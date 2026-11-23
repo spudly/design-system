@@ -421,7 +421,7 @@ export type Voice = {
     /** Formatter: builds one star's accessible name from its star number. */
     rateLabel: VoiceFormatter<[star: number]>;
   };
-  /** RemovableField widget (tranche 1f): the remove control's visible text. */
+  /** CatalogFiltersBar's added-filter remove pairing (tranche 1f; inlined from the former RemovableField widget in #740): the remove control's visible text. */
   removableField: {
     removeLabel: string;
   };

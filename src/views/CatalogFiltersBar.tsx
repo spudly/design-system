@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { XStack, YStack } from "tamagui";
+import { tokens } from "../tokens/index.js";
+import { useVoice } from "../voice/index.js";
 import { politeLiveRegionProps } from "../widgets/accessibility.js";
 import { Button } from "../widgets/Button.js";
 import { CompactRow } from "../widgets/CompactRow.js";
 import { ContentStack } from "../widgets/ContentStack.js";
-import { RemovableField } from "../widgets/RemovableField.js";
 import { SearchField } from "../widgets/form/SearchField.js";
 import { SearchHelpPopover, type SearchHelpContent } from "../widgets/SearchHelpPopover.js";
 import { Text } from "../widgets/Text.js";
@@ -315,8 +317,8 @@ function FilterControl<FilterId extends string>({
  * added. The search placeholder and the filter definitions are
  * props because the catalogs' copy and data differ. The bar
  * composes the shared primitives for its rows: FieldRow for
- * the search row and RemovableField for each added filter —
- * the two catalogs' bars had converged on those exact shapes
+ * the search row and an inline remove pairing for each added
+ * filter — the two catalogs' bars had converged on those exact shapes
  * independently before this component unified them (#119
  * dedupe). */
 export function CatalogFiltersBar<FilterId extends string = string>({
@@ -331,6 +333,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
   filterChooserOpen,
   onFilterChooserOpenChange,
 }: CatalogFiltersBarProps<FilterId>) {
+  const voice = useVoice();
   // Uncontrolled seed: a filter that already carries a non-default
   // value starts added, so existing callers that preset filter
   // values keep seeing (and can clear) those filters.
@@ -413,15 +416,27 @@ export function CatalogFiltersBar<FilterId extends string = string>({
         </CompactRow>
       ) : null}
       {added.map((definition) => (
-        <RemovableField
-          key={definition.id}
-          removeAccessibilityLabel={`Remove ${definition.label} filter`}
-          onRemove={() => {
-            removeFilter(definition);
-          }}
-        >
+        // The added filter's remove pairing, inlined here (#740 —
+        // it was the RemovableField widget, whose only consumer
+        // was this bar): a small ghost "Remove" button
+        // right-aligned above the field at a 4px gap. Removal
+        // semantics (clear the values, hide the field) stay in
+        // removeFilter above.
+        <YStack key={definition.id} gap={tokens.spacing[1]}>
+          <XStack justifyContent="flex-end">
+            <Button
+              ghost
+              size="sm"
+              accessibilityLabel={`Remove ${definition.label} filter`}
+              onPress={() => {
+                removeFilter(definition);
+              }}
+            >
+              {voice.removableField.removeLabel}
+            </Button>
+          </XStack>
           <FilterControl definition={definition} />
-        </RemovableField>
+        </YStack>
       ))}
     </ContentStack>
   );

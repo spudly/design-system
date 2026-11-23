@@ -11,7 +11,9 @@
  * dismiss labels, BulkSelectToolbar's search placeholder and
  * selection count, and the form-field fallbacks
  * (CheckboxSelectList, SelectField, ColorPickerField,
- * StarRatingInput, RemovableField) provably come from the
+ * StarRatingInput, and CatalogFiltersBar's added-filter
+ * remove pairing — the former RemovableField, inlined in
+ * #740) provably come from the
  * app-supplied voice object, not from strings baked into the
  * widget (the DS ships no default strings). Function slots are
  * replaced by sentinel functions, so their outputs are checked
@@ -213,7 +215,7 @@ test("form-field fallbacks render from the voice object", async () => {
     SelectField,
     ColorPickerField,
     StarRatingInput,
-    RemovableField,
+    CatalogFiltersBar,
     fixtureVoice,
   } = await loadRuntime();
 
@@ -273,7 +275,24 @@ test("form-field fallbacks render from the voice object", async () => {
     removeLabel: "SENT remove field",
   });
   const removable = await renderWithVoice(
-    h(RemovableField, { onRemove: noop, removeAccessibilityLabel: "Remove this field" }, "Field"),
+    h(CatalogFiltersBar, {
+      searchPlaceholder: "Search",
+      search: "",
+      onSearchChange: noop,
+      // A non-default value seeds the filter as added, so its
+      // remove pairing renders.
+      filters: [
+        {
+          kind: "select",
+          id: "status",
+          label: "Status",
+          options: [{ value: "a", label: "Option A" }],
+          value: "a",
+          onChange: noop,
+          defaultValue: "",
+        },
+      ],
+    }),
     removableVoice,
   );
   assert.ok(
