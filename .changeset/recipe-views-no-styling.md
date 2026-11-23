@@ -1,5 +1,0 @@
----
-"@spudly/ui": patch
----
-
-The recipe views no longer apply styling directly (#698 tranche 3): RecipeCommentsView, RecipeExportPickerView, RecipeImageView, RecipeInstructionRowView, RecipePreviewView, RecipeSharingView, ScaledIngredientsView, and TransferRecipesView (RecipeIngredientListView, RecipeIngredientRowView, and RecipeInstructionListView were already clean) now compose reusable widgets for all layout and styling. Their stacks render through the new ContentStack, CompactStack, TightStack, CompactRow, EndRow, and Grow layout widgets; the export picker's bounded list renders through the new FramedScrollRegion; the image field's empty state through the new DashedPlaceholder; the scaled-ingredients panel through the new OverlayTextPanel; and the sharing view's loading mirrors through the new RadioSkeletonRow and CheckboxSkeletonRow. Text gains a `strong` variant (body-size bold), which the recipe preview's title uses. Rendering is unchanged apart from the sharing view's action rows taking the shared ButtonRow/CompactRow treatments.
