@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { BulkSelectToolbar } from "./BulkSelectToolbar.js";
 
 const meta: Meta<typeof BulkSelectToolbar> = {
-  title: "Widgets/BulkSelectToolbar",
+  title: "Views/BulkSelectToolbar",
   component: BulkSelectToolbar,
 };
 
