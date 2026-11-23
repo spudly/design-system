@@ -343,11 +343,13 @@ describe("publicRecipePageAdoption", () => {
   });
 
   test("the sections render through the shared library panels (#331)", () => {
-    for (const panel of [
-      "RecipeOverviewPanel",
-      "RecipeIngredientsPanel",
-      "RecipeInstructionsPanel",
-    ]) {
+    // RecipeOverviewPanel is a view since #739; the other two panels
+    // are still widgets on this branch.
+    assert.ok(
+      code.includes(`import { RecipeOverviewPanel } from "../views/RecipeOverviewPanel.js";`),
+      "the page imports the library RecipeOverviewPanel",
+    );
+    for (const panel of ["RecipeIngredientsPanel", "RecipeInstructionsPanel"]) {
       assert.ok(
         code.includes(`import { ${panel} } from "../widgets/${panel}.js";`),
         `the page imports the library ${panel}`,
