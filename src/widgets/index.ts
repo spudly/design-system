@@ -12,7 +12,6 @@ export {
 export { BackLink, type BackLinkProps } from "./BackLink.js";
 export { Badge, type BadgeProps } from "./Badge.js";
 export { BlankWord, type BlankWordProps } from "./BlankWord.js";
-export { BulkSelectToolbar, type BulkSelectToolbarProps } from "./BulkSelectToolbar.js";
 export { Button, type ButtonProps } from "./Button.js";
 export { Card, type CardProps } from "./Card.js";
 export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";

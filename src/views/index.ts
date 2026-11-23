@@ -14,6 +14,7 @@ export {
   type CatalogFilterDefinition,
   type CatalogFiltersBarProps,
 } from "./CatalogFiltersBar.js";
+export { BulkSelectToolbar, type BulkSelectToolbarProps } from "./BulkSelectToolbar.js";
 export { CatalogHeader, type CatalogHeaderProps } from "./CatalogHeader.js";
 export {
   ChunkErrorBoundary,
