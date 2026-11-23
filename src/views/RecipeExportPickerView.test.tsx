@@ -14,36 +14,18 @@
  *    itself, not on the visible count (SSR-pinned below).
  * 3. Outside the error state nothing changes: Select all enables
  *    with visible items, and the items render.
+ *
+ * Converted in #733 tranche 5: the two former source scans
+ * (the view passing an empty visible count in the error state,
+ * and the toolbar's disabled-prop wiring) were deleted —
+ * both contracts are exactly what the SSR tests below pin at
+ * runtime (Select all disabled / Clear selection enabled in
+ * the error state; Select all enabled with visible items).
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
-const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
-const viewSource = readFileSync(join(root, "src/views/RecipeExportPickerView.tsx"), "utf8");
-const toolbarSource = readFileSync(join(root, "src/widgets/BulkSelectToolbar.tsx"), "utf8");
-test("the view reports an empty visible set to the toolbar while the error hides the items", () => {
-  assert.ok(
-    viewSource.includes("filteredCount={error ? 0 : items.length}"),
-    "the toolbar's filteredCount must be 0 in the error state",
-  );
-});
-test("the toolbar gates Select all on the visible count and Clear selection on the selection", () => {
-  assert.match(
-    toolbarSource,
-    /disabled=\{controlsDisabled \|\| filteredCount === 0\}\s*\n\s*onPress=\{onSelectAll\}/,
-    "Select all disables when the visible set is empty",
-  );
-  assert.match(
-    toolbarSource,
-    /disabled=\{controlsDisabled \|\| selectedCount === 0\}\s*\n\s*onPress=\{onClearSelection\}/,
-    "Clear selection disables only when nothing is selected",
-  );
-});
 async function renderPicker(props: Record<string, unknown>): Promise<string> {
   const { createElement: h } = await import("react");
   const { renderToString } = await import("react-dom/server");
