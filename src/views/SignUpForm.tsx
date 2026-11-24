@@ -1,5 +1,6 @@
 import { FormStack } from "../widgets/FormStack.js";
 import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
+import { PasswordField } from "../widgets/form/PasswordField.js";
 import { TextField } from "../widgets/form/TextField.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/TextLink.js";
@@ -93,12 +94,13 @@ export function SignUpForm({
         {...(emailError ? { error: emailError } : {})}
         onSubmitEditing={submitFromField}
       />
-      <TextField
+      <PasswordField
         label={voice.signUpForm.passwordLabel}
         value={password}
         onChangeText={onPasswordChange}
         autoComplete="password-new"
-        secureTextEntry
+        showPasswordLabel={voice.signUpForm.showPasswordLabel}
+        hidePasswordLabel={voice.signUpForm.hidePasswordLabel}
         accessibilityLabel={voice.signUpForm.passwordLabel}
         onSubmitEditing={submitFromField}
         returnKeyType="go"

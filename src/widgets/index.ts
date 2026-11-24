@@ -12,7 +12,6 @@ export {
 export { BackLink, type BackLinkProps } from "./BackLink.js";
 export { Badge, type BadgeProps } from "./Badge.js";
 export { BlankWord, type BlankWordProps } from "./BlankWord.js";
-export { BulkSelectToolbar, type BulkSelectToolbarProps } from "./BulkSelectToolbar.js";
 export { Button, type ButtonProps } from "./Button.js";
 export { Card, type CardProps } from "./Card.js";
 export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";
@@ -21,7 +20,6 @@ export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPickerField.js";
-export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
 export { Divider, type DividerProps } from "./Divider.js";
@@ -32,9 +30,9 @@ export {
   type DropdownProps,
 } from "./form/Dropdown.js";
 export { DropdownButton, type DropdownButtonProps } from "./form/DropdownButton.js";
-export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export { FixedActionBanner, type FixedActionBannerProps } from "./FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
+export { FullScreenShell, type FullScreenShellProps } from "./FullScreenShell.js";
 export {
   MasonryGrid,
   distributeMasonryItems,
@@ -43,7 +41,7 @@ export {
   type MasonryGridProps,
 } from "./MasonryGrid.js";
 export { CardRow, type CardRowProps } from "./CardRow.js";
-export { ListRow, type ListRowProps } from "./ListRow.js";
+export { ListItem, type ListItemProps } from "./ListItem.js";
 export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./MessageCard.js";
 export { MetadataBadge, type MetadataBadgeProps } from "./MetadataBadge.js";
@@ -55,7 +53,7 @@ export { CardStack, type CardStackProps } from "./CardStack.js";
 export { ListStack, type ListStackProps } from "./ListStack.js";
 export { LinkStack, type LinkStackProps } from "./LinkStack.js";
 export { LoadingCardRow } from "./LoadingCardRow.js";
-export { LoadingListRow } from "./LoadingListRow.js";
+export { LoadingListItem } from "./LoadingListItem.js";
 export { LoadingActionCardRow, type LoadingActionCardRowProps } from "./LoadingActionCardRow.js";
 export { CatalogRow, type CatalogRowProps } from "./CatalogRow.js";
 export { CatalogCardColumn, type CatalogCardColumnProps } from "./CatalogCardColumn.js";
@@ -90,6 +88,7 @@ export {
   type RadioOptionGroupProps,
 } from "./form/RadioOptionGroup.js";
 export { SearchField, type SearchFieldProps } from "./form/SearchField.js";
+export { PasswordField, type PasswordFieldProps } from "./form/PasswordField.js";
 export { TextAreaField, type TextAreaFieldProps } from "./form/TextAreaField.js";
 export { TextField, type TextFieldProps } from "./form/TextField.js";
 export { Slider, type SliderProps } from "./form/Slider.js";
@@ -141,7 +140,6 @@ export {
   type RatingsCardRatings,
   type RatingsCardViewerRating,
 } from "./RatingsCard.js";
-export { RemovableField, type RemovableFieldProps } from "./RemovableField.js";
 export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
 export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
 export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
@@ -157,8 +155,7 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // rounds, shipped once here (the tranche PRs adopt these in
 // their post-extraction rounds).
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
-export { FieldColumns, type FieldColumnsProps } from "./form/FieldColumns.js";
-export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
+export { EqualColumns, type EqualColumnsProps } from "./form/EqualColumns.js";
 export {
   NutritionPanel,
   type NutritionFact,
@@ -170,15 +167,9 @@ export {
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
 export {
-  RecipeIngredientsPanel,
-  type RecipeIngredientsPanelProps,
-  type RecipeIngredientsPanelView,
-} from "./RecipeIngredientsPanel.js";
-export {
   RecipeInstructionsPanel,
   type RecipeInstructionsPanelProps,
 } from "./RecipeInstructionsPanel.js";
-export { RecipeOverviewPanel, type RecipeOverviewPanelProps } from "./RecipeOverviewPanel.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./Toolbar.js";
 export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";

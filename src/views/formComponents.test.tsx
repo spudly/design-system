@@ -13,7 +13,7 @@
  *
  * The forms tranche's wider set was split by disposition in the
  * adoption rounds: FieldLabelBlock and StepperGroup composed
- * away into LabeledGroup and FormStack, while FieldColumns
+ * away into LabeledGroup and FormStack, while EqualColumns
  * is a genuine library component — it ships in the #119
  * extraction set and is pinned here alongside the dedupe set.
  * FormSubmit was removed in #478 (a logic-free wrapper whose
@@ -40,7 +40,7 @@ const COMPONENTS = [
   "LabeledGroup",
   "RevertAction",
   "ChangedListBanner",
-  "FieldColumns",
+  "EqualColumns",
   "FormStack",
   "FormHeading",
 ];
@@ -50,7 +50,7 @@ const COMPONENTS = [
 // (it owns its styling); the rest of the set is in src/widgets.
 const VIEWS = new Set(["RevertAction"]);
 // Form-category widgets live in src/widgets/form since #710.
-const FORM_CATEGORY = new Set(["FieldLabel", "LabeledField", "LabeledGroup", "FieldColumns"]);
+const FORM_CATEGORY = new Set(["FieldLabel", "LabeledField", "LabeledGroup", "EqualColumns"]);
 const homeOf = (name: string) => (VIEWS.has(name) ? "views" : "widgets");
 for (const name of COMPONENTS) {
   test(`${name} is exported from the built internal dist surface`, () => {
@@ -69,7 +69,7 @@ for (const name of COMPONENTS) {
   });
 }
 test("the label row is one shared implementation behind both labeled wrappers", () => {
-  const row = readRepoFile("src/widgets/labelRow.tsx");
+  const row = readRepoFile("src/widgets/LabelRow.tsx");
   assert.match(row, /paddingBlockEnd=\{tokens\.spacing\[separation\]\}/);
   assert.match(row, /<FieldLabel htmlFor=\{htmlFor\}>\{label\}<\/FieldLabel>/);
   const field = readRepoFile("src/widgets/form/LabeledField.tsx");
@@ -124,8 +124,8 @@ test("FieldStack does not survive the #477 consolidation", () => {
   const barrel = readRepoFile("src/widgets/index.ts");
   assert.doesNotMatch(barrel, /FieldStack/);
 });
-test("FieldColumns gives every child an equal flex column with an owned 12px gutter", () => {
-  const source = readRepoFile("src/widgets/form/FieldColumns.tsx");
+test("EqualColumns gives every child an equal flex column with an owned 12px gutter", () => {
+  const source = readRepoFile("src/widgets/form/EqualColumns.tsx");
   assert.match(source, /gap=\{tokens\.spacing\[3\]\}/);
   assert.match(source, /<YStack flex=\{1\}>/);
   assert.match(source, /typeof child === "boolean"/);

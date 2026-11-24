@@ -5,7 +5,7 @@ import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../accessibility.js";
 import { Alert } from "../Alert.js";
 import { Button } from "../Button.js";
-import { ListRow } from "../ListRow.js";
+import { ListItem } from "../ListItem.js";
 import { SearchField } from "./SearchField.js";
 import { Spinner } from "../Spinner.js";
 import { Text } from "../Text.js";
@@ -121,7 +121,7 @@ export type AutocompletePickerProps = {
  *   view-models the caller passes in.
  *
  * The picker owns its styling completely (#119): the search
- * field is the DS SearchField, result rows are DS ListRows,
+ * field is the DS SearchField, result rows are DS ListItems,
  * removal is a ghost DS Button, and the stacks are the
  * picker's own layout — callers pass data and callbacks only.
  *
@@ -265,7 +265,7 @@ export function AutocompletePicker({
         ) : (
           <YStack>
             {visibleResults.map((result) => (
-              <ListRow
+              <ListItem
                 key={result.id}
                 title={result.label}
                 {...(result.detail !== undefined ? { subtitle: result.detail } : {})}

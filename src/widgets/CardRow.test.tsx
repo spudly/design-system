@@ -45,7 +45,7 @@ const cardRowCode = cardRowSource
 // hold that it delegates to the block (plain and decorative).
 // Since #587 phase 3 the subtitle line itself lives in the
 // shared RowSubtitleText inside that same file (also composed
-// by ListRow), so the subtitle pins read RowSubtitleText there.
+// by ListItem), so the subtitle pins read RowSubtitleText there.
 const rowTextSource = readFileSync(join(componentsDir, "RowTextContent.tsx"), "utf8");
 const rowTextCode = rowTextSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")

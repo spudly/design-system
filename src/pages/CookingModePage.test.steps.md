@@ -21,11 +21,11 @@ FirstStep, LastStep, NoFooter.
    between the "Step 2 of 3" label and the step body — heading
    line plus the four ingredient lines on the translucent
    panel, readable against the dark overlay.
-4. NoFooter (#729): with NO footer data supplied (the
-   eciperay host's composition), the dark overlay still
-   covers the full viewport — step body, ingredients panel,
-   Done pill, and nav controls all visible and reachable,
-   nothing covered by a cream layer.
+4. NoFooter (#729, reframed by #752): the page takes no
+   footer prop at all — the dark overlay covers the full
+   viewport, and step body, ingredients panel, Done pill,
+   and nav controls are all visible and reachable, nothing
+   covered by a cream layer.
 2. FirstStep: no Back control renders (the nav shows only
    Next); LastStep: the Next control renders disabled and Back
    is present.

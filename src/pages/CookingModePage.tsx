@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
+import { FullScreenShell } from "../widgets/FullScreenShell.js";
 import { StepOverlay } from "../widgets/StepOverlay.js";
 import { ScaledIngredientsView } from "../views/ScaledIngredientsView.js";
 import { StepNavControls } from "./StepNavControls.js";
@@ -57,8 +57,6 @@ export type CookingModePageIngredients = {
 };
 
 export type CookingModePageProps = {
-  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
-  footer?: BigFooterData;
   recipeTitle: string;
   steps: CookingModePageStep[];
   stepIndex: number;
@@ -77,7 +75,7 @@ export function CookingModePage(props: CookingModePageProps) {
   }
 
   return (
-    <BigFooterShell footer={props.footer} scrollMode="overlay">
+    <FullScreenShell>
       <StepOverlay
         title={recipeTitle}
         stepLabel={`Step ${current.stepNumber} of ${steps.length}`}
@@ -96,6 +94,6 @@ export function CookingModePage(props: CookingModePageProps) {
           onNext={onNext}
         />
       </StepOverlay>
-    </BigFooterShell>
+    </FullScreenShell>
   );
 }

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { LabelRow } from "../labelRow.js";
+import { LabelRow } from "../LabelRow.js";
 import { Text } from "../Text.js";
 
 export type LabeledFieldProps = {
@@ -37,7 +37,7 @@ export type LabeledFieldProps = {
  * here so no page sets it. LabeledGroup is the sibling for a
  * labeled control GROUP (an option group, a select list), whose
  * label sits 8px above the group instead. The label row itself
- * is the one implementation both wrappers share (labelRow).
+ * is the one implementation both wrappers share (LabelRow).
  */
 export function LabeledField({ label, fieldId, action, error, children }: LabeledFieldProps) {
   return (

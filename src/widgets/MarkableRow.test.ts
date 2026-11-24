@@ -7,7 +7,7 @@
  * The pins hold the row's distinguishing semantics: a marked
  * row renders dimmed but STAYS pressable (the mark toggles —
  * it is not a disabled state), the press form follows the
- * ListRow keyboard pattern, and without a callback the row is
+ * ListItem keyboard pattern, and without a callback the row is
  * a plain row with no activation.
  */
 import "../../test/registerSvgStub.js";
@@ -70,7 +70,7 @@ test("a marked row never dims but keeps its press — the mark is a toggle, not 
   );
 });
 
-test("the press form is keyboard-operable on web (the ListRow pattern)", () => {
+test("the press form is keyboard-operable on web (the ListItem pattern)", () => {
   assert.match(code, /tabIndex: 0,/);
   assert.match(
     code,

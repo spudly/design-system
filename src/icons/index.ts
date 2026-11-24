@@ -5,6 +5,8 @@ export { BackIcon } from "./BackIcon.js";
 export { CollapsedIcon } from "./CollapsedIcon.js";
 export { CollapsibleIcon, type CollapsibleIconProps } from "./CollapsibleIcon.js";
 export { ExpandedIcon } from "./ExpandedIcon.js";
+export { EyeIcon } from "./EyeIcon.js";
+export { EyeOffIcon } from "./EyeOffIcon.js";
 export { FeedbackIcon } from "./FeedbackIcon.js";
 export { HelpIcon } from "./HelpIcon.js";
 export { HomeIcon } from "./HomeIcon.js";

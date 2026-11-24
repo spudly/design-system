@@ -8,7 +8,7 @@ export type MarkableRowProps = {
   /** The row's label. */
   label: string;
   /** Optional meta line under the label, pre-composed by the
-   * caller (e.g. a quantity/nutrition line) — the ListRow
+   * caller (e.g. a quantity/nutrition line) — the ListItem
    * title/subtitle composition, for plain rows that carry
    * more than a name (#440). */
   subtitle?: string;
@@ -50,11 +50,11 @@ export type MarkableRowProps = {
  * stopgap and the old missing-mark dim are both gone.) A row
  * with no press handler is a plain row and renders no box.
  *
- * Activation follows the ListRow press pattern: the row is
- * focusable on web, and the button keys (Enter and Space) invoke
- * the same callback as a press. The press form announces itself
- * as a checkbox whose checked state is the mark, matching the
- * box it draws.
+ * Activation follows the ListItem press pattern: the row carries
+ * the button role, is focusable on web, and the button keys
+ * (Enter and Space) invoke the same callback as a press. The
+ * press form announces itself as a checkbox whose checked state
+ * is the mark, matching the box it draws.
  */
 export function MarkableRow({
   label,

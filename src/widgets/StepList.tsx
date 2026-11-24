@@ -47,7 +47,7 @@ export type StepListProps = {
  * is caller-supplied pre-composed strings, so the list serves
  * any app's procedures — recipes, setup wizards, onboarding.
  *
- * Activation follows the ListRow press pattern: each card
+ * Activation follows the ListItem press pattern: each card
  * carries the button role, is focusable on web, and the button
  * keys (Enter and Space) activate it like a press.
  *

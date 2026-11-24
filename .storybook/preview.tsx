@@ -40,6 +40,29 @@ function FontStackSync({ theme }: { theme: StorybookThemeName }) {
   return null;
 }
 
+/** The page background for a Storybook theme (#754): the brand theme's semantic background; dark themes share the dark background (gray10, per buildTamaguiThemes). */
+function bodyBackgroundFor(theme: StorybookThemeName): string {
+  if (theme.startsWith("dark")) return baseTheme.tokens.colors.gray.gray10;
+  if (theme.includes("warmHarvest")) return eciperayTheme.semantic.background;
+  if (theme.includes("quietDawn")) return memorizeTheme.semantic.background;
+  return baseTheme.semantic.background;
+}
+
+/**
+ * Paints the story background on the body itself (#754) instead of
+ * wrapping every story in a YStack whose only job was the background,
+ * and zeroes the body padding for page stories: Storybook's padded
+ * layout pads the story root, and page components already carry their
+ * own padding, so pages got doubled spacing.
+ */
+function BodyStyleSync({ theme, isPage }: { theme: StorybookThemeName; isPage: boolean }) {
+  useEffect(() => {
+    document.body.style.backgroundColor = bodyBackgroundFor(theme);
+    document.body.style.padding = isPage ? "0" : "";
+  }, [theme, isPage]);
+  return null;
+}
+
 const themeNames: StorybookThemeName[] = [
   "light",
   "dark",
@@ -92,19 +115,22 @@ const preview: Preview = {
   },
   decorators: [
     (Story, context) => {
-      // #668: the frame viewport resolves toolbar-first, then the
-      // story's own default frame (a `dsViewport` PARAMETER — a global
-      // here would lock the toolbar control and disable switching),
-      // then the phone preset. Captures load stories without touching
-      // the toolbar, so a story's parameter IS its capture pin:
-      // captures keep rendering page stories at exactly their previous
-      // frames (430×844 phone; AppShellPage 1024×844 and
-      // PublicRecipePage 1024×900 via their parameters).
+      // #668/#754: the frame viewport resolves toolbar-first, then
+      // the story's own default frame (a `dsViewport` PARAMETER — a
+      // global here would lock the toolbar control and disable
+      // switching), then the responsive full-width preset (#754:
+      // pages present full-width by default, not in a phone frame).
+      // Captures load stories without touching the toolbar, so a
+      // story's parameter IS its capture pin: stories that must keep
+      // a pinned capture size declare it (AppShellPage 1024×844 and
+      // PublicRecipePage 1024×900 via their parameters); unpinned
+      // page stories now capture at full width — a deliberate
+      // baseline change called out in the #754 PR.
       const toolbarViewport = context.globals.dsViewport as string | undefined;
       const viewport =
         toolbarViewport ??
         (context.parameters.dsViewport as string | undefined) ??
-        "phone";
+        "full";
       // A toolbar selection owns the frame entirely: the story's
       // dsViewportHeight pin (e.g. PublicRecipePage's 900) applies
       // only to the no-toolbar capture default, never over a
@@ -134,6 +160,7 @@ const preview: Preview = {
           defaultTheme={theme}
         >
           <FontStackSync theme={theme} />
+          <BodyStyleSync theme={theme} isPage={context.title.startsWith("Pages/")} />
           {/* #539: stories render under the fixture voice — fixtures only, never defaults. */}
           <VoiceProvider voice={fixtureVoice}>
           {context.parameters.phoneWidthFrame ? (
@@ -141,9 +168,7 @@ const preview: Preview = {
             // phone frame (their story-level decorators supply it) in
             // interactive mode too — the parameter is the opt-out
             // from the viewport-driven frame below.
-            <YStack backgroundColor="$background">
-              <Story />
-            </YStack>
+            <Story />
           ) : context.title.startsWith("Pages/") ? (
             // Page stories (#547, #668): full-bleed — the page shell
             // owns the viewport exactly as in an app, with no
@@ -156,10 +181,10 @@ const preview: Preview = {
             // desktop and full fluid widths so desktop layouts
             // (e.g. #628's centered 1200px column and full-width
             // Big Footer) can be evaluated interactively; with no
-            // toolbar selection the story's parameter (or the phone
-            // preset) pins captures at their previous dimensions.
-            <YStack backgroundColor="$background">
-              <View
+            // toolbar selection the story's parameter pins captures
+            // at its declared dimensions; unpinned stories capture
+            // at the full-width default (#754).
+            <View
                 width={
                   widthOverride ??
                   (viewport === "desktop"
@@ -176,10 +201,9 @@ const preview: Preview = {
                 position="relative"
               >
                 <Story />
-              </View>
-            </YStack>
+            </View>
           ) : (
-            <YStack backgroundColor="$background" padding={24} style={{ minHeight: "100vh" }}>
+            <YStack padding={24} style={{ minHeight: "100vh" }}>
               <Story />
             </YStack>
           )}

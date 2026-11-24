@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { SectionCard } from "./SectionCard.js";
 import { Button } from "./Button.js";
-import { ListRow } from "./ListRow.js";
+import { ListItem } from "./ListItem.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof SectionCard> = {
@@ -94,8 +94,8 @@ export const Loading: Story = {
   args: { title: "API access tokens", loading: true },
   render: (args) => (
     <SectionCard {...args} style={{ maxWidth: 480 }}>
-      <ListRow title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
-      <ListRow title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
+      <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
+      <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
     </SectionCard>
   ),
 };
@@ -113,8 +113,8 @@ export const LoadingOverlay: Story = {
           </Button>
         }
       >
-        <ListRow title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
-        <ListRow title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
+        <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
+        <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
       </SectionCard>
       <YStack
         position="absolute"
@@ -135,8 +135,8 @@ export const LoadingOverlay: Story = {
           }
           loading
         >
-          <ListRow title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
-          <ListRow title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
+          <ListItem title="ci-token" subtitle="Created Oct 2, 2026" onPress={() => {}} />
+          <ListItem title="deploy-token" subtitle="Created Oct 19, 2026" onPress={() => {}} />
         </SectionCard>
       </YStack>
     </YStack>

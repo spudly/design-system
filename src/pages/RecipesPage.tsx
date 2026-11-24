@@ -13,7 +13,7 @@ import {
 } from "../views/CatalogFiltersBar.js";
 import { CatalogHeader } from "../views/CatalogHeader.js";
 import { DiscoveryCard } from "../widgets/DiscoveryCard.js";
-import { EmptyState } from "../widgets/EmptyState.js";
+import { EmptyState } from "../views/EmptyState.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import type { SelectOption } from "../widgets/form/SelectField.js";

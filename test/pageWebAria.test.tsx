@@ -24,7 +24,7 @@
  *   Button; the page has no stack pressable left — pinned below.)
  *   (MealPlansPage's and MealPlanDetailPage's rows were in this
  *   list until the #119 tranche-2 de-styling moved them into the
- *   generic CardRow / ListRow components; the routing moved with
+ *   generic CardRow / ListItem components; the routing moved with
  *   them and the rows test below pins it there. AiSessionPage's
  *   Cancel action was in this list until the #119 ai-import
  *   tranche composed it inline as a text action — since #464 it
@@ -120,9 +120,11 @@ function sourceFiles(dir: string): string[] {
 // ButtonInternal (#480) is Button's own internal form — same routing.
 // LoadingActionCardRow (#119 tranche 2) is sanctioned on the
 // DropdownButton ground: it forwards its `accessibilityLabel` to the
-// DS Button it renders, which translates it.
+// DS Button it renders, which translates it. PasswordField (#758) is
+// sanctioned on the same ground: it forwards its `accessibilityLabel`
+// to the TextField it renders, which translates it.
 const SANCTIONED_TAGS = new Set(
-  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert,LoadingActionCardRow".split(
+  "Button,ButtonInternal,Text,TextField,TextAreaField,ProgressBar,TouchableOpacity,Image,Dropdown,DropdownButton,LinkOverlay,Thumbnail,RatingStars,Alert,LoadingActionCardRow,PasswordField".split(
     ",",
   ),
 );
@@ -163,11 +165,11 @@ test("no raw RN accessibility JSX prop lands on a Tamagui element anywhere in sr
 // Every page that once routed stack pressables through the
 // translator has been de-styled off this list by the #119
 // tranches: ShoppingListPage (its row is CheckboxField's list shape),
-// MealDetailPage (its rows are ListRow), MealsHubPage
+// MealDetailPage (its rows are ListItem), MealsHubPage
 // (TextActionCardRow), MealCookingModePage (its Done pill is
 // StepOverlay's), AiSessionPage (its Cancel control is a
 // ghost Button), RecipeFormPage and the plan pages
-// (CardRow / ListRow; RevertAction / ChangedListBanner), and
+// (CardRow / ListItem; RevertAction / ChangedListBanner), and
 // RecipeDetailPage (its rows/steps through MarkableRow /
 // StepList). The list is empty; the dedicated test below pins
 // all of them translator-free.
@@ -230,11 +232,11 @@ test("the de-styled pages have no stack pressable left to translate (#237, #248,
 });
 test("rows translate the disabled state; the generic rows keep the button role in their press form (#237, #248)", () => {
   // MealDetailPage's member rows are links since #248 and render
-  // through ListRow since the #119 meals tranche: the disabled
+  // through ListItem since the #119 meals tranche: the disabled
   // routing lives in the row, not the page. The plan pages' rows
-  // moved into the generic ListRow / CardRow components (#119
+  // moved into the generic ListItem / CardRow components (#119
   // tranche 2) and the routing moved with them: their press
-  // forms carry the button role, ListRow also translates its
+  // forms carry the button role, ListItem also translates its
   // disabled state, and CardRow has no disabled state.
   // RecipeFormPage's revert pressables (RevertAction /
   // ChangedListBanner, #119 forms tranche) carry no row here:
@@ -244,7 +246,7 @@ test("rows translate the disabled state; the generic rows keep the button role i
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases: [string, RegExp, RegExp | null][] = [
-    ["src/widgets/ListRow.tsx", ROLE, DISABLED],
+    ["src/widgets/ListItem.tsx", ROLE, DISABLED],
     ["src/widgets/CardRow.tsx", ROLE, null],
   ];
   for (const [rel, role, disabled] of cases) {

@@ -1,6 +1,6 @@
 import { FormStack } from "../widgets/FormStack.js";
 import { AuthFormSubmit } from "./AuthFormSubmit.js";
-import { TextField } from "../widgets/form/TextField.js";
+import { PasswordField } from "../widgets/form/PasswordField.js";
 import { useVoice } from "../voice/index.js";
 
 /**
@@ -49,12 +49,13 @@ export function ResetPasswordForm({
   };
   return (
     <FormStack>
-      <TextField
+      <PasswordField
         label={voice.resetPasswordForm.passwordLabel}
         value={password}
         onChangeText={onPasswordChange}
         autoComplete="password-new"
-        secureTextEntry
+        showPasswordLabel={voice.resetPasswordForm.showPasswordLabel}
+        hidePasswordLabel={voice.resetPasswordForm.hidePasswordLabel}
         accessibilityLabel={voice.resetPasswordForm.passwordLabel}
         onSubmitEditing={submitFromField}
         returnKeyType="go"
