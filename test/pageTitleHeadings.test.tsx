@@ -79,7 +79,7 @@ function countOccurrences(code: string, needle: any) {
   return code.split(needle).length - 1;
 }
 test("AddRecipeMenuPage's title takes the title variant — xl bold at level 1 (#263, #119)", () => {
-  const code = readCode("src/pages/AddRecipeMenuPage.tsx");
+  const code = readCode("src/pages/eciperay/AddRecipeMenuPage.tsx");
   assert.equal(
     countOccurrences(code, 'variant="title"'),
     1,
@@ -98,7 +98,7 @@ test("AddRecipeMenuPage's title takes the title variant — xl bold at level 1 (
 });
 test("the #119 meals tranche's page titles take the title variant — xl bold at level 1 (#263, #119)", () => {
   for (const page of TITLE_VARIANT_PAGES) {
-    const code = readCode(`src/pages/${page}.tsx`);
+    const code = readCode(`src/pages/eciperay/${page}.tsx`);
     assert.equal(
       countOccurrences(code, 'variant="title"'),
       1,
@@ -117,7 +117,7 @@ test("the #119 meals tranche's page titles take the title variant — xl bold at
   }
 });
 test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 (#263, #119)", () => {
-  const code = readCode("src/pages/MealPlanDetailPage.tsx");
+  const code = readCode("src/pages/eciperay/MealPlanDetailPage.tsx");
   assert.equal(
     countOccurrences(code, 'variant="title"'),
     1,
@@ -142,7 +142,7 @@ test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 
 });
 test("FeedbackPage and ProfilePage titles take the title variant — xl bold at level 1 (#263, #119)", () => {
   for (const page of ["FeedbackPage", "ProfilePage"]) {
-    const code = readCode(`src/pages/${page}.tsx`);
+    const code = readCode(`src/pages/eciperay/${page}.tsx`);
     assert.equal(
       countOccurrences(code, 'variant="title"'),
       1,
@@ -174,7 +174,7 @@ test("SectionHeading is a level-2 heading under the page title (#317)", () => {
   );
 });
 test("HomePage stays the exception: heading title, subheading section title (#263)", () => {
-  const code = readCode("src/pages/HomePage.tsx");
+  const code = readCode("src/pages/eciperay/HomePage.tsx");
   assert.equal(
     countOccurrences(code, 'variant="heading"'),
     1,
@@ -186,7 +186,7 @@ test("HomePage stays the exception: heading title, subheading section title (#26
   );
 });
 test("the MealsHub composition demotes the nested MealPlansPage title (#263)", () => {
-  const plansCode = readCode("src/pages/MealPlansPage.tsx");
+  const plansCode = readCode("src/pages/eciperay/MealPlansPage.tsx");
   assert.match(
     plansCode,
     /titleLevel\?:\s*1 \| 2/,
@@ -197,7 +197,7 @@ test("the MealsHub composition demotes the nested MealPlansPage title (#263)", (
     /<Text variant="heading" aria-level=\{titleLevel\}>/,
     "MealPlansPage's title must forward titleLevel as the heading level",
   );
-  const hubCode = readCode("src/pages/MealsHubPage.tsx");
+  const hubCode = readCode("src/pages/eciperay/MealsHubPage.tsx");
   assert.match(
     hubCode,
     /<MealPlansPage[\s\S]*?titleLevel=\{2\}/,
@@ -219,8 +219,10 @@ function loadRuntime() {
     // The pages barrel is not Node-importable (some pages import
     // react-native), so the two pages under test are loaded from
     // their own modules — both are plain component compositions.
-    const { MealPlansPage }: Record<string, any> = await import("../dist/pages/MealPlansPage.js");
-    const { MealsHubPage }: Record<string, any> = await import("../dist/pages/MealsHubPage.js");
+    const { MealPlansPage }: Record<string, any> =
+      await import("../dist/pages/eciperay/MealPlansPage.js");
+    const { MealsHubPage }: Record<string, any> =
+      await import("../dist/pages/eciperay/MealsHubPage.js");
     return {
       React,
       renderToString,

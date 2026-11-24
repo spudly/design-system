@@ -109,7 +109,7 @@ export { StatRow, type StatRowProps } from "./StatRow.js";
 export { StepDots, type StepDotsProps } from "./StepDots.js";
 export { Switch, type SwitchProps } from "./form/Switch.js";
 export { Tabs, type TabsProps } from "./Tabs.js";
-export { useTagColorResolver } from "./tagColors.js";
+export { useTagColorResolver, useTagColorShadeResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./Text.js";
 export { Thumbnail, type ThumbnailProps } from "./Thumbnail.js";
 export { TextLink, type TextLinkProps } from "./TextLink.js";
@@ -165,6 +165,12 @@ export {
 } from "./NutritionPanel.js";
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
+export {
+  RecipeIngredientsPanel,
+  type RecipeIngredientsPanelProps,
+  type RecipeIngredientsPanelView,
+} from "./RecipeIngredientsPanel.js";
+export { RecipeOverviewPanel, type RecipeOverviewPanelProps } from "./RecipeOverviewPanel.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./Toolbar.js";
 export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";
@@ -176,6 +182,17 @@ export {
 } from "./WeekDayColumn.js";
 // The #698 tranche-3 extraction set: the layout and loading
 // components the recipe views' de-styling extracted.
+export { Row, type RowProps } from "./Row.js";
+export { Col, type ColProps } from "./Col.js";
+export { Spacer, type SpacerProps } from "./Spacer.js";
+export {
+  resolveLayoutStyle,
+  layoutSizeValues,
+  type LayoutAlignProps,
+  type LayoutAxis,
+  type LayoutSize,
+  type ResolvedLayoutStyle,
+} from "./layout.js";
 export { ContentStack, type ContentStackProps } from "./ContentStack.js";
 export { CompactStack, type CompactStackProps } from "./CompactStack.js";
 export { TightStack, type TightStackProps } from "./TightStack.js";

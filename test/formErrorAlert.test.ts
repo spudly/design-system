@@ -97,7 +97,7 @@ test("form components render their form-level error through Alert (assertive)", 
 
 test("page-level error lines of the same shape render through Alert", () => {
   for (const name of ERROR_PAGES) {
-    const source = read(`src/pages/${name}.tsx`);
+    const source = read(`src/pages/eciperay/${name}.tsx`);
     assert.ok(source.includes(ERROR_ALERT), `${name} renders its error via Alert severity="error"`);
     assert.doesNotMatch(
       source,
@@ -110,7 +110,7 @@ test("page-level error lines of the same shape render through Alert", () => {
 test("AiSessionPage and RecipeFormPage pin their extra error regions", () => {
   // AiSessionPage renders its error in BOTH branches (no-session and
   // active-session); pin each region so deleting one line can't pass.
-  const aiSession = read("src/pages/AiSessionPage.tsx");
+  const aiSession = read("src/pages/eciperay/AiSessionPage.tsx");
   const noSessionStart = aiSession.indexOf("if (!session) {");
   const activeSessionStart = aiSession.indexOf("\n  return (", noSessionStart);
   assert.notEqual(noSessionStart, -1, "AiSessionPage has a no-session branch");
@@ -123,7 +123,7 @@ test("AiSessionPage and RecipeFormPage pin their extra error regions", () => {
     aiSession.slice(activeSessionStart).includes(ERROR_ALERT),
     "AiSessionPage renders its error via Alert in the active-session branch",
   );
-  const recipeForm = read("src/pages/RecipeFormPage.tsx");
+  const recipeForm = read("src/pages/eciperay/RecipeFormPage.tsx");
   assert.ok(
     recipeForm.includes('<Alert severity="error" message={submitError} />'),
     'RecipeFormPage renders its submitError via Alert severity="error"',

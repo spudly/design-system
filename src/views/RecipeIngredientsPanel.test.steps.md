@@ -1,8 +1,8 @@
 ---
 component: RecipeIngredientsPanel
 run_when:
-  - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
----
+  - "src/pages/eciperay/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, StepList), or a changeset naming PublicRecipePage."
+  - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."---
 
 # RecipeIngredientsPanel — manual test steps
 
@@ -54,7 +54,7 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
    border and tint) on open; pressing another card moves the
    highlight to it. Steps render in step-number order.
 
-**Run when:** `src/pages/PublicRecipePage.tsx`, its stories,
+**Run when:** `src/pages/eciperay/PublicRecipePage.tsx`, its stories,
 the recipe panels the page composes (RecipeOverviewPanel,
 RecipeIngredientsPanel, StepList), or a
 changeset naming PublicRecipePage.

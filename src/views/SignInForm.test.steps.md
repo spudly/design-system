@@ -1,7 +1,7 @@
 ---
 component: SignInForm
 run_when:
-  - "src/pages/SignInPage.tsx, src/pages/SignUpPage.tsx, src/pages/ForgotPasswordPage.tsx, src/pages/ResetPasswordPage.tsx, the form components they compose (src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx), their stories, or a changeset naming the auth pages or Enter-to-submit."
+  - "src/pages/eciperay/SignInPage.tsx, src/pages/eciperay/SignUpPage.tsx, src/pages/eciperay/ForgotPasswordPage.tsx, src/pages/eciperay/ResetPasswordPage.tsx, the form components they compose (src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx), their stories, or a changeset naming the auth pages or Enter-to-submit."
   - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/widgets/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
 ---
 
@@ -54,9 +54,9 @@ submit switches the page to its loading state, and a
    from every field of each page, and the last field's return
    key is labeled "go".
 
-**Run when:** `src/pages/SignInPage.tsx`,
-`src/pages/SignUpPage.tsx`, `src/pages/ForgotPasswordPage.tsx`,
-`src/pages/ResetPasswordPage.tsx`, the form components they
+**Run when:** `src/pages/eciperay/SignInPage.tsx`,
+`src/pages/eciperay/SignUpPage.tsx`, `src/pages/eciperay/ForgotPasswordPage.tsx`,
+`src/pages/eciperay/ResetPasswordPage.tsx`, the form components they
 compose (`src/views/SignInForm.tsx`,
 `src/views/SignUpForm.tsx`,
 `src/views/ForgotPasswordForm.tsx`,

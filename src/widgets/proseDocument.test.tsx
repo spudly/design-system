@@ -28,7 +28,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
-const source = readFileSync(join(root, "src", "pages", "LegalDocumentPage.tsx"), "utf8");
+const source = readFileSync(
+  join(root, "src", "pages", "eciperay", "LegalDocumentPage.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const componentsBarrel = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
 test("ProseDocument is not a library component — the page carries the model types", async () => {
@@ -47,7 +50,10 @@ test("ProseDocument is not a library component — the page carries the model ty
     "src/widgets/ProseDocument.stories.tsx must not exist",
   );
   assert.ok(!componentsBarrel.includes("ProseDocument"), "the barrel must not export it");
-  const types = readFileSync(join(root, "dist", "pages", "LegalDocumentPage.d.ts"), "utf8");
+  const types = readFileSync(
+    join(root, "dist", "pages", "eciperay", "LegalDocumentPage.d.ts"),
+    "utf8",
+  );
   for (const name of ["LegalDocumentSection", "LegalDocumentBlock", "LegalDocumentSpan"]) {
     assert.match(types, new RegExp(name), `${name} must be a type export of the page`);
   }

@@ -1,7 +1,7 @@
 ---
 component: Button
 run_when:
-  - "src/pages/LandingPage.tsx, its stories, Button's href form, or a changeset naming LandingPage."
+  - "src/pages/eciperay/LandingPage.tsx, its stories, Button's href form, or a changeset naming LandingPage."
   - "src/widgets/Button.tsx, its stories, or a changeset naming Button or the Button icon slot."
   - "src/widgets/Button.tsx, TextLink.tsx, BackLink.tsx, or Tabs.tsx, their stories, or a changeset naming any of Button, TextLink, BackLink, or Tabs, the navigation link forms, or #248."
 ---
@@ -33,7 +33,7 @@ Open in `Pages/Eciperay/LandingPage`: Default, Wide.
    they wrap onto further rows at their 260px basis instead
    of squeezing — three-across cannot fit there.
 
-**Run when:** `src/pages/LandingPage.tsx`, its stories,
+**Run when:** `src/pages/eciperay/LandingPage.tsx`, its stories,
 Button's href form, or a changeset naming LandingPage.
 
 ## Button

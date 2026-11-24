@@ -1,0 +1,456 @@
+import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { Button } from "../../widgets/Button.js";
+import { Card } from "../../widgets/Card.js";
+import { BoxSkeleton } from "../../widgets/BoxSkeleton.js";
+import { ButtonRow } from "../../widgets/ButtonRow.js";
+import { LoadingScope } from "../../contexts/LoadingScope.js";
+import { MainLandmark } from "../../widgets/MainLandmark.js";
+import { StatBand } from "../../widgets/StatBand.js";
+import { StatCard } from "../../widgets/StatCard.js";
+import { TextSkeleton } from "../../widgets/TextSkeleton.js";
+import { MessageCard } from "../../widgets/MessageCard.js";
+import { RatingsCard } from "../../widgets/RatingsCard.js";
+import { RecipeIngredientsPanel } from "../../views/RecipeIngredientsPanel.js";
+import { StepList } from "../../widgets/StepList.js";
+import { RecipeOverviewPanel } from "../../views/RecipeOverviewPanel.js";
+import { ScrollShell } from "../../widgets/ScrollShell.js";
+import { SectionHeading } from "../../widgets/SectionHeading.js";
+import {
+  RecipeCommentsView,
+  type RecipeCommentsViewProps,
+} from "../../views/RecipeCommentsView.js";
+import type {
+  RecipeDetailPageCommunityRating,
+  RecipeDetailPageIngredient,
+  RecipeDetailPageIngredientsProps,
+  RecipeDetailPageInstruction,
+  RecipeDetailPageInstructionsProps,
+  RecipeDetailPageRatings,
+  RecipeDetailPageSubstitution,
+  RecipeDetailPageTag,
+  RecipeDetailPageViewerRating,
+} from "./RecipeDetailPage.js";
+
+/**
+ * PublicRecipePage (#169): Eciperay's public (signed-out, SEO)
+ * recipe surface as a controlled @spudly/ui page component,
+ * following the RecipeDetailPage precedent throughout. It is a
+ * distinct surface from RecipeDetailPage: an anonymous audience,
+ * no account data in the view-model, no version picker, no
+ * lifecycle/sharing/cook-history/nutrition sections, and two real
+ * error states. The app keeps the route, params and share token,
+ * the getPublic query, the slug-canonical redirect, the document
+ * head (title/meta/JSON-LD), the clone and rating mutations, and
+ * the comments data — and drives this view entirely through
+ * props: a view-model per section in, intent callbacks out.
+ * Nothing here imports an app package or fetches anything.
+ *
+ * Placement: page components live in src/pages and are exported
+ * from the package root (#298) — pages are the package's only
+ * exports; members of the page family import react-native
+ * (TouchableOpacity).
+ *
+ * The contract decisions (Stephen, 2026-10-28, on #169):
+ * - Single scroll, no tabs: the web surface's Overview /
+ *   Ingredients / Instructions tabs are dropped (the
+ *   RecipeDetailPage #71 precedent) and the sections stack in tab
+ *   order — overview, ingredients, instructions, engagement — so
+ *   every section stays in the document on this SEO-first surface.
+ * - Engagement is in v1: the ratings view-model is reused from
+ *   RecipeDetailPage verbatim, and comments enter as a
+ *   `comments` data prop rendering RecipeCommentsView in the
+ *   engagement stack (#130 T7, Stephen's 2026-11-11 Q1 decision,
+ *   option (a)) — the view-model is the view's own props, so the
+ *   query, draft/edit state, and mutations stay host-side behind
+ *   its callbacks; the view supports the signed-out case (its
+ *   composer renders only when the host passes `onPost`). The
+ *   former comments render slot was removed in #681 — the data
+ *   prop is the only path.
+ * - Error states live inside the props union: `notFound` and
+ *   `unavailable` are union members with DS-owned copy (the web
+ *   messages verbatim), so the whole route is one component and
+ *   the error cards get story coverage. RecipeDetailPage's
+ *   no-error-state stance does not bind here — there the app has
+ *   no error UI at all, while here the error cards are designed
+ *   surface.
+ * - The page renders its own footer: every state (loading,
+ *   errors, ready) renders through BigFooterShell from the
+ *   state's `footer` prop, the standard page pattern (#410).
+ *   #473 retired the separate PublicPageFrame page the host
+ *   once wrapped this page in — there is no host-side frame.
+ *   Landmarks (#366): the retired frame's layout owned the
+ *   `main` landmark, so the page owns it now — every state's
+ *   content renders inside exactly one `main` (the MainLandmark
+ *   component below), and BigFooterShell keeps the footer
+ *   (`contentinfo`) outside it, after it in flow.
+ *
+ * The CTA bar sits above the sections, its variant chosen by the
+ * host's auth state: signed-out visitors get sign-up / clone /
+ * get-the-app intents; signed-in viewers get the clone mutation's
+ * own button (with its pending state) and get-the-app. All three
+ * intents are plain callbacks — the host navigates, runs the clone
+ * mutation, or opens the install URL. The button copy is DS-owned
+ * constants that move with the page, per the copy precedent.
+ *
+ * Composition (#119): the page composes design-system components
+ * and passes data and callbacks only. ScrollShell owns the
+ * surface paint, the single scroll region, and the content
+ * column's inset and separation rhythm; RatingsCard carries the
+ * engagement section, and the loading state is a skeleton
+ * composition mirroring the ready layout (#278, tranche 4 —
+ * the centered-Spinner pattern is deleted): the CTA card's
+ * buttons as inert skeletons inside the loading scope, a hero
+ * box bone where the overview's image sits, title and
+ * description bones, the stat band in its loading state, and
+ * text bones under the real Ingredients / Instructions
+ * section headings. The CTA
+ * bar's equal-width button treatment is ButtonRow's (`equal`) and
+ * the two message states are MessageCard — both extracted from
+ * this page's hand-rolled stacks in the component-only change
+ * (#341) after the #119 review found the page sizing its own
+ * buttons and styling its own message shell; the page now
+ * passes the row its buttons and the card its two strings. The
+ * three recipe sections are the shared library panels —
+ * RecipeOverviewPanel and RecipeIngredientsPanel — extracted in the component-only
+ * change (#331) after this tranche first composed them in-file
+ * under the #119 program rule (2026-10-29) that a tranche page
+ * adds no library components; the same panels serve
+ * RecipeDetailPage's sections, so the two surfaces render one
+ * interaction model. What stays page-side is only the wiring:
+ * the section view-models passed through. Section separation is the shell column's 16px gap
+ * throughout, where the hand-styled page mixed 16px section
+ * padding with 8px heading margins — the headings now sit 16px
+ * from the sections on both sides — and the section headings
+ * are the shared SectionHeading (Text's subheading variant,
+ * xl semibold ink) in place of the hand-styled lg treatment.
+ *
+ * The sections' ephemeral state stays inside the shared pieces
+ * that own it, mirroring RecipeDetailPage: the instructions
+ * StepList holds the active step, the ingredients
+ * panel's PresetValueSelector the custom-scale editing. None
+ * of it is business state.
+ *
+ * No lineHeight is set anywhere in this file (the #162 rule).
+ */
+
+// ---------------------------------------------------------------------------
+// View-model types (DS-owned; the app maps its domain types at the
+// boundary). The section shapes that are identical to the detail
+// page's — ingredients, instructions, ratings, tags — are reused
+// from RecipeDetailPage verbatim under this page's names, so the
+// two surfaces cannot drift apart on the shapes they share.
+// ---------------------------------------------------------------------------
+
+export type PublicRecipePageTag = RecipeDetailPageTag;
+
+export type PublicRecipePageRatings = RecipeDetailPageRatings;
+export type PublicRecipePageCommunityRating = RecipeDetailPageCommunityRating;
+export type PublicRecipePageViewerRating = RecipeDetailPageViewerRating;
+
+export type PublicRecipePageIngredient = RecipeDetailPageIngredient;
+export type PublicRecipePageSubstitution = RecipeDetailPageSubstitution;
+export type PublicRecipePageIngredientsProps = RecipeDetailPageIngredientsProps;
+
+export type PublicRecipePageInstruction = RecipeDetailPageInstruction;
+export type PublicRecipePageInstructionsProps = RecipeDetailPageInstructionsProps;
+
+// The comments view-model lives with the view (#130 T7); the
+// page's contract name is an alias, as on RecipeDetailPage.
+export type PublicRecipePageComments = RecipeCommentsViewProps;
+
+export type PublicRecipePageOverviewProps = {
+  imageUrl?: string | null;
+  title: string;
+  description?: string | null;
+  /** Overview stat band values, app-formatted ("4", "15m", "30m"). */
+  servingsLabel: string;
+  prepTimeLabel?: string;
+  cookTimeLabel?: string;
+  tags: PublicRecipePageTag[];
+};
+
+/** The CTA bar's variant, chosen by the host's auth state. The
+ * signed-in variant carries the clone mutation's pending state:
+ * its button reads "Saving…" and disables while a clone is in
+ * flight. */
+export type PublicRecipePageCtas =
+  { variant: "signedOut" } | { variant: "signedIn"; isClonePending?: boolean };
+
+export type PublicRecipePageReadyProps = {
+  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
+  footer?: BigFooterData;
+  state: "ready";
+  overview: PublicRecipePageOverviewProps;
+  ctas: PublicRecipePageCtas;
+  /** Sign-up intent (signed-out bar): the host navigates. */
+  onSignUpPress: () => void;
+  /** Clone intent: signed out, the host navigates to sign-up with
+   * the clone target; signed in, it runs the clone mutation. */
+  onClonePress: () => void;
+  /** Get-the-app intent: the host opens the install URL. */
+  onGetAppPress: () => void;
+  ingredients: PublicRecipePageIngredientsProps;
+  instructions: PublicRecipePageInstructionsProps;
+  /** Engagement block; omit (or pass null) to hide it. */
+  ratings?: PublicRecipePageRatings | null;
+  onViewerRatingChange?: (stars: number | null) => void;
+  /**
+   * The comments section as data (#130 T7): renders
+   * RecipeCommentsView in the engagement stack, under the
+   * ratings card.
+   */
+  comments?: PublicRecipePageComments | null;
+};
+
+export type PublicRecipePageProps =
+  | { state: "loading"; footer?: BigFooterData }
+  | { state: "notFound"; footer?: BigFooterData }
+  | { state: "unavailable"; footer?: BigFooterData }
+  | PublicRecipePageReadyProps;
+
+// ---------------------------------------------------------------------------
+// Constants moved with the page (the copy precedent: option sets
+// and section copy are DS-owned and move with the page).
+// ---------------------------------------------------------------------------
+
+// CTA copy, verbatim from the web surface's CTA bar. The signed-in
+// clone label is the app's shared SAVE_RECIPE_COPY_LABEL; its
+// pending label is the web button's in-flight text.
+const SIGN_UP_LABEL = "Sign up free";
+const CLONE_LABEL = "Clone this recipe";
+const SAVE_COPY_LABEL = "Save a copy";
+const SAVE_COPY_PENDING_LABEL = "Saving…";
+const GET_APP_LABEL = "Get the mobile app";
+
+// Error copy, verbatim from the web surface's error cards.
+const NOT_FOUND_TITLE = "Recipe not found";
+const NOT_FOUND_MESSAGE = "This recipe may be private or no longer available.";
+const UNAVAILABLE_TITLE = "Recipe unavailable";
+const UNAVAILABLE_MESSAGE = "This recipe link is invalid or has expired.";
+
+// The scale option set, the custom-scale label and the missing-
+// ingredients hint moved with the ingredients section into
+// RecipeIngredientsPanel (#331); the servings math stays app-side.
+
+// ---------------------------------------------------------------------------
+// CTA bar (above the sections; variant chosen by auth state). The
+// bar's card has no outer spacing of its own: the shell column
+// insets it and owns its separation from the overview below
+// (#119). Inside the card, ButtonRow (`equal`) owns the buttons'
+// treatment: they share the card's width equally — flex 1 with
+// a 40% minimum, wrapping instead of shrinking — so no caller
+// sizes a button itself (the treatment the row's natural-width
+// form is the sibling of). The bar passes the row the variant's
+// buttons as one fragment; the row flattens and sizes them.
+// ---------------------------------------------------------------------------
+
+function CtaBar({
+  ctas,
+  onSignUpPress,
+  onClonePress,
+  onGetAppPress,
+}: {
+  ctas: PublicRecipePageCtas;
+  onSignUpPress: () => void;
+  onClonePress: () => void;
+  onGetAppPress: () => void;
+}) {
+  const buttons =
+    ctas.variant === "signedOut" ? (
+      <>
+        <Button key="sign-up" variant="primary" onPress={onSignUpPress}>
+          {SIGN_UP_LABEL}
+        </Button>
+        <Button key="clone" variant="secondary" onPress={onClonePress}>
+          {CLONE_LABEL}
+        </Button>
+        <Button key="get-app" variant="secondary" onPress={onGetAppPress}>
+          {GET_APP_LABEL}
+        </Button>
+      </>
+    ) : (
+      <>
+        <Button
+          key="clone"
+          variant="primary"
+          disabled={ctas.isClonePending ?? false}
+          onPress={onClonePress}
+        >
+          {ctas.isClonePending ? SAVE_COPY_PENDING_LABEL : SAVE_COPY_LABEL}
+        </Button>
+        <Button key="get-app" variant="secondary" onPress={onGetAppPress}>
+          {GET_APP_LABEL}
+        </Button>
+      </>
+    );
+  return (
+    <Card>
+      <ButtonRow equal>{buttons}</ButtonRow>
+    </Card>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// The three recipe sections are the shared library panels (see
+// the header's composition note): RecipeOverviewPanel,
+// RecipeIngredientsPanel and StepList carry the
+// sections' rendering; this file only wires the page's
+// view-models into them.
+// ---------------------------------------------------------------------------
+
+/** The overview header block: the shared RecipeOverviewPanel,
+ * fed the page's overview view-model. The page renders no status
+ * badge (#735: recipe status is removed entirely). */
+function OverviewSection({ overview }: { overview: PublicRecipePageOverviewProps }) {
+  return (
+    <RecipeOverviewPanel
+      {...(overview.imageUrl !== undefined ? { imageUrl: overview.imageUrl } : {})}
+      title={overview.title}
+      {...(overview.description !== undefined ? { description: overview.description } : {})}
+      servingsLabel={overview.servingsLabel}
+      {...(overview.prepTimeLabel !== undefined ? { prepTimeLabel: overview.prepTimeLabel } : {})}
+      {...(overview.cookTimeLabel !== undefined ? { cookTimeLabel: overview.cookTimeLabel } : {})}
+      tags={overview.tags}
+    />
+  );
+}
+
+/** The ingredients section: the shared RecipeIngredientsPanel
+ * (the servings stepper and scale selector, the pressable
+ * ingredient rows, and the substitutions block), fed the page's
+ * ingredients view-model — the shape is RecipeDetailPage's,
+ * reused by alias, and the panel's view is the same shape. */
+function IngredientsSection({ ingredients }: { ingredients: PublicRecipePageIngredientsProps }) {
+  return <RecipeIngredientsPanel ingredients={ingredients} />;
+}
+
+/** The instructions section: the shared StepList (the step
+ * cards in step-number order, the tapped card highlighted as
+ * the active step), fed the page's instruction list sorted by
+ * step number with each step's "Step N" eyebrow label composed
+ * here — labels are caller-voiced copy (#747: the panel that
+ * used to do this wiring was removed, its loading skeleton
+ * moved into StepList). */
+function InstructionsSection({ instructions }: { instructions: PublicRecipePageInstruction[] }) {
+  const sorted = [...instructions].sort((a, b) => a.stepNumber - b.stepNumber);
+  return (
+    <StepList
+      steps={sorted.map((step) => ({
+        id: step.id,
+        label: `Step ${step.stepNumber}`,
+        body: step.body,
+      }))}
+    />
+  );
+}
+
+// ---------------------------------------------------------------------------
+// The whole-screen message states (notFound / unavailable)
+// render the shared MessageCard directly: the surface-filled
+// shell, the centered card, and its heading/message treatments
+// are the card's own — the page supplies only the state's two
+// copy constants above.
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// The page.
+// ---------------------------------------------------------------------------
+
+/**
+ * Full-page public recipe view: a CTA bar above all four sections
+ * in a single scroll view (no tabs — overview, ingredients,
+ * instructions, engagement, in the order the tabs had), or one of
+ * the union's non-ready states (loading gate, not-found card,
+ * unavailable card). Every state renders its own BigFooter
+ * through BigFooterShell. Controlled — see the file header for
+ * the contract, the decisions, and the slot design.
+ */
+export function PublicRecipePage(props: PublicRecipePageProps) {
+  if (props.state === "loading") {
+    // Loading (#278, tranche 4): the skeleton composition in
+    // the header's composition note — same shell, same section
+    // order and headings as the ready layout, every content
+    // region skeletonized, no real recipe content.
+    return (
+      <BigFooterShell footer={props.footer} scrollMode="content">
+        <MainLandmark>
+          <LoadingScope active>
+            <ScrollShell>
+              <Card>
+                <ButtonRow equal>
+                  <Button variant="primary" onPress={() => {}}>
+                    {SIGN_UP_LABEL}
+                  </Button>
+                  <Button variant="secondary" onPress={() => {}}>
+                    {CLONE_LABEL}
+                  </Button>
+                  <Button variant="secondary" onPress={() => {}}>
+                    {GET_APP_LABEL}
+                  </Button>
+                </ButtonRow>
+              </Card>
+              <BoxSkeleton aspectRatio={4 / 3} />
+              <TextSkeleton size="2xl" lines={1} />
+              <TextSkeleton size="md" lines={3} />
+              <StatBand loading>
+                <StatCard value="" label="" />
+              </StatBand>
+              <SectionHeading>Ingredients</SectionHeading>
+              <TextSkeleton size="md" lines={4} />
+              <SectionHeading>Instructions</SectionHeading>
+              <BoxSkeleton height={96} />
+              <BoxSkeleton height={96} />
+            </ScrollShell>
+          </LoadingScope>
+        </MainLandmark>
+      </BigFooterShell>
+    );
+  }
+
+  if (props.state === "notFound") {
+    return (
+      <BigFooterShell footer={props.footer} scrollMode="content">
+        <MainLandmark>
+          <MessageCard title={NOT_FOUND_TITLE} message={NOT_FOUND_MESSAGE} />
+        </MainLandmark>
+      </BigFooterShell>
+    );
+  }
+
+  if (props.state === "unavailable") {
+    return (
+      <BigFooterShell footer={props.footer} scrollMode="content">
+        <MainLandmark>
+          <MessageCard title={UNAVAILABLE_TITLE} message={UNAVAILABLE_MESSAGE} />
+        </MainLandmark>
+      </BigFooterShell>
+    );
+  }
+
+  const { ratings, onViewerRatingChange, comments: commentsData } = props;
+  const comments = commentsData ? <RecipeCommentsView {...commentsData} /> : null;
+
+  return (
+    <BigFooterShell footer={props.footer} scrollMode="content">
+      <MainLandmark>
+        <ScrollShell>
+          <CtaBar
+            ctas={props.ctas}
+            onSignUpPress={props.onSignUpPress}
+            onClonePress={props.onClonePress}
+            onGetAppPress={props.onGetAppPress}
+          />
+          <OverviewSection overview={props.overview} />
+          <SectionHeading>Ingredients</SectionHeading>
+          <IngredientsSection ingredients={props.ingredients} />
+          <SectionHeading>Instructions</SectionHeading>
+          <InstructionsSection instructions={props.instructions.instructions} />
+          {ratings ? (
+            <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
+          ) : null}
+          {comments}
+        </ScrollShell>
+      </MainLandmark>
+    </BigFooterShell>
+  );
+}

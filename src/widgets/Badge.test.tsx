@@ -22,8 +22,8 @@ describe("badgeBorder", () => {
   });
   test("the badge border uses the tone's text color (#174)", () => {
     assert.ok(
-      /borderColor = isSelected \? "\$primary" : \(resolvedColor \?\? styles\.text\)/.test(text),
-      "Badge must compute borderColor from styles.text while unselected (the tone fallback when no tag color resolves) so the border is the same color as the badge text for every tone (#174); the selectable form's selected state takes the primary fill instead (the badgeSelectable block in this file)",
+      /borderColor = isSelected \? "\$primary" : \(tagLight \?\? styles\.text\)/.test(text),
+      "Badge must compute borderColor from the tag light shade while unselected (tagLight ?? styles.text — the tone fallback when no tag color resolves) so the border is the same color as the badge text for every tone (#174, inverted tag form #799); the selectable form's selected state takes the primary fill instead (the badgeSelectable block in this file)",
     );
   });
 });
@@ -174,19 +174,23 @@ describe("badgeTagForm", async () => {
     assert.equal(typeof dist.Badge, "function", "Badge must be exported");
     assert.equal(dist.TagPill, undefined, "TagPill must not be exported");
   });
-  test("Badge's color form keeps TagPill's tint and type contract", () => {
+  test("Badge's color form keeps TagPill's type contract, inverted (#799)", () => {
     const source = readFileSync(join(root, "src", "widgets", "Badge.tsx"), "utf8");
     assert.ok(
       source.includes("color?: TagColorName"),
       "Badge color must be the strict TagColorName token union, not a raw string",
     );
     assert.ok(
-      source.includes("useTagColorResolver"),
-      "Badge must resolve tag colors through the shared token resolver",
+      source.includes("useTagColorShadeResolver"),
+      "Badge must resolve tag shades through the shared token shade resolver",
     );
     assert.ok(
-      source.includes("{resolvedColor}22`"),
-      "surface must be the resolved color at 22 hex alpha",
+      source.includes('resolveTagColorShade(color, "dark")'),
+      "surface must be the tag color's dark shade token (#799)",
+    );
+    assert.ok(
+      source.includes('resolveTagColorShade(color, "light")'),
+      "label and border must be the tag color's light shade token (#799)",
     );
     assert.ok(
       source.includes("fontSize: tokens.typography.fontSize.xs"),
@@ -198,12 +202,12 @@ describe("badgeTagForm", async () => {
     );
     assert.ok(source.includes("borderWidth: 1"), "Badge must carry the 1px border (#174)");
     assert.ok(
-      source.includes('const borderColor = isSelected ? "$primary" : (resolvedColor ?? styles.text)'),
-      "the border must be the resolved tag color itself in the color form and match the text color in the tone form while unselected (#211, #174)",
+      source.includes('const borderColor = isSelected ? "$primary" : (tagLight ?? styles.text)'),
+      "the border must be the tag light shade in the color form and match the text color in the tone form while unselected (#799, #174)",
     );
     assert.ok(
-      source.includes('const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text)'),
-      "the label must be the resolved tag color in the color form and the tone text color in the tone form while unselected",
+      source.includes('const textColor = isSelected ? "$onPrimary" : (tagLight ?? styles.text)'),
+      "the label must be the tag light shade in the color form and the tone text color in the tone form while unselected",
     );
   });
   test("no source file still imports TagPill (#183)", () => {

@@ -60,7 +60,7 @@ function loadRuntime() {
     const distRuntime = await loadInternalDist();
     const pages: Record<string, any> = {};
     for (const name of ["SignInPage", "FeedbackPage"]) {
-      Object.assign(pages, await import(`../../dist/pages/${name}.js`));
+      Object.assign(pages, await import(`../../dist/pages/eciperay/${name}.js`));
     }
     const { VoiceProvider }: Record<string, any> = await import("../../dist/voice/index.js");
     const { fixtureVoice }: Record<string, any> = await import("../../dist/voice/fixtures.js");

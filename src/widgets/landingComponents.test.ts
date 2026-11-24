@@ -23,7 +23,7 @@
  * href form and was deleted on Stephen's ruling on PR #311 —
  * the landing's CTAs are <Button href>. The page-level SSR
  * pins for the rendered anchors and headings live in
- * src/pages/LandingPage.test.ts.)
+ * src/pages/eciperay/LandingPage.test.ts.)
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -41,7 +41,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const page = readCode("src/pages/LandingPage.tsx");
+const page = readCode("src/pages/eciperay/LandingPage.tsx");
 const componentsBarrel = readCode("src/widgets/index.ts");
 const heroStack = readCode("src/widgets/HeroStack.tsx");
 const stackedButtonRow = readCode("src/widgets/StackedButtonRow.tsx");

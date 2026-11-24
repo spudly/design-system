@@ -87,18 +87,19 @@ test("CommentItem is exported from the internal barrel as a view, not a widget (
   assert.ok(viewsBarrel.includes("CommentItem"), "CommentItem must be exported from the views barrel");
 });
 
-test("Badge's colored-tag form tints its surface and label from the resolved token color", () => {
+test("Badge's colored-tag form inverts to the resolved dark shade surface with the light shade label (#799)", () => {
   const badge = source("Badge");
-  // #207: the tag color (a token name, strictly typed) resolves
-  // through the shared tag-color resolver first; the tint and label
-  // use the resolved hex.
+  // #799 (superseding the #207 tint): the tag color (a token name,
+  // strictly typed) resolves through the shared tag-color shade
+  // resolver; the surface takes the pair's dark shade and the label
+  // its light shade.
   assert.ok(
-    badge.includes("{resolvedColor}22`"),
-    "surface must be the resolved color at 22 hex alpha",
+    badge.includes('const backgroundColor = isSelected ? "$primary" : (tagDark ?? styles.background)'),
+    "surface must be the resolved tag color's dark shade while unselected (the selectable form's selected state takes the primary fill)",
   );
   assert.ok(
-    badge.includes('const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text)'),
-    "label must render in the resolved color itself while unselected (the selectable form's selected state takes the on-primary ink)",
+    badge.includes('const textColor = isSelected ? "$onPrimary" : (tagLight ?? styles.text)'),
+    "label must render in the resolved tag color's light shade while unselected (the selectable form's selected state takes the on-primary ink)",
   );
   assert.ok(badge.includes("radii.full"), "pill must use the full radius token");
 });

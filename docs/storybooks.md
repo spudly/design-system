@@ -96,7 +96,7 @@ stories, by design:
 - `src/widgets/PageFrame.tsx` — internal page-story scaffolding
   shared by the page stories; not exported from `@spudly/ui`, and
   exercised through every page story.
-- `src/pages/fixtures.ts` — the static fixtures the page stories
+- `src/pages/shared/fixtures.ts` — the static fixtures the page stories
   render.
 
 If a future component is genuinely single-platform, the exception

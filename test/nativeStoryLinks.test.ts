@@ -132,7 +132,7 @@ test("web Storybook never references the native link routing (#300)", () => {
 });
 
 test("premise: fixtures and stories still pass root-relative hrefs (#300)", () => {
-  const fixtures = readFileSync(join(root, "src/pages/fixtures.ts"), "utf8");
+  const fixtures = readFileSync(join(root, "src/pages/shared/fixtures.ts"), "utf8");
   assert.match(fixtures, /href: "\//);
   let storyFilesWithAppHrefs = 0;
   for (const dir of ["src/pages", "src/widgets"]) {

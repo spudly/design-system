@@ -73,16 +73,16 @@ test("Part 3 pages are exported from the pages barrel, with stories", () => {
   for (const name of NEW_PAGES) {
     assert.match(
       pagesBarrel,
-      new RegExp(`export \\{[^}]*\\b${name}\\b[^}]*\\} from "\\./${name}\\.js"`),
+      new RegExp(`export \\{[^}]*\\b${name}\\b[^}]*\\} from "\\./eciperay/${name}\\.js"`),
       `${name} is exported from src/pages/index.ts`,
     );
-    assert.equal(existsSync(`src/pages/${name}.tsx`), true, `${name}.tsx exists`);
-    assert.equal(existsSync(`src/pages/${name}.stories.tsx`), true, `${name} has stories`);
+    assert.equal(existsSync(`src/pages/eciperay/${name}.tsx`), true, `${name}.tsx exists`);
+    assert.equal(existsSync(`src/pages/eciperay/${name}.stories.tsx`), true, `${name} has stories`);
   }
 });
 
 test("RecipeDetailPage renders the sharing / comments views and the confirmation dialogs from data props", () => {
-  const source = read("src/pages/RecipeDetailPage.tsx");
+  const source = read("src/pages/eciperay/RecipeDetailPage.tsx");
   assert.match(source, /sharing\?: RecipeDetailPageSharing \| null/);
   assert.match(source, /comments\?: RecipeDetailPageComments \| null/);
   assert.match(source, /<RecipeSharingView \{\.\.\.sharing\} \/>/);
@@ -100,7 +100,7 @@ test("RecipeDetailPage renders the sharing / comments views and the confirmation
 });
 
 test("ProfilePage renders its four covered sections from typed data props", () => {
-  const source = read("src/pages/ProfilePage.tsx");
+  const source = read("src/pages/eciperay/ProfilePage.tsx");
   assert.match(source, /subscription\?: ProfilePageSubscription/);
   assert.match(source, /feedbackPreferenceSection\?: ProfilePageFeedbackPreference/);
   assert.match(source, /transfer\?: ProfilePageTransfer/);
@@ -112,13 +112,13 @@ test("ProfilePage renders its four covered sections from typed data props", () =
 });
 
 test("ImportImagePage renders the import-anyway override inside the page", () => {
-  const source = read("src/pages/ImportImagePage.tsx");
+  const source = read("src/pages/eciperay/ImportImagePage.tsx");
   assert.match(source, /onImportAnyway\?: \(\) => void/);
   assert.match(source, /Import anyway/);
 });
 
 test("RecipesPage carries the own-section load-more rows", () => {
-  const source = read("src/pages/RecipesPage.tsx");
+  const source = read("src/pages/eciperay/RecipesPage.tsx");
   assert.match(source, /isFetchingNextOwnPage\?: boolean/);
   assert.match(source, /ownLoadMoreErrorMessage\?: string \| null/);
   assert.match(source, /onOwnLoadMoreRetry\?: \(\) => void/);
@@ -127,7 +127,7 @@ test("RecipesPage carries the own-section load-more rows", () => {
 });
 
 test("CookingModePage composes StepOverlay with the ingredients accessory; StepOverlay renders it before the body", () => {
-  const page = read("src/pages/CookingModePage.tsx");
+  const page = read("src/pages/eciperay/CookingModePage.tsx");
   assert.match(page, /<StepOverlay/);
   assert.match(page, /accessory=\{/);
   assert.match(page, /<ScaledIngredientsView/);
@@ -135,7 +135,7 @@ test("CookingModePage composes StepOverlay with the ingredients accessory; StepO
   // MealCookingModePage in StepNavControls (#587 phase 3
   // tranche 5) — the pins follow it there.
   assert.match(page, /<StepNavControls/);
-  const nav = read("src/pages/StepNavControls.tsx");
+  const nav = read("src/pages/shared/StepNavControls.tsx");
   assert.match(nav, /<StepDots/);
   assert.match(nav, /<PrevNextNav/);
   const overlay = read("src/widgets/StepOverlay.tsx");
@@ -170,11 +170,11 @@ test("review round: explicit error states, href home control, negative step guar
     picker,
     /\{error && !showSkeleton \? \(\s*<Alert severity="error" message=\{error\} \/>\s*\) : \(\s*<CheckboxSelectList[\s\S]*?emptyMessage=\{emptyMessage\}/,
   );
-  const pay = read("src/pages/PayPage.tsx");
+  const pay = read("src/pages/eciperay/PayPage.tsx");
   assert.match(pay, /homeHref\?: string/);
   assert.doesNotMatch(pay, /onHomePress/);
   assert.match(pay, /<Button variant="primary" href=\{homeHref\}>/);
-  const cooking = read("src/pages/CookingModePage.tsx");
+  const cooking = read("src/pages/eciperay/CookingModePage.tsx");
   assert.match(cooking, /stepIndex >= 0 \? steps\.at\(stepIndex\) : undefined/);
   // The scaled panel's scroll treatment moved into the
   // OverlayTextPanel widget in #698 tranche 3 — the pin

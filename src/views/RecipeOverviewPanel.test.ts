@@ -113,17 +113,16 @@ test("no recipe surface gains a second level-1 heading from the panel (#364)", (
   // level-1 heading variant of its own — the panel's title is
   // its page's sole level-1 heading (its section headings are
   // SectionHeading, level 2).
-  const publicCode = readCode("PublicRecipePage.tsx");
+  const publicCode = readCode("eciperay/PublicRecipePage.tsx");
   assert.match(publicCode, /<RecipeOverviewPanel/);
   assert.ok(
     !/variant="(heading|title|formTitle)"/.test(publicCode),
     "PublicRecipePage renders no level-1 heading variant besides the panel's title",
   );
   // RecipeDetailPage does not compose the panel; its inline
-  // overview title carries level-1 semantics through the
-  // `display` variant (the serif visual-direction title since
-  // #721; `formTitle` before it).
-  const detailCode = readCode("RecipeDetailPage.tsx");
+  // overview title already carries level-1 semantics through
+  // the `formTitle` variant, so it is untouched by this change.
+  const detailCode = readCode("eciperay/RecipeDetailPage.tsx");
   assert.ok(
     !detailCode.includes("RecipeOverviewPanel"),
     "RecipeDetailPage does not compose the panel",

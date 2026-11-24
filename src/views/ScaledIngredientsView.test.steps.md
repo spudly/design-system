@@ -1,7 +1,7 @@
 ---
 component: ScaledIngredientsView
 run_when:
-  - "src/pages/CookingModePage.tsx, its stories, src/widgets/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
+  - "src/pages/eciperay/CookingModePage.tsx, its stories, src/widgets/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
   - "src/views/ScaledIngredientsView.tsx, its stories, CookingModePage, or a changeset naming ScaledIngredientsView."
 ---
 
@@ -27,7 +27,7 @@ FirstStep, LastStep.
 3. The progress dots track the step (second dot active in
    WithIngredientsPanel, first in FirstStep, third in LastStep).
 
-**Run when:** `src/pages/CookingModePage.tsx`, its stories,
+**Run when:** `src/pages/eciperay/CookingModePage.tsx`, its stories,
 `src/widgets/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
 or a changeset naming CookingModePage.
 

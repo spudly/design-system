@@ -35,9 +35,9 @@ function loadRuntime() {
     const dist: Record<string, any> = await loadInternalDist();
     const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
     const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
-    const pagesFixtures: Record<string, any> = await import("../../dist/pages/fixtures.js");
+    const pagesFixtures: Record<string, any> = await import("../../dist/pages/shared/fixtures.js");
     const { LegalDocumentPage }: Record<string, any> =
-      await import("../../dist/pages/LegalDocumentPage.js");
+      await import("../../dist/pages/eciperay/LegalDocumentPage.js");
     return {
       React,
       renderToString,

@@ -86,11 +86,11 @@ test("in-repo consumers render Alert, not the removed components", () => {
   for (const file of [
     "src/views/AccessTokensPanel.tsx",
     "src/widgets/FixedActionBanner.tsx",
-    "src/pages/EditVersionPage.tsx",
-    "src/pages/MemorizationSessionPage.tsx",
-    "src/pages/MemorizeSettingsPage.tsx",
-    "src/pages/RecipeFormPage.tsx",
-    "src/pages/VerseSearchPage.tsx",
+    "src/pages/eciperay/EditVersionPage.tsx",
+    "src/pages/memorize/MemorizationSessionPage.tsx",
+    "src/pages/memorize/MemorizeSettingsPage.tsx",
+    "src/pages/eciperay/RecipeFormPage.tsx",
+    "src/pages/memorize/VerseSearchPage.tsx",
   ]) {
     const code = readFileSync(file, "utf8");
     assert.doesNotMatch(

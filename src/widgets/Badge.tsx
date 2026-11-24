@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
 import { Text } from "./Text.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { useTagColorResolver } from "./tagColors.js";
+import { useTagColorShadeResolver } from "./tagColors.js";
 
 // Every tone takes the DARK step of its ramp as the background
 // and the LIGHT step as the label and border ink (Stephen's
@@ -66,9 +66,10 @@ export type BadgeProps = Omit<StyledBadgeProps, "onPress"> & {
   /**
    * A tag color: a design-system tag color token name (e.g. "blue"),
    * resolved through the active theme at render. When set, the badge
-   * renders as a colored tag instead of a status pill: the surface is
-   * the resolved color at low alpha (`22` hex, 12.5% opacity), and the
-   * border and label are the resolved color itself. The two forms
+   * renders as a colored tag instead of a status pill: inverted like
+   * the tone badges (#799, Stephen's direction on PR #730 extended to
+   * tags) — the surface is the tag color's DARK shade token and the
+   * border and label are its LIGHT shade token. The two forms
    * share the same label typography and padding — only the colors
    * differ. This is the rendering TagPill had before it was merged
    * into Badge (#183); `tone` is ignored while `color` is set. The
@@ -115,7 +116,7 @@ export function Badge({
   children,
   ...rest
 }: BadgeProps) {
-  const resolveTagColor = useTagColorResolver();
+  const resolveTagColorShade = useTagColorShadeResolver();
   const selectable = onPress !== undefined;
   const isSelected = selectable && selected === true;
   const labelType = {
@@ -160,14 +161,11 @@ export function Badge({
   // those once, then render a single StyledBadge, so a Badge
   // change can't land in one form and miss the other.
   const styles = toneStyles[tone];
-  const resolvedColor = color ? resolveTagColor(color) : undefined;
-  const backgroundColor = isSelected
-    ? "$primary"
-    : resolvedColor
-      ? `${resolvedColor}22`
-      : styles.background;
-  const borderColor = isSelected ? "$primary" : (resolvedColor ?? styles.text);
-  const textColor = isSelected ? "$onPrimary" : (resolvedColor ?? styles.text);
+  const tagDark = color ? resolveTagColorShade(color, "dark") : undefined;
+  const tagLight = color ? resolveTagColorShade(color, "light") : undefined;
+  const backgroundColor = isSelected ? "$primary" : (tagDark ?? styles.background);
+  const borderColor = isSelected ? "$primary" : (tagLight ?? styles.text);
+  const textColor = isSelected ? "$onPrimary" : (tagLight ?? styles.text);
   return (
     <StyledBadge
       backgroundColor={backgroundColor}

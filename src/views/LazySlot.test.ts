@@ -4,56 +4,48 @@
  * through, so hosts stop importing ChunkErrorBoundary.
  *
  * The contracts pinned here:
- * 1. LazySlot is exported from the views barrel only — views are
- *    internal (#438 Part 2), so it must NOT appear on the package
- *    root or the pages barrel (packageExports pins the root; this
- *    pins the barrels by name).
- * 2. Its props are a type alias (the repo-wide rule, #214) whose
- *    only required prop is `children`; `onReload` is the optional
- *    recovery override forwarded to the boundary.
- * 3. The composition is exactly the established one: the internal
+ * 1. LazySlot is exported from the built views barrel only —
+ *    views are internal (#438 Part 2), so it must NOT appear
+ *    on the built package root (asserted against the built
+ *    root's dist type surface — a built-artifact read).
+ * 2. The composition is exactly the established one: the internal
  *    ChunkErrorBoundary (whose fallback — the error Alert plus
  *    the "Reload the app" recovery — is pinned by its own tests)
- *    around a Suspense whose fallback is the DS loading state (a
- *    large Spinner centered in the slot region). No new error or
- *    loading presentation is invented here.
+ *    around a Suspense whose fallback is the DS loading state
+ *    (a skeleton panel of box and text bones filling the slot
+ *    region — no Spinner).
+ *
+ * Converted from source scans to runtime checks in #733
+ * tranche 5: the composition was already exercised against the
+ * built view; the Suspense fallback's skeleton composition is
+ * now asserted on the returned element tree (SkeletonPanel
+ * holding BoxSkeleton / TextSkeleton children) instead of by
+ * reading the source, and the barrel/root absence checks run
+ * against the built modules. Deleted: the type-alias scan
+ * (types are enforced by the TypeScript build, not a test —
+ * Stephen, 2026-11-20) and the stories source scan (story
+ * coverage is not runtime-observable from the built package).
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { Suspense } from "react";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
 const distViews: Record<string, any> = await import("../../dist/views/index.js");
-const distComponents: Record<string, any> = await import("../../dist/widgets/index.js");
+const distWidgets: Record<string, any> = await import("../../dist/widgets/index.js");
+import { readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
+// The built root's type surface (a dist artifact, not source):
+// views must not appear on it.
+const rootTypes = readFileSync(
+  join(dirname(fileURLToPath(import.meta.url)), "../..", "dist", "index.d.ts"),
+  "utf8",
+);
 
-function codeOf(rel: string): string {
-  const source = readFileSync(join(root, rel), "utf8");
-  return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-}
-
-const slot = codeOf("src/views/LazySlot.tsx");
-const stories = readFileSync(join(root, "src/views/LazySlot.stories.tsx"), "utf8");
-
-test("LazySlot is exported from the views barrel and nowhere public", () => {
-  const barrel = readFileSync(join(root, "src/views/index.ts"), "utf8");
-  assert.match(barrel, /export \{ LazySlot, type LazySlotProps \} from "\.\/LazySlot\.js";/);
+test("LazySlot is exported from the built views barrel and nowhere public", () => {
   assert.equal(typeof distViews.LazySlot, "function");
-  const rootEntry = readFileSync(join(root, "src/index.ts"), "utf8");
-  const pagesBarrel = readFileSync(join(root, "src/pages/index.ts"), "utf8");
-  assert.doesNotMatch(rootEntry, /LazySlot/, "views stay internal — no root export");
-  assert.doesNotMatch(pagesBarrel, /LazySlot/, "views stay internal — no pages-barrel export");
-});
-
-test("props are a type alias with children as the core prop", () => {
-  assert.match(slot, /export type LazySlotProps = \{/);
-  assert.match(slot, /children: ReactNode;/);
-  assert.match(slot, /onReload\?: \(\) => void;/);
-  assert.doesNotMatch(slot, /\binterface\s+LazySlotProps\b/);
+  assert.doesNotMatch(rootTypes, /LazySlot/, "views stay internal — no root export");
 });
 
 test("the slot composes the internal boundary around a Suspense", () => {
@@ -72,26 +64,22 @@ test("the slot composes the internal boundary around a Suspense", () => {
   assert.equal(suspense.type, Suspense, "the boundary wraps a Suspense");
   assert.equal(suspense.props.children, "surface content", "the slotted content renders untouched");
   // The Suspense fallback is the DS loading state (#278
-  // tranche 3): a generic skeleton composition filling the slot
-  // region — the incoming component's shape is unknown by
-  // definition, so the fallback mirrors no particular layout.
+  // tranche 3): a skeleton panel holding box and text bones
+  // filling the slot region — the incoming component's shape
+  // is unknown by definition, so the fallback mirrors no
+  // particular layout, and it renders no Spinner.
   const fallback = suspense.props.fallback;
-  const fallbackSource = readFileSync(join(root, "src/views/LazySlot.tsx"), "utf8");
-  assert.match(fallbackSource, /BoxSkeleton/, "the fallback renders box skeletons");
-  assert.match(fallbackSource, /TextSkeleton/, "the fallback renders text skeletons");
-  assert.doesNotMatch(fallbackSource, /Spinner/, "the fallback renders no spinner");
   assert.ok(fallback, "the Suspense carries a fallback");
+  assert.equal(fallback.type, distWidgets.SkeletonPanel, "the fallback is a skeleton panel");
+  const bones = fallback.props.children;
+  const boneTypes = (Array.isArray(bones) ? bones : [bones]).map((b: any) => b?.type);
+  assert.ok(boneTypes.includes(distWidgets.BoxSkeleton), "the fallback renders box skeletons");
+  assert.ok(boneTypes.includes(distWidgets.TextSkeleton), "the fallback renders text skeletons");
+  assert.ok(!boneTypes.includes(distWidgets.Spinner), "the fallback renders no spinner");
 });
 
 test("a caller-supplied onReload is forwarded to the boundary", () => {
   const onReload = () => {};
   const element = distViews.LazySlot({ children: "surface content", onReload });
   assert.equal(element.props.onReload, onReload);
-});
-
-test("stories cover the loaded, loading, and failed-to-load states", () => {
-  assert.match(stories, /title: "Views\/LazySlot"/);
-  assert.match(stories, /export const Loaded: Story/);
-  assert.match(stories, /export const Loading: Story/);
-  assert.match(stories, /export const FailedToLoad: Story/);
 });

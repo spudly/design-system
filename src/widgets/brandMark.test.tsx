@@ -40,7 +40,7 @@ function codeOf(rel: string): string {
 const brandMark = codeOf("src/icons/BrandMark.tsx");
 const brandLink = codeOf("src/widgets/BrandLink.tsx");
 const topBar = codeOf("src/widgets/AppTopBar.tsx");
-const shellPage = codeOf("src/pages/AppShellPage.tsx");
+const shellPage = codeOf("src/pages/eciperay/AppShellPage.tsx");
 const footer = codeOf("src/widgets/BigFooter.tsx");
 
 test("BrandMark carries the Eciperay mark geometry, ported from the logo (#726)", () => {

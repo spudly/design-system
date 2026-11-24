@@ -54,7 +54,7 @@ test("the compact variant: surface, medium radius, 12px padding, small shadow, n
 });
 
 test("the treatment's consumers compose Card's compact variant", () => {
-  const tagsPage = readFileSync(join(root, "src", "pages", "TagsPage.tsx"), "utf8");
+  const tagsPage = readFileSync(join(root, "src", "pages", "eciperay", "TagsPage.tsx"), "utf8");
   // Editor and display rows both render a compact Card keyed by
   // the tag; scope this pin to the display branch (the compact
   // Card whose TrailingActionsRow leads with the tag's Badge) so

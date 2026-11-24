@@ -138,3 +138,60 @@ export function resolveTagColorValue(
 export function tagColorThemeKey(name: TagColorName): string {
   return `tag${name.charAt(0).toUpperCase()}${name.slice(1)}`;
 }
+
+/**
+ * Dark/light shade pair for one tag color (#799): the tag form of
+ * Badge renders inverted like the tone badges (Stephen's direction
+ * on PR #730, extended to tags 2026-11-23) — the DARK shade is the
+ * background and the LIGHT shade is the label/border ink. Shades are
+ * tokens at this level, per theme, so no component hard-codes a
+ * per-color override.
+ */
+export type TagColorShade = "dark" | "light";
+export type TagColorShades = Record<TagColorName, Record<TagColorShade, string>>;
+
+/** Warm Harvest shades: Tailwind 700 (dark) / 200 (light) steps of the palette hues. */
+export const warmHarvestTagColorShades: TagColorShades = {
+  indigo: { dark: "#4338ca", light: "#c7d2fe" },
+  red: { dark: "#b91c1c", light: "#fecaca" },
+  orange: { dark: "#c2410c", light: "#fed7aa" },
+  amber: { dark: "#b45309", light: "#fde68a" },
+  lime: { dark: "#4d7c0f", light: "#d9f99d" },
+  green: { dark: "#15803d", light: "#bbf7d0" },
+  teal: { dark: "#0f766e", light: "#99f6e4" },
+  cyan: { dark: "#0e7490", light: "#a5f3fc" },
+  blue: { dark: "#1d4ed8", light: "#bfdbfe" },
+  purple: { dark: "#7e22ce", light: "#e9d5ff" },
+  pink: { dark: "#be185d", light: "#fbcfe8" },
+  gray: { dark: "#374151", light: "#e5e7eb" },
+};
+
+/** Quiet Dawn shades: the same step pairing in Quiet Dawn's cooler, muted register. */
+export const quietDawnTagColorShades: TagColorShades = {
+  indigo: { dark: "#43449e", light: "#c9caf0" },
+  red: { dark: "#a83a3a", light: "#f3cdcd" },
+  orange: { dark: "#b06534", light: "#f5d7bd" },
+  amber: { dark: "#ad7c14", light: "#f2dfae" },
+  lime: { dark: "#638c2e", light: "#ddefc0" },
+  green: { dark: "#2f7f4c", light: "#c2e7cf" },
+  teal: { dark: "#22766b", light: "#bfe6df" },
+  cyan: { dark: "#237d94", light: "#bde6ef" },
+  blue: { dark: "#3a6aa3", light: "#c8dcf2" },
+  purple: { dark: "#774da3", light: "#e0cff2" },
+  pink: { dark: "#ad4a73", light: "#f2ccdc" },
+  gray: { dark: "#525d63", light: "#dde3e6" },
+};
+
+/** Resolve one shade of a tag color NAME through the given theme's shade table. */
+export function resolveTagColorShade(
+  name: TagColorName,
+  shade: TagColorShade,
+  themeShades?: Partial<TagColorShades>,
+): string {
+  return themeShades?.[name]?.[shade] ?? warmHarvestTagColorShades[name][shade];
+}
+
+/** The Tamagui theme key a tag shade is registered under (`blue` dark -> `tagBlueDark`). */
+export function tagColorShadeThemeKey(name: TagColorName, shade: TagColorShade): string {
+  return `${tagColorThemeKey(name)}${shade.charAt(0).toUpperCase()}${shade.slice(1)}`;
+}

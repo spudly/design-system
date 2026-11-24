@@ -131,17 +131,21 @@ test("every page component renders BigFooter through the shell from a footer pro
     "__snapshots__",
   ]);
   const pages: string[] = [];
-  for (const entry of readdirSync(pagesDir)) {
-    if (
-      entry.endsWith(".stories.tsx") ||
-      entry.endsWith(".test.ts") ||
-      entry.endsWith(".test.tsx") ||
-      entry.endsWith(".test.steps.md") ||
-      exceptions.has(entry)
-    )
-      continue;
-    assert.ok(entry.endsWith(".tsx"), `unaccounted pages file ${entry}`);
-    pages.push(entry);
+  // #710: pages live one level down, under src/pages/<host-app>/.
+  for (const host of readdirSync(pagesDir)) {
+    if (host === "index.ts" || host === "__snapshots__") continue;
+    for (const entry of readdirSync(join(pagesDir, host))) {
+      if (
+        entry.endsWith(".stories.tsx") ||
+        entry.endsWith(".test.ts") ||
+        entry.endsWith(".test.tsx") ||
+        entry.endsWith(".test.steps.md") ||
+        exceptions.has(entry)
+      )
+        continue;
+      assert.ok(entry.endsWith(".tsx"), `unaccounted pages file ${host}/${entry}`);
+      pages.push(`${host}/${entry}`);
+    }
   }
   assert.ok(pages.length >= 38, `expected at least 38 page modules, found ${pages.length}`);
   for (const entry of pages) {
@@ -240,7 +244,7 @@ test("overlay pages get a viewport-bounded region with or without footer data (#
   // their StepOverlay in FullScreenShell instead — the overlay
   // branch above remains the shell's footer-bearing form of
   // the same viewport-bounded region.
-  for (const entry of ["CookingModePage.tsx", "MealCookingModePage.tsx"]) {
+  for (const entry of ["eciperay/CookingModePage.tsx", "eciperay/MealCookingModePage.tsx"]) {
     const code = readCode(join("src", "pages", entry));
     assert.ok(
       code.includes("<FullScreenShell>"),
@@ -249,7 +253,10 @@ test("overlay pages get a viewport-bounded region with or without footer data (#
   }
   // The regression stories render the exact no-footer host
   // composition for both pages.
-  for (const entry of ["CookingModePage.stories.tsx", "MealCookingModePage.stories.tsx"]) {
+  for (const entry of [
+    "eciperay/CookingModePage.stories.tsx",
+    "eciperay/MealCookingModePage.stories.tsx",
+  ]) {
     const code = readCode(join("src", "pages", entry));
     assert.ok(code.includes("export const NoFooter"), `${entry} must carry a NoFooter story`);
   }
@@ -263,16 +270,16 @@ test("list and self-scrolling pages put the shell in content mode (PR #556)", ()
   // nest its scroller inside the shell's ScrollView whenever
   // a host supplies footer data.
   for (const entry of [
-    "RecipesPage.tsx",
-    "DiscoverPage.tsx",
-    "MyVersesPage.tsx",
-    "VerseSearchPage.tsx",
-    "MemorizeReviewPage.tsx",
-    "RecipeFormPage.tsx",
-    "RecipeDetailPage.tsx",
-    "PublicRecipePage.tsx",
-    "AppShellPage.tsx",
-    "TabbedShellPage.tsx",
+    "eciperay/RecipesPage.tsx",
+    "eciperay/DiscoverPage.tsx",
+    "memorize/MyVersesPage.tsx",
+    "memorize/VerseSearchPage.tsx",
+    "memorize/MemorizeReviewPage.tsx",
+    "eciperay/RecipeFormPage.tsx",
+    "eciperay/RecipeDetailPage.tsx",
+    "eciperay/PublicRecipePage.tsx",
+    "eciperay/AppShellPage.tsx",
+    "memorize/TabbedShellPage.tsx",
   ]) {
     const code = readCode(join("src", "pages", entry));
     assert.ok(
@@ -287,7 +294,7 @@ test("list and self-scrolling pages put the shell in content mode (PR #556)", ()
   // A plain content page keeps the default: SignUpPage renders
   // the shell with no scrollMode, so the shell's ScrollView
   // owns its native scrolling with or without footer data.
-  const signUp = readCode("src/pages/SignUpPage.tsx");
+  const signUp = readCode("src/pages/eciperay/SignUpPage.tsx");
   assert.match(signUp, /<BigFooterShell footer=\{footer\}>/);
   assert.ok(!signUp.includes("scrollMode"), "SignUpPage stays in the default shell mode");
 });
@@ -298,7 +305,7 @@ test("composed pages keep exactly one native scroll owner (PR #556 round 2)", ()
   // stays outside it. (The meals tab keeps the default shell:
   // its plain ScreenContainer content has no scroller of its
   // own.)
-  const mealsHub = readCode("src/pages/MealsHubPage.tsx");
+  const mealsHub = readCode("src/pages/eciperay/MealsHubPage.tsx");
   assert.match(
     mealsHub,
     /<BigFooterShell footer=\{footer\} scrollMode="content">\s*<PinnedHeaderShell/,
@@ -309,14 +316,14 @@ test("composed pages keep exactly one native scroll owner (PR #556 round 2)", ()
   // shells are content-mode frames, never a second ScrollView
   // around the region. EditVersionPage's not-editable state
   // renders no form, so that branch keeps the default shell.
-  for (const entry of ["EditRecipePage.tsx", "ManualEntryPage.tsx"]) {
+  for (const entry of ["eciperay/EditRecipePage.tsx", "eciperay/ManualEntryPage.tsx"]) {
     const code = readCode(join("src", "pages", entry));
     assert.ok(
       code.includes('<BigFooterShell footer={footer} scrollMode="content">'),
       `${entry} must render its shell in content mode`,
     );
   }
-  const editVersion = readCode("src/pages/EditVersionPage.tsx");
+  const editVersion = readCode("src/pages/eciperay/EditVersionPage.tsx");
   assert.ok(
     editVersion.includes('<BigFooterShell footer={props.footer} scrollMode="content">'),
     "EditVersionPage's editable branch must render its shell in content mode",
@@ -359,7 +366,7 @@ test("composed pages and stories render exactly one footer", () => {
   // AiSessionPage: BOTH states (start and in-session) render
   // through the shell — the start state used to return early
   // without it.
-  const aiSession = readCode("src/pages/AiSessionPage.tsx");
+  const aiSession = readCode("src/pages/eciperay/AiSessionPage.tsx");
   assert.equal(
     (aiSession.match(/<BigFooterShell footer=\{footer\}>/g) ?? []).length,
     2,
@@ -371,7 +378,7 @@ test("composed pages and stories render exactly one footer", () => {
   // the full pinned layout; MealPlansPage gets NO footer there (an
   // inner shell below the header pushed the footer one header
   // height past the viewport bottom on short lists).
-  const mealsHub = readCode("src/pages/MealsHubPage.tsx");
+  const mealsHub = readCode("src/pages/eciperay/MealsHubPage.tsx");
   assert.match(
     mealsHub,
     /<BigFooterShell footer=\{footer\} scrollMode="content">\s*<PinnedHeaderShell[\s\S]*?<MealPlansPage/,
@@ -385,9 +392,9 @@ test("composed pages and stories render exactly one footer", () => {
   // Nested compositions: the outer page owns the footer; the
   // nested form/page gets no footer prop.
   for (const story of [
-    "src/pages/EditRecipePage.stories.tsx",
-    "src/pages/ManualEntryPage.stories.tsx",
-    "src/pages/EditVersionPage.stories.tsx",
+    "src/pages/eciperay/EditRecipePage.stories.tsx",
+    "src/pages/eciperay/ManualEntryPage.stories.tsx",
+    "src/pages/eciperay/EditVersionPage.stories.tsx",
   ]) {
     assert.doesNotMatch(
       readCode(story),
@@ -398,13 +405,13 @@ test("composed pages and stories render exactly one footer", () => {
   // #473: PublicPageFrame is retired — PublicRecipePage owns its
   // footer itself, so its stories supply the footer to the page.
   assert.match(
-    readCode("src/pages/PublicRecipePage.stories.tsx"),
+    readCode("src/pages/eciperay/PublicRecipePage.stories.tsx"),
     /<PublicRecipePage footer=\{eciperayFooterFixture\}/,
     "the PublicRecipePage stories supply the footer to the page itself — the page owns it (#473)",
   );
 });
 test("the eciperay story fixture carries the Legal column convention as data", () => {
-  const fixtures = readCode("src/pages/fixtures.ts");
+  const fixtures = readCode("src/pages/shared/fixtures.ts");
   assert.ok(fixtures.includes("eciperayFooterFixture"), "eciperay footer fixture exists");
   assert.ok(
     fixtures.includes('"Do Not Sell or Share My Personal Information"') ||
@@ -520,7 +527,8 @@ test("SSR: an exported page renders its footer from the footer prop", async () =
     VoiceProvider,
     fixtureVoice,
   } = await loadRuntime();
-  const { SignInPage }: Record<string, any> = await import("../../dist/pages/SignInPage.js");
+  const { SignInPage }: Record<string, any> =
+    await import("../../dist/pages/eciperay/SignInPage.js");
   const config = createTamaguiConfig(baseTheme);
   const html = renderToString(
     <TamaguiProvider config={config} defaultTheme="light">
@@ -724,7 +732,7 @@ describe("bigFooterStoreBadges", () => {
   test("BigFooterStoreLink requires the store discriminator (#466)", () => {
     assert.match(footer, /export type BigFooterStore = "app-store" \| "google-play";/);
     assert.match(footer, /store: BigFooterStore;/);
-    const fixtures = readCode("src/pages/fixtures.ts");
+    const fixtures = readCode("src/pages/shared/fixtures.ts");
     assert.match(fixtures, /store: "app-store"/);
     assert.match(fixtures, /store: "google-play"/);
   });
