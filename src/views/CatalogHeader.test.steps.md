@@ -1,7 +1,7 @@
 ---
 component: CatalogHeader
 run_when:
-  - "src/views/CatalogFiltersBar.tsx, src/views/CatalogHeader.tsx, their stories, the catalog pages, or a changeset naming either. (namely: CatalogFiltersBar, CatalogHeader, RecipesPage, DiscoverPage)"
+  - "src/views/CatalogFiltersBar.tsx, src/views/CatalogHeader.tsx, their stories, the catalog pages, or a changeset naming either. (namely: CatalogFiltersBar, CatalogHeader, RecipesPage)"
 ---
 
 # CatalogHeader — manual test steps

@@ -18,12 +18,6 @@ export {
   type RecipesPageCookLogForm,
   type RecipesPageCookLogFormValues,
 } from "./eciperay/RecipesPage.js";
-export {
-  DiscoverPage,
-  type DiscoverPageFilterId,
-  type DiscoverPageItem,
-  type DiscoverPageProps,
-} from "./eciperay/DiscoverPage.js";
 export { MealPlansPage, type MealPlansPageItem, type MealPlansPageProps } from "./eciperay/MealPlansPage.js";
 export {
   RecipeDetailPage,

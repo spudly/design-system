@@ -271,7 +271,6 @@ test("list and self-scrolling pages put the shell in content mode (PR #556)", ()
   // a host supplies footer data.
   for (const entry of [
     "eciperay/RecipesPage.tsx",
-    "eciperay/DiscoverPage.tsx",
     "memorize/MyVersesPage.tsx",
     "memorize/VerseSearchPage.tsx",
     "memorize/MemorizeReviewPage.tsx",

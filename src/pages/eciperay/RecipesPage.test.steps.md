@@ -14,7 +14,7 @@ release's changed components. The full index lives in
 
 ## List states
 
-Open in `Pages/Eciperay/DiscoverPage`: Loading,
+Open in `Pages/Eciperay/RecipesPage`: Loading,
 LoadingMore.
 
 1. The loading state is a centered Spinner (Center +
@@ -23,13 +23,13 @@ LoadingMore.
    no padding or margin of its own — spacing around it is
    the parent's. The same composition renders directly at
    the foot of a list for the loading-more slot — check
-   that rendering in `Pages/Eciperay/DiscoverPage`:
+   that rendering in `Pages/Eciperay/RecipesPage`:
    LoadingMore, where the spinner follows the last card
    directly — the list's separator renders only between
    cards, so no gap follows the last card.
 2. A list's error state has no wrapper component: the page
    renders the Alert component directly — check in
-   `Pages/Eciperay/DiscoverPage`: ErrorState, where the alert
+   `Pages/Eciperay/RecipesPage`: DiscoveryError, where the alert
    sits under the filter bar, flush to the parent's inset.
 
 **Run when:** a catalog page's loading or error state
@@ -77,7 +77,7 @@ sections.
    with no recipe rows in either section.
 6. LoadingMore keeps the recipe rows rendered with the footer
    spinner below them (the next-page-in-flight state,
-   `isFetchingNextPage`), like DiscoverPage's LoadingMore story.
+   `isFetchingNextPage`), like RecipesPage's LoadingMore story.
 7. Rows: each own row is an elevated card with a 64px cover-cropped
    thumbnail (or the gray placeholder well when the recipe has
    no image), a semibold title, and a hint subtitle. Both the
