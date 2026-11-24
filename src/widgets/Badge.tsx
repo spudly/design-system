@@ -6,31 +6,35 @@ import { Text } from "./Text.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { useTagColorResolver } from "./tagColors.js";
 
+// Every tone takes the DARK step of its ramp as the background
+// and the LIGHT step as the label and border ink (Stephen's
+// direction on PR #730, 2026-11-21, restated 2026-11-23: for
+// each tone the darker color is the background and the lighter
+// color is the foreground/border). The pattern is one step pair
+// per tone — step-8 background, step-2/3 foreground — resolved
+// through the shared tokens, so all badge tones stay consistent
+// and every theme keeps its own rendering. The success ramp is
+// the visual direction's sage, rebalanced at the token level.
 const toneStyles = {
   neutral: {
-    background: tokens.colors.gray.gray3,
-    text: tokens.colors.gray.gray8,
+    background: tokens.colors.gray.gray8,
+    text: tokens.colors.gray.gray3,
   },
   info: {
-    background: "$primarySubtle",
-    text: "$primaryEmphasis",
+    background: "$primaryEmphasis",
+    text: "$primarySubtle",
   },
   success: {
-    // Sage from the success token ramp (rebalanced to the visual
-    // direction's sage at the token level, PR #730 review): the
-    // same step pattern as every other tone — step-2 background,
-    // step-8 text — so all badge tones stay consistent and every
-    // theme keeps its own rendering through the shared tokens.
-    background: tokens.colors.success.success2,
-    text: tokens.colors.success.success8,
+    background: tokens.colors.success.success8,
+    text: tokens.colors.success.success2,
   },
   warning: {
-    background: tokens.colors.warning.warning2,
-    text: tokens.colors.warning.warning8,
+    background: tokens.colors.warning.warning8,
+    text: tokens.colors.warning.warning2,
   },
   danger: {
-    background: tokens.colors.danger.danger2,
-    text: tokens.colors.danger.danger8,
+    background: tokens.colors.danger.danger8,
+    text: tokens.colors.danger.danger2,
   },
 } as const;
 
