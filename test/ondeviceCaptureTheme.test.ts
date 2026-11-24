@@ -63,7 +63,11 @@ test("on-device preview decorator prefers the capture override over the theme gl
 
 test("premise: page stories pin a light theme global", () => {
   const pagesDir = join(root, "src", "pages");
-  const storyFiles = readdirSync(pagesDir).filter((f) => f.endsWith(".stories.tsx"));
+  const storyFiles = ["eciperay", "memorize", "shared"].flatMap((host) =>
+    readdirSync(join(pagesDir, host))
+      .filter((f) => f.endsWith(".stories.tsx"))
+      .map((f) => join(host, f)),
+  );
   assert.ok(storyFiles.length > 0, "page story files exist");
   for (const file of storyFiles) {
     const source = readFileSync(join(pagesDir, file), "utf8");

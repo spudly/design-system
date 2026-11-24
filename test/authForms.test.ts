@@ -58,7 +58,7 @@ test("the auth forms and LegalSection are exported from their barrels", () => {
 
 test("the auth pages compose their form units and render no fields directly", () => {
   for (const [form, page] of Object.entries(FORM_PAGES)) {
-    const pageSource = read(`src/pages/${page}.tsx`);
+    const pageSource = read(`src/pages/eciperay/${page}.tsx`);
     assert.match(pageSource, new RegExp(String.raw`<${form}\b`), `${page} composes ${form}`);
     assert.doesNotMatch(pageSource, /<TextField/, `${page} renders no field directly`);
     assert.doesNotMatch(
@@ -146,7 +146,7 @@ const PAGE_FORM_PROPS: Record<string, string[]> = {
 
 test("auth pages forward their props to their forms", () => {
   for (const [form, page] of Object.entries(FORM_PAGES)) {
-    const pageSource = read(`src/pages/${page}.tsx`);
+    const pageSource = read(`src/pages/eciperay/${page}.tsx`);
     const invocation = pageSource.match(new RegExp(String.raw`<${form}\b[\s\S]*?/>`));
     assert.ok(invocation, `${page} invokes ${form}`);
     for (const prop of PAGE_FORM_PROPS[page]) {

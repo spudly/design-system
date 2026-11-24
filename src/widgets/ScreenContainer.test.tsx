@@ -96,14 +96,14 @@ test("the default variant flexes on native so form shell pages bound their scrol
   // composing this way, or the scroll region stops flexing, this
   // test forces a re-check of the #676 mechanism.
   for (const page of ["EditRecipePage", "EditVersionPage", "ManualEntryPage"]) {
-    const pageCode = readCode(`src/pages/${page}.tsx`);
+    const pageCode = readCode(`src/pages/eciperay/${page}.tsx`);
     assert.match(
       pageCode,
       /<ScreenContainer>/,
       `${page} must render the default-variant ScreenContainer whose native flex bounds its form body (#676)`,
     );
   }
-  const recipeFormCode = readCode("src/pages/RecipeFormPage.tsx");
+  const recipeFormCode = readCode("src/pages/eciperay/RecipeFormPage.tsx");
   assert.match(
     recipeFormCode,
     /scrollMode="content"/,

@@ -2,7 +2,7 @@
 component: StepOverlay
 run_when:
   - "src/widgets/StepOverlay.tsx, its stories, MealCookingModePage, or a changeset naming StepOverlay."
-  - "src/pages/CookingModePage.tsx, its stories, src/widgets/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
+  - "src/pages/eciperay/CookingModePage.tsx, its stories, src/widgets/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
 ---
 
 # StepOverlay — manual test steps
@@ -64,6 +64,6 @@ FirstStep, LastStep.
 3. The progress dots track the step (second dot active in
    WithIngredientsPanel, first in FirstStep, third in LastStep).
 
-**Run when:** `src/pages/CookingModePage.tsx`, its stories,
+**Run when:** `src/pages/eciperay/CookingModePage.tsx`, its stories,
 `src/widgets/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
 or a changeset naming CookingModePage.

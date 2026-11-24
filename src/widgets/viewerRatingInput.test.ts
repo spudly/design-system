@@ -36,8 +36,8 @@ function readCode(rel: string) {
 }
 
 const pages = [
-  ["PublicRecipePage", "src/pages/PublicRecipePage.tsx"],
-  ["RecipeDetailPage", "src/pages/RecipeDetailPage.tsx"],
+  ["PublicRecipePage", "src/pages/eciperay/PublicRecipePage.tsx"],
+  ["RecipeDetailPage", "src/pages/eciperay/RecipeDetailPage.tsx"],
 ];
 
 for (const [name, rel] of pages) {

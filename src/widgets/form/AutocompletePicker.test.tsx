@@ -54,7 +54,7 @@ test("a failed search is its own state: searchError replaces the no-results mess
     /<Alert\s+severity="error"\s+message=\{searchError\}\s+accessibilityRole="none"\s+accessibilityLiveRegion="none"\s+\/>/,
     "the visible empty state renders the error inside an Alert, not the no-results hint (#460) — with the Alert's own live semantics fully off (no alert role, no live region), so the polite live region is the only announcement (an error Alert's assertive role would announce the same error twice)",
   );
-  for (const page of ["src/pages/MealFormPage.tsx", "src/pages/MealPlanFormPage.tsx"]) {
+  for (const page of ["src/pages/eciperay/MealFormPage.tsx", "src/pages/eciperay/MealPlanFormPage.tsx"]) {
     const source = codeOf(page);
     assert.match(source, /searchError\?: string \| null/, `${page} accepts searchError`);
     assert.match(
@@ -109,9 +109,9 @@ function loadRuntime() {
     const voiceFixtures: Record<string, any> = await import("../../../dist/voice/fixtures.js");
     const voiceModule: Record<string, any> = await import("../../../dist/voice/index.js");
     const { MealFormPage }: Record<string, any> =
-      await import("../../../dist/pages/MealFormPage.js");
+      await import("../../../dist/pages/eciperay/MealFormPage.js");
     const { MealPlanFormPage }: Record<string, any> =
-      await import("../../../dist/pages/MealPlanFormPage.js");
+      await import("../../../dist/pages/eciperay/MealPlanFormPage.js");
     return {
       React,
       renderToString,
@@ -484,8 +484,8 @@ describe("autocompletePickerReview", () => {
   });
   test("the meal form story hooks seed state from the story's initial values", () => {
     for (const rel of [
-      "src/pages/MealFormPage.stories.tsx",
-      "src/pages/MealPlanFormPage.stories.tsx",
+      "src/pages/eciperay/MealFormPage.stories.tsx",
+      "src/pages/eciperay/MealPlanFormPage.stories.tsx",
     ]) {
       const story = codeOf(rel);
       assert.ok(
@@ -505,10 +505,10 @@ describe("autocompletePickerReview", () => {
       );
       assert.match(story, /searchResults,/, `${rel} returns the derived results, not an override`);
     }
-    const mealFormStory = codeOf("src/pages/MealFormPage.stories.tsx");
+    const mealFormStory = codeOf("src/pages/eciperay/MealFormPage.stories.tsx");
     assert.match(mealFormStory, /selectedRecipes: initialSelectedRecipes/);
     assert.match(mealFormStory, /servingsByRecipeId: initialServingsByRecipeId/);
-    const mealPlanStory = codeOf("src/pages/MealPlanFormPage.stories.tsx");
+    const mealPlanStory = codeOf("src/pages/eciperay/MealPlanFormPage.stories.tsx");
     assert.match(mealPlanStory, /selectedEntries: initialSelectedEntries/);
     assert.match(mealPlanStory, /quantityByKey: initialQuantityByKey/);
   });

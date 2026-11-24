@@ -22,7 +22,7 @@
  * resulting story ids in CI.
  */
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
@@ -78,6 +78,12 @@ const demoCollections = [
 ];
 
 function readPagesFile(name: string) {
+  // #710: pages live under src/pages/<host-app>/ since the
+  // pages-by-host-app move; resolve by bare file name.
+  for (const host of ["eciperay", "memorize", "shared"]) {
+    const candidate = join(pagesDir, host, name);
+    if (existsSync(candidate)) return readFileSync(candidate, "utf8");
+  }
   return readFileSync(join(pagesDir, name), "utf8");
 }
 

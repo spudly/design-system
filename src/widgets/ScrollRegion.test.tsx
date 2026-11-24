@@ -91,9 +91,9 @@ function loadRuntime() {
       await import("../../dist/widgets/ScrollRegion.js");
     const { BigFooterShell }: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
     const { PublicRecipePage }: Record<string, any> =
-      await import("../../dist/pages/PublicRecipePage.js");
+      await import("../../dist/pages/eciperay/PublicRecipePage.js");
     const { eciperayFooterFixture }: Record<string, any> =
-      await import("../../dist/pages/fixtures.js");
+      await import("../../dist/pages/shared/fixtures.js");
     return {
       React,
       renderToString,

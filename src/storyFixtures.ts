@@ -1,7 +1,7 @@
 /**
  * Inline image fixtures for stories (issue #352).
  *
- * The page-fixture rules in src/pages/fixtures.ts keep story
+ * The page-fixture rules in src/pages/shared/fixtures.ts keep story
  * screenshots deterministic — no network, no clocks — and these
  * constants extend the same rule to stories that must render an
  * actual image (Thumbnail's cover-crop shapes, Avatar's image

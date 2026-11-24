@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { AccessTokensPanel } from "./AccessTokensPanel.js";
-import { accessTokensFixture } from "../pages/fixtures.js";
+import { accessTokensFixture } from "../pages/shared/fixtures.js";
 import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof AccessTokensPanel> = {

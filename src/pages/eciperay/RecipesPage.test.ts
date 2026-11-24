@@ -1,0 +1,1198 @@
+import assert from "node:assert/strict";
+import { existsSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { describe, test } from "node:test";
+import { fileURLToPath } from "node:url";
+
+describe("recipesPageAccessory", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pagesDir = join(here, "../../..", "src", "pages");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  // The MediaRow composition lives in the shared recipeRow.tsx
+  // (#657); slice it out so the placement pins run against it.
+  const rowSource =
+    readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8");
+  const mediaRow = rowSource.slice(
+    rowSource.indexOf("const textBlockStyle"),
+    rowSource.indexOf("const STAR_STEPS"),
+  );
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
+
+  // Strip block and line comments so documented patterns in prose
+  // cannot pass the scan.
+  const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  // The row wiring (hasAccessory gate, accessory pass-through)
+  // lives in the shared recipeRow.tsx (#657).
+  const rowCode = (
+    readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
+  )
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
+  test("the cook-log form prop is declared as data, not a render slot (#687)", () => {
+    assert.match(
+      code,
+      /cookLogForm\?: RecipesPageCookLogForm \| null;/,
+      "RecipesPageProps must declare cookLogForm?: RecipesPageCookLogForm | null",
+    );
+    assert.doesNotMatch(
+      code,
+      /renderRecipeAccessory/,
+      "the renderRecipeAccessory slot is removed (#687)",
+    );
+  });
+
+  test("the form renders once, under the row its recipeId names", () => {
+    assert.match(
+      code,
+      /cookLogForm && cookLogForm\.recipeId === item\.id/,
+      "renderItem must resolve the row's accessory from the cookLogForm data, defaulting to null",
+    );
+    assert.equal(
+      code.split("cookLogForm.recipeId === item.id").length - 1,
+      1,
+      "the form must render at exactly one row (a second call site could double-render the form)",
+    );
+    assert.match(
+      code,
+      /<RatingForm/,
+      "the accessory is the DS RatingForm, rendered by the page itself",
+    );
+  });
+
+  test("a row with accessory content hides its Log cook button; other rows keep it", () => {
+    assert.match(
+      rowCode,
+      /const hasAccessory = accessory !== null && accessory !== undefined;/,
+      "hasAccessory must be exactly the non-null/non-undefined check on the slot's return",
+    );
+    assert.match(
+      rowCode,
+      /onLogCookPress && !hasAccessory/,
+      "the row's onLogCookPress wiring must be withheld while its accessory renders",
+    );
+    assert.match(
+      rowCode,
+      /onLogCookPress\(item\.id\)/,
+      "when wired, the callback still fires with the row id, unchanged",
+    );
+  });
+
+  test("the accessory renders under the row's card, inside the list item", () => {
+    // Since the #119 recipes-list tranche the row is the page's
+    // page-local MediaRow composition: the page hands the
+    // accessory over only when it has content, and the under-card
+    // placement is the composition's own.
+    assert.match(
+      rowCode,
+      /accessory=\{hasAccessory \? accessory : undefined\}/,
+      "the page must pass the accessory to MediaRow only when it renders content",
+    );
+    const cardAt = mediaRow.indexOf("<Card variant=");
+    const accessoryAt = mediaRow.indexOf("{accessory}");
+    assert.ok(cardAt !== -1, "MediaRow must render its row card");
+    assert.ok(accessoryAt > cardAt, "the accessory must render after (under) the row's card");
+    assert.match(
+      mediaRow,
+      /\{accessory \? <YStack paddingBlockEnd="\$3">\{accessory\}<\/YStack> : null\}/,
+      "the accessory must render in the under-card YStack only when it has content",
+    );
+  });
+
+  test("a story exercises the form so Chromatic captures the expanded layout", () => {
+    assert.match(
+      stories,
+      /export const ExpandedAccessory/,
+      "RecipesPage.stories.tsx must export an ExpandedAccessory story",
+    );
+    assert.match(
+      stories,
+      /cookLogForm: \{/,
+      "the story must pass the cookLogForm data for the expanded row",
+    );
+  });
+});
+
+describe("recipesPageBoundedList", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pagesDir = join(here, "../../..", "src", "pages");
+  const code = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8")
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
+
+  test("RecipesPage renders the fixed list shell, non-scrolling", () => {
+    assert.match(
+      code,
+      /<ScreenContainer variant="list">/,
+      "RecipesPage must render ScreenContainer's list variant so the shell owns the fill",
+    );
+  });
+
+  test("RecipesPage adopts BoundedList with its separator and inset (#119)", () => {
+    assert.match(
+      code,
+      /import \{[\s\S]*?BoundedList[\s\S]*?\} from "\.\.\/shared\/BoundedList\.js";/,
+    );
+    assert.match(code, /<BoundedList/);
+    assert.match(
+      code,
+      /separator="none"/,
+      "the rows space themselves (MediaRow's own padded wrapper) — no list separator, exactly the pre-adoption structure",
+    );
+    assert.match(
+      code,
+      /contentInset="page"/,
+      "the page's 16px sides / 32px bottom inset is BoundedList's page inset",
+    );
+    assert.ok(
+      !code.includes("FlatList"),
+      "the page must not render its own list element — BoundedList owns it",
+    );
+    assert.ok(
+      !code.includes("listStyle"),
+      "the page must not carry the old listStyle constant — BoundedList owns the geometry",
+    );
+  });
+
+  test("the list takes separating taps while the keyboard is open", () => {
+    assert.match(
+      code,
+      /keyboardShouldPersistTaps="handled"/,
+      "filter controls live in the list header — taps must land with the keyboard open",
+    );
+  });
+
+  test("loading keeps the list mounted and shows skeleton rows as the section's own rows", () => {
+    // Since #415 the list's data is the unified row sequence: a
+    // section's loading flag swaps only that section's rows for
+    // its skeleton rows — the DATA is never emptied and the list
+    // never unmounts, so the focused filter input survives a
+    // filter edit mid-typing (the #188 rule, per-section now).
+    // Since #278 tranche 4 the rows are skeletons, not spinners.
+    assert.match(
+      code,
+      /data=\{rows\}/,
+      "the list takes the unified row sequence, never a loading-emptied array",
+    );
+    assert.match(
+      code,
+      /case "loadingOwn":\s*return <LoadingOwnRows \/>;/,
+      "the own section's skeleton rows render as that section's rows in the list",
+    );
+    assert.match(
+      code,
+      /case "loadingDiscovery":\s*return <LoadingDiscoveryRows variant="section" \/>;/,
+      "the discovery section's skeleton rows render as that section's rows in the list",
+    );
+    assert.match(
+      code,
+      /case "ownEmpty":/,
+      "the signed-in list has no list-level empty state — each section carries its own empty row (#415)",
+    );
+    assert.match(
+      code,
+      /ListHeaderComponent=\{filtersHeader\}/,
+      "the one filter bar renders as the native list's header, so it scrolls with the recipes (web renders it in page flow, #547)",
+    );
+    assert.match(
+      code,
+      /const filtersHeader = <CatalogRow>\{filtersBar\}<\/CatalogRow>;/,
+      "the bar's wrapper carries the $3 bottom separation, so the first section heading sits the list's 12px below the search bar in both layouts",
+    );
+  });
+
+  test("rows render through MediaRow, standalone (no list-item wrapper)", () => {
+    assert.match(code, /renderItem=\{\(\{ item: row \}\) => renderRow\(row\)\}/);
+    assert.match(code, /const renderRow = \(row: RecipesPageRow\) => \{/);
+    assert.match(code, /<RecipeRow/);
+    assert.ok(
+      !code.includes('role="listitem"'),
+      "rows must not be wrapped in a listitem element — each row is a standalone article",
+    );
+  });
+
+  test("the list stories pin the bounded geometry (#188)", () => {
+    // #668: page stories no longer carry a local Viewport frame — the
+    // Storybook preview decorator frames them from the dsViewport
+    // resolution (toolbar global, then the story's dsViewport
+    // parameter, then the default preset). #754: that default is now
+    // the responsive "full" preset, so stories without their own
+    // default frame present full-width instead of in a 430×844 phone
+    // frame; the phone preset's geometry below still applies when
+    // the phone frame is selected explicitly.
+    const preview = readFileSync(join(pagesDir, "../../.storybook/preview.tsx"), "utf8");
+    assert.match(
+      preview,
+      /context\.parameters\.dsViewport as string \| undefined\) \?\?\s+"full"/,
+      "the preview falls back through the story's dsViewport parameter to the full preset, presenting page stories full-width by default (#754)",
+    );
+    assert.match(
+      preview,
+      /: 430\n/,
+      "the preview's phone frame is 430 wide, bounding the list to a phone frame",
+    );
+    assert.match(
+      preview,
+      /viewport === "shortPhone" \? 430 : 844/,
+      "the preview's phone frame is 844 high, bounding the list to a phone-height frame",
+    );
+    assert.ok(
+      !stories.includes("width={430}"),
+      "the stories carry no local frame — the preview decorator owns the geometry (#668)",
+    );
+    assert.match(stories, /export const Default/);
+    assert.match(stories, /export const Empty/);
+    assert.match(stories, /export const Loading/);
+  });
+});
+
+describe("recipesPageCollapsedFilters", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pagesDir = join(here, "../../..", "src", "pages");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
+
+  const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
+  test("the collapsed-filter contract props are declared", () => {
+    assert.match(
+      code,
+      /export type RecipesPageFilterId = "status" \| "ingredient" \| "calories" \| "satiety" \| "sort";/,
+      "RecipesPageFilterId must enumerate the five addable filters",
+    );
+    assert.match(code, /CatalogPageFilterProps<RecipesPageFilterId>/);
+    const barSource = readFileSync(join(here, "../../../src/views/CatalogFiltersBar.tsx"), "utf8");
+    assert.match(barSource, /activeFilters\?: FilterId\[\];/);
+    assert.match(barSource, /onActiveFiltersChange\?: \(filters: FilterId\[\]\) => void;/);
+    assert.match(barSource, /filterChooserOpen\?: boolean;/);
+    assert.match(barSource, /onFilterChooserOpenChange\?: \(open: boolean\) => void;/);
+  });
+
+  test("the page renders the shared CatalogFiltersBar with its search copy", () => {
+    assert.match(code, /<CatalogFiltersBar/);
+    assert.match(code, /publicSearchPlaceholder : "Search recipes/);
+    assert.match(code, /filters=\{catalogFilters\}/);
+    assert.match(code, /\{\.\.\.\(activeFilters \? \{ activeFilters \} : \{\}\)\}/);
+    assert.match(code, /\{\.\.\.\(onActiveFiltersChange \? \{ onActiveFiltersChange \} : \{\}\)\}/);
+    assert.match(
+      code,
+      /\{\.\.\.\(filterChooserOpen !== undefined \? \{ filterChooserOpen \} : \{\}\)\}/,
+    );
+    assert.match(
+      code,
+      /\{\.\.\.\(onFilterChooserOpenChange \? \{ onFilterChooserOpenChange \} : \{\}\)\}/,
+    );
+  });
+
+  test("the page supplies its five filters as definitions, in chooser order", () => {
+    // Status: a select over the page's option set, defaulting to
+    // "all", joining only when the host wires it.
+    assert.match(
+      code,
+      /showStatusFilter !== false &&\s*statusFilter !== undefined &&\s*onStatusFilterChange !== undefined/,
+      "the status filter joins only when the host wires it (value + callback, not hidden)",
+    );
+    assert.match(code, /kind: "select",\s*id: "status",\s*label: "Status",/);
+    assert.match(code, /options: STATUS_OPTIONS,/);
+    assert.match(code, /defaultValue: "all",/);
+    // Ingredient: free text with the page's placeholder.
+    assert.match(code, /kind: "text",\s*id: "ingredient",\s*label: "Ingredient",/);
+    assert.match(code, /placeholder: "e\.g\. chicken",/);
+    assert.match(code, /defaultValue: "",/);
+    // Calories and satiety: one range filter each, min/max labels.
+    assert.match(code, /kind: "range",\s*id: "calories",\s*label: "Calories",/);
+    assert.match(code, /minLabel: "Min cal",\s*maxLabel: "Max cal",/);
+    assert.match(code, /kind: "range",\s*id: "satiety",\s*label: "Satiety",/);
+    assert.match(code, /minLabel: "Min satiety",\s*maxLabel: "Max satiety",/);
+    // Sort: the Sort by / Order pair with the page's defaults.
+    assert.match(code, /kind: "sort",\s*id: "sort",\s*label: "Sort",/);
+    assert.match(code, /sortLabel: "Sort by",/);
+    assert.match(code, /sortOptions: SORT_OPTIONS,/);
+    assert.match(code, /defaultSortValue: "newest",/);
+    assert.match(code, /dirLabel: "Order",/);
+    assert.match(code, /dirOptions: SORT_DIR_OPTIONS,/);
+    assert.match(code, /defaultDirValue: "desc",/);
+  });
+
+  test("the page carries no filter-bar implementation of its own (#119 dedupe)", () => {
+    for (const retired of [
+      "RecipesFiltersBar",
+      "NumberFilter",
+      "FILTER_LABELS",
+      "ALL_FILTER_IDS",
+    ]) {
+      assert.ok(
+        !code.includes(retired),
+        `${retired} was the in-page bar's machinery — the shared CatalogFiltersBar owns it now and it must not come back`,
+      );
+    }
+  });
+
+  test("stories cover the initial, chooser-open and filters-added states", () => {
+    assert.match(stories, /export const Default/);
+    assert.match(stories, /export const FilterChooserOpen/);
+    assert.match(stories, /export const WithFiltersAdded/);
+    assert.match(stories, /initialActiveFilters=\{\["status", "ingredient"\]\}/);
+    assert.match(stories, /activeFilters=\{activeFilters\}/);
+    assert.match(stories, /filterChooserOpen=\{filterChooserOpen\}/);
+  });
+});
+
+describe("recipesPageRowA11y", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const page = readFileSync(
+    join(here, "../../..", "src", "pages", "eciperay", "RecipesPage.tsx"),
+    "utf8",
+  )
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  // The MediaRow composition lives in the shared recipeRow.tsx
+  // (#657); slice it out so the row pins run against it alone.
+  const rowPage = (
+    readFileSync(join(here, "../../..", "src", "pages", "shared", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8")
+  )
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const mediaRow = rowPage.slice(
+    rowPage.indexOf("const textBlockStyle"),
+    rowPage.indexOf("const STAR_STEPS"),
+  );
+
+  function count(code: string, literal: any) {
+    return code.split(literal).length - 1;
+  }
+
+  test("both row links exist on both platforms, each carrying the row href", () => {
+    assert.equal(
+      count(mediaRow, 'accessibilityRole: "link"'),
+      2,
+      "the two web anchors declare the link role through the translator",
+    );
+    assert.equal(
+      count(mediaRow, 'accessibilityRole="link"'),
+      2,
+      "the two native LinkOverlays declare the link role directly",
+    );
+    assert.equal(
+      count(mediaRow, "href={href}"),
+      4,
+      "both web anchors and both native overlays carry the href",
+    );
+  });
+
+  test("the media link is named by the title; the text link composes title, subtitle and badge", () => {
+    assert.match(
+      mediaRow,
+      /const labelParts = \[title\];\s*if \(subtitle\) labelParts\.push\(subtitle\);\s*if \(badgeLabel\) labelParts\.push\(badgeLabel\);\s*const textLabel = labelParts\.join\(", "\);/,
+      "the text link's label composes title, subtitle, and the caller-supplied badge (#415) with the comma separator, in that order",
+    );
+    assert.equal(count(mediaRow, "accessibilityLabel: title"), 1, "the web media anchor's label");
+    assert.equal(
+      count(mediaRow, "accessibilityLabel={title}"),
+      1,
+      "the native media overlay's label",
+    );
+    assert.equal(
+      count(mediaRow, "accessibilityLabel: textLabel"),
+      1,
+      "the web text anchor's label",
+    );
+    assert.equal(
+      count(mediaRow, "accessibilityLabel={textLabel}"),
+      1,
+      "the native text overlay's label",
+    );
+  });
+
+  test("native hit testing falls through the decorative texts; the action keeps its presses", () => {
+    // Three pointer-transparent natives: the title text, the
+    // subtitle text, and the badge row (#415 — the badge is
+    // display-only, so its row falls through like the texts).
+    assert.equal(count(mediaRow, 'pointerEvents={native ? "none" : undefined}'), 3);
+    assert.equal(count(mediaRow, 'pointerEvents={native ? "box-none" : undefined}'), 1);
+  });
+
+  test("the row is never a pressable card; the only press target is the caller's subtitle action", () => {
+    assert.ok(!mediaRow.includes("onPress"), "MediaRow renders no press handler of its own");
+    assert.ok(!mediaRow.includes("<Button"), "MediaRow renders no button");
+    assert.ok(
+      !page.includes("TouchableOpacity"),
+      "the page renders no raw pressable — the log-cook control is RatingStars",
+    );
+  });
+
+  test("the page wires the row href and fields through unchanged", () => {
+    assert.match(rowPage, /<MediaRow\s+href=\{item\.href\}\s+title=\{item\.title\}/);
+    assert.match(rowPage, /subtitle=\{item\.subtitle\}/);
+    assert.match(rowPage, /imageUrl=\{item\.imageUrl\}/);
+  });
+});
+
+describe("recipesPageRowActions", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const code = readFileSync(
+    join(here, "../../..", "src", "pages", "eciperay", "RecipesPage.tsx"),
+    "utf8",
+  )
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  // The compositions live in the shared recipeRow.tsx (#657);
+  // slice them out so page-level code cannot satisfy the
+  // composition pins.
+  const rowCode = (
+    readFileSync(join(here, "../../..", "src", "pages", "shared", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8")
+  )
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const mediaRow = rowCode.slice(
+    rowCode.indexOf("const textBlockStyle"),
+    rowCode.indexOf("const STAR_STEPS"),
+  );
+  const ratingStars = rowCode.slice(rowCode.indexOf("const STAR_STEPS"));
+  const stories = readFileSync(
+    join(here, "../../..", "src", "pages", "eciperay", "RecipesPage.stories.tsx"),
+    "utf8",
+  );
+
+  test("the log-cook callback is optional and keyed by recipe id", () => {
+    assert.match(code, /onLogCookPress\?: \(recipeId: string\) => void;/);
+    assert.match(rowCode, /onLogCookPress\(item\.id\)/);
+  });
+
+  test("there is no delete affordance on the list", () => {
+    assert.ok(!code.includes("onDelete"), "RecipesPage must not expose a delete callback");
+    assert.ok(!code.includes("Delete"), "RecipesPage rows render no delete control");
+  });
+
+  test("rows place the RatingStars control in the subtitle flow, rated names carrying the rating", () => {
+    const dollar = String.raw`\$`;
+    assert.match(rowCode, /<RatingStars/);
+    assert.match(
+      rowCode,
+      new RegExp(
+        `\`Log a cook of ${dollar}{item\\.title}, rated ${dollar}{item\\.rating} out of 5 stars\``,
+      ),
+      "the rated control's name must carry the rating — the stars alone would mislead a screen reader",
+    );
+    assert.match(
+      rowCode,
+      new RegExp(`\`Log a cook of ${dollar}{item\\.title}\``),
+      "the unrated control's name is just the action and the title",
+    );
+    assert.match(
+      rowCode,
+      /subtitleAction=\{/,
+      "the control renders through MediaRow's subtitleAction slot",
+    );
+    assert.match(
+      mediaRow,
+      /flexWrap="wrap"\s+alignItems="center"\s+gap="\$1"\s+paddingTop="\$1"/,
+      "MediaRow's subtitle flow is a wrapping inline row — the action sits in the subtitle's flow",
+    );
+    assert.match(mediaRow, /\{subtitleAction\}/);
+  });
+
+  test("RatingStars fills by rounding, in the DS star colors", () => {
+    assert.match(
+      ratingStars,
+      /Math\.min\(5, Math\.max\(1, Math\.round\(rating\)\)\)/,
+      "display averages fill by rounding to whole stars, clamped to 1–5",
+    );
+    assert.match(ratingStars, /tokens\.colors\.warning\.warning6/);
+    assert.match(ratingStars, /tokens\.colors\.gray\.gray4/);
+    assert.equal(
+      ratingStars.split("★").length - 1,
+      2,
+      "two glyph literals: the star row's and the unrated button's single star",
+    );
+  });
+
+  test("the pressable form cancels the click default before firing (the row's links must not also navigate)", () => {
+    assert.match(ratingStars, /event\.preventDefault\(\);\s*onPress\(\);/);
+    assert.match(ratingStars, /accessibilityRole: "button"/);
+    assert.match(
+      ratingStars,
+      /if \(!props\.onPress\) \{\s*return <RatingStarRow rating=\{props\.rating\} \/>;/,
+      "without onPress the stars are a static display, never a button",
+    );
+  });
+
+  test("a per-item canLogCook opt-out suppresses the control (#518)", () => {
+    assert.match(
+      rowCode,
+      /canLogCook\?: boolean;/,
+      "RecipesPageItem carries the optional canLogCook capability field",
+    );
+    assert.match(
+      rowCode,
+      /onLogCookPress && !hasAccessory && item\.canLogCook !== false \? \(/,
+      "the subtitleAction gate omits the control when canLogCook is false, in both rated and unrated states (the one render site)",
+    );
+    const gate = rowCode.slice(rowCode.indexOf("subtitleAction={"), rowCode.indexOf("accessory={"));
+    assert.ok(
+      !gate.includes("badgeLabel"),
+      "suppression is decoupled from badgeLabel — the badge is a display marker, not a capability",
+    );
+  });
+
+  test("the stories suppress the control on the shared (badged) rows only", () => {
+    assert.equal(
+      stories.split("canLogCook: false").length - 1,
+      2,
+      "both shared-with-me fixture rows opt out of the log-cook control",
+    );
+    assert.match(stories, /badgeLabel: "Shared with you",\s+canLogCook: false,/);
+  });
+
+  test("the stories exercise the control across rated and unrated rows", () => {
+    assert.match(stories, /onLogCookPress/);
+    assert.match(stories, /rating: 5/);
+    assert.match(stories, /rating: 4\.5/);
+    assert.match(
+      stories,
+      /unrated rows \(Arroz con Pollo, Beef Chili\)/,
+      "the fixture's unrated rows (rating omitted) render the icon-only button",
+    );
+  });
+});
+
+describe("recipesPageSharedConfig", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pagesDir = join(here, "../../..", "src", "pages");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
+  const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
+
+  // Strip block and line comments so documented patterns in prose
+  // cannot pass the scan.
+  const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  // The shared row item and row live in recipeRow.tsx (#657).
+  const rowCode = (
+    readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
+  )
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
+  test("SharedWithMePage is retired: no file, no stories, no export (#185)", () => {
+    assert.ok(
+      !existsSync(join(pagesDir, "SharedWithMePage.tsx")),
+      "SharedWithMePage.tsx must not exist — RecipesPage is the single recipes browse page",
+    );
+    assert.ok(
+      !existsSync(join(pagesDir, "SharedWithMePage.stories.tsx")),
+      "SharedWithMePage.stories.tsx must not exist — shared-with-me lives in RecipesPage.stories.tsx",
+    );
+    assert.ok(
+      !index.includes("SharedWithMePage"),
+      "src/pages/index.ts must not export SharedWithMePage (#185)",
+    );
+  });
+
+  test("there is no shared section: the row model is own + discovery only (#415)", () => {
+    assert.ok(
+      !code.includes('"shared'),
+      "the row model must not grow a shared row kind — shared items are own-section items with a badge",
+    );
+    assert.ok(
+      !stories.includes("SharedRecipesPageDemo"),
+      "the #185 shared-configuration demo is retired — one demo drives the unified page",
+    );
+    for (const retired of ["SharedDefault", "SharedFiltered", "SharedEmpty", "SharedLoading"]) {
+      assert.ok(
+        !new RegExp(String.raw`export const ${retired}\b`).test(stories),
+        `the ${retired} story belonged to the retired shared configuration and must not return`,
+      );
+    }
+  });
+
+  test("shared items are own-section items carrying the caller-supplied badge", () => {
+    assert.match(
+      rowCode,
+      /badgeLabel\?: string;/,
+      "RecipesPageItem must declare the caller-supplied badgeLabel shared items carry",
+    );
+    assert.match(
+      rowCode,
+      /badgeLabel=\{item\.badgeLabel\}/,
+      "own rows must pass the item's badge through to the row",
+    );
+    const badged = (stories.match(/badgeLabel: "Shared with you"/g) ?? []).length;
+    assert.ok(
+      badged >= 2,
+      `the stories must mark at least two own items as shared — found ${badged}`,
+    );
+  });
+
+  test("the own empty state is per-host copy props with the Recipes default unchanged", () => {
+    assert.match(code, /ownEmptyTitle\?: string;/, "RecipesPageProps must declare ownEmptyTitle");
+    assert.match(code, /ownEmptyBody\?: string;/, "RecipesPageProps must declare ownEmptyBody");
+    assert.match(
+      code,
+      /ownEmptyTitle = "No recipes found\."/,
+      'the default own empty title must stay the Recipes screen\'s "No recipes found."',
+    );
+    assert.match(
+      code,
+      /title=\{ownEmptyTitle\}/,
+      "the own empty row must render the ownEmptyTitle prop, not a hardcoded title",
+    );
+  });
+
+  test("every story item carries its href — shared rows navigate by permalink (#248)", () => {
+    assert.ok(
+      !code.includes("onRecipePress"),
+      "RecipesPage must not declare a row press callback at all (#248)",
+    );
+    const hrefCount =
+      (stories.match(/href: "\/recipes\//g) ?? []).length +
+      (stories.match(/href: "\/recipe\//g) ?? []).length;
+    assert.ok(
+      hrefCount >= 12,
+      `every story item (own + discovery) must carry its href — found ${hrefCount}`,
+    );
+  });
+});
+
+describe("recipesPageUnified", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pagesDir = join(here, "../../..", "src", "pages");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
+  const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
+
+  // Strip block and line comments so documented patterns in prose
+  // cannot pass the scan.
+  const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  // The MediaRow composition lives in the shared recipeRow.tsx
+  // (#657); slice it out so the badge pins run against it.
+  const rowCode = (
+    readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
+  )
+    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
+    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const mediaRow = rowCode.slice(
+    rowCode.indexOf("const textBlockStyle"),
+    rowCode.indexOf("const STAR_STEPS"),
+  );
+
+  function count(haystack: string, literal: string) {
+    return haystack.split(literal).length - 1;
+  }
+
+  test("the contract is sectioned: caller-supplied titles, data, and per-section states", () => {
+    assert.match(code, /ownTitle\?: string;/, "the own section's title is caller-supplied");
+    assert.match(code, /ownRecipes\?: RecipesPageItem\[\];/);
+    assert.match(code, /loadingOwn\?: boolean;/);
+    assert.match(code, /ownErrorMessage\?: string \| null;/);
+    assert.match(code, /ownEmptyTitle\?: string;/);
+    assert.match(code, /ownEmptyBody\?: string;/);
+    assert.match(
+      code,
+      /discoveryTitle\?: string;/,
+      "the discovery section's title is caller-supplied",
+    );
+    assert.match(code, /discoveryRecipes\?: RecipesPageDiscoveryItem\[\];/);
+    assert.match(code, /loadingDiscovery\?: boolean;/);
+    assert.match(code, /discoveryErrorMessage\?: string \| null;/);
+    assert.match(code, /discoveryEmptyTitle\?: string;/);
+    assert.match(code, /discoveryEmptyBody\?: string;/);
+    assert.match(
+      code,
+      /ownEmptyTitle = "No recipes found\."/,
+      "the own empty title keeps the Recipes screen's default copy",
+    );
+    assert.match(
+      code,
+      /discoveryEmptyTitle = "No public recipes match your search\."/,
+      "the discovery empty title keeps the public catalog's default copy",
+    );
+    // The old single-list contract is gone — the replacement is
+    // what makes this a major changeset.
+    assert.ok(
+      !/^\s+recipes: RecipesPageItem\[\];/m.test(code),
+      "the old `recipes` prop must not return",
+    );
+    // #547: `loading` returns ONLY as the public variant's
+    // first-load flag (the former DiscoverPage contract), never
+    // as the signed-in contract's single-list loading prop.
+    assert.match(
+      code,
+      /loading\?: boolean;/,
+      "public mode carries the former DiscoverPage loading flag (#547)",
+    );
+    assert.ok(
+      !/^\s+emptyTitle\?: string;/m.test(code),
+      "the old `emptyTitle` prop must not return",
+    );
+  });
+
+  test("the discovery section is host-optional (#512): omitted props produce no discovery rows and inert pagination", () => {
+    // Presence is keyed off discoveryRecipes being supplied.
+    assert.match(code, /const hasDiscovery = discoveryRecipes !== undefined;/);
+    // Every discovery row is built only inside the presence guard.
+    const guardAt = code.indexOf("if (discoveryRecipes !== undefined) {");
+    const headingAt = code.indexOf(
+      'rows.push({ kind: "discoveryHeading", title: discoveryTitle });',
+    );
+    const emptyAt = code.indexOf('rows.push({ kind: "discoveryEmpty" });');
+    assert.ok(
+      guardAt !== -1 && headingAt > guardAt,
+      "the discovery heading is built only when the section is supplied",
+    );
+    assert.ok(
+      emptyAt > guardAt,
+      "the discovery empty row is built only when the section is supplied",
+    );
+    // The heading itself renders only when the host supplies a title.
+    assert.match(
+      code,
+      /if \(discoveryTitle\) \{\s*rows\.push\(\{ kind: "discoveryHeading", title: discoveryTitle \}\);/,
+    );
+    // Pagination stays inert when the section is absent.
+    assert.match(
+      code,
+      /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,/,
+    );
+    assert.match(
+      code,
+      /hasDiscovery &&\s*!loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage/,
+    );
+    // The OwnOnly story proves the omission path: it passes no discovery props.
+    assert.match(
+      stories,
+      /export const OwnOnly: Story = \{\s*\/\/[^\n]*\n(?:\s*\/\/[^\n]*\n)*\s*render: \(\) => <RecipesPageDemo omitDiscovery \/>/,
+    );
+  });
+
+  test("one row sequence: the own section precedes the discovery section in the one list", () => {
+    assert.match(code, /const rows: RecipesPageRow\[\] = \[\{ kind: "ownHeading" \}\];/);
+    const ownAt = code.indexOf('rows.push({ kind: "ownRecipe", item });');
+    const discoveryHeadingAt = code.indexOf(
+      'rows.push({ kind: "discoveryHeading", title: discoveryTitle });',
+    );
+    const discoveryAt = code.indexOf('rows.push({ kind: "discoveryRecipe", item });');
+    assert.ok(
+      ownAt !== -1 && discoveryHeadingAt > ownAt,
+      "own rows are built before the discovery heading",
+    );
+    assert.ok(discoveryAt > discoveryHeadingAt, "discovery rows follow their heading");
+    assert.equal(
+      count(code, "<BoundedList"),
+      2,
+      "one BoundedList per native mode (signed-in and public, #547) — web renders whole-page flow with no list at all",
+    );
+    assert.match(code, /data=\{rows\}/, "the one list takes the unified row sequence");
+    assert.match(code, /<SectionHeading>\{ownTitle\}<\/SectionHeading>/);
+    assert.match(code, /<SectionHeading>\{row\.title\}<\/SectionHeading>/);
+  });
+
+  test("recipe row keys live in their own namespace, never colliding with heading/state keys", () => {
+    // A recipe id like "heading", "loading", "error" or "empty" must
+    // not produce the section heading's or a state row's key.
+    assert.match(code, /return `own-recipe-\$\{row\.item\.id\}`;/);
+    assert.match(code, /return `discovery-recipe-\$\{row\.item\.id\}`;/);
+    assert.ok(
+      !code.includes("return `own-${row.item.id}`;"),
+      "bare own- recipe keys collide with own-heading/own-loading/own-error/own-empty",
+    );
+    assert.ok(
+      !code.includes("return `discovery-${row.item.id}`;"),
+      "bare discovery- recipe keys collide with the discovery heading/state keys",
+    );
+  });
+
+  test("exactly one search/filter bar covers the unified collection", () => {
+    assert.equal(
+      count(code, "<CatalogFiltersBar"),
+      1,
+      "exactly one CatalogFiltersBar may render — a second bar is the two-surface problem #415 removes",
+    );
+    assert.equal(
+      count(code, "CatalogFiltersBar"),
+      3,
+      "the name appears only as the import, its module path, and the one render — no second bar composition",
+    );
+    assert.match(
+      code,
+      /export type RecipesPageFilterId = "status" \| "ingredient" \| "calories" \| "satiety" \| "sort";/,
+      "the filter-id set is the one both predecessor pages shared",
+    );
+    assert.match(code, /publicSearchPlaceholder : "Search recipes/);
+  });
+
+  test("shared items carry their caller-supplied badge inside the own section", () => {
+    assert.match(
+      rowCode,
+      /badgeLabel\?: string;/,
+      "RecipesPageItem must declare the caller-supplied badgeLabel",
+    );
+    assert.match(
+      rowCode,
+      /badgeLabel=\{item\.badgeLabel\}/,
+      "own rows pass the item's badge to MediaRow",
+    );
+    assert.match(
+      mediaRow,
+      /badgeLabel\?: string \| undefined;/,
+      "MediaRow must declare the badge prop",
+    );
+    assert.match(
+      mediaRow,
+      /<Badge tone="info">\{badgeLabel\}<\/Badge>/,
+      "the badge renders through the shared Badge component",
+    );
+    assert.match(
+      mediaRow,
+      /if \(badgeLabel\) labelParts\.push\(badgeLabel\);/,
+      "the badge joins the row's accessible name — it is announced, not decoration",
+    );
+    assert.match(
+      stories,
+      /badgeLabel: "Shared with you"/,
+      "the stories mark shared items with the caller-supplied badge",
+    );
+  });
+
+  test("section states are independent: each section's state keys off its own props only", () => {
+    // The own section's state chain reads only own props, in
+    // loading → error → empty → rows order.
+    assert.match(
+      code,
+      /if \(loadingOwn\) \{\s*rows\.push\(\{ kind: "loadingOwn" \}\);\s*\} else if \(ownErrorMessage\) \{\s*rows\.push\(\{ kind: "ownError", message: ownErrorMessage \}\);\s*\} else if \(ownRecipes\.length === 0\) \{\s*rows\.push\(\{ kind: "ownEmpty" \}\);/,
+      "the own section's state chain must key off the own props only",
+    );
+    assert.match(
+      code,
+      /if \(loadingDiscovery\) \{\s*rows\.push\(\{ kind: "loadingDiscovery" \}\);\s*\} else if \(discoveryErrorMessage\) \{\s*rows\.push\(\{ kind: "discoveryError", message: discoveryErrorMessage \}\);\s*\} else if \(discoveryRecipes\.length === 0\) \{\s*rows\.push\(\{ kind: "discoveryEmpty" \}\);/,
+      "the discovery section's state chain must key off the discovery props only",
+    );
+    // Each state renders as its own section's row.
+    assert.match(
+      code,
+      /case "ownError":\s*return <Alert severity="error">\{row\.message\}<\/Alert>;/,
+    );
+    assert.match(
+      code,
+      /case "discoveryError":\s*return <Alert severity="error">\{row\.message\}<\/Alert>;/,
+    );
+    assert.match(code, /case "ownEmpty":/);
+    assert.match(
+      code,
+      /title=\{ownEmptyTitle\}/,
+      "the own empty row carries the caller's own copy",
+    );
+    assert.match(code, /case "discoveryEmpty":/);
+    assert.match(
+      code,
+      /title=\{discoveryEmptyTitle\}/,
+      "the discovery empty row carries the caller's discovery copy",
+    );
+    assert.equal(
+      count(code, "<Spinner"),
+      0,
+      "no spinner renders (#278 tranche 4): every loading state — the two sections' loading rows, the own load-more row, the native loading-more footer, the web loading-more row, and the public mode's web/native loading + loading-more states — renders skeleton rows",
+    );
+  });
+
+  test("discovery rows are permalink DiscoveryCards; the view-model is DiscoverPage's item", () => {
+    assert.match(
+      code,
+      /export type RecipesPageDiscoveryItem = DiscoverPageItem;/,
+      "the discovery view-model reuses DiscoverPage's item type so the public rows cannot drift",
+    );
+    assert.match(code, /import type \{ DiscoverPageItem \} from "\.\/DiscoverPage\.js";/);
+    assert.match(code, /<DiscoveryCard/);
+    assert.match(code, /href=\{item\.href\}/, "discovery cards carry the host-built permalink");
+    assert.ok(!code.includes("onRecipePress"), "no press callback may replace the permalink");
+  });
+
+  test("discovery pagination is decoupled: its gate reads discovery state only (#559)", () => {
+    assert.match(
+      code,
+      /itemCount: discoveryRecipes !== undefined \? discoveryRecipes\.length : 0,\s*canPaginate:\s*hasDiscovery &&\s*!loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,/,
+      "the shared pattern counts discovery rows and gates on the discovery first load + the discovery errors — and on the section being supplied at all (#512) — never on the own section's state (#559)",
+    );
+  });
+
+  test("DiscoverPage is the public-variant compatibility wrapper and both pages stay exported (#547 merge)", () => {
+    assert.match(index, /export \{\s*DiscoverPage,/);
+    assert.match(index, /type RecipesPageDiscoveryItem,/);
+    assert.match(index, /export \{\s*RecipesPage,/);
+  });
+
+  test("stories cover the unified states", () => {
+    for (const story of [
+      "Default",
+      "OwnOnly",
+      "DiscoveryOnly",
+      "Empty",
+      "Loading",
+      "DiscoveryError",
+    ]) {
+      assert.ok(
+        new RegExp(String.raw`export const ${story}\b`).test(stories),
+        `RecipesPage.stories.tsx must export a ${story} story`,
+      );
+    }
+    assert.match(stories, /ownTitle="Your recipes"/, "the demo supplies the own section's title");
+    assert.match(
+      stories,
+      /discoveryTitle: "Discover"/,
+      "the demo supplies the discovery section's title (spread in unless the story omits the section, #512)",
+    );
+    // The demo's one search filters both sections — the honest
+    // stand-in for the app's unified server-side filtering.
+    assert.match(stories, /const visibleOwn = ownRecipes\.filter\(/);
+    assert.match(stories, /const visibleDiscovery = discoveryRecipes\.filter\(/);
+  });
+});
+
+describe("recipesPageDecoupledPagination", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const pagesDir = join(here, "../../..", "src", "pages");
+  const source = readFileSync(join(pagesDir, "eciperay", "RecipesPage.tsx"), "utf8");
+  const stories = readFileSync(join(pagesDir, "eciperay", "RecipesPage.stories.tsx"), "utf8");
+
+  // Strip block and line comments so documented patterns in prose
+  // cannot pass the scan.
+  const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
+  test("the new props mirror the own-section load-more trio (#559)", () => {
+    assert.match(code, /onOwnLoadMore\?: \(\) => void;/, "the own continuation prop");
+    assert.match(
+      code,
+      /discoveryLoadMoreErrorMessage\?: string \| null;/,
+      "the discovery load-more error prop",
+    );
+    assert.match(code, /onDiscoveryLoadMoreRetry\?: \(\) => void;/, "the discovery retry prop");
+    assert.match(code, /discoveryLoadMoreRetryLabel\?: string;/, "the discovery retry label prop");
+    assert.match(
+      code,
+      /discoveryLoadMoreRetryLabel = "Try again",/,
+      'the discovery retry label defaults to "Try again", mirroring ownLoadMoreRetryLabel',
+    );
+    // The own trio the new props mirror is unchanged.
+    assert.match(code, /ownLoadMoreErrorMessage\?: string \| null;/);
+    assert.match(code, /onOwnLoadMoreRetry\?: \(\) => void;/);
+    assert.match(code, /ownLoadMoreRetryLabel\?: string;/);
+  });
+
+  test("the own section runs its own pagination instance, gated on own state only", () => {
+    // Semantic checks (loosened from an exact call-shape pin,
+    // PR #563 review): the own instance must use the own
+    // continuation and fetch signal, count own rows, and gate
+    // on the own section's terms only — formatting may vary.
+    const ownBlock = code.slice(
+      code.indexOf("const ownPagination"),
+      code.indexOf("const handleListEndReached"),
+    );
+    assert.ok(ownBlock.length > 0, "the own pagination instance exists");
+    assert.match(ownBlock, /useCatalogPagination\(/);
+    assert.match(ownBlock, /onOwnLoadMore/, "the own continuation");
+    assert.match(ownBlock, /isFetchingNextOwnPage/, "the own fetch signal");
+    assert.match(ownBlock, /ownRecipes\.length/, "the own row count");
+    for (const gate of ["!loadingOwn", "!ownErrorMessage", "!ownLoadMoreErrorMessage"]) {
+      assert.ok(ownBlock.includes(gate), `the own gate includes ${gate}`);
+    }
+    assert.ok(
+      !ownBlock.includes("loadingDiscovery") &&
+        !ownBlock.includes("discoveryErrorMessage") &&
+        !ownBlock.includes("discoveryLoadMoreErrorMessage"),
+      "the own gate must not couple to the discovery section's state (#559)",
+    );
+  });
+
+  test("the discovery instance's gate never reads own state", () => {
+    const discoveryGate = code.slice(
+      code.lastIndexOf("const {", code.indexOf("onLayout: discoveryLayout")),
+      code.indexOf("const ownPagination"),
+    );
+    assert.match(
+      discoveryGate,
+      /canPaginate:\s*hasDiscovery &&\s*!loadingDiscovery && !discoveryErrorMessage && !discoveryLoadMoreErrorMessage,/,
+    );
+    assert.ok(
+      !discoveryGate.includes("loadingOwn") && !discoveryGate.includes("ownErrorMessage"),
+      "the discovery gate must not couple to the own section's loading or error state (#559)",
+    );
+  });
+
+  test("the list and sentinel handlers fan out to both instances", () => {
+    assert.match(
+      code,
+      /const handleListEndReached = \(\) => \{\s*onEndReached\?\.\(\);\s*ownPagination\.onEndReached\?\.\(\);\s*\};/,
+      "the combined end-reached handler calls both instances, so each applies its own gate and latch",
+    );
+    assert.match(
+      code,
+      /const handleListScroll = \(event: Parameters<typeof onScroll>\[0\]\) => \{\s*onScroll\(event\);\s*ownPagination\.onScroll\(event\);\s*\};/,
+      "the combined scroll handler keeps both instances' end latches current",
+    );
+    assert.match(
+      code,
+      /onEndReached=\{handleListEndReached\}/,
+      "the native list uses the combined handler",
+    );
+    assert.match(
+      code,
+      /onScroll=\{handleListScroll\}/,
+      "the native list uses the combined scroll handler",
+    );
+    // #570: the list's layout signals fan out to both instances
+    // so each instance's initial-fire guard sees its lengths.
+    assert.match(
+      code,
+      /const handleListLayout = \(event: LayoutChangeEvent\) => \{\s*discoveryLayout\(event\);\s*ownPagination\.onLayout\(event\);\s*\};/,
+    );
+    assert.match(
+      code,
+      /const handleListContentSizeChange = \(width: number, height: number\) => \{\s*discoveryContentSizeChange\(width, height\);\s*ownPagination\.onContentSizeChange\(width, height\);\s*\};/,
+    );
+    assert.match(code, /onLayout=\{handleListLayout\}/);
+    assert.match(code, /onContentSizeChange=\{handleListContentSizeChange\}/);
+    assert.match(code, /onLayout=\{publicPagination\.onLayout\}/);
+    assert.match(code, /onContentSizeChange=\{publicPagination\.onContentSizeChange\}/);
+    // The web sentinel takes per-section wiring (#559, PR #563
+    // review): each section's own handler and fetching flag, so
+    // availability and dedup are tracked per section — never a
+    // single combined handler or combined fetching flag.
+    const signedInStart = code.lastIndexOf("<WebScrollSentinel");
+    const signedInSentinel = code.slice(signedInStart, code.indexOf("/>", signedInStart));
+    assert.match(signedInSentinel, /sections=\{\[/, "the sentinel takes a sections list");
+    assert.match(
+      signedInSentinel,
+      /onVisible: onEndReached,\s*isFetchingNextPage/,
+      "the discovery section passes its own handler and fetching flag",
+    );
+    assert.match(
+      signedInSentinel,
+      /onVisible: ownPagination\.onEndReached,\s*isFetchingNextPage: isFetchingNextOwnPage/,
+      "the own section passes its own handler and fetching flag",
+    );
+    assert.ok(
+      !signedInSentinel.includes("handleListEndReached") &&
+        !signedInSentinel.includes("isFetchingNextPage || isFetchingNextOwnPage"),
+      "the web sentinel must not use the combined handler or a combined fetching flag (#559)",
+    );
+  });
+
+  test("the discovery load-more error is a row after the discovery rows, winning over the loading-more footer", () => {
+    assert.match(code, /\| \{ kind: "discoveryLoadMoreError"; message: string \}/);
+    assert.match(code, /case "discoveryLoadMoreError":\s*return "discovery-load-more-error";/);
+    const recipeAt = code.indexOf('rows.push({ kind: "discoveryRecipe", item });');
+    const errorAt = code.indexOf(
+      'rows.push({ kind: "discoveryLoadMoreError", message: discoveryLoadMoreErrorMessage });',
+    );
+    assert.ok(
+      recipeAt !== -1 && errorAt > recipeAt,
+      "the error row is pushed after the discovery recipe rows",
+    );
+    assert.match(
+      code,
+      /if \(discoveryLoadMoreErrorMessage\) \{\s*rows\.push\(\{ kind: "discoveryLoadMoreError", message: discoveryLoadMoreErrorMessage \}\);/,
+    );
+    // The loading-more footer (native list footer and web row)
+    // is suppressed while the error shows — the error wins,
+    // exactly as ownLoadMoreError wins over loadingOwnMore.
+    assert.equal(
+      code.split("isFetchingNextPage && !discoveryLoadMoreErrorMessage").length - 1,
+      2,
+      "both signed-in loading-more footers (native and web) yield to the discovery load-more error",
+    );
+  });
+
+  test("the discovery error row renders with the own row's retry-action treatment", () => {
+    // Semantic checks (loosened from an exact Alert JSX pin,
+    // PR #563 review): the row kind must render an error Alert
+    // carrying its message and the discovery retry wiring —
+    // formatting and spread/ternary shape may vary.
+    const discoveryStart = code.indexOf(
+      'case "discoveryLoadMoreError":',
+      code.indexOf("const renderRow"),
+    );
+    const discoveryRow = code.slice(
+      discoveryStart,
+      code.indexOf('case "loadingDiscovery":', discoveryStart),
+    );
+    assert.ok(discoveryRow.length > 0, "the discovery load-more error row exists");
+    assert.match(discoveryRow, /<Alert/, "the row renders an Alert");
+    assert.match(discoveryRow, /severity="error"/, "the row is an error Alert");
+    assert.match(discoveryRow, /row\.message/, "the row carries its message");
+    assert.match(discoveryRow, /onDiscoveryLoadMoreRetry/, "the retry intent is wired");
+    assert.match(discoveryRow, /discoveryLoadMoreRetryLabel/, "the retry label is wired");
+    assert.match(discoveryRow, /actions:/, "the retry is offered as an Alert action");
+    const ownStart = code.indexOf('case "ownLoadMoreError":', code.indexOf("const renderRow"));
+    const ownRow = code.slice(ownStart, code.indexOf('case "discoveryHeading":', ownStart));
+    assert.match(ownRow, /<Alert/, "the own row it mirrors renders an Alert");
+    assert.match(ownRow, /row\.message/, "the own row carries its message");
+  });
+
+  test("the web sentinel tracks availability and dedup per section (#559)", () => {
+    assert.match(code, /type WebScrollSentinelSection = \{/, "the sentinel's section type exists");
+    assert.match(
+      code,
+      /function WebScrollSentinel\(\{ sections \}: \{ sections: WebScrollSentinelSection\[\] \}\)/,
+      "the sentinel takes per-section handlers instead of a single combined handler",
+    );
+    assert.match(
+      code,
+      /const requestedRefs = useRef<boolean\[\]>\(\[\]\);/,
+      "one dedup latch per section",
+    );
+    assert.match(code, /const fireSection = \(index: number\) => \{/);
+    assert.match(
+      code,
+      /requestedRefs\.current\[index\] = false;/,
+      "a fetching change clears only that section's latch",
+    );
+    assert.match(code, /const prevAvailableRefs = useRef<boolean\[\]>\(/);
+    assert.match(code, /const prevFetchingRefs = useRef<boolean\[\]>\(/);
+    assert.match(
+      code,
+      /if \(\s*\(fetchingChanged \|\| availableChanged\) &&\s*visibleRef\.current &&\s*hasScrolledRef\.current\s*\) \{\s*fireSection\(index\);/,
+      "the recheck fires only the section whose availability or fetching changed, and only after a real scroll (#570)",
+    );
+    // #570: the sentinel's sections carry each hook's scroll
+    // signal, and mount-time visibility alone never fires.
+    assert.match(code, /onScrollSignal\?: \(\(\) => void\) \| undefined;/);
+    assert.match(code, /const hasScrolledRef = useRef\(false\);/);
+    assert.match(code, /onScrollSignal: ownPagination\.onScrollSignal,/);
+    // The public variant keeps single-catalog behavior through
+    // the same mechanism with one section.
+    assert.match(
+      code,
+      /onVisible: publicPagination\.onEndReached,\s*isFetchingNextPage/,
+      "the public variant passes its single section to the sentinel",
+    );
+  });
+
+  test("stories cover the discovery load-more error and own pagination during a discovery error", () => {
+    assert.match(stories, /export const DiscoveryLoadMoreError/);
+    assert.match(stories, /discoveryLoadMoreErrorMessage="We couldn't load more public recipes\./);
+    assert.match(stories, /onDiscoveryLoadMoreRetry=\{\(\) => undefined\}/);
+    assert.match(stories, /export const OwnLoadMoreWhileDiscoveryError/);
+    assert.match(
+      stories,
+      /paginateOwn\s+discoveryRecipes=\{\[\]\}\s+discoveryErrorMessage=/,
+      "the own-pagination story runs while discovery carries its first-page error",
+    );
+    assert.match(
+      stories,
+      /onOwnLoadMore: handleOwnLoadMore/,
+      "the demo wires its own continuation only when a story asks for own pagination",
+    );
+  });
+});

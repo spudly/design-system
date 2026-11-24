@@ -35,7 +35,7 @@ import {
 } from "./storyGraph.mjs";
 
 // The story file's exact base name ("RecipesPage" for
-// src/pages/RecipesPage.stories.tsx) — the prefix of every
+// src/pages/eciperay/RecipesPage.stories.tsx) — the prefix of every
 // baseline file that captures one of its stories.
 export function storyFileBase(file) {
   return basename(file).replace(/\.stories\.(?:ts|tsx|js|jsx)$/, "");

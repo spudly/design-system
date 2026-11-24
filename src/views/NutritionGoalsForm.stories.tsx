@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { NutritionGoalsForm } from "./NutritionGoalsForm.js";
-import { nutritionGoalsFixture } from "../pages/fixtures.js";
+import { nutritionGoalsFixture } from "../pages/shared/fixtures.js";
 import { StoryFrame } from "./storyFrame.js";
 
 const meta: Meta<typeof NutritionGoalsForm> = {

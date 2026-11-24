@@ -80,7 +80,7 @@ test("the auth content column is capped at 480px and rendered only for the auth 
 
 test("only the four auth pages use the auth variant (#265)", () => {
   for (const page of ["SignInPage", "SignUpPage", "ForgotPasswordPage", "ResetPasswordPage"]) {
-    const code = readCode(`src/pages/${page}.tsx`);
+    const code = readCode(`src/pages/eciperay/${page}.tsx`);
     assert.match(code, /variant="auth"/, `${page} must use the auth shell`);
   }
 });

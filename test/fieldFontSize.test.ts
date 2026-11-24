@@ -67,7 +67,7 @@ test("the recipes page builds its filter bar from the shared field components (#
   // #119 dedupe the page renders the shared CatalogFiltersBar, which
   // composes the shared fields — pin both links of that chain so the
   // bar's fields stay the font-pinned shared components.
-  const page = codeOf("src/pages/RecipesPage.tsx");
+  const page = codeOf("src/pages/eciperay/RecipesPage.tsx");
   assert.ok(
     page.includes("CatalogFiltersBar"),
     "RecipesPage filter bar should be the shared CatalogFiltersBar",
