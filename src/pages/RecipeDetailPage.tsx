@@ -38,7 +38,7 @@ import { StatBand } from "../widgets/StatBand.js";
 import { StatCard } from "../widgets/StatCard.js";
 import { Badge } from "../widgets/Badge.js";
 import { MetadataBadge } from "../widgets/MetadataBadge.js";
-import { StatusMessage } from "../widgets/StatusMessage.js";
+import { StatusMessage } from "../views/StatusMessage.js";
 import { StepList } from "../widgets/StepList.js";
 import { SuggestionPanel } from "../widgets/form/SuggestionPanel.js";
 import { TagList } from "../widgets/TagList.js";

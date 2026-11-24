@@ -33,7 +33,7 @@ Open in `Widgets/StepList`: Default;
 `Widgets/MarkableRow`: Default;
 `Widgets/Form/SuggestionPanel`: Default;
 `Widgets/TagList`: Default;
-`Widgets/StatusMessage`: Default, Empty, Transient;
+`Views/StatusMessage`: Default, Empty, Transient;
 `Widgets/Form/FieldRow`: (its stories);
 
 1. StepList: steps render numbered in order; a step with a

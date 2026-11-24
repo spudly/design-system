@@ -144,7 +144,6 @@ export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
 export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
 export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./SessionShell.js";
-export { StatusMessage, type StatusMessageProps } from "./StatusMessage.js";
 export { StepList, type StepListProps } from "./StepList.js";
 export { SuggestionPanel, type SuggestionPanelProps } from "./form/SuggestionPanel.js";
 export { TagList, type TagListProps } from "./TagList.js";

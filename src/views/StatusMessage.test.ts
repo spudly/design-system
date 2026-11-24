@@ -30,7 +30,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "StatusMessage.tsx"), "utf8");
+const source = readFileSync(join(here, "../..", "src", "views", "StatusMessage.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const pageSource = readFileSync(
   join(here, "../..", "src", "pages", "RecipeDetailPage.tsx"),
@@ -118,7 +118,7 @@ test("the old gray7 ink fails on the dark surface — the gap $textMuted closes"
 });
 
 test("RecipeDetailPage renders StatusMessage unconditionally for its action message", () => {
-  assert.match(pageCode, /import \{ StatusMessage \} from "\.\.\/widgets\/StatusMessage\.js"/);
+  assert.match(pageCode, /import \{ StatusMessage \} from "\.\.\/views\/StatusMessage\.js"/);
   assert.match(pageCode, /<StatusMessage message=\{actionMessage\} \/>/);
   assert.doesNotMatch(pageCode, /\{actionMessage \? \(/);
   assert.doesNotMatch(pageCode, /accessibilityRole="text"/);
@@ -126,7 +126,7 @@ test("RecipeDetailPage renders StatusMessage unconditionally for its action mess
 
 test("stories cover the message, the mounted-empty region, and the transient toggle", () => {
   const stories = readFileSync(
-    join(here, "../..", "src", "widgets", "StatusMessage.stories.tsx"),
+    join(here, "../..", "src", "views", "StatusMessage.stories.tsx"),
     "utf8",
   );
   for (const name of ["Default", "Empty", "Transient"]) {

@@ -1,7 +1,7 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { politeLiveRegionProps } from "./accessibility.js";
-import { Text } from "./Text.js";
+import { politeLiveRegionProps } from "../widgets/accessibility.js";
+import { Text } from "../widgets/Text.js";
 
 export type StatusMessageProps = {
   /**
