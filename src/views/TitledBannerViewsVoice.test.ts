@@ -11,86 +11,157 @@
  * exceptions: their titles, labels, and messages are all
  * caller-supplied data with no hard-coded defaults, so they read
  * no voice slots.
+ *
+ * Converted from source scans to runtime checks in #733
+ * tranche 5: the voice views are SSR-rendered under the
+ * fixture voice with no label props supplied and the rendered
+ * output is asserted to carry the fixture's slot strings.
+ * The exception views are rendered with NO provider: a view
+ * that read voice slots would throw the fail-fast error, so
+ * a successful render carrying only caller copy is the
+ * runtime form of the exception.
+ *
+ * Runtime assertions run against the built output: `npm run
+ * build` first (the `test` script does both).
  */
+import "../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const strip = (text: string) =>
-  text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-// #698 tranche 4 moved ChangedListBanner, LegalSection, and
-// AppTopBar to src/widgets; the rest still live beside this test.
-const WIDGET_COMPONENTS = new Set(["AppTopBar", "ChangedListBanner", "LegalSection"]);
-const read = (name: string) =>
-  strip(
-    readFileSync(
-      join(here, ...(WIDGET_COMPONENTS.has(name) ? ["..", "widgets"] : []), `${name}.tsx`),
-      "utf8",
-    ),
+let runtimePromise: Promise<Record<string, any>> | undefined;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const { createElement: h } = await import("react");
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider }: Record<string, any> = await import("tamagui");
+    const distRuntime = await loadInternalDist();
+    const { VoiceProvider }: Record<string, any> = await import("../../dist/voice/index.js");
+    const { fixtureVoice }: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    return { h, renderToString, TamaguiProvider, VoiceProvider, fixtureVoice, ...distRuntime };
+  })();
+  return runtimePromise;
+}
+
+async function render(element: any, withVoice = true): Promise<string> {
+  const {
+    h,
+    renderToString,
+    TamaguiProvider,
+    VoiceProvider,
+    fixtureVoice,
+    createTamaguiConfig,
+    baseTheme,
+  } = await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const tree = withVoice ? h(VoiceProvider, { voice: fixtureVoice }, element) : element;
+  const html = renderToString(h(TamaguiProvider, { config, defaultTheme: "light" }, tree));
+  return html.replaceAll("&#x27;", "'");
+}
+
+const noop = () => {};
+
+test("ChangedListBanner renders its Revert action from the voice object", async () => {
+  const { h, ChangedListBanner, fixtureVoice } = await loadRuntime();
+  const html = await render(h(ChangedListBanner, { label: "3 changes", onRevert: noop }));
+  assert.ok(
+    html.includes(fixtureVoice.changedListBanner.revertLabel),
+    "the revert label renders from the voice object",
   );
-
-test("ChangedListBanner reads its Revert action from the voice object", () => {
-  const view = read("ChangedListBanner");
-  assert.match(view, /useVoice\(\)/);
-  assert.match(view, /voice\.changedListBanner\.revertLabel/, "slot revertLabel is read");
-  assert.doesNotMatch(view, /"Revert"|>\s*Revert\s*</);
 });
 
-test("ConsentBannerView reads its defaults from the voice object", () => {
-  const view = read("ConsentBannerView");
-  assert.match(view, /useVoice\(\)/);
-  for (const slot of ["acceptLabel", "declineLabel"]) {
-    assert.match(view, new RegExp(`voice\\.consentBannerView\\.${slot}`), `slot ${slot} is read`);
-  }
-  assert.doesNotMatch(view, /"Accept"|"Decline"/);
+test("ConsentBannerView renders its defaults from the voice object", async () => {
+  const { h, ConsentBannerView, fixtureVoice } = await loadRuntime();
+  const html = await render(
+    h(ConsentBannerView, {
+      messageBeforeLink: "We use cookies as described in our ",
+      linkLabel: "privacy policy",
+      linkHref: "/privacy",
+      messageAfterLink: ".",
+      onAccept: noop,
+      onDecline: noop,
+    }),
+  );
+  assert.ok(html.includes(fixtureVoice.consentBannerView.acceptLabel), "the accept label renders");
+  assert.ok(
+    html.includes(fixtureVoice.consentBannerView.declineLabel),
+    "the decline label renders",
+  );
 });
 
-test("InstallBannerView reads its dismiss default from the voice object", () => {
-  const view = read("InstallBannerView");
-  assert.match(view, /useVoice\(\)/);
-  assert.match(view, /voice\.installBannerView\.dismissLabel/, "slot dismissLabel is read");
-  assert.doesNotMatch(view, /"Dismiss install banner"/);
+test("InstallBannerView renders its dismiss default from the voice object", async () => {
+  const { h, InstallBannerView, fixtureVoice } = await loadRuntime();
+  const html = await render(
+    h(InstallBannerView, {
+      message: "Install the app for the best experience.",
+      links: [],
+      onDismiss: noop,
+    }),
+  );
+  assert.ok(
+    html.includes(fixtureVoice.installBannerView.dismissLabel),
+    "the dismiss accessible name renders from the voice object",
+  );
 });
 
-test("RecipeExportPickerView reads its defaults from the voice object", () => {
-  const view = read("RecipeExportPickerView");
-  assert.match(view, /useVoice\(\)/);
-  for (const slot of ["searchPlaceholder", "emptyMessage", "exportPendingLabel"]) {
-    assert.match(
-      view,
-      new RegExp(`voice\\.recipeExportPickerView\\.${slot}`),
-      `slot ${slot} is read`,
-    );
-  }
-  assert.doesNotMatch(view, /"Search recipes…"|"No recipes to export yet\."|"Exporting…"/);
+test("RecipeExportPickerView renders its defaults from the voice object", async () => {
+  const { h, RecipeExportPickerView, fixtureVoice } = await loadRuntime();
+  const v = fixtureVoice.recipeExportPickerView;
+  const base = {
+    search: "",
+    onSearchChange: noop,
+    items: [],
+    selectedIds: [],
+    onToggle: noop,
+    onSelectAll: noop,
+    onClearSelection: noop,
+    onExport: noop,
+    exportLabel: "Export selected",
+  };
+  const html = await render(h(RecipeExportPickerView, base));
+  assert.ok(html.includes(v.searchPlaceholder), "the search placeholder renders");
+  assert.ok(html.includes(v.emptyMessage), "the empty message renders");
+  const exporting = await render(h(RecipeExportPickerView, { ...base, exporting: true }));
+  assert.ok(exporting.includes(v.exportPendingLabel), "the export pending label renders");
 });
 
-test("ConfirmActionView reads no voice slots — its title and labels are caller-supplied", () => {
-  const view = read("ConfirmActionView");
-  assert.doesNotMatch(view, /useVoice/);
-  assert.match(view, /title: string/);
-  assert.match(view, /confirmLabel: string/);
+test("ConfirmActionView reads no voice slots — its title and labels are caller-supplied", async () => {
+  const { h, ConfirmActionView } = await loadRuntime();
+  // The dialog's content does not SSR-render (it portals in
+  // when open), so the runtime form of the exception here is
+  // that rendering the view with NO provider does not throw
+  // the voice fail-fast error — a view reading voice slots
+  // would throw it during render.
+  await render(
+    h(ConfirmActionView, {
+      open: true,
+      onOpenChange: noop,
+      title: "Delete this recipe?",
+      confirmLabel: "Delete it",
+      onConfirm: noop,
+    }),
+    false,
+  );
 });
 
-test("LegalSection reads no voice slots — its title is caller-supplied", () => {
-  const view = read("LegalSection");
-  assert.doesNotMatch(view, /useVoice/);
-  assert.match(view, /title: string/);
+test("LegalSection reads no voice slots — its title is caller-supplied", async () => {
+  const { h, LegalSection } = await loadRuntime();
+  const html = await render(h(LegalSection, { title: "Legal" }, h("span", null, "Privacy")), false);
+  assert.ok(html.includes("Legal"), "the caller title renders with no provider");
+  assert.ok(html.includes("Privacy"), "the caller children render with no provider");
 });
 
-test("CatalogHeader reads no voice slots — its title is caller-supplied", () => {
-  const view = read("CatalogHeader");
-  assert.doesNotMatch(view, /useVoice/);
-  assert.match(view, /title: string/);
+test("CatalogHeader reads no voice slots — its title is caller-supplied", async () => {
+  const { h, CatalogHeader } = await loadRuntime();
+  const html = await render(
+    h(CatalogHeader, { title: "Recipes" }, h("span", null, "CONTROLS")),
+    false,
+  );
+  assert.ok(html.includes("Recipes"), "the caller title renders with no provider");
 });
 
-test("AppTopBar reads no voice slots — its brand, nav, and actions are caller-supplied", () => {
-  const view = read("AppTopBar");
-  assert.doesNotMatch(view, /useVoice/);
-  assert.match(view, /brand: AppTopBarBrand/);
-  assert.match(view, /navItems\?: AppTopBarNavItem\[\]/);
-  assert.match(view, /actions\?: AppTopBarAction\[\]/);
+test("AppTopBar reads no voice slots — its brand, nav, and actions are caller-supplied", async () => {
+  const { h, AppTopBar } = await loadRuntime();
+  const html = await render(h(AppTopBar, { brand: { label: "Eciperay" } }), false);
+  assert.ok(html.includes("Eciperay"), "the caller brand renders with no provider");
 });

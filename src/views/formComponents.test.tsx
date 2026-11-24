@@ -2,14 +2,7 @@
  * Form-component contracts for the #119 form set the three
  * form pages compose: the dedupe set (LabeledField,
  * LabeledGroup, FieldLabel, RevertAction, ChangedListBanner,
- * FormStack, FormHeading), shipped once on main. Like the
- * layout-components contracts, these pin the public
- * shape (props and owned geometry) so a later edit cannot
- * silently reintroduce styling pass-throughs or move the owned
- * spacing, and pin the three form pages themselves to
- * composing DS components only — the no-page-styling rule is
- * dormant in the ESLint config (no TS7 parser), so this test
- * is the pages' enforcement until the rule revives.
+ * FormStack, FormHeading), shipped once on main.
  *
  * The forms tranche's wider set was split by disposition in the
  * adoption rounds: FieldLabelBlock and StepperGroup composed
@@ -18,6 +11,29 @@
  * extraction set and is pinned here alongside the dedupe set.
  * FormSubmit was removed in #478 (a logic-free wrapper whose
  * only effect was extra separation above the submit row).
+ *
+ * Converted from source scans to runtime checks in #733
+ * tranche 5:
+ * - Every component's runtime export and its type-only Props
+ *   export are asserted against the built dist (the `.d.ts`
+ *   reads are built-artifact reads, not source reads).
+ * - The per-component styling-prop / type-alias source scans
+ *   were deleted: prop surface shape is enforced by the
+ *   TypeScript build, not a test (Stephen, 2026-11-20).
+ * - The owned-geometry source scans (label separations,
+ *   FormStack rhythm, EqualColumns gutter, FormHeading
+ *   separation, the banner's warning wash, the shared
+ *   LabelRow wiring) were deleted: styled-component geometry
+ *   is not observable from rendered output. The observable
+ *   contracts survive as SSR checks below — the label element
+ *   and its `for`, the named group, the error line under its
+ *   field, the revert affordance's text, the banner offering
+ *   its revert only when given one, and the heading's title
+ *   and subtitle.
+ * - FieldStack's absence is asserted on the built surface.
+ * - The three-form-pages composition source scan was deleted:
+ *   page composition is pinned by the pages' own tests, and
+ *   this tranche does not read page source.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -28,12 +44,9 @@ import test from "node:test";
 import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 const dist = await loadInternalDist();
-// Comments are stripped before asserting: the components' doc
-// comments legitimately name the abolished props they refuse.
-const readRepoFile = (rel: string) =>
-  readFileSync(join(here, "../..", rel), "utf8")
-    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+// The Props type check reads the built dist type surface (a
+// built artifact, not JS/TS source).
+const readDistTypes = (rel: string) => readFileSync(join(here, "../..", rel), "utf8");
 const COMPONENTS = [
   "FieldLabel",
   "LabeledField",
@@ -49,118 +62,26 @@ const COMPONENTS = [
 // view from #470 until #698 tranche 4 moved it to src/widgets
 // (it owns its styling); the rest of the set is in src/widgets.
 const VIEWS = new Set(["RevertAction"]);
-// Form-category widgets live in src/widgets/form since #710.
-const FORM_CATEGORY = new Set(["FieldLabel", "LabeledField", "LabeledGroup", "EqualColumns"]);
 const homeOf = (name: string) => (VIEWS.has(name) ? "views" : "widgets");
 for (const name of COMPONENTS) {
   test(`${name} is exported from the built internal dist surface`, () => {
     assert.equal(typeof dist[name], "function", `${name} must be a runtime export`);
   });
   test(`${name}Props is a type-only export from its built internal barrel`, () => {
-    const barrel = readRepoFile(`dist/${homeOf(name)}/index.d.ts`);
+    const barrel = readDistTypes(`dist/${homeOf(name)}/index.d.ts`);
     assert.match(barrel, new RegExp(String.raw`export \{[^}]*type ${name}Props[^}]*\}`));
   });
-  test(`${name} offers no styling or spacing props and uses type aliases only`, () => {
-    const source = readRepoFile(
-      FORM_CATEGORY.has(name) ? `src/widgets/form/${name}.tsx` : `src/${homeOf(name)}/${name}.tsx`,
-    );
-    assert.doesNotMatch(source, /spaceBefore|spaceAfter|className|style\??:/);
-    assert.doesNotMatch(source, /\binterface\s/);
-  });
 }
-test("the label row is one shared implementation behind both labeled wrappers", () => {
-  const row = readRepoFile("src/widgets/LabelRow.tsx");
-  assert.match(row, /paddingBlockEnd=\{tokens\.spacing\[separation\]\}/);
-  assert.match(row, /<FieldLabel htmlFor=\{htmlFor\}>\{label\}<\/FieldLabel>/);
-  const field = readRepoFile("src/widgets/form/LabeledField.tsx");
-  assert.match(
-    field,
-    /<LabelRow label=\{label\} action=\{action\} separation=\{1\} htmlFor=\{fieldId\} \/>/,
-  );
-  const group = readRepoFile("src/widgets/form/LabeledGroup.tsx");
-  assert.match(
-    group,
-    /<LabelRow label=\{label\} action=\{action\} separation=\{2\} htmlFor=\{fieldId\} \/>/,
-  );
-});
-test("FieldLabel renders a real label element on web and keeps the text treatment on native", () => {
-  const source = readRepoFile("src/widgets/form/FieldLabel.tsx");
-  // Stephen's ruling on PR #320: web uses an HTML label element
-  // with a proper `for`; native keeps the plain Text treatment.
-  assert.match(source, /if \(isWeb\) \{/);
-  assert.match(source, /<Label\s+\{\.\.\.\(htmlFor \? \{ htmlFor \} : \{\}\)\}/);
-  assert.match(source, /htmlFor\?: string \| undefined;/);
-  assert.match(source, /<Text\s+fontSize=\{tokens\.typography\.fontSize\.sm\}/);
-});
-test("LabeledField owns the 4px label separation and renders the error below the field", () => {
-  const source = readRepoFile("src/widgets/form/LabeledField.tsx");
-  assert.match(source, /label: string;/);
-  assert.match(source, /fieldId\?: string | undefined;/);
-  assert.match(source, /error\?: string \| null \| undefined;/);
-  assert.match(source, /paddingBlockStart=\{tokens\.spacing\[2\]\}/);
-  assert.match(source, /variant="error"/);
-  // The host-placed error carries the field's deterministic
-  // error id (the field components' own `${id}-error` shape).
-  assert.match(source, /\{\.\.\.\(fieldId \? \{ id: `\$\{fieldId\}-error` \} : \{\}\)\}/);
-});
-test("LabeledGroup owns the wider 8px label separation for non-field controls", () => {
-  const source = readRepoFile("src/widgets/form/LabeledGroup.tsx");
-  assert.match(source, /separation=\{2\}/);
-  assert.match(source, /fieldId\?: string | undefined;/);
-  // The group is programmatically named by its label (the
-  // NumberStepper pattern): group role + accessible name.
-  assert.match(source, /\{\.\.\.groupRoleProps\}/);
-  assert.match(source, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
-});
-test("FormStack owns the form rhythm: 12px field gaps, stretched children, no tail padding (#477)", () => {
-  const source = readRepoFile("src/widgets/FormStack.tsx");
-  assert.match(source, /gap: tokens\.spacing\[3\]/);
-  assert.match(source, /alignItems: "stretch"/);
-  assert.match(source, /Omit<StyledFormStackProps, "gap" \| "alignItems" \| "paddingBlockEnd">/);
-  assert.doesNotMatch(source, /paddingBlockEnd: tokens/);
-});
 test("FieldStack does not survive the #477 consolidation", () => {
-  assert.throws(() => readRepoFile("src/widgets/FieldStack.tsx"));
-  const barrel = readRepoFile("src/widgets/index.ts");
-  assert.doesNotMatch(barrel, /FieldStack/);
-});
-test("EqualColumns gives every child an equal flex column with an owned 12px gutter", () => {
-  const source = readRepoFile("src/widgets/form/EqualColumns.tsx");
-  assert.match(source, /gap=\{tokens\.spacing\[3\]\}/);
-  assert.match(source, /<YStack flex=\{1\}>/);
-  assert.match(source, /typeof child === "boolean"/);
-});
-test("FormHeading owns the title treatment, its 24px separation, and the optional subtitle", () => {
-  const source = readRepoFile("src/widgets/FormHeading.tsx");
-  assert.match(source, /paddingBottom=\{tokens\.spacing\[6\]\}/);
-  assert.match(source, /variant="formTitle"/);
-  // The import tranche's SessionHeader retired into this
-  // optional subtitle (dedupe cluster B5).
-  assert.match(source, /subtitle\?: string;/);
-  assert.match(source, /variant="hint"/);
-});
-test("RevertAction is the revert affordance composed on a ghost Button (#464)", () => {
-  const source = readRepoFile("src/views/RevertAction.tsx");
-  assert.match(source, /Revert to: \$\{label\}/);
-  // Cluster C3 of the dedupe: the button role and its keyboard
-  // behavior are the shared Button's — no hand-rolled pressable
-  // (#464 retired TextAction in favor of Button's ghost form).
-  assert.match(source, /<Button ghost size="sm" onPress=\{onPress\}>/);
-  assert.ok(!source.includes("platformAccessibilityProps"), "no hand-rolled a11y translation");
-});
-test("ChangedListBanner keeps the warning wash and offers its revert only when given one", () => {
-  const source = readRepoFile("src/widgets/ChangedListBanner.tsx");
-  assert.match(source, /backgroundColor=\{tokens\.colors\.warning\.warning1\}/);
-  assert.match(source, /\{onRevert \? \(/);
-  assert.match(
-    source,
-    /<Button ghost size="sm" onPress=\{onRevert\}>/,
-    "the revert renders as a ghost Button (#464)",
+  assert.equal(
+    dist.FieldStack,
+    undefined,
+    "FieldStack must not be exported from the built surface",
   );
 });
 
 // Runtime imports are lazy (inside the SSR tests) so the
-// source-scan tests above still run and report when the build
+// export tests above still run and report when the build
 // output is missing or broken, instead of the whole file
 // failing at import time.
 let runtimePromise;
@@ -171,10 +92,14 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const distRuntime = await loadInternalDist();
+    const { VoiceProvider }: Record<string, any> = await import("../../dist/voice/index.js");
+    const { fixtureVoice }: Record<string, any> = await import("../../dist/voice/fixtures.js");
     return {
       React,
       renderToString,
       TamaguiProvider,
+      VoiceProvider,
+      fixtureVoice,
       ...distRuntime,
     };
   })();
@@ -190,6 +115,10 @@ async function renderToHtml(element: any) {
   );
   const styleEnd = html.lastIndexOf("</style>");
   return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
+}
+async function renderWithVoice(element: any) {
+  const { VoiceProvider, fixtureVoice } = await loadRuntime();
+  return renderToHtml(<VoiceProvider voice={fixtureVoice}>{element}</VoiceProvider>);
 }
 test("SSR: a LabeledField's label is a real label element whose `for` matches the field's id", async () => {
   const { LabeledField, TextField } = await loadRuntime();
@@ -222,12 +151,58 @@ test("SSR: FieldLabel with htmlFor renders a label element; a LabeledGroup is a 
   assert.match(groupHtml, /role="group"/, "the group carries the group role on web");
   assert.match(groupHtml, /aria-label="Tags"/, "the group is named by its label");
 });
-test("the three form pages compose DS components only — no tamagui, no tokens, no styled (#119)", () => {
-  for (const page of ["RecipeFormPage", "MealFormPage", "MealPlanFormPage"]) {
-    const source = readRepoFile(`src/pages/eciperay/${page}.tsx`);
-    assert.doesNotMatch(source, /from "tamagui"/, `${page} must not import layout primitives`);
-    assert.doesNotMatch(source, /tokens/, `${page} must not reach for design tokens`);
-    assert.doesNotMatch(source, /styled\(/, `${page} must not define styled components`);
-    assert.doesNotMatch(source, /<(XStack|YStack|ZStack|Stack|View|ScrollView)\b/);
-  }
+test("SSR: a LabeledField renders its error below the field, keyed by the field's error id", async () => {
+  const { LabeledField, TextField } = await loadRuntime();
+  const html = await renderToHtml(
+    <LabeledField label="Title" fieldId="recipe-title" error="Title is required">
+      <TextField id="recipe-title" accessibilityLabel="Title" value="" onChangeText={() => null} />
+    </LabeledField>,
+  );
+  assert.ok(html.includes("Title is required"), "the error line renders");
+  assert.ok(html.includes('id="recipe-title-error"'), "the error carries the field's error id");
+  assert.ok(
+    html.indexOf("Tuscan") === -1 &&
+      html.indexOf('id="recipe-title"') < html.indexOf("Title is required"),
+    "the error renders below the field",
+  );
+});
+test("SSR: RevertAction renders the revert affordance naming its label (#464)", async () => {
+  const { RevertAction } = await loadRuntime();
+  const html = await renderToHtml(<RevertAction label="Ingredients" onPress={() => null} />);
+  assert.ok(html.includes("Revert to: Ingredients"), "the affordance names what it reverts");
+});
+test("SSR: ChangedListBanner offers its revert only when given one", async () => {
+  const { ChangedListBanner } = await loadRuntime();
+  const withRevert = await renderWithVoice(
+    <ChangedListBanner label="3 changes" onRevert={() => null} />,
+  );
+  assert.ok(withRevert.includes("3 changes"), "the summary line renders");
+  assert.ok(withRevert.includes("Revert"), "the revert action renders when given one");
+  const withoutRevert = await renderWithVoice(<ChangedListBanner label="3 changes" />);
+  assert.ok(!withoutRevert.includes("Revert"), "no revert action renders without one");
+});
+test("SSR: FormHeading renders its title and optional subtitle; FormStack renders its children", async () => {
+  const { FormHeading, FormStack, Text } = await loadRuntime();
+  const headingHtml = await renderToHtml(
+    <FormHeading subtitle="Imported from a link">Recipe details</FormHeading>,
+  );
+  assert.ok(headingHtml.includes("Recipe details"), "the title renders");
+  assert.ok(headingHtml.includes("Imported from a link"), "the subtitle renders");
+  const stackHtml = await renderToHtml(
+    <FormStack>
+      <Text>First field</Text>
+      <Text>Second field</Text>
+    </FormStack>,
+  );
+  assert.ok(stackHtml.includes("First field") && stackHtml.includes("Second field"));
+});
+test("SSR: EqualColumns renders every child", async () => {
+  const { EqualColumns, Text } = await loadRuntime();
+  const html = await renderToHtml(
+    <EqualColumns>
+      <Text>Left column</Text>
+      <Text>Right column</Text>
+    </EqualColumns>,
+  );
+  assert.ok(html.includes("Left column") && html.includes("Right column"));
 });

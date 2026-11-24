@@ -7,108 +7,165 @@
  * app-supplied voice object — the DS ships no default strings.
  * ScaledIngredientsView is pinned as the exception: its heading
  * and lines are caller-composed, so it reads no voice slots.
+ *
+ * Converted from source scans to runtime checks in #733
+ * tranche 5: each view is SSR-rendered under the fixture
+ * voice and the rendered output is asserted to carry the
+ * fixture's slot strings (formatter slots are asserted through
+ * the accessible names they build for a row at a known
+ * position). The pseudo-locale formatter check runs against
+ * the built fixture voices at runtime. ScaledIngredientsView
+ * is rendered with NO provider: a view that read voice slots
+ * would throw the fail-fast error, so a successful render
+ * carrying only caller copy is the runtime form of the
+ * exception.
+ *
+ * Runtime assertions run against the built output: `npm run
+ * build` first (the `test` script does both).
  */
+import "../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const strip = (text: string) =>
-  text.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-const read = (name: string) => strip(readFileSync(join(here, `${name}.tsx`), "utf8"));
+let runtimePromise: Promise<Record<string, any>> | undefined;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const { createElement: h } = await import("react");
+    const { renderToString } = await import("react-dom/server");
+    const { TamaguiProvider }: Record<string, any> = await import("tamagui");
+    const distRuntime = await loadInternalDist();
+    const { VoiceProvider }: Record<string, any> = await import("../../dist/voice/index.js");
+    const fixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    return { h, renderToString, TamaguiProvider, VoiceProvider, ...fixtures, ...distRuntime };
+  })();
+  return runtimePromise;
+}
 
-test("RecipeImageView reads its defaults and chrome from the voice object", () => {
-  const view = read("RecipeImageView");
-  assert.match(view, /useVoice\(\)/);
+async function render(element: any, withVoice = true): Promise<string> {
+  const {
+    h,
+    renderToString,
+    TamaguiProvider,
+    VoiceProvider,
+    fixtureVoice,
+    createTamaguiConfig,
+    baseTheme,
+  } = await loadRuntime();
+  const config = createTamaguiConfig(baseTheme);
+  const tree = withVoice ? h(VoiceProvider, { voice: fixtureVoice }, element) : element;
+  const html = renderToString(h(TamaguiProvider, { config, defaultTheme: "light" }, tree));
+  return html.replaceAll("&#x27;", "'");
+}
+
+const noop = () => {};
+
+test("RecipeImageView renders its defaults and chrome from the voice object", async () => {
+  const { h, RecipeImageView, fixtureVoice } = await loadRuntime();
+  const v = fixtureVoice.recipeImageView;
+  const base = {
+    onPickImageRequest: noop,
+    onTakePhotoRequest: noop,
+    onGenerateImageRequest: noop,
+    onRemoveImage: noop,
+  };
+  const html = await render(h(RecipeImageView, base));
   for (const slot of [
     "label",
     "emptyMessage",
-    "previewLabel",
     "browseLabel",
-    "uploadingLabel",
     "takePhotoLabel",
     "generateLabel",
-    "generatingLabel",
     "generateAccessibilityLabel",
-    "removeLabel",
   ]) {
-    assert.match(view, new RegExp(`voice\\.recipeImageView\\.${slot}`), `slot ${slot} is read`);
+    assert.ok(html.includes(v[slot]), `slot ${slot} renders from the voice object`);
   }
-  assert.doesNotMatch(
-    view,
-    /"Recipe image"|"Choose an image from your library or generate one with AI"|"Recipe preview"|"Browse images"|"Uploading…"|"Take photo"|"Generate with AI"|"Generating…"|"Generate image with AI"|"Remove image"/,
+  const withPreview = await render(
+    h(RecipeImageView, { ...base, imagePreviewUri: "https://example.com/r.jpg" }),
+  );
+  assert.ok(withPreview.includes(v.previewLabel), "the preview label renders");
+  assert.ok(withPreview.includes(v.removeLabel), "the remove label renders");
+  const busy = await render(
+    h(RecipeImageView, {
+      ...base,
+      imagePreviewUri: "https://example.com/r.jpg",
+      isUploading: true,
+      isGenerating: true,
+    }),
+  );
+  assert.ok(busy.includes(v.uploadingLabel), "the uploading label renders");
+  assert.ok(busy.includes(v.generatingLabel), "the generating label renders");
+});
+
+test("RecipeIngredientListView and its rows render their names from the voice object", async () => {
+  const { h, RecipeIngredientListView, fixtureVoice } = await loadRuntime();
+  const v = fixtureVoice.recipeIngredientListView;
+  const rowVoice = fixtureVoice.recipeIngredientRowView;
+  const rows = [{ key: "chicken", quantity: "1", unit: "lb", name: "Chicken" }];
+  const html = await render(
+    h(RecipeIngredientListView, { rows, onAdd: noop, onFieldChange: noop, onRemove: noop }),
+  );
+  assert.ok(html.includes(v.label), "the list label renders");
+  assert.ok(html.includes(v.addLabel), "the add label renders");
+  assert.ok(html.includes(v.addIngredientLabel), "the add action's accessible name renders");
+  assert.ok(html.includes(rowVoice.quantityPlaceholder), "the quantity placeholder renders");
+  assert.ok(html.includes(rowVoice.unitPlaceholder), "the unit placeholder renders");
+  assert.ok(html.includes(rowVoice.namePlaceholder), "the name placeholder renders");
+  assert.ok(html.includes(rowVoice.quantityLabel(1)), "the quantity formatter names the first row");
+  assert.ok(html.includes(rowVoice.unitLabel(1)), "the unit formatter names the first row");
+  assert.ok(html.includes(rowVoice.nameLabel(1)), "the name formatter names the first row");
+  assert.ok(html.includes(rowVoice.removeLabel), "the remove label renders");
+  assert.ok(
+    html.includes(rowVoice.removeIngredientLabel(1)),
+    "the remove formatter names the first row",
+  );
+  const empty = await render(
+    h(RecipeIngredientListView, { rows: [], onAdd: noop, onFieldChange: noop, onRemove: noop }),
+  );
+  assert.ok(empty.includes(v.emptyMessage), "the empty message renders");
+});
+
+test("RecipeInstructionListView and its rows render their names from the voice object", async () => {
+  const { h, RecipeInstructionListView, fixtureVoice } = await loadRuntime();
+  const v = fixtureVoice.recipeInstructionListView;
+  const rowVoice = fixtureVoice.recipeInstructionRowView;
+  const rows = [{ key: "sear", body: "Sear the chicken." }];
+  const html = await render(
+    h(RecipeInstructionListView, { rows, onAdd: noop, onBodyChange: noop, onRemove: noop }),
+  );
+  assert.ok(html.includes(v.label), "the list label renders");
+  assert.ok(html.includes(v.addLabel), "the add label renders");
+  assert.ok(html.includes(v.addInstructionLabel), "the add action's accessible name renders");
+  assert.ok(html.includes(rowVoice.stepLabel(1)), "the step formatter names the first row");
+  assert.ok(html.includes(rowVoice.removeStepLabel(1)), "the remove formatter names the first row");
+  assert.ok(html.includes(rowVoice.removeLabel), "the remove label renders");
+  const empty = await render(
+    h(RecipeInstructionListView, { rows: [], onAdd: noop, onBodyChange: noop, onRemove: noop }),
+  );
+  assert.ok(empty.includes(v.emptyMessage), "the empty message renders");
+});
+
+test("the en-XA fixture voice pseudo-localizes formatter results, not just plain strings", async () => {
+  const { fixtureVoice, fixtureVoicePseudoLocale } = await loadRuntime();
+  const plain = fixtureVoice.recipeIngredientRowView.quantityLabel(2);
+  const pseudo = fixtureVoicePseudoLocale.recipeIngredientRowView.quantityLabel(2);
+  assert.notEqual(pseudo, plain);
+  assert.ok(pseudo.includes("⟦"), "the formatter result is pseudo-localized");
+  assert.ok(
+    pseudo.replaceAll("⟦", "").replaceAll("⟧", "").includes(plain) || pseudo.length > plain.length,
+    "the pseudo-localized result derives from the plain result",
   );
 });
 
-test("RecipeIngredientListView reads its defaults and add-action name from the voice object", () => {
-  const list = read("RecipeIngredientListView");
-  assert.match(list, /useVoice\(\)/);
-  for (const slot of ["label", "emptyMessage", "addLabel", "addIngredientLabel"]) {
-    assert.match(
-      list,
-      new RegExp(`voice\\.recipeIngredientListView\\.${slot}`),
-      `slot ${slot} is read`,
-    );
-  }
-  assert.doesNotMatch(list, /"Ingredients"|"No ingredients yet"|"\+ Add"|"Add ingredient"/);
-});
-
-test("RecipeIngredientRowView builds its field and remove names through the voice formatters", () => {
-  const row = read("RecipeIngredientRowView");
-  assert.match(row, /useVoice\(\)/);
-  for (const slot of ["quantityPlaceholder", "unitPlaceholder", "namePlaceholder", "removeLabel"]) {
-    assert.match(
-      row,
-      new RegExp(`voice\\.recipeIngredientRowView\\.${slot}`),
-      `slot ${slot} is read`,
-    );
-  }
-  for (const formatter of ["quantityLabel", "unitLabel", "nameLabel", "removeIngredientLabel"]) {
-    assert.match(
-      row,
-      new RegExp(`voice\\.recipeIngredientRowView\\.${formatter}\\(position\\)`),
-      `formatter ${formatter} is called with the position`,
-    );
-  }
-  assert.doesNotMatch(
-    row,
-    /`Ingredient \$\{position\} (quantity|unit|name)`|`Remove ingredient \$\{position\}`|"Qty"|"Unit"|"Name"|>\s*Remove\s*</,
+test("ScaledIngredientsView reads no voice slots — its heading and lines are caller-composed", async () => {
+  const { h, ScaledIngredientsView } = await loadRuntime();
+  const html = await render(
+    h(ScaledIngredientsView, { heading: "Ingredients · 4 servings", lines: ["1 lb chicken"] }),
+    false,
   );
-});
-
-test("RecipeInstructionListView reads its defaults and add-action name from the voice object", () => {
-  const list = read("RecipeInstructionListView");
-  assert.match(list, /useVoice\(\)/);
-  for (const slot of ["label", "emptyMessage", "addLabel", "addInstructionLabel"]) {
-    assert.match(
-      list,
-      new RegExp(`voice\\.recipeInstructionListView\\.${slot}`),
-      `slot ${slot} is read`,
-    );
-  }
-  assert.doesNotMatch(list, /"Instructions"|"No instructions yet"|"\+ Add"|"Add instruction"/);
-});
-
-test("RecipeInstructionRowView builds its step and remove names through the voice formatters", () => {
-  const row = read("RecipeInstructionRowView");
-  assert.match(row, /useVoice\(\)/);
-  assert.match(row, /voice\.recipeInstructionRowView\.stepLabel\(position\)/);
-  assert.match(row, /voice\.recipeInstructionRowView\.removeStepLabel\(position\)/);
-  assert.match(row, /voice\.recipeInstructionRowView\.removeLabel/);
-  assert.doesNotMatch(row, /`Step \$\{position\}`|`Remove step \$\{position\}`|>\s*Remove\s*</);
-});
-
-test("the en-XA fixture voice pseudo-localizes formatter results, not just plain strings", () => {
-  const fixtures = readFileSync(join(here, "../voice/fixtures.ts"), "utf8");
-  assert.match(fixtures, /typeof node === "function"/);
-  assert.match(fixtures, /pseudoLocalize\(result\)/);
-});
-
-test("ScaledIngredientsView reads no voice slots — its heading and lines are caller-composed", () => {
-  const view = read("ScaledIngredientsView");
-  assert.doesNotMatch(view, /useVoice/);
-  assert.match(view, /heading: string/);
-  assert.match(view, /lines: string\[\]/);
+  assert.ok(
+    html.includes("Ingredients · 4 servings"),
+    "the caller heading renders with no provider",
+  );
+  assert.ok(html.includes("1 lb chicken"), "the caller lines render with no provider");
 });

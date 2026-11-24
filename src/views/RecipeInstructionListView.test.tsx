@@ -22,59 +22,43 @@
  *    with the host-bound handle node; the remove action renders
  *    only with its intent; an empty list renders its empty
  *    line instead of rows.
+ *
+ * Converted in #733 tranche 5: the barrel / root / page-
+ * composition source scan was replaced by runtime checks on
+ * the built modules (both views ship in the built surface;
+ * the list view stays off the built package root while the
+ * row view is on it under the #671 exception; page
+ * composition is pinned by RecipeFormPage's own tests), and
+ * the controlled / drag-free source scan was deleted — state
+ * ownership and library imports are not observable from the
+ * built output, while every rendered contract is pinned by
+ * the SSR tests below.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
-const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
-const read = (rel: string) => readFileSync(join(root, rel), "utf8");
-test("the views are barrel-exported and RecipeFormPage renders the list from the instructions data prop", () => {
-  const barrel = read("src/views/index.ts");
-  for (const name of ["RecipeInstructionListView", "RecipeInstructionRowView"]) {
-    assert.ok(barrel.includes(name), `${name} is exported from src/views/index.ts`);
-    assert.ok(barrel.includes(`from "./${name}.js"`), `${name} is exported from its own module`);
-  }
-  const rootIndex = read("src/index.ts");
+test("the views ship in the built surface; the list stays internal, the row is public (#671)", async () => {
+  const distRuntime = await loadInternalDist();
+  assert.equal(typeof distRuntime.RecipeInstructionListView, "function");
+  assert.equal(typeof distRuntime.RecipeInstructionRowView, "function");
+  const { readFileSync } = await import("node:fs");
+  const { dirname, join } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const rootTypes = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), "../..", "dist", "index.d.ts"),
+    "utf8",
+  );
   assert.doesNotMatch(
-    rootIndex,
+    rootTypes,
     /\bRecipeInstructionListView\b/,
     "the list view stays off the public surface",
   );
-  // #671 (2026-11-16): the row view is the named exception to the
-  // #298 pages-only rule — it IS exported from the package root.
   assert.match(
-    rootIndex,
+    rootTypes,
     /\bRecipeInstructionRowView\b/,
     "the row view is exported from the package root (#671)",
   );
-  const form = read("src/pages/eciperay/RecipeFormPage.tsx");
-  assert.ok(
-    form.includes("instructions?: RecipeFormPageInstructions | null"),
-    "the instructions data prop is on the form's contract",
-  );
-  assert.match(
-    form,
-    /<RecipeInstructionListView \{\.\.\.instructions\} \/>/,
-    "the page renders the list view from the data prop",
-  );
-  assert.ok(
-    !form.includes("renderInstructionsSection"),
-    "the instructions render slot is removed (#683) — the data prop is the only path",
-  );
-});
-test("the views are controlled and drag-free", () => {
-  for (const file of ["RecipeInstructionListView.tsx", "RecipeInstructionRowView.tsx"]) {
-    const view = read(`src/views/${file}`);
-    assert.ok(!view.includes("useState"), `${file} must not own state`);
-    assert.ok(!view.includes("@dnd-kit"), `${file} must not take a drag library`);
-    assert.ok(!view.includes("draggable-flatlist"), `${file} must not take a drag library`);
-    assert.ok(!view.includes("@eciperay"), `${file} must not import an app package`);
-  }
 });
 const rows = [
   {
