@@ -1,6 +1,6 @@
 import { baseTheme } from "./base.js";
 import { tokens } from "../tokens/index.js";
-import { warmHarvestTagColors } from "./tagColors.js";
+import { warmHarvestTagColors, warmHarvestTagColorShades } from "./tagColors.js";
 
 /**
  * Eciperay theme — "Warm Harvest" visual direction (approved 2026-10-12).
@@ -15,6 +15,7 @@ export const eciperayTheme = {
   // (rather than inherited silently) because that identity is the
   // stored-data contract.
   tagColors: warmHarvestTagColors,
+  tagColorShades: warmHarvestTagColorShades,
   semantic: {
     ...baseTheme.semantic,
     background: "#faf6f0",

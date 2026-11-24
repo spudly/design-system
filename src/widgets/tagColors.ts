@@ -1,9 +1,13 @@
 import { useTheme } from "tamagui";
 import {
+  resolveTagColorShade,
   resolveTagColorValue,
   tagColorNames,
+  tagColorShadeThemeKey,
   tagColorThemeKey,
   type TagColorName,
+  type TagColorShade,
+  type TagColorShades,
   type TagColorValues,
 } from "../themes/tagColors.js";
 
@@ -31,4 +35,27 @@ export function useTagColorResolver(): (name: TagColorName) => string {
     }
   }
   return (name: TagColorName) => resolveTagColorValue(name, themeColors);
+}
+
+/**
+ * The shade-pair companion to `useTagColorResolver` (#799): returns a
+ * resolver that maps a tag color NAME + shade to the active theme's
+ * concrete hex, reading the `tag<Name>Dark` / `tag<Name>Light` keys
+ * the config registers. Badge's inverted tag form uses it so the
+ * dark background / light ink pair stays a theme token decision.
+ */
+export function useTagColorShadeResolver(): (
+  name: TagColorName,
+  shade: TagColorShade,
+) => string {
+  const theme = useTheme();
+  const themeShades: Partial<TagColorShades> = {};
+  for (const name of tagColorNames) {
+    const dark = theme[tagColorShadeThemeKey(name, "dark")];
+    const light = theme[tagColorShadeThemeKey(name, "light")];
+    if (typeof dark?.val === "string" && typeof light?.val === "string") {
+      themeShades[name] = { dark: dark.val, light: light.val };
+    }
+  }
+  return (name, shade) => resolveTagColorShade(name, shade, themeShades);
 }
