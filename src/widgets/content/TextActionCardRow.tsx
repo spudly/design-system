@@ -1,4 +1,5 @@
-import { Anchor, YStack, isWeb } from "tamagui";
+import { Anchor, isWeb } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
 import { Card } from "../layout/Card.js";
@@ -43,7 +44,7 @@ export type TextActionCardRowProps = {
  * a text-based anchor is inline on web and would not hold the
  * block's stacked layout). On native the anchor is a Text and
  * the stacked texts would flow inline inside it, so the block
- * platform-splits (see LinkOverlay): a YStack frame with the
+ * platform-splits (see LinkOverlay): a Col frame with the
  * same structural flex carries the texts, marked decorative,
  * and a childless anchor stretched over it carries the href
  * and the row's one accessibility stop, its label composed
@@ -79,14 +80,14 @@ export function TextActionCardRow({
           {textContent}
         </Anchor>
       ) : (
-        <YStack flex={1} minWidth={0} gap="$1" position="relative">
+        <Col grow shrink minWidth={0} gap="xs" position="relative">
           <RowTextContent title={title} subtitle={subtitle} decorative />
           <LinkOverlay
             href={href}
             accessibilityRole="link"
             accessibilityLabel={subtitle ? `${title}, ${subtitle}` : title}
           />
-        </YStack>
+        </Col>
       )}
       <Button
         ghost

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { XStack } from "tamagui";
+import { Row } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
@@ -58,25 +58,20 @@ export function StatBand({ children, loading = false, loadingCount = 3 }: StatBa
     // this band provides, so no loading prop is drilled into
     // them — and the region marked busy.
     return (
-      <XStack
+      <Row
+        around
         backgroundColor={tokens.colors.gray.gray1}
         borderRadius={tokens.radii.lg}
-        paddingVertical="$4"
-        justifyContent="space-around"
+        py="l"
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
         <LoadingStatTiles keys={dummyKeys} />
-      </XStack>
+      </Row>
     );
   }
   return (
-    <XStack
-      backgroundColor={tokens.colors.gray.gray1}
-      borderRadius={tokens.radii.lg}
-      paddingVertical="$4"
-      justifyContent="space-around"
-    >
+    <Row around backgroundColor={tokens.colors.gray.gray1} borderRadius={tokens.radii.lg} py="l">
       {children}
-    </XStack>
+    </Row>
   );
 }

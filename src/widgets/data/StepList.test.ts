@@ -19,7 +19,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "StepList.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "data", "StepList.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("StepList is exported from the built internal components barrel", async () => {
@@ -47,7 +50,7 @@ test("the numeral presentation is opt-in: a flat row with an orange numeral and 
   assert.match(code, /presentation = "eyebrow"/, "the eyebrow presentation stays the default");
   assert.match(
     code,
-    /if \(presentation === "numeral"\) \{\s+return \(\s+<YStack/,
+    /if \(presentation === "numeral"\) \{\s+return \(\s+<Col/,
     "the numeral presentation renders its own flat row, not the eyebrow card",
   );
   assert.match(code, /fontSize=\{tokens\.typography\.fontSize\["2xl"\]\}/);
@@ -68,7 +71,11 @@ test("step activation is keyboard-operable on web (the ListItem pattern)", () =>
 test("the loading state renders skeleton cards in the cards' own geometry (#747, ex-RecipeInstructionsPanel)", () => {
   assert.match(code, /loading\?: boolean/, "StepList declares the explicit loading prop");
   assert.match(code, /useLoadingScope\(loading\)/, "StepList reads the internal LoadingScope");
-  assert.match(code, /const LOADING_STEP_KEYS = \["loading-1", "loading-2", "loading-3"\] as const;/, "exactly 3 frozen dummy cards when no steps are known");
+  assert.match(
+    code,
+    /const LOADING_STEP_KEYS = \["loading-1", "loading-2", "loading-3"\] as const;/,
+    "exactly 3 frozen dummy cards when no steps are known",
+  );
   assert.match(code, /borderColor="transparent"/, "skeleton card borders are transparent");
   assert.match(code, /accessibilityState: \{ busy: true \}/, "the loading region is marked busy");
 });

@@ -255,7 +255,7 @@ test("LegalSection frames the host's links under its title in the app treatment"
     /fontWeight: tokens\.typography\.fontWeight\.semibold/,
     "the title keeps the app section title's weight",
   );
-  assert.match(source, /gap: tokens\.spacing\[3\]/, "the block carries its 12px rhythm");
+  assert.match(source, /<Col gap="m">/, "the block carries its 12px rhythm");
   assert.match(
     source,
     /color: "\$color"/,

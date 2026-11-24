@@ -1,16 +1,14 @@
 import type { ReactNode } from "react";
-import { XStack, YStack, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "./Text.js";
 
-const StyledWeekDayColumns = styled(XStack, {
-  name: "WeekDayColumns",
-
-  gap: tokens.spacing[3],
-  flexWrap: "wrap",
-  alignItems: "flex-start",
-});
-
+/**
+ * The wrapping row of a week view's day columns (#746, Option
+ * B): a Row with the 12px gap, wrapping, and top alignment
+ * from the former styled root.
+ */
 export type WeekDayColumnsProps = {
   /** The row's day columns (WeekDayColumn children). */
   children: ReactNode;
@@ -27,16 +25,12 @@ export type WeekDayColumnsProps = {
  * props — it owns its treatment completely (#119).
  */
 export function WeekDayColumns({ children }: WeekDayColumnsProps) {
-  return <StyledWeekDayColumns>{children}</StyledWeekDayColumns>;
+  return (
+    <Row wrap gap="m" top>
+      {children}
+    </Row>
+  );
 }
-
-const StyledWeekDayColumn = styled(YStack, {
-  name: "WeekDayColumn",
-
-  gap: tokens.spacing[3],
-  flex: 1,
-  minWidth: 180,
-});
 
 export type WeekDayColumnProps = {
   /** The day's heading (the host composes it, e.g. "Monday"). */
@@ -58,10 +52,10 @@ export type WeekDayColumnProps = {
  */
 export function WeekDayColumn({ label, dateLabel, children }: WeekDayColumnProps) {
   return (
-    <StyledWeekDayColumn>
+    <Col gap="m" grow shrink minWidth={180}>
       <Text variant="subheading">{label}</Text>
       {dateLabel ? <Text variant="hint">{dateLabel}</Text> : null}
       {children}
-    </StyledWeekDayColumn>
+    </Col>
   );
 }

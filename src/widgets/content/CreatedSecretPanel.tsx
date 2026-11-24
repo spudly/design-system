@@ -1,4 +1,5 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Button } from "../actions/Button.js";
 import { Text } from "../data/Text.js";
@@ -34,14 +35,14 @@ export function CreatedSecretPanel({
   onDismiss,
 }: CreatedSecretPanelProps) {
   return (
-    <YStack paddingTop="$4" paddingBottom="$4">
-      <YStack
+    <Col py="l">
+      <Col
         borderRadius={tokens.radii.md}
         borderWidth={1}
         borderColor={tokens.colors.warning.warning4}
         backgroundColor={tokens.colors.warning.warning1}
-        padding="$4"
-        gap="$2"
+        p="l"
+        gap="s"
       >
         <Text
           fontSize={tokens.typography.fontSize.sm}
@@ -50,7 +51,7 @@ export function CreatedSecretPanel({
         >
           {title}
         </Text>
-        <YStack borderRadius={tokens.radii.sm} backgroundColor="$surface" padding="$3">
+        <Col borderRadius={tokens.radii.sm} backgroundColor="$surface" p="m">
           <Text
             userSelect="text"
             color={tokens.colors.gray.gray10}
@@ -61,16 +62,16 @@ export function CreatedSecretPanel({
           >
             {secret}
           </Text>
-        </YStack>
+        </Col>
         <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
           {hint}
         </Text>
-        <XStack gap="$2">
+        <Row gap="s">
           <Button variant="secondary" onPress={onDismiss}>
             {doneLabel}
           </Button>
-        </XStack>
-      </YStack>
-    </YStack>
+        </Row>
+      </Col>
+    </Col>
   );
 }

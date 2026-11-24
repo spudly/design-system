@@ -1,28 +1,26 @@
-import { XStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 
-const StyledDot = styled(XStack, {
-  name: "StepDot",
+/**
+ * One dot (#746, Option B): a Row disc, primary-filled while
+ * its step is the current one, gray otherwise — the former
+ * styled variant computed in code.
+ */
+function Dot({ active }: { active: boolean }) {
+  return (
+    <Row
+      width={tokens.spacing[2]}
+      height={tokens.spacing[2]}
+      borderRadius={tokens.radii.full}
+      backgroundColor={active ? "$primary" : tokens.colors.gray.gray4}
+      aria-hidden
+    />
+  );
+}
 
-  width: tokens.spacing[2],
-  height: tokens.spacing[2],
-  borderRadius: tokens.radii.full,
-  backgroundColor: tokens.colors.gray.gray4,
-
-  variants: {
-    active: {
-      true: {
-        backgroundColor: "$primary",
-      },
-    },
-  } as const,
-});
-
-type StyledDotProps = GetProps<typeof StyledDot>;
-
-export type StepDotsProps = Omit<StyledDotProps, "active"> & {
+export type StepDotsProps = RowProps & {
   /** Total number of dots. */
   count: number;
   /** Zero-based index of the current step. */
@@ -41,9 +39,9 @@ export function StepDots({ count, activeIndex, label, ...rest }: StepDotsProps) 
   const safeIndex = Math.min(Math.max(activeIndex, 0), Math.max(count - 1, 0));
   const accessibleLabel = label ?? `Step ${safeIndex + 1} of ${count}`;
   return (
-    <XStack
-      gap={tokens.spacing[2]}
-      alignItems="center"
+    <Row
+      gap="s"
+      middle
       {...platformAccessibilityProps({
         accessibilityRole: "progressbar",
         accessibilityLabel: accessibleLabel,
@@ -52,8 +50,8 @@ export function StepDots({ count, activeIndex, label, ...rest }: StepDotsProps) 
       {...rest}
     >
       {Array.from({ length: count }, (_, i) => (
-        <StyledDot key={i} active={i === safeIndex} aria-hidden />
+        <Dot key={i} active={i === safeIndex} />
       ))}
-    </XStack>
+    </Row>
   );
 }

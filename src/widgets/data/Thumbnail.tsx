@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Image, YStack, isWeb, styled } from "tamagui";
+import { Image, isWeb, styled } from "tamagui";
+import { Col } from "../layout/Col.js";
+import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 
@@ -26,14 +28,22 @@ const HERO_FALLBACK_ASPECT = 4 / 3;
 const HERO_MIN_ASPECT = 0.75;
 const HERO_MAX_ASPECT = 2.25;
 
-const StyledHeroFrame = styled(YStack, {
-  name: "ThumbnailHeroFrame",
-
-  backgroundColor: tokens.colors.gray.gray1,
-  borderRadius: tokens.radii.lg,
-  overflow: "hidden",
-  width: "100%",
-});
+/**
+ * The hero frame as a function component (#746, Option B):
+ * the recessed well as a Col; the measured aspect ratio
+ * arrives as a prop from the widget.
+ */
+function HeroFrame(props: ColProps) {
+  return (
+    <Col
+      backgroundColor={tokens.colors.gray.gray1}
+      borderRadius={tokens.radii.lg}
+      overflow="hidden"
+      width="100%"
+      {...props}
+    />
+  );
+}
 
 const StyledBannerImage = styled(Image, {
   name: "ThumbnailBanner",
@@ -173,7 +183,7 @@ export function Thumbnail({ src, variant = "hero", accessibilityLabel }: Thumbna
     return <StyledRowImage src={src} {...a11yProps} />;
   }
   return (
-    <StyledHeroFrame aspectRatio={heroAspect}>
+    <HeroFrame aspectRatio={heroAspect}>
       <Image
         src={src}
         width="100%"
@@ -182,6 +192,6 @@ export function Thumbnail({ src, variant = "hero", accessibilityLabel }: Thumbna
         onLoad={handleHeroLoad}
         {...a11yProps}
       />
-    </StyledHeroFrame>
+    </HeroFrame>
   );
 }

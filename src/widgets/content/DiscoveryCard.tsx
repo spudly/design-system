@@ -1,4 +1,5 @@
-import { Anchor, View, YStack, isWeb } from "tamagui";
+import { Anchor, View, isWeb } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
@@ -193,11 +194,11 @@ function DiscoveryCardActionsMenu({
       align="end"
       trigger={<DropdownButton icon="more" accessibilityLabel={label} ghost size="sm" />}
     >
-      <YStack>
+      <Col>
         {actions.map((action) => (
           <DiscoveryCardActionRow key={action.id} action={action} />
         ))}
-      </YStack>
+      </Col>
     </Dropdown>
   );
 }
@@ -226,20 +227,20 @@ export function DiscoveryCard({
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
         <BoxSkeleton width={64} height={64} />
-        <YStack style={textBlockStyle} gap="$1">
+        <Col style={textBlockStyle} gap="xs">
           <TextSkeleton size="md" lines={1} />
           {subtitle ? <TextSkeleton size="sm" lines={1} /> : null}
-        </YStack>
+        </Col>
       </Card>
     );
   }
   const card = (
     <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="m">
       <CardThumbnail imageUrl={imageUrl} />
-      <YStack style={textBlockStyle} gap="$1">
+      <Col style={textBlockStyle} gap="xs">
         <Text fontWeight={tokens.typography.fontWeight.semibold}>{title}</Text>
         {subtitle ? <Text variant="hint">{subtitle}</Text> : null}
-      </YStack>
+      </Col>
     </Card>
   );
   const linked = isWeb ? (

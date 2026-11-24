@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
@@ -53,35 +54,41 @@ export function PreviewCard({ title, actions, children, loading = false }: Previ
     // inert rectangle skeleton (Stephen on #551).
     return (
       <LoadingScope active>
-        <YStack
+        <Col
           borderRadius={tokens.radii.lg}
           borderWidth={1}
           borderColor={tokens.colors.gray.gray3}
           backgroundColor="$surface"
-          padding="$4"
+          p="l"
           {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
         >
           {title ? (
-            <YStack paddingBottom="$3">
+            <Col>
               <TextSkeleton size="sm" lines={1} />
-            </YStack>
+              <Spacer y="m" />
+            </Col>
           ) : null}
           <TextSkeleton size="md" lines={3} />
-          {actions ? <YStack paddingTop="$4">{actions}</YStack> : null}
-        </YStack>
+          {actions ? (
+            <Col>
+              <Spacer y="l" />
+              {actions}
+            </Col>
+          ) : null}
+        </Col>
       </LoadingScope>
     );
   }
   return (
-    <YStack
+    <Col
       borderRadius={tokens.radii.lg}
       borderWidth={1}
       borderColor={tokens.colors.gray.gray3}
       backgroundColor="$surface"
-      padding="$4"
+      p="l"
     >
       {title ? (
-        <YStack paddingBottom="$3">
+        <Col>
           <Text
             fontSize={tokens.typography.fontSize.sm}
             fontWeight={tokens.typography.fontWeight.semibold}
@@ -89,10 +96,16 @@ export function PreviewCard({ title, actions, children, loading = false }: Previ
           >
             {title}
           </Text>
-        </YStack>
+          <Spacer y="m" />
+        </Col>
       ) : null}
       {children}
-      {actions ? <YStack paddingTop="$4">{actions}</YStack> : null}
-    </YStack>
+      {actions ? (
+        <Col>
+          <Spacer y="l" />
+          {actions}
+        </Col>
+      ) : null}
+    </Col>
   );
 }

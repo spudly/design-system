@@ -1,4 +1,5 @@
-import { Anchor, YStack, isWeb } from "tamagui";
+import { Anchor, isWeb } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LinkOverlay } from "../linkOverlay.js";
@@ -79,16 +80,16 @@ export function ListItem({
     // lines reads as a section divider inside a composite's
     // loading state (Stephen on #551).
     return (
-      <YStack
+      <Col
         borderBottomWidth={1}
         borderBottomColor="transparent"
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
-        <YStack paddingVertical="$3">
+        <Col py="m">
           <TextSkeleton size="md" lines={1} />
           {subtitle ? <TextSkeleton size="sm" lines={1} /> : null}
-        </YStack>
-      </YStack>
+        </Col>
+      </Col>
     );
   }
   // Web keyboard support for the press form (the CardRow
@@ -124,7 +125,7 @@ export function ListItem({
   );
   const rowContent = renderRowContent(false);
   return (
-    <YStack borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2}>
+    <Col borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2}>
       {href !== undefined && !isDisabled ? (
         isWeb ? (
           // The row navigates, so it renders as a real anchor
@@ -144,11 +145,11 @@ export function ListItem({
         ) : (
           // Native: the anchor is a Text, so the stacked row
           // content would flow inline inside it (see
-          // LinkOverlay). The row renders in a plain YStack
+          // LinkOverlay). The row renders in a plain Col
           // frame, with a childless anchor stretched over it
           // carrying the href; the overlay's label composes the
           // title line and the subtitle when present.
-          <YStack paddingVertical="$3" position="relative">
+          <Col py="m" position="relative">
             {renderRowContent(true)}
             <LinkOverlay
               href={href}
@@ -157,11 +158,11 @@ export function ListItem({
                 subtitle ? `, ${subtitle}` : ""
               }`}
             />
-          </YStack>
+          </Col>
         )
       ) : (
-        <YStack
-          paddingVertical="$3"
+        <Col
+          py="m"
           {...(isDisabled
             ? platformAccessibilityProps({ accessibilityState: { disabled: true } })
             : {
@@ -173,8 +174,8 @@ export function ListItem({
               })}
         >
           {rowContent}
-        </YStack>
+        </Col>
       )}
-    </YStack>
+    </Col>
   );
 }

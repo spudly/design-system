@@ -1,5 +1,8 @@
 import type { ReactNode } from "react";
-import { Anchor, View, XStack, YStack, isWeb } from "tamagui";
+import { Anchor, View, isWeb } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Badge } from "./Badge.js";
@@ -133,11 +136,13 @@ export function MediaRow({
         block (the #205 failure, seen again in PR #120's narrow
         captures). */}
       {subtitle || subtitleAction ? (
-        <XStack
-          flexWrap="wrap"
-          alignItems="center"
-          gap="$1"
-          paddingTop="$1"
+        // The 4px top inset rides the style channel: Row's
+        // padding props are uniform per axis (#746).
+        <Row
+          wrap
+          middle
+          gap="xs"
+          style={{ paddingTop: tokens.spacing[1] }}
           pointerEvents={native ? "box-none" : undefined}
         >
           {subtitle ? (
@@ -151,17 +156,17 @@ export function MediaRow({
             </Text>
           ) : null}
           {subtitleAction}
-        </XStack>
+        </Row>
       ) : null}
       {badgeLabel ? (
-        <XStack
-          paddingTop="$1"
+        <Row
+          style={{ paddingTop: tokens.spacing[1] }}
           accessible={native ? false : undefined}
           importantForAccessibility={native ? "no-hide-descendants" : undefined}
           pointerEvents={native ? "none" : undefined}
         >
           <Badge tone="info">{badgeLabel}</Badge>
-        </XStack>
+        </Row>
       ) : null}
     </>
   );
@@ -182,7 +187,7 @@ export function MediaRow({
   const textLabel = labelParts.join(", ");
   return (
     <>
-      <YStack paddingBlockEnd="$3">
+      <Col>
         <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="m">
           {isWeb ? (
             <Anchor
@@ -217,14 +222,20 @@ export function MediaRow({
               {textContent}
             </Anchor>
           ) : (
-            <YStack style={textBlockStyle} position="relative">
+            <Col style={textBlockStyle} position="relative">
               <LinkOverlay href={href} accessibilityRole="link" accessibilityLabel={textLabel} />
               {renderTextContent(true)}
-            </YStack>
+            </Col>
           )}
         </Card>
-      </YStack>
-      {accessory ? <YStack paddingBlockEnd="$3">{accessory}</YStack> : null}
+        <Spacer y="m" />
+      </Col>
+      {accessory ? (
+        <Col>
+          {accessory}
+          <Spacer y="m" />
+        </Col>
+      ) : null}
     </>
   );
 }

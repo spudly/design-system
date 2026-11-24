@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
-import { XStack, YStack } from "tamagui";
-import { tokens } from "../../tokens/index.js";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { listItemRoleProps, listRoleProps } from "../accessibility.js";
 import { Text } from "./Text.js";
 
@@ -19,13 +19,13 @@ export type BulletListProps = {
  */
 export function BulletList({ items }: BulletListProps) {
   return (
-    <YStack gap={tokens.spacing[2]} {...listRoleProps}>
+    <Col gap="s" {...listRoleProps}>
       {items.map((item, index) => (
-        <XStack key={index} gap={tokens.spacing[2]} {...listItemRoleProps}>
+        <Row key={index} gap="s" {...listItemRoleProps}>
           <Text>{"•"}</Text>
           <Text flex={1}>{item}</Text>
-        </XStack>
+        </Row>
       ))}
-    </YStack>
+    </Col>
   );
 }

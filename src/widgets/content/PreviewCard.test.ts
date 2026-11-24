@@ -21,7 +21,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "content", "PreviewCard.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "content", "PreviewCard.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("PreviewCard is exported from the built internal components barrel", async () => {
@@ -47,6 +50,10 @@ test("the frame is the fixed gray3 border on the surface fill, not Card's theme 
 
 test("the title and actions render only when passed, on the card's own separation", () => {
   assert.match(code, /\{title \? \(/, "no title, no title block");
-  assert.match(code, /\{actions \? <YStack paddingTop="\$4">\{actions\}<\/YStack> : null\}/);
+  assert.match(
+    code,
+    /\{actions \? \(\s*<Col>\s*<Spacer y="l" \/>\s*\{actions\}\s*<\/Col>\s*\) : null\}/,
+    "the actions sit below a 16px Spacer in their slot (the former paddingTop $4, #746)",
+  );
   assert.match(code, /\{children\}/, "the preview content renders between title and actions");
 });

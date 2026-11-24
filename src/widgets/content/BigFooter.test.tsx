@@ -62,8 +62,8 @@ test("store and social entries are real links with accessible names", () => {
 });
 test("the mobile stack breakpoint is named and the shell is sticky in flow", () => {
   assert.match(bigFooter, /const BIG_FOOTER_STACK_BREAKPOINT = 640;/);
-  assert.match(bigFooter, /flexBasis=\{BIG_FOOTER_COLUMN_BASIS\}/);
-  assert.match(bigFooter, /flexWrap="wrap"/);
+  assert.match(bigFooter, /style=\{\{ flexBasis: BIG_FOOTER_COLUMN_BASIS \}\}/);
+  assert.match(bigFooter, /<Row wrap/);
   // Page-scroll model (#547): the web shell is a flex column with
   // minHeight 100dvh and justifyContent "space-between" and
   // exactly two children — the page content and the footer. The
@@ -71,9 +71,9 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   // on web, 100% of the parent's available height by default —
   // React Native does not support viewport units for minHeight.
   assert.match(bigFooter, /minHeight=\{\{ default: "100%", web: "100dvh" \}\}/);
-  assert.match(bigFooter, /justifyContent="space-between"/);
+  assert.match(bigFooter, /<Col minHeight=\{\{ default: "100%", web: "100dvh" \}\} between>/);
   assert.ok(
-    !/<YStack minHeight="100dvh"/.test(bigFooter),
+    !/<Col minHeight="100dvh"/.test(bigFooter),
     "the shell must not pass a raw 100dvh minHeight to native",
   );
   // The content child is the positioned ancestor, so an
@@ -207,13 +207,13 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
   // shell's plain ScrollView (the RecipesPage windowing bug).
   assert.match(
     bigFooter,
-    /if \(scrollMode === "content" \|\| scrollMode === "overlay"\) \{\s*return \(\s*<YStack flex=\{1\} position="relative">\s*\{children\}/,
+    /if \(scrollMode === "content" \|\| scrollMode === "overlay"\) \{\s*return \(\s*<Col grow shrink position="relative">\s*\{children\}/,
   );
   // "nested" mode: the growing column only — no scroller, no
   // bounded frame; the enclosing shell stays the scroll owner.
   assert.match(
     bigFooter,
-    /if \(scrollMode === "nested"\) \{\s*return \(\s*<YStack flexGrow=\{1\} flexDirection="column" position="relative">\s*\{children\}/,
+    /if \(scrollMode === "nested"\) \{\s*return \(\s*<Col grow position="relative">\s*\{children\}/,
   );
 });
 test("overlay pages get a viewport-bounded region with or without footer data (#729)", () => {
@@ -229,11 +229,11 @@ test("overlay pages get a viewport-bounded region with or without footer data (#
   // when one is supplied.
   assert.match(
     bigFooter,
-    /if \(scrollMode === "overlay"\) \{\s*return \(\s*<YStack\s+minHeight=\{\{ default: "100%", web: "100dvh" \}\}/,
+    /if \(scrollMode === "overlay"\) \{\s*return \(\s*<Col\s+minHeight=\{\{ default: "100%", web: "100dvh" \}\} between>/,
   );
   assert.match(
     bigFooter,
-    /<YStack flex=\{1\} position="relative">\s*\{children\}\s*<\/YStack>\s*\{footer \? <BigFooter footer=\{footer\} \/> : null\}/,
+    /<Col grow shrink position="relative">\s*\{children\}\s*<\/Col>\s*\{footer \? <BigFooter footer=\{footer\} \/> : null\}/,
   );
   assert.ok(
     bigFooter.indexOf('if (scrollMode === "overlay")') < bigFooter.indexOf("if (!footer)"),
@@ -343,7 +343,7 @@ test("on native the shell renders one ScrollView and no BigFooter (#547)", () =>
   assert.match(bigFooter, /if \(!isWeb\) \{/);
   assert.match(
     bigFooter,
-    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">\s*<YStack flexGrow=\{1\} minHeight="100%" position="relative">\s*\{children\}/,
+    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">\s*<Col grow minHeight="100%" position="relative">\s*\{children\}/,
   );
   assert.equal(
     (bigFooter.match(/<ScrollView/g) ?? []).length,
@@ -596,7 +596,8 @@ describe("bigFooterBrandWordmark", () => {
             ...themes,
           };
         });
-      const { BigFooter }: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
+      const { BigFooter }: Record<string, any> =
+        await import("../../../dist/widgets/content/BigFooter.js");
       return {
         React,
         renderToString,
@@ -707,11 +708,11 @@ describe("bigFooterSideColumn", () => {
     const socialAt = sideBlock.indexOf("<StyledBigFooterSocialAnchor");
     assert.ok(storeAt >= 0, "store links render inside the side column");
     assert.ok(socialAt > storeAt, "social row renders below the store links");
-    const tagStart = footer.lastIndexOf("<YStack", sideAt);
+    const tagStart = footer.lastIndexOf("<Col", sideAt);
     const openingTag = footer.slice(tagStart, footer.indexOf(">", sideAt));
     assert.ok(
-      openingTag.includes('justifyContent="space-between"'),
-      "the side column pins its social row to the bottom via space-between",
+      openingTag.includes("between"),
+      "the side column pins its social row to the bottom via space-between (Col's between)",
     );
   });
   test("the side column renders only when it has content (#467)", () => {
@@ -796,7 +797,8 @@ describe("bigFooterStoreBadges", () => {
             ...themes,
           };
         });
-      const { BigFooter }: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
+      const { BigFooter }: Record<string, any> =
+        await import("../../../dist/widgets/content/BigFooter.js");
       return {
         React,
         renderToString,

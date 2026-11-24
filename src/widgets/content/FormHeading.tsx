@@ -1,4 +1,5 @@
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
 
@@ -31,11 +32,12 @@ export type FormHeadingProps = {
  */
 export function FormHeading({ children, subtitle }: FormHeadingProps) {
   return (
-    <YStack paddingBottom={tokens.spacing[6]}>
-      <YStack gap="$2">
+    <Col>
+      <Col gap="s">
         <Text variant="formTitle">{children}</Text>
         {subtitle ? <Text variant="hint">{subtitle}</Text> : null}
-      </YStack>
-    </YStack>
+      </Col>
+      <Spacer y="xl" />
+    </Col>
   );
 }

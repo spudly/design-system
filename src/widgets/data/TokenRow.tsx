@@ -1,4 +1,5 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
@@ -69,39 +70,41 @@ export function TokenRow({
     // as a rectangle skeleton, and the region marked busy.
     return (
       <LoadingScope active>
-        <XStack
-          alignItems="center"
-          justifyContent="space-between"
-          gap="$3"
+        <Row
+          middle
+          between
+          gap="m"
           borderBottomWidth={1}
           borderBottomColor={tokens.colors.gray.gray2}
-          paddingVertical="$3"
+          py="m"
           {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
         >
-          <YStack flex={1} minWidth={0}>
+          <Col grow shrink minWidth={0}>
             <TextSkeleton size="sm" lines={1} />
-            <YStack paddingBlockStart={2}>
+            {/* The 2px line offsets ride the style channel:
+              gap and Spacer take t-shirt sizes only (#746). */}
+            <Col style={{ paddingTop: 2 }}>
               <TextSkeleton size="xs" lines={1} />
-            </YStack>
-            <YStack paddingBlockStart={2}>
+            </Col>
+            <Col style={{ paddingTop: 2 }}>
               <TextSkeleton size="xs" lines={1} />
-            </YStack>
-          </YStack>
+            </Col>
+          </Col>
           {revokeAction}
-        </XStack>
+        </Row>
       </LoadingScope>
     );
   }
   return (
-    <XStack
-      alignItems="center"
-      justifyContent="space-between"
-      gap="$3"
+    <Row
+      middle
+      between
+      gap="m"
       borderBottomWidth={1}
       borderBottomColor={tokens.colors.gray.gray2}
-      paddingVertical="$3"
+      py="m"
     >
-      <YStack flex={1} minWidth={0}>
+      <Col grow shrink minWidth={0}>
         <Text
           fontSize={tokens.typography.fontSize.sm}
           fontWeight={tokens.typography.fontWeight.medium}
@@ -118,7 +121,7 @@ export function TokenRow({
             </Text>
           ) : null}
         </Text>
-        <YStack paddingBlockStart={2}>
+        <Col style={{ paddingTop: 2 }}>
           <Text
             fontFamily={tokens.typography.fontFamily.mono}
             fontSize={tokens.typography.fontSize.xs}
@@ -126,14 +129,14 @@ export function TokenRow({
           >
             {prefix}…
           </Text>
-        </YStack>
-        <YStack paddingBlockStart={2}>
+        </Col>
+        <Col style={{ paddingTop: 2 }}>
           <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.gray.gray6}>
             {metaLabel}
           </Text>
-        </YStack>
-      </YStack>
+        </Col>
+      </Col>
       {revokeAction}
-    </XStack>
+    </Row>
   );
 }

@@ -1,4 +1,6 @@
-import { Anchor, XStack, YStack, isWeb } from "tamagui";
+import { Anchor, isWeb } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Card, type CardProps } from "../layout/Card.js";
 import { platformAccessibilityProps } from "../accessibility.js";
@@ -66,8 +68,8 @@ export function OptionCard({
   // text still enters the accessibility tree; the Android
   // descendant-hiding value is what actually removes it.
   const renderContent = (decorative: boolean) => (
-    <XStack alignItems="center" justifyContent="space-between" gap={tokens.spacing[3]}>
-      <YStack flex={1} gap={tokens.spacing[1]}>
+    <Row middle between gap="m">
+      <Col grow shrink gap="xs">
         <Text
           variant="subheading"
           accessible={decorative ? false : undefined}
@@ -84,7 +86,7 @@ export function OptionCard({
             {description}
           </Text>
         ) : null}
-      </YStack>
+      </Col>
       <Text
         aria-hidden
         accessible={decorative ? false : undefined}
@@ -96,7 +98,7 @@ export function OptionCard({
       >
         ›
       </Text>
-    </XStack>
+    </Row>
   );
   const content = renderContent(false);
   if (href !== undefined) {

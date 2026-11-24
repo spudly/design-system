@@ -74,9 +74,9 @@ test("ListItem's contract is caller-supplied content plus a disabled flag and a 
 test("ListItem keeps the hairline row and composes the title line from its parts", () => {
   assert.match(
     listRowCode,
-    /<YStack borderBottomWidth=\{1\} borderBottomColor=\{tokens\.colors\.gray\.gray2\}>/,
+    /<Col borderBottomWidth=\{1\} borderBottomColor=\{tokens\.colors\.gray\.gray2\}>/,
   );
-  assert.match(listRowCode, /paddingVertical="\$3"/);
+  assert.match(listRowCode, /py="m"/);
   assert.match(
     listRowCode,
     /fontSize=\{tokens\.typography\.fontSize\.md\}\s+fontWeight=\{tokens\.typography\.fontWeight\.medium\}/,

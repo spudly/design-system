@@ -1,4 +1,4 @@
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Card } from "../layout/Card.js";
 import { Text } from "../data/Text.js";
@@ -38,23 +38,17 @@ export type MessageCardProps = {
  */
 export function MessageCard({ title, message }: MessageCardProps) {
   return (
-    <YStack
-      flex={1}
-      backgroundColor="$surface"
-      alignItems="center"
-      justifyContent="center"
-      padding="$4"
-    >
+    <Col grow shrink center middle backgroundColor="$surface" p="l">
       <Card>
-        <YStack alignItems="center" gap="$2">
+        <Col center gap="s">
           <Text variant="heading" textAlign="center">
             {title}
           </Text>
           <Text color={tokens.colors.gray.gray6} textAlign="center">
             {message}
           </Text>
-        </YStack>
+        </Col>
       </Card>
-    </YStack>
+    </Col>
   );
 }

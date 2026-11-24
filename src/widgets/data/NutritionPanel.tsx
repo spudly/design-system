@@ -1,4 +1,7 @@
-import { View, XStack, YStack } from "tamagui";
+import { View } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
@@ -177,19 +180,19 @@ function NutritionFactRow({
   const isSubNutrient = SUB_NUTRIENT_KINDS.has(fact.kind);
   const isPrimary = !isSubNutrient && !MICRO_NUTRIENT_KINDS.has(fact.kind);
   return (
-    <XStack
-      justifyContent="space-between"
-      alignItems="baseline"
-      gap="$3"
-      paddingVertical="$2"
-      {...(isSubNutrient ? { paddingInlineStart: "$5" as const } : {})}
+    <Row
+      between
+      baseline
+      gap="m"
+      py="s"
+      {...(isSubNutrient ? { style: { paddingInlineStart: tokens.spacing[5] } } : {})}
       borderBottomWidth={isLast ? 0 : 1}
       borderBottomColor={LABEL_HAIRLINE}
     >
       {/* Reading order is nutrient name, amount, then %DV — the
         row composes its text in that order, so a screen reader
         walks the label the way the eye does. */}
-      <XStack gap="$2" alignItems="baseline" flexShrink={1}>
+      <Row gap="s" baseline shrink>
         <Text
           fontSize={tokens.typography.fontSize.sm}
           fontWeight={
@@ -202,7 +205,7 @@ function NutritionFactRow({
         <Text fontSize={tokens.typography.fontSize.sm} color={LABEL_INK}>
           {fact.amountLabel}
         </Text>
-      </XStack>
+      </Row>
       <Text
         fontSize={tokens.typography.fontSize.sm}
         fontWeight={tokens.typography.fontWeight.bold}
@@ -210,7 +213,7 @@ function NutritionFactRow({
       >
         {fact.dailyValueLabel ?? ""}
       </Text>
-    </XStack>
+    </Row>
   );
 }
 
@@ -233,14 +236,7 @@ function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
   const macroNutrients = ordered.filter((fact) => !MICRO_NUTRIENT_KINDS.has(fact.kind));
   const microNutrients = ordered.filter((fact) => MICRO_NUTRIENT_KINDS.has(fact.kind));
   return (
-    <YStack
-      backgroundColor={LABEL_SURFACE}
-      borderWidth={2}
-      borderColor={LABEL_INK}
-      paddingHorizontal="$3"
-      paddingVertical="$3"
-      gap="$2"
-    >
+    <Col backgroundColor={LABEL_SURFACE} borderWidth={2} borderColor={LABEL_INK} p="m" gap="s">
       <Text
         accessibilityRole="header"
         aria-level={3}
@@ -255,7 +251,7 @@ function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
           {facts.servingsPerContainerLabel}
         </Text>
       ) : null}
-      <XStack gap="$2" alignItems="baseline">
+      <Row gap="s" baseline>
         <Text
           fontSize={tokens.typography.fontSize.sm}
           fontWeight={tokens.typography.fontWeight.bold}
@@ -266,9 +262,9 @@ function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
         <Text fontSize={tokens.typography.fontSize.sm} color={LABEL_INK}>
           {facts.servingSizeLabel}
         </Text>
-      </XStack>
+      </Row>
       <LabelBar height={THICK_BAR_HEIGHT} />
-      <XStack justifyContent="space-between" alignItems="baseline" gap="$3">
+      <Row between baseline gap="m">
         <Text
           fontSize={tokens.typography.fontSize.lg}
           fontWeight={tokens.typography.fontWeight.bold}
@@ -283,7 +279,7 @@ function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
         >
           {facts.caloriesLabel}
         </Text>
-      </XStack>
+      </Row>
       <LabelBar height={MEDIUM_BAR_HEIGHT} />
       <Text
         fontSize={tokens.typography.fontSize.xs}
@@ -293,7 +289,7 @@ function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
       >
         {voice.nutritionPanel.dailyValueHeaderLabel}
       </Text>
-      <YStack>
+      <Col>
         {macroNutrients.map((fact, index) => (
           <NutritionFactRow
             key={fact.kind}
@@ -302,11 +298,11 @@ function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
             isLast={index === macroNutrients.length - 1}
           />
         ))}
-      </YStack>
+      </Col>
       {microNutrients.length > 0 ? (
         <>
           <LabelBar height={MEDIUM_BAR_HEIGHT} />
-          <YStack>
+          <Col>
             {microNutrients.map((fact, index) => (
               <NutritionFactRow
                 key={fact.kind}
@@ -315,14 +311,14 @@ function NutritionFactsLabel({ facts }: { facts: NutritionFacts }) {
                 isLast={index === microNutrients.length - 1}
               />
             ))}
-          </YStack>
+          </Col>
         </>
       ) : null}
       <LabelBar height={MEDIUM_BAR_HEIGHT} />
       <Text fontSize={tokens.typography.fontSize.xs} color={LABEL_INK}>
         {voice.nutritionPanel.dailyValueFootnote}
       </Text>
-    </YStack>
+    </Col>
   );
 }
 
@@ -345,35 +341,28 @@ function NutritionFactsSkeleton({
   hasServingsPerContainer: boolean;
 }) {
   const renderRow = (key: string) => (
-    <XStack key={key} justifyContent="space-between" gap="$3" paddingVertical="$2">
-      <YStack flex={1}>
+    <Row key={key} between gap="m" py="s">
+      <Col grow shrink>
         <TextSkeleton size="sm" lines={1} />
-      </YStack>
+      </Col>
       <View width={48}>
         <TextSkeleton size="sm" lines={1} />
       </View>
-    </XStack>
+    </Row>
   );
   return (
-    <YStack
-      backgroundColor={LABEL_SURFACE}
-      borderWidth={2}
-      borderColor={LABEL_INK}
-      paddingHorizontal="$3"
-      paddingVertical="$3"
-      gap="$2"
-    >
+    <Col backgroundColor={LABEL_SURFACE} borderWidth={2} borderColor={LABEL_INK} p="m" gap="s">
       <TextSkeleton size="4xl" lines={1} />
       <TextSkeleton size="sm" lines={1} />
       {hasServingsPerContainer ? <TextSkeleton size="sm" lines={1} /> : null}
       <View height={THICK_BAR_HEIGHT} backgroundColor={LABEL_HAIRLINE} />
       <TextSkeleton size="4xl" lines={1} />
       <View height={MEDIUM_BAR_HEIGHT} backgroundColor={LABEL_HAIRLINE} />
-      <XStack justifyContent="flex-end">
+      <Row right>
         <View width={96}>
           <TextSkeleton size="sm" lines={1} />
         </View>
-      </XStack>
+      </Row>
       {rowKeys.map(renderRow)}
       {microRowKeys.length > 0 ? (
         <>
@@ -383,7 +372,7 @@ function NutritionFactsSkeleton({
       ) : null}
       <View height={MEDIUM_BAR_HEIGHT} backgroundColor={LABEL_HAIRLINE} />
       <TextSkeleton size="xs" lines={1} />
-    </YStack>
+    </Col>
   );
 }
 
@@ -430,22 +419,27 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
         : [];
     return (
       <LoadingScope active>
-        <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
-          <XStack paddingBlockEnd="$3" alignItems="center" justifyContent="space-between" gap="$3">
-            <YStack flex={1}>
-              <TextSkeleton size="sm" lines={1} />
-            </YStack>
-            {nutrition.state === "ready" && nutrition.onRefreshPress ? (
-              <Button
-                variant="secondary"
-                size="sm"
-                disabled={(nutrition.isRefreshing ?? false) || (nutrition.isFetching ?? false)}
-                onPress={nutrition.onRefreshPress}
-              >
-                {nutrition.isRefreshing ? voice.nutritionPanel.refreshingLabel : voice.nutritionPanel.refreshLabel}
-              </Button>
-            ) : null}
-          </XStack>
+        <Col {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+          <Col>
+            <Row middle between gap="m">
+              <Col grow shrink>
+                <TextSkeleton size="sm" lines={1} />
+              </Col>
+              {nutrition.state === "ready" && nutrition.onRefreshPress ? (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  disabled={(nutrition.isRefreshing ?? false) || (nutrition.isFetching ?? false)}
+                  onPress={nutrition.onRefreshPress}
+                >
+                  {nutrition.isRefreshing
+                    ? voice.nutritionPanel.refreshingLabel
+                    : voice.nutritionPanel.refreshLabel}
+                </Button>
+              ) : null}
+            </Row>
+            <Spacer y="m" />
+          </Col>
           <NutritionFactsSkeleton
             rowKeys={rowKeys}
             microRowKeys={microRowKeys}
@@ -453,60 +447,70 @@ export function NutritionPanel({ nutrition, loading = false }: NutritionPanelPro
               nutrition.state === "ready" && nutrition.facts.servingsPerContainerLabel !== undefined
             }
           />
-          <YStack paddingBlockStart="$4">
+          <Col>
+            <Spacer y="l" />
             <TextSkeleton size="xs" lines={1} />
-          </YStack>
-        </YStack>
+          </Col>
+        </Col>
       </LoadingScope>
     );
   }
   if (nutrition.state === "unavailable") {
     return (
-      <YStack>
-        <YStack paddingBlockEnd="$3">
+      <Col>
+        <Col>
           <Text color="$textMuted">{voice.nutritionPanel.unavailableLabel}</Text>
-        </YStack>
+          <Spacer y="m" />
+        </Col>
         {nutrition.onEstimatePress ? (
           <Button
             variant="primary"
             disabled={nutrition.isRefreshing ?? false}
             onPress={nutrition.onEstimatePress}
           >
-            {nutrition.isRefreshing ? voice.nutritionPanel.refreshingLabel : voice.nutritionPanel.estimateLabel}
+            {nutrition.isRefreshing
+              ? voice.nutritionPanel.refreshingLabel
+              : voice.nutritionPanel.estimateLabel}
           </Button>
         ) : null}
-      </YStack>
+      </Col>
     );
   }
   return (
-    <YStack>
-      <XStack paddingBlockEnd="$3" alignItems="center" justifyContent="space-between" gap="$3">
-        <Text
-          fontSize={tokens.typography.fontSize.sm}
-          fontWeight={tokens.typography.fontWeight.semibold}
-          letterSpacing={0.35}
-          color={tokens.colors.gray.gray6}
-          textTransform="uppercase"
-        >
-          {voice.nutritionPanel.perServingLabel}
-        </Text>
-        {nutrition.onRefreshPress ? (
-          <Button
-            variant="secondary"
-            size="sm"
-            disabled={(nutrition.isRefreshing ?? false) || (nutrition.isFetching ?? false)}
-            onPress={nutrition.onRefreshPress}
+    <Col>
+      <Col>
+        <Row middle between gap="m">
+          <Text
+            fontSize={tokens.typography.fontSize.sm}
+            fontWeight={tokens.typography.fontWeight.semibold}
+            letterSpacing={0.35}
+            color={tokens.colors.gray.gray6}
+            textTransform="uppercase"
           >
-            {nutrition.isRefreshing ? voice.nutritionPanel.refreshingLabel : voice.nutritionPanel.refreshLabel}
-          </Button>
-        ) : null}
-      </XStack>
+            {voice.nutritionPanel.perServingLabel}
+          </Text>
+          {nutrition.onRefreshPress ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={(nutrition.isRefreshing ?? false) || (nutrition.isFetching ?? false)}
+              onPress={nutrition.onRefreshPress}
+            >
+              {nutrition.isRefreshing
+                ? voice.nutritionPanel.refreshingLabel
+                : voice.nutritionPanel.refreshLabel}
+            </Button>
+          ) : null}
+        </Row>
+        <Spacer y="m" />
+      </Col>
       <NutritionFactsLabel facts={nutrition.facts} />
-      <YStack paddingBlockStart="$4">
+      <Col>
+        <Spacer y="l" />
         <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted">
           {nutrition.disclaimer}
         </Text>
-      </YStack>
-    </YStack>
+      </Col>
+    </Col>
   );
 }

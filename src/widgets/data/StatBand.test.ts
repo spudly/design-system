@@ -20,7 +20,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "StatBand.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "data", "StatBand.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("StatBand is exported from the built internal components barrel", async () => {
@@ -45,8 +48,8 @@ test("the contract is children only — the caller composes the stats", () => {
 test("the band owns the recessed fill, radius, vertical padding, and spread", () => {
   assert.match(code, /backgroundColor=\{tokens\.colors\.gray\.gray1\}/);
   assert.match(code, /borderRadius=\{tokens\.radii\.lg\}/);
-  assert.match(code, /paddingVertical="\$4"/);
-  assert.match(code, /justifyContent="space-around"/);
+  assert.match(code, /py="l"/);
+  assert.match(code, /<Row around/);
 });
 
 test("the band carries no margin or outer spacing of its own", () => {

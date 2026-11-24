@@ -16,7 +16,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "TagList.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "data", "TagList.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("TagList is exported from the built internal components barrel", async () => {
@@ -32,7 +35,7 @@ test("tags render through Badge's color form, one per tag", () => {
   assert.match(code, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/);
   assert.match(code, /\{tag\.name\}/, "the badge label is the tag's name");
   assert.match(code, /tags\.map\(\(tag\) =>/, "one badge per tag, in order");
-  assert.match(code, /<StyledTagRow>/, "the badges flow in the list's wrapping row");
+  assert.match(code, /<Row wrap gap="s" top>/, "the badges flow in the list's wrapping row");
   assert.ok(!code.includes("ChipRow"), "the retired ChipRow must not come back");
   assert.match(code, /color: TagColorName;/, "the color is a strictly-typed tag color name");
   assert.ok(!code.includes("{tag.color}22"), "the list must not re-implement the tag tint inline");

@@ -57,22 +57,30 @@ function source(name: string) {
     if (existsSync(p)) return readFileSync(p, "utf8");
   }
   const viewPath = join(root, "src", "views", `${name}.tsx`);
-  return readFileSync(existsSync(viewPath) ? viewPath : join(root, "src", "widgets", `${name}.tsx`), "utf8");
+  return readFileSync(
+    existsSync(viewPath) ? viewPath : join(root, "src", "widgets", `${name}.tsx`),
+    "utf8",
+  );
 }
 
-const MOVED = [
-  "CheckboxSelectList",
-  "FixedActionBanner",
-  "StatRow",
-  "TokenRow",
-];
+const MOVED = ["CheckboxSelectList", "FixedActionBanner", "StatRow", "TokenRow"];
 
 test("BulkSelectToolbar is exported from the internal barrel as a view, not a widget (#712)", () => {
-  assert.equal(typeof dist.BulkSelectToolbar, "function", "BulkSelectToolbar must remain exported from the internal barrel");
+  assert.equal(
+    typeof dist.BulkSelectToolbar,
+    "function",
+    "BulkSelectToolbar must remain exported from the internal barrel",
+  );
   const widgetsBarrel = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
-  assert.ok(!widgetsBarrel.includes("BulkSelectToolbar"), "BulkSelectToolbar must not be exported from the widgets barrel");
+  assert.ok(
+    !widgetsBarrel.includes("BulkSelectToolbar"),
+    "BulkSelectToolbar must not be exported from the widgets barrel",
+  );
   const viewsBarrel = readFileSync(join(root, "src", "views", "index.ts"), "utf8");
-  assert.ok(viewsBarrel.includes("BulkSelectToolbar"), "BulkSelectToolbar must be exported from the views barrel");
+  assert.ok(
+    viewsBarrel.includes("BulkSelectToolbar"),
+    "BulkSelectToolbar must be exported from the views barrel",
+  );
 });
 
 test("the remaining B2 widgets are exported from the internal components barrel", () => {
@@ -87,11 +95,21 @@ test("the remaining B2 widgets are exported from the internal components barrel"
 });
 
 test("CommentItem is exported from the internal barrel as a view, not a widget (#714)", () => {
-  assert.equal(typeof dist.CommentItem, "function", "CommentItem must remain exported from the internal barrel");
+  assert.equal(
+    typeof dist.CommentItem,
+    "function",
+    "CommentItem must remain exported from the internal barrel",
+  );
   const widgetsBarrel = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
-  assert.ok(!widgetsBarrel.includes("CommentItem"), "CommentItem must not be exported from the widgets barrel");
+  assert.ok(
+    !widgetsBarrel.includes("CommentItem"),
+    "CommentItem must not be exported from the widgets barrel",
+  );
   const viewsBarrel = readFileSync(join(root, "src", "views", "index.ts"), "utf8");
-  assert.ok(viewsBarrel.includes("CommentItem"), "CommentItem must be exported from the views barrel");
+  assert.ok(
+    viewsBarrel.includes("CommentItem"),
+    "CommentItem must be exported from the views barrel",
+  );
 });
 
 test("Badge's colored-tag form inverts to the resolved dark shade surface with the light shade label (#799)", () => {
@@ -101,7 +119,9 @@ test("Badge's colored-tag form inverts to the resolved dark shade surface with t
   // resolver; the surface takes the pair's dark shade and the label
   // its light shade.
   assert.ok(
-    badge.includes('const backgroundColor = isSelected ? "$primary" : (tagDark ?? styles.background)'),
+    badge.includes(
+      'const backgroundColor = isSelected ? "$primary" : (tagDark ?? styles.background)',
+    ),
     "surface must be the resolved tag color's dark shade while unselected (the selectable form's selected state takes the primary fill)",
   );
   assert.ok(
@@ -189,5 +209,5 @@ test("StatRow is the recessed space-around band", () => {
   const row = source("StatRow");
   assert.ok(row.includes("gray.gray1"), "band fill must be gray step 1");
   assert.ok(row.includes("radii.lg"), "band must use the large radius token");
-  assert.ok(row.includes('justifyContent: "space-around"'), "stats must spread space-around");
+  assert.ok(row.includes("around"), "stats must spread space-around (Row's around)");
 });

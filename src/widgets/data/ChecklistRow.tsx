@@ -1,4 +1,6 @@
-import { Checkbox as TamaguiCheckbox, XStack, YStack, styled } from "tamagui";
+import { Checkbox as TamaguiCheckbox, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "./Text.js";
@@ -49,13 +51,8 @@ export function ChecklistRow({ label, metadata, checked, onCheckedChange }: Chec
   const toggle = () => onCheckedChange(!checked);
 
   return (
-    <XStack
-      alignItems="flex-start"
-      gap={tokens.spacing[3]}
-      minHeight={44}
-      paddingVertical={tokens.spacing[1]}
-    >
-      <XStack height={FIRST_LINE_BOX_CONTAINER_HEIGHT} alignItems="center" justifyContent="center">
+    <Row top gap="m" minHeight={44} py="xs">
+      <Row height={FIRST_LINE_BOX_CONTAINER_HEIGHT} middle center>
         <StyledCheckbox
           checked={checked}
           onCheckedChange={onCheckedChange}
@@ -65,8 +62,8 @@ export function ChecklistRow({ label, metadata, checked, onCheckedChange }: Chec
             <Text style={{ fontSize: tokens.typography.fontSize.sm, color: "$primary" }}>✓</Text>
           </TamaguiCheckbox.Indicator>
         </StyledCheckbox>
-      </XStack>
-      <YStack flex={1} onPress={toggle} cursor="pointer">
+      </Row>
+      <Col grow shrink onPress={toggle} cursor="pointer">
         <Text
           style={
             checked
@@ -80,7 +77,7 @@ export function ChecklistRow({ label, metadata, checked, onCheckedChange }: Chec
           {label}
         </Text>
         {metadata ? <Text variant="hint">{metadata}</Text> : null}
-      </YStack>
-    </XStack>
+      </Col>
+    </Row>
   );
 }

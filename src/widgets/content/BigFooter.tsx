@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { Anchor, ScrollView, XStack, YStack, isWeb, styled, useTheme } from "tamagui";
+import { Anchor, ScrollView, isWeb, styled, useTheme } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { SocialFacebookIcon } from "../../icons/SocialFacebookIcon.js";
 import { SocialGithubIcon } from "../../icons/SocialGithubIcon.js";
@@ -255,42 +257,30 @@ export function BigFooter({ footer }: BigFooterProps) {
     </StyledBigFooterBrandAnchor>
   );
   return (
-    <YStack
-      backgroundColor="$primary"
-      paddingHorizontal="$6"
-      paddingVertical="$6"
-      gap="$5"
-      {...contentInfoRoleProps}
-    >
+    <Col backgroundColor="$primary" p="xl" gap="xl" {...contentInfoRoleProps}>
       {brand.mark !== undefined ? (
-        <XStack alignItems="center" gap="$3">
+        <Row middle gap="m">
           <BrandMark mark={brand.mark} size={40} />
           {brandAnchor}
-        </XStack>
+        </Row>
       ) : (
         brandAnchor
       )}
-      <XStack flexWrap="wrap" gap="$5" alignItems="stretch">
+      <Row wrap gap="xl" stretch>
         {columns.length > 0 ? (
-          <XStack
-            flexWrap="wrap"
-            gap="$5"
-            flexGrow={1}
-            flexShrink={1}
-            flexBasis={BIG_FOOTER_COLUMN_BASIS}
-          >
+          <Row wrap gap="xl" grow shrink style={{ flexBasis: BIG_FOOTER_COLUMN_BASIS }}>
             {columns.map((column) => (
-              <YStack
+              <Col
                 key={column.title}
-                flexGrow={1}
-                flexShrink={1}
-                flexBasis={BIG_FOOTER_COLUMN_BASIS}
-                gap="$3"
+                grow
+                shrink
+                style={{ flexBasis: BIG_FOOTER_COLUMN_BASIS }}
+                gap="m"
               >
                 <Text variant="label" color="$onPrimary">
                   {column.title}
                 </Text>
-                <YStack gap="$2">
+                <Col gap="s">
                   {column.links.map((link) => (
                     <TextLink
                       key={link.href}
@@ -301,20 +291,15 @@ export function BigFooter({ footer }: BigFooterProps) {
                       {link.label}
                     </TextLink>
                   ))}
-                </YStack>
-              </YStack>
+                </Col>
+              </Col>
             ))}
-          </XStack>
+          </Row>
         ) : null}
         {storeLinks.length > 0 || socialLinks.length > 0 ? (
-          <YStack
-            flexShrink={1}
-            justifyContent="space-between"
-            gap="$3"
-            testID="big-footer-side-column"
-          >
+          <Col shrink between gap="m" testID="big-footer-side-column">
             {storeLinks.length > 0 ? (
-              <YStack gap="$3" alignItems="flex-start">
+              <Col gap="m" left>
                 {storeLinks.map((link) => {
                   const Badge = STORE_BADGES[link.store];
                   return (
@@ -331,10 +316,10 @@ export function BigFooter({ footer }: BigFooterProps) {
                     </StyledBigFooterStoreAnchor>
                   );
                 })}
-              </YStack>
+              </Col>
             ) : null}
             {socialLinks.length > 0 ? (
-              <XStack flexWrap="wrap" gap="$3">
+              <Row wrap gap="m">
                 {socialLinks.map((link) => {
                   const IconGlyph = SOCIAL_ICONS[link.icon];
                   return (
@@ -351,12 +336,12 @@ export function BigFooter({ footer }: BigFooterProps) {
                     </StyledBigFooterSocialAnchor>
                   );
                 })}
-              </XStack>
+              </Row>
             ) : null}
-          </YStack>
+          </Col>
         ) : null}
-      </XStack>
-    </YStack>
+      </Row>
+    </Col>
   );
 }
 
@@ -484,9 +469,9 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
       // no ScrollView of its own, so the content's scroller
       // is never nested inside a plain ScrollView.
       return (
-        <YStack flex={1} position="relative">
+        <Col grow shrink position="relative">
           {children}
-        </YStack>
+        </Col>
       );
     }
     if (scrollMode === "nested") {
@@ -494,9 +479,9 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
       // a scroller nor a bounded frame — the outer shell is
       // the sole scroll owner.
       return (
-        <YStack flexGrow={1} flexDirection="column" position="relative">
+        <Col grow position="relative">
           {children}
-        </YStack>
+        </Col>
       );
     }
     // Default "shell" mode: the shell's ONE ScrollView wraps
@@ -507,9 +492,9 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
     // the viewport.
     return (
       <ScrollView flex={1} keyboardShouldPersistTaps="handled">
-        <YStack flexGrow={1} minHeight="100%" position="relative">
+        <Col grow minHeight="100%" position="relative">
           {children}
-        </YStack>
+        </Col>
       </ScrollView>
     );
   }
@@ -527,16 +512,12 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
     // covered. The footer, when supplied, stays in flow
     // below the region exactly as in the default shell.
     return (
-      <YStack
-        minHeight={{ default: "100%", web: "100dvh" }}
-        flexDirection="column"
-        justifyContent="space-between"
-      >
-        <YStack flex={1} position="relative">
+      <Col minHeight={{ default: "100%", web: "100dvh" }} between>
+        <Col grow shrink position="relative">
           {children}
-        </YStack>
+        </Col>
         {footer ? <BigFooter footer={footer} /> : null}
-      </YStack>
+      </Col>
     );
   }
   if (!footer) {
@@ -544,9 +525,9 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
     // content still gets the centered desktop column — a page
     // without footer data is not exempt from the measure.
     return (
-      <YStack flexGrow={1} flexDirection="column" position="relative">
+      <Col grow position="relative">
         <PageContentColumn>{children}</PageContentColumn>
-      </YStack>
+      </Col>
     );
   }
   // Web (#547): Stephen's page-scroll model, literally — a flex
@@ -557,13 +538,9 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
   // viewport bottom. Long page: the document scrolls the whole
   // page — there is no nested scroller.
   return (
-    <YStack
-      minHeight={{ default: "100%", web: "100dvh" }}
-      flexDirection="column"
-      justifyContent="space-between"
-    >
+    <Col minHeight={{ default: "100%", web: "100dvh" }} between>
       <PageContentColumn>{children}</PageContentColumn>
       <BigFooter footer={footer} />
-    </YStack>
+    </Col>
   );
 }
