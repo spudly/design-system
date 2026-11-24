@@ -111,6 +111,9 @@ export function SelectField({
           {label}
         </Label>
       ) : null}
+      {/* The Tamagui Select root's props carry no `disabled` in this
+          version; inertness comes from the disabled trigger below
+          (which cannot open the sheet/popover) plus the change guard. */}
       <TamaguiSelect
         value={value ?? ""}
         onValueChange={(v) => {
@@ -119,7 +122,6 @@ export function SelectField({
           }
           onValueChange?.(v);
         }}
-        disabled={disabled}
         zIndex={200000}
       >
         <StyledTrigger
