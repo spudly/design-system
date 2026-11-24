@@ -49,7 +49,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 const a11y = readCode("src/widgets/accessibility.ts");
-const publicFooter = readCode("src/widgets/BigFooter.tsx");
+const publicFooter = readCode("src/widgets/content/BigFooter.tsx");
 const legalPage = readCode("src/pages/eciperay/LegalDocumentPage.tsx");
 test("the shared translation exports web-only landmark props (#366)", () => {
   assert.match(
@@ -87,7 +87,7 @@ test("no other source file adds a landmark role — no duplicates inside the fra
   const srcDir = join(root, "src");
   const owners = new Set([
     join(srcDir, "widgets", "accessibility.ts"),
-    join(srcDir, "widgets", "BigFooter.tsx"),
+    join(srcDir, "widgets", "content", "BigFooter.tsx"),
     join(srcDir, "pages", "eciperay", "LegalDocumentPage.tsx"),
     // #473: MainLandmark owns the `main` role for the public
     // recipe surface now the frame page is retired.
@@ -136,7 +136,7 @@ function loadRuntime() {
       await import("../dist/pages/shared/fixtures.js");
     // BigFooter is internal (not in the components barrel, #410/#298):
     // load its dist module directly, like the icons module's tests do.
-    const { BigFooter }: Record<string, any> = await import("../dist/widgets/BigFooter.js");
+    const { BigFooter }: Record<string, any> = await import("../dist/widgets/content/BigFooter.js");
     return {
       React,
       renderToString,

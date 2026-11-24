@@ -109,7 +109,7 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    const shellModule: Record<string, any> = await import("../../../dist/widgets/BigFooter.js");
+    const shellModule: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
     const { AppShellPage }: Record<string, any> =
       await import("../../../dist/pages/eciperay/AppShellPage.js");
     const { TabbedShellPage }: Record<string, any> =

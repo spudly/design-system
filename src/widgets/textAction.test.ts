@@ -41,7 +41,7 @@ function readCode(rel: string) {
 }
 
 const commentItem = readCode("src/views/CommentItem.tsx");
-const textActionCardRow = readCode("src/widgets/TextActionCardRow.tsx");
+const textActionCardRow = readCode("src/widgets/content/TextActionCardRow.tsx");
 const changedListBanner = readCode("src/widgets/ChangedListBanner.tsx");
 const revertAction = readCode("src/views/RevertAction.tsx");
 const aiSessionPage = readCode("src/pages/eciperay/AiSessionPage.tsx");

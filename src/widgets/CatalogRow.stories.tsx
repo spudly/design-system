@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { CatalogRow } from "./CatalogRow.js";
-import { SectionHeading } from "./SectionHeading.js";
+import { SectionHeading } from "./content/SectionHeading.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof CatalogRow> = {

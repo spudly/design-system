@@ -242,7 +242,7 @@ test("SignUpForm keeps the legal notice between submit and the sign-in link", ()
 });
 
 test("LegalSection frames the host's links under its title in the app treatment", () => {
-  const source = read("src/widgets/LegalSection.tsx");
+  const source = read("src/widgets/content/LegalSection.tsx");
   assert.match(source, /title: string/, "the title crosses as the host's copy");
   assert.match(source, /children: ReactNode/, "the links cross as children");
   assert.match(

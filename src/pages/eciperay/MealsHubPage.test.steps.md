@@ -1,7 +1,7 @@
 ---
 component: MealsHubPage
 run_when:
-  - "src/widgets/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow."
+  - "src/widgets/content/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow."
   - "src/widgets/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell."
   - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
@@ -25,7 +25,7 @@ Open in `Widgets/TextActionCardRow`: Default, TitleOnly.
 2. TitleOnly: the card shows the title alone, no subtitle line
    and no empty gap where it would sit.
 
-**Run when:** `src/widgets/TextActionCardRow.tsx`, its
+**Run when:** `src/widgets/content/TextActionCardRow.tsx`, its
 stories, MealsHubPage's meal list, or a changeset naming
 TextActionCardRow.
 

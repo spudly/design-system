@@ -1,7 +1,7 @@
 ---
 component: RatingsCard
 run_when:
-  - "src/widgets/RatingsCard.tsx, src/widgets/SectionHeading.tsx, their stories, or a changeset naming any of them. (namely: RatingsCard, SectionHeading)"
+  - "src/widgets/RatingsCard.tsx, src/widgets/content/SectionHeading.tsx, their stories, or a changeset naming any of them. (namely: RatingsCard, SectionHeading)"
   - "src/widgets/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
 ---
 
@@ -35,7 +35,7 @@ Stale; `Widgets/SectionHeading`: Default.
    headings.
 
 **Run when:** `src/widgets/RatingsCard.tsx`,
-`src/widgets/SectionHeading.tsx`, their stories, or a
+`src/widgets/content/SectionHeading.tsx`, their stories, or a
 changeset naming any of them.
 
 ## RatingsCard

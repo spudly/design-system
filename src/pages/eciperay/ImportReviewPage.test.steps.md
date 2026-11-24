@@ -2,7 +2,7 @@
 component: ImportReviewPage
 run_when:
   - "src/pages/eciperay/ImportTextPage.tsx, src/pages/eciperay/ImportUrlPage.tsx, src/pages/eciperay/ImportReviewPage.tsx, their stories, or a changeset naming the import pages."
-  - "src/widgets/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard."
+  - "src/widgets/content/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard."
 ---
 
 # ImportReviewPage — manual test steps
@@ -49,6 +49,6 @@ NoActions.
    the card's inset.
 3. NoActions: no actions row renders below the content.
 
-**Run when:** `src/widgets/PreviewCard.tsx`, its stories,
+**Run when:** `src/widgets/content/PreviewCard.tsx`, its stories,
 AiSessionPage, ImportReviewPage, or a changeset naming
 PreviewCard.

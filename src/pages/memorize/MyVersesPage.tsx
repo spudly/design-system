@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Badge } from "../../widgets/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";

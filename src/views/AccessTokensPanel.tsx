@@ -1,10 +1,10 @@
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { ContentStack } from "../widgets/ContentStack.js";
-import { CreatedSecretPanel } from "../widgets/CreatedSecretPanel.js";
+import { CreatedSecretPanel } from "../widgets/content/CreatedSecretPanel.js";
 import { ListStack } from "../widgets/ListStack.js";
 import { Button } from "../widgets/actions/Button.js";
 import { Alert } from "../widgets/Alert.js";
-import { SectionCard } from "../widgets/SectionCard.js";
+import { SectionCard } from "../widgets/content/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextField } from "../widgets/form/TextField.js";
 import { TokenRow } from "../widgets/TokenRow.js";

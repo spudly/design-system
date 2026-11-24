@@ -1,11 +1,11 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/Alert.js";
-import { ChatTranscript } from "../../widgets/ChatTranscript.js";
+import { ChatTranscript } from "../../widgets/content/ChatTranscript.js";
 import { RecipePreviewView, type RecipePreviewViewProps } from "../../views/RecipePreviewView.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
-import { FormHeading } from "../../widgets/FormHeading.js";
-import { PreviewCard } from "../../widgets/PreviewCard.js";
+import { FormHeading } from "../../widgets/content/FormHeading.js";
+import { PreviewCard } from "../../widgets/content/PreviewCard.js";
 import { SessionShell } from "../../widgets/SessionShell.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 

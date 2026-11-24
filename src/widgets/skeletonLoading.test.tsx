@@ -340,13 +340,39 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 // masonry grid (Stephen on #551). CheckboxSelectList's centered
 // spinner is gone.
 
-// Form-category widgets live in src/widgets/form since #710.
-const widgetPath = (name: string) =>
-  existsSync(join(root, "src", "widgets", "form", `${name}.tsx`))
-    ? `src/widgets/form/${name}.tsx`
-    : existsSync(join(root, "src", "views", `${name}.tsx`))
-      ? `src/views/${name}.tsx`
-      : `src/widgets/${name}.tsx`;
+// Widgets live in per-category directories under src/widgets
+// since #710 (form was the first, the rest followed category by
+// category); views live in per-host-app directories under
+// src/views. Probe the category/host directories before falling
+// back to the flat path.
+const WIDGET_CATEGORY_DIRS = [
+  "actions",
+  "content",
+  "data",
+  "feedback",
+  "form",
+  "layout",
+  "overlays",
+] as const;
+const widgetPath = (name: string) => {
+  for (const cat of WIDGET_CATEGORY_DIRS) {
+    if (existsSync(join(root, "src", "widgets", cat, `${name}.tsx`)))
+      return `src/widgets/${cat}/${name}.tsx`;
+  }
+  return `src/widgets/${name}.tsx`;
+};
+const viewPath = (name: string) => {
+  for (const host of ["eciperay", "memorize", "shared"] as const) {
+    if (existsSync(join(root, "src", "views", host, `${name}.tsx`)))
+      return `src/views/${host}/${name}.tsx`;
+  }
+  return `src/views/${name}.tsx`;
+};
+const anyPath = (name: string) => {
+  const w = widgetPath(name);
+  if (existsSync(join(root, w))) return w;
+  return viewPath(name);
+};
 
 const T1_SCOPE_WIDGETS = [
   "CardRow",
@@ -363,7 +389,7 @@ const T1_SCOPE_WIDGETS = [
 ] as const;
 test("T1: every converted list/card widget declares `loading` and reads the LoadingScope", () => {
   for (const name of T1_SCOPE_WIDGETS) {
-    const code = readCode(widgetPath(name));
+    const code = readCode(anyPath(name));
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
@@ -377,7 +403,7 @@ test("T1: every converted list/card widget declares `loading` and reads the Load
   const card = readCode("src/widgets/Card.tsx");
   assert.match(card, /\bloading\?: boolean/, "Card must declare the loading prop");
   assert.match(card, /LoadingScope/, "Card must provide the LoadingScope while loading");
-  const sectionCard = readCode("src/widgets/SectionCard.tsx");
+  const sectionCard = readCode("src/widgets/content/SectionCard.tsx");
   assert.match(sectionCard, /loading/, "SectionCard must handle the loading flag");
   assert.match(sectionCard, /TextSkeleton/, "SectionCard must skeletonize its title");
 });
@@ -948,7 +974,7 @@ const T2_SCOPE_WIDGETS = [
 ] as const;
 test("T2: every converted data widget declares `loading` and reads the LoadingScope", () => {
   for (const name of T2_SCOPE_WIDGETS) {
-    const code = readCode(widgetPath(name));
+    const code = readCode(anyPath(name));
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
@@ -1702,18 +1728,18 @@ const T3_PROP_VIEWS = [
   "TransferRecipesView",
 ] as const;
 // #698 tranche 4: CandidateList, ChangedListBanner, and
-// LegalSection moved to src/widgets (they own their styling).
-const T3_WIDGET_COMPONENTS = new Set(["CandidateList", "ChangedListBanner", "LegalSection"]);
+// LegalSection moved to src/widgets (they own their styling);
+// anyPath above resolves widgets and views alike.
 test("T3: every converted view declares `loading` and reads the LoadingScope", () => {
   for (const name of T3_PROP_VIEWS) {
     const code = readCode(
-      `src/${T3_WIDGET_COMPONENTS.has(name) ? "widgets" : "views"}/${name}.tsx`,
+      anyPath(name),
     );
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
       code,
-      /from "\.\.\/contexts\/LoadingScope\.js"/,
+      /from "(?:\.\.\/)+contexts\/LoadingScope\.js"/,
       `${name} must import the scope from src/contexts`,
     );
     assert.match(

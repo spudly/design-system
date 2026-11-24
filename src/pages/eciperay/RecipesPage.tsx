@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Fragment, useEffect, useRef } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { Alert } from "../../widgets/Alert.js";
@@ -12,10 +12,10 @@ import {
   type CatalogPageFilterProps,
 } from "../../views/CatalogFiltersBar.js";
 import { CatalogHeader } from "../../views/CatalogHeader.js";
-import { DiscoveryCard } from "../../widgets/DiscoveryCard.js";
+import { DiscoveryCard } from "../../widgets/content/DiscoveryCard.js";
 import { EmptyState } from "../../views/EmptyState.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { SectionHeading } from "../../widgets/SectionHeading.js";
+import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import type { SelectOption } from "../../widgets/form/SelectField.js";
 import { LoadingMediaRow } from "../../widgets/LoadingMediaRow.js";
 import { ScrollSentinel } from "../../widgets/ScrollSentinel.js";

@@ -8,7 +8,7 @@
  * Toolbar — the recipedetail tranche's pinned bar — joins the
  * set in the #119 extraction round and is pinned here;
  * StatusMessage retired into CenteredText
- * (src/widgets/CenteredText.test.ts) in the dedupe.
+ * (src/widgets/content/CenteredText.test.ts) in the dedupe.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -73,7 +73,7 @@ test("Toolbar owns the pinned bar's inset, gap, wrap, and hairline divider", () 
 });
 
 test("SectionHeading is the subheading treatment with no baked-in padding", () => {
-  const heading = code("SectionHeading.tsx");
+  const heading = code("content/SectionHeading.tsx");
   assert.match(
     heading,
     /<Text\s+variant="subheading"\s+accessibilityRole="header"\s+aria-level=\{2\}\s*>/,
@@ -86,7 +86,7 @@ test("SectionHeading is the subheading treatment with no baked-in padding", () =
 });
 
 test("SectionHeading carries the header role at level 2 (#317)", () => {
-  const heading = code("SectionHeading.tsx");
+  const heading = code("content/SectionHeading.tsx");
   assert.match(
     heading,
     /accessibilityRole="header"/,

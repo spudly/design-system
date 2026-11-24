@@ -8,7 +8,7 @@ import { Alert } from "../widgets/Alert.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/actions/Button.js";
 import { Center } from "../widgets/Center.js";
-import { SectionCard } from "../widgets/SectionCard.js";
+import { SectionCard } from "../widgets/content/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";

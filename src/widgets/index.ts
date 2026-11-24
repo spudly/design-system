@@ -21,7 +21,7 @@ export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPickerField.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
-export { DiscoveryCard, type DiscoveryCardProps } from "./DiscoveryCard.js";
+export { DiscoveryCard, type DiscoveryCardProps } from "./content/DiscoveryCard.js";
 export { Divider, type DividerProps } from "./Divider.js";
 export {
   Dropdown,
@@ -43,9 +43,9 @@ export {
 export { CardRow, type CardRowProps } from "./CardRow.js";
 export { ListItem, type ListItemProps } from "./ListItem.js";
 export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
-export { MessageCard, type MessageCardProps } from "./MessageCard.js";
+export { MessageCard, type MessageCardProps } from "./content/MessageCard.js";
 export { MetadataBadge, type MetadataBadgeProps } from "./MetadataBadge.js";
-export { OptionCard, type OptionCardProps } from "./OptionCard.js";
+export { OptionCard, type OptionCardProps } from "./content/OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./actions/PrevNextNav.js";
 export { ProgressBar, type ProgressBarProps } from "./ProgressBar.js";
 export { ButtonRow, type ButtonRowProps } from "./actions/ButtonRow.js";
@@ -73,13 +73,13 @@ export { BannerRow, type BannerRowProps } from "./BannerRow.js";
 export { ProseColumn, type ProseColumnProps } from "./ProseColumn.js";
 export { ProseStack, type ProseStackProps } from "./ProseStack.js";
 export { BulletList, type BulletListProps } from "./BulletList.js";
-export { ChatTranscript, type ChatTranscriptProps } from "./ChatTranscript.js";
+export { ChatTranscript, type ChatTranscriptProps } from "./content/ChatTranscript.js";
 export { FieldRow, type FieldRowProps } from "./form/FieldRow.js";
 export { SectionStack, type SectionStackProps } from "./SectionStack.js";
 export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
 export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./form/SecretRevealPanel.js";
-export { SectionCard, type SectionCardProps } from "./SectionCard.js";
+export { SectionCard, type SectionCardProps } from "./content/SectionCard.js";
 export { SelectField, type SelectFieldProps, type SelectOption } from "./form/SelectField.js";
 export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
 export {
@@ -120,9 +120,9 @@ export { VerseText, type VerseTextProps } from "./VerseText.js";
 // branches coined independently, shipped once here (the
 // tranche PRs adopt these in their update rounds).
 export { BrandLink, type BrandLinkProps } from "./actions/BrandLink.js";
-export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
+export { CenteredText, type CenteredTextProps } from "./content/CenteredText.js";
 export { FieldLabel, type FieldLabelProps } from "./form/FieldLabel.js";
-export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
+export { FormHeading, type FormHeadingProps } from "./content/FormHeading.js";
 export { FormStack, type FormStackProps } from "./FormStack.js";
 export { LabeledField, type LabeledFieldProps } from "./form/LabeledField.js";
 export { LabeledGroup, type LabeledGroupProps } from "./form/LabeledGroup.js";
@@ -142,12 +142,12 @@ export {
 } from "./RatingsCard.js";
 export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
 export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
-export { SectionHeading, type SectionHeadingProps } from "./SectionHeading.js";
+export { SectionHeading, type SectionHeadingProps } from "./content/SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./SessionShell.js";
 export { StepList, type StepListProps } from "./StepList.js";
 export { SuggestionPanel, type SuggestionPanelProps } from "./form/SuggestionPanel.js";
 export { TagList, type TagListProps } from "./TagList.js";
-export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCardRow.js";
+export { TextActionCardRow, type TextActionCardRowProps } from "./content/TextActionCardRow.js";
 
 // The #119 extraction set: the components the tranche PRs
 // inventoried as extraction-required during their adoption
@@ -164,7 +164,7 @@ export {
   type NutritionPanelProps,
 } from "./NutritionPanel.js";
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
-export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
+export { PreviewCard, type PreviewCardProps } from "./content/PreviewCard.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./actions/Toolbar.js";
 export { TrailingActionsRow, type TrailingActionsRowProps } from "./actions/TrailingActionsRow.js";
@@ -194,8 +194,8 @@ export { EndRow, type EndRowProps } from "./EndRow.js";
 export { CompactRow, type CompactRowProps } from "./CompactRow.js";
 export { Grow, type GrowProps } from "./Grow.js";
 export { FramedScrollRegion, type FramedScrollRegionProps } from "./FramedScrollRegion.js";
-export { DashedPlaceholder, type DashedPlaceholderProps } from "./DashedPlaceholder.js";
-export { OverlayTextPanel, type OverlayTextPanelProps } from "./OverlayTextPanel.js";
+export { DashedPlaceholder, type DashedPlaceholderProps } from "./content/DashedPlaceholder.js";
+export { OverlayTextPanel, type OverlayTextPanelProps } from "./content/OverlayTextPanel.js";
 export { RadioSkeletonRow, type RadioSkeletonRowProps } from "./RadioSkeletonRow.js";
 export { CheckboxSkeletonRow, type CheckboxSkeletonRowProps } from "./CheckboxSkeletonRow.js";
 
@@ -212,7 +212,7 @@ export {
 } from "./AppTopBar.js";
 export { CandidateList, type CandidateListProps } from "./CandidateList.js";
 export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
-export { LegalSection, type LegalSectionProps } from "./LegalSection.js";
+export { LegalSection, type LegalSectionProps } from "./content/LegalSection.js";
 export { RatingForm, type RatingFormProps } from "./RatingForm.js";
 // The #698 tranche-4 extraction set: the layout and panel
 // components the remaining views' de-styling extracted.
@@ -221,4 +221,4 @@ export { StartStack, type StartStackProps } from "./StartStack.js";
 export { ListHeaderStack, type ListHeaderStackProps } from "./ListHeaderStack.js";
 export { SkeletonPanel, type SkeletonPanelProps } from "./SkeletonPanel.js";
 export { SpacedTopStack, type SpacedTopStackProps } from "./SpacedTopStack.js";
-export { CreatedSecretPanel, type CreatedSecretPanelProps } from "./CreatedSecretPanel.js";
+export { CreatedSecretPanel, type CreatedSecretPanelProps } from "./content/CreatedSecretPanel.js";

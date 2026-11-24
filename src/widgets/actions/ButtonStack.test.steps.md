@@ -1,7 +1,7 @@
 ---
 component: ButtonStack
 run_when:
-  - "src/widgets/actions/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
+  - "src/widgets/actions/ButtonStack.tsx, src/widgets/content/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
   - "src/widgets/actions/ButtonStack.tsx, its stories, HomePage's actions, or a changeset naming ButtonStack."
 ---
 
@@ -24,7 +24,7 @@ Open in `Widgets/ButtonStack`: Default;
    default ink.
 
 **Run when:** `src/widgets/actions/ButtonStack.tsx`,
-`src/widgets/CenteredText.tsx`, their stories, HomePage's
+`src/widgets/content/CenteredText.tsx`, their stories, HomePage's
 header, or a changeset naming either.
 
 ## ButtonStack

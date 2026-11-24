@@ -41,7 +41,7 @@ const brandMark = codeOf("src/icons/BrandMark.tsx");
 const brandLink = codeOf("src/widgets/actions/BrandLink.tsx");
 const topBar = codeOf("src/widgets/AppTopBar.tsx");
 const shellPage = codeOf("src/pages/eciperay/AppShellPage.tsx");
-const footer = codeOf("src/widgets/BigFooter.tsx");
+const footer = codeOf("src/widgets/content/BigFooter.tsx");
 
 test("BrandMark carries the Eciperay mark geometry, ported from the logo (#726)", () => {
   assert.match(brandMark, /export type BrandMarkName = "eciperay";/);

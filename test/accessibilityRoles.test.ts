@@ -138,7 +138,7 @@ const TRANSLATOR_FILES = new Set([
   join(srcDir, "widgets", "Text.tsx"),
   join(srcDir, "widgets", "ProgressBar.tsx"),
   join(srcDir, "widgets", "actions", "TextLink.tsx"),
-  join(srcDir, "widgets", "OptionCard.tsx"),
+  join(srcDir, "widgets", "content", "OptionCard.tsx"),
   join(srcDir, "widgets", "form", "TextField.tsx"),
   join(srcDir, "widgets", "form", "TextAreaField.tsx"),
   // The shared hook the two fields' a11y wiring moved into in

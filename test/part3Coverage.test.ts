@@ -179,6 +179,6 @@ test("review round: explicit error states, href home control, negative step guar
   // The scaled panel's scroll treatment moved into the
   // OverlayTextPanel widget in #698 tranche 3 — the pin
   // follows it there.
-  const scaled = read("src/widgets/OverlayTextPanel.tsx");
+  const scaled = read("src/widgets/content/OverlayTextPanel.tsx");
   assert.match(scaled, /nestedScrollEnabled/);
 });

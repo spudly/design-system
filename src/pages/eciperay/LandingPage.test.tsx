@@ -139,7 +139,7 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    const shellModule: Record<string, any> = await import("../../../dist/widgets/BigFooter.js");
+    const shellModule: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
     // The pages barrel is not Node-importable (some pages import
     // react-native), so the page under test is loaded from its
     // own module — it is a plain component composition.

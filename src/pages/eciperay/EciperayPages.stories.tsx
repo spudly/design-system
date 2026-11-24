@@ -5,7 +5,7 @@ import { Badge } from "../../widgets/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { ChecklistRow } from "../../widgets/ChecklistRow.js";
-import { SectionCard } from "../../widgets/SectionCard.js";
+import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { tokens } from "../../tokens/index.js";

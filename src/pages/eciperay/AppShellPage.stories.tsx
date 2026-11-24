@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { Card } from "../../widgets/Card.js";
-import { SectionCard } from "../../widgets/SectionCard.js";
+import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/Text.js";
 import { AppShellPage, type AppShellPageNavItem } from "./AppShellPage.js";
 import { eciperayFooterFixture } from "../shared/fixtures.js";

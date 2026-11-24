@@ -85,7 +85,7 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    const shellModule: Record<string, any> = await import("../../../dist/widgets/BigFooter.js");
+    const shellModule: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
     const { TabbedShellPage }: Record<string, any> =
       await import("../../../dist/pages/memorize/TabbedShellPage.js");
     const distViews: Record<string, any> = await import("../../../dist/views/index.js");

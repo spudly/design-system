@@ -5,7 +5,7 @@ import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/actions/Button.js";
 import { ButtonRow } from "../widgets/actions/ButtonRow.js";
 import { ContentStack } from "../widgets/ContentStack.js";
-import { DashedPlaceholder } from "../widgets/DashedPlaceholder.js";
+import { DashedPlaceholder } from "../widgets/content/DashedPlaceholder.js";
 import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
 import { Text } from "../widgets/Text.js";
 import { Thumbnail } from "../widgets/Thumbnail.js";

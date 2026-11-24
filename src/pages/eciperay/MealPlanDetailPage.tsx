@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { DetailRow } from "../../views/DetailRow.js";
@@ -8,7 +8,7 @@ import { TextSkeleton } from "../../widgets/TextSkeleton.js";
 import { ListStack } from "../../widgets/ListStack.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { SectionCard } from "../../widgets/SectionCard.js";
+import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { WeekDayColumn, WeekDayColumns } from "../../widgets/WeekDayColumn.js";

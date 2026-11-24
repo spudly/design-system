@@ -1,7 +1,7 @@
 ---
 component: BrandLink
 run_when:
-  - "src/widgets/BigFooter.tsx, BrandLink.tsx, their stories, or a changeset naming any of them. (namely: BigFooter, BrandLink, StickyOnShortPage, LegalDocumentPage)"
+  - "src/widgets/content/BigFooter.tsx, BrandLink.tsx, their stories, or a changeset naming any of them. (namely: BigFooter, BrandLink, StickyOnShortPage, LegalDocumentPage)"
 ---
 
 # BrandLink — manual test steps
@@ -35,6 +35,6 @@ Open in `Widgets/BigFooter`: Default, Memorize, NoSocialsYet, MobileStacked, Sti
    check LegalDocumentPage's header row for the same contract
    in place.
 
-**Run when:** `src/widgets/BigFooter.tsx`,
+**Run when:** `src/widgets/content/BigFooter.tsx`,
 `BrandLink.tsx`, their stories, or a changeset naming any of
 them.

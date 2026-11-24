@@ -33,7 +33,7 @@ function readCode(rel: string): string {
 }
 
 const column = readCode("src/widgets/PageContentColumn.tsx");
-const bigFooter = readCode("src/widgets/BigFooter.tsx");
+const bigFooter = readCode("src/widgets/content/BigFooter.tsx");
 const appTopBar = readCode("src/widgets/AppTopBar.tsx");
 
 test("the column width is the named 1200 constant (#628, Stephen's amendment)", () => {
@@ -80,7 +80,7 @@ test("FullBleed is a pass-through on native", () => {
 });
 
 test("BigFooterShell wraps web content in the column; the footer is NOT inside it", () => {
-  assert.match(bigFooter, /import \{ PageContentColumn \} from "\.\/PageContentColumn\.js";/);
+  assert.match(bigFooter, /import \{ PageContentColumn \} from "\.\.\/PageContentColumn\.js";/);
   // With a footer: content wrapped, footer a direct sibling
   // after the column — the #547 two-children model preserved.
   assert.match(

@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { CatalogCardColumn } from "./CatalogCardColumn.js";
-import { DiscoveryCard } from "./DiscoveryCard.js";
+import { DiscoveryCard } from "./content/DiscoveryCard.js";
 
 const meta: Meta<typeof CatalogCardColumn> = {
   title: "Widgets/CatalogCardColumn",

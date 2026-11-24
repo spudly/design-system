@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { CheckboxField } from "../../widgets/CheckboxField.js";
 import { EmptyState } from "../../views/EmptyState.js";
 import { ListStack } from "../../widgets/ListStack.js";

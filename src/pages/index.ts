@@ -235,4 +235,4 @@ export {
   type BigFooterSocialLink,
   type BigFooterStore,
   type BigFooterStoreLink,
-} from "../widgets/BigFooter.js";
+} from "../widgets/content/BigFooter.js";
