@@ -13,7 +13,7 @@ release's changed components. The full index lives in
 
 ## DiscoveryCard
 
-Open in `Widgets/DiscoveryCard`: Default, WithActions.
+Open in `Widgets/Content/DiscoveryCard`: Default, WithActions.
 
 1. **Default** renders the plain link card — thumbnail placeholder,
    title, subtitle — with **no** menu button anywhere on the card.
