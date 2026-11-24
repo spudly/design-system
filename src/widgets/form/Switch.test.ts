@@ -147,3 +147,24 @@ describe("switchThumb", () => {
     );
   });
 });
+
+describe("switchDisabled (#801)", () => {
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
+  const source = readFileSync(join(root, "src", "widgets", "form", "Switch.tsx"), "utf8");
+  const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+  const stories = readFileSync(join(root, "src", "widgets", "form", "Switch.stories.tsx"), "utf8");
+  test("Switch declares disabled defaulting false and dims the row (#801)", () => {
+    assert.match(code, /disabled\?: boolean/);
+    assert.match(code, /disabled = false/);
+    assert.match(code, /opacity=\{disabled \? 0\.5 : 1\}/);
+  });
+  test("disabled passes to the switch primitive and blocks toggling (#801)", () => {
+    assert.match(code, /disabled=\{disabled\}/);
+    assert.match(code, /aria-disabled=\{disabled \|\| undefined\}/);
+    assert.match(code, /if \(disabled\) \{\s*return;/);
+  });
+  test("Switch has a Disabled story (#801)", () => {
+    assert.match(stories, /export const Disabled/);
+    assert.match(stories, /disabled/);
+  });
+});

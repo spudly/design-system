@@ -14,7 +14,7 @@ release's changed components. The full index lives in
 ## NumberStepper
 
 Open in `Widgets/NumberStepper`: Default, AtMinBound, AtMaxBound,
-CustomStep, Inline, Editable.
+CustomStep, Inline, Editable, Disabled.
 
 1. Exactly **one pair** of step buttons renders — the browser's native
    spin buttons never appear alongside them in the Editable story.
@@ -23,7 +23,9 @@ CustomStep, Inline, Editable.
    increment at the maximum.
 3. Stepping in Default/CustomStep moves by 1 / the custom step, and
    the displayed value updates immediately.
-4. Clearing the Editable field and blurring commits nothing (the
+4. Disabled: the whole stepper reads dimmed, neither step
+   button responds, and the value does not change.
+5. Clearing the Editable field and blurring commits nothing (the
    value returns to / stays at the last committed value) — an empty
    entry never commits 0 or NaN.
 

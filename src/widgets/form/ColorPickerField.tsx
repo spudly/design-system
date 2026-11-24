@@ -44,6 +44,8 @@ export type ColorPickerFieldProps = {
   value?: TagColorName;
   onChange?: (color: TagColorName) => void;
   error?: string;
+  /** When true, every swatch is inert and the group is dimmed. */
+  disabled?: boolean;
   id?: string;
 };
 
@@ -64,6 +66,7 @@ export function ColorPickerField({
   value,
   onChange,
   error,
+  disabled = false,
   id: idProp,
 }: ColorPickerFieldProps) {
   const voice = useVoice();
@@ -84,6 +87,7 @@ export function ColorPickerField({
       <XStack
         flexWrap="wrap"
         gap={tokens.spacing[2]}
+        opacity={disabled ? 0.5 : 1}
         {...groupRoleProps}
         aria-labelledby={label ? labelId : undefined}
         aria-label={label ? undefined : voice.colorPickerField.chooseColorLabel}
@@ -100,9 +104,19 @@ export function ColorPickerField({
               {...platformAccessibilityProps({
                 accessibilityRole: "button",
                 accessibilityLabel: voice.colorPickerField.selectColorLabel(color),
+                accessibilityState: { disabled },
               })}
               aria-pressed={selected}
-              onPress={() => onChange?.(color)}
+              aria-disabled={disabled || undefined}
+              disabled={disabled}
+              tabIndex={disabled ? -1 : 0}
+              onPress={
+                disabled
+                  ? undefined
+                  : () => {
+                      onChange?.(color);
+                    }
+              }
             />
           );
         })}
