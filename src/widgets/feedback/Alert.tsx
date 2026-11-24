@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
-import { XStack, YStack, isWeb, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { isWeb } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "../accessibility.js";
 import { Button, ButtonInternal } from "../actions/Button.js";
@@ -32,23 +34,12 @@ const severityStyles = {
 
 type AlertSeverity = keyof typeof severityStyles;
 
-const StyledAlert = styled(YStack, {
-  name: "Alert",
-
-  borderWidth: 1,
-  borderRadius: tokens.radii.md,
-  padding: tokens.spacing[3],
-  gap: tokens.spacing[2],
-});
-
-type StyledAlertProps = GetProps<typeof StyledAlert>;
-
 type AlertAction = {
   label: string;
   onPress: () => void;
 };
 
-export type AlertProps = StyledAlertProps & {
+export type AlertProps = ColProps & {
   severity?: AlertSeverity;
   /** Plain-text message. Use `children` instead for rich content; children win when both are given. */
   message?: string;
@@ -145,13 +136,17 @@ export function Alert({
       : {}),
   };
   return (
-    <StyledAlert
+    <Col
+      borderWidth={1}
+      borderRadius={tokens.radii.md}
+      p="m"
+      gap="s"
       backgroundColor={styles.background}
       borderColor={styles.border}
       {...a11yProps}
       {...rest}
     >
-      <XStack justifyContent="space-between" alignItems="flex-start" gap={tokens.spacing[2]}>
+      <Row between top gap="s">
         <Text style={{ color: styles.text, flex: 1 }}>{content}</Text>
         {showDismiss ? (
           <ButtonInternal
@@ -186,16 +181,16 @@ export function Alert({
             ×
           </ButtonInternal>
         ) : null}
-      </XStack>
+      </Row>
       {actions && actions.length > 0 ? (
-        <XStack justifyContent="flex-end" gap={tokens.spacing[2]}>
+        <Row right gap="s">
           {actions.map((action) => (
             <Button key={action.label} variant="secondary" onPress={action.onPress}>
               {action.label}
             </Button>
           ))}
-        </XStack>
+        </Row>
       ) : null}
-    </StyledAlert>
+    </Col>
   );
 }

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { XStack } from "tamagui";
+import { Row } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 
 export type TrailingActionsRowProps = {
@@ -26,11 +26,11 @@ export type TrailingActionsRowProps = {
  */
 export function TrailingActionsRow({ leading, children }: TrailingActionsRowProps) {
   return (
-    <XStack flexWrap="wrap" gap="$2" alignItems="center" justifyContent="space-between">
+    <Row wrap gap="s" middle between>
       {leading}
-      <XStack gap={tokens.spacing[3]} alignItems="center">
+      <Row gap="m" middle>
         {children}
-      </XStack>
-    </XStack>
+      </Row>
+    </Row>
   );
 }

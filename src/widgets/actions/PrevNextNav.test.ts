@@ -41,5 +41,8 @@ test("backDisabled is passed to the Back ghost button (#158)", () => {
 
 test("omitting onBack still hides the Back button (#158)", () => {
   assert.match(code, /\{onBack \? \(/);
-  assert.match(code, /justifyContent=\{onBack \? "space-between" : "flex-end"\}/);
+  assert.match(
+    code,
+    /\{\.\.\.\(onBack \? \{ between: true as const \} : \{ right: true as const \}\)\}/,
+  );
 });

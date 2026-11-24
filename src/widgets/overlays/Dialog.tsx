@@ -1,6 +1,8 @@
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { Dialog as TamaguiDialog, XStack, YStack, isWeb, styled } from "tamagui";
+import { Dialog as TamaguiDialog, isWeb, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import {
@@ -855,7 +857,7 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
         <TamaguiDialog.Portal>
           <StyledOverlay />
           <StyledContent ref={setContentRef} {...(isWeb ? { tabIndex: -1 } : {})}>
-            <YStack gap={tokens.spacing[3]}>
+            <Col gap="m">
               <TamaguiDialog.Title
                 fontSize={tokens.typography.fontSize.xl}
                 fontWeight={tokens.typography.fontWeight.semibold}
@@ -868,13 +870,13 @@ export function Dialog({ open, onOpenChange, title, description, children, actio
                   <Text variant="hint">{description}</Text>
                 </TamaguiDialog.Description>
               ) : null}
-              <YStack>{children}</YStack>
+              <Col>{children}</Col>
               {actions ? (
-                <XStack gap={tokens.spacing[2]} justifyContent="flex-end">
+                <Row gap="s" right>
                   {actions}
-                </XStack>
+                </Row>
               ) : null}
-            </YStack>
+            </Col>
           </StyledContent>
         </TamaguiDialog.Portal>
       </TamaguiDialog>

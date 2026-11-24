@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { View, YStack, isWeb } from "tamagui";
+import { View, isWeb } from "tamagui";
+import { Col } from "../layout/Col.js";
 
 // `inert` reaches the DOM through Tamagui's web renderer (which
 // forwards props it does not map — see accessibility.ts), but
@@ -56,7 +57,7 @@ export type CollapsibleProps = {
 export function Collapsible({ isOpen = false, children }: CollapsibleProps) {
   const [contentHeight, setContentHeight] = useState<number | null>(null);
   return (
-    <YStack overflow="hidden" transition="fast" height={isOpen ? (contentHeight ?? undefined) : 0}>
+    <Col overflow="hidden" transition="fast" height={isOpen ? (contentHeight ?? undefined) : 0}>
       <View
         aria-hidden={!isOpen}
         {...inertPropsWhenClosed(isOpen)}
@@ -66,6 +67,6 @@ export function Collapsible({ isOpen = false, children }: CollapsibleProps) {
       >
         {children}
       </View>
-    </YStack>
+    </Col>
   );
 }

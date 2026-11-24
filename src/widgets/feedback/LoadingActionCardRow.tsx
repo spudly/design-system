@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Button } from "../actions/Button.js";
 import { Card } from "../layout/Card.js";
@@ -25,10 +25,10 @@ export type LoadingActionCardRowProps = {
 export function LoadingActionCardRow({ accessibilityLabel, children }: LoadingActionCardRowProps) {
   return (
     <Card variant="elevated" flexDirection="row" alignItems="center" gap="m">
-      <YStack flex={1} minWidth={0} gap={tokens.spacing[1]}>
+      <Col grow shrink minWidth={0} gap="xs">
         <TextSkeleton size="md" lines={1} />
         <TextSkeleton size="sm" lines={1} />
-      </YStack>
+      </Col>
       <Button ghost size="sm" accessibilityLabel={accessibilityLabel} onPress={() => {}}>
         {children}
       </Button>

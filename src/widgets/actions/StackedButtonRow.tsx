@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 
 export type StackedButtonRowProps = {
@@ -19,13 +19,8 @@ export type StackedButtonRowProps = {
  */
 export function StackedButtonRow({ children }: StackedButtonRowProps) {
   return (
-    <YStack
-      flexDirection="web:row"
-      gap={tokens.spacing[3]}
-      alignItems="center"
-      justifyContent="center"
-    >
+    <Col flexDirection="web:row" gap="m" center middle>
       {children}
-    </YStack>
+    </Col>
   );
 }

@@ -133,17 +133,14 @@ test("the layout components are exported from the built internal components barr
 });
 
 test("ButtonRow owns the action bar's gap and wrap; separation from preceding content is the parent's", () => {
-  assert.match(buttonRowCode, /styled\(XStack, \{\s+name: "ButtonRow",/);
-  assert.match(buttonRowCode, /gap: tokens\.spacing\[3\],\s+flexWrap: "wrap",/);
-  assert.match(buttonRowCode, /alignItems: "flex-start",/);
+  // #746 (Option B): no styled root — both branches render a
+  // Row carrying the gap, wrap, and top alignment in props.
+  assert.match(buttonRowCode, /<Row wrap gap="m" top \{\.\.\.rest\}>/);
   assert.ok(
     !buttonRowCode.includes("marginTop"),
     "ButtonRow must not carry a margin — separation from the content it follows belongs to the parent (#119)",
   );
-  assert.match(
-    buttonRowCode,
-    /Omit<\s*StyledButtonRowProps,\s*"gap" \| "alignItems" \| "flexWrap"\s*>/,
-  );
+  assert.match(buttonRowCode, /Omit<RowProps, "gap" \| "top" \| "wrap">/);
 });
 
 test("FieldRow owns the search row's gap and stretch — the equal-height contract (#476)", () => {

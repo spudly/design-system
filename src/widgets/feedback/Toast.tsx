@@ -1,36 +1,43 @@
 import type { ReactNode } from "react";
-import { Toast as TamaguiToast, YStack, styled, toast } from "tamagui";
-import type { GetProps } from "tamagui";
+import { Toast as TamaguiToast, toast } from "tamagui";
+import { Col } from "../layout/Col.js";
+import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
 
-const ToastCard = styled(YStack, {
-  name: "Toast",
+/**
+ * The toast card as a function component (#746, Option B): a
+ * Col carrying the card treatment — theme-matched (same
+ * treatment as Card): surface fill with a 1px border. The
+ * previous fixed near-black (gray10) fill clashed with both
+ * brand themes and, being the same color as the dark page
+ * background, made the card's edges vanish in dark mode; the
+ * border ($borderColor is #525252 in dark themes, ~2.3:1
+ * against the #171717 page) plus the shadow keeps the edge
+ * defined in both modes.
+ */
+function ToastCard(props: ColProps) {
+  return (
+    <Col
+      backgroundColor="$surface"
+      borderWidth={1}
+      borderColor="$borderColor"
+      borderRadius={tokens.radii.md}
+      p="m"
+      gap="xs"
+      minWidth={200}
+      maxWidth={360}
+      shadowColor={tokens.shadows.md.shadowColor}
+      shadowOffset={tokens.shadows.md.shadowOffset}
+      shadowOpacity={tokens.shadows.md.shadowOpacity}
+      shadowRadius={tokens.shadows.md.shadowRadius}
+      {...props}
+    />
+  );
+}
 
-  // Theme-matched card (same treatment as Card): surface fill with a
-  // 1px border. The previous fixed near-black (gray10) fill clashed with
-  // both brand themes and, being the same color as the dark page
-  // background, made the card's edges vanish in dark mode; the border
-  // ($borderColor is #525252 in dark themes, ~2.3:1 against the #171717
-  // page) plus the shadow keeps the edge defined in both modes.
-  backgroundColor: "$surface",
-  borderWidth: 1,
-  borderColor: "$borderColor",
-  borderRadius: tokens.radii.md,
-  padding: tokens.spacing[3],
-  gap: tokens.spacing[1],
-  minWidth: 200,
-  maxWidth: 360,
-  shadowColor: tokens.shadows.md.shadowColor,
-  shadowOffset: tokens.shadows.md.shadowOffset,
-  shadowOpacity: tokens.shadows.md.shadowOpacity,
-  shadowRadius: tokens.shadows.md.shadowRadius,
-});
-
-type ToastCardProps = GetProps<typeof ToastCard>;
-
-export type ToastProps = ToastCardProps & {
+export type ToastProps = ColProps & {
   title?: string;
   description?: ReactNode;
 };

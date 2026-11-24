@@ -1,4 +1,5 @@
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
@@ -23,7 +24,7 @@ const textBlockStyle = { flexGrow: 1, flexShrink: 1, flexBasis: 60, minWidth: 0 
  */
 export function LoadingMediaRow() {
   return (
-    <YStack paddingBlockEnd={tokens.spacing[3]}>
+    <Col>
       <Card
         variant="elevated"
         flexDirection="row"
@@ -33,11 +34,12 @@ export function LoadingMediaRow() {
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
         <BoxSkeleton width={64} height={64} />
-        <YStack style={textBlockStyle} gap={tokens.spacing[1]}>
+        <Col style={textBlockStyle} gap="xs">
           <TextSkeleton size="md" lines={1} />
           <TextSkeleton size="sm" lines={1} />
-        </YStack>
+        </Col>
       </Card>
-    </YStack>
+      <Spacer y="m" />
+    </Col>
   );
 }

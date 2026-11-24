@@ -1,4 +1,5 @@
-import { Anchor, XStack, styled, useTheme } from "tamagui";
+import { Anchor, styled, useTheme } from "tamagui";
+import { Row } from "../layout/Row.js";
 import { BackIcon } from "../../icons/BackIcon.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
@@ -35,7 +36,7 @@ function useBackArrowInk(): string {
 
 /**
  * The href form's frame (#248): the same row geometry as the
- * callback form's XStack (centered row, 44px minimum height, same
+ * callback form's Row (centered row, 44px minimum height, same
  * padding and gap), carried by a Tamagui Anchor — a real `<a href>`
  * on web; on native a press opens the href through the platform
  * link path (Tamagui's Anchor calls Linking.openURL internally, so
@@ -143,22 +144,22 @@ export function BackLink(props: BackLinkProps) {
     }
   };
   return (
-    <XStack
+    <Row
+      middle
+      gap="s"
+      px="s"
+      minHeight={44}
+      alignSelf="flex-start"
       {...platformAccessibilityProps({ accessibilityRole: "link" })}
       onPress={onPress}
       tabIndex={0}
       onKeyDown={handleKeyDown}
       cursor="web:pointer"
-      alignItems="center"
-      alignSelf="flex-start"
-      gap={tokens.spacing[2]}
-      minHeight={44}
-      paddingHorizontal={tokens.spacing[2]}
     >
       <BackIcon size={20} color={arrowInk} />
       <Text color="$link" fontWeight={tokens.typography.fontWeight.semibold}>
         {label}
       </Text>
-    </XStack>
+    </Row>
   );
 }

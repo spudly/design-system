@@ -1,4 +1,5 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { TextSkeleton } from "./TextSkeleton.js";
@@ -19,23 +20,17 @@ import { TextSkeleton } from "./TextSkeleton.js";
  */
 export function LoadingListItem() {
   return (
-    <XStack
-      alignItems="flex-start"
-      gap={tokens.spacing[3]}
-      paddingVertical={tokens.spacing[3]}
-      borderBottomWidth={1}
-      borderBottomColor="transparent"
-    >
-      <XStack
+    <Row top gap="m" py="m" borderBottomWidth={1} borderBottomColor="transparent">
+      <Row
         height={tokens.typography.fontSize.md * tokens.typography.lineHeight.normal}
-        alignItems="center"
-        justifyContent="center"
+        middle
+        center
       >
         <BoxSkeleton width={24} height={24} />
-      </XStack>
-      <YStack flex={1}>
+      </Row>
+      <Col grow shrink>
         <TextSkeleton size="md" lines={1} />
-      </YStack>
-    </XStack>
+      </Col>
+    </Row>
   );
 }

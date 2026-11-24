@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from "react";
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { AccordionSection } from "./AccordionSection.js";
 
 export type AccordionItem = {
@@ -70,7 +70,7 @@ export function Accordion({
   };
 
   return (
-    <YStack>
+    <Col>
       {sections.map((section, index) => (
         <AccordionSection
           key={section.value}
@@ -92,6 +92,6 @@ export function Accordion({
           {section.content}
         </AccordionSection>
       ))}
-    </YStack>
+    </Col>
   );
 }

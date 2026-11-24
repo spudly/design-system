@@ -87,10 +87,7 @@ test("the hero treatment lives in the page's hero Col: centered, 12px rhythm", (
 
 test("the CTA row treatment lives in StackedButtonRow: stacks narrow, rows on web, never wrapping", () => {
   assert.match(page, /<StackedButtonRow>/, "the CTAs render in StackedButtonRow");
-  assert.match(
-    stackedButtonRow,
-    /flexDirection="web:row"\s+gap=\{tokens\.spacing\[3\]\}\s+alignItems="center"\s+justifyContent="center"/,
-  );
+  assert.match(stackedButtonRow, /<Col flexDirection="web:row" gap="m" center middle>/);
   assert.ok(!stackedButtonRow.includes("flexWrap"), "the CTA row never wraps");
 });
 

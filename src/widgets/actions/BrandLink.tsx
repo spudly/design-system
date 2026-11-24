@@ -1,4 +1,6 @@
-import { Anchor, XStack, isWeb, styled } from "tamagui";
+import { Anchor, isWeb, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
 import { BrandMark, type BrandMarkName } from "../../icons/BrandMark.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
@@ -44,12 +46,14 @@ const StyledMarkedBrandAnchor = styled(Anchor, {
  * LinkOverlay stretches over — a native Anchor is a Text and
  * cannot lay out the mark beside the label (see LinkOverlay).
  */
-const StyledMarkedBrandFrame = styled(XStack, {
-  name: "BrandLinkMarkedFrame",
-  position: "relative",
-  alignItems: "center",
-  gap: tokens.spacing[2],
-});
+/**
+ * The marked wordmark's native frame as a function component
+ * (#746, Option B): a positioned Row the LinkOverlay stretches
+ * over.
+ */
+function MarkedBrandFrame(props: RowProps) {
+  return <Row position="relative" middle gap="s" {...props} />;
+}
 
 export type BrandLinkProps = {
   /** The wordmark text — the caller's brand name, as content. */
@@ -141,7 +145,7 @@ export function BrandLink({ label, href, mark }: BrandLinkProps) {
     );
   }
   return (
-    <StyledMarkedBrandFrame>
+    <MarkedBrandFrame>
       <BrandMark mark={mark} size={28} />
       <Text
         accessible={false}
@@ -155,6 +159,6 @@ export function BrandLink({ label, href, mark }: BrandLinkProps) {
         {label}
       </Text>
       <LinkOverlay href={href} accessibilityRole="link" accessibilityLabel={label} />
-    </StyledMarkedBrandFrame>
+    </MarkedBrandFrame>
   );
 }

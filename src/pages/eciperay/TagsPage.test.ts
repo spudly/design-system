@@ -19,7 +19,7 @@ describe("tagsPageCreateForm", () => {
   test("TagsPage create-form row wraps so Add stays visible (#219)", () => {
     assert.match(
       row,
-      /<XStack flexWrap="wrap" gap="\$2" alignItems="center" justifyContent="space-between">\s*\{leading\}/,
+      /<Row wrap gap="s" middle between>\s*\{leading\}/,
       'the TrailingActionsRow XStack must set flexWrap="wrap" so the Add button wraps instead of overflowing (#219)',
     );
     assert.notEqual(createFormEnd, -1, "TagsPage must keep its loading branch boundary");

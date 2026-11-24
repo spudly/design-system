@@ -1,30 +1,10 @@
-import { XStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 
-const StyledToolbar = styled(XStack, {
-  name: "Toolbar",
-
-  flexWrap: "wrap",
-  alignItems: "center",
-  gap: tokens.spacing[2],
-  borderBottomWidth: 1,
-  borderBottomColor: tokens.colors.gray.gray2,
-  paddingHorizontal: tokens.spacing[4],
-  paddingVertical: tokens.spacing[3],
-});
-
-type StyledToolbarProps = GetProps<typeof StyledToolbar>;
-
 export type ToolbarProps = Omit<
-  StyledToolbarProps,
-  | "flexWrap"
-  | "alignItems"
-  | "gap"
-  | "borderBottomWidth"
-  | "borderBottomColor"
-  | "paddingHorizontal"
-  | "paddingVertical"
+  RowProps,
+  "wrap" | "middle" | "gap" | "borderBottomWidth" | "borderBottomColor" | "px" | "py"
 >;
 
 /**
@@ -37,5 +17,16 @@ export type ToolbarProps = Omit<
  * its contents are caller-supplied.
  */
 export function Toolbar({ ...rest }: ToolbarProps) {
-  return <StyledToolbar {...rest} />;
+  return (
+    <Row
+      wrap
+      middle
+      gap="s"
+      px="l"
+      py="m"
+      borderBottomWidth={1}
+      borderBottomColor={tokens.colors.gray.gray2}
+      {...rest}
+    />
+  );
 }

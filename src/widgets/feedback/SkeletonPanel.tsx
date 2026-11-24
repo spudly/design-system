@@ -1,18 +1,8 @@
-import { YStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { Col } from "../layout/Col.js";
+import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 
-const StyledSkeletonPanel = styled(YStack, {
-  name: "SkeletonPanel",
-
-  width: "100%",
-  gap: tokens.spacing[3],
-  padding: tokens.spacing[4],
-});
-
-type StyledSkeletonPanelProps = GetProps<typeof StyledSkeletonPanel>;
-
-export type SkeletonPanelProps = Omit<StyledSkeletonPanelProps, "width" | "gap" | "padding">;
+export type SkeletonPanelProps = Omit<ColProps, "width" | "gap" | "p">;
 
 /**
  * A skeleton panel (#698 tranche 4): the padded, full-width
@@ -23,5 +13,5 @@ export type SkeletonPanelProps = Omit<StyledSkeletonPanelProps, "width" | "gap" 
  * props, by design.
  */
 export function SkeletonPanel({ ...rest }: SkeletonPanelProps) {
-  return <StyledSkeletonPanel {...rest} />;
+  return <Col width="100%" gap="m" p="l" {...rest} />;
 }

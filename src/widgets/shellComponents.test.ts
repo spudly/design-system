@@ -50,30 +50,30 @@ test("ScreenShell owns the fixed-shell frame", () => {
 
 test("Toolbar owns the pinned bar's inset, gap, wrap, and hairline divider", () => {
   const toolbar = code("actions/Toolbar.tsx");
-  assert.match(toolbar, /styled\(XStack, \{\s+name: "Toolbar",/);
-  assert.match(toolbar, /flexWrap: "wrap",\s+alignItems: "center",/);
-  assert.match(toolbar, /gap: tokens\.spacing\[2\],/);
-  assert.match(toolbar, /borderBottomWidth: 1,\s+borderBottomColor: tokens\.colors\.gray\.gray2,/);
+  // #746 (Option B): no styled root — the bar renders a Row
+  // carrying the frame in props, and ToolbarProps omits the
+  // bar-owned subset keys from RowProps.
+  assert.match(toolbar, /<Row\s+wrap\s+middle\s+gap="s"\s+px="l"\s+py="m"/);
   assert.match(
     toolbar,
-    /paddingHorizontal: tokens\.spacing\[4\],\s+paddingVertical: tokens\.spacing\[3\],/,
+    /borderBottomWidth=\{1\}\s+borderBottomColor=\{tokens\.colors\.gray\.gray2\}/,
   );
   for (const owned of [
-    "flexWrap",
-    "alignItems",
+    "wrap",
+    "middle",
     "gap",
     "borderBottomWidth",
     "borderBottomColor",
-    "paddingHorizontal",
-    "paddingVertical",
+    "px",
+    "py",
   ]) {
     assert.match(
       toolbar,
-      new RegExp(String.raw`\|\s*"${owned}"`),
+      new RegExp(String.raw`"${owned}"`),
       `ToolbarProps must omit the bar-owned ${owned}`,
     );
   }
-  assert.match(toolbar, /export type ToolbarProps = Omit<\s+StyledToolbarProps,/);
+  assert.match(toolbar, /export type ToolbarProps = Omit<\s+RowProps,/);
 });
 
 test("SectionHeading is the subheading treatment with no baked-in padding", () => {

@@ -88,11 +88,11 @@ test("the arrow is the Feather arrow-left BackIcon, not the ← text glyph (#95,
 });
 
 test("the row centers the arrow against the label by construction", () => {
-  assert.match(code, /<XStack/, "the arrow and label lay out as one row");
+  assert.match(code, /<Row\s+middle\s+gap="s"/, "the arrow and label lay out as one row");
   assert.match(
     code,
-    /alignItems="center"/,
-    "flex centering — not font metrics — centers the arrow",
+    /<Row\s+middle/,
+    "flex centering (the Row's middle alignment) — not font metrics — centers the arrow",
   );
   assert.match(code, /minHeight=\{44\}/, "the press target keeps a 44px minimum height");
   assert.match(
@@ -103,7 +103,11 @@ test("the row centers the arrow against the label by construction", () => {
 });
 
 test("the label defaults to the voice backLink slot and renders in the link role color", () => {
-  assert.match(code, /props\.label \?\? voice\.backLink\.label/, "the default label comes from the voice object (#539)");
+  assert.match(
+    code,
+    /props\.label \?\? voice\.backLink\.label/,
+    "the default label comes from the voice object (#539)",
+  );
   assert.match(
     code,
     /color="\$link"/,
@@ -112,7 +116,10 @@ test("the label defaults to the voice backLink slot and renders in the link role
 });
 
 test("BackLink is exported from the components index and has stories", () => {
-  assert.match(index, /export \{ BackLink, type BackLinkProps \} from "\.\/actions\/BackLink\.js";/);
+  assert.match(
+    index,
+    /export \{ BackLink, type BackLinkProps \} from "\.\/actions\/BackLink\.js";/,
+  );
   assert.match(stories, /title: "Widgets\/Actions & Navigation\/BackLink"/);
   assert.match(stories, /export const Default/);
 });

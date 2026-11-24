@@ -1,4 +1,5 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Button } from "../actions/Button.js";
@@ -39,19 +40,19 @@ export function ChangedListBanner({ label, onRevert, loading = false }: ChangedL
   const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
   return (
-    <XStack
-      alignItems="center"
-      justifyContent="space-between"
-      gap={tokens.spacing[2]}
+    <Row
+      middle
+      between
+      gap="s"
       borderRadius={tokens.radii.md}
       backgroundColor={tokens.colors.warning.warning1}
-      paddingHorizontal={tokens.spacing[3]}
-      paddingVertical={tokens.spacing[2]}
+      px="m"
+      py="s"
     >
       {showSkeleton ? (
-        <YStack flex={1}>
+        <Col grow shrink>
           <TextSkeleton size="sm" lines={1} />
-        </YStack>
+        </Col>
       ) : (
         <Text
           flex={1}
@@ -68,6 +69,6 @@ export function ChangedListBanner({ label, onRevert, loading = false }: ChangedL
           </Button>
         ) : null}
       </LoadingScope>
-    </XStack>
+    </Row>
   );
 }

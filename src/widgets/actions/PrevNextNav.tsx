@@ -1,4 +1,4 @@
-import { XStack } from "tamagui";
+import { Row } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import { Button } from "./Button.js";
 import { useVoice } from "../../voice/index.js";
@@ -32,11 +32,7 @@ export function PrevNextNav({
   const resolvedBackLabel = backLabel ?? voice.prevNextNav.backLabel;
   const resolvedNextLabel = nextLabel ?? voice.prevNextNav.nextLabel;
   return (
-    <XStack
-      justifyContent={onBack ? "space-between" : "flex-end"}
-      alignItems="center"
-      gap={tokens.spacing[3]}
-    >
+    <Row middle gap="m" {...(onBack ? { between: true as const } : { right: true as const })}>
       {onBack ? (
         <Button ghost onPress={onBack} disabled={backDisabled}>
           {resolvedBackLabel}
@@ -47,6 +43,6 @@ export function PrevNextNav({
           {resolvedNextLabel}
         </Button>
       ) : null}
-    </XStack>
+    </Row>
   );
 }

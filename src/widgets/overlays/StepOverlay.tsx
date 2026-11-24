@@ -1,6 +1,11 @@
 import { useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
-import { ScrollView, YStack, isWeb } from "tamagui";
+import { ScrollView, isWeb } from "tamagui";
+import { Col } from "../layout/Col.js";
+import type { ColProps } from "../layout/Col.js";
+import type { Ref } from "react";
+
+import { Spacer } from "../layout/Spacer.js";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { dialogRoleProps, platformAccessibilityProps } from "../accessibility.js";
@@ -15,6 +20,16 @@ import type { ModalLayer } from "../modalRegistry.js";
 import { Text } from "../data/Text.js";
 import { PageContentColumn } from "../layout/PageContentColumn.js";
 import { useVoice } from "../../voice/index.js";
+
+/**
+ * The overlay shell's root (#746): ColProps carries no ref
+ * slot (React 19 ref-as-prop is not in the Tamagui prop
+ * types), so the shell root wraps Col with the ref typed in —
+ * Col forwards it through its rest spread at runtime.
+ */
+function ShellCol(props: ColProps & { ref?: Ref<TamaguiElement> }) {
+  return <Col {...props} />;
+}
 
 export type StepOverlayProps = {
   /** The top eyebrow line: the context the steps belong to (a
@@ -347,18 +362,15 @@ export function StepOverlay({
     // records it as its parent layer, which is what arbitrates
     // it above this overlay (modalRegistry.ts, #394).
     <ModalLayerContext.Provider value={layerToken}>
-      <YStack
+      <ShellCol
         ref={shellRef}
         position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        bottom={0}
+        style={{ top: 0, left: 0, right: 0, bottom: 0 }}
         backgroundColor={tokens.colors.gray.gray10}
         tabIndex={-1}
         onKeyDown={handleShellKeyDown}
-        {...dialogRoleProps}
-        {...platformAccessibilityProps({ accessibilityLabel: title })}
+        {...(dialogRoleProps as Record<string, unknown>)}
+        {...(platformAccessibilityProps({ accessibilityLabel: title }) as Record<string, unknown>)}
       >
         <ScrollView
           flex={1}
@@ -374,8 +386,8 @@ export function StepOverlay({
               On native the column is a plain full-width stack,
               so the measure is a web-only effect. */}
           <PageContentColumn>
-            <YStack paddingHorizontal="$6" paddingVertical="$12">
-              <YStack paddingBlockEnd="$2">
+            <Col px="xl" style={{ paddingBlock: 48 }}>
+              <Col>
                 <Text
                   fontSize={tokens.typography.fontSize.sm}
                   letterSpacing={1.4}
@@ -385,8 +397,9 @@ export function StepOverlay({
                 >
                   {title}
                 </Text>
-              </YStack>
-              <YStack paddingBlockEnd="$4">
+              </Col>
+              <Spacer y="s" />
+              <Col>
                 <Text
                   fontSize={tokens.typography.fontSize.sm}
                   letterSpacing={1.4}
@@ -396,21 +409,26 @@ export function StepOverlay({
                 >
                   {stepLabel}
                 </Text>
-              </YStack>
-              {accessory ? <YStack paddingBlockEnd="$4">{accessory}</YStack> : null}
-              <YStack paddingBlockEnd="$8">
+              </Col>
+              <Spacer y="m" />
+              {accessory ? (
+                <>
+                  {accessory}
+                  <Spacer y="m" />
+                </>
+              ) : null}
+              <Col style={{ paddingBlockEnd: 32 }}>
                 <Text fontSize={tokens.typography.fontSize["2xl"]} color="$surface">
                   {body}
                 </Text>
-              </YStack>
+              </Col>
               {children}
-            </YStack>
+            </Col>
           </PageContentColumn>
         </ScrollView>
-        <YStack
+        <Col
           position="absolute"
-          right={tokens.spacing[6]}
-          top={tokens.spacing[12]}
+          style={{ right: tokens.spacing[6], top: 48 }}
           borderRadius={tokens.radii.full}
           overflow="hidden"
           backgroundColor={tokens.colors.gray.gray10}
@@ -423,12 +441,9 @@ export function StepOverlay({
           onKeyDown={handleDoneKeyDown}
           cursor="web:pointer"
         >
-          <YStack
+          <Col
             position="absolute"
-            top={0}
-            left={0}
-            right={0}
-            bottom={0}
+            style={{ top: 0, left: 0, right: 0, bottom: 0 }}
             backgroundColor="$surface"
             opacity={0.1}
           />
@@ -440,8 +455,8 @@ export function StepOverlay({
           >
             {resolvedDoneLabel}
           </Text>
-        </YStack>
-      </YStack>
+        </Col>
+      </ShellCol>
     </ModalLayerContext.Provider>
   );
 }
