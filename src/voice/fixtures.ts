@@ -426,5 +426,9 @@ function pseudoLocalizeVoice(voice: Voice): Voice {
  * The en-XA pseudo-locale fixture voice (#539): every slot of the
  * fixture voice pseudo-localized, so any string NOT supplied through
  * the voice object shows up untransformed in a Storybook pass.
+ *
+ * Consumed at runtime from the built dist by Voice.test.ts and
+ * PseudoLocale.test.tsx (dynamic dist imports knip cannot trace) —
+ * listed as a knip entry in knip.json for that reason.
  */
 export const fixtureVoicePseudoLocale: Voice = pseudoLocalizeVoice(fixtureVoice);

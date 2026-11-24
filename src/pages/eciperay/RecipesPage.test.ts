@@ -220,16 +220,16 @@ describe("recipesPageBoundedList", () => {
     // #668: page stories no longer carry a local Viewport frame — the
     // Storybook preview decorator frames them from the dsViewport
     // resolution (toolbar global, then the story's dsViewport
-    // parameter, then the "phone" preset), which pins captures at
-    // 430×844 for stories without their own default frame.
-    const preview = readFileSync(
-      join(pagesDir, "eciperay", "../../../.storybook/preview.tsx"),
-      "utf8",
-    );
+    // parameter, then the default preset). #754: that default is now
+    // the responsive "full" preset, so stories without their own
+    // default frame present full-width instead of in a 430×844 phone
+    // frame; the phone preset's geometry below still applies when
+    // the phone frame is selected explicitly.
+    const preview = readFileSync(join(pagesDir, "../../.storybook/preview.tsx"), "utf8");
     assert.match(
       preview,
-      /context\.parameters\.dsViewport as string \| undefined\) \?\?\s+"phone"/,
-      "the preview falls back through the story's dsViewport parameter to the phone preset, pinning captures to the phone frame",
+      /context\.parameters\.dsViewport as string \| undefined\) \?\?\s+"full"/,
+      "the preview falls back through the story's dsViewport parameter to the full preset, presenting page stories full-width by default (#754)",
     );
     assert.match(
       preview,
@@ -266,7 +266,7 @@ describe("recipesPageCollapsedFilters", () => {
       "RecipesPageFilterId must enumerate the five addable filters",
     );
     assert.match(code, /CatalogPageFilterProps<RecipesPageFilterId>/);
-    const barSource = readFileSync(join(here, "../../views/CatalogFiltersBar.tsx"), "utf8");
+    const barSource = readFileSync(join(here, "../../../src/views/CatalogFiltersBar.tsx"), "utf8");
     assert.match(barSource, /activeFilters\?: FilterId\[\];/);
     assert.match(barSource, /onActiveFiltersChange\?: \(filters: FilterId\[\]\) => void;/);
     assert.match(barSource, /filterChooserOpen\?: boolean;/);
@@ -586,11 +586,11 @@ describe("recipesPageSharedConfig", () => {
 
   test("SharedWithMePage is retired: no file, no stories, no export (#185)", () => {
     assert.ok(
-      !existsSync(join(pagesDir, "eciperay", "SharedWithMePage.tsx")),
+      !existsSync(join(pagesDir, "SharedWithMePage.tsx")),
       "SharedWithMePage.tsx must not exist — RecipesPage is the single recipes browse page",
     );
     assert.ok(
-      !existsSync(join(pagesDir, "eciperay", "SharedWithMePage.stories.tsx")),
+      !existsSync(join(pagesDir, "SharedWithMePage.stories.tsx")),
       "SharedWithMePage.stories.tsx must not exist — shared-with-me lives in RecipesPage.stories.tsx",
     );
     assert.ok(

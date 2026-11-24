@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { FullScreenShell } from "../../widgets/FullScreenShell.js";
 import { Alert } from "../../widgets/Alert.js";
 import { Button } from "../../widgets/Button.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
@@ -41,14 +41,13 @@ import { StepNavControls } from "../shared/StepNavControls.js";
  *   component has no disabled-back state), and Next disables
  *   on the last step. An out-of-range index renders nothing,
  *   as the app view does.
- * - Footer vs overlay (PR #413 review): in the ready state
- *   StepOverlay fills its nearest positioned ancestor with
- *   absolute positioning. BigFooterShell's content region IS
- *   that positioned ancestor and ends above the footer, so
- *   the overlay is bounded to the cooking content region and
- *   can never cover BigFooter — the footer's links stay
- *   reachable for the whole ready state. (The error state has
- *   no overlay; its footer follows the alert in flow.)
+ * - Full-screen frame (#752/#753): cooking mode takes over
+ *   the whole screen and renders NO Big Footer. Both states
+ *   render inside FullScreenShell, whose content region is
+ *   the full viewport and is the positioned ancestor
+ *   StepOverlay fills with absolute positioning in the ready
+ *   state. (The error state has no overlay; its alert renders
+ *   in flow inside the same frame.)
  * - There is no swipe navigation here: the app view has none
  *   (swipe is the recipe mode's app-side shell), and adding
  *   it would be a behavior change, not a port.
@@ -103,8 +102,6 @@ export type MealCookingModePageStep = {
 };
 
 export type MealCookingModePageReadyProps = {
-  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
-  footer?: BigFooterData;
   /** Discriminator for the union; optional so existing hosts
    * passing the flat ready props keep working unchanged —
    * only the error member must name its state. */
@@ -118,8 +115,6 @@ export type MealCookingModePageReadyProps = {
 };
 
 export type MealCookingModePageErrorProps = {
-  /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
-  footer?: BigFooterData;
   state: "error";
   /** The meal's title, when the host has it (its meal query
    * may have succeeded while the cook plan failed); the
@@ -148,7 +143,7 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
   if (props.state === "error") {
     const { mealTitle, errorMessage, onDone } = props;
     return (
-      <BigFooterShell footer={props.footer}>
+      <FullScreenShell>
         <ScreenContainer>
           <SectionStack>
             <Text variant="title">{mealTitle ?? LOAD_ERROR_TITLE}</Text>
@@ -158,7 +153,7 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
             </Button>
           </SectionStack>
         </ScreenContainer>
-      </BigFooterShell>
+      </FullScreenShell>
     );
   }
 
@@ -169,7 +164,7 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
   }
 
   return (
-    <BigFooterShell footer={props.footer} scrollMode="overlay">
+    <FullScreenShell>
       <StepOverlay
         title={mealTitle}
         stepLabel={`Step ${stepIndex + 1} of ${steps.length} · ${current.recipeTitle}`}
@@ -183,6 +178,6 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
           onNext={onNext}
         />
       </StepOverlay>
-    </BigFooterShell>
+    </FullScreenShell>
   );
 }

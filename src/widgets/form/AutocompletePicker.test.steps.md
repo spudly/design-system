@@ -21,7 +21,7 @@ Default, NoSelection, SaveError. Open in
 
 1. RecipeFormPage Default: Title, the Status toggle buttons,
    Description with its "Generate with AI" action, the Servings
-   / Prep / Cook fields in one equal-width FieldColumns row,
+   / Prep / Cook fields in one equal-width EqualColumns row,
    image, Source URL, the selectable Tag badges, the
    Ingredients and Instructions slots, and the
    full-width Create Recipe button, evenly spaced in one

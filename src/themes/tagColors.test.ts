@@ -18,9 +18,12 @@
  * 4. Both brand themes carry a complete, distinct value set, and
  *    the registered Tamagui themes expose the active brand's hex
  *    under the tag<Name> keys the component resolver reads.
- * 5. Source scan: Badge, ColorPickerField, TagsPage, and
- *    RecipeDetailPage all resolve through the one shared resolver
- *    (src/widgets/tagColors.ts) instead of consuming raw hex.
+ * 5. The shared tag-color resolver hook is exported from the built
+ *    widgets module (runtime check, #733 tranche 3). The former
+ *    source scans — components resolving through the shared resolver,
+ *    and the strictly-typed API surface — were deleted: component
+ *    wiring is not runtime-observable here, and the names-only typing
+ *    is enforced by the TypeScript build, not a test.
  *
  * Runtime assertions run against the built output: `npm run build`
  * first (the `test` script does both).
@@ -28,10 +31,7 @@
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 
 const {
   tagColorNames,
@@ -46,11 +46,6 @@ const {
   createTamaguiConfig,
   createStorybookTamaguiConfig,
 }: Record<string, any> = await loadInternalDist();
-
-const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
-function read(rel: string) {
-  return readFileSync(join(root, rel), "utf8");
-}
 
 /** The legacy app palette, in display order (the pre-#207 raw hexes). */
 const legacyPalette = [
@@ -134,51 +129,7 @@ test("registered Tamagui themes expose the active brand's tag hexes", () => {
   assert.equal(storybook.themes.light_warmHarvest.tagBlue.val, "#3b82f6");
 });
 
-test("components resolve tag colors through the one shared resolver", () => {
-  const hook = read("src/widgets/tagColors.ts");
-  assert.match(hook, /export function useTagColorResolver/);
-  assert.match(hook, /resolveTagColorValue\(name, themeColors\)/);
-
-  const badge = read("src/widgets/Badge.tsx");
-  assert.match(badge, /useTagColorResolver\(\)/);
-  assert.match(badge, /resolveTagColor\(color\)/);
-  assert.doesNotMatch(badge, /backgroundColor=\{`\$\{color\}22`\}/);
-
-  const picker = read("src/widgets/form/ColorPickerField.tsx");
-  assert.match(picker, /colors: TagColorName\[\]/);
-  assert.match(picker, /useTagColorResolver\(\)/);
-
-  const tagsPage = read("src/pages/eciperay/TagsPage.tsx");
-  assert.match(tagsPage, /colorOptions: TagColorName\[\]/);
-
-  const recipeDetail = read("src/pages/eciperay/RecipeDetailPage.tsx");
-  assert.doesNotMatch(recipeDetail, /useTagColorResolver\(\)/);
-
-  // RecipeDetailPage's tags render through TagList since the #119
-  // extraction; the Badge color form lives inside it.
-  const tagList = read("src/widgets/TagList.tsx");
-  assert.match(tagList, /<Badge key=\{tag\.id\} color=\{tag\.color\}>/);
-});
-
-test("the tag color API is strictly typed: names only, no hex pass-through", () => {
-  const themeModule = read("src/themes/tagColors.ts");
-  assert.match(themeModule, /export const defaultTagColorName: TagColorName = "gray"/);
-  assert.match(themeModule, /export function tagColorNameForHex\(hex: string\): TagColorName/);
-  assert.match(themeModule, /export function resolveTagColorValue\(\s*name: TagColorName,/);
-  assert.doesNotMatch(themeModule, /passes through unchanged/);
-
-  const hook = read("src/widgets/tagColors.ts");
-  assert.match(hook, /useTagColorResolver\(\): \(name: TagColorName\) => string/);
-
-  const badge = read("src/widgets/Badge.tsx");
-  assert.match(badge, /color\?: TagColorName;/);
-
-  const picker = read("src/widgets/form/ColorPickerField.tsx");
-  assert.match(picker, /value\?: TagColorName;/);
-
-  const tagsPage = read("src/pages/eciperay/TagsPage.tsx");
-  assert.match(tagsPage, /color: TagColorName;/);
-
-  const recipeDetail = read("src/pages/eciperay/RecipeDetailPage.tsx");
-  assert.match(recipeDetail, /color: TagColorName;/);
+test("the shared tag-color resolver hook ships in the built widgets module", async () => {
+  const hookModule: Record<string, any> = await import("../../dist/widgets/tagColors.js");
+  assert.equal(typeof hookModule.useTagColorResolver, "function");
 });

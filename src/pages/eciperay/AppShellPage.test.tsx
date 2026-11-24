@@ -26,6 +26,20 @@
  *    keyed-remount contract), with the host's `contentKey`
  *    winning; a pending surface shows the DS loading state and
  *    a failed one stays inside the slot, shell intact around it.
+ *
+ * Converted from source scans to runtime checks in #733
+ * tranche 6b: the page and the shared top bar are called
+ * directly and their element trees inspected, and the built
+ * pages barrel (dist/pages/index.d.ts — a built-artifact read,
+ * not a source read) pins the export. The former type-shape
+ * pins (nav/search/action type blocks, alias forms) and story
+ * pins were deleted: prop shape is enforced by the TypeScript
+ * build, and story coverage is pinned by the story-parity
+ * tests (Stephen, 2026-11-20). The SearchField wiring inside
+ * AppTopBar (submit/change props, accessible name) is
+ * AppTopBar's own contract — AppTopBar calls hooks, so it
+ * cannot be invoked directly here; the page-level forwarding
+ * and SSR landmark tests below pin the page's half of it.
  */
 import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -35,120 +49,53 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadInternalDist } from "../../../test/internalDist.js";
 const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../../..");
-function codeOf(rel: string): string {
-  const source = readFileSync(join(root, rel), "utf8");
-  return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-}
-const page = codeOf("src/pages/eciperay/AppShellPage.tsx");
-const topBar = codeOf("src/widgets/AppTopBar.tsx");
-const tabbedShell = codeOf("src/pages/memorize/TabbedShellPage.tsx");
-const barrel = readFileSync(join(root, "src/pages/index.ts"), "utf8");
-const stories = readFileSync(join(root, "src/pages/eciperay/AppShellPage.stories.tsx"), "utf8");
-function typeBlock(source: string, name: string): string {
-  const match = new RegExp(`export type ${name} = \\{([\\s\\S]*?)\\n\\};`).exec(source);
-  assert.ok(match, `${name} type block found`);
-  return match[1]!;
-}
-test("AppShellPage is exported from the pages barrel with alias types", () => {
-  assert.match(
-    barrel,
-    /AppShellPage,\s*type AppShellPageAction,\s*type AppShellPageNavItem,\s*type AppShellPageProps,\s*type AppShellPageSearch,\s*\} from "\.\/eciperay\/AppShellPage\.js";/,
-  );
-  assert.match(page, /export type AppShellPageProps = \{/);
-  assert.match(page, /export type AppShellPageNavItem = AppTopBarNavItem;/);
-  assert.match(page, /export type AppShellPageAction = AppTopBarAction;/);
-  assert.match(page, /export type AppShellPageSearch = AppTopBarSearch;/);
-  assert.doesNotMatch(page, /\binterface\s+AppShellPage/);
+
+test("AppShellPage is exported from the built pages barrel", async () => {
+  const { AppShellPage } = await loadRuntime();
+  assert.equal(typeof AppShellPage, "function");
+  const types = readFileSync(join(here, "../../..", "dist", "pages", "index.d.ts"), "utf8");
+  assert.match(types, /AppShellPage/);
+  assert.match(types, /type AppShellPageProps/);
+  assert.match(types, /type AppShellPageNavItem/);
+  assert.match(types, /type AppShellPageAction/);
+  assert.match(types, /type AppShellPageSearch/);
 });
-test("nav crosses as data: hrefs and icon names, never components or callbacks", () => {
-  const navItem = typeBlock(topBar, "AppTopBarNavItem");
-  assert.match(navItem, /id: string;/);
-  assert.match(navItem, /label: string;/);
-  assert.match(navItem, /href: string;/);
-  assert.match(navItem, /icon\?: IconName;/);
-  assert.doesNotMatch(navItem, /onPress|onSelect/, "nav items navigate — no callback form");
-  assert.doesNotMatch(navItem, /content/, "the shell's content is the page child, not nav data");
-});
-test("header search crosses as data: a controlled field with change/submit callbacks (#542)", () => {
-  const search = typeBlock(topBar, "AppTopBarSearch");
-  assert.match(search, /label: string;/, "the input's accessible name is host content");
-  assert.match(search, /placeholder\?: string;/);
-  assert.match(search, /value: string;/, "the term is controlled — the host owns route state");
-  assert.match(search, /onValueChange: \(value: string\) => void;/);
-  assert.match(
-    search,
-    /onSubmit: \(\) => void;/,
-    "submit is a callback — the destination is built from the typed term (#248 exemption)",
-  );
-  assert.doesNotMatch(search, /href/, "no href form — no static destination exists");
-  assert.match(topBar, /search\?: AppTopBarSearch \| null;/);
-  assert.match(page, /search\?: AppShellPageSearch \| null;/);
-  assert.match(
-    topBar,
-    /import \{ SearchField \} from "\.\/form\/SearchField\.js";/,
-    "the bar renders the DS SearchField — no new input widget",
-  );
-  assert.match(
-    topBar,
-    /accessibilityRole: "search"/,
-    "the field sits inside a search landmark (role=search on web via the platform translator)",
-  );
-  assert.match(
-    topBar,
-    /onSubmitEditing=\{search\.onSubmit\}/,
-    "Enter/submit fires the host callback",
-  );
-  assert.match(
-    topBar,
-    /accessibilityLabel: search\.label/,
-    "the field's accessible name comes from the supplied label",
+
+test("the shell is BigFooterShell in content scroll mode around the plain ScreenContainer", async () => {
+  const { AppShellPage, BigFooterShell, ScreenContainer } = await loadRuntime();
+  const footer = { note: "host footer" } as any;
+  const tree = AppShellPage({
+    brand: { label: "Eciperay", href: "/" },
+    navItems: sentinelNav,
+    activeItemId: "recipes",
+    footer,
+    children: <span>PAGE SURFACE</span>,
+  });
+  assert.equal(tree.type, BigFooterShell, "the page renders through the footer shell (#410)");
+  assert.equal(tree.props.scrollMode, "content");
+  assert.equal(tree.props.footer, footer, "the host footer data crosses unchanged");
+  assert.equal(
+    tree.props.children.type,
+    ScreenContainer,
+    "the content renders inside the plain ScreenContainer (#547)",
   );
 });
-test("header actions follow the href-vs-callback split", () => {
-  assert.match(topBar, /export type AppTopBarAction =/);
-  assert.match(topBar, /href: string;\s*onPress\?: never;/);
-  assert.match(topBar, /onPress: \(\) => void;\s*href\?: never;/);
-});
-test("the page composes DS components only and never touches the boundary itself", () => {
-  assert.doesNotMatch(page, /from "tamagui"/, "pages import no Tamagui directly (#297)");
-  assert.doesNotMatch(
-    page,
-    /ChunkErrorBoundary/,
-    "lazy content goes through the internal LazySlot — the page never names the boundary",
+
+test("the top bar is one shared chrome: TabbedShellPage renders it too", async () => {
+  const { TabbedShellPage, distWidgets } = await loadRuntime();
+  const tree = TabbedShellPage({
+    title: "Memorize",
+    tabs: [{ id: "verses", label: "My verses", content: <span>VERSES SURFACE</span> }],
+    activeTabId: "verses",
+    onTabSelect: () => {},
+  });
+  const header = tree.props.children.props.children[0];
+  assert.equal(
+    header.type,
+    distWidgets.AppTopBar,
+    "the tabbed shell's header is the shared AppTopBar widget",
   );
-  assert.match(page, /import \{ LazySlot \} from "\.\.\/\.\.\/views\/LazySlot\.js";/);
-  assert.match(page, /import \{\s*AppTopBar,/);
-  assert.match(page, /<ScreenContainer>/);
-  // The standard page footer contract (#410, pinned for every
-  // page by src/widgets/BigFooter.test.ts): an optional footer prop
-  // rendered through the shell — no data, no footer band.
-  assert.match(page, /footer\?: BigFooterData;/);
-  assert.match(page, /<BigFooterShell footer=\{footer\} scrollMode="content">/);
-});
-test("the top bar is one shared chrome: TabbedShellPage renders it too", () => {
-  assert.match(topBar, /import \{ BrandLink \} from "\.\/BrandLink\.js";/);
-  assert.match(topBar, /iconsByName/);
-  assert.match(topBar, /navigationRoleProps/);
-  assert.match(
-    tabbedShell,
-    /<AppTopBar brand=\{\{ label: title \}\} \/>/,
-    "the tabbed shell's header is the shared top bar with the title as its brand",
-  );
-});
-test("the stories cover the shell's contracted cases", () => {
-  for (const name of [
-    "Default",
-    "WithSearch",
-    "WithNotice",
-    "WithNoticeAction",
-    "NoIcons",
-    "LinkActions",
-    "NoFooter",
-    "ChunkFailedContent",
-  ]) {
-    assert.match(stories, new RegExp(`export const ${name}: Story`), `${name} story exists`);
-  }
+  assert.deepEqual(header.props.brand, { label: "Memorize" }, "the title crosses as its brand");
 });
 
 // Runtime imports are lazy, like TabbedShellPage.test.ts: the
@@ -162,8 +109,11 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
+    const shellModule: Record<string, any> = await import("../../../dist/widgets/BigFooter.js");
     const { AppShellPage }: Record<string, any> =
       await import("../../../dist/pages/eciperay/AppShellPage.js");
+    const { TabbedShellPage }: Record<string, any> =
+      await import("../../../dist/pages/memorize/TabbedShellPage.js");
     const distViews: Record<string, any> = await import("../../../dist/views/index.js");
     const distWidgets: Record<string, any> = await import("../../../dist/widgets/index.js");
     return {
@@ -171,7 +121,9 @@ function loadRuntime() {
       renderToString,
       TamaguiProvider,
       ...dist,
+      BigFooterShell: shellModule.BigFooterShell,
       AppShellPage,
+      TabbedShellPage,
       distViews,
       distWidgets,
     };

@@ -1,11 +1,11 @@
 import { XStack, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { tokens } from "../tokens/index.js";
-import { BoxSkeleton } from "./BoxSkeleton.js";
-import { Button } from "./Button.js";
-import { SkeletonBone } from "./SkeletonClock.js";
-import { Text } from "./Text.js";
-import { LINE_BOXES } from "./TextSkeleton.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { Button } from "../widgets/Button.js";
+import { SkeletonBone } from "../widgets/SkeletonClock.js";
+import { Text } from "../widgets/Text.js";
+import { LINE_BOXES } from "../widgets/TextSkeleton.js";
 import { SearchField } from "../widgets/form/SearchField.js";
 import { useVoice } from "../voice/index.js";
 

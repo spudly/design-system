@@ -115,6 +115,13 @@ test("every page component renders BigFooter through the shell from a footer pro
     // RecipesPage and HomePage render — page-local scaffolding,
     // not a page; it renders no footer of its own.
     "recipeRow.tsx",
+    // The cooking-mode pages are full-screen views (#752/#753,
+    // Stephen's Storybook-review direction 2026-11-20): they
+    // render NO Big Footer and take no footer prop — they frame
+    // themselves in FullScreenShell instead. They are the
+    // standing exception to the #410 every-page-footer rule.
+    "CookingModePage.tsx",
+    "MealCookingModePage.tsx",
     "fixtures.ts",
     "useCatalogPagination.ts",
     "index.ts",
@@ -232,13 +239,16 @@ test("overlay pages get a viewport-bounded region with or without footer data (#
     bigFooter.indexOf('if (scrollMode === "overlay")') < bigFooter.indexOf("if (!footer)"),
     "the web overlay branch precedes the web footer branches",
   );
-  // Both cooking-mode pages opt in; their error/plain branches
-  // and every other page keep their existing modes.
+  // The cooking-mode pages were the overlay mode's consumers;
+  // since #752/#753 they render NO footer at all and frame
+  // their StepOverlay in FullScreenShell instead — the overlay
+  // branch above remains the shell's footer-bearing form of
+  // the same viewport-bounded region.
   for (const entry of ["eciperay/CookingModePage.tsx", "eciperay/MealCookingModePage.tsx"]) {
     const code = readCode(join("src", "pages", entry));
     assert.ok(
-      code.includes('<BigFooterShell footer={props.footer} scrollMode="overlay">'),
-      `${entry} must render its StepOverlay shell in overlay mode`,
+      code.includes("<FullScreenShell>"),
+      `${entry} must frame its StepOverlay shell in FullScreenShell`,
     );
   }
   // The regression stories render the exact no-footer host

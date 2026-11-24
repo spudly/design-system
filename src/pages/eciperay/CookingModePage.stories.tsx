@@ -1,4 +1,3 @@
-import { eciperayFooterFixture } from "../shared/fixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
 import { CookingModePage } from "./CookingModePage.js";
 
@@ -21,7 +20,6 @@ export const WithIngredientsPanel: Story = {
   render: () => (
     <>
       <CookingModePage
-        footer={eciperayFooterFixture}
         recipeTitle="Skillet Chicken"
         steps={steps}
         stepIndex={1}
@@ -43,9 +41,9 @@ export const WithIngredientsPanel: Story = {
 };
 
 /**
- * The host composition that broke in #729: the eciperay host
- * supplies NO footer data, so the shell's web no-footer branch
- * renders — the overlay must still cover the full viewport.
+ * The #729 regression pin, kept under the #752 full-screen
+ * frame: with no footer anywhere in the composition, the
+ * overlay must still cover the full viewport.
  */
 export const NoFooter: Story = {
   render: () => (
@@ -75,7 +73,6 @@ export const FirstStep: Story = {
   render: () => (
     <>
       <CookingModePage
-        footer={eciperayFooterFixture}
         recipeTitle="Skillet Chicken"
         steps={steps}
         stepIndex={0}
@@ -91,7 +88,6 @@ export const LastStep: Story = {
   render: () => (
     <>
       <CookingModePage
-        footer={eciperayFooterFixture}
         recipeTitle="Skillet Chicken"
         steps={steps}
         stepIndex={2}

@@ -9,51 +9,118 @@
  * `renderRecipeRow` slot is removed; the host supplies item
  * data, hrefs, and `onLogCookPress` only.
  *
- * Source scans pin the contract literals; the SSR tests render
- * the built page and pin what a row actually shows.
+ * Converted from source scans to runtime checks in #733
+ * tranche 6b: the shared RecipeRow is called directly and its
+ * element tree inspected (the MediaRow it composes and the
+ * RatingStars log-cook control it wires), HomePage's own tree
+ * is checked for RecipeRow elements carrying the host's items
+ * and callback, and the SSR tests render the built page and
+ * pin what a row actually shows. The former type-alias pins
+ * (HomePageRecipe / RecipesPageItem) were deleted: prop shape
+ * is enforced by the TypeScript build (Stephen, 2026-11-20).
+ * RecipesPage rendering this same row component is pinned by
+ * RecipesPage's own contract tests.
  */
 import "../../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../../..");
-const pagesDir = join(root, "src", "pages", "eciperay");
-
-function readCode(path: string) {
-  return readFileSync(path, "utf8")
-    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+// Collect, in document order, every element in a tree whose
+// type is the given component.
+function findAllByType(node: any, type: any, out: any[] = []): any[] {
+  if (node === null || typeof node !== "object") return out;
+  if (Array.isArray(node)) {
+    for (const child of node) findAllByType(child, type, out);
+    return out;
+  }
+  if (node.type === type) out.push(node);
+  findAllByType(node.props?.children, type, out);
+  return out;
 }
 
-const homeSource = readCode(join(pagesDir, "HomePage.tsx"));
-const rowSource = readCode(join(root, "src", "pages", "shared", "recipeRow.tsx"));
-const recipesSource = readCode(join(pagesDir, "RecipesPage.tsx"));
+async function loadRow() {
+  const runtime = await loadRuntime();
+  const rowModule: Record<string, any> = await import("../../../dist/pages/shared/recipeRow.js");
+  const mediaRow: Record<string, any> = await import("../../../dist/widgets/MediaRow.js");
+  const formWidgets: Record<string, any> =
+    await import("../../../dist/widgets/form/RatingStars.js");
+  return {
+    ...runtime,
+    RecipeRow: rowModule.RecipeRow,
+    MediaRow: mediaRow.MediaRow,
+    RatingStars: formWidgets.RatingStars,
+  };
+}
 
-test("HomePage renders the shared row; the render slot is gone (#657)", () => {
-  assert.match(homeSource, /<RecipeRow key=\{recipe\.id\} item=\{recipe\}/);
-  assert.doesNotMatch(homeSource, /renderRecipeRow/);
-  assert.match(homeSource, /export type HomePageRecipe = RecipeRowItem/);
-  assert.match(homeSource, /onLogCookPress\?: \(recipeId: string\) => void/);
-});
-
-test("RecipesPage renders the same shared row (#657 extraction is shared, not copied)", () => {
-  assert.match(recipesSource, /<RecipeRow item=\{item\} onLogCookPress=\{onLogCookPress\}/);
-  assert.match(recipesSource, /export type RecipesPageItem = RecipeRowItem/);
-  assert.doesNotMatch(recipesSource, /function MediaRow|function RatingStars/);
-});
-
-test("the shared row wires the stars to onLogCookPress with the item id (#657)", () => {
-  assert.match(rowSource, /onLogCookPress\(item\.id\)/);
-  assert.match(
-    rowSource,
-    /Log a cook of \$\{item\.title\}, rated \$\{item\.rating\} out of 5 stars/,
+test("HomePage renders the shared RecipeRow for each recipe, forwarding items and the log-cook callback (#657)", async () => {
+  const { HomePage, RecipeRow } = await loadRow();
+  const onLogCookPress = () => {};
+  const tree = HomePage({
+    title: "Home",
+    subtitle: "Welcome back",
+    browseLabel: "Browse recipes",
+    addLabel: "Add a recipe",
+    sharedWithMeLabel: "Shared with me",
+    recipesTitle: "Recently viewed",
+    emptyMessage: "Nothing here yet",
+    browseHref: "/recipes",
+    addHref: "/recipes/new",
+    sharedWithMeHref: "/shared-with-me",
+    recipes: RECIPES,
+    onLogCookPress,
+  });
+  const rows = findAllByType(tree, RecipeRow);
+  assert.equal(rows.length, RECIPES.length, "one shared row per recipe — no render slot remains");
+  assert.deepEqual(
+    rows.map((r: any) => r.props.item),
+    RECIPES,
+    "the host's item data crosses unchanged",
   );
-  assert.match(rowSource, /item\.canLogCook !== false/);
+  for (const row of rows) {
+    assert.equal(row.props.onLogCookPress, onLogCookPress, "the host's log-cook callback crosses");
+  }
+});
+
+test("the shared row wires the stars to onLogCookPress with the item id (#657)", async () => {
+  const { RecipeRow, MediaRow, RatingStars } = await loadRow();
+  const logged: string[] = [];
+  const tree = RecipeRow({
+    item: RECIPES[0],
+    onLogCookPress: (id: string) => logged.push(id),
+  });
+  assert.equal(tree.type, MediaRow, "the row composes the shared MediaRow");
+  assert.equal(tree.props.href, "/recipes/r1");
+  assert.equal(tree.props.title, "Tuscan Chicken");
+  const stars = tree.props.subtitleAction;
+  assert.equal(stars.type, RatingStars, "the log-cook control is the RatingStars composition");
+  assert.equal(
+    stars.props.accessibilityLabel,
+    "Log a cook of Tuscan Chicken, rated 4 out of 5 stars",
+  );
+  stars.props.onPress();
+  assert.deepEqual(logged, ["r1"], "pressing the stars logs a cook for the item's id");
+  const unrated = RecipeRow({ item: RECIPES[1], onLogCookPress: () => {} });
+  assert.equal(
+    unrated.props.subtitleAction.props.accessibilityLabel,
+    "Log a cook of Fudgy Brownies",
+    "an unrated recipe's icon-only star carries the plain log-cook label",
+  );
+});
+
+test("the shared row renders no log-cook control when the host omits the callback or the item cannot log cooks (#657)", async () => {
+  const { RecipeRow } = await loadRow();
+  assert.equal(
+    RecipeRow({ item: RECIPES[0] }).props.subtitleAction,
+    undefined,
+    "no callback — no control",
+  );
+  assert.equal(
+    RecipeRow({ item: { ...RECIPES[0], canLogCook: false }, onLogCookPress: () => {} }).props
+      .subtitleAction,
+    undefined,
+    "canLogCook false — no control",
+  );
 });
 
 let runtimePromise: Promise<Record<string, any>> | undefined;

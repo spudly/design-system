@@ -1,256 +1,273 @@
 /**
- * Contract test for VerseSearchPage (spudly/design-system#49),
- * the design-system port of Memorize's Search tab (SearchScreen
- * in spudly/memorize packages/app).
+ * Contract test for VerseSearchPage (spudly/design-system#49).
  *
- * The app screen is a fragment rendered inside the app shell's
- * non-scrolling ScreenContainer, and this page carries that
- * structure:
- * 1. The shell is the non-scrolling ScreenContainer (the app
- *    renders every tab inside <ScreenContainer scrollable=
- *    {false}>; its "Memorize" title and tab bar stay app-side).
- * 2. The results list is the shared BoundedList, height-bounded
- *    with `flex: 1` (#188 — the bounding is BoundedList's own
- *    since the #119 fix) and stays mounted across searches — a
- *    re-search never blanks the previous results; the busy
- *    spinner renders above it.
- * 3. The demo-mode notice carries the app's text verbatim and
- *    renders above the search row; the error alert carries the
- *    app-composed message.
- * 4. The search row mirrors the app: the DS SearchField with the
- *    app's placeholder (its keyword example mode-aware, #276),
- *    submit-editing and the Search button
- *    firing the same callback, and the button's disabled rule
- *    (searching, or a blank query).
- * 5. The empty state is scoped to a fruitless search (#287):
- *    before the first search there is deliberately NO message
- *    (the pre-search blank is pinned), but once the app reports
- *    a completed search via `hasSearched` and the results are
- *    empty — not searching, no error — the page renders the DS
- *    EmptyState, consistent with the sibling Memorize pages.
- * 6. Result rows mirror the app card and the add action reports
- *    the verse id. No render slot: no ReactNode prop, no
- *    accessory — the app screen renders no app-owned content
- *    inside itself. No app package is imported.
- * 7. The stories render the real component in its five states
- *    (Default, DemoMode, Searching, Error, NoResults) in the
- *    Quiet Dawn theme.
- *
- * This is a source scan, not a render test, for the same reason
- * as the recipesPageSharedConfig block in src/pages/eciperay/RecipesPage.test.ts: the failures it guards
- * happen in native layout, which no JS renderer in this repo
- * performs, and the invariant is a per-literal property of the
- * source. Comments are stripped before scanning so prose cannot
- * satisfy the patterns.
+ * Converted from source scans to runtime checks in #733
+ * tranche 6a: the page is called directly and the element
+ * tree it returns is inspected — the "Search verses"
+ * heading, the demo-mode notice verbatim above the search
+ * row, the controlled SearchField whose placeholder example
+ * is mode-aware (#276) with submit and the Search button
+ * both firing onSearch under the app's disabled rule, the
+ * error alert, the busy spinner above a results list that
+ * stays mounted, the no-results empty state scoped to a
+ * completed fruitless search (#287), and result rows whose
+ * add action reports the verse id (or the disabled "Added"
+ * confirmation, #242) ARE the rendered contract, observable
+ * without reading source. The former prop-type pins,
+ * barrel-as-source-text, and story pins were deleted: type
+ * shape is enforced by the TypeScript build and story
+ * coverage by the story-parity tests (Stephen, 2026-11-20).
+ * The dist `.d.ts` read below is a built-artifact read, not
+ * a source read, and stays.
  */
+import "../../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
+import { register } from "node:module";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pagesDir = join(here, "../../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "memorize", "VerseSearchPage.tsx"), "utf8");
-const stories = readFileSync(join(pagesDir, "memorize", "VerseSearchPage.stories.tsx"), "utf8");
 
-// Strip block and line comments so documented patterns in prose
-// (this file's subject is heavily commented) cannot pass the scan.
-const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+// BoundedList imports react-native, whose Flow-typed source
+// plain Node cannot parse; redirect the bare specifier to an
+// inert stub before the page module is imported. The tests
+// inspect the BoundedList element's props and call its
+// renderItem — they never render the FlatList itself.
+const reactNativeStubUrl =
+  "data:text/javascript,export%20function%20FlatList()%7Breturn%20null%3B%7D%0Aexport%20function%20View()%7Breturn%20null%3B%7D%0A";
+register(
+  "data:text/javascript," +
+    encodeURIComponent(
+      `export async function resolve(specifier, context, nextResolve) {\n` +
+        `  if (specifier === "react-native") return { shortCircuit: true, url: ${JSON.stringify(reactNativeStubUrl)} };\n` +
+        `  return nextResolve(specifier, context);\n` +
+        `}`,
+    ),
+);
 
-test("VerseSearchPage source is readable and non-trivial", () => {
-  assert.ok(code.length > 1000, "expected the full VerseSearchPage source");
-  assert.match(code, /export function VerseSearchPage/);
+async function loadPage() {
+  const dist: Record<string, any> = await loadInternalDist();
+  const shell: Record<string, any> = await import("../../../dist/widgets/BigFooter.js");
+  const list: Record<string, any> = await import("../../../dist/pages/shared/BoundedList.js");
+  const page: Record<string, any> = await import("../../../dist/pages/memorize/VerseSearchPage.js");
+  return { ...dist, BigFooterShell: shell.BigFooterShell, BoundedList: list.BoundedList, ...page };
+}
+
+function screenChildren(tree: any): any[] {
+  const screen = tree.props.children;
+  const children = screen.props.children;
+  return Array.isArray(children) ? children : [children];
+}
+
+function textOf(element: any): string {
+  const children = element?.props?.children;
+  return (Array.isArray(children) ? children : [children])
+    .map((c) => (typeof c === "string" ? c : ""))
+    .join("")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const RESULTS = [
+  { id: "v1", reference: "Ether 12:27", text: "And if men come unto me" },
+  {
+    id: "v2",
+    reference: "Moroni 10:4",
+    text: "And when ye shall receive these things",
+    added: true,
+  },
+];
+
+function baseProps(overrides: Record<string, any> = {}) {
+  return {
+    query: "weakness",
+    onQueryChange: (_v: string) => {},
+    onSearch: () => {},
+    isSearching: false,
+    usingDemo: false,
+    errorMessage: null,
+    results: RESULTS,
+    onAddVerse: (_id: string) => {},
+    ...overrides,
+  };
+}
+
+function renderRow(tree: any, item: any) {
+  const list = screenChildren(tree).at(-1);
+  const rowElement = list.props.renderItem({ item });
+  return rowElement.type(rowElement.props);
+}
+
+test("VerseSearchPage is exported from the built pages barrel", async () => {
+  const { VerseSearchPage } = await loadPage();
+  assert.equal(typeof VerseSearchPage, "function");
+  const types = readFileSync(join(here, "../../..", "dist", "pages", "index.d.ts"), "utf8");
+  assert.match(types, /VerseSearchPage/);
+  assert.match(types, /type VerseSearchPageProps/);
 });
 
-test("no app imports: every import is react-native, tamagui, a DS component or view, or the internal BoundedList", () => {
-  const specifiers = [...code.matchAll(/from\s+"([^"]+)"/g)].map((m) => m[1]);
-  assert.ok(specifiers.length > 0, "expected import specifiers to scan");
-  for (const specifier of specifiers) {
-    assert.ok(
-      specifier === "react-native" ||
-        specifier === "tamagui" ||
-        specifier.startsWith("../../widgets") ||
-        specifier.startsWith("../../views") ||
-        // Internal page scaffolding (the PageFrame pattern): the
-        // shared bounded list lives with the pages because it
-        // imports react-native (#119).
-        specifier === "../shared/BoundedList.js",
-      `VerseSearchPage must not import "${specifier}" — app logic stays app-side`,
-    );
-  }
+test("the heading is the app screen's own; the shell is the plain ScreenContainer", async () => {
+  const { VerseSearchPage, BigFooterShell, ScreenContainer, Text } = await loadPage();
+  const tree = VerseSearchPage(baseProps());
+  assert.equal(tree.type, BigFooterShell);
+  assert.equal(tree.props.scrollMode, "content");
+  assert.equal(
+    tree.props.children.type,
+    ScreenContainer,
+    "the shell is the plain ScreenContainer (#547)",
+  );
+  const heading = screenChildren(tree)[0];
+  assert.equal(heading.type, Text);
+  assert.equal(heading.props.variant, "heading");
+  assert.equal(heading.props.children, "Search verses");
 });
 
-test("the shell is the plain ScreenContainer (#547: no scroller in the container)", () => {
-  assert.match(
-    code,
-    /<ScreenContainer>/,
-    "VerseSearchPage must render the plain <ScreenContainer>, the app shell's container (#547)",
+test("the demo-mode notice carries the app's text verbatim, above the search row", async () => {
+  const { VerseSearchPage, Alert, FieldRow } = await loadPage();
+  const children = screenChildren(VerseSearchPage(baseProps({ usingDemo: true })));
+  const notice = children[1];
+  assert.equal(notice.type, Alert);
+  assert.equal(notice.props.severity, "info");
+  assert.equal(
+    textOf(notice),
+    "Searching the built-in demo set. Add a gospel-engine API key in Settings for full-library search.",
+    "the demo notice text is the app's, verbatim",
   );
+  assert.equal(children[2].type, FieldRow, "the notice renders above the search row");
+  const noDemo = screenChildren(VerseSearchPage(baseProps({ usingDemo: false })));
+  assert.equal(noDemo[1], null, "no demo notice renders outside demo mode");
 });
 
-test("the heading is the app screen's own heading", () => {
-  assert.match(
-    code,
-    /<Text variant="heading">Search verses<\/Text>/,
-    'the view must render the "Search verses" heading (the app\'s "Memorize" title stays app-side)',
+test("the search row wires the field and the button to the one search callback", async () => {
+  const { VerseSearchPage, SearchField, Button } = await loadPage();
+  let searches = 0;
+  const onSearch = () => {
+    searches += 1;
+  };
+  const onQueryChange = (_v: string) => {};
+  const tree = VerseSearchPage(baseProps({ onSearch, onQueryChange }));
+  const [field, button] = screenChildren(tree)[2].props.children;
+  assert.equal(field.type, SearchField, "the search row renders the DS SearchField");
+  assert.equal(field.props.value, "weakness", "the field is controlled by the query props");
+  assert.equal(field.props.onChangeText, onQueryChange);
+  assert.equal(field.props.onSubmitEditing, onSearch, "submitting the field fires onSearch");
+  assert.equal(field.props.grow, true, "the field takes the row's remaining width");
+  assert.equal(
+    field.props.placeholder,
+    "e.g. Ether 12:27 or “charity”",
+    "full-library mode keeps the charity placeholder (#276)",
   );
+  assert.equal(button.type, Button);
+  assert.equal(button.props.children, "Search");
+  assert.equal(button.props.disabled, false, "a non-blank idle query enables Search");
+  button.props.onPress();
+  assert.equal(searches, 1, "the Search button fires the same onSearch");
+
+  const demoTree = VerseSearchPage(baseProps({ usingDemo: true }));
+  const demoField = screenChildren(demoTree)[2].props.children[0];
+  assert.equal(
+    demoField.props.placeholder,
+    "e.g. Ether 12:27 or “weakness”",
+    "demo mode selects the weakness placeholder (#276)",
+  );
+
+  const blankBtn = screenChildren(VerseSearchPage(baseProps({ query: "   " })))[2].props
+    .children[1];
+  assert.equal(blankBtn.props.disabled, true, "a blank query disables Search, as the app's does");
+  const busyBtn = screenChildren(VerseSearchPage(baseProps({ isSearching: true })))[2].props
+    .children[1];
+  assert.equal(busyBtn.props.disabled, true, "searching disables Search, as the app's does");
 });
 
-test("the demo-mode notice carries the app's text verbatim, above the search row", () => {
-  assert.match(
-    code,
-    /\{usingDemo \? \(/,
-    "the demo notice must render only when the app reports demo mode",
-  );
-  assert.match(
-    code,
-    /Searching the built-in demo set\.\s+Add a gospel-engine API key in Settings for\s+full-library\s+search\./,
-    "the demo notice text must be the app's, verbatim",
-  );
-  assert.ok(
-    code.indexOf("Searching the built-in demo set") < code.indexOf("<SearchField"),
-    "the demo notice must render above the search row, as in the app",
-  );
+test("the error alert carries the app-composed message", async () => {
+  const { VerseSearchPage, Alert } = await loadPage();
+  const children = screenChildren(VerseSearchPage(baseProps({ errorMessage: "Search failed" })));
+  const alert = children[3];
+  assert.equal(alert.type, Alert);
+  assert.equal(alert.props.severity, "error");
+  assert.equal(alert.props.children, "Search failed", "the error message renders verbatim");
+  const noError = screenChildren(VerseSearchPage(baseProps()));
+  assert.equal(noError[3], null, "no error renders no alert");
 });
 
-test("the search row wires the field and the button to the one search callback", () => {
-  assert.match(
-    code,
-    /<SearchField\s+value=\{query\}\s+onChangeText=\{onQueryChange\}/,
-    "the SearchField must be controlled by the query props",
-  );
-  assert.match(
-    code,
-    /placeholder=\{\s*usingDemo \?/,
-    "the placeholder's keyword example must be selected by usingDemo (#276)",
-  );
-  assert.match(
-    code,
-    /usingDemo \? "e\.g\. Ether 12:27 or “weakness”" : "e\.g\. Ether 12:27 or “charity”"/,
-    'the ternary must map demo mode to the "weakness" placeholder (the demo set answers it with Ether 12:27 and contains no "charity" verse) and full-library mode to the "charity" placeholder, verbatim (#276)',
-  );
-  assert.match(
-    code,
-    /onSubmitEditing=\{onSearch\}/,
-    "submitting the field must fire onSearch, as the app's submit invokes its search routine",
-  );
-  assert.match(
-    code,
-    /<Button onPress=\{onSearch\} disabled=\{isSearching \|\| query\.trim\(\) === ""\}>\s*Search\s*<\/Button>/,
-    "the Search button must fire onSearch and follow the app's disabled rule (searching or a blank query)",
-  );
+test("the busy spinner renders above a results list that stays mounted", async () => {
+  const { VerseSearchPage, Spinner, BoundedList } = await loadPage();
+  const children = screenChildren(VerseSearchPage(baseProps({ isSearching: true })));
+  const spinner = children[4];
+  assert.equal(spinner.type, Spinner, "the spinner renders while a search is in flight");
+  assert.equal(spinner.props.label, "Loading");
+  const list = children[5];
+  assert.equal(list.type, BoundedList, "the list stays mounted while searching");
+  assert.equal(list.props.data, RESULTS, "the previous results stay in the list — no blanking");
+  const idle = screenChildren(VerseSearchPage(baseProps()));
+  assert.equal(idle[4], null, "no spinner renders when idle");
+  assert.equal(idle[5].type, BoundedList);
+  assert.equal(idle[5].props.keyExtractor(RESULTS[0]), "v1", "rows key off the verse id");
 });
 
-test("the error alert carries the app-composed message", () => {
-  assert.match(
-    code,
-    /\{errorMessage \? <Alert severity="error">\{errorMessage\}<\/Alert> : null\}/,
-    "a non-null errorMessage must render as the error alert, verbatim",
-  );
-});
+test("a completed search with no results renders the empty state; the pre-search state does not (#287)", async () => {
+  const { VerseSearchPage, EmptyState, BoundedList } = await loadPage();
+  const fruitless = screenChildren(
+    VerseSearchPage(baseProps({ results: [], hasSearched: true })),
+  ).at(-1);
+  assert.equal(fruitless.type, EmptyState);
+  assert.equal(fruitless.props.title, "No results");
+  assert.equal(fruitless.props.body, "Try a different word or reference.");
+  assert.equal(fruitless.props.announce, true, "the empty state announces the search outcome");
 
-test("the busy spinner renders above a results list that stays mounted", () => {
-  assert.match(
-    code,
-    /\{isSearching \? <Spinner label="Loading" \/> : null\}/,
-    "the spinner must render while a search is in flight",
+  const preSearch = screenChildren(VerseSearchPage(baseProps({ results: [] }))).at(-1);
+  assert.equal(
+    preSearch.type,
+    BoundedList,
+    "before the first search there is deliberately no message",
   );
-  assert.match(
-    code,
-    /data=\{results\}/,
-    "the list data must be the results as-is — no swap or blanking while searching",
+  const searching = screenChildren(
+    VerseSearchPage(baseProps({ results: [], hasSearched: true, isSearching: true })),
+  ).at(-1);
+  assert.equal(
+    searching.type,
+    BoundedList,
+    "while searching the spinner, not the empty state, is the feedback",
   );
-  assert.ok(
-    code.indexOf("<Spinner") < code.indexOf("<BoundedList"),
-    "the spinner must render above the list, as in the app",
-  );
-});
-
-test("the list is the shared BoundedList; the page carries no styling of its own (#119)", () => {
-  assert.match(
-    code,
-    /<BoundedList\s+data=\{results\}/,
-    "the results must render through BoundedList, which owns the #188 flex: 1 bounding and row separation",
-  );
-  for (const banned of ["FlatList", "listStyle", "XStack", "YStack", "marginBottom", "style={"]) {
-    assert.ok(
-      !code.includes(banned),
-      `VerseSearchPage must not contain "${banned}" — list bounding, row layout, and card spacing live in BoundedList / FieldRow / SearchField since the #119 fix`,
-    );
-  }
-});
-
-test("a completed search with no results renders the empty state; the pre-search state does not (#287)", () => {
-  assert.match(
-    code,
-    /hasSearched\?: boolean;/,
-    "VerseSearchPageProps must carry the optional hasSearched flag (#287)",
-  );
-  assert.match(
-    code,
-    /\{hasSearched && !isSearching && !errorMessage && results\.length === 0 \? \(\s*<EmptyState title="No results" body="Try a different word or reference\." announce \/>\s*\) : \(\s*<BoundedList/,
-    "a fruitless completed search (hasSearched, not searching, no error, zero results) must render the no-results EmptyState (announced as a polite status, since it is the result of an action) in place of the empty list; every other state renders the list",
-  );
-});
-
-test("result rows mirror the app card and the add action reports the verse id", () => {
-  assert.match(
-    code,
-    /onAddVerse\(item\.id\)/,
-    "the add action must fire onAddVerse with the verse id",
-  );
-  assert.match(
-    code,
-    /<Button size="sm" onPress=\{onAddPress\}>\s*Add to memorize list\s*<\/Button>/,
-    'the row button must be the app\'s small "Add to memorize list" button',
+  const errored = screenChildren(
+    VerseSearchPage(baseProps({ results: [], hasSearched: true, errorMessage: "boom" })),
+  ).at(-1);
+  assert.equal(
+    errored.type,
+    BoundedList,
+    "when the search failed the error alert, not the empty state, is the feedback",
   );
 });
 
-test("an added result renders the disabled Added confirmation, not the Add button (#242)", () => {
-  assert.match(
-    code,
-    /added\?: boolean;/,
-    "VerseSearchPageItem must carry the optional added flag (#242)",
-  );
-  assert.match(
-    code,
-    /\{item\.added \? \(\s*<Button size="sm" variant="secondary" disabled>\s*Added\s*<\/Button>/,
-    'an added result must render the disabled secondary "Added" button (mirroring the memorize web fix)',
-  );
+test("result rows mirror the app card and the add action reports the verse id", async () => {
+  const { VerseSearchPage, Card, Text, Button } = await loadPage();
+  const added: string[] = [];
+  const tree = VerseSearchPage(baseProps({ onAddVerse: (id: string) => added.push(id) }));
+  const row = renderRow(tree, RESULTS[0]);
+  assert.equal(row.type, Card, "a result row is a card");
+  const [reference, text, button] = row.props.children;
+  assert.equal(reference.type, Text);
+  assert.equal(reference.props.variant, "subheading");
+  assert.equal(reference.props.children, "Ether 12:27");
+  assert.equal(text.props.variant, "verse");
+  assert.equal(text.props.children, RESULTS[0].text);
+  assert.equal(button.type, Button);
+  assert.equal(button.props.children, "Add to memorize list", "the row button is the app's");
+  assert.equal(button.props.size, "sm");
+  button.props.onPress();
+  assert.deepEqual(added, ["v1"], "the add action fires onAddVerse with the verse id");
 });
 
-test("no render slot: no ReactNode prop, no accessory", () => {
-  for (const banned of ["ReactNode", "Accessory", "slot"]) {
-    assert.ok(
-      !code.includes(banned),
-      `VerseSearchPage must not contain "${banned}" — the app screen renders no app-owned content inside itself, so the contract is callbacks only`,
-    );
-  }
-});
-
-test("stories render the real component in its six states, in Quiet Dawn", () => {
-  for (const story of [
-    "Default",
-    "DemoMode",
-    "Searching",
-    "Error",
-    "NoResults",
-    "WithAddedResult",
-  ]) {
-    assert.ok(
-      new RegExp(String.raw`export const ${story}\b`).test(stories),
-      `VerseSearchPage.stories.tsx must export a ${story} story`,
-    );
-  }
-  assert.match(
-    stories,
-    /title: "Pages\/Memorize\/VerseSearchPage"/,
-    "the stories must declare the Pages/Memorize/VerseSearchPage title (#70)",
-  );
-  assert.match(
-    stories,
-    /theme: "light_quietDawn"/,
-    "the stories must pin the Quiet Dawn theme (Memorize's brand)",
-  );
+test("an added result renders the disabled Added confirmation, not the Add button (#242)", async () => {
+  const { VerseSearchPage } = await loadPage();
+  const tree = VerseSearchPage(baseProps());
+  const row = renderRow(tree, RESULTS[1]);
+  const button = row.props.children[2];
+  assert.equal(button.props.children, "Added");
+  assert.equal(button.props.size, "sm");
+  assert.equal(button.props.variant, "secondary");
+  assert.equal(button.props.disabled, true, "the Added confirmation is disabled");
 });

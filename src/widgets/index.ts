@@ -12,7 +12,6 @@ export {
 export { BackLink, type BackLinkProps } from "./BackLink.js";
 export { Badge, type BadgeProps } from "./Badge.js";
 export { BlankWord, type BlankWordProps } from "./BlankWord.js";
-export { BulkSelectToolbar, type BulkSelectToolbarProps } from "./BulkSelectToolbar.js";
 export { Button, type ButtonProps } from "./Button.js";
 export { Card, type CardProps } from "./Card.js";
 export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";
@@ -35,6 +34,7 @@ export { DropdownButton, type DropdownButtonProps } from "./form/DropdownButton.
 export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export { FixedActionBanner, type FixedActionBannerProps } from "./FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
+export { FullScreenShell, type FullScreenShellProps } from "./FullScreenShell.js";
 export {
   MasonryGrid,
   distributeMasonryItems,
@@ -157,7 +157,7 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // rounds, shipped once here (the tranche PRs adopt these in
 // their post-extraction rounds).
 export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
-export { FieldColumns, type FieldColumnsProps } from "./form/FieldColumns.js";
+export { EqualColumns, type EqualColumnsProps } from "./form/EqualColumns.js";
 export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
   NutritionPanel,

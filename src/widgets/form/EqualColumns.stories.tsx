@@ -1,21 +1,21 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { FieldColumns } from "./FieldColumns.js";
+import { EqualColumns } from "./EqualColumns.js";
 import { LabeledField } from "./LabeledField.js";
 import { TextField } from "./TextField.js";
 
-const meta: Meta<typeof FieldColumns> = {
-  title: "Widgets/Form/FieldColumns",
-  component: FieldColumns,
+const meta: Meta<typeof EqualColumns> = {
+  title: "Widgets/Form/EqualColumns",
+  component: EqualColumns,
 };
 
 export default meta;
-type Story = StoryObj<typeof FieldColumns>;
+type Story = StoryObj<typeof EqualColumns>;
 
 export const Default: Story = {
   render: () => (
     <YStack maxWidth={430}>
-      <FieldColumns>
+      <EqualColumns>
         <LabeledField label="Servings">
           <TextField
             accessibilityLabel="Servings"
@@ -40,7 +40,7 @@ export const Default: Story = {
             onChangeText={() => {}}
           />
         </LabeledField>
-      </FieldColumns>
+      </EqualColumns>
     </YStack>
   ),
 };

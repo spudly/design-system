@@ -1,13 +1,13 @@
 ---
 component: RecipeFormPage
 run_when:
-  - "src/pages/eciperay/RecipeFormPage.tsx, src/pages/eciperay/MealFormPage.tsx, src/pages/eciperay/MealPlanFormPage.tsx, src/widgets/form/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
-  - "src/widgets/form/FieldColumns.tsx, its stories, RecipeFormPage, or a changeset naming FieldColumns."
+  - "src/pages/RecipeFormPage.tsx, src/pages/MealFormPage.tsx, src/pages/MealPlanFormPage.tsx, src/widgets/form/AutocompletePicker.tsx, their stories, or a changeset naming any of the three pages or AutocompletePicker. Run only the numbered cases for the page(s) that changed; an AutocompletePicker-only change runs only the autocomplete portions of cases 4 and 5."
+  - "src/widgets/form/EqualColumns.tsx, its stories, RecipeFormPage, or a changeset naming EqualColumns."
 ---
 
 # RecipeFormPage — manual test steps
 
-Colocated manual test steps for `src/pages/eciperay/RecipeFormPage.tsx` (design-system #530).
+Colocated manual test steps for `src/pages/RecipeFormPage.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -21,7 +21,7 @@ Default, NoSelection, SaveError. Open in
 
 1. RecipeFormPage Default: Title, the Status toggle buttons,
    Description with its "Generate with AI" action, the Servings
-   / Prep / Cook fields in one equal-width FieldColumns row,
+   / Prep / Cook fields in one equal-width EqualColumns row,
    image, Source URL, the selectable Tag badges, the
    Ingredients and Instructions slots, and the
    full-width Create Recipe button, evenly spaced in one
@@ -51,21 +51,21 @@ Default, NoSelection, SaveError. Open in
    entry in their own field stacks; NoSelection disables Save
    plan.
 
-**Run when:** `src/pages/eciperay/RecipeFormPage.tsx`,
-`src/pages/eciperay/MealFormPage.tsx`, `src/pages/eciperay/MealPlanFormPage.tsx`,
+**Run when:** `src/pages/RecipeFormPage.tsx`,
+`src/pages/MealFormPage.tsx`, `src/pages/MealPlanFormPage.tsx`,
 `src/widgets/form/AutocompletePicker.tsx`, their stories, or a
 changeset naming any of the three pages or
 AutocompletePicker. Run only the numbered cases for the
 page(s) that changed; an AutocompletePicker-only change
 runs only the autocomplete portions of cases 4 and 5.
 
-## FieldColumns
+## EqualColumns
 
-Open in `Widgets/Form/FieldColumns`: Default.
+Open in `Widgets/Form/EqualColumns`: Default.
 
 1. Servings, Prep (min), and Cook (min) fields sit in three
    equal-width columns with an even gutter between them;
    each label sits over its own field.
 
-**Run when:** `src/widgets/form/FieldColumns.tsx`, its
-stories, RecipeFormPage, or a changeset naming FieldColumns.
+**Run when:** `src/widgets/form/EqualColumns.tsx`, its
+stories, RecipeFormPage, or a changeset naming EqualColumns.
