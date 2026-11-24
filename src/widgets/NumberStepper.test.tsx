@@ -20,8 +20,8 @@ function codeOf(rel: string) {{
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }}
 
-const code = codeOf("src/widgets/NumberStepper.tsx");
-const stories = codeOf("src/widgets/NumberStepper.stories.tsx");
+const code = codeOf("src/widgets/form/NumberStepper.tsx");
+const stories = codeOf("src/widgets/form/NumberStepper.stories.tsx");
 test("NumberStepper declares disabled defaulting false (#801)", () => {
   assert.match(code, /disabled\?: boolean/);
   assert.match(code, /disabled = false/);
