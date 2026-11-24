@@ -2,7 +2,7 @@ import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Dialog as TamaguiDialog, XStack, YStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";
-import { tokens } from "../tokens/index.js";
+import { tokens } from "../../tokens/index.js";
 import {
   ModalLayerContext,
   isActiveModalLayer,
@@ -10,9 +10,9 @@ import {
   registeredModalFrames,
   registeredModalRoots,
   unregisterModalLayer,
-} from "./modalRegistry.js";
-import type { ModalLayer } from "./modalRegistry.js";
-import { Text } from "./data/Text.js";
+} from "../modalRegistry.js";
+import type { ModalLayer } from "../modalRegistry.js";
+import { Text } from "../data/Text.js";
 
 const StyledOverlay = styled(TamaguiDialog.Overlay, {
   name: "DialogOverlay",

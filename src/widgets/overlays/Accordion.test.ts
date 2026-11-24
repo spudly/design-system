@@ -35,7 +35,7 @@
  * cannot satisfy the patterns), plus a dist import for the export
  * contract — `npm test` builds before running.
  */
-import "../../test/registerSvgStub.js";
+import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -51,9 +51,9 @@ function codeOf(rel: string): string {
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const accordion = codeOf("src/widgets/Accordion.tsx");
-const section = codeOf("src/widgets/AccordionSection.tsx");
-const collapsible = codeOf("src/widgets/Collapsible.tsx");
+const accordion = codeOf("src/widgets/overlays/Accordion.tsx");
+const section = codeOf("src/widgets/overlays/AccordionSection.tsx");
+const collapsible = codeOf("src/widgets/overlays/Collapsible.tsx");
 const family = { Accordion: accordion, AccordionSection: section, Collapsible: collapsible };
 
 test("Accordion, AccordionSection, and Collapsible are exported from the internal components barrel", () => {

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { tokens } from "../tokens/index.js";
+import { tokens } from "../../tokens/index.js";
 import { Accordion, type AccordionItem } from "./Accordion.js";
-import { Text } from "./data/Text.js";
+import { Text } from "../data/Text.js";
 
 const meta: Meta<typeof Accordion> = {
-  title: "Widgets/Accordion",
+  title: "Widgets/Overlays & Disclosure/Accordion",
   component: Accordion,
 };
 

@@ -1,5 +1,5 @@
-export { Accordion, type AccordionItem, type AccordionProps } from "./Accordion.js";
-export { AccordionSection, type AccordionSectionProps } from "./AccordionSection.js";
+export { Accordion, type AccordionItem, type AccordionProps } from "./overlays/Accordion.js";
+export { AccordionSection, type AccordionSectionProps } from "./overlays/AccordionSection.js";
 export { Alert, type AlertProps } from "./feedback/Alert.js";
 export { ActionBar, type ActionBarProps } from "./actions/ActionBar.js";
 export { Avatar, type AvatarProps } from "./data/Avatar.js";
@@ -17,10 +17,10 @@ export { Card, type CardProps } from "./layout/Card.js";
 export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";
 export { CheckboxField, type CheckboxFieldProps } from "./form/CheckboxField.js";
 export { ChecklistRow, type ChecklistRowProps } from "./data/ChecklistRow.js";
-export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
+export { Collapsible, type CollapsibleProps } from "./overlays/Collapsible.js";
 export { Center, type CenterProps } from "./layout/Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPickerField.js";
-export { Dialog, type DialogProps } from "./Dialog.js";
+export { Dialog, type DialogProps } from "./overlays/Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./content/DiscoveryCard.js";
 export { Divider, type DividerProps } from "./data/Divider.js";
 export {
@@ -65,7 +65,7 @@ export {
   type SearchHelpContent,
   type SearchHelpEntry,
   type SearchHelpPopoverProps,
-} from "./SearchHelpPopover.js";
+} from "./overlays/SearchHelpPopover.js";
 export { HeroStack, type HeroStackProps } from "./layout/HeroStack.js";
 export { StackedButtonRow, type StackedButtonRowProps } from "./actions/StackedButtonRow.js";
 export { CardGrid, type CardGridProps } from "./layout/CardGrid.js";
@@ -165,7 +165,7 @@ export {
 } from "./data/NutritionPanel.js";
 export { PanelStack, type PanelStackProps } from "./layout/PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./content/PreviewCard.js";
-export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
+export { StepOverlay, type StepOverlayProps } from "./overlays/StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./actions/Toolbar.js";
 export { TrailingActionsRow, type TrailingActionsRowProps } from "./actions/TrailingActionsRow.js";
 export {

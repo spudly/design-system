@@ -1,7 +1,7 @@
 ---
 component: ScaledIngredientsView
 run_when:
-  - "src/pages/eciperay/CookingModePage.tsx, its stories, src/widgets/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
+  - "src/pages/eciperay/CookingModePage.tsx, its stories, src/widgets/overlays/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
   - "src/views/ScaledIngredientsView.tsx, its stories, CookingModePage, or a changeset naming ScaledIngredientsView."
 ---
 
@@ -28,7 +28,7 @@ FirstStep, LastStep.
    WithIngredientsPanel, first in FirstStep, third in LastStep).
 
 **Run when:** `src/pages/eciperay/CookingModePage.tsx`, its stories,
-`src/widgets/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
+`src/widgets/overlays/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
 or a changeset naming CookingModePage.
 
 ## ScaledIngredientsView

@@ -1,4 +1,4 @@
-import "../../test/registerSvgStub.js";
+import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 
 describe("dialogFocusContainment", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const source = readFileSync(join(here, "../..", "src", "widgets", "Dialog.tsx"), "utf8");
+  const source = readFileSync(join(here, "../..", "src", "widgets", "overlays", "Dialog.tsx"), "utf8");
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
   test("Dialog is exported from the built internal components barrel", async () => {
@@ -226,7 +226,7 @@ describe("dialogFocusContainment", () => {
 
 describe("dialogFocusRestore", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const source = readFileSync(join(here, "../..", "src", "widgets", "Dialog.tsx"), "utf8");
+  const source = readFileSync(join(here, "../..", "src", "widgets", "overlays", "Dialog.tsx"), "utf8");
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
   test("Dialog is exported from the built internal components barrel", async () => {
@@ -469,8 +469,8 @@ describe("dialogModalRegistry", () => {
     source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   const read = (relative: any) => strip(readFileSync(join(here, "../..", relative), "utf8"));
   const registry = read("src/widgets/modalRegistry.ts");
-  const dialog = read("src/widgets/Dialog.tsx");
-  const overlay = read("src/widgets/StepOverlay.tsx");
+  const dialog = read("src/widgets/overlays/Dialog.tsx");
+  const overlay = read("src/widgets/overlays/StepOverlay.tsx");
 
   test("the modal registry is internal — not exported from the built internal components barrel (#394)", async () => {
     const dist: Record<string, any> = await import("../../dist/widgets/index.js");

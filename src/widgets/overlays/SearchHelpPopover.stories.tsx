@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { SearchHelpPopover, type SearchHelpEntry } from "./SearchHelpPopover.js";
 
 const meta: Meta<typeof SearchHelpPopover> = {
-  title: "Widgets/SearchHelpPopover",
+  title: "Widgets/Overlays & Disclosure/SearchHelpPopover",
   component: SearchHelpPopover,
 };
 

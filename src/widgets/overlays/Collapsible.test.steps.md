@@ -1,12 +1,12 @@
 ---
 component: Collapsible
 run_when:
-  - "src/widgets/Collapsible.tsx, its stories, or a changeset naming Collapsible."
+  - "src/widgets/overlays/Collapsible.tsx, its stories, or a changeset naming Collapsible."
 ---
 
 # Collapsible — manual test steps
 
-Colocated manual test steps for `src/widgets/Collapsible.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/overlays/Collapsible.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -21,5 +21,5 @@ Open in `Widgets/Collapsible`: Closed, Open, Interactive.
    closed — height grows/shrinks smoothly rather than snapping, and
    no content spills outside the frame mid-animation.
 
-**Run when:** `src/widgets/Collapsible.tsx`, its stories, or a
+**Run when:** `src/widgets/overlays/Collapsible.tsx`, its stories, or a
 changeset naming Collapsible.

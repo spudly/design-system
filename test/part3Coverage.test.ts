@@ -138,7 +138,7 @@ test("CookingModePage composes StepOverlay with the ingredients accessory; StepO
   const nav = read("src/pages/shared/StepNavControls.tsx");
   assert.match(nav, /<StepDots/);
   assert.match(nav, /<PrevNextNav/);
-  const overlay = read("src/widgets/StepOverlay.tsx");
+  const overlay = read("src/widgets/overlays/StepOverlay.tsx");
   assert.match(overlay, /accessory\?: ReactNode/);
   const accessoryAt = overlay.indexOf("{accessory ?");
   const bodyAt = overlay.indexOf('fontSize={tokens.typography.fontSize["2xl"]}');

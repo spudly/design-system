@@ -23,8 +23,8 @@
  * semantics through the platform split (dialogRoleProps) and a
  * web mount focus move into the shell.
  */
-import "../../test/registerSvgStub.js";
-import { loadInternalDist } from "../../test/internalDist.js";
+import "../../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -32,7 +32,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "StepOverlay.tsx"), "utf8");
+const source = readFileSync(join(here, "../..", "src", "widgets", "overlays", "StepOverlay.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("StepOverlay is exported from the built internal components barrel", async () => {

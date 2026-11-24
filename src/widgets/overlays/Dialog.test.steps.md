@@ -1,12 +1,12 @@
 ---
 component: Dialog
 run_when:
-  - "src/widgets/Dialog.tsx, its stories, or a changeset naming Dialog."
+  - "src/widgets/overlays/Dialog.tsx, its stories, or a changeset naming Dialog."
 ---
 
 # Dialog — manual test steps
 
-Colocated manual test steps for `src/widgets/Dialog.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/overlays/Dialog.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -36,5 +36,5 @@ NestedDialogs.
    dialogs" button behind the overlays. Dismiss the nested
    dialog (Keep draft) and the parent dialog remains open.
 
-**Run when:** `src/widgets/Dialog.tsx`, its stories, or a
+**Run when:** `src/widgets/overlays/Dialog.tsx`, its stories, or a
 changeset naming Dialog.
