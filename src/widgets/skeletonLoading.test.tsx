@@ -315,7 +315,10 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
   assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
   assert.match(read("src/pages/eciperay/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
-  assert.match(read("src/views/eciperay/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
+  assert.match(
+    read("src/views/eciperay/RecipeIngredientsPanel.tsx"),
+    /\bloadingSubstitutions\?: boolean/,
+  );
   assert.match(
     read("src/pages/eciperay/RecipeDetailPage.tsx"),
     /\bloadingSubstitutions\?: boolean/,
@@ -758,7 +761,7 @@ test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelec
   // row — a date bone (sm) in a 104-wide slot, and a 72x12 box
   // bone where the star rating sits.
   const entry = readCode("src/views/eciperay/LogEntryCard.tsx");
-  assert.match(entry, /<YStack width=\{104\}>/, "the date bone sits in a 104-wide slot");
+  assert.match(entry, /<Col width=\{104\}>/, "the date bone sits in a 104-wide slot");
   assert.match(
     entry,
     /<TextSkeleton size="sm" lines=\{1\} \/>/,
@@ -787,7 +790,11 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
     "the ghost skeleton frame has no filled background and no border",
   );
   assert.match(button, /ghostLabelBone/, "the ghost label is replaced by one text bone");
-  assert.match(button, /from "\.\.\/feedback\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
+  assert.match(
+    button,
+    /from "\.\.\/feedback\/SkeletonClock\.js"/,
+    "the ghost bone is the shared clock's bone",
+  );
   const { Button, LoadingScope } = await loadRuntime();
   const noop = () => {};
   const scopedGhost = await renderToHtml(
@@ -1234,7 +1241,10 @@ test("T2 SSR: loading SecretRevealPanel and StepList hide their content", async 
   assert.match(instructions, /aria-busy/, "a loading StepList marks its region busy");
   const idleSteps = await renderToHtml(<StepList steps={steps} />);
   assert.equal(hiddenBones(idleSteps), 0, "a non-loading StepList renders no bones");
-  assert.ok(idleSteps.includes("Secret first step body"), "a non-loading StepList renders its steps");
+  assert.ok(
+    idleSteps.includes("Secret first step body"),
+    "a non-loading StepList renders its steps",
+  );
 });
 test("T2 SSR: loading RecipeOverviewPanel mirrors its blocks; no real content", async () => {
   const { RecipeOverviewPanel } = await loadRuntime();
@@ -1732,9 +1742,7 @@ const T3_PROP_VIEWS = [
 // anyPath above resolves widgets and views alike.
 test("T3: every converted view declares `loading` and reads the LoadingScope", () => {
   for (const name of T3_PROP_VIEWS) {
-    const code = readCode(
-      anyPath(name),
-    );
+    const code = readCode(anyPath(name));
     assert.match(code, /\bloading\?: boolean/, `${name} must declare the explicit loading prop`);
     assert.match(code, /useLoadingScope/, `${name} must read the internal LoadingScope`);
     assert.match(
@@ -1870,7 +1878,10 @@ test("T3 SSR: loading CandidateList and NutritionGoalsForm render skeletons", as
   // Standalone-token match: the raw substring "2000" also occurs inside
   // Tamagui's generated class hashes in the SSR CSS (e.g. _b-2023200006,
   // the hash for the #799 indigo tag shade #4338ca), which is not a goal value.
-  assert.ok(!/(?<![-\d])2000(?!\d)/.test(goals), "a loading NutritionGoalsForm shows no real goal values");
+  assert.ok(
+    !/(?<![-\d])2000(?!\d)/.test(goals),
+    "a loading NutritionGoalsForm shows no real goal values",
+  );
   assert.match(goals, /aria-busy/, "a loading NutritionGoalsForm marks its region busy");
 });
 test("T5 survivor audit: only the approved survivor files render a Spinner", () => {
