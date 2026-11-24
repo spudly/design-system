@@ -23,7 +23,7 @@ const stories = readFileSync("src/widgets/form/RatingForm.stories.tsx", "utf8");
 
 test("RatingForm is exported from the widgets barrel; CookLogForm is gone", () => {
   const barrel = readFileSync("src/widgets/index.ts", "utf8");
-  assert.match(barrel, /export \{[^}]*\bRatingForm\b[^}]*\} from "\.\/RatingForm\.js"/);
+  assert.match(barrel, /export \{[^}]*\bRatingForm\b[^}]*\} from "\.\/form\/RatingForm\.js"/);
   assert.match(barrel, /type RatingFormProps/);
   assert.doesNotMatch(barrel, /CookLogForm/);
   assert.equal(existsSync("src/widgets/CookLogForm.tsx"), false);
@@ -83,7 +83,7 @@ test("isPending disables Save (half opacity); the secondary action stays live", 
 });
 
 test("reuses the DS StarRatingInput as-is; no forked star rendering", () => {
-  assert.match(source, /import \{ StarRatingInput \} from "\.\/form\/StarRatingInput\.js"/);
+  assert.match(source, /import \{ StarRatingInput \} from "\.\/StarRatingInput\.js"/);
   assert.doesNotMatch(source, /★/, "stars come from StarRatingInput, not a local copy");
 });
 
@@ -95,7 +95,7 @@ test("no app imports, no data layer, no lineHeight (#162)", () => {
 });
 
 test("stories cover both variants and the custom labels in the shared CSF tree", () => {
-  assert.match(stories, /title: "Widgets\/RatingForm"/);
+  assert.match(stories, /title: "Widgets\/Form\/RatingForm"/);
   assert.match(stories, /export const Dark: Story/);
   assert.match(stories, /export const Light: Story/);
   assert.match(stories, /export const Pending: Story/);
