@@ -81,5 +81,6 @@ export { RevertAction, type RevertActionProps } from "./RevertAction.js";
 export { ScaledIngredientsView, type ScaledIngredientsViewProps } from "./ScaledIngredientsView.js";
 export { SignInForm, type SignInFormProps } from "./SignInForm.js";
 export { SignUpForm, type SignUpFormProps, type SignUpLegalNoticeSpan } from "./SignUpForm.js";
+export { StatusMessage, type StatusMessageProps } from "./StatusMessage.js";
 export { SubscriptionView, type SubscriptionViewProps } from "./SubscriptionView.js";
 export { TransferRecipesView, type TransferRecipesViewProps } from "./TransferRecipesView.js";

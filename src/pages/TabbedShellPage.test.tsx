@@ -297,7 +297,7 @@ test("SSR: the link form renders real hrefs and the host's page content", async 
   assert.match(html, /CURRENT PAGE SURFACE/, "the host's page renders through the slot");
 });
 test("notice (#765): absent by default; when present it forwards message + action and the callback fires", async () => {
-  const { React, TabbedShellPage, distWidgets } = await loadRuntime();
+  const { React, TabbedShellPage, distViews, distWidgets } = await loadRuntime();
   const bare = TabbedShellPage({
     title: "Memorize",
     tabs: sentinelTabs(React),
@@ -328,7 +328,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
   const [messageEl, actionEl] = noticeEl.props.children;
   assert.equal(
     messageEl.type,
-    distWidgets.StatusMessage,
+    distViews.StatusMessage,
     "the message renders through StatusMessage",
   );
   assert.equal(messageEl.props.message, "Your verses could not be refreshed.");
