@@ -40,7 +40,7 @@ import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
-const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 function readCode(rel) {
   return readFileSync(join(root, rel), "utf8")
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -111,13 +111,13 @@ function loadRuntime() {
     // not part of the compiled test suite, so it cannot use the
     // test/internalDist.ts helper the .ts tests share).
     const dist = {
-      ...(await import("../../dist/tokens/index.js")),
-      ...(await import("../../dist/themes/index.js")),
-      ...(await import("../../dist/tamagui.config.js")),
-      ...(await import("../../dist/widgets/index.js")),
+      ...(await import("../../../dist/tokens/index.js")),
+      ...(await import("../../../dist/themes/index.js")),
+      ...(await import("../../../dist/tamagui.config.js")),
+      ...(await import("../../../dist/widgets/index.js")),
     };
-    const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
-    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
+    const voiceFixtures: Record<string, any> = await import("../../../dist/voice/fixtures.js");
+    const voiceModule: Record<string, any> = await import("../../../dist/voice/index.js");
     return {
       React,
       renderToString,

@@ -79,7 +79,7 @@ test("stories cover the severities, the dismissible forms, and actions", () => {
   ]) {
     assert.match(stories, new RegExp(`export const ${name}: Story`), `${name} story missing`);
   }
-  assert.match(stories, /title: "Widgets\/Alert"/);
+  assert.match(stories, /title: "Widgets\/Feedback & Loading\/Alert"/);
 });
 
 test("in-repo consumers render Alert, not the removed components", () => {

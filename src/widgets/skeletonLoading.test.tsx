@@ -114,7 +114,7 @@ test("LoadingScope and the clock internals stay off every export surface", async
 });
 test("every bone pulses on the one shared clock — primitives own no loop", () => {
   for (const name of ["BoxSkeleton", "CircleSkeleton", "TextSkeleton"]) {
-    const code = readCode(`src/widgets/${name}.tsx`);
+    const code = readCode(`src/widgets/feedback/${name}.tsx`);
     assert.match(
       code,
       /from "\.\/SkeletonClock\.js"/,
@@ -787,7 +787,7 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
     "the ghost skeleton frame has no filled background and no border",
   );
   assert.match(button, /ghostLabelBone/, "the ghost label is replaced by one text bone");
-  assert.match(button, /from "\.\.\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
+  assert.match(button, /from "\.\.\/feedback\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
   const { Button, LoadingScope } = await loadRuntime();
   const noop = () => {};
   const scopedGhost = await renderToHtml(

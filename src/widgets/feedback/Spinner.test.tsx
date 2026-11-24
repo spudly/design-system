@@ -45,7 +45,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 function codeOf(rel: string) {
-  const source = readFileSync(join(here, "../..", rel), "utf8");
+  const source = readFileSync(join(here, "../../..", rel), "utf8");
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 const code = codeOf("src/widgets/feedback/Spinner.tsx");
@@ -151,7 +151,7 @@ test("SSR: the determinate ring renders its progressbar semantics (#178)", async
   );
 });
 test("stories cover the determinate mode (#178)", () => {
-  assert.match(stories, /title: "Widgets\/Spinner"/);
+  assert.match(stories, /title: "Widgets\/Feedback & Loading\/Spinner"/);
   assert.match(stories, /export const Determinate: Story = \{\s*args: \{ value: 65/);
   assert.match(stories, /export const DeterminateComplete: Story = \{\s*args: \{ value: 100/);
   assert.match(
