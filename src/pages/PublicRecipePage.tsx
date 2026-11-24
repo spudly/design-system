@@ -375,7 +375,7 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
                   </Button>
                 </ButtonRow>
               </Card>
-              <BoxSkeleton height={256} />
+              <BoxSkeleton aspectRatio={4 / 3} />
               <TextSkeleton size="2xl" lines={1} />
               <TextSkeleton size="md" lines={3} />
               <StatBand loading>

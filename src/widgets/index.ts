@@ -44,6 +44,7 @@ export { CardRow, type CardRowProps } from "./CardRow.js";
 export { ListItem, type ListItemProps } from "./ListItem.js";
 export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./MessageCard.js";
+export { MetadataBadge, type MetadataBadgeProps } from "./MetadataBadge.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";
 export { ProgressBar, type ProgressBarProps } from "./ProgressBar.js";

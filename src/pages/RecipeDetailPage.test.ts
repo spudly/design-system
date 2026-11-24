@@ -12,12 +12,13 @@
  *    a centered Spinner (Center + Spinner), before (and instead of) the chrome — the app
  *    screen's gate replaces the whole screen, and it has no
  *    distinct not-found state to model.
- * 3. The chrome is pinned: status badge + version picker toolbar
- *    renders above the single ScrollRegion, and every section
- *    renders inside it (#71 — a section that scrolled its own
- *    chrome away would break the version context). The version
- *    picker is the standard SelectField (#72) with the contract
- *    the custom sheet widget had.
+ * 3. Every section renders inside the single ScrollRegion; the
+ *    status badge + version picker bar renders below Start
+ *    Cooking in the details panel (#721 fidelity round — Stephen's
+ *    ruling that anything not in the visual direction image moves
+ *    below Start Cooking, superseding the #71 pinned chrome). The
+ *    version picker is the standard SelectField (#72) with the
+ *    contract the custom sheet widget had.
  * 4. The sections render in the order the tabs had (overview,
  *    ingredients, instructions, cook history, nutrition), each
  *    section panel opening with its own heading carrying the
@@ -106,7 +107,7 @@ test("the loading state renders only the spinner shell", () => {
     "the props must be the loading | ready union",
   );
   const loadingAt = code.indexOf('props.state === "loading"');
-  const chromeAt = code.indexOf("<VersionPicker");
+  const chromeAt = code.indexOf("<DetailsPanel");
   assert.ok(loadingAt !== -1, "the component must branch on the loading state");
   assert.ok(loadingAt < chromeAt, "the loading branch must come before the chrome render");
   assert.match(
@@ -117,30 +118,36 @@ test("the loading state renders only the spinner shell", () => {
   assert.ok(!code.includes("Spinner"), "the loading state renders skeletons, not a Spinner (#278)");
 });
 
-test("the chrome is pinned above a single scroll region", () => {
-  // Scoped to the ready render: the loading state is a separate
-  // union branch with its own skeleton composition (#278
-  // tranche 4, pinned in skeletonLoading.test.ts T4) — the
-  // single-scroll-region invariant below is the ready layout's.
+test("the status/version bar sits below Start Cooking inside a single scroll region (#721 fidelity round)", () => {
+  // Stephen's ruling: anything not in the visual direction image
+  // — including the status badge + version picker — moves below
+  // Start Cooking, inside the scroll region (no pinned chrome).
   const readyCode = code.replace(
     /if \(props\.state === "loading"\) \{[\s\S]*?(?=\n  const \{ status, versions)/,
     "",
   );
-  const toolbarAt = readyCode.indexOf("<VersionPicker");
   const scrollAt = readyCode.indexOf("<ScrollRegion>");
-  assert.ok(
-    scrollAt !== -1,
-    "the sections render in the ScrollRegion (its contract persists handled taps — slotted forms keep their presses)",
-  );
-  assert.ok(toolbarAt !== -1, "the toolbar must render the version picker");
-  assert.ok(scrollAt > toolbarAt, "the scroll region renders below the pinned chrome");
+  assert.ok(scrollAt !== -1, "the sections render in the ScrollRegion");
   assert.equal(
     readyCode.split("<ScrollRegion").length - 1,
     1,
-    "exactly one ScrollRegion: the ready page's section scroll (the version picker is a SelectField since #72 — its sheet scroll lives in that component)",
+    "exactly one ScrollRegion: the ready page's section scroll",
   );
   const panelAt = readyCode.indexOf("<OverviewPanel");
   assert.ok(panelAt > scrollAt, "the sections render inside the scroll region");
+  const startAt = readyCode.indexOf("<StartCookingPanel");
+  const detailsAt = readyCode.indexOf("<DetailsPanel");
+  const toolbarAt = readyCode.indexOf("<Toolbar>", readyCode.indexOf("function DetailsPanel"));
+  assert.ok(startAt > scrollAt, "Start Cooking renders inside the scroll region");
+  assert.ok(
+    detailsAt > startAt,
+    "the details (status/version bar included) render below Start Cooking",
+  );
+  assert.ok(
+    toolbarAt > readyCode.indexOf("function DetailsPanel") &&
+      toolbarAt < readyCode.indexOf("function IngredientsPanel"),
+    "the status/version bar renders inside the details panel's definition",
+  );
 });
 
 test("there are no tabs: every section renders in one scroll, in tab order, under its heading (#71)", () => {
@@ -163,7 +170,7 @@ test("there are no tabs: every section renders in one scroll, in tab order, unde
   // definitions precede the page body, and Nutrition's section
   // stack is composed in the body, its heading before the panel).
   const sequence = [
-    "<SectionHeading>Ingredients</SectionHeading>",
+    '<SectionHeading icon="list">Ingredients</SectionHeading>',
     "<SectionHeading>Instructions</SectionHeading>",
     "<SectionHeading>Cook History</SectionHeading>",
     "<OverviewPanel",
@@ -240,7 +247,8 @@ test("the status badge map covers the four statuses with a fallback", () => {
     "unknown statuses fall back to idea, as the app's normalizer does",
   );
   // #363 (eciperay #278 ruling): the status renders exactly once — the
-  // toolbar badge beside the version picker, not again in the overview.
+  // badge beside the version picker in the below-Start-Cooking bar,
+  // not again in the overview.
   assert.equal((code.match(/<RecipeStatusBadge status=\{status\} \/>/g) ?? []).length, 1);
   assert.match(code, /<Toolbar>[\s\S]*?<RecipeStatusBadge[\s\S]*?<\/Toolbar>/, "badge in toolbar");
   // #483: the status badge renders Badge directly (StatusBadge is removed).
@@ -488,6 +496,60 @@ test("the activation confirmation mirrors the other confirmations' contract (#53
     /confirmTone: "primary" as const,/,
     "the story's activation confirmation uses the primary tone (reversible action)",
   );
+});
+
+test("the overview follows the recipe-detail visual direction (#721)", () => {
+  // The new optional overview props: category + total time for
+  // the pill, the cooking tip line — all app-supplied strings.
+  assert.match(code, /categoryLabel\?: string;/);
+  assert.match(code, /totalTimeLabel\?: string;/);
+  assert.match(code, /cookingTipLabel\?: string;/);
+  // The metadata pill under the hero: the reusable MetadataBadge
+  // widget (extracted from this page file at Stephen's PR #730
+  // review), parts composed in the direction's order.
+  assert.match(code, /<MetadataBadge/);
+  assert.match(code, /servingsLabel \? `Serves \$\{servingsLabel\}` : undefined/);
+  // The title is the serif display variant, bare (no CardStack).
+  assert.match(code, /<Text variant="display">\{title\}<\/Text>/);
+  assert.ok(!code.includes("CardStack"), "the title's CardStack wrapper is dropped (#721)");
+  assert.ok(!code.includes('variant="formTitle"'), "the title no longer uses formTitle (#721)");
+  // Start Cooking (#721 fidelity round): a fully rounded pill,
+  // full width (grow, no web cap), at the end of the in-image
+  // flow — its color is the theme primary (burnt orange #b13f13
+  // in Warm Harvest, pinned in tamagui.config.test.ts).
+  assert.match(
+    code,
+    /<Button variant="primary" grow borderRadius=\{tokens\.radii\.full\} href=\{cookingHref\}>/,
+  );
+  // The tip line centered under the action, italic, in the
+  // muted-green accent ink, only when supplied.
+  assert.match(
+    code,
+    /\{cookingTipLabel \? \(\s+<CenteredText variant="hint" fontStyle="italic" color="\$accent">\s+\{cookingTipLabel\}\s+<\/CenteredText>\s+\) : null\}/,
+  );
+  // Ingredients heading carries the list icon; instructions use
+  // StepList's numeral presentation.
+  assert.match(code, /<SectionHeading icon="list">Ingredients<\/SectionHeading>/);
+  assert.match(code, /<StepList\s+presentation="numeral"/);
+  // The in-image flow order (#721 fidelity round): overview
+  // (hero/pill/title/description), ingredients, instructions,
+  // Start Cooking — then the details panel with everything else.
+  const flow = [
+    "<OverviewPanel",
+    "<IngredientsPanel",
+    "<InstructionsPanel",
+    "<StartCookingPanel",
+    "<DetailsPanel",
+  ];
+  let last = -1;
+  for (const marker of flow) {
+    const at = code.indexOf(
+      marker,
+      code.indexOf("<ScrollRegion>", code.indexOf("export function RecipeDetailPage")),
+    );
+    assert.ok(at > last, `${marker} must render in the in-image flow order`);
+    last = at;
+  }
 });
 
 test("print/share name the icons module's Feather icons, not text glyphs (#187, #438 Part 4)", () => {

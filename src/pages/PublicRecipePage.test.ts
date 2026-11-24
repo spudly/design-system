@@ -251,12 +251,12 @@ test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(overviewCode, /\{description \? \(/, "the description renders only when present");
   assert.match(
     overviewCode,
-    /\{prepTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/,
+    /\{prepTimeLabel \? \(\s+<StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/,
     "the Prep stat needs a prep time",
   );
   assert.match(
     overviewCode,
-    /\{cookTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/,
+    /\{cookTimeLabel \? \(\s+<StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/,
     "the Cook stat needs a cook time",
   );
   assert.match(overviewCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");

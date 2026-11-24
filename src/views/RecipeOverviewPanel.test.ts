@@ -56,9 +56,18 @@ test("the panel composes the shared building blocks with its conditional content
   assert.match(panelCode, /<Thumbnail src=\{imageUrl\} \/>/, "the hero is Thumbnail's hero frame");
   assert.match(panelCode, /\{description \? \(/, "the description renders only when present");
   assert.match(panelCode, /<StatBand>/, "the stat band is the shared StatBand");
-  assert.match(panelCode, /<StatCard label=\{voice\.recipeOverviewPanel\.servingsLabel\} value=\{servingsLabel\} \/>/);
-  assert.match(panelCode, /\{prepTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/);
-  assert.match(panelCode, /\{cookTimeLabel \? <StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/);
+  assert.match(
+    panelCode,
+    /<StatCard label=\{voice\.recipeOverviewPanel\.servingsLabel\} value=\{servingsLabel\} \/>/,
+  );
+  assert.match(
+    panelCode,
+    /\{prepTimeLabel \? \(\s+<StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/,
+  );
+  assert.match(
+    panelCode,
+    /\{cookTimeLabel \? \(\s+<StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/,
+  );
   assert.match(panelCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
   assert.match(
     panelCode,
@@ -89,7 +98,7 @@ test("the title carries level-1 heading semantics with unchanged rendering (#364
   const textSource = readFileSync(join(componentsDir, "..", "widgets", "Text.tsx"), "utf8");
   assert.match(
     textSource,
-    /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle"\s*\?\s*1/,
+    /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle" \|\| variant === "display"\s*\?\s*1/,
     "Text maps the heading variant to heading level 1",
   );
 });
@@ -111,14 +120,15 @@ test("no recipe surface gains a second level-1 heading from the panel (#364)", (
     "PublicRecipePage renders no level-1 heading variant besides the panel's title",
   );
   // RecipeDetailPage does not compose the panel; its inline
-  // overview title already carries level-1 semantics through
-  // the `formTitle` variant, so it is untouched by this change.
+  // overview title carries level-1 semantics through the
+  // `display` variant (the serif visual-direction title since
+  // #721; `formTitle` before it).
   const detailCode = readCode("RecipeDetailPage.tsx");
   assert.ok(
     !detailCode.includes("RecipeOverviewPanel"),
     "RecipeDetailPage does not compose the panel",
   );
-  assert.match(detailCode, /<Text variant="formTitle">\{title\}<\/Text>/);
+  assert.match(detailCode, /<Text variant="display">\{title\}<\/Text>/);
 });
 
 test("the status badge is the shared Badge fed caller-resolved tone and label", () => {

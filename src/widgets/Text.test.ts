@@ -16,8 +16,8 @@ describe("textFontContext", () => {
     const source = readSrc("widgets/Text.tsx");
     assert.match(
       source,
-      /fontFamily=\{variant === "verse" \? "verse" : "body"\}/,
-      'Text must pass fontFamily={variant === "verse" ? "verse" : "body"} as an instance prop',
+      /fontFamily=\{variant === "verse" \|\| variant === "display" \? "verse" : "body"\}/,
+      'Text must pass fontFamily={variant === "verse" || variant === "display" ? "verse" : "body"} as an instance prop (the display variant is serif too, #721)',
     );
   });
 
@@ -105,9 +105,17 @@ describe("textVariants", () => {
   test("formTitle is a level-1 heading; label carries no heading level", () => {
     assert.match(
       code,
-      /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle"/,
-      "formTitle must sit in the level-1 heading group",
+      /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle" \|\| variant === "display"/,
+      "formTitle (and display, #721) must sit in the level-1 heading group",
     );
+  });
+
+  test("the display variant is the 3xl bold serif display title (#721)", () => {
+    assert.match(
+      code,
+      /display: \{\s+fontSize: tokens\.typography\.fontSize\["3xl"\],\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+\},/,
+    );
+    assert.match(code, /"display"/, "display must be in the public TextProps union");
   });
 
   test("the muted variant is the muted role at body size", () => {

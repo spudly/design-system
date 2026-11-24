@@ -12,13 +12,15 @@ import { Thumbnail } from "../widgets/Thumbnail.js";
 import { tokens } from "../tokens/index.js";
 import { useVoice } from "../voice/index.js";
 
-// The preview frame's heights while loading (#278): with an
-// image, the bone fills Thumbnail's hero frame at its fixed
-// height (256, Thumbnail's StyledHeroFrame); with no image, it
-// fills the empty-state box — that box's $6 vertical padding
-// (spacing 6, each side) plus one hint line (sm at the font
-// config's 1.5 line height).
-const HERO_PREVIEW_HEIGHT = 256;
+// The preview frame's shape while loading (#278): with an
+// image, the bone fills Thumbnail's hero frame at its fallback
+// aspect ratio (4:3 — the hero is aspect-preserving since
+// #721, so the bone holds the fallback shape and the loaded
+// frame settles to the image's measured ratio); with no image,
+// it fills the empty-state box at that box's height — its $6
+// vertical padding (spacing 6, each side) plus one hint line
+// (sm at the font config's 1.5 line height).
+const HERO_PREVIEW_ASPECT = 4 / 3;
 const EMPTY_PREVIEW_HEIGHT =
   tokens.spacing[6] * 2 + tokens.typography.fontSize.sm * tokens.typography.lineHeight.normal;
 
@@ -139,7 +141,11 @@ export function RecipeImageView({
       <LabeledGroup label={label} action={headerAction}>
         <ContentStack>
           {showSkeleton ? (
-            <BoxSkeleton height={imagePreviewUri ? HERO_PREVIEW_HEIGHT : EMPTY_PREVIEW_HEIGHT} />
+            imagePreviewUri ? (
+              <BoxSkeleton aspectRatio={HERO_PREVIEW_ASPECT} />
+            ) : (
+              <BoxSkeleton height={EMPTY_PREVIEW_HEIGHT} />
+            )
           ) : imagePreviewUri ? (
             <Thumbnail
               src={imagePreviewUri}
