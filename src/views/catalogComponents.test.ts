@@ -1,16 +1,9 @@
 /**
  * Contract test for the catalog components
  * (spudly/design-system#168/#119): CatalogFiltersBar and
- * CatalogHeader (views since #470), and the shared list
- * loading state — extracted from DiscoverPage in the
- * public-pages de-styling tranche so the catalog pages compose
- * them and pass data and callbacks only. (The bar's behavior
- * contract — the #96 chooser, the removal/clearing semantics —
- * is pinned here against the bar's own source;
- * src/pages/DiscoverPage.test.ts pins the page's composition, not
- * the bar. This file pins the extraction shape — exports, the
- * header geometry, and the loading state's treatment — plus
- * that behavior.)
+ * CatalogHeader (views since #470), extracted from
+ * DiscoverPage in the public-pages de-styling tranche so the
+ * catalog pages compose them and pass data and callbacks only.
  *
  * The bar is definition-driven (Stephen's ruling on PR #311):
  * which filters exist, their labels, option sets, and defaults
@@ -18,46 +11,43 @@
  * bar owns the control shapes only and hardcodes no app filter
  * or sorter list.
  *
- * The loading state carries no offset of its own (Stephen's
- * ruling on PR #311): an internal top padding is the margin
- * loophole in another form — parents own the spacing between
- * their children — so the page centers its spinner with
- * <Center> directly (#479 removed the ListLoadingState and
- * LoadingGate wrapper components).
- *
  * There is deliberately no ListErrorState and no
  * ListLoadingFooter (Stephen's ruling on PR #320: no middleman
  * components): a list's error renders the Alert component
  * directly where it occurs, and a list's loading-more slot
  * renders the centered Spinner (Center + Spinner) directly.
+ *
+ * Converted from source scans to runtime checks in #733
+ * tranche 5:
+ * - The middleman absence check now runs against the built
+ *   widgets module only; the former file-absence checks were
+ *   deleted (file layout is implementation trivia — what
+ *   ships is the contract).
+ * - The bar's definition-driven contract is pinned by SSR:
+ *   caller-supplied definitions render their labels and
+ *   controls, added filters carry their "Remove <label>
+ *   filter" names, and the open chooser offers only the
+ *   not-yet-added filters under "Add <label> filter" names.
+ *   The add/remove interaction wiring (state updates and
+ *   callbacks on press) is not SSR-observable and its source
+ *   scan was deleted; the rendered names are the observable
+ *   half of that contract.
+ * - CatalogHeader's composition is pinned by SSR: its title
+ *   renders over the controls composed in as children. The
+ *   stack's owned geometry scan was deleted — a styled
+ *   component's default geometry is not observable from the
+ *   rendered output.
+ * - The RecipesPage loading-state source scan was deleted:
+ *   page composition is pinned by the pages' own tests, and
+ *   this tranche does not read page source.
+ *
+ * Runtime assertions run against the built output: `npm run
+ * build` first (the `test` script does both).
  */
 import "../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { existsSync, readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
-
-const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "widgets");
-const viewsDir = join(here, "../..", "src", "views");
-
-function readCodeFrom(dir: string, name: string) {
-  return readFileSync(join(dir, name), "utf8")
-    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-}
-
-function readCode(name: string) {
-  return readCodeFrom(componentsDir, name);
-}
-
-const bar = readCodeFrom(viewsDir, "CatalogFiltersBar.tsx");
-const header = readCodeFrom(viewsDir, "CatalogHeader.tsx");
-// #547: the public catalog's implementation lives in RecipesPage
-// (DiscoverPage is its compatibility wrapper), so the loading-state
-// contract pins RecipesPage's public mode.
-const discoverPage = readCodeFrom(join(here, "../..", "src", "pages"), "RecipesPage.tsx");
 
 test("the catalog views are exported from their built internal barrels", async () => {
   const distViews: Record<string, any> = await import("../../dist/views/index.js");
@@ -78,107 +68,98 @@ test("the middleman list states are not shipped (PR #320)", async () => {
       undefined,
       `${name} must not be exported from the internal components barrel`,
     );
-    assert.ok(
-      !existsSync(join(componentsDir, `${name}.tsx`)),
-      `${name}.tsx must not exist — render Alert / Center + Spinner directly`,
-    );
-    assert.ok(
-      !existsSync(join(componentsDir, `${name}.stories.tsx`)),
-      `${name}.stories.tsx must not exist`,
-    );
   }
 });
 
-test("the bar takes its filters as caller-supplied definitions, never hardcoded lists", () => {
-  assert.match(bar, /export type CatalogFilterDefinition<FilterId extends string = string> =/);
-  assert.match(bar, /filters: CatalogFilterDefinition<FilterId>\[\];/);
-  assert.match(bar, /activeFilters\?: FilterId\[\];/);
-  assert.match(bar, /onActiveFiltersChange\?: \(filters: FilterId\[\]\) => void;/);
-  for (const kind of ["select", "text", "range", "sort"]) {
-    assert.match(
-      bar,
-      new RegExp(`kind: "${kind}";`),
-      `the bar's control shapes include the ${kind} definition`,
-    );
-  }
-  // No single app's catalog data may live in the bar (PR #311):
-  // the recipe option sets and filter labels are the caller's.
-  for (const baked of [
-    "STATUS_OPTIONS",
-    "SORT_OPTIONS",
-    "SORT_DIR_OPTIONS",
-    "FILTER_LABELS",
-    "ALL_FILTER_IDS",
-    "Perfected",
-    "All statuses",
-  ]) {
-    assert.ok(
-      !bar.includes(baked),
-      `the bar must not hardcode ${baked} — filter data is passed in`,
-    );
-  }
-  assert.ok(!/\binterface\b/.test(bar), "props are type aliases, never interfaces");
+async function renderBar(props: Record<string, unknown>): Promise<string> {
+  const { createElement: h } = await import("react");
+  const { renderToString } = await import("react-dom/server");
+  const { TamaguiProvider }: Record<string, any> = await import("tamagui");
+  const distRuntime = await loadInternalDist();
+  const { createTamaguiConfig, baseTheme, CatalogFiltersBar } = distRuntime;
+  const { VoiceProvider }: Record<string, any> = await import("../../dist/voice/index.js");
+  const { fixtureVoice }: Record<string, any> = await import("../../dist/voice/fixtures.js");
+  const config = createTamaguiConfig(baseTheme);
+  return renderToString(
+    h(
+      TamaguiProvider,
+      { config, defaultTheme: "light" },
+      h(VoiceProvider, { voice: fixtureVoice }, h(CatalogFiltersBar, props)),
+    ),
+  );
+}
+
+const FILTERS = [
+  {
+    kind: "text",
+    id: "ingredient",
+    label: "Ingredient",
+    value: "",
+    onChange: () => {},
+    placeholder: "e.g. chicken",
+    defaultValue: "",
+  },
+  {
+    kind: "select",
+    id: "status",
+    label: "Status",
+    value: "all",
+    onChange: () => {},
+    options: [
+      { value: "all", label: "All statuses" },
+      { value: "perfected", label: "Perfected" },
+    ],
+    defaultValue: "all",
+  },
+];
+
+test("the bar renders caller-supplied filter definitions, never a hardcoded list", async () => {
+  const html = await renderBar({
+    searchPlaceholder: "Search the catalog…",
+    search: "",
+    onSearchChange: () => {},
+    filters: FILTERS,
+    activeFilters: ["ingredient"],
+  });
+  assert.ok(html.includes("Ingredient"), "the caller's text filter label renders");
+  assert.ok(html.includes("e.g. chicken"), "the caller's text filter placeholder renders");
+  assert.ok(
+    html.includes("Remove Ingredient filter"),
+    "an added filter carries its remove name, built from the caller's label",
+  );
+  assert.ok(!html.includes("Status"), "a filter that was not added does not render its control");
 });
 
-test("the bar's chooser adds filters and each added filter removes through its inline remove pairing", () => {
-  // The chooser offers only the filters not yet added (#96),
-  // and choosing one appends it and closes the chooser.
-  assert.match(
-    bar,
-    /const addable = filters\.filter\(\(definition\) => !active\.includes\(definition\.id\)\);/,
-  );
-  assert.match(bar, /accessibilityLabel=\{`Add \$\{definition\.label\} filter`\}/);
-  assert.match(
-    bar,
-    /const addFilter = \(id: FilterId\) => \{\s*setActive\(\[\.\.\.active, id\]\);\s*setChooserOpen\(false\);/,
-  );
-  // Added filters render with the inlined remove pairing
-  // (#740); removing one clears its value back to its default
-  // and drops it from the active set.
-  assert.match(bar, /<YStack key=\{definition\.id\} gap=\{tokens\.spacing\[1\]\}>/);
-  assert.match(bar, /accessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/);
-  assert.match(bar, /voice\.removableField\.removeLabel/);
-  assert.match(
-    bar,
-    /const removeFilter = \(definition: CatalogFilterDefinition<FilterId>\) => \{\s*clearFilter\(definition\);\s*setActive\(active\.filter\(\(filterId\) => filterId !== definition\.id\)\);/,
-  );
-  // One setter serves the controlled and uncontrolled forms:
-  // internal state moves only when uncontrolled, and the
-  // change callback always fires.
-  assert.match(bar, /if \(activeFilters === undefined\) setInternalActiveFilters\(next\);/);
-  assert.match(bar, /onActiveFiltersChange\?\.\(next\);/);
+test("the open chooser offers only the filters not yet added, under caller labels", async () => {
+  const html = await renderBar({
+    searchPlaceholder: "Search the catalog…",
+    search: "",
+    onSearchChange: () => {},
+    filters: FILTERS,
+    activeFilters: ["ingredient"],
+    filterChooserOpen: true,
+  });
+  assert.ok(html.includes("Add Status filter"), "the chooser offers the not-yet-added filter");
+  assert.ok(!html.includes("Add Ingredient filter"), "the chooser omits the already-added filter");
 });
 
-test("CatalogHeader renders the title as the heading over its controls", () => {
-  // #698 tranche 4: the header's stack geometry moved into the
-  // ListHeaderStack widget (views apply no styling directly);
-  // the header composes it and the widget owns the rhythm.
-  assert.match(header, /<ListHeaderStack>/);
-  const listHeaderStack = readCode("ListHeaderStack.tsx");
-  assert.match(listHeaderStack, /paddingBlockStart: tokens\.spacing\[4\]/);
-  assert.match(listHeaderStack, /paddingBlockEnd: tokens\.spacing\[2\]/);
-  assert.match(listHeaderStack, /gap: tokens\.spacing\[4\]/);
-  assert.match(header, /<Text variant="heading">\{title\}<\/Text>/);
-  assert.match(header, /title: string;/);
-  assert.match(header, /children: ReactNode;/, "the bar composes in as the child");
-});
-
-test("the loading state is the page's own skeleton rows composition (#278; #479's no-wrapper rule stands)", () => {
-  assert.match(
-    discoverPage,
-    /publicLoading \? \(\s*<LoadingDiscoveryRows \/>\s*\)/,
-    "the public catalog's first load renders the page's own skeleton discovery rows — no loading wrapper components (#479), and the centered Spinner is gone (#278 tranche 4)",
+test("CatalogHeader renders its title as the heading over its controls", async () => {
+  const { createElement: h } = await import("react");
+  const { renderToString } = await import("react-dom/server");
+  const { TamaguiProvider }: Record<string, any> = await import("tamagui");
+  const dist: Record<string, any> = await loadInternalDist();
+  const config = dist.createTamaguiConfig(dist.baseTheme);
+  const html = renderToString(
+    h(
+      TamaguiProvider,
+      { config, defaultTheme: "light" },
+      h(dist.CatalogHeader, { title: "Recipes" }, h("span", null, "CONTROLS")),
+    ),
   );
+  assert.ok(html.includes("Recipes"), "the title renders");
+  assert.ok(html.includes("CONTROLS"), "the controls compose in as the children");
   assert.ok(
-    !discoverPage.includes("<Spinner"),
-    "no Spinner remains anywhere in the catalog page (#278 tranche 4)",
-  );
-  assert.ok(
-    !discoverPage.includes("ListLoadingState"),
-    "the public catalog must not render the removed ListLoadingState (#479)",
-  );
-  assert.ok(
-    !discoverPage.includes("LoadingGate"),
-    "the public catalog must not render the removed LoadingGate (#479)",
+    html.indexOf("Recipes") < html.indexOf("CONTROLS"),
+    "the title renders over its controls",
   );
 });

@@ -20,54 +20,32 @@
  *    generation is in flight the busy action reads its
  *    in-flight label and every action disables; a host error
  *    renders as an alert without hiding the preview.
+ *
+ * Converted in #733 tranche 5: the barrel / page-composition
+ * source scan was replaced by a runtime check on the built
+ * modules (the view ships in the built views barrel and not
+ * on the built package root; page composition is not runtime-
+ * observable here and RecipeFormPage's own tests pin it), and
+ * the controlled / picker-free source scan was deleted — a
+ * view owning state or a picker is not observable from the
+ * built output, while every rendered action contract is
+ * pinned by the SSR tests below.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
-const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
-const read = (rel: string) => readFileSync(join(root, rel), "utf8");
-test("the view is barrel-exported and RecipeFormPage renders it from the image data prop", () => {
-  const barrel = read("src/views/index.ts");
-  assert.match(
-    barrel,
-    /export \{ RecipeImageView, type RecipeImageViewProps \} from "\.\/RecipeImageView\.js"/,
-    "RecipeImageView is exported from src/views/index.ts",
+test("the view ships in the built views barrel and stays off the built package root", async () => {
+  const distRuntime = await loadInternalDist();
+  assert.equal(typeof distRuntime.RecipeImageView, "function");
+  const { readFileSync } = await import("node:fs");
+  const { dirname, join } = await import("node:path");
+  const { fileURLToPath } = await import("node:url");
+  const rootTypes = readFileSync(
+    join(dirname(fileURLToPath(import.meta.url)), "../..", "dist", "index.d.ts"),
+    "utf8",
   );
-  const rootIndex = read("src/index.ts");
-  assert.doesNotMatch(rootIndex, /\bRecipeImageView\b/, "the view stays off the public surface");
-  const form = read("src/pages/RecipeFormPage.tsx");
-  assert.ok(
-    form.includes(
-      'import { RecipeImageView, type RecipeImageViewProps } from "../views/RecipeImageView.js"',
-    ),
-    "RecipeFormPage imports the view",
-  );
-  assert.ok(
-    form.includes("image?: RecipeFormPageImage | null"),
-    "the image data prop is on the form's contract",
-  );
-  assert.match(
-    form,
-    /<RecipeImageView \{\.\.\.image\} headerAction=\{revertAction\("image"\)\} \/>/,
-    "the page renders the view from the data prop with its revert affordance as the header action",
-  );
-  assert.ok(
-    !form.includes("renderImageSection"),
-    "the image render slot is removed (#683) — the data prop is the only path",
-  );
-});
-test("the view is controlled and picker-free", () => {
-  const view = read("src/views/RecipeImageView.tsx");
-  assert.ok(!view.includes("useState"), "the view must not own state");
-  assert.ok(!view.includes("expo-image-picker"), "the view must not call a picker library");
-  assert.ok(!view.includes("react-native-image-picker"), "the view must not call a picker library");
-  assert.ok(!view.includes('type="file"'), "the view must not render a file input");
-  assert.ok(!view.includes("@eciperay"), "the view must not import an app package");
+  assert.doesNotMatch(rootTypes, /\bRecipeImageView\b/, "the view stays off the public surface");
 });
 async function renderView(props: Record<string, unknown>): Promise<string> {
   const { createElement: h } = await import("react");
@@ -85,7 +63,11 @@ async function renderView(props: Record<string, unknown>): Promise<string> {
         config,
         defaultTheme: "light",
       },
-      h(voiceModule.VoiceProvider, { voice: voiceFixtures.fixtureVoice }, h(RecipeImageView, props)),
+      h(
+        voiceModule.VoiceProvider,
+        { voice: voiceFixtures.fixtureVoice },
+        h(RecipeImageView, props),
+      ),
     ),
   );
 }

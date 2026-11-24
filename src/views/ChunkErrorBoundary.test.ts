@@ -3,34 +3,34 @@
  * (design-system#411, lifted from Memorize's app shell, memorize#54).
  *
  * The contracts pinned here:
- * 1. The boundary is exported from the views barrel (internal
- *    only — #438's final major removed the #411 package-root
- *    export; that removal is pinned in
+ * 1. The boundary is exported from the built views barrel
+ *    (internal only — #438's final major removed the #411
+ *    package-root export; that removal is pinned in
  *    test/packageExports.test.ts).
- * 2. Its props/state are type aliases, not interfaces (the repo-wide
- *    rule, #214), and its only required prop is `children` — callers
- *    key the boundary by the active surface to clear the error.
- * 3. Recovery is a FULL RELOAD, never a remount retry: React caches
+ * 2. Recovery is a FULL RELOAD, never a remount retry: React caches
  *    a rejected lazy import, so only `window.location.reload()`
- *    recovers from a stale-chunk 404. The web reload is guarded
- *    (`isWeb` + `typeof window`) so non-web renders never touch
- *    `window`; a caller-supplied `onReload` replaces the default.
- * 4. The fallback is the internal Alert (severity "error") alone —
- *    no styling props, no app-domain concepts. The "Reload the app"
- *    button renders inside the Alert as an Alert action (content
- *    width, never a full-width sibling under the Alert; #471), and
- *    only when a recovery action exists (the web reload or a
- *    caller-supplied `onReload`); a no-op control is never shown.
+ *    recovers from a stale-chunk 404. A caller-supplied `onReload`
+ *    replaces the default, and with no recovery action the
+ *    fallback renders no dead control.
+ * 3. The fallback is the internal Alert (severity "error") alone —
+ *    the "Reload the app" button renders inside the Alert as an
+ *    Alert action, and only when a recovery action exists.
+ *
+ * Converted from source scans to runtime checks in #733
+ * tranche 5: the behavior tests below already exercised the
+ * built boundary directly, so the source scans were deleted —
+ * the barrel export text (the built export is asserted at
+ * runtime instead), the type-alias scan (types are enforced
+ * by the TypeScript build, not a test — Stephen, 2026-11-20),
+ * the guarded-reload source patterns (the default reload and
+ * its no-window no-op are exercised at runtime below), and
+ * the stories source scan (story coverage is not runtime-
+ * observable from the built package).
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
 import { test } from "node:test";
-import { fileURLToPath } from "node:url";
 
-const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
 // The boundary itself is a view (#470); the Alert and Button it
 // composes are widgets, so the runtime surface spans both barrels.
 const dist: Record<string, any> = {
@@ -38,31 +38,8 @@ const dist: Record<string, any> = {
   ...(await import("../../dist/views/index.js")),
 };
 
-function codeOf(rel: string): string {
-  const source = readFileSync(join(root, rel), "utf8");
-  return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-}
-
-const boundary = codeOf("src/views/ChunkErrorBoundary.tsx");
-const stories = readFileSync(join(root, "src/views/ChunkErrorBoundary.stories.tsx"), "utf8");
-
-test("ChunkErrorBoundary is exported from the views barrel", () => {
-  const barrel = readFileSync(join(root, "src/views/index.ts"), "utf8");
-  assert.match(
-    barrel,
-    /export \{\s*ChunkErrorBoundary,\s*type ChunkErrorBoundaryProps,\s*type ChunkErrorBoundaryState,\s*\} from "\.\/ChunkErrorBoundary\.js";/,
-  );
+test("ChunkErrorBoundary is exported from the built views barrel", () => {
   assert.equal(typeof dist.ChunkErrorBoundary, "function");
-});
-
-test("props and state are type aliases with children as the core prop", () => {
-  assert.match(boundary, /export type ChunkErrorBoundaryProps = \{/);
-  assert.match(boundary, /export type ChunkErrorBoundaryState = \{/);
-  assert.match(boundary, /children: ReactNode;/);
-  assert.doesNotMatch(
-    boundary,
-    /\binterface\s+(ChunkErrorBoundaryProps|ChunkErrorBoundaryState)\b/,
-  );
 });
 
 test("a rejected chunk flips the boundary into its failed state", () => {
@@ -98,12 +75,7 @@ test("no reload button renders when no recovery action exists", () => {
   assert.equal(fallback.props.actions, undefined);
 });
 
-test("recovery is a guarded full reload, replaceable by onReload", () => {
-  assert.match(boundary, /window\.location\.reload\(\)/);
-  assert.match(boundary, /isWeb && typeof window !== "undefined"/);
-  // No remount/setState retry: clearing the failed flag in place
-  // would re-render the same rejected lazy import.
-  assert.doesNotMatch(boundary, /setState\(\{\s*failed: false/);
+test("recovery is a full reload, replaceable by onReload", () => {
   let calls = 0;
   const instance = new dist.ChunkErrorBoundary({
     children: "surface content",
@@ -142,10 +114,4 @@ test("recovery is a guarded full reload, replaceable by onReload", () => {
   // throw) where there is no window to reload.
   const webLess = new dist.ChunkErrorBoundary({ children: "surface content" });
   webLess.handleReload();
-});
-
-test("stories cover the loaded and failed-to-load states", () => {
-  assert.match(stories, /title: "Views\/ChunkErrorBoundary"/);
-  assert.match(stories, /export const Loaded: Story/);
-  assert.match(stories, /export const FailedToLoad: Story/);
 });
