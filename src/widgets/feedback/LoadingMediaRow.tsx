@@ -29,7 +29,7 @@ export function LoadingMediaRow() {
         flexDirection="row"
         flexWrap="wrap"
         alignItems="center"
-        gap={tokens.spacing[3]}
+        gap="m"
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
         <BoxSkeleton width={64} height={64} />

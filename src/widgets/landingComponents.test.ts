@@ -99,7 +99,7 @@ test("the feature card and grid treatments live in CardGrid: 260px flex basis, w
   assert.match(page, /<Card key=\{feature\.title\}>/, "the page supplies plain cards");
   assert.match(page, /<Text variant="subheading">\{feature\.title\}<\/Text>/);
   assert.match(page, /color="\$textMuted"/, "the description is muted ink");
-  assert.match(cardGrid, /<XStack flexWrap="wrap" gap=\{tokens\.spacing\[3\]\}>/);
+  assert.match(cardGrid, /<Row wrap gap="m">/);
   assert.match(cardGrid, /flex: 1,/, "the grid grows each card to share its row");
   assert.match(cardGrid, /flexBasis: 260,/, "the grid's wrap basis is 260px");
   assert.match(cardGrid, /gap: "\$2",/, "the grid sets each card's internal rhythm");

@@ -1,4 +1,6 @@
-import { Anchor, XStack, YStack, isWeb } from "tamagui";
+import { Anchor, isWeb } from "tamagui";
+import { Col } from "./Col.js";
+import { Row } from "./Row.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
 import { Card } from "./Card.js";
@@ -74,7 +76,7 @@ export type CardRowProps = CardRowOwnProps &
  * is a Tamagui Anchor (a real link, keyboard-operable by
  * default). On native the anchor is a Text and the stacked texts
  * would flow inline inside it, so the block platform-splits (see
- * LinkOverlay): a YStack frame carries the texts marked
+ * LinkOverlay): a Col frame carries the texts marked
  * decorative, and a childless anchor stretched over it carries
  * the href and the composed label — title and subtitle — as the
  * row's one accessibility stop.
@@ -107,15 +109,15 @@ export function CardRow({
           variant="elevated"
           flexDirection="row"
           alignItems="center"
-          gap="$3"
+          gap="m"
           {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
         >
-          <YStack flex={1} minWidth={0} gap="$1">
+          <Col grow minWidth={0} gap="xs">
             <TextSkeleton size="md" lines={1} />
             {subtitle ? <TextSkeleton size="sm" lines={2} /> : null}
-          </YStack>
+          </Col>
           {actionLabel && onActionPress ? (
-            <XStack paddingInlineStart="$3" alignItems="center">
+            <Row middle>
               <Button
                 variant="secondary"
                 size="sm"
@@ -125,7 +127,7 @@ export function CardRow({
               >
                 {actionLabel}
               </Button>
-            </XStack>
+            </Row>
           ) : null}
         </Card>
       </LoadingScope>
@@ -142,7 +144,7 @@ export function CardRow({
   const handleKeyDown = keyboardActivationHandler(() => onPress?.());
   const textContent = <RowTextContent title={title} subtitle={subtitle} />;
   return (
-    <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
+    <Card variant="elevated" flexDirection="row" alignItems="center" gap="m">
       {href !== undefined ? (
         isWeb ? (
           <Anchor
@@ -157,20 +159,20 @@ export function CardRow({
             {textContent}
           </Anchor>
         ) : (
-          <YStack flex={1} minWidth={0} gap="$1" position="relative">
+          <Col grow minWidth={0} gap="xs" position="relative">
             <RowTextContent title={title} subtitle={subtitle} decorative />
             <LinkOverlay
               href={href}
               accessibilityRole="link"
               accessibilityLabel={subtitle ? `${title}, ${subtitle}` : title}
             />
-          </YStack>
+          </Col>
         )
       ) : (
-        <YStack
-          flex={1}
+        <Col
+          grow
           minWidth={0}
-          gap="$1"
+          gap="xs"
           {...platformAccessibilityProps({ accessibilityRole: "button" })}
           onPress={onPress}
           tabIndex={0}
@@ -178,10 +180,10 @@ export function CardRow({
           cursor="web:pointer"
         >
           {textContent}
-        </YStack>
+        </Col>
       )}
       {onActionPress && actionLabel ? (
-        <XStack paddingInlineStart="$3" alignItems="center">
+        <Row middle>
           <Button
             variant="secondary"
             size="sm"
@@ -191,7 +193,7 @@ export function CardRow({
           >
             {actionLabel}
           </Button>
-        </XStack>
+        </Row>
       ) : null}
     </Card>
   );

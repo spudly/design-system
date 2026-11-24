@@ -11,10 +11,11 @@
  * renders no scroller of its own (the #188 constraint: the
  * content scrolls itself, never nested inside the shell's
  * scroll view). The root frame is platform-split (#705): the
- * bounded `flex: 1` frame is native-only — on web the root
- * only grows (`flexGrow: 1`), so content height is
- * content-driven inside a footer shell and the footer lands
- * below the last content item (#547).
+ * bounded frame is native-only — on web the root only grows,
+ * so content height is content-driven inside a footer shell
+ * and the footer lands below the last content item (#547).
+ * #746: the frame and the header block render as Col/Spacer —
+ * the bounded frame is grow shrink, the web root grow.
  */
 import "../../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../../test/internalDist.js";
@@ -25,7 +26,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "layout", "PinnedHeaderShell.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "layout", "PinnedHeaderShell.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("PinnedHeaderShell is exported from the built internal components barrel", async () => {
@@ -39,13 +43,21 @@ test("PinnedHeaderShell is exported from the built internal components barrel", 
 
 test("the shell paints the page background and insets the header block", () => {
   assert.match(code, /backgroundColor=\{tokens\.colors\.gray\.gray1\}/);
-  assert.match(code, /<YStack paddingHorizontal="\$4" paddingTop="\$4">/);
+  // #746: the header block is a Col with the 16px side inset
+  // (px "l"); its 16px top inset is composed as a Spacer — no
+  // parent gap can own it, and Col offers no single-side
+  // padding. The bottom stays open: the content region owns
+  // its own top spacing.
+  assert.match(code, /<Col px="l">/);
+  assert.match(code, /<Spacer y="l" \/>/);
 });
 
 test("the bounded root frame is native-only — web grows in document flow (#705)", () => {
-  assert.match(code, /isWeb \? \{ flexGrow: 1 \} : \{ flex: 1 \}/);
+  // #746: the platform split is Col's grow (web) vs grow shrink
+  // (native, flex: 1's translation), spread conditionally.
+  assert.match(code, /isWeb \? \{ grow: true \} : \{ grow: true, shrink: true \}/);
   assert.ok(
-    !/<YStack\b[^>]*\bflex=\{1\}/.test(code),
+    !/<Col\b[^>]*\bflex=\{1\}/.test(code),
     "the root must not carry an unconditional bounded flex: 1 frame",
   );
 });

@@ -263,7 +263,7 @@ export function RecipeSharingView({
             )}
             <Row middle wrap gap="s">
               {showSkeleton ? (
-                <Col grow>
+                <Col grow shrink>
                   <TextSkeleton size="md" lines={1} />
                 </Col>
               ) : (

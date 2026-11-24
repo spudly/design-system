@@ -28,7 +28,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { makeRenderToHtml, verticalScrollers } from "../../../test/wholePageFlow.js";
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "layout", "ScreenShell.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "layout", "ScreenShell.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("ScreenShell is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
@@ -39,15 +42,17 @@ test("ScreenShell is exported from the built internal components barrel", async 
   );
 });
 test("native keeps the flex:1 surface frame; the web path renders a growing surface column (#547)", () => {
+  // #746 (Option B): the native frame's flex: 1 is Col's
+  // grow shrink translation; no styled root remains.
   assert.match(
     code,
-    /flex: 1,\s+backgroundColor: "\$surface",/,
-    "the native styled frame is unchanged",
+    /<Col grow shrink backgroundColor="\$surface" \{\.\.\.rest\} \/>/,
+    "the native branch renders the surface frame with flex: 1's grow/shrink translation",
   );
   assert.match(code, /if \(isWeb\) \{/, "the web path is an explicit platform branch");
   assert.match(
     code,
-    /<YStack flexGrow=\{1\} flexDirection="column" backgroundColor="\$surface" \{\.\.\.rest\} \/>/,
+    /<Col grow backgroundColor="\$surface" \{\.\.\.rest\} \/>/,
     "the web branch renders a growing surface column — no zero-basis flex, no bounded frame",
   );
 });
@@ -63,11 +68,14 @@ function loadRuntime() {
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const { loadInternalDist } = await import("../../../test/internalDist.js");
     const dist: Record<string, any> = await loadInternalDist();
-    const { ScreenShell }: Record<string, any> = await import("../../../dist/widgets/layout/ScreenShell.js");
-    const { ScrollShell }: Record<string, any> = await import("../../../dist/widgets/layout/ScrollShell.js");
+    const { ScreenShell }: Record<string, any> =
+      await import("../../../dist/widgets/layout/ScreenShell.js");
+    const { ScrollShell }: Record<string, any> =
+      await import("../../../dist/widgets/layout/ScrollShell.js");
     const { ScrollRegion }: Record<string, any> =
       await import("../../../dist/widgets/layout/ScrollRegion.js");
-    const { BigFooterShell }: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
+    const { BigFooterShell }: Record<string, any> =
+      await import("../../../dist/widgets/content/BigFooter.js");
     const { eciperayFooterFixture }: Record<string, any> =
       await import("../../../dist/pages/shared/fixtures.js");
     return {

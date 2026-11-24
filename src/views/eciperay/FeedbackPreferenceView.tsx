@@ -127,7 +127,7 @@ export function FeedbackPreferenceView({
             <Center width={44} height={44}>
               <BoxSkeleton width={24} height={24} />
             </Center>
-            <Col grow>
+            <Col grow shrink>
               <Col gap="xs">
                 {/* The label bone sits centered in the
                   CheckboxField Label's own line box

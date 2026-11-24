@@ -1,4 +1,6 @@
-import { Anchor, XStack, YStack, isWeb, styled, useTheme } from "tamagui";
+import { Anchor, isWeb, styled, useTheme } from "tamagui";
+import { Col } from "./Col.js";
+import { Row } from "./Row.js";
 import { BrandMark, type BrandMarkName } from "../../icons/BrandMark.js";
 import { iconsByName, type IconName } from "../../icons/iconRegistry.js";
 import { tokens } from "../../tokens/index.js";
@@ -180,15 +182,6 @@ const navItemFrameStyles = {
   borderRadius: tokens.radii.md,
 } as const;
 
-const navItemActiveVariants = {
-  active: {
-    true: {
-      backgroundColor: "$primary",
-    },
-    false: {},
-  },
-} as const;
-
 const StyledNavLink = styled(Anchor, {
   name: "AppTopBarNavLink",
   ...navItemFrameStyles,
@@ -219,31 +212,10 @@ const StyledNavLink = styled(Anchor, {
  * anchor: a raw text child is laid out inline, not as a flex
  * item, so the glyph landed left of the label's center by an
  * amount that varied with label width. Inside this stack both
- * are real flex items sharing one centered axis.
+ * are real flex items sharing one centered axis. #746 (Option
+ * B): the stack is a Col rendered inline at the use site —
+ * `center middle gap="xs"` — no styled root.
  */
-const StyledNavItemStack = styled(YStack, {
-  name: "AppTopBarNavItemStack",
-  alignItems: "center",
-  justifyContent: "center",
-  gap: tokens.spacing[1],
-});
-
-const StyledNavFrame = styled(XStack, {
-  name: "AppTopBarNavFrame",
-  ...navItemFrameStyles,
-  position: "relative",
-
-  variants: navItemActiveVariants,
-});
-
-const StyledNavList = styled(XStack, {
-  name: "AppTopBarNavList",
-  flexWrap: "wrap",
-  flexShrink: 1,
-  minWidth: 0,
-  alignItems: "center",
-  gap: tokens.spacing[1],
-});
 
 /**
  * The concrete glyph inks for nav items: the label's theme
@@ -290,7 +262,7 @@ function NavItem({
         })}
         {...{ "aria-current": active ? ("page" as const) : undefined }}
       >
-        <StyledNavItemStack>
+        <Col center middle gap="xs">
           {glyph}
           <Text
             style={{
@@ -302,12 +274,27 @@ function NavItem({
           >
             {item.label}
           </Text>
-        </StyledNavItemStack>
+        </Col>
       </StyledNavLink>
     );
   }
   return (
-    <StyledNavFrame active={active}>
+    // The native item frame (#746, Option B): the nav item
+    // frame geometry as Row props — centered row, 8px gap,
+    // 12px/8px padding, the 44px minimum height, the medium
+    // radius, positioned for the LinkOverlay stretched over it;
+    // the active item takes the primary fill. No styled root.
+    <Row
+      middle
+      center
+      gap="s"
+      px="m"
+      py="s"
+      minHeight={44}
+      borderRadius={tokens.radii.md}
+      position="relative"
+      {...(active ? { backgroundColor: "$primary" } : null)}
+    >
       {glyph}
       <Text
         accessible={false}
@@ -327,7 +314,7 @@ function NavItem({
         accessibilityLabel={item.label}
         accessibilityState={{ selected: active }}
       />
-    </StyledNavFrame>
+    </Row>
   );
 }
 
@@ -349,7 +336,7 @@ export function AppTopBar({
   // whole constraint; on native the column is a pass-through.
   return (
     <PageContentColumn>
-      <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[3]}>
+      <Row wrap middle gap="m">
         {brand.href !== undefined ? (
           <BrandLink
             label={brand.label}
@@ -357,15 +344,27 @@ export function AppTopBar({
             {...(brand.mark !== undefined ? { mark: brand.mark } : null)}
           />
         ) : brand.mark !== undefined ? (
-          <XStack alignItems="center" gap={tokens.spacing[2]}>
+          <Row middle gap="s">
             <BrandMark mark={brand.mark} size={28} />
             <Text variant="heading">{brand.label}</Text>
-          </XStack>
+          </Row>
         ) : (
           <Text variant="heading">{brand.label}</Text>
         )}
         {navItems !== undefined && navItems.length > 0 ? (
-          <StyledNavList
+          // The nav list (#564): items wrap onto multiple lines
+          // when the bar is narrow instead of overflowing, and
+          // the list shrinks (flexShrink + minWidth 0) so long
+          // labels ellipsize inside their items rather than
+          // pushing the actions off the bar. #746 (Option B):
+          // the geometry is Row props at the use site — no
+          // styled root.
+          <Row
+            wrap
+            shrink
+            middle
+            gap="xs"
+            minWidth={0}
             {...navigationRoleProps}
             {...platformAccessibilityProps({ accessibilityLabel: navLabel })}
           >
@@ -377,10 +376,10 @@ export function AppTopBar({
                 glyphInks={glyphInks}
               />
             ))}
-          </StyledNavList>
+          </Row>
         ) : null}
         {search !== undefined && search !== null ? (
-          <XStack flex={1} {...platformAccessibilityProps({ accessibilityRole: "search" })}>
+          <Row grow shrink {...platformAccessibilityProps({ accessibilityRole: "search" })}>
             <SearchField
               grow
               value={search.value}
@@ -389,10 +388,10 @@ export function AppTopBar({
               {...(search.placeholder !== undefined ? { placeholder: search.placeholder } : null)}
               {...platformAccessibilityProps({ accessibilityLabel: search.label })}
             />
-          </XStack>
+          </Row>
         ) : null}
         {actions !== undefined && actions.length > 0 ? (
-          <XStack flexWrap="wrap" alignItems="center" gap={tokens.spacing[2]} marginLeft="auto">
+          <Row wrap middle gap="s" marginLeft="auto">
             {actions.map((action) =>
               action.href !== undefined ? (
                 <Button key={action.id} ghost href={action.href}>
@@ -404,9 +403,9 @@ export function AppTopBar({
                 </Button>
               ),
             )}
-          </XStack>
+          </Row>
         ) : null}
-      </XStack>
+      </Row>
     </PageContentColumn>
   );
 }

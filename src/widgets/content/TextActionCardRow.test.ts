@@ -88,7 +88,7 @@ test("native renders decorative texts under a LinkOverlay with the composed labe
 });
 
 test("the frame is the elevated Card in row form; the row owns no outer separation", () => {
-  assert.match(code, /<Card variant="elevated" flexDirection="row" alignItems="center" gap="\$3">/);
+  assert.match(code, /<Card variant="elevated" flexDirection="row" alignItems="center" gap="m">/);
   assert.ok(
     !/paddingBlockEnd|margin/.test(code),
     "row separation belongs to the composing Col (#119, #746)",

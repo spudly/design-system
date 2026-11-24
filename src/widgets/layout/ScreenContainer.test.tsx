@@ -1,7 +1,7 @@
 /**
  * Contract test for spudly/design-system#299: ScreenContainer's
- * content column (StyledContent) carries the shell's static 16px
- * section gap (`gap: tokens.spacing[4]`), and pages rely on it as
+ * content column carries the shell's static 16px
+ * section gap, and pages rely on it as
  * their only section separation (e.g. MealPlansPage's loading
  * spinner sits "16px below the create button" per
  * the shells' colocated .test.steps.md files). On web the gap never
@@ -25,11 +25,12 @@
  * passed — both halves are pinned by the runtime tests below via
  * ScreenContainer itself.
  *
- * The contract now:
- * 1. Source: ScreenContainer spreads the caller's gap into
- *    StyledContent ONLY when one was actually passed (the PageFrame
- *    conditional-spread idiom); it never passes `gap={gap}`
- *    unconditionally.
+ * The contract now (#746, Option B: the column is a Col the
+ * container renders directly — there is no styled static gap):
+ * 1. Source: ScreenContainer resolves the caller's gap over its
+ *    own 16px ("l") default in code and spreads the resolved
+ *    size into Col only when one resolved; it never passes
+ *    `gap={gap}` unconditionally.
  * 2. Runtime (SSR, against the built output): the ScreenContainer
  *    element carries a class whose generated CSS rule is
  *    `gap:16px`, in both the scrollable (default) and
@@ -56,18 +57,13 @@ test("the list variant flexes on native so it bounds its list within the shell f
   const code = readCode("src/widgets/layout/ScreenContainer.tsx");
   assert.match(
     code,
-    /const boundedFlexProps = \{ flex: 1 \} as const;/,
-    "the bounded-region flex must be flex: 1 — without it the container sizes to content and a flex: 1 FlatList inside it computes to height 0 in Yoga, rendering the native page body empty (the @spudly/ui 9.2.0 regression)",
+    /const boundedFlexProps = \{ grow: true, shrink: true \} as const;/,
+    "the bounded-region flex must bound the container — without it the container sizes to content and a flex: 1 FlatList inside it computes to height 0 in Yoga, rendering the native page body empty (the @spudly/ui 9.2.0 regression). #746: flex: 1's translation is Col's grow shrink — in the frame's definite height the child lands at the frame height from either basis",
   );
   assert.match(
     code,
-    /rest\.variant === "list"/,
-    "the list variant must be one of the variants that receive the native bounded-region flex (eciperay #526)",
-  );
-  assert.match(
-    code,
-    /!isWeb\s*\?\s*boundedFlexProps\s*:\s*null/,
-    "the flex must be applied only on native: on web flex: 1's zero basis collapses a column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry)",
+    /\{\.\.\.\(variant === "list" && !isWeb \? boundedFlexProps : null\)\}/,
+    "the list variant must receive the bounded-region flex only on native: on web flex: 1's zero basis collapses a column inside BigFooterShell's space-between shell (the ScreenShell / PR #556 geometry)",
   );
 });
 
@@ -75,18 +71,13 @@ test("the default variant flexes on native so form shell pages bound their scrol
   const code = readCode("src/widgets/layout/ScreenContainer.tsx");
   assert.match(
     code,
-    /const defaultFlexProps = \{ flexGrow: 1 \} as const;/,
-    "the default variant's native flex must be flexGrow: 1 with an automatic basis — flex: 1's zero basis would contribute no content height inside BigFooterShell's shell-mode ScrollView column, clipping pages taller than the viewport (#676 review)",
+    /const defaultFlexProps = \{ grow: true \} as const;/,
+    "the default variant's native flex must be flexGrow: 1 with an automatic basis — flex: 1's zero basis would contribute no content height inside BigFooterShell's shell-mode ScrollView column, clipping pages taller than the viewport (#676 review). #746: the translation is Col's grow alone",
   );
   assert.match(
     code,
-    /rest\.variant === undefined \|\| rest\.variant === "default"/,
-    "the default variant (explicit or via defaultVariants when no variant is passed) must receive the native bounded-region flex — without it a default-variant container sizes to content and a flex: 1 scroll region inside it computes to height 0 in Yoga, so Edit Recipe / Edit Version / Manual Entry rendered only their heading on Android (#676)",
-  );
-  assert.match(
-    code,
-    /!isWeb\s*\?\s*defaultFlexProps\s*:\s*null/,
-    "the default variant's flex must be native-only: on web the document scrolls and no flex prop is applied (#676)",
+    /\{\.\.\.\(variant === "default" && !isWeb \? defaultFlexProps : null\)\}/,
+    'the default variant (the destructured variant defaults to "default" when no variant is passed) must receive the native bounded-region flex, native-only — without it a default-variant container sizes to content and a flex: 1 scroll region inside it computes to height 0 in Yoga, so Edit Recipe / Edit Version / Manual Entry rendered only their heading on Android (#676); on web the document scrolls and no flex prop is applied',
   );
   // The composition that needs the bounded height: the three form
   // shell pages render a default-variant ScreenContainer, and their
@@ -111,16 +102,35 @@ test("the default variant flexes on native so form shell pages bound their scrol
   );
 });
 
-test("the caller's gap is spread into StyledContent only when actually passed (#299)", () => {
+test("the container resolves the caller's gap over its own 16px default (#299)", () => {
   const code = readCode("src/widgets/layout/ScreenContainer.tsx");
+  // Scoped to the outer Col: the raw caller gap is forwarded to
+  // AuthContent (which resolves it the same way before touching
+  // its own Col), but the outer stack must never receive it
+  // unconditionally.
+  const outerCol = code.slice(
+    code.indexOf('name="ScreenContainer"'),
+    code.indexOf("style={composedStyle}"),
+  );
   assert.ok(
-    !/gap=\{gap\}/.test(code),
+    !/gap=\{gap\}/.test(outerCol),
     "an unconditional gap={gap} passes gap={undefined} when no caller gap exists, clobbering the static 16px gap on web",
+  );
+  // #746 (Option B): there is no styled static gap to protect —
+  // the container resolves the caller's gap over its own "l"
+  // (16px) default in code and spreads the resolved size into
+  // Col only when it resolved to a t-shirt size, so an absent
+  // caller gap can never reach the stack as an explicit
+  // undefined (the #299 hazard in its new shape).
+  assert.match(
+    code,
+    /const outerGap = resolveGap\(gap \?\? "l"\);/,
+    "the container must resolve the caller's gap over its own 16px default in code",
   );
   assert.match(
     code,
-    /\{\.\.\.\(gap !== undefined \? \{ gap \} : null\)\}/,
-    "StyledContent must receive the caller's gap via a conditional spread so an absent gap leaves the styled static gap in place",
+    /\{\.\.\.\(outerGap\.size !== undefined \? \{ gap: outerGap\.size \} : null\)\}/,
+    "the resolved gap reaches Col via a conditional spread so a non-scale numeric gap (which rides the style channel) leaves Col's gap unset",
   );
 });
 

@@ -134,8 +134,8 @@ test("the document renders in a prose column; list blocks carry list semantics (
   );
   assert.match(
     proseColumn,
-    /width: "100%",\s+maxWidth: PROSE_MAX_WIDTH,\s+alignSelf: "center",\s+gap: tokens\.spacing\[4\],/,
-    "the ProseColumn widget owns the centered 768px column geometry (#119 tranche 2)",
+    /<Col width="100%" maxWidth=\{PROSE_MAX_WIDTH\} alignSelf="center" gap="l" \{\.\.\.rest\} \/>/,
+    'the ProseColumn widget owns the centered 768px column geometry (#119 tranche 2; #746: rendered as Col props, the 16px rhythm is gap "l")',
   );
   assert.match(
     prose,

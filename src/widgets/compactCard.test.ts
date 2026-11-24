@@ -45,12 +45,20 @@ test("CompactCard is gone — the treatment lives on Card as a variant", async (
 });
 
 test("the compact variant: surface, medium radius, 12px padding, small shadow, no border", () => {
+  // #746 (Option B): the variant treatments are style props the
+  // Card's Col root receives — the compact entry carries the
+  // border, radius, and shadow; the 12px padding is Col's p "m",
+  // applied at the render site.
   assert.match(
     code,
-    /compact: \{\s+borderWidth: 0,\s+borderRadius: tokens\.radii\.md,\s+padding: tokens\.spacing\[3\],\s+shadowColor: tokens\.shadows\.sm\.shadowColor,/,
+    /compact: \{\s+borderWidth: 0,\s+borderRadius: tokens\.radii\.md,\s+shadowColor: tokens\.shadows\.sm\.shadowColor,/,
   );
   assert.match(code, /shadowRadius: tokens\.shadows\.sm\.shadowRadius,/);
-  assert.match(code, /variant\?: "default" \| "bordered" \| "muted" \| "elevated" \| "compact";/);
+  assert.match(code, /p=\{resolvedVariant === "compact" \? "m" : "l"\}/);
+  assert.match(
+    code,
+    /type CardVariant = "default" \| "bordered" \| "muted" \| "elevated" \| "compact";/,
+  );
 });
 
 test("the treatment's consumers compose Card's compact variant", () => {

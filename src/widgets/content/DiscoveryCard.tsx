@@ -222,7 +222,7 @@ export function DiscoveryCard({
         flexDirection="row"
         flexWrap="wrap"
         alignItems="center"
-        gap="$3"
+        gap="m"
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
         <BoxSkeleton width={64} height={64} />
@@ -234,7 +234,7 @@ export function DiscoveryCard({
     );
   }
   const card = (
-    <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
+    <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="m">
       <CardThumbnail imageUrl={imageUrl} />
       <YStack style={textBlockStyle} gap="$1">
         <Text fontWeight={tokens.typography.fontWeight.semibold}>{title}</Text>

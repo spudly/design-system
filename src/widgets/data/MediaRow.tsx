@@ -183,7 +183,7 @@ export function MediaRow({
   return (
     <>
       <YStack paddingBlockEnd="$3">
-        <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="$3">
+        <Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="m">
           {isWeb ? (
             <Anchor
               href={href}

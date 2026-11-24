@@ -54,7 +54,7 @@ test("on native the column is a plain full-width pass-through stack", () => {
   const nativeBranch = column.indexOf("if (!isWeb)");
   assert.ok(nativeBranch >= 0, "PageContentColumn handles native explicitly");
   const nativeBlock = column.slice(nativeBranch, column.indexOf("return (", nativeBranch));
-  assert.match(nativeBlock, /<YStack width="100%">\{children\}<\/YStack>/);
+  assert.match(nativeBlock, /<Col width="100%">\{children\}<\/Col>/);
   assert.ok(!nativeBlock.includes("maxWidth"), "the native stack carries no maxWidth");
 });
 
@@ -76,11 +76,14 @@ test("FullBleed is a pass-through on native", () => {
   const fullBleedAt = column.indexOf("export function FullBleed");
   assert.ok(fullBleedAt >= 0, "FullBleed is defined");
   const fullBleedBlock = column.slice(fullBleedAt);
-  assert.match(fullBleedBlock, /if \(!isWeb\) \{\s*return <YStack>\{children\}<\/YStack>;/);
+  assert.match(fullBleedBlock, /if \(!isWeb\) \{\s*return <Col>\{children\}<\/Col>;/);
 });
 
 test("BigFooterShell wraps web content in the column; the footer is NOT inside it", () => {
-  assert.match(bigFooter, /import \{ PageContentColumn \} from "\.\.\/layout\/PageContentColumn\.js";/);
+  assert.match(
+    bigFooter,
+    /import \{ PageContentColumn \} from "\.\.\/layout\/PageContentColumn\.js";/,
+  );
   // With a footer: content wrapped, footer a direct sibling
   // after the column — the #547 two-children model preserved.
   assert.match(
@@ -102,6 +105,6 @@ test("BigFooterShell wraps web content in the column; the footer is NOT inside i
 
 test("AppTopBar constrains its content through the same column", () => {
   assert.match(appTopBar, /import \{ PageContentColumn \} from "\.\/PageContentColumn\.js";/);
-  assert.match(appTopBar, /<PageContentColumn>\s*<XStack/);
-  assert.match(appTopBar, /<\/XStack>\s*<\/PageContentColumn>/);
+  assert.match(appTopBar, /<PageContentColumn>\s*<Row/);
+  assert.match(appTopBar, /<\/Row>\s*<\/PageContentColumn>/);
 });

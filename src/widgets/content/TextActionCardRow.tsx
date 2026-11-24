@@ -61,7 +61,7 @@ export function TextActionCardRow({
 }: TextActionCardRowProps) {
   const textContent = <RowTextContent title={title} subtitle={subtitle} />;
   return (
-    <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
+    <Card variant="elevated" flexDirection="row" alignItems="center" gap="m">
       {isWeb ? (
         <Anchor
           flex={1}

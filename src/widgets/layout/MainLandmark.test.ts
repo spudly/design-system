@@ -10,7 +10,11 @@
  * Converted from source scans to runtime checks in #733
  * tranche 7a: the component is called directly and the element
  * it returns is inspected — in this (web) test environment it
- * is the growing column carrying the main role props. The
+ * is the growing column carrying the main role props. #746:
+ * MainLandmark composes Col, so the inspection captures
+ * through Col to the stack it renders — the prop-capture form
+ * for a composed root (the column direction is the rendered
+ * stack's own nature and no longer a passed prop). The
  * native branch (flex: 1) cannot be observed from the web
  * harness and its former literal pins were deleted with the
  * scan; the shared `mainRoleProps` translation is covered by
@@ -46,9 +50,12 @@ test("MainLandmarkProps is a type-only export from the built components barrel",
 test("MainLandmark renders the growing web column with the main role and its children", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   const element = dist.MainLandmark({ children: "Page content" });
-  assert.equal(element.props.flexGrow, 1, "the web column grows with its content (#547)");
-  assert.equal(element.props.flexDirection, "column");
-  assert.equal(element.props.flex, undefined, "web must not pin flex: 1's zero basis");
-  assert.equal(element.props.role, "main", "the web main role rides the shared translation");
-  assert.equal(element.props.children, "Page content");
+  // Capture through the Col MainLandmark composes (#746) to the
+  // stack it renders: the landmark's contract lives in the
+  // resolved stack props.
+  const stack = dist.Col(element.props);
+  assert.equal(stack.props.flexGrow, 1, "the web column grows with its content (#547)");
+  assert.equal(stack.props.flex, undefined, "web must not pin flex: 1's zero basis");
+  assert.equal(stack.props.role, "main", "the web main role rides the shared translation");
+  assert.equal(stack.props.children, "Page content");
 });

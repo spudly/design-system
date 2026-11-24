@@ -24,7 +24,7 @@ export type LoadingActionCardRowProps = {
  */
 export function LoadingActionCardRow({ accessibilityLabel, children }: LoadingActionCardRowProps) {
   return (
-    <Card variant="elevated" flexDirection="row" alignItems="center" gap={tokens.spacing[3]}>
+    <Card variant="elevated" flexDirection="row" alignItems="center" gap="m">
       <YStack flex={1} minWidth={0} gap={tokens.spacing[1]}>
         <TextSkeleton size="md" lines={1} />
         <TextSkeleton size="sm" lines={1} />

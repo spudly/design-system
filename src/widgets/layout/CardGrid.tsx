@@ -1,6 +1,6 @@
 import { Children, cloneElement, isValidElement } from "react";
 import type { ReactElement, ReactNode } from "react";
-import { XStack } from "tamagui";
+import { Row } from "./Row.js";
 import { tokens } from "../../tokens/index.js";
 
 export type CardGridProps = {
@@ -19,7 +19,7 @@ export type CardGridProps = {
  */
 export function CardGrid({ children }: CardGridProps) {
   return (
-    <XStack flexWrap="wrap" gap={tokens.spacing[3]}>
+    <Row wrap gap="m">
       {Children.map(children, (child) =>
         isValidElement(child)
           ? cloneElement(
@@ -32,6 +32,6 @@ export function CardGrid({ children }: CardGridProps) {
             )
           : child,
       )}
-    </XStack>
+    </Row>
   );
 }

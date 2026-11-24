@@ -1,16 +1,8 @@
-import { YStack, isWeb, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { isWeb } from "tamagui";
+import { Col } from "./Col.js";
+import type { ColProps } from "./Col.js";
 
-const StyledScreenShell = styled(YStack, {
-  name: "ScreenShell",
-
-  flex: 1,
-  backgroundColor: "$surface",
-});
-
-type StyledScreenShellProps = GetProps<typeof StyledScreenShell>;
-
-export type ScreenShellProps = Omit<StyledScreenShellProps, "flex" | "backgroundColor">;
+export type ScreenShellProps = Omit<ColProps, "backgroundColor">;
 
 /**
  * The fixed-shell screen frame (#119): a full-height,
@@ -22,7 +14,7 @@ export type ScreenShellProps = Omit<StyledScreenShellProps, "flex" | "background
  * chrome, then the scroll region, then any pinned footer.
  *
  * Platform split (#547, Stephen's page-scroll model): on native
- * the styled frame's `flex: 1` makes the shell fill the bounded
+ * the frame's `flex: 1` makes the shell fill the bounded
  * frame BigFooterShell's "content" mode gives it, and the
  * ScrollRegion inside is the page's single scroller. On web the
  * page has no bounded frame — the document scrolls — so the
@@ -35,10 +27,14 @@ export type ScreenShellProps = Omit<StyledScreenShellProps, "flex" | "background
  * through ScrollShell, rendered their footer at the top of a
  * multi-viewport document). The surface paint is the shell's
  * on both platforms.
+ *
+ * #746 (Option B): both branches render Col — the native
+ * branch's flex: 1 is the plan's `grow shrink` translation.
+ * No styled root.
  */
 export function ScreenShell({ ...rest }: ScreenShellProps) {
   if (isWeb) {
-    return <YStack flexGrow={1} flexDirection="column" backgroundColor="$surface" {...rest} />;
+    return <Col grow backgroundColor="$surface" {...rest} />;
   }
-  return <StyledScreenShell {...rest} />;
+  return <Col grow shrink backgroundColor="$surface" {...rest} />;
 }
