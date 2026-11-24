@@ -4,7 +4,6 @@ import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { Center } from "../../widgets/layout/Center.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { SpacedTopStack } from "../../widgets/layout/SpacedTopStack.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { EqualColumns } from "../../widgets/form/EqualColumns.js";
@@ -243,11 +242,9 @@ export function NutritionGoalsForm({
         </>
       )}
       {error && !showSkeleton ? <Alert severity="error" message={error} /> : null}
-      <SpacedTopStack>
-        <Button variant="primary" disabled={saving} onPress={onSave}>
-          {voice.nutritionGoalsForm.saveLabel}
-        </Button>
-      </SpacedTopStack>
+      <Button variant="primary" disabled={saving} onPress={onSave}>
+        {voice.nutritionGoalsForm.saveLabel}
+      </Button>
     </SectionCard>
   );
 }

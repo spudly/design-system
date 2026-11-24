@@ -2,7 +2,6 @@ import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { Center } from "../../widgets/layout/Center.js";
-import { StartStack } from "../../widgets/layout/StartStack.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
@@ -120,7 +119,7 @@ export function SubscriptionView({
           </>
         )}
         {onManage || onRefresh || portalUrl ? (
-          <StartStack>
+          <Col left gap="s">
             {onManage ? (
               <Button variant="primary" disabled={managePending} onPress={onManage}>
                 {managePending ? managePendingLabel : manageLabel}
@@ -145,7 +144,7 @@ export function SubscriptionView({
                 <TextLink href={portalUrl}>{portalLabel}</TextLink>
               )
             ) : null}
-          </StartStack>
+          </Col>
         ) : null}
       </Col>
     </SectionCard>

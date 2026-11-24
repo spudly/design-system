@@ -1,10 +1,10 @@
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { Card } from "../../widgets/layout/Card.js";
 import { CommentItem } from "./CommentItem.js";
-import { EndRow } from "../../widgets/layout/EndRow.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { useVoice } from "../../voice/index.js";
@@ -181,7 +181,7 @@ export function RecipeCommentsView({
               placeholder={composerPlaceholder}
               numberOfLines={3}
             />
-            <EndRow>
+            <Row right>
               <Button
                 variant="primary"
                 size="sm"
@@ -190,7 +190,7 @@ export function RecipeCommentsView({
               >
                 {postLabel}
               </Button>
-            </EndRow>
+            </Row>
           </Col>
         ) : null}
       </Col>

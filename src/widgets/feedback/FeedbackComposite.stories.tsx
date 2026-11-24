@@ -5,8 +5,8 @@ import { BrandLink } from "../actions/BrandLink.js";
 import { TextLink } from "../actions/TextLink.js";
 import { Text } from "../data/Text.js";
 import { Col } from "../layout/Col.js";
+import { Row } from "../layout/Row.js";
 import { Alert } from "./Alert.js";
-import { BannerRow } from "./BannerRow.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { ChangedListBanner } from "./ChangedListBanner.js";
 import { CheckboxSkeletonRow } from "./CheckboxSkeletonRow.js";
@@ -50,10 +50,10 @@ const noop = () => {};
 export const Messaging: Story = {
   render: () => (
     <YStack maxWidth={430} gap={16}>
-      <BannerRow>
+      <Row middle between gap="l">
         <BrandLink label="Eciperay" href="/" />
         <TextLink href="/sign-in">Sign in</TextLink>
-      </BannerRow>
+      </Row>
       <Alert severity="info">Syncing your recipes with the cloud…</Alert>
       <Alert severity="success">Recipe saved! Nice work.</Alert>
       <Alert severity="warning">You have 3 recipes with missing photos.</Alert>

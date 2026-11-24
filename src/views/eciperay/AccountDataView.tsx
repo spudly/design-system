@@ -1,7 +1,7 @@
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
-import { CompactRow } from "../../widgets/layout/CompactRow.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
 import { SectionMutedText } from "./SectionMutedText.js";
@@ -72,7 +72,7 @@ export function AccountDataView({
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
       <Col gap="m">
         <SectionMutedText loading={showSkeleton} text={description} />
-        <CompactRow>
+        <Row middle wrap gap="s">
           {onExportData ? (
             <Button variant="secondary" disabled={exportPending} onPress={onExportData}>
               {exportPending ? exportPendingLabel : exportLabel}
@@ -83,7 +83,7 @@ export function AccountDataView({
               {deletePending ? deletePendingLabel : deleteLabel}
             </Button>
           ) : null}
-        </CompactRow>
+        </Row>
         {error && !showSkeleton ? <Text variant="error">{error}</Text> : null}
       </Col>
     </SectionCard>

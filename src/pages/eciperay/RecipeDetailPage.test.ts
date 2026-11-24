@@ -166,7 +166,7 @@ test("there are no tabs: every section renders in one scroll, in tab order, unde
   // panels render in tab order in the page body, and each
   // section's heading sits inside its own panel (the canonical
   // SectionHeading carries no padding of its own, so it renders
-  // inside the PanelStack whose inset it takes — the panel
+  // inside the panel Col whose inset it takes — the panel
   // definitions precede the page body, and Nutrition's section
   // stack is composed in the body, its heading before the panel).
   const sequence = [

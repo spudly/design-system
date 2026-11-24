@@ -19,7 +19,6 @@ import {
 } from "../../widgets/data/NutritionPanel.js";
 import { NumberStepper } from "../../widgets/form/NumberStepper.js";
 import { Col } from "../../widgets/layout/Col.js";
-import { PanelStack } from "../../widgets/layout/PanelStack.js";
 import {
   PresetValueSelector,
   type PresetValueOption,
@@ -143,7 +142,7 @@ import { STATUS_BADGES } from "../shared/recipeStatusBadges.js";
  *
  * The #119 de-styling pass (this tranche) rebuilt the page as a
  * composition of design-system components — ScreenShell + Toolbar
- * chrome over a ScrollRegion, PanelStack panels, and the widgets
+ * chrome over a ScrollRegion, panel Cols, and the widgets
  * extracted from this page's clusters (RatingsCard, NutritionPanel,
  * CandidateList, LogEntryCard, StepList, MarkableRow,
  * PresetValueSelector, SuggestionPanel, SectionHeading, StatusMessage)
@@ -152,7 +151,8 @@ import { STATUS_BADGES } from "../shared/recipeStatusBadges.js";
  * components — the deduped set in the #119 dedupe (#320), the
  * five this page's clusters still owned (PanelStack, Toolbar,
  * CandidateList, LogEntryCard, NutritionPanel) in the #119
- * extraction set (#331) — and the page now composes those; the
+ * extraction set (#331) — and the page now composes those
+ * (PanelStack as a panel Col since #746); the
  * chip components the first extraction leaned on were retired
  * in the dedupe, so the page's chip-shaped actions render as
  * Buttons. The pass is a refactor, not a redesign; the treatment
@@ -173,7 +173,7 @@ import { STATUS_BADGES } from "../shared/recipeStatusBadges.js";
  *   mounted unconditionally so its polite live region announces
  *   the change (#318); the pass first rendered it as a
  *   conditional static centered line, which never announced.
- * - Panel block separations are PanelStack's 16px rhythm: the
+ * - Panel block separations are the panel Col's 16px rhythm: the
  *   servings → scale separation (12px) and the missing-ingredients
  *   hint's offset (12px) normalize to it, as does the last
  *   cook-log entry's trailing separation (a per-entry bottom
@@ -584,7 +584,7 @@ function VersionPicker({
  * of an editable version, over the activation candidates. Both
  * blocks are design-system compositions (a ButtonRow of Buttons,
  * a CandidateList); their separation — and theirs from the blocks
- * around them — is the overview PanelStack's gap. The actions
+ * around them — is the overview panel Col's gap. The actions
  * were chips in the page's first extraction; the #119 dedupe
  * retired the chip components (buttons everywhere), so they
  * render as small Buttons — "Mark perfected" in the neutral
@@ -668,7 +668,7 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
   const { imageUrl, title, description, servingsLabel, categoryLabel, totalTimeLabel } = overview;
 
   return (
-    <PanelStack>
+    <Col gap="l" p="l">
       {imageUrl ? <Thumbnail variant="hero" src={imageUrl} /> : null}
       <MetadataBadge
         parts={[
@@ -679,7 +679,7 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
       />
       <Text variant="display">{title}</Text>
       {description ? <Text variant="body">{description}</Text> : null}
-    </PanelStack>
+    </Col>
   );
 }
 
@@ -695,7 +695,7 @@ function OverviewPanel({ overview }: { overview: RecipeDetailPageOverviewProps }
 function StartCookingPanel({ overview }: { overview: RecipeDetailPageOverviewProps }) {
   const { cookingHref, cookingTipLabel } = overview;
   return (
-    <PanelStack>
+    <Col gap="l" p="l">
       <ButtonRow>
         <Button variant="primary" grow borderRadius={tokens.radii.full} href={cookingHref}>
           Start Cooking
@@ -706,7 +706,7 @@ function StartCookingPanel({ overview }: { overview: RecipeDetailPageOverviewPro
           {cookingTipLabel}
         </CenteredText>
       ) : null}
-    </PanelStack>
+    </Col>
   );
 }
 
@@ -781,7 +781,7 @@ function DetailsPanel({
     onDeletePress !== undefined;
 
   return (
-    <PanelStack>
+    <Col gap="l" p="l">
       <StatBand>
         <StatCard label="Servings" value={servingsLabel} />
         {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
@@ -897,7 +897,7 @@ function DetailsPanel({
         <RatingsCard ratings={ratings} onViewerRatingChange={onViewerRatingChange} />
       ) : null}
       {comments}
-    </PanelStack>
+    </Col>
   );
 }
 
@@ -912,7 +912,7 @@ function IngredientsPanel({
 }) {
   const hasMissing = view.ingredients.some((ingredient) => ingredient.isMissing);
   return (
-    <PanelStack>
+    <Col gap="l" p="l">
       <SectionHeading icon="list">Ingredients</SectionHeading>
       <Col>
         {view.ingredients.map((ingredient) => (
@@ -932,7 +932,7 @@ function IngredientsPanel({
         ))}
       </Col>
       {hasMissing ? <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text> : null}
-    </PanelStack>
+    </Col>
   );
 }
 
@@ -948,7 +948,7 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
     [instructions],
   );
   return (
-    <PanelStack>
+    <Col gap="l" p="l">
       <SectionHeading>Instructions</SectionHeading>
       <StepList
         presentation="numeral"
@@ -959,7 +959,7 @@ function InstructionsPanel({ instructions }: { instructions: RecipeDetailPageIns
           number: step.stepNumber,
         }))}
       />
-    </PanelStack>
+    </Col>
   );
 }
 
@@ -986,7 +986,7 @@ function HistoryPanel({
     // action kept as an inert skeleton Button when the host
     // wires it, as the loaded cards render it).
     return (
-      <PanelStack>
+      <Col gap="l" p="l">
         <SectionHeading>Cook History</SectionHeading>
         {LOADING_COOK_LOG_KEYS.map((key, index) => (
           <LogEntryCard
@@ -1003,7 +1003,7 @@ function HistoryPanel({
               : {})}
           />
         ))}
-      </PanelStack>
+      </Col>
     );
   }
 
@@ -1027,7 +1027,7 @@ function HistoryPanel({
   ) : null;
 
   return (
-    <PanelStack>
+    <Col gap="l" p="l">
       <SectionHeading>Cook History</SectionHeading>
       {form !== null && form !== undefined ? (
         form
@@ -1058,7 +1058,7 @@ function HistoryPanel({
           />
         ))
       )}
-    </PanelStack>
+    </Col>
   );
 }
 
@@ -1089,31 +1089,31 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
               <BoxSkeleton width={180} height={40} />
             </Toolbar>
             <ScrollRegion>
-              <PanelStack>
+              <Col gap="l" p="l">
                 <BoxSkeleton aspectRatio={4 / 3} />
                 <TextSkeleton size="2xl" lines={1} />
                 <TextSkeleton size="md" lines={3} />
                 <StatBand loading>
                   <StatCard value="" label="" />
                 </StatBand>
-              </PanelStack>
-              <PanelStack>
+              </Col>
+              <Col gap="l" p="l">
                 <SectionHeading>Ingredients</SectionHeading>
                 <TextSkeleton size="md" lines={4} />
-              </PanelStack>
-              <PanelStack>
+              </Col>
+              <Col gap="l" p="l">
                 <SectionHeading>Instructions</SectionHeading>
                 <BoxSkeleton height={96} />
                 <BoxSkeleton height={96} />
-              </PanelStack>
-              <PanelStack>
+              </Col>
+              <Col gap="l" p="l">
                 <SectionHeading>Cook History</SectionHeading>
                 <TextSkeleton size="md" lines={3} />
-              </PanelStack>
-              <PanelStack>
+              </Col>
+              <Col gap="l" p="l">
                 <SectionHeading>Nutrition</SectionHeading>
                 <TextSkeleton size="md" lines={3} />
-              </PanelStack>
+              </Col>
             </ScrollRegion>
           </ScreenShell>
         </LoadingScope>
@@ -1141,14 +1141,14 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
           />
           <HistoryPanel history={props.history} selectedVersionId={selectedVersionId} />
           {/* The section headings render inside their panels as the
-            PanelStack's first block (the canonical SectionHeading
+            panel Col's first block (the canonical SectionHeading
             carries no padding of its own — the panel's inset is
             the heading's). NutritionPanel is a bare widget, so its
             section stack is composed here. */}
-          <PanelStack>
+          <Col gap="l" p="l">
             <SectionHeading>Nutrition</SectionHeading>
             <NutritionPanel nutrition={props.nutrition} />
-          </PanelStack>
+          </Col>
         </ScrollRegion>
       </ScreenShell>
       {props.recipeDeleteConfirmation ? (

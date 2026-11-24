@@ -70,10 +70,8 @@ export {
   type SearchHelpEntry,
   type SearchHelpPopoverProps,
 } from "./overlays/SearchHelpPopover.js";
-export { HeroStack, type HeroStackProps } from "./layout/HeroStack.js";
 export { StackedButtonRow, type StackedButtonRowProps } from "./actions/StackedButtonRow.js";
 export { CardGrid, type CardGridProps } from "./layout/CardGrid.js";
-export { BannerRow, type BannerRowProps } from "./feedback/BannerRow.js";
 export { ProseColumn, type ProseColumnProps } from "./layout/ProseColumn.js";
 export { BulletList, type BulletListProps } from "./data/BulletList.js";
 export { ChatTranscript, type ChatTranscriptProps } from "./content/ChatTranscript.js";
@@ -169,7 +167,6 @@ export {
   type NutritionPanelData,
   type NutritionPanelProps,
 } from "./data/NutritionPanel.js";
-export { PanelStack, type PanelStackProps } from "./layout/PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./content/PreviewCard.js";
 export { StepOverlay, type StepOverlayProps } from "./overlays/StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./actions/Toolbar.js";
@@ -193,9 +190,6 @@ export {
   type LayoutSize,
   type ResolvedLayoutStyle,
 } from "./layout.js";
-export { EndRow, type EndRowProps } from "./layout/EndRow.js";
-export { CompactRow, type CompactRowProps } from "./layout/CompactRow.js";
-export { Grow, type GrowProps } from "./layout/Grow.js";
 export { FramedScrollRegion, type FramedScrollRegionProps } from "./layout/FramedScrollRegion.js";
 export { DashedPlaceholder, type DashedPlaceholderProps } from "./content/DashedPlaceholder.js";
 export { OverlayTextPanel, type OverlayTextPanelProps } from "./content/OverlayTextPanel.js";
@@ -222,9 +216,5 @@ export { LegalSection, type LegalSectionProps } from "./content/LegalSection.js"
 export { RatingForm, type RatingFormProps } from "./form/RatingForm.js";
 // The #698 tranche-4 extraction set: the layout and panel
 // components the remaining views' de-styling extracted.
-export { CenteredRow, type CenteredRowProps } from "./layout/CenteredRow.js";
-export { StartStack, type StartStackProps } from "./layout/StartStack.js";
-export { ListHeaderStack, type ListHeaderStackProps } from "./layout/ListHeaderStack.js";
 export { SkeletonPanel, type SkeletonPanelProps } from "./feedback/SkeletonPanel.js";
-export { SpacedTopStack, type SpacedTopStackProps } from "./layout/SpacedTopStack.js";
 export { CreatedSecretPanel, type CreatedSecretPanelProps } from "./content/CreatedSecretPanel.js";

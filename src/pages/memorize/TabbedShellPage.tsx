@@ -1,11 +1,11 @@
 import type { ReactNode } from "react";
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { Row } from "../../widgets/layout/Row.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Tabs } from "../../widgets/actions/Tabs.js";
 import type { IconName } from "../../icons/iconRegistry.js";
 import { AppTopBar } from "../../widgets/layout/AppTopBar.js";
 import { LazySlot } from "../../views/shared/LazySlot.js";
-import { BannerRow } from "../../widgets/feedback/BannerRow.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { StatusMessage } from "../../views/shared/StatusMessage.js";
 
@@ -125,7 +125,7 @@ type TabbedShellPageBaseProps = {
    * plus an optional recovery action ({ label, onPress } — a
    * callback, never an href, per #248). When present it renders
    * between the top bar / tab bar and the content slot via
-   * BannerRow / StatusMessage (the polite live region announces
+   * the banner Row / StatusMessage (the polite live region announces
    * it); the tab content stays mounted underneath. When absent,
    * no notice renders and the shell is unchanged.
    */
@@ -238,12 +238,12 @@ export function TabbedShellPage(props: TabbedShellPageProps) {
         <AppTopBar brand={{ label: title }} />
         {tabBar}
         {notice ? (
-          <BannerRow>
+          <Row middle between gap="l">
             <StatusMessage message={notice.message} />
             {notice.action ? (
               <Button onPress={notice.action.onPress}>{notice.action.label}</Button>
             ) : null}
-          </BannerRow>
+          </Row>
         ) : null}
         {content !== undefined ? (
           <LazySlot

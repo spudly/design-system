@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Center } from "../../widgets/layout/Center.js";
 import { FieldRow } from "../../widgets/form/FieldRow.js";
-import { Grow } from "../../widgets/layout/Grow.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { useVoice } from "../../voice/index.js";
@@ -76,7 +76,7 @@ export function RecipeInstructionRowView({
       <Center horizontal={false}>
         <Text variant="muted">{`${position}.`}</Text>
       </Center>
-      <Grow>
+      <Col grow>
         <TextAreaField
           accessibilityLabel={voice.recipeInstructionRowView.stepLabel(position)}
           readOnly={onBodyChange === undefined}
@@ -86,7 +86,7 @@ export function RecipeInstructionRowView({
             onBodyChange?.(row.key, value);
           }}
         />
-      </Grow>
+      </Col>
       {onRemove ? (
         <Button
           variant="danger"

@@ -85,7 +85,8 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    const shellModule: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
+    const shellModule: Record<string, any> =
+      await import("../../../dist/widgets/content/BigFooter.js");
     const { TabbedShellPage }: Record<string, any> =
       await import("../../../dist/pages/memorize/TabbedShellPage.js");
     const distViews: Record<string, any> = await import("../../../dist/views/index.js");
@@ -324,7 +325,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
     },
   });
   const noticeEl = withNotice.props.children.props.children[2];
-  assert.equal(noticeEl.type, distWidgets.BannerRow, "the notice renders through BannerRow");
+  assert.equal(noticeEl.type, distWidgets.Row, "the notice renders through the banner Row (#746)");
   const [messageEl, actionEl] = noticeEl.props.children;
   assert.equal(
     messageEl.type,

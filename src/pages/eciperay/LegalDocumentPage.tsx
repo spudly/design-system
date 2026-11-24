@@ -1,8 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import type { ReactNode } from "react";
-import { BannerRow } from "../../widgets/feedback/BannerRow.js";
 import { BrandLink } from "../../widgets/actions/BrandLink.js";
 import { BulletList } from "../../widgets/data/BulletList.js";
+import { Row } from "../../widgets/layout/Row.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { ProseColumn } from "../../widgets/layout/ProseColumn.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
@@ -61,7 +61,7 @@ import { useVoice } from "../../voice/index.js";
  * page — the model types live here under the page's public
  * names, so the contract below is unchanged. The renderer's
  * layout primitives are no longer page-local (#119 tranche 2):
- * the banner row is BannerRow, the prose column is
+ * the banner row is a Row (middle, between, gap l), the prose column is
  * ProseColumn, the title block and each section are
  * a Col at gap m, and list blocks are BulletList — only the span
  * and block rendering stays in this page.
@@ -173,10 +173,10 @@ export function LegalDocumentPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <BannerRow {...bannerRoleProps}>
+        <Row middle between gap="l" {...bannerRoleProps}>
           <BrandLink label={brandLabel} href={brandHref} />
           <TextLink href={signInHref}>{signInLabel}</TextLink>
-        </BannerRow>
+        </Row>
         <ProseColumn {...mainRoleProps}>
           <Col gap="m">
             <Text variant="heading">{title}</Text>

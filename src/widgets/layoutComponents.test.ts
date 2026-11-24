@@ -18,15 +18,16 @@
  *   #476: field and button render at one height; SearchRow,
  *   which differed only in that stretch, was consolidated
  *   into it — #481).
- * - PanelStack: a section panel's blocks — padding and gap both
- *   spacing[4] (16px), stretch.
  * - Center: centers a single child — boolean `horizontal` /
  *   `vertical`, both defaulting to true, plus the semantic
  *   `fill` variant (grow to the parent's offered height).
  * #746 (2026-11-24) eliminated the style-only stack wrappers
- * (CardStack, SectionStack, ListStack, ButtonStack, FormStack,
- * and the rest of the rhythm family): their consumers compose
- * Col directly with the matching t-shirt gap, and the export
+ * (the rhythm family — CardStack, SectionStack, ListStack,
+ * ButtonStack, FormStack, and the rest — and the alignment /
+ * special family: BannerRow, CenteredRow, CompactRow, EndRow,
+ * StartStack, PanelStack, HeroStack, ListHeaderStack,
+ * SpacedTopStack, Grow): their consumers compose Row / Col
+ * directly with the matching semantic props, and the export
  * pins below hold that the wrappers do not survive as API.
  * The pins hold each remaining component's treatment, its Omit of the
  * style keys it owns, SearchField's `grow` (the other half
@@ -59,7 +60,6 @@ function code(file: string) {
 
 const buttonRowCode = code("actions/ButtonRow.tsx");
 const fieldRowCode = code("form/FieldRow.tsx");
-const panelStackCode = code("layout/PanelStack.tsx");
 const centerCode = code("layout/Center.tsx");
 const textFieldSource = readFileSync(join(componentsDir, "form/TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(componentsDir, "form/SearchField.tsx"), "utf8");
@@ -68,7 +68,7 @@ const buttonCode = code("actions/Button.tsx");
 
 test("the layout components are exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  for (const name of ["ButtonRow", "FieldRow", "PanelStack", "Center"]) {
+  for (const name of ["ButtonRow", "FieldRow", "Center"]) {
     assert.equal(
       typeof dist[name],
       "function",
@@ -109,6 +109,16 @@ test("the layout components are exported from the built internal components barr
     "ProseStack",
     "SectionStack",
     "TightStack",
+    "BannerRow",
+    "CenteredRow",
+    "CompactRow",
+    "EndRow",
+    "StartStack",
+    "PanelStack",
+    "HeroStack",
+    "ListHeaderStack",
+    "SpacedTopStack",
+    "Grow",
   ]) {
     assert.equal(
       dist[name],
@@ -155,13 +165,6 @@ test("FieldRow's field types fill the row height on their grow path (#476)", () 
   assert.match(selectFieldCode, /<StyledTrigger\s+\{\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)\}/);
 });
 
-test("PanelStack owns the section panel's inset and block rhythm", () => {
-  assert.match(panelStackCode, /styled\(YStack, \{\s+name: "PanelStack",/);
-  assert.match(panelStackCode, /padding: tokens\.spacing\[4\],\s+gap: tokens\.spacing\[4\],/);
-  assert.match(panelStackCode, /alignItems: "stretch",/);
-  assert.match(panelStackCode, /Omit<StyledPanelStackProps, "padding" \| "gap" \| "alignItems">/);
-});
-
 test("Center centers a single child on boolean dimensions, with a semantic fill variant", () => {
   assert.match(centerCode, /styled\(YStack, \{\s+name: "Center",/);
   assert.match(centerCode, /horizontal: \{\s+true: \{ alignItems: "center" \},/);
@@ -182,7 +185,6 @@ test("no layout component offers step, role, or margin props", () => {
   for (const [name, src] of [
     ["ButtonRow", buttonRowCode],
     ["FieldRow", fieldRowCode],
-    ["PanelStack", panelStackCode],
   ]) {
     for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {
       assert.ok(
