@@ -75,7 +75,7 @@ test("form components render their form-level error through Alert (assertive)", 
   // The four auth forms render their error through the shared
   // AuthFormSubmit tail since the #587 phase-2 dedupe — the tail
   // carries the Alert rendering for them.
-  const authFormSubmit = read("src/views/AuthFormSubmit.tsx");
+  const authFormSubmit = read("src/views/eciperay/AuthFormSubmit.tsx");
   assert.ok(
     authFormSubmit.includes(ERROR_ALERT),
     `AuthFormSubmit renders its error via Alert severity="error"`,

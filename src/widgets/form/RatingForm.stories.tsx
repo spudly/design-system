@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { RatingForm } from "./RatingForm.js";
-import { StoryFrame } from "../../views/storyFrame.js";
+import { StoryFrame } from "../../views/shared/storyFrame.js";
 
 const meta: Meta<typeof RatingForm> = {
   title: "Widgets/Form/RatingForm",

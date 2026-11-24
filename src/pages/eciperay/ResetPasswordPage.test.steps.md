@@ -1,7 +1,7 @@
 ---
 component: ResetPasswordPage
 run_when:
-  - "src/pages/eciperay/SignInPage.tsx, src/pages/eciperay/SignUpPage.tsx, src/pages/eciperay/ForgotPasswordPage.tsx, src/pages/eciperay/ResetPasswordPage.tsx, the form components they compose (src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx), their stories, or a changeset naming the auth pages or Enter-to-submit."
+  - "src/pages/eciperay/SignInPage.tsx, src/pages/eciperay/SignUpPage.tsx, src/pages/eciperay/ForgotPasswordPage.tsx, src/pages/eciperay/ResetPasswordPage.tsx, the form components they compose (src/views/eciperay/SignInForm.tsx, src/views/eciperay/SignUpForm.tsx, src/views/eciperay/ForgotPasswordForm.tsx, src/views/eciperay/ResetPasswordForm.tsx), their stories, or a changeset naming the auth pages or Enter-to-submit."
 ---
 
 # ResetPasswordPage — manual test steps
@@ -56,8 +56,8 @@ submit switches the page to its loading state, and a
 **Run when:** `src/pages/eciperay/SignInPage.tsx`,
 `src/pages/eciperay/SignUpPage.tsx`, `src/pages/eciperay/ForgotPasswordPage.tsx`,
 `src/pages/eciperay/ResetPasswordPage.tsx`, the form components they
-compose (`src/views/SignInForm.tsx`,
-`src/views/SignUpForm.tsx`,
-`src/views/ForgotPasswordForm.tsx`,
-`src/views/ResetPasswordForm.tsx`), their stories, or a
+compose (`src/views/eciperay/SignInForm.tsx`,
+`src/views/eciperay/SignUpForm.tsx`,
+`src/views/eciperay/ForgotPasswordForm.tsx`,
+`src/views/eciperay/ResetPasswordForm.tsx`), their stories, or a
 changeset naming the auth pages or Enter-to-submit.

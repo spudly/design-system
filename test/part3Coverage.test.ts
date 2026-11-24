@@ -146,13 +146,13 @@ test("CookingModePage composes StepOverlay with the ingredients accessory; StepO
 });
 
 test("ConfirmActionView locks dismissal while pending", () => {
-  const source = read("src/views/ConfirmActionView.tsx");
+  const source = read("src/views/eciperay/ConfirmActionView.tsx");
   assert.match(source, /if \(!next && pending\)/);
   assert.match(source, /confirmTone = "danger"/);
 });
 
 test("review round: explicit error states, href home control, negative step guard, nested scrolling", () => {
-  const comments = read("src/views/RecipeCommentsView.tsx");
+  const comments = read("src/views/eciperay/RecipeCommentsView.tsx");
   assert.match(comments, /error\?: string \| null/);
   assert.match(comments, /<Alert severity="error" message=\{error\} \/>/);
   // The error branch precedes the empty branch in one ternary chain, so
@@ -161,7 +161,7 @@ test("review round: explicit error states, href home control, negative step guar
     comments,
     /: error \? \(\s*<Alert severity="error" message=\{error\} \/>\s*\) : comments\.length === 0 \? \(\s*<Text variant="muted">\{emptyMessage\}<\/Text>/,
   );
-  const picker = read("src/views/RecipeExportPickerView.tsx");
+  const picker = read("src/views/eciperay/RecipeExportPickerView.tsx");
   assert.match(picker, /error\?: string \| null/);
   assert.match(picker, /<Alert severity="error" message=\{error\} \/>/);
   // Same precedence: the list (and its empty message) renders only in the

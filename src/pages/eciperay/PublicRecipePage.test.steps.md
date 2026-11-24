@@ -6,8 +6,8 @@ run_when:
   - "src/widgets/layout/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
   - "src/widgets/data/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
   - "src/pages/eciperay/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, StepList), or a changeset naming PublicRecipePage."
-  - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
-  - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
+  - "src/views/eciperay/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
+  - "src/views/eciperay/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
   - "src/widgets/data/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."---
 
 # PublicRecipePage — manual test steps
@@ -171,7 +171,7 @@ Open in `Widgets/RecipeOverviewPanel`: Default, Minimal.
    the "Idea" pill, and the Servings stat only — no
    description, Prep/Cook stats, or tag row.
 
-**Run when:** `src/views/RecipeOverviewPanel.tsx`, its
+**Run when:** `src/views/eciperay/RecipeOverviewPanel.tsx`, its
 stories, PublicRecipePage, RecipeDetailPage, or a changeset
 naming RecipeOverviewPanel.
 
@@ -191,7 +191,7 @@ Open in `Views/RecipeIngredientsPanel`: Default, Plain.
 2. Plain: two unadorned rows with hairline separators and no
    substitutions panel.
 
-**Run when:** `src/views/RecipeIngredientsPanel.tsx`,
+**Run when:** `src/views/eciperay/RecipeIngredientsPanel.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeIngredientsPanel.
 

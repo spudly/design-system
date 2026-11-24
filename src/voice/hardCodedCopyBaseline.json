@@ -154,11 +154,11 @@
   "pages/memorize/VerseSearchPage.tsx|jsx|Search",
   "pages/memorize/VerseSearchPage.tsx|jsx|Search verses",
   "pages/memorize/VerseSearchPage.tsx|jsx|Searching the built-in demo set. Add a gospel-engine API key in Settings for full-library search.",
-  "views/AccessTokensPanel.tsx|jsx|loading",
-  "views/CatalogFiltersBar.tsx|attr|Add a filter",
-  "views/CatalogFiltersBar.tsx|jsx|Filters",
-  "views/ChunkErrorBoundary.tsx|jsx|This section failed to load.",
-  "views/LogEntryCard.tsx|jsx|Delete",
+  "views/eciperay/AccessTokensPanel.tsx|jsx|loading",
+  "views/eciperay/CatalogFiltersBar.tsx|attr|Add a filter",
+  "views/eciperay/CatalogFiltersBar.tsx|jsx|Filters",
+  "views/shared/ChunkErrorBoundary.tsx|jsx|This section failed to load.",
+  "views/eciperay/LogEntryCard.tsx|jsx|Delete",
   "widgets/data/CandidateList.tsx|jsx|Activate",
   "widgets/feedback/Spinner.tsx|attr|Loading"
 ]

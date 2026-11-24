@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionStack } from "../../widgets/layout/SectionStack.js";
-import { SignInForm } from "../../views/SignInForm.js";
+import { SignInForm } from "../../views/eciperay/SignInForm.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
 

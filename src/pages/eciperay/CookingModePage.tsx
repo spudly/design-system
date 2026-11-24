@@ -1,6 +1,6 @@
 import { FullScreenShell } from "../../widgets/layout/FullScreenShell.js";
 import { StepOverlay } from "../../widgets/overlays/StepOverlay.js";
-import { ScaledIngredientsView } from "../../views/ScaledIngredientsView.js";
+import { ScaledIngredientsView } from "../../views/eciperay/ScaledIngredientsView.js";
 import { StepNavControls } from "../shared/StepNavControls.js";
 
 /**

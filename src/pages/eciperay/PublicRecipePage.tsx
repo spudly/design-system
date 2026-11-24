@@ -10,15 +10,15 @@ import { StatCard } from "../../widgets/data/StatCard.js";
 import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { MessageCard } from "../../widgets/content/MessageCard.js";
 import { RatingsCard } from "../../widgets/data/RatingsCard.js";
-import { RecipeIngredientsPanel } from "../../views/RecipeIngredientsPanel.js";
+import { RecipeIngredientsPanel } from "../../views/eciperay/RecipeIngredientsPanel.js";
 import { StepList } from "../../widgets/data/StepList.js";
-import { RecipeOverviewPanel } from "../../views/RecipeOverviewPanel.js";
+import { RecipeOverviewPanel } from "../../views/eciperay/RecipeOverviewPanel.js";
 import { ScrollShell } from "../../widgets/layout/ScrollShell.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import {
   RecipeCommentsView,
   type RecipeCommentsViewProps,
-} from "../../views/RecipeCommentsView.js";
+} from "../../views/eciperay/RecipeCommentsView.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,

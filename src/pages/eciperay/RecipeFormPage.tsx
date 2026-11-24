@@ -3,20 +3,20 @@ import type { ReactNode } from "react";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ChangedListBanner } from "../../widgets/feedback/ChangedListBanner.js";
-import { RecipeImageView, type RecipeImageViewProps } from "../../views/RecipeImageView.js";
+import { RecipeImageView, type RecipeImageViewProps } from "../../views/eciperay/RecipeImageView.js";
 import {
   RecipeIngredientListView,
   type RecipeIngredientListViewProps,
-} from "../../views/RecipeIngredientListView.js";
+} from "../../views/eciperay/RecipeIngredientListView.js";
 import {
   RecipeInstructionListView,
   type RecipeInstructionListViewProps,
-} from "../../views/RecipeInstructionListView.js";
+} from "../../views/eciperay/RecipeInstructionListView.js";
 import { EqualColumns } from "../../widgets/form/EqualColumns.js";
 import { FormStack } from "../../widgets/layout/FormStack.js";
 import { LabeledField } from "../../widgets/form/LabeledField.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
-import { RevertAction } from "../../views/RevertAction.js";
+import { RevertAction } from "../../views/eciperay/RevertAction.js";
 import { ScrollRegion } from "../../widgets/layout/ScrollRegion.js";
 import { TagList } from "../../widgets/data/TagList.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";

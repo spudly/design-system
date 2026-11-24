@@ -65,7 +65,7 @@ const page = readFileSync(join(root, "src/pages/eciperay/RecipeDetailPage.tsx"),
 // panel since the #331 extraction, so its control pins scan the
 // panel source (the page wires its view-model into the panel;
 // src/pages/eciperay/PublicRecipePage.test.ts pins that wiring).
-const ingredientsPanel = readFileSync(join(root, "src/views/RecipeIngredientsPanel.tsx"), "utf8");
+const ingredientsPanel = readFileSync(join(root, "src/views/eciperay/RecipeIngredientsPanel.tsx"), "utf8");
 
 test("NumberStepper layout is additive with stacked as the default", () => {
   assert.match(stepper, /layout\?: "stacked" \| "inline";/, "layout prop is declared");

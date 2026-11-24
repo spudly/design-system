@@ -10,10 +10,10 @@ import {
   CatalogFiltersBar,
   type CatalogFilterDefinition,
   type CatalogPageFilterProps,
-} from "../../views/CatalogFiltersBar.js";
-import { CatalogHeader } from "../../views/CatalogHeader.js";
+} from "../../views/eciperay/CatalogFiltersBar.js";
+import { CatalogHeader } from "../../views/eciperay/CatalogHeader.js";
 import { DiscoveryCard } from "../../widgets/content/DiscoveryCard.js";
-import { EmptyState } from "../../views/EmptyState.js";
+import { EmptyState } from "../../views/shared/EmptyState.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import type { SelectOption } from "../../widgets/form/SelectField.js";

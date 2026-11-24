@@ -308,14 +308,14 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   }
   // Spot-pin the renamed surfaces, plain and qualified.
   assert.match(read("src/widgets/form/CheckboxSelectList.tsx"), /\bloading\?: boolean/);
-  assert.match(read("src/views/AccessTokensPanel.tsx"), /\bloading\?: boolean/);
+  assert.match(read("src/views/eciperay/AccessTokensPanel.tsx"), /\bloading\?: boolean/);
   // RecipesPage's loading props are the qualified forms since
   // #415 (one per section of the unified page): loading +
   // qualifier, never isLoading.
   assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
   assert.match(read("src/pages/eciperay/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
   assert.match(read("src/pages/eciperay/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
-  assert.match(read("src/views/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
+  assert.match(read("src/views/eciperay/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
   assert.match(
     read("src/pages/eciperay/RecipeDetailPage.tsx"),
     /\bloadingSubstitutions\?: boolean/,
@@ -757,7 +757,7 @@ test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelec
   // LogEntryCard: the skeleton header mirrors the loaded header
   // row — a date bone (sm) in a 104-wide slot, and a 72x12 box
   // bone where the star rating sits.
-  const entry = readCode("src/views/LogEntryCard.tsx");
+  const entry = readCode("src/views/eciperay/LogEntryCard.tsx");
   assert.match(entry, /<YStack width=\{104\}>/, "the date bone sits in a 104-wide slot");
   assert.match(
     entry,
@@ -1754,10 +1754,10 @@ test("T3: the spinner views' spinners are gone; LazySlot's fallback is a skeleto
     const code = readCode(`src/views/${name}.tsx`);
     assert.doesNotMatch(code, /Spinner/, `${name} must not render a content-loading spinner`);
   }
-  const lazySlot = readCode("src/views/LazySlot.tsx");
+  const lazySlot = readCode("src/views/shared/LazySlot.tsx");
   assert.match(lazySlot, /BoxSkeleton/, "LazySlot's fallback renders box skeletons");
   assert.match(lazySlot, /TextSkeleton/, "LazySlot's fallback renders text skeletons");
-  const tokensPanel = readCode("src/views/AccessTokensPanel.tsx");
+  const tokensPanel = readCode("src/views/eciperay/AccessTokensPanel.tsx");
   assert.doesNotMatch(
     tokensPanel,
     /Loading tokens/,

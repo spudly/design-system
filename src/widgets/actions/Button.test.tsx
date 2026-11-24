@@ -440,7 +440,7 @@ describe("buttonNoStyleProps", () => {
   });
   test("CardRow and LogEntryCard use tone instead of style props (#480)", () => {
     assert.match(read("src/widgets/layout/CardRow.tsx"), /tone: "danger" as const/);
-    assert.match(read("src/views/LogEntryCard.tsx"), /tone="danger"/);
+    assert.match(read("src/views/eciperay/LogEntryCard.tsx"), /tone="danger"/);
   });
   test("Alert's dismiss ink uses only the internal Button form (#480)", () => {
     const alert = read("src/widgets/feedback/Alert.tsx");

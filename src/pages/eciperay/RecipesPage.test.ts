@@ -266,7 +266,7 @@ describe("recipesPageCollapsedFilters", () => {
       "RecipesPageFilterId must enumerate the five addable filters",
     );
     assert.match(code, /CatalogPageFilterProps<RecipesPageFilterId>/);
-    const barSource = readFileSync(join(here, "../../../src/views/CatalogFiltersBar.tsx"), "utf8");
+    const barSource = readFileSync(join(here, "../../../src/views/eciperay/CatalogFiltersBar.tsx"), "utf8");
     assert.match(barSource, /activeFilters\?: FilterId\[\];/);
     assert.match(barSource, /onActiveFiltersChange\?: \(filters: FilterId\[\]\) => void;/);
     assert.match(barSource, /filterChooserOpen\?: boolean;/);

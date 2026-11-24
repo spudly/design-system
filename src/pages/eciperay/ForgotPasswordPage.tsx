@@ -1,5 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
-import { ForgotPasswordForm } from "../../views/ForgotPasswordForm.js";
+import { ForgotPasswordForm } from "../../views/eciperay/ForgotPasswordForm.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";

@@ -358,7 +358,7 @@ describe("publicRecipePageAdoption", () => {
     // RecipeIngredientsPanel is a view since #737, not a widget.
     assert.ok(
       code.includes(
-        'import { RecipeIngredientsPanel } from "../../views/RecipeIngredientsPanel.js";',
+        'import { RecipeIngredientsPanel } from "../../views/eciperay/RecipeIngredientsPanel.js";',
       ),
       "the page imports the RecipeIngredientsPanel view",
     );
