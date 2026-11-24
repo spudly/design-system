@@ -43,8 +43,8 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
-const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+const root = join(here, "../../..");
+const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
 
 function codeOf(rel: string): string {
   const source = readFileSync(join(root, rel), "utf8");
@@ -136,7 +136,7 @@ test("the section's CollapsibleIcon sits to the left of the title (#458)", () =>
 });
 
 test("the section's indicator is the icons module's CollapsibleIcon (#250)", () => {
-  assert.match(section, /import \{ CollapsibleIcon \} from "\.\.\/icons\/CollapsibleIcon\.js"/);
+  assert.match(section, /import \{ CollapsibleIcon \} from "\.\.\/\.\.\/icons\/CollapsibleIcon\.js"/);
   assert.match(section, /<CollapsibleIcon isOpen=\{open\} size=\{20\}/);
   // The drawn-bars chevron it replaced is gone.
   assert.doesNotMatch(section, /SectionChevron/);

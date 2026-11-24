@@ -32,7 +32,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "overlays", "StepOverlay.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "widgets", "overlays", "StepOverlay.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("StepOverlay is exported from the built internal components barrel", async () => {
@@ -68,7 +68,7 @@ test("the body and navigation scroll in a bounded region; short bodies stay cent
   // step text keeps the #628 desktop measure even when the
   // shell's backdrop fills a full-width region (the cooking
   // pages' overlay mode).
-  assert.match(code, /import \{ PageContentColumn \} from "\.\/layout\/PageContentColumn\.js";/);
+  assert.match(code, /import \{ PageContentColumn \} from "\.\.\/layout\/PageContentColumn\.js";/);
   assert.match(
     code,
     /<PageContentColumn>\s*<YStack paddingHorizontal="\$6" paddingVertical="\$12">/,

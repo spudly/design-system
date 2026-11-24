@@ -7,11 +7,11 @@ import { fileURLToPath } from "node:url";
 
 describe("dialogFocusContainment", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const source = readFileSync(join(here, "../..", "src", "widgets", "overlays", "Dialog.tsx"), "utf8");
+  const source = readFileSync(join(here, "../../..", "src", "widgets", "overlays", "Dialog.tsx"), "utf8");
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
   test("Dialog is exported from the built internal components barrel", async () => {
-    const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+    const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
     assert.equal(
       typeof dist.Dialog,
       "function",
@@ -226,11 +226,11 @@ describe("dialogFocusContainment", () => {
 
 describe("dialogFocusRestore", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const source = readFileSync(join(here, "../..", "src", "widgets", "overlays", "Dialog.tsx"), "utf8");
+  const source = readFileSync(join(here, "../../..", "src", "widgets", "overlays", "Dialog.tsx"), "utf8");
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
   test("Dialog is exported from the built internal components barrel", async () => {
-    const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+    const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
     assert.equal(
       typeof dist.Dialog,
       "function",
@@ -467,13 +467,13 @@ describe("dialogModalRegistry", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const strip = (source: string) =>
     source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-  const read = (relative: any) => strip(readFileSync(join(here, "../..", relative), "utf8"));
+  const read = (relative: any) => strip(readFileSync(join(here, "../../..", relative), "utf8"));
   const registry = read("src/widgets/modalRegistry.ts");
   const dialog = read("src/widgets/overlays/Dialog.tsx");
   const overlay = read("src/widgets/overlays/StepOverlay.tsx");
 
   test("the modal registry is internal — not exported from the built internal components barrel (#394)", async () => {
-    const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+    const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
     assert.equal("registerModalLayer" in dist, false, "the registry must not be public API");
     assert.equal("ModalLayerContext" in dist, false, "the layer context must not be public API");
     assert.equal("isActiveModalLayer" in dist, false, "arbitration must not be public API");
@@ -590,7 +590,7 @@ describe("dialogModalRegistry", () => {
   // PR #398 (registrations minting their own symbols) passes
   // every source pin and fails here.
   test("registry behavior: simultaneously-open nested layers — the inner layer is active (#394 case 1)", async () => {
-    const registry: Record<string, any> = await import("../../dist/widgets/modalRegistry.js");
+    const registry: Record<string, any> = await import("../../../dist/widgets/modalRegistry.js");
     const parentToken = Symbol("parent");
     const childToken = Symbol("child");
     // Child effects run before parent effects on a simultaneous
@@ -622,7 +622,7 @@ describe("dialogModalRegistry", () => {
   });
 
   test("registry behavior: a Dialog inside a StepOverlay is above it; a covering StepOverlay is above a Dialog (#394 cases A and B)", async () => {
-    const registry: Record<string, any> = await import("../../dist/widgets/modalRegistry.js");
+    const registry: Record<string, any> = await import("../../../dist/widgets/modalRegistry.js");
     const overlayToken = Symbol("overlay");
     const dialogToken = Symbol("dialog");
     // Case A: the Dialog is composed inside the overlay and
@@ -652,7 +652,7 @@ describe("dialogModalRegistry", () => {
   });
 
   test("registry behavior: a re-presented ancestor cannot cycle the stacking order (CodeRabbit, PR #398)", async () => {
-    const registry: Record<string, any> = await import("../../dist/widgets/modalRegistry.js");
+    const registry: Record<string, any> = await import("../../../dist/widgets/modalRegistry.js");
     const parentToken = Symbol("parent");
     const childToken = Symbol("child");
     const unrelatedToken = Symbol("unrelated");
