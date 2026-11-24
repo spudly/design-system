@@ -12,7 +12,7 @@ import { SectionCard } from "../widgets/content/SectionCard.js";
 import { Text } from "../widgets/data/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
-import { CheckboxField } from "../widgets/CheckboxField.js";
+import { CheckboxField } from "../widgets/form/CheckboxField.js";
 import { useVoice } from "../voice/index.js";
 
 export type FeedbackPreferenceViewProps = {

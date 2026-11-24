@@ -200,7 +200,7 @@ test("page-level stack pressables route through the translator, never raw RN JSX
   }
 });
 test("CheckboxField list shape (ShoppingListPage's row) composes its accessible name from label + detail (#713)", () => {
-  const code = readCode("src/widgets/CheckboxField.tsx");
+  const code = readCode("src/widgets/form/CheckboxField.tsx");
   assert.match(
     code,
     /const accessibleName = detail \? `\$\{label\}, \$\{detail\}` : label;/,
@@ -284,7 +284,7 @@ test("ChecklistRow's Checkbox and ProgressBar's Progress route through the trans
 test("field/primitive wrappers destructure caller RN props out of rest and translate them (#237)", () => {
   // Compact split form: this file sits at the max-lines cap.
   const wrappers =
-    "src/widgets/form/TextField.tsx,src/widgets/form/TextAreaField.tsx,src/widgets/CheckboxField.tsx,src/widgets/actions/TextLink.tsx,src/widgets/content/OptionCard.tsx,src/widgets/feedback/Alert.tsx".split(
+    "src/widgets/form/TextField.tsx,src/widgets/form/TextAreaField.tsx,src/widgets/form/CheckboxField.tsx,src/widgets/actions/TextLink.tsx,src/widgets/content/OptionCard.tsx,src/widgets/feedback/Alert.tsx".split(
       ",",
     );
   for (const rel of wrappers) {

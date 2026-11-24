@@ -390,8 +390,8 @@ test("SearchField search icon is drawn shapes, not a text glyph, so it centers b
 });
 
 test("CheckboxField box clips its glyph with hidden overflow", () => {
-  const file = sources.find(({ posixPath }) => posixPath.endsWith("widgets/CheckboxField.tsx"));
-  assert.ok(file, "src/widgets/CheckboxField.tsx not found");
+  const file = sources.find(({ posixPath }) => posixPath.endsWith("widgets/form/CheckboxField.tsx"));
+  assert.ok(file, "src/widgets/form/CheckboxField.tsx not found");
   const block = styledBlock(stripComments(file.text), "CheckboxBox");
   assert.ok(
     /overflow:\s*"hidden"/.test(block),

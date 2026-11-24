@@ -20,7 +20,7 @@ import type { SelectOption } from "../../widgets/form/SelectField.js";
 import { LoadingMediaRow } from "../../widgets/feedback/LoadingMediaRow.js";
 import { ScrollSentinel } from "../../widgets/ScrollSentinel.js";
 import { Text } from "../../widgets/data/Text.js";
-import { RatingForm } from "../../widgets/RatingForm.js";
+import { RatingForm } from "../../widgets/form/RatingForm.js";
 import { BoundedList } from "../shared/BoundedList.js";
 import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
 import { useCatalogPagination } from "../shared/useCatalogPagination.js";

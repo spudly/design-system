@@ -12,7 +12,7 @@ import { Card } from "../widgets/Card.js";
 import { Text } from "../widgets/data/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
 import { TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
-import { CheckboxField } from "../widgets/CheckboxField.js";
+import { CheckboxField } from "../widgets/form/CheckboxField.js";
 import { RadioOptionGroup, type RadioOption } from "../widgets/form/RadioOptionGroup.js";
 import { useVoice } from "../voice/index.js";
 

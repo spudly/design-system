@@ -3,7 +3,7 @@ import { Input as TamaguiInput, View, XStack, styled } from "tamagui";
 import type { GetProps, TamaguiElement } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { FieldShell } from "../FieldShell.js";
+import { FieldShell } from "./FieldShell.js";
 import { Text } from "../data/Text.js";
 
 /**

@@ -2,7 +2,7 @@ import { View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { MarkableRow } from "../widgets/data/MarkableRow.js";
-import { NumberStepper } from "../widgets/NumberStepper.js";
+import { NumberStepper } from "../widgets/form/NumberStepper.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "../widgets/accessibility.js";
 import { Button } from "../widgets/actions/Button.js";
 import { PresetValueSelector, type PresetValueOption } from "../widgets/form/PresetValueSelector.js";

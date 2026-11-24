@@ -1,12 +1,12 @@
 ---
 component: CheckboxField
 run_when:
-  - "src/widgets/CheckboxField.tsx, its stories, or a changeset naming CheckboxField."
+  - "src/widgets/form/CheckboxField.tsx, its stories, or a changeset naming CheckboxField."
 ---
 
 # CheckboxField — manual test steps
 
-Colocated manual test steps for `src/widgets/CheckboxField.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/form/CheckboxField.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -40,5 +40,5 @@ ListShapeChecked, ListShapeWrappedLabel.
    center against the whole wrapped block or drift off the
    first line.
 
-**Run when:** `src/widgets/CheckboxField.tsx`, its stories, or a
+**Run when:** `src/widgets/form/CheckboxField.tsx`, its stories, or a
 changeset naming CheckboxField.

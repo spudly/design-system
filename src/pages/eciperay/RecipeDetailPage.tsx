@@ -18,7 +18,7 @@ import {
   type NutritionFactKind,
   type NutritionPanelData,
 } from "../../widgets/data/NutritionPanel.js";
-import { NumberStepper } from "../../widgets/NumberStepper.js";
+import { NumberStepper } from "../../widgets/form/NumberStepper.js";
 import { PanelStack } from "../../widgets/PanelStack.js";
 import {
   PresetValueSelector,
@@ -50,7 +50,7 @@ import {
   RecipeCommentsView,
   type RecipeCommentsViewProps,
 } from "../../views/RecipeCommentsView.js";
-import { RatingForm } from "../../widgets/RatingForm.js";
+import { RatingForm } from "../../widgets/form/RatingForm.js";
 import {
   RecipeSharingView,
   type RecipeSharingConsentSpan,

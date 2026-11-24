@@ -18,8 +18,8 @@ import test from "node:test";
  * Source-scan style, like the other batch tests.
  */
 
-const source = readFileSync("src/widgets/RatingForm.tsx", "utf8");
-const stories = readFileSync("src/widgets/RatingForm.stories.tsx", "utf8");
+const source = readFileSync("src/widgets/form/RatingForm.tsx", "utf8");
+const stories = readFileSync("src/widgets/form/RatingForm.stories.tsx", "utf8");
 
 test("RatingForm is exported from the widgets barrel; CookLogForm is gone", () => {
   const barrel = readFileSync("src/widgets/index.ts", "utf8");
