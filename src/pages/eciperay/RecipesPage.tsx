@@ -12,7 +12,10 @@ import {
   type CatalogPageFilterProps,
 } from "../../views/eciperay/CatalogFiltersBar.js";
 import { CatalogHeader } from "../../views/eciperay/CatalogHeader.js";
-import { DiscoveryCard } from "../../widgets/content/DiscoveryCard.js";
+import {
+  DiscoveryCard,
+  type DiscoveryCardAction,
+} from "../../widgets/content/DiscoveryCard.js";
 import { EmptyState } from "../../views/shared/EmptyState.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
@@ -222,6 +225,11 @@ export type RecipesPageDiscoveryItem = {
    * the host. The card renders as a real anchor to this URL on
    * web — see the header's navigation note. */
   href: string;
+  /** Per-card actions (#791): the host's per-recipe menu entries
+   * (e.g. its hide / show-less actions) as plain data — labels
+   * and callbacks are the host's; the card renders them in its
+   * DS-owned overflow menu. Absent or empty renders no menu. */
+  actions?: DiscoveryCardAction[];
 };
 
 // The filter option sets are this catalog's data, passed to the
@@ -1058,6 +1066,7 @@ export function RecipesPage(props: RecipesPageProps) {
               {...(item.subtitle ? { subtitle: item.subtitle } : {})}
               imageUrl={item.imageUrl}
               href={item.href}
+              {...(item.actions ? { actions: item.actions } : {})}
             />
           </CatalogRow>
         );
@@ -1141,6 +1150,7 @@ export function RecipesPage(props: RecipesPageProps) {
                     {...(item.subtitle ? { subtitle: item.subtitle } : {})}
                     imageUrl={item.imageUrl}
                     href={item.href}
+                    {...(item.actions ? { actions: item.actions } : {})}
                   />
                 ))
               )}
@@ -1180,6 +1190,7 @@ export function RecipesPage(props: RecipesPageProps) {
                 {...(item.subtitle ? { subtitle: item.subtitle } : {})}
                 imageUrl={item.imageUrl}
                 href={item.href}
+                {...(item.actions ? { actions: item.actions } : {})}
               />
             )}
             ListEmptyComponent={

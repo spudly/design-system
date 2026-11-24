@@ -21,7 +21,11 @@ export { Collapsible, type CollapsibleProps } from "./overlays/Collapsible.js";
 export { Center, type CenterProps } from "./layout/Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPickerField.js";
 export { Dialog, type DialogProps } from "./overlays/Dialog.js";
-export { DiscoveryCard, type DiscoveryCardProps } from "./content/DiscoveryCard.js";
+export {
+  DiscoveryCard,
+  type DiscoveryCardAction,
+  type DiscoveryCardProps,
+} from "./content/DiscoveryCard.js";
 export { Divider, type DividerProps } from "./data/Divider.js";
 export {
   Dropdown,
