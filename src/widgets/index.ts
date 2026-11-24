@@ -109,7 +109,7 @@ export { StatRow, type StatRowProps } from "./StatRow.js";
 export { StepDots, type StepDotsProps } from "./StepDots.js";
 export { Switch, type SwitchProps } from "./form/Switch.js";
 export { Tabs, type TabsProps } from "./Tabs.js";
-export { useTagColorResolver } from "./tagColors.js";
+export { useTagColorResolver, useTagColorShadeResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./Text.js";
 export { Thumbnail, type ThumbnailProps } from "./Thumbnail.js";
 export { TextLink, type TextLinkProps } from "./TextLink.js";

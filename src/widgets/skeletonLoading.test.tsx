@@ -1850,7 +1850,10 @@ test("T3 SSR: loading CandidateList and NutritionGoalsForm render skeletons", as
     />,
   );
   assert.ok(hiddenBones(goals) > 0, "a loading NutritionGoalsForm renders bones");
-  assert.ok(!goals.includes("2000"), "a loading NutritionGoalsForm shows no real goal values");
+  // Standalone-token match: the raw substring "2000" also occurs inside
+  // Tamagui's generated class hashes in the SSR CSS (e.g. _b-2023200006,
+  // the hash for the #799 indigo tag shade #4338ca), which is not a goal value.
+  assert.ok(!/(?<![-\d])2000(?!\d)/.test(goals), "a loading NutritionGoalsForm shows no real goal values");
   assert.match(goals, /aria-busy/, "a loading NutritionGoalsForm marks its region busy");
 });
 test("T5 survivor audit: only the approved survivor files render a Spinner", () => {

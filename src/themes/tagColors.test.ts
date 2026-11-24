@@ -43,6 +43,9 @@ const {
   memorizeTheme,
   tagColorNameForHex,
   resolveTagColorValue,
+  resolveTagColorShade,
+  warmHarvestTagColorShades,
+  quietDawnTagColorShades,
   createTamaguiConfig,
   createStorybookTamaguiConfig,
 }: Record<string, any> = await loadInternalDist();
@@ -132,4 +135,13 @@ test("registered Tamagui themes expose the active brand's tag hexes", () => {
 test("the shared tag-color resolver hook ships in the built widgets module", async () => {
   const hookModule: Record<string, any> = await import("../../dist/widgets/tagColors.js");
   assert.equal(typeof hookModule.useTagColorResolver, "function");
+});
+
+test("tag shades resolve per theme and differ dark vs light (#799)", () => {
+  for (const name of tagColorNames) {
+    assert.notEqual(warmHarvestTagColorShades[name].dark, warmHarvestTagColorShades[name].light);
+    assert.equal(resolveTagColorShade(name, "dark", warmHarvestTagColorShades), warmHarvestTagColorShades[name].dark);
+    assert.equal(resolveTagColorShade(name, "light", quietDawnTagColorShades), quietDawnTagColorShades[name].light);
+    assert.notEqual(warmHarvestTagColorShades[name].dark, quietDawnTagColorShades[name].dark);
+  }
 });
