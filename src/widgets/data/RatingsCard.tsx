@@ -1,13 +1,13 @@
 import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
-import { BoxSkeleton } from "../BoxSkeleton.js";
+import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
 import { Card } from "../Card.js";
 import { Center } from "../Center.js";
 import { StarRatingInput } from "../form/StarRatingInput.js";
 import { Text } from "./Text.js";
 import { useVoice } from "../../voice/index.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
 export type RatingsCardCommunityRating = {
   /** Pre-rendered star string ("★★★★★"), app-formatted from the average. */

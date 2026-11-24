@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { Alert } from "../widgets/Alert.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { Alert } from "../widgets/feedback/Alert.js";
+import { BoxSkeleton } from "../widgets/feedback/BoxSkeleton.js";
 import { Button } from "../widgets/actions/Button.js";
 import { ButtonRow } from "../widgets/actions/ButtonRow.js";
 import { ContentStack } from "../widgets/ContentStack.js";

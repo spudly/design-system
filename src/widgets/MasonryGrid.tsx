@@ -2,7 +2,7 @@ import { useState, type ReactNode } from "react";
 import { View, XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { BoxSkeleton } from "./BoxSkeleton.js";
+import { BoxSkeleton } from "./feedback/BoxSkeleton.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 
 // The loading grid's dummy items (#278): 24 placeholder items

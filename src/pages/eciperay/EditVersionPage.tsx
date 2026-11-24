@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import type { ReactNode } from "react";
-import { Alert } from "../../widgets/Alert.js";
+import { Alert } from "../../widgets/feedback/Alert.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";

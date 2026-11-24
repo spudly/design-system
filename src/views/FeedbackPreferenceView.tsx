@@ -4,14 +4,14 @@ import { Grow } from "../widgets/Grow.js";
 import { CompactRow } from "../widgets/CompactRow.js";
 import { CompactStack } from "../widgets/CompactStack.js";
 import { TightStack } from "../widgets/TightStack.js";
-import { Alert } from "../widgets/Alert.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { Alert } from "../widgets/feedback/Alert.js";
+import { BoxSkeleton } from "../widgets/feedback/BoxSkeleton.js";
 import { Button } from "../widgets/actions/Button.js";
 import { Center } from "../widgets/Center.js";
 import { SectionCard } from "../widgets/content/SectionCard.js";
 import { Text } from "../widgets/data/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
-import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 import { CheckboxField } from "../widgets/CheckboxField.js";
 import { useVoice } from "../voice/index.js";
 

@@ -6,11 +6,11 @@ import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { StatBand } from "../widgets/data/StatBand.js";
 import { StatCard } from "../widgets/data/StatCard.js";
 import { Badge, type BadgeProps } from "../widgets/data/Badge.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
-import { SkeletonBone } from "../widgets/SkeletonClock.js";
+import { BoxSkeleton } from "../widgets/feedback/BoxSkeleton.js";
+import { SkeletonBone } from "../widgets/feedback/SkeletonClock.js";
 import { TagList } from "../widgets/data/TagList.js";
 import { Text } from "../widgets/data/Text.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 import { Thumbnail } from "../widgets/data/Thumbnail.js";
 import { useVoice } from "../voice/index.js";
 

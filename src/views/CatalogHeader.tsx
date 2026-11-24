@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { ListHeaderStack } from "../widgets/ListHeaderStack.js";
 import { Text } from "../widgets/data/Text.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 
 export type CatalogHeaderProps = {
   /** The catalog's title, rendered as the list header's heading. */

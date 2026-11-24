@@ -5,7 +5,7 @@ import { BlankWord } from "../../widgets/data/BlankWord.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { PrevNextNav } from "../../widgets/actions/PrevNextNav.js";
-import { ProgressBar } from "../../widgets/ProgressBar.js";
+import { ProgressBar } from "../../widgets/feedback/ProgressBar.js";
 import { SearchField } from "../../widgets/form/SearchField.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { StatCard } from "../../widgets/data/StatCard.js";

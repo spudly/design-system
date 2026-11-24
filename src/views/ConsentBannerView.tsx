@@ -1,4 +1,4 @@
-import { FixedActionBanner } from "../widgets/FixedActionBanner.js";
+import { FixedActionBanner } from "../widgets/feedback/FixedActionBanner.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
 import { useVoice } from "../voice/index.js";
 

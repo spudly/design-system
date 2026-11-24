@@ -1,11 +1,11 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { BoxSkeleton } from "../widgets/feedback/BoxSkeleton.js";
 import { Button } from "../widgets/actions/Button.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "../widgets/data/Text.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 
 export type LogEntryCardProps = {
   /** The entry's header label (e.g. its date, pre-composed by the caller). */

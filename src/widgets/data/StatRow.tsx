@@ -4,7 +4,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { LoadingStatTiles } from "../LoadingStatTiles.js";
+import { LoadingStatTiles } from "../feedback/LoadingStatTiles.js";
 
 const StyledStatRow = styled(XStack, {
   name: "StatRow",

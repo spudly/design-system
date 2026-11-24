@@ -3,7 +3,7 @@ import { XStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
-import { LoadingStatTiles } from "../LoadingStatTiles.js";
+import { LoadingStatTiles } from "../feedback/LoadingStatTiles.js";
 
 export type StatBandProps = {
   /** The band's stats — StatCards, composed by the caller. */

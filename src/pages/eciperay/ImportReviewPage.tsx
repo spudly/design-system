@@ -1,5 +1,5 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
-import { Alert } from "../../widgets/Alert.js";
+import { Alert } from "../../widgets/feedback/Alert.js";
 import { RecipePreviewView, type RecipePreviewViewProps } from "../../views/RecipePreviewView.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";

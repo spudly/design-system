@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { Center } from "./Center.js";
-import { Spinner } from "./Spinner.js";
+import { Spinner } from "./feedback/Spinner.js";
 import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof Center> = {

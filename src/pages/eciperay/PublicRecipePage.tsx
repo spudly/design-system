@@ -1,13 +1,13 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
-import { BoxSkeleton } from "../../widgets/BoxSkeleton.js";
+import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { MainLandmark } from "../../widgets/MainLandmark.js";
 import { StatBand } from "../../widgets/data/StatBand.js";
 import { StatCard } from "../../widgets/data/StatCard.js";
-import { TextSkeleton } from "../../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { MessageCard } from "../../widgets/content/MessageCard.js";
 import { RatingsCard } from "../../widgets/data/RatingsCard.js";
 import { RecipeIngredientsPanel } from "../../views/RecipeIngredientsPanel.js";

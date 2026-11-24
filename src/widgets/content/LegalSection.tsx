@@ -3,7 +3,7 @@ import { Text as TamaguiText, YStack, styled } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
 const StyledSection = styled(YStack, {
   name: "LegalSection",

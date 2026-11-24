@@ -5,7 +5,7 @@ import { platformAccessibilityProps, politeLiveRegionProps } from "../accessibil
 import { Button } from "../actions/Button.js";
 import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
 const SecretBox = styled(XStack, {
   name: "SecretBox",

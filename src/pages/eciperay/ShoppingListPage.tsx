@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { CheckboxField } from "../../widgets/CheckboxField.js";
 import { EmptyState } from "../../views/EmptyState.js";
 import { ListStack } from "../../widgets/data/ListStack.js";
-import { LoadingListItem } from "../../widgets/LoadingListItem.js";
+import { LoadingListItem } from "../../widgets/feedback/LoadingListItem.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";

@@ -1,13 +1,13 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { useState } from "react";
 import type { TagColorName } from "../../themes/tagColors.js";
-import { Alert } from "../../widgets/Alert.js";
+import { Alert } from "../../widgets/feedback/Alert.js";
 import { Badge } from "../../widgets/data/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { CardStack } from "../../widgets/CardStack.js";
 import { ColorPickerField } from "../../widgets/form/ColorPickerField.js";
-import { BoxSkeleton } from "../../widgets/BoxSkeleton.js";
+import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { FormStack } from "../../widgets/FormStack.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";

@@ -267,7 +267,7 @@ over the theme global whenever it is set. Browse mode never sets it.
 
 Loading-state captures are taken with the skeleton pulse frozen
 (#648): the pulse behind every skeleton bone is JS-driven
-(`requestAnimationFrame` in `src/widgets/SkeletonClock.tsx`), so
+(`requestAnimationFrame` in `src/widgets/feedback/SkeletonClock.tsx`), so
 the emulator-level animation disabling cannot pin its phase, and
 shard captures and the merge-verify re-capture minutes later
 landed on different opacities — regenerated baselines for loading

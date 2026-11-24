@@ -3,7 +3,7 @@ import { TamaguiProvider, View, YStack } from "tamagui";
 import { createOnDeviceStorybookTamaguiConfig } from "../../../src/tamagui.config.js";
 import { fixtureVoice } from "../../../src/voice/fixtures.js";
 import { VoiceProvider } from "../../../src/voice/index.js";
-import { SkeletonClock } from "../../../src/widgets/SkeletonClock.js";
+import { SkeletonClock } from "../../../src/widgets/feedback/SkeletonClock.js";
 import { getCaptureThemeOverride, isCaptureModeActive } from "../captureTheme";
 
 // On-device mirror of the web .storybook/preview.tsx: same decorator

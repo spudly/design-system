@@ -4,7 +4,7 @@ import { CardStack } from "../../widgets/CardStack.js";
 import { EmptyState } from "../../views/EmptyState.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { PinnedHeaderShell } from "../../widgets/PinnedHeaderShell.js";
-import { LoadingActionCardRow } from "../../widgets/LoadingActionCardRow.js";
+import { LoadingActionCardRow } from "../../widgets/feedback/LoadingActionCardRow.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { Tabs } from "../../widgets/actions/Tabs.js";
