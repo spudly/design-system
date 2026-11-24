@@ -16,11 +16,11 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "data", "TagList.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "TagList.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("TagList is exported from the built internal components barrel", async () => {
-  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+  const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
   assert.equal(
     typeof dist.TagList,
     "function",

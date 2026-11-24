@@ -18,7 +18,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "data", "MarkableRow.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "MarkableRow.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 // Since #587 phase 3 the keyboard-activation handler lives in the
@@ -26,7 +26,7 @@ const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/
 // keyboard pins below read that source, and MarkableRow's own pins
 // hold that it delegates to the block.
 const keyboardActivationSource = readFileSync(
-  join(here, "../..", "src", "widgets", "keyboardActivation.ts"),
+  join(here, "../../..", "src", "widgets", "keyboardActivation.ts"),
   "utf8",
 );
 const keyboardActivationCode = keyboardActivationSource
@@ -34,7 +34,7 @@ const keyboardActivationCode = keyboardActivationSource
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("MarkableRow is exported from the built internal components barrel", async () => {
-  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+  const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
   assert.equal(
     typeof dist.MarkableRow,
     "function",

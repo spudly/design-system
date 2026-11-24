@@ -16,9 +16,10 @@ import { fileURLToPath } from "node:url";
 
 const srcPath = join(
   dirname(fileURLToPath(import.meta.url)),
-  "../..",
+  "../../..",
   "src",
   "widgets",
+  "data",
   "Avatar.tsx",
 );
 const text = readFileSync(srcPath, "utf8");

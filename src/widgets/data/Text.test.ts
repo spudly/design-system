@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 
 describe("textFontContext", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const srcDir = join(here, "../..", "src");
+  const srcDir = join(here, "../../..", "src");
 
   function readSrc(rel: string) {
     return readFileSync(join(srcDir, rel), "utf8");
@@ -80,7 +80,7 @@ describe("textFontContext", () => {
 
 describe("textVariants", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const source = readFileSync(join(here, "../..", "src", "widgets", "data", "Text.tsx"), "utf8");
+  const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "Text.tsx"), "utf8");
   const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
   test("the label variant is the section eyebrow treatment", () => {

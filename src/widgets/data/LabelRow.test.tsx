@@ -28,7 +28,7 @@ function loadRuntime() {
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
     const labelRowModule: Record<string, any> = await import(
-      "../../dist/widgets/data/LabelRow.js"
+      "../../../dist/widgets/data/LabelRow.js"
     );
     return { React, renderToString, TamaguiProvider, ...dist, ...labelRowModule };
   })();

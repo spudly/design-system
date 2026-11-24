@@ -31,8 +31,8 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "widgets");
-const listRowSource = readFileSync(join(componentsDir, "ListItem.tsx"), "utf8");
+const componentsDir = join(here, "../../..", "src", "widgets");
+const listRowSource = readFileSync(join(componentsDir, "data/ListItem.tsx"), "utf8");
 
 const listRowCode = listRowSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -43,7 +43,7 @@ const listRowCode = listRowSource
 // RowTextContent for the card rows); the subtitle pins below
 // read that source, and ListItem's own pins hold that it
 // delegates to the shared component.
-const rowTextSource = readFileSync(join(componentsDir, "RowTextContent.tsx"), "utf8");
+const rowTextSource = readFileSync(join(componentsDir, "data/RowTextContent.tsx"), "utf8");
 const rowTextCode = rowTextSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -58,7 +58,7 @@ test("ListItem is exported from the built internal components barrel", async () 
 });
 
 test("ListItemProps is a type-only export from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(types, /ListItemProps/);
 });
 

@@ -45,10 +45,17 @@ const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const dist: Record<string, any> = await loadInternalDist();
 
 function source(name: string) {
-  // Form-category widgets live in src/widgets/form since #710.
-  const formPath = join(root, "src", "widgets", "form", `${name}.tsx`);
-  if (existsSync(formPath)) return readFileSync(formPath, "utf8");
+  // Widgets live in per-category directories under src/widgets
+  // since #710; views in per-host-app directories under src/views.
+  for (const cat of ["actions", "content", "data", "feedback", "form", "layout", "overlays"]) {
+    const p = join(root, "src", "widgets", cat, `${name}.tsx`);
+    if (existsSync(p)) return readFileSync(p, "utf8");
+  }
   // BulkSelectToolbar (#712) and CommentItem (#714) were reclassified as Views.
+  for (const host of ["eciperay", "memorize", "shared"]) {
+    const p = join(root, "src", "views", host, `${name}.tsx`);
+    if (existsSync(p)) return readFileSync(p, "utf8");
+  }
   const viewPath = join(root, "src", "views", `${name}.tsx`);
   return readFileSync(existsSync(viewPath) ? viewPath : join(root, "src", "widgets", `${name}.tsx`), "utf8");
 }

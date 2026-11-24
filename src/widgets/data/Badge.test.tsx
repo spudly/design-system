@@ -8,9 +8,10 @@ import { loadInternalDist } from "../../../test/internalDist.js";
 describe("badgeBorder", () => {
   const srcPath = join(
     dirname(fileURLToPath(import.meta.url)),
-    "../..",
+    "../../..",
     "src",
     "widgets",
+    "data",
     "Badge.tsx",
   );
   const text = readFileSync(srcPath, "utf8");
@@ -29,7 +30,7 @@ describe("badgeBorder", () => {
 });
 describe("badgeSelectable", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const root = join(here, "../..");
+  const root = join(here, "../../..");
   const badgeSource = readFileSync(join(root, "src", "widgets", "data", "Badge.tsx"), "utf8");
   test("Badge declares the selectable form, gated on a press handler", () => {
     assert.ok(badgeSource.includes("selected?: boolean"), "Badge must declare the selected prop");
@@ -168,7 +169,7 @@ describe("badgeSelectable", () => {
   });
 });
 describe("badgeTagForm", async () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   const dist: Record<string, any> = await loadInternalDist();
   test("Badge is exported and TagPill is gone (#183)", () => {
     assert.equal(typeof dist.Badge, "function", "Badge must be exported");

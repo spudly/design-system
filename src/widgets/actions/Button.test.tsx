@@ -583,7 +583,7 @@ describe("buttonWebAria", () => {
     );
   });
   test("Text routes caller accessibility props through the same translator (#235)", () => {
-    assert.match(text, /from "\.\/accessibility\.js"/);
+    assert.match(text, /from "\.\.\/accessibility\.js"/);
     assert.match(text, /platformAccessibilityProps\(\{/);
     assert.match(text, /\{\.\.\.a11yProps\}/);
     assert.ok(
@@ -596,7 +596,7 @@ describe("buttonWebAria", () => {
       blankWord,
       /accessibilityLabel=\{`Reveal blank word \$\{index \+ 1\} of \$\{total\}`\}/,
     );
-    assert.match(blankWord, /from "\.\/actions\/Button\.js"/);
+    assert.match(blankWord, /from "\.\.\/actions\/Button\.js"/);
   });
   const STACK_PRESSABLES = [
     "src/widgets/RatingForm.tsx",

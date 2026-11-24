@@ -23,7 +23,7 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "data", "Thumbnail.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "Thumbnail.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("Thumbnail is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
@@ -34,7 +34,7 @@ test("Thumbnail is exported from the built internal components barrel", async ()
   );
 });
 test("ThumbnailProps is a type-only export from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(types, /ThumbnailProps/);
 });
 test("the contract is a URL, a presentation variant, and an optional accessible name", () => {
