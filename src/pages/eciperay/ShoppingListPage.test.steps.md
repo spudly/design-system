@@ -3,7 +3,7 @@ component: ShoppingListPage
 run_when:
   - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
-  - "src/widgets/CheckboxField.tsx, its stories, ShoppingListPage's list, or a changeset naming CheckboxField."
+  - "src/widgets/form/CheckboxField.tsx, its stories, ShoppingListPage's list, or a changeset naming CheckboxField."
 ---
 
 # ShoppingListPage — manual test steps
@@ -103,5 +103,5 @@ ListShapeWrappedLabel.
 3. ListShapeWrappedLabel: the label wraps and the box stays
    aligned to the label's first line.
 
-**Run when:** `src/widgets/CheckboxField.tsx`, its stories,
+**Run when:** `src/widgets/form/CheckboxField.tsx`, its stories,
 ShoppingListPage's list, or a changeset naming CheckboxField.

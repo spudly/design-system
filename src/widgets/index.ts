@@ -15,7 +15,7 @@ export { BlankWord, type BlankWordProps } from "./data/BlankWord.js";
 export { Button, type ButtonProps } from "./actions/Button.js";
 export { Card, type CardProps } from "./Card.js";
 export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";
-export { CheckboxField, type CheckboxFieldProps } from "./CheckboxField.js";
+export { CheckboxField, type CheckboxFieldProps } from "./form/CheckboxField.js";
 export { ChecklistRow, type ChecklistRowProps } from "./data/ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
@@ -81,7 +81,7 @@ export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./form/SecretRevealPanel.js";
 export { SectionCard, type SectionCardProps } from "./content/SectionCard.js";
 export { SelectField, type SelectFieldProps, type SelectOption } from "./form/SelectField.js";
-export { NumberStepper, type NumberStepperProps } from "./NumberStepper.js";
+export { NumberStepper, type NumberStepperProps } from "./form/NumberStepper.js";
 export {
   RadioOptionGroup,
   type RadioOption,
@@ -213,7 +213,7 @@ export {
 export { CandidateList, type CandidateListProps } from "./data/CandidateList.js";
 export { ChangedListBanner, type ChangedListBannerProps } from "./feedback/ChangedListBanner.js";
 export { LegalSection, type LegalSectionProps } from "./content/LegalSection.js";
-export { RatingForm, type RatingFormProps } from "./RatingForm.js";
+export { RatingForm, type RatingFormProps } from "./form/RatingForm.js";
 // The #698 tranche-4 extraction set: the layout and panel
 // components the remaining views' de-styling extracted.
 export { CenteredRow, type CenteredRowProps } from "./CenteredRow.js";

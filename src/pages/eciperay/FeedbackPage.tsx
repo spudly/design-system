@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { CheckboxField } from "../../widgets/CheckboxField.js";
+import { CheckboxField } from "../../widgets/form/CheckboxField.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";

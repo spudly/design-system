@@ -265,7 +265,7 @@ test("ShoppingListPage check-off is controlled per line with real checkbox seman
   assert.ok(page.includes("onToggleLine"), "toggles report out through onToggleLine");
   assert.ok(
     page.includes("CheckboxField"),
-    "rows render through the unified CheckboxField's list shape since #713 retired CheckRow — the checkbox semantics and the checked strike-through are pinned in src/widgets/CheckboxField.test.ts",
+    "rows render through the unified CheckboxField's list shape since #713 retired CheckRow — the checkbox semantics and the checked strike-through are pinned in src/widgets/form/CheckboxField.test.ts",
   );
   assert.ok(page.includes("label={line.name}"), "row labels use each line's name");
   assert.ok(

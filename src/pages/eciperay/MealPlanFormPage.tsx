@@ -6,7 +6,7 @@ import { FormHeading } from "../../widgets/content/FormHeading.js";
 import { FormScreenLayout } from "../../widgets/FormScreenLayout.js";
 import { FormStack } from "../../widgets/FormStack.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
-import { NumberStepper } from "../../widgets/NumberStepper.js";
+import { NumberStepper } from "../../widgets/form/NumberStepper.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { TextField } from "../../widgets/form/TextField.js";
 

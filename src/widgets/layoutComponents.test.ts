@@ -72,7 +72,7 @@ const centerCode = code("Center.tsx");
 const formStackCode = code("FormStack.tsx");
 const textFieldSource = readFileSync(join(componentsDir, "form/TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(componentsDir, "form/SearchField.tsx"), "utf8");
-const fieldShellSource = readFileSync(join(componentsDir, "FieldShell.tsx"), "utf8");
+const fieldShellSource = readFileSync(join(componentsDir, "form/FieldShell.tsx"), "utf8");
 const buttonCode = code("actions/Button.tsx");
 
 test("the layout components are exported from the built internal components barrel", async () => {

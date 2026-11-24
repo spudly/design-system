@@ -45,7 +45,7 @@ const VIEW_FORM_COMPONENTS = new Set([
 ]);
 // Form-category widgets live in src/widgets/form since #710;
 // TextAreaField joined them in #748.
-const FORM_CATEGORY_COMPONENTS = new Set(["SelectField", "ColorPickerField", "TextField", "TextAreaField"]);
+const FORM_CATEGORY_COMPONENTS = new Set(["SelectField", "ColorPickerField", "TextField", "TextAreaField", "CheckboxField", "FieldShell", "NumberStepper", "RatingForm"]);
 const formSource = (name: string) =>
   read(
     `src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : FORM_CATEGORY_COMPONENTS.has(name) ? "widgets/form" : "widgets"}/${name}.tsx`,
