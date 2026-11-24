@@ -1,4 +1,6 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../../widgets/layout/Row.js";
+import { Col } from "../../widgets/layout/Col.js";
+import { Spacer } from "../../widgets/layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../../widgets/accessibility.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
@@ -65,17 +67,20 @@ export function LogEntryCard({
   // renders as an inert rectangle skeleton at its normal
   // geometry (Stephen on #551) instead of dropping out.
   const deleteAction = onDeletePress ? (
-    <XStack paddingBlockStart="$2">
-      <Button
-        variant="secondary"
-        size="sm"
-        tone="danger"
-        {...(deleteAccessibilityLabel ? { accessibilityLabel: deleteAccessibilityLabel } : {})}
-        onPress={onDeletePress}
-      >
-        Delete
-      </Button>
-    </XStack>
+    <Col>
+      <Spacer y="s" />
+      <Row>
+        <Button
+          variant="secondary"
+          size="sm"
+          tone="danger"
+          {...(deleteAccessibilityLabel ? { accessibilityLabel: deleteAccessibilityLabel } : {})}
+          onPress={onDeletePress}
+        >
+          Delete
+        </Button>
+      </Row>
+    </Col>
   ) : null;
   if (showSkeleton) {
     // Loading (#278): the same framed card, its skeleton branch
@@ -86,40 +91,36 @@ export function LogEntryCard({
     // rectangle skeleton — and the region marked busy.
     return (
       <LoadingScope active>
-        <YStack
+        <Col
           borderRadius={tokens.radii.md}
           borderWidth={1}
           borderColor={tokens.colors.gray.gray2}
           backgroundColor={tokens.colors.gray.gray1}
-          padding="$4"
+          p="l"
           {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
         >
-          <XStack
-            paddingBlockEnd="$1"
-            alignItems="center"
-            justifyContent="space-between"
-            gap="$2"
-          >
-            <YStack width={104}>
+          <Row middle between gap="s">
+            <Col width={104}>
               <TextSkeleton size="sm" lines={1} />
-            </YStack>
+            </Col>
             {starRating ? <BoxSkeleton width={72} height={12} /> : null}
-          </XStack>
+          </Row>
+          <Spacer y="xs" />
           {notes ? <TextSkeleton size="sm" lines={1} /> : null}
           {deleteAction}
-        </YStack>
+        </Col>
       </LoadingScope>
     );
   }
   return (
-    <YStack
+    <Col
       borderRadius={tokens.radii.md}
       borderWidth={1}
       borderColor={tokens.colors.gray.gray2}
       backgroundColor={tokens.colors.gray.gray1}
-      padding="$4"
+      p="l"
     >
-      <XStack paddingBlockEnd="$1" alignItems="center" justifyContent="space-between" gap="$2">
+      <Row middle between gap="s">
         <Text
           fontSize={tokens.typography.fontSize.sm}
           fontWeight={tokens.typography.fontWeight.medium}
@@ -132,13 +133,14 @@ export function LogEntryCard({
             {"★".repeat(starRating)}
           </Text>
         ) : null}
-      </XStack>
+      </Row>
+      <Spacer y="xs" />
       {notes ? (
         <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray8}>
           {notes}
         </Text>
       ) : null}
       {deleteAction}
-    </YStack>
+    </Col>
   );
 }

@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { XStack, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { useVoice } from "../../voice/index.js";
 import { politeLiveRegionProps } from "../../widgets/accessibility.js";
@@ -425,8 +424,8 @@ export function CatalogFiltersBar<FilterId extends string = string>({
         // right-aligned above the field at a 4px gap. Removal
         // semantics (clear the values, hide the field) stay in
         // removeFilter above.
-        <YStack key={definition.id} gap={tokens.spacing[1]}>
-          <XStack justifyContent="flex-end">
+        <Col key={definition.id} gap="xs">
+          <Row right>
             <Button
               ghost
               size="sm"
@@ -437,9 +436,9 @@ export function CatalogFiltersBar<FilterId extends string = string>({
             >
               {voice.removableField.removeLabel}
             </Button>
-          </XStack>
+          </Row>
           <FilterControl definition={definition} />
-        </YStack>
+        </Col>
       ))}
     </Col>
   );

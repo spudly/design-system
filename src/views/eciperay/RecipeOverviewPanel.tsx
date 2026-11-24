@@ -1,4 +1,5 @@
-import { YStack } from "tamagui";
+import { Col } from "../../widgets/layout/Col.js";
+import { Spacer } from "../../widgets/layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
@@ -122,17 +123,17 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
     // region is marked busy; no real content shows.
     return (
       <LoadingScope active>
-        <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+        <Col {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
           {imageUrl ? (
-            <YStack paddingBlockEnd="$4">
+            <>
               <BoxSkeleton aspectRatio={4 / 3} />
-            </YStack>
+              <Spacer y="l" />
+            </>
           ) : null}
-          <YStack paddingBlockEnd="$2">
-            <TextSkeleton size="2xl" lines={1} />
-          </YStack>
+          <TextSkeleton size="2xl" lines={1} />
+          <Spacer y="s" />
           {statusLabel ? (
-            <YStack paddingBlockEnd="$4" alignSelf="flex-start">
+            <Col alignSelf="flex-start">
               <SkeletonBone
                 width={
                   Math.round(statusLabel.length * tokens.typography.fontSize.xs * 0.62) +
@@ -142,14 +143,16 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
                 height={14 + tokens.spacing[1] * 2 + 2}
                 borderRadius={tokens.radii.full}
               />
-            </YStack>
+              <Spacer y="l" />
+            </Col>
           ) : null}
           {description ? (
-            <YStack paddingBlockEnd="$4">
+            <>
               <TextSkeleton size="md" lines={2} />
-            </YStack>
+              <Spacer y="l" />
+            </>
           ) : null}
-          <YStack paddingBlockEnd="$4">
+          <>
             <StatBand loading loadingCount={1 + (prepTimeLabel ? 1 : 0) + (cookTimeLabel ? 1 : 0)}>
               <StatCard label={voice.recipeOverviewPanel.servingsLabel} value={servingsLabel} />
               {prepTimeLabel ? (
@@ -159,21 +162,23 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
                 <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} />
               ) : null}
             </StatBand>
-          </YStack>
+            <Spacer y="l" />
+          </>
           {tags.length > 0 ? <TagList tags={tags} loading /> : null}
-        </YStack>
+        </Col>
       </LoadingScope>
     );
   }
 
   return (
-    <YStack>
+    <Col>
       {imageUrl ? (
-        <YStack paddingBlockEnd="$4">
+        <>
           <Thumbnail src={imageUrl} />
-        </YStack>
+          <Spacer y="l" />
+        </>
       ) : null}
-      <YStack paddingBlockEnd="$2">
+      <>
         <Text
           variant="heading"
           fontSize={tokens.typography.fontSize["2xl"]}
@@ -182,18 +187,21 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
         >
           {title}
         </Text>
-      </YStack>
+        <Spacer y="s" />
+      </>
       {statusLabel ? (
-        <YStack paddingBlockEnd="$4" alignSelf="flex-start">
+        <Col alignSelf="flex-start">
           <Badge tone={statusTone ?? "neutral"}>{statusLabel}</Badge>
-        </YStack>
+          <Spacer y="l" />
+        </Col>
       ) : null}
       {description ? (
-        <YStack paddingBlockEnd="$4">
+        <>
           <Text color={tokens.colors.gray.gray7}>{description}</Text>
-        </YStack>
+          <Spacer y="l" />
+        </>
       ) : null}
-      <YStack paddingBlockEnd="$4">
+      <>
         <StatBand>
           <StatCard label={voice.recipeOverviewPanel.servingsLabel} value={servingsLabel} />
           {prepTimeLabel ? (
@@ -203,8 +211,9 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
             <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} />
           ) : null}
         </StatBand>
-      </YStack>
+        <Spacer y="l" />
+      </>
       {tags.length > 0 ? <TagList tags={tags} /> : null}
-    </YStack>
+    </Col>
   );
 }

@@ -6,7 +6,7 @@
  *
  * Converted from source scans to runtime checks in #733
  * tranche 5: the row is called directly and the element it
- * returns is inspected — the XStack props it passes (space-
+ * returns is inspected — the Row props it passes (space-
  * between, hairline, vertical padding) and the Text treatments
  * it gives the label (`hint`) and value (small size) ARE the
  * rendered contract, observable without reading source. The
@@ -42,10 +42,13 @@ test("DetailRowProps is a type-only export from the built views barrel", () => {
 test("DetailRow renders a space-between hairline row with its text treatments", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   const element = dist.DetailRow({ label: "Calories", value: "1,800" });
-  assert.equal(element.props.justifyContent, "space-between");
+  // #746: the row is a Row — space-between is its `between`
+  // alignment prop and the $2 vertical padding is the subset's
+  // "s" size on py; the hairline props pass through unchanged.
+  assert.equal(element.props.between, true);
   assert.equal(element.props.borderBottomWidth, 1);
   assert.equal(element.props.borderBottomColor, dist.tokens.colors.gray.gray2);
-  assert.equal(element.props.paddingVertical, "$2");
+  assert.equal(element.props.py, "s");
   const [labelEl, valueEl] = element.props.children;
   assert.equal(labelEl.type, dist.Text);
   assert.equal(labelEl.props.variant, "hint", "the label takes Text's hint treatment");

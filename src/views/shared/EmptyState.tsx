@@ -1,4 +1,4 @@
-import { YStack } from "tamagui";
+import { Col } from "../../widgets/layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../../widgets/accessibility.js";
 import { Button } from "../../widgets/actions/Button.js";
@@ -28,13 +28,7 @@ export type EmptyStateProps = {
  */
 export function EmptyState({ title, body, actionLabel, onAction, announce }: EmptyStateProps) {
   return (
-    <YStack
-      alignItems="center"
-      justifyContent="center"
-      gap={tokens.spacing[2]}
-      padding={tokens.spacing[6]}
-      {...(announce ? politeLiveRegionProps : null)}
-    >
+    <Col center middle gap="s" p="xl" {...(announce ? politeLiveRegionProps : null)}>
       <Text variant="subheading">{title}</Text>
       {body ? (
         <Text variant="hint" textAlign="center">
@@ -46,6 +40,6 @@ export function EmptyState({ title, body, actionLabel, onAction, announce }: Emp
           {actionLabel}
         </Button>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

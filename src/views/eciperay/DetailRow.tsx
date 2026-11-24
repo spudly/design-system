@@ -1,4 +1,4 @@
-import { XStack } from "tamagui";
+import { Row } from "../../widgets/layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../../widgets/data/Text.js";
 
@@ -22,14 +22,9 @@ export type DetailRowProps = {
  */
 export function DetailRow({ label, value }: DetailRowProps) {
   return (
-    <XStack
-      justifyContent="space-between"
-      borderBottomWidth={1}
-      borderBottomColor={tokens.colors.gray.gray2}
-      paddingVertical="$2"
-    >
+    <Row between borderBottomWidth={1} borderBottomColor={tokens.colors.gray.gray2} py="s">
       <Text variant="hint">{label}</Text>
       <Text fontSize={tokens.typography.fontSize.sm}>{value}</Text>
-    </XStack>
+    </Row>
   );
 }
