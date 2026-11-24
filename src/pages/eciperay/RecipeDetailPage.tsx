@@ -19,7 +19,7 @@ import {
   type NutritionPanelData,
 } from "../../widgets/data/NutritionPanel.js";
 import { NumberStepper } from "../../widgets/form/NumberStepper.js";
-import { PanelStack } from "../../widgets/PanelStack.js";
+import { PanelStack } from "../../widgets/layout/PanelStack.js";
 import {
   PresetValueSelector,
   type PresetValueOption,
@@ -30,8 +30,8 @@ import {
   type RatingsCardRatings,
   type RatingsCardViewerRating,
 } from "../../widgets/data/RatingsCard.js";
-import { ScreenShell } from "../../widgets/ScreenShell.js";
-import { ScrollRegion } from "../../widgets/ScrollRegion.js";
+import { ScreenShell } from "../../widgets/layout/ScreenShell.js";
+import { ScrollRegion } from "../../widgets/layout/ScrollRegion.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import { SelectField } from "../../widgets/form/SelectField.js";
 import { StatBand } from "../../widgets/data/StatBand.js";

@@ -13,7 +13,7 @@ import {
 } from "./modalRegistry.js";
 import type { ModalLayer } from "./modalRegistry.js";
 import { Text } from "./data/Text.js";
-import { PageContentColumn } from "./PageContentColumn.js";
+import { PageContentColumn } from "./layout/PageContentColumn.js";
 import { useVoice } from "../voice/index.js";
 
 export type StepOverlayProps = {

@@ -4,7 +4,7 @@ import { Alert } from "../widgets/feedback/Alert.js";
 import { BoxSkeleton } from "../widgets/feedback/BoxSkeleton.js";
 import { Button } from "../widgets/actions/Button.js";
 import { ButtonRow } from "../widgets/actions/ButtonRow.js";
-import { ContentStack } from "../widgets/ContentStack.js";
+import { ContentStack } from "../widgets/layout/ContentStack.js";
 import { DashedPlaceholder } from "../widgets/content/DashedPlaceholder.js";
 import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
 import { Text } from "../widgets/data/Text.js";

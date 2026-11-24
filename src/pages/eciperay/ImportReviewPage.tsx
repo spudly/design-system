@@ -3,7 +3,7 @@ import { Alert } from "../../widgets/feedback/Alert.js";
 import { RecipePreviewView, type RecipePreviewViewProps } from "../../views/RecipePreviewView.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
-import { FormScreenLayout } from "../../widgets/FormScreenLayout.js";
+import { FormScreenLayout } from "../../widgets/layout/FormScreenLayout.js";
 import { PreviewCard } from "../../widgets/content/PreviewCard.js";
 import { Text } from "../../widgets/data/Text.js";
 import { Thumbnail } from "../../widgets/data/Thumbnail.js";

@@ -2,7 +2,7 @@ import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
-import { Card } from "../Card.js";
+import { Card } from "../layout/Card.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 // Structural flex only: the card's text block expands and may

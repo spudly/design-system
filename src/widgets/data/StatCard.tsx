@@ -1,7 +1,7 @@
 import { View, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Card } from "../Card.js";
+import { Card } from "../layout/Card.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { SkeletonBone } from "../feedback/SkeletonClock.js";
 import { LINE_BOXES } from "../feedback/TextSkeleton.js";

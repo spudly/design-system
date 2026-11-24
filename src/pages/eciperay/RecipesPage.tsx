@@ -2,8 +2,8 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { Fragment, useEffect, useRef } from "react";
 import type { LayoutChangeEvent } from "react-native";
 import { Alert } from "../../widgets/feedback/Alert.js";
-import { CatalogCardColumn } from "../../widgets/CatalogCardColumn.js";
-import { CatalogListColumn } from "../../widgets/CatalogListColumn.js";
+import { CatalogCardColumn } from "../../widgets/layout/CatalogCardColumn.js";
+import { CatalogListColumn } from "../../widgets/layout/CatalogListColumn.js";
 import { CatalogRow } from "../../widgets/data/CatalogRow.js";
 import { isWeb } from "../../widgets/platform.js";
 import {
@@ -14,11 +14,11 @@ import {
 import { CatalogHeader } from "../../views/CatalogHeader.js";
 import { DiscoveryCard } from "../../widgets/content/DiscoveryCard.js";
 import { EmptyState } from "../../views/EmptyState.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import type { SelectOption } from "../../widgets/form/SelectField.js";
 import { LoadingMediaRow } from "../../widgets/feedback/LoadingMediaRow.js";
-import { ScrollSentinel } from "../../widgets/ScrollSentinel.js";
+import { ScrollSentinel } from "../../widgets/layout/ScrollSentinel.js";
 import { Text } from "../../widgets/data/Text.js";
 import { RatingForm } from "../../widgets/form/RatingForm.js";
 import { BoundedList } from "../shared/BoundedList.js";

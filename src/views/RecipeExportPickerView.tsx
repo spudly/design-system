@@ -3,8 +3,8 @@ import { Alert } from "../widgets/feedback/Alert.js";
 import { BulkSelectToolbar } from "./BulkSelectToolbar.js";
 import { Button } from "../widgets/actions/Button.js";
 import { CheckboxSelectList } from "../widgets/form/CheckboxSelectList.js";
-import { ContentStack } from "../widgets/ContentStack.js";
-import { FramedScrollRegion } from "../widgets/FramedScrollRegion.js";
+import { ContentStack } from "../widgets/layout/ContentStack.js";
+import { FramedScrollRegion } from "../widgets/layout/FramedScrollRegion.js";
 import { useVoice } from "../voice/index.js";
 
 type RecipeExportPickerViewItem = {

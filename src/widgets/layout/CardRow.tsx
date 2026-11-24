@@ -1,0 +1,198 @@
+import { Anchor, XStack, YStack, isWeb } from "tamagui";
+import { platformAccessibilityProps } from "../accessibility.js";
+import { Button } from "../actions/Button.js";
+import { Card } from "./Card.js";
+import { keyboardActivationHandler } from "../keyboardActivation.js";
+import { LinkOverlay } from "../linkOverlay.js";
+import { RowTextContent } from "../data/RowTextContent.js";
+import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
+
+type CardRowOwnProps = {
+  /** The row's title. */
+  title: string;
+  /** The row's meta line, pre-composed by the caller; omit to
+   * render the title alone. */
+  subtitle?: string;
+  /** Optional trailing action: the action button renders only
+   * when both the label and the callback are provided. Its
+   * accessible name composes the label with the row's title
+   * ("Delete {title}", the TextActionCardRow convention), so
+   * repeated row actions stay distinguishable to screen
+   * readers; the visible text stays the bare label. */
+  actionLabel?: string;
+  /** Optional trailing action press. */
+  onActionPress?: () => void;
+  /** The action button's treatment: `neutral` (the default) is
+   * the plain secondary button; `danger` inks it in the soft
+   * danger tones for destructive actions. */
+  actionTone?: "danger" | "neutral";
+  /** Loading state (#278): the row renders text skeletons in
+   * place of its title/subtitle, with no activation; its action,
+   * when wired, stays in place as an inert rectangle skeleton
+   * (Button skeletonizes itself inside the loading scope). An
+   * enclosing composite's LoadingScope can also put the row
+   * into this state without prop-drilling. */
+  loading?: boolean;
+};
+
+/**
+ * The row's two activation forms, discriminated by `href` (the
+ * Button pattern, #248's navigation rule):
+ * - Press form: pass `onPress`; the text block is a pressable
+ *   view carrying the button role.
+ * - Link form: pass `href` (and no `onPress`); the row
+ *   navigates, so the text block renders as a real link — an
+ *   anchor on web, and on native a view frame with a LinkOverlay
+ *   carrying the href (see LinkOverlay for why).
+ */
+export type CardRowProps = CardRowOwnProps &
+  ({ onPress: () => void; href?: undefined } | { href: string; onPress?: never });
+
+/**
+ * A titled card row for lists (MealPlansPage's plan rows render
+ * through it): an elevated card whose text block — title over an
+ * optional meta line — is the activation target, with an optional
+ * trailing action button beside it. The row owns its layout, its
+ * activation area, and the action's treatment so pages compose
+ * rows without styling them (#119); all content — title, meta
+ * line, action label — is caller-supplied, so the row serves any
+ * app's lists. The row carries no spacing outside its card:
+ * separation between rows is the composing stack's (CardStack's
+ * gap), never the row's own padding.
+ *
+ * The press form's text block is a Tamagui view, not a React
+ * Native Pressable/TouchableOpacity: those map
+ * accessibilityRole="button" to a native <button> element on web,
+ * whose UA styles center the row's text. A Tamagui pressable
+ * renders a div carrying the role (the OptionCard pattern) and
+ * keeps the layout. flex/minWidth are structural only: the block
+ * expands and may shrink within the row.
+ *
+ * The link form follows #248's rule — a control that navigates
+ * to another page is a link with an href. On web the text block
+ * is a Tamagui Anchor (a real link, keyboard-operable by
+ * default). On native the anchor is a Text and the stacked texts
+ * would flow inline inside it, so the block platform-splits (see
+ * LinkOverlay): a YStack frame carries the texts marked
+ * decorative, and a childless anchor stretched over it carries
+ * the href and the composed label — title and subtitle — as the
+ * row's one accessibility stop.
+ */
+export function CardRow({
+  title,
+  subtitle,
+  onPress,
+  href,
+  actionLabel,
+  onActionPress,
+  actionTone = "neutral",
+  loading = false,
+}: CardRowProps) {
+  const showSkeleton = useLoadingScope(loading);
+  if (showSkeleton) {
+    // Loading (#278): the same elevated card geometry, with the
+    // text block swapped for structured skeletons — the title's
+    // bone at the title's size, the subtitle's at the hint size,
+    // in the loaded block's own stack —
+    // no link, no press target, and the region marked busy. The
+    // action slot stays: inside the loading scope the Button
+    // renders as an inert rectangle skeleton at its normal
+    // geometry (Stephen on #551), so the row's shape does not
+    // change when the content lands. The bones are hidden from
+    // assistive tech.
+    return (
+      <LoadingScope active>
+        <Card
+          variant="elevated"
+          flexDirection="row"
+          alignItems="center"
+          gap="$3"
+          {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
+        >
+          <YStack flex={1} minWidth={0} gap="$1">
+            <TextSkeleton size="md" lines={1} />
+            {subtitle ? <TextSkeleton size="sm" lines={2} /> : null}
+          </YStack>
+          {actionLabel && onActionPress ? (
+            <XStack paddingInlineStart="$3" alignItems="center">
+              <Button
+                variant="secondary"
+                size="sm"
+                accessibilityLabel={`${actionLabel} ${title}`}
+                {...(actionTone === "danger" ? { tone: "danger" as const } : {})}
+                onPress={onActionPress}
+              >
+                {actionLabel}
+              </Button>
+            </XStack>
+          ) : null}
+        </Card>
+      </LoadingScope>
+    );
+  }
+  // Web keyboard support for the press form (the TextLink
+  // pattern): a div carrying the button role is not
+  // keyboard-operable on its own, so it is made focusable and
+  // the button activation keys — Enter and Space — invoke the
+  // same callback as a press. `tabIndex` and `onKeyDown` are
+  // web-only props in Tamagui and are ignored on native, where
+  // onPress is the activation path. The link form needs none of
+  // this: a real anchor is keyboard-operable by default.
+  const handleKeyDown = keyboardActivationHandler(() => onPress?.());
+  const textContent = <RowTextContent title={title} subtitle={subtitle} />;
+  return (
+    <Card variant="elevated" flexDirection="row" alignItems="center" gap="$3">
+      {href !== undefined ? (
+        isWeb ? (
+          <Anchor
+            flex={1}
+            minWidth={0}
+            gap="$1"
+            href={href}
+            textDecorationLine="none"
+            display="web:flex"
+            flexDirection="column"
+          >
+            {textContent}
+          </Anchor>
+        ) : (
+          <YStack flex={1} minWidth={0} gap="$1" position="relative">
+            <RowTextContent title={title} subtitle={subtitle} decorative />
+            <LinkOverlay
+              href={href}
+              accessibilityRole="link"
+              accessibilityLabel={subtitle ? `${title}, ${subtitle}` : title}
+            />
+          </YStack>
+        )
+      ) : (
+        <YStack
+          flex={1}
+          minWidth={0}
+          gap="$1"
+          {...platformAccessibilityProps({ accessibilityRole: "button" })}
+          onPress={onPress}
+          tabIndex={0}
+          onKeyDown={handleKeyDown}
+          cursor="web:pointer"
+        >
+          {textContent}
+        </YStack>
+      )}
+      {onActionPress && actionLabel ? (
+        <XStack paddingInlineStart="$3" alignItems="center">
+          <Button
+            variant="secondary"
+            size="sm"
+            accessibilityLabel={`${actionLabel} ${title}`}
+            {...(actionTone === "danger" ? { tone: "danger" as const } : {})}
+            onPress={onActionPress}
+          >
+            {actionLabel}
+          </Button>
+        </XStack>
+      ) : null}
+    </Card>
+  );
+}

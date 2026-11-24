@@ -1,4 +1,4 @@
-import { FormStack } from "../widgets/FormStack.js";
+import { FormStack } from "../widgets/layout/FormStack.js";
 import { LinkStack } from "../widgets/actions/LinkStack.js";
 import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
 import { PasswordField } from "../widgets/form/PasswordField.js";

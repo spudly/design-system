@@ -2,7 +2,7 @@
 component: MealPlanDetailPage
 run_when:
   - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
-  - "src/widgets/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack."
+  - "src/widgets/layout/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack."
   - "src/widgets/data/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
   - "src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow."
   - "src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow."
@@ -64,7 +64,7 @@ blocks in order.
    stack's width (MealPlanDetailPage's page stack is the live
    case: every section separation on the page is that one gap).
 
-**Run when:** `src/widgets/SectionStack.tsx`, its stories,
+**Run when:** `src/widgets/layout/SectionStack.tsx`, its stories,
 the pages that compose SectionStack (MealPlanDetailPage), or a
 changeset naming SectionStack.
 

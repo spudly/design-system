@@ -1,12 +1,12 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { CardStack } from "../../widgets/CardStack.js";
+import { CardStack } from "../../widgets/layout/CardStack.js";
 import { EmptyState } from "../../views/EmptyState.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
-import { PinnedHeaderShell } from "../../widgets/PinnedHeaderShell.js";
+import { PinnedHeaderShell } from "../../widgets/layout/PinnedHeaderShell.js";
 import { LoadingActionCardRow } from "../../widgets/feedback/LoadingActionCardRow.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { SectionStack } from "../../widgets/SectionStack.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
+import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Tabs } from "../../widgets/actions/Tabs.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextActionCardRow } from "../../widgets/content/TextActionCardRow.js";

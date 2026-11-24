@@ -13,12 +13,12 @@ export { BackLink, type BackLinkProps } from "./actions/BackLink.js";
 export { Badge, type BadgeProps } from "./data/Badge.js";
 export { BlankWord, type BlankWordProps } from "./data/BlankWord.js";
 export { Button, type ButtonProps } from "./actions/Button.js";
-export { Card, type CardProps } from "./Card.js";
+export { Card, type CardProps } from "./layout/Card.js";
 export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";
 export { CheckboxField, type CheckboxFieldProps } from "./form/CheckboxField.js";
 export { ChecklistRow, type ChecklistRowProps } from "./data/ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
-export { Center, type CenterProps } from "./Center.js";
+export { Center, type CenterProps } from "./layout/Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPickerField.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./content/DiscoveryCard.js";
@@ -31,53 +31,53 @@ export {
 } from "./form/Dropdown.js";
 export { DropdownButton, type DropdownButtonProps } from "./form/DropdownButton.js";
 export { FixedActionBanner, type FixedActionBannerProps } from "./feedback/FixedActionBanner.js";
-export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
-export { FullScreenShell, type FullScreenShellProps } from "./FullScreenShell.js";
+export { FormScreenLayout, type FormScreenLayoutProps } from "./layout/FormScreenLayout.js";
+export { FullScreenShell, type FullScreenShellProps } from "./layout/FullScreenShell.js";
 export {
   MasonryGrid,
   distributeMasonryItems,
   masonryColumnCount,
   type MasonryColumnCountOptions,
   type MasonryGridProps,
-} from "./MasonryGrid.js";
-export { CardRow, type CardRowProps } from "./CardRow.js";
+} from "./layout/MasonryGrid.js";
+export { CardRow, type CardRowProps } from "./layout/CardRow.js";
 export { ListItem, type ListItemProps } from "./data/ListItem.js";
-export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
+export { MainLandmark, type MainLandmarkProps } from "./layout/MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./content/MessageCard.js";
 export { MetadataBadge, type MetadataBadgeProps } from "./data/MetadataBadge.js";
 export { OptionCard, type OptionCardProps } from "./content/OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./actions/PrevNextNav.js";
 export { ProgressBar, type ProgressBarProps } from "./feedback/ProgressBar.js";
 export { ButtonRow, type ButtonRowProps } from "./actions/ButtonRow.js";
-export { CardStack, type CardStackProps } from "./CardStack.js";
+export { CardStack, type CardStackProps } from "./layout/CardStack.js";
 export { ListStack, type ListStackProps } from "./data/ListStack.js";
 export { LinkStack, type LinkStackProps } from "./actions/LinkStack.js";
 export { LoadingCardRow } from "./feedback/LoadingCardRow.js";
 export { LoadingListItem } from "./feedback/LoadingListItem.js";
 export { LoadingActionCardRow, type LoadingActionCardRowProps } from "./feedback/LoadingActionCardRow.js";
 export { CatalogRow, type CatalogRowProps } from "./data/CatalogRow.js";
-export { CatalogCardColumn, type CatalogCardColumnProps } from "./CatalogCardColumn.js";
-export { CatalogListColumn, type CatalogListColumnProps } from "./CatalogListColumn.js";
+export { CatalogCardColumn, type CatalogCardColumnProps } from "./layout/CatalogCardColumn.js";
+export { CatalogListColumn, type CatalogListColumnProps } from "./layout/CatalogListColumn.js";
 export { LoadingMediaRow } from "./feedback/LoadingMediaRow.js";
-export { ScrollSentinel, type ScrollSentinelProps } from "./ScrollSentinel.js";
+export { ScrollSentinel, type ScrollSentinelProps } from "./layout/ScrollSentinel.js";
 export {
   SearchHelpPopover,
   type SearchHelpContent,
   type SearchHelpEntry,
   type SearchHelpPopoverProps,
 } from "./SearchHelpPopover.js";
-export { HeroStack, type HeroStackProps } from "./HeroStack.js";
+export { HeroStack, type HeroStackProps } from "./layout/HeroStack.js";
 export { StackedButtonRow, type StackedButtonRowProps } from "./actions/StackedButtonRow.js";
-export { CardGrid, type CardGridProps } from "./CardGrid.js";
+export { CardGrid, type CardGridProps } from "./layout/CardGrid.js";
 export { BannerRow, type BannerRowProps } from "./feedback/BannerRow.js";
-export { ProseColumn, type ProseColumnProps } from "./ProseColumn.js";
-export { ProseStack, type ProseStackProps } from "./ProseStack.js";
+export { ProseColumn, type ProseColumnProps } from "./layout/ProseColumn.js";
+export { ProseStack, type ProseStackProps } from "./layout/ProseStack.js";
 export { BulletList, type BulletListProps } from "./data/BulletList.js";
 export { ChatTranscript, type ChatTranscriptProps } from "./content/ChatTranscript.js";
 export { FieldRow, type FieldRowProps } from "./form/FieldRow.js";
-export { SectionStack, type SectionStackProps } from "./SectionStack.js";
-export { ScreenContainer, type ScreenContainerProps } from "./ScreenContainer.js";
-export { ScrollRegion, type ScrollRegionProps } from "./ScrollRegion.js";
+export { SectionStack, type SectionStackProps } from "./layout/SectionStack.js";
+export { ScreenContainer, type ScreenContainerProps } from "./layout/ScreenContainer.js";
+export { ScrollRegion, type ScrollRegionProps } from "./layout/ScrollRegion.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./form/SecretRevealPanel.js";
 export { SectionCard, type SectionCardProps } from "./content/SectionCard.js";
 export { SelectField, type SelectFieldProps, type SelectOption } from "./form/SelectField.js";
@@ -123,11 +123,11 @@ export { BrandLink, type BrandLinkProps } from "./actions/BrandLink.js";
 export { CenteredText, type CenteredTextProps } from "./content/CenteredText.js";
 export { FieldLabel, type FieldLabelProps } from "./form/FieldLabel.js";
 export { FormHeading, type FormHeadingProps } from "./content/FormHeading.js";
-export { FormStack, type FormStackProps } from "./FormStack.js";
+export { FormStack, type FormStackProps } from "./layout/FormStack.js";
 export { LabeledField, type LabeledFieldProps } from "./form/LabeledField.js";
 export { LabeledGroup, type LabeledGroupProps } from "./form/LabeledGroup.js";
 export { MarkableRow, type MarkableRowProps } from "./data/MarkableRow.js";
-export { PinnedHeaderShell, type PinnedHeaderShellProps } from "./PinnedHeaderShell.js";
+export { PinnedHeaderShell, type PinnedHeaderShellProps } from "./layout/PinnedHeaderShell.js";
 export {
   PresetValueSelector,
   type PresetValueOption,
@@ -140,10 +140,10 @@ export {
   type RatingsCardRatings,
   type RatingsCardViewerRating,
 } from "./data/RatingsCard.js";
-export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
-export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
+export { ScreenShell, type ScreenShellProps } from "./layout/ScreenShell.js";
+export { ScrollShell, type ScrollShellProps } from "./layout/ScrollShell.js";
 export { SectionHeading, type SectionHeadingProps } from "./content/SectionHeading.js";
-export { SessionShell, type SessionShellProps } from "./SessionShell.js";
+export { SessionShell, type SessionShellProps } from "./layout/SessionShell.js";
 export { StepList, type StepListProps } from "./data/StepList.js";
 export { SuggestionPanel, type SuggestionPanelProps } from "./form/SuggestionPanel.js";
 export { TagList, type TagListProps } from "./data/TagList.js";
@@ -163,7 +163,7 @@ export {
   type NutritionPanelData,
   type NutritionPanelProps,
 } from "./data/NutritionPanel.js";
-export { PanelStack, type PanelStackProps } from "./PanelStack.js";
+export { PanelStack, type PanelStackProps } from "./layout/PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./content/PreviewCard.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./actions/Toolbar.js";
@@ -176,9 +176,9 @@ export {
 } from "./data/WeekDayColumn.js";
 // The #698 tranche-3 extraction set: the layout and loading
 // components the recipe views' de-styling extracted.
-export { Row, type RowProps } from "./Row.js";
-export { Col, type ColProps } from "./Col.js";
-export { Spacer, type SpacerProps } from "./Spacer.js";
+export { Row, type RowProps } from "./layout/Row.js";
+export { Col, type ColProps } from "./layout/Col.js";
+export { Spacer, type SpacerProps } from "./layout/Spacer.js";
 export {
   resolveLayoutStyle,
   layoutSizeValues,
@@ -187,13 +187,13 @@ export {
   type LayoutSize,
   type ResolvedLayoutStyle,
 } from "./layout.js";
-export { ContentStack, type ContentStackProps } from "./ContentStack.js";
-export { CompactStack, type CompactStackProps } from "./CompactStack.js";
-export { TightStack, type TightStackProps } from "./TightStack.js";
-export { EndRow, type EndRowProps } from "./EndRow.js";
-export { CompactRow, type CompactRowProps } from "./CompactRow.js";
-export { Grow, type GrowProps } from "./Grow.js";
-export { FramedScrollRegion, type FramedScrollRegionProps } from "./FramedScrollRegion.js";
+export { ContentStack, type ContentStackProps } from "./layout/ContentStack.js";
+export { CompactStack, type CompactStackProps } from "./layout/CompactStack.js";
+export { TightStack, type TightStackProps } from "./layout/TightStack.js";
+export { EndRow, type EndRowProps } from "./layout/EndRow.js";
+export { CompactRow, type CompactRowProps } from "./layout/CompactRow.js";
+export { Grow, type GrowProps } from "./layout/Grow.js";
+export { FramedScrollRegion, type FramedScrollRegionProps } from "./layout/FramedScrollRegion.js";
 export { DashedPlaceholder, type DashedPlaceholderProps } from "./content/DashedPlaceholder.js";
 export { OverlayTextPanel, type OverlayTextPanelProps } from "./content/OverlayTextPanel.js";
 export { RadioSkeletonRow, type RadioSkeletonRowProps } from "./feedback/RadioSkeletonRow.js";
@@ -209,16 +209,16 @@ export {
   type AppTopBarAction,
   type AppTopBarNavItem,
   type AppTopBarProps,
-} from "./AppTopBar.js";
+} from "./layout/AppTopBar.js";
 export { CandidateList, type CandidateListProps } from "./data/CandidateList.js";
 export { ChangedListBanner, type ChangedListBannerProps } from "./feedback/ChangedListBanner.js";
 export { LegalSection, type LegalSectionProps } from "./content/LegalSection.js";
 export { RatingForm, type RatingFormProps } from "./form/RatingForm.js";
 // The #698 tranche-4 extraction set: the layout and panel
 // components the remaining views' de-styling extracted.
-export { CenteredRow, type CenteredRowProps } from "./CenteredRow.js";
-export { StartStack, type StartStackProps } from "./StartStack.js";
-export { ListHeaderStack, type ListHeaderStackProps } from "./ListHeaderStack.js";
+export { CenteredRow, type CenteredRowProps } from "./layout/CenteredRow.js";
+export { StartStack, type StartStackProps } from "./layout/StartStack.js";
+export { ListHeaderStack, type ListHeaderStackProps } from "./layout/ListHeaderStack.js";
 export { SkeletonPanel, type SkeletonPanelProps } from "./feedback/SkeletonPanel.js";
-export { SpacedTopStack, type SpacedTopStackProps } from "./SpacedTopStack.js";
+export { SpacedTopStack, type SpacedTopStackProps } from "./layout/SpacedTopStack.js";
 export { CreatedSecretPanel, type CreatedSecretPanelProps } from "./content/CreatedSecretPanel.js";

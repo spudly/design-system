@@ -3,7 +3,7 @@ import { Anchor, View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Badge } from "./Badge.js";
-import { Card } from "../Card.js";
+import { Card } from "../layout/Card.js";
 import { LinkOverlay } from "../linkOverlay.js";
 import { Text } from "./Text.js";
 import { Thumbnail } from "./Thumbnail.js";

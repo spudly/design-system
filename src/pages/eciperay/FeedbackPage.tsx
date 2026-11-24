@@ -3,7 +3,7 @@ import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { CheckboxField } from "../../widgets/form/CheckboxField.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { useVoice } from "../../voice/index.js";

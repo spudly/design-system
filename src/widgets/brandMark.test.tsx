@@ -39,7 +39,7 @@ function codeOf(rel: string): string {
 
 const brandMark = codeOf("src/icons/BrandMark.tsx");
 const brandLink = codeOf("src/widgets/actions/BrandLink.tsx");
-const topBar = codeOf("src/widgets/AppTopBar.tsx");
+const topBar = codeOf("src/widgets/layout/AppTopBar.tsx");
 const shellPage = codeOf("src/pages/eciperay/AppShellPage.tsx");
 const footer = codeOf("src/widgets/content/BigFooter.tsx");
 
@@ -108,7 +108,7 @@ test("stories pin the marked Eciperay brand and the wordmark-only Memorize brand
   const brandLinkStories = readFileSync(join(root, "src/widgets/actions/BrandLink.stories.tsx"), "utf8");
   assert.match(brandLinkStories, /export const WithMark/);
   assert.match(brandLinkStories, /mark: "eciperay"/);
-  const topBarStories = readFileSync(join(root, "src/widgets/AppTopBar.stories.tsx"), "utf8");
+  const topBarStories = readFileSync(join(root, "src/widgets/layout/AppTopBar.stories.tsx"), "utf8");
   assert.match(topBarStories, /export const WordmarkOnlyBrand/);
   assert.match(topBarStories, /brand: \{ label: "Memorize", href: "\/" \}/);
 });

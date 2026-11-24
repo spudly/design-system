@@ -1,6 +1,6 @@
 import { Anchor, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { Card, type CardProps } from "../Card.js";
+import { Card, type CardProps } from "../layout/Card.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LinkOverlay } from "../linkOverlay.js";
 import { Text } from "../data/Text.js";

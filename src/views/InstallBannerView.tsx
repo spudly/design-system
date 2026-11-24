@@ -1,4 +1,4 @@
-import { CompactRow } from "../widgets/CompactRow.js";
+import { CompactRow } from "../widgets/layout/CompactRow.js";
 import { FixedActionBanner } from "../widgets/feedback/FixedActionBanner.js";
 import { Text } from "../widgets/data/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";

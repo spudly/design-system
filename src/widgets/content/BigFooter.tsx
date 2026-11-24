@@ -11,7 +11,7 @@ import type { IconComponentProps } from "../../icons/Icon.js";
 import { AppStoreBadge } from "../../icons/AppStoreBadge.js";
 import { BrandMark, type BrandMarkName } from "../../icons/BrandMark.js";
 import { GooglePlayBadge } from "../../icons/GooglePlayBadge.js";
-import { PageContentColumn } from "../PageContentColumn.js";
+import { PageContentColumn } from "../layout/PageContentColumn.js";
 import { Text } from "../data/Text.js";
 import { TextLink } from "../actions/TextLink.js";
 import { contentInfoRoleProps, platformAccessibilityProps } from "../accessibility.js";

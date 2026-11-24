@@ -1,7 +1,7 @@
 import { Anchor, YStack, isWeb } from "tamagui";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
-import { Card } from "../Card.js";
+import { Card } from "../layout/Card.js";
 import { LinkOverlay } from "../linkOverlay.js";
 import { RowTextContent } from "../data/RowTextContent.js";
 

@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { ListHeaderStack } from "../widgets/ListHeaderStack.js";
+import { ListHeaderStack } from "../widgets/layout/ListHeaderStack.js";
 import { Text } from "../widgets/data/Text.js";
 import { TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 

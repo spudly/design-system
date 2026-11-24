@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { SectionStack } from "../../widgets/SectionStack.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
+import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { SignUpForm, type SignUpLegalNoticeSpan } from "../../views/SignUpForm.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
