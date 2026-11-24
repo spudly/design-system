@@ -21,7 +21,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "content", "PreviewCard.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "widgets", "content", "PreviewCard.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("PreviewCard is exported from the built internal components barrel", async () => {
@@ -34,7 +34,7 @@ test("PreviewCard is exported from the built internal components barrel", async 
 });
 
 test("PreviewCardProps is a type-only export from the built components barrel", () => {
-  const barrel = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const barrel = readFileSync(join(here, "../../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(barrel, /export \{[^}]*type PreviewCardProps[^}]*\}/);
 });
 

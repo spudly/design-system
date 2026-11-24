@@ -27,7 +27,7 @@ function readCode(name: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 const brandLink = readCode("actions/BrandLink.tsx");
-const footer = readCode("BigFooter.tsx");
+const footer = readCode("content/BigFooter.tsx");
 test("BrandLink is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
   assert.equal(

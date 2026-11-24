@@ -136,9 +136,11 @@ test("premise: fixtures and stories still pass root-relative hrefs (#300)", () =
   assert.match(fixtures, /href: "\//);
   let storyFilesWithAppHrefs = 0;
   for (const dir of ["src/pages", "src/widgets"]) {
-    for (const file of readdirSync(join(root, dir))) {
-      if (!file.endsWith(".stories.tsx")) continue;
-      const source = readFileSync(join(root, dir, file), "utf8");
+    // #710: stories live in per-category / per-host-app
+    // subdirectories — walk recursively.
+    for (const file of readdirSync(join(root, dir), { recursive: true })) {
+      if (!String(file).endsWith(".stories.tsx")) continue;
+      const source = readFileSync(join(root, dir, String(file)), "utf8");
       if (/(?:href|createHref)[=:]\s*\{?\s*"\//.test(source)) storyFilesWithAppHrefs += 1;
     }
   }

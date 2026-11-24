@@ -4,7 +4,7 @@ import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, test } from "node:test";
 import { fileURLToPath } from "node:url";
-const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 function readCode(rel: string): string {
   return readFileSync(join(root, rel), "utf8")
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -426,17 +426,17 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const { createTamaguiConfig, baseTheme }: Record<string, any> =
-      await import("../../dist/tamagui.config.js").then(async (configModule) => {
-        const themes: Record<string, any> = await import("../../dist/themes/index.js");
+      await import("../../../dist/tamagui.config.js").then(async (configModule) => {
+        const themes: Record<string, any> = await import("../../../dist/themes/index.js");
         return {
           ...configModule,
           ...themes,
         };
       });
     const { BigFooter, BigFooterShell }: Record<string, any> =
-      await import("../../dist/widgets/content/BigFooter.js");
-    const { VoiceProvider }: Record<string, any> = await import("../../dist/voice/index.js");
-    const { fixtureVoice }: Record<string, any> = await import("../../dist/voice/fixtures.js");
+      await import("../../../dist/widgets/content/BigFooter.js");
+    const { VoiceProvider }: Record<string, any> = await import("../../../dist/voice/index.js");
+    const { fixtureVoice }: Record<string, any> = await import("../../../dist/voice/fixtures.js");
     return {
       React,
       renderToString,
@@ -527,7 +527,7 @@ test("SSR: an exported page renders its footer from the footer prop", async () =
     fixtureVoice,
   } = await loadRuntime();
   const { SignInPage }: Record<string, any> =
-    await import("../../dist/pages/eciperay/SignInPage.js");
+    await import("../../../dist/pages/eciperay/SignInPage.js");
   const config = createTamaguiConfig(baseTheme);
   const html = renderToString(
     <TamaguiProvider config={config} defaultTheme="light">
@@ -555,7 +555,7 @@ test("SSR: an exported page renders its footer from the footer prop", async () =
   );
 });
 describe("bigFooterBrandWordmark", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   function readCode(rel: string) {
     return readFileSync(join(root, rel), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -589,14 +589,14 @@ describe("bigFooterBrandWordmark", () => {
       const { renderToString } = await import("react-dom/server");
       const { TamaguiProvider }: Record<string, any> = await import("tamagui");
       const { createTamaguiConfig, baseTheme }: Record<string, any> =
-        await import("../../dist/tamagui.config.js").then(async (configModule) => {
-          const themes: Record<string, any> = await import("../../dist/themes/index.js");
+        await import("../../../dist/tamagui.config.js").then(async (configModule) => {
+          const themes: Record<string, any> = await import("../../../dist/themes/index.js");
           return {
             ...configModule,
             ...themes,
           };
         });
-      const { BigFooter }: Record<string, any> = await import("../../dist/widgets/content/BigFooter.js");
+      const { BigFooter }: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
       return {
         React,
         renderToString,
@@ -636,7 +636,7 @@ describe("bigFooterBrandWordmark", () => {
   });
 });
 describe("bigFooterPrimary", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   function readCode(rel: string) {
     return readFileSync(join(root, rel), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -685,7 +685,7 @@ describe("bigFooterPrimary", () => {
   });
 });
 describe("bigFooterSideColumn", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   function readCode(rel: string) {
     return readFileSync(join(root, rel), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -719,7 +719,7 @@ describe("bigFooterSideColumn", () => {
   });
 });
 describe("bigFooterStoreBadges", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   function readCode(rel: string) {
     return readFileSync(join(root, rel), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -789,14 +789,14 @@ describe("bigFooterStoreBadges", () => {
       const { renderToString } = await import("react-dom/server");
       const { TamaguiProvider }: Record<string, any> = await import("tamagui");
       const { createTamaguiConfig, baseTheme }: Record<string, any> =
-        await import("../../dist/tamagui.config.js").then(async (configModule) => {
-          const themes: Record<string, any> = await import("../../dist/themes/index.js");
+        await import("../../../dist/tamagui.config.js").then(async (configModule) => {
+          const themes: Record<string, any> = await import("../../../dist/themes/index.js");
           return {
             ...configModule,
             ...themes,
           };
         });
-      const { BigFooter }: Record<string, any> = await import("../../dist/widgets/content/BigFooter.js");
+      const { BigFooter }: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
       return {
         React,
         renderToString,
