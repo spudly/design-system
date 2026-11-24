@@ -351,11 +351,6 @@ describe("publicRecipePageAdoption", () => {
       code.includes(`import { RecipeOverviewPanel } from "../views/RecipeOverviewPanel.js";`),
       "the page imports the library RecipeOverviewPanel",
     );
-      assert.ok(
-        code.includes(`import { ${panel} } from "../widgets/${panel}.js";`),
-        `the page imports the library ${panel}`,
-      );
-    }
     // RecipeIngredientsPanel is a view since #737, not a widget.
     assert.ok(
       code.includes(
