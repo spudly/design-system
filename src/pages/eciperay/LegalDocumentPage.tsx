@@ -1,13 +1,13 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
 import type { ReactNode } from "react";
 import { BannerRow } from "../../widgets/BannerRow.js";
-import { BrandLink } from "../../widgets/BrandLink.js";
+import { BrandLink } from "../../widgets/actions/BrandLink.js";
 import { BulletList } from "../../widgets/BulletList.js";
 import { ProseColumn } from "../../widgets/ProseColumn.js";
 import { ProseStack } from "../../widgets/ProseStack.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { Text } from "../../widgets/Text.js";
-import { TextLink } from "../../widgets/TextLink.js";
+import { TextLink } from "../../widgets/actions/TextLink.js";
 import { bannerRoleProps, mainRoleProps } from "../../widgets/accessibility.js";
 import { tokens } from "../../tokens/index.js";
 import { useVoice } from "../../voice/index.js";

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { RecipeIngredientRowView } from "./RecipeIngredientRowView.js";
 import { StoryFrame } from "./storyFrame.js";
 

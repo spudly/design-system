@@ -284,7 +284,7 @@ test("ChecklistRow's Checkbox and ProgressBar's Progress route through the trans
 test("field/primitive wrappers destructure caller RN props out of rest and translate them (#237)", () => {
   // Compact split form: this file sits at the max-lines cap.
   const wrappers =
-    "src/widgets/form/TextField.tsx,src/widgets/form/TextAreaField.tsx,src/widgets/CheckboxField.tsx,src/widgets/TextLink.tsx,src/widgets/OptionCard.tsx,src/widgets/Alert.tsx".split(
+    "src/widgets/form/TextField.tsx,src/widgets/form/TextAreaField.tsx,src/widgets/CheckboxField.tsx,src/widgets/actions/TextLink.tsx,src/widgets/OptionCard.tsx,src/widgets/Alert.tsx".split(
       ",",
     );
   for (const rel of wrappers) {
@@ -311,7 +311,7 @@ test("field/primitive wrappers destructure caller RN props out of rest and trans
     readCode("src/views/useFieldA11y.ts").includes("platformAccessibilityProps("),
     "useFieldA11y must build the fields' a11yProps via the translator",
   );
-  const backLink = readCode("src/widgets/BackLink.tsx");
+  const backLink = readCode("src/widgets/actions/BackLink.tsx");
   assert.match(backLink, /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/);
   const alert = readCode("src/widgets/Alert.tsx");
   assert.match(alert, /platformAccessibilityProps\(\{ accessibilityRole: "alert" \}\)/);

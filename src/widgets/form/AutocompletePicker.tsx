@@ -4,7 +4,7 @@ import type { TamaguiElement } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../accessibility.js";
 import { Alert } from "../Alert.js";
-import { Button } from "../Button.js";
+import { Button } from "../actions/Button.js";
 import { ListItem } from "../ListItem.js";
 import { SearchField } from "./SearchField.js";
 import { Spinner } from "../Spinner.js";

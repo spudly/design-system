@@ -3,7 +3,7 @@ import type { ReactNode } from "react";
 import { Alert } from "../../widgets/Alert.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { Text } from "../../widgets/Text.js";
-import { TextLink } from "../../widgets/TextLink.js";
+import { TextLink } from "../../widgets/actions/TextLink.js";
 
 /**
  * EditVersionPage (#124, B3a): the shell half of Eciperay's

@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import {
   RecipeInstructionListView,
   type RecipeInstructionRow,

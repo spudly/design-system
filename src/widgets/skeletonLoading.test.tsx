@@ -250,10 +250,10 @@ test("LoadingScope lives in src/contexts — widgets import it from there", () =
     !existsSync(join(root, "src/widgets/LoadingScope.tsx")),
     "the context no longer lives in src/widgets",
   );
-  for (const name of ["Button", "Card", "CardRow", "StatCard"]) {
+  for (const name of ["actions/Button", "Card", "CardRow", "StatCard"]) {
     assert.match(
       read(`src/widgets/${name}.tsx`),
-      /from "\.\.\/contexts\/LoadingScope\.js"/,
+      /from "(?:\.\.\/)+contexts\/LoadingScope\.js"/,
       `${name} must import the scope from src/contexts`,
     );
   }
@@ -595,7 +595,7 @@ test("T1: a Button inside a LoadingScope renders the rectangle-skeleton treatmen
   // Source pins: the scope drives the fill (the theme's border
   // role, SkeletonBone's fill), the press handler is dropped,
   // and the disabled skeleton state withholds the link href.
-  const button = readCode("src/widgets/Button.tsx");
+  const button = readCode("src/widgets/actions/Button.tsx");
   assert.match(button, /const scopedLoading = useLoadingScope\(\)/, "Button reads the scope");
   assert.match(
     button,
@@ -749,7 +749,7 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
   // deprecated `ghost` variant; the skeleton frame stays
   // transparent and borderless; the label is replaced by a
   // SkeletonBone sized from the label.
-  const button = readCode("src/widgets/Button.tsx");
+  const button = readCode("src/widgets/actions/Button.tsx");
   assert.match(
     button,
     /const ghostSkeleton = scopedLoading && \(ghost \|\| variant === "ghost"\)/,
@@ -761,7 +761,7 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
     "the ghost skeleton frame has no filled background and no border",
   );
   assert.match(button, /ghostLabelBone/, "the ghost label is replaced by one text bone");
-  assert.match(button, /from "\.\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
+  assert.match(button, /from "\.\.\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
   const { Button, LoadingScope } = await loadRuntime();
   const noop = () => {};
   const scopedGhost = await renderToHtml(

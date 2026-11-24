@@ -2,7 +2,7 @@ import { Alert } from "../widgets/Alert.js";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Center } from "../widgets/Center.js";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { SpacedTopStack } from "../widgets/SpacedTopStack.js";
 import { TightStack } from "../widgets/TightStack.js";
 import { SectionCard } from "../widgets/SectionCard.js";

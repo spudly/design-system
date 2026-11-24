@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "./Button.js";
+import { Button } from "./actions/Button.js";
 import { StepOverlay } from "./StepOverlay.js";
 import { Text } from "./Text.js";
 

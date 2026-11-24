@@ -91,7 +91,7 @@ test("the shell is BigFooterShell around the plain ScreenContainer; sections in 
 test("the CTAs cross as {label, href} data into Button's href form, in contract order", async () => {
   const { LandingPage, Button } = await loadRuntime();
   const stackModule: Record<string, any> =
-    await import("../../../dist/widgets/StackedButtonRow.js");
+    await import("../../../dist/widgets/actions/StackedButtonRow.js");
   const tree = LandingPage({ ...sentinelProps });
   const row = findAllByType(tree, stackModule.StackedButtonRow)[0];
   assert.ok(row, "the CTAs render in the StackedButtonRow widget");

@@ -3,7 +3,7 @@ import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { useVoice } from "../voice/index.js";
 import { politeLiveRegionProps } from "../widgets/accessibility.js";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { CompactRow } from "../widgets/CompactRow.js";
 import { ContentStack } from "../widgets/ContentStack.js";
 import { SearchField } from "../widgets/form/SearchField.js";

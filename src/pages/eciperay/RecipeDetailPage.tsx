@@ -1,10 +1,10 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
 import { useMemo } from "react";
 import type { TagColorName } from "../../themes/tagColors.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { CenteredText } from "../../widgets/CenteredText.js";
 import { tokens } from "../../tokens/index.js";
-import { ButtonRow } from "../../widgets/ButtonRow.js";
+import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { CandidateList } from "../../widgets/CandidateList.js";
 import { BoxSkeleton } from "../../widgets/BoxSkeleton.js";
 import { ListStack } from "../../widgets/ListStack.js";
@@ -44,7 +44,7 @@ import { SuggestionPanel } from "../../widgets/form/SuggestionPanel.js";
 import { TagList } from "../../widgets/TagList.js";
 import { Text } from "../../widgets/Text.js";
 import { Thumbnail } from "../../widgets/Thumbnail.js";
-import { Toolbar } from "../../widgets/Toolbar.js";
+import { Toolbar } from "../../widgets/actions/Toolbar.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../../views/ConfirmActionView.js";
 import {
   RecipeCommentsView,

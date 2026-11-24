@@ -2,7 +2,7 @@ import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { TextAreaField } from "../widgets/form/TextAreaField.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "../widgets/Text.js";
 import { useVoice } from "../voice/index.js";

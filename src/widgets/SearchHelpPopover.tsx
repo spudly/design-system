@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Adapt, Popover, Sheet, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { Button } from "./Button.js";
+import { Button } from "./actions/Button.js";
 import { Text } from "./Text.js";
 
 /**

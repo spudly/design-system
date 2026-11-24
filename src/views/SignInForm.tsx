@@ -1,9 +1,9 @@
 import { FormStack } from "../widgets/FormStack.js";
-import { LinkStack } from "../widgets/LinkStack.js";
+import { LinkStack } from "../widgets/actions/LinkStack.js";
 import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
 import { PasswordField } from "../widgets/form/PasswordField.js";
 import { TextField } from "../widgets/form/TextField.js";
-import { TextLink } from "../widgets/TextLink.js";
+import { TextLink } from "../widgets/actions/TextLink.js";
 import { useVoice } from "../voice/index.js";
 
 /**

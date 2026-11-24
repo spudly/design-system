@@ -1,5 +1,5 @@
 import { Alert } from "../widgets/Alert.js";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 
 /**
  * The credential-field props shared by SignInForm and SignUpForm

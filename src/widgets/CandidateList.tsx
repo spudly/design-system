@@ -2,7 +2,7 @@ import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "./accessibility.js";
-import { Button } from "./Button.js";
+import { Button } from "./actions/Button.js";
 import { Text } from "./Text.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 

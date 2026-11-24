@@ -1,7 +1,7 @@
 ---
 component: MyVersesPage
 run_when:
-  - "src/widgets/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
+  - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
 ---
 
 # MyVersesPage — manual test steps
@@ -51,7 +51,7 @@ minimum width), so there are no sizing props to pass.
    fails this check even if the standalone ButtonRow stories
    pass.
 
-**Run when:** `src/widgets/ButtonRow.tsx`, its stories, the
+**Run when:** `src/widgets/actions/ButtonRow.tsx`, its stories, the
 pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
 MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset
 naming ButtonRow.

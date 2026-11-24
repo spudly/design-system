@@ -13,7 +13,7 @@ import { BrandMark, type BrandMarkName } from "../icons/BrandMark.js";
 import { GooglePlayBadge } from "../icons/GooglePlayBadge.js";
 import { PageContentColumn } from "./PageContentColumn.js";
 import { Text } from "./Text.js";
-import { TextLink } from "./TextLink.js";
+import { TextLink } from "./actions/TextLink.js";
 import { contentInfoRoleProps, platformAccessibilityProps } from "./accessibility.js";
 
 /**

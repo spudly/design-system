@@ -1,7 +1,7 @@
 import { FormStack } from "../widgets/FormStack.js";
 import { AuthFormSubmit } from "./AuthFormSubmit.js";
 import { TextField } from "../widgets/form/TextField.js";
-import { TextLink } from "../widgets/TextLink.js";
+import { TextLink } from "../widgets/actions/TextLink.js";
 import { useVoice } from "../voice/index.js";
 
 /**

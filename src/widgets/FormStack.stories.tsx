@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { Button } from "./Button.js";
-import { ButtonRow } from "./ButtonRow.js";
+import { Button } from "./actions/Button.js";
+import { ButtonRow } from "./actions/ButtonRow.js";
 import { FormStack } from "./FormStack.js";
 import { LabeledField } from "./form/LabeledField.js";
 import { TextField } from "../widgets/form/TextField.js";

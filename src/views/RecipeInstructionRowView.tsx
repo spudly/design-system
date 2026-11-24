@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { Center } from "../widgets/Center.js";
 import { FieldRow } from "../widgets/form/FieldRow.js";
 import { Grow } from "../widgets/Grow.js";

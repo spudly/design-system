@@ -2,7 +2,7 @@ import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { ContentStack } from "../widgets/ContentStack.js";
 import { CreatedSecretPanel } from "../widgets/CreatedSecretPanel.js";
 import { ListStack } from "../widgets/ListStack.js";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { Alert } from "../widgets/Alert.js";
 import { SectionCard } from "../widgets/SectionCard.js";
 import { Text } from "../widgets/Text.js";

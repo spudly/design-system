@@ -1,8 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { EmptyState } from "../../views/EmptyState.js";
-import { ButtonRow } from "../../widgets/ButtonRow.js";
+import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { Text } from "../../widgets/Text.js";
 import { BoundedList } from "../shared/BoundedList.js";

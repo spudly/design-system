@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
 import { Alert } from "../../widgets/Alert.js";
 import { AutocompletePicker } from "../../widgets/form/AutocompletePicker.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { FormStack } from "../../widgets/FormStack.js";
 import { FormHeading } from "../../widgets/FormHeading.js";
 import { FormScreenLayout } from "../../widgets/FormScreenLayout.js";

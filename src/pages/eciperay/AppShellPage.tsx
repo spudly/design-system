@@ -10,7 +10,7 @@ import {
 } from "../../widgets/AppTopBar.js";
 import { LazySlot } from "../../views/LazySlot.js";
 import { BannerRow } from "../../widgets/BannerRow.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { StatusMessage } from "../../views/StatusMessage.js";
 
 /**
