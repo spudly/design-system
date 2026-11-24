@@ -7,7 +7,7 @@ import { Button } from "../widgets/actions/Button.js";
 import { CompactRow } from "../widgets/layout/CompactRow.js";
 import { ContentStack } from "../widgets/layout/ContentStack.js";
 import { SearchField } from "../widgets/form/SearchField.js";
-import { SearchHelpPopover, type SearchHelpContent } from "../widgets/SearchHelpPopover.js";
+import { SearchHelpPopover, type SearchHelpContent } from "../widgets/overlays/SearchHelpPopover.js";
 import { Text } from "../widgets/data/Text.js";
 import { FieldRow } from "../widgets/form/FieldRow.js";
 import { SelectField, type SelectOption } from "../widgets/form/SelectField.js";

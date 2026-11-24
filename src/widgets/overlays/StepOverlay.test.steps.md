@@ -1,13 +1,13 @@
 ---
 component: StepOverlay
 run_when:
-  - "src/widgets/StepOverlay.tsx, its stories, MealCookingModePage, or a changeset naming StepOverlay."
-  - "src/pages/eciperay/CookingModePage.tsx, its stories, src/widgets/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
+  - "src/widgets/overlays/StepOverlay.tsx, its stories, MealCookingModePage, or a changeset naming StepOverlay."
+  - "src/pages/eciperay/CookingModePage.tsx, its stories, src/widgets/overlays/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
 ---
 
 # StepOverlay — manual test steps
 
-Colocated manual test steps for `src/widgets/StepOverlay.tsx` (design-system #530).
+Colocated manual test steps for `src/widgets/overlays/StepOverlay.tsx` (design-system #530).
 Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
@@ -45,7 +45,7 @@ Open in `Widgets/StepOverlay`: Default, LongBody.
    and keyboard focus returns to the "Reopen the overlay"
    button.
 
-**Run when:** `src/widgets/StepOverlay.tsx`, its
+**Run when:** `src/widgets/overlays/StepOverlay.tsx`, its
 stories, MealCookingModePage, or a changeset naming
 StepOverlay.
 
@@ -65,5 +65,5 @@ FirstStep, LastStep.
    WithIngredientsPanel, first in FirstStep, third in LastStep).
 
 **Run when:** `src/pages/eciperay/CookingModePage.tsx`, its stories,
-`src/widgets/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
+`src/widgets/overlays/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
 or a changeset naming CookingModePage.

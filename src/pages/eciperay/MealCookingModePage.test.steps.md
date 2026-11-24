@@ -2,7 +2,7 @@
 component: MealCookingModePage
 run_when:
   - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
-  - "src/widgets/StepOverlay.tsx, its stories, MealCookingModePage, or a changeset naming StepOverlay."
+  - "src/widgets/overlays/StepOverlay.tsx, its stories, MealCookingModePage, or a changeset naming StepOverlay."
 ---
 
 # MealCookingModePage — manual test steps
@@ -98,6 +98,6 @@ Open in `Widgets/StepOverlay`: Default, LongBody.
    and keyboard focus returns to the "Reopen the overlay"
    button.
 
-**Run when:** `src/widgets/StepOverlay.tsx`, its
+**Run when:** `src/widgets/overlays/StepOverlay.tsx`, its
 stories, MealCookingModePage, or a changeset naming
 StepOverlay.

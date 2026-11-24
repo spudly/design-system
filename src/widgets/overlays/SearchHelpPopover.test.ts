@@ -16,7 +16,7 @@
  *    definition-style list keyed by syntax.
  * 6. DS hard rules: type aliases only, no margins for spacing.
  */
-import "../../test/registerSvgStub.js";
+import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -24,15 +24,15 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
-const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+const root = join(here, "../../..");
+const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
 
 function codeOf(rel: string): string {
   const source = readFileSync(join(root, rel), "utf8");
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const widget = codeOf("src/widgets/SearchHelpPopover.tsx");
+const widget = codeOf("src/widgets/overlays/SearchHelpPopover.tsx");
 
 test("SearchHelpPopover is exported from the internal components barrel", () => {
   assert.equal(typeof dist.SearchHelpPopover, "function");

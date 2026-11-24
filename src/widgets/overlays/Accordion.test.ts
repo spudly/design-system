@@ -35,7 +35,7 @@
  * cannot satisfy the patterns), plus a dist import for the export
  * contract — `npm test` builds before running.
  */
-import "../../test/registerSvgStub.js";
+import "../../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
@@ -43,17 +43,17 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
-const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+const root = join(here, "../../..");
+const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
 
 function codeOf(rel: string): string {
   const source = readFileSync(join(root, rel), "utf8");
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const accordion = codeOf("src/widgets/Accordion.tsx");
-const section = codeOf("src/widgets/AccordionSection.tsx");
-const collapsible = codeOf("src/widgets/Collapsible.tsx");
+const accordion = codeOf("src/widgets/overlays/Accordion.tsx");
+const section = codeOf("src/widgets/overlays/AccordionSection.tsx");
+const collapsible = codeOf("src/widgets/overlays/Collapsible.tsx");
 const family = { Accordion: accordion, AccordionSection: section, Collapsible: collapsible };
 
 test("Accordion, AccordionSection, and Collapsible are exported from the internal components barrel", () => {
@@ -136,7 +136,7 @@ test("the section's CollapsibleIcon sits to the left of the title (#458)", () =>
 });
 
 test("the section's indicator is the icons module's CollapsibleIcon (#250)", () => {
-  assert.match(section, /import \{ CollapsibleIcon \} from "\.\.\/icons\/CollapsibleIcon\.js"/);
+  assert.match(section, /import \{ CollapsibleIcon \} from "\.\.\/\.\.\/icons\/CollapsibleIcon\.js"/);
   assert.match(section, /<CollapsibleIcon isOpen=\{open\} size=\{20\}/);
   // The drawn-bars chevron it replaced is gone.
   assert.doesNotMatch(section, /SectionChevron/);

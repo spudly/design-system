@@ -2,19 +2,19 @@ import { useContext, useEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { ScrollView, YStack, isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
-import { tokens } from "../tokens/index.js";
-import { dialogRoleProps, platformAccessibilityProps } from "./accessibility.js";
+import { tokens } from "../../tokens/index.js";
+import { dialogRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import {
   ModalLayerContext,
   isActiveModalLayer,
   registerModalLayer,
   registeredModalRoots,
   unregisterModalLayer,
-} from "./modalRegistry.js";
-import type { ModalLayer } from "./modalRegistry.js";
-import { Text } from "./data/Text.js";
-import { PageContentColumn } from "./layout/PageContentColumn.js";
-import { useVoice } from "../voice/index.js";
+} from "../modalRegistry.js";
+import type { ModalLayer } from "../modalRegistry.js";
+import { Text } from "../data/Text.js";
+import { PageContentColumn } from "../layout/PageContentColumn.js";
+import { useVoice } from "../../voice/index.js";
 
 export type StepOverlayProps = {
   /** The top eyebrow line: the context the steps belong to (a
