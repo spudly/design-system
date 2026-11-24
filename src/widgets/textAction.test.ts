@@ -40,10 +40,10 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const commentItem = readCode("src/views/CommentItem.tsx");
+const commentItem = readCode("src/views/eciperay/CommentItem.tsx");
 const textActionCardRow = readCode("src/widgets/content/TextActionCardRow.tsx");
 const changedListBanner = readCode("src/widgets/feedback/ChangedListBanner.tsx");
-const revertAction = readCode("src/views/RevertAction.tsx");
+const revertAction = readCode("src/views/eciperay/RevertAction.tsx");
 const aiSessionPage = readCode("src/pages/eciperay/AiSessionPage.tsx");
 const tagsPage = readCode("src/pages/eciperay/TagsPage.tsx");
 const index = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");

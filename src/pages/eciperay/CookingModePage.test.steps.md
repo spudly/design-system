@@ -1,8 +1,8 @@
 ---
 component: CookingModePage
 run_when:
-  - "src/pages/eciperay/CookingModePage.tsx, its stories, src/widgets/overlays/StepOverlay.tsx, src/views/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
-  - "src/views/ScaledIngredientsView.tsx, its stories, CookingModePage, or a changeset naming ScaledIngredientsView."
+  - "src/pages/eciperay/CookingModePage.tsx, its stories, src/widgets/overlays/StepOverlay.tsx, src/views/eciperay/ScaledIngredientsView.tsx, or a changeset naming CookingModePage."
+  - "src/views/eciperay/ScaledIngredientsView.tsx, its stories, CookingModePage, or a changeset naming ScaledIngredientsView."
 ---
 
 # CookingModePage — manual test steps
@@ -33,7 +33,7 @@ FirstStep, LastStep, NoFooter.
    WithIngredientsPanel, first in FirstStep, third in LastStep).
 
 **Run when:** `src/pages/eciperay/CookingModePage.tsx`, its stories,
-`src/widgets/overlays/StepOverlay.tsx`, `src/views/ScaledIngredientsView.tsx`,
+`src/widgets/overlays/StepOverlay.tsx`, `src/views/eciperay/ScaledIngredientsView.tsx`,
 or a changeset naming CookingModePage.
 
 ## ScaledIngredientsView
@@ -45,6 +45,6 @@ Open in `Views/ScaledIngredientsView`: OnOverlay.
    fixed at five, so the scrolls-inside-the-panel behavior
    for longer lists is not exercised by this story.
 
-**Run when:** `src/views/ScaledIngredientsView.tsx`, its
+**Run when:** `src/views/eciperay/ScaledIngredientsView.tsx`, its
 stories, CookingModePage, or a changeset naming
 ScaledIngredientsView.

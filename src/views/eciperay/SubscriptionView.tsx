@@ -1,0 +1,153 @@
+import { useLoadingScope } from "../../contexts/LoadingScope.js";
+import { Button } from "../../widgets/actions/Button.js";
+import { Center } from "../../widgets/layout/Center.js";
+import { CompactStack } from "../../widgets/layout/CompactStack.js";
+import { StartStack } from "../../widgets/layout/StartStack.js";
+import { SectionCard } from "../../widgets/content/SectionCard.js";
+import { Text } from "../../widgets/data/Text.js";
+import { TextLink } from "../../widgets/actions/TextLink.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
+import { useVoice } from "../../voice/index.js";
+
+export type SubscriptionViewProps = {
+  /** Section heading. Defaults to the voice object's subscriptionView title (#539). */
+  title?: string;
+  /** The current plan's display name; absent hides the plan line. */
+  planLabel?: string | null;
+  /** Display-ready status line, composed by the host from its entitlement data. */
+  statusText?: string | null;
+  /** Shown when there is no status line (the subscribe upsell copy). */
+  upsellText?: string | null;
+  /** A status refresh is reconciling with the provider. */
+  reconcilingText?: string | null;
+  error?: string | null;
+  /** Loading state (#278): the section title skeletonizes
+   * through the SectionCard, the plan line renders as a text
+   * skeleton at xl size (the subheading size) and the status/upsell line at md
+   * size, and the manage / refresh / portal actions stay
+   * rendered inside the card's loading scope so each Button
+   * renders as a rectangle skeleton at its normal geometry
+   * (the portal TextLink, which does not read the scope,
+   * renders as a text skeleton in its place). No real plan,
+   * status, or error text shows. An enclosing composite's
+   * LoadingScope can also put the view into this state
+   * without prop-drilling. */
+  loading?: boolean;
+  /** Kept for compatibility with existing hosts: the loading
+   * state is now a skeleton (#278), so this text no longer
+   * renders as visible text. */
+  loadingText?: string;
+  onManage?: () => void;
+  manageLabel?: string;
+  managePendingLabel?: string;
+  managePending?: boolean;
+  onRefresh?: () => void;
+  refreshLabel?: string;
+  refreshPendingLabel?: string;
+  refreshPending?: boolean;
+  /** The provider's customer-portal destination (#248: an href, not a callback). */
+  portalUrl?: string | null;
+  portalLabel?: string;
+};
+
+/**
+ * SubscriptionView (#438 Part 3): the profile Subscription
+ * section as a view — plan, status, upsell, and the manage /
+ * refresh / portal actions on a SectionCard, composed from the
+ * shared widgets so hosts no longer import SectionCard / Text
+ * / Button / TextLink to build the section themselves (the
+ * eciperay audit's coverage disposition for those specifiers).
+ *
+ * The host derives every string from its entitlement data
+ * (plan, status, period end, cancellation) and keeps the
+ * checkout / portal sessions and the refresh mutation; the
+ * view renders display-ready lines and reports intents. The
+ * portal is a real link: it navigates, so it crosses as an
+ * href (#248).
+ */
+export function SubscriptionView({
+  title: titleProp,
+  planLabel,
+  statusText,
+  upsellText,
+  reconcilingText,
+  error,
+  loading = false,
+  onManage,
+  manageLabel: manageLabelProp,
+  managePendingLabel: managePendingLabelProp,
+  managePending = false,
+  onRefresh,
+  refreshLabel: refreshLabelProp,
+  refreshPendingLabel: refreshPendingLabelProp,
+  refreshPending = false,
+  portalUrl,
+  portalLabel: portalLabelProp,
+}: SubscriptionViewProps) {
+  const voice = useVoice();
+  const title = titleProp ?? voice.subscriptionView.title;
+  const manageLabel = manageLabelProp ?? voice.subscriptionView.manageLabel;
+  const managePendingLabel = managePendingLabelProp ?? voice.subscriptionView.managePendingLabel;
+  const refreshLabel = refreshLabelProp ?? voice.subscriptionView.refreshLabel;
+  const refreshPendingLabel = refreshPendingLabelProp ?? voice.subscriptionView.refreshPendingLabel;
+  const portalLabel = portalLabelProp ?? voice.subscriptionView.portalLabel;
+  const showSkeleton = useLoadingScope(loading);
+  return (
+    <SectionCard title={title} variant="elevated" loading={showSkeleton}>
+      <CompactStack>
+        {showSkeleton ? (
+          // Loading (#278): text skeletons mirroring the
+          // loaded lines — the plan line at xl size, the
+          // status/upsell line at md size in the two lines
+          // the status copy wraps to at the section's width
+          // (a single line left the actions shifted up by a
+          // line — Stephen on #579). No real plan, status,
+          // reconciling, or error text renders.
+          <>
+            <TextSkeleton size="xl" lines={1} />
+            <TextSkeleton size="md" lines={2} />
+          </>
+        ) : (
+          <>
+            {planLabel ? <Text variant="subheading">{planLabel}</Text> : null}
+            {statusText ? (
+              <Text variant="body">{statusText}</Text>
+            ) : upsellText ? (
+              <Text variant="muted">{upsellText}</Text>
+            ) : null}
+            {reconcilingText ? <Text variant="muted">{reconcilingText}</Text> : null}
+            {error ? <Text variant="error">{error}</Text> : null}
+          </>
+        )}
+        {onManage || onRefresh || portalUrl ? (
+          <StartStack>
+            {onManage ? (
+              <Button variant="primary" disabled={managePending} onPress={onManage}>
+                {managePending ? managePendingLabel : manageLabel}
+              </Button>
+            ) : null}
+            {onRefresh ? (
+              <Button ghost disabled={refreshPending} onPress={onRefresh}>
+                {refreshPending ? refreshPendingLabel : refreshLabel}
+              </Button>
+            ) : null}
+            {portalUrl ? (
+              showSkeleton ? (
+                // TextLink does not read the loading scope,
+                // so a text skeleton stands in its place —
+                // centered in the link's own line box
+                // (SIZABLE_TEXT_LINE_BOX, 27), not a plain
+                // text line box (Stephen on #579).
+                <Center width="100%" height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
+                  <TextSkeleton size="md" lines={1} />
+                </Center>
+              ) : (
+                <TextLink href={portalUrl}>{portalLabel}</TextLink>
+              )
+            ) : null}
+          </StartStack>
+        ) : null}
+      </CompactStack>
+    </SectionCard>
+  );
+}

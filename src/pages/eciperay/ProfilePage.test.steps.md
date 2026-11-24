@@ -2,10 +2,10 @@
 component: ProfilePage
 run_when:
   - "src/pages/eciperay/ProfilePage.tsx, its stories, the four section views below, or a changeset naming ProfilePage."
-  - "src/views/SubscriptionView.tsx, its stories, ProfilePage, or a changeset naming SubscriptionView."
-  - "src/views/FeedbackPreferenceView.tsx, its stories, ProfilePage, or a changeset naming FeedbackPreferenceView."
-  - "src/views/TransferRecipesView.tsx, src/views/RecipeExportPickerView.tsx, their stories, ProfilePage, or a changeset naming either view."
-  - "src/views/AccountDataView.tsx, its stories, ProfilePage, or a changeset naming AccountDataView."
+  - "src/views/eciperay/SubscriptionView.tsx, its stories, ProfilePage, or a changeset naming SubscriptionView."
+  - "src/views/eciperay/FeedbackPreferenceView.tsx, its stories, ProfilePage, or a changeset naming FeedbackPreferenceView."
+  - "src/views/eciperay/TransferRecipesView.tsx, src/views/eciperay/RecipeExportPickerView.tsx, their stories, ProfilePage, or a changeset naming either view."
+  - "src/views/eciperay/AccountDataView.tsx, its stories, ProfilePage, or a changeset naming AccountDataView."
 ---
 
 # ProfilePage — manual test steps
@@ -39,7 +39,7 @@ Open in `Views/SubscriptionView`: Active, FreeUpsell, Loading.
    manage action only. Loading shows the spinner with its
    "Loading subscription…" line.
 
-**Run when:** `src/views/SubscriptionView.tsx`, its stories,
+**Run when:** `src/views/eciperay/SubscriptionView.tsx`, its stories,
 ProfilePage, or a changeset naming SubscriptionView.
 
 ## FeedbackPreferenceView
@@ -56,7 +56,7 @@ PromptOpen, ShortcutUnavailable.
 3. ShortcutUnavailable: the checkbox is disabled and the
    unavailable hint shows under it.
 
-**Run when:** `src/views/FeedbackPreferenceView.tsx`, its
+**Run when:** `src/views/eciperay/FeedbackPreferenceView.tsx`, its
 stories, ProfilePage, or a changeset naming
 FeedbackPreferenceView.
 
@@ -72,8 +72,8 @@ Open in `Views/TransferRecipesView`: Default; and in
 2. Picker Loading: the list region shows the loading spinner
    and the export button is disabled.
 
-**Run when:** `src/views/TransferRecipesView.tsx`,
-`src/views/RecipeExportPickerView.tsx`, their stories,
+**Run when:** `src/views/eciperay/TransferRecipesView.tsx`,
+`src/views/eciperay/RecipeExportPickerView.tsx`, their stories,
 ProfilePage, or a changeset naming either view.
 
 ## AccountDataView
@@ -85,5 +85,5 @@ Open in `Views/AccountDataView`: Default, WithError.
    danger treatment. WithError adds the error line under the
    buttons.
 
-**Run when:** `src/views/AccountDataView.tsx`, its stories,
+**Run when:** `src/views/eciperay/AccountDataView.tsx`, its stories,
 ProfilePage, or a changeset naming AccountDataView.

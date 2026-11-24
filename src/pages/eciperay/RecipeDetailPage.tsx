@@ -10,7 +10,7 @@ import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { ListStack } from "../../widgets/data/ListStack.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
-import { LogEntryCard } from "../../views/LogEntryCard.js";
+import { LogEntryCard } from "../../views/eciperay/LogEntryCard.js";
 import { MarkableRow } from "../../widgets/data/MarkableRow.js";
 import {
   NutritionPanel,
@@ -38,24 +38,24 @@ import { StatBand } from "../../widgets/data/StatBand.js";
 import { StatCard } from "../../widgets/data/StatCard.js";
 import { Badge } from "../../widgets/data/Badge.js";
 import { MetadataBadge } from "../../widgets/data/MetadataBadge.js";
-import { StatusMessage } from "../../views/StatusMessage.js";
+import { StatusMessage } from "../../views/shared/StatusMessage.js";
 import { StepList } from "../../widgets/data/StepList.js";
 import { SuggestionPanel } from "../../widgets/form/SuggestionPanel.js";
 import { TagList } from "../../widgets/data/TagList.js";
 import { Text } from "../../widgets/data/Text.js";
 import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 import { Toolbar } from "../../widgets/actions/Toolbar.js";
-import { ConfirmActionView, type ConfirmActionViewProps } from "../../views/ConfirmActionView.js";
+import { ConfirmActionView, type ConfirmActionViewProps } from "../../views/eciperay/ConfirmActionView.js";
 import {
   RecipeCommentsView,
   type RecipeCommentsViewProps,
-} from "../../views/RecipeCommentsView.js";
+} from "../../views/eciperay/RecipeCommentsView.js";
 import { RatingForm } from "../../widgets/form/RatingForm.js";
 import {
   RecipeSharingView,
   type RecipeSharingConsentSpan,
   type RecipeSharingViewProps,
-} from "../../views/RecipeSharingView.js";
+} from "../../views/eciperay/RecipeSharingView.js";
 import { STATUS_BADGES } from "../shared/recipeStatusBadges.js";
 
 /**

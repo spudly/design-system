@@ -111,8 +111,8 @@ const restoredByModule: [string, string[]][] = [
   // #671 (2026-11-16): Stephen's minimal named exception to the
   // #298 pages-only rule — exactly these two sortable row views
   // and their prop types, so native hosts can compose them.
-  ["./views/RecipeIngredientRowView.js", ["RecipeIngredientRowView", "RecipeIngredientRowViewProps"]],
-  ["./views/RecipeInstructionRowView.js", ["RecipeInstructionRowView", "RecipeInstructionRowViewProps"]],
+  ["./views/eciperay/RecipeIngredientRowView.js", ["RecipeIngredientRowView", "RecipeIngredientRowViewProps"]],
+  ["./views/eciperay/RecipeInstructionRowView.js", ["RecipeInstructionRowView", "RecipeInstructionRowViewProps"]],
 ];
 
 const restoredNames = new Set(restoredByModule.flatMap(([, names]) => names));
@@ -152,8 +152,8 @@ test("the root entry re-exports the pages barrel and exactly the #411 additions 
         "./themes/index.js",
         "./tamagui.config.js",
         "./voice/index.js",
-        "./views/RecipeIngredientRowView.js",
-        "./views/RecipeInstructionRowView.js",
+        "./views/eciperay/RecipeIngredientRowView.js",
+        "./views/eciperay/RecipeInstructionRowView.js",
       ]),
       `${rel} must re-export from exactly the pages barrel, the #411 source modules, the #539 voice module, and the #671 row-view modules`,
     );

@@ -5,18 +5,18 @@ import { TextLink } from "../../widgets/actions/TextLink.js";
 import { LegalSection } from "../../widgets/content/LegalSection.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
-import { AccountDataView, type AccountDataViewProps } from "../../views/AccountDataView.js";
+import { AccountDataView, type AccountDataViewProps } from "../../views/eciperay/AccountDataView.js";
 import {
   FeedbackPreferenceView,
   type FeedbackPreferenceViewProps,
-} from "../../views/FeedbackPreferenceView.js";
-import { SubscriptionView, type SubscriptionViewProps } from "../../views/SubscriptionView.js";
+} from "../../views/eciperay/FeedbackPreferenceView.js";
+import { SubscriptionView, type SubscriptionViewProps } from "../../views/eciperay/SubscriptionView.js";
 import {
   TransferRecipesView,
   type TransferRecipesViewProps,
-} from "../../views/TransferRecipesView.js";
-import { AccessTokensPanel, type AccessTokensPanelProps } from "../../views/AccessTokensPanel.js";
-import { NutritionGoalsForm, type NutritionGoalsFormProps } from "../../views/NutritionGoalsForm.js";
+} from "../../views/eciperay/TransferRecipesView.js";
+import { AccessTokensPanel, type AccessTokensPanelProps } from "../../views/eciperay/AccessTokensPanel.js";
+import { NutritionGoalsForm, type NutritionGoalsFormProps } from "../../views/eciperay/NutritionGoalsForm.js";
 
 // The section view-models live with the views (#438 Part 3);
 // the page's contract names are aliases, so consumers of the

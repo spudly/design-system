@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { Label, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { useImeCompositionGuard, type ImeCompositionGuard } from "../../views/useImeCompositionGuard.js";
+import { useImeCompositionGuard, type ImeCompositionGuard } from "../../views/shared/useImeCompositionGuard.js";
 
 export type FieldShellProps = ImeCompositionGuard & {
   /** The visible label, associated with the field via `htmlFor`. */

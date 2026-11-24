@@ -71,10 +71,10 @@ test("the auth pages compose their form units and render no fields directly", ()
 
 test("each form composes the shared FormStack and owns its submit handling", () => {
   for (const form of FORMS) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     assert.match(
       source,
-      /import \{ FormStack \} from "\.\.\/widgets\/layout\/FormStack\.js";/,
+      /import \{ FormStack \} from "\.\.\/\.\.\/widgets\/layout\/FormStack\.js";/,
       `${form} imports the shared FormStack`,
     );
     assert.match(source, /<FormStack>/, `${form} renders its sections in the FormStack`);
@@ -88,7 +88,7 @@ test("each form composes the shared FormStack and owns its submit handling", () 
     // other forms declare it in their own props.
     const intentSource =
       form === "SignInForm" || form === "SignUpForm"
-        ? read("src/views/AuthFormSubmit.tsx")
+        ? read("src/views/eciperay/AuthFormSubmit.tsx")
         : source;
     assert.match(intentSource, /onSubmit: \(\) => void/, `${form} submits a bare intent`);
     assert.doesNotMatch(
@@ -157,13 +157,13 @@ test("auth pages forward their props to their forms", () => {
 
 test("the email-bearing forms thread emailError to the email field only (#535)", () => {
   for (const form of ["SignInForm", "SignUpForm", "ForgotPasswordForm"]) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     // SignInForm/SignUpForm declare emailError in the shared
     // EmailPasswordFormProps (#587 phase 3); ForgotPasswordForm
     // declares it in its own props.
     const declarationSource =
       form === "SignInForm" || form === "SignUpForm"
-        ? read("src/views/AuthFormSubmit.tsx")
+        ? read("src/views/eciperay/AuthFormSubmit.tsx")
         : source;
     assert.ok(
       declarationSource.includes("emailError?: string | null | undefined;"),
@@ -179,7 +179,7 @@ test("the email-bearing forms thread emailError to the email field only (#535)",
       `${form} threads emailError exactly once (the email field only)`,
     );
   }
-  const reset = read("src/views/ResetPasswordForm.tsx");
+  const reset = read("src/views/eciperay/ResetPasswordForm.tsx");
   assert.ok(
     !reset.includes("emailError"),
     "ResetPasswordForm has no email field and no emailError",
@@ -201,7 +201,7 @@ test("each form's submit button is named for the label it renders, in both state
     ResetPasswordForm: "resetPasswordForm",
   };
   for (const [form, voiceKey] of Object.entries(BUTTON_VOICE)) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     assert.match(
       source.replace(/\s+/g, " "),
       new RegExp(
@@ -217,7 +217,7 @@ test("each form's submit button is named for the label it renders, in both state
       source.includes("submitLabel={submitLabel}"),
       `${form} passes its resolved label to the shared AuthFormSubmit tail`,
     );
-    const tail = read(`src/views/AuthFormSubmit.tsx`);
+    const tail = read(`src/views/eciperay/AuthFormSubmit.tsx`);
     assert.ok(
       tail.includes("accessibilityLabel={submitLabel}"),
       `${form} names its submit button with the resolved label`,
@@ -230,7 +230,7 @@ test("each form's submit button is named for the label it renders, in both state
 });
 
 test("SignUpForm keeps the legal notice between submit and the sign-in link", () => {
-  const source = read("src/views/SignUpForm.tsx");
+  const source = read("src/views/eciperay/SignUpForm.tsx");
   const submitAt = source.indexOf("{submitLabel}");
   const noticeAt = source.indexOf("{legalNotice ? (");
   const linkAt = source.indexOf("{voice.signUpForm.signInLabel}");

@@ -2,11 +2,11 @@
 component: RecipeDetailPage
 run_when:
   - "src/pages/eciperay/RecipeDetailPage.tsx, its stories, or a changeset naming RecipeDetailPage."
-  - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
-  - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
-  - "src/widgets/data/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."  - "src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
-  - "src/views/RecipeSharingView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeSharingView."
-  - "src/views/ConfirmActionView.tsx, its stories, RecipeDetailPage, or a changeset naming ConfirmActionView."
+  - "src/views/eciperay/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
+  - "src/views/eciperay/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
+  - "src/widgets/data/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."  - "src/views/eciperay/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
+  - "src/views/eciperay/RecipeSharingView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeSharingView."
+  - "src/views/eciperay/ConfirmActionView.tsx, its stories, RecipeDetailPage, or a changeset naming ConfirmActionView."
 ---
 
 # RecipeDetailPage — manual test steps
@@ -59,7 +59,7 @@ Open in `Widgets/RecipeOverviewPanel`: Default, Minimal.
    the "Idea" pill, and the Servings stat only — no
    description, Prep/Cook stats, or tag row.
 
-**Run when:** `src/views/RecipeOverviewPanel.tsx`, its
+**Run when:** `src/views/eciperay/RecipeOverviewPanel.tsx`, its
 stories, PublicRecipePage, RecipeDetailPage, or a changeset
 naming RecipeOverviewPanel.
 
@@ -79,7 +79,7 @@ Open in `Views/RecipeIngredientsPanel`: Default, Plain.
 2. Plain: two unadorned rows with hairline separators and no
    substitutions panel.
 
-**Run when:** `src/views/RecipeIngredientsPanel.tsx`,
+**Run when:** `src/views/eciperay/RecipeIngredientsPanel.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeIngredientsPanel.
 
@@ -109,7 +109,7 @@ Empty, Loading, SignedOut.
    "Comments" heading above a spinner; SignedOut shows the
    comments with no composer.
 
-**Run when:** `src/views/RecipeCommentsView.tsx`, its
+**Run when:** `src/views/eciperay/RecipeCommentsView.tsx`, its
 stories, RecipeDetailPage, or a changeset naming
 RecipeCommentsView.
 
@@ -124,7 +124,7 @@ Open in `Views/RecipeSharingView`: PublicWithConsent, Private.
    permalink row render under the Save button.
 2. Private: no warning, no consent checkbox, no permalink row.
 
-**Run when:** `src/views/RecipeSharingView.tsx`, its stories,
+**Run when:** `src/views/eciperay/RecipeSharingView.tsx`, its stories,
 RecipeDetailPage, or a changeset naming RecipeSharingView.
 
 ## ConfirmActionView
@@ -141,5 +141,5 @@ WithError, Notice.
 2. WithError: the error alert renders inside the dialog above
    the actions. Notice: a single primary OK action, no Cancel.
 
-**Run when:** `src/views/ConfirmActionView.tsx`, its stories,
+**Run when:** `src/views/eciperay/ConfirmActionView.tsx`, its stories,
 RecipeDetailPage, or a changeset naming ConfirmActionView.

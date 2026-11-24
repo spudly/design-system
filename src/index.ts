@@ -69,8 +69,8 @@ export { VoiceProvider, useVoice, type Voice, type VoiceFormatter, type VoicePro
 export {
   RecipeIngredientRowView,
   type RecipeIngredientRowViewProps,
-} from "./views/RecipeIngredientRowView.js";
+} from "./views/eciperay/RecipeIngredientRowView.js";
 export {
   RecipeInstructionRowView,
   type RecipeInstructionRowViewProps,
-} from "./views/RecipeInstructionRowView.js";
+} from "./views/eciperay/RecipeInstructionRowView.js";

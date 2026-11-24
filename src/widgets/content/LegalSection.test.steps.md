@@ -1,7 +1,7 @@
 ---
 component: LegalSection
 run_when:
-  - "src/views/SignInForm.tsx, src/views/SignUpForm.tsx, src/views/ForgotPasswordForm.tsx, src/views/ResetPasswordForm.tsx, src/widgets/content/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
+  - "src/views/eciperay/SignInForm.tsx, src/views/eciperay/SignUpForm.tsx, src/views/eciperay/ForgotPasswordForm.tsx, src/views/eciperay/ResetPasswordForm.tsx, src/widgets/content/LegalSection.tsx, their stories, the auth pages and ProfilePage that compose them, or a changeset naming the auth forms or LegalSection."
 ---
 
 # LegalSection — manual test steps
@@ -45,10 +45,10 @@ forms.
    state; pressing Enter again while loading does not
    increase the readout.
 
-**Run when:** `src/views/SignInForm.tsx`,
-`src/views/SignUpForm.tsx`,
-`src/views/ForgotPasswordForm.tsx`,
-`src/views/ResetPasswordForm.tsx`,
+**Run when:** `src/views/eciperay/SignInForm.tsx`,
+`src/views/eciperay/SignUpForm.tsx`,
+`src/views/eciperay/ForgotPasswordForm.tsx`,
+`src/views/eciperay/ResetPasswordForm.tsx`,
 `src/widgets/content/LegalSection.tsx`, their stories, the auth or
 Profile pages that compose them, or a changeset naming the
 auth forms or LegalSection.

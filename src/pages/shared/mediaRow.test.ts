@@ -136,7 +136,7 @@ test("RatingStars' button is keyboard-operable on web (the CardRow pattern)", ()
 });
 
 test("the bar's inlined remove pairing pairs the field with its end-aligned ghost Remove button at a 4px gap (#740)", () => {
-  const bar = readFileSync(join(here, "../../..", "src", "views", "CatalogFiltersBar.tsx"), "utf8");
+  const bar = readFileSync(join(here, "../../..", "src", "views", "eciperay", "CatalogFiltersBar.tsx"), "utf8");
   assert.match(bar, /<YStack key=\{definition\.id\} gap=\{tokens\.spacing\[1\]\}>/);
   assert.match(bar, /<XStack justifyContent="flex-end">/);
   assert.match(bar, /ghost\s+size="sm"/);

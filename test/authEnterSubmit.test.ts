@@ -18,7 +18,7 @@ import test from "node:test";
  * intent.
  */
 
-const form = (name: string) => readFileSync(`src/views/${name}.tsx`, "utf8");
+const form = (name: string) => readFileSync(`src/views/eciperay/${name}.tsx`, "utf8");
 
 const AUTH_FORMS = [
   { name: "SignInForm", fields: 2 },
@@ -83,7 +83,7 @@ test("TextField: submit-editing is held while an IME composition is active (web)
   const source = readFileSync("src/widgets/form/TextField.tsx", "utf8");
   // The guard internals live in the shared hook since the #587
   // phase-2 dedupe; TextField.tsx only wires its handlers in.
-  const guard = readFileSync("src/views/useImeCompositionGuard.ts", "utf8");
+  const guard = readFileSync("src/views/shared/useImeCompositionGuard.ts", "utf8");
   // Composition is tracked on the field itself (web only —
   // Tamagui's Enter handler fires onSubmitEditing without a
   // composition check, so the guard must live in the shared

@@ -272,7 +272,7 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
   }
 });
 
-test("every view component has a story file titled Views/<Name>", () => {
+test("every view component has a story file titled Views/<App>/<Name>", () => {
   const dir = join(root, "src", "views");
   const index = read("src/views/index.ts");
   // useImeCompositionGuard.ts is an internal hook (the shared IME
@@ -301,31 +301,47 @@ test("every view component has a story file titled Views/<Name>", () => {
     "AuthFormSubmit.tsx",
     "SectionMutedText.tsx",
   ]);
+  // #710: views live in per-host-app subdirectories
+  // (src/views/<eciperay|memorize|shared>/), titled
+  // Views/<App>/<Name>; the parity scan walks each host directory
+  // in turn. The views root itself holds only the barrel and the
+  // aggregate voice/component tests.
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
-    assert.ok(
-      entry.isFile(),
-      `src/views/${entry.name}: unexpected directory — the parity scan is flat`,
-    );
-    if (
-      exceptions.has(entry.name) ||
-      entry.name.endsWith(".stories.tsx") ||
-      entry.name.endsWith(".test.ts") ||
-      entry.name.endsWith(".test.tsx") ||
-      entry.name.endsWith(".test.steps.md")
-    )
-      continue;
-    assert.ok(
-      entry.name.endsWith(".tsx"),
-      `src/views/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
-    );
-    const base = entry.name.replace(/\.tsx$/, "");
-    assertModuleStory({
-      dir,
-      index,
-      base,
-      titleDescription: `title "Views/${base}"`,
-      titleMatches: (t: any) => t === `Views/${base}`,
-    });
+    if (entry.isFile()) {
+      assert.ok(
+        entry.name === "index.ts" || entry.name.includes(".test."),
+        `src/views/${entry.name}: unexpected root file — views live in host-app subdirectories (#710)`,
+      );
+    }
+  }
+  for (const host of ["eciperay", "memorize", "shared"]) {
+    const hostDir = join(dir, host);
+    if (!existsSync(hostDir)) continue;
+    const hostTitle = host.charAt(0).toUpperCase() + host.slice(1);
+    for (const entry of readdirSync(hostDir, { withFileTypes: true })) {
+      assert.ok(entry.isFile(), `src/views/${host}/${entry.name}: unexpected directory`);
+      if (
+        exceptions.has(entry.name) ||
+        entry.name.endsWith(".stories.tsx") ||
+        entry.name.endsWith(".test.ts") ||
+        entry.name.endsWith(".test.tsx") ||
+        entry.name.endsWith(".test.steps.md")
+      )
+        continue;
+      assert.ok(
+        entry.name.endsWith(".tsx"),
+        `src/views/${host}/${entry.name}: unaccounted file — add it to the parity exceptions with a reason, or give it stories`,
+      );
+      const base = entry.name.replace(/\.tsx$/, "");
+      assertModuleStory({
+        dir: hostDir,
+        index,
+        base,
+        specifier: `./${host}/${base}.js`,
+        titleDescription: `title "Views/${hostTitle}/${base}"`,
+        titleMatches: (t: any) => t === `Views/${hostTitle}/${base}`,
+      });
+    }
   }
 });
 
@@ -396,9 +412,11 @@ test("every story file is organized under Widgets/, Views/, or Pages/<App>/ and 
     const dir = join(root, "src", area);
     // #710: page stories live one level down, in the host-app dirs.
     const names =
-      area === "pages"
+      area === "pages" || area === "views"
         ? ["eciperay", "memorize", "shared"].flatMap((host) =>
-            readdirSync(join(dir, host)).map((name) => join(host, name)),
+            existsSync(join(dir, host))
+              ? readdirSync(join(dir, host)).map((name) => join(host, name))
+              : [],
           )
         : readdirSync(dir);
     for (const name of names) {
