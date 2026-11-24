@@ -165,12 +165,6 @@ export {
 } from "./NutritionPanel.js";
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
-export {
-  RecipeIngredientsPanel,
-  type RecipeIngredientsPanelProps,
-  type RecipeIngredientsPanelView,
-} from "./RecipeIngredientsPanel.js";
-export { RecipeOverviewPanel, type RecipeOverviewPanelProps } from "./RecipeOverviewPanel.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
 export { Toolbar, type ToolbarProps } from "./Toolbar.js";
 export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";
