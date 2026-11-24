@@ -65,7 +65,7 @@ const page = readFileSync(join(root, "src/pages/eciperay/RecipeDetailPage.tsx"),
 // panel since the #331 extraction, so its control pins scan the
 // panel source (the page wires its view-model into the panel;
 // src/pages/eciperay/PublicRecipePage.test.ts pins that wiring).
-const ingredientsPanel = readFileSync(join(root, "src/widgets/RecipeIngredientsPanel.tsx"), "utf8");
+const ingredientsPanel = readFileSync(join(root, "src/views/RecipeIngredientsPanel.tsx"), "utf8");
 
 test("NumberStepper layout is additive with stacked as the default", () => {
   assert.match(stepper, /layout\?: "stacked" \| "inline";/, "layout prop is declared");
@@ -104,7 +104,12 @@ test("PresetValueSelector renders one non-wrapping row of toggle buttons, preset
 
 test("the ingredients panels use the inline stepper and the PresetValueSelector", () => {
   for (const [name, source, servingsPattern, scalePattern] of [
-    ["RecipeDetailPage", page, /<NumberStepper\s+label="Servings"\s+layout="inline"/, /<PresetValueSelector\s+label="Scale"\s+options=\{SCALE_OPTIONS\}\s+value=\{view\.scaleValue\}\s+onChange=\{view\.onScaleChange\}/],
+    [
+      "RecipeDetailPage",
+      page,
+      /<NumberStepper\s+label="Servings"\s+layout="inline"/,
+      /<PresetValueSelector\s+label="Scale"\s+options=\{SCALE_OPTIONS\}\s+value=\{view\.scaleValue\}\s+onChange=\{view\.onScaleChange\}/,
+    ],
     [
       "PublicRecipePage (via RecipeIngredientsPanel)",
       ingredientsPanel,
@@ -154,8 +159,16 @@ test("NumberStepper editable is additive, off by default, and renders a numeric 
 });
 
 test("NumberStepper button names accept accessibility-label overrides, generated names by default", () => {
-  assert.match(stepper, /decreaseAccessibilityLabel\?: string;/, "decrease override prop is declared");
-  assert.match(stepper, /increaseAccessibilityLabel\?: string;/, "increase override prop is declared");
+  assert.match(
+    stepper,
+    /decreaseAccessibilityLabel\?: string;/,
+    "decrease override prop is declared",
+  );
+  assert.match(
+    stepper,
+    /increaseAccessibilityLabel\?: string;/,
+    "increase override prop is declared",
+  );
   assert.match(
     stepper,
     /decreaseAccessibilityLabel \?\? \(label \? `Decrease \$\{label\}` : "Decrease value"\)/,

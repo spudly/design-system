@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { DetailRow } from "../views/DetailRow.js";
-import { ListRow } from "./ListRow.js";
+import { ListItem } from "./ListItem.js";
 import { ListStack } from "./ListStack.js";
 import { Text } from "./Text.js";
 import { WeekDayColumn, WeekDayColumns } from "./WeekDayColumn.js";
@@ -20,13 +20,13 @@ export const Default: Story = {
       <WeekDayColumns>
         <WeekDayColumn label="Monday" dateLabel="2026-10-19">
           <ListStack>
-            <ListRow
+            <ListItem
               prefix="Meal · "
               title="Sunday Dinner leftovers"
               subtitle="Qty 1 · 3 recipes"
               onPress={() => {}}
             />
-            <ListRow
+            <ListItem
               prefix="Recipe · "
               title="Test Recipe"
               subtitle="Qty 1 · 4 servings · 520 cal"

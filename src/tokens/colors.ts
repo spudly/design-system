@@ -37,18 +37,26 @@ const primary = {
   primary10: "#312e81",
 } as const;
 
-/** 10-step success ramp (light → dark). */
+/**
+ * 10-step success ramp (light → dark). Sage/olive greens anchored
+ * on the recipe-detail visual direction's sampled sage (#5C614F,
+ * step 7): the badge family and every other success consumer
+ * (Alert, Text) take this hue from the tokens, so a success-color
+ * change is a token change that applies consistently everywhere
+ * the ramp is used — never a per-component override (Stephen's
+ * review on PR #730, 2026-11-21).
+ */
 const success = {
-  success1: "#f0fdf4",
-  success2: "#dcfce7",
-  success3: "#bbf7d0",
-  success4: "#86efac",
-  success5: "#4ade80",
-  success6: "#22c55e",
-  success7: "#16a34a",
-  success8: "#15803d",
-  success9: "#166534",
-  success10: "#14532d",
+  success1: "#f3f4ef",
+  success2: "#e4e7dc",
+  success3: "#cfd4c0",
+  success4: "#b0b99e",
+  success5: "#8f9a7a",
+  success6: "#71805e",
+  success7: "#5c614f",
+  success8: "#4a5040",
+  success9: "#3a3f33",
+  success10: "#2b2f27",
 } as const;
 
 /** 10-step warning ramp (light → dark). */

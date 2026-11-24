@@ -388,7 +388,7 @@ test("SSR: a pending surface shows the loading state; a failed one stays in the 
   assert.match(failedHtml, /href="\/recipes"/, "the nav renders around the failure");
 });
 test("notice (#765): absent by default; when present it forwards message + action and the callback fires", async () => {
-  const { AppShellPage, distWidgets } = await loadRuntime();
+  const { AppShellPage, distViews, distWidgets } = await loadRuntime();
   const bare = AppShellPage({
     brand: { label: "Eciperay", href: "/" },
     navItems: sentinelNav,
@@ -419,7 +419,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
   const [messageEl, actionEl] = noticeEl.props.children;
   assert.equal(
     messageEl.type,
-    distWidgets.StatusMessage,
+    distViews.StatusMessage,
     "the message renders through StatusMessage",
   );
   assert.equal(messageEl.props.message, "Your profile could not be loaded.");

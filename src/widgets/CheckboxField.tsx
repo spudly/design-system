@@ -176,7 +176,7 @@ export function CheckboxField({
   const toggle = () => onCheckedChange(!checked);
   const listShape = detail !== undefined || separator || strikeWhenChecked;
   // The list shape's accessible name composes the detail after the
-  // label (the row family's standing rule — ListRow's composed
+  // label (the row family's standing rule — ListItem's composed
   // label): with the checkbox as the one accessibility stop, a
   // name-only label would drop the quantity from the announcement.
   const accessibleName = detail ? `${label}, ${detail}` : label;

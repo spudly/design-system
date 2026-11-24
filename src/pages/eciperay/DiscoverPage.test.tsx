@@ -200,8 +200,8 @@ test("removing a filter clears its values through the change callbacks", () => {
   );
   assert.match(
     bar,
-    /removeAccessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/,
-    "the added filter's remove control is a RemovableField naming the filter",
+    /accessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/,
+    "the added filter's remove control names the filter",
   );
 });
 test("the title renders as the page heading and pagination rides the shared catalog pattern", () => {

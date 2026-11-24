@@ -166,12 +166,10 @@ function getDefaultStore(): SkeletonClockStore {
     // capture override are separate flags: clearing one must
     // never clear the other (CodeRabbit on PR #662).
     if (isWeb && typeof window !== "undefined" && typeof window.matchMedia === "function") {
-      window
-        .matchMedia("(prefers-reduced-motion: reduce)")
-        .addEventListener("change", (event) => {
-          defaultReducedMotion = event.matches;
-          applyDefaultFrozen();
-        });
+      window.matchMedia("(prefers-reduced-motion: reduce)").addEventListener("change", (event) => {
+        defaultReducedMotion = event.matches;
+        applyDefaultFrozen();
+      });
     }
   }
   return defaultStore;
@@ -272,6 +270,10 @@ const BoneBase = styled(View, {
 export type SkeletonBoneProps = {
   width?: number | `${number}%`;
   height?: number;
+  /** Aspect ratio (width / height) the bone holds instead of a
+   * fixed height — for bones standing in for aspect-shaped media
+   * (Thumbnail's hero frame, #721). */
+  aspectRatio?: number;
   borderRadius?: number;
 };
 
@@ -282,7 +284,7 @@ export type SkeletonBoneProps = {
  * Internal building block for the skeleton primitives; not
  * exported from the package barrel.
  */
-export function SkeletonBone({ width, height, borderRadius }: SkeletonBoneProps) {
+export function SkeletonBone({ width, height, aspectRatio, borderRadius }: SkeletonBoneProps) {
   const opacity = useSkeletonOpacity();
   const theme = useTheme();
   // The fill is the theme's border role; read it from the active
@@ -293,7 +295,7 @@ export function SkeletonBone({ width, height, borderRadius }: SkeletonBoneProps)
     typeof theme.borderColor?.val === "string" ? theme.borderColor.val : tokens.colors.gray.gray3;
   return (
     <BoneBase
-      style={{ width, height, borderRadius, opacity, backgroundColor: fill }}
+      style={{ width, height, aspectRatio, borderRadius, opacity, backgroundColor: fill }}
       {...platformAccessibilityProps({ accessibilityElementsHidden: true })}
     />
   );

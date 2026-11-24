@@ -171,7 +171,7 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
  * `disabled` disables the whole field, clear button included: the
  * input takes the prop as before, and the clear button drops its
  * press handler entirely and reports the disabled state through
- * the platform translator (the ListRow disabled treatment) — a
+ * the platform translator (the ListItem disabled treatment) — a
  * disabled field's text cannot be cleared out from under its
  * owner. The component forwards a ref to the inner input, so a
  * caller that must move focus back to the field — the

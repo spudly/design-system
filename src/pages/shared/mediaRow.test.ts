@@ -61,15 +61,9 @@ const page = strip(
 );
 const mediaRow = page.slice(page.indexOf("const textBlockStyle"), page.indexOf("const STAR_STEPS"));
 const ratingStars = page.slice(page.indexOf("const STAR_STEPS"));
-const removableField = code("RemovableField.tsx");
 
-test("RemovableField is exported from the built internal components barrel; the page-local row and star control are not", async () => {
+test("the page-local row and star control are not exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  assert.equal(
-    typeof dist.RemovableField,
-    "function",
-    "RemovableField must be exported from the internal components barrel",
-  );
   for (const name of ["MediaRow", "RatingStars"]) {
     assert.equal(
       dist[name],
@@ -141,9 +135,10 @@ test("RatingStars' button is keyboard-operable on web (the CardRow pattern)", ()
   );
 });
 
-test("RemovableField pairs the field with its end-aligned ghost Remove button at a 4px gap", () => {
-  assert.match(removableField, /<YStack gap=\{tokens\.spacing\[1\]\}>/);
-  assert.match(removableField, /<XStack justifyContent="flex-end">/);
-  assert.match(removableField, /ghost\s+size="sm"/);
-  assert.match(removableField, /onPress=\{onRemove\}/);
+test("the bar's inlined remove pairing pairs the field with its end-aligned ghost Remove button at a 4px gap (#740)", () => {
+  const bar = readFileSync(join(here, "../../..", "src", "views", "CatalogFiltersBar.tsx"), "utf8");
+  assert.match(bar, /<YStack key=\{definition\.id\} gap=\{tokens\.spacing\[1\]\}>/);
+  assert.match(bar, /<XStack justifyContent="flex-end">/);
+  assert.match(bar, /ghost\s+size="sm"/);
+  assert.match(bar, /accessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/);
 });

@@ -123,7 +123,7 @@ test("the bar takes its filters as caller-supplied definitions, never hardcoded 
   assert.ok(!/\binterface\b/.test(bar), "props are type aliases, never interfaces");
 });
 
-test("the bar's chooser adds filters and each added filter removes through RemovableField", () => {
+test("the bar's chooser adds filters and each added filter removes through its inline remove pairing", () => {
   // The chooser offers only the filters not yet added (#96),
   // and choosing one appends it and closes the chooser.
   assert.match(
@@ -135,11 +135,12 @@ test("the bar's chooser adds filters and each added filter removes through Remov
     bar,
     /const addFilter = \(id: FilterId\) => \{\s*setActive\(\[\.\.\.active, id\]\);\s*setChooserOpen\(false\);/,
   );
-  // Added filters render as RemovableFields; removing one
-  // clears its value back to its default and drops it from
-  // the active set.
-  assert.match(bar, /<RemovableField/);
-  assert.match(bar, /removeAccessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/);
+  // Added filters render with the inlined remove pairing
+  // (#740); removing one clears its value back to its default
+  // and drops it from the active set.
+  assert.match(bar, /<YStack key=\{definition\.id\} gap=\{tokens\.spacing\[1\]\}>/);
+  assert.match(bar, /accessibilityLabel=\{`Remove \$\{definition\.label\} filter`\}/);
+  assert.match(bar, /voice\.removableField\.removeLabel/);
   assert.match(
     bar,
     /const removeFilter = \(definition: CatalogFilterDefinition<FilterId>\) => \{\s*clearFilter\(definition\);\s*setActive\(active\.filter\(\(filterId\) => filterId !== definition\.id\)\);/,

@@ -7,7 +7,7 @@ import { AppTopBar } from "../../widgets/AppTopBar.js";
 import { LazySlot } from "../../views/LazySlot.js";
 import { BannerRow } from "../../widgets/BannerRow.js";
 import { Button } from "../../widgets/Button.js";
-import { StatusMessage } from "../../widgets/StatusMessage.js";
+import { StatusMessage } from "../../views/StatusMessage.js";
 
 /**
  * TabbedShellPage (#438 Part 5): the tabbed app shell as a

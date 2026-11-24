@@ -20,7 +20,7 @@ export type RowTextContentProps = {
  */
 /**
  * The hint subtitle line under a row's title, shared by
- * RowTextContent and ListRow (#587 phase 3): both row families
+ * RowTextContent and ListItem (#587 phase 3): both row families
  * render the identical hint text with the same decorative
  * treatment, so it lives in exactly one place.
  */

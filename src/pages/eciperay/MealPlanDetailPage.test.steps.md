@@ -99,9 +99,9 @@ Open in `Widgets/DetailRow`: Default, Stacked.
 MealPlanDetailPage (the nutrition-goal rows), or a changeset
 naming DetailRow.
 
-## ListRow
+## ListItem
 
-Open in `Widgets/ListRow`: Prefixed, Plain, Disabled.
+Open in `Widgets/ListItem`: Prefixed, Plain, Disabled.
 
 1. Prefixed: the title line reads "Meal · Taco Tuesday" (the
    prefix is caller-supplied content) in medium weight over the
@@ -116,8 +116,8 @@ Open in `Widgets/ListRow`: Prefixed, Plain, Disabled.
    suffix; the row does not press, is not focusable, and is
    exposed as disabled.
 
-**Run when:** `src/widgets/ListRow.tsx`, its stories,
-MealPlanDetailPage's entries, or a changeset naming ListRow.
+**Run when:** `src/widgets/ListItem.tsx`, its stories,
+MealPlanDetailPage's entries, or a changeset naming ListItem.
 
 ## MealPlansPage & MealPlanDetailPage
 

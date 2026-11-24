@@ -6,33 +6,28 @@
  * of shrinking. EqualButtonRow carried that treatment until
  * #475 merged it into ButtonRow as the `equal` prop.
  *
- * PublicRecipePage's CTA bar hand-rolled this sizing in the
- * page (a raw XStack plus cloneElement flex/minWidth sizing on
- * each button) — styling a page may not apply itself under
- * #119 — so the bar is a component here and the page adopts it.
- * Button's `grow` supplies flex: 1 but no 40% floor, so the
- * row's own `equal` treatment is what renders this bar.
- *
- * The pins hold the treatment's identity: the row owns the
- * 12px gap and the wrap (both omitted from the public props),
- * and the row — never the caller — sizes the buttons.
- *
- * Source scan plus a dist export check, like the other
- * component contract tests. The dist import needs the
- * harness's react-native-svg stub registered first, so this
- * file imports registerSvgStub.ts before anything else.
+ * Converted from source scans to runtime checks in #733
+ * tranche 7a: the component is called directly with element
+ * children and the returned tree is inspected — the equal
+ * sizing it clones onto each button, the collision-free
+ * generated keys, and the fragment re-keying ARE the rendered
+ * contract. The styled row's own gap/wrap defaults and the
+ * former type-shape scans were deleted: styled defaults are
+ * not observable on the returned element, and the prop shape
+ * is enforced by the TypeScript build, not a test (Stephen,
+ * 2026-11-20). The dist `.d.ts` read below is a built-artifact
+ * read, not a source read, and stays.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { createElement, Fragment } from "react";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "ButtonRow.tsx"), "utf8");
-const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("ButtonRow is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
@@ -54,36 +49,73 @@ test("ButtonRowProps is a type-only export from the built components barrel", ()
   assert.ok(!barrel.includes("EqualButtonRow"), "the barrel no longer names EqualButtonRow");
 });
 
-test("the row owns the 12px gap and the wrap; neither is a caller prop", () => {
-  assert.match(code, /name: "ButtonRow"/);
-  assert.match(code, /gap: tokens\.spacing\[3\]/);
-  assert.match(code, /flexWrap: "wrap"/);
-  assert.match(code, /Omit<StyledButtonRowProps, "gap" \| "alignItems" \| "flexWrap">/);
-  assert.ok(!/interface\s/.test(code), "type aliases only");
+test("without equal, children pass through unsized", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  const first = createElement("span", { key: "a" }, "One");
+  const second = createElement("span", { key: "b" }, "Two");
+  const element = dist.ButtonRow({ children: [first, second] });
+  assert.deepEqual(element.props.children, [first, second]);
 });
 
-test("the equal row sizes its buttons itself: flex 1 with the 40% floor", () => {
-  assert.match(code, /equal\?: boolean/);
-  assert.match(code, /EQUAL_BUTTON_MIN_WIDTH = "40%"/);
-  assert.match(code, /cloneElement\(/);
-  assert.match(code, /flex: 1,\s+minWidth: EQUAL_BUTTON_MIN_WIDTH/);
-});
-
-test("generated keys are collision-free against caller-supplied keys", () => {
-  // A caller key of `button-1` on one button and no key on the next
-  // must not give both rendered siblings the same key: generated
-  // keys are checked against the row's explicit keys (and each
-  // other) before one is assigned.
-  assert.match(code, /explicitKeys/);
-  assert.match(code, /generatedKey\(index\)/);
-  assert.ok(
-    !/key: \(item as ReactElement\)\.key \?\? `button-\$\{index\}`/.test(code),
-    "the bare index fallback collides with caller keys of the same shape",
+test("the equal row sizes its buttons itself: flex 1 with the 40% floor", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  const element = dist.ButtonRow({
+    equal: true,
+    children: [
+      createElement("span", { key: "a" }, "One"),
+      createElement("span", { key: "b" }, "Two"),
+    ],
+  });
+  const items = element.props.children.flat();
+  assert.equal(items.length, 2);
+  for (const item of items) {
+    assert.equal(item.props.flex, 1, "each button grows to an equal share");
+    assert.equal(item.props.minWidth, "40%", "each button keeps the 40% floor");
+  }
+  assert.deepEqual(
+    items.map((item: any) => item.key),
+    ["a", "b"],
+    "caller keys are preserved",
   );
 });
 
-test("elements lifted out of a fragment are re-keyed under the fragment's scope", () => {
-  // Two fragments may each hold a child keyed the same; the
-  // flattened list must not carry duplicate keys.
-  assert.match(code, /cloneElement\(inner as ReactElement, \{\s+key: `\$\{scope\}:/);
+test("generated keys are collision-free against caller-supplied keys", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  const element = dist.ButtonRow({
+    equal: true,
+    children: [
+      createElement("span", { key: "button-1" }, "Keyed"),
+      createElement("span", null, "Unkeyed"),
+    ],
+  });
+  const keys = element.props.children.flat().map((item: any) => item.key);
+  assert.equal(keys[0], "button-1");
+  assert.notEqual(keys[1], "button-1", "the generated key must not collide with the caller key");
+  assert.ok(keys[1], "the unkeyed button receives a generated key");
+});
+
+test("elements lifted out of a fragment are re-keyed under the fragment's scope", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  const element = dist.ButtonRow({
+    equal: true,
+    children: [
+      createElement(Fragment, { key: "left" }, createElement("span", { key: "same" }, "L")),
+      createElement(Fragment, { key: "right" }, createElement("span", { key: "same" }, "R")),
+    ],
+  });
+  const keys = element.props.children.flat().map((item: any) => item.key);
+  assert.deepEqual(
+    keys,
+    ["left:same", "right:same"],
+    "same inner keys stay distinct per fragment scope",
+  );
+});
+
+test("non-element children in an equal row are wrapped, not dropped", async () => {
+  const dist: Record<string, any> = await loadInternalDist();
+  const element = dist.ButtonRow({ equal: true, children: ["Just text", null, false] });
+  const items = element.props.children.flat().filter(Boolean);
+  assert.equal(items.length, 1);
+  assert.equal(items[0].type, Fragment);
+  assert.equal(items[0].props.children, "Just text");
 });

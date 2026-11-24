@@ -10,12 +10,15 @@ import { StatCard } from "../../widgets/StatCard.js";
 import { TextSkeleton } from "../../widgets/TextSkeleton.js";
 import { MessageCard } from "../../widgets/MessageCard.js";
 import { RatingsCard } from "../../widgets/RatingsCard.js";
-import { RecipeIngredientsPanel } from "../../widgets/RecipeIngredientsPanel.js";
+import { RecipeIngredientsPanel } from "../../views/RecipeIngredientsPanel.js";
 import { RecipeInstructionsPanel } from "../../widgets/RecipeInstructionsPanel.js";
-import { RecipeOverviewPanel } from "../../widgets/RecipeOverviewPanel.js";
+import { RecipeOverviewPanel } from "../../views/RecipeOverviewPanel.js";
 import { ScrollShell } from "../../widgets/ScrollShell.js";
 import { SectionHeading } from "../../widgets/SectionHeading.js";
-import { RecipeCommentsView, type RecipeCommentsViewProps } from "../../views/RecipeCommentsView.js";
+import {
+  RecipeCommentsView,
+  type RecipeCommentsViewProps,
+} from "../../views/RecipeCommentsView.js";
 import type {
   RecipeDetailPageCommunityRating,
   RecipeDetailPageIngredient,
@@ -375,7 +378,7 @@ export function PublicRecipePage(props: PublicRecipePageProps) {
                   </Button>
                 </ButtonRow>
               </Card>
-              <BoxSkeleton height={256} />
+              <BoxSkeleton aspectRatio={4 / 3} />
               <TextSkeleton size="2xl" lines={1} />
               <TextSkeleton size="md" lines={3} />
               <StatBand loading>

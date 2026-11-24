@@ -40,7 +40,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const commentItem = readCode("src/widgets/CommentItem.tsx");
+const commentItem = readCode("src/views/CommentItem.tsx");
 const textActionCardRow = readCode("src/widgets/TextActionCardRow.tsx");
 const changedListBanner = readCode("src/widgets/ChangedListBanner.tsx");
 const revertAction = readCode("src/views/RevertAction.tsx");
@@ -91,8 +91,14 @@ test("TagsPage's row actions render as ghost Buttons with their composed labels 
   // Since #709 the display row is inlined into TagsPage: its Edit
   // and Delete actions render directly as ghost Buttons, Delete
   // with the danger variant.
-  assert.match(tagsPage, /<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/);
-  assert.match(tagsPage, /<Button\s+ghost\s+size="sm"\s+variant="danger"\s+accessibilityLabel=\{`Delete tag \$\{tag\.name\}`\}/);
+  assert.match(
+    tagsPage,
+    /<Button\s+ghost\s+size="sm"\s+accessibilityLabel=\{`Edit tag \$\{tag\.name\}`\}/,
+  );
+  assert.match(
+    tagsPage,
+    /<Button\s+ghost\s+size="sm"\s+variant="danger"\s+accessibilityLabel=\{`Delete tag \$\{tag\.name\}`\}/,
+  );
 });
 
 test("TagsPage's Edit and Delete row actions keep their composed labels (#709)", () => {
