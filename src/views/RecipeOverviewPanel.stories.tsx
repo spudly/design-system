@@ -3,7 +3,7 @@ import { YStack } from "tamagui";
 import { RecipeOverviewPanel } from "./RecipeOverviewPanel.js";
 
 const meta: Meta<typeof RecipeOverviewPanel> = {
-  title: "Widgets/RecipeOverviewPanel",
+  title: "Views/RecipeOverviewPanel",
   component: RecipeOverviewPanel,
 };
 

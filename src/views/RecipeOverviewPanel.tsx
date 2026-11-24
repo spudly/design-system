@@ -2,16 +2,16 @@ import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import type { TagColorName } from "../themes/tagColors.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { platformAccessibilityProps } from "./accessibility.js";
-import { StatBand } from "./StatBand.js";
-import { StatCard } from "./StatCard.js";
-import { Badge, type BadgeProps } from "./Badge.js";
-import { BoxSkeleton } from "./BoxSkeleton.js";
-import { SkeletonBone } from "./SkeletonClock.js";
-import { TagList } from "./TagList.js";
-import { Text } from "./Text.js";
-import { TextSkeleton } from "./TextSkeleton.js";
-import { Thumbnail } from "./Thumbnail.js";
+import { platformAccessibilityProps } from "../widgets/accessibility.js";
+import { StatBand } from "../widgets/StatBand.js";
+import { StatCard } from "../widgets/StatCard.js";
+import { Badge, type BadgeProps } from "../widgets/Badge.js";
+import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { SkeletonBone } from "../widgets/SkeletonClock.js";
+import { TagList } from "../widgets/TagList.js";
+import { Text } from "../widgets/Text.js";
+import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { Thumbnail } from "../widgets/Thumbnail.js";
 import { useVoice } from "../voice/index.js";
 
 /**

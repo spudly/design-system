@@ -21,7 +21,7 @@ const code = strip(source);
 // The recipe sections are the shared library panels (see the
 // header), so the section scans read the panel sources; the
 // page source hosts the wiring pins (render order).
-const overviewCode = strip(readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8"));
+const overviewCode = strip(readFileSync(join(viewsDir, "RecipeOverviewPanel.tsx"), "utf8"));
 const ingredientsCode = strip(
   readFileSync(join(viewsDir, "RecipeIngredientsPanel.tsx"), "utf8"),
 );
@@ -343,7 +343,14 @@ describe("publicRecipePageAdoption", () => {
   });
 
   test("the sections render through the shared library panels (#331)", () => {
-    for (const panel of ["RecipeOverviewPanel", "RecipeInstructionsPanel"]) {
+    // RecipeOverviewPanel is a view since #739 and
+    // RecipeIngredientsPanel is a view since #737; only
+    // RecipeInstructionsPanel is still a widget.
+    assert.ok(
+      code.includes(`import { RecipeOverviewPanel } from "../views/RecipeOverviewPanel.js";`),
+      "the page imports the library RecipeOverviewPanel",
+    );
+    for (const panel of ["RecipeInstructionsPanel"]) {
       assert.ok(
         code.includes(`import { ${panel} } from "../widgets/${panel}.js";`),
         `the page imports the library ${panel}`,

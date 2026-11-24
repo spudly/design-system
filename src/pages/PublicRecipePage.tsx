@@ -12,7 +12,7 @@ import { MessageCard } from "../widgets/MessageCard.js";
 import { RatingsCard } from "../widgets/RatingsCard.js";
 import { RecipeIngredientsPanel } from "../views/RecipeIngredientsPanel.js";
 import { RecipeInstructionsPanel } from "../widgets/RecipeInstructionsPanel.js";
-import { RecipeOverviewPanel } from "../widgets/RecipeOverviewPanel.js";
+import { RecipeOverviewPanel } from "../views/RecipeOverviewPanel.js";
 import { ScrollShell } from "../widgets/ScrollShell.js";
 import { SectionHeading } from "../widgets/SectionHeading.js";
 import { RecipeCommentsView, type RecipeCommentsViewProps } from "../views/RecipeCommentsView.js";
