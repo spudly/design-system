@@ -34,8 +34,8 @@ import { test } from "node:test";
 // The boundary itself is a view (#470); the Alert and Button it
 // composes are widgets, so the runtime surface spans both barrels.
 const dist: Record<string, any> = {
-  ...(await import("../../dist/widgets/index.js")),
-  ...(await import("../../dist/views/index.js")),
+  ...(await import("../../../dist/widgets/index.js")),
+  ...(await import("../../../dist/views/index.js")),
 };
 
 test("ChunkErrorBoundary is exported from the built views barrel", () => {

@@ -71,10 +71,10 @@ test("the auth pages compose their form units and render no fields directly", ()
 
 test("each form composes the shared FormStack and owns its submit handling", () => {
   for (const form of FORMS) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     assert.match(
       source,
-      /import \{ FormStack \} from "\.\.\/widgets\/layout\/FormStack\.js";/,
+      /import \{ FormStack \} from "\.\.\/\.\.\/widgets\/layout\/FormStack\.js";/,
       `${form} imports the shared FormStack`,
     );
     assert.match(source, /<FormStack>/, `${form} renders its sections in the FormStack`);
@@ -157,7 +157,7 @@ test("auth pages forward their props to their forms", () => {
 
 test("the email-bearing forms thread emailError to the email field only (#535)", () => {
   for (const form of ["SignInForm", "SignUpForm", "ForgotPasswordForm"]) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     // SignInForm/SignUpForm declare emailError in the shared
     // EmailPasswordFormProps (#587 phase 3); ForgotPasswordForm
     // declares it in its own props.
@@ -201,7 +201,7 @@ test("each form's submit button is named for the label it renders, in both state
     ResetPasswordForm: "resetPasswordForm",
   };
   for (const [form, voiceKey] of Object.entries(BUTTON_VOICE)) {
-    const source = read(`src/views/${form}.tsx`);
+    const source = read(`src/views/eciperay/${form}.tsx`);
     assert.match(
       source.replace(/\s+/g, " "),
       new RegExp(

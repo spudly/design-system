@@ -32,8 +32,8 @@ async function renderPicker(props: Record<string, unknown>): Promise<string> {
   const { TamaguiProvider }: Record<string, any> = await import("tamagui");
   const distRuntime = await loadInternalDist();
   const { createTamaguiConfig, baseTheme, RecipeExportPickerView } = distRuntime;
-  const { VoiceProvider }: Record<string, any> = await import("../../dist/voice/index.js");
-  const { fixtureVoice }: Record<string, any> = await import("../../dist/voice/fixtures.js");
+  const { VoiceProvider }: Record<string, any> = await import("../../../dist/voice/index.js");
+  const { fixtureVoice }: Record<string, any> = await import("../../../dist/voice/fixtures.js");
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
     h(

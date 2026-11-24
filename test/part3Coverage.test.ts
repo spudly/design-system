@@ -58,11 +58,11 @@ test("Part 3 views are exported from the views barrel and stay off the public su
   for (const name of NEW_VIEWS) {
     assert.match(
       viewsBarrel,
-      new RegExp(`export \\{[^}]*\\b${name}\\b[^}]*\\} from "\\./${name}\\.js"`),
+      new RegExp(`export \\{[^}]*\\b${name}\\b[^}]*\\} from "\\./(?:eciperay|shared|memorize)/${name}\\.js"`),
       `${name} is exported from src/views/index.ts`,
     );
-    assert.equal(existsSync(`src/views/${name}.tsx`), true, `${name}.tsx exists`);
-    assert.equal(existsSync(`src/views/${name}.stories.tsx`), true, `${name} has stories`);
+    assert.equal(existsSync(`src/views/eciperay/${name}.tsx`) || existsSync(`src/views/shared/${name}.tsx`), true, `${name}.tsx exists`);
+    assert.equal(existsSync(`src/views/eciperay/${name}.stories.tsx`) || existsSync(`src/views/shared/${name}.stories.tsx`), true, `${name} has stories`);
     assert.doesNotMatch(pagesBarrel, new RegExp(`\\b${name}\\b`), `${name} is not a page export`);
     assert.doesNotMatch(root, new RegExp(`\\b${name}\\b`), `${name} is not root-exported`);
   }

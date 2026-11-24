@@ -30,7 +30,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "views");
+const componentsDir = join(here, "../../..", "src", "views", "eciperay");
 const panelSource = readFileSync(join(componentsDir, "RecipeOverviewPanel.tsx"), "utf8");
 
 const panelCode = panelSource
@@ -47,7 +47,7 @@ test("RecipeOverviewPanel is exported from the built internal components barrel"
 });
 
 test("RecipeOverviewPanel's types are type-only exports from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "views", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../../..", "dist", "views", "index.d.ts"), "utf8");
   assert.match(types, /RecipeOverviewPanelProps/);
 });
 
@@ -95,7 +95,7 @@ test("the title carries level-1 heading semantics with unchanged rendering (#364
   );
   // Pin the variant's semantics against Text itself: the
   // `heading` variant maps to heading level 1.
-  const textSource = readFileSync(join(componentsDir, "..", "widgets", "data", "Text.tsx"), "utf8");
+  const textSource = readFileSync(join(componentsDir, "..", "..", "widgets", "data", "Text.tsx"), "utf8");
   assert.match(
     textSource,
     /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle" \|\| variant === "display"\s*\?\s*1/,
@@ -104,7 +104,7 @@ test("the title carries level-1 heading semantics with unchanged rendering (#364
 });
 
 test("no recipe surface gains a second level-1 heading from the panel (#364)", () => {
-  const pagesDir = join(here, "../..", "src", "pages");
+  const pagesDir = join(here, "../../..", "src", "pages");
   const readCode = (name: string) =>
     readFileSync(join(pagesDir, name), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")

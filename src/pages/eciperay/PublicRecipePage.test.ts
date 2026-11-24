@@ -21,8 +21,8 @@ const code = strip(source);
 // The recipe sections are the shared library panels (see the
 // header), so the section scans read the panel sources; the
 // page source hosts the wiring pins (render order).
-const overviewCode = strip(readFileSync(join(viewsDir, "RecipeOverviewPanel.tsx"), "utf8"));
-const ingredientsCode = strip(readFileSync(join(viewsDir, "RecipeIngredientsPanel.tsx"), "utf8"));
+const overviewCode = strip(readFileSync(join(viewsDir, "eciperay", "RecipeOverviewPanel.tsx"), "utf8"));
+const ingredientsCode = strip(readFileSync(join(viewsDir, "eciperay", "RecipeIngredientsPanel.tsx"), "utf8"));
 const ratingsCode = strip(ratingsSource);
 const scrollShellCode = strip(scrollShellSource);
 
@@ -347,7 +347,7 @@ describe("publicRecipePageAdoption", () => {
     // RecipeInstructionsPanel was removed in #747.
     for (const panel of ["RecipeOverviewPanel", "RecipeIngredientsPanel"]) {
       assert.ok(
-        code.includes(`import { ${panel} } from "../../views/${panel}.js";`),
+        code.includes(`import { ${panel} } from "../../views/eciperay/${panel}.js";`),
         `the page imports the library ${panel}`,
       );
     }

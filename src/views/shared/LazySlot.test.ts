@@ -31,15 +31,15 @@ import assert from "node:assert/strict";
 import { Suspense } from "react";
 import { test } from "node:test";
 
-const distViews: Record<string, any> = await import("../../dist/views/index.js");
-const distWidgets: Record<string, any> = await import("../../dist/widgets/index.js");
+const distViews: Record<string, any> = await import("../../../dist/views/index.js");
+const distWidgets: Record<string, any> = await import("../../../dist/widgets/index.js");
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 // The built root's type surface (a dist artifact, not source):
 // views must not appear on it.
 const rootTypes = readFileSync(
-  join(dirname(fileURLToPath(import.meta.url)), "../..", "dist", "index.d.ts"),
+  join(dirname(fileURLToPath(import.meta.url)), "../../..", "dist", "index.d.ts"),
   "utf8",
 );
 

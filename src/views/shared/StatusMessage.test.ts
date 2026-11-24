@@ -30,10 +30,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "views", "shared", "StatusMessage.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "views", "shared", "StatusMessage.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 const pageSource = readFileSync(
-  join(here, "../..", "src", "pages", "eciperay", "RecipeDetailPage.tsx"),
+  join(here, "../../..", "src", "pages", "eciperay", "RecipeDetailPage.tsx"),
   "utf8",
 );
 const pageCode = pageSource
@@ -126,7 +126,7 @@ test("RecipeDetailPage renders StatusMessage unconditionally for its action mess
 
 test("stories cover the message, the mounted-empty region, and the transient toggle", () => {
   const stories = readFileSync(
-    join(here, "../..", "src", "views", "shared", "StatusMessage.stories.tsx"),
+    join(here, "../../..", "src", "views", "shared", "StatusMessage.stories.tsx"),
     "utf8",
   );
   for (const name of ["Default", "Empty", "Transient"]) {

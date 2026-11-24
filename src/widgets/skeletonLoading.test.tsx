@@ -1751,7 +1751,7 @@ test("T3: every converted view declares `loading` and reads the LoadingScope", (
 });
 test("T3: the spinner views' spinners are gone; LazySlot's fallback is a skeleton", () => {
   for (const name of ["RecipeCommentsView", "SubscriptionView", "LazySlot"]) {
-    const code = readCode(`src/views/${name}.tsx`);
+    const code = readCode(viewPath(name));
     assert.doesNotMatch(code, /Spinner/, `${name} must not render a content-loading spinner`);
   }
   const lazySlot = readCode("src/views/shared/LazySlot.tsx");

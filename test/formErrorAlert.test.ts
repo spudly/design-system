@@ -48,7 +48,7 @@ const VIEW_FORM_COMPONENTS = new Set([
 const FORM_CATEGORY_COMPONENTS = new Set(["SelectField", "ColorPickerField", "TextField", "TextAreaField", "CheckboxField", "FieldShell", "NumberStepper", "RatingForm"]);
 const formSource = (name: string) =>
   read(
-    `src/${VIEW_FORM_COMPONENTS.has(name) ? "views" : FORM_CATEGORY_COMPONENTS.has(name) ? "widgets/form" : "widgets"}/${name}.tsx`,
+    `src/${VIEW_FORM_COMPONENTS.has(name) ? "views/eciperay" : FORM_CATEGORY_COMPONENTS.has(name) ? "widgets/form" : "widgets"}/${name}.tsx`,
   );
 
 const FORM_COMPONENTS = [

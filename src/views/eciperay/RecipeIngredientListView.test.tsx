@@ -46,7 +46,7 @@ test("the views ship in the built surface; the list stays internal, the row is p
   const { dirname, join } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
   const rootTypes = readFileSync(
-    join(dirname(fileURLToPath(import.meta.url)), "../..", "dist", "index.d.ts"),
+    join(dirname(fileURLToPath(import.meta.url)), "../../..", "dist", "index.d.ts"),
     "utf8",
   );
   assert.doesNotMatch(
@@ -80,8 +80,8 @@ async function renderList(props: Record<string, unknown>): Promise<string> {
   const { TamaguiProvider }: Record<string, any> = await import("tamagui");
   const distRuntime = await loadInternalDist();
   const { createTamaguiConfig, baseTheme, RecipeIngredientListView } = distRuntime;
-  const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
-  const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
+  const voiceFixtures: Record<string, any> = await import("../../../dist/voice/fixtures.js");
+  const voiceModule: Record<string, any> = await import("../../../dist/voice/index.js");
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
     h(

@@ -35,7 +35,7 @@ test("DetailRow is exported from the built internal views barrel", async () => {
 });
 
 test("DetailRowProps is a type-only export from the built views barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "views", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../../..", "dist", "views", "index.d.ts"), "utf8");
   assert.match(types, /DetailRowProps/);
 });
 

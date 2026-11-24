@@ -42,7 +42,7 @@ test("the view ships in the built views barrel and stays off the built package r
   const { dirname, join } = await import("node:path");
   const { fileURLToPath } = await import("node:url");
   const rootTypes = readFileSync(
-    join(dirname(fileURLToPath(import.meta.url)), "../..", "dist", "index.d.ts"),
+    join(dirname(fileURLToPath(import.meta.url)), "../../..", "dist", "index.d.ts"),
     "utf8",
   );
   assert.doesNotMatch(rootTypes, /\bRecipeImageView\b/, "the view stays off the public surface");
@@ -53,8 +53,8 @@ async function renderView(props: Record<string, unknown>): Promise<string> {
   const { TamaguiProvider }: Record<string, any> = await import("tamagui");
   const distRuntime = await loadInternalDist();
   const { createTamaguiConfig, baseTheme, RecipeImageView } = distRuntime;
-  const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
-  const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
+  const voiceFixtures: Record<string, any> = await import("../../../dist/voice/fixtures.js");
+  const voiceModule: Record<string, any> = await import("../../../dist/voice/index.js");
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
     h(

@@ -157,8 +157,8 @@
   "views/eciperay/AccessTokensPanel.tsx|jsx|loading",
   "views/eciperay/CatalogFiltersBar.tsx|attr|Add a filter",
   "views/eciperay/CatalogFiltersBar.tsx|jsx|Filters",
-  "views/shared/ChunkErrorBoundary.tsx|jsx|This section failed to load.",
   "views/eciperay/LogEntryCard.tsx|jsx|Delete",
+  "views/shared/ChunkErrorBoundary.tsx|jsx|This section failed to load.",
   "widgets/data/CandidateList.tsx|jsx|Activate",
   "widgets/feedback/Spinner.tsx|attr|Loading"
 ]
