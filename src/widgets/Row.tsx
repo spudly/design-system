@@ -19,6 +19,20 @@ export type RowProps = Omit<
   | "right"
   | "top"
   | "bottom"
+  | "padding"
+  | "paddingHorizontal"
+  | "paddingVertical"
+  | "paddingLeft"
+  | "paddingRight"
+  | "paddingTop"
+  | "paddingBottom"
+  | "p"
+  | "px"
+  | "py"
+  | "pt"
+  | "pb"
+  | "pl"
+  | "pr"
 > &
   LayoutAlignProps;
 
@@ -29,10 +43,11 @@ export type RowProps = Omit<
  * position props (`left` / `center` / `right` on the main axis,
  * `top` / `middle` / `bottom` on the cross axis), the distribution
  * props (`between` / `around` / `evenly`), `stretch` / `baseline`,
- * `grow` / `shrink` / `wrap`, and the t-shirt `gap`. There are NO
- * margin or padding props and NO width props on Row: spacing
- * between siblings is the parent's `gap`, and separation from
- * surrounding content is the parent's job.
+ * `grow` / `shrink` / `wrap`, and the t-shirt `gap`. Padding is
+ * available ONLY as the uniform t-shirt props `p` / `px` / `py`
+ * (Stephen, 2026-11-24) — no single-side padding, no margins, and
+ * NO width props on Row: spacing between siblings is the parent's
+ * `gap`.
  */
 export function Row({
   grow,
@@ -50,6 +65,9 @@ export function Row({
   stretch,
   baseline,
   gap,
+  p,
+  px,
+  py,
   ...rest
 }: RowProps) {
   const resolved = resolveLayoutStyle("row", {
@@ -68,6 +86,9 @@ export function Row({
     stretch,
     baseline,
     gap,
+    p,
+    px,
+    py,
   });
   return <XStack {...resolved} {...rest} />;
 }

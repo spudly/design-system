@@ -19,6 +19,10 @@
  *    (passed through, e.g. grow={0.35}); wrap maps to flex-wrap.
  * 6. gap takes t-shirt sizes and resolves to the spacing scale
  *    (xs 4, s 8, m 12, l 16, xl 24, xxl 32).
+ * 7. Padding (Stephen's amendment, 2026-11-24): `p` / `px` / `py`
+ *    take the same t-shirt sizes and resolve to uniform padding —
+ *    `p` all four sides, `px` the horizontal pair, `py` the
+ *    vertical pair. There are no single-side padding props.
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -92,4 +96,17 @@ test("grow/shrink booleans and numbers, wrap, and the t-shirt gap scale", () => 
   assert.deepEqual(dist.layoutSizeValues, { xs: 4, s: 8, m: 12, l: 16, xl: 24, xxl: 32 });
   assert.equal(resolve("row", { gap: "m" }).gap, 12);
   assert.deepEqual(resolve("row", {}), {});
+});
+
+test("padding props resolve uniformly per direction on both axes", () => {
+  assert.equal(resolve("row", { p: "m" }).padding, 12);
+  assert.equal(resolve("row", { px: "l" }).paddingHorizontal, 16);
+  assert.equal(resolve("row", { py: "xs" }).paddingVertical, 4);
+  assert.equal(resolve("col", { p: "xl" }).padding, 24);
+  const combined = resolve("col", { p: "s", px: "l", py: "xxl" });
+  assert.equal(combined.padding, 8);
+  assert.equal(combined.paddingHorizontal, 16);
+  assert.equal(combined.paddingVertical, 32);
+  // No padding prop set → no padding keys at all.
+  assert.equal("padding" in resolve("row", { gap: "s" }), false);
 });

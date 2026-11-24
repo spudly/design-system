@@ -11,6 +11,9 @@ import { tokens } from "../tokens/index.js";
  * means "toward the left", whichever axis that is. The subset is
  * closed: a conversion site that fits no combination of these
  * props stops and comes back to Stephen rather than adding a prop.
+ * Padding joined the subset on 2026-11-24 (Stephen's amendment):
+ * `p` / `px` / `py` in the same t-shirt sizes as `gap`, applied
+ * uniformly in each direction — single-side padding stays banned.
  */
 
 /** T-shirt spacing sizes for `gap` and Spacer's `x` / `y`. */
@@ -59,6 +62,17 @@ export type LayoutAlignProps = {
   baseline?: boolean;
   /** The parent's sibling spacing, in t-shirt sizes. */
   gap?: LayoutSize;
+  /**
+   * Uniform padding on all four sides, in t-shirt sizes
+   * (Stephen, 2026-11-24). Padding is the ONLY box spacing Row/Col
+   * accept, and only in these uniform-per-direction forms — there
+   * are no single-side padding props and no margin props.
+   */
+  p?: LayoutSize;
+  /** Uniform horizontal padding (left + right), in t-shirt sizes. */
+  px?: LayoutSize;
+  /** Uniform vertical padding (top + bottom), in t-shirt sizes. */
+  py?: LayoutSize;
 };
 
 export type ResolvedLayoutStyle = {
@@ -69,6 +83,9 @@ export type ResolvedLayoutStyle = {
   flexGrow?: number;
   flexShrink?: number;
   gap?: number;
+  padding?: number;
+  paddingHorizontal?: number;
+  paddingVertical?: number;
 };
 
 /**
@@ -97,6 +114,18 @@ export function resolveLayoutStyle(
   }
   if (props.gap !== undefined) {
     resolved.gap = layoutSizeValues[props.gap];
+  }
+  // Padding (Stephen, 2026-11-24): uniform per direction only.
+  // `px` / `py` resolve to the horizontal / vertical pair, which
+  // the layout engine applies over the `p` value on that axis.
+  if (props.p !== undefined) {
+    resolved.padding = layoutSizeValues[props.p];
+  }
+  if (props.px !== undefined) {
+    resolved.paddingHorizontal = layoutSizeValues[props.px];
+  }
+  if (props.py !== undefined) {
+    resolved.paddingVertical = layoutSizeValues[props.py];
   }
 
   // Main axis: justify-content. The position prop names differ by

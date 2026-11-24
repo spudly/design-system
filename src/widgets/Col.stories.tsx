@@ -29,6 +29,15 @@ export const Centered: Story = {
   ),
 };
 
+export const Padded: Story = {
+  render: () => (
+    <Col px="xl" py="s" gap="s">
+      <Text>Padded block one</Text>
+      <Text>Padded block two</Text>
+    </Col>
+  ),
+};
+
 export const Growing: Story = {
   render: () => (
     <Col grow shrink gap="s">

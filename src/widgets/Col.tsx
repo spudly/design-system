@@ -19,6 +19,20 @@ export type ColProps = Omit<
   | "right"
   | "top"
   | "bottom"
+  | "padding"
+  | "paddingHorizontal"
+  | "paddingVertical"
+  | "paddingLeft"
+  | "paddingRight"
+  | "paddingTop"
+  | "paddingBottom"
+  | "p"
+  | "px"
+  | "py"
+  | "pt"
+  | "pb"
+  | "pl"
+  | "pr"
 > &
   LayoutAlignProps;
 
@@ -28,9 +42,10 @@ export type ColProps = Omit<
  * strict semantic prop subset in `./layout.js` — the same props as
  * Row, translated to the vertical axis (`top` / `middle` /
  * `bottom` on the main axis, `left` / `center` / `right` on the
- * cross axis). There are NO margin or padding props and NO width
- * props on Col: spacing between siblings is the parent's `gap`,
- * and separation from surrounding content is the parent's job.
+ * cross axis). Padding is available ONLY as the uniform t-shirt
+ * props `p` / `px` / `py` (Stephen, 2026-11-24) — no single-side
+ * padding, no margins, and NO width props on Col: spacing between
+ * siblings is the parent's `gap`.
  */
 export function Col({
   grow,
@@ -48,6 +63,9 @@ export function Col({
   stretch,
   baseline,
   gap,
+  p,
+  px,
+  py,
   ...rest
 }: ColProps) {
   const resolved = resolveLayoutStyle("col", {
@@ -66,6 +84,9 @@ export function Col({
     stretch,
     baseline,
     gap,
+    p,
+    px,
+    py,
   });
   return <YStack {...resolved} {...rest} />;
 }

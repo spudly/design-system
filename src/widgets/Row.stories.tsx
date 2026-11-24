@@ -29,6 +29,15 @@ export const MiddleBetween: Story = {
   ),
 };
 
+export const Padded: Story = {
+  render: () => (
+    <Row p="l" gap="m">
+      <Text>Padded first</Text>
+      <Text>Padded second</Text>
+    </Row>
+  ),
+};
+
 export const Wrapping: Story = {
   render: () => (
     <Row middle wrap gap="s">
