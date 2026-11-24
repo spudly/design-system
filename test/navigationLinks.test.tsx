@@ -168,7 +168,7 @@ test("Tabs: link variant items carry hrefs, the variant takes no change callback
   assert.match(tabs, /onValueChange\?: never;/);
   assert.match(tabs, /styled\(Anchor, \{\s*name: "TabsLinkTab",/);
   assert.match(tabs, /aria-current/);
-  assert.match(index, /from "\.\/Tabs\.js"/);
+  assert.match(index, /from "\.\/actions\/Tabs\.js"/);
 });
 
 // Runtime imports are lazy (inside the SSR tests) so the source-scan

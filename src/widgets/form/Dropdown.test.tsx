@@ -328,7 +328,7 @@ test("the panel is a styled Popover.Content frame with the a11y label routed thr
   assert.match(dropdown, /platformAccessibilityProps\(\{ accessibilityLabel \}\)/);
 });
 test("DropdownButton is props-described: label/icon in, DS Button + CollapsibleIcon rendered", () => {
-  assert.match(dropdownButton, /from "\.\.\/Button\.js"/);
+  assert.match(dropdownButton, /from "\.\.\/actions\/Button\.js"/);
   assert.match(
     dropdownButton,
     /import \{ CollapsibleIcon \} from "\.\.\/\.\.\/icons\/CollapsibleIcon\.js"/,

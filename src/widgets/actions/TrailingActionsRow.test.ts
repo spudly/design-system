@@ -18,7 +18,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const source = readFileSync(
-  join(here, "../..", "src", "widgets", "actions", "TrailingActionsRow.tsx"),
+  join(here, "../../..", "src", "widgets", "actions", "TrailingActionsRow.tsx"),
   "utf8",
 );
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");

@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 import { loadInternalDist } from "../../../test/internalDist.js";
 describe("tabsAriaControls", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const root = join(here, "../..");
+  const root = join(here, "../../..");
   function codeOf(rel: string): string {
     const source = readFileSync(join(root, rel), "utf8");
     return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -112,7 +112,7 @@ describe("tabsAriaControls", () => {
 });
 describe("tabsIcon", () => {
   const here = dirname(fileURLToPath(import.meta.url));
-  const root = join(here, "../..");
+  const root = join(here, "../../..");
   function codeOf(rel: string): string {
     const source = readFileSync(join(root, rel), "utf8");
     return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");

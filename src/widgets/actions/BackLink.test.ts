@@ -40,9 +40,9 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "widgets");
-const source = readFileSync(join(componentsDir, "BackLink.tsx"), "utf8");
-const stories = readFileSync(join(componentsDir, "BackLink.stories.tsx"), "utf8");
+const componentsDir = join(here, "../../..", "src", "widgets");
+const source = readFileSync(join(componentsDir, "actions/BackLink.tsx"), "utf8");
+const stories = readFileSync(join(componentsDir, "actions/BackLink.stories.tsx"), "utf8");
 const index = readFileSync(join(componentsDir, "index.ts"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -112,7 +112,7 @@ test("the label defaults to the voice backLink slot and renders in the link role
 });
 
 test("BackLink is exported from the components index and has stories", () => {
-  assert.match(index, /export \{ BackLink, type BackLinkProps \} from "\.\/BackLink\.js";/);
-  assert.match(stories, /title: "Widgets\/BackLink"/);
+  assert.match(index, /export \{ BackLink, type BackLinkProps \} from "\.\/actions\/BackLink\.js";/);
+  assert.match(stories, /title: "Widgets\/Actions & Navigation\/BackLink"/);
   assert.match(stories, /export const Default/);
 });

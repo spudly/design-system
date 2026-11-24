@@ -61,19 +61,19 @@ function code(file: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const buttonRowCode = code("ButtonRow.tsx");
+const buttonRowCode = code("actions/ButtonRow.tsx");
 const cardStackCode = code("CardStack.tsx");
 const sectionStackCode = code("SectionStack.tsx");
 const fieldRowCode = code("form/FieldRow.tsx");
 const listStackCode = code("ListStack.tsx");
 const panelStackCode = code("PanelStack.tsx");
-const buttonStackCode = code("ButtonStack.tsx");
+const buttonStackCode = code("actions/ButtonStack.tsx");
 const centerCode = code("Center.tsx");
 const formStackCode = code("FormStack.tsx");
 const textFieldSource = readFileSync(join(componentsDir, "form/TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(componentsDir, "form/SearchField.tsx"), "utf8");
 const fieldShellSource = readFileSync(join(componentsDir, "FieldShell.tsx"), "utf8");
-const buttonCode = code("Button.tsx");
+const buttonCode = code("actions/Button.tsx");
 
 test("the layout components are exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();

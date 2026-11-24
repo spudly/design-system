@@ -6,7 +6,7 @@ import { fileURLToPath } from "node:url";
 import "../../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../../test/internalDist.js";
 describe("buttonGhostProp", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 
   /**
    * Strip comments without touching string literals: a `//` inside
@@ -147,7 +147,7 @@ describe("buttonGhostProp", () => {
   });
 });
 describe("buttonIcon", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   function readCode(rel: string) {
     return readFileSync(join(root, rel), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -176,7 +176,7 @@ describe("buttonIcon", () => {
   test("the icon slot takes an icon NAME, resolved through the internal registry (#178, #438 Part 4)", () => {
     assert.match(
       button,
-      /import \{ iconsByName, type IconName \} from "\.\.\/icons\/iconRegistry\.js";/,
+      /import \{ iconsByName, type IconName \} from "\.\.\/\.\.\/icons\/iconRegistry\.js";/,
     );
     assert.match(button, /icon\?: IconName;/);
     assert.match(button, /iconsByName\[icon\]/);
@@ -277,7 +277,7 @@ describe("buttonIcon", () => {
     assert.match(button, /gap: tokens\.spacing\[2\]/);
   });
   test("stories cover icon+label and icon-only across variants, sizes, disabled, and a press interaction (#178)", () => {
-    assert.match(stories, /title: "Widgets\/Button"/);
+    assert.match(stories, /title: "Widgets\/Actions & Navigation\/Button"/);
     for (const story of [
       "WithIcon",
       "WithIconVariants",
@@ -401,7 +401,7 @@ describe("buttonIcon", () => {
 describe("buttonNoStyleProps", () => {
   const here = dirname(fileURLToPath(import.meta.url));
   const read = (rel: string) =>
-    readFileSync(join(here, "../..", rel), "utf8")
+    readFileSync(join(here, "../../..", rel), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
       .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   const button = read("src/widgets/actions/Button.tsx");
@@ -451,7 +451,7 @@ describe("buttonNoStyleProps", () => {
   });
 });
 describe("buttonSecondaryBorder", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   function readCode(rel: string) {
     return readFileSync(join(root, rel), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -519,7 +519,7 @@ describe("buttonSecondaryBorder", () => {
   });
 });
 describe("buttonWebAria", () => {
-  const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
+  const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   function readCode(rel: string) {
     return readFileSync(join(root, rel), "utf8")
       .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -555,7 +555,7 @@ describe("buttonWebAria", () => {
     assert.match(accessibility, /ariaHidden \?\? accessibilityElementsHidden/);
   });
   test("Button destructures the RN accessibility props out of rest and routes them through the translator (#235)", () => {
-    assert.match(button, /from "\.\/accessibility\.js"/);
+    assert.match(button, /from "\.\.\/accessibility\.js"/);
     assert.match(button, /platformAccessibilityProps\(\{/);
     for (const prop of [
       "accessibilityLabel",
@@ -596,7 +596,7 @@ describe("buttonWebAria", () => {
       blankWord,
       /accessibilityLabel=\{`Reveal blank word \$\{index \+ 1\} of \$\{total\}`\}/,
     );
-    assert.match(blankWord, /from "\.\/Button\.js"/);
+    assert.match(blankWord, /from "\.\/actions\/Button\.js"/);
   });
   const STACK_PRESSABLES = [
     "src/widgets/RatingForm.tsx",

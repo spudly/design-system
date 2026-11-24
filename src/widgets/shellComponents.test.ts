@@ -45,7 +45,7 @@ test("ScreenShell owns the fixed-shell frame", () => {
 });
 
 test("Toolbar owns the pinned bar's inset, gap, wrap, and hairline divider", () => {
-  const toolbar = code("Toolbar.tsx");
+  const toolbar = code("actions/Toolbar.tsx");
   assert.match(toolbar, /styled\(XStack, \{\s+name: "Toolbar",/);
   assert.match(toolbar, /flexWrap: "wrap",\s+alignItems: "center",/);
   assert.match(toolbar, /gap: tokens\.spacing\[2\],/);

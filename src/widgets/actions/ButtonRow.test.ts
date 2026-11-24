@@ -44,7 +44,7 @@ test("ButtonRow is exported from the built internal components barrel", async ()
 });
 
 test("ButtonRowProps is a type-only export from the built components barrel", () => {
-  const barrel = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const barrel = readFileSync(join(here, "../../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(barrel, /export \{[^}]*type ButtonRowProps[^}]*\}/);
   assert.ok(!barrel.includes("EqualButtonRow"), "the barrel no longer names EqualButtonRow");
 });

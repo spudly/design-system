@@ -22,7 +22,7 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 
 function codeOf(rel: string) {
-  const source = readFileSync(join(here, "../..", rel), "utf8");
+  const source = readFileSync(join(here, "../../..", rel), "utf8");
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
