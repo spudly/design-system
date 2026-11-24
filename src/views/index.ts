@@ -40,6 +40,11 @@ export {
   type NutritionGoalsValues,
 } from "./NutritionGoalsForm.js";
 export { RecipeOverviewPanel, type RecipeOverviewPanelProps } from "./RecipeOverviewPanel.js";
+export {
+  RecipeIngredientsPanel,
+  type RecipeIngredientsPanelProps,
+  type RecipeIngredientsPanelView,
+} from "./RecipeIngredientsPanel.js";
 export { RecipeCommentsView, type RecipeCommentsViewProps } from "./RecipeCommentsView.js";
 export {
   RecipeExportPickerView,

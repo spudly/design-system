@@ -23,7 +23,7 @@ const code = strip(source);
 // page source hosts the wiring pins (render order).
 const overviewCode = strip(readFileSync(join(viewsDir, "RecipeOverviewPanel.tsx"), "utf8"));
 const ingredientsCode = strip(
-  readFileSync(join(componentsDir, "RecipeIngredientsPanel.tsx"), "utf8"),
+  readFileSync(join(viewsDir, "RecipeIngredientsPanel.tsx"), "utf8"),
 );
 const ratingsCode = strip(ratingsSource);
 const scrollShellCode = strip(scrollShellSource);
@@ -343,18 +343,26 @@ describe("publicRecipePageAdoption", () => {
   });
 
   test("the sections render through the shared library panels (#331)", () => {
-    // RecipeOverviewPanel is a view since #739; the other two panels
-    // are still widgets on this branch.
+    // RecipeOverviewPanel is a view since #739 and
+    // RecipeIngredientsPanel is a view since #737; only
+    // RecipeInstructionsPanel is still a widget.
     assert.ok(
       code.includes(`import { RecipeOverviewPanel } from "../views/RecipeOverviewPanel.js";`),
       "the page imports the library RecipeOverviewPanel",
     );
-    for (const panel of ["RecipeIngredientsPanel", "RecipeInstructionsPanel"]) {
+    for (const panel of ["RecipeInstructionsPanel"]) {
       assert.ok(
         code.includes(`import { ${panel} } from "../widgets/${panel}.js";`),
         `the page imports the library ${panel}`,
       );
     }
+    // RecipeIngredientsPanel is a view since #737, not a widget.
+    assert.ok(
+      code.includes(
+        'import { RecipeIngredientsPanel } from "../views/RecipeIngredientsPanel.js";',
+      ),
+      "the page imports the RecipeIngredientsPanel view",
+    );
     // The view-models pass into the panels unchanged (the shared shapes).
     assert.match(code, /<RecipeIngredientsPanel ingredients=\{ingredients\} \/>/);
     assert.match(code, /<RecipeInstructionsPanel instructions=\{instructions\} \/>/);

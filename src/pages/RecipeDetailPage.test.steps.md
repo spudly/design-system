@@ -3,7 +3,7 @@ component: RecipeDetailPage
 run_when:
   - "src/pages/RecipeDetailPage.tsx, its stories, or a changeset naming RecipeDetailPage."
   - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
-  - "src/widgets/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
+  - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
   - "src/widgets/RecipeInstructionsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeInstructionsPanel."
   - "src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
   - "src/views/RecipeSharingView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeSharingView."
@@ -66,7 +66,7 @@ naming RecipeOverviewPanel.
 
 ## RecipeIngredientsPanel
 
-Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
+Open in `Views/RecipeIngredientsPanel`: Default, Plain.
 
 1. Default: the servings stepper and the Scale preset row
    fit the width without the Scale row wrapping; the Custom
@@ -80,7 +80,7 @@ Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
 2. Plain: two unadorned rows with hairline separators and no
    substitutions panel.
 
-**Run when:** `src/widgets/RecipeIngredientsPanel.tsx`,
+**Run when:** `src/views/RecipeIngredientsPanel.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeIngredientsPanel.
 

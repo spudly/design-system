@@ -166,11 +166,6 @@ export {
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
 export {
-  RecipeIngredientsPanel,
-  type RecipeIngredientsPanelProps,
-  type RecipeIngredientsPanelView,
-} from "./RecipeIngredientsPanel.js";
-export {
   RecipeInstructionsPanel,
   type RecipeInstructionsPanelProps,
 } from "./RecipeInstructionsPanel.js";
