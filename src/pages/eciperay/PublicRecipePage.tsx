@@ -11,7 +11,7 @@ import { TextSkeleton } from "../../widgets/TextSkeleton.js";
 import { MessageCard } from "../../widgets/MessageCard.js";
 import { RatingsCard } from "../../widgets/RatingsCard.js";
 import { RecipeIngredientsPanel } from "../../views/RecipeIngredientsPanel.js";
-import { RecipeInstructionsPanel } from "../../widgets/RecipeInstructionsPanel.js";
+import { StepList } from "../../widgets/StepList.js";
 import { RecipeOverviewPanel } from "../../views/RecipeOverviewPanel.js";
 import { ScrollShell } from "../../widgets/ScrollShell.js";
 import { SectionHeading } from "../../widgets/SectionHeading.js";
@@ -111,8 +111,7 @@ import type {
  * buttons and styling its own message shell; the page now
  * passes the row its buttons and the card its two strings. The
  * three recipe sections are the shared library panels —
- * RecipeOverviewPanel, RecipeIngredientsPanel and
- * RecipeInstructionsPanel — extracted in the component-only
+ * RecipeOverviewPanel and RecipeIngredientsPanel — extracted in the component-only
  * change (#331) after this tranche first composed them in-file
  * under the #119 program rule (2026-10-29) that a tranche page
  * adds no library components; the same panels serve
@@ -127,7 +126,7 @@ import type {
  *
  * The sections' ephemeral state stays inside the shared pieces
  * that own it, mirroring RecipeDetailPage: the instructions
- * panel's StepList holds the active step, the ingredients
+ * StepList holds the active step, the ingredients
  * panel's PresetValueSelector the custom-scale editing. None
  * of it is business state.
  *
@@ -294,7 +293,7 @@ function CtaBar({
 // ---------------------------------------------------------------------------
 // The three recipe sections are the shared library panels (see
 // the header's composition note): RecipeOverviewPanel,
-// RecipeIngredientsPanel and RecipeInstructionsPanel carry the
+// RecipeIngredientsPanel and StepList carry the
 // sections' rendering; this file only wires the page's
 // view-models into them.
 // ---------------------------------------------------------------------------
@@ -325,12 +324,24 @@ function IngredientsSection({ ingredients }: { ingredients: PublicRecipePageIngr
   return <RecipeIngredientsPanel ingredients={ingredients} />;
 }
 
-/** The instructions section: the shared
- * RecipeInstructionsPanel (the step cards in step-number order,
- * the tapped card highlighted as the active step), fed the
- * page's instruction list. */
+/** The instructions section: the shared StepList (the step
+ * cards in step-number order, the tapped card highlighted as
+ * the active step), fed the page's instruction list sorted by
+ * step number with each step's "Step N" eyebrow label composed
+ * here — labels are caller-voiced copy (#747: the panel that
+ * used to do this wiring was removed, its loading skeleton
+ * moved into StepList). */
 function InstructionsSection({ instructions }: { instructions: PublicRecipePageInstruction[] }) {
-  return <RecipeInstructionsPanel instructions={instructions} />;
+  const sorted = [...instructions].sort((a, b) => a.stepNumber - b.stepNumber);
+  return (
+    <StepList
+      steps={sorted.map((step) => ({
+        id: step.id,
+        label: `Step ${step.stepNumber}`,
+        body: step.body,
+      }))}
+    />
+  );
 }
 
 // ---------------------------------------------------------------------------

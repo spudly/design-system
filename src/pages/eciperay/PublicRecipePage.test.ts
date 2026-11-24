@@ -342,18 +342,19 @@ describe("publicRecipePageAdoption", () => {
 
   test("the sections render through the shared library panels (#331)", () => {
     // RecipeOverviewPanel is a view since #739 and
-    // RecipeIngredientsPanel is a view since #737; only
-    // RecipeInstructionsPanel is still a widget.
-    assert.ok(
-      code.includes(`import { RecipeOverviewPanel } from "../../views/RecipeOverviewPanel.js";`),
-      "the page imports the library RecipeOverviewPanel",
-    );
-    for (const panel of ["RecipeInstructionsPanel"]) {
+    // RecipeIngredientsPanel is a view since #737; the
+    // instructions section renders through StepList since
+    // RecipeInstructionsPanel was removed in #747.
+    for (const panel of ["RecipeOverviewPanel", "RecipeIngredientsPanel"]) {
       assert.ok(
-        code.includes(`import { ${panel} } from "../../widgets/${panel}.js";`),
+        code.includes(`import { ${panel} } from "../../views/${panel}.js";`),
         `the page imports the library ${panel}`,
       );
     }
+    assert.ok(
+      code.includes(`import { StepList } from "../../widgets/StepList.js";`),
+      "the page imports the library StepList",
+    );
     // RecipeIngredientsPanel is a view since #737, not a widget.
     assert.ok(
       code.includes(
@@ -363,7 +364,11 @@ describe("publicRecipePageAdoption", () => {
     );
     // The view-models pass into the panels unchanged (the shared shapes).
     assert.match(code, /<RecipeIngredientsPanel ingredients=\{ingredients\} \/>/);
-    assert.match(code, /<RecipeInstructionsPanel instructions=\{instructions\} \/>/);
+    assert.ok(
+      code.includes('import { StepList } from "../../widgets/StepList.js";'),
+      "the page imports the library StepList for its instructions section (#747)",
+    );
+    assert.match(code, /label: `Step \$\{step\.stepNumber\}`/, "the page composes each step's Step N label (#747)");
   });
 
   test("stories exercise every union state and both CTA variants", () => {

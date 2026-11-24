@@ -13,7 +13,7 @@ release's changed components. The full index lives in
 
 ## Content rows (StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow)
 
-Open in `Widgets/StepList`: Default;
+Open in `Widgets/StepList`: Default, Loading, LoadingOverlay;
 `Widgets/MarkableRow`: Default;
 `Widgets/Form/SuggestionPanel`: Default;
 `Widgets/TagList`: Default;
@@ -21,7 +21,9 @@ Open in `Widgets/StepList`: Default;
 `Widgets/Form/FieldRow`: (its stories);
 
 1. StepList: steps render numbered in order; a step with a
-   heading shows it above its body.
+   heading shows it above its body. Loading shows skeleton
+   cards mirroring the loaded cards; LoadingOverlay aligns
+   them over the loaded cards with no size drift.
 2. MarkableRow: the row's mark toggle flips its marked state
    treatment without shifting the row layout.
 3. SuggestionPanel: the panel title sits over one entry per

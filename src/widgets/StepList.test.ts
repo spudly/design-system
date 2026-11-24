@@ -64,3 +64,11 @@ test("step activation is keyboard-operable on web (the ListItem pattern)", () =>
   assert.match(code, /event\.key === "Enter" \|\| event\.key === " "/);
   assert.match(code, /setActiveIndex\(i\)/, "keys and presses activate the same step");
 });
+
+test("the loading state renders skeleton cards in the cards' own geometry (#747, ex-RecipeInstructionsPanel)", () => {
+  assert.match(code, /loading\?: boolean/, "StepList declares the explicit loading prop");
+  assert.match(code, /useLoadingScope\(loading\)/, "StepList reads the internal LoadingScope");
+  assert.match(code, /const LOADING_STEP_KEYS = \["loading-1", "loading-2", "loading-3"\] as const;/, "exactly 3 frozen dummy cards when no steps are known");
+  assert.match(code, /borderColor="transparent"/, "skeleton card borders are transparent");
+  assert.match(code, /accessibilityState: \{ busy: true \}/, "the loading region is marked busy");
+});
