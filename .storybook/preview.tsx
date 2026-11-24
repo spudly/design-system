@@ -77,6 +77,17 @@ function isStorybookThemeName(value: string): value is StorybookThemeName {
 }
 
 const preview: Preview = {
+  parameters: {
+    options: {
+      // #710: stories sort alphabetically within each heading
+      // (Widgets/<Category>/, Views/<App>/, Pages/<App>/), so
+      // components are easy to find in the sidebar.
+      storySort: {
+        method: "alphabetical",
+        locales: "en-US",
+      },
+    },
+  },
   globalTypes: {
     dsViewport: {
       description: "Story viewport (frame width for page stories)",
