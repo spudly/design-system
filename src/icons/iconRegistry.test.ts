@@ -15,7 +15,8 @@
  *    meals, profile, recipes, shared, tags, warning), plus "print"
  *    and "share" for RecipeDetailPage's Print / Share actions
  *    (#187), plus "help" for SearchHelpPopover's trigger (#699),
- *    plus "list" for SectionHeading's icon form (#721)
+ *    plus "list" for SectionHeading's icon form (#721), plus
+ *    "more" for DiscoveryCard's overflow-menu trigger (#791)
  *    — no more, no fewer.
  * 2. Every name resolves to the per-icon component of the same
  *    semantic name (add -> AddIcon, …): resolution is identity,
@@ -46,6 +47,7 @@ const NAMES: [string, string][] = [
   ["home", "HomeIcon"],
   ["list", "ListIcon"],
   ["meals", "MealsIcon"],
+  ["more", "MoreIcon"],
   ["print", "PrintIcon"],
   ["profile", "ProfileIcon"],
   ["recipes", "RecipesIcon"],
@@ -55,12 +57,12 @@ const NAMES: [string, string][] = [
   ["warning", "WarningIcon"],
 ];
 
-test("runtime: the registry's name set is exactly the dispositioned thirteen, in order", async () => {
+test("runtime: the registry's name set is exactly the dispositioned fourteen, in order", async () => {
   const loaded: Record<string, any> = await import("../../dist/icons/iconRegistry.js");
   assert.deepEqual(
     [...loaded.iconNames],
     NAMES.map(([name]) => name),
-    "the name set is exactly the dispositioned twelve, in order",
+    "the name set is exactly the dispositioned fourteen, in order",
   );
   assert.deepEqual(
     Object.keys(loaded.iconsByName).sort(),

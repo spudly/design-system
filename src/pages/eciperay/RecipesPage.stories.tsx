@@ -341,6 +341,24 @@ export const DiscoveryOnly: Story = {
   render: () => <RecipesPageDemo ownRecipes={[]} />,
 };
 
+export const DiscoveryWithActions: Story = {
+  // Per-card actions (#791): every discovery item carries the
+  // host's two generic actions, so each card renders its
+  // overflow-menu button; items without actions render none.
+  render: () => (
+    <RecipesPageDemo
+      ownRecipes={[]}
+      discoveryRecipes={discoveryItems.map((item) => ({
+        ...item,
+        actions: [
+          { id: "hide", label: "Hide this recipe", onSelect: () => undefined },
+          { id: "show-less", label: "Show less like this", onSelect: () => undefined },
+        ],
+      }))}
+    />
+  ),
+};
+
 export const DiscoveryError: Story = {
   // Section independence: the discovery load failed, so its
   // section shows the error alert — the user's own recipes

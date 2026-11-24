@@ -48,6 +48,22 @@ export const WithoutSubtitle: Story = {
   },
 };
 
+// Per-card actions (#791): the overflow-menu button overlays the
+// card's trailing edge; the menu itself is the DS Dropdown, opened
+// by the trigger (its open state is covered by interaction, not
+// the static story).
+export const WithActions: Story = {
+  args: {
+    title: "Creamy Tuscan Garlic Chicken",
+    subtitle: "By Maria · ★ 4.5 · Satiety 60",
+    href: "/recipe/tuscan-chicken/creamy-tuscan-garlic-chicken",
+    actions: [
+      { id: "hide", label: "Hide this recipe", onSelect: () => undefined },
+      { id: "show-less", label: "Show less like this", onSelect: () => undefined },
+    ],
+  },
+};
+
 export const Loading: Story = {
   args: {
     title: "Creamy Tuscan Garlic Chicken",
