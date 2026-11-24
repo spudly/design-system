@@ -23,7 +23,6 @@ import { Text } from "../../widgets/Text.js";
 import { RatingForm } from "../../widgets/RatingForm.js";
 import { BoundedList } from "../shared/BoundedList.js";
 import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
-import type { DiscoverPageItem } from "./DiscoverPage.js";
 import { useCatalogPagination } from "../shared/useCatalogPagination.js";
 
 /**
@@ -56,8 +55,8 @@ import { useCatalogPagination } from "../shared/useCatalogPagination.js";
  * no discovery feed for a surface omits the discovery props
  * entirely and the section — heading, loading, error, and
  * empty rows alike — does not render at all.
- * DiscoverPage stays in place untouched; its removal is a
- * follow-up once the app adopts this page.
+ * DiscoverPage was removed in #784 once the app adopted this
+ * page — RecipesPage is the one and only browse page.
  *
  * ONE search field and ONE filter set cover the unified
  * collection: the single CatalogFiltersBar in the list header
@@ -204,11 +203,26 @@ import { useCatalogPagination } from "../shared/useCatalogPagination.js";
  * the two pages' rows cannot drift. */
 export type RecipesPageItem = RecipeRowItem;
 
-/** One discovery-section recipe row's view-model: exactly
- * DiscoverPage's item (the public catalog's shape — the host
- * formats `subtitle` and builds the permalink `href`), reused
- * so the two pages' public rows cannot drift while both exist. */
-export type RecipesPageDiscoveryItem = DiscoverPageItem;
+/** One discovery-section recipe row's view-model (the public
+ * catalog's shape — formerly DiscoverPage's item, owned here
+ * since DiscoverPage's removal in #784). The app formats
+ * `subtitle` (its discovery meta line — "By {author} · {rating}
+ * · {satiety}", with the author fallback applied app-side) and
+ * builds `href` (the recipe's permalink); the view only renders
+ * them. Nothing else is in the model: the card renders no
+ * description, servings/times, tags, or nutrition, and the slug
+ * is needed only to build the permalink, which stays app-side
+ * inside `href`. */
+export type RecipesPageDiscoveryItem = {
+  id: string;
+  title: string;
+  subtitle?: string;
+  imageUrl?: string | null;
+  /** The recipe's permalink (`/recipe/{id}/{slug}`), built by
+   * the host. The card renders as a real anchor to this URL on
+   * web — see the header's navigation note. */
+  href: string;
+};
 
 // The filter option sets are this catalog's data, passed to the
 // shared CatalogFiltersBar as filter definitions (the bar owns
@@ -289,7 +303,7 @@ export type RecipesPageProps = CatalogPageFilterProps<RecipesPageFilterId> & {
   /** Public mode: the failed first load's message; null/absent renders no error state. */
   errorMessage?: string | null;
   /** Public mode: the public recipes to render. */
-  recipes?: DiscoverPageItem[];
+  recipes?: RecipesPageDiscoveryItem[];
   /** Public mode: first-load in flight. */
   loading?: boolean;
 
@@ -1103,7 +1117,7 @@ export function RecipesPage(props: RecipesPageProps) {
   const filtersHeader = <CatalogRow>{filtersBar}</CatalogRow>;
 
   if (variant === "public") {
-    const publicItems: DiscoverPageItem[] = publicLoading ? [] : (publicRecipes ?? []);
+    const publicItems: RecipesPageDiscoveryItem[] = publicLoading ? [] : (publicRecipes ?? []);
     if (isWeb) {
       // Public catalog on web (#547): whole-page flow, no
       // windowing — cards render in document order and the

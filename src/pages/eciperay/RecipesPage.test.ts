@@ -907,13 +907,13 @@ describe("recipesPageUnified", () => {
     );
   });
 
-  test("discovery rows are permalink DiscoveryCards; the view-model is DiscoverPage's item", () => {
+  test("discovery rows are permalink DiscoveryCards; the view-model is the page's own item type", () => {
     assert.match(
       code,
-      /export type RecipesPageDiscoveryItem = DiscoverPageItem;/,
-      "the discovery view-model reuses DiscoverPage's item type so the public rows cannot drift",
+      /export type RecipesPageDiscoveryItem = \{/,
+      "the discovery view-model is defined on RecipesPage itself since DiscoverPage's removal (#784)",
     );
-    assert.match(code, /import type \{ DiscoverPageItem \} from "\.\/DiscoverPage\.js";/);
+    assert.ok(!code.includes("DiscoverPage.js"), "no import of the removed DiscoverPage module may remain");
     assert.match(code, /<DiscoveryCard/);
     assert.match(code, /href=\{item\.href\}/, "discovery cards carry the host-built permalink");
     assert.ok(!code.includes("onRecipePress"), "no press callback may replace the permalink");
@@ -927,8 +927,8 @@ describe("recipesPageUnified", () => {
     );
   });
 
-  test("DiscoverPage is the public-variant compatibility wrapper and both pages stay exported (#547 merge)", () => {
-    assert.match(index, /export \{\s*DiscoverPage,/);
+  test("DiscoverPage is removed and RecipesPage is the only browse page exported (#784)", () => {
+    assert.ok(!index.includes("DiscoverPage"), "the pages barrel must not export DiscoverPage or its types");
     assert.match(index, /type RecipesPageDiscoveryItem,/);
     assert.match(index, /export \{\s*RecipesPage,/);
   });
