@@ -82,6 +82,17 @@ export const WithResults: Story = {
   render: () => <PickerDemo initialSearchText="peppers" />,
 };
 
+/**
+ * Selected items render as removable Badge chips INSIDE the
+ * field (#805), sharing its bordered frame with the search
+ * input — there is no selected-items list below the field.
+ */
+export const WithSelection: Story = {
+  render: () => (
+    <PickerDemo initialSelectedIds={["tuscan-chicken", "stuffed-peppers", "fudgy-brownies"]} />
+  ),
+};
+
 export const NoSelection: Story = {
   render: () => <PickerDemo initialSelectedIds={[]} />,
 };

@@ -1,15 +1,40 @@
 import { useRef } from "react";
-import { XStack, YStack, isWeb } from "tamagui";
+import { XStack, YStack, isWeb, styled } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../accessibility.js";
 import { Alert } from "../feedback/Alert.js";
-import { Button } from "../actions/Button.js";
+import { Badge } from "../data/Badge.js";
 import { ListItem } from "../data/ListItem.js";
 import { SearchField } from "./SearchField.js";
 import { Spinner } from "../feedback/Spinner.js";
 import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
+
+/**
+ * The bordered field frame holding the selected chips and the
+ * (embedded, borderless) search field (#805): it carries the
+ * SearchField container's own border/focus treatment — the
+ * $textMuted border (≥3:1, WCAG 1.4.11, as in SearchField) and
+ * the focus-within ring — so the composite reads as one field.
+ */
+const StyledFieldFrame = styled(XStack, {
+  name: "AutocompletePickerFieldFrame",
+
+  backgroundColor: "$surface",
+  borderWidth: 1,
+  borderColor: "$textMuted",
+  borderRadius: tokens.radii.md,
+  paddingHorizontal: tokens.spacing[2],
+  paddingVertical: tokens.spacing[1],
+  alignItems: "center",
+  flexWrap: "wrap",
+  gap: tokens.spacing[2],
+  outlineWidth: "0px focus-within:2px",
+  outlineStyle: "none focus-within:solid",
+  outlineColor: "$link",
+  outlineOffset: 2,
+});
 
 export type AutocompletePickerResult = {
   /** Stable id of the result — selection and removal report it. */
@@ -89,10 +114,11 @@ export type AutocompletePickerProps = {
 /**
  * Multi-select search autocomplete (#383): a SearchField, the
  * caller's results for the current search text as pressable
- * rows, and the selected items as a removable list — the
- * replacement for rendering a full checkbox list of every
- * option in the meal forms, where the library the host
- * searches is far larger than a form should list.
+ * rows, and the selected items as removable Badge chips inside
+ * the field itself (#805) — the replacement for rendering a
+ * full checkbox list of every option in the meal forms, where
+ * the library the host searches is far larger than a form
+ * should list.
  *
  * The contract is the DS controlled pattern throughout:
  * - The search is the caller's. `searchText` crosses in,
@@ -113,17 +139,22 @@ export type AutocompletePickerProps = {
  * - Selection is multi: picking a result reports its id
  *   through `onSelectResult` and the picker stays available
  *   to add more; the caller appends the item to
- *   `selectedItems`, whose rows each carry a Remove action
- *   reporting through `onRemoveSelectedItem`. What a
- *   selection means beyond the list — the meal forms'
- *   servings steppers, say — is the caller's composition
- *   around the picker, driven by the same selected
- *   view-models the caller passes in.
+ *   `selectedItems`, which render as removable Badge chips
+ *   inside the field frame (#805 — the Jira pattern: chips and
+ *   the search input share one bordered field, the chips in a
+ *   wrapping row and the embedded SearchField flexing beside
+ *   them), each chip's × reporting through
+ *   `onRemoveSelectedItem`. What a selection means beyond the
+ *   chips — the meal forms' servings steppers, say — is the
+ *   caller's composition around the picker, driven by the
+ *   same selected view-models the caller passes in.
  *
  * The picker owns its styling completely (#119): the search
- * field is the DS SearchField, result rows are DS ListItems,
- * removal is a ghost DS Button, and the stacks are the
- * picker's own layout — callers pass data and callbacks only.
+ * field is the DS SearchField (in its embedded, borderless
+ * form inside the picker's field frame), result rows are DS
+ * ListItems, selected items are DS Badges in their removable
+ * form, and the stacks are the picker's own layout — callers
+ * pass data and callbacks only.
  *
  * Search-state announcements: an always-mounted polite live
  * region (the StatusMessage pattern — `politeLiveRegionProps`
@@ -192,7 +223,7 @@ export function AutocompletePicker({
 
   // Both the select and remove paths unmount the control the
   // user just activated (the result row is filtered out as
-  // selected; the selected item's row leaves the list), so
+  // selected; the selected item's chip leaves the field), so
   // focus would fall to the page body; return it to the
   // search input instead (see the focus note above). The
   // input element carries `focus()` on web and the TextInput
@@ -216,14 +247,30 @@ export function AutocompletePicker({
 
   return (
     <YStack gap={tokens.spacing[2]} position="relative">
-      <SearchField
-        ref={searchFieldRef}
-        value={searchText}
-        onChangeText={onSearchTextChange}
-        placeholder={placeholder}
-        aria-label={searchAccessibilityLabel}
-        disabled={disabled}
-      />
+      <StyledFieldFrame testID="autocomplete-picker-field">
+        {selectedItems.map((item) => (
+          <Badge
+            key={item.id}
+            disabled={disabled}
+            onRemove={() => {
+              handleRemoveSelectedItem(item.id);
+            }}
+            removeAccessibilityLabel={voice.autocompletePicker.removeItemLabel(item.label)}
+          >
+            {item.label}
+          </Badge>
+        ))}
+        <SearchField
+          ref={searchFieldRef}
+          embedded
+          grow
+          value={searchText}
+          onChangeText={onSearchTextChange}
+          placeholder={placeholder}
+          aria-label={searchAccessibilityLabel}
+          disabled={disabled}
+        />
+      </StyledFieldFrame>
       <YStack
         collapsable={false}
         {...politeLiveRegionProps}
@@ -277,32 +324,6 @@ export function AutocompletePicker({
             ))}
           </YStack>
         )
-      ) : null}
-      {selectedItems.length > 0 ? (
-        <YStack>
-          {selectedItems.map((item) => (
-            <XStack
-              key={item.id}
-              alignItems="center"
-              justifyContent="space-between"
-              gap={tokens.spacing[3]}
-              paddingVertical={tokens.spacing[2]}
-            >
-              <Text flex={1}>{item.label}</Text>
-              <Button
-                ghost
-                size="sm"
-                accessibilityLabel={voice.autocompletePicker.removeItemLabel(item.label)}
-                disabled={disabled}
-                onPress={() => {
-                  handleRemoveSelectedItem(item.id);
-                }}
-              >
-                {voice.autocompletePicker.removeLabel}
-              </Button>
-            </XStack>
-          ))}
-        </YStack>
       ) : null}
     </YStack>
   );

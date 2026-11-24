@@ -86,6 +86,24 @@ export type BadgeProps = Omit<StyledBadgeProps, "onPress"> & {
    * no press handler is display-only and ignores this prop.
    */
   selected?: boolean;
+  /**
+   * The removable form's remove handler: a bare intent with no
+   * event argument. Passing it renders a small × control inside
+   * the badge, after the label — the chip form. The × is its own
+   * button (see `removeAccessibilityLabel`); the chip label
+   * itself stays plain text, so the whole chip is NOT pressable
+   * in this form — removal is the only action. Leaving it
+   * unpassed renders no remove control.
+   */
+  onRemove?: () => void;
+  /**
+   * The accessible name of the removable form's × button.
+   * Defaults to `Remove <label>` when the label is a plain
+   * string, and to "Remove" otherwise — callers whose voice
+   * object composes the name (e.g. AutocompletePicker's
+   * `removeItemLabel(label)`) pass it explicitly.
+   */
+  removeAccessibilityLabel?: string;
 };
 
 /**
@@ -106,18 +124,30 @@ export type BadgeProps = Omit<StyledBadgeProps, "onPress"> & {
  * A `disabled` selectable badge is inert: out of the tab order,
  * announced disabled, dimmed, and it never activates. With no
  * press handler the badge is display-only.
+ *
+ * Removable form: pass `onRemove` and the badge is a chip — the
+ * label stays plain text and a small × control inside the badge
+ * is its own button, named `removeAccessibilityLabel` (default
+ * `Remove <label>` for a string label). On web the × is
+ * keyboard-operable like the selectable form (focusable, Enter
+ * and Space, no held-key repeats). A `disabled` removable badge
+ * dims and its × is inert: out of the tab order, announced
+ * disabled, and it never activates.
  */
 export function Badge({
   tone = "neutral",
   color,
   selected,
   onPress,
+  onRemove,
+  removeAccessibilityLabel,
   disabled = false,
   children,
   ...rest
 }: BadgeProps) {
   const resolveTagColorShade = useTagColorShadeResolver();
   const selectable = onPress !== undefined;
+  const removable = onRemove !== undefined;
   const isSelected = selectable && selected === true;
   const labelType = {
     fontSize: tokens.typography.fontSize.xs,
@@ -132,17 +162,24 @@ export function Badge({
   // the activation path. A disabled badge leaves the tab order,
   // announces itself disabled, dims, and never activates
   // (the same treatment Button gives `disabled`).
-  const handleKeyDown = (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
-    if (!disabled && (event.key === "Enter" || event.key === " ")) {
-      event.preventDefault();
-      // A held key repeats keydown events; a native button does
-      // not re-activate on repeats, and a repeat here would flip
-      // the selection back and forth.
-      if (!event.repeat) {
-        onPress?.();
+  const makeKeyDownHandler =
+    (activate: (() => void) | undefined) =>
+    (event: { key: string; repeat?: boolean; preventDefault: () => void }) => {
+      if (!disabled && (event.key === "Enter" || event.key === " ")) {
+        event.preventDefault();
+        // A held key repeats keydown events; a native button does
+        // not re-activate on repeats, and a repeat here would flip
+        // the selection back and forth.
+        if (!event.repeat) {
+          activate?.();
+        }
       }
-    }
-  };
+    };
+  const handleKeyDown = makeKeyDownHandler(onPress);
+  const handleRemoveKeyDown = makeKeyDownHandler(onRemove);
+  const removeLabel =
+    removeAccessibilityLabel ??
+    (typeof children === "string" ? `Remove ${children}` : "Remove");
   const selectableProps = selectable
     ? {
         ...platformAccessibilityProps({ accessibilityRole: "button" }),
@@ -170,10 +207,34 @@ export function Badge({
     <StyledBadge
       backgroundColor={backgroundColor}
       borderColor={borderColor}
+      gap={removable ? tokens.spacing[1] : undefined}
+      opacity={removable && disabled ? 0.5 : undefined}
       {...rest}
       {...selectableProps}
     >
       <Text style={{ ...labelType, color: textColor }}>{children}</Text>
+      {removable ? (
+        <XStack
+          {...platformAccessibilityProps({
+            accessibilityRole: "button",
+            accessibilityLabel: removeLabel,
+            accessibilityState: { disabled },
+          })}
+          onPress={disabled ? undefined : onRemove}
+          tabIndex={disabled ? -1 : 0}
+          onKeyDown={handleRemoveKeyDown}
+          cursor="web:pointer"
+          alignItems="center"
+          justifyContent="center"
+          minWidth={20}
+          minHeight={20}
+          {...(isWeb ? { "aria-disabled": disabled } : {})}
+        >
+          <Text aria-hidden style={{ ...labelType, color: textColor }}>
+            ×
+          </Text>
+        </XStack>
+      ) : null}
     </StyledBadge>
   );
 }
