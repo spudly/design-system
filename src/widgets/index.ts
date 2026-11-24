@@ -180,6 +180,17 @@ export {
 } from "./WeekDayColumn.js";
 // The #698 tranche-3 extraction set: the layout and loading
 // components the recipe views' de-styling extracted.
+export { Row, type RowProps } from "./Row.js";
+export { Col, type ColProps } from "./Col.js";
+export { Spacer, type SpacerProps } from "./Spacer.js";
+export {
+  resolveLayoutStyle,
+  layoutSizeValues,
+  type LayoutAlignProps,
+  type LayoutAxis,
+  type LayoutSize,
+  type ResolvedLayoutStyle,
+} from "./layout.js";
 export { ContentStack, type ContentStackProps } from "./ContentStack.js";
 export { CompactStack, type CompactStackProps } from "./CompactStack.js";
 export { TightStack, type TightStackProps } from "./TightStack.js";

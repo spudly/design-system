@@ -94,11 +94,17 @@ test("the layout components are exported from the built internal components barr
       `${name} must be exported from the internal components barrel`,
     );
   }
-  assert.equal(
-    dist.Row,
-    undefined,
-    "the generic step-prop Row must not survive as page-facing API (#119)",
-  );
+  // #746 supersedes the #119 ban on a generic Row: Row / Col /
+  // Spacer are now the approved strict-prop-subset layout
+  // primitives (Stephen's prop table, 2026-11-21), exported from
+  // the barrel and pinned by RowColSpacer.test.ts.
+  for (const name of ["Row", "Col", "Spacer"]) {
+    assert.equal(
+      typeof dist[name],
+      "function",
+      `${name} must be exported from the internal components barrel (#746)`,
+    );
+  }
   assert.equal(
     dist.Column,
     undefined,
