@@ -201,8 +201,8 @@ describe("recipesPageBoundedList", () => {
     );
     assert.match(
       code,
-      /const filtersHeader = <CatalogRow>\{filtersBar\}<\/CatalogRow>;/,
-      "the bar's wrapper carries the $3 bottom separation, so the first section heading sits the list's 12px below the search bar in both layouts",
+      /const filtersHeader = \(\s*<Col>\s*\{filtersBar\}\s*<Spacer y="m" \/>/,
+      "the bar's Col + Spacer carries the $3 bottom separation, so the first section heading sits the list's 12px below the search bar in both layouts",
     );
   });
 
@@ -266,7 +266,10 @@ describe("recipesPageCollapsedFilters", () => {
       "RecipesPageFilterId must enumerate the five addable filters",
     );
     assert.match(code, /CatalogPageFilterProps<RecipesPageFilterId>/);
-    const barSource = readFileSync(join(here, "../../../src/views/eciperay/CatalogFiltersBar.tsx"), "utf8");
+    const barSource = readFileSync(
+      join(here, "../../../src/views/eciperay/CatalogFiltersBar.tsx"),
+      "utf8",
+    );
     assert.match(barSource, /activeFilters\?: FilterId\[\];/);
     assert.match(barSource, /onActiveFiltersChange\?: \(filters: FilterId\[\]\) => void;/);
     assert.match(barSource, /filterChooserOpen\?: boolean;/);
@@ -913,7 +916,10 @@ describe("recipesPageUnified", () => {
       /export type RecipesPageDiscoveryItem = \{/,
       "the discovery view-model is defined on RecipesPage itself since DiscoverPage's removal (#784)",
     );
-    assert.ok(!code.includes("DiscoverPage.js"), "no import of the removed DiscoverPage module may remain");
+    assert.ok(
+      !code.includes("DiscoverPage.js"),
+      "no import of the removed DiscoverPage module may remain",
+    );
     assert.match(code, /<DiscoveryCard/);
     assert.match(code, /href=\{item\.href\}/, "discovery cards carry the host-built permalink");
     assert.ok(!code.includes("onRecipePress"), "no press callback may replace the permalink");
@@ -928,7 +934,10 @@ describe("recipesPageUnified", () => {
   });
 
   test("DiscoverPage is removed and RecipesPage is the only browse page exported (#784)", () => {
-    assert.ok(!index.includes("DiscoverPage"), "the pages barrel must not export DiscoverPage or its types");
+    assert.ok(
+      !index.includes("DiscoverPage"),
+      "the pages barrel must not export DiscoverPage or its types",
+    );
     assert.match(index, /type RecipesPageDiscoveryItem,/);
     assert.match(index, /export \{\s*RecipesPage,/);
   });

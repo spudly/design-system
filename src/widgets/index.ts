@@ -59,9 +59,6 @@ export {
   LoadingActionCardRow,
   type LoadingActionCardRowProps,
 } from "./feedback/LoadingActionCardRow.js";
-export { CatalogRow, type CatalogRowProps } from "./data/CatalogRow.js";
-export { CatalogCardColumn, type CatalogCardColumnProps } from "./layout/CatalogCardColumn.js";
-export { CatalogListColumn, type CatalogListColumnProps } from "./layout/CatalogListColumn.js";
 export { LoadingMediaRow } from "./feedback/LoadingMediaRow.js";
 export { ScrollSentinel, type ScrollSentinelProps } from "./layout/ScrollSentinel.js";
 export {
