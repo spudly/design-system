@@ -55,7 +55,8 @@ describe("switchStories", () => {
   });
 
   test("WithoutDescription story passes no description (#220)", () => {
-    const story = stories.slice(stories.indexOf("export const WithoutDescription"));
+    const start = stories.indexOf("export const WithoutDescription");
+    const story = stories.slice(start, stories.indexOf("export const", start + 10));
     assert.match(story, /label="Dark mode"/);
     assert.doesNotMatch(
       story,

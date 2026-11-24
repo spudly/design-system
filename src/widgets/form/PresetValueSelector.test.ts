@@ -49,7 +49,7 @@ test("the selector is a labeled preset row of toggle buttons plus the editable c
     /\{isCustomEditing \? \(/,
     "the editor replaces the custom button while editing",
   );
-  assert.match(code, /<TextField\s+accessibilityLabel=\{customAccessibilityLabel\}/);
+  assert.match(code, /<TextField\s+disabled=\{disabled\}\s+accessibilityLabel=\{customAccessibilityLabel\}/);
   assert.match(
     code,
     /onChange\(String\(parsed\)\)/,
