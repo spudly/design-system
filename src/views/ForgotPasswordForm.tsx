@@ -1,4 +1,4 @@
-import { FormStack } from "../widgets/FormStack.js";
+import { FormStack } from "../widgets/layout/FormStack.js";
 import { AuthFormSubmit } from "./AuthFormSubmit.js";
 import { TextField } from "../widgets/form/TextField.js";
 import { TextLink } from "../widgets/actions/TextLink.js";

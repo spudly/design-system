@@ -3,7 +3,7 @@ component: PublicRecipePage
 run_when:
   - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
   - "src/widgets/content/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
-  - "src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
+  - "src/widgets/layout/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
   - "src/widgets/data/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
   - "src/pages/eciperay/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, StepList), or a changeset naming PublicRecipePage."
   - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
@@ -88,7 +88,7 @@ Open in `Widgets/ScrollShell`: Default.
    background that fills the frame; the content scrolls as
    one region when it overflows.
 
-**Run when:** `src/widgets/ScrollShell.tsx`, its stories,
+**Run when:** `src/widgets/layout/ScrollShell.tsx`, its stories,
 PublicRecipePage, or a changeset naming ScrollShell.
 
 ## RatingsCard

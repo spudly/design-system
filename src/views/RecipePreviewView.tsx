@@ -1,4 +1,4 @@
-import { CompactStack } from "../widgets/CompactStack.js";
+import { CompactStack } from "../widgets/layout/CompactStack.js";
 import { Text } from "../widgets/data/Text.js";
 
 /**

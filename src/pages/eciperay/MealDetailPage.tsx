@@ -4,9 +4,9 @@ import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { ListItem } from "../../widgets/data/ListItem.js";
 import { ListStack } from "../../widgets/data/ListStack.js";
 import { MarkableRow } from "../../widgets/data/MarkableRow.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
-import { SectionStack } from "../../widgets/SectionStack.js";
+import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 
 /**

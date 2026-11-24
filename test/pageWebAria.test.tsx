@@ -247,7 +247,7 @@ test("rows translate the disabled state; the generic rows keep the button role i
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases: [string, RegExp, RegExp | null][] = [
     ["src/widgets/data/ListItem.tsx", ROLE, DISABLED],
-    ["src/widgets/CardRow.tsx", ROLE, null],
+    ["src/widgets/layout/CardRow.tsx", ROLE, null],
   ];
   for (const [rel, role, disabled] of cases) {
     const code = readCode(rel);

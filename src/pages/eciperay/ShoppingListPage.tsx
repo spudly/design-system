@@ -4,8 +4,8 @@ import { EmptyState } from "../../views/EmptyState.js";
 import { ListStack } from "../../widgets/data/ListStack.js";
 import { LoadingListItem } from "../../widgets/feedback/LoadingListItem.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { SectionStack } from "../../widgets/SectionStack.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
+import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 
 /**

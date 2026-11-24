@@ -2,7 +2,7 @@ import { Anchor, View, YStack, isWeb } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
-import { Card } from "../Card.js";
+import { Card } from "../layout/Card.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Text } from "../data/Text.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";

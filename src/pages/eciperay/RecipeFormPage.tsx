@@ -13,11 +13,11 @@ import {
   type RecipeInstructionListViewProps,
 } from "../../views/RecipeInstructionListView.js";
 import { EqualColumns } from "../../widgets/form/EqualColumns.js";
-import { FormStack } from "../../widgets/FormStack.js";
+import { FormStack } from "../../widgets/layout/FormStack.js";
 import { LabeledField } from "../../widgets/form/LabeledField.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
 import { RevertAction } from "../../views/RevertAction.js";
-import { ScrollRegion } from "../../widgets/ScrollRegion.js";
+import { ScrollRegion } from "../../widgets/layout/ScrollRegion.js";
 import { TagList } from "../../widgets/data/TagList.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { TextField } from "../../widgets/form/TextField.js";

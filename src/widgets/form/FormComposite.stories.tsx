@@ -4,7 +4,7 @@ import { YStack } from "tamagui";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { CheckboxField } from "./CheckboxField.js";
 import { FormHeading } from "../content/FormHeading.js";
-import { FormStack } from "../FormStack.js";
+import { FormStack } from "../layout/FormStack.js";
 import { NumberStepper } from "./NumberStepper.js";
 import {
   AutocompletePicker,

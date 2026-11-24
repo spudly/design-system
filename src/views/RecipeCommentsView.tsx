@@ -1,11 +1,11 @@
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/feedback/Alert.js";
 import { Button } from "../widgets/actions/Button.js";
-import { Card } from "../widgets/Card.js";
+import { Card } from "../widgets/layout/Card.js";
 import { CommentItem } from "./CommentItem.js";
-import { CompactStack } from "../widgets/CompactStack.js";
-import { ContentStack } from "../widgets/ContentStack.js";
-import { EndRow } from "../widgets/EndRow.js";
+import { CompactStack } from "../widgets/layout/CompactStack.js";
+import { ContentStack } from "../widgets/layout/ContentStack.js";
+import { EndRow } from "../widgets/layout/EndRow.js";
 import { Text } from "../widgets/data/Text.js";
 import { TextAreaField } from "../widgets/form/TextAreaField.js";
 import { useVoice } from "../voice/index.js";

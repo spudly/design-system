@@ -1,4 +1,4 @@
-import { FullScreenShell } from "../../widgets/FullScreenShell.js";
+import { FullScreenShell } from "../../widgets/layout/FullScreenShell.js";
 import { StepOverlay } from "../../widgets/StepOverlay.js";
 import { ScaledIngredientsView } from "../../views/ScaledIngredientsView.js";
 import { StepNavControls } from "../shared/StepNavControls.js";

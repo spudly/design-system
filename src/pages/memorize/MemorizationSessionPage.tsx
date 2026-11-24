@@ -2,9 +2,9 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { BackLink } from "../../widgets/actions/BackLink.js";
 import { BlankWord } from "../../widgets/data/BlankWord.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { Card } from "../../widgets/Card.js";
+import { Card } from "../../widgets/layout/Card.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { StepDots } from "../../widgets/data/StepDots.js";
 import { Text } from "../../widgets/data/Text.js";
 import { VerseText } from "../../widgets/data/VerseText.js";

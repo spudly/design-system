@@ -1,6 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { Center } from "../Center.js";
+import { Center } from "../layout/Center.js";
 import { CircleSkeleton } from "./CircleSkeleton.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "./TextSkeleton.js";
 

@@ -1,7 +1,7 @@
 ---
 component: AppShellPage
 run_when:
-  - "src/pages/eciperay/AppShellPage.tsx, src/pages/memorize/TabbedShellPage.tsx, src/widgets/AppTopBar.tsx, their stories, or a changeset naming any of them. (namely: AppShellPage, TabbedShellPage, AppTopBar)"
+  - "src/pages/eciperay/AppShellPage.tsx, src/pages/memorize/TabbedShellPage.tsx, src/widgets/layout/AppTopBar.tsx, their stories, or a changeset naming any of them. (namely: AppShellPage, TabbedShellPage, AppTopBar)"
 ---
 
 # AppShellPage — manual test steps
@@ -44,5 +44,5 @@ WithNoticeAction.
    callback. Without a notice supplied, no notice row renders.
 
 **Run when:** `src/pages/eciperay/AppShellPage.tsx`,
-`src/pages/memorize/TabbedShellPage.tsx`, `src/widgets/AppTopBar.tsx`,
+`src/pages/memorize/TabbedShellPage.tsx`, `src/widgets/layout/AppTopBar.tsx`,
 their stories, or a changeset naming any of them.

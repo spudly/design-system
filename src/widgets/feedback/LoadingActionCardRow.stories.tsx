@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
-import { CardStack } from "../CardStack.js";
+import { CardStack } from "../layout/CardStack.js";
 import { LoadingActionCardRow } from "./LoadingActionCardRow.js";
 
 const meta: Meta<typeof LoadingActionCardRow> = {

@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { Card, type CardProps } from "../Card.js";
+import { Card, type CardProps } from "../layout/Card.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Text } from "../data/Text.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";

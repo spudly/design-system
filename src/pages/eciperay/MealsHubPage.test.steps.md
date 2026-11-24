@@ -2,7 +2,7 @@
 component: MealsHubPage
 run_when:
   - "src/widgets/content/TextActionCardRow.tsx, its stories, MealsHubPage's meal list, or a changeset naming TextActionCardRow."
-  - "src/widgets/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell."
+  - "src/widgets/layout/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell."
   - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
 ---
@@ -38,7 +38,7 @@ Open in `Widgets/PinnedHeaderShell`: Default.
    region below it scrolls; the header's inset matches the
    page inset (16px sides and top).
 
-**Run when:** `src/widgets/PinnedHeaderShell.tsx`, its
+**Run when:** `src/widgets/layout/PinnedHeaderShell.tsx`, its
 stories, MealsHubPage's plans tab, or a changeset naming
 PinnedHeaderShell.
 

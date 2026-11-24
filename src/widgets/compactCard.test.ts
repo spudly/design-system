@@ -23,7 +23,7 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "../..");
-const source = readFileSync(join(root, "src", "widgets", "Card.tsx"), "utf8");
+const source = readFileSync(join(root, "src", "widgets", "layout", "Card.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("CompactCard is gone — the treatment lives on Card as a variant", async () => {

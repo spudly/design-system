@@ -68,7 +68,7 @@ test("the body and navigation scroll in a bounded region; short bodies stay cent
   // step text keeps the #628 desktop measure even when the
   // shell's backdrop fills a full-width region (the cooking
   // pages' overlay mode).
-  assert.match(code, /import \{ PageContentColumn \} from "\.\/PageContentColumn\.js";/);
+  assert.match(code, /import \{ PageContentColumn \} from "\.\/layout\/PageContentColumn\.js";/);
   assert.match(
     code,
     /<PageContentColumn>\s*<YStack paddingHorizontal="\$6" paddingVertical="\$12">/,

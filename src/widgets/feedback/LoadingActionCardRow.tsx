@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { Button } from "../actions/Button.js";
-import { Card } from "../Card.js";
+import { Card } from "../layout/Card.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 export type LoadingActionCardRowProps = {

@@ -1,8 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
-import { SectionStack } from "../../widgets/SectionStack.js";
+import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Spinner } from "../../widgets/feedback/Spinner.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";

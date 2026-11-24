@@ -250,7 +250,7 @@ test("LoadingScope lives in src/contexts — widgets import it from there", () =
     !existsSync(join(root, "src/widgets/LoadingScope.tsx")),
     "the context no longer lives in src/widgets",
   );
-  for (const name of ["actions/Button", "Card", "CardRow", "data/StatCard"]) {
+  for (const name of ["actions/Button", "layout/Card", "layout/CardRow", "data/StatCard"]) {
     assert.match(
       read(`src/widgets/${name}.tsx`),
       /from "(?:\.\.\/)+contexts\/LoadingScope\.js"/,
@@ -400,7 +400,7 @@ test("T1: every converted list/card widget declares `loading` and reads the Load
   }
   // The shells: Card provides the scope (it has no scope to read);
   // SectionCard carries the flag through CardProps.
-  const card = readCode("src/widgets/Card.tsx");
+  const card = readCode("src/widgets/layout/Card.tsx");
   assert.match(card, /\bloading\?: boolean/, "Card must declare the loading prop");
   assert.match(card, /LoadingScope/, "Card must provide the LoadingScope while loading");
   const sectionCard = readCode("src/widgets/content/SectionCard.tsx");
@@ -676,7 +676,7 @@ test("T1: a Button inside a LoadingScope renders the rectangle-skeleton treatmen
   );
 });
 test("T1: the MasonryGrid skeleton fills its columns and the ListItem skeleton hides its hairline", () => {
-  const grid = readCode("src/widgets/MasonryGrid.tsx");
+  const grid = readCode("src/widgets/layout/MasonryGrid.tsx");
   assert.match(
     grid,
     /<View key=\{`loading-\$\{itemIndex\}`\} width="100%">/,

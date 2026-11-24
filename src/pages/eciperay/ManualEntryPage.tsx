@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
 

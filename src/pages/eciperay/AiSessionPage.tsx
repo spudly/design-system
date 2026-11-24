@@ -6,7 +6,7 @@ import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { FormHeading } from "../../widgets/content/FormHeading.js";
 import { PreviewCard } from "../../widgets/content/PreviewCard.js";
-import { SessionShell } from "../../widgets/SessionShell.js";
+import { SessionShell } from "../../widgets/layout/SessionShell.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 
 /**

@@ -1,10 +1,10 @@
 ---
 component: TagsPage
 run_when:
-  - "src/widgets/FormStack.tsx, src/widgets/actions/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
+  - "src/widgets/layout/FormStack.tsx, src/widgets/actions/TrailingActionsRow.tsx, src/widgets/layout/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
   - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "src/pages/eciperay/TagsPage.tsx, its stories, or a changeset naming TagsPage."
-  - "src/widgets/actions/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: TrailingActionsRow, Card, TagsPage)"
+  - "src/widgets/actions/TrailingActionsRow.tsx, src/widgets/layout/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: TrailingActionsRow, Card, TagsPage)"
 ---
 
 # TagsPage — manual test steps
@@ -33,9 +33,9 @@ ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
    former CompactCard, folded into Card as `variant="compact"`
    under Stephen's 2026-10-29 ruling).
 
-**Run when:** `src/widgets/FormStack.tsx`,
+**Run when:** `src/widgets/layout/FormStack.tsx`,
 `src/widgets/actions/TrailingActionsRow.tsx`,
-`src/widgets/Card.tsx`, their stories, TagsPage's
+`src/widgets/layout/Card.tsx`, their stories, TagsPage's
 forms or rows, or a changeset naming any of them.
 
 ## List states
@@ -118,5 +118,5 @@ ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
    `variant="compact"` under Stephen's 2026-10-29 ruling).
 
 **Run when:** `src/widgets/actions/TrailingActionsRow.tsx`,
-`src/widgets/Card.tsx`, their stories, TagsPage's forms
+`src/widgets/layout/Card.tsx`, their stories, TagsPage's forms
 or rows, or a changeset naming any of them.

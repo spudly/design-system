@@ -43,9 +43,9 @@ function readCode(rel: string) {
 
 const page = readCode("src/pages/eciperay/LandingPage.tsx");
 const componentsBarrel = readCode("src/widgets/index.ts");
-const heroStack = readCode("src/widgets/HeroStack.tsx");
+const heroStack = readCode("src/widgets/layout/HeroStack.tsx");
 const stackedButtonRow = readCode("src/widgets/actions/StackedButtonRow.tsx");
-const cardGrid = readCode("src/widgets/CardGrid.tsx");
+const cardGrid = readCode("src/widgets/layout/CardGrid.tsx");
 
 const ELIMINATED = ["Hero", "CtaRow", "FeatureCard"];
 

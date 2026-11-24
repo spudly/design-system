@@ -91,7 +91,7 @@ test("no other source file adds a landmark role — no duplicates inside the fra
     join(srcDir, "pages", "eciperay", "LegalDocumentPage.tsx"),
     // #473: MainLandmark owns the `main` role for the public
     // recipe surface now the frame page is retired.
-    join(srcDir, "widgets", "MainLandmark.tsx"),
+    join(srcDir, "widgets", "layout", "MainLandmark.tsx"),
   ]);
   function files(dir: string): string[] {
     return readdirSync(dir, {

@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
 import { BlankWord } from "../../widgets/data/BlankWord.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { Card } from "../../widgets/Card.js";
+import { Card } from "../../widgets/layout/Card.js";
 import { PrevNextNav } from "../../widgets/actions/PrevNextNav.js";
 import { ProgressBar } from "../../widgets/feedback/ProgressBar.js";
 import { SearchField } from "../../widgets/form/SearchField.js";
@@ -13,7 +13,7 @@ import { StepDots } from "../../widgets/data/StepDots.js";
 import { Text } from "../../widgets/data/Text.js";
 import { VerseText } from "../../widgets/data/VerseText.js";
 import { tokens } from "../../tokens/index.js";
-import { PageFrame } from "../../widgets/PageFrame.js";
+import { PageFrame } from "../../widgets/layout/PageFrame.js";
 import { passageFixture, progressFixtures, verseListFixtures } from "../shared/fixtures.js";
 
 /**

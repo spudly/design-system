@@ -1,9 +1,9 @@
 ---
 component: MealPlansPage
 run_when:
-  - "src/widgets/CardStack.tsx, its stories, the pages that compose CardStack (MealPlansPage), or a changeset naming CardStack."
-  - "src/widgets/Center.tsx, its stories, the pages that compose Center (MealPlansPage), or a changeset naming Center."
-  - "src/widgets/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow."
+  - "src/widgets/layout/CardStack.tsx, its stories, the pages that compose CardStack (MealPlansPage), or a changeset naming CardStack."
+  - "src/widgets/layout/Center.tsx, its stories, the pages that compose Center (MealPlansPage), or a changeset naming Center."
+  - "src/widgets/layout/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow."
   - "src/widgets/form/PresetValueSelector.tsx, its stories, the recipe pages' scale rows, or a changeset naming PresetValueSelector."
   - "src/pages/eciperay/MealPlansPage.tsx, src/pages/eciperay/MealPlanDetailPage.tsx, their stories, or a changeset naming either page."
 ---
@@ -26,7 +26,7 @@ A CardStack is a stack of cards — a list whose rows are cards.
    (MealPlansPage's plan list is the live case, including the
    first card's danger Delete action).
 
-**Run when:** `src/widgets/CardStack.tsx`, its stories, the
+**Run when:** `src/widgets/layout/CardStack.tsx`, its stories, the
 pages that compose CardStack (MealPlansPage), or a changeset
 naming CardStack.
 
@@ -52,7 +52,7 @@ spinner centers in the shell's content area.
    centered horizontally (MealPlansPage's loading block is the
    live page case — the spinner centered under the heading).
 
-**Run when:** `src/widgets/Center.tsx`, its stories, the
+**Run when:** `src/widgets/layout/Center.tsx`, its stories, the
 pages that compose Center (MealPlansPage), or a changeset
 naming Center.
 
@@ -75,7 +75,7 @@ Open in `Widgets/CardRow`: Default, WithAction, TitleOnly.
 3. TitleOnly: the card shows the title alone, no meta line and no
    empty gap where it would sit.
 
-**Run when:** `src/widgets/CardRow.tsx`, its stories,
+**Run when:** `src/widgets/layout/CardRow.tsx`, its stories,
 MealPlansPage's list, or a changeset naming CardRow.
 
 ## PresetValueSelector

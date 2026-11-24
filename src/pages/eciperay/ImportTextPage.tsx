@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { useState } from "react";
 import { Button } from "../../widgets/actions/Button.js";
-import { FormScreenLayout } from "../../widgets/FormScreenLayout.js";
+import { FormScreenLayout } from "../../widgets/layout/FormScreenLayout.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { Text } from "../../widgets/data/Text.js";
 

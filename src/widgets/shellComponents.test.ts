@@ -38,7 +38,7 @@ test("the shell components are exported from the built internal components barre
 });
 
 test("ScreenShell owns the fixed-shell frame", () => {
-  const shell = code("ScreenShell.tsx");
+  const shell = code("layout/ScreenShell.tsx");
   assert.match(shell, /styled\(YStack, \{\s+name: "ScreenShell",/);
   assert.match(shell, /flex: 1,\s+backgroundColor: "\$surface",/);
   assert.match(shell, /Omit<StyledScreenShellProps, "flex" \| "backgroundColor">/);

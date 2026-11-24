@@ -1,7 +1,7 @@
 ---
 component: PresetValueSelector
 run_when:
-  - "src/widgets/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow."
+  - "src/widgets/layout/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow."
   - "src/widgets/form/PresetValueSelector.tsx, its stories, the recipe pages' scale rows, or a changeset naming PresetValueSelector."
 ---
 
@@ -31,7 +31,7 @@ Open in `Widgets/CardRow`: Default, WithAction, TitleOnly.
 3. TitleOnly: the card shows the title alone, no meta line and no
    empty gap where it would sit.
 
-**Run when:** `src/widgets/CardRow.tsx`, its stories,
+**Run when:** `src/widgets/layout/CardRow.tsx`, its stories,
 MealPlansPage's list, or a changeset naming CardRow.
 
 ## PresetValueSelector

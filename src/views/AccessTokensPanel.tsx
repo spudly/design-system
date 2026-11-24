@@ -1,5 +1,5 @@
 import { useLoadingScope } from "../contexts/LoadingScope.js";
-import { ContentStack } from "../widgets/ContentStack.js";
+import { ContentStack } from "../widgets/layout/ContentStack.js";
 import { CreatedSecretPanel } from "../widgets/content/CreatedSecretPanel.js";
 import { ListStack } from "../widgets/data/ListStack.js";
 import { Button } from "../widgets/actions/Button.js";

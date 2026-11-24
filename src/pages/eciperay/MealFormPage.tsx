@@ -2,9 +2,9 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { AutocompletePicker } from "../../widgets/form/AutocompletePicker.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { FormStack } from "../../widgets/FormStack.js";
+import { FormStack } from "../../widgets/layout/FormStack.js";
 import { FormHeading } from "../../widgets/content/FormHeading.js";
-import { FormScreenLayout } from "../../widgets/FormScreenLayout.js";
+import { FormScreenLayout } from "../../widgets/layout/FormScreenLayout.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
 import { NumberStepper } from "../../widgets/form/NumberStepper.js";
 import { Text } from "../../widgets/data/Text.js";

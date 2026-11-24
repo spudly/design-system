@@ -11,7 +11,7 @@ const viewsDir = join(here, "../../..", "src", "views");
 const source = readFileSync(join(pagesDir, "eciperay", "PublicRecipePage.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
 const ratingsSource = readFileSync(join(componentsDir, "data/RatingsCard.tsx"), "utf8");
-const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
+const scrollShellSource = readFileSync(join(componentsDir, "layout/ScrollShell.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
 // cannot pass the scan.

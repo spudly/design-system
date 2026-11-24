@@ -48,7 +48,7 @@
  * - src/widgets/useVariantGlyphInk.ts — the shared variant glyph
  *   ink hook (#587 phase 2); exercised through the Button/
  *   DropdownButton stories.
- * - src/widgets/PageFrame.tsx — internal page-story scaffolding
+ * - src/widgets/layout/PageFrame.tsx — internal page-story scaffolding
  *   shared by the page stories; NOT exported from either barrel, so
  *   it is not part of the @spudly/ui surface. It is exercised through
  *   every page story. If it is ever exported, this test fails and a

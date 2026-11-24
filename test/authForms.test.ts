@@ -74,7 +74,7 @@ test("each form composes the shared FormStack and owns its submit handling", () 
     const source = read(`src/views/${form}.tsx`);
     assert.match(
       source,
-      /import \{ FormStack \} from "\.\.\/widgets\/FormStack\.js";/,
+      /import \{ FormStack \} from "\.\.\/widgets\/layout\/FormStack\.js";/,
       `${form} imports the shared FormStack`,
     );
     assert.match(source, /<FormStack>/, `${form} renders its sections in the FormStack`);

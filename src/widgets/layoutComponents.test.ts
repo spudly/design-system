@@ -62,14 +62,14 @@ function code(file: string) {
 }
 
 const buttonRowCode = code("actions/ButtonRow.tsx");
-const cardStackCode = code("CardStack.tsx");
-const sectionStackCode = code("SectionStack.tsx");
+const cardStackCode = code("layout/CardStack.tsx");
+const sectionStackCode = code("layout/SectionStack.tsx");
 const fieldRowCode = code("form/FieldRow.tsx");
 const listStackCode = code("data/ListStack.tsx");
-const panelStackCode = code("PanelStack.tsx");
+const panelStackCode = code("layout/PanelStack.tsx");
 const buttonStackCode = code("actions/ButtonStack.tsx");
-const centerCode = code("Center.tsx");
-const formStackCode = code("FormStack.tsx");
+const centerCode = code("layout/Center.tsx");
+const formStackCode = code("layout/FormStack.tsx");
 const textFieldSource = readFileSync(join(componentsDir, "form/TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(componentsDir, "form/SearchField.tsx"), "utf8");
 const fieldShellSource = readFileSync(join(componentsDir, "form/FieldShell.tsx"), "utf8");

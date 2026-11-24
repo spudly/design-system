@@ -1,6 +1,6 @@
 import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { Card } from "../Card.js";
+import { Card } from "../layout/Card.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 
 /**

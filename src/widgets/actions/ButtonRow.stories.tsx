@@ -3,7 +3,7 @@ import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { Button } from "./Button.js";
 import { ButtonRow } from "./ButtonRow.js";
-import { Card } from "../Card.js";
+import { Card } from "../layout/Card.js";
 import { Text } from "../data/Text.js";
 
 const meta: Meta<typeof ButtonRow> = {

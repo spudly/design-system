@@ -1,0 +1,39 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
+import { Center } from "./Center.js";
+import { Spinner } from "../feedback/Spinner.js";
+import { Text } from "../data/Text.js";
+
+const meta: Meta<typeof Center> = {
+  title: "Widgets/Layout & Structure/Center",
+  component: Center,
+  argTypes: {
+    horizontal: { control: "boolean" },
+    vertical: { control: "boolean" },
+    fill: { control: "boolean" },
+  },
+};
+
+export default meta;
+type Story = StoryObj<typeof Center>;
+
+export const Centered: Story = {
+  args: { fill: true },
+  render: (args) => (
+    <YStack maxWidth={430} height={200} borderWidth={1} borderColor="$borderColor">
+      <Center {...args}>
+        <Spinner label="Loading" />
+      </Center>
+    </YStack>
+  ),
+};
+
+export const HorizontalOnly: Story = {
+  render: (args) => (
+    <YStack maxWidth={430} borderWidth={1} borderColor="$borderColor">
+      <Center {...args} vertical={false}>
+        <Text variant="hint">A lone notice, centered horizontally at the top of its block.</Text>
+      </Center>
+    </YStack>
+  ),
+};

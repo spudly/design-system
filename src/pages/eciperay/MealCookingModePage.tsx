@@ -1,8 +1,8 @@
-import { FullScreenShell } from "../../widgets/FullScreenShell.js";
+import { FullScreenShell } from "../../widgets/layout/FullScreenShell.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { SectionStack } from "../../widgets/SectionStack.js";
+import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
+import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { StepOverlay } from "../../widgets/StepOverlay.js";
 import { Text } from "../../widgets/data/Text.js";
 import { StepNavControls } from "../shared/StepNavControls.js";
