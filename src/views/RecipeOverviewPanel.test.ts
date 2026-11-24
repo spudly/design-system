@@ -86,7 +86,7 @@ test("the title carries level-1 heading semantics with unchanged rendering (#364
   );
   // Pin the variant's semantics against Text itself: the
   // `heading` variant maps to heading level 1.
-  const textSource = readFileSync(join(componentsDir, "Text.tsx"), "utf8");
+  const textSource = readFileSync(join(componentsDir, "..", "widgets", "Text.tsx"), "utf8");
   assert.match(
     textSource,
     /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle"\s*\?\s*1/,
