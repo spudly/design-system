@@ -9,6 +9,7 @@ const meta: Meta<typeof ColorPickerField> = {
   argTypes: {
     label: { control: "text" },
     error: { control: "text" },
+    disabled: { control: "boolean" },
   },
 };
 
@@ -43,5 +44,10 @@ export const WithError: Story = {
 
 export const WithoutLabel: Story = {
   args: { colors: tagColors },
+  render: (args) => <ColorDemo {...args} />,
+};
+
+export const Disabled: Story = {
+  args: { label: "Tag color", colors: tagColors, value: "orange", disabled: true },
   render: (args) => <ColorDemo {...args} />,
 };

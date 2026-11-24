@@ -33,6 +33,8 @@ export type RadioOptionGroupProps = Omit<
   value: string;
   onValueChange: (value: string) => void;
   error?: string;
+  /** When true, the whole group is inert and dimmed; no option can be selected. */
+  disabled?: boolean;
   id?: string;
 };
 
@@ -50,6 +52,7 @@ export function RadioOptionGroup({
   value,
   onValueChange,
   error,
+  disabled = false,
   id: idProp,
   ...rest
 }: RadioOptionGroupProps) {
@@ -67,7 +70,15 @@ export function RadioOptionGroup({
       ) : null}
       <TamaguiRadioGroup
         value={value}
-        onValueChange={onValueChange}
+        onValueChange={(next) => {
+          if (disabled) {
+            return;
+          }
+          onValueChange(next);
+        }}
+        disabled={disabled}
+        opacity={disabled ? 0.5 : 1}
+        aria-disabled={disabled || undefined}
         aria-labelledby={label ? groupLabelId : undefined}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
@@ -79,7 +90,7 @@ export function RadioOptionGroup({
             const optionLabelId = `${id}-option-${opt.value}`;
             return (
               <XStack key={opt.value} alignItems="center" gap={tokens.spacing[2]}>
-                <StyledItem value={opt.value} aria-labelledby={optionLabelId}>
+                <StyledItem value={opt.value} disabled={disabled} aria-labelledby={optionLabelId}>
                   <XStack
                     width={24}
                     height={24}
@@ -115,7 +126,13 @@ export function RadioOptionGroup({
                 <YStack flex={1} gap={tokens.spacing[1]}>
                   <Label
                     id={optionLabelId}
-                    onPress={() => onValueChange(opt.value)}
+                    onPress={
+                      disabled
+                        ? undefined
+                        : () => {
+                            onValueChange(opt.value);
+                          }
+                    }
                     fontSize={tokens.typography.fontSize.md}
                   >
                     {opt.label}

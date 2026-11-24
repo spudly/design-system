@@ -62,6 +62,8 @@ export type NumberStepperProps = {
    */
   decreaseAccessibilityLabel?: string;
   increaseAccessibilityLabel?: string;
+  /** When true, the whole stepper is inert and dimmed: both buttons (and the editable field, when present) are disabled. */
+  disabled?: boolean;
 };
 
 /**
@@ -89,6 +91,7 @@ export function NumberStepper({
   editable = false,
   decreaseAccessibilityLabel,
   increaseAccessibilityLabel,
+  disabled = false,
 }: NumberStepperProps) {
   // The editable field's uncommitted text; null while not editing, so
   // the field shows the (externally owned) value.
@@ -97,6 +100,10 @@ export function NumberStepper({
   const canIncrement = max === undefined || value + step <= max;
 
   const commitDraft = () => {
+    if (disabled) {
+      setDraft(null);
+      return;
+    }
     if (draft === null) {
       return;
     }
@@ -131,14 +138,18 @@ export function NumberStepper({
     <XStack
       alignItems="center"
       gap={tokens.spacing[2]}
+      opacity={disabled ? 0.5 : 1}
       {...(label ? groupRoleProps : {})}
       {...platformAccessibilityProps({ accessibilityLabel: label })}
     >
       <Button
         variant="secondary"
         size="md"
-        disabled={!canDecrement}
+        disabled={disabled || !canDecrement}
         onPress={() => {
+          if (disabled) {
+            return;
+          }
           setDraft(null);
           onChange(value - step);
         }}
@@ -148,6 +159,7 @@ export function NumberStepper({
       </Button>
       {editable ? (
         <StyledValueInput
+          disabled={disabled}
           type="text"
           keyboardType="numeric"
           inputMode="numeric"
@@ -171,8 +183,11 @@ export function NumberStepper({
       <Button
         variant="secondary"
         size="md"
-        disabled={!canIncrement}
+        disabled={disabled || !canIncrement}
         onPress={() => {
+          if (disabled) {
+            return;
+          }
           setDraft(null);
           onChange(value + step);
         }}

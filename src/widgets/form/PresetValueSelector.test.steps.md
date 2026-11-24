@@ -37,7 +37,7 @@ MealPlansPage's list, or a changeset naming CardRow.
 ## PresetValueSelector
 
 Open in `Widgets/Form/PresetValueSelector`: Default,
-CustomSelected.
+CustomSelected, Disabled.
 
 1. Default: the Scale row shows ½× / 1× / 2× / 3× preset buttons
    at equal width in one non-wrapping row, 1× selected
@@ -46,7 +46,9 @@ CustomSelected.
    mid-word) and all five buttons are the same height.
 2. CustomSelected: the Custom button shows "2.5×" and is
    selected (primary-filled); no preset is selected.
-3. Pressing Custom swaps it in place for a decimal number
+3. Disabled: the whole row reads dimmed, no preset or the
+   Custom button responds, and the value does not change.
+4. Pressing Custom swaps it in place for a decimal number
    input; entering 4 and blurring out of the selector
    entirely applies 4× (the button returns showing "4×",
    selected) — focus must leave the selector: blurring by

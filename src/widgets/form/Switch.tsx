@@ -50,13 +50,15 @@ export type SwitchProps = {
   description?: string;
   checked: boolean;
   onCheckedChange: (checked: boolean) => void;
+  /** When true, the switch is inert and dimmed; it cannot be toggled. */
+  disabled?: boolean;
 };
 
 /**
  * Labeled switch row. The label is associated via `htmlFor` so it toggles
  * the switch; the row carries a 44px minimum height for the touch target.
  */
-export function Switch({ label, description, checked, onCheckedChange }: SwitchProps) {
+export function Switch({ label, description, checked, onCheckedChange, disabled = false }: SwitchProps) {
   const id = useId();
   return (
     <XStack
@@ -65,6 +67,7 @@ export function Switch({ label, description, checked, onCheckedChange }: SwitchP
       gap={tokens.spacing[3]}
       minHeight={44}
       paddingVertical={tokens.spacing[2]}
+      opacity={disabled ? 0.5 : 1}
     >
       <YStack flex={1} gap={tokens.spacing[1]}>
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.md}>
@@ -72,7 +75,19 @@ export function Switch({ label, description, checked, onCheckedChange }: SwitchP
         </Label>
         {description ? <Text variant="hint">{description}</Text> : null}
       </YStack>
-      <StyledSwitch id={id} checked={checked} onCheckedChange={onCheckedChange} on={checked}>
+      <StyledSwitch
+        id={id}
+        checked={checked}
+        onCheckedChange={(next) => {
+          if (disabled) {
+            return;
+          }
+          onCheckedChange(next);
+        }}
+        disabled={disabled}
+        aria-disabled={disabled || undefined}
+        on={checked}
+      >
         {/* transition="fast" is the shared spring from the Tamagui config —
             the mechanism the CSS animation driver turns into a real
             transition (the `animation` prop compiles to a 0s keyframe

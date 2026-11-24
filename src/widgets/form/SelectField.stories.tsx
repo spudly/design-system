@@ -10,6 +10,7 @@ const meta: Meta<typeof SelectField> = {
     label: { control: "text" },
     placeholder: { control: "text" },
     error: { control: "text" },
+    disabled: { control: "boolean" },
   },
 };
 
@@ -59,5 +60,10 @@ export const CustomPlaceholder: Story = {
     value: "",
     placeholder: "Choose a meal…",
   },
+  render: (args) => <SelectDemo {...args} />,
+};
+
+export const Disabled: Story = {
+  args: { label: "Recipe status", options: statusOptions, value: "evolving", disabled: true },
   render: (args) => <SelectDemo {...args} />,
 };

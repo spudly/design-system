@@ -63,6 +63,8 @@ export type SelectFieldProps = {
   onValueChange?: (value: string) => void;
   placeholder?: string;
   error?: string;
+  /** When true, the select is inert and dimmed; the value cannot change. */
+  disabled?: boolean;
   id?: string;
   /**
    * Grow to fill the row's remaining width (SearchField's `grow`
@@ -92,6 +94,7 @@ export function SelectField({
   onValueChange,
   placeholder,
   error,
+  disabled = false,
   id: idProp,
   grow = false,
 }: SelectFieldProps) {
@@ -108,10 +111,25 @@ export function SelectField({
           {label}
         </Label>
       ) : null}
-      <TamaguiSelect value={value ?? ""} onValueChange={(v) => onValueChange?.(v)} zIndex={200000}>
+      {/* The Tamagui Select root's props carry no `disabled` in this
+          version; inertness comes from the disabled trigger below
+          (which cannot open the sheet/popover) plus the change guard. */}
+      <TamaguiSelect
+        value={value ?? ""}
+        onValueChange={(v) => {
+          if (disabled) {
+            return;
+          }
+          onValueChange?.(v);
+        }}
+        zIndex={200000}
+      >
         <StyledTrigger
           {...(grow ? { flex: 1 } : {})}
           id={id}
+          disabled={disabled}
+          opacity={disabled ? 0.5 : 1}
+          aria-disabled={disabled || undefined}
           error={!!error}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? errorId : undefined}

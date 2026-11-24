@@ -34,12 +34,9 @@ import { TextField } from "./TextField.js";
  * this surface exposes gets filed as its own bug issue, never fixed
  * inside this story's PR.
  *
- * Disabled coverage note: TextField, PasswordField, TextAreaField,
- * SearchField, Slider, StarRatingInput, CheckboxField,
- * CheckboxSelectList, and AutocompletePicker accept a `disabled`
- * prop; SelectField, RadioOptionGroup, Switch, ColorPickerField,
- * PresetValueSelector, and NumberStepper do not yet — the Disabled
- * story below disables what the widgets support today.
+ * Disabled coverage: every control in this form accepts a
+ * `disabled` prop (#801), and the Disabled story below disables
+ * all of them.
  */
 const meta: Meta = {
   title: "Widgets/Form/Composite: Full Form",
@@ -156,6 +153,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           options={STATUS_OPTIONS}
           value={status}
           onValueChange={setStatus}
+          disabled={disabled}
           {...(errors ? { error: "Please choose a status." } : {})}
         />
         <AutocompletePicker
@@ -181,6 +179,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           options={IMPORT_OPTIONS}
           value={importMethod}
           onValueChange={setImportMethod}
+          disabled={disabled}
           {...(errors ? { error: "Please choose an import method." } : {})}
         />
         <CheckboxSelectList
@@ -196,6 +195,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           }}
         />
         <ColorPickerField
+          disabled={disabled}
           label="Tag color"
           colors={TAG_COLORS}
           {...(tagColor !== undefined ? { value: tagColor } : {})}
@@ -210,8 +210,16 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           customLabel="Custom"
           customAccessibilityLabel="Custom scale"
           formatCustomValue={(custom) => `${custom}×`}
+          disabled={disabled}
         />
-        <NumberStepper label="Servings" value={servings} min={1} max={12} onChange={setServings} />
+        <NumberStepper
+          label="Servings"
+          value={servings}
+          min={1}
+          max={12}
+          onChange={setServings}
+          disabled={disabled}
+        />
         <Slider
           label="Spice level"
           min={1}
@@ -238,6 +246,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           description="Keep this recipe at the top of your list."
           checked={pinned}
           onCheckedChange={setPinned}
+          disabled={disabled}
         />
       </FormStack>
     </YStack>
@@ -259,7 +268,7 @@ export const WithErrors: Story = {
   render: () => <FullForm mode="errors" />,
 };
 
-/** Disabled treatment across the controls that support it today. */
+/** Disabled treatment across every control in the form (#801). */
 export const Disabled: Story = {
   render: () => <FullForm mode="disabled" />,
 };

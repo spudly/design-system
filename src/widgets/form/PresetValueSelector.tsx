@@ -44,6 +44,8 @@ export type PresetValueSelectorProps = {
    * suffix). Defaults to the value itself.
    */
   formatCustomValue?: (value: string) => string;
+  /** When true, the whole selector is inert and dimmed: presets and the custom slot cannot change the value. */
+  disabled?: boolean;
 };
 
 /**
@@ -96,6 +98,7 @@ export function PresetValueSelector({
   customLabel,
   customAccessibilityLabel,
   formatCustomValue,
+  disabled = false,
 }: PresetValueSelectorProps) {
   const [isCustomEditing, setCustomEditing] = useState(false);
   const [customDraft, setCustomDraft] = useState("");
@@ -111,12 +114,19 @@ export function PresetValueSelector({
   const formattedCustom = formatCustomValue ? formatCustomValue(value) : value;
 
   const startCustomEdit = () => {
+    if (disabled) {
+      return;
+    }
     presetPressPendingRef.current = false;
     setCustomDraft(isPreset ? "" : value);
     setCustomEditing(true);
   };
 
   const commitCustom = () => {
+    if (disabled) {
+      setCustomEditing(false);
+      return;
+    }
     const parsed = Number(customDraft.trim());
     setCustomEditing(false);
     if (Number.isFinite(parsed) && parsed > 0) {
@@ -161,6 +171,7 @@ export function PresetValueSelector({
       ref={groupRef}
       alignItems="center"
       gap="$2"
+      opacity={disabled ? 0.5 : 1}
       {...groupRoleProps}
       {...platformAccessibilityProps({ accessibilityLabel: label })}
     >
@@ -189,6 +200,7 @@ export function PresetValueSelector({
             flexBasis={0}
             flexShrink={1}
             selected={value === option.value}
+            disabled={disabled}
             onPressIn={() => {
               if (isCustomEditing) {
                 presetPressPendingRef.current = true;
@@ -233,6 +245,9 @@ export function PresetValueSelector({
               }
             }}
             onPress={() => {
+              if (disabled) {
+                return;
+              }
               presetPressPendingRef.current = false;
               setCustomEditing(false);
               onChange(option.value);
@@ -253,6 +268,7 @@ export function PresetValueSelector({
       <XStack flex={0.35}>
         {isCustomEditing ? (
           <TextField
+            disabled={disabled}
             accessibilityLabel={customAccessibilityLabel}
             keyboardType="decimal-pad"
             inputMode="decimal"
@@ -270,6 +286,7 @@ export function PresetValueSelector({
             grow
             flexBasis={0}
             flexShrink={1}
+            disabled={disabled}
             selected={isCustomSelected}
             accessibilityLabel={
               isCustomSelected

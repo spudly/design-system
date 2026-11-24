@@ -10,6 +10,7 @@ const meta: Meta<typeof NumberStepper> = {
     min: { control: "number" },
     max: { control: "number" },
     step: { control: "number" },
+    disabled: { control: "boolean" },
   },
 };
 
@@ -50,5 +51,10 @@ export const Inline: Story = {
 
 export const Editable: Story = {
   args: { label: "Servings", value: 4, min: 1, layout: "inline", editable: true },
+  render: (args) => <StepperDemo {...args} />,
+};
+
+export const Disabled: Story = {
+  args: { label: "Servings", value: 4, min: 1, max: 12, disabled: true },
   render: (args) => <StepperDemo {...args} />,
 };

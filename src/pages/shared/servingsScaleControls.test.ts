@@ -286,7 +286,7 @@ test("on native, a preset press in flight suppresses the blur commit (#315)", ()
   );
   assert.match(
     selector,
-    /onPress=\{\(\) => \{\s+presetPressPendingRef\.current = false;/,
+    /onPress=\{\(\) => \{\s+if \(disabled\) \{\s+return;\s+\}\s+presetPressPendingRef\.current = false;/,
     "the preset press clears the pending flag so a later blur still commits",
   );
   assert.match(
