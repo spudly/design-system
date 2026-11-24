@@ -5,7 +5,7 @@ import { LinkOverlay } from "../linkOverlay.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { RowSubtitleText } from "./RowTextContent.js";
 import { Text } from "./Text.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
 type ListItemOwnProps = {
   /** Optional caller-supplied lead-in rendered in the title line

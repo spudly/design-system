@@ -1,5 +1,5 @@
 import { FullScreenShell } from "../../widgets/FullScreenShell.js";
-import { Alert } from "../../widgets/Alert.js";
+import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";

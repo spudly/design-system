@@ -1,5 +1,5 @@
 import { Text } from "../widgets/data/Text.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 
 export type SectionMutedTextProps = {
   /** While the section's loading scope is active, the copy is

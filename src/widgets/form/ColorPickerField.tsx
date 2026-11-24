@@ -4,7 +4,7 @@ import { tokens } from "../../tokens/index.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import { useTagColorResolver } from "../tagColors.js";
-import { Alert } from "../Alert.js";
+import { Alert } from "../feedback/Alert.js";
 import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
 

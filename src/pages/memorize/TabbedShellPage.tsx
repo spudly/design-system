@@ -5,7 +5,7 @@ import { Tabs } from "../../widgets/actions/Tabs.js";
 import type { IconName } from "../../icons/iconRegistry.js";
 import { AppTopBar } from "../../widgets/AppTopBar.js";
 import { LazySlot } from "../../views/LazySlot.js";
-import { BannerRow } from "../../widgets/BannerRow.js";
+import { BannerRow } from "../../widgets/feedback/BannerRow.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { StatusMessage } from "../../views/StatusMessage.js";
 

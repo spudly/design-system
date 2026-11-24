@@ -1,5 +1,5 @@
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { Alert } from "../widgets/Alert.js";
+import { Alert } from "../widgets/feedback/Alert.js";
 import { Button } from "../widgets/actions/Button.js";
 import { Card } from "../widgets/Card.js";
 import { CommentItem } from "./CommentItem.js";

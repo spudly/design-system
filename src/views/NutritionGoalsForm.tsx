@@ -1,12 +1,12 @@
-import { Alert } from "../widgets/Alert.js";
+import { Alert } from "../widgets/feedback/Alert.js";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
+import { BoxSkeleton } from "../widgets/feedback/BoxSkeleton.js";
 import { Center } from "../widgets/Center.js";
 import { Button } from "../widgets/actions/Button.js";
 import { SpacedTopStack } from "../widgets/SpacedTopStack.js";
 import { TightStack } from "../widgets/TightStack.js";
 import { SectionCard } from "../widgets/content/SectionCard.js";
-import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 import { EqualColumns } from "../widgets/form/EqualColumns.js";
 import { TextField } from "../widgets/form/TextField.js";
 import { useVoice } from "../voice/index.js";

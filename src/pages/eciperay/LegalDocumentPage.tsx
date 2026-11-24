@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import type { ReactNode } from "react";
-import { BannerRow } from "../../widgets/BannerRow.js";
+import { BannerRow } from "../../widgets/feedback/BannerRow.js";
 import { BrandLink } from "../../widgets/actions/BrandLink.js";
 import { BulletList } from "../../widgets/data/BulletList.js";
 import { ProseColumn } from "../../widgets/ProseColumn.js";

@@ -1,8 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import type { ReactNode } from "react";
-import { Alert } from "../../widgets/Alert.js";
+import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { ChangedListBanner } from "../../widgets/ChangedListBanner.js";
+import { ChangedListBanner } from "../../widgets/feedback/ChangedListBanner.js";
 import { RecipeImageView, type RecipeImageViewProps } from "../../views/RecipeImageView.js";
 import {
   RecipeIngredientListView,

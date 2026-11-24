@@ -114,7 +114,7 @@ test("LoadingScope and the clock internals stay off every export surface", async
 });
 test("every bone pulses on the one shared clock — primitives own no loop", () => {
   for (const name of ["BoxSkeleton", "CircleSkeleton", "TextSkeleton"]) {
-    const code = readCode(`src/widgets/${name}.tsx`);
+    const code = readCode(`src/widgets/feedback/${name}.tsx`);
     assert.match(
       code,
       /from "\.\/SkeletonClock\.js"/,
@@ -126,7 +126,7 @@ test("every bone pulses on the one shared clock — primitives own no loop", () 
       `${name} must not run its own animation loop`,
     );
   }
-  const clock = readCode("src/widgets/SkeletonClock.tsx");
+  const clock = readCode("src/widgets/feedback/SkeletonClock.tsx");
   assert.match(clock, /requestAnimationFrame/, "the clock is the one place a frame loop lives");
   assert.match(
     clock,
@@ -140,7 +140,7 @@ test("every bone pulses on the one shared clock — primitives own no loop", () 
   );
 });
 test("bones are hidden from assistive tech and filled with the theme border role", async () => {
-  const clock = readCode("src/widgets/SkeletonClock.tsx");
+  const clock = readCode("src/widgets/feedback/SkeletonClock.tsx");
   assert.match(
     clock,
     /platformAccessibilityProps\(\{ accessibilityElementsHidden: true \}\)/,
@@ -262,7 +262,7 @@ test("TextSkeleton lines occupy their size's line box, bone centered", async () 
   // Source pins: the size prop, the line-box table (md is the
   // default: 18 box, 12 bone; 3xl: 34 box, 24 bone), and the
   // centered wrapper — no flat 12px bone row, no inter-line gap.
-  const source = readCode("src/widgets/TextSkeleton.tsx");
+  const source = readCode("src/widgets/feedback/TextSkeleton.tsx");
   assert.match(source, /size\?: TextSkeletonSize/, "TextSkeleton takes a size prop");
   assert.match(source, /md: \{ lineBox: 18, bone: 12 \}/, "the md line box is 18, its bone 12");
   assert.match(source, /"3xl": \{ lineBox: 34, bone: 24 \}/, "the 3xl line box is 34, its bone 24");
@@ -282,16 +282,16 @@ test("TextSkeleton lines occupy their size's line box, bone centered", async () 
   assert.ok(lg.includes("height:14px"), "the lg bone is 14px");
 });
 test("primitive props are semantic geometry only — no styling props", () => {
-  const box = read("src/widgets/BoxSkeleton.tsx");
+  const box = read("src/widgets/feedback/BoxSkeleton.tsx");
   assert.match(box, /export type BoxSkeletonProps = \{/);
   assert.match(box, /width\?: number \| `\$\{number\}%`/);
   assert.match(box, /height\?: number/);
   assert.doesNotMatch(box, /color|background|style|className|borderRadius\?/);
-  const circle = read("src/widgets/CircleSkeleton.tsx");
+  const circle = read("src/widgets/feedback/CircleSkeleton.tsx");
   assert.match(circle, /export type CircleSkeletonProps = \{/);
   assert.match(circle, /size\?: number/);
   assert.doesNotMatch(circle, /color|background|style|className/);
-  const text = read("src/widgets/TextSkeleton.tsx");
+  const text = read("src/widgets/feedback/TextSkeleton.tsx");
   assert.match(text, /export type TextSkeletonProps = \{/);
   assert.match(text, /lines\?: number/);
   assert.doesNotMatch(text, /color|background|style|className|width\?|fontSize/);
@@ -787,7 +787,7 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
     "the ghost skeleton frame has no filled background and no border",
   );
   assert.match(button, /ghostLabelBone/, "the ghost label is replaced by one text bone");
-  assert.match(button, /from "\.\.\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
+  assert.match(button, /from "\.\.\/feedback\/SkeletonClock\.js"/, "the ghost bone is the shared clock's bone");
   const { Button, LoadingScope } = await loadRuntime();
   const noop = () => {};
   const scopedGhost = await renderToHtml(
@@ -1683,7 +1683,7 @@ test("T4: RecipesPage's loading sections and footers render the skeleton rows", 
     /function LoadingOwnRows\(\) \{[\s\S]*?<LoadingMediaRow key=\{key\} \/>/,
     "the own skeleton rows render as LoadingMediaRows",
   );
-  const mediaRow = readCode("src/widgets/LoadingMediaRow.tsx");
+  const mediaRow = readCode("src/widgets/feedback/LoadingMediaRow.tsx");
   assert.match(
     mediaRow,
     /<BoxSkeleton width=\{64\} height=\{64\} \/>/,
@@ -1889,7 +1889,7 @@ test("T5 survivor audit: only the approved survivor files render a Spinner", () 
   const rendering = [];
   for (const file of sourceFiles(join(root, "src"))) {
     const rel = file.slice(root.length).replace(/^\//, "");
-    if (rel.endsWith(".stories.tsx") || rel === "src/widgets/Spinner.tsx") continue;
+    if (rel.endsWith(".stories.tsx") || rel === "src/widgets/feedback/Spinner.tsx") continue;
     if (readCode(rel).includes("<Spinner")) rendering.push(rel);
   }
   assert.deepEqual(

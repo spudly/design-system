@@ -7,7 +7,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { SET_CURRENT_STORY, STORY_RENDERED, UPDATE_GLOBALS } from "storybook/internal/core-events";
 import StorybookUIRoot, { view } from "./Storybook";
 import { setCaptureModeActive, setCaptureThemeOverride } from "./captureTheme";
-import { setDefaultSkeletonClockFrozen } from "../../src/widgets/SkeletonClock.js";
+import { setDefaultSkeletonClockFrozen } from "../../src/widgets/feedback/SkeletonClock.js";
 import { createStoryLinkOpenURL } from "./storyLinks";
 
 // App-side full-content capture module (design-system #137).

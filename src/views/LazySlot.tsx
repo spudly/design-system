@@ -1,8 +1,8 @@
 import { Suspense, type ReactNode } from "react";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
-import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
-import { SkeletonPanel } from "../widgets/SkeletonPanel.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { BoxSkeleton } from "../widgets/feedback/BoxSkeleton.js";
+import { SkeletonPanel } from "../widgets/feedback/SkeletonPanel.js";
+import { TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 import { ChunkErrorBoundary } from "./ChunkErrorBoundary.js";
 
 export type LazySlotProps = {

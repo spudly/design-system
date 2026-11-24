@@ -4,7 +4,7 @@ import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { Text } from "./Text.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
 export type TokenRowProps = {
   /** The token's display name. */

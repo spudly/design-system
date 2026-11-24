@@ -6,7 +6,7 @@ import { StartStack } from "../widgets/StartStack.js";
 import { SectionCard } from "../widgets/content/SectionCard.js";
 import { Text } from "../widgets/data/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
-import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
+import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 import { useVoice } from "../voice/index.js";
 
 export type SubscriptionViewProps = {

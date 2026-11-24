@@ -3,7 +3,7 @@
   "workspaces": {
     ".": {
       "entry": [
-        "src/widgets/SkeletonClock.tsx",
+        "src/widgets/feedback/SkeletonClock.tsx",
         "src/**/*.stories.tsx",
         "src/**/*.test.{ts,tsx}",
         "test/**/*.test.{ts,tsx}",

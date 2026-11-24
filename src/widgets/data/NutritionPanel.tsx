@@ -5,7 +5,7 @@ import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
 import { Text } from "./Text.js";
 import { useVoice } from "../../voice/index.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
 /**
  * One nutrient on the Nutrition Facts label (#722), keyed to the

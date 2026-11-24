@@ -1,6 +1,6 @@
 export { Accordion, type AccordionItem, type AccordionProps } from "./Accordion.js";
 export { AccordionSection, type AccordionSectionProps } from "./AccordionSection.js";
-export { Alert, type AlertProps } from "./Alert.js";
+export { Alert, type AlertProps } from "./feedback/Alert.js";
 export { ActionBar, type ActionBarProps } from "./actions/ActionBar.js";
 export { Avatar, type AvatarProps } from "./data/Avatar.js";
 export {
@@ -30,7 +30,7 @@ export {
   type DropdownProps,
 } from "./form/Dropdown.js";
 export { DropdownButton, type DropdownButtonProps } from "./form/DropdownButton.js";
-export { FixedActionBanner, type FixedActionBannerProps } from "./FixedActionBanner.js";
+export { FixedActionBanner, type FixedActionBannerProps } from "./feedback/FixedActionBanner.js";
 export { FormScreenLayout, type FormScreenLayoutProps } from "./FormScreenLayout.js";
 export { FullScreenShell, type FullScreenShellProps } from "./FullScreenShell.js";
 export {
@@ -47,18 +47,18 @@ export { MessageCard, type MessageCardProps } from "./content/MessageCard.js";
 export { MetadataBadge, type MetadataBadgeProps } from "./data/MetadataBadge.js";
 export { OptionCard, type OptionCardProps } from "./content/OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./actions/PrevNextNav.js";
-export { ProgressBar, type ProgressBarProps } from "./ProgressBar.js";
+export { ProgressBar, type ProgressBarProps } from "./feedback/ProgressBar.js";
 export { ButtonRow, type ButtonRowProps } from "./actions/ButtonRow.js";
 export { CardStack, type CardStackProps } from "./CardStack.js";
 export { ListStack, type ListStackProps } from "./data/ListStack.js";
 export { LinkStack, type LinkStackProps } from "./actions/LinkStack.js";
-export { LoadingCardRow } from "./LoadingCardRow.js";
-export { LoadingListItem } from "./LoadingListItem.js";
-export { LoadingActionCardRow, type LoadingActionCardRowProps } from "./LoadingActionCardRow.js";
+export { LoadingCardRow } from "./feedback/LoadingCardRow.js";
+export { LoadingListItem } from "./feedback/LoadingListItem.js";
+export { LoadingActionCardRow, type LoadingActionCardRowProps } from "./feedback/LoadingActionCardRow.js";
 export { CatalogRow, type CatalogRowProps } from "./data/CatalogRow.js";
 export { CatalogCardColumn, type CatalogCardColumnProps } from "./CatalogCardColumn.js";
 export { CatalogListColumn, type CatalogListColumnProps } from "./CatalogListColumn.js";
-export { LoadingMediaRow } from "./LoadingMediaRow.js";
+export { LoadingMediaRow } from "./feedback/LoadingMediaRow.js";
 export { ScrollSentinel, type ScrollSentinelProps } from "./ScrollSentinel.js";
 export {
   SearchHelpPopover,
@@ -69,7 +69,7 @@ export {
 export { HeroStack, type HeroStackProps } from "./HeroStack.js";
 export { StackedButtonRow, type StackedButtonRowProps } from "./actions/StackedButtonRow.js";
 export { CardGrid, type CardGridProps } from "./CardGrid.js";
-export { BannerRow, type BannerRowProps } from "./BannerRow.js";
+export { BannerRow, type BannerRowProps } from "./feedback/BannerRow.js";
 export { ProseColumn, type ProseColumnProps } from "./ProseColumn.js";
 export { ProseStack, type ProseStackProps } from "./ProseStack.js";
 export { BulletList, type BulletListProps } from "./data/BulletList.js";
@@ -92,16 +92,16 @@ export { PasswordField, type PasswordFieldProps } from "./form/PasswordField.js"
 export { TextAreaField, type TextAreaFieldProps } from "./form/TextAreaField.js";
 export { TextField, type TextFieldProps } from "./form/TextField.js";
 export { Slider, type SliderProps } from "./form/Slider.js";
-export { BoxSkeleton, type BoxSkeletonProps } from "./BoxSkeleton.js";
-export { CircleSkeleton, type CircleSkeletonProps } from "./CircleSkeleton.js";
+export { BoxSkeleton, type BoxSkeletonProps } from "./feedback/BoxSkeleton.js";
+export { CircleSkeleton, type CircleSkeletonProps } from "./feedback/CircleSkeleton.js";
 export {
   SkeletonClock,
   setDefaultSkeletonClockFrozen,
   getDefaultSkeletonClockOpacity,
   type SkeletonClockProps,
-} from "./SkeletonClock.js";
-export { TextSkeleton, type TextSkeletonProps } from "./TextSkeleton.js";
-export { Spinner, type SpinnerProps } from "./Spinner.js";
+} from "./feedback/SkeletonClock.js";
+export { TextSkeleton, type TextSkeletonProps } from "./feedback/TextSkeleton.js";
+export { Spinner, type SpinnerProps } from "./feedback/Spinner.js";
 export { StarRatingInput, type StarRatingInputProps } from "./form/StarRatingInput.js";
 export { StatBand, type StatBandProps } from "./data/StatBand.js";
 export { StatCard, type StatCardProps } from "./data/StatCard.js";
@@ -113,7 +113,7 @@ export { useTagColorResolver, useTagColorShadeResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./data/Text.js";
 export { Thumbnail, type ThumbnailProps } from "./data/Thumbnail.js";
 export { TextLink, type TextLinkProps } from "./actions/TextLink.js";
-export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./Toast.js";
+export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./feedback/Toast.js";
 export { TokenRow, type TokenRowProps } from "./data/TokenRow.js";
 export { VerseText, type VerseTextProps } from "./data/VerseText.js";
 // The #119 dedupe set: the canonical components the tranche
@@ -196,8 +196,8 @@ export { Grow, type GrowProps } from "./Grow.js";
 export { FramedScrollRegion, type FramedScrollRegionProps } from "./FramedScrollRegion.js";
 export { DashedPlaceholder, type DashedPlaceholderProps } from "./content/DashedPlaceholder.js";
 export { OverlayTextPanel, type OverlayTextPanelProps } from "./content/OverlayTextPanel.js";
-export { RadioSkeletonRow, type RadioSkeletonRowProps } from "./RadioSkeletonRow.js";
-export { CheckboxSkeletonRow, type CheckboxSkeletonRowProps } from "./CheckboxSkeletonRow.js";
+export { RadioSkeletonRow, type RadioSkeletonRowProps } from "./feedback/RadioSkeletonRow.js";
+export { CheckboxSkeletonRow, type CheckboxSkeletonRowProps } from "./feedback/CheckboxSkeletonRow.js";
 
 // The #698 tranche-4 move set: the remaining styled leaf and
 // chrome components the views' de-styling moved from
@@ -211,7 +211,7 @@ export {
   type AppTopBarProps,
 } from "./AppTopBar.js";
 export { CandidateList, type CandidateListProps } from "./data/CandidateList.js";
-export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
+export { ChangedListBanner, type ChangedListBannerProps } from "./feedback/ChangedListBanner.js";
 export { LegalSection, type LegalSectionProps } from "./content/LegalSection.js";
 export { RatingForm, type RatingFormProps } from "./RatingForm.js";
 // The #698 tranche-4 extraction set: the layout and panel
@@ -219,6 +219,6 @@ export { RatingForm, type RatingFormProps } from "./RatingForm.js";
 export { CenteredRow, type CenteredRowProps } from "./CenteredRow.js";
 export { StartStack, type StartStackProps } from "./StartStack.js";
 export { ListHeaderStack, type ListHeaderStackProps } from "./ListHeaderStack.js";
-export { SkeletonPanel, type SkeletonPanelProps } from "./SkeletonPanel.js";
+export { SkeletonPanel, type SkeletonPanelProps } from "./feedback/SkeletonPanel.js";
 export { SpacedTopStack, type SpacedTopStackProps } from "./SpacedTopStack.js";
 export { CreatedSecretPanel, type CreatedSecretPanelProps } from "./content/CreatedSecretPanel.js";

@@ -91,7 +91,7 @@ test("the fill keeps at least 3:1 contrast against the track in every brand and 
 
 test("ProgressBar renders its track from $progressTrack", () => {
   const src = readFileSync(
-    join(dirname(fileURLToPath(import.meta.url)), "../..", "src", "widgets", "ProgressBar.tsx"),
+    join(dirname(fileURLToPath(import.meta.url)), "../..", "src", "widgets", "feedback", "ProgressBar.tsx"),
     "utf8",
   );
   assert.ok(

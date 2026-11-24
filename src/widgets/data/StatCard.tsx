@@ -3,8 +3,8 @@ import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Card } from "../Card.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
-import { SkeletonBone } from "../SkeletonClock.js";
-import { LINE_BOXES } from "../TextSkeleton.js";
+import { SkeletonBone } from "../feedback/SkeletonClock.js";
+import { LINE_BOXES } from "../feedback/TextSkeleton.js";
 import { Text } from "./Text.js";
 
 export type StatCardProps = {

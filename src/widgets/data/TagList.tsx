@@ -4,7 +4,7 @@ import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Badge } from "./Badge.js";
-import { SkeletonBone } from "../SkeletonClock.js";
+import { SkeletonBone } from "../feedback/SkeletonClock.js";
 
 const StyledTagRow = styled(XStack, {
   name: "TagListItem",

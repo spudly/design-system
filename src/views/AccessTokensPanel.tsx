@@ -3,7 +3,7 @@ import { ContentStack } from "../widgets/ContentStack.js";
 import { CreatedSecretPanel } from "../widgets/content/CreatedSecretPanel.js";
 import { ListStack } from "../widgets/data/ListStack.js";
 import { Button } from "../widgets/actions/Button.js";
-import { Alert } from "../widgets/Alert.js";
+import { Alert } from "../widgets/feedback/Alert.js";
 import { SectionCard } from "../widgets/content/SectionCard.js";
 import { Text } from "../widgets/data/Text.js";
 import { TextField } from "../widgets/form/TextField.js";

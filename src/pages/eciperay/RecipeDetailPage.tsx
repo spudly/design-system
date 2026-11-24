@@ -6,10 +6,10 @@ import { CenteredText } from "../../widgets/content/CenteredText.js";
 import { tokens } from "../../tokens/index.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { CandidateList } from "../../widgets/data/CandidateList.js";
-import { BoxSkeleton } from "../../widgets/BoxSkeleton.js";
+import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { ListStack } from "../../widgets/data/ListStack.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
-import { TextSkeleton } from "../../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { LogEntryCard } from "../../views/LogEntryCard.js";
 import { MarkableRow } from "../../widgets/data/MarkableRow.js";
 import {

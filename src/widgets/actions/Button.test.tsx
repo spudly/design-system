@@ -443,7 +443,7 @@ describe("buttonNoStyleProps", () => {
     assert.match(read("src/views/LogEntryCard.tsx"), /tone="danger"/);
   });
   test("Alert's dismiss ink uses only the internal Button form (#480)", () => {
-    const alert = read("src/widgets/Alert.tsx");
+    const alert = read("src/widgets/feedback/Alert.tsx");
     assert.match(alert, /<ButtonInternal/);
     assert.match(alert, /internalInk=\{styles\.text\}/);
     const barrel = read("src/widgets/index.ts");

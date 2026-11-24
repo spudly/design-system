@@ -1,7 +1,7 @@
 import { ScrollView, YStack } from "tamagui";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 import { tokens } from "../../tokens/index.js";
 
 export type OverlayTextPanelProps = {

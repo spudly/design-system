@@ -4,7 +4,7 @@ import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "./Text.js";
-import { TextSkeleton } from "../TextSkeleton.js";
+import { TextSkeleton } from "../feedback/TextSkeleton.js";
 
 type StepListStep = {
   /** Stable key for the step. */

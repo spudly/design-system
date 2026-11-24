@@ -6,7 +6,7 @@ import { keyboardActivationHandler } from "./keyboardActivation.js";
 import { LinkOverlay } from "./linkOverlay.js";
 import { RowTextContent } from "./data/RowTextContent.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { TextSkeleton } from "./TextSkeleton.js";
+import { TextSkeleton } from "./feedback/TextSkeleton.js";
 
 type CardRowOwnProps = {
   /** The row's title. */

@@ -4,7 +4,7 @@ import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { DetailRow } from "../../views/DetailRow.js";
 import { ListItem } from "../../widgets/data/ListItem.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
-import { TextSkeleton } from "../../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { ListStack } from "../../widgets/data/ListStack.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";

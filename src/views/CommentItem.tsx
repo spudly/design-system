@@ -6,7 +6,7 @@ import { Button } from "../widgets/actions/Button.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Text } from "../widgets/data/Text.js";
 import { useVoice } from "../voice/index.js";
-import { TextSkeleton } from "../widgets/TextSkeleton.js";
+import { TextSkeleton } from "../widgets/feedback/TextSkeleton.js";
 
 export type CommentItemProps = {
   authorName: string;

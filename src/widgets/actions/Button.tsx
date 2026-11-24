@@ -7,8 +7,8 @@ import { tokens } from "../../tokens/index.js";
 import { iconsByName, type IconName } from "../../icons/iconRegistry.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
-import { SkeletonBone } from "../SkeletonClock.js";
-import { LINE_BOXES } from "../TextSkeleton.js";
+import { SkeletonBone } from "../feedback/SkeletonClock.js";
+import { LINE_BOXES } from "../feedback/TextSkeleton.js";
 import { useVariantGlyphInk } from "../useVariantGlyphInk.js";
 
 /**
