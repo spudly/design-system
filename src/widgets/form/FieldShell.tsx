@@ -1,7 +1,11 @@
 import type { ReactNode } from "react";
-import { Label, YStack } from "tamagui";
+import { Label } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
-import { useImeCompositionGuard, type ImeCompositionGuard } from "../../views/shared/useImeCompositionGuard.js";
+import {
+  useImeCompositionGuard,
+  type ImeCompositionGuard,
+} from "../../views/shared/useImeCompositionGuard.js";
 
 export type FieldShellProps = ImeCompositionGuard & {
   /** The visible label, associated with the field via `htmlFor`. */
@@ -43,13 +47,13 @@ export function FieldShell({
   });
 
   return (
-    <YStack gap={tokens.spacing[1]} {...(grow ? { flex: 1 } : {})}>
+    <Col gap="xs" {...(grow ? { grow: true, shrink: true } : {})}>
       {label ? (
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
           {label}
         </Label>
       ) : null}
       {children(guard)}
-    </YStack>
+    </Col>
   );
 }

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { XStack, isWeb } from "tamagui";
+import { isWeb } from "tamagui";
+import { Row } from "../layout/Row.js";
 import { EyeIcon } from "../../icons/EyeIcon.js";
 import { EyeOffIcon } from "../../icons/EyeOffIcon.js";
 import { tokens } from "../../tokens/index.js";
@@ -35,7 +36,7 @@ export type PasswordFieldProps = Omit<TextFieldProps, "secureTextEntry" | "type"
  * through untouched, so the typed password is never cleared or
  * re-typed.
  *
- * The toggle follows SearchField's clear-button pattern: an XStack
+ * The toggle follows SearchField's clear-button pattern: a Row
  * pressable inside the field, named through
  * platformAccessibilityProps with the button role, a 44px minimum
  * target, and the pressed state announced (`aria-pressed` on web,
@@ -67,7 +68,9 @@ export function PasswordField({
   const [revealed, setRevealed] = useState(defaultRevealed);
   const toggleLabel = revealed ? hidePasswordLabel : showPasswordLabel;
   const toggle = (
-    <XStack
+    <Row
+      middle
+      center
       onPress={disabled ? undefined : () => setRevealed((value) => !value)}
       {...platformAccessibilityProps({
         accessibilityRole: "button",
@@ -75,17 +78,16 @@ export function PasswordField({
         ...(isWeb ? {} : { accessibilityState: { disabled, selected: revealed } }),
       })}
       {...(isWeb ? { "aria-pressed": revealed } : {})}
+      // The edge insets ride the style channel: Row's subset
+      // omits the position-inset props (their names are the
+      // alignment booleans there).
       position="absolute"
-      right={0}
-      top={0}
-      bottom={0}
-      alignItems="center"
-      justifyContent="center"
+      style={{ top: 0, right: 0, bottom: 0 }}
       minWidth={44}
       minHeight={44}
     >
       {revealed ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
-    </XStack>
+    </Row>
   );
   return (
     <TextField

@@ -1,28 +1,27 @@
 import { useId } from "react";
-import { XStack, YStack, isWeb, styled } from "tamagui";
+import { isWeb } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
-const StarButton = styled(YStack, {
-  name: "StarButton",
+/**
+ * The star cells (#746, Option B): a centered 44px-minimum
+ * Col; the button form adds the pointer cursor. The press and
+ * a11y props ride Col's passthrough from the use sites.
+ */
+type StarCellProps = Omit<ColProps, "minWidth" | "minHeight" | "center" | "middle" | "cursor">;
 
-  minWidth: 44,
-  minHeight: 44,
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-});
+function StarButton({ ...rest }: StarCellProps) {
+  return <Col center middle minWidth={44} minHeight={44} cursor="pointer" {...rest} />;
+}
 
-const StarCell = styled(YStack, {
-  name: "StarCell",
-
-  minWidth: 44,
-  minHeight: 44,
-  alignItems: "center",
-  justifyContent: "center",
-});
+function StarCell({ ...rest }: StarCellProps) {
+  return <Col center middle minWidth={44} minHeight={44} {...rest} />;
+}
 
 type StarRatingTone = "default" | "dark";
 
@@ -96,7 +95,7 @@ export function StarRatingInput({
   };
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <Col gap="xs">
       {label ? (
         <Text
           id={labelId}
@@ -106,7 +105,7 @@ export function StarRatingInput({
         </Text>
       ) : null}
       {readOnly ? (
-        <XStack
+        <Row
           {...platformAccessibilityProps({
             accessibilityRole: "image",
             accessibilityLabel: voice.starRatingInput.ratedLabel(value),
@@ -129,9 +128,9 @@ export function StarRatingInput({
               </StarCell>
             );
           })}
-        </XStack>
+        </Row>
       ) : (
-        <XStack
+        <Row
           {...platformAccessibilityProps({ accessibilityRole: "radiogroup" })}
           aria-labelledby={label ? labelId : undefined}
           aria-label={label ? undefined : voice.starRatingInput.label}
@@ -201,8 +200,8 @@ export function StarRatingInput({
               </StarButton>
             );
           })}
-        </XStack>
+        </Row>
       )}
-    </YStack>
+    </Col>
   );
 }

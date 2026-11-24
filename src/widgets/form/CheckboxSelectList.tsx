@@ -1,5 +1,6 @@
-import { View, XStack, YStack } from "tamagui";
-import { tokens } from "../../tokens/index.js";
+import { View } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { CheckboxField } from "./CheckboxField.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
@@ -69,20 +70,20 @@ export function CheckboxSelectList({
     // known yet.
     const rowKeys = items.length > 0 ? items.map((item) => item.id) : LOADING_ROW_KEYS;
     return (
-      <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+      <Col {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
         <LoadingScope active>
           {rowKeys.map((key) => (
-            <XStack key={key} alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
+            <Row key={key} middle gap="m" minHeight={44}>
               <View width={44} height={44} alignItems="center" justifyContent="center">
                 <BoxSkeleton width={24} height={24} />
               </View>
-              <YStack flex={1}>
+              <Col grow shrink>
                 <TextSkeleton size="md" lines={1} />
-              </YStack>
-            </XStack>
+              </Col>
+            </Row>
           ))}
         </LoadingScope>
-      </YStack>
+      </Col>
     );
   }
   if (items.length === 0) {
@@ -90,7 +91,7 @@ export function CheckboxSelectList({
   }
   const selected = new Set(selectedIds);
   return (
-    <YStack>
+    <Col>
       {items.map((item) => (
         <CheckboxField
           key={item.id}
@@ -102,6 +103,6 @@ export function CheckboxSelectList({
           disabled={disabled}
         />
       ))}
-    </YStack>
+    </Col>
   );
 }

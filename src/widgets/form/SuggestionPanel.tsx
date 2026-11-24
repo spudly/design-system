@@ -1,4 +1,5 @@
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
 
@@ -30,8 +31,13 @@ export type SuggestionPanelProps = {
  */
 export function SuggestionPanel({ title, entries }: SuggestionPanelProps) {
   return (
-    <YStack borderRadius={tokens.radii.lg} backgroundColor="$primarySubtle" padding="$4">
-      <YStack paddingBlockEnd="$2">
+    <Col borderRadius={tokens.radii.lg} backgroundColor="$primarySubtle" p="l">
+      {/* Each block carries its own 8px bottom inset — including
+        the last entry's trailing inset inside the panel's
+        padding — so the separation is composed per block with a
+        Spacer, not a parent gap (#746: a parent gap would drop
+        the trailing inset). */}
+      <Col>
         <Text
           fontSize={tokens.typography.fontSize.sm}
           fontWeight={tokens.typography.fontWeight.semibold}
@@ -39,9 +45,10 @@ export function SuggestionPanel({ title, entries }: SuggestionPanelProps) {
         >
           {title}
         </Text>
-      </YStack>
+        <Spacer y="s" />
+      </Col>
       {entries.map((entry) => (
-        <YStack key={entry.id} paddingBlockEnd="$2">
+        <Col key={entry.id}>
           <Text
             fontSize={tokens.typography.fontSize.sm}
             fontWeight={tokens.typography.fontWeight.medium}
@@ -51,8 +58,9 @@ export function SuggestionPanel({ title, entries }: SuggestionPanelProps) {
           <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
             {entry.detail}
           </Text>
-        </YStack>
+          <Spacer y="s" />
+        </Col>
       ))}
-    </YStack>
+    </Col>
   );
 }

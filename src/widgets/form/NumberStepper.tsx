@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Input as TamaguiInput, XStack, YStack, styled } from "tamagui";
+import { Input as TamaguiInput, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
@@ -135,9 +137,9 @@ export function NumberStepper({
   };
 
   const controls = (
-    <XStack
-      alignItems="center"
-      gap={tokens.spacing[2]}
+    <Row
+      middle
+      gap="s"
       opacity={disabled ? 0.5 : 1}
       {...(label ? groupRoleProps : {})}
       {...platformAccessibilityProps({ accessibilityLabel: label })}
@@ -153,7 +155,9 @@ export function NumberStepper({
           setDraft(null);
           onChange(value - step);
         }}
-        accessibilityLabel={decreaseAccessibilityLabel ?? (label ? `Decrease ${label}` : "Decrease value")}
+        accessibilityLabel={
+          decreaseAccessibilityLabel ?? (label ? `Decrease ${label}` : "Decrease value")
+        }
       >
         −
       </Button>
@@ -191,16 +195,18 @@ export function NumberStepper({
           setDraft(null);
           onChange(value + step);
         }}
-        accessibilityLabel={increaseAccessibilityLabel ?? (label ? `Increase ${label}` : "Increase value")}
+        accessibilityLabel={
+          increaseAccessibilityLabel ?? (label ? `Increase ${label}` : "Increase value")
+        }
       >
         +
       </Button>
-    </XStack>
+    </Row>
   );
 
   if (layout === "inline") {
     return (
-      <XStack alignItems="center" justifyContent="space-between" gap={tokens.spacing[3]}>
+      <Row middle between gap="m">
         {label ? (
           <Text
             fontSize={tokens.typography.fontSize.sm}
@@ -211,14 +217,14 @@ export function NumberStepper({
           </Text>
         ) : null}
         {controls}
-      </XStack>
+      </Row>
     );
   }
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <Col gap="xs">
       {label ? <Text variant="hint">{label}</Text> : null}
       {controls}
-    </YStack>
+    </Col>
   );
 }

@@ -147,9 +147,13 @@ test("ButtonRow owns the action bar's gap and wrap; separation from preceding co
 });
 
 test("FieldRow owns the search row's gap and stretch — the equal-height contract (#476)", () => {
-  assert.match(fieldRowCode, /styled\(XStack, \{\s+name: "FieldRow",/);
-  assert.match(fieldRowCode, /gap: tokens\.spacing\[2\],\s+alignItems: "stretch",/);
-  assert.match(fieldRowCode, /Omit<StyledFieldRowProps, "gap" \| "alignItems">/);
+  // #746: FieldRow is a function component rendering Row — the
+  // gap/stretch ownership is pinned on the Row it renders.
+  assert.match(
+    fieldRowCode,
+    /export function FieldRow\(\{ \.\.\.rest \}: FieldRowProps\) \{\s+return <Row gap="s" stretch \{\.\.\.rest\} \/>;/,
+  );
+  assert.match(fieldRowCode, /Omit<RowProps, "gap" \| "stretch">/);
 });
 
 test("FieldRow's field types fill the row height on their grow path (#476)", () => {
@@ -265,7 +269,7 @@ test("SearchField's grow prop flexes the field's root, and only when set", () =>
   );
   assert.match(
     fieldShellSource,
-    /\{\.\.\.\(grow \? \{ flex: 1 \} : \{\}\)\}/,
-    "the field's root must take flex: 1 only when grow is set, so standalone fields are unchanged",
+    /\{\.\.\.\(grow \? \{ grow: true, shrink: true \} : \{\}\)\}/,
+    "the field's root must take flex: 1 (grow shrink, #746's translation) only when grow is set, so standalone fields are unchanged",
   );
 });

@@ -1,7 +1,10 @@
 import { useRef, useState } from "react";
-import type { ComponentProps } from "react";
-import { XStack, isWeb } from "tamagui";
+import type { ComponentProps, Ref } from "react";
+import { isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
@@ -90,6 +93,17 @@ export type PresetValueSelectorProps = {
  * presets' `onPressIn` — which fires ahead of the input's
  * blur for a touch — stands in for it.
  */
+/**
+ * The group row with its ref attached (#746): the blur logic
+ * needs the group's element (containment checks), and Row's
+ * props type does not declare React 19's ref-as-prop — Row
+ * forwards it through its rest spread at runtime, so the ref
+ * rides the props object here.
+ */
+function GroupRow({ ref, ...props }: RowProps & { ref?: Ref<TamaguiElement> }) {
+  return <Row {...{ ...props, ref }} />;
+}
+
 export function PresetValueSelector({
   label,
   options,
@@ -167,15 +181,15 @@ export function PresetValueSelector({
   };
 
   return (
-    <XStack
+    <GroupRow
       ref={groupRef}
-      alignItems="center"
-      gap="$2"
+      middle
+      gap="s"
       opacity={disabled ? 0.5 : 1}
       {...groupRoleProps}
       {...platformAccessibilityProps({ accessibilityLabel: label })}
     >
-      <XStack paddingInlineEnd="$1">
+      <Row>
         <Text
           fontSize={tokens.typography.fontSize.sm}
           fontWeight={tokens.typography.fontWeight.medium}
@@ -183,8 +197,9 @@ export function PresetValueSelector({
         >
           {label}
         </Text>
-      </XStack>
-      <XStack flex={1} gap="$2">
+        <Spacer x="xs" />
+      </Row>
+      <Row grow shrink gap="s">
         {options.map((option) => (
           <Button
             key={option.value}
@@ -256,7 +271,7 @@ export function PresetValueSelector({
             {option.label}
           </Button>
         ))}
-      </XStack>
+      </Row>
       {/* #327: the custom slot's share must leave the small
           Button's label room to sit on one line at the Android
           VR capture width (~430px). At flex 0.25 the slot was
@@ -264,8 +279,11 @@ export function PresetValueSelector({
           making the button taller than the preset row; the
           presets' labels are short (½×, 1×, …), so the custom
           slot takes the larger share while the presets stay
-          equal-width. */}
-      <XStack flex={0.35}>
+          equal-width. #746: flex 0.35 is grow={0.35} in the
+          subset; the shorthand's zero basis — what makes the
+          share proportional rather than extra-space-only —
+          rides the style channel. */}
+      <Row grow={0.35} shrink style={{ flexBasis: 0 }}>
         {isCustomEditing ? (
           <TextField
             disabled={disabled}
@@ -298,7 +316,7 @@ export function PresetValueSelector({
             {isCustomSelected ? formattedCustom : customLabel}
           </Button>
         )}
-      </XStack>
-    </XStack>
+      </Row>
+    </GroupRow>
   );
 }

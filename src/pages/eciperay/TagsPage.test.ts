@@ -10,7 +10,10 @@ describe("tagsPageCreateForm", () => {
   const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   const tagsPage = readFileSync(join(root, "src", "pages", "eciperay", "TagsPage.tsx"), "utf8");
   const createFormEnd = tagsPage.indexOf("{loading ?");
-  const row = readFileSync(join(root, "src", "widgets", "actions", "TrailingActionsRow.tsx"), "utf8");
+  const row = readFileSync(
+    join(root, "src", "widgets", "actions", "TrailingActionsRow.tsx"),
+    "utf8",
+  );
   const picker = readFileSync(join(root, "src", "widgets", "form", "ColorPickerField.tsx"), "utf8");
 
   test("TagsPage create-form row wraps so Add stays visible (#219)", () => {
@@ -38,13 +41,13 @@ describe("tagsPageCreateForm", () => {
   test("ColorPickerField root can shrink inside a flex row (#219)", () => {
     assert.match(
       picker,
-      /<YStack gap=\{tokens\.spacing\[2\]\} flexShrink=\{1\} flexGrow=\{1\} minWidth=\{0\}>/,
-      "the ColorPickerField root YStack must be shrinkable (flexShrink/flexGrow/minWidth) so its wrapping swatch row can narrow (#219)",
+      /<Col gap="s" grow shrink minWidth=\{0\}>/,
+      "the ColorPickerField root Col must be shrinkable (shrink/grow/minWidth) so its wrapping swatch row can narrow (#219)",
     );
     assert.match(
       picker,
-      /flexWrap="wrap"/,
-      'the swatch row itself must keep flexWrap="wrap" so swatches wrap as the field narrows (#219)',
+      /<Row\s+wrap\s+gap="s"/,
+      "the swatch row itself must keep wrapping (Row's wrap prop) so swatches wrap as the field narrows (#219)",
     );
   });
 });

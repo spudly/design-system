@@ -1,5 +1,6 @@
 import { useId } from "react";
-import { Label, Slider as TamaguiSlider, View, YStack, isWeb, styled } from "tamagui";
+import { Label, Slider as TamaguiSlider, View, isWeb, styled } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
@@ -199,13 +200,13 @@ export function Slider({
       };
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <Col gap="xs">
       {label ? (
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
           {label}
         </Label>
       ) : null}
-      <YStack opacity={disabled ? 0.5 : 1}>
+      <Col opacity={disabled ? 0.5 : 1}>
         <TamaguiSlider
           value={[value]}
           onValueChange={(values) => {
@@ -268,12 +269,12 @@ export function Slider({
             })}
           </View>
         ) : null}
-      </YStack>
+      </Col>
       {error ? (
         <Text variant="error" id={errorId}>
           {error}
         </Text>
       ) : null}
-    </YStack>
+    </Col>
   );
 }

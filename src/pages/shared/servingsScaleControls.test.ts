@@ -65,7 +65,10 @@ const page = readFileSync(join(root, "src/pages/eciperay/RecipeDetailPage.tsx"),
 // panel since the #331 extraction, so its control pins scan the
 // panel source (the page wires its view-model into the panel;
 // src/pages/eciperay/PublicRecipePage.test.ts pins that wiring).
-const ingredientsPanel = readFileSync(join(root, "src/views/eciperay/RecipeIngredientsPanel.tsx"), "utf8");
+const ingredientsPanel = readFileSync(
+  join(root, "src/views/eciperay/RecipeIngredientsPanel.tsx"),
+  "utf8",
+);
 
 test("NumberStepper layout is additive with stacked as the default", () => {
   assert.match(stepper, /layout\?: "stacked" \| "inline";/, "layout prop is declared");
@@ -99,7 +102,7 @@ test("PresetValueSelector renders one non-wrapping row of toggle buttons, preset
   // preset's — at the old quarter share (flex 0.25 of the row,
   // level with one preset) the slot was ~68px at the ~430px VR
   // capture width and the "Custom" label wrapped mid-word.
-  assert.match(selector, /flex=\{0\.35\}/, "the custom slot keeps its widened share (#327)");
+  assert.match(selector, /grow=\{0\.35\}/, "the custom slot keeps its widened share (#327)");
 });
 
 test("the ingredients panels use the inline stepper and the PresetValueSelector", () => {
@@ -259,7 +262,7 @@ test("on web, blurring the custom editor to inside the group does not commit (#3
     /const groupRef = useRef<TamaguiElement>\(null\);/,
     "the selector keeps a ref on its group element",
   );
-  assert.match(selector, /<XStack\s+ref=\{groupRef\}/, "the group element carries the ref");
+  assert.match(selector, /<GroupRow\s+ref=\{groupRef\}/, "the group element carries the ref");
   assert.match(
     selector,
     /const relatedTarget = blurEvent\.relatedTarget \?\? blurEvent\.nativeEvent\?\.relatedTarget;/,

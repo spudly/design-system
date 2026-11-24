@@ -1,5 +1,6 @@
-import { TextArea as TamaguiTextArea, Label, YStack, styled } from "tamagui";
+import { TextArea as TamaguiTextArea, Label, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { useFieldA11y } from "../../views/shared/useFieldA11y.js";
 import { Text } from "../data/Text.js";
@@ -99,7 +100,7 @@ export function TextAreaField({
   );
 
   return (
-    <YStack gap={tokens.spacing[1]}>
+    <Col gap="xs">
       {label ? (
         <Label htmlFor={id} fontSize={tokens.typography.fontSize.sm}>
           {label}
@@ -119,6 +120,6 @@ export function TextAreaField({
           {error}
         </Text>
       ) : null}
-    </YStack>
+    </Col>
   );
 }
