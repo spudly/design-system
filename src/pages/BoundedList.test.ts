@@ -16,74 +16,109 @@
  * It lives in src/pages as internal scaffolding (the PageFrame
  * pattern): it imports react-native and it is not a page, so
  * under the pages-only export contract (#298) it is NOT exported
- * from src/pages/index.ts — the pages that use it import it
- * directly. Those placements are pinned here and in
- * test/storybookParity.test.ts.
+ * from the pages barrel — the pages that use it import it
+ * directly.
  *
- * This is a source scan, not a render test, for the same reason
- * as src/pages/VerseSearchPage.test.ts: the failures it guards
- * happen in native layout, which no JS renderer in this repo
- * performs, and the invariant is a per-literal property of the
- * source. Comments are stripped before scanning so prose cannot
- * satisfy the patterns.
+ * Converted from source scans to runtime checks in #733
+ * tranche 6b: BoundedList is called directly (with react-native
+ * stubbed, per the tranche 6a pattern) and the FlatList element
+ * it returns is inspected — its style, separator, and the props
+ * it forwards — and the three fixed-shell list pages are called
+ * and checked for the BoundedList element in their trees. The
+ * built pages barrel (dist/pages/index.d.ts — a built-artifact
+ * read, not a source read) pins BoundedList's absence from the
+ * export surface. The former source-readable pin, the retired
+ * BoundedListLoading helper-name pin, and the RecipesPage
+ * loading-slot scan were deleted: the first two pin
+ * implementation detail with no behavioral contract, and
+ * RecipesPage's loading rows are RecipesPage's own contract,
+ * pinned by its own tests. The separator components are
+ * internal functions, so their rendered heights are read by
+ * calling the separator the list element carries.
  */
+import "../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
+import { register } from "node:module";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const pagesDir = join(here, "../..", "src", "pages");
-const source = readFileSync(join(pagesDir, "BoundedList.tsx"), "utf8");
-const pagesIndex = readFileSync(join(pagesDir, "index.ts"), "utf8");
 
-// Strip block and line comments so documented patterns in prose
-// cannot pass the scan.
-const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+// BoundedList imports react-native, whose Flow-typed source
+// plain Node cannot parse; redirect the bare specifier to an
+// inert stub before the module is imported. The tests inspect
+// the FlatList element's props and call its separator — they
+// never render the FlatList itself.
+const reactNativeStubUrl =
+  "data:text/javascript,export%20function%20FlatList()%7Breturn%20null%3B%7D%0Aexport%20function%20View()%7Breturn%20null%3B%7D%0A";
+register(
+  "data:text/javascript," +
+    encodeURIComponent(
+      `export async function resolve(specifier, context, nextResolve) {\n` +
+        `  if (specifier === "react-native") return { shortCircuit: true, url: ${JSON.stringify(reactNativeStubUrl)} };\n` +
+        `  return nextResolve(specifier, context);\n` +
+        `}`,
+    ),
+);
 
-test("BoundedList source is readable and non-trivial", () => {
-  assert.ok(code.length > 500, "expected the full BoundedList source");
-  assert.match(code, /export function BoundedList/);
+let runtimePromise: Promise<Record<string, any>> | undefined;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const dist: Record<string, any> = await loadInternalDist();
+    const list: Record<string, any> = await import("../../dist/pages/BoundedList.js");
+    const rn: Record<string, any> = await import("react-native");
+    return { ...dist, BoundedList: list.BoundedList, FlatList: rn.FlatList, View: rn.View };
+  })();
+  return runtimePromise;
+}
+
+const DATA = [{ id: "a" }, { id: "b" }];
+const keyExtractor = (item: { id: string }) => item.id;
+const renderItem = () => null;
+
+test("the FlatList is height-bounded with flex: 1, exactly (#188)", async () => {
+  const { BoundedList, FlatList } = await loadRuntime();
+  const tree = BoundedList({ data: DATA, keyExtractor, renderItem });
+  assert.equal(tree.type, FlatList, "BoundedList renders the FlatList itself");
+  assert.deepEqual(tree.props.style, { flex: 1 }, "the bounding lands on the FlatList itself");
 });
 
-test("the FlatList is height-bounded with flex: 1, exactly (#188)", () => {
-  assert.match(
-    code,
-    /const listStyle = \{ flex: 1 \} as const;/,
-    "the listStyle constant must be exactly { flex: 1 }",
+test("row separation is the spacing scale's step 2, rendered by the list itself", async () => {
+  const { BoundedList, View } = await loadRuntime();
+  const tree = BoundedList({ data: DATA, keyExtractor, renderItem });
+  const Separator = tree.props.ItemSeparatorComponent;
+  assert.equal(typeof Separator, "function", "the list renders the separator itself by default");
+  const separatorEl = Separator({});
+  assert.equal(separatorEl.type, View);
+  assert.deepEqual(
+    separatorEl.props.style,
+    { height: 8 },
+    "the default separator is the spacing scale's step 2 (8px)",
   );
-  assert.match(
-    code,
-    /<FlatList\s+style=\{listStyle\}/,
-    "the FlatList must take style={listStyle} so the shell bounds its height",
+  const md = BoundedList({ data: DATA, keyExtractor, renderItem, separator: "md" });
+  assert.deepEqual(
+    md.props.ItemSeparatorComponent({}).props.style,
+    { height: 12 },
+    "md is the 12px card rhythm (spacing step 3)",
   );
+  const none = BoundedList({ data: DATA, keyExtractor, renderItem, separator: "none" });
+  assert.equal(none.props.ItemSeparatorComponent, undefined, "separator none renders no separator");
 });
 
-test("row separation is the spacing scale's step 2, rendered by the list itself", () => {
-  assert.match(
-    code,
-    /const separatorStyle = \{ height: tokens\.spacing\[2\] \} as const;/,
-    "the separator must be exactly the spacing scale's step 2 (8px), the separation the row cards' marginBottom $2 used to give",
-  );
-  assert.match(
-    code,
-    /ItemSeparatorComponent=\{separator === "none" \? undefined : separators\[separator\]\}/,
-    "the list must render the separator itself, so rows carry no spacing props",
-  );
-  assert.match(
-    code,
-    /const separators = \{ sm: BoundedListSeparator, md: BoundedListSeparatorMd \} as const;/,
-    "the default separator stays BoundedListSeparator; md is the only other rhythm",
-  );
-  assert.match(
-    code,
-    /separator = "sm"/,
-    "the separator defaults to sm, so existing consumers render unchanged",
-  );
+test("the API mirrors the FlatList props the pages use — data, keyExtractor, renderItem", async () => {
+  const { BoundedList } = await loadRuntime();
+  const tree = BoundedList({ data: DATA, keyExtractor, renderItem });
+  assert.equal(tree.props.data, DATA);
+  assert.equal(tree.props.keyExtractor, keyExtractor);
+  assert.equal(tree.props.renderItem, renderItem);
 });
 
-test("the catalog slots and handlers are optional and passed through only when given", () => {
+test("the catalog slots and handlers are passed through only when given", async () => {
+  const { BoundedList } = await loadRuntime();
+  const bare = BoundedList({ data: DATA, keyExtractor, renderItem });
   for (const prop of [
     "ListHeaderComponent",
     "ListEmptyComponent",
@@ -94,76 +129,87 @@ test("the catalog slots and handlers are optional and passed through only when g
     "onLayout",
     "onContentSizeChange",
     "keyboardShouldPersistTaps",
+    "contentContainerStyle",
   ]) {
-    assert.match(
-      code,
-      new RegExp(String.raw`\.\.\.\(${prop} !== undefined \? \{ ${prop} \} : null\)`),
-      `${prop} must reach the FlatList only when the caller provides it`,
-    );
+    assert.ok(!(prop in bare.props), `${prop} must not reach the FlatList when not given`);
   }
-  assert.match(
-    code,
-    /const pageContentStyle = \{\s+paddingHorizontal: tokens\.spacing\[4\],\s+paddingBottom: tokens\.spacing\[8\],\s+\} as const;/,
-    "the page content inset is the standard page geometry both catalog lists used",
+  const header = () => null;
+  const onEndReached = () => {};
+  const full = BoundedList({
+    data: DATA,
+    keyExtractor,
+    renderItem,
+    ListHeaderComponent: header,
+    onEndReached,
+    onEndReachedThreshold: 0.5,
+    keyboardShouldPersistTaps: "handled",
+    contentInset: "page",
+  });
+  assert.equal(full.props.ListHeaderComponent, header);
+  assert.equal(full.props.onEndReached, onEndReached);
+  assert.equal(full.props.onEndReachedThreshold, 0.5);
+  assert.equal(full.props.keyboardShouldPersistTaps, "handled");
+  assert.deepEqual(
+    full.props.contentContainerStyle,
+    { paddingHorizontal: 16, paddingBottom: 32 },
+    "the page content inset is the standard page geometry (spacing steps 4 and 8)",
   );
-  assert.match(
-    code,
-    /\.\.\.\(contentInset === "page" \? \{ contentContainerStyle: pageContentStyle \} : null\)/,
-    "the content inset applies only when the caller asks for the page geometry",
-  );
-  assert.match(code, /contentInset = "none"/, "the content inset defaults to none");
 });
 
-test("the API mirrors the FlatList props the pages use — data, keyExtractor, renderItem", () => {
-  assert.match(code, /data: readonly Item\[\];/);
-  assert.match(code, /keyExtractor: \(item: Item, index: number\) => string;/);
-  assert.match(code, /renderItem: ListRenderItem<Item>;/);
-  assert.match(code, /data=\{data\}/);
-  assert.match(code, /keyExtractor=\{keyExtractor\}/);
-  assert.match(code, /renderItem=\{renderItem\}/);
-});
-
-test("BoundedList is internal: not exported from the pages index", () => {
+test("BoundedList is internal: not exported from the built pages barrel", async () => {
+  const { BoundedList } = await loadRuntime();
+  assert.equal(typeof BoundedList, "function", "the internal module loads");
+  const types = readFileSync(join(here, "../..", "dist", "pages", "index.d.ts"), "utf8");
   assert.ok(
-    !pagesIndex.includes("BoundedList"),
-    "BoundedList must not be exported from src/pages/index.ts — it is internal page scaffolding (the PageFrame pattern)",
+    !types.includes("BoundedList"),
+    "BoundedList must not be exported from the pages barrel — it is internal page scaffolding (the PageFrame pattern)",
   );
 });
 
-test("the three fixed-shell list pages render BoundedList", () => {
-  for (const page of ["VerseSearchPage", "MemorizeReviewPage", "MyVersesPage"]) {
-    const pageSource = readFileSync(join(pagesDir, `${page}.tsx`), "utf8");
-    assert.match(
-      pageSource,
-      /import \{ BoundedList \} from "\.\/BoundedList\.js";/,
-      `${page} must import BoundedList from the internal module`,
-    );
-    assert.match(pageSource, /<BoundedList/, `${page} must render BoundedList`);
+// Depth-first search for an element of the given type anywhere
+// in an element tree (children may be nested in arrays).
+function findByType(node: any, type: any): any {
+  if (node === null || typeof node !== "object") return undefined;
+  if (Array.isArray(node)) {
+    for (const child of node) {
+      const found = findByType(child, type);
+      if (found !== undefined) return found;
+    }
+    return undefined;
   }
-});
+  if (node.type === type) return node;
+  return findByType(node.props?.children, type);
+}
 
-test("the retired loading slot helpers stay retired (#119 dedupe)", () => {
-  assert.ok(
-    !code.includes("BoundedListLoading"),
-    "BoundedListLoading/BoundedListLoadingMore were this tranche's local helpers — the dedupe retired them and they must not come back (the loading rows are now the page's skeleton compositions, #278)",
-  );
-});
-
-test("RecipesPage renders its loading slots as skeleton rows (#278 tranche 4)", () => {
-  const page = readFileSync(join(pagesDir, "RecipesPage.tsx"), "utf8");
-  // Since #415 the loading slots are the two sections' own
-  // rows in the unified list (each section loads independently)
-  // plus the shared loading-more footer. Since #278 tranche 4
-  // they render skeleton rows, not a centered Spinner.
-  assert.match(page, /case "loadingOwn":\s*return <LoadingOwnRows \/>;/);
-  assert.match(
-    page,
-    /case "loadingDiscovery":\s*return <LoadingDiscoveryRows variant="section" \/>;/,
-  );
-  assert.match(page, /isFetchingNextPage \? <LoadingDiscoveryRows \/> : undefined/);
-  const pageCode = page.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-  assert.ok(
-    !pageCode.includes("Spinner"),
-    "the catalog's loading states render skeletons, not a Spinner (#278)",
-  );
+test("the three fixed-shell list pages render BoundedList", async () => {
+  const { BoundedList } = await loadRuntime();
+  const verses = [
+    { id: "v1", reference: "Ether 12:27", text: "And if men come unto me" },
+    { id: "v2", reference: "Moroni 10:4", text: "And when ye shall receive these things" },
+  ];
+  const verseSearch: Record<string, any> = await import("../../dist/pages/VerseSearchPage.js");
+  const searchTree = verseSearch.VerseSearchPage({
+    query: "weakness",
+    onQueryChange: () => {},
+    onSearch: () => {},
+    isSearching: false,
+    usingDemo: false,
+    errorMessage: null,
+    results: verses,
+    onAddVerse: () => {},
+  });
+  assert.ok(findByType(searchTree, BoundedList), "VerseSearchPage must render BoundedList");
+  const review: Record<string, any> = await import("../../dist/pages/MemorizeReviewPage.js");
+  const reviewTree = review.MemorizeReviewPage({
+    verses,
+    onRememberedPress: () => {},
+    onForgotPress: () => {},
+  });
+  assert.ok(findByType(reviewTree, BoundedList), "MemorizeReviewPage must render BoundedList");
+  const mine: Record<string, any> = await import("../../dist/pages/MyVersesPage.js");
+  const mineTree = mine.MyVersesPage({
+    verses: verses.map((v) => ({ ...v, drillHref: `/drill/${v.id}`, status: "learning" })),
+    onRemoveVerse: () => {},
+  });
+  assert.ok(findByType(mineTree, BoundedList), "MyVersesPage must render BoundedList");
 });

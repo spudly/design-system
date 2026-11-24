@@ -11,7 +11,7 @@ import {
 import { LazySlot } from "../views/LazySlot.js";
 import { BannerRow } from "../widgets/BannerRow.js";
 import { Button } from "../widgets/Button.js";
-import { StatusMessage } from "../widgets/StatusMessage.js";
+import { StatusMessage } from "../views/StatusMessage.js";
 
 /**
  * AppShellPage (#437): the routed app shell as a design-system

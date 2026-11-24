@@ -47,19 +47,28 @@ const dist: Record<string, any> = await loadInternalDist();
 function source(name: string) {
   // Form-category widgets live in src/widgets/form since #710.
   const formPath = join(root, "src", "widgets", "form", `${name}.tsx`);
-  return readFileSync(existsSync(formPath) ? formPath : join(root, "src", "widgets", `${name}.tsx`), "utf8");
+  if (existsSync(formPath)) return readFileSync(formPath, "utf8");
+  // BulkSelectToolbar (#712) and CommentItem (#714) were reclassified as Views.
+  const viewPath = join(root, "src", "views", `${name}.tsx`);
+  return readFileSync(existsSync(viewPath) ? viewPath : join(root, "src", "widgets", `${name}.tsx`), "utf8");
 }
 
 const MOVED = [
-  "BulkSelectToolbar",
   "CheckboxSelectList",
-  "CommentItem",
   "FixedActionBanner",
   "StatRow",
   "TokenRow",
 ];
 
-test("the six remaining B2 widgets are exported from the internal components barrel", () => {
+test("BulkSelectToolbar is exported from the internal barrel as a view, not a widget (#712)", () => {
+  assert.equal(typeof dist.BulkSelectToolbar, "function", "BulkSelectToolbar must remain exported from the internal barrel");
+  const widgetsBarrel = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
+  assert.ok(!widgetsBarrel.includes("BulkSelectToolbar"), "BulkSelectToolbar must not be exported from the widgets barrel");
+  const viewsBarrel = readFileSync(join(root, "src", "views", "index.ts"), "utf8");
+  assert.ok(viewsBarrel.includes("BulkSelectToolbar"), "BulkSelectToolbar must be exported from the views barrel");
+});
+
+test("the remaining B2 widgets are exported from the internal components barrel", () => {
   for (const name of MOVED) {
     assert.equal(
       typeof dist[name],
@@ -68,6 +77,14 @@ test("the six remaining B2 widgets are exported from the internal components bar
     );
   }
   assert.equal(dist.TagPill, undefined, "TagPill was merged into Badge (#183)");
+});
+
+test("CommentItem is exported from the internal barrel as a view, not a widget (#714)", () => {
+  assert.equal(typeof dist.CommentItem, "function", "CommentItem must remain exported from the internal barrel");
+  const widgetsBarrel = readFileSync(join(root, "src", "widgets", "index.ts"), "utf8");
+  assert.ok(!widgetsBarrel.includes("CommentItem"), "CommentItem must not be exported from the widgets barrel");
+  const viewsBarrel = readFileSync(join(root, "src", "views", "index.ts"), "utf8");
+  assert.ok(viewsBarrel.includes("CommentItem"), "CommentItem must be exported from the views barrel");
 });
 
 test("Badge's colored-tag form tints its surface and label from the resolved token color", () => {

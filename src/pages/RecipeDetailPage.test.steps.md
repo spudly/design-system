@@ -2,8 +2,8 @@
 component: RecipeDetailPage
 run_when:
   - "src/pages/RecipeDetailPage.tsx, its stories, or a changeset naming RecipeDetailPage."
-  - "src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
-  - "src/widgets/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
+  - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
+  - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
   - "src/widgets/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."
   - "src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
   - "src/views/RecipeSharingView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeSharingView."
@@ -60,13 +60,13 @@ Open in `Widgets/RecipeOverviewPanel`: Default, Minimal.
    the "Idea" pill, and the Servings stat only — no
    description, Prep/Cook stats, or tag row.
 
-**Run when:** `src/widgets/RecipeOverviewPanel.tsx`, its
+**Run when:** `src/views/RecipeOverviewPanel.tsx`, its
 stories, PublicRecipePage, RecipeDetailPage, or a changeset
 naming RecipeOverviewPanel.
 
 ## RecipeIngredientsPanel
 
-Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
+Open in `Views/RecipeIngredientsPanel`: Default, Plain.
 
 1. Default: the servings stepper and the Scale preset row
    fit the width without the Scale row wrapping; the Custom
@@ -80,7 +80,7 @@ Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
 2. Plain: two unadorned rows with hairline separators and no
    substitutions panel.
 
-**Run when:** `src/widgets/RecipeIngredientsPanel.tsx`,
+**Run when:** `src/views/RecipeIngredientsPanel.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeIngredientsPanel.
 

@@ -7,7 +7,7 @@ import { Badge } from "./Badge.js";
 import { SkeletonBone } from "./SkeletonClock.js";
 
 const StyledTagRow = styled(XStack, {
-  name: "TagListRow",
+  name: "TagListItem",
 
   flexWrap: "wrap",
   gap: tokens.spacing[2],

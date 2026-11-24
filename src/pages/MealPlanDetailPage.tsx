@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { ButtonRow } from "../widgets/ButtonRow.js";
 import { DetailRow } from "../views/DetailRow.js";
-import { ListRow } from "../widgets/ListRow.js";
+import { ListItem } from "../widgets/ListItem.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { ListStack } from "../widgets/ListStack.js";
@@ -54,7 +54,7 @@ import { WeekDayColumn, WeekDayColumns } from "../widgets/WeekDayColumn.js";
  * title and meta bones, the goals section as a loading
  * SectionCard, the action row's Buttons as inert skeletons
  * inside the loading scope, and the Entries section holding
- * exactly 3 dummy ListRows in their loading state), and
+ * exactly 3 dummy ListItems in their loading state), and
  * `{ state: "ready", ... }` renders the detail. If the app
  * grows a not-found state, the union grows a member.
  *
@@ -133,7 +133,7 @@ import { WeekDayColumn, WeekDayColumns } from "../widgets/WeekDayColumn.js";
  * De-styled for #119: the page renders no layout primitives and
  * sets no styling props. The loading state is the skeleton
  * composition described above, the entry rows are the generic
- * ListRow widget in its link form (the page supplies the kind prefix, the entry's
+ * ListItem widget in its link form (the page supplies the kind prefix, the entry's
  * href, the unavailable suffix, and the disabled flag as
  * content), the goal rows are DetailRow views, the plan title
  * takes Text's `title` variant, the meta lines take its `hint`
@@ -320,7 +320,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
     // through its own loading state; its body lines as bones),
     // the Shopping list / Edit action row kept as inert
     // skeleton Buttons inside the scope, and the Entries
-    // SectionCard holding the dummy ListRows. No real plan
+    // SectionCard holding the dummy ListItems. No real plan
     // content exists in this state to leak.
     return (
       <BigFooterShell footer={props.footer}>
@@ -341,7 +341,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
               <SectionCard title="Entries" loading>
                 <ListStack>
                   {LOADING_ENTRY_KEYS.map((key) => (
-                    <ListRow
+                    <ListItem
                       key={key}
                       title="Entry"
                       subtitle="Entry details"
@@ -377,7 +377,7 @@ export function MealPlanDetailPage(props: MealPlanDetailPageProps) {
   // and the week view's day columns (#660) so navigation and
   // accessibility behaviour are identical in both.
   const renderEntry = (entry: MealPlanDetailPageEntry) => (
-    <ListRow
+    <ListItem
       key={entry.id}
       prefix={entry.kind === "meal" ? "Meal · " : "Recipe · "}
       title={entry.title}

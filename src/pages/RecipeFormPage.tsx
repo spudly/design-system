@@ -12,7 +12,7 @@ import {
   RecipeInstructionListView,
   type RecipeInstructionListViewProps,
 } from "../views/RecipeInstructionListView.js";
-import { FieldColumns } from "../widgets/form/FieldColumns.js";
+import { EqualColumns } from "../widgets/form/EqualColumns.js";
 import { FormStack } from "../widgets/FormStack.js";
 import { LabeledField } from "../widgets/form/LabeledField.js";
 import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
@@ -94,7 +94,7 @@ import { Badge } from "../widgets/Badge.js";
  * - The page applies no styling itself (#119): the scroll region
  *   is ScrollRegion, the body stack is FormStack, each field
  *   section is a LabeledField (the tags a LabeledGroup, the
- *   servings / prep / cook fields a FieldColumns row of
+ *   servings / prep / cook fields a EqualColumns row of
  *   LabeledFields), and the
  *   revert affordances and changed-list banners are the
  *   RevertAction and ChangedListBanner components — the page
@@ -312,7 +312,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
             />
           </LabeledField>
 
-          <FieldColumns>
+          <EqualColumns>
             <LabeledField
               label="Servings"
               fieldId="recipe-servings"
@@ -355,7 +355,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
                 onChangeText={onCookTimeMinChange}
               />
             </LabeledField>
-          </FieldColumns>
+          </EqualColumns>
 
           {image ? (
             <RecipeImageView {...image} headerAction={revertAction("image")} />

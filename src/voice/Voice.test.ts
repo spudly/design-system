@@ -1,66 +1,78 @@
+/**
+ * Voice core contract tests (#539 tranche 1; #733 tranche 4a).
+ *
+ * Converted from source scans to runtime checks: the voice system
+ * is exercised against the built output — the provider and hook
+ * ship in the built package, reading the voice with no provider
+ * throws at render time, a provider supplies exactly the object it
+ * was given (the DS ships no defaults), and the pseudo-locale
+ * fixture transforms the fixture voice's slots.
+ *
+ * Deleted in the conversion (not runtime-observable here):
+ * - The Storybook-preview source scan (both previews wrapping
+ *   stories in the provider): preview wiring lives outside the
+ *   built package; a dropped wrap surfaces as this file's own
+ *   fail-fast throw in any story that reads the voice.
+ * - The type-alias source scan: `Voice` / `VoiceProviderProps`
+ *   being type aliases is a code-style rule enforced by the
+ *   TypeScript build and lint, not a test (Stephen, 2026-11-20:
+ *   types need no dedicated tests).
+ *
+ * Runtime assertions run against the built output: `npm run build`
+ * first (the `test` script does both).
+ */
+import "../../test/registerSvgStub.js";
+import { loadInternalDist } from "../../test/internalDist.js";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
-import { fileURLToPath, URL } from "node:url";
-import test from "node:test";
+import { test } from "node:test";
 
-// #539 tranche 1: the voice-as-theme core. The DS defines the typed
-// Voice slot object and the provider and ships NO default strings;
-// apps author and supply the complete object at the root.
+let runtimePromise: Promise<Record<string, any>> | undefined;
+function loadRuntime() {
+  runtimePromise ??= (async () => {
+    const reactModule = await import("react");
+    const React = reactModule.default;
+    const { renderToString } = await import("react-dom/server");
+    const dist: Record<string, any> = await loadInternalDist();
+    const voiceModule: Record<string, any> = await import("../../dist/voice/index.js");
+    const voiceFixtures: Record<string, any> = await import("../../dist/voice/fixtures.js");
+    return { React, renderToString, ...dist, ...voiceModule, ...voiceFixtures };
+  })();
+  return runtimePromise;
+}
 
-const root = fileURLToPath(new URL("../..", import.meta.url));
-const read = (path: string) => readFileSync(join(root, path), "utf8");
-
-test("Voice system is exported from the package root", () => {
-  const index = read("src/index.ts");
-  assert.match(index, /VoiceProvider/);
-  assert.match(index, /useVoice/);
-  assert.match(index, /type Voice\b/);
+test("Voice system is exported from the package root", async () => {
+  const { VoiceProvider, useVoice } = await loadRuntime();
+  assert.equal(typeof VoiceProvider, "function");
+  assert.equal(typeof useVoice, "function");
 });
 
-test("useVoice fails fast with no provider (no silent defaults)", () => {
-  const voice = read("src/voice/Voice.tsx");
-  assert.match(voice, /throw new Error\(/);
-  assert.match(voice, /no VoiceProvider found/);
-  // The core must not ship a default voice object.
-  assert.doesNotMatch(voice, /defaultVoice|DEFAULT_VOICE/);
-});
-
-test("fixtures are typed as Voice and the pseudo-locale fixture transforms every slot", async () => {
-  const fixturesSource = read("src/voice/fixtures.ts");
-  assert.match(fixturesSource, /fixtureVoice: Voice/);
-  assert.match(fixturesSource, /fixtureVoicePseudoLocale: Voice/);
-  const { fixtureVoice, fixtureVoicePseudoLocale } = await import("./fixtures.js").catch(() => ({
-    fixtureVoice: null,
-    fixtureVoicePseudoLocale: null,
-  }));
-  if (fixtureVoice && fixtureVoicePseudoLocale) {
-    assert.notEqual(fixtureVoicePseudoLocale.common.cancelLabel, fixtureVoice.common.cancelLabel);
-    assert.match(fixtureVoicePseudoLocale.common.cancelLabel, /⟦/);
+test("useVoice fails fast with no provider (no silent defaults)", async () => {
+  const { React, renderToString, useVoice } = await loadRuntime();
+  function Probe() {
+    const voice = useVoice();
+    return React.createElement("span", null, voice.common.cancelLabel);
   }
+  assert.throws(() => renderToString(React.createElement(Probe)), /no VoiceProvider found/);
 });
 
-test("both Storybook previews install the VoiceProvider with the fixture voice (#649)", () => {
-  // Regression guard: the web preview got the #539 wrap, the on-device
-  // (RN) preview did not — every native story whose tree calls
-  // useVoice() threw and rendered the Storybook error frame. Both
-  // previews must keep the provider so a preview rewrite cannot
-  // silently drop it again.
-  for (const path of [".storybook/preview.tsx", "apps/storybook/.rnstorybook/preview.tsx"]) {
-    const preview = read(path);
-    // The provider must ENCLOSE the story, not merely appear beside
-    // it: a sibling <VoiceProvider /> would leave the story tree
-    // without voice context and the error frames would return.
-    const open = preview.indexOf("<VoiceProvider voice={fixtureVoice}>");
-    const story = preview.indexOf("<Story />", open);
-    const close = preview.indexOf("</VoiceProvider>", story);
-    assert.ok(open !== -1, `${path} must render VoiceProvider with the fixture voice`);
-    assert.ok(story > open, `${path} must render the story inside the VoiceProvider`);
-    assert.ok(close > story, `${path} must close the VoiceProvider after the story`);
+test("VoiceProvider supplies exactly the voice object it is given", async () => {
+  const { React, renderToString, VoiceProvider, useVoice, fixtureVoice } = await loadRuntime();
+  function Probe() {
+    const voice = useVoice();
+    return React.createElement("span", null, voice.common.cancelLabel);
   }
+  const html = renderToString(
+    React.createElement(VoiceProvider, { voice: fixtureVoice }, React.createElement(Probe)),
+  );
+  assert.match(html, new RegExp(fixtureVoice.common.cancelLabel.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
 });
 
-test("Voice uses type aliases, not interfaces (DS code style)", () => {
-  const voice = read("src/voice/Voice.tsx");
-  assert.doesNotMatch(voice, /\binterface\s+(Voice|VoiceProviderProps)\b/);
+test("the pseudo-locale fixture transforms the fixture voice's slots", async () => {
+  const { fixtureVoice, fixtureVoicePseudoLocale } = await loadRuntime();
+  assert.ok(fixtureVoice);
+  assert.ok(fixtureVoicePseudoLocale);
+  assert.notEqual(fixtureVoicePseudoLocale.common.cancelLabel, fixtureVoice.common.cancelLabel);
+  assert.match(fixtureVoicePseudoLocale.common.cancelLabel, /⟦/);
+  assert.notEqual(fixtureVoicePseudoLocale.common.saveLabel, fixtureVoice.common.saveLabel);
+  assert.match(fixtureVoicePseudoLocale.common.saveLabel, /⟦/);
 });

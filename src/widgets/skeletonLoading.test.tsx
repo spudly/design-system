@@ -315,7 +315,7 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
   assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingOwn\?: boolean/);
   assert.match(read("src/pages/RecipesPage.tsx"), /\bloadingDiscovery\?: boolean/);
   assert.match(read("src/pages/RecipeFormPage.tsx"), /\bloadingTags\?: boolean/);
-  assert.match(read("src/widgets/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
+  assert.match(read("src/views/RecipeIngredientsPanel.tsx"), /\bloadingSubstitutions\?: boolean/);
   assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloadingSubstitutions\?: boolean/);
   assert.match(read("src/pages/RecipeDetailPage.tsx"), /\bloading\?: boolean/);
 });
@@ -341,11 +341,13 @@ test("the loading prop is `loading` everywhere — `isLoading` is gone from src"
 const widgetPath = (name: string) =>
   existsSync(join(root, "src", "widgets", "form", `${name}.tsx`))
     ? `src/widgets/form/${name}.tsx`
-    : `src/widgets/${name}.tsx`;
+    : existsSync(join(root, "src", "views", `${name}.tsx`))
+      ? `src/views/${name}.tsx`
+      : `src/widgets/${name}.tsx`;
 
 const T1_SCOPE_WIDGETS = [
   "CardRow",
-  "ListRow",
+  "ListItem",
   "DiscoveryCard",
   "PreviewCard",
   "CommentItem",
@@ -382,7 +384,7 @@ test("T1: CheckboxSelectList's centered spinner is gone", () => {
   assert.match(code, /LOADING_ROW_KEYS/, "the dummy rows come from a frozen constant");
 });
 test("T1 SSR: loading rows and cards render skeletons, no real content, actions as skeletons", async () => {
-  const { CardRow, ListRow, DiscoveryCard, CommentItem, LogEntryCard, TokenRow } =
+  const { CardRow, ListItem, DiscoveryCard, CommentItem, LogEntryCard, TokenRow } =
     await loadRuntime();
   const noop = () => {};
   const cardRow = await renderToHtml(
@@ -403,10 +405,10 @@ test("T1 SSR: loading rows and cards render skeletons, no real content, actions 
   );
   assert.match(cardRow, /aria-busy/, "a loading CardRow marks its region busy");
   const listRow = await renderToHtml(
-    <ListRow title="Secret Stew" subtitle="Serves 6" onPress={noop} loading={true} />,
+    <ListItem title="Secret Stew" subtitle="Serves 6" onPress={noop} loading={true} />,
   );
-  assert.equal(hiddenBones(listRow), 2, "a loading ListRow renders title+subtitle bones");
-  assert.ok(!listRow.includes("Secret Stew"), "a loading ListRow shows no real title");
+  assert.equal(hiddenBones(listRow), 2, "a loading ListItem renders title+subtitle bones");
+  assert.ok(!listRow.includes("Secret Stew"), "a loading ListItem shows no real title");
   const discovery = await renderToHtml(
     <DiscoveryCard title="Secret Soup" subtitle="By Maria" href="/recipe/secret" loading={true} />,
   );
@@ -644,23 +646,23 @@ test("T1: a Button inside a LoadingScope renders the rectangle-skeleton treatmen
     "a link Button outside any scope keeps its href",
   );
 });
-test("T1: the MasonryGrid skeleton fills its columns and the ListRow skeleton hides its hairline", () => {
+test("T1: the MasonryGrid skeleton fills its columns and the ListItem skeleton hides its hairline", () => {
   const grid = readCode("src/widgets/MasonryGrid.tsx");
   assert.match(
     grid,
     /<View key=\{`loading-\$\{itemIndex\}`\} width="100%">/,
     "a loading MasonryGrid item wrapper takes the column's full width",
   );
-  const row = readCode("src/widgets/ListRow.tsx");
+  const row = readCode("src/widgets/ListItem.tsx");
   assert.match(
     row,
     /borderBottomColor="transparent"/,
-    "a loading ListRow's hairline renders transparent",
+    "a loading ListItem's hairline renders transparent",
   );
   assert.equal(
     (row.match(/borderBottomColor=\{tokens\.colors\.gray\.gray2\}/g) ?? []).length,
     1,
-    "only the loaded ListRow keeps the visible gray hairline",
+    "only the loaded ListItem keeps the visible gray hairline",
   );
 });
 test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelectList, LogEntryCard)", () => {
@@ -726,7 +728,7 @@ test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelec
   // LogEntryCard: the skeleton header mirrors the loaded header
   // row — a date bone (sm) in a 104-wide slot, and a 72x12 box
   // bone where the star rating sits.
-  const entry = readCode("src/widgets/LogEntryCard.tsx");
+  const entry = readCode("src/views/LogEntryCard.tsx");
   assert.match(entry, /<YStack width=\{104\}>/, "the date bone sits in a 104-wide slot");
   assert.match(
     entry,

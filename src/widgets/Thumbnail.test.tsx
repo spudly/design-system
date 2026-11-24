@@ -3,7 +3,8 @@
  * shared content-image component extracted for the page
  * de-styling program's foundation: three page surfaces hand-styled
  * the raw Image element — the recipe detail/public pages' hero
- * (a 256px recessed frame, image cover-cropped to fill it), the import review's
+ * (an aspect-preserving recessed frame, image cover-cropped to
+ * fill it — #721; originally a fixed 256px frame, #573), the import review's
  * banner preview (full-width, 192px, cover, large radius), and
  * RecipesPage's 64px row thumbnail (its in-page `Thumbnail`
  * helper, generalized here).
@@ -41,14 +42,30 @@ test("the contract is a URL, a presentation variant, and an optional accessible 
   assert.match(code, /variant\?: "hero" \| "banner" \| "row";/);
   assert.match(code, /accessibilityLabel\?: string;/);
 });
-test("the hero is the 256px recessed frame with the image cover-cropped to fill it (#573)", () => {
+test("the hero frame is aspect-preserving: the measured image ratio, clamped, with a 4:3 fallback (#721)", () => {
   assert.match(code, /backgroundColor: tokens\.colors\.gray\.gray1,/);
   assert.match(code, /borderRadius: tokens\.radii\.lg,/);
-  assert.match(code, /height: 256,/);
   assert.match(code, /overflow: "hidden",/);
+  assert.ok(!/height: 256,/.test(code), "the fixed 256px hero height is gone (#721)");
+  assert.match(code, /const HERO_FALLBACK_ASPECT = 4 \/ 3;/);
+  assert.match(code, /const HERO_MIN_ASPECT = 0\.75;/);
+  assert.match(code, /const HERO_MAX_ASPECT = 2\.25;/);
+  assert.match(code, /const \[heroAspect, setHeroAspect\] = useState\(HERO_FALLBACK_ASPECT\);/);
   assert.match(
     code,
-    /<Image src=\{src\} width="100%" height="100%" objectFit="cover" \{\.\.\.a11yProps\} \/>/,
+    /setHeroAspect\(Math\.min\(HERO_MAX_ASPECT, Math\.max\(HERO_MIN_ASPECT, width \/ height\)\)\);/,
+    "the measured natural ratio is clamped to the hero bounds",
+  );
+  assert.match(code, /<StyledHeroFrame aspectRatio=\{heroAspect\}>/);
+  assert.match(
+    code,
+    /const probe = new window\.Image\(\);\s+probe\.onload = \(\) => \{\s+applyMeasuredAspect\(probe\.naturalWidth, probe\.naturalHeight\);\s+\};\s+probe\.src = src;/,
+    "on web the widget measures with a probe image (handler assigned before src, so cached/data-URI loads still report); native measures through the Image onLoad event",
+  );
+  assert.match(
+    code,
+    /<Image\s+src=\{src\}\s+width="100%"\s+height="100%"\s+objectFit="cover"\s+onLoad=\{handleHeroLoad\}\s+\{\.\.\.a11yProps\}\s+\/>/,
+    "the image still cover-fills the frame (#573) and reports its natural dimensions on load",
   );
 });
 test("the banner is the full-width 192px cover image with large rounded corners", () => {

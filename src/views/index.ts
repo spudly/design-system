@@ -14,15 +14,18 @@ export {
   type CatalogFilterDefinition,
   type CatalogFiltersBarProps,
 } from "./CatalogFiltersBar.js";
+export { BulkSelectToolbar, type BulkSelectToolbarProps } from "./BulkSelectToolbar.js";
 export { CatalogHeader, type CatalogHeaderProps } from "./CatalogHeader.js";
 export {
   ChunkErrorBoundary,
   type ChunkErrorBoundaryProps,
   type ChunkErrorBoundaryState,
 } from "./ChunkErrorBoundary.js";
+export { CommentItem, type CommentItemProps } from "./CommentItem.js";
 export { ConfirmActionView, type ConfirmActionViewProps } from "./ConfirmActionView.js";
 export { ConsentBannerView, type ConsentBannerViewProps } from "./ConsentBannerView.js";
 export { DetailRow, type DetailRowProps } from "./DetailRow.js";
+export { EmptyState, type EmptyStateProps } from "./EmptyState.js";
 export {
   FeedbackPreferenceView,
   type FeedbackPreferenceViewProps,
@@ -30,11 +33,18 @@ export {
 export { ForgotPasswordForm, type ForgotPasswordFormProps } from "./ForgotPasswordForm.js";
 export { InstallBannerView, type InstallBannerViewProps } from "./InstallBannerView.js";
 export { LazySlot, type LazySlotProps } from "./LazySlot.js";
+export { LogEntryCard, type LogEntryCardProps } from "./LogEntryCard.js";
 export {
   NutritionGoalsForm,
   type NutritionGoalsFormProps,
   type NutritionGoalsValues,
 } from "./NutritionGoalsForm.js";
+export { RecipeOverviewPanel, type RecipeOverviewPanelProps } from "./RecipeOverviewPanel.js";
+export {
+  RecipeIngredientsPanel,
+  type RecipeIngredientsPanelProps,
+  type RecipeIngredientsPanelView,
+} from "./RecipeIngredientsPanel.js";
 export { RecipeCommentsView, type RecipeCommentsViewProps } from "./RecipeCommentsView.js";
 export {
   RecipeExportPickerView,
@@ -71,5 +81,6 @@ export { RevertAction, type RevertActionProps } from "./RevertAction.js";
 export { ScaledIngredientsView, type ScaledIngredientsViewProps } from "./ScaledIngredientsView.js";
 export { SignInForm, type SignInFormProps } from "./SignInForm.js";
 export { SignUpForm, type SignUpFormProps, type SignUpLegalNoticeSpan } from "./SignUpForm.js";
+export { StatusMessage, type StatusMessageProps } from "./StatusMessage.js";
 export { SubscriptionView, type SubscriptionViewProps } from "./SubscriptionView.js";
 export { TransferRecipesView, type TransferRecipesViewProps } from "./TransferRecipesView.js";

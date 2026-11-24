@@ -24,6 +24,16 @@
  *    case) replaces tab content with no tab selected; a pending
  *    surface shows the DS loading state and a failed one the
  *    boundary's established fallback, shell intact around both.
+ *
+ * Converted from source scans to runtime checks in #733
+ * tranche 6b: the page is called directly and its element tree
+ * inspected, and the built pages barrel (dist/pages/index.d.ts
+ * — a built-artifact read, not a source read) pins the export.
+ * The former type-shape pins (tab/link-tab type blocks, alias
+ * forms, import specifiers) and story pins were deleted: prop
+ * shape is enforced by the TypeScript build, and story
+ * coverage is pinned by the story-parity tests (Stephen,
+ * 2026-11-20).
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";
@@ -33,57 +43,35 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { loadInternalDist } from "../../test/internalDist.js";
 const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
-function codeOf(rel: string): string {
-  const source = readFileSync(join(root, rel), "utf8");
-  return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
-}
-const page = codeOf("src/pages/TabbedShellPage.tsx");
-const stories = readFileSync(join(root, "src/pages/TabbedShellPage.stories.tsx"), "utf8");
-const barrel = readFileSync(join(root, "src/pages/index.ts"), "utf8");
-function typeBlock(source: string, name: string): string {
-  const match = new RegExp(`export type ${name} = \\{([\\s\\S]*?)\\n\\};`).exec(source);
-  assert.ok(match, `${name} type block found`);
-  return match[1]!;
-}
-test("TabbedShellPage is exported from the pages barrel with alias types", () => {
-  assert.match(
-    barrel,
-    /TabbedShellPage,\s*type TabbedShellPageLinkTab,\s*type TabbedShellPageProps,\s*type TabbedShellPageTab,\s*\} from "\.\/TabbedShellPage\.js";/,
-  );
-  assert.match(page, /export type TabbedShellPageProps = TabbedShellPageBaseProps &/);
-  assert.match(page, /export type TabbedShellPageTab = \{/);
-  assert.match(page, /export type TabbedShellPageLinkTab = \{/);
-  assert.doesNotMatch(page, /\binterface\s+TabbedShellPage/);
+
+test("TabbedShellPage is exported from the built pages barrel", async () => {
+  const { TabbedShellPage } = await loadRuntime();
+  assert.equal(typeof TabbedShellPage, "function");
+  const types = readFileSync(join(here, "../..", "dist", "pages", "index.d.ts"), "utf8");
+  assert.match(types, /TabbedShellPage/);
+  assert.match(types, /type TabbedShellPageProps/);
+  assert.match(types, /type TabbedShellPageTab/);
+  assert.match(types, /type TabbedShellPageLinkTab/);
 });
-test("tabs cross as data: content and icon names in the button form, hrefs in the link form", () => {
-  const tab = typeBlock(page, "TabbedShellPageTab");
-  assert.match(tab, /id: string;/);
-  assert.match(tab, /label: string;/);
-  assert.match(tab, /icon\?: IconName;/);
-  assert.match(tab, /content: ReactNode;/);
-  const linkTab = typeBlock(page, "TabbedShellPageLinkTab");
-  assert.match(linkTab, /href: string;/);
-  assert.doesNotMatch(linkTab, /\bcontent\b/, "link tabs navigate — no slotted content");
-  assert.doesNotMatch(linkTab, /\bicon\b/, "the href form omits the icon slot, like Button's");
-});
-test("the page composes DS components only and never touches the boundary itself", () => {
-  assert.doesNotMatch(page, /from "tamagui"/, "pages import no Tamagui directly (#297)");
-  assert.doesNotMatch(
-    page,
-    /ChunkErrorBoundary/,
-    "lazy content goes through the internal LazySlot — the page never names the boundary",
+
+test("the shell is BigFooterShell in content scroll mode around the plain ScreenContainer", async () => {
+  const { React, TabbedShellPage, BigFooterShell, ScreenContainer } = await loadRuntime();
+  const footer = { note: "host footer" } as any;
+  const tree = TabbedShellPage({
+    title: "Memorize",
+    tabs: sentinelTabs(React),
+    activeTabId: "verses",
+    onTabSelect: () => {},
+    footer,
+  });
+  assert.equal(tree.type, BigFooterShell, "the page renders through the footer shell (#410)");
+  assert.equal(tree.props.scrollMode, "content");
+  assert.equal(tree.props.footer, footer, "the host footer data crosses unchanged");
+  assert.equal(
+    tree.props.children.type,
+    ScreenContainer,
+    "the content renders inside the plain ScreenContainer (#547)",
   );
-  assert.match(page, /import \{ LazySlot \} from "\.\.\/views\/LazySlot\.js";/);
-  assert.match(page, /import \{ Tabs \} from "\.\.\/widgets\/Tabs\.js";/);
-  assert.match(page, /<ScreenContainer>/);
-  assert.match(page, /import type \{ IconName \} from "\.\.\/icons\/iconRegistry\.js";/);
-  assert.doesNotMatch(page, /from "\.\.\/icons\/[A-Z]/, "no icon component crosses into the page");
-  // The standard page footer contract (#410, pinned for every
-  // page by src/widgets/BigFooter.test.ts): an optional footer prop
-  // rendered through the shell — no data, no footer band.
-  assert.match(page, /footer\?: BigFooterData;/);
-  assert.match(page, /<BigFooterShell footer=\{footer\} scrollMode="content">/);
 });
 
 // Runtime imports are lazy, like LandingPage.test.ts: the page
@@ -97,6 +85,7 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
+    const shellModule: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
     const { TabbedShellPage }: Record<string, any> =
       await import("../../dist/pages/TabbedShellPage.js");
     const distViews: Record<string, any> = await import("../../dist/views/index.js");
@@ -106,6 +95,7 @@ function loadRuntime() {
       renderToString,
       TamaguiProvider,
       ...dist,
+      BigFooterShell: shellModule.BigFooterShell,
       TabbedShellPage,
       distViews,
       distWidgets,
@@ -306,23 +296,8 @@ test("SSR: the link form renders real hrefs and the host's page content", async 
   assert.match(html, /aria-current="page"/, "the current page's tab is marked current");
   assert.match(html, /CURRENT PAGE SURFACE/, "the host's page renders through the slot");
 });
-test("stories cover the shell, icon tabs, loading, failure, override, and link forms", () => {
-  assert.match(stories, /title: "Pages\/Memorize\/TabbedShellPage"/);
-  for (const story of [
-    "TabbedShell",
-    "IconTabs",
-    "LoadingTabContent",
-    "ChunkFailedTabContent",
-    "DrillOpen",
-    "LinkTabs",
-    "WithNotice",
-    "WithNoticeAction",
-  ]) {
-    assert.match(stories, new RegExp(`export const ${story}: Story`), `missing story ${story}`);
-  }
-});
 test("notice (#765): absent by default; when present it forwards message + action and the callback fires", async () => {
-  const { React, TabbedShellPage, distWidgets } = await loadRuntime();
+  const { React, TabbedShellPage, distViews, distWidgets } = await loadRuntime();
   const bare = TabbedShellPage({
     title: "Memorize",
     tabs: sentinelTabs(React),
@@ -353,7 +328,7 @@ test("notice (#765): absent by default; when present it forwards message + actio
   const [messageEl, actionEl] = noticeEl.props.children;
   assert.equal(
     messageEl.type,
-    distWidgets.StatusMessage,
+    distViews.StatusMessage,
     "the message renders through StatusMessage",
   );
   assert.equal(messageEl.props.message, "Your verses could not be refreshed.");

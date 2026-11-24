@@ -30,11 +30,20 @@
  *    and wide is web — so the row is a flat `web:` clause on a
  *    column stack, never a wrapping row.
  *
- * Source scans strip comments first, like the other contract
- * tests here, so prose cannot satisfy or trip the patterns. The
- * SSR tests import the page from its own dist module (the pages
- * barrel is not Node-importable — some pages import
- * react-native).
+ * Converted from source scans to runtime checks in #733
+ * tranche 6b: the page is called directly, its element tree is
+ * inspected, and it is SSR-rendered with sentinel props; the
+ * built pages barrel (dist/pages/index.d.ts — a built-artifact
+ * read, not a source read) pins the export. The former
+ * type-shape pins (CTA/feature type blocks, alias forms), the
+ * CTA-row geometry pins (the StackedButtonRow / CardGrid
+ * widgets' own contract, pinned by their widget tests), the
+ * fixture/story pins, and the import scans were deleted: prop
+ * shape is enforced by the TypeScript build, and story
+ * coverage is pinned by the story-parity tests (Stephen,
+ * 2026-11-20). The SSR tests import the page from its own dist
+ * module (the pages barrel is not Node-importable — some pages
+ * import react-native).
  */
 import "../../test/registerSvgStub.js";
 import { loadInternalDist } from "../../test/internalDist.js";
@@ -44,137 +53,65 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "../..");
-function readCode(rel: string) {
-  return readFileSync(join(root, rel), "utf8")
-    .replaceAll(/\/\*[\s\S]*?\*\//g, "")
-    .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
+
+// Collect, in document order, every element in a tree whose
+// type is the given component.
+function findAllByType(node: any, type: any, out: any[] = []): any[] {
+  if (node === null || typeof node !== "object") return out;
+  if (Array.isArray(node)) {
+    for (const child of node) findAllByType(child, type, out);
+    return out;
+  }
+  if (node.type === type) out.push(node);
+  findAllByType(node.props?.children, type, out);
+  return out;
 }
-const page = readCode("src/pages/LandingPage.tsx");
-const stories = readCode("src/pages/LandingPage.stories.tsx");
-const pagesIndex = readCode("src/pages/index.ts");
-const fixtures = readCode("src/pages/fixtures.ts");
-// The page's sections are composed from DS widgets: an earlier
-// #119 tranche cut extracted them as Hero / CtaRow / FeatureCard
-// library components and folded them back (they had no second
-// consumer), and #119 tranche 2 re-extracted the sections'
-// geometry into the HeroStack / StackedButtonRow / CardGrid
-// widgets. Scans pin against the page plus those widgets'
-// sources, which is where the treatments now live.
-const landingUnit =
-  page +
-  readCode("src/widgets/HeroStack.tsx") +
-  readCode("src/widgets/StackedButtonRow.tsx") +
-  readCode("src/widgets/CardGrid.tsx");
-test("LandingPage source is readable and exports the page and its view-model types", () => {
-  assert.ok(page.length > 1000, "expected the full LandingPage source");
-  assert.match(page, /export function LandingPage/);
-  for (const name of ["LandingPageProps", "LandingPageCta", "LandingPageFeature"]) {
-    assert.match(
-      page,
-      new RegExp(String.raw`export type ${name} = \{`),
-      `${name} must be an exported type alias`,
-    );
-  }
-  assert.ok(!/\binterface\b/.test(page), "view-model types are type aliases, never interfaces");
+
+test("LandingPage is exported from the built pages barrel", async () => {
+  const { LandingPage } = await loadRuntime();
+  assert.equal(typeof LandingPage, "function");
+  const types = readFileSync(join(root, "dist", "pages", "index.d.ts"), "utf8");
+  assert.match(types, /LandingPage/);
+  assert.match(types, /type LandingPageProps/);
+  assert.match(types, /type LandingPageCta/);
+  assert.match(types, /type LandingPageFeature/);
 });
-test("the features are three fixed slots, not a list (Stephen's decision on #171)", () => {
-  for (const slot of ["featureOne", "featureTwo", "featureThree"]) {
-    assert.match(
-      page,
-      new RegExp(`${slot}: LandingPageFeature;`),
-      `${slot} must be a fixed LandingPageFeature slot prop`,
-    );
-  }
-  assert.ok(
-    !/LandingPageFeature\[\]/.test(page),
-    "the features must not cross as a LandingPageFeature[] array",
-  );
-  assert.ok(!/^\s+features:/m.test(page), "there must be no `features` list prop");
-});
-test("the CTAs cross as {label, href} data — no CTA press callbacks", () => {
-  assert.match(page, /export type LandingPageCta = \{\s+label: string;\s+href: string;\s+\};/);
-  for (const prop of ["discoverCta", "signUpCta", "getAppCta"]) {
-    assert.match(
-      page,
-      new RegExp(`${prop}: LandingPageCta;`),
-      `${prop} must be a LandingPageCta prop`,
-    );
-  }
-  for (const callback of ["onDiscoverPress", "onSignUpPress", "onGetAppPress", "onCtaPress"]) {
-    assert.ok(
-      !page.includes(callback),
-      `the contract must not define ${callback} — CTAs navigate via href`,
-    );
-  }
-});
-test("the CTAs render through Button's href form fed by the CTA data", () => {
-  // Button's href form (ButtonLink) renders the real anchor —
-  // its anchor rendering is pinned by
-  // test/navigationLinks.test.ts; here the page's wiring pins:
-  // each CTA crosses into a <Button href> with its emphasis.
-  // (A dedicated CtaLink duplicated this form and was deleted —
-  // Stephen's ruling on PR #311.)
-  const order = ["discoverCta", "signUpCta", "getAppCta"].map((prop) =>
-    page.indexOf(`${prop}.href`),
-  );
-  assert.ok(
-    order.every((index) => index !== -1),
-    "all three CTAs must render through Button's href form",
-  );
-  assert.ok(
-    order[0] < order[1] && order[1] < order[2],
-    "the CTAs must render in Discover / Sign up / Get-the-app order",
-  );
-  assert.match(page, /<Button href=\{discoverCta\.href\} variant="primary">/);
-  assert.match(page, /<Button href=\{signUpCta\.href\} variant="secondary">/);
-  assert.match(page, /<Button href=\{getAppCta\.href\} variant="secondary">/);
-  assert.ok(!page.includes("CtaLink"), "the page must not render the deleted CtaLink");
-});
-test("the CTA container stacks narrow and rows on web — no wrapping CTA row", () => {
-  assert.match(page, /<StackedButtonRow>/, "the CTAs render in the StackedButtonRow widget");
-  assert.match(
-    landingUnit,
-    /<YStack\s+flexDirection="web:row"\s+gap=\{tokens\.spacing\[3\]\}\s+alignItems="center"\s+justifyContent="center"\s*>/,
-    "the CTA row must become a row only on web — the #171 contract is stacked narrow / row on wide, and its narrow rendering is the native one while wide is web (the DS config defines no width breakpoints)",
-  );
+
+test("the shell is BigFooterShell around the plain ScreenContainer; sections in order", async () => {
+  const { LandingPage, BigFooterShell, ScreenContainer } = await loadRuntime();
+  const tree = LandingPage({ ...sentinelProps });
+  assert.equal(tree.type, BigFooterShell, "the page renders through the footer shell");
   assert.equal(
-    landingUnit.split("flexWrap").length - 1,
-    1,
-    "only the feature grid may flexWrap — a wrapping CTA row could seat two CTAs side by side at the 430px story viewport instead of the contracted stack",
-  );
-  assert.match(landingUnit, /flexWrap="wrap"/, "the one flexWrap is the feature grid's");
-});
-test("frame structure: ScreenContainer shell, sections in hero → CTAs → features order", () => {
-  assert.match(
-    page,
-    /return \(\s+<BigFooterShell[^>]*>\s+<ScreenContainer>/,
-    "the view must render inside the ScreenContainer page shell",
-  );
-  const heroAt = page.indexOf("{heroTitle}");
-  const ctasAt = page.indexOf("href={discoverCta.href}");
-  const featuresAt = page.indexOf("[featureOne, featureTwo, featureThree]");
-  assert.ok(heroAt !== -1 && ctasAt !== -1 && featuresAt !== -1, "all three sections must render");
-  assert.ok(
-    heroAt < ctasAt && ctasAt < featuresAt,
-    "sections must render hero, then CTAs, then features",
-  );
-  assert.equal(
-    landingUnit.split('variant="heading"').length - 1,
-    1,
-    "the hero title must be the page's only heading-variant (level-1) Text",
-  );
-  assert.match(
-    page,
-    /<Text variant="heading" textAlign="center">/,
-    "the hero renders the heading-variant (level-1) title",
-  );
-  assert.match(
-    page,
-    /<Text variant="subheading">\{feature\.title\}<\/Text>/,
-    "feature titles render with the subheading (level-2) variant",
+    tree.props.children.type,
+    ScreenContainer,
+    "the view renders inside the ScreenContainer page shell",
   );
 });
-test("no app copy is baked in and nothing app- or react-native-side is imported", () => {
+
+test("the CTAs cross as {label, href} data into Button's href form, in contract order", async () => {
+  const { LandingPage, Button } = await loadRuntime();
+  const stackModule: Record<string, any> = await import("../../dist/widgets/StackedButtonRow.js");
+  const tree = LandingPage({ ...sentinelProps });
+  const row = findAllByType(tree, stackModule.StackedButtonRow)[0];
+  assert.ok(row, "the CTAs render in the StackedButtonRow widget");
+  const buttons = findAllByType(row, Button);
+  assert.deepEqual(
+    buttons.map((b: any) => ({ href: b.props.href, variant: b.props.variant, label: b.props.children })),
+    [
+      { href: "/discover", variant: "primary", label: "Discover Sentinel" },
+      { href: "/signup", variant: "secondary", label: "Sign Up Sentinel" },
+      {
+        href: "https://apps.example.test/install",
+        variant: "secondary",
+        label: "Get App Sentinel",
+      },
+    ],
+    "each CTA renders through Button's href form with its emphasis, in Discover / Sign up / Get-the-app order — no CTA press callbacks exist in the rendered tree",
+  );
+});
+
+test("SSR: no app copy is baked in — only the props' copy renders", async () => {
+  const html = await renderLanding();
   for (const copy of [
     "Your recipes, organized and ready to cook",
     "Discover public recipes",
@@ -182,32 +119,8 @@ test("no app copy is baked in and nothing app- or react-native-side is imported"
     "Get the mobile app",
     "Import from anywhere",
   ]) {
-    assert.ok(
-      !page.includes(copy),
-      `LandingPage must not bake in the app copy "${copy}" — it crosses as props`,
-    );
+    assert.ok(!html.includes(copy), `the rendered page must not bake in the app copy "${copy}"`);
   }
-  assert.ok(
-    !/from\s+"[^"]*react-native"/.test(page),
-    "the page must not import react-native directly",
-  );
-  assert.ok(!/from\s+"[^"]*eciperay/i.test(page), "the page must not import app code");
-});
-test("the page is exported from the package root (@spudly/ui) and storied under Pages/Eciperay", () => {
-  const normalizedIndex = pagesIndex.replaceAll(/\s+/g, " ");
-  assert.ok(
-    normalizedIndex.includes(
-      'export { LandingPage, type LandingPageProps, type LandingPageCta, type LandingPageFeature, } from "./LandingPage.js";',
-    ),
-    "src/pages/index.ts must export LandingPage and its view-model types",
-  );
-  assert.match(stories, /title: "Pages\/Eciperay\/LandingPage"/);
-  assert.match(
-    stories,
-    /landingFixture/,
-    "the story must render the real page with the landing fixture",
-  );
-  assert.match(fixtures, /export const landingFixture = \{/);
 });
 
 // Runtime imports are lazy (inside the SSR tests) so the source-scan
@@ -221,6 +134,7 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
+    const shellModule: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
     // The pages barrel is not Node-importable (some pages import
     // react-native), so the page under test is loaded from its
     // own module — it is a plain component composition.
@@ -230,6 +144,7 @@ function loadRuntime() {
       renderToString,
       TamaguiProvider,
       ...dist,
+      BigFooterShell: shellModule.BigFooterShell,
       LandingPage,
     };
   })();

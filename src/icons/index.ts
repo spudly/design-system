@@ -10,6 +10,7 @@ export { EyeOffIcon } from "./EyeOffIcon.js";
 export { FeedbackIcon } from "./FeedbackIcon.js";
 export { HelpIcon } from "./HelpIcon.js";
 export { HomeIcon } from "./HomeIcon.js";
+export { ListIcon } from "./ListIcon.js";
 export { MealsIcon } from "./MealsIcon.js";
 export { PrintIcon } from "./PrintIcon.js";
 export { ProfileIcon } from "./ProfileIcon.js";

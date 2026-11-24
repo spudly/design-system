@@ -43,7 +43,7 @@ export type Voice = {
     retryLabel: string;
     loadingLabel: string;
   };
-  /** CommentItem widget (tranche 1). */
+  /** CommentItem view (tranche 1). */
   commentItem: {
     editLabel: string;
     saveLabel: string;
@@ -67,7 +67,7 @@ export type Voice = {
     backLabel: string;
     nextLabel: string;
   };
-  /** BulkSelectToolbar widget (tranche 1c): defaults when label props are not passed. */
+  /** BulkSelectToolbar view (tranche 1c): defaults when label props are not passed. */
   bulkSelectToolbar: {
     selectAllLabel: string;
     clearSelectionLabel: string;
@@ -421,7 +421,7 @@ export type Voice = {
     /** Formatter: builds one star's accessible name from its star number. */
     rateLabel: VoiceFormatter<[star: number]>;
   };
-  /** RemovableField widget (tranche 1f): the remove control's visible text. */
+  /** CatalogFiltersBar's added-filter remove pairing (tranche 1f; inlined from the former RemovableField widget in #740): the remove control's visible text. */
   removableField: {
     removeLabel: string;
   };
