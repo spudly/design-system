@@ -4,7 +4,7 @@ import { CardStack } from "../../widgets/CardStack.js";
 import { EmptyState } from "../../views/EmptyState.js";
 import { CardRow } from "../../widgets/CardRow.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 
 /**
  * MealPlansPage (#49): Eciperay's meal plan list as a controlled

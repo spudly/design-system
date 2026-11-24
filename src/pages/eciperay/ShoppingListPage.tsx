@@ -1,12 +1,12 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { CheckboxField } from "../../widgets/CheckboxField.js";
 import { EmptyState } from "../../views/EmptyState.js";
-import { ListStack } from "../../widgets/ListStack.js";
+import { ListStack } from "../../widgets/data/ListStack.js";
 import { LoadingListItem } from "../../widgets/LoadingListItem.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 
 /**
  * ShoppingListPage (#125, B3b): a meal plan's shopping list —

@@ -1,7 +1,7 @@
 import { XStack, useTheme } from "tamagui";
 import { iconsByName, type IconName } from "../../icons/iconRegistry.js";
 import { tokens } from "../../tokens/index.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 export type SectionHeadingProps = {
   /** The section's heading text. */

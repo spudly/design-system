@@ -7,7 +7,7 @@ import { FieldRow } from "../../widgets/form/FieldRow.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SearchField } from "../../widgets/form/SearchField.js";
 import { Spinner } from "../../widgets/Spinner.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { BoundedList } from "../shared/BoundedList.js";
 
 /**

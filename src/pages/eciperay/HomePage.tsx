@@ -4,10 +4,10 @@ import { ButtonStack } from "../../widgets/actions/ButtonStack.js";
 import { CenteredText } from "../../widgets/content/CenteredText.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { LoadingCardRow } from "../../widgets/LoadingCardRow.js";
-import { ListStack } from "../../widgets/ListStack.js";
+import { ListStack } from "../../widgets/data/ListStack.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
 
 /**

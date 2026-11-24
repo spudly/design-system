@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 import { SpacedTopStack } from "./SpacedTopStack.js";
 
 const meta: Meta<typeof SpacedTopStack> = {

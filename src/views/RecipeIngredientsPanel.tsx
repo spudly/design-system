@@ -1,13 +1,13 @@
 import { View, XStack, YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { MarkableRow } from "../widgets/MarkableRow.js";
+import { MarkableRow } from "../widgets/data/MarkableRow.js";
 import { NumberStepper } from "../widgets/NumberStepper.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "../widgets/accessibility.js";
 import { Button } from "../widgets/actions/Button.js";
 import { PresetValueSelector, type PresetValueOption } from "../widgets/form/PresetValueSelector.js";
 import { SuggestionPanel } from "../widgets/form/SuggestionPanel.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { useVoice } from "../voice/index.js";
 

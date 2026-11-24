@@ -5,10 +5,10 @@ import { tokens } from "../../tokens/index.js";
 import { politeLiveRegionProps } from "../accessibility.js";
 import { Alert } from "../Alert.js";
 import { Button } from "../actions/Button.js";
-import { ListItem } from "../ListItem.js";
+import { ListItem } from "../data/ListItem.js";
 import { SearchField } from "./SearchField.js";
 import { Spinner } from "../Spinner.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
 export type AutocompletePickerResult = {

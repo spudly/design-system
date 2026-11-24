@@ -3,7 +3,7 @@ import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
 import { TextSkeleton } from "../TextSkeleton.js";
 

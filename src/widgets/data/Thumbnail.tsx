@@ -1,0 +1,187 @@
+import { useEffect, useState } from "react";
+import { Image, YStack, isWeb, styled } from "tamagui";
+import { tokens } from "../../tokens/index.js";
+import { platformAccessibilityProps } from "../accessibility.js";
+
+/**
+ * The hero frame: a recessed gray well the feature image fills —
+ * page-background gray fill, large radius, overflow hidden so
+ * the cover-cropped image's corners follow the frame (a
+ * mismatched-aspect image fills the frame instead of
+ * letterboxing against the gray fill, #573).
+ *
+ * The frame's shape is the image's own aspect ratio (#721, the
+ * recipe-detail visual direction): the widget measures the
+ * image's natural dimensions when it loads and sets the frame's
+ * aspectRatio to the measured ratio, clamped to
+ * [HERO_MIN_ASPECT, HERO_MAX_ASPECT] so an extreme panorama or
+ * a tall screenshot cannot stretch the page; before the image
+ * loads (and if it never reports dimensions) the frame holds
+ * the HERO_FALLBACK_ASPECT shape. The image still cover-fills
+ * the frame, so an image whose ratio clamps crops inside its
+ * clamped frame exactly as it cropped inside the old fixed
+ * 256px frame (#573's treatment, kept).
+ */
+const HERO_FALLBACK_ASPECT = 4 / 3;
+const HERO_MIN_ASPECT = 0.75;
+const HERO_MAX_ASPECT = 2.25;
+
+const StyledHeroFrame = styled(YStack, {
+  name: "ThumbnailHeroFrame",
+
+  backgroundColor: tokens.colors.gray.gray1,
+  borderRadius: tokens.radii.lg,
+  overflow: "hidden",
+  width: "100%",
+});
+
+const StyledBannerImage = styled(Image, {
+  name: "ThumbnailBanner",
+
+  width: "100%",
+  height: 192,
+  objectFit: "cover",
+  borderRadius: tokens.radii.lg,
+});
+
+const StyledRowImage = styled(Image, {
+  name: "ThumbnailRow",
+
+  width: "$16",
+  height: "$16",
+  objectFit: "cover",
+  borderRadius: tokens.radii.md,
+  backgroundColor: tokens.colors.gray.gray1,
+});
+
+export type ThumbnailProps = {
+  /** The image URL. */
+  src: string;
+  /**
+   * The image's presentation: `hero` (default — the detail page's
+   * feature image, cover-cropped to fill its aspect-preserving
+   * recessed frame, #721), `banner`
+   * (a full-width 192px cover image with large rounded corners, the
+   * import/review preview), or `row` (the 64px square list-row
+   * thumbnail, cover-cropped with a gray well behind it).
+   */
+  variant?: "hero" | "banner" | "row";
+  /**
+   * Accessible name for the image. When given, the image is exposed
+   * as an image with this name (the import review names its preview
+   * this way); without it the image is decorative — `alt=""` on web
+   * so no screen reader announces it by filename (list rows name
+   * their press target from the row's title instead). On native a
+   * decorative image carries no `alt` at all: React Native's Image
+   * turns any non-null `alt` into `accessible: true` with that
+   * (empty) label, which would expose the image as an unlabeled
+   * accessibility element (#339).
+   */
+  accessibilityLabel?: string;
+};
+
+/**
+ * A content image with its presentation owned by the design system:
+ * the three shapes the pages used to hand-style out of the raw
+ * Image element — the recipe detail/public pages' hero, the import
+ * review's banner preview, and the recipe list's row thumbnail
+ * (RecipesPage's in-page `Thumbnail` helper, generalized). Extracted
+ * as a shared component for the #119 page de-styling program: the
+ * caller supplies only the image URL (and an accessible name where
+ * the image carries meaning), so the component serves any app's
+ * imagery.
+ */
+/**
+ * Props for a decorative (unnamed) image. On web, `alt=""` keeps
+ * screen readers from announcing the image by filename. On native
+ * the prop set is empty: React Native's Image maps any non-null
+ * `alt` to `accessible: true` plus an accessibilityLabel of that
+ * value, so an empty `alt` would expose the image as an unlabeled
+ * accessibility element instead of leaving it decorative —
+ * verified against the Android accessibility tree in #339.
+ */
+const decorativeImageProps = isWeb ? ({ alt: "" } as const) : ({} as const);
+
+export function Thumbnail({ src, variant = "hero", accessibilityLabel }: ThumbnailProps) {
+  // The hero frame's aspect ratio (#721): the image's measured
+  // natural ratio once it loads, clamped to the hero bounds;
+  // the 4:3 fallback until then. Measurement is widget-internal
+  // (the load event's source dimensions — the same shape on web
+  // and native), so no prop or app change is needed. Only the
+  // hero variant measures; banner and row keep fixed geometry.
+  const [heroAspect, setHeroAspect] = useState(HERO_FALLBACK_ASPECT);
+  const applyMeasuredAspect = (width: number, height: number) => {
+    if (width > 0 && height > 0) {
+      setHeroAspect(Math.min(HERO_MAX_ASPECT, Math.max(HERO_MIN_ASPECT, width / height)));
+    }
+  };
+  const handleHeroLoad = (event: {
+    nativeEvent?: { source?: { width?: number; height?: number } };
+  }) => {
+    const width = event.nativeEvent?.source?.width;
+    const height = event.nativeEvent?.source?.height;
+    if (typeof width === "number" && typeof height === "number") {
+      applyMeasuredAspect(width, height);
+    }
+  };
+  // Web measurement: react-native-web's Image load event does
+  // not reliably carry the source dimensions (and a cached or
+  // data-URI image can finish loading before the handler is
+  // attached), so on web the widget measures with a probe image
+  // whose handler is assigned before its src — the load always
+  // reports. Native measures through the Image onLoad above,
+  // whose event carries the source dimensions.
+  useEffect(() => {
+    if (variant !== "hero") {
+      return;
+    }
+    setHeroAspect(HERO_FALLBACK_ASPECT);
+    if (!isWeb || typeof window === "undefined") {
+      return;
+    }
+    const probe = new window.Image();
+    probe.onload = () => {
+      applyMeasuredAspect(probe.naturalWidth, probe.naturalHeight);
+    };
+    probe.src = src;
+    return () => {
+      probe.onload = null;
+    };
+  }, [src, variant]);
+  // A named image is exposed as an image with that name, routed
+  // through the accessibility translator (Avatar's pattern, #235):
+  // the RN `image` role and label become `role="img"` and
+  // `aria-label` on web instead of leaking as raw attributes. The
+  // `accessible: true` flag rides along for native, where an
+  // image is not an accessibility element by default — without
+  // it the label would never be announced (the translator drops
+  // the flag on web, which needs no equivalent). An unnamed
+  // image is decorative and takes decorativeImageProps instead:
+  // `alt=""` on web (DiscoveryCard's treatment), nothing on
+  // native, where an empty alt is NOT ignored (see the const).
+  const a11yProps = accessibilityLabel
+    ? platformAccessibilityProps({
+        accessible: true,
+        accessibilityRole: "image",
+        accessibilityLabel,
+      })
+    : decorativeImageProps;
+  if (variant === "banner") {
+    return <StyledBannerImage src={src} {...a11yProps} />;
+  }
+  if (variant === "row") {
+    return <StyledRowImage src={src} {...a11yProps} />;
+  }
+  return (
+    <StyledHeroFrame aspectRatio={heroAspect}>
+      <Image
+        src={src}
+        width="100%"
+        height="100%"
+        objectFit="cover"
+        onLoad={handleHeroLoad}
+        {...a11yProps}
+      />
+    </StyledHeroFrame>
+  );
+}

@@ -28,7 +28,7 @@ const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/
 // shared RowTextContent block both card rows compose; the
 // decorative-hiding pin below reads that source, and this row's
 // own pin holds that its native form renders the block decorative.
-const rowTextSource = readFileSync(join(here, "../../..", "src", "widgets", "RowTextContent.tsx"), "utf8");
+const rowTextSource = readFileSync(join(here, "../../..", "src", "widgets", "data", "RowTextContent.tsx"), "utf8");
 const rowTextCode = rowTextSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");

@@ -352,7 +352,7 @@ describe("publicRecipePageAdoption", () => {
       );
     }
     assert.ok(
-      code.includes(`import { StepList } from "../../widgets/StepList.js";`),
+      code.includes(`import { StepList } from "../../widgets/data/StepList.js";`),
       "the page imports the library StepList",
     );
     // RecipeIngredientsPanel is a view since #737, not a widget.
@@ -365,7 +365,7 @@ describe("publicRecipePageAdoption", () => {
     // The view-models pass into the panels unchanged (the shared shapes).
     assert.match(code, /<RecipeIngredientsPanel ingredients=\{ingredients\} \/>/);
     assert.ok(
-      code.includes('import { StepList } from "../../widgets/StepList.js";'),
+      code.includes('import { StepList } from "../../widgets/data/StepList.js";'),
       "the page imports the library StepList for its instructions section (#747)",
     );
     assert.match(code, /label: `Step \$\{step\.stepNumber\}`/, "the page composes each step's Step N label (#747)");

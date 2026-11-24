@@ -4,7 +4,7 @@ import type { GetProps } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { FieldShell } from "../FieldShell.js";
 import { useFieldA11y } from "../../views/useFieldA11y.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const StyledInput = styled(TamaguiInput, {
   name: "TextField",

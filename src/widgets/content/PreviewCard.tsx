@@ -3,7 +3,7 @@ import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 import { TextSkeleton } from "../TextSkeleton.js";
 
 export type PreviewCardProps = {

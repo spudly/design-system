@@ -1,4 +1,4 @@
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
 export type SectionMutedTextProps = {

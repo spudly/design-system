@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Button } from "../../widgets/actions/Button.js";
 import { FormScreenLayout } from "../../widgets/FormScreenLayout.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 
 /**
  * ImportTextPage (#126, B3c): the import-from-text step — the

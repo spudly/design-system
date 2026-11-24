@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { CatalogListColumn } from "./CatalogListColumn.js";
-import { CatalogRow } from "./CatalogRow.js";
-import { Text } from "./Text.js";
+import { CatalogRow } from "./data/CatalogRow.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof CatalogListColumn> = {
   title: "Widgets/CatalogListColumn",

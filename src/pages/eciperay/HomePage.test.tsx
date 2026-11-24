@@ -42,7 +42,7 @@ function findAllByType(node: any, type: any, out: any[] = []): any[] {
 async function loadRow() {
   const runtime = await loadRuntime();
   const rowModule: Record<string, any> = await import("../../../dist/pages/shared/recipeRow.js");
-  const mediaRow: Record<string, any> = await import("../../../dist/widgets/MediaRow.js");
+  const mediaRow: Record<string, any> = await import("../../../dist/widgets/data/MediaRow.js");
   const formWidgets: Record<string, any> =
     await import("../../../dist/widgets/form/RatingStars.js");
   return {

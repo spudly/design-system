@@ -1,6 +1,6 @@
 import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 type ChatTranscriptMessage = {
   /** True for the user's own messages: the bubble aligns to the

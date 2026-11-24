@@ -1,7 +1,7 @@
 import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { Card } from "../Card.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 export type MessageCardProps = {
   /** The state's heading — the card's centered title line. */

@@ -4,7 +4,7 @@ import { CollapsibleIcon } from "../icons/CollapsibleIcon.js";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Collapsible } from "./Collapsible.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 export type AccordionSectionProps = {
   /** Section header label; also the header button's accessible name. */

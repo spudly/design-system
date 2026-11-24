@@ -3,7 +3,7 @@ component: MealPlanDetailPage
 run_when:
   - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
   - "src/widgets/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack."
-  - "src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
+  - "src/widgets/data/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
   - "src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow."
   - "src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow."
   - "src/pages/eciperay/MealPlansPage.tsx, src/pages/eciperay/MealPlanDetailPage.tsx, their stories, or a changeset naming either page."
@@ -81,7 +81,7 @@ stack adds no gap of its own — the rows own their separation.
    (MealPlanDetailPage's Entries card and MealDetailPage's
    Recipes card are the live cases).
 
-**Run when:** `src/widgets/ListStack.tsx`, its stories, the
+**Run when:** `src/widgets/data/ListStack.tsx`, its stories, the
 pages that compose ListStack (MealPlanDetailPage,
 MealDetailPage), or a changeset naming ListStack.
 
@@ -116,7 +116,7 @@ Open in `Widgets/ListItem`: Prefixed, Plain, Disabled.
    suffix; the row does not press, is not focusable, and is
    exposed as disabled.
 
-**Run when:** `src/widgets/ListItem.tsx`, its stories,
+**Run when:** `src/widgets/data/ListItem.tsx`, its stories,
 MealPlanDetailPage's entries, or a changeset naming ListItem.
 
 ## MealPlansPage & MealPlanDetailPage

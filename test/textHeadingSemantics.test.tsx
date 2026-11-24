@@ -42,7 +42,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 test("Text defaults heading variants to the header role with a level (#256)", () => {
-  const source = readCode("src/widgets/Text.tsx");
+  const source = readCode("src/widgets/data/Text.tsx");
   assert.match(
     source,
     /accessibilityRole \?\? \(headingLevel !== undefined \? "header" : undefined\)/,

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack, isWeb } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { ScrollRegion } from "./ScrollRegion.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof ScrollRegion> = {
   title: "Widgets/ScrollRegion",

@@ -246,7 +246,7 @@ test("rows translate the disabled state; the generic rows keep the button role i
   const ROLE = /platformAccessibilityProps\(\{ accessibilityRole: "button" \}\)/;
   const DISABLED = /platformAccessibilityProps\(\{ accessibilityState: \{ disabled: true \} \}\)/;
   const cases: [string, RegExp, RegExp | null][] = [
-    ["src/widgets/ListItem.tsx", ROLE, DISABLED],
+    ["src/widgets/data/ListItem.tsx", ROLE, DISABLED],
     ["src/widgets/CardRow.tsx", ROLE, null],
   ];
   for (const [rel, role, disabled] of cases) {
@@ -267,7 +267,7 @@ test("rows translate the disabled state; the generic rows keep the button role i
   );
 });
 test("ChecklistRow's Checkbox and ProgressBar's Progress route through the translator (#237)", () => {
-  const checklist = readCode("src/widgets/ChecklistRow.tsx");
+  const checklist = readCode("src/widgets/data/ChecklistRow.tsx");
   assert.match(checklist, /platformAccessibilityProps\(\{ accessibilityLabel: label \}\)/);
   assert.ok(!/accessibility(Label|State|Role|Value)=/.test(checklist));
   const progress = readCode("src/widgets/ProgressBar.tsx");

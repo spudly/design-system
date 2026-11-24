@@ -1,4 +1,4 @@
-import { Text, type TextProps } from "../Text.js";
+import { Text, type TextProps } from "../data/Text.js";
 
 export type CenteredTextProps = TextProps & {
   /** Muted ink (the theme's $textMuted) instead of the default

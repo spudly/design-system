@@ -4,7 +4,7 @@ import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/actions/Button.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
 export type LogEntryCardProps = {

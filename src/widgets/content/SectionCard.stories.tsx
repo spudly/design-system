@@ -2,8 +2,8 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { SectionCard } from "./SectionCard.js";
 import { Button } from "../actions/Button.js";
-import { ListItem } from "../ListItem.js";
-import { Text } from "../Text.js";
+import { ListItem } from "../data/ListItem.js";
+import { Text } from "../data/Text.js";
 
 const meta: Meta<typeof SectionCard> = {
   title: "Widgets/Content/SectionCard",

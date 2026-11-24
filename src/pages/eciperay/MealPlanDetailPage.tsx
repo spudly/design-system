@@ -2,16 +2,16 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { DetailRow } from "../../views/DetailRow.js";
-import { ListItem } from "../../widgets/ListItem.js";
+import { ListItem } from "../../widgets/data/ListItem.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../../widgets/TextSkeleton.js";
-import { ListStack } from "../../widgets/ListStack.js";
+import { ListStack } from "../../widgets/data/ListStack.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
-import { WeekDayColumn, WeekDayColumns } from "../../widgets/WeekDayColumn.js";
+import { WeekDayColumn, WeekDayColumns } from "../../widgets/data/WeekDayColumn.js";
 
 /**
  * MealPlanDetailPage (#49): Eciperay's meal plan detail screen as

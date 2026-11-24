@@ -2,7 +2,7 @@ export { Accordion, type AccordionItem, type AccordionProps } from "./Accordion.
 export { AccordionSection, type AccordionSectionProps } from "./AccordionSection.js";
 export { Alert, type AlertProps } from "./Alert.js";
 export { ActionBar, type ActionBarProps } from "./actions/ActionBar.js";
-export { Avatar, type AvatarProps } from "./Avatar.js";
+export { Avatar, type AvatarProps } from "./data/Avatar.js";
 export {
   AutocompletePicker,
   type AutocompletePickerProps,
@@ -10,19 +10,19 @@ export {
   type AutocompletePickerSelectedItem,
 } from "./form/AutocompletePicker.js";
 export { BackLink, type BackLinkProps } from "./actions/BackLink.js";
-export { Badge, type BadgeProps } from "./Badge.js";
-export { BlankWord, type BlankWordProps } from "./BlankWord.js";
+export { Badge, type BadgeProps } from "./data/Badge.js";
+export { BlankWord, type BlankWordProps } from "./data/BlankWord.js";
 export { Button, type ButtonProps } from "./actions/Button.js";
 export { Card, type CardProps } from "./Card.js";
 export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";
 export { CheckboxField, type CheckboxFieldProps } from "./CheckboxField.js";
-export { ChecklistRow, type ChecklistRowProps } from "./ChecklistRow.js";
+export { ChecklistRow, type ChecklistRowProps } from "./data/ChecklistRow.js";
 export { Collapsible, type CollapsibleProps } from "./Collapsible.js";
 export { Center, type CenterProps } from "./Center.js";
 export { ColorPickerField, type ColorPickerFieldProps } from "./form/ColorPickerField.js";
 export { Dialog, type DialogProps } from "./Dialog.js";
 export { DiscoveryCard, type DiscoveryCardProps } from "./content/DiscoveryCard.js";
-export { Divider, type DividerProps } from "./Divider.js";
+export { Divider, type DividerProps } from "./data/Divider.js";
 export {
   Dropdown,
   useDropdownClose,
@@ -41,21 +41,21 @@ export {
   type MasonryGridProps,
 } from "./MasonryGrid.js";
 export { CardRow, type CardRowProps } from "./CardRow.js";
-export { ListItem, type ListItemProps } from "./ListItem.js";
+export { ListItem, type ListItemProps } from "./data/ListItem.js";
 export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./content/MessageCard.js";
-export { MetadataBadge, type MetadataBadgeProps } from "./MetadataBadge.js";
+export { MetadataBadge, type MetadataBadgeProps } from "./data/MetadataBadge.js";
 export { OptionCard, type OptionCardProps } from "./content/OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./actions/PrevNextNav.js";
 export { ProgressBar, type ProgressBarProps } from "./ProgressBar.js";
 export { ButtonRow, type ButtonRowProps } from "./actions/ButtonRow.js";
 export { CardStack, type CardStackProps } from "./CardStack.js";
-export { ListStack, type ListStackProps } from "./ListStack.js";
+export { ListStack, type ListStackProps } from "./data/ListStack.js";
 export { LinkStack, type LinkStackProps } from "./actions/LinkStack.js";
 export { LoadingCardRow } from "./LoadingCardRow.js";
 export { LoadingListItem } from "./LoadingListItem.js";
 export { LoadingActionCardRow, type LoadingActionCardRowProps } from "./LoadingActionCardRow.js";
-export { CatalogRow, type CatalogRowProps } from "./CatalogRow.js";
+export { CatalogRow, type CatalogRowProps } from "./data/CatalogRow.js";
 export { CatalogCardColumn, type CatalogCardColumnProps } from "./CatalogCardColumn.js";
 export { CatalogListColumn, type CatalogListColumnProps } from "./CatalogListColumn.js";
 export { LoadingMediaRow } from "./LoadingMediaRow.js";
@@ -72,7 +72,7 @@ export { CardGrid, type CardGridProps } from "./CardGrid.js";
 export { BannerRow, type BannerRowProps } from "./BannerRow.js";
 export { ProseColumn, type ProseColumnProps } from "./ProseColumn.js";
 export { ProseStack, type ProseStackProps } from "./ProseStack.js";
-export { BulletList, type BulletListProps } from "./BulletList.js";
+export { BulletList, type BulletListProps } from "./data/BulletList.js";
 export { ChatTranscript, type ChatTranscriptProps } from "./content/ChatTranscript.js";
 export { FieldRow, type FieldRowProps } from "./form/FieldRow.js";
 export { SectionStack, type SectionStackProps } from "./SectionStack.js";
@@ -103,19 +103,19 @@ export {
 export { TextSkeleton, type TextSkeletonProps } from "./TextSkeleton.js";
 export { Spinner, type SpinnerProps } from "./Spinner.js";
 export { StarRatingInput, type StarRatingInputProps } from "./form/StarRatingInput.js";
-export { StatBand, type StatBandProps } from "./StatBand.js";
-export { StatCard, type StatCardProps } from "./StatCard.js";
-export { StatRow, type StatRowProps } from "./StatRow.js";
-export { StepDots, type StepDotsProps } from "./StepDots.js";
+export { StatBand, type StatBandProps } from "./data/StatBand.js";
+export { StatCard, type StatCardProps } from "./data/StatCard.js";
+export { StatRow, type StatRowProps } from "./data/StatRow.js";
+export { StepDots, type StepDotsProps } from "./data/StepDots.js";
 export { Switch, type SwitchProps } from "./form/Switch.js";
 export { Tabs, type TabsProps } from "./actions/Tabs.js";
 export { useTagColorResolver, useTagColorShadeResolver } from "./tagColors.js";
-export { Text, type TextProps } from "./Text.js";
-export { Thumbnail, type ThumbnailProps } from "./Thumbnail.js";
+export { Text, type TextProps } from "./data/Text.js";
+export { Thumbnail, type ThumbnailProps } from "./data/Thumbnail.js";
 export { TextLink, type TextLinkProps } from "./actions/TextLink.js";
 export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./Toast.js";
-export { TokenRow, type TokenRowProps } from "./TokenRow.js";
-export { VerseText, type VerseTextProps } from "./VerseText.js";
+export { TokenRow, type TokenRowProps } from "./data/TokenRow.js";
+export { VerseText, type VerseTextProps } from "./data/VerseText.js";
 // The #119 dedupe set: the canonical components the tranche
 // branches coined independently, shipped once here (the
 // tranche PRs adopt these in their update rounds).
@@ -126,7 +126,7 @@ export { FormHeading, type FormHeadingProps } from "./content/FormHeading.js";
 export { FormStack, type FormStackProps } from "./FormStack.js";
 export { LabeledField, type LabeledFieldProps } from "./form/LabeledField.js";
 export { LabeledGroup, type LabeledGroupProps } from "./form/LabeledGroup.js";
-export { MarkableRow, type MarkableRowProps } from "./MarkableRow.js";
+export { MarkableRow, type MarkableRowProps } from "./data/MarkableRow.js";
 export { PinnedHeaderShell, type PinnedHeaderShellProps } from "./PinnedHeaderShell.js";
 export {
   PresetValueSelector,
@@ -139,14 +139,14 @@ export {
   type RatingsCardProps,
   type RatingsCardRatings,
   type RatingsCardViewerRating,
-} from "./RatingsCard.js";
+} from "./data/RatingsCard.js";
 export { ScreenShell, type ScreenShellProps } from "./ScreenShell.js";
 export { ScrollShell, type ScrollShellProps } from "./ScrollShell.js";
 export { SectionHeading, type SectionHeadingProps } from "./content/SectionHeading.js";
 export { SessionShell, type SessionShellProps } from "./SessionShell.js";
-export { StepList, type StepListProps } from "./StepList.js";
+export { StepList, type StepListProps } from "./data/StepList.js";
 export { SuggestionPanel, type SuggestionPanelProps } from "./form/SuggestionPanel.js";
-export { TagList, type TagListProps } from "./TagList.js";
+export { TagList, type TagListProps } from "./data/TagList.js";
 export { TextActionCardRow, type TextActionCardRowProps } from "./content/TextActionCardRow.js";
 
 // The #119 extraction set: the components the tranche PRs
@@ -162,7 +162,7 @@ export {
   type NutritionFacts,
   type NutritionPanelData,
   type NutritionPanelProps,
-} from "./NutritionPanel.js";
+} from "./data/NutritionPanel.js";
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./content/PreviewCard.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
@@ -173,7 +173,7 @@ export {
   WeekDayColumns,
   type WeekDayColumnProps,
   type WeekDayColumnsProps,
-} from "./WeekDayColumn.js";
+} from "./data/WeekDayColumn.js";
 // The #698 tranche-3 extraction set: the layout and loading
 // components the recipe views' de-styling extracted.
 export { Row, type RowProps } from "./Row.js";
@@ -210,7 +210,7 @@ export {
   type AppTopBarNavItem,
   type AppTopBarProps,
 } from "./AppTopBar.js";
-export { CandidateList, type CandidateListProps } from "./CandidateList.js";
+export { CandidateList, type CandidateListProps } from "./data/CandidateList.js";
 export { ChangedListBanner, type ChangedListBannerProps } from "./ChangedListBanner.js";
 export { LegalSection, type LegalSectionProps } from "./content/LegalSection.js";
 export { RatingForm, type RatingFormProps } from "./RatingForm.js";

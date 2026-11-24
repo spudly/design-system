@@ -1,8 +1,8 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { LabelRow } from "../LabelRow.js";
-import { Text } from "../Text.js";
+import { LabelRow } from "../data/LabelRow.js";
+import { Text } from "../data/Text.js";
 
 export type LabeledFieldProps = {
   /** The field's label, rendered in the FieldLabel treatment. */

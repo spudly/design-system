@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { FormScreenLayout } from "./FormScreenLayout.js";
 import { Button } from "./actions/Button.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 import { TextField } from "../widgets/form/TextField.js";
 
 const meta: Meta<typeof FormScreenLayout> = {

@@ -2,7 +2,7 @@ import { FormStack } from "../widgets/FormStack.js";
 import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
 import { PasswordField } from "../widgets/form/PasswordField.js";
 import { TextField } from "../widgets/form/TextField.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
 import { useVoice } from "../voice/index.js";
 

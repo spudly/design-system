@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { useState } from "react";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { Alert } from "../../widgets/Alert.js";
-import { Badge } from "../../widgets/Badge.js";
+import { Badge } from "../../widgets/data/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { CardStack } from "../../widgets/CardStack.js";
@@ -12,7 +12,7 @@ import { FormStack } from "../../widgets/FormStack.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { TrailingActionsRow } from "../../widgets/actions/TrailingActionsRow.js";
 

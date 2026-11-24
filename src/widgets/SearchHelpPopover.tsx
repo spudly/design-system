@@ -3,7 +3,7 @@ import { Adapt, Popover, Sheet, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps } from "./accessibility.js";
 import { Button } from "./actions/Button.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 /**
  * One help entry (#699): a syntax token (or phrase pattern) and

@@ -1,6 +1,6 @@
 import { XStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 
 export type DetailRowProps = {
   /** The row's label, rendered muted on the leading edge. */

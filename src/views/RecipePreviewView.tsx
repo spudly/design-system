@@ -1,5 +1,5 @@
 import { CompactStack } from "../widgets/CompactStack.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 
 /**
  * RecipePreviewView (#684): the parsed-recipe preview the

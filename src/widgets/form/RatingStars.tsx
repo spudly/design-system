@@ -1,7 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const STAR_STEPS = [1, 2, 3, 4, 5] as const;
 

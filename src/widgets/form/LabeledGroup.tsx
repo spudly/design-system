@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { YStack } from "tamagui";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
-import { LabelRow } from "../LabelRow.js";
+import { LabelRow } from "../data/LabelRow.js";
 
 export type LabeledGroupProps = {
   /** The group's label, rendered in the FieldLabel treatment. */

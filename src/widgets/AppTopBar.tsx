@@ -7,7 +7,7 @@ import { BrandLink } from "./actions/BrandLink.js";
 import { PageContentColumn } from "./PageContentColumn.js";
 import { Button } from "./actions/Button.js";
 import { LinkOverlay } from "./linkOverlay.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 import { SearchField } from "./form/SearchField.js";
 
 /**

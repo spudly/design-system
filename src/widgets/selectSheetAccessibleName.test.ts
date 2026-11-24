@@ -8,7 +8,7 @@
  * pin holds the fix in the component: the Sheet carries the
  * field's label, with the voice object's selectOptionLabel as the
  * fallback when the field has no label (#539). Source-contract
- * pattern follows the textFontContext block in src/widgets/Text.test.ts.
+ * pattern follows the textFontContext block in src/widgets/data/Text.test.ts.
  */
 import "../../test/registerSvgStub.js";
 import assert from "node:assert/strict";

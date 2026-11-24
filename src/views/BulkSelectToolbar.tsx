@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
 import { Button } from "../widgets/actions/Button.js";
 import { SkeletonBone } from "../widgets/SkeletonClock.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { LINE_BOXES } from "../widgets/TextSkeleton.js";
 import { SearchField } from "../widgets/form/SearchField.js";
 import { useVoice } from "../voice/index.js";

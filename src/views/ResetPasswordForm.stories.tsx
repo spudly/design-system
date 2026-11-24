@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { ResetPasswordForm } from "./ResetPasswordForm.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 
 const meta: Meta<typeof ResetPasswordForm> = {
   title: "Views/ResetPasswordForm",

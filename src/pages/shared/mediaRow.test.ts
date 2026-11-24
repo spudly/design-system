@@ -56,7 +56,7 @@ function code(file: string) {
 
 const page = strip(
   readFileSync(join(here, "../../..", "src", "pages", "shared", "recipeRow.tsx"), "utf8") +
-    readFileSync(join(here, "../../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "widgets", "data", "MediaRow.tsx"), "utf8") +
     readFileSync(join(here, "../../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8"),
 );
 const mediaRow = page.slice(page.indexOf("const textBlockStyle"), page.indexOf("const STAR_STEPS"));

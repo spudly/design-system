@@ -133,7 +133,7 @@ test("MealPlanDetailPage's title takes the title variant — xl bold at level 1 
     0,
     "MealPlanDetailPage must not keep a subheading usage",
   );
-  const text = readCode("src/widgets/Text.tsx");
+  const text = readCode("src/widgets/data/Text.tsx");
   assert.match(
     text,
     /title: \{\s+fontSize: tokens\.typography\.fontSize\.xl,\s+fontWeight: tokens\.typography\.fontWeight\.bold,\s+\}/,

@@ -1,7 +1,7 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { Button } from "../actions/Button.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 export type CreatedSecretPanelProps = {
   /** The panel's title (e.g. "Your new token"). */

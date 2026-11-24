@@ -5,19 +5,19 @@ import { Button } from "../../widgets/actions/Button.js";
 import { CenteredText } from "../../widgets/content/CenteredText.js";
 import { tokens } from "../../tokens/index.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
-import { CandidateList } from "../../widgets/CandidateList.js";
+import { CandidateList } from "../../widgets/data/CandidateList.js";
 import { BoxSkeleton } from "../../widgets/BoxSkeleton.js";
-import { ListStack } from "../../widgets/ListStack.js";
+import { ListStack } from "../../widgets/data/ListStack.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../../widgets/TextSkeleton.js";
 import { LogEntryCard } from "../../views/LogEntryCard.js";
-import { MarkableRow } from "../../widgets/MarkableRow.js";
+import { MarkableRow } from "../../widgets/data/MarkableRow.js";
 import {
   NutritionPanel,
   type NutritionFact,
   type NutritionFactKind,
   type NutritionPanelData,
-} from "../../widgets/NutritionPanel.js";
+} from "../../widgets/data/NutritionPanel.js";
 import { NumberStepper } from "../../widgets/NumberStepper.js";
 import { PanelStack } from "../../widgets/PanelStack.js";
 import {
@@ -29,21 +29,21 @@ import {
   type RatingsCardCommunityRating,
   type RatingsCardRatings,
   type RatingsCardViewerRating,
-} from "../../widgets/RatingsCard.js";
+} from "../../widgets/data/RatingsCard.js";
 import { ScreenShell } from "../../widgets/ScreenShell.js";
 import { ScrollRegion } from "../../widgets/ScrollRegion.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import { SelectField } from "../../widgets/form/SelectField.js";
-import { StatBand } from "../../widgets/StatBand.js";
-import { StatCard } from "../../widgets/StatCard.js";
-import { Badge } from "../../widgets/Badge.js";
-import { MetadataBadge } from "../../widgets/MetadataBadge.js";
+import { StatBand } from "../../widgets/data/StatBand.js";
+import { StatCard } from "../../widgets/data/StatCard.js";
+import { Badge } from "../../widgets/data/Badge.js";
+import { MetadataBadge } from "../../widgets/data/MetadataBadge.js";
 import { StatusMessage } from "../../views/StatusMessage.js";
-import { StepList } from "../../widgets/StepList.js";
+import { StepList } from "../../widgets/data/StepList.js";
 import { SuggestionPanel } from "../../widgets/form/SuggestionPanel.js";
-import { TagList } from "../../widgets/TagList.js";
-import { Text } from "../../widgets/Text.js";
-import { Thumbnail } from "../../widgets/Thumbnail.js";
+import { TagList } from "../../widgets/data/TagList.js";
+import { Text } from "../../widgets/data/Text.js";
+import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 import { Toolbar } from "../../widgets/actions/Toolbar.js";
 import { ConfirmActionView, type ConfirmActionViewProps } from "../../views/ConfirmActionView.js";
 import {
