@@ -160,6 +160,9 @@ const COMPONENT_STORY_EXCEPTIONS = new Set([
   // flag for pages' web/native layout choice. Not a component.
   "platform.ts",
   "accessibility.ts",
+  // layout.ts (#746): the shared Row/Col/Spacer style resolver —
+  // not a component; exercised through the Row/Col/Spacer stories.
+  "layout.ts",
   "keyboardActivation.ts",
   "index.ts",
   "modalRegistry.ts",
