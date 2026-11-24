@@ -22,3 +22,18 @@ export const Default: Story = {
     </YStack>
   ),
 };
+
+export const WithIcon: Story = {
+  // #721: the opt-in icon form — the named glyph in the primary
+  // ink beside the heading text (RecipeDetailPage's Ingredients
+  // heading).
+  render: () => (
+    <YStack maxWidth={430}>
+      <SectionHeading icon="list">Ingredients</SectionHeading>
+      <YStack padding="$4">
+        <Text variant="hint">The heading carries the list glyph beside its text.</Text>
+      </YStack>
+      <SectionHeading>Instructions</SectionHeading>
+    </YStack>
+  ),
+};

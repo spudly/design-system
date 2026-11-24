@@ -217,13 +217,16 @@ describe("recipesPageBoundedList", () => {
     // #668: page stories no longer carry a local Viewport frame — the
     // Storybook preview decorator frames them from the dsViewport
     // resolution (toolbar global, then the story's dsViewport
-    // parameter, then the "phone" preset), which pins captures at
-    // 430×844 for stories without their own default frame.
+    // parameter, then the default preset). #754: that default is now
+    // the responsive "full" preset, so stories without their own
+    // default frame present full-width instead of in a 430×844 phone
+    // frame; the phone preset's geometry below still applies when
+    // the phone frame is selected explicitly.
     const preview = readFileSync(join(pagesDir, "../../.storybook/preview.tsx"), "utf8");
     assert.match(
       preview,
-      /context\.parameters\.dsViewport as string \| undefined\) \?\?\s+"phone"/,
-      "the preview falls back through the story's dsViewport parameter to the phone preset, pinning captures to the phone frame",
+      /context\.parameters\.dsViewport as string \| undefined\) \?\?\s+"full"/,
+      "the preview falls back through the story's dsViewport parameter to the full preset, presenting page stories full-width by default (#754)",
     );
     assert.match(
       preview,

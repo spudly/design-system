@@ -1,0 +1,27 @@
+import type { Meta, StoryObj } from "@storybook/react";
+import { YStack } from "tamagui";
+import { LoadingScope } from "../contexts/LoadingScope.js";
+import { ListStack } from "./ListStack.js";
+import { LoadingListItem } from "./LoadingListItem.js";
+
+const meta: Meta<typeof LoadingListItem> = {
+  title: "Widgets/LoadingListItem",
+  component: LoadingListItem,
+};
+
+export default meta;
+type Story = StoryObj<typeof LoadingListItem>;
+
+export const Default: Story = {
+  render: () => (
+    <YStack maxWidth={430}>
+      <LoadingScope active>
+        <ListStack>
+          <LoadingListItem />
+          <LoadingListItem />
+          <LoadingListItem />
+        </ListStack>
+      </LoadingScope>
+    </YStack>
+  ),
+};

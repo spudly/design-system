@@ -6,7 +6,7 @@
  *
  * The forms tranche's wider set was split by disposition in the
  * adoption rounds: FieldLabelBlock and StepperGroup composed
- * away into LabeledGroup and FormStack, while FieldColumns
+ * away into LabeledGroup and FormStack, while EqualColumns
  * is a genuine library component — it ships in the #119
  * extraction set and is pinned here alongside the dedupe set.
  * FormSubmit was removed in #478 (a logic-free wrapper whose
@@ -21,7 +21,7 @@
  *   were deleted: prop surface shape is enforced by the
  *   TypeScript build, not a test (Stephen, 2026-11-20).
  * - The owned-geometry source scans (label separations,
- *   FormStack rhythm, FieldColumns gutter, FormHeading
+ *   FormStack rhythm, EqualColumns gutter, FormHeading
  *   separation, the banner's warning wash, the shared
  *   LabelRow wiring) were deleted: styled-component geometry
  *   is not observable from rendered output. The observable
@@ -53,7 +53,7 @@ const COMPONENTS = [
   "LabeledGroup",
   "RevertAction",
   "ChangedListBanner",
-  "FieldColumns",
+  "EqualColumns",
   "FormStack",
   "FormHeading",
 ];
@@ -196,13 +196,13 @@ test("SSR: FormHeading renders its title and optional subtitle; FormStack render
   );
   assert.ok(stackHtml.includes("First field") && stackHtml.includes("Second field"));
 });
-test("SSR: FieldColumns renders every child", async () => {
-  const { FieldColumns, Text } = await loadRuntime();
+test("SSR: EqualColumns renders every child", async () => {
+  const { EqualColumns, Text } = await loadRuntime();
   const html = await renderToHtml(
-    <FieldColumns>
+    <EqualColumns>
       <Text>Left column</Text>
       <Text>Right column</Text>
-    </FieldColumns>,
+    </EqualColumns>,
   );
   assert.ok(html.includes("Left column") && html.includes("Right column"));
 });

@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { Button } from "../widgets/Button.js";
 import { CardStack } from "../widgets/CardStack.js";
-import { EmptyState } from "../widgets/EmptyState.js";
+import { EmptyState } from "../views/EmptyState.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
 import { PinnedHeaderShell } from "../widgets/PinnedHeaderShell.js";
 import { LoadingActionCardRow } from "../widgets/LoadingActionCardRow.js";

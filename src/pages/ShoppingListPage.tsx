@@ -1,8 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../widgets/BigFooter.js";
 import { CheckboxField } from "../widgets/CheckboxField.js";
-import { EmptyState } from "../widgets/EmptyState.js";
+import { EmptyState } from "../views/EmptyState.js";
 import { ListStack } from "../widgets/ListStack.js";
-import { LoadingListRow } from "../widgets/LoadingListRow.js";
+import { LoadingListItem } from "../widgets/LoadingListItem.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
 import { ScreenContainer } from "../widgets/ScreenContainer.js";
 import { SectionStack } from "../widgets/SectionStack.js";
@@ -99,7 +99,7 @@ export function ShoppingListPage({
             <LoadingScope active>
               <ListStack>
                 {LOADING_LINE_KEYS.map((key) => (
-                  <LoadingListRow key={key} />
+                  <LoadingListItem key={key} />
                 ))}
               </ListStack>
             </LoadingScope>

@@ -2,13 +2,14 @@ import { base, react, typescriptPendingIgnores } from "@spudly/eslint-config";
 
 import pageStyling from "./eslintRules/noPageStyling.mjs";
 import marginSpacing from "./eslintRules/noMarginSpacing.mjs";
+import sourceReadsInTests from "./eslintRules/noSourceReadsInTests.mjs";
 
 // The repo-local design-system plugin: the #119 page-styling rule
 // and the #209 margin-spacing rule, registered under one namespace
 // (flat config cannot register the same namespace twice for one
 // file with different plugin objects).
 const designSystem = {
-  rules: { ...pageStyling.rules, ...marginSpacing.rules },
+  rules: { ...pageStyling.rules, ...marginSpacing.rules, ...sourceReadsInTests.rules },
 };
 
 // Shared config: @spudly/eslint-config (ported from Eciperay's
@@ -106,6 +107,19 @@ export default [
     files: ["src/widgets/**/*.tsx", "src/views/**/*.tsx"],
     plugins: { "design-system": designSystem },
     rules: { "design-system/no-margin-spacing": "error" },
+  },
+  {
+    // #772 (split from #733): test files must not read JS/TS source
+    // files — source-string pins protect spelling, not behavior.
+    // Adopted WARN-first; promotion to error waits until #733's
+    // conversion tranches burn the warnings down. Reads of dist
+    // output, declaration files, and data files stay allowed (the
+    // audit's LEGIT class). DORMANT in CI beside the other local
+    // rules until the TS lint restoration. Rule:
+    // eslintRules/noSourceReadsInTests.mjs.
+    files: ["src/**/*.test.ts", "src/**/*.test.tsx", "test/**/*.ts", "test/**/*.tsx"],
+    plugins: { "design-system": designSystem },
+    rules: { "design-system/no-source-reads-in-tests": "warn" },
   },
   {
     // Stories are Storybook scaffolding, not shipped page components:

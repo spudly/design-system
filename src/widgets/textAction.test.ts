@@ -40,7 +40,7 @@ function readCode(rel: string) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
-const commentItem = readCode("src/widgets/CommentItem.tsx");
+const commentItem = readCode("src/views/CommentItem.tsx");
 const textActionCardRow = readCode("src/widgets/TextActionCardRow.tsx");
 const changedListBanner = readCode("src/widgets/ChangedListBanner.tsx");
 const revertAction = readCode("src/views/RevertAction.tsx");

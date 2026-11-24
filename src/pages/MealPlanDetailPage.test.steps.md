@@ -5,7 +5,7 @@ run_when:
   - "src/widgets/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack."
   - "src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
   - "src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow."
-  - "src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow."
+  - "src/widgets/ListItem.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListItem."
   - "src/pages/MealPlansPage.tsx, src/pages/MealPlanDetailPage.tsx, their stories, or a changeset naming either page."
 ---
 
@@ -99,9 +99,9 @@ Open in `Widgets/DetailRow`: Default, Stacked.
 MealPlanDetailPage (the nutrition-goal rows), or a changeset
 naming DetailRow.
 
-## ListRow
+## ListItem
 
-Open in `Widgets/ListRow`: Prefixed, Plain, Disabled.
+Open in `Widgets/ListItem`: Prefixed, Plain, Disabled.
 
 1. Prefixed: the title line reads "Meal · Taco Tuesday" (the
    prefix is caller-supplied content) in medium weight over the
@@ -116,8 +116,8 @@ Open in `Widgets/ListRow`: Prefixed, Plain, Disabled.
    suffix; the row does not press, is not focusable, and is
    exposed as disabled.
 
-**Run when:** `src/widgets/ListRow.tsx`, its stories,
-MealPlanDetailPage's entries, or a changeset naming ListRow.
+**Run when:** `src/widgets/ListItem.tsx`, its stories,
+MealPlanDetailPage's entries, or a changeset naming ListItem.
 
 ## MealPlansPage & MealPlanDetailPage
 

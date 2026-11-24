@@ -23,7 +23,7 @@
  * (pre-existing behavior). Since the #119 meals & planning
  * tranche the meal rows render through the generic
  * TextActionCardRow, and MealDetailPage's member rows through
- * ListRow, so both pins now live on the components.
+ * ListItem, so both pins now live on the components.
  *
  * Source scan, not a render test: the failures it guards happen
  * on Android accessibility services, which no JS renderer in this
@@ -53,10 +53,10 @@ function count(code: string, literal: any) {
 // from RecipesPage), and the third element is the file's
 // decorative-text count. Two of the surfaces live in the
 // generic row components since the #119 extractions: the plan
-// rows in CardRow and the entry rows in ListRow. The meals &
+// rows in CardRow and the entry rows in ListItem. The meals &
 // planning tranche added a third generic surface: MealsHubPage's
 // meal rows in TextActionCardRow (MealDetailPage's member rows
-// are ListRow's surface, already counted above). The recipe
+// are ListItem's surface, already counted above). The recipe
 // list's rows are RecipesPage's page-local MediaRow
 // composition (Stephen's tranche rule, 2026-10-29), so its
 // surface was recipeRow.tsx, the shared row module (#657); since
@@ -68,10 +68,10 @@ function count(code: string, literal: any) {
 const FAMILY: [string, string, number][] = [
   ["src/widgets/OptionCard.tsx", "decorative", 3],
   ["src/widgets/RowTextContent.tsx", "decorative", 2],
-  // ListRow's subtitle renders through RowTextContent's shared
+  // ListItem's subtitle renders through RowTextContent's shared
   // subtitle line since #587 phase 3, so only its title line
   // counts here; the subtitle is counted on RowTextContent.
-  ["src/widgets/ListRow.tsx", "decorative", 1],
+  ["src/widgets/ListItem.tsx", "decorative", 1],
   ["src/widgets/MediaRow.tsx", "native", 3],
 ];
 
