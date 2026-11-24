@@ -430,7 +430,7 @@ describe("buttonNoStyleProps", () => {
     assert.match(button, /tokens\.colors\.danger\.danger8/);
   });
   test("NutritionPanel passes no styling props into Button (#480)", () => {
-    const panel = read("src/widgets/NutritionPanel.tsx");
+    const panel = read("src/widgets/data/NutritionPanel.tsx");
     assert.doesNotMatch(panel, /backgroundColor=\{tokens\.colors\.gray/);
     assert.match(
       panel,
@@ -527,8 +527,8 @@ describe("buttonWebAria", () => {
   }
   const accessibility = readCode("src/widgets/accessibility.ts");
   const button = readCode("src/widgets/actions/Button.tsx");
-  const text = readCode("src/widgets/Text.tsx");
-  const blankWord = readCode("src/widgets/BlankWord.tsx");
+  const text = readCode("src/widgets/data/Text.tsx");
+  const blankWord = readCode("src/widgets/data/BlankWord.tsx");
   test("platformAccessibilityProps is the shared translator with a web and a native branch (#235)", () => {
     assert.match(accessibility, /export function platformAccessibilityProps/);
     assert.match(accessibility, /if \(!isWeb\)/, "native must short-circuit unchanged");
@@ -583,7 +583,7 @@ describe("buttonWebAria", () => {
     );
   });
   test("Text routes caller accessibility props through the same translator (#235)", () => {
-    assert.match(text, /from "\.\/accessibility\.js"/);
+    assert.match(text, /from "\.\.\/accessibility\.js"/);
     assert.match(text, /platformAccessibilityProps\(\{/);
     assert.match(text, /\{\.\.\.a11yProps\}/);
     assert.ok(
@@ -596,15 +596,15 @@ describe("buttonWebAria", () => {
       blankWord,
       /accessibilityLabel=\{`Reveal blank word \$\{index \+ 1\} of \$\{total\}`\}/,
     );
-    assert.match(blankWord, /from "\.\/actions\/Button\.js"/);
+    assert.match(blankWord, /from "\.\.\/actions\/Button\.js"/);
   });
   const STACK_PRESSABLES = [
     "src/widgets/RatingForm.tsx",
     "src/widgets/form/ColorPickerField.tsx",
     "src/widgets/form/SearchField.tsx",
     "src/widgets/form/StarRatingInput.tsx",
-    "src/widgets/StepDots.tsx",
-    "src/widgets/Avatar.tsx",
+    "src/widgets/data/StepDots.tsx",
+    "src/widgets/data/Avatar.tsx",
   ];
   test("NumberStepper: group container and value input route through the translator; its buttons are DS Buttons (#235)", () => {
     const code = readCode("src/widgets/NumberStepper.tsx");

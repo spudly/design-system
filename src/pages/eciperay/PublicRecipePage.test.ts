@@ -10,7 +10,7 @@ const componentsDir = join(here, "../../..", "src", "widgets");
 const viewsDir = join(here, "../../..", "src", "views");
 const source = readFileSync(join(pagesDir, "eciperay", "PublicRecipePage.tsx"), "utf8");
 const index = readFileSync(join(pagesDir, "index.ts"), "utf8");
-const ratingsSource = readFileSync(join(componentsDir, "RatingsCard.tsx"), "utf8");
+const ratingsSource = readFileSync(join(componentsDir, "data/RatingsCard.tsx"), "utf8");
 const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
 
 // Strip block and line comments so documented patterns in prose
@@ -352,7 +352,7 @@ describe("publicRecipePageAdoption", () => {
       );
     }
     assert.ok(
-      code.includes(`import { StepList } from "../../widgets/StepList.js";`),
+      code.includes(`import { StepList } from "../../widgets/data/StepList.js";`),
       "the page imports the library StepList",
     );
     // RecipeIngredientsPanel is a view since #737, not a widget.
@@ -365,7 +365,7 @@ describe("publicRecipePageAdoption", () => {
     // The view-models pass into the panels unchanged (the shared shapes).
     assert.match(code, /<RecipeIngredientsPanel ingredients=\{ingredients\} \/>/);
     assert.ok(
-      code.includes('import { StepList } from "../../widgets/StepList.js";'),
+      code.includes('import { StepList } from "../../widgets/data/StepList.js";'),
       "the page imports the library StepList for its instructions section (#747)",
     );
     assert.match(code, /label: `Step \$\{step\.stepNumber\}`/, "the page composes each step's Step N label (#747)");

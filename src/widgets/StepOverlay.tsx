@@ -12,7 +12,7 @@ import {
   unregisterModalLayer,
 } from "./modalRegistry.js";
 import type { ModalLayer } from "./modalRegistry.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 import { PageContentColumn } from "./PageContentColumn.js";
 import { useVoice } from "../voice/index.js";
 

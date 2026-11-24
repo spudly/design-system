@@ -2,7 +2,7 @@ import { Anchor, XStack, styled, useTheme } from "tamagui";
 import { BackIcon } from "../../icons/BackIcon.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
 /**

@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { PanelStack } from "./PanelStack.js";
-import { StatBand } from "./StatBand.js";
-import { StatCard } from "./StatCard.js";
-import { Text } from "./Text.js";
+import { StatBand } from "./data/StatBand.js";
+import { StatCard } from "./data/StatCard.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof PanelStack> = {
   title: "Widgets/PanelStack",

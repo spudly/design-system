@@ -56,7 +56,7 @@
  *    the loading state is a skeleton composition (#278 tranche 4), the entry
  *    rows are the generic ListItem widget (its pressable area,
  *    hairline, and disabled treatment live there — pinned in
- *    src/widgets/ListItem.test.ts; the page supplies the kind prefix,
+ *    src/widgets/data/ListItem.test.ts; the page supplies the kind prefix,
  *    the unavailable suffix, and the disabled flag as content),
  *    the goal rows are DetailRow
  *    widgets, the plan title takes Text's `title` variant, the
@@ -157,7 +157,7 @@ test("entry rows are links carrying the entry href, by kind", () => {
   assert.match(
     code,
     /<ListItem[\s\S]*?href=\{entry\.href\}/,
-    "entry rows must render through ListItem in its link form, carrying the entry's href (the link rendering itself is pinned in src/widgets/ListItem.test.ts)",
+    "entry rows must render through ListItem in its link form, carrying the entry's href (the link rendering itself is pinned in src/widgets/data/ListItem.test.ts)",
   );
   assert.match(code, /kind: "meal" \| "recipe";/, "entries must carry their kind");
   assert.match(
@@ -172,7 +172,7 @@ test("entries render through ListItem, with the kind prefix and availability as 
   assert.match(
     code,
     /<ListItem/,
-    "entry rows must render through the ListItem widget — its disabled state and link wiring are pinned in src/widgets/ListItem.test.ts",
+    "entry rows must render through the ListItem widget — its disabled state and link wiring are pinned in src/widgets/data/ListItem.test.ts",
   );
   assert.match(
     code,

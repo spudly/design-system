@@ -7,8 +7,8 @@ import { ButtonRow } from "../widgets/actions/ButtonRow.js";
 import { ContentStack } from "../widgets/ContentStack.js";
 import { DashedPlaceholder } from "../widgets/content/DashedPlaceholder.js";
 import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
-import { Text } from "../widgets/Text.js";
-import { Thumbnail } from "../widgets/Thumbnail.js";
+import { Text } from "../widgets/data/Text.js";
+import { Thumbnail } from "../widgets/data/Thumbnail.js";
 import { tokens } from "../tokens/index.js";
 import { useVoice } from "../voice/index.js";
 

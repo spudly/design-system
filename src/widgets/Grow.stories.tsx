@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 import { Grow } from "./Grow.js";
 
 const meta: Meta<typeof Grow> = {

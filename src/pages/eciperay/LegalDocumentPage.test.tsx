@@ -59,7 +59,7 @@ const code = readCode("src/pages/eciperay/LegalDocumentPage.tsx");
 // the widget sources the primitives now live in.
 const prose = code;
 const proseColumn = readCode("src/widgets/ProseColumn.tsx");
-const bulletList = readCode("src/widgets/BulletList.tsx");
+const bulletList = readCode("src/widgets/data/BulletList.tsx");
 test("content crosses as structured section/block/span data (#170)", () => {
   for (const spanType of ['"text"', '"strong"', '"code"', '"link"']) {
     assert.ok(

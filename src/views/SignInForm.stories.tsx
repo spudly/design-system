@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { SignInForm } from "./SignInForm.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 
 const meta: Meta<typeof SignInForm> = {
   title: "Views/SignInForm",

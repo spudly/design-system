@@ -1,5 +1,5 @@
 import { PrevNextNav } from "../../widgets/actions/PrevNextNav.js";
-import { StepDots } from "../../widgets/StepDots.js";
+import { StepDots } from "../../widgets/data/StepDots.js";
 
 /**
  * StepNavControls (#587 phase 3 tranche 5): the step-navigation

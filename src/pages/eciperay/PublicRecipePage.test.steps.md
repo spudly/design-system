@@ -4,11 +4,11 @@ run_when:
   - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
   - "src/widgets/content/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
   - "src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
-  - "src/widgets/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
+  - "src/widgets/data/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
   - "src/pages/eciperay/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, StepList), or a changeset naming PublicRecipePage."
   - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
   - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
-  - "src/widgets/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."---
+  - "src/widgets/data/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."---
 
 # PublicRecipePage — manual test steps
 
@@ -105,7 +105,7 @@ Open in `Widgets/RatingsCard`: Default, Stale, No Ratings Yet.
    PublicRecipePage's Default story also exercises the signed-out
    form.
 
-**Run when:** `src/widgets/RatingsCard.tsx`, its stories,
+**Run when:** `src/widgets/data/RatingsCard.tsx`, its stories,
 PublicRecipePage's engagement block, or a changeset naming
 RatingsCard.
 
@@ -206,6 +206,6 @@ Open in `Widgets/StepList`: Default, Loading, LoadingOverlay.
    cards' geometry; LoadingOverlay aligns the skeleton over
    the loaded cards with no size drift.
 
-**Run when:** `src/widgets/StepList.tsx`,
+**Run when:** `src/widgets/data/StepList.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming StepList.

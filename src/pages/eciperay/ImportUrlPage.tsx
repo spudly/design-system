@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { Alert } from "../../widgets/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { FormScreenLayout } from "../../widgets/FormScreenLayout.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { TextField } from "../../widgets/form/TextField.js";
 
 /**

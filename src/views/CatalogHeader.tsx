@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { ListHeaderStack } from "../widgets/ListHeaderStack.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 
 export type CatalogHeaderProps = {

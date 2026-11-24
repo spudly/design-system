@@ -67,12 +67,12 @@ function count(code: string, literal: any) {
 // decorative texts are counted once, on that block's file.
 const FAMILY: [string, string, number][] = [
   ["src/widgets/content/OptionCard.tsx", "decorative", 3],
-  ["src/widgets/RowTextContent.tsx", "decorative", 2],
+  ["src/widgets/data/RowTextContent.tsx", "decorative", 2],
   // ListItem's subtitle renders through RowTextContent's shared
   // subtitle line since #587 phase 3, so only its title line
   // counts here; the subtitle is counted on RowTextContent.
-  ["src/widgets/ListItem.tsx", "decorative", 1],
-  ["src/widgets/MediaRow.tsx", "native", 3],
+  ["src/widgets/data/ListItem.tsx", "decorative", 1],
+  ["src/widgets/data/MediaRow.tsx", "native", 3],
 ];
 
 for (const [rel, flag, expectedCount] of FAMILY) {

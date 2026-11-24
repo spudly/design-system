@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { SessionShell } from "./SessionShell.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof SessionShell> = {
   title: "Widgets/SessionShell",

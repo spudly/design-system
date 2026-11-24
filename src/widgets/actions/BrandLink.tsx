@@ -3,7 +3,7 @@ import { BrandMark, type BrandMarkName } from "../../icons/BrandMark.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LinkOverlay } from "../linkOverlay.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 /**
  * The wordmark's brand treatment, carried by the anchor's styled

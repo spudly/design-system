@@ -2,7 +2,7 @@ import { Anchor, Tabs as TamaguiTabs, XStack, isWeb, styled, useTheme } from "ta
 import { iconsByName, type IconName } from "../../icons/iconRegistry.js";
 import { tokens } from "../../tokens/index.js";
 import { navigationRoleProps, platformAccessibilityProps } from "../accessibility.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const listFrameStyles = {
   gap: tokens.spacing[1],

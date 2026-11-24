@@ -2,7 +2,7 @@ import { useId } from "react";
 import { XStack, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
 const StarButton = styled(YStack, {

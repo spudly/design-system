@@ -1,7 +1,7 @@
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { LoadingScope } from "../contexts/LoadingScope.js";
-import { StatCard } from "./StatCard.js";
+import { StatCard } from "./data/StatCard.js";
 
 export type LoadingStatTilesProps = {
   /** Stable keys for the dummy stats, one per tile — the caller

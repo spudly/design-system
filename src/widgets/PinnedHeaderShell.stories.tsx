@@ -4,7 +4,7 @@ import { tokens } from "../tokens/index.js";
 import { PinnedHeaderShell } from "./PinnedHeaderShell.js";
 import { SectionStack } from "./SectionStack.js";
 import { Tabs } from "./actions/Tabs.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof PinnedHeaderShell> = {
   title: "Widgets/PinnedHeaderShell",

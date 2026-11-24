@@ -3,7 +3,7 @@ import { tokens } from "../../tokens/index.js";
 import { Card, type CardProps } from "../Card.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LinkOverlay } from "../linkOverlay.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 export type OptionCardProps = Omit<CardProps, "onPress"> & {
   title: string;

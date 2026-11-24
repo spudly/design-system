@@ -4,7 +4,7 @@ import { Card } from "../../widgets/Card.js";
 import { EmptyState } from "../../views/EmptyState.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { BoundedList } from "../shared/BoundedList.js";
 
 /**

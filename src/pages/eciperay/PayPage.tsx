@@ -4,7 +4,7 @@ import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { Spinner } from "../../widgets/Spinner.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
 /**

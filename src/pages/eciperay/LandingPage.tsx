@@ -5,7 +5,7 @@ import { CardGrid } from "../../widgets/CardGrid.js";
 import { HeroStack } from "../../widgets/HeroStack.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { StackedButtonRow } from "../../widgets/actions/StackedButtonRow.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 
 /**
  * LandingPage (#171, B7/C11): the signed-out marketing landing —

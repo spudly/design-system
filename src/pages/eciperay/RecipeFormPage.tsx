@@ -18,11 +18,11 @@ import { LabeledField } from "../../widgets/form/LabeledField.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
 import { RevertAction } from "../../views/RevertAction.js";
 import { ScrollRegion } from "../../widgets/ScrollRegion.js";
-import { TagList } from "../../widgets/TagList.js";
+import { TagList } from "../../widgets/data/TagList.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
-import { Badge } from "../../widgets/Badge.js";
+import { Badge } from "../../widgets/data/Badge.js";
 
 /**
  * RecipeFormPage (#124, B3a): the recipe form's view layer — the

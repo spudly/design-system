@@ -4,7 +4,7 @@ import { Button } from "../../widgets/actions/Button.js";
 import { CheckboxField } from "../../widgets/CheckboxField.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { useVoice } from "../../voice/index.js";
 

@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { FullBleed, PAGE_CONTENT_MAX_WIDTH, PageContentColumn } from "./PageContentColumn.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof PageContentColumn> = {
   title: "Widgets/PageContentColumn",

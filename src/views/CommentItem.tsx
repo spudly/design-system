@@ -4,7 +4,7 @@ import { TextAreaField } from "../widgets/form/TextAreaField.js";
 import { platformAccessibilityProps } from "../widgets/accessibility.js";
 import { Button } from "../widgets/actions/Button.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { useVoice } from "../voice/index.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 

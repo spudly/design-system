@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Button } from "../widgets/actions/Button.js";
 import { CompactStack } from "../widgets/CompactStack.js";
 import { LabeledGroup } from "../widgets/form/LabeledGroup.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 
 export type LabeledListSectionProps = {
   /** The section's label. */

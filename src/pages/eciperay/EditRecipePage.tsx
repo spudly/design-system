@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 
 /**
  * EditRecipePage (#124, B3a): the shell half of Eciperay's edit

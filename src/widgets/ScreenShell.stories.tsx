@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { Badge } from "./Badge.js";
+import { Badge } from "./data/Badge.js";
 import { ScreenShell } from "./ScreenShell.js";
 import { ScrollRegion } from "./ScrollRegion.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof ScreenShell> = {
   title: "Widgets/ScreenShell",

@@ -5,8 +5,8 @@ import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { FormScreenLayout } from "../../widgets/FormScreenLayout.js";
 import { PreviewCard } from "../../widgets/content/PreviewCard.js";
-import { Text } from "../../widgets/Text.js";
-import { Thumbnail } from "../../widgets/Thumbnail.js";
+import { Text } from "../../widgets/data/Text.js";
+import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 
 /**
  * ImportReviewPage (#126, B3c): the import review step — the

@@ -1,7 +1,7 @@
 import { useId } from "react";
 import { Label, Switch as TamaguiSwitch, XStack, YStack, styled } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const StyledSwitch = styled(TamaguiSwitch, {
   name: "Switch",

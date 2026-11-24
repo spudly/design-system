@@ -4,7 +4,7 @@ import { LinkStack } from "../../widgets/actions/LinkStack.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { LegalSection } from "../../widgets/content/LegalSection.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { AccountDataView, type AccountDataViewProps } from "../../views/AccountDataView.js";
 import {
   FeedbackPreferenceView,

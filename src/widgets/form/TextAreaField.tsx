@@ -2,7 +2,7 @@ import { TextArea as TamaguiTextArea, Label, YStack, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { useFieldA11y } from "../../views/useFieldA11y.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {
   name: "TextAreaField",

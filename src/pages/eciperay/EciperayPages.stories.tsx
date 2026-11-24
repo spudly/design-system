@@ -1,12 +1,12 @@
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { XStack, YStack } from "tamagui";
-import { Badge } from "../../widgets/Badge.js";
+import { Badge } from "../../widgets/data/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
-import { ChecklistRow } from "../../widgets/ChecklistRow.js";
+import { ChecklistRow } from "../../widgets/data/ChecklistRow.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { tokens } from "../../tokens/index.js";
 import { PageFrame } from "../../widgets/PageFrame.js";

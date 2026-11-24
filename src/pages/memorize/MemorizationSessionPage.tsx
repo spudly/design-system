@@ -1,13 +1,13 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { BackLink } from "../../widgets/actions/BackLink.js";
-import { BlankWord } from "../../widgets/BlankWord.js";
+import { BlankWord } from "../../widgets/data/BlankWord.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { Alert } from "../../widgets/Alert.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { StepDots } from "../../widgets/StepDots.js";
-import { Text } from "../../widgets/Text.js";
-import { VerseText } from "../../widgets/VerseText.js";
+import { StepDots } from "../../widgets/data/StepDots.js";
+import { Text } from "../../widgets/data/Text.js";
+import { VerseText } from "../../widgets/data/VerseText.js";
 
 /**
  * MemorizationSessionPage (#49): Memorize's memorization

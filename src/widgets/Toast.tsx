@@ -3,7 +3,7 @@ import { Toast as TamaguiToast, YStack, styled, toast } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { politeLiveRegionProps } from "./accessibility.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 const ToastCard = styled(YStack, {
   name: "Toast",

@@ -135,7 +135,7 @@ function accessibilityRoleLiterals(source: string) {
 const TRANSLATOR_FILES = new Set([
   join(srcDir, "widgets", "accessibility.ts"),
   join(srcDir, "widgets", "actions", "Button.tsx"),
-  join(srcDir, "widgets", "Text.tsx"),
+  join(srcDir, "widgets", "data", "Text.tsx"),
   join(srcDir, "widgets", "ProgressBar.tsx"),
   join(srcDir, "widgets", "actions", "TextLink.tsx"),
   join(srcDir, "widgets", "content", "OptionCard.tsx"),

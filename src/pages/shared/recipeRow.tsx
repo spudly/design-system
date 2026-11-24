@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { MediaRow } from "../../widgets/MediaRow.js";
+import { MediaRow } from "../../widgets/data/MediaRow.js";
 import { RatingStars } from "../../widgets/form/RatingStars.js";
 
 /**

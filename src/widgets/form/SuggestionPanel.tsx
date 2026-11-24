@@ -1,6 +1,6 @@
 import { YStack } from "tamagui";
 import { tokens } from "../../tokens/index.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 type SuggestionPanelEntry = {
   /** Stable key for the entry. */

@@ -1,7 +1,7 @@
 ---
 component: SectionHeading
 run_when:
-  - "src/widgets/RatingsCard.tsx, src/widgets/content/SectionHeading.tsx, their stories, or a changeset naming any of them. (namely: RatingsCard, SectionHeading)"
+  - "src/widgets/data/RatingsCard.tsx, src/widgets/content/SectionHeading.tsx, their stories, or a changeset naming any of them. (namely: RatingsCard, SectionHeading)"
 ---
 
 # SectionHeading — manual test steps
@@ -33,6 +33,6 @@ Stale; `Widgets/SectionHeading`: Default.
    parent: it insets only its own content, not the
    headings.
 
-**Run when:** `src/widgets/RatingsCard.tsx`,
+**Run when:** `src/widgets/data/RatingsCard.tsx`,
 `src/widgets/content/SectionHeading.tsx`, their stories, or a
 changeset naming any of them.

@@ -250,7 +250,7 @@ test("LoadingScope lives in src/contexts — widgets import it from there", () =
     !existsSync(join(root, "src/widgets/LoadingScope.tsx")),
     "the context no longer lives in src/widgets",
   );
-  for (const name of ["actions/Button", "Card", "CardRow", "StatCard"]) {
+  for (const name of ["actions/Button", "Card", "CardRow", "data/StatCard"]) {
     assert.match(
       read(`src/widgets/${name}.tsx`),
       /from "(?:\.\.\/)+contexts\/LoadingScope\.js"/,
@@ -682,7 +682,7 @@ test("T1: the MasonryGrid skeleton fills its columns and the ListItem skeleton h
     /<View key=\{`loading-\$\{itemIndex\}`\} width="100%">/,
     "a loading MasonryGrid item wrapper takes the column's full width",
   );
-  const row = readCode("src/widgets/ListItem.tsx");
+  const row = readCode("src/widgets/data/ListItem.tsx");
   assert.match(
     row,
     /borderBottomColor="transparent"/,
@@ -700,7 +700,7 @@ test("T1: structured skeletons mirror the loaded layout (StatCard, CheckboxSelec
   // for skeleton text geometry) — value (3xl: 34 box, 24 bone,
   // 46%), label (lg: 21 box, 14 bone, 76%), sublabel (sm: 16 box,
   // 11 bone, 58%) — not a one-size TextSkeleton.
-  const stat = readCode("src/widgets/StatCard.tsx");
+  const stat = readCode("src/widgets/data/StatCard.tsx");
   assert.match(
     stat,
     /<View height=\{LINE_BOXES\["3xl"\]\.lineBox\} justifyContent="center">/,

@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { ResetPasswordForm } from "../../views/ResetPasswordForm.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
 /**

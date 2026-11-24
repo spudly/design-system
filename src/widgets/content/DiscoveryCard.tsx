@@ -4,9 +4,9 @@ import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "../BoxSkeleton.js";
 import { Card } from "../Card.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 import { TextSkeleton } from "../TextSkeleton.js";
-import { Thumbnail } from "../Thumbnail.js";
+import { Thumbnail } from "../data/Thumbnail.js";
 
 /**
  * DiscoveryCard (#168): one public-catalog recipe as a standalone

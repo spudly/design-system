@@ -3,7 +3,7 @@ import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
 import { Card } from "../Card.js";
 import { LinkOverlay } from "../linkOverlay.js";
-import { RowTextContent } from "../RowTextContent.js";
+import { RowTextContent } from "../data/RowTextContent.js";
 
 export type TextActionCardRowProps = {
   /** The row's main line, and the link's accessible name. */

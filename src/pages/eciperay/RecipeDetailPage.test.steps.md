@@ -4,7 +4,7 @@ run_when:
   - "src/pages/eciperay/RecipeDetailPage.tsx, its stories, or a changeset naming RecipeDetailPage."
   - "src/views/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
   - "src/views/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
-  - "src/widgets/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."  - "src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
+  - "src/widgets/data/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."  - "src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
   - "src/views/RecipeSharingView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeSharingView."
   - "src/views/ConfirmActionView.tsx, its stories, RecipeDetailPage, or a changeset naming ConfirmActionView."
 ---
@@ -91,7 +91,7 @@ Open in `Widgets/StepList`: Default.
    tint) on open; pressing another card moves the highlight
    to it. Steps render in step-number order.
 
-**Run when:** `src/widgets/StepList.tsx`,
+**Run when:** `src/widgets/data/StepList.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming StepList.
 

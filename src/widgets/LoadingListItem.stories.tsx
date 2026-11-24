@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { LoadingScope } from "../contexts/LoadingScope.js";
-import { ListStack } from "./ListStack.js";
+import { ListStack } from "./data/ListStack.js";
 import { LoadingListItem } from "./LoadingListItem.js";
 
 const meta: Meta<typeof LoadingListItem> = {

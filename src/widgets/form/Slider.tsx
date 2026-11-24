@@ -2,7 +2,7 @@ import { useId } from "react";
 import { Label, Slider as TamaguiSlider, View, YStack, isWeb, styled } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 
 const StyledTrack = styled(TamaguiSlider.Track, {
   name: "SliderTrack",

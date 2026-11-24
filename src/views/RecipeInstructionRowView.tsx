@@ -3,7 +3,7 @@ import { Button } from "../widgets/actions/Button.js";
 import { Center } from "../widgets/Center.js";
 import { FieldRow } from "../widgets/form/FieldRow.js";
 import { Grow } from "../widgets/Grow.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { TextAreaField } from "../widgets/form/TextAreaField.js";
 import { useVoice } from "../voice/index.js";
 

@@ -1,4 +1,4 @@
-import type { BadgeProps } from "../../widgets/Badge.js";
+import type { BadgeProps } from "../../widgets/data/Badge.js";
 
 /**
  * STATUS_BADGES (#587 phase 3 tranche 5): the status badge map both

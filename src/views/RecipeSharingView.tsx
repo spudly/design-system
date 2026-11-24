@@ -9,7 +9,7 @@ import { RadioSkeletonRow } from "../widgets/RadioSkeletonRow.js";
 import { TightStack } from "../widgets/TightStack.js";
 import { Button } from "../widgets/actions/Button.js";
 import { Card } from "../widgets/Card.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
 import { TextSkeleton } from "../widgets/TextSkeleton.js";
 import { CheckboxField } from "../widgets/CheckboxField.js";

@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { Card } from "./Card.js";
 import { CardGrid } from "./CardGrid.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof CardGrid> = {
   title: "Widgets/CardGrid",

@@ -6,7 +6,7 @@ import {
   type MasonryColumnCountOptions,
   type MasonryGridProps,
 } from "./MasonryGrid.js";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 
 const meta: Meta<typeof MasonryGrid> = {
   title: "Widgets/MasonryGrid",

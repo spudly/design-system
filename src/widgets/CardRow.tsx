@@ -4,7 +4,7 @@ import { Button } from "./actions/Button.js";
 import { Card } from "./Card.js";
 import { keyboardActivationHandler } from "./keyboardActivation.js";
 import { LinkOverlay } from "./linkOverlay.js";
-import { RowTextContent } from "./RowTextContent.js";
+import { RowTextContent } from "./data/RowTextContent.js";
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { TextSkeleton } from "./TextSkeleton.js";
 

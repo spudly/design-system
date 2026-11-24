@@ -4,7 +4,7 @@ import type { LayoutChangeEvent } from "react-native";
 import { Alert } from "../../widgets/Alert.js";
 import { CatalogCardColumn } from "../../widgets/CatalogCardColumn.js";
 import { CatalogListColumn } from "../../widgets/CatalogListColumn.js";
-import { CatalogRow } from "../../widgets/CatalogRow.js";
+import { CatalogRow } from "../../widgets/data/CatalogRow.js";
 import { isWeb } from "../../widgets/platform.js";
 import {
   CatalogFiltersBar,
@@ -19,7 +19,7 @@ import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import type { SelectOption } from "../../widgets/form/SelectField.js";
 import { LoadingMediaRow } from "../../widgets/LoadingMediaRow.js";
 import { ScrollSentinel } from "../../widgets/ScrollSentinel.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { RatingForm } from "../../widgets/RatingForm.js";
 import { BoundedList } from "../shared/BoundedList.js";
 import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";

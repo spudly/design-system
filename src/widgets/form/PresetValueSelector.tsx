@@ -5,7 +5,7 @@ import type { TamaguiElement } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
-import { Text } from "../Text.js";
+import { Text } from "../data/Text.js";
 import { TextField } from "./TextField.js";
 
 export type PresetValueOption = {

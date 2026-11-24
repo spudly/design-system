@@ -8,7 +8,7 @@ import { LoadingActionCardRow } from "../../widgets/LoadingActionCardRow.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { Tabs } from "../../widgets/actions/Tabs.js";
-import { Text } from "../../widgets/Text.js";
+import { Text } from "../../widgets/data/Text.js";
 import { TextActionCardRow } from "../../widgets/content/TextActionCardRow.js";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
 

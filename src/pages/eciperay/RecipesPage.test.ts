@@ -12,7 +12,7 @@ describe("recipesPageAccessory", () => {
   // (#657); slice it out so the placement pins run against it.
   const rowSource =
     readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
-    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "data", "MediaRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8");
   const mediaRow = rowSource.slice(
     rowSource.indexOf("const textBlockStyle"),
@@ -27,7 +27,7 @@ describe("recipesPageAccessory", () => {
   // lives in the shared recipeRow.tsx (#657).
   const rowCode = (
     readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
-    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "data", "MediaRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -355,7 +355,7 @@ describe("recipesPageRowA11y", () => {
   // (#657); slice it out so the row pins run against it alone.
   const rowPage = (
     readFileSync(join(here, "../../..", "src", "pages", "shared", "recipeRow.tsx"), "utf8") +
-    readFileSync(join(here, "../../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "widgets", "data", "MediaRow.tsx"), "utf8") +
     readFileSync(join(here, "../../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -448,7 +448,7 @@ describe("recipesPageRowActions", () => {
   // composition pins.
   const rowCode = (
     readFileSync(join(here, "../../..", "src", "pages", "shared", "recipeRow.tsx"), "utf8") +
-    readFileSync(join(here, "../../..", "src", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(here, "../../..", "src", "widgets", "data", "MediaRow.tsx"), "utf8") +
     readFileSync(join(here, "../../..", "src", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -578,7 +578,7 @@ describe("recipesPageSharedConfig", () => {
   // The shared row item and row live in recipeRow.tsx (#657).
   const rowCode = (
     readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
-    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "data", "MediaRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
@@ -678,7 +678,7 @@ describe("recipesPageUnified", () => {
   // (#657); slice it out so the badge pins run against it.
   const rowCode = (
     readFileSync(join(pagesDir, "shared", "recipeRow.tsx"), "utf8") +
-    readFileSync(join(pagesDir, "..", "widgets", "MediaRow.tsx"), "utf8") +
+    readFileSync(join(pagesDir, "..", "widgets", "data", "MediaRow.tsx"), "utf8") +
     readFileSync(join(pagesDir, "..", "widgets", "form", "RatingStars.tsx"), "utf8")
   )
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")

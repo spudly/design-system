@@ -4,7 +4,7 @@ import { Center } from "../widgets/Center.js";
 import { CompactStack } from "../widgets/CompactStack.js";
 import { StartStack } from "../widgets/StartStack.js";
 import { SectionCard } from "../widgets/content/SectionCard.js";
-import { Text } from "../widgets/Text.js";
+import { Text } from "../widgets/data/Text.js";
 import { TextLink } from "../widgets/actions/TextLink.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { useVoice } from "../voice/index.js";

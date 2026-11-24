@@ -34,7 +34,7 @@ function messageIds(code: string): (string | undefined)[] {
 }
 
 test("direct source reads are flagged", () => {
-  assert.deepEqual(messageIds(`readFileSync("src/widgets/Badge.tsx", "utf8");`), ["sourceRead"]);
+  assert.deepEqual(messageIds(`readFileSync("src/widgets/data/Badge.tsx", "utf8");`), ["sourceRead"]);
   assert.deepEqual(messageIds(`readFileSync(join(root, "src", "pages", "index.ts"), "utf8");`), [
     "sourceRead",
   ]);
@@ -45,7 +45,7 @@ test("direct source reads are flagged", () => {
 
 test("variable-held source paths are flagged", () => {
   const code = [
-    `const path = join(root, "src/widgets/Badge.tsx");`,
+    `const path = join(root, "src/widgets/data/Badge.tsx");`,
     `const src = readFileSync(path, "utf8");`,
   ].join("\n");
   assert.deepEqual(messageIds(code), ["sourceRead"]);
@@ -62,7 +62,7 @@ test("enumerate-then-read over a source directory is flagged", () => {
 test("source-read helper call sites are flagged where the path is known", () => {
   const code = [
     `function readCode(rel) { return readFileSync(join(root, rel), "utf8"); }`,
-    `const pages = [["Badge", "src/widgets/Badge.tsx"]];`,
+    `const pages = [["Badge", "src/widgets/data/Badge.tsx"]];`,
     `for (const [name, rel] of pages) { const code = readCode(rel); }`,
     `const pkg = readCode("package.json");`,
   ].join("\n");
@@ -82,7 +82,7 @@ test("legitimate reads are not flagged: dist output, declarations, data files", 
 });
 
 test("non-read calls and reads of runtime values are untouched", () => {
-  assert.deepEqual(messageIds(`writeFileSync("src/widgets/Badge.tsx", "x");`), []);
+  assert.deepEqual(messageIds(`writeFileSync("src/widgets/data/Badge.tsx", "x");`), []);
   assert.deepEqual(messageIds(`readFileSync(0, "utf8");`), []);
   assert.deepEqual(messageIds(`const text = readFileSync(file, "utf8");`), []);
 });

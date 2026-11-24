@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Text } from "./Text.js";
+import { Text } from "./data/Text.js";
 import { ContentStack } from "./ContentStack.js";
 
 const meta: Meta<typeof ContentStack> = {
