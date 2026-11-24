@@ -153,7 +153,7 @@ test("SSR: heading and subheading Text render heading semantics (#256)", async (
   assertNoLeak(label);
 });
 test("SectionHeading states header role and level 2 explicitly (#317)", () => {
-  const source = readCode("src/widgets/SectionHeading.tsx");
+  const source = readCode("src/widgets/content/SectionHeading.tsx");
   assert.match(
     source,
     /<Text\s+variant="subheading"\s+accessibilityRole="header"\s+aria-level=\{2\}\s*>/,

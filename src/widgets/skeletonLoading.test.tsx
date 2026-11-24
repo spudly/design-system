@@ -377,7 +377,7 @@ test("T1: every converted list/card widget declares `loading` and reads the Load
   const card = readCode("src/widgets/Card.tsx");
   assert.match(card, /\bloading\?: boolean/, "Card must declare the loading prop");
   assert.match(card, /LoadingScope/, "Card must provide the LoadingScope while loading");
-  const sectionCard = readCode("src/widgets/SectionCard.tsx");
+  const sectionCard = readCode("src/widgets/content/SectionCard.tsx");
   assert.match(sectionCard, /loading/, "SectionCard must handle the loading flag");
   assert.match(sectionCard, /TextSkeleton/, "SectionCard must skeletonize its title");
 });

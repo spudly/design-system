@@ -89,7 +89,7 @@ function loadRuntime() {
     const dist: Record<string, any> = await loadInternalDist();
     const { ScrollRegion }: Record<string, any> =
       await import("../../dist/widgets/ScrollRegion.js");
-    const { BigFooterShell }: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
+    const { BigFooterShell }: Record<string, any> = await import("../../dist/widgets/content/BigFooter.js");
     const { PublicRecipePage }: Record<string, any> =
       await import("../../dist/pages/eciperay/PublicRecipePage.js");
     const { eciperayFooterFixture }: Record<string, any> =

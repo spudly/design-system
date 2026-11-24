@@ -5,7 +5,7 @@ import { Center } from "../widgets/Center.js";
 import { Button } from "../widgets/actions/Button.js";
 import { SpacedTopStack } from "../widgets/SpacedTopStack.js";
 import { TightStack } from "../widgets/TightStack.js";
-import { SectionCard } from "../widgets/SectionCard.js";
+import { SectionCard } from "../widgets/content/SectionCard.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../widgets/TextSkeleton.js";
 import { EqualColumns } from "../widgets/form/EqualColumns.js";
 import { TextField } from "../widgets/form/TextField.js";

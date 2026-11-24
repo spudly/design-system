@@ -66,7 +66,7 @@ function count(code: string, literal: any) {
 // through the shared RowTextContent block, so their two
 // decorative texts are counted once, on that block's file.
 const FAMILY: [string, string, number][] = [
-  ["src/widgets/OptionCard.tsx", "decorative", 3],
+  ["src/widgets/content/OptionCard.tsx", "decorative", 3],
   ["src/widgets/RowTextContent.tsx", "decorative", 2],
   // ListItem's subtitle renders through RowTextContent's shared
   // subtitle line since #587 phase 3, so only its title line
@@ -102,7 +102,7 @@ for (const [rel, flag, expectedCount] of FAMILY) {
 }
 
 test("TextActionCardRow's native overlay label composes the subtitle; the web anchor keeps its title-only label", () => {
-  const code = codeOf("src/widgets/TextActionCardRow.tsx");
+  const code = codeOf("src/widgets/content/TextActionCardRow.tsx");
   // The matched source literal itself contains template
   // placeholders; interpolate the "$" signs so this file's lint
   // (no placeholder-looking text in plain strings) stays quiet.

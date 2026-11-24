@@ -33,7 +33,7 @@ function readCode(rel: string): string {
 }
 
 const column = readCode("src/widgets/PageContentColumn.tsx");
-const bigFooter = readCode("src/widgets/BigFooter.tsx");
+const bigFooter = readCode("src/widgets/content/BigFooter.tsx");
 const appTopBar = readCode("src/widgets/AppTopBar.tsx");
 
 test("the column width is the named 1200 constant (#628, Stephen's amendment)", () => {

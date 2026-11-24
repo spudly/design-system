@@ -1,5 +1,5 @@
 import { useLoadingScope } from "../contexts/LoadingScope.js";
-import { OverlayTextPanel } from "../widgets/OverlayTextPanel.js";
+import { OverlayTextPanel } from "../widgets/content/OverlayTextPanel.js";
 
 export type ScaledIngredientsViewProps = {
   /** The panel's heading line, pre-composed by the caller ("Ingredients · 4 servings (scaled ×2)"). */

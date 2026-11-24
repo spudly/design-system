@@ -1,7 +1,7 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonStack } from "../../widgets/actions/ButtonStack.js";
-import { CenteredText } from "../../widgets/CenteredText.js";
+import { CenteredText } from "../../widgets/content/CenteredText.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { LoadingCardRow } from "../../widgets/LoadingCardRow.js";
 import { ListStack } from "../../widgets/ListStack.js";

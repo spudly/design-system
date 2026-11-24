@@ -2,7 +2,7 @@
 component: AiSessionPage
 run_when:
   - "src/pages/eciperay/AiSessionPage.tsx, its stories, or a changeset naming AiSessionPage."
-  - "src/widgets/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard."
+  - "src/widgets/content/PreviewCard.tsx, its stories, AiSessionPage, ImportReviewPage, or a changeset naming PreviewCard."
 ---
 
 # AiSessionPage — manual test steps
@@ -39,6 +39,6 @@ NoActions.
    the card's inset.
 3. NoActions: no actions row renders below the content.
 
-**Run when:** `src/widgets/PreviewCard.tsx`, its stories,
+**Run when:** `src/widgets/content/PreviewCard.tsx`, its stories,
 AiSessionPage, ImportReviewPage, or a changeset naming
 PreviewCard.

@@ -322,7 +322,7 @@ describe("publicRecipePageAdoption", () => {
       "the page imports the library ButtonRow",
     );
     assert.ok(
-      code.includes('import { MessageCard } from "../../widgets/MessageCard.js";'),
+      code.includes('import { MessageCard } from "../../widgets/content/MessageCard.js";'),
       "the page imports the library MessageCard",
     );
     assert.match(

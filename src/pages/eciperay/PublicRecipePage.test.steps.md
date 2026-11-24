@@ -2,7 +2,7 @@
 component: PublicRecipePage
 run_when:
   - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
-  - "src/widgets/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
+  - "src/widgets/content/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
   - "src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
   - "src/widgets/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
   - "src/pages/eciperay/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, StepList), or a changeset naming PublicRecipePage."
@@ -73,7 +73,7 @@ strings.
 3. PublicRecipePage's NotFound and Unavailable stories show
    the identical state once the page adopts the component.
 
-**Run when:** `src/widgets/MessageCard.tsx`, its stories,
+**Run when:** `src/widgets/content/MessageCard.tsx`, its stories,
 PublicRecipePage's notFound and unavailable states, or a
 changeset naming MessageCard.
 

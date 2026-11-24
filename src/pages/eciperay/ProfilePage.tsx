@@ -1,8 +1,8 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { LinkStack } from "../../widgets/actions/LinkStack.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
-import { LegalSection } from "../../widgets/LegalSection.js";
+import { LegalSection } from "../../widgets/content/LegalSection.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { Text } from "../../widgets/Text.js";
 import { AccountDataView, type AccountDataViewProps } from "../../views/AccountDataView.js";

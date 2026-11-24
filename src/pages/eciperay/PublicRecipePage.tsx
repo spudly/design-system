@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { BoxSkeleton } from "../../widgets/BoxSkeleton.js";
@@ -8,13 +8,13 @@ import { MainLandmark } from "../../widgets/MainLandmark.js";
 import { StatBand } from "../../widgets/StatBand.js";
 import { StatCard } from "../../widgets/StatCard.js";
 import { TextSkeleton } from "../../widgets/TextSkeleton.js";
-import { MessageCard } from "../../widgets/MessageCard.js";
+import { MessageCard } from "../../widgets/content/MessageCard.js";
 import { RatingsCard } from "../../widgets/RatingsCard.js";
 import { RecipeIngredientsPanel } from "../../views/RecipeIngredientsPanel.js";
 import { StepList } from "../../widgets/StepList.js";
 import { RecipeOverviewPanel } from "../../views/RecipeOverviewPanel.js";
 import { ScrollShell } from "../../widgets/ScrollShell.js";
-import { SectionHeading } from "../../widgets/SectionHeading.js";
+import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import {
   RecipeCommentsView,
   type RecipeCommentsViewProps,

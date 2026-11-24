@@ -67,7 +67,7 @@ function loadRuntime() {
     const { ScrollShell }: Record<string, any> = await import("../../dist/widgets/ScrollShell.js");
     const { ScrollRegion }: Record<string, any> =
       await import("../../dist/widgets/ScrollRegion.js");
-    const { BigFooterShell }: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
+    const { BigFooterShell }: Record<string, any> = await import("../../dist/widgets/content/BigFooter.js");
     const { eciperayFooterFixture }: Record<string, any> =
       await import("../../dist/pages/shared/fixtures.js");
     return {

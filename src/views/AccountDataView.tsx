@@ -2,7 +2,7 @@ import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { Button } from "../widgets/actions/Button.js";
 import { CompactRow } from "../widgets/CompactRow.js";
 import { ContentStack } from "../widgets/ContentStack.js";
-import { SectionCard } from "../widgets/SectionCard.js";
+import { SectionCard } from "../widgets/content/SectionCard.js";
 import { Text } from "../widgets/Text.js";
 import { SectionMutedText } from "./SectionMutedText.js";
 import { useVoice } from "../voice/index.js";

@@ -161,7 +161,7 @@ test("FeedbackPage and ProfilePage titles take the title variant — xl bold at 
   }
 });
 test("SectionHeading is a level-2 heading under the page title (#317)", () => {
-  const code = readCode("src/widgets/SectionHeading.tsx");
+  const code = readCode("src/widgets/content/SectionHeading.tsx");
   assert.match(
     code,
     /<Text\s+variant="subheading"\s+accessibilityRole="header"\s+aria-level=\{2\}\s*>/,

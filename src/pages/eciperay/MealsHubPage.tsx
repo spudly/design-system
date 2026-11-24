@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { CardStack } from "../../widgets/CardStack.js";
 import { EmptyState } from "../../views/EmptyState.js";
@@ -9,7 +9,7 @@ import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { Tabs } from "../../widgets/actions/Tabs.js";
 import { Text } from "../../widgets/Text.js";
-import { TextActionCardRow } from "../../widgets/TextActionCardRow.js";
+import { TextActionCardRow } from "../../widgets/content/TextActionCardRow.js";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
 
 /**

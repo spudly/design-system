@@ -1,5 +1,5 @@
 import { tagColorNames, type TagColorName } from "../../themes/tagColors.js";
-import type { BigFooterData } from "../../widgets/BigFooter.js";
+import type { BigFooterData } from "../../widgets/content/BigFooter.js";
 import type { LegalDocumentPageProps } from "../eciperay/LegalDocumentPage.js";
 import type { TagsPageTag } from "../eciperay/TagsPage.js";
 

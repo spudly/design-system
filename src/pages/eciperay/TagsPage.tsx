@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { useState } from "react";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { Alert } from "../../widgets/Alert.js";

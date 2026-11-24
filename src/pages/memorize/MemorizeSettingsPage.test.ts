@@ -28,7 +28,7 @@ const here = dirname(fileURLToPath(import.meta.url));
 
 async function loadPage() {
   const dist: Record<string, any> = await loadInternalDist();
-  const shell: Record<string, any> = await import("../../../dist/widgets/BigFooter.js");
+  const shell: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
   const page: Record<string, any> =
     await import("../../../dist/pages/memorize/MemorizeSettingsPage.js");
   return { ...dist, BigFooterShell: shell.BigFooterShell, ...page };

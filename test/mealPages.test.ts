@@ -438,7 +438,7 @@ test("MealsHubPage composes MealPlansPage for the plans tab and reports the tab 
   // the row Delete is a ghost Button (#464), never a TextLink.
   // Since the #119 de-styling the row renders through the generic
   // TextActionCardRow; the ghost Button rendering itself is pinned
-  // in src/widgets/TextActionCardRow.test.ts.
+  // in src/widgets/content/TextActionCardRow.test.ts.
   assert.ok(
     page.includes("TextActionCardRow"),
     "meal rows render through the generic TextActionCardRow (#119)",

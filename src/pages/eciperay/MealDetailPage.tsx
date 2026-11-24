@@ -1,11 +1,11 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { ListItem } from "../../widgets/ListItem.js";
 import { ListStack } from "../../widgets/ListStack.js";
 import { MarkableRow } from "../../widgets/MarkableRow.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { SectionCard } from "../../widgets/SectionCard.js";
+import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { Text } from "../../widgets/Text.js";
 

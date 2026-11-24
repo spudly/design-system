@@ -1,8 +1,8 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { useMemo } from "react";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { CenteredText } from "../../widgets/CenteredText.js";
+import { CenteredText } from "../../widgets/content/CenteredText.js";
 import { tokens } from "../../tokens/index.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { CandidateList } from "../../widgets/CandidateList.js";
@@ -32,7 +32,7 @@ import {
 } from "../../widgets/RatingsCard.js";
 import { ScreenShell } from "../../widgets/ScreenShell.js";
 import { ScrollRegion } from "../../widgets/ScrollRegion.js";
-import { SectionHeading } from "../../widgets/SectionHeading.js";
+import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import { SelectField } from "../../widgets/form/SelectField.js";
 import { StatBand } from "../../widgets/StatBand.js";
 import { StatCard } from "../../widgets/StatCard.js";

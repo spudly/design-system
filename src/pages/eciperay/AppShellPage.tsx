@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
+import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import type { BrandMarkName } from "../../icons/BrandMark.js";
 import {

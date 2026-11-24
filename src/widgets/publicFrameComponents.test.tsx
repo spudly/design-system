@@ -115,7 +115,7 @@ test("SSR: BrandLink renders as a real anchor carrying the given href", async ()
 });
 test("SSR: BigFooter renders exactly the caller's links, in order", async () => {
   const {} = await loadRuntime();
-  const { BigFooter }: Record<string, any> = await import("../../dist/widgets/BigFooter.js");
+  const { BigFooter }: Record<string, any> = await import("../../dist/widgets/content/BigFooter.js");
   const html = await renderToHtml(
     <BigFooter
       footer={{
