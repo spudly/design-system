@@ -5,10 +5,10 @@ run_when:
   - "src/widgets/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
   - "src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
   - "src/widgets/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
-  - "src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, RecipeInstructionsPanel), or a changeset naming PublicRecipePage."
+  - "src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, StepList), or a changeset naming PublicRecipePage."
   - "src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
   - "src/widgets/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
-  - "src/widgets/RecipeInstructionsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeInstructionsPanel."
+  - "src/widgets/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."
 ---
 
 # PublicRecipePage — manual test steps
@@ -159,7 +159,7 @@ CommentsAsData, ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredien
 
 **Run when:** `src/pages/PublicRecipePage.tsx`, its stories,
 the recipe panels the page composes (RecipeOverviewPanel,
-RecipeIngredientsPanel, RecipeInstructionsPanel), or a
+RecipeIngredientsPanel, StepList), or a
 changeset naming PublicRecipePage.
 
 ## RecipeOverviewPanel
@@ -196,14 +196,17 @@ Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeIngredientsPanel.
 
-## RecipeInstructionsPanel
+## StepList
 
-Open in `Widgets/RecipeInstructionsPanel`: Default.
+Open in `Widgets/StepList`: Default, Loading, LoadingOverlay.
 
 1. The first step card is highlighted (primary border and
    tint) on open; pressing another card moves the highlight
    to it. Steps render in step-number order.
+2. Loading shows one skeleton card per step in the loaded
+   cards' geometry; LoadingOverlay aligns the skeleton over
+   the loaded cards with no size drift.
 
-**Run when:** `src/widgets/RecipeInstructionsPanel.tsx`,
+**Run when:** `src/widgets/StepList.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
-changeset naming RecipeInstructionsPanel.
+changeset naming StepList.

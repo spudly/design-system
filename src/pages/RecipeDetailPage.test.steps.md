@@ -4,7 +4,7 @@ run_when:
   - "src/pages/RecipeDetailPage.tsx, its stories, or a changeset naming RecipeDetailPage."
   - "src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
   - "src/widgets/RecipeIngredientsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeIngredientsPanel."
-  - "src/widgets/RecipeInstructionsPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeInstructionsPanel."
+  - "src/widgets/StepList.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming StepList."
   - "src/views/RecipeCommentsView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeCommentsView."
   - "src/views/RecipeSharingView.tsx, its stories, RecipeDetailPage, or a changeset naming RecipeSharingView."
   - "src/views/ConfirmActionView.tsx, its stories, RecipeDetailPage, or a changeset naming ConfirmActionView."
@@ -84,17 +84,17 @@ Open in `Widgets/RecipeIngredientsPanel`: Default, Plain.
 its stories, PublicRecipePage, RecipeDetailPage, or a
 changeset naming RecipeIngredientsPanel.
 
-## RecipeInstructionsPanel
+## StepList
 
-Open in `Widgets/RecipeInstructionsPanel`: Default.
+Open in `Widgets/StepList`: Default.
 
 1. The first step card is highlighted (primary border and
    tint) on open; pressing another card moves the highlight
    to it. Steps render in step-number order.
 
-**Run when:** `src/widgets/RecipeInstructionsPanel.tsx`,
+**Run when:** `src/widgets/StepList.tsx`,
 its stories, PublicRecipePage, RecipeDetailPage, or a
-changeset naming RecipeInstructionsPanel.
+changeset naming StepList.
 
 ## RecipeCommentsView
 

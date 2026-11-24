@@ -924,7 +924,7 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
 // ---------------------------------------------------------------------------
 // #278 Tranche 2 — data panels and the remaining data widgets:
 // NutritionPanel, RatingsCard, RecipeIngredientsPanel,
-// RecipeInstructionsPanel, RecipeOverviewPanel, SecretRevealPanel,
+// RecipeOverviewPanel, SecretRevealPanel, StepList,
 // StatRow, and TagList take the same explicit `loading` prop,
 // read the internal LoadingScope, render skeletons mirroring
 // their loaded layout (actions kept as inert skeleton Buttons
@@ -932,10 +932,10 @@ test("T1 SSR: shells propagate loading through LoadingScope; non-loading is unch
 // while loading, and render unchanged while not loading.
 
 const T2_SCOPE_WIDGETS = [
+  "StepList",
   "NutritionPanel",
   "RatingsCard",
   "RecipeIngredientsPanel",
-  "RecipeInstructionsPanel",
   "RecipeOverviewPanel",
   "SecretRevealPanel",
   "StatRow",
@@ -1147,8 +1147,8 @@ test("T2 SSR: loading RatingsCard, TagList, and StatRow render skeletons, no rea
   assert.equal(hiddenBones(idleRow2), 0, "a non-loading StatRow renders no bones");
   assert.ok(idleRow2.includes("Servings"), "a non-loading StatRow renders its children");
 });
-test("T2 SSR: loading SecretRevealPanel and RecipeInstructionsPanel hide their content", async () => {
-  const { SecretRevealPanel, RecipeInstructionsPanel } = await loadRuntime();
+test("T2 SSR: loading SecretRevealPanel and StepList hide their content", async () => {
+  const { SecretRevealPanel, StepList } = await loadRuntime();
   const noop = () => {};
   const secret = await renderToHtml(
     <SecretRevealPanel
@@ -1181,38 +1181,29 @@ test("T2 SSR: loading SecretRevealPanel and RecipeInstructionsPanel hide their c
   const steps = [
     {
       id: "s1",
-      stepNumber: 1,
+      label: "Step 1",
       body: "Secret first step body",
     },
     {
       id: "s2",
-      stepNumber: 2,
+      label: "Step 2",
       body: "Secret second step body",
     },
   ];
-  const instructions = await renderToHtml(
-    <RecipeInstructionsPanel instructions={steps} loading={true} />,
-  );
+  const instructions = await renderToHtml(<StepList steps={steps} loading={true} />);
   assert.equal(
     hiddenBones(instructions),
     6,
-    "a loading RecipeInstructionsPanel renders eyebrow + 2 body bones per step card",
+    "a loading StepList renders eyebrow + 2 body bones per step card",
   );
   assert.ok(
     !instructions.includes("Secret first step body"),
-    "a loading RecipeInstructionsPanel shows no step text",
+    "a loading StepList shows no step text",
   );
-  assert.match(
-    instructions,
-    /aria-busy/,
-    "a loading RecipeInstructionsPanel marks its region busy",
-  );
-  const idleSteps = await renderToHtml(<RecipeInstructionsPanel instructions={steps} />);
-  assert.equal(hiddenBones(idleSteps), 0, "a non-loading RecipeInstructionsPanel renders no bones");
-  assert.ok(
-    idleSteps.includes("Secret first step body"),
-    "a non-loading RecipeInstructionsPanel renders its steps",
-  );
+  assert.match(instructions, /aria-busy/, "a loading StepList marks its region busy");
+  const idleSteps = await renderToHtml(<StepList steps={steps} />);
+  assert.equal(hiddenBones(idleSteps), 0, "a non-loading StepList renders no bones");
+  assert.ok(idleSteps.includes("Secret first step body"), "a non-loading StepList renders its steps");
 });
 test("T2 SSR: loading RecipeOverviewPanel mirrors its blocks; no real content", async () => {
   const { RecipeOverviewPanel } = await loadRuntime();

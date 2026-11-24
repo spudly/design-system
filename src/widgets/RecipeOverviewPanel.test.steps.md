@@ -1,7 +1,7 @@
 ---
 component: RecipeOverviewPanel
 run_when:
-  - "src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, RecipeInstructionsPanel), or a changeset naming PublicRecipePage."
+  - "src/pages/PublicRecipePage.tsx, its stories, the recipe panels the page composes (RecipeOverviewPanel, RecipeIngredientsPanel, StepList), or a changeset naming PublicRecipePage."
   - "src/widgets/RecipeOverviewPanel.tsx, its stories, PublicRecipePage, RecipeDetailPage, or a changeset naming RecipeOverviewPanel."
 ---
 
@@ -57,7 +57,7 @@ ClonePending, Minimal, Loading, NotFound, Unavailable, Ingredients.
 
 **Run when:** `src/pages/PublicRecipePage.tsx`, its stories,
 the recipe panels the page composes (RecipeOverviewPanel,
-RecipeIngredientsPanel, RecipeInstructionsPanel), or a
+RecipeIngredientsPanel, StepList), or a
 changeset naming PublicRecipePage.
 
 ## RecipeOverviewPanel
