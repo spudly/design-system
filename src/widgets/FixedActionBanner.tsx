@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { XStack, YStack } from "tamagui";
-import { ActionBar } from "./ActionBar.js";
-import { Button } from "./Button.js";
+import { ActionBar } from "./actions/ActionBar.js";
+import { Button } from "./actions/Button.js";
 import { Alert } from "./Alert.js";
 import { useVoice } from "../voice/index.js";
 

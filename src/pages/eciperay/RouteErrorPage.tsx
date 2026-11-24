@@ -1,9 +1,9 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { Text } from "../../widgets/Text.js";
-import { TextLink } from "../../widgets/TextLink.js";
+import { TextLink } from "../../widgets/actions/TextLink.js";
 import { useVoice } from "../../voice/index.js";
 
 /**

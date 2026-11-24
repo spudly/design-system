@@ -1,4 +1,4 @@
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 
 export type RevertActionProps = {
   /** The pre-formatted parent value, rendered after "Revert

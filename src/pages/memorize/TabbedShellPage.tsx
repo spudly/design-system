@@ -1,12 +1,12 @@
 import type { ReactNode } from "react";
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { Tabs } from "../../widgets/Tabs.js";
+import { Tabs } from "../../widgets/actions/Tabs.js";
 import type { IconName } from "../../icons/iconRegistry.js";
 import { AppTopBar } from "../../widgets/AppTopBar.js";
 import { LazySlot } from "../../views/LazySlot.js";
 import { BannerRow } from "../../widgets/BannerRow.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { StatusMessage } from "../../views/StatusMessage.js";
 
 /**

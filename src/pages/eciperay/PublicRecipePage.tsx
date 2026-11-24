@@ -1,8 +1,8 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { BoxSkeleton } from "../../widgets/BoxSkeleton.js";
-import { ButtonRow } from "../../widgets/ButtonRow.js";
+import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { MainLandmark } from "../../widgets/MainLandmark.js";
 import { StatBand } from "../../widgets/StatBand.js";

@@ -1,10 +1,10 @@
 ---
 component: HomePage
 run_when:
-  - "src/widgets/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
+  - "src/widgets/actions/ButtonStack.tsx, src/widgets/CenteredText.tsx, their stories, HomePage's header, or a changeset naming either."
   - "a catalog page's loading or error state (Discover, Home, MealsHub, Recipes, ShoppingList, Tags), or a changeset naming the list loading or error states."
   - "any of the five pages' sources or stories, or a changeset naming any of them. Run only the numbered cases for the page(s) that changed. (namely: MealDetailPage, MealsHubPage, ShoppingListPage, HomePage, MealCookingModePage)"
-  - "src/widgets/ButtonStack.tsx, its stories, HomePage's actions, or a changeset naming ButtonStack."
+  - "src/widgets/actions/ButtonStack.tsx, its stories, HomePage's actions, or a changeset naming ButtonStack."
 ---
 
 # HomePage — manual test steps
@@ -25,7 +25,7 @@ Open in `Widgets/ButtonStack`: Default;
    centered) in the muted ink; the plain line centers in the
    default ink.
 
-**Run when:** `src/widgets/ButtonStack.tsx`,
+**Run when:** `src/widgets/actions/ButtonStack.tsx`,
 `src/widgets/CenteredText.tsx`, their stories, HomePage's
 header, or a changeset naming either.
 
@@ -110,6 +110,6 @@ Open in `Widgets/ButtonStack`: Default.
 1. The three buttons stretch full width at an even 12px
    rhythm.
 
-**Run when:** `src/widgets/ButtonStack.tsx`, its
+**Run when:** `src/widgets/actions/ButtonStack.tsx`, its
 stories, HomePage's actions, or a changeset naming
 ButtonStack.

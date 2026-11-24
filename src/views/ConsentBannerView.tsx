@@ -1,5 +1,5 @@
 import { FixedActionBanner } from "../widgets/FixedActionBanner.js";
-import { TextLink } from "../widgets/TextLink.js";
+import { TextLink } from "../widgets/actions/TextLink.js";
 import { useVoice } from "../voice/index.js";
 
 export type ConsentBannerViewProps = {

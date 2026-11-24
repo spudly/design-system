@@ -202,10 +202,23 @@ test("every widget component has a story file titled Widgets/<Name>", () => {
     // Category subdirectories (#710): a category directory holds
     // its widgets one level down, with titles
     // Widgets/<Category>/<Name> and barrel specifiers
-    // ./<category>/<Name>.js. The directory name is the lowercase
-    // category; the title segment capitalizes it.
+    // ./<category>/<Name>.js. The directory name is a lowercase
+    // token; the title segment is the category's display name from
+    // the #710 plan's taxonomy (single-word categories just
+    // capitalize the directory name).
     if (entry.isDirectory()) {
-      const category = entry.name.charAt(0).toUpperCase() + entry.name.slice(1);
+      const CATEGORY_TITLES: Record<string, string> = {
+        actions: "Actions & Navigation",
+        content: "Content",
+        data: "Data Display",
+        feedback: "Feedback & Loading",
+        form: "Form",
+        layout: "Layout & Structure",
+        overlays: "Overlays & Disclosure",
+      };
+      const category =
+        CATEGORY_TITLES[entry.name] ??
+        entry.name.charAt(0).toUpperCase() + entry.name.slice(1);
       const subdir = join(dir, entry.name);
       for (const sub of readdirSync(subdir, { withFileTypes: true })) {
         assert.ok(

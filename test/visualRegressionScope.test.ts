@@ -237,7 +237,7 @@ test("colocated baselines resolve through the story index (#530)", () => {
 
 test("isFallbackPath classifies the guardrail list", () => {
   assert.equal(isFallbackPath("tools/visualRegression/scope.mjs"), true);
-  assert.equal(isFallbackPath("src/widgets/Button.tsx"), false);
+  assert.equal(isFallbackPath("src/widgets/actions/Button.tsx"), false);
   assert.equal(isFallbackPath("metro.config.js"), true);
   assert.equal(isFallbackPath("README.md"), false);
 });

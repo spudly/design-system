@@ -1,10 +1,10 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { CardGrid } from "../../widgets/CardGrid.js";
 import { HeroStack } from "../../widgets/HeroStack.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
-import { StackedButtonRow } from "../../widgets/StackedButtonRow.js";
+import { StackedButtonRow } from "../../widgets/actions/StackedButtonRow.js";
 import { Text } from "../../widgets/Text.js";
 
 /**

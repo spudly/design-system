@@ -1,7 +1,7 @@
 import { LoadingScope, useLoadingScope } from "../contexts/LoadingScope.js";
 import { Alert } from "../widgets/Alert.js";
 import { BulkSelectToolbar } from "./BulkSelectToolbar.js";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { CheckboxSelectList } from "../widgets/form/CheckboxSelectList.js";
 import { ContentStack } from "../widgets/ContentStack.js";
 import { FramedScrollRegion } from "../widgets/FramedScrollRegion.js";

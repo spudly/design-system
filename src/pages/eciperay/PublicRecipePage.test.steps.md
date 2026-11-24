@@ -1,7 +1,7 @@
 ---
 component: PublicRecipePage
 run_when:
-  - "src/widgets/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
+  - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
   - "src/widgets/MessageCard.tsx, its stories, PublicRecipePage's notFound and unavailable states, or a changeset naming MessageCard."
   - "src/widgets/ScrollShell.tsx, its stories, PublicRecipePage, or a changeset naming ScrollShell."
   - "src/widgets/RatingsCard.tsx, its stories, PublicRecipePage's engagement block, or a changeset naming RatingsCard."
@@ -48,7 +48,7 @@ minimum width), so there are no sizing props to pass.
    card, inset by the card's own padding (the CTA-bar
    composition PublicRecipePage adopts).
 
-**Run when:** `src/widgets/ButtonRow.tsx`, its stories, the
+**Run when:** `src/widgets/actions/ButtonRow.tsx`, its stories, the
 pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
 MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset
 naming ButtonRow.

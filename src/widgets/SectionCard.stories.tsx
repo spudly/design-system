@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { SectionCard } from "./SectionCard.js";
-import { Button } from "./Button.js";
+import { Button } from "./actions/Button.js";
 import { ListItem } from "./ListItem.js";
 import { Text } from "./Text.js";
 

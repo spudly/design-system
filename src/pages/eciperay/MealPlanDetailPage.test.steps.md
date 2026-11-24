@@ -1,7 +1,7 @@
 ---
 component: MealPlanDetailPage
 run_when:
-  - "src/widgets/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
+  - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
   - "src/widgets/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack."
   - "src/widgets/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
   - "src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow."
@@ -47,7 +47,7 @@ minimum width), so there are no sizing props to pass.
    card, inset by the card's own padding (the CTA-bar
    composition PublicRecipePage adopts).
 
-**Run when:** `src/widgets/ButtonRow.tsx`, its stories, the
+**Run when:** `src/widgets/actions/ButtonRow.tsx`, its stories, the
 pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
 MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset
 naming ButtonRow.

@@ -1,7 +1,7 @@
 import { CompactRow } from "../widgets/CompactRow.js";
 import { FixedActionBanner } from "../widgets/FixedActionBanner.js";
 import { Text } from "../widgets/Text.js";
-import { TextLink } from "../widgets/TextLink.js";
+import { TextLink } from "../widgets/actions/TextLink.js";
 import { useVoice } from "../voice/index.js";
 
 type InstallBannerViewLink = {

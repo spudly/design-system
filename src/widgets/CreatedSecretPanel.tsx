@@ -1,6 +1,6 @@
 import { XStack, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "./Button.js";
+import { Button } from "./actions/Button.js";
 import { Text } from "./Text.js";
 
 export type CreatedSecretPanelProps = {

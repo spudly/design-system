@@ -269,7 +269,7 @@ test("LegalSection frames the host's links under its title in the app treatment"
 });
 
 test("TextLink's muted tone is the muted role on both frames, under an explicit color", () => {
-  const source = read("src/widgets/TextLink.tsx");
+  const source = read("src/widgets/actions/TextLink.tsx");
   assert.match(source, /tone\?: "default" \| "muted"/, "the tone prop is declared");
   assert.match(
     source,

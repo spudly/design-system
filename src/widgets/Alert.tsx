@@ -3,7 +3,7 @@ import { XStack, YStack, isWeb, styled } from "tamagui";
 import type { GetProps } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { platformAccessibilityProps, politeLiveRegionProps } from "./accessibility.js";
-import { Button, ButtonInternal } from "./Button.js";
+import { Button, ButtonInternal } from "./actions/Button.js";
 import { Text } from "./Text.js";
 import { useVoice } from "../voice/index.js";
 

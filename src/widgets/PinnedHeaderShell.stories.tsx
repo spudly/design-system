@@ -3,7 +3,7 @@ import { ScrollView, YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
 import { PinnedHeaderShell } from "./PinnedHeaderShell.js";
 import { SectionStack } from "./SectionStack.js";
-import { Tabs } from "./Tabs.js";
+import { Tabs } from "./actions/Tabs.js";
 import { Text } from "./Text.js";
 
 const meta: Meta<typeof PinnedHeaderShell> = {

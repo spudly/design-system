@@ -3,7 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { CheckboxField } from "./CheckboxField.js";
 import { Text } from "./Text.js";
-import { TextLink } from "./TextLink.js";
+import { TextLink } from "./actions/TextLink.js";
 
 const meta: Meta<typeof CheckboxField> = {
   title: "Widgets/CheckboxField",

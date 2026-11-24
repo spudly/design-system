@@ -38,7 +38,7 @@ function codeOf(rel: string): string {
 }
 
 const brandMark = codeOf("src/icons/BrandMark.tsx");
-const brandLink = codeOf("src/widgets/BrandLink.tsx");
+const brandLink = codeOf("src/widgets/actions/BrandLink.tsx");
 const topBar = codeOf("src/widgets/AppTopBar.tsx");
 const shellPage = codeOf("src/pages/eciperay/AppShellPage.tsx");
 const footer = codeOf("src/widgets/BigFooter.tsx");
@@ -105,7 +105,7 @@ test("BigFooter's brand block takes the same mark treatment (#726)", () => {
 });
 
 test("stories pin the marked Eciperay brand and the wordmark-only Memorize brand (#726)", () => {
-  const brandLinkStories = readFileSync(join(root, "src/widgets/BrandLink.stories.tsx"), "utf8");
+  const brandLinkStories = readFileSync(join(root, "src/widgets/actions/BrandLink.stories.tsx"), "utf8");
   assert.match(brandLinkStories, /export const WithMark/);
   assert.match(brandLinkStories, /mark: "eciperay"/);
   const topBarStories = readFileSync(join(root, "src/widgets/AppTopBar.stories.tsx"), "utf8");

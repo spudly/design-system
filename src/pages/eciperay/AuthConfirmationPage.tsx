@@ -2,7 +2,7 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { Text } from "../../widgets/Text.js";
-import { TextLink } from "../../widgets/TextLink.js";
+import { TextLink } from "../../widgets/actions/TextLink.js";
 
 /**
  * AuthConfirmationPage (#438 Part 3): the post-auth

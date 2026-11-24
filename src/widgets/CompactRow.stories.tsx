@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Button } from "./Button.js";
+import { Button } from "./actions/Button.js";
 import { CompactRow } from "./CompactRow.js";
 
 const meta: Meta<typeof CompactRow> = {

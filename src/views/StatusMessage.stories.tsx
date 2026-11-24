@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { tokens } from "../tokens/index.js";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { StatusMessage } from "./StatusMessage.js";
 import { Text } from "../widgets/Text.js";
 

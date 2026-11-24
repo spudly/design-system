@@ -1,7 +1,7 @@
 export { Accordion, type AccordionItem, type AccordionProps } from "./Accordion.js";
 export { AccordionSection, type AccordionSectionProps } from "./AccordionSection.js";
 export { Alert, type AlertProps } from "./Alert.js";
-export { ActionBar, type ActionBarProps } from "./ActionBar.js";
+export { ActionBar, type ActionBarProps } from "./actions/ActionBar.js";
 export { Avatar, type AvatarProps } from "./Avatar.js";
 export {
   AutocompletePicker,
@@ -9,10 +9,10 @@ export {
   type AutocompletePickerResult,
   type AutocompletePickerSelectedItem,
 } from "./form/AutocompletePicker.js";
-export { BackLink, type BackLinkProps } from "./BackLink.js";
+export { BackLink, type BackLinkProps } from "./actions/BackLink.js";
 export { Badge, type BadgeProps } from "./Badge.js";
 export { BlankWord, type BlankWordProps } from "./BlankWord.js";
-export { Button, type ButtonProps } from "./Button.js";
+export { Button, type ButtonProps } from "./actions/Button.js";
 export { Card, type CardProps } from "./Card.js";
 export { CheckboxSelectList, type CheckboxSelectListProps } from "./form/CheckboxSelectList.js";
 export { CheckboxField, type CheckboxFieldProps } from "./CheckboxField.js";
@@ -46,12 +46,12 @@ export { MainLandmark, type MainLandmarkProps } from "./MainLandmark.js";
 export { MessageCard, type MessageCardProps } from "./MessageCard.js";
 export { MetadataBadge, type MetadataBadgeProps } from "./MetadataBadge.js";
 export { OptionCard, type OptionCardProps } from "./OptionCard.js";
-export { PrevNextNav, type PrevNextNavProps } from "./PrevNextNav.js";
+export { PrevNextNav, type PrevNextNavProps } from "./actions/PrevNextNav.js";
 export { ProgressBar, type ProgressBarProps } from "./ProgressBar.js";
-export { ButtonRow, type ButtonRowProps } from "./ButtonRow.js";
+export { ButtonRow, type ButtonRowProps } from "./actions/ButtonRow.js";
 export { CardStack, type CardStackProps } from "./CardStack.js";
 export { ListStack, type ListStackProps } from "./ListStack.js";
-export { LinkStack, type LinkStackProps } from "./LinkStack.js";
+export { LinkStack, type LinkStackProps } from "./actions/LinkStack.js";
 export { LoadingCardRow } from "./LoadingCardRow.js";
 export { LoadingListItem } from "./LoadingListItem.js";
 export { LoadingActionCardRow, type LoadingActionCardRowProps } from "./LoadingActionCardRow.js";
@@ -67,7 +67,7 @@ export {
   type SearchHelpPopoverProps,
 } from "./SearchHelpPopover.js";
 export { HeroStack, type HeroStackProps } from "./HeroStack.js";
-export { StackedButtonRow, type StackedButtonRowProps } from "./StackedButtonRow.js";
+export { StackedButtonRow, type StackedButtonRowProps } from "./actions/StackedButtonRow.js";
 export { CardGrid, type CardGridProps } from "./CardGrid.js";
 export { BannerRow, type BannerRowProps } from "./BannerRow.js";
 export { ProseColumn, type ProseColumnProps } from "./ProseColumn.js";
@@ -108,18 +108,18 @@ export { StatCard, type StatCardProps } from "./StatCard.js";
 export { StatRow, type StatRowProps } from "./StatRow.js";
 export { StepDots, type StepDotsProps } from "./StepDots.js";
 export { Switch, type SwitchProps } from "./form/Switch.js";
-export { Tabs, type TabsProps } from "./Tabs.js";
+export { Tabs, type TabsProps } from "./actions/Tabs.js";
 export { useTagColorResolver, useTagColorShadeResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./Text.js";
 export { Thumbnail, type ThumbnailProps } from "./Thumbnail.js";
-export { TextLink, type TextLinkProps } from "./TextLink.js";
+export { TextLink, type TextLinkProps } from "./actions/TextLink.js";
 export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./Toast.js";
 export { TokenRow, type TokenRowProps } from "./TokenRow.js";
 export { VerseText, type VerseTextProps } from "./VerseText.js";
 // The #119 dedupe set: the canonical components the tranche
 // branches coined independently, shipped once here (the
 // tranche PRs adopt these in their update rounds).
-export { BrandLink, type BrandLinkProps } from "./BrandLink.js";
+export { BrandLink, type BrandLinkProps } from "./actions/BrandLink.js";
 export { CenteredText, type CenteredTextProps } from "./CenteredText.js";
 export { FieldLabel, type FieldLabelProps } from "./form/FieldLabel.js";
 export { FormHeading, type FormHeadingProps } from "./FormHeading.js";
@@ -153,7 +153,7 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./TextActionCard
 // inventoried as extraction-required during their adoption
 // rounds, shipped once here (the tranche PRs adopt these in
 // their post-extraction rounds).
-export { ButtonStack, type ButtonStackProps } from "./ButtonStack.js";
+export { ButtonStack, type ButtonStackProps } from "./actions/ButtonStack.js";
 export { EqualColumns, type EqualColumnsProps } from "./form/EqualColumns.js";
 export {
   NutritionPanel,
@@ -166,8 +166,8 @@ export {
 export { PanelStack, type PanelStackProps } from "./PanelStack.js";
 export { PreviewCard, type PreviewCardProps } from "./PreviewCard.js";
 export { StepOverlay, type StepOverlayProps } from "./StepOverlay.js";
-export { Toolbar, type ToolbarProps } from "./Toolbar.js";
-export { TrailingActionsRow, type TrailingActionsRowProps } from "./TrailingActionsRow.js";
+export { Toolbar, type ToolbarProps } from "./actions/Toolbar.js";
+export { TrailingActionsRow, type TrailingActionsRowProps } from "./actions/TrailingActionsRow.js";
 export {
   WeekDayColumn,
   WeekDayColumns,

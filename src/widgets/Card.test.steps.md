@@ -1,8 +1,8 @@
 ---
 component: Card
 run_when:
-  - "src/widgets/FormStack.tsx, src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
-  - "src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: TrailingActionsRow, Card, TagsPage)"
+  - "src/widgets/FormStack.tsx, src/widgets/actions/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
+  - "src/widgets/actions/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: TrailingActionsRow, Card, TagsPage)"
 ---
 
 # Card — manual test steps
@@ -32,7 +32,7 @@ ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
    under Stephen's 2026-10-29 ruling).
 
 **Run when:** `src/widgets/FormStack.tsx`,
-`src/widgets/TrailingActionsRow.tsx`,
+`src/widgets/actions/TrailingActionsRow.tsx`,
 `src/widgets/Card.tsx`, their stories, TagsPage's
 forms or rows, or a changeset naming any of them.
 
@@ -52,6 +52,6 @@ ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
    (the former CompactCard, folded into Card as
    `variant="compact"` under Stephen's 2026-10-29 ruling).
 
-**Run when:** `src/widgets/TrailingActionsRow.tsx`,
+**Run when:** `src/widgets/actions/TrailingActionsRow.tsx`,
 `src/widgets/Card.tsx`, their stories, TagsPage's forms
 or rows, or a changeset naming any of them.

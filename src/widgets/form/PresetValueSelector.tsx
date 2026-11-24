@@ -4,7 +4,7 @@ import { XStack, isWeb } from "tamagui";
 import type { TamaguiElement } from "tamagui";
 import { tokens } from "../../tokens/index.js";
 import { groupRoleProps, platformAccessibilityProps } from "../accessibility.js";
-import { Button } from "../Button.js";
+import { Button } from "../actions/Button.js";
 import { Text } from "../Text.js";
 import { TextField } from "./TextField.js";
 

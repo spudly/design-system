@@ -1,4 +1,4 @@
-import { PrevNextNav } from "../../widgets/PrevNextNav.js";
+import { PrevNextNav } from "../../widgets/actions/PrevNextNav.js";
 import { StepDots } from "../../widgets/StepDots.js";
 
 /**

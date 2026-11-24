@@ -3,7 +3,7 @@ import { useState } from "react";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { Alert } from "../../widgets/Alert.js";
 import { Badge } from "../../widgets/Badge.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { CardStack } from "../../widgets/CardStack.js";
 import { ColorPickerField } from "../../widgets/form/ColorPickerField.js";
@@ -14,7 +14,7 @@ import { ScreenContainer } from "../../widgets/ScreenContainer.js";
 import { SectionStack } from "../../widgets/SectionStack.js";
 import { Text } from "../../widgets/Text.js";
 import { TextField } from "../../widgets/form/TextField.js";
-import { TrailingActionsRow } from "../../widgets/TrailingActionsRow.js";
+import { TrailingActionsRow } from "../../widgets/actions/TrailingActionsRow.js";
 
 /**
  * TagsPage (#126, B3c): the tag management view — the split

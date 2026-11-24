@@ -2,7 +2,7 @@ import { XStack, YStack } from "tamagui";
 import { useLoadingScope } from "../contexts/LoadingScope.js";
 import { tokens } from "../tokens/index.js";
 import { BoxSkeleton } from "../widgets/BoxSkeleton.js";
-import { Button } from "../widgets/Button.js";
+import { Button } from "../widgets/actions/Button.js";
 import { SkeletonBone } from "../widgets/SkeletonClock.js";
 import { Text } from "../widgets/Text.js";
 import { LINE_BOXES } from "../widgets/TextSkeleton.js";

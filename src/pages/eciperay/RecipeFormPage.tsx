@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
 import type { ReactNode } from "react";
 import { Alert } from "../../widgets/Alert.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { ChangedListBanner } from "../../widgets/ChangedListBanner.js";
 import { RecipeImageView, type RecipeImageViewProps } from "../../views/RecipeImageView.js";
 import {
@@ -21,7 +21,7 @@ import { ScrollRegion } from "../../widgets/ScrollRegion.js";
 import { TagList } from "../../widgets/TagList.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
 import { TextField } from "../../widgets/form/TextField.js";
-import { ButtonRow } from "../../widgets/ButtonRow.js";
+import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { Badge } from "../../widgets/Badge.js";
 
 /**

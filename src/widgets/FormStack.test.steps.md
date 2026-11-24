@@ -1,7 +1,7 @@
 ---
 component: FormStack
 run_when:
-  - "src/widgets/FormStack.tsx, src/widgets/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
+  - "src/widgets/FormStack.tsx, src/widgets/actions/TrailingActionsRow.tsx, src/widgets/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
   - "any of these components, their stories, or a changeset naming them. Run only the numbered case for the component(s) that changed. (namely: StepList, MarkableRow, SuggestionPanel, TagList, StatusMessage, FieldRow)"
   - "any of these components, their stories, the form pages, or a changeset naming them. (namely: FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner, RecipeFormPage, MealFormPage, MealPlanFormPage, TagsPage)"
 ---
@@ -33,7 +33,7 @@ ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
    under Stephen's 2026-10-29 ruling).
 
 **Run when:** `src/widgets/FormStack.tsx`,
-`src/widgets/TrailingActionsRow.tsx`,
+`src/widgets/actions/TrailingActionsRow.tsx`,
 `src/widgets/Card.tsx`, their stories, TagsPage's
 forms or rows, or a changeset naming any of them.
 

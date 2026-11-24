@@ -53,10 +53,10 @@ function readCode(rel: string) {
     .replaceAll(/\/\*[\s\S]*?\*\//g, "")
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
-const button = readCode("src/widgets/Button.tsx");
-const textLink = readCode("src/widgets/TextLink.tsx");
-const backLink = readCode("src/widgets/BackLink.tsx");
-const tabs = readCode("src/widgets/Tabs.tsx");
+const button = readCode("src/widgets/actions/Button.tsx");
+const textLink = readCode("src/widgets/actions/TextLink.tsx");
+const backLink = readCode("src/widgets/actions/BackLink.tsx");
+const tabs = readCode("src/widgets/actions/Tabs.tsx");
 const index = readCode("src/widgets/index.ts");
 test("Button: one shared frame config feeds the button and anchor frames (#248)", () => {
   assert.match(button, /const buttonFrameConfig = \{/);
@@ -158,7 +158,7 @@ test("BackLink: href is optional and renders the row inside a styled Anchor (#24
   assert.match(backLink, /if \(props\.href !== undefined\) \{/);
   assert.match(backLink, /<StyledBackAnchor href=\{props\.href\}/);
   // The callback form is untouched: the pinned XStack pressable and
-  // its translator call survive (see also src/widgets/BackLink.test.ts).
+  // its translator call survive (see also src/widgets/actions/BackLink.test.ts).
   assert.match(backLink, /platformAccessibilityProps\(\{ accessibilityRole: "link" \}\)/);
 });
 test("Tabs: link variant items carry hrefs, the variant takes no change callback (#248)", () => {

@@ -31,7 +31,7 @@ describe("textFontContext", () => {
   });
 
   test("Button passes fontFamily as an instance prop (#69)", () => {
-    const source = readSrc("widgets/Button.tsx");
+    const source = readSrc("widgets/actions/Button.tsx");
     assert.match(
       source,
       /fontFamily="body"/,

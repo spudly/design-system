@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
 import { BannerRow } from "./BannerRow.js";
-import { BrandLink } from "./BrandLink.js";
-import { TextLink } from "./TextLink.js";
+import { BrandLink } from "./actions/BrandLink.js";
+import { TextLink } from "./actions/TextLink.js";
 
 const meta: Meta<typeof BannerRow> = {
   title: "Widgets/BannerRow",

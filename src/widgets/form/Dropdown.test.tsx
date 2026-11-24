@@ -71,7 +71,7 @@ function codeOf(rel: string) {
 }
 const dropdown = codeOf("src/widgets/form/Dropdown.tsx");
 const dropdownButton = codeOf("src/widgets/form/DropdownButton.tsx");
-const button = codeOf("src/widgets/Button.tsx");
+const button = codeOf("src/widgets/actions/Button.tsx");
 const family = {
   Dropdown: dropdown,
   DropdownButton: dropdownButton,

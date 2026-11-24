@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
-import { BackLink } from "../../widgets/BackLink.js";
+import { BackLink } from "../../widgets/actions/BackLink.js";
 import { BlankWord } from "../../widgets/BlankWord.js";
-import { Button } from "../../widgets/Button.js";
+import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/Card.js";
 import { Alert } from "../../widgets/Alert.js";
 import { ScreenContainer } from "../../widgets/ScreenContainer.js";

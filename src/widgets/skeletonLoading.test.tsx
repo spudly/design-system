@@ -595,7 +595,7 @@ test("T1: a Button inside a LoadingScope renders the rectangle-skeleton treatmen
   // Source pins: the scope drives the fill (the theme's border
   // role, SkeletonBone's fill), the press handler is dropped,
   // and the disabled skeleton state withholds the link href.
-  const button = readCode("src/widgets/Button.tsx");
+  const button = readCode("src/widgets/actions/Button.tsx");
   assert.match(button, /const scopedLoading = useLoadingScope\(\)/, "Button reads the scope");
   assert.match(
     button,
@@ -749,7 +749,7 @@ test("T1: a ghost Button inside a LoadingScope renders a text bone, no filled bo
   // deprecated `ghost` variant; the skeleton frame stays
   // transparent and borderless; the label is replaced by a
   // SkeletonBone sized from the label.
-  const button = readCode("src/widgets/Button.tsx");
+  const button = readCode("src/widgets/actions/Button.tsx");
   assert.match(
     button,
     /const ghostSkeleton = scopedLoading && \(ghost \|\| variant === "ghost"\)/,

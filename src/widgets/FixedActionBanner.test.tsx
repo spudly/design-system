@@ -47,7 +47,7 @@ function readCode(rel) {
     .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 const banner = readCode("src/widgets/FixedActionBanner.tsx");
-const actionBar = readCode("src/widgets/ActionBar.tsx");
+const actionBar = readCode("src/widgets/actions/ActionBar.tsx");
 test("FixedActionBanner selects viewport pinning and passes no style props (#405)", () => {
   assert.match(
     banner,

@@ -318,7 +318,7 @@ describe("publicRecipePageAdoption", () => {
 
   test("the CTA sizing and message shell are the shared components' (#341)", () => {
     assert.ok(
-      code.includes('import { ButtonRow } from "../../widgets/ButtonRow.js";'),
+      code.includes('import { ButtonRow } from "../../widgets/actions/ButtonRow.js";'),
       "the page imports the library ButtonRow",
     );
     assert.ok(

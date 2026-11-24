@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { YStack } from "tamagui";
-import { Button } from "./Button.js";
+import { Button } from "./actions/Button.js";
 import { PreviewCard } from "./PreviewCard.js";
 import { Text } from "./Text.js";
 

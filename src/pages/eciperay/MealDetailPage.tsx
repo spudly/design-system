@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/BigFooter.js";
-import { Button } from "../../widgets/Button.js";
-import { ButtonRow } from "../../widgets/ButtonRow.js";
+import { Button } from "../../widgets/actions/Button.js";
+import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { ListItem } from "../../widgets/ListItem.js";
 import { ListStack } from "../../widgets/ListStack.js";
 import { MarkableRow } from "../../widgets/MarkableRow.js";

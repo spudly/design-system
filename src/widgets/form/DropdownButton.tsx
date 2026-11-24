@@ -4,7 +4,7 @@ import type { TamaguiElement } from "tamagui";
 import { CollapsibleIcon } from "../../icons/CollapsibleIcon.js";
 import type { IconName } from "../../icons/iconRegistry.js";
 import { tokens } from "../../tokens/index.js";
-import { Button } from "../Button.js";
+import { Button } from "../actions/Button.js";
 import { useVariantGlyphInk } from "../useVariantGlyphInk.js";
 import { farCornerTouches, touchingCornerRadii, useDropdownContext } from "./Dropdown.js";
 
