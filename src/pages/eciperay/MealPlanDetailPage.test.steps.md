@@ -2,8 +2,8 @@
 component: MealPlanDetailPage
 run_when:
   - "src/widgets/actions/ButtonRow.tsx, its stories, the pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage, MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset naming ButtonRow."
-  - "src/widgets/layout/SectionStack.tsx, its stories, the pages that compose SectionStack (MealPlanDetailPage), or a changeset naming SectionStack."
-  - "src/widgets/data/ListStack.tsx, its stories, the pages that compose ListStack (MealPlanDetailPage, MealDetailPage), or a changeset naming ListStack."
+  - "src/widgets/layout/Col.tsx, its stories, the pages that compose the section Col (MealPlanDetailPage), or a changeset naming Col."
+  - "the pages whose rows compose in a plain Col (MealPlanDetailPage, MealDetailPage), or a changeset naming the row list composition."
   - "src/widgets/DetailRow.tsx, its stories, MealPlanDetailPage (the nutrition-goal rows), or a changeset naming DetailRow."
   - "src/widgets/ListRow.tsx, its stories, MealPlanDetailPage's entries, or a changeset naming ListRow."
   - "src/pages/eciperay/MealPlansPage.tsx, src/pages/eciperay/MealPlanDetailPage.tsx, their stories, or a changeset naming either page."
@@ -52,28 +52,28 @@ pages that compose ButtonRow (MemorizeReviewPage, MyVersesPage,
 MealPlanDetailPage), PublicRecipePage's CTA bar, or a changeset
 naming ButtonRow.
 
-## SectionStack
+## Section Col
 
-Open in `Widgets/SectionStack`: Default.
+Open in `Pages/Eciperay/MealPlanDetailPage` (its stories).
 
-A SectionStack is a stack of a page's sections — its major
+The page's sections stack in a Col at gap xxl — its major
 blocks in order.
 
 1. Every block in the stack — title, meta line, paragraph — is
    separated by the same 32px gap, and children fill the
-   stack's width (MealPlanDetailPage's page stack is the live
-   case: every section separation on the page is that one gap).
+   stack's width: every section separation on the page is
+   that one gap.
 
-**Run when:** `src/widgets/layout/SectionStack.tsx`, its stories,
-the pages that compose SectionStack (MealPlanDetailPage), or a
-changeset naming SectionStack.
+**Run when:** `src/widgets/layout/Col.tsx`, its stories,
+the pages that compose the section Col (MealPlanDetailPage),
+or a changeset naming Col.
 
-## ListStack
+## Entry rows
 
-Open in `Widgets/ListStack`: Default.
+Open in `Pages/Eciperay/MealPlanDetailPage` (its stories).
 
-A ListStack composes hairline rows as one continuous list; the
-stack adds no gap of its own — the rows own their separation.
+The entry rows compose in a plain Col as one continuous list;
+the Col adds no gap of its own — the rows own their separation.
 
 1. The three rows read as one ruled surface: hairlines run
    continuously from row to row with no gaps of card background
@@ -81,9 +81,9 @@ stack adds no gap of its own — the rows own their separation.
    (MealPlanDetailPage's Entries card and MealDetailPage's
    Recipes card are the live cases).
 
-**Run when:** `src/widgets/data/ListStack.tsx`, its stories, the
-pages that compose ListStack (MealPlanDetailPage,
-MealDetailPage), or a changeset naming ListStack.
+**Run when:** the pages whose rows compose in a plain Col
+(MealPlanDetailPage, MealDetailPage), or a changeset naming
+the row list composition.
 
 ## DetailRow
 

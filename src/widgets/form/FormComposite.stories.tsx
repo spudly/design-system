@@ -4,7 +4,6 @@ import { YStack } from "tamagui";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { CheckboxField } from "./CheckboxField.js";
 import { FormHeading } from "../content/FormHeading.js";
-import { FormStack } from "../layout/FormStack.js";
 import { NumberStepper } from "./NumberStepper.js";
 import {
   AutocompletePicker,
@@ -23,6 +22,7 @@ import { StarRatingInput } from "./StarRatingInput.js";
 import { Switch } from "./Switch.js";
 import { TextAreaField } from "./TextAreaField.js";
 import { TextField } from "./TextField.js";
+import { Col } from "../layout/Col.js";
 
 /**
  * Composite story (#711): every form widget rendered together in one
@@ -112,7 +112,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
 
   return (
     <YStack maxWidth={430}>
-      <FormStack>
+      <Col gap="m">
         <FormHeading subtitle="Every form widget, one layout">Recipe details</FormHeading>
         <TextField
           label="Recipe name"
@@ -188,9 +188,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           disabled={disabled}
           onToggle={(id) => {
             setSelectedTagIds((previous) =>
-              previous.includes(id)
-                ? previous.filter((entry) => entry !== id)
-                : [...previous, id],
+              previous.includes(id) ? previous.filter((entry) => entry !== id) : [...previous, id],
             );
           }}
         />
@@ -248,7 +246,7 @@ function FullForm({ mode }: { mode: CompositeMode }) {
           onCheckedChange={setPinned}
           disabled={disabled}
         />
-      </FormStack>
+      </Col>
     </YStack>
   );
 }

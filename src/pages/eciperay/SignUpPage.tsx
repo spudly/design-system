@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { SignUpForm, type SignUpLegalNoticeSpan } from "../../views/eciperay/SignUpForm.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
@@ -70,7 +70,7 @@ export function SignUpPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="heading">{voice.signUpPage.heading}</Text>
           <SignUpForm
             displayName={displayName}
@@ -86,7 +86,7 @@ export function SignUpPage({
             signInHref={signInHref}
             legalNotice={legalNotice}
           />
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

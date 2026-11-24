@@ -3,7 +3,10 @@ import type { ReactNode } from "react";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ChangedListBanner } from "../../widgets/feedback/ChangedListBanner.js";
-import { RecipeImageView, type RecipeImageViewProps } from "../../views/eciperay/RecipeImageView.js";
+import {
+  RecipeImageView,
+  type RecipeImageViewProps,
+} from "../../views/eciperay/RecipeImageView.js";
 import {
   RecipeIngredientListView,
   type RecipeIngredientListViewProps,
@@ -13,10 +16,10 @@ import {
   type RecipeInstructionListViewProps,
 } from "../../views/eciperay/RecipeInstructionListView.js";
 import { EqualColumns } from "../../widgets/form/EqualColumns.js";
-import { FormStack } from "../../widgets/layout/FormStack.js";
 import { LabeledField } from "../../widgets/form/LabeledField.js";
 import { LabeledGroup } from "../../widgets/form/LabeledGroup.js";
 import { RevertAction } from "../../views/eciperay/RevertAction.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScrollRegion } from "../../widgets/layout/ScrollRegion.js";
 import { TagList } from "../../widgets/data/TagList.js";
 import { TextAreaField } from "../../widgets/form/TextAreaField.js";
@@ -92,7 +95,7 @@ import { Badge } from "../../widgets/data/Badge.js";
  *   through the DS TextField / TextAreaField chrome (with the
  *   `changed` variant carrying the diff wash — see TextField).
  * - The page applies no styling itself (#119): the scroll region
- *   is ScrollRegion, the body stack is FormStack, each field
+ *   is ScrollRegion, the body stack is a Col at gap m, each field
  *   section is a LabeledField (the tags a LabeledGroup, the
  *   servings / prep / cook fields a EqualColumns row of
  *   LabeledFields), and the
@@ -270,7 +273,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
   return (
     <BigFooterShell footer={props.footer} scrollMode="content">
       <ScrollRegion>
-        <FormStack>
+        <Col gap="m">
           <LabeledField label="Title" fieldId="recipe-title" action={revertAction("title")}>
             <TextField
               id="recipe-title"
@@ -431,7 +434,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
           <Button disabled={isSubmitting} onPress={onSubmit}>
             {isSubmitting ? submittingLabel : submitLabel}
           </Button>
-        </FormStack>
+        </Col>
       </ScrollRegion>
     </BigFooterShell>
   );

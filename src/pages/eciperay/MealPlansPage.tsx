@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { CardStack } from "../../widgets/layout/CardStack.js";
 import { EmptyState } from "../../views/shared/EmptyState.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { CardRow } from "../../widgets/layout/CardRow.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -81,7 +81,7 @@ import { Text } from "../../widgets/data/Text.js";
  * widget in its link form (its card layout, link area, and action
  * treatment live there; the page supplies the plan content, the
  * plan's href, and the Delete action), and the list stacks in a
- * CardStack.
+ * Col at gap s.
  */
 
 /** One meal plan row's view-model. The app formats `subtitle` (its
@@ -145,7 +145,7 @@ export function MealPlansPage({
         </Text>
         {createHref ? <Button href={createHref}>New meal plan</Button> : null}
         {loading ? (
-          <CardStack>
+          <Col gap="s">
             {LOADING_PLAN_KEYS.map((key) => (
               <CardRow
                 key={key}
@@ -162,11 +162,11 @@ export function MealPlansPage({
                   : {})}
               />
             ))}
-          </CardStack>
+          </Col>
         ) : plans.length === 0 ? (
           <EmptyState title="No meal plans yet." />
         ) : (
-          <CardStack>
+          <Col gap="s">
             {plans.map((plan) => (
               <CardRow
                 key={plan.id}
@@ -184,7 +184,7 @@ export function MealPlansPage({
                   : {})}
               />
             ))}
-          </CardStack>
+          </Col>
         )}
       </ScreenContainer>
     </BigFooterShell>

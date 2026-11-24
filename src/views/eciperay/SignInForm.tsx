@@ -1,6 +1,5 @@
-import { FormStack } from "../../widgets/layout/FormStack.js";
-import { LinkStack } from "../../widgets/actions/LinkStack.js";
 import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { PasswordField } from "../../widgets/form/PasswordField.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
@@ -61,7 +60,7 @@ export function SignInForm({
     }
   };
   return (
-    <FormStack>
+    <Col gap="m">
       <TextField
         label={voice.signInForm.emailLabel}
         value={email}
@@ -91,7 +90,7 @@ export function SignInForm({
         submitLabel={submitLabel}
       />
       {signUpHref || forgotPasswordHref ? (
-        <LinkStack>
+        <Col gap="s">
           {signUpHref ? (
             <TextLink href={signUpHref}>{voice.signInForm.createAccountLabel}</TextLink>
           ) : null}
@@ -100,8 +99,8 @@ export function SignInForm({
               {voice.signInForm.forgotPasswordLabel}
             </TextLink>
           ) : null}
-        </LinkStack>
+        </Col>
       ) : null}
-    </FormStack>
+    </Col>
   );
 }

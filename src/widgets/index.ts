@@ -53,12 +53,12 @@ export { OptionCard, type OptionCardProps } from "./content/OptionCard.js";
 export { PrevNextNav, type PrevNextNavProps } from "./actions/PrevNextNav.js";
 export { ProgressBar, type ProgressBarProps } from "./feedback/ProgressBar.js";
 export { ButtonRow, type ButtonRowProps } from "./actions/ButtonRow.js";
-export { CardStack, type CardStackProps } from "./layout/CardStack.js";
-export { ListStack, type ListStackProps } from "./data/ListStack.js";
-export { LinkStack, type LinkStackProps } from "./actions/LinkStack.js";
 export { LoadingCardRow } from "./feedback/LoadingCardRow.js";
 export { LoadingListItem } from "./feedback/LoadingListItem.js";
-export { LoadingActionCardRow, type LoadingActionCardRowProps } from "./feedback/LoadingActionCardRow.js";
+export {
+  LoadingActionCardRow,
+  type LoadingActionCardRowProps,
+} from "./feedback/LoadingActionCardRow.js";
 export { CatalogRow, type CatalogRowProps } from "./data/CatalogRow.js";
 export { CatalogCardColumn, type CatalogCardColumnProps } from "./layout/CatalogCardColumn.js";
 export { CatalogListColumn, type CatalogListColumnProps } from "./layout/CatalogListColumn.js";
@@ -75,11 +75,9 @@ export { StackedButtonRow, type StackedButtonRowProps } from "./actions/StackedB
 export { CardGrid, type CardGridProps } from "./layout/CardGrid.js";
 export { BannerRow, type BannerRowProps } from "./feedback/BannerRow.js";
 export { ProseColumn, type ProseColumnProps } from "./layout/ProseColumn.js";
-export { ProseStack, type ProseStackProps } from "./layout/ProseStack.js";
 export { BulletList, type BulletListProps } from "./data/BulletList.js";
 export { ChatTranscript, type ChatTranscriptProps } from "./content/ChatTranscript.js";
 export { FieldRow, type FieldRowProps } from "./form/FieldRow.js";
-export { SectionStack, type SectionStackProps } from "./layout/SectionStack.js";
 export { ScreenContainer, type ScreenContainerProps } from "./layout/ScreenContainer.js";
 export { ScrollRegion, type ScrollRegionProps } from "./layout/ScrollRegion.js";
 export { SecretRevealPanel, type SecretRevealPanelProps } from "./form/SecretRevealPanel.js";
@@ -117,7 +115,13 @@ export { useTagColorResolver, useTagColorShadeResolver } from "./tagColors.js";
 export { Text, type TextProps } from "./data/Text.js";
 export { Thumbnail, type ThumbnailProps } from "./data/Thumbnail.js";
 export { TextLink, type TextLinkProps } from "./actions/TextLink.js";
-export { Toast, ToastProvider, toast, type ToastProps, type ToastProviderProps } from "./feedback/Toast.js";
+export {
+  Toast,
+  ToastProvider,
+  toast,
+  type ToastProps,
+  type ToastProviderProps,
+} from "./feedback/Toast.js";
 export { TokenRow, type TokenRowProps } from "./data/TokenRow.js";
 export { VerseText, type VerseTextProps } from "./data/VerseText.js";
 // The #119 dedupe set: the canonical components the tranche
@@ -127,7 +131,6 @@ export { BrandLink, type BrandLinkProps } from "./actions/BrandLink.js";
 export { CenteredText, type CenteredTextProps } from "./content/CenteredText.js";
 export { FieldLabel, type FieldLabelProps } from "./form/FieldLabel.js";
 export { FormHeading, type FormHeadingProps } from "./content/FormHeading.js";
-export { FormStack, type FormStackProps } from "./layout/FormStack.js";
 export { LabeledField, type LabeledFieldProps } from "./form/LabeledField.js";
 export { LabeledGroup, type LabeledGroupProps } from "./form/LabeledGroup.js";
 export { MarkableRow, type MarkableRowProps } from "./data/MarkableRow.js";
@@ -157,7 +160,6 @@ export { TextActionCardRow, type TextActionCardRowProps } from "./content/TextAc
 // inventoried as extraction-required during their adoption
 // rounds, shipped once here (the tranche PRs adopt these in
 // their post-extraction rounds).
-export { ButtonStack, type ButtonStackProps } from "./actions/ButtonStack.js";
 export { EqualColumns, type EqualColumnsProps } from "./form/EqualColumns.js";
 export {
   NutritionPanel,
@@ -191,9 +193,6 @@ export {
   type LayoutSize,
   type ResolvedLayoutStyle,
 } from "./layout.js";
-export { ContentStack, type ContentStackProps } from "./layout/ContentStack.js";
-export { CompactStack, type CompactStackProps } from "./layout/CompactStack.js";
-export { TightStack, type TightStackProps } from "./layout/TightStack.js";
 export { EndRow, type EndRowProps } from "./layout/EndRow.js";
 export { CompactRow, type CompactRowProps } from "./layout/CompactRow.js";
 export { Grow, type GrowProps } from "./layout/Grow.js";
@@ -201,7 +200,10 @@ export { FramedScrollRegion, type FramedScrollRegionProps } from "./layout/Frame
 export { DashedPlaceholder, type DashedPlaceholderProps } from "./content/DashedPlaceholder.js";
 export { OverlayTextPanel, type OverlayTextPanelProps } from "./content/OverlayTextPanel.js";
 export { RadioSkeletonRow, type RadioSkeletonRowProps } from "./feedback/RadioSkeletonRow.js";
-export { CheckboxSkeletonRow, type CheckboxSkeletonRowProps } from "./feedback/CheckboxSkeletonRow.js";
+export {
+  CheckboxSkeletonRow,
+  type CheckboxSkeletonRowProps,
+} from "./feedback/CheckboxSkeletonRow.js";
 
 // The #698 tranche-4 move set: the remaining styled leaf and
 // chrome components the views' de-styling moved from

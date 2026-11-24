@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 
@@ -39,11 +39,11 @@ export function AuthConfirmationPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="heading">{title}</Text>
           <Text variant="muted">{body}</Text>
           {backHref && backLabel ? <TextLink href={backHref}>{backLabel}</TextLink> : null}
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

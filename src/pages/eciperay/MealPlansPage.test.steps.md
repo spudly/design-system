@@ -1,7 +1,7 @@
 ---
 component: MealPlansPage
 run_when:
-  - "src/widgets/layout/CardStack.tsx, its stories, the pages that compose CardStack (MealPlansPage), or a changeset naming CardStack."
+  - "src/widgets/layout/Col.tsx, its stories, the pages that compose the card Col (MealPlansPage), or a changeset naming Col."
   - "src/widgets/layout/Center.tsx, its stories, the pages that compose Center (MealPlansPage), or a changeset naming Center."
   - "src/widgets/layout/CardRow.tsx, its stories, MealPlansPage's list, or a changeset naming CardRow."
   - "src/widgets/form/PresetValueSelector.tsx, its stories, the recipe pages' scale rows, or a changeset naming PresetValueSelector."
@@ -15,20 +15,20 @@ Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
-## CardStack
+## Plan list
 
-Open in `Widgets/CardStack`: Default.
+Open in `Pages/Eciperay/MealPlansPage` (its stories).
 
-A CardStack is a stack of cards — a list whose rows are cards.
+The plan list stacks its cards in a Col at gap s — a list
+whose rows are cards.
 
 1. The three cards stack with an even 8px gap between them,
    each keeping its own internal padding and full width
-   (MealPlansPage's plan list is the live case, including the
-   first card's danger Delete action).
+   (including the first card's danger Delete action).
 
-**Run when:** `src/widgets/layout/CardStack.tsx`, its stories, the
-pages that compose CardStack (MealPlansPage), or a changeset
-naming CardStack.
+**Run when:** `src/widgets/layout/Col.tsx`, its stories, the
+pages that compose the card Col (MealPlansPage), or a
+changeset naming Col.
 
 ## Center
 

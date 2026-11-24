@@ -1,6 +1,6 @@
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { ContentStack } from "../../widgets/layout/ContentStack.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Text } from "../../widgets/data/Text.js";
 import { SectionMutedText } from "./SectionMutedText.js";
@@ -76,7 +76,7 @@ export function TransferRecipesView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <SectionCard title={title} variant="elevated" loading={showSkeleton}>
-      <ContentStack>
+      <Col gap="m">
         <SectionMutedText loading={showSkeleton} text={hint} />
         <RecipeExportPickerView
           {...exportPicker}
@@ -87,7 +87,7 @@ export function TransferRecipesView({
         </Button>
         {importSummary && !showSkeleton ? <Text variant="success">{importSummary}</Text> : null}
         {error && !showSkeleton ? <Text variant="error">{error}</Text> : null}
-      </ContentStack>
+      </Col>
     </SectionCard>
   );
 }

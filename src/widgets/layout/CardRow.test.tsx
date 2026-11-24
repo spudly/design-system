@@ -54,10 +54,7 @@ const rowTextCode = rowTextSource
 // shared keyboardActivation block the pressable rows compose; the
 // keyboard pins below read that source, and CardRow's own pins hold
 // that it delegates to the block.
-const keyboardActivationSource = readFileSync(
-  join(componentsDir, "keyboardActivation.ts"),
-  "utf8",
-);
+const keyboardActivationSource = readFileSync(join(componentsDir, "keyboardActivation.ts"), "utf8");
 const keyboardActivationCode = keyboardActivationSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -105,7 +102,7 @@ test("CardRow keeps the elevated card and the div-button pressable pattern", () 
     "the shared handler activates on Enter and Space",
   );
   // The row carries no spacing outside its card: separation between
-  // rows is the composing stack's gap (CardStack's 8px rhythm),
+  // rows is the composing stack's gap (the Col's 8px rhythm),
   // never the row's own padding.
   assert.doesNotMatch(cardRowCode, /paddingBlockEnd/);
 });

@@ -1,6 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { SignInForm } from "../../views/eciperay/SignInForm.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
@@ -23,7 +23,7 @@ import { useVoice } from "../../voice/index.js";
  * view's AuthScreenLayout adapter renders exactly it) and the
  * heading is the app view's title. The form itself is
  * SignInForm (#119): the page composes the heading and the
- * form as the screen's two sections (SectionStack's rhythm is
+ * form as the screen's two sections (the section Col's rhythm is
  * the separation the app view's title spacing renders), and
  * the form owns the fields, the submit handling, and the
  * footer links.
@@ -69,7 +69,7 @@ export function SignInPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="heading">{voice.signInPage.heading}</Text>
           <SignInForm
             email={email}
@@ -83,7 +83,7 @@ export function SignInPage({
             signUpHref={signUpHref}
             forgotPasswordHref={forgotPasswordHref}
           />
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

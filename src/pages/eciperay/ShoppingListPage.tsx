@@ -1,11 +1,10 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { CheckboxField } from "../../widgets/form/CheckboxField.js";
 import { EmptyState } from "../../views/shared/EmptyState.js";
-import { ListStack } from "../../widgets/data/ListStack.js";
 import { LoadingListItem } from "../../widgets/feedback/LoadingListItem.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 
 /**
@@ -52,7 +51,7 @@ import { Text } from "../../widgets/data/Text.js";
  *
  * De-styled for #119: the page composes DS components only —
  * the title is Text's `title` variant, the sections stack in
- * SectionStack, the lines stack in ListStack, and each line
+ * a Col at gap xxl, the lines stack in a plain Col, and each line
  * renders through the unified CheckboxField's list shape,
  * its `detail` composed
  * here from the line's quantity and optional flag (the row
@@ -93,20 +92,20 @@ export function ShoppingListPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="title">Shopping list</Text>
           {loading ? (
             <LoadingScope active>
-              <ListStack>
+              <Col>
                 {LOADING_LINE_KEYS.map((key) => (
                   <LoadingListItem key={key} />
                 ))}
-              </ListStack>
+              </Col>
             </LoadingScope>
           ) : lines.length === 0 ? (
             <EmptyState title="No items on this list." />
           ) : (
-            <ListStack>
+            <Col>
               {lines.map((line) => (
                 <CheckboxField
                   key={line.key}
@@ -124,9 +123,9 @@ export function ShoppingListPage({
                   }}
                 />
               ))}
-            </ListStack>
+            </Col>
           )}
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

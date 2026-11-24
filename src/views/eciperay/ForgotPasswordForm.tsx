@@ -1,5 +1,5 @@
-import { FormStack } from "../../widgets/layout/FormStack.js";
 import { AuthFormSubmit } from "./AuthFormSubmit.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { useVoice } from "../../voice/index.js";
@@ -59,7 +59,7 @@ export function ForgotPasswordForm({
     }
   };
   return (
-    <FormStack>
+    <Col gap="m">
       <TextField
         label={voice.forgotPasswordForm.emailLabel}
         value={email}
@@ -83,6 +83,6 @@ export function ForgotPasswordForm({
           {voice.forgotPasswordForm.backToSignInLabel}
         </TextLink>
       ) : null}
-    </FormStack>
+    </Col>
   );
 }

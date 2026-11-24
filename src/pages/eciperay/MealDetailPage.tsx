@@ -2,11 +2,10 @@ import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFoo
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { ListItem } from "../../widgets/data/ListItem.js";
-import { ListStack } from "../../widgets/data/ListStack.js";
 import { MarkableRow } from "../../widgets/data/MarkableRow.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 
 /**
@@ -39,7 +38,7 @@ import { Text } from "../../widgets/data/Text.js";
  * unreadable on a dark theme's card surface.
  *
  * De-styled for #119: the page composes DS components only —
- * the sections stack in SectionStack (wrappers that existed
+ * the sections stack in a Col at gap xxl (wrappers that existed
  * only to space content are gone; separation is the stack's,
  * at its uniform rhythm), the title is Text's `title`
  * variant, the notes and nutrition lines are `hint` text,
@@ -117,7 +116,7 @@ export function MealDetailPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="title">{title}</Text>
           {notes ? <Text variant="hint">{notes}</Text> : null}
           {nutritionLabel ? <Text variant="hint">{nutritionLabel}</Text> : null}
@@ -128,7 +127,7 @@ export function MealDetailPage({
             </Button>
           </ButtonRow>
           <SectionCard title="Recipes">
-            <ListStack>
+            <Col>
               {members.map((member) => (
                 <ListItem
                   key={member.recipeId}
@@ -140,11 +139,11 @@ export function MealDetailPage({
                     : {})}
                 />
               ))}
-            </ListStack>
+            </Col>
           </SectionCard>
           {ingredients && ingredients.length > 0 ? (
             <SectionCard title="Ingredients">
-              <ListStack>
+              <Col>
                 {ingredients.map((ingredient) => (
                   <MarkableRow
                     key={ingredient.id}
@@ -152,10 +151,10 @@ export function MealDetailPage({
                     subtitle={ingredient.subtitle}
                   />
                 ))}
-              </ListStack>
+              </Col>
             </SectionCard>
           ) : null}
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

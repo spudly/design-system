@@ -1,4 +1,4 @@
-import { CompactStack } from "../../widgets/layout/CompactStack.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Text } from "../../widgets/data/Text.js";
 
 /**
@@ -34,7 +34,7 @@ export function RecipePreviewView({
   instructions,
 }: RecipePreviewViewProps) {
   return (
-    <CompactStack>
+    <Col gap="s">
       <Text variant="strong">{title}</Text>
       {metaLabel ? <Text>{metaLabel}</Text> : null}
       {(ingredients ?? []).map((line, index) => (
@@ -43,6 +43,6 @@ export function RecipePreviewView({
       {(instructions ?? []).map((line, index) => (
         <Text key={index}>{`${index + 1}. ${line}`}</Text>
       ))}
-    </CompactStack>
+    </Col>
   );
 }

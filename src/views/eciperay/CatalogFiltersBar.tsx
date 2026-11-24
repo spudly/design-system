@@ -4,10 +4,13 @@ import { tokens } from "../../tokens/index.js";
 import { useVoice } from "../../voice/index.js";
 import { politeLiveRegionProps } from "../../widgets/accessibility.js";
 import { Button } from "../../widgets/actions/Button.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { CompactRow } from "../../widgets/layout/CompactRow.js";
-import { ContentStack } from "../../widgets/layout/ContentStack.js";
 import { SearchField } from "../../widgets/form/SearchField.js";
-import { SearchHelpPopover, type SearchHelpContent } from "../../widgets/overlays/SearchHelpPopover.js";
+import {
+  SearchHelpPopover,
+  type SearchHelpContent,
+} from "../../widgets/overlays/SearchHelpPopover.js";
 import { Text } from "../../widgets/data/Text.js";
 import { FieldRow } from "../../widgets/form/FieldRow.js";
 import { SelectField, type SelectOption } from "../../widgets/form/SelectField.js";
@@ -292,7 +295,7 @@ function FilterControl<FilterId extends string>({
       );
     case "sort":
       return (
-        <ContentStack>
+        <Col gap="m">
           <SelectField
             label={definition.sortLabel}
             value={definition.sortValue}
@@ -305,7 +308,7 @@ function FilterControl<FilterId extends string>({
             options={definition.dirOptions}
             onValueChange={definition.onDirChange}
           />
-        </ContentStack>
+        </Col>
       );
   }
 }
@@ -364,7 +367,7 @@ export function CatalogFiltersBar<FilterId extends string = string>({
   };
 
   return (
-    <ContentStack>
+    <Col gap="m">
       {/* FieldRow stretches its children (#188): the small
           Filters button's natural height is shorter than the
           SearchField, so the button stretches to the search
@@ -438,6 +441,6 @@ export function CatalogFiltersBar<FilterId extends string = string>({
           <FilterControl definition={definition} />
         </YStack>
       ))}
-    </ContentStack>
+    </Col>
   );
 }

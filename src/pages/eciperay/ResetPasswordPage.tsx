@@ -1,7 +1,7 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { ResetPasswordForm } from "../../views/eciperay/ResetPasswordForm.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
@@ -20,7 +20,7 @@ import { useVoice } from "../../voice/index.js";
  *
  * The form itself is ResetPasswordForm (#119): the page
  * composes the heading, the intro line, and the form as the
- * screen's sections (SectionStack's rhythm carries the
+ * screen's sections (the section Col's rhythm carries the
  * separations the app view's title and intro spacing render),
  * and the form owns the field and the submit handling.
  */
@@ -47,7 +47,7 @@ export function ResetPasswordPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="auth">
-        <SectionStack>
+        <Col gap="xxl">
           <Text variant="heading">{voice.resetPasswordPage.heading}</Text>
           <Text variant="muted">{voice.resetPasswordPage.description}</Text>
           <ResetPasswordForm
@@ -57,7 +57,7 @@ export function ResetPasswordPage({
             error={error}
             onSubmit={onSubmit}
           />
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

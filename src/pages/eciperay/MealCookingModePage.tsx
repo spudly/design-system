@@ -1,8 +1,8 @@
+import { Col } from "../../widgets/layout/Col.js";
 import { FullScreenShell } from "../../widgets/layout/FullScreenShell.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { StepOverlay } from "../../widgets/overlays/StepOverlay.js";
 import { Text } from "../../widgets/data/Text.js";
 import { StepNavControls } from "../shared/StepNavControls.js";
@@ -91,7 +91,7 @@ import { StepNavControls } from "../shared/StepNavControls.js";
  * and sets no styling props — the overlay shell (formerly
  * this page's own chrome) is the StepOverlay component, the
  * error state's shell and separation are ScreenContainer and
- * SectionStack, and the page contributes only the bounds
+ * a Col at gap xxl, and the page contributes only the bounds
  * logic, the composed step line, and its navigation controls.
  */
 
@@ -145,13 +145,13 @@ export function MealCookingModePage(props: MealCookingModePageProps) {
     return (
       <FullScreenShell>
         <ScreenContainer>
-          <SectionStack>
+          <Col gap="xxl">
             <Text variant="title">{mealTitle ?? LOAD_ERROR_TITLE}</Text>
             <Alert severity="error">{errorMessage ?? LOAD_ERROR_MESSAGE}</Alert>
             <Button variant="secondary" onPress={onDone}>
               Done
             </Button>
-          </SectionStack>
+          </Col>
         </ScreenContainer>
       </FullScreenShell>
     );

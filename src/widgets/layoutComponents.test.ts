@@ -13,26 +13,22 @@
  *   and wrap. Separation from the content it follows is the
  *   parent's (a stack's gap, a card's internal gap), never the
  *   bar's own margin.
- * - CardStack: a stack of cards — gap spacing[2] (8px), stretch.
- * - SectionStack: a page's sections — gap spacing[8] (32px),
- *   stretch.
  * - FieldRow: a search field with its button — gap
  *   spacing[2] (8px), stretch (the equal-height contract,
  *   #476: field and button render at one height; SearchRow,
  *   which differed only in that stretch, was consolidated
  *   into it — #481).
- * - ListStack: hairline rows as one list — no gap of its own;
- *   the rows own their separation.
  * - PanelStack: a section panel's blocks — padding and gap both
  *   spacing[4] (16px), stretch.
- * - ButtonStack: a stack of full-width buttons — gap
- *   spacing[3] (12px), stretch (ButtonRow's vertical form).
  * - Center: centers a single child — boolean `horizontal` /
  *   `vertical`, both defaulting to true, plus the semantic
  *   `fill` variant (grow to the parent's offered height).
- * - FormStack: the one form stack — gap spacing[3] (12px),
- *   stretch (#477 combined the former FieldStack into it).
- * The pins hold each component's treatment, its Omit of the
+ * #746 (2026-11-24) eliminated the style-only stack wrappers
+ * (CardStack, SectionStack, ListStack, ButtonStack, FormStack,
+ * and the rest of the rhythm family): their consumers compose
+ * Col directly with the matching t-shirt gap, and the export
+ * pins below hold that the wrappers do not survive as API.
+ * The pins hold each remaining component's treatment, its Omit of the
  * style keys it owns, SearchField's `grow` (the other half
  * of the FieldRow pattern: the field takes the row's
  * remaining width), and Button's `grow` basis (the ButtonRow
@@ -62,14 +58,9 @@ function code(file: string) {
 }
 
 const buttonRowCode = code("actions/ButtonRow.tsx");
-const cardStackCode = code("layout/CardStack.tsx");
-const sectionStackCode = code("layout/SectionStack.tsx");
 const fieldRowCode = code("form/FieldRow.tsx");
-const listStackCode = code("data/ListStack.tsx");
 const panelStackCode = code("layout/PanelStack.tsx");
-const buttonStackCode = code("actions/ButtonStack.tsx");
 const centerCode = code("layout/Center.tsx");
-const formStackCode = code("layout/FormStack.tsx");
 const textFieldSource = readFileSync(join(componentsDir, "form/TextField.tsx"), "utf8");
 const searchFieldSource = readFileSync(join(componentsDir, "form/SearchField.tsx"), "utf8");
 const fieldShellSource = readFileSync(join(componentsDir, "form/FieldShell.tsx"), "utf8");
@@ -77,17 +68,7 @@ const buttonCode = code("actions/Button.tsx");
 
 test("the layout components are exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  for (const name of [
-    "ButtonRow",
-    "CardStack",
-    "SectionStack",
-    "FieldRow",
-    "ListStack",
-    "PanelStack",
-    "ButtonStack",
-    "Center",
-    "FormStack",
-  ]) {
+  for (const name of ["ButtonRow", "FieldRow", "PanelStack", "Center"]) {
     assert.equal(
       typeof dist[name],
       "function",
@@ -115,6 +96,26 @@ test("the layout components are exported from the built internal components barr
     undefined,
     "FieldStack was combined into FormStack (#477) and must not survive as package API",
   );
+  // #746 eliminated the style-only stack wrappers: consumers
+  // compose Col with the matching t-shirt gap instead.
+  for (const name of [
+    "ButtonStack",
+    "CardStack",
+    "CompactStack",
+    "ContentStack",
+    "FormStack",
+    "LinkStack",
+    "ListStack",
+    "ProseStack",
+    "SectionStack",
+    "TightStack",
+  ]) {
+    assert.equal(
+      dist[name],
+      undefined,
+      `${name} was eliminated by #746 and must not survive as package API`,
+    );
+  }
 });
 
 test("ButtonRow owns the action bar's gap and wrap; separation from preceding content is the parent's", () => {
@@ -129,18 +130,6 @@ test("ButtonRow owns the action bar's gap and wrap; separation from preceding co
     buttonRowCode,
     /Omit<\s*StyledButtonRowProps,\s*"gap" \| "alignItems" \| "flexWrap"\s*>/,
   );
-});
-
-test("CardStack owns the card-list rhythm", () => {
-  assert.match(cardStackCode, /styled\(YStack, \{\s+name: "CardStack",/);
-  assert.match(cardStackCode, /gap: tokens\.spacing\[2\],\s+alignItems: "stretch",/);
-  assert.match(cardStackCode, /Omit<StyledCardStackProps, "gap" \| "alignItems">/);
-});
-
-test("SectionStack owns the page-section rhythm", () => {
-  assert.match(sectionStackCode, /styled\(YStack, \{\s+name: "SectionStack",/);
-  assert.match(sectionStackCode, /gap: tokens\.spacing\[8\],\s+alignItems: "stretch",/);
-  assert.match(sectionStackCode, /Omit<StyledSectionStackProps, "gap" \| "alignItems">/);
 });
 
 test("FieldRow owns the search row's gap and stretch — the equal-height contract (#476)", () => {
@@ -173,17 +162,6 @@ test("PanelStack owns the section panel's inset and block rhythm", () => {
   assert.match(panelStackCode, /Omit<StyledPanelStackProps, "padding" \| "gap" \| "alignItems">/);
 });
 
-test("ButtonStack owns the full-width button stack's rhythm", () => {
-  assert.match(buttonStackCode, /styled\(YStack, \{\s+name: "ButtonStack",/);
-  assert.match(buttonStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
-  assert.match(buttonStackCode, /Omit<StyledButtonStackProps, "gap" \| "alignItems">/);
-});
-
-test("ListStack adds no gap of its own — the rows own their separation", () => {
-  assert.match(listStackCode, /styled\(YStack, \{\s+name: "ListStack",\s+\}\)/);
-  assert.ok(!/gap:/.test(listStackCode), "ListStack must not set a gap");
-});
-
 test("Center centers a single child on boolean dimensions, with a semantic fill variant", () => {
   assert.match(centerCode, /styled\(YStack, \{\s+name: "Center",/);
   assert.match(centerCode, /horizontal: \{\s+true: \{ alignItems: "center" \},/);
@@ -200,25 +178,11 @@ test("Center centers a single child on boolean dimensions, with a semantic fill 
   assert.match(centerCode, /Omit<StyledCenterProps, "alignItems" \| "justifyContent" \| "flex">/);
 });
 
-test("FormStack owns the form-field rhythm", () => {
-  assert.match(formStackCode, /styled\(YStack, \{\s+name: "FormStack",/);
-  assert.match(formStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
-  assert.match(
-    formStackCode,
-    /Omit<StyledFormStackProps, "gap" \| "alignItems" \| "paddingBlockEnd">/,
-  );
-});
-
 test("no layout component offers step, role, or margin props", () => {
   for (const [name, src] of [
     ["ButtonRow", buttonRowCode],
-    ["CardStack", cardStackCode],
-    ["SectionStack", sectionStackCode],
     ["FieldRow", fieldRowCode],
-    ["ListStack", listStackCode],
-    ["FormStack", formStackCode],
     ["PanelStack", panelStackCode],
-    ["ButtonStack", buttonStackCode],
   ]) {
     for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {
       assert.ok(
@@ -246,13 +210,6 @@ test("Button's grow keeps a content-sized basis in both forms (no wrapping-row c
 
 test("the filter-bar shells are exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  for (const name of ["FormStack"]) {
-    assert.equal(
-      typeof dist[name],
-      "function",
-      `${name} must be exported from the internal components barrel`,
-    );
-  }
   assert.equal(
     dist.FilterBar,
     undefined,
@@ -268,26 +225,6 @@ test("the filter-bar shells are exported from the built internal components barr
     undefined,
     "ChoiceRow was this tranche's local chooser row — the #119 dedupe retired it with the chips and it must not survive as package API",
   );
-});
-
-test("FormStack owns the stacked-fields rhythm (#119)", () => {
-  assert.match(formStackCode, /styled\(YStack, \{\s+name: "FormStack",/);
-  assert.match(formStackCode, /gap: tokens\.spacing\[3\],\s+alignItems: "stretch",/);
-  assert.match(
-    formStackCode,
-    /Omit<StyledFormStackProps, "gap" \| "alignItems" \| "paddingBlockEnd">/,
-  );
-});
-
-test("no filter-bar shell offers spacing or margin props", () => {
-  for (const [name, src] of [["FormStack", formStackCode]]) {
-    for (const banned of ["spacing", "spaceBefore", "spaceAfter"]) {
-      assert.ok(
-        !new RegExp(String.raw`${banned}\?:`).test(src),
-        `${name} must not carry a ${banned} prop (#119)`,
-      );
-    }
-  }
 });
 
 test("TextField's grow prop flexes the field's root, and only when set (#119)", () => {

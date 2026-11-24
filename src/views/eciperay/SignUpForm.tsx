@@ -1,5 +1,5 @@
-import { FormStack } from "../../widgets/layout/FormStack.js";
 import { AuthFormSubmit, type EmailPasswordFormProps } from "./AuthFormSubmit.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { PasswordField } from "../../widgets/form/PasswordField.js";
 import { TextField } from "../../widgets/form/TextField.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -37,8 +37,7 @@ import { useVoice } from "../../voice/index.js";
  * LegalDocumentPage span precedent). The notice's text is
  * never re-authored by the DS — spans cross verbatim. */
 export type SignUpLegalNoticeSpan =
-  | { type: "text"; text: string }
-  | { type: "link"; label: string; href: string };
+  { type: "text"; text: string } | { type: "link"; label: string; href: string };
 
 export type SignUpFormProps = EmailPasswordFormProps & {
   displayName: string;
@@ -75,7 +74,7 @@ export function SignUpForm({
     }
   };
   return (
-    <FormStack>
+    <Col gap="m">
       <TextField
         label={voice.signUpForm.nameLabel}
         value={displayName}
@@ -129,6 +128,6 @@ export function SignUpForm({
           {voice.signUpForm.signInLabel}
         </TextLink>
       ) : null}
-    </FormStack>
+    </Col>
   );
 }

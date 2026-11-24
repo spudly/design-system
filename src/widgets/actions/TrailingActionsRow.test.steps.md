@@ -1,7 +1,7 @@
 ---
 component: TrailingActionsRow
 run_when:
-  - "src/widgets/layout/FormStack.tsx, src/widgets/actions/TrailingActionsRow.tsx, src/widgets/layout/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: FormStack, TrailingActionsRow, Card, TagsPage)"
+  - "src/widgets/layout/Col.tsx, src/widgets/actions/TrailingActionsRow.tsx, src/widgets/layout/Card.tsx, their stories, TagsPage's forms or rows, or a changeset naming any of them. (namely: Col, TrailingActionsRow, Card, TagsPage)"
 ---
 
 # TrailingActionsRow — manual test steps
@@ -11,13 +11,13 @@ Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
-## FormStack & TrailingActionsRow; Card's compact variant
+## Form Col & TrailingActionsRow; Card's compact variant
 
-Open in `Widgets/FormStack`: Default, FieldsWithActions;
+Open in `Pages/Eciperay/TagsPage` (its tag form);
 `Widgets/TrailingActionsRow`: FieldAndAction,
 ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
 
-1. FormStack: the form's fields stack at an even 12px rhythm
+1. Form Col: the form's fields stack at an even 12px rhythm
    with the button row last.
 2. TrailingActionsRow FieldAndAction: the leading group sits
    at the left and the action at the right on one line.
@@ -30,7 +30,7 @@ ContentAndGhostButtons, Narrow; `Widgets/Card`: Compact.
    former CompactCard, folded into Card as `variant="compact"`
    under Stephen's 2026-10-29 ruling).
 
-**Run when:** `src/widgets/layout/FormStack.tsx`,
+**Run when:** `src/widgets/layout/Col.tsx`,
 `src/widgets/actions/TrailingActionsRow.tsx`,
 `src/widgets/layout/Card.tsx`, their stories, TagsPage's
 forms or rows, or a changeset naming any of them.

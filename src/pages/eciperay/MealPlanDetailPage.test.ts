@@ -61,7 +61,7 @@
  *    the goal rows are DetailRow
  *    widgets, the plan title takes Text's `title` variant, the
  *    meta lines take its `hint` variant, and the section spacing
- *    rides the SectionStack. The page's only entry logic is the
+ *    rides the section Col. The page's only entry logic is the
  *    kind prefix it composes and the href it passes through.
  *
  * This is a source scan, not a render test: the repo has no JS
@@ -298,7 +298,7 @@ test("the page carries no styling of its own (#119)", () => {
   for (const item of banned) {
     assert.ok(
       !code.includes(item),
-      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in SectionStack / ButtonRow / ListItem / ListStack / DetailRow since the #119 tranche-2 fix`,
+      `MealPlanDetailPage must not contain "${item}" — layout and row treatments live in Col / ButtonRow / ListItem / DetailRow since the #119 tranche-2 fix (#746: SectionStack and ListStack became Col)`,
     );
   }
   assert.match(
@@ -386,14 +386,14 @@ test("the band is absent when weeklyTotals is omitted, null, or empty (#414)", (
 test("the page composes through the purpose-named layout components (#119)", () => {
   assert.match(
     code,
-    /<SectionStack>/,
-    "the page's blocks must be children of one SectionStack, whose gap owns every section separation",
+    /<Col gap="xxl">/,
+    "the page's blocks must be children of one Col at gap xxl, whose gap owns every section separation",
   );
   assert.match(code, /<ButtonRow>/, "the action bar must compose through ButtonRow");
   assert.match(
     code,
-    /<ListStack>/,
-    "the entry rows must compose as one ListStack inside the Entries card (SectionCard spaces its own children; the rows own theirs)",
+    /<Col>/,
+    "the entry rows must compose as one Col inside the Entries card (SectionCard spaces its own children; the rows own theirs)",
   );
 });
 

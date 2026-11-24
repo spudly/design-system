@@ -1,9 +1,9 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Text } from "../../widgets/data/Text.js";
 import { useVoice } from "../../voice/index.js";
 
@@ -58,7 +58,7 @@ export function ConsentPreferencesPage({
     <BigFooterShell footer={footer}>
       <ScreenContainer variant="padded">
         <SectionCard title={voice.consentPreferencesPage.title} variant="elevated">
-          <SectionStack>
+          <Col gap="xxl">
             <Text variant="body">{description}</Text>
             <Text variant="body">
               {voice.consentPreferencesPage.currentChoiceLabel}
@@ -76,7 +76,7 @@ export function ConsentPreferencesPage({
               </Button>
             </ButtonRow>
             <Text variant="hint">{hint}</Text>
-          </SectionStack>
+          </Col>
         </SectionCard>
       </ScreenContainer>
     </BigFooterShell>

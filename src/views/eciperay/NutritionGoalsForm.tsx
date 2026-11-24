@@ -1,10 +1,10 @@
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { Center } from "../../widgets/layout/Center.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { SpacedTopStack } from "../../widgets/layout/SpacedTopStack.js";
-import { TightStack } from "../../widgets/layout/TightStack.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { SIZABLE_TEXT_LINE_BOX, TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { EqualColumns } from "../../widgets/form/EqualColumns.js";
@@ -125,12 +125,12 @@ const LOADING_GOAL_FIELD_KEY_ROWS = [
 
 function GoalFieldSkeleton() {
   return (
-    <TightStack>
+    <Col gap="xs">
       <Center width="35%" height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
         <TextSkeleton size="sm" lines={1} />
       </Center>
       <BoxSkeleton height={44} />
-    </TightStack>
+    </Col>
   );
 }
 

@@ -7,7 +7,6 @@ import { tokens } from "../../tokens/index.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { CandidateList } from "../../widgets/data/CandidateList.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
-import { ListStack } from "../../widgets/data/ListStack.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { TextSkeleton } from "../../widgets/feedback/TextSkeleton.js";
 import { LogEntryCard } from "../../views/eciperay/LogEntryCard.js";
@@ -19,6 +18,7 @@ import {
   type NutritionPanelData,
 } from "../../widgets/data/NutritionPanel.js";
 import { NumberStepper } from "../../widgets/form/NumberStepper.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { PanelStack } from "../../widgets/layout/PanelStack.js";
 import {
   PresetValueSelector,
@@ -45,7 +45,10 @@ import { TagList } from "../../widgets/data/TagList.js";
 import { Text } from "../../widgets/data/Text.js";
 import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 import { Toolbar } from "../../widgets/actions/Toolbar.js";
-import { ConfirmActionView, type ConfirmActionViewProps } from "../../views/eciperay/ConfirmActionView.js";
+import {
+  ConfirmActionView,
+  type ConfirmActionViewProps,
+} from "../../views/eciperay/ConfirmActionView.js";
 import {
   RecipeCommentsView,
   type RecipeCommentsViewProps,
@@ -911,7 +914,7 @@ function IngredientsPanel({
   return (
     <PanelStack>
       <SectionHeading icon="list">Ingredients</SectionHeading>
-      <ListStack>
+      <Col>
         {view.ingredients.map((ingredient) => (
           <MarkableRow
             key={ingredient.id}
@@ -927,7 +930,7 @@ function IngredientsPanel({
               : {})}
           />
         ))}
-      </ListStack>
+      </Col>
       {hasMissing ? <Text variant="hint">{MISSING_INGREDIENTS_HINT}</Text> : null}
     </PanelStack>
   );

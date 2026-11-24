@@ -9,7 +9,6 @@ import { CandidateList } from "./CandidateList.js";
 import { ChecklistRow } from "./ChecklistRow.js";
 import { Divider } from "./Divider.js";
 import { ListItem } from "./ListItem.js";
-import { ListStack } from "./ListStack.js";
 import { MarkableRow } from "./MarkableRow.js";
 import { MediaRow } from "./MediaRow.js";
 import { MetadataBadge } from "./MetadataBadge.js";
@@ -23,6 +22,7 @@ import { StepList } from "./StepList.js";
 import { TagList } from "./TagList.js";
 import { Text } from "./Text.js";
 import { Thumbnail } from "./Thumbnail.js";
+import { Col } from "../layout/Col.js";
 
 /**
  * Composite story (#711): every data-display widget rendered
@@ -79,7 +79,7 @@ function ChecklistDemo() {
   const [oil, setOil] = useState(true);
   const [chicken, setChicken] = useState(false);
   return (
-    <ListStack>
+    <Col>
       <ChecklistRow
         label="2 tbsp olive oil"
         metadata="Pantry"
@@ -92,7 +92,7 @@ function ChecklistDemo() {
         checked={chicken}
         onCheckedChange={setChicken}
       />
-    </ListStack>
+    </Col>
   );
 }
 
@@ -102,7 +102,7 @@ function MarkableDemo() {
     setMarked((current) => ({ ...current, [id]: !current[id] }));
   };
   return (
-    <ListStack>
+    <Col>
       <MarkableRow
         label="1 1/2 lb chicken thighs"
         isMarked={marked["chicken"] ?? false}
@@ -113,7 +113,7 @@ function MarkableDemo() {
         isMarked={marked["rice"] ?? false}
         onPress={() => toggle("rice")}
       />
-    </ListStack>
+    </Col>
   );
 }
 
@@ -123,11 +123,11 @@ function MarkableDemo() {
 export const RowFamily: Story = {
   render: () => (
     <YStack maxWidth={430} gap={16}>
-      <ListStack>
+      <Col>
         <ListItem title="Garlic cream chicken" subtitle="Serves 4 · 2,150 cal" onPress={noop} />
         <ListItem prefix="Meal · " title="Taco Tuesday" subtitle="Serves 4" onPress={noop} />
         <ListItem title="Archived recipe" subtitle="Unavailable" isDisabled onPress={noop} />
-      </ListStack>
+      </Col>
       <Divider />
       <YStack>
         <MediaRow href="/recipes/1" title="Weeknight Chili" subtitle="4 servings · 35 min" />

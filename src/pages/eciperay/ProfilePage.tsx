@@ -1,22 +1,34 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { LinkStack } from "../../widgets/actions/LinkStack.js";
 import { TextLink } from "../../widgets/actions/TextLink.js";
 import { LegalSection } from "../../widgets/content/LegalSection.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
-import { AccountDataView, type AccountDataViewProps } from "../../views/eciperay/AccountDataView.js";
+import {
+  AccountDataView,
+  type AccountDataViewProps,
+} from "../../views/eciperay/AccountDataView.js";
 import {
   FeedbackPreferenceView,
   type FeedbackPreferenceViewProps,
 } from "../../views/eciperay/FeedbackPreferenceView.js";
-import { SubscriptionView, type SubscriptionViewProps } from "../../views/eciperay/SubscriptionView.js";
+import {
+  SubscriptionView,
+  type SubscriptionViewProps,
+} from "../../views/eciperay/SubscriptionView.js";
 import {
   TransferRecipesView,
   type TransferRecipesViewProps,
 } from "../../views/eciperay/TransferRecipesView.js";
-import { AccessTokensPanel, type AccessTokensPanelProps } from "../../views/eciperay/AccessTokensPanel.js";
-import { NutritionGoalsForm, type NutritionGoalsFormProps } from "../../views/eciperay/NutritionGoalsForm.js";
+import {
+  AccessTokensPanel,
+  type AccessTokensPanelProps,
+} from "../../views/eciperay/AccessTokensPanel.js";
+import {
+  NutritionGoalsForm,
+  type NutritionGoalsFormProps,
+} from "../../views/eciperay/NutritionGoalsForm.js";
 
 // The section view-models live with the views (#438 Part 3);
 // the page's contract names are aliases, so consumers of the
@@ -146,13 +158,13 @@ export function ProfilePage({
         {transfer ? <TransferRecipesView {...transfer} /> : null}
         {accountData ? <AccountDataView {...accountData} /> : null}
         <LegalSection title="Legal">
-          <LinkStack>
+          <Col gap="s">
             {(legalLinks ?? []).map((link) => (
               <TextLink key={link.href} href={link.href}>
                 {link.label}
               </TextLink>
             ))}
-          </LinkStack>
+          </Col>
         </LegalSection>
         <Button variant="danger" onPress={onSignOut}>
           Sign Out

@@ -1,12 +1,11 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
-import { CardStack } from "../../widgets/layout/CardStack.js";
 import { EmptyState } from "../../views/shared/EmptyState.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { PinnedHeaderShell } from "../../widgets/layout/PinnedHeaderShell.js";
 import { LoadingActionCardRow } from "../../widgets/feedback/LoadingActionCardRow.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
-import { SectionStack } from "../../widgets/layout/SectionStack.js";
 import { Tabs } from "../../widgets/actions/Tabs.js";
 import { Text } from "../../widgets/data/Text.js";
 import { TextActionCardRow } from "../../widgets/content/TextActionCardRow.js";
@@ -63,13 +62,13 @@ import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
  * scroll region inside the hub's shell.
  *
  * De-styled for #119: the page composes DS components only.
- * The chrome is a SectionStack (the "Meals" title in Text's
+ * The chrome is a Col at gap xxl (the "Meals" title in Text's
  * `title` variant over the tab bar); on the meals tab the
- * whole screen stacks in SectionStack inside the
+ * whole screen stacks in a Col at gap xxl inside the
  * ScreenContainer, and each meal renders through the generic
  * TextActionCardRow — its text block the meal's link, its
  * trailing Delete the #248 action (a ghost Button, #464) — stacked in
- * CardStack, so row separation is the stack's 8px card rhythm
+ * a Col at gap s, so row separation is the stack's 8px card rhythm
  * (the plans tab's own rhythm) instead of a per-row bottom
  * padding. On the plans tab the pinned chrome and the
  * self-scrolling MealPlansPage compose through
@@ -166,7 +165,7 @@ export function MealsHubPage({
     // ScrollViews on native.
     return (
       <BigFooterShell footer={footer} scrollMode="content">
-        <PinnedHeaderShell header={<SectionStack>{hubChrome}</SectionStack>}>
+        <PinnedHeaderShell header={<Col gap="xxl">{hubChrome}</Col>}>
           <MealPlansPage
             plans={plans}
             loading={loading}
@@ -182,25 +181,25 @@ export function MealsHubPage({
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
-        <SectionStack>
+        <Col gap="xxl">
           {hubChrome}
           <Button variant="primary" accessibilityLabel="New meal" href={createMealHref}>
             New meal
           </Button>
           {loading ? (
             <LoadingScope active>
-              <CardStack>
+              <Col gap="s">
                 {LOADING_MEAL_KEYS.map((key) => (
                   <LoadingActionCardRow key={key} accessibilityLabel="Delete meal">
                     Delete
                   </LoadingActionCardRow>
                 ))}
-              </CardStack>
+              </Col>
             </LoadingScope>
           ) : meals.length === 0 ? (
             <EmptyState title="No meals yet." />
           ) : (
-            <CardStack>
+            <Col gap="s">
               {meals.map((meal) => (
                 <TextActionCardRow
                   key={meal.id}
@@ -213,9 +212,9 @@ export function MealsHubPage({
                   }}
                 />
               ))}
-            </CardStack>
+            </Col>
           )}
-        </SectionStack>
+        </Col>
       </ScreenContainer>
     </BigFooterShell>
   );

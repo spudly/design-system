@@ -1,12 +1,10 @@
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { CheckboxSkeletonRow } from "../../widgets/feedback/CheckboxSkeletonRow.js";
+import { Col } from "../../widgets/layout/Col.js";
 import { CompactRow } from "../../widgets/layout/CompactRow.js";
-import { CompactStack } from "../../widgets/layout/CompactStack.js";
-import { ContentStack } from "../../widgets/layout/ContentStack.js";
 import { Grow } from "../../widgets/layout/Grow.js";
 import { RadioSkeletonRow } from "../../widgets/feedback/RadioSkeletonRow.js";
-import { TightStack } from "../../widgets/layout/TightStack.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/layout/Card.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -153,7 +151,7 @@ export function RecipeSharingView({
   const showSkeleton = useLoadingScope(loading);
   return (
     <Card variant="bordered" loading={showSkeleton}>
-      <ContentStack>
+      <Col gap="m">
         {showSkeleton ? (
           <TextSkeleton size="xl" lines={1} />
         ) : (
@@ -170,11 +168,11 @@ export function RecipeSharingView({
           // down the group, Stephen on #579), and a
           // description bone at sm when the option carries
           // one. No real labels or selection show.
-          <TightStack>
+          <Col gap="xs">
             {options.map((option) => (
               <RadioSkeletonRow key={option.value} description={!!option.description} />
             ))}
-          </TightStack>
+          </Col>
         ) : (
           <RadioOptionGroup
             options={options}
@@ -234,7 +232,7 @@ export function RecipeSharingView({
           </ButtonRow>
         ) : null}
         {onRotateShareLink ? (
-          <CompactStack>
+          <Col gap="s">
             {showSkeleton ? (
               <TextSkeleton size="sm" lines={1} />
             ) : (
@@ -255,10 +253,10 @@ export function RecipeSharingView({
                 </Button>
               ) : null}
             </CompactRow>
-          </CompactStack>
+          </Col>
         ) : null}
         {permalinkUrl && onCopyPermalink ? (
-          <CompactStack>
+          <Col gap="s">
             {showSkeleton ? (
               <TextSkeleton size="sm" lines={1} />
             ) : (
@@ -276,9 +274,9 @@ export function RecipeSharingView({
                 {copyPermalinkLabel}
               </Button>
             </CompactRow>
-          </CompactStack>
+          </Col>
         ) : null}
-      </ContentStack>
+      </Col>
     </Card>
   );
 }

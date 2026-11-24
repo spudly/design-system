@@ -1,7 +1,7 @@
 ---
 component: LabeledField
 run_when:
-  - "any of these components, their stories, the form pages, or a changeset naming them. (namely: FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner, RecipeFormPage, MealFormPage, MealPlanFormPage, TagsPage)"
+  - "any of these components, their stories, the form pages, or a changeset naming them. (namely: FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner, RecipeFormPage, MealFormPage, MealPlanFormPage, TagsPage)"
 ---
 
 # LabeledField — manual test steps
@@ -11,20 +11,20 @@ Run these at release finalization when a trigger below matches the
 release's changed components. The full index lives in
 `docs/manual-tests.md` (generated — do not edit it by hand).
 
-## Form set (FormStack, FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)
+## Form set (FormHeading, LabeledField, LabeledGroup, FieldLabel, RevertAction, ChangedListBanner)
 
-Open in `Widgets/FormStack`: Default, FieldsWithActions;
-`Widgets/FormHeading`: Default, WithSubtitle;
+Open in `Widgets/FormHeading`: Default, WithSubtitle;
 `Widgets/Form/LabeledField`: Default, WithAction, WithError;
 `Widgets/Form/LabeledGroup`: Default, WithAction;
 `Widgets/Form/FieldLabel`: Default, Associated;
 `Views/RevertAction` and `Widgets/ChangedListBanner`
 (their stories).
 
-1. FormStack: fields render in order with the form rhythm —
-   even 12px separation, with no extra tail below the
-   last field (FormStack's gap is spacing[3] = 12px and it
-   adds no bottom padding).
+1. Form stack: on any form page story (SignInPage,
+   RecipeFormPage), fields render in order with the form
+   rhythm — even 12px separation, with no extra tail below
+   the last field (the forms' Col gap "m" is spacing[3] =
+   12px and it adds no bottom padding).
 2. FormHeading: the title renders in the form-title treatment;
    WithSubtitle shows the hint line under the title.
 3. LabeledField: the label sits 4px over the field; on web the

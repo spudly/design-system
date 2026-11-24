@@ -25,7 +25,7 @@ export type PinnedHeaderShellProps = {
  * same-direction scroller inside a scroller, which captures
  * the content region's gestures without scrolling (the #188
  * nested-shell failure). The header's own internal rhythm
- * belongs to the header content (a SectionStack, say); the
+ * belongs to the header content (a section Col, say); the
  * shell adds none.
  *
  * Platform split (#705, the #547 page-scroll contract): on
@@ -39,10 +39,7 @@ export type PinnedHeaderShellProps = {
  */
 export function PinnedHeaderShell({ header, children }: PinnedHeaderShellProps) {
   return (
-    <YStack
-      {...(isWeb ? { flexGrow: 1 } : { flex: 1 })}
-      backgroundColor={tokens.colors.gray.gray1}
-    >
+    <YStack {...(isWeb ? { flexGrow: 1 } : { flex: 1 })} backgroundColor={tokens.colors.gray.gray1}>
       <YStack paddingHorizontal="$4" paddingTop="$4">
         {header}
       </YStack>

@@ -5,13 +5,12 @@ import { Badge } from "../data/Badge.js";
 import { Text } from "../data/Text.js";
 import { SelectField } from "../form/SelectField.js";
 import { Card } from "../layout/Card.js";
+import { Col } from "../layout/Col.js";
 import { ActionBar } from "./ActionBar.js";
 import { BackLink } from "./BackLink.js";
 import { BrandLink } from "./BrandLink.js";
 import { Button } from "./Button.js";
 import { ButtonRow } from "./ButtonRow.js";
-import { ButtonStack } from "./ButtonStack.js";
-import { LinkStack } from "./LinkStack.js";
 import { PrevNextNav } from "./PrevNextNav.js";
 import { StackedButtonRow } from "./StackedButtonRow.js";
 import { Tabs } from "./Tabs.js";
@@ -170,7 +169,7 @@ export const AllButtons: Story = {
           Learn more
         </Button>
       </ButtonRow>
-      <ButtonStack>
+      <Col gap="m">
         <Button variant="primary" onPress={noop}>
           Browse recipes
         </Button>
@@ -180,7 +179,7 @@ export const AllButtons: Story = {
         <Button variant="secondary" onPress={noop}>
           Shared with me
         </Button>
-      </ButtonStack>
+      </Col>
       <StackedButtonRow>
         <Button href="/discover" variant="primary">
           Discover recipes
@@ -213,11 +212,11 @@ export const Navigation: Story = {
   render: () => (
     <YStack maxWidth={430} gap={20}>
       <Tabs variant="link" tabs={LINK_TABS} value="plans" />
-      <LinkStack>
+      <Col gap="s">
         <TextLink href="https://example.com/about">About</TextLink>
         <TextLink href="https://example.com/privacy">Privacy Policy</TextLink>
         <TextLink href="https://example.com/licenses">Open Source Licenses</TextLink>
-      </LinkStack>
+      </Col>
       <PrevNextNav onBack={noop} onNext={noop} />
       <PrevNextNav onNext={noop} nextLabel="Continue" />
       <PrevNextNav onBack={noop} onNext={noop} nextDisabled />
