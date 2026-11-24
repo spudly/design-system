@@ -23,15 +23,15 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "widgets");
-const scrollShellSource = readFileSync(join(componentsDir, "ScrollShell.tsx"), "utf8");
+const componentsDir = join(here, "../../..", "src", "widgets");
+const scrollShellSource = readFileSync(join(componentsDir, "layout/ScrollShell.tsx"), "utf8");
 
 const scrollShellCode = scrollShellSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("ScrollShell is exported from the built internal components barrel", async () => {
-  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+  const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
   assert.equal(
     typeof dist.ScrollShell,
     "function",
@@ -40,7 +40,7 @@ test("ScrollShell is exported from the built internal components barrel", async 
 });
 
 test("ScrollShellProps is a type-only export from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(types, /ScrollShellProps/);
 });
 

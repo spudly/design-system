@@ -18,7 +18,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
+const root = join(here, "../../..");
 
 function codeOf(rel: string): string {
   const source = readFileSync(join(root, rel), "utf8");

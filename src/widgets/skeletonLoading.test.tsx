@@ -250,7 +250,7 @@ test("LoadingScope lives in src/contexts — widgets import it from there", () =
     !existsSync(join(root, "src/widgets/LoadingScope.tsx")),
     "the context no longer lives in src/widgets",
   );
-  for (const name of ["actions/Button", "Card", "CardRow", "data/StatCard"]) {
+  for (const name of ["actions/Button", "layout/Card", "layout/CardRow", "data/StatCard"]) {
     assert.match(
       read(`src/widgets/${name}.tsx`),
       /from "(?:\.\.\/)+contexts\/LoadingScope\.js"/,

@@ -34,8 +34,8 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
-const componentsDir = join(here, "../..", "src", "widgets");
-const cardRowSource = readFileSync(join(componentsDir, "CardRow.tsx"), "utf8");
+const componentsDir = join(here, "../../..", "src", "widgets");
+const cardRowSource = readFileSync(join(componentsDir, "layout/CardRow.tsx"), "utf8");
 const cardRowCode = cardRowSource
   .replaceAll(/\/\*[\s\S]*?\*\//g, "")
   .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
@@ -70,7 +70,7 @@ test("CardRow is exported from the built internal components barrel", async () =
   );
 });
 test("CardRowProps is a type-only export from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(types, /CardRowProps/);
 });
 test("CardRow's contract is title, optional subtitle, press, and an optional labeled action", () => {

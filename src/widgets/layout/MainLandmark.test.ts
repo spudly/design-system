@@ -39,7 +39,7 @@ test("MainLandmark is exported from the built internal components barrel", async
 });
 
 test("MainLandmarkProps is a type-only export from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(types, /MainLandmarkProps/);
 });
 

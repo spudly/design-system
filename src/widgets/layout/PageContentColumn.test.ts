@@ -24,7 +24,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const root = join(here, "../..");
+const root = join(here, "../../..");
 
 function readCode(rel: string): string {
   return readFileSync(join(root, rel), "utf8")
@@ -80,7 +80,7 @@ test("FullBleed is a pass-through on native", () => {
 });
 
 test("BigFooterShell wraps web content in the column; the footer is NOT inside it", () => {
-  assert.match(bigFooter, /import \{ PageContentColumn \} from "\.\.\/PageContentColumn\.js";/);
+  assert.match(bigFooter, /import \{ PageContentColumn \} from "\.\.\/layout\/PageContentColumn\.js";/);
   // With a footer: content wrapped, footer a direct sibling
   // after the column — the #547 two-children model preserved.
   assert.match(

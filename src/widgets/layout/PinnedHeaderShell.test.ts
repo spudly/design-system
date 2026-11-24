@@ -25,7 +25,7 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "layout", "PinnedHeaderShell.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "widgets", "layout", "PinnedHeaderShell.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("PinnedHeaderShell is exported from the built internal components barrel", async () => {

@@ -40,10 +40,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { makeRenderToHtml, verticalScrollers } from "../../../test/wholePageFlow.js";
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "layout", "ScrollRegion.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "widgets", "layout", "ScrollRegion.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("ScrollRegion is exported from the built internal components barrel", async () => {
-  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+  const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
   assert.equal(
     typeof dist.ScrollRegion,
     "function",
@@ -51,7 +51,7 @@ test("ScrollRegion is exported from the built internal components barrel", async
   );
 });
 test("ScrollRegionProps is a type-only export from the built components barrel", () => {
-  const types = readFileSync(join(here, "../..", "dist", "widgets", "index.d.ts"), "utf8");
+  const types = readFileSync(join(here, "../../..", "dist", "widgets", "index.d.ts"), "utf8");
   assert.match(types, /ScrollRegionProps/);
 });
 test("the contract is children only — no styling surface", () => {
@@ -88,12 +88,12 @@ function loadRuntime() {
     const { loadInternalDist } = await import("../../../test/internalDist.js");
     const dist: Record<string, any> = await loadInternalDist();
     const { ScrollRegion }: Record<string, any> =
-      await import("../../dist/widgets/layout/ScrollRegion.js");
-    const { BigFooterShell }: Record<string, any> = await import("../../dist/widgets/content/BigFooter.js");
+      await import("../../../dist/widgets/layout/ScrollRegion.js");
+    const { BigFooterShell }: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
     const { PublicRecipePage }: Record<string, any> =
-      await import("../../dist/pages/eciperay/PublicRecipePage.js");
+      await import("../../../dist/pages/eciperay/PublicRecipePage.js");
     const { eciperayFooterFixture }: Record<string, any> =
-      await import("../../dist/pages/shared/fixtures.js");
+      await import("../../../dist/pages/shared/fixtures.js");
     return {
       React,
       renderToString,

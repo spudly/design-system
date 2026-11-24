@@ -28,10 +28,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { makeRenderToHtml, verticalScrollers } from "../../../test/wholePageFlow.js";
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../..", "src", "widgets", "layout", "ScreenShell.tsx"), "utf8");
+const source = readFileSync(join(here, "../../..", "src", "widgets", "layout", "ScreenShell.tsx"), "utf8");
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("ScreenShell is exported from the built internal components barrel", async () => {
-  const dist: Record<string, any> = await import("../../dist/widgets/index.js");
+  const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
   assert.equal(
     typeof dist.ScreenShell,
     "function",
@@ -63,13 +63,13 @@ function loadRuntime() {
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const { loadInternalDist } = await import("../../../test/internalDist.js");
     const dist: Record<string, any> = await loadInternalDist();
-    const { ScreenShell }: Record<string, any> = await import("../../dist/widgets/layout/ScreenShell.js");
-    const { ScrollShell }: Record<string, any> = await import("../../dist/widgets/layout/ScrollShell.js");
+    const { ScreenShell }: Record<string, any> = await import("../../../dist/widgets/layout/ScreenShell.js");
+    const { ScrollShell }: Record<string, any> = await import("../../../dist/widgets/layout/ScrollShell.js");
     const { ScrollRegion }: Record<string, any> =
-      await import("../../dist/widgets/layout/ScrollRegion.js");
-    const { BigFooterShell }: Record<string, any> = await import("../../dist/widgets/content/BigFooter.js");
+      await import("../../../dist/widgets/layout/ScrollRegion.js");
+    const { BigFooterShell }: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
     const { eciperayFooterFixture }: Record<string, any> =
-      await import("../../dist/pages/shared/fixtures.js");
+      await import("../../../dist/pages/shared/fixtures.js");
     return {
       React,
       renderToString,

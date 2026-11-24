@@ -34,11 +34,11 @@ import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
 
 const { masonryColumnCount, distributeMasonryItems, MasonryGrid } = await import(
-  join(here, "../..", "dist", "widgets", "index.js")
+  join(here, "../../..", "dist", "widgets", "index.js")
 );
 
 function codeOf(rel: string) {
-  const source = readFileSync(join(here, "../..", rel), "utf8");
+  const source = readFileSync(join(here, "../../..", rel), "utf8");
   return source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 }
 
@@ -95,8 +95,8 @@ test("MasonryGrid and its helpers are exported from the internal components barr
   assert.equal(typeof MasonryGrid, "function");
   assert.equal(typeof masonryColumnCount, "function");
   assert.equal(typeof distributeMasonryItems, "function");
-  const barrel = readFileSync(join(here, "../..", "src", "widgets", "index.ts"), "utf8");
-  assert.match(barrel, /MasonryGrid,[\s\S]*from "\.\/MasonryGrid\.js"/);
+  const barrel = readFileSync(join(here, "../../..", "src", "widgets", "index.ts"), "utf8");
+  assert.match(barrel, /MasonryGrid,[\s\S]*from "\.\/layout\/MasonryGrid\.js"/);
 });
 
 test("the component measures its container and derives the column count", () => {
