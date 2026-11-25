@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { YStack, isWeb } from "tamagui";
+import { isWeb } from "tamagui";
+import { Col } from "./Col.js";
+import { Spacer } from "./Spacer.js";
 import { tokens } from "../../tokens/index.js";
 
 export type PinnedHeaderShellProps = {
@@ -39,11 +41,17 @@ export type PinnedHeaderShellProps = {
  */
 export function PinnedHeaderShell({ header, children }: PinnedHeaderShellProps) {
   return (
-    <YStack {...(isWeb ? { flexGrow: 1 } : { flex: 1 })} backgroundColor={tokens.colors.gray.gray1}>
-      <YStack paddingHorizontal="$4" paddingTop="$4">
+    <Col
+      {...(isWeb ? { grow: true } : { grow: true, shrink: true })}
+      backgroundColor={tokens.colors.gray.gray1}
+    >
+      <Col px="l">
+        {/* The header's top inset is the shell's own: no parent
+          gap can own it, so it is composed explicitly (#746). */}
+        <Spacer y="l" />
         {header}
-      </YStack>
+      </Col>
       {children}
-    </YStack>
+    </Col>
   );
 }

@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack, isWeb } from "tamagui";
+import { isWeb } from "tamagui";
+import { Col } from "./Col.js";
 
 /**
  * PageContentColumn (#628, Stephen's directive 2026-11-14 as
@@ -53,12 +54,12 @@ export type PageContentColumnProps = {
  */
 export function PageContentColumn({ children }: PageContentColumnProps) {
   if (!isWeb) {
-    return <YStack width="100%">{children}</YStack>;
+    return <Col width="100%">{children}</Col>;
   }
   return (
-    <YStack width="100%" maxWidth={PAGE_CONTENT_MAX_WIDTH} alignSelf="center" position="relative">
+    <Col width="100%" maxWidth={PAGE_CONTENT_MAX_WIDTH} alignSelf="center" position="relative">
       {children}
-    </YStack>
+    </Col>
   );
 }
 
@@ -92,16 +93,16 @@ export type FullBleedProps = {
  */
 export function FullBleed({ children }: FullBleedProps) {
   if (!isWeb) {
-    return <YStack>{children}</YStack>;
+    return <Col>{children}</Col>;
   }
   return (
-    <YStack
+    <Col
       style={{
         marginLeft: "calc(50% - 50vw)",
         marginRight: "calc(50% - 50vw)",
       }}
     >
       {children}
-    </YStack>
+    </Col>
   );
 }

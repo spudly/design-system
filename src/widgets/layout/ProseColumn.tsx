@@ -1,6 +1,5 @@
-import { YStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
-import { tokens } from "../../tokens/index.js";
+import { Col } from "./Col.js";
+import type { ColProps } from "./Col.js";
 
 /**
  * The prose column width: the same 768px (the web layout's
@@ -12,21 +11,7 @@ import { tokens } from "../../tokens/index.js";
  */
 const PROSE_MAX_WIDTH = 768;
 
-const StyledProseColumn = styled(YStack, {
-  name: "ProseColumn",
-
-  width: "100%",
-  maxWidth: PROSE_MAX_WIDTH,
-  alignSelf: "center",
-  gap: tokens.spacing[4],
-});
-
-type StyledProseColumnProps = GetProps<typeof StyledProseColumn>;
-
-export type ProseColumnProps = Omit<
-  StyledProseColumnProps,
-  "width" | "maxWidth" | "alignSelf" | "gap"
->;
+export type ProseColumnProps = Omit<ColProps, "width" | "maxWidth" | "alignSelf" | "gap">;
 
 /**
  * A prose document's column (#119): full width up to the
@@ -35,7 +20,11 @@ export type ProseColumnProps = Omit<
  * blocks and any landmark props (the page passes
  * `mainRoleProps`): there are no spacing or sizing props, by
  * design — the column owns the geometry.
+ *
+ * #746 (Option B): the column renders Col directly — the
+ * geometry is Col's own props (the 16px rhythm is gap "l"),
+ * no styled root.
  */
 export function ProseColumn({ ...rest }: ProseColumnProps) {
-  return <StyledProseColumn {...rest} />;
+  return <Col width="100%" maxWidth={PROSE_MAX_WIDTH} alignSelf="center" gap="l" {...rest} />;
 }

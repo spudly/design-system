@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { YStack, isWeb } from "tamagui";
+import { isWeb } from "tamagui";
+import { Col } from "./Col.js";
+import { Spacer } from "./Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { ScrollRegion } from "./ScrollRegion.js";
 
@@ -57,53 +59,44 @@ export function SessionShell({ scrollable = false, children }: SessionShellProps
   if (scrollable) {
     if (isWeb) {
       return (
-        <YStack flexGrow={1} flexDirection="column" backgroundColor={tokens.colors.gray.gray1}>
+        <Col grow backgroundColor={tokens.colors.gray.gray1}>
           <ScrollRegion>
-            <YStack
-              paddingHorizontal="$4"
-              paddingTop="$4"
-              gap="$4"
-              paddingBottom={tokens.spacing[8]}
-            >
-              {children}
-            </YStack>
+            <Col px="l">
+              {/* The scroll column's top/bottom insets are the
+                shell's own: no parent gap can own them, so they
+                are composed explicitly (#746). */}
+              <Spacer y="l" />
+              <Col gap="l">{children}</Col>
+              <Spacer y="xxl" />
+            </Col>
           </ScrollRegion>
-        </YStack>
+        </Col>
       );
     }
     return (
-      <YStack flex={1} minHeight={0} backgroundColor={tokens.colors.gray.gray1}>
+      <Col grow shrink minHeight={0} backgroundColor={tokens.colors.gray.gray1}>
         <ScrollRegion>
-          <YStack paddingHorizontal="$4" paddingTop="$4" gap="$4" paddingBottom={tokens.spacing[8]}>
-            {children}
-          </YStack>
+          <Col px="l">
+            <Spacer y="l" />
+            <Col gap="l">{children}</Col>
+            <Spacer y="xxl" />
+          </Col>
         </ScrollRegion>
-      </YStack>
+      </Col>
     );
   }
   if (isWeb) {
     return (
-      <YStack
-        flexGrow={1}
-        flexDirection="column"
-        backgroundColor={tokens.colors.gray.gray1}
-        paddingHorizontal="$4"
-        paddingTop="$4"
-        gap="$4"
-      >
-        {children}
-      </YStack>
+      <Col grow backgroundColor={tokens.colors.gray.gray1} px="l">
+        <Spacer y="l" />
+        <Col gap="l">{children}</Col>
+      </Col>
     );
   }
   return (
-    <YStack
-      flex={1}
-      backgroundColor={tokens.colors.gray.gray1}
-      paddingHorizontal="$4"
-      paddingTop="$4"
-      gap="$4"
-    >
-      {children}
-    </YStack>
+    <Col grow shrink backgroundColor={tokens.colors.gray.gray1} px="l">
+      <Spacer y="l" />
+      <Col gap="l">{children}</Col>
+    </Col>
   );
 }

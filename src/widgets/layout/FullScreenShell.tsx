@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack, isWeb } from "tamagui";
+import { isWeb } from "tamagui";
+import { Col } from "./Col.js";
 
 export type FullScreenShellProps = {
   children: ReactNode;
@@ -26,16 +27,16 @@ export type FullScreenShellProps = {
 export function FullScreenShell({ children }: FullScreenShellProps) {
   if (!isWeb) {
     return (
-      <YStack flex={1} position="relative">
+      <Col grow shrink position="relative">
         {children}
-      </YStack>
+      </Col>
     );
   }
   return (
-    <YStack minHeight="100dvh" flexDirection="column">
-      <YStack flex={1} position="relative">
+    <Col minHeight="100dvh">
+      <Col grow shrink position="relative">
         {children}
-      </YStack>
-    </YStack>
+      </Col>
+    </Col>
   );
 }

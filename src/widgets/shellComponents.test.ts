@@ -39,9 +39,13 @@ test("the shell components are exported from the built internal components barre
 
 test("ScreenShell owns the fixed-shell frame", () => {
   const shell = code("layout/ScreenShell.tsx");
-  assert.match(shell, /styled\(YStack, \{\s+name: "ScreenShell",/);
-  assert.match(shell, /flex: 1,\s+backgroundColor: "\$surface",/);
-  assert.match(shell, /Omit<StyledScreenShellProps, "flex" \| "backgroundColor">/);
+  // #746 (Option B): no styled root — both platform branches
+  // render Col with the surface paint; the native branch's
+  // flex: 1 is the plan's grow shrink translation, the web
+  // branch grows only (#547).
+  assert.match(shell, /export type ScreenShellProps = Omit<ColProps, "backgroundColor">;/);
+  assert.match(shell, /<Col grow backgroundColor="\$surface" \{\.\.\.rest\} \/>/);
+  assert.match(shell, /<Col grow shrink backgroundColor="\$surface" \{\.\.\.rest\} \/>/);
 });
 
 test("Toolbar owns the pinned bar's inset, gap, wrap, and hairline divider", () => {

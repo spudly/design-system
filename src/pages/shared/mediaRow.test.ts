@@ -76,7 +76,7 @@ test("the page-local row and star control are not exported from the built intern
 test("MediaRow's card owns the row geometry; the text column keeps its 60dp wrap basis", () => {
   assert.match(
     mediaRow,
-    /<Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="\$3">/,
+    /<Card variant="elevated" flexDirection="row" flexWrap="wrap" alignItems="center" gap="m">/,
   );
   assert.match(mediaRow, /flexBasis: 60/);
 });
@@ -136,7 +136,10 @@ test("RatingStars' button is keyboard-operable on web (the CardRow pattern)", ()
 });
 
 test("the bar's inlined remove pairing pairs the field with its end-aligned ghost Remove button at a 4px gap (#740)", () => {
-  const bar = readFileSync(join(here, "../../..", "src", "views", "eciperay", "CatalogFiltersBar.tsx"), "utf8");
+  const bar = readFileSync(
+    join(here, "../../..", "src", "views", "eciperay", "CatalogFiltersBar.tsx"),
+    "utf8",
+  );
   assert.match(bar, /<YStack key=\{definition\.id\} gap=\{tokens\.spacing\[1\]\}>/);
   assert.match(bar, /<XStack justifyContent="flex-end">/);
   assert.match(bar, /ghost\s+size="sm"/);

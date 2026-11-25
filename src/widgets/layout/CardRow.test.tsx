@@ -81,7 +81,7 @@ test("CardRow's contract is title, optional subtitle, press, and an optional lab
 test("CardRow keeps the elevated card and the div-button pressable pattern", () => {
   assert.match(
     cardRowCode,
-    /<Card variant="elevated" flexDirection="row" alignItems="center" gap="\$3">/,
+    /<Card variant="elevated" flexDirection="row" alignItems="center" gap="m">/,
   );
   assert.match(
     cardRowCode,

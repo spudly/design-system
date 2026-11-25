@@ -1,72 +1,67 @@
-import { YStack, styled } from "tamagui";
+import { YStack } from "tamagui";
 import type { GetProps } from "tamagui";
+import { Col } from "./Col.js";
+import type { ColProps } from "./Col.js";
+import type { LayoutSize } from "../layout.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 
-const StyledCard = styled(YStack, {
-  name: "Card",
+type CardVariant = "default" | "bordered" | "muted" | "elevated" | "compact";
 
-  backgroundColor: "$surface",
-  borderWidth: 1,
-  borderColor: "$borderColor",
-  borderRadius: tokens.radii.lg,
-  padding: tokens.spacing[4],
-
-  variants: {
-    variant: {
-      // Standard section surface: filled and bordered.
-      default: {},
-      // Outline only — no surface fill; content sits on the page background.
-      bordered: {
-        backgroundColor: "transparent",
-      },
-      // Recessed section: page-background fill, no border.
-      muted: {
-        backgroundColor: "$background",
-        borderWidth: 0,
-      },
-      // Raised section: filled, soft shadow instead of a border.
-      elevated: {
-        borderWidth: 0,
-        shadowColor: tokens.shadows.md.shadowColor,
-        shadowOffset: tokens.shadows.md.shadowOffset,
-        shadowOpacity: tokens.shadows.md.shadowOpacity,
-        shadowRadius: tokens.shadows.md.shadowRadius,
-      },
-      // Compact surface: filled, no border — 12px padding, the
-      // medium radius, the small shadow. The dense-row treatment
-      // (tag rows, inline editors), folded in from the former
-      // CompactCard under Stephen's 2026-10-29 ruling: a surface
-      // treatment difference is a variant of Card, not a
-      // separate component.
-      compact: {
-        borderWidth: 0,
-        borderRadius: tokens.radii.md,
-        padding: tokens.spacing[3],
-        shadowColor: tokens.shadows.sm.shadowColor,
-        shadowOffset: tokens.shadows.sm.shadowOffset,
-        shadowOpacity: tokens.shadows.sm.shadowOpacity,
-        shadowRadius: tokens.shadows.sm.shadowRadius,
-      },
-    },
-  } as const,
-
-  defaultVariants: {
-    variant: "default",
+/**
+ * The variant treatments (#746, Option B): each variant is a
+ * fixed set of surface props the Card's Col root receives,
+ * translated from the former styled() variants. Padding is not
+ * here — it is the one variant-driven value Col's padding props
+ * carry, applied at the render site (`p`).
+ */
+const variantStyles: Record<CardVariant, Partial<ColProps>> = {
+  // Standard section surface: filled and bordered.
+  default: {},
+  // Outline only — no surface fill; content sits on the page background.
+  bordered: {
+    backgroundColor: "transparent",
   },
-});
+  // Recessed section: page-background fill, no border.
+  muted: {
+    backgroundColor: "$background",
+    borderWidth: 0,
+  },
+  // Raised section: filled, soft shadow instead of a border.
+  elevated: {
+    borderWidth: 0,
+    shadowColor: tokens.shadows.md.shadowColor,
+    shadowOffset: tokens.shadows.md.shadowOffset,
+    shadowOpacity: tokens.shadows.md.shadowOpacity,
+    shadowRadius: tokens.shadows.md.shadowRadius,
+  },
+  // Compact surface: filled, no border — 12px padding (applied
+  // at the render site), the medium radius, the small shadow.
+  // The dense-row treatment (tag rows, inline editors), folded
+  // in from the former CompactCard under Stephen's 2026-10-29
+  // ruling: a surface treatment difference is a variant of
+  // Card, not a separate component.
+  compact: {
+    borderWidth: 0,
+    borderRadius: tokens.radii.md,
+    shadowColor: tokens.shadows.sm.shadowColor,
+    shadowOffset: tokens.shadows.sm.shadowOffset,
+    shadowOpacity: tokens.shadows.sm.shadowOpacity,
+    shadowRadius: tokens.shadows.sm.shadowRadius,
+  },
+};
 
-type StyledCardProps = GetProps<typeof StyledCard>;
+type YStackProps = GetProps<typeof YStack>;
 
-export type CardProps = StyledCardProps & {
+export type CardProps = Omit<YStackProps, "variant" | "gap"> & {
   /**
    * Appearance: `default` (filled, bordered), `bordered` (outline only),
    * `muted` (page-background fill, no border), `elevated` (filled, soft
    * shadow, no border), `compact` (filled, no border — 12px padding,
    * medium radius, small shadow; dense rows and inline editors).
    */
-  variant?: "default" | "bordered" | "muted" | "elevated" | "compact";
+  variant?: CardVariant;
   /** @deprecated Use `variant="elevated"` instead. Kept for existing consumers. */
   elevated?: boolean;
   /** Loading state (#278): the card marks its region busy and
@@ -75,12 +70,23 @@ export type CardProps = StyledCardProps & {
    * prop-drilling the flag into each one. The card's own frame
    * (fill, border, padding) is unchanged. */
   loading?: boolean;
+  /** Separation between the card's sections: a t-shirt size,
+   * or a raw pixel number for the cases the scale cannot name
+   * (applied through the style channel, like ScreenContainer's
+   * caller gap). */
+  gap?: LayoutSize | number;
 };
 
 /**
  * Surface container with token-driven padding and radius. Appearance comes
  * from `variant` (see {@link CardProps}); the legacy `elevated` boolean maps
  * to `variant="elevated"` when no variant is given.
+ *
+ * #746 (Option B): the card renders Col directly and its
+ * variants translate to Col props in code — no styled root.
+ * Props outside Col's subset (flexDirection, alignItems, press
+ * handlers, …) ride the passthrough to the underlying stack,
+ * as they did through the styled root.
  */
 export function Card({
   variant,
@@ -88,6 +94,7 @@ export function Card({
   style,
   loading = false,
   children,
+  gap,
   ...rest
 }: CardProps) {
   const resolvedVariant = variant ?? (elevated ? "elevated" : "default");
@@ -97,14 +104,16 @@ export function Card({
   // config nor this component's props. It is composed as a style array under
   // the caller's style (React Native flattens arrays left to right), so
   // unrelated caller styles — including caller style arrays — preserve the
-  // shadow and an explicit caller elevation wins.
+  // shadow and an explicit caller elevation wins. A numeric caller gap rides
+  // the same channel: Col's gap names t-shirt sizes only.
   const elevation =
     resolvedVariant === "elevated"
       ? tokens.shadows.md.elevation
       : resolvedVariant === "compact"
         ? tokens.shadows.sm.elevation
         : undefined;
-  const composedStyle = [elevation !== undefined ? { elevation } : undefined, style];
+  const gapStyle = typeof gap === "number" ? { gap } : undefined;
+  const composedStyle = [elevation !== undefined ? { elevation } : undefined, gapStyle, style];
   // The scope this card provides combines its own flag with any
   // enclosing scope: a plain Card nested inside a loading
   // composite must not reset the scope to false for its subtree
@@ -135,10 +144,16 @@ export function Card({
     "aria-selected"?: boolean;
   };
   return (
-    <StyledCard
-      variant={resolvedVariant}
+    <Col
+      p={resolvedVariant === "compact" ? "m" : "l"}
+      backgroundColor="$surface"
+      borderWidth={1}
+      borderColor="$borderColor"
+      borderRadius={tokens.radii.lg}
+      {...variantStyles[resolvedVariant]}
+      {...(typeof gap === "string" ? { gap } : null)}
+      {...(rest as ColProps)}
       style={composedStyle}
-      {...rest}
       {...(showSkeleton
         ? platformAccessibilityProps({
             accessibilityState: { ...caller.accessibilityState, busy: true },
@@ -151,6 +166,6 @@ export function Card({
         : {})}
     >
       <LoadingScope active={showSkeleton}>{children}</LoadingScope>
-    </StyledCard>
+    </Col>
   );
 }

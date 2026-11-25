@@ -170,19 +170,22 @@ test("FieldRow's field types fill the row height on their grow path (#476)", () 
 });
 
 test("Center centers a single child on boolean dimensions, with a semantic fill variant", () => {
-  assert.match(centerCode, /styled\(YStack, \{\s+name: "Center",/);
-  assert.match(centerCode, /horizontal: \{\s+true: \{ alignItems: "center" \},/);
-  assert.match(centerCode, /vertical: \{\s+true: \{ justifyContent: "center" \},/);
-  assert.match(centerCode, /fill: \{\s+true: \{ flex: 1 \},/);
-  assert.match(
-    centerCode,
-    /defaultVariants: \{\s+horizontal: true,\s+vertical: true,\s+fill: false,\s+\}/,
-  );
+  // #746 (Option B): no styled root — the booleans translate to
+  // Col's semantic props in code: horizontal is the cross axis
+  // (center, or stretch when off), vertical the main axis
+  // (middle, or top when off), and fill is flex: 1's grow
+  // shrink translation.
+  assert.match(centerCode, /\{\.\.\.\(horizontal \? \{ center: true \} : \{ stretch: true \}\)\}/);
+  assert.match(centerCode, /\{\.\.\.\(vertical \? \{ middle: true \} : \{ top: true \}\)\}/);
+  assert.match(centerCode, /\{\.\.\.\(fill \? \{ grow: true, shrink: true \} : null\)\}/);
   assert.match(
     centerCode,
     /export function Center\(\{ horizontal = true, vertical = true, fill = false, \.\.\.rest \}: CenterProps\)/,
   );
-  assert.match(centerCode, /Omit<StyledCenterProps, "alignItems" \| "justifyContent" \| "flex">/);
+  assert.match(
+    centerCode,
+    /Omit<\s+ColProps,\s+"center" \| "stretch" \| "middle" \| "top" \| "grow" \| "shrink" \| "fill"\s+>/,
+  );
 });
 
 test("no layout component offers step, role, or margin props", () => {

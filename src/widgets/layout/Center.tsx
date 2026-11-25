@@ -1,34 +1,10 @@
-import { YStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { Col } from "./Col.js";
+import type { ColProps } from "./Col.js";
 
-const StyledCenter = styled(YStack, {
-  name: "Center",
-
-  variants: {
-    horizontal: {
-      true: { alignItems: "center" },
-      false: { alignItems: "stretch" },
-    },
-    vertical: {
-      true: { justifyContent: "center" },
-      false: { justifyContent: "flex-start" },
-    },
-    fill: {
-      true: { flex: 1 },
-      false: {},
-    },
-  } as const,
-
-  defaultVariants: {
-    horizontal: true,
-    vertical: true,
-    fill: false,
-  },
-});
-
-type StyledCenterProps = GetProps<typeof StyledCenter>;
-
-export type CenterProps = Omit<StyledCenterProps, "alignItems" | "justifyContent" | "flex"> & {
+export type CenterProps = Omit<
+  ColProps,
+  "center" | "stretch" | "middle" | "top" | "grow" | "shrink" | "fill"
+> & {
   /** Center the child horizontally (default true). */
   horizontal?: boolean;
   /** Center the child vertically within the Center's own
@@ -49,7 +25,20 @@ export type CenterProps = Omit<StyledCenterProps, "alignItems" | "justifyContent
  * Layout stacks are not centering tools: a stack with a single
  * hardcoded child is a sign Center was meant, so stacks do not
  * offer alignment props for this.
+ *
+ * #746 (Option B): the booleans translate to Col's semantic
+ * props in code — `horizontal` is Col's cross axis (`center`,
+ * or `stretch` when off), `vertical` its main axis (`middle`,
+ * or `top` when off), and `fill` is the plan's flex: 1
+ * translation (`grow shrink`). No styled root.
  */
 export function Center({ horizontal = true, vertical = true, fill = false, ...rest }: CenterProps) {
-  return <StyledCenter horizontal={horizontal} vertical={vertical} fill={fill} {...rest} />;
+  return (
+    <Col
+      {...(horizontal ? { center: true } : { stretch: true })}
+      {...(vertical ? { middle: true } : { top: true })}
+      {...(fill ? { grow: true, shrink: true } : null)}
+      {...rest}
+    />
+  );
 }

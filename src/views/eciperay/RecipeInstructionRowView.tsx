@@ -76,7 +76,7 @@ export function RecipeInstructionRowView({
       <Center horizontal={false}>
         <Text variant="muted">{`${position}.`}</Text>
       </Center>
-      <Col grow>
+      <Col grow shrink>
         <TextAreaField
           accessibilityLabel={voice.recipeInstructionRowView.stepLabel(position)}
           readOnly={onBodyChange === undefined}

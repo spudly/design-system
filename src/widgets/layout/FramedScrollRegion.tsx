@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { ScrollView, YStack } from "tamagui";
+import { ScrollView } from "tamagui";
+import { Col } from "./Col.js";
 import { tokens } from "../../tokens/index.js";
 
 export type FramedScrollRegionProps = {
@@ -23,7 +24,7 @@ export type FramedScrollRegionProps = {
  */
 export function FramedScrollRegion({ loading = false, children }: FramedScrollRegionProps) {
   return (
-    <YStack
+    <Col
       borderWidth={1}
       borderColor={loading ? "transparent" : tokens.colors.gray.gray3}
       borderRadius={tokens.radii.xl}
@@ -31,6 +32,6 @@ export function FramedScrollRegion({ loading = false, children }: FramedScrollRe
       overflow="hidden"
     >
       <ScrollView>{children}</ScrollView>
-    </YStack>
+    </Col>
   );
 }

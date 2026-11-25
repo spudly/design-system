@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { YStack, isWeb } from "tamagui";
+import { isWeb } from "tamagui";
+import { Col } from "./Col.js";
 import { mainRoleProps } from "../accessibility.js";
 
 export type MainLandmarkProps = {
@@ -38,14 +39,14 @@ export type MainLandmarkProps = {
 export function MainLandmark({ children }: MainLandmarkProps) {
   if (isWeb) {
     return (
-      <YStack flexGrow={1} flexDirection="column" {...mainRoleProps}>
+      <Col grow {...mainRoleProps}>
         {children}
-      </YStack>
+      </Col>
     );
   }
   return (
-    <YStack flex={1} {...mainRoleProps}>
+    <Col grow shrink {...mainRoleProps}>
       {children}
-    </YStack>
+    </Col>
   );
 }

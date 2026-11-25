@@ -40,7 +40,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 import { makeRenderToHtml, verticalScrollers } from "../../../test/wholePageFlow.js";
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "layout", "ScrollRegion.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "layout", "ScrollRegion.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("ScrollRegion is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await import("../../../dist/widgets/index.js");
@@ -71,8 +74,8 @@ test("native keeps the region's single ScrollView; the web path renders no Scrol
   assert.match(code, /if \(isWeb\) \{/, "the web path is an explicit platform branch");
   assert.match(
     code,
-    /<YStack flexGrow=\{1\} flexDirection="column">/,
-    "the web branch renders a plain growing column — no scroller, no bounded region",
+    /<Col grow>\{children\}<\/Col>/,
+    "the web branch renders a plain growing column — no scroller, no bounded region (#746: Col's grow is flexGrow with an automatic basis)",
   );
 });
 
@@ -89,7 +92,8 @@ function loadRuntime() {
     const dist: Record<string, any> = await loadInternalDist();
     const { ScrollRegion }: Record<string, any> =
       await import("../../../dist/widgets/layout/ScrollRegion.js");
-    const { BigFooterShell }: Record<string, any> = await import("../../../dist/widgets/content/BigFooter.js");
+    const { BigFooterShell }: Record<string, any> =
+      await import("../../../dist/widgets/content/BigFooter.js");
     const { PublicRecipePage }: Record<string, any> =
       await import("../../../dist/pages/eciperay/PublicRecipePage.js");
     const { eciperayFooterFixture }: Record<string, any> =

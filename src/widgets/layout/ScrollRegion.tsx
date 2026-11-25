@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { ScrollView, YStack, isWeb } from "tamagui";
+import { ScrollView, isWeb } from "tamagui";
+import { Col } from "./Col.js";
 
 export type ScrollRegionProps = {
   children: ReactNode;
@@ -44,11 +45,7 @@ export type ScrollRegionProps = {
  */
 export function ScrollRegion({ children }: ScrollRegionProps) {
   if (isWeb) {
-    return (
-      <YStack flexGrow={1} flexDirection="column">
-        {children}
-      </YStack>
-    );
+    return <Col grow>{children}</Col>;
   }
   return (
     <ScrollView flex={1} keyboardShouldPersistTaps="handled" tabIndex={0}>

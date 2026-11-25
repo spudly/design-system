@@ -55,8 +55,8 @@ test("ScrollShell paints the surface and scrolls its inset column through Scroll
     1,
     "exactly one scroll region: the shell's single scroll",
   );
-  assert.match(scrollShellCode, /<YStack\s+width="100%"/);
-  assert.match(scrollShellCode, /padding="\$4"\s+gap="\$4"/);
+  assert.match(scrollShellCode, /<Col\s+width="100%"/);
+  assert.match(scrollShellCode, /p="l"\s+gap="l"/);
   assert.ok(!scrollShellCode.includes("lineHeight"), "the shell must not set lineHeight");
 });
 

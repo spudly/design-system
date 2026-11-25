@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { Col } from "./Col.js";
 import { ScreenShell } from "./ScreenShell.js";
 import { ScrollRegion } from "./ScrollRegion.js";
 
@@ -23,7 +23,7 @@ export type ScrollShellProps = {
  * every section. ScreenContainer is the unpainted alternative for
  * pages whose host already paints the surface; this shell is for
  * pages that own their paint and their scroll, the shape
- * PublicRecipePage hand-rolled as a styled YStack around its
+ * PublicRecipePage hand-rolled as a styled stack around its
  * ScrollView before adopting ScrollRegion for the scroll itself.
  *
  * The shell is a composition, not a re-declared frame (#119
@@ -48,15 +48,9 @@ export function ScrollShell({ children }: ScrollShellProps) {
   return (
     <ScreenShell>
       <ScrollRegion>
-        <YStack
-          width="100%"
-          maxWidth={SCROLL_SHELL_COLUMN_MAX_WIDTH}
-          alignSelf="center"
-          padding="$4"
-          gap="$4"
-        >
+        <Col width="100%" maxWidth={SCROLL_SHELL_COLUMN_MAX_WIDTH} alignSelf="center" p="l" gap="l">
           {children}
-        </YStack>
+        </Col>
       </ScrollRegion>
     </ScreenShell>
   );
