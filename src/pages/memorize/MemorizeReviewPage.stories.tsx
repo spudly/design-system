@@ -71,6 +71,7 @@ export const Empty: Story = {
         verses={[]}
         onRememberedPress={() => undefined}
         onForgotPress={() => undefined}
+        browseHref="/verses"
       />
     </>
   ),

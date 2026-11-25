@@ -189,6 +189,15 @@ test("the error alert carries the app-composed message", async () => {
   assert.equal(alert.type, Alert);
   assert.equal(alert.props.severity, "error");
   assert.equal(alert.props.children, "Search failed", "the error message renders verbatim");
+  // #856: the error alert carries a Retry action wired to onSearch.
+  assert.equal(alert.props.actions?.length, 1, "the error alert carries one recovery action");
+  assert.equal(alert.props.actions[0].label, "Retry");
+  let retries = 0;
+  const retryAlert = screenChildren(
+    VerseSearchPage(baseProps({ errorMessage: "Search failed", onSearch: () => (retries += 1) })),
+  )[3];
+  retryAlert.props.actions[0].onPress();
+  assert.equal(retries, 1, "Retry fires the page's onSearch");
   const noError = screenChildren(VerseSearchPage(baseProps()));
   assert.equal(noError[3], null, "no error renders no alert");
 });
@@ -217,6 +226,22 @@ test("a completed search with no results renders the empty state; the pre-search
   assert.equal(fruitless.props.title, "No results");
   assert.equal(fruitless.props.body, "Try a different word or reference.");
   assert.equal(fruitless.props.announce, true, "the empty state announces the search outcome");
+  // #856: no-results carries an icon and a Clear search action that
+  // clears the query through the existing onQueryChange.
+  assert.equal(fruitless.props.icon, "help");
+  assert.equal(fruitless.props.actionLabel, "Clear search");
+  const cleared: string[] = [];
+  const withClear = screenChildren(
+    VerseSearchPage(
+      baseProps({
+        results: [],
+        hasSearched: true,
+        onQueryChange: (v: string) => cleared.push(v),
+      }),
+    ),
+  ).at(-1);
+  withClear.props.onAction();
+  assert.deepEqual(cleared, [""], "Clear search clears the query via onQueryChange");
 
   const preSearch = screenChildren(VerseSearchPage(baseProps({ results: [] }))).at(-1);
   assert.equal(

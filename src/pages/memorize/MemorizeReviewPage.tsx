@@ -97,6 +97,11 @@ export type MemorizeReviewPageProps = {
   /** "I forgot it" action: in the app this records a forgot
    * review, resetting the verse's schedule. */
   onForgotPress: (verseId: string) => void;
+  /** Optional empty-state recovery link (#856): the host's browse
+   * destination, rendered as the nothing-due EmptyState's link-form
+   * action ("Browse verses") when supplied. Optional — a host that
+   * supplies nothing renders the empty state exactly as before. */
+  browseHref?: string;
 };
 
 function ReviewVerseRow({
@@ -135,6 +140,7 @@ export function MemorizeReviewPage({
   verses,
   onRememberedPress,
   onForgotPress,
+  browseHref,
   footer,
 }: MemorizeReviewPageProps) {
   return (
@@ -144,7 +150,12 @@ export function MemorizeReviewPage({
           {verses.length === 0 ? "Review" : `Review (${verses.length} due)`}
         </Text>
         {verses.length === 0 ? (
-          <EmptyState title="Nothing due" body="Nice work." />
+          <EmptyState
+            title="Nothing due"
+            body="Nice work."
+            icon="success"
+            {...(browseHref ? { actionLabel: "Browse verses", actionHref: browseHref } : {})}
+          />
         ) : (
           <BoundedList
             data={verses}

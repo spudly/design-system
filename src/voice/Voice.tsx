@@ -329,6 +329,8 @@ export type Voice = {
     replyEmailPlaceholder: string;
     bugLabel: string;
     submitLabel: string;
+    /** FeedbackPage (#856): the submitted state's next action — resets to the blank form via the host's onResetPress. */
+    submittedActionLabel: string;
     submitPendingLabel: string;
   };
   /** ConsentPreferencesPage (tranche 3b): defaults when the description / hint props are not passed, plus the card title, the current-choice line's prefix and choice labels, and the action labels. */

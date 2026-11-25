@@ -5,6 +5,7 @@ import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { SectionCard } from "../../widgets/content/SectionCard.js";
 import { Spinner } from "../../widgets/feedback/Spinner.js";
 import { Text } from "../../widgets/data/Text.js";
+import { Alert } from "../../widgets/feedback/Alert.js";
 import { useVoice } from "../../voice/index.js";
 
 /**
@@ -71,8 +72,12 @@ export function PayPage({
               </>
             ) : (
               <>
-                {copy.body ? <Text variant="body">{copy.body}</Text> : null}
-                {status === "needs-transaction" && homeHref ? (
+                {status === "error" && copy.body ? (
+                  <Alert severity="error" message={copy.body} />
+                ) : copy.body ? (
+                  <Text variant="body">{copy.body}</Text>
+                ) : null}
+                {(status === "needs-transaction" || status === "unconfigured") && homeHref ? (
                   <Button variant="primary" href={homeHref}>
                     {homeLabel}
                   </Button>

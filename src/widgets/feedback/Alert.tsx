@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { isWeb } from "tamagui";
+import { isWeb, useTheme } from "tamagui";
 import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import type { ColProps } from "../layout/Col.js";
@@ -8,6 +8,17 @@ import { platformAccessibilityProps, politeLiveRegionProps } from "../accessibil
 import { Button, ButtonInternal } from "../actions/Button.js";
 import { Text } from "../data/Text.js";
 import { useVoice } from "../../voice/index.js";
+import { ErrorIcon } from "../../icons/ErrorIcon.js";
+import { InfoIcon } from "../../icons/InfoIcon.js";
+import { SuccessIcon } from "../../icons/SuccessIcon.js";
+import { WarningIcon } from "../../icons/WarningIcon.js";
+
+const severityIcons = {
+  info: InfoIcon,
+  success: SuccessIcon,
+  warning: WarningIcon,
+  error: ErrorIcon,
+} as const;
 
 const severityStyles = {
   info: {
@@ -59,7 +70,10 @@ export type AlertProps = ColProps & {
  * `accessibilityLiveRegion="polite"` on native, via `politeLiveRegionProps`
  * (`status` is not a valid React Native `accessibilityRole` and crashes
  * Android — spudly/eciperay#156). Message meaning is carried by text,
- * never color alone. The optional dismiss button is labeled with the
+ * never color alone; since #856 a severity icon (info / check-circle
+ * success / alert-triangle warning / alert-circle error, official
+ * Feather data) renders before the message in the severity's text
+ * ink, so the severity is not carried by the pale tint alone. The optional dismiss button is labeled with the
  * voice object's alert dismiss label (#539) and
  * meets the 44px minimum touch target; its glyph renders at 2xl in the
  * alert's own text color, pulled toward the top-right corner (the
@@ -86,7 +100,20 @@ export function Alert({
   ...rest
 }: AlertProps) {
   const voice = useVoice();
+  const theme = useTheme();
   const styles = severityStyles[severity];
+  const SeverityIcon = severityIcons[severity];
+  // The severity icon is decorative (aria-hidden via the Icon base):
+  // meaning is carried by the message text, never color or glyph
+  // alone (#856). Its ink is the severity's step-8 text token; the
+  // info ramp's text is a theme token ($primaryEmphasis), which SVG
+  // cannot resolve, so it is read from the active theme (the
+  // SectionHeading glyph-ink pattern).
+  const primaryEmphasisVariable = theme["primaryEmphasis"];
+  const iconInk =
+    severity === "info" && typeof primaryEmphasisVariable?.val === "string"
+      ? primaryEmphasisVariable.val
+      : styles.text;
   const isAlert = severity === "error" || severity === "warning";
   const showDismiss = dismissible && onDismiss !== undefined;
   const content = children ?? message;
@@ -147,6 +174,7 @@ export function Alert({
       {...rest}
     >
       <Row between top gap="s">
+        <SeverityIcon size={20} color={iconInk} />
         <Text style={{ color: styles.text, flex: 1 }}>{content}</Text>
         {showDismiss ? (
           <ButtonInternal

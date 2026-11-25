@@ -223,10 +223,23 @@ export function VerseSearchPage({
             Search
           </Button>
         </FieldRow>
-        {errorMessage ? <Alert severity="error">{errorMessage}</Alert> : null}
+        {errorMessage ? (
+          <Alert severity="error" actions={[{ label: "Retry", onPress: onSearch }]}>
+            {errorMessage}
+          </Alert>
+        ) : null}
         {isSearching ? <Spinner label="Loading" /> : null}
         {hasSearched && !isSearching && !errorMessage && results.length === 0 ? (
-          <EmptyState title="No results" body="Try a different word or reference." announce />
+          <EmptyState
+            title="No results"
+            body="Try a different word or reference."
+            announce
+            icon="help"
+            actionLabel="Clear search"
+            onAction={() => {
+              onQueryChange("");
+            }}
+          />
         ) : (
           <BoundedList
             data={results}
