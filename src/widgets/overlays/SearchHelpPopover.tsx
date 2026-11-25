@@ -1,5 +1,7 @@
 import { useState } from "react";
-import { Adapt, Popover, Sheet, XStack, YStack, styled } from "tamagui";
+import { Adapt, Popover, Sheet, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Button } from "../actions/Button.js";
@@ -89,7 +91,13 @@ export function SearchHelpPopover({
   };
 
   return (
-    <Popover open={open} onOpenChange={setOpen} placement="bottom-start" allowFlip stayInFrame={{ padding: tokens.spacing[2] }}>
+    <Popover
+      open={open}
+      onOpenChange={setOpen}
+      placement="bottom-start"
+      allowFlip
+      stayInFrame={{ padding: tokens.spacing[2] }}
+    >
       <Popover.Trigger asChild disablePressTrigger>
         <Button
           variant="secondary"
@@ -113,13 +121,16 @@ export function SearchHelpPopover({
           </Sheet.ScrollView>
         </Sheet>
       </Adapt>
-      <StyledContent onCloseAutoFocus={false} {...platformAccessibilityProps({ accessibilityLabel: title })}>
-        <YStack gap={tokens.spacing[3]}>
+      <StyledContent
+        onCloseAutoFocus={false}
+        {...platformAccessibilityProps({ accessibilityLabel: title })}
+      >
+        <Col gap="m">
           <Text variant="subheading">{title}</Text>
           {intro ? <Text variant="hint">{intro}</Text> : null}
-          <YStack gap={tokens.spacing[2]}>
+          <Col gap="s">
             {entries.map((entry) => (
-              <XStack key={entry.syntax} gap={tokens.spacing[3]} alignItems="flex-start">
+              <Row key={entry.syntax} gap="m" top>
                 <Text
                   fontFamily={tokens.typography.fontFamily.mono}
                   fontSize={tokens.typography.fontSize.sm}
@@ -131,10 +142,10 @@ export function SearchHelpPopover({
                 <Text fontSize={tokens.typography.fontSize.sm} flex={1}>
                   {entry.description}
                 </Text>
-              </XStack>
+              </Row>
             ))}
-          </YStack>
-        </YStack>
+          </Col>
+        </Col>
       </StyledContent>
     </Popover>
   );

@@ -32,7 +32,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "overlays", "StepOverlay.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "overlays", "StepOverlay.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("StepOverlay is exported from the built internal components barrel", async () => {
@@ -61,18 +64,18 @@ test("the body and navigation scroll in a bounded region; short bodies stay cent
     code,
     /const scrollContentContainerStyle = \{ flexGrow: 1, justifyContent: "center" \} as const;/,
   );
-  assert.match(code, /<YStack paddingHorizontal="\$6" paddingVertical="\$12">/);
-  assert.match(code, /paddingHorizontal="\$6"/);
+  // #746: the inset column is a Col — $6 (24px) is the xl
+  // subset size on the px prop; $12 (48px) fits no subset
+  // size and rides the style channel as paddingBlock.
+  assert.match(code, /<Col px="xl" style=\{\{ paddingBlock: 48 \}\}>/);
+  assert.match(code, /px="xl"/);
   // The reading measure lives inside the shell (#729): the
   // scroll content is wrapped in PageContentColumn, so the
   // step text keeps the #628 desktop measure even when the
   // shell's backdrop fills a full-width region (the cooking
   // pages' overlay mode).
   assert.match(code, /import \{ PageContentColumn \} from "\.\.\/layout\/PageContentColumn\.js";/);
-  assert.match(
-    code,
-    /<PageContentColumn>\s*<YStack paddingHorizontal="\$6" paddingVertical="\$12">/,
-  );
+  assert.match(code, /<PageContentColumn>\s*<Col px="xl" style=\{\{ paddingBlock: 48 \}\}>/);
   // The Done pill is NOT inside the scroll region: it renders
   // after the region closes, a fixed sibling of it, so it stays
   // pinned and reachable at any scroll position.
@@ -95,10 +98,16 @@ test("the shell manages focus: dialog semantics and a web mount focus move (#332
   // is an ARIA-only role (no RN accessibilityRole member), so
   // the shell spreads dialogRoleProps and never passes the
   // literal as an accessibilityRole.
-  assert.match(code, /\{\.\.\.dialogRoleProps\}/);
+  // #746: the spreads ride a Record cast — ColProps'
+  // exactOptionalPropertyTypes rejects the translators'
+  // optional-undefined members; the spread itself is unchanged.
+  assert.match(code, /\{\.\.\.\(dialogRoleProps as Record<string, unknown>\)\}/);
   assert.ok(!code.includes('accessibilityRole: "dialog"'), "dialog never routes as an RN role");
   // The dialog is named for its title, through the translator.
-  assert.match(code, /\{\.\.\.platformAccessibilityProps\(\{ accessibilityLabel: title \}\)\}/);
+  assert.match(
+    code,
+    /\{\.\.\.\(platformAccessibilityProps\(\{ accessibilityLabel: title \}\) as Record<string, unknown>\)\}/,
+  );
   // The shell is the focus target: focusable but never a tab
   // stop, and the mount effect moves web focus into it once.
   assert.match(code, /tabIndex=\{-1\}/);

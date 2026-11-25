@@ -1,4 +1,5 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Center } from "../layout/Center.js";
 import { CircleSkeleton } from "./CircleSkeleton.js";
@@ -21,16 +22,16 @@ export type RadioSkeletonRowProps = {
  */
 export function RadioSkeletonRow({ description = false }: RadioSkeletonRowProps) {
   return (
-    <XStack alignItems="center" gap={tokens.spacing[2]}>
+    <Row middle gap="s">
       <Center width={44} height={44}>
         <CircleSkeleton size={20} />
       </Center>
-      <YStack flex={1} gap={tokens.spacing[1]}>
+      <Col grow shrink gap="xs">
         <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
           <TextSkeleton size="md" lines={1} />
         </Center>
         {description ? <TextSkeleton size="sm" lines={1} /> : null}
-      </YStack>
-    </XStack>
+      </Col>
+    </Row>
   );
 }

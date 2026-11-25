@@ -61,41 +61,45 @@ test("FixedActionBanner selects viewport pinning and passes no style props (#405
     );
   }
 });
-test("ActionBar owns the viewport pinning styles in its pinning variant (#405)", () => {
+test("ActionBar owns the viewport pinning styles in its pinning computation (#405)", () => {
+  // #746 (Option B): the styled pinning variant is computed in
+  // code — the same platform-conditional values, selected by
+  // the pinning prop behind the isViewport flag.
   assert.match(
     actionBar,
-    /position: \{\s*default: "absolute",\s*web: "fixed"\s*\}/,
+    /position=\{isViewport \? \{ default: "absolute", web: "fixed" \} : "absolute"\}/,
     "ActionBar's viewport pinning must carry the platform-conditional position (fixed on web, absolute on native)",
   );
   assert.match(
     actionBar,
-    /maxHeight: \{\s*web: "100%"\s*\}/,
+    /maxHeight: \{ web: "100%" \}/,
     "ActionBar's viewport pinning must cap the web bar at the viewport height (100% of the fixed containing block)",
   );
   assert.match(
     actionBar,
-    /overflow: \{\s*web: "auto"\s*\}/,
+    /overflow: \{ web: "auto" \}/,
     "ActionBar's viewport pinning must let an over-height web bar scroll internally so its content stays reachable",
   );
   assert.ok(
-    actionBar.indexOf("pinning:") < actionBar.indexOf('web: "fixed"'),
-    "the pinning styles must live inside ActionBar's pinning variant, not its base styles",
+    actionBar.indexOf('const isViewport = pinning === "viewport"') <
+      actionBar.indexOf('web: "fixed"'),
+    "the pinning styles must be selected by ActionBar's pinning computation, not applied unconditionally",
   );
 });
-test("ActionBar's styled base stays absolute and pinning defaults to container (#405)", () => {
+test("ActionBar's base stays absolute and pinning defaults to container (#405)", () => {
   assert.match(
     actionBar,
-    /position: "absolute"/,
+    /: "absolute"\}/,
     "ActionBar's base must keep absolute positioning for plain (non-banner) use",
   );
   assert.match(
     actionBar,
-    /container: \{\}/,
-    "container pinning must add no styles over the absolute base",
+    /\.\.\.\(isViewport \? \{ maxHeight:/,
+    "container pinning must add no styles over the absolute base (the viewport extras ride the isViewport spread)",
   );
   assert.match(
     actionBar,
-    /pinning: "container"/,
+    /pinning = "container"/,
     "pinning must default to container so a plain ActionBar keeps its existing contract",
   );
 });
@@ -130,8 +134,15 @@ function loadRuntime() {
   return runtimePromise;
 }
 async function renderSsr(element) {
-  const { React, renderToString, TamaguiProvider, createTamaguiConfig, baseTheme, VoiceProvider, fixtureVoice } =
-    await loadRuntime();
+  const {
+    React,
+    renderToString,
+    TamaguiProvider,
+    createTamaguiConfig,
+    baseTheme,
+    VoiceProvider,
+    fixtureVoice,
+  } = await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
   return renderToString(
     <TamaguiProvider config={config} defaultTheme="light">

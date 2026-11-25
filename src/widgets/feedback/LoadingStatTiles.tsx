@@ -1,4 +1,4 @@
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { LoadingScope } from "../../contexts/LoadingScope.js";
 import { StatCard } from "../data/StatCard.js";
@@ -23,9 +23,9 @@ export function LoadingStatTiles({ keys }: LoadingStatTilesProps) {
   return (
     <LoadingScope active>
       {keys.map((key) => (
-        <YStack key={key} flex={1} paddingHorizontal={tokens.spacing[2]}>
+        <Col key={key} grow shrink px="s">
           <StatCard value="" label="" />
-        </YStack>
+        </Col>
       ))}
     </LoadingScope>
   );

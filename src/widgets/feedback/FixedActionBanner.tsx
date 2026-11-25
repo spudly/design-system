@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { ActionBar } from "../actions/ActionBar.js";
 import { Button } from "../actions/Button.js";
 import { Alert } from "./Alert.js";
@@ -58,9 +59,9 @@ export function FixedActionBanner({
   const resolvedDismissAriaLabel = dismissAriaLabel ?? voice.fixedActionBanner.dismissLabel;
   return (
     <ActionBar placement={position} pinning="viewport">
-      <YStack width="100%" maxWidth={1024} alignSelf="center" gap="$3">
+      <Col width="100%" maxWidth={1024} alignSelf="center" gap="m">
         <Alert severity="info">{message}</Alert>
-        <XStack flexWrap="wrap" alignItems="center" gap="$2">
+        <Row wrap middle gap="s">
           {secondaryAction ? (
             <Button variant="secondary" onPress={secondaryAction.onPress}>
               {secondaryAction.label}
@@ -72,12 +73,17 @@ export function FixedActionBanner({
             </Button>
           ) : null}
           {onDismiss ? (
-            <Button ghost size="sm" accessibilityLabel={resolvedDismissAriaLabel} onPress={onDismiss}>
+            <Button
+              ghost
+              size="sm"
+              accessibilityLabel={resolvedDismissAriaLabel}
+              onPress={onDismiss}
+            >
               {voice.fixedActionBanner.dismissLabel}
             </Button>
           ) : null}
-        </XStack>
-      </YStack>
+        </Row>
+      </Col>
     </ActionBar>
   );
 }

@@ -1,20 +1,10 @@
 import { Children, Fragment, cloneElement, isValidElement } from "react";
 import type { ReactElement, ReactNode } from "react";
-import { XStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 
-const StyledButtonRow = styled(XStack, {
-  name: "ButtonRow",
-
-  gap: tokens.spacing[3],
-  flexWrap: "wrap",
-  alignItems: "flex-start",
-});
-
-type StyledButtonRowProps = GetProps<typeof StyledButtonRow>;
-
-export type ButtonRowProps = Omit<StyledButtonRowProps, "gap" | "alignItems" | "flexWrap"> & {
+export type ButtonRowProps = Omit<RowProps, "gap" | "top" | "wrap"> & {
   /**
    * When true, the row's buttons share the row's width equally
    * (the treatment EqualButtonRow carried before #475 merged it
@@ -102,7 +92,11 @@ function flattenRowChildren(children: ReactNode): ReactNode[] {
  */
 export function ButtonRow({ children, equal = false, ...rest }: ButtonRowProps) {
   if (!equal) {
-    return <StyledButtonRow {...rest}>{children}</StyledButtonRow>;
+    return (
+      <Row wrap gap="m" top {...rest}>
+        {children}
+      </Row>
+    );
   }
   const items = flattenRowChildren(children);
   // Generated keys must stay distinct from every caller-supplied key
@@ -128,7 +122,7 @@ export function ButtonRow({ children, equal = false, ...rest }: ButtonRowProps) 
     return key;
   };
   return (
-    <StyledButtonRow {...rest}>
+    <Row wrap gap="m" top {...rest}>
       {items.map((item, index) =>
         isValidElement(item) ? (
           cloneElement(item as ReactElement<{ flex?: number; minWidth?: string }>, {
@@ -140,6 +134,6 @@ export function ButtonRow({ children, equal = false, ...rest }: ButtonRowProps) 
           <Fragment key={generatedKey(index)}>{item}</Fragment>
         ),
       )}
-    </StyledButtonRow>
+    </Row>
   );
 }

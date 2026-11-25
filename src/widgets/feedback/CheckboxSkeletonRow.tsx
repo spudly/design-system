@@ -1,4 +1,5 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { BoxSkeleton } from "./BoxSkeleton.js";
 import { Center } from "../layout/Center.js";
@@ -20,16 +21,16 @@ export type CheckboxSkeletonRowProps = {
  */
 export function CheckboxSkeletonRow({ description = false }: CheckboxSkeletonRowProps) {
   return (
-    <XStack alignItems="center" gap={tokens.spacing[3]} minHeight={44}>
+    <Row middle gap="m" minHeight={44}>
       <Center width={44} height={44}>
         <BoxSkeleton width={24} height={24} />
       </Center>
-      <YStack flex={1} gap={tokens.spacing[1]}>
+      <Col grow shrink gap="xs">
         <Center height={SIZABLE_TEXT_LINE_BOX} horizontal={false}>
           <TextSkeleton size="md" lines={1} />
         </Center>
         {description ? <TextSkeleton size="sm" lines={1} /> : null}
-      </YStack>
-    </XStack>
+      </Col>
+    </Row>
   );
 }

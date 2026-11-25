@@ -1,4 +1,6 @@
-import { Anchor, Tabs as TamaguiTabs, XStack, isWeb, styled, useTheme } from "tamagui";
+import { Anchor, Tabs as TamaguiTabs, isWeb, styled, useTheme } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
 import { iconsByName, type IconName } from "../../icons/iconRegistry.js";
 import { tokens } from "../../tokens/index.js";
 import { navigationRoleProps, platformAccessibilityProps } from "../accessibility.js";
@@ -15,10 +17,14 @@ const StyledList = styled(TamaguiTabs.List, {
   ...listFrameStyles,
 });
 
-const StyledLinkList = styled(XStack, {
-  name: "TabsLinkList",
-  ...listFrameStyles,
-});
+/**
+ * The link variant's list frame (#746, Option B): a Row
+ * carrying the shared list frame styles (see listFrameStyles,
+ * which the Tabs.List form keeps in its styled config).
+ */
+function LinkList(props: RowProps) {
+  return <Row gap="xs" borderBottomWidth={1} borderBottomColor="$borderColor" {...props} />;
+}
 
 /**
  * The tab frame's styling: ONE base shared by the two tab frames
@@ -207,7 +213,7 @@ export function Tabs(props: TabsProps) {
   if (props.variant === "link") {
     const { tabs, value, label } = props;
     return (
-      <StyledLinkList
+      <LinkList
         {...navigationRoleProps}
         {...platformAccessibilityProps({ accessibilityLabel: label })}
       >
@@ -226,7 +232,7 @@ export function Tabs(props: TabsProps) {
             </StyledLinkTab>
           );
         })}
-      </StyledLinkList>
+      </LinkList>
     );
   }
   const { tabs, value, onValueChange, label } = props;

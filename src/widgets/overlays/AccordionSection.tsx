@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from "react";
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
 import { CollapsibleIcon } from "../../icons/CollapsibleIcon.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
@@ -87,7 +88,7 @@ export function AccordionSection({
   const bottomRadius = stackPosition === "last" || stackPosition === "only" ? outerRadius : 0;
 
   return (
-    <YStack
+    <Col
       borderWidth={1}
       borderTopWidth={stackPosition === "first" || stackPosition === "only" ? 1 : 0}
       borderColor="$borderColor"
@@ -98,7 +99,12 @@ export function AccordionSection({
       backgroundColor="$surface"
       overflow="hidden"
     >
-      <XStack
+      <Row
+        middle
+        gap="m"
+        minHeight={44}
+        px="l"
+        py="m"
         {...platformAccessibilityProps({
           accessibilityRole: "button",
           accessibilityLabel: title,
@@ -108,22 +114,17 @@ export function AccordionSection({
         onKeyDown={handleKeyDown}
         tabIndex={0}
         cursor="web:pointer"
-        alignItems="center"
-        gap={tokens.spacing[3]}
-        minHeight={44}
-        paddingHorizontal={tokens.spacing[4]}
-        paddingVertical={tokens.spacing[3]}
       >
         <CollapsibleIcon isOpen={open} size={20} color={tokens.colors.gray.gray7} />
         <Text variant="subheading" flex={1}>
           {title}
         </Text>
-      </XStack>
+      </Row>
       <Collapsible isOpen={open}>
-        <YStack borderTopWidth={1} borderColor="$borderColor" padding={tokens.spacing[4]}>
+        <Col borderTopWidth={1} borderColor="$borderColor" p="l">
           {children}
-        </YStack>
+        </Col>
       </Collapsible>
-    </YStack>
+    </Col>
   );
 }

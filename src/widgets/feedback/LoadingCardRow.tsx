@@ -1,4 +1,5 @@
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { Card } from "../layout/Card.js";
 import { TextSkeleton } from "./TextSkeleton.js";
@@ -14,11 +15,12 @@ import { TextSkeleton } from "./TextSkeleton.js";
  */
 export function LoadingCardRow() {
   return (
-    <YStack paddingBlockEnd={tokens.spacing[3]}>
+    <Col>
       <Card>
         <TextSkeleton size="md" lines={1} />
         <TextSkeleton size="sm" lines={1} />
       </Card>
-    </YStack>
+      <Spacer y="m" />
+    </Col>
   );
 }

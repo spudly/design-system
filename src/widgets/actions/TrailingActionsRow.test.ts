@@ -39,12 +39,9 @@ test("the contract is a leading group plus action children — no styling surfac
 });
 
 test("the row wraps with the groups spread to opposite ends (#219)", () => {
-  assert.match(
-    code,
-    /<XStack flexWrap="wrap" gap="\$2" alignItems="center" justifyContent="space-between">/,
-  );
+  assert.match(code, /<Row wrap gap="s" middle between>/);
 });
 
 test("the actions group keeps the 12px action gap", () => {
-  assert.match(code, /<XStack gap=\{tokens\.spacing\[3\]\} alignItems="center">/);
+  assert.match(code, /<Row gap="m" middle>/);
 });
