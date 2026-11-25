@@ -216,7 +216,15 @@ export function PresetValueSelector({
           </Text>
           <Spacer x="xs" />
         </Row>
-        <Row grow shrink gap="s">
+        {/* #855: the presets row takes a zero basis too — with a
+          content-sized basis the buttons' min-content consumed the
+          group row's free space and starved the custom slot, whose
+          button shrank below its label and spilled the label past
+          the viewport edge (2px horizontal overflow at 390px on
+          RecipeDetailPage). Zero basis makes the shares between
+          this row and the custom slot proportional, as the
+          buttons' own basis already is. */}
+        <Row grow shrink gap="s" style={{ flexBasis: 0 }}>
           {options.map((option) => (
             <Button
               key={option.value}
