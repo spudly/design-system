@@ -80,9 +80,27 @@ test("selecting a result and removing a selected item report their ids", () => {
   assert.match(picker, /onRemoveSelectedItem\(id\)/);
   assert.match(
     picker,
-    /accessibilityLabel=\{voice\.autocompletePicker\.removeItemLabel\(item\.label\)\}/,
-    "each Remove action names the item it removes, through the voice formatter (#539)",
+    /removeAccessibilityLabel=\{voice\.autocompletePicker\.removeItemLabel\(item\.label\)\}/,
+    "each chip's × names the item it removes, through the voice formatter (#539)",
   );
+});
+test("selected items render as removable Badge chips inside the field frame, not a list below it (#805)", () => {
+  assert.match(picker, /<StyledFieldFrame testID="autocomplete-picker-field">/);
+  assert.match(
+    picker,
+    /<Badge\s+key=\{item\.id\}/,
+    "selected items render as Badges inside the frame",
+  );
+  assert.match(picker, /embedded/, "the search field renders embedded (borderless) in the frame");
+  assert.ok(
+    picker.indexOf("<Badge") < picker.indexOf("<SearchField"),
+    "the chips precede the search field inside the frame",
+  );
+  assert.ok(
+    !picker.includes("autocompletePicker.removeLabel}"),
+    "the below-input selected list's Remove button text is gone — removal is the chip's ×",
+  );
+  assert.ok(!picker.includes("justifyContent=\"space-between\""), "the below-input selected rows are gone");
 });
 test("DS hard rules: type aliases only, no styling props, no react-native import", () => {
   assert.ok(!/\binterface\b/.test(picker), "type aliases, never interfaces");
@@ -94,7 +112,7 @@ test("DS hard rules: type aliases only, no styling props, no react-native import
 test("stories cover the picker's captured states", () => {
   const story = readFileSync(join(root, "src/widgets/form/AutocompletePicker.stories.tsx"), "utf8");
   assert.ok(story.includes('title: "Widgets/Form/AutocompletePicker"'));
-  for (const name of ["WithResults", "NoSelection", "Searching", "NoResults", "SearchError"]) {
+  for (const name of ["WithResults", "WithSelection", "NoSelection", "Searching", "NoResults", "SearchError"]) {
     assert.ok(story.includes(`export const ${name}`), `missing the ${name} story`);
   }
 });
@@ -154,7 +172,7 @@ function pickerProps(overrides = {}) {
     ...overrides,
   };
 }
-test("SSR: results, their details, and the selected list render for a search", async () => {
+test("SSR: results, their details, and the selected chips render for a search", async () => {
   const { AutocompletePicker } = await loadRuntime();
   const html = await renderToHtml(
     <AutocompletePicker
@@ -182,8 +200,17 @@ test("SSR: results, their details, and the selected list render for a search", a
   );
   assert.ok(html.includes("Classic Stuffed Peppers"), `result label missing in: ${html}`);
   assert.ok(html.includes("6 servings"), "the result detail renders under its label");
-  assert.ok(html.includes("Selected Soup"), "the selected item renders in the removable list");
-  assert.ok(html.includes("Remove"), "the selected item carries its Remove action");
+  assert.ok(html.includes("Selected Soup"), "the selected item renders as a chip");
+  const chipAt = html.indexOf("Selected Soup");
+  assert.ok(
+    chipAt !== -1 && chipAt < html.indexOf("Classic Stuffed Peppers"),
+    "the selected chip renders inside the field frame (before the results below it), not in a list under the field (#805)",
+  );
+  assert.ok(
+    html.includes('aria-label="Remove Selected Soup"'),
+    "the chip's × carries the remove-item accessible name",
+  );
+  assert.ok(html.includes("×"), "the chip carries its × remove control");
   assert.ok(
     !html.includes("Duplicate Soup"),
     "a result whose id is already selected must not be offered again",
@@ -445,12 +472,12 @@ describe("autocompletePickerReview", () => {
     );
     assert.match(
       picker,
-      /onPress=\{\(\) => \{\s*handleRemoveSelectedItem\(item\.id\);/,
-      "Remove buttons act through the focus-returning handler",
+      /onRemove=\{\(\) => \{\s*handleRemoveSelectedItem\(item\.id\);/,
+      "chip × controls act through the focus-returning handler",
     );
     assert.ok(
       !picker.includes("onRemoveSelectedItem(item.id)"),
-      "no Remove button calls the raw callback directly, bypassing the focus return",
+      "no chip calls the raw callback directly, bypassing the focus return",
     );
   });
   test("the picker mounts a polite live region and its text tracks the search state", () => {

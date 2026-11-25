@@ -89,6 +89,50 @@ export const SelectableDisabled: Story = {
   },
 };
 
+export const Removable: Story = {
+  render: function RemovableStory() {
+    const [values, setValues] = useState<string[]>(["Weeknight", "Comfort food", "Freezer friendly"]);
+    return (
+      <XStack gap={8}>
+        {values.map((label) => (
+          <Badge
+            key={label}
+            onRemove={() => {
+              setValues((current) => current.filter((value) => value !== label));
+            }}
+          >
+            {label}
+          </Badge>
+        ))}
+      </XStack>
+    );
+  },
+};
+
+export const RemovableDisabled: Story = {
+  render: function RemovableDisabledStory() {
+    const [values, setValues] = useState<string[]>(["Weeknight"]);
+    // The handler is live on purpose: if a disabled chip's × ever
+    // activated, the chip would visibly disappear — inertness is
+    // demonstrated, not just asserted.
+    return (
+      <XStack gap={8}>
+        {values.map((label) => (
+          <Badge
+            key={label}
+            disabled
+            onRemove={() => {
+              setValues((current) => current.filter((value) => value !== label));
+            }}
+          >
+            {label}
+          </Badge>
+        ))}
+      </XStack>
+    );
+  },
+};
+
 export const Selectable: Story = {
   render: function SelectableStory() {
     const [values, setValues] = useState<string[]>(["weeknight"]);

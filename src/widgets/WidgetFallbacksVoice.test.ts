@@ -103,8 +103,8 @@ test("AutocompletePicker renders its search defaults and announcements from the 
     "the search accessible name renders from the voice object",
   );
   assert.ok(
-    idle.includes(pickerSentinels.removeLabel),
-    "the remove action renders from the voice object",
+    idle.includes("×"),
+    "the selected item renders as a removable chip whose × is the remove control (#805 — the removeLabel text no longer renders; the accessible name below carries the voice string)",
   );
   assert.ok(
     idle.includes(pickerSentinels.removeItemLabel("Beans")),

@@ -168,6 +168,106 @@ describe("badgeSelectable", () => {
     assert.ok(!html.includes('role="button"'), "a display-only badge carries no button role");
   });
 });
+describe("badgeRemovable", () => {
+  const here = dirname(fileURLToPath(import.meta.url));
+  const root = join(here, "../../..");
+  const badgeSource = readFileSync(join(root, "src", "widgets", "data", "Badge.tsx"), "utf8");
+  test("Badge declares the removable form, gated on a remove handler", () => {
+    assert.ok(badgeSource.includes("onRemove?: () => void"), "Badge must declare the onRemove prop");
+    assert.ok(
+      badgeSource.includes("removeAccessibilityLabel?: string"),
+      "Badge must declare the remove button's accessible-name override",
+    );
+    assert.ok(
+      badgeSource.includes("const removable = onRemove !== undefined"),
+      "the removable form must be gated on a remove handler being passed",
+    );
+  });
+  test("the × is its own button with an accessible name; the label stays text", () => {
+    assert.ok(
+      badgeSource.includes("accessibilityLabel: removeLabel"),
+      "the × button must carry the remove accessible name through the platform helper",
+    );
+    assert.ok(
+      badgeSource.includes("`Remove ${children}`"),
+      "the default remove name is Remove <label> for a string label",
+    );
+    assert.ok(badgeSource.includes("×"), "the remove control renders the × glyph");
+  });
+  test("the removable × is keyboard-operable on web and inert while disabled", () => {
+    assert.ok(
+      badgeSource.includes("onKeyDown: handleRemoveKeyDown"),
+      "the × must wire the activation-keys handler",
+    );
+    assert.ok(
+      badgeSource.includes("onPress: disabled ? undefined : onRemove"),
+      "a disabled chip's × carries no press handler",
+    );
+    assert.ok(
+      badgeSource.includes("removable && disabled ? 0.5 : undefined"),
+      "a disabled removable badge dims",
+    );
+  });
+  let runtimePromise;
+  function loadRuntime() {
+    runtimePromise ??= (async () => {
+      const reactModule = await import("react");
+      const React = reactModule.default;
+      const { renderToString } = await import("react-dom/server");
+      const { TamaguiProvider }: Record<string, any> = await import("tamagui");
+      const distRuntime = await loadInternalDist();
+      return { React, renderToString, TamaguiProvider, ...distRuntime };
+    })();
+    return runtimePromise;
+  }
+  async function renderToHtml(element: any) {
+    const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } = await loadRuntime();
+    const config = createTamaguiConfig(baseTheme);
+    const html = renderToString(
+      <TamaguiProvider config={config} defaultTheme="light">
+        {element}
+      </TamaguiProvider>,
+    );
+    const styleEnd = html.lastIndexOf("</style>");
+    return styleEnd === -1 ? html : html.slice(styleEnd + "</style>".length);
+  }
+  test("SSR: a removable Badge renders the label as text and the × as a named button", async () => {
+    const { Badge } = await loadRuntime();
+    const html = await renderToHtml(<Badge onRemove={() => null}>Weeknight</Badge>);
+    assert.ok(html.includes("Weeknight"), "the chip label renders");
+    assert.ok(html.includes("×"), "the × control renders");
+    assert.match(html, /role="button"/, "the × takes the button role");
+    assert.ok(
+      html.includes('aria-label="Remove Weeknight"'),
+      "the × button's accessible name defaults to Remove <label>",
+    );
+    assert.ok(!html.includes("aria-pressed"), "the removable form announces no pressed state");
+    const named = await renderToHtml(
+      <Badge onRemove={() => null} removeAccessibilityLabel="Remove Weeknight tag">
+        Weeknight
+      </Badge>,
+    );
+    assert.ok(
+      named.includes('aria-label="Remove Weeknight tag"'),
+      "an explicit removeAccessibilityLabel wins over the default",
+    );
+  });
+  test("SSR: a disabled removable Badge announces disabled and leaves the tab order", async () => {
+    const { Badge } = await loadRuntime();
+    const html = await renderToHtml(
+      <Badge disabled onRemove={() => null}>
+        Weeknight
+      </Badge>,
+    );
+    assert.match(html, /aria-disabled="true"/, "a disabled chip's × announces disabled");
+    assert.match(html, /tabindex="-1"/, "a disabled chip's × is out of the tab order");
+  });
+  test("SSR: a display-only Badge renders no × control", async () => {
+    const { Badge } = await loadRuntime();
+    const html = await renderToHtml(<Badge tone="info">Syncing</Badge>);
+    assert.ok(!html.includes("×"), "a display-only badge carries no remove control");
+  });
+});
 describe("badgeTagForm", async () => {
   const root = join(dirname(fileURLToPath(import.meta.url)), "../../..");
   const dist: Record<string, any> = await loadInternalDist();

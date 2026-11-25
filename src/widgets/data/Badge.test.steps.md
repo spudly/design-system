@@ -14,7 +14,8 @@ release's changed components. The full index lives in
 ## Badge
 
 Open in `Widgets/Badge`: Neutral, Info, Success, Warning, Danger,
-AllTones, Selectable, Selected, SelectableDisabled.
+AllTones, Selectable, Selected, SelectableDisabled, Removable,
+RemovableDisabled.
 
 1. Every tone renders as a pill with a **visible 1px border in the
    same color as its label text** — no tone is borderless or uses a
@@ -39,6 +40,13 @@ AllTones, Selectable, Selected, SelectableDisabled.
 7. SelectableDisabled: the pill is dimmed, Tab skips it, and it
    does not toggle by pointer or keyboard; it still announces
    its pressed and disabled state.
+8. Removable: each chip's label is plain text (the chip itself
+   is not pressable) and the small × inside the chip is its own
+   button, announced as "Remove <label>"; pressing it removes
+   that chip only. The × is keyboard-operable: Tab reaches it
+   and Enter/Space removes the chip. RemovableDisabled: the
+   chip is dimmed, Tab skips its ×, and the × does not remove
+   the chip by pointer or keyboard.
 
 **Run when:** `src/widgets/data/Badge.tsx`, `src/widgets/data/Badge.stories.tsx`,
 or a changeset naming Badge (including TagPill-into-Badge changes).

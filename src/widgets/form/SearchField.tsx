@@ -67,6 +67,22 @@ const StyledContainer = styled(XStack, {
   outlineStyle: "none focus-within:solid",
   outlineColor: "$link",
   outlineOffset: 2,
+
+  variants: {
+    // Embedded (#805): the caller's field frame owns the border,
+    // background, and focus ring, so the container renders none
+    // of its own.
+    embedded: {
+      true: {
+        borderWidth: 0,
+        backgroundColor: "transparent",
+        paddingLeft: 0,
+        paddingRight: 0,
+        outlineWidth: "0px",
+        outlineStyle: "none",
+      },
+    },
+  },
 });
 
 const StyledGlyphBox = styled(XStack, {
@@ -158,6 +174,14 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
    * inside stays 44 and centered. Off by default; a standalone
    * field sizes as before. */
   grow?: boolean;
+  /** Borderless form for embedding inside a bordered field frame
+   * owned by the caller (AutocompletePicker's in-field chips
+   * frame, #805): the container drops its own border, background,
+   * horizontal padding, and focus ring — the caller's frame owns
+   * all four — and the field flexes to share the frame's row with
+   * whatever else the frame holds. Used only by the picker; every
+   * other consumer renders the standalone bordered field. */
+  embedded?: boolean;
 };
 
 /**
@@ -186,6 +210,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
     id: idProp,
     placeholder,
     grow = false,
+    embedded = false,
     disabled = false,
     onSubmitEditing,
     onCompositionStart,
@@ -207,7 +232,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
       onSubmitEditing={onSubmitEditing}
     >
       {({ submitEditingProps, compositionProps }) => (
-        <StyledContainer {...(grow && !label ? { flex: 1 } : {})}>
+        <StyledContainer {...(embedded ? { flex: 1, minWidth: 120, embedded: true } : {})} {...(grow && !label ? { flex: 1 } : {})}>
           <StyledGlyphBox>
             <SearchGlyph />
           </StyledGlyphBox>
