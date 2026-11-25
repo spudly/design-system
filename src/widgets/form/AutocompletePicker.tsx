@@ -251,6 +251,12 @@ export function AutocompletePicker({
         {selectedItems.map((item) => (
           <Badge
             key={item.id}
+            // Badge's own alignSelf guard pins it to the start of
+            // the cross axis, which in this row frame would hug the
+            // top of the line the taller search field sets — the
+            // chip must instead center on that line, level with
+            // the input's content.
+            alignSelf="center"
             disabled={disabled}
             onRemove={() => {
               handleRemoveSelectedItem(item.id);
