@@ -3,7 +3,7 @@ import type { GetProps } from "tamagui";
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { useFieldA11y } from "../../views/shared/useFieldA11y.js";
-import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 const StyledTextArea = styled(TamaguiTextArea, {
   name: "TextAreaField",
@@ -115,11 +115,7 @@ export function TextAreaField({
         {...a11yProps}
         {...rest}
       />
-      {error ? (
-        <Text variant="error" id={errorId}>
-          {error}
-        </Text>
-      ) : null}
+      {error ? <FieldError error={error} id={errorId} /> : null}
     </Col>
   );
 }

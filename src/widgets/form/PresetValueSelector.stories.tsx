@@ -75,3 +75,23 @@ export const Disabled: Story = {
     );
   },
 };
+
+export const WithError: Story = {
+  render: () => {
+    const [value, setValue] = useState("1");
+    return (
+      <YStack maxWidth={430} padding="$4">
+        <PresetValueSelector
+          label="Scale"
+          options={SCALE_OPTIONS}
+          value={value}
+          onChange={setValue}
+          customLabel="Custom"
+          customAccessibilityLabel="Custom scale"
+          formatCustomValue={(custom) => `${custom}×`}
+          error="Choose a scale."
+        />
+      </YStack>
+    );
+  },
+};

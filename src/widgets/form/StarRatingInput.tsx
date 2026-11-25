@@ -6,6 +6,7 @@ import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 import { useVoice } from "../../voice/index.js";
 
 /**
@@ -53,6 +54,13 @@ export type StarRatingInputProps = {
   readOnly?: boolean;
   /** When true, the input is inert and dimmed; presses do nothing. */
   disabled?: boolean;
+  /**
+   * Validation error (#804): rendered below the stars through
+   * the shared FieldError (an Alert); the radiogroup carries
+   * `aria-invalid` / `aria-describedby` pointing at it.
+   */
+  error?: string;
+  id?: string;
 };
 
 /**
@@ -78,10 +86,14 @@ export function StarRatingInput({
   allowClear = false,
   readOnly = false,
   disabled = false,
+  error,
+  id: idProp,
 }: StarRatingInputProps) {
   const voice = useVoice();
   const autoId = useId();
-  const labelId = `${autoId}-label`;
+  const id = idProp ?? autoId;
+  const labelId = `${id}-label`;
+  const errorId = `${id}-error`;
   const stars = [1, 2, 3, 4, 5];
 
   const starStyle = (star: number) => {
@@ -134,6 +146,8 @@ export function StarRatingInput({
           {...platformAccessibilityProps({ accessibilityRole: "radiogroup" })}
           aria-labelledby={label ? labelId : undefined}
           aria-label={label ? undefined : voice.starRatingInput.label}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? errorId : undefined}
           opacity={disabled ? 0.5 : 1}
         >
           {stars.map((star) => {
@@ -202,6 +216,7 @@ export function StarRatingInput({
           })}
         </Row>
       )}
+      {error ? <FieldError error={error} id={errorId} /> : null}
     </Col>
   );
 }

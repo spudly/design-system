@@ -32,11 +32,13 @@ function PickerDemo({
   initialSelectedIds = ["tuscan-chicken"],
   isSearching = false,
   searchError,
+  error,
 }: {
   initialSearchText?: string;
   initialSelectedIds?: string[];
   isSearching?: boolean;
   searchError?: string;
+  error?: string;
 }) {
   const [searchText, setSearchText] = useState(initialSearchText);
   const [selectedItems, setSelectedItems] = useState<AutocompletePickerSelectedItem[]>(
@@ -61,6 +63,7 @@ function PickerDemo({
         searchResults={searchResults}
         isSearching={isSearching}
         searchError={searchError}
+        error={error}
         onSelectResult={(id) => {
           const result = LIBRARY.find((item) => item.id === id);
           if (result) {
@@ -118,4 +121,9 @@ export const SearchError: Story = {
       searchError="Could not load recipes: network error."
     />
   ),
+};
+
+/** Validation error (#804): the selection as a whole is invalid — rendered through the shared Alert below the picker. */
+export const WithError: Story = {
+  render: () => <PickerDemo initialSelectedIds={[]} error="Pick at least one recipe." />,
 };

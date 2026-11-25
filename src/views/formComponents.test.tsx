@@ -154,7 +154,7 @@ test("SSR: FieldLabel with htmlFor renders a label element; a LabeledGroup is a 
 });
 test("SSR: a LabeledField renders its error below the field, keyed by the field's error id", async () => {
   const { LabeledField, TextField } = await loadRuntime();
-  const html = await renderToHtml(
+  const html = await renderWithVoice(
     <LabeledField label="Title" fieldId="recipe-title" error="Title is required">
       <TextField id="recipe-title" accessibilityLabel="Title" value="" onChangeText={() => null} />
     </LabeledField>,

@@ -119,7 +119,7 @@ test("field chrome: label by id, error text with its generated id", () => {
   assert.match(slider, /error\?: string/);
   assert.match(slider, /<Label htmlFor=\{id\}/);
   assert.match(slider, /const errorId = `\$\{id\}-error`/);
-  assert.match(slider, /<Text variant="error" id=\{errorId\}>/);
+  assert.match(slider, /<FieldError error=\{error\} id=\{errorId\} \/>/);
 });
 test("the thumb carries the label as its accessible name and the error wiring", () => {
   // The thumb is the focusable slider-role element, so the field's
@@ -233,21 +233,35 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const distModule: Record<string, any> = await loadInternalDist();
+    const { VoiceProvider }: Record<string, any> = await import("../../../dist/voice/index.js");
+    const { fixtureVoice }: Record<string, any> = await import("../../../dist/voice/fixtures.js");
     return {
       React,
       renderToString,
       TamaguiProvider,
+      VoiceProvider,
+      fixtureVoice,
       ...distModule,
     };
   })();
   return runtimePromise;
 }
 async function renderToHtml(element: any) {
-  const { renderToString, TamaguiProvider, createTamaguiConfig, baseTheme } = await loadRuntime();
+  const {
+    renderToString,
+    TamaguiProvider,
+    createTamaguiConfig,
+    baseTheme,
+    VoiceProvider,
+    fixtureVoice,
+  } = await loadRuntime();
   const config = createTamaguiConfig(baseTheme);
+  // #804: a field's error renders through Alert, which reads the
+  // voice object — supply the fixture voice like the other
+  // voice-reading compositions' tests do.
   return renderToString(
     <TamaguiProvider config={config} defaultTheme="light">
-      {element}
+      <VoiceProvider voice={fixtureVoice}>{element}</VoiceProvider>
     </TamaguiProvider>,
   );
 }

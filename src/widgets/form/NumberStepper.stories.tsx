@@ -58,3 +58,8 @@ export const Disabled: Story = {
   args: { label: "Servings", value: 4, min: 1, max: 12, disabled: true },
   render: (args) => <StepperDemo {...args} />,
 };
+
+export const WithError: Story = {
+  args: { label: "Servings", value: 0, min: 1, max: 12, error: "Servings must be at least 1." },
+  render: (args) => <StepperDemo {...args} />,
+};

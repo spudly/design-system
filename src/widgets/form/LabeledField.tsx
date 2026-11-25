@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Col } from "../layout/Col.js";
 import { Spacer } from "../layout/Spacer.js";
 import { LabelRow } from "../data/LabelRow.js";
-import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 export type LabeledFieldProps = {
   /** The field's label, rendered in the FieldLabel treatment. */
@@ -50,9 +50,7 @@ export function LabeledField({ label, fieldId, action, error, children }: Labele
             between the field and its error, so no parent gap
             can own it — composed explicitly (#746). */}
           <Spacer y="s" />
-          <Text variant="error" {...(fieldId ? { id: `${fieldId}-error` } : {})}>
-            {error}
-          </Text>
+          <FieldError error={error} {...(fieldId ? { id: `${fieldId}-error` } : {})} />
         </Col>
       ) : null}
     </Col>

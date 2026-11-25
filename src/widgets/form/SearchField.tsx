@@ -7,6 +7,7 @@ import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { FieldShell } from "./FieldShell.js";
 import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 /**
  * The ⌕ glyph must NOT get an explicit lineHeight. It previously received
@@ -87,6 +88,17 @@ const StyledContainer = styled(XStack, {
     // Embedded (#805): the caller's field frame owns the border,
     // background, and focus ring, so the container renders none
     // of its own.
+    // Error state (#804): the container's border takes the
+    // danger color, the same error border TextField's styled
+    // input carries. The embedded form renders no border of its
+    // own, so an embedded field's error border is its frame's
+    // owner's concern (AutocompletePicker renders its own error
+    // Alert below the frame instead).
+    error: {
+      true: {
+        borderColor: "$danger",
+      },
+    },
     embedded: {
       true: {
         borderWidth: 0,
@@ -200,6 +212,13 @@ export type SearchFieldProps = Omit<StyledInputProps, "value" | "onChangeText"> 
    * whatever else the frame holds. Used only by the picker; every
    * other consumer renders the standalone bordered field. */
   embedded?: boolean;
+  /**
+   * Validation error (#804): rendered below the field through
+   * the shared FieldError (an Alert), wired to the input with
+   * `aria-invalid` / `aria-describedby` at `${id}-error`, and
+   * the container's border takes the error treatment.
+   */
+  error?: string;
 };
 
 /**
@@ -229,6 +248,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
     placeholder,
     grow = false,
     embedded = false,
+    error,
     disabled = false,
     onSubmitEditing,
     onCompositionStart,
@@ -239,6 +259,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
 ) {
   const autoId = useId();
   const id = idProp ?? autoId;
+  const errorId = `${id}-error`;
 
   return (
     <FieldShell
@@ -250,46 +271,55 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
       onSubmitEditing={onSubmitEditing}
     >
       {({ submitEditingProps, compositionProps }) => (
-        <StyledContainer {...(embedded ? { flex: 1, minWidth: 120, embedded: true } : {})} {...(grow && !label ? { flex: 1 } : {})}>
-          <GlyphBox>
-            <SearchGlyph />
-          </GlyphBox>
-          <StyledInput
-            ref={ref}
-            id={id}
-            value={value}
-            onChangeText={onChangeText}
-            placeholder={placeholder}
-            disabled={disabled}
-            {...rest}
-            {...submitEditingProps}
-            {...compositionProps}
-          />
-          {value ? (
-            <Row
-              middle
-              center
-              minWidth={44}
-              minHeight={44}
-              onPress={disabled ? undefined : () => onChangeText("")}
-              {...platformAccessibilityProps({
-                accessibilityRole: "button",
-                accessibilityLabel: "Clear search",
-                accessibilityState: { disabled },
-              })}
-            >
-              <Text
-                aria-hidden
-                style={{
-                  fontSize: tokens.typography.fontSize.lg,
-                  color: "$textMuted",
-                }}
+        <>
+          <StyledContainer
+            error={!!error}
+            {...(embedded ? { flex: 1, minWidth: 120, embedded: true } : {})}
+            {...(grow && !label ? { flex: 1 } : {})}
+          >
+            <GlyphBox>
+              <SearchGlyph />
+            </GlyphBox>
+            <StyledInput
+              ref={ref}
+              id={id}
+              value={value}
+              onChangeText={onChangeText}
+              placeholder={placeholder}
+              disabled={disabled}
+              aria-invalid={error ? true : undefined}
+              aria-describedby={error ? errorId : undefined}
+              {...rest}
+              {...submitEditingProps}
+              {...compositionProps}
+            />
+            {value ? (
+              <Row
+                middle
+                center
+                minWidth={44}
+                minHeight={44}
+                onPress={disabled ? undefined : () => onChangeText("")}
+                {...platformAccessibilityProps({
+                  accessibilityRole: "button",
+                  accessibilityLabel: "Clear search",
+                  accessibilityState: { disabled },
+                })}
               >
-                ×
-              </Text>
-            </Row>
-          ) : null}
-        </StyledContainer>
+                <Text
+                  aria-hidden
+                  style={{
+                    fontSize: tokens.typography.fontSize.lg,
+                    color: "$textMuted",
+                  }}
+                >
+                  ×
+                </Text>
+              </Row>
+            ) : null}
+          </StyledContainer>
+          {error ? <FieldError error={error} id={errorId} /> : null}
+        </>
       )}
     </FieldShell>
   );

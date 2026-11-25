@@ -5,6 +5,7 @@ import { Row } from "../layout/Row.js";
 import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
+import { FieldError } from "./FieldError.js";
 
 const StyledItem = styled(TamaguiRadioGroup.Item, {
   name: "RadioItem",
@@ -146,11 +147,7 @@ export function RadioOptionGroup({
           })}
         </Col>
       </TamaguiRadioGroup>
-      {error ? (
-        <Text variant="error" id={errorId}>
-          {error}
-        </Text>
-      ) : null}
+      {error ? <FieldError error={error} id={errorId} /> : null}
     </Col>
   );
 }
