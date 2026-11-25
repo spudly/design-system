@@ -14,6 +14,12 @@ import { AppStoreBadge } from "../../icons/AppStoreBadge.js";
 import { BrandMark, type BrandMarkName } from "../../icons/BrandMark.js";
 import { GooglePlayBadge } from "../../icons/GooglePlayBadge.js";
 import { PageContentColumn } from "../layout/PageContentColumn.js";
+import {
+  AppTopBar,
+  type AppTopBarAction,
+  type AppTopBarNavItem,
+  type AppTopBarSearch,
+} from "../layout/AppTopBar.js";
 import { Text } from "../data/Text.js";
 import { TextLink } from "../actions/TextLink.js";
 import { contentInfoRoleProps, platformAccessibilityProps } from "../accessibility.js";
@@ -257,7 +263,7 @@ export function BigFooter({ footer }: BigFooterProps) {
     </StyledBigFooterBrandAnchor>
   );
   return (
-    <Col backgroundColor="$primary" p="xl" gap="xl" {...contentInfoRoleProps}>
+    <Col backgroundColor="$footerBackground" p="xl" gap="xl" {...contentInfoRoleProps}>
       {brand.mark !== undefined ? (
         <Row middle gap="m">
           <BrandMark mark={brand.mark} size={40} />
@@ -392,23 +398,51 @@ export function BigFooter({ footer }: BigFooterProps) {
  */
 type BigFooterShellScrollMode = "shell" | "content" | "nested" | "overlay";
 
+/**
+ * Header data for a standalone page (#857, Stephen's option B):
+ * the full AppTopBar (brand + nav + actions) rendered by the shell
+ * when a page supplies it — the same data shape AppShellPage pages
+ * pass to the top bar. A page with no nav/actions data supplies
+ * only its brand; the bar renders with the brand it has and no
+ * invented nav or actions.
+ */
+export type BigFooterShellHeader = {
+  brand: { label: string; href?: string; mark?: BrandMarkName };
+  navItems?: AppTopBarNavItem[];
+  navLabel?: string;
+  activeItemId?: string | null;
+  search?: AppTopBarSearch | null;
+  actions?: AppTopBarAction[];
+};
+
 export type BigFooterShellProps = {
   /** The page's footer data, when its host supplied any. */
   footer?: BigFooterData | undefined;
+  /** The page's header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader | undefined;
   /** Who owns native scrolling; see BigFooterShellScrollMode. */
   scrollMode?: BigFooterShellScrollMode;
   children: ReactNode;
 };
 
 /**
- * The page shell (#547, Stephen's page-scroll model): on web the
- * entire page is a flex container with `minHeight: 100dvh` and
- * `justifyContent: "space-between"` and exactly two children —
- * the page content and the BigFooter. If the page (including
- * the footer) is shorter than the viewport, the footer is
- * pushed to the bottom; if it is longer, the document scrolls
- * the whole page — whole-page scroll, no nested scroller, and
- * the footer is always in flow, never fixed/absolute. The
+ * The page shell (#547, Stephen's page-scroll model; revised
+ * #857, Stephen 2026-11-25): on web the entire page is a flex
+ * container with `minHeight: 100dvh` and exactly two children —
+ * the page content and the BigFooter. The content region GROWS
+ * (flexGrow) so any slack lives inside the content area, in the
+ * page background, instead of an empty band between content and
+ * footer (the pre-#857 `justifyContent: "space-between"` model
+ * put all slack there). A token-level clearance gap (`gap="xl"`,
+ * the $6 spacing step) sits between the content region and the
+ * footer so content — a form's submit button above all — never
+ * touches the footer. If the page (including the footer) is
+ * shorter than the viewport, the footer is still pinned to the
+ * bottom (the growing content region absorbs the slack); if it
+ * is longer, the footer follows directly below the content and
+ * the document scrolls the whole page — whole-page scroll, no
+ * nested scroller, and the footer is always in flow, never
+ * fixed/absolute. The
  * content child keeps `position: "relative"` so an
  * absolutely-positioned full-region child (StepOverlay in
  * MealCookingModePage's ready state) anchors to the content
@@ -458,7 +492,24 @@ export type BigFooterShellProps = {
  * its region (and the #628 column cap would leave the page
  * showing through at the sides of a full-screen shell).
  */
-export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFooterShellProps) {
+export function BigFooterShell({
+  footer,
+  header,
+  scrollMode = "shell",
+  children,
+}: BigFooterShellProps) {
+  // The standalone-page header (#857): the full AppTopBar, rendered
+  // once here in the shell layer when the page supplies header data.
+  const headerNode = header ? (
+    <AppTopBar
+      brand={header.brand}
+      {...(header.navItems !== undefined ? { navItems: header.navItems } : null)}
+      {...(header.navLabel !== undefined ? { navLabel: header.navLabel } : null)}
+      {...(header.activeItemId !== undefined ? { activeItemId: header.activeItemId } : null)}
+      {...(header.search !== undefined ? { search: header.search } : null)}
+      {...(header.actions !== undefined ? { actions: header.actions } : null)}
+    />
+  ) : null;
   if (!isWeb) {
     // Native (#547 addendum): no BigFooter in any mode — native
     // uses bottom navigation (the tab shells' Tabs) instead.
@@ -470,7 +521,10 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
       // is never nested inside a plain ScrollView.
       return (
         <Col grow shrink position="relative">
-          {children}
+          {headerNode}
+          <Col grow shrink position="relative">
+            {children}
+          </Col>
         </Col>
       );
     }
@@ -493,6 +547,7 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
     return (
       <ScrollView flex={1} keyboardShouldPersistTaps="handled">
         <Col grow minHeight="100%" position="relative">
+          {headerNode}
           {children}
         </Col>
       </ScrollView>
@@ -526,20 +581,31 @@ export function BigFooterShell({ footer, scrollMode = "shell", children }: BigFo
     // without footer data is not exempt from the measure.
     return (
       <Col grow position="relative">
-        <PageContentColumn>{children}</PageContentColumn>
+        <PageContentColumn>
+          {headerNode}
+          {children}
+        </PageContentColumn>
       </Col>
     );
   }
-  // Web (#547): Stephen's page-scroll model, literally — a flex
-  // column with minHeight 100dvh and justifyContent
-  // "space-between" and exactly two children: the page content
-  // (positioned, so absolute overlays anchor above the footer)
-  // and the BigFooter. Short page: the footer is pushed to the
-  // viewport bottom. Long page: the document scrolls the whole
-  // page — there is no nested scroller.
+  // Web (#547, revised #857): a flex column with minHeight 100dvh
+  // and exactly two children: the growing content region (the
+  // PageContentColumn, positioned, so absolute overlays anchor
+  // above the footer) and the BigFooter, separated by the
+  // token-level clearance gap (gap "xl" = the $6 spacing step).
+  // Short page: the content region grows, the footer stays pinned
+  // to the viewport bottom, and the slack lives inside the content
+  // area. Long page: the footer follows directly below the
+  // content and the document scrolls the whole page — there is
+  // no nested scroller.
   return (
-    <Col minHeight={{ default: "100%", web: "100dvh" }} between>
-      <PageContentColumn>{children}</PageContentColumn>
+    <Col minHeight={{ default: "100%", web: "100dvh" }} gap="xl">
+      <Col grow shrink position="relative">
+        <PageContentColumn>
+          {headerNode}
+          {children}
+        </PageContentColumn>
+      </Col>
       <BigFooter footer={footer} />
     </Col>
   );

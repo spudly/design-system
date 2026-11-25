@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Badge } from "../../widgets/data/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/layout/Card.js";
@@ -110,6 +110,8 @@ export type MyVersesPageItem = {
 export type MyVersesPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   /** The app's memorize list, in the app's order. */
   verses: MyVersesPageItem[];
   /** Row action: remove this verse from the app's list. */
@@ -147,9 +149,9 @@ function MyVerseRow({
  * Controlled — see the file header for the contract and the
  * screen inventory it mirrors.
  */
-export function MyVersesPage({ verses, onRemoveVerse, footer }: MyVersesPageProps) {
+export function MyVersesPage({ verses, onRemoveVerse, footer, header }: MyVersesPageProps) {
   return (
-    <BigFooterShell footer={footer} scrollMode="content">
+    <BigFooterShell footer={footer} header={header} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">My verses</Text>
         {verses.length === 0 ? (

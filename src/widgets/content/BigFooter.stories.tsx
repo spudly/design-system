@@ -53,3 +53,47 @@ export const StickyOnShortPage: Story = {
     </BigFooterShell>
   ),
 };
+
+/**
+ * Short page, Memorize theme (#857): content well under viewport
+ * height — the footer stays pinned to the viewport bottom and the
+ * slack lives inside the content area (page background), with the
+ * shell's clearance gap above the footer.
+ */
+export const ShortPageMemorize: Story = {
+  globals: { theme: "light_quietDawn" },
+  render: () => (
+    <BigFooterShell footer={memorizeFooterFixture}>
+      <YStack padding="$4">
+        <Text variant="body">A short Memorize page: the footer sits at the viewport bottom.</Text>
+      </YStack>
+    </BigFooterShell>
+  ),
+};
+
+/**
+ * Standalone page with header data (#857, option B): the shell
+ * renders the full AppTopBar (brand + nav + actions) above the
+ * content when the page supplies header data.
+ */
+export const ShortPageWithHeader: Story = {
+  render: () => (
+    <BigFooterShell
+      footer={eciperayFooterFixture}
+      header={{
+        brand: { label: "Eciperay", href: "/", mark: "eciperay" },
+        navItems: [
+          { id: "recipes", label: "Recipes", href: "/recipes" },
+          { id: "meals", label: "Meals", href: "/meals" },
+        ],
+        activeItemId: "recipes",
+        navLabel: "Eciperay sections",
+        actions: [{ id: "sign-in", label: "Sign in", href: "/login" }],
+      }}
+    >
+      <YStack padding="$4">
+        <Text variant="body">A short standalone page with the full header.</Text>
+      </YStack>
+    </BigFooterShell>
+  ),
+};
