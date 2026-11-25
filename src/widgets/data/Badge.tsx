@@ -48,6 +48,17 @@ const toneStyles = {
     background: "$accent",
     text: "#ffffff",
   },
+  // Accent (#852): the secondary-action / tag role the Eciperay
+  // brief assigns to its sage accent — the same theme semantic
+  // accent fill as `mastery`, named for the tag/secondary role so
+  // list markers (e.g. the shared-with-me badge on recipe rows)
+  // render in sage under Warm Harvest instead of the terracotta
+  // primary ramp. Under Memorize it resolves to that theme's
+  // accent, exactly as `mastery` does.
+  accent: {
+    background: "$accent",
+    text: "#ffffff",
+  },
 } as const;
 
 type Tone = keyof typeof toneStyles;
@@ -109,7 +120,8 @@ export type BadgeProps = Omit<RowProps, "onPress"> & {
  * Small status pill. Status is always conveyed with text, never color alone.
  * Tones: `neutral` (default), `info`, `success`, `warning`, `danger`,
  * `mastery` (the theme's accent fill — the progress/mastery role,
- * #850).
+ * #850), `accent` (the same accent fill — the secondary/tag role,
+ * #852).
  * With a `color` prop (a tag color token name) it renders as a colored
  * tag (the former TagPill).
  *

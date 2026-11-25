@@ -1,4 +1,5 @@
 import { eciperayFooterFixture } from "../shared/fixtures.js";
+import { storyImageWide } from "../../storyFixtures.js";
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { MealPlansPage, type MealPlansPageItem } from "./MealPlansPage.js";
@@ -63,6 +64,23 @@ export const Default: Story = {
     <>
       <MealPlansPage
         footer={eciperayFooterFixture}
+        plans={planItems}
+        loading={false}
+        createHref="/meal-plans/new"
+        onPlanDelete={() => undefined}
+      />
+    </>
+  ),
+};
+
+export const WithLeadImage: Story = {
+  // Photography-led lead (#852): the host-supplied lead image
+  // renders as the hero above the heading.
+  render: () => (
+    <>
+      <MealPlansPage
+        footer={eciperayFooterFixture}
+        leadImageUrl={storyImageWide}
         plans={planItems}
         loading={false}
         createHref="/meal-plans/new"

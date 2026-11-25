@@ -48,7 +48,9 @@ export type MediaRowProps = {
    * accessible name after the subtitle, so the row announces
    * its marker ("Title, Subtitle, Shared with you") instead of
    * leaving it as unannounced decoration inside a link whose
-   * label overrides its content. */
+   * label overrides its content. The badge takes Badge's
+   * `accent` tone (#852): the brief's sage secondary/tag role
+   * under the Eciperay theme, not the terracotta `info` tone. */
   badgeLabel?: string | undefined;
   /** Optional image URL; absent renders the placeholder well. */
   imageUrl?: string | null | undefined;
@@ -165,7 +167,7 @@ export function MediaRow({
           importantForAccessibility={native ? "no-hide-descendants" : undefined}
           pointerEvents={native ? "none" : undefined}
         >
-          <Badge tone="info">{badgeLabel}</Badge>
+          <Badge tone="accent">{badgeLabel}</Badge>
         </Row>
       ) : null}
     </>
