@@ -1,5 +1,0 @@
----
-"@spudly/ui": minor
----
-
-Badge gains a removable form — the chip form: pass `onRemove` and the badge renders a small × control inside it, after the label. The × is its own button with an accessible name (`removeAccessibilityLabel`, defaulting to "Remove <label>"); the chip label itself stays plain text, so the whole chip is not pressable in this form. A disabled removable badge dims and its × never activates. AutocompletePicker now renders its selected items as removable Badge chips inside the field itself, sharing one bordered field frame with the search input (which renders in a new embedded, borderless SearchField form, used only by the picker) — the selected-items list below the field is gone. Removing a chip still reports the item's id and returns focus to the search input, and already-selected results stay filtered out of the results. Verify: in Storybook, Widgets/Form/AutocompletePicker WithSelection shows three chips inside the field frame and each chip's × removes it; Widgets/Data Display/Badge Removable shows chips whose × controls remove them, and RemovableDisabled shows a dimmed chip whose × does nothing.
