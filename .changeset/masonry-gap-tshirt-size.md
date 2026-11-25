@@ -1,5 +1,0 @@
----
-"@spudly/ui": major
----
-
-MasonryGrid's `gap` is now a t-shirt size, not a pixel number (#844): `MasonryGridProps.gap` and `MasonryColumnCountOptions.gap` accept the same `LayoutSize` values as Row/Col's `gap` ("xs" | "s" | "m" | "l" | "xl" | "xxl"), defaulting to "m" (the spacing scale's 3, 12px — the same default as before). Callers that passed a number must pass the equivalent size instead. `masonryColumnCount` resolves the size to its token pixel value internally for the column-fit math, which is otherwise unchanged, and `minColumnWidth` stays numeric (it is a target card width used as a layout breakpoint, not spacing). The grid now renders through Row/Col instead of raw Tamagui stacks, so it leaves the `no-direct-stacks` ESLint allowlist — the stack ban is absolute. Verify after adopting: a MasonryGrid with no `gap` lays out exactly as before (12px between columns and stacked items), and passing `gap="l"` widens both the column spacing and the spacing between items stacked in a column while the column count re-fits to the wider gap.
