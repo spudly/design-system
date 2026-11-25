@@ -70,10 +70,14 @@ test("masonryColumnCount treats an unmeasured width as minColumns", () => {
 });
 
 test("masonryColumnCount honors custom minColumnWidth and gap", () => {
-  assert.equal(masonryColumnCount(299, { minColumnWidth: 100, gap: 0 }), 2);
-  assert.equal(masonryColumnCount(300, { minColumnWidth: 100, gap: 0 }), 3);
-  assert.equal(masonryColumnCount(219, { minColumnWidth: 100, gap: 20 }), 1);
-  assert.equal(masonryColumnCount(220, { minColumnWidth: 100, gap: 20 }), 2);
+  // gap "xs" resolves to 4px: two 100px columns need 204px, three 308px.
+  assert.equal(masonryColumnCount(203, { minColumnWidth: 100, gap: "xs" }), 1);
+  assert.equal(masonryColumnCount(204, { minColumnWidth: 100, gap: "xs" }), 2);
+  assert.equal(masonryColumnCount(307, { minColumnWidth: 100, gap: "xs" }), 2);
+  assert.equal(masonryColumnCount(308, { minColumnWidth: 100, gap: "xs" }), 3);
+  // gap "xl" resolves to 24px: two 100px columns need 224px.
+  assert.equal(masonryColumnCount(223, { minColumnWidth: 100, gap: "xl" }), 1);
+  assert.equal(masonryColumnCount(224, { minColumnWidth: 100, gap: "xl" }), 2);
 });
 
 test("distributeMasonryItems deals items round-robin across columns", () => {

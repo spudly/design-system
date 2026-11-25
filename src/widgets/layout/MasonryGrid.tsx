@@ -1,6 +1,8 @@
 import { useState, type ReactNode } from "react";
-import { View, XStack, YStack } from "tamagui";
-import { tokens } from "../../tokens/index.js";
+import { View } from "tamagui";
+import { layoutSizeValues, type LayoutSize } from "../layout.js";
+import { Col } from "./Col.js";
+import { Row } from "./Row.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
@@ -35,8 +37,12 @@ export type MasonryColumnCountOptions = {
   minColumns?: number | undefined;
   /** Most columns, however wide the container. Default 4. */
   maxColumns?: number | undefined;
-  /** Gap between columns in px. Default 12 (the spacing scale's 3). */
-  gap?: number | undefined;
+  /**
+   * Gap between columns, as a t-shirt size on the spacing scale
+   * (#844: spacing comes from the token scale, never a free pixel
+   * number). Default "m" (the spacing scale's 3, 12px).
+   */
+  gap?: LayoutSize | undefined;
 };
 
 /**
@@ -58,7 +64,7 @@ export function masonryColumnCount(
   const minColumnWidth = options.minColumnWidth ?? DEFAULT_MIN_COLUMN_WIDTH;
   const minColumns = Math.max(1, Math.floor(options.minColumns ?? DEFAULT_MIN_COLUMNS));
   const maxColumns = Math.max(minColumns, Math.floor(options.maxColumns ?? DEFAULT_MAX_COLUMNS));
-  const gap = options.gap ?? tokens.spacing[3];
+  const gap = layoutSizeValues[options.gap ?? "m"];
   if (!(containerWidth > 0) || !(minColumnWidth > 0)) {
     return minColumns;
   }
@@ -112,9 +118,10 @@ export type MasonryGridProps<Item> = {
   maxColumns?: number | undefined;
   /**
    * Gap between columns and between the items stacked in a column,
-   * in px. Default 12 (the spacing scale's 3).
+   * as a t-shirt size on the spacing scale (#844). Default "m"
+   * (the spacing scale's 3, 12px).
    */
-  gap?: number | undefined;
+  gap?: LayoutSize | undefined;
   /** Loading state (#278): the grid renders 24 dummy items of
    * varied heights — one BoxSkeleton each, laid out through the
    * grid's normal column distribution, so the loading state
@@ -169,7 +176,7 @@ export function MasonryGrid<Item>({
   minColumnWidth,
   minColumns,
   maxColumns,
-  gap = tokens.spacing[3],
+  gap = "m",
   loading = false,
 }: MasonryGridProps<Item>) {
   const showSkeleton = useLoadingScope(loading);
@@ -193,9 +200,9 @@ export function MasonryGrid<Item>({
       {...(showSkeleton ? platformAccessibilityProps({ accessibilityState: { busy: true } }) : {})}
     >
       <LoadingScope active={showSkeleton}>
-        <XStack gap={gap} alignItems="flex-start">
+        <Row gap={gap} top>
           {columns.map((column, columnIndex) => (
-            <YStack key={columnIndex} flex={1} gap={gap}>
+            <Col key={columnIndex} grow shrink gap={gap}>
               {column.map((itemIndex) => {
                 if (showSkeleton) {
                   return (
@@ -218,9 +225,9 @@ export function MasonryGrid<Item>({
                   </View>
                 );
               })}
-            </YStack>
+            </Col>
           ))}
-        </XStack>
+        </Row>
       </LoadingScope>
     </View>
   );

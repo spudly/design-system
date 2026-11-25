@@ -107,9 +107,20 @@ export function publishBaselines(repoRoot, treeDir) {
   let published = 0;
   for (const rel of treePngs) {
     const parsed = parseTreeRel(rel);
-    const relPath = parsed
-      ? baselineRelPath(index, parsed.storyId, parsed.theme, parsed.narrow)
-      : null;
+    // A standard story id may itself end in "-narrow" (an export
+    // slug ending in "narrow", e.g.
+    // mealshubpage--plans-tab-long-list-narrow), which parseTreeRel
+    // cannot tell apart from the narrow variant of the stripped
+    // id. Resolve against the story index: the full id as a
+    // standard story first, then the stripped id's narrow variant.
+    let relPath = null;
+    if (parsed) {
+      const fullId = parsed.narrow ? `${parsed.storyId}-narrow` : parsed.storyId;
+      relPath = baselineRelPath(index, fullId, parsed.theme, false);
+      if (!relPath && parsed.narrow) {
+        relPath = baselineRelPath(index, parsed.storyId, parsed.theme, true);
+      }
+    }
     if (!relPath) {
       throw new Error(
         `staged baseline ${rel} does not resolve to a story in the index — refusing to publish`,

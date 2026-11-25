@@ -50,11 +50,10 @@
  *   configs, so its StyledContainer (styled XStack) is retained
  *   by Stephen's Option B ruling (2026-11-24). Everything else
  *   in the file composes through Row/Col.
- * - src/widgets/layout/MasonryGrid.tsx — PENDING STEPHEN'S
- *   DECISION: the masonry grid's runtime numeric gap fits no
- *   Row/Col prop combination, so the file is untouched and
- *   allowlisted until Stephen decides its shape. When he does,
- *   the exemption comes out with the conversion.
+ * MasonryGrid was the last allowlist entry: its gap became a
+ *   t-shirt size (#844, Stephen 2026-11-25) and it now composes
+ *   through Row/Col, so the ban is absolute beyond the entries
+ *   above.
  *
  * Dormancy: like the sibling rules, this is wired at "error" in
  * eslint.config.ts but cannot fire today — the shared
