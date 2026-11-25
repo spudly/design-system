@@ -34,6 +34,9 @@ export const eciperayTheme = {
     primaryHover: tokens.colors.terracotta.terracotta8,
     primaryActive: tokens.colors.terracotta.terracotta9,
     onPrimary: tokens.colors.terracotta.terracotta1,
+    // Footer surface (#857): matches the button color — the same
+    // burnt-orange pill sampled for this theme's primary fill.
+    footerBackground: "#b13f13",
     primarySubtle: tokens.colors.terracotta.terracotta2,
     // ProgressBar track stays the primarySubtle tint in Warm Harvest (#94).
     progressTrack: tokens.colors.terracotta.terracotta2,

@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/layout/Card.js";
 import { EmptyState } from "../../views/shared/EmptyState.js";
@@ -87,6 +87,8 @@ export type MemorizeReviewPageVerse = {
 export type MemorizeReviewPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   /** Verses due for review, in the app's order (oldest due
    * first). The app computes dueness from its
    * spaced-repetition schedule; the view only renders. */
@@ -142,9 +144,10 @@ export function MemorizeReviewPage({
   onForgotPress,
   browseHref,
   footer,
+  header,
 }: MemorizeReviewPageProps) {
   return (
-    <BigFooterShell footer={footer} scrollMode="content">
+    <BigFooterShell footer={footer} header={header} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">
           {verses.length === 0 ? "Review" : `Review (${verses.length} due)`}

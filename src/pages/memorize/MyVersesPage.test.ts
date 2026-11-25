@@ -146,7 +146,7 @@ test("a row's badge text is the status and its tone follows the app's rule", asy
   assert.equal(reference.props.children, "Ether 12:27");
   assert.equal(badge.type, Badge);
   assert.equal(badge.props.children, "memorized", "the badge's text is the status itself");
-  assert.equal(badge.props.tone, "success", "memorized maps to the success tone");
+  assert.equal(badge.props.tone, "mastery", "memorized maps to the mastery tone (#850)");
   assert.equal(text.props.variant, "verse");
   assert.equal(text.props.children, VERSES[0].text);
 

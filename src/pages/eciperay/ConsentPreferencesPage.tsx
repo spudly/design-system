@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { ButtonRow } from "../../widgets/actions/ButtonRow.js";
 import { Col } from "../../widgets/layout/Col.js";
@@ -28,6 +28,8 @@ export type ConsentPreferencesPageChoice = "accepted" | "declined" | null;
 export type ConsentPreferencesPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   currentChoice: ConsentPreferencesPageChoice;
   onAccept: () => void;
   onDecline: () => void;
@@ -44,6 +46,7 @@ export function ConsentPreferencesPage({
   description: descriptionProp,
   hint: hintProp,
   footer,
+  header,
 }: ConsentPreferencesPageProps) {
   const voice = useVoice();
   const description = descriptionProp ?? voice.consentPreferencesPage.description;
@@ -55,7 +58,7 @@ export function ConsentPreferencesPage({
         ? voice.consentPreferencesPage.declinedLabel
         : voice.consentPreferencesPage.notSetLabel;
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} header={header}>
       <ScreenContainer variant="padded">
         <SectionCard title={voice.consentPreferencesPage.title} variant="elevated">
           <Col gap="xxl">

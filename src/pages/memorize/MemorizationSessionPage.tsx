@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { BackLink } from "../../widgets/actions/BackLink.js";
 import { BlankWord } from "../../widgets/data/BlankWord.js";
 import { Button } from "../../widgets/actions/Button.js";
@@ -145,6 +145,8 @@ export type MemorizationSessionPageWord = {
 export type MemorizationSessionPageReadyProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   state: "ready";
   /** The verse's reference, rendered as the heading. */
   reference: string;
@@ -162,7 +164,9 @@ export type MemorizationSessionPageReadyProps = {
   feedback?: string | null;
   /** Whether the current round is the session's last — the
    * advance button reads "Finish — mark memorized" instead
-   * of "Next round". */
+   * of "Next round" and takes the accent (mastery) variant,
+   * the brief's reserved progress/mastery treatment (#850);
+   * ordinary rounds keep the primary variant. */
   isFinalRound: boolean;
   /** Leave the session (the BackLink). */
   onBack: () => void;
@@ -177,7 +181,7 @@ export type MemorizationSessionPageReadyProps = {
 };
 
 export type MemorizationSessionPageProps =
-  | { state: "not-found"; onBack: () => void; footer?: BigFooterData }
+  | { state: "not-found"; onBack: () => void; footer?: BigFooterData; header?: BigFooterShellHeader }
   | MemorizationSessionPageReadyProps;
 
 /**
@@ -190,7 +194,7 @@ export type MemorizationSessionPageProps =
 export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
   if (props.state === "not-found") {
     return (
-      <BigFooterShell footer={props.footer}>
+      <BigFooterShell footer={props.footer} header={props.header}>
         <ScreenContainer>
           <Text>Verse not found.</Text>
           <Button onPress={props.onBack}>Back</Button>
@@ -225,7 +229,7 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
   );
 
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} header={props.header}>
       <ScreenContainer>
         <BackLink onPress={onBack} />
         <Text variant="heading">{reference}</Text>
@@ -259,7 +263,7 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
           </VerseText>
         </Card>
         {feedback ? <Alert severity="warning">{feedback}</Alert> : null}
-        <Button onPress={onAdvance}>
+        <Button onPress={onAdvance} variant={isFinalRound ? "accent" : "primary"}>
           {isFinalRound ? "Finish — mark memorized" : "Next round"}
         </Button>
       </ScreenContainer>

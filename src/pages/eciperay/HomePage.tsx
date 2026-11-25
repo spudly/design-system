@@ -6,6 +6,7 @@ import { LoadingCardRow } from "../../widgets/feedback/LoadingCardRow.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
+import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
 
 /**
@@ -68,6 +69,17 @@ export type HomePageRecipe = RecipeRowItem;
 export type HomePageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /**
+   * Photography-led lead image (#852): a host-supplied image URL
+   * rendered as the hero `Thumbnail` above the title, following
+   * RecipeDetailPage's pattern. Absent or null, nothing renders
+   * in the lead slot and the page stays text-led as before — no
+   * placeholder art is baked into the design system (Stephen's
+   * approved option 1 for #852).
+   */
+  leadImageUrl?: string | null;
+  /** Accessible name for the lead image; absent, it is decorative. */
+  leadImageAccessibilityLabel?: string;
   title: string;
   subtitle: string;
   browseLabel: string;
@@ -94,6 +106,8 @@ export type HomePageProps = {
 const LOADING_ROW_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
 
 export function HomePage({
+  leadImageUrl,
+  leadImageAccessibilityLabel,
   title,
   subtitle,
   browseLabel,
@@ -113,16 +127,28 @@ export function HomePage({
     <BigFooterShell footer={footer}>
       <ScreenContainer>
         <Col gap="xxl">
+          {leadImageUrl ? (
+            <Thumbnail
+              variant="hero"
+              src={leadImageUrl}
+              {...(leadImageAccessibilityLabel
+                ? { accessibilityLabel: leadImageAccessibilityLabel }
+                : {})}
+            />
+          ) : null}
           <Text variant="heading">{title}</Text>
           <CenteredText muted>{subtitle}</CenteredText>
           <Col gap="m">
             <Button variant="primary" href={browseHref}>
               {browseLabel}
             </Button>
-            <Button variant="secondary" href={addHref}>
+            {/* Secondary actions take the accent variant (#852):
+                under Warm Harvest that is the brief's sage accent,
+                its secondary-action role. */}
+            <Button variant="accent" href={addHref}>
               {addLabel}
             </Button>
-            <Button variant="secondary" href={sharedWithMeHref}>
+            <Button variant="accent" href={sharedWithMeHref}>
               {sharedWithMeLabel}
             </Button>
           </Col>

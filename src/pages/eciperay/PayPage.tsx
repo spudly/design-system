@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
@@ -32,6 +32,8 @@ export type PayPageStatus = "unconfigured" | "needs-transaction" | "opening" | "
 export type PayPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   status: PayPageStatus;
   /** Reopen the checkout window (the closed and error states). */
   onRetryPress?: () => void;
@@ -47,6 +49,7 @@ export function PayPage({
   homeHref,
   homeLabel: homeLabelProp,
   footer,
+  header,
 }: PayPageProps) {
   const voice = useVoice();
   const copy =
@@ -61,7 +64,7 @@ export function PayPage({
             : { title: voice.payPage.title, body: undefined };
   const homeLabel = homeLabelProp ?? voice.payPage.homeLabel;
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} header={header}>
       <ScreenContainer variant="padded">
         <SectionCard title={copy.title} variant="elevated">
           <Col gap="xxl">

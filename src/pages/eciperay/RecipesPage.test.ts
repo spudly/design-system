@@ -196,8 +196,8 @@ describe("recipesPageBoundedList", () => {
     );
     assert.match(
       code,
-      /ListHeaderComponent=\{filtersHeader\}/,
-      "the one filter bar renders as the native list's header, so it scrolls with the recipes (web renders it in page flow, #547)",
+      /ListHeaderComponent=\{\s*<>\s*\{leadHeader\}\s*\{filtersHeader\}\s*<\/>\s*\}/,
+      "the one filter bar renders as the native list's header (below the #852 lead image), so it scrolls with the recipes (web renders it in page flow, #547)",
     );
     assert.match(
       code,
@@ -854,8 +854,8 @@ describe("recipesPageUnified", () => {
     );
     assert.match(
       mediaRow,
-      /<Badge tone="info">\{badgeLabel\}<\/Badge>/,
-      "the badge renders through the shared Badge component",
+      /<Badge tone="accent">\{badgeLabel\}<\/Badge>/,
+      "the badge renders through the shared Badge component in its accent (sage) tone (#852)",
     );
     assert.match(
       mediaRow,

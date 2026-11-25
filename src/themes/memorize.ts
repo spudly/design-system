@@ -34,6 +34,9 @@ export const memorizeTheme = {
     primaryHover: tokens.colors.teal.teal9,
     primaryActive: tokens.colors.teal.teal10,
     onPrimary: tokens.colors.teal.teal1,
+    // Footer surface (#857): matches the brief's button color —
+    // deep teal #0f766e, this theme's primary (button) fill.
+    footerBackground: tokens.colors.teal.teal8,
     // Without these two the ghost button, Badge/Alert info tones and
     // Avatar fallback silently fell back to the base (indigo) ramp under
     // Quiet Dawn. Steps parallel the other themes: subtle = step 2 tint,

@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Badge } from "../../widgets/data/Badge.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/layout/Card.js";
@@ -42,7 +42,8 @@ import { BoundedList } from "../shared/BoundedList.js";
  *   badge, the verse text (verse variant), an optional next
  *   review line (hint), and a Drill / Remove button pair. The
  *   badge's text is the status itself, as the app renders it;
- *   its tone follows the app's rule (memorized is success,
+ *   its tone follows the app's rule (memorized is mastery —
+ *   the accent treatment the brief reserves for mastery, #850;
  *   learning is info) — presentation the view owns, driven by
  *   the status value.
  * - The next-review line crosses the boundary pre-composed
@@ -109,6 +110,8 @@ export type MyVersesPageItem = {
 export type MyVersesPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   /** The app's memorize list, in the app's order. */
   verses: MyVersesPageItem[];
   /** Row action: remove this verse from the app's list. */
@@ -131,7 +134,7 @@ function MyVerseRow({
   return (
     <Card>
       <Text variant="subheading">{item.reference}</Text>
-      <Badge tone={item.status === "memorized" ? "success" : "info"}>{item.status}</Badge>
+      <Badge tone={item.status === "memorized" ? "mastery" : "info"}>{item.status}</Badge>
       <Text variant="verse">{item.text}</Text>
       {item.nextReviewLabel ? <Text variant="hint">{item.nextReviewLabel}</Text> : null}
       <ButtonRow>
@@ -152,9 +155,9 @@ function MyVerseRow({
  * Controlled — see the file header for the contract and the
  * screen inventory it mirrors.
  */
-export function MyVersesPage({ verses, onRemoveVerse, searchHref, footer }: MyVersesPageProps) {
+export function MyVersesPage({ verses, onRemoveVerse, searchHref, footer, header }: MyVersesPageProps) {
   return (
-    <BigFooterShell footer={footer} scrollMode="content">
+    <BigFooterShell footer={footer} header={header} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">My verses</Text>
         {verses.length === 0 ? (

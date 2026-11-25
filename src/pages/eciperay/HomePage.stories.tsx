@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react";
 import { View } from "tamagui";
 import { homeFixture, eciperayFooterFixture } from "../shared/fixtures.js";
+import { storyImageWide } from "../../storyFixtures.js";
 import { HomePage } from "./HomePage.js";
 
 const meta: Meta<typeof HomePage> = {
@@ -48,6 +49,37 @@ export const WithRecipes: Story = {
             subtitle:
               "6 servings · 1 hr 20 min · braised · weeknight favorite with a very long meta line",
             rating: 5,
+          },
+        ]}
+        onLogCookPress={noop}
+        browseHref="/recipes"
+        addHref="/recipes/new"
+        sharedWithMeHref="/shared-with-me"
+      />
+    </>
+  ),
+};
+
+export const WithLeadImage: Story = {
+  // Photography-led lead (#852): the host-supplied lead image
+  // renders as the hero above the title; the secondary actions
+  // render in the sage accent and one row carries the shared
+  // badge in the accent tone.
+  render: () => (
+    <>
+      <HomePage
+        footer={eciperayFooterFixture}
+        {...homeFixture}
+        leadImageUrl={storyImageWide}
+        recipes={[
+          {
+            id: "tuscan-chicken",
+            href: "/recipes/tuscan-chicken",
+            title: "Tuscan Chicken",
+            subtitle: "4 servings · 45 min",
+            rating: 4,
+            badgeLabel: "Shared with you",
+            canLogCook: false,
           },
         ]}
         onLogCookPress={noop}

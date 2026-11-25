@@ -5,6 +5,7 @@ import { Col } from "../../widgets/layout/Col.js";
 import { CardRow } from "../../widgets/layout/CardRow.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
+import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 
 /**
  * MealPlansPage (#49): Eciperay's meal plan list as a controlled
@@ -100,6 +101,17 @@ export type MealPlansPageItem = {
 export type MealPlansPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /**
+   * Photography-led lead image (#852): a host-supplied image URL
+   * rendered as the hero `Thumbnail` above the heading, following
+   * RecipeDetailPage's pattern. Absent or null, nothing renders
+   * in the lead slot and the page stays text-led as before — no
+   * placeholder art is baked into the design system (Stephen's
+   * approved option 1 for #852).
+   */
+  leadImageUrl?: string | null;
+  /** Accessible name for the lead image; absent, it is decorative. */
+  leadImageAccessibilityLabel?: string;
   /** Meal plans to render, in the app's order. */
   plans: MealPlansPageItem[];
   /** Load in flight: the list region renders skeleton rows
@@ -136,10 +148,21 @@ export function MealPlansPage({
   onPlanDelete,
   titleLevel,
   footer,
+  leadImageUrl,
+  leadImageAccessibilityLabel,
 }: MealPlansPageProps) {
   return (
     <BigFooterShell footer={footer}>
       <ScreenContainer>
+        {leadImageUrl ? (
+          <Thumbnail
+            variant="hero"
+            src={leadImageUrl}
+            {...(leadImageAccessibilityLabel
+              ? { accessibilityLabel: leadImageAccessibilityLabel }
+              : {})}
+          />
+        ) : null}
         <Text variant="heading" aria-level={titleLevel}>
           Meal plans
         </Text>

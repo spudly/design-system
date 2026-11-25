@@ -10,7 +10,7 @@ const meta: Meta<typeof Button> = {
   argTypes: {
     variant: {
       control: "select",
-      options: ["primary", "secondary", "danger"],
+      options: ["primary", "secondary", "danger", "accent"],
     },
     ghost: {
       control: "boolean",
@@ -66,6 +66,10 @@ export const Danger: Story = {
   args: { variant: "danger", size: "md", children: "Delete recipe" },
 };
 
+export const Accent: Story = {
+  args: { variant: "accent", size: "md", children: "Finish — mark memorized" },
+};
+
 export const Sizes: Story = {
   render: () => (
     <XStack gap={12} alignItems="center">
@@ -87,6 +91,7 @@ export const AllVariants: Story = {
       <Button variant="secondary">Secondary</Button>
       <Button ghost>Ghost</Button>
       <Button variant="danger">Danger</Button>
+      <Button variant="accent">Accent</Button>
     </XStack>
   ),
 };

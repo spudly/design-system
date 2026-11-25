@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
 
@@ -51,6 +51,8 @@ import { Text } from "../../widgets/data/Text.js";
 export type MemorizeSettingsPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
 };
 
 /**
@@ -59,9 +61,9 @@ export type MemorizeSettingsPageProps = {
  * file header for the contract and the screen inventory it
  * mirrors.
  */
-export function MemorizeSettingsPage({ footer }: MemorizeSettingsPageProps) {
+export function MemorizeSettingsPage({ footer, header }: MemorizeSettingsPageProps) {
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} header={header}>
       <ScreenContainer>
         <Text variant="heading">Settings</Text>
       </ScreenContainer>

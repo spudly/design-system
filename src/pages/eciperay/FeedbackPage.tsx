@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { CheckboxField } from "../../widgets/form/CheckboxField.js";
@@ -43,6 +43,8 @@ import { useVoice } from "../../voice/index.js";
 export type FeedbackPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   message: string;
   onMessageChange: (value: string) => void;
   replyEmail: string;
@@ -76,10 +78,11 @@ export function FeedbackPage({
   onSubmit,
   onResetPress,
   footer,
+  header,
 }: FeedbackPageProps) {
   const voice = useVoice();
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} header={header}>
       <ScreenContainer variant="padded">
         <Text variant="title">{voice.feedbackPage.title}</Text>
         <Text variant="hint">{voice.feedbackPage.description}</Text>

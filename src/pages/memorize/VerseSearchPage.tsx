@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { Card } from "../../widgets/layout/Card.js";
 import { Alert } from "../../widgets/feedback/Alert.js";
@@ -128,6 +128,8 @@ export type VerseSearchPageItem = {
 export type VerseSearchPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   /** The query text, held by the app (it runs the search). */
   query: string;
   onQueryChange: (value: string) => void;
@@ -198,9 +200,10 @@ export function VerseSearchPage({
   hasSearched,
   onAddVerse,
   footer,
+  header,
 }: VerseSearchPageProps) {
   return (
-    <BigFooterShell footer={footer} scrollMode="content">
+    <BigFooterShell footer={footer} header={header} scrollMode="content">
       <ScreenContainer>
         <Text variant="heading">Search verses</Text>
         {usingDemo ? (

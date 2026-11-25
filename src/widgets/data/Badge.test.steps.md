@@ -14,13 +14,13 @@ release's changed components. The full index lives in
 ## Badge
 
 Open in `Widgets/Badge`: Neutral, Info, Success, Warning, Danger,
-AllTones, Selectable, Selected, SelectableDisabled, Removable,
+Mastery, AllTones, Selectable, Selected, SelectableDisabled, Removable,
 RemovableDisabled.
 
 1. Every tone renders as a pill with a **visible 1px border in the
    same color as its label text** — no tone is borderless or uses a
    mismatched border color.
-2. In AllTones, the five pills align on one baseline with even
+2. In AllTones, the six pills align on one baseline with even
    spacing; no pill is taller or wider than its label needs.
 3. Long labels (type one in via Controls) wrap or truncate without
    breaking the pill shape or overlapping neighbors.

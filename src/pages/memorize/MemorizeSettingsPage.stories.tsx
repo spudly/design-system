@@ -32,7 +32,10 @@ type Story = StoryObj<typeof MemorizeSettingsPage>;
 export const Default: Story = {
   render: () => (
     <>
-      <MemorizeSettingsPage footer={memorizeFooterFixture} />
+      <MemorizeSettingsPage
+        footer={memorizeFooterFixture}
+        header={{ brand: { label: "Memorize", href: "/" } }}
+      />
     </>
   ),
 };

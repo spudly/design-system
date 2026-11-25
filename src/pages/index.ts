@@ -232,4 +232,5 @@ export {
   type BigFooterSocialLink,
   type BigFooterStore,
   type BigFooterStoreLink,
+  type BigFooterShellHeader,
 } from "../widgets/content/BigFooter.js";

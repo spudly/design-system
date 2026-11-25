@@ -37,6 +37,28 @@ const toneStyles = {
     background: tokens.colors.danger.danger8,
     text: tokens.colors.danger.danger2,
   },
+  // Mastery (#850): the fill is the active theme's semantic
+  // accent — the role the brief reserves for progress/mastery
+  // (muted gold #b45309 in Memorize's Quiet Dawn, sage in
+  // Eciperay's Warm Harvest) — with a white label/border ink:
+  // white on the Memorize gold keeps WCAG AA text contrast
+  // (~5:1), as it does on the sage accent. Following the tone
+  // pattern above, the border takes the label ink.
+  mastery: {
+    background: "$accent",
+    text: "#ffffff",
+  },
+  // Accent (#852): the secondary-action / tag role the Eciperay
+  // brief assigns to its sage accent — the same theme semantic
+  // accent fill as `mastery`, named for the tag/secondary role so
+  // list markers (e.g. the shared-with-me badge on recipe rows)
+  // render in sage under Warm Harvest instead of the terracotta
+  // primary ramp. Under Memorize it resolves to that theme's
+  // accent, exactly as `mastery` does.
+  accent: {
+    background: "$accent",
+    text: "#ffffff",
+  },
 } as const;
 
 type Tone = keyof typeof toneStyles;
@@ -96,7 +118,10 @@ export type BadgeProps = Omit<RowProps, "onPress"> & {
 
 /**
  * Small status pill. Status is always conveyed with text, never color alone.
- * Tones: `neutral` (default), `info`, `success`, `warning`, `danger`.
+ * Tones: `neutral` (default), `info`, `success`, `warning`, `danger`,
+ * `mastery` (the theme's accent fill — the progress/mastery role,
+ * #850), `accent` (the same accent fill — the secondary/tag role,
+ * #852).
  * With a `color` prop (a tag color token name) it renders as a colored
  * tag (the former TagPill).
  *

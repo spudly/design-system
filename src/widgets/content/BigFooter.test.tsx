@@ -64,26 +64,34 @@ test("the mobile stack breakpoint is named and the shell is sticky in flow", () 
   assert.match(bigFooter, /const BIG_FOOTER_STACK_BREAKPOINT = 640;/);
   assert.match(bigFooter, /style=\{\{ flexBasis: BIG_FOOTER_COLUMN_BASIS \}\}/);
   assert.match(bigFooter, /<Row wrap/);
-  // Page-scroll model (#547): the web shell is a flex column with
-  // minHeight 100dvh and justifyContent "space-between" and
-  // exactly two children — the page content and the footer. The
-  // minimum height is platform-specific (PR #413 review): 100dvh
-  // on web, 100% of the parent's available height by default —
-  // React Native does not support viewport units for minHeight.
+  // Page-scroll model (#547, revised #857): the web shell is a
+  // flex column with minHeight 100dvh and exactly two children —
+  // the growing content region and the footer, separated by the
+  // token clearance gap (gap "xl" = the $6 spacing step). The
+  // pre-#857 space-between pinning put all slack between content
+  // and footer as an empty band; now the content region grows so
+  // slack lives inside the content area, the footer stays pinned
+  // to the viewport bottom on short pages, and follows directly
+  // below content on long pages. The minimum height is
+  // platform-specific (PR #413 review): 100dvh on web, 100% of
+  // the parent's available height by default — React Native
+  // does not support viewport units for minHeight.
   assert.match(bigFooter, /minHeight=\{\{ default: "100%", web: "100dvh" \}\}/);
-  assert.match(bigFooter, /<Col minHeight=\{\{ default: "100%", web: "100dvh" \}\} between>/);
+  assert.match(bigFooter, /<Col minHeight=\{\{ default: "100%", web: "100dvh" \}\} gap="xl">/);
   assert.ok(
     !/<Col minHeight="100dvh"/.test(bigFooter),
     "the shell must not pass a raw 100dvh minHeight to native",
   );
-  // The content child is the positioned ancestor, so an
-  // absolute-fill child (StepOverlay) cannot cover the footer;
-  // there is no bounded flex region allocating it a height
-  // (#547 removed the bounded region and its nested scroller).
-  // #628: the positioned content child is now the
-  // PageContentColumn (positioned itself, capped at 1200px and
-  // centered); the footer stays its full-width sibling.
-  assert.match(bigFooter, /<PageContentColumn>\{children\}<\/PageContentColumn>/);
+  // The content region is the positioned, growing wrapper around
+  // the PageContentColumn, so an absolute-fill child (StepOverlay)
+  // cannot cover the footer. #628: the PageContentColumn
+  // (positioned itself, capped at 1200px and centered) renders
+  // inside that region; the footer stays its full-width sibling.
+  assert.match(bigFooter, /<Col grow shrink position="relative">\s*<PageContentColumn>/);
+  assert.match(
+    bigFooter,
+    /<PageContentColumn>\s*\{headerNode\}\s*\{children\}\s*<\/PageContentColumn>/,
+  );
   assert.ok(!/flexBasis="auto"/.test(bigFooter), "the bounded content region is gone (#547)");
   assert.ok(!/position="(fixed|absolute)"/.test(bigFooter), "the footer is in flow, never pinned");
 });
@@ -207,7 +215,7 @@ test("native scroll ownership is an explicit shell mode, independent of footer d
   // shell's plain ScrollView (the RecipesPage windowing bug).
   assert.match(
     bigFooter,
-    /if \(scrollMode === "content" \|\| scrollMode === "overlay"\) \{\s*return \(\s*<Col grow shrink position="relative">\s*\{children\}/,
+    /if \(scrollMode === "content" \|\| scrollMode === "overlay"\) \{\s*return \(\s*<Col grow shrink position="relative">\s*\{headerNode\}\s*<Col grow shrink position="relative">\s*\{children\}/,
   );
   // "nested" mode: the growing column only — no scroller, no
   // bounded frame; the enclosing shell stays the scroll owner.
@@ -342,7 +350,7 @@ test("on native the shell renders one ScrollView and no BigFooter (#547)", () =>
   assert.match(bigFooter, /if \(!isWeb\) \{/);
   assert.match(
     bigFooter,
-    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">\s*<Col grow minHeight="100%" position="relative">\s*\{children\}/,
+    /<ScrollView flex=\{1\} keyboardShouldPersistTaps="handled">\s*<Col grow minHeight="100%" position="relative">\s*\{headerNode\}\s*\{children\}/,
   );
   assert.equal(
     (bigFooter.match(/<ScrollView/g) ?? []).length,
@@ -645,8 +653,10 @@ describe("bigFooterPrimary", () => {
       .replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
   }
   const footer = readCode("src/widgets/content/BigFooter.tsx");
-  test("the footer band fills with $primary and carries no top divider (#465)", () => {
-    assert.match(footer, /backgroundColor="\$primary"/);
+  test("the footer band fills with $footerBackground and carries no top divider (#465, #857)", () => {
+    // #857: the band's fill is the footerBackground semantic token,
+    // which each theme sets to its button (primary) color.
+    assert.match(footer, /backgroundColor="\$footerBackground"/);
     assert.ok(
       !/backgroundColor="\$surface"/.test(footer),
       "the band must not keep the surface fill",
@@ -875,4 +885,14 @@ describe("bigFooterStoreBadges", () => {
     assert.ok(!html.includes("Download on the App Store"), "no App Store badge renders");
     assert.ok(!html.includes("Get it on Google Play"), "no Google Play badge renders");
   });
+});
+test("the shell renders the full AppTopBar from header data (#857) and the footer uses the footerBackground token", () => {
+  assert.match(bigFooter, /export type BigFooterShellHeader = \{/);
+  assert.match(bigFooter, /header\?: BigFooterShellHeader \| undefined;/);
+  assert.match(bigFooter, /<AppTopBar/);
+  assert.match(bigFooter, /backgroundColor="\$footerBackground"/);
+  assert.ok(
+    !/backgroundColor="\$primary"/.test(bigFooter),
+    "BigFooter consumes the footerBackground semantic token, not the raw primary token (#857)",
+  );
 });
