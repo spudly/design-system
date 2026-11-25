@@ -14,18 +14,25 @@ const StyledText = styled(TamaguiText, {
       heading: {
         fontSize: tokens.typography.fontSize["3xl"],
         fontWeight: tokens.typography.fontWeight.bold,
+        // The registered `display` font (#851): the brand's title
+        // treatment — serif under Warm Harvest, the UI sans
+        // elsewhere. See the component's fontFamily prop below.
+        fontFamily: "$display",
       },
       title: {
         fontSize: tokens.typography.fontSize.xl,
         fontWeight: tokens.typography.fontWeight.bold,
+        fontFamily: "$display",
       },
       formTitle: {
         fontSize: tokens.typography.fontSize["2xl"],
         fontWeight: tokens.typography.fontWeight.bold,
+        fontFamily: "$display",
       },
       display: {
         fontSize: tokens.typography.fontSize["3xl"],
         fontWeight: tokens.typography.fontWeight.bold,
+        fontFamily: "$display",
       },
       label: {
         fontSize: tokens.typography.fontSize.xs,
@@ -37,6 +44,7 @@ const StyledText = styled(TamaguiText, {
       subheading: {
         fontSize: tokens.typography.fontSize.xl,
         fontWeight: tokens.typography.fontWeight.semibold,
+        fontFamily: "$display",
       },
       body: {
         // Base styles above; no overrides.
@@ -102,9 +110,12 @@ export type TextProps = StyledTextProps & {
  * meta block rather than opening a list), `formTitle` (the form-flow
  * page title — 2xl bold, for the import/form screens whose titles sit
  * inside the form layout rather than opening a page), `display`
- * (the serif display title — 3xl bold in the `verse` serif family,
+ * (the display title — 3xl bold in the registered `display` family,
  * for a detail page's hero title in the visual-direction treatment,
- * #721), `subheading`,
+ * #721; since #851 that family is the brand's title role: serif
+ * under Warm Harvest, the UI sans elsewhere — the title-bearing
+ * variants `heading`, `title`, `formTitle`, and `subheading` render
+ * in the same `display` family), `subheading`,
  * `body` (default), `hint` (muted caption), `muted` (body-size text in
  * the muted treatment — the intro line under a page title, a
  * de-emphasized account line), `strong` (body-size text in bold — a
@@ -178,9 +189,10 @@ export function Text({
       callerAriaLevel ?? (headingLevel !== undefined && roleIsHeading ? headingLevel : undefined),
   });
   // The font family must cross as an instance prop carrying the
-  // BARE font name ("body" / "verse", no "$"): on web, Tamagui only
-  // records the font — and so only emits the font-context class
-  // (`font_body` / `font_verse`) that defines `--f-family` — when a
+  // BARE font name ("body" / "verse" / "display", no "$"): on web,
+  // Tamagui only records the font — and so only emits the
+  // font-context class (`font_body` / `font_verse` / `font_display`)
+  // that defines `--f-family` — when a
   // text component receives a `fontFamily` whose value is a
   // registered font name in exactly that form (Tamagui's own
   // SizableText is built this way, with the bare name body). The
@@ -191,13 +203,25 @@ export function Text({
   // (a browser/RNW default), while fonted primitives (Input, Label)
   // rendered in the theme stack. That mismatch is #69: parts of a
   // page in one family, the rest in another. With the bare name,
-  // body text renders in the registered body font and `verse` text
-  // in the registered verse font, the way the apps' screens render.
+  // body text renders in the registered body font, `verse` text
+  // in the registered verse font, and title-bearing variants in
+  // the registered display font (#851), the way the apps' screens
+  // render.
   // A caller-passed `fontFamily` in `rest` still wins.
   return (
     <StyledText
       variant={variant}
-      fontFamily={variant === "verse" || variant === "display" ? "verse" : "body"}
+      fontFamily={
+        variant === "verse"
+          ? "verse"
+          : variant === "heading" ||
+              variant === "title" ||
+              variant === "formTitle" ||
+              variant === "subheading" ||
+              variant === "display"
+            ? "display"
+            : "body"
+      }
       {...a11yProps}
       {...rest}
     />

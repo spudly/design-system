@@ -25,6 +25,13 @@ function fontStackFor(theme: StorybookThemeName): string {
   return baseTheme.tokens.typography.fontFamily.sans;
 }
 
+/** The display/title stack for a Storybook theme (#851): the serif stack under Warm Harvest, the UI sans stack otherwise. */
+function displayFontStackFor(theme: StorybookThemeName): string {
+  if (theme.includes("warmHarvest")) return eciperayTheme.tokens.typography.fontFamily.display;
+  if (theme.includes("quietDawn")) return memorizeTheme.tokens.typography.fontFamily.display;
+  return baseTheme.tokens.typography.fontFamily.display;
+}
+
 /** The verse-text stack for a Storybook theme (#66): Alegreya under Quiet Dawn, the base serif stack otherwise. */
 function verseFontStackFor(theme: StorybookThemeName): string {
   if (theme.includes("quietDawn")) return memorizeTheme.tokens.typography.fontFamily.verse;
@@ -36,6 +43,7 @@ function FontStackSync({ theme }: { theme: StorybookThemeName }) {
   useEffect(() => {
     document.documentElement.style.setProperty("--dsFontStack", fontStackFor(theme));
     document.documentElement.style.setProperty("--dsVerseFontStack", verseFontStackFor(theme));
+    document.documentElement.style.setProperty("--dsDisplayFontStack", displayFontStackFor(theme));
   }, [theme]);
   return null;
 }

@@ -103,6 +103,41 @@ const fontFamily = {
   verseNative: "Georgia",
   /** Single font name for React Native on Android for the `verse` role. */
   verseNativeAndroid: "serif",
+  /**
+   * Display/title stack (#851): the family the title-bearing Text
+   * variants (heading / title / formTitle / subheading / display)
+   * render in, resolved through the registered Tamagui `display`
+   * font (see tamagui.config). The base role mirrors the `sans`
+   * stack, so a theme that declares no display override keeps
+   * today's sans titles; Warm Harvest (Eciperay) overrides it to
+   * the serif stack — the design brief's serif display type for
+   * page and recipe titles. Apps mark titles with the Text
+   * variants and never name a family themselves.
+   */
+  display:
+    "Raleway, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+  /** Single font name for React Native for the `display` role (mirrors `sansNative` in the base role). */
+  displayNative: "UiSans",
+  /** iOS per-weight face names for the `display` role (the static UiSans faces, as `sansNativeFaces`). */
+  displayNativeFaces: {
+    "400": "UiSans",
+    "500": "UiSans-Medium",
+    "600": "UiSans-SemiBold",
+    "700": "UiSans-Bold",
+    normal: "UiSans",
+    bold: "UiSans-Bold",
+  },
+  /** Single font name for React Native on Android for the `display` role (mirrors `sansNativeAndroid`). */
+  displayNativeAndroid: "UiSans",
+  /** Android per-weight face names for the `display` role (the static UiSans faces, as `sansNativeAndroidFaces`). */
+  displayNativeAndroidFaces: {
+    "400": "UiSans",
+    "500": "UiSans-Medium",
+    "600": "UiSans-SemiBold",
+    "700": "UiSans-Bold",
+    normal: "UiSans",
+    bold: "UiSans-Bold",
+  },
   /** Monospace stack for code / tabular content. */
   mono: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
 } as const;

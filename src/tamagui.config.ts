@@ -206,6 +206,16 @@ type BrandFontFamily = {
   verseNative?: string | undefined;
   /** Verse Android family: a SINGLE font name. */
   verseNativeAndroid?: string | undefined;
+  /** Display/title web family: a full CSS fallback stack (mirrors the `sans` stack when a theme declares none; the serif stack under Warm Harvest, #851). */
+  display?: string | undefined;
+  /** Display iOS family: a SINGLE font name. */
+  displayNative?: string | undefined;
+  /** Display iOS per-weight face names (weight → font name). */
+  displayNativeFaces?: Record<string, string> | undefined;
+  /** Display Android family: a SINGLE font name. */
+  displayNativeAndroid?: string | undefined;
+  /** Display Android per-weight face names (weight → font name). */
+  displayNativeAndroidFaces?: Record<string, string> | undefined;
 };
 
 /** Platforms whose font resolution differs. */
@@ -344,9 +354,30 @@ function buildBrandFonts(fontFamily: BrandFontFamily) {
     ...(verseResolved.face ? { face: verseResolved.face } : {}),
     ...scale,
   });
-  // Headings use the same stack: hierarchy in this system is carried by
-  // size/weight (the DS Text heading variants set no family of their own).
-  return { body: font, heading: font, verse };
+  // The display font (#851): same registration mechanism, resolved
+  // from the theme's `display` role — the base role mirrors the
+  // `sans` stack, and Warm Harvest overrides it to the serif stack,
+  // so Eciperay page/recipe titles render serif while every other
+  // brand's titles keep the UI sans. The title-bearing Text
+  // variants reference it as `$display`, and Tamagui's `heading`
+  // font IS the display font, so headed primitives follow the
+  // brand's title treatment too.
+  const displayResolved = resolveFontFamily(
+    {
+      sans: fontFamily.display ?? tokens.typography.fontFamily.display,
+      sansNative: fontFamily.displayNative,
+      sansNativeFaces: fontFamily.displayNativeFaces,
+      sansNativeAndroid: fontFamily.displayNativeAndroid,
+      sansNativeAndroidFaces: fontFamily.displayNativeAndroidFaces,
+    },
+    fontPlatform,
+  );
+  const display = createFont({
+    family: displayResolved.family,
+    ...(displayResolved.face ? { face: displayResolved.face } : {}),
+    ...scale,
+  });
+  return { body: font, heading: display, verse, display };
 }
 
 export function createTamaguiConfig(theme: {
@@ -371,6 +402,11 @@ export function createTamaguiConfig(theme: {
       verse: theme.tokens?.typography?.fontFamily?.verse,
       verseNative: theme.tokens?.typography?.fontFamily?.verseNative,
       verseNativeAndroid: theme.tokens?.typography?.fontFamily?.verseNativeAndroid,
+      display: theme.tokens?.typography?.fontFamily?.display,
+      displayNative: theme.tokens?.typography?.fontFamily?.displayNative,
+      displayNativeFaces: theme.tokens?.typography?.fontFamily?.displayNativeFaces,
+      displayNativeAndroid: theme.tokens?.typography?.fontFamily?.displayNativeAndroid,
+      displayNativeAndroidFaces: theme.tokens?.typography?.fontFamily?.displayNativeAndroidFaces,
     }),
     tokens: tamaguiTokens,
     themes: buildTamaguiThemes(theme),
@@ -439,6 +475,11 @@ export function createStorybookTamaguiConfig() {
       // sets `--dsVerseFontStack` from the selected brand (Alegreya
       // under Quiet Dawn, the base serif stack otherwise).
       verse: `var(--dsVerseFontStack, ${baseTheme.tokens.typography.fontFamily.verse})`,
+      // Same CSS-var mechanism for the display font (#851): the
+      // preview sets `--dsDisplayFontStack` from the selected brand
+      // (the serif stack under Warm Harvest, the sans stack
+      // otherwise).
+      display: `var(--dsDisplayFontStack, ${baseTheme.tokens.typography.fontFamily.display})`,
     }),
     tokens: tamaguiTokens,
     themes: {
@@ -494,6 +535,18 @@ export function createOnDeviceStorybookTamaguiConfig() {
       verse: memorizeTheme.tokens.typography.fontFamily.verse,
       verseNative: memorizeTheme.tokens.typography.fontFamily.verseNative,
       verseNativeAndroid: memorizeTheme.tokens.typography.fontFamily.verseNativeAndroid,
+      // Display: fonts are config-global, so the on-device config
+      // registers the BASE display role (the UI sans, with its
+      // static faces) for every brand — the same documented
+      // deviation class as verse below, in the safe direction:
+      // Warm Harvest titles render sans on device Storybook where
+      // the Eciperay app config resolves them serif (#851), and no
+      // brand's titles take another brand's serif.
+      display: baseTheme.tokens.typography.fontFamily.display,
+      displayNative: baseTheme.tokens.typography.fontFamily.displayNative,
+      displayNativeFaces: baseTheme.tokens.typography.fontFamily.displayNativeFaces,
+      displayNativeAndroid: baseTheme.tokens.typography.fontFamily.displayNativeAndroid,
+      displayNativeAndroidFaces: baseTheme.tokens.typography.fontFamily.displayNativeAndroidFaces,
     }),
     tokens: tamaguiTokens,
     themes: {
