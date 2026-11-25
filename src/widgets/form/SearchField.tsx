@@ -232,10 +232,7 @@ export const SearchField = forwardRef<TamaguiElement, SearchFieldProps>(function
       onSubmitEditing={onSubmitEditing}
     >
       {({ submitEditingProps, compositionProps }) => (
-        <StyledContainer
-          {...(grow && !label ? { flex: 1 } : {})}
-          {...(embedded ? { flex: 1, minWidth: 120, embedded: true } : {})}
-        >
+        <StyledContainer {...(embedded ? { flex: 1, minWidth: 120, embedded: true } : {})} {...(grow && !label ? { flex: 1 } : {})}>
           <StyledGlyphBox>
             <SearchGlyph />
           </StyledGlyphBox>

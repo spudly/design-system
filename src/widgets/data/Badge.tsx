@@ -180,6 +180,11 @@ export function Badge({
   const removeLabel =
     removeAccessibilityLabel ??
     (typeof children === "string" ? `Remove ${children}` : "Remove");
+  const removeButtonProps = {
+    onPress: disabled ? undefined : onRemove,
+    tabIndex: disabled ? -1 : 0,
+    onKeyDown: handleRemoveKeyDown,
+  };
   const selectableProps = selectable
     ? {
         ...platformAccessibilityProps({ accessibilityRole: "button" }),
@@ -220,9 +225,7 @@ export function Badge({
             accessibilityLabel: removeLabel,
             accessibilityState: { disabled },
           })}
-          onPress={disabled ? undefined : onRemove}
-          tabIndex={disabled ? -1 : 0}
-          onKeyDown={handleRemoveKeyDown}
+          {...removeButtonProps}
           cursor="web:pointer"
           alignItems="center"
           justifyContent="center"
