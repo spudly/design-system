@@ -28,8 +28,8 @@ export type MainLandmarkProps = {
  * message states, since #757), and the footer
  * (BigFooterShell's `contentinfo`) stays outside it.
  *
- * Sizing follows the #547 page-scroll model, like ScreenShell
- * and ScrollRegion: on native the column fills the space its
+ * Sizing follows the #547 page-scroll model, like the page
+ * frame and ScrollRegion: on native the column fills the space its
  * shell leaves it (`flex: 1` inside the shell's bounded frame);
  * on web the document scrolls the whole page, so the column
  * grows with its content — `flex: 1`'s zero basis collapsed it

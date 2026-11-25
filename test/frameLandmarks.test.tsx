@@ -41,9 +41,9 @@
  * unavailable message states render inside MainLandmark, with
  * the footer outside it (the SSR tests below). The unified
  * loading state is the owner form's skeleton composition
- * (ScreenShell carries no landmark — the signed-in app shell
- * owns landmarks there), so the retired page's loading-state
- * landmark test does not carry over.
+ * (the page's inlined frame carries no landmark — the signed-in
+ * app shell owns landmarks there), so the retired page's
+ * loading-state landmark test does not carry over.
  */
 import "./registerSvgStub.js";
 import { loadInternalDist } from "./internalDist.js";
@@ -282,8 +282,8 @@ test("RecipeDetailPage carries its main landmark on its public states (#473, #75
   // unavailable, and the guest ready form. The role itself
   // lives in the MainLandmark component — the page spreads no
   // landmark props of its own. (The owner form and the unified
-  // loading state compose ScreenShell, which carries no
-  // landmark — see the file header.)
+  // loading state compose the page's inlined frame, which
+  // carries no landmark — see the file header.)
   const wraps = recipeDetailPage.match(/<MainLandmark>/g) ?? [];
   assert.equal(wraps.length, 3, "each public-treatment state renders its content inside main");
   assert.ok(

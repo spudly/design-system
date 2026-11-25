@@ -2,7 +2,7 @@
 component: PinnedHeaderShell
 run_when:
   - "src/widgets/layout/PinnedHeaderShell.tsx, its stories, MealsHubPage's plans tab, or a changeset naming PinnedHeaderShell."
-  - "any of the four shell components, their stories, or a changeset naming them. (namely: ScreenShell, ScrollShell, SessionShell, PinnedHeaderShell)"
+  - "any of the three shell components, their stories, or a changeset naming them. (namely: ScrollShell, SessionShell, PinnedHeaderShell)"
 ---
 
 # PinnedHeaderShell — manual test steps
@@ -25,17 +25,19 @@ Open in `Widgets/PinnedHeaderShell`: Default.
 stories, MealsHubPage's plans tab, or a changeset naming
 PinnedHeaderShell.
 
-## Page shells (ScreenShell, ScrollShell, SessionShell, PinnedHeaderShell)
+## Page shells (ScrollShell, SessionShell, PinnedHeaderShell)
 
-Open in `Widgets/ScreenShell`: Default;
-`Widgets/ScrollShell`: Default; `Widgets/SessionShell`:
-Fixed, Scrollable; `Widgets/PinnedHeaderShell`: Default.
+Open in `Widgets/ScrollShell`: Default; `Widgets/SessionShell`:
+Fixed, Scrollable; `Widgets/PinnedHeaderShell`: Default. The
+fixed-shell frame (the retired ScreenShell, inlined by #741)
+is exercised through `Pages/Eciperay/RecipeDetailPage`:
+Loading, Default.
 
-1. ScreenShell: the pinned bar renders above the scroll
-   region, outside it, and the surface behind is the shell's
-   paint. The Default story's region content is a single
-   short paragraph that does not overflow its 480px frame,
-   so fixed-while-scrolling is verified structurally here
+1. The inlined page frame: on Loading, the skeleton toolbar
+   renders above the scroll region, outside it, and the
+   surface behind is the frame's paint; on Default the whole
+   page scrolls as one region on that paint. The frame has no
+   story of its own since #741 — verify the structure here
    (bar outside the ScrollRegion), not by scrolling.
 2. ScrollShell: the whole column scrolls inside the surface
    frame, content inset by the standard padding with even
@@ -53,5 +55,5 @@ Fixed, Scrollable; `Widgets/PinnedHeaderShell`: Default.
 4. PinnedHeaderShell: the header block stays pinned while the
    body scrolls beneath it.
 
-**Run when:** any of the four shell components, their stories,
+**Run when:** any of the three shell components, their stories,
 or a changeset naming them.

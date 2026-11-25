@@ -109,6 +109,23 @@ test("the view imports no app package and runs no data hooks", () => {
   assert.ok(!code.includes("@tanstack"), "no react-query in the view");
 });
 
+test("the fixed-shell frame is inlined with its platform split (#547, #741)", () => {
+  // #741 inlined the retired ScreenShell into this page (its
+  // only page consumer): the loading and owner forms render
+  // through the page-local frame, which carries the #547 split
+  // — the web branch grows only, the native branch keeps
+  // flex: 1's grow/shrink translation, both surface-painted.
+  assert.match(code, /function RecipeDetailFrame/);
+  assert.match(code, /<Col grow backgroundColor="\$surface">/);
+  assert.match(code, /<Col grow shrink backgroundColor="\$surface">/);
+  assert.ok(!code.includes("ScreenShell"), "the retired ScreenShell widget stays retired");
+  assert.equal(
+    code.split("<RecipeDetailFrame>").length - 1,
+    2,
+    "the frame wraps exactly the loading and owner compositions",
+  );
+});
+
 test("the loading state renders only the spinner shell", () => {
   assert.match(
     code,

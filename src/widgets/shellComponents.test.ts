@@ -1,9 +1,11 @@
 /**
  * Contract tests for the shipped shell/heading components of
- * the #119 dedupe set: ScreenShell (the fixed-shell frame) and
- * SectionHeading (the canonical section heading). Each owns its
- * treatment outright — the pins hold the treatments and the
- * package-root exports.
+ * the #119 dedupe set: SectionHeading (the canonical section
+ * heading). Each owns its treatment outright — the pins hold the
+ * treatments and the package-root exports. (ScreenShell, the
+ * set's fixed-shell frame, was retired by #741: its frame is
+ * inlined into RecipeDetailPage and ScrollShell, and its pins
+ * moved with it.)
  *
  * Toolbar — the recipedetail tranche's pinned bar — joins the
  * set in the #119 extraction round and is pinned here;
@@ -28,24 +30,13 @@ function code(file: string) {
 
 test("the shell components are exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
-  for (const name of ["ScreenShell", "SectionHeading", "Toolbar"]) {
+  for (const name of ["SectionHeading", "Toolbar"]) {
     assert.equal(
       typeof dist[name],
       "function",
       `${name} must be exported from the internal components barrel`,
     );
   }
-});
-
-test("ScreenShell owns the fixed-shell frame", () => {
-  const shell = code("layout/ScreenShell.tsx");
-  // #746 (Option B): no styled root — both platform branches
-  // render Col with the surface paint; the native branch's
-  // flex: 1 is the plan's grow shrink translation, the web
-  // branch grows only (#547).
-  assert.match(shell, /export type ScreenShellProps = Omit<ColProps, "backgroundColor">;/);
-  assert.match(shell, /<Col grow backgroundColor="\$surface" \{\.\.\.rest\} \/>/);
-  assert.match(shell, /<Col grow shrink backgroundColor="\$surface" \{\.\.\.rest\} \/>/);
 });
 
 test("Toolbar owns the pinned bar's inset, gap, wrap, and hairline divider", () => {

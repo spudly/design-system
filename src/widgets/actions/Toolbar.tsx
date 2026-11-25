@@ -9,7 +9,7 @@ export type ToolbarProps = Omit<
 
 /**
  * A screen's pinned toolbar (#119): the hairline-divided bar a
- * fixed-shell page (ScreenShell) renders above its scroll
+ * fixed-shell page renders above its scroll
  * region — status and context items at their natural size, a
  * growing field (SelectField's `grow`) taking the remaining
  * width, items wrapping onto a second line when the bar

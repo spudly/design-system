@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
+import { isWeb } from "tamagui";
 import { Col } from "./Col.js";
-import { ScreenShell } from "./ScreenShell.js";
 import { ScrollRegion } from "./ScrollRegion.js";
 
 export type ScrollShellProps = {
@@ -26,9 +26,20 @@ export type ScrollShellProps = {
  * RecipeDetailPage's guest mode (#757) renders inside.
  *
  * The shell is a composition, not a re-declared frame (#119
- * dedupe): ScreenShell supplies the surface frame and
- * ScrollRegion the scroll, and this shell adds only the inset
- * column the blocks stack in.
+ * dedupe): the surface frame is inlined below and ScrollRegion
+ * supplies the scroll, and this shell adds only the inset
+ * column the blocks stack in. The frame is the retired
+ * ScreenShell's (#741, inlined here and into RecipeDetailPage —
+ * its only two compositions): a full-height, surface-filled
+ * column with the #547 platform split — on native the frame's
+ * `flex: 1` (Col's grow shrink) fills the bounded frame
+ * BigFooterShell's "content" mode gives it; on web the document
+ * scrolls the whole page, so the frame renders as a plain
+ * growing surface column (grow only), since `flex: 1`'s zero
+ * basis collapsed it inside BigFooterShell's unbounded
+ * space-between column and left the footer at the viewport's
+ * bottom edge while the content overflowed past it (the
+ * rendered-Storybook audit on PR #556).
  *
  * The column is capped and centered: at most
  * SCROLL_SHELL_COLUMN_MAX_WIDTH (768px, the retired public
@@ -45,13 +56,23 @@ export type ScrollShellProps = {
 const SCROLL_SHELL_COLUMN_MAX_WIDTH = 768;
 
 export function ScrollShell({ children }: ScrollShellProps) {
+  const region = (
+    <ScrollRegion>
+      <Col width="100%" maxWidth={SCROLL_SHELL_COLUMN_MAX_WIDTH} alignSelf="center" p="l" gap="l">
+        {children}
+      </Col>
+    </ScrollRegion>
+  );
+  if (isWeb) {
+    return (
+      <Col grow backgroundColor="$surface">
+        {region}
+      </Col>
+    );
+  }
   return (
-    <ScreenShell>
-      <ScrollRegion>
-        <Col width="100%" maxWidth={SCROLL_SHELL_COLUMN_MAX_WIDTH} alignSelf="center" p="l" gap="l">
-          {children}
-        </Col>
-      </ScrollRegion>
-    </ScreenShell>
+    <Col grow shrink backgroundColor="$surface">
+      {region}
+    </Col>
   );
 }

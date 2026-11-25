@@ -1,5 +1,6 @@
 import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
-import { useMemo } from "react";
+import { useMemo, type ReactNode } from "react";
+import { isWeb } from "../../widgets/platform.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { Button } from "../../widgets/actions/Button.js";
 import { CenteredText } from "../../widgets/content/CenteredText.js";
@@ -30,7 +31,6 @@ import {
   type RatingsCardRatings,
   type RatingsCardViewerRating,
 } from "../../widgets/data/RatingsCard.js";
-import { ScreenShell } from "../../widgets/layout/ScreenShell.js";
 import { ScrollRegion } from "../../widgets/layout/ScrollRegion.js";
 import { MainLandmark } from "../../widgets/layout/MainLandmark.js";
 import { ScrollShell } from "../../widgets/layout/ScrollShell.js";
@@ -1299,6 +1299,34 @@ function isGuestReadyProps(
   return props.viewer === "signedIn" || props.viewer === "signedOut";
 }
 
+/** The page's fixed-shell frame, inlined from the retired
+ * ScreenShell (#741 — this page was its only page consumer):
+ * a full-height, surface-filled column for the states that pin
+ * their own chrome above a ScrollRegion (the loading skeleton
+ * and the owner form). Platform split (#547, Stephen's
+ * page-scroll model): on native the frame's `flex: 1` (Col's
+ * grow shrink) fills the bounded frame BigFooterShell's
+ * "content" mode provides; on web the document scrolls the
+ * whole page, so the frame renders as a plain growing surface
+ * column (grow only) — `flex: 1`'s zero basis collapsed it
+ * inside BigFooterShell's unbounded space-between column,
+ * leaving the footer at the viewport's bottom edge while the
+ * content overflowed past it (PR #556's audit). */
+function RecipeDetailFrame({ children }: { children: ReactNode }) {
+  if (isWeb) {
+    return (
+      <Col grow backgroundColor="$surface">
+        {children}
+      </Col>
+    );
+  }
+  return (
+    <Col grow shrink backgroundColor="$surface">
+      {children}
+    </Col>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // The page.
 // ---------------------------------------------------------------------------
@@ -1324,7 +1352,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
     return (
       <BigFooterShell footer={props.footer} scrollMode="content">
         <LoadingScope active>
-          <ScreenShell>
+          <RecipeDetailFrame>
             <Toolbar>
               <BoxSkeleton width={96} height={24} />
               <BoxSkeleton width={180} height={40} />
@@ -1358,7 +1386,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
                 <TextSkeleton size="md" lines={3} />
               </Col>
             </ScrollRegion>
-          </ScreenShell>
+          </RecipeDetailFrame>
         </LoadingScope>
       </BigFooterShell>
     );
@@ -1422,7 +1450,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
 
   return (
     <BigFooterShell footer={props.footer} scrollMode="content">
-      <ScreenShell>
+      <RecipeDetailFrame>
         <ScrollRegion>
           <OverviewPanel overview={props.overview} />
           <IngredientsPanel ingredients={props.ingredients} />
@@ -1447,7 +1475,7 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
             <NutritionPanel nutrition={props.nutrition} />
           </Col>
         </ScrollRegion>
-      </ScreenShell>
+      </RecipeDetailFrame>
       {props.recipeDeleteConfirmation ? (
         <ConfirmActionView {...props.recipeDeleteConfirmation} />
       ) : null}

@@ -197,3 +197,24 @@ test("SSR: RecipeDetailPage guest mode (ScrollShell → ScrollRegion) renders no
     "the footer renders after the page content",
   );
 });
+test("SSR: RecipeDetailPage loading (inlined frame + ScrollRegion) flows as one page (#547, #741)", async () => {
+  // The retired ScreenShell's shape test, carried onto the real
+  // composition since #741 inlined the frame into the page: the
+  // loading state is the frame + pinned Toolbar + ScrollRegion
+  // shape, and the whole page flows — no vertical scroller, and
+  // the footer renders after the full skeleton content.
+  const { RecipeDetailPage, eciperayFooterFixture } = await loadRuntime();
+  const html = await renderToHtml(
+    <RecipeDetailPage state="loading" footer={eciperayFooterFixture} />,
+  );
+  assert.deepEqual(
+    verticalScrollers(html),
+    [],
+    "the recipe page's loading rendered web markup contains no vertical scroller",
+  );
+  const lastSectionAt = html.indexOf("Nutrition");
+  assert.ok(lastSectionAt !== -1, "the full loading composition renders");
+  const footerAt = html.indexOf('role="contentinfo"');
+  assert.ok(footerAt !== -1, "the footer renders");
+  assert.ok(lastSectionAt < footerAt, "the footer renders after the full content");
+});

@@ -4,11 +4,14 @@
  * single ScrollRegion holds the page's blocks in an inset column
  * with the standard separation rhythm.
  *
- * PublicRecipePage hand-rolled this shell as a styled YStack
- * around its ScrollView — styling a page may not apply itself
- * under #119 — so the shell is a component here and the page
- * composes it. The paint is contractual: the page's own surface
- * paint is what its sections sit on inside the host's frame.
+ * The public recipe surface hand-rolled this shell as a styled
+ * YStack around its ScrollView — styling a page may not apply
+ * itself under #119 — so the shell is a component here and the
+ * page composes it. The paint is contractual: the page's own
+ * surface paint is what its sections sit on inside the host's
+ * frame. Since #741 the surface frame is inlined in the shell
+ * itself (the retired ScreenShell's #547 platform split, carried
+ * below) instead of composed from a separate shell widget.
  *
  * Source scan plus a dist export check, like the other component
  * contract tests. The dist import needs the harness's
@@ -46,10 +49,13 @@ test("ScrollShellProps is a type-only export from the built components barrel", 
 
 test("ScrollShell paints the surface and scrolls its inset column through ScrollRegion", () => {
   assert.match(scrollShellCode, /export type ScrollShellProps = \{\s+children: ReactNode;\s+\};/);
-  // The dedupe rebuild composes ScreenShell — the shell that owns
-  // the flex + surface paint — instead of re-painting its own
-  // frame (cluster B9: one shell implementation).
-  assert.match(scrollShellCode, /<ScreenShell>/);
+  // The frame is inlined (#741): the shell renders the retired
+  // ScreenShell's surface column itself, with its #547 platform
+  // split — the web branch grows only, the native branch keeps
+  // flex: 1's grow/shrink translation.
+  assert.match(scrollShellCode, /if \(isWeb\) \{/);
+  assert.match(scrollShellCode, /<Col grow backgroundColor="\$surface">/);
+  assert.match(scrollShellCode, /<Col grow shrink backgroundColor="\$surface">/);
   assert.equal(
     scrollShellCode.split("<ScrollRegion>").length - 1,
     1,
