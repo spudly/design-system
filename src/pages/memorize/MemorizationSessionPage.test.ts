@@ -183,6 +183,7 @@ test("feedback renders as the warning alert only when present; advance label swi
   const advance = withFeedback[6];
   assert.equal(advance.type, Button);
   assert.equal(advance.props.children, "Next round");
+  assert.equal(advance.props.variant, "primary", "an ordinary round keeps the primary variant");
   advance.props.onPress();
   assert.equal(advances, 1, "advance fires onAdvance");
 
@@ -193,6 +194,11 @@ test("feedback renders as the warning alert only when present; advance label swi
     final[6].props.children,
     "Finish — mark memorized",
     "the advance label switches on the final round, as the app's does",
+  );
+  assert.equal(
+    final[6].props.variant,
+    "accent",
+    "the final round's completion action takes the accent (mastery) variant (#850)",
   );
 });
 

@@ -162,7 +162,9 @@ export type MemorizationSessionPageReadyProps = {
   feedback?: string | null;
   /** Whether the current round is the session's last — the
    * advance button reads "Finish — mark memorized" instead
-   * of "Next round". */
+   * of "Next round" and takes the accent (mastery) variant,
+   * the brief's reserved progress/mastery treatment (#850);
+   * ordinary rounds keep the primary variant. */
   isFinalRound: boolean;
   /** Leave the session (the BackLink). */
   onBack: () => void;
@@ -259,7 +261,7 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
           </VerseText>
         </Card>
         {feedback ? <Alert severity="warning">{feedback}</Alert> : null}
-        <Button onPress={onAdvance}>
+        <Button onPress={onAdvance} variant={isFinalRound ? "accent" : "primary"}>
           {isFinalRound ? "Finish — mark memorized" : "Next round"}
         </Button>
       </ScreenContainer>

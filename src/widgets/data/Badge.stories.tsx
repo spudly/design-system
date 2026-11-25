@@ -10,7 +10,7 @@ const meta: Meta<typeof Badge> = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "info", "success", "warning", "danger"],
+      options: ["neutral", "info", "success", "warning", "danger", "mastery"],
     },
     color: { control: "select", options: [...tagColorNames] },
     selected: { control: "boolean" },
@@ -40,6 +40,10 @@ export const Danger: Story = {
   args: { tone: "danger", children: "Overdue" },
 };
 
+export const Mastery: Story = {
+  args: { tone: "mastery", children: "Memorized" },
+};
+
 export const ColoredTag: Story = {
   args: { color: "indigo", children: "Weeknight" },
 };
@@ -61,6 +65,7 @@ export const AllTones: Story = {
       <Badge tone="success">Success</Badge>
       <Badge tone="warning">Warning</Badge>
       <Badge tone="danger">Danger</Badge>
+      <Badge tone="mastery">Mastery</Badge>
     </XStack>
   ),
 };

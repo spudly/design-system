@@ -32,6 +32,10 @@ export function useVariantGlyphInk(
         return tokens.colors.gray.gray10;
       case "danger":
         return tokens.colors.danger.danger7;
+      case "accent":
+        // The ghost accent button's ink is the accent itself (#850),
+        // matching its label ink from Button's ghostLabelColors.
+        return roleValue("accent") ?? "#b45309";
       case "primary":
       default:
         return roleValue("primary") ?? tokens.colors.primary.primary7;
@@ -43,6 +47,10 @@ export function useVariantGlyphInk(
     case "ghost":
       return roleValue("link") ?? tokens.colors.primary.primary8;
     case "danger":
+      return "#ffffff";
+    case "accent":
+      // The filled accent button's label is white (#850), so its
+      // glyph takes the same ink.
       return "#ffffff";
     case "primary":
     default:
