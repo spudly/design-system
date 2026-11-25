@@ -75,7 +75,7 @@ const MEMORIZE_MARK_ACCENT = "#b45309";
  * fan — the concept's central flame.
  */
 const MEMORIZE_FLAME_PATH =
-  "M128 38c5 10 13 17 13 28 0 8-5 14-9 18l-1 34h-6l-1-34c-4-4-9-10-9-18 0-6 3-11 6-16-1 4 0 7 2 10-1-7 1-15 8-22z";
+  "M128 34c6 14 14 22 14 36 0 12-6 20-11 24l-1 56h-4l-1-56c-5-4-11-12-11-24 0-14 8-22 14-36z";
 
 export type BrandMarkProps = {
   /** The brand whose mark renders — data, never an element. */
@@ -117,16 +117,17 @@ export function BrandMark({ mark, size = 24 }: BrandMarkProps) {
           <Path d="M129.0 165.0 L211.7 134.8 L127.0 159.0 Z" fill={MEMORIZE_MARK_ACCENT} />
           <Path d="M128.3 165.2 L189.7 155.5 L127.7 158.8 Z" fill={MEMORIZE_MARK_ACCENT} />
           <Path d={MEMORIZE_FLAME_PATH} fill={MEMORIZE_MARK_ACCENT} />
-          {/* The open book: page edges, two covers, and the central spine. */}
+          {/* The open book: page edges offset above the covers, two
+              covers either side of the central spine. */}
           <Path
-            d="M42 148 L118 162 L118 168 L42 156 Z M138 162 L214 148 L214 156 L138 168 Z"
+            d="M48 144 L116 158 L116 166 L48 154 Z M140 158 L208 144 L208 154 L140 166 Z"
             fill={MEMORIZE_MARK_BOOK}
           />
-          <Path d="M40 156 L116 170 L116 224 L40 210 Z" fill={MEMORIZE_MARK_BOOK} />
-          <Path d="M140 170 L216 156 L216 210 L140 224 Z" fill={MEMORIZE_MARK_BOOK} />
-          <Path d="M116 170 L140 170 L140 226 Q128 232 116 226 Z" fill={MEMORIZE_MARK_BOOK} />
+          <Path d="M52 154 L116 166 L116 218 L52 206 Z" fill={MEMORIZE_MARK_BOOK} />
+          <Path d="M140 166 L204 154 L204 206 L140 218 Z" fill={MEMORIZE_MARK_BOOK} />
+          <Path d="M116 166 L140 166 L140 220 Q128 226 116 220 Z" fill={MEMORIZE_MARK_BOOK} />
           {/* The notched bookmark hanging below the right cover. */}
-          <Path d="M178 212 L196 212 L196 234 L187 227 L178 234 Z" fill={MEMORIZE_MARK_ACCENT} />
+          <Path d="M172 208 L194 208 L194 232 L183 224 L172 232 Z" fill={MEMORIZE_MARK_ACCENT} />
         </Svg>
       );
   }
