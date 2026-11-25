@@ -85,6 +85,18 @@ const buttonFrameConfig = {
         backgroundColor: tokens.colors.danger.danger7,
         color: "#ffffff",
       },
+      accent: {
+        // The mastery/completion treatment (#850): the fill is the
+        // active theme's semantic accent — the role the design brief
+        // reserves for progress/mastery (muted gold #b45309 in
+        // Memorize's Quiet Dawn, sage in Eciperay's Warm Harvest) —
+        // with a white label: white on the Memorize gold keeps WCAG
+        // AA contrast (~5:1), as it does on the sage accent. Reserve
+        // it for mastery moments (e.g. "Finish — mark memorized");
+        // ordinary primary/navigation actions stay `primary`.
+        backgroundColor: "$accent",
+        color: "#ffffff",
+      },
     },
     size: {
       // #469: one explicit minimum height per size, shared by every form
@@ -220,7 +232,7 @@ type ButtonOwnProps = Omit<
    * it composes with the real variants. When set, the background
    * becomes transparent and any border is removed, and the label
    * and glyph ink match the variant (primary: `$primary`,
-   * secondary: gray10, danger: danger7). A selected toggle's
+   * secondary: gray10, danger: danger7, accent: `$accent`). A selected toggle's
    * filled treatment still wins over it. (The legacy
    * `ghost` spelling is deprecated: it keeps rendering
    * with the old `$link` ink until hosts migrate to this prop.)
@@ -395,6 +407,7 @@ const variantLabelColors = {
   // `ghost` prop inks per variant from `ghostLabelColors` below.
   ghost: "$link",
   danger: "#ffffff",
+  accent: "#ffffff",
 } as const;
 
 /**
@@ -408,6 +421,7 @@ const ghostLabelColors = {
   primary: "$primary",
   secondary: tokens.colors.gray.gray10,
   danger: tokens.colors.danger.danger7,
+  accent: "$accent",
 } as const;
 
 /** Standard glyph size per Button size, for the icon slot. */
@@ -491,7 +505,8 @@ function buttonFrameTreatment({
 /**
  * Universal cross-platform button (web + React Native via Tamagui).
  *
- * Props: `variant` ("primary" | "secondary" | "danger" — the
+ * Props: `variant` ("primary" | "secondary" | "danger" | "accent"
+ * — "accent" is the mastery/completion treatment, #850 — the
  * "ghost" variant value is DEPRECATED, #463), `ghost` (boolean:
  * transparent background, no border, ink matching the variant —
  * it composes with the variants instead of being one), `size`
@@ -644,7 +659,10 @@ function ButtonImpl(props: ButtonRenderProps, ref: Ref<TamaguiElement>) {
   const ghostInkApplies =
     ghost &&
     !selected &&
-    (variant === "primary" || variant === "secondary" || variant === "danger");
+    (variant === "primary" ||
+      variant === "secondary" ||
+      variant === "danger" ||
+      variant === "accent");
   // The danger tone (#480) applies to the secondary form: Button
   // owns the danger1 fill / danger8 ink treatment internally.
   const dangerToneApplies = tone === "danger" && variant === "secondary" && !selected;

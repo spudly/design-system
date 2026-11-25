@@ -39,7 +39,7 @@ Button's href form, or a changeset naming LandingPage.
 ## Button
 
 Open in `Widgets/Button`: Primary, Secondary, Ghost, Danger,
-Sizes, Disabled, AllVariants, WithIcon, WithIconVariants, IconOnly,
+Accent, Sizes, Disabled, AllVariants, WithIcon, WithIconVariants, IconOnly,
 IconOnlyVariants, IconSizes, IconDisabled, IconPressCounter,
 Toggle, ToggleStates.
 

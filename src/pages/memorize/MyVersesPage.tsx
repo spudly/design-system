@@ -42,7 +42,8 @@ import { BoundedList } from "../shared/BoundedList.js";
  *   badge, the verse text (verse variant), an optional next
  *   review line (hint), and a Drill / Remove button pair. The
  *   badge's text is the status itself, as the app renders it;
- *   its tone follows the app's rule (memorized is success,
+ *   its tone follows the app's rule (memorized is mastery —
+ *   the accent treatment the brief reserves for mastery, #850;
  *   learning is info) — presentation the view owns, driven by
  *   the status value.
  * - The next-review line crosses the boundary pre-composed
@@ -125,7 +126,7 @@ function MyVerseRow({
   return (
     <Card>
       <Text variant="subheading">{item.reference}</Text>
-      <Badge tone={item.status === "memorized" ? "success" : "info"}>{item.status}</Badge>
+      <Badge tone={item.status === "memorized" ? "mastery" : "info"}>{item.status}</Badge>
       <Text variant="verse">{item.text}</Text>
       {item.nextReviewLabel ? <Text variant="hint">{item.nextReviewLabel}</Text> : null}
       <ButtonRow>
