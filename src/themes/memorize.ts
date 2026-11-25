@@ -5,7 +5,7 @@ import { quietDawnTagColors, quietDawnTagColorShades } from "./tagColors.js";
 /**
  * Memorize theme — "Quiet Dawn" visual direction (approved 2026-10-12).
  *
- * Cool dawn-paper background, deep teal primary, ink text. Gold accent is reserved
+ * Warm paper background (brief M1 Quiet Dawn, #faf8f2), deep teal primary, ink text. Gold accent is reserved
  * for progress/mastery states and used sparingly. Primary steps are chosen
  * for WCAG AA contrast (white text on primary ≥ 4.5:1).
  */
@@ -17,18 +17,19 @@ export const memorizeTheme = {
   tagColorShades: quietDawnTagColorShades,
   semantic: {
     ...baseTheme.semantic,
-    // Distinct from Warm Harvest's warm cream (#faf6f0) — the two
-    // themes previously resolved to near-identical warm off-whites
-    // (#68). Quiet Dawn's background is a cool, faintly teal dawn
-    // tint that fits its teal primary; the border cools with it (the
-    // old #e9e2d5 was Warm Harvest's warm sand, shared verbatim).
+    // The design brief's warm paper (#849, Stephen's brief-wins
+    // call 2026-11-25): Quiet Dawn's background is the brief's
+    // #faf8f2, superseding the cool dawn tint #68 introduced so the
+    // two themes would not share near-identical warm off-whites —
+    // Stephen accepted that sameness when he approved the brief
+    // value. The border warms with it (the warm sand #e9e2d5).
     // Ink text and muted text keep AA+ contrast on it, and the white
-    // surface stays clearly distinguishable from the background.
-    background: "#e9f0ee",
+    // surface stays distinguishable from the background.
+    background: "#faf8f2",
     surface: "#ffffff",
     text: "#2b2620",
     textMuted: "#57534e",
-    border: "#d3ded9",
+    border: "#e9e2d5",
     primary: tokens.colors.teal.teal8,
     primaryHover: tokens.colors.teal.teal9,
     primaryActive: tokens.colors.teal.teal10,
