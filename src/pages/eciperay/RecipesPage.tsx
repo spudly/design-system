@@ -9,10 +9,7 @@ import {
   type CatalogPageFilterProps,
 } from "../../views/eciperay/CatalogFiltersBar.js";
 import { CatalogHeader } from "../../views/eciperay/CatalogHeader.js";
-import {
-  DiscoveryCard,
-  type DiscoveryCardAction,
-} from "../../widgets/content/DiscoveryCard.js";
+import { DiscoveryCard, type DiscoveryCardAction } from "../../widgets/content/DiscoveryCard.js";
 import { EmptyState } from "../../views/shared/EmptyState.js";
 import { Spacer } from "../../widgets/layout/Spacer.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
@@ -21,6 +18,7 @@ import type { SelectOption } from "../../widgets/form/SelectField.js";
 import { LoadingMediaRow } from "../../widgets/feedback/LoadingMediaRow.js";
 import { ScrollSentinel } from "../../widgets/layout/ScrollSentinel.js";
 import { Text } from "../../widgets/data/Text.js";
+import { Thumbnail } from "../../widgets/data/Thumbnail.js";
 import { RatingForm } from "../../widgets/form/RatingForm.js";
 import { BoundedList } from "../shared/BoundedList.js";
 import { RecipeRow, type RecipeRowItem } from "../shared/recipeRow.js";
@@ -290,6 +288,19 @@ export type RecipesPageCookLogForm = {
 export type RecipesPageProps = CatalogPageFilterProps<RecipesPageFilterId> & {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /**
+   * Photography-led lead image (#852): a host-supplied image URL
+   * rendered as the hero `Thumbnail` above the catalog, following
+   * RecipeDetailPage's pattern. It rides in the list header so it
+   * scrolls with the catalog on native and renders above the
+   * filters on web, in both variants. Absent or null, nothing
+   * renders in the lead slot and the page stays text-led as
+   * before — no placeholder art is baked into the design system
+   * (Stephen's approved option 1 for #852).
+   */
+  leadImageUrl?: string | null;
+  /** Accessible name for the lead image; absent, it is decorative. */
+  leadImageAccessibilityLabel?: string;
 
   /**
    * Which catalog this page renders (#547, Option 2 — RecipesPage
@@ -745,6 +756,8 @@ function WebScrollSentinel({ sections }: { sections: WebScrollSentinelSection[] 
  */
 export function RecipesPage(props: RecipesPageProps) {
   const {
+    leadImageUrl,
+    leadImageAccessibilityLabel,
     variant = "signed-in",
     title: publicTitle,
     searchPlaceholder: publicSearchPlaceholder = "Search public recipes\u2026",
@@ -1136,6 +1149,26 @@ export function RecipesPage(props: RecipesPageProps) {
     </Col>
   );
 
+  // The photography-led lead (#852): the hero Thumbnail above
+  // the catalog when the host supplies one, nothing when it does
+  // not. The header form carries a trailing Spacer for the same
+  // $3 bottom separation the filters header carries (the rows
+  // own their separation individually, so no parent gap can own
+  // this one; #746 — same sanctioned exception as filtersHeader).
+  const leadImage = leadImageUrl ? (
+    <Thumbnail
+      variant="hero"
+      src={leadImageUrl}
+      {...(leadImageAccessibilityLabel ? { accessibilityLabel: leadImageAccessibilityLabel } : {})}
+    />
+  ) : null;
+  const leadHeader = leadImage ? (
+    <Col>
+      {leadImage}
+      <Spacer y="m" />
+    </Col>
+  ) : null;
+
   if (variant === "public") {
     const publicItems: RecipesPageDiscoveryItem[] = publicLoading ? [] : (publicRecipes ?? []);
     if (isWeb) {
@@ -1146,6 +1179,7 @@ export function RecipesPage(props: RecipesPageProps) {
         <BigFooterShell footer={props.footer} scrollMode="content">
           <ScreenContainer variant="list">
             <Col gap="m" px="l">
+              {leadImage}
               <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
               {publicLoading ? (
                 <LoadingDiscoveryRows />
@@ -1193,7 +1227,10 @@ export function RecipesPage(props: RecipesPageProps) {
             data={publicItems}
             keyExtractor={(recipe) => recipe.id}
             ListHeaderComponent={
-              <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
+              <>
+                {leadHeader}
+                <CatalogHeader title={publicTitle ?? ""}>{filtersBar}</CatalogHeader>
+              </>
             }
             renderItem={({ item }) => (
               <DiscoveryCard
@@ -1240,6 +1277,7 @@ export function RecipesPage(props: RecipesPageProps) {
       <BigFooterShell footer={props.footer} scrollMode="content">
         <ScreenContainer variant="list">
           <Col px="l">
+            {leadHeader}
             {filtersHeader}
             {rows.map((row) => (
               <Fragment key={recipesPageRowKey(row)}>{renderRow(row)}</Fragment>
@@ -1288,7 +1326,12 @@ export function RecipesPage(props: RecipesPageProps) {
           // flips a section's loading flag and a tree swap would
           // unmount the focused filter input mid-typing; the loading
           // indicators render as the sections' own rows instead.
-          ListHeaderComponent={filtersHeader}
+          ListHeaderComponent={
+            <>
+              {leadHeader}
+              {filtersHeader}
+            </>
+          }
           renderItem={({ item: row }) => renderRow(row)}
           onEndReached={handleListEndReached}
           onScroll={handleListScroll}

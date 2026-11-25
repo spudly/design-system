@@ -10,7 +10,7 @@ const meta: Meta<typeof Badge> = {
   argTypes: {
     tone: {
       control: "select",
-      options: ["neutral", "info", "success", "warning", "danger", "mastery"],
+      options: ["neutral", "info", "success", "warning", "danger", "mastery", "accent"],
     },
     color: { control: "select", options: [...tagColorNames] },
     selected: { control: "boolean" },
@@ -44,6 +44,10 @@ export const Mastery: Story = {
   args: { tone: "mastery", children: "Memorized" },
 };
 
+export const Accent: Story = {
+  args: { tone: "accent", children: "Shared with you" },
+};
+
 export const ColoredTag: Story = {
   args: { color: "indigo", children: "Weeknight" },
 };
@@ -66,6 +70,7 @@ export const AllTones: Story = {
       <Badge tone="warning">Warning</Badge>
       <Badge tone="danger">Danger</Badge>
       <Badge tone="mastery">Mastery</Badge>
+      <Badge tone="accent">Accent</Badge>
     </XStack>
   ),
 };
@@ -96,7 +101,11 @@ export const SelectableDisabled: Story = {
 
 export const Removable: Story = {
   render: function RemovableStory() {
-    const [values, setValues] = useState<string[]>(["Weeknight", "Comfort food", "Freezer friendly"]);
+    const [values, setValues] = useState<string[]>([
+      "Weeknight",
+      "Comfort food",
+      "Freezer friendly",
+    ]);
     return (
       <XStack gap={8}>
         {values.map((label) => (

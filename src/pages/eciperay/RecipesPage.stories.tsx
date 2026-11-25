@@ -1,4 +1,5 @@
 import { eciperayFooterFixture } from "../shared/fixtures.js";
+import { storyImageWide } from "../../storyFixtures.js";
 import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { Text } from "../../widgets/data/Text.js";
@@ -161,6 +162,7 @@ function RecipesPageDemo({
   expandedRecipeId,
   initialActiveFilters,
   initialFilterChooserOpen = false,
+  withLeadImage = false,
 }: {
   initialSearch?: string;
   ownRecipes?: RecipesPageItem[];
@@ -177,6 +179,7 @@ function RecipesPageDemo({
   expandedRecipeId?: string;
   initialActiveFilters?: RecipesPageFilterId[];
   initialFilterChooserOpen?: boolean;
+  withLeadImage?: boolean;
 }) {
   const [search, setSearch] = useState(initialSearch);
   const [statusFilter, setStatusFilter] = useState("all");
@@ -218,6 +221,7 @@ function RecipesPageDemo({
     <>
       <RecipesPage
         footer={eciperayFooterFixture}
+        {...(withLeadImage ? { leadImageUrl: storyImageWide } : {})}
         ownTitle="Your recipes"
         ownRecipes={pagedOwn}
         loadingOwn={loadingOwn}
@@ -280,6 +284,12 @@ export const Default: Story = {
   // first under "Your recipes", then public discovery content
   // under "Discover", one search/filter bar above both.
   render: () => <RecipesPageDemo />,
+};
+
+export const WithLeadImage: Story = {
+  // Photography-led lead (#852): the host-supplied lead image
+  // renders as the hero above the catalog.
+  render: () => <RecipesPageDemo withLeadImage />,
 };
 
 export const Filtered: Story = {

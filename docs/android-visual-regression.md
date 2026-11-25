@@ -329,7 +329,7 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-editversionpage              | light_warmHarvest |       2 |         2 |
 | pages-eciperay-feedbackpage                 | light_warmHarvest |       2 |         2 |
 | pages-eciperay-forgotpasswordpage           | light_warmHarvest |       3 |         3 |
-| pages-eciperay-homepage                     | light_warmHarvest |       4 |         4 |
+| pages-eciperay-homepage                     | light_warmHarvest |       5 |         4 |
 | pages-eciperay-importimagepage              | light_warmHarvest |       1 |         1 |
 | pages-eciperay-importreviewpage             | light_warmHarvest |       2 |         2 |
 | pages-eciperay-importtextpage               | light_warmHarvest |       2 |         2 |
@@ -342,14 +342,14 @@ refreshes itself when baselines land (issue #284).
 | pages-eciperay-mealformpage                 | light_warmHarvest |       4 |         4 |
 | pages-eciperay-mealplandetailpage           | light_warmHarvest |      10 |        10 |
 | pages-eciperay-mealplanformpage             | light_warmHarvest |       2 |         2 |
-| pages-eciperay-mealplanspage                | light_warmHarvest |       5 |         5 |
+| pages-eciperay-mealplanspage                | light_warmHarvest |       6 |         5 |
 | pages-eciperay-mealshubpage                 | light_warmHarvest |       7 |         7 |
 | pages-eciperay-paypage                      | light_warmHarvest |       5 |         5 |
 | pages-eciperay-profilepage                  | light_warmHarvest |       2 |         2 |
 | pages-eciperay-recipedetailpage             | light_warmHarvest |      22 |        22 |
 | pages-eciperay-recipeformpage               | light_warmHarvest |       6 |         6 |
-| pages-eciperay-recipespage                  | light_warmHarvest |      15 |        15 |
-| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      15 |        15 |
+| pages-eciperay-recipespage                  | light_warmHarvest |      16 |        15 |
+| pages-eciperay-recipespage — narrow variant | light_warmHarvest |      16 |        15 |
 | pages-eciperay-resetpasswordpage            | light_warmHarvest |       2 |         2 |
 | pages-eciperay-routeerrorpage               | light_warmHarvest |       3 |         3 |
 | pages-eciperay-shoppinglistpage             | light_warmHarvest |       4 |         4 |
@@ -363,7 +363,7 @@ refreshes itself when baselines land (issue #284).
 | pages-memorize-myversespage                 | light_quietDawn   |       2 |         2 |
 | pages-memorize-tabbedshellpage              | light_quietDawn   |       8 |         8 |
 | pages-memorize-versesearchpage              | light_quietDawn   |       6 |         6 |
-| **Total**                                   |                   | **199** |   **199** |
+| **Total**                                   |                   | **203** |   **199** |
 
 <!-- VR-COVERAGE-END -->
 
