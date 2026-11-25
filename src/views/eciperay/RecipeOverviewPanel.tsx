@@ -4,9 +4,8 @@ import { tokens } from "../../tokens/index.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../../widgets/accessibility.js";
-import { StatBand } from "../../widgets/data/StatBand.js";
-import { StatCard } from "../../widgets/data/StatCard.js";
 import { Badge, type BadgeProps } from "../../widgets/data/Badge.js";
+import { MetadataBadge } from "../../widgets/data/MetadataBadge.js";
 import { BoxSkeleton } from "../../widgets/feedback/BoxSkeleton.js";
 import { SkeletonBone } from "../../widgets/feedback/SkeletonClock.js";
 import { TagList } from "../../widgets/data/TagList.js";
@@ -18,8 +17,8 @@ import { useVoice } from "../../voice/index.js";
 /**
  * A recipe's overview panel: the header block of the two recipe
  * surfaces (RecipeDetailPage and PublicRecipePage) — hero image,
- * title, status badge, description, the servings/prep/cook stat
- * band, and the tag row. Both pages carried this panel inline
+ * title, status badge, description, the servings/prep/cook
+ * metadata badge, and the tag row. Both pages carried this panel inline
  * before it moved here (#119); the view-model shape is declared
  * here structurally so either page's overview object composes
  * it without a second shape to drift. The panel carries no
@@ -47,7 +46,7 @@ import { useVoice } from "../../voice/index.js";
  *
  * The pieces are the shared ones (#119 dedupe): the status
  * badge is the Badge component, the tag row is the
- * TagList, the stats compose StatBand/StatCard, and the hero is
+ * TagList, the stats compose the MetadataBadge, and the hero is
  * Thumbnail's frame. The status itself arrives as a tone and a
  * label the caller resolved from its own status vocabulary —
  * the design system owns no status map (Stephen's ruling on
@@ -77,7 +76,7 @@ export type RecipeOverviewPanelProps = {
   /** The status badge's label, resolved by the caller. The badge
    * renders only when a label is supplied. */
   statusLabel?: string;
-  /** Stat band values, app-formatted ("4", "15m", "30m"). */
+  /** Metadata badge values, app-formatted ("4", "15m", "30m"). */
   servingsLabel: string;
   prepTimeLabel?: string;
   cookTimeLabel?: string;
@@ -86,7 +85,7 @@ export type RecipeOverviewPanelProps = {
    * its layout block by block — a box skeleton at the hero
    * frame's geometry when an image is present, title and
    * description bones at their own sizes, a pill bone for the
-   * status badge, the stat band in its own loading state, and
+   * status badge, a pill bone for the metadata badge, and
    * the tag list in its loading state — with no real title,
    * values, or tag names. Blocks the loaded panel omits (no
    * image, no description, no tags) stay omitted. An enclosing
@@ -110,6 +109,15 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
   } = props;
   const voice = useVoice();
   const showSkeleton = useLoadingScope(loading);
+  // The stats as metadata-badge parts (#743): each part is the
+  // voice label composed with its app-formatted value — the
+  // badge joins the present parts with " • ". Prep and cook
+  // parts exist only when their values do.
+  const metadataParts = [
+    `${voice.recipeOverviewPanel.servingsLabel} ${servingsLabel}`,
+    prepTimeLabel ? `${voice.recipeOverviewPanel.prepLabel} ${prepTimeLabel}` : undefined,
+    cookTimeLabel ? `${voice.recipeOverviewPanel.cookLabel} ${cookTimeLabel}` : undefined,
+  ];
 
   if (showSkeleton) {
     // Loading (#278): the same block stack, skeletonized block
@@ -118,9 +126,10 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
     // the 2xl size, the status badge a pill bone at the badge's
     // geometry (width estimated from its label, the TagList
     // estimate), the description two bones at the body size,
-    // and the stat band and tag row in their own loading states
-    // (each renders its dummy items through the scope). The
-    // region is marked busy; no real content shows.
+    // a pill bone for the metadata badge (width estimated from
+    // its composed text, the same estimate), and the tag row in
+    // its own loading state. The region is marked busy; no real
+    // content shows.
     return (
       <LoadingScope active>
         <Col {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
@@ -153,15 +162,22 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
             </>
           ) : null}
           <>
-            <StatBand loading loadingCount={1 + (prepTimeLabel ? 1 : 0) + (cookTimeLabel ? 1 : 0)}>
-              <StatCard label={voice.recipeOverviewPanel.servingsLabel} value={servingsLabel} />
-              {prepTimeLabel ? (
-                <StatCard label={voice.recipeOverviewPanel.prepLabel} value={prepTimeLabel} />
-              ) : null}
-              {cookTimeLabel ? (
-                <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} />
-              ) : null}
-            </StatBand>
+            <Col alignSelf="flex-start">
+              <SkeletonBone
+                width={
+                  Math.round(
+                    metadataParts.filter((part): part is string => part !== undefined).join(" • ")
+                      .length *
+                      tokens.typography.fontSize.xs *
+                      0.62,
+                  ) +
+                  tokens.spacing[2] * 2 +
+                  2
+                }
+                height={14 + tokens.spacing[1] * 2 + 2}
+                borderRadius={tokens.radii.full}
+              />
+            </Col>
             <Spacer y="l" />
           </>
           {tags.length > 0 ? <TagList tags={tags} loading /> : null}
@@ -202,15 +218,9 @@ export function RecipeOverviewPanel(props: RecipeOverviewPanelProps) {
         </>
       ) : null}
       <>
-        <StatBand>
-          <StatCard label={voice.recipeOverviewPanel.servingsLabel} value={servingsLabel} />
-          {prepTimeLabel ? (
-            <StatCard label={voice.recipeOverviewPanel.prepLabel} value={prepTimeLabel} />
-          ) : null}
-          {cookTimeLabel ? (
-            <StatCard label={voice.recipeOverviewPanel.cookLabel} value={cookTimeLabel} />
-          ) : null}
-        </StatBand>
+        <Col alignSelf="flex-start">
+          <MetadataBadge parts={metadataParts} />
+        </Col>
         <Spacer y="l" />
       </>
       {tags.length > 0 ? <TagList tags={tags} /> : null}

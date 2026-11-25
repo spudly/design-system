@@ -33,8 +33,7 @@ import { ScreenShell } from "../../widgets/layout/ScreenShell.js";
 import { ScrollRegion } from "../../widgets/layout/ScrollRegion.js";
 import { SectionHeading } from "../../widgets/content/SectionHeading.js";
 import { SelectField } from "../../widgets/form/SelectField.js";
-import { StatBand } from "../../widgets/data/StatBand.js";
-import { StatCard } from "../../widgets/data/StatCard.js";
+import { SkeletonBone } from "../../widgets/feedback/SkeletonClock.js";
 import { Badge } from "../../widgets/data/Badge.js";
 import { MetadataBadge } from "../../widgets/data/MetadataBadge.js";
 import { StatusMessage } from "../../views/shared/StatusMessage.js";
@@ -80,7 +79,7 @@ import { STATUS_BADGES } from "../shared/recipeStatusBadges.js";
  * round (Stephen, 2026-11-20) fixed the order to the visual
  * direction's in-image flow — hero, metadata pill, serif title,
  * description, Ingredients, Instructions, Start Cooking, tip
- * line — with everything else (stat band, status badge + version
+ * line — with everything else (status badge + version
  * picker, servings/scale controls, action rows, substitutions,
  * cook history, nutrition) below Start Cooking, each section
  * under its own heading. The page originally split the sections across
@@ -95,7 +94,7 @@ import { STATUS_BADGES } from "../shared/recipeStatusBadges.js";
  * the skeleton shell (#278, tranche 4 — the centered-Spinner
  * pattern is deleted: the composition mirrors the ready layout's
  * sections in order — hero box bone, title and description
- * bones, the stat band in its loading state, then bone regions
+ * bones, a pill bone for the metadata badge, then bone regions
  * under the real Ingredients / Instructions / Cook History /
  * Nutrition headings), and `{ state: "ready", ... }` renders
  * the chrome and panels. If the app grows a not-found state, the
@@ -254,7 +253,7 @@ export type RecipeDetailPageOverviewProps = {
   imageUrl?: string | null;
   title: string;
   description?: string | null;
-  /** Overview stat band values, app-formatted ("4", "15m", "30m"). */
+  /** Overview metadata values, app-formatted ("4", "15m", "30m"). */
   servingsLabel: string;
   prepTimeLabel?: string;
   cookTimeLabel?: string;
@@ -713,7 +712,7 @@ function StartCookingPanel({ overview }: { overview: RecipeDetailPageOverviewPro
 /**
  * Everything below Start Cooking (#721 fidelity round, Stephen's
  * ruling: anything not in the visual direction image moves below
- * the Start Cooking button): the stat band, the status badge +
+ * the Start Cooking button): the status badge +
  * version selector, the servings stepper and scale pills, the
  * print/share/edit/delete and tweak action rows, the
  * substitutions panel, and the overview's remaining sections
@@ -735,9 +734,6 @@ function DetailsPanel({
   onSelectVersion: (versionId: string) => void;
 }) {
   const {
-    servingsLabel,
-    prepTimeLabel,
-    cookTimeLabel,
     actionMessage,
     onPrintPress,
     onSharePress,
@@ -782,11 +778,6 @@ function DetailsPanel({
 
   return (
     <Col gap="l" p="l">
-      <StatBand>
-        <StatCard label="Servings" value={servingsLabel} />
-        {prepTimeLabel ? <StatCard label="Prep" value={prepTimeLabel} /> : null}
-        {cookTimeLabel ? <StatCard label="Cook" value={cookTimeLabel} /> : null}
-      </StatBand>
       <Toolbar>
         <RecipeStatusBadge status={status} />
         <VersionPicker
@@ -1093,9 +1084,11 @@ export function RecipeDetailPage(props: RecipeDetailPageProps) {
                 <BoxSkeleton aspectRatio={4 / 3} />
                 <TextSkeleton size="2xl" lines={1} />
                 <TextSkeleton size="md" lines={3} />
-                <StatBand loading>
-                  <StatCard value="" label="" />
-                </StatBand>
+                <SkeletonBone
+                  width={200}
+                  height={14 + tokens.spacing[1] * 2 + 2}
+                  borderRadius={tokens.radii.full}
+                />
               </Col>
               <Col gap="l" p="l">
                 <SectionHeading>Ingredients</SectionHeading>

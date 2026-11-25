@@ -1,15 +1,15 @@
 /**
  * Contract test for RecipeOverviewPanel
  * (spudly/design-system#119), a recipe's overview header block —
- * hero image, title, status badge, description, stat band, tag
+ * hero image, title, status badge, description, metadata badge, tag
  * row — shared by the two recipe surfaces, which each carried it
  * inline before it moved here. Its invariants: the hero renders
  * only with an image (through Thumbnail's hero frame), the
  * status badge is the shared Badge fed a tone and label
  * the caller resolved from its own status vocabulary (the panel
  * owns no status map — status words are caller data, #119
- * dedupe), the stat band composes StatBand/StatCard with
- * conditional Prep and Cook stats, and tags render through
+ * dedupe), the stats compose the MetadataBadge with
+ * conditional Prep and Cook parts, and tags render through
  * TagList (Badge's color form, #207). Since #364 the title
  * also carries Text's `heading` treatment — level-1 heading
  * semantics on web with its rendered appearance unchanged —
@@ -55,18 +55,25 @@ test("the panel composes the shared building blocks with its conditional content
   assert.match(panelCode, /\{imageUrl \? \(/, "the hero renders only with an imageUrl");
   assert.match(panelCode, /<Thumbnail src=\{imageUrl\} \/>/, "the hero is Thumbnail's hero frame");
   assert.match(panelCode, /\{description \? \(/, "the description renders only when present");
-  assert.match(panelCode, /<StatBand>/, "the stat band is the shared StatBand");
   assert.match(
     panelCode,
-    /<StatCard label=\{voice\.recipeOverviewPanel\.servingsLabel\} value=\{servingsLabel\} \/>/,
+    /<MetadataBadge parts=\{metadataParts\} \/>/,
+    "the stats render through the shared MetadataBadge (#743)",
   );
   assert.match(
     panelCode,
-    /\{prepTimeLabel \? \(\s+<StatCard label=\{voice\.recipeOverviewPanel\.prepLabel\}/,
+    /`(?:\$\{voice\.recipeOverviewPanel\.servingsLabel\} \$\{servingsLabel\})`/,
+    "the servings part composes the voice label with the value",
   );
   assert.match(
     panelCode,
-    /\{cookTimeLabel \? \(\s+<StatCard label=\{voice\.recipeOverviewPanel\.cookLabel\}/,
+    /prepTimeLabel \? `\$\{voice\.recipeOverviewPanel\.prepLabel\} \$\{prepTimeLabel\}` : undefined/,
+    "the Prep part exists only with a prep time",
+  );
+  assert.match(
+    panelCode,
+    /cookTimeLabel \? `\$\{voice\.recipeOverviewPanel\.cookLabel\} \$\{cookTimeLabel\}` : undefined/,
+    "the Cook part exists only with a cook time",
   );
   assert.match(panelCode, /\{tags\.length > 0 \?/, "the tag row renders only with tags");
   assert.match(
@@ -95,7 +102,10 @@ test("the title carries level-1 heading semantics with unchanged rendering (#364
   );
   // Pin the variant's semantics against Text itself: the
   // `heading` variant maps to heading level 1.
-  const textSource = readFileSync(join(componentsDir, "..", "..", "widgets", "data", "Text.tsx"), "utf8");
+  const textSource = readFileSync(
+    join(componentsDir, "..", "..", "widgets", "data", "Text.tsx"),
+    "utf8",
+  );
   assert.match(
     textSource,
     /variant === "heading" \|\| variant === "title" \|\| variant === "formTitle" \|\| variant === "display"\s*\?\s*1/,

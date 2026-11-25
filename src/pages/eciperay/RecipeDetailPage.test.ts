@@ -112,8 +112,8 @@ test("the loading state renders only the spinner shell", () => {
   assert.ok(loadingAt < chromeAt, "the loading branch must come before the chrome render");
   assert.match(
     code,
-    /<LoadingScope active>[\s\S]*?<StatBand loading>/,
-    "the loading shell renders the skeleton composition in a LoadingScope (#278 tranche 4)",
+    /<LoadingScope active>[\s\S]*?<SkeletonBone/,
+    "the loading shell renders the skeleton composition in a LoadingScope (#278 tranche 4) — the metadata badge's slot is a pill bone (#743)",
   );
   assert.ok(!code.includes("Spinner"), "the loading state renders skeletons, not a Spinner (#278)");
 });
@@ -338,8 +338,10 @@ test("the comments slot renders in the overview panel after the ratings card", (
 test("optional content is omitted cleanly, never rendered as a shell", () => {
   assert.match(code, /\{imageUrl \? <Thumbnail/, "the hero image renders only with an imageUrl");
   assert.match(code, /\{description \? <Text variant="body">/, "description renders when present");
-  assert.match(code, /\{prepTimeLabel \? <StatCard label="Prep"/, "Prep stat needs a prep time");
-  assert.match(code, /\{cookTimeLabel \? <StatCard label="Cook"/, "Cook stat needs a cook time");
+  assert.ok(
+    !code.includes("StatCard") && !code.includes("StatBand"),
+    "the stat tiles are retired (#743) — the overview's MetadataBadge is the metadata presentation",
+  );
   assert.match(code, /\{editHref \? \(\s*<Button[^>]*href=\{editHref\}/, "Edit is href-gated");
   assert.match(code, /\{editDraftHref \? \(\s*<Button[^>]*href=\{editDraftHref\}/, "Edit draft");
   assert.match(

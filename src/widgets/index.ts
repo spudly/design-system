@@ -100,9 +100,6 @@ export {
 export { TextSkeleton, type TextSkeletonProps } from "./feedback/TextSkeleton.js";
 export { Spinner, type SpinnerProps } from "./feedback/Spinner.js";
 export { StarRatingInput, type StarRatingInputProps } from "./form/StarRatingInput.js";
-export { StatBand, type StatBandProps } from "./data/StatBand.js";
-export { StatCard, type StatCardProps } from "./data/StatCard.js";
-export { StatRow, type StatRowProps } from "./data/StatRow.js";
 export { StepDots, type StepDotsProps } from "./data/StepDots.js";
 export { Switch, type SwitchProps } from "./form/Switch.js";
 export { Tabs, type TabsProps } from "./actions/Tabs.js";

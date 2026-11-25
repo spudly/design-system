@@ -31,8 +31,9 @@ const LAST_LINE_WIDTH: `${number}%` = "64%";
 // text keeps: the misalignment Stephen's overlay stories
 // exposed on #551, verified by measuring both layers. Exported
 // as the ONE source of truth for skeleton text geometry: the
-// Button ghost-label bone and StatCard's per-run bones read
-// their heights from this table rather than restating them.
+// Button ghost-label bone and the per-run bones of skeletonized
+// text runs read their heights from this table rather than
+// restating them.
 export const LINE_BOXES: Record<TextSkeletonSize, { lineBox: number; bone: number }> = {
   xs: { lineBox: 14, bone: 10 },
   sm: { lineBox: 16, bone: 11 },
