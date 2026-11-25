@@ -16,6 +16,14 @@ const semantic = {
   primaryHover: tokens.colors.primary.primary8,
   primaryActive: tokens.colors.primary.primary9,
   onPrimary: "#ffffff",
+  /**
+   * Footer surface (#857): the BigFooter's background. Stephen's
+   * rule: the footer background matches the button color on the
+   * design brief — the primary (button) fill — so this role tracks
+   * `primary` per theme and BigFooter consumes this role instead
+   * of reaching for the raw primary token.
+   */
+  footerBackground: tokens.colors.primary.primary7,
   /** Light tint of primary for subtle backgrounds (badges, alerts). */
   primarySubtle: tokens.colors.primary.primary2,
   /**

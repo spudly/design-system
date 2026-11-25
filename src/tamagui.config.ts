@@ -62,6 +62,7 @@ function toTamaguiTheme(
     placeholderColor: semantic.textMuted,
     // Semantic aliases (brand roles).
     primary: semantic.primary,
+    footerBackground: semantic.footerBackground,
     primaryHover: semantic.primaryHover,
     primaryActive: semantic.primaryActive,
     onPrimary: semantic.onPrimary,
@@ -162,6 +163,7 @@ function buildTamaguiThemes(theme: {
     textMuted: tokens.colors.gray.gray5,
     border: tokens.colors.gray.gray7,
     primary: theme.semantic.primary,
+    footerBackground: theme.semantic.footerBackground,
     primaryHover: theme.semantic.primaryHover,
     primaryActive: theme.semantic.primaryActive,
     onPrimary: theme.semantic.onPrimary,

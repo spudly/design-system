@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { Col } from "../../widgets/layout/Col.js";
 import { ScreenContainer } from "../../widgets/layout/ScreenContainer.js";
 import { Text } from "../../widgets/data/Text.js";
@@ -21,6 +21,8 @@ import { TextLink } from "../../widgets/actions/TextLink.js";
 export type AuthConfirmationPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   title: string;
   body: string;
   /** The way back's label; renders only with `backHref`. */
@@ -35,9 +37,10 @@ export function AuthConfirmationPage({
   backLabel,
   backHref,
   footer,
+  header,
 }: AuthConfirmationPageProps) {
   return (
-    <BigFooterShell footer={footer}>
+    <BigFooterShell footer={footer} header={header}>
       <ScreenContainer variant="auth">
         <Col gap="xxl">
           <Text variant="heading">{title}</Text>

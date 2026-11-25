@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import type { ReactNode } from "react";
 import { Alert } from "../../widgets/feedback/Alert.js";
 import { Button } from "../../widgets/actions/Button.js";
@@ -130,6 +130,8 @@ type RecipeFormPageInstructions = RecipeInstructionListViewProps;
 export type RecipeFormPageProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   /** Controlled field values (text — the host parses numerics). */
   title: string;
   onTitleChange: (value: string) => void;
@@ -271,7 +273,7 @@ export function RecipeFormPage(props: RecipeFormPageProps) {
   };
 
   return (
-    <BigFooterShell footer={props.footer} scrollMode="content">
+    <BigFooterShell footer={props.footer} header={props.header} scrollMode="content">
       <ScrollRegion>
         <Col gap="m">
           <LabeledField label="Title" fieldId="recipe-title" action={revertAction("title")}>

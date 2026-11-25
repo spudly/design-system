@@ -16,6 +16,12 @@ export const CheckYourEmail: Story = {
     <>
       <AuthConfirmationPage
         footer={eciperayFooterFixture}
+        header={{
+          brand: { label: "Eciperay", href: "/", mark: "eciperay" },
+          navItems: [{ id: "recipes", label: "Recipes", href: "/recipes" }],
+          activeItemId: null,
+          actions: [{ id: "sign-in", label: "Sign in", href: "/login" }],
+        }}
         title="Check your email"
         body="We sent a password reset link to your email address. It expires in one hour."
         backLabel="Back to sign in"

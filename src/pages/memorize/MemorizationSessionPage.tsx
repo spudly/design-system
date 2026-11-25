@@ -1,4 +1,4 @@
-import { BigFooterShell, type BigFooterData } from "../../widgets/content/BigFooter.js";
+import { BigFooterShell, type BigFooterData, type BigFooterShellHeader } from "../../widgets/content/BigFooter.js";
 import { BackLink } from "../../widgets/actions/BackLink.js";
 import { BlankWord } from "../../widgets/data/BlankWord.js";
 import { Button } from "../../widgets/actions/Button.js";
@@ -145,6 +145,8 @@ export type MemorizationSessionPageWord = {
 export type MemorizationSessionPageReadyProps = {
   /** The page footer data (#410): one footer object supplied by the host; see BigFooter. */
   footer?: BigFooterData;
+  /** The page header data (#857): when supplied, the shell renders the full AppTopBar above the content. */
+  header?: BigFooterShellHeader;
   state: "ready";
   /** The verse's reference, rendered as the heading. */
   reference: string;
@@ -179,7 +181,7 @@ export type MemorizationSessionPageReadyProps = {
 };
 
 export type MemorizationSessionPageProps =
-  | { state: "not-found"; onBack: () => void; footer?: BigFooterData }
+  | { state: "not-found"; onBack: () => void; footer?: BigFooterData; header?: BigFooterShellHeader }
   | MemorizationSessionPageReadyProps;
 
 /**
@@ -192,7 +194,7 @@ export type MemorizationSessionPageProps =
 export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
   if (props.state === "not-found") {
     return (
-      <BigFooterShell footer={props.footer}>
+      <BigFooterShell footer={props.footer} header={props.header}>
         <ScreenContainer>
           <Text>Verse not found.</Text>
           <Button onPress={props.onBack}>Back</Button>
@@ -227,7 +229,7 @@ export function MemorizationSessionPage(props: MemorizationSessionPageProps) {
   );
 
   return (
-    <BigFooterShell footer={props.footer}>
+    <BigFooterShell footer={props.footer} header={props.header}>
       <ScreenContainer>
         <BackLink onPress={onBack} />
         <Text variant="heading">{reference}</Text>
