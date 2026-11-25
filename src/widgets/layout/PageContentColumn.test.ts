@@ -94,7 +94,7 @@ test("BigFooterShell wraps web content in the column; the footer is NOT inside i
   // footerless pages get the column on desktop too.
   assert.match(
     bigFooter,
-    /if \(!footer\) \{\s*return \(\s*<YStack flexGrow=\{1\} flexDirection="column" position="relative">\s*<PageContentColumn>\{children\}<\/PageContentColumn>/,
+    /if \(!footer\) \{\s*return \(\s*<Col grow position="relative">\s*<PageContentColumn>\{children\}<\/PageContentColumn>/,
   );
   assert.equal(
     (bigFooter.match(/<BigFooter footer=\{footer\} \/>/g) ?? []).length,

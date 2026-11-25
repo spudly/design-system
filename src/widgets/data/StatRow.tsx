@@ -1,23 +1,12 @@
 import type { ReactNode } from "react";
-import { XStack, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { LoadingStatTiles } from "../feedback/LoadingStatTiles.js";
 
-const StyledStatRow = styled(XStack, {
-  name: "StatRow",
-
-  justifyContent: "space-around",
-  backgroundColor: tokens.colors.gray.gray1,
-  borderRadius: tokens.radii.lg,
-  paddingVertical: tokens.spacing[4],
-});
-
-type StyledStatRowProps = GetProps<typeof StyledStatRow>;
-
-export type StatRowProps = StyledStatRowProps & {
+export type StatRowProps = RowProps & {
   children?: ReactNode;
   /** Loading state (#278): the row renders exactly 3 dummy
    * stats, each in its own loading state (propagated through
@@ -49,13 +38,27 @@ export function StatRow({ children, loading = false, ...rest }: StatRowProps) {
     // this row provides, so no loading prop is drilled into
     // them — and the region marked busy.
     return (
-      <StyledStatRow
+      <Row
+        around
+        backgroundColor={tokens.colors.gray.gray1}
+        borderRadius={tokens.radii.lg}
+        py="l"
         {...rest}
         {...platformAccessibilityProps({ accessibilityState: { busy: true } })}
       >
         <LoadingStatTiles keys={LOADING_STAT_KEYS} />
-      </StyledStatRow>
+      </Row>
     );
   }
-  return <StyledStatRow {...rest}>{children}</StyledStatRow>;
+  return (
+    <Row
+      around
+      backgroundColor={tokens.colors.gray.gray1}
+      borderRadius={tokens.radii.lg}
+      py="l"
+      {...rest}
+    >
+      {children}
+    </Row>
+  );
 }

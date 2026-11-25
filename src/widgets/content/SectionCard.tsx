@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { Card, type CardProps } from "../layout/Card.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
@@ -39,19 +41,20 @@ export function SectionCard({
   const showSkeleton = useLoadingScope(loading);
   return (
     <Card loading={showSkeleton} {...rest}>
-      <YStack paddingBottom={tokens.spacing[3]}>
-        <XStack justifyContent="space-between" alignItems="center" gap={tokens.spacing[2]}>
+      <Col>
+        <Row between middle gap="s">
           {showSkeleton ? (
-            <YStack flex={1}>
+            <Col grow shrink>
               <TextSkeleton size="xl" lines={1} />
-            </YStack>
+            </Col>
           ) : (
             <Text variant="subheading">{title}</Text>
           )}
           {action}
-        </XStack>
-      </YStack>
-      <YStack gap={tokens.spacing[3]}>{children}</YStack>
+        </Row>
+        <Spacer y="m" />
+      </Col>
+      <Col gap="m">{children}</Col>
     </Card>
   );
 }

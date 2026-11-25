@@ -1,5 +1,8 @@
 import { useState } from "react";
-import { View, XStack, YStack } from "tamagui";
+import { View } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
@@ -87,26 +90,28 @@ export function StepList({ steps, presentation = "eyebrow", loading = false }: S
     // borders transparent, and the region marked busy.
     const keys = steps.length > 0 ? steps.map((step) => step.id) : LOADING_STEP_KEYS;
     return (
-      <YStack {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+      <Col {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
         {keys.map((key) => (
-          <YStack key={key} paddingBlockEnd="$3">
-            <YStack
+          <Col key={key}>
+            <Col
               borderRadius={tokens.radii.lg}
               borderWidth={1}
-              padding="$4"
+              p="l"
               borderColor="transparent"
               backgroundColor="$surface"
             >
-              <YStack paddingBlockEnd="$1">
+              <Col>
                 <View width={56}>
                   <TextSkeleton size="xs" lines={1} />
                 </View>
-              </YStack>
+                <Spacer y="xs" />
+              </Col>
               <TextSkeleton size="md" lines={2} />
-            </YStack>
-          </YStack>
+            </Col>
+            <Spacer y="m" />
+          </Col>
         ))}
-      </YStack>
+      </Col>
     );
   }
   return (
@@ -121,7 +126,7 @@ export function StepList({ steps, presentation = "eyebrow", loading = false }: S
         };
         if (presentation === "numeral") {
           return (
-            <YStack
+            <Col
               key={step.id}
               {...platformAccessibilityProps({
                 accessibilityRole: "button",
@@ -133,9 +138,8 @@ export function StepList({ steps, presentation = "eyebrow", loading = false }: S
               tabIndex={0}
               onKeyDown={handleKeyDown}
               cursor="web:pointer"
-              paddingBlockEnd="$3"
             >
-              <XStack gap="$3" alignItems="flex-start">
+              <Row gap="m" top>
                 <Text
                   fontSize={tokens.typography.fontSize["2xl"]}
                   fontWeight={tokens.typography.fontWeight.bold}
@@ -146,12 +150,13 @@ export function StepList({ steps, presentation = "eyebrow", loading = false }: S
                 <Text flex={1} fontSize={tokens.typography.fontSize.md}>
                   {step.body}
                 </Text>
-              </XStack>
-            </YStack>
+              </Row>
+              <Spacer y="m" />
+            </Col>
           );
         }
         return (
-          <YStack
+          <Col
             key={step.id}
             {...platformAccessibilityProps({
               accessibilityRole: "button",
@@ -164,17 +169,17 @@ export function StepList({ steps, presentation = "eyebrow", loading = false }: S
             onKeyDown={handleKeyDown}
             cursor="web:pointer"
           >
-            <YStack paddingBlockEnd="$3">
-              <YStack
+            <Col>
+              <Col
                 borderRadius={tokens.radii.lg}
                 borderWidth={1}
-                padding="$4"
+                p="l"
                 borderColor={isActive ? "$primary" : tokens.colors.gray.gray2}
                 backgroundColor={isActive ? "$primarySubtle" : "$surface"}
               >
                 {
                   <>
-                    <YStack paddingBlockEnd="$1">
+                    <Col>
                       <Text
                         fontSize={tokens.typography.fontSize.xs}
                         fontWeight={tokens.typography.fontWeight.semibold}
@@ -182,7 +187,8 @@ export function StepList({ steps, presentation = "eyebrow", loading = false }: S
                       >
                         {step.label}
                       </Text>
-                    </YStack>
+                      <Spacer y="xs" />
+                    </Col>
                     <Text
                       fontSize={tokens.typography.fontSize.md}
                       {...(isActive ? { color: "$primaryEmphasis" as const } : {})}
@@ -191,9 +197,10 @@ export function StepList({ steps, presentation = "eyebrow", loading = false }: S
                     </Text>
                   </>
                 }
-              </YStack>
-            </YStack>
-          </YStack>
+              </Col>
+              <Spacer y="m" />
+            </Col>
+          </Col>
         );
       })}
     </>

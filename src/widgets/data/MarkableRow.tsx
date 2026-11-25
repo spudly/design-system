@@ -1,4 +1,6 @@
-import { XStack, YStack } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { keyboardActivationHandler } from "../keyboardActivation.js";
@@ -65,12 +67,12 @@ export function MarkableRow({
 }: MarkableRowProps) {
   const handleKeyDown = keyboardActivationHandler(() => onPress?.());
   return (
-    <XStack
-      alignItems="center"
-      gap={onPress ? "$3" : undefined}
+    <Row
+      middle
+      {...(onPress ? { gap: "m" as const } : {})}
       borderBottomWidth={1}
       borderBottomColor={tokens.colors.gray.gray2}
-      paddingVertical="$3"
+      py="m"
       {...(onPress
         ? {
             ...platformAccessibilityProps({
@@ -85,38 +87,39 @@ export function MarkableRow({
         : null)}
     >
       {onPress ? (
-        <YStack
+        <Col
+          center
+          middle
           width={tokens.spacing[6]}
           height={tokens.spacing[6]}
           borderRadius={tokens.radii.sm}
           borderWidth={2}
           borderColor="$primary"
           backgroundColor="$surface"
-          alignItems="center"
-          justifyContent="center"
         >
           {isMarked ? (
             <Text fontSize={tokens.typography.fontSize.sm} color="$primary">
               ✓
             </Text>
           ) : null}
-        </YStack>
+        </Col>
       ) : null}
       {subtitle ? (
-        <YStack flex={1}>
+        <Col grow shrink>
           <Text>{label}</Text>
           <Text variant="hint">{subtitle}</Text>
-        </YStack>
+        </Col>
       ) : (
         <Text flex={1}>{label}</Text>
       )}
       {trailingNote ? (
-        <YStack paddingInlineStart="$2">
+        <Row>
+          <Spacer x="s" />
           <Text fontSize={tokens.typography.fontSize.xs} color="$textMuted">
             {trailingNote}
           </Text>
-        </YStack>
+        </Row>
       ) : null}
-    </XStack>
+    </Row>
   );
 }

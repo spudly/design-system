@@ -1,5 +1,7 @@
-import { Image as TamaguiImage, YStack, styled } from "tamagui";
+import { Image as TamaguiImage, styled } from "tamagui";
 import type { GetProps } from "tamagui";
+import { Col } from "../layout/Col.js";
+import type { ColProps } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "./Text.js";
@@ -10,16 +12,24 @@ const StyledImage = styled(TamaguiImage, {
   borderRadius: tokens.radii.full,
 });
 
-const Fallback = styled(YStack, {
-  name: "AvatarFallback",
-
-  backgroundColor: "$primarySubtle",
-  borderWidth: 1,
-  borderColor: "$primaryEmphasis",
-  borderRadius: tokens.radii.full,
-  alignItems: "center",
-  justifyContent: "center",
-});
+/**
+ * The initials fallback disc (#746, Option B): a Col carrying
+ * the primary tint, ring, and circular radius, centering the
+ * initials.
+ */
+function AvatarFallback(props: ColProps) {
+  return (
+    <Col
+      center
+      middle
+      backgroundColor="$primarySubtle"
+      borderWidth={1}
+      borderColor="$primaryEmphasis"
+      borderRadius={tokens.radii.full}
+      {...props}
+    />
+  );
+}
 
 type StyledImageProps = GetProps<typeof StyledImage>;
 
@@ -50,7 +60,7 @@ export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
   const dimensions = { width: size, height: size };
   if (!src) {
     return (
-      <Fallback
+      <AvatarFallback
         style={dimensions}
         {...platformAccessibilityProps({
           accessibilityRole: "image",
@@ -66,7 +76,7 @@ export function Avatar({ src, name, size = 40, ...rest }: AvatarProps) {
         >
           {initialsFor(name)}
         </Text>
-      </Fallback>
+      </AvatarFallback>
     );
   }
   return (

@@ -1,4 +1,5 @@
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
 
@@ -30,27 +31,31 @@ export type ChatTranscriptProps = {
  */
 export function ChatTranscript({ messages }: ChatTranscriptProps) {
   return (
-    <YStack gap={tokens.spacing[3]}>
+    <Col gap="m">
       {messages.map((message, index) => (
-        <YStack
+        <Col
           key={index}
-          paddingStart={message.own ? tokens.spacing[8] : undefined}
-          paddingEnd={message.own ? undefined : tokens.spacing[8]}
+          style={
+            message.own
+              ? { paddingInlineStart: tokens.spacing[8] }
+              : { paddingInlineEnd: tokens.spacing[8] }
+          }
         >
-          <YStack
+          <Col
             borderRadius={tokens.radii.md}
             backgroundColor={message.own ? tokens.colors.gray.gray2 : "$primarySubtle"}
-            padding={tokens.spacing[3]}
+            p="m"
           >
-            <YStack paddingBottom={tokens.spacing[1]}>
+            <Col>
               <Text variant="label">{message.author}</Text>
-            </YStack>
+              <Spacer y="xs" />
+            </Col>
             <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
               {message.content}
             </Text>
-          </YStack>
-        </YStack>
+          </Col>
+        </Col>
       ))}
-    </YStack>
+    </Col>
   );
 }

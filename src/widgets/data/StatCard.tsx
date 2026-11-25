@@ -1,4 +1,5 @@
-import { View, YStack } from "tamagui";
+import { View } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Card } from "../layout/Card.js";
@@ -42,7 +43,7 @@ export function StatCard({ value, label, sublabel, loading = false }: StatCardPr
     // values show.
     return (
       <Card {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
-        <YStack>
+        <Col>
           <View height={LINE_BOXES["3xl"].lineBox} justifyContent="center">
             <SkeletonBone
               width="46%"
@@ -62,7 +63,7 @@ export function StatCard({ value, label, sublabel, loading = false }: StatCardPr
               />
             </View>
           ) : null}
-        </YStack>
+        </Col>
       </Card>
     );
   }

@@ -1,4 +1,5 @@
-import { XStack, useTheme } from "tamagui";
+import { useTheme } from "tamagui";
+import { Row } from "../layout/Row.js";
 import { iconsByName, type IconName } from "../../icons/iconRegistry.js";
 import { tokens } from "../../tokens/index.js";
 import { Text } from "../data/Text.js";
@@ -73,11 +74,11 @@ export function SectionHeading({ children, icon }: SectionHeadingProps) {
   const glyphInk =
     typeof primaryVariable?.val === "string" ? primaryVariable.val : tokens.colors.primary.primary8;
   return (
-    <XStack alignItems="center" gap={tokens.spacing[2]}>
+    <Row middle gap="s">
       <Glyph size={22} color={glyphInk} />
       <Text variant="subheading" accessibilityRole="header" aria-level={2}>
         {children}
       </Text>
-    </XStack>
+    </Row>
   );
 }

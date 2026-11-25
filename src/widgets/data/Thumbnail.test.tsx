@@ -23,7 +23,10 @@ import { dirname, join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "data", "Thumbnail.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "data", "Thumbnail.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 test("Thumbnail is exported from the built internal components barrel", async () => {
   const dist: Record<string, any> = await loadInternalDist();
@@ -43,9 +46,9 @@ test("the contract is a URL, a presentation variant, and an optional accessible 
   assert.match(code, /accessibilityLabel\?: string;/);
 });
 test("the hero frame is aspect-preserving: the measured image ratio, clamped, with a 4:3 fallback (#721)", () => {
-  assert.match(code, /backgroundColor: tokens\.colors\.gray\.gray1,/);
-  assert.match(code, /borderRadius: tokens\.radii\.lg,/);
-  assert.match(code, /overflow: "hidden",/);
+  assert.match(code, /backgroundColor=\{tokens\.colors\.gray\.gray1\}/);
+  assert.match(code, /borderRadius=\{tokens\.radii\.lg\}/);
+  assert.match(code, /overflow="hidden"/);
   assert.ok(!/height: 256,/.test(code), "the fixed 256px hero height is gone (#721)");
   assert.match(code, /const HERO_FALLBACK_ASPECT = 4 \/ 3;/);
   assert.match(code, /const HERO_MIN_ASPECT = 0\.75;/);
@@ -56,7 +59,7 @@ test("the hero frame is aspect-preserving: the measured image ratio, clamped, wi
     /setHeroAspect\(Math\.min\(HERO_MAX_ASPECT, Math\.max\(HERO_MIN_ASPECT, width \/ height\)\)\);/,
     "the measured natural ratio is clamped to the hero bounds",
   );
-  assert.match(code, /<StyledHeroFrame aspectRatio=\{heroAspect\}>/);
+  assert.match(code, /<HeroFrame aspectRatio=\{heroAspect\}>/);
   assert.match(
     code,
     /const probe = new window\.Image\(\);\s+probe\.onload = \(\) => \{\s+applyMeasuredAspect\(probe\.naturalWidth, probe\.naturalHeight\);\s+\};\s+probe\.src = src;/,

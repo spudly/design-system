@@ -1,4 +1,5 @@
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
@@ -66,24 +67,29 @@ export function CandidateList({
     const skeletonItems: readonly { id: string; label: string }[] =
       candidates.length > 0 ? candidates : LOADING_CANDIDATE_IDS.map((id) => ({ id, label: "" }));
     return (
-      <YStack gap="$2" {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+      <Col gap="s" {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
         <TextSkeleton size="sm" lines={1} />
         <LoadingScope active>
           {skeletonItems.map((candidate) => (
-            <YStack
+            <Col
               key={candidate.id}
               width="100%"
               borderRadius={tokens.radii.md}
               borderWidth={1}
               borderColor="transparent"
               backgroundColor="$primarySubtle"
-              padding="$3"
+              p="m"
             >
-              <YStack paddingBlockEnd="$2">
+              {/* The label block's 8px bottom inset composes as
+                a Spacer in a gapless Col (#746) — the card's own
+                gap can't own it without moving the card's
+                other separations. */}
+              <Col>
                 <TextSkeleton size="sm" lines={1} />
-              </YStack>
+                <Spacer y="s" />
+              </Col>
               {onActivatePress ? (
-                <YStack alignItems="flex-start">
+                <Col left>
                   <Button
                     variant="primary"
                     size="sm"
@@ -95,16 +101,16 @@ export function CandidateList({
                   >
                     Activate
                   </Button>
-                </YStack>
+                </Col>
               ) : null}
-            </YStack>
+            </Col>
           ))}
         </LoadingScope>
-      </YStack>
+      </Col>
     );
   }
   return (
-    <YStack gap="$2">
+    <Col gap="s">
       <Text
         fontSize={tokens.typography.fontSize.sm}
         fontWeight={tokens.typography.fontWeight.medium}
@@ -113,19 +119,20 @@ export function CandidateList({
         {title}
       </Text>
       {candidates.map((candidate) => (
-        <YStack
+        <Col
           key={candidate.id}
           borderRadius={tokens.radii.md}
           borderWidth={1}
           borderColor={tokens.colors.terracotta.terracotta3}
           backgroundColor="$primarySubtle"
-          padding="$3"
+          p="m"
         >
-          <YStack paddingBlockEnd="$2">
+          <Col>
             <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
               {candidate.label}
             </Text>
-          </YStack>
+            <Spacer y="s" />
+          </Col>
           {onActivatePress ? (
             <Button
               variant="primary"
@@ -140,8 +147,8 @@ export function CandidateList({
               Activate
             </Button>
           ) : null}
-        </YStack>
+        </Col>
       ))}
-    </YStack>
+    </Col>
   );
 }

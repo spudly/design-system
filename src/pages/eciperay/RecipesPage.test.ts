@@ -98,8 +98,8 @@ describe("recipesPageAccessory", () => {
     assert.ok(accessoryAt > cardAt, "the accessory must render after (under) the row's card");
     assert.match(
       mediaRow,
-      /\{accessory \? <YStack paddingBlockEnd="\$3">\{accessory\}<\/YStack> : null\}/,
-      "the accessory must render in the under-card YStack only when it has content",
+      /\{accessory \? \(\s*<Col>\s*\{accessory\}\s*<Spacer y="m" \/>\s*<\/Col>\s*\) : null\}/,
+      "the accessory must render in the under-card block (content + its 12px Spacer, #746) only when it has content",
     );
   });
 
@@ -498,7 +498,7 @@ describe("recipesPageRowActions", () => {
     );
     assert.match(
       mediaRow,
-      /flexWrap="wrap"\s+alignItems="center"\s+gap="\$1"\s+paddingTop="\$1"/,
+      /wrap\s+middle\s+gap="xs"\s+style=\{\{ paddingTop: tokens\.spacing\[1\] \}\}/,
       "MediaRow's subtitle flow is a wrapping inline row — the action sits in the subtitle's flow",
     );
     assert.match(mediaRow, /\{subtitleAction\}/);

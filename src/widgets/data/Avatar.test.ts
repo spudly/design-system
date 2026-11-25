@@ -25,22 +25,25 @@ const srcPath = join(
 const text = readFileSync(srcPath, "utf8");
 
 const fallbackDef = text.slice(
-  text.indexOf("const Fallback"),
+  text.indexOf("function AvatarFallback"),
   text.indexOf("type StyledImageProps"),
 );
-const imageDef = text.slice(text.indexOf("const StyledImage"), text.indexOf("const Fallback"));
+const imageDef = text.slice(
+  text.indexOf("const StyledImage"),
+  text.indexOf("function AvatarFallback"),
+);
 
 test("the initials fallback has a 1px border (#461)", () => {
   assert.ok(
-    /borderWidth: 1,/.test(fallbackDef),
-    "Avatar Fallback must set borderWidth: 1 so non-image avatars render a 1px border (#461)",
+    /borderWidth=\{1\}/.test(fallbackDef),
+    "Avatar Fallback must set borderWidth 1 so non-image avatars render a 1px border (#461)",
   );
 });
 
 test("the fallback border matches the initials text color (#461)", () => {
   assert.ok(
-    /borderColor: "\$primaryEmphasis",/.test(fallbackDef),
-    'Avatar Fallback must set borderColor: "$primaryEmphasis" so the border matches the initials text color (#461)',
+    /borderColor="\$primaryEmphasis"/.test(fallbackDef),
+    'Avatar Fallback must set borderColor "$primaryEmphasis" so the border matches the initials text color (#461)',
   );
   assert.ok(
     /color: "\$primaryEmphasis"/.test(text),

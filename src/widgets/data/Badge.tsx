@@ -1,5 +1,6 @@
-import { XStack, isWeb, styled } from "tamagui";
-import type { GetProps } from "tamagui";
+import { isWeb } from "tamagui";
+import { Row } from "../layout/Row.js";
+import type { RowProps } from "../layout/Row.js";
 import { tokens } from "../../tokens/index.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { Text } from "./Text.js";
@@ -40,20 +41,7 @@ const toneStyles = {
 
 type Tone = keyof typeof toneStyles;
 
-const StyledBadge = styled(XStack, {
-  name: "Badge",
-
-  alignItems: "center",
-  alignSelf: "flex-start",
-  borderWidth: 1,
-  borderRadius: tokens.radii.full,
-  paddingHorizontal: tokens.spacing[2],
-  paddingVertical: tokens.spacing[1],
-});
-
-type StyledBadgeProps = GetProps<typeof StyledBadge>;
-
-export type BadgeProps = Omit<StyledBadgeProps, "onPress"> & {
+export type BadgeProps = Omit<RowProps, "onPress"> & {
   tone?: Tone;
   /**
    * The selectable form's press handler: a bare intent with no
@@ -178,8 +166,7 @@ export function Badge({
   const handleKeyDown = makeKeyDownHandler(onPress);
   const handleRemoveKeyDown = makeKeyDownHandler(onRemove);
   const removeLabel =
-    removeAccessibilityLabel ??
-    (typeof children === "string" ? `Remove ${children}` : "Remove");
+    removeAccessibilityLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove");
   const removeButtonProps = {
     onPress: disabled ? undefined : onRemove,
     tabIndex: disabled ? -1 : 0,
@@ -200,7 +187,7 @@ export function Badge({
     : null;
   // The colored-tag form (`color`) and the status-pill form
   // (`tone`) differ only in three color values (#707): compute
-  // those once, then render a single StyledBadge, so a Badge
+  // those once, then render a single Row, so a Badge
   // change can't land in one form and miss the other.
   const styles = toneStyles[tone];
   const tagDark = color ? resolveTagColorShade(color, "dark") : undefined;
@@ -209,17 +196,23 @@ export function Badge({
   const borderColor = isSelected ? "$primary" : (tagLight ?? styles.text);
   const textColor = isSelected ? "$onPrimary" : (tagLight ?? styles.text);
   return (
-    <StyledBadge
+    <Row
+      middle
+      alignSelf="flex-start"
+      borderWidth={1}
+      borderRadius={tokens.radii.full}
+      px="s"
+      py="xs"
       backgroundColor={backgroundColor}
       borderColor={borderColor}
-      gap={removable ? tokens.spacing[1] : undefined}
+      {...(removable ? { gap: "xs" as const } : {})}
       opacity={removable && disabled ? 0.5 : undefined}
       {...rest}
       {...selectableProps}
     >
       <Text style={{ ...labelType, color: textColor }}>{children}</Text>
       {removable ? (
-        <XStack
+        <Row
           {...platformAccessibilityProps({
             accessibilityRole: "button",
             accessibilityLabel: removeLabel,
@@ -227,8 +220,8 @@ export function Badge({
           })}
           {...removeButtonProps}
           cursor="web:pointer"
-          alignItems="center"
-          justifyContent="center"
+          middle
+          center
           minWidth={20}
           minHeight={20}
           {...(isWeb ? { "aria-disabled": disabled } : {})}
@@ -236,8 +229,8 @@ export function Badge({
           <Text aria-hidden style={{ ...labelType, color: textColor }}>
             ×
           </Text>
-        </XStack>
+        </Row>
       ) : null}
-    </StyledBadge>
+    </Row>
   );
 }

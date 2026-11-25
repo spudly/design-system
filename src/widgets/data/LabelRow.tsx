@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
-import { XStack } from "tamagui";
-import { tokens } from "../../tokens/index.js";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { FieldLabel } from "../form/FieldLabel.js";
 
 /**
@@ -27,18 +28,20 @@ export function LabelRow({
   htmlFor?: string | undefined;
 }) {
   return (
-    <XStack
-      paddingBlockEnd={tokens.spacing[separation]}
-      alignItems="center"
-      justifyContent="space-between"
-      gap={tokens.spacing[3]}
-    >
-      <FieldLabel htmlFor={htmlFor}>{label}</FieldLabel>
-      {action ? (
-        <XStack alignItems="center" gap={tokens.spacing[2]}>
-          {action}
-        </XStack>
-      ) : null}
-    </XStack>
+    // The separation below the row is a Spacer sibling inside a
+    // gapless Col (#746): Row's padding props are uniform per
+    // axis, so the single-side inset composes this way (the
+    // LabeledField/LabeledGroup pattern).
+    <Col>
+      <Row middle between gap="m">
+        <FieldLabel htmlFor={htmlFor}>{label}</FieldLabel>
+        {action ? (
+          <Row middle gap="s">
+            {action}
+          </Row>
+        ) : null}
+      </Row>
+      <Spacer y={separation === 1 ? "xs" : "s"} />
+    </Col>
   );
 }

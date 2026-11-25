@@ -34,7 +34,10 @@ import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
-const source = readFileSync(join(here, "../../..", "src", "widgets", "content", "MessageCard.tsx"), "utf8");
+const source = readFileSync(
+  join(here, "../../..", "src", "widgets", "content", "MessageCard.tsx"),
+  "utf8",
+);
 const code = source.replaceAll(/\/\*[\s\S]*?\*\//g, "").replaceAll(/(^|[^:])\/\/.*$/gm, "$1");
 
 test("MessageCard is exported from the built internal components barrel", async () => {
@@ -53,16 +56,13 @@ test("MessageCardProps is a type-only export from the built components barrel", 
 
 test("MessageCard's contract is its two strings, and its shell fills and centers", () => {
   assert.match(code, /export type MessageCardProps = \{\s+title: string;\s+message: string;\s+\};/);
-  assert.match(
-    code,
-    /<YStack\s+flex=\{1\}\s+backgroundColor="\$surface"\s+alignItems="center"\s+justifyContent="center"\s+padding="\$4"\s*>/,
-  );
+  assert.match(code, /<Col grow shrink center middle backgroundColor="\$surface" p="l">/);
   assert.ok(!/interface\s/.test(code), "type aliases only");
 });
 
 test("the card carries the centered heading over the centered muted line", () => {
   assert.match(code, /<Card>/);
-  assert.match(code, /<YStack alignItems="center" gap="\$2">/);
+  assert.match(code, /<Col center gap="s">/);
   assert.match(code, /<Text variant="heading" textAlign="center">/);
   assert.match(code, /<Text color=\{tokens\.colors\.gray\.gray6\} textAlign="center">/);
 });

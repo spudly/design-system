@@ -1,18 +1,10 @@
-import { XStack, styled } from "tamagui";
+import { Row } from "../layout/Row.js";
 import type { TagColorName } from "../../themes/tagColors.js";
 import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Badge } from "./Badge.js";
 import { SkeletonBone } from "../feedback/SkeletonClock.js";
-
-const StyledTagRow = styled(XStack, {
-  name: "TagListItem",
-
-  flexWrap: "wrap",
-  gap: tokens.spacing[2],
-  alignItems: "flex-start",
-});
 
 type TagListTag = {
   /** Stable key for the tag. */
@@ -83,7 +75,7 @@ export function TagList({ tags, loading = false }: TagListProps) {
           )
         : LOADING_TAG_WIDTHS;
     return (
-      <StyledTagRow {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
+      <Row wrap gap="s" top {...platformAccessibilityProps({ accessibilityState: { busy: true } })}>
         {widths.map((width, index) => (
           <SkeletonBone
             key={tags[index]?.id ?? `loading-${index}`}
@@ -92,16 +84,16 @@ export function TagList({ tags, loading = false }: TagListProps) {
             borderRadius={tokens.radii.full}
           />
         ))}
-      </StyledTagRow>
+      </Row>
     );
   }
   return (
-    <StyledTagRow>
+    <Row wrap gap="s" top>
       {tags.map((tag) => (
         <Badge key={tag.id} color={tag.color}>
           {tag.name}
         </Badge>
       ))}
-    </StyledTagRow>
+    </Row>
   );
 }

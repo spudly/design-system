@@ -27,9 +27,8 @@ function loadRuntime() {
     const { renderToString } = await import("react-dom/server");
     const { TamaguiProvider }: Record<string, any> = await import("tamagui");
     const dist: Record<string, any> = await loadInternalDist();
-    const labelRowModule: Record<string, any> = await import(
-      "../../../dist/widgets/data/LabelRow.js"
-    );
+    const labelRowModule: Record<string, any> =
+      await import("../../../dist/widgets/data/LabelRow.js");
     return { React, renderToString, TamaguiProvider, ...dist, ...labelRowModule };
   })();
   return runtimePromise;
@@ -52,17 +51,21 @@ function declarationBlocks(html: string, className: string) {
 }
 
 /**
- * The below-the-row padding value the outermost rendered element's
- * classes generate, or null. Tamagui emits the logical
- * `padding-block-end` property for `paddingBlockEnd` on web.
+ * The separation height the rendered Spacer below the row
+ * generates, or null (#746: the below-the-row separation
+ * composes as a Spacer sibling inside the row's column, not
+ * as padding on the row element).
  */
-function renderedPaddingBottom(html: string) {
-  const element = html.match(/<div class="([^"]*)"/);
-  assert.ok(element, `expected a rendered row element in: ${html.slice(-600)}`);
-  for (const className of element[1].split(/\s+/)) {
+function renderedSeparation(html: string) {
+  const divs = html.match(/<div[^>]*>/g) ?? [];
+  const spacerTag = divs.find((tag) => tag.includes("aria-hidden"));
+  assert.ok(spacerTag, `expected a rendered spacer element in: ${html.slice(-600)}`);
+  const classMatch = spacerTag.match(/class="([^"]*)"/);
+  assert.ok(classMatch, "the spacer element carries classes");
+  for (const className of classMatch[1].split(/\s+/)) {
     for (const block of declarationBlocks(html, className)) {
-      const padding = block.match(/(?:padding-bottom|padding-block-end):([\d.]+px)/);
-      if (padding) return padding[1];
+      const height = block.match(/height:([\d.]+px)/);
+      if (height) return height[1];
     }
   }
   return null;
@@ -92,8 +95,8 @@ describe("LabelRow", () => {
 
   test("separation 1 renders 4px below the row and separation 2 renders 8px", async () => {
     const one = await renderRow({ label: "Name", separation: 1 });
-    assert.equal(renderedPaddingBottom(one), "4px");
+    assert.equal(renderedSeparation(one), "4px");
     const two = await renderRow({ label: "Name", separation: 2 });
-    assert.equal(renderedPaddingBottom(two), "8px");
+    assert.equal(renderedSeparation(two), "8px");
   });
 });

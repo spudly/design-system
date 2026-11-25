@@ -1,15 +1,10 @@
 import type { ReactNode } from "react";
-import { Text as TamaguiText, YStack, styled } from "tamagui";
+import { Text as TamaguiText, styled } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 import { useLoadingScope } from "../../contexts/LoadingScope.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";
-
-const StyledSection = styled(YStack, {
-  name: "LegalSection",
-
-  gap: tokens.spacing[3],
-});
 
 const StyledTitle = styled(TamaguiText, {
   name: "LegalSectionTitle",
@@ -56,16 +51,16 @@ export type LegalSectionProps = {
 export function LegalSection({ title, children, loading = false }: LegalSectionProps) {
   const showSkeleton = useLoadingScope(loading);
   return (
-    <StyledSection>
+    <Col gap="m">
       {/* A section title carries level-2 heading semantics, like
           the DS's other section titles (SectionCard's) — the page
           title above it is the level-1 heading. While loading the
           bone sits in the title's line box inside a wrapper that
           keeps those heading semantics. */}
       {showSkeleton ? (
-        <YStack {...platformAccessibilityProps({ accessibilityRole: "header", "aria-level": 2 })}>
+        <Col {...platformAccessibilityProps({ accessibilityRole: "header", "aria-level": 2 })}>
           <TextSkeleton size="lg" lines={1} />
-        </YStack>
+        </Col>
       ) : (
         <StyledTitle
           {...platformAccessibilityProps({ accessibilityRole: "header", "aria-level": 2 })}
@@ -82,6 +77,6 @@ export function LegalSection({ title, children, loading = false }: LegalSectionP
       ) : (
         children
       )}
-    </StyledSection>
+    </Col>
   );
 }

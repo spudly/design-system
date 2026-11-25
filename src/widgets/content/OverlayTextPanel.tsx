@@ -1,4 +1,5 @@
-import { ScrollView, YStack } from "tamagui";
+import { ScrollView } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { platformAccessibilityProps } from "../accessibility.js";
 import { Text } from "../data/Text.js";
 import { TextSkeleton } from "../feedback/TextSkeleton.js";
@@ -40,19 +41,16 @@ const LOADING_LINE_KEYS = ["loading-1", "loading-2", "loading-3"] as const;
  */
 export function OverlayTextPanel({ heading, lines, loading = false }: OverlayTextPanelProps) {
   return (
-    <YStack borderRadius={tokens.radii.xl} overflow="hidden">
-      <YStack
+    <Col borderRadius={tokens.radii.xl} overflow="hidden">
+      <Col
         position="absolute"
-        top={0}
-        left={0}
-        right={0}
-        bottom={0}
+        style={{ top: 0, left: 0, right: 0, bottom: 0 }}
         backgroundColor="$surface"
         opacity={0.05}
       />
-      <YStack
-        padding="$3"
-        gap="$2"
+      <Col
+        p="m"
+        gap="s"
         {...(loading ? platformAccessibilityProps({ accessibilityState: { busy: true } }) : {})}
       >
         {loading ? (
@@ -67,7 +65,7 @@ export function OverlayTextPanel({ heading, lines, loading = false }: OverlayTex
           </Text>
         )}
         <ScrollView maxHeight={160} nestedScrollEnabled>
-          <YStack gap="$1">
+          <Col gap="xs">
             {loading
               ? lines.length > 0
                 ? lines.map((_, index) => <TextSkeleton key={index} size="sm" lines={1} />)
@@ -77,9 +75,9 @@ export function OverlayTextPanel({ heading, lines, loading = false }: OverlayTex
                     {line}
                   </Text>
                 ))}
-          </YStack>
+          </Col>
         </ScrollView>
-      </YStack>
-    </YStack>
+      </Col>
+    </Col>
   );
 }

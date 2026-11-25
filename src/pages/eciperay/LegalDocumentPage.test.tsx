@@ -147,12 +147,12 @@ test("the document renders in a prose column; list blocks carry list semantics (
   // widgets/accessibility — native has no listitem role).
   assert.match(
     bulletList,
-    /<YStack gap=\{tokens\.spacing\[2\]\} \{\.\.\.listRoleProps\}>/,
+    /<Col gap="s" \{\.\.\.listRoleProps\}>/,
     "list block carries the list role",
   );
   assert.match(
     bulletList,
-    /<XStack key=\{index\} gap=\{tokens\.spacing\[2\]\} \{\.\.\.listItemRoleProps\}>/,
+    /<Row key=\{index\} gap="s" \{\.\.\.listItemRoleProps\}>/,
     "list items carry the listitem role",
   );
   assert.match(prose, /<BulletList key=\{key\} items=/, "list blocks render through BulletList");

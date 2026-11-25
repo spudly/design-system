@@ -96,14 +96,16 @@ test("MediaRow takes content and slots only — no styling props, no domain fiel
   assert.match(mediaRow, /accessory\?: ReactNode;/);
 });
 
-test("the card and the accessory each sit in the under-row padded wrapper (the row's own 12px)", () => {
+test("the card and the accessory each sit in the under-row separation block (the row's own 12px)", () => {
   // Scoped to the MediaRow function: the loading dummy rows
   // (#278 tranche 4) mirror the same wrapper outside it.
+  // #746: the under-row 12px is a Spacer closing each block
+  // (the card's block and the accessory's block), not padding.
   const mediaRowFn = page.slice(
     page.indexOf("function MediaRow("),
     page.indexOf("const STAR_STEPS"),
   );
-  assert.equal(mediaRowFn.split('paddingBlockEnd="$3"').length - 1, 2);
+  assert.equal(mediaRowFn.split('<Spacer y="m" />').length - 1, 2);
 });
 
 test("RatingStars' pressable target is ≥44dp and carries the button role", () => {

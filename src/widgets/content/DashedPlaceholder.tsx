@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { YStack } from "tamagui";
+import { Col } from "../layout/Col.js";
 import { tokens } from "../../tokens/index.js";
 
 export type DashedPlaceholderProps = {
@@ -16,17 +16,17 @@ export type DashedPlaceholderProps = {
  */
 export function DashedPlaceholder({ children }: DashedPlaceholderProps) {
   return (
-    <YStack
+    <Col
+      center
       overflow="hidden"
       borderRadius={tokens.radii.md}
       borderWidth={2}
       borderStyle="dashed"
       borderColor={tokens.colors.gray.gray4}
       backgroundColor={tokens.colors.gray.gray1}
-      paddingVertical="$6"
-      alignItems="center"
+      py="xl"
     >
       {children}
-    </YStack>
+    </Col>
   );
 }

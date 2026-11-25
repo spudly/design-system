@@ -17,8 +17,8 @@ describe("badgeBorder", () => {
   const text = readFileSync(srcPath, "utf8");
   test("the badge pill has a 1px border (#174)", () => {
     assert.ok(
-      /borderWidth: 1,/.test(text),
-      "StyledBadge must set borderWidth: 1 so the Badge renders a 1px border (#174)",
+      /borderWidth=\{1\}/.test(text),
+      "Badge's Row must set borderWidth 1 so the Badge renders a 1px border (#174)",
     );
   });
   test("the badge border uses the tone's text color (#174)", () => {
@@ -301,7 +301,7 @@ describe("badgeTagForm", async () => {
       source.includes("fontWeight: tokens.typography.fontWeight.semibold"),
       "tag label must use the semibold weight, same as the status form",
     );
-    assert.ok(source.includes("borderWidth: 1"), "Badge must carry the 1px border (#174)");
+    assert.ok(source.includes("borderWidth={1}"), "Badge must carry the 1px border (#174)");
     assert.ok(
       source.includes('const borderColor = isSelected ? "$primary" : (tagLight ?? styles.text)'),
       "the border must be the tag light shade in the color form and match the text color in the tone form while unselected (#799, #174)",

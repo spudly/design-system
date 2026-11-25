@@ -1,4 +1,7 @@
-import { View, XStack, YStack } from "tamagui";
+import { View } from "tamagui";
+import { Row } from "../layout/Row.js";
+import { Col } from "../layout/Col.js";
+import { Spacer } from "../layout/Spacer.js";
 import { tokens } from "../../tokens/index.js";
 import { LoadingScope, useLoadingScope } from "../../contexts/LoadingScope.js";
 import { BoxSkeleton } from "../feedback/BoxSkeleton.js";
@@ -70,19 +73,21 @@ const LOADING_STAR_KEYS = [
 
 function EyebrowLabel({ children }: { children: string }) {
   return (
-    <YStack paddingBlockEnd="$1">
+    <Col>
       <Text variant="label">{children}</Text>
-    </YStack>
+      <Spacer y="xs" />
+    </Col>
   );
 }
 
 function EyebrowSkeleton() {
   return (
-    <YStack paddingBlockEnd="$1">
+    <Col>
       <View width="45%">
         <TextSkeleton size="xs" lines={1} />
       </View>
-    </YStack>
+      <Spacer y="xs" />
+    </Col>
   );
 }
 
@@ -146,41 +151,47 @@ export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: 
           <EyebrowSkeleton />
           {ratings.community ? (
             <>
-              <XStack paddingBlockEnd="$3" alignItems="center" gap="$2">
-                <View width={110}>
-                  <TextSkeleton size="md" lines={1} />
-                </View>
-                <View width={64}>
-                  <TextSkeleton size="sm" lines={1} />
-                </View>
-              </XStack>
+              <Col>
+                <Row middle gap="s">
+                  <View width={110}>
+                    <TextSkeleton size="md" lines={1} />
+                  </View>
+                  <View width={64}>
+                    <TextSkeleton size="sm" lines={1} />
+                  </View>
+                </Row>
+                <Spacer y="m" />
+              </Col>
               {ratings.community.hasStaleRatings ? (
-                <YStack paddingBlockEnd="$3">
+                <Col>
                   <TextSkeleton size="xs" lines={2} />
-                </YStack>
+                  <Spacer y="m" />
+                </Col>
               ) : null}
             </>
           ) : (
-            <YStack paddingBlockEnd="$3">
+            <Col>
               <View width="60%">
                 <TextSkeleton size="sm" lines={1} />
               </View>
-            </YStack>
+              <Spacer y="m" />
+            </Col>
           )}
           {ratings.viewer ? (
             <>
               <EyebrowSkeleton />
-              <XStack>
+              <Row>
                 {LOADING_STAR_KEYS.map((key) => (
                   <Center key={key} width={44} height={44}>
                     <BoxSkeleton width={24} height={24} />
                   </Center>
                 ))}
-              </XStack>
+              </Row>
               {ratings.viewer.isStale ? (
-                <YStack paddingBlockStart="$2">
+                <Col>
+                  <Spacer y="s" />
                   <TextSkeleton size="xs" lines={2} />
-                </YStack>
+                </Col>
               ) : null}
             </>
           ) : null}
@@ -193,26 +204,31 @@ export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: 
       <EyebrowLabel>{voice.ratingsCard.communityRatingLabel}</EyebrowLabel>
       {ratings.community ? (
         <>
-          <XStack paddingBlockEnd="$3" alignItems="center" gap="$2">
-            <Text color={tokens.colors.warning.warning5}>{ratings.community.stars}</Text>
-            <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
-              {ratings.community.label}
-            </Text>
-          </XStack>
+          <Col>
+            <Row middle gap="s">
+              <Text color={tokens.colors.warning.warning5}>{ratings.community.stars}</Text>
+              <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray9}>
+                {ratings.community.label}
+              </Text>
+            </Row>
+            <Spacer y="m" />
+          </Col>
           {ratings.community.hasStaleRatings ? (
-            <YStack paddingBlockEnd="$3">
+            <Col>
               <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
                 {voice.ratingsCard.staleCommunityRatingHint}
               </Text>
-            </YStack>
+              <Spacer y="m" />
+            </Col>
           ) : null}
         </>
       ) : (
-        <YStack paddingBlockEnd="$3">
+        <Col>
           <Text fontSize={tokens.typography.fontSize.sm} color={tokens.colors.gray.gray7}>
             {voice.ratingsCard.noCommunityRatingsLabel}
           </Text>
-        </YStack>
+          <Spacer y="m" />
+        </Col>
       )}
       {ratings.viewer ? (
         <>
@@ -223,11 +239,12 @@ export function RatingsCard({ ratings, onViewerRatingChange, loading = false }: 
             onChange={onViewerRatingChange}
           />
           {ratings.viewer.isStale ? (
-            <YStack paddingBlockStart="$2">
+            <Col>
+              <Spacer y="s" />
               <Text fontSize={tokens.typography.fontSize.xs} color={tokens.colors.warning.warning9}>
                 {voice.ratingsCard.staleViewerRatingHint}
               </Text>
-            </YStack>
+            </Col>
           ) : null}
         </>
       ) : null}
