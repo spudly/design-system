@@ -144,15 +144,10 @@ export default [
     //   this Tamagui version accepts only in styled() configs,
     //   so its StyledContainer (styled XStack) is retained under
     //   Stephen's Option B ruling (2026-11-24).
-    // - MasonryGrid: PENDING STEPHEN'S DECISION — its runtime
-    //   numeric gap fits no Row/Col prop combination; the file
-    //   is untouched until he decides its shape, and this
-    //   exemption comes out with that conversion.
     files: [
       "src/widgets/layout/Row.tsx",
       "src/widgets/layout/Col.tsx",
       "src/widgets/form/SearchField.tsx",
-      "src/widgets/layout/MasonryGrid.tsx",
     ],
     rules: { "design-system/no-direct-stacks": "off" },
   },

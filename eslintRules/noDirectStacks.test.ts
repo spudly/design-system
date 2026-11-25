@@ -116,13 +116,12 @@ test("eslint.config.ts wires the rule at error, with the recorded allowlist off"
   // The allowlist: Row/Col themselves (the primitives render the
   // raw stacks after resolving the subset), SearchField's
   // retained StyledContainer (Option B — the focus-within ring
-  // needs styled()-only pseudo-styles) and MasonryGrid (pending
-  // Stephen's decision on its runtime numeric gap) are off.
+  // needs styled()-only pseudo-styles) are off. MasonryGrid left
+  // the allowlist in #844 (its gap became a t-shirt size).
   for (const allowlisted of [
     "src/widgets/layout/Row.tsx",
     "src/widgets/layout/Col.tsx",
     "src/widgets/form/SearchField.tsx",
-    "src/widgets/layout/MasonryGrid.tsx",
   ]) {
     const allowBlock = config.find(
       (block: any) => block.files?.includes(allowlisted) && block.rules,
